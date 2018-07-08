@@ -71,7 +71,7 @@
          "comment" : "A method/function/procedure",
          "is": ["DECLARATION"],
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["METHOD_RETURN", "METHOD_PARAMETER_IN", "METHOD_PARAMETER_OUT", "LOCAL",
+             {"edgeName": "AST", "inNodes": ["METHOD_RETURN", "METHOD_PARAMETER_IN", "LOCAL",
                                              "MODIFIER", "BLOCK", "TYPE_PARAMETER"]},
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "UNKNOWN"]}
          ]
@@ -81,16 +81,6 @@
          "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "This node represents a formal parameter going towards the callee side.",
          "is": ["HAS_EVAL_TYPE", "DECLARATION", "DATA_FLOW_OBJECT", "LOCAL_LIKE"],
-         "outEdges" : [
-             {"edgeName": "PARAMETER_LINK", "inNodes": ["METHOD_PARAMETER_OUT"]},
-             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
-         ]
-        },
-
-        {"id" : 33, "name" : "METHOD_PARAMETER_OUT",
-         "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
-         "comment" : "This node represents a formal parameter going towards the caller side.",
-         "is": ["HAS_EVAL_TYPE", "DECLARATION", "DATA_FLOW_OBJECT"],
          "outEdges" : [
              {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
          ]
@@ -237,6 +227,7 @@
         {"id" : 44, "name": "UNKNOWN",
          "keys" : ["CODE", "PARSER_TYPE_NAME", "ORDER", "ARGUMENT_INDEX", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "A language-specific node",
+         "is": ["EXPRESSION"],
          "outEdges" : [
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN"]},
              {"edgeName": "AST", "inNodes": ["LITERAL", "MEMBER",
@@ -304,9 +295,6 @@
         {"id" : 6, "name" : "NATIVE", "comment" : "The native modifier."},
         {"id" : 7, "name" : "CONSTRUCTOR", "comment" : "The constructor modifier."},
         {"id" : 8, "name" : "VIRTUAL", "comment" : "The virtual modifier."}
-    ],
+    ]
 
-    // used in extensions
-    "frameworks" : [],
-    "operatorNames" : []
 }
