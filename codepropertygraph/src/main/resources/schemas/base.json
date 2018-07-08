@@ -222,6 +222,13 @@
          ]
         },
 
+        {"id" : 14, "name" : "ARRAY_INITIALIZER",
+         "keys":[],
+         "outEdges": [],
+         "comment" : ""
+        },
+
+
         // This is the "catch-all-others" node type.
 
         {"id" : 44, "name": "UNKNOWN",
@@ -295,6 +302,10 @@
         {"id" : 6, "name" : "NATIVE", "comment" : "The native modifier."},
         {"id" : 7, "name" : "CONSTRUCTOR", "comment" : "The constructor modifier."},
         {"id" : 8, "name" : "VIRTUAL", "comment" : "The virtual modifier."}
-    ]
+    ],
+
+    // used in extensions
+    "frameworks" : [],
+    "operatorNames" : []
 
 }
