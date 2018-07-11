@@ -460,7 +460,11 @@ object DomainClassCreator {
       }
 
       val abstractContainedNodeAccessors = nodeType.containedNodes.map { _.map { containedNode =>
-          val containedNodeType = camelCase(containedNode.nodeType).capitalize + "Base"
+          val containedNodeType = if (containedNode.nodeType != "NODE") {
+            camelCase(containedNode.nodeType).capitalize + "Base"
+          } else {
+            camelCase(containedNode.nodeType).capitalize
+          }
           val completeType = containedNode.cardinality match {
             case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
             case Cardinality.One => containedNodeType
@@ -618,7 +622,11 @@ object DomainClassCreator {
 
         val forContainedNodes: List[String] = nodeType.containedNodes.map { _.map { containedNode =>
           // TODO: remove duplication of handling of containedNodes
-          val containedNodeType = camelCase(containedNode.nodeType).capitalize + "Base"
+          val containedNodeType = if (containedNode.nodeType != "NODE") {
+            camelCase(containedNode.nodeType).capitalize + "Base"
+          } else {
+            camelCase(containedNode.nodeType).capitalize
+          }
           assert(Set(Cardinality.ZeroOrOne,  Cardinality.One, Cardinality.List).contains(containedNode.cardinality),
             s"cardinality must be one of `zeroOrOne`, `one`, `list`, but was ${containedNode.cardinality}")
           val completeType = containedNode.cardinality match {
