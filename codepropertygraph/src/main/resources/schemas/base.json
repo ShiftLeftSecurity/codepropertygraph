@@ -225,7 +225,7 @@
         {"id" : 14, "name" : "ARRAY_INITIALIZER",
          "keys":[],
          "outEdges": [],
-         "comment" : ""
+         "comment" : "Initialization contruct for arrays."
         },
 
 
