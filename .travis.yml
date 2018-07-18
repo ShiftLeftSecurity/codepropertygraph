@@ -1,0 +1,46 @@
+language: scala
+jdk:
+  - oraclejdk8
+
+before_install:
+  - git fetch --tags
+
+env:
+  global:
+    - PROTOC_PKG=protoc-3.6.0-linux-x86_64.zip
+    - PROTOC_RELEASE=https://github.com/google/protobuf/releases/download/v3.6.0/$PROTOC_PKG
+    - PROTOC_TARGET=${HOME}/protoc
+    - PATH="${PROTOC_TARGET}/bin:${PATH}"
+
+install:
+  - rm -rf $HOME/protoc
+  - wget $PROTOC_RELEASE
+  - unzip $PROTOC_PKG -d $PROTOC_TARGET
+  - protoc --version
+
+stages:
+  - name: test
+  - name: release
+    if: (branch = master AND type = push) OR (tag IS present)
+
+jobs:
+  include:
+    - env: TEST="compile"
+      script: sbt compile
+    - stage: release
+      script: sbt ci-release
+
+before_cache:
+  - du -h -d 1 $HOME/.ivy2/cache
+  - du -h -d 2 $HOME/.sbt/
+  - find $HOME/.sbt -name "*.lock" -type f -delete
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
+  - rm -rf $HOME/.ivy2/local
+
+cache:
+  directories:
+    - $HOME/.sbt/1.0/dependency
+    - $HOME/.sbt/boot/scala*
+    - $HOME/.sbt/launchers
+    - $HOME/.ivy2/cache
+    - $HOME/.coursier
