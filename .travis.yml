@@ -2,6 +2,14 @@ language: scala
 jdk:
   - oraclejdk8
 
+addons:
+  apt:
+    packages:
+      - protobuf-compiler
+
+before_install:
+  - git fetch --tags
+
 stages:
   - name: test
   - name: release
@@ -28,6 +36,3 @@ before_cache:
   - find $HOME/.sbt -name "*.lock" -type f -delete
   - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
   - rm -rf $HOME/.ivy2/local
-
-before_install:
-- git fetch --tags
