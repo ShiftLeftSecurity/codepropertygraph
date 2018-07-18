@@ -13,14 +13,9 @@ env:
     - PATH="${PROTOC_TARGET}/bin:${PATH}"
 
 install:
-  - if [ ! -d ${PROTOC_TARGET}/bin/protoc ]; then wget $PROTOC_RELEASE; fi
-  - ls -la protoc-3.6.0-linux-x86_64.zip
-  - file $PROTOC_PKG
-  - if [ -f $PROTOC_PKG ]; then unzip $PROTOC_PKG -d ${PROTOC_TARGET}; fi
-  - ls -la $HOME
-  - ls -la $HOME/protoc
-  - ls -la ${PROTOC_TARGET}
-  - ${PROTOC_TARGET}/bin/protoc --version
+  - rm -rf $HOME/protoc
+  - wget $PROTOC_RELEASE
+  - unzip $PROTOC_PKG -d $PROTOC_TARGET
   - protoc --version
 
 stages:
@@ -44,7 +39,6 @@ before_cache:
 
 cache:
   directories:
-    - $HOME/protoc
     - $HOME/.sbt/1.0/dependency
     - $HOME/.sbt/boot/scala*
     - $HOME/.sbt/launchers
