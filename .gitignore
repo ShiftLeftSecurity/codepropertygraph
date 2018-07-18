@@ -4,3 +4,5 @@
 /codepropertygraph/src/main/proto/io/shiftleft/codepropertygraph/protos.proto
 target/
 /codepropertygraph/src/main/resources/cpg.json
+/protoc
+/protoc.zip
