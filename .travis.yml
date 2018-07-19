@@ -13,7 +13,7 @@ env:
     - PATH="${PROTOC_TARGET}/bin:${PATH}"
 
 install:
-  - rm -rf $HOME/.gnupg
+  - gpg --version
   - rm -rf $HOME/protoc
   - wget $PROTOC_RELEASE
   - unzip $PROTOC_PKG -d $PROTOC_TARGET
