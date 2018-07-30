@@ -1,25 +1,27 @@
 name := "codepropertygraph"
- 
+
 libraryDependencies ++= Seq(
-  "com.michaelpollmeier" %% "gremlin-scala" % "3.3.3.0",
-  "io.shiftleft" % "tinkergraph-gremlin" % "3.3.3.0",
+  "org.apache.tinkerpop" % "tinkergraph-gremlin" % "3.3.3",
+  "com.michaelpollmeier" %% "gremlin-scala" % "3.3.3.15",
   "com.google.guava" % "guava" % "21.0",
   "org.apache.commons" % "commons-lang3" % "3.5",
+  "org.apache.logging.log4j" % "log4j-api" % "2.11.0",
+  "org.apache.logging.log4j" % "log4j-core" % "2.11.0",
   "org.scalatest" %% "scalatest" % "3.0.3" % Test
 )
 
 lazy val mergeSchemaTask = taskKey[Unit]("Merge schemas")
 mergeSchemaTask := {
-    import scala.sys.process._
-    val mergeCmd = "codepropertygraph/codegen/src/main/python/mergeSchemas.py"
-    val mergeResult = Seq(mergeCmd).!
-    if (mergeResult == 0)
-      println("successfully merged schemas to generate cpg.json")
-    else
-      throw new Exception(s"problem when calling $mergeCmd. exitCode was $mergeResult")
+  import scala.sys.process._
+  val mergeCmd = "codepropertygraph/codegen/src/main/python/mergeSchemas.py"
+  val mergeResult = Seq(mergeCmd).!
+  if (mergeResult == 0)
+    println("successfully merged schemas to generate cpg.json")
+  else
+    throw new Exception(s"problem when calling $mergeCmd. exitCode was $mergeResult")
 }
 
-Compile/sourceGenerators += Def.task {
+Compile / sourceGenerators += Def.task {
   val javaDefs = { // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
     import scala.sys.process._
 
@@ -31,12 +33,12 @@ Compile/sourceGenerators += Def.task {
       throw new Exception(s"problem when calling $cmd. exitCode was $result")
     new java.io.File(sourceManaged.in(Compile).value.getAbsolutePath + "/java").getAbsoluteFile.listFiles
   }
-  val domainClassFiles = DomainClassCreator.run((Compile/sourceManaged).value)
+  val domainClassFiles = DomainClassCreator.run((Compile / sourceManaged).value)
 
   domainClassFiles ++ javaDefs
 }.taskValue
 
-(Compile/sourceGenerators) := (Compile/sourceGenerators).value.map(x => x.dependsOn(mergeSchemaTask.taskValue))
+(Compile / sourceGenerators) := (Compile / sourceGenerators).value.map(x => x.dependsOn(mergeSchemaTask.taskValue))
 
 lazy val generateProtobuf = taskKey[Seq[File]]("generate cpg.proto")
 generateProtobuf := {
@@ -54,6 +56,6 @@ generateProtobuf := {
 generateProtobuf := generateProtobuf.dependsOn(mergeSchemaTask).value
 
 // note: this is only invoked on `package`, `publish` etc. since it's not needed for `compile`
-Compile/resourceGenerators += generateProtobuf.taskValue
+Compile / resourceGenerators += generateProtobuf.taskValue
 
-(Compile/resourceGenerators) := (Compile/resourceGenerators).value.map(x => x.dependsOn(mergeSchemaTask.taskValue))
+(Compile / resourceGenerators) := (Compile / resourceGenerators).value.map(x => x.dependsOn(mergeSchemaTask.taskValue))
