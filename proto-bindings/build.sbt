@@ -20,16 +20,17 @@ copyLatestCpgProto := {
   java.nio.file.Files.copy(protoFile.toPath, targetFile.toPath)
 }
 
-/** generate csharp bindings for proto file as a nuget package
-  * 
-  * if `publish-to-repo` and `publish-key` are specified, it will also publish the package, e.g. like this:
-  * `sbt -Dpublish-to-repo=https://shiftleft.jfrog.io/shiftleft/api/nuget/nuget-release-local -Dpublish-key=michael:xxxxxxxxxx generateCsharpBindings`
+/** generate csharp bindings for proto file as a nuget package. 
+  * usage examples:
+  * `sbt generateCsharpBindings` -> just build it locally
+  * `sbt -Dpublish-to-repo=https://shiftleft.jfrog.io/shiftleft/api/nuget/nuget-release-local -Dpublish-key=michael:xxxxxxxxxx generateCsharpBindings` -> publish to the specified repo
   */
 lazy val generateCsharpBindings = taskKey[File]("generate csharp proto bindings")
 generateCsharpBindings := {
   (codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
   import sys.process._
-  val dotnetVersion = "0.1.0-" + version.value.replaceAll("\\+", "-") //dotnet is VERY restrictive with version names
+  val millis = System.currentTimeMillis
+  val dotnetVersion = s"0.0.1-${millis}-${version.value}" //dotnet is VERY restrictive with version names
   val publishToRepo = Option(System.getProperty("publish-to-repo")).map(repo => s"--publish-to-repo $repo")
   val publishKey = Option(System.getProperty("publish-key")).map(key => s"--publish-key $key")
   s"""./build-dotnet-bindings.sh --cpg-version $dotnetVersion ${publishToRepo.getOrElse("")} ${publishKey.getOrElse("")}""".!
