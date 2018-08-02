@@ -200,6 +200,7 @@
         {"id":30, "name": "RETURN",
          "keys": [ "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END", "ORDER", "ARGUMENT_INDEX", "CODE"],
          "comment" : "A return instruction.",
+         "is": [ "EXPRESSION" ],
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL"]},
              {"edgeName": "CFG", "inNodes": ["METHOD_RETURN"]}
