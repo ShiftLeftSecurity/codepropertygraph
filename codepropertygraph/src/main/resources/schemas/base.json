@@ -258,8 +258,8 @@
     // common base traits for nodes
     "nodeBaseTraits" : [
       { "name" : "DECLARATION", "comment" : "", "hasKeys" : ["NAME"]},
-      { "name" : "DATA_FLOW_OBJECT", "comment" : "anything that can appear inside a data flow", "hasKeys" : ["CODE"]},
-      { "name" : "EXPRESSION", "comment" : "expression as a specialisation of data flow objects", "hasKeys" : [], "extends" : "DATA_FLOW_OBJECT"},
+      { "name" : "DATA_FLOW_OBJECT", "comment" : "anything that can appear inside a data flow", "hasKeys" : ["CODE", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"]},
+      { "name" : "EXPRESSION", "comment" : "expression as a specialisation of data flow objects", "hasKeys" : ["ORDER"], "extends" : "DATA_FLOW_OBJECT"},
       { "name" : "LOCAL_LIKE", "comment" : "", "hasKeys" : ["NAME"]}
     ],
 
