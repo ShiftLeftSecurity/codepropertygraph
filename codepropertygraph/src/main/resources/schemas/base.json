@@ -73,7 +73,7 @@
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["METHOD_RETURN", "METHOD_PARAMETER_IN", "LOCAL",
                                              "MODIFIER", "BLOCK", "TYPE_PARAMETER"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "UNKNOWN"]}
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]}
          ]
         },
 
@@ -162,7 +162,7 @@
          "comment" : "Literal/Constant",
          "is": ["HAS_EVAL_TYPE", "DECLARATION", "DATA_FLOW_OBJECT", "EXPRESSION"],
          "outEdges" : [
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "UNKNOWN"]},
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]},
              {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
          ]
         },
@@ -174,7 +174,7 @@
          "outEdges" : [
              {"edgeName": "REF", "inNodes": ["MEMBER"]},
              {"edgeName": "CALL", "inNodes": ["METHOD_INST"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "UNKNOWN"]},
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]},
              {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF"]},
              {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
          ]
@@ -193,7 +193,7 @@
          "is": ["HAS_EVAL_TYPE", "DATA_FLOW_OBJECT", "EXPRESSION", "LOCAL_LIKE"],
          "outEdges" : [
              {"edgeName": "REF", "inNodes": ["LOCAL"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "UNKNOWN"]},
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]},
              {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
          ]
         },
@@ -245,7 +245,7 @@
          "comment" : "A language-specific node",
          "is": ["EXPRESSION"],
          "outEdges" : [
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN"]},
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF"]},
              {"edgeName": "AST", "inNodes": ["LITERAL", "MEMBER",
                                              "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
                                              "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN"]},
