@@ -175,7 +175,7 @@
              {"edgeName": "REF", "inNodes": ["MEMBER"]},
              {"edgeName": "CALL", "inNodes": ["METHOD_INST"]},
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "UNKNOWN"]},
-             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL"]},
+             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF"]},
              {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
          ]
         },
@@ -202,7 +202,7 @@
          "comment" : "A return instruction.",
          "is": [ "EXPRESSION" ],
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL"]},
+             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF"]},
              {"edgeName": "CFG", "inNodes": ["METHOD_RETURN"]}
          ]
         },
@@ -210,7 +210,7 @@
          "keys": [ "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "A structuring block in the AST.",
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "UNKNOWN"]}
+             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]}
          ]
         },
         {"id":32, "name":"METHOD_INST",
