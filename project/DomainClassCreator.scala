@@ -65,9 +65,6 @@ object DomainClassCreator {
       trait StoredNode extends Node {
         /* id of this node in the graph database */
         def id: JLong
-
-        /* returns Map of all properties plus label and id */
-        def toMap: Map[String, Any]
       }
 
       trait HasEvalType extends StoredNode {
@@ -217,26 +214,6 @@ object DomainClassCreator {
       //     }.mkString("\n")
       //   }.getOrElse("")
 
-      val toMap = {
-        val forKeys = keys.map { key: Property =>
-          s"""("${key.name}" -> ${camelCase(key.name)} )"""
-        }.mkString(",\n")
-
-        s"""
-        {
-          val m1: Map[String, Any] = Map("_label" -> "${nodeType.name}", 
-            $forKeys)
-          val m2 = m1.filterNot { case (k,v) =>
-              v == null || v == None
-            }
-          m2.map {
-              case (k, v: Option[_]) => (k,v.get)
-              case other => other
-            }
-        }
-        """
-      }
-
       val abstractFieldAccessors = keys match {
         case Nil => ""
         case keys => "\n " + keys.map{key =>
@@ -269,7 +246,6 @@ object DomainClassCreator {
 
       case class $nodeNameCamelCase(@id id: JLong $additionalFields)
           extends StoredNode $mixinTraits $propertyBasedTraits with ${nodeNameCamelCase}Base {
-        override def toMap: Map[String, Any] = $toMap
       }
       """
 
