@@ -30,6 +30,7 @@ class SchemaMerger:
             cur = json.loads(jsonContent)
             result = self._mergeLists(result, cur)
 
+        result = self._addMissingContainsEdges(result)
         self._assertNoDuplicateIds(result)
         return result
 
@@ -92,6 +93,20 @@ class SchemaMerger:
             mergedLists["outEdges"].append({"edgeName" : edgeName, "inNodes" : inNodes})
 
         return mergedLists
+
+    # for any node that has `containedNode` entries, automatically add the corresponding `outEdges`
+    def _addMissingContainsEdges(self, result):
+        for nodeType in result["nodeTypes"]:
+            if "containedNodes" in nodeType:
+                requiredInNodesForContains = [containedNode["nodeType"] for containedNode in nodeType["containedNodes"]]
+                # replace entry with `edge["edgeName"] == "CONTAINS"` if it exists, or add one if it doesn't
+                # to do that, convert outEdges to Map<EdgeName, OutEdge> and back at the end
+                inNodesByOutEdgeName = { outEdge["edgeName"] : outEdge["inNodes"] for outEdge in nodeType["outEdges"] }
+                containsInNodes = inNodesByOutEdgeName.get("CONTAINS", [])
+                containsInNodes = list(set(containsInNodes + requiredInNodesForContains))
+                inNodesByOutEdgeName.update({"CONTAINS": containsInNodes})
+                nodeType["outEdges"] = [{"edgeName": edgeName, "inNodes": inNodes} for edgeName, inNodes in inNodesByOutEdgeName.items()]
+        return result
 
     def _assertNoKeyIntersection(self, s1, s2):
         # 'name' is allowed in intersection since it's used as a key/foreign key
