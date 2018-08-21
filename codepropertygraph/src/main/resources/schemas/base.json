@@ -232,6 +232,7 @@
         {"id":333, "name":"METHOD_REF",
           "keys": [ "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END", "CODE", "ORDER", "ARGUMENT_INDEX"],
           "comment":"Reference to a method.",
+         "is": ["EXPRESSION"],
           "outEdges": [
             {"edgeName": "REF", "inNodes": ["METHOD_INST"]},
             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]}
