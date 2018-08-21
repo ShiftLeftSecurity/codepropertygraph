@@ -39,7 +39,9 @@
     // Keys for edge properties
 
     "edgeKeys" : [
-        {"id" : 7, "name" : "CONDITION", "comment" : "The condition result under which a CFG edge is followed.", "valueType" : "boolean", "optional" : true}
+      {"id" : 6, "name" : "LOCAL_NAME", "comment" : "localName of referenced CONTAINED node", "valueType" : "string", "optional" : true},
+      {"id" : 7, "name" : "CONDITION", "comment" : "The condition result under which a CFG edge is followed.", "valueType" : "boolean", "optional" : true},
+      {"id" : 8, "name" : "INDEX", "comment" : "index of referenced CONTAINED node (0 based) - used together with cardinality=list", "valueType" : "int", "optional" : true}
     ],
 
     // Types of nodes
@@ -271,8 +273,9 @@
         {"id" : 19, "name" : "CFG", "comment" : "Control flow", "keys" : [] },
 
         // Call graph edges
-
         {"id" : 6, "name" : "CALL", "comment" : "Referencing to e.g. a LOCAL", "keys" : [] },
+
+        {"id" : 9, "name" : "CONTAINS", "keys" : ["LOCAL_NAME", "INDEX"], "comment" : "Shortcut to contained node"},
 
         // Edges to represent type relations
 
