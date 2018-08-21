@@ -353,7 +353,7 @@ object DomainClassCreator {
           nodeType.containedNodes.map(_ => List("containsOut")).getOrElse(Nil)
           // if there are any `contained` nodes, we also need to store the `contains` edges
 
-        fullNames.map { name =>
+        fullNames.distinct.map { name =>
           s"""
           private var _$name: JSet[Edge] = null
           private def $name: JSet[Edge] = {
@@ -699,8 +699,11 @@ object DomainClassCreator {
   }
 
   def calculateNodeToInEdges(nodeTypes: List[NodeType]): mutable.MultiMap[String, String] = {
+    val nodeBaseTraitNames: List[String] =
+      (Resources.cpgJson \ "nodeBaseTraits").as[List[NodeBaseTrait]].map(_.name) :+ "NODE"
+
     val nodeToInEdges = new mutable.HashMap[String, mutable.Set[String]] with mutable.MultiMap[String, String]
-    val nodeTypeNamesSet = nodeTypes.map(_.name).toSet
+    val nodeTypeNamesSet = nodeTypes.map(_.name).toSet ++ nodeBaseTraitNames
 
     for (nodeType <- nodeTypes;
          outEdge <- nodeType.outEdges;
