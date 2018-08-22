@@ -398,19 +398,18 @@ object DomainClassCreator {
             case Cardinality.List => s"List[$containedNodeType]"
           }
           val traversalEnding = containedNode.cardinality match {
-            case Cardinality.ZeroOrOne => s".headOption.asInstanceOf[$completeType]"
-            case Cardinality.One => s".head.asInstanceOf[$completeType]"
-            case Cardinality.List => s".toList.asInstanceOf[$completeType]"
+            case Cardinality.ZeroOrOne => s".headOption"
+            case Cardinality.One => s".head"
+            case Cardinality.List => s".toList.sortBy(_.valueOption[Integer](generated.EdgeKeys.INDEX))"
           }
 
-          // TODO: remove cast
           // TODO: contains is actually optional -> `localName.map(_ == annotationParameters.getOrElse(false)))`
           s"""
            /** link to 'contained' node of type $containedNodeType */
            lazy val ${containedNode.localName}: $completeType =
               containsOut.asScala.toIterable
                 .filter(_.asInstanceOf[generated.edges.Contains].localName == ${containedNode.localName})
-                .map(_.inVertex)
+                .map(_.inVertex.asInstanceOf[$containedNodeType])
                 $traversalEnding
           """
           }.mkString("\n")
