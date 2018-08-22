@@ -1,8 +1,8 @@
 {
   "nodeTypes" : [
-    { "name" : "IDENTIFIER",
+    { "name" : "LOCAL",
       "outEdges" : [
-        {"edgeName": "REF", "inNodes": ["CLOSURE_BINDING"]}
+        {"edgeName": "CAPTURED_BY", "inNodes": ["CLOSURE_BINDING"]}
       ]
     },
     { "name" : "METHOD_REF",
@@ -20,6 +20,7 @@
   ],
 
   "edgeTypes" : [
-    {"id" : 40, "name": "CAPTURE", "comment" : "Represents the capturing of a variable into a closure.", "keys": []}
+    {"id" : 40, "name": "CAPTURE", "comment" : "Represents the capturing of a variable into a closure.", "keys": []},
+    {"id" : 41, "name": "CAPTURED_BY", "comment" : "Connection between a capture LOCAL and the corresponding CLOSURE_BINDING", "keys": []}
   ]
 }
