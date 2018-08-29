@@ -32,11 +32,6 @@ enum LANGUAGES {
   $languages
 }
 
-enum FRAMEWORKS {
-  UNKNOWN_FRAMEWORK = 0;
-  $frameworks
-}
-
 message PropertyValue {
   oneof value {
     string string_value = 1;

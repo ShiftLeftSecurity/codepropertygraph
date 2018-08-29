@@ -28,7 +28,6 @@ def generateJava(cpgDescr):
     writeJavaFile('DispatchTypes', cpgDescr['dispatchTypes'], template, 'String')
     writeJavaFile('Languages', cpgDescr['languages'], template, 'String')
     writeJavaFile('ModifierTypes', cpgDescr['modifierTypes'], template, 'String')
-    writeJavaFile('Frameworks', cpgDescr['frameworks'], template, 'String')
     writeJavaFile('Operators', cpgDescr['operatorNames'], template, 'String', 'operator', 'name')
     writeNodeKeyTypesFile('NodeKeyTypes', cpgDescr['nodeKeys'], template)
 
