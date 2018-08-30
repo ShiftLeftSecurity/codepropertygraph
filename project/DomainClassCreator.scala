@@ -507,7 +507,7 @@ object DomainClassCreator {
             case Some(fieldAccess) => 
               val value = fieldAccess(this)
               if (value == null) VertexProperty.empty[A]
-              else new TinkerVertexProperty(this, key, value.asInstanceOf[A])
+              else new TinkerVertexProperty(-1, this, key, value.asInstanceOf[A])
           }
 
         override protected def updateSpecificProperty[A](key: String, value: A): VertexProperty[A] = {
