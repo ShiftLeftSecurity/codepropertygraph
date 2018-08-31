@@ -174,7 +174,7 @@ object DomainClassCreator {
 
       import io.shiftleft.codepropertygraph.generated
       import java.lang.{Boolean => JBoolean, Long => JLong}
-      import java.util.{Iterator => JIterator, LinkedList => JLinkedList, List => JList, Map => JMap, Set => JSet, HashSet => JHashSet}
+      import java.util.{Iterator => JIterator, LinkedList => JLinkedList, List => JList, Map => JMap, Set => JSet}
       import gremlin.scala._
       import org.apache.tinkerpop.gremlin.structure.Direction
       import org.apache.tinkerpop.gremlin.structure.Edge
@@ -355,9 +355,9 @@ object DomainClassCreator {
 
         fullNames.distinct.map { name =>
           s"""
-          private var _$name: JSet[Edge] = null
-          private def $name: JSet[Edge] = {
-            if (_$name == null) _$name = new JHashSet
+          private var _$name: JList[Edge] = null
+          private def $name: JList[Edge] = {
+            if (_$name == null) _$name = new JLinkedList
             _$name
           }"""
         }
