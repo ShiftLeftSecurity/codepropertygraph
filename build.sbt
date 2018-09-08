@@ -6,6 +6,7 @@ inThisBuild(List(
   packageDoc/publishArtifact := true,
   packageSrc/publishArtifact := true,
   crossPaths := false, // do not append scala version to the generated artifacts
+  publishTo := sonatypePublishTo.value,
   homepage := Some(url("https://github.com/ShiftLeftSecurity/codepropertygraph/")),
   licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
   developers := List(/* sonatype requires this to be non-empty */
