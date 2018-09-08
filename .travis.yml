@@ -11,6 +11,8 @@ env:
   - PROTOC_TARGET=${HOME}/protoc
   - PATH="${PROTOC_TARGET}/bin:${PATH}"
 install:
+- rm -rf $HOME/.gnupg
+- gpg --list-keys
 - gpg --import private-key.pem
 - gpg --list-keys
 - rm -rf $HOME/protoc
