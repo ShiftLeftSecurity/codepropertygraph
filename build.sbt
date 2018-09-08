@@ -1,7 +1,6 @@
 inThisBuild(List(
   organization := "io.shiftleft",
   scalaVersion := "2.12.6",
-  coursierTtl := None, //always check for updated snapshots
   resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
   packageDoc/publishArtifact := true,
   packageSrc/publishArtifact := true,
