@@ -35,5 +35,3 @@ publish/skip := true
 
 lazy val codepropertygraph = project.in(file("codepropertygraph"))
 lazy val protoBindings = project.in(file("proto-bindings"))
-
-
