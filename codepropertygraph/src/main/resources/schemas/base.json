@@ -33,7 +33,8 @@
         // Properties to characterize call-sites
 
         {"id": 25, "name": "DISPATCH_TYPE", "comment": "The dispatch type of a call, which is either static or dynamic. See dispatchTypes.", "valueType" : "string"},
-        {"id": 15, "name" : "EVALUATION_STRATEGY", "comment" : "Evaluation strategy for function parameters and return values. One of the values in \"evaluationStrategies\".", "valueType" : "string"}
+        {"id": 15, "name" : "EVALUATION_STRATEGY", "comment" : "Evaluation strategy for function parameters and return values. One of the values in \"evaluationStrategies\".", "valueType" : "string"},
+        {"id": 50, "name" : "CLOSURE_BINDING_ID", "comment" : "Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with the corresponding CLOSURE_BINDING nodes.", "valueType" : "string", "optional": true}
     ],
 
     // Keys for edge properties
@@ -182,7 +183,7 @@
          ]
         },
         {"id":23, "name" : "LOCAL",
-         "keys": ["CODE", "NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys": ["CODE", "NAME", "CLOSURE_BINDING_ID", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment": "A local variable",
          "is": ["HAS_EVAL_TYPE", "DECLARATION", "LOCAL_LIKE"],
          "outEdges" : [
