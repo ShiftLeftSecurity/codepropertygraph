@@ -63,8 +63,9 @@ object DomainClassCreator {
       trait Node extends gremlin.scala.dsl.DomainRoot
 
       trait StoredNode extends Node {
-        /* id of this node in the graph database */
-        def id: JLong
+        /* underlying vertex in the graph database. 
+         * since this is a StoredNode, this is always set */
+        def underlying: Vertex
       }
 
       trait HasEvalType extends StoredNode {
@@ -239,13 +240,13 @@ object DomainClassCreator {
       val classImpl = s"""
       trait ${nodeNameCamelCase}Base extends Node {
         def asStored: StoredNode = this.asInstanceOf[StoredNode]
-
-        //#abstractFieldAccessors
-        //#abstractContainedNodeAccessors
       }
 
-      case class $nodeNameCamelCase(@id id: JLong $additionalFields)
+      case class $nodeNameCamelCase(@underlying _underlying: Option[Vertex] $additionalFields)
           extends StoredNode $mixinTraits $propertyBasedTraits with ${nodeNameCamelCase}Base {
+        /* underlying vertex in the graph database. 
+         * since this is a StoredNode, this is always set */
+        override val underlying = _underlying.get
       }
       """
 
