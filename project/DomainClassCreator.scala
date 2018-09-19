@@ -677,6 +677,7 @@ object DomainClassCreator {
         override val label = "${nodeType.name}"
         override val properties: Map[String, Any] = $propertiesImpl
         override def containedNodesByLocalName: Map[String, List[Node]] = $containedNodesByLocalName
+        override def hashCode = System.identityHashCode(this)
       }
       """
     }
