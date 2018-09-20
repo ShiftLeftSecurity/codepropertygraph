@@ -1,0 +1,44 @@
+{
+    // enhancement nodes/edges that will automatically be derived from the cpg
+    // note: these should *NOT* be written by the language frontend.
+
+    "nodeKeys" : [
+        {"id" : 8, "name": "VALUE", "comment" : "Tag value", "valueType" : "string" }
+    ],
+
+    "edgeKeys" : [],
+
+    "nodeTypes" : [
+        {"id":24, "name": "TAG",
+         "keys": ["NAME", "VALUE"],
+         "comment": "A string tag.",
+         "outEdges": []
+        },
+        {
+            "id":40,
+            "name": "NAMESPACE",
+            "keys": ["NAME"],
+            "comment": "This node represents a namespace as a hole whereas the NAMESPACE_BLOCK is used for each grouping occurrence of a namespace in code. Single representing NAMESPACE node is required for easier navigation in the query language.",
+            "outEdges": []
+        },
+        {"id" : 33, "name" : "METHOD_PARAMETER_OUT",
+         "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "comment" : "This node represents a formal parameter going towards the caller side.",
+         "is": ["HAS_EVAL_TYPE", "DECLARATION", "DATA_FLOW_OBJECT"],
+         "outEdges" : [
+           {"edgeName": "CALL_ARG_OUT", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "UNKNOWN"]},
+           {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+           {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+         ]
+        }
+    ],
+
+    "edgeTypes" : [
+        {"id" : 12, "name": "PARAMETER_LINK", "comment" : "Links together corresponding METHOD_PARAMETER_IN and METHOD_PARAMETER_OUT nodes.", "keys": []},
+        {"id" : 4, "name" : "CALL_ARG", "comment" : "Function call argument", "keys" : [] },
+        {"id" : 5, "name" : "CALL_RET", "comment" : "Function call return value", "keys" : [] },
+        {"id" : 11, "name": "TAGGED_BY", "keys" : [], "comment" : "Edges from nodes to tags"},
+        {"id" : 14, "name": "CALL_ARG_OUT", "comment" : "Function call output argument. Goes from METHOD_PARAMETER_OUT to call argument node.", "keys" : []}
+    ]
+
+}
