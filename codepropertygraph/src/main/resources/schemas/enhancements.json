@@ -3,7 +3,7 @@
     // note: these should *NOT* be written by the language frontend.
 
     "nodeKeys" : [
-        {"id" : 8, "name": "VALUE", "comment" : "Tag value", "valueType" : "string" }
+        {"id" : 8, "name": "VALUE", "comment" : "Tag value", "valueType" : "string", "cardinality" : "one"}
     ],
 
     "edgeKeys" : [],
