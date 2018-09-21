@@ -41,6 +41,16 @@
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
         },
+        { "name": "TYPE",
+          "outEdges" : [
+             {"edgeName": "REF", "inNodes": ["TYPE_DECL"]}
+          ]
+        },
+        { "name": "TYPE_DECL",
+          "outEdges" : [
+             {"edgeName": "INHERITS_FROM", "inNodes": ["TYPE"]}
+          ]
+        },
         { "name": "MEMBER",
           "outEdges" : [
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
@@ -85,7 +95,8 @@
         {"id" : 11, "name": "TAGGED_BY", "keys" : [], "comment" : "Edges from nodes to tags"},
         {"id" : 14, "name": "CALL_ARG_OUT", "comment" : "Function call output argument. Goes from METHOD_PARAMETER_OUT to call argument node.", "keys" : []},
 
-        {"id" : 21, "name" : "EVAL_TYPE", "keys": [], "comment" : "Link to evaluation type.", "keys" : [] }
+        {"id" : 21, "name" : "EVAL_TYPE", "keys": [], "comment" : "Link to evaluation type.", "keys" : [] },
+        {"id" : 23, "name" : "INHERITS_FROM", "keys": [], "comment" : "Inheritance relation between types.", "keys" : [] }
     ]
 
 }

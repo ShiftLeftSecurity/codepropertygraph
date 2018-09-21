@@ -34,7 +34,12 @@
 
         {"id": 25, "name": "DISPATCH_TYPE", "comment": "The dispatch type of a call, which is either static or dynamic. See dispatchTypes.", "valueType" : "string", "cardinality" : "one"},
         {"id": 15, "name" : "EVALUATION_STRATEGY", "comment" : "Evaluation strategy for function parameters and return values. One of the values in \"evaluationStrategies\".", "valueType" : "string", "cardinality" : "one"},
-        {"id": 50, "name" : "CLOSURE_BINDING_ID", "comment" : "Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with the corresponding CLOSURE_BINDING nodes.", "valueType" : "string", "cardinality" : "zeroOrOne"}
+
+        // Properties used to link nodes in the backend
+        {"id": 50, "name" : "CLOSURE_BINDING_ID", "comment" : "Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with the corresponding CLOSURE_BINDING nodes.", "valueType" : "string", "cardinality" : "zeroOrOne"},
+        {"id": 51, "name" : "TYPE_FULL_NAME", "comment" : "The static type of an entity. E.g. expressions, local, parameters etc. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME.", "valueType" : "string", "cardinality" : "one"},
+        {"id": 52, "name" : "TYPE_DECL_FULL_NAME", "comment" : "The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME.", "valueType" : "string", "cardinality" : "one"},
+        {"id": 53, "name" : "INHERITS_FROM_TYPE_FULL_NAME", "comment" : "The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME.", "valueType" : "string", "cardinality" : "list"}
     ],
 
     // Keys for edge properties
@@ -81,13 +86,13 @@
         },
 
         {"id" : 34, "name" : "METHOD_PARAMETER_IN",
-         "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "This node represents a formal parameter going towards the callee side.",
          "is": ["DECLARATION", "DATA_FLOW_OBJECT", "LOCAL_LIKE"]
         },
 
         {"id" : 3, "name" : "METHOD_RETURN",
-         "keys": ["CODE", "EVALUATION_STRATEGY", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys": ["CODE", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "A formal method return",
          "is": ["DATA_FLOW_OBJECT"]
         },
@@ -103,19 +108,17 @@
         // Types
 
         {"id" : 45, "name" : "TYPE",
-         "keys" : ["NAME", "FULL_NAME"],
+         "keys" : ["NAME", "FULL_NAME", "TYPE_DECL_FULL_NAME"],
          "comment" : "A type which always has to reference a type declaration and may have type argument children if the refered type declaration is a template.",
          "outEdges" : [
-             {"edgeName": "REF", "inNodes": ["TYPE_DECL"]},
              {"edgeName": "AST", "inNodes": ["TYPE_ARGUMENT"]}
          ]
         },
         {"id" : 46, "name" : "TYPE_DECL",
-         "keys" : ["NAME", "FULL_NAME", "IS_EXTERNAL"],
+         "keys" : ["NAME", "FULL_NAME", "IS_EXTERNAL", "INHERITS_FROM_TYPE_FULL_NAME"],
          "comment" : "A type declaration.",
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["TYPE_DECL", "TYPE_PARAMETER", "METHOD", "MEMBER", "MODIFIER"]},
-             {"edgeName": "INHERITS_FROM", "inNodes": ["TYPE"]},
              {"edgeName": "VTABLE", "inNodes": ["METHOD"]}
          ]
         },
@@ -134,7 +137,7 @@
         },
 
         {"id" : 9, "name" : "MEMBER",
-         "keys" : [ "CODE", "NAME"],
+         "keys" : [ "CODE", "NAME", "TYPE_FULL_NAME"],
          "comment" : "Member of a class struct or union",
          "is": ["DECLARATION"]
         },
@@ -152,7 +155,7 @@
         // Nodes that describe method content
 
         {"id" : 8, "name" : "LITERAL",
-         "keys" : ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys" : ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "Literal/Constant",
          "is": ["DECLARATION", "DATA_FLOW_OBJECT", "EXPRESSION"],
          "outEdges" : [
@@ -160,7 +163,7 @@
          ]
         },
         {"id": 15, "name" : "CALL",
-         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "DISPATCH_TYPE", "SIGNATURE", "LINE_NUMBER",
+         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "DISPATCH_TYPE", "SIGNATURE", "TYPE_FULL_NAME", "LINE_NUMBER",
                   "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "A (method)-call",
          "is": ["EXPRESSION"],
@@ -172,12 +175,12 @@
          ]
         },
         {"id":23, "name" : "LOCAL",
-         "keys": ["CODE", "NAME", "CLOSURE_BINDING_ID", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys": ["CODE", "NAME", "CLOSURE_BINDING_ID", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment": "A local variable",
          "is": ["DECLARATION", "LOCAL_LIKE"]
         },
         {"id":27, "name": "IDENTIFIER",
-         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "An arbitrary identifier/reference.",
          "is": ["DATA_FLOW_OBJECT", "EXPRESSION", "LOCAL_LIKE"],
          "outEdges" : [
@@ -263,7 +266,6 @@
         // Edges to represent type relations
 
         {"id" : 22, "name" : "BINDS_TO", "keys": [], "comment" : "Type argument binding to a type parameter.", "keys" : [] },
-        {"id" : 23, "name" : "INHERITS_FROM", "keys": [], "comment" : "Inheritance relation between types.", "keys" : [] },
         {"id" : 10, "name" : "REF", "keys" : [], "comment" : "Referencing to e.g. a LOCAL" },
         {"id" : 30, "name": "VTABLE", "comment" : "Indicates that a method is part of the vtable of a certain type declaration.", "keys": []}
 
