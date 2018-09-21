@@ -83,7 +83,7 @@
         {"id" : 34, "name" : "METHOD_PARAMETER_IN",
          "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "This node represents a formal parameter going towards the callee side.",
-         "is": ["HAS_EVAL_TYPE", "DECLARATION", "DATA_FLOW_OBJECT", "LOCAL_LIKE"],
+         "is": ["DECLARATION", "DATA_FLOW_OBJECT", "LOCAL_LIKE"],
          "outEdges" : [
              {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
          ]
@@ -92,7 +92,7 @@
         {"id" : 3, "name" : "METHOD_RETURN",
          "keys": ["CODE", "EVALUATION_STRATEGY", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "A formal method return",
-         "is": ["HAS_EVAL_TYPE", "DATA_FLOW_OBJECT"],
+         "is": ["DATA_FLOW_OBJECT"],
          "outEdges" : [
              {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
          ]
@@ -142,7 +142,7 @@
         {"id" : 9, "name" : "MEMBER",
          "keys" : [ "CODE", "NAME"],
          "comment" : "Member of a class struct or union",
-         "is": ["HAS_EVAL_TYPE", "DECLARATION"],
+         "is": ["DECLARATION"],
          "outEdges": [
              {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
          ]
@@ -163,7 +163,7 @@
         {"id" : 8, "name" : "LITERAL",
          "keys" : ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "Literal/Constant",
-         "is": ["HAS_EVAL_TYPE", "DECLARATION", "DATA_FLOW_OBJECT", "EXPRESSION"],
+         "is": ["DECLARATION", "DATA_FLOW_OBJECT", "EXPRESSION"],
          "outEdges" : [
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]},
              {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
@@ -173,7 +173,7 @@
          "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "DISPATCH_TYPE", "SIGNATURE", "LINE_NUMBER",
                   "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "A (method)-call",
-         "is": ["HAS_EVAL_TYPE", "EXPRESSION"],
+         "is": ["EXPRESSION"],
          "outEdges" : [
              {"edgeName": "REF", "inNodes": ["MEMBER"]},
              {"edgeName": "CALL", "inNodes": ["METHOD_INST"]},
@@ -185,7 +185,7 @@
         {"id":23, "name" : "LOCAL",
          "keys": ["CODE", "NAME", "CLOSURE_BINDING_ID", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment": "A local variable",
-         "is": ["HAS_EVAL_TYPE", "DECLARATION", "LOCAL_LIKE"],
+         "is": ["DECLARATION", "LOCAL_LIKE"],
          "outEdges" : [
              {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
          ]
@@ -193,7 +193,7 @@
         {"id":27, "name": "IDENTIFIER",
          "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "An arbitrary identifier/reference.",
-         "is": ["HAS_EVAL_TYPE", "DATA_FLOW_OBJECT", "EXPRESSION", "LOCAL_LIKE"],
+         "is": ["DATA_FLOW_OBJECT", "EXPRESSION", "LOCAL_LIKE"],
          "outEdges" : [
              {"edgeName": "REF", "inNodes": ["LOCAL"]},
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]},
@@ -219,7 +219,6 @@
         {"id":32, "name":"METHOD_INST",
          "keys":["NAME", "FULL_NAME", "SIGNATURE"],
          "comment":"A method instance which always has to reference a method and may have type argument children if the refered method is a template.",
-         "is": ["HAS_EVAL_TYPE"],
          "outEdges": [
              {"edgeName": "REF", "inNodes": ["METHOD"]},
              {"edgeName": "AST", "inNodes": ["TYPE_ARGUMENT"]}
