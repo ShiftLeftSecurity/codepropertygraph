@@ -203,12 +203,6 @@ object DomainClassCreator {
         def toMap: Map[String, Any]
       }
 
-      trait HasEvalType extends StoredNode {
-        def evalType: Type = {
-          this.vertices(Direction.OUT, generated.EdgeTypes.EVAL_TYPE).next.asInstanceOf[Type]
-        }
-      }
-
       """
 
       val nodeBaseTraits =
