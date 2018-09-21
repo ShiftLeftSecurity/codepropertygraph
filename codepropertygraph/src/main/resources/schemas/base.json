@@ -83,19 +83,13 @@
         {"id" : 34, "name" : "METHOD_PARAMETER_IN",
          "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "This node represents a formal parameter going towards the callee side.",
-         "is": ["DECLARATION", "DATA_FLOW_OBJECT", "LOCAL_LIKE"],
-         "outEdges" : [
-             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
-         ]
+         "is": ["DECLARATION", "DATA_FLOW_OBJECT", "LOCAL_LIKE"]
         },
 
         {"id" : 3, "name" : "METHOD_RETURN",
          "keys": ["CODE", "EVALUATION_STRATEGY", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "A formal method return",
-         "is": ["DATA_FLOW_OBJECT"],
-         "outEdges" : [
-             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
-         ]
+         "is": ["DATA_FLOW_OBJECT"]
         },
 
         // Modifier
@@ -142,10 +136,7 @@
         {"id" : 9, "name" : "MEMBER",
          "keys" : [ "CODE", "NAME"],
          "comment" : "Member of a class struct or union",
-         "is": ["DECLARATION"],
-         "outEdges": [
-             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
-         ]
+         "is": ["DECLARATION"]
         },
 
         {
@@ -165,8 +156,7 @@
          "comment" : "Literal/Constant",
          "is": ["DECLARATION", "DATA_FLOW_OBJECT", "EXPRESSION"],
          "outEdges" : [
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]},
-             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]}
          ]
         },
         {"id": 15, "name" : "CALL",
@@ -178,17 +168,13 @@
              {"edgeName": "REF", "inNodes": ["MEMBER"]},
              {"edgeName": "CALL", "inNodes": ["METHOD_INST"]},
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]},
-             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF"]},
-             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF"]}
          ]
         },
         {"id":23, "name" : "LOCAL",
          "keys": ["CODE", "NAME", "CLOSURE_BINDING_ID", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment": "A local variable",
-         "is": ["DECLARATION", "LOCAL_LIKE"],
-         "outEdges" : [
-             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
-         ]
+         "is": ["DECLARATION", "LOCAL_LIKE"]
         },
         {"id":27, "name": "IDENTIFIER",
          "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
@@ -196,8 +182,7 @@
          "is": ["DATA_FLOW_OBJECT", "EXPRESSION", "LOCAL_LIKE"],
          "outEdges" : [
              {"edgeName": "REF", "inNodes": ["LOCAL"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]},
-             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]}
          ]
         },
         {"id":30, "name": "RETURN",
@@ -252,9 +237,7 @@
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF"]},
              {"edgeName": "AST", "inNodes": ["LITERAL", "MEMBER",
                                              "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
-                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN"]},
-
-             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN"]}
          ]
         }
     ],
@@ -279,7 +262,6 @@
 
         // Edges to represent type relations
 
-        {"id" : 21, "name" : "EVAL_TYPE", "keys": [], "comment" : "Link to evaluation type.", "keys" : [] },
         {"id" : 22, "name" : "BINDS_TO", "keys": [], "comment" : "Type argument binding to a type parameter.", "keys" : [] },
         {"id" : 23, "name" : "INHERITS_FROM", "keys": [], "comment" : "Inheritance relation between types.", "keys" : [] },
         {"id" : 10, "name" : "REF", "keys" : [], "comment" : "Referencing to e.g. a LOCAL" },

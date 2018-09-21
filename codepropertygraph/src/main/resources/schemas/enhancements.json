@@ -21,6 +21,11 @@
             "comment": "This node represents a namespace as a hole whereas the NAMESPACE_BLOCK is used for each grouping occurrence of a namespace in code. Single representing NAMESPACE node is required for easier navigation in the query language.",
             "outEdges": []
         },
+        { "name": "METHOD_PARAMETER_IN",
+          "outEdges" : [
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+          ]
+        },
         {"id" : 33, "name" : "METHOD_PARAMETER_OUT",
          "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "This node represents a formal parameter going towards the caller side.",
@@ -30,6 +35,46 @@
            {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
          ]
+        },
+        { "name": "METHOD_RETURN",
+          "outEdges" : [
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+          ]
+        },
+        { "name": "MEMBER",
+          "outEdges" : [
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+          ]
+        },
+        { "name": "LITERAL",
+          "outEdges" : [
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+          ]
+        },
+        { "name": "CALL",
+          "outEdges" : [
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+          ]
+        },
+        { "name": "LOCAL",
+          "outEdges" : [
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+          ]
+        },
+        { "name": "IDENTIFIER",
+          "outEdges" : [
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+          ]
+        },
+        { "name": "LOCAL",
+          "outEdges" : [
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+          ]
+        },
+        { "name": "UNKNOWN",
+          "outEdges" : [
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+          ]
         }
     ],
 
@@ -38,7 +83,9 @@
         {"id" : 4, "name" : "CALL_ARG", "comment" : "Function call argument", "keys" : [] },
         {"id" : 5, "name" : "CALL_RET", "comment" : "Function call return value", "keys" : [] },
         {"id" : 11, "name": "TAGGED_BY", "keys" : [], "comment" : "Edges from nodes to tags"},
-        {"id" : 14, "name": "CALL_ARG_OUT", "comment" : "Function call output argument. Goes from METHOD_PARAMETER_OUT to call argument node.", "keys" : []}
+        {"id" : 14, "name": "CALL_ARG_OUT", "comment" : "Function call output argument. Goes from METHOD_PARAMETER_OUT to call argument node.", "keys" : []},
+
+        {"id" : 21, "name" : "EVAL_TYPE", "keys": [], "comment" : "Link to evaluation type.", "keys" : [] }
     ]
 
 }
