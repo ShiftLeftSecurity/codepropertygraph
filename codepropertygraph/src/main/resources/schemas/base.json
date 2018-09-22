@@ -24,7 +24,7 @@
 
         // String properties for various types of nodes
 
-        {"id" : 5, "name": "NAME", "comment": "Name of represented object, e.g., method name", "valueType" : "string", "cardinality" : "list"},
+        {"id" : 5, "name": "NAME", "comment": "Name of represented object, e.g., method name", "valueType" : "string", "cardinality" : "one"},
         {"id" : 6, "name": "FULL_NAME", "comment" : "Full name of an element, e.g., the class name along, including its package.", "valueType" : "string", "cardinality" : "one"},
         {"id": 21, "name": "CODE", "comment": "The code snippet the node represents", "valueType" : "string", "cardinality" : "one"},
         {"id": 22, "name": "SIGNATURE", "comment": "Method signature", "valueType" : "string", "cardinality" : "one"},
