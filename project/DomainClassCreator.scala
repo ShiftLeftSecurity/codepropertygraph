@@ -256,20 +256,20 @@ object DomainClassCreator {
       val keyConstants = keys.map(key => s"""val ${camelCase(key.name).capitalize} = "${key.name}" """).mkString("\n")
       val keyToValueMap = keys.map { key: Property =>
         getHigherType(key) match {
-          case HigherValueType.NONE | HigherValueType.LIST =>
+          case HigherValueType.None | HigherValueType.List =>
             s""" "${key.name}" -> { instance: $nodeNameCamelCase => instance.${camelCase(key.name)}}"""
-          case HigherValueType.OPTION =>
+          case HigherValueType.Option =>
             s""" "${key.name}" -> { instance: $nodeNameCamelCase => instance.${camelCase(key.name)}.orNull}"""
         }
       }.mkString(",\n")
 
       val additionalConstructorParams = keys.map { key =>
         getHigherType(key) match {
-          case HigherValueType.NONE =>
+          case HigherValueType.None =>
             s"""${camelCase(key.name)} = properties.get("${key.name}").asInstanceOf[${getBaseType(key)}]"""
-          case HigherValueType.OPTION =>
+          case HigherValueType.Option =>
             s"""${camelCase(key.name)} = Option(properties.get("${key.name}").asInstanceOf[${getBaseType(key)}])"""
-          case HigherValueType.LIST =>
+          case HigherValueType.List =>
             s"""${camelCase(key.name)} = properties.get("${key.name}").asInstanceOf[${getCompleteType(key)}]"""
         }
       } match {
@@ -332,11 +332,11 @@ object DomainClassCreator {
           case keys =>
             val casesForKeys: List[String] = keys.map { property =>
               getHigherType(property) match {
-                case HigherValueType.NONE =>
+                case HigherValueType.None =>
                   s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getBaseType(property)}] """
-                case HigherValueType.OPTION =>
+                case HigherValueType.Option =>
                   s""" if (key == "${property.name}") this.${camelCase(property.name)} = Option(value).asInstanceOf[${getCompleteType(property)}] """
-                case HigherValueType.LIST =>
+                case HigherValueType.List =>
                   s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getCompleteType(property)}] """
               }
             }
@@ -750,7 +750,7 @@ case class NodeBaseTrait(name: String, hasKeys: List[String], `extends`: Option[
 
 object HigherValueType extends Enumeration {
   type HigherValueType = Value
-  val NONE, OPTION, LIST = Value
+  val None, Option, List = Value
 }
 
 object Utils {
@@ -769,9 +769,9 @@ object Utils {
 
   def getHigherType(property: Property): HigherValueType.Value = 
     Cardinality.fromName(property.cardinality) match {
-      case Cardinality.One => HigherValueType.NONE
-      case Cardinality.ZeroOrOne => HigherValueType.OPTION
-      case Cardinality.List => HigherValueType.LIST
+      case Cardinality.One => HigherValueType.None
+      case Cardinality.ZeroOrOne => HigherValueType.Option
+      case Cardinality.List => HigherValueType.List
     }
 
   def getBaseType(property: Property): String = {
@@ -785,8 +785,8 @@ object Utils {
 
   def getCompleteType(property: Property): String =
     getHigherType(property) match {
-      case HigherValueType.NONE => getBaseType(property)
-      case HigherValueType.OPTION => s"Option[${getBaseType(property)}]"
-      case HigherValueType.LIST => s"java.util.List[${getBaseType(property)}]"
+      case HigherValueType.None => getBaseType(property)
+      case HigherValueType.Option => s"Option[${getBaseType(property)}]"
+      case HigherValueType.List => s"java.util.List[${getBaseType(property)}]"
     }
 }
