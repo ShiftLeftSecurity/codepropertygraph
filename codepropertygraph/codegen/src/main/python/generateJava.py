@@ -47,17 +47,21 @@ def writeJavaFile(className, entryList, template, constantType, identifierField=
 
 def entryListToJavaStrings(entryList, lineTemplate, constantType, identifierField, valueField):
     if constantType == 'Key':
-        lines = [lineTemplate % (x['comment'] if 'comment' in x else '', toJavaType(x['valueType']), x[identifierField], x[valueField]) for x in entryList]
+        lines = [lineTemplate % (x['comment'] if 'comment' in x else '', toJavaType(x['valueType'], x['cardinality']), x[identifierField], x[valueField]) for x in entryList]
     elif constantType == 'String':
         lines = [lineTemplate % (x['comment'] if 'comment' in x else '', x[identifierField], x[valueField]) for x in entryList]
     return "\n".join(lines)
 
-def toJavaType(cpgType):
-    return {
+def toJavaType(cpgType, cardinality):
+    baseType = {
         'string': 'String',
         'int': 'Integer',
         'boolean' : 'Boolean'
     }.get(cpgType, 'UNKNOWN')
+    if cardinality.lower() == 'list':
+        return 'java.util.List<%s>' % baseType
+    else:
+        return baseType
 
 def writeNodeKeyTypesFile(className, nodeKeys, template):
     strings = ''
@@ -72,7 +76,7 @@ def writeNodeKeys(className, types, nodeKeys, template):
     nodeKeysByName = {}
     for key in cpgDescr['nodeKeys']:
         nodeKeysByName[key['name']] = "/** %s */\npublic static final Key<%s> %s = new Key<>(\"%s\");\n\n" \
-                                      % (key['comment'], toJavaType(key['valueType']), key['name'], key['name'])
+                                      % (key['comment'], toJavaType(key['valueType'], key['cardinality']), key['name'], key['name'])
 
     contents = ''.join(sorted(nodeKeysByName.values()))
     for tpe in types:
