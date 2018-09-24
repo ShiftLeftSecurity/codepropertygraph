@@ -392,7 +392,7 @@ object DomainClassCreator {
           val completeType = cardinality match {
             case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
             case Cardinality.One => containedNodeType
-            case Cardinality.List => s"JList[$containedNodeType]"
+            case Cardinality.List => s"List[$containedNodeType]"
           }
           val traversalEnding = cardinality match {
             case Cardinality.ZeroOrOne => s".headOption"
@@ -464,7 +464,7 @@ object DomainClassCreator {
           val completeType = Cardinality.fromName(containedNode.cardinality) match {
             case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
             case Cardinality.One => containedNodeType
-            case Cardinality.List => s"JList[$containedNodeType]"
+            case Cardinality.List => s"List[$containedNodeType]"
           }
           s"""def ${containedNode.localName}: $completeType"""
           }.mkString("\n")
