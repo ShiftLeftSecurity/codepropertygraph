@@ -32,13 +32,15 @@ object DomainClassCreator {
   }
 
   def writeEdgesFile(outputDir: JFile): JFile = {
-    val propertyByName: Map[String, Property] = 
+    val propertyByName: Map[String, Property] =
       (Resources.cpgJson \ "edgeKeys")
         .as[List[Property]]
-        .map{ prop => (prop.name -> prop)}
+        .map { prop =>
+          (prop.name -> prop)
+        }
         .toMap
 
-    def entries: List[String] = 
+    def entries: List[String] =
       (Resources.cpgJson \ "edgeTypes")
         .as[List[EdgeType]]
         .map(edge => generateEdgeSource(edge, edge.keys.map(propertyByName)))
@@ -73,18 +75,20 @@ object DomainClassCreator {
 
       staticHeader + factories
     }
- 
+
     def generateEdgeSource(edgeType: EdgeType, keys: List[Property]) = {
       val edgeNameCamelCase = camelCase(edgeType.name).capitalize
       val keysQuoted = keys.map('"' + _.name + '"')
-      val keyToValueMap = keys.map{ key =>
-        s""" "${key.name}" -> { instance: $edgeNameCamelCase => instance.${camelCase(key.name)}}"""
-      }.mkString(",\n")
+      val keyToValueMap = keys
+        .map { key =>
+          s""" "${key.name}" -> { instance: $edgeNameCamelCase => instance.${camelCase(key.name)}}"""
+        }
+        .mkString(",\n")
 
-      val additionalConstructorParams = keys.map{ key =>
+      val additionalConstructorParams = keys.map { key =>
         s"""${camelCase(key.name)} = properties.get("${key.name}").asInstanceOf[${getBaseType(key)}]"""
       } match {
-        case Nil => ""
+        case Nil    => ""
         case params => ",\n" + params.mkString(",\n")
       }
 
@@ -109,18 +113,23 @@ object DomainClassCreator {
 
       val additionalFields = keys match {
         case Nil => ""
-        case keys => ", " + keys.map{property =>
-          s"var ${camelCase(property.name)}: ${getBaseType(property)}"
-        }.mkString(", ")
+        case keys =>
+          ", " + keys
+            .map { property =>
+              s"var ${camelCase(property.name)}: ${getBaseType(property)}"
+            }
+            .mkString(", ")
       }
 
       val updateSpecificPropertyBody = {
-        val caseNotFound = s"""throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to cpg.json")"""
+        val caseNotFound =
+          s"""throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to cpg.json")"""
         keys match {
           case Nil => caseNotFound
           case keys =>
             val casesForKeys: List[String] = keys.map { property =>
-              s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getBaseType(property)}] """
+              s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getBaseType(
+                property)}] """
             }
             (casesForKeys :+ caseNotFound).mkString("\n else ")
         }
@@ -156,7 +165,9 @@ object DomainClassCreator {
     val propertyByName: Map[String, Property] =
       (Resources.cpgJson \ "nodeKeys")
         .as[List[Property]]
-        .map{ prop => (prop.name -> prop)}
+        .map { prop =>
+          (prop.name -> prop)
+        }
         .toMap
 
     def entries: List[String] = {
@@ -206,33 +217,39 @@ object DomainClassCreator {
       """
 
       val nodeBaseTraits =
-        (Resources.cpgJson \ "nodeBaseTraits").as[List[NodeBaseTrait]]
-          .map { case NodeBaseTrait(name, hasKeys, extendz) =>
-            val nameCC = camelCase(name).capitalize
-            val mixins = hasKeys.map { key =>
-              s"with Has${camelCase(key).capitalize}"
-            }.mkString(" ")
-            val (baseNodeAdditionalMixins, storedNodeExtends) = extendz match {
-              case Some(parent) =>
-                val parentCC = camelCase(parent).capitalize
-                (s"with ${parentCC}Base", parentCC)
-              case None =>
-                ("", "StoredNode")
-            }
-            s"""trait ${nameCC}Base extends Node $mixins $baseNodeAdditionalMixins
+        (Resources.cpgJson \ "nodeBaseTraits")
+          .as[List[NodeBaseTrait]]
+          .map {
+            case NodeBaseTrait(name, hasKeys, extendz) =>
+              val nameCC = camelCase(name).capitalize
+              val mixins = hasKeys
+                .map { key =>
+                  s"with Has${camelCase(key).capitalize}"
+                }
+                .mkString(" ")
+              val (baseNodeAdditionalMixins, storedNodeExtends) = extendz match {
+                case Some(parent) =>
+                  val parentCC = camelCase(parent).capitalize
+                  (s"with ${parentCC}Base", parentCC)
+                case None =>
+                  ("", "StoredNode")
+              }
+              s"""trait ${nameCC}Base extends Node $mixins $baseNodeAdditionalMixins
                 trait ${nameCC} extends $storedNodeExtends with ${nameCC}Base
 """
-          }.mkString("\n")
+          }
+          .mkString("\n")
 
       val keyBasedTraits =
         (Resources.cpgJson \ "nodeKeys")
           .as[List[Property]]
-          .map{ property =>
+          .map { property =>
             val camelCaseName = camelCase(property.name)
             val camelCaseCapitalized = camelCaseName.capitalize
             val tpe = getCompleteType(property)
             s"trait Has$camelCaseCapitalized { def $camelCaseName: $tpe }"
-          }.mkString("\n")
+          }
+          .mkString("\n")
 
       val factories = {
         val vertexFactories: List[String] =
@@ -250,18 +267,22 @@ object DomainClassCreator {
       staticHeader + nodeBaseTraits + keyBasedTraits + factories
     }
 
-    def generateNodeSource(nodeType: NodeType, keys: List[Property], nodeToInEdges: mutable.MultiMap[String, String]) = {
+    def generateNodeSource(nodeType: NodeType,
+                           keys: List[Property],
+                           nodeToInEdges: mutable.MultiMap[String, String]) = {
       val nodeNameCamelCase = camelCase(nodeType.name).capitalize
 
       val keyConstants = keys.map(key => s"""val ${camelCase(key.name).capitalize} = "${key.name}" """).mkString("\n")
-      val keyToValueMap = keys.map { key: Property =>
-        getHigherType(key) match {
-          case HigherValueType.None | HigherValueType.List =>
-            s""" "${key.name}" -> { instance: $nodeNameCamelCase => instance.${camelCase(key.name)}}"""
-          case HigherValueType.Option =>
-            s""" "${key.name}" -> { instance: $nodeNameCamelCase => instance.${camelCase(key.name)}.orNull}"""
+      val keyToValueMap = keys
+        .map { key: Property =>
+          getHigherType(key) match {
+            case HigherValueType.None | HigherValueType.List =>
+              s""" "${key.name}" -> { instance: $nodeNameCamelCase => instance.${camelCase(key.name)}}"""
+            case HigherValueType.Option =>
+              s""" "${key.name}" -> { instance: $nodeNameCamelCase => instance.${camelCase(key.name)}.orNull}"""
+          }
         }
-      }.mkString(",\n")
+        .mkString(",\n")
 
       val additionalConstructorParams = keys.map { key =>
         getHigherType(key) match {
@@ -273,7 +294,7 @@ object DomainClassCreator {
             s"""${camelCase(key.name)} = properties.get("${key.name}").asInstanceOf[${getCompleteType(key)}]"""
         }
       } match {
-        case Nil => ""
+        case Nil    => ""
         case params => ",\n" + params.mkString(",\n")
       }
 
@@ -291,14 +312,18 @@ object DomainClassCreator {
         val Label = "${nodeType.name}"
         object Keys {
           $keyConstants
-          val All: JSet[String] = Set(${keys.map{key => camelCase(key.name).capitalize}.mkString(", ")}).asJava
+          val All: JSet[String] = Set(${keys
+        .map { key =>
+          camelCase(key.name).capitalize
+        }
+        .mkString(", ")}).asJava
           val KeyToValue: Map[String, $nodeNameCamelCase => Any] = Map(
             $keyToValueMap
           )
         }
         object Edges {
           val In: Set[String] = Set(${inEdges(nodeType).map('"' + _ + '"').mkString(",")})
-          val Out: Set[String] = Set(${outEdges(nodeType).map('"' + _+ '"').mkString(",")})
+          val Out: Set[String] = Set(${outEdges(nodeType).map('"' + _ + '"').mkString(",")})
         }
 
         val Factory = new SpecializedElementFactory.ForVertex[$nodeNameCamelCase, JLong] {
@@ -311,33 +336,42 @@ object DomainClassCreator {
       """
 
       val mixinTraits: String =
-        nodeType.is.getOrElse(List())
+        nodeType.is
+          .getOrElse(List())
           .map { traitName =>
             s"with ${camelCase(traitName).capitalize}"
-          }.mkString(" ")
+          }
+          .mkString(" ")
 
       val additionalFields = keys match {
         case Nil => ""
-        case keys => ", " + keys.map{key =>
-          s"var ${camelCase(key.name)}: ${getCompleteType(key)}"
-        }.mkString(", ")
+        case keys =>
+          ", " + keys
+            .map { key =>
+              s"var ${camelCase(key.name)}: ${getCompleteType(key)}"
+            }
+            .mkString(", ")
       }
 
       val propertyBasedTraits = keys.map(key => s"with Has${camelCase(key.name).capitalize}").mkString(" ")
 
       val updateSpecificPropertyBody = {
-        val caseNotFound = s"""throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to cpg.json")"""
+        val caseNotFound =
+          s"""throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to cpg.json")"""
         keys match {
           case Nil => caseNotFound
           case keys =>
             val casesForKeys: List[String] = keys.map { property =>
               getHigherType(property) match {
                 case HigherValueType.None =>
-                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getBaseType(property)}] """
+                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getBaseType(
+                    property)}] """
                 case HigherValueType.Option =>
-                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = Option(value).asInstanceOf[${getCompleteType(property)}] """
+                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = Option(value).asInstanceOf[${getCompleteType(
+                    property)}] """
                 case HigherValueType.List =>
-                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getCompleteType(property)}] """
+                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getCompleteType(
+                    property)}] """
               }
             }
             (casesForKeys :+ caseNotFound).mkString("\n else ")
@@ -346,10 +380,14 @@ object DomainClassCreator {
 
       val edgeSets = {
         val fullNames: List[String] =
-          inEdges(nodeType).map { edge => s"${camelCase(edge)}In"} ++
-          outEdges(nodeType).map { edge => s"${camelCase(edge)}Out"} ++
-          nodeType.containedNodes.map(_ => List("containsOut")).getOrElse(Nil)
-          // if there are any `contained` nodes, we also need to store the `contains` edges
+          inEdges(nodeType).map { edge =>
+            s"${camelCase(edge)}In"
+          } ++
+            outEdges(nodeType).map { edge =>
+              s"${camelCase(edge)}Out"
+            } ++
+            nodeType.containedNodes.map(_ => List("containsOut")).getOrElse(Nil)
+        // if there are any `contained` nodes, we also need to store the `contains` edges
 
         fullNames.distinct.map { name =>
           s"""
@@ -386,22 +424,24 @@ object DomainClassCreator {
       }.mkString("\n")
 
       val containedNodesAsMembers =
-        nodeType.containedNodes.map { _.map { containedNode =>
-          val containedNodeType = camelCase(containedNode.nodeType).capitalize
-          val cardinality = Cardinality.fromName(containedNode.cardinality)
-          val completeType = cardinality match {
-            case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
-            case Cardinality.One => containedNodeType
-            case Cardinality.List => s"List[$containedNodeType]"
-          }
-          val traversalEnding = cardinality match {
-            case Cardinality.ZeroOrOne => s".headOption"
-            case Cardinality.One => s".head"
-            case Cardinality.List => s".toList.sortBy(_.valueOption[Integer](generated.EdgeKeys.INDEX))"
-          }
+        nodeType.containedNodes
+          .map {
+            _.map { containedNode =>
+              val containedNodeType = camelCase(containedNode.nodeType).capitalize
+              val cardinality = Cardinality.fromName(containedNode.cardinality)
+              val completeType = cardinality match {
+                case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
+                case Cardinality.One       => containedNodeType
+                case Cardinality.List      => s"List[$containedNodeType]"
+              }
+              val traversalEnding = cardinality match {
+                case Cardinality.ZeroOrOne => s".headOption"
+                case Cardinality.One       => s".head"
+                case Cardinality.List      => s".toList.sortBy(_.valueOption[Integer](generated.EdgeKeys.INDEX))"
+              }
 
-          // TODO: contains is actually optional -> `localName.map(_ == annotationParameters.getOrElse(false)))`
-          s"""
+              // TODO: contains is actually optional -> `localName.map(_ == annotationParameters.getOrElse(false)))`
+              s"""
            /** link to 'contained' node of type $containedNodeType */
            lazy val ${containedNode.localName}: $completeType =
               containsOut.asScala.toIterable
@@ -409,8 +449,9 @@ object DomainClassCreator {
                 .map(_.inVertex.asInstanceOf[$containedNodeType])
                 $traversalEnding
           """
-          }.mkString("\n")
-        }.getOrElse("")
+            }.mkString("\n")
+          }
+          .getOrElse("")
 
       val walkInEdgeCases = {
         inEdges(nodeType).map { edge =>
@@ -425,14 +466,19 @@ object DomainClassCreator {
       }.mkString("\n")
 
       val productElementAccessors =
-        keys.zipWithIndex.map { case (key, idx) =>
-          s"case ${idx + 1} => ${camelCase(key.name)}"
-        }.mkString("\n")
+        keys.zipWithIndex
+          .map {
+            case (key, idx) =>
+              s"case ${idx + 1} => ${camelCase(key.name)}"
+          }
+          .mkString("\n")
 
       val toMap = {
-        val forKeys = keys.map { key: Property =>
-          s"""("${key.name}" -> ${camelCase(key.name)} )"""
-        }.mkString(",\n")
+        val forKeys = keys
+          .map { key: Property =>
+            s"""("${key.name}" -> ${camelCase(key.name)} )"""
+          }
+          .mkString(",\n")
 
         s"""
         Map("_label" -> "${nodeType.name}",
@@ -450,25 +496,31 @@ object DomainClassCreator {
 
       val abstractFieldAccessors = keys match {
         case Nil => ""
-        case keys => "\n " + keys.map{key =>
-          s"def ${camelCase(key.name)}: ${getCompleteType(key)}"
-        }.mkString("\n ")
+        case keys =>
+          "\n " + keys
+            .map { key =>
+              s"def ${camelCase(key.name)}: ${getCompleteType(key)}"
+            }
+            .mkString("\n ")
       }
 
-      val abstractContainedNodeAccessors = nodeType.containedNodes.map { _.map { containedNode =>
-          val containedNodeType = if (containedNode.nodeType != "NODE") {
-            camelCase(containedNode.nodeType).capitalize + "Base"
-          } else {
-            camelCase(containedNode.nodeType).capitalize
-          }
-          val completeType = Cardinality.fromName(containedNode.cardinality) match {
-            case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
-            case Cardinality.One => containedNodeType
-            case Cardinality.List => s"List[$containedNodeType]"
-          }
-          s"""def ${containedNode.localName}: $completeType"""
+      val abstractContainedNodeAccessors = nodeType.containedNodes
+        .map {
+          _.map { containedNode =>
+            val containedNodeType = if (containedNode.nodeType != "NODE") {
+              camelCase(containedNode.nodeType).capitalize + "Base"
+            } else {
+              camelCase(containedNode.nodeType).capitalize
+            }
+            val completeType = Cardinality.fromName(containedNode.cardinality) match {
+              case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
+              case Cardinality.One       => containedNodeType
+              case Cardinality.List      => s"List[$containedNodeType]"
+            }
+            s"""def ${containedNode.localName}: $completeType"""
           }.mkString("\n")
-        }.getOrElse("")
+        }
+        .getOrElse("")
 
       val classImpl = s"""
       trait ${nodeNameCamelCase}Base extends Node {
@@ -598,7 +650,9 @@ object DomainClassCreator {
     val propertyByName: Map[String, Property] =
       (Resources.cpgJson \ "nodeKeys")
         .as[List[Property]]
-        .map{ prop => (prop.name -> prop)}
+        .map { prop =>
+          (prop.name -> prop)
+        }
         .toMap
 
     def entries: List[String] = {
@@ -616,33 +670,39 @@ object DomainClassCreator {
           s"${camelCase(key.name)}: ${getCompleteType(key)}"
         }
 
-        val forContainedNodes: List[String] = nodeType.containedNodes.map { _.map { containedNode =>
-          // TODO: remove duplication of handling of containedNodes
-          val containedNodeType = if (containedNode.nodeType != "NODE") {
-            camelCase(containedNode.nodeType).capitalize + "Base"
-          } else {
-            camelCase(containedNode.nodeType).capitalize
+        val forContainedNodes: List[String] = nodeType.containedNodes
+          .map {
+            _.map { containedNode =>
+              // TODO: remove duplication of handling of containedNodes
+              val containedNodeType = if (containedNode.nodeType != "NODE") {
+                camelCase(containedNode.nodeType).capitalize + "Base"
+              } else {
+                camelCase(containedNode.nodeType).capitalize
+              }
+              val completeType = Cardinality.fromName(containedNode.cardinality) match {
+                case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
+                case Cardinality.One       => containedNodeType
+                case Cardinality.List      => s"List[$containedNodeType]"
+              }
+              s"${containedNode.localName}: $completeType"
+            }
           }
-          val completeType = Cardinality.fromName(containedNode.cardinality) match {
-            case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
-            case Cardinality.One => containedNodeType
-            case Cardinality.List => s"List[$containedNodeType]"
-          }
-          s"${containedNode.localName}: $completeType"
-        }}.getOrElse(Nil)
+          .getOrElse(Nil)
 
         (forKeys ++ forContainedNodes).mkString(", ")
       }
 
       val propertiesImpl = keys match {
         case Nil => "Map.empty"
-        case keys => 
+        case keys =>
           val containsOptionals = keys.find { property =>
             Cardinality.fromName(property.cardinality) == Cardinality.ZeroOrOne
           }.isDefined
-          val forKeys = keys.map { key: Property =>
-            s"""("${key.name}" -> ${camelCase(key.name)} )"""
-          }.mkString(",\n")
+          val forKeys = keys
+            .map { key: Property =>
+              s"""("${key.name}" -> ${camelCase(key.name)} )"""
+            }
+            .mkString(",\n")
 
           val baseCase = s"""
             Map($forKeys).filterNot { case (k,v) =>
@@ -657,15 +717,20 @@ object DomainClassCreator {
           """
       }
 
-      val containedNodesByLocalName: String = nodeType.containedNodes.map { _.map { containedNode =>
-        val localName = containedNode.localName
-        val value = Cardinality.fromName(containedNode.cardinality) match {
-          case Cardinality.One => s"List($localName)"
-          case Cardinality.ZeroOrOne => s"List($localName).flatten"
-          case Cardinality.List => localName
+      val containedNodesByLocalName: String = nodeType.containedNodes
+        .map {
+          _.map { containedNode =>
+            val localName = containedNode.localName
+            val value = Cardinality.fromName(containedNode.cardinality) match {
+              case Cardinality.One       => s"List($localName)"
+              case Cardinality.ZeroOrOne => s"List($localName).flatten"
+              case Cardinality.List      => localName
+            }
+            s"""Map("$localName" -> $value)"""
+          }
         }
-        s"""Map("$localName" -> $value)"""
-      }}.getOrElse(List("Map.empty")).mkString(" ++ ")
+        .getOrElse(List("Map.empty"))
+        .mkString(" ++ ")
 
       s"""
       case class New$nodeNameCamelCase($fields) extends NewNode with ${nodeNameCamelCase}Base {
@@ -719,8 +784,7 @@ case class NodeType(name: String,
                     is: Option[List[String]],
                     containedNodes: Option[List[ContainedNode]])
 
-case class OutEdgeEntry(edgeName: String,
-                        inNodes: List[String])
+case class OutEdgeEntry(edgeName: String, inNodes: List[String])
 
 /** nodeType links to the referenced NodeType
   * cardinality must be one of `zeroOrOne`, `one`, `list` */
@@ -762,31 +826,31 @@ object Utils {
 
     val elements: List[String] = corrected.split("_").map(_.toLowerCase).toList match {
       case head :: tail => head :: tail.map(_.capitalize)
-      case Nil => Nil
+      case Nil          => Nil
     }
     elements.mkString
   }
 
-  def getHigherType(property: Property): HigherValueType.Value = 
+  def getHigherType(property: Property): HigherValueType.Value =
     Cardinality.fromName(property.cardinality) match {
-      case Cardinality.One => HigherValueType.None
+      case Cardinality.One       => HigherValueType.None
       case Cardinality.ZeroOrOne => HigherValueType.Option
-      case Cardinality.List => HigherValueType.List
+      case Cardinality.List      => HigherValueType.List
     }
 
   def getBaseType(property: Property): String = {
     property.valueType match {
-      case "string" => "String"
-      case "int" => "Integer"
+      case "string"  => "String"
+      case "int"     => "Integer"
       case "boolean" => "JBoolean"
-      case _ => "UNKNOWN"
+      case _         => "UNKNOWN"
     }
   }
 
   def getCompleteType(property: Property): String =
     getHigherType(property) match {
-      case HigherValueType.None => getBaseType(property)
+      case HigherValueType.None   => getBaseType(property)
       case HigherValueType.Option => s"Option[${getBaseType(property)}]"
-      case HigherValueType.List => s"java.util.List[${getBaseType(property)}]"
+      case HigherValueType.List   => s"java.util.List[${getBaseType(property)}]"
     }
 }
