@@ -45,7 +45,37 @@ message PropertyValue {
     int64 long_value = 4;
     float float_value = 5;
     double double_value = 6;
+    StringList string_list = 7;
+    BoolList bool_list = 8;
+    IntList int_list = 9;
+    LongList long_list = 10;
+    FloatList float_list = 11;
+    DoubleList double_list = 12;
   }
+}
+
+message StringList {
+  repeated string values = 1;
+}
+
+message BoolList {
+  repeated bool values = 1;
+}
+
+message IntList {
+  repeated int32 values = 1;
+}
+
+message LongList {
+  repeated int64 values = 1;
+}
+
+message FloatList {
+  repeated float values = 1;
+}
+
+message DoubleList {
+  repeated double values = 1;
 }
 
 message CpgStruct {
