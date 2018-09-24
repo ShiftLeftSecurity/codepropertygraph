@@ -40,8 +40,8 @@ lazy val codepropertygraph = Projects.codepropertygraph
 lazy val protoBindings = Projects.protoBindings
 lazy val queryPrimitives = Projects.queryPrimitives
 lazy val enhancements = Projects.enhancements
+lazy val cpgloaderTinkergraph = Projects.cpgloaderTinkergraph
 
-ThisBuild / publishTo := sonatypePublishTo.value
-
+ThisBuild/publishTo := sonatypePublishTo.value
 ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature")
 ThisBuild/compile/javacOptions ++= Seq("-g") //debug symbols

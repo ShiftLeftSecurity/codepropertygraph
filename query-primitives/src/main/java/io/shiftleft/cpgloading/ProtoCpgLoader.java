@@ -1,4 +1,4 @@
-package io.shiftleft.queryprimitives.cpgloading.proto;
+package io.shiftleft.cpgloading;
 
 import io.shiftleft.proto.cpg.Cpg.CpgStruct;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge;
@@ -22,15 +22,11 @@ import java.util.stream.Collectors;
  * */
 public class ProtoCpgLoader {
 
-  final Logger logger = LogManager.getLogger(getClass());
+  protected final Logger logger = LogManager.getLogger(getClass());
+  protected final ProtoToCpg builder;
 
-  private static ProtoCpgLoader instance;
-
-  public static ProtoCpgLoader getInstance() {
-    if (instance == null) {
-      instance = new ProtoCpgLoader();
-    }
-    return instance;
+  public ProtoCpgLoader(ProtoToCpg builder) {
+    this.builder = builder;
   }
 
   /**
@@ -76,8 +72,6 @@ public class ProtoCpgLoader {
       throws IOException {
     assert(new File(inputDirectory).isDirectory());
 
-    ProtoToCpg builder = new ProtoToTinkerCpg();
-    // ProtoToCpg builder = new ProtoToJanusCpg();
     for (File file : getFilesInDirectory(inputDirectory)) {
       // TODO: use ".bin" extensions in proto output, and then only
       // load files with ".bin" extension here.
@@ -97,7 +91,6 @@ public class ProtoCpgLoader {
   }
 
   public Cpg loadFromInputStream(InputStream inputStream) throws IOException {
-    ProtoToCpg builder = new ProtoToTinkerCpg();
     try {
       CpgStruct cpgStruct = consumeInputStreamNodes(builder, inputStream);
       builder.addEdges(cpgStruct.getEdgeList());
@@ -126,8 +119,6 @@ public class ProtoCpgLoader {
    * Load code property graph from a list of CPGs in proto format.
    **/
   public Cpg loadFromListOfProtos(List<CpgStruct> cpgs) {
-    ProtoToCpg builder = new ProtoToTinkerCpg();
-
     for (CpgStruct cpgStruct : cpgs)
       builder.addNodes(cpgStruct);
     for (CpgStruct cpgStruct : cpgs)

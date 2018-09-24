@@ -1,4 +1,4 @@
-package io.shiftleft.queryprimitives.cpgloading.proto;
+package io.shiftleft.cpgloading;
 
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.createDirectories;

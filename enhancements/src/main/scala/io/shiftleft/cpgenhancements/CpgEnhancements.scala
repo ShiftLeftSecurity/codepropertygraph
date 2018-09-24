@@ -5,6 +5,9 @@ import io.shiftleft.cpgenhancements.generic.calldecorator.CallDecorator
 import io.shiftleft.cpgenhancements.generic.methoddecorator.MethodDecorator
 import io.shiftleft.cpgenhancements.generic.namspacecreator.NamespaceCreator
 
+/* singleton instance for convenience */
+object CpgEnhancements extends CpgEnhancements
+
 class CpgEnhancements {
 
   def run(graph: ScalaGraph) = {

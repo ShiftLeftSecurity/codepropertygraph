@@ -1,4 +1,4 @@
-package io.shiftleft.queryprimitives.cpgloading.proto;
+package io.shiftleft.cpgloading;
 
 import io.shiftleft.proto.cpg.Cpg;
 import org.apache.logging.log4j.Logger;

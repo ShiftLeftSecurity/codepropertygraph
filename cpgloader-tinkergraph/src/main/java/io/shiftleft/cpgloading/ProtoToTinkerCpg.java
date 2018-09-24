@@ -1,4 +1,4 @@
-package io.shiftleft.queryprimitives.cpgloading.proto;
+package io.shiftleft.cpgloading;
 
 import io.shiftleft.proto.cpg.Cpg;
 import org.apache.tinkerpop.gremlin.structure.T;
@@ -8,12 +8,7 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 public class ProtoToTinkerCpg extends ProtoToCpg {
 
   public ProtoToTinkerCpg() {
-    super(
-      TinkerGraph.open(
-        // io.shiftleft.codepropertygraph.generated.nodes.Factories$.MODULE$.AllAsJava(),
-        // io.shiftleft.codepropertygraph.generated.edges.Factories$.MODULE$.AllAsJava()
-      )
-    );
+    super(TinkerGraph.open());
   }
 
   @Override
