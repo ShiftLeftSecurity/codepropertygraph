@@ -1,4 +1,4 @@
-name := "cpgloader-tinkergraph"
+name := "cpgloader-tinkergraph-shiftleft"
 
 dependsOn(Projects.enhancements)
 

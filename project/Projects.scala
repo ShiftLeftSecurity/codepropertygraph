@@ -7,4 +7,5 @@ object Projects {
   lazy val enhancements = project.in(file("enhancements"))
   lazy val cpgloaderTinkergraph = project.in(file("cpgloader-tinkergraph"))
   lazy val cpgloaderTinkergraphShiftleft = project.in(file("cpgloader-tinkergraph-shiftleft"))
+  lazy val cpgloaderJanusgraph = project.in(file("cpgloader-janusgraph"))
 }
