@@ -667,7 +667,7 @@ object DomainClassCreator {
 
       val fields: String = {
         val forKeys = keys.map { key =>
-          s"${camelCase(key.name)}: ${getCompleteType(key)}"
+          s"val ${camelCase(key.name)}: ${getCompleteType(key)}"
         }
 
         val forContainedNodes: List[String] = nodeType.containedNodes
@@ -733,7 +733,7 @@ object DomainClassCreator {
         .mkString(" ++ ")
 
       s"""
-      case class New$nodeNameCamelCase($fields) extends NewNode with ${nodeNameCamelCase}Base {
+      class New$nodeNameCamelCase($fields) extends NewNode with ${nodeNameCamelCase}Base {
         override val label = "${nodeType.name}"
         override val properties: Map[String, Any] = $propertiesImpl
         override def containedNodesByLocalName: Map[String, List[Node]] = $containedNodesByLocalName
