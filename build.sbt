@@ -41,6 +41,7 @@ lazy val protoBindings = Projects.protoBindings
 lazy val queryPrimitives = Projects.queryPrimitives
 lazy val enhancements = Projects.enhancements
 lazy val cpgloaderTinkergraph = Projects.cpgloaderTinkergraph
+lazy val cpgloaderTinkergraphShiftleft = Projects.cpgloaderTinkergraphShiftleft
 
 ThisBuild/publishTo := sonatypePublishTo.value
 ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature")

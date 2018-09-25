@@ -6,4 +6,5 @@ object Projects {
   lazy val queryPrimitives = project.in(file("query-primitives"))
   lazy val enhancements = project.in(file("enhancements"))
   lazy val cpgloaderTinkergraph = project.in(file("cpgloader-tinkergraph"))
+  lazy val cpgloaderTinkergraphShiftleft = project.in(file("cpgloader-tinkergraph-shiftleft"))
 }
