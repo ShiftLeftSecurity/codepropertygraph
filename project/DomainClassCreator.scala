@@ -684,7 +684,7 @@ object DomainClassCreator {
                 case Cardinality.One       => containedNodeType
                 case Cardinality.List      => s"List[$containedNodeType]"
               }
-              s"${containedNode.localName}: $completeType"
+              s"val ${containedNode.localName}: $completeType"
             }
           }
           .getOrElse(Nil)
