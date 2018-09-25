@@ -12,8 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public abstract class ProtoToCpg {
-  Graph graph;
+public abstract class ProtoToCpgBase {
+  protected Graph graph;
   protected Logger logger = LogManager.getLogger(getClass());
   protected Map<Long, Object> keyToVertexId = new HashMap<>();
 
@@ -21,7 +21,7 @@ public abstract class ProtoToCpg {
   protected int elementImportCounter = 0;
   protected long lastStart = System.currentTimeMillis();
 
-  public ProtoToCpg(Graph graph) {
+  public ProtoToCpgBase(Graph graph) {
     this.graph = graph;
   }
 

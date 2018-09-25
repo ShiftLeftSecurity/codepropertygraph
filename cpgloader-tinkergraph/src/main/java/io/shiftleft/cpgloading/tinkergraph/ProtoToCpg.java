@@ -1,18 +1,15 @@
-package io.shiftleft.cpgloading;
+package io.shiftleft.cpgloading.tinkergraph;
 
+import io.shiftleft.cpgloading.ProtoToCpgBase;
 import io.shiftleft.proto.cpg.Cpg;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
-public class ProtoToTinkerShiftleftCpg extends ProtoToCpg {
+public class ProtoToCpg extends ProtoToCpgBase {
 
-  public ProtoToTinkerShiftleftCpg() {
-    super(TinkerGraph.open(
-      // TODO generate factories for case classes
-      // io.shiftleft.codepropertygraph.generated.nodes.Factories$.MODULE$.AllAsJava(),
-      // io.shiftleft.codepropertygraph.generated.edges.Factories$.MODULE$.AllAsJava()
-    ));
+  public ProtoToCpg() {
+    super(TinkerGraph.open());
   }
 
   @Override

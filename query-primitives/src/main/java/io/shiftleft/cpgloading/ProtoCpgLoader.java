@@ -23,9 +23,9 @@ import java.util.stream.Collectors;
 public class ProtoCpgLoader {
 
   protected final Logger logger = LogManager.getLogger(getClass());
-  protected final ProtoToCpg builder;
+  protected final ProtoToCpgBase builder;
 
-  public ProtoCpgLoader(ProtoToCpg builder) {
+  public ProtoCpgLoader(ProtoToCpgBase builder) {
     this.builder = builder;
   }
 
@@ -76,7 +76,7 @@ public class ProtoCpgLoader {
       // TODO: use ".bin" extensions in proto output, and then only
       // load files with ".bin" extension here.
       FileInputStream inputStream = new FileInputStream(file);
-      consumeInputStreamNodes(builder, inputStream);
+      consumeInputStreamNodes(inputStream);
       inputStream.close();
     }
 
@@ -92,7 +92,7 @@ public class ProtoCpgLoader {
 
   public Cpg loadFromInputStream(InputStream inputStream) throws IOException {
     try {
-      CpgStruct cpgStruct = consumeInputStreamNodes(builder, inputStream);
+      CpgStruct cpgStruct = consumeInputStreamNodes(inputStream);
       builder.addEdges(cpgStruct.getEdgeList());
     } finally {
       closeProtoStream(inputStream);
@@ -106,8 +106,7 @@ public class ProtoCpgLoader {
     return Arrays.stream(files).filter(file -> file.isFile()).collect(Collectors.toList());
   }
 
-  private CpgStruct consumeInputStreamNodes(ProtoToCpg builder,
-                                                    InputStream inputStream)
+  private CpgStruct consumeInputStreamNodes(InputStream inputStream)
           throws IOException {
     CpgStruct cpgStruct;
     cpgStruct = getNextProtoCpgFromStream(inputStream);
