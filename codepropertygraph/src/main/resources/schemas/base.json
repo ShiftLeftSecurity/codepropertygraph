@@ -233,7 +233,7 @@
         // This is the "catch-all-others" node type.
 
         {"id" : 44, "name": "UNKNOWN",
-         "keys" : ["CODE", "PARSER_TYPE_NAME", "ORDER", "ARGUMENT_INDEX", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys" : ["CODE", "PARSER_TYPE_NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "A language-specific node",
          "is": ["EXPRESSION"],
          "outEdges" : [
