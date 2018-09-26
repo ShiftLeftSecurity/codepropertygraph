@@ -36,7 +36,15 @@ inThisBuild(
 name := "root"
 publish / skip := true
 
-lazy val codepropertygraph = project.in(file("codepropertygraph"))
-lazy val protoBindings = project.in(file("proto-bindings"))
+lazy val codepropertygraph = Projects.codepropertygraph
+lazy val protoBindings = Projects.protoBindings
+lazy val queryPrimitives = Projects.queryPrimitives
+lazy val enhancements = Projects.enhancements
+lazy val cpgloaderTinkergraph = Projects.cpgloaderTinkergraph
+lazy val cpgloaderTinkergraphShiftleft = Projects.cpgloaderTinkergraphShiftleft
+lazy val cpgloaderJanusgraph = Projects.cpgloaderJanusgraph
+lazy val cpgloaderNeo4j = Projects.cpgloaderNeo4j
 
-ThisBuild / publishTo := sonatypePublishTo.value
+ThisBuild/publishTo := sonatypePublishTo.value
+ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature")
+ThisBuild/compile/javacOptions ++= Seq("-g") //debug symbols
