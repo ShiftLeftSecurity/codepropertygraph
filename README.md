@@ -128,20 +128,18 @@ Method body       | LITERAL, IDENTIFIER, CALL, RETURN, METHOD_INST, METHOD_REF
 Meta data         | META_DATA
 
 
-There are a total of 8 edge types:
+There are a total of 6 edge types:
 
 Name | Usage
 -----|----------------------------------------------------------------
 AST  | Syntax tree edge - structure
 CFG  | Control flow edge - execution order and conditions
 REF  | Reference edge - references to type/method/identifier declarations
-EVAL_TYPE | Type edge - attach known types to expressions
 CALL | Method invocation edge - caller/callee relationship
 VTABLE | Virtual method table edge - represents vtables
-INHERITS_FROM | Type inheritance edge - models OOP inheritance
 BINDS_TO | Binding edge - provides type parameters
 
-There are a total of 17 node keys across 3 categories:
+There are a total of 17 node keys across 4 categories:
 
 Category       | Names
 ---------------| ---------------------------------------------------------------------------------------------------------------------------------
@@ -197,16 +195,19 @@ designated type-declaration node (type TYPE_DECL), with at least a
 full-name attribute. Member variables (type MEMBER), method declarations
 (type METHOD), and type parameters (type TYPE_PARAMETER) are
 connected to the type declaration via AST edges, originating at the
-type declaration. Inheritance relations are expressed via
-INHERITS_FROM edges to zero or more other type declarations (type
-TYPE_DECL), which indicate that the source type declaration inherits
-from the destination declaration.
+type declaration. Inheritance relations are expressed by possibly multiple
+type full name properties (type INHERITS_FROM_TYPE_FULL_NAME) indicating
+derived from TYPE.
 
 Usage of a type, for example in the declaration of a variable, is indicated
-by a type node (type TYPE). The type node is connected to the
-corresponding type declaration via a reference edge (type REF), and to
-type arguments via AST edges (type AST). Finally, type-argument nodes
-are connected to type parameters via binding edges (type BINDS_TO).
+by a type node (type TYPE). A type (type TYPE) is associated to a type
+declaration (type TYPE_DECL) via the declarations fullname (type
+TYPE_DECL_FULL_NAME). Furthermore a type can specify type arguments nodes
+(type TYPE_ARGUMENT) which are connected to it via AST edges. Note that you
+can specify multiple identical TYPE nodes and the backend will deduplicate
+those. This allows frontend to not hold a global type table. Finally,
+type-argument nodes are connected to type parameters via binding edges
+(type BINDS_TO).
 
 ## Method declarations
 
