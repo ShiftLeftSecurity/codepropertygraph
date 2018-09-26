@@ -343,6 +343,34 @@ free-text strings.
 <!-- layers later in the processing pipeline for code analysis systems. -->
 
 
+# query-primitives
+TODO lorem ipsum
+* this will automatically run the cpg enhancements
+
+## Tinkergraph
+```
+sbt cpgloaderTinkergraph/console
+val cpg = io.shiftleft.cpgloading.tinkergraph.CpgLoader.loadCodePropertyGraph("cpg.bin.zip")
+cpg.literal.toList.foreach(println)
+```
+
+## Neo4j
+```
+sbt cpgloaderNeo4j/console
+val dbPath = "/tmp/cpg_data"
+val loader = new io.shiftleft.cpgloading.neo4j.CpgLoader(dbPath)
+val cpg = loader.loadCodePropertyGraph("cpg.bin.zip")
+cpg.literal.toList.foreach(println)
+```
+
+## Janusgraph
+```
+sbt cpgloaderJanusgraph/console
+val cpg = io.shiftleft.cpgloading.janusgraph.CpgLoader.loadCodePropertyGraph("cpg.bin.zip")
+cpg.literal.toList.foreach(println)
+```
+
+
 # References
 
 [1]  Rodriguez and Neubauer - The Graph Traversal Pattern:
