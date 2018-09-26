@@ -1,5 +1,6 @@
 name := "codepropertygraph-protos"
 
+lazy val codepropertygraph = project.in(file("../codepropertygraph"))
 lazy val generateProtobuf = taskKey[Seq[File]]("generate cpg.proto")
 
 enablePlugins(ProtobufPlugin)
@@ -10,7 +11,7 @@ ProtobufConfig / protobufGenerate := (ProtobufConfig / protobufGenerate).depends
 
 lazy val copyLatestCpgProto = taskKey[Unit]("copy latest cpg.proto to externalIncludePath")
 copyLatestCpgProto := {
-  val protoFile = (Projects.codepropertygraph / generateProtobuf).value.head
+  val protoFile = (codepropertygraph / generateProtobuf).value.head
   val targetDir: java.io.File = (ProtobufConfig / protobufExternalIncludePath).value
   val targetFile = targetDir / (protoFile.getName)
   targetDir.mkdirs
@@ -26,7 +27,7 @@ copyLatestCpgProto := {
   */
 lazy val generateCsharpBindings = taskKey[File]("generate csharp proto bindings")
 generateCsharpBindings := {
-  (Projects.codepropertygraph / generateProtobuf).value //ensures this is being run beforehand
+  (codepropertygraph / generateProtobuf).value //ensures this is being run beforehand
   import sys.process._
   val millis = System.currentTimeMillis
   val dotnetVersion = s"0.0.1-${millis}-${version.value}" //dotnet is VERY restrictive with version names
