@@ -27,7 +27,7 @@
           ]
         },
         {"id" : 33, "name" : "METHOD_PARAMETER_OUT",
-         "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "This node represents a formal parameter going towards the caller side.",
          "is": ["DECLARATION", "DATA_FLOW_OBJECT"],
          "outEdges" : [
