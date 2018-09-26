@@ -146,10 +146,14 @@ object DomainClassCreator {
         case keys =>
           ", " + keys
             .map { key =>
-              s"${camelCase(key.name)}: ${getCompleteType(key)}"
+              s"${key.name}: ${getCompleteType(key)}"
             }
             .mkString(", ")
       }
+
+      val camelCaseFields = keys.map { key =>
+        s"val ${camelCase(key.name)}: ${getCompleteType(key)} = ${key.name}"
+      }.mkString("\n")
 
       val propertyBasedTraits = keys.map(key => s"with Has${camelCase(key.name).capitalize}").mkString(" ")
 
@@ -240,6 +244,8 @@ object DomainClassCreator {
         /* underlying vertex in the graph database. 
          * since this is a StoredNode, this is always set */
         override val underlying = _underlying.get
+
+        $camelCaseFields
       }
       """
 
