@@ -43,6 +43,7 @@ lazy val enhancements = Projects.enhancements
 lazy val cpgloaderTinkergraph = Projects.cpgloaderTinkergraph
 lazy val cpgloaderTinkergraphShiftleft = Projects.cpgloaderTinkergraphShiftleft
 lazy val cpgloaderJanusgraph = Projects.cpgloaderJanusgraph
+lazy val cpgloaderNeo4j = Projects.cpgloaderNeo4j
 
 ThisBuild/publishTo := sonatypePublishTo.value
 ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature")
