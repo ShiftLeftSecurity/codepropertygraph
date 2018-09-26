@@ -153,29 +153,6 @@ object DomainClassCreator {
 
       val propertyBasedTraits = keys.map(key => s"with Has${camelCase(key.name).capitalize}").mkString(" ")
 
-      val updateSpecificPropertyBody = {
-        val caseNotFound =
-          s"""throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to cpg.json")"""
-        keys match {
-          case Nil => caseNotFound
-          case keys =>
-            val casesForKeys: List[String] = keys.map { property =>
-              getHigherType(property) match {
-                case HigherValueType.None =>
-                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getBaseType(
-                    property)}] """
-                case HigherValueType.Option =>
-                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = Option(value).asInstanceOf[${getCompleteType(
-                    property)}] """
-                case HigherValueType.List =>
-                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getCompleteType(
-                    property)}] """
-              }
-            }
-            (casesForKeys :+ caseNotFound).mkString("\n else ")
-        }
-      }
-
       /* TODO: reimplement later? */
       // val containedNodesAsMembers =
       //   nodeType.containedNodes.map { _.map { containedNode =>
@@ -235,33 +212,23 @@ object DomainClassCreator {
       //     }.mkString("\n")
       //   }.getOrElse("")
 
-      val abstractFieldAccessors = keys match {
-        case Nil => ""
-        case keys =>
-          "\n " + keys
-            .map { key =>
-              s"def ${camelCase(key.name)}: ${getCompleteType(key)}"
-            }
-            .mkString("\n ")
-      }
-
-      val abstractContainedNodeAccessors = nodeType.containedNodes
-        .map {
-          _.map { containedNode =>
-            val containedNodeType = if (containedNode.nodeType != "NODE") {
-              camelCase(containedNode.nodeType).capitalize + "Base"
-            } else {
-              camelCase(containedNode.nodeType).capitalize
-            }
-            val completeType = Cardinality.fromName(containedNode.cardinality) match {
-              case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
-              case Cardinality.One       => containedNodeType
-              case Cardinality.List      => s"List[$containedNodeType]"
-            }
-            s"""def ${containedNode.localName}: $completeType"""
-          }.mkString("\n")
-        }
-        .getOrElse("")
+      // val abstractContainedNodeAccessors = nodeType.containedNodes
+      //   .map {
+      //     _.map { containedNode =>
+      //       val containedNodeType = if (containedNode.nodeType != "NODE") {
+      //         camelCase(containedNode.nodeType).capitalize + "Base"
+      //       } else {
+      //         camelCase(containedNode.nodeType).capitalize
+      //       }
+      //       val completeType = Cardinality.fromName(containedNode.cardinality) match {
+      //         case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
+      //         case Cardinality.One       => containedNodeType
+      //         case Cardinality.List      => s"List[$containedNodeType]"
+      //       }
+      //       s"""def ${containedNode.localName}: $completeType"""
+      //     }.mkString("\n")
+      //   }
+      //   .getOrElse("")
 
       val classImpl = s"""
       trait ${nodeNameCamelCase}Base extends Node {
