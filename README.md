@@ -266,12 +266,13 @@ designated call node (type CALL). Arguments are either identifiers
 or method references (type METHOD_REF). Each argument has an argument
 index property (type ARGUMENT_INDEX) to indicate which parameter it is
 associated with. Calls are connected to their arguments via outgoing
-AST edges, and to method instance nodes (type METHOD_INST) via call
-edges (type CALL). Method-instance nodes represent concrete
-instantiations of method declarations, that is, method declarations
-along with type parameters. Method nodes are connected to type
-arguments (type TYPE_ARGUMENT) via AST edges, and to their
-corresponding method declaration via references edges (type REF) as shown below.
+AST edges, and are associated with their corrsponding method-instance
+(type METHOD_INST) via their METHOD_INST_FULL_NAME property.
+Method-instance nodes represent concrete instantiations of method
+declarations, that is, method declarations along with type parameters.
+Method nodes are connected to type arguments (type TYPE_ARGUMENT) via
+AST edges, and are associated with their corresponding method via their
+METHOD_FULL_NAME property.
 
 ![Call Site](images/cpg-internal-4.png)
 
