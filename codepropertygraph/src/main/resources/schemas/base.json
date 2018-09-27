@@ -39,7 +39,9 @@
         {"id": 50, "name" : "CLOSURE_BINDING_ID", "comment" : "Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with the corresponding CLOSURE_BINDING nodes.", "valueType" : "string", "cardinality" : "zeroOrOne"},
         {"id": 51, "name" : "TYPE_FULL_NAME", "comment" : "The static type of an entity. E.g. expressions, local, parameters etc. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME.", "valueType" : "string", "cardinality" : "one"},
         {"id": 52, "name" : "TYPE_DECL_FULL_NAME", "comment" : "The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME.", "valueType" : "string", "cardinality" : "one"},
-        {"id": 53, "name" : "INHERITS_FROM_TYPE_FULL_NAME", "comment" : "The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME.", "valueType" : "string", "cardinality" : "list"}
+        {"id": 53, "name" : "INHERITS_FROM_TYPE_FULL_NAME", "comment" : "The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME.", "valueType" : "string", "cardinality" : "list"},
+        {"id": 54, "name" : "METHOD_FULL_NAME", "comment" : "The FULL_NAME of a method. Used to link METHOD_INST and METHOD nodes. It is required to have exactly one METHOD node for each METHOD_FULL_NAME.", "valueType" : "string", "cardinality" : "one"},
+        {"id": 55, "name" : "METHOD_INST_FULL_NAME", "comment" : "The FULL_NAME of a method instance. Used to link CALL and METHOD_REF nodes to METHOD_INST nodes. There needs to be at least one METHOD_INST node for each METHOD_INST_FULL_NAME.", "valueType" : "string", "cardinality" : "one"}
     ],
 
     // Keys for edge properties
@@ -163,13 +165,12 @@
          ]
         },
         {"id": 15, "name" : "CALL",
-         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "DISPATCH_TYPE", "SIGNATURE", "TYPE_FULL_NAME", "LINE_NUMBER",
+         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "DISPATCH_TYPE", "SIGNATURE", "TYPE_FULL_NAME", "METHOD_INST_FULL_NAME", "LINE_NUMBER",
                   "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "A (method)-call",
          "is": ["EXPRESSION"],
          "outEdges" : [
              {"edgeName": "REF", "inNodes": ["MEMBER"]},
-             {"edgeName": "CALL", "inNodes": ["METHOD_INST"]},
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]},
              {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF"]}
          ]
@@ -205,10 +206,9 @@
          ]
         },
         {"id":32, "name":"METHOD_INST",
-         "keys":["NAME", "FULL_NAME", "SIGNATURE"],
+         "keys":["NAME", "FULL_NAME", "SIGNATURE", "METHOD_FULL_NAME"],
          "comment":"A method instance which always has to reference a method and may have type argument children if the refered method is a template.",
          "outEdges": [
-             {"edgeName": "REF", "inNodes": ["METHOD"]},
              {"edgeName": "AST", "inNodes": ["TYPE_ARGUMENT"]}
          ]
         },
@@ -220,11 +220,10 @@
         },
 
         {"id":333, "name":"METHOD_REF",
-          "keys": [ "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END", "CODE", "ORDER", "ARGUMENT_INDEX"],
-          "comment":"Reference to a method.",
+          "keys": ["CODE", "ORDER", "ARGUMENT_INDEX", "METHOD_INST_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+          "comment":"Reference to a method instance.",
          "is": ["EXPRESSION"],
           "outEdges": [
-            {"edgeName": "REF", "inNodes": ["METHOD_INST"]},
             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]}
           ]
         },
@@ -257,9 +256,6 @@
 
         {"id" : 3, "name" : "AST", "comment" : "Syntax child" , "keys" : [] },
         {"id" : 19, "name" : "CFG", "comment" : "Control flow", "keys" : [] },
-
-        // Call graph edges
-        {"id" : 6, "name" : "CALL", "comment" : "Referencing to e.g. a LOCAL", "keys" : [] },
 
         {"id" : 9, "name" : "CONTAINS", "keys" : ["LOCAL_NAME", "INDEX"], "comment" : "Shortcut to contained node"},
 
