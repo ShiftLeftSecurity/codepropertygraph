@@ -1,4 +1,4 @@
-name := "cpgloader-janusgraph"
+name := "cpgloader-neo4j"
 
 dependsOn(Projects.enhancements)
 
