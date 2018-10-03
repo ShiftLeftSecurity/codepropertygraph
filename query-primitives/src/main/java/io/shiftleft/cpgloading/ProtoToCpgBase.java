@@ -9,6 +9,7 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -78,6 +79,11 @@ public abstract class ProtoToCpgBase {
         break;
       case BOOL_VALUE:
         tinkerElement.property(propertyName, propertyValue.getBoolValue());
+        break;
+      case STRING_LIST:
+        List<String> propertyList = new LinkedList<>();
+        propertyList.addAll(propertyValue.getStringList().getValuesList());
+        tinkerElement.property(propertyName, propertyList);
         break;
       case VALUE_NOT_SET:
         break;
