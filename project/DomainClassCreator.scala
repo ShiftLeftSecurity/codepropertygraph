@@ -51,8 +51,9 @@ object DomainClassCreator {
 
       import java.lang.{Boolean => JBoolean, Long => JLong}
       import java.util.{Map => JMap, Set => JSet}
-      import org.apache.tinkerpop.gremlin.structure.Vertex
       import org.apache.tinkerpop.gremlin.structure.Property
+      import org.apache.tinkerpop.gremlin.structure.Vertex
+      import org.apache.tinkerpop.gremlin.structure.VertexProperty
       import org.apache.tinkerpop.gremlin.tinkergraph.structure.SpecializedElementFactory
       import org.apache.tinkerpop.gremlin.tinkergraph.structure.SpecializedTinkerEdge
       import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
@@ -364,14 +365,20 @@ object DomainClassCreator {
             val casesForKeys: List[String] = keys.map { property =>
               getHigherType(property) match {
                 case HigherValueType.None =>
-                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getBaseType(
-                    property)}] """
+                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getBaseType(property)}] """
                 case HigherValueType.Option =>
-                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = Option(value).asInstanceOf[${getCompleteType(
-                    property)}] """
+                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = Option(value).asInstanceOf[${getCompleteType(property)}] """
                 case HigherValueType.List =>
-                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getCompleteType(
-                    property)}] """
+                  val memberName = camelCase(property.name)
+                  s"""if (key == "${property.name}") {
+                        if (cardinality == VertexProperty.Cardinality.list) {
+                          if (this.$memberName == null) { this.$memberName = Nil }
+                          this.$memberName = this.$memberName :+ value.asInstanceOf[${getBaseType(property)}]
+                        } else {
+                          this.$memberName = List(value.asInstanceOf[${getBaseType(property)}])
+                        }
+                      }
+                  """
               }
             }
             (casesForKeys :+ caseNotFound).mkString("\n else ")
@@ -559,7 +566,7 @@ object DomainClassCreator {
               else new TinkerVertexProperty(-1, this, key, value.asInstanceOf[A])
           }
 
-        override protected def updateSpecificProperty[A](key: String, value: A): VertexProperty[A] = {
+        override protected def updateSpecificProperty[A](cardinality: VertexProperty.Cardinality, key: String, value: A): VertexProperty[A] = {
           $updateSpecificPropertyBody
           property(key)
         }
@@ -851,6 +858,6 @@ object Utils {
     getHigherType(property) match {
       case HigherValueType.None   => getBaseType(property)
       case HigherValueType.Option => s"Option[${getBaseType(property)}]"
-      case HigherValueType.List   => s"java.util.List[${getBaseType(property)}]"
+      case HigherValueType.List   => s"List[${getBaseType(property)}]"
     }
 }
