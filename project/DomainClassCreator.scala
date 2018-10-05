@@ -195,6 +195,7 @@ object DomainClassCreator {
       import org.apache.tinkerpop.gremlin.tinkergraph.structure.SpecializedTinkerVertex
       import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
       import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerVertexProperty
+      import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
       import org.apache.tinkerpop.gremlin.util.iterator.MultiIterator
       import scala.collection.JavaConverters._
       import shapeless.HNil
@@ -557,14 +558,20 @@ object DomainClassCreator {
           _id
         }
 
-        override protected def specificProperty[A](key: String): VertexProperty[A] =
+        override protected def specificProperties[A](key: String): JIterator[VertexProperty[A]] = {
           $nodeNameCamelCase.Keys.KeyToValue.get(key) match {
-            case None => VertexProperty.empty[A]
+            case None => IteratorUtils.of(VertexProperty.empty[A])
             case Some(fieldAccess) => 
-              val value = fieldAccess(this)
-              if (value == null) VertexProperty.empty[A]
-              else new TinkerVertexProperty(-1, this, key, value.asInstanceOf[A])
+              fieldAccess(this) match {
+                case null => IteratorUtils.of(VertexProperty.empty[A])
+                case values: List[_] => 
+                  values.map { value => 
+                    new TinkerVertexProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
+                  }.toIterator.asJava
+                case value => IteratorUtils.of(new TinkerVertexProperty(-1, this, key, value.asInstanceOf[A]))
+              }
           }
+        }
 
         override protected def updateSpecificProperty[A](cardinality: VertexProperty.Cardinality, key: String, value: A): VertexProperty[A] = {
           $updateSpecificPropertyBody
