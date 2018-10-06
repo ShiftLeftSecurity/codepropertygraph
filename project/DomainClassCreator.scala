@@ -186,7 +186,7 @@ object DomainClassCreator {
 
       import io.shiftleft.codepropertygraph.generated
       import java.lang.{Boolean => JBoolean, Long => JLong}
-      import java.util.{Iterator => JIterator, LinkedList => JLinkedList, List => JList, Map => JMap, Set => JSet}
+      import java.util.{Collections => JCollections, Iterator => JIterator, LinkedList => JLinkedList, List => JList, Map => JMap, Set => JSet}
       import gremlin.scala._
       import org.apache.tinkerpop.gremlin.structure.Direction
       import org.apache.tinkerpop.gremlin.structure.Edge
@@ -560,10 +560,10 @@ object DomainClassCreator {
 
         override protected def specificProperties[A](key: String): JIterator[VertexProperty[A]] = {
           $nodeNameCamelCase.Keys.KeyToValue.get(key) match {
-            case None => IteratorUtils.of(VertexProperty.empty[A])
+            case None => JCollections.emptyIterator[VertexProperty[A]]
             case Some(fieldAccess) => 
               fieldAccess(this) match {
-                case null => IteratorUtils.of(VertexProperty.empty[A])
+                case null => JCollections.emptyIterator[VertexProperty[A]]
                 case values: List[_] => 
                   values.map { value => 
                     new TinkerVertexProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
