@@ -188,15 +188,9 @@ object DomainClassCreator {
       import java.lang.{Boolean => JBoolean, Long => JLong}
       import java.util.{Collections => JCollections, Iterator => JIterator, LinkedList => JLinkedList, List => JList, Map => JMap, Set => JSet}
       import gremlin.scala._
-      import org.apache.tinkerpop.gremlin.structure.Direction
-      import org.apache.tinkerpop.gremlin.structure.Edge
-      import org.apache.tinkerpop.gremlin.structure.VertexProperty
-      import org.apache.tinkerpop.gremlin.tinkergraph.structure.SpecializedElementFactory
-      import org.apache.tinkerpop.gremlin.tinkergraph.structure.SpecializedTinkerVertex
-      import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-      import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerVertexProperty
-      import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
-      import org.apache.tinkerpop.gremlin.util.iterator.MultiIterator
+      import org.apache.tinkerpop.gremlin.structure.{Direction, Edge, Vertex, VertexProperty}
+      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{SpecializedElementFactory, SpecializedTinkerVertex, TinkerGraph, TinkerVertexProperty}
+      import org.apache.tinkerpop.gremlin.util.iterator.{IteratorUtils, MultiIterator}
       import scala.collection.JavaConverters._
       import shapeless.HNil
 
@@ -558,6 +552,19 @@ object DomainClassCreator {
           _id
         }
 
+        /* performance optimisation to save instantiating an iterator for each property lookup */
+        override protected def specificProperty[A](key: String): VertexProperty[A] = {
+          $nodeNameCamelCase.Keys.KeyToValue.get(key) match {
+            case None => VertexProperty.empty[A]
+            case Some(fieldAccess) => 
+              fieldAccess(this) match {
+                case null => VertexProperty.empty[A]
+                case values: List[_] => throw Vertex.Exceptions.multiplePropertiesExistForProvidedKey(key)
+                case value => new TinkerVertexProperty(-1, this, key, value.asInstanceOf[A])
+              }
+          }
+        }
+
         override protected def specificProperties[A](key: String): JIterator[VertexProperty[A]] = {
           $nodeNameCamelCase.Keys.KeyToValue.get(key) match {
             case None => JCollections.emptyIterator[VertexProperty[A]]
@@ -575,7 +582,7 @@ object DomainClassCreator {
 
         override protected def updateSpecificProperty[A](cardinality: VertexProperty.Cardinality, key: String, value: A): VertexProperty[A] = {
           $updateSpecificPropertyBody
-          property(key)
+          new TinkerVertexProperty(-1, this, key, value)
         }
 
         override protected def addSpecializedInEdge(edge: Edge): Unit =
