@@ -1,8 +1,8 @@
 name := "codepropertygraph"
 
 libraryDependencies ++= Seq(
-  "com.michaelpollmeier" %% "gremlin-scala" % "3.3.3.0",
-  "io.shiftleft" % "tinkergraph-gremlin" % "3.3.3.0",
+  "io.shiftleft" % "tinkergraph-gremlin" % "3.3.3.1",
+  "com.michaelpollmeier" %% "gremlin-scala" % "3.3.3.24",
   "com.google.guava" % "guava" % "21.0",
   "org.apache.commons" % "commons-lang3" % "3.5",
   "org.scalatest" %% "scalatest" % "3.0.3" % Test
