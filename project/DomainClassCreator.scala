@@ -114,9 +114,9 @@ object DomainClassCreator {
 
       val additionalConstructorParams = keys.map { key =>
         getHigherType(key) match {
-          case HigherValueType.NONE =>
+          case HigherValueType.None | HigherValueType.List =>
             s"""${camelCase(key.name)} = properties.get("${key.name}").asInstanceOf[${getBaseType(key)}]"""
-          case HigherValueType.OPTION =>
+          case HigherValueType.Option =>
             s"""${camelCase(key.name)} = Option(properties.get("${key.name}").asInstanceOf[${getBaseType(key)}])"""
         }
       } match {
@@ -138,23 +138,6 @@ object DomainClassCreator {
       }
 
       val propertyBasedTraits = keys.map(key => s"with Has${camelCase(key.name).capitalize}").mkString(" ")
-
-      val updateSpecificPropertyBody = {
-        val caseNotFound = s"""throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to cpg.json")"""
-        keys match {
-          case Nil => caseNotFound
-          case keys =>
-            val casesForKeys: List[String] = keys.map { property =>
-              getHigherType(property) match {
-                case HigherValueType.NONE =>
-                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getBaseType(property)}] """
-                case HigherValueType.OPTION =>
-                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = Option(value).asInstanceOf[${getCompleteType(property)}] """
-              }
-            }
-            (casesForKeys :+ caseNotFound).mkString("\n else ")
-        }
-      }
 
       /* TODO: reimplement later? */
       // val containedNodesAsMembers =
@@ -228,7 +211,7 @@ object DomainClassCreator {
           } else {
             camelCase(containedNode.nodeType).capitalize
           }
-          val completeType = containedNode.cardinality match {
+          val completeType = Cardinality.fromName(containedNode.cardinality) match {
             case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
             case Cardinality.One => containedNodeType
             case Cardinality.List => s"List[$containedNodeType]"
@@ -303,9 +286,7 @@ object DomainClassCreator {
           } else {
             camelCase(containedNode.nodeType).capitalize
           }
-          assert(Set(Cardinality.ZeroOrOne,  Cardinality.One, Cardinality.List).contains(containedNode.cardinality),
-            s"cardinality must be one of `zeroOrOne`, `one`, `list`, but was ${containedNode.cardinality}")
-          val completeType = containedNode.cardinality match {
+          val completeType = Cardinality.fromName(containedNode.cardinality) match {
             case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
             case Cardinality.One => containedNodeType
             case Cardinality.List => s"List[$containedNodeType]"
@@ -319,7 +300,9 @@ object DomainClassCreator {
       val propertiesImpl = keys match {
         case Nil => "Map.empty"
         case keys => 
-          val containsOptionals = keys.map(_.optional.getOrElse(false)).contains(true)
+          val containsOptionals = keys.find { property =>
+            Cardinality.fromName(property.cardinality) == Cardinality.ZeroOrOne
+          }.isDefined
           val forKeys = keys.map { key: Property =>
             s"""("${key.name}" -> ${camelCase(key.name)} )"""
           }.mkString(",\n")
@@ -338,10 +321,8 @@ object DomainClassCreator {
       }
 
       val containedNodesByLocalName: String = nodeType.containedNodes.map { _.map { containedNode =>
-        assert(Set(Cardinality.ZeroOrOne,  Cardinality.One, Cardinality.List).contains(containedNode.cardinality),
-          s"cardinality must be one of `zeroOrOne`, `one`, `list`, but was ${containedNode.cardinality}")
         val localName = containedNode.localName
-        val value = containedNode.cardinality match {
+        val value = Cardinality.fromName(containedNode.cardinality) match {
           case Cardinality.One => s"List($localName)"
           case Cardinality.ZeroOrOne => s"List($localName).flatten"
           case Cardinality.List => localName
@@ -411,26 +392,30 @@ case class OutEdgeEntry(edgeName: String,
 case class ContainedNode(nodeType: String, localName: String, cardinality: String)
 
 // TODO: use better json library which supports enums
-object Cardinality /*extends Enumeration*/ {
-//   type Cardinality = Value
-//   val ZeroOrOne, One, List = Value
-  val ZeroOrOne = "zeroOrOne"
-  val One = "one"
-  val List = "list"
+sealed abstract class Cardinality(val name: String)
+object Cardinality {
+  case object ZeroOrOne extends Cardinality("zeroOrOne")
+  case object One extends Cardinality("one")
+  case object List extends Cardinality("list")
+
+  def fromName(name: String): Cardinality =
+    Seq(ZeroOrOne, One, List)
+      .find(_.name == name)
+      .getOrElse(throw new AssertionError(s"cardinality must be one of `zeroOrOne`, `one`, `list`, but was $name"))
 }
 
 /* representation of EdgeType in cpg.json */
 case class EdgeType(name: String, keys: List[String])
 
 /* representation of nodeKey/edgeKey in cpg.json */
-case class Property(name: String, comment: String, valueType: String, optional: Option[Boolean], multipleValues: Option[String])
+case class Property(name: String, comment: String, valueType: String, cardinality: String)
 
 /* representation of nodeBaseTrait in cpg.json */
 case class NodeBaseTrait(name: String, hasKeys: List[String], `extends`: Option[String])
 
 object HigherValueType extends Enumeration {
   type HigherValueType = Value
-  val OPTION, NONE = Value
+  val None, Option, List = Value
 }
 
 object Utils {
@@ -447,10 +432,11 @@ object Utils {
     elements.mkString
   }
 
-  def getHigherType(property: Property): HigherValueType.Value = 
-    property.optional match {
-      case Some(true) => HigherValueType.OPTION
-      case _ => HigherValueType.NONE
+  def getHigherType(property: Property): HigherValueType.Value =
+    Cardinality.fromName(property.cardinality) match {
+      case Cardinality.One       => HigherValueType.None
+      case Cardinality.ZeroOrOne => HigherValueType.Option
+      case Cardinality.List      => HigherValueType.List
     }
 
   def getBaseType(property: Property): String = {
@@ -464,7 +450,8 @@ object Utils {
 
   def getCompleteType(property: Property): String =
     getHigherType(property) match {
-      case HigherValueType.OPTION => s"Option[${getBaseType(property)}]"
-      case HigherValueType.NONE => getBaseType(property)
+      case HigherValueType.None => getBaseType(property)
+      case HigherValueType.Option => s"Option[${getBaseType(property)}]"
+      case HigherValueType.List   => s"List[${getBaseType(property)}]"
     }
 }
