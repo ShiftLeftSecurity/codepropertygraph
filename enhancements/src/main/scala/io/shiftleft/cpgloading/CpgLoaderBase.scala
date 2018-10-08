@@ -1,7 +1,6 @@
 package io.shiftleft.cpgloading
 
 import io.shiftleft.cpgenhancements.CpgEnhancements
-import io.shiftleft.cpgloading.ProtoCpgLoader
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 
 /** Load cpg proto (typically cpg.bin.zip) into a graph instance */
