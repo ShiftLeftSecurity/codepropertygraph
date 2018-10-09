@@ -22,6 +22,7 @@ class MethodDecorator(graph: ScalaGraph) extends CpgEnhancement(graph) {
             parameterIn.value2(NodeKeys.ORDER),
             parameterIn.value2(NodeKeys.NAME),
             parameterIn.value2(NodeKeys.EVALUATION_STRATEGY),
+            parameterIn.value2(NodeKeys.TYPE_FULL_NAME),
             parameterIn.valueOption(NodeKeys.LINE_NUMBER),
             parameterIn.valueOption(NodeKeys.LINE_NUMBER_END),
             parameterIn.valueOption(NodeKeys.COLUMN_NUMBER),
