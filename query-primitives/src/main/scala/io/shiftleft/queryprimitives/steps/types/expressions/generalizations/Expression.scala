@@ -22,7 +22,7 @@ import shapeless.HList
 class Expression[Labels <: HList](raw: GremlinScala[Vertex])
     extends CpgSteps[nodes.Expression, Labels](raw)(Expression.marshaller)
     with ExpressionBase[nodes.Expression, Labels] {
-  override val converter = ???
+  override val converter = Converter.forDomainNode[nodes.Expression](Expression.marshaller, graph)
 }
 
 object Expression {
