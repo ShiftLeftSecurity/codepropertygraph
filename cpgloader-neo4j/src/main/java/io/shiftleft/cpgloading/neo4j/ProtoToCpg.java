@@ -2,6 +2,8 @@ package io.shiftleft.cpgloading.neo4j;
 
 import io.shiftleft.cpgloading.ProtoToCpgBase;
 import io.shiftleft.proto.cpg.Cpg;
+import org.apache.commons.configuration.BaseConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
@@ -9,8 +11,17 @@ import org.apache.tinkerpop.gremlin.neo4j.structure.Neo4jGraph;
 public class ProtoToCpg extends ProtoToCpgBase {
 
   public ProtoToCpg(String dbPath) {
-    super(Neo4jGraph.open(dbPath));
+    super(Neo4jGraph.open(buildConfig(dbPath)));
   }
+
+  private static Configuration buildConfig(String dbPath) {
+    final Configuration config = new BaseConfiguration();
+    config.setProperty(Neo4jGraph.CONFIG_DIRECTORY, dbPath);
+    config.setProperty(Neo4jGraph.CONFIG_META_PROPERTIES, true);
+    config.setProperty(Neo4jGraph.CONFIG_MULTI_PROPERTIES, true);
+    return config;
+  }
+
 
   @Override
   public void addNodes(Cpg.CpgStruct protoCpg) {
