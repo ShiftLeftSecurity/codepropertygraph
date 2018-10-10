@@ -479,6 +479,6 @@ object Utils {
     getHigherType(property) match {
       case HigherValueType.None   => getBaseType(property)
       case HigherValueType.Option => s"Option[${getBaseType(property)}]"
-      case HigherValueType.List   => s"java.util.List[${getBaseType(property)}]"
+      case HigherValueType.List   => s"List[${getBaseType(property)}]"
     }
 }
