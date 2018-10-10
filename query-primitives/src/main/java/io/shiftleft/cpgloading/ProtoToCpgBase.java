@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -81,9 +82,14 @@ public abstract class ProtoToCpgBase {
         tinkerElement.property(propertyName, propertyValue.getBoolValue());
         break;
       case STRING_LIST:
-        List<String> propertyList = new LinkedList<>();
-        propertyList.addAll(propertyValue.getStringList().getValuesList());
-        tinkerElement.property(propertyName, propertyList);
+        if (tinkerElement instanceof Vertex) {
+          propertyValue.getStringList().getValuesList().forEach(value ->
+            ((Vertex) tinkerElement).property(VertexProperty.Cardinality.list, propertyName, value));
+        } else {
+          List<String> propertyList = new LinkedList<>();
+          propertyList.addAll(propertyValue.getStringList().getValuesList());
+          tinkerElement.property(propertyName, propertyList);
+        }
         break;
       case VALUE_NOT_SET:
         break;
