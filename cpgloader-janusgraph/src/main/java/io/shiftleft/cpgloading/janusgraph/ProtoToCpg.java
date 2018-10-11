@@ -30,6 +30,7 @@ public class ProtoToCpg extends ProtoToCpgBase {
   protected void configureGraph(Graph graph) {
     JanusGraphManagement mgmt = ((JanusGraph) graph).openManagement();
     mgmt.makePropertyKey("INHERITS_FROM_TYPE_FULL_NAME").dataType(String.class).cardinality(Cardinality.LIST).make();
+    mgmt.makePropertyKey("UNRECOGNIZED").dataType(Object.class).make();
     mgmt.commit();
     logger.info("configured janus propertykeys");
   }
