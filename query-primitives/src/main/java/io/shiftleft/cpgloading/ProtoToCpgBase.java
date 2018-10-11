@@ -25,9 +25,14 @@ public abstract class ProtoToCpgBase {
 
   public ProtoToCpgBase(Graph graph) {
     this.graph = graph;
+    configureGraph(graph);
   }
 
   public abstract void addNodes(Cpg.CpgStruct protoCpg);
+
+  /* optionally configure graph in implementing class */
+  protected void configureGraph(Graph graph) {
+  }
 
   public void addEdges(List<Cpg.CpgStruct.Edge> protoEdges) {
     for (Cpg.CpgStruct.Edge protoEdge : protoEdges) {
