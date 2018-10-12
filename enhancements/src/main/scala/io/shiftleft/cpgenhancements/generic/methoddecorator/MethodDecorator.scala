@@ -1,15 +1,20 @@
 package io.shiftleft.cpgenhancements.generic.methoddecorator
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{nodes, EdgeTypes, NodeKeys, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes, nodes}
 import io.shiftleft.cpgenhancements.CpgEnhancement
+import io.shiftleft.queryprimitives.steps.Implicits._
 import org.apache.tinkerpop.gremlin.structure.Direction
+
+object MethodDecorator {
+  private var loggedDeprecatedWarning   = false
+  private var loggedMissingTypeFullName = false
+}
 
 /**
   * Adds a METHOD_PARAMETER_OUT for each METHOD_PARAMETER_IN to the graph and
   * connects those with a PARAMETER_LINK edge.
-  * It also creates an AST edge from METHOD to the new METHOD_PARAMETER_OUT nodes
-  * and EVAL_TYPE edges to the same type which METHOD_PARAMETER_IN points to.
+  * It also creates an AST edge from METHOD to the new METHOD_PARAMETER_OUT nodes.
   */
 class MethodDecorator(graph: ScalaGraph) extends CpgEnhancement(graph) {
   override def run(): Unit = {
@@ -17,7 +22,7 @@ class MethodDecorator(graph: ScalaGraph) extends CpgEnhancement(graph) {
       .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
       .sideEffect { parameterIn =>
         if (!parameterIn.vertices(Direction.OUT, EdgeTypes.PARAMETER_LINK).hasNext) {
-          val parameterOut = nodes.NewMethodParameterOut(
+          val parameterOut = new nodes.NewMethodParameterOut(
             parameterIn.value2(NodeKeys.CODE),
             parameterIn.value2(NodeKeys.ORDER),
             parameterIn.value2(NodeKeys.NAME),
@@ -30,12 +35,21 @@ class MethodDecorator(graph: ScalaGraph) extends CpgEnhancement(graph) {
           )
 
           val method = parameterIn.vertices(Direction.IN, EdgeTypes.AST).next
-          val evalType = parameterIn.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).next
+          if (parameterIn.valueOption(NodeKeys.TYPE_FULL_NAME) == None) {
+            val evalType = parameterIn.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).next
+            dstGraph.addEdgeToOriginal(parameterOut, evalType, EdgeTypes.EVAL_TYPE)
+            if (!MethodDecorator.loggedMissingTypeFullName) {
+              logger.warn("Using deprecated CPG format with missing TYPE_FULL_NAME on METHOD_PARAMETER_IN nodes.")
+              MethodDecorator.loggedMissingTypeFullName = true
+            }
+          }
 
           dstGraph.addNode(parameterOut)
           dstGraph.addEdgeFromOriginal(method, parameterOut, EdgeTypes.AST)
           dstGraph.addEdgeFromOriginal(parameterIn, parameterOut, EdgeTypes.PARAMETER_LINK)
-          dstGraph.addEdgeToOriginal(parameterOut, evalType, EdgeTypes.EVAL_TYPE)
+        } else if (!MethodDecorator.loggedDeprecatedWarning) {
+          logger.warn("Using deprecated CPG format with PARAMETER_LINK egdes")
+          MethodDecorator.loggedDeprecatedWarning = true
         }
       }
       .iterate
