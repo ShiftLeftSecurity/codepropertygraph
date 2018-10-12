@@ -2,6 +2,7 @@ package io.shiftleft.queryprimitives.utils
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
+import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex}
 
 import scala.collection.JavaConverters._
@@ -22,19 +23,19 @@ object ExpandTo {
   }
 
   def parameterToMethod(parameterNode: Vertex): Vertex = {
-    parameterNode.vertices(Direction.IN, EdgeTypes.AST).next
+    parameterNode.vertices(Direction.IN, EdgeTypes.AST).nextChecked
   }
 
   def formalReturnToMethod(formalReturnNode: Vertex): Vertex = {
-    formalReturnNode.vertices(Direction.IN, EdgeTypes.AST).next
+    formalReturnNode.vertices(Direction.IN, EdgeTypes.AST).nextChecked
   }
 
   def expressionToMethod(expression: Vertex): Vertex = {
-    expression.vertices(Direction.IN, EdgeTypes.CONTAINS).next
+    expression.vertices(Direction.IN, EdgeTypes.CONTAINS).nextChecked
   }
 
   def localToMethod(local: Vertex): Vertex = {
-    local.vertices(Direction.IN, EdgeTypes.AST).next
+    local.vertices(Direction.IN, EdgeTypes.AST).nextChecked
   }
 
   def hasModifier(methodNode: Vertex, modifierType: String): Boolean = {
@@ -47,6 +48,6 @@ object ExpandTo {
   }
 
   def astParent(expression: Vertex): Vertex = {
-    expression.vertices(Direction.IN, EdgeTypes.AST).next
+    expression.vertices(Direction.IN, EdgeTypes.AST).nextChecked
   }
 }

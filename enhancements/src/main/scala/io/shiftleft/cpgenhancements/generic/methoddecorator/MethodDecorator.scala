@@ -34,9 +34,9 @@ class MethodDecorator(graph: ScalaGraph) extends CpgEnhancement(graph) {
             parameterIn.valueOption(NodeKeys.COLUMN_NUMBER_END)
           )
 
-          val method = parameterIn.vertices(Direction.IN, EdgeTypes.AST).next
+          val method = parameterIn.vertices(Direction.IN, EdgeTypes.AST).nextChecked
           if (parameterIn.valueOption(NodeKeys.TYPE_FULL_NAME) == None) {
-            val evalType = parameterIn.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).next
+            val evalType = parameterIn.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).nextChecked
             dstGraph.addEdgeToOriginal(parameterOut, evalType, EdgeTypes.EVAL_TYPE)
             if (!MethodDecorator.loggedMissingTypeFullName) {
               logger.warn("Using deprecated CPG format with missing TYPE_FULL_NAME on METHOD_PARAMETER_IN nodes.")
