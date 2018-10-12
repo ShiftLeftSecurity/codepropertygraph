@@ -26,11 +26,6 @@ class CpgSteps[NodeType <: nodes.StoredNode: Marshallable, Labels <: HList](over
     extends NodeSteps[NodeType, Labels](raw) {
   implicit val graph: Graph = raw.traversal.asAdmin.getGraph.get
 
-  def toMaps(): Steps[JMap[String, AnyRef], JMap[String, AnyRef], Labels] = {
-    implicit val c = Converter.identityConverter[JMap[String, AnyRef]]
-    new Steps[JMap[String, AnyRef], JMap[String, AnyRef], Labels](raw.valueMap())
-  }
-
   /**
     * Traverse to source file
     * */
@@ -39,12 +34,6 @@ class CpgSteps[NodeType <: nodes.StoredNode: Marshallable, Labels <: HList](over
       raw
         .until(_.hasLabel(NodeTypes.FILE))
         .repeat(_.in(EdgeTypes.AST)))
-
-  /* follow the incoming edges of the given type as long as possible */
-  protected def walkIn(edgeType: String): GremlinScala[Vertex] =
-    raw
-      .repeat(_.in(edgeType))
-      .until(_.in(edgeType).count.is(P.eq(0)))
 
   /**
     Execute traversal and convert the result to json.
@@ -59,85 +48,5 @@ class CpgSteps[NodeType <: nodes.StoredNode: Marshallable, Labels <: HList](over
     if (pretty) writePretty(maps)
     else write(maps)
   }
-
-  // TODO: move to gremlin.scala.dsl.Steps: everything below here
-
-  /**
-    Execute the traversal and convert it to a mutable buffer
-    */
-  def toBuffer(): mutable.Buffer[NodeType] = toList.toBuffer
-
-  /** filter by id */
-  def id(id: AnyRef): Steps[NodeType, Vertex, Labels] =
-    new Steps[NodeType, Vertex, Labels](raw.hasId(id))
-
-  /**
-     Extend the traversal with a side-effect step, where `fun` is a
-     function that performs a side effect. The function `fun` can
-     access the current traversal element via the variable `_`.
-    */
-  def sideEffect(fun: NodeType => Any): Steps[NodeType, Vertex, Labels] =
-    new Steps[NodeType, Vertex, Labels](raw.sideEffect { v: Vertex =>
-      fun(v.toCC[NodeType])
-    })
-
-  /**
-    Repeat the given traversal. This step can be combined with the until and emit steps to
-    provide a termination and emit criteria.
-    */
-  def repeat[NewNodeType >: NodeType](repeatTraversal: Steps[NodeType, Vertex, HNil] => Steps[NewNodeType, Vertex, _])
-    : Steps[NewNodeType, Vertex, Labels] =
-    ???
-  // new Steps[NewNodeType, Vertex, Labels](
-  //   raw.repeat { rawTraversal =>
-  //     repeatTraversal(
-  //       new Steps[NodeType, HNil](rawTraversal)
-  //     ).raw
-  //   }
-  // )
-
-  /**
-    Termination criteria for a repeat step.
-    If used before the repeat step it as "while" characteristics.
-    If used after the repeat step it as "do-while" characteristics
-    */
-  def until(untilTraversal: Steps[NodeType, Vertex, HNil] => Steps[_, _, _]): Steps[NodeType, Vertex, Labels] =
-    ???
-  // new Steps[NodeType, Vertex, Labels](
-  //   raw.until { rawTraversal =>
-  //     untilTraversal(
-  //       new Steps[NodeType, Vertex, HNil](rawTraversal)
-  //     ).raw
-  //   }
-  // )
-
-  /**
-    * Modifier for repeat steps. Configure the amount of times the repeat traversal is
-    * executed.
-    */
-  def times(maxLoops: Int): Steps[NodeType, Vertex, Labels] =
-    new Steps[NodeType, Vertex, Labels](raw.times(maxLoops))
-
-  /**
-    Emit is used with the repeat step to emit the elements of the repeatTraversal after each
-    iteration of the repeat loop.
-    */
-  def emit(): Steps[NodeType, Vertex, Labels] =
-    new Steps[NodeType, Vertex, Labels](raw.emit())
-
-  /**
-    Emit is used with the repeat step to emit the elements of the repeatTraversal after each
-    iteration of the repeat loop.
-    The emitTraversal defines under which condition the elements are emitted.
-    */
-  def emit(emitTraversal: Steps[NodeType, Vertex, HNil] => Steps[_, _, _]): Steps[NodeType, Vertex, Labels] =
-    ???
-  // new Steps[NodeType, Vertex, Labels](
-  //   raw.emit { rawTraversal =>
-  //     emitTraversal(
-  //       new Steps[NodeType, Vertex, HNil](rawTraversal)
-  //     ).raw
-  //   }
-  // )
 
 }
