@@ -344,31 +344,75 @@ free-text strings.
 <!-- layers later in the processing pipeline for code analysis systems. -->
 
 
-# query-primitives
-TODO lorem ipsum
-* this will automatically run the cpg enhancements
+# Loading a codepropertygraph into a specific graph db
+Cpg loading/querying should work for any Tinkerpop-enabled database. Here's how you can load a cpg for a few example databases in the sbt console - the next section will list some queries you can interactively run from there.
 
-## Tinkergraph
+There are some sample cpgs in this repository in the `resources/cpgs` directory.
+
+### [Tinkergraph (in memory reference db)](http://tinkerpop.apache.org/docs/current/reference/#tinkergraph-gremlin)
 ```
 sbt cpgloaderTinkergraph/console
+```
+```scala
 val cpg = io.shiftleft.cpgloading.tinkergraph.CpgLoader.loadCodePropertyGraph("cpg.bin.zip")
-cpg.literal.toList.foreach(println)
 ```
 
-## Neo4j
+### [Neo4j](http://tinkerpop.apache.org/docs/current/reference/#neo4j-gremlin)
 ```
+rm -rf /tmp/cpg_data
 sbt cpgloaderNeo4j/console
+```
+```scala
 val dbPath = "/tmp/cpg_data"
 val loader = new io.shiftleft.cpgloading.neo4j.CpgLoader(dbPath)
 val cpg = loader.loadCodePropertyGraph("cpg.bin.zip")
-cpg.literal.toList.foreach(println)
 ```
-
-## Janusgraph
+### [Janusgraph](http://janusgraph.org/)
 ```
 sbt cpgloaderJanusgraph/console
+```
+```scala
 val cpg = io.shiftleft.cpgloading.janusgraph.CpgLoader.loadCodePropertyGraph("cpg.bin.zip")
-cpg.literal.toList.foreach(println)
+```
+
+# Querying the cpg
+Once you've loaded a cpg you can run queries, which are provided by the `query-primitives` subproject. Note that if you're in the sbt shell you can play with it interactively: `TAB` completion is your friend. Otherwise your IDE will assist. 
+Don't forget to run `import io.shiftleft.queryprimitives.steps.Implicits._`.
+
+Here are some simple traversals to get all the base nodes. Running all of these without errors is a good test to ensure that your cpg is valid: 
+
+```scala
+import io.shiftleft.queryprimitives.steps.Implicits._
+
+cpg.literal.toList
+cpg.file.toList
+cpg.namespace.toList
+cpg.types.toList
+cpg.methodReturn.toList
+cpg.param.toList
+cpg.member.toList
+cpg.call.toList
+cpg.local.toList
+cpg.identifier.toList
+cpg.argument.toList
+cpg.typeDecl.toList
+cpg.method.toList
+cpg.methodInst.toList
+```
+
+From here you can traverse through the cpg. The query-primitives DSL ensures that only valid steps are available - anything else will result in a compile error:
+
+```scala
+pg.method.name("getAccountList").parameter.toList
+/* List(
+ *   MethodParameterIn(Some(v[7054781587948444580]),this,0,this,BY_SHARING,io.shiftleft.controller.AccountController,Some(28),None,None,None), 
+ *   MethodParameterIn(Some(v[7054781587948444584]),request,2,request,BY_SHARING,javax.servlet.http.HttpServletRequest,Some(28),None,None,None),
+ *   MethodParameterIn(Some(v[7054781587948444582]),response,1,response,BY_SHARING,javax.servlet.http.HttpServletResponse,Some(28),None,None,None)
+ *   )
+ **/
+
+cpg.method.name("getAccountList").definingTypeDecl.toList.head
+// TypeDecl(Some(v[464]),AccountController,io.shiftleft.controller.AccountController,false,List(java.lang.Object))
 ```
 
 
