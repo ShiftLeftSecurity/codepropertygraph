@@ -27,6 +27,16 @@ class CpgSteps[NodeType <: nodes.StoredNode: Marshallable, Labels <: HList](over
   implicit val graph: Graph = raw.traversal.asAdmin.getGraph.get
 
   /**
+    * shortcut for `toList`
+    */
+  def l: List[NodeType] = toList
+
+  /**
+    * shortcut for `iterate`
+    */
+  def exec: Unit = iterate
+
+  /**
     * Traverse to source file
     * */
   def file: File[Labels] =
