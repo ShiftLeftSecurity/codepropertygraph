@@ -164,8 +164,12 @@ files, namespaces, and packages. A program is composed of zero or more
 files (type FILE), each of which contains one or more namespace blocks
 (type NAMESPACE_BLOCK). Namespace blocks contain type and method
 declarations (type TYPE_DECL and METHOD). Abstract syntax tree (AST) edges must exist
-from files to namespace blocks and from namespace blocks to the type
-and method declarations they contain. The figure below shows how a
+from files to namespace blocks. Structural elements below namespce blocks
+are not connected to their AST parents by an edge. Instead the AST_PARENT_TYPE
+and AST_PARENT_FULL_NAME properties are used to inform the backend about the
+AST relation of methods (type METHOD) and type declarations (type TYPE_DECL) to
+their parents. The property FULL_NAME thereby must be a unique identifier for
+the 3 node types METHOD, TYPE_DECL and NAMESPACE_BLOCK. The figure below shows how a
 Java class definition is represented in a Code Property Graph.
 
 ![Program Structure](images/cpg-internal-1.png)

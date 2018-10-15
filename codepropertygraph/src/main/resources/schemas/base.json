@@ -41,7 +41,9 @@
         {"id": 52, "name" : "TYPE_DECL_FULL_NAME", "comment" : "The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME.", "valueType" : "string", "cardinality" : "one"},
         {"id": 53, "name" : "INHERITS_FROM_TYPE_FULL_NAME", "comment" : "The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME.", "valueType" : "string", "cardinality" : "list"},
         {"id": 54, "name" : "METHOD_FULL_NAME", "comment" : "The FULL_NAME of a method. Used to link METHOD_INST and METHOD nodes. It is required to have exactly one METHOD node for each METHOD_FULL_NAME.", "valueType" : "string", "cardinality" : "one"},
-        {"id": 55, "name" : "METHOD_INST_FULL_NAME", "comment" : "The FULL_NAME of a method instance. Used to link CALL and METHOD_REF nodes to METHOD_INST nodes. There needs to be at least one METHOD_INST node for each METHOD_INST_FULL_NAME.", "valueType" : "string", "cardinality" : "one"}
+        {"id": 55, "name" : "METHOD_INST_FULL_NAME", "comment" : "The FULL_NAME of a method instance. Used to link CALL and METHOD_REF nodes to METHOD_INST nodes. There needs to be at least one METHOD_INST node for each METHOD_INST_FULL_NAME.", "valueType" : "string", "cardinality" : "one"},
+        {"id": 56, "name" : "AST_PARENT_TYPE", "comment" : "The type of the AST parent. Since this is only used in some parts of the graph the list does not include all possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK.", "valueType" : "string", "cardinality" : "one"},
+        {"id": 57, "name" : "AST_PARENT_FULL_NAME", "comment" : "The FULL_NAME of a the AST parent of an entity.", "valueType" : "string", "cardinality" : "one"}
     ],
 
     // Keys for edge properties
@@ -76,8 +78,8 @@
         // Nodes of method declarations
 
         {"id" : 1, "name" : "METHOD",
-         "keys": ["NAME", "FULL_NAME", "SIGNATURE", "LINE_NUMBER",
-                  "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys": ["NAME", "FULL_NAME", "SIGNATURE", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME",
+           "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "A method/function/procedure",
          "is": ["DECLARATION"],
          "outEdges" : [
@@ -117,10 +119,10 @@
          ]
         },
         {"id" : 46, "name" : "TYPE_DECL",
-         "keys" : ["NAME", "FULL_NAME", "IS_EXTERNAL", "INHERITS_FROM_TYPE_FULL_NAME"],
+         "keys" : ["NAME", "FULL_NAME", "IS_EXTERNAL", "INHERITS_FROM_TYPE_FULL_NAME", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME"],
          "comment" : "A type declaration.",
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["TYPE_DECL", "TYPE_PARAMETER", "METHOD", "MEMBER", "MODIFIER"]},
+             {"edgeName": "AST", "inNodes": ["TYPE_PARAMETER", "MEMBER", "MODIFIER"]},
              {"edgeName": "VTABLE", "inNodes": ["METHOD"]}
          ]
         },
@@ -147,11 +149,8 @@
         {
             "id":41,
             "name": "NAMESPACE_BLOCK",
-            "keys": ["NAME"],
-            "comment": "A reference to a namespace.",
-            "outEdges": [
-                {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]}
-            ]
+            "keys": ["NAME", "FULL_NAME"],
+            "comment": "A reference to a namespace."
         },
 
         // Nodes that describe method content
