@@ -21,17 +21,6 @@
             "comment": "This node represents a namespace as a hole whereas the NAMESPACE_BLOCK is used for each grouping occurrence of a namespace in code. Single representing NAMESPACE node is required for easier navigation in the query language.",
             "outEdges": []
         },
-        {
-            "name": "NAMESPACE_BLOCK",
-            "outEdges": [
-                {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]}
-            ]
-        },
-        { "name": "METHOD",
-          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]}
-          ]
-        },
         { "name": "METHOD_INST",
           "outEdges" : [
              {"edgeName": "REF", "inNodes": ["METHOD"]}
@@ -69,7 +58,6 @@
         },
         { "name": "TYPE_DECL",
           "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]},
              {"edgeName": "INHERITS_FROM", "inNodes": ["TYPE"]}
           ]
         },
