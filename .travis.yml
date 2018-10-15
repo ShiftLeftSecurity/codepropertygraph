@@ -1,34 +1,39 @@
 language: scala
 jdk: oraclejdk8
+
 before_install:
-- openssl aes-256-cbc -K $encrypted_663dec309dc8_key -iv $encrypted_663dec309dc8_iv
-  -in private-key.pem.enc -out private-key.pem -d
 - git fetch --tags
+- if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE" == "push" ]]; then
+    openssl aes-256-cbc -K $encrypted_663dec309dc8_key -iv $encrypted_663dec309dc8_iv -in private-key.pem.enc -out private-key.pem -d;
+    gpg --import private-key.pem;
+    gpg --list-keys;
+  fi
+
 env:
   global:
   - PROTOC_PKG=protoc-3.6.0-linux-x86_64.zip
   - PROTOC_RELEASE=https://github.com/google/protobuf/releases/download/v3.6.0/$PROTOC_PKG
   - PROTOC_TARGET=${HOME}/protoc
   - PATH="${PROTOC_TARGET}/bin:${PATH}"
+
 install:
-- rm -rf $HOME/.gnupg
-- gpg --list-keys
-- gpg --import private-key.pem
-- gpg --list-keys
 - rm -rf $HOME/protoc
 - wget $PROTOC_RELEASE
 - unzip $PROTOC_PKG -d $PROTOC_TARGET
 - protoc --version
+
 stages:
 - name: test
 - name: release
-  if: branch = master
+  if: branch = master AND type = push
+
 jobs:
   include:
   - stage: test
     script: sbt +test
   - stage: release
     script: sbt ci-release-sonatype
+
 before_cache:
 - du -h -d 1 $HOME/.ivy2/cache
 - du -h -d 2 $HOME/.sbt/
