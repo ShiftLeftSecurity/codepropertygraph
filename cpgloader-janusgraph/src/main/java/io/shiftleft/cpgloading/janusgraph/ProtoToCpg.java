@@ -2,9 +2,13 @@ package io.shiftleft.cpgloading.janusgraph;
 
 import io.shiftleft.cpgloading.ProtoToCpgBase;
 import io.shiftleft.proto.cpg.Cpg;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.janusgraph.core.Cardinality;
+import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphFactory;
+import org.janusgraph.core.schema.JanusGraphManagement;
 
 public class ProtoToCpg extends ProtoToCpgBase {
 
@@ -20,6 +24,15 @@ public class ProtoToCpg extends ProtoToCpgBase {
         // .set("storage.transactions", false)
         // .set("storage.batch-loading", true).set("schema.default", "none")
         .open());
+  }
+
+  @Override
+  protected void configureGraph(Graph graph) {
+    JanusGraphManagement mgmt = ((JanusGraph) graph).openManagement();
+    mgmt.makePropertyKey("INHERITS_FROM_TYPE_FULL_NAME").dataType(String.class).cardinality(Cardinality.LIST).make();
+    mgmt.makePropertyKey("UNRECOGNIZED").dataType(Object.class).make();
+    mgmt.commit();
+    logger.info("configured janus propertykeys");
   }
 
   @Override

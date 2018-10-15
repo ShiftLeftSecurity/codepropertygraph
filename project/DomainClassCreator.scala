@@ -53,11 +53,12 @@ object DomainClassCreator {
 
       import io.shiftleft.codepropertygraph.generated
       import java.lang.{Boolean => JBoolean, Long => JLong}
-      import java.util.{Collections => JCollections, Iterator => JIterator, LinkedList => JLinkedList, List => JList, Map => JMap, Set => JSet}
+      import java.util.{Iterator => JIterator, LinkedList => JLinkedList, List => JList, Map => JMap, Set => JSet}
       import gremlin.scala._
-      import org.apache.tinkerpop.gremlin.structure.{Direction, Edge, Vertex, VertexProperty}
-      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{SpecializedElementFactory, SpecializedTinkerVertex, TinkerGraph, TinkerVertexProperty}
-      import org.apache.tinkerpop.gremlin.util.iterator.{IteratorUtils, MultiIterator}
+      import org.apache.tinkerpop.gremlin.structure.Direction
+      import org.apache.tinkerpop.gremlin.structure.Edge
+      import org.apache.tinkerpop.gremlin.structure.VertexProperty
+      import org.apache.tinkerpop.gremlin.util.iterator.MultiIterator
       import scala.collection.JavaConverters._
       import shapeless.HNil
 
