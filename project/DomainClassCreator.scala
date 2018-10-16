@@ -243,7 +243,7 @@ object DomainClassCreator {
             val camelCaseName = camelCase(property.name)
             val camelCaseCapitalized = camelCaseName.capitalize
             val tpe = getCompleteType(property)
-            s"trait Has$camelCaseCapitalized { def $camelCaseName: $tpe }"
+            s"trait Has$camelCaseCapitalized { var $camelCaseName: $tpe }"
           }
           .mkString("\n")
 
