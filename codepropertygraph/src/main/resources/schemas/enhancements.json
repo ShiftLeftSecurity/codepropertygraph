@@ -85,6 +85,7 @@
         },
         { "name": "CALL",
           "outEdges" : [
+            {"edgeName": "REF", "inNodes": ["MEMBER"]},
             {"edgeName": "CALL", "inNodes": ["METHOD_INST"]},
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
