@@ -169,7 +169,6 @@
          "comment" : "A (method)-call",
          "is": ["EXPRESSION"],
          "outEdges" : [
-             {"edgeName": "REF", "inNodes": ["MEMBER"]},
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]},
              {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF"]}
          ]
