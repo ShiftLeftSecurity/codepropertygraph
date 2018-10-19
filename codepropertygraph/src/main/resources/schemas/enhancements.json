@@ -52,6 +52,21 @@
            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
          ]
         },
+        { "name": "METHOD_CAPTURE_IN",
+          "outEdges" : [
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+          ]
+        },
+        {"id" : 331, "name" : "METHOD_CAPTURE_OUT",
+         "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "comment" : "This node represents a formal captured value going towards the caller side.",
+         "is": ["DECLARATION", "DATA_FLOW_OBJECT"],
+         "outEdges" : [
+           {"edgeName": "CALL_ARG_OUT", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "UNKNOWN"]},
+           {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+           {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+         ]
+        },
         { "name": "METHOD_RETURN",
           "outEdges" : [
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
