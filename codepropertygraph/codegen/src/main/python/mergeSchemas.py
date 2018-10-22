@@ -103,12 +103,12 @@ class SchemaMerger:
         for nodeType in result["nodeTypes"]:
             if "containedNodes" in nodeType:
                 requiredInNodesForContains = [containedNode["nodeType"] for containedNode in nodeType["containedNodes"]]
-                # replace entry with `edge["edgeName"] == "CONTAINS"` if it exists, or add one if it doesn't
+                # replace entry with `edge["edgeName"] == "CONTAINED_IN"` if it exists, or add one if it doesn't
                 # to do that, convert outEdges to Map<EdgeName, OutEdge> and back at the end
                 inNodesByOutEdgeName = { outEdge["edgeName"] : outEdge["inNodes"] for outEdge in nodeType["outEdges"] }
-                containsInNodes = inNodesByOutEdgeName.get("CONTAINS", [])
+                containsInNodes = inNodesByOutEdgeName.get("CONTAINED_IN", [])
                 containsInNodes = list(set(containsInNodes + requiredInNodesForContains))
-                inNodesByOutEdgeName.update({"CONTAINS": containsInNodes})
+                inNodesByOutEdgeName.update({"CONTAINED_IN": containsInNodes})
                 nodeType["outEdges"] = [{"edgeName": edgeName, "inNodes": inNodes} for edgeName, inNodes in inNodesByOutEdgeName.items()]
         return result
 

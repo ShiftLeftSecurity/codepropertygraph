@@ -447,7 +447,7 @@ object DomainClassCreator {
            /** link to 'contained' node of type $containedNodeType */
            lazy val ${containedNode.localName}: $completeType =
               containsOut.asScala.toIterable
-                .filter(_.asInstanceOf[generated.edges.Contains].localName == "${containedNode.localName}")
+                .filter(_.asInstanceOf[generated.edges.ContainedIn].localName == "${containedNode.localName}")
                 .map(_.inVertex.asInstanceOf[$containedNodeType])
                 $traversalEnding
           """
