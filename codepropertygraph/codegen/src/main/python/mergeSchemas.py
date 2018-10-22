@@ -27,7 +27,11 @@ class SchemaMerger:
                 else:
                     jsonContent += line
 
-            cur = json.loads(jsonContent)
+            try:
+                cur = json.loads(jsonContent)
+            except json.decoder.JSONDecodeError as exception:
+                print("Error parsing json file: %s" % jsonFile)
+                raise exception
             result = self._mergeLists(result, cur)
 
         result = self._addMissingContainsEdges(result)
