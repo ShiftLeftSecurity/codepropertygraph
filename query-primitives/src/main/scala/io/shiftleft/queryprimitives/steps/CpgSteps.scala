@@ -57,9 +57,21 @@ class CpgSteps[NodeType <: nodes.StoredNode: Marshallable, Labels <: HList](over
 
   def toJsonPretty: String = _toJson(pretty = true)
 
+  /** like `toMaps`, but values are flat, and contains `_id` and `_label` entries */
+  def toMaps2(): Steps[Map[String, AnyRef], Map[String, AnyRef], Labels] = {
+    implicit val c = Converter.identityConverter[Map[String, AnyRef]]
+    new Steps[Map[String, AnyRef], Map[String, AnyRef], Labels](
+      raw.map { vertex: Vertex =>
+        val propertyEntries: List[(String, AnyRef)] =
+          vertex.properties[AnyRef]().asScala.map(p => (p.key, p.value)).toList
+        (propertyEntries :+ ("_id" -> vertex.id) :+ ("_label" -> vertex.label)).toMap
+      }
+    )
+  }
+
   protected def _toJson(pretty: Boolean): String = {
     implicit val formats = org.json4s.DefaultFormats
-    val maps: List[JMap[String, AnyRef]] = toMaps().toList
+    val maps: List[Map[String, AnyRef]] = toMaps2.toList
     if (pretty) writePretty(maps)
     else write(maps)
   }

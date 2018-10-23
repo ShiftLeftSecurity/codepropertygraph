@@ -6,9 +6,8 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.diffgraph.{DiffGraph, DiffGraphApplier}
-import io.shiftleft.passes.securityprofile._
 import io.shiftleft.queryprimitives.steps.Implicits._
-import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
+import io.shiftleft.queryprimitives.steps.CpgSteps
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.{Matchers, WordSpec}
@@ -54,16 +53,16 @@ class StepsTest extends WordSpec with Matchers {
       "providing one" in new CpgTestFixture("splitmeup") {
         // find an arbitrary method so we can find it again in the next step
         val method: nodes.Method        = cpg.method.toList.head
-        val results: List[nodes.Method] = cpg.method.id(method.id).toList
+        val results: List[nodes.Method] = cpg.method.id(method.underlying.id).toList
 
         results.size shouldBe 1
-        results.head.id
+        results.head.underlying.id
       }
 
       "providing multiple" in new CpgTestFixture("splitmeup") {
         // find two arbitrary methods so we can find it again in the next step
         val methods: Set[nodes.Method]  = cpg.method.toList.take(2).toSet
-        val results: List[nodes.Method] = cpg.method.id(methods.map(_.id)).toList
+        val results: List[nodes.Method] = cpg.method.id(methods.map(_.underlying.id)).toList
 
         results.size shouldBe 2
         results.toSet shouldBe methods.toSet
@@ -160,10 +159,9 @@ class StepsTest extends WordSpec with Matchers {
 
   "toJson" in new CpgTestFixture("splitmeup") {
     val json = cpg.namespace.nameExact("io.shiftleft.testcode.splitmeup").toJson
-
     val parsed = parse(json).children.head //exactly one result for the above query
-    (parsed \ "_label") shouldBe JString("NAMESPACE")
     (parsed \ "NAME") shouldBe JString("io.shiftleft.testcode.splitmeup")
+    (parsed \ "_label") shouldBe JString("NAMESPACE")
   }
 
 }
