@@ -18,14 +18,8 @@ import shapeless.HNil
 class StepsTest extends WordSpec with Matchers {
 
   "generic cpg" should {
-    "find a field by type regex" in new CpgTestFixture("splitmeup") {
-      val queryResult: List[nodes.Member] =
-        cpg.member.evalType(".*").toList
 
-      queryResult.size should be > 1
-    }
-
-    "find a literal by regex" in new CpgTestFixture("splitmeup") {
+    "filter by regex" in new CpgTestFixture("splitmeup") {
       val queryResult: List[nodes.Literal] =
         cpg.literal.code(".*").toList
 
@@ -49,7 +43,7 @@ class StepsTest extends WordSpec with Matchers {
       allMethods.toList.size should be > publicMethods.toList.size
     }
 
-    "filter on key" when {
+    "filter on id" when {
       "providing one" in new CpgTestFixture("splitmeup") {
         // find an arbitrary method so we can find it again in the next step
         val method: nodes.Method        = cpg.method.toList.head
@@ -62,7 +56,8 @@ class StepsTest extends WordSpec with Matchers {
       "providing multiple" in new CpgTestFixture("splitmeup") {
         // find two arbitrary methods so we can find it again in the next step
         val methods: Set[nodes.Method]  = cpg.method.toList.take(2).toSet
-        val results: List[nodes.Method] = cpg.method.id(methods.map(_.underlying.id)).toList
+        val ids = methods.map(_.underlying.id).toSeq
+        val results: List[nodes.Method] = cpg.method.id(ids: _*).toList
 
         results.size shouldBe 2
         results.toSet shouldBe methods.toSet
