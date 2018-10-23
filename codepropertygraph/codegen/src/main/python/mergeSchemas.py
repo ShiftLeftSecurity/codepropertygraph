@@ -101,6 +101,8 @@ class SchemaMerger:
     # for any node that has `containedNode` entries, automatically add the corresponding `outEdges`
     def _addMissingContainsEdges(self, result):
         for nodeType in result["nodeTypes"]:
+            if "CONTAINS_NODE" not in nodeType["outEdges"]:
+                nodeType["outEdges"].append("CONTAINS_NODE")
             if "containedNodes" in nodeType:
                 requiredInNodesForContains = [containedNode["nodeType"] for containedNode in nodeType["containedNodes"]]
                 # replace entry with `edge["edgeName"] == "CONTAINS_NODE"` if it exists, or add one if it doesn't
