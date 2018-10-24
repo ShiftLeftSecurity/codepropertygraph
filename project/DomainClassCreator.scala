@@ -388,7 +388,7 @@ object DomainClassCreator {
             outEdges(nodeType).map { edge =>
               s"${camelCase(edge)}Out"
             } ++
-            nodeType.containedNodes.map(_ => List("containsOut")).getOrElse(Nil)
+            nodeType.containedNodes.map(_ => List("containsNodeOut")).getOrElse(Nil)
         // if there are any `contained` nodes, we also need to store the `contains` edges
 
         fullNames.distinct.map { name =>
@@ -446,7 +446,7 @@ object DomainClassCreator {
               s"""
            /** link to 'contained' node of type $containedNodeType */
            lazy val ${containedNode.localName}: $completeType =
-              containsOut.asScala.toIterable
+              containsNodeOut.asScala.toIterable
                 .filter(_.asInstanceOf[generated.edges.ContainsNode].localName == "${containedNode.localName}")
                 .map(_.inVertex.asInstanceOf[$containedNodeType])
                 $traversalEnding
