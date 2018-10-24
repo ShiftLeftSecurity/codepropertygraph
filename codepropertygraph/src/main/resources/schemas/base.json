@@ -255,7 +255,8 @@
         {"id" : 3, "name" : "AST", "comment" : "Syntax child" , "keys" : [] },
         {"id" : 19, "name" : "CFG", "comment" : "Control flow", "keys" : [] },
 
-        {"id" : 9, "name" : "CONTAINS", "keys" : ["LOCAL_NAME", "INDEX"], "comment" : "Shortcut to contained node"},
+        {"id" : 9, "name" : "CONTAINS_NODE", "keys" : ["LOCAL_NAME", "INDEX"], "comment" : "Edge from container to contained node"},
+        {"id" : 28, "name" : "CONTAINS", "keys" : ["LOCAL_NAME", "INDEX"], "comment" : "Shortcut to contained node"},
 
         // Edges to represent type relations
 
