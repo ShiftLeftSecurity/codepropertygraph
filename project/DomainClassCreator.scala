@@ -785,13 +785,18 @@ object DomainClassCreator {
     val nodeToInEdges = new mutable.HashMap[String, mutable.Set[String]] with mutable.MultiMap[String, String]
     val nodeTypeNamesSet = nodeTypes.map(_.name).toSet ++ nodeBaseTraitNames
 
-    for (nodeType <- nodeTypes;
-         outEdge <- nodeType.outEdges;
-         inNode <- outEdge.inNodes) {
-      if (!nodeTypeNamesSet.contains(inNode)) {
-        throw new RuntimeException(s"Node with name $inNode is not defined.")
-      }
+    for {
+      nodeType <- nodeTypes
+      outEdge  <- nodeType.outEdges
+      inNode   <- outEdge.inNodes
+    } {
+      assert(nodeTypeNamesSet.contains(inNode), s"Node with name $inNode is not defined.")
       nodeToInEdges.addBinding(inNode, outEdge.edgeName)
+    }
+
+    // all nodes can have incoming `CONTAINS_NODE` edges
+    nodeTypes.foreach { nodeType =>
+      nodeToInEdges.addBinding(nodeType.name, "CONTAINS_NODE")
     }
 
     nodeToInEdges
