@@ -28,7 +28,8 @@ class MethodInstLinker(graph: ScalaGraph) extends CpgEnhancement(graph) {
     cpg.methodInst
       .sideEffect { methodInstNode =>
         fullNameToMethodInst += methodInstNode.fullName -> methodInstNode
-      }.iterate()
+      }
+      .iterate()
 
     graph.V
       .hasLabel(NodeTypes.CALL)
@@ -54,7 +55,8 @@ class MethodInstLinker(graph: ScalaGraph) extends CpgEnhancement(graph) {
                     dstGraph.addEdgeInOriginal(callsite, methodInst.underlying, EdgeTypes.CALL)
                     Some(methodInst.underlying)
                   case None =>
-                    logger.error("Missing METHOD_INST node or invalid methodInstFullName=${callsite.value2(NodeKeys.METHOD_INST_FULL_NAME)}")
+                    logger.error(
+                      "Missing METHOD_INST node or invalid methodInstFullName=${callsite.value2(NodeKeys.METHOD_INST_FULL_NAME)}")
                     None
                 }
             }
@@ -118,16 +120,12 @@ class MethodInstLinker(graph: ScalaGraph) extends CpgEnhancement(graph) {
     }
   }
 
-  private def generateCallRetEdge(perCallsiteDstGraph: DiffGraph,
-                                  method: Vertex,
-                                  callsite: Vertex): Unit = {
+  private def generateCallRetEdge(perCallsiteDstGraph: DiffGraph, method: Vertex, callsite: Vertex): Unit = {
     val methodReturn = method
       .vertices(Direction.OUT, EdgeTypes.AST)
       .asScala
       .find(_.label == NodeTypes.METHOD_RETURN)
       .get
-    perCallsiteDstGraph.addEdgeInOriginal(methodReturn,
-                                          callsite,
-                                          EdgeTypes.CALL_RET)
+    perCallsiteDstGraph.addEdgeInOriginal(methodReturn, callsite, EdgeTypes.CALL_RET)
   }
 }

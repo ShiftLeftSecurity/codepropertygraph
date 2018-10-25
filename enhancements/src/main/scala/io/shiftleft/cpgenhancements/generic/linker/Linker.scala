@@ -10,10 +10,10 @@ import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import scala.collection.JavaConverters._
 
 class Linker(graph: ScalaGraph) extends CpgEnhancement(graph) {
-  private var typeDeclFullNameToNode       = Map.empty[String, Vertex]
-  private var typeFullNameToNode           = Map.empty[String, Vertex]
-  private var methodFullNameToNode         = Map.empty[String, Vertex]
-  private var methodInstFullNameToNode     = Map.empty[String, Vertex]
+  private var typeDeclFullNameToNode = Map.empty[String, Vertex]
+  private var typeFullNameToNode = Map.empty[String, Vertex]
+  private var methodFullNameToNode = Map.empty[String, Vertex]
+  private var methodInstFullNameToNode = Map.empty[String, Vertex]
   private var namespaceBlockFullNameToNode = Map.empty[String, Vertex]
 
   override def run(): Unit = {
@@ -28,8 +28,7 @@ class Linker(graph: ScalaGraph) extends CpgEnhancement(graph) {
       dstNodeMap = typeDeclFullNameToNode,
       getDstFullName = (srcNode: Vertex) => srcNode.value2(NodeKeys.TYPE_DECL_FULL_NAME),
       setDstFullName =
-        (srcNode: Vertex, fullName: String) =>
-          srcNode.property(NodeKeyNames.TYPE_DECL_FULL_NAME, fullName)
+        (srcNode: Vertex, fullName: String) => srcNode.property(NodeKeyNames.TYPE_DECL_FULL_NAME, fullName)
     )
 
     linkToSingle(
@@ -38,9 +37,7 @@ class Linker(graph: ScalaGraph) extends CpgEnhancement(graph) {
       edgeType = EdgeTypes.REF,
       dstNodeMap = methodFullNameToNode,
       getDstFullName = (srcNode: Vertex) => srcNode.value2(NodeKeys.METHOD_FULL_NAME),
-      setDstFullName =
-        (srcNode: Vertex, fullName: String) =>
-          srcNode.property(NodeKeyNames.METHOD_FULL_NAME, fullName)
+      setDstFullName = (srcNode: Vertex, fullName: String) => srcNode.property(NodeKeyNames.METHOD_FULL_NAME, fullName)
     )
 
     linkToSingle(
@@ -58,8 +55,7 @@ class Linker(graph: ScalaGraph) extends CpgEnhancement(graph) {
       edgeType = EdgeTypes.EVAL_TYPE,
       dstNodeMap = typeFullNameToNode,
       getDstFullName = (srcNode: Vertex) => srcNode.value2(NodeKeys.TYPE_FULL_NAME),
-      setDstFullName = (srcNode: Vertex, fullName: String) =>
-        srcNode.property(NodeKeyNames.TYPE_FULL_NAME, fullName)
+      setDstFullName = (srcNode: Vertex, fullName: String) => srcNode.property(NodeKeyNames.TYPE_FULL_NAME, fullName)
     )
 
     linkToSingle(
@@ -69,8 +65,7 @@ class Linker(graph: ScalaGraph) extends CpgEnhancement(graph) {
       dstNodeMap = methodInstFullNameToNode,
       getDstFullName = (srcNode: Vertex) => srcNode.value2(NodeKeys.METHOD_INST_FULL_NAME),
       setDstFullName =
-        (srcNode: Vertex, fullName: String) =>
-      srcNode.property(NodeKeyNames.METHOD_INST_FULL_NAME, fullName)
+        (srcNode: Vertex, fullName: String) => srcNode.property(NodeKeyNames.METHOD_INST_FULL_NAME, fullName)
     )
 
     linkToMultiple(
@@ -124,13 +119,12 @@ class Linker(graph: ScalaGraph) extends CpgEnhancement(graph) {
       .iterate()
   }
 
-  private def linkToSingle(
-      srcLabels: List[String],
-      dstNodeLabel: String,
-      edgeType: String,
-      dstNodeMap: Map[String, Vertex],
-      getDstFullName: Vertex => String,
-      setDstFullName: (Vertex, String) => Unit): Unit = {
+  private def linkToSingle(srcLabels: List[String],
+                           dstNodeLabel: String,
+                           edgeType: String,
+                           dstNodeMap: Map[String, Vertex],
+                           getDstFullName: Vertex => String,
+                           setDstFullName: (Vertex, String) => Unit): Unit = {
     var loggedDeprecationWarning = false
     graph.V
       .hasLabel(srcLabels.head, srcLabels.tail: _*)
@@ -140,11 +134,7 @@ class Linker(graph: ScalaGraph) extends CpgEnhancement(graph) {
             case Some(dstNode) =>
               dstGraph.addEdgeInOriginal(srcNode, dstNode, edgeType)
             case None =>
-              logFailedDstLookup(edgeType,
-                                  srcNode.label,
-                                  srcNode.id.toString,
-                                  dstNodeLabel,
-                                  getDstFullName(srcNode))
+              logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, getDstFullName(srcNode))
           }
         } else {
           val dstFullName =
@@ -161,28 +151,23 @@ class Linker(graph: ScalaGraph) extends CpgEnhancement(graph) {
       .iterate()
   }
 
-  private def linkToMultiple(
-      srcLabels: List[String],
-      dstNodeLabel: String,
-      edgeType: String,
-      dstNodeMap: Map[String, Vertex],
-      getDstFullNames: Vertex => Iterable[String],
-      setDstFullNames: (Vertex, Iterable[String]) => Unit): Unit = {
+  private def linkToMultiple(srcLabels: List[String],
+                             dstNodeLabel: String,
+                             edgeType: String,
+                             dstNodeMap: Map[String, Vertex],
+                             getDstFullNames: Vertex => Iterable[String],
+                             setDstFullNames: (Vertex, Iterable[String]) => Unit): Unit = {
     var loggedDeprecationWarning = false
     graph.V
       .hasLabel(srcLabels.head, srcLabels.tail: _*)
-      .sideEffect { srcNode: Vertex => 
+      .sideEffect { srcNode: Vertex =>
         if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
           getDstFullNames(srcNode).foreach { dstFullName =>
             dstNodeMap.get(dstFullName) match {
               case Some(dstNode) =>
                 dstGraph.addEdgeInOriginal(srcNode, dstNode, edgeType)
               case None =>
-                logFailedDstLookup(edgeType,
-                                    srcNode.label,
-                                    srcNode.id.toString,
-                                    dstNodeLabel,
-                                    dstFullName)
+                logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
 
             }
           }
@@ -230,10 +215,10 @@ class Linker(graph: ScalaGraph) extends CpgEnhancement(graph) {
                 dstGraph.addEdgeInOriginal(astParent, astChild, EdgeTypes.AST)
               case None =>
                 logFailedSrcLookup(EdgeTypes.AST,
-                                    astChild.value2(NodeKeys.AST_PARENT_TYPE),
-                                    astChild.value2(NodeKeys.AST_PARENT_FULL_NAME),
-                                    astChild.label,
-                                    astChild.id.toString)
+                                   astChild.value2(NodeKeys.AST_PARENT_TYPE),
+                                   astChild.value2(NodeKeys.AST_PARENT_FULL_NAME),
+                                   astChild.label,
+                                   astChild.id.toString)
             }
           case Some(astEdge) if !loggedDeprecationWarning =>
             logger.warn(

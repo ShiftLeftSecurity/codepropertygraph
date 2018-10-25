@@ -7,7 +7,7 @@ import io.shiftleft.queryprimitives.steps.Implicits._
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 object MethodDecorator {
-  private var loggedDeprecatedWarning   = false
+  private var loggedDeprecatedWarning = false
   private var loggedMissingTypeFullName = false
 }
 
