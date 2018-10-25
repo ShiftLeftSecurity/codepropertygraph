@@ -1,8 +1,9 @@
 package io.shiftleft.cpgenhancements
 
 import gremlin.scala.ScalaGraph
-import io.shiftleft.cpgenhancements.generic.calldecorator.CallDecorator
+import io.shiftleft.cpgenhancements.generic.linker.Linker
 import io.shiftleft.cpgenhancements.generic.methoddecorator.MethodDecorator
+import io.shiftleft.cpgenhancements.generic.methodinstlinker.MethodInstLinker
 import io.shiftleft.cpgenhancements.generic.namspacecreator.NamespaceCreator
 
 /* singleton instance for convenience */
@@ -14,11 +15,14 @@ class CpgEnhancements {
     val methodDecorator = new MethodDecorator(graph)
     methodDecorator.executeAndApply()
 
+    val linker = new Linker(graph)
+    linker.executeAndApply()
+
     val namespaceCreator = new NamespaceCreator(graph)
     namespaceCreator.executeAndApply()
 
-    val callDecorator = new CallDecorator(graph)
-    callDecorator.executeAndApply()
+    val methodInstLinker = new MethodInstLinker(graph)
+    methodInstLinker.executeAndApply()
   }
 
 }

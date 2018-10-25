@@ -36,6 +36,12 @@ trait NodeTypeStarters {
     new Namespace[HNil](scalaGraph.V.hasLabel(NodeTypes.NAMESPACE))
 
   /**
+  Traverse to all namespace blocks, e.g., packages in Java.
+    */
+  def namespaceBlock: NamespaceBlock[HNil] =
+    new NamespaceBlock[HNil](scalaGraph.V.hasLabel(NodeTypes.NAMESPACE_BLOCK))
+
+  /**
     Traverse to all types, e.g., Set<String>
     */
   def types: Type[HNil] =
