@@ -256,6 +256,7 @@
         {"id" : 19, "name" : "CFG", "comment" : "Control flow", "keys" : [] },
 
         {"id" : 9, "name" : "CONTAINS", "keys" : ["LOCAL_NAME", "INDEX"], "comment" : "Shortcut to contained node"},
+        {"id" : 41, "name": "CAPTURED_BY", "comment" : "Connection between a capture LOCAL and the corresponding CLOSURE_BINDING", "keys": []},
 
         // Edges to represent type relations
 

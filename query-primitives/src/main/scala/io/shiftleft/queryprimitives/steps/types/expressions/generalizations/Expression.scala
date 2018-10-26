@@ -12,7 +12,7 @@ import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{
   LineNumberAccessors,
   OrderAccessors
 }
-import io.shiftleft.queryprimitives.steps.types.structure.{Method, MethodParameter}
+import io.shiftleft.queryprimitives.steps.types.structure.{Method, MethodParameter, Type}
 import java.lang.{Long => JLong}
 import shapeless.HList
 
@@ -116,4 +116,10 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
         .in(EdgeTypes.CFG)
         .filterNot(_.hasLabel(NodeTypes.METHOD))
     )
+
+  /**
+    * Traverse to expression evaluation type
+    * */
+  def typ: Type[Labels] =
+    new Type(raw.out(EdgeTypes.EVAL_TYPE))
 }
