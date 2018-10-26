@@ -23,11 +23,11 @@ class NewNodeSteps[A <: NewNode: Marshallable, Labels <: HList](raw: GremlinScal
     // create edges to `contained` nodes for this new node
     for {
       (localName, containedNodes) <- newNode.containedNodesByLocalName
-      (containedNode, index)      <- containedNodes.zipWithIndex
+      (containedNode, index) <- containedNodes.zipWithIndex
     } {
       val properties = Seq(
         EdgeKeys.LOCAL_NAME -> localName,
-        EdgeKeys.INDEX      -> index
+        EdgeKeys.INDEX -> index
       ).map { case KeyValue(key, value) => (key.name, value) }
       addEdge(graph, newNode, containedNode, EdgeTypes.CONTAINS, properties)
     }

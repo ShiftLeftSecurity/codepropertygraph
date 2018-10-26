@@ -94,8 +94,9 @@ class MethodInstLinker(graph: ScalaGraph) extends CpgEnhancement(graph) {
       .toSeq
       .sortBy(_.value2(NodeKeys.ORDER))
 
-    sortedArguments.zip(sortedParameters).foreach { case (argument, parameter) =>
-      perCallsiteDstGraph.addEdgeInOriginal(argument, parameter, EdgeTypes.CALL_ARG)
+    sortedArguments.zip(sortedParameters).foreach {
+      case (argument, parameter) =>
+        perCallsiteDstGraph.addEdgeInOriginal(argument, parameter, EdgeTypes.CALL_ARG)
     }
   }
 
@@ -109,8 +110,9 @@ class MethodInstLinker(graph: ScalaGraph) extends CpgEnhancement(graph) {
       .toSeq
       .sortBy(_.value2(NodeKeys.ORDER))
 
-    sortedArguments.zip(sortedParameters).foreach { case (argument, parameter) =>
-      perCallsiteDstGraph.addEdgeInOriginal(parameter, argument, EdgeTypes.CALL_ARG_OUT)
+    sortedArguments.zip(sortedParameters).foreach {
+      case (argument, parameter) =>
+        perCallsiteDstGraph.addEdgeInOriginal(parameter, argument, EdgeTypes.CALL_ARG_OUT)
     }
   }
 
