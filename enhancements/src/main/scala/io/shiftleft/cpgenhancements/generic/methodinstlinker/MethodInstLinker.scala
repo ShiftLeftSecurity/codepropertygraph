@@ -20,14 +20,14 @@ object MethodInstLinker {
   * CALL_ARG, CALL_ARG_OUT and CALL_RET edges for each call site.
   */
 class MethodInstLinker(graph: ScalaGraph) extends CpgEnhancement(graph) {
-  private var fullNameToMethodInst = Map[String, nodes.MethodInst]()
+  private var fullNameToMethodInst = Map.empty[String, Vertex]
 
   override def run(): Unit = {
     val cpg = Cpg(graph.graph)
 
     cpg.methodInst
       .sideEffect { methodInstNode =>
-        fullNameToMethodInst += methodInstNode.fullName -> methodInstNode
+        fullNameToMethodInst += methodInstNode.fullName -> methodInstNode.underlying
       }
       .iterate()
 
@@ -52,8 +52,8 @@ class MethodInstLinker(graph: ScalaGraph) extends CpgEnhancement(graph) {
               case None =>
                 fullNameToMethodInst.get(callsite.value2(NodeKeys.METHOD_INST_FULL_NAME)) match {
                   case Some(methodInst) =>
-                    dstGraph.addEdgeInOriginal(callsite, methodInst.underlying, EdgeTypes.CALL)
-                    Some(methodInst.underlying)
+                    dstGraph.addEdgeInOriginal(callsite, methodInst, EdgeTypes.CALL)
+                    Some(methodInst)
                   case None =>
                     logger.error(
                       "Missing METHOD_INST node or invalid methodInstFullName=${callsite.value2(NodeKeys.METHOD_INST_FULL_NAME)}")
@@ -95,10 +95,8 @@ class MethodInstLinker(graph: ScalaGraph) extends CpgEnhancement(graph) {
       .sortBy(_.value2(NodeKeys.ORDER))
 
     sortedArguments.zip(sortedParameters).foreach {
-      case (argument: nodes.Expression, parameter: nodes.MethodParameterIn) =>
+      case (argument, parameter) =>
         perCallsiteDstGraph.addEdgeInOriginal(argument, parameter, EdgeTypes.CALL_ARG)
-      case other =>
-        logger.error(s"Failed to generate arg edges for $other")
     }
   }
 
@@ -113,10 +111,8 @@ class MethodInstLinker(graph: ScalaGraph) extends CpgEnhancement(graph) {
       .sortBy(_.value2(NodeKeys.ORDER))
 
     sortedArguments.zip(sortedParameters).foreach {
-      case (argument: nodes.Expression, parameter: nodes.MethodParameterOut) =>
+      case (argument, parameter) =>
         perCallsiteDstGraph.addEdgeInOriginal(parameter, argument, EdgeTypes.CALL_ARG_OUT)
-      case other =>
-        logger.error(s"Failed to generate out arg edges for $other")
     }
   }
 

@@ -206,7 +206,7 @@ class Linker(graph: ScalaGraph) extends CpgEnhancement(graph) {
                 case NodeTypes.NAMESPACE_BLOCK =>
                   namespaceBlockFullNameToNode.get(astChild.value2(NodeKeys.AST_PARENT_FULL_NAME))
                 case _ =>
-                  logger.error("Invalid AST_PARENT_TYPE=${astChild.value2(NodeKeys.AST_PARENT_FULL_NAME)}")
+                  logger.error(s"Invalid AST_PARENT_TYPE=${astChild.value2(NodeKeys.AST_PARENT_FULL_NAME)}")
                   None
               }
 
@@ -239,8 +239,8 @@ class Linker(graph: ScalaGraph) extends CpgEnhancement(graph) {
                                  dstFullName: String): Unit = {
     logger.error(
       "Could not create edge. Destination lookup failed. " +
-        "edgeType=$edgeType, srcNodeType=$srcNodeType, srcNodeId=$srcNodeId, " +
-        "dstNodeType=$dstNodeType, dstFullName=$dstFullName")
+        s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcNodeId=$srcNodeId, " +
+        s"dstNodeType=$dstNodeType, dstFullName=$dstFullName")
   }
 
   @inline
@@ -251,7 +251,7 @@ class Linker(graph: ScalaGraph) extends CpgEnhancement(graph) {
                                  dstNodeId: String): Unit = {
     logger.error(
       "Could not create edge. Destination lookup failed. " +
-        "edgeType=$edgeType, srcNodeType=$srcNodeType, srcFullName=$srcFullName, " +
-        "dstNodeType=$dstNodeType, dstNodeId=$dstNodeId")
+        s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcFullName=$srcFullName, " +
+        s"dstNodeType=$dstNodeType, dstNodeId=$dstNodeId")
   }
 }
