@@ -35,6 +35,11 @@ class CpgSteps[NodeType <: nodes.StoredNode: Marshallable, Labels <: HList](over
         .until(_.hasLabel(NodeTypes.FILE))
         .repeat(_.in(EdgeTypes.AST)))
 
+  def toMaps(): Steps[JMap[String, AnyRef], JMap[String, AnyRef], Labels] = {
+    implicit val c = Converter.identityConverter[JMap[String, AnyRef]]
+    new Steps[JMap[String, AnyRef], JMap[String, AnyRef], Labels](raw.valueMap())
+  }
+
   /**
     Execute traversal and convert the result to json.
     */
