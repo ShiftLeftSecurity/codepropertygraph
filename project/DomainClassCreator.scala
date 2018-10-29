@@ -86,13 +86,6 @@ object DomainClassCreator {
         }
         .mkString(",\n")
 
-      val additionalConstructorParams = keys.map { key =>
-        s"""${camelCase(key.name)} = properties.get("${key.name}").asInstanceOf[${getBaseType(key)}]"""
-      } match {
-        case Nil    => ""
-        case params => ",\n" + params.mkString(",\n")
-      }
-
       val companionObject = s"""
       object $edgeNameCamelCase {
         val Label = "${edgeType.name}"
@@ -106,40 +99,17 @@ object DomainClassCreator {
         val Factory = new SpecializedElementFactory.ForEdge[$edgeNameCamelCase, JLong] {
           override val forLabel = $edgeNameCamelCase.Label
 
-          override def createEdge(id: JLong, outVertex: Vertex, inVertex: Vertex, properties: JMap[String, AnyRef]) = 
-            new $edgeNameCamelCase(id, outVertex, inVertex $additionalConstructorParams)
+          override def createEdge(id: JLong, outVertex: Vertex, inVertex: Vertex) = 
+            new $edgeNameCamelCase(id, outVertex, inVertex)
         }
       }
       """
 
-      val additionalFields = keys match {
-        case Nil => ""
-        case keys =>
-          ", " + keys
-            .map { property =>
-              s"var ${camelCase(property.name)}: ${getBaseType(property)}"
-            }
-            .mkString(", ")
-      }
-
-      val updateSpecificPropertyBody = {
-        val caseNotFound =
-          s"""throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to cpg.json")"""
-        keys match {
-          case Nil => caseNotFound
-          case keys =>
-            val casesForKeys: List[String] = keys.map { property =>
-              s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getBaseType(
-                property)}] """
-            }
-            (casesForKeys :+ caseNotFound).mkString("\n else ")
-        }
-      }
-
       val classImpl = s"""
-      class $edgeNameCamelCase(private val _id: JLong, private val _outVertex: Vertex, _inVertex: Vertex $additionalFields)
+      class $edgeNameCamelCase(private val _id: JLong, private val _outVertex: Vertex, _inVertex: Vertex)
           extends SpecializedTinkerEdge[JLong](_id, _outVertex, $edgeNameCamelCase.Label, _inVertex, $edgeNameCamelCase.Keys.All) {
 
+        ${propertyBasedFields(keys)}
         override protected def specificProperty[A](key: String): Property[A] =
           $edgeNameCamelCase.Keys.KeyToValue.get(key) match {
             case None => Property.empty[A]
@@ -150,7 +120,7 @@ object DomainClassCreator {
           }
 
         override protected def updateSpecificProperty[A](key: String, value: A): Property[A] = {
-          $updateSpecificPropertyBody
+          ${updateSpecificPropertyBody(keys)}
           property(key)
         }
       }
@@ -243,7 +213,14 @@ object DomainClassCreator {
             val camelCaseName = camelCase(property.name)
             val camelCaseCapitalized = camelCaseName.capitalize
             val tpe = getCompleteType(property)
-            s"trait Has$camelCaseCapitalized { var $camelCaseName: $tpe }"
+            val body = getHigherType(property) match {
+              case HigherValueType.None =>
+                s"""var _$camelCaseName: $tpe
+                   |def $camelCaseName: $tpe
+                """.stripMargin
+              case _ => s"def $camelCaseName: $tpe"
+            }
+            s"trait Has$camelCaseCapitalized { $body }"
           }
           .mkString("\n")
 
@@ -270,29 +247,15 @@ object DomainClassCreator {
 
       val keyConstants = keys.map(key => s"""val ${camelCase(key.name).capitalize} = "${key.name}" """).mkString("\n")
       val keyToValueMap = keys
-        .map { key: Property =>
-          getHigherType(key) match {
+        .map { property: Property =>
+          getHigherType(property) match {
             case HigherValueType.None | HigherValueType.List =>
-              s""" "${key.name}" -> { instance: $nodeNameCamelCase => instance.${camelCase(key.name)}}"""
+              s""" "${property.name}" -> { instance: $nodeNameCamelCase => instance.${camelCase(property.name)}}"""
             case HigherValueType.Option =>
-              s""" "${key.name}" -> { instance: $nodeNameCamelCase => instance.${camelCase(key.name)}.orNull}"""
+              s""" "${property.name}" -> { instance: $nodeNameCamelCase => instance.${camelCase(property.name)}.orNull}"""
           }
         }
         .mkString(",\n")
-
-      val additionalConstructorParams = keys.map { key =>
-        getHigherType(key) match {
-          case HigherValueType.None =>
-            s"""${camelCase(key.name)} = properties.get("${key.name}").asInstanceOf[${getBaseType(key)}]"""
-          case HigherValueType.Option =>
-            s"""${camelCase(key.name)} = Option(properties.get("${key.name}").asInstanceOf[${getBaseType(key)}])"""
-          case HigherValueType.List =>
-            s"""${camelCase(key.name)} = properties.get("${key.name}").asInstanceOf[${getCompleteType(key)}]"""
-        }
-      } match {
-        case Nil    => ""
-        case params => ",\n" + params.mkString(",\n")
-      }
 
       def outEdges(nodeType: NodeType): List[String] = {
         nodeType.outEdges.map(_.edgeName)
@@ -325,8 +288,8 @@ object DomainClassCreator {
         val Factory = new SpecializedElementFactory.ForVertex[$nodeNameCamelCase, JLong] {
           override val forLabel = $nodeNameCamelCase.Label
 
-          override def createVertex(id: JLong, graph: TinkerGraph, properties: JMap[String, AnyRef]) =
-            new $nodeNameCamelCase(id, graph $additionalConstructorParams)
+          override def createVertex(id: JLong, graph: TinkerGraph) =
+            new $nodeNameCamelCase(id, graph)
         }
       }
       """
@@ -339,46 +302,7 @@ object DomainClassCreator {
           }
           .mkString(" ")
 
-      val additionalFields = keys match {
-        case Nil => ""
-        case keys =>
-          ", " + keys
-            .map { key =>
-              s"var ${camelCase(key.name)}: ${getCompleteType(key)}"
-            }
-            .mkString(", ")
-      }
-
       val propertyBasedTraits = keys.map(key => s"with Has${camelCase(key.name).capitalize}").mkString(" ")
-
-      val updateSpecificPropertyBody = {
-        val caseNotFound =
-          s"""throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to cpg.json")"""
-        keys match {
-          case Nil => caseNotFound
-          case keys =>
-            val casesForKeys: List[String] = keys.map { property =>
-              getHigherType(property) match {
-                case HigherValueType.None =>
-                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = value.asInstanceOf[${getBaseType(property)}] """
-                case HigherValueType.Option =>
-                  s""" if (key == "${property.name}") this.${camelCase(property.name)} = Option(value).asInstanceOf[${getCompleteType(property)}] """
-                case HigherValueType.List =>
-                  val memberName = camelCase(property.name)
-                  s"""if (key == "${property.name}") {
-                        if (cardinality == VertexProperty.Cardinality.list) {
-                          if (this.$memberName == null) { this.$memberName = Nil }
-                          this.$memberName = this.$memberName :+ value.asInstanceOf[${getBaseType(property)}]
-                        } else {
-                          this.$memberName = List(value.asInstanceOf[${getBaseType(property)}])
-                        }
-                      }
-                  """
-              }
-            }
-            (casesForKeys :+ caseNotFound).mkString("\n else ")
-        }
-      }
 
       val edgeSets = {
         val fullNames: List[String] =
@@ -532,8 +456,10 @@ object DomainClassCreator {
         $abstractContainedNodeAccessors
       }
 
-      class $nodeNameCamelCase(private val _id: JLong, private val _graph: TinkerGraph $additionalFields)
+      class $nodeNameCamelCase(private val _id: JLong, private val _graph: TinkerGraph)
           extends SpecializedTinkerVertex[JLong](_id, $nodeNameCamelCase.Label, _graph, $nodeNameCamelCase.Keys.All) with StoredNode $mixinTraits $propertyBasedTraits with Product with ${nodeNameCamelCase}Base {
+
+        ${propertyBasedFields(keys)}
 
         override val productPrefix = "$nodeNameCamelCase"
         override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[$nodeNameCamelCase]
@@ -581,7 +507,7 @@ object DomainClassCreator {
         }
 
         override protected def updateSpecificProperty[A](cardinality: VertexProperty.Cardinality, key: String, value: A): VertexProperty[A] = {
-          $updateSpecificPropertyBody
+          ${updateSpecificPropertyBody(keys)}
           new TinkerVertexProperty(-1, this, key, value)
         }
 
@@ -879,4 +805,53 @@ object Utils {
       case HigherValueType.Option => s"Option[${getBaseType(property)}]"
       case HigherValueType.List   => s"List[${getBaseType(property)}]"
     }
+
+  def propertyBasedFields(properties: List[Property]): String =
+    properties.map { property =>
+      val name = camelCase(property.name)
+      val tpe = getCompleteType(property)
+
+      getHigherType(property) match {
+        case HigherValueType.None =>
+          s"""|var _$name: $tpe = null
+              |def $name: $tpe = 
+              |  if (_$name == null) {
+              |    throw new AssertionError("property $name is mandatory but hasn't been initialised yet")
+              |} else { _$name }""".stripMargin
+        case HigherValueType.Option =>
+          s"""var $name: $tpe = None"""
+        case HigherValueType.List =>
+          s"""var $name: $tpe = Nil"""
+      }
+    }.mkString("\n\n")
+
+  def updateSpecificPropertyBody(properties: List[Property]): String = {
+    val caseNotFound =
+      s"""throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to cpg.json")"""
+    properties match {
+      case Nil => caseNotFound
+      case keys =>
+        val casesForKeys: List[String] = keys.map { property =>
+          getHigherType(property) match {
+            case HigherValueType.None =>
+              s""" if (key == "${property.name}") this._${camelCase(property.name)} = value.asInstanceOf[${getBaseType(property)}] """
+            case HigherValueType.Option =>
+              s""" if (key == "${property.name}") this.${camelCase(property.name)} = Option(value).asInstanceOf[${getCompleteType(property)}] """
+            case HigherValueType.List =>
+              val memberName = camelCase(property.name)
+              s"""if (key == "${property.name}") {
+                    if (cardinality == VertexProperty.Cardinality.list) {
+                      if (this.$memberName == null) { this.$memberName = Nil }
+                      this.$memberName = this.$memberName :+ value.asInstanceOf[${getBaseType(property)}]
+                    } else {
+                      this.$memberName = List(value.asInstanceOf[${getBaseType(property)}])
+                    }
+                  }
+              """
+          }
+        }
+        (casesForKeys :+ caseNotFound).mkString("\n else ")
+    }
+  }
+
 }
