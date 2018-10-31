@@ -392,16 +392,23 @@ object DomainClassCreator {
 
       val productElementAccessors =
         keys.zipWithIndex
-          .map {
-            case (key, idx) =>
-              s"case ${idx + 1} => ${camelCase(key.name)}"
+          .map { case (key, idx) =>
+            val memberPrefix = Cardinality.fromName(key.cardinality) match {
+              case Cardinality.One => "_"
+              case _ => ""
+            }
+            s"case ${idx + 1} => ${memberPrefix}${camelCase(key.name)}"
           }
           .mkString("\n")
 
       val toMap = {
         val forKeys = keys
           .map { key: Property =>
-            s"""("${key.name}" -> ${camelCase(key.name)} )"""
+            val memberPrefix = Cardinality.fromName(key.cardinality) match {
+              case Cardinality.One => "_"
+              case _ => ""
+            }
+            s"""("${key.name}" -> ${memberPrefix}${camelCase(key.name)} )"""
           }
           .mkString(",\n")
 
