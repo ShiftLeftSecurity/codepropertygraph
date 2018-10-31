@@ -366,12 +366,11 @@ object DomainClassCreator {
                 case Cardinality.List      => s".toList.sortBy(_.valueOption[Integer](generated.EdgeKeys.INDEX))"
               }
 
-              // TODO: contains is actually optional -> `localName.map(_ == annotationParameters.getOrElse(false)))`
               s"""
            /** link to 'contained' node of type $containedNodeType */
            lazy val ${containedNode.localName}: $completeType =
               containsNodeOut.asScala.toIterable
-                .filter(_.asInstanceOf[generated.edges.ContainsNode].localName == "${containedNode.localName}")
+                .filter(_.asInstanceOf[generated.edges.ContainsNode].localName.map(_  == "${containedNode.localName}").getOrElse(false))
                 .map(_.inVertex.asInstanceOf[$containedNodeType])
                 $traversalEnding
           """
