@@ -366,12 +366,11 @@ object DomainClassCreator {
                 case Cardinality.List      => s".toList.sortBy(_.valueOption[Integer](generated.EdgeKeys.INDEX))"
               }
 
-              // TODO: contains is actually optional -> `localName.map(_ == annotationParameters.getOrElse(false)))`
               s"""
            /** link to 'contained' node of type $containedNodeType */
            lazy val ${containedNode.localName}: $completeType =
               containsNodeOut.asScala.toIterable
-                .filter(_.asInstanceOf[generated.edges.ContainsNode].localName == "${containedNode.localName}")
+                .filter(_.asInstanceOf[generated.edges.ContainsNode].localName.map(_  == "${containedNode.localName}").getOrElse(false))
                 .map(_.inVertex.asInstanceOf[$containedNodeType])
                 $traversalEnding
           """
@@ -393,16 +392,23 @@ object DomainClassCreator {
 
       val productElementAccessors =
         keys.zipWithIndex
-          .map {
-            case (key, idx) =>
-              s"case ${idx + 1} => ${camelCase(key.name)}"
+          .map { case (key, idx) =>
+            val memberPrefix = Cardinality.fromName(key.cardinality) match {
+              case Cardinality.One => "_"
+              case _ => ""
+            }
+            s"case ${idx + 1} => ${memberPrefix}${camelCase(key.name)}"
           }
           .mkString("\n")
 
       val toMap = {
         val forKeys = keys
           .map { key: Property =>
-            s"""("${key.name}" -> ${camelCase(key.name)} )"""
+            val memberPrefix = Cardinality.fromName(key.cardinality) match {
+              case Cardinality.One => "_"
+              case _ => ""
+            }
+            s"""("${key.name}" -> ${memberPrefix}${camelCase(key.name)} )"""
           }
           .mkString(",\n")
 
@@ -813,11 +819,15 @@ object Utils {
 
       getHigherType(property) match {
         case HigherValueType.None =>
+        /** TODO: rather than returning `null`, throw an exception, since this is a schema violation:
           s"""|var _$name: $tpe = null
-              |def $name: $tpe = 
+              |def $name: $tpe =
               |  if (_$name == null) {
               |    throw new AssertionError("property $name is mandatory but hasn't been initialised yet")
-              |} else { _$name }""".stripMargin
+              |} else { _$name } """.stripMargin
+          */
+          s"""|var _$name: $tpe = null
+              |def $name: $tpe = _$name""".stripMargin
         case HigherValueType.Option =>
           s"""var $name: $tpe = None"""
         case HigherValueType.List =>
