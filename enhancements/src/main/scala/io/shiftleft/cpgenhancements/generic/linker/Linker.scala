@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 import org.apache.tinkerpop.gremlin.structure.Direction
+import org.apache.tinkerpop.gremlin.structure.VertexProperty
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 
 import scala.collection.JavaConverters._
@@ -74,7 +75,9 @@ class Linker(graph: ScalaGraph) extends CpgEnhancement(graph) {
       edgeType = EdgeTypes.INHERITS_FROM,
       dstNodeMap = typeFullNameToNode,
       getDstFullNames = (srcNode: Vertex) => {
-        Seq(srcNode.valueOption(NodeKeys.INHERITS_FROM_TYPE_FULL_NAME)).flatten
+        srcNode.properties(NodeKeyNames.INHERITS_FROM_TYPE_FULL_NAME).asScala
+          .map { vp: VertexProperty[String] => vp.value }
+          .toList
       },
       setDstFullNames = (srcNode: Vertex, fullNames: Iterable[String]) => {
         fullNames.foreach { fullName =>
