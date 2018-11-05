@@ -16,6 +16,7 @@ object Declaration {
     override def toCC(element: Element) =
       new nodes.Declaration {
         override def underlying: Vertex = element.asInstanceOf[Vertex]
+        override var _name: String = ???
         override def name: String = element.value[String](NodeKeyNames.NAME)
 
         // not really needed AFAIK

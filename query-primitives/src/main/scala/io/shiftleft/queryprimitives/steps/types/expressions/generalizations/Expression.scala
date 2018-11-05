@@ -30,7 +30,9 @@ object Expression {
     override def toCC(element: Element) =
       new nodes.Expression {
         override def underlying: Vertex = element.asInstanceOf[Vertex]
+        override var _code: String = ???
         override def code: String = element.value[String](NodeKeyNames.CODE)
+        override var _order: Integer = ???
         override def order: Integer = element.value[Integer](NodeKeyNames.ORDER)
         override def columnNumber: Option[Integer] = element.property[Integer](NodeKeyNames.COLUMN_NUMBER).toOption
         override def columnNumberEnd: Option[Integer] =
