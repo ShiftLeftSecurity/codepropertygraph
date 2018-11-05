@@ -21,24 +21,24 @@ mergeSchemaTask := {
     throw new Exception(s"problem when calling $mergeCmd. exitCode was $mergeResult")
 }
 
-Compile / sourceGenerators += Def.task {
-  val javaDefs = { // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
-    import scala.sys.process._
+// Compile / sourceGenerators += Def.task {
+//   val javaDefs = { // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
+//     import scala.sys.process._
 
-    val cmd = "codepropertygraph/codegen/src/main/python/generateJava.py"
-    val result = Seq(cmd).!
-    if (result == 0)
-      println(s"successfully called $cmd")
-    else
-      throw new Exception(s"problem when calling $cmd. exitCode was $result")
-    new java.io.File(sourceManaged.in(Compile).value.getAbsolutePath + "/java").getAbsoluteFile.listFiles
-  }
-  val domainClassFiles = DomainClassCreator.run((Compile / sourceManaged).value)
+//     val cmd = "codepropertygraph/codegen/src/main/python/generateJava.py"
+//     val result = Seq(cmd).!
+//     if (result == 0)
+//       println(s"successfully called $cmd")
+//     else
+//       throw new Exception(s"problem when calling $cmd. exitCode was $result")
+//     new java.io.File(sourceManaged.in(Compile).value.getAbsolutePath + "/java").getAbsoluteFile.listFiles
+//   }
+//   val domainClassFiles = DomainClassCreator.run((Compile / sourceManaged).value)
 
-  domainClassFiles ++ javaDefs
-}.taskValue
+//   domainClassFiles ++ javaDefs
+// }.taskValue
 
-(Compile / sourceGenerators) := (Compile / sourceGenerators).value.map(x => x.dependsOn(mergeSchemaTask.taskValue))
+// (Compile / sourceGenerators) := (Compile / sourceGenerators).value.map(x => x.dependsOn(mergeSchemaTask.taskValue))
 
 lazy val generateProtobuf = taskKey[Seq[File]]("generate cpg.proto")
 generateProtobuf := {
