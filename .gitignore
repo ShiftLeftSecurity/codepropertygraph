@@ -1,4 +1,5 @@
 /build/*
+**/generated/*
 .idea/
 /codepropertygraph/src/main/proto/io/shiftleft/codepropertygraph/protos.proto
 target/
