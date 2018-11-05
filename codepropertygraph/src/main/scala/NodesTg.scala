@@ -10,8 +10,19 @@
       import scala.collection.JavaConverters._
       import shapeless.HNil
 
+        object Factories {
+          lazy val All: List[SpecializedElementFactory.ForVertex[_, _]] =
+            List(Type2.Factory)
+            // List(ArrayInitializer.Factory, Block.Factory, Call.Factory, ClosureBinding.Factory, File.Factory, Identifier.Factory, Literal.Factory, Local.Factory, Member.Factory, MetaData.Factory, Method.Factory, MethodInst.Factory, MethodParameterIn.Factory, MethodParameterOut.Factory, MethodRef.Factory, MethodReturn.Factory, Modifier.Factory, Namespace.Factory, NamespaceBlock.Factory, Return.Factory, Tag.Factory, Type.Factory, TypeArgument.Factory, TypeDecl.Factory, TypeParameter.Factory, Unknown.Factory)
+          lazy val AllAsJava: java.util.List[SpecializedElementFactory.ForVertex[_, _]] = All.asJava
+        }
 
       object Type2 {
+        implicit val marshaller: Marshallable[Type2] = new Marshallable[Type2] {
+          override def fromCC(cc: Type2): FromCC = ???
+          override def toCC(element: Element): Type2 = element.asInstanceOf[Type2]
+        }
+
         val Label = "TYPE"
         object Keys {
           val Name = "NAME" 

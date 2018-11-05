@@ -46,6 +46,8 @@ trait NodeTypeStarters {
     */
   def types: Type[HNil] =
     new Type(scalaGraph.V.hasLabel(NodeTypes.TYPE))
+  def types2: Type2[HNil] =
+    new Type2(scalaGraph.V.hasLabel(NodeTypes.TYPE))
 
   /**
     Traverse to all declarations, e.g., Set<T>
