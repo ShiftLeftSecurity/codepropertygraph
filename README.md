@@ -419,6 +419,18 @@ cpg.method.name("getAccountList").definingTypeDecl.toList.head
 // TypeDecl(Some(v[464]),AccountController,io.shiftleft.controller.AccountController,false,List(java.lang.Object))
 ```
 
+# Development FAQ
+## Regenerate all cpgs for tests
+```
+export CPG_PROJECT_DIR=~/Projects/shiftleft/codepropertygraph
+cd java2cpg
+sbt stage
+
+for jar in `find $CPG_PROJECT_DIR/resources/cpgs -name '*.jar'`; do 
+  OUT_DIR=`dirname $jar`
+  ./java2cpg.sh $jar -o $OUT_DIR/cpg.bin.zip
+done;
+```
 
 # References
 

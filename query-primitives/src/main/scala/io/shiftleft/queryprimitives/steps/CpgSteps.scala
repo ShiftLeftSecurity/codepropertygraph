@@ -27,6 +27,11 @@ class CpgSteps[NodeType <: nodes.StoredNode: Marshallable, Labels <: HList](over
   implicit val graph: Graph = raw.traversal.asAdmin.getGraph.get
 
   /**
+    * shortcut for `toList`
+    */
+  def l: List[NodeType] = toList
+
+  /**
     * Traverse to source file
     * */
   def file: File[Labels] =
@@ -35,11 +40,6 @@ class CpgSteps[NodeType <: nodes.StoredNode: Marshallable, Labels <: HList](over
         .until(_.hasLabel(NodeTypes.FILE))
         .repeat(_.in(EdgeTypes.AST)))
 
-  def toMaps(): Steps[JMap[String, AnyRef], JMap[String, AnyRef], Labels] = {
-    implicit val c = Converter.identityConverter[JMap[String, AnyRef]]
-    new Steps[JMap[String, AnyRef], JMap[String, AnyRef], Labels](raw.valueMap())
-  }
-
   /**
     Execute traversal and convert the result to json.
     */
@@ -47,9 +47,20 @@ class CpgSteps[NodeType <: nodes.StoredNode: Marshallable, Labels <: HList](over
 
   def toJsonPretty: String = _toJson(pretty = true)
 
+  def toMaps(): Steps[Map[String, AnyRef], Map[String, AnyRef], Labels] = {
+    implicit val c = Converter.identityConverter[Map[String, AnyRef]]
+    new Steps[Map[String, AnyRef], Map[String, AnyRef], Labels](
+      raw.map { vertex: Vertex =>
+        val propertyEntries: List[(String, AnyRef)] =
+          vertex.properties[AnyRef]().asScala.map(p => (p.key, p.value)).toList
+        (propertyEntries :+ ("_id" -> vertex.id) :+ ("_label" -> vertex.label)).toMap
+      }
+    )
+  }
+
   protected def _toJson(pretty: Boolean): String = {
     implicit val formats = org.json4s.DefaultFormats
-    val maps: List[JMap[String, AnyRef]] = toMaps().toList
+    val maps: List[Map[String, AnyRef]] = toMaps.toList
     if (pretty) writePretty(maps)
     else write(maps)
   }

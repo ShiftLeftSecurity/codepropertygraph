@@ -10,26 +10,28 @@ import shapeless.HList
 class NewNodeSteps[A <: NewNode: Marshallable, Labels <: HList](raw: GremlinScala.Aux[A, Labels]) {
 
   def store()(implicit graph: DiffGraph): Unit =
-    raw.toList.foreach { newNode =>
-      graph.addNode(newNode)
+    raw.toList.foreach(storeRecursively)
 
-      // all `contained` nodes that are NewNodes also need to be added to the DiffGraph
-      newNode.allContainedNodes.collect {
-        case containedNode: NewNode => graph.addNode(containedNode)
-      }
+  private def storeRecursively(newNode: NewNode)(implicit graph: DiffGraph): Unit = {
+    graph.addNode(newNode)
 
-      // create edges to `contained` nodes for this new node
-      for {
-        (localName, containedNodes) <- newNode.containedNodesByLocalName
-        (containedNode, index) <- containedNodes.zipWithIndex
-      } {
-        val properties = Seq(
-          EdgeKeys.LOCAL_NAME -> localName,
-          EdgeKeys.INDEX -> index
-        ).map { case KeyValue(key, value) => (key.name, value) }
-        addEdge(graph, newNode, containedNode, EdgeTypes.CONTAINS, properties)
-      }
+    // add all `contained` nodes that are NewNodes to the DiffGraph
+    newNode.allContainedNodes.collect {
+      case containedNode: NewNode => storeRecursively(containedNode)
     }
+
+    // create edges to `contained` nodes for this new node
+    for {
+      (localName, containedNodes) <- newNode.containedNodesByLocalName
+      (containedNode, index) <- containedNodes.zipWithIndex
+    } {
+      val properties = Seq(
+        EdgeKeys.LOCAL_NAME -> localName,
+        EdgeKeys.INDEX -> index
+      ).map { case KeyValue(key, value) => (key.name, value) }
+      addEdge(graph, newNode, containedNode, EdgeTypes.CONTAINS, properties)
+    }
+  }
 
   private def addEdge(graph: DiffGraph, src: Node, dst: Node, label: String, properties: Seq[(String, AnyRef)]): Unit =
     (src, dst) match {
