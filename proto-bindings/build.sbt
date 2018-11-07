@@ -22,8 +22,8 @@ copyLatestCpgProto := {
 
 /** generate csharp bindings for proto file as a nuget package.
   * usage examples:
-  * `sbt generateCsharpBindings -Ddotnet-version=1.0.0` -> just build it locally
-  * `sbt  -Ddotnet-version=1.0.0 -Dpublish-to-repo=https://shiftleft.jfrog.io/shiftleft/api/nuget/nuget-release-local -Dpublish-key=michael:xxxxxxxxxx generateCsharpBindings` -> publish to the specified repo
+  * `sbt -Ddotnet-version=999.0.0 generateCsharpBindings` -> just build it locally
+  * `sbt -Ddotnet-version=1.0.0 -Dpublish-to-repo=https://shiftleft.jfrog.io/shiftleft/api/nuget/nuget-release-local -Dpublish-key=michael:xxxxxxxxxx generateCsharpBindings` -> publish to the specified repo
   * note: dotnet is VERY restrictive with version names
   */
 lazy val generateCsharpBindings = taskKey[File]("generate csharp proto bindings")
