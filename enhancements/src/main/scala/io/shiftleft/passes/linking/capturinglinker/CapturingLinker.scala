@@ -1,10 +1,10 @@
-package io.shiftleft.cpgenhancements.generic.capturinglinker
+package io.shiftleft.passes.linking.capturinglinker
 
 import gremlin.scala._
-import io.shiftleft.cpgenhancements.CpgEnhancement
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes, nodes}
+import io.shiftleft.passes.CpgPass
 
-class CapturingLinker(graph: ScalaGraph) extends CpgEnhancement(graph) {
+class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
 
   override def run(): Unit = {
     var idToClosureBinding = Map.empty[String, Vertex]

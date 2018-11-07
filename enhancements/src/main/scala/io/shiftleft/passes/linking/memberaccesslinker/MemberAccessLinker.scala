@@ -1,9 +1,9 @@
-package io.shiftleft.cpgenhancements.generic.memberaccesslinker
+package io.shiftleft.passes.linking.memberaccesslinker
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.cpgenhancements.CpgEnhancement
 import io.shiftleft.diffgraph.DiffGraph
+import io.shiftleft.passes.CpgPass
 import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.Expression.marshaller
@@ -11,7 +11,7 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
 
-class MemberAccessLinker(graph: ScalaGraph) extends CpgEnhancement(graph) {
+class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
   implicit val javaGraph = graph.graph
 
   override def run(): Unit = {

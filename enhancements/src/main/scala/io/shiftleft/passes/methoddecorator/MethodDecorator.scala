@@ -1,8 +1,8 @@
-package io.shiftleft.cpgenhancements.generic.methoddecorator
+package io.shiftleft.passes.methoddecorator
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes, nodes}
-import io.shiftleft.cpgenhancements.CpgEnhancement
+import io.shiftleft.passes.CpgPass
 import io.shiftleft.queryprimitives.steps.Implicits._
 import org.apache.tinkerpop.gremlin.structure.Direction
 
@@ -16,7 +16,7 @@ object MethodDecorator {
   * connects those with a PARAMETER_LINK edge.
   * It also creates an AST edge from METHOD to the new METHOD_PARAMETER_OUT nodes.
   */
-class MethodDecorator(graph: ScalaGraph) extends CpgEnhancement(graph) {
+class MethodDecorator(graph: ScalaGraph) extends CpgPass(graph) {
   override def run(): Unit = {
     graph.V
       .hasLabel(NodeTypes.METHOD_PARAMETER_IN)

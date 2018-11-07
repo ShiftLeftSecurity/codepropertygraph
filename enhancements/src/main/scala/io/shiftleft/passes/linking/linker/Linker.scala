@@ -1,7 +1,7 @@
-package io.shiftleft.cpgenhancements.generic.linker
+package io.shiftleft.passes.linking.linker
 import gremlin.scala._
-import io.shiftleft.cpgenhancements.CpgEnhancement
 import io.shiftleft.codepropertygraph.generated._
+import io.shiftleft.passes.CpgPass
 import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 import org.apache.tinkerpop.gremlin.structure.Direction
@@ -10,7 +10,7 @@ import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 
 import scala.collection.JavaConverters._
 
-class Linker(graph: ScalaGraph) extends CpgEnhancement(graph) {
+class Linker(graph: ScalaGraph) extends CpgPass(graph) {
   private var typeDeclFullNameToNode = Map.empty[String, Vertex]
   private var typeFullNameToNode = Map.empty[String, Vertex]
   private var methodFullNameToNode = Map.empty[String, Vertex]

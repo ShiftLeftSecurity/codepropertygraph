@@ -1,4 +1,4 @@
-package io.shiftleft.cpgenhancements
+package io.shiftleft.passes
 
 import gremlin.scala.ScalaGraph
 import io.shiftleft.diffgraph.{DiffGraph, DiffGraphProtoSerializer}
@@ -8,7 +8,7 @@ import org.apache.logging.log4j.LogManager
 /**
   * Base class for CPG enhancements - provides access to a src graph and destination Diff graph
   * */
-abstract class CpgEnhancement(srcGraph: ScalaGraph) {
+abstract class CpgPass(srcGraph: ScalaGraph) {
 
   implicit val dstGraph = new DiffGraph()
 
