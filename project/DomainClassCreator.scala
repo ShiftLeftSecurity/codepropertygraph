@@ -208,8 +208,8 @@ object DomainClassCreator {
       //     s"""
       //      /** link to 'contained' node of type $containedNodeType */
       //      lazy val ${containedNode.localName}: $completeType =
-      //         containsOut.asScala.toIterable
-      //           .filter(_.asInstanceOf[generated.edges.Contains].localName == ${containedNode.localName})
+      //         containsNodeOut.asScala.toIterable
+      //           .filter(_.asInstanceOf[generated.edges.ContainsNode].localName == ${containedNode.localName})
       //           .map(_.inVertex)
       //           $traversalEnding
       //     """
@@ -392,12 +392,12 @@ object DomainClassCreator {
 //     val nodeToInEdges = new mutable.HashMap[String, mutable.Set[String]] with mutable.MultiMap[String, String]
 //     val nodeTypeNamesSet = nodeTypes.map(_.name).toSet ++ nodeBaseTraitNames
 
-//     for (nodeType <- nodeTypes;
-//          outEdge <- nodeType.outEdges;
-//          inNode <- outEdge.inNodes) {
-//       if (!nodeTypeNamesSet.contains(inNode)) {
-//         throw new RuntimeException(s"Node with name $inNode is not defined.")
-//       }
+    // for {
+    //   nodeType <- nodeTypes
+    //   outEdge  <- nodeType.outEdges
+    //   inNode   <- outEdge.inNodes
+    // } {
+    //   assert(nodeTypeNamesSet.contains(inNode), s"Node with name $inNode is not defined.")
 //       nodeToInEdges.addBinding(inNode, outEdge.edgeName)
 //     }
 
