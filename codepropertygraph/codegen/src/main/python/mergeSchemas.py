@@ -101,14 +101,18 @@ class SchemaMerger:
     # for any node that has `containedNode` entries, automatically add the corresponding `outEdges`
     def _addMissingContainsEdges(self, result):
         for nodeType in result["nodeTypes"]:
+            edgeNames = [x['edgeName'] for x in nodeType["outEdges"]] 
+            if "CONTAINS_NODE" not in edgeNames:
+                containsNodeEntry = { "edgeName": "CONTAINS_NODE", "inNodes": ["NODE"]}
+                nodeType["outEdges"].append(containsNodeEntry)
             if "containedNodes" in nodeType:
                 requiredInNodesForContains = [containedNode["nodeType"] for containedNode in nodeType["containedNodes"]]
-                # replace entry with `edge["edgeName"] == "CONTAINS"` if it exists, or add one if it doesn't
+                # replace entry with `edge["edgeName"] == "CONTAINS_NODE"` if it exists, or add one if it doesn't
                 # to do that, convert outEdges to Map<EdgeName, OutEdge> and back at the end
                 inNodesByOutEdgeName = { outEdge["edgeName"] : outEdge["inNodes"] for outEdge in nodeType["outEdges"] }
-                containsInNodes = inNodesByOutEdgeName.get("CONTAINS", [])
+                containsInNodes = inNodesByOutEdgeName.get("CONTAINS_NODE", [])
                 containsInNodes = list(set(containsInNodes + requiredInNodesForContains))
-                inNodesByOutEdgeName.update({"CONTAINS": containsInNodes})
+                inNodesByOutEdgeName.update({"CONTAINS_NODE": containsInNodes})
                 nodeType["outEdges"] = [{"edgeName": edgeName, "inNodes": inNodes} for edgeName, inNodes in inNodesByOutEdgeName.items()]
         return result
 
