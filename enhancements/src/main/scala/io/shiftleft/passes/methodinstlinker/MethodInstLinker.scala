@@ -1,10 +1,10 @@
-package io.shiftleft.cpgenhancements.generic.methodinstlinker
+package io.shiftleft.passes.methodinstlinker
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeyNames, NodeKeys, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeKeyNames, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.cpgenhancements.CpgEnhancement
 import io.shiftleft.diffgraph.DiffGraph
+import io.shiftleft.passes.CpgPass
 import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 import org.apache.tinkerpop.gremlin.structure.Direction
@@ -19,7 +19,7 @@ object MethodInstLinker {
   * Link CALL nodes to METHOD_INST and create
   * CALL_ARG, CALL_ARG_OUT and CALL_RET edges for each call site.
   */
-class MethodInstLinker(graph: ScalaGraph) extends CpgEnhancement(graph) {
+class MethodInstLinker(graph: ScalaGraph) extends CpgPass(graph) {
   private var fullNameToMethodInst = Map.empty[String, Vertex]
 
   override def run(): Unit = {

@@ -1,8 +1,8 @@
-package io.shiftleft.cpgenhancements.generic.methodinstlinker
+package io.shiftleft.passes.methodinstlinker
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
-import io.shiftleft.cpgenhancements.generic.linker.Linker
+import io.shiftleft.passes.linking.linker.Linker
 import io.shiftleft.queryprimitives.steps.Implicits._
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph

@@ -1,4 +1,4 @@
-package io.shiftleft.cpgenhancements
+package io.shiftleft.passes.utils
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}

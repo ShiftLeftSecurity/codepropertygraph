@@ -1,6 +1,6 @@
 package io.shiftleft.cpgloading
 
-import io.shiftleft.cpgenhancements.CpgEnhancements
+import io.shiftleft.layers.EnhancementLayers
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 
 /** Load cpg proto (typically cpg.bin.zip) into a graph instance */
@@ -11,7 +11,7 @@ abstract class CpgLoaderBase {
   def loadCodePropertyGraph(filename: String, runEnhancements: Boolean = true): Cpg = {
     val cpg = new ProtoCpgLoader(builder).loadFromProtoZip(filename)
     if (runEnhancements) {
-      CpgEnhancements.run(cpg.graph)
+      new EnhancementLayers().run(cpg.graph)
     }
     cpg
   }

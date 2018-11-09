@@ -1,4 +1,4 @@
-package io.shiftleft.cpgenhancements.generic.methoddecorator
+package io.shiftleft.passes.methoddecorator
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{

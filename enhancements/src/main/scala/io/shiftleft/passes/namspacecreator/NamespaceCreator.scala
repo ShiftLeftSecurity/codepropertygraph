@@ -1,13 +1,13 @@
-package io.shiftleft.cpgenhancements.generic.namspacecreator
+package io.shiftleft.passes.namspacecreator
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeyNames, NodeKeys, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.cpgenhancements.CpgEnhancement
+import io.shiftleft.passes.CpgPass
 
 import scala.collection.mutable
 
-class NamespaceCreator(graph: ScalaGraph) extends CpgEnhancement(graph) {
+class NamespaceCreator(graph: ScalaGraph) extends CpgPass(graph) {
 
   /**
     * Creates NAMESPACE nodes and connects NAMESPACE_BLOCKs

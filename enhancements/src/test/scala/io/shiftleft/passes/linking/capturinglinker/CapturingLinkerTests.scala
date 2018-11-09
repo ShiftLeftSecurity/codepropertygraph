@@ -1,4 +1,4 @@
-package io.shiftleft.cpgenhancements.generic.capturinglinker
+package io.shiftleft.passes.linking.capturinglinker
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, EdgeTypes, NodeKeys, NodeTypes}
