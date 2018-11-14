@@ -41,8 +41,10 @@ object Expression {
         override def lineNumberEnd: Option[Integer] = element.property[Integer](NodeKeyNames.LINE_NUMBER_END).toOption
 
         // needed for specialised tinkergraph (separate codegen) - doesn't harm standard CC impl
-        var _code: String = ???
-        var _order: Integer = ???
+        def _code_=(value: String): Unit = ???
+        def _code: String = code
+        def _order_=(value: Integer): Unit = ???
+        def _order: Integer = order
         def graph() = underlying.graph
         def id(): Object = underlying.id
         def label(): String = underlying.label

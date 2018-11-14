@@ -21,7 +21,8 @@ object Declaration {
         override def name: String = element.value[String](NodeKeyNames.NAME)
 
         // needed for specialised tinkergraph (separate codegen) - doesn't harm standard CC impl
-        var _name: String = ???
+        def _name_=(value: String): Unit = ???
+        def _name: String = name
         def graph() = underlying.graph
         def id(): Object = underlying.id
         def label(): String = underlying.label
