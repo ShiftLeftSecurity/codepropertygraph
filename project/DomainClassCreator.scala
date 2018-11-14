@@ -166,11 +166,11 @@ object DomainClassCreator {
 
       trait Node extends gremlin.scala.dsl.DomainRoot
 
-      trait StoredNode extends Node {
-
+      /* making use of the fact that SpecializedVertex is also our domain node */
+      trait StoredNode extends Vertex with Node {
         /* underlying vertex in the graph database. 
          * since this is a StoredNode, this is always set */
-        def underlying: Vertex
+        def underlying: Vertex = this
 
         // This is required for accessing the id from java code which only has a reference to StoredNode at hand.
         // Java does not seem to be capable of calling methods from java classes if a scala trait is in the inheritance
@@ -445,8 +445,6 @@ object DomainClassCreator {
 
       class $nodeNameCamelCase(private val _id: JLong, private val _graph: TinkerGraph)
           extends SpecializedTinkerVertex[JLong](_id, $nodeNameCamelCase.Label, _graph, $nodeNameCamelCase.Keys.All) with StoredNode $mixinTraits $propertyBasedTraits with Product with ${nodeNameCamelCase}Base {
-
-        override val underlying = this
 
         ${propertyBasedFields(keys)}
 

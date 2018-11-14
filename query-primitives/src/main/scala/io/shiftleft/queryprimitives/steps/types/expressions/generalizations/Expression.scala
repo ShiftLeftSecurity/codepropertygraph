@@ -14,6 +14,8 @@ import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{
 }
 import io.shiftleft.queryprimitives.steps.types.structure.{Method, MethodParameter, Type}
 import java.lang.{Long => JLong}
+import java.util.{Iterator => JIterator}
+import org.apache.tinkerpop.gremlin.structure.{Direction, VertexProperty}
 import shapeless.HList
 
 /**
@@ -30,9 +32,7 @@ object Expression {
     override def toCC(element: Element) =
       new nodes.Expression {
         override def underlying: Vertex = element.asInstanceOf[Vertex]
-        override var _code: String = ???
         override def code: String = element.value[String](NodeKeyNames.CODE)
-        override var _order: Integer = ???
         override def order: Integer = element.value[Integer](NodeKeyNames.ORDER)
         override def columnNumber: Option[Integer] = element.property[Integer](NodeKeyNames.COLUMN_NUMBER).toOption
         override def columnNumberEnd: Option[Integer] =
@@ -40,10 +40,30 @@ object Expression {
         override def lineNumber: Option[Integer] = element.property[Integer](NodeKeyNames.LINE_NUMBER).toOption
         override def lineNumberEnd: Option[Integer] = element.property[Integer](NodeKeyNames.LINE_NUMBER_END).toOption
 
+        // needed for specialised tinkergraph (separate codegen) - doesn't harm standard CC impl
+        var _code: String = ???
+        var _order: Integer = ???
+        def graph() = underlying.graph
+        def id(): Object = underlying.id
+        def label(): String = underlying.label
+        def remove(): Unit = underlying.remove
+        def addEdge(label: String, inVertex: Vertex, keyValues: Object*) =
+          underlying.addEdge(label, inVertex, keyValues: _*)
+        def edges(direction: Direction, edgeLabels: String*) =
+          underlying.edges(direction, edgeLabels: _*)
+        def properties[V](propertyKeys: String*): JIterator[VertexProperty[V]] =
+          underlying.properties(propertyKeys: _*)
+        def property[V](cardinality: VertexProperty.Cardinality, key: String, value: V, keyValues: Object*): VertexProperty[V] =
+          underlying.property(cardinality, key, value, keyValues: _*)
+        def vertices(direction: Direction, edgeLabels: String*): JIterator[Vertex] = 
+          underlying.vertices(direction, edgeLabels: _*)
+
         // not really needed AFAIK
         override def productArity: Int = ???
         override def productElement(n: Int): Any = ???
         override def canEqual(that: Any): Boolean = ???
+
+
       }
 
     // not really needed AFAIK
