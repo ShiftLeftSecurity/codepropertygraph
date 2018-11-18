@@ -59,13 +59,27 @@ object Expression {
           underlying.property(cardinality, key, value, keyValues: _*)
         def vertices(direction: Direction, edgeLabels: String*): JIterator[Vertex] = 
           underlying.vertices(direction, edgeLabels: _*)
+        def toMap: Map[String, Any] =
+          Map(
+            "_label" -> element.label,
+            "_id" -> element.id,
+            "CODE" -> code,
+            "ORDER" -> order,
+            "LINE_NUMBER" -> lineNumber,
+            "LINE_NUMBER_END" -> lineNumberEnd,
+            "COLUMN_NUMBER" -> columnNumber,
+            "COLUMN_NUMBER_END" -> columnNumberEnd
+          ).filterNot { case (k,v) =>
+            v == null || v == None
+          }.map {
+            case (k, Some(v)) => (k,v)
+            case other => other
+          }
 
         // not really needed AFAIK
         override def productArity: Int = ???
         override def productElement(n: Int): Any = ???
         override def canEqual(that: Any): Boolean = ???
-
-
       }
 
     // not really needed AFAIK

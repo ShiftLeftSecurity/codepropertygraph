@@ -139,6 +139,8 @@ object NodeTypeStarters {
           underlying.property(cardinality, key, value, keyValues: _*)
         def vertices(direction: Direction, edgeLabels: String*): JIterator[Vertex] = 
           underlying.vertices(direction, edgeLabels: _*)
+        def toMap: Map[String, Any] =
+          Map("_label" -> element.label, "_id" -> element.id)
 
         // not really needed AFAIK
         override def productArity: Int = ???
