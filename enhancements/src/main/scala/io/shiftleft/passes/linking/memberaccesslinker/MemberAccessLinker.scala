@@ -48,7 +48,7 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
                 dstGraph.addEdgeInOriginal(call.underlying, member.underlying, EdgeTypes.REF)
                 finished = true
               case None =>
-                val baseTypes = new NodeTypeDeco(typ).start.baseType.toList
+                val baseTypes = typ.start.baseType.toList
                 worklist = worklist ++ baseTypes
             }
           }
@@ -66,20 +66,19 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
   }.iterate()
 
   private def getTypeOfMemberAccessBase(call: nodes.Call): nodes.Type = {
-    val base = new NodeTypeDeco(call).start.argument.order(1).head
+    val base = call.start.argument.order(1).head
     base match {
       case call: nodes.Call
           if call.name == Operators.memberAccess ||
             call.name == Operators.indirectComputedMemberAccess =>
-        new NodeTypeDeco(call).start.argument.order(2).typ.head
+        call.start.argument.order(2).typ.head
       case node: nodes.Expression =>
-        new NodeTypeDeco(node).start.typ.head
-
+        node.start.typ.head
     }
   }
 
   private def findMemberOnType(typ: nodes.Type, memberName: String): Option[nodes.Member] = {
-    val members = new NodeTypeDeco(typ).start.member.filter(_.nameExact(memberName)).toList
+    val members = typ.start.member.filter(_.nameExact(memberName)).toList
     members.find(_.name == memberName)
   }
 }
