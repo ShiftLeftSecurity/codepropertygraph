@@ -5,6 +5,8 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeyNames, NodeTy
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.CpgSteps
 import java.lang.{Long => JLong}
+import java.util.{Iterator => JIterator}
+import org.apache.tinkerpop.gremlin.structure.{Direction, VertexProperty}
 import shapeless.HList
 
 class Declaration[Labels <: HList](raw: GremlinScala[Vertex])
@@ -17,6 +19,30 @@ object Declaration {
       new nodes.Declaration {
         override def underlying: Vertex = element.asInstanceOf[Vertex]
         override def name: String = element.value[String](NodeKeyNames.NAME)
+
+        // needed for specialised tinkergraph (separate codegen) - doesn't harm standard CC impl
+        def _name_=(value: String): Unit = ???
+        def _name: String = name
+        def graph() = underlying.graph
+        def id(): Object = underlying.id
+        def label(): String = underlying.label
+        def remove(): Unit = underlying.remove
+        def addEdge(label: String, inVertex: Vertex, keyValues: Object*) =
+          underlying.addEdge(label, inVertex, keyValues: _*)
+        def edges(direction: Direction, edgeLabels: String*) =
+          underlying.edges(direction, edgeLabels: _*)
+        def properties[V](propertyKeys: String*): JIterator[VertexProperty[V]] =
+          underlying.properties(propertyKeys: _*)
+        def property[V](cardinality: VertexProperty.Cardinality, key: String, value: V, keyValues: Object*): VertexProperty[V] =
+          underlying.property(cardinality, key, value, keyValues: _*)
+        def vertices(direction: Direction, edgeLabels: String*): JIterator[Vertex] = 
+          underlying.vertices(direction, edgeLabels: _*)
+        def toMap: Map[String, Any] =
+          Map(
+            "_label" -> element.label,
+            "_id" -> element.id,
+            "NAME" -> _name
+          )
 
         // not really needed AFAIK
         override def productArity: Int = ???

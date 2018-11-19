@@ -35,7 +35,7 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
             .next
             .value2(NodeKeys.NAME)
 
-          val typ = getTypeOfMemberAccessBase(call)
+          val typ: nodes.Type = getTypeOfMemberAccessBase(call)
 
           var worklist = List(typ)
           var finished = false
@@ -74,13 +74,11 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
         call.start.argument.order(2).typ.head
       case node: nodes.Expression =>
         node.start.typ.head
-
     }
   }
 
   private def findMemberOnType(typ: nodes.Type, memberName: String): Option[nodes.Member] = {
     val members = typ.start.member.filter(_.nameExact(memberName)).toList
-
     members.find(_.name == memberName)
   }
 }

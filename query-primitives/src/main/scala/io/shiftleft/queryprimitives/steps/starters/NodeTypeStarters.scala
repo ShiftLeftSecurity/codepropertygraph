@@ -8,6 +8,8 @@ import io.shiftleft.queryprimitives.steps.types.structure._
 import io.shiftleft.queryprimitives.steps.types.expressions._
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations._
 import java.lang.{Long => JLong}
+import java.util.{Iterator => JIterator}
+import org.apache.tinkerpop.gremlin.structure.{Direction, VertexProperty}
 import shapeless.HNil
 
 trait NodeTypeStarters {
@@ -121,6 +123,24 @@ object NodeTypeStarters {
     override def toCC(element: Element) =
       new nodes.StoredNode {
         override def underlying: Vertex = element.asInstanceOf[Vertex]
+
+        // needed for specialised tinkergraph (separate codegen) - doesn't harm standard CC impl
+        def graph() = underlying.graph
+        def id(): Object = underlying.id
+        def label(): String = underlying.label
+        def remove(): Unit = underlying.remove
+        def addEdge(label: String, inVertex: Vertex, keyValues: Object*) =
+          underlying.addEdge(label, inVertex, keyValues: _*)
+        def edges(direction: Direction, edgeLabels: String*) =
+          underlying.edges(direction, edgeLabels: _*)
+        def properties[V](propertyKeys: String*): JIterator[VertexProperty[V]] =
+          underlying.properties(propertyKeys: _*)
+        def property[V](cardinality: VertexProperty.Cardinality, key: String, value: V, keyValues: Object*): VertexProperty[V] =
+          underlying.property(cardinality, key, value, keyValues: _*)
+        def vertices(direction: Direction, edgeLabels: String*): JIterator[Vertex] = 
+          underlying.vertices(direction, edgeLabels: _*)
+        def toMap: Map[String, Any] =
+          Map("_label" -> element.label, "_id" -> element.id)
 
         // not really needed AFAIK
         override def productArity: Int = ???

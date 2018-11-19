@@ -14,6 +14,8 @@ import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{
 }
 import io.shiftleft.queryprimitives.steps.types.structure.{Method, MethodParameter, Type}
 import java.lang.{Long => JLong}
+import java.util.{Iterator => JIterator}
+import org.apache.tinkerpop.gremlin.structure.{Direction, VertexProperty}
 import shapeless.HList
 
 /**
@@ -37,6 +39,42 @@ object Expression {
           element.property[Integer](NodeKeyNames.COLUMN_NUMBER_END).toOption
         override def lineNumber: Option[Integer] = element.property[Integer](NodeKeyNames.LINE_NUMBER).toOption
         override def lineNumberEnd: Option[Integer] = element.property[Integer](NodeKeyNames.LINE_NUMBER_END).toOption
+
+        // needed for specialised tinkergraph (separate codegen) - doesn't harm standard CC impl
+        def _code_=(value: String): Unit = ???
+        def _code: String = code
+        def _order_=(value: Integer): Unit = ???
+        def _order: Integer = order
+        def graph() = underlying.graph
+        def id(): Object = underlying.id
+        def label(): String = underlying.label
+        def remove(): Unit = underlying.remove
+        def addEdge(label: String, inVertex: Vertex, keyValues: Object*) =
+          underlying.addEdge(label, inVertex, keyValues: _*)
+        def edges(direction: Direction, edgeLabels: String*) =
+          underlying.edges(direction, edgeLabels: _*)
+        def properties[V](propertyKeys: String*): JIterator[VertexProperty[V]] =
+          underlying.properties(propertyKeys: _*)
+        def property[V](cardinality: VertexProperty.Cardinality, key: String, value: V, keyValues: Object*): VertexProperty[V] =
+          underlying.property(cardinality, key, value, keyValues: _*)
+        def vertices(direction: Direction, edgeLabels: String*): JIterator[Vertex] = 
+          underlying.vertices(direction, edgeLabels: _*)
+        def toMap: Map[String, Any] =
+          Map(
+            "_label" -> element.label,
+            "_id" -> element.id,
+            "CODE" -> code,
+            "ORDER" -> order,
+            "LINE_NUMBER" -> lineNumber,
+            "LINE_NUMBER_END" -> lineNumberEnd,
+            "COLUMN_NUMBER" -> columnNumber,
+            "COLUMN_NUMBER_END" -> columnNumberEnd
+          ).filterNot { case (k,v) =>
+            v == null || v == None
+          }.map {
+            case (k, Some(v)) => (k,v)
+            case other => other
+          }
 
         // not really needed AFAIK
         override def productArity: Int = ???
