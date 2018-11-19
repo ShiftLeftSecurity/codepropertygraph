@@ -32,6 +32,7 @@ object DomainClassCreator {
   }
 
   def writeNodesFile(outputDir: JFile): JFile = {
+    val packageName = "io.shiftleft.codepropertygraph.generated.nodes"
     val propertyByName: Map[String, Property] =
       (Resources.cpgJson \ "nodeKeys")
         .as[List[Property]]
@@ -49,7 +50,7 @@ object DomainClassCreator {
 
     def nodeHeader = {
       val staticHeader = s"""
-      package io.shiftleft.codepropertygraph.generated.nodes
+      package $packageName
 
       import io.shiftleft.codepropertygraph.generated
       import java.lang.{Boolean => JBoolean, Long => JLong}
@@ -251,14 +252,15 @@ object DomainClassCreator {
 
       classImpl
     }
-
-    writeFile(s"${outputDir.getPath}/Nodes.scala", nodeHeader, entries)
+    val filename = outputDir.getPath + "/" + packageName.replaceAll("\\.", "/") + "/Nodes.scala"
+    writeFile(filename, nodeHeader, entries)
   }
 
   /** generates classes to easily add new nodes to the graph
     * this ability could have been added to the existing nodes, but it turned out as a different specialisation,
     * since e.g. `id` is not set before adding it to the graph */
   def writeNewNodesFile(outputDir: JFile): JFile = {
+    val packageName = "io.shiftleft.codepropertygraph.generated.nodes"
     val staticHeader = s"""
     package io.shiftleft.codepropertygraph.generated.nodes
 
@@ -368,7 +370,8 @@ object DomainClassCreator {
       """
     }
 
-    writeFile(s"${outputDir.getPath}/NewNodes.scala", staticHeader, entries)
+    val filename = outputDir.getPath + "/" + packageName.replaceAll("\\.", "/") + "/NewNodes.scala"
+    writeFile(filename, staticHeader, entries)
   }
 
   def writeFile(fileName: String, header: String, entries: List[String]): JFile = {

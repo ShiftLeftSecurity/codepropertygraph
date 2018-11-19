@@ -3,7 +3,7 @@
 import json, os
 
 # equivalent of `sourceManaged.in(Compile).value` in build.sbt
-OUTPUT_DIR = '../../../../target/src_managed/main/java'
+OUTPUT_DIR = '../../../../target/src_managed/main/io/shiftleft/codepropertygraph/generated'
 
 def generateJava(cpgDescr):
 
