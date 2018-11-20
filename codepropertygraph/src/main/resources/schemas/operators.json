@@ -216,6 +216,11 @@
             "operator":"compare",
             "name":"<operator>.compare",
             "comment": "Comparsion between to arguments with the results: 0 == equal, negative == left < right, positive == left > right"
+        },
+        {
+            "operator":"addressOf",
+            "name":"<operator>.addressOf",
+            "comment": "Returns the address of a given object."
         }
     ]
 }
