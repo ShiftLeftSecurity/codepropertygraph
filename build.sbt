@@ -42,8 +42,7 @@ lazy val queryPrimitives = Projects.queryPrimitives
 lazy val enhancements = Projects.enhancements
 lazy val cpgloaderTinkergraph = Projects.cpgloaderTinkergraph
 lazy val cpgloaderTinkergraphShiftleft = Projects.cpgloaderTinkergraphShiftleft
-// TODO reenable once oracle's repo works again
-// lazy val cpgloaderJanusgraph = Projects.cpgloaderJanusgraph
+lazy val cpgloaderJanusgraph = Projects.cpgloaderJanusgraph
 lazy val cpgloaderNeo4j = Projects.cpgloaderNeo4j
 lazy val cpgqueryingtests = Projects.cpgqueryingtests
 
