@@ -47,18 +47,20 @@
          "comment" : "This node represents a formal parameter going towards the caller side.",
          "is": ["DECLARATION", "DATA_FLOW_OBJECT"],
          "outEdges" : [
-           {"edgeName": "CALL_ARG_OUT", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "UNKNOWN"]},
+           {"edgeName": "CALL_ARG_OUT", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "BLOCK", "UNKNOWN"]},
            {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
          ]
         },
         { "name": "METHOD_RETURN",
           "outEdges" : [
+            {"edgeName": "CALL_RET", "inNodes": ["CALL"]},
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
         },
         { "name": "METHOD_REF",
           "outEdges" : [
+            {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
             {"edgeName": "REF", "inNodes": ["METHOD_INST"]}
           ]
         },
@@ -80,11 +82,13 @@
         },
         { "name": "LITERAL",
           "outEdges" : [
+            {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
         },
         { "name": "CALL",
           "outEdges" : [
+            {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
             {"edgeName": "REF", "inNodes": ["MEMBER"]},
             {"edgeName": "CALL", "inNodes": ["METHOD_INST"]},
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
@@ -97,6 +101,13 @@
         },
         { "name": "IDENTIFIER",
           "outEdges" : [
+            {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+          ]
+        },
+        { "name": "BLOCK",
+          "outEdges" : [
+            {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
         },
@@ -107,6 +118,7 @@
         },
         { "name": "UNKNOWN",
           "outEdges" : [
+            {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
         }
