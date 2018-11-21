@@ -31,7 +31,8 @@ Compile / sourceGenerators += Def.task {
       println(s"successfully called $cmd")
     else
       throw new Exception(s"problem when calling $cmd. exitCode was $result")
-    new java.io.File(sourceManaged.in(Compile).value.getAbsolutePath + "/java").getAbsoluteFile.listFiles
+    new java.io.File(sourceManaged.in(Compile).value.getAbsolutePath +
+      "/io/shiftleft/codepropertygraph/generated").getAbsoluteFile.listFiles
   }
   val domainClassFiles = DomainClassCreator.run((Compile / sourceManaged).value)
 
@@ -59,3 +60,11 @@ generateProtobuf := generateProtobuf.dependsOn(mergeSchemaTask).value
 Compile / resourceGenerators += generateProtobuf.taskValue
 
 (Compile / resourceGenerators) := (Compile / resourceGenerators).value.map(x => x.dependsOn(mergeSchemaTask.taskValue))
+
+import Path._
+mappings in (Compile, packageSrc) ++= { // publish generated sources
+  val srcs = (managedSources in Compile).value
+  val sdirs = (managedSourceDirectories in Compile).value
+  val base = baseDirectory.value
+  (((srcs --- sdirs --- base) pair (relativeTo(sdirs) | relativeTo(base) | flat)) toSeq)
+}
