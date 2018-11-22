@@ -14,13 +14,15 @@ import scala.collection.JavaConverters._
 class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
   implicit val javaGraph = graph.graph
 
-  override def run(): Unit = {
+  override def run() = {
     linkMemberAccessToMember()
+    dstGraph
   }
 
   private def linkMemberAccessToMember(): Unit = {
-    var loggedDeprecationWarning = false
-    val cpg = Cpg(javaGraph)
+    var loggedDeprecationWarning       = false
+    var loggedForTypeMemberCombination = Set[(nodes.Type, String)]()
+    val cpg                            = Cpg(graph.graph)
 
     cpg.call
       .filter(
@@ -53,9 +55,9 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
             }
           }
 
-          if (!finished) {
-            logger.error(s"Could not find type member. type=${typ.fullName}, member=$memberName")
-          }
+        if (!finished) {
+          logger.error(s"Could not find type member. type=${typ.fullName}, member=$memberName")
+        }
         } else if (!loggedDeprecationWarning) {
           logger.warn(
             s"Using deprecated CPG format with alreay existing REF edge between" +

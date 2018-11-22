@@ -6,7 +6,7 @@ import io.shiftleft.passes.CpgPass
 
 class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
 
-  override def run(): Unit = {
+  override def run() = {
     var idToClosureBinding = Map.empty[String, Vertex]
 
     graph.V
@@ -29,5 +29,6 @@ class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
         }
       }
       .iterate()
+    dstGraph
   }
 }

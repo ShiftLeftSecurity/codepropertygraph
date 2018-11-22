@@ -1,7 +1,7 @@
 package io.shiftleft.passes
 
 import gremlin.scala.ScalaGraph
-import io.shiftleft.diffgraph.{DiffGraph, DiffGraphProtoSerializer}
+import io.shiftleft.diffgraph.{AppliedDiffGraph, DiffGraph, DiffGraphProtoSerializer}
 import io.shiftleft.proto.cpg.Cpg.CpgOverlay
 import org.apache.logging.log4j.LogManager
 
@@ -9,10 +9,9 @@ import org.apache.logging.log4j.LogManager
   * Base class for CPG enhancements - provides access to a src graph and destination Diff graph
   * */
 abstract class CpgPass(srcGraph: ScalaGraph) {
-
   implicit val dstGraph = new DiffGraph()
 
-  protected val logger = LogManager.getLogger(getClass)
+  protected val logger        = LogManager.getLogger(getClass)
   private var startTime: Long = _
 
   /**
@@ -21,11 +20,15 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
   def executeAndApply(): Unit = {
     logStart()
     run()
+
     applyDiff
     logEnd()
   }
 
-  def applyDiff = {
+  /**
+    * Apply diff graph to the source graph
+    * */
+  def applyDiff(): AppliedDiffGraph = {
     dstGraph.applyDiff(srcGraph)
   }
 
@@ -36,7 +39,8 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
     try {
       logStart()
       run()
-      new DiffGraphProtoSerializer().serialize(dstGraph)
+      val appliedDiffGraph = applyDiff()
+      new DiffGraphProtoSerializer().serialize()(appliedDiffGraph)
     } finally {
       logEnd()
     }
@@ -45,7 +49,7 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
   /**
     * Main method of enhancement - to be implemented by child class
     * */
-  def run(): Unit
+  def run(): DiffGraph
 
   private def logStart(): Unit = {
     logger.info(s"Start of enhancement: ${getClass.getName}")

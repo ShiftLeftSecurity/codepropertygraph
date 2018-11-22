@@ -1,8 +1,10 @@
 package io.shiftleft.diffgraph
 
 import gremlin.scala.{Edge, ScalaGraph, Vertex}
-import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node}
-import scala.collection.mutable.ListBuffer
+import io.shiftleft.IdentityHashCode
+import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node, StoredNode}
+
+import scala.collection.mutable
 
 /**
   * A lightweight write-only graph used for creation of CPG graph overlays
@@ -19,33 +21,39 @@ import scala.collection.mutable.ListBuffer
 class DiffGraph {
   import DiffGraph._
 
-  private val _nodes: ListBuffer[NewNode] = ListBuffer()
-  private val _edges: ListBuffer[EdgeInDiffGraph] = ListBuffer()
-  private val _edgesToOriginal: ListBuffer[EdgeToOriginal] = ListBuffer()
-  private val _edgesFromOriginal: ListBuffer[EdgeFromOriginal] = ListBuffer()
-  private val _edgesInOriginal: ListBuffer[EdgeInOriginal] = ListBuffer()
-  private val _nodeProperties: ListBuffer[NodeProperty] = ListBuffer()
-  private val _edgeProperties: ListBuffer[EdgeProperty] = ListBuffer()
+  private val _edges             = mutable.ListBuffer.empty[EdgeInDiffGraph]
+  private val _edgesToOriginal   = mutable.ListBuffer.empty[EdgeToOriginal]
+  private val _edgesFromOriginal = mutable.ListBuffer.empty[EdgeFromOriginal]
+  private val _edgesInOriginal   = mutable.ListBuffer.empty[EdgeInOriginal]
+  private val _nodeProperties    = mutable.ListBuffer.empty[NodeProperty]
+  private val _edgeProperties    = mutable.ListBuffer.empty[EdgeProperty]
 
-  private val diffGraphApplier = new DiffGraphApplier()
+  /* for nodes, ensure we don't get duplicates, as they would later be added to the graph twice */
+  private val _nodes = mutable.Map.empty[IdentityHashCode, NewNode]
 
-  def nodes: List[NewNode] = _nodes.toList
-  def edges: List[EdgeInDiffGraph] = _edges.toList
-  def edgesToOriginal: List[EdgeToOriginal] = _edgesToOriginal.toList
+  /* this could be done much nicer if we wouldn't hold the DiffGraph locally in the CpgPass  */
+  private var applied = false
+
+  def nodes: List[NewNode]                      = _nodes.values.toList
+  def edges: List[EdgeInDiffGraph]              = _edges.toList
+  def edgesToOriginal: List[EdgeToOriginal]     = _edgesToOriginal.toList
   def edgesFromOriginal: List[EdgeFromOriginal] = _edgesFromOriginal.toList
-  def edgesInOriginal: List[EdgeInOriginal] = _edgesInOriginal.toList
-  def nodeProperties: List[NodeProperty] = _nodeProperties.toList
-  def edgeProperties: List[EdgeProperty] = _edgeProperties.toList
+  def edgesInOriginal: List[EdgeInOriginal]     = _edgesInOriginal.toList
+  def nodeProperties: List[NodeProperty]        = _nodeProperties.toList
+  def edgeProperties: List[EdgeProperty]        = _edgeProperties.toList
 
-  def applyDiff(graph: ScalaGraph): Unit = {
-    diffGraphApplier.applyDiff(this, graph)
+  def applyDiff(graph: ScalaGraph): AppliedDiffGraph = {
+    assert(!applied, "DiffGraph has already been applied, this is probably a bug")
+    val appliedDiffGraph = new DiffGraphApplier().applyDiff(this, graph)
+    applied = true
+    appliedDiffGraph
   }
 
   def addNode[A <: NewNode](node: A): Unit =
-    _nodes.append(node)
+    _nodes += IdentityHashCode(node) -> node
 
   def mergeFrom(other: DiffGraph): Unit = {
-    _nodes.appendAll(other._nodes)
+    other.nodes.foreach(addNode)
     _edges.appendAll(other._edges)
     _edgesToOriginal.appendAll(other._edgesToOriginal)
     _edgesInOriginal.appendAll(other._edgesInOriginal)

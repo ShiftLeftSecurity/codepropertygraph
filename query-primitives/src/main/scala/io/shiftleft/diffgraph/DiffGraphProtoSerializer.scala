@@ -1,10 +1,13 @@
 package io.shiftleft.diffgraph
 
+import io.shiftleft.IdentityHashCode
 import io.shiftleft.proto.cpg.Cpg._
 import io.shiftleft.proto.cpg.Cpg.CpgStruct
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
 import java.lang.{Long => JLong}
+import java.util.concurrent.atomic.AtomicLong
+import gremlin.scala.{GremlinScala, ScalaGraph}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -13,54 +16,30 @@ import scala.collection.mutable
   * Provides functionality to serialize diff graphs and add them
   * to existing serialized CPGs as graph overlays.
   * */
-class DiffGraphProtoSerializer {
+class DiffGraphProtoSerializer() {
   import DiffGraph._
-
-  val nodeToId: mutable.HashMap[Int, JLong] = mutable.HashMap()
-
-  var curNodeId = 0
-  private def generateNextNodeId(occupied: Set[JLong]): JLong = {
-    curNodeId += 1
-    while (occupied.contains(curNodeId)) {
-      curNodeId += 1
-    }
-    curNodeId
-  }
 
   /**
     * Generates a serialized graph overlay representing this graph
     * */
-  def serialize(implicit diffGraph: DiffGraph): CpgOverlay = {
+  def serialize()(implicit appliedDiffGraph: AppliedDiffGraph): CpgOverlay = {
     implicit val builder = CpgOverlay.newBuilder()
-    val occupied = occupiedIds(diffGraph)
-    addNodes(occupied)
+    addNodes()
     addEdges()
     addNodeProperties()
     addEdgeProperties()
     builder.build()
   }
 
-  private def occupiedIds(diffGraph: DiffGraph): Set[JLong] = {
-    // val result =
-    //   diffGraph.edgesFromOriginal.map(_.src.getId) ++
-    //     diffGraph.edgesToOriginal.map(_.dst.getId) ++
-    //     diffGraph.edgesInOriginal.flatMap(x => List(x.src.getId, x.dst.getId))
-
-    // result.toSet
-    ???
-  }
-
-  private def addNodes(occupied: Set[JLong])(implicit builder: CpgOverlay.Builder, diffGraph: DiffGraph) = {
-
-    val nodes = diffGraph.nodes.map { node =>
-      val nextNodeId = generateNextNodeId(occupied)
+  private def addNodes()(implicit builder: CpgOverlay.Builder,
+                         appliedDiffGraph: AppliedDiffGraph) = {
+    appliedDiffGraph.diffGraph.nodes.foreach { node =>
+      val nodeId = appliedDiffGraph.nodeToGraphId(IdentityHashCode(node))
 
       val nodeBuilder = CpgStruct.Node
         .newBuilder()
-        .setKey(nextNodeId)
+        .setKey(nodeId)
         .setType(NodeType.valueOf(node.label))
-
-      nodeToId.put(System.identityHashCode(node), nextNodeId)
 
       val properties = node.properties
         .filter { case (key, value) => !key.startsWith("_") }
@@ -68,40 +47,43 @@ class DiffGraphProtoSerializer {
         .asJava
 
       nodeBuilder.addAllProperty(properties).build()
+
+      val finalNode = nodeBuilder.build
+      builder.addNode(finalNode)
     }
-    builder.addAllNode(nodes.asJava)
   }
 
-  private def addEdges()(implicit builder: CpgOverlay.Builder, diffGraph: DiffGraph): Unit = {
+  private def addEdges()(implicit builder: CpgOverlay.Builder,
+                         appliedDiffGraph: AppliedDiffGraph): Unit = {
+    val diffGraph = appliedDiffGraph.diffGraph
 
-    ???
-    // addProtoEdge(diffGraph.edgesInOriginal, { edge: EdgeInOriginal =>
-    //   edge.src.getId
-    // }, { edge: EdgeInOriginal =>
-    //   edge.dst.getId
-    // })
+    addProtoEdge(diffGraph.edgesInOriginal, { edge: EdgeInOriginal =>
+      edge.src.id.asInstanceOf[JLong]
+    }, { edge: EdgeInOriginal =>
+      edge.dst.id.asInstanceOf[JLong]
+    })
 
-    // addProtoEdge(
-    //   diffGraph.edgesFromOriginal, { edge: EdgeFromOriginal =>
-    //     edge.src.getId
-    //   }, { edge: EdgeFromOriginal =>
-    //     nodeToId(System.identityHashCode(edge.dst))
-    //   }
-    // )
+    addProtoEdge(
+      diffGraph.edgesFromOriginal, { edge: EdgeFromOriginal =>
+        edge.src.id.asInstanceOf[JLong]
+      }, { edge: EdgeFromOriginal =>
+        appliedDiffGraph.nodeToGraphId(IdentityHashCode(edge.dst))
+      }
+    )
 
-    // addProtoEdge(diffGraph.edgesToOriginal, { edge: EdgeToOriginal =>
-    //   nodeToId(System.identityHashCode(edge.src))
-    // }, { edge: EdgeToOriginal =>
-    //   edge.dst.getId
-    // })
+    addProtoEdge(diffGraph.edgesToOriginal, { edge: EdgeToOriginal =>
+      appliedDiffGraph.nodeToGraphId(IdentityHashCode(edge.src))
+    }, { edge: EdgeToOriginal =>
+      edge.dst.id.asInstanceOf[JLong]
+    })
 
-    // addProtoEdge(
-    //   diffGraph.edges, { edge: EdgeInDiffGraph =>
-    //     nodeToId(System.identityHashCode(edge.src))
-    //   }, { edge: EdgeInDiffGraph =>
-    //     nodeToId(System.identityHashCode(edge.dst))
-    //   }
-    // )
+    addProtoEdge(
+      diffGraph.edges, { edge: EdgeInDiffGraph =>
+        appliedDiffGraph.nodeToGraphId(IdentityHashCode(edge.src))
+      }, { edge: EdgeInDiffGraph =>
+        appliedDiffGraph.nodeToGraphId(IdentityHashCode(edge.dst))
+      }
+    )
 
     def addProtoEdge[T <: DiffEdge](edges: Seq[T], srcIdGen: T => JLong, dstIdGen: T => JLong) = {
       builder.addAllEdge(edges.map { edge =>
@@ -121,12 +103,13 @@ class DiffGraphProtoSerializer {
         .build
   }
 
-  private def nodeProperty(key: String, value: Any) =
+  private def nodeProperty(key: String, value: Any) = {
     CpgStruct.Node.Property
       .newBuilder()
       .setName(NodePropertyName.valueOf(key))
       .setValue(protoValueForPrimitive(value))
       .build()
+  }
 
   private def edgeProperty(key: String, value: Any) =
     CpgStruct.Edge.Property
@@ -135,22 +118,23 @@ class DiffGraphProtoSerializer {
       .setValue(protoValueForPrimitive(value))
       .build()
 
-  private def addNodeProperties()(implicit builder: CpgOverlay.Builder, diffGraph: DiffGraph): Unit = {
-    // builder.addAllNodeProperty(
-    //   diffGraph.nodeProperties.map { property =>
-    //     AdditionalNodeProperty
-    //       .newBuilder()
-    //       .setNodeId(property.node.getId)
-    //       .setProperty(nodeProperty(property.propertyKey, property.propertyValue))
-    //       .build
-    //   }.asJava
-    // )
-    ???
+  private def addNodeProperties()(implicit builder: CpgOverlay.Builder,
+                                  appliedDiffGraph: AppliedDiffGraph): Unit = {
+    builder.addAllNodeProperty(
+      appliedDiffGraph.diffGraph.nodeProperties.map { property =>
+        AdditionalNodeProperty
+          .newBuilder()
+          .setNodeId(property.node.id.asInstanceOf[JLong])
+          .setProperty(nodeProperty(property.propertyKey, property.propertyValue))
+          .build
+      }.asJava
+    )
   }
 
-  private def addEdgeProperties()(implicit builder: CpgOverlay.Builder, diffGraph: DiffGraph): Unit = {
+  private def addEdgeProperties()(implicit builder: CpgOverlay.Builder,
+                                  appliedDiffGraph: AppliedDiffGraph): Unit = {
     builder.addAllEdgeProperty(
-      diffGraph.edgeProperties.map { property =>
+      appliedDiffGraph.diffGraph.edgeProperties.map { property =>
         AdditionalEdgeProperty
           .newBuilder()
           .setEdgeId(property.edge.id.asInstanceOf[JLong])

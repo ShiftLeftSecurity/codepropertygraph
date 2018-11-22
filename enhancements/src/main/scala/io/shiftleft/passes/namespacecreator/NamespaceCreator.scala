@@ -13,7 +13,7 @@ class NamespaceCreator(graph: ScalaGraph) extends CpgPass(graph) {
     * Creates NAMESPACE nodes and connects NAMESPACE_BLOCKs
     * to corresponding NAMESPACE nodes.
     * */
-  override def run(): Unit = {
+  override def run() = {
     val namespaceBlocks = graph.V().hasLabel(NodeTypes.NAMESPACE_BLOCK).toBuffer
     val blocksByName = namespaceBlocks.groupBy(_.value2(NodeKeys.NAME))
 
@@ -26,5 +26,6 @@ class NamespaceCreator(graph: ScalaGraph) extends CpgPass(graph) {
             dstGraph.addEdgeFromOriginal(block, namespace, EdgeTypes.REF)
         }
     }
+    dstGraph
   }
 }

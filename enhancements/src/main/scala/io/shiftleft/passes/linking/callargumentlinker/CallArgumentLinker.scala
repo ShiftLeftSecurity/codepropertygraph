@@ -13,7 +13,7 @@ import scala.collection.JavaConverters._
 
 class CallArgumentLinker(graph: ScalaGraph) extends CpgPass(graph) {
 
-  override def run(): Unit = {
+  override def run() = {
     graph.V
       .hasLabel(NodeTypes.CALL)
       .sideEffect { callsite =>
@@ -32,7 +32,7 @@ class CallArgumentLinker(graph: ScalaGraph) extends CpgPass(graph) {
         }
       }
       .iterate
-    // dstGraph
+    dstGraph
   }
 
   private def generateCallArgEdges(perCallsiteDstGraph: DiffGraph,

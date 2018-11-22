@@ -15,16 +15,22 @@ import java.util.Map;
 
 public class SerializedCpg {
 
-  FileSystem zipFileSystem;
+  private FileSystem zipFileSystem;
+  private int counter = 0;
 
   /**
    * Create Serialized CPG from existing file. If the file does not exist,
    * an empty Serialized CPG is created.
    * */
   public SerializedCpg(String filename) throws URISyntaxException, IOException {
-    assert(filename != null);
     initZipFilesystem(filename);
   }
+
+  /**
+   * We allow creating a dummy serialized CPG that does not do anything.
+   * */
+
+  public SerializedCpg() { }
 
   private void initZipFilesystem(String filename) throws URISyntaxException, IOException {
     Map<String, String> env = new HashMap<>();
@@ -38,13 +44,22 @@ public class SerializedCpg {
    * Add overlay graph named `name` to the zip file
    * */
   public void addOverlay(CpgOverlay overlay, String name) throws IOException {
-    Path pathInZip = zipFileSystem.getPath(name);
+
+    if (zipFileSystem == null) {
+      return;
+    }
+
+    Path pathInZip = zipFileSystem.getPath(counter + "_" + name);
+    counter++;
     OutputStream outputStream = Files.newOutputStream(pathInZip);
     overlay.writeTo(outputStream);
     outputStream.close();
   }
 
   public void close() throws IOException {
+    if (zipFileSystem == null) {
+      return;
+    }
     zipFileSystem.close();
   }
 

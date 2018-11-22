@@ -17,7 +17,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
   private var methodInstFullNameToNode = Map.empty[String, Vertex]
   private var namespaceBlockFullNameToNode = Map.empty[String, Vertex]
 
-  override def run(): Unit = {
+  override def run() = {
     initMaps()
 
     linkAstChildToParent()
@@ -51,6 +51,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
         NodeTypes.CALL,
         NodeTypes.LOCAL,
         NodeTypes.IDENTIFIER,
+        NodeTypes.BLOCK,
       ),
       dstNodeLabel = NodeTypes.TYPE,
       edgeType = EdgeTypes.EVAL_TYPE,
@@ -86,6 +87,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
       }
     )
 
+    dstGraph
   }
 
   private def initMaps(): Unit = {

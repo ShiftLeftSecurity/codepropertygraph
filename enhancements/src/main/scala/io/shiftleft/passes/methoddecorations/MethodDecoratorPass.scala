@@ -17,6 +17,7 @@ object MethodDecoratorPass {
   * It also creates an AST edge from METHOD to the new METHOD_PARAMETER_OUT nodes.
   */
 class MethodDecoratorPass(graph: ScalaGraph) extends CpgPass(graph) {
+
   override def run() = {
     graph.V
       .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
@@ -54,6 +55,6 @@ class MethodDecoratorPass(graph: ScalaGraph) extends CpgPass(graph) {
         }
       }
       .iterate
-    // dstGraph
+    dstGraph
   }
 }
