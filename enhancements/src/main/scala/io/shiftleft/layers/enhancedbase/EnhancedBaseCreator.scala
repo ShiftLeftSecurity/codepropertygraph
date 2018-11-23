@@ -12,7 +12,11 @@ import io.shiftleft.passes.containsedges.ContainsEdgePass
 import io.shiftleft.passes.languagespecific.fuzzyc.MethodStubCreator
 import io.shiftleft.passes.linking.capturinglinker.CapturingLinker
 import io.shiftleft.passes.methoddecorations.MethodDecoratorPass
+<<<<<<< HEAD
 import io.shiftleft.passes.receiveredges.ReceiverEdgePass
+=======
+import io.shiftleft.passes.namespacecreator.NamespaceCreator
+>>>>>>> typo
 
 class EnhancedBaseCreator(graph: ScalaGraph, language: String) {
 
