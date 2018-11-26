@@ -24,15 +24,15 @@ object DomainClassCreator {
   implicit val nodeBaseTraitRead = Json.reads[NodeBaseTrait]
   implicit val propertyRead = Json.reads[Property]
   implicit val edgeTypeRead = Json.reads[EdgeType]
+  val nodesPackage = "io.shiftleft.codepropertygraph.generated.nodes"
   val edgesPackage = "io.shiftleft.codepropertygraph.generated.edges"
 
   def run(outputDir: JFile): List[JFile] = {
     println(s"generating domain classes for nodes/edges based on cpg.json")
-    List(writeNodesFile(outputDir), writeNewNodesFile(outputDir))
+    List(writeNodesFile(outputDir), writeNewNodesFile(outputDir), writeEdgesFile(outputDir))
   }
 
   def writeNodesFile(outputDir: JFile): JFile = {
-    val packageName = "io.shiftleft.codepropertygraph.generated.nodes"
     val propertyByName: Map[String, Property] =
       (Resources.cpgJson \ "nodeKeys")
         .as[List[Property]]
@@ -50,11 +50,10 @@ object DomainClassCreator {
 
     def nodeHeader = {
       val staticHeader = s"""
-      package $packageName
+      package $nodesPackage
 
       import io.shiftleft.codepropertygraph.generated
       import java.lang.{Boolean => JBoolean, Long => JLong}
-      import java.util.{Iterator => JIterator, LinkedList => JLinkedList, List => JList, Map => JMap, Set => JSet}
       import gremlin.scala._
       import org.apache.tinkerpop.gremlin.structure.Direction
       import org.apache.tinkerpop.gremlin.structure.Edge
@@ -114,7 +113,7 @@ object DomainClassCreator {
           }
           .mkString("\n")
 
-      staticHeader + nodeBaseTraits + keyBasedTraits
+      staticHeader + nodeBaseTraits + keyBasedTraits + emptyFactories
     }
 
     def generateNodeSource(nodeType: NodeType, keys: List[Property]) = {
@@ -255,7 +254,7 @@ object DomainClassCreator {
 
       classImpl
     }
-    val filename = outputDir.getPath + "/" + packageName.replaceAll("\\.", "/") + "/Nodes.scala"
+    val filename = outputDir.getPath + "/" + nodesPackage.replaceAll("\\.", "/") + "/Nodes.scala"
     writeFile(filename, nodeHeader, entries)
   }
 
@@ -263,12 +262,10 @@ object DomainClassCreator {
     * this ability could have been added to the existing nodes, but it turned out as a different specialisation,
     * since e.g. `id` is not set before adding it to the graph */
   def writeNewNodesFile(outputDir: JFile): JFile = {
-    val packageName = "io.shiftleft.codepropertygraph.generated.nodes"
     val staticHeader = s"""
     package io.shiftleft.codepropertygraph.generated.nodes
 
     import java.lang.{Boolean => JBoolean, Long => JLong}
-    import java.util.{Map => JMap, Set => JSet}
 
     /** base type for all nodes that can be added to a graph, e.g. the diffgraph */
     trait NewNode extends Node {
@@ -373,9 +370,25 @@ object DomainClassCreator {
       """
     }
 
-    val filename = outputDir.getPath + "/" + packageName.replaceAll("\\.", "/") + "/NewNodes.scala"
+    val filename = outputDir.getPath + "/" + nodesPackage.replaceAll("\\.", "/") + "/NewNodes.scala"
     writeFile(filename, staticHeader, entries)
   }
+
+  def writeEdgesFile(outputDir: JFile): JFile = {
+    // only write factories for compatiblity with cpgloader-tinkergraphshiftleft
+    val filename = outputDir.getPath + "/" + edgesPackage.replaceAll("\\.", "/") + "/Edges.scala"
+    val content =
+      s"""package $edgesPackage
+          $emptyFactories"""
+    writeFile(filename, content, Nil)
+  }
+
+  val emptyFactories =
+    s"""
+    object Factories {
+      lazy val AllAsJava: java.util.List[_] = new java.util.LinkedList()
+    }
+    """
 
   def writeFile(fileName: String, header: String, entries: List[String]): JFile = {
     val outputFile = File.newTemporaryFile()
