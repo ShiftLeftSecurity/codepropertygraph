@@ -1,7 +1,17 @@
 package io.shiftleft
 
-class IdentityHashCode(val value: Int) extends AnyVal
+case class IdentityHashWrapper[T <: AnyRef](value: T) {
+  override def hashCode(): Int = {
+    System.identityHashCode(value)
+  }
 
-object IdentityHashCode {
-  def apply(instance: Any) = new IdentityHashCode(System.identityHashCode(instance))
+  override def equals(other: Any): Boolean = {
+    if (other == null) {
+      false
+    } else if (!other.isInstanceOf[IdentityHashWrapper[T]]) {
+      false
+    } else {
+      this.value eq other.asInstanceOf[IdentityHashWrapper[T]].value
+    }
+  }
 }

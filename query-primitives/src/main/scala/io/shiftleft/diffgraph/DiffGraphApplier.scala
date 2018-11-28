@@ -1,63 +1,67 @@
 package io.shiftleft.diffgraph
 
 import gremlin.scala._
-import io.shiftleft.IdentityHashCode
+import io.shiftleft.IdentityHashWrapper
+import io.shiftleft.codepropertygraph.generated.nodes.NewNode
 import java.lang.{Long => JLong}
 import org.apache.tinkerpop.gremlin.structure.Vertex
 
-import scala.collection.mutable
-
-case class AppliedDiffGraph(diffGraph: DiffGraph, nodeToGraphId: Map[IdentityHashCode, JLong])
+case class AppliedDiffGraph(diffGraph: DiffGraph,
+                            nodeToGraphId: Map[IdentityHashWrapper[NewNode], JLong])
 
 /**
   * Component to merge diff graphs into existing (loaded) Tinkergraphs
   * */
 class DiffGraphApplier {
 
-  private val overlayNodeToTinkerNode: mutable.HashMap[Int, Vertex] = mutable.HashMap()
-  private val InternalProperty                                      = "_"
+  private var overlayNodeToTinkerNode = Map[IdentityHashWrapper[NewNode], Vertex]()
+  private val InternalProperty        = "_"
 
   /**
     * Applies diff to existing (loaded) TinkerGraph
     **/
   def applyDiff(diffGraph: DiffGraph, graph: ScalaGraph): AppliedDiffGraph = {
-    val nodeToGraphId = addNodes(diffGraph, graph)
+    addNodes(diffGraph, graph)
     addEdges(diffGraph, graph)
     addNodeProperties(diffGraph, graph)
     addEdgeProperties(diffGraph, graph)
-    AppliedDiffGraph(diffGraph, nodeToGraphId)
+    AppliedDiffGraph(diffGraph, overlayNodeToTinkerNode.map {
+      case (wrappedNewNode, vertex) =>
+        (wrappedNewNode, vertex.id.asInstanceOf[JLong])
+    })
   }
 
   // We are in luck: TinkerGraph will assign ids to new nodes for us
-  private def addNodes(diffGraph: DiffGraph, graph: ScalaGraph): Map[IdentityHashCode, JLong] = {
-    diffGraph.nodes.map { node =>
+  private def addNodes(diffGraph: DiffGraph, graph: ScalaGraph): Unit = {
+    diffGraph.nodes.foreach { node =>
       val newNode = graph.addVertex(node.label)
+
       node.properties.map {
         case (key, value) =>
           if (!key.startsWith(InternalProperty)) {
             newNode.property(key, value)
           }
       }
-      overlayNodeToTinkerNode.put(System.identityHashCode(node), newNode)
-      (IdentityHashCode(node), newNode.id.asInstanceOf[JLong])
-    }.toMap
+      overlayNodeToTinkerNode += IdentityHashWrapper(node) -> newNode
+      (IdentityHashWrapper[NewNode](node), newNode.id.asInstanceOf[JLong])
+    }
   }
 
   private def addEdges(diffGraph: DiffGraph, graph: ScalaGraph): Unit = {
     diffGraph.edges.foreach { edge =>
-      val srcTinkerNode = overlayNodeToTinkerNode(System.identityHashCode(edge.src))
-      val dstTinkerNode = overlayNodeToTinkerNode(System.identityHashCode(edge.dst))
+      val srcTinkerNode = overlayNodeToTinkerNode(IdentityHashWrapper(edge.src))
+      val dstTinkerNode = overlayNodeToTinkerNode(IdentityHashWrapper(edge.dst))
       tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
     }
 
     diffGraph.edgesFromOriginal.foreach { edge =>
       val srcTinkerNode = edge.src
-      val dstTinkerNode = overlayNodeToTinkerNode(System.identityHashCode(edge.dst))
+      val dstTinkerNode = overlayNodeToTinkerNode(IdentityHashWrapper(edge.dst))
       tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
     }
 
     diffGraph.edgesToOriginal.foreach { edge =>
-      val srcTinkerNode = overlayNodeToTinkerNode(System.identityHashCode(edge.src))
+      val srcTinkerNode = overlayNodeToTinkerNode(IdentityHashWrapper(edge.src))
       val dstTinkerNode = edge.dst
       tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
     }

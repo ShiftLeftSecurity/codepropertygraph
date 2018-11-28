@@ -1,7 +1,7 @@
 package io.shiftleft.diffgraph
 
 import gremlin.scala.{Edge, ScalaGraph, Vertex}
-import io.shiftleft.IdentityHashCode
+import io.shiftleft.{IdentityHashWrapper}
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node, StoredNode}
 
 import scala.collection.mutable
@@ -29,12 +29,12 @@ class DiffGraph {
   private val _edgeProperties    = mutable.ListBuffer.empty[EdgeProperty]
 
   /* for nodes, ensure we don't get duplicates, as they would later be added to the graph twice */
-  private val _nodes = mutable.Map.empty[IdentityHashCode, NewNode]
+  private var _nodes = Set[IdentityHashWrapper[NewNode]]()
 
   /* this could be done much nicer if we wouldn't hold the DiffGraph locally in the CpgPass  */
   private var applied = false
 
-  def nodes: List[NewNode]                      = _nodes.values.toList
+  def nodes: List[NewNode]                      = _nodes.toList.map(_.value)
   def edges: List[EdgeInDiffGraph]              = _edges.toList
   def edgesToOriginal: List[EdgeToOriginal]     = _edgesToOriginal.toList
   def edgesFromOriginal: List[EdgeFromOriginal] = _edgesFromOriginal.toList
@@ -49,8 +49,9 @@ class DiffGraph {
     appliedDiffGraph
   }
 
-  def addNode[A <: NewNode](node: A): Unit =
-    _nodes += IdentityHashCode(node) -> node
+  def addNode(node: NewNode): Unit = {
+    _nodes += IdentityHashWrapper(node)
+  }
 
   def mergeFrom(other: DiffGraph): Unit = {
     other.nodes.foreach(addNode)

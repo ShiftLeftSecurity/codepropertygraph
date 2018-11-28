@@ -1,16 +1,13 @@
 package io.shiftleft.diffgraph
 
-import io.shiftleft.IdentityHashCode
+import io.shiftleft.IdentityHashWrapper
 import io.shiftleft.proto.cpg.Cpg._
 import io.shiftleft.proto.cpg.Cpg.CpgStruct
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
 import java.lang.{Long => JLong}
-import java.util.concurrent.atomic.AtomicLong
-import gremlin.scala.{GremlinScala, ScalaGraph}
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable
 
 /**
   * Provides functionality to serialize diff graphs and add them
@@ -34,7 +31,7 @@ class DiffGraphProtoSerializer() {
   private def addNodes()(implicit builder: CpgOverlay.Builder,
                          appliedDiffGraph: AppliedDiffGraph) = {
     appliedDiffGraph.diffGraph.nodes.foreach { node =>
-      val nodeId = appliedDiffGraph.nodeToGraphId(IdentityHashCode(node))
+      val nodeId = appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(node))
 
       val nodeBuilder = CpgStruct.Node
         .newBuilder()
@@ -67,21 +64,21 @@ class DiffGraphProtoSerializer() {
       diffGraph.edgesFromOriginal, { edge: EdgeFromOriginal =>
         edge.src.id.asInstanceOf[JLong]
       }, { edge: EdgeFromOriginal =>
-        appliedDiffGraph.nodeToGraphId(IdentityHashCode(edge.dst))
+        appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.dst))
       }
     )
 
     addProtoEdge(diffGraph.edgesToOriginal, { edge: EdgeToOriginal =>
-      appliedDiffGraph.nodeToGraphId(IdentityHashCode(edge.src))
+      appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.src))
     }, { edge: EdgeToOriginal =>
       edge.dst.id.asInstanceOf[JLong]
     })
 
     addProtoEdge(
       diffGraph.edges, { edge: EdgeInDiffGraph =>
-        appliedDiffGraph.nodeToGraphId(IdentityHashCode(edge.src))
+        appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.src))
       }, { edge: EdgeInDiffGraph =>
-        appliedDiffGraph.nodeToGraphId(IdentityHashCode(edge.dst))
+        appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.dst))
       }
     )
 
