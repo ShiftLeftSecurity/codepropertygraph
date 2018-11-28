@@ -47,18 +47,6 @@ class Call[Labels <: HList](raw: GremlinScala[Vertex])
     new MethodInst[Labels](raw.sideEffect(callResolver.resolveDynamicCallSite).out(EdgeTypes.CALL))
 
   /**
-  The callee method, do not trigger call site resolution.
-    */
-  def calledMethodNoResolve: Method[Labels] =
-    calledMethodInstanceNoResolve.method
-
-  /**
-  The callee method instance, do not trigger call site resolution.
-    */
-  def calledMethodInstanceNoResolve: MethodInst[Labels] =
-    new MethodInst[Labels](raw.out(EdgeTypes.CALL))
-
-  /**
     Arguments of the call
     */
   def argument: Expression[Labels] =

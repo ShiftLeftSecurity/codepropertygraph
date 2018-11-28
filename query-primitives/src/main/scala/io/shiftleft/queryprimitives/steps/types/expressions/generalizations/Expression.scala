@@ -120,8 +120,8 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
   /**
     Traverse to sub expressions
     */
-  def expression: Expression[Labels] =
-    new Expression[Labels](raw.out(EdgeTypes.AST))
+  def expressionDown: Expression[Labels] =
+    new Expression[Labels](raw.out(EdgeTypes.AST).not(_.hasLabel(NodeTypes.LOCAL)))
 
   /**
     Traverse to related parameter
@@ -152,8 +152,7 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
     new Expression[Labels](
       raw
         .in(EdgeTypes.CFG)
-        .filterNot(_.hasLabel(NodeTypes.METHOD))
-    )
+        .filterNot(_.hasLabel(NodeTypes.METHOD)))
 
   /**
     * Traverse to expression evaluation type
