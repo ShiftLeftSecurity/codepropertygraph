@@ -22,7 +22,6 @@ object Implicits {
   }
 
   implicit class NodeTypeDecoForSeq[NodeType <: nodes.StoredNode: Marshallable](seq: Seq[NodeType]) {
-
     /**
       Start a new traversal from these nodes
       */
@@ -31,6 +30,22 @@ object Implicits {
       new CpgSteps[NodeType, HNil](raw)
     }
   }
+
+  // implicit class NewNodeTypeDeco[NodeType <: nodes.NewNode](node: NodeType) {
+  //   /**
+  //   Start a new traversal from this node
+  //     */
+  //   def start: NewNodeSteps[NodeType, HNil] =
+  //     new NewNodeSteps[NodeType, HNil](__[NodeType](node))
+  // }
+
+  // implicit class NewNodeTypeDecoForSeq[NodeType <: nodes.NewNode](seq: Seq[NodeType]) {
+  //   /**
+  //   Start a new traversal from these nodes
+  //     */
+  //   def start: NewNodeSteps[NodeType, HNil] =
+  //     new NewNodeSteps[NodeType, HNil](__[NodeType](seq: _*))
+  // }
 
   /**
     * This wrapped is used to make sure to throw a proper NoSuchElementException.
