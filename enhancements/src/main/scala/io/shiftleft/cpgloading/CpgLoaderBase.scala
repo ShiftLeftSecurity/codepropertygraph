@@ -1,7 +1,10 @@
 package io.shiftleft.cpgloading
 
 import io.shiftleft.layers.EnhancementLayers
+import io.shiftleft.proto.cpg.Cpg.CpgOverlay
 import io.shiftleft.queryprimitives.steps.starters.Cpg
+import scala.collection.JavaConverters._
+
 
 /** Load cpg proto (typically cpg.bin.zip) into a graph instance */
 abstract class CpgLoaderBase {
@@ -15,5 +18,8 @@ abstract class CpgLoaderBase {
     }
     cpg
   }
+
+  def loadOverlays(filename: String): List[CpgOverlay] =
+    new ProtoCpgLoader(builder).loadOverlays(filename).asScala.toList
 
 }

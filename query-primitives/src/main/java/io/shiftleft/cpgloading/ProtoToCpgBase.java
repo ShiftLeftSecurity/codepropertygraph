@@ -73,27 +73,27 @@ public abstract class ProtoToCpgBase {
     return iter.next();
   }
 
-  protected void addPropertyToElement(Element tinkerElement, String propertyName,
+  public static void addPropertyToElement(Element element, String propertyName,
                                     Cpg.PropertyValue propertyValue) {
     Cpg.PropertyValue.ValueCase valueCase = propertyValue.getValueCase();
     switch(valueCase) {
       case INT_VALUE:
-        tinkerElement.property(propertyName, propertyValue.getIntValue());
+        element.property(propertyName, propertyValue.getIntValue());
         break;
       case STRING_VALUE:
-        tinkerElement.property(propertyName, propertyValue.getStringValue());
+        element.property(propertyName, propertyValue.getStringValue());
         break;
       case BOOL_VALUE:
-        tinkerElement.property(propertyName, propertyValue.getBoolValue());
+        element.property(propertyName, propertyValue.getBoolValue());
         break;
       case STRING_LIST:
-        if (tinkerElement instanceof Vertex) {
+        if (element instanceof Vertex) {
           propertyValue.getStringList().getValuesList().forEach(value ->
-            ((Vertex) tinkerElement).property(VertexProperty.Cardinality.list, propertyName, value));
+            ((Vertex) element).property(VertexProperty.Cardinality.list, propertyName, value));
         } else {
           List<String> propertyList = new LinkedList<>();
           propertyList.addAll(propertyValue.getStringList().getValuesList());
-          tinkerElement.property(propertyName, propertyList);
+          element.property(propertyName, propertyList);
         }
         break;
       case VALUE_NOT_SET:

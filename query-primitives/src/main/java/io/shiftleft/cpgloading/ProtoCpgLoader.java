@@ -1,11 +1,9 @@
 package io.shiftleft.cpgloading;
 
 import io.shiftleft.proto.cpg.Cpg.CpgStruct;
+import io.shiftleft.proto.cpg.Cpg.CpgOverlay;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge;
 import io.shiftleft.queryprimitives.steps.starters.Cpg;
-import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 import java.io.InputStream;
 import java.io.File;
@@ -15,7 +13,13 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.stream.Collectors;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 
 /**
  * Loader for CPGs stored in Google Protobuf Format
@@ -38,12 +42,8 @@ public class ProtoCpgLoader {
     try {
       tempDir = Files.createTempDirectory("cpg2sp_proto").toFile();
       String tempDirPathName = tempDir.getAbsolutePath();
-
-      long start = System.currentTimeMillis();
-      new ZipArchive(filename).unzip(tempDirPathName);
-      logger.info("Unzipping completed in " +
-           (System.currentTimeMillis() - start) + "ms.");
-
+      extractIntoTemporaryDirectory(filename, tempDirPathName);
+      long start;
       start = System.currentTimeMillis();
       Cpg cpg = loadFromProtobufDirectory(tempDirPathName);
       logger.info("CPG construction finished in " +
@@ -53,15 +53,66 @@ public class ProtoCpgLoader {
     } catch (IOException exception) {
       throw new RuntimeException(exception);
     } finally {
-      try {
-        if (tempDir != null) {
-          FileUtils.deleteDirectory(tempDir);
-        }
-      } catch (IOException exception) {
-        logger.warn("Unable to remove temporary directory: " + tempDir);
-      }
+      removeTemporaryDirectory(tempDir);
     }
 
+  }
+
+  protected void extractIntoTemporaryDirectory(String filename, String tempDirPathName)
+      throws IOException {
+    long start = System.currentTimeMillis();
+    new ZipArchive(filename).unzip(tempDirPathName);
+    logger.info("Unzipping completed in " +
+         (System.currentTimeMillis() - start) + "ms.");
+  }
+
+  protected void removeTemporaryDirectory(File tempDir) {
+    try {
+      if (tempDir != null) {
+        FileUtils.deleteDirectory(tempDir);
+      }
+    } catch (IOException exception) {
+      logger.warn("Unable to remove temporary directory: " + tempDir);
+    }
+  }
+
+  public List<CpgOverlay> loadOverlays(String filename) {
+    File tempDir = null;
+    try {
+      tempDir = Files.createTempDirectory("cpg2sp_proto_overlay").toFile();
+      String tempDirPathName = tempDir.getAbsolutePath();
+      extractIntoTemporaryDirectory(filename, tempDirPathName);
+      return loadOverlaysFromProtobufDirectory(tempDirPathName);
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      removeTemporaryDirectory(tempDir);
+    }
+    return new LinkedList<>();
+  }
+
+  protected List<CpgOverlay> loadOverlaysFromProtobufDirectory(String inputDirectory)
+      throws IOException {
+    List<CpgOverlay> cpgOverlays = new LinkedList<>();
+
+    List<File> filesInDirectory = getFilesInDirectory(inputDirectory);
+    filesInDirectory.sort( (file1, file2) -> {
+          String[] file1Split = file1.getName().split("_");
+          String[] file2Split = file2.getName().split("_");
+          if (file1Split.length < 2 || file2Split.length < 2) {
+            return (file1.getName().compareTo(file2.getName()));
+          }
+          return (Integer.parseInt(file1Split[0]) - Integer.parseInt(file2Split[0]));
+        }
+    );
+
+    for (File file : getFilesInDirectory(inputDirectory)) {
+      FileInputStream inputStream = new FileInputStream(file);
+      CpgOverlay cpgOverlay = CpgOverlay.parseFrom(inputStream);
+      inputStream.close();
+      cpgOverlays.add(cpgOverlay);
+    }
+    return cpgOverlays;
   }
 
   /**
