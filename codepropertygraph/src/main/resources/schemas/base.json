@@ -170,7 +170,8 @@
          "is": ["EXPRESSION"],
          "outEdges" : [
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]},
-             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF"]}
+             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF"]},
+             {"edgeName": "RECEIVER", "inNodes": ["CALL", "IDENTIFIER", "METHOD_REF"]}
          ]
         },
         {"id":23, "name" : "LOCAL",
@@ -257,14 +258,14 @@
         {"id" : 19, "name" : "CFG", "comment" : "Control flow", "keys" : [] },
 
         {"id" : 9, "name" : "CONTAINS_NODE", "keys" : ["LOCAL_NAME", "INDEX"], "comment" : "Membership relation for a compound object"},
-        {"id" : 28, "name" : "CONTAINS", "keys" : [], "comment" : "Shortcut over multiple AST edges"},
         {"id" : 41, "name": "CAPTURED_BY", "comment" : "Connection between a capture LOCAL and the corresponding CLOSURE_BINDING", "keys": []},
 
         // Edges to represent type relations
 
         {"id" : 22, "name" : "BINDS_TO", "keys": [], "comment" : "Type argument binding to a type parameter.", "keys" : [] },
         {"id" : 10, "name" : "REF", "keys" : [], "comment" : "Referencing to e.g. a LOCAL" },
-        {"id" : 30, "name": "VTABLE", "comment" : "Indicates that a method is part of the vtable of a certain type declaration.", "keys": []}
+        {"id" : 30, "name": "VTABLE", "comment" : "Indicates that a method is part of the vtable of a certain type declaration.", "keys": []},
+        {"id" : 55, "name": "RECEIVER", "comment" : "The receiver of a method call which is either an object or a pointer.", "keys": []}
 
     ],
 

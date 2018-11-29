@@ -133,7 +133,8 @@
         {"id" : 14, "name": "CALL_ARG_OUT", "comment" : "Function call output argument. Goes from METHOD_PARAMETER_OUT to call argument node.", "keys" : []},
 
         {"id" : 21, "name" : "EVAL_TYPE", "keys": [], "comment" : "Link to evaluation type.", "keys" : [] },
-        {"id" : 23, "name" : "INHERITS_FROM", "keys": [], "comment" : "Inheritance relation between types.", "keys" : [] }
+        {"id" : 23, "name" : "INHERITS_FROM", "keys": [], "comment" : "Inheritance relation between types.", "keys" : [] },
+        {"id" : 28, "name" : "CONTAINS", "keys" : [], "comment" : "Shortcut over multiple AST edges"}
     ]
 
 }
