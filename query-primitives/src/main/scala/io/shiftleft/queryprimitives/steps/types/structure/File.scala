@@ -11,8 +11,7 @@ import shapeless.HList
   * A source file
   * */
 class File[Labels <: HList](raw: GremlinScala[Vertex])
-    extends CpgSteps[nodes.File, Labels](raw)
-    with NameAccessors[nodes.File, Labels] {
+    extends CpgSteps[nodes.File, Labels](raw) with NameAccessors[nodes.File, Labels] {
   override val converter = Converter.forDomainNode[nodes.File]
 
   def typeDecl: TypeDecl[Labels] =
