@@ -32,7 +32,11 @@ class MethodReturn[Labels <: HList](raw: GremlinScala[Vertex])
     *  Can be multiple.
     */
   def cfgLast: Expression[Labels] =
-    new Expression[Labels](
-      raw.in(EdgeTypes.CFG)
-    )
+    new Expression[Labels](raw.in(EdgeTypes.CFG))
+
+  /**
+    * Traverse to return type
+    * */
+  def typ: Type[Labels] =
+    new Type(raw.out(EdgeTypes.EVAL_TYPE))
 }

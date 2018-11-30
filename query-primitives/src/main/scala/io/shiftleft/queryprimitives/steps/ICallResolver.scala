@@ -1,15 +1,15 @@
 package io.shiftleft.queryprimitives.steps
 
-import gremlin.scala.Vertex
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 
 trait ICallResolver {
-  def resolveDynamicCallSite(callsite: Vertex): Unit
-  def resolveDynamicMethodCallSites(method: Vertex): Unit
-  def resolveDynamicMethodInstCallSites(methodInst: Vertex): Unit
+  def resolveDynamicCallSite(callsite: StoredNode): Unit
+  def resolveDynamicMethodCallSites(method: StoredNode): Unit
+  def resolveDynamicMethodInstCallSites(methodInst: StoredNode): Unit
 }
 
 object NoResolve extends ICallResolver {
-  def resolveDynamicCallSite(callsite: Vertex): Unit = {}
-  def resolveDynamicMethodCallSites(method: Vertex): Unit = {}
-  def resolveDynamicMethodInstCallSites(methodInst: Vertex): Unit = {}
+  def resolveDynamicCallSite(callsite: StoredNode): Unit = {}
+  def resolveDynamicMethodCallSites(method: StoredNode): Unit = {}
+  def resolveDynamicMethodInstCallSites(methodInst: StoredNode): Unit = {}
 }

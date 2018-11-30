@@ -73,14 +73,15 @@ class Method[Labels <: HList](override val raw: GremlinScala[Vertex])
     * Traverse to direct and transitive callers of the method.
     * */
   def calledBy(sourceTrav: Method[Labels])(implicit callResolver: ICallResolver): Method[Labels] = {
-    methodInstance.calledBy(sourceTrav)(callResolver)
+    caller(callResolver).calledByIncludingSink(sourceTrav)(callResolver)
   }
 
   /**
     * Traverse to direct and transitive callers of the method.
     * */
-  def calledBy(sourceTrav: MethodInst[Labels])(implicit callResolver: ICallResolver): Method[Labels] = {
-    methodInstance.calledBy(sourceTrav)(callResolver)
+  def calledBy(sourceTrav: MethodInst[Labels])(
+      implicit callResolver: ICallResolver): Method[Labels] = {
+    caller(callResolver).calledByIncludingSink(sourceTrav.method)(callResolver)
   }
 
   /**
@@ -90,12 +91,12 @@ class Method[Labels <: HList](override val raw: GremlinScala[Vertex])
   def calledByIncludingSink(sourceTrav: Method[Labels], resolve: Boolean = true)(
       implicit callResolver: ICallResolver): Method[Labels] = {
     val sourceMethods = sourceTrav.raw.toSet
-    val sinkMethods = raw.dedup.toList()
+    val sinkMethods   = raw.dedup.toList()
 
     if (sourceMethods.isEmpty || sinkMethods.isEmpty) {
       new Method[Labels](graph.V(-1).asInstanceOf[GremlinScala[Vertex]])
     } else {
-      val ids = sinkMethods.map(_.id)
+      val ids        = sinkMethods.map(_.id)
       val methodTrav = graph.V(ids: _*)
 
       new Method[Labels](
@@ -103,12 +104,11 @@ class Method[Labels <: HList](override val raw: GremlinScala[Vertex])
           .until(_.is(P.within(sourceMethods)))
           .emit(_.is(P.within(sourceMethods)))
           .repeat(
-            _.in(EdgeTypes.REF) // expand to method instance
-              .sideEffect { methodInst =>
-                if (resolve) {
-                  callResolver.resolveDynamicMethodCallSites(methodInst)
-                }
+            _.sideEffect { method =>
+              if (resolve) {
+                callResolver.resolveDynamicMethodCallSites(method.toCC[nodes.Method])
               }
+            }.in(EdgeTypes.REF) // expand to method instance
               .in(EdgeTypes.CALL) // expand to call site
               .in(EdgeTypes.CONTAINS) // expand to method
               .dedup
@@ -135,7 +135,10 @@ class Method[Labels <: HList](override val raw: GremlinScala[Vertex])
     * Incoming call sites
     * */
   def callIn(implicit callResolver: ICallResolver): Call[Labels] = {
-    methodInstance.callIn(callResolver)
+    new Call[Labels](
+      sideEffect(callResolver.resolveDynamicMethodCallSites).raw
+        .in(EdgeTypes.REF)
+        .in(EdgeTypes.CALL))
   }
 
   /**
@@ -180,56 +183,63 @@ class Method[Labels <: HList](override val raw: GremlinScala[Vertex])
     * */
   def isPublic: Method[Labels] =
     new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PUBLIC)))
+      raw.filter(
+        _.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PUBLIC)))
 
   /**
     * Traverse to private methods
     * */
   def isPrivate: Method[Labels] =
     new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PRIVATE)))
+      raw.filter(
+        _.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PRIVATE)))
 
   /**
     * Traverse to protected methods
     * */
   def isProtected: Method[Labels] =
     new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PROTECTED)))
+      raw.filter(
+        _.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PROTECTED)))
 
   /**
     * Traverse to abstract methods
     * */
   def isAbstract: Method[Labels] =
     new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.ABSTRACT)))
+      raw.filter(
+        _.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.ABSTRACT)))
 
   /**
     * Traverse to static methods
     * */
   def isStatic: Method[Labels] =
     new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.STATIC)))
+      raw.filter(
+        _.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.STATIC)))
 
   /**
     * Traverse to native methods
     * */
   def isNative: Method[Labels] =
     new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.NATIVE)))
+      raw.filter(
+        _.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.NATIVE)))
 
   /**
     * Traverse to constructors, that is, keep methods that are constructors
     * */
   def isConstructor: Method[Labels] =
-    new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.CONSTRUCTOR)))
+    new Method[Labels](raw.filter(
+      _.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.CONSTRUCTOR)))
 
   /**
     * Traverse to virtual method
     * */
   def isVirtual: Method[Labels] =
     new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.VIRTUAL)))
+      raw.filter(
+        _.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.VIRTUAL)))
 
   /**
     * Traverse to method modifiers, e.g., "static", "public".
@@ -244,7 +254,12 @@ class Method[Labels <: HList](override val raw: GremlinScala[Vertex])
     * Traverse to the methods local variables
     * */
   def local: Local[Labels] =
-    new Local[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.LOCAL))
+    new Local[Labels](
+      raw
+        .out(EdgeTypes.CONTAINS)
+        .hasLabel(NodeTypes.BLOCK)
+        .out(EdgeTypes.AST)
+        .hasLabel(NodeTypes.LOCAL))
 
   /**
     * Traverse to literals of method
@@ -258,7 +273,7 @@ class Method[Labels <: HList](override val raw: GremlinScala[Vertex])
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.BLOCK)
         .out(EdgeTypes.AST)
-    )
+        .not(_.hasLabel(NodeTypes.LOCAL)))
 
   /**
     *  Traverse to first expressions in CFG.
@@ -275,5 +290,11 @@ class Method[Labels <: HList](override val raw: GremlinScala[Vertex])
     */
   def cfgLast: Expression[Labels] =
     methodReturn.cfgLast
+
+  /**
+    * Traverse to block
+    * */
+  def block: Block[Labels] =
+    new Block[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.BLOCK))
 
 }

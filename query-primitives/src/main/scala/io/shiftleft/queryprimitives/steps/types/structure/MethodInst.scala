@@ -19,9 +19,7 @@ class MethodInst[Labels <: HList](override val raw: GremlinScala[Vertex])
   override val converter = Converter.forDomainNode[nodes.MethodInst]
 
   def method: Method[Labels] = {
-    new Method[Labels](
-      raw.out(EdgeTypes.REF)
-    )
+    new Method[Labels](raw.out(EdgeTypes.REF))
   }
 
   /**
@@ -81,7 +79,9 @@ class MethodInst[Labels <: HList](override val raw: GremlinScala[Vertex])
     // We only do this for virtual method calls.
     // note: side effect writes edges into the graph
     // TODO Also resolve function pointers.
-    new Call[Labels](raw.sideEffect(callResolver.resolveDynamicMethodCallSites).in(EdgeTypes.CALL))
+    new Call[Labels](
+      sideEffect(callResolver.resolveDynamicMethodInstCallSites).raw.in(EdgeTypes.CALL)
+    )
   }
 
   /**

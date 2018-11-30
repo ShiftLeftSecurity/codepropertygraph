@@ -24,4 +24,7 @@ class File[Labels <: HList](raw: GremlinScala[Vertex])
 
   def namespace: Namespace[Labels] =
     new Namespace[Labels](raw.out(EdgeTypes.AST).out(EdgeTypes.REF))
+
+  def namespaceBlock: NamespaceBlock[Labels] =
+    new NamespaceBlock[Labels](raw.out(EdgeTypes.AST))
 }

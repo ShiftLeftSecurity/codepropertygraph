@@ -6,6 +6,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.CpgSteps
 import io.shiftleft.queryprimitives.steps.Implicits._
+import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.Modifier
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{FullNameAccessors, IsExternalAccessor, NameAccessors}
 import shapeless.HList
 
@@ -93,9 +94,12 @@ class TypeDecl[Labels <: HList](raw: GremlinScala[Vertex])
   /**
     * Traverse to the methods which are part of the VTables of this type declaration.
     */
-  def vtableMethod: Method[Labels] = {
-    new Method[Labels](
-      raw.out(EdgeTypes.VTABLE)
-    )
-  }
+  def vtableMethod: Method[Labels] =
+    new Method[Labels](raw.out(EdgeTypes.VTABLE))
+
+  /**
+    * Traverse to method modifiers, e.g., "static", "public".
+    * */
+  def modifier: Modifier[Labels] =
+    new Modifier[Labels](raw.out.hasLabel(NodeTypes.MODIFIER))
 }

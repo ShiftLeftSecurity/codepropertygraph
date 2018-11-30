@@ -25,8 +25,19 @@ class Local[Labels <: HList](raw: GremlinScala[Vertex])
   /**
     * The method hosting this local variable
     * */
-  def method: Method[Labels] =
-    new Method[Labels](raw.in(EdgeTypes.AST))
+  def method: Method[Labels] = {
+    // TODO The following line of code is here for backwards compatibility.
+    // Use the lower commented out line once not required anymore.
+    new Method[Labels](
+      raw.repeat(_.in(EdgeTypes.AST)).until(_.hasLabel(NodeTypes.METHOD)))
+    //definingBlock.method
+  }
+
+  /**
+    * The block in which local is declared.
+    */
+  def definingBlock: Block[Labels] =
+    new Block[Labels](raw.in(EdgeTypes.AST))
 
   /**
     * Places (identifier) where this local is referenced

@@ -116,6 +116,11 @@ trait NodeTypeStarters {
   def argument: Expression[HNil] =
     call.argument
 
+  /**
+    * Traverse to all meta data entries
+    */
+  def metaData: MetaData[HNil] =
+    new MetaData(scalaGraph.V.hasLabel(NodeTypes.META_DATA))
 }
 
 object NodeTypeStarters {

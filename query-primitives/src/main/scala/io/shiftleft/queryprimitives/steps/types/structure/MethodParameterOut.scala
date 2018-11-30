@@ -42,4 +42,10 @@ class MethodParameterOut[Labels <: HList](raw: GremlinScala[Vertex])
 
   def asInput: MethodParameter[Labels] =
     new MethodParameter[Labels](raw.in(EdgeTypes.PARAMETER_LINK))
+
+  /**
+    * Traverse to parameter type
+    * */
+  def typ: Type[Labels] =
+    new Type(raw.out(EdgeTypes.EVAL_TYPE))
 }

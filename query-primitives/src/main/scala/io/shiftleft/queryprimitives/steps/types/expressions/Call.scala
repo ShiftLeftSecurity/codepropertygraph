@@ -44,7 +44,9 @@ class Call[Labels <: HList](raw: GremlinScala[Vertex])
     */
   def calledMethodInstance(implicit callResolver: ICallResolver): MethodInst[Labels] =
     // note: side effect writes edges into the graph
-    new MethodInst[Labels](raw.sideEffect(callResolver.resolveDynamicCallSite).out(EdgeTypes.CALL))
+    new MethodInst[Labels](raw.sideEffect { v =>
+      callResolver.resolveDynamicCallSite(v.toCC[nodes.MethodInst])
+    }.out(EdgeTypes.CALL))
 
   /**
     Arguments of the call

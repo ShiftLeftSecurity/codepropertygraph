@@ -5,7 +5,7 @@ import gremlin.scala.dsl.Converter
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.queryprimitives.steps.CpgSteps
 import io.shiftleft.queryprimitives.steps.types.expressions.Call
-import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.DeclarationBase
+import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{DeclarationBase, Modifier}
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{CodeAccessors, EvalTypeAccessors, NameAccessors}
 import shapeless.HList
 
@@ -59,4 +59,16 @@ class Member[Labels <: HList](raw: GremlinScala[Vertex])
   def isStatic: Member[Labels] =
     new Member[Labels](
       raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.STATIC)))
+
+  /**
+    * Traverse to method modifiers, e.g., "static", "public".
+    * */
+  def modifier: Modifier[Labels] =
+    new Modifier[Labels](raw.out.hasLabel(NodeTypes.MODIFIER))
+
+  /**
+    * Traverse to member type
+    * */
+  def typ: Type[Labels] =
+    new Type(raw.out(EdgeTypes.EVAL_TYPE))
 }
