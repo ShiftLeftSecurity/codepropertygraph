@@ -171,7 +171,7 @@
          "outEdges" : [
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]},
              {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF"]},
-             {"edgeName": "RECEIVER", "inNodes": ["CALL", "IDENTIFIER", "METHOD_REF"]}
+             {"edgeName": "RECEIVER", "inNodes": ["CALL", "IDENTIFIER", "METHOD_REF", "UNKNOWN"]}
          ]
         },
         {"id":23, "name" : "LOCAL",
