@@ -1,7 +1,7 @@
 package io.shiftleft.queryprimitives.steps.types.expressions.generalizations
 
 import gremlin.scala._
-import gremlin.scala.dsl.{Converter, Steps}
+import gremlin.scala.dsl.Steps
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.CpgSteps

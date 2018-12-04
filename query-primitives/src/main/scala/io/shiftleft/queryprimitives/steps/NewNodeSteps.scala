@@ -7,7 +7,7 @@ import io.shiftleft.diffgraph.DiffGraph
 import scala.collection.JavaConverters._
 import shapeless.HList
 
-class NewNodeSteps[A <: NewNode: Marshallable, Labels <: HList](raw: GremlinScala.Aux[A, Labels]) {
+class NewNodeSteps[A <: NewNode: Marshallable, Labels <: HList](val raw: GremlinScala[A]) {
 
   def store()(implicit graph: DiffGraph): Unit =
     raw.toList.foreach(storeRecursively)
@@ -45,44 +45,44 @@ class NewNodeSteps[A <: NewNode: Marshallable, Labels <: HList](raw: GremlinScal
       case (_, _) => throw new NotImplementedError("this should never happen")
     }
 
-//   /**
-//     * Evaluate traversal and return list of results
-//     * TODO fabs/michael: remove - only `store` should be necessary
-//     * */
-//   def l: List[A] = raw.l
+  /**
+    * Evaluate traversal and return list of results
+    * TODO fabs/michael: remove - only `store` should be necessary
+    * */
+  def l: List[A] = raw.l
 
-//   /**
-//     * Evaluate traversal and return Java list of results
-//     * TODO fabs/michael: remove - only `store` should be necessary
-//     * */
-//   def jl: java.util.List[A] = l.asJava
+  /**
+    * Evaluate traversal and return Java list of results
+    * TODO fabs/michael: remove - only `store` should be necessary
+    * */
+  def jl: java.util.List[A] = l.asJava
 
-//   /**
-//     * Evaluate traversal and return first element
-//     * TODO fabs/michael: remove - only `store` should be necessary
-//     * */
-//   def head: A = l.head
+  /**
+    * Evaluate traversal and return first element
+    * TODO fabs/michael: remove - only `store` should be necessary
+    * */
+  def head: A = l.head
 
-//   /**
-//     * Evaluate traversal and return first element as option
-//     * */
-//   def headOption: Option[A] = l.headOption
+  /**
+    * Evaluate traversal and return first element as option
+    * */
+  def headOption: Option[A] = l.headOption
 
-//   /**
-//     * Evaluate traversal and return set of results
-//     * TODO fabs/michael: remove - only `store` should be necessary
-//     * */
-//   def toSet: Set[A] = raw.toSet
+  /**
+    * Evaluate traversal and return set of results
+    * TODO fabs/michael: remove - only `store` should be necessary
+    * */
+  def toSet: Set[A] = raw.toSet
 
-//   /**
-//     * Evaluate traversals and return Java set of results
-//     * TODO fabs/michael: remove - only `store` should be necessary
-//     * */
-//   def toJSet: java.util.Set[A] = toSet.asJava
+  /**
+    * Evaluate traversals and return Java set of results
+    * TODO fabs/michael: remove - only `store` should be necessary
+    * */
+  def toJSet: java.util.Set[A] = toSet.asJava
 
-//   /**
-//     Same as filter, but operates with a lambda (will only work with local databases)
-//     */
-//   def filterOnEnd(predicate: A => Boolean): NewNodeSteps[A, Labels] =
-//     new NewNodeSteps[A, Labels](raw.filterOnEnd(predicate))
+  /**
+    Same as filter, but operates with a lambda (will only work with local databases)
+    */
+  def filterOnEnd(predicate: A => Boolean): NewNodeSteps[A, Labels] =
+    new NewNodeSteps[A, Labels](raw.filterOnEnd(predicate))
 }

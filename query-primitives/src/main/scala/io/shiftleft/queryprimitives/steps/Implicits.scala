@@ -17,7 +17,7 @@ object Implicits {
     /**
       Start a new traversal from this node
       */
-    def start(implicit graph: Graph): CpgSteps[NodeType, HNil] =
+    def start: CpgSteps[NodeType, HNil] =
       new CpgSteps[NodeType, HNil](node.underlying.start)
   }
 
@@ -25,7 +25,7 @@ object Implicits {
     /**
       Start a new traversal from these nodes
       */
-    def start(implicit graph: Graph): CpgSteps[NodeType, HNil] = {
+    def start: CpgSteps[NodeType, HNil] = {
       val raw: GremlinScala.Aux[Vertex, HNil] = __(seq.map(_.underlying): _*)
       new CpgSteps[NodeType, HNil](raw)
     }
