@@ -26,6 +26,8 @@ import shapeless.{HList, HNil}
 class CpgSteps[NodeType <: nodes.StoredNode: Marshallable, Labels <: HList](override val raw: GremlinScala[Vertex])
     extends NodeSteps[NodeType, Labels](raw) {
   implicit val graph: Graph = raw.traversal.asAdmin.getGraph.get
+  override val converter = Converter.forDomainNode[NodeType]
+  val marshaller = implicitly[Marshallable[NodeType]]
 
   /**
     * Traverse to source file

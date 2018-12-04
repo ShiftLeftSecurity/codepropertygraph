@@ -1,7 +1,6 @@
 package io.shiftleft.queryprimitives.steps.types.expressions.generalizations
 
 import gremlin.scala._
-import gremlin.scala.dsl.Converter
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeKeyNames, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.CpgSteps
@@ -24,7 +23,6 @@ import shapeless.HList
 class Expression[Labels <: HList](raw: GremlinScala[Vertex])
     extends CpgSteps[nodes.Expression, Labels](raw)(Expression.marshaller)
     with ExpressionBase[nodes.Expression, Labels] {
-  override val converter = Converter.forDomainNode[nodes.Expression](Expression.marshaller, graph)
 }
 
 object Expression {

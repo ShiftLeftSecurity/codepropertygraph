@@ -1,7 +1,6 @@
 package io.shiftleft.queryprimitives.steps.types.structure
 
 import gremlin.scala._
-import gremlin.scala.dsl.Converter
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.CpgSteps
@@ -18,7 +17,6 @@ class MethodParameterOut[Labels <: HList](raw: GremlinScala[Vertex])
     with OrderAccessors[nodes.MethodParameterOut, Labels]
     with LineNumberAccessors[nodes.MethodParameterOut, Labels]
     with EvalTypeAccessors[nodes.MethodParameterOut, Labels] {
-  override val converter = Converter.forDomainNode[nodes.MethodParameterOut]
 
   /* method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
   def index(num: Int): MethodParameterOut[Labels] =

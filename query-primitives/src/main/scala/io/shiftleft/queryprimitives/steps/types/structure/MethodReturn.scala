@@ -1,7 +1,6 @@
 package io.shiftleft.queryprimitives.steps.types.structure
 
 import gremlin.scala._
-import gremlin.scala.dsl.Converter
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.CpgSteps
@@ -19,7 +18,6 @@ class MethodReturn[Labels <: HList](raw: GremlinScala[Vertex])
     with CodeAccessors[nodes.MethodReturn, Labels]
     with LineNumberAccessors[nodes.MethodReturn, Labels]
     with EvalTypeAccessors[nodes.MethodReturn, Labels] {
-  override val converter = Converter.forDomainNode[nodes.MethodReturn]
 
   def method: Method[Labels] =
     new Method[Labels](raw.in(EdgeTypes.AST))

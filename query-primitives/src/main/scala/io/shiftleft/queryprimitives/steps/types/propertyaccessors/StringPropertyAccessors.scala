@@ -4,11 +4,13 @@ import gremlin.scala._
 import gremlin.scala.dsl.{Converter, Steps}
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.codepropertygraph.predicates.Text.textRegex
+import io.shiftleft.queryprimitives.steps.CpgSteps
 import shapeless.HList
 
 trait StringPropertyAccessors[T <: StoredNode, Labels <: HList] {
   val raw: GremlinScala[Vertex]
   implicit def converter: Converter.Aux[T, Vertex]
+  implicit def marshaller: Marshallable[T]
 
   protected def stringProperty(property: Key[String]) =
     new Steps[String, String, Labels](raw.value(property))

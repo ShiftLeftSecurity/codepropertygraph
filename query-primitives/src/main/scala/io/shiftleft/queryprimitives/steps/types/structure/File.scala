@@ -1,7 +1,6 @@
 package io.shiftleft.queryprimitives.steps.types.structure
 
 import gremlin.scala._
-import gremlin.scala.dsl.Converter
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.queryprimitives.steps.CpgSteps
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.NameAccessors
@@ -12,7 +11,6 @@ import shapeless.HList
   * */
 class File[Labels <: HList](raw: GremlinScala[Vertex])
     extends CpgSteps[nodes.File, Labels](raw) with NameAccessors[nodes.File, Labels] {
-  override val converter = Converter.forDomainNode[nodes.File]
 
   def typeDecl: TypeDecl[Labels] =
     new TypeDecl[Labels](

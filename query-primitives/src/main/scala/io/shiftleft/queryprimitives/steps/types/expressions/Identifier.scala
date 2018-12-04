@@ -1,7 +1,6 @@
 package io.shiftleft.queryprimitives.steps.types.expressions
 
 import gremlin.scala._
-import gremlin.scala.dsl.Converter
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.CpgSteps
@@ -21,7 +20,6 @@ class Identifier[Labels <: HList](raw: GremlinScala[Vertex])
     with OrderAccessors[nodes.Identifier, Labels]
     with LineNumberAccessors[nodes.Identifier, Labels]
     with EvalTypeAccessors[nodes.Identifier, Labels] {
-  override val converter = Converter.forDomainNode[nodes.Identifier]
 
   /**
     * Traverse to all declarations of this identifier

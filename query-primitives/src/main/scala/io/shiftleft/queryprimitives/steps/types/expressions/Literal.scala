@@ -1,7 +1,6 @@
 package io.shiftleft.queryprimitives.steps.types.expressions
 
 import gremlin.scala._
-import gremlin.scala.dsl.Converter
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.queryprimitives.steps.CpgSteps
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations._
@@ -20,7 +19,6 @@ class Literal[Labels <: HList](raw: GremlinScala[Vertex])
     with NameAccessors[nodes.Literal, Labels]
     with LineNumberAccessors[nodes.Literal, Labels]
     with EvalTypeAccessors[nodes.Literal, Labels] {
-  override val converter = Converter.forDomainNode[nodes.Literal]
 
   /**
     * Traverse to method hosting this literal

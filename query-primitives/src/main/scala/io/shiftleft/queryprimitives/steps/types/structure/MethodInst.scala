@@ -1,7 +1,6 @@
 package io.shiftleft.queryprimitives.steps.types.structure
 
 import gremlin.scala._
-import gremlin.scala.dsl.Converter
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps.ICallResolver
@@ -16,7 +15,6 @@ class MethodInst[Labels <: HList](override val raw: GremlinScala[Vertex])
     with NameAccessors[nodes.MethodInst, Labels]
     with FullNameAccessors[nodes.MethodInst, Labels]
     with SignatureAccessors[nodes.MethodInst, Labels] {
-  override val converter = Converter.forDomainNode[nodes.MethodInst]
 
   def method: Method[Labels] = {
     new Method[Labels](raw.out(EdgeTypes.REF))

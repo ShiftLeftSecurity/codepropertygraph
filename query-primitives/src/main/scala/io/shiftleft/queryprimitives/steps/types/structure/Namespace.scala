@@ -1,7 +1,6 @@
 package io.shiftleft.queryprimitives.steps.types.structure
 
 import gremlin.scala._
-import gremlin.scala.dsl.Converter
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.CpgSteps
@@ -14,7 +13,6 @@ import shapeless.HList
 class Namespace[Labels <: HList](raw: GremlinScala[Vertex])
     extends CpgSteps[nodes.Namespace, Labels](raw)
     with NameAccessors[nodes.Namespace, Labels] {
-  override val converter = Converter.forDomainNode[nodes.Namespace]
 
   /**
     * The source files associated with the namespace

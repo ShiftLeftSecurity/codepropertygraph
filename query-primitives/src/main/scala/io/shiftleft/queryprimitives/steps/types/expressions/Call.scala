@@ -1,7 +1,6 @@
 package io.shiftleft.queryprimitives.steps.types.expressions
 
 import gremlin.scala._
-import gremlin.scala.dsl.Converter
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.CpgSteps
@@ -24,7 +23,6 @@ class Call[Labels <: HList](raw: GremlinScala[Vertex])
     with LineNumberAccessors[nodes.Call, Labels]
     with EvalTypeAccessors[nodes.Call, Labels]
     with ExpressionBase[nodes.Call, Labels] {
-  override val converter = Converter.forDomainNode[nodes.Call]
 
   /**
     The caller

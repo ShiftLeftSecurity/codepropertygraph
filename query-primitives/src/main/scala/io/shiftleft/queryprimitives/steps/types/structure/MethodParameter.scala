@@ -1,7 +1,6 @@
 package io.shiftleft.queryprimitives.steps.types.structure
 
 import gremlin.scala._
-import gremlin.scala.dsl.Converter
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.CpgSteps
@@ -21,7 +20,6 @@ class MethodParameter[Labels <: HList](raw: GremlinScala[Vertex])
     with OrderAccessors[nodes.MethodParameterIn, Labels]
     with LineNumberAccessors[nodes.MethodParameterIn, Labels]
     with EvalTypeAccessors[nodes.MethodParameterIn, Labels] {
-  override val converter = Converter.forDomainNode[nodes.MethodParameterIn]
 
   /**
     * Traverse to all `num`th parameters

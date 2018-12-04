@@ -3,7 +3,6 @@ package io.shiftleft.queryprimitives.steps.types.structure
 import java.io._
 
 import gremlin.scala._
-import gremlin.scala.dsl.Converter
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{
@@ -36,7 +35,6 @@ class Method[Labels <: HList](override val raw: GremlinScala[Vertex])
     with SignatureAccessors[nodes.Method, Labels]
     with LineNumberAccessors[nodes.Method, Labels]
     with EvalTypeAccessors[nodes.Method, Labels] {
-  override val converter = Converter.forDomainNode[nodes.Method]
 
   /**
     * Traverse to concrete instances of method.

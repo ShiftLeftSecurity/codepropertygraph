@@ -1,7 +1,6 @@
 package io.shiftleft.queryprimitives.steps.types.structure
 
 import gremlin.scala._
-import gremlin.scala.dsl.Converter
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.queryprimitives.steps.CpgSteps
 import io.shiftleft.queryprimitives.steps.types.expressions.Call
@@ -18,7 +17,6 @@ class Member[Labels <: HList](raw: GremlinScala[Vertex])
     with CodeAccessors[nodes.Member, Labels]
     with NameAccessors[nodes.Member, Labels]
     with EvalTypeAccessors[nodes.Member, Labels] {
-  override val converter = Converter.forDomainNode[nodes.Member]
 
   /**
     * The type declaration this member is defined in

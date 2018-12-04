@@ -4,6 +4,7 @@ import gremlin.scala.Vertex
 import gremlin.scala.dsl.Steps
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
+import io.shiftleft.queryprimitives.steps.CpgSteps
 import shapeless.HList
 
 trait NameAccessors[T <: StoredNode, Labels <: HList] extends StringPropertyAccessors[T, Labels] {
@@ -17,7 +18,7 @@ trait NameAccessors[T <: StoredNode, Labels <: HList] extends StringPropertyAcce
   /**
     * Traverse to nodes where the name matches the regular expression `value`
     * */
-  def name(value: String): Steps[T, Vertex, Labels] =
+  def name(value: String): CpgSteps[T, Labels] =
     stringPropertyFilter(NodeKeys.NAME, value)
 
   /**
