@@ -11,6 +11,8 @@ abstract class CpgLoaderBase {
 
   protected def builder: ProtoToCpgBase
 
+  // override def createIndexes(graph: Graph): Unit = {
+
   def loadCodePropertyGraph(filename: String, runEnhancements: Boolean = true): Cpg = {
     val cpg = new ProtoCpgLoader(builder).loadFromProtoZip(filename)
     if (runEnhancements) {

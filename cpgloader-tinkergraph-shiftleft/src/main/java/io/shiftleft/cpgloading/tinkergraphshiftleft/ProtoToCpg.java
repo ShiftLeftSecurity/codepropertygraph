@@ -1,5 +1,6 @@
 package io.shiftleft.cpgloading.tinkergraphshiftleft;
 
+import io.shiftleft.codepropertygraph.generated.NodeKeys;
 import io.shiftleft.cpgloading.ProtoToCpgBase;
 import io.shiftleft.proto.cpg.Cpg;
 import java.util.List;
@@ -17,6 +18,7 @@ public class ProtoToCpg extends ProtoToCpgBase {
       (List<SpecializedElementFactory.ForEdge<?,?>>)
         io.shiftleft.codepropertygraph.generated.edges.Factories$.MODULE$.AllAsJava()
     ));
+    ((TinkerGraph) graph).createIndex(NodeKeys.FULL_NAME.name(), Vertex.class);
   }
 
   @Override
