@@ -1,42 +1,63 @@
 package io.shiftleft.layers.enhancedbase
 
 import gremlin.scala.ScalaGraph
-import io.shiftleft.passes.linking.capturinglinker.CapturingLinker
+import io.shiftleft.codepropertygraph.generated.Languages
+import io.shiftleft.passes.CpgPass
 import io.shiftleft.passes.linking.linker.Linker
 import io.shiftleft.passes.linking.memberaccesslinker.MemberAccessLinker
-import io.shiftleft.passes.methoddecorator.MethodDecorator
-import io.shiftleft.passes.methodinstlinker.MethodInstLinker
-import io.shiftleft.passes.namspacecreator.NamespaceCreator
+import io.shiftleft.passes.namespacecreator.NamespaceCreator
+import io.shiftleft.SerializedCpg
+import io.shiftleft.passes.linking.callargumentlinker.CallArgumentLinker
+import io.shiftleft.passes.containsedges.ContainsEdgePass
+import io.shiftleft.passes.languagespecific.fuzzyc.MethodStubCreator
+import io.shiftleft.passes.linking.capturinglinker.CapturingLinker
+import io.shiftleft.passes.methoddecorations.MethodDecoratorPass
+import io.shiftleft.passes.receiveredges.ReceiverEdgePass
 
 class EnhancedBaseCreator(graph: ScalaGraph, language: String) {
 
-  def create = {
+  private val enhancementExecList = createEnhancementExecList(language)
 
-    val methodDecorator = new MethodDecorator(graph)
-    methodDecorator.executeAndApply()
-
-    linkingEnhancements(graph)
-
-    // TODO: "contains"-edges are AST edges. Their existence has
-    // historical reasons, and we should replace them by AST
-    // edges in the future
-
-    val namespaceCreator = new NamespaceCreator(graph)
-    namespaceCreator.executeAndApply()
-
-    val methodInstLinker = new MethodInstLinker(graph)
-    methodInstLinker.executeAndApply()
+  private def createEnhancementExecList(language: String): List[CpgPass] = {
+    language match {
+      case Languages.JAVA =>
+        List(
+          new ReceiverEdgePass(graph),
+          new MethodDecoratorPass(graph),
+          new CapturingLinker(graph),
+          new Linker(graph),
+          new MemberAccessLinker(graph),
+          new CallArgumentLinker(graph),
+          new ContainsEdgePass(graph),
+          new NamespaceCreator(graph),
+        )
+      case Languages.FUZZYC =>
+        List(
+          new MethodStubCreator(graph),
+          new ReceiverEdgePass(graph),
+          new MethodDecoratorPass(graph),
+          new CapturingLinker(graph),
+          new Linker(graph),
+          new MemberAccessLinker(graph),
+          new CallArgumentLinker(graph),
+          new ContainsEdgePass(graph),
+          new NamespaceCreator(graph),
+        )
+      case _ =>
+        List(
+          new ReceiverEdgePass(graph),
+          new MethodDecoratorPass(graph),
+          new CapturingLinker(graph),
+          new Linker(graph),
+          new MemberAccessLinker(graph),
+          new CallArgumentLinker(graph),
+          new ContainsEdgePass(graph),
+          new NamespaceCreator(graph),
+        )
+    }
   }
 
-  private def linkingEnhancements(graph: ScalaGraph): Unit = {
-    val capturingLinker = new CapturingLinker(graph)
-    capturingLinker.executeAndApply()
-
-    val linker = new Linker(graph)
-    linker.executeAndApply()
-
-    val memberAccessLinker = new MemberAccessLinker(graph)
-    memberAccessLinker.executeAndApply()
+  def create(): Unit = {
+    enhancementExecList.foreach(_.executeAndApply)
   }
-
 }

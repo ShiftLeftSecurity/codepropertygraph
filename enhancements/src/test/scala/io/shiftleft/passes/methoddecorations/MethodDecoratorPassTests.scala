@@ -1,4 +1,4 @@
-package io.shiftleft.passes.methoddecorator
+package io.shiftleft.passes.methoddecorations
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{
@@ -12,8 +12,7 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{Matchers, WordSpec}
 
-class MethodDecoratorTests extends WordSpec with Matchers {
-
+class MethodDecoratorPassTests extends WordSpec with Matchers {
   "MethodDecoratorTest" in {
     implicit val graph: ScalaGraph = TinkerGraph.open.asScala
 
@@ -29,7 +28,7 @@ class MethodDecoratorTests extends WordSpec with Matchers {
 
     method --- EdgeTypes.AST --> parameterIn
 
-    val methodDecorator = new MethodDecorator(graph)
+    val methodDecorator = new MethodDecoratorPass(graph)
     methodDecorator.executeAndApply()
 
     val parameterOut = parameterIn.vertices(Direction.OUT, EdgeTypes.PARAMETER_LINK).next
