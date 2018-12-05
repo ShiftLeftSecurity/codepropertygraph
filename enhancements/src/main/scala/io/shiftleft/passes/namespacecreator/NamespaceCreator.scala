@@ -1,4 +1,4 @@
-package io.shiftleft.passes.namspacecreator
+package io.shiftleft.passes.namespacecreator
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeyNames, NodeKeys, NodeTypes}
