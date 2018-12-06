@@ -18,7 +18,7 @@ import scala.collection.JavaConverters._
   */
 class ReceiverEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
 
-  override def run(): Unit = {
+  override def run() = {
     var loggedDeprecationWarning = false
 
     graph.V
@@ -44,6 +44,6 @@ class ReceiverEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
         }
       }
       .iterate()
-    // dstGraph
+    dstGraph
   }
 }

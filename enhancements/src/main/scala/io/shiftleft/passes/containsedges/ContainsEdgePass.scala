@@ -8,7 +8,7 @@ import io.shiftleft.passes.utils.Traversals
 
 class ContainsEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
 
-  override def run(): Unit = {
+  override def run() = {
     val sourceTypes = List(
       NodeTypes.METHOD,
       NodeTypes.TYPE_DECL,
@@ -41,6 +41,6 @@ class ContainsEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
         .iterate()
     }
 
-    // dstGraph
+    dstGraph
   }
 }

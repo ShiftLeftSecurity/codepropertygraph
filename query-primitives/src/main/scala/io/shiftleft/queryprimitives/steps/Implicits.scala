@@ -114,6 +114,9 @@ object Implicits {
   implicit def toNamespace[Labels <: HList](steps: Steps[nodes.Namespace, Vertex, Labels]): Namespace[Labels] =
     new Namespace[Labels](steps.raw)
 
+  implicit def toNamespaceBlock[Labels <: HList](steps: Steps[nodes.NamespaceBlock, Vertex, Labels]): NamespaceBlock[Labels] =
+    new NamespaceBlock[Labels](steps.raw)
+
   implicit def toModifier[Labels <: HList](steps: Steps[nodes.Modifier, Vertex, Labels]): Modifier[Labels] =
     new Modifier[Labels](steps.raw)
 

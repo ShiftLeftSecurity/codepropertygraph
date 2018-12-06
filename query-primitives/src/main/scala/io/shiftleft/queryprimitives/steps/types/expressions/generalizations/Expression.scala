@@ -122,6 +122,12 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
     new Expression[Labels](raw.out(EdgeTypes.AST).not(_.hasLabel(NodeTypes.LOCAL)))
 
   /**
+    If the expression is used as receiver for a call, this traverses to the call.
+    */
+  def receivedCall: Call[Labels] =
+    new Call[Labels](raw.in(EdgeTypes.RECEIVER))
+
+  /**
     Traverse to related parameter
     */
   def toParameter: MethodParameter[Labels] =

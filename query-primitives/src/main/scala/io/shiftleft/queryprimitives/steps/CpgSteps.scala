@@ -7,7 +7,6 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps.types.structure.File
 import java.util.{List => JList, Map => JMap}
-import java.util.stream.{Stream => JStream}
 
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import org.apache.tinkerpop.gremlin.structure.T

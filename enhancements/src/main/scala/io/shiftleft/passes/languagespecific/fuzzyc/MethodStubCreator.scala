@@ -18,7 +18,7 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
 
   initMap()
 
-  override def run(): Unit = {
+  override def run() = {
     graph.V
       .hasLabel(NodeTypes.METHOD_INST)
       .sideEffect { v =>
@@ -40,7 +40,7 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
         }
       }
       .iterate()
-    // dstGraph
+    dstGraph
   }
 
   private def createMethodStub(name: String,

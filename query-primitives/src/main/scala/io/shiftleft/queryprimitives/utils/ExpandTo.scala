@@ -8,18 +8,19 @@ import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex}
 import scala.collection.JavaConverters._
 
 object ExpandTo {
-  // The call target is for java always an object instance.
+  // The call receiver is for java always an object instance.
   // For languages which make use of function pointer this can also be the
   // pointer itself.
-  def callTargetOption(callNode: Vertex): Option[Vertex] = {
+  def callReceiverOption(callNode: Vertex): Option[Vertex] = {
     callNode
-      .vertices(Direction.OUT, EdgeTypes.AST)
+      .vertices(Direction.OUT, EdgeTypes.RECEIVER)
       .asScala
-      .find(_.value2(NodeKeys.ARGUMENT_INDEX) == 0)
+      .buffered
+      .headOption
   }
 
-  def callTarget(callNode: Vertex): Vertex = {
-    callTargetOption(callNode).get
+  def callReceiver(callNode: Vertex): Vertex = {
+    callReceiverOption(callNode).get
   }
 
   def parameterToMethod(parameterNode: Vertex): Vertex = {

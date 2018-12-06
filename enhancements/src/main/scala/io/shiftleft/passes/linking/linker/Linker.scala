@@ -33,6 +33,16 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
     )
 
     linkToSingle(
+      srcLabels = List(NodeTypes.CALL),
+      dstNodeLabel = NodeTypes.METHOD_INST,
+      edgeType = EdgeTypes.CALL,
+      dstNodeMap = methodInstFullNameToNode,
+      getDstFullName = (srcNode: Vertex) => srcNode.value2(NodeKeys.METHOD_INST_FULL_NAME),
+      setDstFullName =
+        (srcNode: Vertex, fullName: String) => srcNode.property(NodeKeyNames.METHOD_INST_FULL_NAME, fullName)
+    )
+
+    linkToSingle(
       srcLabels = List(NodeTypes.METHOD_INST),
       dstNodeLabel = NodeTypes.METHOD,
       edgeType = EdgeTypes.REF,
@@ -226,7 +236,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
                                    astChild.id.toString)
             }
           case Some(astEdge) if !loggedDeprecationWarning =>
-            logger.warn(
+            logger.info(
               "Using deprecated CPG format with already existing AST edge between" +
                 s" ${astEdge.outVertex().label()} and ${astChild.label()} node.")
             loggedDeprecationWarning = true
