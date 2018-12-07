@@ -64,7 +64,7 @@ trait NodeTypeStarters {
   /**
     Traverse to all method instances
     */
-  def methodInst: MethodInst[HNil] =
+  def methodInstance: MethodInst[HNil] =
     new MethodInst(scalaGraph.V.hasLabel(NodeTypes.METHOD_INST))
 
   /**
@@ -76,7 +76,7 @@ trait NodeTypeStarters {
   /**
     Traverse to all input parameters
     */
-  def param: MethodParameter[HNil] =
+  def parameter: MethodParameter[HNil] =
     new MethodParameter(scalaGraph.V.hasLabel(NodeTypes.METHOD_PARAMETER_IN))
 
   /**

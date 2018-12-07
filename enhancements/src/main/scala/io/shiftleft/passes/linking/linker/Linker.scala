@@ -121,7 +121,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
       }
       .iterate()
 
-    cpg.methodInst
+    cpg.methodInstance
       .sideEffect { methodInst =>
         methodInstFullNameToNode += methodInst.fullName -> methodInst.underlying
       }
