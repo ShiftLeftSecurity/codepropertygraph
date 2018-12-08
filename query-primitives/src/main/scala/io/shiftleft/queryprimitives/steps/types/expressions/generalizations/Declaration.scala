@@ -14,40 +14,17 @@ class Declaration[Labels <: HList](raw: GremlinScala[Vertex])
     with DeclarationBase[nodes.Declaration, Labels]
 
 object Declaration {
+
+  /* TODO MP: generate in DomainClassCreator */
   val marshaller: Marshallable[nodes.Declaration] = new Marshallable[nodes.Declaration] {
-    override def toCC(element: Element) =
-      new nodes.Declaration {
-        override def underlying: Vertex = element.asInstanceOf[Vertex]
-        override def name: String = element.value[String](NodeKeyNames.NAME)
-
-        // needed for specialised tinkergraph (separate codegen) - doesn't harm standard CC impl
-        def _name_=(value: String): Unit = ???
-        def _name: String = name
-        def graph() = underlying.graph
-        def id(): Object = underlying.id
-        def label(): String = underlying.label
-        def remove(): Unit = underlying.remove
-        def addEdge(label: String, inVertex: Vertex, keyValues: Object*) =
-          underlying.addEdge(label, inVertex, keyValues: _*)
-        def edges(direction: Direction, edgeLabels: String*) =
-          underlying.edges(direction, edgeLabels: _*)
-        def properties[V](propertyKeys: String*): JIterator[VertexProperty[V]] =
-          underlying.properties(propertyKeys: _*)
-        def property[V](cardinality: VertexProperty.Cardinality, key: String, value: V, keyValues: Object*): VertexProperty[V] =
-          underlying.property(cardinality, key, value, keyValues: _*)
-        def vertices(direction: Direction, edgeLabels: String*): JIterator[Vertex] = 
-          underlying.vertices(direction, edgeLabels: _*)
-        def toMap: Map[String, Any] =
-          Map(
-            "_label" -> element.label,
-            "_id" -> element.id,
-            "NAME" -> _name
-          )
-
-        // not really needed AFAIK
-        override def productArity: Int = ???
-        override def productElement(n: Int): Any = ???
-        override def canEqual(that: Any): Boolean = ???
+    override def toCC(element: Element): nodes.Declaration =
+      element.label match {
+        case nodes.Literal.Label => implicitly[Marshallable[nodes.Literal]].toCC(element)
+        case nodes.Local.Label => implicitly[Marshallable[nodes.Local]].toCC(element)
+        case nodes.Member.Label => implicitly[Marshallable[nodes.Member]].toCC(element)
+        case nodes.Method.Label => implicitly[Marshallable[nodes.Method]].toCC(element)
+        case nodes.MethodParameterIn.Label => implicitly[Marshallable[nodes.MethodParameterIn]].toCC(element)
+        case nodes.MethodParameterOut.Label => implicitly[Marshallable[nodes.MethodParameterOut]].toCC(element)
       }
 
     // not really needed AFAIK

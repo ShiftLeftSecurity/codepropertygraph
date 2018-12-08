@@ -124,33 +124,64 @@ trait NodeTypeStarters {
 }
 
 object NodeTypeStarters {
+
+  /* TODO MP: generate in DomainClassCreator */
   val storedNodeMarshaller: Marshallable[nodes.StoredNode] = new Marshallable[nodes.StoredNode] {
-    override def toCC(element: Element) =
-      new nodes.StoredNode {
-        override def underlying: Vertex = element.asInstanceOf[Vertex]
-
-        // needed for specialised tinkergraph (separate codegen) - doesn't harm standard CC impl
-        def graph() = underlying.graph
-        def id(): Object = underlying.id
-        def label(): String = underlying.label
-        def remove(): Unit = underlying.remove
-        def addEdge(label: String, inVertex: Vertex, keyValues: Object*) =
-          underlying.addEdge(label, inVertex, keyValues: _*)
-        def edges(direction: Direction, edgeLabels: String*) =
-          underlying.edges(direction, edgeLabels: _*)
-        def properties[V](propertyKeys: String*): JIterator[VertexProperty[V]] =
-          underlying.properties(propertyKeys: _*)
-        def property[V](cardinality: VertexProperty.Cardinality, key: String, value: V, keyValues: Object*): VertexProperty[V] =
-          underlying.property(cardinality, key, value, keyValues: _*)
-        def vertices(direction: Direction, edgeLabels: String*): JIterator[Vertex] = 
-          underlying.vertices(direction, edgeLabels: _*)
-        def toMap: Map[String, Any] =
-          Map("_label" -> element.label, "_id" -> element.id)
-
-        // not really needed AFAIK
-        override def productArity: Int = ???
-        override def productElement(n: Int): Any = ???
-        override def canEqual(that: Any): Boolean = ???
+    override def toCC(element: Element): nodes.StoredNode =
+      element.label match {
+        case nodes.Annotation.Label => implicitly[Marshallable[nodes.Annotation]].toCC(element)
+        case nodes.AnnotationLiteral.Label => implicitly[Marshallable[nodes.AnnotationLiteral]].toCC(element)
+        case nodes.AnnotationParameter.Label => implicitly[Marshallable[nodes.AnnotationParameter]].toCC(element)
+        case nodes.AnnotationParameterAssign.Label => implicitly[Marshallable[nodes.AnnotationParameterAssign]].toCC(element)
+        case nodes.ArrayInitializer.Label => implicitly[Marshallable[nodes.ArrayInitializer]].toCC(element)
+        case nodes.Block.Label => implicitly[Marshallable[nodes.Block]].toCC(element)
+        case nodes.Call.Label => implicitly[Marshallable[nodes.Call]].toCC(element)
+        case nodes.CallChain.Label => implicitly[Marshallable[nodes.CallChain]].toCC(element)
+        case nodes.CallSite.Label => implicitly[Marshallable[nodes.CallSite]].toCC(element)
+        case nodes.ClosureBinding.Label => implicitly[Marshallable[nodes.ClosureBinding]].toCC(element)
+        case nodes.ConfigFile.Label => implicitly[Marshallable[nodes.ConfigFile]].toCC(element)
+        case nodes.Dependency.Label => implicitly[Marshallable[nodes.Dependency]].toCC(element)
+        case nodes.File.Label => implicitly[Marshallable[nodes.File]].toCC(element)
+        case nodes.Finding.Label => implicitly[Marshallable[nodes.Finding]].toCC(element)
+        case nodes.Flow.Label => implicitly[Marshallable[nodes.Flow]].toCC(element)
+        case nodes.Framework.Label => implicitly[Marshallable[nodes.Framework]].toCC(element)
+        case nodes.FrameworkData.Label => implicitly[Marshallable[nodes.FrameworkData]].toCC(element)
+        case nodes.Identifier.Label => implicitly[Marshallable[nodes.Identifier]].toCC(element)
+        case nodes.Ioflow.Label => implicitly[Marshallable[nodes.Ioflow]].toCC(element)
+        case nodes.Literal.Label => implicitly[Marshallable[nodes.Literal]].toCC(element)
+        case nodes.Local.Label => implicitly[Marshallable[nodes.Local]].toCC(element)
+        case nodes.Location.Label => implicitly[Marshallable[nodes.Location]].toCC(element)
+        case nodes.Member.Label => implicitly[Marshallable[nodes.Member]].toCC(element)
+        case nodes.MetaData.Label => implicitly[Marshallable[nodes.MetaData]].toCC(element)
+        case nodes.Method.Label => implicitly[Marshallable[nodes.Method]].toCC(element)
+        case nodes.MethodInst.Label => implicitly[Marshallable[nodes.MethodInst]].toCC(element)
+        case nodes.MethodParameterIn.Label => implicitly[Marshallable[nodes.MethodParameterIn]].toCC(element)
+        case nodes.MethodParameterOut.Label => implicitly[Marshallable[nodes.MethodParameterOut]].toCC(element)
+        case nodes.MethodRef.Label => implicitly[Marshallable[nodes.MethodRef]].toCC(element)
+        case nodes.MethodReturn.Label => implicitly[Marshallable[nodes.MethodReturn]].toCC(element)
+        case nodes.MethodSummary.Label => implicitly[Marshallable[nodes.MethodSummary]].toCC(element)
+        case nodes.Modifier.Label => implicitly[Marshallable[nodes.Modifier]].toCC(element)
+        case nodes.Namespace.Label => implicitly[Marshallable[nodes.Namespace]].toCC(element)
+        case nodes.NamespaceBlock.Label => implicitly[Marshallable[nodes.NamespaceBlock]].toCC(element)
+        case nodes.ProgramPoint.Label => implicitly[Marshallable[nodes.ProgramPoint]].toCC(element)
+        case nodes.Read.Label => implicitly[Marshallable[nodes.Read]].toCC(element)
+        case nodes.Return.Label => implicitly[Marshallable[nodes.Return]].toCC(element)
+        case nodes.Sink.Label => implicitly[Marshallable[nodes.Sink]].toCC(element)
+        case nodes.Source.Label => implicitly[Marshallable[nodes.Source]].toCC(element)
+        case nodes.SpAnnotationParameter.Label => implicitly[Marshallable[nodes.SpAnnotationParameter]].toCC(element)
+        case nodes.Tag.Label => implicitly[Marshallable[nodes.Tag]].toCC(element)
+        case nodes.Tags.Label => implicitly[Marshallable[nodes.Tags]].toCC(element)
+        case nodes.TagNodePair.Label => implicitly[Marshallable[nodes.TagNodePair]].toCC(element)
+        case nodes.Transform.Label => implicitly[Marshallable[nodes.Transform]].toCC(element)
+        case nodes.Transformation.Label => implicitly[Marshallable[nodes.Transformation]].toCC(element)
+        case nodes.Type.Label => implicitly[Marshallable[nodes.Type]].toCC(element)
+        case nodes.TypeArgument.Label => implicitly[Marshallable[nodes.TypeArgument]].toCC(element)
+        case nodes.TypeDecl.Label => implicitly[Marshallable[nodes.TypeDecl]].toCC(element)
+        case nodes.TypeParameter.Label => implicitly[Marshallable[nodes.TypeParameter]].toCC(element)
+        case nodes.Unknown.Label => implicitly[Marshallable[nodes.Unknown]].toCC(element)
+        case nodes.VariableInfo.Label => implicitly[Marshallable[nodes.VariableInfo]].toCC(element)
+        case nodes.Write.Label => implicitly[Marshallable[nodes.Write]].toCC(element)
+        case nodes.PackagePrefix.Label => implicitly[Marshallable[nodes.PackagePrefix]].toCC(element)
       }
 
     // not really needed AFAIK
