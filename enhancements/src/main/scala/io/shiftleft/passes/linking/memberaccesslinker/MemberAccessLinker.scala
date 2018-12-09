@@ -54,7 +54,7 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
           }
 
           if (!finished) {
-            logger.error("Could not find type member. type=${typ.fullName}, member=$memberName")
+            logger.error(s"Could not find type member. type=${typ.fullName}, member=$memberName")
           }
         } else if (!loggedDeprecationWarning) {
           logger.warn(
