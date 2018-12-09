@@ -147,10 +147,7 @@ object DomainClassCreator {
         case keys =>
           ", " + keys
             .map { key =>
-              val annotation =
-                if (Cardinality.fromName(key.cardinality) == Cardinality.One) "@nullable"
-                else ""
-              s"$annotation ${key.name}: ${getCompleteType(key)}"
+              s"${key.name}: ${getCompleteType(key)}"
             }
             .mkString(", ")
       }
