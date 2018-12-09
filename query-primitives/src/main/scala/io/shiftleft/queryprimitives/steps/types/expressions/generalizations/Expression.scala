@@ -31,13 +31,13 @@ object Expression {
   implicit val marshaller: Marshallable[nodes.Expression] = new Marshallable[nodes.Expression] {
     override def toCC(element: Element): nodes.Expression =
       element.label match {
-        case nodes.Block.Label => implicitly[Marshallable[nodes.Block]].toCC(element)
-        case nodes.Call.Label => implicitly[Marshallable[nodes.Call]].toCC(element)
-        case nodes.Identifier.Label => implicitly[Marshallable[nodes.Identifier]].toCC(element)
-        case nodes.Literal.Label => implicitly[Marshallable[nodes.Literal]].toCC(element)
-        case nodes.MethodRef.Label => implicitly[Marshallable[nodes.MethodRef]].toCC(element)
-        case nodes.Return.Label => implicitly[Marshallable[nodes.Return]].toCC(element)
-        case nodes.Unknown.Label => implicitly[Marshallable[nodes.Unknown]].toCC(element)
+        case "BLOCK" => implicitly[Marshallable[nodes.Block]].toCC(element)
+        case "CALL" => implicitly[Marshallable[nodes.Call]].toCC(element)
+        case "IDENTIFIER" => implicitly[Marshallable[nodes.Identifier]].toCC(element)
+        case "LITERAL" => implicitly[Marshallable[nodes.Literal]].toCC(element)
+        case "METHOD_REF" => implicitly[Marshallable[nodes.MethodRef]].toCC(element)
+        case "RETURN" => implicitly[Marshallable[nodes.Return]].toCC(element)
+        case "UNKNOWN" => implicitly[Marshallable[nodes.Unknown]].toCC(element)
       }
 
     // not really needed AFAIK

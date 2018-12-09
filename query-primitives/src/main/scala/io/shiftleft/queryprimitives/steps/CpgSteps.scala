@@ -62,7 +62,4 @@ class CpgSteps[NodeType <: nodes.StoredNode: Marshallable, Labels <: HList](over
     else write(maps)
   }
 
-  def count(): Long =
-    raw.count.head
-
 }
