@@ -10,3 +10,5 @@ libraryDependencies ++= Seq(
   "io.shiftleft" % "query-primitives" % cpgVersion,
   "io.shiftleft" % "enhancements" % cpgVersion,
 )
+
+enablePlugins(JavaAppPackaging)
