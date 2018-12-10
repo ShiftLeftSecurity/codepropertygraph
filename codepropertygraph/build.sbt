@@ -22,6 +22,9 @@ mergeSchemaTask := {
 }
 
 Compile / sourceGenerators += Def.task {
+  // unfortunately we have to clear everything at the moment, otherwise sbt messes up the file handles
+  // TODO MP: only regenerate these files if the underlying sources have changed, that probably rectifies the issue
+  clean.value
   val javaDefs = { // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
     import scala.sys.process._
 
