@@ -13,7 +13,7 @@ import scala.collection.JavaConverters._
 class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
   // Since the method fullNames for fuzzyc are not unique, we do not have
   // a 1to1 relation and may overwrite some values. We deem this ok for now.
-  private var methodFullNameToNode               = Map[String, nodes.Method]()
+  private var methodFullNameToNode               = Map[String, nodes.MethodBase]()
   private var methodInstFullNameToParameterCount = Map[String, Int]()
 
   initMap()
@@ -28,10 +28,11 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
             case Some(method) =>
             case None =>
               val paramterCount = methodInstFullNameToParameterCount(methodInst.fullName)
-              createMethodStub(methodInst.name,
-                               methodInst.fullName,
-                               methodInst.signature,
-                               paramterCount)
+              val newMethod = createMethodStub(methodInst.name,
+                methodInst.fullName,
+                methodInst.signature,
+                paramterCount)
+              methodFullNameToNode += methodInst.methodFullName -> newMethod
           }
         } catch {
           case _: Exception =>
@@ -45,7 +46,7 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
   private def createMethodStub(name: String,
                                fullName: String,
                                signature: String,
-                               parameterCount: Int): Unit = {
+                               parameterCount: Int): nodes.MethodBase = {
     val methodNode = new nodes.NewMethod(
       name,
       fullName,
@@ -93,6 +94,8 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
     val blockNode = new NewBlock("", 1, 1, "ANY", None, None, None, None)
     dstGraph.addNode(blockNode)
     dstGraph.addEdge(methodNode, blockNode, EdgeTypes.AST)
+
+    methodNode
   }
 
   private def initMap(): Unit = {
