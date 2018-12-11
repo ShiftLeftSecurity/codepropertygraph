@@ -26,9 +26,9 @@ Compile / sourceGenerators += Def.task {
   import scala.sys.process._
 
   val currentMd5 = FileUtils.md5(List(
-    new File("codepropertygraph/codegen/src/main/python"),
+    new File("codepropertygraph/codegen/src/main"),
     new File("project/DomainClassCreator.scala"),
-    new File("codepropertygraph/src/main/resources/schemas/base.json")))
+    new File("codepropertygraph/src/main/resources/schemas")))
   val outputRoot = new File(sourceManaged.in(Compile).value.getAbsolutePath + "/io/shiftleft/codepropertygraph/generated")
 
   if (!outputRoot.exists || CodeGenGlobalState.lastMd5 != currentMd5) {
