@@ -10,52 +10,74 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.3" % Test
 )
 
+import java.io.File
+import scala.sys.process._
+
 lazy val mergeSchemaTask = taskKey[Unit]("Merge schemas")
 mergeSchemaTask := {
-  import scala.sys.process._
-  val mergeCmd = "codepropertygraph/codegen/src/main/python/mergeSchemas.py"
-  val mergeResult = Seq(mergeCmd).!
-  if (mergeResult == 0)
-    println("successfully merged schemas to generate cpg.json")
-  else
-    throw new Exception(s"problem when calling $mergeCmd. exitCode was $mergeResult")
+  val currentMd5 = FileUtils.md5(new File("codepropertygraph/src/main/resources/schemas"))
+  if (MergeSchemaTaskGlobalState.lastMd5 == currentMd5) {
+    println("schemas unchanged, no need to merge them again")
+  } else {
+    val mergeCmd = "codepropertygraph/codegen/src/main/python/mergeSchemas.py"
+    val mergeResult = Seq(mergeCmd).!
+    if (mergeResult == 0)
+      println("successfully merged schemas to generate cpg.json")
+    else
+      throw new Exception(s"problem when calling $mergeCmd. exitCode was $mergeResult")
+  }
+  MergeSchemaTaskGlobalState.lastMd5 = currentMd5
 }
 
 Compile / sourceGenerators += Def.task {
-  // unfortunately we have to clear everything at the moment, otherwise sbt messes up the file handles
-  // TODO MP: only regenerate these files if the underlying sources have changed, that probably rectifies the issue
-  clean.value
-  val javaDefs = { // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
-    import scala.sys.process._
+  val currentMd5 = FileUtils.md5(List(
+    new File("codepropertygraph/codegen/src/main"),
+    new File("project/DomainClassCreator.scala"),
+    new File("codepropertygraph/src/main/resources/schemas")))
+  val outputRoot = new File(sourceManaged.in(Compile).value.getAbsolutePath + "/io/shiftleft/codepropertygraph/generated")
 
+  if (!outputRoot.exists || CodeGenGlobalState.lastMd5 != currentMd5) {
+    println("regenerating domain classes")
+    DomainClassCreator.run((Compile / sourceManaged).value)
+
+    // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
     val cmd = "codepropertygraph/codegen/src/main/python/generateJava.py"
     val result = Seq(cmd).!
     if (result == 0)
       println(s"successfully called $cmd")
     else
       throw new Exception(s"problem when calling $cmd. exitCode was $result")
-    new java.io.File(sourceManaged.in(Compile).value.getAbsolutePath +
-      "/io/shiftleft/codepropertygraph/generated").getAbsoluteFile.listFiles
+  } else {
+    println("no need to regenerate domain classes")
   }
-  val domainClassFiles = DomainClassCreator.run((Compile / sourceManaged).value)
+  CodeGenGlobalState.lastMd5 = currentMd5
 
-  domainClassFiles ++ javaDefs
+  FileUtils.listFilesRecursively(outputRoot)
 }.taskValue
 
 (Compile / sourceGenerators) := (Compile / sourceGenerators).value.map(x => x.dependsOn(mergeSchemaTask.taskValue))
 
 lazy val generateProtobuf = taskKey[Seq[File]]("generate cpg.proto")
 generateProtobuf := {
-  // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
-  import scala.sys.process._
-  val cmd = "codepropertygraph/codegen/src/main/python/generateProtobuf.py"
-  val result = Seq(cmd).!
-  val file = (resourceManaged in Compile).value / "cpg.proto"
-  if (result == 0)
-    println(s"successfully called $cmd")
-  else
-    throw new Exception(s"problem when calling $cmd. exitCode was $result")
-  Seq(file)
+  val output: File = resourceManaged.in(Compile).value / "cpg.proto"
+
+  val currentMd5 = FileUtils.md5(List(
+    new File("codepropertygraph/codegen/src/main"),
+    new File("codepropertygraph/src/main/resources/schemas")))
+  if (!output.exists || GenerateProtobufTaskGlobalState.lastMd5 != currentMd5) {
+    // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
+    val cmd = "codepropertygraph/codegen/src/main/python/generateProtobuf.py"
+    val result = Seq(cmd).!
+    val file = (resourceManaged in Compile).value / "cpg.proto"
+    if (result == 0)
+      println(s"successfully called $cmd")
+    else
+      throw new Exception(s"problem when calling $cmd. exitCode was $result")
+  } else {
+    println("no need to regenerate protobuf")
+  }
+  GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
+  Seq(output)
 }
 generateProtobuf := generateProtobuf.dependsOn(mergeSchemaTask).value
 
