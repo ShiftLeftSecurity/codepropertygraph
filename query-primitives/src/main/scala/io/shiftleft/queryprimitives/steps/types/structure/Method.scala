@@ -97,7 +97,6 @@ class Method[Labels <: HList](override val raw: GremlinScala[Vertex])
 
       new Method[Labels](
         methodTrav
-          .until(_.is(P.within(sourceMethods)))
           .emit(_.is(P.within(sourceMethods)))
           .repeat(
             _.sideEffect { method =>
@@ -238,6 +237,24 @@ class Method[Labels <: HList](override val raw: GremlinScala[Vertex])
         _.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.VIRTUAL)))
 
   /**
+    * Traverse to external methods, that is, methods not present
+    * but only referenced in the CPG.
+    * */
+  def external: Method[Labels] =
+    new Method[Labels](
+      filter(_.definingTypeDecl.external).raw
+    )
+
+  /**
+    * Traverse to internal methods, that is, methods for which
+    * code is included in this CPG.
+    * */
+  def internal: Method[Labels] =
+    new Method[Labels](
+      filter(_.definingTypeDecl.internal).raw
+    )
+
+  /**
     * Traverse to method modifiers, e.g., "static", "public".
     * */
   def modifier: Modifier[Labels] =
@@ -292,5 +309,11 @@ class Method[Labels <: HList](override val raw: GremlinScala[Vertex])
     * */
   def block: Block[Labels] =
     new Block[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.BLOCK))
+
+  /**
+    * Traverse to namespace
+    * */
+  def namespace: Namespace[Labels] =
+    new Namespace[Labels](definingTypeDecl.namespace.raw)
 
 }

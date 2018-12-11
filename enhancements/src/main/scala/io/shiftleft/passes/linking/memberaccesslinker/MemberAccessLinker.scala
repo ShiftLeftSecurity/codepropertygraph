@@ -21,6 +21,7 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
 
   private def linkMemberAccessToMember(): Unit = {
     var loggedDeprecationWarning       = false
+    var loggedForTypeMemberCombination = Set[(nodes.Type, String)]()
     val cpg                            = Cpg(graph.graph)
 
     cpg.call
@@ -54,8 +55,10 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
             }
           }
 
-        if (!finished) {
-          logger.error(s"Could not find type member. type=${typ.fullName}, member=$memberName")
+          if (!finished && !loggedForTypeMemberCombination.contains((typ, memberName))) {
+            loggedForTypeMemberCombination += ((typ, memberName))
+            logger.error(s"Could not find type member. type=${typ.fullName}, member=$memberName")
+          }
         } else if (!loggedDeprecationWarning) {
           logger.warn(
             s"Using deprecated CPG format with alreay existing REF edge between" +
