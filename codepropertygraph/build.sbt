@@ -10,10 +10,11 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.3" % Test
 )
 
+import java.io.File
+import scala.sys.process._
+
 lazy val mergeSchemaTask = taskKey[Unit]("Merge schemas")
 mergeSchemaTask := {
-  import scala.sys.process._
-
   val currentMd5 = FileUtils.md5(List(new File("codepropertygraph/src/main/resources/schemas")))
   if (MergeSchemaTaskGlobalState.lastMd5 == currentMd5) {
     println("schemas unchanged, no need to merge them again")
@@ -29,9 +30,6 @@ mergeSchemaTask := {
 }
 
 Compile / sourceGenerators += Def.task {
-  import java.io.File
-  import scala.sys.process._
-
   val currentMd5 = FileUtils.md5(List(
     new File("codepropertygraph/codegen/src/main"),
     new File("project/DomainClassCreator.scala"),
@@ -50,7 +48,7 @@ Compile / sourceGenerators += Def.task {
     else
       throw new Exception(s"problem when calling $cmd. exitCode was $result")
   } else {
-    println(s"no need to regenerate domain classes. currentMd5=$currentMd5")
+    println("no need to regenerate domain classes")
   }
   CodeGenGlobalState.lastMd5 = currentMd5
 
@@ -61,16 +59,25 @@ Compile / sourceGenerators += Def.task {
 
 lazy val generateProtobuf = taskKey[Seq[File]]("generate cpg.proto")
 generateProtobuf := {
-  // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
-  import scala.sys.process._
-  val cmd = "codepropertygraph/codegen/src/main/python/generateProtobuf.py"
-  val result = Seq(cmd).!
-  val file = (resourceManaged in Compile).value / "cpg.proto"
-  if (result == 0)
-    println(s"successfully called $cmd")
-  else
-    throw new Exception(s"problem when calling $cmd. exitCode was $result")
-  Seq(file)
+  val output: File = resourceManaged.in(Compile).value / "cpg.proto"
+
+  val currentMd5 = FileUtils.md5(List(
+    new File("codepropertygraph/codegen/src/main"),
+    new File("codepropertygraph/src/main/resources/schemas")))
+  if (!output.exists || GenerateProtobufTaskGlobalState.lastMd5 != currentMd5) {
+    // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
+    val cmd = "codepropertygraph/codegen/src/main/python/generateProtobuf.py"
+    val result = Seq(cmd).!
+    val file = (resourceManaged in Compile).value / "cpg.proto"
+    if (result == 0)
+      println(s"successfully called $cmd")
+    else
+      throw new Exception(s"problem when calling $cmd. exitCode was $result")
+  } else {
+    println("no need to regenerate protobuf")
+  }
+  GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
+  Seq(output)
 }
 generateProtobuf := generateProtobuf.dependsOn(mergeSchemaTask).value
 
