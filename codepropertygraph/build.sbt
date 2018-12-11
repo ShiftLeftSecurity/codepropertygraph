@@ -13,12 +13,19 @@ libraryDependencies ++= Seq(
 lazy val mergeSchemaTask = taskKey[Unit]("Merge schemas")
 mergeSchemaTask := {
   import scala.sys.process._
-  val mergeCmd = "codepropertygraph/codegen/src/main/python/mergeSchemas.py"
-  val mergeResult = Seq(mergeCmd).!
-  if (mergeResult == 0)
-    println("successfully merged schemas to generate cpg.json")
-  else
-    throw new Exception(s"problem when calling $mergeCmd. exitCode was $mergeResult")
+
+  val currentMd5 = FileUtils.md5(List(new File("codepropertygraph/src/main/resources/schemas")))
+  if (MergeSchemaTaskGlobalState.lastMd5 == currentMd5) {
+    println("schemas unchanged, no need to merge them again")
+  } else {
+    val mergeCmd = "codepropertygraph/codegen/src/main/python/mergeSchemas.py"
+    val mergeResult = Seq(mergeCmd).!
+    if (mergeResult == 0)
+      println("successfully merged schemas to generate cpg.json")
+    else
+      throw new Exception(s"problem when calling $mergeCmd. exitCode was $mergeResult")
+  }
+  MergeSchemaTaskGlobalState.lastMd5 = currentMd5
 }
 
 Compile / sourceGenerators += Def.task {
