@@ -16,6 +16,19 @@ class NamespaceTests extends WordSpec with Matchers {
       queryResult.map(_.name) should contain("io.shiftleft.testcode.namespace")
     }
 
+    "find a namespace block for io.shiftleft.testcode.namespace" in {
+      val queryResult: List[nodes.NamespaceBlock] = fixture.cpg.namespaceBlock.toList
+      queryResult.map(_.name) should contain("io.shiftleft.testcode.namespace")
+    }
+
+    "be able to traverse from namespace block to type decl" in {
+      val queryResult: List[nodes.TypeDecl] = fixture.cpg.namespaceBlock
+        .nameExact("io.shiftleft.testcode.namespace")
+        .typeDecl
+        .toList
+      queryResult.map(_.name) should contain("NamespaceTest")
+    }
+
     "be able to expand to class NamespaceTest from via its namespace." in {
       val queryResult: List[nodes.TypeDecl] =
         fixture.cpg.namespace.name("io.shiftleft.testcode.namespace").typeDecl.toList
