@@ -15,7 +15,7 @@ import scala.sys.process._
 
 lazy val mergeSchemaTask = taskKey[Unit]("Merge schemas")
 mergeSchemaTask := {
-  val currentMd5 = FileUtils.md5(List(new File("codepropertygraph/src/main/resources/schemas")))
+  val currentMd5 = FileUtils.md5(new File("codepropertygraph/src/main/resources/schemas"))
   if (MergeSchemaTaskGlobalState.lastMd5 == currentMd5) {
     println("schemas unchanged, no need to merge them again")
   } else {

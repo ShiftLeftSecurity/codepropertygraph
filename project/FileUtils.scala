@@ -11,6 +11,9 @@ object FileUtils {
     }
   }
 
+  def md5(root: File): String =
+    md5(List(root))
+
   def md5(roots: List[File]): String = {
     val md = MessageDigest.getInstance("MD5")
     roots.foreach { root =>
@@ -39,6 +42,11 @@ object MergeSchemaTaskGlobalState {
 }
 
 object GenerateProtobufTaskGlobalState {
+  // this is very ugly, but I can't define it like that in the build.sbt
+  var lastMd5: String = ""
+}
+
+object CopyLatestCpgProtoTaskGlobalState {
   // this is very ugly, but I can't define it like that in the build.sbt
   var lastMd5: String = ""
 }

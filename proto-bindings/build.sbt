@@ -13,10 +13,16 @@ copyLatestCpgProto := {
   val protoFile = (Projects.codepropertygraph/generateProtobuf).value.head
   val targetDir: java.io.File = (ProtobufConfig/protobufExternalIncludePath).value
   val targetFile = targetDir / (protoFile.getName)
-  targetDir.mkdirs
-  targetFile.delete
-  println(s"copying $protoFile to $targetFile")
-  java.nio.file.Files.copy(protoFile.toPath, targetFile.toPath)
+  val currentMd5 = FileUtils.md5(protoFile)
+  if (!targetFile.exists || CopyLatestCpgProtoTaskGlobalState.lastMd5 != currentMd5) {
+    targetDir.mkdirs
+    targetFile.delete
+    println(s"copying $protoFile to $targetFile")
+    java.nio.file.Files.copy(protoFile.toPath, targetFile.toPath)
+  } else {
+    println("no need to copy cpg.proto to externalIncludePath")
+  }
+  CopyLatestCpgProtoTaskGlobalState.lastMd5 = currentMd5
 }
 
 /** generate csharp bindings for proto file as a nuget package.
