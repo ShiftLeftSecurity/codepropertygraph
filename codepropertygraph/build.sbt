@@ -22,24 +22,32 @@ mergeSchemaTask := {
 }
 
 Compile / sourceGenerators += Def.task {
-  // unfortunately we have to clear everything at the moment, otherwise sbt messes up the file handles
-  // TODO MP: only regenerate these files if the underlying sources have changed, that probably rectifies the issue
-  clean.value
-  val javaDefs = { // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
-    import scala.sys.process._
+  import java.io.File
+  import scala.sys.process._
 
+  val currentMd5 = FileUtils.md5(List(
+    new File("codepropertygraph/codegen/src/main/python"),
+    new File("project/DomainClassCreator.scala"),
+    new File("codepropertygraph/src/main/resources/schemas/base.json")))
+  val outputRoot = new File(sourceManaged.in(Compile).value.getAbsolutePath + "/io/shiftleft/codepropertygraph/generated")
+
+  if (!outputRoot.exists || CodeGenGlobalState.lastMd5 != currentMd5) {
+    println("regenerating domain classes")
+    DomainClassCreator.run((Compile / sourceManaged).value)
+
+    // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
     val cmd = "codepropertygraph/codegen/src/main/python/generateJava.py"
     val result = Seq(cmd).!
     if (result == 0)
       println(s"successfully called $cmd")
     else
       throw new Exception(s"problem when calling $cmd. exitCode was $result")
-    new java.io.File(sourceManaged.in(Compile).value.getAbsolutePath +
-      "/io/shiftleft/codepropertygraph/generated").getAbsoluteFile.listFiles
+  } else {
+    println(s"no need to regenerate domain classes. currentMd5=$currentMd5")
   }
-  val domainClassFiles = DomainClassCreator.run((Compile / sourceManaged).value)
+  CodeGenGlobalState.lastMd5 = currentMd5
 
-  domainClassFiles ++ javaDefs
+  FileUtils.listFilesRecursively(outputRoot)
 }.taskValue
 
 (Compile / sourceGenerators) := (Compile / sourceGenerators).value.map(x => x.dependsOn(mergeSchemaTask.taskValue))
