@@ -21,7 +21,6 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
 
   private def linkMemberAccessToMember(): Unit = {
     var loggedDeprecationWarning       = false
-    var loggedForTypeMemberCombination = Set[(nodes.Type, String)]()
     val cpg                            = Cpg(graph.graph)
 
     cpg.call
