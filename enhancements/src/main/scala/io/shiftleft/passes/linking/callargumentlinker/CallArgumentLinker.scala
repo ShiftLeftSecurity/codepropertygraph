@@ -7,6 +7,7 @@ import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
 import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps.starters.Cpg
+import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.Expression
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
@@ -46,7 +47,9 @@ class CallArgumentLinker(graph: ScalaGraph) extends CpgPass(graph) {
       .sortBy(_.value2(NodeKeys.ORDER))
 
     sortedArguments.zip(sortedParameters).foreach {
-      case (argument: nodes.Expression, parameter: nodes.MethodParameterIn) =>
+      case (argument, parameter)
+        if Expression.isExpression(argument.label) &&
+        parameter.label == NodeTypes.METHOD_PARAMETER_IN =>
         perCallsiteDstGraph.addEdgeInOriginal(argument, parameter, EdgeTypes.CALL_ARG)
       case other =>
         logger.error(s"Failed to generate arg edges for $other")
@@ -64,7 +67,9 @@ class CallArgumentLinker(graph: ScalaGraph) extends CpgPass(graph) {
       .sortBy(_.value2(NodeKeys.ORDER))
 
     sortedArguments.zip(sortedParameters).foreach {
-      case (argument: nodes.Expression, parameter: nodes.MethodParameterOut) =>
+      case (argument, parameter)
+        if Expression.isExpression(argument.label) &&
+        parameter.label == NodeTypes.METHOD_PARAMETER_OUT =>
         perCallsiteDstGraph.addEdgeInOriginal(parameter, argument, EdgeTypes.CALL_ARG_OUT)
       case other =>
         logger.error(s"Failed to generate out arg edges for $other")

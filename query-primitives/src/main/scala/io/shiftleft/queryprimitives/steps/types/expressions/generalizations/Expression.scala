@@ -25,9 +25,21 @@ class Expression[Labels <: HList](raw: GremlinScala[Vertex])
     with ExpressionBase[nodes.Expression, Labels] {
 }
 
+/* TODO MP: generate in DomainClassCreator */
 object Expression {
+  lazy val expressionLabels =
+    Set(
+      "BLOCK",
+      "CALL",
+      "IDENTIFIER",
+      "LITERAL",
+      "METHOD_REF",
+      "RETURN",
+      "UNKNOWN")
 
-  /* TODO MP: generate in DomainClassCreator */
+  def isExpression(label: String): Boolean =
+    expressionLabels.contains(label)
+
   implicit val marshaller: Marshallable[nodes.Expression] = new Marshallable[nodes.Expression] {
     override def toCC(element: Element): nodes.Expression =
       element.label match {
