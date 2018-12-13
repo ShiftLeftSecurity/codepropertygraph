@@ -3,7 +3,7 @@ name := "codepropertygraph-protos"
 lazy val generateProtobuf = taskKey[Seq[File]]("generate cpg.proto")
 
 enablePlugins(ProtobufPlugin)
-ProtobufConfig / version := "3.5.1"
+ProtobufConfig / version := "3.6.1"
 
 sourceDirectories in ProtobufConfig += (protobufExternalIncludePath in ProtobufConfig).value
 ProtobufConfig / protobufGenerate := (ProtobufConfig / protobufGenerate).dependsOn(copyLatestCpgProto).value
