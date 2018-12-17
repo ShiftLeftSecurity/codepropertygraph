@@ -2,7 +2,7 @@ name := "codepropertygraph"
 
 libraryDependencies ++= Seq(
   "io.shiftleft" % "tinkergraph-gremlin" % "3.3.4.1",
-  "com.michaelpollmeier" %% "gremlin-scala" % "3.3.4.13",
+  "com.michaelpollmeier" %% "gremlin-scala" % "3.3.4.14",
   "com.google.guava" % "guava" % "21.0",
   "org.apache.commons" % "commons-lang3" % "3.5",
   "org.apache.logging.log4j" % "log4j-api" % "2.11.0",

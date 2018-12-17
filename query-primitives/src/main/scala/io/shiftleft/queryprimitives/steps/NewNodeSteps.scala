@@ -89,17 +89,18 @@ class NewNodeSteps[A <: NewNode: Marshallable, Labels <: HList](val raw: Gremlin
   /**
     * Pretty print vertices
     * */
-  def p(): Unit = {
-    l.foreach {
+  def p(): List[String] = {
+    l.map {
       case node: NewNode => {
         val label = node.label
         val keyValPairs = node.properties.toList
           .filter(x => x._2.toString != "")
           .sortBy(_._1)
           .map(x => x._1 + ": " + x._2)
-        println(s"($label): " + keyValPairs.mkString(", "))
+        s"($label): " + keyValPairs.mkString(", ")
       }
-      case elem => println(elem)
+      case elem => elem.toString
+      case _    => ""
     }
   }
 
