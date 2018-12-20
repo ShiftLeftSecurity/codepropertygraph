@@ -72,7 +72,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
       val newNode            = new TestNewNode(containedNodes = List(newContainedNodeL0)) { override val label = "newNode" }
       new NewNodeSteps(__(newNode)).store
 
-      diffGraph.nodes shouldBe List(newNode, newContainedNodeL0, newContainedNodeL1)
+      diffGraph.nodes.toSet shouldBe Set(newNode, newContainedNodeL0, newContainedNodeL1)
       diffGraph.edges.toSet shouldBe Set(
         EdgeInDiffGraph(
           src = newNode,

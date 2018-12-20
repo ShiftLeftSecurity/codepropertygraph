@@ -21,12 +21,17 @@ class MethodTests extends WordSpec with Matchers {
       queryResult.head.name shouldBe "TestGraph"
     }
 
-    "expand to literal" ignore {
+    "expand to literal" in {
       val queryResult: List[nodes.Literal] =
         fixture.cpg.method.name("methodWithLiteral").literal.toList
 
       queryResult.size shouldBe 1
       queryResult.head.name shouldBe "\"myLiteral\""
+    }
+
+    "expand to namespace" in {
+      val queryResult: Set[String] = fixture.cpg.method.namespace.name.l.distinct.toSet
+      queryResult shouldBe Set("io.shiftleft.testcode.method", "java.lang")
     }
 
     "filter by name" in {
@@ -72,6 +77,23 @@ class MethodTests extends WordSpec with Matchers {
 
       expressions.size shouldBe 1
       expressions.head.code shouldBe "return"
+    }
+
+    "filter for external/internal methods" in {
+      val externals = fixture.cpg.method.external.fullName.l
+      externals.size shouldBe 1
+      externals.head shouldBe "java.lang.Object.<init>:void()"
+
+      val internals = fixture.cpg.method.internal.fullName.l
+      internals.size should be > 0
+      internals should not contain "java.lang.Object.<init>:void()"
+
+      val allMethods = fixture.cpg.method
+        .fullNameNot("<operator>.*")
+        .fullName
+        .l
+
+      (internals ++ externals).toSet shouldBe allMethods.toSet
     }
   }
 

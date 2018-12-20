@@ -30,4 +30,10 @@ class Namespace[Labels <: HList](raw: GremlinScala[Vertex])
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.TYPE_DECL)
     )
+
+  /**
+    * Methods defined in this namespace
+    * */
+  def method: Method[Labels] =
+    typeDecl.method
 }
