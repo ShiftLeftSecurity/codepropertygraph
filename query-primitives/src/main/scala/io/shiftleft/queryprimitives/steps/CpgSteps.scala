@@ -30,12 +30,22 @@ class CpgSteps[NodeType <: nodes.StoredNode: Marshallable, Labels <: HList](over
 
   /**
     * Traverse to source file
+    * 
+    * TODO remove the separate handling for namespace, e.g. by making sure we can
+    * follow the same edges from namespaces to the file. waiting for a response from 
+    * fabs/markus (https://shiftleftsecurity.slack.com/archives/G5QE0EYP8/p1545007098033500)
+    * ```
+    * new File[Labels](raw.until(_.hasLabel(NodeTypes.FILE)).repeat(_.in(EdgeTypes.AST)))
+    * ```
     * */
   def file: File[Labels] =
     new File[Labels](
-      raw
-        .until(_.hasLabel(NodeTypes.FILE))
-        .repeat(_.in(EdgeTypes.AST)))
+      raw.choose(
+        _.label.is("NAMESPACE"),
+        onTrue = _.in(EdgeTypes.REF).in(EdgeTypes.AST),
+        onFalse = _.until(_.hasLabel(NodeTypes.FILE)).repeat(_.in(EdgeTypes.AST))
+      )
+    )
 
   /**
     Execute traversal and convert the result to json.
