@@ -18,8 +18,14 @@ import shapeless.HNil
 class StepsTest extends WordSpec with Matchers {
 
   "generic cpg" should {
+    "find a field by type regex" in new CpgTestFixture("splitmeup") {
+      val queryResult: List[nodes.Member] =
+        cpg.member.evalType(".*").toList
 
-    "filter by regex" in new CpgTestFixture("splitmeup") {
+      queryResult.size should be > 1
+    }
+
+    "find a literal by regex" in new CpgTestFixture("splitmeup") {
       val queryResult: List[nodes.Literal] =
         cpg.literal.code(".*").toList
 
@@ -154,9 +160,81 @@ class StepsTest extends WordSpec with Matchers {
 
   "toJson" in new CpgTestFixture("splitmeup") {
     val json = cpg.namespace.nameExact("io.shiftleft.testcode.splitmeup").toJson
+
     val parsed = parse(json).children.head //exactly one result for the above query
-    (parsed \ "NAME") shouldBe JString("io.shiftleft.testcode.splitmeup")
     (parsed \ "_label") shouldBe JString("NAMESPACE")
+    (parsed \ "NAME") shouldBe JString("io.shiftleft.testcode.splitmeup")
+  }
+
+  "repeat, emit, until, times test" should {
+    "find all base types of Derived2" in new CpgTestFixture("steps") {
+      val results = cpg.typeDecl
+        .nameExact("TestGraph$Derived2")
+        .repeat(_.baseTypeDecl)
+        .emit()
+        .toList
+
+      results.size shouldBe 3
+      results.map(_.name).toSet shouldBe Set("TestGraph$Derived1", "TestGraph$Base", "Object")
+    }
+
+    "find all base types of Derived2 whos name contains 'Derived1'" in new CpgTestFixture("steps") {
+      val results = cpg.typeDecl
+        .nameExact("TestGraph$Derived2")
+        .repeat(_.baseTypeDecl)
+        .emit(_.name(".*Derived1.*"))
+        .toList
+
+      results.size shouldBe 1
+      results.map(_.name).toSet shouldBe Set("TestGraph$Derived1")
+    }
+
+    "find base type of Derived2 whos name contains 'Base'" in new CpgTestFixture("steps") {
+      val results = cpg.typeDecl
+        .nameExact("TestGraph$Derived2")
+        .repeat(_.baseTypeDecl)
+        .until(_.name(".*Base.*"))
+        .toList
+
+      results.size shouldBe 1
+      results.map(_.name).toSet shouldBe Set("TestGraph$Base")
+    }
+
+    "find seconde level ancestor class of Derived2 " in new CpgTestFixture("steps") {
+      val results = cpg.typeDecl
+        .nameExact("TestGraph$Derived2")
+        .repeat(_.baseTypeDecl)
+        .times(2)
+        .toList
+
+      results.size shouldBe 1
+      results.map(_.name).toSet shouldBe Set("TestGraph$Base")
+    }
+  }
+
+  "or test" should {
+    "find types Base and Derived1" in new CpgTestFixture("steps") {
+      val results = cpg.typeDecl
+        .or(
+          _.nameExact("TestGraph$Base"),
+          _.nameExact("TestGraph$Derived1"),
+        )
+        .toList
+
+      results.size shouldBe 2
+      results.map(_.name).toSet shouldBe Set("TestGraph$Base", "TestGraph$Derived1")
+    }
+  }
+
+  "and with complete traversal test" should {
+    "find ..." in new CpgTestFixture("steps") {
+      // val results = cpg.typeDecl.and(cpg.method).l
+      // results.size should be > 0
+      // results.head.getClass.getSimpleName shouldBe "Method"
+      // TODO fix in gremlin-scala
+      ???
+    }
+
   }
 
 }
