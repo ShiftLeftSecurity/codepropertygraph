@@ -16,9 +16,9 @@ import io.shiftleft.passes.receiveredges.ReceiverEdgePass
 
 class EnhancedBaseCreator(graph: ScalaGraph, language: String) {
 
-  private val enhancementExecList = createEnhancementExecList(language)
+  protected val enhancementExecList = createEnhancementExecList(language)
 
-  private def createEnhancementExecList(language: String): List[CpgPass] = {
+  protected def createEnhancementExecList(language: String): List[CpgPass] = {
     language match {
       case Languages.JAVA =>
         List(

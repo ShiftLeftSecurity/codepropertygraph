@@ -12,7 +12,7 @@
 // object LoadGraphForHeapdump extends App {
 //   val filename = args.head
 //   println(s"loading cpg from $filename")
-//   val cpg = CpgLoader.loadCodePropertyGraph(filename)
+//   val cpg = CpgLoader.loadFromFile(filename)
 
 //   // val graph = TinkerGraph.open()
 //   // nodes.Utils.registerVertexFactories(graph)

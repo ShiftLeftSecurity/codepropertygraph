@@ -3,7 +3,7 @@ package org.example
 import io.shiftleft.cpgloading.tinkergraph.CpgLoader
 
 object Main extends App {
-  val cpg = CpgLoader.loadCodePropertyGraph("path/to/cpg.bin.zip", runEnhancements = true)
+  val cpg = CpgLoader.loadFromFile("path/to/cpg.bin.zip", runEnhancements = true)
 
   // Print all methods starting with "<operator>"
   cpg.method.name("<operator>.*").p
