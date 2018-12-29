@@ -265,7 +265,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
                                  dstNodeType: String,
                                  dstNodeId: String): Unit = {
     logger.error(
-      "Could not create edge. Destination lookup failed. " +
+      "Could not create edge. Source lookup failed. " +
         s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcFullName=$srcFullName, " +
         s"dstNodeType=$dstNodeType, dstNodeId=$dstNodeId")
   }

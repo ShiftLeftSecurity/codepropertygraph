@@ -3,7 +3,7 @@ package io.shiftleft.layers.enhancedbase
 import gremlin.scala.ScalaGraph
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.generated.Languages
-import io.shiftleft.passes.CpgPass
+import io.shiftleft.passes.{CpgPass, CpgPassRunner}
 import io.shiftleft.passes.linking.linker.Linker
 import io.shiftleft.passes.linking.memberaccesslinker.MemberAccessLinker
 import io.shiftleft.passes.namespacecreator.NamespaceCreator
@@ -14,7 +14,9 @@ import io.shiftleft.passes.linking.capturinglinker.CapturingLinker
 import io.shiftleft.passes.methoddecorations.MethodDecoratorPass
 import io.shiftleft.passes.receiveredges.ReceiverEdgePass
 
-class EnhancedBaseCreator(graph: ScalaGraph, language: String) {
+class EnhancedBaseCreator(graph: ScalaGraph, language: String, serializedCpg: SerializedCpg) {
+
+  protected val runner = new CpgPassRunner(serializedCpg)
 
   protected val enhancementExecList = createEnhancementExecList(language)
 
@@ -58,6 +60,6 @@ class EnhancedBaseCreator(graph: ScalaGraph, language: String) {
   }
 
   def create(): Unit = {
-    enhancementExecList.foreach(_.executeAndApply)
+    enhancementExecList.foreach(runner.createStoreAndApplyOverlay(_))
   }
 }

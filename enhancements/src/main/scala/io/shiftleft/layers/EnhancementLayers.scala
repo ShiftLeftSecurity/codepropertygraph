@@ -1,6 +1,7 @@
 package io.shiftleft.layers
 
 import gremlin.scala._
+import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes}
 import io.shiftleft.layers.enhancedbase.EnhancedBaseCreator
 
@@ -8,8 +9,9 @@ class EnhancementLayers() {
 
   def run(implicit graph: ScalaGraph) = {
     val lang = language(graph)
-
-    new EnhancedBaseCreator(graph, lang).create
+    val serializedCpg = new SerializedCpg
+    
+    new EnhancedBaseCreator(graph, lang, serializedCpg).create
   }
 
   private def metaNode(graph: ScalaGraph): Vertex = {
