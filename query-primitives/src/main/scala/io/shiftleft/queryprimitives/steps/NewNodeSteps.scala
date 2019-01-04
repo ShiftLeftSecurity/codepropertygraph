@@ -29,7 +29,7 @@ class NewNodeSteps[A <: NewNode: Marshallable, Labels <: HList](val raw: Gremlin
         EdgeKeys.LOCAL_NAME -> localName,
         EdgeKeys.INDEX      -> index
       ).map { case KeyValue(key, value) => (key.name, value) }
-      addEdge(graph, newNode, containedNode, EdgeTypes.CONTAINS, properties)
+      addEdge(graph, newNode, containedNode, EdgeTypes.CONTAINS_NODE, properties)
     }
   }
 
