@@ -7,5 +7,5 @@ object CpgLoader extends CpgLoader("/tmp/cpg_data")
 
 /** Load cpg proto (typically cpg.bin.zip) into a new neo4j instance */
 class CpgLoader(dbPath: String) extends CpgLoaderBase {
-  override protected def builder = new ProtoToCpg(dbPath)
+  override def builder = new ProtoToCpg(dbPath)
 }

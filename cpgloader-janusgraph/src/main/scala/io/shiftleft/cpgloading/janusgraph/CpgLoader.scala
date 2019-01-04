@@ -7,5 +7,5 @@ object CpgLoader extends CpgLoader
 
 /** Load cpg proto (typically cpg.bin.zip) into a new Janusgraph instance */
 class CpgLoader extends CpgLoaderBase {
-  override protected def builder = new ProtoToCpg
+  override def builder = new ProtoToCpg
 }
