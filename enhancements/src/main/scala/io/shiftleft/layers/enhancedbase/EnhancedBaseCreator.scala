@@ -31,7 +31,7 @@ class EnhancedBaseCreator(graph: ScalaGraph, language: String) {
           new ContainsEdgePass(graph),
           new NamespaceCreator(graph),
         )
-      case Languages.FUZZYC =>
+      case Languages.C =>
         List(
           new MethodStubCreator(graph),
           new ReceiverEdgePass(graph),
