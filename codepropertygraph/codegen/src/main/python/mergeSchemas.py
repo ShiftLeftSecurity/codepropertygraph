@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
+
 import os.path
 import os
 import json
 from collections import defaultdict
+import re
 
 class SchemaMerger:
 
     nonUniqueKeysFound = False
     categories = ["nodeKeys", "edgeKeys", "nodeTypes", "edgeTypes"]
+
+    lineCommentPattern = re.compile(r"//.*")
+    inlineCommentPattern = re.compile(r"/\*.*?\*/")
 
     def createMergedSchema(self, schemasDirname):
 
@@ -18,14 +23,12 @@ class SchemaMerger:
 
         result = dict()
         for jsonFile in jsonFiles:
-            lines = open(jsonFile).readlines()
+            with open(jsonFile) as f:
+                lines = f.readlines()
 
             jsonContent = ""
             for line in lines:
-                if line.lstrip().startswith("//"):
-                    jsonContent += "\n"
-                else:
-                    jsonContent += line
+                jsonContent += self.inlineCommentPattern.sub("", self.lineCommentPattern.sub("", line))
 
             try:
                 cur = json.loads(jsonContent)
@@ -101,7 +104,7 @@ class SchemaMerger:
     # for any node that has `containedNode` entries, automatically add the corresponding `outEdges`
     def _addMissingContainsEdges(self, result):
         for nodeType in result["nodeTypes"]:
-            edgeNames = [x['edgeName'] for x in nodeType["outEdges"]] 
+            edgeNames = [x['edgeName'] for x in nodeType["outEdges"]]
             if "CONTAINS_NODE" not in edgeNames:
                 containsNodeEntry = { "edgeName": "CONTAINS_NODE", "inNodes": ["NODE"]}
                 nodeType["outEdges"].append(containsNodeEntry)
@@ -151,6 +154,5 @@ if __name__ == '__main__':
         raise ValueError("non-unique keys found in schema definition (see errors above).")
 
     outFilename = os.path.join(schemasDirname, "..", "cpg.json")
-    f = open(outFilename, "w")
-    f.write(json.dumps(mergedSchema, indent=0))
-    f.close()
+    with open(outFilename, "w") as f:
+        f.write(json.dumps(mergedSchema, indent=0))
