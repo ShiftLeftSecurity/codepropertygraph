@@ -156,9 +156,9 @@
         // Nodes that describe method content
 
         {"id" : 8, "name" : "LITERAL",
-         "keys" : ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys" : ["CODE", /* DEPRECATED "NAME",*/ "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "Literal/Constant",
-         "is": ["DECLARATION", "DATA_FLOW_OBJECT", "EXPRESSION"],
+         "is": ["DATA_FLOW_OBJECT", "EXPRESSION"],
          "outEdges" : [
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
          ]

@@ -26,7 +26,7 @@ class MethodTests extends WordSpec with Matchers {
         fixture.cpg.method.name("methodWithLiteral").literal.toList
 
       queryResult.size shouldBe 1
-      queryResult.head.name shouldBe "\"myLiteral\""
+      queryResult.head.code shouldBe "\"myLiteral\""
     }
 
     "filter by name" in {
