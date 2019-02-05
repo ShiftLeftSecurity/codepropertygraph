@@ -14,7 +14,6 @@ import shapeless.HList
   */
 class Literal[Labels <: HList](raw: GremlinScala[Vertex])
     extends CpgSteps[nodes.Literal, Labels](raw)
-    with DeclarationBase[nodes.Literal, Labels]
     with ExpressionBase[nodes.Literal, Labels]
     with CodeAccessors[nodes.Literal, Labels]
     with NameAccessors[nodes.Literal, Labels]
