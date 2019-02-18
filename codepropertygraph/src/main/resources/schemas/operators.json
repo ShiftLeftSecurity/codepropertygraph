@@ -221,6 +221,11 @@
             "operator":"addressOf",
             "name":"<operator>.addressOf",
             "comment": "Returns the address of a given object."
+        },
+        {
+            "operator":"sizeOf",
+            "name":"<operator>.sizeOf",
+            "comment": "Returns the size of a given object."
         }
     ]
 }
