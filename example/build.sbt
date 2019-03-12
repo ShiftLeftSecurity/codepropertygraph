@@ -2,7 +2,7 @@ name := "example"
 organization := "org.example"
 scalaVersion := "2.12.7"
 
-val cpgVersion = "0.9.85"
+val cpgVersion = "0.9.101"
 
 libraryDependencies ++= Seq(
   "io.shiftleft" % "codepropertygraph" % cpgVersion,
