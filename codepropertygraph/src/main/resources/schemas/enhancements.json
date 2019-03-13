@@ -6,7 +6,9 @@
         {"id" : 8, "name": "VALUE", "comment" : "Tag value", "valueType" : "string", "cardinality" : "one"}
     ],
 
-    "edgeKeys" : [],
+    "edgeKeys" : [
+      {"id": 1, "name" : "ALIAS", "comment" : "Defines whether a PROPAGATE edge creates an alias.", "valueType"     : "boolean", "cardinality" : "one" }
+    ],
 
     "nodeTypes" : [
         {"id":24, "name": "TAG",
@@ -39,6 +41,7 @@
         },
         { "name": "METHOD_PARAMETER_IN",
           "outEdges" : [
+            {"edgeName": "PROPAGATE", "inNodes": ["METHOD_PARAMETER_OUT", "METHOD_RETURN"]},
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
         },
@@ -134,7 +137,8 @@
 
         {"id" : 21, "name" : "EVAL_TYPE", "keys": [], "comment" : "Link to evaluation type.", "keys" : [] },
         {"id" : 23, "name" : "INHERITS_FROM", "keys": [], "comment" : "Inheritance relation between types.", "keys" : [] },
-        {"id" : 28, "name" : "CONTAINS", "keys" : [], "comment" : "Shortcut over multiple AST edges"}
+        {"id" : 28, "name" : "CONTAINS", "keys" : [], "comment" : "Shortcut over multiple AST edges"},
+        {"id" : 1, "name" : "PROPAGATE", "keys" : ["ALIAS"], "comment" : "Encodes propagation of data from on node to another."}
     ]
 
 }
