@@ -12,6 +12,7 @@ import io.shiftleft.passes.containsedges.ContainsEdgePass
 import io.shiftleft.passes.languagespecific.fuzzyc.MethodStubCreator
 import io.shiftleft.passes.linking.capturinglinker.CapturingLinker
 import io.shiftleft.passes.methoddecorations.MethodDecoratorPass
+import io.shiftleft.passes.propagateedges.PropagateEdgePass
 import io.shiftleft.passes.receiveredges.ReceiverEdgePass
 
 class EnhancedBaseCreator(graph: ScalaGraph, language: String) {
@@ -24,6 +25,7 @@ class EnhancedBaseCreator(graph: ScalaGraph, language: String) {
         List(
           new ReceiverEdgePass(graph),
           new MethodDecoratorPass(graph),
+          new PropagateEdgePass(graph),
           new CapturingLinker(graph),
           new Linker(graph),
           new MemberAccessLinker(graph),
@@ -36,6 +38,7 @@ class EnhancedBaseCreator(graph: ScalaGraph, language: String) {
           new MethodStubCreator(graph),
           new ReceiverEdgePass(graph),
           new MethodDecoratorPass(graph),
+          new PropagateEdgePass(graph),
           new CapturingLinker(graph),
           new Linker(graph),
           new MemberAccessLinker(graph),
@@ -47,6 +50,7 @@ class EnhancedBaseCreator(graph: ScalaGraph, language: String) {
         List(
           new ReceiverEdgePass(graph),
           new MethodDecoratorPass(graph),
+          new PropagateEdgePass(graph),
           new CapturingLinker(graph),
           new Linker(graph),
           new MemberAccessLinker(graph),
