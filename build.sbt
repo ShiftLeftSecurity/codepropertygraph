@@ -36,6 +36,9 @@ inThisBuild(
 name := "root"
 publish / skip := true
 
+// parsed by project/Utils.scala
+val fuzzyc2cpgVersion = "0.1.0-SNAPSHOT"
+
 lazy val codepropertygraph = Projects.codepropertygraph
 lazy val protoBindings = Projects.protoBindings
 lazy val queryPrimitives = Projects.queryPrimitives
