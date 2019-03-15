@@ -107,7 +107,7 @@ class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex])
     pathReachables
   }
 
-  def getOperation(vertex: Vertex): Option[Vertex] = {
+  private def getOperation(vertex: Vertex): Option[Vertex] = {
     vertex.label match {
       case NodeTypes.IDENTIFIER => getOperation(vertex.vertices(Direction.IN, EdgeTypes.AST).next)
       case NodeTypes.CALL => Some(vertex)
@@ -117,18 +117,18 @@ class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex])
   }
 
   private def methodFast(dataFlowObject: Vertex): Vertex = {
-    dataFlowObject match {
-      case x: nodes.MethodReturn =>
+    dataFlowObject.label match {
+      case NodeTypes.METHOD_RETURN =>
         ExpandTo.formalReturnToMethod(dataFlowObject)
-      case x: nodes.MethodParameterIn =>
+      case NodeTypes.METHOD_PARAMETER_IN =>
         ExpandTo.parameterToMethod(dataFlowObject)
-      case x: nodes.MethodParameterOut =>
+      case NodeTypes.METHOD_PARAMETER_OUT =>
         ExpandTo.parameterToMethod(dataFlowObject)
-      case x: nodes.Identifier =>
-        ExpandTo.expressionToMethod(dataFlowObject)
-      case x: nodes.Literal =>
-        ExpandTo.expressionToMethod(dataFlowObject)
-      case x: nodes.Expression =>
+      case NodeTypes.LITERAL |
+           NodeTypes.CALL |
+           NodeTypes.IDENTIFIER |
+           NodeTypes.RETURN |
+           NodeTypes.UNKNOWN =>
         ExpandTo.expressionToMethod(dataFlowObject)
     }
   }
