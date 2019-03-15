@@ -107,12 +107,11 @@ class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex])
     pathReachables
   }
 
-  private def getOperation(vertex: Vertex): Option[Vertex] = {
-    vertex match {
-      case v: nodes.Identifier => getOperation(v.vertices(Direction.IN, EdgeTypes.AST).next)
-      case v: nodes.Call => Some(v)
-      case v: nodes.Return => Some(v)
-      case v: nodes.Unknown => Some(v)
+  def getOperation(vertex: Vertex): Option[Vertex] = {
+    vertex.label match {
+      case NodeTypes.IDENTIFIER => getOperation(vertex.vertices(Direction.IN, EdgeTypes.AST).next)
+      case NodeTypes.CALL => Some(vertex)
+      case NodeTypes.RETURN => Some(vertex)
       case _ => None
     }
   }
