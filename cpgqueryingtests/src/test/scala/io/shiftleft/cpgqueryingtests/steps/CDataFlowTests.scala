@@ -57,7 +57,7 @@ class CDataFlowTests extends WordSpec with Matchers {
 
     val source = cpg.call.name("sz")
     val sink =  cpg.call.name("read")
-    cpg.method.parameter.name("foo")
-    val df = new DataFlowObject(sink.raw)
+
+    sink.reachableBy(source)
   }
 }
