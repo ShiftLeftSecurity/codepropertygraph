@@ -9,4 +9,8 @@ class Flows(step: Steps[List[nodes.DataFlowObject], List[Vertex], _]) {
       FlowPrettyPrinter.prettyPrint(flow)
     }
   }
+
+  def l(): List[List[nodes.DataFlowObject]] = {
+    step.l
+  }
 }
