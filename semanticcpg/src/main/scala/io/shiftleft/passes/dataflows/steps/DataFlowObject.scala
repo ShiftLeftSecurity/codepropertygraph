@@ -8,6 +8,8 @@ import shapeless.HList
 import DataFlowObject._
 import gremlin.scala.dsl.Steps
 import io.shiftleft.passes.reachingdef.DataFlowFrameworkHelper
+import io.shiftleft.queryprimitives.steps.types.structure.Method
+import io.shiftleft.queryprimitives.utils.ExpandTo
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
@@ -49,6 +51,14 @@ class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex])
     override def clone(): ReachableByContainer = {
       new ReachableByContainer(reachedSource, path)
     }
+  }
+
+  def method: Method[Labels] = {
+    new Method[Labels](
+      raw.map { dataFlowObject =>
+        methodFast(dataFlowObject)
+      }
+    )
   }
 
   def reachableBy(sourceTravs: CpgSteps[nodes.DataFlowObject, _]*): DataFlowObject[Labels] = {
@@ -104,6 +114,23 @@ class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex])
       case v: nodes.Return => Some(v)
       case v: nodes.Unknown => Some(v)
       case _ => None
+    }
+  }
+
+  private def methodFast(dataFlowObject: Vertex): Vertex = {
+    dataFlowObject match {
+      case x: nodes.MethodReturn =>
+        ExpandTo.formalReturnToMethod(dataFlowObject)
+      case x: nodes.MethodParameterIn =>
+        ExpandTo.parameterToMethod(dataFlowObject)
+      case x: nodes.MethodParameterOut =>
+        ExpandTo.parameterToMethod(dataFlowObject)
+      case x: nodes.Identifier =>
+        ExpandTo.expressionToMethod(dataFlowObject)
+      case x: nodes.Literal =>
+        ExpandTo.expressionToMethod(dataFlowObject)
+      case x: nodes.Expression =>
+        ExpandTo.expressionToMethod(dataFlowObject)
     }
   }
 

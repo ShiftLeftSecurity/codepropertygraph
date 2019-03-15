@@ -3,6 +3,7 @@ name := "semanticcpg"
 dependsOn(Projects.queryPrimitives, Projects.enhancements)
 
 libraryDependencies ++= Seq(
+  "com.massisframework"             % "j-text-utils"                      % "0.3.4",
 )
 
 compile / javacOptions ++= Seq("-g") //debug symbols
