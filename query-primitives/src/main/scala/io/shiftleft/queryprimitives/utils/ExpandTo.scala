@@ -39,8 +39,16 @@ object ExpandTo {
     method
       .vertices(Direction.OUT, EdgeTypes.AST)
       .asScala
-      .filter(_.isInstanceOf[nodes.MethodReturn])
+      .filter(_.label == NodeTypes.METHOD_RETURN)
       .next()
+  }
+
+  def methodToOutParameters(method: Vertex): Seq[Vertex] = {
+    method
+      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asScala
+      .filter(_.label == NodeTypes.METHOD_PARAMETER_OUT)
+      .toSeq
   }
 
   def expressionToMethod(expression: Vertex): Vertex = {
@@ -57,25 +65,25 @@ object ExpandTo {
       .asScala
       .exists(astChild =>
         astChild.label == NodeTypes.MODIFIER &&
-          astChild.asInstanceOf[nodes.Modifier].modifierType == modifierType)
+          astChild.value2(NodeKeys.MODIFIER_TYPE) == modifierType)
   }
 
   def astParent(expression: Vertex): Vertex = {
     expression.vertices(Direction.IN, EdgeTypes.AST).nextChecked
   }
 
-  def callToCalledMethod(call: Vertex): Seq[nodes.Method] = {
+  def callToCalledMethod(call: Vertex): Seq[Vertex] = {
     call
       .vertices(Direction.OUT, EdgeTypes.CALL)
       .asScala
       .map(methodInst =>
-        methodInst.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method])
+        methodInst.vertices(Direction.OUT, EdgeTypes.REF).nextChecked)
       .toSeq
   }
 
   def methodToTypeDecl(method: Vertex): Option[Vertex] = {
     var typeDeclOption = method.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
-    while (typeDeclOption.isDefined && !typeDeclOption.get.isInstanceOf[nodes.TypeDecl]) {
+    while (typeDeclOption.isDefined && typeDeclOption.get.label != NodeTypes.TYPE_DECL) {
       typeDeclOption =
         typeDeclOption.get.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
     }
@@ -84,9 +92,40 @@ object ExpandTo {
 
   def methodToFile(method: Vertex): Option[Vertex] = {
     var fileOption = method.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
-    while (fileOption.isDefined && !fileOption.get.isInstanceOf[nodes.File]) {
+    while (fileOption.isDefined && fileOption.get.label != NodeTypes.FILE) {
       fileOption = fileOption.get.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
     }
     fileOption
   }
+
+  def allCfgNodesOfMethod(method: Vertex): Set[Vertex] = {
+    var worklist = method :: Nil
+
+    var cfgNodes = Set[Vertex]()
+
+    while (worklist.nonEmpty) {
+      val cfgNode = worklist.head
+      worklist = worklist.tail
+      cfgNodes += cfgNode
+
+      val newCfgSuccessors = cfgNode
+        .vertices(Direction.OUT, EdgeTypes.CFG)
+        .asScala
+        .filter(cfgSuccessor => !cfgNodes.contains(cfgSuccessor))
+        .toList
+
+      worklist ++= newCfgSuccessors
+    }
+    cfgNodes
+  }
+
+  def reference(node: Vertex): Option[Vertex] = {
+    val iterator = node.vertices(Direction.OUT, EdgeTypes.REF).asScala
+    if (iterator.hasNext) {
+      Some(iterator.next)
+    } else {
+      None
+    }
+  }
+
 }

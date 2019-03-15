@@ -27,7 +27,7 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
       var worklist = Set[Vertex]()
       var out = Map[Vertex, Set[Vertex]]().withDefaultValue(Set[Vertex]())
       var in = Map[Vertex, Set[Vertex]]().withDefaultValue(Set[Vertex]())
-      val allCfgNodes = dfHelper.allCfgNodesOfMethod(method)
+      val allCfgNodes = ExpandTo.allCfgNodesOfMethod(method)
 
       val mapStatementGens  = dfHelper.statementsToGenMap(method).withDefaultValue(Set[Vertex]())
       val mapStatementsKills = dfHelper.statementsToKillMap(method).withDefaultValue(Set[Vertex]())
@@ -84,8 +84,8 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
         for (elem <- outDefs) {
 
           val usesInStatement = dfHelper.getUsesOfStatement(node)
-          var localRefsUses = usesInStatement.map(dfHelper.getRef(_)).filter(_ != None)
-          val localRefGen = dfHelper.getRef(elem)
+          var localRefsUses = usesInStatement.map(ExpandTo.reference(_)).filter(_ != None)
+          val localRefGen = ExpandTo.reference(elem)
 
           dfHelper.getStatementFromGen(elem).foreach { statementOfElement =>
             if (statementOfElement != node && localRefsUses.contains(localRefGen)) {
@@ -93,9 +93,9 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
             }
           }
 
-          if (dfHelper.isOperationAndAssignment(node)) {
+          if (isOperationAndAssignment(node)) {
             localRefsUses = Set(localRefGen)
-            inSet(node).filter(inElement => localRefsUses.contains(dfHelper.getRef(inElement)))
+            inSet(node).filter(inElement => localRefsUses.contains(ExpandTo.reference(inElement)))
               .foreach { usedInElement =>
                 val statementOfInElement = dfHelper.getStatementFromGen(usedInElement)
                   .foreach(statementOfInElement => addEdge(statementOfInElement, node))
@@ -134,34 +134,8 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
     }
     catch{ case _: Exception => ""}
   }
-}
 
-
-/** Common functionalities needed for data flow frameworks */
-class DataFlowFrameworkHelper(graph: ScalaGraph) {
-
-  def allCfgNodesOfMethod(method: Vertex): Set[Vertex] = {
-    val worklist = ListBuffer[Vertex]()
-    worklist += method
-
-    var cfgNodes = Set[Vertex]()
-
-    while (worklist.nonEmpty) {
-      val cfgNode = worklist.remove(0)
-      cfgNodes += cfgNode
-
-      val newCfgSuccessors = cfgNode
-        .vertices(Direction.OUT, EdgeTypes.CFG)
-        .asScala
-        .filter(cfgSuccessor => !cfgNodes.contains(cfgSuccessor))
-        .toList
-
-      worklist ++= newCfgSuccessors
-    }
-    cfgNodes
-  }
-
-  def isOperationAndAssignment(vertex: Vertex): Boolean = {
+  private def isOperationAndAssignment(vertex: Vertex): Boolean = {
     if (vertex.label != NodeTypes.CALL) {
       return false
     }
@@ -184,35 +158,14 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
     }
   }
 
-  def isAssignment(vertex: Vertex): Boolean = {
-    isOperationAndAssignment(vertex) || (vertex.value2(NodeKeys.NAME) == Operators.assignment)
-  }
+}
+
+
+/** Common functionalities needed for data flow frameworks */
+class DataFlowFrameworkHelper(graph: ScalaGraph) {
 
   private def callToMethodParamOut(call: Vertex): Seq[Vertex] = {
-    call
-      .vertices(Direction.OUT, EdgeTypes.CALL).nextChecked
-      .vertices(Direction.OUT, EdgeTypes.REF).nextChecked
-      .vertices(Direction.OUT, EdgeTypes.AST).asScala
-      .filter(_.label == NodeTypes.METHOD_PARAMETER_OUT)
-      .toSeq
-  }
-
-  private implicit class Wrapper[T](iterator: Iterator[T]) {
-    def headOption = {
-      if (iterator.hasNext) {
-        Some(iterator.next)
-      } else {
-        None
-      }
-    }
-  }
-
-  def getRef(vertex: Vertex): Option[Vertex] = {
-    vertex.vertices(Direction.OUT, EdgeTypes.REF).asScala.headOption
-  }
-
-  private def filterOrder(vertexList: List[Vertex], order: Int): List[Vertex] = {
-    vertexList.filter(_.value2(NodeKeys.ORDER) == order)
+    ExpandTo.callToCalledMethod(call).flatMap(method => ExpandTo.methodToOutParameters(method))
   }
 
   private def filterArgumentIndex(vertexList: List[Vertex], orderSeq: Seq[Int]): List[Vertex] = {
@@ -260,7 +213,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
   }
 
   def getStatementFromGen(genVertex: Vertex): Option[Vertex] = {
-    getStatement(genVertex).filter(_.label == NodeTypes.CALL)
+    getOperation(genVertex).filter(_.label == NodeTypes.CALL)
   }
 
   /** Returns a set of vertices that are killed by the passed vertex */
@@ -296,9 +249,9 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
       genStatement -> getGensOfStatement(genStatement)}.toMap
   }
 
-  def getStatement(vertex: Vertex): Option[Vertex] = {
+  def getOperation(vertex: Vertex): Option[Vertex] = {
     vertex match {
-      case v: nodes.Identifier => getStatement(v.vertices(Direction.IN, EdgeTypes.AST).next)
+      case v: nodes.Identifier => getOperation(v.vertices(Direction.IN, EdgeTypes.AST).next)
       case v: nodes.Call => Some(v)
       case v: nodes.Return => Some(v)
       case v: nodes.Unknown => Some(v)

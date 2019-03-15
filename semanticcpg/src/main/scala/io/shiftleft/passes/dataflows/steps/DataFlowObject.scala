@@ -67,9 +67,8 @@ class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex])
 
   private def reachableByInternal(sourceTravs: Seq[CpgSteps[nodes.DataFlowObject, _]])
   : List[ReachableByContainer] = {
-    val dfHelper = new DataFlowFrameworkHelper(graph)
     val sourceSymbols = sourceTravs.flatMap(_.raw.clone.toList)
-      .flatMap { elem => dfHelper.getStatement(elem) }
+      .flatMap { elem => getOperation(elem) }
       .toSet
 
     val sinkSymbols   = raw.clone.dedup().toList.sortBy { _.id.asInstanceOf[java.lang.Long] }
@@ -90,12 +89,22 @@ class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex])
     }
 
     sinkSymbols.foreach { sym =>
-      dfHelper.getStatement(sym) match {
+      getOperation(sym) match {
         case Some(vertex) => traverseDDGBack(List(vertex))
         case None =>
       }
     }
     pathReachables
+  }
+
+  private def getOperation(vertex: Vertex): Option[Vertex] = {
+    vertex match {
+      case v: nodes.Identifier => getOperation(v.vertices(Direction.IN, EdgeTypes.AST).next)
+      case v: nodes.Call => Some(v)
+      case v: nodes.Return => Some(v)
+      case v: nodes.Unknown => Some(v)
+      case _ => None
+    }
   }
 
 }
