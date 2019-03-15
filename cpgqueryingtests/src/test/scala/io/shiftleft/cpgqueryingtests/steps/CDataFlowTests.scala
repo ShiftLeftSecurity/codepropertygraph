@@ -3,7 +3,7 @@ package io.shiftleft.cpgqueryingtests.steps
 import io.shiftleft.cpgqueryingtests.codepropertygraph.{CpgFactory, LanguageFrontend}
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.passes.dataflows._
-import io.shiftleft.passes.dataflows.steps.DataFlowObject
+import io.shiftleft.passes.dataflows.steps.{DataFlowObject, FlowPrettyPrinter}
 
 
 class CDataFlowTests extends WordSpec with Matchers {
@@ -58,6 +58,8 @@ class CDataFlowTests extends WordSpec with Matchers {
     val source = cpg.call.name("sz")
     val sink =  cpg.call.name("read")
 
-    sink.reachableBy(source)
+    sink.reachableByFlows(source).p
+    val foo = FlowPrettyPrinter.prettyPrint(List(sink.head))
+
   }
 }

@@ -68,11 +68,12 @@ class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex])
   }
 
   def reachableByFlows(sourceTravs: CpgSteps[nodes.DataFlowObject, _]*)
-  : Steps[List[nodes.DataFlowObject], List[Vertex], Labels] = {
+  : Flows = {
 
     val pathReachables = reachableByInternal(sourceTravs)
     val paths = pathReachables.map(_.path)
-    new Steps[List[nodes.DataFlowObject], List[Vertex], Labels](graph.asScala().inject[List[Vertex]](paths: _*))
+    new Flows(new Steps[List[nodes.DataFlowObject], List[Vertex], Labels](
+      graph.asScala().inject[List[Vertex]](paths: _*)))
   }
 
   private def reachableByInternal(sourceTravs: Seq[CpgSteps[nodes.DataFlowObject, _]])

@@ -2,7 +2,7 @@ package io.shiftleft.passes
 
 import gremlin.scala.Vertex
 import gremlin.scala.dsl.Steps
-import io.shiftleft.passes.dataflows.steps.{DataFlowObject, FlowMethods}
+import io.shiftleft.passes.dataflows.steps.DataFlowObject
 import io.shiftleft.codepropertygraph.generated.nodes
 import shapeless.HList
 
@@ -14,7 +14,4 @@ package object dataflows {
   (steps: X): DataFlowObject[Labels] =
     new DataFlowObject[Labels](steps.raw)
 
-  implicit def toFlowMethods(step: Steps[List[nodes.DataFlowObject], List[Vertex], _]): FlowMethods = {
-    new FlowMethods(step)
-  }
 }
