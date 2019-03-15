@@ -6,6 +6,11 @@ import io.shiftleft.queryprimitives.steps.CpgSteps
 import org.apache.logging.log4j.LogManager
 import shapeless.HList
 import DataFlowObject._
+import gremlin.scala.dsl.Steps
+import io.shiftleft.passes.reachingdef.DataFlowFrameworkHelper
+import org.apache.tinkerpop.gremlin.structure.Direction
+
+import scala.collection.JavaConverters._
 
 object DataFlowObject {
   protected val logger = LogManager.getLogger(getClass)
@@ -39,5 +44,58 @@ object DataFlowObject {
   * */
 class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex])
     extends CpgSteps[nodes.DataFlowObject, Labels](raw) {
+
+  private class ReachableByContainer(val reachedSource: Vertex, val path: List[Vertex]) {
+    override def clone(): ReachableByContainer = {
+      new ReachableByContainer(reachedSource, path)
+    }
+  }
+
+  def reachableBy(sourceTravs: CpgSteps[nodes.DataFlowObject, _]*): DataFlowObject[Labels] = {
+    val pathReachables = reachableByInternal(sourceTravs)
+    val reachedSources = pathReachables.map(_.reachedSource)
+    new DataFlowObject(graph.asScala().inject(reachedSources:_*))
+  }
+
+  def reachableByFlows(sourceTravs: CpgSteps[nodes.DataFlowObject, _]*)
+  : Steps[List[nodes.DataFlowObject], List[Vertex], Labels] = {
+
+    val pathReachables = reachableByInternal(sourceTravs)
+    val paths = pathReachables.map(_.path)
+    new Steps[List[nodes.DataFlowObject], List[Vertex], Labels](graph.asScala().inject[List[Vertex]](paths: _*))
+  }
+
+  private def reachableByInternal(sourceTravs: Seq[CpgSteps[nodes.DataFlowObject, _]])
+  : List[ReachableByContainer] = {
+    val dfHelper = new DataFlowFrameworkHelper(graph)
+    val sourceSymbols = sourceTravs.flatMap(_.raw.clone.toList)
+      .flatMap { elem => dfHelper.getStatement(elem) }
+      .toSet
+
+    val sinkSymbols   = raw.clone.dedup().toList.sortBy { _.id.asInstanceOf[java.lang.Long] }
+
+    var pathReachables = List[ReachableByContainer]()
+
+    def traverseDDGBack(path: List[Vertex]): Unit = {
+      val node = path.head
+      if(sourceSymbols.contains(node)) {
+        val sack = new ReachableByContainer(node, path)
+        pathReachables = sack :: pathReachables
+      }
+
+      val ddgPredecessors = node.vertices(Direction.IN, EdgeTypes.REACHING_DEF).asScala
+      ddgPredecessors.foreach { pred =>
+        traverseDDGBack(pred :: node :: path.tail)
+      }
+    }
+
+    sinkSymbols.foreach { sym =>
+      dfHelper.getStatement(sym) match {
+        case Some(vertex) => traverseDDGBack(List(vertex))
+        case None =>
+      }
+    }
+    pathReachables
+  }
 
 }
