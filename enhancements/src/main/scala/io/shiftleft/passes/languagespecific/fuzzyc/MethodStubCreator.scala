@@ -13,7 +13,7 @@ import scala.collection.JavaConverters._
 class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
   // Since the method fullNames for fuzzyc are not unique, we do not have
   // a 1to1 relation and may overwrite some values. We deem this ok for now.
-  private var methodFullNameToNode               = Map[String, nodes.MethodBase]()
+  private var methodFullNameToNode = Map[String, nodes.MethodBase]()
   private var methodInstFullNameToParameterCount = Map[String, Int]()
 
   initMap()
@@ -28,10 +28,8 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
             case Some(method) =>
             case None =>
               val paramterCount = methodInstFullNameToParameterCount(methodInst.fullName)
-              val newMethod = createMethodStub(methodInst.name,
-                methodInst.fullName,
-                methodInst.signature,
-                paramterCount)
+              val newMethod =
+                createMethodStub(methodInst.name, methodInst.fullName, methodInst.signature, paramterCount)
               methodFullNameToNode += methodInst.methodFullName -> newMethod
           }
         } catch {
@@ -106,7 +104,8 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
       }
       .exec()
 
-    cpg.call.raw.sideEffect { v: Vertex =>
+    cpg.call.raw
+      .sideEffect { v: Vertex =>
         val call = v.toCC[nodes.Call]
         methodInstFullNameToParameterCount +=
           call.methodInstFullName -> v.vertices(Direction.OUT, EdgeTypes.AST).asScala.size

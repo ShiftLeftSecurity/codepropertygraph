@@ -37,7 +37,7 @@ class StepsTest extends WordSpec with Matchers {
     }
 
     "filter with traversal on cpg type" in new CpgTestFixture("splitmeup") {
-      def allMethods    = cpg.method
+      def allMethods = cpg.method
       val publicMethods = allMethods.filter(_.isPublic)
 
       allMethods.toList.size should be > publicMethods.toList.size
@@ -46,7 +46,7 @@ class StepsTest extends WordSpec with Matchers {
     "filter on id" when {
       "providing one" in new CpgTestFixture("splitmeup") {
         // find an arbitrary method so we can find it again in the next step
-        val method: nodes.Method        = cpg.method.toList.head
+        val method: nodes.Method = cpg.method.toList.head
         val results: List[nodes.Method] = cpg.method.id(method.underlying.id).toList
 
         results.size shouldBe 1
@@ -55,7 +55,7 @@ class StepsTest extends WordSpec with Matchers {
 
       "providing multiple" in new CpgTestFixture("splitmeup") {
         // find two arbitrary methods so we can find it again in the next step
-        val methods: Set[nodes.Method]  = cpg.method.toList.take(2).toSet
+        val methods: Set[nodes.Method] = cpg.method.toList.take(2).toSet
         val ids = methods.map(_.underlying.id).toSeq
         val results: List[nodes.Method] = cpg.method.id(ids: _*).toList
 
@@ -81,7 +81,7 @@ class StepsTest extends WordSpec with Matchers {
 
   "find that all method returns are linked to a method" in new CpgTestFixture("splitmeup") {
     val returnsWithMethods = cpg.method.methodReturn.l
-    val returns            = cpg.methodReturn.l
+    val returns = cpg.methodReturn.l
     returnsWithMethods.size shouldBe returns.size
   }
 
@@ -90,7 +90,7 @@ class StepsTest extends WordSpec with Matchers {
 
     val query = for {
       method <- cpg.method
-      param  <- method.start.parameter
+      param <- method.start.parameter
     } yield MethodParamPairs(method.name, param.name)
 
     val pairs: List[MethodParamPairs] = query.toList
@@ -120,7 +120,7 @@ class StepsTest extends WordSpec with Matchers {
     }
 
     "allow to select a single label" in new CpgTestFixture("splitmeup") {
-      val methodReturnLabel  = StepLabel[nodes.MethodReturn]("methodReturn")
+      val methodReturnLabel = StepLabel[nodes.MethodReturn]("methodReturn")
       val methodLabel = StepLabel[nodes.Method]("method")
       val results: List[nodes.MethodReturn] =
         cpg.method.as(methodLabel).methodReturn.as(methodReturnLabel).select(methodReturnLabel).toList
@@ -129,7 +129,7 @@ class StepsTest extends WordSpec with Matchers {
     }
 
     "allow to select multiple labels" in new CpgTestFixture("splitmeup") {
-      val methodReturnLabel  = StepLabel[nodes.MethodReturn]("methodReturn")
+      val methodReturnLabel = StepLabel[nodes.MethodReturn]("methodReturn")
       val methodLabel = StepLabel[nodes.Method]("method")
       val results: List[(nodes.MethodReturn, nodes.Method)] =
         cpg.method
@@ -145,7 +145,7 @@ class StepsTest extends WordSpec with Matchers {
 
   "raw traversals" should {
     "allow typed as/select" in new CpgTestFixture("splitmeup") {
-      val raw                     = cpg.namespace.raw.asInstanceOf[GremlinScala.Aux[Vertex, HNil]]
+      val raw = cpg.namespace.raw.asInstanceOf[GremlinScala.Aux[Vertex, HNil]]
       val _: List[(Vertex, Edge)] = raw.as("a").outE.as("b").select.toList
       // all that matters is that the result type is (Vertex, Edge)
       // for more options with as/select on raw, see https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala

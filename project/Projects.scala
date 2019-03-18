@@ -10,4 +10,5 @@ object Projects {
   lazy val cpgloaderJanusgraph = project.in(file("cpgloader-janusgraph"))
   lazy val cpgloaderNeo4j = project.in(file("cpgloader-neo4j"))
   lazy val cpgqueryingtests = project.in(file("cpgqueryingtests"))
+  lazy val semanticcpg = project.in(file("semanticcpg"))
 }
