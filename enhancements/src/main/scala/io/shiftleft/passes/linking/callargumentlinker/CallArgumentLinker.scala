@@ -46,7 +46,7 @@ class CallArgumentLinker(graph: ScalaGraph) extends CpgPass(graph) {
       .sortBy(_.value2(NodeKeys.ORDER))
 
     sortedArguments.zip(sortedParameters).foreach {
-      case (argument: nodes.Expression, parameter: nodes.MethodParameterIn) =>
+      case (argument, parameter) =>
         perCallsiteDstGraph.addEdgeInOriginal(argument, parameter, EdgeTypes.CALL_ARG)
       case other =>
         logger.error(s"Failed to generate arg edges for $other")
@@ -64,16 +64,14 @@ class CallArgumentLinker(graph: ScalaGraph) extends CpgPass(graph) {
       .sortBy(_.value2(NodeKeys.ORDER))
 
     sortedArguments.zip(sortedParameters).foreach {
-      case (argument: nodes.Expression, parameter: nodes.MethodParameterOut) =>
+      case (argument, parameter) =>
         perCallsiteDstGraph.addEdgeInOriginal(parameter, argument, EdgeTypes.CALL_ARG_OUT)
       case other =>
         logger.error(s"Failed to generate out arg edges for $other")
     }
   }
 
-  private def generateCallRetEdge(perCallsiteDstGraph: DiffGraph,
-                                  method: Vertex,
-                                  callsite: Vertex): Unit = {
+  private def generateCallRetEdge(perCallsiteDstGraph: DiffGraph, method: Vertex, callsite: Vertex): Unit = {
     val methodReturn = method
       .vertices(Direction.OUT, EdgeTypes.AST)
       .asScala

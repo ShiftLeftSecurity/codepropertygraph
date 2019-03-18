@@ -36,6 +36,9 @@ inThisBuild(
 name := "root"
 publish / skip := true
 
+// parsed by project/Utils.scala
+val fuzzyc2cpgVersion = "0.1.6"
+
 lazy val codepropertygraph = Projects.codepropertygraph
 lazy val protoBindings = Projects.protoBindings
 lazy val queryPrimitives = Projects.queryPrimitives
@@ -45,6 +48,7 @@ lazy val cpgloaderTinkergraphShiftleft = Projects.cpgloaderTinkergraphShiftleft
 lazy val cpgloaderJanusgraph = Projects.cpgloaderJanusgraph
 lazy val cpgloaderNeo4j = Projects.cpgloaderNeo4j
 lazy val cpgqueryingtests = Projects.cpgqueryingtests
+lazy val semanticcpg = Projects.semanticcpg
 
 ThisBuild/publishTo := sonatypePublishTo.value
 ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature")
