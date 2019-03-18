@@ -52,24 +52,24 @@ class PropagateEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
   }
 
   private def addAssignmentSemantic(method: Vertex): Unit = {
-    val secondParameterInOption = method.vertices(Direction.OUT, EdgeTypes.AST).asScala
+    val secondParameterInOption = method
+      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asScala
       .find(node => node.label() == NodeTypes.METHOD_PARAMETER_IN && node.value2(NodeKeys.ORDER) == 2)
-    val firstParameterOutOption = method.vertices(Direction.OUT, EdgeTypes.AST).asScala
+    val firstParameterOutOption = method
+      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asScala
       .find(node => node.label() == NodeTypes.METHOD_PARAMETER_OUT && node.value2(NodeKeys.ORDER) == 1)
-    val methodReturnOption = method.vertices(Direction.OUT, EdgeTypes.AST).asScala
+    val methodReturnOption = method
+      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asScala
       .find(_.label() == NodeTypes.METHOD_RETURN)
 
     if (secondParameterInOption.nonEmpty) {
       if (firstParameterOutOption.nonEmpty) {
         if (methodReturnOption.nonEmpty) {
-          addPropagateEdge(
-            secondParameterInOption.get,
-            firstParameterOutOption.get,
-            isAlias = true)
-          addPropagateEdge(
-            secondParameterInOption.get,
-            methodReturnOption.get,
-            isAlias = true)
+          addPropagateEdge(secondParameterInOption.get, firstParameterOutOption.get, isAlias = true)
+          addPropagateEdge(secondParameterInOption.get, methodReturnOption.get, isAlias = true)
         } else {
           logger.warn(s"Could not find method return of ${method.value2(NodeKeys.FULL_NAME)}.")
         }
@@ -82,31 +82,30 @@ class PropagateEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
   }
 
   private def addCombinedAssignmentSemantic(method: Vertex): Unit = {
-    val secondParameterInOption = method.vertices(Direction.OUT, EdgeTypes.AST).asScala
+    val secondParameterInOption = method
+      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asScala
       .find(node => node.label() == NodeTypes.METHOD_PARAMETER_IN && node.value2(NodeKeys.ORDER) == 2)
-    val firstParameterOutOption = method.vertices(Direction.OUT, EdgeTypes.AST).asScala
+    val firstParameterOutOption = method
+      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asScala
       .find(node => node.label() == NodeTypes.METHOD_PARAMETER_OUT && node.value2(NodeKeys.ORDER) == 1)
-    val methodReturnOption = method.vertices(Direction.OUT, EdgeTypes.AST).asScala
+    val methodReturnOption = method
+      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asScala
       .find(_.label() == NodeTypes.METHOD_RETURN)
-    val firstParameterInOption = method.vertices(Direction.OUT, EdgeTypes.AST).asScala
+    val firstParameterInOption = method
+      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asScala
       .find(node => node.label() == NodeTypes.METHOD_PARAMETER_IN && node.value2(NodeKeys.ORDER) == 1)
 
     if (secondParameterInOption.nonEmpty) {
       if (firstParameterOutOption.nonEmpty) {
         if (methodReturnOption.nonEmpty) {
           if (firstParameterInOption.nonEmpty) {
-            addPropagateEdge(
-              firstParameterInOption.get,
-              firstParameterOutOption.get,
-              isAlias = false)
-            addPropagateEdge(
-              secondParameterInOption.get,
-              firstParameterOutOption.get,
-              isAlias = false)
-            addPropagateEdge(
-              secondParameterInOption.get,
-              methodReturnOption.get,
-              isAlias = false)
+            addPropagateEdge(firstParameterInOption.get, firstParameterOutOption.get, isAlias = false)
+            addPropagateEdge(secondParameterInOption.get, firstParameterOutOption.get, isAlias = false)
+            addPropagateEdge(secondParameterInOption.get, methodReturnOption.get, isAlias = false)
           } else {
             logger.warn(s"Could not find first input parameter of ${method.value2(NodeKeys.FULL_NAME)}.")
           }
@@ -122,10 +121,6 @@ class PropagateEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
   }
 
   private def addPropagateEdge(src: Vertex, dst: Vertex, isAlias: java.lang.Boolean): Unit = {
-    dstGraph.addEdgeInOriginal(
-      src,
-      dst,
-      EdgeTypes.PROPAGATE,
-      (EdgeKeyNames.ALIAS, isAlias) :: Nil)
+    dstGraph.addEdgeInOriginal(src, dst, EdgeTypes.PROPAGATE, (EdgeKeyNames.ALIAS, isAlias) :: Nil)
   }
 }

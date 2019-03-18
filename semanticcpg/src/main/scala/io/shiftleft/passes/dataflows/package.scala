@@ -7,11 +7,8 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import shapeless.HList
 
 package object dataflows {
-  implicit def toDataFlowObject[
-  X <% Steps[NodeType, Vertex, Labels],
-  NodeType <: nodes.DataFlowObject,
-  Labels <: HList]
-  (steps: X): DataFlowObject[Labels] =
+  implicit def toDataFlowObject[X <% Steps[NodeType, Vertex, Labels], NodeType <: nodes.DataFlowObject, Labels <: HList](
+      steps: X): DataFlowObject[Labels] =
     new DataFlowObject[Labels](steps.raw)
 
 }

@@ -85,8 +85,12 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
       edgeType = EdgeTypes.INHERITS_FROM,
       dstNodeMap = typeFullNameToNode,
       getDstFullNames = (srcNode: Vertex) => {
-        srcNode.properties(NodeKeyNames.INHERITS_FROM_TYPE_FULL_NAME).asScala
-          .map { vp: VertexProperty[String] => vp.value }
+        srcNode
+          .properties(NodeKeyNames.INHERITS_FROM_TYPE_FULL_NAME)
+          .asScala
+          .map { vp: VertexProperty[String] =>
+            vp.value
+          }
           .toList
       },
       setDstFullNames = (srcNode: Vertex, fullNames: Iterable[String]) => {

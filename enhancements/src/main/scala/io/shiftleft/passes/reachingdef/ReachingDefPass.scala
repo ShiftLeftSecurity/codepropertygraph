@@ -14,7 +14,6 @@ import java.nio.file.Paths
 
 import scala.collection.JavaConverters._
 
-
 class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
   var dfHelper: DataFlowFrameworkHelper = _
 
@@ -29,19 +28,19 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
       var in = Map[Vertex, Set[Vertex]]().withDefaultValue(Set[Vertex]())
       val allCfgNodes = ExpandTo.allCfgNodesOfMethod(method)
 
-      val mapStatementGens  = dfHelper.statementsToGenMap(method).withDefaultValue(Set[Vertex]())
+      val mapStatementGens = dfHelper.statementsToGenMap(method).withDefaultValue(Set[Vertex]())
       val mapStatementsKills = dfHelper.statementsToKillMap(method).withDefaultValue(Set[Vertex]())
 
       /*Initialize the OUT sets*/
       allCfgNodes.foreach { cfgNode =>
-        if(mapStatementGens.contains(cfgNode)) {
+        if (mapStatementGens.contains(cfgNode)) {
           out += cfgNode -> mapStatementGens(cfgNode)
         }
       }
 
       worklist ++= allCfgNodes
 
-      while(worklist.nonEmpty) {
+      while (worklist.nonEmpty) {
         var currentCfgNode = worklist.head
         worklist = worklist.tail
 
@@ -73,39 +72,41 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
     * The final representation makes it straightforward to build def-use/use-def chains */
   private def addReachingDefEdge(dstGraph: DiffGraph,
                                  outSet: Map[Vertex, Set[Vertex]],
-                                 inSet:  Map[Vertex, Set[Vertex]]) : Unit = {
+                                 inSet: Map[Vertex, Set[Vertex]]): Unit = {
 
     def addEdge(v0: Vertex, v1: Vertex): Unit = {
       dstGraph.addEdgeInOriginal(v0, v1, EdgeTypes.REACHING_DEF)
     }
 
-    outSet.foreach { case (node, outDefs) =>
-      if (node.label == NodeTypes.CALL) {
-        for (elem <- outDefs) {
+    outSet.foreach {
+      case (node, outDefs) =>
+        if (node.label == NodeTypes.CALL) {
+          for (elem <- outDefs) {
 
-          val usesInStatement = dfHelper.getUsesOfStatement(node)
-          var localRefsUses = usesInStatement.map(ExpandTo.reference(_)).filter(_ != None)
-          val localRefGen = ExpandTo.reference(elem)
+            val usesInStatement = dfHelper.getUsesOfStatement(node)
+            var localRefsUses = usesInStatement.map(ExpandTo.reference(_)).filter(_ != None)
+            val localRefGen = ExpandTo.reference(elem)
 
-          dfHelper.getStatementFromGen(elem).foreach { statementOfElement =>
-            if (statementOfElement != node && localRefsUses.contains(localRefGen)) {
-              addEdge(statementOfElement, node)
+            dfHelper.getStatementFromGen(elem).foreach { statementOfElement =>
+              if (statementOfElement != node && localRefsUses.contains(localRefGen)) {
+                addEdge(statementOfElement, node)
+              }
+            }
+
+            if (isOperationAndAssignment(node)) {
+              localRefsUses = Set(localRefGen)
+              inSet(node)
+                .filter(inElement => localRefsUses.contains(ExpandTo.reference(inElement)))
+                .foreach { usedInElement =>
+                  val statementOfInElement = dfHelper
+                    .getStatementFromGen(usedInElement)
+                    .foreach(statementOfInElement => addEdge(statementOfInElement, node))
+                }
             }
           }
-
-          if (isOperationAndAssignment(node)) {
-            localRefsUses = Set(localRefGen)
-            inSet(node).filter(inElement => localRefsUses.contains(ExpandTo.reference(inElement)))
-              .foreach { usedInElement =>
-                val statementOfInElement = dfHelper.getStatementFromGen(usedInElement)
-                  .foreach(statementOfInElement => addEdge(statementOfInElement, node))
-              }
-          }
         }
-      }
     }
   }
-
 
   def toDot(graph: ScalaGraph): String = {
     val buf = new StringBuffer()
@@ -113,11 +114,11 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
     buf.append("digraph g {\n node[shape=plaintext];\n")
 
     graph.E.hasLabel(EdgeTypes.REACHING_DEF).l.foreach { e =>
-      val inV  = vertexToStr(e.inVertex).replace("\"", "\'")
+      val inV = vertexToStr(e.inVertex).replace("\"", "\'")
       val outV = vertexToStr(e.outVertex).replace("\"", "\'")
       buf.append(s""" "$outV" -> "$inV";\n """)
     }
-    buf.append{"}"}
+    buf.append { "}" }
     buf.toString
   }
 
@@ -127,12 +128,11 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
       val methodVertex = ExpandTo.expressionToMethod(vertex)
       val fileName = ExpandTo.methodToFile(methodVertex) match {
         case Some(objFile) => objFile.value2(NodeKeys.NAME)
-        case None => "NA"
+        case None          => "NA"
       }
 
       s"${Paths.get(fileName).getFileName.toString}: ${vertex.value2(NodeKeys.LINE_NUMBER).toString} ${vertex.value2(NodeKeys.CODE)}"
-    }
-    catch{ case _: Exception => ""}
+    } catch { case _: Exception => "" }
   }
 
   private def isOperationAndAssignment(vertex: Vertex): Boolean = {
@@ -142,24 +142,23 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
 
     val name = vertex.value2(NodeKeys.NAME)
     name match {
-      case Operators.assignmentAnd => true
+      case Operators.assignmentAnd                  => true
       case Operators.assignmentArithmeticShiftRight => true
-      case Operators.assignmentDivision => true
-      case Operators.assignmentExponentiation => true
-      case Operators.assignmentLogicalShifRight => true
-      case Operators.assignmentMinus => true
-      case Operators.assignmentModulo => true
-      case Operators.assignmentMultiplication => true
-      case Operators.assignmentOr => true
-      case Operators.assignmentPlus => true
-      case Operators.assignmentShiftLeft => true
-      case Operators.assignmentXor => true
-      case _  => false
+      case Operators.assignmentDivision             => true
+      case Operators.assignmentExponentiation       => true
+      case Operators.assignmentLogicalShifRight     => true
+      case Operators.assignmentMinus                => true
+      case Operators.assignmentModulo               => true
+      case Operators.assignmentMultiplication       => true
+      case Operators.assignmentOr                   => true
+      case Operators.assignmentPlus                 => true
+      case Operators.assignmentShiftLeft            => true
+      case Operators.assignmentXor                  => true
+      case _                                        => false
     }
   }
 
 }
-
 
 /** Common functionalities needed for data flow frameworks */
 class DataFlowFrameworkHelper(graph: ScalaGraph) {
@@ -183,12 +182,13 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
 
   def getGenSet(method: Vertex): Set[Vertex] = {
     var genSet = Set[Vertex]()
-    getStatements(method).foreach{ genStatement =>
+    getStatements(method).foreach { genStatement =>
       val methodParamOutsOrder = callToMethodParamOut(genStatement)
         .filter(_.edges(Direction.IN, EdgeTypes.PROPAGATE).hasNext)
         .map(_.value2(NodeKeys.ORDER).toInt)
 
-      val identifierWithOrder = filterArgumentIndex(genStatement.vertices(Direction.OUT, EdgeTypes.AST).asScala.toList, methodParamOutsOrder)
+      val identifierWithOrder =
+        filterArgumentIndex(genStatement.vertices(Direction.OUT, EdgeTypes.AST).asScala.toList, methodParamOutsOrder)
       genSet ++= identifierWithOrder
     }
     genSet
@@ -200,16 +200,19 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
       .filter(methPO => methPO.edges(Direction.IN, EdgeTypes.PROPAGATE).hasNext)
       .map(_.value2(NodeKeys.ORDER).toInt)
 
-    val identifierWithOrder = filterArgumentIndex(stmt.vertices(Direction.OUT, EdgeTypes.AST).asScala.toList, methodParamOutsOrder)
+    val identifierWithOrder =
+      filterArgumentIndex(stmt.vertices(Direction.OUT, EdgeTypes.AST).asScala.toList, methodParamOutsOrder)
     gens ++= identifierWithOrder
 
     gens
   }
 
   def getUsesOfStatement(stmt: Vertex): Set[Vertex] = {
-    stmt.vertices(Direction.OUT, EdgeTypes.AST)
+    stmt
+      .vertices(Direction.OUT, EdgeTypes.AST)
       .asScala
-      .filter( !getGensOfStatement(stmt).contains(_) ).toSet
+      .filter(!getGensOfStatement(stmt).contains(_))
+      .toSet
   }
 
   def getStatementFromGen(genVertex: Vertex): Option[Vertex] = {
@@ -220,7 +223,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
   def killsVertices(vertex: Vertex): Set[Vertex] = {
     val localRefIt = vertex.vertices(Direction.OUT, EdgeTypes.REF).asScala
 
-    if(!localRefIt.hasNext) {
+    if (!localRefIt.hasNext) {
       Set()
     } else {
       val localRef = localRefIt.next
@@ -229,10 +232,10 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
   }
 
   def kills(vertex: Set[Vertex]): Set[Vertex] = {
-    vertex.map(v => killsVertices(v)).fold(Set())( (v1,v2) => v1.union(v2) )
+    vertex.map(v => killsVertices(v)).fold(Set())((v1, v2) => v1.union(v2))
   }
 
-  def statementsToKillMap(methodVertex: Vertex) : Map[Vertex, Set[Vertex]] = {
+  def statementsToKillMap(methodVertex: Vertex): Map[Vertex, Set[Vertex]] = {
     val genStatements = getStatements(methodVertex)
     val genSet = getGenSet(methodVertex)
 
@@ -245,16 +248,17 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
   def statementsToGenMap(methodVertex: Vertex): Map[Vertex, Set[Vertex]] = {
     /*gen statements correspond to call assignment nodes*/
     val genStatements = getStatements(methodVertex)
-    genStatements.map{genStatement =>
-      genStatement -> getGensOfStatement(genStatement)}.toMap
+    genStatements.map { genStatement =>
+      genStatement -> getGensOfStatement(genStatement)
+    }.toMap
   }
 
   def getOperation(vertex: Vertex): Option[Vertex] = {
     vertex.label match {
       case NodeTypes.IDENTIFIER => getOperation(vertex.vertices(Direction.IN, EdgeTypes.AST).next)
-      case NodeTypes.CALL => Some(vertex)
-      case NodeTypes.RETURN => Some(vertex)
-      case _ => None
+      case NodeTypes.CALL       => Some(vertex)
+      case NodeTypes.RETURN     => Some(vertex)
+      case _                    => None
     }
   }
 }

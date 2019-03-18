@@ -55,9 +55,12 @@ object Expression {
           underlying.edges(direction, edgeLabels: _*)
         def properties[V](propertyKeys: String*): JIterator[VertexProperty[V]] =
           underlying.properties(propertyKeys: _*)
-        def property[V](cardinality: VertexProperty.Cardinality, key: String, value: V, keyValues: Object*): VertexProperty[V] =
+        def property[V](cardinality: VertexProperty.Cardinality,
+                        key: String,
+                        value: V,
+                        keyValues: Object*): VertexProperty[V] =
           underlying.property(cardinality, key, value, keyValues: _*)
-        def vertices(direction: Direction, edgeLabels: String*): JIterator[Vertex] = 
+        def vertices(direction: Direction, edgeLabels: String*): JIterator[Vertex] =
           underlying.vertices(direction, edgeLabels: _*)
         def toMap: Map[String, Any] =
           Map(
@@ -69,12 +72,14 @@ object Expression {
             "LINE_NUMBER_END" -> lineNumberEnd,
             "COLUMN_NUMBER" -> columnNumber,
             "COLUMN_NUMBER_END" -> columnNumberEnd
-          ).filterNot { case (k,v) =>
-            v == null || v == None
-          }.map {
-            case (k, Some(v)) => (k,v)
-            case other => other
-          }
+          ).filterNot {
+              case (k, v) =>
+                v == null || v == None
+            }
+            .map {
+              case (k, Some(v)) => (k, v)
+              case other        => other
+            }
 
         // not really needed AFAIK
         override def productArity: Int = ???

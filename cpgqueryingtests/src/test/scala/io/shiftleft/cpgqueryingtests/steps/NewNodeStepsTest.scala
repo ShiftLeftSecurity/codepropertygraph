@@ -18,12 +18,11 @@ class NewNodeStepsTest extends WordSpec with Matchers {
 
   "stores NewNodes" in {
     implicit val diffGraph = new DiffGraph
-    val newNode            = new TestNewNode
+    val newNode = new TestNewNode
     new NewNodeSteps(__(newNode)).store
 
     diffGraph.nodes shouldBe List(newNode)
   }
-
 
   "stores containedNodes and connecting edge" when {
 
@@ -68,8 +67,10 @@ class NewNodeStepsTest extends WordSpec with Matchers {
     "embedding a NewNode recursively" in {
       implicit val diffGraph = new DiffGraph
       val newContainedNodeL1 = new TestNewNode { override val label = "newContainedNodeL1" }
-      val newContainedNodeL0 = new TestNewNode(containedNodes = List(newContainedNodeL1)) { override val label = "newContainedNodeL0" }
-      val newNode            = new TestNewNode(containedNodes = List(newContainedNodeL0)) { override val label = "newNode" }
+      val newContainedNodeL0 = new TestNewNode(containedNodes = List(newContainedNodeL1)) {
+        override val label = "newContainedNodeL0"
+      }
+      val newNode = new TestNewNode(containedNodes = List(newContainedNodeL0)) { override val label = "newNode" }
       new NewNodeSteps(__(newNode)).store
 
       diffGraph.nodes shouldBe List(newNode, newContainedNodeL0, newContainedNodeL1)
@@ -80,7 +81,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
           label = EdgeTypes.CONTAINS,
           properties = Seq(
             (EdgeKeyNames.LOCAL_NAME -> newNode.testContainedLabel),
-            (EdgeKeyNames.INDEX      -> (0: Integer))
+            (EdgeKeyNames.INDEX -> (0: Integer))
           )
         ),
         EdgeInDiffGraph(
@@ -89,7 +90,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
           label = EdgeTypes.CONTAINS,
           properties = Seq(
             (EdgeKeyNames.LOCAL_NAME -> newNode.testContainedLabel),
-            (EdgeKeyNames.INDEX      -> (0: Integer))
+            (EdgeKeyNames.INDEX -> (0: Integer))
           )
         )
       )
@@ -106,9 +107,9 @@ object NewNodeNodeStepsTest {
   }
 
   class TestNewNode(containedNodes: List[Node] = Nil) extends NewNode {
-    override val label                        = "TEST_LABEL"
+    override val label = "TEST_LABEL"
     override val properties: Map[String, Any] = Map.empty
-    val testContainedLabel                    = "testContains"
+    val testContainedLabel = "testContains"
     override def containedNodesByLocalName: Map[String, List[Node]] =
       Map(testContainedLabel -> containedNodes)
 

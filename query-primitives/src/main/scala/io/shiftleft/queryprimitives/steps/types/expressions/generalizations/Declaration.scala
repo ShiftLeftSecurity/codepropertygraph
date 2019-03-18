@@ -33,9 +33,12 @@ object Declaration {
           underlying.edges(direction, edgeLabels: _*)
         def properties[V](propertyKeys: String*): JIterator[VertexProperty[V]] =
           underlying.properties(propertyKeys: _*)
-        def property[V](cardinality: VertexProperty.Cardinality, key: String, value: V, keyValues: Object*): VertexProperty[V] =
+        def property[V](cardinality: VertexProperty.Cardinality,
+                        key: String,
+                        value: V,
+                        keyValues: Object*): VertexProperty[V] =
           underlying.property(cardinality, key, value, keyValues: _*)
-        def vertices(direction: Direction, edgeLabels: String*): JIterator[Vertex] = 
+        def vertices(direction: Direction, edgeLabels: String*): JIterator[Vertex] =
           underlying.vertices(direction, edgeLabels: _*)
         def toMap: Map[String, Any] =
           Map(

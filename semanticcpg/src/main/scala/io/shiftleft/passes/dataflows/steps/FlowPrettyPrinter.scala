@@ -25,7 +25,7 @@ object FlowPrettyPrinter {
         s"${methodNameOption.getOrElse("N/A")}\t${fileOption.getOrElse("N/A")}"
     }
     val columnNames = List("tracked", "lineNumber", "method", "file").toArray
-    val data        = rows.map(_.split("\t").toArray).toArray.asInstanceOf[Array[Array[Object]]]
+    val data = rows.map(_.split("\t").toArray).toArray.asInstanceOf[Array[Array[Object]]]
     new TextTable(columnNames, data).printTable(ps, 1)
     val content = new String(baos.toByteArray(), StandardCharsets.UTF_8)
     ps.close()

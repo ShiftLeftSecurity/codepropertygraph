@@ -5,7 +5,6 @@ import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.passes.dataflows._
 import io.shiftleft.passes.dataflows.steps.{DataFlowObject, FlowPrettyPrinter}
 
-
 class CDataFlowTests extends WordSpec with Matchers {
   val cpgFactory = new CpgFactory(LanguageFrontend.Fuzzyc)
 
@@ -56,7 +55,7 @@ class CDataFlowTests extends WordSpec with Matchers {
     )
 
     val source = cpg.call.name("sz")
-    val sink =  cpg.call.name("read")
+    val sink = cpg.call.name("read")
 
     sink.reachableByFlows(source).p
     val foo = FlowPrettyPrinter.prettyPrint(List(sink.head))

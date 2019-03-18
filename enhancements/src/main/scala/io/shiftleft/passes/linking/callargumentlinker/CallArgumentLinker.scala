@@ -71,9 +71,7 @@ class CallArgumentLinker(graph: ScalaGraph) extends CpgPass(graph) {
     }
   }
 
-  private def generateCallRetEdge(perCallsiteDstGraph: DiffGraph,
-                                  method: Vertex,
-                                  callsite: Vertex): Unit = {
+  private def generateCallRetEdge(perCallsiteDstGraph: DiffGraph, method: Vertex, callsite: Vertex): Unit = {
     val methodReturn = method
       .vertices(Direction.OUT, EdgeTypes.AST)
       .asScala

@@ -76,16 +76,14 @@ object ExpandTo {
     call
       .vertices(Direction.OUT, EdgeTypes.CALL)
       .asScala
-      .map(methodInst =>
-        methodInst.vertices(Direction.OUT, EdgeTypes.REF).nextChecked)
+      .map(methodInst => methodInst.vertices(Direction.OUT, EdgeTypes.REF).nextChecked)
       .toSeq
   }
 
   def methodToTypeDecl(method: Vertex): Option[Vertex] = {
     var typeDeclOption = method.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
     while (typeDeclOption.isDefined && typeDeclOption.get.label != NodeTypes.TYPE_DECL) {
-      typeDeclOption =
-        typeDeclOption.get.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
+      typeDeclOption = typeDeclOption.get.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
     }
     typeDeclOption
   }

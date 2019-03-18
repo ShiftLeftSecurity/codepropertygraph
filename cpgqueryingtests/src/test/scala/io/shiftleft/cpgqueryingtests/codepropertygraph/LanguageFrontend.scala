@@ -23,5 +23,5 @@ object LanguageFrontend {
     override val fileSuffix: String = ".c"
   }
 
-  val Fuzzyc   = new FuzzycFrontend
+  val Fuzzyc = new FuzzycFrontend
 }
