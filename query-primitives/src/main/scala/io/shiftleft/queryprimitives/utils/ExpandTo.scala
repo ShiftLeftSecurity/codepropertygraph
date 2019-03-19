@@ -126,4 +126,22 @@ object ExpandTo {
     }
   }
 
+  def methodReturnToReturn(node: Vertex): Seq[Vertex] = {
+    if (node.label == NodeTypes.METHOD_RETURN) {
+      node.vertices(Direction.IN, EdgeTypes.CFG)
+        .asScala
+        .filter(_.label == NodeTypes.RETURN)
+        .toSeq
+    } else {
+      Seq()
+    }
+  }
+
+  def methodToMethodReturn(node: Vertex): Option[Vertex] = {
+    node.vertices(Direction.OUT, EdgeTypes.AST)
+      .asScala
+      .filter(_.label == NodeTypes.METHOD_RETURN)
+      .toList
+      .headOption
+  }
 }
