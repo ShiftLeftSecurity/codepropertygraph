@@ -4,7 +4,8 @@ import io.shiftleft.cpgqueryingtests.codepropertygraph.{CpgFactory, LanguageFron
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.passes.dataflows._
 import io.shiftleft.passes.dataflows.steps.{DataFlowObject, FlowPrettyPrinter}
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{NodeKeys, nodes}
+
 
 class CDataFlowTests extends WordSpec with Matchers {
   val cpgFactory = new CpgFactory(LanguageFrontend.Fuzzyc)
@@ -82,14 +83,15 @@ class CDataFlowTests extends WordSpec with Matchers {
     )
 
     val source = cpg.identifier
-    val sink = cpg.identifier.name("z")
+    val sink = cpg.identifier.name("x")
     val flows = sink.reachableByFlows(source).l
+    flows.size shouldBe 6
   }
 
   "Test 4" in {
     val cpg = cpgFactory.buildCpg(
     """
-      | void flow(int a){
+      | int flow(int a){
       |   int z = a;
       |   int b = z;
       |
@@ -98,10 +100,20 @@ class CDataFlowTests extends WordSpec with Matchers {
     """.stripMargin)
 
     val source = cpg.identifier.name("a")
-    val sink = cpg.identifier.name("b")
+    val sink = cpg.methodReturn
     val flows = sink.reachableByFlows(source).l
 
+    flows.size shouldBe 1
+
     //println(sink.reachableByFlows(source).p)
+
+    flows.maxBy(e => e.size).map(point => point.code) shouldBe
+      List[String](
+        "z = a",
+        "b = z",
+        "return b;",
+        "RET"
+      )
   }
 
 }
