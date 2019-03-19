@@ -7,7 +7,7 @@ import io.shiftleft.queryprimitives.steps.Implicits._
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 object MethodDecoratorPass {
-  private var loggedDeprecatedWarning   = false
+  private var loggedDeprecatedWarning = false
   private var loggedMissingTypeFullName = false
 }
 
@@ -39,8 +39,7 @@ class MethodDecoratorPass(graph: ScalaGraph) extends CpgPass(graph) {
             val evalType = parameterIn.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).nextChecked
             dstGraph.addEdgeToOriginal(parameterOut, evalType, EdgeTypes.EVAL_TYPE)
             if (!MethodDecoratorPass.loggedMissingTypeFullName) {
-              logger.warn(
-                "Using deprecated CPG format with missing TYPE_FULL_NAME on METHOD_PARAMETER_IN nodes.")
+              logger.warn("Using deprecated CPG format with missing TYPE_FULL_NAME on METHOD_PARAMETER_IN nodes.")
               MethodDecoratorPass.loggedMissingTypeFullName = true
             }
           }

@@ -31,7 +31,8 @@
         },
         { "name": "METHOD",
           "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]}
+             {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]},
+             {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN"]}
           ]
         },
         { "name": "METHOD_INST",
@@ -94,7 +95,8 @@
             {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
             {"edgeName": "REF", "inNodes": ["MEMBER"]},
             {"edgeName": "CALL", "inNodes": ["METHOD_INST"]},
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]},
+            {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN"]}
           ]
         },
         { "name": "LOCAL",
@@ -138,7 +140,8 @@
         {"id" : 21, "name" : "EVAL_TYPE", "keys": [], "comment" : "Link to evaluation type.", "keys" : [] },
         {"id" : 23, "name" : "INHERITS_FROM", "keys": [], "comment" : "Inheritance relation between types.", "keys" : [] },
         {"id" : 28, "name" : "CONTAINS", "keys" : [], "comment" : "Shortcut over multiple AST edges"},
-        {"id" : 1, "name" : "PROPAGATE", "keys" : ["ALIAS"], "comment" : "Encodes propagation of data from on node to another."}
+        {"id" : 1, "name" : "PROPAGATE", "keys" : ["ALIAS"], "comment" : "Encodes propagation of data from on node to another."},
+        {"id" : 137, "name": "REACHING_DEF", "keys" : [], "comment" : "Reaching definition edge.", "keys" : []}
     ]
 
 }

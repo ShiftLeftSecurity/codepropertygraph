@@ -19,7 +19,7 @@ class EnhancementLayers() {
       .getOrElse(throw new Exception("Meta node missing."))
   }
 
-  def language(graph: ScalaGraph): String = 
+  def language(graph: ScalaGraph): String =
     metaNode(graph).value2(NodeKeys.LANGUAGE)
 
   def isOfLanguage(graph: ScalaGraph, lang: String): Boolean = {

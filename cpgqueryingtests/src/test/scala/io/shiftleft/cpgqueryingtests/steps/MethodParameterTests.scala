@@ -51,8 +51,7 @@ class MethodParameterTests extends WordSpec with Matchers {
           val args: List[nodes.MethodParameterIn] =
             fixture.cpg.method.name("manyArgs").parameter.indexTo(2).toList
 
-          args.map(_.start.typ.head.fullName).toSet shouldBe Set("java.lang.String",
-                                                                 "java.lang.Integer")
+          args.map(_.start.typ.head.fullName).toSet shouldBe Set("java.lang.String", "java.lang.Integer")
         }
       }
     }

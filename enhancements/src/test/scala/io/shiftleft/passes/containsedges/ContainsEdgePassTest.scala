@@ -10,12 +10,12 @@ class ContainsEdgePassTest extends WordSpec with Matchers {
   trait Fixture {
     implicit val cpg: ScalaGraph = TinkerGraph.open.asScala
 
-    val fileVertex            = cpg + NodeTypes.FILE
-    val typeDeclVertex        = cpg + NodeTypes.TYPE_DECL
-    val typeMethodVertex      = cpg + NodeTypes.METHOD
-    val methodVertex          = cpg + NodeTypes.METHOD
-    val innerMethodVertex     = cpg + NodeTypes.METHOD
-    val expressionVertex      = cpg + NodeTypes.CALL
+    val fileVertex = cpg + NodeTypes.FILE
+    val typeDeclVertex = cpg + NodeTypes.TYPE_DECL
+    val typeMethodVertex = cpg + NodeTypes.METHOD
+    val methodVertex = cpg + NodeTypes.METHOD
+    val innerMethodVertex = cpg + NodeTypes.METHOD
+    val expressionVertex = cpg + NodeTypes.CALL
     val innerExpressionVertex = cpg + NodeTypes.CALL
 
     fileVertex --- EdgeTypes.AST --> typeDeclVertex
