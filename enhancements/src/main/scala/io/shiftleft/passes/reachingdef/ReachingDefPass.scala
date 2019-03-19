@@ -85,6 +85,10 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
       }
     }
 
+    ExpandTo.methodToMethodReturn(method).foreach { methodReturn =>
+      ExpandTo.methodReturnToReturn(methodReturn).foreach(returnVertex => addEdge(returnVertex, methodReturn))
+    }
+
     outSet.foreach { case (node, outDefs) =>
       if (node.label == "CALL") {
         val usesInExpression = dfHelper.getUsesOfExpression(node)
