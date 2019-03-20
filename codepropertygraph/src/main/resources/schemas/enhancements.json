@@ -49,7 +49,7 @@
         {"id" : 33, "name" : "METHOD_PARAMETER_OUT",
          "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "This node represents a formal parameter going towards the caller side.",
-         "is": ["DECLARATION", "DATA_FLOW_OBJECT"],
+         "is": ["DECLARATION", "TRACKING_POINT"],
          "outEdges" : [
            {"edgeName": "CALL_ARG_OUT", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "BLOCK", "UNKNOWN"]},
            {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},

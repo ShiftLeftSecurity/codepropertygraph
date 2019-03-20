@@ -32,17 +32,10 @@ object Expression {
     override def toCC(element: Element) =
       new nodes.Expression {
         override def underlying: Vertex = element.asInstanceOf[Vertex]
-        override def code: String = element.value[String](NodeKeyNames.CODE)
         override def order: Integer = element.value[Integer](NodeKeyNames.ORDER)
-        override def columnNumber: Option[Integer] = element.property[Integer](NodeKeyNames.COLUMN_NUMBER).toOption
-        override def columnNumberEnd: Option[Integer] =
-          element.property[Integer](NodeKeyNames.COLUMN_NUMBER_END).toOption
-        override def lineNumber: Option[Integer] = element.property[Integer](NodeKeyNames.LINE_NUMBER).toOption
-        override def lineNumberEnd: Option[Integer] = element.property[Integer](NodeKeyNames.LINE_NUMBER_END).toOption
 
         // needed for specialised tinkergraph (separate codegen) - doesn't harm standard CC impl
         def _code_=(value: String): Unit = ???
-        def _code: String = code
         def _order_=(value: Integer): Unit = ???
         def _order: Integer = order
         def graph() = underlying.graph
@@ -66,12 +59,7 @@ object Expression {
           Map(
             "_label" -> element.label,
             "_id" -> element.id,
-            "CODE" -> code,
             "ORDER" -> order,
-            "LINE_NUMBER" -> lineNumber,
-            "LINE_NUMBER_END" -> lineNumberEnd,
-            "COLUMN_NUMBER" -> columnNumber,
-            "COLUMN_NUMBER_END" -> columnNumberEnd
           ).filterNot {
               case (k, v) =>
                 v == null || v == None
