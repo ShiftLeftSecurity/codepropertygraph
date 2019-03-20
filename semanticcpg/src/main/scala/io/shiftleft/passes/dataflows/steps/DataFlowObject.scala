@@ -95,7 +95,9 @@ class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex]) extends CpgStep
 
       val ddgPredecessors = node.vertices(Direction.IN, EdgeTypes.REACHING_DEF).asScala
       ddgPredecessors.foreach { pred =>
-        traverseDDGBack(pred :: node :: path.tail)
+        if(!path.contains(pred)) {
+          traverseDDGBack(pred :: node :: path.tail)
+        }
       }
     }
 
@@ -110,10 +112,11 @@ class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex]) extends CpgStep
 
   private def getOperation(vertex: Vertex): Option[Vertex] = {
     vertex.label match {
-      case NodeTypes.IDENTIFIER => getOperation(vertex.vertices(Direction.IN, EdgeTypes.AST).next)
-      case NodeTypes.CALL       => Some(vertex)
-      case NodeTypes.RETURN     => Some(vertex)
-      case _                    => None
+      case NodeTypes.IDENTIFIER          => getOperation(vertex.vertices(Direction.IN, EdgeTypes.AST).next)
+      case NodeTypes.CALL                => Some(vertex)
+      case NodeTypes.RETURN              => Some(vertex)
+      case NodeTypes.METHOD_RETURN       => Some(vertex)
+      case _                             => None
     }
   }
 
