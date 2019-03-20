@@ -223,6 +223,7 @@
          "is": ["EXPRESSION"],
           "outEdges": [
             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "UNKNOWN"]}
+            {"edgeName": "REF", "inNodes": ["METHOD"]}
           ]
         },
 
