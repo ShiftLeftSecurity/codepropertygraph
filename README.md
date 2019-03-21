@@ -20,6 +20,8 @@ application-specific data.
 
 # Building the code
 
+*Note*: for first-time users, we recommend building "joern" at https://github.com/ShiftLeftSecurity/joern/ instead. It contains a code property graph generator for C/C++, a component for querying the code property graph, as well as a few helpful examples to get started.
+
 The build process has been verified on Linux and it should be possible
 to build on OS X and BSD systems as well. The build process requires
 the following prerequisites:

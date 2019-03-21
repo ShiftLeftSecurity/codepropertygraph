@@ -1,6 +1,10 @@
 language: scala
 jdk: oraclejdk8
 
+branches:
+  only:
+  - master
+
 before_install:
 - git fetch --tags
 - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE" == "push" ]]; then
