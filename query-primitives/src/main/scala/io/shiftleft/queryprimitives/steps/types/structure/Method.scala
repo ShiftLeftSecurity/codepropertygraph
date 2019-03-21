@@ -244,7 +244,12 @@ class Method[Labels <: HList](override val raw: GremlinScala[Vertex])
     * Traverse to the methods local variables
     * */
   def local: Local[Labels] =
-    new Local[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.LOCAL))
+    new Local[Labels](
+      raw
+        .out(EdgeTypes.CONTAINS)
+        .hasLabel(NodeTypes.BLOCK)
+        .out(EdgeTypes.AST)
+        .hasLabel(NodeTypes.LOCAL))
 
   /**
     * Traverse to literals of method
