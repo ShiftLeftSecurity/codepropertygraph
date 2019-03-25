@@ -5,8 +5,10 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,8 +16,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class ProtoToCpgBase {
-  protected Graph graph;
+public class ProtoToCpg {
+  protected TinkerGraph graph;
   protected Logger logger = LogManager.getLogger(getClass());
   protected Map<Long, Object> keyToVertexId = new HashMap<>();
 
@@ -23,15 +25,35 @@ public abstract class ProtoToCpgBase {
   protected int elementImportCounter = 0;
   protected long lastStart = System.currentTimeMillis();
 
-  public ProtoToCpgBase(Graph graph) {
-    this.graph = graph;
-    configureGraph(graph);
+  public ProtoToCpg() {
+    this.graph = TinkerGraph.open(
+      // TODO generate factories for case classes
+      // io.shiftleft.codepropertygraph.generated.nodes.Factories$.MODULE$.AllAsJava(),
+      // io.shiftleft.codepropertygraph.generated.edges.Factories$.MODULE$.AllAsJava()
+    );
   }
 
-  public abstract void addNodes(Cpg.CpgStruct protoCpg);
-
-  /* optionally configure graph in implementing class */
-  protected void configureGraph(Graph graph) {
+  public void addNodes(Cpg.CpgStruct protoCpg) {
+    for (Cpg.CpgStruct.Node protoNode : protoCpg.getNodeList()) {
+      // if (elementImportCounter % 1000 == 0) {
+      //   long millisSinceLastBatch = System.currentTimeMillis() - lastStart;
+      //   lastStart = System.currentTimeMillis();
+      //   System.out.println("importing node " + elementImportCounter + "; millis since last batch: " + millisSinceLastBatch);
+      // }
+      elementImportCounter++;
+      Vertex node;
+      try {
+        node = graph.addVertex(T.id, protoNode.getKey(),
+          T.label, protoNode.getType().name());
+        keyToVertexId.put(protoNode.getKey(), node.id());
+      } catch (IllegalArgumentException exception) {
+        logger.warn("Failed to insert a vertex", exception);
+        continue;
+      }
+      for (Cpg.CpgStruct.Node.Property property : protoNode.getPropertyList()) {
+        addPropertyToElement(node, property.getName().name(), property.getValue());
+      }
+    }
   }
 
   public void addEdges(List<Cpg.CpgStruct.Edge> protoEdges) {

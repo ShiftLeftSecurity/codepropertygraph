@@ -3,10 +3,12 @@ package io.shiftleft.cpgloading
 import io.shiftleft.layers.EnhancementLayers
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 
-/** Load cpg proto (typically cpg.bin.zip) into a graph instance */
-abstract class CpgLoaderBase {
+/* singleton instance for convenience */
+object CpgLoader extends CpgLoader
 
-  protected def builder: ProtoToCpgBase
+/** Load cpg proto (typically cpg.bin.zip) into a new Tinkergraph instance */
+class CpgLoader {
+  protected def builder = new ProtoToCpg()
 
   def loadCodePropertyGraph(filename: String, runEnhancements: Boolean = true): Cpg = {
     val cpg = new ProtoCpgLoader(builder).loadFromProtoZip(filename)

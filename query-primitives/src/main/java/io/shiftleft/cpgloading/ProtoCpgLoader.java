@@ -23,9 +23,9 @@ import java.util.stream.Collectors;
 public class ProtoCpgLoader {
 
   protected final Logger logger = LogManager.getLogger(getClass());
-  protected final ProtoToCpgBase builder;
+  protected final ProtoToCpg builder;
 
-  public ProtoCpgLoader(ProtoToCpgBase builder) {
+  public ProtoCpgLoader(ProtoToCpg builder) {
     this.builder = builder;
   }
 

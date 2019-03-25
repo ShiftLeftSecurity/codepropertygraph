@@ -1,7 +1,7 @@
 name := "cpgqueryingtests"
 publish / skip := true
 
-dependsOn(Projects.cpgloaderTinkergraph % Test, Projects.semanticcpg % Test)
+dependsOn(Projects.semanticcpg % Test)
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.3" % Test,
