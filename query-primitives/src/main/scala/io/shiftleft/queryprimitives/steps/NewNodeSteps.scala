@@ -1,16 +1,18 @@
 package io.shiftleft.queryprimitives.steps
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node, StoredNode}
-import io.shiftleft.codepropertygraph.generated.{EdgeKeys, EdgeTypes}
+import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
+import io.shiftleft.codepropertygraph.generated.EdgeKeys
 import io.shiftleft.diffgraph.DiffGraph
+import gremlin.scala._
 import scala.collection.JavaConverters._
 import shapeless.HList
 
-class NewNodeSteps[A <: NewNode: Marshallable, Labels <: HList](raw: GremlinScala.Aux[A, Labels]) {
+class NewNodeSteps[A <: NewNode, Labels <: HList](override val raw: GremlinScala.Aux[A, Labels])
+    extends Steps[A, Labels](raw) {
 
   def store()(implicit graph: DiffGraph): Unit =
-    raw.toList.foreach(storeRecursively)
+    raw.sideEffect(storeRecursively).iterate()
 
   private def storeRecursively(newNode: NewNode)(implicit graph: DiffGraph): Unit = {
     graph.addNode(newNode)
@@ -23,26 +25,47 @@ class NewNodeSteps[A <: NewNode: Marshallable, Labels <: HList](raw: GremlinScal
     // create edges to `contained` nodes for this new node
     for {
       (localName, containedNodes) <- newNode.containedNodesByLocalName
-      (containedNode, index) <- containedNodes.zipWithIndex
+      (containedNode, index)      <- containedNodes.zipWithIndex
     } {
       val properties = Seq(
         EdgeKeys.LOCAL_NAME -> localName,
-        EdgeKeys.INDEX -> index
+        EdgeKeys.INDEX      -> index
       ).map { case KeyValue(key, value) => (key.name, value) }
-      addEdge(graph, newNode, containedNode, EdgeTypes.CONTAINS, properties)
+      addEdge(graph, newNode, containedNode, ContainsNode.Label, properties)
     }
   }
 
-  private def addEdge(graph: DiffGraph, src: Node, dst: Node, label: String, properties: Seq[(String, AnyRef)]): Unit =
+  private def addEdge(graph: DiffGraph,
+                      src: Node,
+                      dst: Node,
+                      label: String,
+                      properties: Seq[(String, AnyRef)]): Unit =
     (src, dst) match {
       case (src: NewNode, dst: NewNode) => graph.addEdge(src, dst, label, properties)
       case (src: NewNode, dst: StoredNode) =>
-        graph.addEdgeToOriginal(src, dst.underlying, label, properties)
+        graph.addEdgeToOriginal(src, dst, label, properties)
       case (src: StoredNode, dst: NewNode) =>
-        graph.addEdgeFromOriginal(src.underlying, dst, label, properties)
+        graph.addEdgeFromOriginal(src, dst, label, properties)
       case (src: StoredNode, dst: StoredNode) =>
-        graph.addEdgeInOriginal(src.underlying, dst.underlying, label, properties)
+        graph.addEdgeInOriginal(src, dst, label, properties)
       case (_, _) => throw new NotImplementedError("this should never happen")
     }
+
+  /**
+    * Pretty print vertices
+    * */
+  override def p(): List[String] = {
+    l.map {
+      case node: NewNode => {
+        val label = node.label
+        val keyValPairs = node.properties.toList
+          .filter(x => x._2.toString != "")
+          .sortBy(_._1)
+          .map(x => x._1 + ": " + x._2)
+        s"($label): " + keyValPairs.mkString(", ")
+      }
+      case elem => elem.toString
+    }
+  }
 
 }

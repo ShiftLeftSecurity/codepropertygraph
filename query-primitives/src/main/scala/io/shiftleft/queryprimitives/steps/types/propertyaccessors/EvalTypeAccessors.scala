@@ -1,76 +1,79 @@
 package io.shiftleft.queryprimitives.steps.types.propertyaccessors
 
 import gremlin.scala._
-import gremlin.scala.dsl.{Converter, Steps}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys}
 import io.shiftleft.codepropertygraph.predicates.Text.textRegex
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
+import io.shiftleft.queryprimitives.steps.Steps
 import shapeless.HList
 
-trait EvalTypeAccessors[T <: StoredNode, Labels <: HList] {
-  def raw: GremlinScala[Vertex]
-  implicit def converter: Converter.Aux[T, Vertex]
+trait EvalTypeAccessors[T <: Vertex, Labels <: HList] {
+  def raw: GremlinScala.Aux[T, Labels]
 
-  def evalType(): Steps[String, String, Labels] =
-    new Steps[String, String, Labels](raw.out(EdgeTypes.EVAL_TYPE).out(EdgeTypes.REF).value(NodeKeys.FULL_NAME))
+  def evalType(): Steps[String, Labels] =
+    new Steps[String, Labels](
+      raw.out(EdgeTypes.EVAL_TYPE).out(EdgeTypes.REF).value(NodeKeys.FULL_NAME))
 
-  def evalType(_value: String): Steps[T, Vertex, Labels] =
-    new Steps[T, Vertex, Labels](
+  def evalType(_value: String): Steps[T, Labels] =
+    new Steps[T, Labels](
       raw.filter(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
           .has(NodeKeys.FULL_NAME, textRegex(_value))))
 
-  def evalType(_values: String*): Steps[T, Vertex, Labels] =
+  def evalType(_values: String*): Steps[T, Labels] =
     if (_values.nonEmpty) {
-      new Steps[T, Vertex, Labels](
+      new Steps[T, Labels](
         raw.filter(
           _.out(EdgeTypes.EVAL_TYPE)
             .out(EdgeTypes.REF)
-            .or(_values.map { _value => trav: GremlinScala[Vertex] =>
+            .asInstanceOf[GremlinScala[T]]
+            .or(_values.map { _value => (trav: GremlinScala[T]) =>
               trav.has(NodeKeys.FULL_NAME, textRegex(_value))
             }: _*)))
     } else {
-      new Steps[T, Vertex, Labels](raw.filterOnEnd(unused => false))
+      new Steps[T, Labels](raw.filterOnEnd(unused => false))
     }
 
-  def evalTypeExact(_value: String): Steps[T, Vertex, Labels] =
-    new Steps[T, Vertex, Labels](
+  def evalTypeExact(_value: String): Steps[T, Labels] =
+    new Steps[T, Labels](
       raw.filter(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
           .has(NodeKeys.FULL_NAME, _value)))
 
-  def evalTypeExact(_values: String*): Steps[T, Vertex, Labels] =
+  def evalTypeExact(_values: String*): Steps[T, Labels] =
     if (_values.nonEmpty) {
-      new Steps[T, Vertex, Labels](
+      new Steps[T, Labels](
         raw.filter(
           _.out(EdgeTypes.EVAL_TYPE)
             .out(EdgeTypes.REF)
-            .or(_values.map { _value => trav: GremlinScala[Vertex] =>
+            .asInstanceOf[GremlinScala[T]]
+            .or(_values.map { _value => (trav: GremlinScala[T]) =>
               trav.has(NodeKeys.FULL_NAME, _value)
             }: _*)))
     } else {
-      new Steps[T, Vertex, Labels](raw.filterOnEnd(unused => false))
+      new Steps[T, Labels](raw.filterOnEnd(unused => false))
     }
 
-  def evalTypeNot(_value: String): Steps[T, Vertex, Labels] =
-    new Steps[T, Vertex, Labels](
+  def evalTypeNot(_value: String): Steps[T, Labels] =
+    new Steps[T, Labels](
       raw.filter(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
           .hasNot(NodeKeys.FULL_NAME, textRegex(_value))))
 
-  def evalTypeNot(_values: String*): Steps[T, Vertex, Labels] =
+  def evalTypeNot(_values: String*): Steps[T, Labels] =
     if (_values.nonEmpty) {
-      new Steps[T, Vertex, Labels](
+      new Steps[T, Labels](
         raw.filter(
           _.out(EdgeTypes.EVAL_TYPE)
             .out(EdgeTypes.REF)
-            .or(_values.map { _value => trav: GremlinScala[Vertex] =>
+            .asInstanceOf[GremlinScala[T]]
+            .or(_values.map { _value => (trav: GremlinScala[T]) =>
               trav.hasNot(NodeKeys.FULL_NAME, textRegex(_value))
             }: _*)))
     } else {
-      new Steps[T, Vertex, Labels](raw)
+      new Steps[T, Labels](raw)
     }
 }

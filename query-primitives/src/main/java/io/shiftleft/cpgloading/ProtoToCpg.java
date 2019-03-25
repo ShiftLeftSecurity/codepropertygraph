@@ -1,121 +1,117 @@
 package io.shiftleft.cpgloading;
 
-import io.shiftleft.proto.cpg.Cpg;
+import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge;
+import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node;
+import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.Property;
+import io.shiftleft.proto.cpg.Cpg.PropertyValue;
+import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase;
+import io.shiftleft.queryprimitives.steps.starters.Cpg;
+
+import org.apache.commons.configuration.Configuration;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.apache.tinkerpop.gremlin.structure.Element;
-import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 public class ProtoToCpg {
-  protected TinkerGraph graph;
-  protected Logger logger = LogManager.getLogger(getClass());
-  protected Map<Long, Object> keyToVertexId = new HashMap<>();
 
-  // for debugging output
-  protected int elementImportCounter = 0;
-  protected long lastStart = System.currentTimeMillis();
+  TinkerGraph tinkerGraph;
+  private Logger logger = LogManager.getLogger(getClass());
+  private NodeFilter nodeFilter = new NodeFilter();
 
   public ProtoToCpg() {
-    this.graph = TinkerGraph.open(
-      io.shiftleft.codepropertygraph.generated.nodes.Factories$.MODULE$.AllAsJava(),
-      io.shiftleft.codepropertygraph.generated.edges.Factories$.MODULE$.AllAsJava()
-    );
+    this(Optional.empty());
   }
 
-  public void addNodes(Cpg.CpgStruct protoCpg) {
-    for (Cpg.CpgStruct.Node protoNode : protoCpg.getNodeList()) {
-      // if (elementImportCounter % 1000 == 0) {
-      //   long millisSinceLastBatch = System.currentTimeMillis() - lastStart;
-      //   lastStart = System.currentTimeMillis();
-      //   System.out.println("importing node " + elementImportCounter + "; millis since last batch: " + millisSinceLastBatch);
-      // }
-      elementImportCounter++;
-      Vertex node;
+  public ProtoToCpg(Optional<OnDiskOverflowConfig> onDiskOverflowConfig) {
+    Configuration configuration = TinkerGraph.EMPTY_CONFIGURATION();
+    onDiskOverflowConfig.ifPresent(config -> {
+      configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, true);
+      configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_CACHE_MAX_HEAP_PERCENTAGE, config.cacheHeapPercentage());
+      if (config.alternativeParentDirectory().isDefined()) {
+        configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_ROOT_DIR, config.alternativeParentDirectory().get());
+      }
+    });
+
+    this.tinkerGraph = TinkerGraph.open(
+      configuration,
+      io.shiftleft.codepropertygraph.generated.nodes.Factories$.MODULE$.AllAsJava(),
+      io.shiftleft.codepropertygraph.generated.edges.Factories$.MODULE$.AllAsJava()); 
+  }
+
+  public void addNodes(List<Node> nodes) {
+    for (Node node : nodes) {
       try {
-        node = graph.addVertex(T.id, protoNode.getKey(),
-          T.label, protoNode.getType().name());
-        keyToVertexId.put(protoNode.getKey(), node.id());
+        if (nodeFilter.filterNode(node)) {
+          List<Property> properties = node.getPropertyList();
+          final ArrayList<Object> keyValues = new ArrayList<>(4 + (2 * properties.size()));
+          keyValues.add(T.id);
+          keyValues.add(node.getKey());
+          keyValues.add(T.label);
+          keyValues.add(node.getType().name());
+          for (Property property: properties) {
+            addProperties(keyValues, property.getName().name(), property.getValue());
+          }
+          tinkerGraph.addVertex(keyValues.toArray());
+        }
       } catch (IllegalArgumentException exception) {
         logger.warn("Failed to insert a vertex", exception);
-        continue;
-      }
-      for (Cpg.CpgStruct.Node.Property property : protoNode.getPropertyList()) {
-        addPropertyToElement(node, property.getName().name(), property.getValue());
       }
     }
   }
 
-  public void addEdges(List<Cpg.CpgStruct.Edge> protoEdges) {
-    for (Cpg.CpgStruct.Edge protoEdge : protoEdges) {
-      // if (elementImportCounter % 1000 == 0) {
-      //   long millisSinceLastBatch = System.currentTimeMillis() - lastStart;
-      //   lastStart = System.currentTimeMillis();
-      //   System.out.println("importing edge " + elementImportCounter + "; millis since last batch: " + millisSinceLastBatch);
-      // }
-      // if (elementImportCounter % 10000 == 0) {
-      //   commit();
-      // }
-      elementImportCounter++;
-      long srcNodeId = protoEdge.getSrc();
-      long dstNodeId = protoEdge.getDst();
+  public void addEdges(List<Edge> protoEdges) {
+    for (Edge edge : protoEdges) {
+      long srcNodeId = edge.getSrc();
+      long dstNodeId = edge.getDst();
+      Vertex srcVertex = tinkerGraph.vertices(srcNodeId).next();
+      Vertex dstVertex = tinkerGraph.vertices(dstNodeId).next();
 
-      Vertex srcVertex = lookupNodeByKey(srcNodeId);
-      Vertex dstVertex = lookupNodeByKey(dstNodeId);
-      org.apache.tinkerpop.gremlin.structure.Edge edge;
+      List<Edge.Property> properties = edge.getPropertyList();
+      final ArrayList<Object> keyValues = new ArrayList<>(2 * properties.size());
+      for (Edge.Property property: properties) {
+        addProperties(keyValues, property.getName().name(), property.getValue());
+      }
+
       try {
-        edge = srcVertex.addEdge(protoEdge.getType().name(), dstVertex);
+        srcVertex.addEdge(edge.getType().name(), dstVertex, keyValues.toArray());
       } catch (IllegalArgumentException exception) {
-        logger.warn("Failed to insert an edge", exception);
+        String context = "label=" + edge.getType().name() +
+          ", srcNodeId=" + srcNodeId + 
+          ", dstNodeId=" + dstNodeId + 
+          ", srcVertex=" + srcVertex + 
+          ", dstVertex=" + dstVertex;
+        logger.warn("Failed to insert an edge. context: " + context, exception);
         continue;
       }
-      for (Cpg.CpgStruct.Edge.Property property: protoEdge.getPropertyList()) {
-        addPropertyToElement(edge, property.getName().name(), property.getValue());
-      }
     }
   }
 
-  protected Vertex lookupNodeByKey(Long nodeKey) {
-    Object id = keyToVertexId.get(nodeKey);
-    Iterator<Vertex> iter = graph.vertices(id);
-    if (!iter.hasNext()) {
-      logger.error("unable to find node with key=" + nodeKey + " and id=" + id);
-      return null;
-    }
-    return iter.next();
-  }
-
-  protected void addPropertyToElement(Element tinkerElement, String propertyName,
-                                    Cpg.PropertyValue propertyValue) {
-    Cpg.PropertyValue.ValueCase valueCase = propertyValue.getValueCase();
+  public static void addProperties(ArrayList<Object> tinkerKeyValues, String name, PropertyValue propertyValue) {
+    ValueCase valueCase = propertyValue.getValueCase();
     switch(valueCase) {
       case INT_VALUE:
-        tinkerElement.property(propertyName, propertyValue.getIntValue());
+        tinkerKeyValues.add(name);
+        tinkerKeyValues.add(propertyValue.getIntValue());
         break;
       case STRING_VALUE:
-        tinkerElement.property(propertyName, propertyValue.getStringValue());
+        tinkerKeyValues.add(name);
+        tinkerKeyValues.add(propertyValue.getStringValue());
         break;
       case BOOL_VALUE:
-        tinkerElement.property(propertyName, propertyValue.getBoolValue());
+        tinkerKeyValues.add(name);
+        tinkerKeyValues.add(propertyValue.getBoolValue());
         break;
       case STRING_LIST:
-        if (tinkerElement instanceof Vertex) {
-          propertyValue.getStringList().getValuesList().forEach(value ->
-            ((Vertex) tinkerElement).property(VertexProperty.Cardinality.list, propertyName, value));
-        } else {
-          List<String> propertyList = new LinkedList<>();
-          propertyList.addAll(propertyValue.getStringList().getValuesList());
-          tinkerElement.property(propertyName, propertyList);
-        }
+        propertyValue.getStringList().getValuesList().forEach(value -> {
+          tinkerKeyValues.add(name);
+          tinkerKeyValues.add(value);
+        });
         break;
       case VALUE_NOT_SET:
         break;
@@ -124,17 +120,7 @@ public class ProtoToCpg {
     }
   }
 
-  public io.shiftleft.queryprimitives.steps.starters.Cpg build() {
-    commit();
-    return new io.shiftleft.queryprimitives.steps.starters.Cpg(graph);
-  }
-
-  /* checks whether graph supports transactions and commits it. 
-   * call this regularly when importing in bulk, to avoid the transaction growing too large */
-  public void commit() {
-    if (graph.features().graph().supportsTransactions()) {
-      System.out.println("committing tx");
-      graph.tx().commit();
-    }
+  public Cpg build() {
+    return new Cpg(tinkerGraph);
   }
 }

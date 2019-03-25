@@ -1,26 +1,27 @@
 package io.shiftleft.queryprimitives.steps.types.structure
 
-import gremlin.scala._
-import gremlin.scala.dsl.Converter
+import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.queryprimitives.steps.Implicits._
-import io.shiftleft.queryprimitives.steps.ICallResolver
-import io.shiftleft.queryprimitives.steps.CpgSteps
+import io.shiftleft.queryprimitives.steps.{ICallResolver, NodeSteps}
 import io.shiftleft.queryprimitives.steps.types.expressions.{Call, Literal}
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.Modifier
-import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{FullNameAccessors, NameAccessors, SignatureAccessors}
+import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{
+  FullNameAccessors,
+  NameAccessors,
+  SignatureAccessors
+}
 import shapeless.HList
 
-class MethodInst[Labels <: HList](override val raw: GremlinScala[Vertex])
-    extends CpgSteps[nodes.MethodInst, Labels](raw)
+class MethodInst[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodInst, Labels])
+    extends NodeSteps[nodes.MethodInst, Labels](raw)
     with NameAccessors[nodes.MethodInst, Labels]
     with FullNameAccessors[nodes.MethodInst, Labels]
     with SignatureAccessors[nodes.MethodInst, Labels] {
-  override val converter = Converter.forDomainNode[nodes.MethodInst]
 
   def method: Method[Labels] = {
     new Method[Labels](
-      raw.out(EdgeTypes.REF)
+      raw.out(EdgeTypes.REF).cast[nodes.Method]
     )
   }
 
@@ -55,7 +56,8 @@ class MethodInst[Labels <: HList](override val raw: GremlinScala[Vertex])
   /**
     * Traverse to direct and transitive callers of the method.
     * */
-  def calledBy(sourceTrav: MethodInst[Labels])(implicit callResolver: ICallResolver): Method[Labels] = {
+  def calledBy(sourceTrav: MethodInst[Labels])(
+      implicit callResolver: ICallResolver): Method[Labels] = {
     caller(callResolver).calledByIncludingSink(sourceTrav.method)(callResolver)
   }
 
@@ -79,9 +81,11 @@ class MethodInst[Labels <: HList](override val raw: GremlinScala[Vertex])
   def callIn(implicit callResolver: ICallResolver): Call[Labels] = {
     // Check whether possible call sides are resolved or resolve them.
     // We only do this for virtual method calls.
-    // note: side effect writes edges into the graph
     // TODO Also resolve function pointers.
-    new Call[Labels](raw.sideEffect(callResolver.resolveDynamicMethodCallSites).in(EdgeTypes.CALL))
+    new Call[Labels](
+      sideEffect(callResolver.resolveDynamicMethodInstCallSites).raw
+        .in(EdgeTypes.CALL)
+        .cast[nodes.Call])
   }
 
   /**
