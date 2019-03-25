@@ -27,9 +27,8 @@ public class ProtoToCpg {
 
   public ProtoToCpg() {
     this.graph = TinkerGraph.open(
-      // TODO generate factories for case classes
-      // io.shiftleft.codepropertygraph.generated.nodes.Factories$.MODULE$.AllAsJava(),
-      // io.shiftleft.codepropertygraph.generated.edges.Factories$.MODULE$.AllAsJava()
+      io.shiftleft.codepropertygraph.generated.nodes.Factories$.MODULE$.AllAsJava(),
+      io.shiftleft.codepropertygraph.generated.edges.Factories$.MODULE$.AllAsJava()
     );
   }
 
