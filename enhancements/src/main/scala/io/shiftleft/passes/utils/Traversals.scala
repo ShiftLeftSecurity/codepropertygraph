@@ -9,13 +9,6 @@ object Traversals {
     expression.emit.repeat(_.out(EdgeTypes.AST)).dedup()
   }
 
-  // NOTE: This method is only used by the not updated Javascript specific code
-  // and thus uses ORDER instead of ARGUMENT_INDEX which is not conform with new
-  // semantics.
-  def arguments(call: GremlinScala[Vertex]): GremlinScala[Vertex] = {
-    call.hasLabel(NodeTypes.CALL).out(EdgeTypes.AST).hasNot(NodeKeys.ORDER, new Integer(0))
-  }
-
   def argumentAtIndex(call: GremlinScala[Vertex], index: Int): GremlinScala[Vertex] = {
     getASTChildAtIndex(call.hasLabel(NodeTypes.CALL), index)
   }
@@ -64,9 +57,7 @@ object Traversals {
     expression
       .until(
         _.union(
-          _.join(_.hasLabel(NodeTypes.METHOD))
-            .join(_.has(NodeKeys.PARSER_TYPE_NAME, "Program"))
-        ))
+          _.join(_.hasLabel(NodeTypes.METHOD)).join(_.has(NodeKeys.PARSER_TYPE_NAME, "Program"))))
       .repeat(_.in(EdgeTypes.CFG).simplePath)
   }
 
