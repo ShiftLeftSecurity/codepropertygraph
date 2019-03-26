@@ -2,17 +2,15 @@ package io.shiftleft.passes.dataflows.steps
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.queryprimitives.steps.CpgSteps
+import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
 import org.apache.logging.log4j.LogManager
 import shapeless.HList
 import DataFlowObject._
-import gremlin.scala.dsl.Steps
-import io.shiftleft.passes.reachingdef.DataFlowFrameworkHelper
 import io.shiftleft.queryprimitives.steps.types.structure.Method
 import io.shiftleft.queryprimitives.utils.ExpandTo
 import org.apache.tinkerpop.gremlin.structure.Direction
-
 import scala.collection.JavaConverters._
+import shapeless.HNil
 
 object DataFlowObject {
   protected val logger = LogManager.getLogger(getClass)
@@ -44,37 +42,36 @@ object DataFlowObject {
 /**
   * Base class for nodes that can occur in data flows
   * */
-class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex]) extends CpgSteps[nodes.DataFlowObject, Labels](raw) {
+class DataFlowObject[Labels <: HList](raw: GremlinScala.Aux[nodes.DataFlowObject, Labels])
+    extends NodeSteps(raw) {
 
-  private class ReachableByContainer(val reachedSource: Vertex, val path: List[Vertex]) {
+  private class ReachableByContainer(
+    val reachedSource: nodes.DataFlowObject,
+    val path: List[nodes.DataFlowObject]) {
     override def clone(): ReachableByContainer = {
       new ReachableByContainer(reachedSource, path)
     }
   }
 
   def method: Method[Labels] = {
-    new Method[Labels](
-      raw.map { dataFlowObject =>
-        methodFast(dataFlowObject)
-      }
-    )
+    new Method[Labels](raw.map(methodFast))
   }
 
-  def reachableBy(sourceTravs: CpgSteps[nodes.DataFlowObject, _]*): DataFlowObject[Labels] = {
+  def reachableBy(sourceTravs: NodeSteps[nodes.DataFlowObject, _]*): DataFlowObject[_] = {
     val pathReachables = reachableByInternal(sourceTravs)
     val reachedSources = pathReachables.map(_.reachedSource)
-    new DataFlowObject(graph.asScala().inject(reachedSources: _*))
+    new DataFlowObject(graph.asScala.inject(reachedSources: _*))
   }
 
-  def reachableByFlows(sourceTravs: CpgSteps[nodes.DataFlowObject, _]*): Flows = {
+  def reachableByFlows(sourceTravs: NodeSteps[nodes.DataFlowObject, _]*): Flows = {
 
     val pathReachables = reachableByInternal(sourceTravs)
     val paths = pathReachables.map(_.path)
     new Flows(
-      new Steps[List[nodes.DataFlowObject], List[Vertex], Labels](graph.asScala().inject[List[Vertex]](paths: _*)))
+      new Steps[List[nodes.DataFlowObject], HNil](graph.asScala.inject[List[nodes.DataFlowObject]](paths: _*)))
   }
 
-  private def reachableByInternal(sourceTravs: Seq[CpgSteps[nodes.DataFlowObject, _]]): List[ReachableByContainer] = {
+  private def reachableByInternal(sourceTravs: Seq[NodeSteps[nodes.DataFlowObject, _]]): List[ReachableByContainer] = {
     val sourceSymbols = sourceTravs
       .flatMap(_.raw.clone.toList)
       .flatMap { elem =>
@@ -86,7 +83,7 @@ class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex]) extends CpgStep
 
     var pathReachables = List[ReachableByContainer]()
 
-    def traverseDDGBack(path: List[Vertex]): Unit = {
+    def traverseDDGBack(path: List[nodes.DataFlowObject]): Unit = {
       val node = path.head
       if (sourceSymbols.contains(node)) {
         val sack = new ReachableByContainer(node, path)
@@ -96,14 +93,14 @@ class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex]) extends CpgStep
       val ddgPredecessors = node.vertices(Direction.IN, EdgeTypes.REACHING_DEF).asScala
       ddgPredecessors.foreach { pred =>
         if(!path.contains(pred)) {
-          traverseDDGBack(pred :: node :: path.tail)
+          traverseDDGBack(pred.asInstanceOf[nodes.DataFlowObject] :: node :: path.tail)
         }
       }
     }
 
     sinkSymbols.foreach { sym =>
       getOperation(sym) match {
-        case Some(vertex) => traverseDDGBack(List(vertex))
+        case Some(vertex) => traverseDDGBack(List(vertex.asInstanceOf[nodes.DataFlowObject]))
         case None         =>
       }
     }
@@ -120,16 +117,16 @@ class DataFlowObject[Labels <: HList](raw: GremlinScala[Vertex]) extends CpgStep
     }
   }
 
-  private def methodFast(dataFlowObject: Vertex): Vertex = {
+  private def methodFast(dataFlowObject: nodes.DataFlowObject): nodes.Method = {
     dataFlowObject.label match {
       case NodeTypes.METHOD_RETURN =>
-        ExpandTo.formalReturnToMethod(dataFlowObject)
+        ExpandTo.formalReturnToMethod(dataFlowObject).asInstanceOf[nodes.Method]
       case NodeTypes.METHOD_PARAMETER_IN =>
-        ExpandTo.parameterToMethod(dataFlowObject)
+        ExpandTo.parameterToMethod(dataFlowObject).asInstanceOf[nodes.Method]
       case NodeTypes.METHOD_PARAMETER_OUT =>
-        ExpandTo.parameterToMethod(dataFlowObject)
+        ExpandTo.parameterToMethod(dataFlowObject).asInstanceOf[nodes.Method]
       case NodeTypes.LITERAL | NodeTypes.CALL | NodeTypes.IDENTIFIER | NodeTypes.RETURN | NodeTypes.UNKNOWN =>
-        ExpandTo.expressionToMethod(dataFlowObject)
+        ExpandTo.expressionToMethod(dataFlowObject).asInstanceOf[nodes.Method]
     }
   }
 
