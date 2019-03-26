@@ -90,16 +90,16 @@ object DomainClassCreator {
                   s"with Has${camelCase(key).capitalize}"
                 }
                 .mkString(" ")
-              val (baseNodeAdditionalMixins, storedNodeExtends) = extendz match {
-                case Some(parent) =>
-                  val parentCC = camelCase(parent).capitalize
-                  (s"with ${parentCC}Base", parentCC)
-                case None =>
-                  ("", "StoredNode")
-              }
-              s"""trait ${nameCC}Base extends Node $mixins $baseNodeAdditionalMixins
-                trait ${nameCC} extends $storedNodeExtends with ${nameCC}Base
-            """
+            val mixinTraits: String =
+              extendz
+                .getOrElse(List())
+                .map { traitName =>
+                  s"with ${camelCase(traitName).capitalize}"
+                }
+                  .mkString(" ")
+                  s"""trait ${nameCC}Base extends Node $mixins $mixinTraits
+                  trait ${nameCC} extends StoredNode with ${nameCC}Base
+                  """
           }
           .mkString("\n")
 
@@ -444,7 +444,7 @@ case class EdgeType(name: String, keys: List[String])
 case class Property(name: String, comment: String, valueType: String, cardinality: String)
 
 /* representation of nodeBaseTrait in cpg.json */
-case class NodeBaseTrait(name: String, hasKeys: List[String], `extends`: Option[String])
+case class NodeBaseTrait(name: String, hasKeys: List[String], `extends`: Option[List[String]])
 
 object HigherValueType extends Enumeration {
   type HigherValueType = Value
