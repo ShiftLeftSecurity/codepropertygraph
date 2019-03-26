@@ -63,7 +63,9 @@ object DomainClassCreator {
       import scala.collection.JavaConverters._
       import shapeless.HNil
 
-      trait Node extends gremlin.scala.dsl.DomainRoot
+      trait Node extends gremlin.scala.dsl.DomainRoot {
+        def accept[T](visitor: NodeVisitor[T]): T
+      }
 
       trait StoredNode extends Node {
         /* underlying vertex in the graph database. 
@@ -78,6 +80,12 @@ object DomainClassCreator {
         }
       }
       """
+
+      val nodeVisitor =
+        s"""trait NodeVisitor[T] {
+          ${generateNodeVisitorMethods}
+          ${generateBaseTraitVisitorMethods}
+        }\n"""
 
       val nodeBaseTraits =
         (Resources.cpgJson \ "nodeBaseTraits")
@@ -114,7 +122,27 @@ object DomainClassCreator {
           }
           .mkString("\n")
 
-      staticHeader + nodeBaseTraits + keyBasedTraits
+      staticHeader + nodeVisitor + nodeBaseTraits + keyBasedTraits
+    }
+
+    def generateNodeVisitorMethods() = {
+      val nodeTypes = (Resources.cpgJson \ "nodeTypes").as[List[NodeType]]
+
+      nodeTypes.map { nodeType =>
+        val nodeNameCamelCase = camelCase(nodeType.name).capitalize
+
+        s"def visit(node: ${nodeNameCamelCase}): T = ???"
+      }.mkString("\n")
+    }
+
+    def generateBaseTraitVisitorMethods() = {
+      val baseTraits = (Resources.cpgJson \ "nodeBaseTraits").as[List[NodeBaseTrait]]
+
+      baseTraits.map { case NodeBaseTrait(name, _, _) =>
+        val nodeNameCamelCase = camelCase(name).capitalize
+
+        s"def visit(node: ${nodeNameCamelCase}): T = ???"
+      }.mkString("\n")
     }
 
     def generateNodeSource(nodeType: NodeType, keys: List[Property]) = {
@@ -249,6 +277,10 @@ object DomainClassCreator {
          * since this is a StoredNode, this is always set */
         override val underlying = _underlying.get
 
+        override def accept[T](visitor: NodeVisitor[T]): T = {
+          visitor.visit(this)
+        }
+
         $camelCaseFields
       }
       """
@@ -369,6 +401,7 @@ object DomainClassCreator {
         override val label = "${nodeType.name}"
         override val properties: Map[String, Any] = $propertiesImpl
         override def containedNodesByLocalName: Map[String, List[Node]] = $containedNodesByLocalName
+        override def accept[T](visitor: NodeVisitor[T]): T = ???
       }
       """
     }
