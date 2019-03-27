@@ -41,7 +41,7 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
           }
         } catch {
           case _: Exception =>
-            logger.warn("Unable to create method stub.", "methodInstFullName", methodInst.fullName)
+            logger.warn("Unable to create method stub.methodInstFullName=${methodInst.fullName}")
         }
       }
       .iterate()
@@ -59,8 +59,6 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
       signature,
       NodeTypes.NAMESPACE_BLOCK,
       "<global>",
-      None,
-      None,
       None,
       None,
       None,
@@ -93,14 +91,12 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
       "ANY",
       None,
       None,
-      None,
-      None,
       None
     )
     dstGraph.addNode(methodReturn)
     dstGraph.addEdge(methodNode, methodReturn, EdgeTypes.AST)
 
-    val blockNode = new NewBlock("", 1, 1, "ANY", None, None, None, None, None, 0)
+    val blockNode = new NewBlock("", 1, 1, "ANY", None, None, None, None)
     dstGraph.addNode(blockNode)
     dstGraph.addEdge(methodNode, blockNode, EdgeTypes.AST)
 
