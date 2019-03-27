@@ -23,6 +23,26 @@ object ExpandTo {
     callReceiverOption(callNode).get
   }
 
+  def callArguments(callNode: Vertex): Iterator[nodes.Expression] = {
+    callNode.vertices(Direction.OUT, EdgeTypes.AST).asScala.map(_.asInstanceOf[nodes.Expression])
+  }
+
+  def argumentToCallOrReturn(argument: Vertex): nodes.Expression = {
+    val parent = argument.vertices(Direction.IN, EdgeTypes.AST).nextChecked
+
+    parent match {
+      case call: nodes.Call
+        if call.name == Operators.memberAccess ||
+          call.name == Operators.indirectMemberAccess ||
+          call.name == Operators.computedMemberAccess ||
+          call.name == Operators.indirectComputedMemberAccess ||
+          call.name == Operators.indirection =>
+        argumentToCallOrReturn(call)
+      case expression: nodes.Expression =>
+        expression
+    }
+  }
+
   def typeCarrierToType(parameterNode: Vertex): Vertex = {
     parameterNode.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).nextChecked
   }
@@ -33,6 +53,15 @@ object ExpandTo {
 
   def formalReturnToMethod(formalReturnNode: Vertex): Vertex = {
     formalReturnNode.vertices(Direction.IN, EdgeTypes.AST).nextChecked
+  }
+
+  def returnToReturnedExpression(returnExpression: Vertex): Option[nodes.Expression] = {
+    val it = returnExpression.vertices(Direction.OUT, EdgeTypes.AST)
+    if (it.hasNext) {
+      Some(it.next.asInstanceOf[nodes.Expression])
+    } else {
+      None
+    }
   }
 
   def methodToFormalReturn(method: Vertex): Vertex = {

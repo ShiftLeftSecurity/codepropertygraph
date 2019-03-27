@@ -1,14 +1,8 @@
 package io.shiftleft.passes
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{
-  EdgeTypes,
-  NodeKeyNames,
-  NodeKeys,
-  NodeTypes,
-  edges,
-  nodes
-}
+import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeyNames, NodeKeys, NodeTypes, edges, nodes}
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
@@ -25,6 +19,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
         override def containedNodesByLocalName = ???
         override def label                     = NodeTypes.UNKNOWN
         override def properties                = Map(NodeKeyNames.CODE -> Pass1NewNodeCode)
+        override def accept[T](visitor: NodeVisitor[T]): T = ???
       }
       override def run() = {
         val dstGraph = new DiffGraph
@@ -46,6 +41,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
         override def containedNodesByLocalName = ???
         override def label                     = NodeTypes.UNKNOWN
         override def properties                = Map(NodeKeyNames.CODE -> Pass2NewNodeCode)
+        override def accept[T](visitor: NodeVisitor[T]): T = ???
       }
       override def run() = {
         val dstGraph = new DiffGraph
