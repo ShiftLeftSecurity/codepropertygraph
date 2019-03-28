@@ -3,7 +3,8 @@
     // note: these should *NOT* be written by the language frontend.
 
     "nodeKeys" : [
-        {"id" : 8, "name": "VALUE", "comment" : "Tag value", "valueType" : "string", "cardinality" : "one"}
+        {"id" : 8, "name": "VALUE", "comment" : "Tag value", "valueType" : "string", "cardinality" : "one"},
+        {"id": 14, "name" : "BINARY_SIGNATURE", "comment" : "Binary type signature", "valueType" : "string", "cardinality" : "zeroOrOne" }
     ],
 
     "edgeKeys" : [
@@ -30,6 +31,7 @@
             ]
         },
         { "name": "METHOD",
+          "keys": ["BINARY_SIGNATURE"],
           "outEdges" : [
              {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]},
              {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN"]}
