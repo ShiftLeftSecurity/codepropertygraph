@@ -4,6 +4,7 @@ import io.shiftleft.passes.dataflows.steps.TrackingPoint
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.Steps
 import io.shiftleft.queryprimitives.steps.Implicits._
+import scala.language.implicitConversions
 
 import shapeless.HList
 
