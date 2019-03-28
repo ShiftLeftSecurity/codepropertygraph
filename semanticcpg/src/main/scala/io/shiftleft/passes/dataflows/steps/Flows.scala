@@ -1,17 +1,16 @@
-// TODO markus port to TrackingPoint
-// package io.shiftleft.passes.dataflows.steps
-// import gremlin.scala.Vertex
-// import io.shiftleft.queryprimitives.steps.Steps
-// import io.shiftleft.codepropertygraph.generated.nodes
+package io.shiftleft.passes.dataflows.steps
 
-// class Flows(step: Steps[List[nodes.DataFlowObject], _]) {
-//   def p(): List[String] = {
-//     step.l.map { flow =>
-//       FlowPrettyPrinter.prettyPrint(flow)
-//     }
-//   }
+import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.queryprimitives.steps.Steps
 
-//   def l(): List[List[nodes.DataFlowObject]] = {
-//     step.l
-//   }
-// }
+class Flows(step: Steps[List[nodes.TrackingPoint], _]) {
+  def p(): List[String] = {
+    step.l.map { flow =>
+      FlowPrettyPrinter.prettyPrint(flow)
+    }
+  }
+
+  def l(): List[List[nodes.TrackingPoint]] = {
+    step.l
+  }
+}

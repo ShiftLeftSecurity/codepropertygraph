@@ -17,4 +17,7 @@ package object steps {
 
   implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods =
     new WithinMethodMethods(node)
+
+  implicit def cfgNodeMethodsQp(node: nodes.CfgNode): CfgNodeMethods =
+    new CfgNodeMethods(node)
 }
