@@ -26,16 +26,16 @@
             "outEdges": []
         },
         {
-            "name": "NAMESPACE_BLOCK",
-            "outEdges": [
-                {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]}
+            "name" : "FILE", "outEdges" : [
+                {"edgeName": "CONTAINS", "inNodes": ["TYPE_DECL", "METHOD"]}
             ]
         },
         { "name": "METHOD",
           "keys": ["BINARY_SIGNATURE"],
           "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]},
-             {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN"]}
+             {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD", "METHOD_PARAMETER_OUT"]},
+             {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN"]},
+             {"edgeName": "CONTAINS", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]}
           ]
         },
         { "name": "METHOD_INST",
@@ -46,7 +46,8 @@
         { "name": "METHOD_PARAMETER_IN",
           "outEdges" : [
             {"edgeName": "PROPAGATE", "inNodes": ["METHOD_PARAMETER_OUT", "METHOD_RETURN"]},
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]},
+            {"edgeName": "PARAMETER_LINK", "inNodes": ["METHOD_PARAMETER_OUT"]}
           ]
         },
         {"id" : 33, "name" : "METHOD_PARAMETER_OUT",
@@ -65,6 +66,13 @@
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
         },
+        {
+            "name": "NAMESPACE_BLOCK",
+            "outEdges": [
+              {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]},
+              {"edgeName": "REF", "inNodes": ["NAMESPACE"]}
+            ]
+        },
         { "name": "METHOD_REF", "keys" : ["SCC_ID"],
           "outEdges" : [
             {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
@@ -79,7 +87,8 @@
         { "name": "TYPE_DECL",
           "outEdges" : [
              {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]},
-             {"edgeName": "INHERITS_FROM", "inNodes": ["TYPE"]}
+             {"edgeName": "INHERITS_FROM", "inNodes": ["TYPE"]},
+             {"edgeName": "CONTAINS", "inNodes": ["METHOD"]}
           ]
         },
         { "name": "MEMBER",
@@ -104,7 +113,8 @@
         },
         { "name": "LOCAL",
           "outEdges" : [
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]},
+            {"edgeName": "CAPTURED_BY", "inNodes": ["CLOSURE_BINDING"]}
           ]
         },
         {"name" : "IDENTIFIER", "keys" : ["SCC_ID"],
@@ -117,11 +127,6 @@
         {"name" : "BLOCK", "keys" : ["SCC_ID"],
           "outEdges" : [
             {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
-          ]
-        },
-        { "name": "LOCAL",
-          "outEdges" : [
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
         },
