@@ -1,9 +1,12 @@
-package io.shiftleft.queryprimitives
+package io.shiftleft
 
-import io.shiftleft.codepropertygraph.generated.NodeKeys
+import gremlin.scala.{Graph, ScalaGraph}
+import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
 import io.shiftleft.cpgloading.ProtoCpgLoader
 import io.shiftleft.cpgloading.OnDiskOverflowConfig
+import io.shiftleft.layers.enhancedbase.EnhancedBaseCreator
 import io.shiftleft.queryprimitives.steps.starters.Cpg
+import io.shiftleft.queryprimitives.CpgOverlayLoader
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
@@ -21,11 +24,25 @@ object CpgLoader {
   def loadCodePropertyGraph(filename: String,
                             createIndices: Boolean = true,
                             onDiskOverflowConfig: Option[OnDiskOverflowConfig] = None): Cpg = {
-    var cpg: Cpg = null
     logger.debug("Loading " + filename)
-    cpg = ProtoCpgLoader.loadFromProtoZip(filename, onDiskOverflowConfig.asJava)
+    val cpg = ProtoCpgLoader.loadFromProtoZip(filename, onDiskOverflowConfig.asJava)
+    runEnhancements(cpg.graph)
     if (createIndices) { createIndexes(cpg) }
     cpg
+  }
+
+  protected def runEnhancements(graph: Graph): Unit = {
+    val language = metaNode(graph).language
+    val serializedCpg = new SerializedCpg
+    new EnhancedBaseCreator(graph, language, serializedCpg).create
+  }
+
+  private def metaNode(graph: ScalaGraph): nodes.MetaData = {
+    graph.V
+      .hasLabel(NodeTypes.META_DATA)
+      .headOption()
+      .getOrElse(throw new Exception("Meta node missing."))
+      .asInstanceOf[nodes.MetaData]
   }
 
   /**
