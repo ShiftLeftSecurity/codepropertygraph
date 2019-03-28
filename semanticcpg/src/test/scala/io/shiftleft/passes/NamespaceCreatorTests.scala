@@ -2,7 +2,6 @@ package io.shiftleft.passes.namespacecreator
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
-import io.shiftleft.passes.namespacecreator.NamespaceCreator
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{Matchers, WordSpec}
 

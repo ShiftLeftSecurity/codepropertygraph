@@ -7,7 +7,6 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.diffgraph.{DiffGraph, DiffGraphApplier}
 import io.shiftleft.queryprimitives.steps.Implicits._
-import io.shiftleft.queryprimitives.steps.CpgSteps
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.{Matchers, WordSpec}
@@ -56,8 +55,7 @@ class StepsTest extends WordSpec with Matchers {
       "providing multiple" in new CpgTestFixture("splitmeup") {
         // find two arbitrary methods so we can find it again in the next step
         val methods: Set[nodes.Method] = cpg.method.toList.take(2).toSet
-        val ids = methods.map(_.underlying.id).toSeq
-        val results: List[nodes.Method] = cpg.method.id(ids: _*).toList
+        val results: List[nodes.Method] = cpg.method.id(methods.map(_.id)).toList
 
         results.size shouldBe 2
         results.toSet shouldBe methods.toSet
