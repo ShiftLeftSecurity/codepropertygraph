@@ -59,8 +59,8 @@ public class ProtoToCpg {
           }
           tinkerGraph.addVertex(keyValues.toArray());
         }
-      } catch (IllegalArgumentException exception) {
-        logger.warn("Failed to insert a vertex", exception);
+      } catch (Exception exception) {
+        logger.warn("Failed to insert a vertex. proto:\n" + node, exception);
       }
     }
   }
