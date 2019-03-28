@@ -23,7 +23,7 @@ public class ProtoToCpg {
   private Logger logger = LogManager.getLogger(getClass());
   private NodeFilter nodeFilter = new NodeFilter();
   public static final Set<Integer> IGNORED_NODE_TYPES = new HashSet<>(Arrays.asList(5, 6, 7, 49));
-  public static final Set<Integer> IGNORED_NODE_KEYS = new HashSet<>(Arrays.asList(16));
+  public static final Set<Integer> IGNORED_NODE_KEYS = new HashSet<>(Arrays.asList(14, 16));
 
   public ProtoToCpg() {
     this(Optional.empty());
