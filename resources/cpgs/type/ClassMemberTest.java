@@ -1,12 +1,3 @@
-package io.shiftleft.testcode.type;
-
-public class ClassMemberTest {
-
-  int member;
-  static int static_member;
-
-  public void func() {
-    member = 1;
-    static_member = 1;
-  }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:db96848489252452b75333accca343cade22650d293a85a87d3742c5c6db42ce
+size 180

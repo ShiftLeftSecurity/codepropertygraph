@@ -1,15 +1,3 @@
-package io.shiftleft.testcode.splitmeup;
-
-class TestGraph {
-
-  @Deprecated
-  public final String foo = "myLiteral1";
-
-  public final String manyArgs(String one, Integer two, Long three, Double four) {
-    return "oh wow!";
-  }
-
-  public static void main(String[] args) {
-  }
-
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:1bc1b515ee82b74a439db1bc33422e6868b305a61e6b6edbe45127aa7a761846
+size 278

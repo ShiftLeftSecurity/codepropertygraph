@@ -1,28 +1,3 @@
-package io.shiftleft.testcode.type;
-
-public class ClassHierarchyTest {
-
-  interface Interface1 {
-
-  }
-
-  interface Interface2 {
-
-  }
-
-  static class Base {
-
-  }
-
-  static class Derived extends Base {
-
-  }
-
-  static class Derived2 extends Derived {
-
-  }
-
-  static class InterfaceImplementor implements Interface1, Interface2 {
-
-  }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:8ce26a4d1b6d56d4ff5b4772e3e8b3e1ae4b39e686c889864ce4c1a0b7ae10c0
+size 333
