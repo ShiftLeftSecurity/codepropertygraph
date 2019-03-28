@@ -1,5 +1,6 @@
 package io.shiftleft.cpgloading;
 
+import io.shiftleft.codepropertygraph.generated.NodeTypes;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.Property;
@@ -14,15 +15,15 @@ import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class ProtoToCpg {
 
   TinkerGraph tinkerGraph;
   private Logger logger = LogManager.getLogger(getClass());
   private NodeFilter nodeFilter = new NodeFilter();
+  public static final Set<Integer> IGNORED_NODE_TYPES = new HashSet<>(Arrays.asList(5, 6, 7, 49));
+  public static final Set<Integer> IGNORED_NODE_KEYS = new HashSet<>(Arrays.asList(16));
 
   public ProtoToCpg() {
     this(Optional.empty());
@@ -53,10 +54,18 @@ public class ProtoToCpg {
           keyValues.add(T.id);
           keyValues.add(node.getKey());
           keyValues.add(T.label);
-          keyValues.add(node.getType().name());
-          for (Property property: properties) {
-            addProperties(keyValues, property.getName().name(), property.getValue());
+          if (IGNORED_NODE_TYPES.contains(node.getTypeValue())) {
+            // only defined for cpg-internal schema, insert an UNKOWN node without properties instead
+            keyValues.add(NodeTypes.UNKNOWN);
+          } else {
+            keyValues.add(node.getType().name());
+            for (Property property: properties) {
+              if (!IGNORED_NODE_KEYS.contains(property.getNameValue())) {
+                addProperties(keyValues, property.getName().name(), property.getValue());
+              }
+            }
           }
+
           tinkerGraph.addVertex(keyValues.toArray());
         }
       } catch (Exception exception) {

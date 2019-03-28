@@ -4,8 +4,7 @@
 
     "nodeKeys" : [
         {"id" : 8, "name": "VALUE", "comment" : "Tag value", "valueType" : "string", "cardinality" : "one"},
-        {"id": 14, "name" : "BINARY_SIGNATURE", "comment" : "Binary type signature", "valueType" : "string", "cardinality" : "zeroOrOne" },
-        {"id": 16, "name" : "SCC_ID", "comment" : "Strongly connected component(SCC) ID which is equal for all expressions in the same component. The SCC IDs start from 0 for each method.", "valueType" : "int", "cardinality" : "one"}
+        {"id": 14, "name" : "BINARY_SIGNATURE", "comment" : "Binary type signature", "valueType" : "string", "cardinality" : "zeroOrOne" }
     ],
 
     "edgeKeys" : [
@@ -73,7 +72,7 @@
               {"edgeName": "REF", "inNodes": ["NAMESPACE"]}
             ]
         },
-        { "name": "METHOD_REF", "keys" : ["SCC_ID"],
+        { "name": "METHOD_REF",
           "outEdges" : [
             {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
             {"edgeName": "REF", "inNodes": ["METHOD_INST"]}
@@ -96,13 +95,13 @@
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
         },
-        {"name" : "LITERAL", "keys" : ["SCC_ID"],
+        {"name" : "LITERAL",
           "outEdges" : [
             {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
         },
-        { "name": "CALL", "keys" : ["SCC_ID"],
+        { "name": "CALL",
           "outEdges" : [
             {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
             {"edgeName": "REF", "inNodes": ["MEMBER"]},
@@ -117,20 +116,19 @@
             {"edgeName": "CAPTURED_BY", "inNodes": ["CLOSURE_BINDING"]}
           ]
         },
-        {"name" : "IDENTIFIER", "keys" : ["SCC_ID"],
+        {"name" : "IDENTIFIER",
           "outEdges" : [
             {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
         },
-        {"name" : "RETURN", "keys" : ["SCC_ID"]},
-        {"name" : "BLOCK", "keys" : ["SCC_ID"],
+        {"name" : "BLOCK",
           "outEdges" : [
             {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
         },
-        {"name" : "UNKNOWN", "keys" : ["SCC_ID"],
+        {"name" : "UNKNOWN",
           "outEdges" : [
             {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}

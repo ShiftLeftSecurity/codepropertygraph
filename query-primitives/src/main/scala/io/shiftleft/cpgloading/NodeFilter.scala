@@ -1,6 +1,5 @@
 package io.shiftleft.cpgloading
 
-import io.shiftleft.codepropertygraph.generated.NodeKeyNames
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.Property
 import io.shiftleft.proto.cpg.Cpg.NodePropertyName
