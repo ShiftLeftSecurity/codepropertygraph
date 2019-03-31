@@ -22,14 +22,15 @@ public class ProtoToCpg {
   TinkerGraph tinkerGraph;
   private Logger logger = LogManager.getLogger(getClass());
   private NodeFilter nodeFilter = new NodeFilter();
-  public static final Set<Integer> IGNORED_NODE_TYPES = new HashSet<>(Arrays.asList(5, 6, 7, 49));
-  public static final Set<Integer> IGNORED_NODE_KEYS = new HashSet<>(Arrays.asList(14, 16));
+  public final Optional<IgnoredProtoEntries> ignoredProtoEntries;
 
-  public ProtoToCpg() {
-    this(Optional.empty());
+  public ProtoToCpg(Optional<IgnoredProtoEntries> ignoredProtoEntries) {
+    this(Optional.empty(), ignoredProtoEntries);
   }
 
-  public ProtoToCpg(Optional<OnDiskOverflowConfig> onDiskOverflowConfig) {
+  public ProtoToCpg(
+    Optional<OnDiskOverflowConfig> onDiskOverflowConfig,
+    Optional<IgnoredProtoEntries> ignoredProtoEntries) {
     Configuration configuration = TinkerGraph.EMPTY_CONFIGURATION();
     onDiskOverflowConfig.ifPresent(config -> {
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, true);
@@ -38,6 +39,7 @@ public class ProtoToCpg {
         configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_ROOT_DIR, config.alternativeParentDirectory().get());
       }
     });
+    this.ignoredProtoEntries = ignoredProtoEntries;
 
     this.tinkerGraph = TinkerGraph.open(
       configuration,
@@ -54,13 +56,13 @@ public class ProtoToCpg {
           keyValues.add(T.id);
           keyValues.add(node.getKey());
           keyValues.add(T.label);
-          if (IGNORED_NODE_TYPES.contains(node.getTypeValue())) {
+          if (ignoredProtoEntries.isPresent() && ignoredProtoEntries.get().nodeTypes().contains(node.getTypeValue())) {
             // only defined for cpg-internal schema, insert an UNKOWN node without properties instead
             keyValues.add(NodeTypes.UNKNOWN);
           } else {
             keyValues.add(node.getType().name());
             for (Property property: properties) {
-              if (!IGNORED_NODE_KEYS.contains(property.getNameValue())) {
+              if (!ignoredProtoEntries.isPresent() || !ignoredProtoEntries.get().nodeKeys().contains(property.getNameValue())) {
                 addProperties(keyValues, property.getName().name(), property.getValue());
               }
             }

@@ -24,15 +24,18 @@ import org.apache.logging.log4j.LogManager;
 public class ProtoCpgLoader {
   private static final Logger logger = LogManager.getLogger(ProtoCpgLoader.class);
 
-  public static Cpg loadFromProtoZip(String filename) {
-    return loadFromProtoZip(filename, Optional.empty());
+  public static Cpg loadFromProtoZip(String filename, Optional<IgnoredProtoEntries> ignoredProtoEntries) {
+    return loadFromProtoZip(filename, Optional.empty(), ignoredProtoEntries);
   }
 
   /**
    * Load Code Property Graph from a zip-file containing
    * CPGs in proto format.
    **/
-  public static Cpg loadFromProtoZip(String filename, Optional<OnDiskOverflowConfig> onDiskOverflowConfig) {
+  public static Cpg loadFromProtoZip(
+    String filename,
+    Optional<OnDiskOverflowConfig> onDiskOverflowConfig,
+    Optional<IgnoredProtoEntries> ignoredProtoEntries) {
     File tempDir = null;
     try {
       tempDir = Files.createTempDirectory("cpg2sp_proto").toFile();
@@ -40,7 +43,7 @@ public class ProtoCpgLoader {
       extractIntoTemporaryDirectory(filename, tempDirPathName);
       long start;
       start = System.currentTimeMillis();
-      Cpg cpg = ProtoCpgLoader.loadFromProtobufDirectory(tempDirPathName, onDiskOverflowConfig);
+      Cpg cpg = ProtoCpgLoader.loadFromProtobufDirectory(tempDirPathName, onDiskOverflowConfig, ignoredProtoEntries);
       logger.info("CPG construction finished in " +
           (System.currentTimeMillis() - start) + "ms.");
 
@@ -114,9 +117,12 @@ public class ProtoCpgLoader {
    * Load Code Property Graph from a directory containing
    * CPGs in proto format.
    **/
-  public static Cpg loadFromProtobufDirectory(String inputDirectory, Optional<OnDiskOverflowConfig> onDiskOverflowConfig)
+  public static Cpg loadFromProtobufDirectory(
+    String inputDirectory,
+    Optional<OnDiskOverflowConfig> onDiskOverflowConfig,
+    Optional<IgnoredProtoEntries> ignoredProtoEntries)
       throws IOException {
-    ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig);
+    ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig, ignoredProtoEntries);
     for (File file : getFilesInDirectory(new File(inputDirectory))) {
       // TODO: use ".bin" extensions in proto output, and then only
       // load files with ".bin" extension here.
@@ -139,8 +145,11 @@ public class ProtoCpgLoader {
     return builder.build();
   }
 
-  public static Cpg loadFromInputStream(InputStream inputStream) throws IOException {
-    ProtoToCpg builder = new ProtoToCpg();
+  public static Cpg loadFromInputStream(
+    InputStream inputStream,
+    Optional<OnDiskOverflowConfig> onDiskOverflowConfig,
+    Optional<IgnoredProtoEntries> ignoredProtoEntries) throws IOException {
+    ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig, ignoredProtoEntries);
     try {
       consumeInputStream(builder, inputStream);
     } finally {
@@ -171,8 +180,11 @@ public class ProtoCpgLoader {
   /**
    * Load code property graph from a list of CPGs in proto format.
    **/
-  public static Cpg loadFromListOfProtos(List<CpgStruct> cpgs) {
-    ProtoToCpg builder = new ProtoToCpg();
+  public static Cpg loadFromListOfProtos(
+    List<CpgStruct> cpgs,
+    Optional<OnDiskOverflowConfig> onDiskOverflowConfig,
+    Optional<IgnoredProtoEntries> ignoredProtoEntries) {
+    ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig, ignoredProtoEntries);
 
     for (CpgStruct cpgStruct : cpgs)
       builder.addNodes(cpgStruct.getNodeList());
