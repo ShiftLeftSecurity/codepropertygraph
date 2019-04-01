@@ -27,7 +27,7 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
       var worklist = Set[Vertex]()
       var out = Map[Vertex, Set[Vertex]]().withDefaultValue(Set[Vertex]())
       var in = Map[Vertex, Set[Vertex]]().withDefaultValue(Set[Vertex]())
-      val allCfgNodes = ExpandTo.allCfgNodesOfMethod(method)
+      val allCfgNodes = ExpandTo.allCfgNodesOfMethod(method).toList
 
       val mapExpressionsGens = dfHelper.expressionsToGenMap(method).withDefaultValue(Set[Vertex]())
       val mapExpressionsKills = dfHelper.expressionsToKillMap(method).withDefaultValue(Set[Vertex]())
