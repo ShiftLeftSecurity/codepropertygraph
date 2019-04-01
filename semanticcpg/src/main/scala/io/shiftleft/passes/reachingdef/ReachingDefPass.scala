@@ -17,7 +17,8 @@ import scala.collection.JavaConverters._
 class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
   var dfHelper: DataFlowFrameworkHelper = _
 
-  override def run(): Unit = {
+  override def run(): Stream[DiffGraph] = {
+    val dstGraph = new DiffGraph()
     val methods = graph.V.hasLabel(NodeTypes.METHOD).l
 
     dfHelper = new DataFlowFrameworkHelper(graph)
@@ -65,6 +66,8 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
 
       addReachingDefEdge(dstGraph, method, out, in)
     }
+
+    Stream(dstGraph)
   }
 
   /** Pruned DDG, i.e., two call assignment vertices are adjacent if a
@@ -76,27 +79,28 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
                                  inSet: Map[Vertex, Set[Vertex]]): Unit = {
 
     def addEdge(v0: Vertex, v1: Vertex): Unit = {
-      dstGraph.addEdgeInOriginal(v0, v1, EdgeTypes.REACHING_DEF)
+      dstGraph.addEdgeInOriginal(v0.asInstanceOf[nodes.StoredNode], v1.asInstanceOf[nodes.StoredNode], EdgeTypes.REACHING_DEF)
     }
 
-    method.vertices(Direction.OUT, EdgeTypes.AST).asScala.filter(_.label == "METHOD_PARAMETER_IN").foreach { mPI =>
+    method.vertices(Direction.OUT, EdgeTypes.AST).asScala.filter(_.isInstanceOf[nodes.MethodParameterIn]).foreach { mPI =>
       mPI.vertices(Direction.IN, EdgeTypes.REF).asScala.foreach { refInIdentifier =>
         dfHelper.getOperation(refInIdentifier).foreach(operationNode => addEdge(method, operationNode))
       }
     }
 
-    ExpandTo.methodToMethodReturn(method).foreach { methodReturn =>
-      ExpandTo.methodReturnToReturn(methodReturn).foreach(returnVertex => addEdge(returnVertex, methodReturn))
-    }
+    val methodReturn = ExpandTo.methodToFormalReturn(method)
+
+    ExpandTo.formalReturnToReturn(methodReturn)
+      .foreach(returnVertex => addEdge(returnVertex, methodReturn))
 
     outSet.foreach { case (node, outDefs) =>
-      if (node.label == "CALL") {
+      if (node.isInstanceOf[nodes.Call]) {
         val usesInExpression = dfHelper.getUsesOfExpression(node)
         var localRefsUses = usesInExpression.map(ExpandTo.reference(_)).filter(_ != None)
 
         /* if use is not an identifier, add edge, as we are going to visit the use separately */
         usesInExpression.foreach { use =>
-          if (use.label != "IDENTIFIER" && use.label != "LITERAL") {
+          if (!use.isInstanceOf[nodes.Identifier] && !use.isInstanceOf[nodes.Literal]) {
             addEdge(use, node)
           }
         }
@@ -119,7 +123,7 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
             }
           }
         }
-      } else if (node.label == "RETURN") {
+      } else if (node.isInstanceOf[nodes.Return]) {
         node.vertices(Direction.OUT, EdgeTypes.AST).asScala.foreach { returnExpr =>
           val localRef = ExpandTo.reference(returnExpr)
           inSet(node).filter(inElement => localRef == ExpandTo.reference(inElement)).foreach { filteredInElement =>
@@ -158,7 +162,7 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
   }
 
   private def isOperationAndAssignment(vertex: Vertex): Boolean = {
-    if (vertex.label != NodeTypes.CALL) {
+    if (!vertex.isInstanceOf[nodes.Call]) {
       return false
     }
 
@@ -238,7 +242,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
   }
 
   def getExpressionFromGen(genVertex: Vertex): Option[Vertex] = {
-    getOperation(genVertex).filter(_.label == NodeTypes.CALL)
+    getOperation(genVertex).filter(_.isInstanceOf[nodes.Call])
   }
 
   /** Returns a set of vertices that are killed by the passed vertex */
@@ -276,10 +280,10 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
   }
 
   def getOperation(vertex: Vertex): Option[Vertex] = {
-    vertex.label match {
-      case NodeTypes.IDENTIFIER => getOperation(vertex.vertices(Direction.IN, EdgeTypes.AST).next)
-      case NodeTypes.CALL       => Some(vertex)
-      case NodeTypes.RETURN     => Some(vertex)
+    vertex match {
+      case _: nodes.Identifier => getOperation(vertex.vertices(Direction.IN, EdgeTypes.AST).next)
+      case _: nodes.Call => Some(vertex)
+      case _: nodes.Return => Some(vertex)
       case _                    => None
     }
   }

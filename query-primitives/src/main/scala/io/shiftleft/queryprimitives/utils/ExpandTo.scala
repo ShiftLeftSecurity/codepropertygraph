@@ -72,6 +72,12 @@ object ExpandTo {
       .next()
   }
 
+  def formalReturnToReturn(methodReturn: Vertex): Seq[Vertex] = {
+    methodReturn.vertices(Direction.IN, EdgeTypes.CFG).asScala
+      .filter(_.isInstanceOf[nodes.Return])
+      .toSeq
+  }
+
   def expressionToMethod(expression: Vertex): Vertex = {
     expression.vertices(Direction.IN, EdgeTypes.CONTAINS).nextChecked
   }
@@ -118,4 +124,24 @@ object ExpandTo {
     }
     fileOption
   }
+
+  def methodToOutParameters(method: Vertex): Seq[Vertex] = {
+    method.vertices(Direction.OUT, EdgeTypes.AST).asScala
+      .filter(_.isInstanceOf[nodes.MethodParameterOut])
+      .toSeq
+  }
+
+  def allCfgNodesOfMethod(method: Vertex): TraversableOnce[Vertex] = {
+    method.vertices(Direction.OUT, EdgeTypes.CONTAINS).asScala
+  }
+
+  def reference(node: Vertex): Option[Vertex] = {
+    val iterator = node.vertices(Direction.OUT, EdgeTypes.REF).asScala
+    if (iterator.hasNext) {
+      Some(iterator.next)
+    } else {
+      None
+    }
+  }
+
 }
