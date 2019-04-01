@@ -10,7 +10,9 @@ import shapeless.{HList, HNil}
 
 import scala.language.implicitConversions
 
-object Implicits {
+object Implicits extends Implicits // to allow for a hierarchy of implicits
+
+trait Implicits {
 
   private def newAnonymousTraversalWithAssociatedGraph[NodeType <: nodes.StoredNode](
       seq: NodeType*) = {
