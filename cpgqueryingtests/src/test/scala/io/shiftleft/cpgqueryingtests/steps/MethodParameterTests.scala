@@ -7,8 +7,6 @@ import org.scalatest.{Matchers, WordSpec}
 
 class MethodParameterTests extends WordSpec with Matchers {
   val fixture = CpgTestFixture("methodparameter")
-  import gremlin.scala.Graph
-  implicit val graph: Graph = fixture.cpg.graph
 
   "generic cpg" should {
 
@@ -51,7 +49,8 @@ class MethodParameterTests extends WordSpec with Matchers {
           val args: List[nodes.MethodParameterIn] =
             fixture.cpg.method.name("manyArgs").parameter.indexTo(2).toList
 
-          args.map(_.start.typ.head.fullName).toSet shouldBe Set("java.lang.String", "java.lang.Integer")
+          args.map(_.start.typ.head.fullName).toSet shouldBe Set("java.lang.String",
+                                                                 "java.lang.Integer")
         }
       }
     }
