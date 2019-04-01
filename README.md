@@ -68,9 +68,10 @@ format.
 The Code Property Graph is a directed, edge-labeled, attributed
 multigraph, or property graph for short (see [1]). A property graph
 is the generic data structure underlying many contemporary graph
-databases (e.g., Tinkergraph, Neo4J, Janusgraph). As a result, data
-representations based on property graphs are immediately amenable
-to graph database technologies.
+databases. As a result, data representations based on property graphs
+are immediately amenable to graph database technologies. That being said, 
+we've made some optimizations that (as of April 2019) require to use the
+open source ShiftLeft Tinkergraph [3].
 
 Property graphs alone are comparable in generality to hash tables and
 linked lists. To tailor them towards storing, transmitting, and
@@ -351,40 +352,22 @@ free-text strings.
 <!-- layers later in the processing pipeline for code analysis systems. -->
 
 
-# Loading a codepropertygraph into a specific graph db
-Cpg loading/querying should work for any Tinkerpop-enabled database. Here's how you can load a cpg for a few example databases in the sbt console - the next section will list some queries you can interactively run from there.
+# Loading a codepropertygraph
+Here's how you can load a cpg into ShiftLeft Tinkergraph [3] in the sbt console - the next section will list some queries you can interactively run from there.
 
 There are some sample cpgs in this repository in the `resources/cpgs` directory.
 
 ### [Tinkergraph (in memory reference db)](http://tinkerpop.apache.org/docs/current/reference/#tinkergraph-gremlin)
 ```
-sbt cpgloaderTinkergraph/console
+sbt semanticcpg/console
 ```
 ```scala
-val cpg = io.shiftleft.cpgloading.tinkergraph.CpgLoader.loadCodePropertyGraph("cpg.bin.zip")
-```
-
-### [Neo4j](http://tinkerpop.apache.org/docs/current/reference/#neo4j-gremlin)
-```
-rm -rf /tmp/cpg_data
-sbt cpgloaderNeo4j/console
-```
-```scala
-val dbPath = "/tmp/cpg_data"
-val loader = new io.shiftleft.cpgloading.neo4j.CpgLoader(dbPath)
-val cpg = loader.loadCodePropertyGraph("cpg.bin.zip")
-```
-### [Janusgraph](http://janusgraph.org/)
-```
-sbt cpgloaderJanusgraph/console
-```
-```scala
-val cpg = io.shiftleft.cpgloading.janusgraph.CpgLoader.loadCodePropertyGraph("cpg.bin.zip")
+val cpg = io.shiftleft.CpgLoader.loadCodePropertyGraph("cpg.bin.zip")
 ```
 
 # Querying the cpg
 Once you've loaded a cpg you can run queries, which are provided by the `query-primitives` subproject. Note that if you're in the sbt shell you can play with it interactively: `TAB` completion is your friend. Otherwise your IDE will assist. 
-Don't forget to run `import io.shiftleft.queryprimitives.steps.Implicits._`.
+Don't forget to `import io.shiftleft.queryprimitives.steps.Implicits._`.
 
 Here are some simple traversals to get all the base nodes. Running all of these without errors is a good test to ensure that your cpg is valid: 
 
@@ -396,7 +379,7 @@ cpg.file.toList
 cpg.namespace.toList
 cpg.types.toList
 cpg.methodReturn.toList
-cpg.param.toList
+cpg.parameter.toList
 cpg.member.toList
 cpg.call.toList
 cpg.local.toList
@@ -404,13 +387,13 @@ cpg.identifier.toList
 cpg.argument.toList
 cpg.typeDecl.toList
 cpg.method.toList
-cpg.methodInst.toList
+cpg.methodInstance.toList
 ```
 
 From here you can traverse through the cpg. The query-primitives DSL ensures that only valid steps are available - anything else will result in a compile error:
 
 ```scala
-pg.method.name("getAccountList").parameter.toList
+cpg.method.name("getAccountList").parameter.toList
 /* List(
  *   MethodParameterIn(Some(v[7054781587948444580]),this,0,this,BY_SHARING,io.shiftleft.controller.AccountController,Some(28),None,None,None), 
  *   MethodParameterIn(Some(v[7054781587948444584]),request,2,request,BY_SHARING,javax.servlet.http.HttpServletRequest,Some(28),None,None,None),
