@@ -35,6 +35,11 @@
              {"edgeName": "CONTAINS", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]}
           ]
         },
+        { "name": "RETURN",
+          "outEdges" : [
+             {"edgeName": "REACHING_DEF", "inNodes": ["METHOD_RETURN"]}
+          ]
+        },
         { "name": "METHOD_INST",
           "outEdges" : [
              {"edgeName": "REF", "inNodes": ["METHOD"]}
