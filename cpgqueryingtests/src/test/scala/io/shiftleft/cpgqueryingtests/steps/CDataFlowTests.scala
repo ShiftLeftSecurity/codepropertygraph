@@ -35,7 +35,6 @@ class CDataFlowTests extends CpgDataFlowTests {
 
     val source = cpg.identifier.name("sz")
     val sink = cpg.call.name("read")
-    toTrackingPoint(source)
     val flows = sink.reachableByFlows(source).l
 
     flows.size shouldBe 6
