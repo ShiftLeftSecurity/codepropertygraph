@@ -1,3 +1,4 @@
+name := "codepropertygraph"
 inThisBuild(
   List(
     organization := "io.shiftleft",
