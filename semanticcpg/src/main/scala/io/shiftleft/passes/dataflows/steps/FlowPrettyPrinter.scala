@@ -7,7 +7,7 @@ import dnl.utils.text.table.TextTable
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps._
-import io.shiftleft.passes.dataflows._
+import io.shiftleft.passes.dataflows.Implicits._
 
 object FlowPrettyPrinter {
   def prettyPrint(path: List[nodes.TrackingPoint]): String = {
