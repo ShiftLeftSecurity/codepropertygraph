@@ -86,7 +86,7 @@ class CDataFlowTests extends CpgDataFlowTests {
     val sink = cpg.method.name("free").parameter.argument
     val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 6
+    flows.size shouldBe 5
 
     flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
       Set(
@@ -96,13 +96,6 @@ class CDataFlowTests extends CpgDataFlowTests {
         ),
         List[(String, Option[Integer])](
           ("*p = head", 8),
-          ("p->next", 9),
-          ("q = p->next", 9),
-          ("p = q", 8),
-          ("free(p)", 10)
-        ),
-        List[(String, Option[Integer])](
-          ("p->next", 9),
           ("q = p->next", 9),
           ("p = q", 8),
           ("free(p)", 10)
