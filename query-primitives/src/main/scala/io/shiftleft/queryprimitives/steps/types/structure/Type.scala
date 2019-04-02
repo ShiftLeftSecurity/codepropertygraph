@@ -1,20 +1,18 @@
 package io.shiftleft.queryprimitives.steps.types.structure
 
 import gremlin.scala._
-import gremlin.scala.dsl.Converter
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.queryprimitives.steps.CpgSteps
+import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
 import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{Declaration, Expression}
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{FullNameAccessors, NameAccessors}
 import shapeless.{HList, HNil}
 
-class Type[Labels <: HList](raw: GremlinScala[Vertex])
-    extends CpgSteps[nodes.Type, Labels](raw)
+class Type[Labels <: HList](raw: GremlinScala.Aux[nodes.Type, Labels])
+    extends NodeSteps[nodes.Type, Labels](raw)
     with NameAccessors[nodes.Type, Labels]
     with FullNameAccessors[nodes.Type, Labels] {
-  override val converter = Converter.forDomainNode[nodes.Type]
 
   /**
     * Namespaces in which the corresponding type declaration is defined.
@@ -75,21 +73,21 @@ class Type[Labels <: HList](raw: GremlinScala[Vertex])
     * Type declaration which is referenced by this type.
     */
   def referencedTypeDecl: TypeDecl[Labels] =
-    new TypeDecl[Labels](raw.out(EdgeTypes.REF))
+    new TypeDecl[Labels](raw.out(EdgeTypes.REF).cast[nodes.TypeDecl])
 
   /**
     * Type declarations which derive from this type.
     */
   def derivedTypeDecl: TypeDecl[Labels] =
-    new TypeDecl[Labels](raw.in(EdgeTypes.INHERITS_FROM))
+    new TypeDecl[Labels](raw.in(EdgeTypes.INHERITS_FROM).cast[nodes.TypeDecl])
 
   def localsOfType: Local[Labels] =
-    new Local[Labels](raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL))
+    new Local[Labels](raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
 
   def expressionOfType: Expression[Labels] =
     new Expression[Labels](
       raw
         .in(EdgeTypes.EVAL_TYPE)
         .hasLabel(NodeTypes.IDENTIFIER, NodeTypes.CALL, NodeTypes.LITERAL)
-    )
+        .cast[nodes.Expression])
 }

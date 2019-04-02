@@ -2,8 +2,8 @@ package io.shiftleft.queryprimitives.utils
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex}
+import io.shiftleft.queryprimitives.steps.Implicits._
 
 import scala.collection.JavaConverters._
 
@@ -23,6 +23,26 @@ object ExpandTo {
     callReceiverOption(callNode).get
   }
 
+  def callArguments(callNode: Vertex): Iterator[nodes.Expression] = {
+    callNode.vertices(Direction.OUT, EdgeTypes.AST).asScala.map(_.asInstanceOf[nodes.Expression])
+  }
+
+  def argumentToCallOrReturn(argument: Vertex): nodes.Expression = {
+    val parent = argument.vertices(Direction.IN, EdgeTypes.AST).nextChecked
+
+    parent match {
+      case call: nodes.Call
+          if call.name == Operators.memberAccess ||
+            call.name == Operators.indirectMemberAccess ||
+            call.name == Operators.computedMemberAccess ||
+            call.name == Operators.indirectComputedMemberAccess ||
+            call.name == Operators.indirection =>
+        argumentToCallOrReturn(call)
+      case expression: nodes.Expression =>
+        expression
+    }
+  }
+
   def typeCarrierToType(parameterNode: Vertex): Vertex = {
     parameterNode.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).nextChecked
   }
@@ -35,19 +55,28 @@ object ExpandTo {
     formalReturnNode.vertices(Direction.IN, EdgeTypes.AST).nextChecked
   }
 
+  def returnToReturnedExpression(returnExpression: Vertex): Option[nodes.Expression] = {
+    val it = returnExpression.vertices(Direction.OUT, EdgeTypes.AST)
+    if (it.hasNext) {
+      Some(it.next.asInstanceOf[nodes.Expression])
+    } else {
+      None
+    }
+  }
+
   def methodToFormalReturn(method: Vertex): Vertex = {
     method
       .vertices(Direction.OUT, EdgeTypes.AST)
       .asScala
-      .filter(_.label == NodeTypes.METHOD_RETURN)
+      .filter(_.isInstanceOf[nodes.MethodReturn])
       .next()
   }
 
-  def methodToOutParameters(method: Vertex): Seq[Vertex] = {
-    method
-      .vertices(Direction.OUT, EdgeTypes.AST)
+  def formalReturnToReturn(methodReturn: Vertex): Seq[Vertex] = {
+    methodReturn
+      .vertices(Direction.IN, EdgeTypes.CFG)
       .asScala
-      .filter(_.label == NodeTypes.METHOD_PARAMETER_OUT)
+      .filter(_.isInstanceOf[nodes.Return])
       .toSeq
   }
 
@@ -65,24 +94,24 @@ object ExpandTo {
       .asScala
       .exists(astChild =>
         astChild.label == NodeTypes.MODIFIER &&
-          astChild.value2(NodeKeys.MODIFIER_TYPE) == modifierType)
+          astChild.asInstanceOf[nodes.Modifier].modifierType == modifierType)
   }
 
   def astParent(expression: Vertex): Vertex = {
     expression.vertices(Direction.IN, EdgeTypes.AST).nextChecked
   }
 
-  def callToCalledMethod(call: Vertex): Seq[Vertex] = {
+  def callToCalledMethod(call: Vertex): Seq[nodes.Method] = {
     call
       .vertices(Direction.OUT, EdgeTypes.CALL)
       .asScala
-      .map(methodInst => methodInst.vertices(Direction.OUT, EdgeTypes.REF).nextChecked)
+      .map(methodInst => methodInst.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method])
       .toSeq
   }
 
   def methodToTypeDecl(method: Vertex): Option[Vertex] = {
     var typeDeclOption = method.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
-    while (typeDeclOption.isDefined && typeDeclOption.get.label != NodeTypes.TYPE_DECL) {
+    while (typeDeclOption.isDefined && !typeDeclOption.get.isInstanceOf[nodes.TypeDecl]) {
       typeDeclOption = typeDeclOption.get.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
     }
     typeDeclOption
@@ -90,31 +119,22 @@ object ExpandTo {
 
   def methodToFile(method: Vertex): Option[Vertex] = {
     var fileOption = method.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
-    while (fileOption.isDefined && fileOption.get.label != NodeTypes.FILE) {
+    while (fileOption.isDefined && !fileOption.get.isInstanceOf[nodes.File]) {
       fileOption = fileOption.get.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
     }
     fileOption
   }
 
-  def allCfgNodesOfMethod(method: Vertex): Set[Vertex] = {
-    var worklist = method :: Nil
+  def methodToOutParameters(method: Vertex): Seq[Vertex] = {
+    method
+      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asScala
+      .filter(_.isInstanceOf[nodes.MethodParameterOut])
+      .toSeq
+  }
 
-    var cfgNodes = Set[Vertex]()
-
-    while (worklist.nonEmpty) {
-      val cfgNode = worklist.head
-      worklist = worklist.tail
-      cfgNodes += cfgNode
-
-      val newCfgSuccessors = cfgNode
-        .vertices(Direction.OUT, EdgeTypes.CFG)
-        .asScala
-        .filter(cfgSuccessor => !cfgNodes.contains(cfgSuccessor))
-        .toList
-
-      worklist ++= newCfgSuccessors
-    }
-    cfgNodes
+  def allCfgNodesOfMethod(method: Vertex): TraversableOnce[Vertex] = {
+    method.vertices(Direction.OUT, EdgeTypes.CONTAINS).asScala
   }
 
   def reference(node: Vertex): Option[Vertex] = {
@@ -126,22 +146,4 @@ object ExpandTo {
     }
   }
 
-  def methodReturnToReturn(node: Vertex): Seq[Vertex] = {
-    if (node.label == NodeTypes.METHOD_RETURN) {
-      node.vertices(Direction.IN, EdgeTypes.CFG)
-        .asScala
-        .filter(_.label == NodeTypes.RETURN)
-        .toSeq
-    } else {
-      Seq()
-    }
-  }
-
-  def methodToMethodReturn(node: Vertex): Option[Vertex] = {
-    node.vertices(Direction.OUT, EdgeTypes.AST)
-      .asScala
-      .filter(_.label == NodeTypes.METHOD_RETURN)
-      .toList
-      .headOption
-  }
 }

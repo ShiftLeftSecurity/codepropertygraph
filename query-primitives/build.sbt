@@ -5,6 +5,7 @@ dependsOn(Projects.codepropertygraph, Projects.protoBindings)
 libraryDependencies ++= Seq(
   "org.json4s" %% "json4s-native" % "3.5.2",
   "commons-io" % "commons-io" % "2.5",
+  "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0",
   "org.scalatest" %% "scalatest" % "3.0.3" % Test
 )
 

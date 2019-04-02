@@ -1,8 +1,8 @@
 package io.shiftleft.queryprimitives.steps.starters
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.queryprimitives.steps.CpgSteps
+import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
 import io.shiftleft.queryprimitives.steps.Implicits._
 import shapeless.HNil
 
@@ -20,14 +20,27 @@ object Cpg {
 
   @param graph the underlying graph
   */
-class Cpg(val graph: Graph) extends NodeTypeStarters {
+class Cpg(val graph: Graph) {
 
   /**
     The underlying graph.
 
     This member provides raw access to the underlying graph.
     */
-  implicit lazy val scalaGraph =
+  implicit lazy val scalaGraph: ScalaGraph =
     graph.asScala
+
+  /**
+    Begin traversal at set of nodes
+    */
+  def atDomainVertices[NodeType <: nodes.StoredNode](domainVertices: Seq[NodeType]): NodeSteps[NodeType, HNil] =
+    atVerticesWithId(domainVertices.map(_.id))
+
+  /**
+    Begin traversal at set of nodes - specified by their ids
+    */
+  def atVerticesWithId[NodeType <: nodes.StoredNode](ids: Seq[Any]): NodeSteps[NodeType, HNil] =
+    if (ids.size == 0) new NodeSteps[NodeType, HNil](scalaGraph.V(-1).cast[NodeType])
+    else new NodeSteps[NodeType, HNil](scalaGraph.V(ids: _*).cast[NodeType])
 
 }

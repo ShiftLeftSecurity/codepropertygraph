@@ -1,6 +1,5 @@
 package io.shiftleft.cpgqueryingtests.steps
 
-import gremlin.scala._
 import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.Implicits._
@@ -46,4 +45,161 @@ class TypeTests extends WordSpec with Matchers {
     }
   }
 
+  "ClassHierarchyTest for type declarations" should {
+    "have class Base as base class of class Derived" in {
+      def queryResult: List[nodes.TypeDecl] =
+        fixture.cpg.typeDecl
+          .name(".*Derived")
+          .baseTypeDecl
+          .name(".*Base")
+          .toList
+
+      queryResult.size shouldBe 1
+    }
+
+    "have class Dervied as derived class of class Base" in {
+      def queryResult: List[nodes.TypeDecl] =
+        fixture.cpg.typeDecl
+          .name(".*Base")
+          .derivedTypeDecl
+          .name(".*Derived")
+          .toList
+
+      queryResult.size shouldBe 1
+    }
+
+    "have classes Interface1, Interface2 and Object as base classes of class InterfaceImplementor" in {
+      def queryResult: List[nodes.TypeDecl] =
+        fixture.cpg.typeDecl
+          .name(".*InterfaceImplementor")
+          .baseTypeDecl
+          .toList
+
+      queryResult.size shouldBe 3
+      queryResult.map(_.name).toSet shouldBe
+        Set("ClassHierarchyTest$Interface1", "ClassHierarchyTest$Interface2", "Object")
+    }
+
+    "have class InterfaceImplementor as derived class of class Interface1" in {
+      def queryResult: List[nodes.TypeDecl] =
+        fixture.cpg.typeDecl
+          .name(".*Interface1")
+          .derivedTypeDecl
+          .name(".*InterfaceImplementor")
+          .toList
+
+      queryResult.size shouldBe 1
+    }
+
+    "have class InterfaceImplementor as derived class of class Interface2" in {
+      def queryResult: List[nodes.TypeDecl] =
+        fixture.cpg.typeDecl
+          .name(".*Interface2")
+          .derivedTypeDecl
+          .name(".*InterfaceImplementor")
+          .toList
+
+      queryResult.size shouldBe 1
+    }
+
+    "have Derived and Derived2 as transitive derived types of Base" in {
+      def queryResult: List[nodes.TypeDecl] =
+        fixture.cpg.typeDecl
+          .name(".*Base")
+          .derivedTypeDeclTransitive
+          .toList
+
+      queryResult.map(_.name).toSet shouldBe Set("ClassHierarchyTest$Derived", "ClassHierarchyTest$Derived2")
+    }
+
+    "have Base and Object as transitive base types of Derived" in {
+      def queryResult: List[nodes.TypeDecl] =
+        fixture.cpg.typeDecl
+          .name(".*Derived")
+          .baseTypeDeclTransitive
+          .toList
+
+      queryResult.map(_.name).toSet shouldBe Set("ClassHierarchyTest$Base", "Object")
+    }
+
+  }
+
+  "ClassHierarchyTest for types" should {
+    "have class Base as base class of class Derived" in {
+      def queryResult: List[nodes.Type] =
+        fixture.cpg.types
+          .name(".*Derived")
+          .baseType
+          .name(".*Base")
+          .toList
+
+      queryResult.size shouldBe 1
+    }
+
+    "have class Dervied as derived class of class Base" in {
+      def queryResult: List[nodes.Type] =
+        fixture.cpg.types
+          .name(".*Base")
+          .derivedType
+          .name(".*Derived")
+          .toList
+
+      queryResult.size shouldBe 1
+    }
+
+    "have classes Interface1, Interface2 and Object as base classes of class InterfaceImplementor" in {
+      def queryResult: List[nodes.Type] =
+        fixture.cpg.types
+          .name(".*InterfaceImplementor")
+          .baseType
+          .toList
+
+      queryResult.size shouldBe 3
+      queryResult.map(_.name).toSet shouldBe
+        Set("ClassHierarchyTest$Interface1", "ClassHierarchyTest$Interface2", "Object")
+    }
+
+    "have class InterfaceImplementor as derived class of class Interface1" in {
+      def queryResult: List[nodes.Type] =
+        fixture.cpg.types
+          .name(".*Interface1")
+          .derivedType
+          .name(".*InterfaceImplementor")
+          .toList
+
+      queryResult.size shouldBe 1
+    }
+
+    "have class InterfaceImplementor as derived class of class Interface2" in {
+      def queryResult: List[nodes.Type] =
+        fixture.cpg.types
+          .name(".*Interface2")
+          .derivedType
+          .name(".*InterfaceImplementor")
+          .toList
+
+      queryResult.size shouldBe 1
+    }
+
+    "have Derived and Derived2 as transitive derived types of Base" in {
+      def queryResult: List[nodes.Type] =
+        fixture.cpg.types
+          .name(".*Base")
+          .derivedTypeTransitive
+          .toList
+
+      queryResult.map(_.name).toSet shouldBe Set("ClassHierarchyTest$Derived", "ClassHierarchyTest$Derived2")
+    }
+
+    "have Base and Object as transitive base types of Derived" in {
+      def queryResult: List[nodes.Type] =
+        fixture.cpg.types
+          .name(".*Derived")
+          .baseTypeTransitive
+          .toList
+
+      queryResult.map(_.name).toSet shouldBe Set("ClassHierarchyTest$Base", "Object")
+    }
+
+  }
 }

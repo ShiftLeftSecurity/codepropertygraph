@@ -3,6 +3,7 @@ package io.shiftleft.cpgqueryingtests.steps
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps.starters.Cpg
+import io.shiftleft.queryprimitives.steps._
 import io.shiftleft.queryprimitives.steps.types.expressions.Literal
 import io.shiftleft.queryprimitives.steps.types.structure.{Member, Method}
 import org.scalatest.{Matchers, WordSpec}
@@ -28,7 +29,7 @@ class CpgDataFlowTests extends WordSpec with Matchers {
     cpg.typeDecl.nameExact(typeName).method.literal.codeExact(literalName)
   }
 
-  protected def flowToResultPairs(flow: List[nodes.DataFlowObject]): List[(String, Option[Integer])] = {
-    flow.map(point => (point.code, point.lineNumber))
+  protected def flowToResultPairs(flow: List[nodes.TrackingPoint]): List[(String, Option[Integer])] = {
+    flow.map(point => (point.cfgNode.code, point.cfgNode.lineNumber))
   }
 }

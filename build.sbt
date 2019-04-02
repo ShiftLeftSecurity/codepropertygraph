@@ -1,3 +1,4 @@
+name := "codepropertygraph"
 inThisBuild(
   List(
     organization := "io.shiftleft",
@@ -43,10 +44,6 @@ lazy val codepropertygraph = Projects.codepropertygraph
 lazy val protoBindings = Projects.protoBindings
 lazy val queryPrimitives = Projects.queryPrimitives
 lazy val enhancements = Projects.enhancements
-lazy val cpgloaderTinkergraph = Projects.cpgloaderTinkergraph
-lazy val cpgloaderTinkergraphShiftleft = Projects.cpgloaderTinkergraphShiftleft
-lazy val cpgloaderJanusgraph = Projects.cpgloaderJanusgraph
-lazy val cpgloaderNeo4j = Projects.cpgloaderNeo4j
 lazy val cpgqueryingtests = Projects.cpgqueryingtests
 lazy val semanticcpg = Projects.semanticcpg
 

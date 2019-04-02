@@ -1,8 +1,11 @@
 package io.shiftleft.diffgraph
 
-import gremlin.scala.{Edge, ScalaGraph, Vertex}
-import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node}
-import scala.collection.mutable.ListBuffer
+import gremlin.scala.{Edge, ScalaGraph}
+import io.shiftleft.{IdentityHashWrapper}
+import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
+import java.lang.{Long => JLong}
+
+import scala.collection.mutable
 
 /**
   * A lightweight write-only graph used for creation of CPG graph overlays
@@ -19,17 +22,19 @@ import scala.collection.mutable.ListBuffer
 class DiffGraph {
   import DiffGraph._
 
-  private val _nodes: ListBuffer[NewNode] = ListBuffer()
-  private val _edges: ListBuffer[EdgeInDiffGraph] = ListBuffer()
-  private val _edgesToOriginal: ListBuffer[EdgeToOriginal] = ListBuffer()
-  private val _edgesFromOriginal: ListBuffer[EdgeFromOriginal] = ListBuffer()
-  private val _edgesInOriginal: ListBuffer[EdgeInOriginal] = ListBuffer()
-  private val _nodeProperties: ListBuffer[NodeProperty] = ListBuffer()
-  private val _edgeProperties: ListBuffer[EdgeProperty] = ListBuffer()
+  private val _edges = mutable.ListBuffer.empty[EdgeInDiffGraph]
+  private val _edgesToOriginal = mutable.ListBuffer.empty[EdgeToOriginal]
+  private val _edgesFromOriginal = mutable.ListBuffer.empty[EdgeFromOriginal]
+  private val _edgesInOriginal = mutable.ListBuffer.empty[EdgeInOriginal]
+  private val _nodeProperties = mutable.ListBuffer.empty[NodeProperty]
+  private val _edgeProperties = mutable.ListBuffer.empty[EdgeProperty]
 
-  private val diffGraphApplier = new DiffGraphApplier()
+  private var _nodes = Set[IdentityHashWrapper[NewNode]]()
 
-  def nodes: List[NewNode] = _nodes.toList
+  /* this could be done much nicer if we wouldn't hold the DiffGraph locally in the CpgPass  */
+  private var applied = false
+
+  def nodes: List[NewNode] = _nodes.toList.map(_.value)
   def edges: List[EdgeInDiffGraph] = _edges.toList
   def edgesToOriginal: List[EdgeToOriginal] = _edgesToOriginal.toList
   def edgesFromOriginal: List[EdgeFromOriginal] = _edgesFromOriginal.toList
@@ -37,15 +42,19 @@ class DiffGraph {
   def nodeProperties: List[NodeProperty] = _nodeProperties.toList
   def edgeProperties: List[EdgeProperty] = _edgeProperties.toList
 
-  def applyDiff(graph: ScalaGraph): Unit = {
-    diffGraphApplier.applyDiff(this, graph)
+  def applyDiff(graph: ScalaGraph): AppliedDiffGraph = {
+    assert(!applied, "DiffGraph has already been applied, this is probably a bug")
+    val appliedDiffGraph = new DiffGraphApplier().applyDiff(this, graph)
+    applied = true
+    appliedDiffGraph
   }
 
-  def addNode[A <: NewNode](node: A): Unit =
-    _nodes.append(node)
+  def addNode(node: NewNode): Unit = {
+    _nodes += IdentityHashWrapper(node)
+  }
 
   def mergeFrom(other: DiffGraph): Unit = {
-    _nodes.appendAll(other._nodes)
+    other.nodes.foreach(addNode)
     _edges.appendAll(other._edges)
     _edgesToOriginal.appendAll(other._edgesToOriginal)
     _edgesInOriginal.appendAll(other._edgesInOriginal)
@@ -57,46 +66,46 @@ class DiffGraph {
     * Add edge between nodes present in the diff graph
     * */
   def addEdge(srcNode: NewNode, dstNode: NewNode, edgeLabel: String, properties: Seq[(String, AnyRef)] = List()): Unit =
-    _edges.append(new EdgeInDiffGraph(srcNode, dstNode, edgeLabel, properties))
+    _edges += new EdgeInDiffGraph(srcNode, dstNode, edgeLabel, properties)
 
   /**
     * Add edge from a node in the diff graph to a node in the original graph
     * */
   def addEdgeToOriginal(srcNode: NewNode,
-                        dstNode: Vertex,
+                        dstNode: StoredNode,
                         edgeLabel: String,
                         properties: Seq[(String, AnyRef)] = List()): Unit =
-    _edgesToOriginal.append(new EdgeToOriginal(srcNode, dstNode, edgeLabel, properties))
+    _edgesToOriginal += new EdgeToOriginal(srcNode, dstNode.getId, edgeLabel, properties)
 
   /**
     * Add edge from a node in the original graph to a node in the diff graph
     * */
-  def addEdgeFromOriginal(srcNode: Vertex,
+  def addEdgeFromOriginal(srcNode: StoredNode,
                           dstNode: NewNode,
                           edgeLabel: String,
                           properties: Seq[(String, AnyRef)] = List()): Unit =
-    _edgesFromOriginal.append(new EdgeFromOriginal(srcNode, dstNode, edgeLabel, properties))
+    _edgesFromOriginal += new EdgeFromOriginal(srcNode.getId, dstNode, edgeLabel, properties)
 
   /**
     * Add edge between nodes of the original graph
     * */
-  def addEdgeInOriginal(srcNode: Vertex,
-                        dstNode: Vertex,
+  def addEdgeInOriginal(srcNode: StoredNode,
+                        dstNode: StoredNode,
                         edgeLabel: String,
                         properties: Seq[(String, AnyRef)] = List()): Unit =
-    _edgesInOriginal.append(new EdgeInOriginal(srcNode, dstNode, edgeLabel, properties))
+    _edgesInOriginal += new EdgeInOriginal(srcNode.getId, dstNode.getId, edgeLabel, properties)
 
   /**
     * Add a property to an existing node
     * */
-  def addNodeProperty(node: Vertex, key: String, value: AnyRef) =
-    _nodeProperties.append(new NodeProperty(node, key, value))
+  def addNodeProperty(node: StoredNode, key: String, value: AnyRef) =
+    _nodeProperties += new NodeProperty(node.getId, key, value)
 
   /**
     * Add a property to an existing edge
     * */
   def addEdgeProperty(edge: Edge, key: String, value: AnyRef) =
-    _edgeProperties.append(new EdgeProperty(edge, key, value))
+    _edgeProperties += new EdgeProperty(edge.id().asInstanceOf[JLong], key, value)
 
 }
 
@@ -106,12 +115,12 @@ object DiffGraph {
     def label: String
     def properties: Seq[(String, AnyRef)]
   }
-  case class NodeProperty(node: Vertex, propertyKey: String, propertyValue: AnyRef)
-  case class EdgeProperty(edge: Edge, propertyKey: String, propertyValue: AnyRef)
+  case class NodeProperty(nodeId: Long, propertyKey: String, propertyValue: AnyRef)
+  case class EdgeProperty(edgeId: Long, propertyKey: String, propertyValue: AnyRef)
   type Properties = Seq[(String, AnyRef)]
 
   case class EdgeInDiffGraph(src: NewNode, dst: NewNode, label: String, properties: Properties) extends DiffEdge
-  case class EdgeToOriginal(src: NewNode, dst: Vertex, label: String, properties: Properties) extends DiffEdge
-  case class EdgeFromOriginal(src: Vertex, dst: NewNode, label: String, properties: Properties) extends DiffEdge
-  case class EdgeInOriginal(src: Vertex, dst: Vertex, label: String, properties: Properties) extends DiffEdge
+  case class EdgeToOriginal(src: NewNode, dstId: Long, label: String, properties: Properties) extends DiffEdge
+  case class EdgeFromOriginal(srcId: Long, dst: NewNode, label: String, properties: Properties) extends DiffEdge
+  case class EdgeInOriginal(srcId: Long, dstId: Long, label: String, properties: Properties) extends DiffEdge
 }

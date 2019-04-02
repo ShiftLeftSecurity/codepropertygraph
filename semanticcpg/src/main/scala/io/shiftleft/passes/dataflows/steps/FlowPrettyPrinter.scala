@@ -6,18 +6,18 @@ import java.nio.charset.StandardCharsets
 import dnl.utils.text.table.TextTable
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.Implicits._
-import io.shiftleft.passes.dataflows.steps.DataFlowObject._
-import io.shiftleft.passes.dataflows._
+import io.shiftleft.queryprimitives.steps._
+import io.shiftleft.passes.dataflows.Implicits._
 
 object FlowPrettyPrinter {
-  def prettyPrint(path: List[nodes.DataFlowObject]): String = {
+  def prettyPrint(path: List[nodes.TrackingPoint]): String = {
     val baos = new ByteArrayOutputStream()
     val ps = new PrintStream(baos, true, "utf-8")
-    val rows = path.map { dataFlowObject =>
-      implicit val graph = dataFlowObject.underlying.graph()
-      val method = dataFlowObject.start.method.head
-      val trackedSymbol = dataFlowObject.code
-      val lineNumberOption = dataFlowObject.lineNumber
+    val rows = path.map { trackingPoint =>
+      implicit val graph = trackingPoint.underlying.graph()
+      val method = trackingPoint.start.method.head
+      val trackedSymbol = trackingPoint.cfgNode.code
+      val lineNumberOption = trackingPoint.cfgNode.lineNumber
       val methodNameOption = Some(method.name)
       val fileOption = method.start.file.name.headOption
 

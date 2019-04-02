@@ -1,21 +1,3 @@
-package io.shiftleft.testcode.method;
-
-public class TestGraph {
-  public String methodWithLiteral() {
-    return "myLiteral";
-  }
-
-  public void multipleTopLevelExpressionMethod() {
-    someFunction("FOO");
-    someFunction("BAR");
-  }
-
-  public void someFunction(String str) {
-
-  }
-
-  public int methodForCfgTest(int aaa) {
-    int temp = aaa + 1;
-    return temp;
-  }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:ebfb6b8533fe02e7416531fa8b0600cda3695898c9cdf418d31bcdfb6fc73fd5
+size 372

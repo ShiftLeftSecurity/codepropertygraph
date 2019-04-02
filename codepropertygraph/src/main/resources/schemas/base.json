@@ -81,7 +81,7 @@
          "keys": ["NAME", "FULL_NAME", "SIGNATURE", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME",
            "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "A method/function/procedure",
-         "is": ["DECLARATION"],
+         "is": ["DECLARATION", "CFG_NODE"],
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["METHOD_RETURN", "METHOD_PARAMETER_IN",
                                              "MODIFIER", "BLOCK", "TYPE_PARAMETER"]},
@@ -92,13 +92,13 @@
         {"id" : 34, "name" : "METHOD_PARAMETER_IN",
          "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "This node represents a formal parameter going towards the callee side.",
-         "is": ["DECLARATION", "DATA_FLOW_OBJECT", "LOCAL_LIKE"]
+         "is": ["DECLARATION", "LOCAL_LIKE", "TRACKING_POINT"]
         },
 
         {"id" : 3, "name" : "METHOD_RETURN",
          "keys": ["CODE", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "A formal method return",
-         "is": ["DATA_FLOW_OBJECT"]
+         "is": ["CFG_NODE", "TRACKING_POINT"]
         },
 
         // Modifier
@@ -158,7 +158,7 @@
         {"id" : 8, "name" : "LITERAL",
          "keys" : ["CODE", /* DEPRECATED */"NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "Literal/Constant",
-         "is": ["DATA_FLOW_OBJECT", "EXPRESSION"],
+         "is": ["EXPRESSION"],
          "outEdges" : [
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
          ]
@@ -182,7 +182,7 @@
         {"id":27, "name": "IDENTIFIER",
          "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "An arbitrary identifier/reference.",
-         "is": ["DATA_FLOW_OBJECT", "EXPRESSION", "LOCAL_LIKE"],
+         "is": ["EXPRESSION", "LOCAL_LIKE"],
          "outEdges" : [
              {"edgeName": "REF", "inNodes": ["LOCAL"]},
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
@@ -191,7 +191,7 @@
         {"id":30, "name": "RETURN",
          "keys": [ "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END", "ORDER", "ARGUMENT_INDEX", "CODE"],
          "comment" : "A return instruction.",
-         "is": [ "EXPRESSION" ],
+         "is": [ "EXPRESSION"],
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF"]},
              {"edgeName": "CFG", "inNodes": ["METHOD_RETURN"]}
@@ -200,7 +200,7 @@
         {"id":31, "name": "BLOCK",
          "keys": [ "CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
          "comment" : "A structuring block in the AST.",
-         "is": [ "EXPRESSION" ],
+         "is": [ "EXPRESSION"],
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "LOCAL", "UNKNOWN"]}
          ]
@@ -247,9 +247,11 @@
     // common base traits for nodes
     "nodeBaseTraits" : [
       { "name" : "DECLARATION", "comment" : "", "hasKeys" : ["NAME"]},
-      { "name" : "DATA_FLOW_OBJECT", "comment" : "anything that can appear inside a data flow", "hasKeys" : ["CODE", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"]},
-      { "name" : "EXPRESSION", "comment" : "expression as a specialisation of data flow objects", "hasKeys" : ["ORDER"], "extends" : "DATA_FLOW_OBJECT"},
-      { "name" : "LOCAL_LIKE", "comment" : "", "hasKeys" : ["NAME"]}
+      { "name" : "EXPRESSION", "comment" : "expression as a specialisation of data flow objects", "hasKeys" : ["CODE", "ORDER"], "extends" : ["TRACKING_POINT", "CFG_NODE"]},
+      { "name" : "LOCAL_LIKE", "comment" : "", "hasKeys" : ["NAME"]},
+      { "name" : "CFG_NODE", "comment" : "", "hasKeys" : ["LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"], "extends": ["WITHIN_METHOD"]},
+      { "name" : "TRACKING_POINT", "comment" : "", "hasKeys" : [], "extends": ["WITHIN_METHOD"]},
+      { "name" : "WITHIN_METHOD", "comment" : "", "hasKeys" : []}
     ],
 
     "edgeTypes" : [
