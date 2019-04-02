@@ -93,15 +93,25 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
     ExpandTo.formalReturnToReturn(methodReturn)
       .foreach(returnVertex => addEdge(returnVertex, methodReturn))
 
+    /* Use this for member access nodes or indirections. These nodes are stopovers as we do not want them to appear
+     * in flows (no incident edge to them). However, we want definitions that reach these expression
+     * and which are used here to pass through them to the next call expression */
+    var stopover = Map[Vertex, Vertex]()
+
     outSet.foreach { case (node, outDefs) =>
-      if (node.isInstanceOf[nodes.Call]) {
+      if (node.isInstanceOf[nodes.Call] ) {
         val usesInExpression = dfHelper.getUsesOfExpression(node)
         var localRefsUses = usesInExpression.map(ExpandTo.reference(_)).filter(_ != None)
+        val nodeIsIndirection = indirectAccess(node)
 
         /* if use is not an identifier, add edge, as we are going to visit the use separately */
         usesInExpression.foreach { use =>
           if (!use.isInstanceOf[nodes.Identifier] && !use.isInstanceOf[nodes.Literal]) {
-            addEdge(use, node)
+            if(indirectAccess(use)) {
+              stopover += use -> node
+            } else {
+              addEdge(use, node)
+            }
           }
         }
 
@@ -119,7 +129,12 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
 
           dfHelper.getExpressionFromGen(elem).foreach { expressionOfElement =>
             if (expressionOfElement != node && localRefsUses.contains(localRefGen)) {
-              addEdge(expressionOfElement, node)
+              if(nodeIsIndirection) {
+                val passThrough = stopover(node)
+                addEdge(expressionOfElement, passThrough)
+              } else {
+                addEdge(expressionOfElement, node)
+              }
             }
           }
         }
@@ -181,6 +196,22 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
       case Operators.assignmentShiftLeft            => true
       case Operators.assignmentXor                  => true
       case _                                        => false
+    }
+  }
+
+  private def indirectAccess(vertex: Vertex): Boolean = {
+    if (!vertex.isInstanceOf[nodes.Call]) {
+      return false
+    }
+
+    val callName = vertex.value2(NodeKeys.NAME)
+    callName match {
+      case Operators.memberAccess                 => true
+      case Operators.indirectComputedMemberAccess => true
+      case Operators.indirectMemberAccess         => true
+      case Operators.computedMemberAccess         => true
+      case Operators.indirection                  => true
+      case _                                      => false
     }
   }
 
