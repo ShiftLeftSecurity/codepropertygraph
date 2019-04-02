@@ -134,6 +134,7 @@
         {"name" : "UNKNOWN",
           "outEdges" : [
             {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
+            {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN"]},
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
         }
