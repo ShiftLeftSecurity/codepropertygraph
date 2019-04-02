@@ -3,6 +3,8 @@
 
 # Code Property Graph - Specification and Tooling
 
+**Note: for first-time users, we recommend building "joern" at https://github.com/ShiftLeftSecurity/joern/ instead. It combines this repo with a C/C++ language frontend to construct a complete code analysis platform.**
+
 A Code Property Graph (CPG) is an extensible and language-agnostic
 representation of program code designed for incremental and
 distributed code analysis. This repository hosts the base
