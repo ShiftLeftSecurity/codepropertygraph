@@ -130,8 +130,10 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
           dfHelper.getExpressionFromGen(elem).foreach { expressionOfElement =>
             if (expressionOfElement != node && localRefsUses.contains(localRefGen)) {
               if(nodeIsIndirection) {
-                val passThrough = stopover(node)
-                addEdge(expressionOfElement, passThrough)
+                if(stopover.contains(node)) {
+                  val passThrough = stopover(node)
+                  addEdge(expressionOfElement, passThrough)
+                }
               } else {
                 addEdge(expressionOfElement, node)
               }
