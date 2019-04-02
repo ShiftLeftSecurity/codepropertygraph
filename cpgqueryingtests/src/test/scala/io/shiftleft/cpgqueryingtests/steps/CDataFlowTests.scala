@@ -63,7 +63,8 @@ class CDataFlowTests extends CpgDataFlowTests {
         ),
         List[(String, Option[Integer])](
           ("read(fd, buff, sz)", 12)
-        ))
+        )
+      )
   }
 
   "Test 2: flow with pointers" in {
@@ -106,12 +107,13 @@ class CDataFlowTests extends CpgDataFlowTests {
           ("free(p)", 10)
         ),
         List[(String, Option[Integer])](
-          ("p = q",  8),
+          ("p = q", 8),
           ("free(p)", 10)
         ),
         List[(String, Option[Integer])](
           ("free(p)", 10)
-        ))
+        )
+      )
   }
 
   "Test 3: flow from function call argument" in {
@@ -132,14 +134,13 @@ class CDataFlowTests extends CpgDataFlowTests {
     flows.size shouldBe 2
 
     flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(
-        List[(String, Option[Integer])](
-          ("a = 10", 3),
-          ("foo(a)", 5)
-        ),
-        List[(String, Option[Integer])](
-          ("foo(a)", 5)
-        ))
+      Set(List[(String, Option[Integer])](
+            ("a = 10", 3),
+            ("foo(a)", 5)
+          ),
+          List[(String, Option[Integer])](
+            ("foo(a)", 5)
+          ))
   }
 
   "Test 4: flow chains from x to a" in {
@@ -176,12 +177,12 @@ class CDataFlowTests extends CpgDataFlowTests {
           ("b + c", 6),
           ("z = b + c", 6),
           ("x = z", 9)
-        ))
+        )
+      )
   }
 
   "Test 5: flow from method return to a" in {
-    val cpg = cpgFactory.buildCpg(
-      """
+    val cpg = cpgFactory.buildCpg("""
         | int flow(int a){
         |   int z = a;
         |   int b = z;
@@ -207,8 +208,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 6: flow with nested if-statements from method return to a" in {
-    val cpg = cpgFactory.buildCpg(
-      """
+    val cpg = cpgFactory.buildCpg("""
         | int nested(int a){
         |   int x;
         |   int z = 0x37;
@@ -241,8 +241,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 7: flow with nested if-statements from method return to x" in {
-    val cpg = cpgFactory.buildCpg(
-      """
+    val cpg = cpgFactory.buildCpg("""
         | int nested(int a){
         |   int x;
         |   int z = 0x37;
@@ -279,12 +278,12 @@ class CDataFlowTests extends CpgDataFlowTests {
         List[(String, Option[Integer])](
           ("return x;", 14),
           ("RET", 2)
-        ))
+        )
+      )
   }
 
   "Test 8: flow chain from function argument of foo to a" in {
-    val cpg = cpgFactory.buildCpg(
-      """
+    val cpg = cpgFactory.buildCpg("""
         | void param(int x){
         |    int a = x;
         |    int b = a;
@@ -299,16 +298,15 @@ class CDataFlowTests extends CpgDataFlowTests {
     flows.size shouldBe 2
 
     flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(
-        List[(String, Option[Integer])](
-          ("a = x",  3),
-          ("b = a", 4),
-          ("foo(b)", 5)
-        ),
-        List[(String, Option[Integer])](
-          ("b = a", 4),
-          ("foo(b)", 5)
-        ))
+      Set(List[(String, Option[Integer])](
+            ("a = x", 3),
+            ("b = a", 4),
+            ("foo(b)", 5)
+          ),
+          List[(String, Option[Integer])](
+            ("b = a", 4),
+            ("foo(b)", 5)
+          ))
 
     val source2 = cpg.identifier.name("a")
     val sink2 = cpg.call.name("foo")
@@ -317,15 +315,13 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 9: flow from function foo to a" in {
-    val cpg = cpgFactory.buildCpg(
-      """
+    val cpg = cpgFactory.buildCpg("""
         | void param(int x){
         |    int a = x;
         |    int b = a;
         |    int z = foo(b);
         |  }
       """.stripMargin)
-
 
     val source = cpg.identifier.name("a")
     val sink = cpg.call.name("foo")
@@ -334,15 +330,14 @@ class CDataFlowTests extends CpgDataFlowTests {
     flows.size shouldBe 2
 
     flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(
-        List[(String, Option[Integer])](
-          ("a = x",  3),
-          ("b = a", 4),
-          ("foo(b)", 5)
-        ),
-        List[(String, Option[Integer])](
-          ("b = a", 4),
-          ("foo(b)", 5)
-        ))
+      Set(List[(String, Option[Integer])](
+            ("a = x", 3),
+            ("b = a", 4),
+            ("foo(b)", 5)
+          ),
+          List[(String, Option[Integer])](
+            ("b = a", 4),
+            ("foo(b)", 5)
+          ))
   }
 }

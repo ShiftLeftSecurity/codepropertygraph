@@ -17,8 +17,8 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
     val pass1 = new CpgPass(cpg.graph) {
       val newNode = new nodes.NewNode with DummyProduct {
         override def containedNodesByLocalName = ???
-        override def label                     = NodeTypes.UNKNOWN
-        override def properties                = Map(NodeKeyNames.CODE -> Pass1NewNodeCode)
+        override def label = NodeTypes.UNKNOWN
+        override def properties = Map(NodeKeyNames.CODE -> Pass1NewNodeCode)
         override def accept[T](visitor: NodeVisitor[T]): T = ???
       }
       override def run() = {
@@ -39,8 +39,8 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
     val pass2 = new CpgPass(cpg.graph) {
       val newNode = new nodes.NewNode with DummyProduct {
         override def containedNodesByLocalName = ???
-        override def label                     = NodeTypes.UNKNOWN
-        override def properties                = Map(NodeKeyNames.CODE -> Pass2NewNodeCode)
+        override def label = NodeTypes.UNKNOWN
+        override def properties = Map(NodeKeyNames.CODE -> Pass2NewNodeCode)
         override def accept[T](visitor: NodeVisitor[T]): T = ???
       }
       override def run() = {
@@ -58,14 +58,14 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
     pass1NewNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass2NewNodeCode)
   }
 
-  val InitialNodeCode  = "initialNode"
+  val InitialNodeCode = "initialNode"
   val Pass1NewNodeCode = "pass1NewNodeCode"
   val Pass2NewNodeCode = "pass2NewNodeCode"
 
   /* like a freshly deserialized cpg.bin.zip without any overlays applied */
   def createNewBaseCpg(): Cpg = {
     val graph: Graph = TinkerGraph.open(nodes.Factories.AllAsJava, edges.Factories.AllAsJava)
-    val initialNode  = graph + NodeTypes.UNKNOWN
+    val initialNode = graph + NodeTypes.UNKNOWN
     initialNode.setProperty(NodeKeys.CODE, InitialNodeCode)
     Cpg(graph)
   }
@@ -73,6 +73,6 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
 
 trait DummyProduct {
   def canEqual(that: Any): Boolean = ???
-  def productArity: Int            = ???
-  def productElement(n: Int): Any  = ???
+  def productArity: Int = ???
+  def productElement(n: Int): Any = ???
 }

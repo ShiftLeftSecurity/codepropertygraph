@@ -55,9 +55,7 @@ object Traversals {
 
   def cfgEntry(expression: GremlinScala[Vertex]): GremlinScala[Vertex] = {
     expression
-      .until(
-        _.union(
-          _.join(_.hasLabel(NodeTypes.METHOD)).join(_.has(NodeKeys.PARSER_TYPE_NAME, "Program"))))
+      .until(_.union(_.join(_.hasLabel(NodeTypes.METHOD)).join(_.has(NodeKeys.PARSER_TYPE_NAME, "Program"))))
       .repeat(_.in(EdgeTypes.CFG).simplePath)
   }
 

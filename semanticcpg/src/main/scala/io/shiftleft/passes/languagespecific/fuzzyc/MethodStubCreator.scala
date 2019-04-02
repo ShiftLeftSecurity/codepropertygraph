@@ -14,7 +14,7 @@ import scala.collection.JavaConverters._
 class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
   // Since the method fullNames for fuzzyc are not unique, we do not have
   // a 1to1 relation and may overwrite some values. We deem this ok for now.
-  private var methodFullNameToNode               = Map[String, nodes.MethodBase]()
+  private var methodFullNameToNode = Map[String, nodes.MethodBase]()
   private var methodInstFullNameToParameterCount = Map[String, Int]()
 
   override def run(): Stream[DiffGraph] = {
@@ -31,11 +31,8 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
             case Some(method) =>
             case None =>
               val paramterCount = methodInstFullNameToParameterCount(methodInst.fullName)
-              val newMethod = createMethodStub(methodInst.name,
-                                               methodInst.fullName,
-                                               methodInst.signature,
-                                               paramterCount,
-                                               dstGraph)
+              val newMethod =
+                createMethodStub(methodInst.name, methodInst.fullName, methodInst.signature, paramterCount, dstGraph)
 
               methodFullNameToNode += methodInst.methodFullName -> newMethod
           }

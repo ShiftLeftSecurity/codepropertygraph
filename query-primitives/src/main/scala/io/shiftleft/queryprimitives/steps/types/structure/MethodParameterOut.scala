@@ -5,10 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
 import io.shiftleft.queryprimitives.steps.Implicits._
-import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{
-  DeclarationBase,
-  Expression
-}
+import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{DeclarationBase, Expression}
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors._
 import shapeless.HList
 
@@ -28,14 +25,12 @@ class MethodParameterOut[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodPara
   /* get all parameters from (and including)
    * method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
   def indexFrom(num: Int): MethodParameterOut[Labels] =
-    new MethodParameterOut[Labels](
-      raw.has(NodeKeys.METHOD_PARAMETER_OUT.ORDER, P.gte(num: Integer)))
+    new MethodParameterOut[Labels](raw.has(NodeKeys.METHOD_PARAMETER_OUT.ORDER, P.gte(num: Integer)))
 
   /* get all parameters up to (and including)
    * method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
   def indexTo[Out](num: Int): MethodParameterOut[Labels] =
-    new MethodParameterOut[Labels](
-      raw.has(NodeKeys.METHOD_PARAMETER_OUT.ORDER, P.lte(num: Integer)))
+    new MethodParameterOut[Labels](raw.has(NodeKeys.METHOD_PARAMETER_OUT.ORDER, P.lte(num: Integer)))
 
   def method: Method[Labels] =
     new Method[Labels](raw.in(EdgeTypes.AST).cast[nodes.Method])

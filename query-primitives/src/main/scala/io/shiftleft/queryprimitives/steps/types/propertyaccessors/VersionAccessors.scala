@@ -5,8 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.queryprimitives.steps.Steps
 import shapeless.HList
 
-trait VersionAccessors[T <: StoredNode, Labels <: HList]
-    extends StringPropertyAccessors[T, Labels] {
+trait VersionAccessors[T <: StoredNode, Labels <: HList] extends StringPropertyAccessors[T, Labels] {
   def version(): Steps[String, Labels] =
     stringProperty(NodeKeys.VERSION)
 

@@ -5,8 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.queryprimitives.steps.Steps
 import shapeless.HList
 
-trait ArgumentIndexAccessors[T <: StoredNode, Labels <: HList]
-    extends PropertyAccessors[T, Labels] {
+trait ArgumentIndexAccessors[T <: StoredNode, Labels <: HList] extends PropertyAccessors[T, Labels] {
   def argIndex(): Steps[Integer, Labels] =
     property(NodeKeys.ARGUMENT_INDEX)
 

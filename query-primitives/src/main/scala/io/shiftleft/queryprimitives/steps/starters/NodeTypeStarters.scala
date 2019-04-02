@@ -38,8 +38,7 @@ class NodeTypeStarters(cpg: Cpg) {
   Traverse to all namespace blocks, e.g., packages in Java.
     */
   def namespaceBlock: NamespaceBlock[HNil] =
-    new NamespaceBlock[HNil](
-      scalaGraph.V.hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[nodes.NamespaceBlock])
+    new NamespaceBlock[HNil](scalaGraph.V.hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[nodes.NamespaceBlock])
 
   /**
     Traverse to all types, e.g., Set<String>
@@ -75,8 +74,7 @@ class NodeTypeStarters(cpg: Cpg) {
     Traverse to all input parameters
     */
   def parameter: MethodParameter[HNil] =
-    new MethodParameter(
-      scalaGraph.V.hasLabel(NodeTypes.METHOD_PARAMETER_IN).cast[nodes.MethodParameterIn])
+    new MethodParameter(scalaGraph.V.hasLabel(NodeTypes.METHOD_PARAMETER_IN).cast[nodes.MethodParameterIn])
 
   /**
     Traverse to all class members

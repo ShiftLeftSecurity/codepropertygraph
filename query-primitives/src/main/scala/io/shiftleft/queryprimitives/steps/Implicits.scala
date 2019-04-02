@@ -14,8 +14,7 @@ object Implicits extends Implicits // to allow for a hierarchy of implicits
 
 trait Implicits {
 
-  private def newAnonymousTraversalWithAssociatedGraph[NodeType <: nodes.StoredNode](
-      seq: NodeType*) = {
+  private def newAnonymousTraversalWithAssociatedGraph[NodeType <: nodes.StoredNode](seq: NodeType*) = {
     val anonymousTraversal = __[NodeType](seq: _*)
     if (seq.nonEmpty) {
       anonymousTraversal.traversal.asAdmin().setGraph(seq.head.graph())
@@ -59,8 +58,7 @@ trait Implicits {
       new NewNodeSteps[NodeType, HNil](__[NodeType](seq: _*))
   }
 
-  implicit class GremlinScalaDeco[End <: Vertex, Labels <: HList](
-      raw: GremlinScala.Aux[End, Labels]) {
+  implicit class GremlinScalaDeco[End <: Vertex, Labels <: HList](raw: GremlinScala.Aux[End, Labels]) {
     /* in some cases we cannot statically determine the type of the node, e.g. when traversing
      * from a known nodeType via AST edges, so we have to cast */
     def cast[NodeType <: nodes.StoredNode]: GremlinScala.Aux[NodeType, Labels] =
@@ -108,8 +106,7 @@ trait Implicits {
   implicit def toCall[Labels <: HList](steps: Steps[nodes.Call, Labels]): Call[Labels] =
     new Call[Labels](steps.raw)
 
-  implicit def toIdentifier[Labels <: HList](
-      steps: Steps[nodes.Identifier, Labels]): Identifier[Labels] =
+  implicit def toIdentifier[Labels <: HList](steps: Steps[nodes.Identifier, Labels]): Identifier[Labels] =
     new Identifier[Labels](steps.raw)
 
   implicit def toMember[Labels <: HList](steps: Steps[nodes.Member, Labels]): Member[Labels] =
@@ -118,8 +115,7 @@ trait Implicits {
   implicit def toLocal[Labels <: HList](steps: Steps[nodes.Local, Labels]): Local[Labels] =
     new Local[Labels](steps.raw)
 
-  implicit def toMethodInst[Labels <: HList](
-      steps: Steps[nodes.MethodInst, Labels]): MethodInst[Labels] =
+  implicit def toMethodInst[Labels <: HList](steps: Steps[nodes.MethodInst, Labels]): MethodInst[Labels] =
     new MethodInst[Labels](steps.raw)
 
   implicit def toMethod[Labels <: HList](steps: Steps[nodes.Method, Labels]): Method[Labels] =
@@ -133,27 +129,22 @@ trait Implicits {
       steps: Steps[nodes.MethodParameterOut, Labels]): MethodParameterOut[Labels] =
     new MethodParameterOut[Labels](steps.raw)
 
-  implicit def toMethodReturn[Labels <: HList](
-      steps: Steps[nodes.MethodReturn, Labels]): MethodReturn[Labels] =
+  implicit def toMethodReturn[Labels <: HList](steps: Steps[nodes.MethodReturn, Labels]): MethodReturn[Labels] =
     new MethodReturn[Labels](steps.raw)
 
-  implicit def toNamespace[Labels <: HList](
-      steps: Steps[nodes.Namespace, Labels]): Namespace[Labels] =
+  implicit def toNamespace[Labels <: HList](steps: Steps[nodes.Namespace, Labels]): Namespace[Labels] =
     new Namespace[Labels](steps.raw)
 
-  implicit def toNamespaceBlock[Labels <: HList](
-      steps: Steps[nodes.NamespaceBlock, Labels]): NamespaceBlock[Labels] =
+  implicit def toNamespaceBlock[Labels <: HList](steps: Steps[nodes.NamespaceBlock, Labels]): NamespaceBlock[Labels] =
     new NamespaceBlock[Labels](steps.raw)
 
   implicit def toModifier[Labels <: HList](steps: Steps[nodes.Modifier, Labels]): Modifier[Labels] =
     new Modifier[Labels](steps.raw)
 
-  implicit def toExpression[Labels <: HList](
-      steps: Steps[nodes.Expression, Labels]): Expression[Labels] =
+  implicit def toExpression[Labels <: HList](steps: Steps[nodes.Expression, Labels]): Expression[Labels] =
     new Expression[Labels](steps.raw)
 
-  implicit def toDeclaration[Labels <: HList](
-      steps: Steps[nodes.Declaration, Labels]): Declaration[Labels] =
+  implicit def toDeclaration[Labels <: HList](steps: Steps[nodes.Declaration, Labels]): Declaration[Labels] =
     new Declaration[Labels](steps.raw)
 
   implicit def toFile[Labels <: HList](steps: Steps[nodes.File, Labels]): File[Labels] =

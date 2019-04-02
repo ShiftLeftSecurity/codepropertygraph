@@ -5,8 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.queryprimitives.steps.Steps
 import shapeless.HList
 
-trait DispatchTypeAccessors[T <: StoredNode, Labels <: HList]
-    extends StringPropertyAccessors[T, Labels] {
+trait DispatchTypeAccessors[T <: StoredNode, Labels <: HList] extends StringPropertyAccessors[T, Labels] {
 
   /**
     * Traverse to dispatchType

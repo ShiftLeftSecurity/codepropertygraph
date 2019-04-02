@@ -5,10 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
 import io.shiftleft.queryprimitives.steps.Implicits._
-import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{
-  Declaration,
-  Expression
-}
+import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{Declaration, Expression}
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{FullNameAccessors, NameAccessors}
 import shapeless.{HList, HNil}
 
@@ -28,7 +25,6 @@ class Type[Labels <: HList](raw: GremlinScala.Aux[nodes.Type, Labels])
     * */
   def method: Method[Labels] =
     referencedTypeDecl.method
-
 
   /**
     * Filter for types whos corresponding type declaration is in the analyzed jar.

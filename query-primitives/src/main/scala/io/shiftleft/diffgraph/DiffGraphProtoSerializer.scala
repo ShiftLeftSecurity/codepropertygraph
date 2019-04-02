@@ -29,8 +29,7 @@ class DiffGraphProtoSerializer() {
     builder.build()
   }
 
-  private def addNodes()(implicit builder: CpgOverlay.Builder,
-                         appliedDiffGraph: AppliedDiffGraph) = {
+  private def addNodes()(implicit builder: CpgOverlay.Builder, appliedDiffGraph: AppliedDiffGraph) = {
     appliedDiffGraph.diffGraph.nodes.foreach { node =>
       val nodeId = appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(node))
 
@@ -53,8 +52,7 @@ class DiffGraphProtoSerializer() {
     }
   }
 
-  private def addEdges()(implicit builder: CpgOverlay.Builder,
-                         appliedDiffGraph: AppliedDiffGraph): Unit = {
+  private def addEdges()(implicit builder: CpgOverlay.Builder, appliedDiffGraph: AppliedDiffGraph): Unit = {
     val diffGraph = appliedDiffGraph.diffGraph
 
     addProtoEdge(diffGraph.edgesInOriginal, { edge: EdgeInOriginal =>
@@ -118,8 +116,7 @@ class DiffGraphProtoSerializer() {
       .setValue(protoValue(value))
       .build()
 
-  private def addNodeProperties()(implicit builder: CpgOverlay.Builder,
-                                  appliedDiffGraph: AppliedDiffGraph): Unit = {
+  private def addNodeProperties()(implicit builder: CpgOverlay.Builder, appliedDiffGraph: AppliedDiffGraph): Unit = {
     builder.addAllNodeProperty(
       appliedDiffGraph.diffGraph.nodeProperties.map { property =>
         AdditionalNodeProperty
@@ -131,8 +128,7 @@ class DiffGraphProtoSerializer() {
     )
   }
 
-  private def addEdgeProperties()(implicit builder: CpgOverlay.Builder,
-                                  appliedDiffGraph: AppliedDiffGraph): Unit = {
+  private def addEdgeProperties()(implicit builder: CpgOverlay.Builder, appliedDiffGraph: AppliedDiffGraph): Unit = {
     builder.addAllEdgeProperty(
       appliedDiffGraph.diffGraph.edgeProperties.map { property =>
         AdditionalEdgeProperty

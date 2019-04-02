@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager
   * Base class for CPG enhancements - provides access to a src graph and destination Diff graph
   * */
 abstract class CpgPass(srcGraph: ScalaGraph) {
-  protected val logger        = LogManager.getLogger(getClass)
+  protected val logger = LogManager.getLogger(getClass)
   private var startTime: Long = _
 
   /**

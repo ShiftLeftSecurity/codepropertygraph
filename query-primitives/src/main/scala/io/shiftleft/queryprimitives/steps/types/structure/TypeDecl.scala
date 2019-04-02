@@ -6,11 +6,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.NodeSteps
 import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.Modifier
-import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{
-  FullNameAccessors,
-  IsExternalAccessor,
-  NameAccessors
-}
+import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{FullNameAccessors, IsExternalAccessor, NameAccessors}
 import shapeless.HList
 
 /**

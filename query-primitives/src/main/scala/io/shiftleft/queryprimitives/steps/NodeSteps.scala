@@ -19,8 +19,7 @@ import shapeless.{HList, HNil}
   *
   * This is the base class for all steps defined on nodes.
   * */
-class NodeSteps[NodeType <: nodes.StoredNode, Labels <: HList](
-    raw: GremlinScala.Aux[NodeType, Labels])
+class NodeSteps[NodeType <: nodes.StoredNode, Labels <: HList](raw: GremlinScala.Aux[NodeType, Labels])
     extends Steps[NodeType, Labels](raw) {
 
   /**
@@ -51,7 +50,7 @@ class NodeSteps[NodeType <: nodes.StoredNode, Labels <: HList](
   def toJsonPretty: String = _toJson(pretty = true)
 
   protected def _toJson(pretty: Boolean): String = {
-    implicit val formats             = org.json4s.DefaultFormats
+    implicit val formats = org.json4s.DefaultFormats
     val maps: List[Map[String, Any]] = toList.map(_.toMap)
     if (pretty) writePretty(maps)
     else write(maps)

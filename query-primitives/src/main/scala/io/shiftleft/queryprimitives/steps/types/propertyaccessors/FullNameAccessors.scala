@@ -5,8 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.queryprimitives.steps.Steps
 import shapeless.HList
 
-trait FullNameAccessors[T <: StoredNode, Labels <: HList]
-    extends StringPropertyAccessors[T, Labels] {
+trait FullNameAccessors[T <: StoredNode, Labels <: HList] extends StringPropertyAccessors[T, Labels] {
   def fullName(): Steps[String, Labels] =
     stringProperty(NodeKeys.FULL_NAME)
 

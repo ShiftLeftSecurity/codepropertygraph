@@ -19,7 +19,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
 
   "stores NewNodes" in {
     implicit val diffGraph = new DiffGraph
-    val newNode            = new TestNewNode
+    val newNode = new TestNewNode
     new NewNodeSteps(__(newNode)).store
 
     diffGraph.nodes shouldBe List(newNode)
@@ -28,12 +28,12 @@ class NewNodeStepsTest extends WordSpec with Matchers {
   "stores containedNodes and connecting edge" when {
 
     "embedding a StoredNode and a NewNode" in {
-      implicit val diffGraph    = new DiffGraph
+      implicit val diffGraph = new DiffGraph
       val existingContainedNode = new Modifier(_id = 42, _graph = TinkerGraph.open)
       existingContainedNode.property(Modifier.Keys.ModifierType, ModifierTypes.NATIVE)
 
       val newContainedNode = new TestNewNode
-      val newNode          = new TestNewNode(containedNodes = List(existingContainedNode, newContainedNode))
+      val newNode = new TestNewNode(containedNodes = List(existingContainedNode, newContainedNode))
       new NewNodeSteps(__(newNode)).store
 
       diffGraph.nodes.toSet shouldBe Set(newNode, newContainedNode)
@@ -44,7 +44,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
           label = ContainsNode.Label,
           properties = Seq(
             (EdgeKeyNames.LOCAL_NAME -> newNode.testContainedLabel),
-            (EdgeKeyNames.INDEX      -> (0: Integer))
+            (EdgeKeyNames.INDEX -> (0: Integer))
           )
         )
       )
@@ -56,7 +56,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
           label = ContainsNode.Label,
           properties = Seq(
             (EdgeKeyNames.LOCAL_NAME -> newNode.testContainedLabel),
-            (EdgeKeyNames.INDEX      -> (1: Integer))
+            (EdgeKeyNames.INDEX -> (1: Integer))
           )
         )
       )
@@ -66,7 +66,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
       implicit val diffGraph = new DiffGraph
       val newContainedNodeL1 = new TestNewNode
       val newContainedNodeL0 = new TestNewNode(containedNodes = List(newContainedNodeL1))
-      val newNode            = new TestNewNode(containedNodes = List(newContainedNodeL0))
+      val newNode = new TestNewNode(containedNodes = List(newContainedNodeL0))
       new NewNodeSteps(__(newNode)).store
 
       diffGraph.nodes.toSet shouldBe Set(newNode, newContainedNodeL0, newContainedNodeL1)
@@ -77,7 +77,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
           label = ContainsNode.Label,
           properties = Seq(
             (EdgeKeyNames.LOCAL_NAME -> newNode.testContainedLabel),
-            (EdgeKeyNames.INDEX      -> (0: Integer))
+            (EdgeKeyNames.INDEX -> (0: Integer))
           )
         ),
         EdgeInDiffGraph(
@@ -86,7 +86,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
           label = ContainsNode.Label,
           properties = Seq(
             (EdgeKeyNames.LOCAL_NAME -> newNode.testContainedLabel),
-            (EdgeKeyNames.INDEX      -> (0: Integer))
+            (EdgeKeyNames.INDEX -> (0: Integer))
           )
         )
       )
@@ -98,9 +98,9 @@ class NewNodeStepsTest extends WordSpec with Matchers {
 object NewNodeNodeStepsTest {
 
   case class TestNewNode(containedNodes: List[Node] = Nil) extends NewNode {
-    override val label                        = "TEST_LABEL"
+    override val label = "TEST_LABEL"
     override val properties: Map[String, Any] = Map.empty
-    val testContainedLabel                    = "testContains"
+    val testContainedLabel = "testContains"
     override def containedNodesByLocalName: Map[String, List[Node]] =
       Map(testContainedLabel -> containedNodes)
     override def accept[T](visitor: NodeVisitor[T]): T = ???

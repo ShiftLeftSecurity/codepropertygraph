@@ -13,10 +13,10 @@ import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import scala.collection.JavaConverters._
 
 class Linker(graph: ScalaGraph) extends CpgPass(graph) {
-  private var typeDeclFullNameToNodeId       = Map[String, JLong]()
-  private var typeFullNameToNodeId           = Map[String, JLong]()
-  private var methodFullNameToNodeId         = Map[String, JLong]()
-  private var methodInstFullNameToNodeId     = Map[String, JLong]()
+  private var typeDeclFullNameToNodeId = Map[String, JLong]()
+  private var typeFullNameToNodeId = Map[String, JLong]()
+  private var methodFullNameToNodeId = Map[String, JLong]()
+  private var methodInstFullNameToNodeId = Map[String, JLong]()
   private var namespaceBlockFullNameToNodeId = Map[String, JLong]()
 
   override def run(): Stream[DiffGraph] = {
@@ -105,9 +105,9 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
     val iter = graph.graph.vertices()
     while (iter.hasNext) {
       iter.next() match {
-        case node: nodes.TypeDecl   => typeDeclFullNameToNodeId += node.fullName   -> node.getId
-        case node: nodes.Type       => typeFullNameToNodeId += node.fullName       -> node.getId
-        case node: nodes.Method     => methodFullNameToNodeId += node.fullName     -> node.getId
+        case node: nodes.TypeDecl   => typeDeclFullNameToNodeId += node.fullName -> node.getId
+        case node: nodes.Type       => typeFullNameToNodeId += node.fullName -> node.getId
+        case node: nodes.Method     => methodFullNameToNodeId += node.fullName -> node.getId
         case node: nodes.MethodInst => methodInstFullNameToNodeId += node.fullName -> node.getId
         case node: nodes.NamespaceBlock =>
           namespaceBlockFullNameToNodeId += node.fullName -> node.getId
@@ -139,11 +139,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
                 dstGraph
                   .addEdgeInOriginal(srcNode.asInstanceOf[nodes.StoredNode], dstNode, edgeType)
               case None =>
-                logFailedDstLookup(edgeType,
-                                   srcNode.label,
-                                   srcNode.id.toString,
-                                   dstNodeLabel,
-                                   dstFullName)
+                logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
             }
           }
         } else {
@@ -160,14 +156,13 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
       }
   }
 
-  private def linkToMultiple[SRC_NODE_TYPE <: nodes.StoredNode](
-      srcLabels: List[String],
-      dstNodeLabel: String,
-      edgeType: String,
-      dstNodeIdMap: Map[String, JLong],
-      getDstFullNames: SRC_NODE_TYPE => Iterable[String],
-      dstFullNameKey: String,
-      dstGraph: DiffGraph): Unit = {
+  private def linkToMultiple[SRC_NODE_TYPE <: nodes.StoredNode](srcLabels: List[String],
+                                                                dstNodeLabel: String,
+                                                                edgeType: String,
+                                                                dstNodeIdMap: Map[String, JLong],
+                                                                getDstFullNames: SRC_NODE_TYPE => Iterable[String],
+                                                                dstFullNameKey: String,
+                                                                dstGraph: DiffGraph): Unit = {
     var loggedDeprecationWarning = false
     graph.V
       .hasLabel(srcLabels.head, srcLabels.tail: _*)
@@ -180,11 +175,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
                 case Some(dstNode) =>
                   dstGraph.addEdgeInOriginal(srcNode, dstNode, edgeType)
                 case None =>
-                  logFailedDstLookup(edgeType,
-                                     srcNode.label,
-                                     srcNode.id.toString,
-                                     dstNodeLabel,
-                                     dstFullName)
+                  logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
 
               }
             }
@@ -229,7 +220,8 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
                       .get(astChild.astParentFullName)
                       .flatMap(lookupNode(_))
                   case _ =>
-                    logger.error(s"Invalid AST_PARENT_TYPE=${astChild.value2(NodeKeys.AST_PARENT_FULL_NAME)}; astChild=$astChild")
+                    logger.error(
+                      s"Invalid AST_PARENT_TYPE=${astChild.value2(NodeKeys.AST_PARENT_FULL_NAME)}; astChild=$astChild")
                     None
                 }
 

@@ -109,8 +109,7 @@ class TypeTests extends WordSpec with Matchers {
           .derivedTypeDeclTransitive
           .toList
 
-      queryResult.map(_.name).toSet shouldBe Set("ClassHierarchyTest$Derived",
-                                                 "ClassHierarchyTest$Derived2")
+      queryResult.map(_.name).toSet shouldBe Set("ClassHierarchyTest$Derived", "ClassHierarchyTest$Derived2")
     }
 
     "have Base and Object as transitive base types of Derived" in {
@@ -189,8 +188,7 @@ class TypeTests extends WordSpec with Matchers {
           .derivedTypeTransitive
           .toList
 
-      queryResult.map(_.name).toSet shouldBe Set("ClassHierarchyTest$Derived",
-                                                 "ClassHierarchyTest$Derived2")
+      queryResult.map(_.name).toSet shouldBe Set("ClassHierarchyTest$Derived", "ClassHierarchyTest$Derived2")
     }
 
     "have Base and Object as transitive base types of Derived" in {

@@ -33,8 +33,7 @@ class Cpg(val graph: Graph) {
   /**
     Begin traversal at set of nodes
     */
-  def atDomainVertices[NodeType <: nodes.StoredNode](
-      domainVertices: Seq[NodeType]): NodeSteps[NodeType, HNil] =
+  def atDomainVertices[NodeType <: nodes.StoredNode](domainVertices: Seq[NodeType]): NodeSteps[NodeType, HNil] =
     atVerticesWithId(domainVertices.map(_.id))
 
   /**

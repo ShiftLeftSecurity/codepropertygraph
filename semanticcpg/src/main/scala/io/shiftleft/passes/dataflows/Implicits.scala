@@ -8,8 +8,7 @@ import shapeless.HList
 
 object Implicits {
 
-  implicit def toTrackingPoint[X <% Steps[NodeType, Labels],
-  NodeType <: nodes.TrackingPoint,
-  Labels <: HList](steps: X): TrackingPoint[Labels] =
+  implicit def toTrackingPoint[X <% Steps[NodeType, Labels], NodeType <: nodes.TrackingPoint, Labels <: HList](
+      steps: X): TrackingPoint[Labels] =
     new TrackingPoint[Labels](steps.raw.cast[nodes.TrackingPoint])
 }

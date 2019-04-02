@@ -14,7 +14,7 @@ import scala.compat.java8.OptionConverters._
 object CpgLoader {
   private val logger = LogManager.getLogger(getClass)
 
-  /* some non-public frontends (e.g. java2cpg) use cpg proto entries that are `UNRECOGNIZED` by cpg-public. 
+  /* some non-public frontends (e.g. java2cpg) use cpg proto entries that are `UNRECOGNIZED` by cpg-public.
    * we'll ignore those during the import */
   val ignoredProtoEntries =
     IgnoredProtoEntries(
@@ -32,8 +32,7 @@ object CpgLoader {
                             createIndices: Boolean = true,
                             onDiskOverflowConfig: Option[OnDiskOverflowConfig] = None): Cpg = {
     logger.debug("Loading " + filename)
-    val cpg = ProtoCpgLoader.loadFromProtoZip(
-      filename, onDiskOverflowConfig.asJava, Some(ignoredProtoEntries).asJava)
+    val cpg = ProtoCpgLoader.loadFromProtoZip(filename, onDiskOverflowConfig.asJava, Some(ignoredProtoEntries).asJava)
     runEnhancements(cpg.graph)
     if (createIndices) { createIndexes(cpg) }
     cpg

@@ -9,7 +9,7 @@ class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
 
   override def run(): Stream[DiffGraph] = {
     var idToClosureBinding = Map[String, nodes.ClosureBinding]()
-    val dstGraph           = new DiffGraph
+    val dstGraph = new DiffGraph
 
     graph.V
       .hasLabel(NodeTypes.CLOSURE_BINDING)

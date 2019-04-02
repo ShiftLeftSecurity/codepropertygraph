@@ -126,10 +126,9 @@ class PropagateEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
   }
 
   private def addPropagateEdge(src: Vertex, dst: Vertex, isAlias: java.lang.Boolean): Unit = {
-    dstGraph.addEdgeInOriginal(
-      src.asInstanceOf[nodes.StoredNode],
-      dst.asInstanceOf[nodes.StoredNode],
-      EdgeTypes.PROPAGATE,
-      (EdgeKeyNames.ALIAS, isAlias) :: Nil)
+    dstGraph.addEdgeInOriginal(src.asInstanceOf[nodes.StoredNode],
+                               dst.asInstanceOf[nodes.StoredNode],
+                               EdgeTypes.PROPAGATE,
+                               (EdgeKeyNames.ALIAS, isAlias) :: Nil)
   }
 }

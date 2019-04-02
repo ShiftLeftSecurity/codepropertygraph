@@ -16,8 +16,8 @@ class NamespaceCreator(graph: ScalaGraph) extends CpgPass(graph) {
     * */
   override def run() = {
     val namespaceBlocks = graph.V().hasLabel(NodeTypes.NAMESPACE_BLOCK).toBuffer
-    val blocksByName    = namespaceBlocks.groupBy(_.value2(NodeKeys.NAME))
-    val dstGraph        = new DiffGraph
+    val blocksByName = namespaceBlocks.groupBy(_.value2(NodeKeys.NAME))
+    val dstGraph = new DiffGraph
 
     blocksByName.foreach {
       case (name: String, blocks: mutable.Buffer[Vertex]) =>

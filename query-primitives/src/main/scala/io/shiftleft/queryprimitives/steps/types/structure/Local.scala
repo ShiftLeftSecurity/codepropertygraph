@@ -27,8 +27,7 @@ class Local[Labels <: HList](raw: GremlinScala.Aux[nodes.Local, Labels])
   def method: Method[Labels] = {
     // TODO The following line of code is here for backwards compatibility.
     // Use the lower commented out line once not required anymore.
-    new Method[Labels](
-      raw.repeat(_.in(EdgeTypes.AST)).until(_.hasLabel(NodeTypes.METHOD)).cast[nodes.Method])
+    new Method[Labels](raw.repeat(_.in(EdgeTypes.AST)).until(_.hasLabel(NodeTypes.METHOD)).cast[nodes.Method])
     //definingBlock.method
   }
 
@@ -42,8 +41,7 @@ class Local[Labels <: HList](raw: GremlinScala.Aux[nodes.Local, Labels])
     * Places (identifier) where this local is referenced
     * */
   def referencingIdentifiers: Identifier[Labels] =
-    new Identifier[Labels](
-      raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
+    new Identifier[Labels](raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
     * The type of the local.

@@ -18,8 +18,8 @@ import scala.collection.JavaConverters._
 class CpgOverlayApplier {
 
   private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Vertex] = mutable.HashMap()
-  private val overlayEdgeIdToSrcGraphEdge: mutable.HashMap[Long, Edge]   = mutable.HashMap()
-  private val InternalProperty                                           = "_"
+  private val overlayEdgeIdToSrcGraphEdge: mutable.HashMap[Long, Edge] = mutable.HashMap()
+  private val InternalProperty = "_"
 
   /**
     * Applies diff to existing (loaded) TinkerGraph
@@ -36,8 +36,8 @@ class CpgOverlayApplier {
            "this currently only works for graphs that allow user supplied ids")
 
     overlay.getNodeList.asScala.foreach { node =>
-      val label      = node.getType.toString
-      val id         = node.getKey
+      val label = node.getType.toString
+      val id = node.getKey
       val properties = node.getPropertyList.asScala
 
       val keyValues = new JArrayList[AnyRef](4 + (2 * properties.size))
@@ -60,7 +60,7 @@ class CpgOverlayApplier {
       val dstTinkerNode = getVertexForOverlayId(edge.getDst, graph)
 
       val properties = edge.getPropertyList.asScala
-      val keyValues  = new JArrayList[AnyRef](2 * properties.size)
+      val keyValues = new JArrayList[AnyRef](2 * properties.size)
       properties.foreach { property =>
         ProtoToCpg.addProperties(keyValues, property.getName.name, property.getValue)
       }
@@ -72,7 +72,7 @@ class CpgOverlayApplier {
 
   private def addNodeProperties(overlay: CpgOverlay, graph: ScalaGraph): Unit = {
     overlay.getNodePropertyList.asScala.foreach { additionalNodeProperty =>
-      val property   = additionalNodeProperty.getProperty
+      val property = additionalNodeProperty.getProperty
       val tinkerNode = getVertexForOverlayId(additionalNodeProperty.getNodeId, graph)
       addPropertyToElement(tinkerNode, property.getName.name, property.getValue)
     }
@@ -80,7 +80,7 @@ class CpgOverlayApplier {
 
   private def addEdgeProperties(overlay: CpgOverlay, graph: ScalaGraph): Unit = {
     overlay.getEdgePropertyList.asScala.foreach { additionalEdgeProperty =>
-      val property   = additionalEdgeProperty.getProperty
+      val property = additionalEdgeProperty.getProperty
       val tinkerEdge = getEdgeForOverlayId(additionalEdgeProperty.getEdgeId, graph)
       addPropertyToElement(tinkerEdge, property.getName.name, property.getValue)
     }
@@ -91,8 +91,7 @@ class CpgOverlayApplier {
       overlayNodeIdToSrcGraphNode(id)
     } else {
       val iter = graph.graph.vertices(id.asInstanceOf[Object])
-      assert(iter.hasNext,
-             s"node with id=$id neither found in overlay nodes, nor in existing graph")
+      assert(iter.hasNext, s"node with id=$id neither found in overlay nodes, nor in existing graph")
       iter.nextChecked
     }
   }
@@ -102,15 +101,12 @@ class CpgOverlayApplier {
       overlayEdgeIdToSrcGraphEdge(id)
     } else {
       val iter = graph.graph.edges(id.asInstanceOf[Object])
-      assert(iter.hasNext,
-             s"edge with id=$id neither found in overlay edges, nor in existing graph")
+      assert(iter.hasNext, s"edge with id=$id neither found in overlay edges, nor in existing graph")
       iter.nextChecked
     }
   }
 
-  private def addPropertyToElement(tinkerElement: Element,
-                                   propertyName: String,
-                                   propertyValue: PropertyValue): Unit = {
+  private def addPropertyToElement(tinkerElement: Element, propertyName: String, propertyValue: PropertyValue): Unit = {
     import PropertyValue.ValueCase._
     propertyValue.getValueCase match {
       case INT_VALUE =>

@@ -6,11 +6,7 @@ import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps.{ICallResolver, NodeSteps}
 import io.shiftleft.queryprimitives.steps.types.expressions.{Call, Literal}
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.Modifier
-import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{
-  FullNameAccessors,
-  NameAccessors,
-  SignatureAccessors
-}
+import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{FullNameAccessors, NameAccessors, SignatureAccessors}
 import shapeless.HList
 
 class MethodInst[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodInst, Labels])
@@ -56,8 +52,7 @@ class MethodInst[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Metho
   /**
     * Traverse to direct and transitive callers of the method.
     * */
-  def calledBy(sourceTrav: MethodInst[Labels])(
-      implicit callResolver: ICallResolver): Method[Labels] = {
+  def calledBy(sourceTrav: MethodInst[Labels])(implicit callResolver: ICallResolver): Method[Labels] = {
     caller(callResolver).calledByIncludingSink(sourceTrav.method)(callResolver)
   }
 

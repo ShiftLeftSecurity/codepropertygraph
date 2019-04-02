@@ -25,21 +25,17 @@ class NewNodeSteps[A <: NewNode, Labels <: HList](override val raw: GremlinScala
     // create edges to `contained` nodes for this new node
     for {
       (localName, containedNodes) <- newNode.containedNodesByLocalName
-      (containedNode, index)      <- containedNodes.zipWithIndex
+      (containedNode, index) <- containedNodes.zipWithIndex
     } {
       val properties = Seq(
         EdgeKeys.LOCAL_NAME -> localName,
-        EdgeKeys.INDEX      -> index
+        EdgeKeys.INDEX -> index
       ).map { case KeyValue(key, value) => (key.name, value) }
       addEdge(graph, newNode, containedNode, ContainsNode.Label, properties)
     }
   }
 
-  private def addEdge(graph: DiffGraph,
-                      src: Node,
-                      dst: Node,
-                      label: String,
-                      properties: Seq[(String, AnyRef)]): Unit =
+  private def addEdge(graph: DiffGraph, src: Node, dst: Node, label: String, properties: Seq[(String, AnyRef)]): Unit =
     (src, dst) match {
       case (src: NewNode, dst: NewNode) => graph.addEdge(src, dst, label, properties)
       case (src: NewNode, dst: StoredNode) =>

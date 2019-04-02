@@ -15,8 +15,7 @@ trait StringPropertyAccessors[T <: StoredNode, Labels <: HList] {
   protected def stringPropertyFilter(property: Key[String], value: String): Steps[T, Labels] =
     new Steps[T, Labels](raw.has(property, textRegex(value)))
 
-  protected def stringPropertyFilterMultiple(property: Key[String],
-                                             values: String*): Steps[T, Labels] =
+  protected def stringPropertyFilterMultiple(property: Key[String], values: String*): Steps[T, Labels] =
     if (values.nonEmpty) {
       new Steps[T, Labels](raw.or(values.map { value => (trav: GremlinScala[T]) =>
         trav.has(property, textRegex(value))
@@ -25,12 +24,10 @@ trait StringPropertyAccessors[T <: StoredNode, Labels <: HList] {
       new Steps[T, Labels](raw.filterOnEnd(unused => false))
     }
 
-  protected def stringPropertyFilterExact[Out](property: Key[String],
-                                               _value: String): Steps[T, Labels] =
+  protected def stringPropertyFilterExact[Out](property: Key[String], _value: String): Steps[T, Labels] =
     new Steps[T, Labels](raw.has(property, _value))
 
-  protected def stringPropertyFilterExactMultiple[Out](property: Key[String],
-                                                       values: String*): Steps[T, Labels] =
+  protected def stringPropertyFilterExactMultiple[Out](property: Key[String], values: String*): Steps[T, Labels] =
     if (values.nonEmpty) {
       new Steps[T, Labels](raw.or(values.map { value => (trav: GremlinScala[T]) =>
         trav.has(property, value)
@@ -39,12 +36,10 @@ trait StringPropertyAccessors[T <: StoredNode, Labels <: HList] {
       new Steps[T, Labels](raw.filterOnEnd(unused => false))
     }
 
-  protected def stringPropertyFilterNot[Out](property: Key[String],
-                                             value: String): Steps[T, Labels] =
+  protected def stringPropertyFilterNot[Out](property: Key[String], value: String): Steps[T, Labels] =
     new Steps[T, Labels](raw.hasNot(property, textRegex(value)))
 
-  protected def stringPropertyFilterNotMultiple[Out](property: Key[String],
-                                                     values: String*): Steps[T, Labels] =
+  protected def stringPropertyFilterNotMultiple[Out](property: Key[String], values: String*): Steps[T, Labels] =
     if (values.nonEmpty) {
       new Steps[T, Labels](raw.or(values.map { value => (trav: GremlinScala[T]) =>
         trav.hasNot(property, textRegex(value))

@@ -9,9 +9,8 @@ import java.util
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.tinkerpop.gremlin.structure.Vertex
 
-case class AppliedDiffGraph(
-    diffGraph: DiffGraph,
-    private val nodeToTinkerNode: util.HashMap[IdentityHashWrapper[NewNode], Vertex]) {
+case class AppliedDiffGraph(diffGraph: DiffGraph,
+                            private val nodeToTinkerNode: util.HashMap[IdentityHashWrapper[NewNode], Vertex]) {
   def nodeToGraphId(wrappedNode: IdentityHashWrapper[NewNode]): JLong = {
     nodeToTinkerNode.get(wrappedNode).id.asInstanceOf[JLong]
   }
@@ -23,7 +22,7 @@ case class AppliedDiffGraph(
 class DiffGraphApplier {
 
   private var overlayNodeToTinkerNode = new util.HashMap[IdentityHashWrapper[NewNode], Vertex]()
-  private val InternalProperty        = "_"
+  private val InternalProperty = "_"
 
   /**
     * Applies diff to existing (loaded) TinkerGraph

@@ -17,7 +17,7 @@ class SerializedCpg() {
     * We allow creating a dummy serialized CPG that does not do anything.
   **/
   private var zipFileSystem: FileSystem = null
-  private var counter                   = 0
+  private var counter = 0
 
   /**
     * Create Serialized CPG from existing file. If the file does not exist,

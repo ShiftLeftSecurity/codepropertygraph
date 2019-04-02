@@ -5,8 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.queryprimitives.steps.Steps
 import shapeless.HList
 
-trait SignatureAccessors[T <: StoredNode, Labels <: HList]
-    extends StringPropertyAccessors[T, Labels] {
+trait SignatureAccessors[T <: StoredNode, Labels <: HList] extends StringPropertyAccessors[T, Labels] {
 
   /**
     * Traverse to signature

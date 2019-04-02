@@ -21,7 +21,7 @@ class ReceiverEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
 
   override def run(): Stream[DiffGraph] = {
     var loggedDeprecationWarning = false
-    val dstGraph                 = new DiffGraph
+    val dstGraph = new DiffGraph
 
     graph.V
       .hasLabel(NodeTypes.CALL)

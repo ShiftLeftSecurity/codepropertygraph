@@ -46,8 +46,7 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
     Traverse to enclosing expression
     */
   def expressionUp: Expression[Labels] =
-    new Expression[Labels](
-      raw.in(EdgeTypes.AST).not(_.hasLabel(NodeTypes.LOCAL)).cast[nodes.Expression])
+    new Expression[Labels](raw.in(EdgeTypes.AST).not(_.hasLabel(NodeTypes.LOCAL)).cast[nodes.Expression])
 
   /**
     Traverse to sub expressions

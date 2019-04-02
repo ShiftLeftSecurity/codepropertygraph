@@ -6,7 +6,6 @@ import io.shiftleft.queryprimitives.steps.visitormixins.ExpressionGeneralization
 import io.shiftleft.queryprimitives.steps.Implicits._
 import org.apache.tinkerpop.gremlin.structure.Direction
 
-
 class WithinMethodMethods(val node: nodes.WithinMethod) extends AnyVal {
   def method: nodes.Method = {
     node.accept(WithinMethodToMethod)

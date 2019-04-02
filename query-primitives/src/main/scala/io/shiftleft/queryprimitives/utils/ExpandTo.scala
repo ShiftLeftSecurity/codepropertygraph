@@ -32,11 +32,11 @@ object ExpandTo {
 
     parent match {
       case call: nodes.Call
-        if call.name == Operators.memberAccess ||
-          call.name == Operators.indirectMemberAccess ||
-          call.name == Operators.computedMemberAccess ||
-          call.name == Operators.indirectComputedMemberAccess ||
-          call.name == Operators.indirection =>
+          if call.name == Operators.memberAccess ||
+            call.name == Operators.indirectMemberAccess ||
+            call.name == Operators.computedMemberAccess ||
+            call.name == Operators.indirectComputedMemberAccess ||
+            call.name == Operators.indirection =>
         argumentToCallOrReturn(call)
       case expression: nodes.Expression =>
         expression
@@ -73,7 +73,9 @@ object ExpandTo {
   }
 
   def formalReturnToReturn(methodReturn: Vertex): Seq[Vertex] = {
-    methodReturn.vertices(Direction.IN, EdgeTypes.CFG).asScala
+    methodReturn
+      .vertices(Direction.IN, EdgeTypes.CFG)
+      .asScala
       .filter(_.isInstanceOf[nodes.Return])
       .toSeq
   }
@@ -103,16 +105,14 @@ object ExpandTo {
     call
       .vertices(Direction.OUT, EdgeTypes.CALL)
       .asScala
-      .map(methodInst =>
-        methodInst.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method])
+      .map(methodInst => methodInst.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method])
       .toSeq
   }
 
   def methodToTypeDecl(method: Vertex): Option[Vertex] = {
     var typeDeclOption = method.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
     while (typeDeclOption.isDefined && !typeDeclOption.get.isInstanceOf[nodes.TypeDecl]) {
-      typeDeclOption =
-        typeDeclOption.get.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
+      typeDeclOption = typeDeclOption.get.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
     }
     typeDeclOption
   }
@@ -126,7 +126,9 @@ object ExpandTo {
   }
 
   def methodToOutParameters(method: Vertex): Seq[Vertex] = {
-    method.vertices(Direction.OUT, EdgeTypes.AST).asScala
+    method
+      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asScala
       .filter(_.isInstanceOf[nodes.MethodParameterOut])
       .toSeq
   }

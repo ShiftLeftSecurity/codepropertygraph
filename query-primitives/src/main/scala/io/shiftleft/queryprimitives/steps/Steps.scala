@@ -28,8 +28,7 @@ trait StepsRoot {
   Base class for our DSL
   These are the base steps available in all steps of the query language.
   */
-class Steps[NodeType, Labels <: HList](val raw: GremlinScala.Aux[NodeType, Labels])
-    extends StepsRoot {
+class Steps[NodeType, Labels <: HList](val raw: GremlinScala.Aux[NodeType, Labels]) extends StepsRoot {
   type NodeType0 = NodeType
   implicit lazy val graph: Graph = raw.traversal.asAdmin.getGraph.get
 
@@ -95,7 +94,7 @@ class Steps[NodeType, Labels <: HList](val raw: GremlinScala.Aux[NodeType, Label
     l.map {
       case vertex: Vertex => {
         val label = vertex.label
-        val id    = vertex.id().toString
+        val id = vertex.id().toString
         val keyValPairs = vertex.valueMap.toList
           .filter(x => x._2.toString != "")
           .sortBy(_._1)
@@ -301,23 +300,20 @@ class Steps[NodeType, Labels <: HList](val raw: GremlinScala.Aux[NodeType, Label
   /** Labels the current step and preserves the type - use together with `select` step
     */
   def as[NewLabels <: HList](stepLabel: String)(
-      implicit prependDomain: Prepend.Aux[Labels, NodeType :: HNil, NewLabels])
-    : Steps[NodeType, NewLabels] =
+      implicit prependDomain: Prepend.Aux[Labels, NodeType :: HNil, NewLabels]): Steps[NodeType, NewLabels] =
     new Steps[NodeType, NewLabels](raw.as(stepLabel))
 
   /**
     Labels the current step and preserves the type - use together with `select` step
     */
   def as[NewLabels <: HList](stepLabel: StepLabel[NodeType])(
-      implicit prependDomain: Prepend.Aux[Labels, NodeType :: HNil, NewLabels])
-    : Steps[NodeType, NewLabels] =
+      implicit prependDomain: Prepend.Aux[Labels, NodeType :: HNil, NewLabels]): Steps[NodeType, NewLabels] =
     new Steps[NodeType, NewLabels](raw.as(stepLabel))
 
   /**
     Select all labeled nodes
     */
-  def select[LabelsTuple]()(
-      implicit tupler: Tupler.Aux[Labels, LabelsTuple]): Steps[LabelsTuple, Labels] =
+  def select[LabelsTuple]()(implicit tupler: Tupler.Aux[Labels, LabelsTuple]): Steps[LabelsTuple, Labels] =
     new Steps[LabelsTuple, Labels](raw.select())
 
   /**
@@ -344,10 +340,8 @@ class Steps[NodeType, Labels <: HList](val raw: GremlinScala.Aux[NodeType, Label
       tupler: Tupler.Aux[SelectedTypes, SelectedTypesTuple],
       stepLabelToString: Mapper.Aux[GetLabelName.type, StepLabels, LabelNames],
       trav: ToTraversable.Aux[LabelNames, List, String],
-      folder: RightFolder.Aux[StepLabels,
-                              (HNil, JMap[String, Any]),
-                              combineLabelWithValue.type,
-                              (SelectedTypes, Z)]): Steps[SelectedTypesTuple, Labels] =
+      folder: RightFolder.Aux[StepLabels, (HNil, JMap[String, Any]), combineLabelWithValue.type, (SelectedTypes, Z)])
+    : Steps[SelectedTypesTuple, Labels] =
     new Steps[SelectedTypesTuple, Labels](raw.select(stepLabelsTuple))
 
 }

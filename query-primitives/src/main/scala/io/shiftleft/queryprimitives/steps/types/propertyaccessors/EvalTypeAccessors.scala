@@ -11,8 +11,7 @@ trait EvalTypeAccessors[T <: Vertex, Labels <: HList] {
   def raw: GremlinScala.Aux[T, Labels]
 
   def evalType(): Steps[String, Labels] =
-    new Steps[String, Labels](
-      raw.out(EdgeTypes.EVAL_TYPE).out(EdgeTypes.REF).value(NodeKeys.FULL_NAME))
+    new Steps[String, Labels](raw.out(EdgeTypes.EVAL_TYPE).out(EdgeTypes.REF).value(NodeKeys.FULL_NAME))
 
   def evalType(_value: String): Steps[T, Labels] =
     new Steps[T, Labels](

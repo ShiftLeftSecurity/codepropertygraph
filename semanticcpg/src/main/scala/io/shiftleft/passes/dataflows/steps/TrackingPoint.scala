@@ -13,8 +13,7 @@ import scala.collection.JavaConverters._
 /**
   * Base class for nodes that can occur in data flows
   * */
-class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, Labels])
-  extends NodeSteps(raw) {
+class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, Labels]) extends NodeSteps(raw) {
 
   private class ReachableByContainer(val reachedSource: nodes.TrackingPoint, val path: List[nodes.TrackingPoint]) {
     override def clone(): ReachableByContainer = {
@@ -69,7 +68,7 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
       ddgPredecessors.foreach { pred =>
         getTrackingPoint(pred) match {
           case Some(predTrackingPoint) =>
-            if(!path.contains(predTrackingPoint)) {
+            if (!path.contains(predTrackingPoint)) {
               traverseDDGBack(predTrackingPoint :: node :: path.tail)
             }
           case None =>
@@ -88,11 +87,11 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
 
   private def getTrackingPoint(vertex: Vertex): Option[nodes.TrackingPoint] = {
     vertex match {
-      case identifier: nodes.Identifier          => getTrackingPoint(identifier.vertices(Direction.IN, EdgeTypes.AST).next)
-      case call: nodes.Call => Some(call)
-      case ret: nodes.Return              => Some(ret)
-      case methodReturn: nodes.MethodReturn       => Some(methodReturn)
-      case _                             => None
+      case identifier: nodes.Identifier     => getTrackingPoint(identifier.vertices(Direction.IN, EdgeTypes.AST).next)
+      case call: nodes.Call                 => Some(call)
+      case ret: nodes.Return                => Some(ret)
+      case methodReturn: nodes.MethodReturn => Some(methodReturn)
+      case _                                => None
     }
   }
 

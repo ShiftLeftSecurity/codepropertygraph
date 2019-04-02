@@ -13,7 +13,7 @@ class TrackingPointComparator(trackingPoint: nodes.TrackingPoint) {
     other match {
       case otherTrackingPoint: nodes.TrackingPoint =>
         trackingPoint.cfgNode == otherTrackingPoint.cfgNode &&
-        trackingPoint.trackedBase == otherTrackingPoint.trackedBase
+          trackingPoint.trackedBase == otherTrackingPoint.trackedBase
       case _ => false
     }
   }
