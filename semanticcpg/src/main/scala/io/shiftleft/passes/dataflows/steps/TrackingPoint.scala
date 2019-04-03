@@ -60,7 +60,7 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
 
     def traverseDDGBack(path: List[nodes.TrackingPoint]): Unit = {
       val node = path.head
-      if (sourceSymbols.contains(node)) {
+      if (!indirectAccess(node) && sourceSymbols.contains(node)) {
         val sack = new ReachableByContainer(node, path)
         pathReachables = sack :: pathReachables
       }
@@ -70,7 +70,11 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
         getTrackingPoint(pred) match {
           case Some(predTrackingPoint) =>
             if(!path.contains(predTrackingPoint)) {
-              traverseDDGBack(predTrackingPoint :: node :: path.tail)
+              if(indirectAccess(node)) {
+                traverseDDGBack(predTrackingPoint :: path.tail)
+              } else {
+                traverseDDGBack(predTrackingPoint :: node :: path.tail)
+              }
             }
           case None =>
         }
@@ -89,10 +93,10 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
   private def getTrackingPoint(vertex: Vertex): Option[nodes.TrackingPoint] = {
     vertex match {
       case identifier: nodes.Identifier          => getTrackingPoint(identifier.vertices(Direction.IN, EdgeTypes.AST).next)
-      case call: nodes.Call => Some(call)
-      case ret: nodes.Return              => Some(ret)
-      case methodReturn: nodes.MethodReturn       => Some(methodReturn)
-      case _                             => None
+      case call: nodes.Call                      => Some(call)
+      case ret: nodes.Return                     => Some(ret)
+      case methodReturn: nodes.MethodReturn      => Some(methodReturn)
+      case _                                     => None
     }
   }
 
@@ -109,6 +113,22 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
           ExpandTo.expressionToMethod(dataFlowObject)
       }
     method.asInstanceOf[nodes.Method]
+  }
+
+  private def indirectAccess(vertex: Vertex): Boolean = {
+    if (!vertex.isInstanceOf[nodes.Call]) {
+      return false
+    }
+
+    val callName = vertex.value2(NodeKeys.NAME)
+    callName match {
+      case Operators.memberAccess                 => true
+      case Operators.indirectComputedMemberAccess => true
+      case Operators.indirectMemberAccess         => true
+      case Operators.computedMemberAccess         => true
+      case Operators.indirection                  => true
+      case _                                      => false
+    }
   }
 
 }
