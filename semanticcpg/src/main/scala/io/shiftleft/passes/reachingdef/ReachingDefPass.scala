@@ -102,6 +102,18 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
         usesInExpression.foreach { use =>
           if (!use.isInstanceOf[nodes.Identifier] && !use.isInstanceOf[nodes.Literal]) {
             addEdge(use, node)
+
+            /* handle indirect access uses: check if we have it in our out set and get
+             * the corresponding def expression from which the definition reaches the use
+             */
+            if(isIndirectAccess(use)) {
+              outDefs.filter(out => isIndirectAccess(out)).foreach { indirectOutDef =>
+                if(indirectOutDef.asInstanceOf[nodes.Call].code == use.asInstanceOf[nodes.Call].code) {
+                  val expandedToCall = ExpandTo.argumentToCallOrReturn(indirectOutDef)
+                  addEdge(expandedToCall, use)
+                }
+              }
+            }
           }
         }
 
@@ -181,6 +193,22 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
       case Operators.assignmentShiftLeft            => true
       case Operators.assignmentXor                  => true
       case _                                        => false
+    }
+  }
+
+  private def isIndirectAccess(vertex: Vertex): Boolean = {
+    if (!vertex.isInstanceOf[nodes.Call]) {
+      return false
+    }
+
+    val callName = vertex.value2(NodeKeys.NAME)
+    callName match {
+      case Operators.memberAccess                 => true
+      case Operators.indirectComputedMemberAccess => true
+      case Operators.indirectMemberAccess         => true
+      case Operators.computedMemberAccess         => true
+      case Operators.indirection                  => true
+      case _                                      => false
     }
   }
 
