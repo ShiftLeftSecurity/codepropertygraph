@@ -340,4 +340,38 @@ class CDataFlowTests extends CpgDataFlowTests {
             ("foo(b)", 5)
           ))
   }
+
+  "Test 10: flow with member access in expression to identifier x" in {
+    val cpg = cpgFactory.buildCpg(
+      """
+        | struct node {
+        | int value1;
+        | int value2;
+        |};
+        |
+        |void test(void){
+        |  int x = 10;
+        |  struct node n;
+        |  n.value1 = x;
+        |  n.value2 = n.value1;
+        |}
+      """.stripMargin)
+
+    val source = cpg.identifier.name("x")
+    val sink = cpg.call.code("n.value2 = n.value1")
+    val flows = sink.reachableByFlows(source).l
+
+    flows.size shouldBe 2
+
+    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      Set(List[(String, Option[Integer])](
+        ("x = 10", 8),
+        ("n.value1 = x", 10),
+        ("n.value2 = n.value1", 11)
+      ),
+      List[(String, Option[Integer])](
+        ("n.value1 = x", 10),
+        ("n.value2 = n.value1", 11)
+      ))
+  }
 }
