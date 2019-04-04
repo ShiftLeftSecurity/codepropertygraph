@@ -5,7 +5,6 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.types.structure._
 import io.shiftleft.queryprimitives.steps.types.expressions._
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations._
-import scala.language.implicitConversions
 import shapeless.{HList, HNil}
 
 object Implicits extends Implicits // to allow for a hierarchy of implicits

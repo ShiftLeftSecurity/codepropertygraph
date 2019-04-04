@@ -4,7 +4,6 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
 import io.shiftleft.queryprimitives.steps.Implicits._
-import scala.language.implicitConversions
 import shapeless.HNil
 
 object Cpg {

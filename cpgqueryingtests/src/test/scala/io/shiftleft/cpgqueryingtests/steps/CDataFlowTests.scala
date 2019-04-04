@@ -9,7 +9,6 @@ import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps._
 import io.shiftleft.passes.dataflows.Implicits._
 
-import scala.language.implicitConversions
 
 class CDataFlowTests extends CpgDataFlowTests {
   val cpgFactory = new CpgFactory(LanguageFrontend.Fuzzyc)

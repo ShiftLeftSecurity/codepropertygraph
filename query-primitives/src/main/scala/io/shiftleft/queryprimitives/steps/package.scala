@@ -1,7 +1,6 @@
 package io.shiftleft.queryprimitives
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import scala.language.implicitConversions
 
 /**
   Steps for traversing the code property graph

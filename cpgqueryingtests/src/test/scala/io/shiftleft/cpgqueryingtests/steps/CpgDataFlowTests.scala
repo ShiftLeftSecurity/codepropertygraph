@@ -8,7 +8,6 @@ import io.shiftleft.queryprimitives.steps.types.expressions.Literal
 import io.shiftleft.queryprimitives.steps.types.structure.{Member, Method}
 import org.scalatest.{Matchers, WordSpec}
 
-import scala.language.implicitConversions
 import shapeless.HNil
 
 class CpgDataFlowTests extends WordSpec with Matchers {
