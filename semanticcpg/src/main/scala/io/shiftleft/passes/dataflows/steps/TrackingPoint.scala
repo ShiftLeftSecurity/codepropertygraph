@@ -96,6 +96,7 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
       case call: nodes.Call                      => Some(call)
       case ret: nodes.Return                     => Some(ret)
       case methodReturn: nodes.MethodReturn      => Some(methodReturn)
+      case literal: nodes.Literal                => getTrackingPoint(literal.vertices(Direction.IN, EdgeTypes.AST).next)
       case _                                     => None
     }
   }
