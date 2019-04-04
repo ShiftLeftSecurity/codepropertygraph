@@ -1,8 +1,8 @@
-package io.shiftleft
+package io.shiftleft.cpgloading
 
 import gremlin.scala.{Graph, ScalaGraph}
+import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
-import io.shiftleft.cpgloading.{IgnoredProtoEntries, OnDiskOverflowConfig, ProtoCpgLoader}
 import io.shiftleft.layers.enhancedbase.EnhancedBaseCreator
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 import io.shiftleft.queryprimitives.CpgOverlayLoader
