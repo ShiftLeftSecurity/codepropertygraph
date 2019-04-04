@@ -374,4 +374,35 @@ class CDataFlowTests extends CpgDataFlowTests {
         ("n.value2 = n.value1", 11)
       ))
   }
+
+  "Test 11: flow chain from x to literal 0x37" in {
+    val cpg = cpgFactory.buildCpg(
+      """
+        | void flow(void) {
+        |   int a = 0x37;
+        |   int b=a;
+        |   int c=0x31;
+        |   int z = b + c;
+        |   z++;
+        |   int* p = &z;
+        |   int x = z;
+        | }
+      """.stripMargin
+    )
+
+    val source = cpg.literal.code("0x37")
+    val sink = cpg.identifier.name("x")
+    val flows = sink.reachableByFlows(source).l
+
+    flows.size shouldBe 1
+
+    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      Set(List[(String, Option[Integer])](
+        ("a = 0x37", 3),
+        ("b=a", 4),
+        ("b + c", 6),
+        ("z = b + c", 6),
+        ("x = z", 9)
+      ))
+  }
 }
