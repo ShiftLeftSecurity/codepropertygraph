@@ -50,3 +50,4 @@ lazy val semanticcpg = Projects.semanticcpg
 ThisBuild/publishTo := sonatypePublishTo.value
 ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature")
 ThisBuild/compile/javacOptions ++= Seq("-g") //debug symbols
+ 
