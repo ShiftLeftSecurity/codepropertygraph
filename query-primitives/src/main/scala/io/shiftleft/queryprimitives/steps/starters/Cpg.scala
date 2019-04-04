@@ -4,6 +4,7 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
 import io.shiftleft.queryprimitives.steps.Implicits._
+import scala.language.implicitConversions
 import shapeless.HNil
 
 object Cpg {
@@ -11,6 +12,9 @@ object Cpg {
   /* syntactic sugar for `Cpg(graph)`. Usage:
    * `Cpg(graph)` or simply `Cpg` if you have an `implicit Graph` in scope */
   def apply(implicit graph: Graph) = new Cpg(graph)
+
+  implicit def toNodeTypeStarters(cpg: Cpg): NodeTypeStarters =
+    new NodeTypeStarters(cpg)
 }
 
 /**

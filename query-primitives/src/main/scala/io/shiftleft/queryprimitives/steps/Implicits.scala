@@ -2,13 +2,11 @@ package io.shiftleft.queryprimitives.steps
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.queryprimitives.steps.starters.{Cpg, NodeTypeStarters}
 import io.shiftleft.queryprimitives.steps.types.structure._
 import io.shiftleft.queryprimitives.steps.types.expressions._
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations._
-import shapeless.{HList, HNil}
-
 import scala.language.implicitConversions
+import shapeless.{HList, HNil}
 
 object Implicits extends Implicits // to allow for a hierarchy of implicits
 
@@ -89,9 +87,6 @@ trait Implicits {
       }
     }
   }
-
-  implicit def toNodeTypeStarters(cpg: Cpg): NodeTypeStarters =
-    new NodeTypeStarters(cpg)
 
   /* TODO: generate this boilerplate */
   implicit def toLiteral[Labels <: HList](steps: Steps[nodes.Literal, Labels]): Literal[Labels] =
