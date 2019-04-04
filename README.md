@@ -35,6 +35,8 @@ the following prerequisites:
 * Scala build tool (sbt)
   - Link: https://www.scala-sbt.org/
 
+Some binary files are managed through `git-lfs`. If you haven't cloned this repository yet, simply run `git lfs install`. 
+If you have cloned it already, additionally run `git lfs pull` (from within the repository).
 
 Additional build-time dependencies are automatically downloaded as
 part of the build process. To build and install into your local Maven
