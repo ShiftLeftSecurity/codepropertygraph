@@ -221,7 +221,9 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
                       .flatMap(lookupNode(_))
                   case _ =>
                     logger.error(
-                      s"Invalid AST_PARENT_TYPE=${astChild.value2(NodeKeys.AST_PARENT_FULL_NAME)}; astChild=$astChild")
+                      s"Invalid AST_PARENT_TYPE=${astChild.valueOption(NodeKeys.AST_PARENT_FULL_NAME)};" +
+                        s" astChild LABEL=${astChild.label};" +
+                        s" astChild FULL_NAME=${astChild.valueOption(NodeKeys.FULL_NAME)}")
                     None
                 }
 
