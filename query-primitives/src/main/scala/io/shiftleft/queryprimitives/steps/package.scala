@@ -31,7 +31,6 @@ package object steps {
   implicit def cfgNodeMethodsQp(node: nodes.CfgNode): CfgNodeMethods =
     new CfgNodeMethods(node)
 
-
   implicit def toLiteral[Labels <: HList](steps: Steps[nodes.Literal, Labels]): Literal[Labels] =
     new Literal[Labels](steps.raw)
 

@@ -14,7 +14,7 @@ import scala.collection.JavaConverters._
   * Base class for nodes that can occur in data flows
   * */
 class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, Labels])
-  extends NodeSteps(raw) {
+  extends NodeSteps[nodes.TrackingPoint, Labels](raw) {
 
   private class ReachableByContainer(val reachedSource: nodes.TrackingPoint, val path: List[nodes.TrackingPoint]) {
     override def clone(): ReachableByContainer = {
