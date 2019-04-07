@@ -373,13 +373,10 @@ val cpg = io.shiftleft.cpgloading.CpgLoader.loadCodePropertyGraph("cpg.bin.zip")
 
 # Querying the cpg
 Once you've loaded a cpg you can run queries, which are provided by the `query-primitives` subproject. Note that if you're in the sbt shell you can play with it interactively: `TAB` completion is your friend. Otherwise your IDE will assist. 
-Don't forget to `import io.shiftleft.queryprimitives.steps.Implicits._`.
 
 Here are some simple traversals to get all the base nodes. Running all of these without errors is a good test to ensure that your cpg is valid: 
 
 ```scala
-import io.shiftleft.queryprimitives.steps.Implicits._
-
 cpg.literal.toList
 cpg.file.toList
 cpg.namespace.toList
