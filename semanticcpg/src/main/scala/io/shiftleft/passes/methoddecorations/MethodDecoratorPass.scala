@@ -4,7 +4,7 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
-import io.shiftleft.queryprimitives.steps.Implicits._
+import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 object MethodDecoratorPass {

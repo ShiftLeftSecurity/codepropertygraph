@@ -3,7 +3,7 @@ package io.shiftleft.passes.dataflows
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.passes.dataflows.steps.TrackingPoint
 import io.shiftleft.queryprimitives.steps.Steps
-import io.shiftleft.queryprimitives.steps.Implicits._
+import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import shapeless.HList
 
 object Implicits {

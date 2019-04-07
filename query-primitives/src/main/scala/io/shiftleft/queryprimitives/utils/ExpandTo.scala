@@ -3,7 +3,7 @@ package io.shiftleft.queryprimitives.utils
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex}
-import io.shiftleft.queryprimitives.steps.Implicits._
+import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 
 import scala.collection.JavaConverters._
 

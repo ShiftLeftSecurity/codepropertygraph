@@ -3,7 +3,6 @@ package io.shiftleft.cpgqueryingtests.steps
 import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.{Languages, NodeKeys, NodeTypes}
-import io.shiftleft.queryprimitives.steps.Implicits._
 import org.scalatest.{Matchers, WordSpec}
 import java.io._
 import org.json4s._

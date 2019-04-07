@@ -1,9 +1,8 @@
 package io.shiftleft.queryprimitives.steps
 
-import gremlin.scala._
+import gremlin.scala.{GremlinScala,P,Vertex}
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.queryprimitives.steps.Implicits._
+import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.types.structure.File
 import java.util.{List => JList}
 
@@ -30,7 +29,7 @@ class NodeSteps[NodeType <: nodes.StoredNode, Labels <: HList](raw: GremlinScala
       raw
         .cast[nodes.StoredNode]
         .until(_.hasLabel(NodeTypes.FILE))
-        .repeat(_.in(EdgeTypes.AST).cast[StoredNode])
+        .repeat(_.in(EdgeTypes.AST).cast[nodes.StoredNode])
         .cast[nodes.File])
 
   /* follow the incoming edges of the given type as long as possible */

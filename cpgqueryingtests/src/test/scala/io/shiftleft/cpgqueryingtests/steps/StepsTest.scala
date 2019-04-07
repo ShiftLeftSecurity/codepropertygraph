@@ -1,12 +1,11 @@
 package io.shiftleft.cpgqueryingtests.steps
 
 import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
-import gremlin.scala._
+import gremlin.scala.{Edge,GremlinScala,StepLabel,Vertex}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.diffgraph.{DiffGraph, DiffGraphApplier}
-import io.shiftleft.queryprimitives.steps.Implicits._
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.{Matchers, WordSpec}

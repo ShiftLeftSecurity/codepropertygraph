@@ -3,7 +3,7 @@ package io.shiftleft.queryprimitives.steps.starters
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
-import io.shiftleft.queryprimitives.steps.Implicits._
+import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import shapeless.HNil
 
 object Cpg {

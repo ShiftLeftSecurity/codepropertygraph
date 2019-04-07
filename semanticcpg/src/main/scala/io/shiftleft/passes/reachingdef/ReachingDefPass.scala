@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
-import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps.types.structure.File
 import io.shiftleft.queryprimitives.utils.ExpandTo
 
