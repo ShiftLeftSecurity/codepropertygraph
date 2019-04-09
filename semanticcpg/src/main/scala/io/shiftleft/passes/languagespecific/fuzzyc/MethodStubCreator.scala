@@ -6,7 +6,6 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
 import io.shiftleft.queryprimitives.steps.starters.Cpg
-import io.shiftleft.queryprimitives.steps.Implicits._
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._

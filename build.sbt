@@ -48,5 +48,5 @@ lazy val cpgqueryingtests = Projects.cpgqueryingtests
 lazy val semanticcpg = Projects.semanticcpg
 
 ThisBuild/publishTo := sonatypePublishTo.value
-ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature")
+ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature", "-language:implicitConversions")
 ThisBuild/compile/javacOptions ++= Seq("-g") //debug symbols

@@ -4,7 +4,7 @@ import java.nio.file.Files
 
 import gremlin.scala._
 import io.shiftleft.passes.methoddecorations.MethodDecoratorPass
-import io.shiftleft.CpgLoader
+import io.shiftleft.cpgloading.CpgLoader
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 import org.apache.tinkerpop.gremlin.structure.Graph
 

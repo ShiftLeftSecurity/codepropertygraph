@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
 import io.shiftleft.queryprimitives.steps.starters.Cpg
-import io.shiftleft.queryprimitives.steps.Implicits._
 
 class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
 
