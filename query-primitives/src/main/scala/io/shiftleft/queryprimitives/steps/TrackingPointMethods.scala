@@ -9,29 +9,9 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
 
-sealed trait TrackedBase
-case class TrackedNamedVariable(name: String) extends TrackedBase
-case class TrackedReturnValue(call: nodes.Call) extends TrackedBase
-case class TrackedLiteral(literal: nodes.Literal) extends TrackedBase
-case class TrackedMethodRef(methodRef: nodes.MethodRef) extends TrackedBase
-object TrackedUnknown extends TrackedBase {
-  override def toString: String = {
-    "TrackedUnknown"
-  }
-}
-object TrackedFormalReturn extends TrackedBase {
-  override def toString: String = {
-    "TrackedFormalReturn"
-  }
-}
-
 class TrackingPointMethods(val node: nodes.TrackingPoint) extends AnyVal {
   def cfgNode: nodes.CfgNode = {
     node.accept(TrackPointToCfgNode)
-  }
-
-  def trackedBase: TrackedBase = {
-    node.accept(TrackingPointToTrackedBase)
   }
 }
 
@@ -73,58 +53,5 @@ private object TrackPointToCfgNode extends NodeVisitor[nodes.CfgNode] with Expre
 
   override def visit(node: nodes.Expression): nodes.CfgNode = {
     node
-  }
-}
-
-private object TrackingPointToTrackedBase extends NodeVisitor[TrackedBase] {
-  override def visit(node: nodes.MethodParameterIn): TrackedBase = {
-    TrackedNamedVariable(node.name)
-  }
-
-  override def visit(node: nodes.MethodParameterOut): TrackedBase = {
-    TrackedNamedVariable(node.name)
-  }
-
-  override def visit(node: nodes.MethodReturn): TrackedBase = {
-    TrackedFormalReturn
-  }
-
-  override def visit(node: nodes.Call): TrackedBase = {
-    val callName = node.name
-    if (callName == Operators.memberAccess ||
-        callName == Operators.indirectMemberAccess ||
-        callName == Operators.computedMemberAccess ||
-        callName == Operators.indirectComputedMemberAccess ||
-        callName == Operators.indirection) {
-      node
-        .vertices(Direction.OUT, EdgeTypes.AST)
-        .asScala
-        .find(_.value2(NodeKeys.ARGUMENT_INDEX) == 1)
-        .get
-        .asInstanceOf[nodes.TrackingPoint]
-        .accept(this)
-    } else {
-      TrackedReturnValue(node)
-    }
-  }
-
-  override def visit(node: nodes.Identifier): TrackedBase = {
-    TrackedNamedVariable(node.name)
-  }
-
-  override def visit(node: nodes.Literal): TrackedBase = {
-    TrackedLiteral(node)
-  }
-
-  override def visit(node: nodes.Return): TrackedBase = {
-    TrackedFormalReturn
-  }
-
-  override def visit(node: nodes.MethodRef): TrackedBase = {
-    TrackedMethodRef(node)
-  }
-
-  override def visit(node: nodes.Unknown): TrackedBase = {
-    TrackedUnknown
   }
 }
