@@ -2,6 +2,8 @@ package io.shiftleft.queryprimitives
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.passes.dataflows.steps.TrackingPoint
+import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.types.structure._
 import io.shiftleft.queryprimitives.steps.types.expressions._
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations._
@@ -86,4 +88,7 @@ package object steps {
 
   implicit def toFile[Labels <: HList](steps: Steps[nodes.File, Labels]): File[Labels] =
     new File[Labels](steps.raw)
+
+  implicit def toTrackingPoint[NodeType <: nodes.TrackingPoint, Labels <: HList](steps: Steps[NodeType, Labels]): TrackingPoint[Labels] =
+    new TrackingPoint[Labels](steps.raw.cast[nodes.TrackingPoint])
 }

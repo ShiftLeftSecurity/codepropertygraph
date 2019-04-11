@@ -3,7 +3,6 @@ name := "semanticcpg"
 dependsOn(Projects.queryPrimitives, Projects.enhancements)
 
 libraryDependencies ++= Seq(
-  "com.massisframework" % "j-text-utils"     % "0.3.4",
   "com.github.scopt"    %% "scopt"           % "3.7.0",
   "org.apache.commons"  % "commons-lang3"    % "3.8",
   "org.scalatest"       %% "scalatest"       % "3.0.3" % Test,

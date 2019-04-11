@@ -6,8 +6,6 @@ import io.shiftleft.passes.dataflows._
 import io.shiftleft.passes.dataflows.steps.{FlowPrettyPrinter}
 import io.shiftleft.codepropertygraph.generated.{NodeKeys, nodes}
 import io.shiftleft.queryprimitives.steps._
-import io.shiftleft.passes.dataflows.Implicits._
-
 
 class CDataFlowTests extends CpgDataFlowTests {
   val cpgFactory = new CpgFactory(LanguageFrontend.Fuzzyc)
