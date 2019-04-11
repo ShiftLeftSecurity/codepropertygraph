@@ -37,4 +37,19 @@ class Namespace[Labels <: HList](raw: GremlinScala.Aux[nodes.Namespace, Labels])
     * */
   def method: Method[Labels] =
     typeDecl.method
+
+  /**
+    * External namespaces - any namespaces
+    * which contain one or more external type.
+    * */
+  def external: Namespace[Labels] =
+    new Namespace(filter(_.typeDecl.external).raw)
+
+  /**
+    * Internal namespaces - any namespaces
+    * which contain one or more internal type
+    * */
+  def internal: Namespace[Labels] =
+    new Namespace(filter(_.typeDecl.internal).raw)
+
 }
