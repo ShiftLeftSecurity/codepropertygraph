@@ -3,6 +3,7 @@ package io.shiftleft.diffgraph
 import gremlin.scala._
 import io.shiftleft.IdentityHashWrapper
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
+import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 import java.lang.{Long => JLong}
 import java.util
 
@@ -58,7 +59,7 @@ class DiffGraphApplier {
 
   private def addEdges(diffGraph: DiffGraph, graph: ScalaGraph) = {
     def lookupNode(id: JLong): Vertex =
-      graph.graph.vertices(id).next
+      graph.graph.vertices(id).nextChecked
 
     diffGraph.edges.foreach { edge =>
       val srcTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.src))

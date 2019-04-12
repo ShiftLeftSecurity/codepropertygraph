@@ -102,19 +102,15 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
   }
 
   private def initMaps(): Unit = {
-    val iter = graph.graph.vertices()
-    while (iter.hasNext) {
-      iter.next() match {
-        case node: nodes.TypeDecl   => typeDeclFullNameToNodeId += node.fullName -> node.getId
-        case node: nodes.Type       => typeFullNameToNodeId += node.fullName -> node.getId
-        case node: nodes.Method     => methodFullNameToNodeId += node.fullName -> node.getId
-        case node: nodes.MethodInst => methodInstFullNameToNodeId += node.fullName -> node.getId
-        case node: nodes.NamespaceBlock =>
-          namespaceBlockFullNameToNodeId += node.fullName -> node.getId
-        case _ => // ignore
-      }
+    graph.graph.vertices().asScala.foreach {
+      case node: nodes.TypeDecl   => typeDeclFullNameToNodeId += node.fullName -> node.getId
+      case node: nodes.Type       => typeFullNameToNodeId += node.fullName -> node.getId
+      case node: nodes.Method     => methodFullNameToNodeId += node.fullName -> node.getId
+      case node: nodes.MethodInst => methodInstFullNameToNodeId += node.fullName -> node.getId
+      case node: nodes.NamespaceBlock =>
+        namespaceBlockFullNameToNodeId += node.fullName -> node.getId
+      case _ => // ignore
     }
-
   }
 
   private def linkToSingle[SRC_NODE_TYPE <: nodes.StoredNode](srcLabels: Set[String],
@@ -144,7 +140,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
           }
         } else {
           val dstFullName =
-            srcNode.vertices(Direction.OUT, edgeType).next.value2(NodeKeys.FULL_NAME)
+            srcNode.vertices(Direction.OUT, edgeType).nextChecked.value2(NodeKeys.FULL_NAME)
           srcNode.property(dstFullNameKey, dstFullName)
           if (!loggedDeprecationWarning) {
             logger.warn(
@@ -273,6 +269,6 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
   }
 
   private def lookupNode(nodeId: JLong): Option[nodes.StoredNode] =
-    Option(graph.graph.vertices(nodeId).next).asInstanceOf[Option[nodes.StoredNode]]
+    graph.graph.vertices(nodeId).nextOption.map(_.asInstanceOf[nodes.StoredNode])
 
 }

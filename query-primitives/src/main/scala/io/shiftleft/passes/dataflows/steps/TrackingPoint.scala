@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
 import shapeless.HList
 import io.shiftleft.queryprimitives.steps.types.structure.Method
+import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 import io.shiftleft.queryprimitives.utils.ExpandTo
 import org.apache.tinkerpop.gremlin.structure.Direction
 
@@ -92,11 +93,11 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
 
   private def getTrackingPoint(vertex: Vertex): Option[nodes.TrackingPoint] = {
     vertex match {
-      case identifier: nodes.Identifier          => getTrackingPoint(identifier.vertices(Direction.IN, EdgeTypes.AST).next)
+      case identifier: nodes.Identifier          => getTrackingPoint(identifier.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
       case call: nodes.Call                      => Some(call)
       case ret: nodes.Return                     => Some(ret)
       case methodReturn: nodes.MethodReturn      => Some(methodReturn)
-      case literal: nodes.Literal                => getTrackingPoint(literal.vertices(Direction.IN, EdgeTypes.AST).next)
+      case literal: nodes.Literal                => getTrackingPoint(literal.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
       case _                                     => None
     }
   }

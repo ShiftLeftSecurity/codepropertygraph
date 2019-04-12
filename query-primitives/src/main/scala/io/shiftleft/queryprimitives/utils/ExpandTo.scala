@@ -56,12 +56,7 @@ object ExpandTo {
   }
 
   def returnToReturnedExpression(returnExpression: Vertex): Option[nodes.Expression] = {
-    val it = returnExpression.vertices(Direction.OUT, EdgeTypes.AST)
-    if (it.hasNext) {
-      Some(it.next.asInstanceOf[nodes.Expression])
-    } else {
-      None
-    }
+    returnExpression.vertices(Direction.OUT, EdgeTypes.AST).nextOption.map(_.asInstanceOf[nodes.Expression])
   }
 
   def methodToFormalReturn(method: Vertex): Vertex = {
@@ -69,7 +64,8 @@ object ExpandTo {
       .vertices(Direction.OUT, EdgeTypes.AST)
       .asScala
       .filter(_.isInstanceOf[nodes.MethodReturn])
-      .next()
+      .asJava
+      .nextChecked
   }
 
   def formalReturnToReturn(methodReturn: Vertex): Seq[Vertex] = {
@@ -138,12 +134,7 @@ object ExpandTo {
   }
 
   def reference(node: Vertex): Option[Vertex] = {
-    val iterator = node.vertices(Direction.OUT, EdgeTypes.REF).asScala
-    if (iterator.hasNext) {
-      Some(iterator.next)
-    } else {
-      None
-    }
+    node.vertices(Direction.OUT, EdgeTypes.REF).nextOption
   }
 
 }

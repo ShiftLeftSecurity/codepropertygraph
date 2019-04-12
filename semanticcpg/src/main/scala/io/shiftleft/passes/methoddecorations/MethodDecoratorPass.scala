@@ -39,7 +39,7 @@ class MethodDecoratorPass(graph: ScalaGraph) extends CpgPass(graph) {
           )
 
           val method =
-            parameterIn.vertices(Direction.IN, EdgeTypes.AST).next.asInstanceOf[nodes.Method]
+            parameterIn.vertices(Direction.IN, EdgeTypes.AST).nextChecked.asInstanceOf[nodes.Method]
           if (parameterIn.typeFullName == null) {
             val evalType = parameterIn
               .vertices(Direction.OUT, EdgeTypes.EVAL_TYPE)
