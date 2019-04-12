@@ -1,11 +1,13 @@
 package io.shiftleft.passes.linking.memberaccesslinker
 
+import gremlin.scala.ScalaGraph
 import io.shiftleft.codepropertygraph.generated.{nodes, EdgeTypes, NodeKeys, Operators}
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
 import io.shiftleft.queryprimitives.steps.starters.Cpg
+import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 import org.apache.tinkerpop.gremlin.structure.Direction
-import gremlin.scala.{ScalaGraph, Vertex}
+
 
 import scala.collection.JavaConverters._
 
@@ -32,7 +34,8 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
             .vertices(Direction.OUT, EdgeTypes.AST)
             .asScala
             .filter(_.value(NodeKeys.ORDER.name) == 2)
-            .next
+            .asJava
+            .nextChecked
             .asInstanceOf[nodes.Identifier]
             .name
 

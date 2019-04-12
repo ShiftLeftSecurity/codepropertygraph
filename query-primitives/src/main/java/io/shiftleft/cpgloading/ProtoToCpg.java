@@ -7,6 +7,7 @@ import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.Property;
 import io.shiftleft.proto.cpg.Cpg.PropertyValue;
 import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase;
 import io.shiftleft.queryprimitives.steps.starters.Cpg;
+import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.logging.log4j.Logger;
@@ -80,8 +81,8 @@ public class ProtoToCpg {
     for (Edge edge : protoEdges) {
       long srcNodeId = edge.getSrc();
       long dstNodeId = edge.getDst();
-      Vertex srcVertex = tinkerGraph.vertices(srcNodeId).next();
-      Vertex dstVertex = tinkerGraph.vertices(dstNodeId).next();
+      Vertex srcVertex = new JavaIteratorDeco<>(tinkerGraph.vertices(srcNodeId)).nextChecked();
+      Vertex dstVertex = new JavaIteratorDeco<>(tinkerGraph.vertices(dstNodeId)).nextChecked();
 
       List<Edge.Property> properties = edge.getPropertyList();
       final ArrayList<Object> keyValues = new ArrayList<>(2 * properties.size());
