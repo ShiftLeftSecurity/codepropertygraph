@@ -82,7 +82,7 @@ public class ProtoToCpg {
       long srcNodeId = edge.getSrc();
       long dstNodeId = edge.getDst();
       if (srcNodeId == -1 || dstNodeId == -1) {
-        throw new IllegalArgumentException("edge " + edge + "has illegal src|dst node. something seems wrong with the cpg");
+        throw new IllegalArgumentException("edge " + edge + " has illegal src|dst node. something seems wrong with the cpg");
       }
       Vertex srcVertex = new JavaIteratorDeco<>(tinkerGraph.vertices(srcNodeId)).nextChecked();
       Vertex dstVertex = new JavaIteratorDeco<>(tinkerGraph.vertices(dstNodeId)).nextChecked();
