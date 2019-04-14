@@ -47,7 +47,7 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
   /**
    Cast to call if applicable and filter for callee fullName `calleeRegex`
     */
-  def call(calleeRegex: String)(implicit callResolver : ICallResolver): Call[Labels] =
+  def call(calleeRegex: String)(implicit callResolver: ICallResolver): Call[Labels] =
     call.filter(_.calledMethod.fullName(calleeRegex))
 
   /**
