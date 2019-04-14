@@ -134,6 +134,12 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, L
     new Call[Labels](raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.CALL).cast[nodes.Call])
 
   /**
+    * Outgoing call sites to methods where fullName matches `regex`.
+    * */
+  def callOut(regex: String)(implicit callResolver: ICallResolver): Call[Labels] =
+    callOut.filter(_.calledMethod.fullName(regex))
+
+  /**
     * The type declaration associated with this method, e.g., the class it is defined in.
     * */
   def definingTypeDecl: TypeDecl[Labels] =

@@ -10,6 +10,8 @@ import io.shiftleft.queryprimitives.steps.types.propertyaccessors._
 import io.shiftleft.queryprimitives.steps.types.structure.{Method, MethodParameter, Type}
 import shapeless.HList
 
+import io.shiftleft.queryprimitives.steps.ICallResolver
+
 /**
   An expression (base type)
   */
@@ -41,6 +43,12 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
     */
   def call: Call[Labels] =
     new Call[Labels](raw.hasLabel(NodeTypes.CALL).cast[nodes.Call])
+
+  /**
+   Cast to call if applicable and filter for callee fullName `calleeRegex`
+    */
+  def call(calleeRegex: String)(implicit callResolver: ICallResolver): Call[Labels] =
+    call.filter(_.calledMethod.fullName(calleeRegex))
 
   /**
     Traverse to enclosing expression

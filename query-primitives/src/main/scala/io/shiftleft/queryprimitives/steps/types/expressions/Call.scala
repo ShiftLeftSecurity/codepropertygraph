@@ -63,6 +63,12 @@ class Call[Labels <: HList](raw: GremlinScala.Aux[nodes.Call, Labels])
     new Expression[Labels](raw.out(EdgeTypes.AST).cast[nodes.Expression])
 
   /**
+    `i'th` arguments of the call
+    */
+  def argument(i: Integer): Expression[Labels] =
+    argument.order(i)
+
+  /**
     To formal method return parameter
     */
   def toMethodReturn: MethodReturn[Labels] =
