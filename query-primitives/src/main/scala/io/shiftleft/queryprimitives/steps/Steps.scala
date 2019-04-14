@@ -29,7 +29,9 @@ trait StepsRoot {
   Base class for our DSL
   These are the base steps available in all steps of the query language.
   */
-class Steps[NodeType, Labels <: HList](val raw: GremlinScala.Aux[NodeType, Labels]) extends StepsRoot with ext.Enrichable {
+class Steps[NodeType, Labels <: HList](val raw: GremlinScala.Aux[NodeType, Labels])
+    extends StepsRoot
+    with ext.Enrichable {
   type NodeType0 = NodeType
   implicit lazy val graph: Graph = raw.traversal.asAdmin.getGraph.get
 

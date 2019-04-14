@@ -15,7 +15,7 @@ import scala.collection.JavaConverters._
   * Base class for nodes that can occur in data flows
   * */
 class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, Labels])
-  extends NodeSteps[nodes.TrackingPoint, Labels](raw) {
+    extends NodeSteps[nodes.TrackingPoint, Labels](raw) {
 
   private class ReachableByContainer(val reachedSource: nodes.TrackingPoint, val path: List[nodes.TrackingPoint]) {
     override def clone(): ReachableByContainer = {
@@ -70,8 +70,8 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
       ddgPredecessors.foreach { pred =>
         getTrackingPoint(pred) match {
           case Some(predTrackingPoint) =>
-            if(!path.contains(predTrackingPoint)) {
-              if(indirectAccess(node)) {
+            if (!path.contains(predTrackingPoint)) {
+              if (indirectAccess(node)) {
                 traverseDDGBack(predTrackingPoint :: path.tail)
               } else {
                 traverseDDGBack(predTrackingPoint :: node :: path.tail)
@@ -93,12 +93,13 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
 
   private def getTrackingPoint(vertex: Vertex): Option[nodes.TrackingPoint] = {
     vertex match {
-      case identifier: nodes.Identifier          => getTrackingPoint(identifier.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
-      case call: nodes.Call                      => Some(call)
-      case ret: nodes.Return                     => Some(ret)
-      case methodReturn: nodes.MethodReturn      => Some(methodReturn)
-      case literal: nodes.Literal                => getTrackingPoint(literal.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
-      case _                                     => None
+      case identifier: nodes.Identifier =>
+        getTrackingPoint(identifier.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
+      case call: nodes.Call                 => Some(call)
+      case ret: nodes.Return                => Some(ret)
+      case methodReturn: nodes.MethodReturn => Some(methodReturn)
+      case literal: nodes.Literal           => getTrackingPoint(literal.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
+      case _                                => None
     }
   }
 

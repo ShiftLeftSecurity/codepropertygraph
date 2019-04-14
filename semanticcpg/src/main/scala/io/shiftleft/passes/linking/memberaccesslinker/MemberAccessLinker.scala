@@ -8,7 +8,6 @@ import io.shiftleft.queryprimitives.steps.starters.Cpg
 import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 import org.apache.tinkerpop.gremlin.structure.Direction
 
-
 import scala.collection.JavaConverters._
 
 class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {

@@ -1,12 +1,13 @@
 package io.shiftleft.codepropertygraph.generated
 
 import gremlin.scala._
-import io.shiftleft.queryprimitives.steps.{NewNodeSteps,NodeSteps}
+import io.shiftleft.queryprimitives.steps.{NewNodeSteps, NodeSteps}
 import shapeless.{HList, HNil}
 
 package object nodes {
 
-  private def newAnonymousTraversalWithAssociatedGraph[NodeType <: StoredNode](seq: NodeType*): GremlinScala.Aux[NodeType, HNil] = {
+  private def newAnonymousTraversalWithAssociatedGraph[NodeType <: StoredNode](
+      seq: NodeType*): GremlinScala.Aux[NodeType, HNil] = {
     val anonymousTraversal = __[NodeType](seq: _*)
     if (seq.nonEmpty) {
       anonymousTraversal.traversal.asAdmin().setGraph(seq.head.graph)

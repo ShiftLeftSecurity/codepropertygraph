@@ -13,8 +13,8 @@ import shapeless.{HList, HNil}
   Steps for traversing the code property graph
 
   All traversals start at io.shiftleft.queryprimitives.starters.Cpg.
-  
-  Implicit conversions to specific steps, based on the node at hand. 
+
+  Implicit conversions to specific steps, based on the node at hand.
   Automatically in scope when using anything in the `steps` package, e.g. `Steps`
   */
 package object steps {
@@ -89,6 +89,7 @@ package object steps {
   implicit def toFile[Labels <: HList](steps: Steps[nodes.File, Labels]): File[Labels] =
     new File[Labels](steps.raw)
 
-  implicit def toTrackingPoint[NodeType <: nodes.TrackingPoint, Labels <: HList](steps: Steps[NodeType, Labels]): TrackingPoint[Labels] =
+  implicit def toTrackingPoint[NodeType <: nodes.TrackingPoint, Labels <: HList](
+      steps: Steps[NodeType, Labels]): TrackingPoint[Labels] =
     new TrackingPoint[Labels](steps.raw.cast[nodes.TrackingPoint])
 }

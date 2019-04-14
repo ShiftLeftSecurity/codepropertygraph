@@ -76,70 +76,76 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
                                  inSet: Map[Vertex, Set[Vertex]]): Unit = {
 
     def addEdge(v0: Vertex, v1: Vertex): Unit = {
-      dstGraph.addEdgeInOriginal(v0.asInstanceOf[nodes.StoredNode], v1.asInstanceOf[nodes.StoredNode], EdgeTypes.REACHING_DEF)
+      dstGraph.addEdgeInOriginal(v0.asInstanceOf[nodes.StoredNode],
+                                 v1.asInstanceOf[nodes.StoredNode],
+                                 EdgeTypes.REACHING_DEF)
     }
 
-    method.vertices(Direction.OUT, EdgeTypes.AST).asScala.filter(_.isInstanceOf[nodes.MethodParameterIn]).foreach { mPI =>
-      mPI.vertices(Direction.IN, EdgeTypes.REF).asScala.foreach { refInIdentifier =>
-        dfHelper.getOperation(refInIdentifier).foreach(operationNode => addEdge(method, operationNode))
-      }
+    method.vertices(Direction.OUT, EdgeTypes.AST).asScala.filter(_.isInstanceOf[nodes.MethodParameterIn]).foreach {
+      mPI =>
+        mPI.vertices(Direction.IN, EdgeTypes.REF).asScala.foreach { refInIdentifier =>
+          dfHelper.getOperation(refInIdentifier).foreach(operationNode => addEdge(method, operationNode))
+        }
     }
 
     val methodReturn = ExpandTo.methodToFormalReturn(method)
 
-    ExpandTo.formalReturnToReturn(methodReturn)
+    ExpandTo
+      .formalReturnToReturn(methodReturn)
       .foreach(returnVertex => addEdge(returnVertex, methodReturn))
 
-    outSet.foreach { case (node, outDefs) =>
-      if (node.isInstanceOf[nodes.Call]) {
-        val usesInExpression = dfHelper.getUsesOfExpression(node)
-        var localRefsUses = usesInExpression.map(ExpandTo.reference(_)).filter(_ != None)
+    outSet.foreach {
+      case (node, outDefs) =>
+        if (node.isInstanceOf[nodes.Call]) {
+          val usesInExpression = dfHelper.getUsesOfExpression(node)
+          var localRefsUses = usesInExpression.map(ExpandTo.reference(_)).filter(_ != None)
 
-        /* if use is not an identifier, add edge, as we are going to visit the use separately */
-        usesInExpression.foreach { use =>
-          if (!use.isInstanceOf[nodes.Identifier] && !use.isInstanceOf[nodes.Literal]) {
-            addEdge(use, node)
+          /* if use is not an identifier, add edge, as we are going to visit the use separately */
+          usesInExpression.foreach { use =>
+            if (!use.isInstanceOf[nodes.Identifier] && !use.isInstanceOf[nodes.Literal]) {
+              addEdge(use, node)
 
-            /* handle indirect access uses: check if we have it in our out set and get
-             * the corresponding def expression from which the definition reaches the use
-             */
-            if(isIndirectAccess(use)) {
-              outDefs.filter(out => isIndirectAccess(out)).foreach { indirectOutDef =>
-                if(indirectOutDef.asInstanceOf[nodes.Call].code == use.asInstanceOf[nodes.Call].code) {
-                  val expandedToCall = ExpandTo.argumentToCallOrReturn(indirectOutDef)
-                  addEdge(expandedToCall, use)
+              /* handle indirect access uses: check if we have it in our out set and get
+               * the corresponding def expression from which the definition reaches the use
+               */
+              if (isIndirectAccess(use)) {
+                outDefs.filter(out => isIndirectAccess(out)).foreach { indirectOutDef =>
+                  if (indirectOutDef.asInstanceOf[nodes.Call].code == use.asInstanceOf[nodes.Call].code) {
+                    val expandedToCall = ExpandTo.argumentToCallOrReturn(indirectOutDef)
+                    addEdge(expandedToCall, use)
+                  }
                 }
               }
             }
           }
-        }
 
-        val nodeIsOperandAssignment = isOperationAndAssignment(node)
-        if (nodeIsOperandAssignment) {
-          val localRefGens = dfHelper.getGensOfExpression(node).map(ExpandTo.reference(_))
-          inSet(node).filter(inElement => localRefGens.contains(ExpandTo.reference(inElement)))
-            .foreach { filteredInElement =>
-              val expr = dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, node))
+          val nodeIsOperandAssignment = isOperationAndAssignment(node)
+          if (nodeIsOperandAssignment) {
+            val localRefGens = dfHelper.getGensOfExpression(node).map(ExpandTo.reference(_))
+            inSet(node)
+              .filter(inElement => localRefGens.contains(ExpandTo.reference(inElement)))
+              .foreach { filteredInElement =>
+                val expr = dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, node))
+              }
+          }
+
+          for (elem <- outDefs) {
+            val localRefGen = ExpandTo.reference(elem)
+
+            dfHelper.getExpressionFromGen(elem).foreach { expressionOfElement =>
+              if (expressionOfElement != node && localRefsUses.contains(localRefGen)) {
+                addEdge(expressionOfElement, node)
+              }
             }
-        }
-
-        for (elem <- outDefs) {
-          val localRefGen = ExpandTo.reference(elem)
-
-          dfHelper.getExpressionFromGen(elem).foreach { expressionOfElement =>
-            if (expressionOfElement != node && localRefsUses.contains(localRefGen)) {
-              addEdge(expressionOfElement, node)
+          }
+        } else if (node.isInstanceOf[nodes.Return]) {
+          node.vertices(Direction.OUT, EdgeTypes.AST).asScala.foreach { returnExpr =>
+            val localRef = ExpandTo.reference(returnExpr)
+            inSet(node).filter(inElement => localRef == ExpandTo.reference(inElement)).foreach { filteredInElement =>
+              dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, node))
             }
           }
         }
-      } else if (node.isInstanceOf[nodes.Return]) {
-        node.vertices(Direction.OUT, EdgeTypes.AST).asScala.foreach { returnExpr =>
-          val localRef = ExpandTo.reference(returnExpr)
-          inSet(node).filter(inElement => localRef == ExpandTo.reference(inElement)).foreach { filteredInElement =>
-            dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, node))
-          }
-        }
-      }
     }
   }
 
@@ -307,9 +313,9 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
   def getOperation(vertex: Vertex): Option[Vertex] = {
     vertex match {
       case _: nodes.Identifier => getOperation(vertex.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
-      case _: nodes.Call => Some(vertex)
-      case _: nodes.Return => Some(vertex)
-      case _                    => None
+      case _: nodes.Call       => Some(vertex)
+      case _: nodes.Return     => Some(vertex)
+      case _                   => None
     }
   }
 }

@@ -1,6 +1,6 @@
 package io.shiftleft.queryprimitives.steps
 
-import gremlin.scala.{GremlinScala,P,Vertex}
+import gremlin.scala.{GremlinScala, P, Vertex}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.types.structure.File
