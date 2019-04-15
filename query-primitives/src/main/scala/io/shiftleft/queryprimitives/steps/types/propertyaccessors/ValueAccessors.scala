@@ -2,29 +2,29 @@ package io.shiftleft.queryprimitives.steps.types.propertyaccessors
 
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.queryprimitives.steps.Steps
+import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
 import shapeless.HList
 
 trait ValueAccessors[T <: StoredNode, Labels <: HList] extends StringPropertyAccessors[T, Labels] {
   def value(): Steps[String, Labels] =
     stringProperty(NodeKeys.VALUE)
 
-  def value(value: String): Steps[T, Labels] =
+  def value(value: String): NodeSteps[T, Labels] =
     stringPropertyFilter(NodeKeys.VALUE, value)
 
-  def value(value: String*): Steps[T, Labels] =
+  def value(value: String*): NodeSteps[T, Labels] =
     stringPropertyFilterMultiple(NodeKeys.VALUE, value: _*)
 
-  def valueExact(value: String): Steps[T, Labels] =
+  def valueExact(value: String): NodeSteps[T, Labels] =
     stringPropertyFilterExact(NodeKeys.VALUE, value)
 
-  def valueExact(values: String*): Steps[T, Labels] =
+  def valueExact(values: String*): NodeSteps[T, Labels] =
     stringPropertyFilterExactMultiple(NodeKeys.VALUE, values: _*)
 
-  def valueNot(value: String): Steps[T, Labels] =
+  def valueNot(value: String): NodeSteps[T, Labels] =
     stringPropertyFilterNot(NodeKeys.VALUE, value)
 
-  def valueNot(values: String*): Steps[T, Labels] =
+  def valueNot(values: String*): NodeSteps[T, Labels] =
     stringPropertyFilterNotMultiple(NodeKeys.VALUE, values: _*)
 
 }
