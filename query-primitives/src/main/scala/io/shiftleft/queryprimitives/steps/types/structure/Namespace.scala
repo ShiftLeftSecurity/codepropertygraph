@@ -16,12 +16,6 @@ class Namespace[Labels <: HList](raw: GremlinScala.Aux[nodes.Namespace, Labels])
     with NameAccessors[nodes.Namespace, Labels] {
 
   /**
-    * The source files associated with the namespace
-    * */
-  override def file: File[Labels] =
-    new File[Labels](raw.in(EdgeTypes.REF).in(EdgeTypes.AST).cast[nodes.File])
-
-  /**
     * The type declarations defined in this namespace
     * */
   def typeDecl: TypeDecl[Labels] =
