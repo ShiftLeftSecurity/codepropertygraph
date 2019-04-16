@@ -222,8 +222,15 @@ object DomainClassCreator {
                     s"with ${camelCase(traitName).capitalize}"
                   }
                     .mkString(" ")
-              s"""trait ${nameCC}Base extends Node $mixins $mixinTraits 
-              trait ${nameCC} extends StoredNode with ${nameCC}Base
+              val mixinTraitsForBase: String =
+                extendz
+                  .getOrElse(List())
+                  .map { traitName =>
+                    s"with ${camelCase(traitName).capitalize}Base"
+                  }
+                    .mkString(" ")
+              s"""trait ${nameCC}Base extends Node $mixins $mixinTraitsForBase
+              trait ${nameCC} extends StoredNode with ${nameCC}Base $mixinTraits
               """
           }
           .mkString("\n")
