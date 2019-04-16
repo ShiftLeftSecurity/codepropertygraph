@@ -84,8 +84,16 @@ public class ProtoToCpg {
       if (srcNodeId == -1 || dstNodeId == -1) {
         throw new IllegalArgumentException("edge " + edge + " has illegal src|dst node. something seems wrong with the cpg");
       }
-      Vertex srcVertex = new JavaIteratorDeco<>(tinkerGraph.vertices(srcNodeId)).nextChecked();
-      Vertex dstVertex = new JavaIteratorDeco<>(tinkerGraph.vertices(dstNodeId)).nextChecked();
+      Iterator<Vertex> srcVertices = tinkerGraph.vertices(srcNodeId);
+      if (!srcVertices.hasNext()) {
+        throw new NoSuchElementException("Couldn't find source node " + srcNodeId + " for edge to " + dstNodeId + " of type " + edge.getType().name());
+      }
+      Vertex srcVertex = srcVertices.next();
+      Iterator<Vertex> dstVertices = tinkerGraph.vertices(dstNodeId);
+      if (!dstVertices.hasNext()) {
+        throw new NoSuchElementException("Couldn't find destination node " + dstNodeId + " for edge from " + srcNodeId + " of type " + edge.getType().name());
+      }
+      Vertex dstVertex = dstVertices.next();
 
       List<Edge.Property> properties = edge.getPropertyList();
       final ArrayList<Object> keyValues = new ArrayList<>(2 * properties.size());
