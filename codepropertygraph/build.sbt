@@ -57,7 +57,7 @@ Compile / sourceGenerators += Def.task {
 
 (Compile / sourceGenerators) := (Compile / sourceGenerators).value.map(x => x.dependsOn(mergeSchemaTask.taskValue))
 
-lazy val generateProtobuf = taskKey[Seq[File]]("generate cpg.proto")
+lazy val generateProtobuf = taskKey[File]("generate cpg.proto")
 generateProtobuf := {
   val output: File = resourceManaged.in(Compile).value / "cpg.proto"
 
@@ -77,12 +77,12 @@ generateProtobuf := {
     println("no need to regenerate protobuf")
   }
   GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
-  Seq(output)
+  output
 }
 generateProtobuf := generateProtobuf.dependsOn(mergeSchemaTask).value
 
 // note: this is only invoked on `package`, `publish` etc. since it's not needed for `compile`
-Compile / resourceGenerators += generateProtobuf.taskValue
+Compile / resourceGenerators += generateProtobuf.taskValue.map(Seq(_))
 
 (Compile / resourceGenerators) := (Compile / resourceGenerators).value.map(x => x.dependsOn(mergeSchemaTask.taskValue))
 

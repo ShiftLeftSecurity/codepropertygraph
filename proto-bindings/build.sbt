@@ -1,6 +1,6 @@
 name := "codepropertygraph-protos"
 
-lazy val generateProtobuf = taskKey[Seq[File]]("generate cpg.proto")
+lazy val generateProtobuf = taskKey[File]("generate cpg.proto")
 
 enablePlugins(ProtobufPlugin)
 ProtobufConfig / version := "3.7.0"
@@ -10,7 +10,7 @@ ProtobufConfig / protobufGenerate := (ProtobufConfig / protobufGenerate).depends
 
 lazy val copyLatestCpgProto = taskKey[Unit]("copy latest cpg.proto to externalIncludePath")
 copyLatestCpgProto := {
-  val protoFile = (Projects.codepropertygraph/generateProtobuf).value.head
+  val protoFile = (Projects.codepropertygraph/generateProtobuf).value
   val targetDir: java.io.File = (ProtobufConfig/protobufExternalIncludePath).value
   val targetFile = targetDir / (protoFile.getName)
   val currentMd5 = FileUtils.md5(protoFile)
