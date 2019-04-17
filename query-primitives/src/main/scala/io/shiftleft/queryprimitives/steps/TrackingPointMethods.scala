@@ -9,7 +9,7 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
 
-class TrackingPointMethods(val node: nodes.TrackingPoint) extends AnyVal {
+class TrackingPointMethods(val node: nodes.TrackingPointBase) extends AnyVal {
   def cfgNode: nodes.CfgNode = {
     node.accept(TrackPointToCfgNode)
   }
