@@ -222,8 +222,15 @@ object DomainClassCreator {
                     s"with ${camelCase(traitName).capitalize}"
                   }
                     .mkString(" ")
-              s"""trait ${nameCC}Base extends Node $mixins $mixinTraits 
-              trait ${nameCC} extends StoredNode with ${nameCC}Base
+              val mixinTraitsForBase: String =
+                extendz
+                  .getOrElse(List())
+                  .map { traitName =>
+                    s"with ${camelCase(traitName).capitalize}Base"
+                  }
+                    .mkString(" ")
+              s"""trait ${nameCC}Base extends Node $mixins $mixinTraitsForBase
+              trait ${nameCC} extends StoredNode with ${nameCC}Base $mixinTraits
               """
           }
           .mkString("\n")
@@ -338,6 +345,13 @@ object DomainClassCreator {
           .getOrElse(List())
           .map { traitName =>
             s"with ${camelCase(traitName).capitalize}"
+          }
+          .mkString(" ")
+      val mixinTraitsForBase: String =
+        nodeType.is
+          .getOrElse(List())
+          .map { traitName =>
+            s"with ${camelCase(traitName).capitalize}Base"
           }
           .mkString(" ")
 
@@ -501,7 +515,7 @@ object DomainClassCreator {
         .getOrElse("")
 
       val classImpl = s"""
-      trait ${nodeNameCamelCase}Base extends Node {
+      trait ${nodeNameCamelCase}Base extends Node $mixinTraitsForBase {
         def asStored : StoredNode = this.asInstanceOf[StoredNode]
 
         $abstractFieldAccessors
