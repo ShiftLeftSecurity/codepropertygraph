@@ -200,6 +200,7 @@ object DomainClassCreator {
       val nodeVisitor = 
         s"""trait NodeVisitor[T] {
           ${generateNodeVisitorMethods}
+          ${generateNewNodeVisitorMethods}
           ${generateBaseTraitVisitorMethods}
         }\n"""
 
@@ -269,6 +270,16 @@ object DomainClassCreator {
         val nodeNameCamelCase = camelCase(nodeType.name).capitalize
 
         s"def visit(node: ${nodeNameCamelCase}): T = ???"
+      }.mkString("\n")
+    }
+
+    def generateNewNodeVisitorMethods() = {
+      val nodeTypes = (Resources.cpgJson \ "nodeTypes").as[List[NodeType]]
+
+      nodeTypes.map { nodeType =>
+        val nodeNameCamelCase = camelCase(nodeType.name).capitalize
+
+        s"def visit(node: New${nodeNameCamelCase}): T = ???"
       }.mkString("\n")
     }
 
@@ -770,7 +781,9 @@ object DomainClassCreator {
         override val properties: Map[String, Any] = $propertiesImpl
         override def containedNodesByLocalName: Map[String, List[Node]] = $containedNodesByLocalName
 
-        override def accept[T](visitor: NodeVisitor[T]): T = ???
+        override def accept[T](visitor: NodeVisitor[T]): T = {
+          visitor.visit(this)
+        }
       }
       """
     }
