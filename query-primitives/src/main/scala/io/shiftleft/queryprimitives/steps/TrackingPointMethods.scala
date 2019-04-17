@@ -10,12 +10,12 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 import scala.collection.JavaConverters._
 
 class TrackingPointMethods(val node: nodes.TrackingPointBase) extends AnyVal {
-  def cfgNode: nodes.CfgNode = {
-    node.accept(TrackPointToCfgNode)
+  def cfgNode(implicit impl: TrackPointToCfgNode): nodes.CfgNode = {
+    node.accept(impl)
   }
 }
 
-private object TrackPointToCfgNode extends NodeVisitor[nodes.CfgNode] with ExpressionGeneralization[nodes.CfgNode] {
+class TrackPointToCfgNode extends NodeVisitor[nodes.CfgNode] with ExpressionGeneralization[nodes.CfgNode] {
   override def visit(node: nodes.MethodParameterIn): nodes.CfgNode = {
     ExpandTo.parameterToMethod(node).asInstanceOf[nodes.CfgNode]
   }

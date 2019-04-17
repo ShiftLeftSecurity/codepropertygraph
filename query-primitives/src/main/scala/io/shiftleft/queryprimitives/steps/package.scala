@@ -22,7 +22,9 @@ package object steps {
   // TODO MP: rather use `start` mechanism?
   // alternative: move to `nodes` package object?
   implicit def trackingPointBaseMethodsQp(node: nodes.TrackingPointBase): TrackingPointMethods =
-    new TrackingPointMethods(node.asInstanceOf[nodes.TrackingPoint])
+    new TrackingPointMethods(node)
+
+  implicit var trackingPointToCfgNodeImpl = new TrackPointToCfgNode()
 
   implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods =
     new WithinMethodMethods(node)
