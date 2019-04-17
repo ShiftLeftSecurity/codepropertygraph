@@ -2,7 +2,7 @@ package io.shiftleft.queryprimitives.steps.starters
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
+import io.shiftleft.queryprimitives.steps.{ext, NodeSteps, Steps}
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import shapeless.HNil
 
@@ -23,7 +23,10 @@ object Cpg {
 
   @param graph the underlying graph
   */
-class Cpg(val graph: Graph) {
+class Cpg(val graph: Graph)
+    extends ext.Enrichable
+    with ext.securityprofile.Enrichable
+    with ext.semanticcpg.Enrichable {
 
   /**
     The underlying graph.
