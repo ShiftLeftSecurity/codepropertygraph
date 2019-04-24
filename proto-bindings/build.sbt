@@ -43,3 +43,16 @@ generateCsharpBindings := {
   s"""./build-dotnet-bindings.sh --cpg-version $dotnetVersion ${publishToRepo.getOrElse("")} ${publishKey.getOrElse("")}""".!
   new File(s"cpg-proto-bindings.${dotnetVersion}.nupkg")
 }
+
+lazy val generateGoBindings = taskKey[File]("generate go proto bindings (doesn't publish them anywhere)")
+generateGoBindings := {
+  import sys.process._
+  // generate cpg.proto file
+  (Projects.codepropertygraph/generateProtobuf).value
+  val protoFile = "codepropertygraph/target/resource_managed/main/cpg.proto"
+  val outDir = new File("codepropertygraph/target/protoc-go")
+  outDir.mkdirs
+  println(s"writing go proto bindings to $outDir")
+  s"""protoc --go_out=$outDir $protoFile""".!
+  outDir
+}
