@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.generated
 
 import gremlin.scala._
-import io.shiftleft.queryprimitives.steps.{NewNodeSteps, NodeSteps}
+import io.shiftleft.queryprimitives.steps.{NewNodeSteps, NodeSteps, Steps}
 import shapeless.{HList, HNil}
 
 package object nodes {
@@ -49,6 +49,24 @@ package object nodes {
       */
     def start: NewNodeSteps[NodeType, HNil] =
       new NewNodeSteps[NodeType, HNil](__[NodeType](seq: _*))
+  }
+
+  implicit class BaseNodeTypeDeco[NodeType <: nodes.Node](node: NodeType) {
+
+    /**
+    Start a new traversal from this node
+      */
+    def start: Steps[NodeType, HNil] =
+      new Steps[NodeType, HNil](__[NodeType](node))
+  }
+
+  implicit class BaseNodeTypeDecoForSeq[NodeType <: nodes.Node](seq: Seq[NodeType]) {
+
+    /**
+    Start a new traversal from these nodes
+      */
+    def start: Steps[NodeType, HNil] =
+      new Steps[NodeType, HNil](__[NodeType](seq: _*))
   }
 
 }
