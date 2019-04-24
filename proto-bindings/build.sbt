@@ -1,6 +1,6 @@
 name := "codepropertygraph-protos"
 
-lazy val generateProtobuf = taskKey[Seq[File]]("generate cpg.proto")
+lazy val generateProtobuf = taskKey[File]("generate cpg.proto")
 
 enablePlugins(ProtobufPlugin)
 ProtobufConfig / version := "3.7.0"
@@ -10,7 +10,7 @@ ProtobufConfig / protobufGenerate := (ProtobufConfig / protobufGenerate).depends
 
 lazy val copyLatestCpgProto = taskKey[Unit]("copy latest cpg.proto to externalIncludePath")
 copyLatestCpgProto := {
-  val protoFile = (Projects.codepropertygraph/generateProtobuf).value.head
+  val protoFile = (Projects.codepropertygraph/generateProtobuf).value
   val targetDir: java.io.File = (ProtobufConfig/protobufExternalIncludePath).value
   val targetFile = targetDir / (protoFile.getName)
   val currentMd5 = FileUtils.md5(protoFile)
@@ -42,4 +42,17 @@ generateCsharpBindings := {
   val publishKey = Option(System.getProperty("publish-key")).map(key => s"--publish-key $key")
   s"""./build-dotnet-bindings.sh --cpg-version $dotnetVersion ${publishToRepo.getOrElse("")} ${publishKey.getOrElse("")}""".!
   new File(s"cpg-proto-bindings.${dotnetVersion}.nupkg")
+}
+
+lazy val generateGoBindings = taskKey[File]("generate go proto bindings (doesn't publish them anywhere)")
+generateGoBindings := {
+  import sys.process._
+  // generate cpg.proto file
+  (Projects.codepropertygraph/generateProtobuf).value
+  val protoFile = "codepropertygraph/target/resource_managed/main/cpg.proto"
+  val outDir = new File("codepropertygraph/target/protoc-go")
+  outDir.mkdirs
+  println(s"writing go proto bindings to $outDir")
+  s"""protoc --go_out=$outDir $protoFile""".!
+  outDir
 }
