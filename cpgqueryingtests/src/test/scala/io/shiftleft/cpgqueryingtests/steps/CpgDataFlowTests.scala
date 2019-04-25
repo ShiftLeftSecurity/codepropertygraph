@@ -1,6 +1,7 @@
 package io.shiftleft.cpgqueryingtests.steps
 
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.passes.dataflows.steps._
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 import io.shiftleft.queryprimitives.steps._
 import io.shiftleft.queryprimitives.steps.types.expressions.Literal

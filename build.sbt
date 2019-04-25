@@ -46,6 +46,7 @@ lazy val queryPrimitives = Projects.queryPrimitives
 lazy val enhancements = Projects.enhancements
 lazy val cpgqueryingtests = Projects.cpgqueryingtests
 lazy val semanticcpg = Projects.semanticcpg
+lazy val dataflowengine = Projects.dataflowengine
 
 ThisBuild/publishTo := sonatypePublishTo.value
 ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature", "-language:implicitConversions")

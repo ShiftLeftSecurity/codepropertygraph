@@ -1,21 +1,10 @@
-package io.shiftleft.queryprimitives.steps
+package io.shiftleft.queryprimitives.steps.visitormixins
 
-import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, Operators, nodes}
+import io.shiftleft.codepropertygraph.generated.{Operators, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
-import io.shiftleft.queryprimitives.steps.visitormixins.ExpressionGeneralization
 import io.shiftleft.queryprimitives.utils.ExpandTo
-import org.apache.tinkerpop.gremlin.structure.Direction
 
-import scala.collection.JavaConverters._
-
-class TrackingPointMethods(val node: nodes.TrackingPointBase) extends AnyVal {
-  def cfgNode: nodes.CfgNode = {
-    node.accept(TrackPointToCfgNode)
-  }
-}
-
-private object TrackPointToCfgNode extends NodeVisitor[nodes.CfgNode] with ExpressionGeneralization[nodes.CfgNode] {
+object TrackPointToCfgNode extends NodeVisitor[nodes.CfgNode] with ExpressionGeneralization[nodes.CfgNode] {
   override def visit(node: nodes.MethodParameterIn): nodes.CfgNode = {
     ExpandTo.parameterToMethod(node).asInstanceOf[nodes.CfgNode]
   }
