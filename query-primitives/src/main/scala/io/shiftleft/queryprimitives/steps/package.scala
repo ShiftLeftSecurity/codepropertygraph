@@ -2,7 +2,6 @@ package io.shiftleft.queryprimitives
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.passes.dataflows.steps.TrackingPoint
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.types.structure._
 import io.shiftleft.queryprimitives.steps.types.expressions._
@@ -18,11 +17,6 @@ import shapeless.{HList, HNil}
   Automatically in scope when using anything in the `steps` package, e.g. `Steps`
   */
 package object steps {
-
-  // TODO MP: rather use `start` mechanism?
-  // alternative: move to `nodes` package object?
-  implicit def trackingPointBaseMethodsQp(node: nodes.TrackingPointBase): TrackingPointMethods =
-    new TrackingPointMethods(node.asInstanceOf[nodes.TrackingPoint])
 
   implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods =
     new WithinMethodMethods(node)
@@ -85,8 +79,4 @@ package object steps {
 
   implicit def toFile[Labels <: HList](steps: Steps[nodes.File, Labels]): File[Labels] =
     new File[Labels](steps.raw)
-
-  implicit def toTrackingPoint[NodeType <: nodes.TrackingPoint, Labels <: HList](
-      steps: Steps[NodeType, Labels]): TrackingPoint[Labels] =
-    new TrackingPoint[Labels](steps.raw.cast[nodes.TrackingPoint])
 }

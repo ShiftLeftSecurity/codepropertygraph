@@ -5,6 +5,7 @@ import io.shiftleft.queryprimitives.steps.starters.Cpg
 import io.shiftleft.queryprimitives.steps._
 import io.shiftleft.queryprimitives.steps.types.expressions.Literal
 import io.shiftleft.queryprimitives.steps.types.structure.{Member, Method}
+import io.shiftleft.queryprimitives.steps.ext.dataflows.trackingPointBaseMethodsQp
 import org.scalatest.{Matchers, WordSpec}
 
 import shapeless.HNil
