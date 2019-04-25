@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets
 import dnl.utils.text.table.TextTable
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps._
-import io.shiftleft.queryprimitives.steps.ext.dataflows.trackingPointBaseMethodsQp
+import io.shiftleft.passes.dataflows.steps._
 
 object FlowPrettyPrinter {
   def prettyPrint(path: List[nodes.TrackingPoint]): String = {

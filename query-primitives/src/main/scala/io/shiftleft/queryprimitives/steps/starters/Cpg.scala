@@ -26,7 +26,6 @@ object Cpg {
 class Cpg(val graph: Graph)
     extends ext.Enrichable
     with ext.securityprofile.Enrichable
-    with ext.dataflows.Enrichable
     with ext.semanticcpg.Enrichable {
 
   /**

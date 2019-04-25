@@ -1,4 +1,4 @@
-package io.shiftleft.queryprimitives.steps.ext
+package io.shiftleft.passes.dataflows
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.passes.dataflows.steps._
@@ -7,7 +7,7 @@ import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import shapeless.HList
 
 /** extend steps without the need for additional implicit imports */
-package object dataflows {
+package object steps {
 
   // TODO MP: rather use `start` mechanism?
   // alternative: move to `nodes` package object?
