@@ -401,4 +401,67 @@ class CDataFlowTests extends CpgDataFlowTests {
         ("x = z", 9)
       ))
   }
+
+   "Test 12: flow with short hand assignment operator" in {
+       val cpg = cpgFactory.buildCpg(
+       """
+         | void flow(void) {
+         |    int a = 0x37;
+         |    int b = a;
+         |    int z = b;
+         |    z+=a;
+         | }
+       """.stripMargin
+       )
+     val source = cpg.call.code("a = 0x37")
+     val sink = cpg.call.code("z\\+=a")
+     val flows = sink.reachableByFlows(source).l
+
+     flows.size shouldBe 2
+
+     flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+       Set(List[(String, Option[Integer])](
+         ("a = 0x37", 3),
+         ("b = a", 4),
+         ("z = b", 5),
+         ("z+=a",  6)
+       ),
+       List[(String, Option[Integer])](
+           ("a = 0x37", 3),
+           ("z+=a",  6)
+       ))
+   }
+
+  "Test 13: flow after short hand assignment" in {
+    val cpg = cpgFactory.buildCpg(
+      """
+        | void flow(void) {
+        |    int a = 0x37;
+        |    int b = a;
+        |    int z = b;
+        |    z+=a;
+        |    int w = z;
+        | }
+      """.stripMargin
+    )
+    val source = cpg.call.code("a = 0x37")
+    val sink = cpg.identifier.name("w")
+    val flows = sink.reachableByFlows(source).l
+
+    flows.size shouldBe 2
+
+    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      Set(List[(String, Option[Integer])](
+        ("a = 0x37", 3),
+        ("b = a", 4),
+        ("z = b", 5),
+        ("z+=a",  6),
+        ("w = z", 7)
+      ),
+      List[(String, Option[Integer])](
+          ("a = 0x37", 3),
+          ("z+=a",  6),
+          ("w = z", 7)
+      ))
+  }
 }
