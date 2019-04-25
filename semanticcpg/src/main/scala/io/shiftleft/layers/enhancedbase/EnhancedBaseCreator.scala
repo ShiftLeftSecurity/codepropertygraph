@@ -7,6 +7,7 @@ import io.shiftleft.passes.linking.linker.Linker
 import io.shiftleft.passes.linking.memberaccesslinker.MemberAccessLinker
 import io.shiftleft.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.SerializedCpg
+import io.shiftleft.argdefloader.ArgumentDefs
 import io.shiftleft.passes.containsedges.ContainsEdgePass
 import io.shiftleft.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
 import io.shiftleft.passes.linking.capturinglinker.CapturingLinker
@@ -15,7 +16,10 @@ import io.shiftleft.passes.propagateedges.PropagateEdgePass
 import io.shiftleft.passes.reachingdef.ReachingDefPass
 import io.shiftleft.passes.receiveredges.ReceiverEdgePass
 
-class EnhancedBaseCreator(graph: ScalaGraph, language: String, serializedCpg: SerializedCpg) {
+class EnhancedBaseCreator(graph: ScalaGraph,
+                          language: String,
+                          serializedCpg: SerializedCpg,
+                          argumentDefs: ArgumentDefs) {
 
   private val runner = new CpgPassRunner(serializedCpg)
 
@@ -27,7 +31,7 @@ class EnhancedBaseCreator(graph: ScalaGraph, language: String, serializedCpg: Se
         List(
           new ReceiverEdgePass(graph),
           new MethodDecoratorPass(graph),
-          new PropagateEdgePass(graph),
+          new PropagateEdgePass(graph, argumentDefs),
           new CapturingLinker(graph),
           new Linker(graph),
           new MemberAccessLinker(graph),
@@ -41,7 +45,7 @@ class EnhancedBaseCreator(graph: ScalaGraph, language: String, serializedCpg: Se
           new MethodStubCreator(graph),
           new ReceiverEdgePass(graph),
           new MethodDecoratorPass(graph),
-          new PropagateEdgePass(graph),
+          new PropagateEdgePass(graph, argumentDefs),
           new CapturingLinker(graph),
           new Linker(graph),
           new MemberAccessLinker(graph),
@@ -53,7 +57,7 @@ class EnhancedBaseCreator(graph: ScalaGraph, language: String, serializedCpg: Se
         List(
           new ReceiverEdgePass(graph),
           new MethodDecoratorPass(graph),
-          new PropagateEdgePass(graph),
+          new PropagateEdgePass(graph, argumentDefs),
           new CapturingLinker(graph),
           new Linker(graph),
           new MemberAccessLinker(graph),

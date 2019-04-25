@@ -9,7 +9,7 @@ import io.shiftleft.queryprimitives.steps.starters.Cpg
 import org.apache.tinkerpop.gremlin.structure.Graph
 
 class Fixture(projectName: String) {
-  val cpg = CpgLoader.loadCodePropertyGraph(s"resources/cpgs/$projectName/cpg.bin.zip")
+  val cpg = CpgLoader.loadCodePropertyGraph(s"resources/cpgs/$projectName/cpg.bin.zip", argDefFilename = None)
   val scalaGraph: ScalaGraph = cpg.graph
 
   protected def applyMethodDecorator(graph: Graph): Unit = {
