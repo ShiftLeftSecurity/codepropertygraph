@@ -5,6 +5,8 @@ import io.shiftleft.queryprimitives.dsl.ShallowPipe.ShallowPipe
 import io.shiftleft.queryprimitives.steps.types.structure.MethodMethods
 
 object Implicits extends PipeOperationImplicits with LowPriorityImplicits {
+  implicit val typeErasureResolve1 = new TypeErasureResolve1()
+
   implicit def realPipeMethods[ElemType](pipe: RealPipe[ElemType]) = {
     new RealPipeMethods(pipe)
   }
@@ -16,10 +18,8 @@ object Implicits extends PipeOperationImplicits with LowPriorityImplicits {
 }
 
 class PipeOperationImplicits {
-  implicit val realPipeOps = new RealPipeOperations[Any]()
-
-  implicit val methodRealPipeOps = new RealPipeOperations[nodes.Method]()
-  implicit val methodShallowPipeOps = new ShallowPipeOperations[nodes.Method]()
+  implicit val realPipeOps = new RealPipeOperations()
+  implicit val shallowPipeOps = new ShallowPipeOperations()
 }
 
 sealed trait LowPriorityImplicits {
