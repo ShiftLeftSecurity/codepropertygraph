@@ -5,8 +5,6 @@ import io.shiftleft.queryprimitives.dsl.ShallowPipe.ShallowPipe
 import io.shiftleft.queryprimitives.steps.types.structure.MethodMethods
 
 object Implicits extends PipeOperationImplicits with LowPriorityImplicits {
-  implicit val typeErasureResolve1 = new TypeErasureResolve1()
-
   implicit def realPipeMethods[ElemType](pipe: RealPipe[ElemType]) = {
     new RealPipeMethods(pipe)
   }

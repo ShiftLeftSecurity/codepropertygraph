@@ -12,14 +12,13 @@ class RealPipeOperations extends PipeOperations[RealPipe] {
     new RealPipe(pipe.impl.map(function))
   }
 
-  override def flatMap[SrcType, DstType](pipe: RealPipe[SrcType],
-                                         function: SrcType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
+  override def flatMap2[SrcType, DstType](pipe: RealPipe[SrcType],
+                                          function: SrcType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
     new RealPipe(pipe.impl.flatMap(function.apply))
   }
 
   override def flatMap[SrcType, DstType](pipe: RealPipe[SrcType],
-                                         function: SrcType => RealPipe[DstType])
-                                        (implicit unused: TypeErasureResolve1): RealPipe[DstType] = {
+                                         function: SrcType => RealPipe[DstType]): RealPipe[DstType] = {
     val applyAndUnwrap = (sourceElement: SrcType) => function.apply(sourceElement).impl
     new RealPipe(pipe.impl.flatMap(applyAndUnwrap))
   }
