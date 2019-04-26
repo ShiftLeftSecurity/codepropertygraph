@@ -2,6 +2,7 @@ package io.shiftleft.queryprimitives.dsl
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.dsl.ShallowPipe.ShallowPipe
+import io.shiftleft.queryprimitives.dsl.pipeops.{RealPipeOperations, ShallowPipeOperations}
 import io.shiftleft.queryprimitives.steps.types.structure.MethodMethods
 
 object Implicits extends PipeOperationImplicits with LowPriorityImplicits {
