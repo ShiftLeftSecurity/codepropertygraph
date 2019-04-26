@@ -2,6 +2,12 @@ package io.shiftleft.queryprimitives.dsl
 
 import scala.collection.GenTraversableOnce
 
+object RealPipe {
+  def newBuilder[ElemType]: RealPipeBuilder[ElemType] = {
+    new RealPipeBuilder()
+  }
+}
+
 class RealPipe[ElemType](val impl: List[ElemType]) extends AnyVal {
 
   def map[DstType](function: ElemType => DstType): RealPipe[DstType] = {

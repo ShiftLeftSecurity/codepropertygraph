@@ -37,5 +37,13 @@ class ShallowPipeOperations extends PipeOperations[ShallowPipe] {
   override def head[ElemType](pipe: ShallowPipe[ElemType]): ElemType = {
     pipe
   }
+
+  override def iterator[ElemType](pipe: ShallowPipe[ElemType]): Iterator[ElemType] = {
+    (pipe :: Nil).toIterator
+  }
+
+  override def toList[ElemType](pipe: ShallowPipe[ElemType]): List[ElemType] = {
+    pipe :: Nil
+  }
 }
 

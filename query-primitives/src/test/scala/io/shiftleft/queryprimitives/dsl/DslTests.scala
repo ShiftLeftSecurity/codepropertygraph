@@ -5,9 +5,9 @@ import io.shiftleft.queryprimitives.dsl.ShallowPipe.ShallowPipe
 import io.shiftleft.queryprimitives.dsl.pipeops.PipeOperations
 import org.scalatest.{Matchers, WordSpec}
 
-case class A()
+case class A(a: Int = 0)
 
-case class B()
+case class B(b: Int = 0)
 
 class NodeAMethods[PipeType[_], ElemType <: A](val pipe: PipeType[ElemType]) extends AnyVal {
   def toB(implicit ops: PipeOperations[PipeType]): PipeType[B] = {
