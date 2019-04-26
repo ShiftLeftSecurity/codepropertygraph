@@ -1,5 +1,6 @@
-package io.shiftleft.queryprimitives.dsl
+package io.shiftleft.queryprimitives.dsl.pipeops
 
+import io.shiftleft.queryprimitives.dsl.RealPipe
 import io.shiftleft.queryprimitives.dsl.ShallowPipe.ShallowPipe
 
 import scala.collection.GenTraversableOnce
