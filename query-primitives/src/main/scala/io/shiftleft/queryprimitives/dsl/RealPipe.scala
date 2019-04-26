@@ -1,3 +1,26 @@
 package io.shiftleft.queryprimitives.dsl
 
-class RealPipe[ElemType](val impl: List[ElemType]) extends AnyVal
+import scala.collection.GenTraversableOnce
+
+class RealPipe[ElemType](val impl: List[ElemType]) extends AnyVal {
+
+  def map[DstType](function: ElemType => DstType): RealPipe[DstType] = {
+    Implicits.realPipeOps.map(this, function)
+  }
+
+  def map(function: ElemType => ElemType, times: Int): RealPipe[ElemType] = {
+    Implicits.realPipeOps.map(this, function, times)
+  }
+
+  def flatMap2[DstType](function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
+    Implicits.realPipeOps.flatMap2(this, function)
+  }
+
+  def flatMap[DstType](function: ElemType => RealPipe[DstType]): RealPipe[DstType] = {
+    Implicits.realPipeOps.flatMap(this, function)
+  }
+
+  def head: ElemType = {
+    Implicits.realPipeOps.head(this)
+  }
+}
