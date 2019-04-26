@@ -1,6 +1,6 @@
 package io.shiftleft.queryprimitives.dsl.pipeops
 
-import io.shiftleft.queryprimitives.dsl.RealPipe
+import io.shiftleft.queryprimitives.dsl.{RealPipe, ShallowPipe}
 
 import scala.collection.GenTraversableOnce
 
@@ -20,6 +20,10 @@ trait PipeOperations[PipeType[_]] {
                        function: ElemType => Boolean): RealPipe[ElemType]
 
   def head[ElemType](pipe: PipeType[ElemType]): ElemType
+
+  def toList[ElemType](pipe: PipeType[ElemType]): List[ElemType]
+
+  def iterator[ElemType](pipe: PipeType[ElemType]): Iterator[ElemType]
 
   def map[ElemType](pipe: PipeType[ElemType],
                     function: ElemType => ElemType,
@@ -46,5 +50,24 @@ trait PipeOperations[PipeType[_]] {
       currentPipe = flatMap2(pipe, function)
     }
     currentPipe
+  }
+
+  def flatMap3[ElemType](pipe: PipeType[ElemType],
+                         function: ElemType => GenTraversableOnce[ElemType],
+                         until: ElemType => Boolean): RealPipe[ElemType] = {
+    var stack = toList(pipe)
+    var builder = RealPipe.newBuilder[ElemType]
+
+    while (stack.nonEmpty) {
+      val elem = stack.head
+      stack = stack.tail
+
+      if (until(elem)) {
+        builder += elem
+      } else {
+        stack = function(elem).toList ::: stack
+      }
+    }
+    builder.result
   }
 }

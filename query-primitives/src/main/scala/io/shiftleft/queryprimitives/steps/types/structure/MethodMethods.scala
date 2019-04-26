@@ -3,12 +3,13 @@ package io.shiftleft.queryprimitives.steps.types.structure
 import gremlin.scala.Vertex
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.queryprimitives.dsl.RealPipe
+import io.shiftleft.queryprimitives.dsl.{Implicits, RealPipe}
 import io.shiftleft.queryprimitives.dsl.pipeops.PipeOperations
 import io.shiftleft.queryprimitives.steps.ICallResolver
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
+import scala.language.higherKinds
 
 class MethodMethods[PipeType[_], ElemType <: nodes.Method](val pipe: PipeType[ElemType]) extends AnyVal {
 
@@ -39,19 +40,19 @@ class MethodMethods[PipeType[_], ElemType <: nodes.Method](val pipe: PipeType[El
   /**
     * The type declaration associated with this method, e.g., the class it is defined in.
     * */
-  /*
-  def definingTypeDecl(implicit ops: PipeOperations[PipeType, nodes.Method]): PipeType[nodes.TypeDecl] = {
-  ops.map(pipe, _.vertices(Direction.IN, EdgeTypes.AST).asScala)
-
-
-  new TypeDecl[Labels](
-    raw
-      .cast[nodes.StoredNode]
-      .repeat(_.in(EdgeTypes.AST).cast[nodes.StoredNode])
-      .until(_.hasLabel(NodeTypes.TYPE_DECL))
-      .cast[nodes.TypeDecl])
+  def definingTypeDecl(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.TypeDecl] = {
+    ops.flatMap3[nodes.StoredNode](
+      pipe,
+      _.vertices(Direction.IN, EdgeTypes.AST).asScala,
+      _.label == NodeTypes.TYPE_DECL)
   }
-      */
+
+  implicit def foo[T](x: Iterator[Vertex]): T = {
+    x.asInstanceOf[T]
+  }
+  implicit def foo[T](x: RealPipe[_]): T = {
+    x.asInstanceOf[T]
+  }
 }
 
 private object MethodMethodsMethodInstanceVisitor extends NodeVisitor[Iterator[nodes.MethodInst]] {

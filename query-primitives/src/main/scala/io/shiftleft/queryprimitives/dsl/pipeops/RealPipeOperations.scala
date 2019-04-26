@@ -34,4 +34,11 @@ class RealPipeOperations extends PipeOperations[RealPipe] {
     pipe.impl.head
   }
 
+  override def iterator[ElemType](pipe: RealPipe[ElemType]): Iterator[ElemType] = {
+    pipe.impl.iterator
+  }
+
+  override def toList[ElemType](pipe: RealPipe[ElemType]): List[ElemType] = {
+    pipe.impl
+  }
 }
