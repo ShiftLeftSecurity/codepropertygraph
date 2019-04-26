@@ -16,7 +16,7 @@ class MethodMethods[PipeType[_], ElemType <: nodes.Method](val pipe: PipeType[El
     * Traverse to concrete instances of method.
     */
   def methodInstance(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.MethodInst] = {
-    ops.flatMap(pipe, (_: ElemType).accept(MethodMethodsMethodInstanceVisitor))
+    ops.flatMap2(pipe, (_: ElemType).accept(MethodMethodsMethodInstanceVisitor))
     //ops.flatMapIterator(pipe,
       //_.vertices(Direction.IN, EdgeTypes.REF).asScala)
   }
@@ -25,7 +25,7 @@ class MethodMethods[PipeType[_], ElemType <: nodes.Method](val pipe: PipeType[El
     * Traverse to parameters of the method
     * */
   def parameter(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.MethodParameterIn] = {
-    ops.flatMap(pipe, (_: ElemType).accept(MethodMethodsParameterVisitor))
+    ops.flatMap2(pipe, (_: ElemType).accept(MethodMethodsParameterVisitor))
   }
 
   /**
@@ -33,7 +33,7 @@ class MethodMethods[PipeType[_], ElemType <: nodes.Method](val pipe: PipeType[El
     * */
   def callIn(implicit ops: PipeOperations[PipeType],
              callResolver: ICallResolver): RealPipe[nodes.Call] = {
-    ops.flatMap(pipe, (_: ElemType).accept(new MethodMethodsCallInVisitor(callResolver)))
+    ops.flatMap2(pipe, (_: ElemType).accept(new MethodMethodsCallInVisitor(callResolver)))
   }
 
   /**

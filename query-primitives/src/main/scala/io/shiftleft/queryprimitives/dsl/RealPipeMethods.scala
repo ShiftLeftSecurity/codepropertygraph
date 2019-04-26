@@ -11,14 +11,18 @@ class RealPipeMethods[ElemType](val pipe: RealPipe[ElemType]) /* extends AnyVal 
     ops.map(pipe, function)
   }
 
-  def flatMap[DstType](function: ElemType => GenTraversableOnce[DstType])
+  def map(function: ElemType => ElemType, times: Int)
+         (implicit ops: PipeOperations[RealPipe]): RealPipe[ElemType] = {
+    ops.map(pipe, function, times)
+  }
+
+  def flatMap2[DstType](function: ElemType => GenTraversableOnce[DstType])
                       (implicit ops: PipeOperations[RealPipe]): RealPipe[DstType] = {
-    ops.flatMap(pipe, function)
+    ops.flatMap2(pipe, function)
   }
 
   def flatMap[DstType](function: ElemType => RealPipe[DstType])
-                      (implicit ops: PipeOperations[RealPipe],
-                       unused: TypeErasureResolve1): RealPipe[DstType] = {
+                      (implicit ops: PipeOperations[RealPipe]): RealPipe[DstType] = {
     ops.flatMap(pipe, function)
   }
 

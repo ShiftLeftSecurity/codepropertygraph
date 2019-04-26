@@ -8,12 +8,11 @@ trait PipeOperations[PipeType[_]] {
   def map[SrcType, DstType](pipe: PipeType[SrcType],
                             function: SrcType => DstType): PipeType[DstType]
 
-  def flatMap[SrcType, DstType](pipe: PipeType[SrcType],
-                                function: SrcType => GenTraversableOnce[DstType]): RealPipe[DstType]
+  def flatMap2[SrcType, DstType](pipe: PipeType[SrcType],
+                                 function: SrcType => GenTraversableOnce[DstType]): RealPipe[DstType]
 
   def flatMap[SrcType, DstType](pipe: PipeType[SrcType],
-                                function: SrcType => RealPipe[DstType])
-                               (implicit unused: TypeErasureResolve1): RealPipe[DstType]
+                                function: SrcType => RealPipe[DstType]): RealPipe[DstType]
 
   def filter[ElemType](pipe: PipeType[ElemType],
                        function: ElemType => Boolean): RealPipe[ElemType]
@@ -42,7 +41,7 @@ trait PipeOperations[PipeType[_]] {
                         times: Int): RealPipe[ElemType] = {
     var currentPipe = toRealPipe(pipe)
     for (_ <- 0 until times) {
-      currentPipe = flatMap(pipe, function)
+      currentPipe = flatMap2(pipe, function)
     }
     currentPipe
   }
