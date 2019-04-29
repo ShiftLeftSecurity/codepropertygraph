@@ -4,6 +4,7 @@ import io.shiftleft.queryprimitives.dsl.RealPipe
 
 import scala.collection.GenTraversableOnce
 
+/*
 trait PipeOperations[PipeType[+_], +ElemType] {
   def toRealPipe[SuperType >: ElemType]
   (pipe: PipeType[SuperType]): RealPipe[SuperType]
@@ -83,3 +84,5 @@ trait PipeOperations[PipeType[+_], +ElemType] {
     builder.result
   }
 }
+
+ */

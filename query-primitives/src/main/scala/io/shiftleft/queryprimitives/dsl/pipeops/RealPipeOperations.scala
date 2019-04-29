@@ -4,6 +4,7 @@ import io.shiftleft.queryprimitives.dsl.RealPipe
 
 import scala.collection.GenTraversableOnce
 
+/*
 class RealPipeOperations[+ElemType] extends PipeOperations[RealPipe, ElemType] {
   override def toRealPipe[SuperType >: ElemType]
   (pipe: RealPipe[SuperType]): RealPipe[SuperType] = {
@@ -50,3 +51,5 @@ class RealPipeOperations[+ElemType] extends PipeOperations[RealPipe, ElemType] {
     pipe.impl
   }
 }
+
+ */

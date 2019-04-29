@@ -1,5 +1,7 @@
 package io.shiftleft.queryprimitives.dsl
 
+import io.shiftleft.queryprimitives.dsl.pipeops.Pipe
+
 import scala.collection.GenTraversableOnce
 
 object RealPipe {
@@ -8,26 +10,20 @@ object RealPipe {
   }
 }
 
-class RealPipe[+ElemType](val impl: List[ElemType]) extends AnyVal {
+class RealPipe[+ElemType](val impl: List[ElemType]) extends AnyVal with Pipe[ElemType] {
+  override def toRealPipe: RealPipe[ElemType] = ???
 
-  def map[DstType](function: ElemType => DstType): RealPipe[DstType] = {
-    Implicits.realPipeOps.map(this, function)
-  }
+  override def map[DstType](function: ElemType => DstType): Pipe[DstType] = ???
 
-  def map[SuperType >: ElemType](function: SuperType => SuperType,
-                                 times: Int): RealPipe[SuperType] = {
-    Implicits.realPipeOps.map(this, function, times)
-  }
+  override def flatMap2[DstType](function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = ???
 
-  def flatMap2[DstType](function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
-    Implicits.realPipeOps.flatMap2(this, function)
-  }
+  override def flatMap[DstType](function: ElemType => RealPipe[DstType]): RealPipe[DstType] = ???
 
-  def flatMap[DstType](function: ElemType => RealPipe[DstType]): RealPipe[DstType] = {
-    Implicits.realPipeOps.flatMap(this, function)
-  }
+  override def filter(function: ElemType => Boolean): RealPipe[ElemType] = ???
 
-  def head: ElemType = {
-    Implicits.realPipeOps.head(this)
-  }
+  override def head: ElemType = ???
+
+  override def toList: List[ElemType] = ???
+
+  override def iterator: Iterator[ElemType] = ???
 }

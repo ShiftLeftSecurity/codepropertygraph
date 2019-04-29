@@ -4,20 +4,20 @@ import gremlin.scala.Vertex
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.queryprimitives.dsl.{Implicits, RealPipe}
-import io.shiftleft.queryprimitives.dsl.pipeops.PipeOperations
+import io.shiftleft.queryprimitives.dsl.pipeops.Pipe
 import io.shiftleft.queryprimitives.steps.ICallResolver
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
 import scala.language.higherKinds
 
-class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyVal {
+class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method] with Pipe[nodes.Method]) extends AnyVal {
 
   /**
     * Traverse to concrete instances of method.
     */
-  def methodInstance(implicit ops: PipeOperations[PipeType, nodes.Method]): RealPipe[nodes.MethodInst] = {
-    ops.flatMap2(pipe, (_: nodes.Method).accept(MethodMethodsMethodInstanceVisitor))
+  def methodInstance: RealPipe[nodes.MethodInst] = {
+    pipe.flatMap2((_: nodes.Method).accept(MethodMethodsMethodInstanceVisitor))
     //ops.flatMapIterator(pipe,
       //_.vertices(Direction.IN, EdgeTypes.REF).asScala)
   }
@@ -25,24 +25,22 @@ class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyV
   /**
     * Traverse to parameters of the method
     * */
-  def parameter(implicit ops: PipeOperations[PipeType, nodes.Method]): RealPipe[nodes.MethodParameterIn] = {
-    ops.flatMap2(pipe, (_: nodes.Method).accept(MethodMethodsParameterVisitor))
+  def parameter: RealPipe[nodes.MethodParameterIn] = {
+    pipe.flatMap2((_: nodes.Method).accept(MethodMethodsParameterVisitor))
   }
 
   /**
     * Incoming call sites
     * */
-  def callIn(implicit ops: PipeOperations[PipeType, nodes.Method],
-             callResolver: ICallResolver): RealPipe[nodes.Call] = {
-    ops.flatMap2(pipe, (_: nodes.Method).accept(new MethodMethodsCallInVisitor(callResolver)))
+  def callIn(implicit callResolver: ICallResolver): RealPipe[nodes.Call] = {
+    pipe.flatMap2((_: nodes.Method).accept(new MethodMethodsCallInVisitor(callResolver)))
   }
 
   /**
     * The type declaration associated with this method, e.g., the class it is defined in.
     * */
-  def definingTypeDecl(implicit ops: PipeOperations[PipeType, nodes.Method]): RealPipe[nodes.TypeDecl] = {
-    ops.flatMap3[nodes.StoredNode](
-      pipe,
+  def definingTypeDecl: RealPipe[nodes.TypeDecl] = {
+    pipe.flatMap3[nodes.StoredNode](
       _.vertices(Direction.IN, EdgeTypes.AST).asScala,
       _.label == NodeTypes.TYPE_DECL)
   }
