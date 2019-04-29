@@ -12,22 +12,22 @@ class B(b: Int = 0)
 class BDerived() extends B
 
 class NodeAMethods[PipeType[+_]](val pipe: PipeType[A]) extends AnyVal {
-  def toB(implicit ops: PipeOperations[PipeType]): PipeType[B] = {
+  def toB(implicit ops: PipeOperations[PipeType, A]): PipeType[B] = {
     ops.map(pipe, (x: A) => new B())
   }
-  def toMultipleB(implicit ops: PipeOperations[PipeType]): RealPipe[B] = {
+  def toMultipleB(implicit ops: PipeOperations[PipeType, A]): RealPipe[B] = {
     ops.flatMap2(pipe, (x: A) => new B() :: Nil)
   }
 }
 
 class NodeBMethods[PipeType[+_]](val pipe: PipeType[B]) extends AnyVal {
-  def toA(implicit ops: PipeOperations[PipeType]): PipeType[A] = {
+  def toA(implicit ops: PipeOperations[PipeType, B]): PipeType[A] = {
     ops.map(pipe, (x: B) => new A())
   }
-  def toMultipleA(implicit ops: PipeOperations[PipeType]): RealPipe[A] = {
+  def toMultipleA(implicit ops: PipeOperations[PipeType, B]): RealPipe[A] = {
     ops.flatMap2(pipe, (x: B) => new A() :: Nil)
   }
-  def toAMapTimesX(implicit ops: PipeOperations[PipeType]): PipeType[B] = {
+  def toAMapTimesX(implicit ops: PipeOperations[PipeType, B]): PipeType[B] = {
     ops.map(pipe, (x: B) => new BDerived(), 2)
   }
 }
