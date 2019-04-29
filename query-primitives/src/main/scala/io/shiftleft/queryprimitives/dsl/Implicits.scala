@@ -14,8 +14,8 @@ object Implicits extends PipeOperationImplicits with LowPriorityImplicits {
 }
 
 class PipeOperationImplicits {
-  implicit def realPipeOps[ElemType] = new RealPipeOperations[ElemType]
-  implicit def shallowPipeOps[ElemType] = new ShallowPipeOperations[ElemType]()
+  implicit val realPipeOps = new RealPipeOperations[Nothing]()
+  implicit val shallowPipeOps = new ShallowPipeOperations[Nothing]()
 }
 
 sealed trait LowPriorityImplicits {
