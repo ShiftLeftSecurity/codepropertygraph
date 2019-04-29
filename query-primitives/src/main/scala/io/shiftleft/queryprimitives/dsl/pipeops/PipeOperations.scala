@@ -4,6 +4,8 @@ import io.shiftleft.queryprimitives.dsl.{RealPipe, ShallowPipe}
 
 import scala.collection.GenTraversableOnce
 
+// TODO at Micha: It should be PipeType[+_] as type parameter. But i guess due to type erasure that is
+// not handled because the compiler does not start complaining about countervariant parameters.
 trait PipeOperations[PipeType[_]] {
   def toRealPipe[ElemType](pipe: PipeType[ElemType]): RealPipe[ElemType]
 

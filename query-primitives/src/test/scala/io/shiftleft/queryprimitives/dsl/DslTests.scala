@@ -9,7 +9,7 @@ case class A(a: Int = 0)
 
 case class B(b: Int = 0)
 
-class NodeAMethods[PipeType[_], ElemType <: A](val pipe: PipeType[ElemType]) extends AnyVal {
+class NodeAMethods[PipeType[+_], ElemType <: A](val pipe: PipeType[ElemType]) extends AnyVal {
   def toB(implicit ops: PipeOperations[PipeType]): PipeType[B] = {
     ops.map(pipe, (x: ElemType) => B())
   }
@@ -18,7 +18,7 @@ class NodeAMethods[PipeType[_], ElemType <: A](val pipe: PipeType[ElemType]) ext
   }
 }
 
-class NodeBMethods[PipeType[_], ElemType <: B](val pipe: PipeType[ElemType]) extends AnyVal {
+class NodeBMethods[PipeType[+_], ElemType <: B](val pipe: PipeType[ElemType]) extends AnyVal {
   def toA(implicit ops: PipeOperations[PipeType]): PipeType[A] = {
     ops.map(pipe, (x: ElemType) => A())
   }
@@ -80,6 +80,5 @@ class DslTests extends WordSpec with Matchers {
   "Be able to use flatMap on GenTraversableOnce function." in {
     A().toMultipleB.flatMap2(_ => A()::Nil).head shouldBe A()
   }
-
 
 }
