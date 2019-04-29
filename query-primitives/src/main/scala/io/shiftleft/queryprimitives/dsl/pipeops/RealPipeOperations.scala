@@ -4,41 +4,49 @@ import io.shiftleft.queryprimitives.dsl.RealPipe
 
 import scala.collection.GenTraversableOnce
 
-class RealPipeOperations extends PipeOperations[RealPipe] {
-  override def toRealPipe[ElemType](pipe: RealPipe[ElemType]): RealPipe[ElemType] = {
+class RealPipeOperations[+ElemType] extends PipeOperations[RealPipe, ElemType] {
+  override def toRealPipe[SuperType >: ElemType]
+  (pipe: RealPipe[SuperType]): RealPipe[SuperType] = {
     pipe
   }
 
-  override def map[SrcType, DstType](pipe: RealPipe[SrcType],
-                                     function: SrcType => DstType): RealPipe[DstType] = {
+  override def map[SuperType >: ElemType, DstType]
+  (pipe: RealPipe[SuperType],
+   function: SuperType => DstType): RealPipe[DstType] = {
     new RealPipe(pipe.impl.map(function))
   }
 
-  override def flatMap2[SrcType, DstType](pipe: RealPipe[SrcType],
-                                          function: SrcType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
+  override def flatMap2[SuperType >: ElemType, DstType]
+  (pipe: RealPipe[SuperType],
+   function: SuperType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
     new RealPipe(pipe.impl.flatMap(function.apply))
   }
 
-  override def flatMap[SrcType, DstType](pipe: RealPipe[SrcType],
-                                         function: SrcType => RealPipe[DstType]): RealPipe[DstType] = {
-    val applyAndUnwrap = (sourceElement: SrcType) => function.apply(sourceElement).impl
+  override def flatMap[SuperType >: ElemType, DstType]
+  (pipe: RealPipe[SuperType],
+   function: SuperType => RealPipe[DstType]): RealPipe[DstType] = {
+    val applyAndUnwrap = (sourceElement: SuperType) => function.apply(sourceElement).impl
     new RealPipe(pipe.impl.flatMap(applyAndUnwrap))
   }
 
-  override def filter[ElemType](pipe: RealPipe[ElemType],
-                                function: ElemType => Boolean): RealPipe[ElemType] = {
+  override def filter[SuperType >: ElemType]
+  (pipe: RealPipe[SuperType],
+   function: SuperType => Boolean): RealPipe[SuperType] = {
     new RealPipe(pipe.impl.filter(function))
   }
 
-  override def head[ElemType](pipe: RealPipe[ElemType]): ElemType = {
+  override def head[SuperType >: ElemType]
+  (pipe: RealPipe[SuperType]): SuperType = {
     pipe.impl.head
   }
 
-  override def iterator[ElemType](pipe: RealPipe[ElemType]): Iterator[ElemType] = {
+  override def iterator[SuperType >: ElemType]
+  (pipe: RealPipe[SuperType]): Iterator[SuperType] = {
     pipe.impl.iterator
   }
 
-  override def toList[ElemType](pipe: RealPipe[ElemType]): List[ElemType] = {
+  override def toList[SuperType >: ElemType]
+  (pipe: RealPipe[SuperType]): List[SuperType] = {
     pipe.impl
   }
 }
