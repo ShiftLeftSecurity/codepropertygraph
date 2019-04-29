@@ -8,13 +8,14 @@ object RealPipe {
   }
 }
 
-class RealPipe[ElemType](val impl: List[ElemType]) extends AnyVal {
+class RealPipe[+ElemType](val impl: List[ElemType]) extends AnyVal {
 
   def map[DstType](function: ElemType => DstType): RealPipe[DstType] = {
     Implicits.realPipeOps.map(this, function)
   }
 
-  def map(function: ElemType => ElemType, times: Int): RealPipe[ElemType] = {
+  def map[SuperType >: ElemType](function: SuperType => SuperType,
+                                 times: Int): RealPipe[SuperType] = {
     Implicits.realPipeOps.map(this, function, times)
   }
 

@@ -11,7 +11,7 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 import scala.collection.JavaConverters._
 import scala.language.higherKinds
 
-class MethodMethods[PipeType[_], ElemType <: nodes.Method](val pipe: PipeType[ElemType]) extends AnyVal {
+class MethodMethods[PipeType[+_], ElemType <: nodes.Method](val pipe: PipeType[ElemType]) extends AnyVal {
 
   /**
     * Traverse to concrete instances of method.
