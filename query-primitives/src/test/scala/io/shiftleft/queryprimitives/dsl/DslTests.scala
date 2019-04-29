@@ -9,21 +9,21 @@ case class A(a: Int = 0)
 
 case class B(b: Int = 0)
 
-class NodeAMethods[PipeType[+_], ElemType <: A](val pipe: PipeType[ElemType]) extends AnyVal {
+class NodeAMethods[PipeType[+_]](val pipe: PipeType[A]) extends AnyVal {
   def toB(implicit ops: PipeOperations[PipeType]): PipeType[B] = {
-    ops.map(pipe, (x: ElemType) => B())
+    ops.map(pipe, (x: A) => B())
   }
   def toMultipleB(implicit ops: PipeOperations[PipeType]): RealPipe[B] = {
-    ops.flatMap2(pipe, (x: ElemType) => B() :: Nil)
+    ops.flatMap2(pipe, (x: A) => B() :: Nil)
   }
 }
 
-class NodeBMethods[PipeType[+_], ElemType <: B](val pipe: PipeType[ElemType]) extends AnyVal {
+class NodeBMethods[PipeType[+_]](val pipe: PipeType[B]) extends AnyVal {
   def toA(implicit ops: PipeOperations[PipeType]): PipeType[A] = {
-    ops.map(pipe, (x: ElemType) => A())
+    ops.map(pipe, (x: B) => A())
   }
   def toMultipleA(implicit ops: PipeOperations[PipeType]): RealPipe[A] = {
-    ops.flatMap2(pipe, (x: ElemType) => A() :: Nil)
+    ops.flatMap2(pipe, (x: B) => A() :: Nil)
   }
 }
 

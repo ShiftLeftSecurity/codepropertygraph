@@ -11,13 +11,13 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 import scala.collection.JavaConverters._
 import scala.language.higherKinds
 
-class MethodMethods[PipeType[+_], ElemType <: nodes.Method](val pipe: PipeType[ElemType]) extends AnyVal {
+class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyVal {
 
   /**
     * Traverse to concrete instances of method.
     */
   def methodInstance(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.MethodInst] = {
-    ops.flatMap2(pipe, (_: ElemType).accept(MethodMethodsMethodInstanceVisitor))
+    ops.flatMap2(pipe, (_: nodes.Method).accept(MethodMethodsMethodInstanceVisitor))
     //ops.flatMapIterator(pipe,
       //_.vertices(Direction.IN, EdgeTypes.REF).asScala)
   }
@@ -26,7 +26,7 @@ class MethodMethods[PipeType[+_], ElemType <: nodes.Method](val pipe: PipeType[E
     * Traverse to parameters of the method
     * */
   def parameter(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.MethodParameterIn] = {
-    ops.flatMap2(pipe, (_: ElemType).accept(MethodMethodsParameterVisitor))
+    ops.flatMap2(pipe, (_: nodes.Method).accept(MethodMethodsParameterVisitor))
   }
 
   /**
@@ -34,7 +34,7 @@ class MethodMethods[PipeType[+_], ElemType <: nodes.Method](val pipe: PipeType[E
     * */
   def callIn(implicit ops: PipeOperations[PipeType],
              callResolver: ICallResolver): RealPipe[nodes.Call] = {
-    ops.flatMap2(pipe, (_: ElemType).accept(new MethodMethodsCallInVisitor(callResolver)))
+    ops.flatMap2(pipe, (_: nodes.Method).accept(new MethodMethodsCallInVisitor(callResolver)))
   }
 
   /**
