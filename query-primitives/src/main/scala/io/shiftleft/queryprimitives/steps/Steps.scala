@@ -26,7 +26,8 @@ import shapeless.ops.product.ToHList
 class Steps[NodeType, Labels <: HList](val raw: GremlinScala.Aux[NodeType, Labels])
     extends ext.Enrichable
     with ext.securityprofile.Enrichable
-    with ext.semanticcpg.Enrichable {
+    with ext.semanticcpg.Enrichable
+    with ext.dataflowengine.Enrichable {
   implicit lazy val graph: Graph = raw.traversal.asAdmin.getGraph.get
 
   /**
