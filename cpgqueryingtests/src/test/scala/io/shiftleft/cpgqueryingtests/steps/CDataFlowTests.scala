@@ -1,11 +1,6 @@
 package io.shiftleft.cpgqueryingtests.steps
 
 import io.shiftleft.cpgqueryingtests.codepropertygraph.{CpgFactory, LanguageFrontend}
-import org.scalatest.{Matchers, WordSpec}
-import io.shiftleft.passes.dataflows._
-import io.shiftleft.passes.dataflows.steps._
-import io.shiftleft.codepropertygraph.generated.{NodeKeys, nodes}
-import io.shiftleft.queryprimitives.steps._
 
 class CDataFlowTests extends CpgDataFlowTests {
   val cpgFactory = new CpgFactory(LanguageFrontend.Fuzzyc)
