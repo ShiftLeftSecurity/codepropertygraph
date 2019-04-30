@@ -34,7 +34,8 @@ class SerializedCpg() {
     val env = new util.HashMap[String, String]
     // This ensures that the file is created if it does not exist
     env.put("create", "true")
-    val outputUri = new URI("jar:file", null, new File(filename).getAbsolutePath, null)
+    val fileUri = new File(filename).toURI
+    val outputUri = new URI("jar:" + fileUri.getScheme, null, fileUri.getPath, null)
     zipFileSystem = FileSystems.newFileSystem(outputUri, env)
   }
 
