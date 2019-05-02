@@ -5,33 +5,28 @@ import io.shiftleft.queryprimitives.dsl.ShallowPipe.ShallowPipe
 
 import scala.collection.GenTraversableOnce
 
-class ShallowPipeOperations[+ElemType] extends PipeOperations[ShallowPipe, ElemType] {
-  override def toRealPipe[SuperType >: ElemType]
-  (pipe: ShallowPipe[SuperType]): RealPipe[SuperType] = {
+class ShallowPipeOperations[ElemType] extends PipeOperations[ShallowPipe, ElemType] {
+  override def toRealPipe(pipe: ShallowPipe[ElemType]): RealPipe[ElemType] = {
     new RealPipe(pipe :: Nil)
   }
 
-  override def map[SuperType >: ElemType, DstType]
-  (pipe: ShallowPipe[SuperType],
-   function: SuperType => DstType): ShallowPipe[DstType] = {
+  override def map[DstType](pipe: ShallowPipe[ElemType],
+                            function: ElemType => DstType): ShallowPipe[DstType] = {
     function.apply(pipe)
   }
 
-  override def flatMap2[SuperType >: ElemType, DstType]
-  (pipe: ShallowPipe[SuperType],
-   function: SuperType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
+  override def flatMap2[DstType](pipe: ShallowPipe[ElemType],
+                                 function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
     new RealPipe(function.apply(pipe).toList)
   }
 
-  override def flatMap[SuperType >: ElemType, DstType]
-  (pipe: ShallowPipe[SuperType],
-   function: SuperType => RealPipe[DstType]): RealPipe[DstType] = {
+  override def flatMap[DstType](pipe: ShallowPipe[ElemType],
+                                function: ElemType => RealPipe[DstType]): RealPipe[DstType] = {
     new RealPipe(function.apply(pipe).impl)
   }
 
-  override def filter[SuperType >: ElemType]
-  (pipe: ShallowPipe[SuperType],
-   function: SuperType => Boolean): RealPipe[SuperType] = {
+  override def filter(pipe: ShallowPipe[ElemType],
+                      function: ElemType => Boolean): RealPipe[ElemType] = {
     if (function.apply(pipe)){
       new RealPipe(pipe :: Nil)
     } else {
@@ -39,18 +34,15 @@ class ShallowPipeOperations[+ElemType] extends PipeOperations[ShallowPipe, ElemT
     }
   }
 
-  override def head[SuperType >: ElemType]
-  (pipe: ShallowPipe[SuperType]): SuperType = {
+  override def head(pipe: ShallowPipe[ElemType]): ElemType = {
     pipe
   }
 
-  override def iterator[SuperType >: ElemType]
-  (pipe: ShallowPipe[SuperType]): Iterator[SuperType] = {
+  override def iterator(pipe: ShallowPipe[ElemType]): Iterator[ElemType] = {
     (pipe :: Nil).toIterator
   }
 
-  override def toList[SuperType >: ElemType]
-  (pipe: ShallowPipe[SuperType]): List[SuperType] = {
+  override def toList(pipe: ShallowPipe[ElemType]): List[ElemType] = {
     pipe :: Nil
   }
 }

@@ -13,22 +13,22 @@ class BDerived() extends B
 
 class NodeAMethods[PipeType[+_]](val pipe: PipeType[A]) extends AnyVal {
   def toB(implicit ops: PipeOperations[PipeType, A]): PipeType[B] = {
-    ops.map(pipe, (x: A) => new B())
+    ops.map(pipe, _ => new B())
   }
   def toMultipleB(implicit ops: PipeOperations[PipeType, A]): RealPipe[B] = {
-    ops.flatMap2(pipe, (x: A) => new B() :: Nil)
+    ops.flatMap2(pipe, _ => new B() :: Nil)
   }
 }
 
 class NodeBMethods[PipeType[+_]](val pipe: PipeType[B]) extends AnyVal {
   def toA(implicit ops: PipeOperations[PipeType, B]): PipeType[A] = {
-    ops.map(pipe, (x: B) => new A())
+    ops.map(pipe, _ => new A())
   }
   def toMultipleA(implicit ops: PipeOperations[PipeType, B]): RealPipe[A] = {
-    ops.flatMap2(pipe, (x: B) => new A() :: Nil)
+    ops.flatMap2(pipe, _ => new A() :: Nil)
   }
-  def toAMapTimesX(implicit ops: PipeOperations[PipeType, B]): PipeType[B] = {
-    ops.map(pipe, (x: B) => new BDerived(), 2)
+  def toBMapTimesX(implicit ops: PipeOperations[PipeType, B]): PipeType[B] = {
+    ops.mapTimes(pipe, _ => new BDerived(), 2)
   }
 }
 
@@ -75,7 +75,7 @@ class DslTests extends WordSpec with Matchers {
   }
 
   "Be able to use map with repeat function." in {
-    new A().toMultipleB.map(_.toA.toB, 1).head shouldBe new B()
+    new A().toMultipleB.mapTimes(_.toA.toB, 1).head shouldBe new B()
   }
 
   "Be able to use flatMap on real pipe function." in {
@@ -84,6 +84,14 @@ class DslTests extends WordSpec with Matchers {
 
   "Be able to use flatMap on GenTraversableOnce function." in {
     new A().toMultipleB.flatMap2(_ => new A()::Nil).head shouldBe new A()
+  }
+
+  "X" in {
+    new B().toBMapTimesX shouldBe new BDerived
+  }
+
+  "Y" in {
+    new A().toMultipleB.toBMapTimesX.head shouldBe new BDerived
   }
 
 }

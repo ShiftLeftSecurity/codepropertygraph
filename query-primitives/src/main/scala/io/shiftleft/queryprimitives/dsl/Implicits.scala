@@ -14,8 +14,16 @@ object Implicits extends PipeOperationImplicits with LowPriorityImplicits {
 }
 
 class PipeOperationImplicits {
-  implicit val realPipeOps = new RealPipeOperations[Nothing]()
-  implicit val shallowPipeOps = new ShallowPipeOperations[Nothing]()
+  private val realPipeOps = new RealPipeOperations[Nothing]()
+  private val shallowPipeOps = new ShallowPipeOperations[Nothing]()
+
+  implicit def getRealPipeOps[ElemType]: RealPipeOperations[ElemType] = {
+    realPipeOps.asInstanceOf[RealPipeOperations[ElemType]]
+  }
+
+  implicit def getShallowPipeOps[ElemType]: ShallowPipeOperations[ElemType] = {
+    shallowPipeOps.asInstanceOf[ShallowPipeOperations[ElemType]]
+  }
 }
 
 sealed trait LowPriorityImplicits {

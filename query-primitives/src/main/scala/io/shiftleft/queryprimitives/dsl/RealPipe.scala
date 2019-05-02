@@ -11,23 +11,23 @@ object RealPipe {
 class RealPipe[+ElemType](val impl: List[ElemType]) extends AnyVal {
 
   def map[DstType](function: ElemType => DstType): RealPipe[DstType] = {
-    Implicits.realPipeOps.map(this, function)
+    Implicits.getRealPipeOps.map(this, function)
   }
 
-  def map[SuperType >: ElemType](function: SuperType => SuperType,
-                                 times: Int): RealPipe[SuperType] = {
-    Implicits.realPipeOps.map(this, function, times)
+  def mapTimes[SuperType >: ElemType](function: SuperType => SuperType,
+                                      times: Int): RealPipe[SuperType] = {
+    Implicits.getRealPipeOps.mapTimes(this, function, times)
   }
 
   def flatMap2[DstType](function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
-    Implicits.realPipeOps.flatMap2(this, function)
+    Implicits.getRealPipeOps.flatMap2(this, function)
   }
 
   def flatMap[DstType](function: ElemType => RealPipe[DstType]): RealPipe[DstType] = {
-    Implicits.realPipeOps.flatMap(this, function)
+    Implicits.getRealPipeOps.flatMap(this, function)
   }
 
   def head: ElemType = {
-    Implicits.realPipeOps.head(this)
+    Implicits.getRealPipeOps.head(this)
   }
 }
