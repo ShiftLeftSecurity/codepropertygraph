@@ -694,7 +694,7 @@ object DomainClassCreator {
             /* a little hack to allow us to have different DomainClassCreator while using the same cpg traversals */
             if (getHigherType(key) == HigherValueType.Option) " = None"
             else if (key.valueType == "int") " = -1"
-            else if (key.valueType == "String") """ ="" """
+            else if (getHigherType(key) == HigherValueType.None && key.valueType == "string") """ ="" """
             else ""
           s"${camelCase(key.name)}: ${getCompleteType(key)} $optionalDefault"
         }
