@@ -2,8 +2,9 @@ package io.shiftleft.queryprimitives.steps.starters
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.queryprimitives.steps.{ext, NodeSteps, Steps}
+import io.shiftleft.queryprimitives.steps.{NodeSteps, ext}
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import shapeless.HNil
 
 object Cpg {
@@ -14,6 +15,21 @@ object Cpg {
 
   implicit def toNodeTypeStarters(cpg: Cpg): NodeTypeStarters =
     new NodeTypeStarters(cpg)
+
+  /**
+    * Create an empty code property graph
+    * */
+  def emptyCpg : Cpg = new Cpg(emptyGraph)
+
+  /**
+    * Create an empty graph
+    * */
+  def emptyGraph : TinkerGraph =
+    TinkerGraph
+      .open(
+        io.shiftleft.codepropertygraph.generated.nodes.Factories.AllAsJava,
+        io.shiftleft.codepropertygraph.generated.edges.Factories.AllAsJava
+      )
 }
 
 /**
@@ -21,12 +37,9 @@ object Cpg {
   This is the starting point of all traversals. A variable of this
   type named `cpg` is made available in the REPL.
 
-  @param graph the underlying graph
+  @param graph the underlying graph. An empty graph is created if this parameter is omitted.
   */
-class Cpg(val graph: Graph)
-    extends ext.Enrichable
-    with ext.securityprofile.Enrichable
-    with ext.semanticcpg.Enrichable {
+class Cpg(val graph: Graph = Cpg.emptyGraph) extends ext.Enrichable with ext.securityprofile.Enrichable with ext.semanticcpg.Enrichable {
 
   /**
     The underlying graph.
