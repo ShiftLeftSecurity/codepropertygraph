@@ -1,6 +1,6 @@
 package io.shiftleft.queryprimitives.dsl
 
-import io.shiftleft.queryprimitives.dsl.RealPipe.RealPipe
+import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -18,7 +18,7 @@ class RealPipeBuilder[ElemType] extends mutable.Builder[ElemType, RealPipe[ElemT
   }
 
   override def result(): RealPipe[ElemType] = {
-    RealPipe.RealPipe(listBuffer.toList)
+    pipetypes.RealPipe.RealPipe(listBuffer.toList)
   }
 }
 

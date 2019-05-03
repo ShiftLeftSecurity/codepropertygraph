@@ -3,7 +3,7 @@ package io.shiftleft.queryprimitives.steps.types.structure
 import gremlin.scala.Vertex
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.queryprimitives.dsl.RealPipe.RealPipe
+import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 import io.shiftleft.queryprimitives.dsl.pipeops.PipeOperations
 import io.shiftleft.queryprimitives.steps.ICallResolver
 import org.apache.tinkerpop.gremlin.structure.Direction

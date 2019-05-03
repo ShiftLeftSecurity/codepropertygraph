@@ -1,10 +1,12 @@
 package io.shiftleft.queryprimitives.dsl
 
 import Implicits._
-import io.shiftleft.queryprimitives.dsl.RealPipe.RealPipe
-import io.shiftleft.queryprimitives.dsl.ShallowPipe.ShallowPipe
+import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
+import io.shiftleft.queryprimitives.dsl.pipetypes.ShallowPipe.ShallowPipe
 import io.shiftleft.queryprimitives.dsl.pipeops.PipeOperations
 import org.scalatest.{Matchers, WordSpec}
+
+import scala.language.higherKinds
 
 class A(a: Int = 0)
 class ADerived() extends A

@@ -1,8 +1,8 @@
 package io.shiftleft.queryprimitives.dsl
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.queryprimitives.dsl.RealPipe.RealPipe
-import io.shiftleft.queryprimitives.dsl.ShallowPipe.ShallowPipe
+import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
+import io.shiftleft.queryprimitives.dsl.pipetypes.ShallowPipe.ShallowPipe
 import io.shiftleft.queryprimitives.dsl.pipeops.{RealPipeOperations, ShallowPipeOperations}
 import io.shiftleft.queryprimitives.steps.types.structure.MethodMethods
 

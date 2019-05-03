@@ -1,32 +1,8 @@
 package io.shiftleft.queryprimitives.dsl
 
-import io.shiftleft.queryprimitives.dsl.RealPipe.RealPipe
+import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 
 import scala.collection.GenTraversableOnce
-import scala.language.higherKinds
-
-object RealPipe {
-  sealed abstract class RealPipeImpl {
-    type PipeType[+ElemType]
-
-    def apply[ElemType](impl: List[ElemType]): PipeType[ElemType]
-    def unwrap[ElemType](pipeType: PipeType[ElemType]): List[ElemType]
-  }
-
-  val RealPipe: RealPipeImpl = new RealPipeImpl {
-    override type PipeType[+ElemType] = List[ElemType]
-
-    override def apply[ElemType](impl: List[ElemType]): List[ElemType] = {
-      impl
-    }
-
-    override def unwrap[ElemType](pipeType: PipeType[ElemType]): List[ElemType] = {
-      pipeType
-    }
-  }
-
-  type RealPipe[+ElemType] = RealPipe.PipeType[ElemType]
-}
 
 class RealPipeMethods[ElemType](val pipe: RealPipe[ElemType]) extends AnyVal {
   def map[DstType](function: ElemType => DstType): RealPipe[DstType] = {
@@ -58,3 +34,4 @@ class RealPipeMethods[ElemType](val pipe: RealPipe[ElemType]) extends AnyVal {
     Implicits.getRealPipeOps.toList(pipe)
   }
 }
+

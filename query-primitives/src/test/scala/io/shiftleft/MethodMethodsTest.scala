@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.queryprimitives.dsl.Implicits._
-import io.shiftleft.queryprimitives.dsl.RealPipe.RealPipe
+import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 
 class MethodMethodsTest extends WordSpec with Matchers {
   "foo" in {

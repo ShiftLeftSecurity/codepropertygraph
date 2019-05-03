@@ -1,9 +1,10 @@
 package io.shiftleft.queryprimitives.dsl.pipeops
 
-import io.shiftleft.queryprimitives.dsl.RealPipe.RealPipe
+import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 import io.shiftleft.queryprimitives.dsl.{Implicits, RealPipeBuilder}
 
 import scala.collection.GenTraversableOnce
+import scala.language.higherKinds
 
 trait PipeOperations[PipeType[+_], ElemType] {
   // We cannot make PipeOperations covariant in ElemType because the pipe containing the

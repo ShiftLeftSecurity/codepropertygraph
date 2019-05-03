@@ -1,6 +1,6 @@
 package io.shiftleft.queryprimitives.dsl.pipeops
 
-import io.shiftleft.queryprimitives.dsl.RealPipe.RealPipe
+import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 
 import scala.collection.GenTraversableOnce
 
