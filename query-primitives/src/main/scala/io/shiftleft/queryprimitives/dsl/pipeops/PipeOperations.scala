@@ -21,7 +21,7 @@ trait PipeOperations[PipeType[+_], ElemType] extends BasicPipeOperations[PipeTyp
 
     var currentPipe: PipeType[SuperType] = pipe
     for (_ <- 0 until times) {
-      currentPipe = pipeOps.map(pipe, function)
+      currentPipe = pipeOps.map(currentPipe, function)
     }
     currentPipe
   }
