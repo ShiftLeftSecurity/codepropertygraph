@@ -22,13 +22,13 @@ class RealPipeMethods[ElemType](val pipe: RealPipe[ElemType]) extends AnyVal {
     Implicits.getRealPipeOps.map(pipe, function)
   }
 
-  def repeat[SuperType >: ElemType](function: SuperType => SuperType,
-                                    times: Int): RealPipe[SuperType] = {
+  def repeat[DstType >: ElemType](function: DstType => DstType,
+                                  times: Int): RealPipe[DstType] = {
     Implicits.getRealPipeOps.repeat(pipe, function, times)
   }
 
-  def repeatUntil[SuperType >: ElemType](function: SuperType => SuperType,
-                                         until: SuperType => Boolean): RealPipe[SuperType] = {
+  def repeatUntil[DstType >: ElemType](function: DstType => DstType,
+                                       until: DstType => Boolean): RealPipe[DstType] = {
     Implicits.getRealPipeOps.repeatUntil(pipe, function, until)
   }
 
@@ -36,13 +36,13 @@ class RealPipeMethods[ElemType](val pipe: RealPipe[ElemType]) extends AnyVal {
     Implicits.getRealPipeOps.flatMap(pipe, function)
   }
 
-  def flatRepeat[SuperType >: ElemType](function: SuperType => GenTraversableOnce[SuperType],
-                                        times: Int): RealPipe[SuperType] = {
+  def flatRepeat[DstType >: ElemType](function: DstType => GenTraversableOnce[DstType],
+                                      times: Int): RealPipe[DstType] = {
     Implicits.getRealPipeOps.flatRepeat(pipe, function, times)
   }
 
-  def flatRepeatUntil[SuperType >: ElemType](function: SuperType => GenTraversableOnce[SuperType],
-                                             until: SuperType => Boolean): RealPipe[SuperType] = {
+  def flatRepeatUntil[DstType >: ElemType](function: DstType => GenTraversableOnce[DstType],
+                                           until: DstType => Boolean): RealPipe[DstType] = {
     Implicits.getRealPipeOps.flatRepeatUntil(pipe, function, until)
   }
 }

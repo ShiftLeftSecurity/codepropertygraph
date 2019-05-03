@@ -14,42 +14,42 @@ trait PipeOperations[PipeType[+_], ElemType] extends BasicPipeOperations[PipeTyp
     this.asInstanceOf[PipeOperations[PipeType, NewElemType]]
   }
 
-  def repeat[SuperType >: ElemType](pipe: PipeType[SuperType],
-                                    function: SuperType => SuperType,
-                                    times: Int): PipeType[SuperType] = {
-    val pipeOps = castElemType[SuperType]
+  def repeat[DstType >: ElemType](pipe: PipeType[DstType],
+                                  function: DstType => DstType,
+                                  times: Int): PipeType[DstType] = {
+    val pipeOps = castElemType[DstType]
 
-    var currentPipe: PipeType[SuperType] = pipe
+    var currentPipe: PipeType[DstType] = pipe
     for (_ <- 0 until times) {
       currentPipe = pipeOps.map(currentPipe, function)
     }
     currentPipe
   }
 
-  def repeatUntil[SuperType >: ElemType](pipe: PipeType[SuperType],
-                                         function: SuperType => SuperType,
-                                         until: SuperType => Boolean): PipeType[SuperType] = {
+  def repeatUntil[DstType >: ElemType](pipe: PipeType[DstType],
+                                       function: DstType => DstType,
+                                       until: DstType => Boolean): PipeType[DstType] = {
     // TODO implement
     pipe
   }
 
-  def flatRepeat[SuperType >: ElemType](pipe: PipeType[ElemType],
-                                        function: SuperType => GenTraversableOnce[SuperType],
-                                        times: Int): RealPipe[SuperType] = {
-    val pipeOps = Implicits.getRealPipeOps.castElemType[SuperType]
+  def flatRepeat[DstType >: ElemType](pipe: PipeType[ElemType],
+                                      function: DstType => GenTraversableOnce[DstType],
+                                      times: Int): RealPipe[DstType] = {
+    val pipeOps = Implicits.getRealPipeOps.castElemType[DstType]
 
-    var currentPipe: RealPipe[SuperType] = flatMap(pipe, function)
+    var currentPipe: RealPipe[DstType] = flatMap(pipe, function)
     for (_ <- 0 until times - 1) {
       currentPipe = pipeOps.flatMap(currentPipe, function)
     }
     currentPipe
   }
 
-  def flatRepeatUntil[SuperType >: ElemType](pipe: PipeType[ElemType],
-                                             function: SuperType => GenTraversableOnce[SuperType],
-                                             until: SuperType => Boolean): RealPipe[SuperType] = {
-    var stack: List[SuperType] = toList(pipe)
-    var builder = new RealPipeBuilder[SuperType]()
+  def flatRepeatUntil[DstType >: ElemType](pipe: PipeType[ElemType],
+                                           function: DstType => GenTraversableOnce[DstType],
+                                           until: DstType => Boolean): RealPipe[DstType] = {
+    var stack: List[DstType] = toList(pipe)
+    var builder = new RealPipeBuilder[DstType]()
 
     while (stack.nonEmpty) {
       val elem = stack.head
