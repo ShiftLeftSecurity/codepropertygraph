@@ -6,8 +6,8 @@ object RealPipe {
   sealed abstract class RealPipeImpl {
     type PipeType[+ElemType]
 
-    def apply[ElemType](impl: List[ElemType]): PipeType[ElemType]
-    def unwrap[ElemType](pipeType: PipeType[ElemType]): List[ElemType]
+    private[dsl] def apply[ElemType](impl: List[ElemType]): PipeType[ElemType]
+    private[dsl] def unwrap[ElemType](pipeType: PipeType[ElemType]): List[ElemType]
   }
 
   val RealPipe: RealPipeImpl = new RealPipeImpl {
