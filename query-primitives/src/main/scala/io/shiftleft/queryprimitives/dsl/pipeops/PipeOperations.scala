@@ -38,8 +38,8 @@ trait PipeOperations[PipeType[+_], ElemType] extends BasicPipeOperations[PipeTyp
                                         times: Int): RealPipe[SuperType] = {
     val pipeOps = Implicits.getRealPipeOps.castElemType[SuperType]
 
-    var currentPipe: RealPipe[SuperType] = toRealPipe(pipe)
-    for (_ <- 0 until times) {
+    var currentPipe: RealPipe[SuperType] = flatMap(pipe, function)
+    for (_ <- 0 until times - 1) {
       currentPipe = pipeOps.flatMap(currentPipe, function)
     }
     currentPipe

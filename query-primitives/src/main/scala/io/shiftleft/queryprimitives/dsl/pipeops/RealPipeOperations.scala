@@ -5,9 +5,6 @@ import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 import scala.collection.GenTraversableOnce
 
 class RealPipeOperations[ElemType] extends PipeOperations[RealPipe, ElemType] {
-  override def toRealPipe(pipe: RealPipe[ElemType]): RealPipe[ElemType] = {
-    pipe
-  }
 
   override def map[DstType](pipe: RealPipe[ElemType],
                             function: ElemType => DstType): RealPipe[DstType] = {

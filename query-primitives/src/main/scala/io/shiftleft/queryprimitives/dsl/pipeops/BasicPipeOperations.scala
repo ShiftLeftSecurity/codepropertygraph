@@ -6,8 +6,6 @@ import scala.collection.GenTraversableOnce
 import scala.language.higherKinds
 
 trait BasicPipeOperations[PipeType[+_], ElemType] {
-  def toRealPipe(pipe: PipeType[ElemType]): RealPipe[ElemType]
-
   def map[DstType](pipe: PipeType[ElemType],
                    function: ElemType => DstType): PipeType[DstType]
 
