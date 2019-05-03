@@ -19,7 +19,7 @@ class NodeAMethods[PipeType[+_]](val pipe: PipeType[A]) extends AnyVal {
     ops.map(pipe, _ => new B())
   }
   def toMultipleB(implicit ops: PipeOperations[PipeType, A]): RealPipe[B] = {
-    ops.flatMap2(pipe, _ => new B() :: Nil)
+    ops.flatMap(pipe, _ => new B() :: Nil)
   }
 }
 
@@ -28,7 +28,7 @@ class NodeBMethods[PipeType[+_]](val pipe: PipeType[B]) extends AnyVal {
     ops.map(pipe, _ => new A())
   }
   def toMultipleA(implicit ops: PipeOperations[PipeType, B]): RealPipe[A] = {
-    ops.flatMap2(pipe, _ => new A() :: Nil)
+    ops.flatMap(pipe, _ => new A() :: Nil)
   }
   def toBMapTimesX(implicit ops: PipeOperations[PipeType, B]): PipeType[B] = {
     ops.mapTimes(pipe, _ => new BDerived(), 2)
@@ -81,12 +81,8 @@ class DslTests extends WordSpec with Matchers {
     new A().toMultipleB.mapTimes(_.toA.toB, 1).head shouldBe new B()
   }
 
-  "Be able to use flatMap on real pipe function." in {
-    new A().toMultipleB.flatMap(_.toMultipleA).head shouldBe new A()
-  }
-
   "Be able to use flatMap on GenTraversableOnce function." in {
-    new A().toMultipleB.flatMap2(_ => new A()::Nil).head shouldBe new A()
+    new A().toMultipleB.flatMap(_ => new A()::Nil).head shouldBe new A()
   }
 
   "X" in {

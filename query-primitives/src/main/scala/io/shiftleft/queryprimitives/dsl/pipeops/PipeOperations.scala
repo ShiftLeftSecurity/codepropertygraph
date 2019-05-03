@@ -19,11 +19,8 @@ trait PipeOperations[PipeType[+_], ElemType] {
   def map[DstType](pipe: PipeType[ElemType],
                    function: ElemType => DstType): PipeType[DstType]
 
-  def flatMap2[DstType](pipe: PipeType[ElemType],
-                        function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType]
-
   def flatMap[DstType](pipe: PipeType[ElemType],
-                       function: ElemType => RealPipe[DstType]): RealPipe[DstType]
+                       function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType]
 
   def filter(pipe: PipeType[ElemType],
              function: ElemType => Boolean): RealPipe[ElemType]
@@ -65,7 +62,7 @@ trait PipeOperations[PipeType[+_], ElemType] {
 
     var currentPipe: RealPipe[SuperType] = toRealPipe(pipe)
     for (_ <- 0 until times) {
-      currentPipe = pipeOps.flatMap2(currentPipe, function)
+      currentPipe = pipeOps.flatMap(currentPipe, function)
     }
     currentPipe
   }

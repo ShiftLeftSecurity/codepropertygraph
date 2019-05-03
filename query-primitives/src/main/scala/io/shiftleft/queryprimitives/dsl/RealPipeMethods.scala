@@ -14,11 +14,7 @@ class RealPipeMethods[ElemType](val pipe: RealPipe[ElemType]) extends AnyVal {
     Implicits.getRealPipeOps.mapTimes(pipe, function, times)
   }
 
-  def flatMap2[DstType](function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
-    Implicits.getRealPipeOps.flatMap2(pipe, function)
-  }
-
-  def flatMap[DstType](function: ElemType => RealPipe[DstType]): RealPipe[DstType] = {
+  def flatMap[DstType](function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
     Implicits.getRealPipeOps.flatMap(pipe, function)
   }
 

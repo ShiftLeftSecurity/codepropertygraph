@@ -17,7 +17,7 @@ class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyV
     * Traverse to concrete instances of method.
     */
   def methodInstance(implicit ops: PipeOperations[PipeType, nodes.Method]): RealPipe[nodes.MethodInst] = {
-    ops.flatMap2(pipe, _.accept(MethodMethodsMethodInstanceVisitor))
+    ops.flatMap(pipe, _.accept(MethodMethodsMethodInstanceVisitor))
     //ops.flatMapIterator(pipe,
       //_.vertices(Direction.IN, EdgeTypes.REF).asScala)
   }
@@ -26,7 +26,7 @@ class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyV
     * Traverse to parameters of the method
     * */
   def parameter(implicit ops: PipeOperations[PipeType, nodes.Method]): RealPipe[nodes.MethodParameterIn] = {
-    ops.flatMap2(pipe, _.accept(MethodMethodsParameterVisitor))
+    ops.flatMap(pipe, _.accept(MethodMethodsParameterVisitor))
   }
 
   /**
@@ -34,7 +34,7 @@ class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyV
     * */
   def callIn(implicit ops: PipeOperations[PipeType, nodes.Method],
              callResolver: ICallResolver): RealPipe[nodes.Call] = {
-    ops.flatMap2(pipe, _.accept(new MethodMethodsCallInVisitor(callResolver)))
+    ops.flatMap(pipe, _.accept(new MethodMethodsCallInVisitor(callResolver)))
   }
 
   /**

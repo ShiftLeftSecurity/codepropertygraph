@@ -15,14 +15,9 @@ class ShallowPipeOperations[ElemType] extends PipeOperations[ShallowPipe, ElemTy
     function.apply(pipe)
   }
 
-  override def flatMap2[DstType](pipe: ShallowPipe[ElemType],
-                                 function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
-    RealPipe(function.apply(pipe).toList)
-  }
-
   override def flatMap[DstType](pipe: ShallowPipe[ElemType],
-                                function: ElemType => RealPipe[DstType]): RealPipe[DstType] = {
-    RealPipe(RealPipe.unwrap(function.apply(pipe)))
+                                function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
+    RealPipe(function.apply(pipe).toList)
   }
 
   override def filter(pipe: ShallowPipe[ElemType],

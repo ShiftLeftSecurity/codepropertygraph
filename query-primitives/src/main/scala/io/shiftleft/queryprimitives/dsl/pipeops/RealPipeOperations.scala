@@ -14,15 +14,9 @@ class RealPipeOperations[ElemType] extends PipeOperations[RealPipe, ElemType] {
     RealPipe(RealPipe.unwrap(pipe).map(function))
   }
 
-  override def flatMap2[DstType](pipe: RealPipe[ElemType],
-                                 function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
-    RealPipe(RealPipe.unwrap(pipe).flatMap(function))
-  }
-
   override def flatMap[DstType](pipe: RealPipe[ElemType],
-                                function: ElemType => RealPipe[DstType]): RealPipe[DstType] = {
-    val applyAndUnwrap = (sourceElement: ElemType) => RealPipe.unwrap(function.apply(sourceElement))
-    RealPipe(RealPipe.unwrap(pipe).flatMap(applyAndUnwrap))
+                                function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
+    RealPipe(RealPipe.unwrap(pipe).flatMap(function))
   }
 
   override def filter(pipe: RealPipe[ElemType],
