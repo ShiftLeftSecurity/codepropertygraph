@@ -716,6 +716,7 @@ object DomainClassCreator {
               }
               val optionalDefault = Cardinality.fromName(containedNode.cardinality) match {
                 case Cardinality.List      => "= List()"
+                case Cardinality.ZeroOrOne => "= None"
                 case _ => ""
               }
 
