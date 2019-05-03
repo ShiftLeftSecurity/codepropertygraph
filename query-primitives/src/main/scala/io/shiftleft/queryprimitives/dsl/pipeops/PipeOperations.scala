@@ -6,33 +6,13 @@ import io.shiftleft.queryprimitives.dsl.{Implicits, RealPipeBuilder}
 import scala.collection.GenTraversableOnce
 import scala.language.higherKinds
 
-trait PipeOperations[PipeType[+_], ElemType] {
+trait PipeOperations[PipeType[+_], ElemType] extends BasicPipeOperations[PipeType, ElemType] {
   // We cannot make PipeOperations covariant in ElemType because the pipe containing the
   // elements of ElemType is passed as parameter and not as instance parameter which breaks
   // common variance semantics/handling.
   def castElemType[NewElemType]: PipeOperations[PipeType, NewElemType] = {
     this.asInstanceOf[PipeOperations[PipeType, NewElemType]]
   }
-
-  def toRealPipe(pipe: PipeType[ElemType]): RealPipe[ElemType]
-
-  def map[DstType](pipe: PipeType[ElemType],
-                   function: ElemType => DstType): PipeType[DstType]
-
-  def flatMap[DstType](pipe: PipeType[ElemType],
-                       function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType]
-
-  def filter(pipe: PipeType[ElemType],
-             function: ElemType => Boolean): RealPipe[ElemType]
-
-  def head(pipe: PipeType[ElemType]): ElemType
-
-  def toList(pipe: PipeType[ElemType]): List[ElemType]
-
-  def iterator(pipe: PipeType[ElemType]): Iterator[ElemType]
-
-  def foreach[DstType](pipe: PipeType[ElemType],
-                       function: ElemType => DstType): Unit
 
   def mapTimes[SuperType >: ElemType](pipe: PipeType[SuperType],
                                       function: SuperType => SuperType,
@@ -46,18 +26,16 @@ trait PipeOperations[PipeType[+_], ElemType] {
     currentPipe
   }
 
-  def map[SuperType >: ElemType]
-  (pipe: PipeType[SuperType],
-   function: SuperType => SuperType,
-   until: SuperType => Boolean): PipeType[SuperType] = {
+  def map[SuperType >: ElemType](pipe: PipeType[SuperType],
+                                 function: SuperType => SuperType,
+                                 until: SuperType => Boolean): PipeType[SuperType] = {
     // TODO implement
     pipe
   }
 
-  def flatMap[SuperType >: ElemType]
-  (pipe: PipeType[ElemType],
-   function: SuperType => GenTraversableOnce[SuperType],
-   times: Int): RealPipe[SuperType] = {
+  def flatMap[SuperType >: ElemType](pipe: PipeType[ElemType],
+                                     function: SuperType => GenTraversableOnce[SuperType],
+                                     times: Int): RealPipe[SuperType] = {
     val pipeOps = Implicits.getRealPipeOps.castElemType[SuperType]
 
     var currentPipe: RealPipe[SuperType] = toRealPipe(pipe)
@@ -67,10 +45,9 @@ trait PipeOperations[PipeType[+_], ElemType] {
     currentPipe
   }
 
-  def flatMap3[SuperType >: ElemType]
-  (pipe: PipeType[ElemType],
-   function: SuperType => GenTraversableOnce[SuperType],
-   until: SuperType => Boolean): RealPipe[SuperType] = {
+  def flatMap3[SuperType >: ElemType](pipe: PipeType[ElemType],
+                                      function: SuperType => GenTraversableOnce[SuperType],
+                                      until: SuperType => Boolean): RealPipe[SuperType] = {
     var stack: List[SuperType] = toList(pipe)
     var builder = new RealPipeBuilder[SuperType]()
 
