@@ -3,10 +3,12 @@ package io.shiftleft.queryprimitives.steps.types.structure
 import gremlin.scala.Vertex
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.queryprimitives.dsl.Implicits._
 import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 import io.shiftleft.queryprimitives.dsl.pipeops.PipeOperations
 import io.shiftleft.queryprimitives.steps.ICallResolver
 import org.apache.tinkerpop.gremlin.structure.Direction
+
 
 import scala.collection.JavaConverters._
 import scala.language.higherKinds
@@ -45,12 +47,10 @@ class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyV
       pipe,
       _.vertices(Direction.IN, EdgeTypes.AST).asScala,
       _.label == NodeTypes.TYPE_DECL)
+      .cast
   }
 
   implicit def foo[T](x: Iterator[Vertex]): T = {
-    x.asInstanceOf[T]
-  }
-  implicit def foo[T](x: RealPipe[_]): T = {
     x.asInstanceOf[T]
   }
 }
