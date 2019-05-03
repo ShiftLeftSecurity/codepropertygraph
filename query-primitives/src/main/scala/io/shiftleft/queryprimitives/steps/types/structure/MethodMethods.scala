@@ -41,7 +41,7 @@ class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyV
     * The type declaration associated with this method, e.g., the class it is defined in.
     * */
   def definingTypeDecl(implicit ops: PipeOperations[PipeType, nodes.Method]): RealPipe[nodes.TypeDecl] = {
-    ops.flatMap3[nodes.StoredNode](
+    ops.flatRepeatUntil[nodes.StoredNode](
       pipe,
       _.vertices(Direction.IN, EdgeTypes.AST).asScala,
       _.label == NodeTypes.TYPE_DECL)

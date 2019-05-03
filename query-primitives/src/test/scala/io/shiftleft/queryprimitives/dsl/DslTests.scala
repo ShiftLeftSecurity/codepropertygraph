@@ -31,7 +31,7 @@ class NodeBMethods[PipeType[+_]](val pipe: PipeType[B]) extends AnyVal {
     ops.flatMap(pipe, _ => new A() :: Nil)
   }
   def toBMapTimesX(implicit ops: PipeOperations[PipeType, B]): PipeType[B] = {
-    ops.mapTimes(pipe, _ => new BDerived(), 2)
+    ops.repeat(pipe, _ => new BDerived(), 2)
   }
 }
 
@@ -78,7 +78,7 @@ class DslTests extends WordSpec with Matchers {
   }
 
   "Be able to use map with repeat function." in {
-    new A().toMultipleB.mapTimes(_.toA.toB, 1).head shouldBe new B()
+    new A().toMultipleB.repeat(_.toA.toB, 1).head shouldBe new B()
   }
 
   "Be able to use flatMap on GenTraversableOnce function." in {
