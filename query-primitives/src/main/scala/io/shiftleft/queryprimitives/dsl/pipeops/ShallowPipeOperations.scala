@@ -1,13 +1,13 @@
 package io.shiftleft.queryprimitives.dsl.pipeops
 
-import io.shiftleft.queryprimitives.dsl.RealPipe
+import io.shiftleft.queryprimitives.dsl.RealPipe.RealPipe
 import io.shiftleft.queryprimitives.dsl.ShallowPipe.ShallowPipe
 
 import scala.collection.GenTraversableOnce
 
 class ShallowPipeOperations[ElemType] extends PipeOperations[ShallowPipe, ElemType] {
   override def toRealPipe(pipe: ShallowPipe[ElemType]): RealPipe[ElemType] = {
-    new RealPipe(pipe :: Nil)
+    RealPipe(pipe :: Nil)
   }
 
   override def map[DstType](pipe: ShallowPipe[ElemType],
@@ -17,20 +17,20 @@ class ShallowPipeOperations[ElemType] extends PipeOperations[ShallowPipe, ElemTy
 
   override def flatMap2[DstType](pipe: ShallowPipe[ElemType],
                                  function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
-    new RealPipe(function.apply(pipe).toList)
+    RealPipe(function.apply(pipe).toList)
   }
 
   override def flatMap[DstType](pipe: ShallowPipe[ElemType],
                                 function: ElemType => RealPipe[DstType]): RealPipe[DstType] = {
-    new RealPipe(function.apply(pipe).impl)
+    RealPipe(RealPipe.unwrap(function.apply(pipe)))
   }
 
   override def filter(pipe: ShallowPipe[ElemType],
                       function: ElemType => Boolean): RealPipe[ElemType] = {
     if (function.apply(pipe)){
-      new RealPipe(pipe :: Nil)
+      RealPipe(pipe :: Nil)
     } else {
-      new RealPipe(Nil)
+      RealPipe(Nil)
     }
   }
 
@@ -44,6 +44,11 @@ class ShallowPipeOperations[ElemType] extends PipeOperations[ShallowPipe, ElemTy
 
   override def toList(pipe: ShallowPipe[ElemType]): List[ElemType] = {
     pipe :: Nil
+  }
+
+  override def foreach[DstType](pipe: ShallowPipe[ElemType],
+                                function: ElemType => DstType): Unit = {
+    function(pipe)
   }
 }
 

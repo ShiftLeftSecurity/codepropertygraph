@@ -1,6 +1,7 @@
 package io.shiftleft.queryprimitives.dsl
 
-import io.shiftleft.queryprimitives.dsl.Implicits._
+import Implicits._
+import io.shiftleft.queryprimitives.dsl.RealPipe.RealPipe
 import io.shiftleft.queryprimitives.dsl.ShallowPipe.ShallowPipe
 import io.shiftleft.queryprimitives.dsl.pipeops.PipeOperations
 import org.scalatest.{Matchers, WordSpec}

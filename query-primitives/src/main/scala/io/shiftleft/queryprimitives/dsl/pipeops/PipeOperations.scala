@@ -1,6 +1,7 @@
 package io.shiftleft.queryprimitives.dsl.pipeops
 
-import io.shiftleft.queryprimitives.dsl.{Implicits, RealPipe}
+import io.shiftleft.queryprimitives.dsl.RealPipe.RealPipe
+import io.shiftleft.queryprimitives.dsl.{Implicits, RealPipeBuilder}
 
 import scala.collection.GenTraversableOnce
 
@@ -31,6 +32,9 @@ trait PipeOperations[PipeType[+_], ElemType] {
   def toList(pipe: PipeType[ElemType]): List[ElemType]
 
   def iterator(pipe: PipeType[ElemType]): Iterator[ElemType]
+
+  def foreach[DstType](pipe: PipeType[ElemType],
+                       function: ElemType => DstType): Unit
 
   def mapTimes[SuperType >: ElemType](pipe: PipeType[SuperType],
                                       function: SuperType => SuperType,
@@ -70,7 +74,7 @@ trait PipeOperations[PipeType[+_], ElemType] {
    function: SuperType => GenTraversableOnce[SuperType],
    until: SuperType => Boolean): RealPipe[SuperType] = {
     var stack: List[SuperType] = toList(pipe)
-    var builder = RealPipe.newBuilder[SuperType]
+    var builder = new RealPipeBuilder[SuperType]()
 
     while (stack.nonEmpty) {
       val elem = stack.head

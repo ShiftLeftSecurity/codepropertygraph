@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.queryprimitives.dsl.Implicits._
-import io.shiftleft.queryprimitives.dsl.RealPipe
+import io.shiftleft.queryprimitives.dsl.RealPipe.RealPipe
 
 class MethodMethodsTest extends WordSpec with Matchers {
   "foo" in {
@@ -21,10 +21,10 @@ class MethodMethodsTest extends WordSpec with Matchers {
 
     val typeMethod = method.asInstanceOf[nodes.Method]
 
-    typeMethod.methodInstance.impl should contain (methodInst)
+    typeMethod.methodInstance.toList should contain (methodInst)
 
     //typeMethod.parameter.map(x => x).impl should contain (methodInst)
-    new RealPipe(List(1, 2, 3)).map(_ + 1).impl.foreach(x => println(x))
+    RealPipe(List(1, 2, 3)).map(_ + 1).foreach(x => println(x))
 
 
   }
