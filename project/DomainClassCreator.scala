@@ -695,6 +695,7 @@ object DomainClassCreator {
             if (getHigherType(key) == HigherValueType.Option) " = None"
             else if (key.valueType == "int") " = -1"
             else if (getHigherType(key) == HigherValueType.None && key.valueType == "string") """ ="" """
+            else if (getHigherType(key) == HigherValueType.List) "= List()"
             else ""
           s"${camelCase(key.name)}: ${getCompleteType(key)} $optionalDefault"
         }
@@ -713,7 +714,12 @@ object DomainClassCreator {
                 case Cardinality.One       => containedNodeType
                 case Cardinality.List      => s"List[$containedNodeType]"
               }
-              s"val ${containedNode.localName}: $completeType"
+              val optionalDefault = Cardinality.fromName(containedNode.cardinality) match {
+                case Cardinality.List      => "= List()"
+                case _ => ""
+              }
+
+              s"val ${containedNode.localName}: $completeType $optionalDefault"
             }
           }
           .getOrElse(Nil)
