@@ -1,7 +1,6 @@
 package io.shiftleft.diffgraph
 
 import gremlin.scala._
-import io.shiftleft.IdentityHashWrapper
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
 import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 import java.lang.{Long => JLong}

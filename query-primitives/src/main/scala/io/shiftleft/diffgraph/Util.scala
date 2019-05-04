@@ -1,4 +1,4 @@
-package io.shiftleft
+package io.shiftleft.diffgraph
 
 case class IdentityHashWrapper[T <: AnyRef](value: T) {
   override def hashCode(): Int = {
