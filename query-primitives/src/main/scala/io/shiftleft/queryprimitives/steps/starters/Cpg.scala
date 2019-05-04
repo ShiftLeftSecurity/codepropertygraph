@@ -50,12 +50,6 @@ class Cpg(val graph: Graph = Cpg.emptyGraph) extends ext.Enrichable with ext.sec
     graph.asScala
 
   /**
-    Begin traversal at set of nodes
-    */
-  def atDomainVertices[NodeType <: nodes.StoredNode](domainVertices: Seq[NodeType]): NodeSteps[NodeType, HNil] =
-    atVerticesWithId(domainVertices.map(_.id))
-
-  /**
     Begin traversal at set of nodes - specified by their ids
     */
   def atVerticesWithId[NodeType <: nodes.StoredNode](ids: Seq[Any]): NodeSteps[NodeType, HNil] =

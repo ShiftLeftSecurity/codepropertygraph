@@ -5,7 +5,6 @@ import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
 import io.shiftleft.codepropertygraph.generated.EdgeKeys
 import io.shiftleft.diffgraph.DiffGraph
 import gremlin.scala._
-import scala.collection.JavaConverters._
 import shapeless.HList
 
 class NewNodeSteps[A <: NewNode, Labels <: HList](override val raw: GremlinScala.Aux[A, Labels])
