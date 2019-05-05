@@ -8,7 +8,14 @@ import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.{ICallResolver, NodeSteps}
 import io.shiftleft.queryprimitives.steps.types.expressions.{Call, Literal}
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors._
-import shapeless.HList
+import shapeless.{HList, HNil}
+
+class MethodNode(node : nodes.Method) {
+
+  def parameter : MethodParameter[HNil] =
+    List(node).start.parameter
+
+}
 
 /**
   * A method, function, or procedure

@@ -175,7 +175,7 @@ object DomainClassCreator {
       import scala.collection.JavaConverters._
       import shapeless.HNil
 
-      trait Node extends gremlin.scala.dsl.DomainRoot {
+      trait Node extends gremlin.scala.dsl.DomainRoot with io.shiftleft.codepropertygraph.nodes.Enrichable {
         def accept[T](visitor: NodeVisitor[T]): T
       }
 

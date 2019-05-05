@@ -11,6 +11,13 @@ import org.json4s.native.JsonMethods._
 class MethodTests extends WordSpec with Matchers {
   val fixture = CpgTestFixture("method")
 
+  "Method node" should {
+    "expand to parameters" in {
+      val m = fixture.cpg.method.head
+      m.parameter.name.toSet shouldBe Set("param0", "param1")
+    }
+  }
+
   "Method traversals" should {
     "expand to type declaration" in {
       val queryResult: List[nodes.TypeDecl] =
