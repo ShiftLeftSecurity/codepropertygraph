@@ -2,17 +2,14 @@ package io.shiftleft.queryprimitives.steps
 
 import gremlin.scala._
 import gremlin.scala.StepLabel.{GetLabelName, combineLabelWithValue}
-import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes._
 import java.util.{List => JList, Map => JMap}
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import org.apache.tinkerpop.gremlin.process.traversal.Scope
 import org.apache.tinkerpop.gremlin.structure.Vertex
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-import scala.compat.java8.OptionConverters._
 import shapeless.{::, HList, HNil}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
 import shapeless.ops.product.ToHList

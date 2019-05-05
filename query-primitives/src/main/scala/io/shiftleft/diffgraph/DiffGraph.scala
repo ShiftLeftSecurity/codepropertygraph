@@ -1,7 +1,6 @@
 package io.shiftleft.diffgraph
 
 import gremlin.scala.{Edge, ScalaGraph}
-import io.shiftleft.{IdentityHashWrapper}
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import java.lang.{Long => JLong}
 

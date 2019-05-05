@@ -1,8 +1,7 @@
 package io.shiftleft.queryprimitives.steps
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.nodes
-import shapeless.{HList, HNil}
+import shapeless.HList
 
 object Implicits {
 

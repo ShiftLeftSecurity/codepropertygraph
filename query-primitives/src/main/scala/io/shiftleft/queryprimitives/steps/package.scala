@@ -1,12 +1,10 @@
 package io.shiftleft.queryprimitives
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.types.structure._
 import io.shiftleft.queryprimitives.steps.types.expressions._
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations._
-import shapeless.{HList, HNil}
+import shapeless.HList
 
 /**
   Steps for traversing the code property graph

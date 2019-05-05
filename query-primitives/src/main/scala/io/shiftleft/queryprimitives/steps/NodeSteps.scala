@@ -1,17 +1,12 @@
 package io.shiftleft.queryprimitives.steps
 
 import gremlin.scala.{GremlinScala, P, Vertex}
-import io.shiftleft.codepropertygraph.generated.{nodes, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.types.structure.File
-import java.util.{List => JList}
-
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
-import org.apache.tinkerpop.gremlin.structure.T
-
-import scala.collection.JavaConverters._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import org.json4s.native.Serialization.{write, writePretty}
-import shapeless.{HList, HNil}
+import shapeless.HList
 
 /**
   * Steps for all node types

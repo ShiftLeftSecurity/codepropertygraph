@@ -6,8 +6,6 @@ import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
 import java.lang.{Long => JLong}
 
-import io.shiftleft.IdentityHashWrapper
-
 import scala.collection.JavaConverters._
 
 /**

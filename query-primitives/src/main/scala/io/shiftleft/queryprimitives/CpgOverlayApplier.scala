@@ -19,7 +19,6 @@ class CpgOverlayApplier {
 
   private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Vertex] = mutable.HashMap()
   private val overlayEdgeIdToSrcGraphEdge: mutable.HashMap[Long, Edge] = mutable.HashMap()
-  private val InternalProperty = "_"
 
   /**
     * Applies diff to existing (loaded) TinkerGraph
@@ -36,7 +35,6 @@ class CpgOverlayApplier {
            "this currently only works for graphs that allow user supplied ids")
 
     overlay.getNodeList.asScala.foreach { node =>
-      val label = node.getType.toString
       val id = node.getKey
       val properties = node.getPropertyList.asScala
 
@@ -115,7 +113,7 @@ class CpgOverlayApplier {
         tinkerElement.property(propertyName, propertyValue.getStringValue)
       case BOOL_VALUE =>
         tinkerElement.property(propertyName, propertyValue.getBoolValue)
-      case STRING_LIST if (tinkerElement.isInstanceOf[Vertex]) =>
+      case STRING_LIST if tinkerElement.isInstanceOf[Vertex] =>
         propertyValue.getStringList.getValuesList.forEach { value: String =>
           tinkerElement
             .asInstanceOf[Vertex]
