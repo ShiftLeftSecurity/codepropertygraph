@@ -95,11 +95,12 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
     vertex match {
       case identifier: nodes.Identifier =>
         getTrackingPoint(identifier.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
-      case call: nodes.Call                 => Some(call)
-      case ret: nodes.Return                => Some(ret)
-      case methodReturn: nodes.MethodReturn => Some(methodReturn)
-      case literal: nodes.Literal           => getTrackingPoint(literal.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
-      case _                                => None
+      case call: nodes.Call                       => Some(call)
+      case ret: nodes.Return                      => Some(ret)
+      case methodReturn: nodes.MethodReturn       => Some(methodReturn)
+      case methodParamIn: nodes.MethodParameterIn => Some(methodParamIn)
+      case literal: nodes.Literal         => getTrackingPoint(literal.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
+      case _                              => None
     }
   }
 

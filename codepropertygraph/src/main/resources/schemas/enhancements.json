@@ -49,6 +49,7 @@
           "outEdges" : [
             {"edgeName": "PROPAGATE", "inNodes": ["METHOD_PARAMETER_OUT", "METHOD_RETURN"]},
             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]},
+            {"edgeName": "REACHING_DEF", "inNodes": ["IDENTIFIER"]},
             {"edgeName": "PARAMETER_LINK", "inNodes": ["METHOD_PARAMETER_OUT"]}
           ]
         },
