@@ -4,7 +4,7 @@ import io.shiftleft.cpgqueryingtests.codepropertygraph.LanguageFrontend
 import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgFactory
 
 class CDataFlowTests extends CpgDataFlowTests {
-  val cpgFactory = new CpgFactory(LanguageFrontend.Fuzzyc)
+  val cpgFactory = new CpgFactory(LanguageFrontend.Fuzzyc, "cpgqueryingtests/src/test/resources/default.semantics")
 
   "Test 1: flow from function call read to multiple versions of the same variable" in {
     val cpg = cpgFactory.buildCpg(

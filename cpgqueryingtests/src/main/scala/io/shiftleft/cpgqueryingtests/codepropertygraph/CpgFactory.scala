@@ -7,7 +7,7 @@ import io.shiftleft.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 
 class CpgFactory(frontend: LanguageFrontend,
-                 semanticsFilename : String = "cpgqueryingtests/src/test/resources/default.semantics") {
+                 semanticsFilename : String) {
 
   /**
     * Build a CPG for the provided C/C++ code snippet.
