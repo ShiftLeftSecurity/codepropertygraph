@@ -38,6 +38,10 @@ class ShallowPipeOperations[ElemType] extends PipeOperations[ShallowPipe, ElemTy
     pipe :: Nil
   }
 
+  override def toSet(pipe: ShallowPipe[ElemType]): Set[ElemType] = {
+    Set() + pipe
+  }
+
   override def foreach[DstType](pipe: ShallowPipe[ElemType],
                                 function: ElemType => DstType): Unit = {
     function(pipe)

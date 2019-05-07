@@ -19,6 +19,8 @@ trait BasicPipeOperations[PipeType[+_], ElemType] {
 
   def toList(pipe: PipeType[ElemType]): List[ElemType]
 
+  def toSet(pipe: PipeType[ElemType]): Set[ElemType]
+
   def iterator(pipe: PipeType[ElemType]): Iterator[ElemType]
 
   def foreach[DstType](pipe: PipeType[ElemType],

@@ -18,6 +18,10 @@ class RealPipeMethods[ElemType](val pipe: RealPipe[ElemType]) extends AnyVal {
     Implicits.getRealPipeOps.toList(pipe)
   }
 
+  def filter(function: ElemType => Boolean): RealPipe[ElemType] = {
+    Implicits.getRealPipeOps.filter(pipe, function)
+  }
+
   def cast[NewElemType]: RealPipe[NewElemType] = {
     pipe.asInstanceOf[RealPipe[NewElemType]]
   }

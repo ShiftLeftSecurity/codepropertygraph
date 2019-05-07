@@ -33,6 +33,10 @@ class RealPipeOperations[ElemType] extends PipeOperations[RealPipe, ElemType] {
     RealPipe.unwrap(pipe)
   }
 
+  override def toSet(pipe: RealPipe[ElemType]): Set[ElemType] = {
+    RealPipe.unwrap(pipe).toSet
+  }
+
   override def foreach[DstType](pipe: RealPipe[ElemType],
                                 function: ElemType => DstType): Unit = {
     RealPipe.unwrap(pipe).foreach(function)
