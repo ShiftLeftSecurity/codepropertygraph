@@ -3,8 +3,7 @@ package io.shiftleft.cpgqueryingtests.codepropertygraph
 import java.io.{File, PrintWriter}
 import java.nio.file.Files
 
-import io.shiftleft.cpgloading.CpgLoader
-import io.shiftleft.cpgloading.CpgLoaderConfig
+import io.shiftleft.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 
 class CpgFactory(frontend: LanguageFrontend) {
