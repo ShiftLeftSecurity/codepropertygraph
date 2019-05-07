@@ -6,10 +6,14 @@ import java.nio.file.Files
 import io.shiftleft.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 
-class CpgFactory(frontend: LanguageFrontend) {
+class CpgFactory(frontend: LanguageFrontend,
+                 semanticsFilename : String = "cpgqueryingtests/src/test/resources/default.semantics") {
+
+  /**
+    * Build a CPG for the provided C/C++ code snippet.
+    * */
 
   def buildCpg(sourceCode: String): Cpg = {
-
     val tmpDir = Files.createTempDirectory("dflowtest").toFile
     tmpDir.deleteOnExit()
 
@@ -21,7 +25,7 @@ class CpgFactory(frontend: LanguageFrontend) {
     val cpgFile = frontend.execute(tmpDir)
 
     val config = CpgLoaderConfig.default
-    config.semanticsFilename = Some("cpgqueryingtests/src/test/resources/default.semantics")
+    config.semanticsFilename = Some(semanticsFilename)
     val graph = CpgLoader.load(cpgFile.getAbsolutePath, config)
 
     graph
