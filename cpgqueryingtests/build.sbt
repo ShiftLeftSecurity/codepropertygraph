@@ -1,5 +1,4 @@
 name := "cpgqueryingtests"
-publish / skip := true
 
 dependsOn(
   Projects.semanticcpg % Test,
