@@ -369,7 +369,7 @@ There are some sample cpgs in this repository in the `resources/cpgs` directory.
 sbt semanticcpg/console
 ```
 ```scala
-val cpg = io.shiftleft.cpgloading.CpgLoader.loadCodePropertyGraph("cpg.bin.zip")
+val cpg = io.shiftleft.cpgloading.CpgLoader.load("cpg.bin.zip")
 ```
 
 # Querying the cpg
