@@ -19,9 +19,9 @@ object CpgLoaderConfig {
     CpgLoaderConfig(argDefFilename = None, createIndices = true, onDiskOverflowConfig = None)
 }
 
-case class CpgLoaderConfig(argDefFilename: Option[String],
-                           createIndices: Boolean,
-                           onDiskOverflowConfig: Option[OnDiskOverflowConfig]) {}
+case class CpgLoaderConfig(var argDefFilename: Option[String],
+                           var createIndices: Boolean,
+                           var onDiskOverflowConfig: Option[OnDiskOverflowConfig]) {}
 
 object CpgLoader {
 

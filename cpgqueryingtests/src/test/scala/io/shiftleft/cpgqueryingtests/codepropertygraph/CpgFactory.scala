@@ -4,6 +4,7 @@ import java.io.{File, PrintWriter}
 import java.nio.file.Files
 
 import io.shiftleft.cpgloading.CpgLoader
+import io.shiftleft.cpgloading.CpgLoaderConfig
 import io.shiftleft.queryprimitives.steps.starters.Cpg
 
 class CpgFactory(frontend: LanguageFrontend) {
@@ -20,9 +21,9 @@ class CpgFactory(frontend: LanguageFrontend) {
 
     val cpgFile = frontend.execute(tmpDir)
 
-    val graph = CpgLoader.loadCodePropertyGraph(
-      cpgFile.getAbsolutePath,
-      argDefFilename = Some("cpgqueryingtests/src/test/resources/default.argdef"))
+    val config = CpgLoaderConfig.default
+    config.argDefFilename = Some("cpgqueryingtests/src/test/resources/default.argdef")
+    val graph = CpgLoader.load(cpgFile.getAbsolutePath, config)
 
     graph
   }
