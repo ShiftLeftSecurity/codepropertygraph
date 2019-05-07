@@ -7,7 +7,7 @@ import io.shiftleft.passes.linking.linker.Linker
 import io.shiftleft.passes.linking.memberaccesslinker.MemberAccessLinker
 import io.shiftleft.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.SerializedCpg
-import io.shiftleft.argdefloader.ArgumentDefs
+import io.shiftleft.semanticsloader.ArgumentDefs
 import io.shiftleft.passes.containsedges.ContainsEdgePass
 import io.shiftleft.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
 import io.shiftleft.passes.linking.capturinglinker.CapturingLinker

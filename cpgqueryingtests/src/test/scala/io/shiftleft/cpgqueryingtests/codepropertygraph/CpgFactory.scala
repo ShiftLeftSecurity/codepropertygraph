@@ -22,7 +22,7 @@ class CpgFactory(frontend: LanguageFrontend) {
     val cpgFile = frontend.execute(tmpDir)
 
     val config = CpgLoaderConfig.default
-    config.argDefFilename = Some("cpgqueryingtests/src/test/resources/default.argdef")
+    config.semanticsFilename = Some("cpgqueryingtests/src/test/resources/default.semantics")
     val graph = CpgLoader.load(cpgFile.getAbsolutePath, config)
 
     graph

@@ -1,7 +1,7 @@
 package io.shiftleft.passes.propagateedges
 
 import gremlin.scala._
-import io.shiftleft.argdefloader.ArgumentDefs
+import io.shiftleft.semanticsloader.ArgumentDefs
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
