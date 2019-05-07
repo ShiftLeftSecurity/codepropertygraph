@@ -1,6 +1,6 @@
 package io.shiftleft.cpgqueryingtests.steps
 
-import io.shiftleft.codepropertygraph.LanguageFrontend
+import io.shiftleft.cpgqueryingtests.codepropertygraph.LanguageFrontend
 import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgFactory
 
 class CDataFlowTests extends CpgDataFlowTests {
