@@ -1,10 +1,11 @@
 package io.shiftleft.cpgqueryingtests.steps
 
-import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.{Languages, NodeKeys, NodeTypes}
 import org.scalatest.{Matchers, WordSpec}
 import java.io._
+
+import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
 import org.json4s._
 import org.json4s.native.JsonMethods._
 

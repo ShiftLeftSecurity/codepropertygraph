@@ -1,6 +1,7 @@
 package io.shiftleft.cpgqueryingtests.steps
 
-import io.shiftleft.cpgqueryingtests.codepropertygraph.{CpgFactory, LanguageFrontend}
+import io.shiftleft.codepropertygraph.LanguageFrontend
+import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgFactory
 
 class CDataFlowTests extends CpgDataFlowTests {
   val cpgFactory = new CpgFactory(LanguageFrontend.Fuzzyc)
