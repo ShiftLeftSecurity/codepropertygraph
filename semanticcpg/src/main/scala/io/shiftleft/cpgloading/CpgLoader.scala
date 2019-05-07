@@ -13,7 +13,37 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
 import scala.compat.java8.OptionConverters._
 
+object Config {
+
+  def default: Config = Config(argDefFilename = None, createIndices = true, onDiskOverflowConfig = None)
+}
+
+case class Config(argDefFilename: Option[String],
+                  createIndices: Boolean,
+                  onDiskOverflowConfig: Option[OnDiskOverflowConfig]) {}
+
 object CpgLoader {
+
+  /**
+    * Load a Code Property Graph
+    *
+    * @param filename      name of file that stores the code property graph
+    * @param argDefFilename file containing argument definition entries
+    * @param createIndices whether or not to create indices
+    * @param onDiskOverflowConfig for the on-disk-overflow feature
+    */
+  @deprecated
+  def loadCodePropertyGraph(filename: String,
+                            argDefFilename: Option[String] = None,
+                            createIndices: Boolean = true,
+                            onDiskOverflowConfig: Option[OnDiskOverflowConfig] = None): Cpg = {
+    new CpgLoader().loadCodePropertyGraph(filename, argDefFilename, createIndices, onDiskOverflowConfig)
+  }
+
+}
+
+class CpgLoader {
+
   private val logger = LogManager.getLogger(getClass)
 
   /* some non-public frontends (e.g. java2cpg) use cpg proto entries that are `UNRECOGNIZED` by cpg-public.
@@ -27,26 +57,41 @@ object CpgLoader {
   /**
     * Load a Code Property Graph
     *
-    * @param filename      name of file that stores the code property graph
-    * @param argDefFilename name of file with the argument def statements
-    * @param createIndices create indexes after loading the file
-    */
-  def loadCodePropertyGraph(filename: String,
-                            argDefFilename: Option[String] = None,
-                            createIndices: Boolean = true,
-                            onDiskOverflowConfig: Option[OnDiskOverflowConfig] = None): Cpg = {
+    * @param filename name of file that stores the code property graph
+    * @param config loader configuration
+    * */
+  def loadCodePropertyGraph(filename: String, config: Config = Config.default): Cpg = {
     logger.debug("Loading " + filename)
     val argumentDefs =
-      if (argDefFilename.isDefined) {
-        val argumentDefLoader = new ArgumentDefLoader(argDefFilename.get)
+      if (config.argDefFilename.isDefined) {
+        val argumentDefLoader = new ArgumentDefLoader(config.argDefFilename.get)
         argumentDefLoader.load()
       } else {
         ArgumentDefs(Nil)
       }
-    val cpg = ProtoCpgLoader.loadFromProtoZip(filename, onDiskOverflowConfig.asJava, Some(ignoredProtoEntries).asJava)
+    val cpg =
+      ProtoCpgLoader.loadFromProtoZip(filename, config.onDiskOverflowConfig.asJava, Some(ignoredProtoEntries).asJava)
     runEnhancements(cpg.graph, argumentDefs)
-    if (createIndices) { createIndexes(cpg) }
+    if (config.createIndices) { createIndexes(cpg) }
     cpg
+  }
+
+  /**
+    * Load a Code Property Graph
+    *
+    * @param filename      name of file that stores the code property graph
+    * @param argDefFilename file containing argument definition entries
+    * @param createIndices whether or not to create indices
+    * @param onDiskOverflowConfig for the on-disk-overflow feature
+    */
+  @deprecated
+  def loadCodePropertyGraph(filename: String,
+                            argDefFilename: Option[String],
+                            createIndices: Boolean,
+                            onDiskOverflowConfig: Option[OnDiskOverflowConfig]): Cpg = {
+
+    val config = new Config(argDefFilename, createIndices, onDiskOverflowConfig)
+    loadCodePropertyGraph(filename, config)
   }
 
   protected def runEnhancements(graph: Graph, argumentDefs: ArgumentDefs): Unit = {
@@ -77,5 +122,3 @@ object CpgLoader {
     }
 
 }
-
-class CpgLoader {}
