@@ -13,16 +13,27 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
 import scala.compat.java8.OptionConverters._
 
-object Config {
+object CpgLoaderConfig {
 
-  def default: Config = Config(argDefFilename = None, createIndices = true, onDiskOverflowConfig = None)
+  def default: CpgLoaderConfig =
+    CpgLoaderConfig(argDefFilename = None, createIndices = true, onDiskOverflowConfig = None)
 }
 
-case class Config(argDefFilename: Option[String],
-                  createIndices: Boolean,
-                  onDiskOverflowConfig: Option[OnDiskOverflowConfig]) {}
+case class CpgLoaderConfig(argDefFilename: Option[String],
+                           createIndices: Boolean,
+                           onDiskOverflowConfig: Option[OnDiskOverflowConfig]) {}
 
 object CpgLoader {
+
+  /**
+    * Load a Code Property Graph
+    *
+    * @param filename name of file that stores the code property graph
+    * @param config loader configuration
+    * */
+  def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg = {
+    new CpgLoader().load(filename, config)
+  }
 
   /**
     * Load a Code Property Graph
@@ -32,7 +43,7 @@ object CpgLoader {
     * @param createIndices whether or not to create indices
     * @param onDiskOverflowConfig for the on-disk-overflow feature
     */
-  @deprecated
+  @deprecated("this method will be removed", "codepropertygraph")
   def loadCodePropertyGraph(filename: String,
                             argDefFilename: Option[String] = None,
                             createIndices: Boolean = true,
@@ -42,7 +53,7 @@ object CpgLoader {
 
 }
 
-class CpgLoader {
+private class CpgLoader {
 
   private val logger = LogManager.getLogger(getClass)
 
@@ -60,7 +71,7 @@ class CpgLoader {
     * @param filename name of file that stores the code property graph
     * @param config loader configuration
     * */
-  def loadCodePropertyGraph(filename: String, config: Config = Config.default): Cpg = {
+  def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg = {
     logger.debug("Loading " + filename)
     val argumentDefs =
       if (config.argDefFilename.isDefined) {
@@ -84,14 +95,14 @@ class CpgLoader {
     * @param createIndices whether or not to create indices
     * @param onDiskOverflowConfig for the on-disk-overflow feature
     */
-  @deprecated
+  @deprecated("this method will be removed", "codepropertygraph")
   def loadCodePropertyGraph(filename: String,
                             argDefFilename: Option[String],
                             createIndices: Boolean,
                             onDiskOverflowConfig: Option[OnDiskOverflowConfig]): Cpg = {
 
-    val config = new Config(argDefFilename, createIndices, onDiskOverflowConfig)
-    loadCodePropertyGraph(filename, config)
+    val config = new CpgLoaderConfig(argDefFilename, createIndices, onDiskOverflowConfig)
+    load(filename, config)
   }
 
   protected def runEnhancements(graph: Graph, argumentDefs: ArgumentDefs): Unit = {
