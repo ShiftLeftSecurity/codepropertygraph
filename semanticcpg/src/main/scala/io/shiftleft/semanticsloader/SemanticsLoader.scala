@@ -1,6 +1,4 @@
-package io.shiftleft.argdefloader
-
-import java.nio.file.{Files, Paths}
+package io.shiftleft.semanticsloader
 
 import org.apache.logging.log4j.LogManager
 
@@ -9,7 +7,7 @@ import scala.io.Source
 case class ArgumentDef(methodFullName: String, parameterIndex: Int)
 case class ArgumentDefs(elements: List[ArgumentDef])
 
-class ArgumentDefLoader(filename: String) {
+class SemanticsLoader(filename: String) {
   private val logger = LogManager.getLogger(getClass)
 
   def load(): ArgumentDefs = {

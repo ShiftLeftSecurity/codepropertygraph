@@ -2,7 +2,7 @@ package io.shiftleft.cpgloading
 
 import gremlin.scala.{Graph, ScalaGraph}
 import io.shiftleft.SerializedCpg
-import io.shiftleft.argdefloader.{ArgumentDefLoader, ArgumentDefs}
+import io.shiftleft.semanticsloader.{SemanticsLoader, ArgumentDefs}
 import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
 import io.shiftleft.layers.enhancedbase.EnhancedBaseCreator
 import io.shiftleft.queryprimitives.steps.starters.Cpg
@@ -16,10 +16,16 @@ import scala.compat.java8.OptionConverters._
 object CpgLoaderConfig {
 
   def default: CpgLoaderConfig =
-    CpgLoaderConfig(argDefFilename = None, createIndices = true, onDiskOverflowConfig = None)
+    CpgLoaderConfig(semanticsFilename = None, createIndices = true, onDiskOverflowConfig = None)
 }
 
-case class CpgLoaderConfig(var argDefFilename: Option[String],
+/**
+  * Configuration for the CPG loader
+  * @param semanticsFilename filename of the file containing taint semantics
+  * @param createIndices indicate whether to create indices or not
+  * @param onDiskOverflowConfig configuration for the on-disk-overflow feature
+  *  */
+case class CpgLoaderConfig(var semanticsFilename: Option[String],
                            var createIndices: Boolean,
                            var onDiskOverflowConfig: Option[OnDiskOverflowConfig]) {}
 
@@ -39,16 +45,16 @@ object CpgLoader {
     * Load a Code Property Graph
     *
     * @param filename      name of file that stores the code property graph
-    * @param argDefFilename file containing argument definition entries
+    * @param semanticsFilename file containing argument definition entries
     * @param createIndices whether or not to create indices
     * @param onDiskOverflowConfig for the on-disk-overflow feature
     */
   @deprecated("this method will be removed", "codepropertygraph")
   def loadCodePropertyGraph(filename: String,
-                            argDefFilename: Option[String] = None,
+                            semanticsFilename: Option[String] = None,
                             createIndices: Boolean = true,
                             onDiskOverflowConfig: Option[OnDiskOverflowConfig] = None): Cpg = {
-    new CpgLoader().loadCodePropertyGraph(filename, argDefFilename, createIndices, onDiskOverflowConfig)
+    new CpgLoader().loadCodePropertyGraph(filename, semanticsFilename, createIndices, onDiskOverflowConfig)
   }
 
 }
@@ -74,8 +80,8 @@ private class CpgLoader {
   def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg = {
     logger.debug("Loading " + filename)
     val argumentDefs =
-      if (config.argDefFilename.isDefined) {
-        val argumentDefLoader = new ArgumentDefLoader(config.argDefFilename.get)
+      if (config.semanticsFilename.isDefined) {
+        val argumentDefLoader = new SemanticsLoader(config.semanticsFilename.get)
         argumentDefLoader.load()
       } else {
         ArgumentDefs(Nil)
@@ -91,17 +97,17 @@ private class CpgLoader {
     * Load a Code Property Graph
     *
     * @param filename      name of file that stores the code property graph
-    * @param argDefFilename file containing argument definition entries
+    * @param semanticsFilename file containing argument definition entries
     * @param createIndices whether or not to create indices
     * @param onDiskOverflowConfig for the on-disk-overflow feature
     */
   @deprecated("this method will be removed", "codepropertygraph")
   def loadCodePropertyGraph(filename: String,
-                            argDefFilename: Option[String],
+                            semanticsFilename: Option[String],
                             createIndices: Boolean,
                             onDiskOverflowConfig: Option[OnDiskOverflowConfig]): Cpg = {
 
-    val config = new CpgLoaderConfig(argDefFilename, createIndices, onDiskOverflowConfig)
+    val config = new CpgLoaderConfig(semanticsFilename, createIndices, onDiskOverflowConfig)
     load(filename, config)
   }
 
