@@ -19,12 +19,12 @@ object Cpg {
   /**
     * Create an empty code property graph
     * */
-  def emptyCpg : Cpg = new Cpg(emptyGraph)
+  def emptyCpg: Cpg = new Cpg(emptyGraph)
 
   /**
     * Create an empty graph
     * */
-  def emptyGraph : TinkerGraph =
+  def emptyGraph: TinkerGraph =
     TinkerGraph
       .open(
         io.shiftleft.codepropertygraph.generated.nodes.Factories.AllAsJava,
@@ -39,7 +39,10 @@ object Cpg {
 
   @param graph the underlying graph. An empty graph is created if this parameter is omitted.
   */
-class Cpg(val graph: Graph = Cpg.emptyGraph) extends ext.Enrichable with ext.securityprofile.Enrichable with ext.semanticcpg.Enrichable {
+class Cpg(val graph: Graph = Cpg.emptyGraph)
+    extends ext.Enrichable
+    with ext.securityprofile.Enrichable
+    with ext.semanticcpg.Enrichable {
 
   /**
     The underlying graph.

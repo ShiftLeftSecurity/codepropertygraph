@@ -21,11 +21,13 @@ class NodeSteps[NodeType <: nodes.StoredNode, Labels <: HList](raw: GremlinScala
     * */
   def file: File[Labels] =
     new File[Labels](
-      raw.choose(
-        _.label.is(NodeTypes.NAMESPACE),
-        onTrue = _.in(EdgeTypes.REF).in(EdgeTypes.AST),
-        onFalse = _.until(_.hasLabel(NodeTypes.FILE)).repeat(_.in(EdgeTypes.AST))
-      ).cast[nodes.File]
+      raw
+        .choose(
+          _.label.is(NodeTypes.NAMESPACE),
+          onTrue = _.in(EdgeTypes.REF).in(EdgeTypes.AST),
+          onFalse = _.until(_.hasLabel(NodeTypes.FILE)).repeat(_.in(EdgeTypes.AST))
+        )
+        .cast[nodes.File]
     )
 
   /* follow the incoming edges of the given type as long as possible */

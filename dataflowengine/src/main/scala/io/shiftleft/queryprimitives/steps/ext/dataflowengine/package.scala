@@ -13,6 +13,6 @@ package object dataflowengine {
     new TrackingPointMethods(node.asInstanceOf[nodes.TrackingPoint])
 
   implicit def toTrackingPoint[NodeType <: nodes.TrackingPoint, Labels <: HList](
-                                                                                  steps: Steps[NodeType, Labels]): TrackingPoint[Labels] =
+      steps: Steps[NodeType, Labels]): TrackingPoint[Labels] =
     new TrackingPoint[Labels](steps.raw.cast[nodes.TrackingPoint])
 }

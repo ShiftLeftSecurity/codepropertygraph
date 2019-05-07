@@ -8,6 +8,4 @@ package io.shiftleft.queryprimitives.steps.ext.dataflowengine
   * Important: this project should *not* define anything in the `ext` package object. If it does,
   * it will be shadowed by enriching libraries.
   */
-trait Enrichable {
-
-}
+trait Enrichable {}
