@@ -124,7 +124,7 @@ class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyV
     * */
   def callee(implicit ops: PipeOperations[PipeType],
              callResolver: ICallResolver): RealPipe[nodes.Method] = {
-    callOut.calledMethod(callResolver)
+    callOut.calledMethod
   }
 
   /**
