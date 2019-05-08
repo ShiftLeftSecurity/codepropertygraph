@@ -42,6 +42,14 @@ class GenericPipeMethods[PipeType[+_], ElemType](val pipe: PipeType[ElemType]) e
     ops.filter(pipe, function)
   }
 
+  def isEmpty(implicit ops: PipeOperations[PipeType]): Boolean = {
+    ops.isEmpty(pipe)
+  }
+
+  def nonEmpty(implicit ops: PipeOperations[PipeType]): Boolean = {
+    ops.nonEmpty(pipe)
+  }
+
   def map[DstType](function: ElemType => DstType)
                   (implicit ops: PipeOperations[PipeType]): PipeType[DstType] = {
     ops.map(pipe, function)

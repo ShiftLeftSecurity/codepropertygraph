@@ -31,6 +31,12 @@ trait BasicPipeOperations[PipeType[+_]] {
   private[dsl] def iterator[ElemType]
   (pipe: PipeType[ElemType]): Iterator[ElemType]
 
+  private[dsl] def isEmpty[ElemType]
+  (pipe: PipeType[ElemType]): Boolean
+
+  private[dsl] def nonEmpty[ElemType]
+  (pipe: PipeType[ElemType]): Boolean
+
   private[dsl] def foreach[DstType, ElemType]
   (pipe: PipeType[ElemType],
    function: ElemType => DstType): Unit

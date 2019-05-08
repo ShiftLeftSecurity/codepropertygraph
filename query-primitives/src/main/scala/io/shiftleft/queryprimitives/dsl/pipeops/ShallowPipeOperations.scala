@@ -39,6 +39,16 @@ class ShallowPipeOperations extends PipeOperations[ShallowPipe] {
     (pipe :: Nil).toIterator
   }
 
+  private[dsl] override def isEmpty[ElemType]
+  (pipe: ShallowPipe[ElemType]): Boolean = {
+    false
+  }
+
+  private[dsl] override def nonEmpty[ElemType]
+  (pipe: ShallowPipe[ElemType]): Boolean = {
+    true
+  }
+
   private[dsl] override def toList[ElemType]
   (pipe: ShallowPipe[ElemType]): List[ElemType] = {
     pipe :: Nil

@@ -36,6 +36,16 @@ class RealPipeOperations extends PipeOperations[RealPipe] {
     RealPipe.unwrap(pipe).iterator
   }
 
+  private[dsl] override def isEmpty[ElemType]
+  (pipe: RealPipe[ElemType]): Boolean = {
+    RealPipe.unwrap(pipe).isEmpty
+  }
+
+  private[dsl] override def nonEmpty[ElemType]
+  (pipe: RealPipe[ElemType]): Boolean = {
+    RealPipe.unwrap(pipe).nonEmpty
+  }
+
   private[dsl] override def toList[ElemType]
   (pipe: RealPipe[ElemType]): List[ElemType] = {
     RealPipe.unwrap(pipe)
