@@ -6,6 +6,18 @@ import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 import scala.collection.GenTraversableOnce
 import scala.language.higherKinds
 
+/**
+  * This class along with the corresponding implicit conversion enables the DSL writer to
+  * write things like: pipe.map(someFunc) instead of ops.map(pipe, someFunc).
+  * Besides the obvious benefit of being a little bit nicer to write and read this also
+  * solves the problem that for complex functions like repeat(), the scala type system
+  * requires us to specify the the passed function parameter if we would use the
+  * ops.repeat(pipe, (x: SomeType) => x, 1) syntax. From this obligation we are relieved
+  * when using pipe.repeat(x => x, 1) because the ElemType of is predefined in the
+  * GenericPipeMethods wrapper creation.
+  *
+  * It also enables the DSL user to use the provide methods on our pipe types.
+  */
 class GenericPipeMethods[PipeType[+_], ElemType](val pipe: PipeType[ElemType]) extends AnyVal {
 
   def head(implicit ops: PipeOperations[PipeType]): ElemType = {

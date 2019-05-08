@@ -2,7 +2,7 @@ package io.shiftleft.queryprimitives.steps.types.structure
 
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.queryprimitives.dsl.Implicits._
-import io.shiftleft.queryprimitives.dsl.InternalImplicits._
+import io.shiftleft.queryprimitives.dsl.DslWriterImplicits._
 import io.shiftleft.queryprimitives.dsl.pipeops.PipeOperations
 import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 import io.shiftleft.queryprimitives.steps.NoResolve

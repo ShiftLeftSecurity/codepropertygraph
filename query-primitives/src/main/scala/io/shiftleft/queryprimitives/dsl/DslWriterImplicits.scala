@@ -1,6 +1,6 @@
 package io.shiftleft.queryprimitives.dsl
 
-object InternalImplicits {
+object DslWriterImplicits {
 
   implicit def toGenericPipeMethods[PipeType[+_], ElemType](pipe: PipeType[ElemType])
   : GenericPipeMethods[PipeType, ElemType] = {

@@ -9,7 +9,7 @@ import io.shiftleft.queryprimitives.steps.types.structure.{MethodMethods, Method
 
 object Implicits extends PipeOperationImplicits with LowPriorityImplicits {
   implicit def realPipeMethods[ElemType](pipe: RealPipe[ElemType]) = {
-    new RealPipeMethods(pipe)
+    new GenericPipeMethods(pipe)
   }
 
   implicit def methodMethods[PipeType[+_]](pipe: PipeType[nodes.Method]) = {

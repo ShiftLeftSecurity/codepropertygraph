@@ -4,7 +4,7 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, ModifierTypes, NodeKeys, NodeTypes, nodes}
 import io.shiftleft.queryprimitives.dsl.Implicits._
-import io.shiftleft.queryprimitives.dsl.InternalImplicits._
+import io.shiftleft.queryprimitives.dsl.DslWriterImplicits._
 import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 import io.shiftleft.queryprimitives.dsl.pipeops.PipeOperations
 import io.shiftleft.queryprimitives.steps.ICallResolver

@@ -4,7 +4,7 @@ import Implicits._
 import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 import io.shiftleft.queryprimitives.dsl.pipetypes.ShallowPipe.ShallowPipe
 import io.shiftleft.queryprimitives.dsl.pipeops.PipeOperations
-import io.shiftleft.queryprimitives.dsl.InternalImplicits._
+import io.shiftleft.queryprimitives.dsl.DslWriterImplicits._
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.language.higherKinds
