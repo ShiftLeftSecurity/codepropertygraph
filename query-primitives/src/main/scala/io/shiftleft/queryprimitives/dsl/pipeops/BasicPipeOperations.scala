@@ -41,13 +41,5 @@ trait BasicPipeOperations[PipeType[+_]] {
   (pipe: PipeType[ElemType],
    function: ElemType => DstType): Unit
 
-  private[dsl] def append[ElemType]
-  (pipe: PipeType[ElemType],
-   otherPipe: RealPipe[ElemType]): RealPipe[ElemType]
-
-  private[dsl] def append[ElemType]
-  (pipe: PipeType[ElemType],
-   otherPipe: ShallowPipe[ElemType]): RealPipe[ElemType]
-
 
 }

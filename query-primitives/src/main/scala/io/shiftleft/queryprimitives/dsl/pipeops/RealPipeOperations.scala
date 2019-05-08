@@ -61,16 +61,4 @@ class RealPipeOperations extends PipeOperations[RealPipe] {
    function: ElemType => DstType): Unit = {
     RealPipe.unwrap(pipe).foreach(function)
   }
-
-  private[dsl] override def append[ElemType]
-  (pipe: RealPipe[ElemType],
-   otherPipe: RealPipe[ElemType]): RealPipe[ElemType] = {
-    RealPipe(RealPipe.unwrap(pipe) ::: RealPipe.unwrap(otherPipe))
-  }
-
-  private[dsl] override def append[ElemType]
-  (pipe: RealPipe[ElemType],
-   otherPipe: ShallowPipe[ElemType]): RealPipe[ElemType] = {
-    RealPipe(RealPipe.unwrap(pipe) :+ otherPipe)
-  }
 }
