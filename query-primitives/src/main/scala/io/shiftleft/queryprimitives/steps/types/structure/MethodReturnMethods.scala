@@ -15,7 +15,7 @@ class MethodReturnMethods[PipeType[+_]](val pipe: PipeType[nodes.MethodReturn]) 
   /**
     * Traverse to the method this formal method return belongs to
     */
-  def method(implicit ops: PipeOperations[PipeType, nodes.MethodReturn]): PipeType[nodes.Method] = {
+  def method(implicit ops: PipeOperations[PipeType]): PipeType[nodes.Method] = {
     pipe.map(_.vertices(Direction.IN, EdgeTypes.AST).next.asInstanceOf)
   }
 
@@ -34,14 +34,14 @@ class MethodReturnMethods[PipeType[+_]](val pipe: PipeType[nodes.MethodReturn]) 
     *  Traverse to last expressions in CFG.
     *  Can be multiple.
     */
-  def cfgLast(implicit ops: PipeOperations[PipeType, nodes.MethodReturn]): RealPipe[nodes.Expression] = {
+  def cfgLast(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Expression] = {
     pipe.flatMap(_.vertices(Direction.IN, EdgeTypes.CFG).asScala.asInstanceOf)
   }
 
   /**
     * Traverse to return type
     * */
-  def typ(implicit ops: PipeOperations[PipeType, nodes.MethodReturn]): PipeType[nodes.Type] = {
+  def typ(implicit ops: PipeOperations[PipeType]): PipeType[nodes.Type] = {
     pipe.map(_.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).next.asInstanceOf)
   }
 }

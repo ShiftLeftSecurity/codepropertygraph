@@ -4,41 +4,49 @@ import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 
 import scala.collection.GenTraversableOnce
 
-class RealPipeOperations[ElemType] extends PipeOperations[RealPipe, ElemType] {
+class RealPipeOperations extends PipeOperations[RealPipe] {
 
-  override def map[DstType](pipe: RealPipe[ElemType],
-                            function: ElemType => DstType): RealPipe[DstType] = {
+  private[dsl] override def map[DstType, ElemType]
+  (pipe: RealPipe[ElemType],
+   function: ElemType => DstType): RealPipe[DstType] = {
     RealPipe(RealPipe.unwrap(pipe).map(function))
   }
 
-  override def flatMap[DstType](pipe: RealPipe[ElemType],
-                                function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
+  private[dsl] override def flatMap[DstType, ElemType]
+  (pipe: RealPipe[ElemType],
+   function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
     RealPipe(RealPipe.unwrap(pipe).flatMap(function))
   }
 
-  override def filter(pipe: RealPipe[ElemType],
-                      function: ElemType => Boolean): RealPipe[ElemType] = {
+  private[dsl] override def filter[ElemType]
+  (pipe: RealPipe[ElemType],
+   function: ElemType => Boolean): RealPipe[ElemType] = {
     RealPipe(RealPipe.unwrap(pipe).filter(function))
   }
 
-  override def head(pipe: RealPipe[ElemType]): ElemType = {
+  private[dsl] override def head[ElemType]
+  (pipe: RealPipe[ElemType]): ElemType = {
     RealPipe.unwrap(pipe).head
   }
 
-  override def iterator(pipe: RealPipe[ElemType]): Iterator[ElemType] = {
+  private[dsl] override def iterator[ElemType]
+  (pipe: RealPipe[ElemType]): Iterator[ElemType] = {
     RealPipe.unwrap(pipe).iterator
   }
 
-  override def toList(pipe: RealPipe[ElemType]): List[ElemType] = {
+  private[dsl] override def toList[ElemType]
+  (pipe: RealPipe[ElemType]): List[ElemType] = {
     RealPipe.unwrap(pipe)
   }
 
-  override def toSet(pipe: RealPipe[ElemType]): Set[ElemType] = {
+  private[dsl] override def toSet[ElemType]
+  (pipe: RealPipe[ElemType]): Set[ElemType] = {
     RealPipe.unwrap(pipe).toSet
   }
 
-  override def foreach[DstType](pipe: RealPipe[ElemType],
-                                function: ElemType => DstType): Unit = {
+  private[dsl] override def foreach[DstType, ElemType]
+  (pipe: RealPipe[ElemType],
+   function: ElemType => DstType): Unit = {
     RealPipe.unwrap(pipe).foreach(function)
   }
 }

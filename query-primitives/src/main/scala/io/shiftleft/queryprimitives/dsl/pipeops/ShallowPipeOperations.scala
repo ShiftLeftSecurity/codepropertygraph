@@ -5,20 +5,23 @@ import io.shiftleft.queryprimitives.dsl.pipetypes.ShallowPipe.ShallowPipe
 
 import scala.collection.GenTraversableOnce
 
-class ShallowPipeOperations[ElemType] extends PipeOperations[ShallowPipe, ElemType] {
+class ShallowPipeOperations extends PipeOperations[ShallowPipe] {
 
-  override def map[DstType](pipe: ShallowPipe[ElemType],
-                            function: ElemType => DstType): ShallowPipe[DstType] = {
+  private[dsl] override def map[DstType, ElemType]
+  (pipe: ShallowPipe[ElemType],
+   function: ElemType => DstType): ShallowPipe[DstType] = {
     function.apply(pipe)
   }
 
-  override def flatMap[DstType](pipe: ShallowPipe[ElemType],
-                                function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
+  private[dsl] override def flatMap[DstType, ElemType]
+  (pipe: ShallowPipe[ElemType],
+   function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType] = {
     RealPipe(function.apply(pipe).toList)
   }
 
-  override def filter(pipe: ShallowPipe[ElemType],
-                      function: ElemType => Boolean): RealPipe[ElemType] = {
+  private[dsl] override def filter[ElemType]
+  (pipe: ShallowPipe[ElemType],
+   function: ElemType => Boolean): RealPipe[ElemType] = {
     if (function.apply(pipe)){
       RealPipe(pipe :: Nil)
     } else {
@@ -26,24 +29,29 @@ class ShallowPipeOperations[ElemType] extends PipeOperations[ShallowPipe, ElemTy
     }
   }
 
-  override def head(pipe: ShallowPipe[ElemType]): ElemType = {
+  private[dsl] override def head[ElemType]
+  (pipe: ShallowPipe[ElemType]): ElemType = {
     pipe
   }
 
-  override def iterator(pipe: ShallowPipe[ElemType]): Iterator[ElemType] = {
+  private[dsl] override def iterator[ElemType]
+  (pipe: ShallowPipe[ElemType]): Iterator[ElemType] = {
     (pipe :: Nil).toIterator
   }
 
-  override def toList(pipe: ShallowPipe[ElemType]): List[ElemType] = {
+  private[dsl] override def toList[ElemType]
+  (pipe: ShallowPipe[ElemType]): List[ElemType] = {
     pipe :: Nil
   }
 
-  override def toSet(pipe: ShallowPipe[ElemType]): Set[ElemType] = {
+  private[dsl] override def toSet[ElemType]
+  (pipe: ShallowPipe[ElemType]): Set[ElemType] = {
     Set() + pipe
   }
 
-  override def foreach[DstType](pipe: ShallowPipe[ElemType],
-                                function: ElemType => DstType): Unit = {
+  private[dsl] override def foreach[DstType, ElemType]
+  (pipe: ShallowPipe[ElemType],
+   function: ElemType => DstType): Unit = {
     function(pipe)
   }
 }

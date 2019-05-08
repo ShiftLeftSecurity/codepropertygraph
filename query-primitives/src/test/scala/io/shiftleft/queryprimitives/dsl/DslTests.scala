@@ -4,6 +4,7 @@ import Implicits._
 import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 import io.shiftleft.queryprimitives.dsl.pipetypes.ShallowPipe.ShallowPipe
 import io.shiftleft.queryprimitives.dsl.pipeops.PipeOperations
+import io.shiftleft.queryprimitives.dsl.InternalImplicits._
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.language.higherKinds
@@ -15,23 +16,23 @@ class B(b: Int = 0)
 class BDerived() extends B
 
 class NodeAMethods[PipeType[+_]](val pipe: PipeType[A]) extends AnyVal {
-  def toB(implicit ops: PipeOperations[PipeType, A]): PipeType[B] = {
-    ops.map(pipe, _ => new B())
+  def toB(implicit ops: PipeOperations[PipeType]): PipeType[B] = {
+    pipe.map(_ => new B())
   }
-  def toMultipleB(implicit ops: PipeOperations[PipeType, A]): RealPipe[B] = {
-    ops.flatMap(pipe, _ => new B() :: Nil)
+  def toMultipleB(implicit ops: PipeOperations[PipeType]): RealPipe[B] = {
+    pipe.flatMap(_ => new B() :: Nil)
   }
 }
 
 class NodeBMethods[PipeType[+_]](val pipe: PipeType[B]) extends AnyVal {
-  def toA(implicit ops: PipeOperations[PipeType, B]): PipeType[A] = {
-    ops.map(pipe, _ => new A())
+  def toA(implicit ops: PipeOperations[PipeType]): PipeType[A] = {
+    pipe.map(_ => new A())
   }
-  def toMultipleA(implicit ops: PipeOperations[PipeType, B]): RealPipe[A] = {
-    ops.flatMap(pipe, _ => new A() :: Nil)
+  def toMultipleA(implicit ops: PipeOperations[PipeType]): RealPipe[A] = {
+    pipe.flatMap(_ => new A() :: Nil)
   }
-  def toBMapTimesX(implicit ops: PipeOperations[PipeType, B]): PipeType[B] = {
-    ops.repeat(pipe, _ => new BDerived(), 2)
+  def toBMapTimesX(implicit ops: PipeOperations[PipeType]): PipeType[B] = {
+    pipe.repeat(_ => new BDerived(), 2)
   }
 }
 
