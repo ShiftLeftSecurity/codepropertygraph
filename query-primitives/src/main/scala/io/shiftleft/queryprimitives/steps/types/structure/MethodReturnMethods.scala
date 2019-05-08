@@ -9,8 +9,10 @@ import io.shiftleft.queryprimitives.steps.NoResolve
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
+import scala.language.higherKinds
 
-class MethodReturnMethods[PipeType[+_]](val pipe: PipeType[nodes.MethodReturn]) extends AnyVal {
+class MethodReturnMethods[PipeType[+_], ElemType <: nodes.MethodReturn]
+(val pipe: PipeType[ElemType]) extends AnyVal {
 
   /**
     * Traverse to the method this formal method return belongs to

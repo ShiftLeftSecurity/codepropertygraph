@@ -11,7 +11,8 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 import scala.collection.JavaConverters._
 import scala.language.higherKinds
 
-class CallMethods[PipeType[+_]](val pipe: PipeType[nodes.Call]) extends AnyVal {
+class CallMethods[PipeType[+_], ElemType <: nodes.Call]
+(val pipe: PipeType[ElemType]) extends AnyVal {
 
   /**
     * The caller

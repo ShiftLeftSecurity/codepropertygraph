@@ -9,7 +9,8 @@ import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 
 import scala.language.higherKinds
 
-class HasFullNameMethods[PipeType[+_], ElemType <: nodes.HasFullName](val pipe: PipeType[ElemType]) extends AnyVal {
+class HasFullNameMethods[PipeType[+_], ElemType <: nodes.HasFullName]
+(val pipe: PipeType[ElemType]) extends AnyVal {
 
   def fullName(implicit ops: PipeOperations[PipeType]): PipeType[String] = {
     pipe.map(_.fullName)

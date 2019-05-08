@@ -7,7 +7,8 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.language.higherKinds
 
-class MethodInstMethods[PipeType[+_]](val pipe: PipeType[nodes.MethodInst]) extends AnyVal {
+class MethodInstMethods[PipeType[+_], ElemType <: nodes.MethodInst]
+(val pipe: PipeType[ElemType]) extends AnyVal {
 
   /**
     * Traverse to corresponding method.

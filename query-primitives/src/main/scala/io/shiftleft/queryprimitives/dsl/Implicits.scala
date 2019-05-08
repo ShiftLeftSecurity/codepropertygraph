@@ -17,28 +17,28 @@ object Implicits extends PipeOperationImplicits with LowPriorityImplicits {
     new GenericPipeMethods(pipe)
   }
 
-  implicit def callMethods[PipeType[+_]](pipe: PipeType[nodes.Call])
-  : CallMethods[PipeType] = {
+  implicit def callMethods[PipeType[+_], ElemType <: nodes.Call]
+  (pipe: PipeType[ElemType]): CallMethods[PipeType, ElemType] = {
     new CallMethods(pipe)
   }
 
-  implicit def hasFullNameMethods[PipeType[+_], ElemType <: nodes.HasFullName](pipe: PipeType[ElemType])
-  : HasFullNameMethods[PipeType, ElemType] = {
+  implicit def hasFullNameMethods[PipeType[+_], ElemType <: nodes.HasFullName]
+  (pipe: PipeType[ElemType]): HasFullNameMethods[PipeType, ElemType] = {
     new HasFullNameMethods(pipe)
   }
 
-  implicit def methodMethods[PipeType[+_]](pipe: PipeType[nodes.Method])
-  : MethodMethods[PipeType] = {
+  implicit def methodMethods[PipeType[+_], ElemType <: nodes.Method]
+  (pipe: PipeType[ElemType]): MethodMethods[PipeType, ElemType] = {
     new MethodMethods(pipe)
   }
 
-  implicit def methodInstMethods[PipeType[+_]](pipe: PipeType[nodes.MethodInst])
-  : MethodInstMethods[PipeType] = {
+  implicit def methodInstMethods[PipeType[+_], ElemType <: nodes.MethodInst]
+  (pipe: PipeType[ElemType]): MethodInstMethods[PipeType, ElemType] = {
     new MethodInstMethods(pipe)
   }
 
-  implicit def methodReturnMethods[PipeType[+_]](pipe: PipeType[nodes.MethodReturn])
-  : MethodReturnMethods[PipeType] = {
+  implicit def methodReturnMethods[PipeType[+_], ElemType <: nodes.MethodReturn]
+  (pipe: PipeType[ElemType]): MethodReturnMethods[PipeType, ElemType] = {
     new MethodReturnMethods(pipe)
   }
 
@@ -52,29 +52,29 @@ class PipeOperationImplicits {
 
 sealed trait LowPriorityImplicits {
 
-  implicit def callMethods(pipe: nodes.Call)
-  : CallMethods[ShallowPipe] = {
-    new CallMethods(pipe.asInstanceOf[ShallowPipe[nodes.Call]])
+  implicit def callMethods[ElemType <: nodes.Call]
+  (pipe: ElemType): CallMethods[ShallowPipe, ElemType] = {
+    new CallMethods(pipe.asInstanceOf[ShallowPipe[ElemType]])
   }
 
-  implicit def hasFullNameMethods[ElemType <: nodes.HasFullName](pipe: ElemType)
-  : HasFullNameMethods[ShallowPipe, ElemType] = {
+  implicit def hasFullNameMethods[ElemType <: nodes.HasFullName]
+  (pipe: ElemType): HasFullNameMethods[ShallowPipe, ElemType] = {
     new HasFullNameMethods(pipe.asInstanceOf[ShallowPipe[ElemType]])
   }
 
-  implicit def methodMethods(pipe: nodes.Method)
-  : MethodMethods[ShallowPipe] = {
-    new MethodMethods(pipe.asInstanceOf[ShallowPipe[nodes.Method]])
+  implicit def methodMethods[ElemType <: nodes.Method]
+  (pipe: ElemType): MethodMethods[ShallowPipe, ElemType] = {
+    new MethodMethods(pipe.asInstanceOf[ShallowPipe[ElemType]])
   }
 
-  implicit def methodInstMethods(pipe: nodes.MethodInst)
-  : MethodInstMethods[ShallowPipe] = {
-    new MethodInstMethods(pipe.asInstanceOf[ShallowPipe[nodes.MethodInst]])
+  implicit def methodInstMethods[ElemType <: nodes.MethodInst]
+  (pipe: ElemType): MethodInstMethods[ShallowPipe, ElemType] = {
+    new MethodInstMethods(pipe.asInstanceOf[ShallowPipe[ElemType]])
   }
 
-  implicit def methodReturnMethods(pipe: nodes.MethodReturn)
-  : MethodReturnMethods[ShallowPipe] = {
-    new MethodReturnMethods(pipe.asInstanceOf[ShallowPipe[nodes.MethodReturn]])
+  implicit def methodReturnMethods[ElemType <: nodes.MethodReturn]
+  (pipe: ElemType): MethodReturnMethods[ShallowPipe, ElemType] = {
+    new MethodReturnMethods(pipe.asInstanceOf[ShallowPipe[ElemType]])
   }
 
 }

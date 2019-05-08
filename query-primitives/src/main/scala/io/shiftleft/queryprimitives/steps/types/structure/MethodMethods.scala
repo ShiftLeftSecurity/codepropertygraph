@@ -13,7 +13,8 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 import scala.collection.JavaConverters._
 import scala.language.higherKinds
 
-class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyVal {
+class MethodMethods[PipeType[+_], ElemType <: nodes.Method]
+(val pipe: PipeType[ElemType]) extends AnyVal {
 
   /**
     * Traverse to concrete instances of method.
@@ -175,70 +176,70 @@ class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyV
   /**
     * Traverse only to methods that are stubs, e.g., their code is not available
     * */
-  def isStub(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Method] = {
+  def isStub(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
     pipe.filter(_.edges(Direction.OUT, EdgeTypes.CFG).asScala.isEmpty)
   }
 
   /**
     * Traverse only to methods that are not stubs.
     * */
-  def isNotStub(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Method] = {
+  def isNotStub(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
     pipe.filter(_.edges(Direction.OUT, EdgeTypes.CFG).asScala.nonEmpty)
   }
 
   /**
     * Traverse to public methods
     * */
-  def isPublic(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Method] = {
+  def isPublic(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
     pipe.filter(hasMethodModifier(ModifierTypes.PUBLIC))
   }
 
   /**
     * Traverse to private methods
     * */
-  def isPrivate(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Method] = {
+  def isPrivate(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
     pipe.filter(hasMethodModifier(ModifierTypes.PRIVATE))
   }
 
   /**
     * Traverse to protected methods
     * */
-  def isProtected(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Method] = {
+  def isProtected(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
     pipe.filter(hasMethodModifier(ModifierTypes.PROTECTED))
   }
 
   /**
     * Traverse to abstract methods
     * */
-  def isAbstract(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Method] = {
+  def isAbstract(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
     pipe.filter(hasMethodModifier(ModifierTypes.ABSTRACT))
   }
 
   /**
     * Traverse to static methods
     * */
-  def isStatic(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Method] = {
+  def isStatic(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
     pipe.filter(hasMethodModifier(ModifierTypes.STATIC))
   }
 
   /**
     * Traverse to native methods
     * */
-  def isNative(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Method] = {
+  def isNative(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
     pipe.filter(hasMethodModifier(ModifierTypes.NATIVE))
   }
 
   /**
     * Traverse to constructors, that is, keep methods that are constructors
     * */
-  def isConstructor(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Method] = {
+  def isConstructor(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
     pipe.filter(hasMethodModifier(ModifierTypes.CONSTRUCTOR))
   }
 
   /**
     * Traverse to virtual method
     * */
-  def isVirtual(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Method] = {
+  def isVirtual(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
     pipe.filter(hasMethodModifier(ModifierTypes.VIRTUAL))
   }
 
@@ -246,7 +247,7 @@ class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyV
     * Traverse to external methods, that is, methods not present
     * but only referenced in the CPG.
     * */
-  def external(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Method] = {
+  def external(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
     pipe.filter(_.definingTypeDecl.external)
   }
 
@@ -254,7 +255,7 @@ class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyV
     * Traverse to internal methods, that is, methods for which
     * code is included in this CPG.
     * */
-  def external(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Method] = {
+  def external(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
     pipe.filter(_.definingTypeDecl.internal)
   }
 
