@@ -36,7 +36,7 @@ jobs:
   - stage: test
     script: sbt +test
   - stage: release
-    script: travis_wait 30 sbt ci-release-sonatype
+    script: travis_wait 60 sbt ci-release-sonatype
 
 before_cache:
 - du -h -d 1 $HOME/.ivy2/cache
