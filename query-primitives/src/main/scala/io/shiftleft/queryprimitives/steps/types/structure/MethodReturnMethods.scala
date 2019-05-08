@@ -22,13 +22,10 @@ class MethodReturnMethods[PipeType[+_]](val pipe: PipeType[nodes.MethodReturn]) 
   /**
     * Traverse to call sites of the corresponding method.
     */
-  /*
-  def returnUser(implicit ops: PipeOperations[PipeType, nodes.MethodReturn]): RealPipe[nodes.Call] = {
+  def returnUser(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Call] = {
     implicit val callResolver = NoResolve
     method.callIn
   }
-
-   */
 
   /**
     *  Traverse to last expressions in CFG.
