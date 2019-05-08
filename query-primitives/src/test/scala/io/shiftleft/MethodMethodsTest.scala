@@ -23,6 +23,8 @@ class MethodMethodsTest extends WordSpec with Matchers {
 
     typeMethod.methodInstance.toList should contain (methodInst)
 
+    typeMethod.fullName("abc").methodInstance
+
     //typeMethod.parameter.map(x => x).impl should contain (methodInst)
     //RealPipe(List(1, 2, 3)).map(_ + 1).foreach(x => println(x))
 

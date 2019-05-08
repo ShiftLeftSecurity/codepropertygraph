@@ -149,7 +149,7 @@ class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyV
     * */
   def callOut(regex: String)(implicit ops: PipeOperations[PipeType],
                              callResolver: ICallResolver): RealPipe[nodes.Call] = {
-    callOut.filter(_.calledMethod.fullName(regex))
+    callOut.filter(_.calledMethod.fullName(regex).nonEmpty)
   }
 
   /**

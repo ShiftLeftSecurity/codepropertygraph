@@ -1,10 +1,12 @@
 package io.shiftleft.queryprimitives.dsl
 
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.Call
 import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 import io.shiftleft.queryprimitives.dsl.pipetypes.ShallowPipe.ShallowPipe
 import io.shiftleft.queryprimitives.dsl.pipeops.{RealPipeOperations, ShallowPipeOperations}
 import io.shiftleft.queryprimitives.steps.types.expressions.CallMethods
+import io.shiftleft.queryprimitives.steps.types.propertyaccessors.HasFullNameMethods
 import io.shiftleft.queryprimitives.steps.types.structure.{MethodInstMethods, MethodMethods, MethodReturnMethods}
 
 import scala.language.higherKinds
@@ -18,6 +20,11 @@ object Implicits extends PipeOperationImplicits with LowPriorityImplicits {
   implicit def callMethods[PipeType[+_]](pipe: PipeType[nodes.Call])
   : CallMethods[PipeType] = {
     new CallMethods(pipe)
+  }
+
+  implicit def hasFullNameMethods[PipeType[+_], ElemType <: nodes.HasFullName](pipe: PipeType[ElemType])
+  : HasFullNameMethods[PipeType, ElemType] = {
+    new HasFullNameMethods(pipe)
   }
 
   implicit def methodMethods[PipeType[+_]](pipe: PipeType[nodes.Method])
@@ -48,6 +55,11 @@ sealed trait LowPriorityImplicits {
   implicit def callMethods(pipe: nodes.Call)
   : CallMethods[ShallowPipe] = {
     new CallMethods(pipe.asInstanceOf[ShallowPipe[nodes.Call]])
+  }
+
+  implicit def hasFullNameMethods[ElemType <: nodes.HasFullName](pipe: ElemType)
+  : HasFullNameMethods[ShallowPipe, ElemType] = {
+    new HasFullNameMethods(pipe.asInstanceOf[ShallowPipe[ElemType]])
   }
 
   implicit def methodMethods(pipe: nodes.Method)
