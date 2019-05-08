@@ -54,5 +54,17 @@ class ShallowPipeOperations extends PipeOperations[ShallowPipe] {
    function: ElemType => DstType): Unit = {
     function(pipe)
   }
+
+  private[dsl] override def append[ElemType]
+  (pipe: ShallowPipe[ElemType],
+   otherPipe: RealPipe[ElemType]): RealPipe[ElemType] = {
+    RealPipe(pipe :: RealPipe.unwrap(otherPipe))
+  }
+
+  private[dsl] override def append[ElemType]
+  (pipe: ShallowPipe[ElemType],
+   otherPipe: ShallowPipe[ElemType]): RealPipe[ElemType] = {
+    RealPipe(pipe :: otherPipe :: Nil)
+  }
 }
 

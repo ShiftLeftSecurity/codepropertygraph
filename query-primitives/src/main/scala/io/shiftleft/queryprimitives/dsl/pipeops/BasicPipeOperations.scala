@@ -1,6 +1,7 @@
 package io.shiftleft.queryprimitives.dsl.pipeops
 
 import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
+import io.shiftleft.queryprimitives.dsl.pipetypes.ShallowPipe.ShallowPipe
 
 import scala.collection.GenTraversableOnce
 import scala.language.higherKinds
@@ -33,6 +34,14 @@ trait BasicPipeOperations[PipeType[+_]] {
   private[dsl] def foreach[DstType, ElemType]
   (pipe: PipeType[ElemType],
    function: ElemType => DstType): Unit
+
+  private[dsl] def append[ElemType]
+  (pipe: PipeType[ElemType],
+   otherPipe: RealPipe[ElemType]): RealPipe[ElemType]
+
+  private[dsl] def append[ElemType]
+  (pipe: PipeType[ElemType],
+   otherPipe: ShallowPipe[ElemType]): RealPipe[ElemType]
 
 
 }

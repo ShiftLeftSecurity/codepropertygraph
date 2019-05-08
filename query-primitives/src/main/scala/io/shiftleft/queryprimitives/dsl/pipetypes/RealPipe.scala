@@ -8,6 +8,8 @@ object RealPipe {
 
     private[dsl] def apply[ElemType](impl: List[ElemType]): PipeType[ElemType]
     private[dsl] def unwrap[ElemType](pipeType: PipeType[ElemType]): List[ElemType]
+
+    def empty[ElemType]: PipeType[ElemType]
   }
 
   val RealPipe: RealPipeImpl = new RealPipeImpl {
@@ -19,6 +21,10 @@ object RealPipe {
 
     override def unwrap[ElemType](pipeType: PipeType[ElemType]): List[ElemType] = {
       pipeType
+    }
+
+    override def empty[ElemType]: List[ElemType] = {
+      Nil
     }
   }
 

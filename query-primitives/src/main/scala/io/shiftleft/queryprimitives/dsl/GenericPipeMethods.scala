@@ -21,6 +21,10 @@ class GenericPipeMethods[PipeType[+_], ElemType](val pipe: PipeType[ElemType]) e
     ops.toList(pipe)
   }
 
+  def toSet(implicit ops: PipeOperations[PipeType]): Set[ElemType] = {
+    ops.toSet(pipe)
+  }
+
   def filter(function: ElemType => Boolean)
             (implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
     ops.filter(pipe, function)

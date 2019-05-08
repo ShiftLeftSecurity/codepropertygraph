@@ -19,6 +19,24 @@ trait PipeOperations[PipeType[+_]] extends BasicPipeOperations[PipeType] {
     currentPipe
   }
 
+  /*
+  def repeat[DstType >: ElemType, ElemType](pipe: PipeType[ElemType],
+                                  function: DstType => DstType,
+                                  times: Int,
+                                  emitFunction: DstType => Boolean): RealPipe[DstType] = {
+    val pipeOps = castElemType[DstType]
+    val realPipeOps = Implicits.getRealPipeOps.castElemType[DstType]
+
+    var emitted = pipeOps.filter(pipe, emitFunction)
+    var currentPipe: PipeType[DstType] = pipe
+    for (_ <- 0 until times) {
+      currentPipe = pipeOps.map(currentPipe, function)
+      emitted = realPipeOps.append(emitted, pipeOps.filter(currentPipe, emitFunction))
+    }
+    currentPipe
+  }
+   */
+
   private[dsl] def repeatUntil[DstType >: ElemType, ElemType]
   (pipe: PipeType[ElemType],
    function: DstType => DstType,

@@ -1,6 +1,8 @@
 package io.shiftleft.queryprimitives.dsl.pipeops
 
+import io.shiftleft.queryprimitives.dsl.Implicits
 import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
+import io.shiftleft.queryprimitives.dsl.pipetypes.ShallowPipe.ShallowPipe
 
 import scala.collection.GenTraversableOnce
 
@@ -48,5 +50,17 @@ class RealPipeOperations extends PipeOperations[RealPipe] {
   (pipe: RealPipe[ElemType],
    function: ElemType => DstType): Unit = {
     RealPipe.unwrap(pipe).foreach(function)
+  }
+
+  private[dsl] override def append[ElemType]
+  (pipe: RealPipe[ElemType],
+   otherPipe: RealPipe[ElemType]): RealPipe[ElemType] = {
+    RealPipe(RealPipe.unwrap(pipe) ::: RealPipe.unwrap(otherPipe))
+  }
+
+  private[dsl] override def append[ElemType]
+  (pipe: RealPipe[ElemType],
+   otherPipe: ShallowPipe[ElemType]): RealPipe[ElemType] = {
+    RealPipe(RealPipe.unwrap(pipe) :+ otherPipe)
   }
 }
