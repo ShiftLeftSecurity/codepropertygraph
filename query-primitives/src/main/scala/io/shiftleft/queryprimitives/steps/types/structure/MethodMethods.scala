@@ -3,12 +3,11 @@ package io.shiftleft.queryprimitives.steps.types.structure
 import gremlin.scala.Vertex
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.queryprimitives.dsl.Implicits._
+import io.shiftleft.queryprimitives.dsl.InternalImplicits._
 import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 import io.shiftleft.queryprimitives.dsl.pipeops.PipeOperations
 import io.shiftleft.queryprimitives.steps.ICallResolver
 import org.apache.tinkerpop.gremlin.structure.Direction
-
 
 import scala.collection.JavaConverters._
 import scala.language.higherKinds
@@ -19,7 +18,7 @@ class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyV
     * Traverse to concrete instances of method.
     */
   def methodInstance(implicit ops: PipeOperations[PipeType, nodes.Method]): RealPipe[nodes.MethodInst] = {
-    ops.flatMap(pipe, _.accept(MethodMethodsMethodInstanceVisitor))
+    pipe.flatMap(_.accept(MethodMethodsMethodInstanceVisitor))
     //ops.flatMapIterator(pipe,
       //_.vertices(Direction.IN, EdgeTypes.REF).asScala)
   }
@@ -28,7 +27,7 @@ class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyV
     * Traverse to parameters of the method
     * */
   def parameter(implicit ops: PipeOperations[PipeType, nodes.Method]): RealPipe[nodes.MethodParameterIn] = {
-    ops.flatMap(pipe, _.accept(MethodMethodsParameterVisitor))
+    pipe.flatMap(_.accept(MethodMethodsParameterVisitor))
   }
 
   /**
@@ -36,18 +35,17 @@ class MethodMethods[PipeType[+_]](val pipe: PipeType[nodes.Method]) extends AnyV
     * */
   def callIn(implicit ops: PipeOperations[PipeType, nodes.Method],
              callResolver: ICallResolver): RealPipe[nodes.Call] = {
-    ops.flatMap(pipe, _.accept(new MethodMethodsCallInVisitor(callResolver)))
+    pipe.flatMap(_.accept(new MethodMethodsCallInVisitor(callResolver)))
   }
 
   /**
     * The type declaration associated with this method, e.g., the class it is defined in.
     * */
   def definingTypeDecl(implicit ops: PipeOperations[PipeType, nodes.Method]): RealPipe[nodes.TypeDecl] = {
-    ops.flatRepeatUntil[nodes.StoredNode](
-      pipe,
+    pipe.flatRepeatUntil[nodes.StoredNode](
       _.vertices(Direction.IN, EdgeTypes.AST).asScala,
       _.label == NodeTypes.TYPE_DECL)
-      .cast
+      .asInstanceOf
   }
 
   implicit def foo[T](x: Iterator[Vertex]): T = {

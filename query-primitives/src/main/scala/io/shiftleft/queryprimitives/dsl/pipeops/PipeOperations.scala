@@ -14,7 +14,7 @@ trait PipeOperations[PipeType[+_], ElemType] extends BasicPipeOperations[PipeTyp
     this.asInstanceOf[PipeOperations[PipeType, NewElemType]]
   }
 
-  def repeat[DstType >: ElemType](pipe: PipeType[DstType],
+  private[dsl] def repeat[DstType >: ElemType](pipe: PipeType[DstType],
                                   function: DstType => DstType,
                                   times: Int): PipeType[DstType] = {
     val pipeOps = castElemType[DstType]
@@ -26,14 +26,14 @@ trait PipeOperations[PipeType[+_], ElemType] extends BasicPipeOperations[PipeTyp
     currentPipe
   }
 
-  def repeatUntil[DstType >: ElemType](pipe: PipeType[DstType],
+  private[dsl] def repeatUntil[DstType >: ElemType](pipe: PipeType[DstType],
                                        function: DstType => DstType,
                                        until: DstType => Boolean): PipeType[DstType] = {
     // TODO implement
     pipe
   }
 
-  def flatRepeat[DstType >: ElemType](pipe: PipeType[ElemType],
+  private[dsl] def flatRepeat[DstType >: ElemType](pipe: PipeType[ElemType],
                                       function: DstType => GenTraversableOnce[DstType],
                                       times: Int): RealPipe[DstType] = {
     val pipeOps = Implicits.getRealPipeOps.castElemType[DstType]
@@ -45,7 +45,7 @@ trait PipeOperations[PipeType[+_], ElemType] extends BasicPipeOperations[PipeTyp
     currentPipe
   }
 
-  def flatRepeatUntil[DstType >: ElemType](pipe: PipeType[ElemType],
+  private[dsl] def flatRepeatUntil[DstType >: ElemType](pipe: PipeType[ElemType],
                                            function: DstType => GenTraversableOnce[DstType],
                                            until: DstType => Boolean): RealPipe[DstType] = {
     var stack: List[DstType] = toList(pipe)

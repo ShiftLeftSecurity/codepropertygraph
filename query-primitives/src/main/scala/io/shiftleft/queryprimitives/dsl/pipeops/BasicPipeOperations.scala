@@ -6,25 +6,25 @@ import scala.collection.GenTraversableOnce
 import scala.language.higherKinds
 
 trait BasicPipeOperations[PipeType[+_], ElemType] {
-  def map[DstType](pipe: PipeType[ElemType],
-                   function: ElemType => DstType): PipeType[DstType]
+  private[dsl] def map[DstType](pipe: PipeType[ElemType],
+                                function: ElemType => DstType): PipeType[DstType]
 
-  def flatMap[DstType](pipe: PipeType[ElemType],
-                       function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType]
+  private[dsl] def flatMap[DstType](pipe: PipeType[ElemType],
+                                    function: ElemType => GenTraversableOnce[DstType]): RealPipe[DstType]
 
-  def filter(pipe: PipeType[ElemType],
-             function: ElemType => Boolean): RealPipe[ElemType]
+  private[dsl] def filter(pipe: PipeType[ElemType],
+                          function: ElemType => Boolean): RealPipe[ElemType]
 
-  def head(pipe: PipeType[ElemType]): ElemType
+  private[dsl] def head(pipe: PipeType[ElemType]): ElemType
 
-  def toList(pipe: PipeType[ElemType]): List[ElemType]
+  private[dsl] def toList(pipe: PipeType[ElemType]): List[ElemType]
 
-  def toSet(pipe: PipeType[ElemType]): Set[ElemType]
+  private[dsl] def toSet(pipe: PipeType[ElemType]): Set[ElemType]
 
-  def iterator(pipe: PipeType[ElemType]): Iterator[ElemType]
+  private[dsl] def iterator(pipe: PipeType[ElemType]): Iterator[ElemType]
 
-  def foreach[DstType](pipe: PipeType[ElemType],
-                       function: ElemType => DstType): Unit
+  private[dsl] def foreach[DstType](pipe: PipeType[ElemType],
+                                    function: ElemType => DstType): Unit
 
 
 }
