@@ -1,13 +1,12 @@
 package io.shiftleft.queryprimitives.dsl
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.Call
 import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
 import io.shiftleft.queryprimitives.dsl.pipetypes.ShallowPipe.ShallowPipe
 import io.shiftleft.queryprimitives.dsl.pipeops.{RealPipeOperations, ShallowPipeOperations}
 import io.shiftleft.queryprimitives.steps.types.expressions.CallMethods
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.HasFullNameMethods
-import io.shiftleft.queryprimitives.steps.types.structure.{MethodInstMethods, MethodMethods, MethodReturnMethods}
+import io.shiftleft.queryprimitives.steps.types.structure.{BlockMethods, MethodInstMethods, MethodMethods, MethodReturnMethods, TypeDeclMethods}
 
 import scala.language.higherKinds
 
@@ -15,6 +14,11 @@ object Implicits extends PipeOperationImplicits with LowPriorityImplicits {
   implicit def realPipeMethods[ElemType](pipe: RealPipe[ElemType])
   : GenericPipeMethods[RealPipe,ElemType] = {
     new GenericPipeMethods(pipe)
+  }
+
+  implicit def blockMethods[PipeType[+_], ElemType <: nodes.Block]
+  (pipe: PipeType[ElemType]): BlockMethods[PipeType, ElemType] = {
+    new BlockMethods(pipe)
   }
 
   implicit def callMethods[PipeType[+_], ElemType <: nodes.Call]
@@ -42,6 +46,11 @@ object Implicits extends PipeOperationImplicits with LowPriorityImplicits {
     new MethodReturnMethods(pipe)
   }
 
+  implicit def typeDeclMethods[PipeType[+_], ElemType <: nodes.TypeDecl]
+  (pipe: PipeType[ElemType]): TypeDeclMethods[PipeType, ElemType] = {
+    new TypeDeclMethods(pipe)
+  }
+
 }
 
 class PipeOperationImplicits {
@@ -51,6 +60,11 @@ class PipeOperationImplicits {
 }
 
 sealed trait LowPriorityImplicits {
+
+  implicit def blockMethods[ElemType <: nodes.Block]
+  (pipe: ElemType): BlockMethods[ShallowPipe, ElemType] = {
+    new BlockMethods(pipe.asInstanceOf[ShallowPipe[ElemType]])
+  }
 
   implicit def callMethods[ElemType <: nodes.Call]
   (pipe: ElemType): CallMethods[ShallowPipe, ElemType] = {
@@ -75,6 +89,11 @@ sealed trait LowPriorityImplicits {
   implicit def methodReturnMethods[ElemType <: nodes.MethodReturn]
   (pipe: ElemType): MethodReturnMethods[ShallowPipe, ElemType] = {
     new MethodReturnMethods(pipe.asInstanceOf[ShallowPipe[ElemType]])
+  }
+
+  implicit def typeDeclMethods[ElemType <: nodes.TypeDecl]
+  (pipe: ElemType): TypeDeclMethods[ShallowPipe, ElemType] = {
+    new TypeDeclMethods(pipe.asInstanceOf[ShallowPipe[ElemType]])
   }
 
 }

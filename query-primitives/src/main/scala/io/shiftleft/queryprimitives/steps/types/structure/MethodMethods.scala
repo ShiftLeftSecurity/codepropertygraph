@@ -248,15 +248,15 @@ class MethodMethods[PipeType[+_], ElemType <: nodes.Method]
     * but only referenced in the CPG.
     * */
   def external(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
-    pipe.filter(_.definingTypeDecl.external)
+    pipe.filter(_.definingTypeDecl.external.nonEmpty)
   }
 
   /**
     * Traverse to internal methods, that is, methods for which
     * code is included in this CPG.
     * */
-  def external(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
-    pipe.filter(_.definingTypeDecl.internal)
+  def internal(implicit ops: PipeOperations[PipeType]): RealPipe[ElemType] = {
+    pipe.filter(_.definingTypeDecl.internal.nonEmpty)
   }
 
   /**
@@ -293,7 +293,7 @@ class MethodMethods[PipeType[+_], ElemType <: nodes.Method]
     * method outermost block.
     */
   def topLevelExpressions(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Expression] = {
-    block.local
+    block.topLevelExpressions
   }
 
   /**
@@ -323,7 +323,7 @@ class MethodMethods[PipeType[+_], ElemType <: nodes.Method]
   /**
     * Traverse to namespace
     * */
-  def namespace(implicit ops: PipeOperations[PipeType]): PipeType[nodes.Namespace] = {
+  def namespace(implicit ops: PipeOperations[PipeType]): RealPipe[nodes.Namespace] = {
     definingTypeDecl.namespace
   }
 
