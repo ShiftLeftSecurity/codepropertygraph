@@ -15,7 +15,14 @@ object FlowPrettyPrinter {
     val rows = path.map { trackingPoint =>
       implicit val graph = trackingPoint.underlying.graph()
       val method = trackingPoint.start.method.head
-      val trackedSymbol = trackingPoint.cfgNode.code
+
+      val trackedSymbol = trackingPoint match {
+        case methodParamIn: nodes.MethodParameterIn => {
+          s"${method.name}(${method.start.parameter.l.sortBy(_.order).map(_.code).mkString(", ")})"
+        }
+        case _ => trackingPoint.cfgNode.code
+      }
+
       val lineNumberOption = trackingPoint.cfgNode.lineNumber
       val methodNameOption = Some(method.name)
       val fileOption = method.start.file.name.headOption
