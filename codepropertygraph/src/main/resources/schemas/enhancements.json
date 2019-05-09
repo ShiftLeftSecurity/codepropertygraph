@@ -20,7 +20,7 @@
             "id":40,
             "name": "NAMESPACE",
             "keys": ["NAME"],
-            "comment": "This node represents a namespace as a hole whereas the NAMESPACE_BLOCK is used for each grouping occurrence of a namespace in code. Single representing NAMESPACE node is required for easier navigation in the query language.",
+            "comment": "This node represents a namespace as a whole whereas the NAMESPACE_BLOCK is used for each grouping occurrence of a namespace in code. Single representing NAMESPACE node is required for easier navigation in the query language.",
             "outEdges": []
         },
         {
