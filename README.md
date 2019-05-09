@@ -193,7 +193,11 @@ Java or Python, do not provide the same type of namespace blocks. However, they 
 package declarations at the start of source files that serve the
 purpose of placing all remaining declarations of the source file into
 a namespace. We translate package declarations into corresponding
-namespace blocks for these languages.
+namespace blocks for these languages. So the name of a namespace block is
+the complete namespace of all the elements within the block and the
+full name of a namespace block is a unique identifier for a specific block.
+E.g. for Java it would be enough to prefix the file name to the namespace
+because there is only one namespace describing package statement per file.
 
 ## Type declarations
 
