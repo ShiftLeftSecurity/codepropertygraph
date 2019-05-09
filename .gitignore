@@ -2,6 +2,7 @@
 .idea/
 /codepropertygraph/src/main/proto/io/shiftleft/codepropertygraph/protos.proto
 target/
+codepropertygraph/project/
 /codepropertygraph/src/main/resources/cpg.json
 protoc-3.6.0-linux-x86_64.zip
 private-key.pem
