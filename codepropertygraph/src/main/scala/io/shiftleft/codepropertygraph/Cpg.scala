@@ -1,20 +1,16 @@
-package io.shiftleft.queryprimitives.steps.starters
+package io.shiftleft.codepropertygraph
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.queryprimitives.steps.{NodeSteps, ext}
-import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import shapeless.HNil
+import io.shiftleft.queryprimitives.steps.ext
 
 object Cpg {
 
   /* syntactic sugar for `Cpg(graph)`. Usage:
    * `Cpg(graph)` or simply `Cpg` if you have an `implicit Graph` in scope */
   def apply(implicit graph: Graph) = new Cpg(graph)
-
-  implicit def toNodeTypeStarters(cpg: Cpg): NodeTypeStarters =
-    new NodeTypeStarters(cpg)
 
   /**
     * Create an empty code property graph
@@ -41,8 +37,10 @@ object Cpg {
   */
 class Cpg(val graph: Graph = Cpg.emptyGraph)
     extends ext.Enrichable
+    with ext.queryprimitives.Enrichable
     with ext.securityprofile.Enrichable
-    with ext.semanticcpg.Enrichable {
+    with ext.semanticcpg.Enrichable
+    with ext.dataflowengine.Enrichable {
 
   /**
     The underlying graph.
@@ -51,12 +49,5 @@ class Cpg(val graph: Graph = Cpg.emptyGraph)
     */
   implicit lazy val scalaGraph: ScalaGraph =
     graph.asScala
-
-  /**
-    Begin traversal at set of nodes - specified by their ids
-    */
-  def atVerticesWithId[NodeType <: nodes.StoredNode](ids: Seq[Any]): NodeSteps[NodeType, HNil] =
-    if (ids.size == 0) new NodeSteps[NodeType, HNil](scalaGraph.V(-1).cast[NodeType])
-    else new NodeSteps[NodeType, HNil](scalaGraph.V(ids: _*).cast[NodeType])
 
 }

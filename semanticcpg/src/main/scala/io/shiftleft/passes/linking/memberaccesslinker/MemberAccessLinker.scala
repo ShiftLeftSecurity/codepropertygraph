@@ -1,10 +1,10 @@
 package io.shiftleft.passes.linking.memberaccesslinker
 
 import gremlin.scala.ScalaGraph
-import io.shiftleft.codepropertygraph.generated.{nodes, EdgeTypes, NodeKeys, Operators}
+import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, Operators, nodes}
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
-import io.shiftleft.queryprimitives.steps.starters.Cpg
 import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 import org.apache.tinkerpop.gremlin.structure.Direction
 

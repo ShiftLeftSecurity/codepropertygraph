@@ -1,6 +1,7 @@
 package io.shiftleft.queryprimitives.steps.starters
 
 import gremlin.scala._
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
 import io.shiftleft.queryprimitives.steps.types.structure._
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
@@ -118,4 +119,11 @@ class NodeTypeStarters(cpg: Cpg) {
     */
   def metaData: MetaData[HNil] =
     new MetaData(scalaGraph.V.hasLabel(NodeTypes.META_DATA).cast[nodes.MetaData])
+
+  /**
+  Begin traversal at set of nodes - specified by their ids
+    */
+  def atVerticesWithId[NodeType <: nodes.StoredNode](ids: Seq[Any]): NodeSteps[NodeType, HNil] =
+    if (ids.size == 0) new NodeSteps[NodeType, HNil](scalaGraph.V(-1).cast[NodeType])
+    else new NodeSteps[NodeType, HNil](scalaGraph.V(ids: _*).cast[NodeType])
 }

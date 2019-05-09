@@ -1,7 +1,7 @@
 package io.shiftleft.queryprimitives
 
-import io.shiftleft.cpgloading.ProtoCpgLoader
-import io.shiftleft.queryprimitives.steps.starters.Cpg
+import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.cpgloading.ProtoCpgLoader
 
 import scala.collection.JavaConverters._
 

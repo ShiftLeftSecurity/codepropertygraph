@@ -1,9 +1,9 @@
 package io.shiftleft.passes.languagespecific.fuzzyc
 import gremlin.scala.ScalaGraph
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
-import io.shiftleft.queryprimitives.steps.starters.Cpg
 
 class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
 

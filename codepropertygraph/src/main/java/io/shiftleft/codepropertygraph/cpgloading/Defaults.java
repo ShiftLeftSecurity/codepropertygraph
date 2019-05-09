@@ -1,4 +1,4 @@
-package io.shiftleft.cpgloading;
+package io.shiftleft.codepropertygraph.cpgloading;
 
 public class Defaults {
 

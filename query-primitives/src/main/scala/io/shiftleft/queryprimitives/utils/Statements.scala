@@ -1,6 +1,6 @@
 package io.shiftleft.queryprimitives.utils
 
-import io.shiftleft.queryprimitives.steps.starters.Cpg
+import io.shiftleft.codepropertygraph.Cpg
 
 object Statements {
   def countAll(cpg: Cpg): Long = {

@@ -1,13 +1,12 @@
-package io.shiftleft.cpgloading;
+package io.shiftleft.codepropertygraph.cpgloading;
 
+import io.shiftleft.codepropertygraph.Cpg;
 import io.shiftleft.codepropertygraph.generated.NodeTypes;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.Property;
 import io.shiftleft.proto.cpg.Cpg.PropertyValue;
 import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase;
-import io.shiftleft.queryprimitives.steps.starters.Cpg;
-import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.logging.log4j.Logger;
