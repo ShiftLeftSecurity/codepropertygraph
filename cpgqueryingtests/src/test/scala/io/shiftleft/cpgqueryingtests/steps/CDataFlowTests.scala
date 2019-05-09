@@ -468,28 +468,29 @@ class CDataFlowTests extends CpgDataFlowTests {
         |    int x = argv[1];
         |    int y = x;
         |    int z = y;
+        |
+        |    return 0;
         | }
       """.stripMargin
     )
 
     val source = cpg.method.parameter
     val sink = cpg.identifier.name("y")
-    val flows = sink.reachableByFlows(source).p
+    val flows = sink.reachableByFlows(source).l
 
     flows.size shouldBe 2
 
-    /**
     flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
       Set(List[(String, Option[Integer])](
-        ("main", 2),
+        ("main(int argc, char** argv)", 2),
         ("x = argv[1]", 3),
         ("y = x", 4),
         ("z = y", 5)
       ),
         List[(String, Option[Integer])](
-          ("main", 2),
+          ("main(int argc, char** argv)", 2),
           ("x = argv[1]", 3),
           ("y = x", 4)
-        ))*/
+        ))
   }
 }
