@@ -1,4 +1,4 @@
-package io.shiftleft.queryprimitives.steps.ext.queryprimitives
+package io.shiftleft.codepropertygraph.ext.queryprimitivesext
 
 /** Sole purpose of this trait is to allow to enrich ('pimp') this DSL without the need of additional
   * imports a la `import x.y.z.Implicits._`. We're making use of the fact that package objects of
