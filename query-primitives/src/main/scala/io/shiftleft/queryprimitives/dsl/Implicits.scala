@@ -16,6 +16,9 @@ object Implicits extends PipeOperationImplicits with LowPriorityImplicits {
     new GenericPipeMethods(pipe)
   }
 
+  implicit val erasureDisable: DisambiguityResolver = new DisambiguityResolver()
+
+
   implicit def blockMethods[PipeType[+_], ElemType <: nodes.Block]
   (pipe: PipeType[ElemType]): BlockMethods[PipeType, ElemType] = {
     new BlockMethods(pipe)

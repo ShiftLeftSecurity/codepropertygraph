@@ -3,6 +3,7 @@ package io.shiftleft.queryprimitives.steps.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, ModifierTypes, NodeKeys, NodeTypes, nodes}
+import io.shiftleft.queryprimitives.dsl.TypeErasureResolver
 import io.shiftleft.queryprimitives.dsl.Implicits._
 import io.shiftleft.queryprimitives.dsl.DslWriterImplicits._
 import io.shiftleft.queryprimitives.dsl.pipetypes.RealPipe.RealPipe
@@ -63,7 +64,8 @@ class MethodMethods[PipeType[+_], ElemType <: nodes.Method]
   def calledBy[SourcePipeType[+_]](sourcePipe: SourcePipeType[nodes.MethodInst])
                                   (implicit ops: PipeOperations[PipeType],
                                    sourceOps: PipeOperations[SourcePipeType],
-                                   callResolver: ICallResolver): RealPipe[nodes.Method] = {
+                                   callResolver: ICallResolver,
+                                   unused: TypeErasureResolver): RealPipe[nodes.Method] = {
     caller.calledByIncludingSink(sourcePipe.method)
   }
 
