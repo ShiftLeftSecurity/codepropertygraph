@@ -1,10 +1,10 @@
 package io.shiftleft.passes
 
 import gremlin.scala._
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeyNames, NodeKeys, NodeTypes, edges, nodes}
 import io.shiftleft.diffgraph.DiffGraph
-import io.shiftleft.queryprimitives.steps.starters.Cpg
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{Matchers, WordSpec}
 

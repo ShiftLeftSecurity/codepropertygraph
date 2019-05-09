@@ -1,12 +1,12 @@
 package io.shiftleft.queryprimitives
 
 import gremlin.scala._
-import io.shiftleft.cpgloading.ProtoToCpg
 import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, PropertyValue}
 import java.lang.{Long => JLong}
 import java.util.{ArrayList => JArrayList}
 
+import io.shiftleft.codepropertygraph.cpgloading.ProtoToCpg
 import org.apache.tinkerpop.gremlin.structure.{T, Vertex, VertexProperty}
 
 import scala.collection.mutable

@@ -1,4 +1,4 @@
-package io.shiftleft.cpgloading;
+package io.shiftleft.codepropertygraph.cpgloading;
 
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.createDirectories;

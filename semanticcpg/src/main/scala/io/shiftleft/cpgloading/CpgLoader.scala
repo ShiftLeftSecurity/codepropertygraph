@@ -2,10 +2,11 @@ package io.shiftleft.cpgloading
 
 import gremlin.scala.{Graph, ScalaGraph}
 import io.shiftleft.SerializedCpg
-import io.shiftleft.semanticsloader.{SemanticsLoader, ArgumentDefs}
+import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.cpgloading.{IgnoredProtoEntries, OnDiskOverflowConfig, ProtoCpgLoader}
+import io.shiftleft.semanticsloader.{ArgumentDefs, SemanticsLoader}
 import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
 import io.shiftleft.layers.enhancedbase.EnhancedBaseCreator
-import io.shiftleft.queryprimitives.steps.starters.Cpg
 import io.shiftleft.queryprimitives.CpgOverlayLoader
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Vertex

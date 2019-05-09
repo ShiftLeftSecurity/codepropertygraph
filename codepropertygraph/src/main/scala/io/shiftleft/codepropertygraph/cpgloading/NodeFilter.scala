@@ -1,7 +1,6 @@
-package io.shiftleft.cpgloading
+package io.shiftleft.codepropertygraph.cpgloading
 
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node
-import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.Property
 import io.shiftleft.proto.cpg.Cpg.NodePropertyName
 
 import scala.collection.JavaConverters._
@@ -22,7 +21,7 @@ class NodeFilter {
     }
   }
 
-  private def filterTypeNode(properties: mutable.Buffer[Property],
+  private def filterTypeNode(properties: mutable.Buffer[Node.Property],
                              filterByProperty: NodePropertyName,
                              compareSet: mutable.Set[String]): Boolean = {
     val propertyOption =

@@ -1,12 +1,10 @@
-package io.shiftleft.cpgloading;
+package io.shiftleft.codepropertygraph.cpgloading;
 
-import io.shiftleft.diffgraph.DiffGraph;
+import io.shiftleft.codepropertygraph.Cpg;
 import io.shiftleft.proto.cpg.Cpg.CpgOverlay;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge;
-import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node;
-import io.shiftleft.queryprimitives.steps.starters.Cpg;
-import java.io.FileNotFoundException;
+
 import java.io.InputStream;
 import java.io.File;
 import java.io.FileInputStream;

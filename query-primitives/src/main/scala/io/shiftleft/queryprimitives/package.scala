@@ -1,5 +1,7 @@
 package io.shiftleft
 
+import io.shiftleft.codepropertygraph.Cpg
+
 /**
   * Domain specific language for querying code property graphs
   *
@@ -24,7 +26,7 @@ package io.shiftleft
   * {{{ cpg.local }}}
   *
   * will start at all local variables. The complete list of starting points can be found here:
-  * [[io.shiftleft.queryprimitives.steps.starters.Cpg]]
+  * [[Cpg]]
   *
   * == Lazy evaluation ==
   * Queries are lazily evaluated, e.g., `cpg.method` creates a traversal which you can add more
