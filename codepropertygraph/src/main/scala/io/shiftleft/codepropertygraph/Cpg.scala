@@ -4,7 +4,6 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import shapeless.HNil
-import io.shiftleft.queryprimitives.steps.ext
 
 object Cpg {
 
@@ -36,11 +35,10 @@ object Cpg {
   @param graph the underlying graph. An empty graph is created if this parameter is omitted.
   */
 class Cpg(val graph: Graph = Cpg.emptyGraph)
-    extends ext.Enrichable
-    with ext.queryprimitives.Enrichable
+    extends ext.queryprimitives.Enrichable
+    with ext.queryprimitivesext.Enrichable
     with ext.securityprofile.Enrichable
-    with ext.semanticcpg.Enrichable
-    with ext.dataflowengine.Enrichable {
+    with ext.semanticcpg.Enrichable {
 
   /**
     The underlying graph.
