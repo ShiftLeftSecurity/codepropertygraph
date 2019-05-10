@@ -16,10 +16,7 @@ import io.shiftleft.passes.propagateedges.PropagateEdgePass
 import io.shiftleft.passes.reachingdef.ReachingDefPass
 import io.shiftleft.passes.receiveredges.ReceiverEdgePass
 
-class EnhancedBaseCreator(graph: ScalaGraph,
-                          language: String,
-                          serializedCpg: SerializedCpg,
-                          semantics: Semantics) {
+class EnhancedBaseCreator(graph: ScalaGraph, language: String, serializedCpg: SerializedCpg, semantics: Semantics) {
 
   private val runner = new CpgPassRunner(serializedCpg)
 

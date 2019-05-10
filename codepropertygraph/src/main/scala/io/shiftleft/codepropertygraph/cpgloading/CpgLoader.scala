@@ -38,7 +38,6 @@ object CpgLoader {
     new CpgLoader().load(filename, config)
   }
 
-
   /**
     * Create any indexes necessary for quick access.
     *

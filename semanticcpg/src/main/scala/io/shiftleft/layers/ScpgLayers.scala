@@ -5,7 +5,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.layers.enhancedbase.EnhancedBaseCreator
 import io.shiftleft.semanticsloader.Semantics
 
-
 class ScpgLayers(semantics: Semantics) {
   def run(cpg: Cpg, serializedCpg: SerializedCpg): Unit = {
 
