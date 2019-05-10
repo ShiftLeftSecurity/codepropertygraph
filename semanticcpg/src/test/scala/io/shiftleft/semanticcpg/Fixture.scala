@@ -2,8 +2,8 @@ package io.shiftleft.semanticcpg
 
 import gremlin.scala._
 import io.shiftleft.SerializedCpg
+import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.passes.methoddecorations.MethodDecoratorPass
-import io.shiftleft.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.layers.ScpgLayers
 import io.shiftleft.semanticsloader.SemanticsLoader
 import org.apache.tinkerpop.gremlin.structure.Graph

@@ -1,9 +1,7 @@
-package io.shiftleft.cpgloading
+package io.shiftleft.codepropertygraph.cpgloading
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.cpgloading.{IgnoredProtoEntries, OnDiskOverflowConfig, ProtoCpgLoader}
 import io.shiftleft.codepropertygraph.generated.NodeKeys
-import io.shiftleft.queryprimitives.CpgOverlayLoader
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph

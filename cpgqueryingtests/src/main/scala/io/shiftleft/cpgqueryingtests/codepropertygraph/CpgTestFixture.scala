@@ -2,7 +2,7 @@ package io.shiftleft.cpgqueryingtests.codepropertygraph
 
 import gremlin.scala.{Graph, ScalaGraph}
 import io.shiftleft.SerializedCpg
-import io.shiftleft.cpgloading.{CpgLoader, CpgLoaderConfig}
+import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.layers.ScpgLayers
 import io.shiftleft.semanticsloader.SemanticsLoader
 

@@ -5,7 +5,7 @@ import java.nio.file.Files
 
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.cpgloading.{CpgLoader, CpgLoaderConfig}
+import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.layers.ScpgLayers
 import io.shiftleft.semanticsloader.SemanticsLoader
 
