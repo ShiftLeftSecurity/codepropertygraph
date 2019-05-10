@@ -11,6 +11,8 @@ import scala.collection.JavaConverters._
 
 /**
   * Create PROPAGATE edges which mark parameters defined by a method.
+  * PROPAGATE edges can be picked up by the reachingdef pass to calculate
+  * reaching definition edges.
   */
 class PropagateEdgePass(graph: ScalaGraph, semantics: Semantics) extends CpgPass(graph) {
   var dstGraph: DiffGraph = _

@@ -6,7 +6,7 @@ import java.nio.file.Files
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
-import io.shiftleft.layers.EnhancementRunner
+import io.shiftleft.layers.{DataFlowRunner, EnhancementRunner}
 import io.shiftleft.semanticsloader.SemanticsLoader
 
 class CpgFactory(frontend: LanguageFrontend, semanticsFilename: String) {
@@ -29,7 +29,8 @@ class CpgFactory(frontend: LanguageFrontend, semanticsFilename: String) {
     val cpg = CpgLoader.load(cpgFile.getAbsolutePath, config)
 
     val semantics = new SemanticsLoader(semanticsFilename).load
-    new EnhancementRunner(semantics).run(cpg, new SerializedCpg())
+    new EnhancementRunner().run(cpg, new SerializedCpg())
+    new DataFlowRunner(semantics).run(cpg, new SerializedCpg())
 
     cpg
   }
