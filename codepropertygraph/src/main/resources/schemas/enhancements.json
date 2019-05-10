@@ -128,7 +128,8 @@
         {"name" : "BLOCK",
           "outEdges" : [
             {"edgeName": "CALL_ARG", "inNodes": ["METHOD_PARAMETER_IN"]},
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]},
+	    {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN", "BLOCK"]}
           ]
         },
         {"name" : "UNKNOWN",
