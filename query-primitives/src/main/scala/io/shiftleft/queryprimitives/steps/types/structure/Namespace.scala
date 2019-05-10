@@ -30,7 +30,12 @@ class Namespace[Labels <: HList](raw: GremlinScala.Aux[nodes.Namespace, Labels])
     * Methods defined in this namespace
     * */
   def method: Method[Labels] =
-    typeDecl.method
+    new Method[Labels](
+      raw
+        .in(EdgeTypes.REF)
+        .out(EdgeTypes.AST)
+        .hasLabel(NodeTypes.METHOD)
+        .cast[nodes.Method])
 
   /**
     * External namespaces - any namespaces
