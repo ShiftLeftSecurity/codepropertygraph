@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.layers.enhancedbase.EnhancedBaseCreator
 import io.shiftleft.semanticsloader.Semantics
 
-class ScpgLayers(semantics: Semantics) {
+class EnhancementRunner(semantics: Semantics) {
   def run(cpg: Cpg, serializedCpg: SerializedCpg): Unit = {
 
     val language = cpg.metaData.language.head
