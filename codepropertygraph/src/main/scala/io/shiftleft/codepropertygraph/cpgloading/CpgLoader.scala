@@ -37,6 +37,20 @@ object CpgLoader {
   def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg = {
     new CpgLoader().load(filename, config)
   }
+
+
+  /**
+    * Create any indexes necessary for quick access.
+    *
+    * @param cpg the CPG to create indexes in
+    */
+  def createIndexes(cpg: Cpg): Unit = {
+    new CpgLoader().createIndexes(cpg)
+  }
+
+  def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit = {
+    new CpgLoader().createIndexes(cpg)
+  }
 }
 
 private class CpgLoader {
@@ -65,9 +79,10 @@ private class CpgLoader {
   def createIndexes(cpg: Cpg): Unit =
     cpg.graph.asInstanceOf[TinkerGraph].createIndex(NodeKeys.FULL_NAME.name, classOf[Vertex])
 
-  def addOverlays(overlayFilenames: Seq[String], cpg: Cpg) =
+  def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit = {
     overlayFilenames.foreach { overlayFilename =>
       CpgOverlayLoader.load(overlayFilename, cpg)
     }
+  }
 
 }
