@@ -1,16 +1,14 @@
-package io.shiftleft.queryprimitives
+package io.shiftleft.codepropertygraph.cpgloading
 
-import gremlin.scala._
-import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
-import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, PropertyValue}
 import java.lang.{Long => JLong}
 import java.util.{ArrayList => JArrayList}
 
-import io.shiftleft.codepropertygraph.cpgloading.ProtoToCpg
+import gremlin.scala._
+import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, PropertyValue}
 import org.apache.tinkerpop.gremlin.structure.{T, Vertex, VertexProperty}
 
-import scala.collection.mutable
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 /**
   * Component to merge CPG overlay into existing graph
@@ -90,7 +88,7 @@ class CpgOverlayApplier {
     } else {
       val iter = graph.graph.vertices(id.asInstanceOf[Object])
       assert(iter.hasNext, s"node with id=$id neither found in overlay nodes, nor in existing graph")
-      iter.nextChecked
+      nextChecked(iter)
     }
   }
 
@@ -100,7 +98,7 @@ class CpgOverlayApplier {
     } else {
       val iter = graph.graph.edges(id.asInstanceOf[Object])
       assert(iter.hasNext, s"edge with id=$id neither found in overlay edges, nor in existing graph")
-      iter.nextChecked
+      nextChecked(iter)
     }
   }
 
@@ -126,6 +124,15 @@ class CpgOverlayApplier {
       case VALUE_NOT_SET =>
       case valueCase =>
         throw new RuntimeException("Error: unsupported property case: " + valueCase)
+    }
+  }
+
+  private def nextChecked[T](iterator: java.util.Iterator[T]): T = {
+    try {
+      iterator.next
+    } catch {
+      case _: NoSuchElementException =>
+        throw new NoSuchElementException()
     }
   }
 

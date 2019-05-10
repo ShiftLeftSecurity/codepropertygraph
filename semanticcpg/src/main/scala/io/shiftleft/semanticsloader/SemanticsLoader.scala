@@ -4,18 +4,24 @@ import org.apache.logging.log4j.LogManager
 
 import scala.io.Source
 
-case class ArgumentDef(methodFullName: String, parameterIndex: Int)
-case class ArgumentDefs(elements: List[ArgumentDef])
+case class Semantic(methodFullName: String, parameterIndex: Int)
+case class Semantics(elements: List[Semantic])
+
+object SemanticsLoader {
+  def emptySemantics: Semantics = {
+    Semantics(Nil)
+  }
+}
 
 class SemanticsLoader(filename: String) {
   private val logger = LogManager.getLogger(getClass)
 
-  def load(): ArgumentDefs = {
+  def load(): Semantics = {
     val bufferedReader = Source.fromFile(filename)
     var lineNumber = 0
 
     try {
-      val argumentDefElements =
+      val semanticElements =
         bufferedReader
           .getLines()
           .flatMap { line =>
@@ -26,7 +32,7 @@ class SemanticsLoader(filename: String) {
                 val methodFullName = parts(0).trim
                 val parameterIndex = parts(1).trim.toInt
                 lineNumber += 1
-                Some(ArgumentDef(methodFullName, parameterIndex))
+                Some(Semantic(methodFullName, parameterIndex))
               } catch {
                 case _: NumberFormatException =>
                   logFormatError("Argument index is not convertable to Int.", lineNumber)
@@ -41,7 +47,7 @@ class SemanticsLoader(filename: String) {
           }
           .toList
 
-      ArgumentDefs(argumentDefElements)
+      Semantics(semanticElements)
     } finally {
       bufferedReader.close()
     }

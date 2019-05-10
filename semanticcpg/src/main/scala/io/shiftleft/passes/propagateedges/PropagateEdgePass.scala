@@ -1,7 +1,7 @@
 package io.shiftleft.passes.propagateedges
 
 import gremlin.scala._
-import io.shiftleft.semanticsloader.ArgumentDefs
+import io.shiftleft.semanticsloader.Semantics
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
@@ -12,19 +12,19 @@ import scala.collection.JavaConverters._
 /**
   * Create PROPAGATE edges which mark parameters defined by a method.
   */
-class PropagateEdgePass(graph: ScalaGraph, argumentDefs: ArgumentDefs) extends CpgPass(graph) {
+class PropagateEdgePass(graph: ScalaGraph, semantics: Semantics) extends CpgPass(graph) {
   var dstGraph: DiffGraph = _
 
   override def run(): Stream[DiffGraph] = {
     dstGraph = new DiffGraph()
 
-    argumentDefs.elements.foreach { argDef =>
+    semantics.elements.foreach { semantic =>
       val methodOption =
-        graph.V().hasLabel(NodeTypes.METHOD).has(NodeKeys.FULL_NAME -> argDef.methodFullName).headOption()
+        graph.V().hasLabel(NodeTypes.METHOD).has(NodeKeys.FULL_NAME -> semantic.methodFullName).headOption()
 
       methodOption match {
         case Some(method) =>
-          addSelfDefSemantic(method, argDef.parameterIndex)
+          addSelfDefSemantic(method, semantic.parameterIndex)
         case None =>
       }
     }
