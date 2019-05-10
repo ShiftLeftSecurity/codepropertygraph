@@ -1,12 +1,8 @@
 package io.shiftleft.cpgloading
 
-import gremlin.scala.{Graph, ScalaGraph}
-import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.{IgnoredProtoEntries, OnDiskOverflowConfig, ProtoCpgLoader}
-import io.shiftleft.semanticsloader.{Semantics, SemanticsLoader}
-import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
-import io.shiftleft.layers.enhancedbase.EnhancedBaseCreator
+import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.queryprimitives.CpgOverlayLoader
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Vertex
@@ -16,8 +12,11 @@ import scala.compat.java8.OptionConverters._
 
 object CpgLoaderConfig {
 
-  def default: CpgLoaderConfig =
-    CpgLoaderConfig(createIndices = true, onDiskOverflowConfig = None)
+  def default: CpgLoaderConfig = CpgLoaderConfig(
+    createIndices = true,
+    onDiskOverflowConfig = None,
+    ignoredProtoEntries = None
+  )
 }
 
 /**
@@ -26,7 +25,8 @@ object CpgLoaderConfig {
   * @param onDiskOverflowConfig configuration for the on-disk-overflow feature
   *  */
 case class CpgLoaderConfig(var createIndices: Boolean,
-                           var onDiskOverflowConfig: Option[OnDiskOverflowConfig]) {}
+                           var onDiskOverflowConfig: Option[OnDiskOverflowConfig],
+                           var ignoredProtoEntries: Option[IgnoredProtoEntries])
 
 object CpgLoader {
 
@@ -45,14 +45,6 @@ private class CpgLoader {
 
   private val logger = LogManager.getLogger(getClass)
 
-  /* some non-public frontends (e.g. java2cpg) use cpg proto entries that are `UNRECOGNIZED` by cpg-public.
-   * we'll ignore those during the import */
-  val ignoredProtoEntries =
-    IgnoredProtoEntries(
-      nodeTypes = Set(5, 6, 7, 49),
-      nodeKeys = Set(14, 16)
-    )
-
   /**
     * Load a Code Property Graph
     *
@@ -62,7 +54,7 @@ private class CpgLoader {
   def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg = {
     logger.debug("Loading " + filename)
     val cpg =
-      ProtoCpgLoader.loadFromProtoZip(filename, config.onDiskOverflowConfig.asJava, Some(ignoredProtoEntries).asJava)
+      ProtoCpgLoader.loadFromProtoZip(filename, config.onDiskOverflowConfig.asJava, config.ignoredProtoEntries.asJava)
     if (config.createIndices) { createIndexes(cpg) }
     cpg
   }
