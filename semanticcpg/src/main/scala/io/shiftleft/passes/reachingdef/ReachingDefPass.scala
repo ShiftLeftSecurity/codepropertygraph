@@ -84,7 +84,8 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
     method.vertices(Direction.OUT, EdgeTypes.AST).asScala.filter(_.isInstanceOf[nodes.MethodParameterIn]).foreach {
       methodParameterIn =>
         methodParameterIn.vertices(Direction.IN, EdgeTypes.REF).asScala.foreach { refInIdentifier =>
-          dfHelper.getOperation(refInIdentifier)
+          dfHelper
+            .getOperation(refInIdentifier)
             .foreach(operationNode => addEdge(methodParameterIn, operationNode))
         }
     }
