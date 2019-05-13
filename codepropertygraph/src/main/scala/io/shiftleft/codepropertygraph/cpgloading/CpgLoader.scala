@@ -48,7 +48,7 @@ object CpgLoader {
   }
 
   def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit = {
-    new CpgLoader().createIndexes(cpg)
+    new CpgLoader().addOverlays(overlayFilenames, cpg)
   }
 }
 
