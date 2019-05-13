@@ -2,7 +2,7 @@ name := "cpgqueryingtests"
 
 dependsOn(
   Projects.semanticcpg,
-  Projects.dataflowengine
+  Projects.dataflowengine % Test
 )
 
 libraryDependencies ++= Seq(
