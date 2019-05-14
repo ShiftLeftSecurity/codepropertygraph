@@ -34,7 +34,7 @@ inThisBuild(
     )
   ))
 
-name := "root"
+name := "codepropertygraph"
 publish / skip := true
 
 // parsed by project/Utils.scala

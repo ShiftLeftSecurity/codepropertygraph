@@ -24,7 +24,7 @@ trait ExpressionGeneralization[T] extends NodeVisitor[T] {
     visit(node.asInstanceOf[nodes.Expression])
   }
 
-  override def visit(node: nodes.MethodRef): T = {
+  override def visit(node: nodes.MethodReference): T = {
     visit(node.asInstanceOf[nodes.Expression])
   }
 

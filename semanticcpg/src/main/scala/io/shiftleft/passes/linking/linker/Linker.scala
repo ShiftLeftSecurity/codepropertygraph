@@ -78,7 +78,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
       dstNodeLabel = NodeTypes.METHOD_INST,
       edgeType = EdgeTypes.REF,
       dstNodeIdMap = methodInstFullNameToNodeId,
-      dstFullNameKey = nodes.MethodRef.Keys.MethodInstFullName,
+      dstFullNameKey = nodes.MethodReference.Keys.MethodInstFullName,
       dstGraph
     )
 
