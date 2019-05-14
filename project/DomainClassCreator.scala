@@ -421,16 +421,6 @@ object DomainClassCreator {
           }
           .mkString("\n")
 
-      val abstractFieldAccessors = keys match {
-        case Nil => ""
-        case keys =>
-          "\n " + keys
-            .map { key =>
-              s"def ${camelCase(key.name)}: ${getCompleteType(key)}"
-            }
-            .mkString("\n ")
-      }
-
       val abstractContainedNodeAccessors = nodeType.containedNodes
         .map {
           _.map { containedNode =>
@@ -476,7 +466,7 @@ object DomainClassCreator {
           |/** important: do not used `wrapped` internally in this class, only pass it to VertexRef constructor
           |* this is to ensure it can be managed by the ReferenceManager
           |* */
-          |class ${nodeType.className}Ref(wrapped: ${nodeType.className}) extends VertexRef[${nodeType.className}](wrapped) with ${nodeType.className}Base with StoredNode {
+          |class ${nodeType.className}Ref(wrapped: ${nodeType.className}) extends VertexRef[${nodeType.className}](wrapped) with ${nodeType.className}Base $propertyBasedTraits with StoredNode {
           |$propertyDelegators
           |$delegatingContainedNodeAccessors
           |  override def toMap: Map[String, Any] = get.toMap
@@ -491,12 +481,11 @@ object DomainClassCreator {
       trait ${nodeType.className}Base extends Node $mixinTraitsForBase {
         def asStored : StoredNode = this.asInstanceOf[StoredNode]
 
-        $abstractFieldAccessors
         $abstractContainedNodeAccessors
       }
 
       class ${nodeType.className}(private val _id: JLong, private val _graph: TinkerGraph)
-          extends SpecializedTinkerVertex(_id, ${nodeType.className}.Label, _graph) with StoredNode $mixinTraits $propertyBasedTraits with Product with ${nodeType.className}Base {
+          extends SpecializedTinkerVertex(_id, ${nodeType.className}.Label, _graph) with StoredNode $mixinTraits with Product with ${nodeType.className}Base {
 
         override def allowedInEdgeLabels() = ${nodeType.className}.Edges.In.asJava
         override def allowedOutEdgeLabels() = ${nodeType.className}.Edges.Out.asJava
