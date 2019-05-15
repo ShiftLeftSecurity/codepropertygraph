@@ -734,7 +734,7 @@ case class NodeType(name: String,
                     outEdges: List[OutEdgeEntry],
                     is: Option[List[String]],
                     containedNodes: Option[List[ContainedNode]]) {
-  lazy val className = Utils.handlePotentialRefNameClash(name)
+  lazy val className = Utils.camelCase(Utils.handlePotentialRefNameClash(name)).capitalize
 }
 
 case class OutEdgeEntry(edgeName: String, inNodes: List[String])
@@ -742,7 +742,7 @@ case class OutEdgeEntry(edgeName: String, inNodes: List[String])
 /** nodeType links to the referenced NodeType
   * cardinality must be one of `zeroOrOne`, `one`, `list` */
 case class ContainedNode(nodeType: String, localName: String, cardinality: String) {
-  lazy val nodeTypeClassName = Utils.handlePotentialRefNameClash(name)
+  lazy val nodeTypeClassName = Utils.camelCase(Utils.handlePotentialRefNameClash(nodeType)).capitalize
 }
 
 // TODO: use better json library which supports enums
@@ -760,7 +760,7 @@ object Cardinality {
 
 /* representation of EdgeType in cpg.json */
 case class EdgeType(name: String, keys: List[String]) {
-  lazy val className = Utils.camelCase(name).capitalize
+  lazy val className = Utils.camelCase(Utils.handlePotentialRefNameClash(name)).capitalize
 }
 
 /* representation of nodeKey/edgeKey in cpg.json */
@@ -769,7 +769,7 @@ case class Property(name: String, comment: String, valueType: String, cardinalit
 /* representation of nodeBaseTrait in cpg.json */
 case class NodeBaseTrait(name: String, hasKeys: List[String], `extends`: Option[List[String]]) {
   lazy val extendz = `extends` //it's mapped from the key in json :(
-  lazy val className = Utils.handlePotentialRefNameClash(name)
+  lazy val className = Utils.camelCase(Utils.handlePotentialRefNameClash(name)).capitalize
 }
 
 object HigherValueType extends Enumeration {
@@ -794,9 +794,9 @@ object Utils {
   // avoid clashes with `AbcRef` types
   def handlePotentialRefNameClash(originalName: String): String =
     if (originalName.endsWith("_REF"))
-      Utils.camelCase(s"${originalName}ERENCE").capitalize
+      s"${originalName}ERENCE"
     else
-      Utils.camelCase(name).capitalize
+      originalName
 
   def getHigherType(property: Property): HigherValueType.Value =
     Cardinality.fromName(property.cardinality) match {
