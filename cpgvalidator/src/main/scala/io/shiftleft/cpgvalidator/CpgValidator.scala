@@ -25,22 +25,12 @@ class CpgValidator(notEnhancedCpg: Cpg) {
   }
 
   def validate(): Boolean = {
-    val outConstraintsBySrcType = Facts.nodeOutFacts.groupBy(_.srcNodeType)
-    val outConstraintSrcTypesSorted = Facts.nodeOutFacts.map(_.srcNodeType).distinct.sorted
+    val outFactsBySrcType = Facts.nodeOutFacts.groupBy(_.srcNodeType)
+    val outFactSrcTypesSorted = Facts.nodeOutFacts.map(_.srcNodeType).distinct.sorted
 
-    outConstraintSrcTypesSorted.foreach { srcType =>
-      validate(srcType, outConstraintsBySrcType(srcType).map(constraint => new OutDegreeConstraint(constraint)))
+    outFactSrcTypesSorted.foreach { srcType =>
+      validate(srcType, outFactsBySrcType(srcType).map(outFact => new OutDegreeConstraint(outFact)))
     }
-
-    val inConstraintsByDstType = Facts.nodeInFacts.groupBy(_.dstNodeType)
-    val inConstraintDstTypesSorted = Facts.nodeInFacts.map(_.dstNodeType).distinct.sorted
-
-    inConstraintDstTypesSorted.foreach { dstType =>
-      validate(dstType, inConstraintsByDstType(dstType).map(constraint => new InDegreeConstraint(constraint)))
-    }
-
-
-
 
 
 
