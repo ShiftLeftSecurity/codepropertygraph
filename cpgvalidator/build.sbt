@@ -6,7 +6,3 @@ enablePlugins(JavaAppPackaging)
 
 libraryDependencies ++= Seq(
 )
-
-scalacOptions in (Compile, doc) ++= Seq(
-  version.value
-)
