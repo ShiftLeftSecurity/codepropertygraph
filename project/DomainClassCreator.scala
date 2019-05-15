@@ -466,7 +466,7 @@ object DomainClassCreator {
           |/** important: do not used `wrapped` internally in this class, only pass it to VertexRef constructor
           |* this is to ensure it can be managed by the ReferenceManager
           |* */
-          |class ${nodeType.className}Ref(wrapped: ${nodeType.className}) extends VertexRef[${nodeType.className}](wrapped) with ${nodeType.className}Base $propertyBasedTraits with StoredNode {
+          |class ${nodeType.className}Ref(wrapped: ${nodeType.className}) extends VertexRef[${nodeType.className}](wrapped) with ${nodeType.className}Base with StoredNode {
           |$propertyDelegators
           |$delegatingContainedNodeAccessors
           |  override def toMap: Map[String, Any] = get.toMap
@@ -478,7 +478,7 @@ object DomainClassCreator {
       }
 
       val classImpl = s"""
-      trait ${nodeType.className}Base extends Node $mixinTraitsForBase {
+      trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
         def asStored : StoredNode = this.asInstanceOf[StoredNode]
 
         $abstractContainedNodeAccessors
