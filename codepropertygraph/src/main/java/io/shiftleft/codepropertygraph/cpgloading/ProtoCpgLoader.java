@@ -22,8 +22,8 @@ import org.apache.logging.log4j.LogManager;
 public class ProtoCpgLoader {
   private static final Logger logger = LogManager.getLogger(ProtoCpgLoader.class);
 
-  public static Cpg loadFromProtoZip(String filename, Optional<IgnoredProtoEntries> ignoredProtoEntries) {
-    return loadFromProtoZip(filename, Optional.empty(), ignoredProtoEntries);
+  public static Cpg loadFromProtoZip(String filename) {
+    return loadFromProtoZip(filename, Optional.empty());
   }
 
   /**
@@ -32,8 +32,7 @@ public class ProtoCpgLoader {
    **/
   public static Cpg loadFromProtoZip(
     String filename,
-    Optional<OnDiskOverflowConfig> onDiskOverflowConfig,
-    Optional<IgnoredProtoEntries> ignoredProtoEntries) {
+    Optional<OnDiskOverflowConfig> onDiskOverflowConfig) {
     File tempDir = null;
     try {
       tempDir = Files.createTempDirectory("cpg2sp_proto").toFile();
@@ -41,7 +40,7 @@ public class ProtoCpgLoader {
       extractIntoTemporaryDirectory(filename, tempDirPathName);
       long start;
       start = System.currentTimeMillis();
-      Cpg cpg = ProtoCpgLoader.loadFromProtobufDirectory(tempDirPathName, onDiskOverflowConfig, ignoredProtoEntries);
+      Cpg cpg = ProtoCpgLoader.loadFromProtobufDirectory(tempDirPathName, onDiskOverflowConfig);
       logger.info("CPG construction finished in " +
           (System.currentTimeMillis() - start) + "ms.");
 
@@ -117,10 +116,9 @@ public class ProtoCpgLoader {
    **/
   public static Cpg loadFromProtobufDirectory(
     String inputDirectory,
-    Optional<OnDiskOverflowConfig> onDiskOverflowConfig,
-    Optional<IgnoredProtoEntries> ignoredProtoEntries)
+    Optional<OnDiskOverflowConfig> onDiskOverflowConfig)
       throws IOException {
-    ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig, ignoredProtoEntries);
+    ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig);
     for (File file : getFilesInDirectory(new File(inputDirectory))) {
       // TODO: use ".bin" extensions in proto output, and then only
       // load files with ".bin" extension here.
@@ -145,9 +143,8 @@ public class ProtoCpgLoader {
 
   public static Cpg loadFromInputStream(
     InputStream inputStream,
-    Optional<OnDiskOverflowConfig> onDiskOverflowConfig,
-    Optional<IgnoredProtoEntries> ignoredProtoEntries) throws IOException {
-    ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig, ignoredProtoEntries);
+    Optional<OnDiskOverflowConfig> onDiskOverflowConfig) throws IOException {
+    ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig);
     try {
       consumeInputStream(builder, inputStream);
     } finally {
@@ -180,9 +177,8 @@ public class ProtoCpgLoader {
    **/
   public static Cpg loadFromListOfProtos(
     List<CpgStruct> cpgs,
-    Optional<OnDiskOverflowConfig> onDiskOverflowConfig,
-    Optional<IgnoredProtoEntries> ignoredProtoEntries) {
-    ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig, ignoredProtoEntries);
+    Optional<OnDiskOverflowConfig> onDiskOverflowConfig) {
+    ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig);
 
     for (CpgStruct cpgStruct : cpgs)
       builder.addNodes(cpgStruct.getNodeList());

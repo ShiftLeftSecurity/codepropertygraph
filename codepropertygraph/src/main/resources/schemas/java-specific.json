@@ -1,0 +1,80 @@
+{
+    "nodeKeys" : [
+      {"id": 14, "name" : "BINARY_SIGNATURE", "comment" : "Binary type signature", "valueType" : "string", "cardinality" : "zeroOrOne" },
+      {"id": 20, "name" : "CONTENT", "comment" : "Content of CONFIG_FILE node.", "valueType" : "string", "cardinality" : "one"}
+    ],
+
+    "nodeTypes" : [
+
+        // New node types introduced for annotations
+        // This is only intended for Java.
+
+        {"id" : 5, "name" : "ANNOTATION",
+         "keys": ["CODE", "NAME", "FULL_NAME"],
+         "comment" : "A method annotation",
+         "outEdges" : [
+             {"edgeName": "AST", "inNodes": ["ANNOTATION_PARAMETER_ASSIGN"]}
+         ]
+        },
+
+        {"id" : 6, "name" : "ANNOTATION_PARAMETER_ASSIGN",
+         "keys" : ["CODE"],
+         "comment" : "Assignment of annotation argument to annotation parameter",
+         "outEdges" : [
+             {"edgeName": "AST", "inNodes": ["ANNOTATION_PARAMETER", "ARRAY_INITIALIZER", "ANNOTATION_LITERAL", "ANNOTATION"]}
+         ]
+        },
+
+        {"id" : 7, "name" : "ANNOTATION_PARAMETER",
+         "keys" : ["CODE"],
+         "comment" : "Formal annotation parameter",
+         "outEdges": []
+        },
+
+        {"id" : 49, "name" : "ANNOTATION_LITERAL",
+         "keys" : ["CODE", "NAME", "ORDER"],
+         "comment" : "A literal value assigned to an ANNOTATION_PARAMETER.",
+         "outEdges" : [ ]
+        },
+
+        {"name" : "ARRAY_INITIALIZER",
+         "keys" : ["CODE"],
+         "outEdges" : [
+             {"edgeName": "AST", "inNodes": ["LITERAL"]},
+             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+         ]
+        },
+
+        // Modifications to existing node types
+
+        {"name" : "METHOD", "keys" : ["BINARY_SIGNATURE"],
+         "outEdges" : [ {"edgeName": "AST", "inNodes": ["ANNOTATION"]} ]
+        },
+        {
+         "name" : "METHOD_PARAMETER_IN", "keys" : [],
+         "outEdges" : [{"edgeName" : "AST", "inNodes" : ["ANNOTATION"] }]
+        },
+        {
+         "name" : "METHOD_PARAMETER_OUT", "keys" : [],
+         "outEdges" : [{"edgeName" : "AST", "inNodes" : ["ANNOTATION"] }]
+        },
+        {
+         "name" : "TYPE_DECL", "keys" : [],
+         "outEdges" : [{"edgeName" : "AST", "inNodes" : ["ANNOTATION"] }]
+        },
+        {
+         "name" : "MEMBER", "keys" : [],
+         "outEdges" : [{"edgeName" : "AST", "inNodes" : ["ANNOTATION"] }]
+        },
+
+        // Node to store config files.
+        { "id":50,
+          "name": "CONFIG_FILE",
+          "keys": ["NAME", "CONTENT"],
+          "comment": "Configuration file contents. Might be in use by a framework.",
+          "outEdges": []
+        }
+
+
+    ]
+}

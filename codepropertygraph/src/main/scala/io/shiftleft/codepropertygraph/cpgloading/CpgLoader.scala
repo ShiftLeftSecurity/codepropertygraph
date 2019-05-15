@@ -65,7 +65,7 @@ private class CpgLoader {
   def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg = {
     logger.debug("Loading " + filename)
     val cpg =
-      ProtoCpgLoader.loadFromProtoZip(filename, config.onDiskOverflowConfig.asJava, config.ignoredProtoEntries.asJava)
+      ProtoCpgLoader.loadFromProtoZip(filename, config.onDiskOverflowConfig.asJava)
     if (config.createIndices) { createIndexes(cpg) }
     cpg
   }

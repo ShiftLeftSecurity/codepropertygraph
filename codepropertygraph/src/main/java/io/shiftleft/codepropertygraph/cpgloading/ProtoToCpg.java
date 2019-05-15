@@ -22,15 +22,13 @@ public class ProtoToCpg {
   TinkerGraph tinkerGraph;
   private Logger logger = LogManager.getLogger(getClass());
   private NodeFilter nodeFilter = new NodeFilter();
-  public final Optional<IgnoredProtoEntries> ignoredProtoEntries;
 
-  public ProtoToCpg(Optional<IgnoredProtoEntries> ignoredProtoEntries) {
-    this(Optional.empty(), ignoredProtoEntries);
+  public ProtoToCpg() {
+    this(Optional.empty());
   }
 
   public ProtoToCpg(
-    Optional<OnDiskOverflowConfig> onDiskOverflowConfig,
-    Optional<IgnoredProtoEntries> ignoredProtoEntries) {
+    Optional<OnDiskOverflowConfig> onDiskOverflowConfig) {
     Configuration configuration = TinkerGraph.EMPTY_CONFIGURATION();
     onDiskOverflowConfig.ifPresent(config -> {
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, true);
@@ -39,7 +37,6 @@ public class ProtoToCpg {
         configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_ROOT_DIR, config.alternativeParentDirectory().get());
       }
     });
-    this.ignoredProtoEntries = ignoredProtoEntries;
 
     this.tinkerGraph = TinkerGraph.open(
       configuration,
@@ -56,16 +53,9 @@ public class ProtoToCpg {
           keyValues.add(T.id);
           keyValues.add(node.getKey());
           keyValues.add(T.label);
-          if (ignoredProtoEntries.isPresent() && ignoredProtoEntries.get().nodeTypes().contains(node.getTypeValue())) {
-            // only defined for cpg-internal schema, insert an UNKOWN node without properties instead
-            keyValues.add(NodeTypes.UNKNOWN);
-          } else {
-            keyValues.add(node.getType().name());
-            for (Property property: properties) {
-              if (!ignoredProtoEntries.isPresent() || !ignoredProtoEntries.get().nodeKeys().contains(property.getNameValue())) {
-                addProperties(keyValues, property.getName().name(), property.getValue());
-              }
-            }
+          keyValues.add(node.getType().name());
+          for (Property property: properties) {
+            addProperties(keyValues, property.getName().name(), property.getValue());
           }
 
           tinkerGraph.addVertex(keyValues.toArray());

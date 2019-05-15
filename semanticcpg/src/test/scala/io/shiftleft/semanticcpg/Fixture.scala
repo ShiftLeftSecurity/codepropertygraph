@@ -9,8 +9,7 @@ import io.shiftleft.semanticsloader.SemanticsLoader
 import org.apache.tinkerpop.gremlin.structure.Graph
 
 class Fixture(projectName: String) {
-  val loadConfig = CpgLoaderConfig.default.copy(ignoredProtoEntries = IgnoredCpgEntities.forJava2Cpg)
-  val cpg = CpgLoader.load(s"resources/cpgs/$projectName/cpg.bin.zip", loadConfig)
+  val cpg = CpgLoader.load(s"resources/cpgs/$projectName/cpg.bin.zip", CpgLoaderConfig.default)
   new EnhancementRunner().run(cpg, new SerializedCpg())
   new DataFlowRunner(SemanticsLoader.emptySemantics)
   val scalaGraph: ScalaGraph = cpg.graph
