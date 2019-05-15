@@ -33,7 +33,7 @@ class CpgValidator(notEnhancedCpg: Cpg) {
     }
 
     val inConstraintsByDstType = Constraints.inConstraints.groupBy(_.dstNodeType)
-    val inConstraintDstTypesSorted = Constraints.outConstraints.map(_.srcNodeType).distinct.sorted
+    val inConstraintDstTypesSorted = Constraints.inConstraints.map(_.dstNodeType).distinct.sorted
 
     inConstraintDstTypesSorted.foreach { dstType =>
       validate(dstType, inConstraintsByDstType(dstType).map(constraint => new InConstraintValidator(constraint)))
