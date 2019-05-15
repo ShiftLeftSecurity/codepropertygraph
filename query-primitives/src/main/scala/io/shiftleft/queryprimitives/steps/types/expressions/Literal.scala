@@ -12,12 +12,12 @@ import shapeless.HList
 /**
   A literal, e.g., a constant string or number
   */
-class Literal[Labels <: HList](raw: GremlinScala.Aux[nodes.Literal, Labels])
-    extends NodeSteps[nodes.Literal, Labels](raw)
-    with ExpressionBase[nodes.Literal, Labels]
-    with CodeAccessors[nodes.Literal, Labels]
-    with LineNumberAccessors[nodes.Literal, Labels]
-    with EvalTypeAccessors[nodes.Literal, Labels] {
+class Literal[Labels <: HList](raw: GremlinScala.Aux[nodes.LiteralRef, Labels])
+    extends NodeSteps[nodes.LiteralRef, Labels](raw)
+    with ExpressionBase[nodes.LiteralRef, Labels]
+    with CodeAccessors[nodes.LiteralRef, Labels]
+    with LineNumberAccessors[nodes.LiteralRef, Labels]
+    with EvalTypeAccessors[nodes.LiteralRef, Labels] {
 
   /**
     * Traverse to method hosting this literal
@@ -28,6 +28,6 @@ class Literal[Labels <: HList](raw: GremlinScala.Aux[nodes.Literal, Labels])
         .cast[nodes.StoredNode]
         .repeat(_.in(EdgeTypes.AST).cast[nodes.StoredNode])
         .until(_.hasLabel(NodeTypes.METHOD))
-        .cast[nodes.Method])
+        .cast[nodes.MethodRef])
 
 }

@@ -30,7 +30,7 @@ object ExpandTo {
     val parent = argument.vertices(Direction.IN, EdgeTypes.AST).nextChecked
 
     parent match {
-      case call: nodes.Call
+      case call: nodes.CallRef
           if call.name == Operators.memberAccess ||
             call.name == Operators.indirectMemberAccess ||
             call.name == Operators.computedMemberAccess ||
@@ -62,7 +62,7 @@ object ExpandTo {
     method
       .vertices(Direction.OUT, EdgeTypes.AST)
       .asScala
-      .filter(_.isInstanceOf[nodes.MethodReturn])
+      .filter(_.isInstanceOf[nodes.MethodReturnRef])
       .asJava
       .nextChecked
   }
@@ -71,7 +71,7 @@ object ExpandTo {
     methodReturn
       .vertices(Direction.IN, EdgeTypes.CFG)
       .asScala
-      .filter(_.isInstanceOf[nodes.Return])
+      .filter(_.isInstanceOf[nodes.ReturnRef])
       .toSeq
   }
 
@@ -89,24 +89,24 @@ object ExpandTo {
       .asScala
       .exists(astChild =>
         astChild.label == NodeTypes.MODIFIER &&
-          astChild.asInstanceOf[nodes.Modifier].modifierType == modifierType)
+          astChild.asInstanceOf[nodes.ModifierRef].modifierType == modifierType)
   }
 
   def astParent(expression: Vertex): Vertex = {
     expression.vertices(Direction.IN, EdgeTypes.AST).nextChecked
   }
 
-  def callToCalledMethod(call: Vertex): Seq[nodes.Method] = {
+  def callToCalledMethod(call: Vertex): Seq[nodes.MethodRef] = {
     call
       .vertices(Direction.OUT, EdgeTypes.CALL)
       .asScala
-      .map(methodInst => methodInst.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method])
+      .map(methodInst => methodInst.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.MethodRef])
       .toSeq
   }
 
   def methodToTypeDecl(method: Vertex): Option[Vertex] = {
     var typeDeclOption = method.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
-    while (typeDeclOption.isDefined && !typeDeclOption.get.isInstanceOf[nodes.TypeDecl]) {
+    while (typeDeclOption.isDefined && !typeDeclOption.get.isInstanceOf[nodes.TypeDeclRef]) {
       typeDeclOption = typeDeclOption.get.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
     }
     typeDeclOption
@@ -114,7 +114,7 @@ object ExpandTo {
 
   def methodToFile(method: Vertex): Option[Vertex] = {
     var fileOption = method.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
-    while (fileOption.isDefined && !fileOption.get.isInstanceOf[nodes.File]) {
+    while (fileOption.isDefined && !fileOption.get.isInstanceOf[nodes.FileRef]) {
       fileOption = fileOption.get.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
     }
     fileOption
@@ -124,7 +124,7 @@ object ExpandTo {
     method
       .vertices(Direction.OUT, EdgeTypes.AST)
       .asScala
-      .filter(_.isInstanceOf[nodes.MethodParameterOut])
+      .filter(_.isInstanceOf[nodes.MethodParameterOutRef])
       .toSeq
   }
 

@@ -24,7 +24,7 @@ class NamespaceCreator(graph: ScalaGraph) extends CpgPass(graph) {
         val namespace = new nodes.NewNamespace(name)
         dstGraph.addNode(namespace)
         blocks.foreach {
-          case block: nodes.NamespaceBlock =>
+          case block: nodes.NamespaceBlockRef =>
             dstGraph.addEdgeFromOriginal(block, namespace, EdgeTypes.REF)
         }
     }

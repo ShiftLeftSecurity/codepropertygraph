@@ -14,18 +14,18 @@ import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{
 }
 import shapeless.HList
 
-class MethodReturn[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodReturn, Labels])
-    extends NodeSteps[nodes.MethodReturn, Labels](raw)
-    with CodeAccessors[nodes.MethodReturn, Labels]
-    with LineNumberAccessors[nodes.MethodReturn, Labels]
-    with EvalTypeAccessors[nodes.MethodReturn, Labels] {
+class MethodReturn[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodReturnRef, Labels])
+    extends NodeSteps[nodes.MethodReturnRef, Labels](raw)
+    with CodeAccessors[nodes.MethodReturnRef, Labels]
+    with LineNumberAccessors[nodes.MethodReturnRef, Labels]
+    with EvalTypeAccessors[nodes.MethodReturnRef, Labels] {
 
   def method: Method[Labels] =
-    new Method[Labels](raw.in(EdgeTypes.AST).cast[nodes.Method])
+    new Method[Labels](raw.in(EdgeTypes.AST).cast[nodes.MethodRef])
 
   def returnUser: Call[Labels] = {
     new Call[Labels](
-      raw.in(EdgeTypes.AST).in(EdgeTypes.REF).in(EdgeTypes.CALL).cast[nodes.Call]
+      raw.in(EdgeTypes.AST).in(EdgeTypes.REF).in(EdgeTypes.CALL).cast[nodes.CallRef]
     )
   }
 
@@ -42,5 +42,5 @@ class MethodReturn[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodReturn, La
     * Traverse to return type
     * */
   def typ: Type[Labels] =
-    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.TypeRef])
 }

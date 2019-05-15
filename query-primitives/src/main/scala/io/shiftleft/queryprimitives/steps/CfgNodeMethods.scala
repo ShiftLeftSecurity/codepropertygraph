@@ -15,11 +15,11 @@ private object CfgNodeToCode extends NodeVisitor[String] with ExpressionGenerali
     node.code
   }
 
-  override def visit(node: nodes.Method): String = {
+  override def visit(node: nodes.MethodRef): String = {
     node.name
   }
 
-  override def visit(node: nodes.MethodReturn): String = {
+  override def visit(node: nodes.MethodReturnRef): String = {
     node.code
   }
 }

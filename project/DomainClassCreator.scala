@@ -176,7 +176,7 @@ object DomainClassCreator {
       import scala.collection.JavaConverters._
 
       trait Node extends gremlin.scala.dsl.DomainRoot {
-        def accept[T](visitor: NodeVisitor[T]): T
+        def accept[T](visitor: NodeVisitor[T]): T = ???
       }
 
 
@@ -262,7 +262,7 @@ object DomainClassCreator {
       val nodeTypes = (Resources.cpgJson \ "nodeTypes").as[List[NodeType]]
 
       nodeTypes.map { nodeType =>
-        s"def visit(node: ${nodeType.className}): T = ???"
+        s"def visit(node: ${nodeType.className}Ref): T = ???"
       }.mkString("\n")
     }
 
@@ -466,11 +466,13 @@ object DomainClassCreator {
           |/** important: do not used `wrapped` internally in this class, only pass it to VertexRef constructor
           |* this is to ensure it can be managed by the ReferenceManager
           |* */
-          |class ${nodeType.className}Ref(wrapped: ${nodeType.className}) extends VertexRef[${nodeType.className}](wrapped) with ${nodeType.className}Base with StoredNode {
+          |class ${nodeType.className}Ref(wrapped: ${nodeType.className}) extends VertexRef[${nodeType.className}](wrapped) with ${nodeType.className}Base with StoredNode $mixinTraits {
           |$propertyDelegators
           |$delegatingContainedNodeAccessors
+          |  override def accept[T](visitor: NodeVisitor[T]): T = {
+          |    visitor.visit(this)
+          |  }
           |  override def toMap: Map[String, Any] = get.toMap
-          |  override def accept[T](visitor: NodeVisitor[T]): T = get.accept(visitor)
           |  override val productArity = get.productArity
           |  override def productElement(n: Int): Any = wrapped.productElement(n)
           |  override def canEqual(that: Any): Boolean = get.canEqual(that)
@@ -492,10 +494,6 @@ object DomainClassCreator {
         override def specificKeys() = ${nodeType.className}.Keys.All
 
         override def toMap: Map[String, Any] = $toMap
-
-        override def accept[T](visitor: NodeVisitor[T]): T = {
-          visitor.visit(this)
-        }
 
         ${propertyBasedFields(keys)}
 

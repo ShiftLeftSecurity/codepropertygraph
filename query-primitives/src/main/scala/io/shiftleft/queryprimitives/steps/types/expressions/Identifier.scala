@@ -13,14 +13,14 @@ import shapeless.HList
 /**
   An identifier, e.g., an instance of a local variable, or a temporary variable
   */
-class Identifier[Labels <: HList](raw: GremlinScala.Aux[nodes.Identifier, Labels])
-    extends NodeSteps[nodes.Identifier, Labels](raw)
-    with ExpressionBase[nodes.Identifier, Labels]
-    with CodeAccessors[nodes.Identifier, Labels]
-    with NameAccessors[nodes.Identifier, Labels]
-    with OrderAccessors[nodes.Identifier, Labels]
-    with LineNumberAccessors[nodes.Identifier, Labels]
-    with EvalTypeAccessors[nodes.Identifier, Labels] {
+class Identifier[Labels <: HList](raw: GremlinScala.Aux[nodes.IdentifierRef, Labels])
+    extends NodeSteps[nodes.IdentifierRef, Labels](raw)
+    with ExpressionBase[nodes.IdentifierRef, Labels]
+    with CodeAccessors[nodes.IdentifierRef, Labels]
+    with NameAccessors[nodes.IdentifierRef, Labels]
+    with OrderAccessors[nodes.IdentifierRef, Labels]
+    with LineNumberAccessors[nodes.IdentifierRef, Labels]
+    with EvalTypeAccessors[nodes.IdentifierRef, Labels] {
 
   /**
     * Traverse to all declarations of this identifier

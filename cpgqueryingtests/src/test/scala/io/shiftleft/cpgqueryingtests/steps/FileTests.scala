@@ -9,13 +9,13 @@ class FileTests extends WordSpec with Matchers {
 
   "generic cpg" should {
     "find file io/shiftleft/testcode/file/FileTest" in {
-      val queryResult: List[nodes.File] = fixture.cpg.file.toList
+      val queryResult: List[nodes.FileRef] = fixture.cpg.file.toList
 
       queryResult.map(_.name) should contain("io/shiftleft/testcode/file/FileTest.java")
     }
 
     "be able to expand to class FileTest" in {
-      val queryResult: List[nodes.TypeDecl] =
+      val queryResult: List[nodes.TypeDeclRef] =
         fixture.cpg.file.name("io/shiftleft/testcode/file/FileTest.java").typeDecl.toList
 
       queryResult.size shouldBe 1
@@ -23,7 +23,7 @@ class FileTests extends WordSpec with Matchers {
     }
 
     "be able to expand to namespace" in {
-      val queryResult: List[nodes.Namespace] =
+      val queryResult: List[nodes.NamespaceRef] =
         fixture.cpg.file.name("io/shiftleft/testcode/file/FileTest.java").namespace.toList
 
       queryResult.size shouldBe 1
@@ -31,7 +31,7 @@ class FileTests extends WordSpec with Matchers {
     }
 
     "be able to get file in which a formal method return is defined" in {
-      val queryResult: List[nodes.File] =
+      val queryResult: List[nodes.FileRef] =
         fixture.cpg.method.name("method").methodReturn.file.toList
 
       queryResult.size shouldBe 1

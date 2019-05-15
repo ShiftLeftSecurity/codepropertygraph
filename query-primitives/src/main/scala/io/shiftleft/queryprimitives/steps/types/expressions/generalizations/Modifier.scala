@@ -9,8 +9,8 @@ import shapeless.HList
 /**
   * Modifier, e.g., "static", "public",
   * */
-class Modifier[Labels <: HList](raw: GremlinScala.Aux[nodes.Modifier, Labels])
-    extends NodeSteps[nodes.Modifier, Labels](raw) {
+class Modifier[Labels <: HList](raw: GremlinScala.Aux[nodes.ModifierRef, Labels])
+    extends NodeSteps[nodes.ModifierRef, Labels](raw) {
 
   def code(): Steps[String, Labels] =
     new Steps[String, Labels](raw.value(NodeKeys.CODE))

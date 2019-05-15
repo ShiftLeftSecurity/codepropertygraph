@@ -10,9 +10,9 @@ import shapeless.HList
 /**
   * A source file
   * */
-class File[Labels <: HList](raw: GremlinScala.Aux[nodes.File, Labels])
-    extends NodeSteps[nodes.File, Labels](raw)
-    with NameAccessors[nodes.File, Labels] {
+class File[Labels <: HList](raw: GremlinScala.Aux[nodes.FileRef, Labels])
+    extends NodeSteps[nodes.FileRef, Labels](raw)
+    with NameAccessors[nodes.FileRef, Labels] {
 
   def typeDecl: TypeDecl[Labels] =
     new TypeDecl[Labels](
@@ -20,11 +20,11 @@ class File[Labels <: HList](raw: GremlinScala.Aux[nodes.File, Labels])
         .out(EdgeTypes.AST)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.TYPE_DECL)
-        .cast[nodes.TypeDecl])
+        .cast[nodes.TypeDeclRef])
 
   def namespace: Namespace[Labels] =
-    new Namespace[Labels](raw.out(EdgeTypes.AST).out(EdgeTypes.REF).cast[nodes.Namespace])
+    new Namespace[Labels](raw.out(EdgeTypes.AST).out(EdgeTypes.REF).cast[nodes.NamespaceRef])
 
   def namespaceBlock: NamespaceBlock[Labels] =
-    new NamespaceBlock[Labels](raw.out(EdgeTypes.AST).cast[nodes.NamespaceBlock])
+    new NamespaceBlock[Labels](raw.out(EdgeTypes.AST).cast[nodes.NamespaceBlockRef])
 }

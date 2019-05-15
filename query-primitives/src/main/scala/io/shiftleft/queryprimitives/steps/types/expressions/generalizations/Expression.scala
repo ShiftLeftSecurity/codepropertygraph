@@ -30,19 +30,19 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
     Cast to literal if applicable
     */
   def literal: Literal[Labels] =
-    new Literal[Labels](raw.hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
+    new Literal[Labels](raw.hasLabel(NodeTypes.LITERAL).cast[nodes.LiteralRef])
 
   /**
     Cast to identifier, if applicable
     */
   def identifier: Identifier[Labels] =
-    new Identifier[Labels](raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
+    new Identifier[Labels](raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.IdentifierRef])
 
   /**
     Cast to call if applicable
     */
   def call: Call[Labels] =
-    new Call[Labels](raw.hasLabel(NodeTypes.CALL).cast[nodes.Call])
+    new Call[Labels](raw.hasLabel(NodeTypes.CALL).cast[nodes.CallRef])
 
   /**
    Cast to call if applicable and filter for callee fullName `calleeRegex`
@@ -73,7 +73,7 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
     new Call[Labels](
       raw
         .in(EdgeTypes.RECEIVER)
-        .cast[nodes.Call]
+        .cast[nodes.CallRef]
     )
 
   /**
@@ -92,7 +92,7 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
           val parameterIndex = traverser.sack[Integer]
           traverser.get.value2(NodeKeys.ORDER) == parameterIndex
         }
-        .cast[nodes.MethodParameterIn]
+        .cast[nodes.MethodParameterInRef]
     )
   }
 
@@ -100,7 +100,7 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
     Traverse to enclosing method
     */
   def method: Method[Labels] =
-    new Method[Labels](raw.in(EdgeTypes.CONTAINS).cast[nodes.Method])
+    new Method[Labels](raw.in(EdgeTypes.CONTAINS).cast[nodes.MethodRef])
 
   /**
     * Traverse to next expression in CFG.
@@ -128,5 +128,5 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
     * Traverse to expression evaluation type
     * */
   def typ: Type[Labels] =
-    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.TypeRef])
 }

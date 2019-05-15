@@ -12,14 +12,14 @@ import shapeless.HList
 /**
   * A local variable
   * */
-class Local[Labels <: HList](raw: GremlinScala.Aux[nodes.Local, Labels])
-    extends NodeSteps[nodes.Local, Labels](raw)
-    with DeclarationBase[nodes.Local, Labels]
-    with CodeAccessors[nodes.Local, Labels]
-    with NameAccessors[nodes.Local, Labels]
-    with OrderAccessors[nodes.Local, Labels]
-    with LineNumberAccessors[nodes.Local, Labels]
-    with EvalTypeAccessors[nodes.Local, Labels] {
+class Local[Labels <: HList](raw: GremlinScala.Aux[nodes.LocalRef, Labels])
+    extends NodeSteps[nodes.LocalRef, Labels](raw)
+    with DeclarationBase[nodes.LocalRef, Labels]
+    with CodeAccessors[nodes.LocalRef, Labels]
+    with NameAccessors[nodes.LocalRef, Labels]
+    with OrderAccessors[nodes.LocalRef, Labels]
+    with LineNumberAccessors[nodes.LocalRef, Labels]
+    with EvalTypeAccessors[nodes.LocalRef, Labels] {
 
   /**
     * The method hosting this local variable
@@ -27,7 +27,7 @@ class Local[Labels <: HList](raw: GremlinScala.Aux[nodes.Local, Labels])
   def method: Method[Labels] = {
     // TODO The following line of code is here for backwards compatibility.
     // Use the lower commented out line once not required anymore.
-    new Method[Labels](raw.repeat(_.in(EdgeTypes.AST)).until(_.hasLabel(NodeTypes.METHOD)).cast[nodes.Method])
+    new Method[Labels](raw.repeat(_.in(EdgeTypes.AST)).until(_.hasLabel(NodeTypes.METHOD)).cast[nodes.MethodRef])
     //definingBlock.method
   }
 
@@ -35,13 +35,13 @@ class Local[Labels <: HList](raw: GremlinScala.Aux[nodes.Local, Labels])
     * The block in which local is declared.
     */
   def definingBlock: Block[Labels] =
-    new Block[Labels](raw.in(EdgeTypes.AST).cast[nodes.Block])
+    new Block[Labels](raw.in(EdgeTypes.AST).cast[nodes.BlockRef])
 
   /**
     * Places (identifier) where this local is referenced
     * */
   def referencingIdentifiers: Identifier[Labels] =
-    new Identifier[Labels](raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
+    new Identifier[Labels](raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.IdentifierRef])
 
   /**
     * The type of the local.
@@ -49,5 +49,5 @@ class Local[Labels <: HList](raw: GremlinScala.Aux[nodes.Local, Labels])
     * Unfortunately, `type` is a keyword, so we use `typ` here.
     * */
   def typ: Type[Labels] =
-    new Type[Labels](raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+    new Type[Labels](raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.TypeRef])
 }

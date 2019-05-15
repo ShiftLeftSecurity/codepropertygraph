@@ -8,13 +8,13 @@ import io.shiftleft.passes.CpgPass
 class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
 
   override def run(): Stream[DiffGraph] = {
-    var idToClosureBinding = Map[String, nodes.ClosureBinding]()
+    var idToClosureBinding = Map[String, nodes.ClosureBindingRef]()
     val dstGraph = new DiffGraph
 
     graph.V
       .hasLabel(NodeTypes.CLOSURE_BINDING)
       .sideEffect {
-        case closureBinding: nodes.ClosureBinding =>
+        case closureBinding: nodes.ClosureBindingRef =>
           idToClosureBinding += ((closureBinding.closureBindingId.get, closureBinding))
       }
       .iterate()
@@ -22,7 +22,7 @@ class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
     graph.V
       .hasLabel(NodeTypes.LOCAL)
       .sideEffect {
-        case local: nodes.Local =>
+        case local: nodes.LocalRef =>
           local.closureBindingId.foreach { closureBindingId =>
             idToClosureBinding.get(closureBindingId) match {
               case Some(closureBindingNode) =>

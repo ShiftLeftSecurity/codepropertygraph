@@ -17,12 +17,12 @@ class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
     graph.V
       .hasLabel(NodeTypes.TYPE)
       .sideEffectWithTraverser { traverser =>
-        val typ = traverser.get.asInstanceOf[nodes.Type]
-        typeDeclFullNameToNode.get(typ.fullName()) match {
+        val typ = traverser.get.asInstanceOf[nodes.TypeRef]
+        typeDeclFullNameToNode.get(typ.fullName) match {
           case Some(_) =>
           case None =>
-            val newTypeDecl = createTypeDeclStub(typ.name, typ.fullName())
-            typeDeclFullNameToNode += typ.fullName() -> newTypeDecl
+            val newTypeDecl = createTypeDeclStub(typ.name, typ.fullName)
+            typeDeclFullNameToNode += typ.fullName -> newTypeDecl
             dstGraph.addNode(newTypeDecl)
         }
       }
@@ -45,7 +45,7 @@ class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
   private def init(): Unit = {
     val cpg = Cpg(graph.graph)
     cpg.typeDecl.sideEffect { typeDecl =>
-      typeDeclFullNameToNode += typeDecl.fullName() -> typeDecl
+      typeDeclFullNameToNode += typeDecl.fullName -> typeDecl
     }
   }
 }

@@ -38,13 +38,18 @@ class MethodDecoratorPass(graph: ScalaGraph) extends CpgPass(graph) {
             parameterIn.columnNumberEnd
           )
 
+          println("X000 " + parameterIn)
+          println("X001 " + parameterIn.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
+          println("X002 " + parameterIn.vertices(Direction.IN, EdgeTypes.AST).nextChecked.getClass)
+
+
           val method =
-            parameterIn.vertices(Direction.IN, EdgeTypes.AST).nextChecked.asInstanceOf[nodes.Method]
+            parameterIn.vertices(Direction.IN, EdgeTypes.AST).nextChecked.asInstanceOf[nodes.MethodRef]
           if (parameterIn.typeFullName == null) {
             val evalType = parameterIn
               .vertices(Direction.OUT, EdgeTypes.EVAL_TYPE)
               .nextChecked
-              .asInstanceOf[nodes.Type]
+              .asInstanceOf[nodes.TypeRef]
             dstGraph.addEdgeToOriginal(parameterOut, evalType, EdgeTypes.EVAL_TYPE)
             if (!MethodDecoratorPass.loggedMissingTypeFullName) {
               logger.warn("Using deprecated CPG format with missing TYPE_FULL_NAME on METHOD_PARAMETER_IN nodes.")

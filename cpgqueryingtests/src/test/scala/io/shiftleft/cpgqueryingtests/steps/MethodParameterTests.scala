@@ -11,7 +11,7 @@ class MethodParameterTests extends WordSpec with Matchers {
 
     "find parameters" when {
       "asking for all parameters" in {
-        val args: List[nodes.MethodParameterIn] =
+        val args: List[nodes.MethodParameterInRef] =
           fixture.cpg.method.name("manyArgs").parameter.toList
 
         args.size shouldBe 4
@@ -20,7 +20,7 @@ class MethodParameterTests extends WordSpec with Matchers {
       }
 
       "filtering by name" in {
-        val queryResult: List[nodes.MethodParameterIn] =
+        val queryResult: List[nodes.MethodParameterInRef] =
           fixture.cpg.method.parameter.name(".*").toList
 
         queryResult.size should be > 1
@@ -28,7 +28,7 @@ class MethodParameterTests extends WordSpec with Matchers {
 
       "finding parameter by index" when {
         "specifying number" in {
-          val args: List[nodes.MethodParameterIn] =
+          val args: List[nodes.MethodParameterInRef] =
             fixture.cpg.method.name("manyArgs").parameter.index(num = 1).toList
 
           args.size shouldBe 1
@@ -36,7 +36,7 @@ class MethodParameterTests extends WordSpec with Matchers {
         }
 
         "specifying index >= x" in {
-          val args: List[nodes.MethodParameterIn] =
+          val args: List[nodes.MethodParameterInRef] =
             fixture.cpg.method.name("manyArgs").parameter.indexFrom(2).toList
 
           args.map(_.start.typ.head.fullName).toSet shouldBe Set("java.lang.Integer",
@@ -45,7 +45,7 @@ class MethodParameterTests extends WordSpec with Matchers {
         }
 
         "specifying index <= x" in {
-          val args: List[nodes.MethodParameterIn] =
+          val args: List[nodes.MethodParameterInRef] =
             fixture.cpg.method.name("manyArgs").parameter.indexTo(2).toList
 
           args.map(_.start.typ.head.fullName).toSet shouldBe Set("java.lang.String", "java.lang.Integer")
@@ -54,7 +54,7 @@ class MethodParameterTests extends WordSpec with Matchers {
     }
 
     "find method that a MethodParameter belongs to" in {
-      val methods: List[nodes.Method] =
+      val methods: List[nodes.MethodRef] =
         fixture.cpg.method.name("manyArgs").parameter.index(num = 1).method.toList
 
       methods.size shouldBe 1

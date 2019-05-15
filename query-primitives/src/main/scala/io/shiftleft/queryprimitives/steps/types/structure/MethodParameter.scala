@@ -12,14 +12,14 @@ import shapeless.HList
 /**
   * Formal method input parameter
   * */
-class MethodParameter[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodParameterIn, Labels])
-    extends NodeSteps[nodes.MethodParameterIn, Labels](raw)
-    with DeclarationBase[nodes.MethodParameterIn, Labels]
-    with CodeAccessors[nodes.MethodParameterIn, Labels]
-    with NameAccessors[nodes.MethodParameterIn, Labels]
-    with OrderAccessors[nodes.MethodParameterIn, Labels]
-    with LineNumberAccessors[nodes.MethodParameterIn, Labels]
-    with EvalTypeAccessors[nodes.MethodParameterIn, Labels] {
+class MethodParameter[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodParameterInRef, Labels])
+    extends NodeSteps[nodes.MethodParameterInRef, Labels](raw)
+    with DeclarationBase[nodes.MethodParameterInRef, Labels]
+    with CodeAccessors[nodes.MethodParameterInRef, Labels]
+    with NameAccessors[nodes.MethodParameterInRef, Labels]
+    with OrderAccessors[nodes.MethodParameterInRef, Labels]
+    with LineNumberAccessors[nodes.MethodParameterInRef, Labels]
+    with EvalTypeAccessors[nodes.MethodParameterInRef, Labels] {
 
   /**
     * Traverse to all `num`th parameters
@@ -47,7 +47,7 @@ class MethodParameter[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodParamet
     * Traverse to method associated with this formal parameter
     * */
   def method: Method[Labels] =
-    new Method[Labels](raw.in(EdgeTypes.AST).cast[nodes.Method])
+    new Method[Labels](raw.in(EdgeTypes.AST).cast[nodes.MethodRef])
 
   /**
     * Traverse to arguments (actual parameters) associated with this formal parameter
@@ -55,7 +55,7 @@ class MethodParameter[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodParamet
   def argument() = {
     new Expression[Labels](
       raw
-        .sack((sack: Integer, node: nodes.MethodParameterIn) => node.value2(NodeKeys.ORDER))
+        .sack((sack: Integer, node: nodes.MethodParameterInRef) => node.value2(NodeKeys.ORDER))
         .in(EdgeTypes.AST)
         .in(EdgeTypes.REF)
         .in(EdgeTypes.CALL)
@@ -72,12 +72,12 @@ class MethodParameter[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodParamet
     * Traverse to corresponding formal output parameter
     * */
   def asOutput: MethodParameterOut[Labels] =
-    new MethodParameterOut[Labels](raw.out(EdgeTypes.PARAMETER_LINK).cast[nodes.MethodParameterOut])
+    new MethodParameterOut[Labels](raw.out(EdgeTypes.PARAMETER_LINK).cast[nodes.MethodParameterOutRef])
 
   /**
     * Traverse to parameter type
     * */
   def typ: Type[Labels] =
-    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.TypeRef])
 
 }
