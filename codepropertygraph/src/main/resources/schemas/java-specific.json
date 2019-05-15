@@ -1,6 +1,7 @@
 {
     "nodeKeys" : [
-      {"id": 14, "name" : "BINARY_SIGNATURE", "comment" : "Binary type signature", "valueType" : "string", "cardinality" : "zeroOrOne" }
+      {"id": 14, "name" : "BINARY_SIGNATURE", "comment" : "Binary type signature", "valueType" : "string", "cardinality" : "zeroOrOne" },
+      {"id": 20, "name" : "CONTENT", "comment" : "Content of CONFIG_FILE node.", "valueType" : "string", "cardinality" : "one"}
     ],
 
     "nodeTypes" : [
@@ -64,7 +65,16 @@
         {
          "name" : "MEMBER", "keys" : [],
          "outEdges" : [{"edgeName" : "AST", "inNodes" : ["ANNOTATION"] }]
+        },
+
+        // Node to store config files.
+        { "id":50,
+          "name": "CONFIG_FILE",
+          "keys": ["NAME", "CONTENT"],
+          "comment": "Configuration file contents. Might be in use by a framework.",
+          "outEdges": []
         }
+
 
     ]
 }
