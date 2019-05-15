@@ -25,15 +25,15 @@ class CpgValidator(notEnhancedCpg: Cpg) {
   }
 
   def validate(): Boolean = {
-    val outConstraintsBySrcType = Constraints.outConstraints.groupBy(_.srcNodeType)
-    val outConstraintSrcTypesSorted = Constraints.outConstraints.map(_.srcNodeType).distinct.sorted
+    val outConstraintsBySrcType = Facts.nodeOutFacts.groupBy(_.srcNodeType)
+    val outConstraintSrcTypesSorted = Facts.nodeOutFacts.map(_.srcNodeType).distinct.sorted
 
     outConstraintSrcTypesSorted.foreach { srcType =>
       validate(srcType, outConstraintsBySrcType(srcType).map(constraint => new OutConstraintValidator(constraint)))
     }
 
-    val inConstraintsByDstType = Constraints.inConstraints.groupBy(_.dstNodeType)
-    val inConstraintDstTypesSorted = Constraints.inConstraints.map(_.dstNodeType).distinct.sorted
+    val inConstraintsByDstType = Facts.nodeInFacts.groupBy(_.dstNodeType)
+    val inConstraintDstTypesSorted = Facts.nodeInFacts.map(_.dstNodeType).distinct.sorted
 
     inConstraintDstTypesSorted.foreach { dstType =>
       validate(dstType, inConstraintsByDstType(dstType).map(constraint => new InConstraintValidator(constraint)))
@@ -45,7 +45,7 @@ class CpgValidator(notEnhancedCpg: Cpg) {
 
 
     val outConstraintsBySrcNodeAndEdgeType =
-      Constraints.outConstraints.groupBy(outConstraint => (outConstraint.srcNodeType, outConstraint.edgeType))
+      Facts.nodeOutFacts.groupBy(outConstraint => (outConstraint.srcNodeType, outConstraint.edgeType))
         .toList
 
     val allowedDstNodesForSrcEdgeTypePair =

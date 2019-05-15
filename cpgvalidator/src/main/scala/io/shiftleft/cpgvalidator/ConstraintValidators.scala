@@ -1,7 +1,7 @@
 package io.shiftleft.cpgvalidator
 
 import gremlin.scala.Vertex
-import io.shiftleft.cpgvalidator.ConstraintClasses.{InConstraint, OutConstraint}
+import io.shiftleft.cpgvalidator.FactConstructionClasses.{InFact, OutFact}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
@@ -13,23 +13,23 @@ object ConstraintValidators {
   sealed trait ValidationError extends ValidationResult
 
   case class ValidationOutDegreeError(srcNode: Vertex,
-                                      outConstraint: OutConstraint,
+                                      outConstraint: OutFact,
                                       invalidDegree: Int) extends ValidationError
   case class ValidationInDegreeError(dstNode: Vertex,
-                                     inConstraint: InConstraint,
+                                     inConstraint: InFact,
                                      invalidDegree: Int) extends ValidationError
   case class ValidationDstNodeError(srcNode: Vertex,
-                                    outConstraint: OutConstraint,
+                                    outConstraint: OutFact,
                                     invalidDstNodes: List[Vertex]) extends ValidationError
   case class ValidationSrcNodeError(dstNode: Vertex,
-                                    inConstraint: InConstraint,
+                                    inConstraint: InFact,
                                     invalidSrcNodes: List[Vertex]) extends ValidationError
 
   trait ConstraintValidator {
     def validate(node: Vertex): ValidationResult
   }
 
-  class OutConstraintValidator(outConstraint: OutConstraint) extends ConstraintValidator {
+  class OutConstraintValidator(outConstraint: OutFact) extends ConstraintValidator {
     def validate(node: Vertex): ValidationResult = {
       val actualDstNodes = node.vertices(Direction.OUT, outConstraint.edgeType).asScala
         .filter(dstNode => outConstraint.dstNodeTypes.contains(dstNode.label))
@@ -44,7 +44,7 @@ object ConstraintValidators {
     }
   }
 
-  class InConstraintValidator(inConstraint: InConstraint) extends ConstraintValidator {
+  class InConstraintValidator(inConstraint: InFact) extends ConstraintValidator {
     def validate(node: Vertex): ValidationResult = {
       val actualSrcNodes = node.vertices(Direction.IN, inConstraint.edgeType).asScala
         .filter(srcNode => inConstraint.srcNodeTypes.contains(srcNode.label))
