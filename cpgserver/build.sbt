@@ -1,7 +1,6 @@
 val ScalatraVersion = "2.6.5"
 organization := "io.shiftleft"
 name := "CPG server"
-version := "0.1.0-SNAPSHOT"
 
 resolvers += Classpaths.typesafeReleases
 
