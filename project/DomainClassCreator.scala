@@ -147,6 +147,8 @@ object DomainClassCreator {
   }
 
   def writeNodesFile(outputDir: JFile): JFile = {
+    val baseTraits = (Resources.cpgJson \ "nodeBaseTraits").as[List[NodeBaseTrait]]
+
     val propertyByName: Map[String, Property] =
       (Resources.cpgJson \ "nodeKeys")
         .as[List[Property]]
@@ -269,8 +271,6 @@ object DomainClassCreator {
     }
 
     def generateBaseTraitVisitorMethods() = {
-      val baseTraits = (Resources.cpgJson \ "nodeBaseTraits").as[List[NodeBaseTrait]]
-
       baseTraits.map { nodeBaseTrait: NodeBaseTrait =>
         s"def visit(node: ${nodeBaseTrait.className}): T = ???"
       }.mkString("\n")
@@ -378,7 +378,13 @@ object DomainClassCreator {
         nodeType.containedNodes
           .map {
             _.map { containedNode =>
-              val containedNodeType = containedNode.nodeTypeClassName
+              val containedNodeType = {
+                if (isNodeBaseTrait(baseTraits, containedNode.nodeType)) {
+                  containedNode.nodeTypeClassName
+                } else {
+                  containedNode.nodeTypeClassName + "Ref"
+                }
+              }
               val cardinality = Cardinality.fromName(containedNode.cardinality)
               val completeType = cardinality match {
                 case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
@@ -426,6 +432,7 @@ object DomainClassCreator {
       val abstractContainedNodeAccessors = nodeType.containedNodes
         .map {
           _.map { containedNode =>
+              // TODO: remove duplication of handling of containedNodes
             val containedNodeType = if (containedNode.nodeType != "NODE") {
               containedNode.nodeTypeClassName + "Base"
             } else {
@@ -444,16 +451,6 @@ object DomainClassCreator {
       val delegatingContainedNodeAccessors = nodeType.containedNodes
         .map {
           _.map { containedNode =>
-            val containedNodeType = if (containedNode.nodeType != "NODE") {
-              containedNode.nodeTypeClassName + "Base"
-            } else {
-              containedNode.nodeTypeClassName
-            }
-            val completeType = Cardinality.fromName(containedNode.cardinality) match {
-              case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
-              case Cardinality.One       => containedNodeType
-              case Cardinality.List      => s"List[$containedNodeType]"
-            }
             s"""def ${containedNode.localName} = get().${containedNode.localName}"""
           }.mkString("\n")
         }
@@ -778,6 +775,9 @@ object HigherValueType extends Enumeration {
 }
 
 object Utils {
+
+  def isNodeBaseTrait(baseTraits: List[NodeBaseTrait], nodeName: String): Boolean = 
+    nodeName == "NODE" || baseTraits.map(_.name).contains(nodeName)
 
   def camelCase(snakeCase: String): String = {
     val corrected = // correcting for internal keys, like "_KEY" -> drop leading underscore
