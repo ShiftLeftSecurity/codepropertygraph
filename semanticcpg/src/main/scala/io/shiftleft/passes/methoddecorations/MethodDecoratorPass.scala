@@ -38,11 +38,6 @@ class MethodDecoratorPass(graph: ScalaGraph) extends CpgPass(graph) {
             parameterIn.columnNumberEnd
           )
 
-          println("X000 " + parameterIn)
-          println("X001 " + parameterIn.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
-          println("X002 " + parameterIn.vertices(Direction.IN, EdgeTypes.AST).nextChecked.getClass)
-
-
           val method =
             parameterIn.vertices(Direction.IN, EdgeTypes.AST).nextChecked.asInstanceOf[nodes.MethodRef]
           if (parameterIn.typeFullName == null) {

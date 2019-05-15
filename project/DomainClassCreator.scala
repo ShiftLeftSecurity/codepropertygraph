@@ -53,9 +53,8 @@ object DomainClassCreator {
       import java.lang.{Boolean => JBoolean, Long => JLong}
       import java.util.{Set => JSet}
       import org.apache.tinkerpop.gremlin.structure.Property
-      import org.apache.tinkerpop.gremlin.structure.Vertex
-      import org.apache.tinkerpop.gremlin.structure.VertexProperty
-      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{EdgeRef, SpecializedElementFactory , SpecializedTinkerEdge , TinkerGraph , TinkerProperty}
+      import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
+      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{EdgeRef, SpecializedElementFactory, SpecializedTinkerEdge, TinkerGraph, TinkerProperty, TinkerVertex, VertexRef}
       import scala.collection.JavaConverters._
       """
 
@@ -85,23 +84,26 @@ object DomainClassCreator {
         .mkString(",\n")
 
       val companionObject = s"""
-      object $edgeClassName {
-        val Label = "${edgeType.name}"
-        object Keys {
-          val All: JSet[String] = Set(${keysQuoted.mkString(", ")}).asJava
-          val KeyToValue: Map[String, $edgeClassName => Any] = Map(
-            $keyToValueMap
-          )
-        }
-
-        val Factory = new SpecializedElementFactory.ForEdge[$edgeClassName] {
-          override val forLabel = $edgeClassName.Label
-
-          override def createEdge(id: JLong, graph: TinkerGraph, outVertex: Vertex, inVertex: Vertex) = new $edgeClassName(graph, id, outVertex, inVertex)
-          override def createEdgeRef(id: JLong, graph: TinkerGraph, outVertex: Vertex, inVertex: Vertex) = new ${edgeClassName}Ref(createEdge(id, graph, outVertex, inVertex))
-        }
-      }
-      """
+      |object $edgeClassName {
+      |  val Label = "${edgeType.name}"
+      |  object Keys {
+      |    val All: JSet[String] = Set(${keysQuoted.mkString(", ")}).asJava
+      |    val KeyToValue: Map[String, $edgeClassName => Any] = Map(
+      |      $keyToValueMap
+      |    )
+      |  }
+      |
+      |  val Factory = new SpecializedElementFactory.ForEdge[$edgeClassName] {
+      |    override val forLabel = $edgeClassName.Label
+      |
+      |    override def createEdge(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: TinkerVertex], inVertex: VertexRef[_ <: TinkerVertex]) =
+      |      new $edgeClassName(graph, id, outVertex, inVertex)
+      |
+      |    override def createEdgeRef(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: TinkerVertex], inVertex: VertexRef[_ <: TinkerVertex]) = 
+      |      new ${edgeClassName}Ref(createEdge(id, graph, outVertex, inVertex))
+      |  }
+      |}
+      """.stripMargin
 
       val edgeRefImpl = s"""
         |/** important: do not used `wrapped` internally in this class, only pass it to VertexRef constructor
