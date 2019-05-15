@@ -1,4 +1,8 @@
 {
+    "nodeKeys" : [
+      {"id": 14, "name" : "BINARY_SIGNATURE", "comment" : "Binary type signature", "valueType" : "string", "cardinality" : "zeroOrOne" }
+    ],
+
     "nodeTypes" : [
 
         // New node types introduced for annotations
@@ -42,7 +46,7 @@
 
         // Modifications to existing node types
 
-        {"name" : "METHOD", "keys" : [],
+        {"name" : "METHOD", "keys" : ["BINARY_SIGNATURE"],
          "outEdges" : [ {"edgeName": "AST", "inNodes": ["ANNOTATION"]} ]
         },
         {
