@@ -454,7 +454,7 @@ object DomainClassCreator {
               case Cardinality.One       => containedNodeType
               case Cardinality.List      => s"List[$containedNodeType]"
             }
-            s"""def ${containedNode.localName}: $completeType = get().${containedNode.localName}"""
+            s"""def ${containedNode.localName} = get().${containedNode.localName}"""
           }.mkString("\n")
         }
         .getOrElse("")
