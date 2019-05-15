@@ -11,13 +11,18 @@ object ConstraintValidators {
   sealed trait ValidationResult
   object ValidationSuccess extends ValidationResult
   sealed trait ValidationError extends ValidationResult
-  case class ValidationOutDegreeError(outConstraint: OutConstraint,
+
+  case class ValidationOutDegreeError(srcNode: Vertex,
+                                      outConstraint: OutConstraint,
                                       invalidDegree: Int) extends ValidationError
-  case class ValidationInDegreeError(inConstraint: InConstraint,
+  case class ValidationInDegreeError(dstNode: Vertex,
+                                     inConstraint: InConstraint,
                                      invalidDegree: Int) extends ValidationError
-  case class ValidationDstNodeError(outConstraint: OutConstraint,
+  case class ValidationDstNodeError(srcNode: Vertex,
+                                    outConstraint: OutConstraint,
                                     invalidDstNodes: List[Vertex]) extends ValidationError
-  case class ValidationSrcNodeError(inConstraint: InConstraint,
+  case class ValidationSrcNodeError(dstNode: Vertex,
+                                    inConstraint: InConstraint,
                                     invalidSrcNodes: List[Vertex]) extends ValidationError
 
   trait ConstraintValidator {
@@ -26,47 +31,31 @@ object ConstraintValidators {
 
   class OutConstraintValidator(outConstraint: OutConstraint) extends ConstraintValidator {
     def validate(node: Vertex): ValidationResult = {
-      val actualDstNodes = node.vertices(Direction.OUT, outConstraint.edgeType).asScala.toList
+      val actualDstNodes = node.vertices(Direction.OUT, outConstraint.edgeType).asScala
+        .filter(dstNode => outConstraint.dstNodeTypes.contains(dstNode.label))
+        .toList
 
       if (actualDstNodes.size < outConstraint.outDegreeRange.start ||
         actualDstNodes.size > outConstraint.outDegreeRange.end) {
-        ValidationOutDegreeError(outConstraint, actualDstNodes.size)
+        ValidationOutDegreeError(node, outConstraint, actualDstNodes.size)
       } else {
-        val invalidDstNodes = getInvalidDstNodes(actualDstNodes)
-
-        if (invalidDstNodes.nonEmpty) {
-          ValidationDstNodeError(outConstraint, invalidDstNodes)
-        } else {
-          ValidationSuccess
-        }
+        ValidationSuccess
       }
-    }
-
-    private def getInvalidDstNodes(actualDstNodes: List[Vertex]): List[Vertex] = {
-      actualDstNodes.filter(actualDstNode => !outConstraint.dstNodeTypes.contains(actualDstNode.label))
     }
   }
 
   class InConstraintValidator(inConstraint: InConstraint) extends ConstraintValidator {
     def validate(node: Vertex): ValidationResult = {
-      val actualSrcNodes = node.vertices(Direction.IN, inConstraint.edgeType).asScala.toList
+      val actualSrcNodes = node.vertices(Direction.IN, inConstraint.edgeType).asScala
+        .filter(srcNode => inConstraint.srcNodeTypes.contains(srcNode.label))
+        .toList
 
       if (actualSrcNodes.size < inConstraint.inDegreeRange.start ||
         actualSrcNodes.size > inConstraint.inDegreeRange.end) {
-        ValidationInDegreeError(inConstraint, actualSrcNodes.size)
+        ValidationInDegreeError(node, inConstraint, actualSrcNodes.size)
       } else {
-        val invalidDstNodes = getInvalidSrcNodes(actualSrcNodes)
-
-        if (invalidDstNodes.nonEmpty) {
-          ValidationSrcNodeError(inConstraint, invalidDstNodes)
-        } else {
-          ValidationSuccess
-        }
+        ValidationSuccess
       }
-    }
-
-    private def getInvalidSrcNodes(actualSrcNodes: List[Vertex]): List[Vertex] = {
-      actualSrcNodes.filter(actualSrcNode => !inConstraint.srcNodeTypes.contains(actualSrcNode.label))
     }
   }
 }

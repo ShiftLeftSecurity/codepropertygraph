@@ -39,6 +39,20 @@ class CpgValidator(notEnhancedCpg: Cpg) {
       validate(dstType, inConstraintsByDstType(dstType).map(constraint => new InConstraintValidator(constraint)))
     }
 
+
+
+
+
+
+    val outConstraintsBySrcNodeAndEdgeType =
+      Constraints.outConstraints.groupBy(outConstraint => (outConstraint.srcNodeType, outConstraint.edgeType))
+        .toList
+
+    val allowedDstNodesForSrcEdgeTypePair =
+      outConstraintsBySrcNodeAndEdgeType.map { case ((srcType, edgeType), outConstraints) =>
+        (srcType, edgeType, outConstraints.flatMap(_.dstNodeTypes).distinct)
+      }
+
     validationErrors.isEmpty
   }
 
