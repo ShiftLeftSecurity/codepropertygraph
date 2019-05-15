@@ -1,14 +1,14 @@
 package io.shiftleft.cpgvalidator
 
 import io.shiftleft.codepropertygraph.Cpg
-import ConstraintValidators._
+import Constraints._
 import org.apache.logging.log4j.LogManager
 
 class CpgValidator(notEnhancedCpg: Cpg) {
   private var validationErrors = List.empty[ValidationError]
   private val logger = LogManager.getLogger(getClass)
 
-  private def validate(nodeType: String, validators: List[ConstraintValidator]): Unit = {
+  private def validate(nodeType: String, validators: List[Constraint]): Unit = {
     notEnhancedCpg.scalaGraph.V().hasLabel(nodeType).sideEffectWithTraverser { traverser =>
       val node = traverser.get
       val valErrors =
@@ -29,14 +29,14 @@ class CpgValidator(notEnhancedCpg: Cpg) {
     val outConstraintSrcTypesSorted = Facts.nodeOutFacts.map(_.srcNodeType).distinct.sorted
 
     outConstraintSrcTypesSorted.foreach { srcType =>
-      validate(srcType, outConstraintsBySrcType(srcType).map(constraint => new OutConstraintValidator(constraint)))
+      validate(srcType, outConstraintsBySrcType(srcType).map(constraint => new OutDegreeConstraint(constraint)))
     }
 
     val inConstraintsByDstType = Facts.nodeInFacts.groupBy(_.dstNodeType)
     val inConstraintDstTypesSorted = Facts.nodeInFacts.map(_.dstNodeType).distinct.sorted
 
     inConstraintDstTypesSorted.foreach { dstType =>
-      validate(dstType, inConstraintsByDstType(dstType).map(constraint => new InConstraintValidator(constraint)))
+      validate(dstType, inConstraintsByDstType(dstType).map(constraint => new InDegreeConstraint(constraint)))
     }
 
 

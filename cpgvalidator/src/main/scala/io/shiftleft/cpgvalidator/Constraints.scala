@@ -6,7 +6,7 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
 
-object ConstraintValidators {
+object Constraints {
 
   sealed trait ValidationResult
   object ValidationSuccess extends ValidationResult
@@ -25,26 +25,26 @@ object ConstraintValidators {
                                     inConstraint: InFact,
                                     invalidSrcNodes: List[Vertex]) extends ValidationError
 
-  trait ConstraintValidator {
+  trait Constraint {
     def validate(node: Vertex): ValidationResult
   }
 
-  class OutConstraintValidator(outConstraint: OutFact) extends ConstraintValidator {
+  class OutDegreeConstraint(outFact: OutFact) extends Constraint {
     def validate(node: Vertex): ValidationResult = {
-      val actualDstNodes = node.vertices(Direction.OUT, outConstraint.edgeType).asScala
-        .filter(dstNode => outConstraint.dstNodeTypes.contains(dstNode.label))
+      val actualDstNodes = node.vertices(Direction.OUT, outFact.edgeType).asScala
+        .filter(dstNode => outFact.dstNodeTypes.contains(dstNode.label))
         .toList
 
-      if (actualDstNodes.size < outConstraint.outDegreeRange.start ||
-        actualDstNodes.size > outConstraint.outDegreeRange.end) {
-        ValidationOutDegreeError(node, outConstraint, actualDstNodes.size)
+      if (actualDstNodes.size < outFact.outDegreeRange.start ||
+        actualDstNodes.size > outFact.outDegreeRange.end) {
+        ValidationOutDegreeError(node, outFact, actualDstNodes.size)
       } else {
         ValidationSuccess
       }
     }
   }
 
-  class InConstraintValidator(inConstraint: InFact) extends ConstraintValidator {
+  class InDegreeConstraint(inConstraint: InFact) extends Constraint {
     def validate(node: Vertex): ValidationResult = {
       val actualSrcNodes = node.vertices(Direction.IN, inConstraint.edgeType).asScala
         .filter(srcNode => inConstraint.srcNodeTypes.contains(srcNode.label))
