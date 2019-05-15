@@ -41,7 +41,6 @@ publish / skip := true
 val fuzzyc2cpgVersion = "0.1.47"
 
 lazy val codepropertygraph = Projects.codepropertygraph
-lazy val codepropertygraph1 = project.in(file("codepropertygraph1"))
 lazy val protoBindings = Projects.protoBindings
 lazy val queryPrimitives = Projects.queryPrimitives
 lazy val enhancements = Projects.enhancements
