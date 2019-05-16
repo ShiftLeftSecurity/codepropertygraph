@@ -216,7 +216,7 @@
         {"id" : 14, "name" : "ARRAY_INITIALIZER",
          "keys":[],
          "outEdges": [],
-         "comment" : "Initialization contruct for arrays."
+         "comment" : "Initialization construct for arrays."
         },
 
         {"id":333, "name":"METHOD_REF",
@@ -281,7 +281,7 @@
 
     "dispatchTypes" : [
         {"id" : 1, "name" : "STATIC_DISPATCH", "comment": "For statically dispatched calls the call target is known before program execution."},
-        {"id" : 2, "name" : "DYNAMIC_DISPATCH", "comment": "For dynamitcally dispatched calls the target is determined during runtime."}
+        {"id" : 2, "name" : "DYNAMIC_DISPATCH", "comment": "For dynamically dispatched calls the target is determined during runtime."}
     ],
 
     "languages" : [
