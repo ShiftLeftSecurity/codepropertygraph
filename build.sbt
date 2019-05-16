@@ -52,3 +52,4 @@ lazy val cpgserver = Projects.cpgserver
 ThisBuild/publishTo := sonatypePublishTo.value
 ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature", "-language:implicitConversions")
 ThisBuild/compile/javacOptions ++= Seq("-g") //debug symbols
+ThisBuild/Compile/packageDoc/publishArtifact := false //don't publish javadoc/scaladoc
