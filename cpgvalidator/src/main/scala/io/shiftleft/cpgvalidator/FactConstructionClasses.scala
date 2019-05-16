@@ -41,14 +41,22 @@ object FactConstructionClasses {
     def to(dstNodeType: String): OutFact = {
       OutFact(srcNodeType, outDegreeRange, edgeType, dstNodeType :: Nil)
     }
+
+    def to(dstNodeTypes: List[String]): OutFact = {
+      OutFact(srcNodeType, outDegreeRange, edgeType, dstNodeTypes)
+    }
   }
 
   case class OutFact(srcNodeType: String,
                      outDegreeRange: Range.Inclusive,
                      edgeType: String,
                      dstNodeTypes: List[String]) {
-    def and(dstNodeType: String): OutFact = {
+    def or(dstNodeType: String): OutFact = {
       OutFact(srcNodeType, outDegreeRange, edgeType, dstNodeType :: dstNodeTypes)
+    }
+
+    def or(additionalDstNodeTypes: List[String]): OutFact = {
+      OutFact(srcNodeType, outDegreeRange, edgeType, additionalDstNodeTypes ::: dstNodeTypes)
     }
   }
 
@@ -58,14 +66,22 @@ object FactConstructionClasses {
     def from(srcNodeType: String): InFact = {
       InFact(dstNodeType, inDegreeRange, edgeType, srcNodeType :: Nil)
     }
+
+    def from(srcNodeTypes: List[String]): InFact = {
+      InFact(dstNodeType, inDegreeRange, edgeType, srcNodeTypes)
+    }
   }
 
   case class InFact(dstNodeType: String,
                     inDegreeRange: Range.Inclusive,
                     edgeType: String,
                     srcNodeTypes: List[String]) {
-    def and(srcNodeType: String): InFact = {
+    def or(srcNodeType: String): InFact = {
       InFact(dstNodeType, inDegreeRange, edgeType, srcNodeType :: srcNodeTypes)
+    }
+
+    def or(additionalSrcNodeType: List[String]): InFact = {
+      InFact(dstNodeType, inDegreeRange, edgeType, additionalSrcNodeType ::: srcNodeTypes)
     }
   }
 
