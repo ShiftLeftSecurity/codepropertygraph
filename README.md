@@ -37,7 +37,7 @@ the following prerequisites:
 * Git-lfs
   - Link: https://git-lfs.github.com/
 
-Some binary files required for testing are managed through `git-lfs`. If you haven't cloned this repository yet, simply run `git lfs install`. 
+Some binary files required for testing are managed through `git-lfs`. If you haven't cloned this repository yet, simply run `git lfs install`.
 If you have cloned it already, additionally run `git lfs pull` (from within the repository).
 
 Additional build-time dependencies are automatically downloaded as
@@ -75,7 +75,7 @@ The Code Property Graph is a directed, edge-labeled, attributed
 multigraph, or property graph for short (see [1]). A property graph
 is the generic data structure underlying many contemporary graph
 databases. As a result, data representations based on property graphs
-are immediately amenable to graph database technologies. That being said, 
+are immediately amenable to graph database technologies. That being said,
 we've made some optimizations that (as of April 2019) require to use the
 open source ShiftLeft Tinkergraph [3].
 
@@ -284,7 +284,7 @@ designated call node (type CALL). Arguments are either identifiers
 or method references (type METHOD_REF). Each argument has an argument
 index property (type ARGUMENT_INDEX) to indicate which parameter it is
 associated with. Calls are connected to their arguments via outgoing
-AST edges, and are associated with their corrsponding method-instance
+AST edges, and are associated with their corresponding method-instance
 (type METHOD_INST) via their METHOD_INST_FULL_NAME property.
 Method-instance nodes represent concrete instantiations of method
 declarations, that is, method declarations along with type parameters.
@@ -378,9 +378,9 @@ val cpg = io.shiftleft.cpgloading.CpgLoader.load("cpg.bin.zip")
 
 # Querying the cpg
 
-Once you've loaded a cpg you can run queries, which are provided by the `query-primitives` subproject. Note that if you're in the sbt shell you can play with it interactively: `TAB` completion is your friend. Otherwise your IDE will assist. 
+Once you've loaded a cpg you can run queries, which are provided by the `query-primitives` subproject. Note that if you're in the sbt shell you can play with it interactively: `TAB` completion is your friend. Otherwise your IDE will assist.
 
-Here are some simple traversals to get all the base nodes. Running all of these without errors is a good test to ensure that your cpg is valid: 
+Here are some simple traversals to get all the base nodes. Running all of these without errors is a good test to ensure that your cpg is valid:
 
 ```scala
 cpg.literal.toList
@@ -404,7 +404,7 @@ From here you can traverse through the cpg. The query-primitives DSL ensures tha
 ```scala
 cpg.method.name("getAccountList").parameter.toList
 /* List(
- *   MethodParameterIn(Some(v[7054781587948444580]),this,0,this,BY_SHARING,io.shiftleft.controller.AccountController,Some(28),None,None,None), 
+ *   MethodParameterIn(Some(v[7054781587948444580]),this,0,this,BY_SHARING,io.shiftleft.controller.AccountController,Some(28),None,None,None),
  *   MethodParameterIn(Some(v[7054781587948444584]),request,2,request,BY_SHARING,javax.servlet.http.HttpServletRequest,Some(28),None,None,None),
  *   MethodParameterIn(Some(v[7054781587948444582]),response,1,response,BY_SHARING,javax.servlet.http.HttpServletResponse,Some(28),None,None,None)
  *   )
