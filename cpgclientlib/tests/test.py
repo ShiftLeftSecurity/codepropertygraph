@@ -1,22 +1,34 @@
 import unittest
+import os.path
 from cpgclient import CpgClient
+import pprint
 
 SERVER = "127.0.0.1"
 PORT = 8080
 
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+
 class TestStringMethods(unittest.TestCase):
 
     def setUp(self):
-        pass
+        self.client = CpgClient.CpgClient(SERVER, PORT)
 
-    def testShouldFailForCreateCpgUnUnknownFile(self):
+    def testShouldRaiseForCreateCpgOnNonExistingFile(self):
         """
-        Ensure that we can create a CPG
-        via a call to the server
+        Ensure that `createCpg` raises an exception
+        if the filename is not that of an existing file
         """
         filename = "filethatdoesnotexist"
-        client = CpgClient.CpgClient(SERVER, PORT)
-        self.assertRaises(Exception, client.createCpg, filename)
+        self.assertRaises(Exception, self.client.createCpg, filename)
+
+    def testShouldSucceedForCreateCpgOnKnownFile(self):
+        """
+        Ensure that `createCpg` returns without exception
+        if filename is that of a known file.
+        """
+        filename = os.path.join(SCRIPT_DIR, "testcode")
+        self.client.createCpg(filename)
+        self.assertEqual(True, self.client.isCpgLoaded())
 
     def tearDown(self):
         pass
