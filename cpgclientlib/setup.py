@@ -2,12 +2,19 @@ import setuptools
 import subprocess
 import os, os.path
 
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+NEWEST_VERSION_SCRIPT = os.path.join(SCRIPT_DIR, "newestVersion.sh")
+
+def getCurrentVersion():
+    output = str(subprocess.check_output(['./newestVersion.sh']))
+    return output.replace("'", "").replace("\\n", "").replace("v", "").replace("b", "")
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
     
     setuptools.setup(
         name='cpgclientlib',
-        version='0.1',
+        version=getCurrentVersion(),
         scripts=[] ,
         author="Fabian Yamaguchi",
         author_email="fabs@shiftleft.io",
