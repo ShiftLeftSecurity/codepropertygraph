@@ -46,15 +46,15 @@ class CpgClient:
         response = requests.get("{}/status".format(self.handlerAndUrl))
         jsonBody = response.json()
         try:
-            isCpgLoaded = jsonBody["isCpgLoaded"]
+            loaded = jsonBody["isCpgLoaded"]
         except KeyError:
             return False
 
-        return isCpgLoaded
+        return loaded
 
     def _waitUntilCpgIsCreated(self):
         while not self.isCpgLoaded():
-            time.sleep(100)
+            time.sleep(.001)
 
     def query(self, q):
         """
@@ -70,4 +70,4 @@ class CpgClient:
             jsonBody = response.json()
             if jsonBody["isQueryCompleted"]:
                 return jsonBody["response"]
-            time.sleep(100)
+            time.sleep(.001)
