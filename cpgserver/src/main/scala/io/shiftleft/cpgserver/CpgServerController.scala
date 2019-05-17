@@ -92,7 +92,7 @@ class CpgServerController(impl: ServerImpl, system: ActorSystem = ActorSystem())
   def runQuery(query: String): Unit = {
     Try {
       logger.info("Running query")
-      val e = new ScriptEngineManager(null).getEngineByName("scala")
+      val e = new ScriptEngineManager().getEngineByName("scala")
       if (e == null) {
         throw new RuntimeException("Error: cannot initialize script engine")
       }
