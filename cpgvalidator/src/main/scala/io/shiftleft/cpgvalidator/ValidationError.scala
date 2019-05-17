@@ -12,10 +12,11 @@ case class EdgeDegreeError(node: Vertex,
                            direction: Direction,
                            invalidEdgeDegree: Int,
                            expectedDegreeRange: Range.Inclusive,
-                           otherSideNodeTypes: List[String]) extends ValidationError {
+                           otherSideNodeTypes: List[String])
+    extends ValidationError {
   override def toString: Label = {
     val start = expectedDegreeRange.start
-    val end = if (expectedDegreeRange.end != Int.MaxValue) {expectedDegreeRange.end.toString} else {"N"}
+    val end = if (expectedDegreeRange.end != Int.MaxValue) { expectedDegreeRange.end.toString } else { "N" }
 
     if (direction == Direction.OUT) {
       s"Expected $start to $end outgoing $edgeType edges " +
@@ -33,10 +34,8 @@ case class EdgeDegreeError(node: Vertex,
   }
 }
 
-case class NodeTypeError(node: Vertex,
-                         edgeType: String,
-                         direction: Direction,
-                         invalidOtherSideNodes: List[Vertex]) extends ValidationError {
+case class NodeTypeError(node: Vertex, edgeType: String, direction: Direction, invalidOtherSideNodes: List[Vertex])
+    extends ValidationError {
   override def toString: String = {
     if (direction == Direction.OUT) {
       s"Expected no outgoing $edgeType edges from ${node.label()} to " +
@@ -52,9 +51,7 @@ case class NodeTypeError(node: Vertex,
   }
 }
 
-case class EdgeTypeError(node: Vertex,
-                         direction: Direction,
-                         invalidEdges: List[Edge]) extends ValidationError {
+case class EdgeTypeError(node: Vertex, direction: Direction, invalidEdges: List[Edge]) extends ValidationError {
   override def toString: String = {
     if (direction == Direction.OUT) {
       s"Expected no outgoing ${invalidEdges.map(_.label).mkString(" or ")} edges from ${node.label}."

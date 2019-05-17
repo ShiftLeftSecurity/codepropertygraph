@@ -2,7 +2,7 @@ package io.shiftleft.cpgvalidator
 
 object FactConstructionClasses {
 
-  val N:Int = Int.MaxValue
+  val N: Int = Int.MaxValue
 
   implicit class FactStartWrapper(val nodeType: String) {
     def has(degreeStart: Int): FactTier1 = {
@@ -35,9 +35,7 @@ object FactConstructionClasses {
     }
   }
 
-  case class OutFactTier1(srcNodeType: String,
-                          outDegreeRange: Range.Inclusive,
-                          edgeType: String) {
+  case class OutFactTier1(srcNodeType: String, outDegreeRange: Range.Inclusive, edgeType: String) {
     def to(dstNodeType: String): OutFact = {
       OutFact(srcNodeType, outDegreeRange, edgeType, dstNodeType :: Nil)
     }
@@ -60,9 +58,7 @@ object FactConstructionClasses {
     }
   }
 
-  case class InFactTier1(dstNodeType: String,
-                         inDegreeRange: Range.Inclusive,
-                         edgeType: String) {
+  case class InFactTier1(dstNodeType: String, inDegreeRange: Range.Inclusive, edgeType: String) {
     def from(srcNodeType: String): InFact = {
       InFact(dstNodeType, inDegreeRange, edgeType, srcNodeType :: Nil)
     }
@@ -72,10 +68,7 @@ object FactConstructionClasses {
     }
   }
 
-  case class InFact(dstNodeType: String,
-                    inDegreeRange: Range.Inclusive,
-                    edgeType: String,
-                    srcNodeTypes: List[String]) {
+  case class InFact(dstNodeType: String, inDegreeRange: Range.Inclusive, edgeType: String, srcNodeTypes: List[String]) {
     def or(srcNodeType: String): InFact = {
       InFact(dstNodeType, inDegreeRange, edgeType, srcNodeType :: srcNodeTypes)
     }
@@ -84,6 +77,5 @@ object FactConstructionClasses {
       InFact(dstNodeType, inDegreeRange, edgeType, additionalSrcNodeType ::: srcNodeTypes)
     }
   }
-
 
 }

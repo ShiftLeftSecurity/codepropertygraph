@@ -15,7 +15,8 @@ object EdgeDegreeErrorCatergory {
 case class EdgeDegreeErrorCatergory(nodeLabel: String,
                                     edgeType: String,
                                     direction: Direction,
-                                    otherSideNodeTypes: List[String]) extends ValidationErrorCategory
+                                    otherSideNodeTypes: List[String])
+    extends ValidationErrorCategory
 
 object NodeTypeErrorCategory {
   def apply(error: NodeTypeError): NodeTypeErrorCategory = {
@@ -23,9 +24,8 @@ object NodeTypeErrorCategory {
   }
 }
 
-case class NodeTypeErrorCategory(nodeLabel: String,
-                                 edgeType: String,
-                                 direction: Direction) extends ValidationErrorCategory
+case class NodeTypeErrorCategory(nodeLabel: String, edgeType: String, direction: Direction)
+    extends ValidationErrorCategory
 
 object EdgeTypeErrorCategory {
   def apply(error: EdgeTypeError): EdgeTypeErrorCategory = {
@@ -33,7 +33,5 @@ object EdgeTypeErrorCategory {
   }
 }
 
-case class EdgeTypeErrorCategory(nodeLabel: String,
-                                 direction: Direction,
-                                 invalidEdgeTypes: List[String]) extends ValidationErrorCategory
-
+case class EdgeTypeErrorCategory(nodeLabel: String, direction: Direction, invalidEdgeTypes: List[String])
+    extends ValidationErrorCategory

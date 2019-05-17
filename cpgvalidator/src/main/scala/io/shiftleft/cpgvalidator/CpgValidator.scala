@@ -25,49 +25,58 @@ class CpgValidator(notEnhancedCpg: Cpg) {
   private def validateOutFacts(): Unit = {
     val outFactsByEdgeTypeBySrcType = getOutFactByEdgeTypeBySrcType
 
-    outFactsByEdgeTypeBySrcType.foreach { case (srcType, outFactsByEdgeType) =>
-      notEnhancedCpg.scalaGraph.V.hasLabel(srcType).sideEffectWithTraverser { traverser =>
-        val srcNode = traverser.get
-        val outEdges = srcNode.edges(Direction.OUT).asScala.toList
-        outFactsByEdgeType.foreach { case (edgeType, outFacts) =>
-          val actualDstNodes = outEdges.filter(_.label == edgeType).map(_.inVertex)
-          outFacts.foreach { outFact =>
-            validateOutDegree(srcNode, actualDstNodes, outFact)
+    outFactsByEdgeTypeBySrcType.foreach {
+      case (srcType, outFactsByEdgeType) =>
+        notEnhancedCpg.scalaGraph.V
+          .hasLabel(srcType)
+          .sideEffectWithTraverser { traverser =>
+            val srcNode = traverser.get
+            val outEdges = srcNode.edges(Direction.OUT).asScala.toList
+            outFactsByEdgeType.foreach {
+              case (edgeType, outFacts) =>
+                val actualDstNodes = outEdges.filter(_.label == edgeType).map(_.inVertex)
+                outFacts.foreach { outFact =>
+                  validateOutDegree(srcNode, actualDstNodes, outFact)
+                }
+
+                validateAllDstNodeTypes(srcNode, edgeType, actualDstNodes, outFacts)
+            }
+
+            val allowedEdgeTypes = outFactsByEdgeType.map(_._1)
+            validateAllOutEdgesTypes(srcNode, outEdges, allowedEdgeTypes)
+
           }
-
-          validateAllDstNodeTypes(srcNode, edgeType, actualDstNodes, outFacts)
-        }
-
-        val allowedEdgeTypes = outFactsByEdgeType.map(_._1)
-        validateAllOutEdgesTypes(srcNode, outEdges, allowedEdgeTypes)
-
-      }.iterate()
+          .iterate()
     }
   }
 
   private def validateInFacts(): Unit = {
     val inFactsByEdgeTypeByDstType = getInFactByEdgeTypeByDstType
 
-    inFactsByEdgeTypeByDstType.foreach { case (srcType, inFactsByEdgeType) =>
-      notEnhancedCpg.scalaGraph.V.hasLabel(srcType).sideEffectWithTraverser { traverser =>
-        val dstNode = traverser.get
-        val inEdges = dstNode.edges(Direction.IN).asScala.toList
-        inFactsByEdgeType.foreach { case (edgeType, inFacts) =>
-          val actualSrcNodes = inEdges.filter(_.label == edgeType).map(_.outVertex)
-          inFacts.foreach { inFact =>
-            validateInDegree(dstNode, actualSrcNodes, inFact)
+    inFactsByEdgeTypeByDstType.foreach {
+      case (srcType, inFactsByEdgeType) =>
+        notEnhancedCpg.scalaGraph.V
+          .hasLabel(srcType)
+          .sideEffectWithTraverser { traverser =>
+            val dstNode = traverser.get
+            val inEdges = dstNode.edges(Direction.IN).asScala.toList
+            inFactsByEdgeType.foreach {
+              case (edgeType, inFacts) =>
+                val actualSrcNodes = inEdges.filter(_.label == edgeType).map(_.outVertex)
+                inFacts.foreach { inFact =>
+                  validateInDegree(dstNode, actualSrcNodes, inFact)
+                }
+
+                validateAllSrcNodeTypes(dstNode, edgeType, actualSrcNodes, inFacts)
+            }
+
+            val allowedEdgeTypes = inFactsByEdgeType.map(_._1)
+            validateAllInEdgesTypes(dstNode, inEdges, allowedEdgeTypes)
+
           }
-
-          validateAllSrcNodeTypes(dstNode, edgeType, actualSrcNodes, inFacts)
-        }
-
-        val allowedEdgeTypes = inFactsByEdgeType.map(_._1)
-        validateAllInEdgesTypes(dstNode, inEdges, allowedEdgeTypes)
-
-      }.iterate()
+          .iterate()
     }
   }
-
 
   private def validateOutDegree(srcNode: Vertex, actualDstNodes: List[Vertex], outFact: OutFact): Unit = {
     val actualOutDegree =
@@ -150,21 +159,35 @@ class CpgValidator(notEnhancedCpg: Cpg) {
   private def getOutFactByEdgeTypeBySrcType = {
     val outFactsBySrcAndEdgeType = Facts.nodeOutFacts.groupBy(outFact => (outFact.srcNodeType, outFact.edgeType)).toList
     val outFactsBySrcAndEdgeTypeBySrcType = outFactsBySrcAndEdgeType.groupBy(z => z._1._1).toList
-    outFactsBySrcAndEdgeTypeBySrcType.map { case (srcType, list) =>
-      (srcType, list.map { case ((_, edgeType), outFacts) =>
-        (edgeType, outFacts)
-      }.sortBy(_._1)) // Sort by edgeType
-    }.sortBy(_._1) // Sort by srcType
+    outFactsBySrcAndEdgeTypeBySrcType
+      .map {
+        case (srcType, list) =>
+          (srcType,
+           list
+             .map {
+               case ((_, edgeType), outFacts) =>
+                 (edgeType, outFacts)
+             }
+             .sortBy(_._1)) // Sort by edgeType
+      }
+      .sortBy(_._1) // Sort by srcType
   }
 
   private def getInFactByEdgeTypeByDstType = {
     val inFactsByDstAndEdgeType = Facts.nodeInFacts.groupBy(inFact => (inFact.dstNodeType, inFact.edgeType)).toList
     val inFactsByDstAndEdgeTypeByDstType = inFactsByDstAndEdgeType.groupBy(z => z._1._1).toList
-    inFactsByDstAndEdgeTypeByDstType.map { case (dstType, list) =>
-      (dstType, list.map { case ((_, edgeType), inFacts) =>
-        (edgeType, inFacts)
-      }.sortBy(_._1)) // Sort by edgeType
-    }.sortBy(_._1) // Sort by srcType
+    inFactsByDstAndEdgeTypeByDstType
+      .map {
+        case (dstType, list) =>
+          (dstType,
+           list
+             .map {
+               case ((_, edgeType), inFacts) =>
+                 (edgeType, inFacts)
+             }
+             .sortBy(_._1)) // Sort by edgeType
+      }
+      .sortBy(_._1) // Sort by srcType
   }
 
 }
