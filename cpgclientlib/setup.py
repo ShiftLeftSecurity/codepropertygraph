@@ -6,7 +6,7 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 NEWEST_VERSION_SCRIPT = os.path.join(SCRIPT_DIR, "newestVersion.sh")
 
 def getCurrentVersion():
-    output = str(subprocess.check_output(['./newestVersion.sh']))
+    output = str(subprocess.check_output([NEWEST_VERSION_SCRIPT]))
     return output.replace("'", "").replace("\\n", "").replace("v", "").replace("b", "")
 
 with open("README.md", "r") as fh:
