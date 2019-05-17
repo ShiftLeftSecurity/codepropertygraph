@@ -55,10 +55,6 @@
          "outEdges" : [{"edgeName" : "AST", "inNodes" : ["ANNOTATION"] }]
         },
         {
-         "name" : "METHOD_PARAMETER_OUT", "keys" : [],
-         "outEdges" : [{"edgeName" : "AST", "inNodes" : ["ANNOTATION"] }]
-        },
-        {
          "name" : "TYPE_DECL", "keys" : [],
          "outEdges" : [{"edgeName" : "AST", "inNodes" : ["ANNOTATION"] }]
         },

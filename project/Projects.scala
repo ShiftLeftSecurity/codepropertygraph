@@ -9,4 +9,5 @@ object Projects {
   lazy val semanticcpg = project.in(file("semanticcpg"))
   lazy val dataflowengine = project.in(file("dataflowengine"))
   lazy val cpgserver = project.in(file("cpgserver"))
+  lazy val cpgvalidator = project.in(file("cpgvalidator"))
 }
