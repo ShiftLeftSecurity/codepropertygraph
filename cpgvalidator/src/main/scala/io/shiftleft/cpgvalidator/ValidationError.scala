@@ -7,6 +7,12 @@ sealed trait ValidationError {
   def getCategory: ValidationErrorCategory
 }
 
+object ErrorHelper {
+  def getNodeDetails(node: Vertex): String = {
+    s"${node.label} details: id: ${node.id}, properties: ${node.valueMap}"
+  }
+}
+
 case class EdgeDegreeError(node: Vertex,
                            edgeType: String,
                            direction: Direction,
@@ -21,11 +27,13 @@ case class EdgeDegreeError(node: Vertex,
     if (direction == Direction.OUT) {
       s"Expected $start to $end outgoing $edgeType edges " +
         s"from ${node.label} " +
-        s"to ${otherSideNodeTypes.mkString(" or ")} but found $invalidEdgeDegree."
+        s"to ${otherSideNodeTypes.mkString(" or ")} but found $invalidEdgeDegree. " +
+        ErrorHelper.getNodeDetails(node)
     } else {
       s"Expected $start to $end incoming $edgeType edges " +
         s"to ${node.label} " +
-        s"from ${otherSideNodeTypes.mkString(" or ")} but found $invalidEdgeDegree."
+        s"from ${otherSideNodeTypes.mkString(" or ")} but found $invalidEdgeDegree. " +
+        ErrorHelper.getNodeDetails(node)
     }
   }
 
@@ -39,10 +47,12 @@ case class NodeTypeError(node: Vertex, edgeType: String, direction: Direction, i
   override def toString: String = {
     if (direction == Direction.OUT) {
       s"Expected no outgoing $edgeType edges from ${node.label()} to " +
-        s"${invalidOtherSideNodes.map(_.label).mkString(" or ")}."
+        s"${invalidOtherSideNodes.map(_.label).mkString(" or ")}. " +
+        ErrorHelper.getNodeDetails(node)
     } else {
       s"Expected no incoming $edgeType edges to ${node.label()} from " +
-        s"${invalidOtherSideNodes.map(_.label).mkString(" or ")}."
+        s"${invalidOtherSideNodes.map(_.label).mkString(" or ")}. " +
+        ErrorHelper.getNodeDetails(node)
     }
   }
 
@@ -54,9 +64,11 @@ case class NodeTypeError(node: Vertex, edgeType: String, direction: Direction, i
 case class EdgeTypeError(node: Vertex, direction: Direction, invalidEdges: List[Edge]) extends ValidationError {
   override def toString: String = {
     if (direction == Direction.OUT) {
-      s"Expected no outgoing ${invalidEdges.map(_.label).mkString(" or ")} edges from ${node.label}."
+      s"Expected no outgoing ${invalidEdges.map(_.label).mkString(" or ")} edges from ${node.label}. " +
+        ErrorHelper.getNodeDetails(node)
     } else {
-      s"Expected no incoming ${invalidEdges.map(_.label).mkString(" or ")} edges to ${node.label}."
+      s"Expected no incoming ${invalidEdges.map(_.label).mkString(" or ")} edges to ${node.label}. " +
+        ErrorHelper.getNodeDetails(node)
     }
   }
 
