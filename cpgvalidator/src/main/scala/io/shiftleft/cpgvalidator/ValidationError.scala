@@ -3,7 +3,9 @@ package io.shiftleft.cpgvalidator
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.structure.Direction
 
-sealed trait ValidationError
+sealed trait ValidationError {
+  def getCategory: ValidationErrorCategory
+}
 
 case class EdgeDegreeError(node: Vertex,
                            edgeType: String,
@@ -25,6 +27,10 @@ case class EdgeDegreeError(node: Vertex,
         s"from ${otherSideNodeTypes.mkString(" or ")} but found $invalidEdgeDegree."
     }
   }
+
+  override def getCategory: ValidationErrorCategory = {
+    EdgeDegreeErrorCatergory(this)
+  }
 }
 
 case class NodeTypeError(node: Vertex,
@@ -40,6 +46,10 @@ case class NodeTypeError(node: Vertex,
         s"${invalidOtherSideNodes.map(_.label).mkString(" or ")}."
     }
   }
+
+  override def getCategory: ValidationErrorCategory = {
+    NodeTypeErrorCategory(this)
+  }
 }
 
 case class EdgeTypeError(node: Vertex,
@@ -47,9 +57,13 @@ case class EdgeTypeError(node: Vertex,
                          invalidEdges: List[Edge]) extends ValidationError {
   override def toString: String = {
     if (direction == Direction.OUT) {
-      s"${node.label} has invalid outgoing edges ${invalidEdges.map(_.label)}."
+      s"Expected no outgoing ${invalidEdges.map(_.label).mkString(" or ")} edges from ${node.label}."
     } else {
-      s"${node.label} has invalid incoming edges ${invalidEdges.map(_.label)}."
+      s"Expected no incoming ${invalidEdges.map(_.label).mkString(" or ")} edges to ${node.label}."
     }
+  }
+
+  override def getCategory: ValidationErrorCategory = {
+    EdgeTypeErrorCategory(this)
   }
 }

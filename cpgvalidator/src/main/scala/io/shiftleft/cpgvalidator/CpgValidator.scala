@@ -9,30 +9,17 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 import scala.collection.JavaConverters._
 
 class CpgValidator(notEnhancedCpg: Cpg) {
-  private var validationErrors = List.empty[ValidationError]
-  private val logger = LogManager.getLogger(getClass)
+  private val errorRegistry = new ValidationErrorRegistry()
 
   def validate(): Boolean = {
     validateOutFacts()
     validateInFacts()
 
-    validationErrors.isEmpty
-  }
-
-  def getValidationErrors: List[ValidationError] = {
-    validationErrors
+    errorRegistry.getErrorCount == 0
   }
 
   def logValidationErrors(): Unit = {
-    validationErrors.foreach { error =>
-      logger.error(s"Validation error: $error")
-    }
-
-    if (validationErrors.isEmpty) {
-      logger.info("Found 0 errors.")
-    } else {
-      logger.error(s"Found ${validationErrors.size} errors.")
-    }
+    errorRegistry.logValidationErrors()
   }
 
   private def validateOutFacts(): Unit = {
@@ -87,7 +74,7 @@ class CpgValidator(notEnhancedCpg: Cpg) {
       actualDstNodes.count(actualDstNode => outFact.dstNodeTypes.contains(actualDstNode.label))
 
     if (!outFact.outDegreeRange.contains(actualOutDegree)) {
-      validationErrors =
+      errorRegistry.addError(
         EdgeDegreeError(
           srcNode,
           outFact.edgeType,
@@ -95,7 +82,7 @@ class CpgValidator(notEnhancedCpg: Cpg) {
           actualOutDegree,
           outFact.outDegreeRange,
           outFact.dstNodeTypes
-        ) :: validationErrors
+        ))
     }
   }
 
@@ -104,7 +91,7 @@ class CpgValidator(notEnhancedCpg: Cpg) {
       actualSrcNode.count(actualSrcNode => inFact.srcNodeTypes.contains(actualSrcNode.label))
 
     if (!inFact.inDegreeRange.contains(actualInDegree)) {
-      validationErrors =
+      errorRegistry.addError(
         EdgeDegreeError(
           dstNode,
           inFact.edgeType,
@@ -112,7 +99,7 @@ class CpgValidator(notEnhancedCpg: Cpg) {
           actualInDegree,
           inFact.inDegreeRange,
           inFact.srcNodeTypes
-        ) :: validationErrors
+        ))
     }
   }
 
@@ -125,7 +112,7 @@ class CpgValidator(notEnhancedCpg: Cpg) {
     val invalidDstNodes = actualDstNodes.filter(actualDstNode => !allAllowedDstTypes.contains(actualDstNode.label))
 
     if (invalidDstNodes.nonEmpty) {
-      validationErrors = NodeTypeError(srcNode, edgeType, Direction.OUT, invalidDstNodes) :: validationErrors
+      errorRegistry.addError(NodeTypeError(srcNode, edgeType, Direction.OUT, invalidDstNodes))
     }
   }
 
@@ -138,7 +125,7 @@ class CpgValidator(notEnhancedCpg: Cpg) {
     val invalidSrcNodes = actualSrcNodes.filter(actualSrcNode => !allAllowedSrcTypes.contains(actualSrcNode.label))
 
     if (invalidSrcNodes.nonEmpty) {
-      validationErrors = NodeTypeError(dstNode, edgeType, Direction.IN, invalidSrcNodes) :: validationErrors
+      errorRegistry.addError(NodeTypeError(dstNode, edgeType, Direction.IN, invalidSrcNodes))
     }
   }
 
@@ -147,7 +134,7 @@ class CpgValidator(notEnhancedCpg: Cpg) {
                                        allowedEdgeTypes: List[String]): Unit = {
     val invalidEdges = actualEdges.filter(actualEdge => !allowedEdgeTypes.contains(actualEdge.label))
     if (invalidEdges.nonEmpty) {
-      validationErrors = EdgeTypeError(srcNode, Direction.OUT, invalidEdges) :: validationErrors
+      errorRegistry.addError(EdgeTypeError(srcNode, Direction.OUT, invalidEdges))
     }
   }
 
@@ -156,7 +143,7 @@ class CpgValidator(notEnhancedCpg: Cpg) {
                                       allowedEdgeTypes: List[String]): Unit = {
     val invalidEdges = actualEdges.filter(actualEdge => !allowedEdgeTypes.contains(actualEdge.label))
     if (invalidEdges.nonEmpty) {
-      validationErrors = EdgeTypeError(dstNode, Direction.IN, invalidEdges) :: validationErrors
+      errorRegistry.addError(EdgeTypeError(dstNode, Direction.IN, invalidEdges))
     }
   }
 
