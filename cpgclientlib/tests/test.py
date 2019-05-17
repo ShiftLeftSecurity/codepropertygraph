@@ -30,6 +30,12 @@ class TestStringMethods(unittest.TestCase):
         self.client.createCpg(filename)
         self.assertEqual(True, self.client.isCpgLoaded())
 
+    def testSimpleQuery(self):
+        filename = os.path.join(SCRIPT_DIR, "testcode")
+        self.client.createCpg(filename)
+        response = self.client.query("cpg.method.name.l")
+        print(response)
+
     def tearDown(self):
         pass
 

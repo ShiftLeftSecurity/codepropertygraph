@@ -27,11 +27,15 @@ class CpgClient:
             and optionally block until it is ready.
         """
         postBody = {"filenames" : [filename]}
-        response = requests.post("{}/create".format(self.handlerAndUrl), json = postBody)
-        if response.status_code == 202:
-            self._waitUntilCpgIsCreated()
-        else:
-            raise Exception("Invalid request: {}".format(response._content))
+        response = self._request("create", postBody)
+        self._waitUntilCpgIsCreated()
+
+    def _request(self, operation, body, isGet = False):
+        url = "{}/{}".format(self.handlerAndUrl, operation)
+        response = requests.post(url, json = body)
+        if not response.status_code in [200, 202]:
+            raise Exception("Invalid request: " + response)
+        return response
 
     # TODO: if we do allow multiple CPGs to be loaded, this method
     # will need to receive an optional Id.
@@ -50,4 +54,20 @@ class CpgClient:
 
     def _waitUntilCpgIsCreated(self):
         while not self.isCpgLoaded():
+            time.sleep(100)
+
+    def query(self, q):
+        """
+        Run query `q` on the CPG and return result
+        """
+        postBody = {"query" : q}
+        response = self._request("query", postBody)
+        return self._pollForQueryResult()
+
+    def _pollForQueryResult(self):
+        while True:
+            response = requests.get("{}/queryresult".format(self.handlerAndUrl))
+            jsonBody = response.json()
+            if jsonBody["isQueryCompleted"]:
+                return jsonBody["response"]
             time.sleep(100)
