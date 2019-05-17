@@ -97,12 +97,12 @@ object Facts {
 
 
     NodeTypes.LITERAL has 1 incoming EdgeTypes.AST from SuperTypes.Expression,
-    NodeTypes.LITERAL has 1 to N incoming EdgeTypes.CFG from SuperTypes.Expression or NodeTypes.METHOD,
+    NodeTypes.LITERAL has 0 to N incoming EdgeTypes.CFG from SuperTypes.Expression or NodeTypes.METHOD,
     NodeTypes.LITERAL has 0 to 1 incoming EdgeTypes.RECEIVER from NodeTypes.CALL,
 
 
     NodeTypes.CALL has 1 incoming EdgeTypes.AST from SuperTypes.Expression,
-    NodeTypes.CALL has 1 to N incoming EdgeTypes.CFG from SuperTypes.Expression or NodeTypes.METHOD,
+    NodeTypes.CALL has 0 to N incoming EdgeTypes.CFG from SuperTypes.Expression or NodeTypes.METHOD,
     NodeTypes.CALL has 0 to 1 incoming EdgeTypes.RECEIVER from NodeTypes.CALL,
 
 
@@ -112,12 +112,12 @@ object Facts {
 
 
     NodeTypes.IDENTIFIER has 1 incoming EdgeTypes.AST from SuperTypes.Expression,
-    NodeTypes.IDENTIFIER has 1 to N incoming EdgeTypes.CFG from SuperTypes.Expression or NodeTypes.METHOD,
+    NodeTypes.IDENTIFIER has 0 to N incoming EdgeTypes.CFG from SuperTypes.Expression or NodeTypes.METHOD,
     NodeTypes.IDENTIFIER has 0 to 1 incoming EdgeTypes.RECEIVER from NodeTypes.CALL,
 
 
     NodeTypes.RETURN has 1 incoming EdgeTypes.AST from SuperTypes.Expression,
-    NodeTypes.RETURN has 1 to N incoming EdgeTypes.CFG from SuperTypes.Expression or NodeTypes.METHOD,
+    NodeTypes.RETURN has 0 to N incoming EdgeTypes.CFG from SuperTypes.Expression or NodeTypes.METHOD,
 
 
     NodeTypes.BLOCK has 1 incoming EdgeTypes.AST from SuperTypes.Expression or NodeTypes.METHOD,
@@ -126,7 +126,7 @@ object Facts {
 
 
     NodeTypes.METHOD_REF has 1 incoming EdgeTypes.AST from SuperTypes.Expression,
-    NodeTypes.METHOD_REF has 1 to N incoming EdgeTypes.CFG from SuperTypes.Expression or NodeTypes.METHOD,
+    NodeTypes.METHOD_REF has 0 to N incoming EdgeTypes.CFG from SuperTypes.Expression or NodeTypes.METHOD,
     NodeTypes.METHOD_REF has 0 to 1 incoming EdgeTypes.RECEIVER from NodeTypes.CALL,
   )
 
