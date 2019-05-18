@@ -7,15 +7,15 @@ import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.NameAccessors
 import shapeless.HList
 
-class NamespaceBlock[Labels <: HList](raw: GremlinScala.Aux[nodes.NamespaceBlockRef, Labels])
-    extends NodeSteps[nodes.NamespaceBlockRef, Labels](raw)
-    with NameAccessors[nodes.NamespaceBlockRef, Labels] {
+class NamespaceBlock[Labels <: HList](raw: GremlinScala.Aux[nodes.NamespaceBlock, Labels])
+    extends NodeSteps[nodes.NamespaceBlock, Labels](raw)
+    with NameAccessors[nodes.NamespaceBlock, Labels] {
 
   /**
     * Namespaces for namespace blocks.
     * */
   def namespaces: Namespace[Labels] =
-    new Namespace[Labels](raw.out(EdgeTypes.REF).cast[nodes.NamespaceRef])
+    new Namespace[Labels](raw.out(EdgeTypes.REF).cast[nodes.Namespace])
 
   /**
     * The type declarations defined in this namespace
@@ -25,6 +25,6 @@ class NamespaceBlock[Labels <: HList](raw: GremlinScala.Aux[nodes.NamespaceBlock
       raw
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.TYPE_DECL)
-        .cast[nodes.TypeDeclRef])
+        .cast[nodes.TypeDecl])
 
 }

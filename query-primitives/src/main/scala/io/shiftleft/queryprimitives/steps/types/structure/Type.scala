@@ -9,10 +9,10 @@ import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{Dec
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{FullNameAccessors, NameAccessors}
 import shapeless.{HList, HNil}
 
-class Type[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeRef, Labels])
-    extends NodeSteps[nodes.TypeRef, Labels](raw)
-    with NameAccessors[nodes.TypeRef, Labels]
-    with FullNameAccessors[nodes.TypeRef, Labels] {
+class Type[Labels <: HList](raw: GremlinScala.Aux[nodes.Type, Labels])
+    extends NodeSteps[nodes.Type, Labels](raw)
+    with NameAccessors[nodes.Type, Labels]
+    with FullNameAccessors[nodes.Type, Labels] {
 
   /**
     * Namespaces in which the corresponding type declaration is defined.
@@ -73,16 +73,16 @@ class Type[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeRef, Labels])
     * Type declaration which is referenced by this type.
     */
   def referencedTypeDecl: TypeDecl[Labels] =
-    new TypeDecl[Labels](raw.out(EdgeTypes.REF).cast[nodes.TypeDeclRef])
+    new TypeDecl[Labels](raw.out(EdgeTypes.REF).cast[nodes.TypeDecl])
 
   /**
     * Type declarations which derive from this type.
     */
   def derivedTypeDecl: TypeDecl[Labels] =
-    new TypeDecl[Labels](raw.in(EdgeTypes.INHERITS_FROM).cast[nodes.TypeDeclRef])
+    new TypeDecl[Labels](raw.in(EdgeTypes.INHERITS_FROM).cast[nodes.TypeDecl])
 
   def localsOfType: Local[Labels] =
-    new Local[Labels](raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.LocalRef])
+    new Local[Labels](raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
 
   def expressionOfType: Expression[Labels] =
     new Expression[Labels](

@@ -10,18 +10,18 @@ class NamespaceTests extends WordSpec with Matchers {
   "generic cpg" should {
 
     "find package io.shiftleft.testcode.namespace" in {
-      val queryResult: List[nodes.NamespaceRef] = fixture.cpg.namespace.toList
+      val queryResult: List[nodes.Namespace] = fixture.cpg.namespace.toList
 
       queryResult.map(_.name) should contain("io.shiftleft.testcode.namespace")
     }
 
     "find a namespace block for io.shiftleft.testcode.namespace" in {
-      val queryResult: List[nodes.NamespaceBlockRef] = fixture.cpg.namespaceBlock.toList
+      val queryResult: List[nodes.NamespaceBlock] = fixture.cpg.namespaceBlock.toList
       queryResult.map(_.name) should contain("io.shiftleft.testcode.namespace")
     }
 
     "be able to traverse from namespace block to type decl" in {
-      val queryResult: List[nodes.TypeDeclRef] = fixture.cpg.namespaceBlock
+      val queryResult: List[nodes.TypeDecl] = fixture.cpg.namespaceBlock
         .nameExact("io.shiftleft.testcode.namespace")
         .typeDecl
         .toList
@@ -29,7 +29,7 @@ class NamespaceTests extends WordSpec with Matchers {
     }
 
     "be able to expand to class NamespaceTest from via its namespace." in {
-      val queryResult: List[nodes.TypeDeclRef] =
+      val queryResult: List[nodes.TypeDecl] =
         fixture.cpg.namespace.name("io.shiftleft.testcode.namespace").typeDecl.toList
 
       queryResult.size shouldBe 1
@@ -37,7 +37,7 @@ class NamespaceTests extends WordSpec with Matchers {
     }
 
     "be able to expand to file which defines namespace." in {
-      val queryResult: List[nodes.FileRef] =
+      val queryResult: List[nodes.File] =
         fixture.cpg.namespace.name("io.shiftleft.testcode.namespace").file.toList
 
       queryResult.size shouldBe 1

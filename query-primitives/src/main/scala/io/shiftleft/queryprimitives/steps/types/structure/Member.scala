@@ -12,24 +12,24 @@ import shapeless.HList
 /**
   * A member variable of a class/type.
   * */
-class Member[Labels <: HList](raw: GremlinScala.Aux[nodes.MemberRef, Labels])
-    extends NodeSteps[nodes.MemberRef, Labels](raw)
-    with DeclarationBase[nodes.MemberRef, Labels]
-    with CodeAccessors[nodes.MemberRef, Labels]
-    with NameAccessors[nodes.MemberRef, Labels]
-    with EvalTypeAccessors[nodes.MemberRef, Labels] {
+class Member[Labels <: HList](raw: GremlinScala.Aux[nodes.Member, Labels])
+    extends NodeSteps[nodes.Member, Labels](raw)
+    with DeclarationBase[nodes.Member, Labels]
+    with CodeAccessors[nodes.Member, Labels]
+    with NameAccessors[nodes.Member, Labels]
+    with EvalTypeAccessors[nodes.Member, Labels] {
 
   /**
     * The type declaration this member is defined in
     * */
   def typeDecl: TypeDecl[Labels] =
-    new TypeDecl[Labels](raw.in(EdgeTypes.AST).cast[nodes.TypeDeclRef])
+    new TypeDecl[Labels](raw.in(EdgeTypes.AST).cast[nodes.TypeDecl])
 
   /**
     * Places where
     * */
   def ref: Call[Labels] =
-    new Call[Labels](raw.in(EdgeTypes.REF).cast[nodes.CallRef])
+    new Call[Labels](raw.in(EdgeTypes.REF).cast[nodes.Call])
 
   /**
     * Public members
@@ -66,12 +66,12 @@ class Member[Labels <: HList](raw: GremlinScala.Aux[nodes.MemberRef, Labels])
     new Modifier[Labels](
       raw.out
         .hasLabel(NodeTypes.MODIFIER)
-        .cast[nodes.ModifierRef]
+        .cast[nodes.Modifier]
     )
 
   /**
     * Traverse to member type
     * */
   def typ: Type[Labels] =
-    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.TypeRef])
+    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 }

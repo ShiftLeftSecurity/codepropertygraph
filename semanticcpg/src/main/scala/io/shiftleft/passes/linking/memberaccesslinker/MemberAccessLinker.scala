@@ -20,7 +20,7 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
 
   private def linkMemberAccessToMember(dstGraph: DiffGraph): Unit = {
     var loggedDeprecationWarning = false
-    var loggedForTypeMemberCombination = Set[(nodes.TypeRef, String)]()
+    var loggedForTypeMemberCombination = Set[(nodes.Type, String)]()
     val cpg = Cpg(graph.graph)
 
     cpg.call
@@ -35,7 +35,7 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
             .filter(_.value(NodeKeys.ORDER.name) == 2)
             .asJava
             .nextChecked
-            .asInstanceOf[nodes.IdentifierRef]
+            .asInstanceOf[nodes.Identifier]
             .name
 
           val typ = getTypeOfMemberAccessBase(call)
@@ -69,10 +69,10 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
       }
   }.exec()
 
-  private def getTypeOfMemberAccessBase(call: nodes.CallRef): nodes.TypeRef = {
+  private def getTypeOfMemberAccessBase(call: nodes.Call): nodes.Type = {
     val base = call.start.argument.order(1).head
     base match {
-      case call: nodes.CallRef
+      case call: nodes.Call
           if call.name == Operators.memberAccess ||
             call.name == Operators.indirectComputedMemberAccess =>
         call.start.argument.order(2).typ.head
@@ -82,7 +82,7 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
     }
   }
 
-  private def findMemberOnType(typ: nodes.TypeRef, memberName: String): Option[nodes.MemberRef] = {
+  private def findMemberOnType(typ: nodes.Type, memberName: String): Option[nodes.Member] = {
     val members = typ.start.member.filter(_.nameExact(memberName)).l
 
     members.find(_.name == memberName)

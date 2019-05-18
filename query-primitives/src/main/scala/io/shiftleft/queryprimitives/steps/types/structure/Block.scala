@@ -7,13 +7,13 @@ import shapeless.HList
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.ExpressionBase
 
-class Block[Labels <: HList](raw: GremlinScala.Aux[nodes.BlockRef, Labels])
-    extends NodeSteps[nodes.BlockRef, Labels](raw)
-    with ExpressionBase[nodes.BlockRef, Labels] {
+class Block[Labels <: HList](raw: GremlinScala.Aux[nodes.Block, Labels])
+    extends NodeSteps[nodes.Block, Labels](raw)
+    with ExpressionBase[nodes.Block, Labels] {
 
   /**
     * Traverse to locals of this block.
     */
   def local: Local[Labels] =
-    new Local[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.LOCAL).cast[nodes.LocalRef])
+    new Local[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
 }

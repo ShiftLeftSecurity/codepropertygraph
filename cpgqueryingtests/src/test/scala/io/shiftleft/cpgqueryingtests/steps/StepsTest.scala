@@ -18,14 +18,14 @@ class StepsTest extends WordSpec with Matchers {
   "generic cpg" should {
 
     "filter by regex" in new CpgTestFixture("splitmeup") {
-      val queryResult: List[nodes.LiteralRef] =
+      val queryResult: List[nodes.Literal] =
         cpg.literal.code(".*").toList
 
       queryResult.size should be > 1
     }
 
     "filter on cpg type" in new CpgTestFixture("splitmeup") {
-      val mainMethods: List[nodes.MethodRef] =
+      val mainMethods: List[nodes.Method] =
         cpg.method
           .name(".*")
           .filterOnEnd(_.fullName.matches(".*main.*"))
@@ -44,8 +44,8 @@ class StepsTest extends WordSpec with Matchers {
     "filter on id" when {
       "providing one" in new CpgTestFixture("splitmeup") {
         // find an arbitrary method so we can find it again in the next step
-        val method: nodes.MethodRef = cpg.method.toList.head
-        val results: List[nodes.MethodRef] = cpg.method.id(method.underlying.id).toList
+        val method: nodes.Method = cpg.method.toList.head
+        val results: List[nodes.Method] = cpg.method.id(method.underlying.id).toList
 
         results.size shouldBe 1
         results.head.underlying.id
@@ -53,8 +53,8 @@ class StepsTest extends WordSpec with Matchers {
 
       "providing multiple" in new CpgTestFixture("splitmeup") {
         // find two arbitrary methods so we can find it again in the next step
-        val methods: Set[nodes.MethodRef] = cpg.method.toList.take(2).toSet
-        val results: List[nodes.MethodRef] = cpg.method.id(methods.map(_.id)).toList
+        val methods: Set[nodes.Method] = cpg.method.toList.take(2).toSet
+        val results: List[nodes.Method] = cpg.method.id(methods.map(_.id)).toList
 
         results.size shouldBe 2
         results.toSet shouldBe methods.toSet
@@ -62,9 +62,9 @@ class StepsTest extends WordSpec with Matchers {
     }
 
     "aggregate intermediary results into a given collection" in new CpgTestFixture("splitmeup") {
-      val allMethods = mutable.ArrayBuffer.empty[nodes.MethodRef]
+      val allMethods = mutable.ArrayBuffer.empty[nodes.Method]
 
-      val mainMethods: List[nodes.MethodRef] =
+      val mainMethods: List[nodes.Method] =
         cpg.method
           .name(".*")
           .aggregate(allMethods)
@@ -98,7 +98,7 @@ class StepsTest extends WordSpec with Matchers {
     val query = cpg.method.isPublic.map { method =>
       (method.name, method.start.parameter.toList)
     }
-    val results: List[(String, List[nodes.MethodParameterInRef])] = query.toList
+    val results: List[(String, List[nodes.MethodParameterIn])] = query.toList
     results.size should be > 1
   }
 
@@ -110,25 +110,25 @@ class StepsTest extends WordSpec with Matchers {
 
   "as/select" should {
     "select all by default" in new CpgTestFixture("splitmeup") {
-      val results: List[(nodes.MethodRef, nodes.MethodReturnRef)] =
+      val results: List[(nodes.Method, nodes.MethodReturn)] =
         cpg.method.as("method").methodReturn.as("methodReturn").select.toList
 
       results.size should be > 0
     }
 
     "allow to select a single label" in new CpgTestFixture("splitmeup") {
-      val methodReturnLabel = StepLabel[nodes.MethodReturnRef]("methodReturn")
-      val methodLabel = StepLabel[nodes.MethodRef]("method")
-      val results: List[nodes.MethodReturnRef] =
+      val methodReturnLabel = StepLabel[nodes.MethodReturn]("methodReturn")
+      val methodLabel = StepLabel[nodes.Method]("method")
+      val results: List[nodes.MethodReturn] =
         cpg.method.as(methodLabel).methodReturn.as(methodReturnLabel).select(methodReturnLabel).toList
 
       results.size should be > 0
     }
 
     "allow to select multiple labels" in new CpgTestFixture("splitmeup") {
-      val methodReturnLabel = StepLabel[nodes.MethodReturnRef]("methodReturn")
-      val methodLabel = StepLabel[nodes.MethodRef]("method")
-      val results: List[(nodes.MethodReturnRef, nodes.MethodRef)] =
+      val methodReturnLabel = StepLabel[nodes.MethodReturn]("methodReturn")
+      val methodLabel = StepLabel[nodes.Method]("method")
+      val results: List[(nodes.MethodReturn, nodes.Method)] =
         cpg.method
           .as(methodLabel)
           .methodReturn

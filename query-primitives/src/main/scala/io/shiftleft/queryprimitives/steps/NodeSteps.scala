@@ -27,7 +27,7 @@ class NodeSteps[NodeType <: nodes.StoredNode, Labels <: HList](raw: GremlinScala
           onTrue = _.in(EdgeTypes.REF).in(EdgeTypes.AST),
           onFalse = _.until(_.hasLabel(NodeTypes.FILE)).repeat(_.in(EdgeTypes.AST))
         )
-        .cast[nodes.FileRef]
+        .cast[nodes.File]
     )
 
   /* follow the incoming edges of the given type as long as possible */

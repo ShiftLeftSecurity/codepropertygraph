@@ -9,15 +9,15 @@ import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.Modi
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{FullNameAccessors, NameAccessors, SignatureAccessors}
 import shapeless.HList
 
-class MethodInst[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodInstRef, Labels])
-    extends NodeSteps[nodes.MethodInstRef, Labels](raw)
-    with NameAccessors[nodes.MethodInstRef, Labels]
-    with FullNameAccessors[nodes.MethodInstRef, Labels]
-    with SignatureAccessors[nodes.MethodInstRef, Labels] {
+class MethodInst[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodInst, Labels])
+    extends NodeSteps[nodes.MethodInst, Labels](raw)
+    with NameAccessors[nodes.MethodInst, Labels]
+    with FullNameAccessors[nodes.MethodInst, Labels]
+    with SignatureAccessors[nodes.MethodInst, Labels] {
 
   def method: Method[Labels] = {
     new Method[Labels](
-      raw.out(EdgeTypes.REF).cast[nodes.MethodRef]
+      raw.out(EdgeTypes.REF).cast[nodes.Method]
     )
   }
 
@@ -80,7 +80,7 @@ class MethodInst[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Metho
     new Call[Labels](
       sideEffect(callResolver.resolveDynamicMethodInstCallSites).raw
         .in(EdgeTypes.CALL)
-        .cast[nodes.CallRef])
+        .cast[nodes.Call])
   }
 
   /**

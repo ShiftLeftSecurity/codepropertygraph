@@ -17,7 +17,7 @@ object FlowPrettyPrinter {
       val method = trackingPoint.start.method.head
 
       val trackedSymbol = trackingPoint match {
-        case methodParamIn: nodes.MethodParameterInRef => {
+        case methodParamIn: nodes.MethodParameterIn => {
           s"${method.name}(${method.start.parameter.l.sortBy(_.order).map(_.code).mkString(", ")})"
         }
         case _ => trackingPoint.cfgNode.code

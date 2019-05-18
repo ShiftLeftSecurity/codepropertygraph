@@ -81,7 +81,7 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
                                  EdgeTypes.REACHING_DEF)
     }
 
-    method.vertices(Direction.OUT, EdgeTypes.AST).asScala.filter(_.isInstanceOf[nodes.MethodParameterInRef]).foreach {
+    method.vertices(Direction.OUT, EdgeTypes.AST).asScala.filter(_.isInstanceOf[nodes.MethodParameterIn]).foreach {
       methodParameterIn =>
         methodParameterIn.vertices(Direction.IN, EdgeTypes.REF).asScala.foreach { refInIdentifier =>
           dfHelper
@@ -98,13 +98,13 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
 
     outSet.foreach {
       case (node, outDefs) =>
-        if (node.isInstanceOf[nodes.CallRef]) {
+        if (node.isInstanceOf[nodes.Call]) {
           val usesInExpression = dfHelper.getUsesOfExpression(node)
           var localRefsUses = usesInExpression.map(ExpandTo.reference(_)).filter(_ != None)
 
           /* if use is not an identifier, add edge, as we are going to visit the use separately */
           usesInExpression.foreach { use =>
-            if (!use.isInstanceOf[nodes.IdentifierRef] && !use.isInstanceOf[nodes.LiteralRef]) {
+            if (!use.isInstanceOf[nodes.Identifier] && !use.isInstanceOf[nodes.Literal]) {
               addEdge(use, node)
 
               /* handle indirect access uses: check if we have it in our out set and get
@@ -112,7 +112,7 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
                */
               if (isIndirectAccess(use)) {
                 outDefs.filter(out => isIndirectAccess(out)).foreach { indirectOutDef =>
-                  if (indirectOutDef.asInstanceOf[nodes.CallRef].code == use.asInstanceOf[nodes.CallRef].code) {
+                  if (indirectOutDef.asInstanceOf[nodes.Call].code == use.asInstanceOf[nodes.Call].code) {
                     val expandedToCall = ExpandTo.argumentToCallOrReturn(indirectOutDef)
                     addEdge(expandedToCall, use)
                   }
@@ -140,7 +140,7 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
               }
             }
           }
-        } else if (node.isInstanceOf[nodes.ReturnRef]) {
+        } else if (node.isInstanceOf[nodes.Return]) {
           node.vertices(Direction.OUT, EdgeTypes.AST).asScala.foreach { returnExpr =>
             val localRef = ExpandTo.reference(returnExpr)
             inSet(node).filter(inElement => localRef == ExpandTo.reference(inElement)).foreach { filteredInElement =>
@@ -179,7 +179,7 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
   }
 
   private def isOperationAndAssignment(vertex: Vertex): Boolean = {
-    if (!vertex.isInstanceOf[nodes.CallRef]) {
+    if (!vertex.isInstanceOf[nodes.Call]) {
       return false
     }
 
@@ -202,7 +202,7 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
   }
 
   private def isIndirectAccess(vertex: Vertex): Boolean = {
-    if (!vertex.isInstanceOf[nodes.CallRef]) {
+    if (!vertex.isInstanceOf[nodes.Call]) {
       return false
     }
 
@@ -275,7 +275,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
   }
 
   def getExpressionFromGen(genVertex: Vertex): Option[Vertex] = {
-    getOperation(genVertex).filter(_.isInstanceOf[nodes.CallRef])
+    getOperation(genVertex).filter(_.isInstanceOf[nodes.Call])
   }
 
   /** Returns a set of vertices that are killed by the passed vertex */
@@ -314,9 +314,9 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
 
   def getOperation(vertex: Vertex): Option[Vertex] = {
     vertex match {
-      case _: nodes.IdentifierRef => getOperation(vertex.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
-      case _: nodes.CallRef       => Some(vertex)
-      case _: nodes.ReturnRef     => Some(vertex)
+      case _: nodes.Identifier => getOperation(vertex.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
+      case _: nodes.Call       => Some(vertex)
+      case _: nodes.Return     => Some(vertex)
       case _                   => None
     }
   }

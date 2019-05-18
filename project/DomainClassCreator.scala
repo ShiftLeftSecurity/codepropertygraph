@@ -76,10 +76,11 @@ object DomainClassCreator {
 
     def generateEdgeSource(edgeType: EdgeType, keys: List[Property]) = {
       val edgeClassName = edgeType.className
+      val edgeClassNameDb = s"${edgeClassName}Db"
       val keysQuoted = keys.map('"' + _.name + '"')
       val keyToValueMap = keys
         .map { key =>
-          s""" "${key.name}" -> { instance: $edgeClassName => instance.${camelCase(key.name)}()}"""
+          s""" "${key.name}" -> { instance: $edgeClassNameDb => instance.${camelCase(key.name)}()}"""
         }
         .mkString(",\n")
 
@@ -88,19 +89,19 @@ object DomainClassCreator {
       |  val Label = "${edgeType.name}"
       |  object Keys {
       |    val All: JSet[String] = Set(${keysQuoted.mkString(", ")}).asJava
-      |    val KeyToValue: Map[String, $edgeClassName => Any] = Map(
+      |    val KeyToValue: Map[String, $edgeClassNameDb => Any] = Map(
       |      $keyToValueMap
       |    )
       |  }
       |
-      |  val Factory = new SpecializedElementFactory.ForEdge[$edgeClassName] {
+      |  val Factory = new SpecializedElementFactory.ForEdge[${edgeClassNameDb}] {
       |    override val forLabel = $edgeClassName.Label
       |
       |    override def createEdge(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: TinkerVertex], inVertex: VertexRef[_ <: TinkerVertex]) =
-      |      new $edgeClassName(graph, id, outVertex, inVertex)
+      |      new ${edgeClassNameDb}(graph, id, outVertex, inVertex)
       |
       |    override def createEdgeRef(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: TinkerVertex], inVertex: VertexRef[_ <: TinkerVertex]) = 
-      |      new ${edgeClassName}Ref(createEdge(id, graph, outVertex, inVertex))
+      |      new ${edgeClassName}(createEdge(id, graph, outVertex, inVertex))
       |  }
       |}
       """.stripMargin
@@ -110,11 +111,11 @@ object DomainClassCreator {
         |* this is to ensure it can be managed by the ReferenceManager
         |* TODO MP: add property accessors
         |* */
-        |class ${edgeClassName}Ref(wrapped: ${edgeClassName}) extends EdgeRef[${edgeClassName}](wrapped) {
+        |class ${edgeClassName}(wrapped: ${edgeClassNameDb}) extends EdgeRef[${edgeClassNameDb}](wrapped) {
         |}""".stripMargin
 
       val classImpl = s"""
-      class $edgeClassName(private val _graph: TinkerGraph, private val _id: Long, private val _outVertex: Vertex, _inVertex: Vertex)
+      class ${edgeClassNameDb}(private val _graph: TinkerGraph, private val _id: Long, private val _outVertex: Vertex, _inVertex: Vertex)
           extends SpecializedTinkerEdge(_graph, _id, _outVertex, $edgeClassName.Label, _inVertex, $edgeClassName.Keys.All) {
 
         ${propertyBasedFields(keys)}
@@ -266,7 +267,7 @@ object DomainClassCreator {
       val nodeTypes = (Resources.cpgJson \ "nodeTypes").as[List[NodeType]]
 
       nodeTypes.map { nodeType =>
-        s"def visit(node: ${nodeType.className}Ref): T = ???"
+        s"def visit(node: ${nodeType.className}): T = ???"
       }.mkString("\n")
     }
 
@@ -284,9 +285,9 @@ object DomainClassCreator {
         .map { property: Property =>
           getHigherType(property) match {
             case HigherValueType.None | HigherValueType.List =>
-              s""" "${property.name}" -> { instance: ${nodeType.className} => instance.${camelCase(property.name)}}"""
+              s""" "${property.name}" -> { instance: ${nodeType.classNameDb} => instance.${camelCase(property.name)}}"""
             case HigherValueType.Option =>
-              s""" "${property.name}" -> { instance: ${nodeType.className} => instance.${camelCase(property.name)}.orNull}"""
+              s""" "${property.name}" -> { instance: ${nodeType.classNameDb} => instance.${camelCase(property.name)}.orNull}"""
           }
         }
         .mkString(",\n")
@@ -302,9 +303,9 @@ object DomainClassCreator {
 
       val companionObject = s"""
       object ${nodeType.className} {
-        implicit val marshaller: Marshallable[${nodeType.className}] = new Marshallable[${nodeType.className}] {
-          override def fromCC(cc: ${nodeType.className}): FromCC = ???
-          override def toCC(element: Element): ${nodeType.className} = element.asInstanceOf[${nodeType.className}]
+        implicit val marshaller: Marshallable[${nodeType.classNameDb}] = new Marshallable[${nodeType.classNameDb}] {
+          override def fromCC(cc: ${nodeType.classNameDb}): FromCC = ???
+          override def toCC(element: Element): ${nodeType.classNameDb} = element.asInstanceOf[${nodeType.classNameDb}]
         }
         val Label = "${nodeType.name}"
         object Keys {
@@ -314,7 +315,7 @@ object DomainClassCreator {
           camelCase(key.name).capitalize
         }
         .mkString(", ")}).asJava
-          val KeyToValue: Map[String, ${nodeType.className} => Any] = Map(
+          val KeyToValue: Map[String, ${nodeType.classNameDb} => Any] = Map(
             $keyToValueMap
           )
         }
@@ -323,11 +324,11 @@ object DomainClassCreator {
           val Out: Set[String] = Set(${outEdges(nodeType).map('"' + _ + '"').mkString(",")})
         }
 
-        val Factory = new SpecializedElementFactory.ForVertex[${nodeType.className}] {
+        val Factory = new SpecializedElementFactory.ForVertex[${nodeType.classNameDb}] {
           override val forLabel = ${nodeType.className}.Label
 
-          override def createVertex(id: JLong, graph: TinkerGraph) = new ${nodeType.className}(id, graph)
-          override def createVertexRef(id: JLong, graph: TinkerGraph) = new ${nodeType.className}Ref(createVertex(id, graph))
+          override def createVertex(id: JLong, graph: TinkerGraph) = new ${nodeType.classNameDb}(id, graph)
+          override def createVertexRef(id: JLong, graph: TinkerGraph) = new ${nodeType.className}(createVertex(id, graph))
         }
       }
       """
@@ -378,13 +379,7 @@ object DomainClassCreator {
         nodeType.containedNodes
           .map {
             _.map { containedNode =>
-              val containedNodeType = {
-                if (isNodeBaseTrait(baseTraits, containedNode.nodeType)) {
-                  containedNode.nodeTypeClassName
-                } else {
-                  containedNode.nodeTypeClassName + "Ref"
-                }
-              }
+              val containedNodeType = containedNode.nodeTypeClassName
               val cardinality = Cardinality.fromName(containedNode.cardinality)
               val completeType = cardinality match {
                 case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
@@ -465,7 +460,7 @@ object DomainClassCreator {
           |/** important: do not used `wrapped` internally in this class, only pass it to VertexRef constructor
           |* this is to ensure it can be managed by the ReferenceManager
           |* */
-          |class ${nodeType.className}Ref(wrapped: ${nodeType.className}) extends VertexRef[${nodeType.className}](wrapped) with ${nodeType.className}Base with StoredNode $mixinTraits {
+          |class ${nodeType.className}(wrapped: ${nodeType.classNameDb}) extends VertexRef[${nodeType.classNameDb}](wrapped) with ${nodeType.className}Base with StoredNode $mixinTraits {
           |$propertyDelegators
           |$delegatingContainedNodeAccessors
           |  override def accept[T](visitor: NodeVisitor[T]): T = {
@@ -485,7 +480,7 @@ object DomainClassCreator {
         $abstractContainedNodeAccessors
       }
 
-      class ${nodeType.className}(private val _id: JLong, private val _graph: TinkerGraph)
+      class ${nodeType.classNameDb}(private val _id: JLong, private val _graph: TinkerGraph)
           extends SpecializedTinkerVertex(_id, ${nodeType.className}.Label, _graph) with StoredNode $mixinTraits with Product with ${nodeType.className}Base {
 
         override def allowedInEdgeLabels() = ${nodeType.className}.Edges.In.asJava
@@ -497,7 +492,7 @@ object DomainClassCreator {
         ${propertyBasedFields(keys)}
 
         override val productPrefix = "${nodeType.className}"
-        override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[${nodeType.className}]
+        override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[${nodeType.classNameDb}]
         override val productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
         override def productElement(n: Int): Any =
             n match {
@@ -731,7 +726,8 @@ case class NodeType(name: String,
                     outEdges: List[OutEdgeEntry],
                     is: Option[List[String]],
                     containedNodes: Option[List[ContainedNode]]) {
-  lazy val className = Utils.camelCase(Utils.handlePotentialRefNameClash(name)).capitalize
+  lazy val className = Utils.camelCase(name).capitalize
+  lazy val classNameDb = s"${className}Db"
 }
 
 case class OutEdgeEntry(edgeName: String, inNodes: List[String])
@@ -739,7 +735,7 @@ case class OutEdgeEntry(edgeName: String, inNodes: List[String])
 /** nodeType links to the referenced NodeType
   * cardinality must be one of `zeroOrOne`, `one`, `list` */
 case class ContainedNode(nodeType: String, localName: String, cardinality: String) {
-  lazy val nodeTypeClassName = Utils.camelCase(Utils.handlePotentialRefNameClash(nodeType)).capitalize
+  lazy val nodeTypeClassName = Utils.camelCase(nodeType).capitalize
 }
 
 // TODO: use better json library which supports enums
@@ -757,7 +753,7 @@ object Cardinality {
 
 /* representation of EdgeType in cpg.json */
 case class EdgeType(name: String, keys: List[String]) {
-  lazy val className = Utils.camelCase(Utils.handlePotentialRefNameClash(name)).capitalize
+  lazy val className = Utils.camelCase(name).capitalize
 }
 
 /* representation of nodeKey/edgeKey in cpg.json */
@@ -766,7 +762,7 @@ case class Property(name: String, comment: String, valueType: String, cardinalit
 /* representation of nodeBaseTrait in cpg.json */
 case class NodeBaseTrait(name: String, hasKeys: List[String], `extends`: Option[List[String]]) {
   lazy val extendz = `extends` //it's mapped from the key in json :(
-  lazy val className = Utils.camelCase(Utils.handlePotentialRefNameClash(name)).capitalize
+  lazy val className = Utils.camelCase(name).capitalize
 }
 
 object HigherValueType extends Enumeration {
@@ -790,13 +786,6 @@ object Utils {
     }
     elements.mkString
   }
-
-  // avoid clashes with `AbcRef` types
-  def handlePotentialRefNameClash(originalName: String): String =
-    if (originalName.endsWith("_REF"))
-      s"${originalName}ERENCE"
-    else
-      originalName
 
   def getHigherType(property: Property): HigherValueType.Value =
     Cardinality.fromName(property.cardinality) match {

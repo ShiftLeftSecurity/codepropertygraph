@@ -9,9 +9,9 @@ import shapeless.HList
 /**
   * A meta data entry
   * */
-class MetaData[Labels <: HList](raw: GremlinScala.Aux[nodes.MetaDataRef, Labels])
-    extends NodeSteps[nodes.MetaDataRef, Labels](raw)
-    with VersionAccessors[nodes.MetaDataRef, Labels] {
+class MetaData[Labels <: HList](raw: GremlinScala.Aux[nodes.MetaData, Labels])
+    extends NodeSteps[nodes.MetaData, Labels](raw)
+    with VersionAccessors[nodes.MetaData, Labels] {
 
   /**
     * Programming language the code represented by this CPG was

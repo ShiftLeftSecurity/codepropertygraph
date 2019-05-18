@@ -78,7 +78,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
       dstNodeLabel = NodeTypes.METHOD_INST,
       edgeType = EdgeTypes.REF,
       dstNodeIdMap = methodInstFullNameToNodeId,
-      dstFullNameKey = nodes.MethodReference.Keys.MethodInstFullName,
+      dstFullNameKey = nodes.MethodRef.Keys.MethodInstFullName,
       dstGraph
     )
 
@@ -87,7 +87,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
       dstNodeLabel = NodeTypes.TYPE,
       edgeType = EdgeTypes.INHERITS_FROM,
       dstNodeIdMap = typeFullNameToNodeId,
-      getDstFullNames = (srcNode: nodes.TypeDeclRef) => {
+      getDstFullNames = (srcNode: nodes.TypeDecl) => {
         if (srcNode.inheritsFromTypeFullName != null) {
           srcNode.inheritsFromTypeFullName
         } else {
@@ -103,11 +103,11 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
 
   private def initMaps(): Unit = {
     graph.graph.vertices().asScala.foreach {
-      case node: nodes.TypeDeclRef   => typeDeclFullNameToNodeId += node.fullName -> node.getId
-      case node: nodes.TypeRef       => typeFullNameToNodeId += node.fullName -> node.getId
-      case node: nodes.MethodRef     => methodFullNameToNodeId += node.fullName -> node.getId
-      case node: nodes.MethodInstRef => methodInstFullNameToNodeId += node.fullName -> node.getId
-      case node: nodes.NamespaceBlockRef =>
+      case node: nodes.TypeDecl   => typeDeclFullNameToNodeId += node.fullName -> node.getId
+      case node: nodes.Type       => typeFullNameToNodeId += node.fullName -> node.getId
+      case node: nodes.Method     => methodFullNameToNodeId += node.fullName -> node.getId
+      case node: nodes.MethodInst => methodInstFullNameToNodeId += node.fullName -> node.getId
+      case node: nodes.NamespaceBlock =>
         namespaceBlockFullNameToNodeId += node.fullName -> node.getId
       case _ => // ignore
     }

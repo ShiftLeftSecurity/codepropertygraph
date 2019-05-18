@@ -24,7 +24,7 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
     graph.V
       .hasLabel(NodeTypes.METHOD_INST)
       .sideEffectWithTraverser { traverser =>
-        val methodInst = traverser.get.asInstanceOf[nodes.MethodInstRef]
+        val methodInst = traverser.get.asInstanceOf[nodes.MethodInst]
         try {
           methodFullNameToNode.get(methodInst.methodFullName) match {
             case Some(method) =>

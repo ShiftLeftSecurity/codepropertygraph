@@ -9,14 +9,14 @@ import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{Dec
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors._
 import shapeless.HList
 
-class MethodParameterOut[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodParameterOutRef, Labels])
-    extends NodeSteps[nodes.MethodParameterOutRef, Labels](raw)
-    with DeclarationBase[nodes.MethodParameterOutRef, Labels]
-    with CodeAccessors[nodes.MethodParameterOutRef, Labels]
-    with NameAccessors[nodes.MethodParameterOutRef, Labels]
-    with OrderAccessors[nodes.MethodParameterOutRef, Labels]
-    with LineNumberAccessors[nodes.MethodParameterOutRef, Labels]
-    with EvalTypeAccessors[nodes.MethodParameterOutRef, Labels] {
+class MethodParameterOut[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodParameterOut, Labels])
+    extends NodeSteps[nodes.MethodParameterOut, Labels](raw)
+    with DeclarationBase[nodes.MethodParameterOut, Labels]
+    with CodeAccessors[nodes.MethodParameterOut, Labels]
+    with NameAccessors[nodes.MethodParameterOut, Labels]
+    with OrderAccessors[nodes.MethodParameterOut, Labels]
+    with LineNumberAccessors[nodes.MethodParameterOut, Labels]
+    with EvalTypeAccessors[nodes.MethodParameterOut, Labels] {
 
   /* method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
   def index(num: Int): MethodParameterOut[Labels] =
@@ -33,12 +33,12 @@ class MethodParameterOut[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodPara
     new MethodParameterOut[Labels](raw.has(NodeKeys.METHOD_PARAMETER_OUT.ORDER, P.lte(num: Integer)))
 
   def method: Method[Labels] =
-    new Method[Labels](raw.in(EdgeTypes.AST).cast[nodes.MethodRef])
+    new Method[Labels](raw.in(EdgeTypes.AST).cast[nodes.Method])
 
   def argument: Expression[Labels] = {
     new Expression[Labels](
       raw
-        .sack((sack: Integer, node: nodes.MethodParameterOutRef) => node.value2(NodeKeys.ORDER))
+        .sack((sack: Integer, node: nodes.MethodParameterOut) => node.value2(NodeKeys.ORDER))
         .in(EdgeTypes.AST)
         .in(EdgeTypes.REF)
         .in(EdgeTypes.CALL)
@@ -52,11 +52,11 @@ class MethodParameterOut[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodPara
   }
 
   def asInput: MethodParameter[Labels] =
-    new MethodParameter[Labels](raw.in(EdgeTypes.PARAMETER_LINK).cast[nodes.MethodParameterInRef])
+    new MethodParameter[Labels](raw.in(EdgeTypes.PARAMETER_LINK).cast[nodes.MethodParameterIn])
 
   /**
     * Traverse to parameter type
     * */
   def typ: Type[Labels] =
-    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.TypeRef])
+    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 }

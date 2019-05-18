@@ -17,7 +17,7 @@ class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
     graph.V
       .hasLabel(NodeTypes.TYPE)
       .sideEffectWithTraverser { traverser =>
-        val typ = traverser.get.asInstanceOf[nodes.TypeRef]
+        val typ = traverser.get.asInstanceOf[nodes.Type]
         typeDeclFullNameToNode.get(typ.fullName) match {
           case Some(_) =>
           case None =>

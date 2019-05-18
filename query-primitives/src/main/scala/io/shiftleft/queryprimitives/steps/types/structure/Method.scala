@@ -13,21 +13,21 @@ import shapeless.HList
 /**
   * A method, function, or procedure
   * */
-class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodRef, Labels])
-    extends NodeSteps[nodes.MethodRef, Labels](raw)
-    with DeclarationBase[nodes.MethodRef, Labels]
-    with NameAccessors[nodes.MethodRef, Labels]
-    with FullNameAccessors[nodes.MethodRef, Labels]
-    with SignatureAccessors[nodes.MethodRef, Labels]
-    with LineNumberAccessors[nodes.MethodRef, Labels]
-    with EvalTypeAccessors[nodes.MethodRef, Labels] {
+class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, Labels])
+    extends NodeSteps[nodes.Method, Labels](raw)
+    with DeclarationBase[nodes.Method, Labels]
+    with NameAccessors[nodes.Method, Labels]
+    with FullNameAccessors[nodes.Method, Labels]
+    with SignatureAccessors[nodes.Method, Labels]
+    with LineNumberAccessors[nodes.Method, Labels]
+    with EvalTypeAccessors[nodes.Method, Labels] {
 
   /**
     * Traverse to concrete instances of method.
     */
   def methodInstance: MethodInst[Labels] = {
     new MethodInst[Labels](
-      raw.in(EdgeTypes.REF).cast[nodes.MethodInstRef]
+      raw.in(EdgeTypes.REF).cast[nodes.MethodInst]
     )
   }
 
@@ -39,20 +39,20 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodRef
       raw
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
-        .cast[nodes.MethodParameterInRef])
+        .cast[nodes.MethodParameterIn])
 
   /**
     * Traverse to formal return parameter
     * */
   def methodReturn: MethodReturn[Labels] =
-    new MethodReturn[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.METHOD_RETURN).cast[nodes.MethodReturnRef])
+    new MethodReturn[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.METHOD_RETURN).cast[nodes.MethodReturn])
 
   /**
     * Traverse to the type declarations were this method is in the VTable.
     */
   def inVTableOfTypeDecl: TypeDecl[Labels] = {
     new TypeDecl[Labels](
-      raw.in(EdgeTypes.VTABLE).cast[nodes.TypeDeclRef]
+      raw.in(EdgeTypes.VTABLE).cast[nodes.TypeDecl]
     )
   }
 
@@ -80,7 +80,7 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodRef
     val sinkMethods = raw.dedup.toList()
 
     if (sourceMethods.isEmpty || sinkMethods.isEmpty) {
-      new Method[Labels](graph.V(-1).asInstanceOf[GremlinScala.Aux[nodes.MethodRef, Labels]])
+      new Method[Labels](graph.V(-1).asInstanceOf[GremlinScala.Aux[nodes.Method, Labels]])
     } else {
       val ids = sinkMethods.map(_.id)
       val methodTrav = graph.V(ids: _*)
@@ -91,7 +91,7 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodRef
           .repeat(
             _.sideEffect { method =>
               if (resolve) {
-                callResolver.resolveDynamicMethodCallSites(method.asInstanceOf[nodes.MethodRef])
+                callResolver.resolveDynamicMethodCallSites(method.asInstanceOf[nodes.Method])
               }
             }.in(EdgeTypes.REF) // expand to method instance
               .in(EdgeTypes.CALL) // expand to call site
@@ -99,7 +99,7 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodRef
               .dedup
               .simplePath()
           )
-          .asInstanceOf[GremlinScala.Aux[nodes.MethodRef, Labels]]
+          .asInstanceOf[GremlinScala.Aux[nodes.Method, Labels]]
       )
     }
   }
@@ -124,14 +124,14 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodRef
       sideEffect(callResolver.resolveDynamicMethodCallSites).raw
         .in(EdgeTypes.REF)
         .in(EdgeTypes.CALL)
-        .cast[nodes.CallRef])
+        .cast[nodes.Call])
   }
 
   /**
     * Outgoing call sites
     * */
   def callOut: Call[Labels] =
-    new Call[Labels](raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.CALL).cast[nodes.CallRef])
+    new Call[Labels](raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.CALL).cast[nodes.Call])
 
   /**
     * Outgoing call sites to methods where fullName matches `regex`.
@@ -148,7 +148,7 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodRef
         .cast[nodes.StoredNode]
         .repeat(_.in(EdgeTypes.AST).cast[nodes.StoredNode])
         .until(_.hasLabel(NodeTypes.TYPE_DECL))
-        .cast[nodes.TypeDeclRef])
+        .cast[nodes.TypeDecl])
 
   /**
     * The method in which this method is defined
@@ -159,7 +159,7 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodRef
         .cast[nodes.StoredNode]
         .repeat(_.in(EdgeTypes.AST).cast[nodes.StoredNode])
         .until(_.hasLabel(NodeTypes.METHOD))
-        .cast[nodes.MethodRef])
+        .cast[nodes.Method])
 
   /**
     * Traverse only to methods that are stubs, e.g., their code is not available
@@ -254,7 +254,7 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodRef
     new Modifier[Labels](
       raw.out
         .hasLabel(NodeTypes.MODIFIER)
-        .cast[nodes.ModifierRef])
+        .cast[nodes.Modifier])
 
   /**
     * Traverse to the methods local variables
@@ -266,13 +266,13 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodRef
         .hasLabel(NodeTypes.BLOCK)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.LOCAL)
-        .cast[nodes.LocalRef])
+        .cast[nodes.Local])
 
   /**
     * Traverse to literals of method
     * */
   def literal: Literal[Labels] =
-    new Literal[Labels](raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.LITERAL).cast[nodes.LiteralRef])
+    new Literal[Labels](raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
 
   def topLevelExpressions: Expression[Labels] =
     new Expression[Labels](
@@ -303,7 +303,7 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodRef
     * Traverse to block
     * */
   def block: Block[Labels] =
-    new Block[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.BLOCK).cast[nodes.BlockRef])
+    new Block[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
 
   /**
     * Traverse to namespace

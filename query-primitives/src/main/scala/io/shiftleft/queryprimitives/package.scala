@@ -71,7 +71,7 @@ import io.shiftleft.codepropertygraph.Cpg
   *
   * {{{
   *   cpg.method.as("method").definingTypeDecl.as("classDef").select.toList
-  *   // return type: List[(nodes.MethodRef, nodes.TypeDeclRef)]
+  *   // return type: List[(nodes.Method, nodes.TypeDecl)]
   * }}}
   *
   * == [advanced] For comprehensions ==

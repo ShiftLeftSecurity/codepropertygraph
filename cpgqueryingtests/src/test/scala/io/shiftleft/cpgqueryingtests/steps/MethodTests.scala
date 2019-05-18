@@ -14,7 +14,7 @@ class MethodTests extends WordSpec with Matchers {
 
   "Method traversals" should {
     "expand to type declaration" in {
-      val queryResult: List[nodes.TypeDeclRef] =
+      val queryResult: List[nodes.TypeDecl] =
         fixture.cpg.method.name("methodWithLiteral").definingTypeDecl.toList
 
       queryResult.size shouldBe 1
@@ -22,7 +22,7 @@ class MethodTests extends WordSpec with Matchers {
     }
 
     "expand to literal" in {
-      val queryResult: List[nodes.LiteralRef] =
+      val queryResult: List[nodes.Literal] =
         fixture.cpg.method.name("methodWithLiteral").literal.toList
 
       queryResult.size shouldBe 1
@@ -35,20 +35,20 @@ class MethodTests extends WordSpec with Matchers {
     }
 
     "filter by name" in {
-      val methods: List[nodes.MethodRef] =
+      val methods: List[nodes.Method] =
         fixture.cpg.method.name("methodWithLiteral").toList
       methods.size shouldBe 1
       verifyMainMethod(methods.head)
     }
 
     "filter by name with regex" in {
-      val methods: List[nodes.MethodRef] =
+      val methods: List[nodes.Method] =
         fixture.cpg.method.name(".*methodWithLiteral.*").toList
       methods.size shouldBe 1
       verifyMainMethod(methods.head)
     }
 
-    def verifyMainMethod(main: nodes.MethodRef) = {
+    def verifyMainMethod(main: nodes.Method) = {
       main.name shouldBe "methodWithLiteral"
       main.fullName shouldBe
         "io.shiftleft.testcode.method.TestGraph.methodWithLiteral:java.lang.String()"

@@ -12,17 +12,17 @@ import shapeless.HList
 /**
   * Type declaration - possibly a template that requires instantiation
   * */
-class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDeclRef, Labels])
-    extends NodeSteps[nodes.TypeDeclRef, Labels](raw)
-    with NameAccessors[nodes.TypeDeclRef, Labels]
-    with FullNameAccessors[nodes.TypeDeclRef, Labels]
-    with IsExternalAccessor[nodes.TypeDeclRef, Labels] {
+class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDecl, Labels])
+    extends NodeSteps[nodes.TypeDecl, Labels](raw)
+    with NameAccessors[nodes.TypeDecl, Labels]
+    with FullNameAccessors[nodes.TypeDecl, Labels]
+    with IsExternalAccessor[nodes.TypeDecl, Labels] {
 
   /**
     * Types referencing to this type declaration.
     * */
   def referencingType: Type[Labels] =
-    new Type[Labels](raw.in(EdgeTypes.REF).cast[nodes.TypeRef])
+    new Type[Labels](raw.in(EdgeTypes.REF).cast[nodes.Type])
 
   /**
     * Namespace in which this type declaration is defined
@@ -33,13 +33,13 @@ class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDeclRef, Labels]
         .in(EdgeTypes.AST)
         .hasLabel(NodeTypes.NAMESPACE_BLOCK)
         .out(EdgeTypes.REF)
-        .cast[nodes.NamespaceRef])
+        .cast[nodes.Namespace])
 
   /**
     * Methods defined as part of this type
     * */
   def method: Method[Labels] =
-    new Method[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.METHOD).cast[nodes.MethodRef])
+    new Method[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.METHOD).cast[nodes.Method])
 
   /**
     * Filter for type declarations contained in the analyzed code.
@@ -57,13 +57,13 @@ class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDeclRef, Labels]
     * Member variables
     * */
   def member: Member[Labels] =
-    new Member[Labels](raw.out().hasLabel(NodeTypes.MEMBER).cast[nodes.MemberRef])
+    new Member[Labels](raw.out().hasLabel(NodeTypes.MEMBER).cast[nodes.Member])
 
   /**
     * Direct base types in the inheritance graph.
     * */
   def baseType: Type[Labels] =
-    new Type(raw.out(EdgeTypes.INHERITS_FROM).cast[nodes.TypeRef])
+    new Type(raw.out(EdgeTypes.INHERITS_FROM).cast[nodes.Type])
 
   /**
     * Direct base type declaration.
@@ -94,7 +94,7 @@ class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDeclRef, Labels]
     */
   def vtableMethod: Method[Labels] = {
     new Method[Labels](
-      raw.out(EdgeTypes.VTABLE).cast[nodes.MethodRef]
+      raw.out(EdgeTypes.VTABLE).cast[nodes.Method]
     )
   }
 
@@ -105,6 +105,6 @@ class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDeclRef, Labels]
     new Modifier[Labels](
       raw.out
         .hasLabel(NodeTypes.MODIFIER)
-        .cast[nodes.ModifierRef]
+        .cast[nodes.Modifier]
     )
 }

@@ -13,16 +13,16 @@ import shapeless.HList
 /**
   A call site
   */
-class Call[Labels <: HList](raw: GremlinScala.Aux[nodes.CallRef, Labels])
-    extends NodeSteps[nodes.CallRef, Labels](raw)
-    with CodeAccessors[nodes.CallRef, Labels]
-    with NameAccessors[nodes.CallRef, Labels]
-    with OrderAccessors[nodes.CallRef, Labels]
-    with SignatureAccessors[nodes.CallRef, Labels]
-    with DispatchTypeAccessors[nodes.CallRef, Labels]
-    with LineNumberAccessors[nodes.CallRef, Labels]
-    with EvalTypeAccessors[nodes.CallRef, Labels]
-    with ExpressionBase[nodes.CallRef, Labels] {
+class Call[Labels <: HList](raw: GremlinScala.Aux[nodes.Call, Labels])
+    extends NodeSteps[nodes.Call, Labels](raw)
+    with CodeAccessors[nodes.Call, Labels]
+    with NameAccessors[nodes.Call, Labels]
+    with OrderAccessors[nodes.Call, Labels]
+    with SignatureAccessors[nodes.Call, Labels]
+    with DispatchTypeAccessors[nodes.Call, Labels]
+    with LineNumberAccessors[nodes.Call, Labels]
+    with EvalTypeAccessors[nodes.Call, Labels]
+    with ExpressionBase[nodes.Call, Labels] {
 
   /**
     Only statically dispatched calls
@@ -38,7 +38,7 @@ class Call[Labels <: HList](raw: GremlinScala.Aux[nodes.CallRef, Labels])
     The caller
     */
   override def method: Method[Labels] =
-    new Method[Labels](raw.in(EdgeTypes.CONTAINS).hasLabel(NodeTypes.METHOD).cast[nodes.MethodRef])
+    new Method[Labels](raw.in(EdgeTypes.CONTAINS).hasLabel(NodeTypes.METHOD).cast[nodes.Method])
 
   /**
     The callee method
@@ -54,7 +54,7 @@ class Call[Labels <: HList](raw: GremlinScala.Aux[nodes.CallRef, Labels])
     new MethodInst[Labels](
       sideEffect(callResolver.resolveDynamicCallSite).raw
         .out(EdgeTypes.CALL)
-        .cast[nodes.MethodInstRef])
+        .cast[nodes.MethodInst])
 
   /**
     Arguments of the call
@@ -78,13 +78,13 @@ class Call[Labels <: HList](raw: GremlinScala.Aux[nodes.CallRef, Labels])
         .out(EdgeTypes.REF)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.METHOD_RETURN)
-        .cast[nodes.MethodReturnRef])
+        .cast[nodes.MethodReturn])
 
   /**
     * Traverse to referenced members
     * */
   def referencedMember: Member[Labels] = new Member(
-    raw.out(EdgeTypes.REF).cast[nodes.MemberRef]
+    raw.out(EdgeTypes.REF).cast[nodes.Member]
   )
 
 }

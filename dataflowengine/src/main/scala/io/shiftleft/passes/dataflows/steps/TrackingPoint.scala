@@ -93,18 +93,18 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
 
   private def getTrackingPoint(vertex: Vertex): Option[nodes.TrackingPoint] = {
     vertex match {
-      case identifier: nodes.IdentifierRef =>
+      case identifier: nodes.Identifier =>
         getTrackingPoint(identifier.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
-      case call: nodes.CallRef                       => Some(call)
-      case ret: nodes.ReturnRef                      => Some(ret)
-      case methodReturn: nodes.MethodReturnRef       => Some(methodReturn)
-      case methodParamIn: nodes.MethodParameterInRef => Some(methodParamIn)
-      case literal: nodes.LiteralRef                 => getTrackingPoint(literal.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
+      case call: nodes.Call                       => Some(call)
+      case ret: nodes.Return                      => Some(ret)
+      case methodReturn: nodes.MethodReturn       => Some(methodReturn)
+      case methodParamIn: nodes.MethodParameterIn => Some(methodParamIn)
+      case literal: nodes.Literal                 => getTrackingPoint(literal.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
       case _                                      => None
     }
   }
 
-  private def methodFast(dataFlowObject: nodes.TrackingPoint): nodes.MethodRef = {
+  private def methodFast(dataFlowObject: nodes.TrackingPoint): nodes.Method = {
     val method =
       dataFlowObject.label match {
         case NodeTypes.METHOD_RETURN =>
@@ -116,11 +116,11 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
         case NodeTypes.LITERAL | NodeTypes.CALL | NodeTypes.IDENTIFIER | NodeTypes.RETURN | NodeTypes.UNKNOWN =>
           ExpandTo.expressionToMethod(dataFlowObject)
       }
-    method.asInstanceOf[nodes.MethodRef]
+    method.asInstanceOf[nodes.Method]
   }
 
   private def indirectAccess(vertex: Vertex): Boolean = {
-    if (!vertex.isInstanceOf[nodes.CallRef]) {
+    if (!vertex.isInstanceOf[nodes.Call]) {
       return false
     }
 

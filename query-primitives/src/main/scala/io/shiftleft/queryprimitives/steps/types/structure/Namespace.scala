@@ -11,9 +11,9 @@ import shapeless.HList
 /**
   * A namespace, e.g., Java package or C# namespace
   * */
-class Namespace[Labels <: HList](raw: GremlinScala.Aux[nodes.NamespaceRef, Labels])
-    extends NodeSteps[nodes.NamespaceRef, Labels](raw)
-    with NameAccessors[nodes.NamespaceRef, Labels] {
+class Namespace[Labels <: HList](raw: GremlinScala.Aux[nodes.Namespace, Labels])
+    extends NodeSteps[nodes.Namespace, Labels](raw)
+    with NameAccessors[nodes.Namespace, Labels] {
 
   /**
     * The type declarations defined in this namespace
@@ -24,7 +24,7 @@ class Namespace[Labels <: HList](raw: GremlinScala.Aux[nodes.NamespaceRef, Label
         .in(EdgeTypes.REF)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.TYPE_DECL)
-        .cast[nodes.TypeDeclRef])
+        .cast[nodes.TypeDecl])
 
   /**
     * Methods defined in this namespace
@@ -35,7 +35,7 @@ class Namespace[Labels <: HList](raw: GremlinScala.Aux[nodes.NamespaceRef, Label
         .in(EdgeTypes.REF)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.METHOD)
-        .cast[nodes.MethodRef])
+        .cast[nodes.Method])
 
   /**
     * External namespaces - any namespaces
