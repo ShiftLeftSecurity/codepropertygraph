@@ -6,34 +6,44 @@ import json
 import subprocess
 import time
 import requests
+import signal
+import threading
 
 SERVER = "127.0.0.1"
 PORT = 8080
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
+stopEvent = threading.Event()
+
+def doStartServer():
+    cmd = str(testServerPath())
+    subprocess.Popen(cmd, stdout = subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    while True:
+        try:
+            response = requests.get("http://{}:{}/".format(SERVER, PORT))
+        except requests.exceptions.ConnectionError:
+            if stopEvent.is_set():
+                break
+            time.sleep(1)
+            continue
+        break
+
+def testServerPath():
+    scriptDir = os.path.dirname(os.path.realpath(__file__))
+    relpath = os.path.join(scriptDir, "..", "..","testserver.sh")
+    return os.path.abspath(relpath)
+
 class TestStringMethods(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
-        cmd = str(self._testServerPath())
-        subprocess.Popen(cmd, stdout = subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    def setUpClass(cls):
 
-        # wait until server is available
-        while True:
-            try:
-                requests.get("http://{}:{}/".format(SERVER, PORT))
-            except requests.exceptions.ConnectionError:
-                time.sleep(0.1)
-                continue
-            break
-
-        self.client = CpgClient.CpgClient(SERVER, PORT)
-
-    def _testServerPath():
-        scriptDir = os.path.dirname(os.path.realpath(__file__))
-        relpath = os.path.join(scriptDir, "..", "..","testserver.sh")
-        return os.path.abspath(relpath)
+        startServerThread = threading.Thread(target=doStartServer)
+        startServerThread.start()
+        startServerThread.join(timeout=10)
+        stopEvent.set()
+        cls.client = CpgClient.CpgClient(SERVER, PORT)
 
     def testShouldRaiseForCreateCpgOnNonExistingFile(self):
         """
