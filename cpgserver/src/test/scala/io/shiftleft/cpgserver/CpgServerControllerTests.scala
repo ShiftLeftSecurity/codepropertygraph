@@ -10,7 +10,7 @@ class CpgServerControllerTests extends ScalatraFunSuite {
 
   implicit val swagger = new CpgServerSwagger
   val system = ActorSystem()
-  val impl = new NullServerImpl
+  val impl = new TestServerImpl
   val controller = new CpgServerController(impl)
   addServlet(controller, "/*")
 

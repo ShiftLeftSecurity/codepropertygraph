@@ -5,6 +5,7 @@ name := "CPG server"
 resolvers += Classpaths.typesafeReleases
 
 dependsOn(Projects.codepropertygraph)
+dependsOn(Projects.queryPrimitives)
 
 libraryDependencies ++= Seq(
   "org.scalatra" %% "scalatra" % ScalatraVersion,
@@ -22,5 +23,6 @@ libraryDependencies ++= Seq(
   "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided"
 )
 
+enablePlugins(JavaAppPackaging)
 enablePlugins(SbtTwirl)
 enablePlugins(ScalatraPlugin)

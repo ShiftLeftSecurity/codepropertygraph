@@ -3,16 +3,47 @@ import os.path
 from cpgclient import CpgClient
 import pprint
 import json
+import subprocess
+import time
+import requests
+import signal
+import threading
 
 SERVER = "127.0.0.1"
 PORT = 8080
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
+stopEvent = threading.Event()
+
+def doStartServer():
+    cmd = str(testServerPath())
+    subprocess.Popen(cmd, stdout = subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    while True:
+        try:
+            response = requests.get("http://{}:{}/".format(SERVER, PORT))
+        except requests.exceptions.ConnectionError:
+            if stopEvent.is_set():
+                break
+            time.sleep(1)
+            continue
+        break
+
+def testServerPath():
+    scriptDir = os.path.dirname(os.path.realpath(__file__))
+    relpath = os.path.join(scriptDir, "..", "..","testserver.sh")
+    return os.path.abspath(relpath)
+
 class TestStringMethods(unittest.TestCase):
 
-    def setUp(self):
-        self.client = CpgClient.CpgClient(SERVER, PORT)
+    @classmethod
+    def setUpClass(cls):
+
+        startServerThread = threading.Thread(target=doStartServer)
+        startServerThread.start()
+        startServerThread.join(timeout=10)
+        stopEvent.set()
+        cls.client = CpgClient.CpgClient(SERVER, PORT)
 
     def testShouldRaiseForCreateCpgOnNonExistingFile(self):
         """
@@ -38,8 +69,9 @@ class TestStringMethods(unittest.TestCase):
         jsonResponse = json.loads(response)
         self.assertEqual("main", jsonResponse[0]["NAME"])
 
-    def tearDown(self):
-        pass
+    @classmethod
+    def tearDownClass(self):
+        os.system("pkill -f cpg-server")
 
 if __name__ == '__main__':
     unittest.main()
