@@ -115,6 +115,12 @@ class DiffGraph {
   def addEdgeProperty(edge: Edge, key: String, value: AnyRef) =
     _edgeProperties += new EdgeProperty(edge.id().asInstanceOf[JLong], key, value)
 
+  override def toString() = {
+    val nodeCount = _nodes.size
+    val edgeCount = _edges.size + _edgesToOriginal.size + _edgesFromOriginal.size + _edgesInOriginal.size
+    val propertyCount = _nodeProperties.size + _edgeProperties.size
+    s"DiffGraph[nodes: $nodeCount, edges: $edgeCount, properties: $propertyCount]"
+  }
 }
 
 object DiffGraph {
