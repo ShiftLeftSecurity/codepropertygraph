@@ -1,6 +1,7 @@
 import requests
 import time
 import pprint
+import json
 
 DEFAULT_PORT = 8080
 
@@ -32,7 +33,8 @@ class CpgClient:
 
     def _request(self, operation, body, isGet = False):
         url = "{}/{}".format(self.handlerAndUrl, operation)
-        response = requests.post(url, json = body)
+        body = json.dumps(body)
+        response = requests.post(url, data = body)
         if not response.status_code in [200, 202]:
             raise Exception("Invalid request: " + response)
         return response

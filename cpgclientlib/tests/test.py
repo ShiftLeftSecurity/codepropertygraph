@@ -1,7 +1,11 @@
-import unittest
+import sys
 import os.path
+
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(SCRIPT_DIR + "/../")
+
+import unittest
 from cpgclient import CpgClient
-import pprint
 import json
 import subprocess
 import time
@@ -12,13 +16,13 @@ import threading
 SERVER = "127.0.0.1"
 PORT = 8080
 
-SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-
 stopEvent = threading.Event()
 
 def doStartServer():
     cmd = str(testServerPath())
-    subprocess.Popen(cmd, stdout = subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    FNULL = open(os.devnull, 'w')
+    subprocess.Popen(cmd, stdout = FNULL, stderr=FNULL)
     while True:
         try:
             response = requests.get("http://{}:{}/".format(SERVER, PORT))
@@ -77,3 +81,4 @@ class TestStringMethods(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+    
