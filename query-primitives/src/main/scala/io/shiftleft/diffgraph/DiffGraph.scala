@@ -3,7 +3,7 @@ package io.shiftleft.diffgraph
 import gremlin.scala.{Edge, ScalaGraph}
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import java.lang.{Long => JLong}
-
+import org.apache.logging.log4j.LogManager
 import scala.collection.mutable
 
 /**
@@ -50,6 +50,7 @@ class DiffGraph {
 
   def addNode(node: NewNode): Unit = {
     _nodes += IdentityHashWrapper(node)
+    incrementNodeCreatedCount()
   }
 
   def mergeFrom(other: DiffGraph): Unit = {
@@ -64,8 +65,10 @@ class DiffGraph {
   /**
     * Add edge between nodes present in the diff graph
     * */
-  def addEdge(srcNode: NewNode, dstNode: NewNode, edgeLabel: String, properties: Seq[(String, AnyRef)] = List()): Unit =
+  def addEdge(srcNode: NewNode, dstNode: NewNode, edgeLabel: String, properties: Seq[(String, AnyRef)] = List()): Unit = {
     _edges += new EdgeInDiffGraph(srcNode, dstNode, edgeLabel, properties)
+    incrementEdgeCreatedCount()
+  }
 
   /**
     * Add edge from a node in the diff graph to a node in the original graph
@@ -73,8 +76,10 @@ class DiffGraph {
   def addEdgeToOriginal(srcNode: NewNode,
                         dstNode: StoredNode,
                         edgeLabel: String,
-                        properties: Seq[(String, AnyRef)] = List()): Unit =
+    properties: Seq[(String, AnyRef)] = List()): Unit = {
     _edgesToOriginal += new EdgeToOriginal(srcNode, dstNode.getId, edgeLabel, properties)
+    incrementEdgeCreatedCount()
+  }
 
   /**
     * Add edge from a node in the original graph to a node in the diff graph
@@ -82,8 +87,10 @@ class DiffGraph {
   def addEdgeFromOriginal(srcNode: StoredNode,
                           dstNode: NewNode,
                           edgeLabel: String,
-                          properties: Seq[(String, AnyRef)] = List()): Unit =
+                          properties: Seq[(String, AnyRef)] = List()): Unit = {
     _edgesFromOriginal += new EdgeFromOriginal(srcNode.getId, dstNode, edgeLabel, properties)
+    incrementEdgeCreatedCount()
+  }
 
   /**
     * Add edge between nodes of the original graph
@@ -91,8 +98,10 @@ class DiffGraph {
   def addEdgeInOriginal(srcNode: StoredNode,
                         dstNode: StoredNode,
                         edgeLabel: String,
-                        properties: Seq[(String, AnyRef)] = List()): Unit =
+                        properties: Seq[(String, AnyRef)] = List()): Unit = {
     _edgesInOriginal += new EdgeInOriginal(srcNode.getId, dstNode.getId, edgeLabel, properties)
+    incrementEdgeCreatedCount()
+  }
 
   /**
     * Add a property to an existing node
@@ -106,9 +115,30 @@ class DiffGraph {
   def addEdgeProperty(edge: Edge, key: String, value: AnyRef) =
     _edgeProperties += new EdgeProperty(edge.id().asInstanceOf[JLong], key, value)
 
+  override def toString() = {
+    val nodeCount = _nodes.size
+    val edgeCount = _edges.size + _edgesToOriginal.size + _edgesFromOriginal.size + _edgesInOriginal.size
+    val propertyCount = _nodeProperties.size + _edgeProperties.size
+    s"DiffGraph[nodes: $nodeCount, edges: $edgeCount, properties: $propertyCount]"
+  }
 }
 
 object DiffGraph {
+  private val logger = LogManager.getLogger(getClass)
+  private var nodesCreatedCount = 0
+  private var edgesCreatedCount = 0
+
+  def incrementNodeCreatedCount(): Unit = {
+    nodesCreatedCount += 1
+    if (nodesCreatedCount % 100000 == 0)
+      logger.debug(s"added $nodesCreatedCount nodes (total across all DiffGraphs)")
+  }
+
+  def incrementEdgeCreatedCount(): Unit = {
+    edgesCreatedCount += 1
+    if (edgesCreatedCount % 100000 == 0)
+      logger.debug(s"added $edgesCreatedCount edges (total across all DiffGraphs)")
+  }
 
   abstract class DiffEdge {
     def label: String
