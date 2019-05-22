@@ -184,7 +184,7 @@
          "comment" : "An arbitrary identifier/reference.",
          "is": ["EXPRESSION", "LOCAL_LIKE"],
          "outEdges" : [
-             {"edgeName": "REF", "inNodes": ["LOCAL"]},
+             {"edgeName": "REF", "inNodes": ["LOCAL", "METHOD_PARAMETER_IN"]},
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
          ]
         },
