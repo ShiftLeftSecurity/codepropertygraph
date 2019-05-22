@@ -29,7 +29,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
 
     "embedding a StoredNode and a NewNode" in {
       implicit val diffGraph = new DiffGraph
-      val existingContainedNode = new ModifierDb(_id = 42, _graph = TinkerGraph.open)
+      val existingContainedNode = new Modifier(_id = 42, _graph = TinkerGraph.open)
       existingContainedNode.property(Modifier.Keys.ModifierType, ModifierTypes.NATIVE)
 
       val newContainedNode = new TestNewNode
