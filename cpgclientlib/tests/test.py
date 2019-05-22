@@ -32,6 +32,8 @@ def doStartServer():
 def testServerPath():
     scriptDir = os.path.dirname(os.path.realpath(__file__))
     relpath = os.path.join(scriptDir, "..", "..","testserver.sh")
+    if not os.path.isfile(relpath):
+        raise Exception("testserver not found")
     return os.path.abspath(relpath)
 
 class TestStringMethods(unittest.TestCase):

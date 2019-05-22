@@ -34,7 +34,7 @@ stages:
 jobs:
   include:
   - stage: test
-    script: sbt +test
+    script: sbt stage +test
   - stage: release
     script: travis_wait 60 sbt ci-release-sonatype
 
