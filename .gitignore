@@ -7,3 +7,4 @@ codepropertygraph/project/
 protoc-3.6.0-linux-x86_64.zip
 private-key.pem
 travis_wait_*
+**/*.pyc
