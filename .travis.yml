@@ -21,10 +21,12 @@ env:
   - PATH="${PROTOC_TARGET}/bin:${PATH}"
 
 install:
+- pip install requests
 - rm -rf $HOME/protoc
 - wget $PROTOC_RELEASE
 - unzip $PROTOC_PKG -d $PROTOC_TARGET
 - protoc --version
+
 
 stages:
 - name: test
@@ -34,7 +36,7 @@ stages:
 jobs:
   include:
   - stage: test
-    script: sbt +test
+    script: sbt stage +test
   - stage: release
     script: travis_wait 60 sbt ci-release-sonatype
 
