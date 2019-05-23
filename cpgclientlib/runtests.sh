@@ -1,2 +1,2 @@
-python tests/test.py
+python2 tests/test.py
 
