@@ -14,7 +14,7 @@ class WithinMethodMethods(val node: nodes.WithinMethod) extends AnyVal {
 
 private object WithinMethodToMethod extends NodeVisitor[nodes.Method] with ExpressionGeneralization[nodes.Method] {
   override def visit(node: nodes.Method): nodes.Method = {
-    node.asInstanceOf[nodes.Method]
+    node
   }
 
   override def visit(node: nodes.MethodParameterIn): nodes.Method = {

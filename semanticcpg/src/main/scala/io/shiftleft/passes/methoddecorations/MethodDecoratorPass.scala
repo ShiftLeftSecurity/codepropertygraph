@@ -23,8 +23,8 @@ class MethodDecoratorPass(graph: ScalaGraph) extends CpgPass(graph) {
 
     graph.V
       .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
-      .sideEffect { node =>
-        val parameterIn = node.asInstanceOf[nodes.MethodParameterIn]
+      .sideEffectWithTraverser { traverser =>
+        val parameterIn = traverser.get.asInstanceOf[nodes.MethodParameterIn]
         if (!parameterIn.vertices(Direction.OUT, EdgeTypes.PARAMETER_LINK).hasNext) {
           val parameterOut = new nodes.NewMethodParameterOut(
             parameterIn.code,

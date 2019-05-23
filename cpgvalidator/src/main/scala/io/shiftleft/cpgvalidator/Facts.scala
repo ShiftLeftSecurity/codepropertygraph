@@ -29,7 +29,7 @@ object Facts {
     NodeTypes.CALL has 0 to 1 outgoing EdgeTypes.RECEIVER to
       NodeTypes.CALL or NodeTypes.IDENTIFIER or NodeTypes.LITERAL or NodeTypes.METHOD_REF or NodeTypes.BLOCK,
     NodeTypes.IDENTIFIER has 1 outgoing EdgeTypes.CFG to SuperTypes.Expression,
-    NodeTypes.IDENTIFIER has 0 to 1 outgoing EdgeTypes.REF to NodeTypes.LOCAL,
+    NodeTypes.IDENTIFIER has 0 to 1 outgoing EdgeTypes.REF to NodeTypes.LOCAL or NodeTypes.METHOD_PARAMETER_IN,
     NodeTypes.RETURN has 0 to 1 outgoing EdgeTypes.AST to SuperTypes.Expression,
     NodeTypes.RETURN has 1 outgoing EdgeTypes.CFG to NodeTypes.METHOD_RETURN,
     NodeTypes.BLOCK has 0 to N outgoing EdgeTypes.AST to SuperTypes.Expression,
@@ -44,7 +44,7 @@ object Facts {
   val nodeInFacts = List(
     NodeTypes.METHOD has 0 to N incoming EdgeTypes.VTABLE from NodeTypes.TYPE_DECL,
     NodeTypes.METHOD_PARAMETER_IN has 1 incoming EdgeTypes.AST from NodeTypes.METHOD,
-    NodeTypes.METHOD_PARAMETER_IN has 0 to N incoming EdgeTypes.REF from NodeTypes.CLOSURE_BINDING,
+    NodeTypes.METHOD_PARAMETER_IN has 0 to N incoming EdgeTypes.REF from NodeTypes.IDENTIFIER or NodeTypes.CLOSURE_BINDING,
     NodeTypes.METHOD_RETURN has 1 incoming EdgeTypes.AST from NodeTypes.METHOD,
     NodeTypes.METHOD_RETURN has 0 to N incoming EdgeTypes.CFG from NodeTypes.RETURN,
     NodeTypes.MODIFIER has 1 incoming EdgeTypes.AST from
