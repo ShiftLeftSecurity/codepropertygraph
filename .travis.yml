@@ -22,7 +22,7 @@ env:
 
 install:
 - pip install requests
-- pip install setuptools
+- python3 -m pip install setuptools
 - rm -rf $HOME/protoc
 - wget $PROTOC_RELEASE
 - unzip $PROTOC_PKG -d $PROTOC_TARGET
