@@ -30,6 +30,8 @@ install:
 
 stages:
 - name: test
+- name: release-python
+  if: branch = master AND type = push
 - name: release
   if: branch = master AND type = push
 
@@ -37,6 +39,8 @@ jobs:
   include:
   - stage: test
     script: sbt stage +test
+  - stage: release-python
+    script: cpgclientlib/deploy.sh
   - stage: release
     script: travis_wait 60 sbt ci-release-sonatype
 
