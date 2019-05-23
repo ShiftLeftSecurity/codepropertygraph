@@ -1,12 +1,10 @@
 import setuptools
-import subprocess
 import os, os.path
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-NEWEST_VERSION_SCRIPT = os.path.join(SCRIPT_DIR, "newestVersion.sh")
 
 def getCurrentVersion():
-    output = str(subprocess.check_output([NEWEST_VERSION_SCRIPT]))
+    output = open(os.path.join(SCRIPT_DIR,"version")).readline()
     return output.replace("'", "").replace("\\n", "").replace("v", "").replace("b", "")
 
 with open("README.md", "r") as fh:
@@ -15,7 +13,7 @@ with open("README.md", "r") as fh:
     setuptools.setup(
         name='cpgclientlib',
         version=getCurrentVersion(),
-        scripts=[] ,
+        scripts=['version'] ,
         author="Fabian Yamaguchi",
         author_email="fabs@shiftleft.io",
         description="A client library for CPG servers",
@@ -27,7 +25,7 @@ with open("README.md", "r") as fh:
 
         classifiers=[
             "Programming Language :: Python :: 3",
-            "License :: OSI Approved :: Apache 2 License",
+            "License :: OSI Approved :: Apache Software License",
             "Operating System :: OS Independent",
         ],
 )
