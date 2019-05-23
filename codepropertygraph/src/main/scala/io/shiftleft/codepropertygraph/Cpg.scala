@@ -48,4 +48,6 @@ class Cpg(val graph: Graph = Cpg.emptyGraph)
   implicit lazy val scalaGraph: ScalaGraph =
     graph.asScala
 
+  def close(): Unit =
+    graph.close
 }

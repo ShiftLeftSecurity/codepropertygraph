@@ -3,8 +3,9 @@ name := "codepropertygraph"
 dependsOn(Projects.protoBindings)
 
 libraryDependencies ++= Seq(
-  "io.shiftleft" % "tinkergraph-gremlin" % "3.3.4.6",
+  "io.shiftleft" % "tinkergraph-gremlin" % "3.3.4.11",
   "com.michaelpollmeier" %% "gremlin-scala" % "3.3.4.13",
+  "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.11.2", //redirect tinkerpop's slf4j logging to log4j
   "com.google.guava" % "guava" % "21.0",
   "org.apache.commons" % "commons-lang3" % "3.5",
   "commons-io" % "commons-io" % "2.5",

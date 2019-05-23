@@ -27,11 +27,12 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
         dstGraph.addEdgeFromOriginal(srcNode = initialNode.asInstanceOf[nodes.StoredNode],
                                      dstNode = newNode,
                                      edgeLabel = EdgeTypes.AST)
-        Stream(dstGraph)
+        Iterator(dstGraph)
       }
     }
 
     val overlay1 = pass1.executeAndCreateOverlay()
+    fullyConsume(overlay1)
     cpg.graph.V.count.head shouldBe 2
     initialNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass1NewNodeCode)
 
@@ -49,11 +50,12 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
         dstGraph.addEdgeFromOriginal(srcNode = pass1NewNode.asInstanceOf[nodes.StoredNode],
                                      dstNode = newNode,
                                      edgeLabel = EdgeTypes.AST)
-        Stream(dstGraph)
+        Iterator(dstGraph)
       }
     }
 
     val overlay2 = pass2.executeAndCreateOverlay()
+    fullyConsume(overlay2)
     cpg.graph.V.count.head shouldBe 3
     pass1NewNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass2NewNodeCode)
   }
@@ -69,6 +71,10 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
     initialNode.setProperty(NodeKeys.CODE, InitialNodeCode)
     Cpg(graph)
   }
+
+  /** equivalent of what happens in `CpgPassRunner.createStoreAndApplyOverlay` */
+  def fullyConsume(overlay: Iterator[_]): Unit =
+    while (overlay.hasNext) overlay.next()
 }
 
 trait DummyProduct {

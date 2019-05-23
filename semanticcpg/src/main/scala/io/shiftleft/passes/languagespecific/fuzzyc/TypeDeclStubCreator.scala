@@ -9,7 +9,7 @@ class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
 
   private var typeDeclFullNameToNode = Map[String, nodes.TypeDeclBase]()
 
-  override def run(): Stream[DiffGraph] = {
+  override def run(): Iterator[DiffGraph] = {
     val dstGraph = new DiffGraph
 
     init()
@@ -18,17 +18,17 @@ class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
       .hasLabel(NodeTypes.TYPE)
       .sideEffectWithTraverser { traverser =>
         val typ = traverser.get.asInstanceOf[nodes.Type]
-        typeDeclFullNameToNode.get(typ.fullName()) match {
+        typeDeclFullNameToNode.get(typ.fullName) match {
           case Some(_) =>
           case None =>
-            val newTypeDecl = createTypeDeclStub(typ.name, typ.fullName())
-            typeDeclFullNameToNode += typ.fullName() -> newTypeDecl
+            val newTypeDecl = createTypeDeclStub(typ.name, typ.fullName)
+            typeDeclFullNameToNode += typ.fullName -> newTypeDecl
             dstGraph.addNode(newTypeDecl)
         }
       }
       .iterate()
 
-    Stream(dstGraph)
+    Iterator(dstGraph)
   }
 
   private def createTypeDeclStub(name: String, fullName: String): nodes.NewTypeDecl = {
@@ -45,7 +45,7 @@ class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
   private def init(): Unit = {
     val cpg = Cpg(graph.graph)
     cpg.typeDecl.sideEffect { typeDecl =>
-      typeDeclFullNameToNode += typeDecl.fullName() -> typeDecl
+      typeDeclFullNameToNode += typeDecl.fullName -> typeDecl
     }
   }
 }

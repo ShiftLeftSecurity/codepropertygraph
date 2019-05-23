@@ -15,7 +15,7 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
   override def run() = {
     val dstGraph = new DiffGraph
     linkMemberAccessToMember(dstGraph)
-    Stream(dstGraph)
+    Iterator(dstGraph)
   }
 
   private def linkMemberAccessToMember(dstGraph: DiffGraph): Unit = {

@@ -7,7 +7,7 @@ import io.shiftleft.passes.CpgPass
 
 class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
 
-  override def run(): Stream[DiffGraph] = {
+  override def run(): Iterator[DiffGraph] = {
     var idToClosureBinding = Map[String, nodes.ClosureBinding]()
     val dstGraph = new DiffGraph
 
@@ -34,6 +34,6 @@ class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
         case _ =>
       }
       .iterate()
-    Stream(dstGraph)
+    Iterator(dstGraph)
   }
 }

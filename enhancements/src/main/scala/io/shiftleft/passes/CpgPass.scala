@@ -12,6 +12,9 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
   protected val logger = LogManager.getLogger(getClass)
   private var startTime: Long = _
 
+  /** override in concrete pass if needed */
+  def name = getClass.getName
+
   /**
     * Execute the enhancement and apply result to graph
     * */
@@ -25,7 +28,7 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
   /**
     * Main method of enhancement - to be implemented by child class
     * */
-  def run(): Stream[DiffGraph]
+  def run(): Iterator[DiffGraph]
 
   /**
     * Apply diff graph to the source graph
@@ -37,11 +40,10 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
   /**
     * Execute and create a serialized overlay
     * */
-  def executeAndCreateOverlay(): Stream[CpgOverlay] = {
+  def executeAndCreateOverlay(): Iterator[CpgOverlay] = {
     try {
       logStart()
-      val dstGraphs = run()
-      dstGraphs.map(serializeOverlay)
+      run().map(serializeOverlay)
     } finally {
       logEnd()
     }
@@ -53,13 +55,13 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
   }
 
   private def logStart(): Unit = {
-    logger.info(s"Start of enhancement: ${getClass.getName}")
+    logger.info(s"Start of enhancement: ${name}")
     startTime = System.currentTimeMillis()
   }
 
   private def logEnd(): Unit = {
     val endTime = System.currentTimeMillis()
-    logger.info(s"End of enhancement: ${getClass.getName}, after ${endTime - startTime}ms")
+    logger.info(s"End of enhancement: ${name}, after ${endTime - startTime}ms")
   }
 
 }

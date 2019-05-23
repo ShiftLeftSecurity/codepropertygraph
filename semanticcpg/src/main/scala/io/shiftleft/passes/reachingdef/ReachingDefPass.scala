@@ -14,7 +14,7 @@ import scala.collection.JavaConverters._
 class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
   var dfHelper: DataFlowFrameworkHelper = _
 
-  override def run(): Stream[DiffGraph] = {
+  override def run(): Iterator[DiffGraph] = {
     val dstGraph = new DiffGraph()
     val methods = graph.V.hasLabel(NodeTypes.METHOD).l
 
@@ -64,7 +64,7 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
       addReachingDefEdge(dstGraph, method, out, in)
     }
 
-    Stream(dstGraph)
+    Iterator(dstGraph)
   }
 
   /** Pruned DDG, i.e., two call assignment vertices are adjacent if a

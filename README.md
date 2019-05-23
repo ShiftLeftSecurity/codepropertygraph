@@ -30,6 +30,7 @@ the following prerequisites:
 
 * Python3
   - Link: https://www.python.org/downloads/
+* Python2 and python2-requests
 * Java runtime 8
   - Link: http://openjdk.java.net/install/
 * Scala build tool (sbt)
