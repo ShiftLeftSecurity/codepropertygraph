@@ -36,7 +36,7 @@ class CpgClient:
         body = json.dumps(body)
         response = requests.post(url, data = body)
         if not response.status_code in [200, 202]:
-            raise Exception("Invalid request: " + response)
+            raise Exception("Invalid request: " + str(response))
         return response
 
     # TODO: if we do allow multiple CPGs to be loaded, this method
