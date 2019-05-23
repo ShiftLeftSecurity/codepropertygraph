@@ -43,8 +43,7 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
   def executeAndCreateOverlay(): Stream[CpgOverlay] = {
     try {
       logStart()
-      val dstGraphs = run()
-      dstGraphs.map(serializeOverlay)
+      run().map(serializeOverlay)
     } finally {
       logEnd()
     }
