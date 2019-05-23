@@ -27,7 +27,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
         dstGraph.addEdgeFromOriginal(srcNode = initialNode.asInstanceOf[nodes.StoredNode],
                                      dstNode = newNode,
                                      edgeLabel = EdgeTypes.AST)
-        Stream(dstGraph)
+        Iterator(dstGraph)
       }
     }
 
@@ -49,7 +49,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
         dstGraph.addEdgeFromOriginal(srcNode = pass1NewNode.asInstanceOf[nodes.StoredNode],
                                      dstNode = newNode,
                                      edgeLabel = EdgeTypes.AST)
-        Stream(dstGraph)
+        Iterator(dstGraph)
       }
     }
 

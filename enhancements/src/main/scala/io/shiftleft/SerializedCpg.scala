@@ -53,7 +53,7 @@ class SerializedCpg() {
   }
 
   @throws[IOException]
-  def addOverlay(overlays: Stream[Cpg.CpgOverlay], name: String): Unit = {
+  def addOverlay(overlays: Iterator[Cpg.CpgOverlay], name: String): Unit = {
     overlays.zipWithIndex.foreach {
       case (overlay, i) => addOverlay(overlay, name + "_" + i)
     }

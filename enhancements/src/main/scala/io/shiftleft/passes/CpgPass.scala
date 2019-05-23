@@ -28,7 +28,7 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
   /**
     * Main method of enhancement - to be implemented by child class
     * */
-  def run(): Stream[DiffGraph]
+  def run(): Iterator[DiffGraph]
 
   /**
     * Apply diff graph to the source graph
@@ -40,7 +40,7 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
   /**
     * Execute and create a serialized overlay
     * */
-  def executeAndCreateOverlay(): Stream[CpgOverlay] = {
+  def executeAndCreateOverlay(): Iterator[CpgOverlay] = {
     try {
       logStart()
       run().map(serializeOverlay)

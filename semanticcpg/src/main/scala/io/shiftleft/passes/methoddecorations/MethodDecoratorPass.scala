@@ -61,6 +61,6 @@ class MethodDecoratorPass(graph: ScalaGraph) extends CpgPass(graph) {
         }
       }
       .iterate
-    Stream(dstGraph)
+    Iterator(dstGraph)
   }
 }

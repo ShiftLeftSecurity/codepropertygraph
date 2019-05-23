@@ -16,7 +16,7 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
   private var methodFullNameToNode = Map[String, nodes.MethodBase]()
   private var methodInstFullNameToParameterCount = Map[String, Int]()
 
-  override def run(): Stream[DiffGraph] = {
+  override def run(): Iterator[DiffGraph] = {
     val dstGraph = new DiffGraph
 
     init()
@@ -41,7 +41,7 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
         }
       }
       .iterate()
-    Stream(dstGraph)
+    Iterator(dstGraph)
   }
 
   private def createMethodStub(name: String,

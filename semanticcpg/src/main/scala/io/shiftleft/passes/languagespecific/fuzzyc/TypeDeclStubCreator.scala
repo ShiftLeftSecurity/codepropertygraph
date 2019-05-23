@@ -9,7 +9,7 @@ class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
 
   private var typeDeclFullNameToNode = Map[String, nodes.TypeDeclBase]()
 
-  override def run(): Stream[DiffGraph] = {
+  override def run(): Iterator[DiffGraph] = {
     val dstGraph = new DiffGraph
 
     init()
@@ -28,7 +28,7 @@ class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
       }
       .iterate()
 
-    Stream(dstGraph)
+    Iterator(dstGraph)
   }
 
   private def createTypeDeclStub(name: String, fullName: String): nodes.NewTypeDecl = {

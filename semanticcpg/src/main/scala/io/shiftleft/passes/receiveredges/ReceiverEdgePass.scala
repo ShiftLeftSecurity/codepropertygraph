@@ -19,7 +19,7 @@ import scala.collection.JavaConverters._
   */
 class ReceiverEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
 
-  override def run(): Stream[DiffGraph] = {
+  override def run(): Iterator[DiffGraph] = {
     var loggedDeprecationWarning = false
     val dstGraph = new DiffGraph
 
@@ -48,6 +48,6 @@ class ReceiverEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
         }
       }
       .iterate()
-    Stream(dstGraph)
+    Iterator(dstGraph)
   }
 }

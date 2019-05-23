@@ -28,6 +28,6 @@ class NamespaceCreator(graph: ScalaGraph) extends CpgPass(graph) {
             dstGraph.addEdgeFromOriginal(block, namespace, EdgeTypes.REF)
         }
     }
-    Stream(dstGraph)
+    Iterator(dstGraph)
   }
 }

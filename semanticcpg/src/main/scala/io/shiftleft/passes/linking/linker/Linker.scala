@@ -19,7 +19,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
   private var methodInstFullNameToNodeId = Map[String, JLong]()
   private var namespaceBlockFullNameToNodeId = Map[String, JLong]()
 
-  override def run(): Stream[DiffGraph] = {
+  override def run(): Iterator[DiffGraph] = {
     val dstGraph = new DiffGraph
 
     initMaps()
@@ -98,7 +98,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
       dstGraph
     )
 
-    Stream(dstGraph)
+    Iterator(dstGraph)
   }
 
   private def initMaps(): Unit = {
