@@ -8,7 +8,7 @@ def getCurrentVersion():
     if not os.path.exists(versionFile):
         os.system(os.path.join(SCRIPT_DIR, "setVersion"))
     output = open(versionFile).readline()
-    return output.replace("'", "").replace("\\n", "").replace("v", "").replace("b", "")
+    return output.replace("'", "").replace("\\n", "").replace("v", "").replace("b", "").replace("\n","")
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
