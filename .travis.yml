@@ -3,6 +3,8 @@ matrix:
   - language: python
     python: 3.6
     before_script:
+      - mkdir -p $HOME/.sbt/launchers/1.2.6/
+      - curl -L -o $HOME/.sbt/launchers/1.2.6/sbt-launch.jar http://central.maven.org/maven2/org/scala-sbt/sbt-launch/1.2.6/sbt-launch-1.2.6.jar
       - sbt stage
       - cd cpgclientlib 
   - language: scala
