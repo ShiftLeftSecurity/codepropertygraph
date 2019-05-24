@@ -38,7 +38,7 @@ matrix:
     jobs:
       include:
       - stage: test
-        script: sbt stage +test
+        script: sbt +test
       - stage: release
         script: travis_wait 60 sbt ci-release-sonatype
 
