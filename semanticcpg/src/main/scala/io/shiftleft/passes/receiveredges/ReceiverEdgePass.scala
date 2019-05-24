@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
+import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
@@ -18,6 +19,7 @@ import scala.collection.JavaConverters._
   TODO remove once not needed anymore.
   */
 class ReceiverEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
+  import ReceiverEdgePass.logger
 
   override def run(): Iterator[DiffGraph] = {
     var loggedDeprecationWarning = false
@@ -50,4 +52,8 @@ class ReceiverEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
       .iterate()
     Iterator(dstGraph)
   }
+}
+
+object ReceiverEdgePass {
+  private val logger: Logger = LogManager.getLogger(classOf[ReceiverEdgePass])
 }

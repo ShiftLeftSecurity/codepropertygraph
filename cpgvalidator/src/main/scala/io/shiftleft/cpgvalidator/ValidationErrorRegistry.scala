@@ -5,8 +5,9 @@ import org.apache.logging.log4j.LogManager
 import scala.collection.mutable
 
 class ValidationErrorRegistry {
-  private var validationErrors = mutable.Map[ValidationErrorCategory, List[ValidationError]]()
-  private val logger = LogManager.getLogger(getClass)
+  import ValidationErrorRegistry.logger
+
+  private[this] val validationErrors = mutable.Map[ValidationErrorCategory, List[ValidationError]]()
 
   def addError(error: ValidationError): Unit = {
     val category = error.getCategory
@@ -34,4 +35,8 @@ class ValidationErrorRegistry {
     validationErrors.keys.size
   }
 
+}
+
+object ValidationErrorRegistry {
+  private val logger = LogManager.getLogger(classOf[ValidationErrorRegistry])
 }
