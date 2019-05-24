@@ -56,7 +56,7 @@ matrix:
       - sbt test
       
     after_success:
-      - if [ $TRAVIS_PULL_REQUEST = 'false' ]; then travis_wait 60 sbt ci-release-sonatype; fi
+      - if [[ "$TRAVIS_BRANCH" == "master" && $TRAVIS_PULL_REQUEST = 'false' ]]; then travis_wait 60 sbt ci-release-sonatype; fi
 
     before_cache:
     - du -h -d 1 $HOME/.ivy2/cache
