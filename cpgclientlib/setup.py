@@ -4,10 +4,7 @@ import os, os.path
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 def getCurrentVersion():
-    versionFile = os.path.join(SCRIPT_DIR,"version")
-    if not os.path.exists(versionFile):
-        os.system(os.path.join(SCRIPT_DIR, "setVersion"))
-    output = open(versionFile).readline()
+    output = open(os.path.join(SCRIPT_DIR,"version")).readline()
     return output.replace("'", "").replace("\\n", "").replace("v", "").replace("b", "")
 
 with open("README.md", "r") as fh:

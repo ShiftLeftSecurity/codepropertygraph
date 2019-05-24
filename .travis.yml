@@ -21,10 +21,6 @@ matrix:
       - cd cpgclientlib
     script:
       - ./runtests.sh
-    deploy:
-      provider: pypi
-      user: "fabsx00"
-      password: $PIPY_PASSWORD
 
   - language: scala
     jdk: oraclejdk8
