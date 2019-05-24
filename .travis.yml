@@ -2,7 +2,9 @@ matrix:
   include:
   - language: python
     python: 3.6
-
+    before_script:
+      - sbt stage
+      - cd cpgclientlib 
   - language: scala
     jdk: oraclejdk8
     branches:
