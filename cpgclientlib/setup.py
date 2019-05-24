@@ -4,11 +4,17 @@ import os, os.path
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 def getCurrentVersion():
+    print(SCRIPT_DIR)
     versionFile = os.path.join(SCRIPT_DIR,"version")
+    print(versionFile)
     if not os.path.exists(versionFile):
-        os.system(os.path.join(SCRIPT_DIR, "setVersion"))
+        setVersionFilename = str(os.path.join(SCRIPT_DIR, "setVersion"))
+        print(setVersionFilename)
+        os.system(setVersionFilename)
     output = open(versionFile).readline()
-    return output.replace("'", "").replace("\\n", "").replace("v", "").replace("b", "").replace("\n","")
+    version = output.replace("'", "").replace("\\n", "").replace("v", "").replace("b", "").replace("\n","")
+    print(version)
+    return version
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
