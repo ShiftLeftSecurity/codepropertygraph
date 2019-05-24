@@ -52,6 +52,19 @@ matrix:
     - unzip $PROTOC_PKG -d $PROTOC_TARGET
     - protoc --version
 
+    stages:
+    - name: test
+      if: branch = master AND type = push
+    - name: release
+      if: branch = master AND type = push
+
+    jobs:
+      include:
+      - stage: test
+        script: sbt +test
+      - stage: release
+        script: travis_wait 60 sbt ci-release-sonatype
+
     before_cache:
     - du -h -d 1 $HOME/.ivy2/cache
     - du -h -d 2 $HOME/.sbt/
@@ -66,16 +79,3 @@ matrix:
       - "$HOME/.sbt/launchers"
       - "$HOME/.ivy2/cache"
       - "$HOME/.coursier"
-
-stages:
-  - name: test
-    if: branch = master AND type = push
-  - name: release
-    if: branch = master AND type = push
-
-  jobs:
-    include:
-      - stage: test
-        script: sbt +test
-      - stage: release
-        script: travis_wait 60 sbt ci-release-sonatype
