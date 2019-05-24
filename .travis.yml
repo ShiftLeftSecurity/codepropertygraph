@@ -56,14 +56,14 @@ matrix:
     - name: test
       if: branch = master AND type = push
     - name: release
-      if: branch = master AND type = push
+      # if: branch = master AND type = push
 
     jobs:
       include:
       - stage: test
         script: sbt +test
       - stage: release
-        script: travis_wait 60 sbt ci-release-sonatype
+        script: echo "running deploy"
 
     before_cache:
     - du -h -d 1 $HOME/.ivy2/cache
