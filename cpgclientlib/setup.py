@@ -1,28 +1,31 @@
 import setuptools
-import os, os.path
+import os
+import os.path
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-def getCurrentVersion():
+
+def get_version():
     print(SCRIPT_DIR)
-    versionFile = os.path.join(SCRIPT_DIR,"version")
-    print(versionFile)
-    if not os.path.exists(versionFile):
-        setVersionFilename = str(os.path.join(SCRIPT_DIR, "setVersion"))
-        print(setVersionFilename)
-        os.system(setVersionFilename)
-    output = open(versionFile).readline()
-    version = output.replace("'", "").replace("\\n", "").replace("v", "").replace("b", "").replace("\n","")
+    version_file = os.path.join(SCRIPT_DIR, "version")
+    print(version_file)
+    if not os.path.exists(version_file):
+        set_version_filename = str(os.path.join(SCRIPT_DIR, "setVersion"))
+        print(set_version_filename)
+        os.system(set_version_filename)
+    output = open(version_file).readline()
+    version = output.replace("'", "").replace("\\n", "").replace("v", "").replace("b", "").replace("\n", "")
     print(version)
     return version
 
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
-    
+
     setuptools.setup(
         name='cpgclientlib',
-        version=getCurrentVersion(),
-        scripts=['version'] ,
+        version=get_version(),
+        scripts=['version'],
         author="Fabian Yamaguchi",
         author_email="fabs@shiftleft.io",
         description="A client library for CPG servers",
@@ -37,4 +40,4 @@ with open("README.md", "r") as fh:
             "License :: OSI Approved :: Apache Software License",
             "Operating System :: OS Independent",
         ],
-)
+    )
