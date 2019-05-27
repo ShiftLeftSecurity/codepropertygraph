@@ -57,7 +57,7 @@ class TestStringMethods(unittest.TestCase):
         if the filename is not that of an existing file
         """
         filename = "filethatdoesnotexist"
-        self.assertRaises(Exception, self.client.createCpg, filename)
+        self.assertRaises(Exception, self.client.create_cpg, filename)
 
     def testShouldSucceedForCreateCpgOnKnownFile(self):
         """
@@ -65,12 +65,12 @@ class TestStringMethods(unittest.TestCase):
         if filename is that of a known file.
         """
         filename = os.path.join(SCRIPT_DIR, "testcode")
-        self.client.createCpg(filename)
-        self.assertEqual(True, self.client.isCpgLoaded())
+        self.client.create_cpg(filename)
+        self.assertEqual(True, self.client.is_cpg_loaded())
 
     def testSimpleQuery(self):
         filename = os.path.join(SCRIPT_DIR, "testcode")
-        self.client.createCpg(filename)
+        self.client.create_cpg(filename)
         response = self.client.query("cpg.method.toJson")
         jsonResponse = json.loads(response)
         self.assertEqual("main", jsonResponse[0]["NAME"])
