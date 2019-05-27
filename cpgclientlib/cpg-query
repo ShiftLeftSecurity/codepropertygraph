@@ -4,7 +4,7 @@ import argparse
 from cpgclient.CpgClient import CpgClient
 
 
-class JoernQuery:
+class CpgQuery:
 
     def main(self):
         args = self._parse_command_line()
@@ -24,4 +24,4 @@ class JoernQuery:
 
 
 if __name__ == '__main__':
-    JoernQuery().main()
+    CpgQuery().main()

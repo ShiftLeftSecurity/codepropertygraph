@@ -7,7 +7,7 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 def get_version():
     print(SCRIPT_DIR)
-    version_file = os.path.join(SCRIPT_DIR, "version")
+    version_file = os.path.join(SCRIPT_DIR, "cpg-version")
     print(version_file)
     if not os.path.exists(version_file):
         set_version_filename = str(os.path.join(SCRIPT_DIR, "setVersion"))
@@ -25,7 +25,7 @@ with open("README.md", "r") as fh:
     setuptools.setup(
         name='cpgclientlib',
         version=get_version(),
-        scripts=['version'],
+        scripts=['cpg-version', 'cpg-create', 'cpg-query'],
         author="Fabian Yamaguchi",
         author_email="fabs@shiftleft.io",
         description="A client library for CPG servers",

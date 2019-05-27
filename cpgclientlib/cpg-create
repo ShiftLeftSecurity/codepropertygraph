@@ -4,7 +4,7 @@ import argparse
 from cpgclient.CpgClient import CpgClient
 
 
-class JoernCreate:
+class CpgCreate:
 
     def main(self):
         """
@@ -29,4 +29,4 @@ class JoernCreate:
 
 
 if __name__ == '__main__':
-    JoernCreate().main()
+    CpgCreate().main()
