@@ -26,7 +26,7 @@ public enum Text implements BiPredicate<Object, Object> {
     }
   };
 
-  // TODO: delete ones java traversals are gone
+  // TODO: delete once java traversals are gone
   public static P<String> textRegex(final String value) {
     return new P(Text.REGEX, Pattern.compile(value));
   }

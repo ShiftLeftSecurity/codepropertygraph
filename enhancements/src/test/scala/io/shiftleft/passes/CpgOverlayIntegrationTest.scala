@@ -9,27 +9,17 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{Matchers, WordSpec}
 
 class CpgOverlayIntegrationTest extends WordSpec with Matchers {
+  import CpgOverlayIntegrationTest.DummyProduct
+
+  val InitialNodeCode = "initialNode"
+  val Pass1NewNodeCode = "pass1NewNodeCode"
+  val Pass2NewNodeCode = "pass2NewNodeCode"
 
   "cpg passes being serialised to and from overlay protobuf via DiffGraph" in {
     val cpg = createNewBaseCpg()
 
     val initialNode = cpg.graph.V.has(NodeKeys.CODE, InitialNodeCode).head
-    val pass1 = new CpgPass(cpg.graph) {
-      val newNode = new nodes.NewNode with DummyProduct {
-        override def containedNodesByLocalName = ???
-        override def label = NodeTypes.UNKNOWN
-        override def properties = Map(NodeKeyNames.CODE -> Pass1NewNodeCode)
-        override def accept[T](visitor: NodeVisitor[T]): T = ???
-      }
-      override def run() = {
-        val dstGraph = new DiffGraph
-        dstGraph.addNode(newNode)
-        dstGraph.addEdgeFromOriginal(srcNode = initialNode.asInstanceOf[nodes.StoredNode],
-                                     dstNode = newNode,
-                                     edgeLabel = EdgeTypes.AST)
-        Iterator(dstGraph)
-      }
-    }
+    val pass1 = passAddsEdgeTo(initialNode.asInstanceOf[nodes.StoredNode], Pass1NewNodeCode, cpg)
 
     val overlay1 = pass1.executeAndCreateOverlay()
     fullyConsume(overlay1)
@@ -37,22 +27,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
     initialNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass1NewNodeCode)
 
     val pass1NewNode = cpg.graph.V.has(NodeKeys.CODE, Pass1NewNodeCode).head
-    val pass2 = new CpgPass(cpg.graph) {
-      val newNode = new nodes.NewNode with DummyProduct {
-        override def containedNodesByLocalName = ???
-        override def label = NodeTypes.UNKNOWN
-        override def properties = Map(NodeKeyNames.CODE -> Pass2NewNodeCode)
-        override def accept[T](visitor: NodeVisitor[T]): T = ???
-      }
-      override def run() = {
-        val dstGraph = new DiffGraph
-        dstGraph.addNode(newNode)
-        dstGraph.addEdgeFromOriginal(srcNode = pass1NewNode.asInstanceOf[nodes.StoredNode],
-                                     dstNode = newNode,
-                                     edgeLabel = EdgeTypes.AST)
-        Iterator(dstGraph)
-      }
-    }
+    val pass2 = passAddsEdgeTo(pass1NewNode.asInstanceOf[nodes.StoredNode], Pass2NewNodeCode, cpg)
 
     val overlay2 = pass2.executeAndCreateOverlay()
     fullyConsume(overlay2)
@@ -60,9 +35,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
     pass1NewNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass2NewNodeCode)
   }
 
-  val InitialNodeCode = "initialNode"
-  val Pass1NewNodeCode = "pass1NewNodeCode"
-  val Pass2NewNodeCode = "pass2NewNodeCode"
+
 
   /* like a freshly deserialized cpg.bin.zip without any overlays applied */
   def createNewBaseCpg(): Cpg = {
@@ -72,13 +45,39 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
     Cpg(graph)
   }
 
+  def passAddsEdgeTo(from: nodes.StoredNode, propValue: String, cpg: Cpg): CpgPass = {
+    val newNode = new nodes.NewNode with DummyProduct {
+      override def containedNodesByLocalName = ???
+      override def label = NodeTypes.UNKNOWN
+      override def properties = Map(NodeKeyNames.CODE -> propValue)
+      override def accept[T](visitor: NodeVisitor[T]): T = ???
+    }
+    new CpgPass(cpg.graph) {
+      /**
+        * Main method of enhancement - to be implemented by child class
+        **/
+      override def run(): Iterator[DiffGraph] = {
+        val dstGraph = new DiffGraph
+        dstGraph.addNode(newNode)
+        dstGraph.addEdgeFromOriginal(srcNode = from,
+          dstNode = newNode,
+          edgeLabel = EdgeTypes.AST)
+        Iterator(dstGraph)
+      }
+    }
+  }
+
   /** equivalent of what happens in `CpgPassRunner.createStoreAndApplyOverlay` */
   def fullyConsume(overlay: Iterator[_]): Unit =
     while (overlay.hasNext) overlay.next()
 }
 
-trait DummyProduct {
-  def canEqual(that: Any): Boolean = ???
-  def productArity: Int = ???
-  def productElement(n: Int): Any = ???
+object CpgOverlayIntegrationTest {
+  private trait DummyProduct {
+    def canEqual(that: Any): Boolean = ???
+    def productArity: Int = ???
+    def productElement(n: Int): Any = ???
+  }
 }
+
+
