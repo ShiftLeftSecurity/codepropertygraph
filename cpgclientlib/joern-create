@@ -7,17 +7,25 @@ from cpgclient.CpgClient import CpgClient
 class JoernCreate:
 
     def main(self):
+        """
+        Parse command line and issue command to create CPG
+        """
 
+        args = self._parse_command_line()
+        self.create(args.directory)
+
+    def _parse_command_line(self):
         parser = argparse.ArgumentParser(description='Instruct server to create and load a CPG')
         parser.add_argument('directory', type=str,
-                    help='directory containing C/C++ code')
-        parser.add_argument('--name', dest='cpg_name', action='store',
-                    default="cpg.bin.zip",
-                    help='Name of the CPG')
-        args = parser.parse_args()
+                            help='directory containing C/C++ code')
+        return parser.parse_args()
 
+    def create(self, directory):
+        """
+        Issue command to create CPG for `directory`
+        """
         client = CpgClient()
-        client.create_cpg(args.directory)
+        client.create_cpg(directory)
 
 
 if __name__ == '__main__':
