@@ -34,7 +34,7 @@ class CpgClient:
         url = "{}/{}".format(self.handlerAndUrl, operation)
         body = json.dumps(body)
         response = requests.post(url, data=body)
-        if not response.status_code in [200, 202]:
+        if response.status_code not in [200, 202]:
             raise Exception("Invalid request: " + str(response))
         return response
 
