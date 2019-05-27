@@ -12,8 +12,10 @@ import scala.collection.mutable
 
 /**
   * Component to merge CPG overlay into existing graph
-  * */
-class CpgOverlayApplier {
+  *
+  * @param graph the existing (loaded) graph to apply overlay to
+  */
+class CpgOverlayApplier(graph: ScalaGraph) {
 
   private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Vertex] = mutable.HashMap()
   private val overlayEdgeIdToSrcGraphEdge: mutable.HashMap[Long, Edge] = mutable.HashMap()
@@ -21,14 +23,14 @@ class CpgOverlayApplier {
   /**
     * Applies diff to existing (loaded) TinkerGraph
     **/
-  def applyDiff(overlay: CpgOverlay, graph: ScalaGraph): Unit = {
-    addNodes(overlay, graph)
-    addEdges(overlay, graph)
-    addNodeProperties(overlay, graph)
-    addEdgeProperties(overlay, graph)
+  def applyDiff(overlay: CpgOverlay): Unit = {
+    addNodes(overlay)
+    addEdges(overlay)
+    addNodeProperties(overlay)
+    addEdgeProperties(overlay)
   }
 
-  private def addNodes(overlay: CpgOverlay, graph: ScalaGraph): Unit = {
+  private def addNodes(overlay: CpgOverlay): Unit = {
     assert(graph.graph.features.vertex.supportsUserSuppliedIds,
            "this currently only works for graphs that allow user supplied ids")
 
@@ -50,10 +52,10 @@ class CpgOverlayApplier {
     }
   }
 
-  private def addEdges(overlay: CpgOverlay, graph: ScalaGraph) = {
+  private def addEdges(overlay: CpgOverlay) = {
     overlay.getEdgeList.asScala.foreach { edge =>
-      val srcTinkerNode = getVertexForOverlayId(edge.getSrc, graph)
-      val dstTinkerNode = getVertexForOverlayId(edge.getDst, graph)
+      val srcTinkerNode = getVertexForOverlayId(edge.getSrc)
+      val dstTinkerNode = getVertexForOverlayId(edge.getDst)
 
       val properties = edge.getPropertyList.asScala
       val keyValues = new JArrayList[AnyRef](2 * properties.size)
@@ -66,23 +68,23 @@ class CpgOverlayApplier {
     }
   }
 
-  private def addNodeProperties(overlay: CpgOverlay, graph: ScalaGraph): Unit = {
+  private def addNodeProperties(overlay: CpgOverlay): Unit = {
     overlay.getNodePropertyList.asScala.foreach { additionalNodeProperty =>
       val property = additionalNodeProperty.getProperty
-      val tinkerNode = getVertexForOverlayId(additionalNodeProperty.getNodeId, graph)
+      val tinkerNode = getVertexForOverlayId(additionalNodeProperty.getNodeId)
       addPropertyToElement(tinkerNode, property.getName.name, property.getValue)
     }
   }
 
-  private def addEdgeProperties(overlay: CpgOverlay, graph: ScalaGraph): Unit = {
+  private def addEdgeProperties(overlay: CpgOverlay): Unit = {
     overlay.getEdgePropertyList.asScala.foreach { additionalEdgeProperty =>
       val property = additionalEdgeProperty.getProperty
-      val tinkerEdge = getEdgeForOverlayId(additionalEdgeProperty.getEdgeId, graph)
+      val tinkerEdge = getEdgeForOverlayId(additionalEdgeProperty.getEdgeId)
       addPropertyToElement(tinkerEdge, property.getName.name, property.getValue)
     }
   }
 
-  private def getVertexForOverlayId(id: Long, graph: ScalaGraph): Vertex = {
+  private def getVertexForOverlayId(id: Long): Vertex = {
     if (overlayNodeIdToSrcGraphNode.contains(id)) {
       overlayNodeIdToSrcGraphNode(id)
     } else {
@@ -92,7 +94,7 @@ class CpgOverlayApplier {
     }
   }
 
-  private def getEdgeForOverlayId(id: Long, graph: ScalaGraph): Edge = {
+  private def getEdgeForOverlayId(id: Long): Edge = {
     if (overlayEdgeIdToSrcGraphEdge.contains(id)) {
       overlayEdgeIdToSrcGraphEdge(id)
     } else {
