@@ -8,7 +8,7 @@ class CpgOverlayLoader {
 
   /**
     * Load overlay stored in the file with the name `filename`.
-    * */
+    */
   def load(filename: String, baseCpg: Cpg): Unit = {
     val applier = new CpgOverlayApplier(baseCpg.graph)
     ProtoCpgLoader.loadOverlays(filename).asScala.foreach { overlay =>

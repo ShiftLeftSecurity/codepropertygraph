@@ -13,7 +13,7 @@ object CpgLoader {
     *
     * @param filename name of file that stores the code property graph
     * @param config loader configuration
-    * */
+    */
   def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg = {
     new CpgLoader().load(filename, config)
   }
@@ -41,7 +41,7 @@ private class CpgLoader {
     *
     * @param filename name of file that stores the code property graph
     * @param config loader configuration
-    * */
+    */
   def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg = {
     logger.debug("Loading " + filename)
 

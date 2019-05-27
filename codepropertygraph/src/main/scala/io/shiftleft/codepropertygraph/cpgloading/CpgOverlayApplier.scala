@@ -22,7 +22,7 @@ class CpgOverlayApplier(graph: ScalaGraph) {
 
   /**
     * Applies diff to existing (loaded) TinkerGraph
-    **/
+    */
   def applyDiff(overlay: CpgOverlay): Unit = {
     addNodes(overlay)
     addEdges(overlay)
