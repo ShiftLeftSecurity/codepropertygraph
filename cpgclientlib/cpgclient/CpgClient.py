@@ -2,6 +2,7 @@ import requests
 import time
 import json
 
+DEFAULT_SERVER = '127.0.0.1'
 DEFAULT_PORT = 8080
 
 
@@ -13,7 +14,7 @@ class CpgClient:
     issue queries and work with the responses.
     """
 
-    def __init__(self, server, port):
+    def __init__(self, server=DEFAULT_SERVER, port=DEFAULT_PORT):
         self.server = server
         self.port = port
         self.handlerAndUrl = "http://{}:{}".format(server, port)

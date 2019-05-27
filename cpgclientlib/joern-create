@@ -1,18 +1,24 @@
 #!/usr/bin/env python3
 
 import argparse
+from cpgclient.CpgClient import CpgClient
+
 
 class JoernCreate:
 
     def main(self):
 
-        parser = argparse.ArgumentParser(description='Instruct server to create a CPG')
-        parser.add_argument('directories', type=str, nargs='+',
-                    help='directories containing C/C++ code')
+        parser = argparse.ArgumentParser(description='Instruct server to create and load a CPG')
+        parser.add_argument('directory', type=str,
+                    help='directory containing C/C++ code')
         parser.add_argument('--name', dest='cpg_name', action='store',
                     default="cpg.bin.zip",
                     help='Name of the CPG')
         args = parser.parse_args()
+
+        client = CpgClient()
+        client.create_cpg(args.directory)
+
 
 if __name__ == '__main__':
     JoernCreate().main()
