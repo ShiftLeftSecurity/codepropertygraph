@@ -6,26 +6,6 @@ import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
-import scala.compat.java8.OptionConverters._
-
-object CpgLoaderConfig {
-
-  def default: CpgLoaderConfig = CpgLoaderConfig(
-    createIndices = true,
-    onDiskOverflowConfig = None,
-    ignoredProtoEntries = None
-  )
-}
-
-/**
-  * Configuration for the CPG loader
-  * @param createIndices indicate whether to create indices or not
-  * @param onDiskOverflowConfig configuration for the on-disk-overflow feature
-  *  */
-case class CpgLoaderConfig(var createIndices: Boolean,
-                           var onDiskOverflowConfig: Option[OnDiskOverflowConfig],
-                           var ignoredProtoEntries: Option[IgnoredProtoEntries])
-
 object CpgLoader {
 
   /**
@@ -64,6 +44,9 @@ private class CpgLoader {
     * */
   def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg = {
     logger.debug("Loading " + filename)
+
+    import scala.compat.java8.OptionConverters._
+
     val cpg =
       ProtoCpgLoader.loadFromProtoZip(filename, config.onDiskOverflowConfig.asJava)
     if (config.createIndices) { createIndexes(cpg) }
