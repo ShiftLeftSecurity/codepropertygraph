@@ -25,7 +25,7 @@ with open("README.md", "r") as fh:
     setuptools.setup(
         name='cpgclientlib',
         version=get_version(),
-        scripts=['cpg-version', 'cpg-create', 'cpg-query'],
+        scripts=['cpg-create', 'cpg-query'],
         author="Fabian Yamaguchi",
         author_email="fabs@shiftleft.io",
         description="A client library for CPG servers",
