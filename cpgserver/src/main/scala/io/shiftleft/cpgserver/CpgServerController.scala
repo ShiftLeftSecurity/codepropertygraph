@@ -99,6 +99,8 @@ class CpgServerController(impl: ServerImpl, system: ActorSystem = ActorSystem())
       e.put("aCpg", cpg.get)
       e.eval(s"""
                 import io.shiftleft.codepropertygraph.Cpg
+                | import io.shiftleft.queryprimitives.steps.NoResolve
+                | implicit val resolver = NoResolve
                 | val cpg = aCpg.asInstanceOf[io.shiftleft.codepropertygraph.Cpg]
                 | $query
             """.stripMargin).toString
