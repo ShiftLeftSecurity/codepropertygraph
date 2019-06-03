@@ -27,6 +27,10 @@ class Steps[NodeType, Labels <: HList](val raw: GremlinScala.Aux[NodeType, Label
     with ext.dataflowengine.Enrichable {
   implicit lazy val graph: Graph = raw.traversal.asAdmin.getGraph.get
 
+  def toIterator(): Iterator[NodeType] = {
+    GremlinScalaIterator(raw)
+  }
+
   /**
     Execute the traversal and convert the result to a list
     */

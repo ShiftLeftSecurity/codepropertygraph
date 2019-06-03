@@ -7,6 +7,7 @@ import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 import java.lang.{Long => JLong}
 
 import io.shiftleft.diffgraph.DiffGraph
+import io.shiftleft.queryprimitives.steps.GremlinScalaIterator
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.logging.log4j.{LogManager, Logger}
@@ -30,7 +31,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
     linkAstChildToParent(dstGraph)
 
     linkToSingle(
-      srcLabels = Set(NodeTypes.TYPE),
+      srcLabels = List(NodeTypes.TYPE),
       dstNodeLabel = NodeTypes.TYPE_DECL,
       edgeType = EdgeTypes.REF,
       dstNodeIdMap = typeDeclFullNameToNodeId,
@@ -39,7 +40,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
     )
 
     linkToSingle(
-      srcLabels = Set(NodeTypes.CALL),
+      srcLabels = List(NodeTypes.CALL),
       dstNodeLabel = NodeTypes.METHOD_INST,
       edgeType = EdgeTypes.CALL,
       dstNodeIdMap = methodInstFullNameToNodeId,
@@ -48,7 +49,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
     )
 
     linkToSingle(
-      srcLabels = Set(NodeTypes.METHOD_INST),
+      srcLabels = List(NodeTypes.METHOD_INST),
       dstNodeLabel = NodeTypes.METHOD,
       edgeType = EdgeTypes.REF,
       dstNodeIdMap = methodFullNameToNodeId,
@@ -57,7 +58,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
     )
 
     linkToSingle(
-      srcLabels = Set(
+      srcLabels = List(
         NodeTypes.METHOD_PARAMETER_IN,
         NodeTypes.METHOD_PARAMETER_OUT,
         NodeTypes.METHOD_RETURN,
@@ -77,7 +78,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
     )
 
     linkToSingle(
-      srcLabels = Set(NodeTypes.METHOD_REF),
+      srcLabels = List(NodeTypes.METHOD_REF),
       dstNodeLabel = NodeTypes.METHOD_INST,
       edgeType = EdgeTypes.REF,
       dstNodeIdMap = methodInstFullNameToNodeId,
@@ -116,43 +117,40 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
     }
   }
 
-  private def linkToSingle[SRC_NODE_TYPE <: nodes.StoredNode](srcLabels: Set[String],
+  private def linkToSingle[SRC_NODE_TYPE <: nodes.StoredNode](srcLabels: List[String],
                                                               dstNodeLabel: String,
                                                               edgeType: String,
                                                               dstNodeIdMap: Map[String, JLong],
                                                               dstFullNameKey: String,
                                                               dstGraph: DiffGraph): Unit = {
     var loggedDeprecationWarning = false
-    graph.graph
-      .vertices()
-      .asScala
-      .filter(srcNode => srcLabels.contains(srcNode.label()))
-      .foreach { srcNode =>
-        if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
-          // for `UNKNOWN` this is not always set, so we're using an Option here
-          srcNode.valueOption[String](dstFullNameKey).map { dstFullName =>
-            val dstNode: Option[nodes.StoredNode] =
-              dstNodeIdMap.get(dstFullName).flatMap(lookupNode(_))
-            dstNode match {
-              case Some(dstNode) =>
-                dstGraph
-                  .addEdgeInOriginal(srcNode.asInstanceOf[nodes.StoredNode], dstNode, edgeType)
-              case None =>
-                logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
-            }
-          }
-        } else {
-          val dstFullName =
-            srcNode.vertices(Direction.OUT, edgeType).nextChecked.value2(NodeKeys.FULL_NAME)
-          srcNode.property(dstFullNameKey, dstFullName)
-          if (!loggedDeprecationWarning) {
-            logger.warn(
-              s"Using deprecated CPG format with already existing $edgeType edge between" +
-                s" a source node of type $srcLabels and a $dstNodeLabel node.")
-            loggedDeprecationWarning = true
+    val sourceIterator = GremlinScalaIterator(graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*))
+    sourceIterator.foreach { srcNode =>
+      if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
+        // for `UNKNOWN` this is not always set, so we're using an Option here
+        srcNode.valueOption[String](dstFullNameKey).map { dstFullName =>
+          val dstNode: Option[nodes.StoredNode] =
+            dstNodeIdMap.get(dstFullName).flatMap(lookupNode(_))
+          dstNode match {
+            case Some(dstNode) =>
+              dstGraph
+                .addEdgeInOriginal(srcNode.asInstanceOf[nodes.StoredNode], dstNode, edgeType)
+            case None =>
+              logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
           }
         }
+      } else {
+        val dstFullName =
+          srcNode.vertices(Direction.OUT, edgeType).nextChecked.value2(NodeKeys.FULL_NAME)
+        srcNode.property(dstFullNameKey, dstFullName)
+        if (!loggedDeprecationWarning) {
+          logger.warn(
+            s"Using deprecated CPG format with already existing $edgeType edge between" +
+              s" a source node of type $srcLabels and a $dstNodeLabel node.")
+          loggedDeprecationWarning = true
+        }
       }
+    }
   }
 
   private def linkToMultiple[SRC_NODE_TYPE <: nodes.StoredNode](srcLabels: List[String],
