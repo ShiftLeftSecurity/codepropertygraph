@@ -3,7 +3,7 @@ package io.shiftleft.passes
 import gremlin.scala.ScalaGraph
 import io.shiftleft.diffgraph.{AppliedDiffGraph, DiffGraph, DiffGraphProtoSerializer}
 import io.shiftleft.proto.cpg.Cpg.CpgOverlay
-import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.{LogManager, Logger}
 
 /**
   * Base class for CPG enhancements
@@ -11,7 +11,8 @@ import org.apache.logging.log4j.LogManager
   * The class provides access to an underlying source graph and destination Diff graph
   */
 abstract class CpgPass(srcGraph: ScalaGraph) {
-  protected val logger = LogManager.getLogger(getClass)
+  import CpgPass.logger
+
   private var startTime: Long = _
 
   /**
@@ -72,4 +73,8 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
     logger.info(s"End of enhancement: ${name}, after ${endTime - startTime}ms")
   }
 
+}
+
+object CpgPass {
+  private val logger: Logger = LogManager.getLogger(classOf[CpgPass])
 }

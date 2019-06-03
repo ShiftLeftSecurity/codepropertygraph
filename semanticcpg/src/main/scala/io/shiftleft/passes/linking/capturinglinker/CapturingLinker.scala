@@ -4,8 +4,10 @@ import gremlin.scala.ScalaGraph
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
+import org.apache.logging.log4j.{LogManager, Logger}
 
 class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
+  import CapturingLinker.logger
 
   override def run(): Iterator[DiffGraph] = {
     var idToClosureBinding = Map[String, nodes.ClosureBinding]()
@@ -37,3 +39,8 @@ class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
     Iterator(dstGraph)
   }
 }
+
+object CapturingLinker {
+  private val logger: Logger = LogManager.getLogger(classOf[CapturingLinker])
+}
+

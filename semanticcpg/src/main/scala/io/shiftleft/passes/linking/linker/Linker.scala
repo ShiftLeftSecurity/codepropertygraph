@@ -9,10 +9,13 @@ import java.lang.{Long => JLong}
 import io.shiftleft.diffgraph.DiffGraph
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
+import org.apache.logging.log4j.{LogManager, Logger}
 
 import scala.collection.JavaConverters._
 
 class Linker(graph: ScalaGraph) extends CpgPass(graph) {
+  import Linker.logger
+
   private var typeDeclFullNameToNodeId = Map[String, JLong]()
   private var typeFullNameToNodeId = Map[String, JLong]()
   private var methodFullNameToNodeId = Map[String, JLong]()
@@ -271,4 +274,8 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
   private def lookupNode(nodeId: JLong): Option[nodes.StoredNode] =
     graph.graph.vertices(nodeId).nextOption.map(_.asInstanceOf[nodes.StoredNode])
 
+}
+
+object Linker {
+  private val logger: Logger = LogManager.getLogger(classOf[Linker])
 }
