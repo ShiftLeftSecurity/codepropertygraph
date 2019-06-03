@@ -29,7 +29,7 @@ from cpgclient.CpgClient import CpgClient
 server = '127.0.0.1'
 port = 8080
 client = CpgClient(server, port)
-client.createCpg('/path/to/cpg')
+client.create_cpg('/path/to/cpg')
 methods = client.query('cpg.method.toJson')
 print(methods)
 ```

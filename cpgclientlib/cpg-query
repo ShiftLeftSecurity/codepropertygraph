@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+
+import argparse
+from cpgclient.CpgClient import CpgClient
+
+
+class CpgQuery:
+
+    def main(self):
+        args = self._parse_command_line()
+        self.query_cpg(args.query)
+
+    def _parse_command_line(self):
+        parser = argparse.ArgumentParser(description='Instruct query CPG')
+        parser.add_argument('query', type=str,
+                            help='query')
+        return parser.parse_args()
+        pass
+
+    def query_cpg(self, query):
+        client = CpgClient()
+        result = client.query(query)
+        print(result)
+
+
+if __name__ == '__main__':
+    CpgQuery().main()

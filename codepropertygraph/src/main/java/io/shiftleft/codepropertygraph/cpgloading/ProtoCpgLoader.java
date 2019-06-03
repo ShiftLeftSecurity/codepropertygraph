@@ -18,7 +18,7 @@ import org.apache.logging.log4j.LogManager;
 
 /**
  * Loader for CPGs stored in Google Protobuf Format
- * */
+ */
 public class ProtoCpgLoader {
   private static final Logger logger = LogManager.getLogger(ProtoCpgLoader.class);
 
@@ -29,7 +29,7 @@ public class ProtoCpgLoader {
   /**
    * Load Code Property Graph from a zip-file containing
    * CPGs in proto format.
-   **/
+   */
   public static Cpg loadFromProtoZip(
     String filename,
     Optional<OnDiskOverflowConfig> onDiskOverflowConfig) {

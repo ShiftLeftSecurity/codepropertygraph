@@ -13,7 +13,9 @@ class CpgFactory(frontend: LanguageFrontend, semanticsFilename: String) {
 
   /**
     * Build a CPG for the provided C/C++ code snippet.
-    * */
+    *
+    * @param sourceCode code for which one wants to generate cpg
+    */
   def buildCpg(sourceCode: String): Cpg = {
     val tmpDir = Files.createTempDirectory("dflowtest").toFile
     tmpDir.deleteOnExit()
@@ -28,7 +30,7 @@ class CpgFactory(frontend: LanguageFrontend, semanticsFilename: String) {
     val config = CpgLoaderConfig.default
     val cpg = CpgLoader.load(cpgFile.getAbsolutePath, config)
 
-    val semantics = new SemanticsLoader(semanticsFilename).load
+    val semantics = new SemanticsLoader(semanticsFilename).load()
     new EnhancementRunner().run(cpg, new SerializedCpg())
     new DataFlowRunner(semantics).run(cpg, new SerializedCpg())
 

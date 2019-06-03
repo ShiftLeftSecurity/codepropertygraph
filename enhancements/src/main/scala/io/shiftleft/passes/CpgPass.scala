@@ -6,24 +6,32 @@ import io.shiftleft.proto.cpg.Cpg.CpgOverlay
 import org.apache.logging.log4j.{LogManager, Logger}
 
 /**
-  * Base class for CPG enhancements - provides access to a src graph and destination Diff graph
-  * */
+  * Base class for CPG enhancements
+  *
+  * The class provides access to an underlying source graph and destination Diff graph
+  */
 abstract class CpgPass(srcGraph: ScalaGraph) {
   import CpgPass.logger
 
   private var startTime: Long = _
 
-  /** override in concrete pass if needed */
+  /**
+    * Name of the enhancement pass.
+    * By default it is inferred from the name of the class, override if needed.
+    */
   def name = getClass.getName
 
   /**
-    * Execute the enhancement and apply result to graph
-    * */
+    * Execute the enhancement and apply result to the underlying graph
+    */
   def executeAndApply(): Unit = {
     logStart()
-    val dstGraphs = run()
-    dstGraphs.foreach(applyDiff)
-    logEnd()
+    try {
+      val dstGraphs = run()
+      dstGraphs.foreach(applyDiff)
+    } finally {
+      logEnd()
+    }
   }
 
   /**
@@ -40,7 +48,7 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
 
   /**
     * Execute and create a serialized overlay
-    * */
+    */
   def executeAndCreateOverlay(): Iterator[CpgOverlay] = {
     try {
       logStart()
