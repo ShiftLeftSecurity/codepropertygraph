@@ -6,7 +6,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 object Facts {
 
   val nodeOutFacts = List(
-    NodeTypes.FILE has 1 to N outgoing EdgeTypes.AST to NodeTypes.NAMESPACE_BLOCK,
+    NodeTypes.FILE has 0 to N outgoing EdgeTypes.AST to NodeTypes.NAMESPACE_BLOCK,
     NodeTypes.METHOD has 1 outgoing EdgeTypes.AST to NodeTypes.METHOD_RETURN,
     NodeTypes.METHOD has 0 to N outgoing EdgeTypes.AST to NodeTypes.METHOD_PARAMETER_IN,
     NodeTypes.METHOD has 0 to N outgoing EdgeTypes.AST to NodeTypes.MODIFIER,
@@ -37,7 +37,7 @@ object Facts {
     NodeTypes.BLOCK has 0 to 1 outgoing EdgeTypes.CFG to SuperTypes.Expression or NodeTypes.METHOD_RETURN,
     NodeTypes.METHOD_INST has 0 to N outgoing EdgeTypes.AST to NodeTypes.TYPE_ARGUMENT,
     NodeTypes.METHOD_REF has 1 outgoing EdgeTypes.CFG to SuperTypes.Expression,
-    NodeTypes.METHOD_REF has 1 to N outgoing EdgeTypes.CAPTURE to NodeTypes.CLOSURE_BINDING,
+    NodeTypes.METHOD_REF has 0 to N outgoing EdgeTypes.CAPTURE to NodeTypes.CLOSURE_BINDING,
     NodeTypes.CLOSURE_BINDING has 1 outgoing EdgeTypes.REF to NodeTypes.LOCAL or NodeTypes.METHOD_PARAMETER_IN,
   )
 
