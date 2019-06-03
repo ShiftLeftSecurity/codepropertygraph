@@ -5,6 +5,7 @@ import io.shiftleft.semanticsloader.Semantics
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
+import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
@@ -15,6 +16,8 @@ import scala.collection.JavaConverters._
   * reaching definition edges.
   */
 class PropagateEdgePass(graph: ScalaGraph, semantics: Semantics) extends CpgPass(graph) {
+  import PropagateEdgePass.logger
+
   var dstGraph: DiffGraph = _
 
   override def run(): Iterator[DiffGraph] = {
@@ -63,4 +66,8 @@ class PropagateEdgePass(graph: ScalaGraph, semantics: Semantics) extends CpgPass
                                EdgeTypes.PROPAGATE,
                                (EdgeKeyNames.ALIAS, isAlias) :: Nil)
   }
+}
+
+object PropagateEdgePass {
+  private val logger: Logger = LogManager.getLogger(classOf[PropagateEdgePass])
 }

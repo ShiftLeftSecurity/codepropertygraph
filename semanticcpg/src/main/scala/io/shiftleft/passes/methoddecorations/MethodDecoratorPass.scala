@@ -5,11 +5,13 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
 import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
+import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 object MethodDecoratorPass {
   private var loggedDeprecatedWarning = false
   private var loggedMissingTypeFullName = false
+  private val logger: Logger = LogManager.getLogger(classOf[MethodDecoratorPass])
 }
 
 /**
@@ -18,6 +20,8 @@ object MethodDecoratorPass {
   * It also creates an AST edge from METHOD to the new METHOD_PARAMETER_OUT nodes.
   */
 class MethodDecoratorPass(graph: ScalaGraph) extends CpgPass(graph) {
+  import MethodDecoratorPass.logger
+
   override def run() = {
     val dstGraph = new DiffGraph
 

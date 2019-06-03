@@ -6,11 +6,14 @@ import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewMethodReturn
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes, nodes}
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
+import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
 
 class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
+  import MethodStubCreator.logger
+
   // Since the method fullNames for fuzzyc are not unique, we do not have
   // a 1to1 relation and may overwrite some values. We deem this ok for now.
   private var methodFullNameToNode = Map[String, nodes.MethodBase]()
@@ -114,4 +117,8 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
       }
       .exec()
   }
+}
+
+object MethodStubCreator {
+  private val logger: Logger = LogManager.getLogger(classOf[MethodStubCreator])
 }

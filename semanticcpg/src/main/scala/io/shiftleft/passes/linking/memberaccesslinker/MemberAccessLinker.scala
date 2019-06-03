@@ -6,11 +6,13 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, Operators,
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
 import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
+import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
 
 class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
+  import MemberAccessLinker.logger
 
   override def run() = {
     val dstGraph = new DiffGraph
@@ -87,4 +89,8 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
 
     members.find(_.name == memberName)
   }
+}
+
+object MemberAccessLinker {
+  private val logger: Logger = LogManager.getLogger(classOf[MemberAccessLinker])
 }
