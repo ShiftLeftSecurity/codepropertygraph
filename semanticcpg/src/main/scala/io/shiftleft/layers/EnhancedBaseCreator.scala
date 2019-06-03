@@ -33,7 +33,6 @@ class EnhancedBaseCreator(graph: ScalaGraph, language: String, serializedCpg: Se
         List(
           new TypeDeclStubCreator(graph),
           new MethodStubCreator(graph),
-          new ReceiverEdgePass(graph),
           new MethodDecoratorPass(graph),
           new CapturingLinker(graph),
           new Linker(graph),
