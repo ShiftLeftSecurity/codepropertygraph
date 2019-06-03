@@ -4,7 +4,7 @@ import gremlin.scala.ScalaGraph
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, Operators, nodes}
 import io.shiftleft.diffgraph.DiffGraph
-import io.shiftleft.passes.CpgPass
+import io.shiftleft.passes.{CpgPass, ParallelIteratorExecutor}
 import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
@@ -13,63 +13,64 @@ import scala.collection.JavaConverters._
 
 class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
   import MemberAccessLinker.logger
+  private var loggedDeprecationWarning: Boolean = _
+  private var loggedForTypeMemberCombination: Set[(nodes.Type, String)] = _
 
-  override def run() = {
-    val dstGraph = new DiffGraph
-    linkMemberAccessToMember(dstGraph)
-    Iterator(dstGraph)
-  }
+  override def run(): Iterator[DiffGraph] = {
+    loggedDeprecationWarning = false
+    loggedForTypeMemberCombination = Set[(nodes.Type, String)]()
 
-  private def linkMemberAccessToMember(dstGraph: DiffGraph): Unit = {
-    var loggedDeprecationWarning = false
-    var loggedForTypeMemberCombination = Set[(nodes.Type, String)]()
-    val cpg = Cpg(graph.graph)
-
-    cpg.call
+    val memberAccessIterator = Cpg(graph.graph).call
       .filter(
         _.nameExact(Operators.memberAccess, Operators.indirectMemberAccess)
-      )
-      .sideEffect { call =>
-        if (!call.edges(Direction.OUT, EdgeTypes.REF).hasNext) {
-          val memberName = call
-            .vertices(Direction.OUT, EdgeTypes.AST)
-            .asScala
-            .filter(_.value(NodeKeys.ORDER.name) == 2)
-            .asJava
-            .nextChecked
-            .asInstanceOf[nodes.Identifier]
-            .name
+      ).toIterator
 
-          val typ = getTypeOfMemberAccessBase(call)
+    new ParallelIteratorExecutor(memberAccessIterator).map(perMemberAccess)
+  }
 
-          var worklist = List(typ)
-          var finished = false
-          while (!finished && worklist.nonEmpty) {
-            val typ = worklist.head
-            worklist = worklist.tail
+  private def perMemberAccess(call: nodes.Call): DiffGraph = {
+    val dstGraph = new DiffGraph()
 
-            findMemberOnType(typ, memberName) match {
-              case Some(member) =>
-                dstGraph.addEdgeInOriginal(call, member, EdgeTypes.REF)
-                finished = true
-              case None =>
-                val baseTypes = typ.start.baseType.l
-                worklist = worklist ++ baseTypes
-            }
-          }
+    if (!call.edges(Direction.OUT, EdgeTypes.REF).hasNext) {
+      val memberName = call
+        .vertices(Direction.OUT, EdgeTypes.AST)
+        .asScala
+        .filter(_.value(NodeKeys.ORDER.name) == 2)
+        .asJava
+        .nextChecked
+        .asInstanceOf[nodes.Identifier]
+        .name
 
-          if (!finished && !loggedForTypeMemberCombination.contains((typ, memberName))) {
-            loggedForTypeMemberCombination += ((typ, memberName))
-            logger.warn(s"Could not find type member. type=${typ.fullName}, member=$memberName")
-          }
-        } else if (!loggedDeprecationWarning) {
-          logger.warn(
-            s"Using deprecated CPG format with alreay existing REF edge between" +
-              s" a member access node and a member.")
-          loggedDeprecationWarning = true
+      val typ = getTypeOfMemberAccessBase(call)
+
+      var worklist = List(typ)
+      var finished = false
+      while (!finished && worklist.nonEmpty) {
+        val typ = worklist.head
+        worklist = worklist.tail
+
+        findMemberOnType(typ, memberName) match {
+          case Some(member) =>
+            dstGraph.addEdgeInOriginal(call, member, EdgeTypes.REF)
+            finished = true
+          case None =>
+            val baseTypes = typ.start.baseType.l
+            worklist = worklist ++ baseTypes
         }
       }
-  }.exec()
+
+      if (!finished && !loggedForTypeMemberCombination.contains((typ, memberName))) {
+        loggedForTypeMemberCombination += ((typ, memberName))
+        logger.warn(s"Could not find type member. type=${typ.fullName}, member=$memberName")
+      }
+    } else if (!loggedDeprecationWarning) {
+      logger.warn(
+        s"Using deprecated CPG format with alreay existing REF edge between" +
+          s" a member access node and a member.")
+      loggedDeprecationWarning = true
+    }
+    dstGraph
+  }
 
   private def getTypeOfMemberAccessBase(call: nodes.Call): nodes.Type = {
     val base = call.start.argument.order(1).head
