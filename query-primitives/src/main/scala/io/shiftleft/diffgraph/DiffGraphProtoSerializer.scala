@@ -87,16 +87,20 @@ class DiffGraphProtoSerializer() {
       }.asJava)
     }
 
-    def protoEdge(edge: DiffEdge, srcId: JLong, dstId: JLong) =
-      CpgStruct.Edge
-        .newBuilder()
+    def protoEdge(edge: DiffEdge, srcId: JLong, dstId: JLong) = {
+      val edgeBuilder = CpgStruct.Edge.newBuilder()
+
+      edgeBuilder
         .setSrc(srcId)
         .setDst(dstId)
         .setType(EdgeType.valueOf(edge.label))
-        .addAllProperty(
-          edge.properties.map { case (key, value) => edgeProperty(key, value) }.asJava
-        )
-        .build
+
+      edge.properties.foreach { property =>
+        edgeBuilder.addProperty(edgeProperty(property._1, property._2))
+      }
+
+      edgeBuilder.build
+    }
   }
 
   private def nodeProperty(key: String, value: Any) = {
