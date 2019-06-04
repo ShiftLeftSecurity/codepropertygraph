@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
@@ -153,9 +154,11 @@ public class ProtoCpgLoader {
     return builder.build();
   }
 
-  private static List<File> getFilesInDirectory(File directory) {
-    File[] files = directory.listFiles();
-    return Arrays.stream(files).filter(File::isFile).collect(Collectors.toList());
+  private static List<File> getFilesInDirectory(File directory) throws IOException {
+    return Files.walk(directory.toPath())
+            .filter(Files::isRegularFile)
+            .map(Path::toFile)
+            .collect(Collectors.toList());
   }
 
   private static List<Edge> consumeInputStreamNodes(ProtoToCpg builder,

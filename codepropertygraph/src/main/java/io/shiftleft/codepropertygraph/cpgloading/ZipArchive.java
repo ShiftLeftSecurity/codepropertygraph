@@ -6,14 +6,7 @@ import static java.nio.file.Files.notExists;
 import static java.nio.file.Files.walkFileTree;
 
 import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
 public class ZipArchive {
@@ -35,7 +28,16 @@ public class ZipArchive {
       walkFileTree(root, new SimpleFileVisitor<Path>() {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          Path destFile = Paths.get(outputDirectory.toString(), file.toString());
+          String filename = file.toString();
+          if (filename.contains("..")) {
+            System.err.println("Skipping entry " + filename + " because it contains '..'");
+            return FileVisitResult.CONTINUE;
+          }
+          Path destFile = Paths.get(outputDirectory, file.toString());
+          if (destFile.getParent() != null && !Files.exists(destFile.getParent())) {
+            Files.createDirectories(destFile.getParent());
+          }
+
           try {
             copy(file, destFile, StandardCopyOption.REPLACE_EXISTING);
           } catch (DirectoryNotEmptyException ignore) {
