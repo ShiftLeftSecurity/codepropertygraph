@@ -1,9 +1,8 @@
 package io.shiftleft.codepropertygraph
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{edges, nodes}
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import shapeless.HNil
 
 object Cpg {
 
@@ -23,11 +22,7 @@ object Cpg {
     * Returns a fresh, empty graph
     */
   private def emptyGraph: TinkerGraph =
-    TinkerGraph
-      .open(
-        io.shiftleft.codepropertygraph.generated.nodes.Factories.AllAsJava,
-        io.shiftleft.codepropertygraph.generated.edges.Factories.AllAsJava
-      )
+    TinkerGraph.open(nodes.Factories.AllAsJava, edges.Factories.AllAsJava)
 }
 
 /**
@@ -38,7 +33,8 @@ object Cpg {
   * @param graph the underlying graph. An empty graph is created if this parameter is omitted.
   */
 class Cpg(val graph: Graph = Cpg.emptyGraph)
-    extends ext.queryprimitives.Enrichable
+    extends AutoCloseable
+    with ext.queryprimitives.Enrichable
     with ext.queryprimitivesext.Enrichable
     with ext.securityprofile.Enrichable
     with ext.semanticcpg.Enrichable {
@@ -55,6 +51,6 @@ class Cpg(val graph: Graph = Cpg.emptyGraph)
     * Closes code property graph.
     * No further operations can be performed on it.
     */
-  def close(): Unit =
+  override def close(): Unit =
     graph.close
 }
