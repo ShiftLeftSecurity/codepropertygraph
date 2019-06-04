@@ -10,8 +10,11 @@ class CpgPassRunner(serializedCpg: SerializedCpg) {
   def createStoreAndApplyOverlay(pass: CpgPass, counter: Int = 0) = {
     val overlays = pass.executeAndCreateOverlay()
     overlays.zipWithIndex.foreach {
-      case (x, index) =>
-        serializedCpg.addOverlay(x, pass.getClass.getSimpleName + counter.toString + "_" + index)
+      case (overlay, index) => {
+        if (overlay.getSerializedSize > 0) {
+          serializedCpg.addOverlay(overlay, pass.getClass.getSimpleName + counter.toString + "_" + index)
+        }
+      }
     }
   }
 
