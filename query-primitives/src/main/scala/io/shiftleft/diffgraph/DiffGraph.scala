@@ -77,7 +77,7 @@ class DiffGraph {
                         dstNode: StoredNode,
                         edgeLabel: String,
     properties: Seq[(String, AnyRef)] = List()): Unit = {
-    _edgesToOriginal += new EdgeToOriginal(srcNode, dstNode.getId, edgeLabel, properties)
+    _edgesToOriginal += new EdgeToOriginal(srcNode, dstNode, edgeLabel, properties)
     incrementEdgeCreatedCount()
   }
 
@@ -88,7 +88,7 @@ class DiffGraph {
                           dstNode: NewNode,
                           edgeLabel: String,
                           properties: Seq[(String, AnyRef)] = List()): Unit = {
-    _edgesFromOriginal += new EdgeFromOriginal(srcNode.getId, dstNode, edgeLabel, properties)
+    _edgesFromOriginal += new EdgeFromOriginal(srcNode, dstNode, edgeLabel, properties)
     incrementEdgeCreatedCount()
   }
 
@@ -99,7 +99,7 @@ class DiffGraph {
                         dstNode: StoredNode,
                         edgeLabel: String,
                         properties: Seq[(String, AnyRef)] = List()): Unit = {
-    _edgesInOriginal += new EdgeInOriginal(srcNode.getId, dstNode.getId, edgeLabel, properties)
+    _edgesInOriginal += new EdgeInOriginal(srcNode, dstNode, edgeLabel, properties)
     incrementEdgeCreatedCount()
   }
 
@@ -149,7 +149,7 @@ object DiffGraph {
   type Properties = Seq[(String, AnyRef)]
 
   case class EdgeInDiffGraph(src: NewNode, dst: NewNode, label: String, properties: Properties) extends DiffEdge
-  case class EdgeToOriginal(src: NewNode, dstId: Long, label: String, properties: Properties) extends DiffEdge
-  case class EdgeFromOriginal(srcId: Long, dst: NewNode, label: String, properties: Properties) extends DiffEdge
-  case class EdgeInOriginal(srcId: Long, dstId: Long, label: String, properties: Properties) extends DiffEdge
+  case class EdgeToOriginal(src: NewNode, dst: StoredNode, label: String, properties: Properties) extends DiffEdge
+  case class EdgeFromOriginal(src: StoredNode, dst: NewNode, label: String, properties: Properties) extends DiffEdge
+  case class EdgeInOriginal(src: StoredNode, dst: StoredNode, label: String, properties: Properties) extends DiffEdge
 }

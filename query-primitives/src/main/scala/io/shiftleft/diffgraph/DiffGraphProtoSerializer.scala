@@ -54,14 +54,14 @@ class DiffGraphProtoSerializer() {
     val diffGraph = appliedDiffGraph.diffGraph
 
     addProtoEdge(diffGraph.edgesInOriginal, { edge: EdgeInOriginal =>
-      edge.srcId
+      edge.src.getId
     }, { edge: EdgeInOriginal =>
-      edge.dstId
+      edge.dst.getId
     })
 
     addProtoEdge(
       diffGraph.edgesFromOriginal, { edge: EdgeFromOriginal =>
-        edge.srcId
+        edge.src.getId
       }, { edge: EdgeFromOriginal =>
         appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.dst))
       }
@@ -70,7 +70,7 @@ class DiffGraphProtoSerializer() {
     addProtoEdge(diffGraph.edgesToOriginal, { edge: EdgeToOriginal =>
       appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.src))
     }, { edge: EdgeToOriginal =>
-      edge.dstId
+      edge.dst.getId
     })
 
     addProtoEdge(

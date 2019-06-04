@@ -57,9 +57,6 @@ class DiffGraphApplier {
   }
 
   private def addEdges(diffGraph: DiffGraph, graph: ScalaGraph) = {
-    def lookupNode(id: JLong): Vertex =
-      graph.graph.vertices(id).nextChecked
-
     diffGraph.edges.foreach { edge =>
       val srcTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.src))
       val dstTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.dst))
@@ -67,20 +64,20 @@ class DiffGraphApplier {
     }
 
     diffGraph.edgesFromOriginal.foreach { edge =>
-      val srcTinkerNode = lookupNode(edge.srcId)
+      val srcTinkerNode = edge.src
       val dstTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.dst))
       tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
     }
 
     diffGraph.edgesToOriginal.foreach { edge =>
       val srcTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.src))
-      val dstTinkerNode = lookupNode(edge.dstId)
+      val dstTinkerNode = edge.dst
       tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
     }
 
     diffGraph.edgesInOriginal.foreach { edge =>
-      val srcTinkerNode = lookupNode(edge.srcId)
-      val dstTinkerNode = lookupNode(edge.dstId)
+      val srcTinkerNode = edge.src
+      val dstTinkerNode = edge.dst
       tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
     }
 
