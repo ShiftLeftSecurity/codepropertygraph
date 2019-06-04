@@ -100,11 +100,11 @@ message CpgStruct {
 
   message Edge {
     reserved 5;
-    reserved "key";
     // Source node.
     int64 src = 1;
     // Destination node.
     int64 dst = 2;
+    int64 key = 6;
 
     // Edge type.
     enum EdgeType {
@@ -135,6 +135,7 @@ message AdditionalEdgeProperty {
 }
 
 message CpgOverlay {
+  string name = 5;
   repeated CpgStruct.Node node = 1;
   repeated CpgStruct.Edge edge = 2;
   repeated AdditionalNodeProperty node_property = 3;

@@ -60,13 +60,19 @@ public class ProtoToCpg {
           tinkerGraph.addVertex(keyValues.toArray());
         }
       } catch (Exception exception) {
-        logger.warn("Failed to insert a vertex. proto:\n" + node, exception);
+        logger.error("Failed to insert a vertex. proto:\n" + node, exception);
       }
     }
   }
 
   public void addEdges(List<Edge> protoEdges) {
     for (Edge edge : protoEdges) {
+      final Optional<Long> edgeIdMaybe;
+      if (edge.getKey() == 0) { //stupid proto default
+        edgeIdMaybe = Optional.empty();
+      } else {
+        edgeIdMaybe = Optional.of(edge.getKey());
+      }
       long srcNodeId = edge.getSrc();
       long dstNodeId = edge.getDst();
       if (srcNodeId == -1 || dstNodeId == -1) {
@@ -84,7 +90,11 @@ public class ProtoToCpg {
       Vertex dstVertex = dstVertices.next();
 
       List<Edge.Property> properties = edge.getPropertyList();
-      final ArrayList<Object> keyValues = new ArrayList<>(2 * properties.size());
+      final ArrayList<Object> keyValues = new ArrayList<>(2 + (2 * properties.size()));
+      edgeIdMaybe.ifPresent(edgeId -> {
+        keyValues.add(T.id);
+        keyValues.add(edge.getKey());
+        });
       for (Edge.Property property: properties) {
         addProperties(keyValues, property.getName().name(), property.getValue());
       }
@@ -93,11 +103,12 @@ public class ProtoToCpg {
         srcVertex.addEdge(edge.getType().name(), dstVertex, keyValues.toArray());
       } catch (IllegalArgumentException exception) {
         String context = "label=" + edge.getType().name() +
-          ", srcNodeId=" + srcNodeId + 
-          ", dstNodeId=" + dstNodeId + 
+          ", edgeId=" + edgeIdMaybe +
+          ", srcNodeId=" + srcNodeId +
+          ", dstNodeId=" + dstNodeId +
           ", srcVertex=" + srcVertex + 
           ", dstVertex=" + dstVertex;
-        logger.warn("Failed to insert an edge. context: " + context, exception);
+        logger.error("Failed to insert an edge. context: " + context, exception);
         continue;
       }
     }
