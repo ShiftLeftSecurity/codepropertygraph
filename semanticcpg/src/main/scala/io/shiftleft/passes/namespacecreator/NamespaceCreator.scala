@@ -8,6 +8,12 @@ import io.shiftleft.passes.CpgPass
 
 import scala.collection.mutable
 
+/**
+  * Creates NAMESPACE nodes and connects NAMESPACE_BLOCKs
+  * to corresponding NAMESPACE nodes.
+  *
+  * This pass has no other pass as prerequisite.
+  */
 class NamespaceCreator(graph: ScalaGraph) extends CpgPass(graph) {
 
   /**

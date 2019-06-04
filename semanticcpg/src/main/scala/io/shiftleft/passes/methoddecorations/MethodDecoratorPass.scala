@@ -18,6 +18,10 @@ object MethodDecoratorPass {
   * Adds a METHOD_PARAMETER_OUT for each METHOD_PARAMETER_IN to the graph and
   * connects those with a PARAMETER_LINK edge.
   * It also creates an AST edge from METHOD to the new METHOD_PARAMETER_OUT nodes.
+  *
+  * This pass has MethodStubCreator as prerequisite for language frontends which do
+  * not provide method stubs.
+  *
   */
 class MethodDecoratorPass(graph: ScalaGraph) extends CpgPass(graph) {
   import MethodDecoratorPass.logger

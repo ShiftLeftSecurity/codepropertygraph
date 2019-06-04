@@ -11,12 +11,15 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 import scala.collection.JavaConverters._
 
 /**
-  This path only exists to assure backwards compatibility for java and c#
-  cpgs which do not yet have the RECEIVER edge.
-  For those cases the RECEIVER edge is always between a CALL and
-  a possibly existing instance argument and can thus easily be calculated
-  here.
-  TODO remove once not needed anymore.
+  * This pass only exists to assure backwards compatibility for java and c#
+  * cpgs which do not yet have the RECEIVER edge.
+  * For those cases the RECEIVER edge is always between a CALL and
+  * a possibly existing instance argument and can thus easily be calculated
+  * here.
+  *
+  * This pass has no other pass as prerequisite.
+  *
+  * TODO remove once not needed anymore.
   */
 class ReceiverEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
   import ReceiverEdgePass.logger

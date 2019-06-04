@@ -6,6 +6,10 @@ import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
 import org.apache.logging.log4j.{LogManager, Logger}
 
+/**
+  *
+  * This pass has no other pass as prerequisite.
+  */
 class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
   import CapturingLinker.logger
 

@@ -14,6 +14,10 @@ import org.apache.logging.log4j.{LogManager, Logger}
 
 import scala.collection.JavaConverters._
 
+/**
+  * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
+  * language frontends which do not provide method stubs and type decl stubs.
+  */
 class Linker(graph: ScalaGraph) extends CpgPass(graph) {
   import Linker.logger
 

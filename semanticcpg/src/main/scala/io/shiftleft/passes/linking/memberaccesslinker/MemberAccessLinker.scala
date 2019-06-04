@@ -11,6 +11,9 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
 
+/**
+  * This pass has Linker as prerequisite.
+  */
 class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
   import MemberAccessLinker.logger
   private var loggedDeprecationWarning: Boolean = _

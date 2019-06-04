@@ -8,6 +8,10 @@ import io.shiftleft.passes.{CpgPass, ParallelIteratorExecutor}
 import io.shiftleft.passes.utils.Traversals
 import io.shiftleft.queryprimitives.steps.GremlinScalaIterator
 
+/**
+  * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
+  * language frontends which do not provide method stubs and type decl stubs.
+  */
 class ContainsEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
 
   private val sourceTypes = List(
