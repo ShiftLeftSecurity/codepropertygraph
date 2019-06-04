@@ -57,9 +57,6 @@ class DiffGraphApplier {
   }
 
   private def addEdges(diffGraph: DiffGraph, graph: ScalaGraph) = {
-    def lookupNode(id: JLong): Vertex =
-      graph.graph.vertices(id).nextChecked
-
     diffGraph.edges.foreach { edge =>
       val srcTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.src))
       val dstTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.dst))
@@ -67,20 +64,20 @@ class DiffGraphApplier {
     }
 
     diffGraph.edgesFromOriginal.foreach { edge =>
-      val srcTinkerNode = lookupNode(edge.srcId)
+      val srcTinkerNode = edge.src
       val dstTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.dst))
       tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
     }
 
     diffGraph.edgesToOriginal.foreach { edge =>
       val srcTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.src))
-      val dstTinkerNode = lookupNode(edge.dstId)
+      val dstTinkerNode = edge.dst
       tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
     }
 
     diffGraph.edgesInOriginal.foreach { edge =>
-      val srcTinkerNode = lookupNode(edge.srcId)
-      val dstTinkerNode = lookupNode(edge.dstId)
+      val srcTinkerNode = edge.src
+      val dstTinkerNode = edge.dst
       tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
     }
 
@@ -94,14 +91,24 @@ class DiffGraphApplier {
     }
   }
 
-  private def addNodeProperties(diffGraph: DiffGraph, graph: ScalaGraph): Unit =
-    diffGraph.nodeProperties.foreach { property =>
-      graph.V(property.nodeId).property(Key(property.propertyKey) -> property.propertyValue).iterate
-    }
+  private def addNodeProperties(diffGraph: DiffGraph, graph: ScalaGraph): Unit = {
+    def lookupNode(id: JLong): Vertex =
+      graph.graph.vertices(id).nextChecked
 
-  private def addEdgeProperties(diffGraph: DiffGraph, graph: ScalaGraph): Unit =
-    diffGraph.edgeProperties.foreach { property =>
-      graph.E(property.edgeId).property(Key(property.propertyKey) -> property.propertyValue).iterate
+    diffGraph.nodeProperties.foreach { property =>
+      val vertex = lookupNode(property.nodeId)
+      vertex.property(property.propertyKey, property.propertyValue)
     }
+  }
+
+  private def addEdgeProperties(diffGraph: DiffGraph, graph: ScalaGraph): Unit = {
+    def lookupEdge(id: JLong): Edge =
+      graph.graph.edges(id).nextChecked
+
+    diffGraph.edgeProperties.foreach { property =>
+      val edge = lookupEdge(property.edgeId)
+      edge.property(property.propertyKey, property.propertyValue)
+    }
+  }
 
 }
