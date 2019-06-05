@@ -40,7 +40,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
       diffGraph.edgesToOriginal shouldBe List(
         EdgeToOriginal(
           src = newNode,
-          dstId = existingContainedNode.getId,
+          dst = existingContainedNode,
           label = ContainsNode.Label,
           properties = Seq(
             (EdgeKeyNames.LOCAL_NAME -> newNode.testContainedLabel),

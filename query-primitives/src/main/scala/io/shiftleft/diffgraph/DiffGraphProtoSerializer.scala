@@ -54,14 +54,14 @@ class DiffGraphProtoSerializer() {
     val diffGraph = appliedDiffGraph.diffGraph
 
     addProtoEdge(diffGraph.edgesInOriginal, { edge: EdgeInOriginal =>
-      edge.srcId
+      edge.src.getId
     }, { edge: EdgeInOriginal =>
-      edge.dstId
+      edge.dst.getId
     })
 
     addProtoEdge(
       diffGraph.edgesFromOriginal, { edge: EdgeFromOriginal =>
-        edge.srcId
+        edge.src.getId
       }, { edge: EdgeFromOriginal =>
         appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.dst))
       }
@@ -70,7 +70,7 @@ class DiffGraphProtoSerializer() {
     addProtoEdge(diffGraph.edgesToOriginal, { edge: EdgeToOriginal =>
       appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.src))
     }, { edge: EdgeToOriginal =>
-      edge.dstId
+      edge.dst.getId
     })
 
     addProtoEdge(
@@ -87,16 +87,20 @@ class DiffGraphProtoSerializer() {
       }.asJava)
     }
 
-    def protoEdge(edge: DiffEdge, srcId: JLong, dstId: JLong) =
-      CpgStruct.Edge
-        .newBuilder()
+    def protoEdge(edge: DiffEdge, srcId: JLong, dstId: JLong) = {
+      val edgeBuilder = CpgStruct.Edge.newBuilder()
+
+      edgeBuilder
         .setSrc(srcId)
         .setDst(dstId)
         .setType(EdgeType.valueOf(edge.label))
-        .addAllProperty(
-          edge.properties.map { case (key, value) => edgeProperty(key, value) }.asJava
-        )
-        .build
+
+      edge.properties.foreach { property =>
+        edgeBuilder.addProperty(edgeProperty(property._1, property._2))
+      }
+
+      edgeBuilder.build
+    }
   }
 
   private def nodeProperty(key: String, value: Any) = {
