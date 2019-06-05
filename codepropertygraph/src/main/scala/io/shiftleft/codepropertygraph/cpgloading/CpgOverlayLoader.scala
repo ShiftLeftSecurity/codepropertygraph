@@ -11,7 +11,7 @@ class CpgOverlayLoader {
     */
   def load(filename: String, baseCpg: Cpg): Unit = {
     val applier = new CpgOverlayApplier(baseCpg.graph)
-    ProtoCpgLoader.loadOverlays(filename).asScala.foreach { overlay =>
+    ProtoCpgLoader.loadOverlays(filename).foreach { overlay =>
       applier.applyDiff(overlay)
     }
   }

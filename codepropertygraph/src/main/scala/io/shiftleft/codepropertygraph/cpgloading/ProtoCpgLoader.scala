@@ -1,0 +1,199 @@
+package io.shiftleft.codepropertygraph.cpgloading
+
+import java.io.{File, FileInputStream, IOException, InputStream}
+import java.nio.file.Files
+import java.util.Optional
+
+import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.proto
+import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct}
+import org.apache.commons.io.FileUtils
+import org.apache.logging.log4j.LogManager
+
+import scala.collection.JavaConverters._
+
+class ProtoCpgLoader {}
+
+/**
+  * Warning - this is an internal class. Please use `CpgLoader` if you
+  * require a stable API.
+  * */
+object ProtoCpgLoader {
+
+  private val logger = LogManager.getLogger(classOf[ProtoCpgLoader])
+
+  /**
+    * Load code property graph from zip archive. The zip archive
+    * contains proto files. The default loader configuration is used.
+    * @param filename filename of the CPG archive
+    * */
+  def loadFromProtoZip(filename: String): Cpg =
+    loadFromProtoZip(filename, CpgLoaderConfig.default)
+
+  /**
+    * Load code property graph from zip archive. The zip archive
+    * contains proto files.
+    * @param filename filename of the CPG archive
+    * @param config loader configuration
+    * */
+  def loadFromProtoZip(filename: String, config: CpgLoaderConfig): Cpg = {
+    extractArchiveAndExecuteOnDir[Cpg](filename, "cpg2sp_proto", { tempDirPathName =>
+      loadFromProtobufDirectory(tempDirPathName, config)
+    })
+  }
+
+  def loadOverlays(filename: String): List[proto.cpg.Cpg.CpgOverlay] =
+    extractArchiveAndExecuteOnDir(filename, "cpg2sp_proto_overlay", { tempDirPathName =>
+      loadOverlaysFromProtobufDirectory(tempDirPathName)
+    })
+
+  def loadOverlaysFromProtobufDirectory(inputDirectory: String): List[proto.cpg.Cpg.CpgOverlay] = {
+    val filesInDirectory = getFilesinDirectory(new File(inputDirectory)).asJava
+    filesInDirectory.sort(comparator)
+
+    def comparator(file1: File, file2: File): Int = {
+      val file1Split = file1.getName.split("_")
+      val file2Split = file2.getName.split("_")
+      if (file1Split.length < 2 || file2Split.length < 2) {
+        file1.getName.compareTo(file2.getName)
+      } else {
+        Integer.parseInt(file1Split(0)) - Integer.parseInt(file2Split(0))
+      }
+    }
+
+    filesInDirectory.asScala.map { file =>
+      val inputStream = new FileInputStream(file)
+      val cpgOverlay = CpgOverlay.parseFrom(inputStream)
+      inputStream.close()
+      cpgOverlay
+    }.toList
+
+  }
+
+  def getFilesinDirectory(directory: File): List[File] = {
+    Files
+      .walk(directory.toPath)
+      .iterator()
+      .asScala
+      .filter(f => Files.isRegularFile(f))
+      .map(_.toFile)
+      .toList
+  }
+
+  private def extractArchiveAndExecuteOnDir[T](filename: String, dstDirname: String, f: String => T): T = {
+
+    def extractIntoTemporaryDirectory(filename: String, tempDirPathName: String): Unit = {
+      val start = System.currentTimeMillis
+      new ZipArchive(filename).unzip(tempDirPathName)
+      logger.info("Unzipping completed in " + (System.currentTimeMillis - start) + "ms.")
+    }
+
+    def removeTemporaryDirectory(tempDir: File): Unit = {
+      try if (tempDir != null) FileUtils.deleteDirectory(tempDir)
+      catch {
+        case _: IOException =>
+          logger.warn("Unable to remove temporary directory: " + tempDir)
+      }
+    }
+
+    var tempDir: File = null
+    try {
+      tempDir = Files.createTempDirectory(dstDirname).toFile
+      val tempDirPathName = tempDir.getAbsolutePath
+      extractIntoTemporaryDirectory(filename, tempDirPathName)
+      var start = 0L
+      start = System.currentTimeMillis
+      f(tempDirPathName)
+    } catch {
+      case exception: IOException => throw new RuntimeException(exception)
+    } finally {
+      removeTemporaryDirectory(tempDir)
+    }
+
+  }
+
+  /**
+    * Load code property graph from directory containing protobuf bin files.
+    * This is the directory obtained by extracting a CPG zip archive.
+    * */
+  def loadFromProtobufDirectory(inputDirectory: String, config: CpgLoaderConfig): Cpg = {
+    val onDiskOverflowConfig = config.onDiskOverflowConfig
+      .map { c =>
+        Optional.ofNullable(c)
+      }
+      .getOrElse(Optional.empty())
+    val builder = new ProtoToCpg(onDiskOverflowConfig)
+
+    getFilesinDirectory(new File(inputDirectory)).foreach { file =>
+      // TODO: use ".bin" extensions in proto output, and then only
+      // load files with ".bin" extension here.
+      val inputStream = new FileInputStream(file)
+      builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList)
+      inputStream.close()
+    }
+
+    getFilesinDirectory(new File(inputDirectory)).foreach { file =>
+      // TODO: use ".bin" extensions in proto output, and then only
+      // load files with ".bin" extension here.
+      val inputStream = new FileInputStream(file)
+      builder.addEdges(getNextProtoCpgFromStream(inputStream).getEdgeList)
+      inputStream.close()
+    }
+
+    def getNextProtoCpgFromStream(inputStream: FileInputStream): CpgStruct = CpgStruct.parseFrom(inputStream)
+
+    builder.build()
+  }
+
+  def loadFromInputStream(inputStream: InputStream, config: CpgLoaderConfig): Cpg = {
+    val onDiskOverflowConfig = config.onDiskOverflowConfig
+      .map { c =>
+        Optional.ofNullable(c)
+      }
+      .getOrElse(Optional.empty())
+    val builder = new ProtoToCpg(onDiskOverflowConfig);
+    try {
+      builder.addEdges(consumeInputStreamNodes(builder, inputStream).asJava)
+    } finally {
+      closeProtoStream(inputStream);
+    }
+    return builder.build();
+  }
+
+  private def consumeInputStreamNodes(builder: ProtoToCpg, inputStream: InputStream): List[CpgStruct.Edge] = {
+    val cpgStruct: CpgStruct = CpgStruct.parseFrom(inputStream)
+    builder.addNodes(cpgStruct.getNodeList)
+    cpgStruct.getEdgeList.asScala.toList
+  }
+
+  private def closeProtoStream(inputStream: InputStream): Unit = {
+    try inputStream.close()
+    catch {
+      case exception: IOException =>
+        throw new RuntimeException(exception)
+    }
+  }
+
+  /**
+    * Load code property graph from a list of CPGs in proto format.
+    **/
+  def loadFromListOfProtos(cpgs: List[proto.cpg.Cpg.CpgStruct], config: CpgLoaderConfig): Cpg = {
+    val onDiskOverflowConfig = config.onDiskOverflowConfig
+      .map { c =>
+        Optional.ofNullable(c)
+      }
+      .getOrElse(Optional.empty())
+    val builder = new ProtoToCpg(onDiskOverflowConfig)
+
+    for (cpgStruct <- cpgs) {
+      builder.addNodes(cpgStruct.getNodeList)
+    }
+
+    for (cpgStruct <- cpgs) {
+      builder.addEdges(cpgStruct.getEdgeList)
+    }
+
+    return builder.build
+  }
+
+}

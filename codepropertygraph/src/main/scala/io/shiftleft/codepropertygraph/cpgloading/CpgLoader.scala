@@ -48,7 +48,7 @@ private class CpgLoader {
     import scala.compat.java8.OptionConverters._
 
     val cpg =
-      ProtoCpgLoader.loadFromProtoZip(filename, config.onDiskOverflowConfig.asJava)
+      ProtoCpgLoader.loadFromProtoZip(filename, config)
     if (config.createIndices) { createIndexes(cpg) }
     cpg
   }
