@@ -1,8 +1,9 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
 import java.io.{File, FileInputStream, IOException, InputStream}
-import java.nio.file.Files
+import java.nio.file.{Files, Path}
 import java.util.Optional
+import java.util.stream.Collectors
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto
@@ -48,18 +49,20 @@ object ProtoCpgLoader {
     })
 
   def loadOverlaysFromProtobufDirectory(inputDirectory: String): List[proto.cpg.Cpg.CpgOverlay] = {
-    val filesInDirectory = getFilesinDirectory(new File(inputDirectory)).asJava
-    filesInDirectory.sort(comparator)
 
-    def comparator(file1: File, file2: File): Int = {
-      val file1Split = file1.getName.split("_")
-      val file2Split = file2.getName.split("_")
+    def comparator(file1: String, file2: String): Int = {
+      val file1Split = file1.split("_")
+      val file2Split = file2.split("_")
       if (file1Split.length < 2 || file2Split.length < 2) {
-        file1.getName.compareTo(file2.getName)
+        file1.compareTo(file2)
       } else {
         Integer.parseInt(file1Split(0)) - Integer.parseInt(file2Split(0))
       }
     }
+
+    val filesInDirectory = getFileNamesInDirectory(new File(inputDirectory))
+
+    filesInDirectory.sort(comparator)
 
     filesInDirectory.asScala.map { file =>
       val inputStream = new FileInputStream(file)
@@ -67,17 +70,20 @@ object ProtoCpgLoader {
       inputStream.close()
       cpgOverlay
     }.toList
-
   }
 
-  def getFilesinDirectory(directory: File): List[File] = {
+  def getFileNamesInDirectory(directory: File): java.util.List[String] = {
+
     Files
       .walk(directory.toPath)
-      .iterator()
+      .collect(Collectors.toList[Path])
       .asScala
-      .filter(f => Files.isRegularFile(f))
-      .map(_.toFile)
       .toList
+      .filter(f => f.toFile.isFile)
+      .map { path: Path =>
+        path.toFile.toString
+      }
+      .asJava
   }
 
   private def extractArchiveAndExecuteOnDir[T](filename: String, dstDirname: String, f: String => T): T = {
@@ -124,7 +130,7 @@ object ProtoCpgLoader {
       .getOrElse(Optional.empty())
     val builder = new ProtoToCpg(onDiskOverflowConfig)
 
-    getFilesinDirectory(new File(inputDirectory)).foreach { file =>
+    getFileNamesInDirectory(new File(inputDirectory)).asScala.foreach { file =>
       // TODO: use ".bin" extensions in proto output, and then only
       // load files with ".bin" extension here.
       val inputStream = new FileInputStream(file)
@@ -132,7 +138,7 @@ object ProtoCpgLoader {
       inputStream.close()
     }
 
-    getFilesinDirectory(new File(inputDirectory)).foreach { file =>
+    getFileNamesInDirectory(new File(inputDirectory)).asScala.foreach { file =>
       // TODO: use ".bin" extensions in proto output, and then only
       // load files with ".bin" extension here.
       val inputStream = new FileInputStream(file)
