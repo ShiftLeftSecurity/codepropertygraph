@@ -11,6 +11,9 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
 
+/**
+  * This pass has no other pass as prerequisite.
+  */
 class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
   import MethodStubCreator.logger
 

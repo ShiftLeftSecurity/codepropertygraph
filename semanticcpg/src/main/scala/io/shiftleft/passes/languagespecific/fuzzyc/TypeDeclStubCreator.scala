@@ -5,6 +5,9 @@ import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
 
+/**
+  * This pass has no other pass as prerequisite.
+  */
 class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
 
   private var typeDeclFullNameToNode = Map[String, nodes.TypeDeclBase]()
