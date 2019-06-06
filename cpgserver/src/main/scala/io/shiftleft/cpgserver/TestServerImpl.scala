@@ -7,7 +7,7 @@ import io.shiftleft.diffgraph.DiffGraph
 class TestServerImpl extends ServerImpl {
 
   override def cpg: Option[Cpg] = _cpg
-  var _cpg : Option[Cpg] = None
+  var _cpg: Option[Cpg] = None
 
   override def createCpg(filenames: List[String]): Unit = {
     _cpg = Some(new Cpg())

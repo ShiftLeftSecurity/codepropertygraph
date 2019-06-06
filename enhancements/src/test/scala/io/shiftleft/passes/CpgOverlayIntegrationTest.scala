@@ -35,8 +35,6 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
     pass1NewNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass2NewNodeCode)
   }
 
-
-
   /* like a freshly deserialized cpg.bin.zip without any overlays applied */
   def createNewBaseCpg(): Cpg = {
     val graph: Graph = TinkerGraph.open(nodes.Factories.AllAsJava, edges.Factories.AllAsJava)
@@ -53,15 +51,14 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       override def accept[T](visitor: NodeVisitor[T]): T = ???
     }
     new CpgPass(cpg.graph) {
+
       /**
         * Main method of enhancement - to be implemented by child class
         **/
       override def run(): Iterator[DiffGraph] = {
         val dstGraph = new DiffGraph
         dstGraph.addNode(newNode)
-        dstGraph.addEdgeFromOriginal(srcNode = from,
-          dstNode = newNode,
-          edgeLabel = EdgeTypes.AST)
+        dstGraph.addEdgeFromOriginal(srcNode = from, dstNode = newNode, edgeLabel = EdgeTypes.AST)
         Iterator(dstGraph)
       }
     }
@@ -79,5 +76,3 @@ object CpgOverlayIntegrationTest {
     def productElement(n: Int): Any = ???
   }
 }
-
-

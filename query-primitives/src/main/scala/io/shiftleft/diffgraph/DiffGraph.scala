@@ -65,7 +65,10 @@ class DiffGraph {
   /**
     * Add edge between nodes present in the diff graph
     * */
-  def addEdge(srcNode: NewNode, dstNode: NewNode, edgeLabel: String, properties: Seq[(String, AnyRef)] = List()): Unit = {
+  def addEdge(srcNode: NewNode,
+              dstNode: NewNode,
+              edgeLabel: String,
+              properties: Seq[(String, AnyRef)] = List()): Unit = {
     _edges += new EdgeInDiffGraph(srcNode, dstNode, edgeLabel, properties)
     incrementEdgeCreatedCount()
   }
@@ -76,7 +79,7 @@ class DiffGraph {
   def addEdgeToOriginal(srcNode: NewNode,
                         dstNode: StoredNode,
                         edgeLabel: String,
-    properties: Seq[(String, AnyRef)] = List()): Unit = {
+                        properties: Seq[(String, AnyRef)] = List()): Unit = {
     _edgesToOriginal += new EdgeToOriginal(srcNode, dstNode, edgeLabel, properties)
     incrementEdgeCreatedCount()
   }
