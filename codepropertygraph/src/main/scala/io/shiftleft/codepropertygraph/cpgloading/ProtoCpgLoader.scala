@@ -74,9 +74,9 @@ object ProtoCpgLoader {
     // all filenames here. For the directory of overlays, this is not
     // problematic though, since the number of overlay files in rather small.
     // If it does ever grow, we may need to rethink this
-    filesInDirectory.sorted(comparator)
 
-    filesInDirectory.iterator.asScala.map { file =>
+
+    filesInDirectory.sorted(comparator).iterator.asScala.map { file =>
       val inputStream = new FileInputStream(file)
       val cpgOverlay = CpgOverlay.parseFrom(inputStream)
       inputStream.close()
