@@ -47,9 +47,9 @@ class ContainsEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
       .sideEffect(destination =>
         if (destinationTypes.contains(destination.label())) {
           dstGraph.addEdgeInOriginal(source.asInstanceOf[StoredNode],
-            destination.asInstanceOf[StoredNode],
-            EdgeTypes.CONTAINS)
-        })
+                                     destination.asInstanceOf[StoredNode],
+                                     EdgeTypes.CONTAINS)
+      })
       .iterate()
 
     dstGraph

@@ -43,4 +43,3 @@ class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
 object CapturingLinker {
   private val logger: Logger = LogManager.getLogger(classOf[CapturingLinker])
 }
-

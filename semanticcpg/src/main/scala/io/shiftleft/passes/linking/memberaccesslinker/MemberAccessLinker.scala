@@ -23,7 +23,8 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
     val memberAccessIterator = Cpg(graph.graph).call
       .filter(
         _.nameExact(Operators.memberAccess, Operators.indirectMemberAccess)
-      ).toIterator
+      )
+      .toIterator
 
     new ParallelIteratorExecutor(memberAccessIterator).map(perMemberAccess)
   }
