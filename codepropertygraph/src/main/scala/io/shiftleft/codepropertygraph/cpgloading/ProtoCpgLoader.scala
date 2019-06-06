@@ -43,11 +43,19 @@ object ProtoCpgLoader {
     })
   }
 
+  /**
+    * Load overlays from archive of overlays stored at `filename`
+    * @param filename the filename of the archive
+    * */
   def loadOverlays(filename: String): List[proto.cpg.Cpg.CpgOverlay] =
     extractArchiveAndExecuteOnDir(filename, "cpg2sp_proto_overlay", { tempDirPathName =>
       loadOverlaysFromProtobufDirectory(tempDirPathName)
     })
 
+  /**
+    * Load overlays from directory containing overlays in proto format.
+    * @inputDirectory directory containing overlays
+    * */
   def loadOverlaysFromProtobufDirectory(inputDirectory: String): List[proto.cpg.Cpg.CpgOverlay] = {
 
     def comparator(file1: String, file2: String): Int = {
@@ -61,10 +69,14 @@ object ProtoCpgLoader {
     }
 
     val filesInDirectory = getFileNamesInDirectory(new File(inputDirectory))
+    // Note: sorting is necessary here because we need to load overlays
+    // in the right order. Sorting requires us to eagerly accumulate
+    // all filenames here. For the directory of overlays, this is not
+    // problematic though, since the number of overlay files in rather small.
+    // If it does ever grow, we may need to rethink this
+    filesInDirectory.sorted(comparator)
 
-    filesInDirectory.sort(comparator)
-
-    filesInDirectory.asScala.map { file =>
+    filesInDirectory.iterator.asScala.map { file =>
       val inputStream = new FileInputStream(file)
       val cpgOverlay = CpgOverlay.parseFrom(inputStream)
       inputStream.close()
@@ -72,19 +84,10 @@ object ProtoCpgLoader {
     }.toList
   }
 
-  def getFileNamesInDirectory(directory: File): java.util.List[String] = {
-
-    Files
+  private def getFileNamesInDirectory(directory: File) : java.util.stream.Stream[String] = Files
       .walk(directory.toPath)
-      .collect(Collectors.toList[Path])
-      .asScala
-      .toList
-      .filter(f => f.toFile.isFile)
-      .map { path: Path =>
-        path.toFile.toString
-      }
-      .asJava
-  }
+      .filter(_.toFile.isFile)
+      .map[String](_.toFile.toString)
 
   private def extractArchiveAndExecuteOnDir[T](filename: String, dstDirname: String, f: String => T): T = {
 
@@ -130,7 +133,7 @@ object ProtoCpgLoader {
       .getOrElse(Optional.empty())
     val builder = new ProtoToCpg(onDiskOverflowConfig)
 
-    getFileNamesInDirectory(new File(inputDirectory)).asScala.foreach { file =>
+    getFileNamesInDirectory(new File(inputDirectory)).iterator.asScala.foreach { file =>
       // TODO: use ".bin" extensions in proto output, and then only
       // load files with ".bin" extension here.
       val inputStream = new FileInputStream(file)
@@ -138,7 +141,7 @@ object ProtoCpgLoader {
       inputStream.close()
     }
 
-    getFileNamesInDirectory(new File(inputDirectory)).asScala.foreach { file =>
+    getFileNamesInDirectory(new File(inputDirectory)).iterator.asScala.foreach { file =>
       // TODO: use ".bin" extensions in proto output, and then only
       // load files with ".bin" extension here.
       val inputStream = new FileInputStream(file)
@@ -151,6 +154,9 @@ object ProtoCpgLoader {
     builder.build()
   }
 
+  /**
+    * Load code property graph from input stream pointing to proto file
+    * */
   def loadFromInputStream(inputStream: InputStream, config: CpgLoaderConfig): Cpg = {
     val onDiskOverflowConfig = config.onDiskOverflowConfig
       .map { c =>
