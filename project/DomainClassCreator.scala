@@ -468,7 +468,7 @@ object DomainClassCreator {
           |  }
           |  override def toMap: Map[String, Any] = get.toMap
           |  override val productArity = get.productArity
-          |  override def productElement(n: Int): Any = wrapped.productElement(n)
+          |  override def productElement(n: Int): Any = get.productElement(n)
           |  override def canEqual(that: Any): Boolean = get.canEqual(that)
           |}""".stripMargin
       }
