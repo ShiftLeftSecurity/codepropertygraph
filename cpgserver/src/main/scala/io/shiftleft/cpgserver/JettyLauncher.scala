@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 
 object JettyLauncher {
 
-  def startServer(port : Int) : Unit  = {
+  def startServer(port: Int): Unit = {
     val logger = LoggerFactory.getLogger(getClass)
     val server = new Server(port)
     val context = new WebAppContext()

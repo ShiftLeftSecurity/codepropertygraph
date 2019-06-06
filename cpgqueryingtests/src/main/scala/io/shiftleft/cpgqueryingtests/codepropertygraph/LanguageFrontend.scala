@@ -10,6 +10,7 @@ import io.shiftleft.fuzzyc2cpg.output.protobuf.OutputModuleFactory
   * into CPGs
   */
 abstract class LanguageFrontend {
+
   /**
     * A standard file extension for the source code files of the given language.
     * E.g. `.c` for C language
