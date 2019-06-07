@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 object CpgValidatorMain extends App {
   val cpgFileName = args(0)
 
-  val loaderConfig = new CpgLoaderConfig(createIndices = true, onDiskOverflowConfig = None, ignoredProtoEntries = None)
+  val loaderConfig = CpgLoaderConfig.default
   val cpg = CpgLoader.load(cpgFileName, loaderConfig)
 
   val validator = new CpgValidator(cpg)

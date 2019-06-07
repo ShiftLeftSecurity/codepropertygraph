@@ -45,8 +45,6 @@ private class CpgLoader {
   def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg = {
     logger.debug("Loading " + filename)
 
-    import scala.compat.java8.OptionConverters._
-
     val cpg =
       ProtoCpgLoader.loadFromProtoZip(filename, config)
     if (config.createIndices) { createIndexes(cpg) }

@@ -75,16 +75,21 @@ object ProtoCpgLoader {
     // problematic though, since the number of overlay files in rather small.
     // If it does ever grow, we may need to rethink this
 
-
-    filesInDirectory.sorted(comparator).iterator.asScala.map { file =>
-      val inputStream = new FileInputStream(file)
-      val cpgOverlay = CpgOverlay.parseFrom(inputStream)
-      inputStream.close()
-      cpgOverlay
-    }.toList
+    filesInDirectory
+      .sorted(comparator)
+      .iterator
+      .asScala
+      .map { file =>
+        val inputStream = new FileInputStream(file)
+        val cpgOverlay = CpgOverlay.parseFrom(inputStream)
+        inputStream.close()
+        cpgOverlay
+      }
+      .toList
   }
 
-  private def getFileNamesInDirectory(directory: File) : java.util.stream.Stream[String] = Files
+  private def getFileNamesInDirectory(directory: File): java.util.stream.Stream[String] =
+    Files
       .walk(directory.toPath)
       .filter(_.toFile.isFile)
       .map[String](_.toFile.toString)
