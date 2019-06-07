@@ -1,9 +1,8 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
 import java.io.{File, FileInputStream, IOException, InputStream}
-import java.nio.file.{Files, Path}
+import java.nio.file.Files
 import java.util.Optional
-import java.util.stream.Collectors
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto
@@ -138,21 +137,31 @@ object ProtoCpgLoader {
       .getOrElse(Optional.empty())
     val builder = new ProtoToCpg(onDiskOverflowConfig)
 
-    getFileNamesInDirectory(new File(inputDirectory)).iterator.asScala.foreach { file =>
-      // TODO: use ".bin" extensions in proto output, and then only
-      // load files with ".bin" extension here.
-      val inputStream = new FileInputStream(file)
-      builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList)
-      inputStream.close()
+    def matchesPattern(file: String): Boolean = {
+      config.patterns.isEmpty || config.patterns.exists { p: String =>
+        file.matches(p)
+      }
     }
 
-    getFileNamesInDirectory(new File(inputDirectory)).iterator.asScala.foreach { file =>
-      // TODO: use ".bin" extensions in proto output, and then only
-      // load files with ".bin" extension here.
-      val inputStream = new FileInputStream(file)
-      builder.addEdges(getNextProtoCpgFromStream(inputStream).getEdgeList)
-      inputStream.close()
-    }
+    getFileNamesInDirectory(new File(inputDirectory)).iterator.asScala
+      .filter(matchesPattern)
+      .foreach { file =>
+        // TODO: use ".bin" extensions in proto output, and then only
+        // load files with ".bin" extension here.
+        val inputStream = new FileInputStream(file)
+        builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList)
+        inputStream.close()
+      }
+
+    getFileNamesInDirectory(new File(inputDirectory)).iterator.asScala
+      .filter(matchesPattern)
+      .foreach { file =>
+        // TODO: use ".bin" extensions in proto output, and then only
+        // load files with ".bin" extension here.
+        val inputStream = new FileInputStream(file)
+        builder.addEdges(getNextProtoCpgFromStream(inputStream).getEdgeList)
+        inputStream.close()
+      }
 
     def getNextProtoCpgFromStream(inputStream: FileInputStream): CpgStruct = CpgStruct.parseFrom(inputStream)
 
