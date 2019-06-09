@@ -7,12 +7,11 @@ import java.util.Optional
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct}
-import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.LogManager
 
 import scala.collection.JavaConverters._
 
-class ProtoCpgLoader {}
+private class ProtoCpgLoader {}
 
 /**
   * Warning - this is an internal class. Please use `CpgLoader` if you
@@ -36,10 +35,19 @@ object ProtoCpgLoader {
     * @param filename filename of the CPG archive
     * @param config loader configuration
     * */
-  def loadFromProtoZip(filename: String, config: CpgLoaderConfig): Cpg = {
-    extractArchiveAndExecuteOnDir[Cpg](filename, "cpg2sp_proto", { tempDirPathName =>
-      loadFromProtobufDirectory(tempDirPathName, config)
-    })
+  def loadFromProtoZip(filename: String, config: CpgLoaderConfig): Cpg =
+    loadFromProtobufDirectory(new ProtoCpgArchive(filename, "cpg2sp_proto").extract(), config)
+
+  /**
+    * Load code property graph from directory containing protobuf bin files.
+    * This is the directory obtained by extracting a CPG zip archive.
+    * */
+  def loadFromProtobufDirectory(inputDirectory: String, config: CpgLoaderConfig): Cpg = {
+    val filenamesInDirectory = filenamesForConfig(inputDirectory, config)
+    val builder = builderForConfig(config)
+    filenamesInDirectory.foreach(addNodes(_, builder))
+    filenamesInDirectory.foreach(addEdges(_, builder))
+    builder.build()
   }
 
   /**
@@ -47,9 +55,7 @@ object ProtoCpgLoader {
     * @param filename the filename of the archive
     * */
   def loadOverlays(filename: String): List[proto.cpg.Cpg.CpgOverlay] =
-    extractArchiveAndExecuteOnDir(filename, "cpg2sp_proto_overlay", { tempDirPathName =>
-      loadOverlaysFromProtobufDirectory(tempDirPathName)
-    })
+    loadOverlaysFromProtobufDirectory(new ProtoCpgArchive(filename, "cpg2sp_proto_overlay").extract())
 
   /**
     * Load overlays from directory containing overlays in proto format.
@@ -92,50 +98,6 @@ object ProtoCpgLoader {
       .walk(directory.toPath)
       .filter(_.toFile.isFile)
       .map[String](_.toFile.toString)
-
-  private def extractArchiveAndExecuteOnDir[T](filename: String, dstDirname: String, f: String => T): T = {
-
-    def extractIntoTemporaryDirectory(filename: String, tempDirPathName: String): Unit = {
-      val start = System.currentTimeMillis
-      new ZipArchive(filename).unzip(tempDirPathName)
-      logger.info("Unzipping completed in " + (System.currentTimeMillis - start) + "ms.")
-    }
-
-    def removeTemporaryDirectory(tempDir: File): Unit = {
-      try if (tempDir != null) FileUtils.deleteDirectory(tempDir)
-      catch {
-        case _: IOException =>
-          logger.warn("Unable to remove temporary directory: " + tempDir)
-      }
-    }
-
-    var tempDir: File = null
-    try {
-      tempDir = Files.createTempDirectory(dstDirname).toFile
-      val tempDirPathName = tempDir.getAbsolutePath
-      extractIntoTemporaryDirectory(filename, tempDirPathName)
-      var start = 0L
-      start = System.currentTimeMillis
-      f(tempDirPathName)
-    } catch {
-      case exception: IOException => throw new RuntimeException(exception)
-    } finally {
-      removeTemporaryDirectory(tempDir)
-    }
-
-  }
-
-  /**
-    * Load code property graph from directory containing protobuf bin files.
-    * This is the directory obtained by extracting a CPG zip archive.
-    * */
-  def loadFromProtobufDirectory(inputDirectory: String, config: CpgLoaderConfig): Cpg = {
-    val filenamesInDirectory = filenamesForConfig(inputDirectory, config)
-    val builder = builderForConfig(config)
-    filenamesInDirectory.foreach(addNodes(_, builder))
-    filenamesInDirectory.foreach(addEdges(_, builder))
-    builder.build()
-  }
 
   private def builderForConfig(config: CpgLoaderConfig): ProtoToCpg = {
     val onDiskOverflowConfig: Optional[OnDiskOverflowConfig] = config.onDiskOverflowConfig
@@ -219,25 +181,6 @@ object ProtoCpgLoader {
     }
 
     return builder.build
-  }
-
-  /**
-    * From archive at `filename`, return a stream of CPGs obtained by loading
-    * proto files one by one.
-    * */
-  def loadStream(filename: String, config: CpgLoaderConfig): Iterator[Cpg] = {
-    extractArchiveAndExecuteOnDir[Iterator[Cpg]](
-      filename,
-      "cpg2sp_proto", { tempDirPathName =>
-        val filenamesInDirectory = filenamesForConfig(tempDirPathName, config)
-        filenamesInDirectory.toIterator.map { file =>
-          val builder = builderForConfig(config)
-          addNodes(file, builder)
-          addEdges(file, builder)
-          builder.build()
-        }
-      }
-    )
   }
 
 }
