@@ -110,21 +110,28 @@ object ProtoCpgLoader {
       .filter(_.toFile.isFile)
       .map[String](_.toFile.toString)
 
-  private def builderForConfig(config: CpgLoaderConfig): ProtoToCpg = {
+
+  /**
+    * For the given config, return a ProtoToCpg builder
+    * */
+  def builderForConfig(config: CpgLoaderConfig): ProtoToCpg = {
     val onDiskOverflowConfig: Optional[OnDiskOverflowConfig] = config.onDiskOverflowConfig
       .map(x => Optional.ofNullable(x))
       .getOrElse(Optional.empty())
     new ProtoToCpg(onDiskOverflowConfig)
   }
 
-  private def filenamesForConfig(inputDirectory: String, config: CpgLoaderConfig) = {
+  /**
+    * List of filenames of proto CPG files to process, according to loader configuration.
+    * */
+  def filenamesForConfig(inputDirectory: String, config: CpgLoaderConfig) : List[String] = {
     getFileNamesInDirectory(new File(inputDirectory)).iterator.asScala.filter(matchesPattern(_, config)).toList
   }
 
   private def matchesPattern(file: String, config: CpgLoaderConfig): Boolean =
     config.patterns.isEmpty || config.patterns.exists(file.matches)
 
-  private def addNodes(file: String, builder: ProtoToCpg) = {
+  def addNodes(file: String, builder: ProtoToCpg) = {
     // TODO: use ".bin" extensions in proto output, and then only
     // load files with ".bin" extension here.
     val inputStream = new FileInputStream(file)
@@ -132,7 +139,7 @@ object ProtoCpgLoader {
     inputStream.close()
   }
 
-  private def addEdges(file: String, builder: ProtoToCpg) = {
+  def addEdges(file: String, builder: ProtoToCpg) = {
     // TODO: use ".bin" extensions in proto output, and then only
     // load files with ".bin" extension here.
     val inputStream = new FileInputStream(file)
