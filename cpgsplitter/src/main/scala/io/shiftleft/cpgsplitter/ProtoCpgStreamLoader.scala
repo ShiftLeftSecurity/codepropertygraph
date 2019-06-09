@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.cpgloading.{CpgLoaderConfig, ProtoCpgArchi
 
 class ProtoCpgStreamLoader {
 
-  var archive: Option[ProtoCpgArchiveLoader] = None
+  var archiveLoader: ProtoCpgArchiveLoader = new ProtoCpgArchiveLoader()
 
   /**
     * Load code property graph stream. Code property graphs are bundled in archives.
@@ -16,14 +16,14 @@ class ProtoCpgStreamLoader {
     *
     * */
   def loadStream(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default) = {
-    archive = Some(new ProtoCpgArchiveLoader(filename, "stream"))
+    archiveLoader.extract(filename, "stream")
   }
 
   /**
     * Call to free resources
     * */
   def shutdown(): Unit = {
-    archive.foreach(_.destroy)
+    archiveLoader.destroy
   }
 
 }

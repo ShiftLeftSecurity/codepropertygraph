@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import java.io.IOException
+import java.io.{File, IOException}
 import java.nio.file.Files
 
 import org.apache.commons.io.FileUtils
@@ -8,28 +8,24 @@ import org.apache.logging.log4j.LogManager
 
 import scala.util.{Failure, Success, Try}
 
-/**
-  * Utility class to handle CPG archives, that is, archives
-  * containing protobuf files, each of which represent a part of a code property graph.
-  *
-  * @param filename the filename of the archive
-  * */
-class ProtoCpgArchiveLoader(filename: String, prefix: String = "cpgarchive") {
+class ProtoCpgArchiveLoader() {
 
   private val logger = LogManager.getLogger(classOf[ProtoCpgLoader])
 
-  val tempDir = Try(Files.createTempDirectory(prefix).toFile) match {
-    case Success(v) => v
-    case Failure(e) => null
-  }
-
-  val tempDirPathName = tempDir.getAbsolutePath
+  var tempDir: Option[File] = None
+  def tempDirPathName: Option[String] = tempDir.map(_.getAbsolutePath)
 
   /**
     * Extract archive into temporary directory and return directory name
     * */
-  def extract(): String = {
-    extractIntoDirectory(filename, tempDir.toPath.toAbsolutePath.toString)
+  def extract(filename: String, prefix: String = "cpgarchive"): Option[String] = {
+    tempDir = Try(Files.createTempDirectory(prefix).toFile) match {
+      case Success(v) => Some(v)
+      case Failure(e) => None
+    }
+    tempDir.foreach { t =>
+      extractIntoDirectory(filename, t.toPath.toAbsolutePath.toString)
+    }
     tempDirPathName
   }
 
@@ -48,8 +44,9 @@ class ProtoCpgArchiveLoader(filename: String, prefix: String = "cpgarchive") {
   def destroy: Unit = removeTemporaryDirectory
 
   private def removeTemporaryDirectory: Unit = {
-    try if (tempDir != null) FileUtils.deleteDirectory(tempDir)
-    catch {
+    try {
+      tempDir.foreach(FileUtils.deleteDirectory)
+    } catch {
       case _: IOException =>
         logger.warn("Unable to remove temporary directory: " + tempDir)
     }

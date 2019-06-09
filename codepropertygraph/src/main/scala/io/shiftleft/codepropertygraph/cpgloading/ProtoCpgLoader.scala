@@ -33,9 +33,12 @@ object ProtoCpgLoader {
     * @param config loader configuration
     * */
   def loadFromProtoZip(filename: String, config: CpgLoaderConfig): Cpg = {
-    val archive = new ProtoCpgArchiveLoader(filename, "cpg2sp_proto")
-    val cpg = loadFromProtobufDirectory(archive.extract(), config)
-    archive.destroy
+    val archiveLoader = new ProtoCpgArchiveLoader()
+    val tmpDirPath = archiveLoader
+      .extract(filename, "cpg2sp_proto")
+      .getOrElse(throw new RuntimeException("Error extracting archive"))
+    val cpg = loadFromProtobufDirectory(tmpDirPath, config)
+    archiveLoader.destroy
     cpg
   }
 
@@ -56,8 +59,11 @@ object ProtoCpgLoader {
     * @param filename the filename of the archive
     * */
   def loadOverlays(filename: String): List[proto.cpg.Cpg.CpgOverlay] = {
-    val archiveLoader = new ProtoCpgArchiveLoader(filename, "cpg2sp_proto_overlay")
-    val cpg = loadOverlaysFromProtobufDirectory(archiveLoader.extract())
+    val archiveLoader = new ProtoCpgArchiveLoader()
+    val tmpDirPath = archiveLoader
+      .extract(filename, "cpg2sp_proto_overlay")
+      .getOrElse(throw new RuntimeException("Error extracting archive"))
+    val cpg = loadOverlaysFromProtobufDirectory(tmpDirPath)
     archiveLoader.destroy
     cpg
   }
