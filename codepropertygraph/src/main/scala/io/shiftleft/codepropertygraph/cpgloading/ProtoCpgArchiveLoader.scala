@@ -14,13 +14,13 @@ import scala.util.{Failure, Success, Try}
   *
   * @param filename the filename of the archive
   * */
-class ProtoCpgArchive(filename: String, prefix: String = "cpgarchive") {
+class ProtoCpgArchiveLoader(filename: String, prefix: String = "cpgarchive") {
 
   private val logger = LogManager.getLogger(classOf[ProtoCpgLoader])
 
   val tempDir = Try(Files.createTempDirectory(prefix).toFile) match {
     case Success(v) => v
-    case Failure(e) => throw new RuntimeException(e)
+    case Failure(e) => null
   }
 
   val tempDirPathName = tempDir.getAbsolutePath

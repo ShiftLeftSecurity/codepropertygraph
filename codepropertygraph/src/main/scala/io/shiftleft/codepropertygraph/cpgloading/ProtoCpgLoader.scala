@@ -7,7 +7,6 @@ import java.util.Optional
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct}
-import org.apache.logging.log4j.LogManager
 
 import scala.collection.JavaConverters._
 
@@ -18,8 +17,6 @@ private class ProtoCpgLoader {}
   * require a stable API.
   * */
 object ProtoCpgLoader {
-
-  private val logger = LogManager.getLogger(classOf[ProtoCpgLoader])
 
   /**
     * Load code property graph from zip archive. The zip archive
@@ -35,8 +32,12 @@ object ProtoCpgLoader {
     * @param filename filename of the CPG archive
     * @param config loader configuration
     * */
-  def loadFromProtoZip(filename: String, config: CpgLoaderConfig): Cpg =
-    loadFromProtobufDirectory(new ProtoCpgArchive(filename, "cpg2sp_proto").extract(), config)
+  def loadFromProtoZip(filename: String, config: CpgLoaderConfig): Cpg = {
+    val archive = new ProtoCpgArchiveLoader(filename, "cpg2sp_proto")
+    val cpg = loadFromProtobufDirectory(archive.extract(), config)
+    archive.destroy
+    cpg
+  }
 
   /**
     * Load code property graph from directory containing protobuf bin files.
@@ -54,8 +55,12 @@ object ProtoCpgLoader {
     * Load overlays from archive of overlays stored at `filename`
     * @param filename the filename of the archive
     * */
-  def loadOverlays(filename: String): List[proto.cpg.Cpg.CpgOverlay] =
-    loadOverlaysFromProtobufDirectory(new ProtoCpgArchive(filename, "cpg2sp_proto_overlay").extract())
+  def loadOverlays(filename: String): List[proto.cpg.Cpg.CpgOverlay] = {
+    val archiveLoader = new ProtoCpgArchiveLoader(filename, "cpg2sp_proto_overlay")
+    val cpg = loadOverlaysFromProtobufDirectory(archiveLoader.extract())
+    archiveLoader.destroy
+    cpg
+  }
 
   /**
     * Load overlays from directory containing overlays in proto format.
