@@ -174,7 +174,7 @@ object DomainClassCreator {
       import gremlin.scala._
       import io.shiftleft.codepropertygraph.generated.EdgeKeys
       import java.lang.{Boolean => JBoolean, Long => JLong}
-      import java.util.{Collections => JCollections, Iterator => JIterator, Set => JSet}
+      import java.util.{Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
       import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
       import org.apache.tinkerpop.gremlin.tinkergraph.structure.{SpecializedElementFactory, SpecializedTinkerVertex, TinkerGraph, TinkerVertexProperty, VertexRef}
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
@@ -196,8 +196,16 @@ object DomainClassCreator {
         // chain.
         def getId: JLong = underlying.id.asInstanceOf[JLong]
 
-        /* returns Map of all properties plus label and id */
-        def toMap: Map[String, Any]
+        /* all properties plus label and id */
+        def toMap: Map[String, Any] = {
+          val map = valueMap
+          map.put("_label", label)
+          map.put("_id", getId)
+          map.asScala.toMap
+        }
+
+        /* all properties */
+        def valueMap: JMap[String, AnyRef]
       }
 
       """
@@ -350,29 +358,26 @@ object DomainClassCreator {
 
       val propertyBasedTraits = keys.map(key => s"with Has${camelCase(key.name).capitalize}").mkString(" ")
 
-      val toMap = {
-        val forKeys = keys
+      val valueMapImpl = {
+        val putKeysImpl = keys
           .map { key: Property =>
-            val memberPrefix = Cardinality.fromName(key.cardinality) match {
-              case Cardinality.One => "_"
-              case _ => ""
+            val memberName = camelCase(key.name)
+            Cardinality.fromName(key.cardinality) match {
+              case Cardinality.One =>
+                s"""if (${memberName} != null) { properties.put("${key.name}", ${memberName}) }"""
+              case Cardinality.ZeroOrOne =>
+                s"""${memberName}.map { value => properties.put("${key.name}", value) }"""
+              case Cardinality.List => // need java list, e.g. for VertexSerializer
+                s"""if (${memberName}.nonEmpty) { properties.put("${key.name}", ${memberName}.asJava) }"""
             }
-            s"""("${key.name}" -> ${memberPrefix}${camelCase(key.name)} )"""
           }
-          .mkString(",\n")
+          .mkString("\n")
 
-        s"""
-        Map("_label" -> "${nodeType.name}",
-          "_id" -> (_id: Long),
-          $forKeys
-        ).filterNot { case (k,v) =>
-            v == null || v == None
-          }
-         .map {
-            case (k, Some(v)) => (k,v)
-            case other => other
-          }
-        """
+        s""" {
+        |  val properties = new JHashMap[String, AnyRef]
+        |  $putKeysImpl
+        |  properties
+        |}""".stripMargin
       }
 
       val containedNodesAsMembers =
@@ -466,7 +471,7 @@ object DomainClassCreator {
           |  override def accept[T](visitor: NodeVisitor[T]): T = {
           |    visitor.visit(this)
           |  }
-          |  override def toMap: Map[String, Any] = get.toMap
+          |  override def valueMap: JMap[String, AnyRef] = get.valueMap
           |  override val productArity = get.productArity
           |  override def productElement(n: Int): Any = get.productElement(n)
           |  override def canEqual(that: Any): Boolean = get.canEqual(that)
@@ -487,7 +492,8 @@ object DomainClassCreator {
         override def allowedOutEdgeLabels() = ${nodeType.className}.Edges.Out.asJava
         override def specificKeys() = ${nodeType.className}.Keys.All
 
-        override def toMap: Map[String, Any] = $toMap
+        /* all properties */
+        override def valueMap: JMap[String, AnyRef] = $valueMapImpl
 
         ${propertyBasedFields(keys)}
 
