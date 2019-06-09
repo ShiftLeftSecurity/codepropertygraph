@@ -19,6 +19,19 @@ object CpgLoader {
   }
 
   /**
+    * Load code property graph stream. Code property graphs are bundled in archives.
+    * This method consecutively loads the CPGs of the archive, returning them one by
+    * one via an iterator.
+    *
+    * @param filename file of the CPG (archive)
+    * @param config loader configuration
+    *
+    * */
+  def loadStream(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Iterator[Cpg] = {
+    new CpgLoader().loadStream(filename, config)
+  }
+
+  /**
     * Create any indexes necessary for quick access.
     *
     * @param cpg the CPG to create indexes in
@@ -49,6 +62,13 @@ private class CpgLoader {
       ProtoCpgLoader.loadFromProtoZip(filename, config)
     if (config.createIndices) { createIndexes(cpg) }
     cpg
+  }
+
+  def loadStream(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Iterator[Cpg] = {
+    ProtoCpgLoader.loadStream(filename, config).map { cpg =>
+      if (config.createIndices) { createIndexes(cpg) }
+      cpg
+    }
   }
 
   /**

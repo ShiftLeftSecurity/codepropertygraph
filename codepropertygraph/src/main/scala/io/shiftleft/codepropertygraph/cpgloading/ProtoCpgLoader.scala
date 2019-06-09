@@ -130,42 +130,41 @@ object ProtoCpgLoader {
     * This is the directory obtained by extracting a CPG zip archive.
     * */
   def loadFromProtobufDirectory(inputDirectory: String, config: CpgLoaderConfig): Cpg = {
-    val onDiskOverflowConfig = config.onDiskOverflowConfig
-      .map { c =>
-        Optional.ofNullable(c)
-      }
-      .getOrElse(Optional.empty())
-    val builder = new ProtoToCpg(onDiskOverflowConfig)
-
-    def matchesPattern(file: String): Boolean = {
-      config.patterns.isEmpty || config.patterns.exists { p: String =>
-        file.matches(p)
-      }
-    }
-
-    getFileNamesInDirectory(new File(inputDirectory)).iterator.asScala
-      .filter(matchesPattern)
-      .foreach { file =>
-        // TODO: use ".bin" extensions in proto output, and then only
-        // load files with ".bin" extension here.
-        val inputStream = new FileInputStream(file)
-        builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList)
-        inputStream.close()
-      }
-
-    getFileNamesInDirectory(new File(inputDirectory)).iterator.asScala
-      .filter(matchesPattern)
-      .foreach { file =>
-        // TODO: use ".bin" extensions in proto output, and then only
-        // load files with ".bin" extension here.
-        val inputStream = new FileInputStream(file)
-        builder.addEdges(getNextProtoCpgFromStream(inputStream).getEdgeList)
-        inputStream.close()
-      }
-
-    def getNextProtoCpgFromStream(inputStream: FileInputStream): CpgStruct = CpgStruct.parseFrom(inputStream)
-
+    val filenamesInDirectory = filenamesForConfig(inputDirectory, config)
+    val builder = builderForConfig(config)
+    filenamesInDirectory.foreach(addNodes(_, builder))
+    filenamesInDirectory.foreach(addEdges(_, builder))
     builder.build()
+  }
+
+  private def builderForConfig(config: CpgLoaderConfig): ProtoToCpg = {
+    val onDiskOverflowConfig: Optional[OnDiskOverflowConfig] = config.onDiskOverflowConfig
+      .map(x => Optional.ofNullable(x))
+      .getOrElse(Optional.empty())
+    new ProtoToCpg(onDiskOverflowConfig)
+  }
+
+  private def filenamesForConfig(inputDirectory: String, config: CpgLoaderConfig) = {
+    getFileNamesInDirectory(new File(inputDirectory)).iterator.asScala.filter(matchesPattern(_, config)).toList
+  }
+
+  private def matchesPattern(file: String, config: CpgLoaderConfig): Boolean =
+    config.patterns.isEmpty || config.patterns.exists(file.matches)
+
+  private def addNodes(file: String, builder: ProtoToCpg) = {
+    // TODO: use ".bin" extensions in proto output, and then only
+    // load files with ".bin" extension here.
+    val inputStream = new FileInputStream(file)
+    builder.addNodes(CpgStruct.parseFrom(inputStream).getNodeList)
+    inputStream.close()
+  }
+
+  private def addEdges(file: String, builder: ProtoToCpg) = {
+    // TODO: use ".bin" extensions in proto output, and then only
+    // load files with ".bin" extension here.
+    val inputStream = new FileInputStream(file)
+    builder.addEdges(CpgStruct.parseFrom(inputStream).getEdgeList)
+    inputStream.close()
   }
 
   /**
@@ -177,13 +176,13 @@ object ProtoCpgLoader {
         Optional.ofNullable(c)
       }
       .getOrElse(Optional.empty())
-    val builder = new ProtoToCpg(onDiskOverflowConfig);
+    val builder = new ProtoToCpg(onDiskOverflowConfig)
     try {
       builder.addEdges(consumeInputStreamNodes(builder, inputStream).asJava)
     } finally {
-      closeProtoStream(inputStream);
+      closeProtoStream(inputStream)
     }
-    return builder.build();
+    return builder.build()
   }
 
   private def consumeInputStreamNodes(builder: ProtoToCpg, inputStream: InputStream): List[CpgStruct.Edge] = {
@@ -220,6 +219,25 @@ object ProtoCpgLoader {
     }
 
     return builder.build
+  }
+
+  /**
+    * From archive at `filename`, return a stream of CPGs obtained by loading
+    * proto files one by one.
+    * */
+  def loadStream(filename: String, config: CpgLoaderConfig): Iterator[Cpg] = {
+    extractArchiveAndExecuteOnDir[Iterator[Cpg]](
+      filename,
+      "cpg2sp_proto", { tempDirPathName =>
+        val filenamesInDirectory = filenamesForConfig(tempDirPathName, config)
+        filenamesInDirectory.toIterator.map { file =>
+          val builder = builderForConfig(config)
+          addNodes(file, builder)
+          addEdges(file, builder)
+          builder.build()
+        }
+      }
+    )
   }
 
 }
