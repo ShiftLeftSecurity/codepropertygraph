@@ -210,7 +210,7 @@
         {
             "operator":"cast",
             "name":"<operator>.cast",
-            "comment": "Type casts of any sort."
+            "comment": "Type casts of any sort"
         },
         {
             "operator":"compare",
