@@ -20,6 +20,7 @@ class ProtoCpgStreamLoader {
       Iterator()
     } else {
       val filenames = ProtoCpgLoader.filenamesForConfig(tmpDirName.get, config)
+
       filenames.iterator.map{ filename =>
         val builder = ProtoCpgLoader.builderForConfig(config)
         ProtoCpgLoader.addNodes(filename, builder)
