@@ -32,8 +32,11 @@ public class ProtoToCpg {
     Configuration configuration = TinkerGraph.EMPTY_CONFIGURATION();
     onDiskOverflowConfig.ifPresent(config -> {
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, true);
+      configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_OVERFLOW_HEAP_PERCENTAGE_THRESHOLD,
+        config.heapPercentageThreshold());
       if (config.alternativeParentDirectory().isDefined()) {
-        configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_ROOT_DIR, config.alternativeParentDirectory().get());
+        configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_ROOT_DIR,
+          config.alternativeParentDirectory().get());
       }
     });
 
