@@ -31,12 +31,12 @@
         {
             "operator":"logicalShiftRight",
             "name":"<operator>.logicalShiftRight",
-            "comment":"shift right padding with zeros"
+            "comment":"Shift right padding with zeros"
         },
         {
             "operator":"arithmeticShiftRight",
             "name":"<operator>.arithmeticShiftRight",
-            "comment":"shift right preserving the sign"
+            "comment":"Shift right preserving the sign"
         },
         {
             "operator":"not",
@@ -109,12 +109,12 @@
         {
             "operator":"minus",
             "name":"<operator>.minus",
-            "comment":"e.g. `a = -b`"
+            "comment":"E.g. `a = -b`"
         },
         {
             "operator":"plus",
             "name":"<operator>.plus",
-            "comment":"e.g. `a = +b`"
+            "comment":"E.g. `a = +b`"
         },
         {
             "operator":"preIncrement",
@@ -175,37 +175,37 @@
         {
             "operator":"memberAccess",
             "name":"<operator>.memberAccess",
-            "comment":"e.g. in C: `a.b` but not! in Java"
+            "comment":"E.g. in C: `a.b` but not! in Java"
         },
         {
             "operator":"indirectMemberAccess",
             "name":"<operator>.indirectMemberAccess",
-            "comment":"e.g. in C: `a->b` and `a.b` in Java"
+            "comment":"E.g. in C: `a->b` and `a.b` in Java"
         },
         {
           "operator":"computedMemberAccess",
           "name":"<operator>.computedMemberAccess",
-          "comment":"e.g. in C: `a[b]` but not! in Java"
+          "comment":"E.g. in C: `a[b]` but not! in Java"
         },
         {
           "operator":"indirectComputedMemberAccess",
           "name":"<operator>.indirectComputedMemberAccess",
-          "comment":"e.g. in C++: `a->*b` and a[b] in Java"
+          "comment":"E.g. in C++: `a->*b` and a[b] in Java"
         },
         {
           "operator":"indirection",
           "name":"<operator>.indirection",
-          "comment":"e.g. in C: `*a`"
+          "comment":"E.g. in C: `*a`"
         },
         {
           "operator":"delete",
             "name":"<operator>.delete",
-            "comment":"deletes a property from a namespace. E.g. `a=3; delete a; a == undefined;"
+            "comment":"Deletes a property from a namespace. E.g. `a=3; delete a; a == undefined;"
         },
         {
             "operator":"conditional",
             "name":"<operator>.conditional",
-            "comment": "E.g. `a ? consequent : alternate`. In future probably also used for if statements."
+            "comment": "E.g. `a ? consequent : alternate`. In future probably also used for if statements"
         },
         {
             "operator":"cast",
@@ -215,17 +215,17 @@
         {
             "operator":"compare",
             "name":"<operator>.compare",
-            "comment": "Comparison between to arguments with the results: 0 == equal, negative == left < right, positive == left > right"
+            "comment": "Comparison between two arguments with the results: 0 == equal, negative == left < right, positive == left > right"
         },
         {
             "operator":"addressOf",
             "name":"<operator>.addressOf",
-            "comment": "Returns the address of a given object."
+            "comment": "Returns the address of a given object"
         },
         {
             "operator":"sizeOf",
             "name":"<operator>.sizeOf",
-            "comment": "Returns the size of a given object."
+            "comment": "Returns the size of a given object"
         }
     ]
 }

@@ -20,7 +20,7 @@
             "id":40,
             "name": "NAMESPACE",
             "keys": ["NAME"],
-            "comment": "This node represents a namespace as a whole whereas the NAMESPACE_BLOCK is used for each grouping occurrence of a namespace in code. Single representing NAMESPACE node is required for easier navigation in the query language.",
+            "comment": "This node represents a namespace as a whole whereas the NAMESPACE_BLOCK is used for each grouping occurrence of a namespace in code. Single representing NAMESPACE node is required for easier navigation in the query language",
             "outEdges": []
         },
         {
@@ -55,7 +55,7 @@
         },
         {"id" : 33, "name" : "METHOD_PARAMETER_OUT",
          "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
-         "comment" : "This node represents a formal parameter going towards the caller side.",
+         "comment" : "This node represents a formal parameter going towards the caller side",
          "is": ["DECLARATION", "TRACKING_POINT"],
          "outEdges" : [
            {"edgeName": "CALL_ARG_OUT", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "BLOCK", "UNKNOWN"]},
@@ -143,18 +143,18 @@
     ],
 
     "edgeTypes" : [
-        {"id" : 12, "name": "PARAMETER_LINK", "comment" : "Links together corresponding METHOD_PARAMETER_IN and METHOD_PARAMETER_OUT nodes.", "keys": []},
+        {"id" : 12, "name": "PARAMETER_LINK", "comment" : "Links together corresponding METHOD_PARAMETER_IN and METHOD_PARAMETER_OUT nodes", "keys": []},
         {"id" : 4, "name" : "CALL_ARG", "comment" : "Function call argument", "keys" : [] },
         {"id" : 5, "name" : "CALL_RET", "comment" : "Function call return value", "keys" : [] },
         {"id" : 6, "name" : "CALL", "comment" : "Referencing to e.g. a LOCAL", "keys" : [] },
         {"id" : 11, "name": "TAGGED_BY", "keys" : [], "comment" : "Edges from nodes to tags"},
-        {"id" : 14, "name": "CALL_ARG_OUT", "comment" : "Function call output argument. Goes from METHOD_PARAMETER_OUT to call argument node.", "keys" : []},
+        {"id" : 14, "name": "CALL_ARG_OUT", "comment" : "Function call output argument. Goes from METHOD_PARAMETER_OUT to call argument node", "keys" : []},
 
-        {"id" : 21, "name" : "EVAL_TYPE", "keys": [], "comment" : "Link to evaluation type.", "keys" : [] },
-        {"id" : 23, "name" : "INHERITS_FROM", "keys": [], "comment" : "Inheritance relation between types.", "keys" : [] },
+        {"id" : 21, "name" : "EVAL_TYPE", "keys": [], "comment" : "Link to evaluation type", "keys" : [] },
+        {"id" : 23, "name" : "INHERITS_FROM", "keys": [], "comment" : "Inheritance relation between types", "keys" : [] },
         {"id" : 28, "name" : "CONTAINS", "keys" : [], "comment" : "Shortcut over multiple AST edges"},
-        {"id" : 1, "name" : "PROPAGATE", "keys" : ["ALIAS"], "comment" : "Encodes propagation of data from on node to another."},
-        {"id" : 137, "name": "REACHING_DEF", "keys" : [], "comment" : "Reaching definition edge.", "keys" : []}
+        {"id" : 1, "name" : "PROPAGATE", "keys" : ["ALIAS"], "comment" : "Encodes propagation of data from on node to another"},
+        {"id" : 137, "name": "REACHING_DEF", "keys" : [], "comment" : "Reaching definition edge", "keys" : []}
     ]
 
 }
