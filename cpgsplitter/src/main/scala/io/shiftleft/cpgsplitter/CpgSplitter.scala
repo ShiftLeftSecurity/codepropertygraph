@@ -22,30 +22,51 @@ class CpgSplitter {
         ret
     }.toMap
 
+    val callers : mutable.Map[String, List[String]] = mutable.HashMap()
+    callees.foreach { case (method : String, children : List[String]) =>
+      children.foreach{ child =>
+        if (!callers.contains(child)) {
+          callers(child) = List(method)
+        } else {
+          callers(child) ++= List(method)
+        }
+      }
+    }
+
+
     val allMethods = callees.keys.toList
-    val cache : mutable.HashMap[String, List[String]] = mutable.HashMap()
+    val forwardCache : mutable.HashMap[String, List[String]] = mutable.HashMap()
+    val backwardCache : mutable.HashMap[String, List[String]] = mutable.HashMap()
 
-    def cpgFor(m : String, visited : List[String] = List()) : List[String] = {
+    def cpgForForward(m : String, visited : List[String] = List()) : List[String] =
+      cpgForShared(m, visited, callees, forwardCache)
 
+    def cpgForBackward(m : String, visited : List[String] =  List()) : List[String] =
+      cpgForShared(m, visited, callers.toMap, backwardCache)
+
+    def cpgForShared(m : String, visited : List[String],
+                     adjMap: Map[String, List[String]],
+                     cache : mutable.HashMap[String, List[String]]) : List[String] = {
       if (visited.contains(m)) {
         return List()
       }
-
       if (cache.contains(m)) {
         cache(m)
       } else {
-        cache(m) = m :: callees.getOrElse(m, List()).flatMap(cpgFor(_, m :: visited))
+        cache(m) = m :: adjMap.getOrElse(m, List()).flatMap(cpgForForward(_, m :: visited))
         cache(m)
       }
     }
 
-    val cpgs = allMethods.map(cpgFor(_).distinct)
+    def cpgFor(m : String) : List[String] = cpgForForward(m) ++ cpgForBackward(m)
+
+    val epsilon = 2
+    val cpgs = allMethods.map(cpgFor(_).distinct).map(_.toSet).distinct
+    val cpgsWithoutSubSets = cpgs.filter(c => !cpgs.exists{ c1 => c != c1 && (c diff c1).size <= epsilon })
 
     println(allMethods.size)
-    println(cpgs.size)
-//    cpgs.foreach{ cpg =>
-//      println(cpg.size)
-//    }
+    println(cpgsWithoutSubSets.size)
+    // cpgs.foreach(println(_))
 
   }
 
