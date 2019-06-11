@@ -1,4 +1,6 @@
-package io.shiftleft.queryprimitives.steps.visitormixins
+package io.shiftleft.queryprimitives
+package steps
+package visitormixins
 
 import io.shiftleft.codepropertygraph.generated.{Operators, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
@@ -20,12 +22,7 @@ object TrackPointToCfgNode extends NodeVisitor[nodes.CfgNode] with ExpressionGen
   }
 
   override def visit(node: nodes.Call): nodes.CfgNode = {
-    val callName = node.name
-    if (callName == Operators.memberAccess ||
-        callName == Operators.indirectMemberAccess ||
-        callName == Operators.computedMemberAccess ||
-        callName == Operators.indirectComputedMemberAccess ||
-        callName == Operators.indirection) {
+    if (isGenericMemberAccessName(node.name)) {
       ExpandTo.argumentToCallOrReturn(node)
     } else {
       node

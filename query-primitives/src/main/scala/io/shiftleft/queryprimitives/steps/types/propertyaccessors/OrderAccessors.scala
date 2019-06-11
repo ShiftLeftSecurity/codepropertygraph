@@ -18,6 +18,6 @@ trait OrderAccessors[T <: StoredNode, Labels <: HList] extends PropertyAccessors
   def orderNot(value: Integer): NodeSteps[T, Labels] =
     propertyFilterNot(NodeKeys.ORDER, value)
 
-  def orderNot[Out](values: Integer*): NodeSteps[T, Labels] =
+  def orderNot(values: Integer*): NodeSteps[T, Labels] =
     propertyFilterNotMultiple(NodeKeys.ORDER, values: _*)
 }

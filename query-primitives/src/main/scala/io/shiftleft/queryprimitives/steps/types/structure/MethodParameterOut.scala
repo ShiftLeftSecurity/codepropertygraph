@@ -38,13 +38,13 @@ class MethodParameterOut[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodPara
   def argument: Expression[Labels] = {
     new Expression[Labels](
       raw
-        .sack((sack: Integer, node: nodes.MethodParameterOut) => node.value2(NodeKeys.ORDER))
+        .sack((_: Integer, node: nodes.MethodParameterOut) => node.value2(NodeKeys.ORDER))
         .in(EdgeTypes.AST)
         .in(EdgeTypes.REF)
         .in(EdgeTypes.CALL)
         .out(EdgeTypes.AST)
         .filterWithTraverser { traverser =>
-          val argumentIndex = traverser.sack[Integer]
+          val argumentIndex = traverser.sack
           traverser.get.value2(NodeKeys.ARGUMENT_INDEX) == argumentIndex
         }
         .cast[nodes.Expression]

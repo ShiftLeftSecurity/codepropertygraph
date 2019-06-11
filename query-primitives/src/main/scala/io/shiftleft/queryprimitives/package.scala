@@ -1,6 +1,7 @@
 package io.shiftleft
 
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Operators
 
 /**
   * Domain specific language for querying code property graphs
@@ -94,4 +95,12 @@ import io.shiftleft.codepropertygraph.Cpg
   * }}}
   *
   **/
-package object queryprimitives {}
+package object queryprimitives {
+  def isGenericMemberAccessName(name: String): Boolean = {
+    (name == Operators.memberAccess) ||
+    (name == Operators.indirectComputedMemberAccess) ||
+    (name == Operators.indirectMemberAccess) ||
+    (name == Operators.computedMemberAccess) ||
+    (name == Operators.indirection)
+  }
+}
