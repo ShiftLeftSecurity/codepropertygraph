@@ -57,7 +57,7 @@ class MethodParameter[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodParamet
         .in(EdgeTypes.CALL)
         .out(EdgeTypes.AST)
         .filterWithTraverser { traverser =>
-          val argumentIndex = traverser.sack
+          val argumentIndex = traverser.sack[Integer]
           traverser.get.value2(NodeKeys.ARGUMENT_INDEX) == argumentIndex
         }
         .cast[nodes.Expression]
