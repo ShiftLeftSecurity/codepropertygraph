@@ -7,7 +7,6 @@ import org.scalatest.{Matchers, WordSpec}
 class MethodParameterTests extends WordSpec with Matchers {
 
   "generic cpg" should CpgTestFixture("methodparameter") { fixture =>
-
     "find parameters" when {
       "asking for all parameters" in {
         val args: List[nodes.MethodParameterIn] =

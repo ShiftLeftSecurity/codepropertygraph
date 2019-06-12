@@ -144,8 +144,8 @@ class StepsTest extends WordSpec with Matchers {
     "allow typed as/select" in CpgTestFixture("splitmeup") { fixture =>
       val raw = fixture.cpg.namespace.raw.asInstanceOf[GremlinScala.Aux[Vertex, HNil]]
       val _: List[(Vertex, Edge)] = raw.as("a").outE.as("b").select.toList
-      // all that matters is that the result type is (Vertex, Edge)
-      // for more options with as/select on raw, see https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala
+    // all that matters is that the result type is (Vertex, Edge)
+    // for more options with as/select on raw, see https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala
     }
   }
 

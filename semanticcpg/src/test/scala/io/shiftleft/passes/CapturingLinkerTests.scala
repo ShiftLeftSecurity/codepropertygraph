@@ -9,7 +9,6 @@ import org.scalatest.{Matchers, WordSpec}
 class CapturingLinkerTests extends WordSpec with Matchers {
 
   "link CLOSURE_BINDING and LOCALS with same CLOSURE_BINDING_IDs" in PlainGraphFixture { graph =>
-
     val closureBinding1 = graph + (NodeTypes.CLOSURE_BINDING, NodeKeys.CLOSURE_BINDING_ID -> "id1")
     val closureBinding2 = graph + (NodeTypes.CLOSURE_BINDING, NodeKeys.CLOSURE_BINDING_ID -> "id2")
     val local1 = graph + (NodeTypes.LOCAL, NodeKeys.CLOSURE_BINDING_ID -> "id1")

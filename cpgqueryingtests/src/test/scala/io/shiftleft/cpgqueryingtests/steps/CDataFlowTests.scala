@@ -23,8 +23,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         |     read(fd, buff, sz);
         | }
       """.stripMargin
-    ).autoClose { cpg =>
-
+    ) { cpg =>
       val source = cpg.identifier.name("sz")
       val sink = cpg.call.name("read")
       val flows = sink.reachableByFlows(source).l
@@ -75,7 +74,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         | }
         |}
       """.stripMargin
-    ).autoClose { cpg =>
+    ) { cpg =>
       val source = cpg.identifier
       val sink = cpg.method.name("free").parameter.argument
       val flows = sink.reachableByFlows(source).l
@@ -120,7 +119,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         |  }
         | }
       """.stripMargin
-    ).autoClose { cpg =>
+    ) { cpg =>
       val source = cpg.identifier.name("a")
       val sink = cpg.method.name("foo").parameter.argument
       val flows = sink.reachableByFlows(source).l
@@ -129,12 +128,12 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
         Set(List[(String, Option[Integer])](
-          ("a = 10", 3),
-          ("foo(a)", 5)
-        ),
-          List[(String, Option[Integer])](
-            ("foo(a)", 5)
-          ))
+              ("a = 10", 3),
+              ("foo(a)", 5)
+            ),
+            List[(String, Option[Integer])](
+              ("foo(a)", 5)
+            ))
     }
   }
 
@@ -151,8 +150,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         |   int x = z;
         | }
       """.stripMargin
-    ).autoClose { cpg =>
-
+    ) { cpg =>
       val source = cpg.identifier.name("a")
       val sink = cpg.identifier.name("x")
       val flows = sink.reachableByFlows(source).l
@@ -185,8 +183,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         |
         |   return b;
         | }
-      """.stripMargin).autoClose { cpg =>
-
+      """.stripMargin) { cpg =>
       val source = cpg.identifier.name("a")
       val sink = cpg.methodReturn
       val flows = sink.reachableByFlows(source).l
@@ -220,8 +217,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         |
         |   return x;
         | }
-      """.stripMargin).autoClose { cpg =>
-
+      """.stripMargin) { cpg =>
       val source = cpg.identifier.name("a")
       val sink = cpg.methodReturn
       val flows = sink.reachableByFlows(source).l
@@ -254,8 +250,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         |
         |   return x;
         | }
-      """.stripMargin).autoClose { cpg =>
-
+      """.stripMargin) { cpg =>
       val source = cpg.identifier.name("x")
       val sink = cpg.methodReturn
       val flows = sink.reachableByFlows(source).l
@@ -288,8 +283,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         |    int b = a;
         |    int z = foo(b);
         |  }
-      """.stripMargin).autoClose { cpg =>
-
+      """.stripMargin) { cpg =>
       val source = cpg.identifier.name("a")
       val sink = cpg.method.name("foo").parameter.argument
       val flows = sink.reachableByFlows(source).l
@@ -298,14 +292,14 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
         Set(List[(String, Option[Integer])](
-          ("a = x", 3),
-          ("b = a", 4),
-          ("foo(b)", 5)
-        ),
-          List[(String, Option[Integer])](
-            ("b = a", 4),
-            ("foo(b)", 5)
-          ))
+              ("a = x", 3),
+              ("b = a", 4),
+              ("foo(b)", 5)
+            ),
+            List[(String, Option[Integer])](
+              ("b = a", 4),
+              ("foo(b)", 5)
+            ))
 
       val source2 = cpg.identifier.name("a")
       val sink2 = cpg.call.name("foo")
@@ -321,8 +315,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         |    int b = a;
         |    int z = foo(b);
         |  }
-      """.stripMargin).autoClose { cpg =>
-
+      """.stripMargin) { cpg =>
       val source = cpg.identifier.name("a")
       val sink = cpg.call.name("foo")
       val flows = sink.reachableByFlows(source).l
@@ -331,14 +324,14 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
         Set(List[(String, Option[Integer])](
-          ("a = x", 3),
-          ("b = a", 4),
-          ("foo(b)", 5)
-        ),
-          List[(String, Option[Integer])](
-            ("b = a", 4),
-            ("foo(b)", 5)
-          ))
+              ("a = x", 3),
+              ("b = a", 4),
+              ("foo(b)", 5)
+            ),
+            List[(String, Option[Integer])](
+              ("b = a", 4),
+              ("foo(b)", 5)
+            ))
     }
   }
 
@@ -355,8 +348,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         |  n.value1 = x;
         |  n.value2 = n.value1;
         |}
-      """.stripMargin).autoClose { cpg =>
-
+      """.stripMargin) { cpg =>
       val source = cpg.identifier.name("x")
       val sink = cpg.call.code("n.value2 = n.value1")
       val flows = sink.reachableByFlows(source).l
@@ -391,8 +383,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         |   int x = z;
         | }
       """.stripMargin
-    ).autoClose { cpg =>
-
+    ) { cpg =>
       val source = cpg.literal.code("0x37")
       val sink = cpg.identifier.name("x")
       val flows = sink.reachableByFlows(source).l
@@ -421,7 +412,7 @@ class CDataFlowTests extends CpgDataFlowTests {
          |    z+=a;
          | }
        """.stripMargin
-    ).autoClose { cpg =>
+    ) { cpg =>
       val source = cpg.call.code("a = 0x37")
       val sink = cpg.call.code("z\\+=a")
       val flows = sink.reachableByFlows(source).l
@@ -430,15 +421,15 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
         Set(List[(String, Option[Integer])](
-          ("a = 0x37", 3),
-          ("b = a", 4),
-          ("z = b", 5),
-          ("z+=a", 6)
-        ),
-          List[(String, Option[Integer])](
-            ("a = 0x37", 3),
-            ("z+=a", 6)
-          ))
+              ("a = 0x37", 3),
+              ("b = a", 4),
+              ("z = b", 5),
+              ("z+=a", 6)
+            ),
+            List[(String, Option[Integer])](
+              ("a = 0x37", 3),
+              ("z+=a", 6)
+            ))
     }
   }
 
@@ -453,7 +444,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         |    int w = z;
         | }
       """.stripMargin
-    ).autoClose { cpg =>
+    ) { cpg =>
       val source = cpg.call.code("a = 0x37")
       val sink = cpg.identifier.name("w")
       val flows = sink.reachableByFlows(source).l
@@ -489,8 +480,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         |    return 0;
         | }
       """.stripMargin
-    ).autoClose { cpg =>
-
+    ) { cpg =>
       val source = cpg.method.parameter
       val sink = cpg.identifier.name("y")
       val flows = sink.reachableByFlows(source).l

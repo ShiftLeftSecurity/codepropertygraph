@@ -7,7 +7,6 @@ import org.scalatest.{Matchers, WordSpec}
 class NamespaceTests extends WordSpec with Matchers {
 
   "generic cpg" should CpgTestFixture("namespace") { fixture =>
-
     "find package io.shiftleft.testcode.namespace" in {
       val queryResult: List[nodes.Namespace] = fixture.cpg.namespace.toList
 

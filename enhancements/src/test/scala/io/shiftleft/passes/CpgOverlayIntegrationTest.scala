@@ -16,7 +16,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
   val Pass2NewNodeCode = "pass2NewNodeCode"
 
   "cpg passes being serialised to and from overlay protobuf via DiffGraph" in {
-    createNewBaseCpg().autoClose { cpg =>
+    withNewBaseCpg { cpg =>
       val initialNode = cpg.graph.V.has(NodeKeys.CODE, InitialNodeCode).head
       val pass1 = passAddsEdgeTo(initialNode.asInstanceOf[nodes.StoredNode], Pass1NewNodeCode, cpg)
 
@@ -36,11 +36,13 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
   }
 
   /* like a freshly deserialized cpg.bin.zip without any overlays applied */
-  def createNewBaseCpg(): Cpg = {
+  def withNewBaseCpg[T](fun: Cpg => T): T = {
     val graph: ScalaGraph = TinkerGraphTestInstance.create
     val initialNode = graph + NodeTypes.UNKNOWN
     initialNode.setProperty(NodeKeys.CODE, InitialNodeCode)
-    Cpg(graph.asJava())
+    val cpg = Cpg(graph.asJava())
+    try fun(cpg)
+    finally cpg.close()
   }
 
   def passAddsEdgeTo(from: nodes.StoredNode, propValue: String, cpg: Cpg): CpgPass = {
