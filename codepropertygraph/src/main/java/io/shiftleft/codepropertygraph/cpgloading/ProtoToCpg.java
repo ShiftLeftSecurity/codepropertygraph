@@ -14,6 +14,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import scala.None;
+import scala.None$;
 
 import java.util.*;
 
@@ -24,21 +26,22 @@ public class ProtoToCpg {
   private NodeFilter nodeFilter = new NodeFilter();
 
   public ProtoToCpg() {
-    this(Optional.empty());
+    this(Optional.of(OnDiskOverflowConfig.defaultForJava()));
   }
 
   public ProtoToCpg(
     Optional<OnDiskOverflowConfig> onDiskOverflowConfig) {
     Configuration configuration = TinkerGraph.EMPTY_CONFIGURATION();
-    onDiskOverflowConfig.ifPresent(config -> {
+    if (onDiskOverflowConfig.isPresent()) {
+      OnDiskOverflowConfig config = onDiskOverflowConfig.get();
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, true);
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_OVERFLOW_HEAP_PERCENTAGE_THRESHOLD,
         config.heapPercentageThreshold());
-      if (config.alternativeParentDirectory().isDefined()) {
-        configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_ROOT_DIR,
-          config.alternativeParentDirectory().get());
-      }
-    });
+      config.alternativeParentDirectoryAsJava().ifPresent(dir ->
+        configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_ROOT_DIR, dir));
+    } else {
+      configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, false);
+    }
 
     this.tinkerGraph = TinkerGraph.open(
       configuration,

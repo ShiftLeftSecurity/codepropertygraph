@@ -1,11 +1,11 @@
 package io.shiftleft.passes
 
 import gremlin.scala._
+import io.shiftleft.TinkerGraphTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeyNames, NodeKeys, NodeTypes, edges, nodes}
 import io.shiftleft.diffgraph.DiffGraph
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{Matchers, WordSpec}
 
 class CpgOverlayIntegrationTest extends WordSpec with Matchers {
@@ -37,10 +37,10 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
 
   /* like a freshly deserialized cpg.bin.zip without any overlays applied */
   def createNewBaseCpg(): Cpg = {
-    val graph: Graph = TinkerGraph.open(nodes.Factories.AllAsJava, edges.Factories.AllAsJava)
+    val graph: ScalaGraph = TinkerGraphTestInstance.create
     val initialNode = graph + NodeTypes.UNKNOWN
     initialNode.setProperty(NodeKeys.CODE, InitialNodeCode)
-    Cpg(graph)
+    Cpg(graph.asJava())
   }
 
   def passAddsEdgeTo(from: nodes.StoredNode, propValue: String, cpg: Cpg): CpgPass = {
