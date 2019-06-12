@@ -101,21 +101,24 @@ object ExpandTo {
       .toSeq
   }
 
-  @tailrec
   def methodToTypeDecl(vertex: Vertex): Option[Vertex] = {
-    vertex.vertices(Direction.IN, EdgeTypes.AST).asScala.toList match {
-      case head :: _ if head.isInstanceOf[nodes.TypeDecl] => Some(head)
-      case head :: _                                      => methodToTypeDecl(head)
-      case _                                              => None
-    }
+    findVertex(vertex, _.isInstanceOf[nodes.TypeDecl])
+  }
+
+  def methodToFile(vertex: Vertex): Option[Vertex] = {
+    findVertex(vertex, _.isInstanceOf[nodes.File])
   }
 
   @tailrec
-  def methodToFile(vertex: Vertex): Option[Vertex] = {
-    vertex.vertices(Direction.IN, EdgeTypes.AST).asScala.toList match {
-      case head :: _ if head.isInstanceOf[nodes.File] => Some(head)
-      case head :: _                                  => methodToFile(head)
-      case _                                          => None
+  private def findVertex(vertex: Vertex, instanceCheck: Vertex => Boolean): Option[Vertex] = {
+    val iterator = vertex.vertices(Direction.IN, EdgeTypes.AST)
+    if (iterator.hasNext) {
+      iterator.next() match {
+        case head if instanceCheck(head) => Some(head)
+        case head                        => findVertex(head, instanceCheck)
+      }
+    } else {
+      None
     }
   }
 
