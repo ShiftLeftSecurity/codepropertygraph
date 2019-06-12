@@ -471,7 +471,6 @@ object DomainClassCreator {
           |    visitor.visit(this)
           |  }
           |  override def valueMap: JMap[String, AnyRef] = get.valueMap
-          |  override val productArity = get.productArity
           |  override def productElement(n: Int): Any = get.productElement(n)
           |  override def canEqual(that: Any): Boolean = get.canEqual(that)
           |}""".stripMargin
@@ -480,6 +479,8 @@ object DomainClassCreator {
       val classImpl = s"""
       trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
         def asStored : StoredNode = this.asInstanceOf[StoredNode]
+        override def productPrefix = "${nodeType.className}"
+        override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
 
         $abstractContainedNodeAccessors
       }
@@ -496,9 +497,7 @@ object DomainClassCreator {
 
         ${propertyBasedFields(keys)}
 
-        override val productPrefix = "${nodeType.className}"
         override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[${nodeType.classNameDb}]
-        override val productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
         override def productElement(n: Int): Any =
             n match {
               case 0 => _id
