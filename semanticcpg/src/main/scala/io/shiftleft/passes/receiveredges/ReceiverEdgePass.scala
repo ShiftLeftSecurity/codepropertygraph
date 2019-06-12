@@ -31,26 +31,22 @@ class ReceiverEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
     graph.V
       .hasLabel(NodeTypes.CALL)
       .sideEffect { call =>
-        val instanceOption = call
+        call
           .vertices(Direction.OUT, EdgeTypes.AST)
           .asScala
           .find(_.value2(NodeKeys.ARGUMENT_INDEX) == 0)
-
-        instanceOption match {
-          case Some(instance) =>
+          .foreach { instance =>
             if (!instance.edges(Direction.IN, EdgeTypes.RECEIVER).hasNext) {
               dstGraph.addEdgeInOriginal(call.asInstanceOf[StoredNode],
                                          instance.asInstanceOf[StoredNode],
                                          EdgeTypes.RECEIVER)
               if (!loggedDeprecationWarning) {
-                logger.warn(
-                  s"Using deprecated CPG format without RECEIVER edge between " +
-                    s"CALL and instance nodes.")
+                logger.warn(s"Using deprecated CPG format without RECEIVER edge between " +
+                  s"CALL and instance nodes.")
                 loggedDeprecationWarning = true
               }
             }
-          case None =>
-        }
+          }
       }
       .iterate()
     Iterator(dstGraph)

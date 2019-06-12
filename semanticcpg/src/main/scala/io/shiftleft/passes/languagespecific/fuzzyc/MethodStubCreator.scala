@@ -33,17 +33,17 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
         val methodInst = traverser.get.asInstanceOf[nodes.MethodInst]
         try {
           methodFullNameToNode.get(methodInst.methodFullName) match {
-            case Some(method) =>
             case None =>
-              val paramterCount = methodInstFullNameToParameterCount(methodInst.fullName)
+              val parameterCount = methodInstFullNameToParameterCount(methodInst.fullName)
               val newMethod =
-                createMethodStub(methodInst.name, methodInst.fullName, methodInst.signature, paramterCount, dstGraph)
+                createMethodStub(methodInst.name, methodInst.fullName, methodInst.signature, parameterCount, dstGraph)
 
               methodFullNameToNode += methodInst.methodFullName -> newMethod
+            case _ =>
           }
         } catch {
-          case _: Exception =>
-            logger.warn("Unable to create method stub.methodInstFullName=${methodInst.fullName}")
+          case exc: Exception =>
+            logger.warn("Unable to create method stub.methodInstFullName=${methodInst.fullName}", exc)
         }
       }
       .iterate()
