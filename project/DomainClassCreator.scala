@@ -180,10 +180,9 @@ object DomainClassCreator {
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
       import scala.collection.JavaConverters._
 
-      trait Node extends gremlin.scala.dsl.DomainRoot {
+      trait Node extends Product {
         def accept[T](visitor: NodeVisitor[T]): T = ???
       }
-
 
       /* making use of the fact that SpecializedVertex is also our domain node */
       trait StoredNode extends Vertex with Node {
