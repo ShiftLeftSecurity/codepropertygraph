@@ -1,14 +1,44 @@
 package io.shiftleft.passes.containsedges
 
 import gremlin.scala._
-import io.shiftleft.TinkerGraphTestInstance
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
+import io.shiftleft.TinkerGraphTestInstance
 import org.scalatest.{Matchers, WordSpec}
 
 class ContainsEdgePassTest extends WordSpec with Matchers {
 
-  trait Fixture {
-    implicit val graph: ScalaGraph = TinkerGraphTestInstance.create
+  import ContainsEdgePassTest.Fixture
+
+  "Files " can {
+    "contain Methods" in Fixture { fixture =>
+      fixture.methodVertex.in(EdgeTypes.CONTAINS).toList should contain only fixture.fileVertex
+    }
+    "contain Classes" in Fixture { fixture =>
+      fixture.typeDeclVertex.in(EdgeTypes.CONTAINS).toList should contain only fixture.fileVertex
+    }
+  }
+
+  "Classes " can {
+    "contain Methods" in Fixture { fixture =>
+      fixture.typeMethodVertex.in(EdgeTypes.CONTAINS).toList should contain only fixture.typeDeclVertex
+    }
+  }
+
+  "Methods " can {
+    "contain Methods" in Fixture { fixture =>
+      fixture.innerMethodVertex.in(EdgeTypes.CONTAINS).toList should contain only fixture.methodVertex
+    }
+    "contain expressions" in Fixture { fixture =>
+      fixture.expressionVertex.in(EdgeTypes.CONTAINS).toList should contain only fixture.methodVertex
+      fixture.innerExpressionVertex.in(EdgeTypes.CONTAINS).toList should contain only fixture.innerMethodVertex
+    }
+  }
+
+}
+
+object ContainsEdgePassTest {
+  private class Fixture {
+    private implicit val graph: ScalaGraph = TinkerGraphTestInstance.create
 
     val fileVertex = graph + NodeTypes.FILE
     val typeDeclVertex = graph + NodeTypes.TYPE_DECL
@@ -30,29 +60,10 @@ class ContainsEdgePassTest extends WordSpec with Matchers {
     containsEdgeCalculator.executeAndApply()
   }
 
-  "Files " can {
-    "contain Methods" in new Fixture {
-      methodVertex.in(EdgeTypes.CONTAINS).toList should contain only fileVertex
-    }
-    "contain Classes" in new Fixture {
-      typeDeclVertex.in(EdgeTypes.CONTAINS).toList should contain only fileVertex
+  private object Fixture {
+    def apply[T](fun: Fixture => T): T = {
+      val fixture = new Fixture()
+      try fun(fixture) finally fixture.graph.close()
     }
   }
-
-  "Classes " can {
-    "contain Methods" in new Fixture {
-      typeMethodVertex.in(EdgeTypes.CONTAINS).toList should contain only typeDeclVertex
-    }
-  }
-
-  "Methods " can {
-    "contain Methods" in new Fixture {
-      innerMethodVertex.in(EdgeTypes.CONTAINS).toList should contain only methodVertex
-    }
-    "contain expressions" in new Fixture {
-      expressionVertex.in(EdgeTypes.CONTAINS).toList should contain only methodVertex
-      innerExpressionVertex.in(EdgeTypes.CONTAINS).toList should contain only innerMethodVertex
-    }
-  }
-
 }

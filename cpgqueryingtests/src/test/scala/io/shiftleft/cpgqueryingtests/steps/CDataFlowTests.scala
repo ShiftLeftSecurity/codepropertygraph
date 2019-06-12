@@ -7,7 +7,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   val cpgFactory = new CpgFactory(LanguageFrontend.Fuzzyc, "cpgqueryingtests/src/test/resources/default.semantics")
 
   "Test 1: flow from function call read to multiple versions of the same variable" in {
-    val cpg = cpgFactory.buildCpg(
+    cpgFactory.buildCpg(
       """
         |
         | void flows1(FILE *fd, int mode)
@@ -23,44 +23,45 @@ class CDataFlowTests extends CpgDataFlowTests {
         |     read(fd, buff, sz);
         | }
       """.stripMargin
-    )
+    ).autoClose { cpg =>
 
-    val source = cpg.identifier.name("sz")
-    val sink = cpg.call.name("read")
-    val flows = sink.reachableByFlows(source).l
+      val source = cpg.identifier.name("sz")
+      val sink = cpg.call.name("read")
+      val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 6
+      flows.size shouldBe 6
 
-    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(
-        List[(String, Option[Integer])](
-          ("sz = 200", 8),
-          ("read(fd, buff, sz)", 12)
-        ),
-        List[(String, Option[Integer])](
-          ("sz = -5", 10),
-          ("read(fd, buff, sz)", 12)
-        ),
-        List[(String, Option[Integer])](
-          ("sz = 41", 9),
-          ("read(fd, buff, sz)", 12)
-        ),
-        List[(String, Option[Integer])](
-          ("sz = 0", 6),
-          ("read(fd, buff, sz)", 12)
-        ),
-        List[(String, Option[Integer])](
-          ("sz = 20", 7),
-          ("read(fd, buff, sz)", 12)
-        ),
-        List[(String, Option[Integer])](
-          ("read(fd, buff, sz)", 12)
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(
+          List[(String, Option[Integer])](
+            ("sz = 200", 8),
+            ("read(fd, buff, sz)", 12)
+          ),
+          List[(String, Option[Integer])](
+            ("sz = -5", 10),
+            ("read(fd, buff, sz)", 12)
+          ),
+          List[(String, Option[Integer])](
+            ("sz = 41", 9),
+            ("read(fd, buff, sz)", 12)
+          ),
+          List[(String, Option[Integer])](
+            ("sz = 0", 6),
+            ("read(fd, buff, sz)", 12)
+          ),
+          List[(String, Option[Integer])](
+            ("sz = 20", 7),
+            ("read(fd, buff, sz)", 12)
+          ),
+          List[(String, Option[Integer])](
+            ("read(fd, buff, sz)", 12)
+          )
         )
-      )
+    }
   }
 
   "Test 2: flow with pointers" in {
-    val cpg = cpgFactory.buildCpg(
+    cpgFactory.buildCpg(
       """
         |struct node {
         | int value;
@@ -74,42 +75,43 @@ class CDataFlowTests extends CpgDataFlowTests {
         | }
         |}
       """.stripMargin
-    )
-    val source = cpg.identifier
-    val sink = cpg.method.name("free").parameter.argument
-    val flows = sink.reachableByFlows(source).l
+    ).autoClose { cpg =>
+      val source = cpg.identifier
+      val sink = cpg.method.name("free").parameter.argument
+      val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 5
+      flows.size shouldBe 5
 
-    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(
-        List[(String, Option[Integer])](
-          ("*p = head", 8),
-          ("free(p)", 10)
-        ),
-        List[(String, Option[Integer])](
-          ("*p = head", 8),
-          ("q = p->next", 9),
-          ("p = q", 8),
-          ("free(p)", 10)
-        ),
-        List[(String, Option[Integer])](
-          ("q = p->next", 9),
-          ("p = q", 8),
-          ("free(p)", 10)
-        ),
-        List[(String, Option[Integer])](
-          ("p = q", 8),
-          ("free(p)", 10)
-        ),
-        List[(String, Option[Integer])](
-          ("free(p)", 10)
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(
+          List[(String, Option[Integer])](
+            ("*p = head", 8),
+            ("free(p)", 10)
+          ),
+          List[(String, Option[Integer])](
+            ("*p = head", 8),
+            ("q = p->next", 9),
+            ("p = q", 8),
+            ("free(p)", 10)
+          ),
+          List[(String, Option[Integer])](
+            ("q = p->next", 9),
+            ("p = q", 8),
+            ("free(p)", 10)
+          ),
+          List[(String, Option[Integer])](
+            ("p = q", 8),
+            ("free(p)", 10)
+          ),
+          List[(String, Option[Integer])](
+            ("free(p)", 10)
+          )
         )
-      )
+    }
   }
 
   "Test 3: flow from function call argument" in {
-    val cpg = cpgFactory.buildCpg(
+    cpgFactory.buildCpg(
       """
         | int method(int y){
         |  int a = 10;
@@ -118,21 +120,22 @@ class CDataFlowTests extends CpgDataFlowTests {
         |  }
         | }
       """.stripMargin
-    )
-    val source = cpg.identifier.name("a")
-    val sink = cpg.method.name("foo").parameter.argument
-    val flows = sink.reachableByFlows(source).l
+    ).autoClose { cpg =>
+      val source = cpg.identifier.name("a")
+      val sink = cpg.method.name("foo").parameter.argument
+      val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 2
+      flows.size shouldBe 2
 
-    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(List[(String, Option[Integer])](
-            ("a = 10", 3),
-            ("foo(a)", 5)
-          ),
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(List[(String, Option[Integer])](
+          ("a = 10", 3),
+          ("foo(a)", 5)
+        ),
           List[(String, Option[Integer])](
             ("foo(a)", 5)
           ))
+    }
   }
 
   "Test 4: flow chains from x to a" in {
@@ -148,59 +151,61 @@ class CDataFlowTests extends CpgDataFlowTests {
         |   int x = z;
         | }
       """.stripMargin
-    )
+    ).autoClose { cpg =>
 
-    val source = cpg.identifier.name("a")
-    val sink = cpg.identifier.name("x")
-    val flows = sink.reachableByFlows(source).l
+      val source = cpg.identifier.name("a")
+      val sink = cpg.identifier.name("x")
+      val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 2
-    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(
-        List[(String, Option[Integer])](
-          ("a = 0x37", 3),
-          ("b=a", 4),
-          ("b + c", 6),
-          ("z = b + c", 6),
-          ("x = z", 9)
-        ),
-        List[(String, Option[Integer])](
-          ("b=a", 4),
-          ("b + c", 6),
-          ("z = b + c", 6),
-          ("x = z", 9)
+      flows.size shouldBe 2
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(
+          List[(String, Option[Integer])](
+            ("a = 0x37", 3),
+            ("b=a", 4),
+            ("b + c", 6),
+            ("z = b + c", 6),
+            ("x = z", 9)
+          ),
+          List[(String, Option[Integer])](
+            ("b=a", 4),
+            ("b + c", 6),
+            ("z = b + c", 6),
+            ("x = z", 9)
+          )
         )
-      )
+    }
   }
 
   "Test 5: flow from method return to a" in {
-    val cpg = cpgFactory.buildCpg("""
+    cpgFactory.buildCpg("""
         | int flow(int a){
         |   int z = a;
         |   int b = z;
         |
         |   return b;
         | }
-      """.stripMargin)
+      """.stripMargin).autoClose { cpg =>
 
-    val source = cpg.identifier.name("a")
-    val sink = cpg.methodReturn
-    val flows = sink.reachableByFlows(source).l
+      val source = cpg.identifier.name("a")
+      val sink = cpg.methodReturn
+      val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 1
+      flows.size shouldBe 1
 
-    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(
-        List[(String, Option[Integer])](
-          ("z = a", 3),
-          ("b = z", 4),
-          ("return b;", 6),
-          ("RET", 2)
-        ))
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(
+          List[(String, Option[Integer])](
+            ("z = a", 3),
+            ("b = z", 4),
+            ("return b;", 6),
+            ("RET", 2)
+          ))
+    }
   }
 
   "Test 6: flow with nested if-statements from method return to a" in {
-    val cpg = cpgFactory.buildCpg("""
+    cpgFactory.buildCpg("""
         | int nested(int a){
         |   int x;
         |   int z = 0x37;
@@ -215,25 +220,26 @@ class CDataFlowTests extends CpgDataFlowTests {
         |
         |   return x;
         | }
-      """.stripMargin)
+      """.stripMargin).autoClose { cpg =>
 
-    val source = cpg.identifier.name("a")
-    val sink = cpg.methodReturn
-    val flows = sink.reachableByFlows(source).l
+      val source = cpg.identifier.name("a")
+      val sink = cpg.methodReturn
+      val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 1
+      flows.size shouldBe 1
 
-    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(
-        List[(String, Option[Integer])](
-          ("x = a", 8),
-          ("return x;", 14),
-          ("RET", 2)
-        ))
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(
+          List[(String, Option[Integer])](
+            ("x = a", 8),
+            ("return x;", 14),
+            ("RET", 2)
+          ))
+    }
   }
 
   "Test 7: flow with nested if-statements from method return to x" in {
-    val cpg = cpgFactory.buildCpg("""
+    cpgFactory.buildCpg("""
         | int nested(int a){
         |   int x;
         |   int z = 0x37;
@@ -248,93 +254,96 @@ class CDataFlowTests extends CpgDataFlowTests {
         |
         |   return x;
         | }
-      """.stripMargin)
+      """.stripMargin).autoClose { cpg =>
 
-    val source = cpg.identifier.name("x")
-    val sink = cpg.methodReturn
-    val flows = sink.reachableByFlows(source).l
-    flows.size shouldBe 3
+      val source = cpg.identifier.name("x")
+      val sink = cpg.methodReturn
+      val flows = sink.reachableByFlows(source).l
+      flows.size shouldBe 3
 
-    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(
-        List[(String, Option[Integer])](
-          ("x = z", 12),
-          ("return x;", 14),
-          ("RET", 2)
-        ),
-        List[(String, Option[Integer])](
-          ("x = a", 8),
-          ("return x;", 14),
-          ("RET", 2)
-        ),
-        List[(String, Option[Integer])](
-          ("return x;", 14),
-          ("RET", 2)
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(
+          List[(String, Option[Integer])](
+            ("x = z", 12),
+            ("return x;", 14),
+            ("RET", 2)
+          ),
+          List[(String, Option[Integer])](
+            ("x = a", 8),
+            ("return x;", 14),
+            ("RET", 2)
+          ),
+          List[(String, Option[Integer])](
+            ("return x;", 14),
+            ("RET", 2)
+          )
         )
-      )
+    }
   }
 
   "Test 8: flow chain from function argument of foo to a" in {
-    val cpg = cpgFactory.buildCpg("""
+    cpgFactory.buildCpg("""
         | void param(int x){
         |    int a = x;
         |    int b = a;
         |    int z = foo(b);
         |  }
-      """.stripMargin)
+      """.stripMargin).autoClose { cpg =>
 
-    val source = cpg.identifier.name("a")
-    val sink = cpg.method.name("foo").parameter.argument
-    val flows = sink.reachableByFlows(source).l
+      val source = cpg.identifier.name("a")
+      val sink = cpg.method.name("foo").parameter.argument
+      val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 2
+      flows.size shouldBe 2
 
-    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(List[(String, Option[Integer])](
-            ("a = x", 3),
-            ("b = a", 4),
-            ("foo(b)", 5)
-          ),
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(List[(String, Option[Integer])](
+          ("a = x", 3),
+          ("b = a", 4),
+          ("foo(b)", 5)
+        ),
           List[(String, Option[Integer])](
             ("b = a", 4),
             ("foo(b)", 5)
           ))
 
-    val source2 = cpg.identifier.name("a")
-    val sink2 = cpg.call.name("foo")
-    val flows2 = sink2.reachableByFlows(source2).l
-    flows shouldBe flows2
+      val source2 = cpg.identifier.name("a")
+      val sink2 = cpg.call.name("foo")
+      val flows2 = sink2.reachableByFlows(source2).l
+      flows shouldBe flows2
+    }
   }
 
   "Test 9: flow from function foo to a" in {
-    val cpg = cpgFactory.buildCpg("""
+    cpgFactory.buildCpg("""
         | void param(int x){
         |    int a = x;
         |    int b = a;
         |    int z = foo(b);
         |  }
-      """.stripMargin)
+      """.stripMargin).autoClose { cpg =>
 
-    val source = cpg.identifier.name("a")
-    val sink = cpg.call.name("foo")
-    val flows = sink.reachableByFlows(source).l
+      val source = cpg.identifier.name("a")
+      val sink = cpg.call.name("foo")
+      val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 2
+      flows.size shouldBe 2
 
-    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(List[(String, Option[Integer])](
-            ("a = x", 3),
-            ("b = a", 4),
-            ("foo(b)", 5)
-          ),
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(List[(String, Option[Integer])](
+          ("a = x", 3),
+          ("b = a", 4),
+          ("foo(b)", 5)
+        ),
           List[(String, Option[Integer])](
             ("b = a", 4),
             ("foo(b)", 5)
           ))
+    }
   }
 
   "Test 10: flow with member access in expression to identifier x" in {
-    val cpg = cpgFactory.buildCpg("""
+    cpgFactory.buildCpg("""
         | struct node {
         | int value1;
         | int value2;
@@ -346,30 +355,31 @@ class CDataFlowTests extends CpgDataFlowTests {
         |  n.value1 = x;
         |  n.value2 = n.value1;
         |}
-      """.stripMargin)
+      """.stripMargin).autoClose { cpg =>
 
-    val source = cpg.identifier.name("x")
-    val sink = cpg.call.code("n.value2 = n.value1")
-    val flows = sink.reachableByFlows(source).l
+      val source = cpg.identifier.name("x")
+      val sink = cpg.call.code("n.value2 = n.value1")
+      val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 2
+      flows.size shouldBe 2
 
-    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(
-        List[(String, Option[Integer])](
-          ("x = 10", 8),
-          ("n.value1 = x", 10),
-          ("n.value2 = n.value1", 11)
-        ),
-        List[(String, Option[Integer])](
-          ("n.value1 = x", 10),
-          ("n.value2 = n.value1", 11)
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(
+          List[(String, Option[Integer])](
+            ("x = 10", 8),
+            ("n.value1 = x", 10),
+            ("n.value2 = n.value1", 11)
+          ),
+          List[(String, Option[Integer])](
+            ("n.value1 = x", 10),
+            ("n.value2 = n.value1", 11)
+          )
         )
-      )
+    }
   }
 
   "Test 11: flow chain from x to literal 0x37" in {
-    val cpg = cpgFactory.buildCpg(
+    cpgFactory.buildCpg(
       """
         | void flow(void) {
         |   int a = 0x37;
@@ -381,27 +391,28 @@ class CDataFlowTests extends CpgDataFlowTests {
         |   int x = z;
         | }
       """.stripMargin
-    )
+    ).autoClose { cpg =>
 
-    val source = cpg.literal.code("0x37")
-    val sink = cpg.identifier.name("x")
-    val flows = sink.reachableByFlows(source).l
+      val source = cpg.literal.code("0x37")
+      val sink = cpg.identifier.name("x")
+      val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 1
+      flows.size shouldBe 1
 
-    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(
-        List[(String, Option[Integer])](
-          ("a = 0x37", 3),
-          ("b=a", 4),
-          ("b + c", 6),
-          ("z = b + c", 6),
-          ("x = z", 9)
-        ))
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(
+          List[(String, Option[Integer])](
+            ("a = 0x37", 3),
+            ("b=a", 4),
+            ("b + c", 6),
+            ("z = b + c", 6),
+            ("x = z", 9)
+          ))
+    }
   }
 
   "Test 12: flow with short hand assignment operator" in {
-    val cpg = cpgFactory.buildCpg(
+    cpgFactory.buildCpg(
       """
          | void flow(void) {
          |    int a = 0x37;
@@ -410,28 +421,29 @@ class CDataFlowTests extends CpgDataFlowTests {
          |    z+=a;
          | }
        """.stripMargin
-    )
-    val source = cpg.call.code("a = 0x37")
-    val sink = cpg.call.code("z\\+=a")
-    val flows = sink.reachableByFlows(source).l
+    ).autoClose { cpg =>
+      val source = cpg.call.code("a = 0x37")
+      val sink = cpg.call.code("z\\+=a")
+      val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 2
+      flows.size shouldBe 2
 
-    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(List[(String, Option[Integer])](
-            ("a = 0x37", 3),
-            ("b = a", 4),
-            ("z = b", 5),
-            ("z+=a", 6)
-          ),
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(List[(String, Option[Integer])](
+          ("a = 0x37", 3),
+          ("b = a", 4),
+          ("z = b", 5),
+          ("z+=a", 6)
+        ),
           List[(String, Option[Integer])](
             ("a = 0x37", 3),
             ("z+=a", 6)
           ))
+    }
   }
 
   "Test 13: flow after short hand assignment" in {
-    val cpg = cpgFactory.buildCpg(
+    cpgFactory.buildCpg(
       """
         | void flow(void) {
         |    int a = 0x37;
@@ -441,32 +453,33 @@ class CDataFlowTests extends CpgDataFlowTests {
         |    int w = z;
         | }
       """.stripMargin
-    )
-    val source = cpg.call.code("a = 0x37")
-    val sink = cpg.identifier.name("w")
-    val flows = sink.reachableByFlows(source).l
+    ).autoClose { cpg =>
+      val source = cpg.call.code("a = 0x37")
+      val sink = cpg.identifier.name("w")
+      val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 2
+      flows.size shouldBe 2
 
-    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(
-        List[(String, Option[Integer])](
-          ("a = 0x37", 3),
-          ("b = a", 4),
-          ("z = b", 5),
-          ("z+=a", 6),
-          ("w = z", 7)
-        ),
-        List[(String, Option[Integer])](
-          ("a = 0x37", 3),
-          ("z+=a", 6),
-          ("w = z", 7)
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(
+          List[(String, Option[Integer])](
+            ("a = 0x37", 3),
+            ("b = a", 4),
+            ("z = b", 5),
+            ("z+=a", 6),
+            ("w = z", 7)
+          ),
+          List[(String, Option[Integer])](
+            ("a = 0x37", 3),
+            ("z+=a", 6),
+            ("w = z", 7)
+          )
         )
-      )
+    }
   }
 
   "Test 14: flow from identifier to method parameter" in {
-    val cpg = cpgFactory.buildCpg(
+    cpgFactory.buildCpg(
       """
         | int main(int argc, char** argv){
         |    int x = argv[1];
@@ -476,27 +489,28 @@ class CDataFlowTests extends CpgDataFlowTests {
         |    return 0;
         | }
       """.stripMargin
-    )
+    ).autoClose { cpg =>
 
-    val source = cpg.method.parameter
-    val sink = cpg.identifier.name("y")
-    val flows = sink.reachableByFlows(source).l
+      val source = cpg.method.parameter
+      val sink = cpg.identifier.name("y")
+      val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 2
+      flows.size shouldBe 2
 
-    flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
-      Set(
-        List[(String, Option[Integer])](
-          ("main(int argc, char** argv)", 2),
-          ("x = argv[1]", 3),
-          ("y = x", 4),
-          ("z = y", 5)
-        ),
-        List[(String, Option[Integer])](
-          ("main(int argc, char** argv)", 2),
-          ("x = argv[1]", 3),
-          ("y = x", 4)
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(
+          List[(String, Option[Integer])](
+            ("main(int argc, char** argv)", 2),
+            ("x = argv[1]", 3),
+            ("y = x", 4),
+            ("z = y", 5)
+          ),
+          List[(String, Option[Integer])](
+            ("main(int argc, char** argv)", 2),
+            ("x = argv[1]", 3),
+            ("y = x", 4)
+          )
         )
-      )
+    }
   }
 }

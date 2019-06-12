@@ -16,23 +16,23 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
   val Pass2NewNodeCode = "pass2NewNodeCode"
 
   "cpg passes being serialised to and from overlay protobuf via DiffGraph" in {
-    val cpg = createNewBaseCpg()
+    createNewBaseCpg().autoClose { cpg =>
+      val initialNode = cpg.graph.V.has(NodeKeys.CODE, InitialNodeCode).head
+      val pass1 = passAddsEdgeTo(initialNode.asInstanceOf[nodes.StoredNode], Pass1NewNodeCode, cpg)
 
-    val initialNode = cpg.graph.V.has(NodeKeys.CODE, InitialNodeCode).head
-    val pass1 = passAddsEdgeTo(initialNode.asInstanceOf[nodes.StoredNode], Pass1NewNodeCode, cpg)
+      val overlay1 = pass1.executeAndCreateOverlay()
+      fullyConsume(overlay1)
+      cpg.graph.V.count.head shouldBe 2
+      initialNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass1NewNodeCode)
 
-    val overlay1 = pass1.executeAndCreateOverlay()
-    fullyConsume(overlay1)
-    cpg.graph.V.count.head shouldBe 2
-    initialNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass1NewNodeCode)
+      val pass1NewNode = cpg.graph.V.has(NodeKeys.CODE, Pass1NewNodeCode).head
+      val pass2 = passAddsEdgeTo(pass1NewNode.asInstanceOf[nodes.StoredNode], Pass2NewNodeCode, cpg)
 
-    val pass1NewNode = cpg.graph.V.has(NodeKeys.CODE, Pass1NewNodeCode).head
-    val pass2 = passAddsEdgeTo(pass1NewNode.asInstanceOf[nodes.StoredNode], Pass2NewNodeCode, cpg)
-
-    val overlay2 = pass2.executeAndCreateOverlay()
-    fullyConsume(overlay2)
-    cpg.graph.V.count.head shouldBe 3
-    pass1NewNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass2NewNodeCode)
+      val overlay2 = pass2.executeAndCreateOverlay()
+      fullyConsume(overlay2)
+      cpg.graph.V.count.head shouldBe 3
+      pass1NewNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass2NewNodeCode)
+    }
   }
 
   /* like a freshly deserialized cpg.bin.zip without any overlays applied */

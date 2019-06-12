@@ -5,9 +5,8 @@ import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class ExpressionTests extends WordSpec with Matchers {
-  val fixture = CpgTestFixture("expression")
 
-  "generic cpg" should {
+  "generic cpg" should CpgTestFixture("expression") { fixture =>
 
     "expand to next expression in CFG" in {
       val expressions: List[nodes.Expression] =
