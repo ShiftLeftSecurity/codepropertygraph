@@ -4,6 +4,14 @@ object CpgLoaderConfig {
 
   def default: CpgLoaderConfig = CpgLoaderConfig(
     createIndices = true,
+    onDiskOverflowConfig = Some(OnDiskOverflowConfig()),
+    ignoredProtoEntries = None
+  )
+
+
+  def withoutOverflow: CpgLoaderConfig =
+    CpgLoaderConfig(
+    createIndices = true,
     onDiskOverflowConfig = None,
     ignoredProtoEntries = None
   )

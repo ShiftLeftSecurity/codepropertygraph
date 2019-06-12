@@ -1,25 +1,22 @@
 package io.shiftleft.passes.containsedges
 
 import gremlin.scala._
+import io.shiftleft.TinkerGraphTestInstance
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{Matchers, WordSpec}
 
 class ContainsEdgePassTest extends WordSpec with Matchers {
 
   trait Fixture {
-    implicit val cpg: ScalaGraph = TinkerGraph
-      .open(io.shiftleft.codepropertygraph.generated.nodes.Factories.AllAsJava,
-            io.shiftleft.codepropertygraph.generated.edges.Factories.AllAsJava)
-      .asScala()
+    implicit val graph: ScalaGraph = TinkerGraphTestInstance.create
 
-    val fileVertex = cpg + NodeTypes.FILE
-    val typeDeclVertex = cpg + NodeTypes.TYPE_DECL
-    val typeMethodVertex = cpg + NodeTypes.METHOD
-    val methodVertex = cpg + NodeTypes.METHOD
-    val innerMethodVertex = cpg + NodeTypes.METHOD
-    val expressionVertex = cpg + NodeTypes.CALL
-    val innerExpressionVertex = cpg + NodeTypes.CALL
+    val fileVertex = graph + NodeTypes.FILE
+    val typeDeclVertex = graph + NodeTypes.TYPE_DECL
+    val typeMethodVertex = graph + NodeTypes.METHOD
+    val methodVertex = graph + NodeTypes.METHOD
+    val innerMethodVertex = graph + NodeTypes.METHOD
+    val expressionVertex = graph + NodeTypes.CALL
+    val innerExpressionVertex = graph + NodeTypes.CALL
 
     fileVertex --- EdgeTypes.AST --> typeDeclVertex
     typeDeclVertex --- EdgeTypes.AST --> typeMethodVertex
@@ -29,7 +26,7 @@ class ContainsEdgePassTest extends WordSpec with Matchers {
     methodVertex --- EdgeTypes.AST --> expressionVertex
     innerMethodVertex --- EdgeTypes.AST --> innerExpressionVertex
 
-    val containsEdgeCalculator = new ContainsEdgePass(cpg)
+    val containsEdgeCalculator = new ContainsEdgePass(graph)
     containsEdgeCalculator.executeAndApply()
   }
 

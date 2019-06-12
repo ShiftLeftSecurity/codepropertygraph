@@ -10,7 +10,6 @@ import io.shiftleft.queryprimitives.steps.NewNodeSteps
 import java.lang.{Long => JLong}
 
 import io.shiftleft.codepropertygraph.generated.ModifierTypes
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.SpecializedTinkerVertex
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{Matchers, WordSpec}
 
@@ -29,7 +28,9 @@ class NewNodeStepsTest extends WordSpec with Matchers {
 
     "embedding a StoredNode and a NewNode" in {
       implicit val diffGraph = new DiffGraph
-      val existingContainedNode = new ModifierDb(_id = 42, _graph = TinkerGraph.open)
+      val configuration = TinkerGraph.EMPTY_CONFIGURATION
+      configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, false)
+      val existingContainedNode = new ModifierDb(_id = 42, _graph = TinkerGraph.open(configuration))
       existingContainedNode.property(Modifier.Keys.ModifierType, ModifierTypes.NATIVE)
 
       val newContainedNode = new TestNewNode

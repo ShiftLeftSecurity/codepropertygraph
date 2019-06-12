@@ -23,7 +23,7 @@ public class ProtoCpgLoader {
   private static final Logger logger = LogManager.getLogger(ProtoCpgLoader.class);
 
   public static Cpg loadFromProtoZip(String filename) {
-    return loadFromProtoZip(filename, Optional.empty());
+    return loadFromProtoZip(filename, Optional.of(OnDiskOverflowConfig.defaultForJava()));
   }
 
   /**
