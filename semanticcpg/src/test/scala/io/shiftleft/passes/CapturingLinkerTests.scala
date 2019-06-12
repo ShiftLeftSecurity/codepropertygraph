@@ -1,18 +1,15 @@
 package io.shiftleft.passes.capturinglinker
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, EdgeTypes, NodeKeys, NodeTypes}
+import io.shiftleft.TinkerGraphTestInstance
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.passes.linking.capturinglinker.CapturingLinker
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{Matchers, WordSpec}
 
 class CapturingLinkerTests extends WordSpec with Matchers {
 
   "link CLOSURE_BINDING and LOCALS with same CLOSURE_BINDING_IDs" in {
-    implicit val graph: ScalaGraph = TinkerGraph
-      .open(io.shiftleft.codepropertygraph.generated.nodes.Factories.AllAsJava,
-            io.shiftleft.codepropertygraph.generated.edges.Factories.AllAsJava)
-      .asScala()
+    implicit val graph: ScalaGraph = TinkerGraphTestInstance.create
 
     val closureBinding1 = graph + (NodeTypes.CLOSURE_BINDING, NodeKeys.CLOSURE_BINDING_ID -> "id1")
     val closureBinding2 = graph + (NodeTypes.CLOSURE_BINDING, NodeKeys.CLOSURE_BINDING_ID -> "id2")
