@@ -65,7 +65,7 @@ class DiffGraphProtoSerializer() {
     )
 
     def addProtoEdge[T <: DiffEdge](edges: Seq[T])(srcIdGen: T => JLong, dstIdGen: T => JLong) = {
-      builder.addAllEdge(edges.map(edge => protoEdge(edge, srcIdGen(edge), dstIdGen(edge))).asJava)
+      edges.foreach(edge => builder.addEdge(protoEdge(edge, srcIdGen(edge), dstIdGen(edge))))
     }
 
     def protoEdge(edge: DiffEdge, srcId: JLong, dstId: JLong) = {
