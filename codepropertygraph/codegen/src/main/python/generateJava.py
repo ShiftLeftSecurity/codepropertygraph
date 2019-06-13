@@ -47,10 +47,21 @@ def writeJavaFile(className, entryList, template, constantType, identifierField=
 
 def entryListToJavaStrings(entryList, lineTemplate, constantType, identifierField, valueField):
     if constantType == 'Key':
-        lines = [lineTemplate % (x['comment'] if 'comment' in x else '', toJavaType(x['valueType']), x[identifierField], x[valueField]) for x in entryList]
+        lines = [lineTemplate % (optCommentField(x), toJavaType(x['valueType']), x[identifierField], x[valueField]) for x in entryList]
     elif constantType == 'String':
-        lines = [lineTemplate % (x['comment'] if 'comment' in x else '', x[identifierField], x[valueField]) for x in entryList]
+        lines = [lineTemplate % (optCommentField(x), x[identifierField], x[valueField]) for x in entryList]
     return "\n".join(lines)
+
+def optCommentField(entry):
+    if ('comment' in entry) and entry['comment']:
+        if not entry['comment'][0].isupper():
+            raise Exception("Linter error: comment has to start with a capital letter in '%s'" % entry['comment'])
+        elif entry['comment'].endswith('.'):
+            raise Exception("Linter error: comment cannot end with a dot in '%s'" % entry['comment'])
+        else:
+            return entry['comment']
+    else:
+        return ''
 
 def toJavaType(cpgType):
     return {

@@ -2,7 +2,7 @@
     "nodeTypes" : [
         {"id" : 35, "name" : "DEPENDENCY",
          "keys": ["VERSION","NAME","DEPENDENCY_GROUP_ID"],
-         "comment" : "This node represents a dependency.",
+         "comment" : "This node represents a dependency",
          "outEdges": []
         }
     ]

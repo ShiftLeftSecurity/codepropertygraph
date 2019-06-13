@@ -13,10 +13,11 @@ object Implicits {
   }
 
   /**
-    * This wrapped is used to make sure to throw a proper NoSuchElementException.
+    * A wrapper around a Java iterator that throws a proper NoSuchElementException.
+    *
     * Proper in this case means an exception with a stack trace.
     * This is intended to be used as a replacement for next() on the iterators
-    * returned from Tinkerpop since those are missing stack traces.
+    * returned from TinkerPop since those are missing stack traces.
     */
   implicit class JavaIteratorDeco[T](iterator: java.util.Iterator[T]) {
     def nextChecked: T = {

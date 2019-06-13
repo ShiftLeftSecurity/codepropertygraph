@@ -1,7 +1,7 @@
 {
     "nodeKeys" : [
       {"id": 14, "name" : "BINARY_SIGNATURE", "comment" : "Binary type signature", "valueType" : "string", "cardinality" : "zeroOrOne" },
-      {"id": 20, "name" : "CONTENT", "comment" : "Content of CONFIG_FILE node.", "valueType" : "string", "cardinality" : "one"}
+      {"id": 20, "name" : "CONTENT", "comment" : "Content of CONFIG_FILE node", "valueType" : "string", "cardinality" : "one"}
     ],
 
     "nodeTypes" : [
@@ -33,7 +33,7 @@
 
         {"id" : 49, "name" : "ANNOTATION_LITERAL",
          "keys" : ["CODE", "NAME", "ORDER"],
-         "comment" : "A literal value assigned to an ANNOTATION_PARAMETER.",
+         "comment" : "A literal value assigned to an ANNOTATION_PARAMETER",
          "outEdges" : [ ]
         },
 
@@ -67,7 +67,7 @@
         { "id":50,
           "name": "CONFIG_FILE",
           "keys": ["NAME", "CONTENT"],
-          "comment": "Configuration file contents. Might be in use by a framework.",
+          "comment": "Configuration file contents. Might be in use by a framework",
           "outEdges": []
         }
 

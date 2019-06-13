@@ -45,13 +45,13 @@ class Type[Labels <: HList](raw: GremlinScala.Aux[nodes.Type, Labels])
     referencedTypeDecl.member
 
   /**
-    * Direct base types of the corresponding type declarationi in the inheritance graph.
+    * Direct base types of the corresponding type declaration in the inheritance graph.
     * */
   def baseType: Type[Labels] =
     referencedTypeDecl.baseType
 
   /**
-    * Direct and transitive base types of the corresponding type declarationi.
+    * Direct and transitive base types of the corresponding type declaration.
     * */
   def baseTypeTransitive: Type[Labels] = {
     repeat(_.baseType).emit()
