@@ -9,10 +9,9 @@ object TinkerGraphTestInstance {
   def create: ScalaGraph = {
     val config = TinkerGraph.EMPTY_CONFIGURATION
     config.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, false)
-    TinkerGraph.open(config,
-      nodes.Factories.AllAsJava,
-      edges.Factories.AllAsJava)
-    .asScala()
+    TinkerGraph
+      .open(config, nodes.Factories.AllAsJava, edges.Factories.AllAsJava)
+      .asScala()
   }
 
 }

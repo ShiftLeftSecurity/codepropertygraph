@@ -63,7 +63,8 @@ object ContainsEdgePassTest {
   private object Fixture {
     def apply[T](fun: Fixture => T): T = {
       val fixture = new Fixture()
-      try fun(fixture) finally fixture.graph.close()
+      try fun(fixture)
+      finally fixture.graph.close()
     }
   }
 }

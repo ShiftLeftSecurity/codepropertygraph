@@ -8,13 +8,12 @@ object CpgLoaderConfig {
     ignoredProtoEntries = None
   )
 
-
   def withoutOverflow: CpgLoaderConfig =
     CpgLoaderConfig(
-    createIndices = true,
-    onDiskOverflowConfig = None,
-    ignoredProtoEntries = None
-  )
+      createIndices = true,
+      onDiskOverflowConfig = None,
+      ignoredProtoEntries = None
+    )
 
 }
 
