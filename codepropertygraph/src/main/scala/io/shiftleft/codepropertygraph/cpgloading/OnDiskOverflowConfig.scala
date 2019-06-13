@@ -10,5 +10,5 @@ case class OnDiskOverflowConfig(alternativeParentDirectory: Option[String] = Non
 
 object OnDiskOverflowConfig {
   val defaultForJava = OnDiskOverflowConfig()
-  val defaultHeapPercentageThreshold: Int = 90
+  val defaultHeapPercentageThreshold: Int = 80
 }
