@@ -472,6 +472,8 @@ object DomainClassCreator {
           |  }
           |  override def valueMap: JMap[String, AnyRef] = get.valueMap
           |  override def productElement(n: Int): Any = get.productElement(n)
+          |  override def productPrefix = "${nodeType.className}"
+          |  override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
           |  override def canEqual(that: Any): Boolean = get.canEqual(that)
           |}""".stripMargin
       }
@@ -479,14 +481,12 @@ object DomainClassCreator {
       val classImpl = s"""
       trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
         def asStored : StoredNode = this.asInstanceOf[StoredNode]
-        override def productPrefix = "${nodeType.className}"
-        override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
 
         $abstractContainedNodeAccessors
       }
 
       class ${nodeType.classNameDb}(private val _id: JLong, private val _graph: TinkerGraph)
-          extends SpecializedTinkerVertex(_id, ${nodeType.className}.Label, _graph) with StoredNode $mixinTraits with Product with ${nodeType.className}Base {
+          extends SpecializedTinkerVertex(_id, ${nodeType.className}.Label, _graph) with StoredNode $mixinTraits with ${nodeType.className}Base {
 
         override def allowedInEdgeLabels() = ${nodeType.className}.Edges.In.asJava
         override def allowedOutEdgeLabels() = ${nodeType.className}.Edges.Out.asJava
@@ -503,6 +503,9 @@ object DomainClassCreator {
               case 0 => _id
               $productElementAccessors
             }
+
+        override def productPrefix = "${nodeType.className}"
+        override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
         
         /* performance optimisation to save instantiating an iterator for each property lookup */
         override protected def specificProperty[A](key: String): VertexProperty[A] = {
