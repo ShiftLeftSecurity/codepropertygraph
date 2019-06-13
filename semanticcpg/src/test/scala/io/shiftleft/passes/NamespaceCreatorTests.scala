@@ -1,14 +1,12 @@
 package io.shiftleft.passes.namespacecreator
 
 import gremlin.scala._
-import io.shiftleft.TinkerGraphTestInstance
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
+import io.shiftleft.semanticcpg.PlainGraphFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class NamespaceCreatorTests extends WordSpec with Matchers {
-  "NamespaceCreateor test " in {
-    implicit val graph: ScalaGraph = TinkerGraphTestInstance.create
-
+  "NamespaceCreateor test " in PlainGraphFixture { graph =>
     val block1 = graph + (NodeTypes.NAMESPACE_BLOCK, NodeKeys.NAME -> "namespace1")
     val block2 = graph + (NodeTypes.NAMESPACE_BLOCK, NodeKeys.NAME -> "namespace1")
     val block3 = graph + (NodeTypes.NAMESPACE_BLOCK, NodeKeys.NAME -> "namespace2")

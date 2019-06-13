@@ -5,9 +5,8 @@ import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class FileTests extends WordSpec with Matchers {
-  val fixture = CpgTestFixture("file")
 
-  "generic cpg" should {
+  "generic cpg" should CpgTestFixture("file") { fixture =>
     "find file io/shiftleft/testcode/file/FileTest" in {
       val queryResult: List[nodes.File] = fixture.cpg.file.toList
 

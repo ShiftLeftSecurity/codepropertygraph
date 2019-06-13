@@ -13,9 +13,10 @@ class Fixture(projectName: String) {
   new EnhancementRunner().run(cpg, new SerializedCpg())
   new DataFlowRunner(SemanticsLoader.emptySemantics)
   val scalaGraph: ScalaGraph = cpg.graph
+}
 
-  protected def applyMethodDecorator(graph: Graph): Unit = {
-    val methodDecorator = new MethodDecoratorPass(graph)
-    methodDecorator.executeAndApply()
+object Fixture {
+  def apply[T](projectName: String)(fun: Fixture => T): T = {
+    fun(new Fixture(projectName))
   }
 }
