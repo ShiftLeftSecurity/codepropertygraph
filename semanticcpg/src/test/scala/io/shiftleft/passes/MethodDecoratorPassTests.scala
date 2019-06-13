@@ -1,15 +1,13 @@
 package io.shiftleft.passes.methoddecorations
 
 import gremlin.scala._
-import io.shiftleft.TinkerGraphTestInstance
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeKeys, NodeTypes, nodes}
+import io.shiftleft.semanticcpg.PlainGraphFixture
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.scalatest.{Matchers, WordSpec}
 
 class MethodDecoratorPassTests extends WordSpec with Matchers {
-  "MethodDecoratorTest" in {
-    implicit val graph: ScalaGraph = TinkerGraphTestInstance.create
-
+  "MethodDecoratorTest" in PlainGraphFixture { implicit graph =>
     val method = graph + NodeTypes.METHOD
     val parameterIn = graph + (NodeTypes.METHOD_PARAMETER_IN,
     NodeKeys.CODE -> "p1",

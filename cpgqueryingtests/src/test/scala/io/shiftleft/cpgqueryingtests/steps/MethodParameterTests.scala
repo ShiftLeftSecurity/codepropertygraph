@@ -5,10 +5,8 @@ import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class MethodParameterTests extends WordSpec with Matchers {
-  val fixture = CpgTestFixture("methodparameter")
 
-  "generic cpg" should {
-
+  "generic cpg" should CpgTestFixture("methodparameter") { fixture =>
     "find parameters" when {
       "asking for all parameters" in {
         val args: List[nodes.MethodParameterIn] =

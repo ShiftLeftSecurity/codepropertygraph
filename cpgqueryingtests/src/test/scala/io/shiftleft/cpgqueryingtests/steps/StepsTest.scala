@@ -17,16 +17,16 @@ class StepsTest extends WordSpec with Matchers {
 
   "generic cpg" should {
 
-    "filter by regex" in new CpgTestFixture("splitmeup") {
+    "filter by regex" in CpgTestFixture("splitmeup") { fixture =>
       val queryResult: List[nodes.Literal] =
-        cpg.literal.code(".*").toList
+        fixture.cpg.literal.code(".*").toList
 
       queryResult.size should be > 1
     }
 
-    "filter on cpg type" in new CpgTestFixture("splitmeup") {
+    "filter on cpg type" in CpgTestFixture("splitmeup") { fixture =>
       val mainMethods: List[nodes.Method] =
-        cpg.method
+        fixture.cpg.method
           .name(".*")
           .filterOnEnd(_.fullName.matches(".*main.*"))
           .toList
@@ -34,38 +34,38 @@ class StepsTest extends WordSpec with Matchers {
       mainMethods.size shouldBe 1
     }
 
-    "filter with traversal on cpg type" in new CpgTestFixture("splitmeup") {
-      def allMethods = cpg.method
+    "filter with traversal on cpg type" in CpgTestFixture("splitmeup") { fixture =>
+      def allMethods = fixture.cpg.method
       val publicMethods = allMethods.filter(_.isPublic)
 
       allMethods.toList.size should be > publicMethods.toList.size
     }
 
     "filter on id" when {
-      "providing one" in new CpgTestFixture("splitmeup") {
+      "providing one" in CpgTestFixture("splitmeup") { fixture =>
         // find an arbitrary method so we can find it again in the next step
-        val method: nodes.Method = cpg.method.toList.head
-        val results: List[nodes.Method] = cpg.method.id(method.underlying.id).toList
+        val method: nodes.Method = fixture.cpg.method.toList.head
+        val results: List[nodes.Method] = fixture.cpg.method.id(method.underlying.id).toList
 
         results.size shouldBe 1
         results.head.underlying.id
       }
 
-      "providing multiple" in new CpgTestFixture("splitmeup") {
+      "providing multiple" in CpgTestFixture("splitmeup") { fixture =>
         // find two arbitrary methods so we can find it again in the next step
-        val methods: Set[nodes.Method] = cpg.method.toList.take(2).toSet
-        val results: List[nodes.Method] = cpg.method.id(methods.map(_.id())).toList
+        val methods: Set[nodes.Method] = fixture.cpg.method.toList.take(2).toSet
+        val results: List[nodes.Method] = fixture.cpg.method.id(methods.map(_.id())).toList
 
         results.size shouldBe 2
         results.toSet shouldBe methods.toSet
       }
     }
 
-    "aggregate intermediary results into a given collection" in new CpgTestFixture("splitmeup") {
+    "aggregate intermediary results into a given collection" in CpgTestFixture("splitmeup") { fixture =>
       val allMethods = mutable.ArrayBuffer.empty[nodes.Method]
 
       val mainMethods: List[nodes.Method] =
-        cpg.method
+        fixture.cpg.method
           .name(".*")
           .aggregate(allMethods)
           .filterOnEnd(_.fullName.matches(".*main.*"))
@@ -76,17 +76,17 @@ class StepsTest extends WordSpec with Matchers {
     }
   }
 
-  "find that all method returns are linked to a method" in new CpgTestFixture("splitmeup") {
-    val returnsWithMethods = cpg.method.methodReturn.l
-    val returns = cpg.methodReturn.l
+  "find that all method returns are linked to a method" in CpgTestFixture("splitmeup") { fixture =>
+    val returnsWithMethods = fixture.cpg.method.methodReturn.l
+    val returns = fixture.cpg.methodReturn.l
     returnsWithMethods.size shouldBe returns.size
   }
 
-  "allow for comprehensions" in new CpgTestFixture("splitmeup") {
+  "allow for comprehensions" in CpgTestFixture("splitmeup") { fixture =>
     case class MethodParamPairs(methodName: String, paramName: String)
 
     val query = for {
-      method <- cpg.method
+      method <- fixture.cpg.method
       param <- method.start.parameter
     } yield MethodParamPairs(method.name, param.name)
 
@@ -94,42 +94,42 @@ class StepsTest extends WordSpec with Matchers {
     pairs.size should be > 0
   }
 
-  "allow lists in map/flatMap/forComprehension" in new CpgTestFixture("splitmeup") {
-    val query = cpg.method.isPublic.map { method =>
+  "allow lists in map/flatMap/forComprehension" in CpgTestFixture("splitmeup") { fixture =>
+    val query = fixture.cpg.method.isPublic.map { method =>
       (method.name, method.start.parameter.toList)
     }
     val results: List[(String, List[nodes.MethodParameterIn])] = query.toList
     results.size should be > 1
   }
 
-  "allow side effects" in new CpgTestFixture("splitmeup") {
+  "allow side effects" in CpgTestFixture("splitmeup") { fixture =>
     var i = 0
-    cpg.method.sideEffect(_ => i = i + 1).exec
+    fixture.cpg.method.sideEffect(_ => i = i + 1).exec
     i should be > 0
   }
 
   "as/select" should {
-    "select all by default" in new CpgTestFixture("splitmeup") {
+    "select all by default" in CpgTestFixture("splitmeup") { fixture =>
       val results: List[(nodes.Method, nodes.MethodReturn)] =
-        cpg.method.as("method").methodReturn.as("methodReturn").select.toList
+        fixture.cpg.method.as("method").methodReturn.as("methodReturn").select.toList
 
       results.size should be > 0
     }
 
-    "allow to select a single label" in new CpgTestFixture("splitmeup") {
+    "allow to select a single label" in CpgTestFixture("splitmeup") { fixture =>
       val methodReturnLabel = StepLabel[nodes.MethodReturn]("methodReturn")
       val methodLabel = StepLabel[nodes.Method]("method")
       val results: List[nodes.MethodReturn] =
-        cpg.method.as(methodLabel).methodReturn.as(methodReturnLabel).select(methodReturnLabel).toList
+        fixture.cpg.method.as(methodLabel).methodReturn.as(methodReturnLabel).select(methodReturnLabel).toList
 
       results.size should be > 0
     }
 
-    "allow to select multiple labels" in new CpgTestFixture("splitmeup") {
+    "allow to select multiple labels" in CpgTestFixture("splitmeup") { fixture =>
       val methodReturnLabel = StepLabel[nodes.MethodReturn]("methodReturn")
       val methodLabel = StepLabel[nodes.Method]("method")
       val results: List[(nodes.MethodReturn, nodes.Method)] =
-        cpg.method
+        fixture.cpg.method
           .as(methodLabel)
           .methodReturn
           .as(methodReturnLabel)
@@ -141,16 +141,16 @@ class StepsTest extends WordSpec with Matchers {
   }
 
   "raw traversals" should {
-    "allow typed as/select" in new CpgTestFixture("splitmeup") {
-      val raw = cpg.namespace.raw.asInstanceOf[GremlinScala.Aux[Vertex, HNil]]
+    "allow typed as/select" in CpgTestFixture("splitmeup") { fixture =>
+      val raw = fixture.cpg.namespace.raw.asInstanceOf[GremlinScala.Aux[Vertex, HNil]]
       val _: List[(Vertex, Edge)] = raw.as("a").outE.as("b").select.toList
-      // all that matters is that the result type is (Vertex, Edge)
-      // for more options with as/select on raw, see https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala
+    // all that matters is that the result type is (Vertex, Edge)
+    // for more options with as/select on raw, see https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala
     }
   }
 
-  "toJson" in new CpgTestFixture("splitmeup") {
-    val json = cpg.namespace.nameExact("io.shiftleft.testcode.splitmeup").toJson
+  "toJson" in CpgTestFixture("splitmeup") { fixture =>
+    val json = fixture.cpg.namespace.nameExact("io.shiftleft.testcode.splitmeup").toJson
     val parsed = parse(json).children.head //exactly one result for the above query
     (parsed \ "NAME") shouldBe JString("io.shiftleft.testcode.splitmeup")
     (parsed \ "_label") shouldBe JString("NAMESPACE")

@@ -5,9 +5,8 @@ import io.shiftleft.queryprimitives.utils.Statements
 import org.scalatest.{Matchers, WordSpec}
 
 class CountStatementsTests extends WordSpec with Matchers {
-  val fixture = CpgTestFixture("method")
 
-  "Class Statements" should {
+  "Class Statements" should CpgTestFixture("method") { fixture =>
     "count statements correctly" in {
       Statements.countAll(fixture.cpg) should be(9)
     }

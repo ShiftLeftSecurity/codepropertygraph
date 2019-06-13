@@ -10,9 +10,8 @@ import org.json4s._
 import org.json4s.native.JsonMethods._
 
 class MethodTests extends WordSpec with Matchers {
-  val fixture = CpgTestFixture("method")
 
-  "Method traversals" should {
+  "Method traversals" should CpgTestFixture("method") { fixture =>
     "expand to type declaration" in {
       val queryResult: List[nodes.TypeDecl] =
         fixture.cpg.method.name("methodWithLiteral").definingTypeDecl.toList

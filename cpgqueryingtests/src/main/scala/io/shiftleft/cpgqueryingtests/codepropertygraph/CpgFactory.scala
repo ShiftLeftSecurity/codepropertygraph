@@ -16,7 +16,7 @@ class CpgFactory(frontend: LanguageFrontend, semanticsFilename: String) {
     *
     * @param sourceCode code for which one wants to generate cpg
     */
-  def buildCpg(sourceCode: String): Cpg = {
+  def buildCpg[T](sourceCode: String)(fun: Cpg => T): T = {
     val tmpDir = Files.createTempDirectory("dflowtest").toFile
     tmpDir.deleteOnExit()
 
@@ -34,7 +34,8 @@ class CpgFactory(frontend: LanguageFrontend, semanticsFilename: String) {
     new EnhancementRunner().run(cpg, new SerializedCpg())
     new DataFlowRunner(semantics).run(cpg, new SerializedCpg())
 
-    cpg
+    try fun(cpg)
+    finally { cpg.close() }
   }
 
 }

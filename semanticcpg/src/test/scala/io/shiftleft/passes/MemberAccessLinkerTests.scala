@@ -6,9 +6,8 @@ import io.shiftleft.semanticcpg.Fixture
 import org.scalatest.{Matchers, WordSpec}
 
 class MemberAccessLinkerTests extends WordSpec with Matchers {
-  val fixture = new Fixture("memberaccesslinker")
 
-  "have a reference to correct member" in {
+  "have a reference to correct member" in Fixture("memberaccesslinker") { fixture =>
     val queryResult: List[Vertex] = fixture.scalaGraph.V
       .hasLabel(NodeTypes.CALL)
       .has(NodeKeys.NAME -> Operators.indirectMemberAccess)
