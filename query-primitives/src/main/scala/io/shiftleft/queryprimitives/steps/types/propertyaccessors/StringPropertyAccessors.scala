@@ -21,7 +21,7 @@ trait StringPropertyAccessors[T <: StoredNode, Labels <: HList] {
         trav.has(property, textRegex(value))
       }: _*))
     } else {
-      new NodeSteps[T, Labels](raw.filterOnEnd(unused => false))
+      new NodeSteps[T, Labels](raw.filterOnEnd(_ => false))
     }
 
   protected def stringPropertyFilterExact[Out](property: Key[String], _value: String): NodeSteps[T, Labels] =
@@ -33,7 +33,7 @@ trait StringPropertyAccessors[T <: StoredNode, Labels <: HList] {
         trav.has(property, value)
       }: _*))
     } else {
-      new NodeSteps[T, Labels](raw.filterOnEnd(unused => false))
+      new NodeSteps[T, Labels](raw.filterOnEnd(_ => false))
     }
 
   protected def stringPropertyFilterNot[Out](property: Key[String], value: String): NodeSteps[T, Labels] =

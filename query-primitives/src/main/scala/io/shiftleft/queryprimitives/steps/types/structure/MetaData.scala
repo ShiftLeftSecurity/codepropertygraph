@@ -14,7 +14,7 @@ class MetaData[Labels <: HList](raw: GremlinScala.Aux[nodes.MetaData, Labels])
     with VersionAccessors[nodes.MetaData, Labels] {
 
   /**
-    * Programming language the code represented by this CPG was
+    * Returns the programming language of the code for which this CPG was
     * generated from.
     * */
   def language: GremlinScala.Aux[String, Labels] = raw.map(_.language)

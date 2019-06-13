@@ -5,13 +5,8 @@ case class IdentityHashWrapper[T <: AnyRef](value: T) {
     System.identityHashCode(value)
   }
 
-  override def equals(other: Any): Boolean = {
-    if (other == null) {
-      false
-    } else if (!other.isInstanceOf[IdentityHashWrapper[T]]) {
-      false
-    } else {
-      this.value eq other.asInstanceOf[IdentityHashWrapper[T]].value
-    }
-  }
+  override def equals(other: Any): Boolean =
+    other != null &&
+      other.isInstanceOf[IdentityHashWrapper[T]] &&
+      (this.value eq other.asInstanceOf[IdentityHashWrapper[T]].value)
 }

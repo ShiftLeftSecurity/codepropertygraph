@@ -71,10 +71,10 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, L
   }
 
   /**
-    * Intendend for internal use!
+    * Intended for internal use!
     * Traverse to direct and transitive callers of the method.
     */
-  def calledByIncludingSink(sourceTrav: Method[Labels], resolve: Boolean = true)(
+  private[queryprimitives] def calledByIncludingSink(sourceTrav: Method[Labels], resolve: Boolean = true)(
       implicit callResolver: ICallResolver): Method[Labels] = {
     val sourceMethods = sourceTrav.raw.toSet
     val sinkMethods = raw.dedup.toList()
@@ -177,57 +177,52 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, L
     * Traverse to public methods
     * */
   def isPublic: Method[Labels] =
-    new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PUBLIC)))
+    isMethodWithModifier(ModifierTypes.PUBLIC)
 
   /**
     * Traverse to private methods
     * */
   def isPrivate: Method[Labels] =
-    new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PRIVATE)))
+    isMethodWithModifier(ModifierTypes.PRIVATE)
 
   /**
     * Traverse to protected methods
     * */
   def isProtected: Method[Labels] =
-    new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PROTECTED)))
+    isMethodWithModifier(ModifierTypes.PROTECTED)
 
   /**
     * Traverse to abstract methods
     * */
   def isAbstract: Method[Labels] =
-    new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.ABSTRACT)))
+    isMethodWithModifier(ModifierTypes.ABSTRACT)
 
   /**
     * Traverse to static methods
     * */
   def isStatic: Method[Labels] =
-    new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.STATIC)))
+    isMethodWithModifier(ModifierTypes.STATIC)
 
   /**
     * Traverse to native methods
     * */
   def isNative: Method[Labels] =
-    new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.NATIVE)))
+    isMethodWithModifier(ModifierTypes.NATIVE)
 
   /**
     * Traverse to constructors, that is, keep methods that are constructors
     * */
   def isConstructor: Method[Labels] =
-    new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.CONSTRUCTOR)))
+    isMethodWithModifier(ModifierTypes.CONSTRUCTOR)
 
   /**
     * Traverse to virtual method
     * */
   def isVirtual: Method[Labels] =
-    new Method[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.VIRTUAL)))
+    isMethodWithModifier(ModifierTypes.VIRTUAL)
+
+  private def isMethodWithModifier(modifier: String): Method[Labels] =
+    new Method[Labels](raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> modifier)))
 
   /**
     * Traverse to external methods, that is, methods not present

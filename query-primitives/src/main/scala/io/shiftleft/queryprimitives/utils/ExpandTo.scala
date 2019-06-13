@@ -2,8 +2,10 @@ package io.shiftleft.queryprimitives.utils
 
 import io.shiftleft.codepropertygraph.generated._
 import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex}
+import io.shiftleft.queryprimitives
 import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 
+import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
 object ExpandTo {
@@ -30,12 +32,7 @@ object ExpandTo {
     val parent = argument.vertices(Direction.IN, EdgeTypes.AST).nextChecked
 
     parent match {
-      case call: nodes.Call
-          if call.name == Operators.memberAccess ||
-            call.name == Operators.indirectMemberAccess ||
-            call.name == Operators.computedMemberAccess ||
-            call.name == Operators.indirectComputedMemberAccess ||
-            call.name == Operators.indirection =>
+      case call: nodes.Call if queryprimitives.isGenericMemberAccessName(call.name) =>
         argumentToCallOrReturn(call)
       case expression: nodes.Expression =>
         expression
@@ -104,20 +101,25 @@ object ExpandTo {
       .toSeq
   }
 
-  def methodToTypeDecl(method: Vertex): Option[Vertex] = {
-    var typeDeclOption = method.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
-    while (typeDeclOption.isDefined && !typeDeclOption.get.isInstanceOf[nodes.TypeDecl]) {
-      typeDeclOption = typeDeclOption.get.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
-    }
-    typeDeclOption
+  def methodToTypeDecl(vertex: Vertex): Option[Vertex] = {
+    findVertex(vertex, _.isInstanceOf[nodes.TypeDecl])
   }
 
-  def methodToFile(method: Vertex): Option[Vertex] = {
-    var fileOption = method.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
-    while (fileOption.isDefined && !fileOption.get.isInstanceOf[nodes.File]) {
-      fileOption = fileOption.get.vertices(Direction.IN, EdgeTypes.AST).asScala.toList.headOption
+  def methodToFile(vertex: Vertex): Option[Vertex] = {
+    findVertex(vertex, _.isInstanceOf[nodes.File])
+  }
+
+  @tailrec
+  private def findVertex(vertex: Vertex, instanceCheck: Vertex => Boolean): Option[Vertex] = {
+    val iterator = vertex.vertices(Direction.IN, EdgeTypes.AST)
+    if (iterator.hasNext) {
+      iterator.next() match {
+        case head if instanceCheck(head) => Some(head)
+        case head                        => findVertex(head, instanceCheck)
+      }
+    } else {
+      None
     }
-    fileOption
   }
 
   def methodToOutParameters(method: Vertex): Seq[Vertex] = {

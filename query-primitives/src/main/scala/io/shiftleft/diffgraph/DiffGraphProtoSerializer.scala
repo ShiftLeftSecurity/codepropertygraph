@@ -43,9 +43,7 @@ class DiffGraphProtoSerializer() {
             nodeBuilder.addProperty(property)
         }
 
-      nodeBuilder.build()
-
-      val finalNode = nodeBuilder.build
+      val finalNode = nodeBuilder.build()
       builder.addNode(finalNode)
     }
   }
@@ -53,38 +51,21 @@ class DiffGraphProtoSerializer() {
   private def addEdges()(implicit builder: CpgOverlay.Builder, appliedDiffGraph: AppliedDiffGraph): Unit = {
     val diffGraph = appliedDiffGraph.diffGraph
 
-    addProtoEdge(diffGraph.edgesInOriginal, { edge: EdgeInOriginal =>
-      edge.src.getId
-    }, { edge: EdgeInOriginal =>
-      edge.dst.getId
-    })
+    addProtoEdge(diffGraph.edgesInOriginal)(_.src.getId, _.dst.getId)
 
-    addProtoEdge(
-      diffGraph.edgesFromOriginal, { edge: EdgeFromOriginal =>
-        edge.src.getId
-      }, { edge: EdgeFromOriginal =>
-        appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.dst))
-      }
+    addProtoEdge(diffGraph.edgesFromOriginal)(_.src.getId,
+                                              edge => appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.dst)))
+
+    addProtoEdge(diffGraph.edgesToOriginal)(edge => appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.src)),
+                                            _.dst.getId)
+
+    addProtoEdge(diffGraph.edges)(
+      edge => appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.src)),
+      edge => appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.dst))
     )
 
-    addProtoEdge(diffGraph.edgesToOriginal, { edge: EdgeToOriginal =>
-      appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.src))
-    }, { edge: EdgeToOriginal =>
-      edge.dst.getId
-    })
-
-    addProtoEdge(
-      diffGraph.edges, { edge: EdgeInDiffGraph =>
-        appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.src))
-      }, { edge: EdgeInDiffGraph =>
-        appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.dst))
-      }
-    )
-
-    def addProtoEdge[T <: DiffEdge](edges: Seq[T], srcIdGen: T => JLong, dstIdGen: T => JLong) = {
-      builder.addAllEdge(edges.map { edge =>
-        protoEdge(edge, srcIdGen(edge), dstIdGen(edge))
-      }.asJava)
+    def addProtoEdge[T <: DiffEdge](edges: Seq[T])(srcIdGen: T => JLong, dstIdGen: T => JLong) = {
+      edges.foreach(edge => builder.addEdge(protoEdge(edge, srcIdGen(edge), dstIdGen(edge))))
     }
 
     def protoEdge(edge: DiffEdge, srcId: JLong, dstId: JLong) = {
@@ -99,7 +80,7 @@ class DiffGraphProtoSerializer() {
         edgeBuilder.addProperty(edgeProperty(property._1, property._2))
       }
 
-      edgeBuilder.build
+      edgeBuilder.build()
     }
   }
 
@@ -148,7 +129,7 @@ class DiffGraphProtoSerializer() {
       case t: Traversable[_] if t.isEmpty =>
         builder //empty property
       case t: Traversable[_] =>
-        // determine property list type based on first element - assuming it's a homogenous list
+        // determine property list type based on first element - assuming it's a homogeneous list
         t.head match {
           case _: String =>
             val b = StringList.newBuilder

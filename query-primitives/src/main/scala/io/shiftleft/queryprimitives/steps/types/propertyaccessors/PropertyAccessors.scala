@@ -20,7 +20,7 @@ trait PropertyAccessors[T <: StoredNode, Labels <: HList] {
         trav.has(property, value)
       }: _*))
     } else {
-      new NodeSteps[T, Labels](raw.filterOnEnd(unused => false))
+      new NodeSteps[T, Labels](raw.filterOnEnd(_ => false))
     }
 
   def propertyFilterNot[Out, P](property: Key[P], value: P): NodeSteps[T, Labels] =

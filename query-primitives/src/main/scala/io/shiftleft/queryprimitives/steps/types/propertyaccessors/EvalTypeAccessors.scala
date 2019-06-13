@@ -31,7 +31,7 @@ trait EvalTypeAccessors[T <: StoredNode, Labels <: HList] {
               trav.has(NodeKeys.FULL_NAME, textRegex(_value))
             }: _*)))
     } else {
-      new NodeSteps[T, Labels](raw.filterOnEnd(unused => false))
+      new NodeSteps[T, Labels](raw.filterOnEnd(_ => false))
     }
 
   def evalTypeExact(_value: String): NodeSteps[T, Labels] =
@@ -52,7 +52,7 @@ trait EvalTypeAccessors[T <: StoredNode, Labels <: HList] {
               trav.has(NodeKeys.FULL_NAME, _value)
             }: _*)))
     } else {
-      new NodeSteps[T, Labels](raw.filterOnEnd(unused => false))
+      new NodeSteps[T, Labels](raw.filterOnEnd(_ => false))
     }
 
   def evalTypeNot(_value: String): NodeSteps[T, Labels] =

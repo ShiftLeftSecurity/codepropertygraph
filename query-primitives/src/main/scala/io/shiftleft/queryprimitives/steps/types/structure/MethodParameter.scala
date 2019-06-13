@@ -30,16 +30,12 @@ class MethodParameter[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodParamet
   /**
     * Traverse to all parameters with index greater or equal than `num`
     * */
-  /* get all parameters from (and including)
-   * method parameter indexes are  based, i.e. first parameter has index (that's how java2cpg generates it) */
   def indexFrom(num: Int): MethodParameter[Labels] =
     new MethodParameter[Labels](raw.has(NodeKeys.METHOD_PARAMETER_IN.ORDER, P.gte(num: Integer)))
 
   /**
     * Traverse to all parameters with index smaller or equal than `num`
     * */
-  /* get all parameters up to (and including)
-   * method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
   def indexTo(num: Int): MethodParameter[Labels] =
     new MethodParameter[Labels](raw.has(NodeKeys.METHOD_PARAMETER_IN.ORDER, P.lte(num: Integer)))
 
@@ -55,7 +51,7 @@ class MethodParameter[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodParamet
   def argument() = {
     new Expression[Labels](
       raw
-        .sack((sack: Integer, node: nodes.MethodParameterIn) => node.value2(NodeKeys.ORDER))
+        .sack((_: Integer, node: nodes.MethodParameterIn) => node.value2(NodeKeys.ORDER))
         .in(EdgeTypes.AST)
         .in(EdgeTypes.REF)
         .in(EdgeTypes.CALL)

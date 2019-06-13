@@ -20,9 +20,9 @@ case class AppliedDiffGraph(diffGraph: DiffGraph,
   * Component to merge diff graphs into existing (loaded) Tinkergraphs
   * */
 class DiffGraphApplier {
+  import DiffGraphApplier.InternalProperty
 
-  private var overlayNodeToTinkerNode = new util.HashMap[IdentityHashWrapper[NewNode], Vertex]()
-  private val InternalProperty = "_"
+  private val overlayNodeToTinkerNode = new util.HashMap[IdentityHashWrapper[NewNode], Vertex]()
 
   /**
     * Applies diff to existing (loaded) TinkerGraph
@@ -111,4 +111,8 @@ class DiffGraphApplier {
     }
   }
 
+}
+
+object DiffGraphApplier {
+  private val InternalProperty = "_"
 }

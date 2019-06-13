@@ -38,7 +38,7 @@ class MethodParameterOut[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodPara
   def argument: Expression[Labels] = {
     new Expression[Labels](
       raw
-        .sack((sack: Integer, node: nodes.MethodParameterOut) => node.value2(NodeKeys.ORDER))
+        .sack((_: Integer, node: nodes.MethodParameterOut) => node.value2(NodeKeys.ORDER))
         .in(EdgeTypes.AST)
         .in(EdgeTypes.REF)
         .in(EdgeTypes.CALL)
