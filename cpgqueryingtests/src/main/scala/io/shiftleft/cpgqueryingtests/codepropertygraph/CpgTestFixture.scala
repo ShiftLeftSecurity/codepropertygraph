@@ -15,7 +15,6 @@ class CpgTestFixture(projectName: String) {
 }
 
 object CpgTestFixture {
-
   def apply[T](projectName: String)(fun: CpgTestFixture => T): T = {
     val fixture = new CpgTestFixture(projectName)
     try {

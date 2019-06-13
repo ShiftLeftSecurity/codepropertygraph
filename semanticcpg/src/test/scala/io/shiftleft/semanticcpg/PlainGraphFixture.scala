@@ -9,5 +9,4 @@ object PlainGraphFixture {
     try fun(graph)
     finally { graph.close() }
   }
-
 }
