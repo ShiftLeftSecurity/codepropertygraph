@@ -180,10 +180,9 @@ object DomainClassCreator {
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
       import scala.collection.JavaConverters._
 
-      trait Node extends gremlin.scala.dsl.DomainRoot {
+      trait Node extends Product {
         def accept[T](visitor: NodeVisitor[T]): T = ???
       }
-
 
       /* making use of the fact that SpecializedVertex is also our domain node */
       trait StoredNode extends Vertex with Node {
@@ -472,8 +471,9 @@ object DomainClassCreator {
           |    visitor.visit(this)
           |  }
           |  override def valueMap: JMap[String, AnyRef] = get.valueMap
-          |  override val productArity = get.productArity
           |  override def productElement(n: Int): Any = get.productElement(n)
+          |  override def productPrefix = "${nodeType.className}"
+          |  override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
           |  override def canEqual(that: Any): Boolean = get.canEqual(that)
           |}""".stripMargin
       }
@@ -486,7 +486,7 @@ object DomainClassCreator {
       }
 
       class ${nodeType.classNameDb}(private val _id: JLong, private val _graph: TinkerGraph)
-          extends SpecializedTinkerVertex(_id, ${nodeType.className}.Label, _graph) with StoredNode $mixinTraits with Product with ${nodeType.className}Base {
+          extends SpecializedTinkerVertex(_id, ${nodeType.className}.Label, _graph) with StoredNode $mixinTraits with ${nodeType.className}Base {
 
         override def allowedInEdgeLabels() = ${nodeType.className}.Edges.In.asJava
         override def allowedOutEdgeLabels() = ${nodeType.className}.Edges.Out.asJava
@@ -497,14 +497,15 @@ object DomainClassCreator {
 
         ${propertyBasedFields(keys)}
 
-        override val productPrefix = "${nodeType.className}"
         override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[${nodeType.classNameDb}]
-        override val productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
         override def productElement(n: Int): Any =
             n match {
               case 0 => _id
               $productElementAccessors
             }
+
+        override def productPrefix = "${nodeType.className}"
+        override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
         
         /* performance optimisation to save instantiating an iterator for each property lookup */
         override protected def specificProperty[A](key: String): VertexProperty[A] = {
