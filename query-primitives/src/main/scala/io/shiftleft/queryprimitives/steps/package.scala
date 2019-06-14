@@ -80,4 +80,7 @@ package object steps {
 
   implicit def toFile[Labels <: HList](steps: Steps[nodes.File, Labels]): File[Labels] =
     new File[Labels](steps.raw)
+
+  implicit def toBlock[Labels <: HList](steps: Steps[nodes.Block, Labels]): Block[Labels] =
+    new Block[Labels](steps.raw)
 }
