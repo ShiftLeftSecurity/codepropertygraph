@@ -75,6 +75,12 @@ package object steps {
   implicit def toDeclaration[Labels <: HList](steps: Steps[nodes.Declaration, Labels]): Declaration[Labels] =
     new Declaration[Labels](steps.raw)
 
+  implicit def toCfgNode[Labels <: HList](steps: Steps[nodes.CfgNode, Labels]): CfgNode[Labels] =
+    new CfgNode[Labels](steps.raw)
+
   implicit def toFile[Labels <: HList](steps: Steps[nodes.File, Labels]): File[Labels] =
     new File[Labels](steps.raw)
+
+  implicit def toBlock[Labels <: HList](steps: Steps[nodes.Block, Labels]): Block[Labels] =
+    new Block[Labels](steps.raw)
 }
