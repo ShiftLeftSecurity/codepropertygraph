@@ -24,6 +24,12 @@ class NodeTypeStarters(cpg: Cpg) {
     new NodeSteps[nodes.StoredNode, HNil](scalaGraph.V.cast[nodes.StoredNode])
 
   /**
+    * Traverse to all comments in source-based CPGs.
+    * */
+  def comment: Comment[HNil] =
+    new Comment[HNil](scalaGraph.V.hasLabel(NodeTypes.COMMENT).cast[nodes.Comment])
+
+  /**
     Traverse to all source files
     */
   def file: File[HNil] =
