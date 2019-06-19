@@ -26,5 +26,5 @@ class File[Labels <: HList](raw: GremlinScala.Aux[nodes.File, Labels])
     new Namespace[Labels](raw.out(EdgeTypes.AST).out(EdgeTypes.REF).cast[nodes.Namespace])
 
   def namespaceBlock: NamespaceBlock[Labels] =
-    new NamespaceBlock[Labels](raw.out(EdgeTypes.AST).cast[nodes.NamespaceBlock])
+    new NamespaceBlock[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[nodes.NamespaceBlock])
 }

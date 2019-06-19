@@ -1,0 +1,15 @@
+{
+    "nodeTypes" : [
+	{"id" : 511, "name" : "COMMENT",
+	 "keys" : ["LINE_NUMBER", "CODE"],
+	 "comment" : "A comment",
+	 "outEdges" : []
+	},
+
+	{"name" : "FILE",
+	 "outEdges" : [
+	  {"edgeName": "AST", "inNodes": ["COMMENT"]}
+	 ]
+	}
+    ]
+}
