@@ -8,7 +8,7 @@ import io.shiftleft.queryprimitives.steps.types.propertyaccessors.NameAccessors
 import shapeless.HList
 
 /**
-  * A source file
+  * A compilation unit
   * */
 class File[Labels <: HList](raw: GremlinScala.Aux[nodes.File, Labels])
     extends NodeSteps[nodes.File, Labels](raw)
@@ -26,5 +26,9 @@ class File[Labels <: HList](raw: GremlinScala.Aux[nodes.File, Labels])
     new Namespace[Labels](raw.out(EdgeTypes.AST).out(EdgeTypes.REF).cast[nodes.Namespace])
 
   def namespaceBlock: NamespaceBlock[Labels] =
-    new NamespaceBlock[Labels](raw.out(EdgeTypes.AST).cast[nodes.NamespaceBlock])
+    new NamespaceBlock[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[nodes.NamespaceBlock])
+
+  def comment: Comment[Labels] =
+    new Comment[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.COMMENT).cast[nodes.Comment])
+
 }
