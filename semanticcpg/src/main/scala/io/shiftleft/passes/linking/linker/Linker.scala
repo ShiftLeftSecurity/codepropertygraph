@@ -121,12 +121,12 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
     }
   }
 
-  private def linkToSingle[SRC_NODE_TYPE <: nodes.StoredNode](srcLabels: List[String],
-                                                              dstNodeLabel: String,
-                                                              edgeType: String,
-                                                              dstNodeIdMap: Map[String, JLong],
-                                                              dstFullNameKey: String,
-                                                              dstGraph: DiffGraph): Unit = {
+  private def linkToSingle(srcLabels: List[String],
+                           dstNodeLabel: String,
+                           edgeType: String,
+                           dstNodeIdMap: Map[String, JLong],
+                           dstFullNameKey: String,
+                           dstGraph: DiffGraph): Unit = {
     var loggedDeprecationWarning = false
     val sourceIterator = GremlinScalaIterator(graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*))
     sourceIterator.foreach { srcNode =>

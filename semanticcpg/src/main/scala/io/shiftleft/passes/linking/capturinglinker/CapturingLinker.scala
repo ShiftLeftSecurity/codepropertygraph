@@ -14,16 +14,16 @@ class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
   import CapturingLinker.logger
 
   override def run(): Iterator[DiffGraph] = {
-    var idToClosureBinding = Map[String, nodes.ClosureBinding]()
     val dstGraph = new DiffGraph
 
-    graph.V
-      .hasLabel(NodeTypes.CLOSURE_BINDING)
-      .sideEffect {
-        case closureBinding: nodes.ClosureBinding =>
-          idToClosureBinding += ((closureBinding.closureBindingId.get, closureBinding))
-      }
-      .iterate()
+    val idToClosureBinding: Map[String, nodes.ClosureBinding] =
+      graph.V
+        .hasLabel(NodeTypes.CLOSURE_BINDING)
+        .collect {
+          case closureBinding: nodes.ClosureBinding =>
+            (closureBinding.closureBindingId.get, closureBinding)
+        }
+        .toMap
 
     graph.V
       .hasLabel(NodeTypes.LOCAL)
