@@ -37,8 +37,8 @@ public class ProtoToCpg {
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, true);
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_OVERFLOW_HEAP_PERCENTAGE_THRESHOLD,
         config.heapPercentageThreshold());
-      config.alternativeParentDirectoryAsJava().ifPresent(dir ->
-        configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_ROOT_DIR, dir));
+      config.graphLocationAsJava().ifPresent(path ->
+        configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_GRAPH_LOCATION, path));
     } else {
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, false);
     }

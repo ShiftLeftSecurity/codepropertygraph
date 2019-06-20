@@ -16,7 +16,21 @@ object Cpg {
   /**
     * Create an empty code property graph
     */
-  def emptyCpg: Cpg = new Cpg(emptyGraph)
+  def emptyCpg: Cpg =
+    new Cpg(emptyGraph)
+
+  /**
+    * Instantiate cpg with storage.
+    * If the storage file already exists, it will load (a subset of) the data into memory. Otherwise it will create an empty cpg.
+    * In either case, configuring storage means that OverflowDb will be stored to disk on shutdown (`close`).
+    * I.e. if you want to preserve state between sessions, just use this method to instantiate the cpg and ensure to properly `close` the cpg at the end.
+    * @param path to the storage file, e.g. /home/user1/overflowdb.bin
+    */
+  def withStorage(path: String): Cpg = {
+    val configuration = TinkerGraph.EMPTY_CONFIGURATION
+    configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_GRAPH_LOCATION, path)
+    new Cpg(TinkerGraph.open(configuration, nodes.Factories.AllAsJava, edges.Factories.AllAsJava))
+  }
 
   /**
     * Returns a fresh, empty graph

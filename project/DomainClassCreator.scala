@@ -100,19 +100,19 @@ object DomainClassCreator {
       |    override def createEdge(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: TinkerVertex], inVertex: VertexRef[_ <: TinkerVertex]) =
       |      new ${edgeClassNameDb}(graph, id, outVertex, inVertex)
       |
+      |    override def createEdgeRef(edge: ${edgeClassNameDb}) = ${edgeClassName}(edge)
+      |
       |    override def createEdgeRef(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: TinkerVertex], inVertex: VertexRef[_ <: TinkerVertex]) = 
-      |      new ${edgeClassName}(createEdge(id, graph, outVertex, inVertex))
+      |      ${edgeClassName}(id, graph)
       |  }
+      |
+      |  def apply(wrapped: $edgeClassNameDb) = new EdgeRef(wrapped) with $edgeClassName
+      |  def apply(id: Long, graph: TinkerGraph) = 
+      |    new EdgeRef[${edgeClassNameDb}](id, $edgeClassName.Label, graph) with $edgeClassName
       |}
       """.stripMargin
 
-      val edgeRefImpl = s"""
-        |/** important: do not used `wrapped` internally in this class, only pass it to VertexRef constructor
-        |* this is to ensure it can be managed by the ReferenceManager
-        |* TODO MP: add property accessors
-        |* */
-        |class ${edgeClassName}(wrapped: ${edgeClassNameDb}) extends EdgeRef[${edgeClassNameDb}](wrapped) {
-        |}""".stripMargin
+      val edgeRefImpl = s"trait ${edgeClassName} extends EdgeRef[${edgeClassNameDb}]"
 
       val classImpl = s"""
       class ${edgeClassNameDb}(private val _graph: TinkerGraph, private val _id: Long, private val _outVertex: Vertex, _inVertex: Vertex)
@@ -335,8 +335,13 @@ object DomainClassCreator {
           override val forLabel = ${nodeType.className}.Label
 
           override def createVertex(id: JLong, graph: TinkerGraph) = new ${nodeType.classNameDb}(id, graph)
-          override def createVertexRef(id: JLong, graph: TinkerGraph) = new ${nodeType.className}(createVertex(id, graph))
+          override def createVertexRef(vertex: ${nodeType.classNameDb}) = ${nodeType.className}(vertex)
+          override def createVertexRef(id: JLong, graph: TinkerGraph) = ${nodeType.className}(id, graph)
         }
+
+        def apply(wrapped: ${nodeType.classNameDb}) = new VertexRef(wrapped) with ${nodeType.className}
+        def apply(id: Long, graph: TinkerGraph) = 
+          new VertexRef[${nodeType.classNameDb}](id, ${nodeType.className}.Label, graph) with ${nodeType.className}
       }
       """
 
@@ -461,10 +466,7 @@ object DomainClassCreator {
         }.mkString("\n")
         val containedNodesDelegators = nodeType.containedNodes
         s"""
-          |/** important: do not used `wrapped` internally in this class, only pass it to VertexRef constructor
-          |* this is to ensure it can be managed by the ReferenceManager
-          |* */
-          |class ${nodeType.className}(wrapped: ${nodeType.classNameDb}) extends VertexRef[${nodeType.classNameDb}](wrapped) with ${nodeType.className}Base with StoredNode $mixinTraits {
+          |trait ${nodeType.className} extends VertexRef[${nodeType.classNameDb}] with ${nodeType.className}Base with StoredNode $mixinTraits {
           |$propertyDelegators
           |$delegatingContainedNodeAccessors
           |  override def accept[T](visitor: NodeVisitor[T]): T = {
