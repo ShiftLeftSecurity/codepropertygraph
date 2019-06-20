@@ -19,11 +19,9 @@ import scala.None$;
 
 import java.util.*;
 
-public class ProtoToCpg {
+public class ProtoToCpg extends ProtoToX<Cpg> {
 
-  TinkerGraph tinkerGraph;
-  private Logger logger = LogManager.getLogger(getClass());
-  private NodeFilter nodeFilter = new NodeFilter();
+  private TinkerGraph tinkerGraph;
 
   public ProtoToCpg() {
     this(Optional.of(OnDiskOverflowConfig.defaultForJava()));
@@ -49,6 +47,7 @@ public class ProtoToCpg {
       io.shiftleft.codepropertygraph.generated.edges.Factories$.MODULE$.AllAsJava()); 
   }
 
+  @Override
   public void addNodes(List<Node> nodes) {
     for (Node node : nodes) {
       try {
@@ -71,6 +70,7 @@ public class ProtoToCpg {
     }
   }
 
+  @Override
   public void addEdges(List<Edge> protoEdges) {
     for (Edge edge : protoEdges) {
       long srcNodeId = edge.getSrc();
@@ -109,8 +109,8 @@ public class ProtoToCpg {
     }
   }
 
-  public static void addProperties(ArrayList<Object> tinkerKeyValues, String name, PropertyValue propertyValue) {
-    ValueCase valueCase = propertyValue.getValueCase();
+  public static void addProperties(ArrayList<Object> tinkerKeyValues, String name, io.shiftleft.proto.cpg.Cpg.PropertyValue propertyValue) {
+    io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase valueCase = propertyValue.getValueCase();
     switch(valueCase) {
       case INT_VALUE:
         tinkerKeyValues.add(name);
@@ -137,6 +137,7 @@ public class ProtoToCpg {
     }
   }
 
+  @Override
   public Cpg build() {
     return new Cpg(tinkerGraph);
   }
