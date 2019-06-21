@@ -48,7 +48,7 @@ public class ProtoToCpg extends ProtoToX<Cpg> {
   }
 
   @Override
-  public void addNodes(List<Node> nodes) {
+  public void addNodes(Iterable<Node> nodes) {
     for (Node node : nodes) {
       try {
         if (nodeFilter.filterNode(node)) {
@@ -71,7 +71,7 @@ public class ProtoToCpg extends ProtoToX<Cpg> {
   }
 
   @Override
-  public void addEdges(List<Edge> protoEdges) {
+  public void addEdges(Iterable<Edge> protoEdges) {
     for (Edge edge : protoEdges) {
       long srcNodeId = edge.getSrc();
       long dstNodeId = edge.getDst();
