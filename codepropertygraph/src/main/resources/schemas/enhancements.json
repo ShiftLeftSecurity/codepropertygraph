@@ -91,6 +91,7 @@
           "outEdges" : [
              {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]},
              {"edgeName": "INHERITS_FROM", "inNodes": ["TYPE"]},
+             {"edgeName": "ALIAS_OF", "inNodes": ["TYPE"]},
              {"edgeName": "CONTAINS", "inNodes": ["METHOD"]}
           ]
         },
@@ -154,7 +155,8 @@
         {"id" : 23, "name" : "INHERITS_FROM", "keys": [], "comment" : "Inheritance relation between types", "keys" : [] },
         {"id" : 28, "name" : "CONTAINS", "keys" : [], "comment" : "Shortcut over multiple AST edges"},
         {"id" : 1, "name" : "PROPAGATE", "keys" : ["ALIAS"], "comment" : "Encodes propagation of data from on node to another"},
-        {"id" : 137, "name": "REACHING_DEF", "keys" : [], "comment" : "Reaching definition edge", "keys" : []}
+        {"id" : 137, "name": "REACHING_DEF", "keys" : [], "comment" : "Reaching definition edge", "keys" : []},
+        {"id" : 138, "name" : "ALIAS_OF", "keys": [], "comment" : "Alias relation between types", "keys" : [] }
     ]
 
 }

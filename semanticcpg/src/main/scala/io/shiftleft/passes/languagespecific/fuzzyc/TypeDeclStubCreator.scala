@@ -49,6 +49,6 @@ class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
     val cpg = Cpg(graph.graph)
     cpg.typeDecl.sideEffect { typeDecl =>
       typeDeclFullNameToNode += typeDecl.fullName -> typeDecl
-    }
+    }.exec
   }
 }
