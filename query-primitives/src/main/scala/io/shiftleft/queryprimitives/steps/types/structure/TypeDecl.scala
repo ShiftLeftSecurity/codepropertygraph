@@ -7,6 +7,7 @@ import io.shiftleft.queryprimitives.steps.NodeSteps
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.Modifier
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{FullNameAccessors, IsExternalAccessor, NameAccessors}
+import org.apache.tinkerpop.gremlin.structure.Direction
 import shapeless.HList
 
 /**
@@ -39,31 +40,31 @@ class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDecl, Labels])
     * Methods defined as part of this type
     * */
   def method: Method[Labels] =
-    new Method[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.METHOD).cast[nodes.Method])
+    new Method[Labels](canonicalType.raw.out(EdgeTypes.AST).hasLabel(NodeTypes.METHOD).cast[nodes.Method])
 
   /**
     * Filter for type declarations contained in the analyzed code.
     * */
   def internal: TypeDecl[Labels] =
-    new TypeDecl[Labels](raw.has(NodeKeys.IS_EXTERNAL -> false))
+    new TypeDecl[Labels](canonicalType.raw.has(NodeKeys.IS_EXTERNAL -> false))
 
   /**
     * Filter for type declarations not contained in the analyzed code.
     * */
   def external: TypeDecl[Labels] =
-    new TypeDecl[Labels](raw.has(NodeKeys.IS_EXTERNAL -> true))
+    new TypeDecl[Labels](canonicalType.raw.has(NodeKeys.IS_EXTERNAL -> true))
 
   /**
     * Member variables
     * */
   def member: Member[Labels] =
-    new Member[Labels](raw.out().hasLabel(NodeTypes.MEMBER).cast[nodes.Member])
+    new Member[Labels](canonicalType.raw.out().hasLabel(NodeTypes.MEMBER).cast[nodes.Member])
 
   /**
     * Direct base types in the inheritance graph.
     * */
   def baseType: Type[Labels] =
-    new Type(raw.out(EdgeTypes.INHERITS_FROM).cast[nodes.Type])
+    new Type(canonicalType.raw.out(EdgeTypes.INHERITS_FROM).cast[nodes.Type])
 
   /**
     * Direct base type declaration.
@@ -94,7 +95,7 @@ class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDecl, Labels])
     */
   def vtableMethod: Method[Labels] = {
     new Method[Labels](
-      raw.out(EdgeTypes.VTABLE).cast[nodes.Method]
+      canonicalType.raw.out(EdgeTypes.VTABLE).cast[nodes.Method]
     )
   }
 
@@ -103,8 +104,72 @@ class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDecl, Labels])
     * */
   def modifier: Modifier[Labels] =
     new Modifier[Labels](
-      raw.out
+      canonicalType.raw.out
         .hasLabel(NodeTypes.MODIFIER)
         .cast[nodes.Modifier]
     )
+
+  /**
+    * Traverse to alias type declarations.
+    */
+  def isAlias: TypeDecl[Labels] = {
+    new TypeDecl[Labels](raw.filterOnEnd(_.aliasTypeFullName.isDefined))
+  }
+
+  /**
+    * Traverse to canonical type declarations.
+    */
+  def isCanonical: TypeDecl[Labels] = {
+    new TypeDecl[Labels](raw.filterOnEnd(_.aliasTypeFullName.isEmpty))
+  }
+
+  /**
+    * If this is an alias type declaration, go to its underlying type declaration
+    * else unchanged.
+    */
+  def unravelAlias: TypeDecl[Labels] = {
+    new TypeDecl[Labels](raw.map{ typeDecl =>
+      if (typeDecl.aliasTypeFullName.isDefined) {
+        typeDecl.vertices(Direction.OUT, EdgeTypes.ALIAS_OF).next.asInstanceOf[nodes.Type]
+          .vertices(Direction.OUT, EdgeTypes.REF).next.asInstanceOf[nodes.TypeDecl]
+      } else {
+        typeDecl
+      }
+    })
+  }
+
+  /**
+    * Traverse to canonical type which means unravel aliases until we find
+    * a non alias type declaration.
+    */
+  def canonicalType: TypeDecl[Labels] = {
+    // We cannot use this compact form because the gremlin implementation at least
+    // in some case seems to have problems with nested "repeat" steps. Since this
+    // step is used in other repeat steps we do not use it here.
+    //until(_.isCanonical).repeat(_.unravelAlias)
+
+    new TypeDecl[Labels](raw.map { typeDecl =>
+      var currentTypeDecl = typeDecl
+      while (currentTypeDecl.aliasTypeFullName.isDefined) {
+        currentTypeDecl =
+          currentTypeDecl.vertices(Direction.OUT, EdgeTypes.ALIAS_OF).next.asInstanceOf[nodes.Type]
+            .vertices(Direction.OUT, EdgeTypes.REF).next.asInstanceOf[nodes.TypeDecl]
+      }
+      currentTypeDecl
+    })
+  }
+
+  /**
+    *  Direct alias type declarations.
+    */
+  def aliasTypeDecl: TypeDecl[Labels] = {
+    referencingType.aliasTypeDecl
+  }
+
+  /**
+    *  Direct and transitive alias type declarations.
+    */
+  def alisTypeDeclTransitive: TypeDecl[Labels] = {
+    repeat(_.aliasTypeDecl).emit()
+  }
 }

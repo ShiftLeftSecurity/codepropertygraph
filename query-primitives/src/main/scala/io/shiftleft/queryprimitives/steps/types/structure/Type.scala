@@ -81,6 +81,27 @@ class Type[Labels <: HList](raw: GremlinScala.Aux[nodes.Type, Labels])
   def derivedTypeDecl: TypeDecl[Labels] =
     new TypeDecl[Labels](raw.in(EdgeTypes.INHERITS_FROM).cast[nodes.TypeDecl])
 
+  /**
+    * Direct alias type declarations.
+    */
+  def aliasTypeDecl: TypeDecl[Labels] = {
+    new TypeDecl[Labels](raw.in(EdgeTypes.ALIAS_OF).cast[nodes.TypeDecl])
+  }
+
+  /**
+    * Direct alias types.
+    */
+  def aliasType: Type[Labels] = {
+    aliasTypeDecl.referencingType
+  }
+
+  /**
+    * Direct and transitive alias types.
+    */
+  def aliasTypeTransitive: Type[Labels] = {
+    repeat(_.aliasType).emit()
+  }
+
   def localsOfType: Local[Labels] =
     new Local[Labels](raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
 
