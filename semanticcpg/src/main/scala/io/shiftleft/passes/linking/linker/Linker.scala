@@ -106,6 +106,18 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
       dstGraph
     )
 
+    linkToMultiple(
+      srcLabels = List(NodeTypes.TYPE_DECL),
+      dstNodeLabel = NodeTypes.TYPE,
+      edgeType = EdgeTypes.ALIAS_OF,
+      dstNodeIdMap = typeFullNameToNodeId,
+      getDstFullNames = (srcNode: nodes.TypeDecl) => {
+        srcNode.aliasTypeFullName
+      },
+      dstFullNameKey = NodeKeyNames.ALIAS_TYPE_FULL_NAME,
+      dstGraph
+    )
+
     Iterator(dstGraph)
   }
 
