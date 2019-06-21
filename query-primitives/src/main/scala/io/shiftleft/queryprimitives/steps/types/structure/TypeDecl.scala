@@ -128,10 +128,15 @@ class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDecl, Labels])
     * else unchanged.
     */
   def unravelAlias: TypeDecl[Labels] = {
-    new TypeDecl[Labels](raw.map{ typeDecl =>
+    new TypeDecl[Labels](raw.map { typeDecl =>
       if (typeDecl.aliasTypeFullName.isDefined) {
-        typeDecl.vertices(Direction.OUT, EdgeTypes.ALIAS_OF).next.asInstanceOf[nodes.Type]
-          .vertices(Direction.OUT, EdgeTypes.REF).next.asInstanceOf[nodes.TypeDecl]
+        typeDecl
+          .vertices(Direction.OUT, EdgeTypes.ALIAS_OF)
+          .next
+          .asInstanceOf[nodes.Type]
+          .vertices(Direction.OUT, EdgeTypes.REF)
+          .next
+          .asInstanceOf[nodes.TypeDecl]
       } else {
         typeDecl
       }
@@ -151,9 +156,13 @@ class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDecl, Labels])
     new TypeDecl[Labels](raw.map { typeDecl =>
       var currentTypeDecl = typeDecl
       while (currentTypeDecl.aliasTypeFullName.isDefined) {
-        currentTypeDecl =
-          currentTypeDecl.vertices(Direction.OUT, EdgeTypes.ALIAS_OF).next.asInstanceOf[nodes.Type]
-            .vertices(Direction.OUT, EdgeTypes.REF).next.asInstanceOf[nodes.TypeDecl]
+        currentTypeDecl = currentTypeDecl
+          .vertices(Direction.OUT, EdgeTypes.ALIAS_OF)
+          .next
+          .asInstanceOf[nodes.Type]
+          .vertices(Direction.OUT, EdgeTypes.REF)
+          .next
+          .asInstanceOf[nodes.TypeDecl]
       }
       currentTypeDecl
     })
