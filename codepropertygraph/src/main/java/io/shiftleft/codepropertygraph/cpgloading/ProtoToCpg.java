@@ -1,23 +1,20 @@
 package io.shiftleft.codepropertygraph.cpgloading;
 
 import io.shiftleft.codepropertygraph.Cpg;
-import io.shiftleft.codepropertygraph.generated.NodeTypes;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.Property;
-import io.shiftleft.proto.cpg.Cpg.PropertyValue;
-import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase;
-
 import org.apache.commons.configuration.Configuration;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
-import scala.None;
-import scala.None$;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 public class ProtoToCpg extends ProtoToX<Cpg> {
 
@@ -44,11 +41,11 @@ public class ProtoToCpg extends ProtoToX<Cpg> {
     this.tinkerGraph = TinkerGraph.open(
       configuration,
       io.shiftleft.codepropertygraph.generated.nodes.Factories$.MODULE$.AllAsJava(),
-      io.shiftleft.codepropertygraph.generated.edges.Factories$.MODULE$.AllAsJava()); 
+      io.shiftleft.codepropertygraph.generated.edges.Factories$.MODULE$.AllAsJava());
   }
 
   @Override
-  public void addNodes(Iterable<Node> nodes) {
+  public void addNodes(Collection<Node> nodes) {
     for (Node node : nodes) {
       try {
         if (nodeFilter.filterNode(node)) {
@@ -71,7 +68,7 @@ public class ProtoToCpg extends ProtoToX<Cpg> {
   }
 
   @Override
-  public void addEdges(Iterable<Edge> protoEdges) {
+  public void addEdges(Collection<Edge> protoEdges) {
     for (Edge edge : protoEdges) {
       long srcNodeId = edge.getSrc();
       long dstNodeId = edge.getDst();
@@ -99,9 +96,9 @@ public class ProtoToCpg extends ProtoToX<Cpg> {
         srcVertex.addEdge(edge.getType().name(), dstVertex, keyValues.toArray());
       } catch (IllegalArgumentException exception) {
         String context = "label=" + edge.getType().name() +
-          ", srcNodeId=" + srcNodeId + 
-          ", dstNodeId=" + dstNodeId + 
-          ", srcVertex=" + srcVertex + 
+          ", srcNodeId=" + srcNodeId +
+          ", dstNodeId=" + dstNodeId +
+          ", srcVertex=" + srcVertex +
           ", dstVertex=" + dstVertex;
         logger.warn("Failed to insert an edge. context: " + context, exception);
         continue;
