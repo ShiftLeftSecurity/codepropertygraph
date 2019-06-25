@@ -3,7 +3,6 @@ inThisBuild(
   List(
     organization := "io.shiftleft",
     scalaVersion := "2.12.8",
-    libraryDependencies += "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.11.2" % Runtime, //redirect tinkerpop's slf4j logging to log4j. TODO: move everything to slf4j and drop this
     resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,

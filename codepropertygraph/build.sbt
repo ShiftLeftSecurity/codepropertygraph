@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0",
   "org.apache.logging.log4j" % "log4j-api" % "2.11.0",
   "org.apache.logging.log4j" % "log4j-core" % "2.11.0",
+  "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.11.2" % Runtime, //redirect tinkerpop's slf4j logging to log4j
   "org.scalatest" %% "scalatest" % "3.0.3" % Test
 )
 
