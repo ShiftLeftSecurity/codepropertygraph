@@ -25,10 +25,12 @@ object ProtoToOverflowDb extends App {
   type NodeId = java.lang.Long
   type EdgeLabel = String
 
-  val logger = LogManager.getLogger(getClass)
-  val edgeSerializer = new ProtoEdgeSerializer
+  private lazy val logger = LogManager.getLogger(getClass)
+  private lazy val edgeSerializer = new ProtoEdgeSerializer
 
-  parseConfig.map { config =>
+  parseConfig.map(run)
+
+  def run(config: Config): File = {
     val writeTo = config.writeTo.getOrElse(new File("overflowdb.bin"))
     logger.info(s"running ProtoToOverflowDb with cpg=${config.cpg}; writing results to $writeTo")
     if (writeTo.exists) writeTo.delete()
@@ -41,15 +43,16 @@ object ProtoToOverflowDb extends App {
         tempDir.listFiles.filter(_.isFile).par.foreach(importProtoBin(overflowDb))
       }
       logger.info("OverflowDb construction finished in " + (System.currentTimeMillis - start) + "ms.")
+      writeTo
     } finally ProtoCpgLoader.removeTemporaryDirectory(tempDir)
   }
 
-  def importProtoBin(overflowDb: OndiskOverflow)(protoFile: File): Unit =
+  private def importProtoBin(overflowDb: OndiskOverflow)(protoFile: File): Unit =
     for (inputStream <- managed(new FileInputStream(protoFile))) {
       importCpgStruct(CpgStruct.parseFrom(inputStream), overflowDb)
     }
 
-  def importCpgStruct(cpgProto: CpgStruct, overflowDb: OndiskOverflow): Unit = {
+  private def importCpgStruct(cpgProto: CpgStruct, overflowDb: OndiskOverflow): Unit = {
     /** cpg proto nodes don't know their adjacent edges, but those are required for the OverflowDb serializer,
       * so we need to build some helper maps to import the nodes */
     val inEdgesByNodeId: JMap[NodeId, JMap[EdgeLabel, TLongSet]] = new JHashMap
@@ -71,11 +74,11 @@ object ProtoToOverflowDb extends App {
 
     val nodeSerializer = new ProtoNodeSerializer(inEdgesByNodeId, outEdgesByNodeId)
     cpgProto.getNodeList.asScala.par.foreach { node =>
-      overflowDb.getEdgeMVMap.put(node.getKey, nodeSerializer.serialize(node))
+      overflowDb.getVertexMVMap.put(node.getKey, nodeSerializer.serialize(node))
     }
   }
 
-  def parseConfig: Option[Config] = {
+  private def parseConfig: Option[Config] = {
     new scopt.OptionParser[Config](getClass.getSimpleName) {
       opt[File]("cpg").required
         .action((x, c) => c.copy(cpg = x))
