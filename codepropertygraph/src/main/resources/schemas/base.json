@@ -45,7 +45,8 @@
         {"id": 55, "name" : "METHOD_INST_FULL_NAME", "comment" : "The FULL_NAME of a method instance. Used to link CALL and METHOD_REF nodes to METHOD_INST nodes. There needs to be at least one METHOD_INST node for each METHOD_INST_FULL_NAME", "valueType" : "string", "cardinality" : "one"},
         {"id": 56, "name" : "AST_PARENT_TYPE", "comment" : "The type of the AST parent. Since this is only used in some parts of the graph the list does not include all possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK", "valueType" : "string", "cardinality" : "one"},
         {"id": 57, "name" : "AST_PARENT_FULL_NAME", "comment" : "The FULL_NAME of a the AST parent of an entity", "valueType" : "string", "cardinality" : "one"},
-        {"id": 158, "name" : "ALIAS_TYPE_FULL_NAME", "comment" : "Type full name of which a TYPE_DECL is an alias of", "valueType" : "string", "cardinality" : "zeroOrOne"}
+        {"id": 158, "name" : "ALIAS_TYPE_FULL_NAME", "comment" : "Type full name of which a TYPE_DECL is an alias of", "valueType" : "string", "cardinality" : "zeroOrOne"},
+        {"id": 159, "name" : "CLOSURE_ORIGINAL_NAME", "comment" : "The original name of the (potentially mangled) captured variable", "valueType" : "string", "cardinality" : "zeroOrOne"}
     ],
 
     // Keys for edge properties
