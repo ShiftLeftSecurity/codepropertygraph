@@ -5,6 +5,8 @@ import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.Property;
 import org.apache.commons.configuration.Configuration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
@@ -16,8 +18,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-public class ProtoToCpg extends ProtoToX<Cpg> {
-
+public class ProtoToCpg {
+  private Logger logger = LogManager.getLogger(getClass());
+  private NodeFilter nodeFilter = new NodeFilter();
   private TinkerGraph tinkerGraph;
 
   public ProtoToCpg() {
@@ -44,7 +47,6 @@ public class ProtoToCpg extends ProtoToX<Cpg> {
       io.shiftleft.codepropertygraph.generated.edges.Factories$.MODULE$.AllAsJava());
   }
 
-  @Override
   public void addNodes(Collection<Node> nodes) {
     for (Node node : nodes) {
       try {
@@ -67,7 +69,6 @@ public class ProtoToCpg extends ProtoToX<Cpg> {
     }
   }
 
-  @Override
   public void addEdges(Collection<Edge> protoEdges) {
     for (Edge edge : protoEdges) {
       long srcNodeId = edge.getSrc();
@@ -107,8 +108,7 @@ public class ProtoToCpg extends ProtoToX<Cpg> {
   }
 
   public static void addProperties(ArrayList<Object> tinkerKeyValues, String name, io.shiftleft.proto.cpg.Cpg.PropertyValue propertyValue) {
-    io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase valueCase = propertyValue.getValueCase();
-    switch(valueCase) {
+    switch(propertyValue.getValueCase()) {
       case INT_VALUE:
         tinkerKeyValues.add(name);
         tinkerKeyValues.add(propertyValue.getIntValue());
@@ -130,11 +130,10 @@ public class ProtoToCpg extends ProtoToX<Cpg> {
       case VALUE_NOT_SET:
         break;
       default:
-        throw new RuntimeException("Error: unsupported property case: " + valueCase.name());
+        throw new RuntimeException("Error: unsupported property case: " + propertyValue.getValueCase().name());
     }
   }
 
-  @Override
   public Cpg build() {
     return new Cpg(tinkerGraph);
   }
