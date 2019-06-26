@@ -6,7 +6,7 @@
       ]
     },
     {"id":334, "name":"CLOSURE_BINDING",
-      "keys": [ "CLOSURE_BINDING_ID", "EVALUATION_STRATEGY" ],
+      "keys": [ "CLOSURE_BINDING_ID", "EVALUATION_STRATEGY", "CLOSURE_ORIGINAL_NAME" ],
       "comment":"Represents the binding of a LOCAL or METHOD_PARAMETER_IN into the closure of a method",
       "outEdges": [
         {"edgeName": "REF", "inNodes": ["LOCAL", "METHOD_PARAMETER_IN"]}
