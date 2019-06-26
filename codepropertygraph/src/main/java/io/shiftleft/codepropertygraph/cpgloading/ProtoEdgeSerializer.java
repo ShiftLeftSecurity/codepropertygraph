@@ -69,4 +69,5 @@ public class ProtoEdgeSerializer extends Serializer<ProtoEdgeWithId> {
     adjacentNodeIds.put(direction.name(), nodeIds);
     return adjacentNodeIds;
   }
+
 }

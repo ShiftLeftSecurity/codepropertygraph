@@ -10,6 +10,7 @@ import io.shiftleft.proto.cpg.Cpg.CpgStruct
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.tinkergraph.storage.OndiskOverflow
 import scala.collection.JavaConverters._
+import resource.managed
 
 /**
   * converts cpg.bin.zip proto to OverflowDb, so we don't need to first import into Tinkergraph and then serialize it out again
@@ -30,27 +31,23 @@ object ProtoToOverflowDb extends App {
   parseConfig.map { config =>
     val writeTo = config.writeTo.getOrElse(new File("overflowdb.bin"))
     logger.info(s"running ProtoToOverflowDb with cpg=${config.cpg}; writing results to $writeTo")
-    if (writeTo.exists()) writeTo.delete()
+    if (writeTo.exists) writeTo.delete()
+    val start = System.currentTimeMillis
 
     val tempDir = Files.createTempDirectory("cpg2sp_proto").toFile
     try {
       ProtoCpgLoader.extractIntoTemporaryDirectory(config.cpg.getAbsolutePath, tempDir.getAbsolutePath)
-      val start = System.currentTimeMillis
-      val overflowDb = OndiskOverflow.createWithSpecificLocation(writeTo)
-
-      tempDir.listFiles.filter(_.isFile).par.foreach { protoFile =>
-        val inputStream = new FileInputStream(protoFile)
-        importCpgStruct(CpgStruct.parseFrom(inputStream), overflowDb)
-        inputStream.close()
+      for (overflowDb <- managed(OndiskOverflow.createWithSpecificLocation(writeTo))) {
+        tempDir.listFiles.filter(_.isFile).par.foreach(importProtoBin(overflowDb))
       }
-
-      overflowDb.close()
       logger.info("OverflowDb construction finished in " + (System.currentTimeMillis - start) + "ms.")
-    } catch {
-      case exception: IOException =>
-        throw new RuntimeException(exception)
     } finally ProtoCpgLoader.removeTemporaryDirectory(tempDir)
   }
+
+  def importProtoBin(overflowDb: OndiskOverflow)(protoFile: File): Unit =
+    for (inputStream <- managed(new FileInputStream(protoFile))) {
+      importCpgStruct(CpgStruct.parseFrom(inputStream), overflowDb)
+    }
 
   def importCpgStruct(cpgProto: CpgStruct, overflowDb: OndiskOverflow): Unit = {
     /** cpg proto nodes don't know their adjacent edges, but those are required for the OverflowDb serializer,
