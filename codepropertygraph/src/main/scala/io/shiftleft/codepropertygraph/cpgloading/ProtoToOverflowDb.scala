@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import java.io.{File, FileInputStream, IOException}
+import java.io.{File, FileInputStream}
 import java.nio.file.Files
 import java.util.{HashMap => JHashMap, Map => JMap}
 
@@ -9,6 +9,7 @@ import gnu.trove.set.hash.TLongHashSet
 import io.shiftleft.proto.cpg.Cpg.CpgStruct
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.tinkergraph.storage.OndiskOverflow
+
 import scala.collection.JavaConverters._
 import resource.managed
 
@@ -27,6 +28,7 @@ object ProtoToOverflowDb extends App {
 
   private lazy val logger = LogManager.getLogger(getClass)
   private lazy val edgeSerializer = new ProtoEdgeSerializer
+  private lazy val nodeFilter = new NodeFilter
 
   parseConfig.map(run)
 
@@ -73,7 +75,7 @@ object ProtoToOverflowDb extends App {
     }
 
     val nodeSerializer = new ProtoNodeSerializer(inEdgesByNodeId, outEdgesByNodeId)
-    cpgProto.getNodeList.asScala.par.foreach { node =>
+    cpgProto.getNodeList.asScala.par.filter(nodeFilter.filterNode).foreach { node =>
       overflowDb.getVertexMVMap.put(node.getKey, nodeSerializer.serialize(node))
     }
   }
