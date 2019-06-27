@@ -52,7 +52,7 @@ public class ProtoCpgLoader {
     }
   }
 
-  private static void extractIntoTemporaryDirectory(String filename, String tempDirPathName)
+  public static void extractIntoTemporaryDirectory(String filename, String tempDirPathName)
       throws IOException {
     long start = System.currentTimeMillis();
     new ZipArchive(filename).unzip(tempDirPathName);
@@ -60,7 +60,7 @@ public class ProtoCpgLoader {
          (System.currentTimeMillis() - start) + "ms.");
   }
 
-  private static void removeTemporaryDirectory(File tempDir) {
+  public static void removeTemporaryDirectory(File tempDir) {
     try {
       if (tempDir != null) {
         FileUtils.deleteDirectory(tempDir);

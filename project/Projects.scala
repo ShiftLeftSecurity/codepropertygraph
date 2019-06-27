@@ -10,4 +10,5 @@ object Projects {
   lazy val dataflowengine = project.in(file("dataflowengine"))
   lazy val cpgserver = project.in(file("cpgserver"))
   lazy val cpgvalidator = project.in(file("cpgvalidator"))
+  lazy val cpg2overflowdb = project.in(file("cpg2overflowdb"))
 }
