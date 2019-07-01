@@ -164,7 +164,7 @@
          ]
         },
         {"id": 15, "name" : "CALL",
-         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "DISPATCH_TYPE", "SIGNATURE", "TYPE_FULL_NAME", "METHOD_INST_FULL_NAME", "LINE_NUMBER",
+         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "DISPATCH_TYPE", "SIGNATURE", "TYPE_FULL_NAME", "LINE_NUMBER",
                   "COLUMN_NUMBER"],
          "comment" : "A (method)-call",
          "is": ["EXPRESSION", "CALL_REPR"],

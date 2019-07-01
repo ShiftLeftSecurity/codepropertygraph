@@ -44,15 +44,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     )
 
     linkToSingle(
-      srcLabels = List(NodeTypes.CALL),
-      dstNodeLabel = NodeTypes.METHOD_INST,
-      edgeType = EdgeTypes.CALL,
-      dstNodeMap = methodInstFullNameToNode,
-      dstFullNameKey = nodes.Call.Keys.MethodInstFullName,
-      dstGraph
-    )
-
-    linkToSingle(
       srcLabels = List(NodeTypes.METHOD_INST),
       dstNodeLabel = NodeTypes.METHOD,
       edgeType = EdgeTypes.REF,

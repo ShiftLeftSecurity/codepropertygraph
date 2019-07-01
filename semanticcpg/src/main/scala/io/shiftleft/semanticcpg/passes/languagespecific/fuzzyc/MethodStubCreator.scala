@@ -110,12 +110,15 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
       }
       .exec()
 
+    // TODO find other way to count arguments.
+    /*
     cpg.call
       .sideEffect { call =>
         methodInstFullNameToParameterCount +=
-          call.methodInstFullName -> call.vertices(Direction.OUT, EdgeTypes.AST).asScala.size
+          //call.methodInstFullName -> call.vertices(Direction.OUT, EdgeTypes.AST).asScala.size
       }
       .exec()
+     */
   }
 }
 
