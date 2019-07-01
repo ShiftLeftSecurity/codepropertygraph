@@ -52,6 +52,27 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstGraph
     )
 
+    def linkCall(call: nodes.Call): Unit = {
+      val receiver = call.vertices(Direction.OUT, EdgeTypes.RECEIVER).next
+      val receiverTypeDecl = receiver.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).next
+        .vertices(Direction.OUT, EdgeTypes.REF).next
+
+      val resolvedMethodOption =
+        receiverTypeDecl.vertices(Direction.OUT, EdgeTypes.VTABLE).asScala.collectFirst {
+          case method: nodes.Method
+            if method.name.equals(call.name) && method.signature.equals(call.signature) =>
+            method
+        }
+
+      resolvedMethodOption match {
+        case Some(method) =>
+          val methodInstNodeId = methodInstFullNameToNodeId.get(method.fullName).get
+          dstGraph.addEdgeInOriginal(call, lookupNode(methodInstNodeId).get, EdgeTypes.CALL)
+        case None =>
+      }
+    }
+
+
     linkToSingle(
       srcLabels = List(
         NodeTypes.METHOD_PARAMETER_IN,
