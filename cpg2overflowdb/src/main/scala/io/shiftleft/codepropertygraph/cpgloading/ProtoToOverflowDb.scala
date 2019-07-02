@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
 import java.io.{File, FileInputStream}
-import java.nio.file.Files
+import java.nio.file.{Files, Path}
 import java.util.{HashMap => JHashMap, Map => JMap}
 
 import gnu.trove.set.TLongSet
@@ -38,19 +38,16 @@ object ProtoToOverflowDb extends App {
     if (writeTo.exists) writeTo.delete()
     val start = System.currentTimeMillis
 
-    val tempDir = Files.createTempDirectory("cpg2sp_proto").toFile
-    try {
-      ProtoCpgLoader.extractIntoTemporaryDirectory(config.cpg.getAbsolutePath, tempDir.getAbsolutePath)
-      for (overflowDb <- managed(OndiskOverflow.createWithSpecificLocation(writeTo))) {
-        tempDir.listFiles.filter(_.isFile).par.foreach(importProtoBin(overflowDb))
-      }
-      logger.info("OverflowDb construction finished in " + (System.currentTimeMillis - start) + "ms.")
-      writeTo
-    } finally ProtoCpgLoader.removeTemporaryDirectory(tempDir)
+    for (overflowDb <- managed(OndiskOverflow.createWithSpecificLocation(writeTo));
+         zipArchive <- managed(new ZipArchive(config.cpg.getAbsolutePath))) {
+      zipArchive.getFileEntries.asScala.par.foreach(importProtoBin(overflowDb))
+    }
+    logger.info("OverflowDb construction finished in " + (System.currentTimeMillis - start) + "ms.")
+    writeTo
   }
 
-  private def importProtoBin(overflowDb: OndiskOverflow)(protoFile: File): Unit =
-    for (inputStream <- managed(new FileInputStream(protoFile))) {
+  private def importProtoBin(overflowDb: OndiskOverflow)(protoFile: Path): Unit =
+    for (inputStream <- managed(Files.newInputStream(protoFile))) {
       importCpgStruct(CpgStruct.parseFrom(inputStream), overflowDb)
     }
 
