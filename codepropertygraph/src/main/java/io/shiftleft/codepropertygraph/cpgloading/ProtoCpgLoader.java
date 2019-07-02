@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
@@ -33,143 +34,67 @@ public class ProtoCpgLoader {
   public static Cpg loadFromProtoZip(
     String filename,
     Optional<OnDiskOverflowConfig> onDiskOverflowConfig) {
-    File tempDir = null;
     try {
-      tempDir = Files.createTempDirectory("cpg2sp_proto").toFile();
-      String tempDirPathName = tempDir.getAbsolutePath();
-      extractIntoTemporaryDirectory(filename, tempDirPathName);
+      ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig);
+
       long start;
       start = System.currentTimeMillis();
-      Cpg cpg = ProtoCpgLoader.loadFromProtobufDirectory(tempDirPathName, onDiskOverflowConfig);
+
+      try (ZipArchive zip = new ZipArchive(filename)) {
+        for (Path entry: zip.getFileEntries()) {
+          InputStream inputStream = Files.newInputStream(entry);
+          builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList());
+          inputStream.close();
+        }
+      }
+
+      /** second pass so we can stream for the edges
+       * -> holding them all in memory is potentially too much
+       * -> adding them as we go isn't an option because we may only have one of the adjacent vertices */
+      try (ZipArchive zip = new ZipArchive(filename)) {
+        for (Path entry: zip.getFileEntries()) {
+          InputStream inputStream = Files.newInputStream(entry);
+          builder.addEdges(getNextProtoCpgFromStream(inputStream).getEdgeList());
+          inputStream.close();
+        }
+      }
+
+      Cpg cpg = builder.build();
       logger.info("CPG construction finished in " +
           (System.currentTimeMillis() - start) + "ms.");
 
       return cpg;
     } catch (IOException exception) {
       throw new RuntimeException(exception);
-    } finally {
-      removeTemporaryDirectory(tempDir);
-    }
-  }
-
-  public static void extractIntoTemporaryDirectory(String filename, String tempDirPathName)
-      throws IOException {
-    long start = System.currentTimeMillis();
-    new ZipArchive(filename).unzip(tempDirPathName);
-    logger.info("Unzipping completed in " +
-         (System.currentTimeMillis() - start) + "ms.");
-  }
-
-  public static void removeTemporaryDirectory(File tempDir) {
-    try {
-      if (tempDir != null) {
-        FileUtils.deleteDirectory(tempDir);
-      }
-    } catch (IOException exception) {
-      logger.warn("Unable to remove temporary directory: " + tempDir);
     }
   }
 
   public static List<CpgOverlay> loadOverlays(String filename) {
-    File tempDir = null;
-    try {
-      tempDir = Files.createTempDirectory("cpg2sp_proto_overlay").toFile();
-      String tempDirPathName = tempDir.getAbsolutePath();
-      extractIntoTemporaryDirectory(filename, tempDirPathName);
-      return ProtoCpgLoader.loadOverlaysFromProtobufDirectory(tempDirPathName);
+    try (ZipArchive zip = new ZipArchive(filename)) {
+      List<CpgOverlay> cpgOverlays = new ArrayList<>();
+
+      List<Path> filesInDirectory = new ArrayList<>(zip.getFileEntries());
+      filesInDirectory.sort( (path1, path2) -> {
+            String[] file1Split = path1.toString().split("_");
+            String[] file2Split = path2.toString().split("_");
+            if (file1Split.length < 2 || file2Split.length < 2) {
+              return (path1.toString().compareTo(path2.toString()));
+            }
+            return (Integer.parseInt(file1Split[0]) - Integer.parseInt(file2Split[0]));
+          }
+      );
+
+      for (Path path : filesInDirectory) {
+        InputStream inputStream = Files.newInputStream(path);
+        CpgOverlay cpgOverlay = CpgOverlay.parseFrom(inputStream);
+        inputStream.close();
+        cpgOverlays.add(cpgOverlay);
+      }
+      return cpgOverlays;
     } catch (IOException e) {
       e.printStackTrace();
-    } finally {
-      removeTemporaryDirectory(tempDir);
     }
     return new ArrayList<>();
-  }
-
-  private static List<CpgOverlay> loadOverlaysFromProtobufDirectory(String inputDirectory)
-      throws IOException {
-    List<CpgOverlay> cpgOverlays = new ArrayList<>();
-
-    List<File> filesInDirectory = getFilesInDirectory(new File(inputDirectory));
-    filesInDirectory.sort( (file1, file2) -> {
-          String[] file1Split = file1.getName().split("_");
-          String[] file2Split = file2.getName().split("_");
-          if (file1Split.length < 2 || file2Split.length < 2) {
-            return (file1.getName().compareTo(file2.getName()));
-          }
-          return (Integer.parseInt(file1Split[0]) - Integer.parseInt(file2Split[0]));
-        }
-    );
-
-    for (File file : filesInDirectory) {
-      FileInputStream inputStream = new FileInputStream(file);
-      CpgOverlay cpgOverlay = CpgOverlay.parseFrom(inputStream);
-      inputStream.close();
-      cpgOverlays.add(cpgOverlay);
-    }
-    return cpgOverlays;
-  }
-
-
-  /**
-   * Load Code Property Graph from a directory containing
-   * CPGs in proto format.
-   **/
-  public static Cpg loadFromProtobufDirectory(
-    String inputDirectory,
-    Optional<OnDiskOverflowConfig> onDiskOverflowConfig)
-      throws IOException {
-    ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig);
-    for (File file : getFilesInDirectory(new File(inputDirectory))) {
-      // TODO: use ".bin" extensions in proto output, and then only
-      // load files with ".bin" extension here.
-      FileInputStream inputStream = new FileInputStream(file);
-      builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList());
-      inputStream.close();
-    }
-
-    /** second pass so we can stream for the edges
-     * -> holding them all in memory is potentially too much
-     * -> adding them as we go isn't an option because we may only have one of the adjacent vertices */
-    for (File file : getFilesInDirectory(new File(inputDirectory))) {
-      // TODO: use ".bin" extensions in proto output, and then only
-      // load files with ".bin" extension here.
-      FileInputStream inputStream = new FileInputStream(file);
-      builder.addEdges(getNextProtoCpgFromStream(inputStream).getEdgeList());
-      inputStream.close();
-    }
-
-    return builder.build();
-  }
-
-  public static Cpg loadFromInputStream(
-    InputStream inputStream,
-    Optional<OnDiskOverflowConfig> onDiskOverflowConfig) throws IOException {
-    ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig);
-    try {
-      consumeInputStream(builder, inputStream);
-    } finally {
-      closeProtoStream(inputStream);
-    }
-    return builder.build();
-  }
-
-  private static List<File> getFilesInDirectory(File directory) {
-    File[] files = directory.listFiles();
-    return Arrays.stream(files).filter(File::isFile).collect(Collectors.toList());
-  }
-
-  private static List<Edge> consumeInputStreamNodes(ProtoToCpg builder,
-                                                    InputStream inputStream)
-          throws IOException {
-    CpgStruct cpgStruct = getNextProtoCpgFromStream(inputStream);
-    builder.addNodes(cpgStruct.getNodeList());
-    return cpgStruct.getEdgeList();
-  }
-
-  private static void consumeInputStream(ProtoToCpg builder,
-                                         InputStream inputStream)
-      throws IOException {
-    builder.addEdges(consumeInputStreamNodes(builder, inputStream));
   }
 
   /**
@@ -191,14 +116,6 @@ public class ProtoCpgLoader {
   private static CpgStruct getNextProtoCpgFromStream(InputStream inputStream)
       throws IOException {
     return CpgStruct.parseFrom(inputStream);
-  }
-
-  private static void closeProtoStream(InputStream inputStream) {
-    try {
-      inputStream.close();
-    } catch (IOException exception) {
-      throw new RuntimeException(exception);
-    }
   }
 
 }
