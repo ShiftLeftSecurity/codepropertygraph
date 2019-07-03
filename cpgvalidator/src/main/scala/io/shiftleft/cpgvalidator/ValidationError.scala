@@ -38,7 +38,7 @@ case class EdgeDegreeError(node: Vertex,
   }
 
   override def getCategory: ValidationErrorCategory = {
-    EdgeDegreeErrorCatergory(this)
+    EdgeDegreeErrorCategory(this)
   }
 }
 
