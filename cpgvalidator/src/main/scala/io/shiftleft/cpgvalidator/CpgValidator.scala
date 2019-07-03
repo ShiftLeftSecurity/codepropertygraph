@@ -3,7 +3,6 @@ package io.shiftleft.cpgvalidator
 import io.shiftleft.codepropertygraph.Cpg
 import gremlin.scala.{Edge, Vertex}
 import io.shiftleft.cpgvalidator.FactConstructionClasses.{InFact, OutFact}
-import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
