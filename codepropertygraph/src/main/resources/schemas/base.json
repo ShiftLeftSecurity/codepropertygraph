@@ -157,7 +157,7 @@
         // Nodes that describe method content
 
         {"id" : 8, "name" : "LITERAL",
-         "keys" : ["CODE", /* DEPRECATED */"NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys" : ["CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "Literal/Constant",
          "is": ["EXPRESSION"],
          "outEdges" : [
