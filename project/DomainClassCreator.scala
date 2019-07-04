@@ -54,7 +54,7 @@ object DomainClassCreator {
       import java.util.{Set => JSet}
       import org.apache.tinkerpop.gremlin.structure.Property
       import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
-      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{EdgeRef, SpecializedElementFactory, SpecializedTinkerEdge, TinkerGraph, TinkerProperty, TinkerVertex, VertexRef}
+      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{EdgeRef, SpecializedElementFactory, SpecializedTinkerEdge, TinkerGraph, TinkerProperty, VertexRef}
       import scala.collection.JavaConverters._
       import org.slf4j.LoggerFactory
 
@@ -110,12 +110,12 @@ object DomainClassCreator {
       |  val Factory = new SpecializedElementFactory.ForEdge[${edgeClassNameDb}] {
       |    override val forLabel = $edgeClassName.Label
       |
-      |    override def createEdge(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: TinkerVertex], inVertex: VertexRef[_ <: TinkerVertex]) =
+      |    override def createEdge(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: Vertex], inVertex: VertexRef[_ <: Vertex]) =
       |      new ${edgeClassNameDb}(graph, id, outVertex, inVertex)
       |
       |    override def createEdgeRef(edge: ${edgeClassNameDb}) = ${edgeClassName}(edge)
       |
-      |    override def createEdgeRef(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: TinkerVertex], inVertex: VertexRef[_ <: TinkerVertex]) = 
+      |    override def createEdgeRef(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: Vertex], inVertex: VertexRef[_ <: Vertex]) = 
       |      ${edgeClassName}(id, graph)
       |  }
       |
@@ -189,7 +189,7 @@ object DomainClassCreator {
       import java.lang.{Boolean => JBoolean, Long => JLong}
       import java.util.{Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
       import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
-      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{SpecializedElementFactory, SpecializedTinkerVertex, TinkerGraph, TinkerVertexProperty, VertexRef}
+      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{SpecializedElementFactory, SpecializedTinkerVertex, TinkerGraph, SpecializedVertexProperty, VertexRef}
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
       import scala.collection.JavaConverters._
       import org.slf4j.LoggerFactory
@@ -514,7 +514,7 @@ object DomainClassCreator {
       }
 
       class ${nodeType.classNameDb}(_id: JLong, _graph: TinkerGraph)
-          extends SpecializedTinkerVertex(_id, ${nodeType.className}.Label, _graph) with StoredNode $mixinTraits with ${nodeType.className}Base {
+          extends SpecializedTinkerVertex(_id, _graph) with StoredNode $mixinTraits with ${nodeType.className}Base {
 
         override def allowedInEdgeLabels() = ${nodeType.className}.Edges.In.asJava
         override def allowedOutEdgeLabels() = ${nodeType.className}.Edges.Out.asJava
@@ -524,6 +524,10 @@ object DomainClassCreator {
         override def valueMap: JMap[String, AnyRef] = $valueMapImpl
 
         ${propertyBasedFields(keys)}
+      
+        override def label(): String = {
+          ${nodeType.className}.Label
+        }
 
         override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[${nodeType.classNameDb}]
         override def productElement(n: Int): Any =
@@ -543,8 +547,8 @@ object DomainClassCreator {
               fieldAccess(this) match {
                 case null | None => VertexProperty.empty[A]
                 case values: List[_] => throw Vertex.Exceptions.multiplePropertiesExistForProvidedKey(key)
-                case Some(value) => new TinkerVertexProperty(-1, this, key, value.asInstanceOf[A])
-                case value => new TinkerVertexProperty(-1, this, key, value.asInstanceOf[A])
+                case Some(value) => new SpecializedVertexProperty(-1, this, key, value.asInstanceOf[A])
+                case value => new SpecializedVertexProperty(-1, this, key, value.asInstanceOf[A])
               }
           }
         }
@@ -557,16 +561,16 @@ object DomainClassCreator {
                 case null => JCollections.emptyIterator[VertexProperty[A]]
                 case values: List[_] => 
                   values.map { value => 
-                    new TinkerVertexProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
+                    new SpecializedVertexProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
                   }.toIterator.asJava
-                case value => IteratorUtils.of(new TinkerVertexProperty(-1, this, key, value.asInstanceOf[A]))
+                case value => IteratorUtils.of(new SpecializedVertexProperty(-1, this, key, value.asInstanceOf[A]))
               }
           }
         }
 
         override protected def updateSpecificProperty[A](cardinality: VertexProperty.Cardinality, key: String, value: A): VertexProperty[A] = {
           ${updateSpecificPropertyBody(keys)}
-          new TinkerVertexProperty(-1, this, key, value)
+          new SpecializedVertexProperty(-1, this, key, value)
         }
 
         override protected def removeSpecificProperty(key: String): Unit =
