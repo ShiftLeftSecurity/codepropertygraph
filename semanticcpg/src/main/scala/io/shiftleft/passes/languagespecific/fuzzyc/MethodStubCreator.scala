@@ -64,7 +64,6 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
       None,
       None,
       None,
-      None
     )
     dstGraph.addNode(methodNode)
 
@@ -79,8 +78,6 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
         "ANY",
         None,
         None,
-        None,
-        None
       )
 
       dstGraph.addNode(methodParameterIn)
@@ -93,12 +90,11 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
       "ANY",
       None,
       None,
-      None
     )
     dstGraph.addNode(methodReturn)
     dstGraph.addEdge(methodNode, methodReturn, EdgeTypes.AST)
 
-    val blockNode = new NewBlock("", 1, 1, "ANY", None, None, None, None)
+    val blockNode = new NewBlock("", 1, 1, "ANY", None, None)
     dstGraph.addNode(blockNode)
     dstGraph.addEdge(methodNode, blockNode, EdgeTypes.AST)
 

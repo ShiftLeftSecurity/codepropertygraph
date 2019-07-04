@@ -13,9 +13,7 @@
         // Properties that indicate where the code can be found
 
         {"id" : 2, "name": "LINE_NUMBER", "comment": "Line where the code starts", "valueType" : "int", "cardinality" : "zeroOrOne"},
-        {"id" : 10, "name": "LINE_NUMBER_END", "comment" : "Line where the code ends", "valueType" : "int", "cardinality" : "zeroOrOne" },
         {"id" : 11, "name": "COLUMN_NUMBER", "comment" : "Column where the code starts", "valueType" : "int", "cardinality" : "zeroOrOne" },
-        {"id" : 12, "name": "COLUMN_NUMBER_END", "comment" : "Column where the code ends", "valueType" : "int", "cardinality" : "zeroOrOne" },
 
         {"id" : 3, "name": "PARSER_TYPE_NAME", "comment": "Type name emitted by parser, only present for logical type UNKNOWN", "valueType" : "string", "cardinality" : "one"},
         {"id" : 4, "name": "ORDER", "comment": "General ordering property. E.g. used to express the ordering of children in the AST", "valueType" : "int", "cardinality" : "one"},
@@ -82,7 +80,7 @@
 
         {"id" : 1, "name" : "METHOD",
          "keys": ["NAME", "FULL_NAME", "SIGNATURE", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME",
-           "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+           "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "A method/function/procedure",
          "is": ["DECLARATION", "CFG_NODE"],
          "outEdges" : [
@@ -93,13 +91,13 @@
         },
 
         {"id" : 34, "name" : "METHOD_PARAMETER_IN",
-         "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "This node represents a formal parameter going towards the callee side",
          "is": ["DECLARATION", "LOCAL_LIKE", "TRACKING_POINT"]
         },
 
         {"id" : 3, "name" : "METHOD_RETURN",
-         "keys": ["CODE", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys": ["CODE", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "A formal method return",
          "is": ["CFG_NODE", "TRACKING_POINT"]
         },
@@ -159,7 +157,7 @@
         // Nodes that describe method content
 
         {"id" : 8, "name" : "LITERAL",
-         "keys" : ["CODE", /* DEPRECATED */"NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys" : ["CODE", /* DEPRECATED */"NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "Literal/Constant",
          "is": ["EXPRESSION"],
          "outEdges" : [
@@ -168,7 +166,7 @@
         },
         {"id": 15, "name" : "CALL",
          "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "DISPATCH_TYPE", "SIGNATURE", "TYPE_FULL_NAME", "METHOD_INST_FULL_NAME", "LINE_NUMBER",
-                  "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+                  "COLUMN_NUMBER"],
          "comment" : "A (method)-call",
          "is": ["EXPRESSION"],
          "outEdges" : [
@@ -178,12 +176,12 @@
          ]
         },
         {"id":23, "name" : "LOCAL",
-         "keys": ["CODE", "NAME", "CLOSURE_BINDING_ID", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys": ["CODE", "NAME", "CLOSURE_BINDING_ID", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment": "A local variable",
          "is": ["DECLARATION", "LOCAL_LIKE"]
         },
         {"id":27, "name": "IDENTIFIER",
-         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "An arbitrary identifier/reference",
          "is": ["EXPRESSION", "LOCAL_LIKE"],
          "outEdges" : [
@@ -192,7 +190,7 @@
          ]
         },
         {"id":30, "name": "RETURN",
-         "keys": [ "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END", "ORDER", "ARGUMENT_INDEX", "CODE"],
+         "keys": [ "LINE_NUMBER", "COLUMN_NUMBER", "ORDER", "ARGUMENT_INDEX", "CODE"],
          "comment" : "A return instruction",
          "is": [ "EXPRESSION"],
          "outEdges" : [
@@ -201,7 +199,7 @@
          ]
         },
         {"id":31, "name": "BLOCK",
-         "keys": [ "CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys": [ "CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "A structuring block in the AST",
          "is": [ "EXPRESSION"],
          "outEdges" : [
@@ -224,7 +222,7 @@
         },
 
         {"id":333, "name":"METHOD_REF",
-          "keys": ["CODE", "ORDER", "ARGUMENT_INDEX", "METHOD_INST_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+          "keys": ["CODE", "ORDER", "ARGUMENT_INDEX", "METHOD_INST_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
           "comment":"Reference to a method instance",
          "is": ["EXPRESSION"],
           "outEdges": [
@@ -236,7 +234,7 @@
         // This is the "catch-all-others" node type.
 
         {"id" : 44, "name": "UNKNOWN",
-         "keys" : ["CODE", "PARSER_TYPE_NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"],
+         "keys" : ["CODE", "PARSER_TYPE_NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "A language-specific node",
          "is": ["EXPRESSION"],
          "outEdges" : [
@@ -253,7 +251,7 @@
       { "name" : "DECLARATION", "comment" : "", "hasKeys" : ["NAME"]},
       { "name" : "EXPRESSION", "comment" : "Expression as a specialisation of data flow objects", "hasKeys" : ["CODE", "ORDER"], "extends" : ["TRACKING_POINT", "CFG_NODE"]},
       { "name" : "LOCAL_LIKE", "comment" : "", "hasKeys" : ["NAME"]},
-      { "name" : "CFG_NODE", "comment" : "", "hasKeys" : ["LINE_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER", "COLUMN_NUMBER_END"], "extends": ["WITHIN_METHOD"]},
+      { "name" : "CFG_NODE", "comment" : "", "hasKeys" : ["LINE_NUMBER", "COLUMN_NUMBER"], "extends": ["WITHIN_METHOD"]},
       { "name" : "TRACKING_POINT", "comment" : "", "hasKeys" : [], "extends": ["WITHIN_METHOD"]},
       { "name" : "WITHIN_METHOD", "comment" : "", "hasKeys" : []}
     ],

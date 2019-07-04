@@ -41,9 +41,7 @@ class MethodDecoratorPass(graph: ScalaGraph) extends CpgPass(graph) {
               parameterIn.evaluationStrategy,
               parameterIn.typeFullName,
               parameterIn.lineNumber,
-              parameterIn.lineNumberEnd,
               parameterIn.columnNumber,
-              parameterIn.columnNumberEnd
             )
 
             val method =
