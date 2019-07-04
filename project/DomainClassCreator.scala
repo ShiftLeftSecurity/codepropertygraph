@@ -115,7 +115,7 @@ object DomainClassCreator {
       val edgeRefImpl = s"trait ${edgeClassName} extends EdgeRef[${edgeClassNameDb}]"
 
       val classImpl = s"""
-      class ${edgeClassNameDb}(private val _graph: TinkerGraph, private val _id: Long, private val _outVertex: Vertex, _inVertex: Vertex)
+      class ${edgeClassNameDb}(_graph: TinkerGraph, _id: Long, private val _outVertex: Vertex, _inVertex: Vertex)
           extends SpecializedTinkerEdge(_graph, _id, _outVertex, $edgeClassName.Label, _inVertex, $edgeClassName.Keys.All) {
 
         ${propertyBasedFields(keys)}
@@ -487,7 +487,7 @@ object DomainClassCreator {
         $abstractContainedNodeAccessors
       }
 
-      class ${nodeType.classNameDb}(private val _id: JLong, private val _graph: TinkerGraph)
+      class ${nodeType.classNameDb}(_id: JLong, _graph: TinkerGraph)
           extends SpecializedTinkerVertex(_id, ${nodeType.className}.Label, _graph) with StoredNode $mixinTraits with ${nodeType.className}Base {
 
         override def allowedInEdgeLabels() = ${nodeType.className}.Edges.In.asJava
@@ -502,7 +502,7 @@ object DomainClassCreator {
         override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[${nodeType.classNameDb}]
         override def productElement(n: Int): Any =
             n match {
-              case 0 => _id
+              case 0 => getId
               $productElementAccessors
             }
 
