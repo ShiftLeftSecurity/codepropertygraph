@@ -56,6 +56,19 @@ object DomainClassCreator {
       import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
       import org.apache.tinkerpop.gremlin.tinkergraph.structure.{EdgeRef, SpecializedElementFactory, SpecializedTinkerEdge, TinkerGraph, TinkerProperty, TinkerVertex, VertexRef}
       import scala.collection.JavaConverters._
+      import org.slf4j.LoggerFactory
+
+      object PropertyErrorRegister {
+        private var errorMap = Set[(Class[_], String)]()
+        private val logger = LoggerFactory.getLogger(getClass)
+
+        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String) {
+          if (!errorMap.contains((clazz, propertyName))) {
+            logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
+            errorMap += ((clazz, propertyName))
+          }
+        }
+      }
       """
 
       val factories = {
@@ -179,6 +192,19 @@ object DomainClassCreator {
       import org.apache.tinkerpop.gremlin.tinkergraph.structure.{SpecializedElementFactory, SpecializedTinkerVertex, TinkerGraph, TinkerVertexProperty, VertexRef}
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
       import scala.collection.JavaConverters._
+      import org.slf4j.LoggerFactory
+
+      object PropertyErrorRegister {
+        private var errorMap = Set[(Class[_], String)]()
+        private val logger = LoggerFactory.getLogger(getClass)
+
+        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String) {
+          if (!errorMap.contains((clazz, propertyName))) {
+            logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
+            errorMap += ((clazz, propertyName))
+          }
+        }
+      }
 
       trait Node extends Product {
         def accept[T](visitor: NodeVisitor[T]): T = ???
@@ -846,7 +872,7 @@ object Utils {
 
   def updateSpecificPropertyBody(properties: List[Property]): String = {
     val caseNotFound =
-      s"""throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to cpg.json")"""
+      s"""PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)"""
     properties match {
       case Nil => caseNotFound
       case keys =>
