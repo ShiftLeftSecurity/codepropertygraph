@@ -9,9 +9,19 @@ import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.tinkergraph.storage.Serializer;
 
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class ProtoEdgeSerializer extends Serializer<ProtoEdgeWithId> {
+
+  /* TODO move definition of property indices to json schema
+   * (or - better - ensure it's always in the same order when generating the cpg.proto and
+   * use the index there) */
+  final Map<String, Map<String, Integer>> propertyIndexByEdgeAndPropertyName;
+
+  public ProtoEdgeSerializer(Map<String, Map<String, Integer>> propertyIndexByEdgeAndPropertyName) {
+    this.propertyIndexByEdgeAndPropertyName = propertyIndexByEdgeAndPropertyName;
+  }
 
   @Override
   protected long getId(ProtoEdgeWithId edgeWithId) {
@@ -24,10 +34,13 @@ public class ProtoEdgeSerializer extends Serializer<ProtoEdgeWithId> {
   }
 
   @Override
-  protected Map<String, Object> getProperties(ProtoEdgeWithId edgeWithId) {
-    final Map<String, Object> propertyMap = new THashMap<>(edgeWithId.edge.getPropertyCount());
+  protected SortedMap<Integer, Object> getProperties(ProtoEdgeWithId edgeWithId) {
+    final SortedMap<Integer, Object> propertyMap = new TreeMap<>();
+    final String edgeType = edgeWithId.edge.getType().name();
+    final Map<String, Integer> propertyIndexByName = propertyIndexByEdgeAndPropertyName.get(edgeType);
+
     for (Cpg.CpgStruct.Edge.Property property : edgeWithId.edge.getPropertyList()) {
-      final String key = property.getName().name();
+      final Integer key = propertyIndexByName.get(property.getName().name());
       final Cpg.PropertyValue propertyValue = property.getValue();
       switch(propertyValue.getValueCase()) {
         case INT_VALUE:

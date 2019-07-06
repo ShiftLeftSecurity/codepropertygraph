@@ -10,14 +10,24 @@ import org.apache.tinkerpop.gremlin.tinkergraph.storage.Serializer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class ProtoNodeSerializer extends Serializer<Cpg.CpgStruct.Node> {
+
+  /* TODO move definition of property indices to json schema
+   * (or - better - ensure it's always in the same order when generating the cpg.proto and
+   * use the index there) */
+  final Map<String, Map<String, Integer>> propertyIndexByEdgeAndPropertyName;
 
   //NodeId -> EdgeLabel -> EdgeId
   private final Map<Long, Map<String, TLongSet>> inEdgesByNodeId;
   private final Map<Long, Map<String, TLongSet>> outEdgesByNodeId;
 
-  public ProtoNodeSerializer(Map<Long, Map<String, TLongSet>> inEdgesByNodeId, Map<Long, Map<String, TLongSet>> outEdgesByNodeId) {
+  public ProtoNodeSerializer(Map<String, Map<String, Integer>> propertyIndexByEdgeAndPropertyName,
+                             Map<Long, Map<String, TLongSet>> inEdgesByNodeId,
+                             Map<Long, Map<String, TLongSet>> outEdgesByNodeId) {
+    this.propertyIndexByEdgeAndPropertyName = propertyIndexByEdgeAndPropertyName;
     this.inEdgesByNodeId = inEdgesByNodeId;
     this.outEdgesByNodeId = outEdgesByNodeId;
   }
@@ -33,10 +43,13 @@ public class ProtoNodeSerializer extends Serializer<Cpg.CpgStruct.Node> {
   }
 
   @Override
-  protected Map<String, Object> getProperties(Cpg.CpgStruct.Node node) {
-    final Map<String, Object> propertyMap = new THashMap<>(node.getPropertyCount());
+  protected SortedMap<Integer, Object> getProperties(Cpg.CpgStruct.Node node) {
+    final SortedMap<Integer, Object> propertyMap = new TreeMap<>();
+    final String nodeType = node.getType().name();
+    final Map<String, Integer> propertyIndexByName = propertyIndexByEdgeAndPropertyName.get(nodeType);
+
     for (Cpg.CpgStruct.Node.Property property : node.getPropertyList()) {
-      final String key = property.getName().name();
+      final Integer key = propertyIndexByName.get(property.getName().name());
       final Cpg.PropertyValue propertyValue = property.getValue();
       switch (propertyValue.getValueCase()) {
         case INT_VALUE:

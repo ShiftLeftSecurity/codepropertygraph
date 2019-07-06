@@ -1,12 +1,13 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import java.io.{File, FileInputStream}
+import java.io.File
 import java.nio.file.{Files, Path}
 import java.util.{HashMap => JHashMap, Map => JMap}
 
 import gnu.trove.set.TLongSet
 import gnu.trove.set.hash.TLongHashSet
 import io.shiftleft.proto.cpg.Cpg.CpgStruct
+import io.shiftleft.codepropertygraph.generated.{edges, nodes}
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.tinkergraph.storage.OndiskOverflow
 
@@ -27,7 +28,20 @@ object ProtoToOverflowDb extends App {
   type EdgeLabel = String
 
   private lazy val logger = LogManager.getLogger(getClass)
-  private lazy val edgeSerializer = new ProtoEdgeSerializer
+
+  private val edgePropertyIndexByNameAndElementName: JMap[String, JMap[String, Integer]] =
+    edges.Factories.All.map { factory =>
+      (factory.forLabel, propertyIndexByName(factory.propertyNamesByIndex))
+    }.toMap.asJava
+
+  private lazy val nodePropertyIndexByNameAndElementName: JMap[String, JMap[String, Integer]] =
+    nodes.Factories.All.map { factory =>
+      (factory.forLabel, propertyIndexByName(factory.propertyNamesByIndex))
+    }.toMap.asJava
+
+  private lazy val edgeSerializer =
+    new ProtoEdgeSerializer(edgePropertyIndexByNameAndElementName)
+
   private lazy val nodeFilter = new NodeFilter
 
   parseConfig.map(run)
@@ -71,7 +85,7 @@ object ProtoToOverflowDb extends App {
       overflowDb.getEdgeMVMap.put(edgeWithId.id, edgeSerializer.serialize(edgeWithId))
     }
 
-    val nodeSerializer = new ProtoNodeSerializer(inEdgesByNodeId, outEdgesByNodeId)
+    val nodeSerializer = new ProtoNodeSerializer(nodePropertyIndexByNameAndElementName, inEdgesByNodeId, outEdgesByNodeId)
     cpgProto.getNodeList.asScala.par.filter(nodeFilter.filterNode).foreach { node =>
       overflowDb.getVertexMVMap.put(node.getKey, nodeSerializer.serialize(node))
     }
@@ -88,6 +102,13 @@ object ProtoToOverflowDb extends App {
       help("help").text("prints this usage text")
     }.parse(args, Config(cpg = null))
   }
+
+
+  private def propertyIndexByName(
+                                   propertyNamesByIndex: JMap[Integer, String]): JMap[String, Integer] =
+    propertyNamesByIndex.asScala.map {
+      case (idx, name) => (name, idx)
+    }.asJava
 
 }
 
