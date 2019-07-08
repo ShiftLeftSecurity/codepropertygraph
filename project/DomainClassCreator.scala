@@ -119,13 +119,20 @@ object DomainClassCreator {
       |      ${edgeClassName}(id, graph)
       |  }
       |
-      |  def apply(wrapped: $edgeClassNameDb) = new EdgeRef(wrapped) with $edgeClassName
-      |  def apply(id: Long, graph: TinkerGraph) = 
-      |    new EdgeRef[${edgeClassNameDb}](id, $edgeClassName.Label, graph) with $edgeClassName
+      |  def apply(wrapped: $edgeClassNameDb) =
+      |   new $edgeClassName(wrapped.id.asInstanceOf[JLong], wrapped.graph.asInstanceOf[TinkerGraph], wrapped)
+      |  def apply(id: Long, graph: TinkerGraph) = new $edgeClassName(id, graph, null)
       |}
       """.stripMargin
 
-      val edgeRefImpl = s"trait ${edgeClassName} extends EdgeRef[${edgeClassNameDb}]"
+      val edgeRefImpl =
+        s"""
+           |class ${edgeClassName}(_id: JLong, _graph: TinkerGraph, dbNode: ${edgeClassNameDb}) extends EdgeRef[${edgeClassNameDb}](_id, _graph, dbNode) {
+           |  override def label(): String = {
+           |    ${edgeClassName}.Label
+           |  }
+           |}
+           """.stripMargin
 
       val classImpl = s"""
       class ${edgeClassNameDb}(_graph: TinkerGraph, _id: Long, private val _outVertex: Vertex, _inVertex: Vertex)
@@ -365,9 +372,9 @@ object DomainClassCreator {
           override def createVertexRef(id: JLong, graph: TinkerGraph) = ${nodeType.className}(id, graph)
         }
 
-        def apply(wrapped: ${nodeType.classNameDb}) = new VertexRef(wrapped) with ${nodeType.className}
-        def apply(id: Long, graph: TinkerGraph) = 
-          new VertexRef[${nodeType.classNameDb}](id, ${nodeType.className}.Label, graph) with ${nodeType.className}
+        def apply(wrapped: ${nodeType.classNameDb}) =
+         new ${nodeType.className}(wrapped.id.asInstanceOf[JLong], wrapped.graph.asInstanceOf[TinkerGraph], wrapped)
+        def apply(id: Long, graph: TinkerGraph) = new ${nodeType.className}(id, graph, null)
       }
       """
 
@@ -492,7 +499,7 @@ object DomainClassCreator {
         }.mkString("\n")
         val containedNodesDelegators = nodeType.containedNodes
         s"""
-          |trait ${nodeType.className} extends VertexRef[${nodeType.classNameDb}] with ${nodeType.className}Base with StoredNode $mixinTraits {
+          |class ${nodeType.className}(_id: JLong, _graph: TinkerGraph, dbNode: ${nodeType.classNameDb}) extends VertexRef[${nodeType.classNameDb}](_id, _graph, dbNode) with ${nodeType.className}Base with StoredNode $mixinTraits {
           |$propertyDelegators
           |$delegatingContainedNodeAccessors
           |  override def accept[T](visitor: NodeVisitor[T]): T = {
@@ -503,6 +510,9 @@ object DomainClassCreator {
           |  override def productPrefix = "${nodeType.className}"
           |  override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
           |  override def canEqual(that: Any): Boolean = get.canEqual(that)
+          |  override def label(): String = {
+          |    ${nodeType.className}.Label
+          |  }
           |}""".stripMargin
       }
 
