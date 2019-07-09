@@ -194,9 +194,9 @@ object DomainClassCreator {
       import gremlin.scala._
       import io.shiftleft.codepropertygraph.generated.EdgeKeys
       import java.lang.{Boolean => JBoolean, Long => JLong}
-      import java.util.{Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
-      import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
-      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{SpecializedElementFactory, SpecializedTinkerVertex, TinkerGraph, SpecializedVertexProperty, VertexRef}
+      import java.util.{ArrayList => JArrayList, Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
+      import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
+      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{OverflowDbNode, SpecializedElementFactory, SpecializedTinkerVertex, TinkerGraph, SpecializedVertexProperty, VertexRef}
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
       import scala.collection.JavaConverters._
       import org.slf4j.LoggerFactory
@@ -516,6 +516,94 @@ object DomainClassCreator {
           |}""".stripMargin
       }
 
+      val adjacentNodeCollections = {
+        // TODO: use a collection type that only ever grows by one and is still memory efficient (unlike LinkedList)
+        val inVertices = inEdges(nodeType).map { tpe =>
+          s"private lazy val ${camelCase(tpe)}_In: JArrayList[Vertex] = new JArrayList(0)"
+        }
+        val outVertices = outEdges(nodeType).map { tpe =>
+          s"private lazy val ${camelCase(tpe)}_Out: JArrayList[Vertex] = new JArrayList(0)"
+        }
+        (inVertices ++ outVertices).mkString("\n")
+      }
+
+      val storeAdjacentInNode = {
+        val specificEdgeCases = inEdges(nodeType).map { tpe =>
+          s"""case "$tpe" => ${camelCase(tpe)}_In.add(inNodeRef); ${camelCase(tpe)}_In.trimToSize"""
+        }.mkString("\n")
+
+        s"""
+        |override def storeAdjacentInNode(edgeLabel: String, inNodeRef: VertexRef[OverflowDbNode]): Unit =
+        |  edgeLabel match {
+        |    $specificEdgeCases
+        |    case _ => throw new IllegalArgumentException("$nodeType node doesn't support incoming edge of type " + edgeLabel)
+        |  }
+        """.stripMargin
+      }
+
+      val storeAdjacentOutNode = {
+        val specificEdgeCases = outEdges(nodeType).map { tpe =>
+          s"""case "$tpe" => ${camelCase(tpe)}_Out.add(outNodeRef); ${camelCase(tpe)}_Out.trimToSize"""
+        }.mkString("\n")
+
+        s"""
+        |override def storeAdjacentOutNode(edgeLabel: String, outNodeRef: VertexRef[OverflowDbNode], keyValues: Object*): Unit = {
+        |  val edge = edgeLabel match {
+        |    $specificEdgeCases
+        |    case _ => throw new IllegalArgumentException("$nodeType node doesn't support outgoing edge of type " + edgeLabel)
+        |  }
+        |  // TODO store edge properties
+        |}
+        """.stripMargin
+      }
+
+      val adjacentVertices = {
+        val specificInEdgeCases = inEdges(nodeType).map { tpe =>
+          s"""case ("$tpe", Direction.IN) => ${camelCase(tpe)}_In.iterator"""
+        }.mkString("\n")
+        val specificOutEdgeCases = outEdges(nodeType).map { tpe =>
+          s"""case ("$tpe", Direction.OUT) => ${camelCase(tpe)}_Out.iterator"""
+        }.mkString("\n")
+
+        s"""
+        |override def adjacentVertices(direction: Direction, edgeLabel: String): JIterator[Vertex] =
+        |  (edgeLabel, direction) match {
+        |    $specificInEdgeCases
+        |    $specificOutEdgeCases
+        |    case _ => JCollections.emptyIterator[Vertex]
+        |  }
+        """.stripMargin
+      }
+
+      val adjacentDummyEdges = {
+        // TODO attach properties: get from this: ElementHelper.attachProperties(edge, inNode.edgeKeyValues)
+        val specificInEdgeCases = inEdges(nodeType).map { tpe =>
+          s"""|case ("$tpe", Direction.IN) => 
+              |  ${camelCase(tpe)}_In.asScala.map { inNode => 
+              |    val edge = instantiateDummyEdge(edgeLabel, thisRef, inNode.asInstanceOf[VertexRef[OverflowDbNode]])
+              |    edge.asInstanceOf[Edge]
+              |  }.asJava.iterator""".stripMargin
+        }.mkString("\n")
+        val specificOutEdgeCases = outEdges(nodeType).map { tpe =>
+          s"""|case ("$tpe", Direction.OUT) => 
+              |  ${camelCase(tpe)}_Out.asScala.map { outNode => 
+              |    val edge = instantiateDummyEdge(edgeLabel, outNode.asInstanceOf[VertexRef[OverflowDbNode]], thisRef)
+              |    edge.asInstanceOf[Edge]
+              |  }.asJava.iterator""".stripMargin
+        }.mkString("\n")
+
+        s"""
+        |override def adjacentDummyEdges(direction: Direction, edgeLabel: String): JIterator[Edge] = {
+        |  val thisRef = graph.vertex(id).asInstanceOf[VertexRef[OverflowDbNode]]
+        |  (edgeLabel, direction) match {
+        |    $specificInEdgeCases
+        |    $specificOutEdgeCases
+        |    case _ => JCollections.emptyIterator[Edge]
+        |  }
+        |}
+        """.stripMargin
+      }
+
       val classImpl = s"""
       trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
         def asStored : StoredNode = this.asInstanceOf[StoredNode]
@@ -524,7 +612,7 @@ object DomainClassCreator {
       }
 
       class ${nodeType.classNameDb}(_id: JLong, _graph: TinkerGraph)
-          extends SpecializedTinkerVertex(_id, _graph) with StoredNode $mixinTraits with ${nodeType.className}Base {
+          extends OverflowDbNode(_id, _graph) with StoredNode $mixinTraits with ${nodeType.className}Base {
 
         override def allowedInEdgeLabels() = ${nodeType.className}.Edges.In.asJava
         override def allowedOutEdgeLabels() = ${nodeType.className}.Edges.Out.asJava
@@ -534,7 +622,13 @@ object DomainClassCreator {
         override def valueMap: JMap[String, AnyRef] = $valueMapImpl
 
         ${propertyBasedFields(keys)}
-      
+
+        $adjacentNodeCollections
+        $storeAdjacentInNode
+        $storeAdjacentOutNode
+        $adjacentVertices
+        $adjacentDummyEdges
+
         override def label(): String = {
           ${nodeType.className}.Label
         }
