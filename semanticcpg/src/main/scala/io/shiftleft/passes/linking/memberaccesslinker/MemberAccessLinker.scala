@@ -36,36 +36,42 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
     val dstGraph = new DiffGraph()
 
     if (!call.edges(Direction.OUT, EdgeTypes.REF).hasNext) {
-      val memberName = call
-        .vertices(Direction.OUT, EdgeTypes.AST)
-        .asScala
-        .filter(_.value(NodeKeys.ORDER.name) == 2)
-        .asJava
-        .nextChecked
-        .asInstanceOf[nodes.Identifier]
-        .name
+      try {
+        val memberName = call
+          .vertices(Direction.OUT, EdgeTypes.AST)
+          .asScala
+          .filter(_.value(NodeKeys.ORDER.name) == 2)
+          .asJava
+          .nextChecked
+          .asInstanceOf[nodes.Identifier]
+          .name
 
-      val typ = getTypeOfMemberAccessBase(call)
+        val typ = getTypeOfMemberAccessBase(call)
 
-      var worklist = List(typ)
-      var finished = false
-      while (!finished && worklist.nonEmpty) {
-        val typ = worklist.head
-        worklist = worklist.tail
+        var worklist = List(typ)
+        var finished = false
+        while (!finished && worklist.nonEmpty) {
+          val typ = worklist.head
+          worklist = worklist.tail
 
-        findMemberOnType(typ, memberName) match {
-          case Some(member) =>
-            dstGraph.addEdgeInOriginal(call, member, EdgeTypes.REF)
-            finished = true
-          case None =>
-            val baseTypes = typ.start.baseType.l
-            worklist = worklist ++ baseTypes
+          findMemberOnType(typ, memberName) match {
+            case Some(member) =>
+              dstGraph.addEdgeInOriginal(call, member, EdgeTypes.REF)
+              finished = true
+            case None =>
+              val baseTypes = typ.start.baseType.l
+              worklist = worklist ++ baseTypes
+          }
         }
-      }
 
-      if (!finished && !loggedForTypeMemberCombination.contains((typ, memberName))) {
-        loggedForTypeMemberCombination += ((typ, memberName))
-        logger.warn(s"Could not find type member. type=${typ.fullName}, member=$memberName")
+        if (!finished && !loggedForTypeMemberCombination.contains((typ, memberName))) {
+          loggedForTypeMemberCombination += ((typ, memberName))
+          logger.warn(s"Could not find type member. type=${typ.fullName}, member=$memberName")
+        }
+      } catch {
+        case exception: Exception =>
+          logger.warn(s"Error while obtaining IDENTIFIER associated to member access." +
+            s" Reason: ${exception.getMessage}")
       }
     } else if (!loggedDeprecationWarning) {
       logger.warn(
