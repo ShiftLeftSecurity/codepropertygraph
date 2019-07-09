@@ -9,7 +9,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class ProtoToOverflowDbTest extends WordSpec with Matchers {
 
-  "imports cpg.bin.zip into overflowdb.bin" in {
+  "imports cpg.bin.zip into overflowdb.bin" ignore {
     val cpgBinZip = "resources/cpgs/namespace/cpg.bin.zip"
     val reference = CpgLoader.load(cpgBinZip, CpgLoaderConfig.withoutOverflow).scalaGraph
 
