@@ -519,17 +519,17 @@ object DomainClassCreator {
       val adjacentNodeCollections = {
         // TODO: use a collection type that only ever grows by one and is still memory efficient (unlike LinkedList)
         val inVertices = inEdges(nodeType).map { tpe =>
-          s"private lazy val ${camelCase(tpe)}_In: JArrayList[Vertex] = new JArrayList(0)"
+          s"private var ${camelCase(tpe)}_In: Array[Vertex] = new Array(0)"
         }
         val outVertices = outEdges(nodeType).map { tpe =>
-          s"private lazy val ${camelCase(tpe)}_Out: JArrayList[Vertex] = new JArrayList(0)"
+          s"private var ${camelCase(tpe)}_Out: Array[Vertex] = new Array(0)"
         }
         (inVertices ++ outVertices).mkString("\n")
       }
 
       val storeAdjacentInNode = {
         val specificEdgeCases = inEdges(nodeType).map { tpe =>
-          s"""case "$tpe" => ${camelCase(tpe)}_In.add(inNodeRef); ${camelCase(tpe)}_In.trimToSize"""
+          s"""case "$tpe" => ${camelCase(tpe)}_In = ${camelCase(tpe)}_In :+ inNodeRef"""
         }.mkString("\n")
 
         s"""
@@ -543,7 +543,7 @@ object DomainClassCreator {
 
       val storeAdjacentOutNode = {
         val specificEdgeCases = outEdges(nodeType).map { tpe =>
-          s"""case "$tpe" => ${camelCase(tpe)}_Out.add(outNodeRef); ${camelCase(tpe)}_Out.trimToSize"""
+          s"""case "$tpe" => ${camelCase(tpe)}_Out = ${camelCase(tpe)}_Out :+ outNodeRef"""
         }.mkString("\n")
 
         s"""
@@ -559,10 +559,10 @@ object DomainClassCreator {
 
       val adjacentVertices = {
         val specificInEdgeCases = inEdges(nodeType).map { tpe =>
-          s"""case ("$tpe", Direction.IN) => ${camelCase(tpe)}_In.iterator"""
+          s"""case ("$tpe", Direction.IN) => ${camelCase(tpe)}_In.iterator.asJava"""
         }.mkString("\n")
         val specificOutEdgeCases = outEdges(nodeType).map { tpe =>
-          s"""case ("$tpe", Direction.OUT) => ${camelCase(tpe)}_Out.iterator"""
+          s"""case ("$tpe", Direction.OUT) => ${camelCase(tpe)}_Out.iterator.asJava"""
         }.mkString("\n")
 
         s"""
@@ -579,17 +579,17 @@ object DomainClassCreator {
         // TODO attach properties: get from this: ElementHelper.attachProperties(edge, inNode.edgeKeyValues)
         val specificInEdgeCases = inEdges(nodeType).map { tpe =>
           s"""|case ("$tpe", Direction.IN) => 
-              |  ${camelCase(tpe)}_In.asScala.map { inNode => 
+              |  ${camelCase(tpe)}_In.map { inNode => 
               |    val edge = instantiateDummyEdge(edgeLabel, thisRef, inNode.asInstanceOf[VertexRef[OverflowDbNode]])
               |    edge.asInstanceOf[Edge]
-              |  }.asJava.iterator""".stripMargin
+              |  }.iterator.asJava""".stripMargin
         }.mkString("\n")
         val specificOutEdgeCases = outEdges(nodeType).map { tpe =>
           s"""|case ("$tpe", Direction.OUT) => 
-              |  ${camelCase(tpe)}_Out.asScala.map { outNode => 
+              |  ${camelCase(tpe)}_Out.map { outNode => 
               |    val edge = instantiateDummyEdge(edgeLabel, outNode.asInstanceOf[VertexRef[OverflowDbNode]], thisRef)
               |    edge.asInstanceOf[Edge]
-              |  }.asJava.iterator""".stripMargin
+              |  }.iterator.asJava""".stripMargin
         }.mkString("\n")
 
         s"""
