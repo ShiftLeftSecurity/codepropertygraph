@@ -8,7 +8,6 @@
 
         { "id": 19, "name" : "LANGUAGE", "comment" : "The programming language this graph originates from", "valueType" : "string", "cardinality" : "one"},
         { "id" : 13, "name": "VERSION", "comment" : "A version, given as a string", "valueType" : "string", "cardinality" : "one"},
-        { "id" : 58, "name" : "DEPENDENCY_GROUP_ID", "comment" : "The group ID for a dependency", "valueType" : "string", "cardinality" : "zeroOrOne" },
 
         // Properties that indicate where the code can be found
 
@@ -35,7 +34,6 @@
         {"id": 15, "name" : "EVALUATION_STRATEGY", "comment" : "Evaluation strategy for function parameters and return values. One of the values in \"evaluationStrategies\"", "valueType" : "string", "cardinality" : "one"},
 
         // Properties used to link nodes in the backend
-        {"id": 50, "name" : "CLOSURE_BINDING_ID", "comment" : "Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with the corresponding CLOSURE_BINDING nodes", "valueType" : "string", "cardinality" : "zeroOrOne"},
         {"id": 51, "name" : "TYPE_FULL_NAME", "comment" : "The static type of an entity. E.g. expressions, local, parameters etc. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME", "valueType" : "string", "cardinality" : "one"},
         {"id": 52, "name" : "TYPE_DECL_FULL_NAME", "comment" : "The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME", "valueType" : "string", "cardinality" : "one"},
         {"id": 53, "name" : "INHERITS_FROM_TYPE_FULL_NAME", "comment" : "The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME", "valueType" : "string", "cardinality" : "list"},
@@ -43,8 +41,7 @@
         {"id": 55, "name" : "METHOD_INST_FULL_NAME", "comment" : "The FULL_NAME of a method instance. Used to link CALL and METHOD_REF nodes to METHOD_INST nodes. There needs to be at least one METHOD_INST node for each METHOD_INST_FULL_NAME", "valueType" : "string", "cardinality" : "one"},
         {"id": 56, "name" : "AST_PARENT_TYPE", "comment" : "The type of the AST parent. Since this is only used in some parts of the graph the list does not include all possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK", "valueType" : "string", "cardinality" : "one"},
         {"id": 57, "name" : "AST_PARENT_FULL_NAME", "comment" : "The FULL_NAME of a the AST parent of an entity", "valueType" : "string", "cardinality" : "one"},
-        {"id": 158, "name" : "ALIAS_TYPE_FULL_NAME", "comment" : "Type full name of which a TYPE_DECL is an alias of", "valueType" : "string", "cardinality" : "zeroOrOne"},
-        {"id": 159, "name" : "CLOSURE_ORIGINAL_NAME", "comment" : "The original name of the (potentially mangled) captured variable", "valueType" : "string", "cardinality" : "zeroOrOne"}
+        {"id": 158, "name" : "ALIAS_TYPE_FULL_NAME", "comment" : "Type full name of which a TYPE_DECL is an alias of", "valueType" : "string", "cardinality" : "zeroOrOne"}
     ],
 
     // Keys for edge properties

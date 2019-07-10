@@ -1,4 +1,9 @@
 {
+  "nodeKeys" : [
+      {"id": 50, "name" : "CLOSURE_BINDING_ID", "comment" : "Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with the corresponding CLOSURE_BINDING nodes", "valueType" : "string", "cardinality" : "zeroOrOne"},
+      {"id": 159, "name" : "CLOSURE_ORIGINAL_NAME", "comment" : "The original name of the (potentially mangled) captured variable", "valueType" : "string", "cardinality" : "zeroOrOne"}
+  ],
+
   "nodeTypes" : [
     { "name" : "METHOD_REF",
       "outEdges" : [
