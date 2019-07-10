@@ -1,4 +1,9 @@
 {
+    "nodeKeys" : [
+	{ "id" : 13, "name": "VERSION", "comment" : "A version, given as a string", "valueType" : "string", "cardinality" : "one"},
+	{ "id" : 58, "name" : "DEPENDENCY_GROUP_ID", "comment" : "The group ID for a dependency", "valueType" : "string", "cardinality" : "zeroOrOne" }
+    ],
+
     "nodeTypes" : [
         {"id" : 35, "name" : "DEPENDENCY",
          "keys": ["VERSION","NAME","DEPENDENCY_GROUP_ID"],
