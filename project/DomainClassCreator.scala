@@ -196,6 +196,7 @@ object DomainClassCreator {
       import java.lang.{Boolean => JBoolean, Long => JLong}
       import java.util.{ArrayList => JArrayList, Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
       import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
+      import org.apache.tinkerpop.gremlin.structure.util.ElementHelper
       import org.apache.tinkerpop.gremlin.tinkergraph.structure.{OverflowDbNode, SpecializedElementFactory, SpecializedTinkerVertex, TinkerGraph, SpecializedVertexProperty, VertexRef}
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
       import scala.collection.JavaConverters._
@@ -316,6 +317,9 @@ object DomainClassCreator {
         s"def visit(node: ${nodeBaseTrait.className}): T = ???"
       }.mkString("\n")
     }
+
+    def edgeTypeByName: Map[String, EdgeType] =
+      (Resources.cpgJson \ "edgeTypes").as[List[EdgeType]].groupBy(_.name).mapValues(_.head)
 
     def generateNodeSource(nodeType: NodeType,
                            keys: List[Property],
@@ -517,7 +521,6 @@ object DomainClassCreator {
       }
 
       val adjacentNodeCollections = {
-        // TODO: use a collection type that only ever grows by one and is still memory efficient (unlike LinkedList)
         val inVertices = inEdges(nodeType).map { tpe =>
           s"private var ${camelCase(tpe)}_In: Array[Vertex] = new Array(0)"
         }
@@ -526,6 +529,13 @@ object DomainClassCreator {
         }
         (inVertices ++ outVertices).mkString("\n")
       }
+
+      val edgePropertiesForOutNodes = {
+        for {
+          tpe <- outEdges(nodeType)
+          key <- edgeTypeByName(tpe).keys
+        } yield s"private var ${camelCase(tpe)}_Out_$key: Array[Object] = new Array(0)"
+      }.mkString("\n")
 
       val storeAdjacentInNode = {
         val specificEdgeCases = inEdges(nodeType).map { tpe =>
@@ -543,12 +553,21 @@ object DomainClassCreator {
 
       val storeAdjacentOutNode = {
         val specificEdgeCases = outEdges(nodeType).map { tpe =>
-          s"""case "$tpe" => ${camelCase(tpe)}_Out = ${camelCase(tpe)}_Out :+ outNodeRef"""
+          val storeEdgeProperties = edgeTypeByName(tpe).keys.map { key =>
+            s"""${camelCase(tpe)}_Out_$key :+ edgeKeyValues.get("$key")"""
+          }.mkString("\n")
+
+          s"""|case "$tpe" => this.synchronized {
+              |  ${camelCase(tpe)}_Out = ${camelCase(tpe)}_Out :+ outNodeRef
+              |  /* store edge properties on the SRC node side 
+              |   * we need to also store `null` values, since they must have the same index as the outNodeRef array */
+              |  $storeEdgeProperties
+              |}""".stripMargin
         }.mkString("\n")
 
         s"""
-        |override def storeAdjacentOutNode(edgeLabel: String, outNodeRef: VertexRef[OverflowDbNode], keyValues: Object*): Unit = {
-        |  val edge = edgeLabel match {
+        |override def storeAdjacentOutNode(edgeLabel: String, outNodeRef: VertexRef[OverflowDbNode], edgeKeyValues: JMap[String, Object]): Unit = {
+        |  edgeLabel match {
         |    $specificEdgeCases
         |    case _ => throw new IllegalArgumentException("$nodeType node doesn't support outgoing edge of type " + edgeLabel)
         |  }
@@ -576,28 +595,68 @@ object DomainClassCreator {
       }
 
       val adjacentDummyEdges = {
-        // TODO attach properties: get from this: ElementHelper.attachProperties(edge, inNode.edgeKeyValues)
-        val specificInEdgeCases = inEdges(nodeType).map { tpe =>
-          s"""|case ("$tpe", Direction.IN) => 
-              |  ${camelCase(tpe)}_In.map { inNode => 
-              |    val edge = instantiateDummyEdge(edgeLabel, thisRef, inNode.asInstanceOf[VertexRef[OverflowDbNode]])
-              |    edge.asInstanceOf[Edge]
-              |  }.iterator.asJava""".stripMargin
-        }.mkString("\n")
         val specificOutEdgeCases = outEdges(nodeType).map { tpe =>
+          val attachEdgeProperties = edgeTypeByName(tpe).keys match {
+            case Nil => ""
+            case keys =>
+              val keyValues = keys.map { key =>
+                s""" "$key", ${camelCase(tpe)}_Out_$key(currIdx)"""
+              }.mkString(", ")
+              s"ElementHelper.attachProperties(edge, $keyValues)"
+          }
           s"""|case ("$tpe", Direction.OUT) => 
-              |  ${camelCase(tpe)}_Out.map { outNode => 
+              |new JIterator[Edge] {
+              |  /* to ensure we use the same index for adjacent vertex and the edge properties
+              |   * note: this simple model is not thread safe, and can cause IndexOutOfBounds exceptions if
+              |   * edge properties are removed while iterating them */
+              |  private var idx: Int = 0
+              |  override def hasNext = ${camelCase(tpe)}_Out.size > idx
+              |  override def next = {
+              |    val currIdx = idx
+              |    idx += 1
+              |    val inNode = ${camelCase(tpe)}_Out(currIdx)
+              |    val edge = instantiateDummyEdge(edgeLabel, thisRef, inNode.asInstanceOf[VertexRef[OverflowDbNode]])
+              |    $attachEdgeProperties 
+              |    edge
+              |  }
+              |}""".stripMargin
+        }.mkString("\n")
+
+        val specificInEdgeCases = inEdges(nodeType).map { tpe =>
+          val attachEdgeProperties = edgeTypeByName(tpe).keys match {
+            case Nil => ""
+            case keys =>
+              val keyValues = keys.map { key =>
+                s""" "$key", outNodeDb.${camelCase(tpe)}_Out_$key(currIdx)"""
+              }.mkString(", ")
+              s"ElementHelper.attachProperties(edge, $keyValues)"
+          }
+          s"""|case ("$tpe", Direction.IN) => 
+              |new JIterator[Edge] {
+              |  /* to ensure we use the same index for adjacent vertex and the edge properties
+              |   * note: this simple model is not thread safe, and can cause IndexOutOfBounds exceptions if
+              |   * edge properties are removed while iterating them */
+              |  private var idx: Int = 0
+              |  override def hasNext = ${camelCase(tpe)}_In.size > idx
+              |  override def next = {
+              |    val currIdx = idx
+              |    idx += 1
+              |    // properties are stored at the SRC node only, so we need to get them from there...
+              |    val outNode = ${camelCase(tpe)}_In(currIdx)
               |    val edge = instantiateDummyEdge(edgeLabel, outNode.asInstanceOf[VertexRef[OverflowDbNode]], thisRef)
-              |    edge.asInstanceOf[Edge]
-              |  }.iterator.asJava""".stripMargin
+              |    val outNodeDb = outNode.asInstanceOf[VertexRef[${nodeType.className}Db]].get
+              |    $attachEdgeProperties 
+              |    edge
+              |  }
+              |}""".stripMargin
         }.mkString("\n")
 
         s"""
         |override def adjacentDummyEdges(direction: Direction, edgeLabel: String): JIterator[Edge] = {
         |  val thisRef = graph.vertex(id).asInstanceOf[VertexRef[OverflowDbNode]]
         |  (edgeLabel, direction) match {
-        |    $specificInEdgeCases
         |    $specificOutEdgeCases
+        |    $specificInEdgeCases
         |    case _ => JCollections.emptyIterator[Edge]
         |  }
         |}
@@ -624,6 +683,11 @@ object DomainClassCreator {
         ${propertyBasedFields(keys)}
 
         $adjacentNodeCollections
+
+        /* we store edge properties on the SRC node side
+          * we need to also store `null` values, since they must have the same index as the outNodeRef array */
+        $edgePropertiesForOutNodes 
+
         $storeAdjacentInNode
         $storeAdjacentOutNode
         $adjacentVertices
