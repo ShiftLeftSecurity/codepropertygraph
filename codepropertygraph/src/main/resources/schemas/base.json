@@ -7,6 +7,7 @@
     "nodeKeys" : [
 
         { "id": 19, "name" : "LANGUAGE", "comment" : "The programming language this graph originates from", "valueType" : "string", "cardinality" : "one"},
+        { "id" : 13, "name": "VERSION", "comment" : "A version, given as a string", "valueType" : "string", "cardinality" : "one"},
 
         // Properties that indicate where the code can be found
 
