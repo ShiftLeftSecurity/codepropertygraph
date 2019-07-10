@@ -627,7 +627,7 @@ object DomainClassCreator {
             case Nil => ""
             case keys =>
               val keyValues = keys.map { key =>
-                s""" "$key", outNodeDb.${camelCase(tpe)}_Out_$key(currIdx)"""
+                s""" "$key", outNode.get.getEdgeProperty("$tpe", "$key", id)"""
               }.mkString(", ")
               s"ElementHelper.attachProperties(edge, $keyValues)"
           }
@@ -642,9 +642,8 @@ object DomainClassCreator {
               |    val currIdx = idx
               |    idx += 1
               |    // properties are stored at the SRC node only, so we need to get them from there...
-              |    val outNode = ${camelCase(tpe)}_In(currIdx)
-              |    val edge = instantiateDummyEdge(edgeLabel, outNode.asInstanceOf[VertexRef[OverflowDbNode]], thisRef)
-              |    val outNodeDb = outNode.asInstanceOf[VertexRef[${nodeType.className}Db]].get
+              |    val outNode = ${camelCase(tpe)}_In(currIdx).asInstanceOf[VertexRef[OverflowDbNode]]
+              |    val edge = instantiateDummyEdge(edgeLabel, outNode, thisRef)
               |    $attachEdgeProperties 
               |    edge
               |  }
@@ -661,6 +660,24 @@ object DomainClassCreator {
         |  }
         |}
         """.stripMargin
+      }
+
+      val getEdgeProperty = {
+        val edgeAndKeySpecificCases = {
+          for {
+            tpe <- outEdges(nodeType)
+            key <- edgeTypeByName(tpe).keys
+          } yield
+            s"""case ("$tpe", "$key") =>
+                |val idx = findElementIdx(${camelCase(tpe)}_Out, inNodeId)
+                |${camelCase(tpe)}_Out_$key(idx)""".stripMargin
+        }.mkString("\n")
+
+        s"""override def getEdgeProperty(edgeLabel: String, key: String, inNodeId: Long): Object = 
+            |  (edgeLabel, key) match {
+            |    $edgeAndKeySpecificCases
+            |    case _ => null
+            |  }""".stripMargin
       }
 
       val classImpl = s"""
@@ -687,6 +704,8 @@ object DomainClassCreator {
         /* we store edge properties on the SRC node side
           * we need to also store `null` values, since they must have the same index as the outNodeRef array */
         $edgePropertiesForOutNodes 
+
+        $getEdgeProperty 
 
         $storeAdjacentInNode
         $storeAdjacentOutNode
