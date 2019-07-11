@@ -54,7 +54,7 @@ object DomainClassCreator {
       import java.util.{Set => JSet}
       import org.apache.tinkerpop.gremlin.structure.Property
       import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
-      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{EdgeRef, SpecializedElementFactory, SpecializedTinkerEdge, TinkerGraph, TinkerProperty, VertexRef}
+      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{EdgeRef, OverflowDbEdge, OverflowDbNode, SpecializedElementFactory, SpecializedTinkerEdge, TinkerGraph, TinkerProperty, VertexRef}
       import scala.collection.JavaConverters._
       import org.slf4j.LoggerFactory
 
@@ -111,7 +111,7 @@ object DomainClassCreator {
       |    override val forLabel = $edgeClassName.Label
       |
       |    override def createEdge(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: Vertex], inVertex: VertexRef[_ <: Vertex]) =
-      |      new ${edgeClassNameDb}(graph, id, outVertex, inVertex)
+      |      new ${edgeClassNameDb}(graph, outVertex.asInstanceOf[VertexRef[OverflowDbNode]], inVertex.asInstanceOf[VertexRef[OverflowDbNode]])
       |
       |    override def createEdgeRef(edge: ${edgeClassNameDb}) = ${edgeClassName}(edge)
       |
@@ -134,29 +134,37 @@ object DomainClassCreator {
            |}
            """.stripMargin
 
-      val classImpl = s"""
-      class ${edgeClassNameDb}(_graph: TinkerGraph, _id: Long, private val _outVertex: Vertex, _inVertex: Vertex)
-          extends SpecializedTinkerEdge(_graph, _id, _outVertex, $edgeClassName.Label, _inVertex, $edgeClassName.Keys.All) {
+      def propertyBasedFieldAccessors(properties: List[Property]): String =
+        properties.map { property =>
+          val name = camelCase(property.name)
+          val baseType = getBaseType(property)
+          val tpe = getCompleteType(property)
 
-        ${propertyBasedFields(keys)}
-        override protected def specificProperty[A](key: String): Property[A] =
-          $edgeClassName.Keys.KeyToValue.get(key) match {
-            case None => Property.empty[A]
-            case Some(fieldAccess) => 
-              fieldAccess(this) match {
-                case null | None => Property.empty[A]
-                case Some(value) => new TinkerProperty(this, key, value.asInstanceOf[A])
-                case value => new TinkerProperty(this, key, value.asInstanceOf[A])
-              }
+          // TODO refactor so we don't need to wrap the property in a TinkerProperty instance, only to unwrap it later
+          getHigherType(property) match {
+            case HigherValueType.None =>
+              s"""def $name(): $tpe = property("${property.name}").value.asInstanceOf[$tpe]"""
+            case HigherValueType.Option =>
+              s"""def $name(): $tpe = {
+                 |  val tp = property("${property.name}")
+                 |  if (tp.isPresent) Option(tp.value.asInstanceOf[$baseType])
+                 |  else None
+                 |}""".stripMargin
+            case HigherValueType.List =>
+              s"""private var _$name: $tpe = Nil
+                 |def $name(): $tpe = {
+                 |  val tp = property("${property.name}")
+                 |  if (tp.isPresent) tp.value.asInstanceOf[JList].asScala
+                 |  else Nil
+                 |}""".stripMargin
           }
+        }.mkString("\n\n")
 
-        override protected def updateSpecificProperty[A](key: String, value: A): Property[A] = {
-          ${updateSpecificPropertyBody(keys)}
-          property(key)
-        }
+      val classImpl = s"""
+      class ${edgeClassNameDb}(_graph: TinkerGraph, _outVertex: VertexRef[OverflowDbNode], _inVertex: VertexRef[OverflowDbNode])
+          extends OverflowDbEdge(_graph, $edgeClassName.Label, _outVertex, _inVertex, $edgeClassName.Keys.All) {
 
-        override protected def removeSpecificProperty(key: String): Unit =
-          ${removeSpecificPropertyBody(keys)}
+        ${propertyBasedFieldAccessors(keys)}
       }
       """
 
