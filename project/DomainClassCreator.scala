@@ -583,7 +583,7 @@ object DomainClassCreator {
           ${nodeType.className}.Edges.keyCountByLabel.getOrElse(edgeLabel, -1)
 
         override def getPositionInEdgeOffsets(direction: Direction, edgeLabel: String): Int =
-          ${nodeType.className}.Edges.positionInEdgeOffsets.getOrElse((direction, label), -1)
+          ${nodeType.className}.Edges.positionInEdgeOffsets.getOrElse((direction, edgeLabel), -1)
 
         override def getOffsetRelativeToAdjacentVertexRef(edgeLabel: String, key: String): Int = 
           ${nodeType.className}.Edges.offsetRelativeToAdjacentVertexRef.getOrElse((edgeLabel, key), -1)
