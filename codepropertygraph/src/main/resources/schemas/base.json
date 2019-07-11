@@ -26,7 +26,7 @@
         {"id" : 6, "name": "FULL_NAME", "comment" : "Full name of an element, e.g., the class name along, including its package", "valueType" : "string", "cardinality" : "one"},
         {"id": 21, "name": "CODE", "comment": "The code snippet the node represents", "valueType" : "string", "cardinality" : "one"},
         {"id": 22, "name": "SIGNATURE", "comment": "Method signature", "valueType" : "string", "cardinality" : "one"},
-        { "id": 26, "name" : "MODIFIER_TYPE", "comment" : "Indicates the modifier which is represented by a MODIFIER node. See modifierTypes", "valueType" : "string", "cardinality" : "one"},
+        {"id": 26, "name" : "MODIFIER_TYPE", "comment" : "Indicates the modifier which is represented by a MODIFIER node. See modifierTypes", "valueType" : "string", "cardinality" : "one"},
 
         // Properties to characterize call-sites
 
@@ -97,12 +97,9 @@
          "comment" : "A formal method return",
          "is": ["CFG_NODE", "TRACKING_POINT"]
         },
-
-        // Modifier
-
         {"id" : 300, "name" : "MODIFIER",
          "keys" : ["MODIFIER_TYPE"],
-         "comment" : "The static-modifier",
+         "comment" : "A modifier, e.g., static, public, private",
          "outEdges": []
         },
 
@@ -255,7 +252,7 @@
     // common base traits for nodes
     "nodeBaseTraits" : [
       { "name" : "DECLARATION", "comment" : "", "hasKeys" : ["NAME"]},
-      { "name" : "EXPRESSION", "comment" : "Expression as a specialisation of data flow objects", "hasKeys" : ["CODE", "ORDER"], "extends" : ["TRACKING_POINT", "CFG_NODE"]},
+      { "name" : "EXPRESSION", "comment" : "Expression as a specialisation of tracking point", "hasKeys" : ["CODE", "ORDER"], "extends" : ["TRACKING_POINT", "CFG_NODE"]},
       { "name" : "LOCAL_LIKE", "comment" : "", "hasKeys" : ["NAME"]},
       { "name" : "CFG_NODE", "comment" : "", "hasKeys" : ["LINE_NUMBER", "COLUMN_NUMBER"], "extends": ["WITHIN_METHOD"]},
       { "name" : "TRACKING_POINT", "comment" : "", "hasKeys" : [], "extends": ["WITHIN_METHOD"]},
@@ -264,8 +261,8 @@
 
     "edgeTypes" : [
 
-        {"id" : 3, "name" : "AST", "comment" : "Syntax child" , "keys" : [] },
-        {"id" : 19, "name" : "CFG", "comment" : "Control flow", "keys" : [] },
+        {"id" : 3, "name" : "AST", "comment" : "Syntax tree edge" , "keys" : [] },
+        {"id" : 19, "name" : "CFG", "comment" : "Control flow edge", "keys" : [] },
 
         {"id" : 9, "name" : "CONTAINS_NODE", "keys" : ["LOCAL_NAME", "INDEX"], "comment" : "Membership relation for a compound object"},
         {"id" : 41, "name": "CAPTURED_BY", "comment" : "Connection between a captured LOCAL and the corresponding CLOSURE_BINDING", "keys": []},
