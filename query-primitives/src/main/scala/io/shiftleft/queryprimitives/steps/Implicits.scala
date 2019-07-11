@@ -41,11 +41,10 @@ object Implicits {
     }
   }
 
-
-  implicit class EnhancedBlock(block : nodes.Block) {
-    def ast : AstNode[HNil] = blockPipe.ast
-    def children : AstNode[HNil] = blockPipe.children
-    private def blockPipe  : Block[HNil] = new Block[HNil](block.start.cast[nodes.Block])
+  implicit class EnhancedBlock(block: nodes.Block) {
+    def ast: AstNode[HNil] = blockPipe.ast
+    def children: AstNode[HNil] = blockPipe.children
+    private def blockPipe: Block[HNil] = new Block[HNil](block.start.cast[nodes.Block])
   }
 
 }

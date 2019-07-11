@@ -52,6 +52,7 @@ object ProtoToOverflowDb extends App {
     }
 
   private def importCpgStruct(cpgProto: CpgStruct, overflowDb: OndiskOverflow): Unit = {
+
     /** cpg proto nodes don't know their adjacent edges, but those are required for the OverflowDb serializer,
       * so we need to build some helper maps to import the nodes */
     val inEdgesByNodeId: JMap[NodeId, JMap[EdgeLabel, TLongSet]] = new JHashMap

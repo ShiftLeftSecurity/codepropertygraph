@@ -70,8 +70,9 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
         }
       } catch {
         case exception: Exception =>
-          logger.warn(s"Error while obtaining IDENTIFIER associated to member access." +
-            s" Reason: ${exception.getMessage}")
+          logger.warn(
+            s"Error while obtaining IDENTIFIER associated to member access." +
+              s" Reason: ${exception.getMessage}")
       }
     } else if (!loggedDeprecationWarning) {
       logger.warn(
