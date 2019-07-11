@@ -425,6 +425,9 @@ object DomainClassCreator {
           override def createVertex(id: JLong, graph: TinkerGraph) =
             new ${nodeType.classNameDb}(createVertexRef(id, graph).asInstanceOf[VertexRef[Vertex]])
 
+          override def createVertex(ref: VertexRef[${nodeType.classNameDb}]) =
+            new ${nodeType.classNameDb}(ref.asInstanceOf[VertexRef[Vertex]])
+
           override def createVertexRef(id: JLong, graph: TinkerGraph) = ${nodeType.className}(id, graph)
         }
 
