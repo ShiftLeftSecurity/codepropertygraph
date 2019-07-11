@@ -301,6 +301,11 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, L
     new Block[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
 
   /**
+    * Traverse to method body (alias for `block`)
+    * */
+  def body : Block[Labels] = block
+
+  /**
     * Traverse to namespace
     * */
   def namespace: Namespace[Labels] =

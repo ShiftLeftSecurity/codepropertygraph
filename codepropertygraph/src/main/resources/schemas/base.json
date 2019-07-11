@@ -254,9 +254,10 @@
       { "name" : "DECLARATION", "comment" : "", "hasKeys" : ["NAME"]},
       { "name" : "EXPRESSION", "comment" : "Expression as a specialisation of tracking point", "hasKeys" : ["CODE", "ORDER"], "extends" : ["TRACKING_POINT", "CFG_NODE"]},
       { "name" : "LOCAL_LIKE", "comment" : "Formal input parameters, locals, and identifiers", "hasKeys" : ["NAME"]},
-      { "name" : "CFG_NODE", "comment" : "Any node that can occur as part of a control flow graph", "hasKeys" : ["LINE_NUMBER", "COLUMN_NUMBER"], "extends": ["WITHIN_METHOD"]},
-      { "name" : "TRACKING_POINT", "comment" : "Any node that can occur in a data flow", "hasKeys" : [], "extends": ["WITHIN_METHOD"]},
-      { "name" : "WITHIN_METHOD", "comment" : "Any node that can exist in a method", "hasKeys" : []}
+      { "name" : "CFG_NODE", "comment" : "Any node that can occur as part of a control flow graph", "hasKeys" : ["LINE_NUMBER", "COLUMN_NUMBER"], "extends": ["WITHIN_METHOD", "AST_NODE"]},
+      { "name" : "TRACKING_POINT", "comment" : "Any node that can occur in a data flow", "hasKeys" : [], "extends": ["WITHIN_METHOD", "AST_NODE"]},
+      { "name" : "WITHIN_METHOD", "comment" : "Any node that can exist in a method", "hasKeys" : []},
+      { "name" : "AST_NODE", "comment": "Any node that can exist in an abstract syntax tree.", "hasKeys" : []}
     ],
 
     "edgeTypes" : [

@@ -1,7 +1,10 @@
 package io.shiftleft.queryprimitives.steps
 
 import gremlin.scala._
-import shapeless.HList
+import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.AstNode
+import io.shiftleft.queryprimitives.steps.types.structure.Block
+import shapeless.{HList, HNil}
 
 object Implicits {
 
@@ -36,6 +39,13 @@ object Implicits {
         None
       }
     }
+  }
+
+
+  implicit class EnhancedBlock(block : nodes.Block) {
+    def ast : AstNode[HNil] = blockPipe.ast
+    def children : AstNode[HNil] = blockPipe.children
+    private def blockPipe  : Block[HNil] = new Block[HNil](block.start.cast[nodes.Block])
   }
 
 }
