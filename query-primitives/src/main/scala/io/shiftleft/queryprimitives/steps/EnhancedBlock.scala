@@ -6,7 +6,7 @@ import shapeless.HNil
 
 object EnhancedBlock {
 
-  implicit class EnhancedBlock(block: nodes.Block) {
+  class EnhancedBlock(block: nodes.Block) {
     def ast: AstNode[HNil] = block.start.ast
     def children: AstNode[HNil] = block.start.children
   }

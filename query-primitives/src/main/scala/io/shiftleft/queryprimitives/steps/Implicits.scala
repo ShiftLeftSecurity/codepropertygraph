@@ -1,6 +1,8 @@
 package io.shiftleft.queryprimitives.steps
 
 import gremlin.scala._
+import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.queryprimitives.steps.EnhancedBlock.EnhancedBlock
 import shapeless.HList
 
 object Implicits {
@@ -37,5 +39,7 @@ object Implicits {
       }
     }
   }
+
+  implicit def toEnhancedBlock(node: nodes.Block) = new EnhancedBlock(node)
 
 }

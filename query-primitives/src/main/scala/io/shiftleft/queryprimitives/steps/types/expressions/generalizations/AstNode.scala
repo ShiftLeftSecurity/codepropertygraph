@@ -24,22 +24,37 @@ class AstNode[Labels <: HList](raw: GremlinScala.Aux[nodes.AstNode, Labels])
     raw.hasLabel(NodeTypes.BLOCK).cast[nodes.Block]
   )
 
+  /**
+    * Traverse only to AST nodes that are expressions
+    * */
   def expression: Expression[Labels] = new Expression[Labels](
     raw.filterOnEnd(_.isInstanceOf[nodes.Expression]).cast[nodes.Expression]
   )
 
+  /**
+    * Traverse only to AST nodes that are calls
+    * */
   def call: Call[Labels] = new Call[Labels](
     raw.hasLabel(NodeTypes.CALL).cast[nodes.Call]
   )
 
+  /**
+    * Traverse only to AST nodes that are literals
+    * */
   def literal: Literal[Labels] = new Literal[Labels](
     raw.hasLabel(NodeTypes.LITERAL).cast[nodes.Literal]
   )
 
+  /**
+    * Traverse only to AST nodes that are identifier
+    * */
   def identifier: Identifier[Labels] = new Identifier[Labels](
     raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier]
   )
 
+  /**
+    * Traverse only to AST nodes that are return nodes
+    * */
   def returnNode: Return[Labels] = new Return[Labels](
     raw.hasLabel(NodeTypes.RETURN).cast[nodes.Return]
   )
