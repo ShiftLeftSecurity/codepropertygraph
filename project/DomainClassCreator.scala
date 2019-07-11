@@ -195,8 +195,8 @@ object DomainClassCreator {
       import io.shiftleft.codepropertygraph.generated.EdgeKeys
       import java.lang.{Boolean => JBoolean, Long => JLong}
       import java.util.{Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
-      import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
-      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{SpecializedElementFactory, SpecializedTinkerVertex, TinkerGraph, SpecializedVertexProperty, VertexRef}
+      import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
+      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{OverflowDbNode, SpecializedElementFactory, SpecializedTinkerVertex, TinkerGraph, SpecializedVertexProperty, VertexRef}
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
       import scala.collection.JavaConverters._
       import org.slf4j.LoggerFactory
@@ -317,6 +317,9 @@ object DomainClassCreator {
       }.mkString("\n")
     }
 
+    def edgeTypeByName: Map[String, EdgeType] =
+      (Resources.cpgJson \ "edgeTypes").as[List[EdgeType]].groupBy(_.name).mapValues(_.head)
+
     def generateNodeSource(nodeType: NodeType,
                            keys: List[Property],
                            nodeToInEdges: mutable.MultiMap[String, String]) = {
@@ -341,6 +344,39 @@ object DomainClassCreator {
         option.map(_.toList).getOrElse(Nil)
       }
 
+      def allEdges(nodeType: NodeType): List[String] =
+        (outEdges(nodeType) ++ inEdges(nodeType)).distinct
+
+      val keyCountByLabelEntries =
+        allEdges(nodeType).map { edgeType =>
+          val propertyCount = edgeTypeByName(edgeType).keys.size
+          s""" "$edgeType" -> $propertyCount"""
+        }.mkString(",\n")
+
+      val positionInEdgeOffsetsEntries = {
+        var position = -1 // starts with `0`
+        val forOutEdges = outEdges(nodeType).map { edgeType =>
+          position += 1
+          s""" (Direction.OUT, "$edgeType") -> $position"""
+        }
+        val forInEdges = inEdges(nodeType).map { edgeType =>
+          position += 1
+          s""" (Direction.IN, "$edgeType") -> $position"""
+        }
+        (forOutEdges ++ forInEdges).mkString(",\n")
+      }
+
+      val offsetRelativeToAdjacentVertexRefEntries = {
+        var offset = 0 // must start with `1`, because position `0` is the vertexRef itself
+        for {
+          edgeType <- allEdges(nodeType)
+          key <- edgeTypeByName(edgeType).keys
+        } yield {
+          offset += 1
+          s""" ("$edgeType", "$key") -> $offset """
+        }
+      }.mkString(",\n")
+
       val companionObject = s"""
       object ${nodeType.className} {
         implicit val marshaller: Marshallable[${nodeType.classNameDb}] = new Marshallable[${nodeType.classNameDb}] {
@@ -362,6 +398,17 @@ object DomainClassCreator {
         object Edges {
           val In: Set[String] = Set(${inEdges(nodeType).map('"' + _ + '"').mkString(",")})
           val Out: Set[String] = Set(${outEdges(nodeType).map('"' + _ + '"').mkString(",")})
+          val keyCountByLabel: Map[String, Int] = Map(
+            $keyCountByLabelEntries
+          )
+
+          val positionInEdgeOffsets: Map[(Direction, String), Int] = Map(
+            $positionInEdgeOffsetsEntries
+          )
+
+          val offsetRelativeToAdjacentVertexRef: Map[(String, String), Int] = Map(
+            $offsetRelativeToAdjacentVertexRefEntries
+          )
         }
 
         val Factory = new SpecializedElementFactory.ForVertex[${nodeType.classNameDb}] {
@@ -516,6 +563,8 @@ object DomainClassCreator {
           |}""".stripMargin
       }
 
+      val numberOfDifferentAdjacentTypes = outEdges(nodeType).size + inEdges(nodeType).size
+
       val classImpl = s"""
       trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
         def asStored : StoredNode = this.asInstanceOf[StoredNode]
@@ -524,11 +573,20 @@ object DomainClassCreator {
       }
 
       class ${nodeType.classNameDb}(_id: JLong, _graph: TinkerGraph)
-          extends SpecializedTinkerVertex(_id, _graph) with StoredNode $mixinTraits with ${nodeType.className}Base {
+          extends OverflowDbNode(_id, _graph, $numberOfDifferentAdjacentTypes) with StoredNode $mixinTraits with ${nodeType.className}Base {
 
         override def allowedInEdgeLabels() = ${nodeType.className}.Edges.In.asJava
         override def allowedOutEdgeLabels() = ${nodeType.className}.Edges.Out.asJava
         override def specificKeys() = ${nodeType.className}.Keys.All
+
+        override def getEdgeKeyCount(edgeLabel: String): Int =
+          ${nodeType.className}.Edges.keyCountByLabel.getOrElse(edgeLabel, -1)
+
+        override def getPositionInEdgeOffsets(direction: Direction, edgeLabel: String): Int =
+          ${nodeType.className}.Edges.positionInEdgeOffsets.getOrElse((direction, label), -1)
+
+        override def getOffsetRelativeToAdjacentVertexRef(edgeLabel: String, key: String): Int = 
+          ${nodeType.className}.Edges.offsetRelativeToAdjacentVertexRef.getOrElse((edgeLabel, key), -1)
 
         /* all properties */
         override def valueMap: JMap[String, AnyRef] = $valueMapImpl
