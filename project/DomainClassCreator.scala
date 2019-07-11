@@ -414,8 +414,9 @@ object DomainClassCreator {
         val Factory = new SpecializedElementFactory.ForVertex[${nodeType.classNameDb}] {
           override val forLabel = ${nodeType.className}.Label
 
-          override def createVertex(id: JLong, graph: TinkerGraph) = new ${nodeType.classNameDb}(id, graph)
-          override def createVertexRef(vertex: ${nodeType.classNameDb}) = ${nodeType.className}(vertex)
+          override def createVertex(id: JLong, graph: TinkerGraph) =
+            new ${nodeType.classNameDb}(createVertexRef(id, graph).asInstanceOf[VertexRef[Vertex]])
+
           override def createVertexRef(id: JLong, graph: TinkerGraph) = ${nodeType.className}(id, graph)
         }
 
@@ -572,8 +573,8 @@ object DomainClassCreator {
         $abstractContainedNodeAccessors
       }
 
-      class ${nodeType.classNameDb}(_id: JLong, _graph: TinkerGraph)
-          extends OverflowDbNode(_id, _graph, $numberOfDifferentAdjacentTypes) with StoredNode $mixinTraits with ${nodeType.className}Base {
+      class ${nodeType.classNameDb}(ref: VertexRef[Vertex])
+          extends OverflowDbNode($numberOfDifferentAdjacentTypes, ref) with StoredNode $mixinTraits with ${nodeType.className}Base {
 
         override def allowedInEdgeLabels() = ${nodeType.className}.Edges.In.asJava
         override def allowedOutEdgeLabels() = ${nodeType.className}.Edges.Out.asJava
