@@ -7,7 +7,6 @@ import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.diffgraph.DiffGraph._
 import io.shiftleft.queryprimitives.steps.NewNodeSteps
-import java.lang.{Long => JLong}
 
 import io.shiftleft.codepropertygraph.generated.ModifierTypes
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph

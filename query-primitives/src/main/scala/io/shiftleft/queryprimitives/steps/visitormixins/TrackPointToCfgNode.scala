@@ -2,7 +2,7 @@ package io.shiftleft.queryprimitives
 package steps
 package visitormixins
 
-import io.shiftleft.codepropertygraph.generated.{Operators, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.queryprimitives.utils.ExpandTo
 

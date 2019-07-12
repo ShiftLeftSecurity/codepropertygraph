@@ -11,13 +11,8 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 import shapeless.HList
 
 class CfgNode[Labels <: HList](raw: GremlinScala.Aux[nodes.CfgNode, Labels])
-    extends NodeSteps[nodes.CfgNode, Labels](raw) {
-
-  /**
-  Cast to call if applicable
-    */
-  def call: Call[Labels] =
-    new Call[Labels](raw.hasLabel(NodeTypes.CALL).cast[nodes.Call])
+    extends NodeSteps[nodes.CfgNode, Labels](raw)
+    with AstNodeBase[nodes.CfgNode, Labels] {
 
   /**
   Traverse to enclosing method

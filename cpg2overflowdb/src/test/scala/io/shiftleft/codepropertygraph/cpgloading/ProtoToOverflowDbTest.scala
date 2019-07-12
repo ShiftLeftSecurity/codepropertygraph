@@ -22,7 +22,8 @@ class ProtoToOverflowDbTest extends WordSpec with Matchers {
     referenceEdgeCount.toInt should be > 50
     referenceSpecificPropertyCount.toInt should be > 10
 
-    val overflowdbFile = ProtoToOverflowDb.run(Config(new File(cpgBinZip), Some(Files.createTempFile("overflowdb", "bin").toFile)))
+    val overflowdbFile =
+      ProtoToOverflowDb.run(Config(new File(cpgBinZip), Some(Files.createTempFile("overflowdb", "bin").toFile)))
     val fromStorage = Cpg.withStorage(overflowdbFile.getAbsolutePath).scalaGraph
     fromStorage.V.count.head shouldBe referenceNodeCount
     fromStorage.E.count.head shouldBe referenceEdgeCount

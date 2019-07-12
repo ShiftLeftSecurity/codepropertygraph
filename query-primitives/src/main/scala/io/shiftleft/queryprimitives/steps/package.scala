@@ -16,11 +16,22 @@ import shapeless.HList
   */
 package object steps {
 
+  // Implicit conversions from generated node types. We use these to add methods
+  // to generated node types.
+
   implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods =
     new WithinMethodMethods(node)
 
   implicit def cfgNodeMethodsQp(node: nodes.CfgNode): CfgNodeMethods =
     new CfgNodeMethods(node)
+
+  implicit def astNodeMethodsQp(node: nodes.AstNode): AstNodeMethods =
+    new AstNodeMethods(node)
+
+  // Implicit conversions from Step[NodeType, Label] to corresponding Step classes.
+  // If you introduce a new Step-type, that is, one that inherits from `Steps[NodeType,Labels]`,
+  // then you need to add an implicit conversion from `Steps[NodeType,Labels]` to your type
+  // here.
 
   implicit def toLiteral[Labels <: HList](steps: Steps[nodes.Literal, Labels]): Literal[Labels] =
     new Literal[Labels](steps.raw)
@@ -77,6 +88,9 @@ package object steps {
 
   implicit def toCfgNode[Labels <: HList](steps: Steps[nodes.CfgNode, Labels]): CfgNode[Labels] =
     new CfgNode[Labels](steps.raw)
+
+  implicit def toAstNode[Labels <: HList](steps: Steps[nodes.AstNode, Labels]): AstNode[Labels] =
+    new AstNode[Labels](steps.raw)
 
   implicit def toFile[Labels <: HList](steps: Steps[nodes.File, Labels]): File[Labels] =
     new File[Labels](steps.raw)

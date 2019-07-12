@@ -1,7 +1,7 @@
 package io.shiftleft.queryprimitives.steps.types.expressions.generalizations
 
 import gremlin.scala.GremlinScala
-import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.queryprimitives.steps.NodeSteps
 import io.shiftleft.queryprimitives.steps.types.structure.Block
 import shapeless.HList
@@ -9,7 +9,14 @@ import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps.types.expressions.{Call, Identifier, Literal, Return}
 
 class AstNode[Labels <: HList](raw: GremlinScala.Aux[nodes.AstNode, Labels])
-    extends NodeSteps[nodes.AstNode, Labels](raw) {
+    extends NodeSteps[nodes.AstNode, Labels](raw)
+    with AstNodeBase[nodes.AstNode, Labels] {}
+
+trait AstNodeBase[NodeType <: nodes.AstNode, Labels <: HList] { this: NodeSteps[NodeType, Labels] =>
+
+  def ast: AstNode[Labels] = new AstNode[Labels](raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
+
+  def children: AstNode[Labels] = new AstNode[Labels](raw.repeat(_.out(EdgeTypes.AST)).emit.cast[nodes.AstNode])
 
   /**
     * Traverse only to those AST nodes that are also control flow graph nodes
@@ -58,5 +65,4 @@ class AstNode[Labels <: HList](raw: GremlinScala.Aux[nodes.AstNode, Labels])
   def returnNode: Return[Labels] = new Return[Labels](
     raw.hasLabel(NodeTypes.RETURN).cast[nodes.Return]
   )
-
 }
