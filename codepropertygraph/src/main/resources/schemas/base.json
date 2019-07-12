@@ -69,7 +69,8 @@
          "comment": "Node representing a source file. Often also the AST root",
          "outEdges": [
              {"edgeName": "AST", "inNodes": ["NAMESPACE_BLOCK"]}
-         ]
+         ],
+	 "is" : ["AST_NODE"]
         },
 
         // Nodes of method declarations
@@ -78,7 +79,7 @@
          "keys": ["NAME", "FULL_NAME", "SIGNATURE", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME",
            "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "A method/function/procedure",
-         "is": ["DECLARATION", "CFG_NODE"],
+         "is": ["DECLARATION", "CFG_NODE", "AST_NODE"],
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["METHOD_RETURN", "METHOD_PARAMETER_IN",
                                              "MODIFIER", "BLOCK", "TYPE_PARAMETER"]},
@@ -89,7 +90,7 @@
         {"id" : 34, "name" : "METHOD_PARAMETER_IN",
          "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "This node represents a formal parameter going towards the callee side",
-         "is": ["DECLARATION", "LOCAL_LIKE", "TRACKING_POINT"]
+         "is": ["DECLARATION", "LOCAL_LIKE", "TRACKING_POINT", "AST_NODE"]
         },
 
         {"id" : 3, "name" : "METHOD_RETURN",
@@ -100,7 +101,8 @@
         {"id" : 300, "name" : "MODIFIER",
          "keys" : ["MODIFIER_TYPE"],
          "comment" : "A modifier, e.g., static, public, private",
-         "outEdges": []
+         "outEdges": [],
+	 "is" : ["AST_NODE"]
         },
 
         // Types
@@ -118,12 +120,14 @@
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["TYPE_PARAMETER", "MEMBER", "MODIFIER"]},
              {"edgeName": "VTABLE", "inNodes": ["METHOD"]}
-         ]
+         ],
+	 "is" : ["AST_NODE"]
         },
         {"id" : 47, "name" : "TYPE_PARAMETER",
          "keys" : ["NAME", "ORDER"],
          "comment" : "Type parameter of TYPE_DECL or METHOD",
-         "outEdges" : []
+         "outEdges" : [],
+	 "is" : ["AST_NODE"]
         },
         {"id" : 48, "name" : "TYPE_ARGUMENT",
          "keys" : [],
@@ -131,20 +135,22 @@
          "outEdges" : [
              {"edgeName": "REF", "inNodes": ["TYPE"]},
              {"edgeName": "BINDS_TO", "inNodes": ["TYPE_PARAMETER"]}
-         ]
+         ],
+	 "is" : ["AST_NODE"]
         },
 
         {"id" : 9, "name" : "MEMBER",
          "keys" : [ "CODE", "NAME", "TYPE_FULL_NAME"],
          "comment" : "Member of a class struct or union",
-         "is": ["DECLARATION"]
+         "is": ["DECLARATION", "AST_NODE"]
         },
 
         {
             "id":41,
             "name": "NAMESPACE_BLOCK",
             "keys": ["NAME", "FULL_NAME"],
-            "comment": "A reference to a namespace"
+            "comment": "A reference to a namespace",
+	    "is" : ["AST_NODE"]
         },
 
         // Nodes that describe method content
@@ -205,13 +211,15 @@
          "comment":"A method instance which always has to reference a method and may have type argument children if the referred to method is a template",
          "outEdges": [
              {"edgeName": "AST", "inNodes": ["TYPE_ARGUMENT"]}
-         ]
+         ],
+	 "is" : ["AST_NODE"]
         },
 
         {"id" : 14, "name" : "ARRAY_INITIALIZER",
          "keys":[],
          "outEdges": [],
-         "comment" : "Initialization construct for arrays"
+         "comment" : "Initialization construct for arrays",
+	 "is" : ["AST_NODE"]
         },
 
         {"id":333, "name":"METHOD_REF",
@@ -252,7 +260,7 @@
     // common base traits for nodes
     "nodeBaseTraits" : [
       { "name" : "DECLARATION", "comment" : "", "hasKeys" : ["NAME"]},
-	{ "name" : "EXPRESSION", "comment" : "Expression as a specialisation of tracking point", "hasKeys" : ["CODE", "ORDER"], "extends" : ["TRACKING_POINT", "CFG_NODE", "AST_NODE"]},
+      { "name" : "EXPRESSION", "comment" : "Expression as a specialisation of tracking point", "hasKeys" : ["CODE", "ORDER"], "extends" : ["TRACKING_POINT", "CFG_NODE", "AST_NODE"]},
       { "name" : "LOCAL_LIKE", "comment" : "Formal input parameters, locals, and identifiers", "hasKeys" : ["NAME"]},
       { "name" : "CFG_NODE", "comment" : "Any node that can occur as part of a control flow graph", "hasKeys" : ["LINE_NUMBER", "COLUMN_NUMBER"], "extends": ["WITHIN_METHOD", "AST_NODE"]},
       { "name" : "TRACKING_POINT", "comment" : "Any node that can occur in a data flow", "hasKeys" : [], "extends": ["WITHIN_METHOD"]},
