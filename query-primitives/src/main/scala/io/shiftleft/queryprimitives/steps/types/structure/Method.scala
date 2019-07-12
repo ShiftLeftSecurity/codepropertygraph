@@ -3,7 +3,7 @@ package io.shiftleft.queryprimitives.steps.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{DeclarationBase, Expression, Modifier}
+import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{AstNodeBase, DeclarationBase, Expression, Modifier}
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.{ICallResolver, NodeSteps}
 import io.shiftleft.queryprimitives.steps.types.expressions.{Call, Literal}
@@ -20,7 +20,8 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, L
     with FullNameAccessors[nodes.Method, Labels]
     with SignatureAccessors[nodes.Method, Labels]
     with LineNumberAccessors[nodes.Method, Labels]
-    with EvalTypeAccessors[nodes.Method, Labels] {
+    with EvalTypeAccessors[nodes.Method, Labels]
+    with AstNodeBase[nodes.Method, Labels] {
 
   /**
     * Traverse to concrete instances of method.
@@ -303,7 +304,7 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, L
   /**
     * Traverse to method body (alias for `block`)
     * */
-  def body: Block[Labels] = block
+  def body: Block[Labels] = isBlock
 
   /**
     * Traverse to namespace

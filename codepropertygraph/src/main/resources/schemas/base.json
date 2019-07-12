@@ -177,7 +177,7 @@
         {"id":23, "name" : "LOCAL",
          "keys": ["CODE", "NAME", "CLOSURE_BINDING_ID", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment": "A local variable",
-         "is": ["DECLARATION", "LOCAL_LIKE"]
+         "is": ["DECLARATION", "LOCAL_LIKE", "AST_NODE"]
         },
         {"id":27, "name": "IDENTIFIER",
          "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],

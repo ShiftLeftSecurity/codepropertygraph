@@ -24,7 +24,7 @@ class CpgDataFlowTests extends WordSpec with Matchers {
   }
 
   protected def getLiteralOfType(cpg: Cpg, typeName: String, literalName: String): Literal[HNil] = {
-    cpg.typeDecl.nameExact(typeName).method.literal.codeExact(literalName)
+    cpg.typeDecl.nameExact(typeName).method.isLiteral.codeExact(literalName)
   }
 
   protected def flowToResultPairs(flow: List[nodes.TrackingPoint]): List[(String, Option[Integer])] = {
