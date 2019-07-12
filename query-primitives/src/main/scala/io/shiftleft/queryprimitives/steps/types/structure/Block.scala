@@ -10,17 +10,6 @@ import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{Ast
 class Block[Labels <: HList](raw: GremlinScala.Aux[nodes.Block, Labels])
     extends NodeSteps[nodes.Block, Labels](raw)
     with ExpressionBase[nodes.Block, Labels] {
-
-  /**
-    * All abstract syntax tree nodes in this block, including the root
-    * */
-  def ast: AstNode[Labels] = new AstNode[Labels](raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
-
-  /**
-    * All abstract syntax tree nodes in this block, excluding the root
-    * */
-  def children: AstNode[Labels] = new AstNode[Labels](raw.repeat(_.out(EdgeTypes.AST)).emit.cast[nodes.AstNode])
-
   /**
     * Traverse to locals of this block.
     */
