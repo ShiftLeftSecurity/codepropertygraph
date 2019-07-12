@@ -48,7 +48,6 @@
 
     "edgeKeys" : [
       {"id" : 6, "name" : "LOCAL_NAME", "comment" : "Local name of referenced CONTAINED node", "valueType" : "string", "cardinality" : "zeroOrOne"},
-      {"id" : 7, "name" : "CONDITION", "comment" : "The condition result under which a CFG edge is followed", "valueType" : "boolean", "cardinality" : "zeroOrOne"},
       {"id" : 8, "name" : "INDEX", "comment" : "Index of referenced CONTAINED node (0 based) - used together with cardinality=list", "valueType" : "int", "cardinality" : "zeroOrOne"}
     ],
 
