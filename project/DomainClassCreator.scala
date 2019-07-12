@@ -52,6 +52,7 @@ object DomainClassCreator {
 
       import java.lang.{Boolean => JBoolean, Long => JLong}
       import java.util.{Set => JSet}
+      import java.util.{List => JList}
       import org.apache.tinkerpop.gremlin.structure.Property
       import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
       import org.apache.tinkerpop.gremlin.tinkergraph.structure.{EdgeRef, OverflowDbEdge, OverflowDbNode, SpecializedElementFactory, SpecializedTinkerEdge, TinkerGraph, TinkerProperty, VertexRef}
@@ -98,6 +99,11 @@ object DomainClassCreator {
         .mkString(",\n")
 
       val companionObject = s"""
+      |object ${edgeClassName}NoClash {
+      |  object Keys {
+      |    val AllList: JList[String] = List(${keysQuoted.mkString(", ")}).asJava
+      |  }
+      |}
       |object $edgeClassName {
       |  val Label = "${edgeType.name}"
       |  object Keys {
@@ -208,6 +214,7 @@ object DomainClassCreator {
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
       import scala.collection.JavaConverters._
       import org.slf4j.LoggerFactory
+      import io.shiftleft.codepropertygraph.generated.edges._
 
       object PropertyErrorRegister {
         private var errorMap = Set[(Class[_], String)]()
@@ -577,6 +584,14 @@ object DomainClassCreator {
 
       val numberOfDifferentAdjacentTypes = outEdges(nodeType).size + inEdges(nodeType).size
 
+      val allowedEdgeKeysBody =
+        s"""
+           | edgeLabel match {
+           | ${outEdges(nodeType).map { outEdge => s"""case "$outEdge" => ${Utils.camelCase(outEdge).capitalize}NoClash.Keys.AllList"""}.mkString("\n")}
+           |   case _ => Nil.asJava
+           | }
+         """.stripMargin
+
       val classImpl = s"""
       trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
         def asStored : StoredNode = this.asInstanceOf[StoredNode]
@@ -590,6 +605,10 @@ object DomainClassCreator {
         override def allowedInEdgeLabels() = ${nodeType.className}.Edges.In.asJava
         override def allowedOutEdgeLabels() = ${nodeType.className}.Edges.Out.asJava
         override def specificKeys() = ${nodeType.className}.Keys.All
+
+        override def allowedEdgeKeys(edgeLabel: String) = {
+          $allowedEdgeKeysBody
+        }
 
         override def getEdgeKeyCount(edgeLabel: String): Int =
           ${nodeType.className}.Edges.keyCountByLabel.getOrElse(edgeLabel, -1)
