@@ -226,6 +226,17 @@
           ]
         },
 
+	{"id" : 339, "name" : "CONDITION",
+	 "keys" : ["CODE", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER"],
+	 "comment" : "A boolean expression that indicates whether or not to enter a block",
+	 "is" : ["EXPRESSION"],
+	 "outEdges" : [
+	     {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]},
+             {"edgeName": "AST", "inNodes": ["LITERAL", "MEMBER",
+                                             "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
+                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN"]}
+	 ]
+	},
 
         // This is the "catch-all-others" node type.
 
