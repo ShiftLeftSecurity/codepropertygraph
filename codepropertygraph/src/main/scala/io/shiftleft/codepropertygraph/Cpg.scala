@@ -35,8 +35,11 @@ object Cpg {
   /**
     * Returns a fresh, empty graph
     */
-  private def emptyGraph: TinkerGraph =
-    TinkerGraph.open(nodes.Factories.AllAsJava, edges.Factories.AllAsJava)
+  private def emptyGraph: TinkerGraph = {
+    val config = TinkerGraph.EMPTY_CONFIGURATION
+    config.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, false)
+    TinkerGraph.open(config, nodes.Factories.AllAsJava, edges.Factories.AllAsJava)
+  }
 }
 
 /**
