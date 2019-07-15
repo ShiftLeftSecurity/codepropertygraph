@@ -381,16 +381,14 @@ object DomainClassCreator {
         (forOutEdges ++ forInEdges).mkString(",\n")
       }
 
-      val offsetRelativeToAdjacentVertexRefEntries = {
-        var offset = 0 // must start with `1`, because position `0` is the vertexRef itself
-        for {
-          edgeType <- allEdges(nodeType)
-          key <- edgeTypeByName(edgeType).keys
-        } yield {
-          offset += 1
-          s""" ("$edgeType", "$key") -> $offset """
-        }
-      }.mkString(",\n")
+      val offsetRelativeToAdjacentVertexRefEntries =
+        allEdges(nodeType).flatMap { edgeType =>
+          var offset = 0 // must start with `1`, because position `0` is the vertexRef itself
+          edgeTypeByName(edgeType).keys.map { key =>
+            offset = offset + 1
+            s""" ("$edgeType", "$key") -> $offset """
+          }
+        }.mkString(",\n")
 
       val companionObject = s"""
       object ${nodeType.className} {
