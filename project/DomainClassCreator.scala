@@ -409,8 +409,8 @@ object DomainClassCreator {
           )
         }
         object Edges {
-          val In: Set[String] = Set(${inEdges(nodeType).map('"' + _ + '"').mkString(",")})
-          val Out: Set[String] = Set(${outEdges(nodeType).map('"' + _ + '"').mkString(",")})
+          val In: Array[String] = Array(${inEdges(nodeType).map('"' + _ + '"').mkString(",")})
+          val Out: Array[String] = Array(${outEdges(nodeType).map('"' + _ + '"').mkString(",")})
           val keyCountByLabel: Map[String, Int] = Map(
             $keyCountByLabelEntries
           )
@@ -600,8 +600,8 @@ object DomainClassCreator {
       class ${nodeType.classNameDb}(ref: VertexRef[Vertex])
           extends OverflowDbNode($numberOfDifferentAdjacentTypes, ref) with StoredNode $mixinTraits with ${nodeType.className}Base {
 
-        override def allowedInEdgeLabels() = ${nodeType.className}.Edges.In.asJava
-        override def allowedOutEdgeLabels() = ${nodeType.className}.Edges.Out.asJava
+        override def allowedInEdgeLabels() = ${nodeType.className}.Edges.In
+        override def allowedOutEdgeLabels() = ${nodeType.className}.Edges.Out
         override def specificKeys() = ${nodeType.className}.Keys.All
 
         override def allowedEdgeKeys(edgeLabel: String) = {
