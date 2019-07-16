@@ -167,7 +167,7 @@
          "is": ["EXPRESSION"],
          "outEdges" : [
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]},
-             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK"]},
+             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "CONDITION"]},
              {"edgeName": "RECEIVER", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "BLOCK", "UNKNOWN"]}
          ]
         },
@@ -190,7 +190,7 @@
          "comment" : "A return instruction",
          "is": [ "EXPRESSION"],
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]},
+             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN", "CONDITION"]},
              {"edgeName": "CFG", "inNodes": ["METHOD_RETURN"]}
          ]
         },
@@ -199,7 +199,7 @@
          "comment" : "A structuring block in the AST",
          "is": [ "EXPRESSION"],
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "LOCAL", "UNKNOWN"]},
+             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "LOCAL", "UNKNOWN", "CONDITION"]},
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
          ]
         },
@@ -233,7 +233,7 @@
 	 "outEdges" : [
              {"edgeName": "AST", "inNodes": ["LITERAL", "MEMBER",
                                              "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
-                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN"]}
+                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN", "CONDITION"]}
 	 ]
 	},
 
@@ -247,7 +247,7 @@
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]},
              {"edgeName": "AST", "inNodes": ["LITERAL", "MEMBER",
                                              "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
-                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN"]}
+                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN", "CONDITION"]}
          ]
         }
     ],
