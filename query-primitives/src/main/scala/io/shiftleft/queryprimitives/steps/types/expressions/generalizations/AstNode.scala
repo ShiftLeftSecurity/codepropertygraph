@@ -6,11 +6,12 @@ import io.shiftleft.queryprimitives.steps.{ICallResolver, NodeSteps}
 import io.shiftleft.queryprimitives.steps.types.structure.Block
 import shapeless.HList
 import io.shiftleft.queryprimitives.steps.Implicits._
-import io.shiftleft.queryprimitives.steps.types.expressions.{Call, Identifier, Literal, Return}
+import io.shiftleft.queryprimitives.steps.types.expressions._
 
 class AstNode[Labels <: HList](raw: GremlinScala.Aux[nodes.AstNode, Labels])
     extends NodeSteps[nodes.AstNode, Labels](raw)
-    with AstNodeBase[nodes.AstNode, Labels] {}
+    with AstNodeBase[nodes.AstNode, Labels] {
+}
 
 trait AstNodeBase[NodeType <: nodes.AstNode, Labels <: HList] { this: NodeSteps[NodeType, Labels] =>
 
@@ -37,6 +38,12 @@ trait AstNodeBase[NodeType <: nodes.AstNode, Labels <: HList] { this: NodeSteps[
   def isBlock: Block[Labels] = new Block[Labels](
     raw.hasLabel(NodeTypes.BLOCK).cast[nodes.Block]
   )
+
+  /**
+    * Traverse only to those AST nodes that are control structures
+    * */
+  def isControlStructure : ControlStructure[Labels] =
+    new ControlStructure[Labels](raw.hasLabel(NodeTypes.CONTROL_STRUCTURE).cast[nodes.ControlStructure])
 
   /**
     * Traverse only to AST nodes that are expressions

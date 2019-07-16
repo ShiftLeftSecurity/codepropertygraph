@@ -6,7 +6,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{AstNodeBase, DeclarationBase, Expression, Modifier}
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.{ICallResolver, NodeSteps}
-import io.shiftleft.queryprimitives.steps.types.expressions.{Call, Literal}
+import io.shiftleft.queryprimitives.steps.types.expressions.{Call, ControlStructure, Literal}
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors._
 import shapeless.HList
 
@@ -70,6 +70,11 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, L
   def calledBy(sourceTrav: MethodInst[Labels])(implicit callResolver: ICallResolver): Method[Labels] = {
     caller(callResolver).calledByIncludingSink(sourceTrav.method)(callResolver)
   }
+
+  /**
+    * Shorthand to traverse to control structures where condition matches `regex`
+    * */
+  def condition(regex : String) : ControlStructure[Labels] = ast.isControlStructure.condition(regex)
 
   /**
     * Intended for internal use!
