@@ -10,6 +10,7 @@ import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{Ast
 class Block[Labels <: HList](raw: GremlinScala.Aux[nodes.Block, Labels])
     extends NodeSteps[nodes.Block, Labels](raw)
     with ExpressionBase[nodes.Block, Labels] {
+
   /**
     * Traverse to locals of this block.
     */

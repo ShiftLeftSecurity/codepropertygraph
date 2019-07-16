@@ -10,15 +10,13 @@ import io.shiftleft.queryprimitives.steps.types.expressions._
 
 class AstNode[Labels <: HList](raw: GremlinScala.Aux[nodes.AstNode, Labels])
     extends NodeSteps[nodes.AstNode, Labels](raw)
-    with AstNodeBase[nodes.AstNode, Labels] {
-}
+    with AstNodeBase[nodes.AstNode, Labels] {}
 
 trait AstNodeBase[NodeType <: nodes.AstNode, Labels <: HList] { this: NodeSteps[NodeType, Labels] =>
 
   /**
     * Nodes of the AST rooted in this node, including the node itself.
     * */
-
   def ast: AstNode[Labels] = new AstNode[Labels](raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
 
   /**
@@ -42,7 +40,7 @@ trait AstNodeBase[NodeType <: nodes.AstNode, Labels <: HList] { this: NodeSteps[
   /**
     * Traverse only to those AST nodes that are control structures
     * */
-  def isControlStructure : ControlStructure[Labels] =
+  def isControlStructure: ControlStructure[Labels] =
     new ControlStructure[Labels](raw.hasLabel(NodeTypes.CONTROL_STRUCTURE).cast[nodes.ControlStructure])
 
   /**

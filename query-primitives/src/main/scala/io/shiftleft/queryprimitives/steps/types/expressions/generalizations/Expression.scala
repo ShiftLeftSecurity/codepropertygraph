@@ -17,9 +17,7 @@ import io.shiftleft.queryprimitives.steps.ICallResolver
   */
 class Expression[Labels <: HList](raw: GremlinScala.Aux[nodes.Expression, Labels])
     extends NodeSteps[nodes.Expression, Labels](raw)
-    with ExpressionBase[nodes.Expression, Labels] {
-
-}
+    with ExpressionBase[nodes.Expression, Labels] {}
 
 trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
     extends OrderAccessors[NodeType, Labels]

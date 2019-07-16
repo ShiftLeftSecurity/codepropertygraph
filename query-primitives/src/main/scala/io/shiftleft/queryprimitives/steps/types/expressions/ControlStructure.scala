@@ -9,24 +9,24 @@ import io.shiftleft.queryprimitives.steps.Implicits._
 import shapeless.HList
 
 class ControlStructure[Labels <: HList](raw: GremlinScala.Aux[nodes.ControlStructure, Labels])
-  extends NodeSteps[nodes.ControlStructure, Labels](raw)
+    extends NodeSteps[nodes.ControlStructure, Labels](raw)
     with ParserTypeNameAccessors[nodes.ControlStructure, Labels]
     with ExpressionBase[nodes.ControlStructure, Labels] {
 
   /**
     * The expression introduced by this control structure, if any
     * */
-  def condition : Expression[Labels] =
+  def condition: Expression[Labels] =
     new Expression(raw.out.has(NodeKeys.ORDER, new Integer(1)).cast[nodes.Expression])
 
   /**
     * Only those control structures where condition matched `regex`
     * */
-  def condition(regex : String) : ControlStructure[Labels] =
+  def condition(regex: String): ControlStructure[Labels] =
     new ControlStructure(this.filterOnEnd(_.code.matches(regex)).raw)
 
   def whenTrue: AstNode[Labels] = new AstNode(
-      raw.out.has(NodeKeys.ORDER, new Integer(2)).cast[nodes.AstNode]
+    raw.out.has(NodeKeys.ORDER, new Integer(2)).cast[nodes.AstNode]
   )
 
   def whenFalse: AstNode[Labels] = new AstNode(
