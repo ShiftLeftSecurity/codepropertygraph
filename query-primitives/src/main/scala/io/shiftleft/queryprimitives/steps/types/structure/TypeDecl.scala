@@ -18,6 +18,7 @@ class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDecl, Labels])
     with NameAccessors[nodes.TypeDecl, Labels]
     with FullNameAccessors[nodes.TypeDecl, Labels]
     with IsExternalAccessor[nodes.TypeDecl, Labels] {
+  import TypeDecl._
 
   /**
     * Types referencing to this type declaration.
@@ -155,7 +156,8 @@ class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDecl, Labels])
 
     new TypeDecl[Labels](raw.map { typeDecl =>
       var currentTypeDecl = typeDecl
-      while (currentTypeDecl.aliasTypeFullName.isDefined) {
+      var aliasExpansionCounter = 0
+      while (currentTypeDecl.aliasTypeFullName.isDefined && aliasExpansionCounter < maxAliasExpansions) {
         currentTypeDecl = currentTypeDecl
           .vertices(Direction.OUT, EdgeTypes.ALIAS_OF)
           .next
@@ -163,6 +165,7 @@ class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDecl, Labels])
           .vertices(Direction.OUT, EdgeTypes.REF)
           .next
           .asInstanceOf[nodes.TypeDecl]
+        aliasExpansionCounter += 1
       }
       currentTypeDecl
     })
@@ -181,4 +184,8 @@ class TypeDecl[Labels <: HList](raw: GremlinScala.Aux[nodes.TypeDecl, Labels])
   def alisTypeDeclTransitive: TypeDecl[Labels] = {
     repeat(_.aliasTypeDecl).emit()
   }
+}
+
+object TypeDecl {
+  private val maxAliasExpansions = 100
 }
