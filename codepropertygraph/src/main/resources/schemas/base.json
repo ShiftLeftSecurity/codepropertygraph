@@ -190,7 +190,7 @@
          "comment" : "A return instruction",
          "is": [ "EXPRESSION"],
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN", "CONDITION"]},
+             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN", "CONTROL_STRUCTURE"]},
              {"edgeName": "CFG", "inNodes": ["METHOD_RETURN"]}
          ]
         },
@@ -199,7 +199,7 @@
          "comment" : "A structuring block in the AST",
          "is": [ "EXPRESSION"],
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "LOCAL", "UNKNOWN", "CONDITION"]},
+             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "LOCAL", "UNKNOWN", "CONTROL_STRUCTURE"]},
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
          ]
         },
@@ -226,14 +226,14 @@
           ]
         },
 
-	{"id" : 339, "name" : "CONDITION",
+	{"id" : 339, "name" : "CONTROL_STRUCTURE",
 	 "keys" : ["CODE", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER", "PARSER_TYPE_NAME", "ARGUMENT_INDEX"],
 	 "comment" : "A boolean expression that indicates whether or not to enter a block",
 	 "is" : ["EXPRESSION"],
 	 "outEdges" : [
              {"edgeName": "AST", "inNodes": ["LITERAL", "MEMBER",
                                              "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
-                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN", "CONDITION"]}
+                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN", "CONTROL_STRUCTURE"]}
 	 ]
 	},
 
@@ -247,7 +247,7 @@
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]},
              {"edgeName": "AST", "inNodes": ["LITERAL", "MEMBER",
                                              "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
-                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN", "CONDITION"]}
+                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN", "CONTROL_STRUCTURE"]}
          ]
         }
     ],
