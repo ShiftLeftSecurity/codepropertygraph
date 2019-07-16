@@ -227,7 +227,7 @@
         },
 
 	{"id" : 339, "name" : "CONDITION",
-	 "keys" : ["CODE", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER", "PARSER_TYPE_NAME"],
+	 "keys" : ["CODE", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER", "PARSER_TYPE_NAME", "ARGUMENT_INDEX"],
 	 "comment" : "A boolean expression that indicates whether or not to enter a block",
 	 "is" : ["EXPRESSION"],
 	 "outEdges" : [
