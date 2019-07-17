@@ -114,11 +114,7 @@ class DiffGraphProtoSerializer() {
   private def addEdgeProperties()(implicit builder: CpgOverlay.Builder, appliedDiffGraph: AppliedDiffGraph): Unit = {
     builder.addAllEdgeProperty(
       appliedDiffGraph.diffGraph.edgeProperties.map { property =>
-        AdditionalEdgeProperty
-          .newBuilder()
-          .setEdgeId(property.edgeId)
-          .setProperty(edgeProperty(property.propertyKey, property.propertyValue))
-          .build
+        throw new RuntimeException("Not implemented.")
       }.asJava
     )
   }
