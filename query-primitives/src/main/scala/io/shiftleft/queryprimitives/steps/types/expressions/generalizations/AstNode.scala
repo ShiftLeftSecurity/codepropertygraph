@@ -49,13 +49,11 @@ trait AstNodeBase[NodeType <: nodes.AstNode, Labels <: HList] { this: NodeSteps[
   def isExpression: Expression[Labels] = new Expression[Labels](
     raw.filterOnEnd(_.isInstanceOf[nodes.Expression]).cast[nodes.Expression]
   )
-
-
   @deprecated("replaced by isCall", "July 19")
-  def call : Call[Labels] = isCall
+  def call: Call[Labels] = isCall
 
   @deprecated("replaced by isLiteral", "July 19")
-  def literal : Literal[Labels] = isLiteral
+  def literal: Literal[Labels] = isLiteral
 
   /**
     * Traverse only to AST nodes that are calls
