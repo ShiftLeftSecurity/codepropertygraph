@@ -1,20 +1,26 @@
 package io.shiftleft.queryprimitives.steps.types.expressions
 
 import gremlin.scala.GremlinScala
-import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{NodeKeys, nodes}
 import io.shiftleft.queryprimitives.steps.NodeSteps
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{AstNode, Expression, ExpressionBase}
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.ParserTypeNameAccessors
 import io.shiftleft.queryprimitives.steps.Implicits._
 import shapeless.HList
 
+object ControlStructure {
+
+  val secondChildIndex = new Integer(2)
+  val thirdChildIndex = new Integer(3)
+
+}
+
 class ControlStructure[Labels <: HList](raw: GremlinScala.Aux[nodes.ControlStructure, Labels])
     extends NodeSteps[nodes.ControlStructure, Labels](raw)
     with ParserTypeNameAccessors[nodes.ControlStructure, Labels]
     with ExpressionBase[nodes.ControlStructure, Labels] {
 
-  val secondChildIndex = new Integer(2)
-  val thirdChildIndex = new Integer(3)
+  import ControlStructure._
 
   /**
     * The expression introduced by this control structure, if any
