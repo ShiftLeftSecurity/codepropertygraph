@@ -314,7 +314,7 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, L
   /**
     * Traverse to method body (alias for `block`)
     * */
-  def body: Block[Labels] = isBlock
+  def body: Block[Labels] = block
 
   /**
     * Traverse to namespace

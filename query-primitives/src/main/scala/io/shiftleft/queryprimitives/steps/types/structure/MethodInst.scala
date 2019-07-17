@@ -192,6 +192,6 @@ class MethodInst[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Metho
     * Traverse to literals used in method.
     * */
   def literal: Literal[Labels] = {
-    method.isLiteral
+    method.literal
   }
 }

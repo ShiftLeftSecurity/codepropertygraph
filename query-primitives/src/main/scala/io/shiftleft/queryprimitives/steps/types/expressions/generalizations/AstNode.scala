@@ -28,7 +28,7 @@ trait AstNodeBase[NodeType <: nodes.AstNode, Labels <: HList] { this: NodeSteps[
     * Traverse only to those AST nodes that are also control flow graph nodes
     * */
   def isCfgNode: CfgNode[Labels] =
-    new CfgNode[Labels](raw.filterOnEnd(_.isInstanceOf[nodes.CfgNode]).map(_.asInstanceOf[nodes.CfgNode]))
+    new CfgNode[Labels](raw.filterOnEnd(_.isInstanceOf[nodes.CfgNode]).cast[nodes.CfgNode])
 
   /**
     * Traverse only to those AST nodes that are blocks

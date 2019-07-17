@@ -13,6 +13,9 @@ class ControlStructure[Labels <: HList](raw: GremlinScala.Aux[nodes.ControlStruc
     with ParserTypeNameAccessors[nodes.ControlStructure, Labels]
     with ExpressionBase[nodes.ControlStructure, Labels] {
 
+  val secondChildIndex = new Integer(2)
+  val thirdChildIndex = new Integer(3)
+
   /**
     * The expression introduced by this control structure, if any
     * */
@@ -26,11 +29,11 @@ class ControlStructure[Labels <: HList](raw: GremlinScala.Aux[nodes.ControlStruc
     new ControlStructure(this.filterOnEnd(_.code.matches(regex)).raw)
 
   def whenTrue: AstNode[Labels] = new AstNode(
-    raw.out.has(NodeKeys.ORDER, new Integer(2)).cast[nodes.AstNode]
+    raw.out.has(NodeKeys.ORDER, secondChildIndex).cast[nodes.AstNode]
   )
 
   def whenFalse: AstNode[Labels] = new AstNode(
-    raw.out.has(NodeKeys.ORDER, new Integer(3)).cast[nodes.AstNode]
+    raw.out.has(NodeKeys.ORDER, thirdChildIndex).cast[nodes.AstNode]
   )
 
 }
