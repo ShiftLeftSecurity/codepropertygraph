@@ -22,7 +22,7 @@ trait AstNodeBase[NodeType <: nodes.AstNode, Labels <: HList] { this: NodeSteps[
   /**
     * Nodes of the AST rooted in this node, minus the node itself
     * */
-  def children: AstNode[Labels] = new AstNode[Labels](raw.repeat(_.out(EdgeTypes.AST)).emit.cast[nodes.AstNode])
+  def astMinusRoot: AstNode[Labels] = new AstNode[Labels](raw.repeat(_.out(EdgeTypes.AST)).emit.cast[nodes.AstNode])
 
   /**
     * Traverse only to those AST nodes that are also control flow graph nodes

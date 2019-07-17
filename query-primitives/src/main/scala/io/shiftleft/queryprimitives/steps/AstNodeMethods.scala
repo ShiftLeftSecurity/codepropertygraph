@@ -11,6 +11,6 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
   def ast: AstNode[HNil] = node.start.ast
 
-  def children: AstNode[HNil] = node.start.children
+  def children: AstNode[HNil] = node.start.astMinusRoot
 
 }
