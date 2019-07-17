@@ -3,8 +3,8 @@ package io.shiftleft.queryprimitives.steps.types.expressions
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.queryprimitives.steps.{ICallResolver, NodeSteps, Steps}
-import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
+import io.shiftleft.queryprimitives.steps._
+import io.shiftleft.queryprimitives.steps.{ICallResolver, NodeSteps}
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors._
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations._
 import io.shiftleft.queryprimitives.steps.types.structure.{Member, Method, MethodInst, MethodReturn}

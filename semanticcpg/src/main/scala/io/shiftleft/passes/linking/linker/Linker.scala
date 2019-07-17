@@ -3,7 +3,7 @@ package io.shiftleft.passes.linking.linker
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.CpgPass
-import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
+import io.shiftleft.queryprimitives.steps._
 import java.lang.{Long => JLong}
 
 import io.shiftleft.diffgraph.DiffGraph

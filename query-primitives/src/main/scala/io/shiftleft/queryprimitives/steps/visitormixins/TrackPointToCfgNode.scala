@@ -22,7 +22,7 @@ object TrackPointToCfgNode extends NodeVisitor[nodes.CfgNode] with ExpressionGen
   }
 
   override def visit(node: nodes.Call): nodes.CfgNode = {
-    if (isGenericMemberAccessName(node.name)) {
+    if (ExpandTo.isGenericMemberAccessName(node.name)) {
       ExpandTo.argumentToCallOrReturn(node)
     } else {
       node

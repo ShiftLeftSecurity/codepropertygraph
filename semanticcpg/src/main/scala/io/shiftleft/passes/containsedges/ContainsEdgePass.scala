@@ -33,10 +33,7 @@ class ContainsEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
   )
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = new DiffGraph
-
     val sourceVerticesIterator = GremlinScalaIterator(graph.V.hasLabel(sourceTypes.head, sourceTypes.tail: _*))
-
     new ParallelIteratorExecutor(sourceVerticesIterator).map(perSource)
   }
 

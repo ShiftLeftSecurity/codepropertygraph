@@ -2,8 +2,8 @@ package io.shiftleft.queryprimitives.steps.types.structure
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
+import io.shiftleft.queryprimitives.steps._
 import io.shiftleft.queryprimitives.steps.NodeSteps
-import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.types.expressions.Call
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{DeclarationBase, Modifier}
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{CodeAccessors, EvalTypeAccessors, NameAccessors}

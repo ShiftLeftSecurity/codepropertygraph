@@ -4,9 +4,8 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
 import shapeless.HList
-import io.shiftleft.queryprimitives
+import io.shiftleft.queryprimitives.steps._
 import io.shiftleft.queryprimitives.steps.types.structure.Method
-import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 import io.shiftleft.queryprimitives.utils.ExpandTo
 import org.apache.tinkerpop.gremlin.structure.Direction
 
@@ -126,7 +125,7 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
     }
 
     val callName = vertex.value2(NodeKeys.NAME)
-    queryprimitives.isGenericMemberAccessName(callName)
+    ExpandTo.isGenericMemberAccessName(callName)
   }
 
 }

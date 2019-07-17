@@ -2,7 +2,7 @@ package io.shiftleft.queryprimitives.steps.types.structure
 
 import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
+import io.shiftleft.queryprimitives.steps._
 import io.shiftleft.queryprimitives.steps.{ICallResolver, NodeSteps}
 import io.shiftleft.queryprimitives.steps.types.expressions.{Call, Literal}
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.Modifier

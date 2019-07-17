@@ -1,13 +1,18 @@
-package io.shiftleft.queryprimitives.steps
+package io.shiftleft.queryprimitives.steps.visitormixins
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
-import io.shiftleft.queryprimitives.steps.visitormixins.ExpressionGeneralization
 
+/**
+  * Methods for single Cfg nodes.
+  * */
 class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
   def code: String = node.accept(CfgNodeToCode)
 }
 
+/**
+  * Lookup of `code` field for different node types.
+  * */
 private object CfgNodeToCode extends NodeVisitor[String] with ExpressionGeneralization[String] {
 
   override def visit(node: nodes.Expression): String = node.code

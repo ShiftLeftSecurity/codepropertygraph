@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.queryprimitives.steps.{ICallResolver, NodeSteps}
 import io.shiftleft.queryprimitives.steps.types.structure.Block
 import shapeless.HList
-import io.shiftleft.queryprimitives.steps.Implicits._
+import io.shiftleft.queryprimitives.steps._
 import io.shiftleft.queryprimitives.steps.types.expressions._
 
 class AstNode[Labels <: HList](raw: GremlinScala.Aux[nodes.AstNode, Labels])

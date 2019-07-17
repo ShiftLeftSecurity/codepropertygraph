@@ -1,13 +1,11 @@
 package io.shiftleft.queryprimitives.steps.types.expressions.generalizations
 
 import gremlin.scala.GremlinScala
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.queryprimitives.steps._
 import io.shiftleft.queryprimitives.steps.NodeSteps
-import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
-import io.shiftleft.queryprimitives.steps.types.expressions.Call
 import io.shiftleft.queryprimitives.steps.types.structure.Method
 import io.shiftleft.queryprimitives.utils.ExpandTo
-import org.apache.tinkerpop.gremlin.structure.Direction
 import shapeless.HList
 
 class CfgNode[Labels <: HList](raw: GremlinScala.Aux[nodes.CfgNode, Labels])

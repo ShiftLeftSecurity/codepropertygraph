@@ -1,7 +1,6 @@
 package io.shiftleft
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.Operators
 
 /**
   * Domain specific language for querying code property graphs
@@ -95,18 +94,4 @@ import io.shiftleft.codepropertygraph.generated.Operators
   * }}}
   *
   **/
-package object queryprimitives {
-
-  /**
-    * For a given name, determine whether it is the
-    * name of a "member access" operation, e.g.,
-    * "<operator>.memberAccess".
-    * */
-  def isGenericMemberAccessName(name: String): Boolean = {
-    (name == Operators.memberAccess) ||
-    (name == Operators.indirectComputedMemberAccess) ||
-    (name == Operators.indirectMemberAccess) ||
-    (name == Operators.computedMemberAccess) ||
-    (name == Operators.indirection)
-  }
-}
+package object queryprimitives {}

@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.queryprimitives.steps.NodeSteps
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{CodeAccessors, LineNumberAccessors}
 import shapeless.HList
-import io.shiftleft.queryprimitives.steps.Implicits._
+import io.shiftleft.queryprimitives.steps._
 
 class Comment[Labels <: HList](raw: GremlinScala.Aux[nodes.Comment, Labels])
     extends NodeSteps[nodes.Comment, Labels](raw)
