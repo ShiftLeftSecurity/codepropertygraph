@@ -14,7 +14,8 @@
          "comment" : "A method annotation",
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["ANNOTATION_PARAMETER_ASSIGN"]}
-         ]
+         ],
+          "is" : ["AST_NODE"]
         },
 
         {"id" : 6, "name" : "ANNOTATION_PARAMETER_ASSIGN",
@@ -22,19 +23,22 @@
          "comment" : "Assignment of annotation argument to annotation parameter",
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["ANNOTATION_PARAMETER", "ARRAY_INITIALIZER", "ANNOTATION_LITERAL", "ANNOTATION"]}
-         ]
+         ],
+          "is" : ["AST_NODE"]
         },
 
         {"id" : 7, "name" : "ANNOTATION_PARAMETER",
          "keys" : ["CODE"],
          "comment" : "Formal annotation parameter",
-         "outEdges": []
+         "outEdges": [],
+          "is" : ["AST_NODE"]
         },
 
         {"id" : 49, "name" : "ANNOTATION_LITERAL",
          "keys" : ["CODE", "NAME", "ORDER"],
          "comment" : "A literal value assigned to an ANNOTATION_PARAMETER",
-         "outEdges" : [ ]
+         "outEdges" : [ ],
+          "is" : ["AST_NODE"]
         },
 
         {"name" : "ARRAY_INITIALIZER",

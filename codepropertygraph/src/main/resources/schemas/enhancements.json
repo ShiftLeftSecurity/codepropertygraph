@@ -21,7 +21,8 @@
             "name": "NAMESPACE",
             "keys": ["NAME"],
             "comment": "This node represents a namespace as a whole whereas the NAMESPACE_BLOCK is used for each grouping occurrence of a namespace in code. Single representing NAMESPACE node is required for easier navigation in the query language",
-            "outEdges": []
+          "is" : ["AST_NODE"],
+          "outEdges": []
         },
         {
             "name" : "FILE", "outEdges" : [
@@ -56,7 +57,7 @@
         {"id" : 33, "name" : "METHOD_PARAMETER_OUT",
          "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "This node represents a formal parameter going towards the caller side",
-         "is": ["DECLARATION", "TRACKING_POINT"],
+         "is": ["DECLARATION", "TRACKING_POINT", "AST_NODE"],
          "outEdges" : [
            {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}

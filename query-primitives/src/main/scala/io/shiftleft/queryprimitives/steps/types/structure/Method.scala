@@ -3,10 +3,15 @@ package io.shiftleft.queryprimitives.steps.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{DeclarationBase, Expression, Modifier}
+import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{
+  AstNodeBase,
+  DeclarationBase,
+  Expression,
+  Modifier
+}
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.{ICallResolver, NodeSteps}
-import io.shiftleft.queryprimitives.steps.types.expressions.{Call, Literal}
+import io.shiftleft.queryprimitives.steps.types.expressions.{Call, ControlStructure, Literal}
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors._
 import shapeless.HList
 
@@ -20,7 +25,8 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, L
     with FullNameAccessors[nodes.Method, Labels]
     with SignatureAccessors[nodes.Method, Labels]
     with LineNumberAccessors[nodes.Method, Labels]
-    with EvalTypeAccessors[nodes.Method, Labels] {
+    with EvalTypeAccessors[nodes.Method, Labels]
+    with AstNodeBase[nodes.Method, Labels] {
 
   /**
     * Traverse to concrete instances of method.
@@ -69,6 +75,11 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, L
   def calledBy(sourceTrav: MethodInst[Labels])(implicit callResolver: ICallResolver): Method[Labels] = {
     caller(callResolver).calledByIncludingSink(sourceTrav.method)(callResolver)
   }
+
+  /**
+    * Shorthand to traverse to control structures where condition matches `regex`
+    * */
+  def condition(regex: String): ControlStructure[Labels] = ast.isControlStructure.condition(regex)
 
   /**
     * Intended for internal use!
@@ -299,6 +310,11 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, L
     * */
   def block: Block[Labels] =
     new Block[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
+
+  /**
+    * Traverse to method body (alias for `block`)
+    * */
+  def body: Block[Labels] = block
 
   /**
     * Traverse to namespace

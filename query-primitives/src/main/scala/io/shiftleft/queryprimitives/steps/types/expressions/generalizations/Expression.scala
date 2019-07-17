@@ -17,38 +17,15 @@ import io.shiftleft.queryprimitives.steps.ICallResolver
   */
 class Expression[Labels <: HList](raw: GremlinScala.Aux[nodes.Expression, Labels])
     extends NodeSteps[nodes.Expression, Labels](raw)
-    with ExpressionBase[nodes.Expression, Labels]
+    with ExpressionBase[nodes.Expression, Labels] {}
 
 trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
     extends OrderAccessors[NodeType, Labels]
     with ArgumentIndexAccessors[NodeType, Labels]
     with EvalTypeAccessors[NodeType, Labels]
     with CodeAccessors[NodeType, Labels]
-    with LineNumberAccessors[NodeType, Labels] { this: NodeSteps[NodeType, Labels] =>
-
-  /**
-    Cast to literal if applicable
-    */
-  def literal: Literal[Labels] =
-    new Literal[Labels](raw.hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
-
-  /**
-    Cast to identifier, if applicable
-    */
-  def identifier: Identifier[Labels] =
-    new Identifier[Labels](raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
-
-  /**
-    Cast to call if applicable
-    */
-  def call: Call[Labels] =
-    new Call[Labels](raw.hasLabel(NodeTypes.CALL).cast[nodes.Call])
-
-  /**
-   Cast to call if applicable and filter for callee fullName `calleeRegex`
-    */
-  def call(calleeRegex: String)(implicit callResolver: ICallResolver): Call[Labels] =
-    call.filter(_.calledMethod.fullName(calleeRegex))
+    with LineNumberAccessors[NodeType, Labels]
+    with AstNodeBase[NodeType, Labels] { this: NodeSteps[NodeType, Labels] =>
 
   /**
     Traverse to enclosing expression
