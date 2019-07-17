@@ -277,7 +277,7 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, L
   /**
     * Traverse to literals of method
     * */
-  def literal: Literal[Labels] =
+  override def literal: Literal[Labels] =
     new Literal[Labels](raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
 
   def topLevelExpressions: Expression[Labels] =
