@@ -55,7 +55,7 @@ object DomainClassCreator {
       import java.util.{List => JList}
       import org.apache.tinkerpop.gremlin.structure.Property
       import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
-      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{EdgeRef, OverflowDbEdge, OverflowDbNode, OverflowElementFactory, TinkerGraph, TinkerProperty, VertexRef}
+      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{OverflowDbEdge, OverflowDbNode, OverflowElementFactory, TinkerGraph, TinkerProperty, VertexRef}
       import scala.collection.JavaConverters._
       import org.slf4j.LoggerFactory
 
@@ -90,11 +90,10 @@ object DomainClassCreator {
 
     def generateEdgeSource(edgeType: EdgeType, keys: List[Property]) = {
       val edgeClassName = edgeType.className
-      val edgeClassNameDb = s"${edgeClassName}Db"
       val keysQuoted = keys.map('"' + _.name + '"')
       val keyToValueMap = keys
         .map { key =>
-          s""" "${key.name}" -> { instance: $edgeClassNameDb => instance.${camelCase(key.name)}()}"""
+          s""" "${key.name}" -> { instance: $edgeClassName => instance.${camelCase(key.name)}()}"""
         }
         .mkString(",\n")
 
@@ -108,37 +107,19 @@ object DomainClassCreator {
       |  val Label = "${edgeType.name}"
       |  object Keys {
       |    val All: JSet[String] = Set(${keysQuoted.mkString(", ")}).asJava
-      |    val KeyToValue: Map[String, $edgeClassNameDb => Any] = Map(
+      |    val KeyToValue: Map[String, $edgeClassName => Any] = Map(
       |      $keyToValueMap
       |    )
       |  }
       |
-      |  val Factory = new OverflowElementFactory.ForEdge[${edgeClassNameDb}] {
+      |  val Factory = new OverflowElementFactory.ForEdge[${edgeClassName}] {
       |    override val forLabel = $edgeClassName.Label
       |
       |    override def createEdge(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: Vertex], inVertex: VertexRef[_ <: Vertex]) =
-      |      new ${edgeClassNameDb}(graph, outVertex.asInstanceOf[VertexRef[OverflowDbNode]], inVertex.asInstanceOf[VertexRef[OverflowDbNode]])
-      |
-      |    override def createEdgeRef(edge: ${edgeClassNameDb}) = ${edgeClassName}(edge)
-      |
-      |    override def createEdgeRef(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: Vertex], inVertex: VertexRef[_ <: Vertex]) = 
-      |      ${edgeClassName}(id, graph)
+      |      new ${edgeClassName}(graph, outVertex.asInstanceOf[VertexRef[OverflowDbNode]], inVertex.asInstanceOf[VertexRef[OverflowDbNode]])
       |  }
-      |
-      |  def apply(wrapped: $edgeClassNameDb) =
-      |   new $edgeClassName(wrapped.id.asInstanceOf[JLong], wrapped.graph.asInstanceOf[TinkerGraph], wrapped)
-      |  def apply(id: Long, graph: TinkerGraph) = new $edgeClassName(id, graph, null)
       |}
       """.stripMargin
-
-      val edgeRefImpl =
-        s"""
-           |class ${edgeClassName}(_id: JLong, _graph: TinkerGraph, dbNode: ${edgeClassNameDb}) extends EdgeRef[${edgeClassNameDb}](_id, _graph, dbNode) {
-           |  override def label(): String = {
-           |    ${edgeClassName}.Label
-           |  }
-           |}
-           """.stripMargin
 
       def propertyBasedFieldAccessors(properties: List[Property]): String =
         properties.map { property =>
@@ -167,14 +148,14 @@ object DomainClassCreator {
         }.mkString("\n\n")
 
       val classImpl = s"""
-      class ${edgeClassNameDb}(_graph: TinkerGraph, _outVertex: VertexRef[OverflowDbNode], _inVertex: VertexRef[OverflowDbNode])
+      class ${edgeClassName}(_graph: TinkerGraph, _outVertex: VertexRef[OverflowDbNode], _inVertex: VertexRef[OverflowDbNode])
           extends OverflowDbEdge(_graph, $edgeClassName.Label, _outVertex, _inVertex, $edgeClassName.Keys.All) {
 
         ${propertyBasedFieldAccessors(keys)}
       }
       """
 
-      companionObject + edgeRefImpl + classImpl
+      companionObject  + classImpl
     }
 
     val filename = outputDir.getPath + "/" + edgesPackage.replaceAll("\\.", "/") + "/Edges.scala"
