@@ -5,8 +5,8 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.{CpgPass, ParallelIteratorExecutor}
-import io.shiftleft.passes.utils.Traversals
 import io.shiftleft.queryprimitives.steps.GremlinScalaIterator
+import io.shiftleft.queryprimitives.utils.ExpandTo
 
 /**
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
@@ -43,7 +43,7 @@ class ContainsEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
   private def perSource(source: Vertex): DiffGraph = {
     val dstGraph = new DiffGraph()
 
-    Traversals
+    ExpandTo
       .walkAST(
         source.start
           .out(EdgeTypes.AST)

@@ -1,8 +1,8 @@
 package io.shiftleft.queryprimitives.utils
 
+import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated._
 import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex}
-import io.shiftleft.queryprimitives
 import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 
 import scala.annotation.tailrec
@@ -136,6 +136,10 @@ object ExpandTo {
 
   def reference(node: Vertex): Option[Vertex] = {
     node.vertices(Direction.OUT, EdgeTypes.REF).nextOption
+  }
+
+  def walkAST(expression: GremlinScala[Vertex]): GremlinScala[Vertex] = {
+    expression.emit.repeat(_.out(EdgeTypes.AST)).dedup()
   }
 
 }
