@@ -1,9 +1,9 @@
-package io.shiftleft.queryprimitives.steps
+package io.shiftleft.queryprimitives.steps.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.queryprimitives.steps.visitormixins.ExpressionGeneralization
 import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
+import io.shiftleft.queryprimitives.steps.visitormixins.ExpressionGeneralization
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 class WithinMethodMethods(val node: nodes.WithinMethod) extends AnyVal {

@@ -1,6 +1,7 @@
 package io.shiftleft.queryprimitives
 
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.queryprimitives.steps.nodemethods.{AstNodeMethods, CfgNodeMethods, WithinMethodMethods}
 import io.shiftleft.queryprimitives.steps.types.structure._
 import io.shiftleft.queryprimitives.steps.types.expressions._
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations._
