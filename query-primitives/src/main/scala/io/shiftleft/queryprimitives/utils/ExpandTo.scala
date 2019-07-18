@@ -32,7 +32,7 @@ object ExpandTo {
     val parent = argument.vertices(Direction.IN, EdgeTypes.AST).nextChecked
 
     parent match {
-      case call: nodes.Call if queryprimitives.isGenericMemberAccessName(call.name) =>
+      case call: nodes.Call if MemberAccess.isGenericMemberAccessName(call.name) =>
         argumentToCallOrReturn(call)
       case expression: nodes.Expression =>
         expression

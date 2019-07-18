@@ -4,7 +4,7 @@ package visitormixins
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
-import io.shiftleft.queryprimitives.utils.ExpandTo
+import io.shiftleft.queryprimitives.utils.{ExpandTo, MemberAccess}
 
 object TrackPointToCfgNode extends NodeVisitor[nodes.CfgNode] with ExpressionGeneralization[nodes.CfgNode] {
   override def visit(node: nodes.MethodParameterIn): nodes.CfgNode = {
@@ -22,7 +22,7 @@ object TrackPointToCfgNode extends NodeVisitor[nodes.CfgNode] with ExpressionGen
   }
 
   override def visit(node: nodes.Call): nodes.CfgNode = {
-    if (isGenericMemberAccessName(node.name)) {
+    if (MemberAccess.isGenericMemberAccessName(node.name)) {
       ExpandTo.argumentToCallOrReturn(node)
     } else {
       node

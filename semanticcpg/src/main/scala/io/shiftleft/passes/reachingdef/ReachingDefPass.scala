@@ -6,10 +6,11 @@ import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.passes.CpgPass
 import io.shiftleft.queryprimitives
 import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
-import io.shiftleft.queryprimitives.utils.ExpandTo
+import io.shiftleft.queryprimitives.utils.{ExpandTo, MemberAccess}
 import java.nio.file.Paths
 
 import org.apache.tinkerpop.gremlin.structure.Direction
+
 import scala.collection.JavaConverters._
 
 class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
@@ -208,7 +209,7 @@ class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
     }
 
     val callName = vertex.value2(NodeKeys.NAME)
-    queryprimitives.isGenericMemberAccessName(callName)
+    MemberAccess.isGenericMemberAccessName(callName)
   }
 
 }
