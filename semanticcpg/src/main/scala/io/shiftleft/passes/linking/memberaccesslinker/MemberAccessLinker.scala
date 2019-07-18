@@ -99,7 +99,7 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
   private def findMemberOnType(typ: nodes.Type, memberName: String): Option[nodes.Member] = {
     val members = typ.start.member.filter(_.nameExact(memberName)).l
 
-    members.find(_.name == memberName)
+    members.headOption
   }
 }
 

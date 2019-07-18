@@ -29,7 +29,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
       implicit val diffGraph = new DiffGraph
       val configuration = TinkerGraph.EMPTY_CONFIGURATION
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, false)
-      val existingContainedNode = new ModifierDb(_id = 42, _graph = TinkerGraph.open(configuration))
+      val existingContainedNode = Modifier.Factory.createVertex(id = 42L, graph = TinkerGraph.open(configuration))
       existingContainedNode.property(Modifier.Keys.ModifierType, ModifierTypes.NATIVE)
 
       val newContainedNode = new TestNewNode

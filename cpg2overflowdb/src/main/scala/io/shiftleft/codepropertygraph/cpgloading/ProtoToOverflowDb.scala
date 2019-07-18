@@ -27,7 +27,7 @@ object ProtoToOverflowDb extends App {
   type EdgeLabel = String
 
   private lazy val logger = LogManager.getLogger(getClass)
-  private lazy val edgeSerializer = new ProtoEdgeSerializer
+//  private lazy val edgeSerializer = new ProtoEdgeSerializer
   private lazy val nodeFilter = new NodeFilter
 
   parseConfig.map(run)
@@ -69,12 +69,14 @@ object ProtoToOverflowDb extends App {
         .computeIfAbsent(edgeWithId.edge.getDst, _ => new JHashMap)
         .computeIfAbsent(label, _ => new TLongHashSet)
         .add(edgeWithId.id)
-      overflowDb.getEdgeMVMap.put(edgeWithId.id, edgeSerializer.serialize(edgeWithId))
+      ???
+//      overflowDb.getEdgeMVMap.put(edgeWithId.id, edgeSerializer.serialize(edgeWithId))
     }
 
-    val nodeSerializer = new ProtoNodeSerializer(inEdgesByNodeId, outEdgesByNodeId)
+//    val nodeSerializer = new ProtoNodeSerializer(inEdgesByNodeId, outEdgesByNodeId)
     cpgProto.getNodeList.asScala.par.filter(nodeFilter.filterNode).foreach { node =>
-      overflowDb.getVertexMVMap.put(node.getKey, nodeSerializer.serialize(node))
+      ???
+//      overflowDb.getVertexMVMap.put(node.getKey, nodeSerializer.serialize(node))
     }
   }
 

@@ -18,7 +18,6 @@ import scala.collection.mutable
 class CpgOverlayApplier(graph: ScalaGraph) {
 
   private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Vertex] = mutable.HashMap()
-  private val overlayEdgeIdToSrcGraphEdge: mutable.HashMap[Long, Edge] = mutable.HashMap()
 
   /**
     * Applies diff to existing (loaded) TinkerGraph
@@ -64,7 +63,6 @@ class CpgOverlayApplier(graph: ScalaGraph) {
       }
       val newEdge =
         srcTinkerNode.addEdge(edge.getType.toString, dstTinkerNode, keyValues.toArray: _*)
-      overlayEdgeIdToSrcGraphEdge.put(newEdge.id.asInstanceOf[Long], newEdge)
     }
   }
 
@@ -78,9 +76,7 @@ class CpgOverlayApplier(graph: ScalaGraph) {
 
   private def addEdgeProperties(overlay: CpgOverlay): Unit = {
     overlay.getEdgePropertyList.asScala.foreach { additionalEdgeProperty =>
-      val property = additionalEdgeProperty.getProperty
-      val tinkerEdge = getEdgeForOverlayId(additionalEdgeProperty.getEdgeId)
-      addPropertyToElement(tinkerEdge, property.getName.name, property.getValue)
+      throw new RuntimeException("Not implemented.")
     }
   }
 
@@ -90,16 +86,6 @@ class CpgOverlayApplier(graph: ScalaGraph) {
     } else {
       val iter = graph.graph.vertices(id.asInstanceOf[Object])
       assert(iter.hasNext, s"node with id=$id neither found in overlay nodes, nor in existing graph")
-      nextChecked(iter)
-    }
-  }
-
-  private def getEdgeForOverlayId(id: Long): Edge = {
-    if (overlayEdgeIdToSrcGraphEdge.contains(id)) {
-      overlayEdgeIdToSrcGraphEdge(id)
-    } else {
-      val iter = graph.graph.edges(id.asInstanceOf[Object])
-      assert(iter.hasNext, s"edge with id=$id neither found in overlay edges, nor in existing graph")
       nextChecked(iter)
     }
   }

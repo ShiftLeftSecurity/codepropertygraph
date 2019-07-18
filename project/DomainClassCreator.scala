@@ -52,9 +52,10 @@ object DomainClassCreator {
 
       import java.lang.{Boolean => JBoolean, Long => JLong}
       import java.util.{Set => JSet}
+      import java.util.{List => JList}
       import org.apache.tinkerpop.gremlin.structure.Property
       import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
-      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{EdgeRef, SpecializedElementFactory, SpecializedTinkerEdge, TinkerGraph, TinkerProperty, VertexRef}
+      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{OverflowDbEdge, OverflowDbNode, OverflowElementFactory, TinkerGraph, TinkerProperty, VertexRef}
       import scala.collection.JavaConverters._
       import org.slf4j.LoggerFactory
 
@@ -78,8 +79,8 @@ object DomainClassCreator {
             .map(edgeType => edgeType.className + ".Factory")
         s"""
         object Factories {
-          lazy val All: List[SpecializedElementFactory.ForEdge[_]] = ${edgeFactories}
-          lazy val AllAsJava: java.util.List[SpecializedElementFactory.ForEdge[_]] = All.asJava
+          lazy val All: List[OverflowElementFactory.ForEdge[_]] = ${edgeFactories}
+          lazy val AllAsJava: java.util.List[OverflowElementFactory.ForEdge[_]] = All.asJava
         }
         """
       }
@@ -89,78 +90,72 @@ object DomainClassCreator {
 
     def generateEdgeSource(edgeType: EdgeType, keys: List[Property]) = {
       val edgeClassName = edgeType.className
-      val edgeClassNameDb = s"${edgeClassName}Db"
       val keysQuoted = keys.map('"' + _.name + '"')
       val keyToValueMap = keys
         .map { key =>
-          s""" "${key.name}" -> { instance: $edgeClassNameDb => instance.${camelCase(key.name)}()}"""
+          s""" "${key.name}" -> { instance: $edgeClassName => instance.${camelCase(key.name)}()}"""
         }
         .mkString(",\n")
 
       val companionObject = s"""
+      |object ${edgeClassName}NoClash {
+      |  object Keys {
+      |    val AllList: JList[String] = List(${keysQuoted.mkString(", ")}).asJava
+      |  }
+      |}
       |object $edgeClassName {
       |  val Label = "${edgeType.name}"
       |  object Keys {
       |    val All: JSet[String] = Set(${keysQuoted.mkString(", ")}).asJava
-      |    val KeyToValue: Map[String, $edgeClassNameDb => Any] = Map(
+      |    val KeyToValue: Map[String, $edgeClassName => Any] = Map(
       |      $keyToValueMap
       |    )
       |  }
       |
-      |  val Factory = new SpecializedElementFactory.ForEdge[${edgeClassNameDb}] {
+      |  val Factory = new OverflowElementFactory.ForEdge[${edgeClassName}] {
       |    override val forLabel = $edgeClassName.Label
       |
       |    override def createEdge(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: Vertex], inVertex: VertexRef[_ <: Vertex]) =
-      |      new ${edgeClassNameDb}(graph, id, outVertex, inVertex)
-      |
-      |    override def createEdgeRef(edge: ${edgeClassNameDb}) = ${edgeClassName}(edge)
-      |
-      |    override def createEdgeRef(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: Vertex], inVertex: VertexRef[_ <: Vertex]) = 
-      |      ${edgeClassName}(id, graph)
+      |      new ${edgeClassName}(graph, outVertex.asInstanceOf[VertexRef[OverflowDbNode]], inVertex.asInstanceOf[VertexRef[OverflowDbNode]])
       |  }
-      |
-      |  def apply(wrapped: $edgeClassNameDb) =
-      |   new $edgeClassName(wrapped.id.asInstanceOf[JLong], wrapped.graph.asInstanceOf[TinkerGraph], wrapped)
-      |  def apply(id: Long, graph: TinkerGraph) = new $edgeClassName(id, graph, null)
       |}
       """.stripMargin
 
-      val edgeRefImpl =
-        s"""
-           |class ${edgeClassName}(_id: JLong, _graph: TinkerGraph, dbNode: ${edgeClassNameDb}) extends EdgeRef[${edgeClassNameDb}](_id, _graph, dbNode) {
-           |  override def label(): String = {
-           |    ${edgeClassName}.Label
-           |  }
-           |}
-           """.stripMargin
+      def propertyBasedFieldAccessors(properties: List[Property]): String =
+        properties.map { property =>
+          val name = camelCase(property.name)
+          val baseType = getBaseType(property)
+          val tpe = getCompleteType(property)
+
+          // TODO refactor so we don't need to wrap the property in a TinkerProperty instance, only to unwrap it later
+          getHigherType(property) match {
+            case HigherValueType.None =>
+              s"""def $name(): $tpe = property("${property.name}").value.asInstanceOf[$tpe]"""
+            case HigherValueType.Option =>
+              s"""def $name(): $tpe = {
+                 |  val tp = property("${property.name}")
+                 |  if (tp.isPresent) Option(tp.value.asInstanceOf[$baseType])
+                 |  else None
+                 |}""".stripMargin
+            case HigherValueType.List =>
+              s"""private var _$name: $tpe = Nil
+                 |def $name(): $tpe = {
+                 |  val tp = property("${property.name}")
+                 |  if (tp.isPresent) tp.value.asInstanceOf[JList].asScala
+                 |  else Nil
+                 |}""".stripMargin
+          }
+        }.mkString("\n\n")
 
       val classImpl = s"""
-      class ${edgeClassNameDb}(_graph: TinkerGraph, _id: Long, private val _outVertex: Vertex, _inVertex: Vertex)
-          extends SpecializedTinkerEdge(_graph, _id, _outVertex, $edgeClassName.Label, _inVertex, $edgeClassName.Keys.All) {
+      class ${edgeClassName}(_graph: TinkerGraph, _outVertex: VertexRef[OverflowDbNode], _inVertex: VertexRef[OverflowDbNode])
+          extends OverflowDbEdge(_graph, $edgeClassName.Label, _outVertex, _inVertex, $edgeClassName.Keys.All) {
 
-        ${propertyBasedFields(keys)}
-        override protected def specificProperty[A](key: String): Property[A] =
-          $edgeClassName.Keys.KeyToValue.get(key) match {
-            case None => Property.empty[A]
-            case Some(fieldAccess) => 
-              fieldAccess(this) match {
-                case null | None => Property.empty[A]
-                case Some(value) => new TinkerProperty(this, key, value.asInstanceOf[A])
-                case value => new TinkerProperty(this, key, value.asInstanceOf[A])
-              }
-          }
-
-        override protected def updateSpecificProperty[A](key: String, value: A): Property[A] = {
-          ${updateSpecificPropertyBody(keys)}
-          property(key)
-        }
-
-        override protected def removeSpecificProperty(key: String): Unit =
-          ${removeSpecificPropertyBody(keys)}
+        ${propertyBasedFieldAccessors(keys)}
       }
       """
 
-      companionObject + edgeRefImpl + classImpl
+      companionObject  + classImpl
     }
 
     val filename = outputDir.getPath + "/" + edgesPackage.replaceAll("\\.", "/") + "/Edges.scala"
@@ -195,11 +190,12 @@ object DomainClassCreator {
       import io.shiftleft.codepropertygraph.generated.EdgeKeys
       import java.lang.{Boolean => JBoolean, Long => JLong}
       import java.util.{Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
-      import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
-      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{SpecializedElementFactory, SpecializedTinkerVertex, TinkerGraph, SpecializedVertexProperty, VertexRef}
+      import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
+      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{OverflowElementFactory, OverflowDbNode, TinkerGraph, OverflowNodeProperty, VertexRef}
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
       import scala.collection.JavaConverters._
       import org.slf4j.LoggerFactory
+      import io.shiftleft.codepropertygraph.generated.edges._
 
       object PropertyErrorRegister {
         private var errorMap = Set[(Class[_], String)]()
@@ -217,7 +213,7 @@ object DomainClassCreator {
         def accept[T](visitor: NodeVisitor[T]): T = ???
       }
 
-      /* making use of the fact that SpecializedVertex is also our domain node */
+      /* making use of the fact that OverflowNode is also our domain node */
       trait StoredNode extends Vertex with Node {
         /* underlying vertex in the graph database. 
          * since this is a StoredNode, this is always set */
@@ -294,8 +290,8 @@ object DomainClassCreator {
             .map(nodeType => nodeType.className + ".Factory")
         s"""
         object Factories {
-          lazy val All: List[SpecializedElementFactory.ForVertex[_]] = ${vertexFactories}
-          lazy val AllAsJava: java.util.List[SpecializedElementFactory.ForVertex[_]] = All.asJava
+          lazy val All: List[OverflowElementFactory.ForVertex[_]] = ${vertexFactories}
+          lazy val AllAsJava: java.util.List[OverflowElementFactory.ForVertex[_]] = All.asJava
         }
         """
       }
@@ -316,6 +312,9 @@ object DomainClassCreator {
         s"def visit(node: ${nodeBaseTrait.className}): T = ???"
       }.mkString("\n")
     }
+
+    def edgeTypeByName: Map[String, EdgeType] =
+      (Resources.cpgJson \ "edgeTypes").as[List[EdgeType]].groupBy(_.name).mapValues(_.head)
 
     def generateNodeSource(nodeType: NodeType,
                            keys: List[Property],
@@ -341,6 +340,37 @@ object DomainClassCreator {
         option.map(_.toList).getOrElse(Nil)
       }
 
+      def allEdges(nodeType: NodeType): List[String] =
+        (outEdges(nodeType) ++ inEdges(nodeType)).distinct
+
+      val keyCountByLabelEntries =
+        allEdges(nodeType).map { edgeType =>
+          val propertyCount = edgeTypeByName(edgeType).keys.size
+          s""" "$edgeType" -> $propertyCount"""
+        }.mkString(",\n")
+
+      val positionInEdgeOffsetsEntries = {
+        var position = -1 // starts with `0`
+        val forOutEdges = outEdges(nodeType).map { edgeType =>
+          position += 1
+          s""" (Direction.OUT, "$edgeType") -> $position"""
+        }
+        val forInEdges = inEdges(nodeType).map { edgeType =>
+          position += 1
+          s""" (Direction.IN, "$edgeType") -> $position"""
+        }
+        (forOutEdges ++ forInEdges).mkString(",\n")
+      }
+
+      val offsetRelativeToAdjacentVertexRefEntries =
+        allEdges(nodeType).flatMap { edgeType =>
+          var offset = 0 // must start with `1`, because position `0` is the vertexRef itself
+          edgeTypeByName(edgeType).keys.map { key =>
+            offset = offset + 1
+            s""" ("$edgeType", "$key") -> $offset """
+          }
+        }.mkString(",\n")
+
       val companionObject = s"""
       object ${nodeType.className} {
         implicit val marshaller: Marshallable[${nodeType.classNameDb}] = new Marshallable[${nodeType.classNameDb}] {
@@ -360,15 +390,30 @@ object DomainClassCreator {
           )
         }
         object Edges {
-          val In: Set[String] = Set(${inEdges(nodeType).map('"' + _ + '"').mkString(",")})
-          val Out: Set[String] = Set(${outEdges(nodeType).map('"' + _ + '"').mkString(",")})
+          val In: Array[String] = Array(${inEdges(nodeType).map('"' + _ + '"').mkString(",")})
+          val Out: Array[String] = Array(${outEdges(nodeType).map('"' + _ + '"').mkString(",")})
+          val keyCountByLabel: Map[String, Int] = Map(
+            $keyCountByLabelEntries
+          )
+
+          val positionInEdgeOffsets: Map[(Direction, String), Int] = Map(
+            $positionInEdgeOffsetsEntries
+          )
+
+          val offsetRelativeToAdjacentVertexRef: Map[(String, String), Int] = Map(
+            $offsetRelativeToAdjacentVertexRefEntries
+          )
         }
 
-        val Factory = new SpecializedElementFactory.ForVertex[${nodeType.classNameDb}] {
+        val Factory = new OverflowElementFactory.ForVertex[${nodeType.classNameDb}] {
           override val forLabel = ${nodeType.className}.Label
 
-          override def createVertex(id: JLong, graph: TinkerGraph) = new ${nodeType.classNameDb}(id, graph)
-          override def createVertexRef(vertex: ${nodeType.classNameDb}) = ${nodeType.className}(vertex)
+          override def createVertex(id: JLong, graph: TinkerGraph) =
+            new ${nodeType.classNameDb}(createVertexRef(id, graph).asInstanceOf[VertexRef[Vertex]])
+
+          override def createVertex(ref: VertexRef[${nodeType.classNameDb}]) =
+            new ${nodeType.classNameDb}(ref.asInstanceOf[VertexRef[Vertex]])
+
           override def createVertexRef(id: JLong, graph: TinkerGraph) = ${nodeType.className}(id, graph)
         }
 
@@ -437,7 +482,7 @@ object DomainClassCreator {
               s"""
               /** link to 'contained' node of type $containedNodeType */
               lazy val ${containedNode.localName}: $completeType =
-                getOutEdgesByLabel("CONTAINS_NODE").asScala
+                edges(Direction.OUT, "CONTAINS_NODE").asScala.toList
                   .filter(_.valueOption(EdgeKeys.LOCAL_NAME).map(_  == "${containedNode.localName}").getOrElse(false))
                   .sortBy(_.valueOption(EdgeKeys.INDEX))
                   .map(_.inVertex.asInstanceOf[$containedNodeType])
@@ -516,6 +561,16 @@ object DomainClassCreator {
           |}""".stripMargin
       }
 
+      val numberOfDifferentAdjacentTypes = outEdges(nodeType).size + inEdges(nodeType).size
+
+      val allowedEdgeKeysBody =
+        s"""
+           | edgeLabel match {
+           | ${outEdges(nodeType).map { outEdge => s"""case "$outEdge" => ${Utils.camelCase(outEdge).capitalize}NoClash.Keys.AllList"""}.mkString("\n")}
+           |   case _ => Nil.asJava
+           | }
+         """.stripMargin
+
       val classImpl = s"""
       trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
         def asStored : StoredNode = this.asInstanceOf[StoredNode]
@@ -523,12 +578,25 @@ object DomainClassCreator {
         $abstractContainedNodeAccessors
       }
 
-      class ${nodeType.classNameDb}(_id: JLong, _graph: TinkerGraph)
-          extends SpecializedTinkerVertex(_id, _graph) with StoredNode $mixinTraits with ${nodeType.className}Base {
+      class ${nodeType.classNameDb}(ref: VertexRef[Vertex])
+          extends OverflowDbNode($numberOfDifferentAdjacentTypes, ref) with StoredNode $mixinTraits with ${nodeType.className}Base {
 
-        override def allowedInEdgeLabels() = ${nodeType.className}.Edges.In.asJava
-        override def allowedOutEdgeLabels() = ${nodeType.className}.Edges.Out.asJava
+        override def allowedInEdgeLabels() = ${nodeType.className}.Edges.In
+        override def allowedOutEdgeLabels() = ${nodeType.className}.Edges.Out
         override def specificKeys() = ${nodeType.className}.Keys.All
+
+        override def allowedEdgeKeys(edgeLabel: String) = {
+          $allowedEdgeKeysBody
+        }
+
+        override def getEdgeKeyCount(edgeLabel: String): Int =
+          ${nodeType.className}.Edges.keyCountByLabel.getOrElse(edgeLabel, -1)
+
+        override def getPositionInEdgeOffsets(direction: Direction, edgeLabel: String): Int =
+          ${nodeType.className}.Edges.positionInEdgeOffsets.getOrElse((direction, edgeLabel), -1)
+
+        override def getOffsetRelativeToAdjacentVertexRef(edgeLabel: String, key: String): Int = 
+          ${nodeType.className}.Edges.offsetRelativeToAdjacentVertexRef.getOrElse((edgeLabel, key), -1)
 
         /* all properties */
         override def valueMap: JMap[String, AnyRef] = $valueMapImpl
@@ -557,8 +625,8 @@ object DomainClassCreator {
               fieldAccess(this) match {
                 case null | None => VertexProperty.empty[A]
                 case values: List[_] => throw Vertex.Exceptions.multiplePropertiesExistForProvidedKey(key)
-                case Some(value) => new SpecializedVertexProperty(-1, this, key, value.asInstanceOf[A])
-                case value => new SpecializedVertexProperty(-1, this, key, value.asInstanceOf[A])
+                case Some(value) => new OverflowNodeProperty(-1, this, key, value.asInstanceOf[A])
+                case value => new OverflowNodeProperty(-1, this, key, value.asInstanceOf[A])
               }
           }
         }
@@ -571,16 +639,16 @@ object DomainClassCreator {
                 case null => JCollections.emptyIterator[VertexProperty[A]]
                 case values: List[_] => 
                   values.map { value => 
-                    new SpecializedVertexProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
+                    new OverflowNodeProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
                   }.toIterator.asJava
-                case value => IteratorUtils.of(new SpecializedVertexProperty(-1, this, key, value.asInstanceOf[A]))
+                case value => IteratorUtils.of(new OverflowNodeProperty(-1, this, key, value.asInstanceOf[A]))
               }
           }
         }
 
         override protected def updateSpecificProperty[A](cardinality: VertexProperty.Cardinality, key: String, value: A): VertexProperty[A] = {
           ${updateSpecificPropertyBody(keys)}
-          new SpecializedVertexProperty(-1, this, key, value)
+          new OverflowNodeProperty(-1, this, key, value)
         }
 
         override protected def removeSpecificProperty(key: String): Unit =
