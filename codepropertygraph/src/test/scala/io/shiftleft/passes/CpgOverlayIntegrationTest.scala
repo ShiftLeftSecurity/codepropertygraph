@@ -4,7 +4,7 @@ import gremlin.scala._
 import io.shiftleft.TinkerGraphTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeyNames, NodeKeys, NodeTypes, edges, nodes}
+import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.diffgraph.DiffGraph
 import org.scalatest.{Matchers, WordSpec}
 

@@ -1,12 +1,8 @@
 package io.shiftleft
 
-import java.io.File
-import java.io.IOException
-import java.net.URI
-import java.net.URISyntaxException
-import java.nio.file.FileSystem
-import java.nio.file.FileSystems
-import java.nio.file.Files
+import java.io.{File, IOException}
+import java.net.{URI, URISyntaxException}
+import java.nio.file.{FileSystem, FileSystems, Files}
 import java.util
 
 import io.shiftleft.proto.cpg.Cpg
