@@ -1,7 +1,7 @@
 package io.shiftleft.layers
 
-import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.passes.SerializedCpg
 
 class EnhancementRunner {
   def run(cpg: Cpg, serializedCpg: SerializedCpg): Unit = {

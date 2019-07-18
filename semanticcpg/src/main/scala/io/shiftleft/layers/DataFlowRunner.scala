@@ -1,8 +1,7 @@
 package io.shiftleft.layers
 
-import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.CpgPassRunner
+import io.shiftleft.passes.{CpgPassRunner, SerializedCpg}
 import io.shiftleft.passes.propagateedges.PropagateEdgePass
 import io.shiftleft.passes.reachingdef.ReachingDefPass
 import io.shiftleft.semanticsloader.Semantics

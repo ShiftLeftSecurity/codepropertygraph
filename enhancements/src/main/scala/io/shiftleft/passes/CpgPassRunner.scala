@@ -1,7 +1,5 @@
 package io.shiftleft.passes
 
-import io.shiftleft.SerializedCpg
-
 /**
   * A generic CPG pass runner
   * */

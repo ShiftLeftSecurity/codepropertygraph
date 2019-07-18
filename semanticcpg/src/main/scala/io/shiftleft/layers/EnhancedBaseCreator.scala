@@ -1,7 +1,6 @@
 package io.shiftleft.layers
 
 import gremlin.scala.ScalaGraph
-import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.containsedges.ContainsEdgePass
 import io.shiftleft.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
@@ -11,7 +10,7 @@ import io.shiftleft.passes.linking.memberaccesslinker.MemberAccessLinker
 import io.shiftleft.passes.methoddecorations.MethodDecoratorPass
 import io.shiftleft.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.passes.receiveredges.ReceiverEdgePass
-import io.shiftleft.passes.{CpgPass, CpgPassRunner}
+import io.shiftleft.passes.{CpgPass, CpgPassRunner, SerializedCpg}
 
 class EnhancedBaseCreator(graph: ScalaGraph, language: String, serializedCpg: SerializedCpg) {
   private val runner = new CpgPassRunner(serializedCpg)

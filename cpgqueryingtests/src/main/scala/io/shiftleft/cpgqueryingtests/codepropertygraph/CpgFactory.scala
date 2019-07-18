@@ -3,10 +3,10 @@ package io.shiftleft.cpgqueryingtests.codepropertygraph
 import java.io.{File, PrintWriter}
 import java.nio.file.Files
 
-import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.layers.{DataFlowRunner, EnhancementRunner}
+import io.shiftleft.passes.SerializedCpg
 import io.shiftleft.semanticsloader.SemanticsLoader
 
 class CpgFactory(frontend: LanguageFrontend, semanticsFilename: String) {

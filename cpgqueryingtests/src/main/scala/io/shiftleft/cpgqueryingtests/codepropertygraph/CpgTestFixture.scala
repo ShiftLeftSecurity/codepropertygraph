@@ -1,9 +1,9 @@
 package io.shiftleft.cpgqueryingtests.codepropertygraph
 
 import gremlin.scala.{Graph, ScalaGraph}
-import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.layers.{DataFlowRunner, EnhancementRunner}
+import io.shiftleft.passes.SerializedCpg
 import io.shiftleft.semanticsloader.SemanticsLoader
 
 class CpgTestFixture(projectName: String) {
