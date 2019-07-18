@@ -35,18 +35,19 @@
         },
 
         {"id" : 49, "name" : "ANNOTATION_LITERAL",
-         "keys" : ["CODE", "NAME", "ORDER"],
+         "keys" : ["CODE", "NAME", "ORDER", "COLUMN_NUMBER", "LINE_NUMBER"],
          "comment" : "A literal value assigned to an ANNOTATION_PARAMETER",
          "outEdges" : [ ],
-          "is" : ["AST_NODE"]
+          "is" : ["EXPRESSION"]
         },
 
         {"name" : "ARRAY_INITIALIZER",
-         "keys" : ["CODE"],
+         "keys" : ["CODE", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER"],
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["LITERAL"]},
              {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
-         ]
+         ],
+	 "is" : ["EXPRESSION"]
         },
 
         // Modifications to existing node types
