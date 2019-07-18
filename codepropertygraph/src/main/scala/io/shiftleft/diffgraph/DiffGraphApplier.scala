@@ -2,10 +2,10 @@ package io.shiftleft.diffgraph
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
-import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
 import java.lang.{Long => JLong}
 import java.util
 
+import io.shiftleft.Implicits.JavaIteratorDeco
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.tinkerpop.gremlin.structure.Vertex
 

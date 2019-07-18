@@ -1,6 +1,6 @@
 name := "semanticcpg"
 
-dependsOn(Projects.queryPrimitives, Projects.enhancements)
+dependsOn(Projects.queryPrimitives)
 
 libraryDependencies ++= Seq(
   "org.apache.commons"  % "commons-lang3"    % "3.8",
