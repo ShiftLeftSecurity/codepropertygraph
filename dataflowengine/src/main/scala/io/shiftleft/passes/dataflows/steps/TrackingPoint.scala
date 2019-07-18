@@ -7,7 +7,7 @@ import shapeless.HList
 import io.shiftleft.queryprimitives
 import io.shiftleft.queryprimitives.steps.types.structure.Method
 import io.shiftleft.queryprimitives.steps.Implicits.JavaIteratorDeco
-import io.shiftleft.queryprimitives.utils.ExpandTo
+import io.shiftleft.queryprimitives.utils.{ExpandTo, MemberAccess}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
@@ -126,7 +126,7 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
     }
 
     val callName = vertex.value2(NodeKeys.NAME)
-    queryprimitives.isGenericMemberAccessName(callName)
+    MemberAccess.isGenericMemberAccessName(callName)
   }
 
 }
