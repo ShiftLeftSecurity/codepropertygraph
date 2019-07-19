@@ -29,7 +29,7 @@ class DiffGraphProtoSerializer() {
 
   private def addNodes()(implicit builder: CpgOverlay.Builder, appliedDiffGraph: AppliedDiffGraph) = {
     appliedDiffGraph.diffGraph.nodes.foreach { node =>
-      val nodeId = appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(node))
+      val nodeId = appliedDiffGraph.nodeToGraphId(node)
 
       val nodeBuilder = CpgStruct.Node
         .newBuilder()
@@ -53,15 +53,13 @@ class DiffGraphProtoSerializer() {
 
     addProtoEdge(diffGraph.edgesInOriginal)(_.src.getId, _.dst.getId)
 
-    addProtoEdge(diffGraph.edgesFromOriginal)(_.src.getId,
-                                              edge => appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.dst)))
+    addProtoEdge(diffGraph.edgesFromOriginal)(_.src.getId, edge => appliedDiffGraph.nodeToGraphId(edge.dst))
 
-    addProtoEdge(diffGraph.edgesToOriginal)(edge => appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.src)),
-                                            _.dst.getId)
+    addProtoEdge(diffGraph.edgesToOriginal)(edge => appliedDiffGraph.nodeToGraphId(edge.src), _.dst.getId)
 
     addProtoEdge(diffGraph.edges)(
-      edge => appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.src)),
-      edge => appliedDiffGraph.nodeToGraphId(IdentityHashWrapper(edge.dst))
+      edge => appliedDiffGraph.nodeToGraphId(edge.src),
+      edge => appliedDiffGraph.nodeToGraphId(edge.dst)
     )
 
     def addProtoEdge[T <: DiffEdge](edges: Seq[T])(srcIdGen: T => JLong, dstIdGen: T => JLong) = {

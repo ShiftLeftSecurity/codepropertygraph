@@ -9,13 +9,6 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.tinkerpop.gremlin.structure.Vertex
 
-case class AppliedDiffGraph(diffGraph: DiffGraph,
-                            private val nodeToTinkerNode: util.HashMap[IdentityHashWrapper[NewNode], Vertex]) {
-  def nodeToGraphId(wrappedNode: IdentityHashWrapper[NewNode]): JLong = {
-    nodeToTinkerNode.get(wrappedNode).id.asInstanceOf[JLong]
-  }
-}
-
 /**
   * Component to merge diff graphs into existing (loaded) Tinkergraphs
   * */

@@ -1,6 +1,6 @@
 package io.shiftleft.diffgraph
 
-case class IdentityHashWrapper[T <: AnyRef](value: T) {
+private[diffgraph] case class IdentityHashWrapper[T <: AnyRef](value: T) {
   override def hashCode(): Int = {
     System.identityHashCode(value)
   }

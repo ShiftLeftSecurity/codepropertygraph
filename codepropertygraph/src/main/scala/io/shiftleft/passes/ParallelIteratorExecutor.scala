@@ -11,7 +11,6 @@ class ParallelIteratorExecutor[T](iterator: Iterator[T]) {
         func(element)
       }
     }
-
     Await.result(futures, Duration.Inf)
   }
 }
