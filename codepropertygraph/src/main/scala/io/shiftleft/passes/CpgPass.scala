@@ -52,13 +52,13 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
   def executeAndCreateOverlay(): Iterator[CpgOverlay] = {
     try {
       logStart()
-      run().map(serializeOverlay)
+      run().map(applyAndSerializeOverlay)
     } finally {
       logEnd()
     }
   }
 
-  def serializeOverlay(dstGraph: DiffGraph): CpgOverlay = {
+  private def applyAndSerializeOverlay(dstGraph: DiffGraph): CpgOverlay = {
     val appliedDiffGraph = applyDiff(dstGraph)
     new DiffGraphProtoSerializer().serialize()(appliedDiffGraph)
   }
