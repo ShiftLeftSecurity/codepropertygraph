@@ -3,8 +3,7 @@ package io.shiftleft.passes.linking.memberaccesslinker
 import gremlin.scala.ScalaGraph
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, Operators, nodes}
-import io.shiftleft.diffgraph.DiffGraph
-import io.shiftleft.passes.{CpgPass, ParallelIteratorExecutor}
+import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.Implicits.JavaIteratorDeco
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction

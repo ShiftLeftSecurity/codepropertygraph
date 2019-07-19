@@ -12,7 +12,7 @@ class NamespaceCreatorTests extends WordSpec with Matchers {
     val block3 = graph + (NodeTypes.NAMESPACE_BLOCK, NodeKeys.NAME -> "namespace2")
 
     val namespaceCreator = new NamespaceCreator(graph)
-    namespaceCreator.executeAndApply()
+    namespaceCreator.createAndApply()
 
     val namespaces = graph.V().hasLabel(NodeTypes.NAMESPACE).toBuffer
     namespaces.size shouldBe 2

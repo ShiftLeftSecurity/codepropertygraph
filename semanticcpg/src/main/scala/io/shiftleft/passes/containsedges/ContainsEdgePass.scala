@@ -3,8 +3,7 @@ package io.shiftleft.passes.containsedges
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import io.shiftleft.diffgraph.DiffGraph
-import io.shiftleft.passes.{CpgPass, ParallelIteratorExecutor}
+import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.queryprimitives.steps.GremlinScalaIterator
 import io.shiftleft.queryprimitives.utils.ExpandTo
 

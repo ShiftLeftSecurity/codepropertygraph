@@ -3,8 +3,8 @@ package io.shiftleft.queryprimitives.steps
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node, StoredNode}
 import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
 import io.shiftleft.codepropertygraph.generated.EdgeKeys
-import io.shiftleft.diffgraph.DiffGraph
 import gremlin.scala._
+import io.shiftleft.passes.DiffGraph
 import shapeless.HList
 
 class NewNodeSteps[A <: NewNode, Labels <: HList](override val raw: GremlinScala.Aux[A, Labels])

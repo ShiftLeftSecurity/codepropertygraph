@@ -5,7 +5,6 @@ import io.shiftleft.TinkerGraphTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.diffgraph.DiffGraph
 import org.scalatest.{Matchers, WordSpec}
 
 class CpgOverlayIntegrationTest extends WordSpec with Matchers {
@@ -20,7 +19,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       val initialNode = cpg.graph.V.has(NodeKeys.CODE, InitialNodeCode).head
       val pass1 = passAddsEdgeTo(initialNode.asInstanceOf[nodes.StoredNode], Pass1NewNodeCode, cpg)
 
-      val overlay1 = pass1.executeAndApplyAndCreateOverlay()
+      val overlay1 = pass1.createApplyAndSerialize()
       fullyConsume(overlay1)
       cpg.graph.V.count.head shouldBe 2
       initialNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass1NewNodeCode)
@@ -28,7 +27,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       val pass1NewNode = cpg.graph.V.has(NodeKeys.CODE, Pass1NewNodeCode).head
       val pass2 = passAddsEdgeTo(pass1NewNode.asInstanceOf[nodes.StoredNode], Pass2NewNodeCode, cpg)
 
-      val overlay2 = pass2.executeAndApplyAndCreateOverlay()
+      val overlay2 = pass2.createApplyAndSerialize()
       fullyConsume(overlay2)
       cpg.graph.V.count.head shouldBe 3
       pass1NewNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass2NewNodeCode)

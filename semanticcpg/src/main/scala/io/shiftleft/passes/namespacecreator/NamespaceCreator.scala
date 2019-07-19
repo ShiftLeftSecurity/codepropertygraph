@@ -3,8 +3,7 @@ package io.shiftleft.passes.namespacecreator
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeyNames, NodeKeys, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.diffgraph.DiffGraph
-import io.shiftleft.passes.CpgPass
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 
 import scala.collection.mutable
 

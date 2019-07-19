@@ -57,7 +57,7 @@ object ContainsEdgePassTest {
     innerMethodVertex --- EdgeTypes.AST --> innerExpressionVertex
 
     val containsEdgeCalculator = new ContainsEdgePass(graph)
-    containsEdgeCalculator.executeAndApply()
+    containsEdgeCalculator.createAndApply()
   }
 
   private object Fixture {
