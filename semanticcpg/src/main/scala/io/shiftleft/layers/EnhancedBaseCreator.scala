@@ -11,10 +11,9 @@ import io.shiftleft.passes.linking.memberaccesslinker.MemberAccessLinker
 import io.shiftleft.passes.methoddecorations.MethodDecoratorPass
 import io.shiftleft.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.passes.receiveredges.ReceiverEdgePass
-import io.shiftleft.passes.{CpgPass, CpgPassRunner}
+import io.shiftleft.passes.CpgPass
 
 class EnhancedBaseCreator(graph: ScalaGraph, language: String, serializedCpg: SerializedCpg) {
-  private val runner = new CpgPassRunner(serializedCpg)
   private val enhancementExecList = createEnhancementExecList(language)
 
   private def createEnhancementExecList(language: String): List[CpgPass] = {
@@ -54,6 +53,6 @@ class EnhancedBaseCreator(graph: ScalaGraph, language: String, serializedCpg: Se
   }
 
   def create(): Unit = {
-    enhancementExecList.foreach(runner.createStoreAndApplyOverlay(_))
+    enhancementExecList.foreach(_.createStoreAndApplyOverlay(serializedCpg))
   }
 }
