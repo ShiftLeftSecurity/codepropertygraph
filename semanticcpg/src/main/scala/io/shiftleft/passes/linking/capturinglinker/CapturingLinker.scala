@@ -2,8 +2,7 @@ package io.shiftleft.passes.linking.capturinglinker
 
 import gremlin.scala.ScalaGraph
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.diffgraph.DiffGraph
-import io.shiftleft.passes.CpgPass
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 import org.apache.logging.log4j.{LogManager, Logger}
 
 /**

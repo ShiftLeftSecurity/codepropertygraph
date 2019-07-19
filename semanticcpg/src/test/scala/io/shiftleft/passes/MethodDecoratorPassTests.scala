@@ -21,7 +21,7 @@ class MethodDecoratorPassTests extends WordSpec with Matchers {
     method --- EdgeTypes.AST --> parameterIn
 
     val methodDecorator = new MethodDecoratorPass(graph)
-    methodDecorator.executeAndApply()
+    methodDecorator.createAndApply()
 
     val parameterOut = parameterIn.vertices(Direction.OUT, EdgeTypes.PARAMETER_LINK).next
     parameterOut.value2(NodeKeys.CODE) shouldBe "p1"

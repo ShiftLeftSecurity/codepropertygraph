@@ -11,7 +11,7 @@ class DataFlowRunner(semantics: Semantics) {
   def run(cpg: Cpg, serializedCpg: SerializedCpg): Unit = {
     val graph = cpg.graph
     val enhancementExecList = List(new PropagateEdgePass(graph, semantics), new ReachingDefPass(graph))
-    enhancementExecList.foreach(_.createStoreAndApplyOverlay(serializedCpg))
+    enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg))
   }
 
 }

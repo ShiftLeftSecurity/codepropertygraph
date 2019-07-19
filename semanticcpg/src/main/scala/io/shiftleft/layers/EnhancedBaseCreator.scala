@@ -53,6 +53,6 @@ class EnhancedBaseCreator(graph: ScalaGraph, language: String, serializedCpg: Se
   }
 
   def create(): Unit = {
-    enhancementExecList.foreach(_.createStoreAndApplyOverlay(serializedCpg))
+    enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg))
   }
 }

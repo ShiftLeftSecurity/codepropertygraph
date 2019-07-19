@@ -1,9 +1,11 @@
-package io.shiftleft.diffgraph
+package io.shiftleft.passes
 
-import gremlin.scala.{Edge, ScalaGraph}
-import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import java.lang.{Long => JLong}
+
+import gremlin.scala.Edge
+import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import org.apache.logging.log4j.LogManager
+
 import scala.collection.mutable
 
 /**
@@ -30,9 +32,6 @@ class DiffGraph {
 
   private var _nodes = Set[IdentityHashWrapper[NewNode]]()
 
-  /* this could be done much nicer if we wouldn't hold the DiffGraph locally in the CpgPass  */
-  private var applied = false
-
   def nodes: List[NewNode] = _nodes.toList.map(_.value)
   def edges: List[EdgeInDiffGraph] = _edges.toList
   def edgesToOriginal: List[EdgeToOriginal] = _edgesToOriginal.toList
@@ -40,13 +39,6 @@ class DiffGraph {
   def edgesInOriginal: List[EdgeInOriginal] = _edgesInOriginal.toList
   def nodeProperties: List[NodeProperty] = _nodeProperties.toList
   def edgeProperties: List[EdgeProperty] = _edgeProperties.toList
-
-  def applyDiff(graph: ScalaGraph): AppliedDiffGraph = {
-    assert(!applied, "DiffGraph has already been applied, this is probably a bug")
-    val appliedDiffGraph = new DiffGraphApplier().applyDiff(this, graph)
-    applied = true
-    appliedDiffGraph
-  }
 
   def addNode(node: NewNode): Unit = {
     _nodes += IdentityHashWrapper(node)

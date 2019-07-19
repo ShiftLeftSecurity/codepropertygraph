@@ -2,11 +2,10 @@ package io.shiftleft.passes.linking.linker
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.passes.CpgPass
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.Implicits.JavaIteratorDeco
 import java.lang.{Long => JLong}
 
-import io.shiftleft.diffgraph.DiffGraph
 import io.shiftleft.queryprimitives.steps.GremlinScalaIterator
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality

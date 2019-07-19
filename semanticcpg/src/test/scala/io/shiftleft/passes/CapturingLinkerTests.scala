@@ -15,7 +15,7 @@ class CapturingLinkerTests extends WordSpec with Matchers {
     val local2 = graph + (NodeTypes.LOCAL, NodeKeys.CLOSURE_BINDING_ID -> "id2")
 
     val capturingLinker = new CapturingLinker(graph)
-    capturingLinker.executeAndApply()
+    capturingLinker.createAndApply()
 
     val capturedByDest1 = local1.out(EdgeTypes.CAPTURED_BY).toList()
     capturedByDest1.size shouldBe 1

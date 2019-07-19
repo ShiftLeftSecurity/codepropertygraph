@@ -4,11 +4,10 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.EdgeKeyNames
 import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
-import io.shiftleft.diffgraph.DiffGraph
-import io.shiftleft.diffgraph.DiffGraph._
 import io.shiftleft.queryprimitives.steps.NewNodeSteps
-
 import io.shiftleft.codepropertygraph.generated.ModifierTypes
+import io.shiftleft.passes.DiffGraph
+import io.shiftleft.passes.DiffGraph.{EdgeInDiffGraph, EdgeToOriginal}
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{Matchers, WordSpec}
 

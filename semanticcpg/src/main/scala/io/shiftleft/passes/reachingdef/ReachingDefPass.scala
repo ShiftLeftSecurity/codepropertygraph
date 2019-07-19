@@ -2,8 +2,7 @@ package io.shiftleft.passes.reachingdef
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.diffgraph.DiffGraph
-import io.shiftleft.passes.CpgPass
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.queryprimitives.utils.{ExpandTo, MemberAccess}
 import java.nio.file.Paths
