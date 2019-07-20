@@ -1,6 +1,7 @@
 package io.shiftleft.passes.linking.capturinglinker
 
-import gremlin.scala.ScalaGraph
+import gremlin.scala._
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import org.apache.logging.log4j.{LogManager, Logger}
@@ -9,14 +10,14 @@ import org.apache.logging.log4j.{LogManager, Logger}
   *
   * This pass has no other pass as prerequisite.
   */
-class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
+class CapturingLinker(cpg: Cpg) extends CpgPass(cpg) {
   import CapturingLinker.logger
 
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = new DiffGraph
 
     val idToClosureBinding: Map[String, nodes.ClosureBinding] =
-      graph.V
+      cpg.graph.V
         .hasLabel(NodeTypes.CLOSURE_BINDING)
         .collect {
           case closureBinding: nodes.ClosureBinding =>
@@ -24,7 +25,7 @@ class CapturingLinker(graph: ScalaGraph) extends CpgPass(graph) {
         }
         .toMap
 
-    graph.V
+    cpg.graph.V
       .hasLabel(NodeTypes.LOCAL)
       .sideEffect {
         case local: nodes.Local =>

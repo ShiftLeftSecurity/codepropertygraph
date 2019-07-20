@@ -12,8 +12,11 @@ import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
+
 import scala.collection.JavaConverters._
 import java.lang.{Long => JLong}
+
+import io.shiftleft.codepropertygraph.Cpg
 
 /**
   * Base class for CPG pass - a program, which receives an input graph
@@ -32,9 +35,9 @@ import java.lang.{Long => JLong}
   * 3. Serialize: After applying a diff graph, the diff graph can be serialized into a CPG overlay
   * 4. Store: The CPG overlay can be stored in a serialized CPG.
   *
-  * @param srcGraph the source graph this CPG pass traverses
+  * @param cpg the source CPG this pass traverses
   */
-abstract class CpgPass(srcGraph: ScalaGraph) {
+abstract class CpgPass(cpg: Cpg) {
   import CpgPass.logger
 
   /**
@@ -74,7 +77,7 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
     try {
       logStart()
       run().map { dstGraph =>
-        val appliedDiffGraph = new DiffGraphApplier().applyDiff(dstGraph, srcGraph)
+        val appliedDiffGraph = new DiffGraphApplier().applyDiff(dstGraph, cpg.graph)
         new DiffGraphProtoSerializer().serialize(appliedDiffGraph)
       }
     } finally {
@@ -88,7 +91,7 @@ abstract class CpgPass(srcGraph: ScalaGraph) {
   def createAndApply(): Unit = {
     logStart()
     try {
-      run().foreach(new DiffGraphApplier().applyDiff(_, srcGraph))
+      run().foreach(new DiffGraphApplier().applyDiff(_, cpg.graph))
     } finally {
       logEnd()
     }

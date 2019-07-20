@@ -1,5 +1,5 @@
 package io.shiftleft.passes.languagespecific.fuzzyc
-import gremlin.scala.ScalaGraph
+import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
@@ -7,7 +7,7 @@ import io.shiftleft.passes.{CpgPass, DiffGraph}
 /**
   * This pass has no other pass as prerequisite.
   */
-class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
+class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 
   private var typeDeclFullNameToNode = Map[String, nodes.TypeDeclBase]()
 
@@ -16,7 +16,7 @@ class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
 
     init()
 
-    graph.V
+    cpg.graph.V
       .hasLabel(NodeTypes.TYPE)
       .sideEffectWithTraverser { traverser =>
         val typ = traverser.get.asInstanceOf[nodes.Type]
@@ -45,7 +45,6 @@ class TypeDeclStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
   }
 
   private def init(): Unit = {
-    val cpg = Cpg(graph.graph)
     cpg.typeDecl.sideEffect { typeDecl =>
       typeDeclFullNameToNode += typeDecl.fullName -> typeDecl
     }.exec

@@ -1,6 +1,7 @@
 package io.shiftleft.passes.capturinglinker
 
 import gremlin.scala._
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.passes.linking.capturinglinker.CapturingLinker
 import io.shiftleft.semanticcpg.PlainGraphFixture
@@ -14,7 +15,7 @@ class CapturingLinkerTests extends WordSpec with Matchers {
     val local1 = graph + (NodeTypes.LOCAL, NodeKeys.CLOSURE_BINDING_ID -> "id1")
     val local2 = graph + (NodeTypes.LOCAL, NodeKeys.CLOSURE_BINDING_ID -> "id2")
 
-    val capturingLinker = new CapturingLinker(graph)
+    val capturingLinker = new CapturingLinker(new Cpg(graph.graph))
     capturingLinker.createAndApply()
 
     val capturedByDest1 = local1.out(EdgeTypes.CAPTURED_BY).toList()

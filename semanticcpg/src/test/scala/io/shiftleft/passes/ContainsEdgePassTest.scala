@@ -3,6 +3,7 @@ package io.shiftleft.passes.containsedges
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.TinkerGraphTestInstance
+import io.shiftleft.codepropertygraph.Cpg
 import org.scalatest.{Matchers, WordSpec}
 
 class ContainsEdgePassTest extends WordSpec with Matchers {
@@ -56,7 +57,7 @@ object ContainsEdgePassTest {
     methodVertex --- EdgeTypes.AST --> expressionVertex
     innerMethodVertex --- EdgeTypes.AST --> innerExpressionVertex
 
-    val containsEdgeCalculator = new ContainsEdgePass(graph)
+    val containsEdgeCalculator = new ContainsEdgePass(new Cpg(graph.graph))
     containsEdgeCalculator.createAndApply()
   }
 

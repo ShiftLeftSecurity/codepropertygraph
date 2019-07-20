@@ -13,7 +13,7 @@ import scala.collection.JavaConverters._
 /**
   * This pass has no other pass as prerequisite.
   */
-class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
+class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
   import MethodStubCreator.logger
 
   // Since the method fullNames for fuzzyc are not unique, we do not have
@@ -26,7 +26,7 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
 
     init()
 
-    graph.V
+    cpg.graph.V
       .hasLabel(NodeTypes.METHOD_INST)
       .sideEffectWithTraverser { traverser =>
         val methodInst = traverser.get.asInstanceOf[nodes.MethodInst]
@@ -101,7 +101,6 @@ class MethodStubCreator(graph: ScalaGraph) extends CpgPass(graph) {
   }
 
   private def init(): Unit = {
-    val cpg = Cpg(graph.graph)
     cpg.method
       .sideEffect { method =>
         methodFullNameToNode += method.fullName -> method

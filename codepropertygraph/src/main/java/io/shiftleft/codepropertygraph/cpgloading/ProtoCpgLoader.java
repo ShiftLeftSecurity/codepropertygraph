@@ -3,17 +3,12 @@ package io.shiftleft.codepropertygraph.cpgloading;
 import io.shiftleft.codepropertygraph.Cpg;
 import io.shiftleft.proto.cpg.Cpg.CpgOverlay;
 import io.shiftleft.proto.cpg.Cpg.CpgStruct;
-import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge;
 
 import java.io.InputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 

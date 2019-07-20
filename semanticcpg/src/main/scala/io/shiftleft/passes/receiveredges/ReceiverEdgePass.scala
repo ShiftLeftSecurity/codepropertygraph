@@ -1,6 +1,7 @@
 package io.shiftleft.passes.receiveredges
 
 import gremlin.scala._
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
@@ -20,14 +21,14 @@ import scala.collection.JavaConverters._
   *
   * TODO remove once not needed anymore.
   */
-class ReceiverEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
+class ReceiverEdgePass(cpg: Cpg) extends CpgPass(cpg) {
   import ReceiverEdgePass.logger
 
   override def run(): Iterator[DiffGraph] = {
     var loggedDeprecationWarning = false
     val dstGraph = new DiffGraph
 
-    graph.V
+    cpg.graph.V
       .hasLabel(NodeTypes.CALL)
       .sideEffect { call =>
         val instanceOption = call
