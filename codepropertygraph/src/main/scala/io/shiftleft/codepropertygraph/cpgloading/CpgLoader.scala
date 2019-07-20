@@ -14,34 +14,31 @@ object CpgLoader {
     * @param filename name of file that stores the code property graph
     * @param config loader configuration
     */
-  def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg = {
+  def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg =
     new CpgLoader().load(filename, config)
-  }
 
   /**
     * Create any indexes necessary for quick access.
     *
     * @param cpg the CPG to create indexes in
     */
-  def createIndexes(cpg: Cpg): Unit = {
+  def createIndexes(cpg: Cpg): Unit =
     new CpgLoader().createIndexes(cpg)
-  }
 
-  def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit = {
+  /**
+    * Load and apply overlays from archives to the given CPG.
+    *
+    * @param overlayFilenames filenames of proto archives
+    * @param cpg The CPG to apply overlays to
+    * */
+  def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit =
     new CpgLoader().addOverlays(overlayFilenames, cpg)
-  }
 }
 
 private class CpgLoader {
 
   private val logger = LogManager.getLogger(getClass)
 
-  /**
-    * Load a Code Property Graph
-    *
-    * @param filename name of file that stores the code property graph
-    * @param config loader configuration
-    */
   def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg = {
     logger.debug("Loading " + filename)
 
@@ -53,11 +50,6 @@ private class CpgLoader {
     cpg
   }
 
-  /**
-    * Create any indexes necessary for quick access.
-    *
-    * @param cpg the CPG to create indexes in
-    */
   def createIndexes(cpg: Cpg): Unit =
     cpg.graph.asInstanceOf[TinkerGraph].createIndex(NodeKeys.FULL_NAME.name, classOf[Vertex])
 
