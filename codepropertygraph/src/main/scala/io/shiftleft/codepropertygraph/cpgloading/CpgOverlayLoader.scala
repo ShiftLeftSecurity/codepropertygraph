@@ -9,7 +9,7 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import gremlin.scala._
 
-private [cpgloading] object CpgOverlayLoader {
+private[cpgloading] object CpgOverlayLoader {
 
   /**
     * Load overlays stored in the file with the name `filename`.

@@ -1,6 +1,5 @@
 package io.shiftleft.passes.linking.memberaccesslinker
 
-import gremlin.scala.ScalaGraph
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, Operators, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
@@ -13,7 +12,7 @@ import scala.collection.JavaConverters._
 /**
   * This pass has Linker as prerequisite.
   */
-class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
+class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
   import MemberAccessLinker.logger
   private var loggedDeprecationWarning: Boolean = _
   private var loggedForTypeMemberCombination: Set[(nodes.Type, String)] = _
@@ -22,7 +21,7 @@ class MemberAccessLinker(graph: ScalaGraph) extends CpgPass(graph) {
     loggedDeprecationWarning = false
     loggedForTypeMemberCombination = Set[(nodes.Type, String)]()
 
-    val memberAccessIterator = Cpg(graph.graph).call
+    val memberAccessIterator = cpg.call
       .filter(
         _.nameExact(Operators.memberAccess, Operators.indirectMemberAccess)
       )

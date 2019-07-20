@@ -51,7 +51,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       override def properties = Map(NodeKeyNames.CODE -> propValue)
       override def accept[T](visitor: NodeVisitor[T]): T = ???
     }
-    new CpgPass(cpg.graph) {
+    new CpgPass(cpg) {
 
       /**
         * Main method of enhancement - to be implemented by child class

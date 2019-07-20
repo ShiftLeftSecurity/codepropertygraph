@@ -7,18 +7,19 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.queryprimitives.utils.{ExpandTo, MemberAccess}
 import java.nio.file.Paths
 
+import io.shiftleft.codepropertygraph.Cpg
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
 
-class ReachingDefPass(graph: ScalaGraph) extends CpgPass(graph) {
+class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
   var dfHelper: DataFlowFrameworkHelper = _
 
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = new DiffGraph()
-    val methods = graph.V.hasLabel(NodeTypes.METHOD).l
+    val methods = cpg.method.l
 
-    dfHelper = new DataFlowFrameworkHelper(graph)
+    dfHelper = new DataFlowFrameworkHelper(cpg.graph)
 
     methods.foreach { method =>
       var worklist = Set[Vertex]()

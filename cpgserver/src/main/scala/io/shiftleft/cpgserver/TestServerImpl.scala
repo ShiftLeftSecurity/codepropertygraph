@@ -1,6 +1,5 @@
 package io.shiftleft.cpgserver
 
-import gremlin.scala.ScalaGraph
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.passes.{CpgPass, DiffGraph}
@@ -13,7 +12,7 @@ class TestServerImpl extends ServerImpl {
   override def createCpg(filenames: List[String]): Unit = {
     _cpg = Some(new Cpg())
 
-    class MyPass(srcGraph: ScalaGraph) extends CpgPass(srcGraph) {
+    class MyPass(cpg: Cpg) extends CpgPass(cpg) {
 
       override def run(): Iterator[DiffGraph] = {
         implicit val diffGraph: DiffGraph = new DiffGraph
@@ -21,6 +20,6 @@ class TestServerImpl extends ServerImpl {
         Iterator(diffGraph)
       }
     }
-    new MyPass(_cpg.get.graph).createAndApply()
+    new MyPass(_cpg.get).createAndApply()
   }
 }

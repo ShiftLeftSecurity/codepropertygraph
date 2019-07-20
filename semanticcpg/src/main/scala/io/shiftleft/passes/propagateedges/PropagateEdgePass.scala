@@ -1,6 +1,7 @@
 package io.shiftleft.passes.propagateedges
 
 import gremlin.scala._
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticsloader.Semantics
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
@@ -14,7 +15,7 @@ import scala.collection.JavaConverters._
   * PROPAGATE edges can be picked up by the reachingdef pass to calculate
   * reaching definition edges.
   */
-class PropagateEdgePass(graph: ScalaGraph, semantics: Semantics) extends CpgPass(graph) {
+class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
   import PropagateEdgePass.logger
 
   var dstGraph: DiffGraph = _
@@ -24,7 +25,7 @@ class PropagateEdgePass(graph: ScalaGraph, semantics: Semantics) extends CpgPass
 
     semantics.elements.foreach { semantic =>
       val methodOption =
-        graph.V().hasLabel(NodeTypes.METHOD).has(NodeKeys.FULL_NAME -> semantic.methodFullName).headOption()
+        cpg.graph.V().hasLabel(NodeTypes.METHOD).has(NodeKeys.FULL_NAME -> semantic.methodFullName).headOption()
 
       methodOption match {
         case Some(method) =>

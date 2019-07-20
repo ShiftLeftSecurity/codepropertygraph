@@ -6,6 +6,7 @@ import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.Implicits.JavaIteratorDeco
 import java.lang.{Long => JLong}
 
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.queryprimitives.steps.GremlinScalaIterator
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
@@ -17,7 +18,7 @@ import scala.collection.JavaConverters._
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
   * language frontends which do not provide method stubs and type decl stubs.
   */
-class Linker(graph: ScalaGraph) extends CpgPass(graph) {
+class Linker(cpg: Cpg) extends CpgPass(cpg) {
   import Linker.logger
 
   private var typeDeclFullNameToNodeId = Map[String, JLong]()
@@ -121,7 +122,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
   }
 
   private def initMaps(): Unit = {
-    graph.graph.vertices().asScala.foreach {
+    cpg.graph.graph.vertices().asScala.foreach {
       case node: nodes.TypeDecl   => typeDeclFullNameToNodeId += node.fullName -> node.getId
       case node: nodes.Type       => typeFullNameToNodeId += node.fullName -> node.getId
       case node: nodes.Method     => methodFullNameToNodeId += node.fullName -> node.getId
@@ -139,7 +140,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
                            dstFullNameKey: String,
                            dstGraph: DiffGraph): Unit = {
     var loggedDeprecationWarning = false
-    val sourceIterator = GremlinScalaIterator(graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*))
+    val sourceIterator = GremlinScalaIterator(cpg.graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*))
     sourceIterator.foreach { srcNode =>
       if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
         // for `UNKNOWN` this is not always set, so we're using an Option here
@@ -176,7 +177,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
                                                                 dstFullNameKey: String,
                                                                 dstGraph: DiffGraph): Unit = {
     var loggedDeprecationWarning = false
-    graph.V
+    cpg.graph.V
       .hasLabel(srcLabels.head, srcLabels.tail: _*)
       .sideEffect {
         case srcNode: SRC_NODE_TYPE @unchecked =>
@@ -215,7 +216,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
   private def linkAstChildToParent(dstGraph: DiffGraph): Unit = {
     var loggedDeprecationWarning = false
 
-    graph.V
+    cpg.graph.V
       .hasLabel(NodeTypes.METHOD, NodeTypes.TYPE_DECL)
       .sideEffect {
         case astChild: nodes.HasAstParentType with nodes.HasAstParentFullName with nodes.StoredNode =>
@@ -285,7 +286,7 @@ class Linker(graph: ScalaGraph) extends CpgPass(graph) {
   }
 
   private def lookupNode(nodeId: JLong): Option[nodes.StoredNode] =
-    graph.graph.vertices(nodeId).nextOption.map(_.asInstanceOf[nodes.StoredNode])
+    cpg.graph.graph.vertices(nodeId).nextOption.map(_.asInstanceOf[nodes.StoredNode])
 
 }
 

@@ -1,6 +1,7 @@
 package io.shiftleft.passes.containsedges
 
 import gremlin.scala._
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
@@ -11,7 +12,7 @@ import io.shiftleft.queryprimitives.utils.ExpandTo
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
   * language frontends which do not provide method stubs and type decl stubs.
   */
-class ContainsEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
+class ContainsEdgePass(cpg: Cpg) extends CpgPass(cpg) {
 
   private val sourceTypes = List(
     NodeTypes.METHOD,
@@ -32,7 +33,7 @@ class ContainsEdgePass(graph: ScalaGraph) extends CpgPass(graph) {
   )
 
   override def run(): Iterator[DiffGraph] = {
-    val sourceVerticesIterator = GremlinScalaIterator(graph.V.hasLabel(sourceTypes.head, sourceTypes.tail: _*))
+    val sourceVerticesIterator = GremlinScalaIterator(cpg.graph.V.hasLabel(sourceTypes.head, sourceTypes.tail: _*))
     new ParallelIteratorExecutor(sourceVerticesIterator).map(perSource)
   }
 
