@@ -7,8 +7,9 @@ import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, PropertyValue}
 import org.apache.tinkerpop.gremlin.structure.{T, Vertex, VertexProperty}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
+import gremlin.scala._
 
-class CpgOverlayLoader {
+private [cpgloading] object CpgOverlayLoader {
 
   /**
     * Load overlays stored in the file with the name `filename`.
@@ -21,12 +22,6 @@ class CpgOverlayLoader {
   }
 
 }
-
-/** singleton instance for convenience */
-object CpgOverlayLoader extends CpgOverlayLoader
-
-import gremlin.scala._
-import scala.collection.JavaConverters._
 
 /**
   * Component to merge CPG overlay into existing graph
