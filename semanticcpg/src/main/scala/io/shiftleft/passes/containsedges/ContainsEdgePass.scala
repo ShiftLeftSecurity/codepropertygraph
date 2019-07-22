@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
-import io.shiftleft.queryprimitives.steps.GremlinScalaIterator
+import io.shiftleft.queryprimitives.steps.Steps
 import io.shiftleft.queryprimitives.utils.ExpandTo
 
 /**
@@ -33,7 +33,8 @@ class ContainsEdgePass(cpg: Cpg) extends CpgPass(cpg) {
   )
 
   override def run(): Iterator[DiffGraph] = {
-    val sourceVerticesIterator = GremlinScalaIterator(cpg.graph.V.hasLabel(sourceTypes.head, sourceTypes.tail: _*))
+    val sourceVerticesTraversal = cpg.graph.V.hasLabel(sourceTypes.head, sourceTypes.tail: _*)
+    val sourceVerticesIterator = new Steps(sourceVerticesTraversal).toIterator
     new ParallelIteratorExecutor(sourceVerticesIterator).map(perSource)
   }
 

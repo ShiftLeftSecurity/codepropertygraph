@@ -28,7 +28,8 @@ class Steps[NodeType, Labels <: HList](val raw: GremlinScala.Aux[NodeType, Label
   implicit lazy val graph: Graph = raw.traversal.asAdmin.getGraph.get
 
   def toIterator(): Iterator[NodeType] = {
-    GremlinScalaIterator(raw)
+    val iter: java.util.Iterator[NodeType] = raw.traversal
+    iter.asScala
   }
 
   /**

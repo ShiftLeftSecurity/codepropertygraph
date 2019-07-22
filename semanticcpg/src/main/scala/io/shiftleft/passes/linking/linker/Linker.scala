@@ -3,11 +3,11 @@ package io.shiftleft.passes.linking.linker
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.queryprimitives.steps.Steps
 import io.shiftleft.Implicits.JavaIteratorDeco
 import java.lang.{Long => JLong}
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.queryprimitives.steps.GremlinScalaIterator
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.logging.log4j.{LogManager, Logger}
@@ -140,7 +140,8 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
                            dstFullNameKey: String,
                            dstGraph: DiffGraph): Unit = {
     var loggedDeprecationWarning = false
-    val sourceIterator = GremlinScalaIterator(cpg.graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*))
+    val sourceTraversal = cpg.graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*)
+    val sourceIterator = new Steps(sourceTraversal).toIterator
     sourceIterator.foreach { srcNode =>
       if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
         // for `UNKNOWN` this is not always set, so we're using an Option here
