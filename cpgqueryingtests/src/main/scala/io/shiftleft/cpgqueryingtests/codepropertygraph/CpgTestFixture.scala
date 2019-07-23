@@ -2,12 +2,13 @@ package io.shiftleft.cpgqueryingtests.codepropertygraph
 
 import gremlin.scala.{Graph, ScalaGraph}
 import io.shiftleft.SerializedCpg
-import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
+import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig, OnDiskOverflowConfig}
 import io.shiftleft.layers.{DataFlowRunner, EnhancementRunner}
 import io.shiftleft.semanticsloader.SemanticsLoader
 
 class CpgTestFixture(projectName: String) {
-  lazy val cpg = CpgLoader.load(s"resources/cpgs/$projectName/cpg.bin.zip", CpgLoaderConfig.default.withoutOverflow)
+  lazy val cpg = CpgLoader.load(s"resources/cpgs/$projectName/cpg.bin.zip",
+                                CpgLoaderConfig.default.withOverflowConfig(OnDiskOverflowConfig.disabled))
   new EnhancementRunner().run(cpg, new SerializedCpg())
   new DataFlowRunner(SemanticsLoader.emptySemantics).run(cpg, new SerializedCpg());
   implicit val graph: Graph = cpg.graph

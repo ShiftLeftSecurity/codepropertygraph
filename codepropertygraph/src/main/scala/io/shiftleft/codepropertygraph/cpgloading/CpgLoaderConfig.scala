@@ -8,21 +8,21 @@ object CpgLoaderConfig {
   def default =
     CpgLoaderConfig(
       createIndexes = true,
-      onDiskOverflowConfig = Some(OnDiskOverflowConfig()),
+      onDiskOverflowConfig = OnDiskOverflowConfig.default,
     )
 
   @deprecated("Use CpgLoaderConfig.default.withStorage instead", "")
   def withStorage(path: String) =
     CpgLoaderConfig(
       createIndexes = true,
-      onDiskOverflowConfig = Some(OnDiskOverflowConfig(graphLocation = Some(path))),
+      onDiskOverflowConfig = OnDiskOverflowConfig.default.withGraphLocation(path),
     )
 
   @deprecated("Use CpgLoaderConfig.default.withoutStorage instead", "")
   def withoutOverflow =
     CpgLoaderConfig(
       createIndexes = true,
-      onDiskOverflowConfig = None
+      onDiskOverflowConfig = OnDiskOverflowConfig.default.disabled
     )
 
 }
@@ -32,20 +32,7 @@ object CpgLoaderConfig {
   * @param createIndexes indicate whether to create indices or not
   * @param onDiskOverflowConfig configuration for the on-disk-overflow feature
   */
-case class CpgLoaderConfig(createIndexes: Boolean, onDiskOverflowConfig: Option[OnDiskOverflowConfig]) {
-
-  /**
-    * Existing configuration with overflowdb path as specified
-    * @param path the path of the on disk overflow database
-    * */
-  def withStorage(path: String): CpgLoaderConfig =
-    this.copy(onDiskOverflowConfig = Some(OnDiskOverflowConfig(graphLocation = Some(path))))
-
-  /**
-    * Existing configuration with overflowdb turned off.
-    * */
-  def withoutOverflow: CpgLoaderConfig =
-    this.copy(onDiskOverflowConfig = None)
+case class CpgLoaderConfig(createIndexes: Boolean, onDiskOverflowConfig: OnDiskOverflowConfig) {
 
   /**
     * Existing configuration without indexing on load.
@@ -58,5 +45,11 @@ case class CpgLoaderConfig(createIndexes: Boolean, onDiskOverflowConfig: Option[
     * */
   def createIndexesOnLoad: CpgLoaderConfig =
     this.copy(createIndexes = true)
+
+  /**
+    * Return existing configuration but with overflowdb config set to `overflowConfig`.
+    * */
+  def withOverflowConfig(overflowConfig: OnDiskOverflowConfig): CpgLoaderConfig =
+    this.copy(onDiskOverflowConfig = overflowConfig)
 
 }

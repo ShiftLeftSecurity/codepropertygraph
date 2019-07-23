@@ -24,18 +24,18 @@ public class ProtoToCpg {
   private TinkerGraph tinkerGraph;
 
   public ProtoToCpg() {
-    this(Optional.of(OnDiskOverflowConfig.defaultForJava()));
+    this(OnDiskOverflowConfig.defaultForJava());
   }
 
   public ProtoToCpg(
-    Optional<OnDiskOverflowConfig> onDiskOverflowConfig) {
+    OnDiskOverflowConfig onDiskOverflowConfig) {
     Configuration configuration = TinkerGraph.EMPTY_CONFIGURATION();
-    if (onDiskOverflowConfig.isPresent()) {
-      OnDiskOverflowConfig config = onDiskOverflowConfig.get();
+    if (onDiskOverflowConfig.enabled()) {
+
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, true);
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_OVERFLOW_HEAP_PERCENTAGE_THRESHOLD,
-        config.heapPercentageThreshold());
-      config.graphLocationAsJava().ifPresent(path ->
+              onDiskOverflowConfig.heapPercentageThreshold());
+      onDiskOverflowConfig.graphLocationAsJava().ifPresent(path ->
         configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_GRAPH_LOCATION, path));
     } else {
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, false);
