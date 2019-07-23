@@ -7,21 +7,21 @@ object CpgLoaderConfig {
 
   def default =
     CpgLoaderConfig(
-      createIndices = true,
+      createIndexes = true,
       onDiskOverflowConfig = Some(OnDiskOverflowConfig()),
     )
 
   @deprecated("Use CpgLoaderConfig.default.withStorage instead", "")
   def withStorage(path: String) =
     CpgLoaderConfig(
-      createIndices = true,
+      createIndexes = true,
       onDiskOverflowConfig = Some(OnDiskOverflowConfig(graphLocation = Some(path))),
     )
 
   @deprecated("Use CpgLoaderConfig.default.withoutStorage instead", "")
   def withoutOverflow =
     CpgLoaderConfig(
-      createIndices = true,
+      createIndexes = true,
       onDiskOverflowConfig = None
     )
 
@@ -29,10 +29,10 @@ object CpgLoaderConfig {
 
 /**
   * Configuration for the CPG loader
-  * @param createIndices indicate whether to create indices or not
+  * @param createIndexes indicate whether to create indices or not
   * @param onDiskOverflowConfig configuration for the on-disk-overflow feature
   */
-case class CpgLoaderConfig(createIndices: Boolean, onDiskOverflowConfig: Option[OnDiskOverflowConfig]) {
+case class CpgLoaderConfig(createIndexes: Boolean, onDiskOverflowConfig: Option[OnDiskOverflowConfig]) {
 
   /**
     * Existing configuration with overflowdb path as specified
@@ -50,13 +50,13 @@ case class CpgLoaderConfig(createIndices: Boolean, onDiskOverflowConfig: Option[
   /**
     * Existing configuration without indexing on load.
     * */
-  def doNotCreateIndicesOnLoad: CpgLoaderConfig =
-    this.copy(createIndices = false)
+  def doNotCreateIndexesOnLoad: CpgLoaderConfig =
+    this.copy(createIndexes = false)
 
   /**
     * Existing configuration but with indexing on load.
     * */
-  def createIndicesOnLoad: CpgLoaderConfig =
-    this.copy(createIndices = true)
+  def createIndexesOnLoad: CpgLoaderConfig =
+    this.copy(createIndexes = true)
 
 }

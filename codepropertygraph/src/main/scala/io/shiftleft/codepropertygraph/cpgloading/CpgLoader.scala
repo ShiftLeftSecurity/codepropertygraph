@@ -46,7 +46,7 @@ private class CpgLoader {
 
     val cpg =
       ProtoCpgLoader.loadFromProtoZip(filename, config.onDiskOverflowConfig.asJava)
-    if (config.createIndices) { createIndexes(cpg) }
+    if (config.createIndexes) { createIndexes(cpg) }
     cpg
   }
 
