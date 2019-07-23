@@ -11,7 +11,7 @@ class ProtoToOverflowDbTest extends WordSpec with Matchers {
 
   "imports cpg.bin.zip into overflowdb.bin" ignore {
     val cpgBinZip = "resources/cpgs/namespace/cpg.bin.zip"
-    val reference = CpgLoader.load(cpgBinZip, CpgLoaderConfig.withoutOverflow).scalaGraph
+    val reference = CpgLoader.load(cpgBinZip, CpgLoaderConfig.default.withoutOverflow).scalaGraph
 
     val referenceNodeCount = reference.V.count.head
     val referenceEdgeCount = reference.E.count.head

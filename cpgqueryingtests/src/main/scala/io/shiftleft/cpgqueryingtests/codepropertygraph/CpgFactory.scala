@@ -27,7 +27,7 @@ class CpgFactory(frontend: LanguageFrontend, semanticsFilename: String) {
 
     val cpgFile = frontend.execute(tmpDir)
 
-    val config = CpgLoaderConfig.withoutOverflow
+    val config = CpgLoaderConfig.default.withoutOverflow
     val cpg = CpgLoader.load(cpgFile.getAbsolutePath, config)
 
     val semantics = new SemanticsLoader(semanticsFilename).load()
