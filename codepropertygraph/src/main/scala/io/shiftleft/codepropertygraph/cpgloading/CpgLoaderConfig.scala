@@ -11,14 +11,14 @@ object CpgLoaderConfig {
       onDiskOverflowConfig = Some(OnDiskOverflowConfig()),
     )
 
-  @deprecated("Use CpgLoaderConfig.default.withStorage instead", "Jul 19")
+  @deprecated("Use CpgLoaderConfig.default.withStorage instead", "")
   def withStorage(path: String) =
     CpgLoaderConfig(
       createIndices = true,
       onDiskOverflowConfig = Some(OnDiskOverflowConfig(graphLocation = Some(path))),
     )
 
-  @deprecated("Use CpgLoaderConfig.default.withoutStorage instead", "Jul 19")
+  @deprecated("Use CpgLoaderConfig.default.withoutStorage instead", "")
   def withoutOverflow =
     CpgLoaderConfig(
       createIndices = true,
