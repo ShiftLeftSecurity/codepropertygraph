@@ -115,7 +115,7 @@ object DomainClassCreator {
       |  val Factory = new OverflowElementFactory.ForEdge[${edgeClassName}] {
       |    override val forLabel = $edgeClassName.Label
       |
-      |    override def createEdge(id: JLong, graph: TinkerGraph, outVertex: VertexRef[_ <: Vertex], inVertex: VertexRef[_ <: Vertex]) =
+      |    override def createEdge(graph: TinkerGraph, outVertex: VertexRef[_ <: Vertex], inVertex: VertexRef[_ <: Vertex]) =
       |      new ${edgeClassName}(graph, outVertex.asInstanceOf[VertexRef[OverflowDbNode]], inVertex.asInstanceOf[VertexRef[OverflowDbNode]])
       |  }
       |}

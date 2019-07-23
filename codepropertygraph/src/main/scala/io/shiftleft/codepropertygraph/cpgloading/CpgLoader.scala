@@ -39,7 +39,7 @@ private class CpgLoader {
 
   private val logger = LogManager.getLogger(getClass)
 
-  def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg = {
+  def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.withoutOverflow): Cpg = {
     logger.debug("Loading " + filename)
 
     import scala.compat.java8.OptionConverters._
