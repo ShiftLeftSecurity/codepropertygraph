@@ -11,6 +11,9 @@ object CpgLoaderConfig {
       onDiskOverflowConfig = OnDiskOverflowConfig.default,
     )
 
+  // This is required because `default` is a keyword in Java
+  def defaultForJava: CpgLoaderConfig = default
+
   @deprecated("Use CpgLoaderConfig.default.withStorage instead", "")
   def withStorage(path: String) =
     CpgLoaderConfig(
