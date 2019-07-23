@@ -39,14 +39,13 @@ private class CpgLoader {
 
   private val logger = LogManager.getLogger(getClass)
 
-  def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.withoutOverflow): Cpg = {
+  def load(filename: String,
+           config: CpgLoaderConfig = CpgLoaderConfig.default.withOverflowConfig(OnDiskOverflowConfig.disabled)): Cpg = {
     logger.debug("Loading " + filename)
 
-    import scala.compat.java8.OptionConverters._
-
     val cpg =
-      ProtoCpgLoader.loadFromProtoZip(filename, config.onDiskOverflowConfig.asJava)
-    if (config.createIndices) { createIndexes(cpg) }
+      ProtoCpgLoader.loadFromProtoZip(filename, config.onDiskOverflowConfig)
+    if (config.createIndexes) { createIndexes(cpg) }
     cpg
   }
 
