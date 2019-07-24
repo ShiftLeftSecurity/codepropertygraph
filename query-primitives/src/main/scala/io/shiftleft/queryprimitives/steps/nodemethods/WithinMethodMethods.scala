@@ -23,6 +23,9 @@ private object WithinMethodToMethod extends NodeVisitor[nodes.Method] with Expre
   override def visit(node: nodes.MethodReturn): nodes.Method =
     node.vertices(Direction.IN, EdgeTypes.AST).nextChecked.asInstanceOf[nodes.Method]
 
+  override def visit(node: nodes.ImplicitCall): nodes.Method =
+    node.vertices(Direction.IN, EdgeTypes.AST).nextChecked.asInstanceOf[nodes.Method]
+
   override def visit(node: nodes.Expression): nodes.Method =
     node.vertices(Direction.IN, EdgeTypes.CONTAINS).nextChecked.asInstanceOf[nodes.Method]
 }
