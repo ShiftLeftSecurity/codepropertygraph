@@ -167,7 +167,7 @@
          "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "DISPATCH_TYPE", "SIGNATURE", "TYPE_FULL_NAME", "METHOD_INST_FULL_NAME", "LINE_NUMBER",
                   "COLUMN_NUMBER"],
          "comment" : "A (method)-call",
-         "is": ["EXPRESSION"],
+         "is": ["EXPRESSION", "CALL_REPR"],
          "outEdges" : [
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]},
              {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "CONTROL_STRUCTURE"]},
@@ -265,7 +265,8 @@
       { "name" : "CFG_NODE", "comment" : "Any node that can occur as part of a control flow graph", "hasKeys" : ["LINE_NUMBER", "COLUMN_NUMBER"], "extends": ["WITHIN_METHOD", "AST_NODE"]},
       { "name" : "TRACKING_POINT", "comment" : "Any node that can occur in a data flow", "hasKeys" : [], "extends": ["WITHIN_METHOD"]},
       { "name" : "WITHIN_METHOD", "comment" : "Any node that can exist in a method", "hasKeys" : []},
-      { "name" : "AST_NODE", "comment": "Any node that can exist in an abstract syntax tree.", "hasKeys" : []}
+      { "name" : "AST_NODE", "comment": "Any node that can exist in an abstract syntax tree.", "hasKeys" : []},
+      { "name" : "CALL_REPR", "comment": "Call representation", "hasKeys" : [], "extends": []}
     ],
 
     "edgeTypes" : [

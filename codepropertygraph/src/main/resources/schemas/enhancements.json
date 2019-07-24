@@ -11,6 +11,14 @@
     ],
 
     "nodeTypes" : [
+      {
+        "id":307,"name" : "IMPLICIT_CALL",
+        "keys" : ["CODE", "NAME", "SIGNATURE", "LINE_NUMBER", "COLUMN_NUMBER"],
+        "comment" : "An implicit call site hidden in a method indicated by METHOD_MAP policy entries",
+        "is": ["CALL_REPR", "CFG_NODE", "TRACKING_POINT"],
+        "outEdges" : []
+      },
+
         {"id":24, "name": "TAG",
          "keys": ["NAME", "VALUE"],
          "comment": "A string tag",
@@ -31,7 +39,7 @@
         },
         { "name": "METHOD",
           "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD", "METHOD_PARAMETER_OUT"]},
+             {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD", "METHOD_PARAMETER_OUT", "IMPLICIT_CALL"]},
              {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN"]},
              {"edgeName": "CONTAINS", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]}
           ]
