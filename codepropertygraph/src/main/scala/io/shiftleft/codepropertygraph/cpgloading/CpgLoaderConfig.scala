@@ -8,24 +8,24 @@ object CpgLoaderConfig {
   def default =
     CpgLoaderConfig(
       createIndexes = true,
-      onDiskOverflowConfig = OnDiskOverflowConfig.default,
+      onDiskOverflowConfig = OverflowDbConfig.default,
     )
 
   // This is required because `default` is a keyword in Java
-  def defaultForJava: CpgLoaderConfig = default
+  def withDefaults: CpgLoaderConfig = default
 
   @deprecated("Use CpgLoaderConfig.default.withStorage instead", "")
   def withStorage(path: String) =
     CpgLoaderConfig(
       createIndexes = true,
-      onDiskOverflowConfig = OnDiskOverflowConfig.default.withGraphLocation(path),
+      onDiskOverflowConfig = OverflowDbConfig.default.withGraphLocation(path),
     )
 
   @deprecated("Use CpgLoaderConfig.default.withoutStorage instead", "")
   def withoutOverflow =
     CpgLoaderConfig(
       createIndexes = true,
-      onDiskOverflowConfig = OnDiskOverflowConfig.default.disabled
+      onDiskOverflowConfig = OverflowDbConfig.default.disabled
     )
 
 }
@@ -35,7 +35,7 @@ object CpgLoaderConfig {
   * @param createIndexes indicate whether to create indices or not
   * @param onDiskOverflowConfig configuration for the on-disk-overflow feature
   */
-case class CpgLoaderConfig(createIndexes: Boolean, onDiskOverflowConfig: OnDiskOverflowConfig) {
+case class CpgLoaderConfig(createIndexes: Boolean, onDiskOverflowConfig: OverflowDbConfig) {
 
   /**
     * Existing configuration without indexing on load.
@@ -52,7 +52,7 @@ case class CpgLoaderConfig(createIndexes: Boolean, onDiskOverflowConfig: OnDiskO
   /**
     * Return existing configuration but with overflowdb config set to `overflowConfig`.
     * */
-  def withOverflowConfig(overflowConfig: OnDiskOverflowConfig): CpgLoaderConfig =
+  def withOverflowConfig(overflowConfig: OverflowDbConfig): CpgLoaderConfig =
     this.copy(onDiskOverflowConfig = overflowConfig)
 
 }

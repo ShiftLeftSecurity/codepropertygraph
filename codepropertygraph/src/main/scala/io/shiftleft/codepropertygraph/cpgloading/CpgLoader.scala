@@ -40,7 +40,7 @@ private class CpgLoader {
   private val logger = LogManager.getLogger(getClass)
 
   def load(filename: String,
-           config: CpgLoaderConfig = CpgLoaderConfig.default.withOverflowConfig(OnDiskOverflowConfig.disabled)): Cpg = {
+           config: CpgLoaderConfig = CpgLoaderConfig.default.withOverflowConfig(OverflowDbConfig.disabled)): Cpg = {
     logger.debug("Loading " + filename)
 
     val cpg =

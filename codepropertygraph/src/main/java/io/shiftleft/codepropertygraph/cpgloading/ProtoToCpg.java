@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 public class ProtoToCpg {
   private Logger logger = LogManager.getLogger(getClass());
@@ -24,18 +23,18 @@ public class ProtoToCpg {
   private TinkerGraph tinkerGraph;
 
   public ProtoToCpg() {
-    this(OnDiskOverflowConfig.defaultForJava());
+    this(OverflowDbConfig.withDefaults());
   }
 
   public ProtoToCpg(
-    OnDiskOverflowConfig onDiskOverflowConfig) {
+          OverflowDbConfig overflowDbConfig) {
     Configuration configuration = TinkerGraph.EMPTY_CONFIGURATION();
-    if (onDiskOverflowConfig.enabled()) {
+    if (overflowDbConfig.enabled()) {
 
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, true);
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_OVERFLOW_HEAP_PERCENTAGE_THRESHOLD,
-              onDiskOverflowConfig.heapPercentageThreshold());
-      onDiskOverflowConfig.graphLocationAsJava().ifPresent(path ->
+              overflowDbConfig.heapPercentageThreshold());
+      overflowDbConfig.graphLocationAsJava().ifPresent(path ->
         configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_GRAPH_LOCATION, path));
     } else {
       configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, false);
