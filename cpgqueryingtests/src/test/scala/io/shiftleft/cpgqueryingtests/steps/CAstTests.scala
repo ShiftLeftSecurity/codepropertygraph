@@ -51,6 +51,23 @@ class CAstTests extends CpgDataFlowTests {
     }
   }
 
+  "should allow parserTypeName filtering and then ast" in {
+    cpgFactory.buildCpg(code) { cpg =>
+      val query1Size = cpg.method.name("foo").ast.isControlStructure.ast.l.size
+      query1Size should be > 0
+
+      val query2Size = cpg.method
+        .name("foo")
+        .ast
+        .isControlStructure
+        .parserTypeName(".*")
+        .ast
+        .l
+        .size
+      query1Size shouldBe query2Size
+    }
+  }
+
   "should allow filtering on conditions" in {
     cpgFactory.buildCpg(code) { cpg =>
       cpg.method

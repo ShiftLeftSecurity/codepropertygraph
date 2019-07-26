@@ -123,12 +123,12 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
 
   private def initMaps(): Unit = {
     cpg.graph.graph.vertices().asScala.foreach {
-      case node: nodes.TypeDecl   => typeDeclFullNameToNode += node.fullName -> node
-      case node: nodes.Type       => typeFullNameToNode += node.fullName -> node
-      case node: nodes.Method     => methodFullNameToNode += node.fullName -> node
-      case node: nodes.MethodInst => methodInstFullNameToNode += node.fullName -> node
+      case node: nodes.TypeDecl       => typeDeclFullNameToNode += node.fullName -> node
+      case node: nodes.Type           => typeFullNameToNode += node.fullName -> node
+      case node: nodes.Method         => methodFullNameToNode += node.fullName -> node
+      case node: nodes.MethodInst     => methodInstFullNameToNode += node.fullName -> node
       case node: nodes.NamespaceBlock => namespaceBlockFullNameToNode += node.fullName -> node
-      case _ => // ignore
+      case _                          => // ignore
     }
   }
 
@@ -221,8 +221,8 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
             case None =>
               val astParentOption: Option[nodes.StoredNode] =
                 astChild.astParentType match {
-                  case NodeTypes.METHOD => methodFullNameToNode.get(astChild.astParentFullName)
-                  case NodeTypes.TYPE_DECL => typeDeclFullNameToNode.get(astChild.astParentFullName)
+                  case NodeTypes.METHOD          => methodFullNameToNode.get(astChild.astParentFullName)
+                  case NodeTypes.TYPE_DECL       => typeDeclFullNameToNode.get(astChild.astParentFullName)
                   case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode.get(astChild.astParentFullName)
                   case _ =>
                     logger.error(

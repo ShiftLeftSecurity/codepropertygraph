@@ -46,6 +46,10 @@ package object steps {
   implicit def toCall[Labels <: HList](steps: Steps[nodes.Call, Labels]): Call[Labels] =
     new Call[Labels](steps.raw)
 
+  implicit def toControlStructure[Labels <: HList](
+      steps: Steps[nodes.ControlStructure, Labels]): ControlStructure[Labels] =
+    new ControlStructure[Labels](steps.raw)
+
   implicit def toIdentifier[Labels <: HList](steps: Steps[nodes.Identifier, Labels]): Identifier[Labels] =
     new Identifier[Labels](steps.raw)
 
