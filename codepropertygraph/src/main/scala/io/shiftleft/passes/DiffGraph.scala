@@ -102,13 +102,13 @@ class DiffGraph {
     * Add a property to an existing node
     * */
   def addNodeProperty(node: StoredNode, key: String, value: AnyRef) =
-    _nodeProperties += new NodeProperty(node.getId, key, value)
+    _nodeProperties += new NodeProperty(node, key, value)
 
   /**
     * Add a property to an existing edge
     * */
   def addEdgeProperty(edge: Edge, key: String, value: AnyRef) =
-    _edgeProperties += new EdgeProperty(edge.id().asInstanceOf[JLong], key, value)
+    _edgeProperties += new EdgeProperty(edge, key, value)
 
   override def toString() = {
     val nodeCount = _nodes.size
@@ -139,8 +139,8 @@ object DiffGraph {
     def label: String
     def properties: Seq[(String, AnyRef)]
   }
-  case class NodeProperty(nodeId: Long, propertyKey: String, propertyValue: AnyRef)
-  case class EdgeProperty(edgeId: Long, propertyKey: String, propertyValue: AnyRef)
+  case class NodeProperty(node: StoredNode, propertyKey: String, propertyValue: AnyRef)
+  case class EdgeProperty(edge: Edge, propertyKey: String, propertyValue: AnyRef)
   type Properties = Seq[(String, AnyRef)]
 
   case class EdgeInDiffGraph(src: NewNode, dst: NewNode, label: String, properties: Properties) extends DiffEdge
