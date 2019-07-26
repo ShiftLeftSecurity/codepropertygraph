@@ -21,11 +21,11 @@ import scala.collection.JavaConverters._
 class Linker(cpg: Cpg) extends CpgPass(cpg) {
   import Linker.logger
 
-  private var typeDeclFullNameToNodeId = Map[String, JLong]()
-  private var typeFullNameToNodeId = Map[String, JLong]()
-  private var methodFullNameToNodeId = Map[String, JLong]()
-  private var methodInstFullNameToNodeId = Map[String, JLong]()
-  private var namespaceBlockFullNameToNodeId = Map[String, JLong]()
+  private var typeDeclFullNameToNode = Map.empty[String, nodes.StoredNode]
+  private var typeFullNameToNode = Map.empty[String, nodes.StoredNode]
+  private var methodFullNameToNode = Map.empty[String, nodes.StoredNode]
+  private var methodInstFullNameToNode = Map.empty[String, nodes.StoredNode]
+  private var namespaceBlockFullNameToNode = Map.empty[String, nodes.StoredNode]
 
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = new DiffGraph
@@ -38,7 +38,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       srcLabels = List(NodeTypes.TYPE),
       dstNodeLabel = NodeTypes.TYPE_DECL,
       edgeType = EdgeTypes.REF,
-      dstNodeIdMap = typeDeclFullNameToNodeId,
+      dstNodeMap = typeDeclFullNameToNode,
       dstFullNameKey = nodes.Type.Keys.TypeDeclFullName,
       dstGraph
     )
@@ -47,7 +47,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       srcLabels = List(NodeTypes.CALL),
       dstNodeLabel = NodeTypes.METHOD_INST,
       edgeType = EdgeTypes.CALL,
-      dstNodeIdMap = methodInstFullNameToNodeId,
+      dstNodeMap = methodInstFullNameToNode,
       dstFullNameKey = nodes.Call.Keys.MethodInstFullName,
       dstGraph
     )
@@ -56,7 +56,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       srcLabels = List(NodeTypes.METHOD_INST),
       dstNodeLabel = NodeTypes.METHOD,
       edgeType = EdgeTypes.REF,
-      dstNodeIdMap = methodFullNameToNodeId,
+      dstNodeMap = methodFullNameToNode,
       dstFullNameKey = nodes.MethodInst.Keys.MethodFullName,
       dstGraph
     )
@@ -76,7 +76,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       ),
       dstNodeLabel = NodeTypes.TYPE,
       edgeType = EdgeTypes.EVAL_TYPE,
-      dstNodeIdMap = typeFullNameToNodeId,
+      dstNodeMap = typeFullNameToNode,
       dstFullNameKey = "TYPE_FULL_NAME",
       dstGraph
     )
@@ -85,7 +85,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       srcLabels = List(NodeTypes.METHOD_REF),
       dstNodeLabel = NodeTypes.METHOD_INST,
       edgeType = EdgeTypes.REF,
-      dstNodeIdMap = methodInstFullNameToNodeId,
+      dstNodeMap = methodInstFullNameToNode,
       dstFullNameKey = nodes.MethodRef.Keys.MethodInstFullName,
       dstGraph
     )
@@ -94,7 +94,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       srcLabels = List(NodeTypes.TYPE_DECL),
       dstNodeLabel = NodeTypes.TYPE,
       edgeType = EdgeTypes.INHERITS_FROM,
-      dstNodeIdMap = typeFullNameToNodeId,
+      dstNodeMap = typeFullNameToNode,
       getDstFullNames = (srcNode: nodes.TypeDecl) => {
         if (srcNode.inheritsFromTypeFullName != null) {
           srcNode.inheritsFromTypeFullName
@@ -110,7 +110,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       srcLabels = List(NodeTypes.TYPE_DECL),
       dstNodeLabel = NodeTypes.TYPE,
       edgeType = EdgeTypes.ALIAS_OF,
-      dstNodeIdMap = typeFullNameToNodeId,
+      dstNodeMap = typeFullNameToNode,
       getDstFullNames = (srcNode: nodes.TypeDecl) => {
         srcNode.aliasTypeFullName
       },
@@ -123,12 +123,11 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
 
   private def initMaps(): Unit = {
     cpg.graph.graph.vertices().asScala.foreach {
-      case node: nodes.TypeDecl   => typeDeclFullNameToNodeId += node.fullName -> node.getId
-      case node: nodes.Type       => typeFullNameToNodeId += node.fullName -> node.getId
-      case node: nodes.Method     => methodFullNameToNodeId += node.fullName -> node.getId
-      case node: nodes.MethodInst => methodInstFullNameToNodeId += node.fullName -> node.getId
-      case node: nodes.NamespaceBlock =>
-        namespaceBlockFullNameToNodeId += node.fullName -> node.getId
+      case node: nodes.TypeDecl   => typeDeclFullNameToNode += node.fullName -> node
+      case node: nodes.Type       => typeFullNameToNode += node.fullName -> node
+      case node: nodes.Method     => methodFullNameToNode += node.fullName -> node
+      case node: nodes.MethodInst => methodInstFullNameToNode += node.fullName -> node
+      case node: nodes.NamespaceBlock => namespaceBlockFullNameToNode += node.fullName -> node
       case _ => // ignore
     }
   }
@@ -136,7 +135,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
   private def linkToSingle(srcLabels: List[String],
                            dstNodeLabel: String,
                            edgeType: String,
-                           dstNodeIdMap: Map[String, JLong],
+                           dstNodeMap: Map[String, nodes.StoredNode],
                            dstFullNameKey: String,
                            dstGraph: DiffGraph): Unit = {
     var loggedDeprecationWarning = false
@@ -146,8 +145,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
         // for `UNKNOWN` this is not always set, so we're using an Option here
         srcNode.valueOption[String](dstFullNameKey).map { dstFullName =>
-          val dstNode: Option[nodes.StoredNode] =
-            dstNodeIdMap.get(dstFullName).flatMap(lookupNode(_))
+          val dstNode: Option[nodes.StoredNode] = dstNodeMap.get(dstFullName)
           dstNode match {
             case Some(dstNode) =>
               dstGraph
@@ -173,7 +171,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
   private def linkToMultiple[SRC_NODE_TYPE <: nodes.StoredNode](srcLabels: List[String],
                                                                 dstNodeLabel: String,
                                                                 edgeType: String,
-                                                                dstNodeIdMap: Map[String, JLong],
+                                                                dstNodeMap: Map[String, nodes.StoredNode],
                                                                 getDstFullNames: SRC_NODE_TYPE => Iterable[String],
                                                                 dstFullNameKey: String,
                                                                 dstGraph: DiffGraph): Unit = {
@@ -184,13 +182,11 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
         case srcNode: SRC_NODE_TYPE @unchecked =>
           if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
             getDstFullNames(srcNode).foreach { dstFullName =>
-              val node = dstNodeIdMap.get(dstFullName).flatMap(lookupNode(_))
-              node match {
+              dstNodeMap.get(dstFullName) match {
                 case Some(dstNode) =>
                   dstGraph.addEdgeInOriginal(srcNode, dstNode, edgeType)
                 case None =>
                   logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
-
               }
             }
           } else {
@@ -225,14 +221,9 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
             case None =>
               val astParentOption: Option[nodes.StoredNode] =
                 astChild.astParentType match {
-                  case NodeTypes.METHOD =>
-                    methodFullNameToNodeId.get(astChild.astParentFullName).flatMap(lookupNode(_))
-                  case NodeTypes.TYPE_DECL =>
-                    typeDeclFullNameToNodeId.get(astChild.astParentFullName).flatMap(lookupNode(_))
-                  case NodeTypes.NAMESPACE_BLOCK =>
-                    namespaceBlockFullNameToNodeId
-                      .get(astChild.astParentFullName)
-                      .flatMap(lookupNode(_))
+                  case NodeTypes.METHOD => methodFullNameToNode.get(astChild.astParentFullName)
+                  case NodeTypes.TYPE_DECL => typeDeclFullNameToNode.get(astChild.astParentFullName)
+                  case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode.get(astChild.astParentFullName)
                   case _ =>
                     logger.error(
                       s"Invalid AST_PARENT_TYPE=${astChild.valueOption(NodeKeys.AST_PARENT_FULL_NAME)};" +
@@ -285,9 +276,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
         s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcFullName=$srcFullName, " +
         s"dstNodeType=$dstNodeType, dstNodeId=$dstNodeId")
   }
-
-  private def lookupNode(nodeId: JLong): Option[nodes.StoredNode] =
-    cpg.graph.graph.vertices(nodeId).nextOption.map(_.asInstanceOf[nodes.StoredNode])
 
 }
 

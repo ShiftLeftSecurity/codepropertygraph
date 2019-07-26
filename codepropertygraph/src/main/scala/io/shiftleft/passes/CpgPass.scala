@@ -219,21 +219,15 @@ private class DiffGraphApplier {
   }
 
   private def addNodeProperties(diffGraph: DiffGraph, graph: ScalaGraph): Unit = {
-    def lookupNode(id: JLong): Vertex =
-      graph.graph.vertices(id).nextChecked
-
     diffGraph.nodeProperties.foreach { property =>
-      val vertex = lookupNode(property.nodeId)
-      vertex.property(property.propertyKey, property.propertyValue)
+      val node = property.node
+      node.property(property.propertyKey, property.propertyValue)
     }
   }
 
   private def addEdgeProperties(diffGraph: DiffGraph, graph: ScalaGraph): Unit = {
-    def lookupEdge(id: JLong): Edge =
-      graph.graph.edges(id).nextChecked
-
     diffGraph.edgeProperties.foreach { property =>
-      val edge = lookupEdge(property.edgeId)
+      val edge = property.edge
       edge.property(property.propertyKey, property.propertyValue)
     }
   }
@@ -339,7 +333,7 @@ private[passes] class DiffGraphProtoSerializer() {
       appliedDiffGraph.diffGraph.nodeProperties.map { property =>
         AdditionalNodeProperty
           .newBuilder()
-          .setNodeId(property.nodeId)
+          .setNodeId(property.node.getId)
           .setProperty(nodeProperty(property.propertyKey, property.propertyValue))
           .build
       }.asJava
