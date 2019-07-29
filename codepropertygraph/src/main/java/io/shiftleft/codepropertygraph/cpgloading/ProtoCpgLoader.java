@@ -19,7 +19,7 @@ public class ProtoCpgLoader {
   private static final Logger logger = LogManager.getLogger(ProtoCpgLoader.class);
 
   public static Cpg loadFromProtoZip(String filename) {
-    return loadFromProtoZip(filename, OnDiskOverflowConfig.defaultForJava());
+    return loadFromProtoZip(filename, OverflowDbConfig.withDefaults());
   }
 
   /**
@@ -27,10 +27,10 @@ public class ProtoCpgLoader {
    * CPGs in proto format.
    */
   public static Cpg loadFromProtoZip(
-    String filename,
-    OnDiskOverflowConfig onDiskOverflowConfig) {
+          String filename,
+          OverflowDbConfig overflowDbConfig) {
     try {
-      ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig);
+      ProtoToCpg builder = new ProtoToCpg(overflowDbConfig);
 
       long start;
       start = System.currentTimeMillis();
@@ -96,9 +96,9 @@ public class ProtoCpgLoader {
    * Load code property graph from a list of CPGs in proto format.
    **/
   public static Cpg loadFromListOfProtos(
-    List<CpgStruct> cpgs,
-    OnDiskOverflowConfig onDiskOverflowConfig) {
-    ProtoToCpg builder = new ProtoToCpg(onDiskOverflowConfig);
+          List<CpgStruct> cpgs,
+          OverflowDbConfig overflowDbConfig) {
+    ProtoToCpg builder = new ProtoToCpg(overflowDbConfig);
 
     for (CpgStruct cpgStruct : cpgs)
       builder.addNodes(cpgStruct.getNodeList());

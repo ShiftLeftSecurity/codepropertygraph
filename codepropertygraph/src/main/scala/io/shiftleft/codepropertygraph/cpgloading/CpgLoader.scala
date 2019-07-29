@@ -14,7 +14,7 @@ object CpgLoader {
     * @param filename name of file that stores the code property graph
     * @param config loader configuration
     */
-  def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.default): Cpg =
+  def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig()): Cpg =
     new CpgLoader().load(filename, config)
 
   /**
@@ -40,11 +40,11 @@ private class CpgLoader {
   private val logger = LogManager.getLogger(getClass)
 
   def load(filename: String,
-           config: CpgLoaderConfig = CpgLoaderConfig.default.withOverflowConfig(OnDiskOverflowConfig.disabled)): Cpg = {
+           config: CpgLoaderConfig = CpgLoaderConfig().withOverflowConfig(OverflowDbConfig.disabled)): Cpg = {
     logger.debug("Loading " + filename)
 
     val cpg =
-      ProtoCpgLoader.loadFromProtoZip(filename, config.onDiskOverflowConfig)
+      ProtoCpgLoader.loadFromProtoZip(filename, config.overflowDbConfig)
     if (config.createIndexes) { createIndexes(cpg) }
     cpg
   }

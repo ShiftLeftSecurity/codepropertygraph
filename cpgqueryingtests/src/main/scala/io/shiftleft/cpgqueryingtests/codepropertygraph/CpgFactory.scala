@@ -5,7 +5,7 @@ import java.nio.file.Files
 
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig, OnDiskOverflowConfig}
+import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig, OverflowDbConfig}
 import io.shiftleft.layers.{DataFlowRunner, EnhancementRunner}
 import io.shiftleft.semanticsloader.SemanticsLoader
 
@@ -27,7 +27,7 @@ class CpgFactory(frontend: LanguageFrontend, semanticsFilename: String) {
 
     val cpgFile = frontend.execute(tmpDir)
 
-    val config = CpgLoaderConfig.default.withOverflowConfig(OnDiskOverflowConfig.disabled)
+    val config = CpgLoaderConfig().withOverflowConfig(OverflowDbConfig.disabled)
     val cpg = CpgLoader.load(cpgFile.getAbsolutePath, config)
 
     val semantics = new SemanticsLoader(semanticsFilename).load()

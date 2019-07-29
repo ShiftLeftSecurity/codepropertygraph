@@ -2,30 +2,23 @@ package io.shiftleft.codepropertygraph.cpgloading
 
 object CpgLoaderConfig {
 
-  // To add a new option, please add a default value below and corresponding
-  // methods in the case class.
+  /**
+    * Get a default object
+    * */
+  def apply(): CpgLoaderConfig = new CpgLoaderConfig()
 
-  def default =
-    CpgLoaderConfig(
-      createIndexes = true,
-      onDiskOverflowConfig = OnDiskOverflowConfig.default,
-    )
+  val withDefaults = CpgLoaderConfig()
 
-  // This is required because `default` is a keyword in Java
-  def defaultForJava: CpgLoaderConfig = default
-
-  @deprecated("Use CpgLoaderConfig.default.withStorage instead", "")
+  @deprecated("Use CpgLoaderConfig.withDefaults.withStorage instead", "")
   def withStorage(path: String) =
-    CpgLoaderConfig(
-      createIndexes = true,
-      onDiskOverflowConfig = OnDiskOverflowConfig.default.withGraphLocation(path),
+    new CpgLoaderConfig(
+      overflowDbConfig = OverflowDbConfig().withGraphLocation(path),
     )
 
-  @deprecated("Use CpgLoaderConfig.default.withoutStorage instead", "")
+  @deprecated("Use CpgLoaderConfig.withDefaults.withoutStorage instead", "")
   def withoutOverflow =
-    CpgLoaderConfig(
-      createIndexes = true,
-      onDiskOverflowConfig = OnDiskOverflowConfig.default.disabled
+    new CpgLoaderConfig(
+      overflowDbConfig = OverflowDbConfig().disabled
     )
 
 }
@@ -33,26 +26,32 @@ object CpgLoaderConfig {
 /**
   * Configuration for the CPG loader
   * @param createIndexes indicate whether to create indices or not
-  * @param onDiskOverflowConfig configuration for the on-disk-overflow feature
+  * @param overflowDbConfig configuration for the on-disk-overflow feature
   */
-case class CpgLoaderConfig(createIndexes: Boolean, onDiskOverflowConfig: OnDiskOverflowConfig) {
+class CpgLoaderConfig(var createIndexes: Boolean = true, var overflowDbConfig: OverflowDbConfig = OverflowDbConfig()) {
 
   /**
     * Existing configuration without indexing on load.
     * */
-  def doNotCreateIndexesOnLoad: CpgLoaderConfig =
-    this.copy(createIndexes = false)
+  def doNotCreateIndexesOnLoad: CpgLoaderConfig = {
+    this.createIndexes = false
+    this
+  }
 
   /**
     * Existing configuration but with indexing on load.
     * */
-  def createIndexesOnLoad: CpgLoaderConfig =
-    this.copy(createIndexes = true)
+  def createIndexesOnLoad: CpgLoaderConfig = {
+    this.createIndexes = true
+    this
+  }
 
   /**
     * Return existing configuration but with overflowdb config set to `overflowConfig`.
     * */
-  def withOverflowConfig(overflowConfig: OnDiskOverflowConfig): CpgLoaderConfig =
-    this.copy(onDiskOverflowConfig = overflowConfig)
+  def withOverflowConfig(overflowConfig: OverflowDbConfig): CpgLoaderConfig = {
+    this.overflowDbConfig = overflowConfig
+    this
+  }
 
 }

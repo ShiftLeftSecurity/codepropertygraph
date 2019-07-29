@@ -1,11 +1,11 @@
 package io.shiftleft.cpgvalidator
 
-import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig, OnDiskOverflowConfig}
+import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig, OverflowDbConfig}
 
 object CpgValidatorMain extends App {
   val cpgFileName = args(0)
 
-  val loaderConfig = CpgLoaderConfig.default.withOverflowConfig(OnDiskOverflowConfig.disabled)
+  val loaderConfig = CpgLoaderConfig().withOverflowConfig(OverflowDbConfig.disabled)
   val cpg = CpgLoader.load(cpgFileName, loaderConfig)
 
   val validator = new CpgValidator(cpg)
