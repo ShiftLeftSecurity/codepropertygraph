@@ -10,7 +10,7 @@
         // This is only intended for Java.
 
         {"id" : 5, "name" : "ANNOTATION",
-         "keys": ["CODE", "NAME", "FULL_NAME"],
+         "keys": ["CODE", "NAME", "FULL_NAME", "ORDER"],
          "comment" : "A method annotation",
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["ANNOTATION_PARAMETER_ASSIGN"]}
@@ -19,7 +19,7 @@
         },
 
         {"id" : 6, "name" : "ANNOTATION_PARAMETER_ASSIGN",
-         "keys" : ["CODE"],
+         "keys" : ["CODE", "ORDER"],
          "comment" : "Assignment of annotation argument to annotation parameter",
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["ANNOTATION_PARAMETER", "ARRAY_INITIALIZER", "ANNOTATION_LITERAL", "ANNOTATION"]}
@@ -28,7 +28,7 @@
         },
 
         {"id" : 7, "name" : "ANNOTATION_PARAMETER",
-         "keys" : ["CODE"],
+         "keys" : ["CODE", "ORDER"],
          "comment" : "Formal annotation parameter",
          "outEdges": [],
           "is" : ["AST_NODE"]

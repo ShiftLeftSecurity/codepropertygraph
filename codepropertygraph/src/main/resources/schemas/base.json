@@ -65,7 +65,7 @@
 
         {"id" : 38,
          "name": "FILE",
-         "keys": ["NAME"],
+         "keys": ["NAME", "ORDER"],
          "comment": "Node representing a source file. Often also the AST root",
          "outEdges": [
              {"edgeName": "AST", "inNodes": ["NAMESPACE_BLOCK"]}
@@ -77,7 +77,7 @@
 
         {"id" : 1, "name" : "METHOD",
          "keys": ["NAME", "FULL_NAME", "SIGNATURE", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME",
-           "LINE_NUMBER", "COLUMN_NUMBER"],
+		  "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
          "comment" : "A method/function/procedure",
          "is": ["DECLARATION", "CFG_NODE", "AST_NODE"],
          "outEdges" : [
@@ -94,12 +94,12 @@
         },
 
         {"id" : 3, "name" : "METHOD_RETURN",
-         "keys": ["CODE", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys": ["CODE", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
          "comment" : "A formal method return",
          "is": ["CFG_NODE", "TRACKING_POINT"]
         },
         {"id" : 300, "name" : "MODIFIER",
-         "keys" : ["MODIFIER_TYPE"],
+         "keys" : ["MODIFIER_TYPE", "ORDER"],
          "comment" : "A modifier, e.g., static, public, private",
          "outEdges": [],
 	 "is" : ["AST_NODE"]
@@ -115,7 +115,7 @@
          ]
         },
         {"id" : 46, "name" : "TYPE_DECL",
-         "keys" : ["NAME", "FULL_NAME", "IS_EXTERNAL", "INHERITS_FROM_TYPE_FULL_NAME", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME", "ALIAS_TYPE_FULL_NAME"],
+         "keys" : ["NAME", "FULL_NAME", "IS_EXTERNAL", "INHERITS_FROM_TYPE_FULL_NAME", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME", "ALIAS_TYPE_FULL_NAME", "ORDER"],
          "comment" : "A type declaration",
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["TYPE_PARAMETER", "MEMBER", "MODIFIER"]},
@@ -130,7 +130,7 @@
 	 "is" : ["AST_NODE"]
         },
         {"id" : 48, "name" : "TYPE_ARGUMENT",
-         "keys" : [],
+         "keys" : ["ORDER"],
          "comment" : "Argument for a TYPE_PARAMETER that belongs to a TYPE or METHOD_INST. It binds another TYPE to a TYPE_PARAMETER",
          "outEdges" : [
              {"edgeName": "REF", "inNodes": ["TYPE"]},
@@ -140,7 +140,7 @@
         },
 
         {"id" : 9, "name" : "MEMBER",
-         "keys" : [ "CODE", "NAME", "TYPE_FULL_NAME"],
+         "keys" : [ "CODE", "NAME", "TYPE_FULL_NAME", "ORDER"],
          "comment" : "Member of a class struct or union",
          "is": ["DECLARATION", "AST_NODE"]
         },
@@ -148,7 +148,7 @@
         {
             "id":41,
             "name": "NAMESPACE_BLOCK",
-            "keys": ["NAME", "FULL_NAME"],
+            "keys": ["NAME", "FULL_NAME", "ORDER"],
             "comment": "A reference to a namespace",
 	    "is" : ["AST_NODE"]
         },
@@ -175,7 +175,7 @@
          ]
         },
         {"id":23, "name" : "LOCAL",
-         "keys": ["CODE", "NAME", "CLOSURE_BINDING_ID", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys": ["CODE", "NAME", "CLOSURE_BINDING_ID", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
          "comment": "A local variable",
          "is": ["DECLARATION", "LOCAL_LIKE", "AST_NODE"]
         },
@@ -207,7 +207,7 @@
          ]
         },
         {"id":32, "name":"METHOD_INST",
-         "keys":["NAME", "FULL_NAME", "SIGNATURE", "METHOD_FULL_NAME"],
+         "keys":["NAME", "FULL_NAME", "SIGNATURE", "METHOD_FULL_NAME", "ORDER"],
          "comment":"A method instance which always has to reference a method and may have type argument children if the referred to method is a template",
          "outEdges": [
              {"edgeName": "AST", "inNodes": ["TYPE_ARGUMENT"]}
@@ -265,7 +265,7 @@
       { "name" : "CFG_NODE", "comment" : "Any node that can occur as part of a control flow graph", "hasKeys" : ["LINE_NUMBER", "COLUMN_NUMBER"], "extends": ["WITHIN_METHOD", "AST_NODE"]},
       { "name" : "TRACKING_POINT", "comment" : "Any node that can occur in a data flow", "hasKeys" : [], "extends": ["WITHIN_METHOD"]},
       { "name" : "WITHIN_METHOD", "comment" : "Any node that can exist in a method", "hasKeys" : []},
-      { "name" : "AST_NODE", "comment": "Any node that can exist in an abstract syntax tree.", "hasKeys" : []},
+      { "name" : "AST_NODE", "comment": "Any node that can exist in an abstract syntax tree.", "hasKeys" : ["ORDER"]},
       { "name" : "CALL_REPR", "comment": "Call representation", "hasKeys" : ["CODE", "NAME", "SIGNATURE"], "extends": []}
     ],
 

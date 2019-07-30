@@ -7,10 +7,12 @@ import io.shiftleft.queryprimitives.steps.types.structure.Block
 import shapeless.HList
 import io.shiftleft.queryprimitives.steps.Implicits._
 import io.shiftleft.queryprimitives.steps.types.expressions._
+import io.shiftleft.queryprimitives.steps.types.propertyaccessors.OrderAccessors
 
 class AstNode[Labels <: HList](raw: GremlinScala.Aux[nodes.AstNode, Labels])
     extends NodeSteps[nodes.AstNode, Labels](raw)
-    with AstNodeBase[nodes.AstNode, Labels] {}
+    with AstNodeBase[nodes.AstNode, Labels]
+    with OrderAccessors[nodes.AstNode, Labels] {}
 
 trait AstNodeBase[NodeType <: nodes.AstNode, Labels <: HList] { this: NodeSteps[NodeType, Labels] =>
 
@@ -23,6 +25,37 @@ trait AstNodeBase[NodeType <: nodes.AstNode, Labels <: HList] { this: NodeSteps[
     * Nodes of the AST rooted in this node, minus the node itself
     * */
   def astMinusRoot: AstNode[Labels] = new AstNode[Labels](raw.repeat(_.out(EdgeTypes.AST)).emit.cast[nodes.AstNode])
+
+  /**
+    * Direct children of node in the AST
+    * */
+  def astChildren: AstNode[Labels] = new AstNode[Labels](raw.out(EdgeTypes.AST).cast[nodes.AstNode])
+
+  /**
+    * Parent AST node
+    * */
+  def astParent: AstNode[Labels] = new AstNode[Labels](raw.in(EdgeTypes.AST).cast[nodes.AstNode])
+
+  /**
+    * Nodes of the AST obtained by expanding AST edges backwards until the method root is reached
+    * */
+  def inAst: AstNode[Labels] =
+    new AstNode[Labels](
+      raw.emit
+        .until(_.hasLabel(NodeTypes.METHOD))
+        .repeat(_.in(EdgeTypes.AST))
+        .cast[nodes.AstNode])
+
+  /**
+    * Nodes of the AST obtained by expanding AST edges backwards until the method root is reached, minus this node
+    * */
+  def inAstMinusLeaf: AstNode[Labels] =
+    new AstNode[Labels](
+      raw
+        .until(_.hasLabel(NodeTypes.METHOD))
+        .repeat(_.in(EdgeTypes.AST))
+        .emit
+        .cast[nodes.AstNode])
 
   /**
     * Traverse only to those AST nodes that are also control flow graph nodes

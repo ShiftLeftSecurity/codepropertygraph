@@ -97,4 +97,53 @@ class CAstTests extends CpgDataFlowTests {
     }
   }
 
+  val bufInLoopCode =
+    """
+      |void foo(int bar) {
+      | char buf[10];
+      | int i;
+      | for (int i = 0; i < bar; i++) {
+      |   buf[i] = 42;
+      | }
+      |}
+    """.stripMargin
+
+  "should find index `i` used for buf" in {
+    cpgFactory.buildCpg(bufInLoopCode) { cpg =>
+      cpg.call
+        .name("<operator>.computedMemberAccess")
+        .argument
+        .argIndex(2)
+        .code
+        .l shouldBe List("i")
+    }
+  }
+
+  "should find that i is assigned as part of loop header" in {
+    cpgFactory.buildCpg(bufInLoopCode) { cpg =>
+      cpg.call
+        .name("<operator>.computedMemberAccess")
+        .argument
+        .argIndex(2)
+        .inAstMinusLeaf
+        .isControlStructure
+        .code
+        .l shouldBe List("for (int i = 0; i < bar; i++)")
+    }
+  }
+
+  "should correctly identify condition of for loop" in {
+    cpgFactory.buildCpg(bufInLoopCode) { cpg =>
+      cpg.call
+        .name("<operator>.computedMemberAccess")
+        .argument
+        .argIndex(2)
+        .inAstMinusLeaf
+        .isControlStructure
+        .condition
+        .code
+        .l shouldBe List("i < bar")
+    }
+  }
+
 }
