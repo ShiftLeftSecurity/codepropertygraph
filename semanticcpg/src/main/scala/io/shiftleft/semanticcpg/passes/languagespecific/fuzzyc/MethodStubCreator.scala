@@ -20,7 +20,7 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
   // Since the method fullNames for fuzzyc are not unique, we do not have
   // a 1to1 relation and may overwrite some values. We deem this ok for now.
   private var methodFullNameToNode = Map[String, nodes.MethodBase]()
-  private var methodInstFullNameToParameterCount = Map[String, Int]()
+  private var methodNameToParameterCount = Map[String, Int]()
 
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = new DiffGraph
@@ -34,9 +34,9 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
         try {
           methodFullNameToNode.get(methodInst.methodFullName) match {
             case None =>
-              val parameterCount = methodInstFullNameToParameterCount(methodInst.fullName)
+              val parameterCount = methodNameToParameterCount(methodInst.name)
               val newMethod =
-                createMethodStub(methodInst.name, methodInst.fullName, methodInst.signature, parameterCount, dstGraph)
+                createMethodStub(methodInst.name, methodInst.name, methodInst.signature, parameterCount, dstGraph)
 
               methodFullNameToNode += methodInst.methodFullName -> newMethod
             case _ =>
@@ -110,15 +110,12 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
       }
       .exec()
 
-    // TODO find other way to count arguments.
-    /*
     cpg.call
       .sideEffect { call =>
-        methodInstFullNameToParameterCount +=
-          //call.methodInstFullName -> call.vertices(Direction.OUT, EdgeTypes.AST).asScala.size
+        methodNameToParameterCount +=
+          call.name -> call.vertices(Direction.OUT, EdgeTypes.AST).asScala.size
       }
       .exec()
-     */
   }
 }
 

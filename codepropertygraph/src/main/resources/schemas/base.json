@@ -215,7 +215,7 @@
          ]
         },
         {"id":32, "name":"METHOD_INST",
-         "keys":["NAME", "FULL_NAME", "SIGNATURE", "METHOD_FULL_NAME", "ORDER"],
+         "keys":["NAME", "SIGNATURE", "METHOD_FULL_NAME", "ORDER"],
          "comment":"A method instance which always has to reference a method and may have type argument children if the referred to method is a template",
          "outEdges": [
              {"edgeName": "AST", "inNodes": ["TYPE_ARGUMENT"]}
