@@ -62,7 +62,8 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
       "<global>",
       None,
       None,
-      None,
+      0,
+      None
     )
     dstGraph.addNode(methodNode)
 

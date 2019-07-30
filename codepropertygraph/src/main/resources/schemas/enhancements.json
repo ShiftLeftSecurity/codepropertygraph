@@ -13,7 +13,7 @@
     "nodeTypes" : [
       {
         "id":307,"name" : "IMPLICIT_CALL",
-        "keys" : ["CODE", "NAME", "SIGNATURE", "LINE_NUMBER", "COLUMN_NUMBER"],
+          "keys" : ["CODE", "NAME", "SIGNATURE", "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
         "comment" : "An implicit call site hidden in a method indicated by METHOD_MAP policy entries",
         "is": ["CALL_REPR", "CFG_NODE", "TRACKING_POINT"],
         "outEdges" : []
@@ -27,7 +27,7 @@
         {
             "id":40,
             "name": "NAMESPACE",
-            "keys": ["NAME"],
+            "keys": ["NAME", "ORDER"],
             "comment": "This node represents a namespace as a whole whereas the NAMESPACE_BLOCK is used for each grouping occurrence of a namespace in code. Single representing NAMESPACE node is required for easier navigation in the query language",
           "is" : ["AST_NODE"],
           "outEdges": []
