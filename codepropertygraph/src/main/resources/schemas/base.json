@@ -236,9 +236,10 @@
 	 "comment" : "A control structure such as if, while, or for",
 	 "is" : ["EXPRESSION"],
 	 "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["LITERAL", "MEMBER",
+             {"edgeName": "AST", "inNodes": ["LITERAL",
                                              "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
-                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN", "CONTROL_STRUCTURE"]}
+                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN", "CONTROL_STRUCTURE"]},
+	     {"edgeName" : "CONDITION", "inNodes" : ["LITERAL", "CALL", "IDENTIFIER", "RETURN", "BLOCK", "METHOD_REF", "CONTROL_STRUCTURE", "UNKNOWN", "ARRAY_INITIALIZER"] }
 	 ]
 	},
 
@@ -282,7 +283,8 @@
         {"id" : 22, "name" : "BINDS_TO", "keys": [], "comment" : "Type argument binding to a type parameter", "keys" : [] },
         {"id" : 10, "name" : "REF", "keys" : [], "comment" : "A reference to e.g. a LOCAL" },
         {"id" : 30, "name": "VTABLE", "comment" : "Indicates that a method is part of the vtable of a certain type declaration", "keys": []},
-        {"id" : 55, "name": "RECEIVER", "comment" : "The receiver of a method call which is either an object or a pointer", "keys": []}
+        {"id" : 55, "name": "RECEIVER", "comment" : "The receiver of a method call which is either an object or a pointer", "keys": []},
+	{"id" : 56, "name": "CONDITION", "comment" : "Edge from control structure node to the expression that holds the condition", "keys" : []}
 
     ],
 
