@@ -214,15 +214,6 @@
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
          ]
         },
-        {"id":32, "name":"METHOD_INST",
-         "keys":["NAME", "SIGNATURE", "METHOD_FULL_NAME", "ORDER"],
-         "comment":"A method instance which always has to reference a method and may have type argument children if the referred to method is a template",
-         "outEdges": [
-             {"edgeName": "AST", "inNodes": ["TYPE_ARGUMENT"]}
-         ],
-	 "is" : ["AST_NODE"]
-        },
-
         {"id" : 14, "name" : "ARRAY_INITIALIZER",
          "keys":[],
          "outEdges": [],
@@ -246,7 +237,7 @@
 	 "outEdges" : [
              {"edgeName": "AST", "inNodes": ["LITERAL",
                                              "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
-                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN", "CONTROL_STRUCTURE"]},
+                                             "IDENTIFIER", "RETURN", "BLOCK", "UNKNOWN", "CONTROL_STRUCTURE"]},
 	     {"edgeName" : "CONDITION", "inNodes" : ["LITERAL", "CALL", "IDENTIFIER", "RETURN", "BLOCK", "METHOD_REF", "CONTROL_STRUCTURE", "UNKNOWN", "ARRAY_INITIALIZER"] }
 	 ]
 	},
@@ -261,7 +252,7 @@
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]},
              {"edgeName": "AST", "inNodes": ["LITERAL", "MEMBER",
                                              "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
-                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN", "CONTROL_STRUCTURE"]}
+                                             "IDENTIFIER", "RETURN", "BLOCK", "UNKNOWN", "CONTROL_STRUCTURE"]}
          ]
         }
     ],

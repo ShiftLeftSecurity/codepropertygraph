@@ -24,7 +24,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
   private var typeDeclFullNameToNode = Map.empty[String, nodes.StoredNode]
   private var typeFullNameToNode = Map.empty[String, nodes.StoredNode]
   private var methodFullNameToNode = Map.empty[String, nodes.StoredNode]
-  private var methodInstFullNameToNode = Map.empty[String, nodes.StoredNode]
   private var namespaceBlockFullNameToNode = Map.empty[String, nodes.StoredNode]
 
   override def run(): Iterator[DiffGraph] = {
@@ -43,15 +42,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstGraph
     )
 
-    linkToSingle(
-      srcLabels = List(NodeTypes.METHOD_INST),
-      dstNodeLabel = NodeTypes.METHOD,
-      edgeType = EdgeTypes.REF,
-      dstNodeMap = methodFullNameToNode,
-      dstFullNameKey = nodes.MethodInst.Keys.MethodFullName,
-      dstGraph
-    )
-
+    /*
     def linkCall(call: nodes.Call): Unit = {
       val receiver = call.vertices(Direction.OUT, EdgeTypes.RECEIVER).next
       val receiverTypeDecl = receiver.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).next
@@ -71,6 +62,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
         case None =>
       }
     }
+     */
 
 
     linkToSingle(
@@ -84,7 +76,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
         NodeTypes.LOCAL,
         NodeTypes.IDENTIFIER,
         NodeTypes.BLOCK,
-        NodeTypes.UNKNOWN,
+        NodeTypes.UNKNOWN
       ),
       dstNodeLabel = NodeTypes.TYPE,
       edgeType = EdgeTypes.EVAL_TYPE,
@@ -95,9 +87,9 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
 
     linkToSingle(
       srcLabels = List(NodeTypes.METHOD_REF),
-      dstNodeLabel = NodeTypes.METHOD_INST,
+      dstNodeLabel = NodeTypes.METHOD,
       edgeType = EdgeTypes.REF,
-      dstNodeMap = methodInstFullNameToNode,
+      dstNodeMap = methodFullNameToNode,
       dstFullNameKey = nodes.MethodRef.Keys.MethodInstFullName,
       dstGraph
     )
@@ -138,7 +130,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       case node: nodes.TypeDecl       => typeDeclFullNameToNode += node.fullName -> node
       case node: nodes.Type           => typeFullNameToNode += node.fullName -> node
       case node: nodes.Method         => methodFullNameToNode += node.fullName -> node
-      case node: nodes.MethodInst     => methodInstFullNameToNode += node.fullName -> node
       case node: nodes.NamespaceBlock => namespaceBlockFullNameToNode += node.fullName -> node
       case _                          => // ignore
     }

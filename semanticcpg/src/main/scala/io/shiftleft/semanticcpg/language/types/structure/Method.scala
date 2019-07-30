@@ -28,15 +28,6 @@ class Method(override val raw: GremlinScala[nodes.Method])
     with AstNodeBase[nodes.Method] {
 
   /**
-    * Traverse to concrete instances of method.
-    */
-  def methodInstance: MethodInst = {
-    new MethodInst(
-      raw.in(EdgeTypes.REF).cast[nodes.MethodInst]
-    )
-  }
-
-  /**
     * Traverse to parameters of the method
     * */
   def parameter: MethodParameter =

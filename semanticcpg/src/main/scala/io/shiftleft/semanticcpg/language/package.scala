@@ -59,9 +59,6 @@ package object language {
   implicit def toLocal(steps: Steps[nodes.Local]): Local =
     new Local(steps.raw)
 
-  implicit def toMethodInst(steps: Steps[nodes.MethodInst]): OriginalMethodInst =
-    new OriginalMethodInst(steps.raw)
-
   implicit def toMethod(steps: Steps[nodes.Method]): OriginalMethod =
     new OriginalMethod(steps.raw)
 
