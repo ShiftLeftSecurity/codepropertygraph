@@ -3,11 +3,15 @@ package io.shiftleft.codepropertygraph.cpgloading
 import io.shiftleft.codepropertygraph.Cpg
 import java.lang.{Long => JLong}
 import java.util.{ArrayList => JArrayList}
+
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, PropertyValue}
 import org.apache.tinkerpop.gremlin.structure.{T, Vertex, VertexProperty}
+
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import gremlin.scala._
+
+import scala.collection.mutable.ArrayBuffer
 
 private[cpgloading] object CpgOverlayLoader {
 
@@ -16,11 +20,10 @@ private[cpgloading] object CpgOverlayLoader {
     */
   def load(filename: String, baseCpg: Cpg): Unit = {
     val applier = new CpgOverlayApplier(baseCpg.graph)
-    ProtoCpgLoader.loadOverlays(filename).asScala.foreach { overlay =>
+    ProtoCpgLoader.loadOverlays(filename).foreach { overlay =>
       applier.applyDiff(overlay)
     }
   }
-
 }
 
 /**
@@ -50,11 +53,11 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
       val id = node.getKey
       val properties = node.getPropertyList.asScala
 
-      val keyValues = new JArrayList[AnyRef](4 + (2 * properties.size))
-      keyValues.add(T.id)
-      keyValues.add(node.getKey: JLong)
-      keyValues.add(T.label)
-      keyValues.add(node.getType.name)
+      val keyValues = new ArrayBuffer[AnyRef](4 + (2 * properties.size))
+      keyValues += T.id
+      keyValues += (node.getKey: JLong)
+      keyValues += T.label
+      keyValues += node.getType.name
       properties.foreach { property =>
         ProtoToCpg.addProperties(keyValues, property.getName.name, property.getValue)
       }
@@ -70,7 +73,7 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
       val dstTinkerNode = getVertexForOverlayId(edge.getDst)
 
       val properties = edge.getPropertyList.asScala
-      val keyValues = new JArrayList[AnyRef](2 * properties.size)
+      val keyValues = new ArrayBuffer[AnyRef](2 * properties.size)
       properties.foreach { property =>
         ProtoToCpg.addProperties(keyValues, property.getName.name, property.getValue)
       }
