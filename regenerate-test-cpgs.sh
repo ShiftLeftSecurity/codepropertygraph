@@ -2,13 +2,12 @@
 
 export CPG_HOME=`pwd`
 
-# https://stackoverflow.com/a/28085062
-: ${DEFAULT_JAVA2CPG_HOME:=`readlink -f ../java2cpg`}
-echo "java2cpg root directory [$DEFAULT_JAVA2CPG_HOME]:"
-read INSTALL_DIR
+DEFAULT_JAVA2CPG_HOME=`readlink -f ../java2cpg`
 if [ -z "$JAVA2CPG_HOME" ]; then
   JAVA2CPG_HOME=$DEFAULT_JAVA2CPG_HOME
 fi
+
+echo "java2cpg home directory: $JAVA2CPG_HOME"
 
 cd $JAVA2CPG_HOME
 sbt stage
