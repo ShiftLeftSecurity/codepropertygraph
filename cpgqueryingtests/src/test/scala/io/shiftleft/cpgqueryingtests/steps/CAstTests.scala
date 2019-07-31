@@ -47,7 +47,7 @@ class CAstTests extends CpgDataFlowTests {
 
   "should identify conditions" in {
     cpgFactory.buildCpg(code) { cpg =>
-      cpg.method.name("foo").ast.isControlStructure.condition.code.l shouldBe List("x > 10", "", "y > x")
+      cpg.method.name("foo").ast.isControlStructure.condition.code.l shouldBe List("x > 10", "y > x")
     }
   }
 
