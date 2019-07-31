@@ -86,6 +86,7 @@ https://docs.shiftleft.io/shiftleft/using-shiftleft-ocular/getting-started/cpg-d
 Here's how you can load a cpg into ShiftLeft Tinkergraph [3] in the sbt console - the next section will list some queries you can interactively run from there.
 
 There are some sample cpgs in this repository in the `resources/cpgs` directory.
+You can run `./regenerate-test-cpgs.sh` to update them, but this requires the proprietary java2cpg installed locally.
 
 ### [Tinkergraph (in memory reference db)](http://tinkerpop.apache.org/docs/current/reference/#tinkergraph-gremlin)
 ```
