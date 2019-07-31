@@ -19,6 +19,8 @@ def get_version():
     return version
 
 
+dependencies=["requests"]
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
@@ -34,7 +36,7 @@ with open("README.md", "r") as fh:
 
         url="https://github.com/ShiftLeftSecurity/codepropertygraph",
         packages=setuptools.find_packages(),
-
+        install_requires=dependencies,
         classifiers=[
             "Programming Language :: Python :: 3",
             "License :: OSI Approved :: Apache Software License",
