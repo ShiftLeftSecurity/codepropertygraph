@@ -33,6 +33,8 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
 
     linkAstChildToParent(dstGraph)
 
+    linkCalls(dstGraph)
+
     linkToSingle(
       srcLabels = List(NodeTypes.TYPE),
       dstNodeLabel = NodeTypes.TYPE_DECL,
@@ -41,29 +43,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstFullNameKey = nodes.Type.Keys.TypeDeclFullName,
       dstGraph
     )
-
-    /*
-    def linkCall(call: nodes.Call): Unit = {
-      val receiver = call.vertices(Direction.OUT, EdgeTypes.RECEIVER).next
-      val receiverTypeDecl = receiver.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).next
-        .vertices(Direction.OUT, EdgeTypes.REF).next
-
-      val resolvedMethodOption =
-        receiverTypeDecl.vertices(Direction.OUT, EdgeTypes.VTABLE).asScala.collectFirst {
-          case method: nodes.Method
-            if method.name.equals(call.name) && method.signature.equals(call.signature) =>
-            method
-        }
-
-      resolvedMethodOption match {
-        case Some(method) =>
-          val methodInstNodeId = methodInstFullNameToNodeId.get(method.fullName).get
-          dstGraph.addEdgeInOriginal(call, lookupNode(methodInstNodeId).get, EdgeTypes.CALL)
-        case None =>
-      }
-    }
-     */
-
 
     linkToSingle(
       srcLabels = List(
@@ -279,6 +258,29 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
         s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcFullName=$srcFullName, " +
         s"dstNodeType=$dstNodeType, dstNodeId=$dstNodeId")
   }
+
+  private def linkCalls(dstGraph: DiffGraph): Unit = {
+    cpg.call.sideEffect { call =>
+      linkCall(call, dstGraph)
+    }.exec()
+  }
+
+  private def linkCall(call: nodes.Call, dstGraph: DiffGraph): Unit = {
+    val receiver = call.vertices(Direction.OUT, EdgeTypes.RECEIVER).next
+    val receiverTypeDecl = receiver.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).next
+      .vertices(Direction.OUT, EdgeTypes.REF).next
+
+    val resolvedMethodOption =
+      receiverTypeDecl.vertices(Direction.OUT, EdgeTypes.BINDS).asScala.collectFirst {
+        case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
+          binding.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method]
+      }
+
+    resolvedMethodOption.foreach { method =>
+      dstGraph.addEdgeInOriginal(call, method, EdgeTypes.CALL)
+    }
+  }
+
 
 }
 
