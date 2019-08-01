@@ -53,3 +53,8 @@ lazy val cpg2overflowdb = Projects.cpg2overflowdb
 ThisBuild/publishTo := sonatypePublishTo.value
 ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature", "-language:implicitConversions")
 ThisBuild/compile/javacOptions ++= Seq("-g") //debug symbols
+
+onLoad in Global := {
+  assert(GitLFSUtils.isGitLFSEnabled(), "You need to install git-lfs and run 'git lfs pull'")
+  (onLoad in Global).value
+}
