@@ -1,5 +1,7 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
+import java.io.IOException
+
 import io.shiftleft.codepropertygraph.Cpg
 import java.lang.{Long => JLong}
 import java.util.{ArrayList => JArrayList}
@@ -20,9 +22,17 @@ private[cpgloading] object CpgOverlayLoader {
     */
   def load(filename: String, baseCpg: Cpg): Unit = {
     val applier = new CpgOverlayApplier(baseCpg.graph)
-    ProtoCpgLoader.loadOverlays(filename).foreach { overlay =>
-      applier.applyDiff(overlay)
-    }
+    ProtoCpgLoader.loadOverlays(filename)
+      .map { overlays: Iterator[CpgOverlay] =>
+        overlays.foreach(applier.applyDiff)
+      }
+      .tried
+      .recover {
+        case e: IOException =>
+          e.printStackTrace()
+          Nil
+      }
+      .get
   }
 }
 

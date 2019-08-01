@@ -6,8 +6,9 @@ import java.nio.file.{Files, Path}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct}
 import org.apache.logging.log4j.LogManager
-import resource.managed
+import resource.{ManagedResource, managed}
 import java.util.{List => JList}
+
 import scala.collection.JavaConverters._
 
 object ProtoCpgLoader {
@@ -46,26 +47,18 @@ object ProtoCpgLoader {
   def loadFromListOfProtos(cpgs: JList[CpgStruct], overflowDbConfig: OverflowDbConfig): Cpg =
     loadFromListOfProtos(cpgs.asScala, overflowDbConfig)
 
-  def loadOverlays(fileName: String): List[CpgOverlay] =
-    managed(new ZipArchive(fileName))
-      .map(readOverlayEntries)
-      .tried
-      .recover {
-        case e: IOException =>
-          e.printStackTrace()
-          Nil
-      }
-      .get
+  def loadOverlays(fileName: String): ManagedResource[Iterator[CpgOverlay]] =
+    managed(new ZipArchive(fileName)).map(readOverlayEntries)
 
   private def readOverlay(path: Path): CpgOverlay =
     managed(Files.newInputStream(path)).map(CpgOverlay.parseFrom).tried.get
 
-  private def readOverlayEntries(zip: ZipArchive): List[CpgOverlay] =
+  private def readOverlayEntries(zip: ZipArchive): Iterator[CpgOverlay] =
     zip
       .entries
       .sortWith(compareOverlayPath)
+      .iterator
       .map(readOverlay)
-      .toList
 
   private def compareOverlayPath(a: Path, b: Path): Boolean = {
     val file1Split: Array[String] = a.toString.replace("/", "").split("_")
