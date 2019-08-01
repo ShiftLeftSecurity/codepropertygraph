@@ -17,22 +17,22 @@ import scala.collection.mutable.ArrayBuffer
 object ProtoToCpg {
   val logger: Logger = LogManager.getLogger(classOf[ProtoToCpg])
 
-  def addProperties(kvs: ArrayBuffer[AnyRef], name: String, value: PropertyValue): Unit = {
+  def addProperties(keyValues: ArrayBuffer[AnyRef], name: String, value: PropertyValue): Unit = {
     import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase._
     value.getValueCase match {
       case INT_VALUE =>
-        kvs += name
-        kvs += (value.getIntValue: JInt)
+        keyValues += name
+        keyValues += (value.getIntValue: JInt)
       case STRING_VALUE =>
-        kvs += name
-        kvs += value.getStringValue
+        keyValues += name
+        keyValues += value.getStringValue
       case BOOL_VALUE =>
-        kvs += name
-        kvs += (value.getBoolValue: JBoolean)
+        keyValues += name
+        keyValues += (value.getBoolValue: JBoolean)
       case STRING_LIST =>
         value.getStringList.getValuesList.asScala.foreach { elem: String =>
-          kvs += name
-          kvs += elem
+          keyValues += name
+          keyValues += elem
         }
       case VALUE_NOT_SET => ()
       case _ =>
@@ -43,11 +43,11 @@ object ProtoToCpg {
 
 class ProtoToCpg(val overflowConfig: OverflowDbConfig = OverflowDbConfig.withDefaults) {
   private val nodeFilter: NodeFilter = new NodeFilter
-  private val tinkerGraph: TinkerGraph = mkTinkerGraph
+  private val tinkerGraph: TinkerGraph = makeTinkerGraph
 
   import ProtoToCpg._
 
-  private def mkTinkerGraphConfig: Configuration = {
+  private def makeTinkerGraphConfig: Configuration = {
     val conf = TinkerGraph.EMPTY_CONFIGURATION
     if (overflowConfig.enabled)
       setupOverflowProperties(conf)
@@ -69,9 +69,9 @@ class ProtoToCpg(val overflowConfig: OverflowDbConfig = OverflowDbConfig.withDef
     conf.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, false)
   }
 
-  private def mkTinkerGraph: TinkerGraph =
+  private def makeTinkerGraph: TinkerGraph =
     TinkerGraph.open(
-      mkTinkerGraphConfig,
+      makeTinkerGraphConfig,
       io.shiftleft.codepropertygraph.generated.nodes.Factories.AllAsJava,
       io.shiftleft.codepropertygraph.generated.edges.Factories.AllAsJava
     )
@@ -101,12 +101,12 @@ class ProtoToCpg(val overflowConfig: OverflowDbConfig = OverflowDbConfig.withDef
       val srcVertex = findVertexById(edge, edge.getSrc)
       val dstVertex = findVertexById(edge, edge.getDst)
       val properties: Seq[Edge.Property] = edge.getPropertyList.asScala
-      val kvs = new ArrayBuffer[AnyRef](2 * properties.size)
+      val keyValues = new ArrayBuffer[AnyRef](2 * properties.size)
       for (edgeProperty <- properties) {
-        addProperties(kvs, edgeProperty.getName.name(), edgeProperty.getValue)
+        addProperties(keyValues, edgeProperty.getName.name(), edgeProperty.getValue)
       }
       try {
-        srcVertex.addEdge(edge.getType.name(), dstVertex, kvs.toArray: _*)
+        srcVertex.addEdge(edge.getType.name(), dstVertex, keyValues.toArray: _*)
       } catch {
         case e: IllegalArgumentException =>
           val context = "label=" + edge.getType.name +
@@ -132,14 +132,14 @@ class ProtoToCpg(val overflowConfig: OverflowDbConfig = OverflowDbConfig.withDef
 
   private def nodeToArray(node: Node): Array[AnyRef] = {
     val props = node.getPropertyList
-    val kvs = new ArrayBuffer[AnyRef](4 + (2 * props.size()))
-    kvs += T.id
-    kvs += (node.getKey: JLong)
-    kvs += T.label
-    kvs += node.getType.name()
+    val keyValues = new ArrayBuffer[AnyRef](4 + (2 * props.size()))
+    keyValues += T.id
+    keyValues += (node.getKey: JLong)
+    keyValues += T.label
+    keyValues += node.getType.name()
     for (prop <- props.asScala) {
-      addProperties(kvs, prop.getName.name, prop.getValue)
+      addProperties(keyValues, prop.getName.name, prop.getValue)
     }
-    kvs.toArray
+    keyValues.toArray
   }
 }

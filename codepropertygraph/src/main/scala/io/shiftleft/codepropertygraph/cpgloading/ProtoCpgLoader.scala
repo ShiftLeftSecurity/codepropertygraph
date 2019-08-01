@@ -16,11 +16,11 @@ object ProtoCpgLoader {
   def loadFromProtoZip(fileName: String, overflowDbConfig: OverflowDbConfig = OverflowDbConfig.withDefaults): Cpg = {
     measureAndReport {
       val builder = new ProtoToCpg(overflowDbConfig)
-      for (zip <- managed(new ZipArchive(fileName));
-           entry <- zip.entries;
-           inputStream <- managed(Files.newInputStream(entry))) {
+      for {zip <- managed(new ZipArchive(fileName))
+           entry <- zip.entries
+           inputStream <- managed(Files.newInputStream(entry))}
         builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList)
-      }
+      
 
       /* second pass so we can stream for the edges
        * -> holding them all in memory is potentially too much
