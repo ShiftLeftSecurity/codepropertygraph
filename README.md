@@ -70,8 +70,7 @@ protoc --cpp_out=cpp --python_out=python cpg.proto
 
 You can find the code property graph specification at:
 
-https://docs.shiftleft.io/shiftleft/using-shiftleft-ocular/getting-started/cpg-deep-dive
-
+https://docs.shiftleft.io/shiftleft/using-shiftleft-ocular/about-shiftleft-ocular/cpg-deep-dive
 
 <!-- # Extending the specification -->
 
@@ -95,7 +94,7 @@ You can run `./regenerate-test-cpgs.sh` to update them, but this requires the pr
 sbt semanticcpg/console
 ```
 ```scala
-val cpg = io.shiftleft.cpgloading.CpgLoader.load("cpg.bin.zip")
+val cpg = io.shiftleft.codepropertygraph.cpgloading.CpgLoader.load("./resources/cpgs/helloshiftleft/cpg.bin.zip")
 ```
 
 # Querying the cpg
