@@ -12,11 +12,12 @@ import org.apache.tinkerpop.gremlin.structure.{T, Vertex, VertexProperty}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import gremlin.scala._
+import org.apache.logging.log4j.LogManager
 
 import scala.collection.mutable.ArrayBuffer
 
 private[cpgloading] object CpgOverlayLoader {
-
+  private val logger = LogManager.getLogger(getClass)
   /**
     * Load overlays stored in the file with the name `filename`.
     */
@@ -29,7 +30,7 @@ private[cpgloading] object CpgOverlayLoader {
       .tried
       .recover {
         case e: IOException =>
-          e.printStackTrace()
+          logger.error("Failed to load overlay from " + filename, e)
           Nil
       }
       .get
