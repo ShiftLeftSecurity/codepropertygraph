@@ -37,6 +37,8 @@ the following prerequisites:
   - Link: https://www.scala-sbt.org/
 * Git-lfs
   - Link: https://git-lfs.github.com/
+* Protoc
+  - Link: https://github.com/protocolbuffers/protobuf/releases
 
 Some binary files required for testing are managed through `git-lfs`. If you haven't cloned this repository yet, simply run `git lfs install`.
 If you have cloned it already, additionally run `git lfs pull` (from within the repository).
