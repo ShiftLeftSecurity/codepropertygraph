@@ -1,5 +1,7 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
+import java.io.IOException
+
 import io.shiftleft.codepropertygraph.Cpg
 import java.lang.{Long => JLong}
 import java.util.{ArrayList => JArrayList}
@@ -10,19 +12,28 @@ import org.apache.tinkerpop.gremlin.structure.{T, Vertex, VertexProperty}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import gremlin.scala._
+import org.apache.logging.log4j.LogManager
 
 import scala.collection.mutable.ArrayBuffer
 
 private[cpgloading] object CpgOverlayLoader {
-
+  private val logger = LogManager.getLogger(getClass)
   /**
     * Load overlays stored in the file with the name `filename`.
     */
   def load(filename: String, baseCpg: Cpg): Unit = {
     val applier = new CpgOverlayApplier(baseCpg.graph)
-    ProtoCpgLoader.loadOverlays(filename).foreach { overlay =>
-      applier.applyDiff(overlay)
-    }
+    ProtoCpgLoader.loadOverlays(filename)
+      .map { overlays: Iterator[CpgOverlay] =>
+        overlays.foreach(applier.applyDiff)
+      }
+      .tried
+      .recover {
+        case e: IOException =>
+          logger.error("Failed to load overlay from " + filename, e)
+          Nil
+      }
+      .get
   }
 }
 
