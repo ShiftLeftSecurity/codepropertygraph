@@ -100,6 +100,9 @@ package object language {
 
   implicit def toReturn(steps: Steps[nodes.Return]): Return =
     new Return(steps.raw)
+  
+  implicit def toBinding(steps: Steps[nodes.Binding]): Binding =
+    new Binding(steps.raw)
 
   implicit class GremlinScalaDeco[End](raw: GremlinScala[End]) {
     /* in some cases we cannot statically determine the type of the node, e.g. when traversing

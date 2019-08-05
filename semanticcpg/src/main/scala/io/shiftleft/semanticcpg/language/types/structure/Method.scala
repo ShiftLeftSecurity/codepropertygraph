@@ -53,6 +53,22 @@ class Method(override val raw: GremlinScala[nodes.Method])
   }
 
   /**
+    * Traverse to type decl which have this method bound to it.
+    */
+  def bindingTypeDecl: TypeDecl = {
+    referencingBinding.bindingTypeDecl
+  }
+
+  /**
+    * Traverse to bindings which reference to this method.
+    */
+  def referencingBinding: Binding = {
+    new Binding(
+      raw.in(EdgeTypes.REF).filter(_.hasLabel(NodeTypes.BINDING)).cast[nodes.Binding]
+    )
+  }
+  
+  /**
     * Shorthand to traverse to control structures where condition matches `regex`
     * */
   def condition(regex: String): ControlStructure = ast.isControlStructure.condition(regex)
