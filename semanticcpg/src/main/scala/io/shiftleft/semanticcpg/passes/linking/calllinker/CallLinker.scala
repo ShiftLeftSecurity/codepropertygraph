@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.linking.calllinker
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.Implicits._
@@ -38,27 +38,27 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg){
   }
 
   private def linkCall(call: nodes.Call, dstGraph: DiffGraph): Unit = {
-    call.vertices(Direction.OUT, EdgeTypes.RECEIVER).nextOption.foreach {
-      case methodRef: nodes.MethodRef =>
-        methodFullNameToNode.get(methodRef.methodInstFullName) match {
-          case Some(method) =>
-            dstGraph.addEdgeInOriginal(call, method, EdgeTypes.CALL)
-          case None =>
-            logger.warn(s"Unable to link METHOD_REF with METHOD_FULL_NAME ${methodRef.methodInstFullName}.")
-        }
-      case receiver =>
-        val receiverTypeDecl = receiver.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).nextChecked
-          .vertices(Direction.OUT, EdgeTypes.REF).nextChecked
-
-        val resolvedMethodOption =
-          receiverTypeDecl.vertices(Direction.OUT, EdgeTypes.BINDS).asScala.collectFirst {
-            case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
-              binding.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method]
-          }
-
-        resolvedMethodOption.foreach { method =>
+    if (call.dispatchType == DispatchTypes.STATIC_DISPATCH) {
+      methodFullNameToNode.get(call.methodInstFullName) match {
+        case Some(method) =>
           dstGraph.addEdgeInOriginal(call, method, EdgeTypes.CALL)
+        case None =>
+          logger.warn(s"Unable to link METHOD_REF with METHOD_FULL_NAME ${call.methodInstFullName}.")
+      }
+    } else {
+      val receiver = call.vertices(Direction.OUT, EdgeTypes.RECEIVER).nextChecked
+      val receiverTypeDecl = receiver.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).nextChecked
+        .vertices(Direction.OUT, EdgeTypes.REF).nextChecked
+
+      val resolvedMethodOption =
+        receiverTypeDecl.vertices(Direction.OUT, EdgeTypes.BINDS).asScala.collectFirst {
+          case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
+            binding.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method]
         }
+
+      resolvedMethodOption.foreach { method =>
+        dstGraph.addEdgeInOriginal(call, method, EdgeTypes.CALL)
+      }
     }
   }
 }
