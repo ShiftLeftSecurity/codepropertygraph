@@ -76,7 +76,7 @@
         // Nodes of method declarations
 
         {"id" : 1, "name" : "METHOD",
-         "keys": ["NAME", "FULL_NAME", "SIGNATURE", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME",
+         "keys": ["NAME", "FULL_NAME", "IS_EXTERNAL", "SIGNATURE", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME",
 		  "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
          "comment" : "A method/function/procedure",
          "is": ["DECLARATION", "CFG_NODE", "AST_NODE"],

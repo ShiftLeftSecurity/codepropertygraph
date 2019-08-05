@@ -1,13 +1,9 @@
 package io.shiftleft.cpgqueryingtests.steps
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.{Languages, NodeKeys, NodeTypes}
 import org.scalatest.{Matchers, WordSpec}
-import java.io._
 
 import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
-import org.json4s._
-import org.json4s.native.JsonMethods._
 
 class MethodTests extends WordSpec with Matchers {
 
@@ -80,8 +76,11 @@ class MethodTests extends WordSpec with Matchers {
 
     "filter for external/internal methods" in {
       val externals = fixture.cpg.method.external.fullName.l
-      externals.size shouldBe 1
-      externals.head shouldBe "java.lang.Object.<init>:void()"
+      externals.size shouldBe 2
+      externals should contain only(
+        "java.lang.Object.<init>:void()",
+        "java.lang.Object.toString:java.lang.String()"
+      )
 
       val internals = fixture.cpg.method.internal.fullName.l
       internals.size should be > 0
@@ -93,6 +92,22 @@ class MethodTests extends WordSpec with Matchers {
         .l
 
       (internals ++ externals).toSet shouldBe allMethods.toSet
+    }
+
+    "get the isExternal property (true) for external method calls" in {
+      val methods: List[nodes.Method] =
+        fixture.cpg.method.name("toString").toList
+
+      methods.size shouldBe 1
+      methods.head.isExternal shouldBe true
+    }
+
+    "get the isExternal property (false) for non-external method calls" in {
+      val methods: List[nodes.Method] =
+        fixture.cpg.method.name("someInternalFunction").toList
+
+      methods.size shouldBe 1
+      methods.head.isExternal shouldBe false
     }
   }
 

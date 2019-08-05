@@ -57,6 +57,7 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
     val methodNode = new nodes.NewMethod(
       name,
       fullName,
+      true,
       signature,
       NodeTypes.NAMESPACE_BLOCK,
       "<global>",
