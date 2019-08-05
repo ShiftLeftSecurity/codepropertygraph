@@ -16,7 +16,7 @@ class TestServerImpl extends ServerImpl {
 
       override def run(): Iterator[DiffGraph] = {
         implicit val diffGraph: DiffGraph = new DiffGraph
-        new nodes.NewMethod(name = "main").start.store
+        new nodes.NewMethod(name = "main", isExternal = false).start.store
         Iterator(diffGraph)
       }
     }

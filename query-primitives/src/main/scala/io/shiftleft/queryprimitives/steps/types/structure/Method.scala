@@ -240,18 +240,14 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, L
     * but only referenced in the CPG.
     * */
   def external: Method[Labels] =
-    new Method[Labels](
-      filter(_.definingTypeDecl.external).raw
-    )
+    new Method[Labels](raw.has(NodeKeys.IS_EXTERNAL -> true))
 
   /**
     * Traverse to internal methods, that is, methods for which
     * code is included in this CPG.
     * */
   def internal: Method[Labels] =
-    new Method[Labels](
-      filter(_.definingTypeDecl.internal).raw
-    )
+    new Method[Labels](raw.has(NodeKeys.IS_EXTERNAL -> false))
 
   /**
     * Traverse to method modifiers, e.g., "static", "public".
