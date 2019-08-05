@@ -76,8 +76,8 @@ class MethodTests extends WordSpec with Matchers {
 
     "filter for external/internal methods" in {
       val externals = fixture.cpg.method.external.fullName.l
-      externals.size shouldBe 2
-      externals should contain only(
+      externals.size should be > 0
+      externals should contain allElementsOf Seq(
         "java.lang.Object.<init>:void()",
         "java.lang.Object.toString:java.lang.String()"
       )
@@ -86,12 +86,9 @@ class MethodTests extends WordSpec with Matchers {
       internals.size should be > 0
       internals should not contain "java.lang.Object.<init>:void()"
 
-      val allMethods = fixture.cpg.method
-        .fullNameNot("<operator>.*")
-        .fullName
-        .l
-
-      (internals ++ externals).toSet shouldBe allMethods.toSet
+      val allMethods = fixture.cpg.method.fullName.l
+      allMethods should contain allElementsOf internals
+      allMethods should contain allElementsOf externals
     }
 
     "get the isExternal property (true) for external method calls" in {
