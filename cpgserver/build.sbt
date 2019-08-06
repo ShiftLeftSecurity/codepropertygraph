@@ -5,7 +5,7 @@ name := "CPG server"
 resolvers += Classpaths.typesafeReleases
 
 dependsOn(Projects.codepropertygraph)
-dependsOn(Projects.queryPrimitives)
+dependsOn(Projects.semanticcpg)
 
 libraryDependencies ++= Seq(
   "org.scalatra" %% "scalatra" % ScalatraVersion,

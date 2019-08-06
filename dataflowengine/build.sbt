@@ -1,3 +1,3 @@
 name := "dataflowengine"
 
-dependsOn(Projects.queryPrimitives)
+dependsOn(Projects.semanticcpg)
