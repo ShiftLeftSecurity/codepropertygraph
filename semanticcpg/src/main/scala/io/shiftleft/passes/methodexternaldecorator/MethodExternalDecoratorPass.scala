@@ -24,7 +24,7 @@ object MethodExternalDecoratorPass {
 
   def log(message: String): Unit = {
     if (!loggedDeprecatedWarning) {
-      logger.info(message)
+      logger.warn(message)
       loggedDeprecatedWarning = true
     }
   }
@@ -33,13 +33,15 @@ object MethodExternalDecoratorPass {
 /**
   * Sets the isExternal flag for Method in case it is not set already.
   * It is set to its parent type decl isExternal, defaulting to false otherwise.
+  *
+  * This solution is only meant to be used until all language frontends set the isExternal flag on their own.
   */
 class MethodExternalDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
 
   import MethodExternalDecoratorPass._
 
-  private def isValidExternalFlag(f: java.lang.Boolean): Boolean =
-    f != null
+  private def isValidExternalFlag(isExternal: java.lang.Boolean): Boolean =
+    isExternal != null
 
   private def findMethodTypeDecl(method: nodes.Method): Option[Vertex] =
     method
@@ -60,7 +62,7 @@ class MethodExternalDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   private def setIsExtern(dstGraph: DiffGraph,
                           method: nodes.Method,
                           isExtern: Boolean): Unit = {
-    log(s"Set value 'isExtern=$isExtern' for method '${method.fullName}'.")
+    log("Using deprecated CPG format with missing IS_EXTERNAL property on METHOD node.")
     dstGraph.addNodeProperty(
       method,
       NodeKeyNames.IS_EXTERNAL,
