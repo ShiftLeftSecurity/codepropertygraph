@@ -5,9 +5,10 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig, OverflowDbConfig}
 import io.shiftleft.layers.EnhancementRunner
 
-class CpgTestFixture(projectName: String) {
-  lazy val cpg = CpgLoader.load(s"resources/testcode/cpgs/$projectName/cpg.bin.zip",
-                                CpgLoaderConfig().withOverflowConfig(OverflowDbConfig.disabled))
+private class CpgTestFixture(projectName: String) {
+  private val cpgFilename = s"resources/testcode/cpgs/$projectName/cpg.bin.zip"
+  private val config = CpgLoaderConfig().withOverflowConfig(OverflowDbConfig.disabled)
+  lazy val cpg = CpgLoader.load(cpgFilename, config)
   new EnhancementRunner().run(cpg, new SerializedCpg())
   implicit val graph: Graph = cpg.graph
   lazy val scalaGraph: ScalaGraph = graph

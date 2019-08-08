@@ -3,7 +3,7 @@ package io.shiftleft.queryprimitives.steps
 import org.scalatest.{Matchers, WordSpec}
 
 class CAstTests extends WordSpec with Matchers {
-  val cpgFactory = new CpgFactory(LanguageFrontend.Fuzzyc)
+  val cpgFactory = CpgFactory()
 
   val code =
     """

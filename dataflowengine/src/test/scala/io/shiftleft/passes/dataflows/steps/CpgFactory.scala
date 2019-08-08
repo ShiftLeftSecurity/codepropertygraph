@@ -9,6 +9,12 @@ import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig, Ov
 import io.shiftleft.layers.{DataFlowRunner, EnhancementRunner}
 import io.shiftleft.semanticsloader.SemanticsLoader
 
+object CpgFactory {
+  def apply(frontend: LanguageFrontend = LanguageFrontend.Fuzzyc,
+            semanticsFilename: String = "dataflowengine/src/test/resources/default.semantics"): CpgFactory =
+    new CpgFactory(frontend, semanticsFilename)
+}
+
 class CpgFactory(frontend: LanguageFrontend, semanticsFilename: String) {
 
   /**
