@@ -1,12 +1,18 @@
 package io.shiftleft.cpgvalidator
 
+import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.Cardinality
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 sealed trait ValidationErrorCategory
 
 object EdgeDegreeErrorCategory {
   def apply(error: EdgeDegreeError): EdgeDegreeErrorCategory = {
-    EdgeDegreeErrorCategory(error.node.label, error.edgeType, error.direction, error.otherSideNodeTypes)
+    EdgeDegreeErrorCategory(
+      error.node.label,
+      error.edgeType,
+      error.direction,
+      error.otherSideNodeTypes
+    )
   }
 }
 
@@ -22,14 +28,33 @@ object NodeTypeErrorCategory {
   }
 }
 
-case class NodeTypeErrorCategory(nodeLabel: String, edgeType: String, direction: Direction)
+case class NodeTypeErrorCategory(nodeLabel: String,
+                                 edgeType: String,
+                                 direction: Direction)
     extends ValidationErrorCategory
 
 object EdgeTypeErrorCategory {
   def apply(error: EdgeTypeError): EdgeTypeErrorCategory = {
-    EdgeTypeErrorCategory(error.node.label, error.direction, error.invalidEdges.map(_.label))
+    EdgeTypeErrorCategory(
+      error.node.label,
+      error.direction,
+      error.invalidEdges.map(_.label)
+    )
   }
 }
 
-case class EdgeTypeErrorCategory(nodeLabel: String, direction: Direction, invalidEdgeTypes: List[String])
+case class EdgeTypeErrorCategory(nodeLabel: String,
+                                 direction: Direction,
+                                 invalidEdgeTypes: List[String])
+    extends ValidationErrorCategory
+
+object KeyErrorCategory {
+  def apply(error: KeyError): KeyErrorCategory = {
+    KeyErrorCategory(error.node.label, error.nodeKeyType, error.cardinality)
+  }
+}
+
+case class KeyErrorCategory(nodeLabel: String,
+                            nodeKeyType: String,
+                            cardinality: Cardinality)
     extends ValidationErrorCategory

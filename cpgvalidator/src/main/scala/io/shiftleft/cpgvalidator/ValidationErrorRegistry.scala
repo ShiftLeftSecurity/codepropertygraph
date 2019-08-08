@@ -7,7 +7,9 @@ import scala.collection.mutable
 class ValidationErrorRegistry {
   import ValidationErrorRegistry.logger
 
-  private[this] val validationErrors = mutable.Map[ValidationErrorCategory, List[ValidationError]]()
+  protected val validationErrors
+    : mutable.Map[ValidationErrorCategory, List[ValidationError]] =
+    mutable.Map.empty
 
   def addError(error: ValidationError): Unit = {
     val category = error.getCategory
@@ -20,7 +22,7 @@ class ValidationErrorRegistry {
     // We only log one error per category in order to not spam the user
     // because errors are usually quite repetitive.
     validationErrors.toList.foreach {
-      case (categery, errors) =>
+      case (_, errors) =>
         logger.error(s"Validation error: ${errors.head}")
     }
 
