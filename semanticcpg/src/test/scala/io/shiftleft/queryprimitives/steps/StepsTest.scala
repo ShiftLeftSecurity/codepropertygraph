@@ -1,14 +1,13 @@
-package io.shiftleft.cpgqueryingtests.steps
+package io.shiftleft.queryprimitives.steps
 
 import gremlin.scala.{Edge, GremlinScala, StepLabel, Vertex}
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.{Matchers, WordSpec}
+import shapeless.HNil
 
 import scala.collection.mutable
-import shapeless.HNil
 
 class StepsTest extends WordSpec with Matchers {
 

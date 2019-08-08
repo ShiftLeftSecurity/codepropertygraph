@@ -1,12 +1,12 @@
-package io.shiftleft.cpgqueryingtests.steps
+package io.shiftleft.queryprimitives.steps
 
 import gremlin.scala._
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.EdgeKeyNames
 import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
-import io.shiftleft.queryprimitives.steps.NewNodeSteps
-import io.shiftleft.codepropertygraph.generated.ModifierTypes
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, ModifierTypes}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.passes.DiffGraph.{EdgeInDiffGraph, EdgeToOriginal}
 import io.shiftleft.overflowdb.OdbGraph

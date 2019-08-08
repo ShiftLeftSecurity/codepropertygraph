@@ -1,15 +1,14 @@
-package io.shiftleft.cpgqueryingtests.codepropertygraph
+package io.shiftleft.queryprimitives.steps
 
 import java.io.{File, PrintWriter}
 import java.nio.file.Files
 
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
-import io.shiftleft.layers.{DataFlowRunner, EnhancementRunner}
-import io.shiftleft.semanticsloader.SemanticsLoader
+import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig, OverflowDbConfig}
+import io.shiftleft.layers.EnhancementRunner
 
-class CpgFactory(frontend: LanguageFrontend, semanticsFilename: String) {
+class CpgFactory(frontend: LanguageFrontend) {
 
   /**
     * Build a CPG for the provided C/C++ code snippet.
@@ -30,9 +29,7 @@ class CpgFactory(frontend: LanguageFrontend, semanticsFilename: String) {
     val config = CpgLoaderConfig.withoutOverflow
     val cpg = CpgLoader.load(cpgFile.getAbsolutePath, config)
 
-    val semantics = new SemanticsLoader(semanticsFilename).load()
     new EnhancementRunner().run(cpg, new SerializedCpg())
-    new DataFlowRunner(semantics).run(cpg, new SerializedCpg())
 
     try fun(cpg)
     finally { cpg.close() }

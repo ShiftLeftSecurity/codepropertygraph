@@ -42,7 +42,6 @@ val fuzzyc2cpgVersion = "0.1.73"
 
 lazy val codepropertygraph = Projects.codepropertygraph
 lazy val protoBindings = Projects.protoBindings
-lazy val cpgqueryingtests = Projects.cpgqueryingtests
 lazy val semanticcpg = Projects.semanticcpg
 lazy val dataflowengine = Projects.dataflowengine
 lazy val cpgserver = Projects.cpgserver

@@ -7,7 +7,8 @@ libraryDependencies ++= Seq(
   "org.json4s" %% "json4s-native" % "3.5.2",
   "com.massisframework" % "j-text-utils" % "0.3.4",
   "org.scalatest"       %% "scalatest"       % "3.0.3" % Test,
-  "org.scalatest" %% "scalatest" % "3.0.3" % Test
+  "org.scalatest" %% "scalatest" % "3.0.3" % Test,
+  "io.shiftleft" %% "fuzzyc2cpg" % Versions.fuzzyc2cpg
 )
 
 scalacOptions in (Compile, doc) ++= Seq(

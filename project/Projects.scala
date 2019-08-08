@@ -3,7 +3,6 @@ import sbt._
 object Projects {
   lazy val codepropertygraph = project.in(file("codepropertygraph"))
   lazy val protoBindings = project.in(file("proto-bindings"))
-  lazy val cpgqueryingtests = project.in(file("cpgqueryingtests"))
   lazy val semanticcpg = project.in(file("semanticcpg"))
   lazy val dataflowengine = project.in(file("dataflowengine"))
   lazy val cpgserver = project.in(file("cpgserver"))

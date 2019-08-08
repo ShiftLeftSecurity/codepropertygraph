@@ -1,7 +1,6 @@
-package io.shiftleft.cpgqueryingtests.steps
+package io.shiftleft.queryprimitives.steps
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class FileTests extends WordSpec with Matchers {
