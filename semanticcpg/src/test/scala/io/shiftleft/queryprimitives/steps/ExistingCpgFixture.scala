@@ -5,7 +5,7 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig, OverflowDbConfig}
 import io.shiftleft.layers.EnhancementRunner
 
-private class CpgTestFixture(projectName: String) {
+private class ExistingCpgFixture(projectName: String) {
   private val cpgFilename = s"resources/testcode/cpgs/$projectName/cpg.bin.zip"
   private val config = CpgLoaderConfig().withOverflowConfig(OverflowDbConfig.disabled)
   lazy val cpg = CpgLoader.load(cpgFilename, config)
@@ -14,9 +14,9 @@ private class CpgTestFixture(projectName: String) {
   lazy val scalaGraph: ScalaGraph = graph
 }
 
-object CpgTestFixture {
-  def apply[T](projectName: String)(fun: CpgTestFixture => T): T = {
-    val fixture = new CpgTestFixture(projectName)
+object ExistingCpgFixture {
+  def apply[T](projectName: String)(fun: ExistingCpgFixture => T): T = {
+    val fixture = new ExistingCpgFixture(projectName)
     try {
       fun(fixture)
     } finally {

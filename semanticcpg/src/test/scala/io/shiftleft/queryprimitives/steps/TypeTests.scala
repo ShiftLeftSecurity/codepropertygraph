@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import org.scalatest.{Matchers, WordSpec}
 
 class TypeTests extends WordSpec with Matchers {
-  CpgTestFixture("type") { fixture =>
+  ExistingCpgFixture("type") { fixture =>
     "ClassMemberTest" should {
 
       "have ClassMemberTest as internal class" in {

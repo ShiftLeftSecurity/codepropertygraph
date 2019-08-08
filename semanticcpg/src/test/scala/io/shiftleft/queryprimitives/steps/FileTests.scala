@@ -5,7 +5,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class FileTests extends WordSpec with Matchers {
 
-  "generic cpg" should CpgTestFixture("file") { fixture =>
+  "generic cpg" should ExistingCpgFixture("file") { fixture =>
     "find file io/shiftleft/testcode/file/FileTest" in {
       val queryResult: List[nodes.File] = fixture.cpg.file.toList
 

@@ -5,7 +5,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class MethodTests extends WordSpec with Matchers {
 
-  "Method traversals" should CpgTestFixture("method") { fixture =>
+  "Method traversals" should ExistingCpgFixture("method") { fixture =>
     "expand to type declaration" in {
       val queryResult: List[nodes.TypeDecl] =
         fixture.cpg.method.name("methodWithLiteral").definingTypeDecl.toList

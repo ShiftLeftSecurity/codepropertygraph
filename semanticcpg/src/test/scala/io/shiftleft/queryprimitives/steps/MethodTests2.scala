@@ -12,37 +12,37 @@ class MethodTests2 extends WordSpec with Matchers {
     """
 
   "should return correct function/method name" in {
-    CpgFactory().buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       cpg.method.name.toSet shouldBe Set("main")
     }
   }
 
   "should have correct type signature" in
-    CpgFactory().buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       cpg.method.signature.toSet shouldBe Set("int(int,char * *)")
     }
 
   "should return correct number of parameters" in
-    CpgFactory().buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       cpg.parameter.name.toSet shouldBe Set("argc", "argv")
       cpg.method.name("main").parameter.name.toSet shouldBe Set("argc", "argv")
     }
 
   "should return correct parameter types" in
-    CpgFactory().buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       cpg.parameter.name("argc").evalType.l shouldBe List("int")
       cpg.parameter.name("argv").evalType.l shouldBe List("char * *")
     }
 
   "should return correct return type" in
-    CpgFactory().buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       cpg.methodReturn.evalType.l shouldBe List("int")
       cpg.method.name("main").methodReturn.evalType.l shouldBe List("int")
       cpg.parameter.name("argc").method.methodReturn.evalType.l shouldBe List("int")
     }
 
   "should return a filename for method 'main'" in
-    CpgFactory().buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       cpg.method.name("main").file.name.l should not be empty
     }
 

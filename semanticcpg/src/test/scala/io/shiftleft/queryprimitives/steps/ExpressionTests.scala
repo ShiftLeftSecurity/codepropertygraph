@@ -5,7 +5,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class ExpressionTests extends WordSpec with Matchers {
 
-  "generic cpg" should CpgTestFixture("expression") { fixture =>
+  "generic cpg" should ExistingCpgFixture("expression") { fixture =>
     "expand to next expression in CFG" in {
       val expressions: List[nodes.Expression] =
         fixture.cpg.method.name("methodForCfgTest").cfgFirst.cfgNext.toList

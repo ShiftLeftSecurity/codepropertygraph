@@ -8,11 +8,11 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig, OverflowDbConfig}
 import io.shiftleft.layers.EnhancementRunner
 
-object CpgFactory {
-  def apply(frontend: LanguageFrontend = LanguageFrontend.Fuzzyc): CpgFactory = new CpgFactory(frontend)
+object CodeToCpgFixture {
+  def apply(frontend: LanguageFrontend = LanguageFrontend.Fuzzyc): CodeToCpgFixture = new CodeToCpgFixture(frontend)
 }
 
-class CpgFactory(frontend: LanguageFrontend) {
+class CodeToCpgFixture(frontend: LanguageFrontend) {
 
   /**
     * Build a CPG for the provided code snippet.

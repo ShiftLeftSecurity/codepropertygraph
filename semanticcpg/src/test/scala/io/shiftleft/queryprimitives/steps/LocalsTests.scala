@@ -32,23 +32,23 @@ class LocalsTests extends WordSpec with Matchers {
                  """.stripMargin
 
   "should allow to query for all locals" in
-    CpgFactory().buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       cpg.local.name.toSet shouldBe Set("a", "b", "c", "z", "x", "q", "p")
     }
 
   "should allow to query for all locals in method `free_list`" in
-    CpgFactory().buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       cpg.method.name("free_list").local.name.toSet shouldBe Set("q", "p")
     }
 
   "should prove correct (name, type) pairs for locals" in
-    CpgFactory().buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       cpg.method.name("free_list").local.map(l => (l.name, l.typeFullName)).toSet shouldBe
         Set(("q", "struct node *"), ("p", "struct node *"))
     }
 
   "should allow finding filenames by local regex" in
-    CpgFactory().buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       val filename = cpg.local.name("a*").file.name.headOption()
       filename should not be empty
       filename.head.endsWith(".c") shouldBe true
