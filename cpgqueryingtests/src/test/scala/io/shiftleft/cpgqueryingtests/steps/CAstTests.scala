@@ -1,8 +1,9 @@
 package io.shiftleft.cpgqueryingtests.steps
 
 import io.shiftleft.cpgqueryingtests.codepropertygraph.{CpgFactory, LanguageFrontend}
+import org.scalatest.{Matchers, WordSpec}
 
-class CAstTests extends CpgDataFlowTests {
+class CAstTests extends WordSpec with Matchers {
   val cpgFactory = new CpgFactory(LanguageFrontend.Fuzzyc, "cpgqueryingtests/src/test/resources/default.semantics")
 
   val code =

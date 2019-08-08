@@ -1,6 +1,7 @@
-package io.shiftleft.cpgqueryingtests.codepropertygraph
+package io.shiftleft.passes.dataflows.steps
 
 import java.io.File
+
 import io.shiftleft.fuzzyc2cpg.FuzzyC2Cpg
 import io.shiftleft.fuzzyc2cpg.output.protobuf.OutputModuleFactory
 

@@ -1,11 +1,11 @@
-package io.shiftleft.cpgqueryingtests.steps
+package io.shiftleft.passes.dataflows.steps
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps._
+import io.shiftleft.queryprimitives.steps.ext.dataflowengine._
 import io.shiftleft.queryprimitives.steps.types.expressions.Literal
 import io.shiftleft.queryprimitives.steps.types.structure.{Member, Method}
-import io.shiftleft.queryprimitives.steps.ext.dataflowengine._
 import org.scalatest.{Matchers, WordSpec}
 import shapeless.HNil
 
