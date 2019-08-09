@@ -1,6 +1,5 @@
-package io.shiftleft.queryprimitives.steps
+package io.shiftleft.queryprimitives.utils
 
-import io.shiftleft.queryprimitives.utils.Statements
 import io.shiftleft.testfixtures.ExistingCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 

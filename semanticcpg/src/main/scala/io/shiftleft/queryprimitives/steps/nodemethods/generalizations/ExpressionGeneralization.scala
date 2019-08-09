@@ -1,4 +1,4 @@
-package io.shiftleft.queryprimitives.steps.visitormixins
+package io.shiftleft.queryprimitives.steps.nodemethods.generalizations
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor

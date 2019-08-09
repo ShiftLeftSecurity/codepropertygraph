@@ -10,8 +10,6 @@ import shapeless.HList
 /**
   Steps for traversing the code property graph
 
-  All traversals start at io.shiftleft.queryprimitives.starters.Cpg.
-
   Implicit conversions to specific steps, based on the node at hand.
   Automatically in scope when using anything in the `steps` package, e.g. `Steps`
   */

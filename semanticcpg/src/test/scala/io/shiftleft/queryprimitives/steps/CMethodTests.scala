@@ -6,7 +6,7 @@ import org.scalatest.{Matchers, WordSpec}
 /**
   * Language primitives for navigating method stubs
   * */
-class MethodTests2 extends WordSpec with Matchers {
+class CMethodTests extends WordSpec with Matchers {
 
   val code = """
        int main(int argc, char **argv) { }

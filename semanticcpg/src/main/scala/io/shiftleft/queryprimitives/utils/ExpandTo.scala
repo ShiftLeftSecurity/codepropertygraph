@@ -8,9 +8,14 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
+// TODO This object is problematic. While it offers a few utility methods
+// on nodes, these are all lumped together into one object, and they are
+// unavailable in the query language. We should rather extend the query
+// language appropriately.
+
 object ExpandTo {
-  // The call receiver is for java always an object instance.
-  // For languages which make use of function pointer this can also be the
+  // For java, the call receiver is always an object instance.
+  // For languages which make use of function pointers, this can also be the
   // pointer itself.
   def callReceiverOption(callNode: Vertex): Option[Vertex] = {
     callNode
@@ -43,11 +48,11 @@ object ExpandTo {
     parameterNode.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).nextChecked
   }
 
-  def parameterToMethod(parameterNode: Vertex): Vertex = {
+  def parameterInToMethod(parameterNode: Vertex): Vertex = {
     parameterNode.vertices(Direction.IN, EdgeTypes.AST).nextChecked
   }
 
-  def formalReturnToMethod(formalReturnNode: Vertex): Vertex = {
+  def methodReturnToMethod(formalReturnNode: Vertex): Vertex = {
     formalReturnNode.vertices(Direction.IN, EdgeTypes.AST).nextChecked
   }
 

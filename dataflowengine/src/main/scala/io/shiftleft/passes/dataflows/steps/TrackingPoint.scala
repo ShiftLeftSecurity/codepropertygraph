@@ -108,11 +108,11 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
     val method =
       dataFlowObject.label match {
         case NodeTypes.METHOD_RETURN =>
-          ExpandTo.formalReturnToMethod(dataFlowObject)
+          ExpandTo.methodReturnToMethod(dataFlowObject)
         case NodeTypes.METHOD_PARAMETER_IN =>
-          ExpandTo.parameterToMethod(dataFlowObject)
+          ExpandTo.parameterInToMethod(dataFlowObject)
         case NodeTypes.METHOD_PARAMETER_OUT =>
-          ExpandTo.parameterToMethod(dataFlowObject)
+          ExpandTo.parameterInToMethod(dataFlowObject)
         case NodeTypes.LITERAL | NodeTypes.CALL | NodeTypes.IDENTIFIER | NodeTypes.RETURN | NodeTypes.UNKNOWN =>
           ExpandTo.expressionToMethod(dataFlowObject)
       }

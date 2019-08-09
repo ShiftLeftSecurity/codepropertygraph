@@ -1,6 +1,4 @@
-package io.shiftleft.queryprimitives
-package steps
-package visitormixins
+package io.shiftleft.queryprimitives.steps.nodemethods.generalizations
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
@@ -11,11 +9,11 @@ object TrackingPointToCfgNode extends TrackingPointToCfgNode
 trait TrackingPointToCfgNode extends NodeVisitor[nodes.CfgNode] with ExpressionGeneralization[nodes.CfgNode] {
 
   override def visit(node: nodes.MethodParameterIn): nodes.CfgNode = {
-    ExpandTo.parameterToMethod(node).asInstanceOf[nodes.CfgNode]
+    ExpandTo.parameterInToMethod(node).asInstanceOf[nodes.CfgNode]
   }
 
   override def visit(node: nodes.MethodParameterOut): nodes.CfgNode = {
-    val method = ExpandTo.parameterToMethod(node)
+    val method = ExpandTo.parameterInToMethod(node)
     val methodReturn = ExpandTo.methodToFormalReturn(method)
     methodReturn.asInstanceOf[nodes.CfgNode]
   }

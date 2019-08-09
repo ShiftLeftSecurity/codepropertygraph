@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{
   AstNodeBase,
+  CfgNode,
   DeclarationBase,
   Expression,
   Modifier
@@ -284,6 +285,11 @@ class Method[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Method, L
         .out(EdgeTypes.AST)
         .not(_.hasLabel(NodeTypes.LOCAL))
         .cast[nodes.Expression])
+
+  def cfgNode: CfgNode[Labels] =
+    new CfgNode(
+      raw.out(EdgeTypes.CONTAINS).filterOnEnd(_.isInstanceOf[nodes.CfgNode]).cast[nodes.CfgNode]
+    )
 
   /**
     *  Traverse to first expressions in CFG.

@@ -1,13 +1,12 @@
-package io.shiftleft.queryprimitives.steps.starters
+package io.shiftleft.queryprimitives.steps
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
-import io.shiftleft.queryprimitives.steps.types.structure._
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
-import io.shiftleft.queryprimitives.steps.NodeSteps
 import io.shiftleft.queryprimitives.steps.types.expressions._
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations._
+import io.shiftleft.queryprimitives.steps.types.structure._
 import shapeless.HNil
 
 class NodeTypeStarters(cpg: Cpg) {

@@ -1,6 +1,5 @@
 package io.shiftleft.codepropertygraph.predicates
 
-import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.scalatest.{Matchers, WordSpec}
 
 class TextTest extends WordSpec with Matchers {
