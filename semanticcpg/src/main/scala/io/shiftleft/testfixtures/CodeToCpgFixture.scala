@@ -1,4 +1,4 @@
-package io.shiftleft.queryprimitives.steps
+package io.shiftleft.testfixtures
 
 import java.io.{File, PrintWriter}
 import java.nio.file.Files
@@ -19,24 +19,29 @@ class CodeToCpgFixture(frontend: LanguageFrontend) {
     *
     * @param sourceCode code for which one wants to generate cpg
     */
-  def buildCpg[T](sourceCode: String)(fun: Cpg => T): T = {
-    val tmpDir = Files.createTempDirectory("dflowtest").toFile
-    tmpDir.deleteOnExit()
-
-    val codeFile = File.createTempFile("Test", frontend.fileSuffix, tmpDir)
-    codeFile.deleteOnExit()
-
-    new PrintWriter(codeFile) { write(sourceCode); close() }
-
+  def buildCpg[T](sourceCode: String, passes: (Cpg => Unit) = createEnhancements)(fun: Cpg => T): T = {
+    val tmpDir = writeCodeToFile(sourceCode)
     val cpgFile = frontend.execute(tmpDir)
-
     val config = CpgLoaderConfig.withoutOverflow
     val cpg = CpgLoader.load(cpgFile.getAbsolutePath, config)
 
-    new EnhancementRunner().run(cpg, new SerializedCpg())
+    passes(cpg)
 
     try fun(cpg)
     finally { cpg.close() }
+  }
+
+  private def createEnhancements(cpg: Cpg): Unit = {
+    new EnhancementRunner().run(cpg, new SerializedCpg())
+  }
+
+  private def writeCodeToFile(sourceCode: String): File = {
+    val tmpDir = Files.createTempDirectory("semanticcpgtest").toFile
+    tmpDir.deleteOnExit()
+    val codeFile = File.createTempFile("Test", frontend.fileSuffix, tmpDir)
+    codeFile.deleteOnExit()
+    new PrintWriter(codeFile) { write(sourceCode); close() }
+    tmpDir
   }
 
 }

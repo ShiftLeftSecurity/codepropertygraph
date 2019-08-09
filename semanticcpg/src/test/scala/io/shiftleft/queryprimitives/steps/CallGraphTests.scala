@@ -1,5 +1,6 @@
 package io.shiftleft.queryprimitives.steps
 
+import io.shiftleft.testfixtures.CodeToCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class CallGraphTests extends WordSpec with Matchers {

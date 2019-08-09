@@ -1,11 +1,11 @@
 package io.shiftleft.queryprimitives.steps
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.Fixture
+import io.shiftleft.testfixtures.ExistingCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class TypeTests extends WordSpec with Matchers {
-  Fixture("type") { fixture =>
+  ExistingCpgFixture("type") { fixture =>
     "ClassMemberTest" should {
 
       "have ClassMemberTest as internal class" in {

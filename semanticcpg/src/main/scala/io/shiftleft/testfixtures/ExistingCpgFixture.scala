@@ -1,11 +1,11 @@
-package io.shiftleft.semanticcpg
+package io.shiftleft.testfixtures
 
 import gremlin.scala._
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig, OverflowDbConfig}
 import io.shiftleft.layers.EnhancementRunner
 
-private class Fixture(projectName: String) {
+private class ExistingCpgFixture(projectName: String) {
   private val config = CpgLoaderConfig().withOverflowConfig(OverflowDbConfig.disabled)
   private val cpgFilename = s"resources/testcode/cpgs/$projectName/cpg.bin.zip"
   lazy val cpg = CpgLoader.load(cpgFilename, config)
@@ -14,9 +14,9 @@ private class Fixture(projectName: String) {
   lazy val scalaGraph: ScalaGraph = graph
 }
 
-object Fixture {
-  def apply[T](projectName: String)(fun: Fixture => T): T = {
-    val fixture = new Fixture(projectName)
+object ExistingCpgFixture {
+  def apply[T](projectName: String)(fun: ExistingCpgFixture => T): T = {
+    val fixture = new ExistingCpgFixture(projectName)
     try {
       fun(fixture)
     } finally {

@@ -1,12 +1,12 @@
 package io.shiftleft.queryprimitives.steps
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.Fixture
+import io.shiftleft.testfixtures.ExistingCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class MethodParameterTests extends WordSpec with Matchers {
 
-  "generic cpg" should Fixture("methodparameter") { fixture =>
+  "generic cpg" should ExistingCpgFixture("methodparameter") { fixture =>
     "find parameters" when {
       "asking for all parameters" in {
         val args: List[nodes.MethodParameterIn] =

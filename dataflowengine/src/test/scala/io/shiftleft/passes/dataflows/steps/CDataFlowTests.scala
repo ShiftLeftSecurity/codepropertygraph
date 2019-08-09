@@ -1,7 +1,7 @@
 package io.shiftleft.passes.dataflows.steps
 
 class CDataFlowTests extends CpgDataFlowTests {
-  val cpgFactory = new CpgFactory(LanguageFrontend.Fuzzyc, "dataflowengine/src/test/resources/default.semantics")
+  val cpgFactory = DataFlowCodeToCpgFixture()
 
   "Test 1: flow from function call read to multiple versions of the same variable" in {
     cpgFactory.buildCpg(

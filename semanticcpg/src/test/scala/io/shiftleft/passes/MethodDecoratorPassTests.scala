@@ -2,13 +2,13 @@ package io.shiftleft.passes.methoddecorations
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeKeys, NodeTypes, nodes}
-import io.shiftleft.semanticcpg.PlainGraphFixture
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeKeys, NodeTypes}
+import io.shiftleft.testfixtures.EmptyScalaGraphFixture
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.scalatest.{Matchers, WordSpec}
 
 class MethodDecoratorPassTests extends WordSpec with Matchers {
-  "MethodDecoratorTest" in PlainGraphFixture { implicit graph =>
+  "MethodDecoratorTest" in EmptyScalaGraphFixture { implicit graph =>
     val method = graph + NodeTypes.METHOD
     val parameterIn = graph + (NodeTypes.METHOD_PARAMETER_IN,
     NodeKeys.CODE -> "p1",

@@ -1,12 +1,12 @@
 package io.shiftleft.queryprimitives.steps
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.Fixture
+import io.shiftleft.testfixtures.ExistingCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class NamespaceTests extends WordSpec with Matchers {
 
-  "generic cpg" should Fixture("namespace") { fixture =>
+  "generic cpg" should ExistingCpgFixture("namespace") { fixture =>
     "find package io.shiftleft.testcode.namespace" in {
       val queryResult: List[nodes.Namespace] = fixture.cpg.namespace.toList
 

@@ -1,4 +1,4 @@
-package io.shiftleft.queryprimitives.steps
+package io.shiftleft.testfixtures
 
 import java.io.File
 
