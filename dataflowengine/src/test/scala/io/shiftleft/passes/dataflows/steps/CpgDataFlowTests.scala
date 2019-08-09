@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps._
 import io.shiftleft.queryprimitives.steps.ext.dataflowengine._
+import io.shiftleft.queryprimitives.steps.nodemethods.CfgNodeMethods
 import io.shiftleft.queryprimitives.steps.types.expressions.Literal
 import io.shiftleft.queryprimitives.steps.types.structure.{Member, Method}
 import org.scalatest.{Matchers, WordSpec}
@@ -36,7 +37,7 @@ class CpgDataFlowTests extends WordSpec with Matchers {
           val code = s"$method_name(${method.start.parameter.l.sortBy(_.order).map(_.code).mkString(", ")})"
           (code, point.cfgNode.lineNumber)
         }
-        case _ => (point.cfgNode.code, point.cfgNode.lineNumber)
+        case _ => (CfgNodeMethods.repr(point.cfgNode), point.cfgNode.lineNumber)
       }
     }
   }

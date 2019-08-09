@@ -7,6 +7,7 @@ import dnl.utils.text.table.TextTable
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps._
 import io.shiftleft.queryprimitives.steps.ext.dataflowengine._
+import io.shiftleft.queryprimitives.steps.nodemethods.CfgNodeMethods
 
 object FlowPrettyPrinter {
   def prettyPrint(path: List[nodes.TrackingPoint]): String = {
@@ -20,7 +21,7 @@ object FlowPrettyPrinter {
         case methodParamIn: nodes.MethodParameterIn => {
           s"${method.name}(${method.start.parameter.l.sortBy(_.order).map(_.code).mkString(", ")})"
         }
-        case _ => trackingPoint.cfgNode.code
+        case _ => CfgNodeMethods.repr(trackingPoint.cfgNode)
       }
 
       val lineNumberOption = trackingPoint.cfgNode.lineNumber
