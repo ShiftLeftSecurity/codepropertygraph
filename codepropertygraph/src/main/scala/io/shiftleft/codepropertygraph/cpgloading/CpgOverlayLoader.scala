@@ -18,12 +18,14 @@ import scala.collection.mutable.ArrayBuffer
 
 private[cpgloading] object CpgOverlayLoader {
   private val logger = LogManager.getLogger(getClass)
+
   /**
     * Load overlays stored in the file with the name `filename`.
     */
   def load(filename: String, baseCpg: Cpg): Unit = {
     val applier = new CpgOverlayApplier(baseCpg.graph)
-    ProtoCpgLoader.loadOverlays(filename)
+    ProtoCpgLoader
+      .loadOverlays(filename)
       .map { overlays: Iterator[CpgOverlay] =>
         overlays.foreach(applier.applyDiff)
       }

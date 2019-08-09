@@ -17,11 +17,11 @@ object ProtoCpgLoader {
   def loadFromProtoZip(fileName: String, overflowDbConfig: OverflowDbConfig = OverflowDbConfig.withDefaults): Cpg = {
     measureAndReport {
       val builder = new ProtoToCpg(overflowDbConfig)
-      for {zip <- managed(new ZipArchive(fileName))
-           entry <- zip.entries
-           inputStream <- managed(Files.newInputStream(entry))}
-        builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList)
-      
+      for {
+        zip <- managed(new ZipArchive(fileName))
+        entry <- zip.entries
+        inputStream <- managed(Files.newInputStream(entry))
+      } builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList)
 
       /* second pass so we can stream for the edges
        * -> holding them all in memory is potentially too much
@@ -54,8 +54,7 @@ object ProtoCpgLoader {
     managed(Files.newInputStream(path)).map(CpgOverlay.parseFrom).tried.get
 
   private def readOverlayEntries(zip: ZipArchive): Iterator[CpgOverlay] =
-    zip
-      .entries
+    zip.entries
       .sortWith(compareOverlayPath)
       .iterator
       .map(readOverlay)
@@ -79,4 +78,3 @@ object ProtoCpgLoader {
     result
   }
 }
-
