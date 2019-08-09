@@ -2,6 +2,7 @@ package io.shiftleft.queryprimitives.steps
 
 import gremlin.scala.{Edge, GremlinScala, StepLabel, Vertex}
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.semanticcpg.Fixture
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.{Matchers, WordSpec}
@@ -13,14 +14,14 @@ class StepsTest extends WordSpec with Matchers {
 
   "generic cpg" should {
 
-    "filter by regex" in ExistingCpgFixture("splitmeup") { fixture =>
+    "filter by regex" in Fixture("splitmeup") { fixture =>
       val queryResult: List[nodes.Literal] =
         fixture.cpg.literal.code(".*").toList
 
       queryResult.size should be > 1
     }
 
-    "filter on cpg type" in ExistingCpgFixture("splitmeup") { fixture =>
+    "filter on cpg type" in Fixture("splitmeup") { fixture =>
       val mainMethods: List[nodes.Method] =
         fixture.cpg.method
           .name(".*")
@@ -30,7 +31,7 @@ class StepsTest extends WordSpec with Matchers {
       mainMethods.size shouldBe 1
     }
 
-    "filter with traversal on cpg type" in ExistingCpgFixture("splitmeup") { fixture =>
+    "filter with traversal on cpg type" in Fixture("splitmeup") { fixture =>
       def allMethods = fixture.cpg.method
       val publicMethods = allMethods.filter(_.isPublic)
 
@@ -38,7 +39,7 @@ class StepsTest extends WordSpec with Matchers {
     }
 
     "filter on id" when {
-      "providing one" in ExistingCpgFixture("splitmeup") { fixture =>
+      "providing one" in Fixture("splitmeup") { fixture =>
         // find an arbitrary method so we can find it again in the next step
         val method: nodes.Method = fixture.cpg.method.toList.head
         val results: List[nodes.Method] = fixture.cpg.method.id(method.underlying.id).toList
@@ -47,7 +48,7 @@ class StepsTest extends WordSpec with Matchers {
         results.head.underlying.id
       }
 
-      "providing multiple" in ExistingCpgFixture("splitmeup") { fixture =>
+      "providing multiple" in Fixture("splitmeup") { fixture =>
         // find two arbitrary methods so we can find it again in the next step
         val methods: Set[nodes.Method] = fixture.cpg.method.toList.take(2).toSet
         val results: List[nodes.Method] = fixture.cpg.method.id(methods.map(_.id())).toList
@@ -57,7 +58,7 @@ class StepsTest extends WordSpec with Matchers {
       }
     }
 
-    "aggregate intermediary results into a given collection" in ExistingCpgFixture("splitmeup") { fixture =>
+    "aggregate intermediary results into a given collection" in Fixture("splitmeup") { fixture =>
       val allMethods = mutable.ArrayBuffer.empty[nodes.Method]
 
       val mainMethods: List[nodes.Method] =
@@ -72,13 +73,13 @@ class StepsTest extends WordSpec with Matchers {
     }
   }
 
-  "find that all method returns are linked to a method" in ExistingCpgFixture("splitmeup") { fixture =>
+  "find that all method returns are linked to a method" in Fixture("splitmeup") { fixture =>
     val returnsWithMethods = fixture.cpg.method.methodReturn.l
     val returns = fixture.cpg.methodReturn.l
     returnsWithMethods.size shouldBe returns.size
   }
 
-  "allow for comprehensions" in ExistingCpgFixture("splitmeup") { fixture =>
+  "allow for comprehensions" in Fixture("splitmeup") { fixture =>
     case class MethodParamPairs(methodName: String, paramName: String)
 
     val query = for {
@@ -90,7 +91,7 @@ class StepsTest extends WordSpec with Matchers {
     pairs.size should be > 0
   }
 
-  "allow lists in map/flatMap/forComprehension" in ExistingCpgFixture("splitmeup") { fixture =>
+  "allow lists in map/flatMap/forComprehension" in Fixture("splitmeup") { fixture =>
     val query = fixture.cpg.method.isPublic.map { method =>
       (method.name, method.start.parameter.toList)
     }
@@ -98,21 +99,21 @@ class StepsTest extends WordSpec with Matchers {
     results.size should be > 1
   }
 
-  "allow side effects" in ExistingCpgFixture("splitmeup") { fixture =>
+  "allow side effects" in Fixture("splitmeup") { fixture =>
     var i = 0
     fixture.cpg.method.sideEffect(_ => i = i + 1).exec
     i should be > 0
   }
 
   "as/select" should {
-    "select all by default" in ExistingCpgFixture("splitmeup") { fixture =>
+    "select all by default" in Fixture("splitmeup") { fixture =>
       val results: List[(nodes.Method, nodes.MethodReturn)] =
         fixture.cpg.method.as("method").methodReturn.as("methodReturn").select.toList
 
       results.size should be > 0
     }
 
-    "allow to select a single label" in ExistingCpgFixture("splitmeup") { fixture =>
+    "allow to select a single label" in Fixture("splitmeup") { fixture =>
       val methodReturnLabel = StepLabel[nodes.MethodReturn]("methodReturn")
       val methodLabel = StepLabel[nodes.Method]("method")
       val results: List[nodes.MethodReturn] =
@@ -121,7 +122,7 @@ class StepsTest extends WordSpec with Matchers {
       results.size should be > 0
     }
 
-    "allow to select multiple labels" in ExistingCpgFixture("splitmeup") { fixture =>
+    "allow to select multiple labels" in Fixture("splitmeup") { fixture =>
       val methodReturnLabel = StepLabel[nodes.MethodReturn]("methodReturn")
       val methodLabel = StepLabel[nodes.Method]("method")
       val results: List[(nodes.MethodReturn, nodes.Method)] =
@@ -137,7 +138,7 @@ class StepsTest extends WordSpec with Matchers {
   }
 
   "raw traversals" should {
-    "allow typed as/select" in ExistingCpgFixture("splitmeup") { fixture =>
+    "allow typed as/select" in Fixture("splitmeup") { fixture =>
       val raw = fixture.cpg.namespace.raw.asInstanceOf[GremlinScala.Aux[Vertex, HNil]]
       val _: List[(Vertex, Edge)] = raw.as("a").outE.as("b").select.toList
     // all that matters is that the result type is (Vertex, Edge)
@@ -145,7 +146,7 @@ class StepsTest extends WordSpec with Matchers {
     }
   }
 
-  "toJson" in ExistingCpgFixture("splitmeup") { fixture =>
+  "toJson" in Fixture("splitmeup") { fixture =>
     val json = fixture.cpg.namespace.nameExact("io.shiftleft.testcode.splitmeup").toJson
     val parsed = parse(json).children.head //exactly one result for the above query
     (parsed \ "NAME") shouldBe JString("io.shiftleft.testcode.splitmeup")

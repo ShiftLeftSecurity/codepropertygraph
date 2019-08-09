@@ -3,7 +3,6 @@ package io.shiftleft.queryprimitives.steps
 import org.scalatest.{Matchers, WordSpec}
 
 class CAstTests extends WordSpec with Matchers {
-  val cpgFactory = CodeToCpgFixture()
 
   val code =
     """
@@ -20,13 +19,13 @@ class CAstTests extends WordSpec with Matchers {
     """.stripMargin
 
   "should identify four blocks" in {
-    cpgFactory.buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       cpg.method.name("foo").ast.isBlock.l.size shouldBe 4
     }
   }
 
   "should identify three control structures" in {
-    cpgFactory.buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       cpg.method
         .name("foo")
         .ast
@@ -46,13 +45,13 @@ class CAstTests extends WordSpec with Matchers {
   }
 
   "should identify conditions" in {
-    cpgFactory.buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       cpg.method.name("foo").ast.isControlStructure.condition.code.l shouldBe List("x > 10", "y > x")
     }
   }
 
   "should allow parserTypeName filtering and then ast" in {
-    cpgFactory.buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       val query1Size = cpg.method.name("foo").ast.isControlStructure.ast.l.size
       query1Size should be > 0
 
@@ -69,7 +68,7 @@ class CAstTests extends WordSpec with Matchers {
   }
 
   "should allow filtering on conditions" in {
-    cpgFactory.buildCpg(code) { cpg =>
+    CodeToCpgFixture().buildCpg(code) { cpg =>
       cpg.method
         .name("foo")
         .condition(".*x > 10.*")
@@ -109,7 +108,7 @@ class CAstTests extends WordSpec with Matchers {
     """.stripMargin
 
   "should find index `i` used for buf" in {
-    cpgFactory.buildCpg(bufInLoopCode) { cpg =>
+    CodeToCpgFixture().buildCpg(bufInLoopCode) { cpg =>
       cpg.call
         .name("<operator>.computedMemberAccess")
         .argument
@@ -120,7 +119,7 @@ class CAstTests extends WordSpec with Matchers {
   }
 
   "should find that i is assigned as part of loop header" in {
-    cpgFactory.buildCpg(bufInLoopCode) { cpg =>
+    CodeToCpgFixture().buildCpg(bufInLoopCode) { cpg =>
       cpg.call
         .name("<operator>.computedMemberAccess")
         .argument
@@ -133,7 +132,7 @@ class CAstTests extends WordSpec with Matchers {
   }
 
   "should correctly identify condition of for loop" in {
-    cpgFactory.buildCpg(bufInLoopCode) { cpg =>
+    CodeToCpgFixture().buildCpg(bufInLoopCode) { cpg =>
       cpg.call
         .name("<operator>.computedMemberAccess")
         .argument

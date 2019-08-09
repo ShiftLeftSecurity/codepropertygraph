@@ -1,11 +1,12 @@
 package io.shiftleft.queryprimitives.steps
 
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.semanticcpg.Fixture
 import org.scalatest.{Matchers, WordSpec}
 
 class ExpressionTests extends WordSpec with Matchers {
 
-  "generic cpg" should ExistingCpgFixture("expression") { fixture =>
+  "generic cpg" should Fixture("expression") { fixture =>
     "expand to next expression in CFG" in {
       val expressions: List[nodes.Expression] =
         fixture.cpg.method.name("methodForCfgTest").cfgFirst.cfgNext.toList

@@ -1,11 +1,12 @@
 package io.shiftleft.queryprimitives.steps
 
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.semanticcpg.Fixture
 import org.scalatest.{Matchers, WordSpec}
 
 class MethodTests extends WordSpec with Matchers {
 
-  "Method traversals" should ExistingCpgFixture("method") { fixture =>
+  "Method traversals" should Fixture("method") { fixture =>
     "expand to type declaration" in {
       val queryResult: List[nodes.TypeDecl] =
         fixture.cpg.method.name("methodWithLiteral").definingTypeDecl.toList
