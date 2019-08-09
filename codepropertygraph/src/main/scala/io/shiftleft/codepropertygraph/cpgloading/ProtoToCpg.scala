@@ -58,11 +58,9 @@ class ProtoToCpg(val overflowConfig: OverflowDbConfig = OverflowDbConfig.withDef
 
   private def setupOverflowProperties(conf: Configuration): Unit = {
     conf.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, true)
-    conf.setProperty(
-      TinkerGraph.GREMLIN_TINKERGRAPH_OVERFLOW_HEAP_PERCENTAGE_THRESHOLD,
-      overflowConfig.heapPercentageThreshold)
-    overflowConfig.graphLocation.foreach(
-      path => conf.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_GRAPH_LOCATION, path))
+    conf.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_OVERFLOW_HEAP_PERCENTAGE_THRESHOLD,
+                     overflowConfig.heapPercentageThreshold)
+    overflowConfig.graphLocation.foreach(path => conf.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_GRAPH_LOCATION, path))
   }
 
   private def disableOverflowProperties(conf: Configuration): Unit = {
@@ -85,8 +83,7 @@ class ProtoToCpg(val overflowConfig: OverflowDbConfig = OverflowDbConfig.withDef
       .foreach(addVertexToTinkerGraph)
 
   private def addVertexToTinkerGraph(node: Node) = {
-    try
-      tinkerGraph.addVertex(nodeToArray(node): _*)
+    try tinkerGraph.addVertex(nodeToArray(node): _*)
     catch {
       case e: Exception =>
         throw new RuntimeException("Failed to insert a vertex. proto:\n" + node, e)
@@ -123,10 +120,12 @@ class ProtoToCpg(val overflowConfig: OverflowDbConfig = OverflowDbConfig.withDef
 
   private def findVertexById(edge: Edge, nodeId: Long): Vertex = {
     if (nodeId == -1)
-      throw new IllegalArgumentException("edge " + edge + " has illegal src|dst node. something seems wrong with the cpg")
+      throw new IllegalArgumentException(
+        "edge " + edge + " has illegal src|dst node. something seems wrong with the cpg")
     val vertices: JIterator[Vertex] = tinkerGraph.vertices(nodeId: JLong)
     if (!vertices.hasNext)
-      throw new NoSuchElementException("Couldn't find src|dst node " + nodeId + " for edge " + edge + " of type " + edge.getType.name)
+      throw new NoSuchElementException(
+        "Couldn't find src|dst node " + nodeId + " for edge " + edge + " of type " + edge.getType.name)
     vertices.next
   }
 

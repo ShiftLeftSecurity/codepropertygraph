@@ -5,12 +5,7 @@ import java.lang
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.TypeDecl
-import io.shiftleft.codepropertygraph.generated.{
-  EdgeTypes,
-  NodeKeyNames,
-  NodeTypes,
-  nodes
-}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeyNames, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
@@ -59,9 +54,7 @@ class MethodExternalDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   private def getExternalFromTypeDecl(method: nodes.Method): Option[Boolean] =
     findMethodTypeDecl(method).map(_.asInstanceOf[TypeDecl].isExternal)
 
-  private def setIsExtern(dstGraph: DiffGraph,
-                          method: nodes.Method,
-                          isExtern: Boolean): Unit = {
+  private def setIsExtern(dstGraph: DiffGraph, method: nodes.Method, isExtern: Boolean): Unit = {
     log("Using deprecated CPG format with missing IS_EXTERNAL property on METHOD node.")
     dstGraph.addNodeProperty(
       method,
