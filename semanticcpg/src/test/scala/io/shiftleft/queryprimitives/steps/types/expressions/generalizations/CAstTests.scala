@@ -1,4 +1,4 @@
-package io.shiftleft.queryprimitives.steps
+package io.shiftleft.queryprimitives.steps.types.expressions.generalizations
 
 import io.shiftleft.testfixtures.CodeToCpgFixture
 import org.scalatest.{Matchers, WordSpec}

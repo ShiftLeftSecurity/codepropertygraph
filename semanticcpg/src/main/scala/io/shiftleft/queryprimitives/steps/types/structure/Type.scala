@@ -1,13 +1,13 @@
 package io.shiftleft.queryprimitives.steps.types.structure
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
+import io.shiftleft.queryprimitives.steps.NodeSteps
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
-import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{Declaration, Expression}
+import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.Expression
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{FullNameAccessors, NameAccessors}
-import shapeless.{HList, HNil}
+import shapeless.HList
 
 class Type[Labels <: HList](raw: GremlinScala.Aux[nodes.Type, Labels])
     extends NodeSteps[nodes.Type, Labels](raw)

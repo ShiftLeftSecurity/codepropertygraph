@@ -23,6 +23,9 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
     }
   }
 
+  /**
+    * The enclosing method of the tracking point
+    * */
   def method: Method[Labels] = {
     new Method[Labels](
       raw.map { dataFlowObject =>

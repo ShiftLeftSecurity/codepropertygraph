@@ -1,4 +1,4 @@
-package io.shiftleft.queryprimitives.steps
+package io.shiftleft.queryprimitives.steps.types.expressions
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.testfixtures.ExistingCpgFixture

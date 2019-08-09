@@ -12,6 +12,9 @@ import shapeless.HList
 class Modifier[Labels <: HList](raw: GremlinScala.Aux[nodes.Modifier, Labels])
     extends NodeSteps[nodes.Modifier, Labels](raw) {
 
+  // TODO: This looks wrong. Modifier does not have a code field. It has a
+  // ModifierType field.
+
   def code(): Steps[String, Labels] =
     new Steps[String, Labels](raw.value(NodeKeys.CODE))
 }

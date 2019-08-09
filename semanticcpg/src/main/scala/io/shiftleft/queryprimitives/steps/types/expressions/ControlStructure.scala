@@ -1,6 +1,6 @@
 package io.shiftleft.queryprimitives.steps.types.expressions
 
-import gremlin.scala.{BranchCase, BranchOtherwise, GremlinScala}
+import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
 import io.shiftleft.queryprimitives.steps.NodeSteps
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{AstNode, Expression, ExpressionBase}

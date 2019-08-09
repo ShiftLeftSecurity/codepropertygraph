@@ -7,7 +7,6 @@ import io.shiftleft.queryprimitives.steps.NodeSteps
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors._
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations._
-import io.shiftleft.queryprimitives.steps.types.structure.Method
 import shapeless.HList
 
 /**
