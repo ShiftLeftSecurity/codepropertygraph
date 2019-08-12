@@ -4,8 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Vertex
-import io.shiftleft.overflowdb.OdbGraph
-import io.shiftleft.overflowdb.OdbConfig
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
 object CpgLoader {
 
@@ -40,7 +39,8 @@ private class CpgLoader {
 
   private val logger = LogManager.getLogger(getClass)
 
-  def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.withoutOverflow): Cpg = {
+  def load(filename: String,
+           config: CpgLoaderConfig = CpgLoaderConfig().withOverflowConfig(OverflowDbConfig.disabled)): Cpg = {
     logger.debug("Loading " + filename)
 
     val cpg =
@@ -50,7 +50,7 @@ private class CpgLoader {
   }
 
   def createIndexes(cpg: Cpg): Unit =
-    cpg.graph.asInstanceOf[OdbGraph].createIndex(NodeKeys.FULL_NAME.name, classOf[Vertex])
+    cpg.graph.asInstanceOf[TinkerGraph].createIndex(NodeKeys.FULL_NAME.name, classOf[Vertex])
 
   def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit = {
     overlayFilenames.foreach { overlayFilename =>

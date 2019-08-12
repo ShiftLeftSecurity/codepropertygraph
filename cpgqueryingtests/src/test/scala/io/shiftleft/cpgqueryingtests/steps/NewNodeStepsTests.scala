@@ -1,7 +1,6 @@
 package io.shiftleft.cpgqueryingtests.steps
 
 import gremlin.scala._
-import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.EdgeKeyNames
 import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
@@ -9,7 +8,7 @@ import io.shiftleft.queryprimitives.steps.NewNodeSteps
 import io.shiftleft.codepropertygraph.generated.ModifierTypes
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.passes.DiffGraph.{EdgeInDiffGraph, EdgeToOriginal}
-import io.shiftleft.overflowdb.OdbGraph
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{Matchers, WordSpec}
 
 class NewNodeStepsTest extends WordSpec with Matchers {
@@ -27,7 +26,9 @@ class NewNodeStepsTest extends WordSpec with Matchers {
 
     "embedding a StoredNode and a NewNode" in {
       implicit val diffGraph = new DiffGraph
-      val existingContainedNode = Modifier.Factory.createNode(OverflowDbTestInstance.create, 42L)
+      val configuration = TinkerGraph.EMPTY_CONFIGURATION
+      configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, false)
+      val existingContainedNode = Modifier.Factory.createVertex(id = 42L, graph = TinkerGraph.open(configuration))
       existingContainedNode.property(Modifier.Keys.ModifierType, ModifierTypes.NATIVE)
 
       val newContainedNode = new TestNewNode

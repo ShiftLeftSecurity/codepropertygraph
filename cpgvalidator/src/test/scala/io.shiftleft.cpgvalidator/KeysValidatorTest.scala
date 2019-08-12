@@ -3,7 +3,7 @@ package io.shiftleft.cpgvalidator
 import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.cpgvalidator.validators.KeysValidator
 import gremlin.scala._
-import io.shiftleft.OverflowDbTestInstance
+import io.shiftleft.TinkerGraphTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.Cardinality
 import org.scalatest.{Matchers, WordSpec}
@@ -22,8 +22,8 @@ class KeysValidatorTest extends WordSpec with Matchers {
   }
 
   private def withNewBaseCpg[T](fun: Cpg => T): T = {
-    val graph = OverflowDbTestInstance.create
-    val cpg = Cpg(graph)
+    val graph = TinkerGraphTestInstance.create
+    val cpg = Cpg(graph.graph)
     try fun(cpg)
     finally cpg.close()
   }

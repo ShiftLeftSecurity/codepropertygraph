@@ -9,11 +9,10 @@ import io.shiftleft.proto.cpg.Cpg.PropertyValue
 import org.apache.commons.configuration.Configuration
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.{T, Vertex}
-import io.shiftleft.overflowdb.OdbGraph
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
-import io.shiftleft.overflowdb.OdbConfig
 
 object ProtoToCpg {
   val logger: Logger = LogManager.getLogger(classOf[ProtoToCpg])
@@ -42,13 +41,38 @@ object ProtoToCpg {
   }
 }
 
-class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
+class ProtoToCpg(val overflowConfig: OverflowDbConfig = OverflowDbConfig.withDefaults) {
+  private val nodeFilter: NodeFilter = new NodeFilter
+  private val tinkerGraph: TinkerGraph = makeTinkerGraph
+
   import ProtoToCpg._
-  private val nodeFilter = new NodeFilter
-  private val odbGraph =
-    OdbGraph.open(overflowConfig,
-                  io.shiftleft.codepropertygraph.generated.nodes.Factories.AllAsJava,
-                  io.shiftleft.codepropertygraph.generated.edges.Factories.AllAsJava)
+
+  private def makeTinkerGraphConfig: Configuration = {
+    val conf = TinkerGraph.EMPTY_CONFIGURATION
+    if (overflowConfig.enabled)
+      setupOverflowProperties(conf)
+    else
+      disableOverflowProperties(conf)
+    conf
+  }
+
+  private def setupOverflowProperties(conf: Configuration): Unit = {
+    conf.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, true)
+    conf.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_OVERFLOW_HEAP_PERCENTAGE_THRESHOLD,
+                     overflowConfig.heapPercentageThreshold)
+    overflowConfig.graphLocation.foreach(path => conf.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_GRAPH_LOCATION, path))
+  }
+
+  private def disableOverflowProperties(conf: Configuration): Unit = {
+    conf.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, false)
+  }
+
+  private def makeTinkerGraph: TinkerGraph =
+    TinkerGraph.open(
+      makeTinkerGraphConfig,
+      io.shiftleft.codepropertygraph.generated.nodes.Factories.AllAsJava,
+      io.shiftleft.codepropertygraph.generated.edges.Factories.AllAsJava
+    )
 
   def addNodes(nodes: JCollection[Node]): Unit =
     addNodes(nodes.asScala)
@@ -56,10 +80,10 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
   def addNodes(nodes: Iterable[Node]): Unit =
     nodes
       .filter(nodeFilter.filterNode)
-      .foreach(addVertexToOdbGraph)
+      .foreach(addVertexToTinkerGraph)
 
-  private def addVertexToOdbGraph(node: Node) = {
-    try odbGraph.addVertex(nodeToArray(node): _*)
+  private def addVertexToTinkerGraph(node: Node) = {
+    try tinkerGraph.addVertex(nodeToArray(node): _*)
     catch {
       case e: Exception =>
         throw new RuntimeException("Failed to insert a vertex. proto:\n" + node, e)
@@ -92,13 +116,13 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     }
   }
 
-  def build(): Cpg = new Cpg(odbGraph)
+  def build(): Cpg = new Cpg(tinkerGraph)
 
   private def findVertexById(edge: Edge, nodeId: Long): Vertex = {
     if (nodeId == -1)
       throw new IllegalArgumentException(
         "edge " + edge + " has illegal src|dst node. something seems wrong with the cpg")
-    val vertices: JIterator[Vertex] = odbGraph.vertices(nodeId: JLong)
+    val vertices: JIterator[Vertex] = tinkerGraph.vertices(nodeId: JLong)
     if (!vertices.hasNext)
       throw new NoSuchElementException(
         "Couldn't find src|dst node " + nodeId + " for edge " + edge + " of type " + edge.getType.name)

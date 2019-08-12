@@ -49,7 +49,7 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
   private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Vertex] = mutable.HashMap()
 
   /**
-    * Applies diff to existing (loaded) OdbGraph
+    * Applies diff to existing (loaded) TinkerGraph
     */
   def applyDiff(overlay: CpgOverlay): Unit = {
     addNodes(overlay)

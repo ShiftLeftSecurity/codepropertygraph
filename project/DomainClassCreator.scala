@@ -55,7 +55,7 @@ object DomainClassCreator {
       import java.util.{List => JList}
       import org.apache.tinkerpop.gremlin.structure.Property
       import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
-      import io.shiftleft.overflowdb.{EdgeLayoutInformation, EdgeFactory, NodeFactory, OdbEdge, OdbNode, OdbGraph, NodeRef}
+      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{EdgeLayoutInformation, OverflowDbEdge, OverflowDbNode, OverflowElementFactory, TinkerGraph, TinkerProperty, VertexRef}
       import scala.collection.JavaConverters._
       import org.slf4j.LoggerFactory
 
@@ -79,8 +79,8 @@ object DomainClassCreator {
             .map(edgeType => edgeType.className + ".Factory")
         s"""
         object Factories {
-          lazy val All: List[EdgeFactory[_]] = ${edgeFactories}
-          lazy val AllAsJava: java.util.List[EdgeFactory[_]] = All.asJava
+          lazy val All: List[OverflowElementFactory.ForEdge[_]] = ${edgeFactories}
+          lazy val AllAsJava: java.util.List[OverflowElementFactory.ForEdge[_]] = All.asJava
         }
         """
       }
@@ -109,11 +109,11 @@ object DomainClassCreator {
       |
       |  val layoutInformation = new EdgeLayoutInformation(Label, Keys.All)
       |
-      |  val Factory = new EdgeFactory[${edgeClassName}] {
+      |  val Factory = new OverflowElementFactory.ForEdge[${edgeClassName}] {
       |    override val forLabel = $edgeClassName.Label
       |
-      |    override def createEdge(graph: OdbGraph, outNode: NodeRef[OdbNode], inNode: NodeRef[OdbNode]) =
-      |      new ${edgeClassName}(graph, outNode, inNode)
+      |    override def createEdge(graph: TinkerGraph, outVertex: VertexRef[_ <: Vertex], inVertex: VertexRef[_ <: Vertex]) =
+      |      new ${edgeClassName}(graph, outVertex.asInstanceOf[VertexRef[OverflowDbNode]], inVertex.asInstanceOf[VertexRef[OverflowDbNode]])
       |  }
       |}
       """.stripMargin
@@ -124,7 +124,7 @@ object DomainClassCreator {
           val baseType = getBaseType(property)
           val tpe = getCompleteType(property)
 
-          // TODO refactor so we don't need to wrap the property in a separate Property instance, only to unwrap it later
+          // TODO refactor so we don't need to wrap the property in a TinkerProperty instance, only to unwrap it later
           getHigherType(property) match {
             case HigherValueType.None =>
               s"""def $name(): $tpe = property("${property.name}").value.asInstanceOf[$tpe]"""
@@ -145,8 +145,8 @@ object DomainClassCreator {
         }.mkString("\n\n")
 
       val classImpl = s"""
-      class ${edgeClassName}(_graph: OdbGraph, _outNode: NodeRef[OdbNode], _inNode: NodeRef[OdbNode])
-          extends OdbEdge(_graph, $edgeClassName.Label, _outNode, _inNode, $edgeClassName.Keys.All) {
+      class ${edgeClassName}(_graph: TinkerGraph, _outVertex: VertexRef[OverflowDbNode], _inVertex: VertexRef[OverflowDbNode])
+          extends OverflowDbEdge(_graph, $edgeClassName.Label, _outVertex, _inVertex, $edgeClassName.Keys.All) {
 
         ${propertyBasedFieldAccessors(keys)}
       }
@@ -188,7 +188,7 @@ object DomainClassCreator {
       import java.lang.{Boolean => JBoolean, Long => JLong}
       import java.util.{Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
       import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
-      import io.shiftleft.overflowdb.{EdgeFactory, NodeFactory, NodeLayoutInformation, OdbNode, OdbGraph, OdbNodeProperty, NodeRef}
+      import org.apache.tinkerpop.gremlin.tinkergraph.structure.{NodeLayoutInformation, OverflowElementFactory, OverflowDbNode, TinkerGraph, OverflowNodeProperty, VertexRef}
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
       import scala.collection.JavaConverters._
       import org.slf4j.LoggerFactory
@@ -211,7 +211,7 @@ object DomainClassCreator {
         def accept[T](visitor: NodeVisitor[T]): T = ???
       }
 
-      /* a node that stored inside an OdbGraph (rather than e.g. DiffGraph) */
+      /* making use of the fact that OverflowNode is also our domain node */
       trait StoredNode extends Vertex with Node {
         /* underlying vertex in the graph database. 
          * since this is a StoredNode, this is always set */
@@ -282,14 +282,14 @@ object DomainClassCreator {
           .mkString("\n")
 
       val factories = {
-        val nodeFactories: List[String] =
+        val vertexFactories: List[String] =
           (Resources.cpgJson \ "nodeTypes")
             .as[List[NodeType]]
             .map(nodeType => nodeType.className + ".Factory")
         s"""
         object Factories {
-          lazy val All: List[NodeFactory[_]] = ${nodeFactories}
-          lazy val AllAsJava: java.util.List[NodeFactory[_]] = All.asJava
+          lazy val All: List[OverflowElementFactory.ForNode[_]] = ${vertexFactories}
+          lazy val AllAsJava: java.util.List[OverflowElementFactory.ForNode[_]] = All.asJava
         }
         """
       }
@@ -341,10 +341,6 @@ object DomainClassCreator {
 
       val companionObject = s"""
       object ${nodeType.className} {
-
-        def apply(graph: OdbGraph, dbNode: ${nodeType.classNameDb}) = new NodeRef[${nodeType.classNameDb}](graph, dbNode) with ${nodeType.className}
-        def apply(graph: OdbGraph, id: Long) = new NodeRef[${nodeType.classNameDb}](graph, id) with ${nodeType.className}
-
         val layoutInformation = new NodeLayoutInformation(
           Keys.All,
           List($outEdgeLayouts).asJava,
@@ -366,14 +362,21 @@ object DomainClassCreator {
           val Out: Array[String] = Array(${outEdges.map('"' + _ + '"').mkString(",")})
         }
 
-        val Factory = new NodeFactory[${nodeType.classNameDb}] {
+        val Factory = new OverflowElementFactory.ForNode[${nodeType.classNameDb}] {
           override val forLabel = ${nodeType.className}.Label
 
-          override def createNode(ref: NodeRef[${nodeType.classNameDb}]) =
-            new ${nodeType.classNameDb}(ref.asInstanceOf[NodeRef[OdbNode]])
+          override def createVertex(id: JLong, graph: TinkerGraph) =
+            new ${nodeType.classNameDb}(createVertexRef(id, graph).asInstanceOf[VertexRef[Vertex]])
 
-          override def createNodeRef(graph: OdbGraph, id: Long) = ${nodeType.className}(graph, id)
+          override def createVertex(ref: VertexRef[${nodeType.classNameDb}]) =
+            new ${nodeType.classNameDb}(ref.asInstanceOf[VertexRef[Vertex]])
+
+          override def createVertexRef(id: JLong, graph: TinkerGraph) = ${nodeType.className}(id, graph)
         }
+
+        def apply(wrapped: ${nodeType.classNameDb}) =
+         new ${nodeType.className}(wrapped.id.asInstanceOf[JLong], wrapped.graph.asInstanceOf[TinkerGraph], wrapped)
+        def apply(id: Long, graph: TinkerGraph) = new ${nodeType.className}(id, graph, null)
       }
       """
 
@@ -403,7 +406,7 @@ object DomainClassCreator {
                 s"""if (${memberName} != null) { properties.put("${key.name}", ${memberName}) }"""
               case Cardinality.ZeroOrOne =>
                 s"""${memberName}.map { value => properties.put("${key.name}", value) }"""
-              case Cardinality.List => // need java list, e.g. for NodeSerializer
+              case Cardinality.List => // need java list, e.g. for VertexSerializer
                 s"""if (${memberName}.nonEmpty) { properties.put("${key.name}", ${memberName}.asJava) }"""
             }
           }
@@ -492,19 +495,13 @@ object DomainClassCreator {
         }
         .getOrElse("")
 
-      val nodeBaseImpl = s"""
-      |trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
-      |  def asStored : StoredNode = this.asInstanceOf[StoredNode]
-      |  $abstractContainedNodeAccessors
-      |}""".stripMargin
-
       val nodeRefImpl = {
         val propertyDelegators = keys.map(_.name).map(camelCase).map { name =>
           s"""override def $name = get().$name"""
         }.mkString("\n")
         val containedNodesDelegators = nodeType.containedNodes
         s"""
-          |trait ${nodeType.className} extends NodeRef[${nodeType.classNameDb}] with ${nodeType.className}Base with StoredNode $mixinTraits {
+          |class ${nodeType.className}(_id: JLong, _graph: TinkerGraph, dbNode: ${nodeType.classNameDb}) extends VertexRef[${nodeType.classNameDb}](_id, _graph, dbNode) with ${nodeType.className}Base with StoredNode $mixinTraits {
           |$propertyDelegators
           |$delegatingContainedNodeAccessors
           |  override def accept[T](visitor: NodeVisitor[T]): T = {
@@ -522,8 +519,14 @@ object DomainClassCreator {
       }
 
       val classImpl = s"""
-      class ${nodeType.classNameDb}(ref: NodeRef[OdbNode]) extends OdbNode(ref) with StoredNode 
-        $mixinTraits with ${nodeType.className}Base {
+      trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
+        def asStored : StoredNode = this.asInstanceOf[StoredNode]
+
+        $abstractContainedNodeAccessors
+      }
+
+      class ${nodeType.classNameDb}(ref: VertexRef[Vertex])
+          extends OverflowDbNode(ref) with StoredNode $mixinTraits with ${nodeType.className}Base {
 
         override def layoutInformation: NodeLayoutInformation = ${nodeType.className}.layoutInformation
 
@@ -554,8 +557,8 @@ object DomainClassCreator {
               fieldAccess(this) match {
                 case null | None => VertexProperty.empty[A]
                 case values: List[_] => throw Vertex.Exceptions.multiplePropertiesExistForProvidedKey(key)
-                case Some(value) => new OdbNodeProperty(-1, this, key, value.asInstanceOf[A])
-                case value => new OdbNodeProperty(-1, this, key, value.asInstanceOf[A])
+                case Some(value) => new OverflowNodeProperty(-1, this, key, value.asInstanceOf[A])
+                case value => new OverflowNodeProperty(-1, this, key, value.asInstanceOf[A])
               }
           }
         }
@@ -568,16 +571,16 @@ object DomainClassCreator {
                 case null => JCollections.emptyIterator[VertexProperty[A]]
                 case values: List[_] => 
                   values.map { value => 
-                    new OdbNodeProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
+                    new OverflowNodeProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
                   }.toIterator.asJava
-                case value => IteratorUtils.of(new OdbNodeProperty(-1, this, key, value.asInstanceOf[A]))
+                case value => IteratorUtils.of(new OverflowNodeProperty(-1, this, key, value.asInstanceOf[A]))
               }
           }
         }
 
         override protected def updateSpecificProperty[A](cardinality: VertexProperty.Cardinality, key: String, value: A): VertexProperty[A] = {
           ${updateSpecificPropertyBody(keys)}
-          new OdbNodeProperty(-1, this, key, value)
+          new OverflowNodeProperty(-1, this, key, value)
         }
 
         override protected def removeSpecificProperty(key: String): Unit =
@@ -587,7 +590,7 @@ object DomainClassCreator {
       }
       """
 
-      companionObject + nodeBaseImpl + nodeRefImpl + classImpl
+      companionObject + nodeRefImpl + classImpl
     }
 
     val filename = outputDir.getPath + "/" + nodesPackage.replaceAll("\\.", "/") + "/Nodes.scala"

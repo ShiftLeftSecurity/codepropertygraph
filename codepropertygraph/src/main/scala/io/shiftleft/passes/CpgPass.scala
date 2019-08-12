@@ -144,7 +144,7 @@ private[passes] case class IdentityHashWrapper[T <: AnyRef](value: T) {
 }
 
 /**
-  * Component to merge diff graphs into existing (loaded) OdbGraph
+  * Component to merge diff graphs into existing (loaded) Tinkergraphs
   * */
 private class DiffGraphApplier {
   import DiffGraphApplier.InternalProperty
@@ -152,7 +152,7 @@ private class DiffGraphApplier {
   private val overlayNodeToTinkerNode = new util.HashMap[IdentityHashWrapper[NewNode], Vertex]()
 
   /**
-    * Applies diff to existing (loaded) OdbGraph
+    * Applies diff to existing (loaded) TinkerGraph
     **/
   def applyDiff(diffGraph: DiffGraph, graph: ScalaGraph): AppliedDiffGraph = {
     addNodes(diffGraph, graph)
@@ -162,7 +162,7 @@ private class DiffGraphApplier {
     AppliedDiffGraph(diffGraph, overlayNodeToTinkerNode)
   }
 
-  // We are in luck: OdbGraph will assign ids to new nodes for us
+  // We are in luck: TinkerGraph will assign ids to new nodes for us
   private def addNodes(diffGraph: DiffGraph, graph: ScalaGraph): Unit = {
     val nodeTinkerNodePairs = diffGraph.nodes.map { node =>
       val newNode = graph.graph.addVertex(node.label)
