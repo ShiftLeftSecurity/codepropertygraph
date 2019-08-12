@@ -7,6 +7,7 @@ matrix:
       - master
     before_install:
     - git fetch --tags
+    - git lfs fetch --all
     - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE" == "push" ]]; then
       openssl aes-256-cbc -K $encrypted_663dec309dc8_key -iv $encrypted_663dec309dc8_iv
       -in private-key.pem.enc -out private-key.pem -d; gpg --import private-key.pem;
