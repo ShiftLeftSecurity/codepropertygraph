@@ -1,6 +1,7 @@
 package io.shiftleft.cpgvalidator
 
 import gremlin.scala._
+import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.Cardinality
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 sealed trait ValidationError {
@@ -22,7 +23,9 @@ case class EdgeDegreeError(node: Vertex,
     extends ValidationError {
   override def toString: Label = {
     val start = expectedDegreeRange.start
-    val end = if (expectedDegreeRange.end != Int.MaxValue) { expectedDegreeRange.end.toString } else { "N" }
+    val end = if (expectedDegreeRange.end != Int.MaxValue) {
+      expectedDegreeRange.end.toString
+    } else { "N" }
 
     if (direction == Direction.OUT) {
       s"Expected $start to $end outgoing $edgeType edges " +
@@ -42,7 +45,10 @@ case class EdgeDegreeError(node: Vertex,
   }
 }
 
-case class NodeTypeError(node: Vertex, edgeType: String, direction: Direction, invalidOtherSideNodes: List[Vertex])
+case class NodeTypeError(node: Vertex,
+                         edgeType: String,
+                         direction: Direction,
+                         invalidOtherSideNodes: List[Vertex])
     extends ValidationError {
   override def toString: String = {
     if (direction == Direction.OUT) {
@@ -61,7 +67,10 @@ case class NodeTypeError(node: Vertex, edgeType: String, direction: Direction, i
   }
 }
 
-case class EdgeTypeError(node: Vertex, direction: Direction, invalidEdges: List[Edge]) extends ValidationError {
+case class EdgeTypeError(node: Vertex,
+                         direction: Direction,
+                         invalidEdges: List[Edge])
+    extends ValidationError {
   override def toString: String = {
     if (direction == Direction.OUT) {
       s"Expected no outgoing ${invalidEdges.map(_.label).mkString(" or ")} edges from ${node.label}. " +
@@ -74,5 +83,16 @@ case class EdgeTypeError(node: Vertex, direction: Direction, invalidEdges: List[
 
   override def getCategory: ValidationErrorCategory = {
     EdgeTypeErrorCategory(this)
+  }
+}
+
+case class KeyError(node: Vertex, nodeKeyType: String, cardinality: Cardinality)
+    extends ValidationError {
+  override def toString: String =
+    s"Cardinality $cardinality of NodeKeyType $nodeKeyType violated for node ${node.label}." +
+      ErrorHelper.getNodeDetails(node)
+
+  override def getCategory: ValidationErrorCategory = {
+    KeyErrorCategory(this)
   }
 }
