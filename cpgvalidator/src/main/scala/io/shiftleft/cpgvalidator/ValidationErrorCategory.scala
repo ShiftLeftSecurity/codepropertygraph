@@ -28,9 +28,7 @@ object NodeTypeErrorCategory {
   }
 }
 
-case class NodeTypeErrorCategory(nodeLabel: String,
-                                 edgeType: String,
-                                 direction: Direction)
+case class NodeTypeErrorCategory(nodeLabel: String, edgeType: String, direction: Direction)
     extends ValidationErrorCategory
 
 object EdgeTypeErrorCategory {
@@ -43,9 +41,7 @@ object EdgeTypeErrorCategory {
   }
 }
 
-case class EdgeTypeErrorCategory(nodeLabel: String,
-                                 direction: Direction,
-                                 invalidEdgeTypes: List[String])
+case class EdgeTypeErrorCategory(nodeLabel: String, direction: Direction, invalidEdgeTypes: List[String])
     extends ValidationErrorCategory
 
 object KeyErrorCategory {
@@ -54,7 +50,5 @@ object KeyErrorCategory {
   }
 }
 
-case class KeyErrorCategory(nodeLabel: String,
-                            nodeKeyType: String,
-                            cardinality: Cardinality)
+case class KeyErrorCategory(nodeLabel: String, nodeKeyType: String, cardinality: Cardinality)
     extends ValidationErrorCategory

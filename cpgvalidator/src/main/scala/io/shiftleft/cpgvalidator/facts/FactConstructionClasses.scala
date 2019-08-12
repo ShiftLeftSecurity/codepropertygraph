@@ -41,10 +41,7 @@ object FactConstructionClasses {
         )
   }
 
-  case class KeysFact(nodeType: String,
-                      nodeKeyType: String,
-                      cardinality: Cardinality)
-      extends Fact
+  case class KeysFact(nodeType: String, nodeKeyType: String, cardinality: Cardinality) extends Fact
 
   case class FactTier1(nodeType: String, degreeRange: Range.Inclusive) {
     def to(degreeEnd: Int): FactTier2 = {
@@ -70,9 +67,7 @@ object FactConstructionClasses {
     }
   }
 
-  case class OutFactTier1(srcNodeType: String,
-                          outDegreeRange: Range.Inclusive,
-                          edgeType: String) {
+  case class OutFactTier1(srcNodeType: String, outDegreeRange: Range.Inclusive, edgeType: String) {
     def to(dstNodeType: String): OutFact = {
       OutFact(srcNodeType, outDegreeRange, edgeType, dstNodeType :: Nil)
     }
@@ -82,10 +77,7 @@ object FactConstructionClasses {
     }
   }
 
-  case class OutFact(srcNodeType: String,
-                     outDegreeRange: Range.Inclusive,
-                     edgeType: String,
-                     dstNodeTypes: List[String])
+  case class OutFact(srcNodeType: String, outDegreeRange: Range.Inclusive, edgeType: String, dstNodeTypes: List[String])
       extends Fact {
     def or(dstNodeType: String): OutFact = {
       OutFact(
@@ -106,9 +98,7 @@ object FactConstructionClasses {
     }
   }
 
-  case class InFactTier1(dstNodeType: String,
-                         inDegreeRange: Range.Inclusive,
-                         edgeType: String) {
+  case class InFactTier1(dstNodeType: String, inDegreeRange: Range.Inclusive, edgeType: String) {
     def from(srcNodeType: String): InFact = {
       InFact(dstNodeType, inDegreeRange, edgeType, srcNodeType :: Nil)
     }
@@ -118,10 +108,7 @@ object FactConstructionClasses {
     }
   }
 
-  case class InFact(dstNodeType: String,
-                    inDegreeRange: Range.Inclusive,
-                    edgeType: String,
-                    srcNodeTypes: List[String])
+  case class InFact(dstNodeType: String, inDegreeRange: Range.Inclusive, edgeType: String, srcNodeTypes: List[String])
       extends Fact {
     def or(srcNodeType: String): InFact = {
       InFact(dstNodeType, inDegreeRange, edgeType, srcNodeType :: srcNodeTypes)
