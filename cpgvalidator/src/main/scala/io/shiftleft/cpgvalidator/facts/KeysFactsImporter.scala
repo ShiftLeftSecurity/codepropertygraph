@@ -8,16 +8,11 @@ class KeysFactsImporter extends FactsImporter {
 
   import FactConstructionClasses._
 
-  case class NodeKey(name: String,
-                     comment: String,
-                     valueType: String,
-                     cardinality: String)
+  case class NodeKey(name: String, comment: String, valueType: String, cardinality: String)
 
   case class OutEdgeEntry(edgeName: String, inNodes: List[String])
 
-  case class ContainedNode(nodeType: String,
-                           localName: String,
-                           cardinality: String)
+  case class ContainedNode(nodeType: String, localName: String, cardinality: String)
 
   case class NodeType(name: String,
                       keys: List[String],

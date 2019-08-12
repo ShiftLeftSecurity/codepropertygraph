@@ -7,8 +7,7 @@ import scala.collection.mutable
 class ValidationErrorRegistry {
   import ValidationErrorRegistry.logger
 
-  protected val validationErrors
-    : mutable.Map[ValidationErrorCategory, List[ValidationError]] =
+  protected val validationErrors: mutable.Map[ValidationErrorCategory, List[ValidationError]] =
     mutable.Map.empty
 
   def addError(error: ValidationError): Unit = {

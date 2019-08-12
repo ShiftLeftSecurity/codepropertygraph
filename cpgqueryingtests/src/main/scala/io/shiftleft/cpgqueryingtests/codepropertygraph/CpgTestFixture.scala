@@ -7,8 +7,7 @@ import io.shiftleft.layers.{DataFlowRunner, EnhancementRunner}
 import io.shiftleft.semanticsloader.SemanticsLoader
 
 class CpgTestFixture(projectName: String) {
-  lazy val cpg = CpgLoader.load(s"resources/testcode/cpgs/$projectName/cpg.bin.zip",
-                                CpgLoaderConfig.withoutOverflow)
+  lazy val cpg = CpgLoader.load(s"resources/testcode/cpgs/$projectName/cpg.bin.zip", CpgLoaderConfig.withoutOverflow)
   new EnhancementRunner().run(cpg, new SerializedCpg)
   new DataFlowRunner(SemanticsLoader.emptySemantics).run(cpg, new SerializedCpg)
   implicit val graph: Graph = cpg.graph

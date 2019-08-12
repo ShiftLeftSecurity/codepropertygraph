@@ -50,8 +50,7 @@ class OutFactsValidator extends Validator {
     }
   }
 
-  private def getOutFactByEdgeTypeBySrcType
-    : List[(String, List[(String, List[OutFact])])] = {
+  private def getOutFactByEdgeTypeBySrcType: List[(String, List[(String, List[OutFact])])] = {
     val outFactsBySrcAndEdgeType = new OutFactsImporter().loadFacts
       .groupBy(outFact => (outFact.srcNodeType, outFact.edgeType))
       .toList
@@ -73,9 +72,7 @@ class OutFactsValidator extends Validator {
       .sortBy(_._1) // Sort by srcType
   }
 
-  private def validateOutDegree(srcNode: Vertex,
-                                actualDstNodes: List[Vertex],
-                                outFact: OutFact): Unit = {
+  private def validateOutDegree(srcNode: Vertex, actualDstNodes: List[Vertex], outFact: OutFact): Unit = {
     val actualOutDegree =
       actualDstNodes.count(
         actualDstNode => outFact.dstNodeTypes.contains(actualDstNode.label)
