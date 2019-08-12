@@ -127,6 +127,12 @@ class NodeTypeStarters(cpg: Cpg) {
     new MetaData(scalaGraph.V.hasLabel(NodeTypes.META_DATA).cast[nodes.MetaData])
 
   /**
+    * Traverse to all method references
+    * */
+  def methodRef: MethodRef[HNil] =
+    new MethodRef(scalaGraph.V.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef])
+
+  /**
   Begin traversal at set of nodes - specified by their ids
     */
   def atVerticesWithId[NodeType <: nodes.StoredNode](ids: Seq[Any]): NodeSteps[NodeType, HNil] =
