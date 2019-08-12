@@ -18,12 +18,14 @@ import scala.collection.mutable.ArrayBuffer
 
 private[cpgloading] object CpgOverlayLoader {
   private val logger = LogManager.getLogger(getClass)
+
   /**
     * Load overlays stored in the file with the name `filename`.
     */
   def load(filename: String, baseCpg: Cpg): Unit = {
     val applier = new CpgOverlayApplier(baseCpg.graph)
-    ProtoCpgLoader.loadOverlays(filename)
+    ProtoCpgLoader
+      .loadOverlays(filename)
       .map { overlays: Iterator[CpgOverlay] =>
         overlays.foreach(applier.applyDiff)
       }
@@ -47,7 +49,7 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
   private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Vertex] = mutable.HashMap()
 
   /**
-    * Applies diff to existing (loaded) TinkerGraph
+    * Applies diff to existing (loaded) OdbGraph
     */
   def applyDiff(overlay: CpgOverlay): Unit = {
     addNodes(overlay)

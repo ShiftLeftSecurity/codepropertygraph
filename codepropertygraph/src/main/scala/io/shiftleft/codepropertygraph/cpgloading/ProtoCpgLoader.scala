@@ -10,18 +10,19 @@ import resource.{ManagedResource, managed}
 import java.util.{List => JList}
 
 import scala.collection.JavaConverters._
+import io.shiftleft.overflowdb.OdbConfig
 
 object ProtoCpgLoader {
   private val logger = LogManager.getLogger(getClass)
 
-  def loadFromProtoZip(fileName: String, overflowDbConfig: OverflowDbConfig = OverflowDbConfig.withDefaults): Cpg = {
+  def loadFromProtoZip(fileName: String, overflowDbConfig: OdbConfig = OdbConfig.withoutOverflow): Cpg = {
     measureAndReport {
       val builder = new ProtoToCpg(overflowDbConfig)
-      for {zip <- managed(new ZipArchive(fileName))
-           entry <- zip.entries
-           inputStream <- managed(Files.newInputStream(entry))}
-        builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList)
-      
+      for {
+        zip <- managed(new ZipArchive(fileName))
+        entry <- zip.entries
+        inputStream <- managed(Files.newInputStream(entry))
+      } builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList)
 
       /* second pass so we can stream for the edges
        * -> holding them all in memory is potentially too much
@@ -37,14 +38,14 @@ object ProtoCpgLoader {
     }
   }
 
-  def loadFromListOfProtos(cpgs: Seq[CpgStruct], overflowDbConfig: OverflowDbConfig): Cpg = {
+  def loadFromListOfProtos(cpgs: Seq[CpgStruct], overflowDbConfig: OdbConfig): Cpg = {
     val builder = new ProtoToCpg(overflowDbConfig)
     cpgs.foreach(cpg => builder.addNodes(cpg.getNodeList))
     cpgs.foreach(cpg => builder.addEdges(cpg.getEdgeList))
     builder.build()
   }
 
-  def loadFromListOfProtos(cpgs: JList[CpgStruct], overflowDbConfig: OverflowDbConfig): Cpg =
+  def loadFromListOfProtos(cpgs: JList[CpgStruct], overflowDbConfig: OdbConfig): Cpg =
     loadFromListOfProtos(cpgs.asScala, overflowDbConfig)
 
   def loadOverlays(fileName: String): ManagedResource[Iterator[CpgOverlay]] =
@@ -54,8 +55,7 @@ object ProtoCpgLoader {
     managed(Files.newInputStream(path)).map(CpgOverlay.parseFrom).tried.get
 
   private def readOverlayEntries(zip: ZipArchive): Iterator[CpgOverlay] =
-    zip
-      .entries
+    zip.entries
       .sortWith(compareOverlayPath)
       .iterator
       .map(readOverlay)
@@ -79,4 +79,3 @@ object ProtoCpgLoader {
     result
   }
 }
-

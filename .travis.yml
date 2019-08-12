@@ -18,7 +18,7 @@ matrix:
     - pip install requests
     - cd cpgclientlib
     script:
-    - ./runtests.sh
+    - travis_wait 60 ./runtests.sh
     deploy:
       provider: pypi
       user: fabsx00
