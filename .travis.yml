@@ -47,7 +47,7 @@ matrix:
     - unzip $PROTOC_PKG -d $PROTOC_TARGET
     - protoc --version
     script:
-    - sbt test
+    - sbt test scalafmtCheck
     after_success:
     - if [[ "$TRAVIS_BRANCH" == "master" && $TRAVIS_PULL_REQUEST = 'false' ]]; then
       travis_wait 60 sbt ci-release-sonatype; fi
