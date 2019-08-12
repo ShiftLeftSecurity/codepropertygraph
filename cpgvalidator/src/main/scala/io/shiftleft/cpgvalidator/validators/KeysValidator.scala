@@ -2,10 +2,7 @@ package io.shiftleft.cpgvalidator.validators
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.cpgvalidator._
-import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.{
-  Cardinality,
-  KeysFact
-}
+import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.{Cardinality, KeysFact}
 import io.shiftleft.cpgvalidator.facts.KeysFactsImporter
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.structure.VertexProperty
@@ -19,9 +16,7 @@ class KeysValidator extends Validator {
     errorRegistry.getErrorCount == 0
   }
 
-  private def validateNode(node: Vertex,
-                           nodeKeyType: String,
-                           cardinality: Cardinality): Unit =
+  private def validateNode(node: Vertex, nodeKeyType: String, cardinality: Cardinality): Unit =
     cardinality match {
       case Cardinality.One =>
         validateCardinalityOne(node, nodeKeyType)
@@ -44,16 +39,14 @@ class KeysValidator extends Validator {
     }
   }
 
-  private def validateCardinalityOne(dstNode: Vertex,
-                                     nodeKeyType: String): Unit = {
+  private def validateCardinalityOne(dstNode: Vertex, nodeKeyType: String): Unit = {
     val property = dstNode.property(nodeKeyType)
     if (null == property || !property.isPresent) {
       errorRegistry.addError(KeyError(dstNode, nodeKeyType, Cardinality.One))
     }
   }
 
-  private def validateCardinalityZeroOrOne(dstNode: Vertex,
-                                           nodeKeyType: String): Unit = {
+  private def validateCardinalityZeroOrOne(dstNode: Vertex, nodeKeyType: String): Unit = {
     val property = dstNode.property(nodeKeyType)
     if (null == property || !property.isInstanceOf[VertexProperty[_]]) {
       errorRegistry.addError(
@@ -62,8 +55,7 @@ class KeysValidator extends Validator {
     }
   }
 
-  private def validateCardinalityList(dstNode: Vertex,
-                                      nodeKeyType: String): Unit = {
+  private def validateCardinalityList(dstNode: Vertex, nodeKeyType: String): Unit = {
     val properties = dstNode.properties(nodeKeyType).asScala.toList
     if (null == properties || !properties.isInstanceOf[List[_]]) {
       errorRegistry.addError(KeyError(dstNode, nodeKeyType, Cardinality.List))

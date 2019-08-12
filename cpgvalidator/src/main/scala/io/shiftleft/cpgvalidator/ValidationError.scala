@@ -45,10 +45,7 @@ case class EdgeDegreeError(node: Vertex,
   }
 }
 
-case class NodeTypeError(node: Vertex,
-                         edgeType: String,
-                         direction: Direction,
-                         invalidOtherSideNodes: List[Vertex])
+case class NodeTypeError(node: Vertex, edgeType: String, direction: Direction, invalidOtherSideNodes: List[Vertex])
     extends ValidationError {
   override def toString: String = {
     if (direction == Direction.OUT) {
@@ -67,10 +64,7 @@ case class NodeTypeError(node: Vertex,
   }
 }
 
-case class EdgeTypeError(node: Vertex,
-                         direction: Direction,
-                         invalidEdges: List[Edge])
-    extends ValidationError {
+case class EdgeTypeError(node: Vertex, direction: Direction, invalidEdges: List[Edge]) extends ValidationError {
   override def toString: String = {
     if (direction == Direction.OUT) {
       s"Expected no outgoing ${invalidEdges.map(_.label).mkString(" or ")} edges from ${node.label}. " +
@@ -86,8 +80,7 @@ case class EdgeTypeError(node: Vertex,
   }
 }
 
-case class KeyError(node: Vertex, nodeKeyType: String, cardinality: Cardinality)
-    extends ValidationError {
+case class KeyError(node: Vertex, nodeKeyType: String, cardinality: Cardinality) extends ValidationError {
   override def toString: String =
     s"Cardinality $cardinality of NodeKeyType $nodeKeyType violated for node ${node.label}." +
       ErrorHelper.getNodeDetails(node)

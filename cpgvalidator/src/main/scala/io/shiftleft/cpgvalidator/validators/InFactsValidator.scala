@@ -50,9 +50,7 @@ class InFactsValidator extends Validator {
     }
   }
 
-  private def validateInDegree(dstNode: Vertex,
-                               actualSrcNode: List[Vertex],
-                               inFact: InFact): Unit = {
+  private def validateInDegree(dstNode: Vertex, actualSrcNode: List[Vertex], inFact: InFact): Unit = {
     val actualInDegree =
       actualSrcNode.count(
         actualSrcNode => inFact.srcNodeTypes.contains(actualSrcNode.label)
@@ -100,8 +98,7 @@ class InFactsValidator extends Validator {
     }
   }
 
-  private def getInFactByEdgeTypeByDstType
-    : List[(String, List[(String, List[InFact])])] = {
+  private def getInFactByEdgeTypeByDstType: List[(String, List[(String, List[InFact])])] = {
     val inFactsByDstAndEdgeType = new InFactsImporter().loadFacts
       .groupBy(inFact => (inFact.dstNodeType, inFact.edgeType))
       .toList
