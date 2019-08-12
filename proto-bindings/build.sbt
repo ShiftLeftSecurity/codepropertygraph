@@ -56,3 +56,15 @@ generateGoBindings := {
   s"""protoc --go_out=$outDir $protoFile""".!
   outDir
 }
+
+lazy val generatePythonBindings = taskKey[File]("generate Python proto bindings")
+generatePythonBindings := {
+  import sys.process._
+  (Projects.codepropertygraph/generateProtobuf).value
+  val protoFile = "codepropertygraph/target/resource_managed/main/cpg.proto"
+  val outDir = new File("codepropertygraph/target/protoc-py")
+  outDir.mkdirs
+  println(s"writing Python proto bindings to $outDir")
+  s"""protoc --python_out=$outDir $protoFile""".!
+  outDir
+}
