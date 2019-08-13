@@ -2,13 +2,27 @@ package io.shiftleft.passes.containsedges
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import io.shiftleft.TinkerGraphTestInstance
+import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import org.scalatest.{Matchers, WordSpec}
 
 class ContainsEdgePassTest extends WordSpec with Matchers {
 
   import ContainsEdgePassTest.Fixture
+
+  "foo" in {
+    implicit val graph: ScalaGraph = OverflowDbTestInstance.create
+    val fileVertex = graph + NodeTypes.FILE
+    val typeDeclVertex = graph + NodeTypes.TYPE_DECL
+//    fileVertex --- EdgeTypes.AST --> typeDeclVertex
+
+    graph.traversal.V(fileVertex).addE(EdgeTypes.AST).to(typeDeclVertex).toList //Nil
+    println(fileVertex.start.outE().toList()) //Nil
+
+    fileVertex.addEdge("AST", typeDeclVertex)
+    println(fileVertex.start.outE().toList()) //Nil
+
+  }
 
   "Files " can {
     "contain Methods" in Fixture { fixture =>
@@ -39,7 +53,7 @@ class ContainsEdgePassTest extends WordSpec with Matchers {
 
 object ContainsEdgePassTest {
   private class Fixture {
-    private implicit val graph: ScalaGraph = TinkerGraphTestInstance.create
+    private implicit val graph: ScalaGraph = OverflowDbTestInstance.create
 
     val fileVertex = graph + NodeTypes.FILE
     val typeDeclVertex = graph + NodeTypes.TYPE_DECL

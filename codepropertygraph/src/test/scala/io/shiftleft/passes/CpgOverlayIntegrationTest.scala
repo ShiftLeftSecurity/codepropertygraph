@@ -1,7 +1,7 @@
 package io.shiftleft.passes
 
 import gremlin.scala._
-import io.shiftleft.TinkerGraphTestInstance
+import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.codepropertygraph.generated._
@@ -36,7 +36,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
 
   /* like a freshly deserialized cpg.bin.zip without any overlays applied */
   def withNewBaseCpg[T](fun: Cpg => T): T = {
-    val graph: ScalaGraph = TinkerGraphTestInstance.create
+    val graph: ScalaGraph = OverflowDbTestInstance.create
     val initialNode = graph + NodeTypes.UNKNOWN
     initialNode.setProperty(NodeKeys.CODE, InitialNodeCode)
     val cpg = Cpg(graph.asJava())
