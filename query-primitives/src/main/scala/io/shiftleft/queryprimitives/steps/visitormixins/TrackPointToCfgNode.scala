@@ -37,6 +37,10 @@ object TrackPointToCfgNode extends NodeVisitor[nodes.CfgNode] with ExpressionGen
     ExpandTo.argumentToCallOrReturn(node)
   }
 
+  override def visit(node: nodes.MethodRef): nodes.CfgNode = {
+    ExpandTo.argumentToCallOrReturn(node)
+  }
+
   override def visit(node: nodes.Literal): nodes.CfgNode = {
     ExpandTo.argumentToCallOrReturn(node)
   }
