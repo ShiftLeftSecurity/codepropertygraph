@@ -10,12 +10,11 @@ import resource.{ManagedResource, managed}
 import java.util.{List => JList}
 
 import scala.collection.JavaConverters._
-import io.shiftleft.overflowdb.OdbConfig
 
 object ProtoCpgLoader {
   private val logger = LogManager.getLogger(getClass)
 
-  def loadFromProtoZip(fileName: String, overflowDbConfig: OdbConfig = OdbConfig.withoutOverflow): Cpg = {
+  def loadFromProtoZip(fileName: String, overflowDbConfig: OverflowDbConfig = OverflowDbConfig.withDefaults): Cpg = {
     measureAndReport {
       val builder = new ProtoToCpg(overflowDbConfig)
       for {
@@ -38,14 +37,14 @@ object ProtoCpgLoader {
     }
   }
 
-  def loadFromListOfProtos(cpgs: Seq[CpgStruct], overflowDbConfig: OdbConfig): Cpg = {
+  def loadFromListOfProtos(cpgs: Seq[CpgStruct], overflowDbConfig: OverflowDbConfig): Cpg = {
     val builder = new ProtoToCpg(overflowDbConfig)
     cpgs.foreach(cpg => builder.addNodes(cpg.getNodeList))
     cpgs.foreach(cpg => builder.addEdges(cpg.getEdgeList))
     builder.build()
   }
 
-  def loadFromListOfProtos(cpgs: JList[CpgStruct], overflowDbConfig: OdbConfig): Cpg =
+  def loadFromListOfProtos(cpgs: JList[CpgStruct], overflowDbConfig: OverflowDbConfig): Cpg =
     loadFromListOfProtos(cpgs.asScala, overflowDbConfig)
 
   def loadOverlays(fileName: String): ManagedResource[Iterator[CpgOverlay]] =

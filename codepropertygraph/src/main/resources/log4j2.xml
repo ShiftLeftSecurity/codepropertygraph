@@ -9,7 +9,7 @@
     <!-- java.util.logging redirection (from tomcat/jasper) -->
     <Logger name="org.apache.tomcat" level="error"/>
     <Logger name="org.apache.jasper" level="error"/>
-    <Logger name="io.shiftleft.overflowdb" level="debug"/>
+    <Logger name="org.apache.tinkerpop.gremlin.tinkergraph" level="debug"/>
 
     <Root level="info">
       <AppenderRef ref="STDOUT"/>

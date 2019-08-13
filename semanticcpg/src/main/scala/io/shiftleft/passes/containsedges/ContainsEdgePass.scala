@@ -47,7 +47,7 @@ class ContainsEdgePass(cpg: Cpg) extends CpgPass(cpg) {
           .out(EdgeTypes.AST)
           .until(v => v.hasLabel(sourceTypes.head, sourceTypes.tail: _*)))
       .sideEffect(destination =>
-        if (destinationTypes.contains(destination.label)) {
+        if (destinationTypes.contains(destination.label())) {
           dstGraph.addEdgeInOriginal(source.asInstanceOf[StoredNode],
                                      destination.asInstanceOf[StoredNode],
                                      EdgeTypes.CONTAINS)

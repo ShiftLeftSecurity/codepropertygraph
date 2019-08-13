@@ -2,8 +2,7 @@ package io.shiftleft.codepropertygraph
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{edges, nodes}
-import io.shiftleft.overflowdb.OdbGraph
-import io.shiftleft.overflowdb.OdbConfig
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
 object Cpg {
 
@@ -27,17 +26,20 @@ object Cpg {
     * I.e. if you want to preserve state between sessions, just use this method to instantiate the cpg and ensure to properly `close` the cpg at the end.
     * @param path to the storage file, e.g. /home/user1/overflowdb.bin
     */
-  def withStorage(path: String): Cpg =
-    new Cpg(
-      OdbGraph.open(OdbConfig.withoutOverflow.withStorageLocation(path),
-                    nodes.Factories.AllAsJava,
-                    edges.Factories.AllAsJava))
+  def withStorage(path: String): Cpg = {
+    val configuration = TinkerGraph.EMPTY_CONFIGURATION
+    configuration.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_GRAPH_LOCATION, path)
+    new Cpg(TinkerGraph.open(configuration, nodes.Factories.AllAsJava, edges.Factories.AllAsJava))
+  }
 
   /**
     * Returns a fresh, empty graph
     */
-  private def emptyGraph: OdbGraph =
-    OdbGraph.open(OdbConfig.withoutOverflow, nodes.Factories.AllAsJava, edges.Factories.AllAsJava)
+  private def emptyGraph: TinkerGraph = {
+    val config = TinkerGraph.EMPTY_CONFIGURATION
+    config.setProperty(TinkerGraph.GREMLIN_TINKERGRAPH_ONDISK_OVERFLOW_ENABLED, false)
+    TinkerGraph.open(config, nodes.Factories.AllAsJava, edges.Factories.AllAsJava)
+  }
 }
 
 /**
