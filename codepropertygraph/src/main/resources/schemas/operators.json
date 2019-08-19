@@ -83,8 +83,8 @@
             "name":"<operators>.assignmentShiftLeft"
         },
         {
-            "operator":"assignmentLogicalShifRight",
-            "name":"<operators>.assignmentLogicalShifRight"
+            "operator":"assignmentLogicalShiftRight",
+            "name":"<operators>.assignmentLogicalShiftRight"
         },
         {
             "operator":"assignmentArithmeticShiftRight",
