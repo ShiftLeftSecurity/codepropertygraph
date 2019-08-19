@@ -738,6 +738,7 @@ object DomainClassCreator {
 
     println(s"writing results to $targetFile")
     outputFile.copyTo(targetFile, overwrite = true)
+    outputFile.delete()
     targetFile.toJava
   }
 
