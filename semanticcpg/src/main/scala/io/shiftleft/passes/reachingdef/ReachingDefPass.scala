@@ -190,7 +190,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       case Operators.assignmentArithmeticShiftRight => true
       case Operators.assignmentDivision             => true
       case Operators.assignmentExponentiation       => true
-      case Operators.assignmentLogicalShiftRight     => true
+      case Operators.assignmentLogicalShiftRight    => true
       case Operators.assignmentMinus                => true
       case Operators.assignmentModulo               => true
       case Operators.assignmentMultiplication       => true
