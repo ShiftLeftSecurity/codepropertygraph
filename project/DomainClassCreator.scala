@@ -737,8 +737,7 @@ object DomainClassCreator {
     targetFile.createIfNotExists(createParents = true)
 
     println(s"writing results to $targetFile")
-    outputFile.copyTo(targetFile, overwrite = true)
-    targetFile.toJava
+    outputFile.moveTo(targetFile, overwrite = true).toJava
   }
 
   def calculateNodeToInEdges(nodeTypes: List[NodeType]): mutable.MultiMap[String, String] = {
