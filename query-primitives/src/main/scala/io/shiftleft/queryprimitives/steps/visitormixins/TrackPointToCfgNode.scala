@@ -6,7 +6,9 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.queryprimitives.utils.{ExpandTo, MemberAccess}
 
-object TrackPointToCfgNode extends NodeVisitor[nodes.CfgNode] with ExpressionGeneralization[nodes.CfgNode] {
+object TrackPointToCfgNode extends TrackPointToCfgNode
+
+trait TrackPointToCfgNode extends NodeVisitor[nodes.CfgNode] with ExpressionGeneralization[nodes.CfgNode] {
   override def visit(node: nodes.MethodParameterIn): nodes.CfgNode = {
     ExpandTo.parameterToMethod(node).asInstanceOf[nodes.CfgNode]
   }
