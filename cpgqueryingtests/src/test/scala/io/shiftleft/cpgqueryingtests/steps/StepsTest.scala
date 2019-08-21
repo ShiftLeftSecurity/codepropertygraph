@@ -3,6 +3,7 @@ package io.shiftleft.cpgqueryingtests.steps
 import gremlin.scala.{Edge, GremlinScala, StepLabel, Vertex}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
+import io.shiftleft.queryprimitives.Implicits._
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.{Matchers, WordSpec}

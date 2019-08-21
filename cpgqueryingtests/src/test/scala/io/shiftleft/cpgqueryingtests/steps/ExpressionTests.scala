@@ -3,6 +3,7 @@ package io.shiftleft.cpgqueryingtests.steps
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
 import org.scalatest.{Matchers, WordSpec}
+import io.shiftleft.queryprimitives.Implicits._
 
 class ExpressionTests extends WordSpec with Matchers {
 

@@ -1,6 +1,7 @@
 package io.shiftleft.cpgqueryingtests.steps
 
 import io.shiftleft.cpgqueryingtests.codepropertygraph.{CpgFactory, LanguageFrontend}
+import io.shiftleft.queryprimitives.Implicits._
 
 class CAstTests extends CpgDataFlowTests {
   val cpgFactory = new CpgFactory(LanguageFrontend.Fuzzyc, "cpgqueryingtests/src/test/resources/default.semantics")

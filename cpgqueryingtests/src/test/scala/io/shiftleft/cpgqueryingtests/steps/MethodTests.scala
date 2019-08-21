@@ -4,6 +4,8 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import org.scalatest.{Matchers, WordSpec}
 
 import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
+import io.shiftleft.queryprimitives.Implicits._
+
 
 class MethodTests extends WordSpec with Matchers {
 

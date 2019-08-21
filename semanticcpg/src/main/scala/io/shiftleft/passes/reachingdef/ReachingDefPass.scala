@@ -4,6 +4,7 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.Implicits.JavaIteratorDeco
+import io.shiftleft.queryprimitives.Implicits._
 import io.shiftleft.queryprimitives.utils.{ExpandTo, MemberAccess}
 import java.nio.file.Paths
 

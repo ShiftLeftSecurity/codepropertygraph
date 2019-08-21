@@ -20,11 +20,7 @@ import shapeless.ops.product.ToHList
   Base class for our DSL
   These are the base steps available in all steps of the query language.
   */
-class Steps[NodeType, Labels <: HList](val raw: GremlinScala.Aux[NodeType, Labels])
-    extends ext.Enrichable
-    with ext.securityprofile.Enrichable
-    with ext.semanticcpg.Enrichable
-    with ext.dataflowengine.Enrichable {
+class Steps[NodeType, Labels <: HList](val raw: GremlinScala.Aux[NodeType, Labels]) {
   implicit lazy val graph: Graph = raw.traversal.asAdmin.getGraph.get
 
   def toIterator(): Iterator[NodeType] = {

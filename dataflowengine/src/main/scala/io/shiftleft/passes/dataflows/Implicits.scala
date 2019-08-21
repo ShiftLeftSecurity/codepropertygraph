@@ -1,4 +1,4 @@
-package io.shiftleft.queryprimitives.steps.ext
+package io.shiftleft.passes.dataflows
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.passes.dataflows.steps.{TrackingPoint, TrackingPointMethods}
@@ -6,7 +6,7 @@ import io.shiftleft.queryprimitives.steps.Steps
 import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import shapeless.HList
 
-package object dataflowengine {
+object Implicits {
   // TODO MP: rather use `start` mechanism?
   // alternative: move to `nodes` package object?
   implicit def trackingPointBaseMethodsQp(node: nodes.TrackingPointBase): TrackingPointMethods =
