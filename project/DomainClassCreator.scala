@@ -207,9 +207,7 @@ object DomainClassCreator {
         }
       }
 
-      trait Node extends Product {
-        def accept[T](visitor: NodeVisitor[T]): T = ???
-      }
+      trait Node extends Product
 
       /* a node that stored inside an OdbGraph (rather than e.g. DiffGraph) */
       trait StoredNode extends Vertex with Node {
@@ -235,12 +233,6 @@ object DomainClassCreator {
       }
 
       """
-
-      val nodeVisitor = 
-        s"""trait NodeVisitor[T] {
-          ${generateNodeVisitorMethods}
-          ${generateBaseTraitVisitorMethods}
-        }\n"""
 
       val nodeBaseTraits =
         (Resources.cpgJson \ "nodeBaseTraits")
@@ -294,21 +286,7 @@ object DomainClassCreator {
         """
       }
 
-      staticHeader + nodeVisitor + nodeBaseTraits + keyBasedTraits + factories
-    }
-
-    def generateNodeVisitorMethods() = {
-      val nodeTypes = (Resources.cpgJson \ "nodeTypes").as[List[NodeType]]
-
-      nodeTypes.map { nodeType =>
-        s"def visit(node: ${nodeType.className}): T = ???"
-      }.mkString("\n")
-    }
-
-    def generateBaseTraitVisitorMethods() = {
-      baseTraits.map { nodeBaseTrait: NodeBaseTrait =>
-        s"def visit(node: ${nodeBaseTrait.className}): T = ???"
-      }.mkString("\n")
+      staticHeader + nodeBaseTraits + keyBasedTraits + factories
     }
 
     def edgeTypeByName: Map[String, EdgeType] =
@@ -507,9 +485,6 @@ object DomainClassCreator {
           |trait ${nodeType.className} extends NodeRef[${nodeType.classNameDb}] with ${nodeType.className}Base with StoredNode $mixinTraits {
           |$propertyDelegators
           |$delegatingContainedNodeAccessors
-          |  override def accept[T](visitor: NodeVisitor[T]): T = {
-          |    visitor.visit(this)
-          |  }
           |  override def valueMap: JMap[String, AnyRef] = get.valueMap
           |  override def productElement(n: Int): Any = get.productElement(n)
           |  override def productPrefix = "${nodeType.className}"
@@ -718,8 +693,6 @@ object DomainClassCreator {
         override val label = "${nodeType.name}"
         override val properties: Map[String, Any] = $propertiesImpl
         override def containedNodesByLocalName: Map[String, List[Node]] = $containedNodesByLocalName
-
-        override def accept[T](visitor: NodeVisitor[T]): T = ???
       }
       """
     }
