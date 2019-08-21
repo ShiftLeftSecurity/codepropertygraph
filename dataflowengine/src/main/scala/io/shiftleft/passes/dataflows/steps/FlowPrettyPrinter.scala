@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets
 import dnl.utils.text.table.TextTable
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.queryprimitives.steps._
+import io.shiftleft.queryprimitives.Implicits._
 import io.shiftleft.passes.dataflows.Implicits._
 
 object FlowPrettyPrinter {

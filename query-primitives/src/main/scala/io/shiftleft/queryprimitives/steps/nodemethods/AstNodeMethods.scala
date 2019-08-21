@@ -1,6 +1,7 @@
 package io.shiftleft.queryprimitives.steps.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.queryprimitives.Implicits._
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.AstNode
 import shapeless.HNil
 
