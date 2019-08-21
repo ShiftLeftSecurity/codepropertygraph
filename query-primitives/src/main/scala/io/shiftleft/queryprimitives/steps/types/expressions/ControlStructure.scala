@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
 import io.shiftleft.queryprimitives.steps.NodeSteps
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{AstNode, Expression, ExpressionBase}
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.ParserTypeNameAccessors
-import io.shiftleft.queryprimitives.steps.Implicits._
+import io.shiftleft.queryprimitives.Implicits._
 import shapeless.HList
 
 object ControlStructure {

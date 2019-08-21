@@ -3,8 +3,8 @@ package io.shiftleft.queryprimitives.steps.types.expressions.generalizations
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.queryprimitives.steps.{NodeSteps}
-import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
+import io.shiftleft.queryprimitives.Implicits.GremlinScalaDeco
+import io.shiftleft.queryprimitives.steps.NodeSteps
 import shapeless.HList
 
 class Declaration[Labels <: HList](raw: GremlinScala.Aux[nodes.Declaration, Labels])

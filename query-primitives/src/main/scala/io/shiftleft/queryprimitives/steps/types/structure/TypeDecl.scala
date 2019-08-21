@@ -3,8 +3,8 @@ package io.shiftleft.queryprimitives.steps.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.queryprimitives.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.NodeSteps
-import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.Modifier
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors.{FullNameAccessors, IsExternalAccessor, NameAccessors}
 import org.apache.tinkerpop.gremlin.structure.Direction

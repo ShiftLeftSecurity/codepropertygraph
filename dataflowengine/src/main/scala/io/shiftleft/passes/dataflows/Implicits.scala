@@ -2,8 +2,8 @@ package io.shiftleft.passes.dataflows
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.passes.dataflows.steps.{TrackingPoint, TrackingPointMethods}
+import io.shiftleft.queryprimitives.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.Steps
-import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
 import shapeless.HList
 
 object Implicits {

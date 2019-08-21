@@ -9,7 +9,7 @@ import io.shiftleft.queryprimitives.steps.types.expressions.generalizations.{
   Expression,
   Modifier
 }
-import io.shiftleft.queryprimitives.steps.Implicits.GremlinScalaDeco
+import io.shiftleft.queryprimitives.Implicits.GremlinScalaDeco
 import io.shiftleft.queryprimitives.steps.{ICallResolver, NodeSteps}
 import io.shiftleft.queryprimitives.steps.types.expressions.{Call, ControlStructure, Literal}
 import io.shiftleft.queryprimitives.steps.types.propertyaccessors._
