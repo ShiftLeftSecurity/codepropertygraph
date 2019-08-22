@@ -236,11 +236,15 @@ object DomainClassCreator {
 
       """
 
-      val nodeVisitor = 
-        s"""trait NodeVisitor[T] {
-          ${generateNodeVisitorMethods}
-          ${generateBaseTraitVisitorMethods}
-        }\n"""
+      val nodeVisitor = s""" 
+        |/* Using pattern matching would be prettier than the visitor pattern, but because the matches would 
+        | * contain type checks, scalac cannot compile them down to jvm `lookupswitch|tableswitch` instructions, 
+        | * which would make them slower. 
+        | * See https://github.com/ShiftLeftSecurity/codepropertygraph/pull/317 for more details. */
+        |trait NodeVisitor[T] {
+        |  ${generateNodeVisitorMethods}
+        |  ${generateBaseTraitVisitorMethods}
+        |}\n""".stripMargin
 
       val nodeBaseTraits =
         (Resources.cpgJson \ "nodeBaseTraits")
