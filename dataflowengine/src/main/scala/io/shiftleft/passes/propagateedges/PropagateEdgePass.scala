@@ -2,9 +2,9 @@ package io.shiftleft.passes.propagateedges
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.semanticsloader.Semantics
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.semanticsloader.Semantics
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 

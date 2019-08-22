@@ -1,4 +1,4 @@
-package io.shiftleft.layers
+package io.shiftleft.passes.dataflows
 
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
