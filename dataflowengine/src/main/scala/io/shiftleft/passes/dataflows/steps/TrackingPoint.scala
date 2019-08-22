@@ -2,11 +2,11 @@ package io.shiftleft.passes.dataflows.steps
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.queryprimitives.steps.{NodeSteps, Steps}
+import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
 import shapeless.HList
-import io.shiftleft.queryprimitives.steps.types.structure.Method
+import io.shiftleft.semanticcpg.language.types.structure.Method
 import io.shiftleft.Implicits.JavaIteratorDeco
-import io.shiftleft.queryprimitives.utils.{ExpandTo, MemberAccess}
+import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._

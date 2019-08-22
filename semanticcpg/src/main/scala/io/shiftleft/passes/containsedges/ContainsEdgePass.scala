@@ -5,8 +5,8 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
-import io.shiftleft.queryprimitives.steps.Steps
-import io.shiftleft.queryprimitives.utils.ExpandTo
+import io.shiftleft.semanticcpg.language.Steps
+import io.shiftleft.semanticcpg.utils.ExpandTo
 
 /**
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for

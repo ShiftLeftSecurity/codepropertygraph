@@ -1,7 +1,7 @@
 package io.shiftleft.passes.dataflows.steps
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.queryprimitives.steps.Steps
+import io.shiftleft.semanticcpg.language.Steps
 
 class Flows(step: Steps[List[nodes.TrackingPoint], _]) {
   def p(): List[String] = {

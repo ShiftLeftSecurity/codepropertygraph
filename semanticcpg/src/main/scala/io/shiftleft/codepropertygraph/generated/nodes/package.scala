@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.generated
 
 import gremlin.scala._
-import io.shiftleft.queryprimitives.steps.{NewNodeSteps, NodeSteps, Steps}
+import io.shiftleft.semanticcpg.language.{NewNodeSteps, NodeSteps, Steps}
 import shapeless.{HList, HNil}
 
 package object nodes {
