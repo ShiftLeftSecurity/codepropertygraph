@@ -1,4 +1,4 @@
-package io.shiftleft.testfixtures
+package io.shiftleft.semanticcpg.testfixtures
 
 import java.io.{File, PrintWriter}
 import java.nio.file.Files

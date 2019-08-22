@@ -1,4 +1,4 @@
-package io.shiftleft.testfixtures
+package io.shiftleft.semanticcpg.testfixtures
 
 import gremlin.scala._
 import io.shiftleft.SerializedCpg

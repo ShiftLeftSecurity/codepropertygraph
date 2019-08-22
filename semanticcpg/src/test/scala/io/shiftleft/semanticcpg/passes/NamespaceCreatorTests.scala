@@ -1,10 +1,10 @@
-package io.shiftleft.passes.namespacecreator
+package io.shiftleft.semanticcpg.passes
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
-import io.shiftleft.testfixtures.EmptyScalaGraphFixture
+import io.shiftleft.semanticcpg.testfixtures.EmptyScalaGraphFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class NamespaceCreatorTests extends WordSpec with Matchers {

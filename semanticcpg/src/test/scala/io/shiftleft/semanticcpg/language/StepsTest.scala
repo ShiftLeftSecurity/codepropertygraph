@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language
 
 import gremlin.scala.{Edge, GremlinScala, StepLabel, Vertex}
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.testfixtures.ExistingCpgFixture
+import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.{Matchers, WordSpec}

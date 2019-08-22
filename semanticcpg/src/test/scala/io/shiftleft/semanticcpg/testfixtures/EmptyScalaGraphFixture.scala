@@ -1,6 +1,6 @@
-package io.shiftleft.testfixtures
+package io.shiftleft.semanticcpg.testfixtures
 
-import gremlin.scala._
+import gremlin.scala.ScalaGraph
 import io.shiftleft.OverflowDbTestInstance
 
 object EmptyScalaGraphFixture {

@@ -1,8 +1,8 @@
-package io.shiftleft.passes.memberaccesslinker
+package io.shiftleft.semanticcpg.passes
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.testfixtures.ExistingCpgFixture
+import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class MemberAccessLinkerTests extends WordSpec with Matchers {

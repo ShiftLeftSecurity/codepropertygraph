@@ -1,8 +1,8 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import io.shiftleft.testfixtures.CodeToCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
 
 class TypeDeclTests extends WordSpec with Matchers {
 

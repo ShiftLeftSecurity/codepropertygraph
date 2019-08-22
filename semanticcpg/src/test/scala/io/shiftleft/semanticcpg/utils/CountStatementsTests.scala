@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.utils
 
-import io.shiftleft.testfixtures.ExistingCpgFixture
+import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class CountStatementsTests extends WordSpec with Matchers {
