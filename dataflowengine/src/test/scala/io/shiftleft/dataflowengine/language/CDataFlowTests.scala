@@ -502,4 +502,16 @@ class CDataFlowTests extends CpgDataFlowTests {
         )
     }
   }
+  "Test 15: conditional expressions (joern issue #91)" in {
+    cpgFactory.buildCpg(
+      """
+  int  _min(int x, int y) {
+    int z =  x<y ? x : y;
+    return z;
+  }
+      """.stripMargin
+    ) { cpg =>
+    }
+  }
+
 }
