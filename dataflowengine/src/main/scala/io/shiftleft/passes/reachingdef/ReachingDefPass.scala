@@ -1,13 +1,13 @@
 package io.shiftleft.passes.reachingdef
 
-import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.passes.{CpgPass, DiffGraph}
-import io.shiftleft.Implicits.JavaIteratorDeco
-import io.shiftleft.queryprimitives.utils.{ExpandTo, MemberAccess}
 import java.nio.file.Paths
 
+import gremlin.scala._
+import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated._
+import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.queryprimitives.utils.{ExpandTo, MemberAccess}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
