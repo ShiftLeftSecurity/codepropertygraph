@@ -6,7 +6,6 @@ import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.cpgqueryingtests.codepropertygraph.CpgTestFixture
 import io.shiftleft.queryprimitives.Implicits._
 
-
 class MethodTests extends WordSpec with Matchers {
 
   "Method traversals" should CpgTestFixture("method") { fixture =>

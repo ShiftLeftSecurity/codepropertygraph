@@ -10,7 +10,6 @@ import shapeless.HNil
 import io.shiftleft.passes.dataflows.Implicits._
 import io.shiftleft.queryprimitives.Implicits._
 
-
 class CpgDataFlowTests extends WordSpec with Matchers {
 
   protected implicit def int2IntegerOption(x: Int): Option[Integer] = {

@@ -6,7 +6,6 @@ import io.shiftleft.queryprimitives.Implicits._
 
 import org.scalatest.{Matchers, WordSpec}
 
-
 class NamespaceTests extends WordSpec with Matchers {
 
   "generic cpg" should CpgTestFixture("namespace") { fixture =>
