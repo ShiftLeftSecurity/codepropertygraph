@@ -1,10 +1,10 @@
 package io.shiftleft.passes.dataflows.steps
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.queryprimitives.steps.visitormixins.TrackPointToCfgNode
+import io.shiftleft.queryprimitives.steps.nodemethods.generalizations.TrackingPointToCfgNode
 
 class TrackingPointMethods(val node: nodes.TrackingPointBase) extends AnyVal {
   def cfgNode: nodes.CfgNode = {
-    node.accept(TrackPointToCfgNode)
+    node.accept(TrackingPointToCfgNode)
   }
 }

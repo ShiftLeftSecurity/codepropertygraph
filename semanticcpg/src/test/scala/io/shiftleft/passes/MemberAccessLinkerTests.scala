@@ -2,12 +2,12 @@ package io.shiftleft.passes.memberaccesslinker
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.semanticcpg.Fixture
+import io.shiftleft.testfixtures.ExistingCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class MemberAccessLinkerTests extends WordSpec with Matchers {
 
-  "have a reference to correct member" in Fixture("memberaccesslinker") { fixture =>
+  "have a reference to correct member" in ExistingCpgFixture("memberaccesslinker") { fixture =>
     val queryResult: List[Vertex] = fixture.scalaGraph.V
       .hasLabel(NodeTypes.CALL)
       .has(NodeKeys.NAME -> Operators.indirectMemberAccess)
