@@ -4,6 +4,8 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.AstNode
 import shapeless.HNil
 
+import io.shiftleft.semanticcpg.language._
+
 class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
   /**

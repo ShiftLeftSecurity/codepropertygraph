@@ -3,6 +3,7 @@ package io.shiftleft.cpgserver
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.semanticcpg.language._
 
 class TestServerImpl extends ServerImpl {
 
