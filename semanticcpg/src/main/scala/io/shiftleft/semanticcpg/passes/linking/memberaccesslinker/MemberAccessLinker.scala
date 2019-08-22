@@ -1,4 +1,4 @@
-package io.shiftleft.passes.linking.memberaccesslinker
+package io.shiftleft.semanticcpg.passes.linking.memberaccesslinker
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, Operators, nodes}
@@ -6,6 +6,7 @@ import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.Implicits.JavaIteratorDeco
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
+import io.shiftleft.semanticcpg.language._
 
 import scala.collection.JavaConverters._
 

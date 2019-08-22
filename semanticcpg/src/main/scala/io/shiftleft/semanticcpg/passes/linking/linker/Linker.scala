@@ -1,4 +1,4 @@
-package io.shiftleft.passes.linking.linker
+package io.shiftleft.semanticcpg.passes.linking.linker
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._

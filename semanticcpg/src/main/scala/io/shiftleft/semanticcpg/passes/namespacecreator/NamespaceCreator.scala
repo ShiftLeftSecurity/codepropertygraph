@@ -1,4 +1,4 @@
-package io.shiftleft.passes.namespacecreator
+package io.shiftleft.semanticcpg.passes.namespacecreator
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg

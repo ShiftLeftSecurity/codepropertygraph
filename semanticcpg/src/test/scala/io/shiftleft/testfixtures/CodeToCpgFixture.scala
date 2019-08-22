@@ -6,7 +6,7 @@ import java.nio.file.Files
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
-import io.shiftleft.layers.EnhancementRunner
+import io.shiftleft.semanticcpg.layers.EnhancementRunner
 
 object CodeToCpgFixture {
   def apply(frontend: LanguageFrontend = LanguageFrontend.Fuzzyc): CodeToCpgFixture = new CodeToCpgFixture(frontend)

@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 
 import io.shiftleft.testfixtures.CodeToCpgFixture
 import org.scalatest.{Matchers, WordSpec}
+import io.shiftleft.semanticcpg.language._
 
 /**
   * Language primitives for navigating method stubs

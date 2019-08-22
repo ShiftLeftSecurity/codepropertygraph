@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.language.types.expressions
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.testfixtures.ExistingCpgFixture
 import org.scalatest.{Matchers, WordSpec}
+import io.shiftleft.semanticcpg.language._
 
 class ExpressionTests extends WordSpec with Matchers {
 

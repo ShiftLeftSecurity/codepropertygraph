@@ -3,7 +3,7 @@ package io.shiftleft.testfixtures
 import gremlin.scala._
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
-import io.shiftleft.layers.EnhancementRunner
+import io.shiftleft.semanticcpg.layers.EnhancementRunner
 
 private class ExistingCpgFixture(projectName: String) {
   private val config = CpgLoaderConfig.withoutOverflow

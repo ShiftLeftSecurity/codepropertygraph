@@ -1,4 +1,4 @@
-package io.shiftleft.passes.receiveredges
+package io.shiftleft.semanticcpg.passes.receiveredges
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg

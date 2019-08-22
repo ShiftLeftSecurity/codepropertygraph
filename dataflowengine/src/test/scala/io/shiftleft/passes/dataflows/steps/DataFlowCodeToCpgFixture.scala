@@ -2,8 +2,8 @@ package io.shiftleft.passes.dataflows.steps
 
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.layers.EnhancementRunner
 import io.shiftleft.passes.dataflows.DataFlowRunner
+import io.shiftleft.semanticcpg.layers.EnhancementRunner
 import io.shiftleft.semanticsloader.SemanticsLoader
 import io.shiftleft.testfixtures.{CodeToCpgFixture, LanguageFrontend}
 

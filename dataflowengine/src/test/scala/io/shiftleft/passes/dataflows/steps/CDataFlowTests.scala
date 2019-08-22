@@ -1,5 +1,7 @@
 package io.shiftleft.passes.dataflows.steps
 
+import io.shiftleft.semanticcpg.language._
+
 class CDataFlowTests extends CpgDataFlowTests {
   val cpgFactory = DataFlowCodeToCpgFixture()
 

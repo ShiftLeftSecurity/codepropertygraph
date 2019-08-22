@@ -4,6 +4,7 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
 import org.scalatest.{Matchers, WordSpec}
 
 class ContainsEdgePassTest extends WordSpec with Matchers {

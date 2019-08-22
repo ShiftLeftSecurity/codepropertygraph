@@ -1,18 +1,18 @@
-package io.shiftleft.layers
+package io.shiftleft.semanticcpg.layers
 
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
-import io.shiftleft.passes.containsedges.ContainsEdgePass
-import io.shiftleft.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
-import io.shiftleft.passes.linking.capturinglinker.CapturingLinker
-import io.shiftleft.passes.linking.linker.Linker
-import io.shiftleft.passes.linking.memberaccesslinker.MemberAccessLinker
-import io.shiftleft.passes.methoddecorations.MethodDecoratorPass
-import io.shiftleft.passes.namespacecreator.NamespaceCreator
-import io.shiftleft.passes.receiveredges.ReceiverEdgePass
 import io.shiftleft.passes.CpgPass
-import io.shiftleft.passes.methodexternaldecorator.MethodExternalDecoratorPass
+import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
+import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
+import io.shiftleft.semanticcpg.passes.linking.capturinglinker.CapturingLinker
+import io.shiftleft.semanticcpg.passes.linking.linker.Linker
+import io.shiftleft.semanticcpg.passes.linking.memberaccesslinker.MemberAccessLinker
+import io.shiftleft.semanticcpg.passes.methoddecorations.MethodDecoratorPass
+import io.shiftleft.semanticcpg.passes.methodexternaldecorator.MethodExternalDecoratorPass
+import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
+import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
 
 class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedCpg) {
   private val enhancementExecList = createEnhancementExecList(language)

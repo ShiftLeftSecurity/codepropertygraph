@@ -1,8 +1,10 @@
-package io.shiftleft.passes.languagespecific.fuzzyc
+package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
+
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.semanticcpg.language._
 
 /**
   * This pass has no other pass as prerequisite.

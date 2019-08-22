@@ -9,6 +9,7 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
 import org.apache.tinkerpop.gremlin.structure.Direction
+import io.shiftleft.semanticcpg.language._
 
 import scala.collection.JavaConverters._
 

@@ -1,4 +1,4 @@
-package io.shiftleft.passes.methodexternaldecorator
+package io.shiftleft.semanticcpg.passes.methodexternaldecorator
 
 import java.lang
 

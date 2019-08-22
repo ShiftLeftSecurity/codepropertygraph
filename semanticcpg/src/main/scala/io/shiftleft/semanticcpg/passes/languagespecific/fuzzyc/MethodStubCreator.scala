@@ -1,4 +1,4 @@
-package io.shiftleft.passes.languagespecific.fuzzyc
+package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
@@ -7,6 +7,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
+import io.shiftleft.semanticcpg.language._
 
 import scala.collection.JavaConverters._
 

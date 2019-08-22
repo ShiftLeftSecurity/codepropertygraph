@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg
 
 import gremlin.scala.GremlinScala
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language.nodemethods.{AstNodeMethods, CfgNodeMethods, WithinMethodMethods}
 import io.shiftleft.semanticcpg.language.types.structure._
@@ -105,5 +106,8 @@ package object language {
     def cast[NodeType]: GremlinScala.Aux[NodeType, Labels] =
       raw.asInstanceOf[GremlinScala.Aux[NodeType, Labels]]
   }
+
+  implicit def toNodeTypeStarters(cpg: Cpg): NodeTypeStarters =
+    new NodeTypeStarters(cpg)
 
 }

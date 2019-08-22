@@ -3,6 +3,7 @@ package io.shiftleft.passes.namespacecreator
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
+import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.testfixtures.EmptyScalaGraphFixture
 import org.scalatest.{Matchers, WordSpec}
 

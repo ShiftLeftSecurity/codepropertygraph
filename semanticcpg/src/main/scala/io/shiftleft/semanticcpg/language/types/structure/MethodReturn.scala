@@ -6,11 +6,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.Call
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.{
-  CodeAccessors,
-  EvalTypeAccessors,
-  LineNumberAccessors
-}
+import io.shiftleft.semanticcpg.language.types.propertyaccessors.{CodeAccessors, EvalTypeAccessors, LineNumberAccessors}
 import shapeless.HList
 
 class MethodReturn[Labels <: HList](raw: GremlinScala.Aux[nodes.MethodReturn, Labels])

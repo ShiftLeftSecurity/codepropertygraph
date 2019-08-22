@@ -3,7 +3,7 @@ package io.shiftleft.passes.capturinglinker
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
-import io.shiftleft.passes.linking.capturinglinker.CapturingLinker
+import io.shiftleft.semanticcpg.passes.linking.capturinglinker.CapturingLinker
 import io.shiftleft.testfixtures.EmptyScalaGraphFixture
 import org.scalatest.{Matchers, WordSpec}
 
