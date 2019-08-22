@@ -1,6 +1,5 @@
 package io.shiftleft.passes.dataflows.steps
 
-import io.shiftleft.testfixtures.CodeToCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class DataFlowTests extends WordSpec with Matchers {
