@@ -1,4 +1,4 @@
-package io.shiftleft.passes.dataflows.steps
+package io.shiftleft.dataflowengine.language
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._

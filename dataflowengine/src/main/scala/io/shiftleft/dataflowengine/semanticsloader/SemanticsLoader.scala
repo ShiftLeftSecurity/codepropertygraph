@@ -1,4 +1,4 @@
-package io.shiftleft.semanticsloader
+package io.shiftleft.dataflowengine.semanticsloader
 
 import org.apache.logging.log4j.LogManager
 

@@ -1,4 +1,4 @@
-package io.shiftleft.passes.dataflows.steps
+package io.shiftleft.dataflowengine.language
 
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._

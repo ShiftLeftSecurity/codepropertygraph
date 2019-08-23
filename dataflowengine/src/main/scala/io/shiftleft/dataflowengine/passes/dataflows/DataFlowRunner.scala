@@ -1,10 +1,10 @@
-package io.shiftleft.passes.dataflows
+package io.shiftleft.dataflowengine.passes.dataflows
 
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.propagateedges.PropagateEdgePass
-import io.shiftleft.passes.reachingdef.ReachingDefPass
-import io.shiftleft.semanticsloader.Semantics
+import io.shiftleft.dataflowengine.passes.propagateedges.PropagateEdgePass
+import io.shiftleft.dataflowengine.passes.reachingdef.ReachingDefPass
+import io.shiftleft.dataflowengine.semanticsloader.Semantics
 
 class DataFlowRunner(semantics: Semantics) {
 
