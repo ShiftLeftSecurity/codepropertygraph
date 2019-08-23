@@ -23,31 +23,3 @@ object Tracer {
   }
 }
 
-
-object TracerExample {
-  def f(): Unit = {
-    Tracer.measure("f") {
-      g()
-      g()
-    }
-  }
-  def g(): Unit = {
-    Tracer.measure("g") {
-      q()
-      Thread.sleep(100)
-      (1 to 1000).par.map { _ => q(); () }
-    }
-  }
-  def q(): Unit = {
-    Tracer.measure("q") {
-      Thread.sleep(10)
-    }
-  }
-
-  def main(args: Array[String]): Unit = {
-    f()
-    Tracer.dump()
-  }
-}
-
-
