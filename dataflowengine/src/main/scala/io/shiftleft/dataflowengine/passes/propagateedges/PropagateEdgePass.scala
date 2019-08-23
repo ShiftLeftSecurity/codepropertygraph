@@ -1,10 +1,10 @@
-package io.shiftleft.passes.propagateedges
+package io.shiftleft.dataflowengine.passes.propagateedges
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
-import io.shiftleft.semanticsloader.Semantics
+import io.shiftleft.dataflowengine.semanticsloader.Semantics
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 

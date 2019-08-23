@@ -1,4 +1,4 @@
-package io.shiftleft.passes.dataflows.steps
+package io.shiftleft.dataflowengine.language
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes

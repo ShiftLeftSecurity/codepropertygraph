@@ -1,11 +1,12 @@
-package io.shiftleft.semanticcpg.language.ext
+package io.shiftleft.dataflowengine
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.passes.dataflows.steps.{TrackingPoint, TrackingPointMethods}
-import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.Steps
 import shapeless.HList
 
-package object dataflowengine {
+import io.shiftleft.semanticcpg.language._
+
+package object language {
 
   // TODO MP: rather use `start` mechanism?
   // alternative: move to `nodes` package object?
@@ -21,4 +22,5 @@ package object dataflowengine {
   implicit def toTrackingPoint[NodeType <: nodes.TrackingPointBase, Labels <: HList](
       steps: Steps[NodeType, Labels]): TrackingPoint[Labels] =
     new TrackingPoint[Labels](steps.raw.cast[nodes.TrackingPoint])
+
 }
