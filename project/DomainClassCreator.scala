@@ -686,7 +686,7 @@ object DomainClassCreator {
             .mkString(",\n")
 
           val baseCase = s"""
-            Map($forKeys).filterNot { case (k,v) =>
+            Map($forKeys).asInstanceOf[Map[String, Any]].filterNot { case (k,v) =>
                 v == null || v == None
               }
             """
