@@ -346,8 +346,7 @@ object DomainClassCreator {
       val companionObject = s"""
       object ${nodeType.className} {
 
-        def apply(graph: OdbGraph, dbNode: ${nodeType.classNameDb}) = new NodeRef[${nodeType.classNameDb}](graph, dbNode) with ${nodeType.className}
-        def apply(graph: OdbGraph, id: Long) = new NodeRef[${nodeType.classNameDb}](graph, id) with ${nodeType.className}
+        def apply(graph: OdbGraph, id: Long) = new ${nodeType.className}(graph, id)
 
         val layoutInformation = new NodeLayoutInformation(
           Keys.All,
@@ -508,7 +507,7 @@ object DomainClassCreator {
         }.mkString("\n")
         val containedNodesDelegators = nodeType.containedNodes
         s"""
-          |trait ${nodeType.className} extends NodeRef[${nodeType.classNameDb}] with ${nodeType.className}Base with StoredNode $mixinTraits {
+          |class ${nodeType.className}(graph: OdbGraph, id: Long) extends NodeRef[${nodeType.classNameDb}](graph, id) with ${nodeType.className}Base with StoredNode $mixinTraits {
           |$propertyDelegators
           |$delegatingContainedNodeAccessors
           |  override def accept[T](visitor: NodeVisitor[T]): T = {
