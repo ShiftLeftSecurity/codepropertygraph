@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets
 import dnl.utils.text.table.TextTable
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.ext.dataflowengine._
 import io.shiftleft.semanticcpg.language.nodemethods.CfgNodeMethods
 
 object FlowPrettyPrinter {
