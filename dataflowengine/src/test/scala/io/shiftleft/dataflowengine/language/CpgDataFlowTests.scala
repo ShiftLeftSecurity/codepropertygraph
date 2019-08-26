@@ -3,7 +3,6 @@ package io.shiftleft.dataflowengine.language
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.ext.dataflowengine._
 import io.shiftleft.semanticcpg.language.nodemethods.CfgNodeMethods
 import io.shiftleft.semanticcpg.language.types.expressions.Literal
 import io.shiftleft.semanticcpg.language.types.structure.{Member, Method}

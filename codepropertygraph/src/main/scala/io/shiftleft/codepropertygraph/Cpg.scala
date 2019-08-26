@@ -47,12 +47,7 @@ object Cpg {
   *
   * @param graph the underlying graph. An empty graph is created if this parameter is omitted.
   */
-class Cpg(val graph: Graph = Cpg.emptyGraph)
-    extends AutoCloseable
-    with ext.queryprimitives.Enrichable
-    with ext.queryprimitivesext.Enrichable
-    with ext.securityprofile.Enrichable
-    with ext.semanticcpg.Enrichable {
+class Cpg(val graph: Graph = Cpg.emptyGraph) extends AutoCloseable {
 
   /**
     * The underlying graph.
