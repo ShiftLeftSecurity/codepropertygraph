@@ -515,8 +515,17 @@ class CDataFlowTests extends CpgDataFlowTests {
       val sink = cpg.identifier.name("z")
       val flows = sink.reachableByFlows(source).l
       flows.map(flow => flowToResultPairs(flow)).toSet shouldBe Set(
-        List[(String, Option[Integer])](("foo(bool x, void* y)", 2), ("g(y)", 3), ("x ? f(y) : g(y)", 3), ("* z =  x ? f(y) : g(y)", 3)),
-        List[(String, Option[Integer])](("foo(bool x, void* y)", 2), ("f(y)", 3), ("x ? f(y) : g(y)", 3), ("* z =  x ? f(y) : g(y)", 3))
+        List[(String, Option[Integer])](
+          ("foo(bool x, void* y)", 2),
+          ("g(y)", 3), ("x ? f(y) : g(y)", 3),
+          ("* z =  x ? f(y) : g(y)", 3)
+        ),
+        List[(String, Option[Integer])](
+          ("foo(bool x, void* y)", 2),
+          ("f(y)", 3),
+          ("x ? f(y) : g(y)", 3),
+          ("* z =  x ? f(y) : g(y)", 3)
+        )
       )
     }
   }
