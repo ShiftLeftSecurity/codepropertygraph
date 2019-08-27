@@ -7,34 +7,33 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.Call
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 import io.shiftleft.semanticcpg.language.types.structure.{Method, MethodParameter, Type}
-import shapeless.HList
 
 /**
   An expression (base type)
   */
-class Expression[Labels <: HList](raw: GremlinScala.Aux[nodes.Expression, Labels])
-    extends NodeSteps[nodes.Expression, Labels](raw)
-    with ExpressionBase[nodes.Expression, Labels] {}
+class Expression(raw: GremlinScala[nodes.Expression])
+    extends NodeSteps[nodes.Expression](raw)
+    with ExpressionBase[nodes.Expression] {}
 
-trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
-    extends OrderAccessors[NodeType, Labels]
-    with ArgumentIndexAccessors[NodeType, Labels]
-    with EvalTypeAccessors[NodeType, Labels]
-    with CodeAccessors[NodeType, Labels]
-    with LineNumberAccessors[NodeType, Labels]
-    with AstNodeBase[NodeType, Labels] { this: NodeSteps[NodeType, Labels] =>
+trait ExpressionBase[NodeType <: nodes.Expression]
+    extends OrderAccessors[NodeType]
+    with ArgumentIndexAccessors[NodeType]
+    with EvalTypeAccessors[NodeType]
+    with CodeAccessors[NodeType]
+    with LineNumberAccessors[NodeType]
+    with AstNodeBase[NodeType] { this: NodeSteps[NodeType] =>
 
   /**
     Traverse to enclosing expression
     */
-  def expressionUp: Expression[Labels] =
-    new Expression[Labels](raw.in(EdgeTypes.AST).not(_.hasLabel(NodeTypes.LOCAL)).cast[nodes.Expression])
+  def expressionUp: Expression =
+    new Expression(raw.in(EdgeTypes.AST).not(_.hasLabel(NodeTypes.LOCAL)).cast[nodes.Expression])
 
   /**
     Traverse to sub expressions
     */
-  def expressionDown: Expression[Labels] =
-    new Expression[Labels](
+  def expressionDown: Expression =
+    new Expression(
       raw
         .out(EdgeTypes.AST)
         .not(_.hasLabel(NodeTypes.LOCAL))
@@ -43,8 +42,8 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
   /**
     If the expression is used as receiver for a call, this traverses to the call.
     */
-  def receivedCall: Call[Labels] =
-    new Call[Labels](
+  def receivedCall: Call =
+    new Call(
       raw
         .in(EdgeTypes.RECEIVER)
         .cast[nodes.Call]
@@ -53,8 +52,8 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
   /**
     Traverse to related parameter
     */
-  def toParameter: MethodParameter[Labels] = {
-    new MethodParameter[Labels](
+  def toParameter: MethodParameter = {
+    new MethodParameter(
       raw
         .sack((sack: Integer, node: nodes.Expression) => node.value2(NodeKeys.ARGUMENT_INDEX))
         .in(EdgeTypes.AST)
@@ -73,14 +72,14 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
   /**
     Traverse to enclosing method
     */
-  def method: Method[Labels] =
-    new Method[Labels](raw.in(EdgeTypes.CONTAINS).cast[nodes.Method])
+  def method: Method =
+    new Method(raw.in(EdgeTypes.CONTAINS).cast[nodes.Method])
 
   /**
     * Traverse to next expression in CFG.
     */
-  def cfgNext: Expression[Labels] =
-    new Expression[Labels](
+  def cfgNext: Expression =
+    new Expression(
       raw
         .out(EdgeTypes.CFG)
         .filterNot(_.hasLabel(NodeTypes.METHOD_RETURN))
@@ -90,8 +89,8 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
   /**
     * Traverse to previous expression in CFG.
     */
-  def cfgPrev: Expression[Labels] =
-    new Expression[Labels](
+  def cfgPrev: Expression =
+    new Expression(
       raw
         .in(EdgeTypes.CFG)
         .filterNot(_.hasLabel(NodeTypes.METHOD))
@@ -101,6 +100,6 @@ trait ExpressionBase[NodeType <: nodes.Expression, Labels <: HList]
   /**
     * Traverse to expression evaluation type
     * */
-  def typ: Type[Labels] =
+  def typ: Type =
     new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 }

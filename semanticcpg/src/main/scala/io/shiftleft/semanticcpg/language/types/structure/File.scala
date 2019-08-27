@@ -5,30 +5,27 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.NameAccessors
-import shapeless.HList
 
 /**
   * A compilation unit
   * */
-class File[Labels <: HList](raw: GremlinScala.Aux[nodes.File, Labels])
-    extends NodeSteps[nodes.File, Labels](raw)
-    with NameAccessors[nodes.File, Labels] {
+class File(raw: GremlinScala[nodes.File]) extends NodeSteps[nodes.File](raw) with NameAccessors[nodes.File] {
 
-  def typeDecl: TypeDecl[Labels] =
-    new TypeDecl[Labels](
+  def typeDecl: TypeDecl =
+    new TypeDecl(
       raw
         .out(EdgeTypes.AST)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.TYPE_DECL)
         .cast[nodes.TypeDecl])
 
-  def namespace: Namespace[Labels] =
-    new Namespace[Labels](raw.out(EdgeTypes.AST).out(EdgeTypes.REF).cast[nodes.Namespace])
+  def namespace: Namespace =
+    new Namespace(raw.out(EdgeTypes.AST).out(EdgeTypes.REF).cast[nodes.Namespace])
 
-  def namespaceBlock: NamespaceBlock[Labels] =
-    new NamespaceBlock[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[nodes.NamespaceBlock])
+  def namespaceBlock: NamespaceBlock =
+    new NamespaceBlock(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[nodes.NamespaceBlock])
 
-  def comment: Comment[Labels] =
-    new Comment[Labels](raw.out(EdgeTypes.AST).hasLabel(NodeTypes.COMMENT).cast[nodes.Comment])
+  def comment: Comment =
+    new Comment(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.COMMENT).cast[nodes.Comment])
 
 }

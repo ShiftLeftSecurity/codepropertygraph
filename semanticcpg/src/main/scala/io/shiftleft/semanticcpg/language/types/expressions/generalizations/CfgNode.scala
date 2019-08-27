@@ -6,18 +6,17 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.CodeAccessors
 import io.shiftleft.semanticcpg.language.types.structure.Method
 import io.shiftleft.semanticcpg.utils.ExpandTo
-import shapeless.HList
 
-class CfgNode[Labels <: HList](raw: GremlinScala.Aux[nodes.CfgNode, Labels])
-    extends NodeSteps[nodes.CfgNode, Labels](raw)
-    with CodeAccessors[nodes.CfgNode, Labels]
-    with AstNodeBase[nodes.CfgNode, Labels] {
+class CfgNode(raw: GremlinScala[nodes.CfgNode])
+    extends NodeSteps[nodes.CfgNode](raw)
+    with CodeAccessors[nodes.CfgNode]
+    with AstNodeBase[nodes.CfgNode] {
 
   /**
   Traverse to enclosing method
     */
-  def method: Method[Labels] = {
-    new Method[Labels](
+  def method: Method = {
+    new Method(
       raw
         .map {
           case method: nodes.Method =>

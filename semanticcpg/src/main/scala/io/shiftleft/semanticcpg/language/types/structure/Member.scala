@@ -7,63 +7,58 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.Call
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{DeclarationBase, Modifier}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.{CodeAccessors, EvalTypeAccessors, NameAccessors}
-import shapeless.HList
 
 /**
   * A member variable of a class/type.
   * */
-class Member[Labels <: HList](raw: GremlinScala.Aux[nodes.Member, Labels])
-    extends NodeSteps[nodes.Member, Labels](raw)
-    with DeclarationBase[nodes.Member, Labels]
-    with CodeAccessors[nodes.Member, Labels]
-    with NameAccessors[nodes.Member, Labels]
-    with EvalTypeAccessors[nodes.Member, Labels] {
+class Member(raw: GremlinScala[nodes.Member])
+    extends NodeSteps[nodes.Member](raw)
+    with DeclarationBase[nodes.Member]
+    with CodeAccessors[nodes.Member]
+    with NameAccessors[nodes.Member]
+    with EvalTypeAccessors[nodes.Member] {
 
   /**
     * The type declaration this member is defined in
     * */
-  def typeDecl: TypeDecl[Labels] =
-    new TypeDecl[Labels](raw.in(EdgeTypes.AST).cast[nodes.TypeDecl])
+  def typeDecl: TypeDecl =
+    new TypeDecl(raw.in(EdgeTypes.AST).cast[nodes.TypeDecl])
 
   /**
     * Places where
     * */
-  def ref: Call[Labels] =
-    new Call[Labels](raw.in(EdgeTypes.REF).cast[nodes.Call])
+  def ref: Call =
+    new Call(raw.in(EdgeTypes.REF).cast[nodes.Call])
 
   /**
     * Public members
     * */
-  def isPublic: Member[Labels] =
-    new Member[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PUBLIC)))
+  def isPublic: Member =
+    new Member(raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PUBLIC)))
 
   /**
     * Private members
     * */
-  def isPrivate: Member[Labels] =
-    new Member[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PRIVATE)))
+  def isPrivate: Member =
+    new Member(raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PRIVATE)))
 
   /**
     * Protected members
     * */
-  def isProtected: Member[Labels] =
-    new Member[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PROTECTED)))
+  def isProtected: Member =
+    new Member(raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.PROTECTED)))
 
   /**
     * Static members
     * */
-  def isStatic: Member[Labels] =
-    new Member[Labels](
-      raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.STATIC)))
+  def isStatic: Member =
+    new Member(raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.STATIC)))
 
   /**
     * Traverse to method modifiers, e.g., "static", "public".
     * */
-  def modifier: Modifier[Labels] =
-    new Modifier[Labels](
+  def modifier: Modifier =
+    new Modifier(
       raw.out
         .hasLabel(NodeTypes.MODIFIER)
         .cast[nodes.Modifier]
@@ -72,6 +67,6 @@ class Member[Labels <: HList](raw: GremlinScala.Aux[nodes.Member, Labels])
   /**
     * Traverse to member type
     * */
-  def typ: Type[Labels] =
+  def typ: Type =
     new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 }

@@ -3,28 +3,27 @@ package io.shiftleft.semanticcpg.language.types.propertyaccessors
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
-import shapeless.HList
 
-trait VersionAccessors[T <: StoredNode, Labels <: HList] extends StringPropertyAccessors[T, Labels] {
-  def version(): Steps[String, Labels] =
+trait VersionAccessors[T <: StoredNode] extends StringPropertyAccessors[T] {
+  def version(): Steps[String] =
     stringProperty(NodeKeys.VERSION)
 
-  def version(value: String): NodeSteps[T, Labels] =
+  def version(value: String): NodeSteps[T] =
     stringPropertyFilter(NodeKeys.VERSION, value)
 
-  def version(value: String*): NodeSteps[T, Labels] =
+  def version(value: String*): NodeSteps[T] =
     stringPropertyFilterMultiple(NodeKeys.VERSION, value: _*)
 
-  def versionExact(value: String): NodeSteps[T, Labels] =
+  def versionExact(value: String): NodeSteps[T] =
     stringPropertyFilterExact(NodeKeys.VERSION, value)
 
-  def versionExact(values: String*): NodeSteps[T, Labels] =
+  def versionExact(values: String*): NodeSteps[T] =
     stringPropertyFilterExactMultiple(NodeKeys.VERSION, values: _*)
 
-  def versionNot(value: String): NodeSteps[T, Labels] =
+  def versionNot(value: String): NodeSteps[T] =
     stringPropertyFilterNot(NodeKeys.VERSION, value)
 
-  def versionNot(values: String*): NodeSteps[T, Labels] =
+  def versionNot(values: String*): NodeSteps[T] =
     stringPropertyFilterNotMultiple(NodeKeys.VERSION, values: _*)
 
 }

@@ -3,7 +3,7 @@ package io.shiftleft.dataflowengine.language
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language.Steps
 
-class Flows(step: Steps[List[nodes.TrackingPoint], _]) {
+class Flows(step: Steps[List[nodes.TrackingPoint]]) {
   def p(): List[String] = {
     step.l.map { flow =>
       FlowPrettyPrinter.prettyPrint(flow)

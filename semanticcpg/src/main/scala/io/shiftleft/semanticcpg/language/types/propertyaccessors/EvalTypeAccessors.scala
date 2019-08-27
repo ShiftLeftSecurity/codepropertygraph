@@ -5,24 +5,23 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys}
 import io.shiftleft.codepropertygraph.predicates.Text.textRegex
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
-import shapeless.HList
 
-trait EvalTypeAccessors[T <: StoredNode, Labels <: HList] {
-  def raw: GremlinScala.Aux[T, Labels]
+trait EvalTypeAccessors[T <: StoredNode] {
+  def raw: GremlinScala[T]
 
-  def evalType(): Steps[String, Labels] =
-    new Steps[String, Labels](raw.out(EdgeTypes.EVAL_TYPE).out(EdgeTypes.REF).value(NodeKeys.FULL_NAME))
+  def evalType(): Steps[String] =
+    new Steps[String](raw.out(EdgeTypes.EVAL_TYPE).out(EdgeTypes.REF).value(NodeKeys.FULL_NAME))
 
-  def evalType(_value: String): NodeSteps[T, Labels] =
-    new NodeSteps[T, Labels](
+  def evalType(_value: String): NodeSteps[T] =
+    new NodeSteps[T](
       raw.filter(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
           .has(NodeKeys.FULL_NAME, textRegex(_value))))
 
-  def evalType(_values: String*): NodeSteps[T, Labels] =
+  def evalType(_values: String*): NodeSteps[T] =
     if (_values.nonEmpty) {
-      new NodeSteps[T, Labels](
+      new NodeSteps[T](
         raw.filter(
           _.out(EdgeTypes.EVAL_TYPE)
             .out(EdgeTypes.REF)
@@ -31,19 +30,19 @@ trait EvalTypeAccessors[T <: StoredNode, Labels <: HList] {
               trav.has(NodeKeys.FULL_NAME, textRegex(_value))
             }: _*)))
     } else {
-      new NodeSteps[T, Labels](raw.filterOnEnd(_ => false))
+      new NodeSteps[T](raw.filterOnEnd(_ => false))
     }
 
-  def evalTypeExact(_value: String): NodeSteps[T, Labels] =
-    new NodeSteps[T, Labels](
+  def evalTypeExact(_value: String): NodeSteps[T] =
+    new NodeSteps[T](
       raw.filter(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
           .has(NodeKeys.FULL_NAME, _value)))
 
-  def evalTypeExact(_values: String*): NodeSteps[T, Labels] =
+  def evalTypeExact(_values: String*): NodeSteps[T] =
     if (_values.nonEmpty) {
-      new NodeSteps[T, Labels](
+      new NodeSteps[T](
         raw.filter(
           _.out(EdgeTypes.EVAL_TYPE)
             .out(EdgeTypes.REF)
@@ -52,19 +51,19 @@ trait EvalTypeAccessors[T <: StoredNode, Labels <: HList] {
               trav.has(NodeKeys.FULL_NAME, _value)
             }: _*)))
     } else {
-      new NodeSteps[T, Labels](raw.filterOnEnd(_ => false))
+      new NodeSteps[T](raw.filterOnEnd(_ => false))
     }
 
-  def evalTypeNot(_value: String): NodeSteps[T, Labels] =
-    new NodeSteps[T, Labels](
+  def evalTypeNot(_value: String): NodeSteps[T] =
+    new NodeSteps[T](
       raw.filter(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
           .hasNot(NodeKeys.FULL_NAME, textRegex(_value))))
 
-  def evalTypeNot(_values: String*): NodeSteps[T, Labels] =
+  def evalTypeNot(_values: String*): NodeSteps[T] =
     if (_values.nonEmpty) {
-      new NodeSteps[T, Labels](
+      new NodeSteps[T](
         raw.filter(
           _.out(EdgeTypes.EVAL_TYPE)
             .out(EdgeTypes.REF)
@@ -73,6 +72,6 @@ trait EvalTypeAccessors[T <: StoredNode, Labels <: HList] {
               trav.hasNot(NodeKeys.FULL_NAME, textRegex(_value))
             }: _*)))
     } else {
-      new NodeSteps[T, Labels](raw)
+      new NodeSteps[T](raw)
     }
 }

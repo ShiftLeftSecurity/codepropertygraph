@@ -5,10 +5,8 @@ import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
 import io.shiftleft.codepropertygraph.generated.EdgeKeys
 import gremlin.scala._
 import io.shiftleft.passes.DiffGraph
-import shapeless.HList
 
-class NewNodeSteps[A <: NewNode, Labels <: HList](override val raw: GremlinScala.Aux[A, Labels])
-    extends Steps[A, Labels](raw) {
+class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Steps[A](raw) {
 
   def store()(implicit graph: DiffGraph): Unit =
     raw.sideEffect(storeRecursively).iterate()

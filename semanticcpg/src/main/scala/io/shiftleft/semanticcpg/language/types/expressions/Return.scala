@@ -10,14 +10,13 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors.{
   LineNumberAccessors,
   OrderAccessors
 }
-import shapeless.HList
 
 // TODO: ColumnNumberAccessor missing
 
-class Return[Labels <: HList](raw: GremlinScala.Aux[nodes.Return, Labels])
-    extends NodeSteps[nodes.Return, Labels](raw)
-    with ExpressionBase[nodes.Return, Labels]
-    with LineNumberAccessors[nodes.Return, Labels]
-    with OrderAccessors[nodes.Return, Labels]
-    with ArgumentIndexAccessors[nodes.Return, Labels]
-    with CodeAccessors[nodes.Return, Labels] {}
+class Return(raw: GremlinScala[nodes.Return])
+    extends NodeSteps[nodes.Return](raw)
+    with ExpressionBase[nodes.Return]
+    with LineNumberAccessors[nodes.Return]
+    with OrderAccessors[nodes.Return]
+    with ArgumentIndexAccessors[nodes.Return]
+    with CodeAccessors[nodes.Return] {}
