@@ -1,4 +1,4 @@
-package io.shiftleft.metrics
+package io.shiftleft.utils.metrics
 
 trait Measure {
   def currentValue: Long

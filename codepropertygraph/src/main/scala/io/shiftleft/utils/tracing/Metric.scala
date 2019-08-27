@@ -1,4 +1,4 @@
-package io.shiftleft.metrics
+package io.shiftleft.utils.metrics
 
 import java.io.PrintStream
 import java.text.DecimalFormat
