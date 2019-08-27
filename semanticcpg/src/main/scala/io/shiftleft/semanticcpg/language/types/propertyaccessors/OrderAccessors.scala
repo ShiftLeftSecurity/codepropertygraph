@@ -3,21 +3,20 @@ package io.shiftleft.semanticcpg.language.types.propertyaccessors
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
-import shapeless.HList
 
-trait OrderAccessors[T <: StoredNode, Labels <: HList] extends PropertyAccessors[T, Labels] {
-  def order(): Steps[Integer, Labels] =
+trait OrderAccessors[T <: StoredNode] extends PropertyAccessors[T] {
+  def order(): Steps[Integer] =
     property(NodeKeys.ORDER)
 
-  def order(value: Integer): NodeSteps[T, Labels] =
+  def order(value: Integer): NodeSteps[T] =
     propertyFilter(NodeKeys.ORDER, value)
 
-  def order(value: Integer*): NodeSteps[T, Labels] =
+  def order(value: Integer*): NodeSteps[T] =
     propertyFilterMultiple(NodeKeys.ORDER, value: _*)
 
-  def orderNot(value: Integer): NodeSteps[T, Labels] =
+  def orderNot(value: Integer): NodeSteps[T] =
     propertyFilterNot(NodeKeys.ORDER, value)
 
-  def orderNot(values: Integer*): NodeSteps[T, Labels] =
+  def orderNot(values: Integer*): NodeSteps[T] =
     propertyFilterNotMultiple(NodeKeys.ORDER, values: _*)
 }

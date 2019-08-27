@@ -3,23 +3,22 @@ package io.shiftleft.semanticcpg.language.types.propertyaccessors
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
-import shapeless.HList
 
-trait MethodInstFullNameAccessors[T <: StoredNode, Labels <: HList] extends PropertyAccessors[T, Labels] {
+trait MethodInstFullNameAccessors[T <: StoredNode] extends PropertyAccessors[T] {
 
-  def methodInstFullName(): Steps[String, Labels] =
+  def methodInstFullName(): Steps[String] =
     property(NodeKeys.METHOD_INST_FULL_NAME)
 
-  def methodInstFullName(value: String): NodeSteps[T, Labels] =
+  def methodInstFullName(value: String): NodeSteps[T] =
     propertyFilter(NodeKeys.METHOD_INST_FULL_NAME, value)
 
-  def methodInstFullName(value: String*): NodeSteps[T, Labels] =
+  def methodInstFullName(value: String*): NodeSteps[T] =
     propertyFilterMultiple(NodeKeys.METHOD_INST_FULL_NAME, value: _*)
 
-  def methodInstFullNameNot(value: String): NodeSteps[T, Labels] =
+  def methodInstFullNameNot(value: String): NodeSteps[T] =
     propertyFilterNot(NodeKeys.METHOD_INST_FULL_NAME, value)
 
-  def methodInstFullNameNot[Out](values: String*): NodeSteps[T, Labels] =
+  def methodInstFullNameNot[Out](values: String*): NodeSteps[T] =
     propertyFilterNotMultiple(NodeKeys.METHOD_INST_FULL_NAME, values: _*)
 
 }

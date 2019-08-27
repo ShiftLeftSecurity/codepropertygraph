@@ -2,7 +2,6 @@ package io.shiftleft.dataflowengine
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language.Steps
-import shapeless.HList
 
 import io.shiftleft.semanticcpg.language._
 
@@ -19,8 +18,7 @@ package object language {
   implicit def trackingPointBaseMethodsQp(node: nodes.TrackingPointBase): TrackingPointMethods =
     new TrackingPointMethods(node.asInstanceOf[nodes.TrackingPoint])
 
-  implicit def toTrackingPoint[NodeType <: nodes.TrackingPointBase, Labels <: HList](
-      steps: Steps[NodeType, Labels]): TrackingPoint[Labels] =
-    new TrackingPoint[Labels](steps.raw.cast[nodes.TrackingPoint])
+  implicit def toTrackingPoint[NodeType <: nodes.TrackingPointBase](steps: Steps[NodeType]): TrackingPoint =
+    new TrackingPoint(steps.raw.cast[nodes.TrackingPoint])
 
 }

@@ -6,7 +6,6 @@ import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.{Matchers, WordSpec}
-import shapeless.HNil
 
 import scala.collection.mutable
 
@@ -103,47 +102,6 @@ class StepsTest extends WordSpec with Matchers {
     var i = 0
     fixture.cpg.method.sideEffect(_ => i = i + 1).exec
     i should be > 0
-  }
-
-  "as/select" should {
-    "select all by default" in ExistingCpgFixture("splitmeup") { fixture =>
-      val results: List[(nodes.Method, nodes.MethodReturn)] =
-        fixture.cpg.method.as("method").methodReturn.as("methodReturn").select.toList
-
-      results.size should be > 0
-    }
-
-    "allow to select a single label" in ExistingCpgFixture("splitmeup") { fixture =>
-      val methodReturnLabel = StepLabel[nodes.MethodReturn]("methodReturn")
-      val methodLabel = StepLabel[nodes.Method]("method")
-      val results: List[nodes.MethodReturn] =
-        fixture.cpg.method.as(methodLabel).methodReturn.as(methodReturnLabel).select(methodReturnLabel).toList
-
-      results.size should be > 0
-    }
-
-    "allow to select multiple labels" in ExistingCpgFixture("splitmeup") { fixture =>
-      val methodReturnLabel = StepLabel[nodes.MethodReturn]("methodReturn")
-      val methodLabel = StepLabel[nodes.Method]("method")
-      val results: List[(nodes.MethodReturn, nodes.Method)] =
-        fixture.cpg.method
-          .as(methodLabel)
-          .methodReturn
-          .as(methodReturnLabel)
-          .select((methodReturnLabel, methodLabel))
-          .toList
-
-      results.size should be > 0
-    }
-  }
-
-  "raw traversals" should {
-    "allow typed as/select" in ExistingCpgFixture("splitmeup") { fixture =>
-      val raw = fixture.cpg.namespace.raw.asInstanceOf[GremlinScala.Aux[Vertex, HNil]]
-      val _: List[(Vertex, Edge)] = raw.as("a").outE.as("b").select.toList
-    // all that matters is that the result type is (Vertex, Edge)
-    // for more options with as/select on raw, see https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala
-    }
   }
 
   "toJson" in ExistingCpgFixture("splitmeup") { fixture =>

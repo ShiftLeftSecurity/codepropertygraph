@@ -6,16 +6,15 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.{Call, Literal}
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Modifier
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.{FullNameAccessors, NameAccessors, SignatureAccessors}
-import shapeless.HList
 
-class MethodInst[Labels <: HList](override val raw: GremlinScala.Aux[nodes.MethodInst, Labels])
-    extends NodeSteps[nodes.MethodInst, Labels](raw)
-    with NameAccessors[nodes.MethodInst, Labels]
-    with FullNameAccessors[nodes.MethodInst, Labels]
-    with SignatureAccessors[nodes.MethodInst, Labels] {
+class MethodInst(override val raw: GremlinScala[nodes.MethodInst])
+    extends NodeSteps[nodes.MethodInst](raw)
+    with NameAccessors[nodes.MethodInst]
+    with FullNameAccessors[nodes.MethodInst]
+    with SignatureAccessors[nodes.MethodInst] {
 
-  def method: Method[Labels] = {
-    new Method[Labels](
+  def method: Method = {
+    new Method(
       raw.out(EdgeTypes.REF).cast[nodes.Method]
     )
   }
@@ -23,60 +22,60 @@ class MethodInst[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Metho
   /**
     * Traverse to parameters of method.
     * */
-  def parameter: MethodParameter[Labels] = {
+  def parameter: MethodParameter = {
     method.parameter
   }
 
   /**
     * Traverse to formal return parameter of method.
     * */
-  def methodReturn: MethodReturn[Labels] = {
+  def methodReturn: MethodReturn = {
     method.methodReturn
   }
 
   /**
     * Traverse to the type declarations were method is in the VTable.
     */
-  def inVTableOfTypeDecl: TypeDecl[Labels] = {
+  def inVTableOfTypeDecl: TypeDecl = {
     method.inVTableOfTypeDecl
   }
 
   /**
     * Traverse to direct and transitive callers of the method.
     * */
-  def calledBy(sourceTrav: Method[Labels])(implicit callResolver: ICallResolver): Method[Labels] = {
+  def calledBy(sourceTrav: Method)(implicit callResolver: ICallResolver): Method = {
     caller(callResolver).calledByIncludingSink(sourceTrav)(callResolver)
   }
 
   /**
     * Traverse to direct and transitive callers of the method.
     * */
-  def calledBy(sourceTrav: MethodInst[Labels])(implicit callResolver: ICallResolver): Method[Labels] = {
+  def calledBy(sourceTrav: MethodInst)(implicit callResolver: ICallResolver): Method = {
     caller(callResolver).calledByIncludingSink(sourceTrav.method)(callResolver)
   }
 
   /**
     * Traverse to direct callers of this method
     * */
-  def caller(implicit callResolver: ICallResolver): Method[Labels] = {
+  def caller(implicit callResolver: ICallResolver): Method = {
     callIn(callResolver).method
   }
 
   /**
     * Traverse to methods called by method.
     * */
-  def callee(implicit callResolver: ICallResolver): Method[Labels] = {
+  def callee(implicit callResolver: ICallResolver): Method = {
     method.callee(callResolver)
   }
 
   /**
     * Incoming call sites
     * */
-  def callIn(implicit callResolver: ICallResolver): Call[Labels] = {
+  def callIn(implicit callResolver: ICallResolver): Call = {
     // Check whether possible call sides are resolved or resolve them.
     // We only do this for virtual method calls.
     // TODO Also resolve function pointers.
-    new Call[Labels](
+    new Call(
       sideEffect(callResolver.resolveDynamicMethodInstCallSites).raw
         .in(EdgeTypes.CALL)
         .cast[nodes.Call])
@@ -85,112 +84,112 @@ class MethodInst[Labels <: HList](override val raw: GremlinScala.Aux[nodes.Metho
   /**
     * Outgoing call sites of method.
     * */
-  def callOut: Call[Labels] = {
+  def callOut: Call = {
     method.callOut
   }
 
   /**
     * The type declaration associated with method.
     * */
-  def definingTypeDecl: TypeDecl[Labels] = {
+  def definingTypeDecl: TypeDecl = {
     method.definingTypeDecl
   }
 
   /**
     * The method in which the method is defined.
     * */
-  def definingMethod: Method[Labels] = {
+  def definingMethod: Method = {
     method.definingMethod
   }
 
   /**
     * Traverse only to methods that are stubs, e.g., their code is not available
     * */
-  def isStub: MethodInst[Labels] = {
+  def isStub: MethodInst = {
     filter(_.method.isStub)
   }
 
   /**
     * Traverse only to methods that are not stubs.
     * */
-  def isNotStub: MethodInst[Labels] = {
+  def isNotStub: MethodInst = {
     filter(_.method.isNotStub)
   }
 
   /**
     * Traverse to public methods
     * */
-  def isPublic: MethodInst[Labels] = {
+  def isPublic: MethodInst = {
     filter(_.method.isPublic)
   }
 
   /**
     * Traverse to private methods
     * */
-  def isPrivate: MethodInst[Labels] = {
+  def isPrivate: MethodInst = {
     filter(_.method.isPublic)
   }
 
   /**
     * Traverse to protected methods
     * */
-  def isProtected: MethodInst[Labels] = {
+  def isProtected: MethodInst = {
     filter(_.method.isProtected)
   }
 
   /**
     * Traverse to abstract methods
     * */
-  def isAbstract: MethodInst[Labels] = {
+  def isAbstract: MethodInst = {
     filter(_.method.isAbstract)
   }
 
   /**
     * Traverse to static methods
     * */
-  def isStatic: MethodInst[Labels] = {
+  def isStatic: MethodInst = {
     filter(_.method.isStatic)
   }
 
   /**
     * Traverse to native methods
     * */
-  def isNative: MethodInst[Labels] = {
+  def isNative: MethodInst = {
     filter(_.method.isNative)
   }
 
   /**
     * Traverse to constructors, that is, keep methods that are constructors
     * */
-  def isConstructor: MethodInst[Labels] = {
+  def isConstructor: MethodInst = {
     filter(_.method.isConstructor)
   }
 
   /**
     * Traverse to virtual method
     * */
-  def isVirtual: MethodInst[Labels] = {
+  def isVirtual: MethodInst = {
     filter(_.method.isVirtual)
   }
 
   /**
     * Traverse to method modifiers of method.
     * */
-  def modifier: Modifier[Labels] = {
+  def modifier: Modifier = {
     method.modifier
   }
 
   /**
     * Traverse to the methods local variables.
     * */
-  def local: Local[Labels] = {
+  def local: Local = {
     method.local
   }
 
   /**
     * Traverse to literals used in method.
     * */
-  def literal: Literal[Labels] = {
+  def literal: Literal = {
     method.literal
   }
 }

@@ -6,47 +6,46 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.Identifier
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.DeclarationBase
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
-import shapeless.HList
 
 /**
   * A local variable
   * */
-class Local[Labels <: HList](raw: GremlinScala.Aux[nodes.Local, Labels])
-    extends NodeSteps[nodes.Local, Labels](raw)
-    with DeclarationBase[nodes.Local, Labels]
-    with CodeAccessors[nodes.Local, Labels]
-    with NameAccessors[nodes.Local, Labels]
-    with OrderAccessors[nodes.Local, Labels]
-    with LineNumberAccessors[nodes.Local, Labels]
-    with EvalTypeAccessors[nodes.Local, Labels] {
+class Local(raw: GremlinScala[nodes.Local])
+    extends NodeSteps[nodes.Local](raw)
+    with DeclarationBase[nodes.Local]
+    with CodeAccessors[nodes.Local]
+    with NameAccessors[nodes.Local]
+    with OrderAccessors[nodes.Local]
+    with LineNumberAccessors[nodes.Local]
+    with EvalTypeAccessors[nodes.Local] {
 
   /**
     * The method hosting this local variable
     * */
-  def method: Method[Labels] = {
+  def method: Method = {
     // TODO The following line of code is here for backwards compatibility.
     // Use the lower commented out line once not required anymore.
-    new Method[Labels](raw.repeat(_.in(EdgeTypes.AST)).until(_.hasLabel(NodeTypes.METHOD)).cast[nodes.Method])
+    new Method(raw.repeat(_.in(EdgeTypes.AST)).until(_.hasLabel(NodeTypes.METHOD)).cast[nodes.Method])
     //definingBlock.method
   }
 
   /**
     * The block in which local is declared.
     */
-  def definingBlock: Block[Labels] =
-    new Block[Labels](raw.in(EdgeTypes.AST).cast[nodes.Block])
+  def definingBlock: Block =
+    new Block(raw.in(EdgeTypes.AST).cast[nodes.Block])
 
   /**
     * Places (identifier) where this local is referenced
     * */
-  def referencingIdentifiers: Identifier[Labels] =
-    new Identifier[Labels](raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
+  def referencingIdentifiers: Identifier =
+    new Identifier(raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
     * The type of the local.
     *
     * Unfortunately, `type` is a keyword, so we use `typ` here.
     * */
-  def typ: Type[Labels] =
-    new Type[Labels](raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+  def typ: Type =
+    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 }

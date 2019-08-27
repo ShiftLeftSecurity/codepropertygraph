@@ -8,7 +8,6 @@ import io.shiftleft.semanticcpg.language.nodemethods.{AstNodeMethods, CfgNodeMet
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
-import shapeless.{HList, HNil}
 
 /**
   Language for traversing the code property graph
@@ -32,87 +31,84 @@ package object language {
   // then you need to add an implicit conversion from `Steps[NodeType,Labels]` to your type
   // here.
 
-  implicit def toLiteral[Labels <: HList](steps: Steps[nodes.Literal, Labels]): Literal[Labels] =
-    new Literal[Labels](steps.raw)
+  implicit def toLiteral(steps: Steps[nodes.Literal]): Literal =
+    new Literal(steps.raw)
 
-  implicit def toType[Labels <: HList](steps: Steps[nodes.Type, Labels]): Type[Labels] =
-    new Type[Labels](steps.raw)
+  implicit def toType(steps: Steps[nodes.Type]): Type =
+    new Type(steps.raw)
 
-  implicit def toTypeDecl[Labels <: HList](steps: Steps[nodes.TypeDecl, Labels]): TypeDecl[Labels] =
-    new TypeDecl[Labels](steps.raw)
+  implicit def toTypeDecl(steps: Steps[nodes.TypeDecl]): TypeDecl =
+    new TypeDecl(steps.raw)
 
-  implicit def toCall[Labels <: HList](steps: Steps[nodes.Call, Labels]): Call[Labels] =
-    new Call[Labels](steps.raw)
+  implicit def toCall(steps: Steps[nodes.Call]): Call =
+    new Call(steps.raw)
 
-  implicit def toControlStructure[Labels <: HList](
-      steps: Steps[nodes.ControlStructure, Labels]): ControlStructure[Labels] =
-    new ControlStructure[Labels](steps.raw)
+  implicit def toControlStructure(steps: Steps[nodes.ControlStructure]): ControlStructure =
+    new ControlStructure(steps.raw)
 
-  implicit def toIdentifier[Labels <: HList](steps: Steps[nodes.Identifier, Labels]): Identifier[Labels] =
-    new Identifier[Labels](steps.raw)
+  implicit def toIdentifier(steps: Steps[nodes.Identifier]): Identifier =
+    new Identifier(steps.raw)
 
-  implicit def toMember[Labels <: HList](steps: Steps[nodes.Member, Labels]): Member[Labels] =
-    new Member[Labels](steps.raw)
+  implicit def toMember(steps: Steps[nodes.Member]): Member =
+    new Member(steps.raw)
 
-  implicit def toLocal[Labels <: HList](steps: Steps[nodes.Local, Labels]): Local[Labels] =
-    new Local[Labels](steps.raw)
+  implicit def toLocal(steps: Steps[nodes.Local]): Local =
+    new Local(steps.raw)
 
-  implicit def toMethodInst[Labels <: HList](steps: Steps[nodes.MethodInst, Labels]): MethodInst[Labels] =
-    new MethodInst[Labels](steps.raw)
+  implicit def toMethodInst(steps: Steps[nodes.MethodInst]): MethodInst =
+    new MethodInst(steps.raw)
 
-  implicit def toMethod[Labels <: HList](steps: Steps[nodes.Method, Labels]): Method[Labels] =
-    new Method[Labels](steps.raw)
+  implicit def toMethod(steps: Steps[nodes.Method]): Method =
+    new Method(steps.raw)
 
-  implicit def toMethodParameter[Labels <: HList](
-      steps: Steps[nodes.MethodParameterIn, Labels]): MethodParameter[Labels] =
-    new MethodParameter[Labels](steps.raw)
+  implicit def toMethodParameter(steps: Steps[nodes.MethodParameterIn]): MethodParameter =
+    new MethodParameter(steps.raw)
 
-  implicit def toMethodParameterOut[Labels <: HList](
-      steps: Steps[nodes.MethodParameterOut, Labels]): MethodParameterOut[Labels] =
-    new MethodParameterOut[Labels](steps.raw)
+  implicit def toMethodParameterOut(steps: Steps[nodes.MethodParameterOut]): MethodParameterOut =
+    new MethodParameterOut(steps.raw)
 
-  implicit def toMethodReturn[Labels <: HList](steps: Steps[nodes.MethodReturn, Labels]): MethodReturn[Labels] =
-    new MethodReturn[Labels](steps.raw)
+  implicit def toMethodReturn(steps: Steps[nodes.MethodReturn]): MethodReturn =
+    new MethodReturn(steps.raw)
 
-  implicit def toNamespace[Labels <: HList](steps: Steps[nodes.Namespace, Labels]): Namespace[Labels] =
-    new Namespace[Labels](steps.raw)
+  implicit def toNamespace(steps: Steps[nodes.Namespace]): Namespace =
+    new Namespace(steps.raw)
 
-  implicit def toNamespaceBlock[Labels <: HList](steps: Steps[nodes.NamespaceBlock, Labels]): NamespaceBlock[Labels] =
-    new NamespaceBlock[Labels](steps.raw)
+  implicit def toNamespaceBlock(steps: Steps[nodes.NamespaceBlock]): NamespaceBlock =
+    new NamespaceBlock(steps.raw)
 
-  implicit def toModifier[Labels <: HList](steps: Steps[nodes.Modifier, Labels]): Modifier[Labels] =
-    new Modifier[Labels](steps.raw)
+  implicit def toModifier(steps: Steps[nodes.Modifier]): Modifier =
+    new Modifier(steps.raw)
 
-  implicit def toExpression[Labels <: HList](steps: Steps[nodes.Expression, Labels]): Expression[Labels] =
-    new Expression[Labels](steps.raw)
+  implicit def toExpression(steps: Steps[nodes.Expression]): Expression =
+    new Expression(steps.raw)
 
-  implicit def toDeclaration[Labels <: HList](steps: Steps[nodes.Declaration, Labels]): Declaration[Labels] =
-    new Declaration[Labels](steps.raw)
+  implicit def toDeclaration(steps: Steps[nodes.Declaration]): Declaration =
+    new Declaration(steps.raw)
 
-  implicit def toCfgNode[Labels <: HList](steps: Steps[nodes.CfgNode, Labels]): CfgNode[Labels] =
-    new CfgNode[Labels](steps.raw)
+  implicit def toCfgNode(steps: Steps[nodes.CfgNode]): CfgNode =
+    new CfgNode(steps.raw)
 
-  implicit def toAstNode[Labels <: HList](steps: Steps[nodes.AstNode, Labels]): AstNode[Labels] =
-    new AstNode[Labels](steps.raw)
+  implicit def toAstNode(steps: Steps[nodes.AstNode]): AstNode =
+    new AstNode(steps.raw)
 
-  implicit def toFile[Labels <: HList](steps: Steps[nodes.File, Labels]): File[Labels] =
-    new File[Labels](steps.raw)
+  implicit def toFile(steps: Steps[nodes.File]): File =
+    new File(steps.raw)
 
-  implicit def toBlock[Labels <: HList](steps: Steps[nodes.Block, Labels]): Block[Labels] =
-    new Block[Labels](steps.raw)
+  implicit def toBlock(steps: Steps[nodes.Block]): Block =
+    new Block(steps.raw)
 
-  implicit class GremlinScalaDeco[End, Labels <: HList](raw: GremlinScala.Aux[End, Labels]) {
+  implicit class GremlinScalaDeco[End](raw: GremlinScala[End]) {
     /* in some cases we cannot statically determine the type of the node, e.g. when traversing
      * from a known nodeType via AST edges, so we have to cast */
-    def cast[NodeType]: GremlinScala.Aux[NodeType, Labels] =
-      raw.asInstanceOf[GremlinScala.Aux[NodeType, Labels]]
+    def cast[NodeType]: GremlinScala[NodeType] =
+      raw.asInstanceOf[GremlinScala[NodeType]]
   }
 
   implicit def toNodeTypeStarters(cpg: Cpg): NodeTypeStarters =
     new NodeTypeStarters(cpg)
 
   private def newAnonymousTraversalWithAssociatedGraph[NodeType <: StoredNode](
-      seq: NodeType*): GremlinScala.Aux[NodeType, HNil] = {
+      seq: NodeType*): GremlinScala[NodeType] = {
     val anonymousTraversal = __[NodeType](seq: _*)
     if (seq.nonEmpty) {
       anonymousTraversal.traversal.asAdmin().setGraph(seq.head.graph)
@@ -125,8 +121,8 @@ package object language {
     /**
     Start a new traversal from this node
       */
-    def start: NodeSteps[NodeType, HNil] =
-      new NodeSteps[NodeType, HNil](newAnonymousTraversalWithAssociatedGraph(node))
+    def start: NodeSteps[NodeType] =
+      new NodeSteps[NodeType](newAnonymousTraversalWithAssociatedGraph(node))
   }
 
   implicit class NodeTypeDecoForSeq[NodeType <: nodes.StoredNode](seq: Seq[NodeType]) {
@@ -134,8 +130,8 @@ package object language {
     /**
     Start a new traversal from these nodes
       */
-    def start: NodeSteps[NodeType, HNil] =
-      new NodeSteps[NodeType, HNil](newAnonymousTraversalWithAssociatedGraph(seq: _*))
+    def start: NodeSteps[NodeType] =
+      new NodeSteps[NodeType](newAnonymousTraversalWithAssociatedGraph(seq: _*))
   }
 
   implicit class NewNodeTypeDeco[NodeType <: nodes.NewNode](node: NodeType) {
@@ -143,8 +139,8 @@ package object language {
     /**
     Start a new traversal from this node
       */
-    def start: NewNodeSteps[NodeType, HNil] =
-      new NewNodeSteps[NodeType, HNil](__[NodeType](node))
+    def start: NewNodeSteps[NodeType] =
+      new NewNodeSteps[NodeType](__[NodeType](node))
   }
 
   implicit class NewNodeTypeDecoForSeq[NodeType <: nodes.NewNode](seq: Seq[NodeType]) {
@@ -152,8 +148,8 @@ package object language {
     /**
     Start a new traversal from these nodes
       */
-    def start: NewNodeSteps[NodeType, HNil] =
-      new NewNodeSteps[NodeType, HNil](__[NodeType](seq: _*))
+    def start: NewNodeSteps[NodeType] =
+      new NewNodeSteps[NodeType](__[NodeType](seq: _*))
   }
 
   implicit class BaseNodeTypeDeco[NodeType <: nodes.Node](node: NodeType) {
@@ -161,8 +157,8 @@ package object language {
     /**
     Start a new traversal from this node
       */
-    def start: Steps[NodeType, HNil] =
-      new Steps[NodeType, HNil](__[NodeType](node))
+    def start: Steps[NodeType] =
+      new Steps[NodeType](__[NodeType](node))
   }
 
   implicit class BaseNodeTypeDecoForSeq[NodeType <: nodes.Node](seq: Seq[NodeType]) {
@@ -170,8 +166,8 @@ package object language {
     /**
     Start a new traversal from these nodes
       */
-    def start: Steps[NodeType, HNil] =
-      new Steps[NodeType, HNil](__[NodeType](seq: _*))
+    def start: Steps[NodeType] =
+      new Steps[NodeType](__[NodeType](seq: _*))
   }
 
 }

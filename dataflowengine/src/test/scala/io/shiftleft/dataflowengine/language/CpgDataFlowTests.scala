@@ -7,7 +7,6 @@ import io.shiftleft.semanticcpg.language.nodemethods.CfgNodeMethods
 import io.shiftleft.semanticcpg.language.types.expressions.Literal
 import io.shiftleft.semanticcpg.language.types.structure.{Member, Method}
 import org.scalatest.{Matchers, WordSpec}
-import shapeless.HNil
 
 class CpgDataFlowTests extends WordSpec with Matchers {
 
@@ -15,15 +14,15 @@ class CpgDataFlowTests extends WordSpec with Matchers {
     Some(x)
   }
 
-  protected def getMemberOfType(cpg: Cpg, typeName: String, memberName: String): Member[HNil] = {
+  protected def getMemberOfType(cpg: Cpg, typeName: String, memberName: String): Member = {
     cpg.typeDecl.nameExact(typeName).member.nameExact(memberName)
   }
 
-  protected def getMethodOfType(cpg: Cpg, typeName: String, methodName: String): Method[HNil] = {
+  protected def getMethodOfType(cpg: Cpg, typeName: String, methodName: String): Method = {
     cpg.typeDecl.nameExact(typeName).method.nameExact(methodName)
   }
 
-  protected def getLiteralOfType(cpg: Cpg, typeName: String, literalName: String): Literal[HNil] = {
+  protected def getLiteralOfType(cpg: Cpg, typeName: String, literalName: String): Literal = {
     cpg.typeDecl.nameExact(typeName).method.isLiteral.codeExact(literalName)
   }
 

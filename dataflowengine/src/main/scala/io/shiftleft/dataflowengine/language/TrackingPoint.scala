@@ -3,7 +3,6 @@ package io.shiftleft.dataflowengine.language
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
-import shapeless.HList
 import io.shiftleft.semanticcpg.language.types.structure.Method
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
@@ -14,8 +13,7 @@ import scala.collection.JavaConverters._
 /**
   * Base class for nodes that can occur in data flows
   * */
-class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, Labels])
-    extends NodeSteps[nodes.TrackingPoint, Labels](raw) {
+class TrackingPoint(raw: GremlinScala[nodes.TrackingPoint]) extends NodeSteps[nodes.TrackingPoint](raw) {
 
   private class ReachableByContainer(val reachedSource: nodes.TrackingPoint, val path: List[nodes.TrackingPoint]) {
     override def clone(): ReachableByContainer = {
@@ -26,31 +24,30 @@ class TrackingPoint[Labels <: HList](raw: GremlinScala.Aux[nodes.TrackingPoint, 
   /**
     * The enclosing method of the tracking point
     * */
-  def method: Method[Labels] = {
-    new Method[Labels](
+  def method: Method = {
+    new Method(
       raw.map { dataFlowObject =>
         methodFast(dataFlowObject)
       }
     )
   }
 
-  def reachableBy(sourceTravs: NodeSteps[nodes.TrackingPoint, _]*): TrackingPoint[Labels] = {
+  def reachableBy(sourceTravs: NodeSteps[nodes.TrackingPoint]*): TrackingPoint = {
     val pathReachables = reachableByInternal(sourceTravs)
     val reachedSources = pathReachables.map(_.reachedSource)
-    new TrackingPoint(
-      graph.asScala().inject(reachedSources: _*).asInstanceOf[GremlinScala.Aux[nodes.TrackingPoint, Labels]])
+    new TrackingPoint(graph.asScala().inject(reachedSources: _*).asInstanceOf[GremlinScala[nodes.TrackingPoint]])
   }
 
-  def reachableByFlows(sourceTravs: NodeSteps[nodes.TrackingPoint, _]*): Flows = {
+  def reachableByFlows(sourceTravs: NodeSteps[nodes.TrackingPoint]*): Flows = {
 
     val pathReachables = reachableByInternal(sourceTravs)
     val paths = pathReachables.map(_.path)
     new Flows(
-      new Steps[List[nodes.TrackingPoint], Labels](
-        graph.asScala().inject(paths: _*).asInstanceOf[GremlinScala.Aux[List[nodes.TrackingPoint], Labels]]))
+      new Steps[List[nodes.TrackingPoint]](
+        graph.asScala().inject(paths: _*).asInstanceOf[GremlinScala[List[nodes.TrackingPoint]]]))
   }
 
-  private def reachableByInternal(sourceTravs: Seq[NodeSteps[nodes.TrackingPoint, _]]): List[ReachableByContainer] = {
+  private def reachableByInternal(sourceTravs: Seq[NodeSteps[nodes.TrackingPoint]]): List[ReachableByContainer] = {
     val sourceSymbols = sourceTravs
       .flatMap(_.raw.clone.toList)
       .flatMap { elem =>

@@ -5,21 +5,19 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language.types.structure.File
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import org.json4s.native.Serialization.{write, writePretty}
-import shapeless.HList
 
 /**
   * Steps for all node types
   *
   * This is the base class for all steps defined on nodes.
   * */
-class NodeSteps[NodeType <: nodes.StoredNode, Labels <: HList](raw: GremlinScala.Aux[NodeType, Labels])
-    extends Steps[NodeType, Labels](raw) {
+class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) extends Steps[NodeType](raw) {
 
   /**
     * Traverse to source file
     * */
-  def file: File[Labels] =
-    new File[Labels](
+  def file: File =
+    new File(
       raw
         .choose(
           _.label.is(NodeTypes.NAMESPACE),
@@ -35,8 +33,8 @@ class NodeSteps[NodeType <: nodes.StoredNode, Labels <: HList](raw: GremlinScala
       .repeat(_.in(edgeType))
       .until(_.in(edgeType).count.is(P.eq(0)))
 
-  def toMaps(): Steps[Map[String, Any], Labels] =
-    new Steps[Map[String, Any], Labels](raw.map(_.toMap))
+  def toMaps(): Steps[Map[String, Any]] =
+    new Steps[Map[String, Any]](raw.map(_.toMap))
 
   /**
     Execute traversal and convert the result to json.

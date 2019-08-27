@@ -8,50 +8,49 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
 import io.shiftleft.semanticcpg.language.types.structure.{Member, Method, MethodInst, MethodReturn}
-import shapeless.HList
 
 /**
   A call site
   */
-class Call[Labels <: HList](raw: GremlinScala.Aux[nodes.Call, Labels])
-    extends NodeSteps[nodes.Call, Labels](raw)
-    with CodeAccessors[nodes.Call, Labels]
-    with NameAccessors[nodes.Call, Labels]
-    with OrderAccessors[nodes.Call, Labels]
-    with SignatureAccessors[nodes.Call, Labels]
-    with DispatchTypeAccessors[nodes.Call, Labels]
-    with LineNumberAccessors[nodes.Call, Labels]
-    with EvalTypeAccessors[nodes.Call, Labels]
-    with ExpressionBase[nodes.Call, Labels] {
+class Call(raw: GremlinScala[nodes.Call])
+    extends NodeSteps[nodes.Call](raw)
+    with CodeAccessors[nodes.Call]
+    with NameAccessors[nodes.Call]
+    with OrderAccessors[nodes.Call]
+    with SignatureAccessors[nodes.Call]
+    with DispatchTypeAccessors[nodes.Call]
+    with LineNumberAccessors[nodes.Call]
+    with EvalTypeAccessors[nodes.Call]
+    with ExpressionBase[nodes.Call] {
 
   /**
     Only statically dispatched calls
     */
-  def isStatic: Call[Labels] = dispatchType("STATIC_DISPATCH")
+  def isStatic: Call = dispatchType("STATIC_DISPATCH")
 
   /**
     Only dynamically dispatched calls
     */
-  def isDynamic: Call[Labels] = dispatchType("DYNAMIC_DISPATCH")
+  def isDynamic: Call = dispatchType("DYNAMIC_DISPATCH")
 
   /**
     The caller
     */
-  override def method: Method[Labels] =
-    new Method[Labels](raw.in(EdgeTypes.CONTAINS).hasLabel(NodeTypes.METHOD).cast[nodes.Method])
+  override def method: Method =
+    new Method(raw.in(EdgeTypes.CONTAINS).hasLabel(NodeTypes.METHOD).cast[nodes.Method])
 
   /**
     The callee method
     */
-  def calledMethod(implicit callResolver: ICallResolver): Method[Labels] = {
+  def calledMethod(implicit callResolver: ICallResolver): Method = {
     calledMethodInstance(callResolver).method
   }
 
   /**
    The callee method instance
     */
-  def calledMethodInstance(implicit callResolver: ICallResolver): MethodInst[Labels] =
-    new MethodInst[Labels](
+  def calledMethodInstance(implicit callResolver: ICallResolver): MethodInst =
+    new MethodInst(
       sideEffect(callResolver.resolveDynamicCallSite).raw
         .out(EdgeTypes.CALL)
         .cast[nodes.MethodInst])
@@ -59,20 +58,20 @@ class Call[Labels <: HList](raw: GremlinScala.Aux[nodes.Call, Labels])
   /**
     Arguments of the call
     */
-  def argument: Expression[Labels] =
-    new Expression[Labels](raw.out(EdgeTypes.AST).cast[nodes.Expression])
+  def argument: Expression =
+    new Expression(raw.out(EdgeTypes.AST).cast[nodes.Expression])
 
   /**
     `i'th` arguments of the call
     */
-  def argument(i: Integer): Expression[Labels] =
+  def argument(i: Integer): Expression =
     argument.order(i)
 
   /**
     To formal method return parameter
     */
-  def toMethodReturn: MethodReturn[Labels] =
-    new MethodReturn[Labels](
+  def toMethodReturn: MethodReturn =
+    new MethodReturn(
       raw
         .out(EdgeTypes.CALL)
         .out(EdgeTypes.REF)
@@ -83,7 +82,7 @@ class Call[Labels <: HList](raw: GremlinScala.Aux[nodes.Call, Labels])
   /**
     * Traverse to referenced members
     * */
-  def referencedMember: Member[Labels] = new Member(
+  def referencedMember: Member = new Member(
     raw.out(EdgeTypes.REF).cast[nodes.Member]
   )
 

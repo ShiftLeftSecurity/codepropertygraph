@@ -5,20 +5,19 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.NameAccessors
-import shapeless.HList
 
 /**
   * A namespace, e.g., Java package or C# namespace
   * */
-class Namespace[Labels <: HList](raw: GremlinScala.Aux[nodes.Namespace, Labels])
-    extends NodeSteps[nodes.Namespace, Labels](raw)
-    with NameAccessors[nodes.Namespace, Labels] {
+class Namespace(raw: GremlinScala[nodes.Namespace])
+    extends NodeSteps[nodes.Namespace](raw)
+    with NameAccessors[nodes.Namespace] {
 
   /**
     * The type declarations defined in this namespace
     * */
-  def typeDecl: TypeDecl[Labels] =
-    new TypeDecl[Labels](
+  def typeDecl: TypeDecl =
+    new TypeDecl(
       raw
         .in(EdgeTypes.REF)
         .out(EdgeTypes.AST)
@@ -28,8 +27,8 @@ class Namespace[Labels <: HList](raw: GremlinScala.Aux[nodes.Namespace, Labels])
   /**
     * Methods defined in this namespace
     * */
-  def method: Method[Labels] =
-    new Method[Labels](
+  def method: Method =
+    new Method(
       raw
         .in(EdgeTypes.REF)
         .out(EdgeTypes.AST)
@@ -40,14 +39,14 @@ class Namespace[Labels <: HList](raw: GremlinScala.Aux[nodes.Namespace, Labels])
     * External namespaces - any namespaces
     * which contain one or more external type.
     * */
-  def external: Namespace[Labels] =
+  def external: Namespace =
     new Namespace(filter(_.typeDecl.external).raw)
 
   /**
     * Internal namespaces - any namespaces
     * which contain one or more internal type
     * */
-  def internal: Namespace[Labels] =
+  def internal: Namespace =
     new Namespace(filter(_.typeDecl.internal).raw)
 
 }
