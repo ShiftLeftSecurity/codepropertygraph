@@ -20,7 +20,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
     val newNode = new TestNewNode
     new NewNodeSteps(__(newNode)).store
 
-    diffGraph.nodes shouldBe List(newNode)
+    diffGraph.nodes.toList shouldBe List(newNode)
   }
 
   "stores containedNodes and connecting edge" when {
