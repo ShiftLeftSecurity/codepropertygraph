@@ -505,12 +505,18 @@ class CDataFlowTests extends CpgDataFlowTests {
   "Test 15: conditional expressions (joern issue #91)" in {
     cpgFactory.buildCpg(
       """
-  int  _min(int x, int y) {
-    int z =  x<y ? x : y;
-    return z;
+  void  foo(bool x, void* y) {
+    void* z =  x ? f(y) : g(y);
+    return;
   }
       """.stripMargin
     ) { cpg =>
+      val source = cpg.method.parameter.name("y")
+      val sink = cpg.identifier.name("z")
+      val flows = sink.reachableByFlows(source).l
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(List(("foo(bool x, void* y)", Some(2)), ("g(y)", Some(3)), ("x ? f(y) : g(y)", Some(3)), ("* z =  x ? f(y) : g(y)", Some(3))),
+          List(("foo(bool x, void* y)", Some(2)), ("f(y)", Some(3)), ("x ? f(y) : g(y)", Some(3)), ("* z =  x ? f(y) : g(y)", Some(3))))
     }
   }
 
