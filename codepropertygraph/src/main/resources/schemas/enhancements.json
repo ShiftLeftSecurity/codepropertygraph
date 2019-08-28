@@ -15,7 +15,7 @@
         "id":307,"name" : "IMPLICIT_CALL",
           "keys" : ["CODE", "NAME", "SIGNATURE", "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
         "comment" : "An implicit call site hidden in a method indicated by METHOD_MAP policy entries",
-        "is": ["CALL_REPR", "CFG_NODE", "TRACKING_POINT"],
+        "is": ["CALL_REPR", "TRACKING_POINT"],
         "outEdges" : []
       },
 
