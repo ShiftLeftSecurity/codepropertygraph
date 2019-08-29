@@ -8,7 +8,7 @@ libraryDependencies ++= Seq(
   "io.shiftleft" % "codepropertygraph" % cpgVersion,
   "io.shiftleft" % "enhancements"  % cpgVersion,
 
-  "org.scalatest" %% "scalatest" % "3.0.3" % Test
+  "org.scalatest" %% "scalatest" % "3.0.8" % Test
 )
 
 ThisBuild / resolvers ++= Seq(

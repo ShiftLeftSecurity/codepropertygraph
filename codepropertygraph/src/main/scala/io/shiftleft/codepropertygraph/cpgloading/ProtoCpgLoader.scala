@@ -46,7 +46,7 @@ object ProtoCpgLoader {
   }
 
   def loadFromListOfProtos(cpgs: JList[CpgStruct], overflowDbConfig: OdbConfig): Cpg =
-    loadFromListOfProtos(cpgs.asScala, overflowDbConfig)
+    loadFromListOfProtos(cpgs.asScala.toSeq, overflowDbConfig)
 
   def loadOverlays(fileName: String): ManagedResource[Iterator[CpgOverlay]] =
     managed(new ZipArchive(fileName)).map(readOverlayEntries)

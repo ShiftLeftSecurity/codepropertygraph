@@ -73,7 +73,7 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     for (edge <- protoEdges) {
       val srcVertex = findVertexById(edge, edge.getSrc)
       val dstVertex = findVertexById(edge, edge.getDst)
-      val properties: Seq[Edge.Property] = edge.getPropertyList.asScala
+      val properties: Seq[Edge.Property] = edge.getPropertyList.asScala.toSeq
       val keyValues = new ArrayBuffer[AnyRef](2 * properties.size)
       for (edgeProperty <- properties) {
         addProperties(keyValues, edgeProperty.getName.name(), edgeProperty.getValue)

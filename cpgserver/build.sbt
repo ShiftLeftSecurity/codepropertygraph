@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.5.3",
   "net.databinder.dispatch" %% "dispatch-core" % "0.13.1",
 
-  "org.json4s"   %% "json4s-native" % "3.5.2",
+  "org.json4s"   %% "json4s-native" % "3.6.7",
   "ch.qos.logback" % "logback-classic" % "1.2.3" % "runtime",
   "org.eclipse.jetty" % "jetty-webapp" % "9.4.7.v20170914" % "container;compile",
   "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided"
