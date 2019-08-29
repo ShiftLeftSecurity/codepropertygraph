@@ -2,11 +2,14 @@ package io.shiftleft.passes
 
 import java.lang.{Long => JLong}
 
+import gnu.trove.set.hash.TCustomHashSet
+import gnu.trove.strategy.IdentityHashingStrategy
 import gremlin.scala.Edge
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import org.apache.logging.log4j.LogManager
 
 import scala.collection.mutable
+import scala.collection.JavaConverters._
 
 /**
   * A lightweight write-only graph used for creation of CPG graph overlays
@@ -23,25 +26,25 @@ import scala.collection.mutable
 class DiffGraph {
   import DiffGraph._
 
-  private val _edges = mutable.ListBuffer.empty[EdgeInDiffGraph]
-  private val _edgesToOriginal = mutable.ListBuffer.empty[EdgeToOriginal]
-  private val _edgesFromOriginal = mutable.ListBuffer.empty[EdgeFromOriginal]
-  private val _edgesInOriginal = mutable.ListBuffer.empty[EdgeInOriginal]
-  private val _nodeProperties = mutable.ListBuffer.empty[NodeProperty]
-  private val _edgeProperties = mutable.ListBuffer.empty[EdgeProperty]
+  private val _edges = mutable.ArrayBuffer.empty[EdgeInDiffGraph]
+  private val _edgesToOriginal = mutable.ArrayBuffer.empty[EdgeToOriginal]
+  private val _edgesFromOriginal = mutable.ArrayBuffer.empty[EdgeFromOriginal]
+  private val _edgesInOriginal = mutable.ArrayBuffer.empty[EdgeInOriginal]
+  private val _nodeProperties = mutable.ArrayBuffer.empty[NodeProperty]
+  private val _edgeProperties = mutable.ArrayBuffer.empty[EdgeProperty]
 
-  private var _nodes = Set[IdentityHashWrapper[NewNode]]()
+  private var _nodes = new TCustomHashSet[NewNode](IdentityHashingStrategy.INSTANCE)
 
-  def nodes: List[NewNode] = _nodes.toList.map(_.value)
-  def edges: List[EdgeInDiffGraph] = _edges.toList
-  def edgesToOriginal: List[EdgeToOriginal] = _edgesToOriginal.toList
-  def edgesFromOriginal: List[EdgeFromOriginal] = _edgesFromOriginal.toList
-  def edgesInOriginal: List[EdgeInOriginal] = _edgesInOriginal.toList
-  def nodeProperties: List[NodeProperty] = _nodeProperties.toList
-  def edgeProperties: List[EdgeProperty] = _edgeProperties.toList
+  def nodes: Iterator[NewNode] = _nodes.iterator().asScala
+  def edges: Vector[EdgeInDiffGraph] = _edges.toVector
+  def edgesToOriginal: Vector[EdgeToOriginal] = _edgesToOriginal.toVector
+  def edgesFromOriginal: Vector[EdgeFromOriginal] = _edgesFromOriginal.toVector
+  def edgesInOriginal: Vector[EdgeInOriginal] = _edgesInOriginal.toVector
+  def nodeProperties: Vector[NodeProperty] = _nodeProperties.toVector
+  def edgeProperties: Vector[EdgeProperty] = _edgeProperties.toVector
 
   def addNode(node: NewNode): Unit = {
-    _nodes += IdentityHashWrapper(node)
+    _nodes.add(node)
     incrementNodeCreatedCount()
   }
 
