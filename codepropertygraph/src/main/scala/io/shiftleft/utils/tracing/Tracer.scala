@@ -19,7 +19,6 @@ object Tracer {
   }
 
   def dump(): Unit = {
-    root.dump(System.out)    
+    root.dump(System.out)
   }
 }
-
