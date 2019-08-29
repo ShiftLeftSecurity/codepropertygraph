@@ -2,11 +2,11 @@ name := "codepropertygraph"
 inThisBuild(
   List(
     organization := "io.shiftleft",
-    scalaVersion := "2.12.8",
+    scalaVersion := "2.12.9",
+    crossScalaVersions := Seq("2.12.9", "2.13.0"),
     resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
-    crossPaths := false, // do not append scala version to the generated artifacts
     scmInfo := Some(ScmInfo(url("https://github.com/ShiftLeftSecurity/codepropertygraph"),
                             "scm:git@github.com:ShiftLeftSecurity/codepropertygraph.git")),
     homepage := Some(url("https://github.com/ShiftLeftSecurity/codepropertygraph/")),

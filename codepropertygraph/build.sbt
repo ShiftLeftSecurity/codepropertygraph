@@ -47,12 +47,17 @@ Compile / sourceGenerators += Def.task {
     println("regenerating domain classes")
     DomainClassCreator.run((Compile / sourceManaged).value)
 
+// # equivalent of `sourceManaged.in(Compile).value` in build.sbt
+// OUTPUT_DIR = '../../../../target/src_managed/main/io/shiftleft/codepropertygraph/generated'
     // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
     val cmd = "codepropertygraph/codegen/src/main/python/generateJava.py"
     val result = Seq(cmd).!
-    if (result == 0)
-      println(s"successfully called $cmd")
-    else
+    if (result == 0) {
+      val outputRootBF = better.files.File(outputRoot.toPath)
+      val generateJavaTmpOutput = better.files.File("codepropertygraph/target/generateJava")
+      generateJavaTmpOutput.children.foreach(_.moveToDirectory(outputRootBF))
+      println(s"successfully generated java files in $outputRoot")
+    } else
       throw new Exception(s"problem when calling $cmd. exitCode was $result")
   } else {
     println("no need to regenerate domain classes")
@@ -75,11 +80,13 @@ generateProtobuf := {
     // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
     val cmd = "codepropertygraph/codegen/src/main/python/generateProtobuf.py"
     val result = Seq(cmd).!
-    val file = (resourceManaged in Compile).value / "cpg.proto"
-    if (result == 0)
-      println(s"successfully called $cmd")
-    else
-      throw new Exception(s"problem when calling $cmd. exitCode was $result")
+    val scriptOutputFile = better.files.File("codepropertygraph/target/cpg.proto")
+    if (result == 0 && scriptOutputFile.exists) {
+      val outputBF = better.files.File(output.toPath)
+      outputBF.createIfNotExists(createParents = true)
+      scriptOutputFile.moveTo(outputBF)(better.files.File.CopyOptions(overwrite = true))
+      println(s"successfully wrote protobuf to $result")
+    } else throw new Exception(s"problem when calling $cmd. exitCode was $result")
   } else {
     println("no need to regenerate protobuf")
   }

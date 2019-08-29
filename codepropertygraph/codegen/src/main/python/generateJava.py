@@ -3,10 +3,9 @@
 import json, os
 
 # equivalent of `sourceManaged.in(Compile).value` in build.sbt
-OUTPUT_DIR = '../../../../target/src_managed/main/io/shiftleft/codepropertygraph/generated'
+OUTPUT_DIR = '../../../../target/generateJava/' # codepropertygraph/target
 
 def generateJava(cpgDescr):
-
     try:
         os.makedirs(OUTPUT_DIR)
     except FileExistsError:
