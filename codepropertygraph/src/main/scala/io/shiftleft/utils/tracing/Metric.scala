@@ -23,7 +23,7 @@ class Metric(val name: String) {
   def begin(timeMeasure: TimeMeasure): Unit = {
     this.startTime = timeMeasure.currentValue
   }
-  
+
   def end(timeMeasure: TimeMeasure): Unit = {
     val timeDelta = timeMeasure.currentValue - this.startTime
     this.invocations += 1
@@ -37,26 +37,28 @@ class Metric(val name: String) {
     val df = new DecimalFormat("#.##s")
     df.format(seconds)
   }
-  
+
   def dump(writer: PrintStream = System.out, parent: Option[Metric] = None, level: Int = 0): Unit = {
     val indent = "  " * level + "+"
     val percentageFormat = new DecimalFormat("#.#")
     val percentage = parent match {
       case None => ""
-      case Some(m) => 
+      case Some(m) =>
         if (m.totalTime != 0)
           percentageFormat.format(this.totalTime.toDouble / m.totalTime * 100) + "%"
         else
           "100%"
     }
-    writer.println(indent + this.name + " "
-      + percentage + " "
-      + s"""total=${formatTime(totalTime)}, n=${invocations}, maxTime=${formatTime(maxTime)}, minTime=${formatTime(minTime)}"""
-      + s""", threadId=${initialThreadId}"""
-      )
-    _inner
-      .toList
+    writer.println(
+      indent + this.name + " "
+        + percentage + " "
+        + s"""total=${formatTime(totalTime)}, n=${invocations}, maxTime=${formatTime(maxTime)}, minTime=${formatTime(
+          minTime
+        )}"""
+        + s""", threadId=${initialThreadId}"""
+    )
+    _inner.toList
       .sortBy { case (k, m) => m.totalTime }
-      .foreach { case (k, m) => m.dump(writer, Some(this), level + 1)}
+      .foreach { case (k, m) => m.dump(writer, Some(this), level + 1) }
   }
 }
