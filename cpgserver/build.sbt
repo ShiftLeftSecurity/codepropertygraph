@@ -1,4 +1,4 @@
-val ScalatraVersion = "2.6.5"
+val ScalatraVersion = "2.7.0-RC1"
 organization := "io.shiftleft"
 name := "CPG server"
 
@@ -13,9 +13,9 @@ libraryDependencies ++= Seq(
   "org.scalatra" %% "scalatra-json" % ScalatraVersion,
   "org.scalatra" %% "scalatra-swagger"  % ScalatraVersion,
 
-  "com.github.pathikrit" %% "better-files"  % "3.1.0",
-  "com.typesafe.akka" %% "akka-actor" % "2.5.3",
-  "net.databinder.dispatch" %% "dispatch-core" % "0.13.1",
+  "com.github.pathikrit" %% "better-files"  % "3.8.0",
+  "com.typesafe.akka" %% "akka-actor" % "2.5.25",
+  // "net.databinder.dispatch" %% "dispatch-core" % "0.13.1",
 
   "org.json4s"   %% "json4s-native" % "3.6.7",
   "ch.qos.logback" % "logback-classic" % "1.2.3" % "runtime",
