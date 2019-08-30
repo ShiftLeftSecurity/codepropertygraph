@@ -63,7 +63,7 @@ object DomainClassCreator {
         private var errorMap = Set[(Class[_], String)]()
         private val logger = LoggerFactory.getLogger(getClass)
 
-        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String) {
+        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
           if (!errorMap.contains((clazz, propertyName))) {
             logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
             errorMap += ((clazz, propertyName))
@@ -199,7 +199,7 @@ object DomainClassCreator {
         private var errorMap = Set[(Class[_], String)]()
         private val logger = LoggerFactory.getLogger(getClass)
 
-        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String) {
+        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
           if (!errorMap.contains((clazz, propertyName))) {
             logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
             errorMap += ((clazz, propertyName))
