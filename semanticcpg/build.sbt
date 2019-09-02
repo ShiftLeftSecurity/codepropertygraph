@@ -8,7 +8,7 @@ libraryDependencies ++= Seq(
   "com.massisframework" % "j-text-utils" % "0.3.4",
   "org.scalatest"       %% "scalatest"       % "3.0.8" % Test,
   "org.scalatest" %% "scalatest" % "3.0.8" % Test,
-  "io.shiftleft" %% "fuzzyc2cpg" % Versions.fuzzyc2cpg % Test exclude("io.shiftleft", "codepropertygraph") exclude("io.shiftleft", "codepropertygraph-protos")
+  "io.shiftleft" %% "fuzzyc2cpg" % Versions.fuzzyc2cpg % Test
 )
 
 scalacOptions in (Compile, doc) ++= Seq(
