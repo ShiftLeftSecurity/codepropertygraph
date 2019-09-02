@@ -1,11 +1,10 @@
 package io.shiftleft.dataflowengine.language
 
-import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 
 import io.shiftleft.semanticcpg.language._
 
-class CDataFlowTests2 extends WordSpec with Matchers {
+class FreeListDataFlowTests extends WordSpec with Matchers {
 
   val code = """| #include <stdlib.h>
                 | struct node {
