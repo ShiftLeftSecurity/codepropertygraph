@@ -56,7 +56,7 @@ object DomainClassCreator {
       import org.apache.tinkerpop.gremlin.structure.Property
       import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
       import io.shiftleft.overflowdb.{EdgeLayoutInformation, EdgeFactory, NodeFactory, OdbEdge, OdbNode, OdbGraph, NodeRef}
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       import org.slf4j.LoggerFactory
 
       object PropertyErrorRegister {
@@ -190,7 +190,7 @@ object DomainClassCreator {
       import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
       import io.shiftleft.overflowdb.{EdgeFactory, NodeFactory, NodeLayoutInformation, OdbNode, OdbGraph, OdbNodeProperty, NodeRef}
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       import org.slf4j.LoggerFactory
       import io.shiftleft.codepropertygraph.generated.edges
       import io.shiftleft.codepropertygraph.generated.edges._

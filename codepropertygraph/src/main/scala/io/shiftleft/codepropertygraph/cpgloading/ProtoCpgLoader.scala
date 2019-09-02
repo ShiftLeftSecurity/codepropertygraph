@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager
 import resource.{ManagedResource, managed}
 import java.util.{List => JList}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import io.shiftleft.overflowdb.OdbConfig
 
 object ProtoCpgLoader {

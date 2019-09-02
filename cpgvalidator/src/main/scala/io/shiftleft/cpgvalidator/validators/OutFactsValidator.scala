@@ -7,7 +7,7 @@ import io.shiftleft.cpgvalidator._
 import io.shiftleft.cpgvalidator.facts.OutFactsImporter
 import org.apache.tinkerpop.gremlin.structure.Direction
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class OutFactsValidator extends Validator {
 

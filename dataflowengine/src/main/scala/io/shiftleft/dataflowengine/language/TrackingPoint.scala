@@ -8,7 +8,7 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   * Base class for nodes that can occur in data flows

@@ -11,7 +11,7 @@ import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
 import org.apache.tinkerpop.gremlin.structure.Direction
 import io.shiftleft.semanticcpg.language._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
   var dfHelper: DataFlowFrameworkHelper = _

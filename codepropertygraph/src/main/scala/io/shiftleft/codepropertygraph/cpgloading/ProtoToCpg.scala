@@ -11,7 +11,7 @@ import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.{T, Vertex}
 import io.shiftleft.overflowdb.OdbGraph
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable.ArrayBuffer
 import io.shiftleft.overflowdb.OdbConfig
 
