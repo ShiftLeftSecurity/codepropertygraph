@@ -11,6 +11,7 @@ object CpgServerApiInfo
       "Docs for the CPG Server API",
       "http://github.com/ShiftLeftSecurity/codepropertygraph",
       ContactInfo("Fabian Yamaguchi", "fabs@shiftleft.io", "https://www.shiftleft.io"),
-      LicenseInfo("Apache2", "https://www.apache.org/licenses/LICENSE-2.0"))
+      LicenseInfo("Apache2", "https://www.apache.org/licenses/LICENSE-2.0")
+    )
 
 class CpgServerSwagger extends Swagger(Swagger.SpecVersion, "1.0.0", CpgServerApiInfo)
