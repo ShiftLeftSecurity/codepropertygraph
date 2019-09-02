@@ -53,10 +53,9 @@ Compile / sourceGenerators += Def.task {
     val cmd = "codepropertygraph/codegen/src/main/python/generateJava.py"
     val result = Seq(cmd).!
     if (result == 0) {
-      val outputRootBF = better.files.File(outputRoot.toPath)
       val generateJavaTmpOutput = better.files.File("codepropertygraph/target/generateJava")
       generateJavaTmpOutput.children.foreach(
-        _.copyToDirectory(outputRootBF)(copyOptions = better.files.File.CopyOptions(overwrite = true)))
+        _.copyToDirectory(better.files.File(outputRoot.toPath))(copyOptions = better.files.File.CopyOptions(overwrite = true)))
       println(s"successfully generated java files in $outputRoot")
     } else
       throw new Exception(s"problem when calling $cmd. exitCode was $result")
@@ -72,7 +71,7 @@ Compile / sourceGenerators += Def.task {
 
 lazy val generateProtobuf = taskKey[File]("generate cpg.proto")
 generateProtobuf := {
-  val output: File = resourceManaged.in(Compile).value / "cpg.proto"
+  val output = better.files.File((resourceManaged.in(Compile).value / "cpg.proto").toPath)
 
   val currentMd5 = FileUtils.md5(List(
     new File("codepropertygraph/codegen/src/main"),
@@ -83,16 +82,15 @@ generateProtobuf := {
     val result = Seq(cmd).!
     val scriptOutputFile = better.files.File("codepropertygraph/target/cpg.proto")
     if (result == 0 && scriptOutputFile.exists) {
-      val outputBF = better.files.File(output.toPath)
-      outputBF.createIfNotExists(createParents = true)
-      scriptOutputFile.moveTo(outputBF)(better.files.File.CopyOptions(overwrite = true))
+      output.createIfNotExists(createParents = true)
+      scriptOutputFile.moveTo(output)(better.files.File.CopyOptions(overwrite = true))
       println(s"successfully wrote protobuf to $result")
     } else throw new Exception(s"problem when calling $cmd. exitCode was $result")
   } else {
     println("no need to regenerate protobuf")
   }
   GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
-  output
+  output.toJava
 }
 generateProtobuf := generateProtobuf.dependsOn(mergeSchemaTask).value
 
