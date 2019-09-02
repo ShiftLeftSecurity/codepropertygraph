@@ -572,7 +572,7 @@ object DomainClassCreator {
                 case values: List[_] => 
                   values.map { value => 
                     new OdbNodeProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
-                  }.toIterator.asJava
+                  }.iterator.asJava
                 case value => IteratorUtils.of(new OdbNodeProperty(-1, this, key, value.asInstanceOf[A]))
               }
           }

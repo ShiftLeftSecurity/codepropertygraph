@@ -6,7 +6,7 @@ class ScalatraBootstrap extends LifeCycle {
 
   implicit val swagger = new CpgServerSwagger
 
-  override def init(context: ServletContext) {
+  override def init(context: ServletContext): Unit = {
     context.mount(new CpgServerController(new TestServerImpl), "/*")
     context.mount(new ResourcesApp, "/api-docs")
   }

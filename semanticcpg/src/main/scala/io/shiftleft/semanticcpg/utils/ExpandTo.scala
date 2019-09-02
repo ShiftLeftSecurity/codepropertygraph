@@ -135,7 +135,7 @@ object ExpandTo {
       .toSeq
   }
 
-  def allCfgNodesOfMethod(method: Vertex): TraversableOnce[Vertex] = {
+  def allCfgNodesOfMethod(method: Vertex): IterableOnce[Vertex] = {
     method.vertices(Direction.OUT, EdgeTypes.CONTAINS).asScala
   }
 

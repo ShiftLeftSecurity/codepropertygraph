@@ -26,13 +26,13 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       var worklist = Set[Vertex]()
       var out = Map[Vertex, Set[Vertex]]().withDefaultValue(Set[Vertex]())
       var in = Map[Vertex, Set[Vertex]]().withDefaultValue(Set[Vertex]())
-      val allCfgNodes = ExpandTo.allCfgNodesOfMethod(method).toList
+      val allCfgNodes = ExpandTo.allCfgNodesOfMethod(method)
 
       val mapExpressionsGens = dfHelper.expressionsToGenMap(method).withDefaultValue(Set[Vertex]())
       val mapExpressionsKills = dfHelper.expressionsToKillMap(method).withDefaultValue(Set[Vertex]())
 
       /*Initialize the OUT sets*/
-      allCfgNodes.foreach { cfgNode =>
+      allCfgNodes.iterator.foreach { cfgNode =>
         if (mapExpressionsGens.contains(cfgNode)) {
           out += cfgNode -> mapExpressionsGens(cfgNode)
         }

@@ -6,7 +6,7 @@ import java.nio.file.{FileSystem, FileSystems, FileVisitResult, Files, Path, Pat
 import java.util.{Collection => JCollection}
 
 import scala.collection.mutable.ArrayBuffer
-import collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class ZipArchive(inputFile: String) extends Closeable {
   private val zipFileSystem: FileSystem = FileSystems.newFileSystem(Paths.get(inputFile), null)
