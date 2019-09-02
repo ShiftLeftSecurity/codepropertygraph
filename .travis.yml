@@ -23,10 +23,10 @@ matrix:
     - unzip $PROTOC_PKG -d $PROTOC_TARGET
     - protoc --version
     script:
-    - sbt +test scalafmtCheck
+    - sbt test scalafmtCheck
     after_success:
     - if [[ "$TRAVIS_BRANCH" == "master" && $TRAVIS_PULL_REQUEST = 'false' ]]; then
-      travis_wait 60 sbt ci-cross-release-sonatype; fi
+      travis_wait 60 sbt ci-release-sonatype; fi
     before_cache:
     - find $HOME/.sbt -name "*.lock" -type f -delete
     - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
