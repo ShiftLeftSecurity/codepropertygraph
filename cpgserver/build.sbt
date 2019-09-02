@@ -15,7 +15,6 @@ libraryDependencies ++= Seq(
 
   "com.github.pathikrit" %% "better-files"  % "3.8.0",
   "com.typesafe.akka" %% "akka-actor" % "2.5.25",
-  // "net.databinder.dispatch" %% "dispatch-core" % "0.13.1",
 
   "org.json4s"   %% "json4s-native" % "3.6.7",
   "ch.qos.logback" % "logback-classic" % "1.2.3" % "runtime",
