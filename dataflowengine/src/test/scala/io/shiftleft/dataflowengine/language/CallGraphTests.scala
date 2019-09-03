@@ -1,9 +1,8 @@
-package io.shiftleft.semanticcpg.language.types.structure
+package io.shiftleft.dataflowengine.language
 
-import io.shiftleft.semanticcpg.language.NoResolve
-import org.scalatest.{Matchers, WordSpec}
-import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.{NoResolve, _}
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
+import org.scalatest.{Matchers, WordSpec}
 
 class CallGraphTests extends WordSpec with Matchers {
 

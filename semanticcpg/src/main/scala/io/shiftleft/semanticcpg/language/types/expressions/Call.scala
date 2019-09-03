@@ -40,22 +40,6 @@ class Call(raw: GremlinScala[nodes.Call])
     new Method(raw.in(EdgeTypes.CONTAINS).hasLabel(NodeTypes.METHOD).cast[nodes.Method])
 
   /**
-    The callee method
-    */
-  def calledMethod(implicit callResolver: ICallResolver): Method = {
-    calledMethodInstance(callResolver).method
-  }
-
-  /**
-   The callee method instance
-    */
-  def calledMethodInstance(implicit callResolver: ICallResolver): MethodInst =
-    new MethodInst(
-      sideEffect(callResolver.resolveDynamicCallSite).raw
-        .out(EdgeTypes.CALL)
-        .cast[nodes.MethodInst])
-
-  /**
     Arguments of the call
     */
   def argument: Expression =
