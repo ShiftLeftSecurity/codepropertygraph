@@ -38,6 +38,7 @@ name := "codepropertygraph"
 publish / skip := true
 
 // parsed by project/Utils.scala
+
 val fuzzyc2cpgVersion = "0.1.82"
 
 lazy val codepropertygraph = Projects.codepropertygraph
