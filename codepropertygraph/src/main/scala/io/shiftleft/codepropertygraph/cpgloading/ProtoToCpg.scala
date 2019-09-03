@@ -1,10 +1,8 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
 import java.lang.{Boolean => JBoolean, Integer => JInt, Long => JLong}
-import java.util
 import java.util.{NoSuchElementException, Collection => JCollection, Iterator => JIterator}
 
-import gnu.trove.map.hash.THashMap
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.{Edge, Node}
 import io.shiftleft.proto.cpg.Cpg.PropertyValue
