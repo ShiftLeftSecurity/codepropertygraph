@@ -1,4 +1,4 @@
-package io.shiftleft.dataflowengine.language
+package io.shiftleft.callgraph.language
 
 import io.shiftleft.codepropertygraph.generated.nodes
 

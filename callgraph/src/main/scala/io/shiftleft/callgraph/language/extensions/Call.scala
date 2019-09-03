@@ -1,11 +1,10 @@
-package io.shiftleft.dataflowengine.language.extensions
+package io.shiftleft.callgraph.language.extensions
 
+import io.shiftleft.callgraph.language.ICallResolver
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.dataflowengine.language.ICallResolver
-import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod}
-import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
-import io.shiftleft.semanticcpg.language.types.structure.{MethodInst => OriginalMethodInst}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
+import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod, MethodInst => OriginalMethodInst}
 
 class Call(original : OriginalCall) {
 

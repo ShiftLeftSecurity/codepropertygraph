@@ -1,11 +1,11 @@
-package io.shiftleft.dataflowengine.language.extensions
+package io.shiftleft.callgraph.language.extensions
 
 import gremlin.scala._
+import io.shiftleft.callgraph.language.ICallResolver
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.dataflowengine.language.ICallResolver
-import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod, MethodInst => OriginalMethodInst}
-import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
+import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod, MethodInst => OriginalMethodInst}
 
 class Method(original : OriginalMethod) {
 
@@ -69,14 +69,14 @@ class Method(original : OriginalMethod) {
   /**
     * Traverse to direct and transitive callers of the method.
     * */
-  def calledBy(sourceTrav: OriginalMethod)(implicit callResolver: ICallResolver): Method = {
+  def calledBy(sourceTrav: OriginalMethod)(implicit callResolver: ICallResolver): OriginalMethod = {
     new Method(caller(callResolver)).calledByIncludingSink(sourceTrav)(callResolver)
   }
 
   /**
     * Traverse to direct and transitive callers of the method.
     * */
-  def calledBy(sourceTrav: OriginalMethodInst)(implicit callResolver: ICallResolver): Method = {
+  def calledBy(sourceTrav: OriginalMethodInst)(implicit callResolver: ICallResolver): OriginalMethod = {
     new Method(caller(callResolver)).calledByIncludingSink(sourceTrav.method)(callResolver)
   }
 
@@ -84,7 +84,7 @@ class Method(original : OriginalMethod) {
   /**
     * Outgoing call sites to methods where fullName matches `regex`.
     * */
-  def callOut(regex: String)(implicit callResolver: ICallResolver): Call =
+  def callOut(regex: String)(implicit callResolver: ICallResolver): OriginalCall =
     original.callOut.filter(new Call(_).calledMethod.fullName(regex))
 
 

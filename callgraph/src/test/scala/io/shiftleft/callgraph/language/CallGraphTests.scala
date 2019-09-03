@@ -1,6 +1,6 @@
-package io.shiftleft.dataflowengine.language
+package io.shiftleft.callgraph.language
 
-import io.shiftleft.semanticcpg.language.{_}
+import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 
