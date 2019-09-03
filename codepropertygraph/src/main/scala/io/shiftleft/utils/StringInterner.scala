@@ -7,7 +7,7 @@ trait StringInterner {
 }
 
 object StringInterner {
-  val DefaultMaxStringLength: Int = 64
+  val DefaultMaxStringLength: Int = 1024
   val DefaultInitialSize: Int = 64 * 1024
 
   val noop: StringInterner = new StringInterner {
