@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 
 import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.semanticcpg.language.{ICallResolver, NodeSteps}
+import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language.types.structure.Block
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions._
@@ -95,10 +95,10 @@ trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
   )
 
   /**
-  Cast to call if applicable and filter for callee fullName `calleeRegex`
+  Cast to call if applicable and filter on call code `calleeRegex`
     */
-  def isCall(calleeRegex: String)(implicit callResolver: ICallResolver): Call =
-    isCall.filter(_.calledMethod.fullName(calleeRegex))
+  def isCall(calleeRegex: String): Call =
+    isCall.filter(_.code(calleeRegex))
 
   /**
     * Traverse only to AST nodes that are literals
