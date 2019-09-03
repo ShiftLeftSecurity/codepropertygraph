@@ -2,7 +2,7 @@ package io.shiftleft
 
 import java.io.{File, IOException}
 import java.net.{URI, URISyntaxException}
-import java.nio.file.{FileSystem, FileSystemAlreadyExistsException, FileSystems, Files}
+import java.nio.file.{FileSystem, FileSystems, Files}
 import java.util
 
 import io.shiftleft.proto.cpg.Cpg
@@ -32,14 +32,7 @@ class SerializedCpg() {
     env.put("create", "true")
     val fileUri = new File(filename).toURI
     val outputUri = new URI("jar:" + fileUri.getScheme, null, fileUri.getPath, null)
-    try {
-      zipFileSystem = FileSystems.newFileSystem(outputUri, env)
-    } catch {
-      case _: FileSystemAlreadyExistsException => {
-        zipFileSystem = FileSystems.getFileSystem(outputUri)
-      }
-      case exception: RuntimeException => throw exception
-    }
+    zipFileSystem = FileSystems.newFileSystem(outputUri, env)
   }
 
   /**
