@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import java.io.{IOException, InputStream}
+import java.io.InputStream
 import java.nio.file.{Files, Path}
 
 import io.shiftleft.codepropertygraph.Cpg

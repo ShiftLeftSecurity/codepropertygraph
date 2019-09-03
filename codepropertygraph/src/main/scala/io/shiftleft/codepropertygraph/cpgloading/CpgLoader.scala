@@ -5,7 +5,6 @@ import io.shiftleft.codepropertygraph.generated.NodeKeys
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import io.shiftleft.overflowdb.OdbGraph
-import io.shiftleft.overflowdb.OdbConfig
 
 object CpgLoader {
 

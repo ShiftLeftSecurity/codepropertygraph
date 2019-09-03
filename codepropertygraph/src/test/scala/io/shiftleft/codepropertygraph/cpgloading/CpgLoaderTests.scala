@@ -1,0 +1,65 @@
+package io.shiftleft.codepropertygraph.cpgloading
+
+import io.shiftleft.overflowdb.OdbGraph
+import org.scalatest.{Matchers, WordSpec}
+
+/**
+  * Specification of the CPGLoader. The loader allows CPGs to be loaded
+  * from the CPG protobuf file format (based on Google protocol buffers).
+  * An optional `CpgLoaderConfig` can be passed to the loader to influence
+  * the loading process.
+  * */
+class CpgLoaderTests extends WordSpec with Matchers {
+
+  val filename = "resources/testcode/cpgs/hello-shiftleft-0.0.5/cpg.bin.zip"
+
+  "CpgLoader" should {
+
+    /**
+      * CpgLoader receives the filename of the CPG that
+      * is to be loaded.
+      */
+    "allow loading of CPG from bin.zip file" in {
+      val cpg = CpgLoader.load(filename)
+      cpg.graph.vertices().hasNext shouldBe true
+    }
+
+    /**
+      * By default, the returned by the CpgLoader will be backed by overflowdb
+      * - making it possible to hold graphs larger than your RAM. This feature
+      * can be disabled to increase performance when it is known that the graph
+      * will fit into RAM.
+      * */
+    "allow disabling the overflowdb backend" in {
+      val config = new CpgLoaderConfig()
+      config.overflowDbConfig.disableOverflow()
+      val cpg = CpgLoader.load(filename, config)
+      cpg.graph.vertices().hasNext shouldBe true
+    }
+
+    /**
+      * By default, indexes will be created for the CPG in order to increase
+      * performance of traversals. The downside is that graph modifications
+      * become more expensive as indexes need to be updated on each modification.
+      * If a large number of updates is to be performed on the CPG after loading it,
+      * it may make sense to defer creation of indexes such that is is performed
+      * after modifications have been made.
+      * */
+    "allow late creation of indexes" in {
+      // Do not create indexes on load
+      val config = new CpgLoaderConfig(createIndexes = false)
+      val cpg = CpgLoader.load(filename, config)
+
+      // ... execute lots of operations on the graph
+      val vertex = cpg.graph.addVertex("METHOD")
+      // ...
+
+      cpg.graph.asInstanceOf[OdbGraph].getIndexedKeys(vertex.getClass).toArray shouldBe Array()
+      // Now create indexes
+      CpgLoader.createIndexes(cpg)
+      cpg.graph.asInstanceOf[OdbGraph].getIndexedKeys(vertex.getClass).toArray shouldBe Array("FULL_NAME")
+    }
+
+  }
+
+}
