@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import io.shiftleft.overflowdb.OdbGraph
+import io.shiftleft.overflowdb.{OdbConfig, OdbGraph}
 import org.scalatest.{Matchers, WordSpec}
 
 /**
@@ -25,14 +25,12 @@ class CpgLoaderTests extends WordSpec with Matchers {
     }
 
     /**
-      * By default, the returned by the CpgLoader will be backed by overflowdb
-      * - making it possible to hold graphs larger than your RAM. This feature
-      * can be disabled to increase performance when it is known that the graph
-      * will fit into RAM.
+      * By default, the returned by the CpgLoader will NOT be backed by overflowdb
+      * - limiting usage to graphs that fit into RAM. Overflowdb can be enabled
+      * by passing a CpgLoaderConfig as follows.
       * */
     "allow disabling the overflowdb backend" in {
-      val config = new CpgLoaderConfig()
-      config.overflowDbConfig.disableOverflow()
+      val config = new CpgLoaderConfig(overflowDbConfig = new OdbConfig())
       val cpg = CpgLoader.load(filename, config)
       cpg.graph.vertices().hasNext shouldBe true
     }
