@@ -3,11 +3,11 @@ package io.shiftleft.semanticcpg.language.types.expressions
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.language.{ICallResolver, NodeSteps}
+import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
-import io.shiftleft.semanticcpg.language.types.structure.{Member, Method, MethodInst, MethodReturn}
+import io.shiftleft.semanticcpg.language.types.structure.{Member, Method, MethodReturn}
 
 /**
   A call site

@@ -41,19 +41,6 @@ class MethodInst(override val raw: GremlinScala[nodes.MethodInst])
   }
 
   /**
-    * Incoming call sites
-    * */
-  def callIn(implicit callResolver: ICallResolver): Call = {
-    // Check whether possible call sides are resolved or resolve them.
-    // We only do this for virtual method calls.
-    // TODO Also resolve function pointers.
-    new Call(
-      sideEffect(callResolver.resolveDynamicMethodInstCallSites).raw
-        .in(EdgeTypes.CALL)
-        .cast[nodes.Call])
-  }
-
-  /**
     * Outgoing call sites of method.
     * */
   def callOut: Call = {

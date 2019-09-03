@@ -1,4 +1,4 @@
-package io.shiftleft.semanticcpg.language
+package io.shiftleft.dataflowengine.language
 
 import io.shiftleft.codepropertygraph.generated.nodes
 
