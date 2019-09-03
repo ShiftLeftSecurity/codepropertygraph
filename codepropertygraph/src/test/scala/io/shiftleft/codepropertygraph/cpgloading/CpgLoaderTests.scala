@@ -25,7 +25,7 @@ class CpgLoaderTests extends WordSpec with Matchers {
     }
 
     /**
-      * By default, the returned by the CpgLoader will NOT be backed by overflowdb
+      * By default, the CPG returned by the CpgLoader will NOT be backed by overflowdb
       * - limiting usage to graphs that fit into RAM. Overflowdb can be enabled
       * by passing a CpgLoaderConfig as follows.
       * */
