@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language.Steps
 import io.shiftleft.semanticcpg.language._
 
-
 package object language {
 
   // TODO MP: rather use `start` mechanism?

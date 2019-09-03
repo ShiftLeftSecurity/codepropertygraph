@@ -6,7 +6,7 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod, MethodInst => OriginalMethodInst}
 
-class Call(original : OriginalCall) {
+class Call(original: OriginalCall) {
 
   /**
   The callee method
@@ -20,7 +20,9 @@ class Call(original : OriginalCall) {
     */
   def calledMethodInstance(implicit callResolver: ICallResolver): OriginalMethodInst =
     new OriginalMethodInst(
-      original.sideEffect(callResolver.resolveDynamicCallSite).raw
+      original
+        .sideEffect(callResolver.resolveDynamicCallSite)
+        .raw
         .out(EdgeTypes.CALL)
         .cast[nodes.MethodInst])
 

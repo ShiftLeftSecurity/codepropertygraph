@@ -7,14 +7,14 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod, MethodInst => OriginalMethodInst}
 
-class Method(original : OriginalMethod) {
+class Method(original: OriginalMethod) {
 
   /**
     * Intended for internal use!
     * Traverse to direct and transitive callers of the method.
     */
   def calledByIncludingSink(sourceTrav: OriginalMethod, resolve: Boolean = true)(
-    implicit callResolver: ICallResolver): OriginalMethod = {
+      implicit callResolver: ICallResolver): OriginalMethod = {
     val sourceMethods = sourceTrav.raw.toSet
     val sinkMethods = original.raw.dedup.toList()
 
@@ -60,7 +60,9 @@ class Method(original : OriginalMethod) {
     * */
   def callIn(implicit callResolver: ICallResolver): OriginalCall = {
     new OriginalCall(
-      original.sideEffect(callResolver.resolveDynamicMethodCallSites).raw
+      original
+        .sideEffect(callResolver.resolveDynamicMethodCallSites)
+        .raw
         .in(EdgeTypes.REF)
         .in(EdgeTypes.CALL)
         .cast[nodes.Call])
@@ -80,12 +82,10 @@ class Method(original : OriginalMethod) {
     new Method(caller(callResolver)).calledByIncludingSink(sourceTrav.method)(callResolver)
   }
 
-
   /**
     * Outgoing call sites to methods where fullName matches `regex`.
     * */
   def callOut(regex: String)(implicit callResolver: ICallResolver): OriginalCall =
     original.callOut.filter(new Call(_).calledMethod.fullName(regex))
-
 
 }

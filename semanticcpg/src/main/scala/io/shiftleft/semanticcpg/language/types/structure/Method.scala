@@ -3,7 +3,13 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{AstNodeBase, CfgNode, DeclarationBase, Expression, Modifier}
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{
+  AstNodeBase,
+  CfgNode,
+  DeclarationBase,
+  Expression,
+  Modifier
+}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.{Call, ControlStructure, Literal}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._

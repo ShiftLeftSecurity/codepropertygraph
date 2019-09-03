@@ -6,7 +6,7 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod, MethodInst => OriginalMethodInst}
 
-class MethodInst(original : OriginalMethodInst) {
+class MethodInst(original: OriginalMethodInst) {
 
   /**
     * Traverse to direct and transitive callers of the method.
@@ -44,11 +44,11 @@ class MethodInst(original : OriginalMethodInst) {
     // We only do this for virtual method calls.
     // TODO Also resolve function pointers.
     new OriginalCall(
-      original.sideEffect(callResolver.resolveDynamicMethodInstCallSites).raw
+      original
+        .sideEffect(callResolver.resolveDynamicMethodInstCallSites)
+        .raw
         .in(EdgeTypes.CALL)
         .cast[nodes.Call])
   }
-
-
 
 }

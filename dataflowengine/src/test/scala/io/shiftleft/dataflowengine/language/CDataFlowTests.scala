@@ -517,7 +517,8 @@ class CDataFlowTests extends CpgDataFlowTests {
       flows.map(flow => flowToResultPairs(flow)).toSet shouldBe Set(
         List[(String, Option[Integer])](
           ("foo(bool x, void* y)", 2),
-          ("g(y)", 3), ("x ? f(y) : g(y)", 3),
+          ("g(y)", 3),
+          ("x ? f(y) : g(y)", 3),
           ("* z =  x ? f(y) : g(y)", 3)
         ),
         List[(String, Option[Integer])](
