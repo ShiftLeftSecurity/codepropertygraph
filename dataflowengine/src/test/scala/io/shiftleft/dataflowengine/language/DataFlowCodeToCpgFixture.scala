@@ -2,7 +2,7 @@ package io.shiftleft.dataflowengine.language
 
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.dataflowengine.passes.dataflows.DataFlowRunner
+import io.shiftleft.dataflowengine.layers.dataflows.DataFlowRunner
 import io.shiftleft.semanticcpg.layers.EnhancementRunner
 import io.shiftleft.semanticcpg.testfixtures.{CodeToCpgFixture, LanguageFrontend}
 import io.shiftleft.dataflowengine.semanticsloader.SemanticsLoader

@@ -140,7 +140,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
                            dstGraph: DiffGraph): Unit = {
     var loggedDeprecationWarning = false
     val sourceTraversal = cpg.graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*)
-    val sourceIterator = new Steps(sourceTraversal).toIterator
+    val sourceIterator = new Steps(sourceTraversal).toIterator()
     sourceIterator.foreach { srcNode =>
       if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
         // for `UNKNOWN` this is not always set, so we're using an Option here
