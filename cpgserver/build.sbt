@@ -6,6 +6,7 @@ resolvers += Classpaths.typesafeReleases
 
 dependsOn(Projects.codepropertygraph)
 dependsOn(Projects.semanticcpg)
+dependsOn(Projects.dataflowengine)
 
 libraryDependencies ++= Seq(
   "org.scalatra" %% "scalatra" % ScalatraVersion,

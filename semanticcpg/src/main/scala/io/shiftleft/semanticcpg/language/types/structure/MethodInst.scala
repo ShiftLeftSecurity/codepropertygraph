@@ -41,47 +41,6 @@ class MethodInst(override val raw: GremlinScala[nodes.MethodInst])
   }
 
   /**
-    * Traverse to direct and transitive callers of the method.
-    * */
-  def calledBy(sourceTrav: Method)(implicit callResolver: ICallResolver): Method = {
-    caller(callResolver).calledByIncludingSink(sourceTrav)(callResolver)
-  }
-
-  /**
-    * Traverse to direct and transitive callers of the method.
-    * */
-  def calledBy(sourceTrav: MethodInst)(implicit callResolver: ICallResolver): Method = {
-    caller(callResolver).calledByIncludingSink(sourceTrav.method)(callResolver)
-  }
-
-  /**
-    * Traverse to direct callers of this method
-    * */
-  def caller(implicit callResolver: ICallResolver): Method = {
-    callIn(callResolver).method
-  }
-
-  /**
-    * Traverse to methods called by method.
-    * */
-  def callee(implicit callResolver: ICallResolver): Method = {
-    method.callee(callResolver)
-  }
-
-  /**
-    * Incoming call sites
-    * */
-  def callIn(implicit callResolver: ICallResolver): Call = {
-    // Check whether possible call sides are resolved or resolve them.
-    // We only do this for virtual method calls.
-    // TODO Also resolve function pointers.
-    new Call(
-      sideEffect(callResolver.resolveDynamicMethodInstCallSites).raw
-        .in(EdgeTypes.CALL)
-        .cast[nodes.Call])
-  }
-
-  /**
     * Outgoing call sites of method.
     * */
   def callOut: Call = {
