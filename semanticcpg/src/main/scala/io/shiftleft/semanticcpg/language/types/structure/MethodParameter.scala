@@ -1,9 +1,9 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys}
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.types.expressions.Identifier
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{DeclarationBase, Expression}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
@@ -46,7 +46,7 @@ class MethodParameter(raw: GremlinScala[nodes.MethodParameterIn])
   /**
     * Traverse to arguments (actual parameters) associated with this formal parameter
     * */
-  def argument() = {
+  def argument(): Expression = {
     new Expression(
       raw
         .sack((_: Integer, node: nodes.MethodParameterIn) => node.value2(NodeKeys.ORDER))
@@ -67,6 +67,12 @@ class MethodParameter(raw: GremlinScala[nodes.MethodParameterIn])
     * */
   def asOutput: MethodParameterOut =
     new MethodParameterOut(raw.out(EdgeTypes.PARAMETER_LINK).cast[nodes.MethodParameterOut])
+
+  /**
+    * Places (identifier) where this parameter is being referenced
+    * */
+  def referencingIdentifiers: Identifier =
+    new Identifier(raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
     * Traverse to parameter type

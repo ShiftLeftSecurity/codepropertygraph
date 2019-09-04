@@ -36,7 +36,7 @@ class Local(raw: GremlinScala[nodes.Local])
     new Block(raw.in(EdgeTypes.AST).cast[nodes.Block])
 
   /**
-    * Places (identifier) where this local is referenced
+    * Places (identifier) where this local is being referenced
     * */
   def referencingIdentifiers: Identifier =
     new Identifier(raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
