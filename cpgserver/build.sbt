@@ -6,7 +6,6 @@ resolvers += Classpaths.typesafeReleases
 
 dependsOn(Projects.codepropertygraph)
 dependsOn(Projects.semanticcpg)
-dependsOn(Projects.callgraph)
 dependsOn(Projects.dataflowengine)
 
 libraryDependencies ++= Seq(

@@ -1,4 +1,4 @@
-package io.shiftleft.callgraph.language
+package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.generated.nodes
 

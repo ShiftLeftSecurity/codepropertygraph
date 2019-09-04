@@ -4,10 +4,14 @@ import gremlin.scala.{GremlinScala, __}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.semanticcpg.language.nodemethods.{AstNodeMethods, CfgNodeMethods, WithinMethodMethods}
+import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method, MethodInst}
+import io.shiftleft.semanticcpg.language.nodemethods.{AstNodeMethods, WithinMethodMethods}
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
+
+import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod, MethodInst => OriginalMethodInst}
+import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
 
 /**
   Language for traversing the code property graph
@@ -40,8 +44,8 @@ package object language {
   implicit def toTypeDecl(steps: Steps[nodes.TypeDecl]): TypeDecl =
     new TypeDecl(steps.raw)
 
-  implicit def toCall(steps: Steps[nodes.Call]): Call =
-    new Call(steps.raw)
+  implicit def toCall(steps: Steps[nodes.Call]): OriginalCall =
+    new OriginalCall(steps.raw)
 
   implicit def toControlStructure(steps: Steps[nodes.ControlStructure]): ControlStructure =
     new ControlStructure(steps.raw)
@@ -55,11 +59,11 @@ package object language {
   implicit def toLocal(steps: Steps[nodes.Local]): Local =
     new Local(steps.raw)
 
-  implicit def toMethodInst(steps: Steps[nodes.MethodInst]): MethodInst =
-    new MethodInst(steps.raw)
+  implicit def toMethodInst(steps: Steps[nodes.MethodInst]): OriginalMethodInst =
+    new OriginalMethodInst(steps.raw)
 
-  implicit def toMethod(steps: Steps[nodes.Method]): Method =
-    new Method(steps.raw)
+  implicit def toMethod(steps: Steps[nodes.Method]): OriginalMethod =
+    new OriginalMethod(steps.raw)
 
   implicit def toMethodParameter(steps: Steps[nodes.MethodParameterIn]): MethodParameter =
     new MethodParameter(steps.raw)
@@ -169,5 +173,16 @@ package object language {
     def start: Steps[NodeType] =
       new Steps[NodeType](__[NodeType](seq: _*))
   }
+
+  // Call graph extension
+
+  implicit def toMethodForCallGraph[X <% OriginalMethod](original: X): Method =
+    new Method(original)
+
+  implicit def toCallForCallGraph[X <% OriginalCall](original: X): Call =
+    new Call(original)
+
+  implicit def toMethodInstForCallGraph[X <% OriginalMethodInst](original: X): MethodInst =
+    new MethodInst(original)
 
 }
