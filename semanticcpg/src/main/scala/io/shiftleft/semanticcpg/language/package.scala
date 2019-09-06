@@ -10,8 +10,9 @@ import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
 
-import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod, MethodInst => OriginalMethodInst}
+import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod, MethodInst => OriginalMethodInst, File => OriginalFile}
 import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
+import io.shiftleft.semanticcpg.language.commentextension.{File => CommentFile}
 
 /**
   Language for traversing the code property graph
@@ -95,8 +96,8 @@ package object language {
   implicit def toAstNode(steps: Steps[nodes.AstNode]): AstNode =
     new AstNode(steps.raw)
 
-  implicit def toFile(steps: Steps[nodes.File]): File =
-    new File(steps.raw)
+  implicit def toFile(steps: Steps[nodes.File]): OriginalFile =
+    new OriginalFile(steps.raw)
 
   implicit def toBlock(steps: Steps[nodes.Block]): Block =
     new Block(steps.raw)
@@ -184,5 +185,9 @@ package object language {
 
   implicit def toMethodInstForCallGraph[X <% OriginalMethodInst](original: X): MethodInst =
     new MethodInst(original)
+
+  // Comment extension
+
+  implicit def toFileForComment[X <% OriginalFile](original: X) : CommentFile = new CommentFile(original)
 
 }
