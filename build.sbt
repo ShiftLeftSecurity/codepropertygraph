@@ -48,6 +48,7 @@ lazy val dataflowengine = Projects.dataflowengine
 lazy val cpgserver = Projects.cpgserver
 lazy val cpgvalidator = Projects.cpgvalidator
 lazy val cpg2overflowdb = Projects.cpg2overflowdb
+lazy val console = Projects.console
 
 ThisBuild/publishTo := sonatypePublishTo.value
 ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature", "-language:implicitConversions")
