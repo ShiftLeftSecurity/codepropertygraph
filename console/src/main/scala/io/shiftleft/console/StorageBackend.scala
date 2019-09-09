@@ -9,7 +9,7 @@ import ammonite.util.Tag
   */
 class StorageBackend extends Storage.Folder(StorageBackend.consoleHome) {
   override def compileCacheSave(path: String, tag: Tag, data: Storage.CompileCache): Unit = ()
-  override def compileCacheLoad(path: String, tag: Tag): Option[Storage.CompileCache]     = None
+  override def compileCacheLoad(path: String, tag: Tag): Option[Storage.CompileCache] = None
 }
 
 object StorageBackend {
