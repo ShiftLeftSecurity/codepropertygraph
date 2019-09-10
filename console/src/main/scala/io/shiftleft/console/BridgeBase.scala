@@ -59,10 +59,6 @@ trait BridgeBase {
         readScript(file.toScala)
       }
 
-    def shutdownHooks: List[String] = List()
-
-    def promptStr(): String = "ocular>"
-
     config.scriptFile match {
       case None =>
         val replConfig = List(
@@ -123,5 +119,9 @@ trait BridgeBase {
   }
 
   protected def predefPlus(lines: List[String]): String
+
+  protected def shutdownHooks: List[String]
+
+  protected def promptStr(): String
 
 }
