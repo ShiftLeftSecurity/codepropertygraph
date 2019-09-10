@@ -14,26 +14,30 @@ import io.shiftleft.overflowdb.OdbGraph
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 import io.shiftleft.overflowdb.OdbConfig
+import io.shiftleft.utils.StringInterner
 
 object ProtoToCpg {
   val logger: Logger = LogManager.getLogger(classOf[ProtoToCpg])
 
-  def addProperties(keyValues: ArrayBuffer[AnyRef], name: String, value: PropertyValue): Unit = {
+  def addProperties(keyValues: ArrayBuffer[AnyRef],
+                    name: String,
+                    value: PropertyValue,
+                    interner: StringInterner = StringInterner.noop): Unit = {
     import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase._
     value.getValueCase match {
       case INT_VALUE =>
-        keyValues += name
+        keyValues += interner.intern(name)
         keyValues += (value.getIntValue: JInt)
       case STRING_VALUE =>
-        keyValues += name
-        keyValues += value.getStringValue
+        keyValues += interner.intern(name)
+        keyValues += interner.intern(value.getStringValue)
       case BOOL_VALUE =>
-        keyValues += name
+        keyValues += interner.intern(name)
         keyValues += (value.getBoolValue: JBoolean)
       case STRING_LIST =>
         value.getStringList.getValuesList.asScala.foreach { elem: String =>
-          keyValues += name
-          keyValues += elem
+          keyValues += interner.intern(name)
+          keyValues += interner.intern(elem)
         }
       case VALUE_NOT_SET => ()
       case _ =>
@@ -49,6 +53,7 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     OdbGraph.open(overflowConfig,
                   io.shiftleft.codepropertygraph.generated.nodes.Factories.AllAsJava,
                   io.shiftleft.codepropertygraph.generated.edges.Factories.AllAsJava)
+  private val interner: StringInterner = StringInterner.makeStrongInterner()
 
   def addNodes(nodes: JCollection[Node]): Unit =
     addNodes(nodes.asScala)
@@ -76,7 +81,7 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
       val properties: Seq[Edge.Property] = edge.getPropertyList.asScala
       val keyValues = new ArrayBuffer[AnyRef](2 * properties.size)
       for (edgeProperty <- properties) {
-        addProperties(keyValues, edgeProperty.getName.name(), edgeProperty.getValue)
+        addProperties(keyValues, edgeProperty.getName.name(), edgeProperty.getValue, interner)
       }
       try {
         srcVertex.addEdge(edge.getType.name(), dstVertex, keyValues.toArray: _*)
@@ -113,7 +118,7 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     keyValues += T.label
     keyValues += node.getType.name()
     for (prop <- props.asScala) {
-      addProperties(keyValues, prop.getName.name, prop.getValue)
+      addProperties(keyValues, prop.getName.name, prop.getValue, interner)
     }
     keyValues.toArray
   }
