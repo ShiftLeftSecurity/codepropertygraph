@@ -39,11 +39,11 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg){
 
   private def linkCall(call: nodes.Call, dstGraph: DiffGraph): Unit = {
     if (call.dispatchType == DispatchTypes.STATIC_DISPATCH) {
-      methodFullNameToNode.get(call.methodInstFullName) match {
+      methodFullNameToNode.get(call.methodFullName) match {
         case Some(method) =>
           dstGraph.addEdgeInOriginal(call, method, EdgeTypes.CALL)
         case None =>
-          logger.warn(s"Unable to link METHOD_REF with METHOD_FULL_NAME ${call.methodInstFullName}.")
+          logger.warn(s"Unable to link METHOD_REF with METHOD_FULL_NAME ${call.methodFullName}.")
       }
     } else {
       val receiver = call.vertices(Direction.OUT, EdgeTypes.RECEIVER).nextChecked

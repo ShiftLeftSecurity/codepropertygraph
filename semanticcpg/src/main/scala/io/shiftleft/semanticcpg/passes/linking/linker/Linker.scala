@@ -67,7 +67,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstNodeLabel = NodeTypes.METHOD,
       edgeType = EdgeTypes.REF,
       dstNodeMap = methodFullNameToNode,
-      dstFullNameKey = nodes.MethodRef.Keys.MethodInstFullName,
+      dstFullNameKey = nodes.MethodRef.Keys.MethodFullName,
       dstGraph
     )
 
