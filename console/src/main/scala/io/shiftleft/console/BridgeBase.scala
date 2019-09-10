@@ -59,14 +59,14 @@ trait BridgeBase {
         readScript(file.toScala)
       }
 
-    val shutdownHooks = List(
-      "interp.beforeExitHooks.append{_ => workspace.loadedCpgs.foreach(_.close)}"
-    )
+    def shutdownHooks: List[String] = List()
+
+    def promptStr(): String = "ocular>"
 
     config.scriptFile match {
       case None =>
         val replConfig = List(
-          "repl.prompt() = \"ocular> \"",
+          "repl.prompt() = \"" + promptStr() + "\"",
           "repl.pprinter() = repl.pprinter().copy(defaultHeight = 99999)",
           "banner()"
         )
