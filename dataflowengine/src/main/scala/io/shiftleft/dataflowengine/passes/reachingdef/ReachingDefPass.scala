@@ -6,7 +6,7 @@ import gremlin.scala._
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
 import org.apache.tinkerpop.gremlin.structure.Direction
 import io.shiftleft.semanticcpg.language._
@@ -17,11 +17,11 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
   var dfHelper: DataFlowFrameworkHelper = _
 
   override def run(): Iterator[DiffGraph] = {
-    val methods = cpg.method.l
+    val methods = cpg.method.toIterator()
 
     dfHelper = new DataFlowFrameworkHelper(cpg.graph)
 
-    val dstGraphs = methods.par.map { method =>
+    new ParallelIteratorExecutor(methods).map { method =>
       val dstGraph = new DiffGraph()
       var worklist = Set[Vertex]()
       var out = Map[Vertex, Set[Vertex]]().withDefaultValue(Set[Vertex]())
@@ -66,7 +66,6 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       addReachingDefEdge(dstGraph, method, out, in)
       dstGraph
     }
-    dstGraphs.toIterator
   }
 
   /** Pruned DDG, i.e., two call assignment vertices are adjacent if a
