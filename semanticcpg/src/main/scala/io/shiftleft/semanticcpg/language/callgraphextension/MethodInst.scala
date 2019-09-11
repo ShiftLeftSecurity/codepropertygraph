@@ -11,14 +11,14 @@ class MethodInst(original: OriginalMethodInst) {
     * Traverse to direct and transitive callers of the method.
     * */
   def calledBy(sourceTrav: OriginalMethod)(implicit callResolver: ICallResolver): OriginalMethod = {
-    new Method(caller(callResolver)).calledByIncludingSink(sourceTrav)(callResolver)
+    caller(callResolver).calledByIncludingSink(sourceTrav)(callResolver)
   }
 
   /**
     * Traverse to direct and transitive callers of the method.
     * */
   def calledBy(sourceTrav: OriginalMethodInst)(implicit callResolver: ICallResolver): OriginalMethod = {
-    new Method(caller(callResolver)).calledByIncludingSink(sourceTrav.method)(callResolver)
+    caller(callResolver).calledByIncludingSink(sourceTrav.method)(callResolver)
   }
 
   /**
@@ -32,7 +32,7 @@ class MethodInst(original: OriginalMethodInst) {
     * Traverse to methods called by method.
     * */
   def callee(implicit callResolver: ICallResolver): OriginalMethod = {
-    new Method(original.method).callee(callResolver)
+    original.method.callee(callResolver)
   }
 
   /**
