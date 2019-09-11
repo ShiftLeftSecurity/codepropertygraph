@@ -1,26 +1,24 @@
 package io.shiftleft.semanticcpg.language.callgraphextension
 
+import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
-import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod, MethodInst => OriginalMethodInst}
 
-class Call(original: OriginalCall) {
+class Call(override val raw: GremlinScala[nodes.Call]) extends NodeSteps[nodes.Call](raw) {
 
   /**
   The callee method
     */
-  def calledMethod(implicit callResolver: ICallResolver): OriginalMethod = {
+  def calledMethod(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] = {
     calledMethodInstance(callResolver).method
   }
 
   /**
   The callee method instance
     */
-  def calledMethodInstance(implicit callResolver: ICallResolver): OriginalMethodInst =
-    new OriginalMethodInst(
-      original
-        .sideEffect(callResolver.resolveDynamicCallSite)
+  def calledMethodInstance(implicit callResolver: ICallResolver): NodeSteps[nodes.MethodInst] =
+    new NodeSteps[nodes.MethodInst](
+        sideEffect(callResolver.resolveDynamicCallSite)
         .raw
         .out(EdgeTypes.CALL)
         .cast[nodes.MethodInst])

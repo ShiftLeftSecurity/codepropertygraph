@@ -179,8 +179,8 @@ package object language {
   implicit def toMethodForCallGraph(steps: Steps[nodes.Method]): Method =
     new Method(steps.raw)
 
-  implicit def toCallForCallGraph[X <% OriginalCall](original: X): Call =
-    new Call(original)
+  implicit def toCallForCallGraph(steps: Steps[nodes.Call]): Call =
+    new Call(steps.raw)
 
   implicit def toMethodInstForCallGraph[X <% OriginalMethodInst](original: X): MethodInst =
     new MethodInst(original)
