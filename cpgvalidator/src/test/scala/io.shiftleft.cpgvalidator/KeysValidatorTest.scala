@@ -14,13 +14,6 @@ class KeysValidatorTest extends WordSpec with Matchers {
     def getErrors: Iterable[ValidationError] = validationErrors.values.flatten
   }
 
-  private class TestKeysValidator extends KeysValidator {
-
-    override val errorRegistry: TestValidationErrorRegistry =
-      new TestValidationErrorRegistry
-
-  }
-
   private def withNewBaseCpg[T](fun: Cpg => T): T = {
     val graph = OverflowDbTestInstance.create
     val cpg = Cpg(graph)
@@ -30,7 +23,7 @@ class KeysValidatorTest extends WordSpec with Matchers {
 
   "report no validation errors for a key with Cardinality one" in {
     withNewBaseCpg { cpg =>
-      val validator = new KeysValidator()
+      val validator = new KeysValidator(new ValidationErrorRegistry)
       val node = cpg.graph + NodeTypes.METHOD_PARAMETER_IN
       node.property("NAME", "someMethod")
       node.property("TYPE_FULL_NAME", "someMethod")
@@ -43,10 +36,11 @@ class KeysValidatorTest extends WordSpec with Matchers {
 
   "report a validation error for a key with Cardinality one but is not set" in {
     withNewBaseCpg { cpg =>
-      val validator = new TestKeysValidator()
+      val errorRegistry = new TestValidationErrorRegistry()
+      val validator = new KeysValidator(errorRegistry)
       val node = cpg.graph + NodeTypes.METHOD
       validator.validate(cpg) shouldBe false
-      validator.errorRegistry.getErrors should contain(
+      errorRegistry.getErrors should contain(
         KeyError(node, "NAME", Cardinality.One)
       )
     }
@@ -54,7 +48,7 @@ class KeysValidatorTest extends WordSpec with Matchers {
 
   "report no validation errors for a key with Cardinality list (with some values)" in {
     withNewBaseCpg { cpg =>
-      val validator = new KeysValidator()
+      val validator = new KeysValidator(new ValidationErrorRegistry)
       val node = cpg.graph + NodeTypes.TYPE_DECL
       node.setPropertyList("INHERITS_FROM_TYPE_FULL_NAME", List("a", "b"))
       node.property("NAME", "SomeTypeDecl")
@@ -69,7 +63,7 @@ class KeysValidatorTest extends WordSpec with Matchers {
 
   "report no validation errors for a key with Cardinality list when this property is not set" in {
     withNewBaseCpg { cpg =>
-      val validator = new KeysValidator()
+      val validator = new KeysValidator(new ValidationErrorRegistry)
       val node = cpg.graph + NodeTypes.TYPE_DECL
       node.property("NAME", "SomeTypeDecl")
       node.property("AST_PARENT_TYPE", "SomeParentType")
@@ -83,7 +77,7 @@ class KeysValidatorTest extends WordSpec with Matchers {
 
   "report no validation errors for a key with Cardinality list when this list is empty)" in {
     withNewBaseCpg { cpg =>
-      val validator = new KeysValidator()
+      val validator = new KeysValidator(new ValidationErrorRegistry)
       val node = cpg.graph + NodeTypes.TYPE_DECL
       node.setPropertyList("INHERITS_FROM_TYPE_FULL_NAME", List.empty)
       node.property("NAME", "SomeTypeDecl")
@@ -98,7 +92,7 @@ class KeysValidatorTest extends WordSpec with Matchers {
 
   "report no validation errors for a key with Cardinality zeroOrOne when exactly 1 is present" in {
     withNewBaseCpg { cpg =>
-      val validator = new KeysValidator()
+      val validator = new KeysValidator(new ValidationErrorRegistry)
       val node = cpg.graph + NodeTypes.ANNOTATION_LITERAL
       node.property("LINE_NUMBER", 1)
       node.property("NAME", "SomeAnnotation")
@@ -110,7 +104,7 @@ class KeysValidatorTest extends WordSpec with Matchers {
 
   "report no validation errors for a key with Cardinality zeroOrOne when this property is empty" in {
     withNewBaseCpg { cpg =>
-      val validator = new KeysValidator()
+      val validator = new KeysValidator(new ValidationErrorRegistry)
       val node = cpg.graph + NodeTypes.ANNOTATION_LITERAL
       node.property("LINE_NUMBER", Option.empty)
       node.property("NAME", "SomeAnnotation")
@@ -122,7 +116,7 @@ class KeysValidatorTest extends WordSpec with Matchers {
 
   "report no validation errors for a key with Cardinality zeroOrOne when this property is not set" in {
     withNewBaseCpg { cpg =>
-      val validator = new KeysValidator()
+      val validator = new KeysValidator(new ValidationErrorRegistry)
       val node = cpg.graph + NodeTypes.ANNOTATION_LITERAL
       node.property("NAME", "SomeAnnotation")
       node.property("ORDER", 1)

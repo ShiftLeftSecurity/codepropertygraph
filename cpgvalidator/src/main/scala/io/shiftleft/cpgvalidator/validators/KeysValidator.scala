@@ -9,7 +9,7 @@ import org.apache.tinkerpop.gremlin.structure.VertexProperty
 
 import scala.collection.JavaConverters._
 
-class KeysValidator extends Validator {
+class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
 
   override def validate(notEnhancedCpg: Cpg): Boolean = {
     validateKeysFacts(notEnhancedCpg)
