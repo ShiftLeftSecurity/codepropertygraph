@@ -58,8 +58,7 @@ class Method(override val raw: GremlinScala[nodes.Method]) extends Steps[nodes.M
     * */
   def callIn(implicit callResolver: ICallResolver): Steps[nodes.Call] = {
     new Steps[nodes.Call](
-        sideEffect(callResolver.resolveDynamicMethodCallSites)
-        .raw
+      sideEffect(callResolver.resolveDynamicMethodCallSites).raw
         .in(EdgeTypes.REF)
         .in(EdgeTypes.CALL)
         .cast[nodes.Call])
@@ -75,7 +74,8 @@ class Method(override val raw: GremlinScala[nodes.Method]) extends Steps[nodes.M
   /**
     * Traverse to direct and transitive callers of the method.
     * */
-  def calledBy(sourceTrav: Steps[nodes.MethodInst])(implicit callResolver: ICallResolver, x: DummyImplicit): Steps[nodes.Method] = {
+  def calledBy(sourceTrav: Steps[nodes.MethodInst])(implicit callResolver: ICallResolver,
+                                                    x: DummyImplicit): Steps[nodes.Method] = {
     caller(callResolver).calledByIncludingSink(sourceTrav.method)(callResolver)
   }
 
