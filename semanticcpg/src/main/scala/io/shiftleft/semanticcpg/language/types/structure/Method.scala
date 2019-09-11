@@ -67,7 +67,7 @@ class Method(override val raw: GremlinScala[nodes.Method])
       raw.in(EdgeTypes.REF).filter(_.hasLabel(NodeTypes.BINDING)).cast[nodes.Binding]
     )
   }
-  
+
   /**
     * Shorthand to traverse to control structures where condition matches `regex`
     * */
