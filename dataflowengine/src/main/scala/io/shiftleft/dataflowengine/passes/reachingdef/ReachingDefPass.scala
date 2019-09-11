@@ -17,12 +17,12 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
   var dfHelper: DataFlowFrameworkHelper = _
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = new DiffGraph()
     val methods = cpg.method.l
 
     dfHelper = new DataFlowFrameworkHelper(cpg.graph)
 
-    methods.foreach { method =>
+    val dstGraphs = methods.par.map { method =>
+      val dstGraph = new DiffGraph()
       var worklist = Set[Vertex]()
       var out = Map[Vertex, Set[Vertex]]().withDefaultValue(Set[Vertex]())
       var in = Map[Vertex, Set[Vertex]]().withDefaultValue(Set[Vertex]())
@@ -64,9 +64,9 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       }
 
       addReachingDefEdge(dstGraph, method, out, in)
+      dstGraph
     }
-
-    Iterator(dstGraph)
+    dstGraphs.toIterator
   }
 
   /** Pruned DDG, i.e., two call assignment vertices are adjacent if a
