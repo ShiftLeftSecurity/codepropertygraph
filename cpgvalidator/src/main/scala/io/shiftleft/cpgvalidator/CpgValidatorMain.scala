@@ -6,9 +6,10 @@ import io.shiftleft.cpgvalidator.validators.CpgValidator
 object CpgValidatorMain extends App {
   val cpgFileName = args(0)
   val cpg = CpgLoader.load(cpgFileName, CpgLoaderConfig.withoutOverflow)
-  val validator = new CpgValidator()
+  val errorRegistry = new ValidationErrorRegistry
+  val validator = new CpgValidator(errorRegistry)
   val cpgValid = validator.validate(cpg)
-  validator.logValidationErrors()
+  errorRegistry.logValidationErrors()
 
   if (cpgValid) {
     System.exit(0)

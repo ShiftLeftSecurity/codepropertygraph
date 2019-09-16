@@ -9,7 +9,7 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
 
-class InFactsValidator extends Validator {
+class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
 
   override def validate(notEnhancedCpg: Cpg): Boolean = {
     validateInFacts(notEnhancedCpg)
