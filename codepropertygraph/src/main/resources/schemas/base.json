@@ -15,8 +15,10 @@
         {"id" : 11, "name": "COLUMN_NUMBER", "comment" : "Column where the code starts", "valueType" : "int", "cardinality" : "zeroOrOne" },
 
         {"id" : 3, "name": "PARSER_TYPE_NAME", "comment": "Type name emitted by parser, only present for logical type UNKNOWN", "valueType" : "string", "cardinality" : "one"},
-        {"id" : 4, "name": "ORDER", "comment": "General ordering property. E.g. used to express the ordering of children in the AST", "valueType" : "int", "cardinality" : "one"},
-        {"id" : 40, "name": "ARGUMENT_INDEX", "comment": "The index of a call argument. This is used for the association between arguments and parameters. This property is different from ORDER for named arguments because of the required reordering to align arguments with parameters", "valueType" : "int", "cardinality" : "one"},
+        {"id" : 4, "name": "ORDER", "comment": "General ordering property, such that the children of each AST-node are typically numbered from 1, ..., N (this is not enforced). The ordering has no technical meaning, but is used for pretty printing and OUGHT TO reflect order in the source code.", "valueType" : "int", "cardinality" : "one"},
+        {"id" : 40, "name": "ARGUMENT_INDEX", "comment": "AST-children of CALL nodes have an argument index, that is used to match call-site arguments with callee parameters. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this parameter. CALLs without implicit parameter therefore have arguments starting with index 1. AST-children of BLOCK nodes may have an argument index as well; in this case, the last argument index determines the return-value of a BLOCK expression.",
+
+          "valueType" : "int", "cardinality" : "one"},
 
         {"id" : 7, "name": "IS_EXTERNAL", "comment" : "Indicates that the construct is external, that is, it is referenced but not defined in the code", "valueType" : "boolean", "cardinality" : "one"},
 
