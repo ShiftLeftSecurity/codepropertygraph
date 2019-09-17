@@ -5,6 +5,6 @@ import io.shiftleft.semanticcpg.language._
 
 object Statements {
   def countAll(cpg: Cpg): Long = {
-    cpg.method.topLevelExpressions.s.count
+    cpg.method.topLevelExpressions.toIterator.size
   }
 }
