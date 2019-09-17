@@ -20,14 +20,14 @@
 
           "valueType" : "int", "cardinality" : "one"},
 
-        {"id" : 7, "name": "IS_EXTERNAL", "comment" : "Indicates that the construct is external, that is, it is referenced but not defined in the code", "valueType" : "boolean", "cardinality" : "one"},
+        {"id" : 7, "name": "IS_EXTERNAL", "comment" : "Indicates that the construct (METHOD or TYPE_DECL) is external, that is, it is referenced but not defined in the code (applies both to insular parsing and to library functions where we have header files only).", "valueType" : "boolean", "cardinality" : "one"},
 
         // String properties for various types of nodes
 
-        {"id" : 5, "name": "NAME", "comment": "Name of represented object, e.g., method name", "valueType" : "string", "cardinality" : "one"},
-        {"id" : 6, "name": "FULL_NAME", "comment" : "Full name of an element, e.g., the class name along, including its package", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 5, "name": "NAME", "comment": "Name of represented object, e.g., method name (e.g. \"run\")", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 6, "name": "FULL_NAME", "comment" : "Full name of an element, e.g., the class name along, including its package (e.g. \"io.shiftleft.dataflowenging.layers.dataflows.DataFlowRunner.run\"). In theory, the FULL_NAME just needs to be unique and is used for linking references, so a consecutive integer would be valid. In practice, this should be human readable.", "valueType" : "string", "cardinality" : "one"},
         {"id": 21, "name": "CODE", "comment": "The code snippet the node represents", "valueType" : "string", "cardinality" : "one"},
-        {"id": 22, "name": "SIGNATURE", "comment": "Method signature", "valueType" : "string", "cardinality" : "one"},
+        {"id": 22, "name": "SIGNATURE", "comment": "Method signature. The format is defined by the language front-end, and the backend simply compares strings to resolve function overloading, i.e. match call-sites to METHODs. In theory, consecutive integers would be valid, but in practice this should be human readable.", "valueType" : "string", "cardinality" : "one"},
         {"id": 26, "name" : "MODIFIER_TYPE", "comment" : "Indicates the modifier which is represented by a MODIFIER node. See modifierTypes", "valueType" : "string", "cardinality" : "one"},
 
         // Properties to characterize call-sites
