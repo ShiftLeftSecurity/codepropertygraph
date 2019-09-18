@@ -47,8 +47,8 @@ matrix:
     - PROTOC_TARGET=${HOME}/protoc
     - PATH="${PROTOC_TARGET}/bin:${PATH}"
     before_script:
-    - mkdir -p $HOME/.sbt/launchers/1.2.6/
-    - curl -L -o $HOME/.sbt/launchers/1.2.6/sbt-launch.jar http://central.maven.org/maven2/org/scala-sbt/sbt-launch/1.2.6/sbt-launch-1.2.6.jar
+    - mkdir -p $HOME/.sbt/launchers/1.3.0/
+    - curl -L -o $HOME/.sbt/launchers/1.3.0/sbt-launch.jar http://central.maven.org/maven2/org/scala-sbt/sbt-launch/1.3.0/sbt-launch-1.3.0.jar
     - rm -rf $HOME/protoc
     - wget $PROTOC_RELEASE
     - unzip $PROTOC_PKG -d $PROTOC_TARGET
