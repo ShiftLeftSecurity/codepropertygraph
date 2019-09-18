@@ -1,8 +1,8 @@
 matrix:
   include:
   - language: scala
-    dist: bionic
-    jdk: openjdk10
+    dist: xenial
+    jdk: openjdk8
     if: tag IS blank
     branches:
       only:

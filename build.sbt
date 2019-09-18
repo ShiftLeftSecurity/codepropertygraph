@@ -51,7 +51,7 @@ lazy val cpg2overflowdb = Projects.cpg2overflowdb
 lazy val console = Projects.console
 
 ThisBuild/publishTo := sonatypePublishToBundle.value
-Global/useGpgPinentry := true
+Global / useGpg := false
 ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature", "-language:implicitConversions")
 ThisBuild/compile/javacOptions ++= Seq("-g") //debug symbols
 
