@@ -27,3 +27,5 @@ libraryDependencies ++= Seq(
 enablePlugins(JavaAppPackaging)
 enablePlugins(SbtTwirl)
 enablePlugins(ScalatraPlugin)
+
+Test/fork := true
