@@ -290,6 +290,7 @@
 
         {"id" : 22, "name" : "BINDS_TO", "keys": [], "comment" : "Type argument binding to a type parameter", "keys" : [] },
         {"id" : 10, "name" : "REF", "keys" : [], "comment" : "A reference to e.g. a LOCAL" },
+        // VTABLE edge is deprecated.
         {"id" : 30, "name": "VTABLE", "comment" : "Indicates that a method is part of the vtable of a certain type declaration", "keys": []},
         {"id" : 55, "name": "RECEIVER", "comment" : "The receiver of a method call which is either an object or a pointer", "keys": []},
         {"id" : 56, "name": "CONDITION", "comment" : "Edge from control structure node to the expression that holds the condition", "keys" : []},

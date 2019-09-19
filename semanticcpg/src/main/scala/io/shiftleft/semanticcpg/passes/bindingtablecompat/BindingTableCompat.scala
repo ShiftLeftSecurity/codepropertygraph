@@ -21,7 +21,8 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
 
     if (cpg.graph.traversal.V().hasLabel(NodeTypes.BINDING).asScala.isEmpty) {
       cpg.typeDecl.toIterator().foreach { typeDecl =>
-        val methodsInVTable = typeDecl.start.vtableMethod.l
+        val methodsInVTable = typeDecl.vertices(Direction.OUT, EdgeTypes.VTABLE)
+          .asScala.map(_.asInstanceOf[nodes.Method])
         methodsInVTable.foreach(createBinding(typeDecl, diffGraph))
 
         val nonVirtNonConstructorMethods = getNonVirtualNonConstructorMethodsTransitive(typeDecl)
