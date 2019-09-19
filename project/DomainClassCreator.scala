@@ -471,18 +471,7 @@ object DomainClassCreator {
       val abstractContainedNodeAccessors = nodeType.containedNodes
         .map {
           _.map { containedNode =>
-              // TODO: remove duplication of handling of containedNodes
-            val containedNodeType = if (containedNode.nodeType != "NODE") {
-              containedNode.nodeTypeClassName + "Base"
-            } else {
-              containedNode.nodeTypeClassName
-            }
-            val completeType = Cardinality.fromName(containedNode.cardinality) match {
-              case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
-              case Cardinality.One       => containedNodeType
-              case Cardinality.List      => s"List[$containedNodeType]"
-            }
-            s"""def ${containedNode.localName}: $completeType"""
+            s"""def ${containedNode.localName}: ${getCompleteType(containedNode)}"""
           }.mkString("\n")
         }
         .getOrElse("")
@@ -647,24 +636,13 @@ object DomainClassCreator {
         val forContainedNodes: List[String] = nodeType.containedNodes
           .map {
             _.map { containedNode =>
-              // TODO: remove duplication of handling of containedNodes
-              val containedNodeType = if (containedNode.nodeType != "NODE") {
-                containedNode.nodeTypeClassName + "Base"
-              } else {
-                containedNode.nodeTypeClassName
-              }
-              val completeType = Cardinality.fromName(containedNode.cardinality) match {
-                case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
-                case Cardinality.One       => containedNodeType
-                case Cardinality.List      => s"List[$containedNodeType]"
-              }
               val optionalDefault = Cardinality.fromName(containedNode.cardinality) match {
                 case Cardinality.List      => "= List()"
                 case Cardinality.ZeroOrOne => "= None"
                 case _ => ""
               }
 
-              s"val ${containedNode.localName}: $completeType $optionalDefault"
+              s"val ${containedNode.localName}: ${getCompleteType(containedNode)} $optionalDefault"
             }
           }
           .getOrElse(Nil)
@@ -856,6 +834,20 @@ object Utils {
       case HigherValueType.Option => s"Option[${getBaseType(property)}]"
       case HigherValueType.List   => s"List[${getBaseType(property)}]"
     }
+
+  def getCompleteType(containedNode: ContainedNode) = {
+    val tpe = if (containedNode.nodeType != "NODE") {
+      containedNode.nodeTypeClassName + "Base"
+    } else {
+      containedNode.nodeTypeClassName
+    }
+
+    Cardinality.fromName(containedNode.cardinality) match {
+      case Cardinality.ZeroOrOne => s"Option[$tpe]"
+      case Cardinality.One       => tpe
+      case Cardinality.List      => s"List[$tpe]"
+    }
+  }
 
   def propertyBasedFields(properties: List[Property]): String =
     properties.map { property =>
