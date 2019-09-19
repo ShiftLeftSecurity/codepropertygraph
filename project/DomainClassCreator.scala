@@ -865,13 +865,6 @@ object Utils {
 
       getHigherType(property) match {
         case HigherValueType.None =>
-        /** TODO: rather than returning `null`, throw an exception, since this is a schema violation:
-          s"""|var _$name: $tpe = null
-              |def $name: $tpe =
-              |  if (_$name == null) {
-              |    throw new AssertionError("property $name is mandatory but hasn't been initialised yet")
-              |} else { _$name } """.stripMargin
-          */
           s"""|private var _$name: $tpe = null
               |def $name(): $tpe = _$name""".stripMargin
         case HigherValueType.Option =>
