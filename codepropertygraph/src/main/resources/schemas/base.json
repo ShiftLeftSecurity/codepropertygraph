@@ -15,17 +15,17 @@
         {"id" : 11, "name": "COLUMN_NUMBER", "comment" : "Column where the code starts", "valueType" : "int", "cardinality" : "zeroOrOne" },
 
         {"id" : 3, "name": "PARSER_TYPE_NAME", "comment": "Type name emitted by parser, only present for logical type UNKNOWN", "valueType" : "string", "cardinality" : "one"},
-        {"id" : 4, "name": "ORDER", "comment": "General ordering property. E.g. used to express the ordering of children in the AST", "valueType" : "int", "cardinality" : "one"},
-        {"id" : 40, "name": "ARGUMENT_INDEX", "comment": "The index of a call argument. This is used for the association between arguments and parameters. This property is different from ORDER for named arguments because of the required reordering to align arguments with parameters", "valueType" : "int", "cardinality" : "one"},
+        {"id" : 4, "name": "ORDER", "comment": "General ordering property, such that the children of each AST-node are typically numbered from 1, ..., N (this is not enforced). The ordering has no technical meaning, but is used for pretty printing and OUGHT TO reflect order in the source code", "valueType" : "int", "cardinality" : "one"},
+        {"id" : 40, "name": "ARGUMENT_INDEX", "comment": "AST-children of CALL nodes have an argument index, that is used to match call-site arguments with callee parameters. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this parameter. CALLs without implicit parameter therefore have arguments starting with index 1. AST-children of BLOCK nodes may have an argument index as well; in this case, the last argument index determines the return-value of a BLOCK expression", "valueType" : "int", "cardinality" : "one"},
 
-        {"id" : 7, "name": "IS_EXTERNAL", "comment" : "Indicates that the construct is external, that is, it is referenced but not defined in the code", "valueType" : "boolean", "cardinality" : "one"},
+        {"id" : 7, "name": "IS_EXTERNAL", "comment" : "Indicates that the construct (METHOD or TYPE_DECL) is external, that is, it is referenced but not defined in the code (applies both to insular parsing and to library functions where we have header files only)", "valueType" : "boolean", "cardinality" : "one"},
 
         // String properties for various types of nodes
 
-        {"id" : 5, "name": "NAME", "comment": "Name of represented object, e.g., method name", "valueType" : "string", "cardinality" : "one"},
-        {"id" : 6, "name": "FULL_NAME", "comment" : "Full name of an element, e.g., the class name along, including its package", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 5, "name": "NAME", "comment": "Name of represented object, e.g., method name (e.g. \"run\")", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 6, "name": "FULL_NAME", "comment" : "Full name of an element, e.g., the class name along, including its package (e.g. \"io.shiftleft.dataflowenging.layers.dataflows.DataFlowRunner.run\"). In theory, the FULL_NAME just needs to be unique and is used for linking references, so a consecutive integer would be valid. In practice, this should be human readable", "valueType" : "string", "cardinality" : "one"},
         {"id": 21, "name": "CODE", "comment": "The code snippet the node represents", "valueType" : "string", "cardinality" : "one"},
-        {"id": 22, "name": "SIGNATURE", "comment": "Method signature", "valueType" : "string", "cardinality" : "one"},
+        {"id": 22, "name": "SIGNATURE", "comment": "Method signature. The format is defined by the language front-end, and the backend simply compares strings to resolve function overloading, i.e. match call-sites to METHODs. In theory, consecutive integers would be valid, but in practice this should be human readable", "valueType" : "string", "cardinality" : "one"},
         {"id": 26, "name" : "MODIFIER_TYPE", "comment" : "Indicates the modifier which is represented by a MODIFIER node. See modifierTypes", "valueType" : "string", "cardinality" : "one"},
 
         // Properties to characterize call-sites
@@ -266,7 +266,7 @@
       { "name" : "CFG_NODE", "comment" : "Any node that can occur as part of a control flow graph", "hasKeys" : ["LINE_NUMBER", "COLUMN_NUMBER"], "extends": ["WITHIN_METHOD", "AST_NODE"]},
       { "name" : "TRACKING_POINT", "comment" : "Any node that can occur in a data flow", "hasKeys" : [], "extends": ["WITHIN_METHOD"]},
       { "name" : "WITHIN_METHOD", "comment" : "Any node that can exist in a method", "hasKeys" : []},
-      { "name" : "AST_NODE", "comment": "Any node that can exist in an abstract syntax tree.", "hasKeys" : ["ORDER"]},
+      { "name" : "AST_NODE", "comment": "Any node that can exist in an abstract syntax tree", "hasKeys" : ["ORDER"]},
       { "name" : "CALL_REPR", "comment": "Call representation", "hasKeys" : ["CODE", "NAME", "SIGNATURE"], "extends": ["CFG_NODE"]}
     ],
 
