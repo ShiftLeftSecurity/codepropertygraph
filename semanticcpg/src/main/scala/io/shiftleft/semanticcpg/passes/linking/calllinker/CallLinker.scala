@@ -43,7 +43,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg){
         case Some(method) =>
           dstGraph.addEdgeInOriginal(call, method, EdgeTypes.CALL)
         case None =>
-          logger.warn(s"Unable to link METHOD_REF with METHOD_FULL_NAME ${call.methodFullName}.")
+          logger.warn(s"Unable to link CALL with METHOD_FULL_NAME ${call.methodFullName}.")
       }
     } else {
       val receiver = call.vertices(Direction.OUT, EdgeTypes.RECEIVER).nextChecked
