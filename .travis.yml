@@ -1,84 +1,53 @@
-matrix:
+language: scala
+dist: xenial
+jdk: openjdk8
+if: tag IS blank
+
+branches:
+  only:
+  - master
+
+before_install:
+- git fetch --tags
+- git lfs fetch --all
+- if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE" == "push" ]]; then
+    openssl aes-256-cbc -K $encrypted_663dec309dc8_key -iv $encrypted_663dec309dc8_iv -in private-key.pem.enc -out private-key.pem -d;
+    gpg --import --batch private-key.pem;
+  fi
+
+env:
+  global:
+    - PROTOC_PKG=protoc-3.6.0-linux-x86_64.zip
+    - PROTOC_RELEASE=https://github.com/google/protobuf/releases/download/v3.6.0/$PROTOC_PKG
+    - PROTOC_TARGET=${HOME}/protoc
+    - PATH="${PROTOC_TARGET}/bin:${PATH}"
+
+install:
+- rm -rf $HOME/protoc
+- wget $PROTOC_RELEASE
+- unzip $PROTOC_PKG -d $PROTOC_TARGET
+- protoc --version
+
+stages:
+- name: test
+- name: release
+  if: branch = master AND type = push
+
+jobs:
   include:
-  - language: scala
-    dist: xenial
-    jdk: openjdk8
-    if: tag IS blank
-    branches:
-      only:
-      - master
-    before_install:
-    - git fetch --tags
-    - git lfs fetch --all
-    - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE" == "push" ]]; then
-        openssl aes-256-cbc -K $encrypted_663dec309dc8_key -iv $encrypted_663dec309dc8_iv -in private-key.pem.enc -out private-key.pem -d;
-        gpg --import --batch private-key.pem;
-      fi
-    env:
-    - PROTOC_PKG=protoc-3.6.0-linux-x86_64.zip
-    - PROTOC_RELEASE=https://github.com/google/protobuf/releases/download/v3.6.0/$PROTOC_PKG
-    - PROTOC_TARGET=${HOME}/protoc
-    - PATH="${PROTOC_TARGET}/bin:${PATH}"
-    install:
-    - rm -rf $HOME/protoc
-    - wget $PROTOC_RELEASE
-    - unzip $PROTOC_PKG -d $PROTOC_TARGET
-    - protoc --version
-    stages:
-    - name: test
-    - name: release
-      if: branch = master AND type = push
-    jobs:
-      include:
-      - stage: test
-        script: sbt test scalafmtCheck
-      - stage: release
-        script: sbt ci-release-sonatype
-    before_cache:
-    - find $HOME/.sbt -name "*.lock" -type f -delete
-    - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
-    - rm -rf $HOME/.ivy2/local
-    cache:
-      directories:
-      - $HOME/.sbt/1.0/dependency
-      - $HOME/.sbt/boot/scala*
-      - $HOME/.sbt/launchers
-      - $HOME/.ivy2/cache
-      - $HOME/.coursier
+  - stage: test
+    script: sbt test scalafmtCheck
+  - stage: release
+    script: sbt ci-release-sonatype
 
-  - language: python
-    python: 3.6
-    env:
-    - PROTOC_PKG=protoc-3.6.0-linux-x86_64.zip
-    - PROTOC_RELEASE=https://github.com/google/protobuf/releases/download/v3.6.0/$PROTOC_PKG
-    - PROTOC_TARGET=${HOME}/protoc
-    - PATH="${PROTOC_TARGET}/bin:${PATH}"
-    before_script:
-    - mkdir -p $HOME/.sbt/launchers/1.3.0/
-    - curl -L -o $HOME/.sbt/launchers/1.3.0/sbt-launch.jar http://central.maven.org/maven2/org/scala-sbt/sbt-launch/1.3.0/sbt-launch-1.3.0.jar
-    - rm -rf $HOME/protoc
-    - wget $PROTOC_RELEASE
-    - unzip $PROTOC_PKG -d $PROTOC_TARGET
-    - protoc --version
-    - sbt stage
-    - pip install requests
-    - cd cpgclientlib
-    script:
-    - ./runtests.sh
-    deploy:
-      provider: pypi
-      user: fabsx00
-      password:
-        secure: z5qFzk8TezOPD/KUseNsP1hbf4UQb4WwxazAaQq8kK96jSdkfWefqCBF06MOzHz4xuLFvY6MdYJqB+ySLS9qmH4xSyQDZUkoD8pEY7Esa9gjw4P1mZn4efkFYVSoGrugbEHRYJU+5on6d3S+agyfaJMtlRIVGDFqnPWvyVoWsH20hJM+uIOb80Lo1oRqJ+YIVuuPTrN2NEBIqSny1gy7p4wUp5y5piLC3Qjq+wfVTaXEpaGVMfhjzf0wcbeFoxHHmoAnFT4WIDzyD3z//7zFnspMZb63JRfcooEMjWBpeGJeNPCnN9k3mmsKjOTZ9716i/8HL/dPPLBE6h/zKRxseBQU7fnKItPdYOSmaoOY3M8VTCTRNzPZm4pmunCn8I+dtJ+UiixYthc8SM9fWiewmpLA9gvCAm8yTZ9NxUu/k84vOgARUqlisVBcSRaLrxeg2BSSAnKkRcjWdXV8rklrBN4LN3BN736HGPinTK6b1TjncOljpsRsTPI+ZKmMl2QSoJSfNHT5veqiwfS2kzq3NNn7ka9yenmUwfE407kwe5HuLb23VDbUGw+yjRxMN0glcXpwRSAjEtIR2ZriET3GB+JQGLtILMrgKplSs4WmCNYqVArbpSIGUb9gM5rZOguXcCUFbPMxp5wK3lKMQLIwqbqp1ubEl/3DuPfnfKYk8wo=
-    before_cache:
-    - find $HOME/.sbt -name "*.lock" -type f -delete
-    - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
-    - rm -rf $HOME/.ivy2/local
-    cache:
-      directories:
-      - $HOME/.sbt/1.0/dependency
-      - $HOME/.sbt/boot/scala*
-      - $HOME/.sbt/launchers
-      - $HOME/.ivy2/cache
-      - $HOME/.coursier
-
+before_cache:
+- find $HOME/.sbt -name "*.lock" -type f -delete
+- find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
+- rm -rf $HOME/.ivy2/local
+cache:
+  directories:
+  - $HOME/.sbt/1.0/dependency
+  - $HOME/.sbt/boot/scala*
+  - $HOME/.sbt/launchers
+  - $HOME/.ivy2/cache
+  - $HOME/.coursier
