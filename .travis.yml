@@ -24,11 +24,16 @@ matrix:
     - wget $PROTOC_RELEASE
     - unzip $PROTOC_PKG -d $PROTOC_TARGET
     - protoc --version
-    script:
-    - sbt test scalafmtCheck
-    after_success:
-    - if [[ "$TRAVIS_BRANCH" == "master" && $TRAVIS_PULL_REQUEST = 'false' ]]; then
-      travis_wait 60 sbt ci-release-sonatype; fi
+    stages:
+    - name: test
+    - name: release
+      if: branch = master AND type = push
+    jobs:
+      include:
+      - stage: test
+        script: sbt test scalafmtCheck
+      - stage: release
+        script: sbt ci-release-sonatype
     before_cache:
     - find $HOME/.sbt -name "*.lock" -type f -delete
     - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
