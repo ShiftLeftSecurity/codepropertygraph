@@ -30,17 +30,17 @@ install:
 - python --version
 
 stages:
-#- name: test
-#- name: release
-#  if: branch = master AND type = push
+- name: test
+- name: release
+  if: branch = master AND type = push
 - name: python-test
 
 jobs:
   include:
-#  - stage: test
-#    script: sbt test scalafmtCheck
-#  - stage: release
-#    script: sbt ci-release-sonatype
+  - stage: test
+    script: sbt test scalafmtCheck
+  - stage: release
+    script: sbt ci-release-sonatype
   - stage: python-test
     script: 
       - pip install requests
