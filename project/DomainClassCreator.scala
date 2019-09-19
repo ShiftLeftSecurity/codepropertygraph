@@ -786,7 +786,6 @@ case class ContainedNode(nodeType: String, localName: String, cardinality: Strin
   lazy val nodeTypeClassName = Utils.camelCase(nodeType).capitalize
 }
 
-// TODO: use better json library which supports enums
 sealed abstract class Cardinality(val name: String)
 object Cardinality {
   case object ZeroOrOne extends Cardinality("zeroOrOne")
