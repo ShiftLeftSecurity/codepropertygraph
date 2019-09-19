@@ -33,7 +33,7 @@ stages:
 - name: test
 - name: release
   if: branch = master AND type = push
-- name: python-test
+- name: python-test-and-release
 
 jobs:
   include:
@@ -41,20 +41,19 @@ jobs:
     script: sbt test scalafmtCheck
   - stage: release
     script: sbt ci-release-sonatype
-  - stage: python-test
+  - stage: python-test-and-release
     script: 
       - pip install requests
       - sbt stage
       - cd cpgclientlib
       - ./runtests.sh
-
-deploy:
-  provider: pypi
-  user: fabsx00
-  password:
-    secure: z5qFzk8TezOPD/KUseNsP1hbf4UQb4WwxazAaQq8kK96jSdkfWefqCBF06MOzHz4xuLFvY6MdYJqB+ySLS9qmH4xSyQDZUkoD8pEY7Esa9gjw4P1mZn4efkFYVSoGrugbEHRYJU+5on6d3S+agyfaJMtlRIVGDFqnPWvyVoWsH20hJM+uIOb80Lo1oRqJ+YIVuuPTrN2NEBIqSny1gy7p4wUp5y5piLC3Qjq+wfVTaXEpaGVMfhjzf0wcbeFoxHHmoAnFT4WIDzyD3z//7zFnspMZb63JRfcooEMjWBpeGJeNPCnN9k3mmsKjOTZ9716i/8HL/dPPLBE6h/zKRxseBQU7fnKItPdYOSmaoOY3M8VTCTRNzPZm4pmunCn8I+dtJ+UiixYthc8SM9fWiewmpLA9gvCAm8yTZ9NxUu/k84vOgARUqlisVBcSRaLrxeg2BSSAnKkRcjWdXV8rklrBN4LN3BN736HGPinTK6b1TjncOljpsRsTPI+ZKmMl2QSoJSfNHT5veqiwfS2kzq3NNn7ka9yenmUwfE407kwe5HuLb23VDbUGw+yjRxMN0glcXpwRSAjEtIR2ZriET3GB+JQGLtILMrgKplSs4WmCNYqVArbpSIGUb9gM5rZOguXcCUFbPMxp5wK3lKMQLIwqbqp1ubEl/3DuPfnfKYk8wo=
-  on:
-    branch: master
+    deploy:
+      provider: pypi
+      user: fabsx00
+      password:
+        secure: z5qFzk8TezOPD/KUseNsP1hbf4UQb4WwxazAaQq8kK96jSdkfWefqCBF06MOzHz4xuLFvY6MdYJqB+ySLS9qmH4xSyQDZUkoD8pEY7Esa9gjw4P1mZn4efkFYVSoGrugbEHRYJU+5on6d3S+agyfaJMtlRIVGDFqnPWvyVoWsH20hJM+uIOb80Lo1oRqJ+YIVuuPTrN2NEBIqSny1gy7p4wUp5y5piLC3Qjq+wfVTaXEpaGVMfhjzf0wcbeFoxHHmoAnFT4WIDzyD3z//7zFnspMZb63JRfcooEMjWBpeGJeNPCnN9k3mmsKjOTZ9716i/8HL/dPPLBE6h/zKRxseBQU7fnKItPdYOSmaoOY3M8VTCTRNzPZm4pmunCn8I+dtJ+UiixYthc8SM9fWiewmpLA9gvCAm8yTZ9NxUu/k84vOgARUqlisVBcSRaLrxeg2BSSAnKkRcjWdXV8rklrBN4LN3BN736HGPinTK6b1TjncOljpsRsTPI+ZKmMl2QSoJSfNHT5veqiwfS2kzq3NNn7ka9yenmUwfE407kwe5HuLb23VDbUGw+yjRxMN0glcXpwRSAjEtIR2ZriET3GB+JQGLtILMrgKplSs4WmCNYqVArbpSIGUb9gM5rZOguXcCUFbPMxp5wK3lKMQLIwqbqp1ubEl/3DuPfnfKYk8wo=
+      on:
+        branch: master
 
 before_cache:
 - find $HOME/.sbt -name "*.lock" -type f -delete
