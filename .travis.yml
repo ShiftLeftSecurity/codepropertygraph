@@ -27,18 +27,26 @@ install:
 - wget $PROTOC_RELEASE
 - unzip $PROTOC_PKG -d $PROTOC_TARGET
 - protoc --version
+- python --version
 
 stages:
-- name: test
-- name: release
-  if: branch = master AND type = push
+#- name: test
+#- name: release
+#  if: branch = master AND type = push
+- name: python-test
 
 jobs:
   include:
-  - stage: test
-    script: sbt test scalafmtCheck
-  - stage: release
-    script: sbt ci-release-sonatype
+#  - stage: test
+#    script: sbt test scalafmtCheck
+#  - stage: release
+#    script: sbt ci-release-sonatype
+  - stage: python-test
+    script: 
+      - pip install requests
+      - sbt stage
+      - cd cpgclientlib
+      - ./runtests.sh
 
 before_cache:
 - find $HOME/.sbt -name "*.lock" -type f -delete
