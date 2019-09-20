@@ -5,7 +5,6 @@ import java.nio.file.{Files, Paths}
 
 import scala.collection.JavaConverters._
 import play.api.libs.json._
-import Utils._
 
 import scala.Option
 import scala.collection.mutable
@@ -18,10 +17,10 @@ object Resources {
 /** Parses cpg domain model and generates specialized TinkerVertices and TinkerEdges
   * sbt is setup to invoke this class automatically. */
 object DomainClassCreator {
+  import Helpers._
   implicit val outEdgeEntryRead = Json.reads[OutEdgeEntry]
   implicit val containedNodeRead = Json.reads[ContainedNode]
   implicit val nodeTypesRead = Json.reads[NodeType]
-  implicit val nodeBaseTraitRead = Json.reads[NodeBaseTrait]
   implicit val propertyRead = Json.reads[Property]
   implicit val edgeTypeRead = Json.reads[EdgeType]
   val nodesPackage = "io.shiftleft.codepropertygraph.generated.nodes"
@@ -160,8 +159,6 @@ object DomainClassCreator {
   }
 
   def writeNodesFile(outputDir: JFile): JFile = {
-    val baseTraits = (Resources.cpgJson \ "nodeBaseTraits").as[List[NodeBaseTrait]]
-
     val propertyByName: Map[String, Property] =
       (Resources.cpgJson \ "nodeKeys")
         .as[List[Property]]
@@ -246,33 +243,29 @@ object DomainClassCreator {
         |  ${generateBaseTraitVisitorMethods}
         |}\n""".stripMargin
 
-      val nodeBaseTraits =
-        (Resources.cpgJson \ "nodeBaseTraits")
-          .as[List[NodeBaseTrait]]
-          .map {
-            case nodeBaseTrait: NodeBaseTrait =>
-              val mixins = nodeBaseTrait.hasKeys.map { key =>
-                s"with Has${camelCase(key).capitalize}"
-              }.mkString(" ")
+      val nodeBaseTraitsSources = nodeBaseTraits.map { nodeBaseTrait =>
+        val mixins = nodeBaseTrait.hasKeys.map { key =>
+          s"with Has${camelCase(key).capitalize}"
+        }.mkString(" ")
 
-              val mixinTraits = nodeBaseTrait
-                .extendz
-                .getOrElse(Nil)
-                .map { traitName =>
-                  s"with ${camelCase(traitName).capitalize}"
-                }.mkString(" ")
+        val mixinTraits = nodeBaseTrait
+          .extendz
+          .getOrElse(Nil)
+          .map { traitName =>
+            s"with ${camelCase(traitName).capitalize}"
+          }.mkString(" ")
 
-              val mixinTraitsForBase = nodeBaseTrait
-                .extendz
-                .getOrElse(List())
-                .map { traitName =>
-                  s"with ${camelCase(traitName).capitalize}Base"
-                }.mkString(" ")
+        val mixinTraitsForBase = nodeBaseTrait
+          .extendz
+          .getOrElse(List())
+          .map { traitName =>
+            s"with ${camelCase(traitName).capitalize}Base"
+          }.mkString(" ")
 
-              s"""trait ${nodeBaseTrait.className}Base extends Node $mixins $mixinTraitsForBase
-                  trait ${nodeBaseTrait.className} extends StoredNode with ${nodeBaseTrait.className}Base $mixinTraits
-              """
-          }.mkString("\n")
+        s"""trait ${nodeBaseTrait.className}Base extends Node $mixins $mixinTraitsForBase
+            trait ${nodeBaseTrait.className} extends StoredNode with ${nodeBaseTrait.className}Base $mixinTraits
+        """
+      }.mkString("\n")
 
       val keyBasedTraits =
         (Resources.cpgJson \ "nodeKeys")
@@ -298,7 +291,7 @@ object DomainClassCreator {
         """
       }
 
-      staticHeader + nodeVisitor + nodeBaseTraits + keyBasedTraits + factories
+      staticHeader + nodeVisitor + nodeBaseTraitsSources + keyBasedTraits + factories
     }
 
     def generateNodeVisitorMethods() = {
@@ -310,7 +303,7 @@ object DomainClassCreator {
     }
 
     def generateBaseTraitVisitorMethods() = {
-      baseTraits.map { nodeBaseTrait: NodeBaseTrait =>
+      nodeBaseTraits.map { nodeBaseTrait: NodeBaseTrait =>
         s"def visit(node: ${nodeBaseTrait.className}): T = ???"
       }.mkString("\n")
     }
@@ -723,7 +716,7 @@ object DomainClassCreator {
 
   def calculateNodeToInEdges(nodeTypes: List[NodeType]): mutable.MultiMap[String, String] = {
     val nodeBaseTraitNames: List[String] =
-      (Resources.cpgJson \ "nodeBaseTraits").as[List[NodeBaseTrait]].map(_.name) :+ "NODE"
+      nodeBaseTraits.map(_.name) :+ "NODE"
 
     val nodeToInEdges = new mutable.HashMap[String, mutable.Set[String]] with mutable.MultiMap[String, String]
     val nodeTypeNamesSet = nodeTypes.map(_.name).toSet ++ nodeBaseTraitNames
@@ -752,7 +745,7 @@ case class NodeType(name: String,
                     outEdges: List[OutEdgeEntry],
                     is: Option[List[String]],
                     containedNodes: Option[List[ContainedNode]]) {
-  lazy val className = Utils.camelCase(name).capitalize
+  lazy val className = Helpers.camelCase(name).capitalize
   lazy val classNameDb = s"${className}Db"
 }
 
@@ -761,7 +754,7 @@ case class OutEdgeEntry(edgeName: String, inNodes: List[String])
 /** nodeType links to the referenced NodeType
   * cardinality must be one of `zeroOrOne`, `one`, `list` */
 case class ContainedNode(nodeType: String, localName: String, cardinality: String) {
-  lazy val nodeTypeClassName = Utils.camelCase(nodeType).capitalize
+  lazy val nodeTypeClassName = Helpers.camelCase(nodeType).capitalize
 }
 
 sealed abstract class Cardinality(val name: String)
@@ -778,7 +771,7 @@ object Cardinality {
 
 /* representation of EdgeType in cpg.json */
 case class EdgeType(name: String, keys: List[String]) {
-  lazy val className = Utils.camelCase(name).capitalize
+  lazy val className = Helpers.camelCase(name).capitalize
 }
 
 /* representation of nodeKey/edgeKey in cpg.json */
@@ -787,7 +780,7 @@ case class Property(name: String, comment: String, valueType: String, cardinalit
 /* representation of nodeBaseTrait in cpg.json */
 case class NodeBaseTrait(name: String, hasKeys: List[String], `extends`: Option[List[String]]) {
   lazy val extendz = `extends` //it's mapped from the key in json :(
-  lazy val className = Utils.camelCase(name).capitalize
+  lazy val className = Helpers.camelCase(name).capitalize
 }
 
 object HigherValueType extends Enumeration {
@@ -795,7 +788,12 @@ object HigherValueType extends Enumeration {
   val None, Option, List = Value
 }
 
-object Utils {
+object Helpers {
+
+  lazy val nodeBaseTraits = {
+    implicit val nodeBaseTraitRead = Json.reads[NodeBaseTrait]
+    (Resources.cpgJson \ "nodeBaseTraits").as[List[NodeBaseTrait]]
+  }
 
   def isNodeBaseTrait(baseTraits: List[NodeBaseTrait], nodeName: String): Boolean = 
     nodeName == "NODE" || baseTraits.map(_.name).contains(nodeName)
