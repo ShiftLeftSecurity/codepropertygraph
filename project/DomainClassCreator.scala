@@ -25,18 +25,15 @@ class Schema(schemaFile: String) {
   lazy val edgeKeys = (jsonRoot \ "edgeKeys").as[List[Property]]
 }
 
-/** Parses cpg domain model and generates specialized TinkerVertices and TinkerEdges
-  * sbt is setup to invoke this class automatically. */
+/** Parses schema file and generates a domain model for OverflowDb */
 class DomainClassCreator(schemaFile: String) {
   import Helpers._
   val nodesPackage = "io.shiftleft.codepropertygraph.generated.nodes"
   val edgesPackage = "io.shiftleft.codepropertygraph.generated.edges"
   val schema = new Schema(schemaFile)
 
-  def run(outputDir: JFile): List[JFile] = {
-    println(s"generating domain classes for nodes/edges based on cpg.json")
+  def run(outputDir: JFile): List[JFile] =
     List(writeEdgesFile(outputDir), writeNodesFile(outputDir), writeNewNodesFile(outputDir))
-  }
 
   def writeEdgesFile(outputDir: JFile): JFile = {
     val propertyByName: Map[String, Property] =
@@ -591,7 +588,6 @@ class DomainClassCreator(schemaFile: String) {
       val fields: String = {
         val forKeys = keys.map { key =>
           val optionalDefault =
-            /* a little hack to allow us to have different DomainClassCreator while using the same cpg traversals */
             if (getHigherType(key) == HigherValueType.Option) " = None"
             else if (key.valueType == "int") " = -1"
             else if (getHigherType(key) == HigherValueType.None && key.valueType == "string") """ ="" """
@@ -713,7 +709,6 @@ class DomainClassCreator(schemaFile: String) {
   }
 }
 
-/* representation of NodeType in cpg.json */
 case class NodeType(name: String,
                     keys: List[String],
                     outEdges: List[OutEdgeEntry],
@@ -725,8 +720,6 @@ case class NodeType(name: String,
 
 case class OutEdgeEntry(edgeName: String, inNodes: List[String])
 
-/** nodeType links to the referenced NodeType
-  * cardinality must be one of `zeroOrOne`, `one`, `list` */
 case class ContainedNode(nodeType: String, localName: String, cardinality: String) {
   lazy val nodeTypeClassName = Helpers.camelCaseCaps(nodeType)
 }
@@ -743,15 +736,12 @@ object Cardinality {
       .getOrElse(throw new AssertionError(s"cardinality must be one of `zeroOrOne`, `one`, `list`, but was $name"))
 }
 
-/* representation of EdgeType in cpg.json */
 case class EdgeType(name: String, keys: List[String]) {
   lazy val className = Helpers.camelCaseCaps(name)
 }
 
-/* representation of nodeKey/edgeKey in cpg.json */
 case class Property(name: String, comment: String, valueType: String, cardinality: String)
 
-/* representation of nodeBaseTrait in cpg.json */
 case class NodeBaseTrait(name: String, hasKeys: List[String], `extends`: Option[List[String]]) {
   lazy val extendz = `extends` //it's mapped from the key in json :(
   lazy val className = Helpers.camelCaseCaps(name)
@@ -867,7 +857,7 @@ object Helpers {
 
   def removeSpecificPropertyBody(properties: List[Property]): String = {
     val caseNotFound =
-      s"""throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to cpg.json")"""
+      s"""throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to the schema...")"""
     properties match {
       case Nil => caseNotFound
       case keys =>
