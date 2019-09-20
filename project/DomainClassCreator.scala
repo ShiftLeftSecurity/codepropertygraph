@@ -9,7 +9,7 @@ import play.api.libs.json._
 import scala.Option
 import scala.collection.mutable
 
-object Resources {
+class Schema(schemaFile: String) {
   implicit val nodeBaseTraitRead = Json.reads[NodeBaseTrait]
   implicit val outEdgeEntryRead = Json.reads[OutEdgeEntry]
   implicit val containedNodeRead = Json.reads[ContainedNode]
@@ -17,20 +17,21 @@ object Resources {
   implicit val propertyRead = Json.reads[Property]
   implicit val edgeTypeRead = Json.reads[EdgeType]
 
-  lazy val cpgJson = Json.parse(new FileInputStream("codepropertygraph/src/main/resources/cpg.json"))
-  lazy val nodeBaseTraits = (cpgJson \ "nodeBaseTraits").as[List[NodeBaseTrait]]
-  lazy val nodeTypes = (cpgJson \ "nodeTypes").as[List[NodeType]]
-  lazy val edgeTypes = (cpgJson \ "edgeTypes").as[List[EdgeType]]
-  lazy val nodeKeys = (cpgJson \ "nodeKeys").as[List[Property]]
-  lazy val edgeKeys = (cpgJson \ "edgeKeys").as[List[Property]]
+  private lazy val jsonRoot = Json.parse(new FileInputStream(schemaFile))
+  lazy val nodeBaseTraits = (jsonRoot \ "nodeBaseTraits").as[List[NodeBaseTrait]]
+  lazy val nodeTypes = (jsonRoot \ "nodeTypes").as[List[NodeType]]
+  lazy val edgeTypes = (jsonRoot \ "edgeTypes").as[List[EdgeType]]
+  lazy val nodeKeys = (jsonRoot \ "nodeKeys").as[List[Property]]
+  lazy val edgeKeys = (jsonRoot \ "edgeKeys").as[List[Property]]
 }
 
 /** Parses cpg domain model and generates specialized TinkerVertices and TinkerEdges
   * sbt is setup to invoke this class automatically. */
-object DomainClassCreator {
+class DomainClassCreator(schemaFile: String) {
   import Helpers._
   val nodesPackage = "io.shiftleft.codepropertygraph.generated.nodes"
   val edgesPackage = "io.shiftleft.codepropertygraph.generated.edges"
+  val schema = new Schema(schemaFile)
 
   def run(outputDir: JFile): List[JFile] = {
     println(s"generating domain classes for nodes/edges based on cpg.json")
@@ -39,10 +40,10 @@ object DomainClassCreator {
 
   def writeEdgesFile(outputDir: JFile): JFile = {
     val propertyByName: Map[String, Property] =
-      Resources.edgeKeys.map(key => key.name -> key).toMap
+      schema.edgeKeys.map(key => key.name -> key).toMap
 
     def entries: List[String] =
-      Resources.edgeTypes.map(edge => generateEdgeSource(edge, edge.keys.map(propertyByName)))
+      schema.edgeTypes.map(edge => generateEdgeSource(edge, edge.keys.map(propertyByName)))
 
     def edgeHeader = {
       val staticHeader = s"""
@@ -72,7 +73,7 @@ object DomainClassCreator {
 
       val factories = {
         val edgeFactories: List[String] =
-          Resources.edgeTypes.map(edgeType => edgeType.className + ".Factory")
+          schema.edgeTypes.map(edgeType => edgeType.className + ".Factory")
         s"""
         object Factories {
           lazy val All: List[EdgeFactory[_]] = ${edgeFactories}
@@ -157,12 +158,12 @@ object DomainClassCreator {
 
   def writeNodesFile(outputDir: JFile): JFile = {
     val propertyByName: Map[String, Property] =
-      Resources.nodeKeys.map(prop => prop.name -> prop).toMap
+      schema.nodeKeys.map(prop => prop.name -> prop).toMap
 
     def entries: List[String] = {
-      val nodeToInEdges = calculateNodeToInEdges(Resources.nodeTypes)
+      val nodeToInEdges = calculateNodeToInEdges(schema.nodeTypes)
 
-      Resources.nodeTypes.map(node =>
+      schema.nodeTypes.map(node =>
         generateNodeSource(node, node.keys.map(propertyByName), nodeToInEdges)
       )
     }
@@ -234,7 +235,7 @@ object DomainClassCreator {
         |  ${generateBaseTraitVisitorMethods}
         |}\n""".stripMargin
 
-      val nodeBaseTraits = Resources.nodeBaseTraits.map { nodeBaseTrait =>
+      val nodeBaseTraits = schema.nodeBaseTraits.map { nodeBaseTrait =>
         val mixins = nodeBaseTrait.hasKeys.map { key =>
           s"with Has${camelCaseCaps(key)}"
         }.mkString(" ")
@@ -259,7 +260,7 @@ object DomainClassCreator {
       }.mkString("\n")
 
       val keyBasedTraits =
-        Resources.nodeKeys.map { property =>
+        schema.nodeKeys.map { property =>
           val camelCaseName = camelCase(property.name)
           val camelCaseCapitalized = camelCaseName.capitalize
           val tpe = getCompleteType(property)
@@ -268,7 +269,7 @@ object DomainClassCreator {
 
       val factories = {
         val nodeFactories: List[String] =
-          Resources.nodeTypes.map(nodeType => nodeType.className + ".Factory")
+          schema.nodeTypes.map(nodeType => nodeType.className + ".Factory")
         s"""
         object Factories {
           lazy val All: List[NodeFactory[_]] = ${nodeFactories}
@@ -281,17 +282,17 @@ object DomainClassCreator {
     }
 
     def generateNodeVisitorMethods =
-      Resources.nodeTypes.map { nodeType =>
+      schema.nodeTypes.map { nodeType =>
         s"def visit(node: ${nodeType.className}): T = ???"
       }.mkString("\n")
 
     def generateBaseTraitVisitorMethods() =
-      Resources.nodeBaseTraits.map { nodeBaseTrait: NodeBaseTrait =>
+      schema.nodeBaseTraits.map { nodeBaseTrait: NodeBaseTrait =>
         s"def visit(node: ${nodeBaseTrait.className}): T = ???"
       }.mkString("\n")
 
     def edgeTypeByName: Map[String, EdgeType] =
-      Resources.edgeTypes.groupBy(_.name).mapValues(_.head)
+      schema.edgeTypes.groupBy(_.name).mapValues(_.head)
 
     def generateNodeSource(nodeType: NodeType,
                            keys: List[Property],
@@ -581,10 +582,10 @@ object DomainClassCreator {
     """
 
     val propertyByName: Map[String, Property] =
-      Resources.nodeKeys.map(prop => prop.name -> prop).toMap
+      schema.nodeKeys.map(prop => prop.name -> prop).toMap
 
     def entries: List[String] =
-      Resources.nodeTypes.map(node => generateNodeSource(node, node.keys.map(propertyByName)))
+      schema.nodeTypes.map(node => generateNodeSource(node, node.keys.map(propertyByName)))
 
     def generateNodeSource(nodeType: NodeType, keys: List[Property]) = {
       val fields: String = {
@@ -689,7 +690,7 @@ object DomainClassCreator {
 
   def calculateNodeToInEdges(nodeTypes: List[NodeType]): mutable.MultiMap[String, String] = {
     val nodeBaseTraitNames: List[String] =
-      Resources.nodeBaseTraits.map(_.name) :+ "NODE"
+      schema.nodeBaseTraits.map(_.name) :+ "NODE"
 
     val nodeToInEdges = new mutable.HashMap[String, mutable.Set[String]] with mutable.MultiMap[String, String]
     val nodeTypeNamesSet = nodeTypes.map(_.name).toSet ++ nodeBaseTraitNames
