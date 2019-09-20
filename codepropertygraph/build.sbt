@@ -46,8 +46,9 @@ Compile / sourceGenerators += Def.task {
   if (!outputRoot.exists || CodeGenGlobalState.lastMd5 != currentMd5) {
     val schemaFile = "codepropertygraph/src/main/resources/cpg.json"
     println(s"generating domain classes from $schemaFile")
+    val basePackage = "io.shiftleft.codepropertygraph.generated"
     val outputDir = (Compile / sourceManaged).value
-    new DomainClassCreator(schemaFile).run(outputDir)
+    new DomainClassCreator(schemaFile, basePackage).run(outputDir)
 
     // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
     val cmd = "codepropertygraph/codegen/src/main/python/generateJava.py"

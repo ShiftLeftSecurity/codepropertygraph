@@ -25,11 +25,15 @@ class Schema(schemaFile: String) {
   lazy val edgeKeys = (jsonRoot \ "edgeKeys").as[List[Property]]
 }
 
-/** Parses schema file and generates a domain model for OverflowDb */
-class DomainClassCreator(schemaFile: String) {
+/** Generates a domain model for OverflowDb traversals based on your domain-specific json schema.
+  * 
+  * @param schemaFile: path to the schema (json file)
+  * @param basePackage: specific for your domain, e.g. `com.example.mydomain`
+  */
+class DomainClassCreator(schemaFile: String, basePackage: String) {
   import Helpers._
-  val nodesPackage = "io.shiftleft.codepropertygraph.generated.nodes"
-  val edgesPackage = "io.shiftleft.codepropertygraph.generated.edges"
+  val nodesPackage = s"$basePackage.nodes"
+  val edgesPackage = s"$basePackage.edges"
   val schema = new Schema(schemaFile)
 
   def run(outputDir: JFile): List[JFile] =
@@ -170,7 +174,9 @@ class DomainClassCreator(schemaFile: String) {
       package $nodesPackage
 
       import gremlin.scala._
-      import io.shiftleft.codepropertygraph.generated.EdgeKeys
+      import $basePackage.EdgeKeys
+      import $basePackage.edges
+      import $basePackage.edges._
       import java.lang.{Boolean => JBoolean, Long => JLong}
       import java.util.{Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
       import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
@@ -178,8 +184,6 @@ class DomainClassCreator(schemaFile: String) {
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
       import scala.collection.JavaConverters._
       import org.slf4j.LoggerFactory
-      import io.shiftleft.codepropertygraph.generated.edges
-      import io.shiftleft.codepropertygraph.generated.edges._
 
       object PropertyErrorRegister {
         private var errorMap = Set[(Class[_], String)]()
