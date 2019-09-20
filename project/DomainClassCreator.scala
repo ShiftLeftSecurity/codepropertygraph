@@ -245,21 +245,21 @@ object DomainClassCreator {
 
       val nodeBaseTraitsSources = nodeBaseTraits.map { nodeBaseTrait =>
         val mixins = nodeBaseTrait.hasKeys.map { key =>
-          s"with Has${camelCase(key).capitalize}"
+          s"with Has${camelCaseCaps(key)}"
         }.mkString(" ")
 
         val mixinTraits = nodeBaseTrait
           .extendz
           .getOrElse(Nil)
           .map { traitName =>
-            s"with ${camelCase(traitName).capitalize}"
+            s"with ${camelCaseCaps(traitName)}"
           }.mkString(" ")
 
         val mixinTraitsForBase = nodeBaseTrait
           .extendz
           .getOrElse(List())
           .map { traitName =>
-            s"with ${camelCase(traitName).capitalize}Base"
+            s"with ${camelCaseCaps(traitName)}Base"
           }.mkString(" ")
 
         s"""trait ${nodeBaseTrait.className}Base extends Node $mixins $mixinTraitsForBase
@@ -314,7 +314,7 @@ object DomainClassCreator {
     def generateNodeSource(nodeType: NodeType,
                            keys: List[Property],
                            nodeToInEdges: mutable.MultiMap[String, String]) = {
-      val keyConstants = keys.map(key => s"""val ${camelCase(key.name).capitalize} = "${key.name}" """).mkString("\n")
+      val keyConstants = keys.map(key => s"""val ${camelCaseCaps(key.name)} = "${key.name}" """).mkString("\n")
       val keyToValueMap = keys
         .map { property: Property =>
           getHigherType(property) match {
@@ -333,8 +333,8 @@ object DomainClassCreator {
         option.map(_.toList).getOrElse(Nil)
       }
 
-      val outEdgeLayouts = outEdges.map(edge => s"edges.${camelCase(edge).capitalize}.layoutInformation").mkString(", ")
-      val inEdgeLayouts = inEdges.map(edge => s"edges.${camelCase(edge).capitalize}.layoutInformation").mkString(", ")
+      val outEdgeLayouts = outEdges.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
+      val inEdgeLayouts = inEdges.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
 
       val companionObject = s"""
       object ${nodeType.className} {
@@ -350,7 +350,7 @@ object DomainClassCreator {
         object Keys {
           $keyConstants
           val All: JSet[String] = Set(${keys.map { key =>
-            camelCase(key.name).capitalize
+            camelCaseCaps(key.name)
           }
           .mkString(", ")}).asJava
             val KeyToValue: Map[String, ${nodeType.classNameDb} => Any] = Map(
@@ -377,18 +377,18 @@ object DomainClassCreator {
         nodeType.is
           .getOrElse(List())
           .map { traitName =>
-            s"with ${camelCase(traitName).capitalize}"
+            s"with ${camelCaseCaps(traitName)}"
           }
           .mkString(" ")
       val mixinTraitsForBase: String =
         nodeType.is
           .getOrElse(List())
           .map { traitName =>
-            s"with ${camelCase(traitName).capitalize}Base"
+            s"with ${camelCaseCaps(traitName)}Base"
           }
           .mkString(" ")
 
-      val propertyBasedTraits = keys.map(key => s"with Has${camelCase(key.name).capitalize}").mkString(" ")
+      val propertyBasedTraits = keys.map(key => s"with Has${camelCaseCaps(key.name)}").mkString(" ")
 
       val valueMapImpl = {
         val putKeysImpl = keys
@@ -444,13 +444,13 @@ object DomainClassCreator {
 
       val walkInEdgeCases = {
         inEdges.map { edge =>
-          s"case ${edgesPackage}.${camelCase(edge).capitalize}.Label => walkIterators.add(${camelCase(edge)}In.iterator)"
+          s"case ${edgesPackage}.${camelCaseCaps(edge)}.Label => walkIterators.add(${camelCase(edge)}In.iterator)"
         }
       }.mkString("\n")
 
       val walkOutEdgeCases = {
         outEdges.map { edge =>
-          s"case ${edgesPackage}.${camelCase(edge).capitalize}.Label => walkIterators.add(${camelCase(edge)}Out.iterator)"
+          s"case ${edgesPackage}.${camelCaseCaps(edge)}.Label => walkIterators.add(${camelCase(edge)}Out.iterator)"
         }
       }.mkString("\n")
 
@@ -745,7 +745,7 @@ case class NodeType(name: String,
                     outEdges: List[OutEdgeEntry],
                     is: Option[List[String]],
                     containedNodes: Option[List[ContainedNode]]) {
-  lazy val className = Helpers.camelCase(name).capitalize
+  lazy val className = Helpers.camelCaseCaps(name)
   lazy val classNameDb = s"${className}Db"
 }
 
@@ -754,7 +754,7 @@ case class OutEdgeEntry(edgeName: String, inNodes: List[String])
 /** nodeType links to the referenced NodeType
   * cardinality must be one of `zeroOrOne`, `one`, `list` */
 case class ContainedNode(nodeType: String, localName: String, cardinality: String) {
-  lazy val nodeTypeClassName = Helpers.camelCase(nodeType).capitalize
+  lazy val nodeTypeClassName = Helpers.camelCaseCaps(nodeType)
 }
 
 sealed abstract class Cardinality(val name: String)
@@ -771,7 +771,7 @@ object Cardinality {
 
 /* representation of EdgeType in cpg.json */
 case class EdgeType(name: String, keys: List[String]) {
-  lazy val className = Helpers.camelCase(name).capitalize
+  lazy val className = Helpers.camelCaseCaps(name)
 }
 
 /* representation of nodeKey/edgeKey in cpg.json */
@@ -780,7 +780,7 @@ case class Property(name: String, comment: String, valueType: String, cardinalit
 /* representation of nodeBaseTrait in cpg.json */
 case class NodeBaseTrait(name: String, hasKeys: List[String], `extends`: Option[List[String]]) {
   lazy val extendz = `extends` //it's mapped from the key in json :(
-  lazy val className = Helpers.camelCase(name).capitalize
+  lazy val className = Helpers.camelCaseCaps(name)
 }
 
 object HigherValueType extends Enumeration {
@@ -797,6 +797,8 @@ object Helpers {
 
   def isNodeBaseTrait(baseTraits: List[NodeBaseTrait], nodeName: String): Boolean = 
     nodeName == "NODE" || baseTraits.map(_.name).contains(nodeName)
+
+  def camelCaseCaps(snakeCase: String): String = camelCase(snakeCase).capitalize
 
   def camelCase(snakeCase: String): String = {
     val corrected = // correcting for internal keys, like "_KEY" -> drop leading underscore
