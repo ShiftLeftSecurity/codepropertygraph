@@ -25,14 +25,14 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg){
       methodFullNameToNode += (method.fullName -> method)
     }.iterate()
 
-    cpg.call.sideEffect { call =>
+    cpg.call.toIterator().foreach { call =>
       try {
         linkCall(call, dstGraph)
       } catch {
         case exception: Exception =>
           throw new RuntimeException(exception)
       }
-    }.exec()
+    }
 
     Iterator(dstGraph)
   }
