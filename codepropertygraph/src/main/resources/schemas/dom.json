@@ -16,6 +16,9 @@
 	 "comment" : "Attribute of a DOM node",
 	 "keys" : ["NAME", "VALUE"],
 	 "outEdges" : []
-	}    
+	},
+	{"name" : "CONFIG_FILE",
+	 "outEdges" : [{"edgeName" : "CONTAINS", "inNodes" : ["DOM_NODE"]}]
+	}
     ]
 }
