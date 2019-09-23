@@ -1,0 +1,21 @@
+{
+    "nodeTypes" : [
+	{"id" : 600,
+	 "name" : "DOM_NODE",
+	 "comment" : "A node in a Document Object Model (Tree) as obtained from, e.g., an HTML parser",
+	 "keys" : ["NAME"],	 
+	 "outEdges" : [
+	     {"edgeName" : "AST", "inNodes": ["DOM_NODE"]}
+	 ],
+	 "containedNodes" : [
+	     {"nodeType" : "DOM_ATTRIBUTE", "localName" : "attributes", "cardinality" : "list"}
+	 ]
+	},
+	{"id" : 601,
+	 "name" : "DOM_ATTRIBUTE",
+	 "comment" : "Attribute of a DOM node",
+	 "keys" : ["NAME", "VALUE"],
+	 "outEdges" : []
+	}    
+    ]
+}
