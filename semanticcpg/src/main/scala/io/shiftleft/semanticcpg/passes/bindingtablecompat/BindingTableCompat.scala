@@ -21,12 +21,8 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
 
     if (cpg.graph.traversal.V().hasLabel(NodeTypes.BINDING).asScala.isEmpty) {
       cpg.typeDecl.toIterator().foreach { typeDecl =>
-        val methodsInVTable = typeDecl.vertices(Direction.OUT, EdgeTypes.VTABLE)
-          .asScala.map(_.asInstanceOf[nodes.Method])
-        methodsInVTable.foreach(createBinding(typeDecl, diffGraph))
-
-        val nonVirtNonConstructorMethods = getNonVirtualNonConstructorMethodsTransitive(typeDecl)
-        nonVirtNonConstructorMethods.foreach(createBinding(typeDecl, diffGraph))
+        val nonConstructorMethods = getNonConstructorMethodsTransitive(typeDecl)
+        nonConstructorMethods.foreach(createBinding(typeDecl, diffGraph))
 
         val constructorMethods = typeDecl.start.method.isConstructor.l
         constructorMethods.foreach(createBinding(typeDecl, diffGraph))
@@ -44,30 +40,29 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
     diffGraph.addEdgeToOriginal(newBinding, method, EdgeTypes.REF)
   }
 
-  private def getNonVirtualNonConstructorMethodsTransitive(typeDecl: nodes.TypeDecl): List[nodes.Method] = {
+  private def getNonConstructorMethodsTransitive(typeDecl: nodes.TypeDecl): List[nodes.Method] = {
     val baseTypeDecls = typeDecl.vertices(Direction.OUT, EdgeTypes.INHERITS_FROM).asScala
       .flatMap(typ => typ.vertices(Direction.OUT, EdgeTypes.REF).asScala).toList
 
-    val nonVirtNonConstructorMethodsOfBases = baseTypeDecls.flatMap { baseTypeDecl =>
-      getNonVirtualNonConstructorMethodsTransitive(baseTypeDecl.asInstanceOf[nodes.TypeDecl])}
+    val nonConstructorMethodsOfBases = baseTypeDecls.flatMap { baseTypeDecl =>
+      getNonConstructorMethodsTransitive(baseTypeDecl.asInstanceOf[nodes.TypeDecl])}
 
-    val ownNonVirtNonConstructorMethods = getNonVirtualNonConstructorMethods(typeDecl)
+    val ownNonConstructorMethods = getNonConstructorMethods(typeDecl)
 
     val notShadowedInheritedMethods =
-      nonVirtNonConstructorMethodsOfBases.filter { method =>
-        !ownNonVirtNonConstructorMethods.exists { ownMethod =>
+      nonConstructorMethodsOfBases.filter { method =>
+        !ownNonConstructorMethods.exists { ownMethod =>
           ownMethod.name == method.name && ownMethod.signature == method.signature
         }
       }
 
-    notShadowedInheritedMethods ++ ownNonVirtNonConstructorMethods
+    notShadowedInheritedMethods ++ ownNonConstructorMethods
   }
 
-  private def getNonVirtualNonConstructorMethods(typeDecl: nodes.TypeDecl): List[nodes.Method] = {
+  private def getNonConstructorMethods(typeDecl: nodes.TypeDecl): List[nodes.Method] = {
     typeDecl.vertices(Direction.OUT, EdgeTypes.AST).asScala
       .filter { method =>
         method.isInstanceOf[nodes.Method] &&
-          method.asInstanceOf[nodes.Method].start.isVirtual.headOption().isEmpty &&
           method.asInstanceOf[nodes.Method].start.isConstructor.headOption().isEmpty
       }.map (_.asInstanceOf[nodes.Method]).toList
   }
