@@ -1,12 +1,15 @@
-package io.shiftleft.semanticcpg.passes.languagespecific.csharp
+package io.shiftleft.semanticcpg.passes.compat.callnamecompat
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.NodeKeyNames
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
-import scala.collection.JavaConverters._
-
+/**
+  * Compitibilty pass which fixes mismatches between method full name and method name
+  * properties.
+  * TODO remove once this is fixed.
+  */
 class CallNameFixup(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     cpg.call.toIterator().foreach { call =>

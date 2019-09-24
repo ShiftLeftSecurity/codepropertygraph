@@ -1,4 +1,4 @@
-package io.shiftleft.semanticcpg.passes.bindingtablecompat
+package io.shiftleft.semanticcpg.passes.compat.bindingtablecompat
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewBinding

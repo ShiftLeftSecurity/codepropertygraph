@@ -1,4 +1,4 @@
-package io.shiftleft.semanticcpg.passes.methodinstcompat
+package io.shiftleft.semanticcpg.passes.compat.methodinstcompat
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
