@@ -39,12 +39,16 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def init(): Unit = {
-    cpg.graph.traversal().V().hasLabel(NodeTypes.METHOD_INST).sideEffect { traverser =>
-      val methodInst = traverser.get
-      methodInstFullNameToMethodFullName.put(
-        methodInst.value2(NodeKeys.FULL_NAME),
-        methodInst.value2(NodeKeys.METHOD_FULL_NAME))
-    }.iterate()
+    cpg.graph
+      .traversal()
+      .V()
+      .hasLabel(NodeTypes.METHOD_INST)
+      .sideEffect { traverser =>
+        val methodInst = traverser.get
+        methodInstFullNameToMethodFullName.put(methodInst.value2(NodeKeys.FULL_NAME),
+                                               methodInst.value2(NodeKeys.METHOD_FULL_NAME))
+      }
+      .iterate()
   }
 }
 

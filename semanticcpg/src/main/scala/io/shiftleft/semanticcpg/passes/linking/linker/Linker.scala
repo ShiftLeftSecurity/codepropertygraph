@@ -257,7 +257,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
         s"dstNodeType=$dstNodeType, dstNodeId=$dstNodeId")
   }
 
-
 }
 
 object Linker {

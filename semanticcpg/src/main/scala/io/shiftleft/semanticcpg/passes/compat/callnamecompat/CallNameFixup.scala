@@ -24,7 +24,6 @@ class CallNameFixup(cpg: Cpg) extends CpgPass(cpg) {
 
         val nameFromFullName = nameParts.last
 
-
         if (nameFromFullName != call.name) {
           call.property(NodeKeyNames.NAME, nameFromFullName)
         }

@@ -11,19 +11,23 @@ import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 
-class CallLinker(cpg: Cpg) extends CpgPass(cpg){
+class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
   import CallLinker._
   private var methodFullNameToNode = Map.empty[String, nodes.StoredNode]
+
   /**
     * Main method of enhancement - to be implemented by child class
     **/
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = new DiffGraph()
 
-    cpg.graph.V.hasLabel(NodeTypes.METHOD).sideEffectWithTraverser { traverser =>
-      val method = traverser.get.asInstanceOf[nodes.Method]
-      methodFullNameToNode += (method.fullName -> method)
-    }.iterate()
+    cpg.graph.V
+      .hasLabel(NodeTypes.METHOD)
+      .sideEffectWithTraverser { traverser =>
+        val method = traverser.get.asInstanceOf[nodes.Method]
+        methodFullNameToNode += (method.fullName -> method)
+      }
+      .iterate()
 
     cpg.call.toIterator().foreach { call =>
       try {
@@ -43,8 +47,11 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg){
         methodFullNameToNode.get(call.methodFullName)
       } else {
         val receiver = call.vertices(Direction.OUT, EdgeTypes.RECEIVER).nextChecked
-        val receiverTypeDecl = receiver.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).nextChecked
-          .vertices(Direction.OUT, EdgeTypes.REF).nextChecked
+        val receiverTypeDecl = receiver
+          .vertices(Direction.OUT, EdgeTypes.EVAL_TYPE)
+          .nextChecked
+          .vertices(Direction.OUT, EdgeTypes.REF)
+          .nextChecked
 
         receiverTypeDecl.vertices(Direction.OUT, EdgeTypes.BINDS).asScala.collectFirst {
           case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
@@ -56,7 +63,8 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg){
       case Some(method) =>
         dstGraph.addEdgeInOriginal(call, method, EdgeTypes.CALL)
       case None =>
-        logger.warn(s"Unable to link CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, SIGNATURE ${call.signature}")
+        logger.warn(
+          s"Unable to link CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, SIGNATURE ${call.signature}")
     }
   }
 }

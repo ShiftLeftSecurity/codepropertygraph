@@ -100,7 +100,10 @@ object ExpandTo {
 
   def callToCalledMethod(call: Vertex): Seq[nodes.Method] = {
     call
-      .vertices(Direction.OUT, EdgeTypes.CALL).asScala.map(_.asInstanceOf[nodes.Method]).toSeq
+      .vertices(Direction.OUT, EdgeTypes.CALL)
+      .asScala
+      .map(_.asInstanceOf[nodes.Method])
+      .toSeq
   }
 
   def methodToTypeDecl(vertex: Vertex): Option[Vertex] = {

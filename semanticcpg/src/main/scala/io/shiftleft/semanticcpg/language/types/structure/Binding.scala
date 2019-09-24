@@ -5,7 +5,8 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.{NameAccessors, SignatureAccessors}
 
-class Binding(raw: GremlinScala[nodes.Binding]) extends NodeSteps[nodes.Binding](raw)
+class Binding(raw: GremlinScala[nodes.Binding])
+    extends NodeSteps[nodes.Binding](raw)
     with NameAccessors[nodes.Binding]
     with SignatureAccessors[nodes.Binding] {
 
