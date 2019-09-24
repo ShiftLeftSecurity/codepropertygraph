@@ -84,7 +84,7 @@ generateProtobuf := {
     val scriptOutputFile = better.files.File("codepropertygraph/target/cpg.proto")
     if (result == 0 && scriptOutputFile.exists) {
       output.createIfNotExists(createParents = true)
-      scriptOutputFile.moveTo(output)(better.files.File.CopyOptions(overwrite = true))
+      scriptOutputFile.copyTo(output)(better.files.File.CopyOptions(overwrite = true))
       println(s"successfully wrote protobuf to $result")
     } else throw new Exception(s"problem when calling $cmd. exitCode was $result")
   } else {

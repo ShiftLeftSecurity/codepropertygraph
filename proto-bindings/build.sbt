@@ -47,9 +47,9 @@ generateCsharpBindings := {
 lazy val generateGoBindings = taskKey[File]("generate go proto bindings (doesn't publish them anywhere)")
 generateGoBindings := {
   import sys.process._
-  // generate cpg.proto file
-  (Projects.codepropertygraph/generateProtobuf).value
-  val protoFile = "codepropertygraph/target/resource_managed/main/cpg.proto"
+  (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
+  // protoc requires a relative path...
+  val protoFile = "codepropertygraph/target/cpg.proto"
   val outDir = new File("codepropertygraph/target/protoc-go")
   outDir.mkdirs
   println(s"writing go proto bindings to $outDir")
@@ -60,8 +60,9 @@ generateGoBindings := {
 lazy val generatePythonBindings = taskKey[File]("generate Python proto bindings")
 generatePythonBindings := {
   import sys.process._
-  (Projects.codepropertygraph/generateProtobuf).value
-  val protoFile = "codepropertygraph/target/resource_managed/main/cpg.proto"
+  (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
+  // protoc requires a relative path...
+  val protoFile = "codepropertygraph/target/cpg.proto"
   val outDir = new File("codepropertygraph/target/protoc-py")
   outDir.mkdirs
   println(s"writing Python proto bindings to $outDir")
