@@ -2,7 +2,7 @@
 
 import json, os
 
-OUTPUT_DIR = '../../../../target/resource_managed/main/'
+OUTPUT_DIR = '../../../../target/' # codepropertygraph/target
 
 def generateProtobuf(cpgDescr):
     protoStr = open('../resources/templates/cpg.proto.tpl').read()
