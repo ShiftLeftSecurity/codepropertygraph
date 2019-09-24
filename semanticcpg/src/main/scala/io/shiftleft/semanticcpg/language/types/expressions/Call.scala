@@ -58,7 +58,6 @@ class Call(raw: GremlinScala[nodes.Call])
     new MethodReturn(
       raw
         .out(EdgeTypes.CALL)
-        .out(EdgeTypes.REF)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.METHOD_RETURN)
         .cast[nodes.MethodReturn])

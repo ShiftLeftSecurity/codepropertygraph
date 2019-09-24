@@ -10,16 +10,10 @@ class Call(override val raw: GremlinScala[nodes.Call]) extends NodeSteps[nodes.C
   The callee method
     */
   def calledMethod(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] = {
-    calledMethodInstance(callResolver).method
-  }
-
-  /**
-  The callee method instance
-    */
-  def calledMethodInstance(implicit callResolver: ICallResolver): NodeSteps[nodes.MethodInst] =
-    new NodeSteps[nodes.MethodInst](
+    new NodeSteps[nodes.Method](
       sideEffect(callResolver.resolveDynamicCallSite).raw
         .out(EdgeTypes.CALL)
-        .cast[nodes.MethodInst])
+        .cast[nodes.Method])
+  }
 
 }

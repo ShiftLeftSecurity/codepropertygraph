@@ -22,7 +22,7 @@ class OutFactsImporter extends FactsImporter {
       NodeTypes.TYPE_DECL has 0 to N outgoing EdgeTypes.AST to NodeTypes.MEMBER,
       NodeTypes.TYPE_DECL has 0 to N outgoing EdgeTypes.AST to NodeTypes.MODIFIER,
       NodeTypes.TYPE_DECL has 0 to N outgoing EdgeTypes.AST to NodeTypes.ANNOTATION,
-      NodeTypes.TYPE_DECL has 0 to N outgoing EdgeTypes.VTABLE to NodeTypes.METHOD,
+      NodeTypes.TYPE_DECL has 0 to N outgoing EdgeTypes.BINDS to NodeTypes.BINDING,
       NodeTypes.MEMBER has 0 to N outgoing EdgeTypes.AST to NodeTypes.ANNOTATION,
       NodeTypes.MEMBER has 0 to N outgoing EdgeTypes.AST to NodeTypes.MODIFIER,
       NodeTypes.LITERAL has 1 to N outgoing EdgeTypes.CFG to SuperTypes.Expression or NodeTypes.METHOD_RETURN,
@@ -37,10 +37,10 @@ class OutFactsImporter extends FactsImporter {
       NodeTypes.BLOCK has 0 to N outgoing EdgeTypes.AST to SuperTypes.Expression,
       NodeTypes.BLOCK has 0 to N outgoing EdgeTypes.AST to NodeTypes.LOCAL,
       NodeTypes.BLOCK has 0 to N outgoing EdgeTypes.CFG to SuperTypes.Expression or NodeTypes.METHOD_RETURN,
-      NodeTypes.METHOD_INST has 0 to N outgoing EdgeTypes.AST to NodeTypes.TYPE_ARGUMENT,
       NodeTypes.METHOD_REF has 1 to N outgoing EdgeTypes.CFG to SuperTypes.Expression,
       NodeTypes.METHOD_REF has 0 to N outgoing EdgeTypes.CAPTURE to NodeTypes.CLOSURE_BINDING,
       NodeTypes.CLOSURE_BINDING has 1 outgoing EdgeTypes.REF to NodeTypes.LOCAL or NodeTypes.METHOD_PARAMETER_IN,
+      NodeTypes.BINDING has 1 outgoing EdgeTypes.REF to NodeTypes.METHOD,
     )
 
 }

@@ -37,11 +37,12 @@
         {"id": 51, "name" : "TYPE_FULL_NAME", "comment" : "The static type of an entity. E.g. expressions, local, parameters etc. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME", "valueType" : "string", "cardinality" : "one"},
         {"id": 52, "name" : "TYPE_DECL_FULL_NAME", "comment" : "The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME", "valueType" : "string", "cardinality" : "one"},
         {"id": 53, "name" : "INHERITS_FROM_TYPE_FULL_NAME", "comment" : "The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME", "valueType" : "string", "cardinality" : "list"},
-        {"id": 54, "name" : "METHOD_FULL_NAME", "comment" : "The FULL_NAME of a method. Used to link METHOD_INST and METHOD nodes. It is required to have exactly one METHOD node for each METHOD_FULL_NAME", "valueType" : "string", "cardinality" : "one"},
-        {"id": 55, "name" : "METHOD_INST_FULL_NAME", "comment" : "The FULL_NAME of a method instance. Used to link CALL and METHOD_REF nodes to METHOD_INST nodes. There needs to be at least one METHOD_INST node for each METHOD_INST_FULL_NAME", "valueType" : "string", "cardinality" : "one"},
+        {"id": 54, "name" : "METHOD_FULL_NAME", "comment" : "The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node for each METHOD_FULL_NAME", "valueType" : "string", "cardinality" : "one"},
+        {"id": 55, "name" : "METHOD_INST_FULL_NAME", "comment" : "Deprecated", "valueType" : "string", "cardinality" : "zeroOrOne"},
         {"id": 56, "name" : "AST_PARENT_TYPE", "comment" : "The type of the AST parent. Since this is only used in some parts of the graph the list does not include all possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK", "valueType" : "string", "cardinality" : "one"},
         {"id": 57, "name" : "AST_PARENT_FULL_NAME", "comment" : "The FULL_NAME of a the AST parent of an entity", "valueType" : "string", "cardinality" : "one"},
-        {"id": 158, "name" : "ALIAS_TYPE_FULL_NAME", "comment" : "Type full name of which a TYPE_DECL is an alias of", "valueType" : "string", "cardinality" : "zeroOrOne"}
+        {"id": 158, "name" : "ALIAS_TYPE_FULL_NAME", "comment" : "Type full name of which a TYPE_DECL is an alias of", "valueType" : "string", "cardinality" : "zeroOrOne"},
+        {"id": 1591, "name" : "DYNAMIC_TYPE_HINT_FULL_NAME", "comment" : "Type hint for the dynamic type", "valueType" : "string", "cardinality" : "list"}
     ],
 
     // Keys for edge properties
@@ -88,13 +89,13 @@
         },
 
         {"id" : 34, "name" : "METHOD_PARAMETER_IN",
-         "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "This node represents a formal parameter going towards the callee side",
          "is": ["DECLARATION", "LOCAL_LIKE", "TRACKING_POINT", "AST_NODE"]
         },
 
         {"id" : 3, "name" : "METHOD_RETURN",
-         "keys": ["CODE", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
+         "keys": ["CODE", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
          "comment" : "A formal method return",
          "is": ["CFG_NODE", "TRACKING_POINT"]
         },
@@ -119,9 +120,17 @@
          "comment" : "A type declaration",
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["TYPE_PARAMETER", "MEMBER", "MODIFIER"]},
+             {"edgeName": "BINDS", "inNodes": ["BINDING"]},
              {"edgeName": "VTABLE", "inNodes": ["METHOD"]}
          ],
 	 "is" : ["AST_NODE"]
+        },
+        {"id" : 146, "name" : "BINDING",
+         "keys" : ["NAME", "SIGNATURE"],
+         "comment" : "A binding of a METHOD into a TYPE_DECL",
+         "outEdges" : [
+             {"edgeName": "REF", "inNodes": ["METHOD"]}
+         ]
         },
         {"id" : 47, "name" : "TYPE_PARAMETER",
          "keys" : ["NAME", "ORDER"],
@@ -131,7 +140,7 @@
         },
         {"id" : 48, "name" : "TYPE_ARGUMENT",
          "keys" : ["ORDER"],
-         "comment" : "Argument for a TYPE_PARAMETER that belongs to a TYPE or METHOD_INST. It binds another TYPE to a TYPE_PARAMETER",
+         "comment" : "Argument for a TYPE_PARAMETER that belongs to a TYPE. It binds another TYPE to a TYPE_PARAMETER",
          "outEdges" : [
              {"edgeName": "REF", "inNodes": ["TYPE"]},
              {"edgeName": "BINDS_TO", "inNodes": ["TYPE_PARAMETER"]}
@@ -140,7 +149,7 @@
         },
 
         {"id" : 9, "name" : "MEMBER",
-         "keys" : [ "CODE", "NAME", "TYPE_FULL_NAME", "ORDER"],
+         "keys" : [ "CODE", "NAME", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "ORDER"],
          "comment" : "Member of a class struct or union",
          "is": ["DECLARATION", "AST_NODE"]
         },
@@ -156,7 +165,7 @@
         // Nodes that describe method content
 
         {"id" : 8, "name" : "LITERAL",
-         "keys" : ["CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys" : ["CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "Literal/Constant",
          "is": ["EXPRESSION"],
          "outEdges" : [
@@ -164,8 +173,7 @@
          ]
         },
         {"id": 15, "name" : "CALL",
-         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "DISPATCH_TYPE", "SIGNATURE", "TYPE_FULL_NAME", "METHOD_INST_FULL_NAME", "LINE_NUMBER",
-                  "COLUMN_NUMBER"],
+         "keys": ["CODE", "NAME", "ORDER", "METHOD_INST_FULL_NAME", "METHOD_FULL_NAME", "ARGUMENT_INDEX", "DISPATCH_TYPE", "SIGNATURE", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "A (method)-call",
          "is": ["EXPRESSION", "CALL_REPR"],
          "outEdges" : [
@@ -175,12 +183,12 @@
          ]
         },
         {"id":23, "name" : "LOCAL",
-         "keys": ["CODE", "NAME", "CLOSURE_BINDING_ID", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
+         "keys": ["CODE", "NAME", "CLOSURE_BINDING_ID", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
          "comment": "A local variable",
          "is": ["DECLARATION", "LOCAL_LIKE", "AST_NODE"]
         },
         {"id":27, "name": "IDENTIFIER",
-         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "An arbitrary identifier/reference",
          "is": ["EXPRESSION", "LOCAL_LIKE"],
          "outEdges" : [
@@ -198,7 +206,7 @@
          ]
         },
         {"id":31, "name": "BLOCK",
-         "keys": [ "CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys": [ "CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "A structuring block in the AST",
          "is": [ "EXPRESSION"],
          "outEdges" : [
@@ -206,15 +214,15 @@
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
          ]
         },
-        {"id":32, "name":"METHOD_INST",
-         "keys":["NAME", "FULL_NAME", "SIGNATURE", "METHOD_FULL_NAME", "ORDER"],
+        // METHOD_INST is deprecated.
+       {"id":32, "name":"METHOD_INST",
+         "keys":["NAME", "SIGNATURE", "FULL_NAME", "METHOD_FULL_NAME", "ORDER"],
          "comment":"A method instance which always has to reference a method and may have type argument children if the referred to method is a template",
          "outEdges": [
              {"edgeName": "AST", "inNodes": ["TYPE_ARGUMENT"]}
          ],
 	 "is" : ["AST_NODE"]
         },
-
         {"id" : 14, "name" : "ARRAY_INITIALIZER",
          "keys":[],
          "outEdges": [],
@@ -223,7 +231,7 @@
         },
 
         {"id":333, "name":"METHOD_REF",
-          "keys": ["CODE", "ORDER", "ARGUMENT_INDEX", "METHOD_INST_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+          "keys": ["CODE", "ORDER", "ARGUMENT_INDEX", "METHOD_INST_FULL_NAME", "METHOD_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
           "comment":"Reference to a method instance",
          "is": ["EXPRESSION"],
           "outEdges": [
@@ -238,7 +246,7 @@
 	 "outEdges" : [
              {"edgeName": "AST", "inNodes": ["LITERAL",
                                              "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
-                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN", "CONTROL_STRUCTURE"]},
+                                             "IDENTIFIER", "RETURN", "BLOCK", "UNKNOWN", "CONTROL_STRUCTURE"]},
 	     {"edgeName" : "CONDITION", "inNodes" : ["LITERAL", "CALL", "IDENTIFIER", "RETURN", "BLOCK", "METHOD_REF", "CONTROL_STRUCTURE", "UNKNOWN", "ARRAY_INITIALIZER"] }
 	 ]
 	},
@@ -246,14 +254,14 @@
         // This is the "catch-all-others" node type.
 
         {"id" : 44, "name": "UNKNOWN",
-         "keys" : ["CODE", "PARSER_TYPE_NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys" : ["CODE", "PARSER_TYPE_NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "A language-specific node",
          "is": ["EXPRESSION"],
          "outEdges" : [
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]},
              {"edgeName": "AST", "inNodes": ["LITERAL", "MEMBER",
                                              "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
-                                             "IDENTIFIER", "RETURN", "BLOCK", "METHOD_INST", "UNKNOWN", "CONTROL_STRUCTURE"]}
+                                             "IDENTIFIER", "RETURN", "BLOCK", "UNKNOWN", "CONTROL_STRUCTURE"]}
          ]
         }
     ],
@@ -282,9 +290,11 @@
 
         {"id" : 22, "name" : "BINDS_TO", "keys": [], "comment" : "Type argument binding to a type parameter", "keys" : [] },
         {"id" : 10, "name" : "REF", "keys" : [], "comment" : "A reference to e.g. a LOCAL" },
+        // VTABLE edge is deprecated.
         {"id" : 30, "name": "VTABLE", "comment" : "Indicates that a method is part of the vtable of a certain type declaration", "keys": []},
         {"id" : 55, "name": "RECEIVER", "comment" : "The receiver of a method call which is either an object or a pointer", "keys": []},
-	{"id" : 56, "name": "CONDITION", "comment" : "Edge from control structure node to the expression that holds the condition", "keys" : []}
+        {"id" : 56, "name": "CONDITION", "comment" : "Edge from control structure node to the expression that holds the condition", "keys" : []},
+        {"id" : 155, "name": "BINDS", "comment" : "Relation between TYPE_DECL and BINDING node", "keys": []}
 
     ],
 

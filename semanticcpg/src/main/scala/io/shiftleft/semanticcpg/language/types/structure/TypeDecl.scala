@@ -90,11 +90,18 @@ class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
     repeat(_.baseTypeDecl).emit()
 
   /**
-    * Traverse to the methods which are part of the VTables of this type declaration.
+    * Traverse to methods bound to this type decl.
     */
-  def vtableMethod: Method = {
-    new Method(
-      canonicalType.raw.out(EdgeTypes.VTABLE).cast[nodes.Method]
+  def boundMethod: Method = {
+    methodBinding.boundMethod
+  }
+
+  /**
+    * Traverse to the method bindings of this type declaration.
+    */
+  def methodBinding: Binding = {
+    new Binding(
+      canonicalType.raw.out(EdgeTypes.BINDS).cast[nodes.Binding]
     )
   }
 
