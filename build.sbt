@@ -6,7 +6,6 @@ inThisBuild(
     resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
-    crossPaths := false, // do not append scala version to the generated artifacts
     scmInfo := Some(ScmInfo(url("https://github.com/ShiftLeftSecurity/codepropertygraph"),
                             "scm:git@github.com:ShiftLeftSecurity/codepropertygraph.git")),
     homepage := Some(url("https://github.com/ShiftLeftSecurity/codepropertygraph/")),

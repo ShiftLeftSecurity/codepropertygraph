@@ -53,9 +53,12 @@ Compile / sourceGenerators += Def.task {
     // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
     val cmd = "codepropertygraph/codegen/src/main/python/generateJava.py"
     val result = Seq(cmd).!
-    if (result == 0)
-      println(s"successfully called $cmd")
-    else
+    if (result == 0) {
+      val generateJavaTmpOutput = better.files.File("codepropertygraph/target/generateJava")
+      generateJavaTmpOutput.children.foreach(
+        _.copyToDirectory(better.files.File(outputRoot.toPath))(copyOptions = better.files.File.CopyOptions(overwrite = true)))
+      println(s"successfully generated java files in $outputRoot")
+    } else
       throw new Exception(s"problem when calling $cmd. exitCode was $result")
   } else {
     println("no need to regenerate domain classes")
@@ -69,7 +72,7 @@ Compile / sourceGenerators += Def.task {
 
 lazy val generateProtobuf = taskKey[File]("generate cpg.proto")
 generateProtobuf := {
-  val output: File = resourceManaged.in(Compile).value / "cpg.proto"
+  val output = better.files.File((resourceManaged.in(Compile).value / "cpg.proto").toPath)
 
   val currentMd5 = FileUtils.md5(List(
     new File("codepropertygraph/codegen/src/main"),
@@ -78,16 +81,17 @@ generateProtobuf := {
     // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
     val cmd = "codepropertygraph/codegen/src/main/python/generateProtobuf.py"
     val result = Seq(cmd).!
-    val file = (resourceManaged in Compile).value / "cpg.proto"
-    if (result == 0)
-      println(s"successfully called $cmd")
-    else
-      throw new Exception(s"problem when calling $cmd. exitCode was $result")
+    val scriptOutputFile = better.files.File("codepropertygraph/target/cpg.proto")
+    if (result == 0 && scriptOutputFile.exists) {
+      output.createIfNotExists(createParents = true)
+      scriptOutputFile.moveTo(output)(better.files.File.CopyOptions(overwrite = true))
+      println(s"successfully wrote protobuf to $result")
+    } else throw new Exception(s"problem when calling $cmd. exitCode was $result")
   } else {
     println("no need to regenerate protobuf")
   }
   GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
-  output
+  output.toJava
 }
 generateProtobuf := generateProtobuf.dependsOn(mergeSchemaTask).value
 
