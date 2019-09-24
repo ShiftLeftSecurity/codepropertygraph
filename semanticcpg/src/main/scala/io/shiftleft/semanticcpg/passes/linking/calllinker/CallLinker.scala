@@ -38,27 +38,25 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg){
   }
 
   private def linkCall(call: nodes.Call, dstGraph: DiffGraph): Unit = {
-    if (call.dispatchType == DispatchTypes.STATIC_DISPATCH) {
-      methodFullNameToNode.get(call.methodFullName) match {
-        case Some(method) =>
-          dstGraph.addEdgeInOriginal(call, method, EdgeTypes.CALL)
-        case None =>
-          logger.warn(s"Unable to link CALL with METHOD_FULL_NAME ${call.methodFullName}.")
-      }
-    } else {
-      val receiver = call.vertices(Direction.OUT, EdgeTypes.RECEIVER).nextChecked
-      val receiverTypeDecl = receiver.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).nextChecked
-        .vertices(Direction.OUT, EdgeTypes.REF).nextChecked
+    val resolvedMethodOption =
+      if (call.dispatchType == DispatchTypes.STATIC_DISPATCH) {
+        methodFullNameToNode.get(call.methodFullName)
+      } else {
+        val receiver = call.vertices(Direction.OUT, EdgeTypes.RECEIVER).nextChecked
+        val receiverTypeDecl = receiver.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).nextChecked
+          .vertices(Direction.OUT, EdgeTypes.REF).nextChecked
 
-      val resolvedMethodOption =
         receiverTypeDecl.vertices(Direction.OUT, EdgeTypes.BINDS).asScala.collectFirst {
           case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
             binding.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method]
         }
-
-      resolvedMethodOption.foreach { method =>
-        dstGraph.addEdgeInOriginal(call, method, EdgeTypes.CALL)
       }
+
+    resolvedMethodOption match {
+      case Some(method) =>
+        dstGraph.addEdgeInOriginal(call, method, EdgeTypes.CALL)
+      case None =>
+        logger.warn(s"Unable to link CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, SIGNATURE ${call.signature}")
     }
   }
 }
