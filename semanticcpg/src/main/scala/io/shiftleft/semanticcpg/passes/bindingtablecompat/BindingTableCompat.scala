@@ -34,7 +34,15 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def createBinding(typeDecl: nodes.TypeDecl, diffGraph: DiffGraph)(method: nodes.Method): Unit = {
-    val newBinding = new NewBinding(method.name, method.signature)
+    // The csharp frontend creates method names which contain type parameters.
+    // This is unintended so we strip them here.
+    val indexOfTypeParameterStart = method.name.indexOf("<")
+    val mangledMethodName = if (indexOfTypeParameterStart != -1) {
+      method.name.substring(0, indexOfTypeParameterStart)
+    } else {
+      method.name
+    }
+    val newBinding = new NewBinding(mangledMethodName, method.signature)
     diffGraph.addNode(newBinding)
     diffGraph.addEdgeFromOriginal(typeDecl, newBinding, EdgeTypes.BINDS)
     diffGraph.addEdgeToOriginal(newBinding, method, EdgeTypes.REF)
