@@ -1,4 +1,4 @@
-val ScalatraVersion = "2.6.5"
+val ScalatraVersion = "2.7.0-RC1"
 organization := "io.shiftleft"
 name := "CPG server"
 
@@ -13,12 +13,9 @@ libraryDependencies ++= Seq(
   "org.scalatra" %% "scalatra-scalatest" % ScalatraVersion % "test",
   "org.scalatra" %% "scalatra-json" % ScalatraVersion,
   "org.scalatra" %% "scalatra-swagger"  % ScalatraVersion,
-
-  "com.github.pathikrit" %% "better-files"  % "3.1.0",
+  "com.github.pathikrit" %% "better-files"  % "3.8.0",
   "com.typesafe.akka" %% "akka-actor" % "2.5.3",
-  "net.databinder.dispatch" %% "dispatch-core" % "0.13.1",
-
-  "org.json4s"   %% "json4s-native" % "3.5.2",
+  "org.json4s"   %% "json4s-native" % "3.6.7",
   "ch.qos.logback" % "logback-classic" % "1.2.3" % "runtime",
   "org.eclipse.jetty" % "jetty-webapp" % "9.4.7.v20170914" % "container;compile",
   "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided"
