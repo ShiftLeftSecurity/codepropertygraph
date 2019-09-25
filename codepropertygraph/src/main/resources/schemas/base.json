@@ -288,7 +288,7 @@
 
         // Edges to represent type relations
 
-        {"id" : 22, "name" : "BINDS_TO", "keys": [], "comment" : "Type argument binding to a type parameter", "keys" : [] },
+        {"id" : 22, "name" : "BINDS_TO", "comment" : "Type argument binding to a type parameter", "keys" : [] },
         {"id" : 10, "name" : "REF", "keys" : [], "comment" : "A reference to e.g. a LOCAL" },
         // VTABLE edge is deprecated.
         {"id" : 30, "name": "VTABLE", "comment" : "Indicates that a method is part of the vtable of a certain type declaration", "keys": []},

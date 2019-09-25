@@ -144,12 +144,12 @@
         {"id" : 6, "name" : "CALL", "comment" : "Referencing to e.g. a LOCAL", "keys" : [] },
         {"id" : 11, "name": "TAGGED_BY", "keys" : [], "comment" : "Edges from nodes to tags"},
 
-        {"id" : 21, "name" : "EVAL_TYPE", "keys": [], "comment" : "Link to evaluation type", "keys" : [] },
-        {"id" : 23, "name" : "INHERITS_FROM", "keys": [], "comment" : "Inheritance relation between types", "keys" : [] },
+        {"id" : 21, "name" : "EVAL_TYPE", "comment" : "Link to evaluation type", "keys" : [] },
+        {"id" : 23, "name" : "INHERITS_FROM", "comment" : "Inheritance relation between types", "keys" : [] },
         {"id" : 28, "name" : "CONTAINS", "keys" : [], "comment" : "Shortcut over multiple AST edges"},
         {"id" : 1, "name" : "PROPAGATE", "keys" : ["ALIAS"], "comment" : "Encodes propagation of data from on node to another"},
-        {"id" : 137, "name": "REACHING_DEF", "keys" : [], "comment" : "Reaching definition edge", "keys" : []},
-        {"id" : 138, "name" : "ALIAS_OF", "keys": [], "comment" : "Alias relation between types", "keys" : [] }
+        {"id" : 137, "name": "REACHING_DEF", "comment" : "Reaching definition edge", "keys" : []},
+        {"id" : 138, "name" : "ALIAS_OF", "comment" : "Alias relation between types", "keys" : [] }
     ]
 
 }
