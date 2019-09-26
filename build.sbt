@@ -2,7 +2,7 @@ name := "codepropertygraph"
 inThisBuild(
   List(
     organization := "io.shiftleft",
-    scalaVersion := "2.12.10",
+    scalaVersion := "2.12.9",
     resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
