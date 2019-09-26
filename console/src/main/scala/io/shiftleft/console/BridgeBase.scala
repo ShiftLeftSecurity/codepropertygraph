@@ -3,8 +3,7 @@ package io.shiftleft.console
 import ammonite.ops.pwd
 import ammonite.ops.Path
 import ammonite.util.{Colors, Res}
-import better.files.FileOps
-import better.files.File
+import better.files._
 
 case class Config(
     scriptFile: Option[Path] = None,
