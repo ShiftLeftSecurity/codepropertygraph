@@ -25,7 +25,7 @@ trait CpgProvider {
     * Returns a CPG result identified by `uuid` iff the CPG has been created.
     *
     * @param cpgId A UUID associated with a CPG.
-    * @return A [[cats.data.OptionT]], containing a CPG result if it exists.
+    * @return A OptionT, containing a CPG result if it exists.
     */
   def retrieveCpg(cpgId: UUID): OptionT[IO, CpgOperationResult[Cpg]]
 }

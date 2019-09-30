@@ -28,7 +28,7 @@ trait CpgQueryExecutor[ResultT] {
     * Returns a query result identified by `uuid` iff the query has finished running.
     *
     * @param queryId A UUID associated with a CPG query.
-    * @return A [[cats.data.OptionT]], containing a CPG query result if it exists.
+    * @return An OptionT, containing a CPG query result if it exists.
     */
   def retrieveQueryResult(queryId: UUID): OptionT[IO, CpgOperationResult[ResultT]]
 }

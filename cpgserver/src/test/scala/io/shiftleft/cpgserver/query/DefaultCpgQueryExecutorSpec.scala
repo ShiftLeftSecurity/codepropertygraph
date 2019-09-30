@@ -30,7 +30,7 @@ class DefaultCpgQueryExecutorSpec extends BaseSpec {
       def eval(reader: Reader): AnyRef = ???
       def eval(script: String, n: Bindings): AnyRef = ???
       def eval(reader: Reader, n: Bindings): AnyRef = ???
-      def put(key: String, value: Any): Unit = ???
+      def put(key: String, value: Any): Unit = ()
       def get(key: String): AnyRef = ???
       def getBindings(scope: Int): Bindings = ???
       def setBindings(bindings: Bindings, scope: Int): Unit = ???
