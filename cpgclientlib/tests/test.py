@@ -14,7 +14,7 @@ import signal
 import threading
 
 SERVER = "127.0.0.1"
-PORT = 1337
+PORT = 8080
 
 stopEvent = threading.Event()
 
@@ -72,6 +72,7 @@ class TestStringMethods(unittest.TestCase):
         filename = os.path.join(SCRIPT_DIR, "testcode")
         self.client.create_cpg(filename)
         response = self.client.query("cpg.method.toJson")
+        print(response)
         jsonResponse = json.loads(response)
         self.assertEqual("main", jsonResponse[0]["NAME"])
 

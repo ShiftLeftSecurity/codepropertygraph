@@ -42,6 +42,7 @@ class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager) extends 
     for {
       e <- engine
       resultUuid <- uuidProvider
+      _ <- IO(e.put("aCpg", cpg))
       _ <- IO(e.eval(completeQuery).toString).runAsync {
         case Right(result) => IO(queryResultMap.put(resultUuid, CpgOperationSuccess(result))).map(_ => ())
         case Left(ex)      => IO(queryResultMap.put(resultUuid, CpgOperationFailure(ex))).map(_ => ())
