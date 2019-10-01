@@ -1,13 +1,14 @@
 package io.shiftleft.cpgserver.cpg
 
 import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.{ConcurrentHashMap, Executors}
 
 import scala.collection.JavaConverters._
 import scala.collection.concurrent.Map
+import scala.concurrent.ExecutionContext
 
 import cats.data.OptionT
-import cats.effect.IO
+import cats.effect.{Blocker, ContextShift, IO}
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewMethod
@@ -20,7 +21,10 @@ import io.shiftleft.semanticcpg.language._
   *
   * Any file names passed to the `createCpg` method will be ignored.
   */
-class DummyCpgProvider extends CpgProvider {
+class DummyCpgProvider(implicit cs: ContextShift[IO]) extends CpgProvider {
+
+  private val blocker: Blocker =
+    Blocker.liftExecutionContext(ExecutionContext.fromExecutor(Executors.newFixedThreadPool(2)))
 
   private val cpgMap: Map[UUID, CpgOperationResult[Cpg]] =
     new ConcurrentHashMap[UUID, CpgOperationResult[Cpg]].asScala
@@ -40,10 +44,13 @@ class DummyCpgProvider extends CpgProvider {
 
     for {
       cpgId <- uuidProvider
-      _ <- IO(new MyPass(cpg).createAndApply()).runAsync {
-        case Right(_) => IO(cpgMap.put(cpgId, CpgOperationSuccess(cpg))).map(_ => ())
-        case Left(ex) => IO(cpgMap.put(cpgId, CpgOperationFailure(ex))).map(_ => ())
-      }.toIO
+      _ <- blocker
+        .blockOn(IO(new MyPass(cpg).createAndApply()))
+        .runAsync {
+          case Right(_) => IO(cpgMap.put(cpgId, CpgOperationSuccess(cpg))).map(_ => ())
+          case Left(ex) => IO(cpgMap.put(cpgId, CpgOperationFailure(ex))).map(_ => ())
+        }
+        .toIO
     } yield cpgId
   }
 

@@ -2,14 +2,21 @@ package io.shiftleft.cpgserver.cpg
 
 import java.util.UUID
 
+import scala.concurrent.ExecutionContext
+
 import cats.data.OptionT
-import cats.effect.IO
+import cats.effect.{ContextShift, IO}
+import org.scalatest.concurrent.Eventually
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.cpgserver.BaseSpec
 import io.shiftleft.cpgserver.model.CpgOperationResult
+import scala.concurrent.duration._
+import scala.language.postfixOps
 
-class DummyCpgProviderSpec extends BaseSpec {
+class DummyCpgProviderSpec extends BaseSpec with Eventually {
+
+  private implicit val cs: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
 
   private def withNewCpgProvider[T](f: DummyCpgProvider => T): T = {
     f(new DummyCpgProvider)
@@ -24,7 +31,10 @@ class DummyCpgProviderSpec extends BaseSpec {
   "Retrieving a CPG" should {
     "return a success if the CPG was created successfully" in withNewCpgProvider { cpgProvider =>
       val cpgId = cpgProvider.createCpg(Set.empty).unsafeRunSync()
-      cpgProvider.retrieveCpg(cpgId).value.unsafeRunSync() shouldBe defined
+
+      eventually(timeout(2 seconds), interval(500 millis)) {
+        cpgProvider.retrieveCpg(cpgId).value.unsafeRunSync() shouldBe defined
+      }
     }
 
     "return an empty OptionT if the CPG does not exist" in withNewCpgProvider { cpgProvider =>

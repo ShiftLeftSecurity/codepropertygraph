@@ -3,18 +3,25 @@ package io.shiftleft.cpgserver.query
 import java.io.Reader
 import java.util.UUID
 
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
+import scala.language.postfixOps
+
 import cats.data.OptionT
-import cats.effect.IO
-import javax.script.{Bindings, ScriptContext, ScriptEngine, ScriptEngineFactory, ScriptEngineManager}
+import cats.effect.{ContextShift, IO}
+import javax.script._
+import org.scalatest.concurrent.Eventually
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.cpgserver.BaseSpec
 import io.shiftleft.cpgserver.model.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess}
 
-class DefaultCpgQueryExecutorSpec extends BaseSpec {
+class DefaultCpgQueryExecutorSpec extends BaseSpec with Eventually {
 
   private val queryResult = "a result"
   private val queryException = new RuntimeException("Oh noes!")
+
+  private implicit val cs: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
 
   private object UndefinedScriptEngineManager extends ScriptEngineManager {
     override def getEngineByName(shortName: String): ScriptEngine = null
@@ -68,14 +75,17 @@ class DefaultCpgQueryExecutorSpec extends BaseSpec {
     "return a success if the query was completed successfully" in withNewQueryExecutor() { executor =>
       val queryId = executor.executeQuery(Cpg.emptyCpg, "cpg.method.l").unsafeRunSync()
 
-      executor.retrieveQueryResult(queryId) shouldBe OptionT.pure[IO](CpgOperationSuccess(queryResult))
+      eventually(timeout(2 seconds), interval(500 millis)) {
+        executor.retrieveQueryResult(queryId) shouldBe OptionT.pure[IO](CpgOperationSuccess(queryResult))
+      }
     }
 
     "return a failure if there was an issue running the query" in withNewQueryExecutor(queryError = true) { executor =>
       val queryId = executor.executeQuery(Cpg.emptyCpg, "cpg.method.l").unsafeRunSync()
 
-      executor.retrieveQueryResult(queryId) shouldBe OptionT.pure[IO](CpgOperationFailure(queryException))
-
+      eventually(timeout(2 seconds), interval(500 millis)) {
+        executor.retrieveQueryResult(queryId) shouldBe OptionT.pure[IO](CpgOperationFailure(queryException))
+      }
     }
 
     "return an empty OptionT if the query does not yet exist" in withNewQueryExecutor() { executor =>
