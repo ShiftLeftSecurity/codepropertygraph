@@ -1,21 +1,26 @@
 package io.shiftleft.cpgserver.query
 
 import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.{ConcurrentHashMap, Executors}
 
 import scala.collection.JavaConverters._
 import scala.collection.concurrent.Map
+import scala.concurrent.ExecutionContext
 
 import cats.data.OptionT
-import cats.effect.IO
+import cats.effect.{Blocker, ContextShift, IO}
 import javax.script.ScriptEngineManager
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.cpgserver.model.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess}
 
-class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager) extends CpgQueryExecutor[String] {
+class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager)(implicit val cs: ContextShift[IO])
+    extends CpgQueryExecutor[String] {
 
   private val engineType = "scala"
+
+  private val blocker: Blocker =
+    Blocker.liftExecutionContext(ExecutionContext.fromExecutor(Executors.newFixedThreadPool(2)))
 
   private val queryResultMap: Map[UUID, CpgOperationResult[String]] =
     new ConcurrentHashMap[UUID, CpgOperationResult[String]].asScala
@@ -43,10 +48,13 @@ class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager) extends 
       e <- engine
       resultUuid <- uuidProvider
       _ <- IO(e.put("aCpg", cpg))
-      _ <- IO(e.eval(completeQuery).toString).runAsync {
-        case Right(result) => IO(queryResultMap.put(resultUuid, CpgOperationSuccess(result))).map(_ => ())
-        case Left(ex)      => IO(queryResultMap.put(resultUuid, CpgOperationFailure(ex))).map(_ => ())
-      }.toIO
+      _ <- blocker
+        .blockOn(IO(e.eval(completeQuery).toString))
+        .runAsync {
+          case Right(result) => IO(queryResultMap.put(resultUuid, CpgOperationSuccess(result))).map(_ => ())
+          case Left(ex)      => IO(queryResultMap.put(resultUuid, CpgOperationFailure(ex))).map(_ => ())
+        }
+        .toIO
     } yield resultUuid
   }
 
