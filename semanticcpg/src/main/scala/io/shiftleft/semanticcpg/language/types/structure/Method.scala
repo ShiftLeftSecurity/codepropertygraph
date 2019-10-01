@@ -28,6 +28,15 @@ class Method(override val raw: GremlinScala[nodes.Method])
     with AstNodeBase[nodes.Method] {
 
   /**
+    * Traverse to concrete instances of method.
+    */
+  def methodInstance: MethodInst = {
+    new MethodInst(
+      raw.in(EdgeTypes.REF).cast[nodes.MethodInst]
+    )
+  }
+
+  /**
     * Traverse to parameters of the method
     * */
   def parameter: MethodParameter =
@@ -44,18 +53,11 @@ class Method(override val raw: GremlinScala[nodes.Method])
     new MethodReturn(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.METHOD_RETURN).cast[nodes.MethodReturn])
 
   /**
-    * Traverse to type decl which have this method bound to it.
+    * Traverse to the type declarations were this method is in the VTable.
     */
-  def bindingTypeDecl: TypeDecl = {
-    referencingBinding.bindingTypeDecl
-  }
-
-  /**
-    * Traverse to bindings which reference to this method.
-    */
-  def referencingBinding: Binding = {
-    new Binding(
-      raw.in(EdgeTypes.REF).filter(_.hasLabel(NodeTypes.BINDING)).cast[nodes.Binding]
+  def inVTableOfTypeDecl: TypeDecl = {
+    new TypeDecl(
+      raw.in(EdgeTypes.VTABLE).cast[nodes.TypeDecl]
     )
   }
 

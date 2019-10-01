@@ -11,11 +11,14 @@ import scala.collection.mutable
   */
 class NodeFilter {
   private val typeFullNames = mutable.Set[String]()
+  private val methodInstFullNames = mutable.Set[String]()
 
   def filterNode(protoNode: Node): Boolean = {
     protoNode.getType match {
       case Node.NodeType.TYPE =>
         filterTypeNode(protoNode.getPropertyList.asScala, NodePropertyName.FULL_NAME, typeFullNames)
+      case Node.NodeType.METHOD_INST =>
+        filterTypeNode(protoNode.getPropertyList.asScala, NodePropertyName.FULL_NAME, methodInstFullNames)
       case _ =>
         true
     }
