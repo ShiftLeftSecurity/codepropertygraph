@@ -51,6 +51,7 @@ class MethodParameter(raw: GremlinScala[nodes.MethodParameterIn])
       raw
         .sack((_: Integer, node: nodes.MethodParameterIn) => node.value2(NodeKeys.ORDER))
         .in(EdgeTypes.AST)
+        .in(EdgeTypes.REF)
         .in(EdgeTypes.CALL)
         .out(EdgeTypes.AST)
         .filterWithTraverser { traverser =>

@@ -8,7 +8,7 @@ class InFactsImporter extends FactsImporter {
 
   override def loadFacts: List[InFact] =
     List(
-      NodeTypes.METHOD has 0 to N incoming EdgeTypes.REF from NodeTypes.BINDING,
+      NodeTypes.METHOD has 0 to N incoming EdgeTypes.VTABLE from NodeTypes.TYPE_DECL,
       NodeTypes.METHOD_PARAMETER_IN has 1 incoming EdgeTypes.AST from NodeTypes.METHOD,
       NodeTypes.METHOD_PARAMETER_IN has 0 to N incoming EdgeTypes.REF from NodeTypes.IDENTIFIER or NodeTypes.CLOSURE_BINDING,
       NodeTypes.METHOD_RETURN has 1 incoming EdgeTypes.AST from NodeTypes.METHOD,
@@ -40,7 +40,6 @@ class InFactsImporter extends FactsImporter {
       NodeTypes.METHOD_REF has 1 incoming EdgeTypes.AST from SuperTypes.Expression,
       NodeTypes.METHOD_REF has 0 to N incoming EdgeTypes.CFG from SuperTypes.Expression or NodeTypes.METHOD,
       NodeTypes.METHOD_REF has 0 to 1 incoming EdgeTypes.RECEIVER from NodeTypes.CALL,
-      NodeTypes.BINDING has 1 incoming EdgeTypes.BINDS from NodeTypes.TYPE_DECL,
     )
 
 }

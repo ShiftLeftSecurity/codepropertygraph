@@ -58,6 +58,7 @@ trait ExpressionBase[NodeType <: nodes.Expression]
         .sack((sack: Integer, node: nodes.Expression) => node.value2(NodeKeys.ARGUMENT_INDEX))
         .in(EdgeTypes.AST)
         .out(EdgeTypes.CALL)
+        .out(EdgeTypes.REF)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
         .filterWithTraverser { traverser =>

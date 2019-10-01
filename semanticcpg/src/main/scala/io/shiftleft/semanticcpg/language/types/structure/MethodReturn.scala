@@ -19,7 +19,7 @@ class MethodReturn(raw: GremlinScala[nodes.MethodReturn])
 
   def returnUser: Call = {
     new Call(
-      raw.in(EdgeTypes.AST).in(EdgeTypes.CALL).cast[nodes.Call]
+      raw.in(EdgeTypes.AST).in(EdgeTypes.REF).in(EdgeTypes.CALL).cast[nodes.Call]
     )
   }
 
