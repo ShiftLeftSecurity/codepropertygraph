@@ -1,0 +1,182 @@
+{
+
+    // New node keys introduced by enhancements
+
+    "nodeKeys" : [
+        {"id": 17, "name" : "DEPTH_FIRST_ORDER", "comment" : "The depth first ordering number used to detect back edges in reducible CFGs", "valueType" : "int", "cardinality" : "zeroOrOne"},
+        {"id": 23, "name": "HAS_MAPPING", "comment": "Marks that a method has at least one mapping defined from the policies", "valueType" : "boolean", "cardinality" : "zeroOrOne"}
+    ],
+
+    // New edge keys introduced by enhancements
+
+    "edgeKeys" : [
+    ],
+
+    "nodeTypes" : [
+
+        // New node types introduced by enhancements
+
+        {
+         "id":301,"name" : "TAGS",
+         "keys" : [],
+         "comment" : "Multiple tags",
+         "outEdges" : [],
+         "containedNodes" : [{"localName" : "tags", "nodeType" : "TAG", "cardinality" : "list" }]
+        },
+        // deprecated, c.f. CONFIG_FILE
+        {
+            "id":42,
+            "name": "FRAMEWORK",
+            "keys": ["NAME"],
+            "comment": "Indicates the usage of a framework. E.g. java spring. The name key is one of the values from frameworks list",
+            "outEdges": [
+                {"edgeName": "ATTACHED_DATA", "inNodes": ["FRAMEWORK_DATA"]}
+            ]
+        },
+        // deprecated, c.f. CONFIG_FILE
+        {
+            "id":43,
+            "name": "FRAMEWORK_DATA",
+            "keys": ["NAME", "CONTENT"],
+            "comment": "Data used by a framework",
+            "outEdges": []
+        },
+
+        // Modifications to existing node types
+
+        {"name" : "METHOD", "keys" : ["HAS_MAPPING", "DEPTH_FIRST_ORDER"],
+         "outEdges" : [ 
+           {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+           {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]}
+         ]
+        },
+        {"name" : "METHOD_RETURN", "keys" : ["DEPTH_FIRST_ORDER"],
+         "outEdges" : [
+           {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
+           {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]}
+        ]},
+        {"name" : "LITERAL", "keys" : ["DEPTH_FIRST_ORDER"],
+        "outEdges" : [
+            {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+            {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
+            {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
+            {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
+             {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+        ]},
+        {"name" : "LOCAL",
+         "outEdges" : [
+             {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]}
+         ]
+        },
+        {"name" : "MEMBER", "outEdges" : [
+            {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL"]}
+        ]
+        },
+
+        {"name" : "CALL", "keys" : ["DEPTH_FIRST_ORDER"],
+         "outEdges" : [
+             {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
+             {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
+             {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
+             {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+         ]
+        },
+        {"name" : "IDENTIFIER", "keys" : ["DEPTH_FIRST_ORDER"],
+        "outEdges" : [
+            {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+            {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
+            {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
+            {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
+             {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+        ]},
+        {"name" : "METHOD_PARAMETER_IN",
+         "outEdges" : [
+             {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
+             {"edgeName": "TAINT_REMOVE", "inNodes": ["METHOD_PARAMETER_OUT"]}
+         ]
+        },
+
+        {"name" : "RETURN", "keys" : ["DEPTH_FIRST_ORDER"],
+            "outEdges": [
+                {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
+                {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]}
+            ]
+        },
+        {"name" : "BLOCK", "keys" : ["DEPTH_FIRST_ORDER"],
+          "outEdges" : [
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]}
+          ]
+        },
+        {"name" : "UNKNOWN", "keys" : ["DEPTH_FIRST_ORDER"],
+         "outEdges" : [
+             {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
+             {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
+             {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
+             {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+         ]
+        },
+        {
+            "name": "METHOD_REF", "keys" : ["DEPTH_FIRST_ORDER"],
+            "outEdges": [
+                {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
+                {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
+                {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+            ]
+        },
+        {
+            "name": "CLOSURE_BINDING", "outEdges": [
+            ]
+        },
+        {
+            "id": 1001, "name": "DETACHED_TRACKING_POINT", "comment": "", "keys": [],
+            "is": ["TRACKING_POINT"],
+            "containedNodes": [
+              {"localName" : "cfgNode", "nodeType" : "CFG_NODE", "cardinality" : "one"}
+            ],
+            "outEdges": []
+        }
+
+    ],
+
+
+    "edgeTypes" : [
+
+        // New edge types introduced by enhancements
+
+        {"id" : 17, "name": "TAINT_REMOVE", "keys" : [], "comment" : "Indicates taint removal. Only present between corresponding METHOD_PARAMETER_IN and METHOD_PARAMETER_OUT nodes"},
+        {"id" : 20, "name" : "DYNAMIC_TYPE", "keys": [], "comment" : "Indicates the dynamic type(s) of an entity. This comes initially from the frontend provided DYNAMIC_TYPE_HINT_FULL_NAME property and is extended by our type resolution" },
+        {"id" : 181, "name": "DOMINATE", "keys" : [], "comment" : "Points to dominated node in DOM tree", "keys" : []},
+        {"id" : 182, "name": "POST_DOMINATE", "keys" : [], "comment" : "Points to dominated node in post DOM tree", "keys" : []},
+        {"id" : 183, "name": "CDG", "keys" : [], "comment" : "Control dependency graph", "keys" : []},
+        // deprecated, c.f. CONFIG_FILE
+        {"id" : 18, "name": "ATTACHED_DATA", "keys" : [], "comment" : "Link between FRAMEWORK and FRAMEWORK_DATA nodes", "keys" : []}
+
+        // Modifications to existing edge types
+    ],
+
+    // deprecated, c.f. CONFIG_FILE
+    "frameworks" : [
+        {"id" : 1, "name" : "PLAY", "comment" : "Play framework"},
+        {"id" : 2, "name" : "GWT", "comment" : "Google web toolkit"},
+        {"id" : 3, "name" : "SPRING", "comment" : "Java spring framework"},
+        {"id" : 4, "name" : "VERTX", "comment" : "Polyglot event-driven framework"},
+        {"id" : 5, "name" : "JSF", "comment" : "JavaServer Faces"},
+        {"id" : 6, "name" : "SERVLET", "comment" : "Java Servlet based frameworks"},
+        {"id" : 7, "name" : "JAXRS", "comment" : "JAX-RS"},
+        {"id" : 8, "name" : "SPARK", "comment" : "Spark micro web framework"},
+        {"id" : 9, "name" : "ASP_NET_CORE", "comment" : "Microsoft ASP.NET Core"},
+        {"id" : 10, "name" : "ASP_NET_WEB_API", "comment" : "Microsoft ASP.NET Web API"},
+        {"id" : 11, "name" : "ASP_NET_MVC", "comment" : "Microsoft ASP.NET MVC"},
+        {"id" : 12, "name" : "JAXWS", "comment" : "JAX-WS"},
+        {"id" : 13, "name" : "ASP_NET_WEB_UI", "comment" : "Microsoft ASP.NET Web UI"},
+        {"id" : 14, "name" : "JAVA_INTERNAL", "comment" : "Framework facilities directly provided by Java"},
+        {"id" : 15, "name" : "DROPWIZARD", "comment" : "Dropwizard framework"},
+        {"id" : 16, "name" : "WCF", "comment" : "WCF HTTP and REST"}
+    ]
+
+}
