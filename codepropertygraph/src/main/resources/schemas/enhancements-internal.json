@@ -104,7 +104,9 @@
         },
         {"name" : "BLOCK", "keys" : ["DEPTH_FIRST_ORDER"],
           "outEdges" : [
-             {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]}
+             {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
+             {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
+             {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
           ]
         },
         {"name" : "UNKNOWN", "keys" : ["DEPTH_FIRST_ORDER"],
