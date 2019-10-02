@@ -1,0 +1,52 @@
+{
+    "nodeKeys" : [	
+	{"id" : 813, "name" : "PATTERN", "valueType" : "string", "cardinality" : "one", "comment" : ""}
+    ],
+    "edgeKeys" : [],
+    "nodeTypes" : [
+	{"id" : 51, "name" : "MATCH_INFO", "keys" : ["PATTERN", "CATEGORY"], "comment" : "", "outEdges" : []},
+	
+	{"id" : 52, "name" : "SENSITIVE_DATA_TYPE", "keys" : ["FULL_NAME"], "comment" : "",
+	 "containedNodes" : [
+	     {"localName" : "names", "nodeType" : "MATCH_INFO", "cardinality" : "list"},
+	     {"localName" : "members", "nodeType" : "SENSITIVE_MEMBER", "cardinality" : "list"}
+	 ],
+	 "outEdges" : [
+	    {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF", "inNodes" : ["TYPE_DECL"]}
+	 ]
+	},
+	
+	{"id" : 53, "name" : "SENSITIVE_MEMBER", "keys" : ["NAME"], "comment" : "",
+	 "containedNodes" : [
+	     {"localName" : "names", "nodeType" : "MATCH_INFO", "cardinality" : "list"}
+	 ],
+	 "outEdges" : [
+	     {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF", "inNodes" : ["TYPE", "MEMBER"]}
+	 ]
+	},
+	{"id" : 54, "name" : "SENSITIVE_VARIABLE", "keys" : ["NAME"], "comment" : "",
+	 "containedNodes" : [
+	     {"localName" : "names", "nodeType" : "MATCH_INFO", "cardinality" : "list"},
+	     {"localName" : "evalType", "nodeType" : "TYPE", "cardinality" : "one"}
+	 ], "outEdges" : [
+	     // "inNodes" : "LOCAL_LIKE" is what I want here, but it is currently necessary
+	     // to enumerate all child classes
+	     {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF", "inNodes" : ["METHOD_PARAMETER_IN", "LOCAL", "IDENTIFIER"] },
+	     {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF_REF", "inNodes" : ["SENSITIVE_REFERENCE"] },
+	     {"edgeName" : "IS_SENSITIVE_DATA_OF_TYPE", "inNodes" : ["SENSITIVE_DATA_TYPE"]}
+	 ]
+	},
+	{"id" : 55, "name" : "SENSITIVE_REFERENCE", "keys" : [], "comment" : "",
+	 "containedNodes" : [
+	     {"localName" : "ioflows", "nodeType" : "IOFLOW", "cardinality" : "list"}
+	 ], "outEdges" : [
+	   {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF_REF", "inNodes" : ["METHOD_PARAMETER_IN", "LOCAL", "IDENTIFIER"]}
+	 ]
+	}
+    ],
+    "edgeTypes" : [
+	{"id" : 900, "name" : "IS_SENSITIVE_DATA_DESCR_OF", "keys" : [], "comment" : ""},
+	{"id" : 901, "name" : "IS_SENSITIVE_DATA_DESCR_OF_REF", "keys" : [], "comment" : ""},
+	{"id" : 902, "name" : "IS_SENSITIVE_DATA_OF_TYPE", "keys" : [], "comment" : ""}
+    ]
+}
