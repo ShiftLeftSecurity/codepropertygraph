@@ -9,7 +9,8 @@ case class Config(
     scriptFile: Option[Path] = None,
     params: Map[String, String] = Map.empty,
     additionalImports: List[Path] = Nil,
-    colors: Option[Colors] = None
+    colors: Option[Colors] = None,
+    subcommand: Option[String] = None
 )
 
 /**
@@ -44,6 +45,10 @@ trait BridgeBase {
       opt[Unit]("nocolors")
         .action((x, c) => c.copy(colors = Some(Colors.BlackWhite)))
         .text("turn off colors")
+
+      opt[String]("subcommand")
+        .action((x, c) => c.copy(subcommand = Some(x)))
+        .text("select one of multiple @main methods")
     }
 
     // note: if config is really `None` an error message would have been displayed earlier
@@ -78,7 +83,13 @@ trait BridgeBase {
       case Some(scriptFile) =>
         val isEncryptedScript = scriptFile.ext == "enc"
         println(s"executing $scriptFile with params=${config.params}")
-        val scriptArgs: Seq[(String, Option[String])] = config.params.mapValues(Option.apply).toSeq
+        val scriptArgs: Seq[(String, Option[String])] = {
+          val subcommandArgs = config.subcommand match {
+            case Some(subcommand) => Seq(subcommand -> None)
+            case _ => Nil
+          }
+          subcommandArgs ++ config.params.mapValues(Option.apply).toSeq
+        }
         val actualScriptFile =
           if (isEncryptedScript) decryptedScript(scriptFile)
           else scriptFile
