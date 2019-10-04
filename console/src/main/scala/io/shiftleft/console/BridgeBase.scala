@@ -86,7 +86,7 @@ trait BridgeBase {
         val scriptArgs: Seq[(String, Option[String])] = {
           val commandArgs = config.command match {
             case Some(command) => Seq(command -> None)
-            case _                => Nil
+            case _             => Nil
           }
           commandArgs ++ config.params.mapValues(Option.apply).toSeq
         }
