@@ -4,13 +4,13 @@ import gremlin.scala.{GremlinScala, __}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method, MethodInst}
+import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.nodemethods.{AstNodeMethods, WithinMethodMethods}
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
 
-import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod, MethodInst => OriginalMethodInst}
+import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod}
 import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
 
 /**
@@ -58,9 +58,6 @@ package object language {
 
   implicit def toLocal(steps: Steps[nodes.Local]): Local =
     new Local(steps.raw)
-
-  implicit def toMethodInst(steps: Steps[nodes.MethodInst]): OriginalMethodInst =
-    new OriginalMethodInst(steps.raw)
 
   implicit def toMethod(steps: Steps[nodes.Method]): OriginalMethod =
     new OriginalMethod(steps.raw)
@@ -187,8 +184,5 @@ package object language {
 
   implicit def toCallForCallGraph(steps: Steps[nodes.Call]): Call =
     new Call(steps.raw)
-
-  implicit def toMethodInstForCallGraph[X <% OriginalMethodInst](original: X): MethodInst =
-    new MethodInst(original)
 
 }

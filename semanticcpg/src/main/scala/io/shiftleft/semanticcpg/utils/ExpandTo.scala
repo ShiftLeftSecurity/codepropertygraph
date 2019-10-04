@@ -102,7 +102,7 @@ object ExpandTo {
     call
       .vertices(Direction.OUT, EdgeTypes.CALL)
       .asScala
-      .map(methodInst => methodInst.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method])
+      .map(_.asInstanceOf[nodes.Method])
       .toSeq
   }
 
