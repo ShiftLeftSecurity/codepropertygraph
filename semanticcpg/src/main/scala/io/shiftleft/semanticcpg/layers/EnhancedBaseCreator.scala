@@ -11,6 +11,7 @@ import io.shiftleft.semanticcpg.passes.linking.linker.Linker
 import io.shiftleft.semanticcpg.passes.linking.memberaccesslinker.MemberAccessLinker
 import io.shiftleft.semanticcpg.passes.methoddecorations.MethodDecoratorPass
 import io.shiftleft.semanticcpg.passes.methodexternaldecorator.MethodExternalDecoratorPass
+import io.shiftleft.semanticcpg.passes.compat.methodinstcompat.MethodInstCompat
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
 
@@ -21,6 +22,7 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
     language match {
       case Languages.JAVA =>
         List(
+          new MethodInstCompat(cpg),
           new ReceiverEdgePass(cpg),
           new MethodDecoratorPass(cpg),
           new CapturingLinker(cpg),
@@ -28,10 +30,11 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
           new ContainsEdgePass(cpg),
-          new NamespaceCreator(cpg)
+          new NamespaceCreator(cpg),
         )
       case Languages.C =>
         List(
+          new MethodInstCompat(cpg),
           new TypeDeclStubCreator(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
@@ -44,6 +47,7 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
         )
       case _ =>
         List(
+          new MethodInstCompat(cpg),
           new ReceiverEdgePass(cpg),
           new MethodDecoratorPass(cpg),
           new CapturingLinker(cpg),
@@ -51,7 +55,7 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
           new ContainsEdgePass(cpg),
-          new NamespaceCreator(cpg)
+          new NamespaceCreator(cpg),
         )
     }
   }
