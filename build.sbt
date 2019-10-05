@@ -2,7 +2,7 @@ name := "codepropertygraph"
 inThisBuild(
   List(
     organization := "io.shiftleft",
-    scalaVersion := "2.12.9",
+    scalaVersion := "2.12.8", // do not upgrade until https://github.com/lihaoyi/Ammonite/issues/1009 is resolved
     resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
