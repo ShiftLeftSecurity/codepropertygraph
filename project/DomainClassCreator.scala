@@ -157,7 +157,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
     writeFile(filename, edgeHeader, entries)
   }
 
-  def neighboraccessorname(et: String, direction: String) : String = {s"_${et}_${direction}"}
+  def neighboraccessorname(et: String, direction: String) : String = {"_" + camelCase(et + "_" + direction)}
 
 
   def writeNodesFile(outputDir: JFile): JFile = {
