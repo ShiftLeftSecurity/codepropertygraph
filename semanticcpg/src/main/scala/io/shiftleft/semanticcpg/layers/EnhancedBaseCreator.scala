@@ -4,8 +4,10 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.CpgPass
+import io.shiftleft.semanticcpg.passes.compat.bindingtablecompat.BindingTableCompat
 import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
+import io.shiftleft.semanticcpg.passes.linking.calllinker.CallLinker
 import io.shiftleft.semanticcpg.passes.linking.capturinglinker.CapturingLinker
 import io.shiftleft.semanticcpg.passes.linking.linker.Linker
 import io.shiftleft.semanticcpg.passes.linking.memberaccesslinker.MemberAccessLinker
@@ -27,6 +29,8 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new MethodDecoratorPass(cpg),
           new CapturingLinker(cpg),
           new Linker(cpg),
+          new BindingTableCompat(cpg),
+          new CallLinker(cpg),
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
           new ContainsEdgePass(cpg),
@@ -40,10 +44,12 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new MethodDecoratorPass(cpg),
           new CapturingLinker(cpg),
           new Linker(cpg),
+          new BindingTableCompat(cpg),
+          new CallLinker(cpg),
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
           new ContainsEdgePass(cpg),
-          new NamespaceCreator(cpg)
+          new NamespaceCreator(cpg),
         )
       case _ =>
         List(
@@ -52,6 +58,8 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new MethodDecoratorPass(cpg),
           new CapturingLinker(cpg),
           new Linker(cpg),
+          new BindingTableCompat(cpg),
+          new CallLinker(cpg),
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
           new ContainsEdgePass(cpg),
