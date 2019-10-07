@@ -41,7 +41,8 @@
         {"id": 55, "name" : "METHOD_INST_FULL_NAME", "comment" : "Deprecated", "valueType" : "string", "cardinality" : "zeroOrOne"},
         {"id": 56, "name" : "AST_PARENT_TYPE", "comment" : "The type of the AST parent. Since this is only used in some parts of the graph the list does not include all possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK", "valueType" : "string", "cardinality" : "one"},
         {"id": 57, "name" : "AST_PARENT_FULL_NAME", "comment" : "The FULL_NAME of a the AST parent of an entity", "valueType" : "string", "cardinality" : "one"},
-        {"id": 158, "name" : "ALIAS_TYPE_FULL_NAME", "comment" : "Type full name of which a TYPE_DECL is an alias of", "valueType" : "string", "cardinality" : "zeroOrOne"}
+        {"id": 158, "name" : "ALIAS_TYPE_FULL_NAME", "comment" : "Type full name of which a TYPE_DECL is an alias of", "valueType" : "string", "cardinality" : "zeroOrOne"},
+        {"id": 1591, "name" : "DYNAMIC_TYPE_HINT_FULL_NAME", "comment" : "Type hint for the dynamic type", "valueType" : "string", "cardinality" : "list"}
     ],
 
     // Keys for edge properties
@@ -88,13 +89,13 @@
         },
 
         {"id" : 34, "name" : "METHOD_PARAMETER_IN",
-         "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys": ["CODE", "ORDER", "NAME", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "This node represents a formal parameter going towards the callee side",
          "is": ["DECLARATION", "LOCAL_LIKE", "TRACKING_POINT", "AST_NODE"]
         },
 
         {"id" : 3, "name" : "METHOD_RETURN",
-         "keys": ["CODE", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
+         "keys": ["CODE", "EVALUATION_STRATEGY", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
          "comment" : "A formal method return",
          "is": ["CFG_NODE", "TRACKING_POINT"]
         },
@@ -148,7 +149,7 @@
         },
 
         {"id" : 9, "name" : "MEMBER",
-         "keys" : [ "CODE", "NAME", "TYPE_FULL_NAME", "ORDER"],
+         "keys" : [ "CODE", "NAME", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "ORDER"],
          "comment" : "Member of a class struct or union",
          "is": ["DECLARATION", "AST_NODE"]
         },
@@ -164,7 +165,7 @@
         // Nodes that describe method content
 
         {"id" : 8, "name" : "LITERAL",
-         "keys" : ["CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys" : ["CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "Literal/Constant",
          "is": ["EXPRESSION"],
          "outEdges" : [
@@ -172,7 +173,7 @@
          ]
         },
         {"id": 15, "name" : "CALL",
-         "keys": ["CODE", "NAME", "ORDER", "METHOD_INST_FULL_NAME", "METHOD_FULL_NAME", "ARGUMENT_INDEX", "DISPATCH_TYPE", "SIGNATURE", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys": ["CODE", "NAME", "ORDER", "METHOD_INST_FULL_NAME", "METHOD_FULL_NAME", "ARGUMENT_INDEX", "DISPATCH_TYPE", "SIGNATURE", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "A (method)-call",
          "is": ["EXPRESSION", "CALL_REPR"],
          "outEdges" : [
@@ -182,12 +183,12 @@
          ]
         },
         {"id":23, "name" : "LOCAL",
-         "keys": ["CODE", "NAME", "CLOSURE_BINDING_ID", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
+         "keys": ["CODE", "NAME", "CLOSURE_BINDING_ID", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
          "comment": "A local variable",
          "is": ["DECLARATION", "LOCAL_LIKE", "AST_NODE"]
         },
         {"id":27, "name": "IDENTIFIER",
-         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys": ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "An arbitrary identifier/reference",
          "is": ["EXPRESSION", "LOCAL_LIKE"],
          "outEdges" : [
@@ -205,7 +206,7 @@
          ]
         },
         {"id":31, "name": "BLOCK",
-         "keys": [ "CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys": [ "CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "A structuring block in the AST",
          "is": [ "EXPRESSION"],
          "outEdges" : [
@@ -253,7 +254,7 @@
         // This is the "catch-all-others" node type.
 
         {"id" : 44, "name": "UNKNOWN",
-         "keys" : ["CODE", "PARSER_TYPE_NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys" : ["CODE", "PARSER_TYPE_NAME", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "A language-specific node",
          "is": ["EXPRESSION"],
          "outEdges" : [
