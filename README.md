@@ -117,7 +117,6 @@ cpg.identifier.toList
 cpg.argument.toList
 cpg.typeDecl.toList
 cpg.method.toList
-cpg.methodInstance.toList
 ```
 
 From here you can traverse through the cpg. The query-primitives DSL ensures that only valid steps are available - anything else will result in a compile error:
