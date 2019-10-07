@@ -99,6 +99,22 @@ class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
   }
 
   /**
+    * Traverse to methods bound to this type decl.
+    */
+  def boundMethod: Method = {
+    methodBinding.boundMethod
+  }
+
+  /**
+    * Traverse to the method bindings of this type declaration.
+    */
+  def methodBinding: Binding = {
+    new Binding(
+      canonicalType.raw.out(EdgeTypes.BINDS).cast[nodes.Binding]
+    )
+  }
+
+  /**
     * Traverse to method modifiers, e.g., "static", "public".
     * */
   def modifier: Modifier =

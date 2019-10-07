@@ -104,6 +104,9 @@ package object language {
   implicit def toMethodRef(steps: Steps[nodes.MethodRef]): MethodRef =
     new MethodRef(steps.raw)
 
+  implicit def toBinding(steps: Steps[nodes.Binding]): Binding =
+    new Binding(steps.raw)
+
   implicit class GremlinScalaDeco[End](raw: GremlinScala[End]) {
     /* in some cases we cannot statically determine the type of the node, e.g. when traversing
      * from a known nodeType via AST edges, so we have to cast */
