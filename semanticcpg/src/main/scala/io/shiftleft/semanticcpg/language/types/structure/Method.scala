@@ -7,8 +7,7 @@ import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{
   AstNodeBase,
   CfgNode,
   DeclarationBase,
-  Expression,
-  Modifier
+  Expression
 }
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.{Call, ControlStructure, Literal}
@@ -25,7 +24,8 @@ class Method(override val raw: GremlinScala[nodes.Method])
     with SignatureAccessors[nodes.Method]
     with LineNumberAccessors[nodes.Method]
     with EvalTypeAccessors[nodes.Method]
-    with AstNodeBase[nodes.Method] {
+    with AstNodeBase[nodes.Method]
+    with ModifierAccessors[nodes.Method] {
 
   /**
     * Traverse to parameters of the method
@@ -168,15 +168,6 @@ class Method(override val raw: GremlinScala[nodes.Method])
     * */
   def internal: Method =
     new Method(raw.has(NodeKeys.IS_EXTERNAL -> false))
-
-  /**
-    * Traverse to method modifiers, e.g., "static", "public".
-    * */
-  def modifier: Modifier =
-    new Modifier(
-      raw.out
-        .hasLabel(NodeTypes.MODIFIER)
-        .cast[nodes.Modifier])
 
   /**
     * Traverse to the methods local variables

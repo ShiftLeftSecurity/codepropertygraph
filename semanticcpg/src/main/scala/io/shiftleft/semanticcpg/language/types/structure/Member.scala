@@ -5,8 +5,13 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.Call
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{DeclarationBase, Modifier}
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.{CodeAccessors, EvalTypeAccessors, NameAccessors}
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.DeclarationBase
+import io.shiftleft.semanticcpg.language.types.propertyaccessors.{
+  CodeAccessors,
+  EvalTypeAccessors,
+  ModifierAccessors,
+  NameAccessors
+}
 
 /**
   * A member variable of a class/type.
@@ -16,7 +21,8 @@ class Member(raw: GremlinScala[nodes.Member])
     with DeclarationBase[nodes.Member]
     with CodeAccessors[nodes.Member]
     with NameAccessors[nodes.Member]
-    with EvalTypeAccessors[nodes.Member] {
+    with EvalTypeAccessors[nodes.Member]
+    with ModifierAccessors[nodes.Member] {
 
   /**
     * The type declaration this member is defined in
@@ -54,15 +60,8 @@ class Member(raw: GremlinScala[nodes.Member])
   def isStatic: Member =
     new Member(raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> ModifierTypes.STATIC)))
 
-  /**
-    * Traverse to method modifiers, e.g., "static", "public".
-    * */
-  def modifier: Modifier =
-    new Modifier(
-      raw.out
-        .hasLabel(NodeTypes.MODIFIER)
-        .cast[nodes.Modifier]
-    )
+  def isMemberWithModifier(modifier: String): Member =
+    new Member(raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> modifier)))
 
   /**
     * Traverse to member type
