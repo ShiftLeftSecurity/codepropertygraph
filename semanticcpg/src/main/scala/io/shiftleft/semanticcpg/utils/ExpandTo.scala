@@ -17,7 +17,7 @@ object ExpandTo {
   // For java, the call receiver is always an object instance.
   // For languages which make use of function pointers, this can also be the
   // pointer itself.
-  def callReceiverOption(callNode: Vertex): Option[Vertex] = {
+  def callReceiverOption(callNode: Vertex): Option[nodes.StoredNode] = {
     callNode
       .asInstanceOf[nodes.StoredNode]._receiverOut
       .asScala
@@ -25,7 +25,7 @@ object ExpandTo {
       .headOption
   }
 
-  def callReceiver(callNode: Vertex): Vertex = {
+  def callReceiver(callNode: Vertex): nodes.StoredNode = {
     callReceiverOption(callNode).get
   }
 
@@ -43,15 +43,15 @@ object ExpandTo {
     }
   }
 
-  def typeCarrierToType(parameterNode: Vertex): Vertex = {
+  def typeCarrierToType(parameterNode: Vertex): nodes.StoredNode = {
     parameterNode.asInstanceOf[nodes.StoredNode]._evalTypeOut.nextChecked
   }
 
-  def parameterInToMethod(parameterNode: Vertex): Vertex = {
+  def parameterInToMethod(parameterNode: Vertex): nodes.StoredNode = {
     parameterNode.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
   }
 
-  def methodReturnToMethod(formalReturnNode: Vertex): Vertex = {
+  def methodReturnToMethod(formalReturnNode: Vertex): nodes.StoredNode = {
     formalReturnNode.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
   }
 
@@ -59,7 +59,7 @@ object ExpandTo {
     returnExpression.asInstanceOf[nodes.StoredNode]._astOut.nextOption.map(_.asInstanceOf[nodes.Expression])
   }
 
-  def methodToFormalReturn(method: Vertex): Vertex = {
+  def methodToFormalReturn(method: Vertex): nodes.StoredNode = {
     method
       .asInstanceOf[nodes.StoredNode]._astOut
       .asScala
@@ -68,15 +68,15 @@ object ExpandTo {
       .nextChecked
   }
 
-  def formalReturnToReturn(methodReturn: Vertex): Seq[Vertex] = {
+  def formalReturnToReturn(methodReturn: Vertex): Seq[nodes.StoredNode] = {
     methodReturn
-      .asInstanceOf[nodes.StoredNode].cfgIn
+      .asInstanceOf[nodes.StoredNode]._cfgIn
       .asScala
       .filter(_.isInstanceOf[nodes.Return])
       .toSeq
   }
 
-  def expressionToMethod(expression: Vertex): Vertex = {
+  def expressionToMethod(expression: Vertex): nodes.StoredNode = {
     expression.asInstanceOf[nodes.StoredNode]._containsIn.nextChecked
   }
 
@@ -89,11 +89,11 @@ object ExpandTo {
       .asInstanceOf[nodes.StoredNode]._astOut
       .asScala
       .exists(astChild =>
-        astChild.label == NodeTypes.MODIFIER &&
+        astChild.isInstanceOf[nodes.Modifier] &&
           astChild.asInstanceOf[nodes.Modifier].modifierType == modifierType)
   }
 
-  def astParent(expression: Vertex): Vertex = {
+  def astParent(expression: Vertex): nodes.StoredNode = {
     expression.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
   }
 
@@ -105,7 +105,7 @@ object ExpandTo {
       .toSeq
   }
 
-  def methodToTypeDecl(vertex: Vertex): Option[Vertex] = {
+  def methodToTypeDecl(vertex: Vertex): Option[nodes.StoredNode] = {
     findVertex(vertex, _.isInstanceOf[nodes.TypeDecl])
   }
 
@@ -114,7 +114,7 @@ object ExpandTo {
   }
 
   @tailrec
-  private def findVertex(vertex: Vertex, instanceCheck: Vertex => Boolean): Option[Vertex] = {
+  private def findVertex(vertex: Vertex, instanceCheck: Vertex => Boolean): Option[nodes.StoredNode] = {
     val iterator = vertex.asInstanceOf[nodes.StoredNode]._astIn
     if (iterator.hasNext) {
       iterator.next() match {
@@ -126,7 +126,7 @@ object ExpandTo {
     }
   }
 
-  def methodToOutParameters(method: Vertex): Seq[Vertex] = {
+  def methodToOutParameters(method: Vertex): Seq[nodes.StoredNode] = {
     method
       .asInstanceOf[nodes.StoredNode]._astOut
       .asScala
@@ -134,11 +134,11 @@ object ExpandTo {
       .toSeq
   }
 
-  def allCfgNodesOfMethod(method: Vertex): TraversableOnce[Vertex] = {
+  def allCfgNodesOfMethod(method: Vertex): TraversableOnce[nodes.StoredNode] = {
     method.asInstanceOf[nodes.StoredNode]._containsOut.asScala
   }
 
-  def reference(node: Vertex): Option[Vertex] = {
+  def reference(node: Vertex): Option[nodes.StoredNode] = {
     node.asInstanceOf[nodes.StoredNode]._refOut.nextOption
   }
 

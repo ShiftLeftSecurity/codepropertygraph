@@ -476,9 +476,9 @@ $neighborAccesors
       |  $abstractContainedNodeAccessors
       |}""".stripMargin
 
-      val neighborDelegators = (outEdges.map(et => neighboraccessorname(et, "OUT")) ++
-                                inEdges.map(et => neighboraccessorname(et, "IN"))).map(st =>
-        s"override def ${st}(): JIterator[StoredNode] = get().${st}()").mkString("\n")
+      val neighborDelegators = (outEdges.map(edgetypename => neighborAccessorName(edgetypename, "OUT")) ++
+                                inEdges.map(edgetypename => neighborAccessorName(edgetypename, "IN"))).map(nbaName =>
+        s"override def ${nbaName}(): JIterator[StoredNode] = get().${nbaName}()").mkString("\n")
 
       val nodeRefImpl = {
         val propertyDelegators = keys.map(_.name).map(camelCase).map { name =>
