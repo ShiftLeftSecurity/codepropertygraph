@@ -78,18 +78,15 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
                                  inSet: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Unit = {
 
     def addEdge(v0: nodes.StoredNode, v1: nodes.StoredNode): Unit = {
-      dstGraph.addEdgeInOriginal(v0,
-                                 v1,
-                                 EdgeTypes.REACHING_DEF)
+      dstGraph.addEdgeInOriginal(v0, v1, EdgeTypes.REACHING_DEF)
     }
 
-    method._astOut.asScala.filter(_.isInstanceOf[nodes.MethodParameterIn]).foreach {
-      methodParameterIn =>
-        methodParameterIn._refIn.asScala.foreach { refInIdentifier =>
-          dfHelper
-            .getOperation(refInIdentifier)
-            .foreach(operationNode => addEdge(methodParameterIn, operationNode))
-        }
+    method._astOut.asScala.filter(_.isInstanceOf[nodes.MethodParameterIn]).foreach { methodParameterIn =>
+      methodParameterIn._refIn.asScala.foreach { refInIdentifier =>
+        dfHelper
+          .getOperation(refInIdentifier)
+          .foreach(operationNode => addEdge(methodParameterIn, operationNode))
+      }
     }
 
     val methodReturn = ExpandTo.methodToFormalReturn(method)
@@ -226,8 +223,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
   }
 
   def getExpressions(method: nodes.StoredNode): List[nodes.StoredNode] = {
-    val callNodes = method
-      ._containsOut.asScala
+    val callNodes = method._containsOut.asScala
       .filter(_.isInstanceOf[nodes.Call])
       .toList
 
@@ -262,8 +258,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
   }
 
   def getUsesOfExpression(expr: nodes.StoredNode): Set[nodes.StoredNode] = {
-    expr
-      ._astOut.asScala
+    expr._astOut.asScala
       .filter(!getGensOfExpression(expr).contains(_))
       .toSet
   }

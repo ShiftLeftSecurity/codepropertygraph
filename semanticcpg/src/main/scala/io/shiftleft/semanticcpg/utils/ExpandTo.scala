@@ -19,7 +19,8 @@ object ExpandTo {
   // pointer itself.
   def callReceiverOption(callNode: Vertex): Option[nodes.StoredNode] = {
     callNode
-      .asInstanceOf[nodes.StoredNode]._receiverOut
+      .asInstanceOf[nodes.StoredNode]
+      ._receiverOut
       .asScala
       .toList
       .headOption
@@ -61,7 +62,8 @@ object ExpandTo {
 
   def methodToFormalReturn(method: Vertex): nodes.StoredNode = {
     method
-      .asInstanceOf[nodes.StoredNode]._astOut
+      .asInstanceOf[nodes.StoredNode]
+      ._astOut
       .asScala
       .filter(_.isInstanceOf[nodes.MethodReturn])
       .asJava
@@ -70,7 +72,8 @@ object ExpandTo {
 
   def formalReturnToReturn(methodReturn: Vertex): Seq[nodes.StoredNode] = {
     methodReturn
-      .asInstanceOf[nodes.StoredNode]._cfgIn
+      .asInstanceOf[nodes.StoredNode]
+      ._cfgIn
       .asScala
       .filter(_.isInstanceOf[nodes.Return])
       .toSeq
@@ -86,7 +89,8 @@ object ExpandTo {
 
   def hasModifier(methodNode: Vertex, modifierType: String): Boolean = {
     methodNode
-      .asInstanceOf[nodes.StoredNode]._astOut
+      .asInstanceOf[nodes.StoredNode]
+      ._astOut
       .asScala
       .exists(astChild =>
         astChild.isInstanceOf[nodes.Modifier] &&
@@ -99,7 +103,8 @@ object ExpandTo {
 
   def callToCalledMethod(call: Vertex): Seq[nodes.Method] = {
     call
-      .asInstanceOf[nodes.StoredNode]._callOut
+      .asInstanceOf[nodes.StoredNode]
+      ._callOut
       .asScala
       .map(_.asInstanceOf[nodes.Method])
       .toSeq
@@ -128,7 +133,8 @@ object ExpandTo {
 
   def methodToOutParameters(method: Vertex): Seq[nodes.StoredNode] = {
     method
-      .asInstanceOf[nodes.StoredNode]._astOut
+      .asInstanceOf[nodes.StoredNode]
+      ._astOut
       .asScala
       .filter(_.isInstanceOf[nodes.MethodParameterOut])
       .toSeq
