@@ -3,7 +3,7 @@ name := "codepropertygraph"
 dependsOn(Projects.protoBindings)
 
 libraryDependencies ++= Seq(
-  "io.shiftleft" % "overflowdb-tinkerpop3" % "0.28",
+  "io.shiftleft" % "overflowdb-tinkerpop3" % "0.30",
   "com.michaelpollmeier" %% "gremlin-scala" % "3.3.4.17",
   "com.google.guava" % "guava" % "21.0",
   "org.apache.commons" % "commons-lang3" % "3.5",

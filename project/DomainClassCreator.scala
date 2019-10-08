@@ -504,7 +504,7 @@ $neighboraccesors
           |}""".stripMargin
       }
       val neighbor_accesors = (outEdges.map(x=>neighboraccessorname(x, "OUT")) ++
-        outEdges.map(x=>neighboraccessorname(x, "IN")) ).zipWithIndex.map{case (s: String, n: Int) =>
+        inEdges.map(x=>neighboraccessorname(x, "IN")) ).zipWithIndex.map{case (s: String, n: Int) =>
           s"override def $s : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($n).asInstanceOf[JIterator[StoredNode]]"
       }.mkString("\n")
 
