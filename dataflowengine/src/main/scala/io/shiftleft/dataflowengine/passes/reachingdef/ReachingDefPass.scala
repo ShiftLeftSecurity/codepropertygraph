@@ -56,7 +56,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
         val oldSize = out(currentCfgNode).size
         val gens = mapExpressionsGens(currentCfgNode)
         val kills = mapExpressionsKills(currentCfgNode)
-        gens
+
         out += currentCfgNode -> gens.union(inSet.diff(kills))
         val newSize = out(currentCfgNode).size
 
@@ -73,7 +73,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
     * reaching definition edge reaches a vertex where the definition is used.
     * The final representation makes it straightforward to build def-use/use-def chains */
   private def addReachingDefEdge(dstGraph: DiffGraph,
-                                 method: Vertex,
+                                 method: nodes.StoredNode,
                                  outSet: Map[nodes.StoredNode, Set[nodes.StoredNode]],
                                  inSet: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Unit = {
 
@@ -83,7 +83,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
                                  EdgeTypes.REACHING_DEF)
     }
 
-    method.asInstanceOf[nodes.StoredNode]._astOut.asScala.filter(_.isInstanceOf[nodes.MethodParameterIn]).foreach {
+    method._astOut.asScala.filter(_.isInstanceOf[nodes.MethodParameterIn]).foreach {
       methodParameterIn =>
         methodParameterIn._refIn.asScala.foreach { refInIdentifier =>
           dfHelper
@@ -102,7 +102,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       case (node, outDefs) =>
         if (node.isInstanceOf[nodes.Call]) {
           val usesInExpression = dfHelper.getUsesOfExpression(node)
-          var localRefsUses = usesInExpression.map(ExpandTo.reference(_)).filter(_ != None)
+          val localRefsUses = usesInExpression.map(ExpandTo.reference(_)).filter(_ != None)
 
           /* if use is not an identifier, add edge, as we are going to visit the use separately */
           usesInExpression.foreach { use =>
@@ -129,7 +129,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
             inSet(node)
               .filter(inElement => localRefGens.contains(ExpandTo.reference(inElement)))
               .foreach { filteredInElement =>
-                val expr = dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, node))
+                dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, node))
               }
           }
 
@@ -180,12 +180,12 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
     } catch { case _: Exception => "" }
   }
 
-  private def isOperationAndAssignment(vertex: Vertex): Boolean = {
+  private def isOperationAndAssignment(vertex: nodes.StoredNode): Boolean = {
     if (!vertex.isInstanceOf[nodes.Call]) {
       return false
     }
 
-    val name = vertex.value2(NodeKeys.NAME)
+    val name = vertex.asInstanceOf[nodes.Call].name
     name match {
       case Operators.assignmentAnd                  => true
       case Operators.assignmentArithmeticShiftRight => true
@@ -203,12 +203,12 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
     }
   }
 
-  private def isIndirectAccess(vertex: Vertex): Boolean = {
+  private def isIndirectAccess(vertex: nodes.StoredNode): Boolean = {
     if (!vertex.isInstanceOf[nodes.Call]) {
       return false
     }
 
-    val callName = vertex.value2(NodeKeys.NAME)
+    val callName = vertex.asInstanceOf[nodes.Call].name
     MemberAccess.isGenericMemberAccessName(callName)
   }
 
@@ -217,29 +217,29 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
 /** Common functionalities needed for data flow frameworks */
 class DataFlowFrameworkHelper(graph: ScalaGraph) {
 
-  private def callToMethodParamOut(call: Vertex): Seq[Vertex] = {
+  private def callToMethodParamOut(call: nodes.StoredNode): Seq[nodes.StoredNode] = {
     ExpandTo.callToCalledMethod(call).flatMap(method => ExpandTo.methodToOutParameters(method))
   }
 
   private def filterArgumentIndex(vertexList: List[nodes.StoredNode], orderSeq: Seq[Int]): List[nodes.StoredNode] = {
-    vertexList.filter(v => orderSeq.contains(v.value2(NodeKeys.ARGUMENT_INDEX)))
+    vertexList.filter(v => orderSeq.contains(v.asInstanceOf[nodes.HasArgumentIndex].argumentIndex.toInt))
   }
 
-  def getExpressions(method: Vertex): List[nodes.StoredNode] = {
+  def getExpressions(method: nodes.StoredNode): List[nodes.StoredNode] = {
     val callNodes = method
-      .out(EdgeTypes.CONTAINS)
-      .hasLabel(NodeTypes.CALL)
+      ._containsOut.asScala
+      .filter(_.isInstanceOf[nodes.Call])
       .toList
 
-    callNodes.asInstanceOf[List[nodes.StoredNode]]
+    callNodes
   }
 
-  def getGenSet(method: Vertex): Set[nodes.StoredNode] = {
+  def getGenSet(method: nodes.StoredNode): Set[nodes.StoredNode] = {
     var genSet = Set[nodes.StoredNode]()
     getExpressions(method).foreach { genExpression =>
       val methodParamOutsOrder = callToMethodParamOut(genExpression)
-        .filter(_.edges(Direction.IN, EdgeTypes.PROPAGATE).hasNext)
-        .map(_.value2(NodeKeys.ORDER).toInt)
+        .filter(_._propagateIn.hasNext)
+        .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
 
       val identifierWithOrder =
         filterArgumentIndex(genExpression._astOut.asScala.toList, methodParamOutsOrder)
@@ -248,34 +248,33 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
     genSet
   }
 
-  def getGensOfExpression(expr: Vertex): Set[nodes.StoredNode] = {
+  def getGensOfExpression(expr: nodes.StoredNode): Set[nodes.StoredNode] = {
     var gens = Set[nodes.StoredNode]()
     val methodParamOutsOrder = callToMethodParamOut(expr)
-      .filter(methPO => methPO.edges(Direction.IN, EdgeTypes.PROPAGATE).hasNext)
-      .map(_.value2(NodeKeys.ORDER).toInt)
+      .filter(methPO => methPO._propagateIn.hasNext)
+      .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
 
     val identifierWithOrder =
-      filterArgumentIndex(expr.asInstanceOf[nodes.StoredNode]._astOut.asScala.toList, methodParamOutsOrder)
+      filterArgumentIndex(expr._astOut.asScala.toList, methodParamOutsOrder)
     gens ++= identifierWithOrder
 
     gens
   }
 
-  def getUsesOfExpression(expr: Vertex): Set[nodes.StoredNode] = {
+  def getUsesOfExpression(expr: nodes.StoredNode): Set[nodes.StoredNode] = {
     expr
-      .asInstanceOf[nodes.StoredNode]._astOut
-      .asScala
+      ._astOut.asScala
       .filter(!getGensOfExpression(expr).contains(_))
       .toSet
   }
 
-  def getExpressionFromGen(genVertex: Vertex): Option[nodes.StoredNode] = {
+  def getExpressionFromGen(genVertex: nodes.StoredNode): Option[nodes.StoredNode] = {
     getOperation(genVertex).filter(_.isInstanceOf[nodes.Call])
   }
 
   /** Returns a set of vertices that are killed by the passed vertex */
-  def killsVertices(vertex: Vertex): Set[nodes.StoredNode] = {
-    val localRefIt = vertex.asInstanceOf[nodes.StoredNode]._refOut.asScala
+  def killsVertices(vertex: nodes.StoredNode): Set[nodes.StoredNode] = {
+    val localRefIt = vertex._refOut.asScala
 
     if (!localRefIt.hasNext) {
       Set()
@@ -289,9 +288,8 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
     vertex.map(v => killsVertices(v)).fold(Set())((v1, v2) => v1.union(v2))
   }
 
-  def expressionsToKillMap(methodVertex: Vertex): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
+  def expressionsToKillMap(methodVertex: nodes.StoredNode): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
     val genExpressions = getExpressions(methodVertex)
-    val genSet = getGenSet(methodVertex)
 
     genExpressions.map { expression =>
       val gens = getGensOfExpression(expression)
@@ -299,7 +297,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
     }.toMap
   }
 
-  def expressionsToGenMap(methodVertex: Vertex): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
+  def expressionsToGenMap(methodVertex: nodes.StoredNode): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
     /*genExpressions correspond to call assignment nodes*/
     val genExpressions = getExpressions(methodVertex)
     genExpressions.map { genExpression =>
@@ -307,11 +305,11 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
     }.toMap
   }
 
-  def getOperation(vertex: Vertex): Option[nodes.StoredNode] = {
+  def getOperation(vertex: nodes.StoredNode): Option[nodes.StoredNode] = {
     vertex match {
-      case _: nodes.Identifier => getOperation(vertex.asInstanceOf[nodes.StoredNode]._astIn.nextChecked)
-      case _: nodes.Call       => Some(vertex.asInstanceOf[nodes.StoredNode])
-      case _: nodes.Return     => Some(vertex.asInstanceOf[nodes.StoredNode])
+      case _: nodes.Identifier => getOperation(vertex._astIn.nextChecked)
+      case _: nodes.Call       => Some(vertex)
+      case _: nodes.Return     => Some(vertex)
       case _                   => None
     }
   }

@@ -80,7 +80,7 @@ object ExpandTo {
     expression.asInstanceOf[nodes.StoredNode]._containsIn.nextChecked
   }
 
-  def localToMethod(local: Vertex): Vertex = {
+  def localToMethod(local: Vertex): nodes.StoredNode = {
     local.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
   }
 
