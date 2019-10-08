@@ -8,7 +8,7 @@ import play.api.libs.json._
 
 import scala.Option
 import scala.collection.mutable
-//x
+
 class Schema(schemaFile: String) {
   implicit val nodeBaseTraitRead = Json.reads[NodeBaseTrait]
   implicit val outEdgeEntryRead = Json.reads[OutEdgeEntry]
@@ -157,7 +157,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
     writeFile(filename, edgeHeader, entries)
   }
 
-  def neighboraccessorname(et: String, direction: String) : String = {"_" + camelCase(et + "_" + direction)}
+  def neighborAccessorName(edgetypename: String, direction: String) : String = {"_" + camelCase(edgetypename + "_" + direction)}
 
 
   def writeNodesFile(outputDir: JFile): JFile = {
@@ -173,9 +173,9 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
     }
 
     def nodeHeader = {
-      val neighboraccesors = (schema.edgeTypes.map(et => neighboraccessorname(et.name, "IN")) ++
-        schema.edgeTypes.map(et => neighboraccessorname(et.name, "OUT"))).map(st =>
-        s"def ${st}(): JIterator[StoredNode] = { JCollections.emptyIterator() }").mkString("\n") // foooo
+      val neighborAccesors = (schema.edgeTypes.map(edgetype => neighborAccessorName(edgetype.name, "IN")) ++
+        schema.edgeTypes.map(edgetype => neighborAccessorName(edgetype.name, "OUT"))).map(nbname =>
+        s"def ${nbname}(): JIterator[StoredNode] = { JCollections.emptyIterator() }").mkString("\n")
 
 
       val staticHeader = s"""
@@ -230,7 +230,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
         /* all properties */
         def valueMap: JMap[String, AnyRef]
-$neighboraccesors
+$neighborAccesors
       }
 
       """
@@ -478,7 +478,7 @@ $neighboraccesors
 
       val neighborDelegators = (outEdges.map(et => neighboraccessorname(et, "OUT")) ++
                                 inEdges.map(et => neighboraccessorname(et, "IN"))).map(st =>
-        s"override def ${st}(): JIterator[StoredNode] = get().${st}()").mkString("\n") // foooo
+        s"override def ${st}(): JIterator[StoredNode] = get().${st}()").mkString("\n")
 
       val nodeRefImpl = {
         val propertyDelegators = keys.map(_.name).map(camelCase).map { name =>
@@ -503,9 +503,9 @@ $neighboraccesors
           |  }
           |}""".stripMargin
       }
-      val neighbor_accesors = (outEdges.map(x=>neighboraccessorname(x, "OUT")) ++
-        inEdges.map(x=>neighboraccessorname(x, "IN")) ).zipWithIndex.map{case (s: String, n: Int) =>
-          s"override def $s : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($n).asInstanceOf[JIterator[StoredNode]]"
+      val neighborAccesors = (outEdges.map(edgetypename => neighborAccessorName(edgetypename, "OUT")) ++
+        inEdges.map(edgetypename => neighborAccessorName(edgetypename, "IN")) ).zipWithIndex.map{case (nbaName: String, offsetPos: Int) =>
+          s"override def $nbaName : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[StoredNode]]"
       }.mkString("\n")
 
       val classImpl = s"""
@@ -518,7 +518,7 @@ $neighboraccesors
         override def valueMap: JMap[String, AnyRef] = $valueMapImpl
 
         ${propertyBasedFields(keys)}
-${neighbor_accesors}
+${neighborAccesors}
 
 
         override def label(): String = {
