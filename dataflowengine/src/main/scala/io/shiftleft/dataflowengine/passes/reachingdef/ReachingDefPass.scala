@@ -46,7 +46,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
 
         var inSet = Set[Vertex]()
 
-        val cfgPredecessors = currentCfgNode.vertices(Direction.IN, EdgeTypes.CFG).asScala
+        val cfgPredecessors = currentCfgNode.asInstanceOf[nodes.StoredNode]._cfgIn.asScala
         cfgPredecessors.foreach { pred =>
           inSet ++= inSet.union(out(pred))
         }
@@ -60,7 +60,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
         val newSize = out(currentCfgNode).size
 
         if (oldSize != newSize)
-          worklist ++= currentCfgNode.vertices(Direction.OUT, EdgeTypes.CFG).asScala.toList
+          worklist ++= currentCfgNode.asInstanceOf[nodes.StoredNode]._cfgOut.asScala.toList
       }
 
       addReachingDefEdge(dstGraph, method, out, in)
@@ -82,9 +82,9 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
                                  EdgeTypes.REACHING_DEF)
     }
 
-    method.vertices(Direction.OUT, EdgeTypes.AST).asScala.filter(_.isInstanceOf[nodes.MethodParameterIn]).foreach {
+    method.asInstanceOf[nodes.StoredNode]._astOut.asScala.filter(_.isInstanceOf[nodes.MethodParameterIn]).foreach {
       methodParameterIn =>
-        methodParameterIn.vertices(Direction.IN, EdgeTypes.REF).asScala.foreach { refInIdentifier =>
+        methodParameterIn._refIn.asScala.foreach { refInIdentifier =>
           dfHelper
             .getOperation(refInIdentifier)
             .foreach(operationNode => addEdge(methodParameterIn, operationNode))
@@ -142,7 +142,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
             }
           }
         } else if (node.isInstanceOf[nodes.Return]) {
-          node.vertices(Direction.OUT, EdgeTypes.AST).asScala.foreach { returnExpr =>
+          node.asInstanceOf[nodes.StoredNode]._astOut.asScala.foreach { returnExpr =>
             val localRef = ExpandTo.reference(returnExpr)
             inSet(node).filter(inElement => localRef == ExpandTo.reference(inElement)).foreach { filteredInElement =>
               dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, node))
@@ -241,7 +241,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
         .map(_.value2(NodeKeys.ORDER).toInt)
 
       val identifierWithOrder =
-        filterArgumentIndex(genExpression.vertices(Direction.OUT, EdgeTypes.AST).asScala.toList, methodParamOutsOrder)
+        filterArgumentIndex(genExpression.asInstanceOf[nodes.StoredNode]._astOut.asScala.toList, methodParamOutsOrder)
       genSet ++= identifierWithOrder
     }
     genSet
@@ -254,7 +254,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
       .map(_.value2(NodeKeys.ORDER).toInt)
 
     val identifierWithOrder =
-      filterArgumentIndex(expr.vertices(Direction.OUT, EdgeTypes.AST).asScala.toList, methodParamOutsOrder)
+      filterArgumentIndex(expr.asInstanceOf[nodes.StoredNode]._astOut.asScala.toList, methodParamOutsOrder)
     gens ++= identifierWithOrder
 
     gens
@@ -262,7 +262,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
 
   def getUsesOfExpression(expr: Vertex): Set[Vertex] = {
     expr
-      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asInstanceOf[nodes.StoredNode]._astOut
       .asScala
       .filter(!getGensOfExpression(expr).contains(_))
       .toSet
@@ -274,13 +274,13 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
 
   /** Returns a set of vertices that are killed by the passed vertex */
   def killsVertices(vertex: Vertex): Set[Vertex] = {
-    val localRefIt = vertex.vertices(Direction.OUT, EdgeTypes.REF).asScala
+    val localRefIt = vertex.asInstanceOf[nodes.StoredNode]._refOut.asScala
 
     if (!localRefIt.hasNext) {
       Set()
     } else {
       val localRef = localRefIt.next
-      localRef.vertices(Direction.IN, EdgeTypes.REF).asScala.filter(_.id != vertex.id).toSet
+      localRef._refIn.asScala.filter(_.id != vertex.id).toSet
     }
   }
 
@@ -308,7 +308,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
 
   def getOperation(vertex: Vertex): Option[Vertex] = {
     vertex match {
-      case _: nodes.Identifier => getOperation(vertex.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
+      case _: nodes.Identifier => getOperation(vertex.asInstanceOf[nodes.StoredNode]._astIn.nextChecked)
       case _: nodes.Call       => Some(vertex)
       case _: nodes.Return     => Some(vertex)
       case _                   => None
