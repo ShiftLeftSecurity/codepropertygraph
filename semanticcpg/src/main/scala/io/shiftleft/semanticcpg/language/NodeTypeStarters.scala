@@ -64,12 +64,6 @@ class NodeTypeStarters(cpg: Cpg) {
     new Method(scalaGraph.V.hasLabel(NodeTypes.METHOD).cast[nodes.Method])
 
   /**
-    Traverse to all method instances
-    */
-  def methodInstance: MethodInst =
-    new MethodInst(scalaGraph.V.hasLabel(NodeTypes.METHOD_INST).cast[nodes.MethodInst])
-
-  /**
     Traverse to all formal return parameters
     */
   def methodReturn: MethodReturn =

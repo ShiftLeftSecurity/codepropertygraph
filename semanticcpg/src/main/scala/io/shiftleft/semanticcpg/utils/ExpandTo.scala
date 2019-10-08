@@ -101,7 +101,7 @@ object ExpandTo {
     call
       .asInstanceOf[nodes.StoredNode]._callOut
       .asScala
-      .map(methodInst => methodInst._refOut.nextChecked.asInstanceOf[nodes.Method])
+      .map(_.asInstanceOf[nodes.Method])
       .toSeq
   }
 

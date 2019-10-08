@@ -53,29 +53,32 @@
         {"name" : "METHOD_RETURN", "keys" : ["DEPTH_FIRST_ORDER"],
          "outEdges" : [
            {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+           {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
            {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]}
         ]},
         {"name" : "LITERAL", "keys" : ["DEPTH_FIRST_ORDER"],
         "outEdges" : [
             {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+            {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
             {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
             {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
              {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
         ]},
         {"name" : "LOCAL",
          "outEdges" : [
-             {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]}
+             {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]}
          ]
         },
         {"name" : "MEMBER", "outEdges" : [
-            {"edgeName": "RESOLVED_TO", "inNodes": ["TYPE_DECL"]}
+            {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL"]}
         ]
         },
 
         {"name" : "CALL", "keys" : ["DEPTH_FIRST_ORDER"],
          "outEdges" : [
              {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
-             {"edgeName": "RESOLVED_TO", "inNodes": ["TYPE_DECL", "METHOD"]},
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
              {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
              {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
              {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
@@ -84,7 +87,7 @@
         {"name" : "IDENTIFIER", "keys" : ["DEPTH_FIRST_ORDER"],
         "outEdges" : [
             {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
-            {"edgeName": "RESOLVED_TO", "inNodes": ["TYPE_DECL", "METHOD"]},
+            {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
             {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
             {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
              {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
@@ -92,6 +95,7 @@
         {"name" : "METHOD_PARAMETER_IN",
          "outEdges" : [
              {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
              {"edgeName": "TAINT_REMOVE", "inNodes": ["METHOD_PARAMETER_OUT"]}
          ]
         },
@@ -104,12 +108,16 @@
         },
         {"name" : "BLOCK", "keys" : ["DEPTH_FIRST_ORDER"],
           "outEdges" : [
-             {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]}
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
+             {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
+             {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
+             {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
           ]
         },
         {"name" : "UNKNOWN", "keys" : ["DEPTH_FIRST_ORDER"],
          "outEdges" : [
              {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
              {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
              {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
              {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
@@ -144,7 +152,8 @@
         // New edge types introduced by enhancements
 
         {"id" : 17, "name": "TAINT_REMOVE", "keys" : [], "comment" : "Indicates taint removal. Only present between corresponding METHOD_PARAMETER_IN and METHOD_PARAMETER_OUT nodes"},
-        {"id" : 20, "name" : "RESOLVED_TO", "keys": [], "comment" : "Indicates the concrete TYPE for references aka IDENTIFIER or CALL(those which return references) nodes" },
+        {"id" : 20, "name" : "DYNAMIC_TYPE", "keys": [], "comment" : "Indicates the dynamic type(s) of an entity. This comes initially from the frontend provided DYNAMIC_TYPE_HINT_FULL_NAME property and is extended by our type resolution" },
+
         {"id" : 181, "name": "DOMINATE", "keys" : [], "comment" : "Points to dominated node in DOM tree", "keys" : []},
         {"id" : 182, "name": "POST_DOMINATE", "keys" : [], "comment" : "Points to dominated node in post DOM tree", "keys" : []},
         {"id" : 183, "name": "CDG", "keys" : [], "comment" : "Control dependency graph", "keys" : []},

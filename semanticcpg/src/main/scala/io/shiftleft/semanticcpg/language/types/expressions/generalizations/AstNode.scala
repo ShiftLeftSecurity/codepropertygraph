@@ -120,4 +120,11 @@ trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
   def isReturnNode: Return = new Return(
     raw.hasLabel(NodeTypes.RETURN).cast[nodes.Return]
   )
+
+  /**
+    * Traverse only to AST nodes that are method reference nodes.
+    */
+  def isMethodRef: MethodRef = new MethodRef(
+    raw.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef]
+  )
 }
