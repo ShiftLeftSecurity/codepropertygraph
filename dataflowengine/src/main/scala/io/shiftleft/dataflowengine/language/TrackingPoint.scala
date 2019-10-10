@@ -66,7 +66,7 @@ class TrackingPoint(raw: GremlinScala[nodes.TrackingPoint]) extends NodeSteps[no
         pathReachables = sack :: pathReachables
       }
 
-      val ddgPredecessors = node._reachingDefIn.asScala
+      val ddgPredecessors = node.vertices(Direction.IN, EdgeTypes.REACHING_DEF).asScala
       ddgPredecessors.foreach { pred =>
         getTrackingPoint(pred) match {
           case Some(predTrackingPoint) =>
@@ -94,12 +94,12 @@ class TrackingPoint(raw: GremlinScala[nodes.TrackingPoint]) extends NodeSteps[no
   private def getTrackingPoint(vertex: Vertex): Option[nodes.TrackingPoint] = {
     vertex match {
       case identifier: nodes.Identifier =>
-        getTrackingPoint(identifier._astIn.nextChecked)
+        getTrackingPoint(identifier.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
       case call: nodes.Call                       => Some(call)
       case ret: nodes.Return                      => Some(ret)
       case methodReturn: nodes.MethodReturn       => Some(methodReturn)
       case methodParamIn: nodes.MethodParameterIn => Some(methodParamIn)
-      case literal: nodes.Literal                 => getTrackingPoint(literal._astIn.nextChecked)
+      case literal: nodes.Literal                 => getTrackingPoint(literal.vertices(Direction.IN, EdgeTypes.AST).nextChecked)
       case _                                      => None
     }
   }
