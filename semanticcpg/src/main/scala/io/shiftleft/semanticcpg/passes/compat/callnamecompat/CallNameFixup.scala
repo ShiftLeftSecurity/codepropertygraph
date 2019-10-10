@@ -13,19 +13,21 @@ import io.shiftleft.semanticcpg.language._
 class CallNameFixup(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     cpg.call.toIterator().foreach { call =>
-      val colonIndex = call.methodFullName.indexOf(":")
-      if (colonIndex != -1) {
+      if (call.methodFullName != null) {
+        val colonIndex = call.methodFullName.indexOf(":")
+        if (colonIndex != -1) {
 
-        val namePart = call.methodFullName.substring(0, colonIndex)
+          val namePart = call.methodFullName.substring(0, colonIndex)
 
-        val nameWithoutTypes = earseTypeInformation(namePart)
+          val nameWithoutTypes = earseTypeInformation(namePart)
 
-        val nameParts = nameWithoutTypes.split("\\.").toList
+          val nameParts = nameWithoutTypes.split("\\.").toList
 
-        val nameFromFullName = nameParts.last
+          val nameFromFullName = nameParts.last
 
-        if (nameFromFullName != call.name) {
-          call.property(NodeKeyNames.NAME, nameFromFullName)
+          if (nameFromFullName != call.name) {
+            call.property(NodeKeyNames.NAME, nameFromFullName)
+          }
         }
       }
     }
