@@ -17,25 +17,25 @@ object ExpandTo {
   // For java, the call receiver is always an object instance.
   // For languages which make use of function pointers, this can also be the
   // pointer itself.
-  def callReceiverOption(callNode: Vertex): Option[Vertex] = {
+  def callReceiverOption(callNode: Vertex): Option[nodes.StoredNode] = {
     callNode
-      .vertices(Direction.OUT, EdgeTypes.RECEIVER)
+      .asInstanceOf[nodes.StoredNode]
+      ._receiverOut
       .asScala
       .toList
       .headOption
   }
 
-  def callReceiver(callNode: Vertex): Vertex = {
+  def callReceiver(callNode: Vertex): nodes.StoredNode = {
     callReceiverOption(callNode).get
   }
 
   def callArguments(callNode: Vertex): Iterator[nodes.Expression] = {
-    callNode.vertices(Direction.OUT, EdgeTypes.AST).asScala.map(_.asInstanceOf[nodes.Expression])
+    callNode.asInstanceOf[nodes.StoredNode]._astOut.asScala.map(_.asInstanceOf[nodes.Expression])
   }
 
   def argumentToCallOrReturn(argument: Vertex): nodes.Expression = {
-    val parent = argument.vertices(Direction.IN, EdgeTypes.AST).nextChecked
-
+    val parent = argument.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
     parent match {
       case call: nodes.Call if MemberAccess.isGenericMemberAccessName(call.name) =>
         argumentToCallOrReturn(call)
@@ -44,69 +44,73 @@ object ExpandTo {
     }
   }
 
-  def typeCarrierToType(parameterNode: Vertex): Vertex = {
-    parameterNode.vertices(Direction.OUT, EdgeTypes.EVAL_TYPE).nextChecked
+  def typeCarrierToType(parameterNode: Vertex): nodes.StoredNode = {
+    parameterNode.asInstanceOf[nodes.StoredNode]._evalTypeOut.nextChecked
   }
 
-  def parameterInToMethod(parameterNode: Vertex): Vertex = {
-    parameterNode.vertices(Direction.IN, EdgeTypes.AST).nextChecked
+  def parameterInToMethod(parameterNode: Vertex): nodes.StoredNode = {
+    parameterNode.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
   }
 
-  def methodReturnToMethod(formalReturnNode: Vertex): Vertex = {
-    formalReturnNode.vertices(Direction.IN, EdgeTypes.AST).nextChecked
+  def methodReturnToMethod(formalReturnNode: Vertex): nodes.StoredNode = {
+    formalReturnNode.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
   }
 
   def returnToReturnedExpression(returnExpression: Vertex): Option[nodes.Expression] = {
-    returnExpression.vertices(Direction.OUT, EdgeTypes.AST).nextOption.map(_.asInstanceOf[nodes.Expression])
+    returnExpression.asInstanceOf[nodes.StoredNode]._astOut.nextOption.map(_.asInstanceOf[nodes.Expression])
   }
 
-  def methodToFormalReturn(method: Vertex): Vertex = {
+  def methodToFormalReturn(method: Vertex): nodes.StoredNode = {
     method
-      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asInstanceOf[nodes.StoredNode]
+      ._astOut
       .asScala
       .filter(_.isInstanceOf[nodes.MethodReturn])
       .asJava
       .nextChecked
   }
 
-  def formalReturnToReturn(methodReturn: Vertex): Seq[Vertex] = {
+  def formalReturnToReturn(methodReturn: Vertex): Seq[nodes.StoredNode] = {
     methodReturn
-      .vertices(Direction.IN, EdgeTypes.CFG)
+      .asInstanceOf[nodes.StoredNode]
+      ._cfgIn
       .asScala
       .filter(_.isInstanceOf[nodes.Return])
       .toSeq
   }
 
-  def expressionToMethod(expression: Vertex): Vertex = {
-    expression.vertices(Direction.IN, EdgeTypes.CONTAINS).nextChecked
+  def expressionToMethod(expression: Vertex): nodes.StoredNode = {
+    expression.asInstanceOf[nodes.StoredNode]._containsIn.nextChecked
   }
 
-  def localToMethod(local: Vertex): Vertex = {
-    local.vertices(Direction.IN, EdgeTypes.AST).nextChecked
+  def localToMethod(local: Vertex): nodes.StoredNode = {
+    local.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
   }
 
   def hasModifier(methodNode: Vertex, modifierType: String): Boolean = {
     methodNode
-      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asInstanceOf[nodes.StoredNode]
+      ._astOut
       .asScala
       .exists(astChild =>
-        astChild.label == NodeTypes.MODIFIER &&
+        astChild.isInstanceOf[nodes.Modifier] &&
           astChild.asInstanceOf[nodes.Modifier].modifierType == modifierType)
   }
 
-  def astParent(expression: Vertex): Vertex = {
-    expression.vertices(Direction.IN, EdgeTypes.AST).nextChecked
+  def astParent(expression: Vertex): nodes.StoredNode = {
+    expression.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
   }
 
   def callToCalledMethod(call: Vertex): Seq[nodes.Method] = {
     call
-      .vertices(Direction.OUT, EdgeTypes.CALL)
+      .asInstanceOf[nodes.StoredNode]
+      ._callOut
       .asScala
       .map(_.asInstanceOf[nodes.Method])
       .toSeq
   }
 
-  def methodToTypeDecl(vertex: Vertex): Option[Vertex] = {
+  def methodToTypeDecl(vertex: Vertex): Option[nodes.StoredNode] = {
     findVertex(vertex, _.isInstanceOf[nodes.TypeDecl])
   }
 
@@ -115,8 +119,8 @@ object ExpandTo {
   }
 
   @tailrec
-  private def findVertex(vertex: Vertex, instanceCheck: Vertex => Boolean): Option[Vertex] = {
-    val iterator = vertex.vertices(Direction.IN, EdgeTypes.AST)
+  private def findVertex(vertex: Vertex, instanceCheck: Vertex => Boolean): Option[nodes.StoredNode] = {
+    val iterator = vertex.asInstanceOf[nodes.StoredNode]._astIn
     if (iterator.hasNext) {
       iterator.next() match {
         case head if instanceCheck(head) => Some(head)
@@ -127,20 +131,21 @@ object ExpandTo {
     }
   }
 
-  def methodToOutParameters(method: Vertex): Seq[Vertex] = {
+  def methodToOutParameters(method: Vertex): Seq[nodes.StoredNode] = {
     method
-      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asInstanceOf[nodes.StoredNode]
+      ._astOut
       .asScala
       .filter(_.isInstanceOf[nodes.MethodParameterOut])
       .toSeq
   }
 
-  def allCfgNodesOfMethod(method: Vertex): TraversableOnce[Vertex] = {
-    method.vertices(Direction.OUT, EdgeTypes.CONTAINS).asScala
+  def allCfgNodesOfMethod(method: Vertex): TraversableOnce[nodes.StoredNode] = {
+    method.asInstanceOf[nodes.StoredNode]._containsOut.asScala
   }
 
-  def reference(node: Vertex): Option[Vertex] = {
-    node.vertices(Direction.OUT, EdgeTypes.REF).nextOption
+  def reference(node: Vertex): Option[nodes.StoredNode] = {
+    node.asInstanceOf[nodes.StoredNode]._refOut.nextOption
   }
 
   def walkAST(expression: GremlinScala[Vertex]): GremlinScala[Vertex] = {
