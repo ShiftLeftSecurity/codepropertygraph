@@ -72,6 +72,7 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
         nameAndCode,
         EvaluationStrategies.BY_VALUE,
         "ANY",
+        Nil,
         None,
         None,
       )
@@ -84,13 +85,14 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
       "RET",
       EvaluationStrategies.BY_VALUE,
       "ANY",
+      Nil,
       None,
       None,
     )
     dstGraph.addNode(methodReturn)
     dstGraph.addEdge(methodNode, methodReturn, EdgeTypes.AST)
 
-    val blockNode = new NewBlock("", 1, 1, "ANY", None, None)
+    val blockNode = new NewBlock("", 1, 1, "ANY", Nil, None, None)
     dstGraph.addNode(blockNode)
     dstGraph.addEdge(methodNode, blockNode, EdgeTypes.AST)
 
