@@ -157,6 +157,9 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
     writeFile(filename, edgeHeader, entries)
   }
 
+  def neighborAccessorName(edgetypename: String, direction: String) : String = {"_" + camelCase(edgetypename + "_" + direction)}
+
+
   def writeNodesFile(outputDir: JFile): JFile = {
     val propertyByName: Map[String, Property] =
       schema.nodeKeys.map(prop => prop.name -> prop).toMap
@@ -170,6 +173,11 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
     }
 
     def nodeHeader = {
+      val neighborAccesors = (schema.edgeTypes.map(edgetype => neighborAccessorName(edgetype.name, "IN")) ++
+        schema.edgeTypes.map(edgetype => neighborAccessorName(edgetype.name, "OUT"))).map(nbname =>
+        s"def ${nbname}(): JIterator[StoredNode] = { JCollections.emptyIterator() }").mkString("\n")
+
+
       val staticHeader = s"""
       package $nodesPackage
 
@@ -222,6 +230,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
         /* all properties */
         def valueMap: JMap[String, AnyRef]
+$neighborAccesors
       }
 
       """
@@ -467,6 +476,10 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       |  $abstractContainedNodeAccessors
       |}""".stripMargin
 
+      val neighborDelegators = (outEdges.map(edgetypename => neighborAccessorName(edgetypename, "OUT")) ++
+                                inEdges.map(edgetypename => neighborAccessorName(edgetypename, "IN"))).map(nbaName =>
+        s"override def ${nbaName}(): JIterator[StoredNode] = get().${nbaName}()").mkString("\n")
+
       val nodeRefImpl = {
         val propertyDelegators = keys.map(_.name).map(camelCase).map { name =>
           s"""override def $name = get().$name"""
@@ -476,6 +489,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
           |class ${nodeType.className}(graph: OdbGraph, id: Long) extends NodeRef[${nodeType.classNameDb}](graph, id) with ${nodeType.className}Base with StoredNode $mixinTraits {
           |$propertyDelegators
           |$delegatingContainedNodeAccessors
+          |$neighborDelegators
           |  override def accept[T](visitor: NodeVisitor[T]): T = {
           |    visitor.visit(this)
           |  }
@@ -489,6 +503,10 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
           |  }
           |}""".stripMargin
       }
+      val neighborAccesors = (outEdges.map(edgetypename => neighborAccessorName(edgetypename, "OUT")) ++
+        inEdges.map(edgetypename => neighborAccessorName(edgetypename, "IN")) ).zipWithIndex.map{case (nbaName: String, offsetPos: Int) =>
+          s"override def $nbaName : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[StoredNode]]"
+      }.mkString("\n")
 
       val classImpl = s"""
       class ${nodeType.classNameDb}(ref: NodeRef[OdbNode]) extends OdbNode(ref) with StoredNode 
@@ -500,7 +518,9 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
         override def valueMap: JMap[String, AnyRef] = $valueMapImpl
 
         ${propertyBasedFields(keys)}
-      
+${neighborAccesors}
+
+
         override def label(): String = {
           ${nodeType.className}.Label
         }
@@ -556,7 +576,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       }
       """
 
-      companionObject + nodeBaseImpl + nodeRefImpl + classImpl
+      s"\n//${nodeType.name} BEGIN\n" + companionObject + nodeBaseImpl + nodeRefImpl + classImpl + s"\n//${nodeType.name} END\n"
     }
 
     val filename = outputDir.getPath + "/" + nodesPackage.replaceAll("\\.", "/") + "/Nodes.scala"
