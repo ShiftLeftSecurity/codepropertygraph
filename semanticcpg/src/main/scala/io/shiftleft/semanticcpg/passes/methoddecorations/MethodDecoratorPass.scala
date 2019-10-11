@@ -8,12 +8,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
-object MethodDecoratorPass {
-  private var loggedDeprecatedWarning = false
-  private var loggedMissingTypeFullName = false
-  private val logger: Logger = LogManager.getLogger(classOf[MethodDecoratorPass])
-}
-
 /**
   * Adds a METHOD_PARAMETER_OUT for each METHOD_PARAMETER_IN to the graph and
   * connects those with a PARAMETER_LINK edge.
@@ -25,6 +19,9 @@ object MethodDecoratorPass {
   */
 class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   import MethodDecoratorPass.logger
+
+  private[this] var loggedDeprecatedWarning = false
+  private[this] var loggedMissingTypeFullName = false
 
   override def run() = {
     val dstGraph = new DiffGraph
@@ -52,21 +49,25 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
                 .nextChecked
                 .asInstanceOf[nodes.Type]
               dstGraph.addEdgeToOriginal(parameterOut, evalType, EdgeTypes.EVAL_TYPE)
-              if (!MethodDecoratorPass.loggedMissingTypeFullName) {
+              if (!loggedMissingTypeFullName) {
                 logger.warn("Using deprecated CPG format with missing TYPE_FULL_NAME on METHOD_PARAMETER_IN nodes.")
-                MethodDecoratorPass.loggedMissingTypeFullName = true
+                loggedMissingTypeFullName = true
               }
             }
 
             dstGraph.addNode(parameterOut)
             dstGraph.addEdgeFromOriginal(method, parameterOut, EdgeTypes.AST)
             dstGraph.addEdgeFromOriginal(parameterIn, parameterOut, EdgeTypes.PARAMETER_LINK)
-          } else if (!MethodDecoratorPass.loggedDeprecatedWarning) {
+          } else if (!loggedDeprecatedWarning) {
             logger.warn("Using deprecated CPG format with PARAMETER_LINK edges")
-            MethodDecoratorPass.loggedDeprecatedWarning = true
+            loggedDeprecatedWarning = true
           }
       }
       .iterate
     Iterator(dstGraph)
   }
+}
+
+object MethodDecoratorPass {
+  private val logger: Logger = LogManager.getLogger(classOf[MethodDecoratorPass])
 }

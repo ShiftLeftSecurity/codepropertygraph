@@ -15,8 +15,9 @@ import scala.collection.JavaConverters._
   */
 class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
   import MemberAccessLinker.logger
-  private var loggedDeprecationWarning: Boolean = _
-  private var loggedForTypeMemberCombination: Set[(nodes.Type, String)] = _
+
+  private[this] var loggedDeprecationWarning: Boolean = _
+  private[this] var loggedForTypeMemberCombination: Set[(nodes.Type, String)] = _
 
   override def run(): Iterator[DiffGraph] = {
     loggedDeprecationWarning = false

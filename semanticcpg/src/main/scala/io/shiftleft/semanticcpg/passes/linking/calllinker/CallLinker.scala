@@ -7,7 +7,7 @@ import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.Implicits._
 import org.apache.tinkerpop.gremlin.structure.Direction
-import org.slf4j.LoggerFactory
+import org.apache.logging.log4j.{LogManager, Logger}
 
 import scala.collection.JavaConverters._
 
@@ -76,5 +76,5 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
 }
 
 object CallLinker {
-  private val logger = LoggerFactory.getLogger(getClass)
+  private val logger: Logger = LogManager.getLogger(getClass)
 }

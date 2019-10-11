@@ -13,24 +13,7 @@ import io.shiftleft.semanticcpg.utils.ExpandTo
   * language frontends which do not provide method stubs and type decl stubs.
   */
 class ContainsEdgePass(cpg: Cpg) extends CpgPass(cpg) {
-
-  private val sourceTypes = List(
-    NodeTypes.METHOD,
-    NodeTypes.TYPE_DECL,
-    NodeTypes.FILE
-  )
-
-  private val destinationTypes = List(
-    NodeTypes.BLOCK,
-    NodeTypes.IDENTIFIER,
-    NodeTypes.RETURN,
-    NodeTypes.METHOD,
-    NodeTypes.TYPE_DECL,
-    NodeTypes.CALL,
-    NodeTypes.LITERAL,
-    NodeTypes.METHOD_REF,
-    NodeTypes.UNKNOWN
-  )
+  import ContainsEdgePass.{destinationTypes, sourceTypes}
 
   override def run(): Iterator[DiffGraph] = {
     val sourceVerticesTraversal = cpg.graph.V.hasLabel(sourceTypes.head, sourceTypes.tail: _*)
@@ -56,4 +39,26 @@ class ContainsEdgePass(cpg: Cpg) extends CpgPass(cpg) {
 
     dstGraph
   }
+}
+
+object ContainsEdgePass {
+
+  private val destinationTypes = List(
+    NodeTypes.BLOCK,
+    NodeTypes.IDENTIFIER,
+    NodeTypes.RETURN,
+    NodeTypes.METHOD,
+    NodeTypes.TYPE_DECL,
+    NodeTypes.CALL,
+    NodeTypes.LITERAL,
+    NodeTypes.METHOD_REF,
+    NodeTypes.UNKNOWN
+  )
+
+  private val sourceTypes = List(
+    NodeTypes.METHOD,
+    NodeTypes.TYPE_DECL,
+    NodeTypes.FILE
+  )
+
 }

@@ -1,7 +1,5 @@
 package io.shiftleft.semanticcpg.passes.methodexternaldecorator
 
-import java.lang
-
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.TypeDecl
@@ -12,19 +10,6 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
 
-object MethodExternalDecoratorPass {
-  private var loggedDeprecatedWarning = false
-  private val logger: Logger =
-    LogManager.getLogger(classOf[MethodExternalDecoratorPass])
-
-  def log(message: String): Unit = {
-    if (!loggedDeprecatedWarning) {
-      logger.warn(message)
-      loggedDeprecatedWarning = true
-    }
-  }
-}
-
 /**
   * Sets the isExternal flag for Method in case it is not set already.
   * It is set to its parent type decl isExternal, defaulting to false otherwise.
@@ -34,6 +19,8 @@ object MethodExternalDecoratorPass {
 class MethodExternalDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
 
   import MethodExternalDecoratorPass._
+
+  private[this] var loggedDeprecatedWarning = false
 
   private def isValidExternalFlag(isExternal: java.lang.Boolean): Boolean =
     isExternal != null
@@ -87,4 +74,17 @@ class MethodExternalDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
 
     Iterator(dstGraph)
   }
+
+  @inline
+  private def log(message: String): Unit = {
+    if (!loggedDeprecatedWarning) {
+      logger.warn(message)
+      loggedDeprecatedWarning = true
+    }
+  }
+
+}
+
+object MethodExternalDecoratorPass {
+  private val logger: Logger = LogManager.getLogger(classOf[MethodExternalDecoratorPass])
 }
