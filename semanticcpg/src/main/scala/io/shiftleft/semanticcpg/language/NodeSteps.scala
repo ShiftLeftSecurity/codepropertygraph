@@ -1,9 +1,8 @@
 package io.shiftleft.semanticcpg.language
 
 import gremlin.scala.{GremlinScala, P, Vertex}
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language.types.structure.File
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import org.json4s.native.Serialization.{write, writePretty}
 
 /**

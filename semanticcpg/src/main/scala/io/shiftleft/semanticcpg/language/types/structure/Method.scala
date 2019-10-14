@@ -7,8 +7,7 @@ import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{
   AstNodeBase,
   CfgNode,
   DeclarationBase,
-  Expression,
-  Modifier
+  Expression
 }
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.{Call, ControlStructure, Literal}
@@ -25,7 +24,8 @@ class Method(override val raw: GremlinScala[nodes.Method])
     with SignatureAccessors[nodes.Method]
     with LineNumberAccessors[nodes.Method]
     with EvalTypeAccessors[nodes.Method]
-    with AstNodeBase[nodes.Method] {
+    with AstNodeBase[nodes.Method]
+    with ModifierAccessors[nodes.Method] {
 
   /**
     * Traverse to parameters of the method
@@ -117,52 +117,49 @@ class Method(override val raw: GremlinScala[nodes.Method])
     * Traverse to public methods
     * */
   def isPublic: Method =
-    isMethodWithModifier(ModifierTypes.PUBLIC)
+    hasModifier(ModifierTypes.PUBLIC)
 
   /**
     * Traverse to private methods
     * */
   def isPrivate: Method =
-    isMethodWithModifier(ModifierTypes.PRIVATE)
+    hasModifier(ModifierTypes.PRIVATE)
 
   /**
     * Traverse to protected methods
     * */
   def isProtected: Method =
-    isMethodWithModifier(ModifierTypes.PROTECTED)
+    hasModifier(ModifierTypes.PROTECTED)
 
   /**
     * Traverse to abstract methods
     * */
   def isAbstract: Method =
-    isMethodWithModifier(ModifierTypes.ABSTRACT)
+    hasModifier(ModifierTypes.ABSTRACT)
 
   /**
     * Traverse to static methods
     * */
   def isStatic: Method =
-    isMethodWithModifier(ModifierTypes.STATIC)
+    hasModifier(ModifierTypes.STATIC)
 
   /**
     * Traverse to native methods
     * */
   def isNative: Method =
-    isMethodWithModifier(ModifierTypes.NATIVE)
+    hasModifier(ModifierTypes.NATIVE)
 
   /**
     * Traverse to constructors, that is, keep methods that are constructors
     * */
   def isConstructor: Method =
-    isMethodWithModifier(ModifierTypes.CONSTRUCTOR)
+    hasModifier(ModifierTypes.CONSTRUCTOR)
 
   /**
     * Traverse to virtual method
     * */
   def isVirtual: Method =
-    isMethodWithModifier(ModifierTypes.VIRTUAL)
-
-  private def isMethodWithModifier(modifier: String): Method =
-    new Method(raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> modifier)))
+    hasModifier(ModifierTypes.VIRTUAL)
 
   /**
     * Traverse to external methods, that is, methods not present
@@ -177,15 +174,6 @@ class Method(override val raw: GremlinScala[nodes.Method])
     * */
   def internal: Method =
     new Method(raw.has(NodeKeys.IS_EXTERNAL -> false))
-
-  /**
-    * Traverse to method modifiers, e.g., "static", "public".
-    * */
-  def modifier: Modifier =
-    new Modifier(
-      raw.out
-        .hasLabel(NodeTypes.MODIFIER)
-        .cast[nodes.Modifier])
 
   /**
     * Traverse to the methods local variables

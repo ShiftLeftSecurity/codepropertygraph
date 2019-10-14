@@ -4,8 +4,12 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Modifier
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.{FullNameAccessors, IsExternalAccessor, NameAccessors}
+import io.shiftleft.semanticcpg.language.types.propertyaccessors.{
+  FullNameAccessors,
+  IsExternalAccessors,
+  ModifierAccessors,
+  NameAccessors
+}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 /**
@@ -15,7 +19,8 @@ class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
     extends NodeSteps[nodes.TypeDecl](raw)
     with NameAccessors[nodes.TypeDecl]
     with FullNameAccessors[nodes.TypeDecl]
-    with IsExternalAccessor[nodes.TypeDecl] {
+    with IsExternalAccessors[nodes.TypeDecl]
+    with ModifierAccessors[nodes.TypeDecl] {
   import TypeDecl._
 
   /**
@@ -115,16 +120,6 @@ class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
   }
 
   /**
-    * Traverse to method modifiers, e.g., "static", "public".
-    * */
-  def modifier: Modifier =
-    new Modifier(
-      canonicalType.raw.out
-        .hasLabel(NodeTypes.MODIFIER)
-        .cast[nodes.Modifier]
-    )
-
-  /**
     * Traverse to alias type declarations.
     */
   def isAlias: TypeDecl = {
@@ -195,9 +190,10 @@ class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
   /**
     *  Direct and transitive alias type declarations.
     */
-  def alisTypeDeclTransitive: TypeDecl = {
+  def aliasTypeDeclTransitive: TypeDecl = {
     repeat(_.aliasTypeDecl).emit()
   }
+
 }
 
 object TypeDecl {

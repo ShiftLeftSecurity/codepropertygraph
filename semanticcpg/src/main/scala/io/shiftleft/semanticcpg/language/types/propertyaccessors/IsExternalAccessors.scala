@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
 import java.lang.{Boolean => JBoolean}
 
-trait IsExternalAccessor[T <: StoredNode] extends PropertyAccessors[T] {
+trait IsExternalAccessors[T <: StoredNode] extends PropertyAccessors[T] {
   def isExternal(): Steps[JBoolean] =
     property(NodeKeys.IS_EXTERNAL)
 
