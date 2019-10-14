@@ -22,6 +22,7 @@ class OutFactsImporter extends FactsImporter {
       NodeTypes.TYPE_DECL has 0 to N outgoing EdgeTypes.AST to NodeTypes.MEMBER,
       NodeTypes.TYPE_DECL has 0 to N outgoing EdgeTypes.AST to NodeTypes.MODIFIER,
       NodeTypes.TYPE_DECL has 0 to N outgoing EdgeTypes.AST to NodeTypes.ANNOTATION,
+      NodeTypes.TYPE_DECL has 0 to N outgoing EdgeTypes.VTABLE to NodeTypes.METHOD,
       NodeTypes.TYPE_DECL has 0 to N outgoing EdgeTypes.BINDS to NodeTypes.BINDING,
       NodeTypes.MEMBER has 0 to N outgoing EdgeTypes.AST to NodeTypes.ANNOTATION,
       NodeTypes.MEMBER has 0 to N outgoing EdgeTypes.AST to NodeTypes.MODIFIER,

@@ -3,14 +3,14 @@ package io.shiftleft.console
 import ammonite.ops.pwd
 import ammonite.ops.Path
 import ammonite.util.{Colors, Res}
-import better.files.FileOps
-import better.files.File
+import better.files._
 
 case class Config(
     scriptFile: Option[Path] = None,
     params: Map[String, String] = Map.empty,
     additionalImports: List[Path] = Nil,
-    colors: Option[Colors] = None
+    colors: Option[Colors] = None,
+    command: Option[String] = None
 )
 
 /**
@@ -45,6 +45,10 @@ trait BridgeBase {
       opt[Unit]("nocolors")
         .action((x, c) => c.copy(colors = Some(Colors.BlackWhite)))
         .text("turn off colors")
+
+      opt[String]("command")
+        .action((x, c) => c.copy(command = Some(x)))
+        .text("select one of multiple @main methods")
     }
 
     // note: if config is really `None` an error message would have been displayed earlier
@@ -79,7 +83,13 @@ trait BridgeBase {
       case Some(scriptFile) =>
         val isEncryptedScript = scriptFile.ext == "enc"
         println(s"executing $scriptFile with params=${config.params}")
-        val scriptArgs: Seq[(String, Option[String])] = config.params.mapValues(Option.apply).toSeq
+        val scriptArgs: Seq[(String, Option[String])] = {
+          val commandArgs = config.command match {
+            case Some(command) => Seq(command -> None)
+            case _             => Nil
+          }
+          commandArgs ++ config.params.mapValues(Option.apply).toSeq
+        }
         val actualScriptFile =
           if (isEncryptedScript) decryptedScript(scriptFile)
           else scriptFile

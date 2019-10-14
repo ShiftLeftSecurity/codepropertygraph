@@ -14,7 +14,7 @@ import signal
 import threading
 
 SERVER = "127.0.0.1"
-PORT = 1337
+PORT = 8080
 
 stopEvent = threading.Event()
 

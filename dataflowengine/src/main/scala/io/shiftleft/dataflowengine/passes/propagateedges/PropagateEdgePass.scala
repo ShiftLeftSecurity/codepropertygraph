@@ -41,12 +41,14 @@ class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
     // From where the PROPAGATE edge is coming does not matter for the open source reachable by.
     // Thus we let it start from the corresponding METHOD_PARAMETER_IN.
     val parameterInOption = method
-      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asInstanceOf[nodes.StoredNode]
+      ._astOut
       .asScala
       .find(node => node.label() == NodeTypes.METHOD_PARAMETER_IN && node.value2(NodeKeys.ORDER) == parameterIndex)
 
     val parameterOutOption = method
-      .vertices(Direction.OUT, EdgeTypes.AST)
+      .asInstanceOf[nodes.StoredNode]
+      ._astOut
       .asScala
       .find(node => node.label() == NodeTypes.METHOD_PARAMETER_OUT && node.value2(NodeKeys.ORDER) == parameterIndex)
 

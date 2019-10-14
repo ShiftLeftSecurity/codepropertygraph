@@ -44,6 +44,15 @@ class Method(override val raw: GremlinScala[nodes.Method])
     new MethodReturn(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.METHOD_RETURN).cast[nodes.MethodReturn])
 
   /**
+    * Traverse to the type declarations were this method is in the VTable.
+    */
+  def inVTableOfTypeDecl: TypeDecl = {
+    new TypeDecl(
+      raw.in(EdgeTypes.VTABLE).cast[nodes.TypeDecl]
+    )
+  }
+
+  /**
     * Traverse to type decl which have this method bound to it.
     */
   def bindingTypeDecl: TypeDecl = {

@@ -25,13 +25,35 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
       init()
 
       cpg.call.toIterator.foreach { call =>
-        val methodFullNameOption = call.methodInstFullName.map(methodInstFullNameToMethodFullName.apply)
-        call.setProperty(NodeKeys.METHOD_FULL_NAME, methodFullNameOption.get)
+        call.methodInstFullName match {
+          case Some(methodInstFullName) =>
+            methodInstFullNameToMethodFullName.get(methodInstFullName) match {
+              case Some(methodFullName) =>
+                call.setProperty(NodeKeys.METHOD_FULL_NAME, methodFullName)
+              case None =>
+                MethodInstCompat.logger.warn(
+                  s"Unable to find method full name by " +
+                    s"method instance full name $methodInstFullName for CALL ${call.code}.")
+            }
+          case None =>
+            None
+        }
+
       }
 
       cpg.methodRef.toIterator.foreach { methodRef =>
-        val methodFullNameOption = methodRef.methodInstFullName.map(methodInstFullNameToMethodFullName.apply)
-        methodRef.setProperty(NodeKeys.METHOD_FULL_NAME, methodFullNameOption.get)
+        methodRef.methodInstFullName match {
+          case Some(methodInstFullName) =>
+            methodInstFullNameToMethodFullName.get(methodInstFullName) match {
+              case Some(methodFullName) =>
+                methodRef.setProperty(NodeKeys.METHOD_FULL_NAME, methodFullName)
+              case None =>
+                MethodInstCompat.logger.warn(
+                  s"Unable to find method full name by " +
+                    s"method instance full name $methodInstFullName for METHDO_REF ${methodRef.code}.")
+            }
+          case None =>
+        }
       }
     }
 

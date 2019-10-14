@@ -40,6 +40,12 @@ class Call(raw: GremlinScala[nodes.Call])
     new Method(raw.in(EdgeTypes.CONTAINS).hasLabel(NodeTypes.METHOD).cast[nodes.Method])
 
   /**
+    The receiver of a call if the call has a receiver associated.
+    */
+  def receiver: Expression =
+    new Expression(raw.out(EdgeTypes.RECEIVER).cast[nodes.Expression])
+
+  /**
     Arguments of the call
     */
   def argument: Expression =

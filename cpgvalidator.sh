@@ -2,6 +2,8 @@
 
 SCRIPT_ABS_PATH=$(readlink -f "$0")
 SCRIPT_ABS_DIR=$(dirname $SCRIPT_ABS_PATH)
+CPG_FILE=$(readlink -f $@)
 
-$SCRIPT_ABS_DIR/cpgvalidator/target/universal/stage/bin/cpgvalidator $@
+cd $SCRIPT_ABS_DIR
+$SCRIPT_ABS_DIR/cpgvalidator/target/universal/stage/bin/cpgvalidator $CPG_FILE
 

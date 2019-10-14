@@ -316,7 +316,8 @@
         {"id" : 2, "name" : "JAVASCRIPT", "comment" : ""},
         {"id" : 3, "name" : "GOLANG", "comment" : ""},
         {"id" : 4, "name" : "CSHARP", "comment" : ""},
-        {"id" : 5, "name" : "C", "comment" : ""}
+        {"id" : 5, "name" : "C", "comment" : ""},
+        {"id" : 6, "name" : "PYTHON", "comment" : ""}
     ],
 
     "modifierTypes" : [
