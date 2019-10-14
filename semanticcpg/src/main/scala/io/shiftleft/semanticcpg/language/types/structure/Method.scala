@@ -117,52 +117,49 @@ class Method(override val raw: GremlinScala[nodes.Method])
     * Traverse to public methods
     * */
   def isPublic: Method =
-    isMethodWithModifier(ModifierTypes.PUBLIC)
+    hasModifier(ModifierTypes.PUBLIC)
 
   /**
     * Traverse to private methods
     * */
   def isPrivate: Method =
-    isMethodWithModifier(ModifierTypes.PRIVATE)
+    hasModifier(ModifierTypes.PRIVATE)
 
   /**
     * Traverse to protected methods
     * */
   def isProtected: Method =
-    isMethodWithModifier(ModifierTypes.PROTECTED)
+    hasModifier(ModifierTypes.PROTECTED)
 
   /**
     * Traverse to abstract methods
     * */
   def isAbstract: Method =
-    isMethodWithModifier(ModifierTypes.ABSTRACT)
+    hasModifier(ModifierTypes.ABSTRACT)
 
   /**
     * Traverse to static methods
     * */
   def isStatic: Method =
-    isMethodWithModifier(ModifierTypes.STATIC)
+    hasModifier(ModifierTypes.STATIC)
 
   /**
     * Traverse to native methods
     * */
   def isNative: Method =
-    isMethodWithModifier(ModifierTypes.NATIVE)
+    hasModifier(ModifierTypes.NATIVE)
 
   /**
     * Traverse to constructors, that is, keep methods that are constructors
     * */
   def isConstructor: Method =
-    isMethodWithModifier(ModifierTypes.CONSTRUCTOR)
+    hasModifier(ModifierTypes.CONSTRUCTOR)
 
   /**
     * Traverse to virtual method
     * */
   def isVirtual: Method =
-    isMethodWithModifier(ModifierTypes.VIRTUAL)
-
-  private def isMethodWithModifier(modifier: String): Method =
-    new Method(raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> modifier)))
+    hasModifier(ModifierTypes.VIRTUAL)
 
   /**
     * Traverse to external methods, that is, methods not present

@@ -9,14 +9,8 @@ import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Modif
 trait ModifierAccessors[T <: StoredNode] {
   val raw: GremlinScala[T]
 
-  def hasModifier(modifier: String): Boolean =
-    raw
-      .filter(
-        _.out
-          .hasLabel(NodeTypes.MODIFIER)
-          .has(NodeKeys.MODIFIER_TYPE -> modifier)
-      )
-      .exists()
+  def hasModifier(modifier: String): Steps[T] =
+    new Steps[T](raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> modifier)))
 
   /**
     * Traverse to modifiers, e.g., "static", "public".

@@ -194,9 +194,6 @@ class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
     repeat(_.aliasTypeDecl).emit()
   }
 
-  def isTypeDeclWithModifier(modifier: String): TypeDecl =
-    new TypeDecl(raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> modifier)))
-
 }
 
 object TypeDecl {

@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{ModifierTypes, nodes}
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
@@ -105,6 +105,19 @@ class MethodTests extends WordSpec with Matchers {
 
       methods.size shouldBe 1
       methods.head.isExternal shouldBe false
+    }
+
+    "filter by modifier" in {
+      val internalMethod: List[nodes.Method] =
+        fixture.cpg.method.name("someInternalFunction").hasModifier(ModifierTypes.PRIVATE).toList
+      internalMethod.size shouldBe 1
+
+      val methodForCfgTest = fixture.cpg.method
+        .name("methodForCfgTest")
+        .hasModifier(ModifierTypes.PUBLIC)
+        .hasModifier(ModifierTypes.VIRTUAL)
+        .toList
+      methodForCfgTest.size shouldBe 1
     }
   }
 

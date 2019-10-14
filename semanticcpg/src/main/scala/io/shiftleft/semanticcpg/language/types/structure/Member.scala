@@ -40,28 +40,25 @@ class Member(raw: GremlinScala[nodes.Member])
     * Public members
     * */
   def isPublic: Member =
-    isMemberWithModifier(ModifierTypes.PUBLIC)
+    hasModifier(ModifierTypes.PUBLIC)
 
   /**
     * Private members
     * */
   def isPrivate: Member =
-    isMemberWithModifier(ModifierTypes.PRIVATE)
+    hasModifier(ModifierTypes.PRIVATE)
 
   /**
     * Protected members
     * */
   def isProtected: Member =
-    isMemberWithModifier(ModifierTypes.PROTECTED)
+    hasModifier(ModifierTypes.PROTECTED)
 
   /**
     * Static members
     * */
   def isStatic: Member =
-    isMemberWithModifier(ModifierTypes.STATIC)
-
-  def isMemberWithModifier(modifier: String): Member =
-    new Member(raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> modifier)))
+    hasModifier(ModifierTypes.STATIC)
 
   /**
     * Traverse to member type
