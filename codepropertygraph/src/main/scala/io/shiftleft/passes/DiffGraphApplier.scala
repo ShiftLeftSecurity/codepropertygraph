@@ -10,7 +10,7 @@ import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 /**
   * Component to merge diff graphs into existing (loaded) OdbGraph
   * */
-private class DiffGraphApplier {
+class DiffGraphApplier {
   import DiffGraphApplier.InternalProperty
 
   private val overlayNodeToTinkerNode = new util.HashMap[IdentityHashWrapper[NewNode], Vertex]()
