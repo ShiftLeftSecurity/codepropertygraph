@@ -1,6 +1,5 @@
 package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewMethodReturn}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes, nodes}

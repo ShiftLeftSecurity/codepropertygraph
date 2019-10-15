@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 
 /**
   * This pass ensures compatibility with CPGs in old format containing METHOD_INST nodes.
-  * TODO remove when not need anymore.
+  * TODO remove when not needed anymore.
   */
 class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
   private val methodInstFullNameToMethodFullName = mutable.Map.empty[String, String]
@@ -25,34 +25,29 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
       init()
 
       cpg.call.toIterator.foreach { call =>
-        call.methodInstFullName match {
-          case Some(methodInstFullName) =>
-            methodInstFullNameToMethodFullName.get(methodInstFullName) match {
-              case Some(methodFullName) =>
-                call.setProperty(NodeKeys.METHOD_FULL_NAME, methodFullName)
-              case None =>
-                MethodInstCompat.logger.warn(
-                  s"Unable to find method full name by " +
-                    s"method instance full name $methodInstFullName for CALL ${call.code}.")
-            }
-          case None =>
-            None
+        call.methodInstFullName.foreach { methodInstFullName =>
+          methodInstFullNameToMethodFullName.get(methodInstFullName) match {
+            case Some(methodFullName) =>
+              call.setProperty(NodeKeys.METHOD_FULL_NAME, methodFullName)
+            case None =>
+              MethodInstCompat.logger.warn(
+                s"Unable to find method full name by " +
+                  s"method instance full name $methodInstFullName for CALL ${call.code}.")
+          }
         }
 
       }
 
       cpg.methodRef.toIterator.foreach { methodRef =>
-        methodRef.methodInstFullName match {
-          case Some(methodInstFullName) =>
-            methodInstFullNameToMethodFullName.get(methodInstFullName) match {
-              case Some(methodFullName) =>
-                methodRef.setProperty(NodeKeys.METHOD_FULL_NAME, methodFullName)
-              case None =>
-                MethodInstCompat.logger.warn(
-                  s"Unable to find method full name by " +
-                    s"method instance full name $methodInstFullName for METHDO_REF ${methodRef.code}.")
-            }
-          case None =>
+        methodRef.methodInstFullName.foreach { methodInstFullName =>
+          methodInstFullNameToMethodFullName.get(methodInstFullName) match {
+            case Some(methodFullName) =>
+              methodRef.setProperty(NodeKeys.METHOD_FULL_NAME, methodFullName)
+            case None =>
+              MethodInstCompat.logger.warn(
+                s"Unable to find method full name by " +
+                  s"method instance full name $methodInstFullName for METHDO_REF ${methodRef.code}.")
+          }
         }
       }
     }

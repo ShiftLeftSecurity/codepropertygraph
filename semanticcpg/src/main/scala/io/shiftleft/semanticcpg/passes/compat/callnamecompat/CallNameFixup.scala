@@ -6,9 +6,9 @@ import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
 /**
-  * Compitibilty pass which fixes mismatches between method full name and method name
+  * Compatibility pass which fixes mismatches between method full name and method name
   * properties.
-  * TODO remove once this is fixed.
+  * TODO remove when not needed anymore.
   */
 class CallNameFixup(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
@@ -19,7 +19,7 @@ class CallNameFixup(cpg: Cpg) extends CpgPass(cpg) {
 
           val namePart = call.methodFullName.substring(0, colonIndex)
 
-          val nameWithoutTypes = earseTypeInformation(namePart)
+          val nameWithoutTypes = eraseTypeInformation(namePart)
 
           val nameParts = nameWithoutTypes.split("\\.").toList
 
@@ -35,7 +35,7 @@ class CallNameFixup(cpg: Cpg) extends CpgPass(cpg) {
     Iterator.empty
   }
 
-  private def earseTypeInformation(name: String): String = {
+  private def eraseTypeInformation(name: String): String = {
 
     val dstStringBuilder = StringBuilder.newBuilder
 
