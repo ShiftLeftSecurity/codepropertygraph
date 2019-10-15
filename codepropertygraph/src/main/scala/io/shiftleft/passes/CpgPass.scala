@@ -121,7 +121,7 @@ object CpgPass {
   * diff graph, which additionally provides a map from nodes to graph ids.
   * */
 case class AppliedDiffGraph(diffGraph: DiffGraph,
-                                    private val nodeToTinkerNode: util.HashMap[IdentityHashWrapper[NewNode], Vertex]) {
+                            private val nodeToTinkerNode: util.HashMap[IdentityHashWrapper[NewNode], Vertex]) {
 
   /**
     * Obtain the id this node has in the applied graph
