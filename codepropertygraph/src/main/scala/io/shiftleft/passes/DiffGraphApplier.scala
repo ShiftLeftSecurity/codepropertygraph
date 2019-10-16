@@ -3,6 +3,7 @@ package io.shiftleft.passes
 import java.util
 
 import gremlin.scala.ScalaGraph
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
@@ -18,7 +19,8 @@ class DiffGraphApplier {
   /**
     * Applies diff to existing (loaded) OdbGraph
     **/
-  def applyDiff(diffGraph: DiffGraph, graph: ScalaGraph): AppliedDiffGraph = {
+  def applyDiff(diffGraph: DiffGraph, cpg: Cpg): AppliedDiffGraph = {
+    val graph = cpg.graph
     addNodes(diffGraph, graph)
     addEdges(diffGraph, graph)
     addNodeProperties(diffGraph, graph)
