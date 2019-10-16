@@ -19,6 +19,8 @@ class Local(raw: GremlinScala[nodes.Local])
     with LineNumberAccessors[nodes.Local]
     with EvalTypeAccessors[nodes.Local] {
 
+  override def help: String = "a local. todo add more text"
+
   /**
     * The method hosting this local variable
     * */

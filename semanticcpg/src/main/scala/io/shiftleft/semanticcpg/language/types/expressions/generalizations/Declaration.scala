@@ -11,4 +11,6 @@ class Declaration(raw: GremlinScala[nodes.Declaration])
 trait DeclarationBase[NodeType <: nodes.Declaration] {
   this: NodeSteps[NodeType] =>
   // TODO: steps for Declarations go here
+
+  def help: String = "a declaration. todo add more text"
 }
