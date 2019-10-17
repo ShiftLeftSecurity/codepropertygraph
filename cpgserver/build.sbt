@@ -3,7 +3,6 @@ name := "CPG server"
 
 dependsOn(Projects.codepropertygraph)
 dependsOn(Projects.semanticcpg)
-dependsOn(Projects.dataflowengine)
 
 scalacOptions ++= Seq(
   "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
