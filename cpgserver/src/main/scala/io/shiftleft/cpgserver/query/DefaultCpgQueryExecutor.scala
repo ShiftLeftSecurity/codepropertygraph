@@ -27,7 +27,7 @@ class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager)(implicit
 
   private val uuidProvider = IO { UUID.randomUUID }
 
-  private def buildQuery(query: String) =
+  protected def buildQuery(query: String): String =
     s"""
       |import io.shiftleft.codepropertygraph.Cpg
       |import io.shiftleft.semanticcpg.language._
