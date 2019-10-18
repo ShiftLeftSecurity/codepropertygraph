@@ -1,12 +1,16 @@
 package io.shiftleft.passes
 
 import java.lang.{Long => JLong}
+import java.util
 
 import gnu.trove.set.hash.TCustomHashSet
 import gnu.trove.strategy.IdentityHashingStrategy
-import gremlin.scala.Edge
+import gremlin.scala.{Edge, ScalaGraph}
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import org.apache.logging.log4j.LogManager
+import org.apache.tinkerpop.gremlin.structure.Vertex
+import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 
 import scala.collection.mutable
 import scala.collection.JavaConverters._
@@ -119,6 +123,11 @@ class DiffGraph {
     val propertyCount = _nodeProperties.size + _edgeProperties.size
     s"DiffGraph[nodes: $nodeCount, edges: $edgeCount, properties: $propertyCount]"
   }
+
+  def apply(cpg: Cpg): AppliedDiffGraph = {
+    new DiffGraphApplier().applyDiff(this, cpg)
+  }
+
 }
 
 object DiffGraph {
@@ -150,4 +159,100 @@ object DiffGraph {
   case class EdgeToOriginal(src: NewNode, dst: StoredNode, label: String, properties: Properties) extends DiffEdge
   case class EdgeFromOriginal(src: StoredNode, dst: NewNode, label: String, properties: Properties) extends DiffEdge
   case class EdgeInOriginal(src: StoredNode, dst: StoredNode, label: String, properties: Properties) extends DiffEdge
+}
+
+/**
+  * Component to merge diff graphs into existing (loaded) OdbGraph
+  * */
+private class DiffGraphApplier {
+  import DiffGraphApplier.InternalProperty
+
+  private val overlayNodeToTinkerNode = new util.HashMap[IdentityHashWrapper[NewNode], Vertex]()
+
+  /**
+    * Applies diff to existing (loaded) OdbGraph
+    **/
+  def applyDiff(diffGraph: DiffGraph, cpg: Cpg): AppliedDiffGraph = {
+    val graph = cpg.graph
+    addNodes(diffGraph, graph)
+    addEdges(diffGraph, graph)
+    addNodeProperties(diffGraph, graph)
+    addEdgeProperties(diffGraph, graph)
+    AppliedDiffGraph(diffGraph, overlayNodeToTinkerNode)
+  }
+
+  // We are in luck: OdbGraph will assign ids to new nodes for us
+  private def addNodes(diffGraph: DiffGraph, graph: ScalaGraph): Unit = {
+    val nodeTinkerNodePairs = diffGraph.nodes.map { node =>
+      val newNode = graph.graph.addVertex(node.label)
+
+      node.properties.filter { case (key, _) => !key.startsWith(InternalProperty) }.foreach {
+        case (key, value: Traversable[_]) =>
+          value.foreach { value =>
+            newNode.property(Cardinality.list, key, value)
+          }
+        case (key, value) =>
+          newNode.property(key, value)
+      }
+      (node, newNode)
+    }
+    nodeTinkerNodePairs.foreach {
+      case (node, tinkerNode) =>
+        overlayNodeToTinkerNode.put(IdentityHashWrapper(node), tinkerNode)
+    }
+  }
+
+  private def addEdges(diffGraph: DiffGraph, graph: ScalaGraph) = {
+    diffGraph.edges.foreach { edge =>
+      val srcTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.src))
+      val dstTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.dst))
+      tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
+    }
+
+    diffGraph.edgesFromOriginal.foreach { edge =>
+      val srcTinkerNode = edge.src
+      val dstTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.dst))
+      tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
+    }
+
+    diffGraph.edgesToOriginal.foreach { edge =>
+      val srcTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.src))
+      val dstTinkerNode = edge.dst
+      tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
+    }
+
+    diffGraph.edgesInOriginal.foreach { edge =>
+      val srcTinkerNode = edge.src
+      val dstTinkerNode = edge.dst
+      tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
+    }
+
+    def tinkerAddEdge(src: Vertex, dst: Vertex, edge: DiffGraph.DiffEdge) = {
+      val tinkerEdge = src.addEdge(edge.label, dst)
+
+      edge.properties.foreach {
+        case (key, value) =>
+          tinkerEdge.property(key, value)
+      }
+    }
+  }
+
+  private def addNodeProperties(diffGraph: DiffGraph, graph: ScalaGraph): Unit = {
+    diffGraph.nodeProperties.foreach { property =>
+      val node = property.node
+      node.property(property.propertyKey, property.propertyValue)
+    }
+  }
+
+  private def addEdgeProperties(diffGraph: DiffGraph, graph: ScalaGraph): Unit = {
+    diffGraph.edgeProperties.foreach { property =>
+      val edge = property.edge
+      edge.property(property.propertyKey, property.propertyValue)
+    }
+  }
+
+}
+
+private object DiffGraphApplier {
+  private val InternalProperty = "_"
 }
