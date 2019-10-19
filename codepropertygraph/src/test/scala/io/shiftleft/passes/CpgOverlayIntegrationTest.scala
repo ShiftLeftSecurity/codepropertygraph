@@ -50,6 +50,8 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       override def label = NodeTypes.UNKNOWN
       override def properties = Map(NodeKeyNames.CODE -> propValue)
       override def accept[T](visitor: NodeVisitor[T]): T = ???
+      override def getId: java.lang.Long = ???
+      override def productElementLabel(n: Int): String = ???
     }
     new CpgPass(cpg) {
 

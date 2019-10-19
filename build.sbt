@@ -54,6 +54,7 @@ Global / useGpg := false
 ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature", "-language:implicitConversions")
 ThisBuild/compile/javacOptions ++= Seq("-g") //debug symbols
 
+Global/onChangedBuildSource := ReloadOnSourceChanges
 onLoad in Global := {
   assert(GitLFSUtils.isGitLFSEnabled(), "You need to install git-lfs and run 'git lfs pull'")
   (onLoad in Global).value
