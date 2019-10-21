@@ -3,13 +3,12 @@ package io.shiftleft.semanticcpg
 import gremlin.scala.{GremlinScala, __}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
+import io.shiftleft.codepropertygraph.generated.nodes.{Node, StoredNode}
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.nodemethods.{AstNodeMethods, WithinMethodMethods}
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
-
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod}
 import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
 
@@ -187,5 +186,23 @@ package object language {
 
   implicit def toCallForCallGraph(steps: Steps[nodes.Call]): Call =
     new Call(steps.raw)
+
+  // Locations
+
+  implicit def toExtendedNode(node: Node): ExtendedNode =
+    new ExtendedNode(node)
+
+  case class ExtendedNode(node: Node) {
+
+    def location: nodes.NewLocation = {
+      node match {
+        case storedNode: StoredNode =>
+          LocationCreator(storedNode)
+        case _ =>
+          LocationCreator.emptyLocation("", None)
+
+      }
+    }
+  }
 
 }
