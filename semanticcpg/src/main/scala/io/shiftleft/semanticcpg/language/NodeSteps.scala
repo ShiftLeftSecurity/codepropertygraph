@@ -26,6 +26,12 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
         .cast[nodes.File]
     )
 
+  /**
+    * Execute traversal and map each node to location.
+    * */
+  def location: NewLocation =
+    new NewLocation(raw.map(x => x.location))
+
   /* follow the incoming edges of the given type as long as possible */
   protected def walkIn(edgeType: String): GremlinScala[Vertex] =
     raw
