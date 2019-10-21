@@ -106,7 +106,7 @@ object LocationCreator {
       new nodes.NewLocation("", "", "", "", None, "", "", "", Some(node))
     } else {
       val typeOption = ExpandTo.methodToTypeDecl(method).map(_.asInstanceOf[nodes.TypeDecl])
-      val typeName   = typeOption.map(_.fullName).getOrElse("")
+      val typeName = typeOption.map(_.fullName).getOrElse("")
 
       val namespaceOptionVertex = typeOption.flatMap(
         _.vertices(Direction.IN, EdgeTypes.AST).asScala
@@ -116,9 +116,9 @@ object LocationCreator {
           .headOption
       )
       val namespaceOption = namespaceOptionVertex.map(_.asInstanceOf[nodes.Namespace])
-      val namespaceName   = namespaceOption.map(_.name).getOrElse("")
-      val fileOption      = ExpandTo.methodToFile(method).map(_.asInstanceOf[nodes.File])
-      val fileName        = fileOption.map(_.name).getOrElse("N/A")
+      val namespaceName = namespaceOption.map(_.name).getOrElse("")
+      val fileOption = ExpandTo.methodToFile(method).map(_.asInstanceOf[nodes.File])
+      val fileName = fileOption.map(_.name).getOrElse("N/A")
 
       new nodes.NewLocation(
         symbol = symbol,
