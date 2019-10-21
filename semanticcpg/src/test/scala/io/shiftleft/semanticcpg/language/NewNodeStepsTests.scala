@@ -102,5 +102,7 @@ object NewNodeNodeStepsTest {
     override def containedNodesByLocalName: Map[String, List[Node]] =
       Map(testContainedLabel -> containedNodes)
     override def accept[T](visitor: NodeVisitor[T]): T = ???
+    override def getId: java.lang.Long = ???
+    override def productElementLabel(n: Int): String = ???
   }
 }

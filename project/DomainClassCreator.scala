@@ -207,6 +207,11 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
       trait Node extends Product {
         def accept[T](visitor: NodeVisitor[T]): T = ???
+
+        /** labels of product elements, used e.g. for pretty-printing */
+        def productElementLabel(n: Int): String
+
+        def getId: JLong
       }
 
       /* a node that stored inside an OdbGraph (rather than e.g. DiffGraph) */
@@ -215,10 +220,9 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
          * since this is a StoredNode, this is always set */
         def underlying: Vertex = this
 
-        // This is required for accessing the id from java code which only has a reference to StoredNode at hand.
         // Java does not seem to be capable of calling methods from java classes if a scala trait is in the inheritance
         // chain.
-        def getId: JLong = underlying.id.asInstanceOf[JLong]
+        override def getId: JLong = underlying.id.asInstanceOf[JLong]
 
         /* all properties plus label and id */
         def toMap: Map[String, Any] = {
@@ -447,10 +451,17 @@ $neighborAccesors
         }
       }.mkString("\n")
 
+      val productElementLabels =
+        keys.zipWithIndex
+          .map { case (key, idx) =>
+            s"""case ${idx + 1} => "${camelCase(key.name)}" """
+          }
+          .mkString("\n")
+
       val productElementAccessors =
         keys.zipWithIndex
           .map { case (key, idx) =>
-            s"case ${idx + 1} => ${camelCase(key.name)}()"
+            s"case ${idx + 1} => ${camelCase(key.name)}"
           }
           .mkString("\n")
 
@@ -473,7 +484,25 @@ $neighborAccesors
       val nodeBaseImpl = s"""
       |trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
       |  def asStored : StoredNode = this.asInstanceOf[StoredNode]
+      |  override def getId: JLong = -1l
+      |
       |  $abstractContainedNodeAccessors
+      |
+      |  override def productElementLabel(n: Int): String =
+      |      n match {
+      |        case 0 => "id"
+      |        $productElementLabels
+      |      }
+
+      |  override def productElement(n: Int): Any =
+      |      n match {
+      |        case 0 => getId
+      |        $productElementAccessors
+      |      }
+      |
+      |  override def productPrefix = "${nodeType.className}"
+      |  override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
+      |  
       |}""".stripMargin
 
       val neighborDelegators = (outEdges.map(edgetypename => neighborAccessorName(edgetypename, "OUT")) ++
@@ -494,9 +523,6 @@ $neighborAccesors
           |    visitor.visit(this)
           |  }
           |  override def valueMap: JMap[String, AnyRef] = get.valueMap
-          |  override def productElement(n: Int): Any = get.productElement(n)
-          |  override def productPrefix = "${nodeType.className}"
-          |  override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
           |  override def canEqual(that: Any): Boolean = get.canEqual(that)
           |  override def label(): String = {
           |    ${nodeType.className}.Label
@@ -526,15 +552,7 @@ ${neighborAccesors}
         }
 
         override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[${nodeType.classNameDb}]
-        override def productElement(n: Int): Any =
-            n match {
-              case 0 => getId
-              $productElementAccessors
-            }
 
-        override def productPrefix = "${nodeType.className}"
-        override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
-        
         /* performance optimisation to save instantiating an iterator for each property lookup */
         override protected def specificProperty[A](key: String): VertexProperty[A] = {
           ${nodeType.className}.Keys.KeyToValue.get(key) match {
