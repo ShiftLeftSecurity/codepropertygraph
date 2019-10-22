@@ -32,6 +32,8 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
 
     linkAstChildToParent(dstGraph)
 
+    // Create REF edges from TYPE nodes to TYPE_DECL nodes.
+
     linkToSingle(
       srcLabels = List(NodeTypes.TYPE),
       dstNodeLabel = NodeTypes.TYPE_DECL,
@@ -40,6 +42,9 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstFullNameKey = nodes.Type.Keys.TypeDeclFullName,
       dstGraph
     )
+
+    // Create EVAL_TYPE edges from nodes of various types
+    // to TYPE nodes.
 
     linkToSingle(
       srcLabels = List(
@@ -61,6 +66,9 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstGraph
     )
 
+    // Create REF edges from METHOD_REFs to
+    // METHOD nodes.
+
     linkToSingle(
       srcLabels = List(NodeTypes.METHOD_REF),
       dstNodeLabel = NodeTypes.METHOD,
@@ -69,6 +77,9 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstFullNameKey = nodes.MethodRef.Keys.MethodFullName,
       dstGraph
     )
+
+    // Create INHERITS_FROM nodes from TYPE_DECL
+    // nodes to TYPE nodes.
 
     linkToMultiple(
       srcLabels = List(NodeTypes.TYPE_DECL),
@@ -85,6 +96,9 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstFullNameKey = nodes.TypeDecl.Keys.InheritsFromTypeFullName,
       dstGraph
     )
+
+    // Create ALIAS_OF edges from TYPE_DECL nodes to
+    // TYPE nodes.
 
     linkToMultiple(
       srcLabels = List(NodeTypes.TYPE_DECL),
