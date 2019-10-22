@@ -1,4 +1,4 @@
-package io.shiftleft.cpgserver.model
+package io.shiftleft.console.query
 
 sealed trait CpgOperationResult[+T]
 

@@ -1,8 +1,9 @@
 package io.shiftleft.console
 
 import better.files.File
-import io.shiftleft.console.ScriptManager.ScriptDescription
 import org.scalatest.{Inside, Matchers, WordSpec}
+
+import io.shiftleft.console.ScriptManager.ScriptDescription
 
 class ScriptManagerTest extends WordSpec with Matchers with Inside {
 
@@ -31,10 +32,8 @@ class ScriptManagerTest extends WordSpec with Matchers with Inside {
       val sut = new TestScriptManager
       inside(sut.scripts()) {
         case ScriptDescription("list-funcs", _) :: _ =>
-          val actualT: String = sut.runScriptT("list-funcs")
-          actualT shouldBe expected
-          val actual = sut.runScript("list-funcs")
-          actual shouldBe expected
+          sut.runScriptT[String]("list-funcs") shouldBe expected
+          sut.runScript("list-funcs") shouldBe expected
       }
 
     }

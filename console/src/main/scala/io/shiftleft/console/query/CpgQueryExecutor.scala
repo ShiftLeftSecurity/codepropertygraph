@@ -1,12 +1,11 @@
-package io.shiftleft.cpgserver.query
-
-import java.util.UUID
+package io.shiftleft.console.query
 
 import cats.data.OptionT
 import cats.effect.IO
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.cpgserver.model.CpgOperationResult
+
+import java.util.UUID
 
 /**
   * This trait provides an abstraction over the execution of queries on a CPG.

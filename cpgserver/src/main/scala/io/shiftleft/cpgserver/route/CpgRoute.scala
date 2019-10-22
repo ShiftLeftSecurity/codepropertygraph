@@ -2,7 +2,6 @@ package io.shiftleft.cpgserver.route
 
 import java.nio.file.{Files, Paths}
 import java.util.UUID
-
 import cats.effect.IO
 import cats.implicits.catsStdInstancesForList
 import cats.syntax.foldable._
@@ -14,9 +13,8 @@ import org.http4s.dsl.io._
 import org.http4s.{EntityDecoder, HttpRoutes, MessageBodyFailure, Response}
 import org.slf4j.LoggerFactory
 
+import io.shiftleft.console.query.{CpgOperationFailure, CpgOperationSuccess, CpgQueryExecutor}
 import io.shiftleft.cpgserver.cpg.CpgProvider
-import io.shiftleft.cpgserver.model.{CpgOperationFailure, CpgOperationSuccess}
-import io.shiftleft.cpgserver.query.CpgQueryExecutor
 
 final class CpgRoute[T: Encoder](cpgProvider: CpgProvider, cpgQueryExecutor: CpgQueryExecutor[T])(
     implicit httpErrorHandler: HttpErrorHandler) {

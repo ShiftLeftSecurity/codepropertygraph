@@ -1,4 +1,10 @@
-package io.shiftleft.cpgserver.query
+package io.shiftleft.console.query
+
+import cats.data.OptionT
+import cats.effect.{Blocker, ContextShift, IO}
+import javax.script.ScriptEngineManager
+
+import io.shiftleft.codepropertygraph.Cpg
 
 import java.util.UUID
 import java.util.concurrent.{ConcurrentHashMap, Executors}
@@ -6,13 +12,6 @@ import java.util.concurrent.{ConcurrentHashMap, Executors}
 import scala.collection.JavaConverters._
 import scala.collection.concurrent.Map
 import scala.concurrent.ExecutionContext
-
-import cats.data.OptionT
-import cats.effect.{Blocker, ContextShift, IO}
-import javax.script.ScriptEngineManager
-
-import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.cpgserver.model.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess}
 
 class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager)(implicit val cs: ContextShift[IO])
     extends CpgQueryExecutor[String] {
