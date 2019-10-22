@@ -1,6 +1,6 @@
 package io.shiftleft.console
 
-abstract class ScriptExecutor {
+trait ScriptExecutor {
 
   def run(script: String): Object
 

@@ -1,32 +1,36 @@
 package io.shiftleft.console
 
-import java.io.FileInputStream
 import better.files._
-import play.api.libs.json.{Json, Reads}
+import io.circe.generic.auto._, io.circe.parser._
+
+object ScriptManager {
+
+  final case class ScriptDescription(name: String, description: String)
+
+}
 
 abstract class ScriptManager(executor: ScriptExecutor) {
 
-  protected val DEFAULT_SCRIPTS_FOLDER: String = "scripts/"
+  import ScriptManager._
+
+  protected val DEFAULT_SCRIPTS_FOLDER: File = File("scripts")
 
   private val SCRIPT_DESC: String = "description.json"
 
-  case class ScriptDescription(name: String, description: String)
+  private def folders() = DEFAULT_SCRIPTS_FOLDER.children.filter(_.isDirectory)
 
-  private implicit val scriptDescriptionRead: Reads[ScriptDescription] = Json.reads[ScriptDescription]
+  private def scriptFileContent(file: File): String = file.lines.mkString(System.lineSeparator())
 
-  private def folders() = File(DEFAULT_SCRIPTS_FOLDER).children.filter(_.isDirectory)
+  def scripts(): List[ScriptDescription] =
+    folders().flatMap { folder =>
+      decode[ScriptDescription](scriptFileContent(folder / SCRIPT_DESC)).toOption
+    }.toList
 
-  def scripts(): List[ScriptDescription] = {
-    val allScriptDescriptions = folders().map { folder =>
-      Json.parse(new FileInputStream(folder.pathAsString + "/" + SCRIPT_DESC)).as[ScriptDescription]
-    }
-    allScriptDescriptions.toList
-  }
+  def runScript(name: String): Object =
+    executor.run(scriptFileContent(DEFAULT_SCRIPTS_FOLDER / name / s"$name.scala"))
 
-  def runScript(name: String): Object = {
-    val script = File(s"$DEFAULT_SCRIPTS_FOLDER$name/$name.scala")
-    val content = script.lines.mkString("\n")
-    executor.run(content)
+  def runScriptT[T <: AnyRef](name: String): T = {
+    runScript(name).asInstanceOf[T]
   }
 
 }
