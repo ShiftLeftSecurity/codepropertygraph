@@ -8,6 +8,9 @@ import io.shiftleft.semanticcpg.language._
 
 /**
   * This pass has no other pass as prerequisite.
+  * For each `TYPE` node that does not have a corresponding `TYPE_DECL`
+  * node, this pass creates a `TYPE_DECL` node. The `TYPE_DECL` is
+  * considered external.
   */
 class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 

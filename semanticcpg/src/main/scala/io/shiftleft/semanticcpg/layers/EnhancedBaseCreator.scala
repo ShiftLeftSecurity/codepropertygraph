@@ -52,35 +52,6 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new ContainsEdgePass(cpg),
           new NamespaceCreator(cpg),
         )
-      case Languages.CSHARP =>
-        List(
-          new MethodInstCompat(cpg),
-          new CallNameFixup(cpg),
-          new ReceiverEdgePass(cpg),
-          new MethodDecoratorPass(cpg),
-          new CapturingLinker(cpg),
-          new Linker(cpg),
-          new BindingTableCompat(cpg),
-          new CallLinker(cpg),
-          new MemberAccessLinker(cpg),
-          new MethodExternalDecoratorPass(cpg),
-          new ContainsEdgePass(cpg),
-          new NamespaceCreator(cpg),
-        )
-      case _ =>
-        List(
-          new MethodInstCompat(cpg),
-          new ReceiverEdgePass(cpg),
-          new MethodDecoratorPass(cpg),
-          new CapturingLinker(cpg),
-          new Linker(cpg),
-          new BindingTableCompat(cpg),
-          new CallLinker(cpg),
-          new MemberAccessLinker(cpg),
-          new MethodExternalDecoratorPass(cpg),
-          new ContainsEdgePass(cpg),
-          new NamespaceCreator(cpg),
-        )
     }
   }
 

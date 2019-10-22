@@ -29,7 +29,7 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
     init()
 
     // TODO bring in Receiver type. Just working on name and comparing to full name
-    // will only work for C because there name always equals full name.
+    // will only work for C because in C, name always equals full name.
     methodToParameterCount.foreach {
       case (NameAndSignature(name, signature), parameterCount) =>
         methodFullNameToNode.get(name) match {

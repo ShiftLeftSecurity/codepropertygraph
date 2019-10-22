@@ -32,6 +32,8 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
 
     linkAstChildToParent(dstGraph)
 
+    // Create REF edges from TYPE nodes to TYPE_DECL nodes.
+
     linkToSingle(
       srcLabels = List(NodeTypes.TYPE),
       dstNodeLabel = NodeTypes.TYPE_DECL,
@@ -40,6 +42,9 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstFullNameKey = nodes.Type.Keys.TypeDeclFullName,
       dstGraph
     )
+
+    // Create EVAL_TYPE edges from nodes of various types
+    // to TYPE nodes.
 
     linkToSingle(
       srcLabels = List(
@@ -61,6 +66,9 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstGraph
     )
 
+    // Create REF edges from METHOD_REFs to
+    // METHOD nodes.
+
     linkToSingle(
       srcLabels = List(NodeTypes.METHOD_REF),
       dstNodeLabel = NodeTypes.METHOD,
@@ -69,6 +77,9 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstFullNameKey = nodes.MethodRef.Keys.MethodFullName,
       dstGraph
     )
+
+    // Create INHERITS_FROM nodes from TYPE_DECL
+    // nodes to TYPE nodes.
 
     linkToMultiple(
       srcLabels = List(NodeTypes.TYPE_DECL),
@@ -85,6 +96,9 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstFullNameKey = nodes.TypeDecl.Keys.InheritsFromTypeFullName,
       dstGraph
     )
+
+    // Create ALIAS_OF edges from TYPE_DECL nodes to
+    // TYPE nodes.
 
     linkToMultiple(
       srcLabels = List(NodeTypes.TYPE_DECL),
@@ -111,6 +125,12 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     }
   }
 
+  /**
+    * For all nodes `n` with a label in `srcLabels`, determine
+    * the value of `n.$dstFullNameKey`, use that to lookup the
+    * destination node in `dstNodeMap`, and create an edge of type
+    * `edgeType` between `n` and the destination node.
+    * */
   private def linkToSingle(srcLabels: List[String],
                            dstNodeLabel: String,
                            edgeType: String,
@@ -121,14 +141,16 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     val sourceTraversal = cpg.graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*)
     val sourceIterator = new Steps(sourceTraversal).toIterator()
     sourceIterator.foreach { srcNode =>
+      // If the source node does not have any outgoing edges of this type
+      // This check is just required for backward compatibility
       if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
-        // for `UNKNOWN` this is not always set, so we're using an Option here
-        srcNode.valueOption[String](dstFullNameKey).map { dstFullName =>
+        srcNode.valueOption[String](dstFullNameKey).foreach { dstFullName =>
+          // for `UNKNOWN` this is not always set, so we're using an Option here
           val dstNode: Option[nodes.StoredNode] = dstNodeMap.get(dstFullName)
           dstNode match {
-            case Some(dstNode) =>
+            case Some(dstNodeInner) =>
               dstGraph
-                .addEdgeInOriginal(srcNode.asInstanceOf[nodes.StoredNode], dstNode, edgeType)
+                .addEdgeInOriginal(srcNode.asInstanceOf[nodes.StoredNode], dstNodeInner, edgeType)
             case None =>
               logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
           }
