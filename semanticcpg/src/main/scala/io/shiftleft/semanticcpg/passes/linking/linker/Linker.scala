@@ -111,6 +111,12 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     }
   }
 
+  /**
+    * For all nodes `n` with a label in `srcLabels`, determine
+    * the value of `n.$dstFullNameKey`, use that to lookup the
+    * destination node in `dstNodeMap`, and create an edge of type
+    * `edgeType` between `n` and the destination node.
+    * */
   private def linkToSingle(srcLabels: List[String],
                            dstNodeLabel: String,
                            edgeType: String,
@@ -121,14 +127,16 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     val sourceTraversal = cpg.graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*)
     val sourceIterator = new Steps(sourceTraversal).toIterator()
     sourceIterator.foreach { srcNode =>
+      // If the source node does not have any outgoing edges of this type
+      // This check is just required for backward compatibility
       if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
-        // for `UNKNOWN` this is not always set, so we're using an Option here
-        srcNode.valueOption[String](dstFullNameKey).map { dstFullName =>
+        srcNode.valueOption[String](dstFullNameKey).foreach { dstFullName =>
+          // for `UNKNOWN` this is not always set, so we're using an Option here
           val dstNode: Option[nodes.StoredNode] = dstNodeMap.get(dstFullName)
           dstNode match {
-            case Some(dstNode) =>
+            case Some(dstNodeInner) =>
               dstGraph
-                .addEdgeInOriginal(srcNode.asInstanceOf[nodes.StoredNode], dstNode, edgeType)
+                .addEdgeInOriginal(srcNode.asInstanceOf[nodes.StoredNode], dstNodeInner, edgeType)
             case None =>
               logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
           }
