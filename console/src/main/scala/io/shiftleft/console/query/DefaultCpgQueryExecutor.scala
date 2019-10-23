@@ -14,8 +14,9 @@ import scala.concurrent.ExecutionContext
 /**
   * This class executes a query on a given CPG.
   */
-class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager)(implicit val cs: ContextShift[IO])
-    extends CpgQueryExecutor[AnyRef] {
+class DefaultCpgQueryExecutor[ResultT <: AnyRef](scriptEngineManager: ScriptEngineManager)(
+    implicit val cs: ContextShift[IO])
+    extends CpgQueryExecutor[ResultT] {
 
   private val engine: IO[ScriptEngine] = OptionT
     .fromOption[IO](Option(scriptEngineManager.getEngineByName("scala")))
@@ -24,8 +25,8 @@ class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager)(implicit
   private val blocker: Blocker =
     Blocker.liftExecutionContext(ExecutionContext.fromExecutor(Executors.newFixedThreadPool(2)))
 
-  private val queryResultMap: Map[UUID, CpgOperationResult[AnyRef]] =
-    new ConcurrentHashMap[UUID, CpgOperationResult[AnyRef]].asScala
+  private val queryResultMap: Map[UUID, CpgOperationResult[ResultT]] =
+    new ConcurrentHashMap[UUID, CpgOperationResult[ResultT]].asScala
 
   private val uuidProvider = IO { UUID.randomUUID }
 
@@ -47,24 +48,25 @@ class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager)(implicit
       _ <- blocker
         .blockOn(IO(e.eval(buildQuery(query))))
         .runAsync {
-          case Right(result) => IO(queryResultMap.put(resultUuid, CpgOperationSuccess(result))).map(_ => ())
-          case Left(ex)      => IO(queryResultMap.put(resultUuid, CpgOperationFailure(ex))).map(_ => ())
+          case Right(result) =>
+            IO(queryResultMap.put(resultUuid, CpgOperationSuccess(result.asInstanceOf[ResultT]))).map(_ => ())
+          case Left(ex) => IO(queryResultMap.put(resultUuid, CpgOperationFailure(ex))).map(_ => ())
         }
         .toIO
     } yield resultUuid
   }
 
-  override def retrieveQueryResult(queryId: UUID): OptionT[IO, CpgOperationResult[AnyRef]] = {
+  override def retrieveQueryResult(queryId: UUID): OptionT[IO, CpgOperationResult[ResultT]] = {
     OptionT.fromOption(queryResultMap.get(queryId))
   }
 
-  override def executeQuerySync(cpg: Cpg, query: String): IO[CpgOperationResult[AnyRef]] = {
+  override def executeQuerySync(cpg: Cpg, query: String): IO[CpgOperationResult[ResultT]] = {
     for {
       e <- engine
       _ <- IO(e.put("aCpg", cpg))
       result <- IO(e.eval(buildQuery(query)))
         .handleErrorWith(err => IO(CpgOperationFailure(err)))
-        .map(CpgOperationSuccess(_))
+        .map(v => CpgOperationSuccess(v.asInstanceOf[ResultT]))
     } yield result
   }
 }
