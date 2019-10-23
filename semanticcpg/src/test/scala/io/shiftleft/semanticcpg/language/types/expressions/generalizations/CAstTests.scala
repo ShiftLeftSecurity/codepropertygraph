@@ -28,11 +28,14 @@ class CAstTests extends WordSpec with Matchers {
 
   "should allow finding addition in argument to bar" in {
     CodeToCpgFixture().buildCpg(code) { cpg =>
-      implicit val resolver : ICallResolver = NoResolve
-      cpg.method.name("bar")
-        .callIn.argument(1)
+      implicit val resolver: ICallResolver = NoResolve
+      cpg.method
+        .name("bar")
+        .callIn
+        .argument(1)
         .filter(_.ast.isCall.name("<operator>.(addition|multiplication)"))
-        .code.l shouldBe List ("x + 10")
+        .code
+        .l shouldBe List("x + 10")
     }
   }
 
