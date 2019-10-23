@@ -3,7 +3,6 @@ package io.shiftleft.semanticcpg.language
 import gremlin.scala.{GremlinScala, P, Vertex}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language.types.structure.File
-import org.json4s.native.Serialization.{write, writePretty}
 
 /**
   * Steps for all node types
@@ -40,19 +39,5 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
 
   def toMaps(): Steps[Map[String, Any]] =
     new Steps[Map[String, Any]](raw.map(_.toMap))
-
-  /**
-    Execute traversal and convert the result to json.
-    */
-  def toJson: String = _toJson(pretty = false)
-
-  def toJsonPretty: String = _toJson(pretty = true)
-
-  protected def _toJson(pretty: Boolean): String = {
-    implicit val formats = org.json4s.DefaultFormats
-    val maps: List[Map[String, Any]] = toList.map(_.toMap)
-    if (pretty) writePretty(maps)
-    else write(maps)
-  }
 
 }
