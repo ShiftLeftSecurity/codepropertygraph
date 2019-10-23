@@ -16,20 +16,23 @@ class CpgRouteSpec extends Http4sSpec {
   import CpgRouteSpec._
 
   private class DummyCpgProvider(uuid: UUID, cpg: OptionT[IO, CpgOperationResult[Cpg]]) extends CpgProvider {
-    def createCpg(fileNames: Set[String]): IO[UUID] = IO.pure(uuid)
-    def retrieveCpg(cpgId: UUID): OptionT[IO, CpgOperationResult[Cpg]] = cpg
+    override def createCpg(fileNames: Set[String]): IO[UUID] = IO.pure(uuid)
+    override def retrieveCpg(cpgId: UUID): OptionT[IO, CpgOperationResult[Cpg]] = cpg
   }
 
-  private class DummyCpgQueryExecutor(uuid: UUID, queryResult: OptionT[IO, CpgOperationResult[String]]) extends CpgQueryExecutor[String] {
-    def executeQuery(cpg: Cpg, query: String): IO[UUID] = IO.pure(uuid)
-    def retrieveQueryResult(queryId: UUID): OptionT[IO, CpgOperationResult[String]] = queryResult
+  private class DummyCpgQueryExecutor(uuid: UUID, queryResult: OptionT[IO, CpgOperationResult[String]])
+      extends CpgQueryExecutor[String] {
+    override def executeQuery(cpg: Cpg, query: String): IO[UUID] = IO.pure(uuid)
+    override def retrieveQueryResult(queryId: UUID): OptionT[IO, CpgOperationResult[String]] = queryResult
+    override def executeQuerySync(cpg: Cpg, query: String): IO[CpgOperationResult[String]] = ???
   }
 
-  private def withRoute[T](cpgUuid: UUID = UUID.randomUUID(),
-                           cpg: OptionT[IO, CpgOperationResult[Cpg]] = OptionT.pure(CpgOperationSuccess(Cpg.emptyCpg)),
-                           queryUuid: UUID = UUID.randomUUID(),
-                           queryResult: OptionT[IO, CpgOperationResult[String]] = OptionT.pure(CpgOperationSuccess("")))
-                          (f: Kleisli[IO, Request[IO], Response[IO]] => T): T = {
+  private def withRoute[T](
+      cpgUuid: UUID = UUID.randomUUID(),
+      cpg: OptionT[IO, CpgOperationResult[Cpg]] = OptionT.pure(CpgOperationSuccess(Cpg.emptyCpg)),
+      queryUuid: UUID = UUID.randomUUID(),
+      queryResult: OptionT[IO, CpgOperationResult[String]] = OptionT.pure(CpgOperationSuccess("")))(
+      f: Kleisli[IO, Request[IO], Response[IO]] => T): T = {
     val cpgProvider = new DummyCpgProvider(cpgUuid, cpg)
     val cpgQueryExecutor = new DummyCpgQueryExecutor(queryUuid, queryResult)
     implicit val errorHandler: HttpErrorHandler = CpgRoute.CpgHttpErrorHandler
@@ -91,7 +94,9 @@ class CpgRouteSpec extends Http4sSpec {
       val request = Request[IO](method = Method.POST, uri = uri"/v1/create").withEntity(requestBody)
       val response = route.run(request)
 
-      check(response, Status.BadRequest, Some(ApiError("Invalid payload. Please check that the payload is formatted correctly.")))
+      check(response,
+            Status.BadRequest,
+            Some(ApiError("Invalid payload. Please check that the payload is formatted correctly.")))
     }
   }
 
@@ -106,7 +111,6 @@ class CpgRouteSpec extends Http4sSpec {
     "succeed with 200 OK if the CPG was unable to be created" in withRoute(
       cpgUuid = fixedCpgUuid,
       cpg = OptionT.pure(CpgOperationFailure(new RuntimeException("Oh no!")))) { route =>
-
       val request = Request[IO](method = Method.GET, uri = uri"/v1/cpg" / fixedCpgUuid.toString)
       val response = route.run(request)
 
@@ -117,7 +121,6 @@ class CpgRouteSpec extends Http4sSpec {
       cpgUuid = fixedCpgUuid,
       cpg = OptionT.none
     ) { route =>
-
       val request = Request[IO](method = Method.GET, uri = uri"/v1/cpg" / fixedCpgUuid.toString)
       val response = route.run(request)
 
@@ -146,8 +149,8 @@ class CpgRouteSpec extends Http4sSpec {
       cpgUuid = fixedCpgUuid,
       queryUuid = fixedQueryUuid
     ) { route =>
-
-      val request = Request[IO](method = Method.POST, uri = uri"/v1/cpg" / fixedCpgUuid.toString / "query").withEntity(query)
+      val request =
+        Request[IO](method = Method.POST, uri = uri"/v1/cpg" / fixedCpgUuid.toString / "query").withEntity(query)
       val response = route.run(request)
 
       check(response, Status.Accepted, Some(CreateCpgQueryResponse(fixedQueryUuid))) shouldBe true
@@ -157,7 +160,8 @@ class CpgRouteSpec extends Http4sSpec {
       cpgUuid = fixedCpgUuid,
       cpg = OptionT.pure(CpgOperationFailure(new RuntimeException("Oh noes!")))
     ) { route =>
-      val request = Request[IO](method = Method.POST, uri = uri"/v1/cpg" / fixedCpgUuid.toString / "query").withEntity(query)
+      val request =
+        Request[IO](method = Method.POST, uri = uri"/v1/cpg" / fixedCpgUuid.toString / "query").withEntity(query)
       val response = route.run(request)
 
       check(
@@ -169,7 +173,8 @@ class CpgRouteSpec extends Http4sSpec {
     "fail with 404 NOT FOUND if the target CPG does not exist" in withRoute(
       cpg = OptionT.none
     ) { route =>
-      val request = Request[IO](method = Method.POST, uri = uri"/v1/cpg" / fixedCpgUuid.toString / "query").withEntity(query)
+      val request =
+        Request[IO](method = Method.POST, uri = uri"/v1/cpg" / fixedCpgUuid.toString / "query").withEntity(query)
       val response = route.run(request)
 
       check(response, Status.NotFound, Some(ApiError(s"CPG referenced by [$fixedCpgUuid] does not exist.")))
@@ -185,10 +190,13 @@ class CpgRouteSpec extends Http4sSpec {
           |}
           |""".stripMargin
 
-      val request = Request[IO](method = Method.POST, uri = uri"/v1/cpg" / fixedCpgUuid.toString / "query").withEntity(requestBody)
+      val request =
+        Request[IO](method = Method.POST, uri = uri"/v1/cpg" / fixedCpgUuid.toString / "query").withEntity(requestBody)
       val response = route.run(request)
 
-      check(response, Status.BadRequest, Some(ApiError("Invalid payload. Please check that the payload is formatted correctly.")))
+      check(response,
+            Status.BadRequest,
+            Some(ApiError("Invalid payload. Please check that the payload is formatted correctly.")))
     }
   }
 

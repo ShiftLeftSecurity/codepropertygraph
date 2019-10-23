@@ -27,8 +27,9 @@ class DefaultCpgQueryExecutorSpec extends WordSpec with Matchers with Eventually
 
   private class DefinedScriptEnginerManager(queryError: Boolean) extends ScriptEngineManager {
     override def getEngineByName(shortName: String): ScriptEngine = new ScriptEngine {
-      def eval(script: String): AnyRef = if (queryError) throw queryException
-                                         else queryResult
+      def eval(script: String): AnyRef =
+        if (queryError) throw queryException
+        else queryResult
 
       def eval(script: String, context: ScriptContext): AnyRef = ???
       def eval(reader: Reader, context: ScriptContext): AnyRef = ???
@@ -46,11 +47,11 @@ class DefaultCpgQueryExecutorSpec extends WordSpec with Matchers with Eventually
     }
   }
 
-  private def withNewQueryExecutor[T](scripManagerIsDefined: Boolean = true,
-                                      queryError: Boolean = false)
-                                     (f: DefaultCpgQueryExecutor => T): T = {
-    val manager = if (scripManagerIsDefined) new DefinedScriptEnginerManager(queryError)
-                  else UndefinedScriptEngineManager
+  private def withNewQueryExecutor[T](scripManagerIsDefined: Boolean = true, queryError: Boolean = false)(
+      f: DefaultCpgQueryExecutor => T): T = {
+    val manager =
+      if (scripManagerIsDefined) new DefinedScriptEnginerManager(queryError)
+      else UndefinedScriptEngineManager
 
     f(new DefaultCpgQueryExecutor(manager))
   }

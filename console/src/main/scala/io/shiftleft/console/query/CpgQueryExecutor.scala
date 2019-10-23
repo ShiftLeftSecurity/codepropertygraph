@@ -24,6 +24,15 @@ trait CpgQueryExecutor[ResultT] {
   def executeQuery(cpg: Cpg, query: String): IO[UUID]
 
   /**
+    * Synchronously performs the provided CPG `query` against the specified `cpg`.
+    *
+    * @param cpg The CPG to perform the query against.
+    * @param query A String containing a CPG query.
+    * @return A CpgOperationResult containing the result of the query.
+    */
+  def executeQuerySync(cpg: Cpg, query: String): IO[CpgOperationResult[ResultT]]
+
+  /**
     * Returns a query result identified by `uuid` iff the query has finished running.
     *
     * @param queryId A UUID associated with a CPG query.

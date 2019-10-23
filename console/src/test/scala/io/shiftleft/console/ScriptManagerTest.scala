@@ -1,19 +1,32 @@
 package io.shiftleft.console
 
-import better.files.File
-import org.scalatest.{Inside, Matchers, WordSpec}
+import java.util.UUID
 
+import better.files.File
+import cats.data.OptionT
+import cats.effect.IO
+import io.shiftleft.codepropertygraph.Cpg
+import org.scalatest.{Inside, Matchers, WordSpec}
 import io.shiftleft.console.ScriptManager.ScriptDescription
+import io.shiftleft.console.query.{CpgOperationResult, CpgOperationSuccess, CpgQueryExecutor}
 
 class ScriptManagerTest extends WordSpec with Matchers with Inside {
 
-  private class TestScriptExecutor extends ScriptExecutor {
-    override def run(script: String): String = script
+  private class TestScriptExecutor extends CpgQueryExecutor[AnyRef] {
+    override def executeQuery(cpg: Cpg, query: String): IO[UUID] = ???
+
+    override def executeQuerySync(cpg: Cpg, query: String): IO[CpgOperationResult[AnyRef]] =
+      // Faking the actual execution by just returning the query itself
+      IO(CpgOperationSuccess(query))
+
+    override def retrieveQueryResult(queryId: UUID): OptionT[IO, CpgOperationResult[AnyRef]] = ???
   }
 
   private class TestScriptManager extends ScriptManager(new TestScriptExecutor) {
 
     override val DEFAULT_SCRIPTS_FOLDER: File = File("resources") / "testcode" / "scripts"
+    override val DEFAULT_CPG_NAME: String =
+      (File("resources") / "testcode" / "cpgs" / "method" / "cpg.bin.zip").pathAsString
 
   }
 
@@ -27,12 +40,10 @@ class ScriptManagerTest extends WordSpec with Matchers with Inside {
 
   "running scripts" should {
     "be correct" in {
-      val expected = """loadCpg("cpg.bin.zip")
-                        |cpg.method.name.l""".stripMargin
+      val expected = "cpg.method.name.l"
       val sut = new TestScriptManager
       inside(sut.scripts()) {
         case ScriptDescription("list-funcs", _) :: _ =>
-          sut.runScriptT[String]("list-funcs") shouldBe expected
           sut.runScript("list-funcs") shouldBe expected
       }
 

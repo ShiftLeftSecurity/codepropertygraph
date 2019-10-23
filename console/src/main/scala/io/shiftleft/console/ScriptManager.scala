@@ -1,7 +1,11 @@
 package io.shiftleft.console
 
 import better.files._
-import io.circe.generic.auto._, io.circe.parser._
+import cats.effect.IO
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.shiftleft.codepropertygraph.cpgloading.CpgLoader
+import io.shiftleft.console.query.{CpgOperationFailure, CpgOperationSuccess, CpgQueryExecutor}
 
 object ScriptManager {
 
@@ -9,7 +13,7 @@ object ScriptManager {
 
 }
 
-abstract class ScriptManager(executor: ScriptExecutor) {
+abstract class ScriptManager(executor: CpgQueryExecutor[AnyRef]) {
 
   import ScriptManager._
 
@@ -17,7 +21,9 @@ abstract class ScriptManager(executor: ScriptExecutor) {
 
   private val SCRIPT_DESC: String = "description.json"
 
-  private def folders() = DEFAULT_SCRIPTS_FOLDER.children.filter(_.isDirectory)
+  protected val DEFAULT_CPG_NAME: String = "cpg.bin.zip"
+
+  private def folders(): Iterator[File] = DEFAULT_SCRIPTS_FOLDER.children.filter(_.isDirectory)
 
   private def scriptFileContent(file: File): String = file.lines.mkString(System.lineSeparator())
 
@@ -26,11 +32,16 @@ abstract class ScriptManager(executor: ScriptExecutor) {
       decode[ScriptDescription](scriptFileContent(folder / SCRIPT_DESC)).toOption
     }.toList
 
-  def runScript(name: String): Object =
-    executor.run(scriptFileContent(DEFAULT_SCRIPTS_FOLDER / name / s"$name.scala"))
-
-  def runScriptT[T <: AnyRef](name: String): T = {
-    runScript(name).asInstanceOf[T]
+  def runScript(name: String): AnyRef = {
+    val scriptExecutionResult = for {
+      queryResult <- executor.executeQuerySync(CpgLoader.load(DEFAULT_CPG_NAME),
+                                               scriptFileContent(DEFAULT_SCRIPTS_FOLDER / name / s"$name.scala"))
+      result <- queryResult match {
+        case CpgOperationSuccess(result) => IO(result)
+        case CpgOperationFailure(ex)     => IO.raiseError[AnyRef](ex)
+      }
+    } yield result
+    scriptExecutionResult.handleErrorWith(IO(_)).unsafeRunSync()
   }
 
 }
