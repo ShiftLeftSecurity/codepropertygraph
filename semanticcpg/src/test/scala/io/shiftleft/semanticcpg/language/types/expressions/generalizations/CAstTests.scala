@@ -11,6 +11,7 @@ class CAstTests extends WordSpec with Matchers {
       | int foo(int y) {
       |   int x = 10;
       |   if (x > 10) {
+      |     moo(boo(1+2));
       |     return bar(x + 10);
       |   } else {
       |     if (y > x) {
@@ -36,6 +37,34 @@ class CAstTests extends WordSpec with Matchers {
         .filter(_.ast.isCall.name("<operator>.(addition|multiplication)"))
         .code
         .l shouldBe List("x + 10")
+    }
+  }
+
+  "should allow finding that addition is not a direct argument of moo" in {
+    CodeToCpgFixture().buildCpg(code) { cpg =>
+      implicit val resolver: ICallResolver = NoResolve
+
+      cpg.method
+        .name("moo")
+        .callIn
+        .argument(1)
+        .filter(_.ast.isCall.name("<operator>.(addition|multiplication)"))
+        .code
+        .l shouldBe List("boo(1+2)")
+
+      cpg.method
+        .name("moo")
+        .callIn
+        .argument(1)
+        .filterOnEnd(
+          arg =>
+            arg.start.ast.isCall
+              .name("<operator>.(addition|multiplication)")
+              .filterNot(_.inAstMinusLeaf(arg).isCall)
+              .l
+              .nonEmpty)
+        .code
+        .l shouldBe List()
     }
   }
 
