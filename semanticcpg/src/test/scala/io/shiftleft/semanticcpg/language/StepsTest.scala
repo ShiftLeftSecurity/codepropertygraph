@@ -1,6 +1,5 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala.{Edge, GremlinScala, StepLabel, Vertex}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
@@ -104,11 +103,28 @@ class StepsTest extends WordSpec with Matchers {
     i should be > 0
   }
 
-  "toJson" in ExistingCpgFixture("splitmeup") { fixture =>
-    val json = fixture.cpg.namespace.nameExact("io.shiftleft.testcode.splitmeup").toJson
-    val parsed = parse(json).children.head //exactly one result for the above query
-    (parsed \ "NAME") shouldBe JString("io.shiftleft.testcode.splitmeup")
-    (parsed \ "_label") shouldBe JString("NAMESPACE")
+  "toJson" when ExistingCpgFixture("splitmeup") { fixture =>
+    "operating on StoredNode" in {
+      val json = fixture.cpg.namespace.nameExact("io.shiftleft.testcode.splitmeup").toJson
+      val parsed = parse(json).children.head //exactly one result for the above query
+      (parsed \ "_label") shouldBe JString("NAMESPACE")
+      (parsed \ "NAME") shouldBe JString("io.shiftleft.testcode.splitmeup")
+    }
+
+    "operating on NewNode" in {
+      val json = fixture.cpg.method.name(".*manyArgs.*").location.toJson
+      val parsed = parse(json).children.head //exactly one result for the above query
+      (parsed \ "SYMBOL") shouldBe JString("manyArgs")
+      (parsed \ "CLASS_NAME") shouldBe JString("io.shiftleft.testcode.splitmeup.TestGraph")
+      (parsed \ "FILENAME") shouldBe JString("io/shiftleft/testcode/splitmeup/TestGraph.java")
+    }
+
+    "operating on primitive" in {
+      val json = fixture.cpg.method.name(".*manyArgs.*").signature.toJson
+      println(json)
+      val parsed = parse(json).children.head //exactly one result for the above query
+      parsed shouldBe JString("java.lang.String(java.lang.String,java.lang.Integer,java.lang.Long,java.lang.Double)")
+    }
   }
 
 }
