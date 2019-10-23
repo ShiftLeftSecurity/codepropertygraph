@@ -52,4 +52,11 @@ class CallGraphTests extends WordSpec with Matchers {
       cpg.argument.toParameter.name.toSet should not be empty
     }
   }
+
+  "should allow traversing from argument to call" in {
+    CodeToCpgFixture().buildCpg(code) { cpg =>
+      cpg.method.name("printf").callIn.argument.call.name.toSet shouldBe Set("printf")
+    }
+  }
+
 }
