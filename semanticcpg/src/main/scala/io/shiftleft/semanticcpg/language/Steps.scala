@@ -1,12 +1,15 @@
 package io.shiftleft.semanticcpg.language
 
 import gremlin.scala._
-import gremlin.scala.StepLabel.{GetLabelName, combineLabelWithValue}
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes._
-import java.util.{List => JList, Map => JMap}
+import java.util.{List => JList}
 
 import org.apache.tinkerpop.gremlin.process.traversal.Scope
 import org.apache.tinkerpop.gremlin.structure.Vertex
+import org.json4s.CustomSerializer
+import org.json4s.native.Serialization.{write, writePretty}
+import org.json4s.Extraction
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -95,6 +98,29 @@ class Steps[NodeType](val raw: GremlinScala[NodeType]) {
       case elem => elem.toString
     }
   }
+
+  /** Execute traversal and convert the result to json. */
+  def toJson: String = toJson(pretty = false)
+
+  /** Execute traversal and convert the result to pretty json. */
+  def toJsonPretty: String = toJson(pretty = true)
+
+  private def toJson(pretty: Boolean): String = {
+    implicit val formats = org.json4s.DefaultFormats + nodeSerializer
+
+    val results = toList()
+    if (pretty) writePretty(results)
+    else write(results)
+  }
+
+  private lazy val nodeSerializer = new CustomSerializer[nodes.Node](
+    implicit format =>
+      (
+        { case _                => ??? }, {
+          case node: StoredNode => Extraction.decompose(node.toMap)
+          case node: NewNode    => Extraction.decompose(node.properties)
+        }
+    ))
 
   /**
      Extend the traversal with a side-effect step, where `fun` is a
