@@ -92,8 +92,6 @@ trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
   def isExpression: Expression = new Expression(
     raw.filterOnEnd(_.isInstanceOf[nodes.Expression]).cast[nodes.Expression]
   )
-  @deprecated("replaced by isCall", "July 19")
-  def call: Call = isCall
 
   @deprecated("replaced by isLiteral", "July 19")
   def literal: Literal = isLiteral
