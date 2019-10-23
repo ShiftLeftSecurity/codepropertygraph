@@ -17,10 +17,8 @@ import scala.concurrent.ExecutionContext
 class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager)(implicit val cs: ContextShift[IO])
     extends CpgQueryExecutor[AnyRef] {
 
-  private val ENGINE_NAME = "scala"
-
-  private lazy val engine: IO[ScriptEngine] = OptionT
-    .fromOption[IO](Option(scriptEngineManager.getEngineByName(ENGINE_NAME)))
+  private val engine: IO[ScriptEngine] = OptionT
+    .fromOption[IO](Option(scriptEngineManager.getEngineByName("scala")))
     .getOrElseF(IO.raiseError(new RuntimeException("Engine could not be instantiated.")))
 
   private val blocker: Blocker =
@@ -42,13 +40,12 @@ class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager)(implicit
       |""".stripMargin
 
   override def executeQuery(cpg: Cpg, query: String): IO[UUID] = {
-    val completeQuery = buildQuery(query)
     for {
       e <- engine
       resultUuid <- uuidProvider
       _ <- IO(e.put("aCpg", cpg))
       _ <- blocker
-        .blockOn(IO(e.eval(completeQuery)))
+        .blockOn(IO(e.eval(buildQuery(query))))
         .runAsync {
           case Right(result) => IO(queryResultMap.put(resultUuid, CpgOperationSuccess(result))).map(_ => ())
           case Left(ex)      => IO(queryResultMap.put(resultUuid, CpgOperationFailure(ex))).map(_ => ())
@@ -62,11 +59,10 @@ class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager)(implicit
   }
 
   override def executeQuerySync(cpg: Cpg, query: String): IO[CpgOperationResult[AnyRef]] = {
-    val completeQuery = buildQuery(query)
     for {
       e <- engine
       _ <- IO(e.put("aCpg", cpg))
-      result <- IO(e.eval(completeQuery))
+      result <- IO(e.eval(buildQuery(query)))
         .handleErrorWith(err => IO(CpgOperationFailure(err)))
         .map(CpgOperationSuccess(_))
     } yield result
