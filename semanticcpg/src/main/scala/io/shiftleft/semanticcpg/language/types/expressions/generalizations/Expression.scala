@@ -52,14 +52,13 @@ trait ExpressionBase[NodeType <: nodes.Expression]
   /**
     * Only those expressions which are (direct) arguments of a call
     * */
-  def isArgument : Expression =
+  def isArgument: Expression =
     new Expression(raw.filter(_.in(EdgeTypes.AST).hasLabel(NodeTypes.CALL)).cast[nodes.Expression])
-
 
   /**
     * Traverse to surrounding call
     * */
-  def call : Call = new Call(
+  def call: Call = new Call(
     raw.repeat(_.in(EdgeTypes.AST)).until(_.hasLabel(NodeTypes.CALL)).cast[nodes.Call]
   )
 
