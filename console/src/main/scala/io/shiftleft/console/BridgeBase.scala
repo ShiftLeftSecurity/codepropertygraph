@@ -43,7 +43,7 @@ trait BridgeBase {
         .text("import additional additional script(s): will execute and keep console open")
 
       opt[Unit]("nocolors")
-        .action((x, c) => c.copy(colors = Some(Colors.BlackWhite)))
+        .action((_, c) => c.copy(colors = Some(Colors.BlackWhite)))
         .text("turn off colors")
 
       opt[String]("command")

@@ -3,6 +3,7 @@ name := "CPG server"
 
 dependsOn(Projects.codepropertygraph)
 dependsOn(Projects.semanticcpg)
+dependsOn(Projects.console)
 
 scalacOptions ++= Seq(
   "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
@@ -53,7 +54,7 @@ scalacOptions ++= Seq(
 )
 
 val Http4sVersion = "0.20.11"
-val CirceVersion = "0.12.1"
+val CirceVersion = "0.12.2"
 val PureconfigVersion = "0.12.1"
 val WebjarLocatorVersion = "0.37"
 val SwaggerVersion = "3.23.8"

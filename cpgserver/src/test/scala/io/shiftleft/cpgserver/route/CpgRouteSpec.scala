@@ -2,15 +2,14 @@ package io.shiftleft.cpgserver.route
 
 import java.nio.file.Files
 import java.util.UUID
-
 import cats.data.{Kleisli, OptionT}
 import cats.effect.IO
 import org.http4s.implicits._
 import org.http4s._
+
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.console.query.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess, CpgQueryExecutor}
 import io.shiftleft.cpgserver.cpg.CpgProvider
-import io.shiftleft.cpgserver.model.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess}
-import io.shiftleft.cpgserver.query.CpgQueryExecutor
 import io.shiftleft.cpgserver.route.CpgRoute.{ApiError, CpgOperationResponse, CreateCpgQueryResponse, CreateCpgResponse}
 
 class CpgRouteSpec extends Http4sSpec {

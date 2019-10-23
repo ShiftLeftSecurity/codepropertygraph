@@ -1,4 +1,4 @@
-package io.shiftleft.cpgserver.query
+package io.shiftleft.console.query
 
 import java.io.Reader
 import java.util.UUID
@@ -6,17 +6,15 @@ import java.util.UUID
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.language.postfixOps
-
 import cats.data.OptionT
 import cats.effect.{ContextShift, IO}
 import javax.script._
+import org.scalatest.{Matchers, WordSpec}
 import org.scalatest.concurrent.Eventually
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.cpgserver.BaseSpec
-import io.shiftleft.cpgserver.model.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess}
 
-class DefaultCpgQueryExecutorSpec extends BaseSpec with Eventually {
+class DefaultCpgQueryExecutorSpec extends WordSpec with Matchers with Eventually {
 
   private val queryResult = "a result"
   private val queryException = new RuntimeException("Oh noes!")

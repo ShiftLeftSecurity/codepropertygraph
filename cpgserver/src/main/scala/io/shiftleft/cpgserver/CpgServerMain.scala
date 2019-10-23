@@ -6,9 +6,9 @@ import javax.script.ScriptEngineManager
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
 
+import io.shiftleft.console.query.DefaultCpgQueryExecutor
 import io.shiftleft.cpgserver.config.ServerConfiguration
 import io.shiftleft.cpgserver.cpg.DummyCpgProvider
-import io.shiftleft.cpgserver.query.DefaultCpgQueryExecutor
 import io.shiftleft.cpgserver.route.{CpgRoute, HttpErrorHandler, SwaggerRoute}
 
 object CpgServerMain extends IOApp {

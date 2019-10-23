@@ -1,12 +1,11 @@
 package io.shiftleft.cpgserver.cpg
 
 import java.util.UUID
-
 import cats.data.OptionT
 import cats.effect.IO
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.cpgserver.model.CpgOperationResult
+import io.shiftleft.console.query.CpgOperationResult
 
 trait CpgProvider {
 
