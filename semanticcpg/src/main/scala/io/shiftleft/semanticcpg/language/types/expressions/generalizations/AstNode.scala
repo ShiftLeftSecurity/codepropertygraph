@@ -38,20 +38,31 @@ trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
   /**
     * Nodes of the AST obtained by expanding AST edges backwards until the method root is reached
     * */
-  def inAst: AstNode =
-    new AstNode(
-      raw.emit
-        .until(_.hasLabel(NodeTypes.METHOD))
-        .repeat(_.in(EdgeTypes.AST))
-        .cast[nodes.AstNode])
+  def inAst: AstNode = inAst(null)
 
   /**
     * Nodes of the AST obtained by expanding AST edges backwards until the method root is reached, minus this node
     * */
-  def inAstMinusLeaf: AstNode =
+  def inAstMinusLeaf: AstNode = inAstMinusLeaf(null)
+
+  /**
+    * Nodes of the AST obtained by expanding AST edges backwards until `root` or the method root is reached
+    * */
+  def inAst(root: nodes.AstNode): AstNode =
+    new AstNode(
+      raw.emit
+        .until(_.or(_.hasLabel(NodeTypes.METHOD), _.filterOnEnd(n => root != null && root == n)))
+        .repeat(_.in(EdgeTypes.AST))
+        .cast[nodes.AstNode])
+
+  /**
+    * Nodes of the AST obtained by expanding AST edges backwards until `root` or the method root is reached,
+    * minus this node
+    * */
+  def inAstMinusLeaf(root: nodes.AstNode): AstNode =
     new AstNode(
       raw
-        .until(_.hasLabel(NodeTypes.METHOD))
+        .until(_.or(_.hasLabel(NodeTypes.METHOD), _.filterOnEnd(n => root != null && root == n)))
         .repeat(_.in(EdgeTypes.AST))
         .emit
         .cast[nodes.AstNode])
@@ -127,4 +138,5 @@ trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
   def isMethodRef: MethodRef = new MethodRef(
     raw.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef]
   )
+
 }
