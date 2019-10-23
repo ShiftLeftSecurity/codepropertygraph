@@ -63,9 +63,15 @@ trait ExpressionBase[NodeType <: nodes.Expression]
   )
 
   /**
+  Traverse to related parameter
+    */
+  @deprecated("October 2019")
+  def toParameter: MethodParameter = parameter
+
+  /**
     Traverse to related parameter
     */
-  def toParameter: MethodParameter = {
+  def parameter: MethodParameter = {
     new MethodParameter(
       raw
         .sack((sack: Integer, node: nodes.Expression) => node.value2(NodeKeys.ARGUMENT_INDEX))
