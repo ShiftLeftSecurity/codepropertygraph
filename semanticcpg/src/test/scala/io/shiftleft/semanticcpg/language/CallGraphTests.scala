@@ -49,7 +49,7 @@ class CallGraphTests extends WordSpec with Matchers {
 
   "should allow traversing from argument to formal parameter" in {
     CodeToCpgFixture().buildCpg(code) { cpg =>
-      cpg.argument.toParameter.name.toSet should not be empty
+      cpg.argument.parameter.name.toSet should not be empty
     }
   }
 
