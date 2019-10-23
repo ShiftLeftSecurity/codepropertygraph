@@ -16,7 +16,7 @@ object LocationCreator {
         apply(
           paramIn,
           paramIn.name,
-          paramIn.label(),
+          paramIn.label,
           paramIn.lineNumber,
           ExpandTo.parameterInToMethod(paramIn).asInstanceOf[nodes.Method]
         )
@@ -24,7 +24,7 @@ object LocationCreator {
         apply(
           paramOut,
           paramOut.name,
-          paramOut.label(),
+          paramOut.label,
           paramOut.lineNumber,
           ExpandTo.parameterInToMethod(paramOut).asInstanceOf[nodes.Method]
         )
@@ -32,7 +32,7 @@ object LocationCreator {
         apply(
           methodReturn,
           "$ret",
-          methodReturn.label(),
+          methodReturn.label,
           methodReturn.lineNumber,
           ExpandTo.methodReturnToMethod(methodReturn).asInstanceOf[nodes.Method]
         )
@@ -40,7 +40,7 @@ object LocationCreator {
         apply(
           call,
           call.code,
-          call.label(),
+          call.label,
           call.lineNumber,
           ExpandTo.expressionToMethod(call).asInstanceOf[nodes.Method]
         )
@@ -48,7 +48,7 @@ object LocationCreator {
         apply(
           implicitCall,
           implicitCall.code,
-          implicitCall.label(),
+          implicitCall.label,
           implicitCall.lineNumber,
           ExpandTo.implicitCallToMethod(implicitCall)
         )
@@ -56,7 +56,7 @@ object LocationCreator {
         apply(
           method,
           method.name,
-          method.label(),
+          method.label,
           method.lineNumber,
           method
         )
@@ -64,7 +64,7 @@ object LocationCreator {
         apply(
           identifier,
           identifier.name,
-          identifier.label(),
+          identifier.label,
           identifier.lineNumber,
           ExpandTo.expressionToMethod(identifier).asInstanceOf[nodes.Method]
         )
@@ -72,7 +72,7 @@ object LocationCreator {
         apply(
           literal,
           literal.code,
-          literal.label(),
+          literal.label,
           literal.lineNumber,
           ExpandTo.expressionToMethod(literal) match {
             case method: nodes.Method =>
@@ -87,12 +87,12 @@ object LocationCreator {
         apply(
           local,
           local.name,
-          local.label(),
+          local.label,
           local.lineNumber,
           local.start.method.head
         )
       case vertex: Vertex =>
-        emptyLocation(vertex.label(), Some(vertex.asInstanceOf[nodes.Node]))
+        emptyLocation(vertex.label, Some(vertex.asInstanceOf[nodes.Node]))
     }
   }
 
@@ -110,7 +110,7 @@ object LocationCreator {
 
       val namespaceOptionVertex = typeOption.flatMap(
         _.vertices(Direction.IN, EdgeTypes.AST).asScala
-          .filter(_.label() == NodeTypes.NAMESPACE_BLOCK)
+          .filter(_.label == NodeTypes.NAMESPACE_BLOCK)
           .flatMap(_.vertices(Direction.OUT, EdgeTypes.REF).asScala)
           .toList
           .headOption

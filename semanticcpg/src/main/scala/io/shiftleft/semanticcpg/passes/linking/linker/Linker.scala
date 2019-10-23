@@ -246,7 +246,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
             case Some(astEdge) if !loggedDeprecationWarning =>
               logger.info(
                 "Using deprecated CPG format with already existing AST edge between" +
-                  s" ${astEdge.outVertex().label()} and ${astChild.label()} node.")
+                  s" ${astEdge.outVertex.label} and ${astChild.label} node.")
               loggedDeprecationWarning = true
             case _ =>
           }

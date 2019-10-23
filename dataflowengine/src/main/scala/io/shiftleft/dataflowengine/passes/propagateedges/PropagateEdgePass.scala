@@ -44,13 +44,13 @@ class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
       .asInstanceOf[nodes.StoredNode]
       ._astOut
       .asScala
-      .find(node => node.label() == NodeTypes.METHOD_PARAMETER_IN && node.value2(NodeKeys.ORDER) == parameterIndex)
+      .find(node => node.label == NodeTypes.METHOD_PARAMETER_IN && node.value2(NodeKeys.ORDER) == parameterIndex)
 
     val parameterOutOption = method
       .asInstanceOf[nodes.StoredNode]
       ._astOut
       .asScala
-      .find(node => node.label() == NodeTypes.METHOD_PARAMETER_OUT && node.value2(NodeKeys.ORDER) == parameterIndex)
+      .find(node => node.label == NodeTypes.METHOD_PARAMETER_OUT && node.value2(NodeKeys.ORDER) == parameterIndex)
 
     (parameterInOption, parameterOutOption) match {
       case (Some(parameterIn), Some(parameterOut)) =>
