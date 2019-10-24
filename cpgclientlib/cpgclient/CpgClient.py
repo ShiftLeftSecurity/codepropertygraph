@@ -60,7 +60,7 @@ class CpgClient:
 
     def _wait_until_cpg_is_created(self):
         while not self.is_cpg_loaded():
-            time.sleep(1)
+            time.sleep(.001)
 
     def query(self, q):
         """
@@ -79,4 +79,4 @@ class CpgClient:
             json_body = response.json()
             if json_body["ready"]:
                 return json_body["result"] or json_body["error"]
-            time.sleep(1)
+            time.sleep(.001)
