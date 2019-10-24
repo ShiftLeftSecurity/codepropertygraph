@@ -16,14 +16,15 @@ class CpgRouteSpec extends Http4sSpec {
   import CpgRouteSpec._
 
   private class DummyCpgProvider(uuid: UUID, cpg: OptionT[IO, CpgOperationResult[Cpg]]) extends CpgProvider {
-    def createCpg(fileNames: Set[String]): IO[UUID] = IO.pure(uuid)
-    def retrieveCpg(cpgId: UUID): OptionT[IO, CpgOperationResult[Cpg]] = cpg
+    override def createCpg(fileNames: Set[String]): IO[UUID] = IO.pure(uuid)
+    override def retrieveCpg(cpgId: UUID): OptionT[IO, CpgOperationResult[Cpg]] = cpg
   }
 
   private class DummyCpgQueryExecutor(uuid: UUID, queryResult: OptionT[IO, CpgOperationResult[String]])
       extends CpgQueryExecutor[String] {
-    def executeQuery(cpg: Cpg, query: String): IO[UUID] = IO.pure(uuid)
-    def retrieveQueryResult(queryId: UUID): OptionT[IO, CpgOperationResult[String]] = queryResult
+    override def executeQuery(cpg: Cpg, query: String): IO[UUID] = IO.pure(uuid)
+    override def retrieveQueryResult(queryId: UUID): OptionT[IO, CpgOperationResult[String]] = queryResult
+    override def executeQuerySync(cpg: Cpg, query: String): IO[CpgOperationResult[String]] = ???
   }
 
   private def withRoute[T](
