@@ -20,6 +20,11 @@ trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
     * */
   def ast: AstNode = new AstNode(raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
 
+  def containsCallTo(regex: String): Call =
+    new Call(new AstNode(raw.cast[nodes.AstNode]).filter(_.ast.isCall.name(regex)).raw.cast[nodes.Call])
+
+  def isCallTo(regex: String): Call = isCall.name(regex)
+
   /**
     * Nodes of the AST rooted in this node, minus the node itself
     * */

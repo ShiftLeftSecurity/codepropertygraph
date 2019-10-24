@@ -34,7 +34,7 @@ class CAstTests extends WordSpec with Matchers {
         .name("bar")
         .callIn
         .argument(1)
-        .filter(_.ast.isCall.name("<operator>.(addition|multiplication)"))
+        .containsCallTo("<operator>.(addition|multiplication)")
         .code
         .l shouldBe List("x + 10")
     }
@@ -48,7 +48,7 @@ class CAstTests extends WordSpec with Matchers {
         .name("moo")
         .callIn
         .argument(1)
-        .filter(_.ast.isCall.name("<operator>.(addition|multiplication)"))
+        .containsCallTo("<operator>.(addition|multiplication)")
         .code
         .l shouldBe List("boo(1+2)")
 
@@ -58,8 +58,8 @@ class CAstTests extends WordSpec with Matchers {
         .argument(1)
         .filterOnEnd(
           arg =>
-            arg.start.ast.isCall
-              .name("<operator>.(addition|multiplication)")
+            arg.start.ast
+              .isCallTo("<operator>.(addition|multiplication)")
               .filterNot(_.inAstMinusLeaf(arg).isCall)
               .l
               .nonEmpty)
