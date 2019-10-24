@@ -14,7 +14,7 @@
         {"id" : 2, "name": "LINE_NUMBER", "comment": "Line where the code starts", "valueType" : "int", "cardinality" : "zeroOrOne"},
         {"id" : 11, "name": "COLUMN_NUMBER", "comment" : "Column where the code starts", "valueType" : "int", "cardinality" : "zeroOrOne" },
 	{"id" : 12, "name": "LINE_NUMBER_END", "comment" : "Line where the code ends", "valueType" : "int", "cardinality" : "zeroOrOne"},
-	{"id" : 16, "name": "COLUMN_NUMBER_END", "comment" : "Column where the code ends", "valueType" : "string", "cardinality" : "zeroOrOne"},
+	{"id" : 16, "name": "COLUMN_NUMBER_END", "comment" : "Column where the code ends", "valueType" : "int", "cardinality" : "zeroOrOne"},
 
         {"id" : 3, "name": "PARSER_TYPE_NAME", "comment": "Type name emitted by parser, only present for logical type UNKNOWN", "valueType" : "string", "cardinality" : "one"},
         {"id" : 4, "name": "ORDER", "comment": "General ordering property, such that the children of each AST-node are typically numbered from 1, ..., N (this is not enforced). The ordering has no technical meaning, but is used for pretty printing and OUGHT TO reflect order in the source code", "valueType" : "int", "cardinality" : "one"},
