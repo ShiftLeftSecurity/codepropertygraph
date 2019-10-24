@@ -18,6 +18,7 @@ object LocationCreator {
           paramIn.name,
           paramIn.label(),
           paramIn.lineNumber,
+          None,
           ExpandTo.parameterInToMethod(paramIn).asInstanceOf[nodes.Method]
         )
       case paramOut: nodes.MethodParameterOut =>
@@ -26,6 +27,7 @@ object LocationCreator {
           paramOut.name,
           paramOut.label(),
           paramOut.lineNumber,
+          None,
           ExpandTo.parameterInToMethod(paramOut).asInstanceOf[nodes.Method]
         )
       case methodReturn: nodes.MethodReturn =>
@@ -34,6 +36,7 @@ object LocationCreator {
           "$ret",
           methodReturn.label(),
           methodReturn.lineNumber,
+          None,
           ExpandTo.methodReturnToMethod(methodReturn).asInstanceOf[nodes.Method]
         )
       case call: nodes.Call =>
@@ -42,6 +45,7 @@ object LocationCreator {
           call.code,
           call.label(),
           call.lineNumber,
+          None,
           ExpandTo.expressionToMethod(call).asInstanceOf[nodes.Method]
         )
       case implicitCall: nodes.ImplicitCall =>
@@ -50,6 +54,7 @@ object LocationCreator {
           implicitCall.code,
           implicitCall.label(),
           implicitCall.lineNumber,
+          None,
           ExpandTo.implicitCallToMethod(implicitCall)
         )
       case method: nodes.Method =>
@@ -58,6 +63,7 @@ object LocationCreator {
           method.name,
           method.label(),
           method.lineNumber,
+          method.lineNumberEnd,
           method
         )
       case identifier: nodes.Identifier =>
@@ -66,6 +72,7 @@ object LocationCreator {
           identifier.name,
           identifier.label(),
           identifier.lineNumber,
+          None,
           ExpandTo.expressionToMethod(identifier).asInstanceOf[nodes.Method]
         )
       case literal: nodes.Literal =>
@@ -74,6 +81,7 @@ object LocationCreator {
           literal.code,
           literal.label(),
           literal.lineNumber,
+          None,
           ExpandTo.expressionToMethod(literal) match {
             case method: nodes.Method =>
               method
@@ -89,6 +97,7 @@ object LocationCreator {
           local.name,
           local.label(),
           local.lineNumber,
+          None,
           local.start.method.head
         )
       case vertex: Vertex =>
@@ -100,10 +109,11 @@ object LocationCreator {
             symbol: String,
             label: String,
             lineNumber: Option[Integer],
+            lineNumberEnd: Option[Integer],
             method: nodes.Method): nodes.NewLocation = {
 
     if (method == null) {
-      new nodes.NewLocation("", "", "", "", None, "", "", "", Some(node))
+      nodes.NewLocation(node = Some(node))
     } else {
       val typeOption = ExpandTo.methodToTypeDecl(method).map(_.asInstanceOf[nodes.TypeDecl])
       val typeName = typeOption.map(_.fullName).getOrElse("")
@@ -120,12 +130,13 @@ object LocationCreator {
       val fileOption = ExpandTo.methodToFile(method).map(_.asInstanceOf[nodes.File])
       val fileName = fileOption.map(_.name).getOrElse("N/A")
 
-      new nodes.NewLocation(
+      nodes.NewLocation(
         symbol = symbol,
         methodFullName = method.fullName,
         methodShortName = method.name,
         packageName = namespaceName,
         lineNumber = lineNumber,
+        lineNumberEnd = lineNumberEnd,
         className = typeName,
         nodeLabel = label,
         filename = fileName,
@@ -134,7 +145,6 @@ object LocationCreator {
     }
   }
 
-  def emptyLocation(label: String, node: Option[nodes.Node]): nodes.NewLocation = {
-    new nodes.NewLocation("", "", "", "", None, "", label, "", node)
-  }
+  def emptyLocation(label: String, node: Option[nodes.Node]): nodes.NewLocation =
+    nodes.NewLocation(nodeLabel = label, node = node)
 }

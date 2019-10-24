@@ -124,7 +124,7 @@
 	{"id" : 215, "name" : "ROUTE", "comment" : "", "keys": ["PATH"], "outEdges" : []},
 	{"id" : 25,
          "name" : "LOCATION",
-         "keys" : ["SYMBOL", "METHOD_FULL_NAME", "METHOD_SHORT_NAME", "PACKAGE_NAME", "LINE_NUMBER", "CLASS_NAME", "NODE_LABEL", "FILENAME"],
+         "keys" : ["SYMBOL", "METHOD_FULL_NAME", "METHOD_SHORT_NAME", "PACKAGE_NAME", "LINE_NUMBER", "LINE_NUMBER_END", "CLASS_NAME", "NODE_LABEL", "FILENAME"],
          "comment" : "",
          "outEdges" : [],
          "containedNodes" : [

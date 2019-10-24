@@ -23,7 +23,7 @@ class LocationTests extends WordSpec with Matchers {
       loc.lineNumber shouldBe Some(2)
       loc.filename should endWith(".c")
       loc.nodeLabel shouldBe "METHOD"
-
+      loc.lineNumberEnd shouldBe Some(4)
     }
   }
 
