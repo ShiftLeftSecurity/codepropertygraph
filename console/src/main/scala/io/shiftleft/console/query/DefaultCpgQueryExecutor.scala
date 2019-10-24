@@ -46,7 +46,7 @@ class DefaultCpgQueryExecutor[ResultT <: AnyRef](scriptEngineManager: ScriptEngi
       resultUuid <- uuidProvider
       _ <- IO(e.put("aCpg", cpg))
       _ <- blocker
-        .blockOn(IO(e.eval(buildQuery(query))))
+        .blockOn(IO(e.eval(buildQuery(query)).toString))
         .runAsync {
           case Right(result) =>
             IO(queryResultMap.put(resultUuid, CpgOperationSuccess(result.asInstanceOf[ResultT]))).map(_ => ())
