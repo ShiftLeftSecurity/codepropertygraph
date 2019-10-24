@@ -48,7 +48,7 @@ class DefaultCpgQueryExecutorSpec extends WordSpec with Matchers with Eventually
   }
 
   private def withNewQueryExecutor[T](scripManagerIsDefined: Boolean = true, queryError: Boolean = false)(
-      f: DefaultCpgQueryExecutor[String] => T): T = {
+      f: DefaultCpgQueryExecutor => T): T = {
     val manager =
       if (scripManagerIsDefined) new DefinedScriptEnginerManager(queryError)
       else UndefinedScriptEngineManager

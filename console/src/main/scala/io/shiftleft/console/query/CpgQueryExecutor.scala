@@ -30,7 +30,7 @@ trait CpgQueryExecutor[ResultT] {
     * @param query A String containing a CPG query.
     * @return A CpgOperationResult containing the result of the query.
     */
-  def executeQuerySync(cpg: Cpg, query: String): IO[CpgOperationResult[ResultT]]
+  def executeQuerySync(cpg: Cpg, query: String): IO[CpgOperationResult[Object]]
 
   /**
     * Returns a query result identified by `uuid` iff the query has finished running.
