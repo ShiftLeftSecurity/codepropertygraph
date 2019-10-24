@@ -73,7 +73,7 @@ final class CpgRoute[T: Encoder](cpgProvider: CpgProvider, cpgQueryExecutor: Cpg
       .retrieveQueryResult(queryId)
       .semiflatMap {
         case CpgOperationSuccess(queryResult) =>
-          Ok(CpgOperationResponse(ready = true, result = Some(queryResult.toString)).asJson)
+          Ok(CpgOperationResponse[T](ready = true, result = Some(queryResult)).asJson)
         case CpgOperationFailure(ex) =>
           Ok(CpgOperationResponse[T](ready = true, error = Some(ex.getMessage)).asJson)
       }
