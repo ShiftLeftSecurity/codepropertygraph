@@ -206,12 +206,13 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       }
 
       trait Node extends Product {
+        def label: String
+        def getId: JLong
+
         def accept[T](visitor: NodeVisitor[T]): T = ???
 
         /** labels of product elements, used e.g. for pretty-printing */
         def productElementLabel(n: Int): String
-
-        def getId: JLong
       }
 
       /* a node that stored inside an OdbGraph (rather than e.g. DiffGraph) */
@@ -524,7 +525,7 @@ $neighborAccesors
           |  }
           |  override def valueMap: JMap[String, AnyRef] = get.valueMap
           |  override def canEqual(that: Any): Boolean = get.canEqual(that)
-          |  override def label(): String = {
+          |  override def label: String = {
           |    ${nodeType.className}.Label
           |  }
           |}""".stripMargin
@@ -547,7 +548,7 @@ $neighborAccesors
 ${neighborAccesors}
 
 
-        override def label(): String = {
+        override def label: String = {
           ${nodeType.className}.Label
         }
 
@@ -613,7 +614,7 @@ ${neighborAccesors}
 
     /** base type for all nodes that can be added to a graph, e.g. the diffgraph */
     trait NewNode extends Node {
-      def label: String
+      override def label: String
       def properties: Map[String, Any]
       def containedNodesByLocalName: Map[String, List[Node]]
       def allContainedNodes: List[Node] = containedNodesByLocalName.values.flatten.toList
