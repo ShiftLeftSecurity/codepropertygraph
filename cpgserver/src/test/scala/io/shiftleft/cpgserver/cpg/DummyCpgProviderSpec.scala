@@ -32,7 +32,7 @@ class DummyCpgProviderSpec extends BaseSpec with Eventually {
     "return a success if the CPG was created successfully" in withNewCpgProvider { cpgProvider =>
       val cpgId = cpgProvider.createCpg(Set.empty).unsafeRunSync()
 
-      eventually(timeout(5 seconds), interval(500 millis)) {
+      eventually(timeout(2 seconds), interval(500 millis)) {
         cpgProvider.retrieveCpg(cpgId).value.unsafeRunSync() shouldBe defined
       }
     }
