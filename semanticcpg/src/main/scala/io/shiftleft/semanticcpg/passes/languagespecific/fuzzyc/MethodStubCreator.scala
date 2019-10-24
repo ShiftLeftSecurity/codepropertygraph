@@ -57,6 +57,8 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
       "<global>",
       None,
       None,
+      None,
+      None,
       0,
       None
     )

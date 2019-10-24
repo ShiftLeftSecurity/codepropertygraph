@@ -49,11 +49,11 @@ case class NodeTypeError(node: Vertex, edgeType: String, direction: Direction, i
     extends ValidationError {
   override def toString: String = {
     if (direction == Direction.OUT) {
-      s"Expected no outgoing $edgeType edges from ${node.label()} to " +
+      s"Expected no outgoing $edgeType edges from ${node.label} to " +
         s"${invalidOtherSideNodes.map(_.label).mkString(" or ")}. " +
         ErrorHelper.getNodeDetails(node)
     } else {
-      s"Expected no incoming $edgeType edges to ${node.label()} from " +
+      s"Expected no incoming $edgeType edges to ${node.label} from " +
         s"${invalidOtherSideNodes.map(_.label).mkString(" or ")}. " +
         ErrorHelper.getNodeDetails(node)
     }

@@ -13,6 +13,9 @@ import scala.collection.JavaConverters._
 import scala.collection.concurrent.Map
 import scala.concurrent.ExecutionContext
 
+/**
+  * This class executes a query on a given CPG.
+  */
 class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager)(implicit val cs: ContextShift[IO])
     extends CpgQueryExecutor[String] {
 
@@ -59,5 +62,21 @@ class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager)(implicit
 
   override def retrieveQueryResult(queryId: UUID): OptionT[IO, CpgOperationResult[String]] = {
     OptionT.fromOption(queryResultMap.get(queryId))
+  }
+
+  override def executeQuerySync(cpg: Cpg, query: String): IO[CpgOperationResult[AnyRef]] = {
+    val engine = OptionT
+      .fromOption[IO](Option(scriptEngineManager.getEngineByName(engineType)))
+      .getOrElseF(IO.raiseError(new RuntimeException("Engine could not be instantiated.")))
+
+    val completeQuery = buildQuery(query)
+
+    for {
+      e <- engine
+      _ <- IO(e.put("aCpg", cpg))
+      result <- IO(e.eval(completeQuery))
+        .handleErrorWith(err => IO(CpgOperationFailure(err)))
+        .map(v => CpgOperationSuccess(v))
+    } yield result
   }
 }
