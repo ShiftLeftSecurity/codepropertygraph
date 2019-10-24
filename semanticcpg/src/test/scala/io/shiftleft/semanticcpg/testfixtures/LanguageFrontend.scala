@@ -31,8 +31,8 @@ object LanguageFrontend {
     def execute(sourceCodePath: File): File = {
       val cpgFile = File.createTempFile("fuzzyc", ".zip")
       cpgFile.deleteOnExit()
-      val fuzzyc2Cpg = new FuzzyC2Cpg(new OutputModuleFactory(cpgFile.getAbsolutePath, true, false))
-      fuzzyc2Cpg.runAndOutput(Seq(sourceCodePath.getAbsolutePath).toArray)
+      val fuzzyc2Cpg = new FuzzyC2Cpg(new OutputModuleFactory(cpgFile.getAbsolutePath, true))
+      fuzzyc2Cpg.runAndOutput(Set(sourceCodePath.getAbsolutePath), Set(".c"))
       cpgFile
     }
     override val fileSuffix: String = ".c"
