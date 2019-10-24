@@ -34,14 +34,11 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
 
   private def createBinding(typeDecl: nodes.TypeDecl, diffGraph: DiffGraph)(method: nodes.Method): Unit = {
     // The csharp frontend creates method names which contain type parameters.
-    // This is unintended so we strip them here.
-    val indexOfTypeParameterStart = method.name.indexOf("<")
-    val mangledMethodName = if (indexOfTypeParameterStart != -1) {
-      method.name.substring(0, indexOfTypeParameterStart)
-    } else {
-      method.name
-    }
-    val newBinding = new NewBinding(mangledMethodName, method.signature)
+    // It is necessary to keep them because a class may define parametric and non-parametric
+    // functions with the same name, i.e., `void f() {} and void f<T>() {}' is valid.
+    // Also, different than Java, C# carries generic type information over to runtime.
+
+    val newBinding = new NewBinding(method.name, method.signature)
     diffGraph.addNode(newBinding)
     diffGraph.addEdgeFromOriginal(typeDecl, newBinding, EdgeTypes.BINDS)
     diffGraph.addEdgeToOriginal(newBinding, method, EdgeTypes.REF)
