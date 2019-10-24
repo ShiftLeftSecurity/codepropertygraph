@@ -105,7 +105,7 @@ class Steps[NodeType](val raw: GremlinScala[NodeType]) {
   /** Execute traversal and convert the result to pretty json. */
   def toJsonPretty: String = toJson(pretty = true)
 
-  private def toJson(pretty: Boolean): String = {
+  protected def toJson(pretty: Boolean): String = {
     implicit val formats = org.json4s.DefaultFormats + nodeSerializer
 
     val results = toList()
