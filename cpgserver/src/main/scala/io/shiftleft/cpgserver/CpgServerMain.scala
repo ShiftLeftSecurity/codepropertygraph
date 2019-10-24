@@ -16,7 +16,8 @@ object CpgServerMain extends IOApp {
   private val cpgProvider: DummyCpgProvider =
     new DummyCpgProvider
 
-  private val cpgQueryExecutor = new DefaultCpgQueryExecutor(new ScriptEngineManager())
+  private val cpgQueryExecutor: DefaultCpgQueryExecutor =
+    new DefaultCpgQueryExecutor(new ScriptEngineManager())
 
   private implicit val httpErrorHandler: HttpErrorHandler =
     CpgRoute.CpgHttpErrorHandler
