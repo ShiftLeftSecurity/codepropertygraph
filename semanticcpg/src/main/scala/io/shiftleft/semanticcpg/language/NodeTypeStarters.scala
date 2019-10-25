@@ -136,7 +136,7 @@ class NodeTypeStarters(cpg: Cpg) {
     if (ids.isEmpty) new NodeSteps[NodeType](scalaGraph.V(-1).cast[NodeType])
     else new NodeSteps[NodeType](scalaGraph.V(ids: _*).cast[NodeType])
 
-  @deprecated("October 2019", "")
+  @deprecated("", "October 2019")
   def atVerticesWithId[NodeType <: nodes.StoredNode](ids: Seq[Any]): NodeSteps[NodeType] = id(ids)
 
 }
