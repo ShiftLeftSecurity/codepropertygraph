@@ -21,14 +21,12 @@ class CAstTests extends WordSpec with Matchers {
       | }
     """.stripMargin
 
-  "should identify four blocks" in {
-    CodeToCpgFixture().buildCpg(code) { cpg =>
+  CodeToCpgFixture(code) { cpg =>
+    "should identify four blocks" in {
       cpg.method.name("foo").ast.isBlock.l.size shouldBe 4
     }
-  }
 
-  "should allow finding addition in argument to bar" in {
-    CodeToCpgFixture().buildCpg(code) { cpg =>
+    "should allow finding addition in argument to bar" in {
       implicit val resolver: ICallResolver = NoResolve
       cpg.method
         .name("bar")
@@ -38,10 +36,8 @@ class CAstTests extends WordSpec with Matchers {
         .code
         .l shouldBe List("x + 10")
     }
-  }
 
-  "should allow finding that addition is not a direct argument of moo" in {
-    CodeToCpgFixture().buildCpg(code) { cpg =>
+    "should allow finding that addition is not a direct argument of moo" in {
       implicit val resolver: ICallResolver = NoResolve
 
       cpg.method
@@ -66,10 +62,8 @@ class CAstTests extends WordSpec with Matchers {
         .code
         .l shouldBe List()
     }
-  }
 
-  "should identify three control structures" in {
-    CodeToCpgFixture().buildCpg(code) { cpg =>
+    "should identify three control structures" in {
       cpg.method
         .name("foo")
         .ast
@@ -86,16 +80,12 @@ class CAstTests extends WordSpec with Matchers {
         .l
         .size shouldBe 1
     }
-  }
 
-  "should identify conditions" in {
-    CodeToCpgFixture().buildCpg(code) { cpg =>
+    "should identify conditions" in {
       cpg.method.name("foo").ast.isControlStructure.condition.code.l shouldBe List("x > 10", "y > x")
     }
-  }
 
-  "should allow parserTypeName filtering and then ast" in {
-    CodeToCpgFixture().buildCpg(code) { cpg =>
+    "should allow parserTypeName filtering and then ast" in {
       val query1Size = cpg.method.name("foo").ast.isControlStructure.ast.l.size
       query1Size should be > 0
 
@@ -109,10 +99,8 @@ class CAstTests extends WordSpec with Matchers {
         .size
       query1Size shouldBe query2Size
     }
-  }
 
-  "should allow filtering on conditions" in {
-    CodeToCpgFixture().buildCpg(code) { cpg =>
+    "should allow filtering on conditions" in {
       cpg.method
         .name("foo")
         .condition(".*x > 10.*")
@@ -138,6 +126,7 @@ class CAstTests extends WordSpec with Matchers {
         .code
         .l shouldBe List("printf(\"reached\")")
     }
+
   }
 
   val bufInLoopCode =
@@ -151,8 +140,9 @@ class CAstTests extends WordSpec with Matchers {
       |}
     """.stripMargin
 
-  "should find index `i` used for buf" in {
-    CodeToCpgFixture().buildCpg(bufInLoopCode) { cpg =>
+  CodeToCpgFixture().buildCpg(bufInLoopCode) { cpg =>
+    "should find index `i` used for buf" in {
+
       cpg.call
         .name("<operator>.computedMemberAccess")
         .argument
@@ -160,10 +150,9 @@ class CAstTests extends WordSpec with Matchers {
         .code
         .l shouldBe List("i")
     }
-  }
 
-  "should find that i is assigned as part of loop header" in {
-    CodeToCpgFixture().buildCpg(bufInLoopCode) { cpg =>
+    "should find that i is assigned as part of loop header" in {
+
       cpg.call
         .name("<operator>.computedMemberAccess")
         .argument
@@ -172,11 +161,10 @@ class CAstTests extends WordSpec with Matchers {
         .isControlStructure
         .code
         .l shouldBe List("for (int i = 0; i < bar; i++)")
-    }
-  }
 
-  "should correctly identify condition of for loop" in {
-    CodeToCpgFixture().buildCpg(bufInLoopCode) { cpg =>
+    }
+
+    "should correctly identify condition of for loop" in {
       cpg.call
         .name("<operator>.computedMemberAccess")
         .argument
@@ -187,6 +175,7 @@ class CAstTests extends WordSpec with Matchers {
         .code
         .l shouldBe List("i < bar")
     }
+
   }
 
 }
