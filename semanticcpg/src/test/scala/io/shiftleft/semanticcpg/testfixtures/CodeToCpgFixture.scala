@@ -9,7 +9,19 @@ import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.semanticcpg.layers.EnhancementRunner
 
 object CodeToCpgFixture {
-  def apply(frontend: LanguageFrontend = LanguageFrontend.Fuzzyc): CodeToCpgFixture = new CodeToCpgFixture(frontend)
+
+  def apply[T](): CodeToCpgFixture =
+    new CodeToCpgFixture(LanguageFrontend.Fuzzyc)
+
+  def apply[T](sourceCode: String,
+               passes: (Cpg => Unit) = createEnhancements,
+               frontend: LanguageFrontend = LanguageFrontend.Fuzzyc)(fun: Cpg => T): T =
+    new CodeToCpgFixture(frontend).buildCpg(sourceCode, passes)(fun)
+
+  private def createEnhancements(cpg: Cpg): Unit = {
+    new EnhancementRunner().run(cpg, new SerializedCpg())
+  }
+
 }
 
 class CodeToCpgFixture(frontend: LanguageFrontend) {
@@ -19,7 +31,7 @@ class CodeToCpgFixture(frontend: LanguageFrontend) {
     *
     * @param sourceCode code for which one wants to generate cpg
     */
-  def buildCpg[T](sourceCode: String, passes: (Cpg => Unit) = createEnhancements)(fun: Cpg => T): T = {
+  def buildCpg[T](sourceCode: String, passes: (Cpg => Unit) = CodeToCpgFixture.createEnhancements)(fun: Cpg => T): T = {
     val tmpDir = writeCodeToFile(sourceCode)
     val cpgFile = frontend.execute(tmpDir)
     val config = CpgLoaderConfig.withoutOverflow
@@ -29,10 +41,6 @@ class CodeToCpgFixture(frontend: LanguageFrontend) {
 
     try fun(cpg)
     finally { cpg.close() }
-  }
-
-  private def createEnhancements(cpg: Cpg): Unit = {
-    new EnhancementRunner().run(cpg, new SerializedCpg())
   }
 
   private def writeCodeToFile(sourceCode: String): File = {

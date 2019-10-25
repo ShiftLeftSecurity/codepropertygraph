@@ -1,7 +1,6 @@
 package io.shiftleft.semanticcpg.language
 
 import org.scalatest.{Matchers, WordSpec}
-import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
 
 class LocationTests extends WordSpec with Matchers {
@@ -11,8 +10,9 @@ class LocationTests extends WordSpec with Matchers {
       int x = foo(param1);
    }"""
 
-  "should return location for method" in {
-    CodeToCpgFixture().buildCpg(code) { cpg =>
+  CodeToCpgFixture(code) { cpg =>
+    "should return location for method" in {
+
       val locations = cpg.method.name("my_func").location.l
       locations.size shouldBe 1
 
@@ -25,10 +25,9 @@ class LocationTests extends WordSpec with Matchers {
       loc.nodeLabel shouldBe "METHOD"
 
     }
-  }
 
-  "should return location for parameter" in {
-    CodeToCpgFixture().buildCpg(code) { cpg =>
+    "should return location for parameter" in {
+
       val locations = cpg.parameter.name("param1").location.l
       locations.size shouldBe 1
 
@@ -39,11 +38,11 @@ class LocationTests extends WordSpec with Matchers {
       loc.lineNumber shouldBe Some(2)
       loc.filename should endWith(".c")
       loc.nodeLabel shouldBe "METHOD_PARAMETER_IN"
-    }
-  }
 
-  "should return location for return parameter" in {
-    CodeToCpgFixture().buildCpg(code) { cpg =>
+    }
+
+    "should return location for return parameter" in {
+
       val locations = cpg.method.name("my_func").methodReturn.location.l
       locations.size shouldBe 1
 
@@ -54,11 +53,11 @@ class LocationTests extends WordSpec with Matchers {
       loc.lineNumber shouldBe Some(2)
       loc.filename should endWith(".c")
       loc.nodeLabel shouldBe "METHOD_RETURN"
-    }
-  }
 
-  "should return location for call" in {
-    CodeToCpgFixture().buildCpg(code) { cpg =>
+    }
+
+    "should return location for call" in {
+
       val locations = cpg.call.name("foo").location.l
       locations.size shouldBe 1
 
@@ -69,11 +68,10 @@ class LocationTests extends WordSpec with Matchers {
       loc.lineNumber shouldBe Some(3)
       loc.filename should endWith(".c")
       loc.nodeLabel shouldBe "CALL"
-    }
-  }
 
-  "should return location for identifier" in {
-    CodeToCpgFixture().buildCpg(code) { cpg =>
+    }
+
+    "should return location for identifier" in {
       val locations = cpg.identifier.name("x").location.l
       locations.size shouldBe 1
 
@@ -84,7 +82,9 @@ class LocationTests extends WordSpec with Matchers {
       loc.lineNumber shouldBe Some(3)
       loc.filename should endWith(".c")
       loc.nodeLabel shouldBe "IDENTIFIER"
+
     }
+
   }
 
 }
