@@ -15,6 +15,8 @@ class InheritanceTests extends WordSpec with Matchers {
                |   int method () {}
                | };
                |
+               | Foo forceFooTohaveTypeNode();
+               |
     """.stripMargin
 
   "should find that Bar is derived from Foo" in
