@@ -65,7 +65,7 @@ trait ExpressionBase[NodeType <: nodes.Expression]
   /**
   Traverse to related parameter
     */
-  @deprecated("October 2019", "")
+  @deprecated("", "October 2019")
   def toParameter: MethodParameter = parameter
 
   /**
