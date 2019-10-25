@@ -125,9 +125,18 @@ class NodeTypeStarters(cpg: Cpg) {
     new MethodRef(scalaGraph.V.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef])
 
   /**
+  Begin traversal at node with id.
+    */
+  def id[NodeType <: nodes.StoredNode](anId: Any): NodeSteps[NodeType] = id(Seq(anId))
+
+  /**
   Begin traversal at set of nodes - specified by their ids
     */
-  def atVerticesWithId[NodeType <: nodes.StoredNode](ids: Seq[Any]): NodeSteps[NodeType] =
-    if (ids.size == 0) new NodeSteps[NodeType](scalaGraph.V(-1).cast[NodeType])
+  def id[NodeType <: nodes.StoredNode](ids: Seq[Any]): NodeSteps[NodeType] =
+    if (ids.isEmpty) new NodeSteps[NodeType](scalaGraph.V(-1).cast[NodeType])
     else new NodeSteps[NodeType](scalaGraph.V(ids: _*).cast[NodeType])
+
+  @deprecated("October 2019", "")
+  def atVerticesWithId[NodeType <: nodes.StoredNode](ids: Seq[Any]): NodeSteps[NodeType] = id(ids)
+
 }
