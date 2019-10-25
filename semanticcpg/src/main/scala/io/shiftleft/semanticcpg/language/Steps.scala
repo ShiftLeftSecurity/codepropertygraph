@@ -150,6 +150,11 @@ class Steps[NodeType](val raw: GremlinScala[NodeType]) {
     new Steps[NodeType](raw.dedup())
 
   /**
+    * Traverse to ids of underlying objects
+    * */
+  def id: Steps[AnyRef] = new Steps(raw.id)
+
+  /**
     Step that selects only the node with the given id.
     */
   def id(key: AnyRef)(implicit isElement: NodeType <:< Element): Steps[NodeType] =

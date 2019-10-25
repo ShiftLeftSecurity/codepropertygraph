@@ -103,6 +103,10 @@ class StepsTest extends WordSpec with Matchers {
     i should be > 0
   }
 
+  "allow retrieving ids" in ExistingCpgFixture("splitmeup") { fixture =>
+    fixture.cpg.method.id.l should not be empty
+  }
+
   "toJson" when ExistingCpgFixture("splitmeup") { fixture =>
     "operating on StoredNode" in {
       val json = fixture.cpg.namespace.nameExact("io.shiftleft.testcode.splitmeup").toJson
