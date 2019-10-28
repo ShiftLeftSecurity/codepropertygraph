@@ -40,11 +40,9 @@ object CodeDumper {
 
     val lineToHighlight = location.lineNumber
     method
-      .filter { m =>
-        m.lineNumber.isDefined && m.lineNumberEnd.isDefined
-      }
-      .map { m =>
-        code(filename, m.lineNumber.get, m.lineNumberEnd.get, lineToHighlight)
+      .collect {
+        case m: nodes.Method if m.lineNumber.isDefined && m.lineNumberEnd.isDefined =>
+          code(filename, m.lineNumber.get, m.lineNumberEnd.get, lineToHighlight)
       }
       .getOrElse("")
   }

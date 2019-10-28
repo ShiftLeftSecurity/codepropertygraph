@@ -20,7 +20,7 @@ class CodeDumperTests extends WordSpec with Matchers {
       val query = cpg.method.name("my_func")
       val code = CodeDumper.dump(query)
       code should startWith(CodeDumper.arrow.toString)
-      code.contains("foo(param1)") shouldBe true
+      code should include("foo(param1)")
       code should endWith("}")
     }
 
@@ -28,7 +28,7 @@ class CodeDumperTests extends WordSpec with Matchers {
       val query = cpg.call.name("foo")
       val code = CodeDumper.dump(query)
       code should startWith("int")
-      code.matches(".*" + CodeDumper.arrow + ".*" + "int x = foo" + ".*")
+      code should include regex (CodeDumper.arrow + ".*" + "int x = foo" + ".*")
       code should endWith("}")
     }
 
