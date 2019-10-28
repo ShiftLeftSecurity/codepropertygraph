@@ -52,7 +52,7 @@ object CodeDumper {
   /**
     * For a given `filename`, `startLine`, and `endLine`, return the corresponding code
     * by reading it from the file. If `lineToHighlight` is defined, then a line containing
-    * and arrow (as a source code comment) is included right before that line.
+    * an arrow (as a source code comment) is included right before that line.
     * */
   def code(filename: String, startLine: Integer, endLine: Integer, lineToHighlight: Option[Integer] = None): String = {
     val lines = Try(File(filename).lines.toList).getOrElse {
