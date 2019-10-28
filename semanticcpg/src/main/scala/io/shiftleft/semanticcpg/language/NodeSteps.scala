@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.language
 
 import gremlin.scala.{GremlinScala, P, Vertex}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.semanticcpg.codedumper.CodeDumper
 import io.shiftleft.semanticcpg.language.types.structure.File
 
 /**
@@ -35,6 +36,8 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
     * */
   def location: NewLocation =
     new NewLocation(raw.map(x => x.location))
+
+  def dump: String = CodeDumper.dump(this)
 
   /* follow the incoming edges of the given type as long as possible */
   protected def walkIn(edgeType: String): GremlinScala[Vertex] =
