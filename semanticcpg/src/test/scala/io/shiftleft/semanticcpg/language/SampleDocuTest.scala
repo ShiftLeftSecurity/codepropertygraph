@@ -9,7 +9,7 @@ class SampleDocuTest extends WordSpec with Matchers {
        int main(int argc, char **argv) { }
     """
 
-  CodeToCpgFixture().buildCpg(code) { cpg =>
+  CodeToCpgFixture(code) { cpg =>
     "should return `main` as the only method" in {
       cpg.method.name.toSet shouldBe Set("main")
     }
