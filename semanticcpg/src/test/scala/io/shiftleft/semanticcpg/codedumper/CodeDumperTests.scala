@@ -36,6 +36,11 @@ class CodeDumperTests extends WordSpec with Matchers {
       CodeDumper.code("foo", 1, 2) shouldBe ""
     }
 
+    "should allow dumping via .dump" in {
+      val code = cpg.method.name("my_func").dump
+      code should startWith(CodeDumper.arrow.toString)
+    }
+
   }
 
 }
