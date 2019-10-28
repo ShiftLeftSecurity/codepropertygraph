@@ -17,16 +17,15 @@ class CallNameFixup(cpg: Cpg) extends CpgPass(cpg) {
         val colonIndex = call.methodFullName.indexOf(":")
         if (colonIndex != -1) {
 
-          val namePart = call.methodFullName.substring(0, colonIndex)
+          var qualMethodName = call.methodFullName.substring(0, colonIndex)
 
-          val nameWithoutTypes = eraseTypeInformation(namePart)
+          // If the CALL name contains parametric type information, preserve it; otherwise, erase it.
+          qualMethodName = if (call.name.indexOf("<") != -1) qualMethodName else eraseTypeInformation(qualMethodName)
 
-          val nameParts = nameWithoutTypes.split("\\.").toList
+          val unqualMethodName = qualMethodName.split("\\.").toList.last
 
-          val nameFromFullName = nameParts.last
-
-          if (nameFromFullName != call.name) {
-            call.property(NodeKeyNames.NAME, nameFromFullName)
+          if (unqualMethodName != call.name) {
+            call.property(NodeKeyNames.NAME, unqualMethodName)
           }
         }
       }
