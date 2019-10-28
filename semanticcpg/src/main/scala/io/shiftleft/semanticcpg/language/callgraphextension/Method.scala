@@ -55,8 +55,8 @@ class Method(override val raw: GremlinScala[nodes.Method]) extends Steps[nodes.M
   /**
     * Incoming call sites
     * */
-  def callIn(implicit callResolver: ICallResolver): Steps[nodes.Call] = {
-    new Steps[nodes.Call](
+  def callIn(implicit callResolver: ICallResolver): Call = {
+    new Call(
       sideEffect(callResolver.resolveDynamicMethodCallSites).raw
         .in(EdgeTypes.CALL)
         .cast[nodes.Call])
