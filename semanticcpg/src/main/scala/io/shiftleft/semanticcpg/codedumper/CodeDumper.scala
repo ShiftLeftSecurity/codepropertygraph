@@ -101,7 +101,7 @@ object CodeDumper {
       highlightedCode
     } catch {
       case exception: Exception =>
-        logger.info("syntax highlighting now working. Is `source-highlight-esc.sh` installed?")
+        logger.info("syntax highlighting now working. Is `source-highlight` installed?")
         logger.info(exception)
         ""
     } finally {
