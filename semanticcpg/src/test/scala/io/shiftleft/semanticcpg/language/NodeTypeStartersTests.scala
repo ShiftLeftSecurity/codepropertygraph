@@ -15,7 +15,7 @@ class NodeTypeStartersTests extends WordSpec with Matchers {
   val code = """
        /* A C comment */
        // A C++ comment
-       int main(int argc, char **argv) { int mylocal; }
+       int main(int argc, char **argv) { int mylocal; libfunc(1); }
        struct foo { int x; };
     """
 
@@ -24,8 +24,14 @@ class NodeTypeStartersTests extends WordSpec with Matchers {
       cpg.file.name.l.head should endWith(".c")
     }
 
+    /**
+      * All methods - whether defined (e.g., "main") or only referenced, e.g., "libfunc"
+      * are represented by METHOD nodes in the CPG. Any method for which a definition
+      * exists is in `cpg.method.internal`. All other methods are in `cpg.method.external`.
+      * */
     "should allow retrieving methods" in {
-      cpg.method.name.l shouldBe List("main")
+      cpg.method.internal.name.l shouldBe List("main")
+      cpg.method.external.name.l shouldBe List("libfunc")
     }
 
     "should allow retrieving comments" in {
@@ -33,15 +39,27 @@ class NodeTypeStartersTests extends WordSpec with Matchers {
     }
 
     "should allow retrieving parameters" in {
-      cpg.parameter.name.toSet shouldBe Set("argc", "argv")
+      cpg.parameter.filter(_.method.internal).name.toSet shouldBe Set("argc", "argv")
     }
 
     "should allow retrieving locals" in {
       cpg.local.name.l shouldBe List("mylocal")
     }
 
+    "should allow retrieving of literals" in {
+      cpg.literal.code.l shouldBe List("1")
+    }
+
+    "should allow retrieving calls" in {
+      cpg.call.name.l shouldBe List("libfunc")
+    }
+
+    "should allow retrieving arguments" in {
+      cpg.argument.isLiteral.code.l shouldBe List("1")
+    }
+
     "should allow retrieving type declarations" in {
-      cpg.typeDecl.name.toSet shouldBe Set("foo", "int", "void", "char * *")
+      cpg.typeDecl.internal.name.toSet shouldBe Set("foo")
     }
 
     "should allow retrieving members" in {
@@ -49,7 +67,7 @@ class NodeTypeStartersTests extends WordSpec with Matchers {
     }
 
     "should allow retrieving (used) types" in {
-      cpg.types.name.toSet shouldBe Set("int", "void", "char * *")
+      cpg.types.name.toSet shouldBe Set("ANY", "int", "void", "char * *")
     }
 
     "should allow retrieving namespaces" in {
@@ -61,7 +79,7 @@ class NodeTypeStartersTests extends WordSpec with Matchers {
     }
 
     "should allow retrieving of method returns" in {
-      cpg.methodReturn.code.l shouldBe List("RET")
+      cpg.methodReturn.l.size shouldBe 2
     }
 
     "should allow retrieving of meta data" in {
@@ -85,7 +103,10 @@ class NodeTypeStartersTests extends WordSpec with Matchers {
         NodeTypes.TYPE,
         NodeTypes.BLOCK,
         NodeTypes.COMMENT,
-        NodeTypes.LOCAL
+        NodeTypes.LOCAL,
+        NodeTypes.CALL,
+        NodeTypes.LITERAL,
+        NodeTypes.METHOD_INST
       )
     }
 
