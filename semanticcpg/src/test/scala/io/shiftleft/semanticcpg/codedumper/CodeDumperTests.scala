@@ -1,5 +1,7 @@
 package io.shiftleft.semanticcpg.codedumper
 
+import java.util.regex.Pattern
+
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
@@ -13,7 +15,9 @@ class CodeDumperTests extends WordSpec with Matchers {
 
   CodeToCpgFixture(code) { cpg =>
     "should return empty string for empty traversal" in {
-      CodeDumper.dump(cpg.method.name("notinthere"), false).mkString("\n") shouldBe ""
+      CodeDumper
+        .dump(cpg.method.name("notinthere"), false)
+        .mkString("\n") shouldBe ""
     }
 
     "should be able to dump complete function" in {
@@ -28,7 +32,7 @@ class CodeDumperTests extends WordSpec with Matchers {
       val query = cpg.call.name("foo")
       val code = CodeDumper.dump(query, false).mkString("\n")
       code should startWith("int")
-      code should include regex (CodeDumper.arrow + ".*" + "int x = foo" + ".*")
+      code should include regex (Pattern.quote(CodeDumper.arrow.toString) + ".*" + "int x = foo" + ".*")
       code should endWith("}")
     }
 
