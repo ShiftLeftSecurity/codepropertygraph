@@ -13,7 +13,7 @@ import scala.util.Try
 object CodeDumper {
 
   private val logger = LogManager.getLogger(CodeDumper)
-  val arrow: CharSequence = "// ===> "
+  val arrow: CharSequence = "/* ===> */ "
 
   /**
     * Evaluate the `step` and determine associated locations.
