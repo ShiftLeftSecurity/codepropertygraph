@@ -37,9 +37,17 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
   def location: NewLocation =
     new NewLocation(raw.map(x => x.location))
 
-  def dump: String = CodeDumper.dump(this, true)
+  /**
+    * For methods, dump the method code. For expressions,
+    * dump the method code along with an arrow pointing
+    * to the expression.
+    * */
+  def dump: String = CodeDumper.dump(this, false)
 
-  def dumpRaw: String = CodeDumper.dump(this, false)
+  /**
+    * Dump with colored (syntax highlighted output)
+    * */
+  def dumpc: String = CodeDumper.dump(this, false)
 
   /* follow the incoming edges of the given type as long as possible */
   protected def walkIn(edgeType: String): GremlinScala[Vertex] =
