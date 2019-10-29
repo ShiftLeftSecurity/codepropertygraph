@@ -13,12 +13,12 @@ class CodeDumperTests extends WordSpec with Matchers {
 
   CodeToCpgFixture(code) { cpg =>
     "should return empty string for empty traversal" in {
-      CodeDumper.dump(cpg.method.name("notinthere"), false) shouldBe ""
+      CodeDumper.dump(cpg.method.name("notinthere"), false).mkString("\n") shouldBe ""
     }
 
     "should be able to dump complete function" in {
       val query = cpg.method.name("my_func")
-      val code = CodeDumper.dump(query, false)
+      val code = CodeDumper.dump(query, false).mkString("\n")
       code should startWith(CodeDumper.arrow.toString)
       code should include("foo(param1)")
       code should endWith("}")
@@ -26,7 +26,7 @@ class CodeDumperTests extends WordSpec with Matchers {
 
     "should dump method with arrow for expression (a call)" in {
       val query = cpg.call.name("foo")
-      val code = CodeDumper.dump(query, false)
+      val code = CodeDumper.dump(query, false).mkString("\n")
       code should startWith("int")
       code should include regex (CodeDumper.arrow + ".*" + "int x = foo" + ".*")
       code should endWith("}")
@@ -37,13 +37,13 @@ class CodeDumperTests extends WordSpec with Matchers {
     }
 
     "should allow dumping via .dump" in {
-      val code = cpg.method.name("my_func").dump
+      val code = cpg.method.name("my_func").dump.mkString("\n")
       code should startWith(CodeDumper.arrow.toString)
     }
 
     "should allow dumping callIn" in {
       implicit val resolver: ICallResolver = NoResolve
-      val code = cpg.method.name("foo").callIn.dump
+      val code = cpg.method.name("foo").callIn.dump.mkString("\n")
       code should startWith("int")
     }
 

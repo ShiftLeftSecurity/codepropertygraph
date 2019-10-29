@@ -13,15 +13,15 @@ import scala.util.Try
 object CodeDumper {
 
   private val logger = LogManager.getLogger(CodeDumper)
-  val arrow: CharSequence = "// ===>\n"
+  val arrow: CharSequence = "// ===> "
 
   /**
     * Evaluate the `step` and determine associated locations.
     * Dump code at those locations
     * */
-  def dump[NodeType <: nodes.StoredNode](step: NodeSteps[NodeType], highlight: Boolean = true): String = {
+  def dump[NodeType <: nodes.StoredNode](step: NodeSteps[NodeType], highlight: Boolean = true): List[String] = {
     val cpg = new Cpg(step.graph)
-    step.location.l.map(dump(_, highlight, cpg)).mkString("\n")
+    step.location.l.map(dump(_, highlight, cpg))
   }
 
   /**
