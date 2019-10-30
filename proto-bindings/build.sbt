@@ -34,38 +34,43 @@ copyLatestCpgProto := {
 lazy val generateCsharpBindings = taskKey[File]("generate csharp proto bindings")
 generateCsharpBindings := {
   (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
-  import sys.process._
   val dotnetVersion = System.getProperty("dotnet-version")
   assert(dotnetVersion != null, "you must define the dotnet version via a jvm system property, e.g. via `-Ddotnet-version=1.0.0`")
   println(s"building and publishing csharp proto version $dotnetVersion")
   val publishToRepo = Option(System.getProperty("publish-to-repo")).map(repo => s"--publish-to-repo $repo")
   val publishKey = Option(System.getProperty("publish-key")).map(key => s"--publish-key $key")
-  s"""./build-dotnet-bindings.sh --cpg-version $dotnetVersion ${publishToRepo.getOrElse("")} ${publishKey.getOrElse("")}""".!
+  runCmd(s"""./build-dotnet-bindings.sh --cpg-version $dotnetVersion ${publishToRepo.getOrElse("")} ${publishKey.getOrElse("")}""", "./build-dotnet-bindings.sh")
   new File(s"cpg-proto-bindings.${dotnetVersion}.nupkg")
 }
 
 lazy val generateGoBindings = taskKey[File]("generate go proto bindings (doesn't publish them anywhere)")
 generateGoBindings := {
-  import sys.process._
   (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
   // protoc requires a relative path...
   val protoFile = "codepropertygraph/target/cpg.proto"
   val outDir = new File("codepropertygraph/target/protoc-go")
   outDir.mkdirs
   println(s"writing go proto bindings to $outDir")
-  s"""protoc --go_out=$outDir $protoFile""".!
+  val cmd = s"""protoc --go_out=$outDir $protoFile"""
+  runCmd(cmd, cmd)
   outDir
 }
 
 lazy val generatePythonBindings = taskKey[File]("generate Python proto bindings")
 generatePythonBindings := {
-  import sys.process._
   (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
   // protoc requires a relative path...
   val protoFile = "codepropertygraph/target/cpg.proto"
   val outDir = new File("codepropertygraph/target/protoc-py")
   outDir.mkdirs
   println(s"writing Python proto bindings to $outDir")
-  s"""protoc --python_out=$outDir $protoFile""".!
+  val cmd = s"""protoc --python_out=$outDir $protoFile"""
+  runCmd(cmd, cmd)
   outDir
+}
+
+def runCmd(cmd: String, contextOnError: => String): Unit = {
+  import sys.process._
+  val result = cmd.!
+  assert(result == 0, s"exitCode=$result when running external command. context: `$contextOnError`")
 }
