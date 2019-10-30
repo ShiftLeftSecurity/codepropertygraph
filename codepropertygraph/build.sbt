@@ -3,11 +3,15 @@ name := "codepropertygraph"
 dependsOn(Projects.protoBindings)
 
 libraryDependencies ++= Seq(
+//  "com.lihaoyi" %% "fansi" % "0.2.7", //do not commit
+  "com.lihaoyi" %% "pprint" % "0.5.6", //do not commit
+
   "io.shiftleft" % "overflowdb-tinkerpop3" % "0.30",
   "com.michaelpollmeier" %% "gremlin-scala" % "3.3.4.17",
   "com.google.guava" % "guava" % "21.0",
   "org.apache.commons" % "commons-lang3" % "3.5",
   "commons-io" % "commons-io" % "2.5",
+  "com.github.pathikrit" %% "better-files"  % "3.8.0",
   "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0",
   "com.jsuereth" %% "scala-arm" % "2.0",
   "com.github.scopt" %% "scopt" % "3.7.1",

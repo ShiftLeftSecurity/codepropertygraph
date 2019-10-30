@@ -67,22 +67,53 @@ trait BridgeBase {
       case None =>
         val replConfig = List(
           "repl.prompt() = \"" + promptStr() + "\"",
-          """|val originalPrinter = repl.pprinter()
-             |repl.pprinter.update(originalPrinter.copy(
-             |  defaultHeight = 99999,
-             |  additionalHandlers = {
-             |    case node: nodes.Node =>
-             |      import pprint.Tree
-             |      Tree.Apply(
-             |        node.productPrefix,
-             |        Iterator.range(0, node.productArity).map { n =>
-             |          Tree.Infix(
-             |            Tree.Literal(node.productElementLabel(n)),
-             |            "->",
-             |            originalPrinter.treeify(node.productElement(n)))
-             |      })
-             |  }
-             |))""".stripMargin,
+          """
+            |val originalPPrinter = repl.pprinter()
+            |repl.pprinter.update(io.shiftleft.console.pprinter.create(originalPPrinter))
+            |""".stripMargin,
+          //repl.pprinter.update(new io.shiftleft.console.PPrinter(originalPrinter))
+//          defaultHeight = 99999,
+//          additionalHandlers = {
+//            case node: nodes.Node =>
+//              Tree.Apply(
+//                node.productPrefix,
+//                Iterator.range(0, node.productArity).map { n =>
+//                  Tree.Infix(
+//                    Tree.Literal(node.productElementLabel(n)),
+//                    "->",
+//                    originalPrinter.treeify(node.productElement(n)))
+//                })
+//          }) {
+//          override def tokenize(x: Any,
+//                                width: Int = defaultWidth,
+//                                height: Int = defaultHeight,
+//                                indent: Int = defaultIndent,
+//                                initialOffset: Int = 0): Iterator[fansi.Str] = x match {
+//            case s: String =>
+//              println("yyyy: in myPPrinter")
+//              val fixed = s.replaceAll("\\[m", "[39m")
+//              Iterator.single(fixed)
+//            case x => super.tokenize(x, width, height, indent, initialOffset)
+//          }
+//        })
+//          """|import pprint.Tree
+//             |val originalPrinter = repl.pprinter()
+//             |repl.pprinter.update(originalPrinter.copy(
+//             |  defaultHeight = 99999,
+//             |  additionalHandlers = {
+//             |    //case source: io.shiftleft.utils.Source =>
+//             |      //io.shiftleft.utils.SourceHighlighter.highlight(source).getOrElse(source.code)
+//             |    case node: nodes.Node =>
+//             |      Tree.Apply(
+//             |        node.productPrefix,
+//             |        Iterator.range(0, node.productArity).map { n =>
+//             |          Tree.Infix(
+//             |            Tree.Literal(node.productElementLabel(n)),
+//             |            "->",
+//             |            originalPrinter.treeify(node.productElement(n)))
+//             |      })
+//             |  }
+//             |))""".stripMargin,
           "banner()"
         )
         ammonite

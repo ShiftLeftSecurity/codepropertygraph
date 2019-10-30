@@ -1,13 +1,13 @@
 package io.shiftleft.semanticcpg.codedumper
 
+import better.files.File
 import io.shiftleft.codepropertygraph.generated.{Languages, nodes}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.NodeSteps
-import better.files._
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.utils.{Source, SourceHighlighter}
 import org.apache.logging.log4j.LogManager
 
-import sys.process._
 import scala.util.Try
 
 object CodeDumper {
@@ -55,12 +55,12 @@ object CodeDumper {
         case m: nodes.Method if m.lineNumber.isDefined && m.lineNumberEnd.isDefined =>
           val rawCode = code(filename, m.lineNumber.get, m.lineNumberEnd.get, lineToHighlight)
           if (highlight) {
-            externalHighlighter(rawCode, language)
+//            SourceHighlighter.highlight(Source(rawCode, language.get))
+            SourceHighlighter.highlight(Source(rawCode, language.get))
           } else {
-            rawCode
+            Some(rawCode)
           }
-      }
-      .getOrElse("")
+      }.flatten.getOrElse("")
   }
 
   /**
@@ -85,29 +85,6 @@ object CodeDumper {
           }
       }
       .mkString("\n")
-  }
-
-  private def externalHighlighter(code: String, language: Option[String]): String = {
-
-    val langFlag = language match {
-      case Some(Languages.C) => "-sC"
-      case _                 => throw new RuntimeException("Attempting to call highlighter on unsupported language")
-    }
-
-    val f = File.newTemporaryFile("dump")
-    f.writeText(code)
-    val ret = try {
-      val highlightedCode: String = Process(Seq("source-highlight-esc.sh", f.path.toString, langFlag)).!!
-      highlightedCode
-    } catch {
-      case exception: Exception =>
-        logger.info("syntax highlighting now working. Is `source-highlight` installed?")
-        logger.info(exception)
-        ""
-    } finally {
-      f.delete()
-    }
-    ret
   }
 
 }
