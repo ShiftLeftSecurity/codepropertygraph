@@ -9,21 +9,10 @@ import scala.sys.process.Process
   * TODO: generate enums instead of Strings for the languages */
 case class Source(code: String, language: String)
 
-case class HighlightedSource(value: String) {
-  /** We use source-highlight to encode source as ansi strings, e.g. the .dump step
-    * Ammonite uses fansi for it's colour-coding, and while both pledge to follow the ansi codec, they aren't compatible
-    * TODO: PR for fansi to support these standard encodings out of the box
-    * */
-  lazy val fixedForFansi = value
-    .replaceAll("""\u001b\[m""", """\u001b[39m""") //encoding ends with [39m for fansi instead of [m
-    .replaceAll("""\u001b\[0(\d)m""", """\u001b[$1m""") // `[01m` is encoded as `[1m` in fansi for all single digit numbers
-    .replaceAll("""\u001b\[[0?](\d);(\d+)m""", """\u001b[$1m\u001b[$2m""") // `[01;34m` is encoded as `[1m[34m` in fansi
-}
-
 object SourceHighlighter {
   private val logger = LogManager.getLogger(this)
 
-  def highlight(source: Source): Option[HighlightedSource] = {
+  def highlight(source: Source): Option[String] = {
     val langFlag = source.language match {
       case Languages.C => "-sC"
       case other       => throw new RuntimeException(s"Attempting to call highlighter on unsupported language: $other")
@@ -33,7 +22,7 @@ object SourceHighlighter {
     tmpSrcFile.writeText(source.code)
     try {
       val highlightedCode = Process(Seq("source-highlight-esc.sh", tmpSrcFile.path.toString, langFlag)).!!
-      Some(HighlightedSource(highlightedCode))
+      Some(highlightedCode)
     } catch {
       case exception: Exception =>
         logger.info("syntax highlighting not working. Is `source-highlight` installed?")
