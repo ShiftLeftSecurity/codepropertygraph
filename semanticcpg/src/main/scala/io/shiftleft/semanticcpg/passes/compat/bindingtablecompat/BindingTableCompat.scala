@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.NewBinding
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
+import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
@@ -21,7 +22,7 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
 
     if (cpg.graph.traversal.V().hasLabel(NodeTypes.BINDING).asScala.isEmpty) {
       cpg.typeDecl.toIterator().foreach { typeDecl =>
-        val nonConstructorMethods = getNonConstructorMethodsTransitive(typeDecl)
+        val nonConstructorMethods = getNonConstructorMethodsTransitive(typeDecl, Set.empty)
         nonConstructorMethods.foreach(createBinding(typeDecl, diffGraph))
 
         val constructorMethods = typeDecl.start.method.isConstructor.l
@@ -44,7 +45,13 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
     diffGraph.addEdgeToOriginal(newBinding, method, EdgeTypes.REF)
   }
 
-  private def getNonConstructorMethodsTransitive(typeDecl: nodes.TypeDecl): List[nodes.Method] = {
+  private def getNonConstructorMethodsTransitive(typeDecl: nodes.TypeDecl,
+                                                 alreadyVisitedTypeDecls: Set[nodes.TypeDecl]): List[nodes.Method] = {
+    if (alreadyVisitedTypeDecls.contains(typeDecl)) {
+      BindingTableCompat.logger.warn(s"Found invalid cyclic TYPE_DECL inheritance for TYPE_DECL ${typeDecl.fullName}")
+      return Nil
+    }
+
     val baseTypeDecls = typeDecl
       .vertices(Direction.OUT, EdgeTypes.INHERITS_FROM)
       .asScala
@@ -52,7 +59,7 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
       .toList
 
     val nonConstructorMethodsOfBases = baseTypeDecls.flatMap { baseTypeDecl =>
-      getNonConstructorMethodsTransitive(baseTypeDecl.asInstanceOf[nodes.TypeDecl])
+      getNonConstructorMethodsTransitive(baseTypeDecl.asInstanceOf[nodes.TypeDecl], alreadyVisitedTypeDecls + typeDecl)
     }
 
     val ownNonConstructorMethods = getNonConstructorMethods(typeDecl)
@@ -79,4 +86,8 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
       .toList
   }
 
+}
+
+object BindingTableCompat {
+  private val logger = LogManager.getLogger(getClass)
 }
