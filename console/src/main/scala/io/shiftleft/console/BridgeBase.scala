@@ -67,22 +67,10 @@ trait BridgeBase {
       case None =>
         val replConfig = List(
           "repl.prompt() = \"" + promptStr() + "\"",
-          """|val originalPrinter = repl.pprinter()
-             |repl.pprinter.update(originalPrinter.copy(
-             |  defaultHeight = 99999,
-             |  additionalHandlers = {
-             |    case node: nodes.Node =>
-             |      import pprint.Tree
-             |      Tree.Apply(
-             |        node.productPrefix,
-             |        Iterator.range(0, node.productArity).map { n =>
-             |          Tree.Infix(
-             |            Tree.Literal(node.productElementLabel(n)),
-             |            "->",
-             |            originalPrinter.treeify(node.productElement(n)))
-             |      })
-             |  }
-             |))""".stripMargin,
+          """
+            |val originalPPrinter = repl.pprinter()
+            |repl.pprinter.update(io.shiftleft.console.pprinter.create(originalPPrinter))
+            |""".stripMargin,
           "banner()"
         )
         ammonite

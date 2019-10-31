@@ -47,7 +47,7 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
   /**
     * Dump with colored (syntax highlighted output)
     * */
-  def dumpc: List[String] = CodeDumper.dump(this, false)
+  def dumpc: List[String] = CodeDumper.dump(this, true)
 
   /* follow the incoming edges of the given type as long as possible */
   protected def walkIn(edgeType: String): GremlinScala[Vertex] =

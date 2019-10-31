@@ -56,7 +56,7 @@ val ScoptVersion = "3.7.1"
 val BetterFilesVersion = "3.8.0"
 val CatsVersion = "2.0.0"
 val CirceVersion = "0.12.2"
-val AmmoniteVersion = "1.7.1"
+val AmmoniteVersion = "1.8.1"
 val ScalatestVersion = "3.0.8"
 
 libraryDependencies ++= Seq(
