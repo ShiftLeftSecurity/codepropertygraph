@@ -41,13 +41,13 @@ class CodeDumperTests extends WordSpec with Matchers {
     }
 
     "should allow dumping via .dump" in {
-      val code = cpg.method.name("my_func").dump.mkString("\n")
+      val code = cpg.method.name("my_func").dumpRaw.mkString("\n")
       code should startWith(CodeDumper.arrow.toString)
     }
 
     "should allow dumping callIn" in {
       implicit val resolver: ICallResolver = NoResolve
-      val code = cpg.method.name("foo").callIn.dump.mkString("\n")
+      val code = cpg.method.name("foo").callIn.dumpRaw.mkString("\n")
       code should startWith("int")
     }
 
