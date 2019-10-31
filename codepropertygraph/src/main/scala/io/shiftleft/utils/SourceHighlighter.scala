@@ -19,8 +19,7 @@ case class HighlightedSource(value: String) {
 object SourceHighlighter {
   private val logger = LogManager.getLogger(this)
 
-  def highlight(source: Source): Option[String] = {
-//  def highlight(source: Source): Option[HighlightedSource] = {
+  def highlight(source: Source): Option[HighlightedSource] = {
     val langFlag = source.language match {
       case Languages.C => "-sC"
       case other       => throw new RuntimeException(s"Attempting to call highlighter on unsupported language: $other")
@@ -30,14 +29,10 @@ object SourceHighlighter {
     tmpSrcFile.writeText(source.code)
     try {
       val highlightedCode = Process(Seq("source-highlight-esc.sh", tmpSrcFile.path.toString, langFlag)).!!
-      // fixup for fansi.Str parsing
-//      val fixedForFansi = highlightedCode.replaceAll("\\[m", "[39m")
-//      Some(HighlightedSource(fixedForFansi))
-//      Some(fixedForFansi)
-      Some(highlightedCode)
+      Some(HighlightedSource(highlightedCode))
     } catch {
       case exception: Exception =>
-        logger.info("syntax highlighting now working. Is `source-highlight` installed?")
+        logger.info("syntax highlighting not working. Is `source-highlight` installed?")
         logger.info(exception)
         None
     } finally {

@@ -55,8 +55,7 @@ object CodeDumper {
         case m: nodes.Method if m.lineNumber.isDefined && m.lineNumberEnd.isDefined =>
           val rawCode = code(filename, m.lineNumber.get, m.lineNumberEnd.get, lineToHighlight)
           if (highlight) {
-//            SourceHighlighter.highlight(Source(rawCode, language.get))
-            SourceHighlighter.highlight(Source(rawCode, language.get))
+            SourceHighlighter.highlight(Source(rawCode, language.get)).map(_.fixedForFansi)
           } else {
             Some(rawCode)
           }
