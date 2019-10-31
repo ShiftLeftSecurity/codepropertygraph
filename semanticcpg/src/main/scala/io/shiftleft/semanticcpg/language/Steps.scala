@@ -317,4 +317,9 @@ class Steps[NodeType](val raw: GremlinScala[NodeType]) {
   def orderBy[A](fun: NodeType => A): Steps[NodeType] =
     new Steps[NodeType](raw.order(By(fun)))
 
+
+  def num: Number = new Number(__().inject(raw.clone.l.size.toLong))
+
+  def num(n : Long) : Steps[NodeType] = filter(_.num.is(n))
+
 }
