@@ -35,5 +35,3 @@ class PPrinterTest extends WordSpec with Matchers {
   }
 
 }
-
-

@@ -59,7 +59,9 @@ object CodeDumper {
           } else {
             Some(rawCode)
           }
-      }.flatten.getOrElse("")
+      }
+      .flatten
+      .getOrElse("")
   }
 
   /**
