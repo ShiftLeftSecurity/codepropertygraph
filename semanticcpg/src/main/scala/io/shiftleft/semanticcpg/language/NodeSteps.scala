@@ -42,7 +42,7 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
     * dump the method code along with an arrow pointing
     * to the expression.
     * */
-  def dump: List[String] = CodeDumper.dump(this, true)
+  def dump: List[String] = CodeDumper.dump(this, false)
 
   /**
     * Dump with colored (syntax highlighted output)
