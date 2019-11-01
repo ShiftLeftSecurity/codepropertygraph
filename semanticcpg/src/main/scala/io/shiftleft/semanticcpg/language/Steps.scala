@@ -14,68 +14,68 @@ import org.json4s.Extraction
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-/**
-  Base class for our DSL
-  These are the base steps available in all steps of the query language.
+/** Base class for our DSL
+  * These are the base steps available in all steps of the query language.
+  * There are no constraints on the element types, unlike e.g. [[NodeSteps]]
   */
-class Steps[NodeType](val raw: GremlinScala[NodeType]) {
+class Steps[A](val raw: GremlinScala[A]) {
   implicit lazy val graph: Graph = raw.traversal.asAdmin.getGraph.get
 
-  def toIterator(): Iterator[NodeType] = {
-    val iter: java.util.Iterator[NodeType] = raw.traversal
+  def toIterator(): Iterator[A] = {
+    val iter: java.util.Iterator[A] = raw.traversal
     iter.asScala
   }
 
   /**
     Execute the traversal and convert the result to a list
     */
-  def toList(): List[NodeType] = raw.toList()
+  def toList(): List[A] = raw.toList()
 
   /**
     Shorthand for `toList`
     */
-  def l(): List[NodeType] = toList()
+  def l(): List[A] = toList()
 
   /**
     Execute the traversal and convert it to a mutable buffer
     */
-  def toBuffer(): mutable.Buffer[NodeType] = raw.toBuffer()
+  def toBuffer(): mutable.Buffer[A] = raw.toBuffer()
 
   /**
     Shorthand for `toBuffer`
     */
-  def b(): mutable.Buffer[NodeType] = toBuffer()
+  def b(): mutable.Buffer[A] = toBuffer()
 
   /**
     Alias for `toList`
     @deprecated
     */
-  def exec(): List[NodeType] = toList()
+  def exec(): List[A] = toList()
 
   /**
     Execute the travel and convert it to a Java stream.
     */
-  def toStream(): java.util.stream.Stream[NodeType] = raw.toStream()
+  def toStream(): java.util.stream.Stream[A] = raw.toStream()
 
   /**
     Alias for `toStream`
     */
-  def s(): java.util.stream.Stream[NodeType] = toStream()
+  def s(): java.util.stream.Stream[A] = toStream()
 
   /**
     Execute the traversal and convert it into a Java list (as opposed
     to the Scala list obtained via `toList`)
     */
-  def jl(): JList[NodeType] = b.asJava
+  def jl(): JList[A] = b.asJava
 
   /**
     Execute the traversal and convert it into a set
     */
-  def toSet(): Set[NodeType] = raw.toSet()
+  def toSet(): Set[A] = raw.toSet()
 
-  def head(): NodeType = raw.head()
+  def head(): A = raw.head()
 
-  def headOption(): Option[NodeType] = raw.headOption()
+  def headOption(): Option[A] = raw.headOption()
 
   def isDefined: Boolean = headOption().isDefined
 
@@ -127,27 +127,27 @@ class Steps[NodeType](val raw: GremlinScala[NodeType]) {
      function that performs a side effect. The function `fun` can
      access the current traversal element via the variable `_`.
     */
-  def sideEffect(fun: NodeType => Any): Steps[NodeType] =
-    new Steps[NodeType](raw.sideEffect(fun))
+  def sideEffect(fun: A => Any): Steps[A] =
+    new Steps[A](raw.sideEffect(fun))
 
   /** Aggregate all objects at this point into the given collection,
-    * e.g. `mutable.ArrayBuffer.empty[NodeType]`
+    * e.g. `mutable.ArrayBuffer.empty[A]`
     */
-  def aggregate(into: mutable.Buffer[NodeType]): Steps[NodeType] =
-    new Steps[NodeType](raw.sideEffect { into += _ })
+  def aggregate(into: mutable.Buffer[A]): Steps[A] =
+    new Steps[A](raw.sideEffect { into += _ })
 
   /**
     Create a deep copy of the traversal.
     */
-  override def clone: Steps[NodeType] =
-    new Steps[NodeType](raw.clone)
+  override def clone: Steps[A] =
+    new Steps[A](raw.clone)
 
   /**
     Extend the traversal with a deduplication step. This step ensures
     that duplicate elements are removed.
     */
-  def dedup: Steps[NodeType] =
-    new Steps[NodeType](raw.dedup())
+  def dedup: Steps[A] =
+    new Steps[A](raw.dedup())
 
   /**
     * Traverse to ids of underlying objects
@@ -157,24 +157,24 @@ class Steps[NodeType](val raw: GremlinScala[NodeType]) {
   /**
     Step that selects only the node with the given id.
     */
-  def id(key: AnyRef)(implicit isElement: NodeType <:< Element): Steps[NodeType] =
-    new Steps[NodeType](raw.hasId(key))
+  def id(key: AnyRef)(implicit isElement: A <:< Element): Steps[A] =
+    new Steps[A](raw.hasId(key))
 
   /**
     Step that selects only nodes in the given id set `keys`.
     */
-  def id(keys: Set[AnyRef])(implicit isElement: NodeType <:< Element): Steps[NodeType] =
-    new Steps[NodeType](raw.hasId(P.within(keys)))
+  def id(keys: Set[AnyRef])(implicit isElement: A <:< Element): Steps[A] =
+    new Steps[A](raw.hasId(P.within(keys)))
 
   /**
     Repeat the given traversal. This step can be combined with the until and emit steps to
     provide a termination and emit criteria.
     */
-  def repeat[NewNodeType >: NodeType](repeatTraversal: Steps[NodeType] => Steps[NewNodeType]): Steps[NewNodeType] =
+  def repeat[NewNodeType >: A](repeatTraversal: Steps[A] => Steps[NewNodeType]): Steps[NewNodeType] =
     new Steps[NewNodeType](
       raw.repeat { rawTraversal =>
         repeatTraversal(
-          new Steps[NodeType](rawTraversal)
+          new Steps[A](rawTraversal)
         ).raw
       }
     )
@@ -184,11 +184,11 @@ class Steps[NodeType](val raw: GremlinScala[NodeType]) {
     If used before the repeat step it as "while" characteristics.
     If used after the repeat step it as "do-while" characteristics
     */
-  def until(untilTraversal: Steps[NodeType] => Steps[_]): Steps[NodeType] =
-    new Steps[NodeType](
+  def until(untilTraversal: Steps[A] => Steps[_]): Steps[A] =
+    new Steps[A](
       raw.until { rawTraversal =>
         untilTraversal(
-          new Steps[NodeType](rawTraversal)
+          new Steps[A](rawTraversal)
         ).raw
       }
     )
@@ -197,27 +197,27 @@ class Steps[NodeType](val raw: GremlinScala[NodeType]) {
     * Modifier for repeat steps. Configure the amount of times the repeat traversal is
     * executed.
     */
-  def times(maxLoops: Int): Steps[NodeType] = {
-    new Steps[NodeType](raw.times(maxLoops))
+  def times(maxLoops: Int): Steps[A] = {
+    new Steps[A](raw.times(maxLoops))
   }
 
   /**
     Emit is used with the repeat step to emit the elements of the repeatTraversal after each
     iteration of the repeat loop.
     */
-  def emit(): Steps[NodeType] =
-    new Steps[NodeType](raw.emit())
+  def emit(): Steps[A] =
+    new Steps[A](raw.emit())
 
   /**
     Emit is used with the repeat step to emit the elements of the repeatTraversal after each
     iteration of the repeat loop.
     The emitTraversal defines under which condition the elements are emitted.
     */
-  def emit(emitTraversal: Steps[NodeType] => Steps[_]): Steps[NodeType] =
-    new Steps[NodeType](
+  def emit(emitTraversal: Steps[A] => Steps[_]): Steps[A] =
+    new Steps[A](
       raw.emit { rawTraversal =>
         emitTraversal(
-          new Steps[NodeType](rawTraversal)
+          new Steps[A](rawTraversal)
         ).raw
       }
     )
@@ -225,49 +225,35 @@ class Steps[NodeType](val raw: GremlinScala[NodeType]) {
   /**
     * Keep elements if the provided `predicate` traversal returns something
     */
-  def filter(predicate: Steps[NodeType] => Steps[_]): Steps[NodeType] =
-    new Steps[NodeType](
-      raw.filter { gs =>
-        predicate(
-          new Steps[NodeType](gs.asInstanceOf[GremlinScala[NodeType]])
-        ).raw
-      }
-    )
+  def filter(predicate: Steps[A] => Steps[_]): Steps[A] =
+    new Steps[A](raw.filter(gs => predicate(new Steps[A](gs)).raw))
 
   /**
     * Keep elements if they do not match the predicate `predicate`
     * */
-  def filterNot(predicate: Steps[NodeType] => Steps[_]): Steps[NodeType] =
-    new Steps[NodeType](
-      raw.filterNot { gs =>
-        predicate(
-          new Steps[NodeType](gs.asInstanceOf[GremlinScala[NodeType]])
-        ).raw
-      }
-    )
+  def filterNot(predicate: Steps[A] => Steps[_]): Steps[A] =
+    new Steps[A](raw.filterNot(gs => predicate(new Steps[A](gs)).raw))
 
   /**
     Same as filter, but operates with a lambda (will only work with local databases)
     */
-  def filterOnEnd(predicate: NodeType => Boolean): Steps[NodeType] =
-    new Steps[NodeType](
-      raw.filterOnEnd(predicate)
-    )
+  def filterOnEnd(predicate: A => Boolean): Steps[A] =
+    new Steps[A](raw.filterOnEnd(predicate))
 
   /**
     * The or step is a filter with multiple or related filter traversals.
     */
-  def or(orTraversals: (Steps[NodeType] => Steps[_])*): Steps[NodeType] = {
+  def or(orTraversals: (Steps[A] => Steps[_])*): Steps[A] = {
     val rawOrTraversals = rawTraversals(orTraversals: _*)
-    new Steps[NodeType](raw.or(rawOrTraversals: _*))
+    new Steps[A](raw.or(rawOrTraversals: _*))
   }
 
   /**
     * The and step is a filter with multiple and related filter traversals.
     * */
-  def and(andTraversals: (Steps[NodeType] => Steps[_])*): Steps[NodeType] = {
+  def and(andTraversals: (Steps[A] => Steps[_])*): Steps[A] = {
     val rawAndTraversals = rawTraversals(andTraversals: _*)
-    new Steps[NodeType](
+    new Steps[A](
       raw.and(rawAndTraversals: _*)
     )
   }
@@ -282,39 +268,36 @@ class Steps[NodeType](val raw: GremlinScala[NodeType]) {
       }
     )
 
-  private def rawTraversals(traversals: (Steps[NodeType] => Steps[_])*) =
-    traversals.map { traversal => (rawTraversal: GremlinScala[NodeType]) =>
+  private def rawTraversals(traversals: (Steps[A] => Steps[_])*) =
+    traversals.map { traversal => (rawTraversal: GremlinScala[A]) =>
       traversal(
-        new Steps[NodeType](rawTraversal.asInstanceOf[GremlinScala[NodeType]])
+        new Steps[A](rawTraversal)
       ).raw
     }
 
-  def range(low: Long, high: Long): Steps[NodeType] =
-    new Steps[NodeType](raw.range(low, high))
+  def range(low: Long, high: Long): Steps[A] =
+    new Steps[A](raw.range(low, high))
 
-  def range(scope: Scope, low: Long, high: Long): Steps[NodeType] =
-    new Steps[NodeType](raw.range(scope, low, high))
+  def range(scope: Scope, low: Long, high: Long): Steps[A] =
+    new Steps[A](raw.range(scope, low, high))
 
   /**
     * Step that applies the map `fun` to each element.
     */
-  def map[NewNodeType](fun: NodeType => NewNodeType): Steps[NewNodeType] =
-    new Steps[NewNodeType](raw.map(fun))
+  def map[B](fun: A => B): Steps[B] =
+    new Steps[B](raw.map(fun))
 
   /**
     Step that applies the map `fun` to each element and flattens the result.
     */
-  def flatMap[NewNodeType](fun: NodeType => Steps[NewNodeType]): Steps[NewNodeType] =
-    new Steps[NewNodeType](
-      raw.flatMap { n: NodeType =>
-        fun(n).raw
-      }
-    )
+  def flatMap[B](fun: A => Steps[B]): Steps[B] =
+    new Steps[B](raw.flatMap { a: A =>
+      fun(a).raw
+    })
 
   /**
     * Step that orders nodes according to f.
     * */
-  def orderBy[A](fun: NodeType => A): Steps[NodeType] =
-    new Steps[NodeType](raw.order(By(fun)))
-
+  def orderBy[B](fun: A => B): Steps[A] =
+    new Steps[A](raw.order(By(fun)))
 }
