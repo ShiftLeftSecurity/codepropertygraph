@@ -1,5 +1,6 @@
 package io.shiftleft.semanticcpg.language
 
+import gremlin.scala.P
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
@@ -68,6 +69,25 @@ class StepsTest extends WordSpec with Matchers {
 
       mainMethods.size shouldBe 1
       allMethods.size should be > 1
+    }
+  }
+
+  "count/size" in ExistingCpgFixture("splitmeup") { fixture =>
+    val methodCount: Long = fixture.cpg.method.count.head
+    methodCount should be > 30L
+  }
+
+  "filter on count/size" when {
+    "comparing against concrete value" in ExistingCpgFixture("splitmeup") { fixture =>
+      val methodsWithOneParam: Long =
+        fixture.cpg.method.filter(_.parameter.size.is(Long.box(1))).size.head
+      methodsWithOneParam should be > 5L
+    }
+
+    "comparing against predicate" in ExistingCpgFixture("splitmeup") { fixture =>
+      val methodsWithMoreThanOneParams: Long =
+        fixture.cpg.method.filter(_.parameter.size.is(P.gt(1))).size.head
+      methodsWithMoreThanOneParams should be > 20L
     }
   }
 

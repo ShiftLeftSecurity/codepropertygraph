@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.language
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes._
+import java.lang.{Long => JLong}
 import java.util.{List => JList}
 
 import org.apache.tinkerpop.gremlin.process.traversal.Scope
@@ -300,4 +301,19 @@ class Steps[A](val raw: GremlinScala[A]) {
     * */
   def orderBy[B](fun: A => B): Steps[A] =
     new Steps[A](raw.order(By(fun)))
+
+  /** count number of elements */
+  def count: Steps[JLong] =
+    new Steps[JLong](raw.count)
+
+  /** alias for [[count]] step */
+  def size: Steps[JLong] = count
+
+  /** filter by a concrete value to compare against */
+  def is(value: AnyRef): Steps[A] =
+    new Steps[A](raw.is(value))
+
+  /** filter by a Predicate, e.g. [[P.gt(5)]] or [[P.eq(42)]] */
+  def is(predicate: P[A]): Steps[A] =
+    new Steps[A](raw.is(predicate))
 }
