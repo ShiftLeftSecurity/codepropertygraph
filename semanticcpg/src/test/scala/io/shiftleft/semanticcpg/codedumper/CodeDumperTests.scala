@@ -10,7 +10,8 @@ class CodeDumperTests extends WordSpec with Matchers {
 
   val code = """
                 | // A comment
-                |int my_func(int param1) {
+                |int my_func(int param1)
+                |{
                 |   int x = foo(param1);
                 |}""".stripMargin
 
