@@ -86,7 +86,7 @@ generateProtobuf := {
     if (result == 0 && scriptOutputFile.exists) {
       output.createIfNotExists(createParents = true)
       scriptOutputFile.copyTo(output)(better.files.File.CopyOptions(overwrite = true))
-      println(s"successfully wrote protobuf to $result")
+      println(s"successfully wrote protobuf to $scriptOutputFile")
     } else throw new Exception(s"problem when calling $cmd. exitCode was $result")
   } else {
     println("no need to regenerate protobuf")
