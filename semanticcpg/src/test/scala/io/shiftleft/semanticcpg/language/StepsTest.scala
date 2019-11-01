@@ -80,7 +80,7 @@ class StepsTest extends WordSpec with Matchers {
   "filter on count/size" when {
     "comparing against concrete value" in ExistingCpgFixture("splitmeup") { fixture =>
       val methodsWithOneParam: Long =
-        fixture.cpg.method.filter(_.parameter.size.is(Long.box(1))).size.head
+        fixture.cpg.method.filter(_.parameter.size.is(1)).size.head
       methodsWithOneParam should be > 5L
     }
 
