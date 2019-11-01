@@ -10,6 +10,7 @@ class PPrinterTest extends WordSpec with Matchers {
   val IntGreenForeground = "\u001b[32mint\u001b[m"
   val IfBlueBold = "\u001b[01;34mif\u001b[m"
   val FBold = "\u001b[01mF\u001b[m"
+  val X8bit = "\u001b[00;38;05;70mX\u001b[m"
 
   "fansi encoding fix" must {
     "handle different ansi encoding termination" in {
@@ -31,6 +32,13 @@ class PPrinterTest extends WordSpec with Matchers {
       val fixedForFansi = pprinter.fixForFansi(IfBlueBold)
       fixedForFansi shouldBe "\u001b[1m\u001b[34mif\u001b[39m"
       fansi.Str(fixedForFansi) shouldBe fansi.Color.Blue("if").overlay(fansi.Bold.On)
+    }
+
+    "handle 8bit (256) 'full' colors" in {
+      // `[00;38;05;70m` is encoded as `[38;5;70m` in fansi
+      val fixedForFansi = pprinter.fixForFansi(X8bit)
+      fixedForFansi shouldBe "\u001b[38;5;70mX\u001b[39m"
+      fansi.Str(fixedForFansi) shouldBe fansi.Color.Full(70)("X")
     }
   }
 
