@@ -9,8 +9,7 @@ class CDataFlowTests extends CpgDataFlowTests {
     cpgFactory.buildCpg(
       """
         |
-        | void flows1(FILE *fd, int mode)
-        | {
+        | void flows1(FILE *fd, int mode) {
         |     char buff[40];
         |
         |     int sz = 0;

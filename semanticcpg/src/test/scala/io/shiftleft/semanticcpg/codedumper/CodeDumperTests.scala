@@ -9,7 +9,9 @@ import io.shiftleft.semanticcpg.language._
 class CodeDumperTests extends WordSpec with Matchers {
 
   val code = """
-                |int my_func(int param1) {
+                | // A comment
+                |int my_func(int param1)
+                |{
                 |   int x = foo(param1);
                 |}""".stripMargin
 
@@ -23,7 +25,7 @@ class CodeDumperTests extends WordSpec with Matchers {
     "should be able to dump complete function" in {
       val query = cpg.method.name("my_func")
       val code = CodeDumper.dump(query, false).mkString("\n")
-      code should startWith(CodeDumper.arrow.toString)
+      code should startWith("int my_func")
       code should include("foo(param1)")
       code should endWith("}")
     }
@@ -32,7 +34,7 @@ class CodeDumperTests extends WordSpec with Matchers {
       val query = cpg.call.name("foo")
       val code = CodeDumper.dump(query, false).mkString("\n")
       code should startWith("int")
-      code should include regex (Pattern.quote(CodeDumper.arrow.toString) + ".*" + "int x = foo" + ".*")
+      code should include regex (".*" + "int x = foo" + ".*" + Pattern.quote(CodeDumper.arrow.toString) + ".*")
       code should endWith("}")
     }
 
@@ -42,7 +44,7 @@ class CodeDumperTests extends WordSpec with Matchers {
 
     "should allow dumping via .dump" in {
       val code = cpg.method.name("my_func").dumpRaw.mkString("\n")
-      code should startWith(CodeDumper.arrow.toString)
+      code should startWith("int my_func")
     }
 
     "should allow dumping callIn" in {
