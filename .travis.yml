@@ -71,7 +71,7 @@ jobs:
     - echo "TR TAG= $TRAVIS_TAG"
     - echo "TR TAG:1= ${TRAVIS_TAG:1}"
   - stage: proto-bindings-for-go
-    script: sbt version
+    script: echo foo
 before_cache:
 - find $HOME/.sbt -name "*.lock" -type f -delete
 - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
