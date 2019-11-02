@@ -82,7 +82,7 @@ class CAstTests extends WordSpec with Matchers {
     }
 
     "should identify conditions" in {
-      cpg.method.name("foo").ast.isControlStructure.condition.code.l shouldBe List("x > 10", "y > x")
+      cpg.method.name("foo").controlStructure.condition.code.l shouldBe List("x > 10", "y > x")
     }
 
     "should allow parserTypeName filtering and then ast" in {
@@ -100,7 +100,7 @@ class CAstTests extends WordSpec with Matchers {
       query1Size shouldBe query2Size
     }
 
-    "should allow filtering on conditions" in {
+    "should allow filtering on control structures" in {
       cpg.method
         .name("foo")
         .controlStructure(".*x > 10.*")
