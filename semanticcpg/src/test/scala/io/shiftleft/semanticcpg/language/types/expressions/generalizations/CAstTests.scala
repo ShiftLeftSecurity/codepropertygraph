@@ -103,13 +103,13 @@ class CAstTests extends WordSpec with Matchers {
     "should allow filtering on conditions" in {
       cpg.method
         .name("foo")
-        .condition(".*x > 10.*")
+        .controlStructure(".*x > 10.*")
         .l
         .size shouldBe 1
 
       cpg.method
         .name("foo")
-        .condition(".*x > 10.*")
+        .controlStructure(".*x > 10.*")
         .whenTrue
         .ast
         .isReturnNode
@@ -118,7 +118,7 @@ class CAstTests extends WordSpec with Matchers {
 
       cpg.method
         .name("foo")
-        .condition(".*x > 10.*")
+        .controlStructure(".*x > 10.*")
         .whenFalse
         .ast
         .isCall

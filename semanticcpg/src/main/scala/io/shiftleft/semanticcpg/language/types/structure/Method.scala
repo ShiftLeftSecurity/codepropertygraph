@@ -60,9 +60,14 @@ class Method(override val raw: GremlinScala[nodes.Method])
   }
 
   /**
+    * All control structures of this method
+    * */
+  def controlStructure: ControlStructure = ast.isControlStructure
+
+  /**
     * Shorthand to traverse to control structures where condition matches `regex`
     * */
-  def condition(regex: String): ControlStructure = ast.isControlStructure.condition(regex)
+  def controlStructure(regex: String): ControlStructure = ast.isControlStructure.code(regex)
 
   /**
     * Outgoing call sites
