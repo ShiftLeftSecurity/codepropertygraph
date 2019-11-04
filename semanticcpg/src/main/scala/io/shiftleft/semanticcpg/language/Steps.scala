@@ -300,4 +300,7 @@ class Steps[A](val raw: GremlinScala[A]) {
     * */
   def orderBy[B](fun: A => B): Steps[A] =
     new Steps[A](raw.order(By(fun)))
+
+  def size: Int = l.size
+
 }
