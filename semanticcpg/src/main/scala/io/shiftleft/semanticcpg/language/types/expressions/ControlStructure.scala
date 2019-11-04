@@ -26,12 +26,6 @@ class ControlStructure(raw: GremlinScala[nodes.ControlStructure])
   def condition: Expression =
     new Expression(raw.out(EdgeTypes.CONDITION).cast[nodes.Expression])
 
-  /**
-    * Only those control structures where condition matched `regex`
-    * */
-  def condition(regex: String): ControlStructure =
-    new ControlStructure(this.filterOnEnd(_.code.matches(regex)).raw)
-
   def whenTrue: AstNode = new AstNode(
     raw.out.has(NodeKeys.ORDER, secondChildIndex).cast[nodes.AstNode]
   )
