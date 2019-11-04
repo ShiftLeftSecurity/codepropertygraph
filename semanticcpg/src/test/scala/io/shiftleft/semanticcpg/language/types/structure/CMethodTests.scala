@@ -56,8 +56,8 @@ class CMethodTests extends WordSpec with Matchers {
     }
 
     "should allow filtering by number of parameters" in {
-      cpg.method.filterOnEnd(_.parameter.size == 2).name.l shouldBe List("main")
-      cpg.method.filterOnEnd(_.parameter.size == 1).name.l shouldBe List()
+      cpg.method.where(_.parameter.size == 2).name.l shouldBe List("main")
+      cpg.method.where(_.parameter.size == 1).name.l shouldBe List()
     }
 
   }
