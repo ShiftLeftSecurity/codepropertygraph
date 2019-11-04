@@ -23,7 +23,7 @@ class StepsTest extends WordSpec with Matchers {
       val mainMethods: List[nodes.Method] =
         fixture.cpg.method
           .name(".*")
-          .filterOnEnd(_.fullName.matches(".*main.*"))
+          .where(_.fullName.matches(".*main.*"))
           .toList
 
       mainMethods.size shouldBe 1
@@ -63,7 +63,7 @@ class StepsTest extends WordSpec with Matchers {
         fixture.cpg.method
           .name(".*")
           .aggregate(allMethods)
-          .filterOnEnd(_.fullName.matches(".*main.*"))
+          .where(_.fullName.matches(".*main.*"))
           .toList
 
       mainMethods.size shouldBe 1

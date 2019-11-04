@@ -52,7 +52,7 @@ class CAstTests extends WordSpec with Matchers {
         .name("moo")
         .callIn
         .argument(1)
-        .filterOnEnd(
+        .where(
           arg =>
             arg.start.ast
               .isCallTo("<operator>.(addition|multiplication)")

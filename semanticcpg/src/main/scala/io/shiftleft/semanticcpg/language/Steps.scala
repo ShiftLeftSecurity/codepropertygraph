@@ -237,8 +237,12 @@ class Steps[A](val raw: GremlinScala[A]) {
   /**
     Same as filter, but operates with a lambda (will only work with local databases)
     */
-  def filterOnEnd(predicate: A => Boolean): Steps[A] =
+  def where(predicate: A => Boolean): Steps[A] =
     new Steps[A](raw.filterOnEnd(predicate))
+
+  @deprecated("", "Nov. 2019")
+  def filterOnEnd(predicate: A => Boolean): Steps[A] =
+    where(predicate)
 
   /**
     * The or step is a filter with multiple or related filter traversals.
