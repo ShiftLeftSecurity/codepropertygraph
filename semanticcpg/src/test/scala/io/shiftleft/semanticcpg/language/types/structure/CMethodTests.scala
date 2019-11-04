@@ -55,6 +55,11 @@ class CMethodTests extends WordSpec with Matchers {
       cpg.method.name("main").file.name.l should not be empty
     }
 
+    "should allow filtering by number of parameters" in {
+      cpg.method.filterOnEnd(_.parameter.size == 2).name.l shouldBe List("main")
+      cpg.method.filterOnEnd(_.parameter.size == 1).name.l shouldBe List()
+    }
+
   }
 
 }
