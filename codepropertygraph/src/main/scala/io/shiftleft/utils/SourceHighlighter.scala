@@ -27,7 +27,7 @@ object SourceHighlighter {
       case exception: Exception =>
         logger.info("syntax highlighting not working. Is `source-highlight` installed?")
         logger.info(exception)
-        None
+        Some(source.code)
     } finally {
       tmpSrcFile.delete()
     }
