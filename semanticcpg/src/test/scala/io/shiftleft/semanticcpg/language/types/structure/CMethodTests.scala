@@ -10,12 +10,25 @@ import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
 class CMethodTests extends WordSpec with Matchers {
 
   val code = """
-       int main(int argc, char **argv) { }
+       int main(int argc, char **argv) {
+       }
     """
 
   CodeToCpgFixture(code) { cpg =>
     "should return correct function/method name" in {
       cpg.method.name.toSet shouldBe Set("main")
+    }
+
+    "should return correct line number" in {
+      cpg.method.lineNumber.l shouldBe List(2)
+    }
+
+    "should return correct end line number" in {
+      cpg.method.lineNumberEnd.l shouldBe List(3)
+    }
+
+    "should return correct number of lines" in {
+      cpg.method.numberOfLines.l shouldBe List(2)
     }
 
     "should have correct type signature" in {

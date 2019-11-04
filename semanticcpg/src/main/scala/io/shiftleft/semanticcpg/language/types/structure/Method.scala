@@ -23,6 +23,7 @@ class Method(override val raw: GremlinScala[nodes.Method])
     with FullNameAccessors[nodes.Method]
     with SignatureAccessors[nodes.Method]
     with LineNumberAccessors[nodes.Method]
+    with LineNumberEndAccessors[nodes.Method]
     with EvalTypeAccessors[nodes.Method]
     with AstNodeBase[nodes.Method]
     with ModifierAccessors[nodes.Method] {
@@ -235,5 +236,11 @@ class Method(override val raw: GremlinScala[nodes.Method])
     * */
   def namespace: Namespace =
     new Namespace(definingTypeDecl.namespace.raw)
+
+  def numberOfLines: Steps[Int] =
+    new Steps(raw.collect {
+      case x: nodes.Method if x.lineNumber.isDefined && x.lineNumberEnd.isDefined =>
+        x.lineNumberEnd.get - x.lineNumber.get + 1
+    })
 
 }
