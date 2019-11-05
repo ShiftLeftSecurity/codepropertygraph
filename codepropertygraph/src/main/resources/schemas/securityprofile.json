@@ -74,6 +74,7 @@
             {"localName" : "nodeType", "nodeType" : "TYPE", "cardinality" : "one"}
         ]},	{"id" : 203, "name" : "SINK", "comment" : "", "keys" : ["SINK_TYPE"], "comment" : "", "outEdges" : [], "containedNodes" : [
             {"localName" : "node", "nodeType" : "TRACKING_POINT", "cardinality" : "one"},
+	    {"localName" : "nodeType", "nodeType" : "TYPE", "cardinality" : "one"},
             {"localName" : "method", "nodeType" : "METHOD", "cardinality" : "one" },
             {"localName" : "methodTags", "nodeType" : "TAG", "cardinality" : "list"},
             {"localName" : "callingMethod", "nodeType" : "METHOD", "cardinality" : "zeroOrOne"},
