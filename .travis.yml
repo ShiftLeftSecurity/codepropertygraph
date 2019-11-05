@@ -67,11 +67,13 @@ jobs:
     - export HIGHEST_TAG=$(git tag --points-at HEAD | sort --version-sort | tail -n1)
     - export VERSION=${HIGHEST_TAG:1}
     - echo "releasing csharp proto bindings v$VERSION"
-    - echo "foo $(git tag --points-at HEAD | sort --version-sort | tail -n1)"
-    - echo "TR TAG= $TRAVIS_TAG"
-    - echo "TR TAG:1= ${TRAVIS_TAG:1}"
   - stage: proto-bindings-for-go
-    script: echo foo2
+    script:
+    - sbt generateGoBindings
+    - export PUBLISH_TO_REPO="git@github.com:ShiftLeftSecurity/go-cpg.git"
+    - export HIGHEST_TAG=$(git tag --points-at HEAD | sort --version-sort | tail -n1)
+    - export VERSION=${HIGHEST_TAG:1}
+    - echo "publishing go protoc bindings for v$VERSION to ${PUBLISH_TO_REPO}"
 before_cache:
 - find $HOME/.sbt -name "*.lock" -type f -delete
 - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
