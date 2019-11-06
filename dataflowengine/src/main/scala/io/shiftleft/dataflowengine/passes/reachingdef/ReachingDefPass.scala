@@ -238,7 +238,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
         .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
 
       val identifierWithOrder =
-        filterArgumentIndex(genExpression._astOut.asScala.toList, methodParamOutsOrder)
+        filterArgumentIndex(genExpression._argumentOut.asScala.toList, methodParamOutsOrder)
       genSet ++= identifierWithOrder
     }
     genSet
@@ -251,14 +251,14 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
       .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
 
     val identifierWithOrder =
-      filterArgumentIndex(expr._astOut.asScala.toList, methodParamOutsOrder)
+      filterArgumentIndex(expr._argumentOut.asScala.toList, methodParamOutsOrder)
     gens ++= identifierWithOrder
 
     gens
   }
 
   def getUsesOfExpression(expr: nodes.StoredNode): Set[nodes.StoredNode] = {
-    expr._astOut.asScala
+    expr._argumentOut.asScala
       .filter(!getGensOfExpression(expr).contains(_))
       .toSet
   }
@@ -302,7 +302,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
 
   def getOperation(vertex: nodes.StoredNode): Option[nodes.StoredNode] = {
     vertex match {
-      case _: nodes.Identifier => getOperation(vertex._astIn.nextChecked)
+      case _: nodes.Identifier => getOperation(vertex._argumentIn().nextChecked)
       case _: nodes.Call       => Some(vertex)
       case _: nodes.Return     => Some(vertex)
       case _                   => None

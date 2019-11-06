@@ -181,7 +181,8 @@
          "outEdges" : [
              {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]},
              {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "CONTROL_STRUCTURE"]},
-             {"edgeName": "RECEIVER", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "BLOCK", "UNKNOWN"]}
+             {"edgeName": "RECEIVER", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "BLOCK", "UNKNOWN"]},
+             {"edgeName": "ARGUMENT", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "BLOCK", "UNKNOWN"]}
          ]
         },
         {"id":23, "name" : "LOCAL",
@@ -204,7 +205,8 @@
          "is": [ "EXPRESSION"],
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN", "CONTROL_STRUCTURE"]},
-             {"edgeName": "CFG", "inNodes": ["METHOD_RETURN"]}
+             {"edgeName": "CFG", "inNodes": ["METHOD_RETURN"]},
+             {"edgeName": "ARGUMENT", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
          ]
         },
         {"id":31, "name": "BLOCK",
@@ -296,7 +298,8 @@
         {"id" : 30, "name": "VTABLE", "comment" : "Indicates that a method is part of the vtable of a certain type declaration", "keys": []},
         {"id" : 55, "name": "RECEIVER", "comment" : "The receiver of a method call which is either an object or a pointer", "keys": []},
         {"id" : 56, "name": "CONDITION", "comment" : "Edge from control structure node to the expression that holds the condition", "keys" : []},
-        {"id" : 155, "name": "BINDS", "comment" : "Relation between TYPE_DECL and BINDING node", "keys": []}
+        {"id" : 155, "name": "BINDS", "comment" : "Relation between TYPE_DECL and BINDING node", "keys": []},
+        {"id" : 156, "name": "ARGUMENT", "comment" : "Relation between a CALL and its arguments and RETURN and the returned expression", "keys": []}
 
     ],
 
