@@ -38,7 +38,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
     if (!call.edges(Direction.OUT, EdgeTypes.REF).hasNext) {
       try {
         val memberName = call
-          .vertices(Direction.OUT, EdgeTypes.AST)
+          .vertices(Direction.OUT, EdgeTypes.ARGUMENT)
           .asScala
           .filter(_.value(NodeKeys.ORDER.name) == 2)
           .asJava

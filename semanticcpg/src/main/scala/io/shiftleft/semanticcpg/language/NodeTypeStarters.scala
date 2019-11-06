@@ -113,6 +113,12 @@ class NodeTypeStarters(cpg: Cpg) {
     call.argument
 
   /**
+    * Traverse to all return expressions
+    */
+  def returnExpression: Return =
+    new Return(scalaGraph.V.hasLabel(NodeTypes.RETURN).cast[nodes.Return])
+
+  /**
     * Traverse to all meta data entries
     */
   def metaData: MetaData =

@@ -94,12 +94,12 @@ class TrackingPoint(raw: GremlinScala[nodes.TrackingPoint]) extends NodeSteps[no
   private def getTrackingPoint(vertex: Vertex): Option[nodes.TrackingPoint] = {
     vertex match {
       case identifier: nodes.Identifier =>
-        getTrackingPoint(identifier._astIn.nextChecked)
+        getTrackingPoint(identifier._argumentIn().nextChecked)
       case call: nodes.Call                       => Some(call)
       case ret: nodes.Return                      => Some(ret)
       case methodReturn: nodes.MethodReturn       => Some(methodReturn)
       case methodParamIn: nodes.MethodParameterIn => Some(methodParamIn)
-      case literal: nodes.Literal                 => getTrackingPoint(literal._astIn.nextChecked)
+      case literal: nodes.Literal                 => getTrackingPoint(literal._argumentIn().nextChecked)
       case _                                      => None
     }
   }

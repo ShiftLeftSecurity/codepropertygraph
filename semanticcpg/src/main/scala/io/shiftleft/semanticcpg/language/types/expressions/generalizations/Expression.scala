@@ -53,13 +53,13 @@ trait ExpressionBase[NodeType <: nodes.Expression]
     * Only those expressions which are (direct) arguments of a call
     * */
   def isArgument: Expression =
-    new Expression(raw.filter(_.in(EdgeTypes.AST).hasLabel(NodeTypes.CALL)).cast[nodes.Expression])
+    new Expression(raw.filter(_.in(EdgeTypes.ARGUMENT)).cast[nodes.Expression])
 
   /**
     * Traverse to surrounding call
     * */
   def call: Call = new Call(
-    raw.repeat(_.in(EdgeTypes.AST)).until(_.hasLabel(NodeTypes.CALL)).cast[nodes.Call]
+    raw.repeat(_.in(EdgeTypes.ARGUMENT)).until(_.hasLabel(NodeTypes.CALL)).cast[nodes.Call]
   )
 
   /**
@@ -75,7 +75,7 @@ trait ExpressionBase[NodeType <: nodes.Expression]
     new MethodParameter(
       raw
         .sack((sack: Integer, node: nodes.Expression) => node.value2(NodeKeys.ARGUMENT_INDEX))
-        .in(EdgeTypes.AST)
+        .in(EdgeTypes.ARGUMENT)
         .out(EdgeTypes.CALL)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.METHOD_PARAMETER_IN)

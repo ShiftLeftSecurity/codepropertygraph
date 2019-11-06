@@ -49,7 +49,7 @@ class Call(raw: GremlinScala[nodes.Call])
     Arguments of the call
     */
   def argument: Expression =
-    new Expression(raw.out(EdgeTypes.AST).cast[nodes.Expression])
+    new Expression(raw.out(EdgeTypes.ARGUMENT).cast[nodes.Expression])
 
   /**
     `i'th` arguments of the call

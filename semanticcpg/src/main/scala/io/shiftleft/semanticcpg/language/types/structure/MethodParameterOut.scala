@@ -39,7 +39,7 @@ class MethodParameterOut(raw: GremlinScala[nodes.MethodParameterOut])
         .sack((_: Integer, node: nodes.MethodParameterOut) => node.value2(NodeKeys.ORDER))
         .in(EdgeTypes.AST)
         .in(EdgeTypes.CALL)
-        .out(EdgeTypes.AST)
+        .out(EdgeTypes.ARGUMENT)
         .filterWithTraverser { traverser =>
           val argumentIndex = traverser.sack[Integer]
           traverser.get.value2(NodeKeys.ARGUMENT_INDEX) == argumentIndex

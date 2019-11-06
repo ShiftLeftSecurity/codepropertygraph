@@ -31,7 +31,7 @@ object ExpandTo {
   }
 
   def callArguments(callNode: Vertex): Iterator[nodes.Expression] = {
-    callNode.asInstanceOf[nodes.StoredNode]._astOut.asScala.map(_.asInstanceOf[nodes.Expression])
+    callNode.asInstanceOf[nodes.StoredNode]._argumentOut.asScala.map(_.asInstanceOf[nodes.Expression])
   }
 
   def argumentToCallOrReturn(argument: Vertex): nodes.Expression = {
