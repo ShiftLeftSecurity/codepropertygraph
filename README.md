@@ -1,5 +1,5 @@
 [![Build Status](https://secure.travis-ci.org/ShiftLeftSecurity/codepropertygraph.png?branch=master)](http://travis-ci.org/ShiftLeftSecurity/codepropertygraph)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.shiftleft/codepropertygraph_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.shiftleft/codepropertygraph_2.12)
+[![JCenter](https://api.bintray.com/packages/shiftleft/maven/codepropertygraph/images/download.svg)](https://bintray.com/shiftleft/maven/codepropertygraph/_latestVersion)
 
 # Code Property Graph - Specification and Tooling
 
