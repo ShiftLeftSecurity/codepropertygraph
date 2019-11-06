@@ -27,22 +27,15 @@ install:
 - python --version
 stages:
 - name: test
-- name: release-jfrog
-  if: branch = master AND type = push
-- name: release-sonatype
+- name: release
   if: branch = master AND type = push
 - name: python-test-and-release
 jobs:
   include:
   - stage: test
     script: sbt scalafmtCheck test
-  - stage: release-jfrog
-    script: sbt ciReleaseTagNextVersion 'set ThisBuild/publishTo := Some("releases"
-      at "https://shiftleft.jfrog.io/shiftleft/libs-release-local")' "set credentials
-      += Credentials(\"Artifactory Realm\", \"shiftleft.jfrog.io\", \"$JFROG_USER\",
-      \"$JFROG_PASS\")" ciRelease
-  - stage: release-sonatype
-    script: sbt ciReleaseSonatype
+  - stage: release
+    script: sbt ciReleaseTagNextVersion ciReleaseBintray
   - stage: python-test-and-release
     script:
     - pip install requests
