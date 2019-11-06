@@ -13,7 +13,7 @@ class ArgumentCompat(cpg: Cpg) extends CpgPass(cpg) {
     val oldFormat = cpg.graph.traversal.E().hasLabel(EdgeTypes.ARGUMENT).range(0, 1).toList.isEmpty
 
     if (oldFormat) {
-      ArgumentCompat.logger.warn(s"Using old CPG format not containing ARGUMENT edges.")
+      ArgumentCompat.logger.info(s"Using old CPG format not containing ARGUMENT edges.")
 
       val diffGraph = new DiffGraph
       val callIterator = cpg.call.toIterator()
