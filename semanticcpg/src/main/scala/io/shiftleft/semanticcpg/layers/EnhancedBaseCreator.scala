@@ -4,6 +4,8 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.CpgPass
+import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
+import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
 import io.shiftleft.semanticcpg.passes.compat.bindingtablecompat.BindingTableCompat
 import io.shiftleft.semanticcpg.passes.compat.argumentcompat.ArgumentCompat
 import io.shiftleft.semanticcpg.passes.compat.callnamecompat.CallNameFixup
@@ -38,6 +40,8 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new MethodExternalDecoratorPass(cpg),
           new ContainsEdgePass(cpg),
           new NamespaceCreator(cpg),
+          new CfgDominatorPass(cpg),
+          new CdgPass(cpg),
         )
       case Languages.C =>
         List(
@@ -54,6 +58,8 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new MethodExternalDecoratorPass(cpg),
           new ContainsEdgePass(cpg),
           new NamespaceCreator(cpg),
+          new CfgDominatorPass(cpg),
+          new CdgPass(cpg),
         )
     }
   }
