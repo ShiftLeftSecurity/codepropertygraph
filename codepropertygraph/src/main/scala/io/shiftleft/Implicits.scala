@@ -14,7 +14,7 @@ object Implicits {
       try {
         iterator.next
       } catch {
-        case _: Exception =>
+        case _: NoSuchElementException =>
           throw new NoSuchElementException()
       }
     }
