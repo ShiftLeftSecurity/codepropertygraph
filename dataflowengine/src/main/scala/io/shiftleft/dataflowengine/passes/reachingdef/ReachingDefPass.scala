@@ -308,9 +308,9 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
         } else {
           None
         }
-      case _: nodes.Call       => Some(vertex)
-      case _: nodes.Return     => Some(vertex)
-      case _                   => None
+      case _: nodes.Call   => Some(vertex)
+      case _: nodes.Return => Some(vertex)
+      case _               => None
     }
   }
 }
