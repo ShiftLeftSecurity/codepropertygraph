@@ -35,7 +35,7 @@ stages:
 jobs:
   include:
   - stage: test
-    script: sbt test scalafmtCheck
+    script: sbt scalafmtCheck test
   - stage: release-jfrog
     script: sbt ciReleaseTagNextVersion 'set ThisBuild/publishTo := Some("releases"
       at "https://shiftleft.jfrog.io/shiftleft/libs-release-local")' "set credentials

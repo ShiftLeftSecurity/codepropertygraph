@@ -302,10 +302,15 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
 
   def getOperation(vertex: nodes.StoredNode): Option[nodes.StoredNode] = {
     vertex match {
-      case _: nodes.Identifier => getOperation(vertex._argumentIn().nextChecked)
-      case _: nodes.Call       => Some(vertex)
-      case _: nodes.Return     => Some(vertex)
-      case _                   => None
+      case _: nodes.Identifier =>
+        if (vertex._argumentIn().hasNext) {
+          getOperation(vertex._argumentIn().nextChecked)
+        } else {
+          None
+        }
+      case _: nodes.Call   => Some(vertex)
+      case _: nodes.Return => Some(vertex)
+      case _               => None
     }
   }
 }
