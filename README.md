@@ -1,5 +1,5 @@
 [![Build Status](https://secure.travis-ci.org/ShiftLeftSecurity/codepropertygraph.png?branch=master)](http://travis-ci.org/ShiftLeftSecurity/codepropertygraph)
-[![JCenter](https://api.bintray.com/packages/shiftleft/maven/codepropertygraph/images/download.svg)](https://bintray.com/shiftleft/maven/codepropertygraph/_latestVersion)
+[![bintray](https://api.bintray.com/packages/shiftleft/maven/codepropertygraph/images/download.svg)](https://bintray.com/shiftleft/maven/codepropertygraph/_latestVersion)
 
 # Code Property Graph - Specification and Tooling
 
@@ -19,6 +19,14 @@ intermediate representations along with analysis results. With this
 goal in mind, the specification consists of a minimal base schema that
 can be augmented via extension schemas to enable storage of
 application-specific data.
+
+# Usage as a dependency
+`build.sbt`:
+```
+libraryDependencies += "io.shiftleft" %% "fuzzyc2cpg" % "x.y.z"
+resolvers += Resolver.bintrayRepo("shiftleft", "maven")
+```
+Other build tools: see [bintray instructions](https://bintray.com/shiftleft/maven/codepropertygraph/_latestVersion).
 
 # Building the code
 

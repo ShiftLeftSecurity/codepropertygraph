@@ -3,7 +3,7 @@ inThisBuild(
   List(
     organization := "io.shiftleft",
     scalaVersion := "2.12.8", // do not upgrade until https://github.com/lihaoyi/Ammonite/issues/1009 is resolved
-    resolvers ++= Seq(Resolver.mavenLocal, Resolver.jcenterRepo, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
+    resolvers ++= Seq(Resolver.mavenLocal, Resolver.bintrayRepo("shiftleft", "maven"), "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
     bintrayVcsUrl := Some("https://github.com/ShiftLeftSecurity/codepropertygraph"),
