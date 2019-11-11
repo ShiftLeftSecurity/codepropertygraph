@@ -133,7 +133,7 @@ trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
   /**
     * Traverse only to AST nodes that are return nodes
     * */
-  def isReturnNode: Return = new Return(
+  def isReturn: Return = new Return(
     raw.hasLabel(NodeTypes.RETURN).cast[nodes.Return]
   )
 

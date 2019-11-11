@@ -86,8 +86,8 @@ class FunctionComplexityMetrics extends WordSpec with Matchers {
     }
 
     "find functions with multiple returns" in {
-      cpg.method.where(_.ast.isReturnNode.l.size > 1).name.l shouldBe List("func_with_multiple_returns")
-      cpg.method.where(_.ast.isReturnNode.l.size == 1).name.l should not contain "func_with_multiple_returns"
+      cpg.method.where(_.ast.isReturn.l.size > 1).name.l shouldBe List("func_with_multiple_returns")
+      cpg.method.where(_.ast.isReturn.l.size == 1).name.l should not contain "func_with_multiple_returns"
     }
 
     "find functions with high number of loops" in {

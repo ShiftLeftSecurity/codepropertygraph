@@ -14,4 +14,5 @@ object CfgNodeMethods {
       case expr: nodes.Expression           => expr.code
     }
   }
+
 }

@@ -6,7 +6,6 @@ import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
 import io.shiftleft.semanticcpg.language.types.structure.Method
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
-import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
 
@@ -31,6 +30,12 @@ class TrackingPoint(raw: GremlinScala[nodes.TrackingPoint]) extends NodeSteps[no
       }
     )
   }
+
+
+  /**
+    * Convert to nearest CFG node
+    * */
+  def cfgNode: Steps[nodes.CfgNode] = map(_.cfgNode)
 
   def reachableBy(sourceTravs: NodeSteps[nodes.TrackingPoint]*): TrackingPoint = {
     val pathReachables = reachableByInternal(sourceTravs)

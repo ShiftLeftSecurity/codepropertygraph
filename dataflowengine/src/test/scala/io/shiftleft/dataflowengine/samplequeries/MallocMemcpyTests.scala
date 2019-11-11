@@ -4,7 +4,6 @@ import io.shiftleft.dataflowengine.language.DataFlowCodeToCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.dataflowengine.language._
-import io.shiftleft.codepropertygraph.generated.nodes
 
 class MallocMemcpyTests extends WordSpec with Matchers {
 
@@ -18,11 +17,13 @@ class MallocMemcpyTests extends WordSpec with Matchers {
 
   DataFlowCodeToCpgFixture(code) { cpg =>
     "find calls to malloc where first argument contains addition" in {
-      cpg.call.name("memcpy").argument(3).where { arg =>
-        arg.start.reachableBy(
-          cpg.call.name("malloc").argument(1).containsCallTo("<operator>.add.*")
-        ).where(_.asInstanceOf[nodes.Expression].code != arg.code).size > 0
-      }
+      cpg.call.name("memcpy")
+        .argument(3)
+        .whereNonEmpty( arg =>
+          arg.reachableBy(
+            cpg.call.name("malloc").argument(1).containsCallTo("<operator>.add.*")
+          ).filterNot(_.cfgNode.codeExact(arg.code))
+        )
     }
 
   }

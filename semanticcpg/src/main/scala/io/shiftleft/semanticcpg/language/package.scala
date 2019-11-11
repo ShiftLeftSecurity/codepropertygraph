@@ -23,6 +23,8 @@ package object language {
   // Implicit conversions from generated node types. We use these to add methods
   // to generated node types.
 
+  implicit def cfgNodeToAstNode(node: nodes.CfgNode): AstNodeMethods = new AstNodeMethods(node)
+
   implicit def toExtendedNode(node: Node): NodeMethods = new NodeMethods(node)
 
   implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods =

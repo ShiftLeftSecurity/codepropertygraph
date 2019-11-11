@@ -19,6 +19,7 @@ import scala.collection.mutable
   * There are no constraints on the element types, unlike e.g. [[NodeSteps]]
   */
 class Steps[A](val raw: GremlinScala[A]) {
+
   implicit lazy val graph: Graph = raw.traversal.asAdmin.getGraph.get
 
   def toIterator(): Iterator[A] = {
@@ -239,6 +240,9 @@ class Steps[A](val raw: GremlinScala[A]) {
     */
   def where(predicate: A => Boolean): Steps[A] =
     new Steps[A](raw.filterOnEnd(predicate))
+
+  def whereNonEmpty(predicate: A => Steps[_]): Steps[A] =
+    new Steps[A](raw.filterOnEnd(predicate(_).size > 0))
 
   @deprecated("", "Nov. 2019")
   def filterOnEnd(predicate: A => Boolean): Steps[A] =
