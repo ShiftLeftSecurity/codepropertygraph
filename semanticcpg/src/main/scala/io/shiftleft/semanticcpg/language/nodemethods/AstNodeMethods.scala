@@ -34,7 +34,6 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
     val additionalDepth = if (p(node)) { 1 } else { 0 }
 
     val childDepths = node.start.astChildren.map(_.depth(p)).l
-
     additionalDepth + (if (childDepths.isEmpty) {
                          0
                        } else {
