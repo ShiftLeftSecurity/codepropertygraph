@@ -20,8 +20,8 @@ trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
     * */
   def ast: AstNode = new AstNode(raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
 
-  def containsCallTo(regex: String): Call =
-    new Call(new AstNode(raw.cast[nodes.AstNode]).filter(_.ast.isCall.name(regex)).raw.cast[nodes.Call])
+  def containsCallTo(regex: String): Steps[NodeType] =
+    where(_.ast.isCall.name(regex).size > 0)
 
   def depth(p: nodes.AstNode => Boolean): Steps[Int] = map(_.depth(p))
 
