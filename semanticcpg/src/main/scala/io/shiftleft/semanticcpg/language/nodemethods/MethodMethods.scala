@@ -14,11 +14,11 @@ class MethodMethods(val node: nodes.Method) extends AnyVal {
 
   def local: Local = node.start.local
 
-  def controlStructure : ControlStructure = node.start.controlStructure
+  def controlStructure: ControlStructure = node.start.controlStructure
 
-  def ast : AstNode = node.start.ast
+  def ast: AstNode = node.start.ast
 
-  def numberOfLines : Int = {
+  def numberOfLines: Int = {
     if (node.lineNumber.isDefined && node.lineNumberEnd.isDefined) {
       node.lineNumberEnd.get - node.lineNumber.get + 1
     } else {

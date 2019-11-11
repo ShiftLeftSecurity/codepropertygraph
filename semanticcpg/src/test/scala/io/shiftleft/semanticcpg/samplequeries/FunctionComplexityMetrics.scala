@@ -59,7 +59,6 @@ class FunctionComplexityMetrics extends WordSpec with Matchers {
     """
 
   CodeToCpgFixture(code) { cpg =>
-
     "find functions with too many parameters" in {
       cpg.method.where(_.parameter.size > 4).name.l shouldBe List("too_many_params")
       cpg.method.where(_.parameter.size < 4).name.l should not contain "too_many_params"
@@ -67,7 +66,7 @@ class FunctionComplexityMetrics extends WordSpec with Matchers {
 
     "find functions with high cyclomatic complexity" in {
       cpg.method.where(_.controlStructure.size > 3).name.l shouldBe List("high_cyclomatic_complexity")
-      cpg.method.where(_.controlStructure.size <= 3).name.l should not contain("high_cyclomatic_complexity")
+      cpg.method.where(_.controlStructure.size <= 3).name.l should not contain ("high_cyclomatic_complexity")
     }
 
     "find functions that are long (in terms of line numbers)" in {

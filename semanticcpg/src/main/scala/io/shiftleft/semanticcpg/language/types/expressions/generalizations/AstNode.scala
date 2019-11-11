@@ -23,7 +23,7 @@ trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
   def containsCallTo(regex: String): Call =
     new Call(new AstNode(raw.cast[nodes.AstNode]).filter(_.ast.isCall.name(regex)).raw.cast[nodes.Call])
 
-  def depth(p : nodes.AstNode => Boolean) : Steps[Int] = map(_.depth(p))
+  def depth(p: nodes.AstNode => Boolean): Steps[Int] = map(_.depth(p))
 
   def isCallTo(regex: String): Call = isCall.name(regex)
 
