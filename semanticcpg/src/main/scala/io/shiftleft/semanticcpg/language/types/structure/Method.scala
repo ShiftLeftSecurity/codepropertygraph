@@ -237,10 +237,6 @@ class Method(override val raw: GremlinScala[nodes.Method])
   def namespace: Namespace =
     new Namespace(definingTypeDecl.namespace.raw)
 
-  def numberOfLines: Steps[Int] =
-    new Steps(raw.collect {
-      case x: nodes.Method if x.lineNumber.isDefined && x.lineNumberEnd.isDefined =>
-        x.lineNumberEnd.get - x.lineNumber.get + 1
-    })
+  def numberOfLines: Steps[Int] = map(_.numberOfLines)
 
 }
