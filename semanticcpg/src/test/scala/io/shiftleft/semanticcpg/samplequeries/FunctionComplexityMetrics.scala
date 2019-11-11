@@ -13,8 +13,8 @@ class FunctionComplexityMetrics extends WordSpec with Matchers {
     int high_cyclomatic_complexity(int x) {
       while(true) {
         for(int i = 0; i < 10; i++) {
-
         }
+        if(foo()) {}
       }
       if (x > 10) {
         for(int i = 0; i < 10; i++) {
@@ -56,6 +56,17 @@ class FunctionComplexityMetrics extends WordSpec with Matchers {
       }
     }
 
+    int high_number_of_loops () {
+      for(int i = 0; i < 10; i++){
+      }
+      int j = 0;
+      do {
+        j++
+      } while(j < 10);
+      while(foo()) {}
+      while(bar()){}
+    }
+
     """
 
   CodeToCpgFixture(code) { cpg =>
@@ -65,8 +76,8 @@ class FunctionComplexityMetrics extends WordSpec with Matchers {
     }
 
     "find functions with high cyclomatic complexity" in {
-      cpg.method.where(_.controlStructure.size > 3).name.l shouldBe List("high_cyclomatic_complexity")
-      cpg.method.where(_.controlStructure.size <= 3).name.l should not contain ("high_cyclomatic_complexity")
+      cpg.method.where(_.controlStructure.size > 4).name.l shouldBe List("high_cyclomatic_complexity")
+      cpg.method.where(_.controlStructure.size <= 4).name.l should not contain ("high_cyclomatic_complexity")
     }
 
     "find functions that are long (in terms of line numbers)" in {
@@ -77,6 +88,15 @@ class FunctionComplexityMetrics extends WordSpec with Matchers {
     "find functions with multiple returns" in {
       cpg.method.where(_.ast.isReturnNode.l.size > 1).name.l shouldBe List("func_with_multiple_returns")
       cpg.method.where(_.ast.isReturnNode.l.size == 1).name.l should not contain "func_with_multiple_returns"
+    }
+
+    "find functions with high number of loops" in {
+      cpg.method.where(_.ast.isControlStructure.parserTypeName("(For|Do|While).*").size >= 4).name.l shouldBe List(
+        "high_number_of_loops")
+      cpg.method
+        .where(_.ast.isControlStructure.parserTypeName("(For|Do|While).*").size < 4)
+        .name
+        .l should not contain "high_number_of_loops"
     }
 
     "find deeply nested functions" in {
