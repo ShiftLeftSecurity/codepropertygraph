@@ -3,10 +3,9 @@ package io.shiftleft.dataflowengine.language
 import io.shiftleft.semanticcpg.language._
 
 class CDataFlowTests extends CpgDataFlowTests {
-  val cpgFactory = DataFlowCodeToCpgFixture()
 
   "Test 1: flow from function call read to multiple versions of the same variable" in {
-    cpgFactory.buildCpg(
+    DataFlowCodeToCpgFixture(
       """
         |
         | void flows1(FILE *fd, int mode) {
@@ -58,7 +57,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 2: flow with pointers" in {
-    cpgFactory.buildCpg(
+    DataFlowCodeToCpgFixture(
       """
         |struct node {
         | int value;
@@ -108,7 +107,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 3: flow from function call argument" in {
-    cpgFactory.buildCpg(
+    DataFlowCodeToCpgFixture(
       """
         | int method(int y){
         |  int a = 10;
@@ -136,7 +135,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 4: flow chains from x to a" in {
-    val cpg = cpgFactory.buildCpg(
+    DataFlowCodeToCpgFixture(
       """
         | void flow(void) {
         |   int a = 0x37;
@@ -174,7 +173,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 5: flow from method return to a" in {
-    cpgFactory.buildCpg("""
+    DataFlowCodeToCpgFixture("""
         | int flow(int a){
         |   int z = a;
         |   int b = z;
@@ -200,7 +199,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 6: flow with nested if-statements from method return to a" in {
-    cpgFactory.buildCpg("""
+    DataFlowCodeToCpgFixture("""
         | int nested(int a){
         |   int x;
         |   int z = 0x37;
@@ -233,7 +232,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 7: flow with nested if-statements from method return to x" in {
-    cpgFactory.buildCpg("""
+    DataFlowCodeToCpgFixture("""
         | int nested(int a){
         |   int x;
         |   int z = 0x37;
@@ -275,7 +274,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 8: flow chain from function argument of foo to a" in {
-    cpgFactory.buildCpg("""
+    DataFlowCodeToCpgFixture("""
         | void param(int x){
         |    int a = x;
         |    int b = a;
@@ -307,7 +306,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 9: flow from function foo to a" in {
-    cpgFactory.buildCpg("""
+    DataFlowCodeToCpgFixture("""
         | void param(int x){
         |    int a = x;
         |    int b = a;
@@ -334,7 +333,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 10: flow with member access in expression to identifier x" in {
-    cpgFactory.buildCpg("""
+    DataFlowCodeToCpgFixture("""
         | struct node {
         | int value1;
         | int value2;
@@ -369,7 +368,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 11: flow chain from x to literal 0x37" in {
-    cpgFactory.buildCpg(
+    DataFlowCodeToCpgFixture(
       """
         | void flow(void) {
         |   int a = 0x37;
@@ -401,7 +400,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 12: flow with short hand assignment operator" in {
-    cpgFactory.buildCpg(
+    DataFlowCodeToCpgFixture(
       """
          | void flow(void) {
          |    int a = 0x37;
@@ -432,7 +431,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 13: flow after short hand assignment" in {
-    cpgFactory.buildCpg(
+    DataFlowCodeToCpgFixture(
       """
         | void flow(void) {
         |    int a = 0x37;
@@ -468,7 +467,7 @@ class CDataFlowTests extends CpgDataFlowTests {
   }
 
   "Test 14: flow from identifier to method parameter" in {
-    cpgFactory.buildCpg(
+    DataFlowCodeToCpgFixture(
       """
         | int main(int argc, char** argv){
         |    int x = argv[1];
@@ -502,7 +501,7 @@ class CDataFlowTests extends CpgDataFlowTests {
     }
   }
   "Test 15: conditional expressions (joern issue #91)" in {
-    cpgFactory.buildCpg(
+    DataFlowCodeToCpgFixture(
       """
   void foo(bool x, void* y) {
     void* z =  x ? f(y) : g(y);
