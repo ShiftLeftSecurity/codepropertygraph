@@ -9,10 +9,20 @@ import io.shiftleft.semanticcpg.language.nodemethods.generalizations.TrackingPoi
 class TrackingPointMethods(val node: nodes.TrackingPointBase) extends AnyVal {
 
   /**
-    * Convert to nearest CFG node
+    * Convert to nearest CFG node for flow pretty printing
     * */
   def cfgNode: nodes.CfgNode = {
     node.accept(TrackingPointToCfgNode)
+  }
+
+  /**
+    * Convert to nearest AST node
+    * */
+  def astNode: nodes.AstNode = {
+    node match {
+      case n: nodes.AstNode               => n
+      case n: nodes.DetachedTrackingPoint => n.cfgNode
+    }
   }
 
   def reachableBy(sourceTravs: NodeSteps[nodes.TrackingPoint]*): TrackingPoint =

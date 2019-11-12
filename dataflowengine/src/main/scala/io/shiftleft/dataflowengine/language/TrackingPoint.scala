@@ -36,10 +36,6 @@ class TrackingPoint(raw: GremlinScala[nodes.TrackingPoint]) extends NodeSteps[no
     * */
   def cfgNode: Steps[nodes.CfgNode] = map(_.cfgNode)
 
-  def isCall = cfgNode.isCall
-
-  def isAstNode: Steps[nodes.AstNode] = where(_.isInstanceOf[nodes.AstNode]).map(_.asInstanceOf[nodes.AstNode])
-
   def reachableBy(sourceTravs: NodeSteps[nodes.TrackingPoint]*): TrackingPoint = {
     val pathReachables = reachableByInternal(sourceTravs)
     val reachedSources = pathReachables.map(_.reachedSource)
