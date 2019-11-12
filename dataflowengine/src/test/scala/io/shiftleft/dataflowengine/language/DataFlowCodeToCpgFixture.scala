@@ -9,22 +9,15 @@ import io.shiftleft.dataflowengine.semanticsloader.SemanticsLoader
 
 object DataFlowCodeToCpgFixture {
 
-  def apply(): DataFlowCodeToCpgFixture = {
-    new DataFlowCodeToCpgFixture(LanguageFrontend.Fuzzyc)
-  }
+  def apply[T](sourceCode: String,
+               passes: (Cpg => Unit) = passes,
+               frontend: LanguageFrontend = LanguageFrontend.Fuzzyc)(fun: Cpg => T): T =
+    new CodeToCpgFixture(frontend).buildCpg(sourceCode, passes)(fun)
 
-  def passes(cpg: Cpg): Unit = {
+  private def passes(cpg: Cpg): Unit = {
     new EnhancementRunner().run(cpg, new SerializedCpg())
     val semantics = new SemanticsLoader("dataflowengine/src/test/resources/default.semantics").load()
     new DataFlowRunner(semantics).run(cpg, new SerializedCpg())
-  }
-
-}
-
-class DataFlowCodeToCpgFixture(frontend: LanguageFrontend) extends CodeToCpgFixture(frontend) {
-
-  override def buildCpg[T](sourceCode: String, passes: (Cpg => Unit))(fun: Cpg => T): T = {
-    super.buildCpg(sourceCode, DataFlowCodeToCpgFixture.passes)(fun)
   }
 
 }

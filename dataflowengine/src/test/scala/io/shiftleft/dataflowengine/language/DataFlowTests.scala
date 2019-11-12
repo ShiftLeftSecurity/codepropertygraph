@@ -30,20 +30,20 @@ class DataFlowTests extends WordSpec with Matchers {
              """.stripMargin
 
   "should identify all calls to `free`" in {
-    DataFlowCodeToCpgFixture().buildCpg(code) { cpg =>
+    DataFlowCodeToCpgFixture(code) { cpg =>
       cpg.call.name("free").code.toSet shouldBe Set("free(p)")
     }
   }
 
   "should find flows to arguments of `free`" in
-    DataFlowCodeToCpgFixture().buildCpg(code) { cpg =>
+    DataFlowCodeToCpgFixture(code) { cpg =>
       val source = cpg.identifier
       val sink = cpg.method.name("free").parameter.argument
       sink.reachableByFlows(source).l.size shouldBe 5
     }
 
   "should find flows to `free`" in
-    DataFlowCodeToCpgFixture().buildCpg(code) { cpg =>
+    DataFlowCodeToCpgFixture(code) { cpg =>
       val source = cpg.identifier
       val sink = cpg.call.name("free")
       sink.reachableByFlows(source).l.size shouldBe 5
@@ -85,7 +85,7 @@ class DataFlowTests extends WordSpec with Matchers {
     }
 
   "should find flows from identifiers to return values of `flow`" in
-    DataFlowCodeToCpgFixture().buildCpg(code) { cpg =>
+    DataFlowCodeToCpgFixture(code) { cpg =>
       val source = cpg.identifier
       val sink = cpg.method.name("flow").methodReturn
       sink.reachableByFlows(source).l.size shouldBe 7
@@ -151,7 +151,7 @@ class DataFlowTests extends WordSpec with Matchers {
     }
 
   "find flows from z to method returns of flow" in
-    DataFlowCodeToCpgFixture().buildCpg(code) { cpg =>
+    DataFlowCodeToCpgFixture(code) { cpg =>
       val source = cpg.identifier.name("z")
       val sink = cpg.method.name("flow").methodReturn
       sink.reachableByFlows(source).l.size shouldBe 2

@@ -6,7 +6,6 @@ import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
 import io.shiftleft.semanticcpg.language.types.structure.Method
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
-import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.JavaConverters._
 
@@ -32,10 +31,15 @@ class TrackingPoint(raw: GremlinScala[nodes.TrackingPoint]) extends NodeSteps[no
     )
   }
 
-  def reachableBy(sourceTravs: NodeSteps[nodes.TrackingPoint]*): TrackingPoint = {
+  /**
+    * Convert to nearest CFG node
+    * */
+  def cfgNode: Steps[nodes.CfgNode] = map(_.cfgNode)
+
+  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*): Steps[NodeType] = {
     val pathReachables = reachableByInternal(sourceTravs)
     val reachedSources = pathReachables.map(_.reachedSource)
-    new TrackingPoint(graph.asScala().inject(reachedSources: _*).asInstanceOf[GremlinScala[nodes.TrackingPoint]])
+    new NodeSteps[NodeType](__(reachedSources: _*).asInstanceOf[GremlinScala[NodeType]])
   }
 
   def reachableByFlows(sourceTravs: NodeSteps[nodes.TrackingPoint]*): Flows = {
@@ -47,11 +51,12 @@ class TrackingPoint(raw: GremlinScala[nodes.TrackingPoint]) extends NodeSteps[no
         graph.asScala().inject(paths: _*).asInstanceOf[GremlinScala[List[nodes.TrackingPoint]]]))
   }
 
-  private def reachableByInternal(sourceTravs: Seq[NodeSteps[nodes.TrackingPoint]]): List[ReachableByContainer] = {
+  private def reachableByInternal[NodeType <: nodes.TrackingPoint](
+      sourceTravs: Seq[Steps[NodeType]]): List[ReachableByContainer] = {
     val sourceSymbols = sourceTravs
       .flatMap(_.raw.clone.toList)
       .flatMap { elem =>
-        getTrackingPoint(elem)
+        getTrackingPoint(elem.asInstanceOf[nodes.TrackingPoint])
       }
       .toSet
 

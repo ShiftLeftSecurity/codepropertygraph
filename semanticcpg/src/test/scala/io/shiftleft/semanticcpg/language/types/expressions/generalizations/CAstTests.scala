@@ -112,7 +112,7 @@ class CAstTests extends WordSpec with Matchers {
         .controlStructure(".*x > 10.*")
         .whenTrue
         .ast
-        .isReturnNode
+        .isReturn
         .code
         .l shouldBe List("return bar(x + 10);")
 

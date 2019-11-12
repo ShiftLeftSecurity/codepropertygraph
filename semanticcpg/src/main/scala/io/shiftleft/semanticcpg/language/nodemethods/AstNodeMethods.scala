@@ -24,6 +24,20 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
     * */
   def isControlStructure: Boolean = node.start.isControlStructure.size == 1
 
+  def isIdentifier: Boolean = node.start.isIdentifier.size == 1
+
+  def isReturn: Boolean = node.start.isReturn.size == 1
+
+  def isLiteral: Boolean = node.start.isLiteral.size == 1
+
+  def isCall: Boolean = node.start.isCall.size == 1
+
+  def isExpression: Boolean = node.start.isExpression.size == 1
+
+  def isMethodRef: Boolean = node.start.isMethodRef.size == 1
+
+  def isBlock: Boolean = node.start.isBlock.size == 1
+
   /**
     * The depth of the AST rooted in this node. Upon walking
     * the tree to its leaves, the depth is only increased for

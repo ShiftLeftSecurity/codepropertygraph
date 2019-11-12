@@ -5,7 +5,13 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.{Node, StoredNode}
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
-import io.shiftleft.semanticcpg.language.nodemethods.{AstNodeMethods, MethodMethods, NodeMethods, WithinMethodMethods}
+import io.shiftleft.semanticcpg.language.nodemethods.{
+  AstNodeMethods,
+  CallMethods,
+  MethodMethods,
+  NodeMethods,
+  WithinMethodMethods
+}
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
@@ -23,6 +29,8 @@ package object language {
   // Implicit conversions from generated node types. We use these to add methods
   // to generated node types.
 
+  implicit def cfgNodeToAstNode(node: nodes.CfgNode): AstNodeMethods = new AstNodeMethods(node)
+
   implicit def toExtendedNode(node: Node): NodeMethods = new NodeMethods(node)
 
   implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods =
@@ -33,6 +41,9 @@ package object language {
 
   implicit def toMethodMethods(node: nodes.Method): MethodMethods =
     new MethodMethods(node)
+
+  implicit def toCallMethods(node: nodes.Call): CallMethods =
+    new CallMethods(node)
 
   // Implicit conversions from Step[NodeType, Label] to corresponding Step classes.
   // If you introduce a new Step-type, that is, one that inherits from `Steps[NodeType,Labels]`,
