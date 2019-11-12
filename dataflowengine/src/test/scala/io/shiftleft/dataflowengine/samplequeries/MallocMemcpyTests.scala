@@ -24,18 +24,13 @@ class MallocMemcpyTests extends WordSpec with Matchers {
   DataFlowCodeToCpgFixture(code) { cpg =>
     "find calls to malloc where first argument contains addition" in {
 
-      val src = cpg
-        .call("malloc")
-        .filter(_.argument(1).containsCallTo("<operator>.add.*"))
+      val src = cpg.call("malloc").filter(_.argument(1).containsCallTo("<operator>.add.*"))
 
       cpg
         .call("memcpy")
         .whereNonEmpty { call =>
           val codeInThirdArg = call.argument(3).code
-          call
-            .argument(1)
-            .reachableBy(src)
-            .filterNot(_.argument(1).codeExact(codeInThirdArg))
+          call.argument(1).reachableBy(src).filterNot(_.argument(1).codeExact(codeInThirdArg))
         }
         .code
         .l shouldBe List("memcpy(dst, src, len + 7)")
