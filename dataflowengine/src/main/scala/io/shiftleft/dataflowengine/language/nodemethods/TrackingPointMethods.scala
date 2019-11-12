@@ -25,7 +25,7 @@ class TrackingPointMethods(val node: nodes.TrackingPointBase) extends AnyVal {
     }
   }
 
-  def reachableBy(sourceTravs: NodeSteps[nodes.TrackingPoint]*): TrackingPoint =
+  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*): Steps[NodeType] =
     node.start.reachableBy(sourceTravs: _*)
 
 }

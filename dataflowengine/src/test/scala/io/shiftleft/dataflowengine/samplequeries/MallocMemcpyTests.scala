@@ -35,7 +35,6 @@ class MallocMemcpyTests extends WordSpec with Matchers {
           call
             .argument(1)
             .reachableBy(src)
-            .isCall
             .filterNot(_.argument(1).codeExact(codeInThirdArg))
         }
         .code
