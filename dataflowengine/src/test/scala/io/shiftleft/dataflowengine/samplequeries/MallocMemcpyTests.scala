@@ -9,21 +9,37 @@ class MallocMemcpyTests extends WordSpec with Matchers {
 
   val code: String =
     """
-      | int func(size_t len, char *src) {
-      | char *dst = malloc(len + 8);
-      | memcpy(dst, src, len + 7);
-      | }
-    """.stripMargin
+      int vulnerable(size_t len, char *src) {
+        char *dst = malloc(len + 8);
+        memcpy(dst, src, len + 7);
+      }
+
+      int non_vulnerable(size_t len, char *src) {
+       char *dst = malloc(len + 8);
+       memcpy(dst, src,len + 8);
+      }
+
+    """
 
   DataFlowCodeToCpgFixture(code) { cpg =>
     "find calls to malloc where first argument contains addition" in {
-      cpg.call.name("memcpy")
-        .argument(3)
-        .whereNonEmpty( arg =>
-          arg.reachableBy(
-            cpg.call.name("malloc").argument(1).containsCallTo("<operator>.add.*")
-          ).filterNot(_.cfgNode.codeExact(arg.code))
-        )
+
+      val src = cpg
+        .call("malloc")
+        .filter(_.argument(1).containsCallTo("<operator>.add.*"))
+
+      cpg
+        .call("memcpy")
+        .whereNonEmpty { call =>
+          val codeInThirdArg = call.argument(3).code
+          call
+            .argument(1)
+            .reachableBy(src)
+            .isCall
+            .filterNot(_.argument(1).codeExact(codeInThirdArg))
+        }
+        .code
+        .l shouldBe List("memcpy(dst, src, len + 7)")
     }
 
   }

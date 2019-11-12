@@ -87,6 +87,8 @@ class NodeTypeStarters(cpg: Cpg) {
   def call: Call =
     new Call(scalaGraph.V.hasLabel(NodeTypes.CALL).cast[nodes.Call])
 
+  def call(regex: String): Call = call.name(regex)
+
   /**
     Traverse to all local variable declarations
 
