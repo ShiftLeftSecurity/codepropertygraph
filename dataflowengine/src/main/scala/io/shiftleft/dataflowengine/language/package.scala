@@ -1,7 +1,6 @@
 package io.shiftleft.dataflowengine
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.AstNodeBase
 import io.shiftleft.dataflowengine.language.nodemethods.TrackingPointMethods
 import io.shiftleft.semanticcpg.language.Steps
 import io.shiftleft.semanticcpg.language._
