@@ -1,8 +1,8 @@
 package io.shiftleft.semanticcpg
 
-import gremlin.scala.{GremlinScala, __}
+import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes.{Node, StoredNode}
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.nodemethods.{
@@ -202,5 +202,11 @@ package object language {
 
   implicit def toCallForCallGraph(steps: Steps[nodes.Call]): Call =
     new Call(steps.raw)
+
+  implicit def toNodeStepsTag[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =
+    new NodeSteps[NodeType](original.raw)
+
+  implicit def toTagTag(steps: Steps[nodes.Tag]): Tag =
+    new Tag(steps.raw)
 
 }

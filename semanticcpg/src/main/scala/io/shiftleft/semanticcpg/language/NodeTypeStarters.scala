@@ -147,4 +147,10 @@ class NodeTypeStarters(cpg: Cpg) {
   @deprecated("", "October 2019")
   def atVerticesWithId[NodeType <: nodes.StoredNode](ids: Seq[Any]): NodeSteps[NodeType] = id(ids)
 
+  /**
+  Traverse to all tags
+    */
+  def tag: Tag =
+    new Tag(scalaGraph.V.hasLabel(NodeTypes.TAG).cast[nodes.Tag])
+
 }

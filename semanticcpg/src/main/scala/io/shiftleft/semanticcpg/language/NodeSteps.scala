@@ -60,4 +60,29 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
   def toMaps(): Steps[Map[String, Any]] =
     new Steps[Map[String, Any]](raw.map(_.toMap))
 
+  /**
+    * Execute traversal and create new (tag,node) pair.
+    * */
+  def newTagNodePair(tagName: String, tagValue: String = ""): NewTagNodePair[NodeType] = {
+    new NewTagNodePair[NodeType](
+      raw.map { node =>
+        nodes.NewTagNodePair(nodes.NewTag(tagName, tagValue), node)
+      }
+    )
+  }
+
+  /**
+  Execute traversal and map each node to the list of its associated tags.
+    */
+  def tagList: List[List[nodes.TagBase]] =
+    raw.map { taggedNode =>
+      taggedNode.tagList
+    }.l
+
+  /**
+  Traverse to tags of nodes in enhanced graph
+    */
+  def tag: Tag =
+    new Tag(raw.out(EdgeTypes.TAGGED_BY).cast[nodes.Tag])
+
 }
