@@ -21,18 +21,6 @@ class CopyOperations extends WordSpec with Matchers {
       cpg.assignment.target.arrayAccess.subscripts.map(_.code.toSet).l shouldBe List(Set("i", "j", "offset"))
     }
 
-    /**
-      * Determine assignments where target (argument(1)) contains a computed member
-      * access. For that access, determine the destination buffer and all indices
-      * */
-    def indexBufferAssigns(cpg: Cpg) =
-      cpg.assignment.target.arrayAccess
-        .map { array =>
-          val indices = array.subscripts.code.toSet
-          val buf = array.call.argument(1)
-          (buf, indices)
-        }
-
     "find indexed buffer assignment targets in loops where index is incremented" in {
 
       /**
