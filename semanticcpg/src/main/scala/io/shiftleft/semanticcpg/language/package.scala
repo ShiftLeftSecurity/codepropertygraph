@@ -12,7 +12,8 @@ import io.shiftleft.semanticcpg.language.nodemethods.{
   NodeMethods,
   WithinMethodMethods
 }
-import io.shiftleft.semanticcpg.language.operatorextension.{ArrayAccess, ArrayAccessNode}
+import io.shiftleft.semanticcpg.language.operatorextension.ArrayAccess
+import io.shiftleft.semanticcpg.language.operatorextension.nodes.ArrayAccess
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
@@ -213,10 +214,13 @@ package object language {
   implicit def toNodeTypeStartersOps(cpg: Cpg): OpNodeTypeStarters =
     new OpNodeTypeStarters(cpg)
 
-  implicit def arrayAccessToCall(node: ArrayAccessNode): nodes.Call = node.call
+  implicit def arrayAccessToCall(
+      node: operatorextension.nodes.ArrayAccess): io.shiftleft.semanticcpg.language.nodemethods.CallMethods =
+    node.call
 
-  implicit def arrayAccessToCallStep(step: Steps[ArrayAccessNode]): Call =
-    new Call(step.raw.map(_.call))
+  implicit def arrayAccessToCallStep(
+      step: operatorextension.ArrayAccess): io.shiftleft.semanticcpg.language.types.expressions.Call =
+    new io.shiftleft.semanticcpg.language.types.expressions.Call(step.raw.map(_.call))
 
   // /Operator extension
 

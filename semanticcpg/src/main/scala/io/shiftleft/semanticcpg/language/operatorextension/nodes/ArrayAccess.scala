@@ -1,10 +1,10 @@
-package io.shiftleft.semanticcpg.language.operatorextension
+package io.shiftleft.semanticcpg.language.operatorextension.nodes
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.language.types.expressions.Identifier
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.types.expressions.Identifier
 
-class ArrayAccessNode(node: nodes.Call) {
+class ArrayAccess(node: nodes.Call) {
 
   def call: nodes.Call = node
 
