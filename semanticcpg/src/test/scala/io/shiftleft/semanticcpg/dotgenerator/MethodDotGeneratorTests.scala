@@ -66,7 +66,7 @@ class MethodDotGeneratorTests extends WordSpec with Matchers {
       }
 
       "return the dot representation of a method using the query language extensions" in {
-        val List(dotGraph) = cpg.method.nameExact("my_func").toDotGraph
+        val List(dotGraph) = cpg.method.nameExact("my_func").dot
 
         dotGraph should fullyMatch regex expectedMyFuncRegex
       }

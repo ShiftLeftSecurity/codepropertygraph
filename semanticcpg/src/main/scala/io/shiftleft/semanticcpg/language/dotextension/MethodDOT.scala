@@ -1,4 +1,4 @@
-package io.shiftleft.semanticcpg.language.callgraphextension
+package io.shiftleft.semanticcpg.language.dotextension
 
 import gremlin.scala._
 
@@ -8,7 +8,7 @@ import io.shiftleft.semanticcpg.language._
 
 class MethodDOT(override val raw: GremlinScala[nodes.Method]) extends Steps[nodes.Method](raw) {
 
-  def toDotGraph: List[String] =
+  def dot: List[String] =
     MethodDotGenerator.toDotGraph(this)
-  
+
 }

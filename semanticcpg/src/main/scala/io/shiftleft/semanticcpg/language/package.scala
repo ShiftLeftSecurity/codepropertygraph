@@ -5,7 +5,8 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.{Node, StoredNode}
-import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method, MethodDOT}
+import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
+import io.shiftleft.semanticcpg.language.dotextension.MethodDOT
 import io.shiftleft.semanticcpg.language.nodemethods.{
   AstNodeMethods,
   CallMethods,
