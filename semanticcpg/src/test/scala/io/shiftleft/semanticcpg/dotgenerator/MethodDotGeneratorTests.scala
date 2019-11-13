@@ -46,7 +46,7 @@ class MethodDotGeneratorTests extends WordSpec with Matchers {
       }
 
       "return a dot representation of all methods" in {
-        val List(boopGraph, myFuncGraph) = MethodDotGenerator.toDotGraph(cpg.method)
+        val List(boopGraph, myFuncGraph) = MethodDotGenerator.toDotGraph(cpg.method).sortBy(_.length)
 
         val expectedBoopRegex =
           """|digraph boop \{
