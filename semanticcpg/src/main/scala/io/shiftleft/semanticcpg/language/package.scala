@@ -12,6 +12,8 @@ import io.shiftleft.semanticcpg.language.nodemethods.{
   NodeMethods,
   WithinMethodMethods
 }
+import io.shiftleft.semanticcpg.language.operatorextension.ArrayAccess
+import io.shiftleft.semanticcpg.language.operatorextension.nodes.ArrayAccess
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
@@ -202,6 +204,25 @@ package object language {
 
   implicit def toCallForCallGraph(steps: Steps[nodes.Call]): Call =
     new Call(steps.raw)
+
+  // / Call graph extension
+
+  // Operator extension
+
+  import io.shiftleft.semanticcpg.language.operatorextension.{NodeTypeStarters => OpNodeTypeStarters}
+
+  implicit def toNodeTypeStartersOps(cpg: Cpg): OpNodeTypeStarters =
+    new OpNodeTypeStarters(cpg)
+
+  implicit def arrayAccessToCall(
+      node: operatorextension.nodes.ArrayAccess): io.shiftleft.semanticcpg.language.nodemethods.CallMethods =
+    node.call
+
+  implicit def arrayAccessToCallStep(
+      step: operatorextension.ArrayAccess): io.shiftleft.semanticcpg.language.types.expressions.Call =
+    new io.shiftleft.semanticcpg.language.types.expressions.Call(step.raw.map(_.call))
+
+  // /Operator extension
 
   implicit def toNodeStepsTag[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =
     new NodeSteps[NodeType](original.raw)

@@ -1,9 +1,8 @@
-package io.shiftleft.dataflowengine.samplequeries
+package io.shiftleft.queries
 
-import io.shiftleft.dataflowengine.language.DataFlowCodeToCpgFixture
-import org.scalatest.{Matchers, WordSpec}
+import io.shiftleft.dataflowengine.language.{DataFlowCodeToCpgFixture, _}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.dataflowengine.language._
+import org.scalatest.{Matchers, WordSpec}
 
 class MallocMemcpyTests extends WordSpec with Matchers {
 
