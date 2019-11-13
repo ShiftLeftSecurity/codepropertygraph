@@ -9,7 +9,7 @@ import io.shiftleft.codepropertygraph.generated.{nodes => basenodes}
 
 class ArrayAccess(raw: GremlinScala[nodes.ArrayAccess]) extends Steps[nodes.ArrayAccess](raw) {
 
-  def call : Steps[basenodes.Call] = map(_.call)
+  def call: Steps[basenodes.Call] = map(_.call)
 
   def array: Expression = map(_.array)
 

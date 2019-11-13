@@ -5,6 +5,6 @@ import io.shiftleft.semanticcpg.language._
 
 class NodeTypeStarters(cpg: Cpg) {
 
-  def assignment: Assignment = new Assignment(cpg.call.name("<operator>.assignment.*").raw)
+  def assignment: Assignment = new Assignment(cpg.call.name("<operator>.assignment.*").map(new nodes.Assignment(_)).raw)
 
 }

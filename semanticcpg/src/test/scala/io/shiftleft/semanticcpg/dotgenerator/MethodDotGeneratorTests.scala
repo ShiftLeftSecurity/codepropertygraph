@@ -25,7 +25,6 @@ class MethodDotGeneratorTests extends WordSpec with Matchers {
        |}
        |""".stripMargin
 
-
   private val expectedMyFuncRegex =
     """|digraph my_func \{
        | "\d+" -> "\d+" \[label="y = x \* 2"\];
