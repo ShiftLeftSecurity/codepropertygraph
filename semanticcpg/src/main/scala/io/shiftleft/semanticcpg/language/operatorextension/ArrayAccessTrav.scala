@@ -7,7 +7,7 @@ import io.shiftleft.semanticcpg.language.Steps
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.codepropertygraph.generated.{nodes => basenodes}
 
-class ArrayAccess(raw: GremlinScala[nodes.ArrayAccess]) extends Steps[nodes.ArrayAccess](raw) {
+class ArrayAccessTrav(raw: GremlinScala[nodes.ArrayAccess]) extends Steps[nodes.ArrayAccess](raw) {
 
   def call: Steps[basenodes.Call] = map(_.call)
 
