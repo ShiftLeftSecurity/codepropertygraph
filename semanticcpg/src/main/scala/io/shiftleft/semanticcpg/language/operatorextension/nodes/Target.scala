@@ -7,7 +7,7 @@ import io.shiftleft.semanticcpg.language.operatorextension.{ArrayAccess => Array
 
 class Target(val expr: basenodes.Expression) extends AnyRef {
 
-  def arrayAccess: ArrayAccessStep =
+  def isArrayAccess: ArrayAccessStep =
     new ArrayAccessStep(
       expr.ast.isCall
         .nameExact("<operator>.computedMemberAccess")

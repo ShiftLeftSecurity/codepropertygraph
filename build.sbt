@@ -27,6 +27,7 @@ lazy val cpgvalidator = Projects.cpgvalidator
 lazy val cpg2overflowdb = Projects.cpg2overflowdb
 lazy val console = Projects.console
 lazy val queries = Projects.queries
+lazy val cppext = Projects.cppext
 
 ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature", "-language:implicitConversions")
 ThisBuild/compile/javacOptions ++= Seq("-g") //debug symbols

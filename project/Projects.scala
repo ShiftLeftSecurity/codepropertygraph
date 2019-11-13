@@ -10,4 +10,5 @@ object Projects {
   lazy val cpg2overflowdb = project.in(file("cpg2overflowdb"))
   lazy val console = project.in(file("console"))
   lazy val queries = project.in(file("queries"))
+  lazy val cppext  = project.in(file("cppext"))
 }

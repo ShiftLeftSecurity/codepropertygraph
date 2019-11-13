@@ -219,6 +219,15 @@ package object language {
   implicit def toNodeTypeStartersOps(cpg: Cpg): OpNodeTypeStarters =
     new OpNodeTypeStarters(cpg)
 
+  implicit def toOpsAstNodeTrav(steps: AstNode): operatorextension.OpAstNodeTrav =
+    new operatorextension.OpAstNodeTrav(steps.raw)
+
+  implicit def toOpsAstNodeTrav2(steps: Steps[nodes.AstNode]): operatorextension.OpAstNodeTrav =
+    new operatorextension.OpAstNodeTrav(steps.raw)
+
+  implicit def toOpAstNode(node: nodes.AstNode): operatorextension.nodes.OpAstNode =
+    new operatorextension.nodes.OpAstNode(node)
+
   // /Operator extension
 
   implicit def toNodeStepsTag[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =

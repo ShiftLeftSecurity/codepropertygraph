@@ -1,8 +1,7 @@
-name := "queries"
+name := "cppext"
 
 dependsOn(Projects.semanticcpg % "compile -> compile; test -> test",
-          Projects.dataflowengine % "compile -> compile; test -> test",
-          Projects.cppext % "compile -> compile; test -> test")
+          Projects.dataflowengine % "compile -> compile; test -> test")
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.8" % Test,
