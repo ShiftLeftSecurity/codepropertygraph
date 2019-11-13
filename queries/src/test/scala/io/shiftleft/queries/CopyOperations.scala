@@ -18,7 +18,7 @@ class CopyOperations extends WordSpec with Matchers {
 
   CodeToCpgFixture(code) { cpg =>
     "find indexed buffer assigment targets" in {
-      indexBufferAssigns(cpg).l.map(_._2) shouldBe List(Set("i", "j", "offset"))
+      cpg.assignment.target.arrayAccess.subscripts.map(_.code.toSet).l shouldBe List(Set("i", "j", "offset"))
     }
 
     /**
@@ -26,13 +26,10 @@ class CopyOperations extends WordSpec with Matchers {
       * access. For that access, determine the destination buffer and all indices
       * */
     def indexBufferAssigns(cpg: Cpg) =
-      cpg.assign.target
-        .ast
-        .isCall
-        .name(".*op.*computedMemberAccess.*")
-        .map { call =>
-          val indices = call.argument(2).ast.isIdentifier.code.toSet
-          val buf = call.argument(1)
+      cpg.assignment.target.arrayAccess
+        .map { array =>
+          val indices = array.subscripts.code.toSet
+          val buf = array.call.argument(1)
           (buf, indices)
         }
 
@@ -44,9 +41,12 @@ class CopyOperations extends WordSpec with Matchers {
         * the first argument of that Inc operation and check if they are used as indices for
         * the write operation into the buffer.
         * */
-      indexBufferAssigns(cpg)
+      cpg.assignment.target.arrayAccess
+        .map { access =>
+          (access.array, access.subscripts.code.toSet)
+        }
         .where {
-          case (buf, indices) =>
+          case (buf, subscripts) =>
             val incIdentifiers = buf.start.inAst.isControlStructure.astChildren
               .filterNot(_.isBlock)
               .ast
@@ -55,7 +55,7 @@ class CopyOperations extends WordSpec with Matchers {
               .argument(1)
               .code
               .toSet
-            (incIdentifiers & indices).nonEmpty
+            (incIdentifiers & subscripts).nonEmpty
         }
         .map(_._1)
         .code

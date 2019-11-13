@@ -1,15 +1,14 @@
 package io.shiftleft.semanticcpg.language.operatorextension
 
 import gremlin.scala.GremlinScala
-import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.language.Steps
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
+import io.shiftleft.codepropertygraph.generated.{nodes => basenodes}
+import io.shiftleft.semanticcpg.language.NodeSteps
 
 /**
   * A wrapper for assignment calls that offers syntactic sugar
   * */
-class Assignment(override val raw: GremlinScala[nodes.Call]) extends Steps[nodes.Call](raw) {
+class Assignment(override val raw: GremlinScala[basenodes.Call]) extends NodeSteps[basenodes.Call](raw) {
 
-  def target: Expression = new Assignment(raw).argument(1)
+  def target: AssignTarget = new AssignTarget(new Assignment(raw).argument(1).raw)
 
 }
