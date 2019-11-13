@@ -218,15 +218,7 @@ package object language {
 
   implicit def toNodeTypeStartersOps(cpg: Cpg): OpNodeTypeStarters =
     new OpNodeTypeStarters(cpg)
-
-  implicit def arrayAccessToCall(
-      node: operatorextension.nodes.ArrayAccess): io.shiftleft.semanticcpg.language.nodemethods.CallMethods =
-    node.call
-
-  implicit def arrayAccessToCallStep(
-      step: operatorextension.ArrayAccess): io.shiftleft.semanticcpg.language.types.expressions.Call =
-    new io.shiftleft.semanticcpg.language.types.expressions.Call(step.raw.map(_.call))
-
+  
   // /Operator extension
 
   implicit def toNodeStepsTag[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =
