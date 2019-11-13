@@ -1,8 +1,8 @@
-package io.shiftleft.semanticcpg.samplequeries
+package io.shiftleft.queries
 
+import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
 import org.scalatest.{Matchers, WordSpec}
-import io.shiftleft.semanticcpg.language._
 
 class FunctionComplexityMetrics extends WordSpec with Matchers {
 

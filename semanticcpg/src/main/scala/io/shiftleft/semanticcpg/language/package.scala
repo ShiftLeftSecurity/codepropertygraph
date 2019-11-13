@@ -203,6 +203,16 @@ package object language {
   implicit def toCallForCallGraph(steps: Steps[nodes.Call]): Call =
     new Call(steps.raw)
 
+  // / Call graph extension
+
+  // Operator extension
+
+  import io.shiftleft.semanticcpg.language.operatorextension.{NodeTypeStarters => OpNodeTypeStarters}
+  implicit def toNodeTypeStartersOps(cpg: Cpg): OpNodeTypeStarters =
+    new OpNodeTypeStarters(cpg)
+
+  // /Operator extension
+
   implicit def toNodeStepsTag[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =
     new NodeSteps[NodeType](original.raw)
 
