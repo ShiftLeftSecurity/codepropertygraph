@@ -22,10 +22,10 @@ class ScriptManagerTest extends WordSpec with Matchers with Inside {
     override def retrieveQueryResult(queryId: UUID): OptionT[IO, CpgOperationResult[AnyRef]] = ???
   }
 
-  private object TestScriptManager extends ScriptManager(TestScriptExecutor) {
-    override protected val DEFAULT_CPG_NAME: String =
-      (File("resources") / "testcode" / "cpgs" / "method" / "cpg.bin.zip").pathAsString
-  }
+  private object TestScriptManager extends ScriptManager(TestScriptExecutor)
+
+  protected val DEFAULT_CPG_NAME: String =
+    (File("resources") / "testcode" / "cpgs" / "method" / "cpg.bin.zip").pathAsString
 
   def withScriptManager(f: ScriptManager => Unit): Unit = {
     f(TestScriptManager)
@@ -39,13 +39,14 @@ class ScriptManagerTest extends WordSpec with Matchers with Inside {
   }
 
   "running scripts" should {
-    "be correct" in withScriptManager { scriptManager =>
+    "be correct when explicitly specifying a CPG" in withScriptManager { scriptManager =>
       val expected = "cpg.method.name.l"
-      inside(scriptManager.scripts()) {
-        case ScriptDescription("list-funcs", _) :: _ =>
-          scriptManager.runScript("list-funcs", Cpg.emptyCpg) shouldBe expected
-      }
+      scriptManager.runScript("list-funcs", Cpg.emptyCpg) shouldBe expected
+    }
 
+    "be correctly when specifying a CPG filename" in withScriptManager { scriptManager =>
+      val expected = "cpg.method.name.l"
+      scriptManager.runScript("list-funcs", DEFAULT_CPG_NAME) shouldBe expected
     }
   }
 
