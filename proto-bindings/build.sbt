@@ -35,11 +35,12 @@ lazy val generateCsharpBindings = taskKey[File]("generate csharp proto bindings"
 generateCsharpBindings := {
   (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
   val dotnetVersion = System.getProperty("dotnet-version")
-  assert(dotnetVersion != null, "you must define the dotnet version via a jvm system property, e.g. via `-Ddotnet-version=1.0.0`")
+  assert(dotnetVersion != null && !dotnetVersion.trim.isEmpty, "you must define the dotnet version via a jvm system property, e.g. via `-Ddotnet-version=1.0.0`")
   println(s"building and publishing csharp proto version $dotnetVersion")
   val publishToRepo = Option(System.getProperty("publish-to-repo")).map(repo => s"--publish-to-repo $repo")
   val publishKey = Option(System.getProperty("publish-key")).map(key => s"--publish-key $key")
-  runCmd(s"""./build-dotnet-bindings.sh --cpg-version $dotnetVersion ${publishToRepo.getOrElse("")} ${publishKey.getOrElse("")}""", "./build-dotnet-bindings.sh")
+  runCmd(s"""./build-dotnet-bindings.sh --cpg-version $dotnetVersion ${publishToRepo.getOrElse("")} ${publishKey.getOrElse("")}""",
+    contextOnError = s"""./build-dotnet-bindings.sh --cpg-version $dotnetVersion ${publishToRepo.getOrElse("")} SECRET_PUBLISH_KEY""")
   new File(s"cpg-proto-bindings.${dotnetVersion}.nupkg")
 }
 
