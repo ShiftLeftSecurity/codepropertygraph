@@ -8,16 +8,26 @@ class CopyOperations extends WordSpec with Matchers {
 
   val code =
     """
-      int array_indexing_in_loop (char *dst, char *src, int offset) {
+      int index_into_dst_array (char *dst, char *src, int offset) {
         for(i = 0; i < strlen(src); i++) {
           dst[i + + j*8 + offset] = src[i];
         }
       }
+
+      // We do not want to detect this one because the
+      // index only specifies where to read from
+      int index_into_src_array() {
+        for(i = 0; i < strlen(src); i++) {
+          dst[k] = src[i];
+        }
+      }
+
     """
 
   CodeToCpgFixture(code) { cpg =>
     "find indexed buffer assigment targets" in {
-      cpg.assignment.target.arrayAccess.subscripts.map(_.code.toSet).l shouldBe List(Set("i", "j", "offset"))
+      cpg.assignment.target.isArrayAccess.subscripts.map(_.code.toSet).toSet shouldBe Set(Set("k"),
+                                                                                          Set("i", "j", "offset"))
     }
 
     "find indexed buffer assignment targets in loops where index is incremented" in {
@@ -28,7 +38,7 @@ class CopyOperations extends WordSpec with Matchers {
         * the first argument of that Inc operation and check if they are used as indices for
         * the write operation into the buffer.
         * */
-      cpg.assignment.target.arrayAccess
+      cpg.assignment.target.isArrayAccess
         .map { access =>
           (access.array, access.subscripts.code.toSet)
         }
@@ -36,17 +46,17 @@ class CopyOperations extends WordSpec with Matchers {
           case (buf, subscripts) =>
             val incIdentifiers = buf.start.inAst.isControlStructure.astChildren
               .filterNot(_.isBlock)
-              .ast
-              .isCall
-              .name(".*Inc.*")
-              .argument(1)
+              .assignments
+              .target
+              .expr
               .code
               .toSet
             (incIdentifiers & subscripts).nonEmpty
         }
         .map(_._1)
-        .code
-        .l shouldBe List("dst")
+        .method
+        .name
+        .l shouldBe List("index_into_dst_array")
 
     }
 
