@@ -26,8 +26,6 @@ abstract class ScriptManager(executor: CpgQueryExecutor[AnyRef]) {
 
   private val SCRIPT_DESCS: String = "scripts.json"
 
-  protected val DEFAULT_CPG_NAME: String = "cpg.bin.zip"
-
   private def scriptContent(file: File): String = file.lines.mkString(System.lineSeparator())
 
   def scripts(): List[ScriptDescription] =
@@ -48,7 +46,7 @@ abstract class ScriptManager(executor: CpgQueryExecutor[AnyRef]) {
 
   def runScript(name: String, cpgFilename: String): AnyRef =
     handleQueryResult(
-      executor.executeQuerySync(CpgLoader.load(cpgFilename), scriptContent(DEFAULT_SCRIPTS_FOLDER / name)))
+      executor.executeQuerySync(CpgLoader.load(cpgFilename), scriptContent(DEFAULT_SCRIPTS_FOLDER / s"$name.sc")))
 
   def runScript(name: String, cpg: Cpg): AnyRef =
     handleQueryResult(executor.executeQuerySync(cpg, scriptContent(DEFAULT_SCRIPTS_FOLDER / s"$name.sc")))
