@@ -23,7 +23,7 @@ application-specific data.
 # Usage as a dependency
 `build.sbt`:
 ```
-libraryDependencies += "io.shiftleft" %% "fuzzyc2cpg" % "x.y.z"
+libraryDependencies += "io.shiftleft" %% "codepropertygraph" % "x.y.z"
 resolvers += Resolver.bintrayRepo("shiftleft", "maven")
 ```
 Other build tools: see [bintray instructions](https://bintray.com/shiftleft/maven/codepropertygraph/_latestVersion).
