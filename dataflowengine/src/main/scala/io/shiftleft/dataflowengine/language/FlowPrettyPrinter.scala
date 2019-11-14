@@ -9,11 +9,11 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.nodemethods.CfgNodeMethods
 
 object FlowPrettyPrinter {
-  def prettyPrint(path: List[nodes.TrackingPoint]): String = {
+  def prettyPrint(path: List[nodes.TrackingPointBase]): String = {
     val baos = new ByteArrayOutputStream()
     val ps = new PrintStream(baos, true, "utf-8")
     val rows = path.map { trackingPoint =>
-      implicit val graph = trackingPoint.underlying.graph()
+      // implicit val graph = trackingPoint.underlying.graph()
       val method = trackingPoint.start.method.head
 
       val trackedSymbol = trackingPoint match {

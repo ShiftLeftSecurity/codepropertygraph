@@ -42,13 +42,24 @@ class TrackingPoint(raw: GremlinScala[nodes.TrackingPoint]) extends NodeSteps[no
     new NodeSteps[NodeType](__(reachedSources: _*).asInstanceOf[GremlinScala[NodeType]])
   }
 
-  def reachableByFlows(sourceTravs: NodeSteps[nodes.TrackingPoint]*): Flow = {
+  def reachableByFlows(sourceTravs: NodeSteps[nodes.TrackingPoint]*): NewFlow = {
 
     val pathReachables = reachableByInternal(sourceTravs)
     val paths = pathReachables.map(_.path)
-    new Flow(
-      new Steps[List[nodes.TrackingPoint]](
-        graph.asScala().inject(paths: _*).asInstanceOf[GremlinScala[List[nodes.TrackingPoint]]]))
+    new NewFlow(
+      graph.asScala().inject(paths: _*).asInstanceOf[GremlinScala[List[nodes.TrackingPoint]]].map(createFlow)
+    )
+  }
+
+  private def createFlow(trackingPoints : List[nodes.TrackingPoint]) : nodes.NewFlow = {
+    val source : nodes.NewSource = ???
+    val sink : nodes.NewSink = ???
+    val programPoints : List[nodes.NewProgramPoint] = ???
+    nodes.NewFlow(
+      source = source,
+      sink = sink,
+      points = programPoints
+    )
   }
 
   private def reachableByInternal[NodeType <: nodes.TrackingPoint](
