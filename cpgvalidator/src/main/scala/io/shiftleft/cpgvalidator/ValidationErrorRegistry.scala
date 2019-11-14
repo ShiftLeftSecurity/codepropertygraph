@@ -20,7 +20,7 @@ class ValidationErrorRegistry {
   def logValidationErrors(): Unit = {
     // We only log one error per category in order to not spam the user
     // because errors are usually quite repetitive.
-    validationErrors.toList.foreach {
+    validationErrors.foreach {
       case (_, errors) =>
         logger.error(s"Validation error: ${errors.head}")
     }
