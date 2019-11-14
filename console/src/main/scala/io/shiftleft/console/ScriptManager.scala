@@ -9,7 +9,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.CpgLoader
 import io.shiftleft.console.query.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess, CpgQueryExecutor}
 
-import java.nio.file.Paths
+import java.nio.file.{FileSystems, Paths}
 
 object ScriptManager {
 
@@ -21,8 +21,16 @@ abstract class ScriptManager(executor: CpgQueryExecutor[AnyRef]) {
 
   import ScriptManager._
 
-  protected val DEFAULT_SCRIPTS_FOLDER: File =
-    File(Paths.get(getClass.getClassLoader.getResource("scripts").toURI))
+  protected lazy val DEFAULT_SCRIPTS_FOLDER: File = {
+    import scala.collection.JavaConverters.mapAsJavaMapConverter
+
+    val scriptsPath = getClass.getClassLoader.getResource("scripts").toURI
+    if (scriptsPath.getScheme.contains("jar")) {
+      FileSystems.newFileSystem(scriptsPath, Map("create" -> "false").asJava)
+    }
+
+    File(Paths.get(scriptsPath))
+  }
 
   private val SCRIPT_DESCS: String = "scripts.json"
 
