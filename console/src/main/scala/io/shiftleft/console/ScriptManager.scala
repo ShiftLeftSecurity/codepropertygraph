@@ -4,44 +4,53 @@ import better.files._
 import cats.effect.IO
 import io.circe.generic.auto._
 import io.circe.parser._
+
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.CpgLoader
-import io.shiftleft.console.query.{CpgOperationFailure, CpgOperationSuccess, CpgQueryExecutor}
+import io.shiftleft.console.query.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess, CpgQueryExecutor}
+
+import java.nio.file.Paths
 
 object ScriptManager {
 
+  final case class ScriptDescriptions(scripts: List[ScriptDescription])
   final case class ScriptDescription(name: String, description: String)
-
 }
 
 abstract class ScriptManager(executor: CpgQueryExecutor[AnyRef]) {
 
   import ScriptManager._
 
-  protected val DEFAULT_SCRIPTS_FOLDER: File = File("scripts")
+  protected val DEFAULT_SCRIPTS_FOLDER: File =
+    File(Paths.get(getClass.getClassLoader.getResource("scripts").toURI))
 
-  private val SCRIPT_DESC: String = "description.json"
+  private val SCRIPT_DESCS: String = "scripts.json"
 
   protected val DEFAULT_CPG_NAME: String = "cpg.bin.zip"
 
-  private def folders(): Iterator[File] = DEFAULT_SCRIPTS_FOLDER.children.filter(_.isDirectory)
-
-  private def scriptFileContent(file: File): String = file.lines.mkString(System.lineSeparator())
+  private def scriptContent(file: File): String = file.lines.mkString(System.lineSeparator())
 
   def scripts(): List[ScriptDescription] =
-    folders().flatMap { folder =>
-      decode[ScriptDescription](scriptFileContent(folder / SCRIPT_DESC)).toOption
-    }.toList
+    decode[ScriptDescriptions] {
+      (DEFAULT_SCRIPTS_FOLDER / SCRIPT_DESCS).lines.mkString(System.lineSeparator())
+    }.toOption.map(_.scripts).getOrElse(List.empty)
 
-  def runScript(name: String): AnyRef = {
+  private def handleQueryResult(result: IO[CpgOperationResult[AnyRef]]): AnyRef = {
     val scriptExecutionResult = for {
-      queryResult <- executor.executeQuerySync(CpgLoader.load(DEFAULT_CPG_NAME),
-                                               scriptFileContent(DEFAULT_SCRIPTS_FOLDER / name / s"$name.scala"))
+      queryResult <- result
       result <- queryResult match {
         case CpgOperationSuccess(result) => IO(result)
-        case CpgOperationFailure(ex)     => IO.raiseError[AnyRef](ex)
+        case CpgOperationFailure(ex)     => IO.raiseError(ex)
       }
     } yield result
     scriptExecutionResult.handleErrorWith(IO(_)).unsafeRunSync()
   }
+
+  def runScript(name: String, cpgFilename: String): AnyRef =
+    handleQueryResult(
+      executor.executeQuerySync(CpgLoader.load(cpgFilename), scriptContent(DEFAULT_SCRIPTS_FOLDER / name)))
+
+  def runScript(name: String, cpg: Cpg): AnyRef =
+    handleQueryResult(executor.executeQuerySync(cpg, scriptContent(DEFAULT_SCRIPTS_FOLDER / s"$name.sc")))
 
 }
