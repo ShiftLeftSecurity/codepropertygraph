@@ -540,6 +540,7 @@ $neighborAccesors
         $mixinTraits with ${nodeType.className}Base {
 
         override def layoutInformation: NodeLayoutInformation = ${nodeType.className}.layoutInformation
+        override def getId = ref.id
 
         /* all properties */
         override def valueMap: JMap[String, AnyRef] = $valueMapImpl
