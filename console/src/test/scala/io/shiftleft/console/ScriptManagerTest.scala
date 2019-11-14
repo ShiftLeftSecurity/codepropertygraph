@@ -12,7 +12,7 @@ import io.shiftleft.console.query.{CpgOperationResult, CpgOperationSuccess, CpgQ
 
 class ScriptManagerTest extends WordSpec with Matchers with Inside {
 
-  private class TestScriptExecutor extends CpgQueryExecutor[AnyRef] {
+  private object TestScriptExecutor extends CpgQueryExecutor[AnyRef] {
     override def executeQuery(cpg: Cpg, query: String): IO[UUID] = ???
 
     override def executeQuerySync(cpg: Cpg, query: String): IO[CpgOperationResult[AnyRef]] =
@@ -22,29 +22,28 @@ class ScriptManagerTest extends WordSpec with Matchers with Inside {
     override def retrieveQueryResult(queryId: UUID): OptionT[IO, CpgOperationResult[AnyRef]] = ???
   }
 
-  private class TestScriptManager extends ScriptManager(new TestScriptExecutor) {
-
-    override val DEFAULT_SCRIPTS_FOLDER: File = File("resources") / "testcode" / "scripts"
-    override val DEFAULT_CPG_NAME: String =
+  private object TestScriptManager extends ScriptManager(TestScriptExecutor) {
+    override protected val DEFAULT_CPG_NAME: String =
       (File("resources") / "testcode" / "cpgs" / "method" / "cpg.bin.zip").pathAsString
+  }
 
+  def withScriptManager(f: ScriptManager => Unit): Unit = {
+    f(TestScriptManager)
   }
 
   "listing scripts" should {
-    "be correct" in {
-      val sut = new TestScriptManager
-      val scripts = sut.scripts()
+    "be correct" in withScriptManager { scriptManager =>
+      val scripts = scriptManager.scripts()
       scripts shouldBe List(ScriptDescription("list-funcs", "Lists all functions."))
     }
   }
 
   "running scripts" should {
-    "be correct" in {
+    "be correct" in withScriptManager { scriptManager =>
       val expected = "cpg.method.name.l"
-      val sut = new TestScriptManager
-      inside(sut.scripts()) {
+      inside(scriptManager.scripts()) {
         case ScriptDescription("list-funcs", _) :: _ =>
-          sut.runScript("list-funcs") shouldBe expected
+          scriptManager.runScript("list-funcs", Cpg.emptyCpg) shouldBe expected
       }
 
     }
