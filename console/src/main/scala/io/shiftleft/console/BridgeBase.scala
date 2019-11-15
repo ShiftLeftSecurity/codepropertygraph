@@ -23,7 +23,7 @@ trait BridgeBase {
       scopt.Read.stringRead
         .map(Path(_, pwd)) //support both relative and absolute paths
 
-    val parser = new scopt.OptionParser[Config]("scopt") {
+    val parser = new scopt.OptionParser[Config]("(joern|ocular)") {
       override def errorOnUnknownArgument = false
 
       head("cpg scripting")
@@ -49,6 +49,8 @@ trait BridgeBase {
       opt[String]("command")
         .action((x, c) => c.copy(command = Some(x)))
         .text("select one of multiple @main methods")
+
+      help("help")
     }
 
     // note: if config is really `None` an error message would have been displayed earlier
