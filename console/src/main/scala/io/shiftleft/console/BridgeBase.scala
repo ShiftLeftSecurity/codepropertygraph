@@ -57,8 +57,7 @@ trait BridgeBase {
     parser.parse(args, Config()).get
   }
 
-  protected def runAmmonite(config: Config,
-                            slProduct: SLProduct = OcularProduct): Unit = {
+  protected def runAmmonite(config: Config, slProduct: SLProduct = OcularProduct): Unit = {
     val additionalImportCode: List[String] =
       config.additionalImports.flatMap { importScript =>
         val file = importScript.toIO
