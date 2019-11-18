@@ -57,7 +57,8 @@ trait BridgeBase {
     parser.parse(args, Config()).get
   }
 
-  protected def runAmmonite(config: Config): Unit = {
+  protected def runAmmonite(config: Config,
+                            slProduct: SLProduct = OcularProduct): Unit = {
     val additionalImportCode: List[String] =
       config.additionalImports.flatMap { importScript =>
         val file = importScript.toIO
@@ -79,7 +80,7 @@ trait BridgeBase {
           .Main(
             predefCode = predefPlus(additionalImportCode ++ replConfig ++ shutdownHooks),
             welcomeBanner = Some("Welcome to ShiftLeft Ocular/Joern"),
-            storageBackend = new StorageBackend,
+            storageBackend = new StorageBackend(slProduct),
             remoteLogging = false,
             colors = config.colors.getOrElse(Colors.Default)
           )
