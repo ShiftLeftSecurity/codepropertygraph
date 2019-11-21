@@ -108,6 +108,8 @@
       {"localName": "dataTags", "nodeType" : "TAG", "cardinality" : "list"},
       {"localName": "sourceDescriptorTags", "nodeType" : "TAG", "cardinality" : "list"},
       {"localName": "sinkDescriptorTags", "nodeType" : "TAG", "cardinality" : "list"},
+      {"localName": "sourceTags", "nodeType" : "TAG", "cardinality" : "list"},
+      {"localName": "dstTags", "nodeType" : "TAG", "cardinality": "list"},
       {"localName" : "source", "nodeType" : "SOURCE", "cardinality" : "one"},
       {"localName" : "sink", "nodeType" : "SINK", "cardinality" : "one"},
       {"localName" : "transforms", "nodeType" : "TRANSFORM", "cardinality" : "list"},
