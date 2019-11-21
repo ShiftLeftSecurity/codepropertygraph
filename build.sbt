@@ -28,7 +28,11 @@ lazy val cpg2overflowdb = Projects.cpg2overflowdb
 lazy val console = Projects.console
 lazy val queries = Projects.queries
 
-ThisBuild/scalacOptions ++= Seq("-deprecation", "-feature", "-language:implicitConversions")
+ThisBuild/scalacOptions ++= Seq(
+  "-deprecation",
+  "-feature",
+  "-Xfatal-warnings",
+  "-language:implicitConversions")
 ThisBuild/compile/javacOptions ++= Seq("-g") //debug symbols
 
 Global/onChangedBuildSource := ReloadOnSourceChanges

@@ -21,6 +21,7 @@ package object language {
   private def trackingPointToAstNode(node: nodes.TrackingPoint): nodes.AstNode = node match {
     case n: nodes.AstNode               => n
     case n: nodes.DetachedTrackingPoint => n.cfgNode
+    case _                              => ??? //TODO markus/fabs?
   }
 
   implicit def trackingPointToAstBase(trav: TrackingPoint): AstNode = new AstNode(trav.map(trackingPointToAstNode).raw)
