@@ -3,7 +3,8 @@
     // note: these should *NOT* be written by the language frontend.
 
     "nodeKeys" : [
-        {"id" : 8, "name": "VALUE", "comment" : "Tag value", "valueType" : "string", "cardinality" : "one"}
+        {"id" : 8, "name": "VALUE", "comment" : "Tag value", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 1002, "name": "IS_METHOD_NEVER_OVERRIDDEN", "comment" : "True if the referenced method is never overridden by the subclasses and false otherwise", "valueType" : "boolean", "cardinality" : "zeroOrOne"}
     ],
 
     "edgeKeys" : [
@@ -43,6 +44,9 @@
              {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN"]},
              {"edgeName": "CONTAINS", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]}
           ]
+        },
+        { "name" : "BINDING",
+          "keys" : ["IS_METHOD_NEVER_OVERRIDDEN"]
         },
         { "name": "RETURN",
           "outEdges" : [
