@@ -269,9 +269,9 @@ $neighborAccesors
             s"with ${camelCaseCaps(traitName)}Base"
           }.mkString(" ")
 
-        s"""trait ${nodeBaseTrait.className}Base extends Node $mixins $mixinTraitsForBase
-            trait ${nodeBaseTrait.className} extends StoredNode with ${nodeBaseTrait.className}Base $mixinTraits
-        """
+        s"""sealed trait ${nodeBaseTrait.className}Base extends Node $mixins $mixinTraitsForBase
+           |sealed trait ${nodeBaseTrait.className} extends StoredNode with ${nodeBaseTrait.className}Base $mixinTraits
+        """.stripMargin
       }.mkString("\n")
 
       val keyBasedTraits =
@@ -279,7 +279,7 @@ $neighborAccesors
           val camelCaseName = camelCase(property.name)
           val camelCaseCapitalized = camelCaseName.capitalize
           val tpe = getCompleteType(property)
-          s"trait Has$camelCaseCapitalized { def $camelCaseName: $tpe }"
+          s"sealed trait Has$camelCaseCapitalized { def $camelCaseName: $tpe }"
         }.mkString("\n")
 
       val factories = {
@@ -608,19 +608,19 @@ ${neighborAccesors}
     * since e.g. `id` is not set before adding it to the graph */
   def writeNewNodesFile(outputDir: JFile): JFile = {
     val staticHeader = s"""
-    package $nodesPackage
+    |package $nodesPackage
 
-    import java.lang.{Boolean => JBoolean, Long => JLong}
-    import java.util.{Map => JMap, Set => JSet}
+    |import java.lang.{Boolean => JBoolean, Long => JLong}
+    |import java.util.{Map => JMap, Set => JSet}
 
-    /** base type for all nodes that can be added to a graph, e.g. the diffgraph */
-    trait NewNode extends Node {
-      override def label: String
-      def properties: Map[String, Any]
-      def containedNodesByLocalName: Map[String, List[Node]]
-      def allContainedNodes: List[Node] = containedNodesByLocalName.values.flatten.toList
-    }
-    """
+    |/** base type for all nodes that can be added to a graph, e.g. the diffgraph */
+    |trait NewNode extends Node {
+    |  override def label: String
+    |  def properties: Map[String, Any]
+    |  def containedNodesByLocalName: Map[String, List[Node]]
+    |  def allContainedNodes: List[Node] = containedNodesByLocalName.values.flatten.toList
+    |}
+    """.stripMargin
 
     val propertyByName: Map[String, Property] =
       schema.nodeKeys.map(prop => prop.name -> prop).toMap
