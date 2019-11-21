@@ -12,12 +12,12 @@ import scala.annotation.tailrec
 object MethodDotGenerator {
 
   /**
-    * Generates a [[java.lang.String]] representation of a DOT graph for
+    * Generates a java.lang.String representation of a DOT graph for
     * each internal method contained in the set of methods selected in
     * the previous node step(s).
     *
     * @param methodStep A step resulting in a set of methods.
-    * @return A [[java.lang.String]] containing a DOT graph for each internal method.
+    * @return A java.lang.String containing a DOT graph for each internal method.
     */
   def toDotGraph(methodStep: NodeSteps[Method]): List[String] =
     methodStep.internal.l.map(generateDotFromMethod)
