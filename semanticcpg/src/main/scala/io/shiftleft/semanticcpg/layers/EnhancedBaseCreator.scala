@@ -4,6 +4,7 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.CpgPass
+import io.shiftleft.semanticcpg.passes.BindingMethodOverridesPass
 import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
 import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
 import io.shiftleft.semanticcpg.passes.compat.bindingtablecompat.BindingTableCompat
@@ -35,6 +36,7 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new CapturingLinker(cpg),
           new Linker(cpg),
           new BindingTableCompat(cpg),
+          new BindingMethodOverridesPass(cpg),
           new CallLinker(cpg),
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
@@ -53,6 +55,7 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new CapturingLinker(cpg),
           new Linker(cpg),
           new BindingTableCompat(cpg),
+          new BindingMethodOverridesPass(cpg),
           new CallLinker(cpg),
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
