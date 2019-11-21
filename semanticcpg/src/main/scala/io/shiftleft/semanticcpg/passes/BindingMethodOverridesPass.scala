@@ -11,17 +11,20 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
     cpg.method.map(processMethod).toList().iterator
   }
 
-  def processMethod(m: nodes.Method): DiffGraph = {
+  def processMethod(method: nodes.Method): DiffGraph = {
     val diff: DiffGraph = new DiffGraph
-    m.start.referencingBinding
+    method.start.referencingBinding
       .toIterator()
       .foreach(binding => {
         val typeDecl: Option[nodes.TypeDecl] = binding.start.bindingTypeDecl.headOption()
         assert(typeDecl.isDefined,
-               "No binding typeDecl found in BindingMethodOverridesPass: " + m.name + " " + m.signature)
-        val neverOverriddenFlag = isMethodNeverOverridden(typeDecl.get, m.name, m.signature)
-        diff
-          .addNodeProperty(binding, NodeKeys.IS_METHOD_NEVER_OVERRIDDEN.name, neverOverriddenFlag.asInstanceOf[AnyRef])
+               "No binding typeDecl found in BindingMethodOverridesPass: " + method.name + " " + method.signature)
+        val neverOverriddenFlag = isMethodNeverOverridden(typeDecl.get, method.name, method.signature)
+        diff.addNodeProperty(
+          binding,
+          NodeKeys.IS_METHOD_NEVER_OVERRIDDEN.name,
+          neverOverriddenFlag.asInstanceOf[AnyRef]
+        )
       })
     diff
   }
