@@ -3,10 +3,12 @@ name := "codepropertygraph-protos"
 lazy val generateProtobuf = taskKey[File]("generate cpg.proto")
 
 enablePlugins(ProtobufPlugin)
+val protocLocalDir = "protoc"
+val protocBinaryPath = s"$protocLocalDir/bin/protoc"
+ProtobufConfig / protobufProtoc := protocBinaryPath
 ProtobufConfig / version := "3.10.0"
-
 sourceDirectories in ProtobufConfig += (protobufExternalIncludePath in ProtobufConfig).value
-ProtobufConfig / protobufGenerate := (ProtobufConfig / protobufGenerate).dependsOn(copyLatestCpgProto).value
+ProtobufConfig / protobufGenerate := (ProtobufConfig/protobufGenerate).dependsOn(copyLatestCpgProto).dependsOn(installProtoc).value
 
 lazy val copyLatestCpgProto = taskKey[Unit]("copy latest cpg.proto to externalIncludePath")
 copyLatestCpgProto := {
@@ -49,8 +51,6 @@ installProtoc := {
   import sys.process._
   import better.files.FileExtensions
   val protocVersion = (ProtobufConfig/version).value
-  val protocLocalDir = "protoc"
-  val protocBinaryPath = s"$protocLocalDir/bin/protoc"
   val protocBinary = new File(protocBinaryPath)
   val isAlreadyInstalled = protocBinary.exists && s"$protocBinaryPath --version".!!.contains(protocVersion)
 
