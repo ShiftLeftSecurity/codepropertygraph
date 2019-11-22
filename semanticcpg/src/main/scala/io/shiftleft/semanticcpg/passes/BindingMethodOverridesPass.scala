@@ -9,7 +9,8 @@ import org.apache.logging.log4j.LogManager
 
 class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
-    val methodIterator = cpg.method.toIterator().grouped(1024)
+    val methodIterator = cpg.method.toIterator()
+      .grouped(BindingMethodOverridesPass.BatchSize)
     new ParallelIteratorExecutor(methodIterator).map(processMethods)
   }
 
@@ -46,4 +47,5 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
 
 object BindingMethodOverridesPass {
   private val logger = LogManager.getLogger(getClass)
+  val BatchSize = 1024
 }
