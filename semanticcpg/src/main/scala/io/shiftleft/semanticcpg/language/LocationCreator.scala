@@ -91,6 +91,8 @@ object LocationCreator {
           local.lineNumber,
           local.start.method.head
         )
+      case source: nodes.Source =>
+        apply(source.node)
       case vertex: Vertex =>
         emptyLocation(vertex.label, Some(vertex.asInstanceOf[nodes.Node]))
     }
