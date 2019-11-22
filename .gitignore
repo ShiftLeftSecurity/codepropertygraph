@@ -4,7 +4,7 @@
 target/
 codepropertygraph/project/
 /codepropertygraph/src/main/resources/cpg.json
-/protoc-*.zip
 private-key.pem
 travis_wait_*
 **/*.pyc
+/protoc

@@ -44,15 +44,44 @@ generateCsharpBindings := {
   new File(s"cpg-proto-bindings.${dotnetVersion}.nupkg")
 }
 
+lazy val installProtoc = taskKey[File]("downloads configured protoc version for your platform, unless already available")
+installProtoc := {
+  import sys.process._
+  import better.files.FileExtensions
+  val protocVersion = (ProtobufConfig/version).value
+  val protocLocalDir = "protoc"
+  val protocBinaryPath = s"$protocLocalDir/bin/protoc"
+  val protocBinary = new File(protocBinaryPath)
+  val isAlreadyInstalled = protocBinary.exists && s"$protocBinaryPath --version".!!.contains(protocVersion)
+
+  if (!isAlreadyInstalled) {
+    val platform= (System.getProperty("os.name"), System.getProperty("os.arch")) match {
+      case ("Linux", "amd64") => "linux-x86_64"
+      case (name, "amd64") if name.startsWith("Windows") => "win64"
+      case (name, arch) if name.toLowerCase.contains("mac") && arch.contains("64") => "osx-x86_64"
+      case (name, arch) => throw new AssertionError(s"unknown platform name/arch ($name/$arch), please add in `proto-bindings/build.sbt` match")
+    }
+    val url = new URL(s"https://github.com/protocolbuffers/protobuf/releases/download/v$protocVersion/protoc-$protocVersion-$platform.zip")
+
+    println(s"downloading $url and extracting into $protocLocalDir")
+    val outdir = new File(protocLocalDir)
+    if (outdir.exists) outdir.toScala.delete()
+    IO.unzipURL(url, outdir)
+    protocBinary.toScala.addPermission(java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE)
+  }
+  protocBinary
+}
+
 lazy val generateGoBindings = taskKey[File]("generate go proto bindings (doesn't publish them anywhere)")
 generateGoBindings := {
   (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
+  val protocBinary = installProtoc.value
   // protoc requires a relative path...
   val protoFile = "codepropertygraph/target/cpg.proto"
   val outDir = new File("codepropertygraph/target/protoc-go")
   outDir.mkdirs
   println(s"writing go proto bindings to $outDir")
-  val cmd = s"""protoc --go_out=$outDir $protoFile"""
+  val cmd = s"""$protocBinary --go_out=$outDir $protoFile"""
   runCmd(cmd, cmd)
   outDir
 }
@@ -60,12 +89,13 @@ generateGoBindings := {
 lazy val generatePythonBindings = taskKey[File]("generate Python proto bindings")
 generatePythonBindings := {
   (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
+  val protocBinary = installProtoc.value
   // protoc requires a relative path...
   val protoFile = "codepropertygraph/target/cpg.proto"
   val outDir = new File("codepropertygraph/target/protoc-py")
   outDir.mkdirs
   println(s"writing Python proto bindings to $outDir")
-  val cmd = s"""protoc --python_out=$outDir $protoFile"""
+  val cmd = s"""$protocBinary --python_out=$outDir $protoFile"""
   runCmd(cmd, cmd)
   outDir
 }
