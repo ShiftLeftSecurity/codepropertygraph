@@ -20,7 +20,7 @@ class TruncationsTests extends WordSpec with Matchers {
     """
 
   DataFlowCodeToCpgFixture(code) { cpg =>
-    cpg.call("strlen").inAssignment.target.expr.evalType("(g?)int").method.name.l shouldBe ("vulnerable")
+    cpg.call("strlen").inAssignment.target.expr.evalType("(g?)int").method.name.l shouldBe List("vulnerable")
   }
 
 }
