@@ -6,6 +6,11 @@ import io.shiftleft.semanticcpg.language._
 
 class OpAstNode(val node: nodes.AstNode) extends AnyRef {
 
+  def inAssignment: AssignmentTrav =
+    new AssignmentTrav(
+      node.start.inAstMinusLeaf.isCall.name(NodeTypeStarters.assignmentPattern).map(new Assignment(_)).raw
+    )
+
   def assignments: AssignmentTrav =
     new AssignmentTrav(rawTravForPattern(NodeTypeStarters.assignmentPattern).map(new Assignment(_)).raw)
 
