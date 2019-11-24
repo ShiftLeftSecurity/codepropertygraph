@@ -269,8 +269,8 @@ $neighborAccesors
             s"with ${camelCaseCaps(traitName)}Base"
           }.mkString(" ")
 
-        s"""sealed trait ${nodeBaseTrait.className}Base extends Node $mixins $mixinTraitsForBase
-           |sealed trait ${nodeBaseTrait.className} extends StoredNode with ${nodeBaseTrait.className}Base $mixinTraits
+        s"""trait ${nodeBaseTrait.className}Base extends Node $mixins $mixinTraitsForBase
+           |trait ${nodeBaseTrait.className} extends StoredNode with ${nodeBaseTrait.className}Base $mixinTraits
         """.stripMargin
       }.mkString("\n")
 
@@ -279,7 +279,7 @@ $neighborAccesors
           val camelCaseName = camelCase(property.name)
           val camelCaseCapitalized = camelCaseName.capitalize
           val tpe = getCompleteType(property)
-          s"sealed trait Has$camelCaseCapitalized { def $camelCaseName: $tpe }"
+          s"trait Has$camelCaseCapitalized { def $camelCaseName: $tpe }"
         }.mkString("\n")
 
       val factories = {
