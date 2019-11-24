@@ -11,7 +11,7 @@ import org.json4s.CustomSerializer
 import org.json4s.native.Serialization.{write, writePretty}
 import org.json4s.Extraction
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 
 /** Base class for our DSL

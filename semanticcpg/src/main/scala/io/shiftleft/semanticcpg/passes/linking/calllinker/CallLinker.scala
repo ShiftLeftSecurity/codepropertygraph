@@ -9,7 +9,7 @@ import io.shiftleft.Implicits._
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.logging.log4j.{LogManager, Logger}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
   import CallLinker._

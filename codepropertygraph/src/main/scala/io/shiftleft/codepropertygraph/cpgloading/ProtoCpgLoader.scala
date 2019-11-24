@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager
 import resource.{ManagedResource, managed}
 import java.util.{List => JList}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import io.shiftleft.overflowdb.OdbConfig
 
 object ProtoCpgLoader {
@@ -46,7 +46,7 @@ object ProtoCpgLoader {
   }
 
   def loadFromListOfProtos(cpgs: JList[CpgStruct], overflowDbConfig: OdbConfig): Cpg =
-    loadFromListOfProtos(cpgs.asScala, overflowDbConfig)
+    loadFromListOfProtos(cpgs.asScala.toSeq, overflowDbConfig)
 
   def loadOverlays(fileName: String): ManagedResource[Iterator[CpgOverlay]] =
     managed(new ZipArchive(fileName)).map(readOverlayEntries)

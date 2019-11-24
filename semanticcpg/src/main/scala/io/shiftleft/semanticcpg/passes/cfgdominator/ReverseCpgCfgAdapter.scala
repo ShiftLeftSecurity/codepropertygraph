@@ -4,7 +4,7 @@ import gremlin.scala.Vertex
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import org.apache.tinkerpop.gremlin.structure.Direction
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class ReverseCpgCfgAdapter extends CfgAdapter[Vertex] {
   override def successors(node: Vertex): TraversableOnce[Vertex] = {

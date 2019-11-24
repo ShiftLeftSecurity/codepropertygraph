@@ -11,7 +11,7 @@ import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.{T, Vertex}
 import io.shiftleft.overflowdb.OdbGraph
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable.ArrayBuffer
 import io.shiftleft.overflowdb.OdbConfig
 import io.shiftleft.utils.StringInterner
@@ -78,7 +78,7 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     for (edge <- protoEdges) {
       val srcVertex = findVertexById(edge, edge.getSrc)
       val dstVertex = findVertexById(edge, edge.getDst)
-      val properties: Seq[Edge.Property] = edge.getPropertyList.asScala
+      val properties = edge.getPropertyList.asScala
       val keyValues = new ArrayBuffer[AnyRef](2 * properties.size)
       for (edgeProperty <- properties) {
         addProperties(keyValues, edgeProperty.getName.name(), edgeProperty.getValue, interner)

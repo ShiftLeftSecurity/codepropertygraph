@@ -8,7 +8,7 @@ import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.scalatest.{Matchers, WordSpec}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class CfgDominatorPassTests extends WordSpec with Matchers {
   "Have correct DOMINATE/POST_DOMINATE edges after CfgDominatorPass run." in {

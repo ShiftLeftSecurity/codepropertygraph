@@ -7,7 +7,7 @@ import io.shiftleft.cpgvalidator.facts.KeysFactsImporter
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.structure.VertexProperty
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
 

@@ -6,7 +6,7 @@ import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominator, CfgDominatorF
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.scalatest.{Matchers, WordSpec}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class CfgDominatorFrontierTests extends WordSpec with Matchers {
 

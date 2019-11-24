@@ -10,7 +10,7 @@
 // import org.apache.logging.log4j.LogManager
 // import org.apache.tinkerpop.gremlin.tinkergraph.storage.OndiskOverflow
 
-// import scala.collection.JavaConverters._
+// import scala.jdk.CollectionConverters._
 // import resource.managed
 
 // /**

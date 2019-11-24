@@ -56,14 +56,14 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       import org.apache.tinkerpop.gremlin.structure.Property
       import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
       import io.shiftleft.overflowdb.{EdgeLayoutInformation, EdgeFactory, NodeFactory, OdbEdge, OdbNode, OdbGraph, NodeRef}
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       import org.slf4j.LoggerFactory
 
       object PropertyErrorRegister {
         private var errorMap = Set[(Class[_], String)]()
         private val logger = LoggerFactory.getLogger(getClass)
 
-        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String) {
+        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
           if (!errorMap.contains((clazz, propertyName))) {
             logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
             errorMap += ((clazz, propertyName))
@@ -190,14 +190,14 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
       import io.shiftleft.overflowdb.{EdgeFactory, NodeFactory, NodeLayoutInformation, OdbNode, OdbGraph, OdbNodeProperty, NodeRef}
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       import org.slf4j.LoggerFactory
 
       object PropertyErrorRegister {
         private var errorMap = Set[(Class[_], String)]()
         private val logger = LoggerFactory.getLogger(getClass)
 
-        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String) {
+        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
           if (!errorMap.contains((clazz, propertyName))) {
             logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
             errorMap += ((clazz, propertyName))
@@ -485,7 +485,7 @@ $neighborAccesors
       val nodeBaseImpl = s"""
       |trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
       |  def asStored : StoredNode = this.asInstanceOf[StoredNode]
-      |  override def getId: JLong = -1l
+      |  override def getId: JLong = -1L
       |
       |  $abstractContainedNodeAccessors
       |
@@ -578,7 +578,7 @@ ${neighborAccesors}
                 case values: List[_] => 
                   values.map { value => 
                     new OdbNodeProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
-                  }.toIterator.asJava
+                  }.iterator.asJava
                 case value => IteratorUtils.of(new OdbNodeProperty(-1, this, key, value.asInstanceOf[A]))
               }
           }

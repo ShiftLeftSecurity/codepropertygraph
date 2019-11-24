@@ -6,7 +6,7 @@ import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex}
 import io.shiftleft.Implicits.JavaIteratorDeco
 
 import scala.annotation.tailrec
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // TODO This object is problematic. While it offers a few utility methods
 // on nodes, these are all lumped together into one object, and they are
@@ -140,7 +140,7 @@ object ExpandTo {
       .toSeq
   }
 
-  def allCfgNodesOfMethod(method: Vertex): TraversableOnce[nodes.StoredNode] = {
+  def allCfgNodesOfMethod(method: Vertex): IterableOnce[nodes.StoredNode] = {
     method.asInstanceOf[nodes.StoredNode]._containsOut.asScala
   }
 

@@ -8,7 +8,7 @@ import io.shiftleft.passes.{CpgPass, DiffGraph}
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Direction
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   * Compatibility pass which calculates missing binding tables.
