@@ -11,6 +11,8 @@ class AssignmentTrav(override val raw: GremlinScala[nodes.Assignment]) extends S
 
   def target: Target = new Target(map(_.target).map(new nodes.Target(_)).raw)
 
+  def source: AssignSource = new AssignSource(map(_.source).map(new nodes.AssignSource(_)).raw)
+
   def call: Steps[Call] = map(_.call)
 
 }
