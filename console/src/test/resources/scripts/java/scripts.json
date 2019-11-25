@@ -1,0 +1,9 @@
+{
+  "description": "A collection of java-specific scripts.",
+  "scripts": [
+    {
+      "name": "list-sl-ns",
+      "description": "Lists all shiftleft namespaces."
+    }
+  ]
+}
