@@ -9,9 +9,10 @@ object CfgNodeMethods {
     * */
   def repr(cfgNode: nodes.CfgNode): String = {
     cfgNode match {
-      case method: nodes.Method             => method.name
-      case methodReturn: nodes.MethodReturn => methodReturn.code
-      case expr: nodes.Expression           => expr.code
+      case method: nodes.MethodBase             => method.name
+      case methodReturn: nodes.MethodReturnBase => methodReturn.code
+      case expr: nodes.Expression               => expr.code
+      case call: nodes.ImplicitCallBase         => call.code
     }
   }
 

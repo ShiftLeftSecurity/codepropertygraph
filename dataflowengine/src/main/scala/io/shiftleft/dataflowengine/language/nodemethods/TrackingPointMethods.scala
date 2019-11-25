@@ -22,6 +22,7 @@ class TrackingPointMethods(val node: nodes.TrackingPointBase) extends AnyVal {
     node match {
       case n: nodes.AstNode               => n
       case n: nodes.DetachedTrackingPoint => n.cfgNode
+      case _                              => ??? //TODO markus/fabs?
     }
   }
 
