@@ -26,6 +26,7 @@
 	},
 	{"id" : 54, "name" : "SENSITIVE_VARIABLE", "keys" : ["NAME"], "comment" : "",
 	 "containedNodes" : [
+	     {"localName": "variable", "nodeType" : "LOCAL_LIKE", "cardinality" : "one"},
 	     {"localName" : "names", "nodeType" : "MATCH_INFO", "cardinality" : "list"},
 	     {"localName" : "evalType", "nodeType" : "TYPE", "cardinality" : "one"}
 	 ], "outEdges" : [
