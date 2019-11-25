@@ -11,10 +11,10 @@ import scala.jdk.CollectionConverters._
 class CfgDominatorFrontierTests extends WordSpec with Matchers {
 
   private class TestCfgAdapter extends CfgAdapter[Vertex] {
-    override def successors(node: Vertex): TraversableOnce[Vertex] = {
+    override def successors(node: Vertex): IterableOnce[Vertex] = {
       node.vertices(Direction.OUT, "CFG").asScala
     }
-    override def predecessors(node: Vertex): TraversableOnce[Vertex] = {
+    override def predecessors(node: Vertex): IterableOnce[Vertex] = {
       node.vertices(Direction.IN, "CFG").asScala
     }
   }
