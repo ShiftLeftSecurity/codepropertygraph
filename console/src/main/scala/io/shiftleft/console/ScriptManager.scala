@@ -42,9 +42,9 @@ abstract class ScriptManager(executor: CpgQueryExecutor[AnyRef]) {
   import ScriptManager._
 
   protected lazy val DEFAULT_SCRIPTS_FOLDER: File = {
-    import scala.collection.JavaConverters.mapAsJavaMapConverter
+    import scala.jdk.CollectionConverters._
 
-    val scriptsPath = getClass.getClassLoader.getResource("scripts").toURI
+    val scriptsPath = this.getClass.getClassLoader.getResource("scripts").toURI
     if (scriptsPath.getScheme.contains("jar")) {
       FileSystems.newFileSystem(scriptsPath, Map("create" -> "false").asJava)
     }
