@@ -12,11 +12,31 @@ import io.shiftleft.console.query.{CpgOperationFailure, CpgOperationResult, CpgO
 import java.nio.file.{FileSystems, Paths}
 
 object ScriptManager {
-
-  final case class ScriptDescriptions(scripts: List[ScriptDescription])
+  final case class ScriptCollections(collection: String, scripts: ScriptDescriptions)
+  final case class ScriptDescriptions(description: String, scripts: List[ScriptDescription])
   final case class ScriptDescription(name: String, description: String)
 }
 
+/**
+  * This class manages a hierarchy of scripts, and provides an interface
+  * that allows users to easily discover and run scripts on their CPGs.
+  *
+  * Scripts should be grouped inside folders placed within the application's
+  * `resource` directory, for example:
+  *
+  *  resources
+  *    |-- java
+  *        |-- my-java-script.sc
+  *    |-- go
+  *    |-- csharp
+  *
+  * To run `my-java-script.sc` you would run:
+  * `runScript("java/my-java-script", cpg)`
+  *
+  * All scripts *must* have the `.sc` extension to be picked up by the script manager.
+  *
+  * @param executor A CPG executor that is used to run the managed scripts.
+  */
 abstract class ScriptManager(executor: CpgQueryExecutor[AnyRef]) {
 
   import ScriptManager._
@@ -36,10 +56,20 @@ abstract class ScriptManager(executor: CpgQueryExecutor[AnyRef]) {
 
   private def scriptContent(file: File): String = file.lines.mkString(System.lineSeparator())
 
-  def scripts(): List[ScriptDescription] =
-    decode[ScriptDescriptions] {
-      (DEFAULT_SCRIPTS_FOLDER / SCRIPT_DESCS).lines.mkString(System.lineSeparator())
-    }.toOption.map(_.scripts).getOrElse(List.empty)
+  def scripts(): List[ScriptCollections] = {
+    DEFAULT_SCRIPTS_FOLDER
+      .collectChildren(_.isDirectory)
+      .collect {
+        case dir if dir != DEFAULT_SCRIPTS_FOLDER =>
+          val relativeDir = DEFAULT_SCRIPTS_FOLDER.relativize(dir)
+
+          val scriptDescs = decode[ScriptDescriptions] {
+            (dir / SCRIPT_DESCS).lines.mkString(System.lineSeparator())
+          }.toOption.getOrElse(ScriptDescriptions("", List.empty))
+
+          ScriptCollections(relativeDir.toString, scriptDescs)
+      }.toList
+  }
 
   private def handleQueryResult(result: IO[CpgOperationResult[AnyRef]]): AnyRef = {
     val scriptExecutionResult = for {

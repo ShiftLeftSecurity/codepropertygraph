@@ -1,4 +1,5 @@
 {
+  "description": "A collection of general purpose scripts.",
   "scripts": [
     {
       "name": "list-funcs",

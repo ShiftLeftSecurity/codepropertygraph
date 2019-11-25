@@ -1,14 +1,17 @@
 package io.shiftleft.console
 
 import java.util.UUID
-
 import better.files.File
 import cats.data.OptionT
 import cats.effect.IO
+
 import io.shiftleft.codepropertygraph.Cpg
 import org.scalatest.{Inside, Matchers, WordSpec}
-import io.shiftleft.console.ScriptManager.ScriptDescription
+
+import io.shiftleft.console.ScriptManager.{ScriptCollections, ScriptDescription, ScriptDescriptions}
 import io.shiftleft.console.query.{CpgOperationResult, CpgOperationSuccess, CpgQueryExecutor}
+
+import java.nio.file.NoSuchFileException
 
 class ScriptManagerTest extends WordSpec with Matchers with Inside {
 
@@ -34,19 +37,42 @@ class ScriptManagerTest extends WordSpec with Matchers with Inside {
   "listing scripts" should {
     "be correct" in withScriptManager { scriptManager =>
       val scripts = scriptManager.scripts()
-      scripts shouldBe List(ScriptDescription("list-funcs", "Lists all functions."))
+      val expected = List(
+        ScriptCollections("general",
+          ScriptDescriptions(
+            "A collection of general purpose scripts.",
+            List(ScriptDescription("list-funcs", "Lists all functions."))
+          )),
+        ScriptCollections("java",
+          ScriptDescriptions(
+            "A collection of java-specific scripts.",
+            List(ScriptDescription("list-sl-ns", "Lists all shiftleft namespaces."))
+          )),
+        ScriptCollections("general/general_plus",
+          ScriptDescriptions(
+            "Even more general purpose scripts.",
+            List.empty
+          )))
+
+      scripts should contain theSameElementsAs expected
     }
   }
 
   "running scripts" should {
     "be correct when explicitly specifying a CPG" in withScriptManager { scriptManager =>
       val expected = "cpg.method.name.l"
-      scriptManager.runScript("list-funcs", Cpg.emptyCpg) shouldBe expected
+      scriptManager.runScript("general/list-funcs", Cpg.emptyCpg) shouldBe expected
     }
 
     "be correctly when specifying a CPG filename" in withScriptManager { scriptManager =>
       val expected = "cpg.method.name.l"
-      scriptManager.runScript("list-funcs", DEFAULT_CPG_NAME) shouldBe expected
+      scriptManager.runScript("general/list-funcs", DEFAULT_CPG_NAME) shouldBe expected
+    }
+
+    "throw an exception if the specified script can not be found" in withScriptManager { scriptManager =>
+      intercept[NoSuchFileException] {
+        scriptManager.runScript("list-funcs", Cpg.emptyCpg)
+      }
     }
   }
 

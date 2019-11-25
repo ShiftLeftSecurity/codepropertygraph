@@ -1,0 +1,1 @@
+cpg.namespace.name(".*shiftleft.*").l
