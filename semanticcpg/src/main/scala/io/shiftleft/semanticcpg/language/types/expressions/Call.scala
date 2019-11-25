@@ -55,7 +55,7 @@ class Call(raw: GremlinScala[nodes.Call])
     `i'th` arguments of the call
     */
   def argument(i: Integer): Expression =
-    argument.order(i)
+    argument.argIndex(i)
 
   /**
     To formal method return parameter
