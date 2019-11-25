@@ -68,7 +68,8 @@ abstract class ScriptManager(executor: CpgQueryExecutor[AnyRef]) {
           }.toOption.getOrElse(ScriptDescriptions("", List.empty))
 
           ScriptCollections(relativeDir.toString, scriptDescs)
-      }.toList
+      }
+      .toList
   }
 
   private def handleQueryResult(result: IO[CpgOperationResult[AnyRef]]): AnyRef = {
