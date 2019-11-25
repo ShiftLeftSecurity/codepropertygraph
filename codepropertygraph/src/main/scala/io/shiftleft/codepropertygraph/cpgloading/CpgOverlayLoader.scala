@@ -28,14 +28,11 @@ private[cpgloading] object CpgOverlayLoader {
       .loadOverlays(filename)
       .map { overlays: Iterator[CpgOverlay] =>
         overlays.foreach(applier.applyDiff)
-      }
-      .tried
-      .recover {
+      }.recover {
         case e: IOException =>
           logger.error("Failed to load overlay from " + filename, e)
           Nil
-      }
-      .get
+      }.get
   }
 }
 
