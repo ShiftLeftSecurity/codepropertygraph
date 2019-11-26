@@ -27,24 +27,20 @@ class CdgPass(cpg: Cpg) extends CpgPass(cpg) {
       val cfgNodes = method.vertices(Direction.OUT, EdgeTypes.CONTAINS).asScala.toList
       val postDomFrontiers = dominanceFrontier.calculate(method :: cfgNodes)
 
-      postDomFrontiers.foreach {
-        case (node, frontier) =>
-          frontier.foreach { postDomFrontierNode =>
-            postDomFrontierNode match {
-              case _: nodes.Literal | _: nodes.Identifier | _: nodes.Call | _: nodes.MethodRef | _: nodes.Unknown =>
-                dstGraph.addEdgeInOriginal(postDomFrontierNode.asInstanceOf[nodes.StoredNode],
-                                           node.asInstanceOf[nodes.StoredNode],
-                                           EdgeTypes.CDG)
-              case _ =>
-                val method = postDomFrontierNode.vertices(Direction.IN, EdgeTypes.CONTAINS).next
-                val nodeLabel = postDomFrontierNode.label
-                logger.warn(
-                  s"Found CDG edge starting at $nodeLabel node. This is most likely caused by an invalid CFG." +
-                    s" Method: ${method.valueOption(NodeKeys.FULL_NAME)}" +
-                    s" number of outgoing CFG edges from $nodeLabel node: ${postDomFrontierNode.edges(Direction.OUT, EdgeTypes.CFG).asScala.size}")
-
-            }
-          }
+      postDomFrontiers.foreach { case (node, postDomFrontierNode) =>
+        postDomFrontierNode match {
+          case _: nodes.Literal | _: nodes.Identifier | _: nodes.Call | _: nodes.MethodRef | _: nodes.Unknown =>
+            dstGraph.addEdgeInOriginal(postDomFrontierNode.asInstanceOf[nodes.StoredNode],
+                                       node.asInstanceOf[nodes.StoredNode],
+                                       EdgeTypes.CDG)
+          case _ =>
+            val method = postDomFrontierNode.vertices(Direction.IN, EdgeTypes.CONTAINS).next
+            val nodeLabel = postDomFrontierNode.label
+            logger.warn(
+              s"Found CDG edge starting at $nodeLabel node. This is most likely caused by an invalid CFG." +
+                s" Method: ${method.valueOption(NodeKeys.FULL_NAME)}" +
+                s" number of outgoing CFG edges from $nodeLabel node: ${postDomFrontierNode.edges(Direction.OUT, EdgeTypes.CFG).asScala.size}")
+        }
       }
     }
 

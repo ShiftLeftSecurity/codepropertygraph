@@ -41,6 +41,7 @@ final class CpgRoute[T: Encoder](cpgProvider: CpgProvider, cpgQueryExecutor: Cpg
       }
   }
 
+  // TODO discuss with jacob: according to scalac this is unreachable... commenting for now since it probably never worked anyway
   private def createCpgQuery(cpgId: UUID, queryRequest: CreateCpgQueryRequest): IO[Response[IO]] = {
     cpgProvider
       .retrieveCpg(cpgId)
@@ -86,6 +87,7 @@ final class CpgRoute[T: Encoder](cpgProvider: CpgProvider, cpgQueryExecutor: Cpg
         .as[CreateCpgRequest]
         .flatMap(createCpg)
 
+      // TODO discuss with jacob: according to scalac this is unreachable... commenting for now since it probably never worked anyway
     case req @ POST -> Root / "v1" / "cpg" / UUIDVar(cpgId) / "query" =>
       req
         .as[CreateCpgQueryRequest]
