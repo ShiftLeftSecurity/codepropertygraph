@@ -3,7 +3,11 @@ inThisBuild(
   List(
     organization := "io.shiftleft",
     scalaVersion := "2.13.1",
-    resolvers ++= Seq(Resolver.mavenLocal, Resolver.bintrayRepo("shiftleft", "maven"), "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
+    resolvers ++= Seq(
+      Resolver.mavenLocal,
+      Resolver.bintrayRepo("shiftleft", "maven"),
+      Resolver.bintrayRepo("mpollmeier", "maven"),
+      "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
     bintrayVcsUrl := Some("https://github.com/ShiftLeftSecurity/codepropertygraph"),
