@@ -46,6 +46,9 @@ scalacOptions ++= Seq(
   "-Ywarn-value-discard"               // Warn when non-Unit expression results are unused.
 )
 
+// Re-enable fatal warnings once this Scala 2.13 issue is fixed: https://github.com/scala/bug/issues/11457
+scalacOptions -= "-Xfatal-warnings"
+
 val Http4sVersion = "0.21.0-M5"
 val CirceVersion = "0.12.2"
 val PureconfigVersion = "0.12.1"
