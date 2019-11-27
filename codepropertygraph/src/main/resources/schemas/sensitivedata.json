@@ -1,6 +1,8 @@
 {
     "nodeKeys" : [	
-	{"id" : 813, "name" : "PATTERN", "valueType" : "string", "cardinality" : "one", "comment" : ""}
+	{"id" : 813, "name" : "PATTERN", "valueType" : "string", "cardinality" : "one", "comment" : ""},
+	{"id" : 814, "name" : "CATEGORIES", "valueType" : "string", "cardinality" : "list", "comment" : ""},
+	{"id" : 815, "name" : "EVAL_TYPE", "valueType": "string", "cardinality" : "one", "comment" : ""}
     ],
     "edgeKeys" : [],
     "nodeTypes" : [
@@ -24,10 +26,9 @@
 	     {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF", "inNodes" : ["TYPE", "MEMBER"]}
 	 ]
 	},
-	{"id" : 54, "name" : "SENSITIVE_VARIABLE", "keys" : ["NAME"], "comment" : "",
+	{"id" : 54, "name" : "SENSITIVE_VARIABLE", "keys" : ["NAME", "EVAL_TYPE", "CATEGORIES"], "comment" : "",
 	 "containedNodes" : [
-	     {"localName" : "names", "nodeType" : "MATCH_INFO", "cardinality" : "list"},
-	     {"localName" : "evalType", "nodeType" : "TYPE", "cardinality" : "one"}
+	     {"localName" : "node", "nodeType" : "LOCAL_LIKE", "cardinality" : "one" }
 	 ], "outEdges" : [
 	     // "inNodes" : "LOCAL_LIKE" is what I want here, but it is currently necessary
 	     // to enumerate all child classes
