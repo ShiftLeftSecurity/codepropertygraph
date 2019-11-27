@@ -6,7 +6,9 @@
     "edgeKeys" : [],
     "nodeTypes" : [
 	{"id" : 54, "name" : "SENSITIVE_VARIABLE", "keys" : ["NAME", "EVAL_TYPE", "CATEGORIES"], "comment" : "",
-	 "containedNodes" : [],
+	 "containedNodes" : [
+	     {"localName" : "node", "nodeType" : "LOCAL_LIKE", "cardinality" : "one"}
+	 ],
 	 "outEdges" : []
 	}
     ],
