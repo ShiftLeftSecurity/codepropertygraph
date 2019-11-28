@@ -7,7 +7,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct}
 import org.apache.logging.log4j.LogManager
 import java.util.{List => JList}
-
 import scala.jdk.CollectionConverters._
 import scala.util.{Try, Using}
 import io.shiftleft.overflowdb.OdbConfig
@@ -51,18 +50,15 @@ object ProtoCpgLoader {
     loadFromListOfProtos(cpgs.asScala.toSeq, overflowDbConfig)
 
   def loadOverlays(fileName: String): Try[Iterator[CpgOverlay]] =
-    Using(new ZipArchive(fileName)) { zip => readOverlayEntries(zip) }
-
-  private def readOverlay(path: Path): CpgOverlay =
-    Using(Files.newInputStream(path)) { is =>
-      CpgOverlay.parseFrom(is)
-    }.get
-
-  private def readOverlayEntries(zip: ZipArchive): Iterator[CpgOverlay] =
-    zip.entries
-      .sortWith(compareOverlayPath)
-      .iterator
-      .map(readOverlay)
+    Using(new ZipArchive(fileName)) { zip =>
+      zip.entries
+        .sortWith(compareOverlayPath)
+        .map { path =>
+          val is = Files.newInputStream(path)
+          CpgOverlay.parseFrom(is)
+        }
+        .iterator
+    }
 
   private def compareOverlayPath(a: Path, b: Path): Boolean = {
     val file1Split: Array[String] = a.toString.replace("/", "").split("_")
