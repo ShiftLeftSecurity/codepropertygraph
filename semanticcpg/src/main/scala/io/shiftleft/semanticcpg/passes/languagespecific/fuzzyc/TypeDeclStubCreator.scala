@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{CpgPass,  DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
 /**
@@ -17,7 +17,7 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
   private var typeDeclFullNameToNode = Map[String, nodes.TypeDeclBase]()
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = new DiffGraph
+    val dstGraph = DiffGraph.newBuilder
 
     init()
 
@@ -35,7 +35,7 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
       }
       .iterate()
 
-    Iterator(dstGraph)
+    Iterator(dstGraph.build())
   }
 
   private def createTypeDeclStub(name: String, fullName: String): nodes.NewTypeDecl = {

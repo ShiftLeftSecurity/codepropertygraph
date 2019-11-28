@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewMethodReturn}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{CpgPass,  DiffGraph}
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 import io.shiftleft.semanticcpg.language._
@@ -24,7 +24,7 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
   private var methodToParameterCount = Map[NameAndSignature, Int]()
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = new DiffGraph
+    val dstGraph = DiffGraph.newBuilder
 
     init()
 
@@ -40,14 +40,14 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 
     }
 
-    Iterator(dstGraph)
+    Iterator(dstGraph.build())
   }
 
   private def createMethodStub(name: String,
                                fullName: String,
                                signature: String,
                                parameterCount: Int,
-                               dstGraph: DiffGraph): nodes.MethodBase = {
+                               dstGraph: DiffGraph.Builder): nodes.MethodBase = {
     val methodNode = new nodes.NewMethod(
       name,
       fullName,

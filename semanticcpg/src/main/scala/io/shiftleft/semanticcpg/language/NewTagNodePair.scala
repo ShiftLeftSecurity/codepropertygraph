@@ -3,11 +3,11 @@ package io.shiftleft.semanticcpg.language
 import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node, StoredNode}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.passes.DiffGraph
+import io.shiftleft.passes.{ DiffGraph}
 
 class NewTagNodePair[NodeType <: Node](raw: GremlinScala[nodes.NewTagNodePair]) {
 
-  def store()(implicit diffGraph: DiffGraph): Unit = {
+  def store()(implicit diffGraph: DiffGraph.Builder): Unit = {
     raw.toList.foreach { tagNodePair =>
       val tag = tagNodePair.tag
       val tagValue = tagNodePair.node

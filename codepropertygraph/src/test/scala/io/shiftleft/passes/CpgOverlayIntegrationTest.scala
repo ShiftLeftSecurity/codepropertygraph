@@ -59,10 +59,10 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
         * Main method of enhancement - to be implemented by child class
         **/
       override def run(): Iterator[DiffGraph] = {
-        val dstGraph = new DiffGraph
+        val dstGraph = DiffGraph.newBuilder
         dstGraph.addNode(newNode)
         dstGraph.addEdgeFromOriginal(srcNode = from, dstNode = newNode, edgeLabel = EdgeTypes.AST)
-        Iterator(dstGraph)
+        Iterator(dstGraph.build())
       }
     }
   }

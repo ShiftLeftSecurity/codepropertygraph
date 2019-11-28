@@ -8,7 +8,6 @@ import scala.collection.concurrent.Map
 import scala.concurrent.ExecutionContext
 import cats.data.OptionT
 import cats.effect.{Blocker, ContextShift, IO}
-
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewMethod
 import io.shiftleft.console.query.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess}
@@ -32,9 +31,9 @@ class DummyCpgProvider(implicit cs: ContextShift[IO]) extends CpgProvider {
 
   private class MyPass(cpg: Cpg) extends CpgPass(cpg) {
     override def run(): Iterator[DiffGraph] = {
-      implicit val diffGraph: DiffGraph = new DiffGraph
+      implicit val diffGraph: DiffGraph.Builder = DiffGraph.newBuilder
       NewMethod(name = "main", isExternal = false).start.store
-      Iterator(diffGraph)
+      Iterator(diffGraph.build())
     }
   }
 

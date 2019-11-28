@@ -4,7 +4,7 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
 import org.apache.logging.log4j.LogManager
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{CpgPass,  DiffGraph}
 import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominatorFrontier, ReverseCpgCfgAdapter}
 import org.apache.tinkerpop.gremlin.structure.Direction
 import io.shiftleft.semanticcpg.language._
@@ -18,7 +18,7 @@ class CdgPass(cpg: Cpg) extends CpgPass(cpg) {
   import CdgPass.logger
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = new DiffGraph
+    val dstGraph = DiffGraph.newBuilder
 
     val dominanceFrontier =
       new CfgDominatorFrontier(new ReverseCpgCfgAdapter(), new CpgPostDomTreeAdapter())
@@ -48,7 +48,7 @@ class CdgPass(cpg: Cpg) extends CpgPass(cpg) {
       }
     }
 
-    Iterator(dstGraph)
+    Iterator(dstGraph.build())
   }
 }
 

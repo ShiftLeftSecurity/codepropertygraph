@@ -4,15 +4,15 @@ import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node, StoredNode
 import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
 import io.shiftleft.codepropertygraph.generated.EdgeKeys
 import gremlin.scala._
-import io.shiftleft.passes.DiffGraph
+import io.shiftleft.passes.{ DiffGraph}
 
 class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Steps[A](raw) {
 
-  def store()(implicit graph: DiffGraph): Unit =
+  def store()(implicit diffBuilder: DiffGraph.Builder): Unit =
     raw.sideEffect(storeRecursively).iterate()
 
-  private def storeRecursively(newNode: NewNode)(implicit graph: DiffGraph): Unit = {
-    graph.addNode(newNode)
+  private def storeRecursively(newNode: NewNode)(implicit diffBuilder: DiffGraph.Builder): Unit = {
+    diffBuilder.addNode(newNode)
 
     // add all `contained` nodes that are NewNodes to the DiffGraph
     newNode.allContainedNodes.collect {
@@ -28,19 +28,19 @@ class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Step
         EdgeKeys.LOCAL_NAME -> localName,
         EdgeKeys.INDEX -> index
       ).map { case KeyValue(key, value) => (key.name, value) }
-      addEdge(graph, newNode, containedNode, ContainsNode.Label, properties)
+      addEdge(diffBuilder, newNode, containedNode, ContainsNode.Label, properties)
     }
   }
 
-  private def addEdge(graph: DiffGraph, src: Node, dst: Node, label: String, properties: Seq[(String, AnyRef)]): Unit =
+  private def addEdge(diffBuilder: DiffGraph.Builder, src: Node, dst: Node, label: String, properties: Seq[(String, AnyRef)]): Unit =
     (src, dst) match {
-      case (src: NewNode, dst: NewNode) => graph.addEdge(src, dst, label, properties)
+      case (src: NewNode, dst: NewNode) => diffBuilder.addEdge(src, dst, label, properties)
       case (src: NewNode, dst: StoredNode) =>
-        graph.addEdgeToOriginal(src, dst, label, properties)
+        diffBuilder.addEdgeToOriginal(src, dst, label, properties)
       case (src: StoredNode, dst: NewNode) =>
-        graph.addEdgeFromOriginal(src, dst, label, properties)
+        diffBuilder.addEdgeFromOriginal(src, dst, label, properties)
       case (src: StoredNode, dst: StoredNode) =>
-        graph.addEdgeInOriginal(src, dst, label, properties)
+        diffBuilder.addEdgeInOriginal(src, dst, label, properties)
       case (_, _) => throw new NotImplementedError("this should never happen")
     }
 

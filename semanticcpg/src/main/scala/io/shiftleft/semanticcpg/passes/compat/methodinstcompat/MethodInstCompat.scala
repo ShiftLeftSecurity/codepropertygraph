@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.compat.methodinstcompat
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{CpgPass,  DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.apache.logging.log4j.LogManager
 
@@ -18,7 +18,7 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
   private val methodInstFullNameToMethodFullName = mutable.Map.empty[String, String]
 
   override def run(): Iterator[DiffGraph] = {
-    val diffGraph = new DiffGraph
+    val diffGraph = DiffGraph.newBuilder
 
     if (cpg.graph.traversal.V().hasLabel(NodeTypes.METHOD_INST).asScala.nonEmpty) {
       MethodInstCompat.logger.warn("Using deprecated CPG format with METHOD_INST nodes.")
@@ -52,7 +52,7 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
       }
     }
 
-    Iterator(diffGraph)
+    Iterator(diffGraph.build())
   }
 
   private def init(): Unit = {

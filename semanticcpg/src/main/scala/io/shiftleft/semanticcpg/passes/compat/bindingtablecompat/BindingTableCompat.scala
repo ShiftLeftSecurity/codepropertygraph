@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewBinding
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{CpgPass,  DiffGraph}
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Direction
 
@@ -18,7 +18,7 @@ import scala.collection.JavaConverters._
 class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
 
   override def run(): Iterator[DiffGraph] = {
-    val diffGraph = new DiffGraph
+    val diffGraph = DiffGraph.newBuilder
 
     if (cpg.graph.traversal.V().hasLabel(NodeTypes.BINDING).asScala.isEmpty) {
       cpg.typeDecl.toIterator().foreach { typeDecl =>
@@ -30,10 +30,10 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
       }
     }
 
-    Iterator(diffGraph)
+    Iterator(diffGraph.build())
   }
 
-  private def createBinding(typeDecl: nodes.TypeDecl, diffGraph: DiffGraph)(method: nodes.Method): Unit = {
+  private def createBinding(typeDecl: nodes.TypeDecl, diffGraph: DiffGraph.Builder)(method: nodes.Method): Unit = {
     // The csharp frontend creates method names which contain type parameters.
     // It is necessary to keep them because a class may define parametric and non-parametric
     // functions with the same name, i.e., `void f() {} and void f<T>() {}' is valid.

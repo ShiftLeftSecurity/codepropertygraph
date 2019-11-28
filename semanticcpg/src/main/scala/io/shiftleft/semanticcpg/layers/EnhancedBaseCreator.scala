@@ -68,6 +68,6 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
   }
 
   def create(): Unit = {
-    enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg))
+    enhancementExecList.foreach(_.createApplySerializeAndStoreAsync(serializedCpg))
   }
 }

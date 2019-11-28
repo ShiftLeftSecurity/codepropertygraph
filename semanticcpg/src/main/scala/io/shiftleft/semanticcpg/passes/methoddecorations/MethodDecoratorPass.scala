@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.methoddecorations
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{CpgPass,  DiffGraph}
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import org.apache.logging.log4j.{LogManager, Logger}
@@ -24,7 +24,7 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   private[this] var loggedMissingTypeFullName = false
 
   override def run() = {
-    val dstGraph = new DiffGraph
+    val dstGraph = DiffGraph.newBuilder
 
     cpg.graph.V
       .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
@@ -64,7 +64,7 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
           }
       }
       .iterate
-    Iterator(dstGraph)
+    Iterator(dstGraph.build())
   }
 }
 
