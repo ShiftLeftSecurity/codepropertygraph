@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.methoddecorations
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.passes.{CpgPass,  DiffGraph}
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import org.apache.logging.log4j.{LogManager, Logger}

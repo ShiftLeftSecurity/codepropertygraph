@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.linking.linker
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.passes.{CpgPass,  DiffGraph}
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language.Steps
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
@@ -20,7 +20,8 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
   import Linker.logger
 
   private var typeDeclFullNameToNode = Map.empty[String, nodes.StoredNode]
-  private var typeFullNameToNode: collection.immutable.Map[String, nodes.StoredNode] = Map.empty[String, nodes.StoredNode]
+  private var typeFullNameToNode: collection.immutable.Map[String, nodes.StoredNode] =
+    Map.empty[String, nodes.StoredNode]
   private var methodFullNameToNode = Map.empty[String, nodes.StoredNode]
   private var namespaceBlockFullNameToNode = Map.empty[String, nodes.StoredNode]
 

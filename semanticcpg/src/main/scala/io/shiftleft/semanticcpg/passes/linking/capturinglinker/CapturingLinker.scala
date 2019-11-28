@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.linking.capturinglinker
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.passes.{CpgPass,  DiffGraph}
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 import org.apache.logging.log4j.{LogManager, Logger}
 
 /**

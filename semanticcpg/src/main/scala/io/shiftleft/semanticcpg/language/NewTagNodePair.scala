@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language
 import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node, StoredNode}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.passes.{ DiffGraph}
+import io.shiftleft.passes.{DiffGraph}
 
 class NewTagNodePair[NodeType <: Node](raw: GremlinScala[nodes.NewTagNodePair]) {
 

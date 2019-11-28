@@ -79,7 +79,7 @@ abstract class CpgPass(cpg: Cpg) {
     val futures: List[Future[Unit]] = overlays.zipWithIndex.map {
       case (overlay, index) => {
         if (overlay.getSerializedSize > 0) {
-        Future {
+          Future {
             blocking {
               serializedCpg.addOverlay(overlay, getClass.getSimpleName + counter.toString + "_" + index)
             }
@@ -171,6 +171,7 @@ private[passes] case class IdentityHashWrapper[T <: AnyRef](value: T) {
   * */
 private[passes] class DiffGraphProtoSerializer() {
   private val logger = LogManager.getLogger(getClass)
+
   /**
     * Generates a serialized graph overlay representing this graph
     * */
@@ -179,9 +180,10 @@ private[passes] class DiffGraphProtoSerializer() {
     implicit val graph = appliedDiffGraph
     val diff = appliedDiffGraph.diffGraph
     diff.iterator.foreach {
-      case c:DiffGraph.Change.CreateEdge => addEdge(c, builder, appliedDiffGraph)
+      case c: DiffGraph.Change.CreateEdge       => addEdge(c, builder, appliedDiffGraph)
       case DiffGraph.Change.CreateNode(newNode) => addNode(builder, newNode, appliedDiffGraph)
-      case DiffGraph.Change.SetNodeProperty(node, key, value) => addNodeProperty(node.getId, key, value, builder, appliedDiffGraph)
+      case DiffGraph.Change.SetNodeProperty(node, key, value) =>
+        addNodeProperty(node.getId, key, value, builder, appliedDiffGraph)
       case DiffGraph.Change.SetEdgeProperty(_, _, _) => ???
     }
     val overlay = builder.build()
@@ -207,7 +209,9 @@ private[passes] class DiffGraphProtoSerializer() {
     builder.addNode(finalNode)
   }
 
-  private def addEdge(change: DiffGraph.Change.CreateEdge, builder: CpgOverlay.Builder, appliedDiffGraph: AppliedDiffGraph): Unit = {
+  private def addEdge(change: DiffGraph.Change.CreateEdge,
+                      builder: CpgOverlay.Builder,
+                      appliedDiffGraph: AppliedDiffGraph): Unit = {
     val diffGraph = appliedDiffGraph.diffGraph
     val srcId =
       if (change.sourceNodeKind == DiffGraph.Change.NodeKind.New)
@@ -254,13 +258,17 @@ private[passes] class DiffGraphProtoSerializer() {
       .setValue(protoValue(value))
       .build()
 
-  private def addNodeProperty(nodeId: Long, key: String, value: AnyRef, builder: CpgOverlay.Builder, appliedDiffGraph: AppliedDiffGraph): Unit = {
+  private def addNodeProperty(nodeId: Long,
+                              key: String,
+                              value: AnyRef,
+                              builder: CpgOverlay.Builder,
+                              appliedDiffGraph: AppliedDiffGraph): Unit = {
     builder.addNodeProperty(
-        AdditionalNodeProperty
-          .newBuilder()
-          .setNodeId(nodeId)
-          .setProperty(nodeProperty(key, value))
-          .build
+      AdditionalNodeProperty
+        .newBuilder()
+        .setNodeId(nodeId)
+        .setProperty(nodeProperty(key, value))
+        .build
     )
   }
 

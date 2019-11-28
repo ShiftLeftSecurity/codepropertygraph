@@ -55,13 +55,17 @@ class SerializedCpg() {
 
   @throws[IOException]
   def addOverlay(overlays: Iterator[Cpg.CpgOverlay], name: String): Unit = {
-    overlays.zipWithIndex.map {
-      case (overlay, i) => Future {
-        blocking {
-          addOverlay(overlay, name + "_" + i)
-        }
+    overlays.zipWithIndex
+      .map {
+        case (overlay, i) =>
+          Future {
+            blocking {
+              addOverlay(overlay, name + "_" + i)
+            }
+          }
       }
-    }.toList.foreach(Await.result(_, Duration.Inf))
+      .toList
+      .foreach(Await.result(_, Duration.Inf))
   }
 
   @throws[IOException]

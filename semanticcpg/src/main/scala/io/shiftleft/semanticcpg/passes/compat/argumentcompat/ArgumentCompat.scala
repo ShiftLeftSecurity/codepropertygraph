@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes.compat.argumentcompat
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.{CpgPass,  DiffGraph}
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import org.apache.logging.log4j.LogManager
