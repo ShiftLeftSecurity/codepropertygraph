@@ -50,7 +50,7 @@ class SerializedCpg() {
 
   @throws[IOException]
   def addOverlay(overlays: Iterator[Cpg.CpgOverlay], name: String): Unit = {
-    overlays.zipWithIndex.foreach {
+    overlays.zipWithIndex.map { // TODO: This can map to futures, try adding parallelism here
       case (overlay, i) => addOverlay(overlay, name + "_" + i)
     }
   }
