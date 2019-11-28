@@ -91,6 +91,14 @@ object LocationCreator {
           local.lineNumber,
           local.start.method.head
         )
+      case methodRef: nodes.MethodRef =>
+        apply(
+          methodRef,
+          methodRef.code,
+          methodRef.label,
+          methodRef.lineNumber,
+          methodRef.start.method.head
+        )
       case source: nodes.Source =>
         apply(source.node)
       case vertex: Vertex =>
