@@ -34,7 +34,7 @@ lazy val queries = Projects.queries
 ThisBuild/scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
-  // "-Xfatal-warnings", // reenable once https://github.com/scala/bug/issues/11457 is fixed (False positive unreachable code warning)
+  "-Xfatal-warnings",
   "-language:implicitConversions")
 ThisBuild/compile/javacOptions ++= Seq("-g") //debug symbols
 
