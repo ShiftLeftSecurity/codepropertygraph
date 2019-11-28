@@ -107,21 +107,6 @@ abstract class CpgPass(cpg: Cpg) {
     }
   }
 
-//  def createApplyAndSerializeAsync(): Iterator[Future[CpgOverlay]] = {
-//    try {
-//      logStart()
-//      run().map { dstGraph =>
-//        Future {
-//          val appliedDiffGraph = DiffGraph.Applier.applyDiff(dstGraph, cpg)
-//          new DiffGraphProtoSerializer().serialize(appliedDiffGraph)
-//        }
-//      }
-//    } finally {
-//      logEnd()
-//    }
-//  }
-
-
   /**
     * Execute the enhancement and apply result to the underlying graph
     */
@@ -190,7 +175,6 @@ private[passes] class DiffGraphProtoSerializer() {
     * Generates a serialized graph overlay representing this graph
     * */
   def serialize(appliedDiffGraph: AppliedDiffGraph): CpgOverlay = {
-    val start: Long = System.currentTimeMillis()
     implicit val builder = CpgOverlay.newBuilder()
     implicit val graph = appliedDiffGraph
     val diff = appliedDiffGraph.diffGraph
@@ -201,8 +185,6 @@ private[passes] class DiffGraphProtoSerializer() {
       case DiffGraph.Change.SetEdgeProperty(_, _, _) => ???
     }
     val overlay = builder.build()
-    val end = System.currentTimeMillis()
-//    logger.info("DiffGraphProtoSerializer.serialize took " + (end - start) + "ms")
     overlay
   }
 
