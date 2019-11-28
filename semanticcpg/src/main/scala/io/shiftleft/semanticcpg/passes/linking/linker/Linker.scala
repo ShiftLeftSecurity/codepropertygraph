@@ -195,7 +195,8 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
               .vertices(Direction.OUT, edgeType)
               .asScala
               .map(_.value2(NodeKeys.FULL_NAME))
-              .iterator.to(Iterable)
+              .iterator
+              .to(Iterable)
             srcNode.removeProperty(Key(dstFullNameKey))
             dstFullNames.foreach { name =>
               srcNode.property(Cardinality.list, dstFullNameKey, name)
