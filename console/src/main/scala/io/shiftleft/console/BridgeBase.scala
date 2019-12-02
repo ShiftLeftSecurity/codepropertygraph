@@ -93,7 +93,7 @@ trait BridgeBase {
             case Some(command) => Seq(command -> None)
             case _             => Nil
           }
-          commandArgs ++ config.params.mapValues(Option.apply).toSeq
+          commandArgs ++ config.params.view.mapValues(Option.apply).toSeq
         }
         val actualScriptFile =
           if (isEncryptedScript) decryptedScript(scriptFile)

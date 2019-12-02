@@ -4,14 +4,14 @@ import gremlin.scala.Vertex
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import org.apache.tinkerpop.gremlin.structure.Direction
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class ReverseCpgCfgAdapter extends CfgAdapter[Vertex] {
-  override def successors(node: Vertex): TraversableOnce[Vertex] = {
+  override def successors(node: Vertex): IterableOnce[Vertex] = {
     node.vertices(Direction.IN, EdgeTypes.CFG).asScala
   }
 
-  override def predecessors(node: Vertex): TraversableOnce[Vertex] = {
+  override def predecessors(node: Vertex): IterableOnce[Vertex] = {
     node.vertices(Direction.OUT, EdgeTypes.CFG).asScala
   }
 }

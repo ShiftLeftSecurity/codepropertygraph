@@ -2,8 +2,15 @@ name := "codepropertygraph"
 inThisBuild(
   List(
     organization := "io.shiftleft",
-    scalaVersion := "2.12.8", // do not upgrade until https://github.com/lihaoyi/Ammonite/issues/1009 is resolved
-    resolvers ++= Seq(Resolver.mavenLocal, Resolver.bintrayRepo("shiftleft", "maven"), "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
+    /* n.b. skip 2.13.1, it has a regression https://github.com/scala/bug/issues/11754,
+     * which is fixed in https://github.com/scala/scala/pull/8447, i.e. we can upgrade
+     * to 2.13.2 once that's released */
+    scalaVersion := "2.13.0",
+    resolvers ++= Seq(
+      Resolver.mavenLocal,
+      Resolver.bintrayRepo("shiftleft", "maven"),
+      Resolver.bintrayRepo("mpollmeier", "maven"),
+      "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
     bintrayVcsUrl := Some("https://github.com/ShiftLeftSecurity/codepropertygraph"),
@@ -15,8 +22,7 @@ name := "codepropertygraph"
 publish / skip := true
 
 // parsed by project/Utils.scala
-
-val fuzzyc2cpgVersion = "1.1.18"
+val fuzzyc2cpgVersion = "1.1.19"
 
 lazy val codepropertygraph = Projects.codepropertygraph
 lazy val protoBindings = Projects.protoBindings

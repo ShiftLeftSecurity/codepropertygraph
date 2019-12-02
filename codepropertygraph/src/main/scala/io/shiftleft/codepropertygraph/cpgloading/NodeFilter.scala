@@ -3,7 +3,7 @@ package io.shiftleft.codepropertygraph.cpgloading
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node
 import io.shiftleft.proto.cpg.Cpg.NodePropertyName
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 
 /**

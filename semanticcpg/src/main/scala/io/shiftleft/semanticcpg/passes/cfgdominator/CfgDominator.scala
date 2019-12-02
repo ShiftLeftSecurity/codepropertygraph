@@ -40,13 +40,14 @@ class CfgDominator[Node](adapter: CfgAdapter[Node]) {
       nodesInReversePostOrder.foreach { node =>
         val firstNotUndefinedPred = adapter
           .predecessors(node)
+          .iterator
           .find { predecessor =>
             saveDominators(indexOf(predecessor)) != UNDEFINED
           }
           .get
 
         var newImmediateDominator = indexOf(firstNotUndefinedPred)
-        adapter.predecessors(node).foreach { predecessor =>
+        adapter.predecessors(node).iterator.foreach { predecessor =>
           val predecessorIndex = indexOf(predecessor)
           if (saveDominators(predecessorIndex) != UNDEFINED) {
             newImmediateDominator = intersect(dominators, predecessorIndex, newImmediateDominator)
@@ -87,7 +88,7 @@ class CfgDominator[Node](adapter: CfgAdapter[Node]) {
   }
 
   private def createPostOrderNumbering(cfgEntry: Node): Map[Node, Int] = {
-    var stack = (cfgEntry, adapter.successors(cfgEntry).toIterator) :: Nil
+    var stack = (cfgEntry, adapter.successors(cfgEntry).iterator) :: Nil
     var visited = Set.empty[Node]
     var numbering = Map.empty[Node, Int]
     var nextNumber = 0
@@ -100,7 +101,7 @@ class CfgDominator[Node](adapter: CfgAdapter[Node]) {
       if (successorIt.hasNext) {
         val successor = successorIt.next
         if (!visited.contains(successor)) {
-          stack = (successor, adapter.successors(successor).toIterator) :: stack
+          stack = (successor, adapter.successors(successor).iterator) :: stack
         }
       } else {
         stack = stack.tail

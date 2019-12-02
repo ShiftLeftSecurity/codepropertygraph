@@ -9,7 +9,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import java.util.UUID
 import java.util.concurrent.{ConcurrentHashMap, Executors}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.concurrent.Map
 import scala.concurrent.ExecutionContext
 

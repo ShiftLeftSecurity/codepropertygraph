@@ -6,15 +6,15 @@ import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominator, CfgDominatorF
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.scalatest.{Matchers, WordSpec}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class CfgDominatorFrontierTests extends WordSpec with Matchers {
 
   private class TestCfgAdapter extends CfgAdapter[Vertex] {
-    override def successors(node: Vertex): TraversableOnce[Vertex] = {
+    override def successors(node: Vertex): IterableOnce[Vertex] = {
       node.vertices(Direction.OUT, "CFG").asScala
     }
-    override def predecessors(node: Vertex): TraversableOnce[Vertex] = {
+    override def predecessors(node: Vertex): IterableOnce[Vertex] = {
       node.vertices(Direction.IN, "CFG").asScala
     }
   }
@@ -53,13 +53,13 @@ class CfgDominatorFrontierTests extends WordSpec with Matchers {
     val cfgDominatorFrontier = new CfgDominatorFrontier(cfgAdapter, domTreeAdapter)
     val dominanceFrontier = cfgDominatorFrontier.calculate(graph.V.l())
 
-    dominanceFrontier.get(v0) shouldBe None
-    dominanceFrontier.get(v1) shouldBe None
-    dominanceFrontier.get(v2) shouldBe Some(Set(v2))
-    dominanceFrontier.get(v3) shouldBe Some(Set(v2, v5))
-    dominanceFrontier.get(v4) shouldBe Some(Set(v2, v5))
-    dominanceFrontier.get(v5) shouldBe None
-    dominanceFrontier.get(v6) shouldBe None
+    dominanceFrontier.get(v0) shouldBe Set.empty
+    dominanceFrontier.get(v1) shouldBe Set.empty
+    dominanceFrontier.get(v2) shouldBe Set(v2)
+    dominanceFrontier.get(v3) shouldBe Set(v2, v5)
+    dominanceFrontier.get(v4) shouldBe Set(v2, v5)
+    dominanceFrontier.get(v5) shouldBe Set.empty
+    dominanceFrontier.get(v6) shouldBe Set.empty
   }
 
   "Cfg domiance frontier with dead code test" in {
@@ -80,9 +80,9 @@ class CfgDominatorFrontierTests extends WordSpec with Matchers {
     val cfgDominatorFrontier = new CfgDominatorFrontier(cfgAdapter, domTreeAdapter)
     val dominanceFrontier = cfgDominatorFrontier.calculate(graph.V.l())
 
-    dominanceFrontier.get(v0) shouldBe None
-    dominanceFrontier.get(v1) shouldBe Some(Set(v2))
-    dominanceFrontier.get(v2) shouldBe None
+    dominanceFrontier.get(v0) shouldBe Set.empty
+    dominanceFrontier.get(v1) shouldBe Set(v2)
+    dominanceFrontier.get(v2) shouldBe Set.empty
   }
 
 }

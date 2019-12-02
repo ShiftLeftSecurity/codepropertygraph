@@ -9,7 +9,7 @@ import java.util.{ArrayList => JArrayList}
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, PropertyValue}
 import org.apache.tinkerpop.gremlin.structure.{T, Vertex, VertexProperty}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 import gremlin.scala._
 import org.apache.logging.log4j.LogManager
@@ -29,7 +29,6 @@ private[cpgloading] object CpgOverlayLoader {
       .map { overlays: Iterator[CpgOverlay] =>
         overlays.foreach(applier.applyDiff)
       }
-      .tried
       .recover {
         case e: IOException =>
           logger.error("Failed to load overlay from " + filename, e)

@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.utils.ExpandTo
 import org.apache.tinkerpop.gremlin.structure.Direction
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /* TODO MP: this should be part of the normal steps, rather than matching on the type at runtime
  * all (and only) steps extending DataFlowObject should/must have `newSink`, `newSource` and `newLocation` */

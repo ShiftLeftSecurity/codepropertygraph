@@ -11,7 +11,7 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.logging.log4j.{LogManager, Logger}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
@@ -195,7 +195,8 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
               .vertices(Direction.OUT, edgeType)
               .asScala
               .map(_.value2(NodeKeys.FULL_NAME))
-              .toIterable
+              .iterator
+              .to(Iterable)
             srcNode.removeProperty(Key(dstFullNameKey))
             dstFullNames.foreach { name =>
               srcNode.property(Cardinality.list, dstFullNameKey, name)
