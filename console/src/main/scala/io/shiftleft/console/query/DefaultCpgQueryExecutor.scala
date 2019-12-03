@@ -75,8 +75,8 @@ class DefaultCpgQueryExecutor(scriptEngineManager: ScriptEngineManager)(implicit
       e <- engine
       _ <- IO(e.put("aCpg", cpg))
       result <- IO(e.eval(completeQuery))
-        .handleErrorWith(err => IO(CpgOperationFailure(err)))
         .map(v => CpgOperationSuccess(v))
+        .handleErrorWith(err => IO(CpgOperationFailure(err)))
     } yield result
   }
 }
