@@ -429,7 +429,7 @@ $neighborAccesors
 
               s"""
               /** link to 'contained' node of type $containedNodeType */
-              lazy val ${containedNode.localName}: $completeType =
+              def ${containedNode.localName}: $completeType =
                 edges(Direction.OUT, "CONTAINS_NODE").asScala.toList
                   .filter(_.valueOption(EdgeKeys.LOCAL_NAME).map(_  == "${containedNode.localName}").getOrElse(false))
                   .sortBy(_.valueOption(EdgeKeys.INDEX))
