@@ -1,5 +1,7 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
+import java.io.FileNotFoundException
+
 import io.shiftleft.overflowdb.{OdbConfig, OdbGraph}
 import org.scalatest.{Matchers, WordSpec}
 
@@ -22,6 +24,10 @@ class CpgLoaderTests extends WordSpec with Matchers {
     "allow loading of CPG from bin.zip file" in {
       val cpg = CpgLoader.load(filename)
       cpg.graph.vertices().hasNext shouldBe true
+    }
+
+    "throw an appropriate exception if the provided filename that refers to a non-existing file" in {
+      an[FileNotFoundException] should be thrownBy CpgLoader.load("invalid/path/cpg.bin.zip")
     }
 
     /**

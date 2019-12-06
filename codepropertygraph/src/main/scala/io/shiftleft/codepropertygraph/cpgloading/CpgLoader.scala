@@ -1,5 +1,8 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
+import java.io.FileNotFoundException
+
+import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import org.apache.logging.log4j.LogManager
@@ -13,6 +16,7 @@ object CpgLoader {
     *
     * @param filename name of file that stores the code property graph
     * @param config loader configuration
+    * @throws FileNotFoundException if filename refers to a non-existing file
     */
   def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig()): Cpg =
     new CpgLoader().load(filename, config)
@@ -40,6 +44,9 @@ private class CpgLoader {
   private val logger = LogManager.getLogger(getClass)
 
   def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.withoutOverflow): Cpg = {
+    if (!File(filename).exists) {
+      throw new FileNotFoundException(s"'$filename' does not exists!")
+    }
     logger.debug("Loading " + filename)
 
     val cpg =
