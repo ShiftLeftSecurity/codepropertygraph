@@ -18,26 +18,21 @@ object ProtoCpgLoader {
   def loadFromProtoZip(fileName: String, overflowDbConfig: OdbConfig = OdbConfig.withoutOverflow): Cpg =
     measureAndReport {
       val builder = new ProtoToCpg(overflowDbConfig)
-      val nodeListTry = Using.Manager { use =>
+      Using.Manager { use =>
         use(new ZipArchive(fileName)).entries.foreach { entry =>
           val inputStream = use(Files.newInputStream(entry))
           builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList)
         }
-      }
-
-      /* second pass so we can stream for the edges
-       * -> holding them all in memory is potentially too much
-       * -> adding them as we go isn't an option because we may only have one of the adjacent vertices
-       * TODO double check: is that really so? protos don't really allow for streaming, so this may be unnecessary overhead
-       */
-      val edgeListTry = Using.Manager { use =>
+        /* second pass so we can stream for the edges
+         * -> holding them all in memory is potentially too much
+         * -> adding them as we go isn't an option because we may only have one of the adjacent vertices
+         * TODO double check: is that really so? protos don't really allow for streaming, so this may be unnecessary overhead
+         */
         use(new ZipArchive(fileName)).entries.foreach { entry =>
           val inputStream = use(Files.newInputStream(entry))
           builder.addEdges(getNextProtoCpgFromStream(inputStream).getEdgeList)
         }
-      }
-
-      nodeListTry.orElse(edgeListTry) match {
+      } match {
         case Failure(exception) => throw exception
         case Success(_)         => builder.build()
       }
