@@ -24,27 +24,28 @@ class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator
         notEnhancedCpg.scalaGraph.V
           .hasLabel(srcType)
           .sideEffectWithTraverser { traverser =>
-            val dstNode = traverser.get
-            val inEdges = dstNode.edges(Direction.IN).asScala.toList
-            inFactsByEdgeType.foreach {
-              case (edgeType, inFacts) =>
-                val actualSrcNodes =
-                  inEdges.filter(_.label == edgeType).map(_.outVertex)
-                inFacts.foreach { inFact =>
-                  validateInDegree(dstNode, actualSrcNodes, inFact)
+            traverser.get match {
+              case dstNode if dstNode.label() != "UNKNOWN" =>
+                val inEdges = dstNode.edges(Direction.IN).asScala.toList
+                inFactsByEdgeType.foreach {
+                  case (edgeType, inFacts) =>
+                    val actualSrcNodes =
+                      inEdges.filter(_.label == edgeType).map(_.outVertex).filterNot(_.label() == "UNKNOWN")
+                    inFacts.foreach { inFact =>
+                      validateInDegree(dstNode, actualSrcNodes, inFact)
+                    }
+
+                    validateAllSrcNodeTypes(
+                      dstNode,
+                      edgeType,
+                      actualSrcNodes,
+                      inFacts
+                    )
                 }
-
-                validateAllSrcNodeTypes(
-                  dstNode,
-                  edgeType,
-                  actualSrcNodes,
-                  inFacts
-                )
+                val allowedEdgeTypes = inFactsByEdgeType.map(_._1)
+                validateAllInEdgesTypes(dstNode, inEdges, allowedEdgeTypes)
+              case _ => // Do nothing. Hence, we skip UNKNOWN nodes
             }
-
-            val allowedEdgeTypes = inFactsByEdgeType.map(_._1)
-            validateAllInEdgesTypes(dstNode, inEdges, allowedEdgeTypes)
-
           }
           .iterate()
     }

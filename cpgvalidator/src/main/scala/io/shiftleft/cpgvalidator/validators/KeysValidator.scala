@@ -32,8 +32,11 @@ class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
         notEnhancedCpg.scalaGraph.V
           .hasLabel(nodeType)
           .sideEffectWithTraverser { traverser =>
-            val dstNode = traverser.get
-            validateNode(dstNode, nodeKeyType, cardinality)
+            traverser.get match {
+              case dstNode if dstNode.label() != "UNKNOWN" =>
+                validateNode(dstNode, nodeKeyType, cardinality)
+              case _ => // Do nothing. Hence, we skip UNKNOWN nodes
+            }
           }
           .iterate()
     }
