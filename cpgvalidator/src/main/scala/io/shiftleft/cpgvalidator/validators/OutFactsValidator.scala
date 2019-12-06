@@ -2,6 +2,7 @@ package io.shiftleft.cpgvalidator.validators
 
 import gremlin.scala.{Edge, Vertex}
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.OutFact
 import io.shiftleft.cpgvalidator._
 import io.shiftleft.cpgvalidator.facts.OutFactsImporter
@@ -25,12 +26,12 @@ class OutFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validato
           .hasLabel(srcType)
           .sideEffectWithTraverser { traverser =>
             traverser.get match {
-              case srcNode if srcNode.label() != "UNKNOWN" =>
+              case srcNode if srcNode.label() != NodeTypes.UNKNOWN =>
                 val outEdges = srcNode.edges(Direction.OUT).asScala.toList
                 outFactsByEdgeType.foreach {
                   case (edgeType, outFacts) =>
                     val actualDstNodes =
-                      outEdges.filter(_.label == edgeType).map(_.inVertex).filterNot(_.label() == "UNKNOWN")
+                      outEdges.filter(_.label == edgeType).map(_.inVertex).filterNot(_.label() == NodeTypes.UNKNOWN)
                     outFacts.foreach { outFact =>
                       validateOutDegree(srcNode, actualDstNodes, outFact)
                     }

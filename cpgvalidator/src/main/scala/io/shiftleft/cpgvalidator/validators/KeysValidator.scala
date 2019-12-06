@@ -5,6 +5,7 @@ import io.shiftleft.cpgvalidator._
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.{Cardinality, KeysFact}
 import io.shiftleft.cpgvalidator.facts.KeysFactsImporter
 import gremlin.scala._
+import io.shiftleft.codepropertygraph.generated.NodeTypes
 import org.apache.tinkerpop.gremlin.structure.VertexProperty
 
 import scala.jdk.CollectionConverters._
@@ -33,7 +34,7 @@ class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
           .hasLabel(nodeType)
           .sideEffectWithTraverser { traverser =>
             traverser.get match {
-              case dstNode if dstNode.label() != "UNKNOWN" =>
+              case dstNode if dstNode.label() != NodeTypes.UNKNOWN =>
                 validateNode(dstNode, nodeKeyType, cardinality)
               case _ => // Do nothing. Hence, we skip UNKNOWN nodes
             }
