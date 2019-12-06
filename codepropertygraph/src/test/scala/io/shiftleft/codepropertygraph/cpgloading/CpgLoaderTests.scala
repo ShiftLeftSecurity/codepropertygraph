@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import java.io.FileNotFoundException
+import java.nio.file.FileSystemNotFoundException
 
 import io.shiftleft.overflowdb.{OdbConfig, OdbGraph}
 import org.scalatest.{Matchers, WordSpec}
@@ -27,7 +27,7 @@ class CpgLoaderTests extends WordSpec with Matchers {
     }
 
     "throw an appropriate exception if the provided filename that refers to a non-existing file" in {
-      an[FileNotFoundException] should be thrownBy CpgLoader.load("invalid/path/cpg.bin.zip")
+      an[FileSystemNotFoundException] should be thrownBy CpgLoader.load("invalid/path/cpg.bin.zip")
     }
 
     /**
