@@ -1,7 +1,5 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import java.nio.file.FileSystemNotFoundException
-
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import org.apache.logging.log4j.LogManager
@@ -15,7 +13,6 @@ object CpgLoader {
     *
     * @param filename name of file that stores the code property graph
     * @param config loader configuration
-    * @throws FileSystemNotFoundException if filename refers to a non-existing file
     */
   def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig()): Cpg =
     new CpgLoader().load(filename, config)
