@@ -39,7 +39,7 @@ trait TrackingPointToCfgNode extends NodeVisitor[nodes.CfgNode] with ExpressionG
   }
 
   override def visit(node: nodes.MethodRef): nodes.CfgNode = {
-    node
+    ExpandTo.argumentToCallOrReturn(node)
   }
 
   override def visit(node: nodes.Literal): nodes.CfgNode = {
