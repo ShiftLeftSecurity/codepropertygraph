@@ -3,7 +3,6 @@ package io.shiftleft.passes
 import gremlin.scala._
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.NodeVisitor
 import io.shiftleft.codepropertygraph.generated._
 import org.scalatest.{Matchers, WordSpec}
 
@@ -49,9 +48,6 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       override def containedNodesByLocalName = ???
       override def label = NodeTypes.UNKNOWN
       override def properties = Map(NodeKeyNames.CODE -> propValue)
-      override def accept[T](visitor: NodeVisitor[T]): T = ???
-      override def getId: java.lang.Long = ???
-      override def productElementLabel(n: Int): String = ???
     }
     new CpgPass(cpg) {
 
@@ -74,8 +70,10 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
 
 object CpgOverlayIntegrationTest {
   private trait DummyProduct {
+    def getId: java.lang.Long = ???
     def canEqual(that: Any): Boolean = ???
     def productArity: Int = ???
     def productElement(n: Int): Any = ???
+    def productElementLabel(n: Int): String = ???
   }
 }

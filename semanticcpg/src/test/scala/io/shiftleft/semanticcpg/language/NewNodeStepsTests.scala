@@ -96,13 +96,12 @@ class NewNodeStepsTest extends WordSpec with Matchers {
 object NewNodeNodeStepsTest {
 
   case class TestNewNode(containedNodes: List[Node] = Nil) extends NewNode {
+    override def getId: java.lang.Long = ???
+    override def productElementLabel(n: Int): String = ???
     override val label = "TEST_LABEL"
     override val properties: Map[String, Any] = Map.empty
     val testContainedLabel = "testContains"
     override def containedNodesByLocalName: Map[String, List[Node]] =
       Map(testContainedLabel -> containedNodes)
-    override def accept[T](visitor: NodeVisitor[T]): T = ???
-    override def getId: java.lang.Long = ???
-    override def productElementLabel(n: Int): String = ???
   }
 }

@@ -209,8 +209,6 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
         def label: String
         def getId: JLong
 
-        def accept[T](visitor: NodeVisitor[T]): T = ???
-
         /** labels of product elements, used e.g. for pretty-printing */
         def productElementLabel(n: Int): String
       }
@@ -239,16 +237,6 @@ $neighborAccesors
       }
 
       """
-
-      val nodeVisitor = s""" 
-        |/* Using pattern matching would be prettier than the visitor pattern, but because the matches would 
-        | * contain type checks, scalac cannot compile them down to jvm `lookupswitch|tableswitch` instructions, 
-        | * which would make them slower. 
-        | * See https://github.com/ShiftLeftSecurity/codepropertygraph/pull/317 for more details. */
-        |trait NodeVisitor[T] {
-        |  ${generateNodeVisitorMethods}
-        |  ${generateBaseTraitVisitorMethods}
-        |}\n""".stripMargin
 
       val nodeBaseTraits = schema.nodeBaseTraits.map { nodeBaseTrait =>
         val mixins = nodeBaseTrait.hasKeys.map { key =>
@@ -293,18 +281,8 @@ $neighborAccesors
         """
       }
 
-      staticHeader + nodeVisitor + nodeBaseTraits + keyBasedTraits + factories
+      staticHeader + nodeBaseTraits + keyBasedTraits + factories
     }
-
-    def generateNodeVisitorMethods =
-      schema.nodeTypes.map { nodeType =>
-        s"def visit(node: ${nodeType.className}): T = ???"
-      }.mkString("\n")
-
-    def generateBaseTraitVisitorMethods() =
-      schema.nodeBaseTraits.map { nodeBaseTrait: NodeBaseTrait =>
-        s"def visit(node: ${nodeBaseTrait.className}): T = ???"
-      }.mkString("\n")
 
     def edgeTypeByName: Map[String, EdgeType] =
       schema.edgeTypes.groupBy(_.name).mapValues(_.head)
@@ -520,9 +498,6 @@ $neighborAccesors
           |$propertyDelegators
           |$delegatingContainedNodeAccessors
           |$neighborDelegators
-          |  override def accept[T](visitor: NodeVisitor[T]): T = {
-          |    visitor.visit(this)
-          |  }
           |  override def valueMap: JMap[String, AnyRef] = get.valueMap
           |  override def canEqual(that: Any): Boolean = get.canEqual(that)
           |  override def label: String = {
@@ -706,8 +681,6 @@ ${neighborAccesors}
         override val label = "${nodeType.name}"
         override val properties: Map[String, Any] = $propertiesImpl
         override def containedNodesByLocalName: Map[String, List[Node]] = $containedNodesByLocalName
-
-        override def accept[T](visitor: NodeVisitor[T]): T = ???
       }
       """
     }
