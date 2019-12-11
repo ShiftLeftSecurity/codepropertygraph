@@ -31,7 +31,7 @@ class OutFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validato
                 outFactsByEdgeType.foreach {
                   case (edgeType, outFacts) =>
                     val actualDstNodes =
-                      outEdges.filter(_.label == edgeType).map(_.inVertex).filterNot(_.label() == NodeTypes.UNKNOWN)
+                      outEdges.filter(_.label == edgeType).map(_.inVertex)
                     outFacts.foreach { outFact =>
                       validateOutDegree(srcNode, actualDstNodes, outFact)
                     }
@@ -43,7 +43,7 @@ class OutFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validato
                       outFacts
                     )
                 }
-                val allowedEdgeTypes = outFactsByEdgeType.map(_._1)
+                val allowedEdgeTypes = outFactsByEdgeType.map(_._1) :+ NodeTypes.UNKNOWN
                 validateAllOutEdgesTypes(srcNode, outEdges, allowedEdgeTypes)
               case _ => // Do nothing. Hence, we skip UNKNOWN nodes
             }
@@ -98,7 +98,7 @@ class OutFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validato
                                       edgeType: String,
                                       actualDstNodes: List[Vertex],
                                       outFacts: List[OutFact]): Unit = {
-    val allAllowedDstTypes = outFacts.flatMap(_.dstNodeTypes).distinct
+    val allAllowedDstTypes = outFacts.flatMap(_.dstNodeTypes).distinct :+ NodeTypes.UNKNOWN
 
     val invalidDstNodes = actualDstNodes.filter(
       actualDstNode => !allAllowedDstTypes.contains(actualDstNode.label)
