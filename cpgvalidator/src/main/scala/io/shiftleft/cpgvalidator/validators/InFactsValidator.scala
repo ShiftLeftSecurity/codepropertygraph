@@ -76,7 +76,7 @@ class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator
                                       edgeType: String,
                                       actualSrcNodes: List[Vertex],
                                       inFacts: List[InFact]): Unit = {
-    val allAllowedSrcTypes = inFacts.flatMap(_.srcNodeTypes).distinct
+    val allAllowedSrcTypes = inFacts.flatMap(_.srcNodeTypes).distinct :+ NodeTypes.UNKNOWN
 
     val invalidSrcNodes = actualSrcNodes.filter(
       actualSrcNode => !allAllowedSrcTypes.contains(actualSrcNode.label)
