@@ -61,12 +61,8 @@ object ExpandTo {
   }
 
   def methodToFormalReturn(method: Vertex): nodes.StoredNode = {
-    println(method.getClass)
-    println(method.isInstanceOf[nodes.StoredNode])
     method
       .asInstanceOf[nodes.StoredNode]
-//      .asInstanceOf[nodes.Method]
-//      .get
       ._astOut
       .asScala
       .filter(_.isInstanceOf[nodes.MethodReturn])
