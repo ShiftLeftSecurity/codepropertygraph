@@ -31,7 +31,7 @@ class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator
                 inFactsByEdgeType.foreach {
                   case (edgeType, inFacts) =>
                     val actualSrcNodes =
-                      inEdges.filter(_.label == edgeType).map(_.outVertex).filterNot(_.label() == NodeTypes.UNKNOWN)
+                      inEdges.filter(_.label == edgeType).map(_.outVertex)
                     inFacts.foreach { inFact =>
                       validateInDegree(dstNode, actualSrcNodes, inFact)
                     }
@@ -43,7 +43,7 @@ class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator
                       inFacts
                     )
                 }
-                val allowedEdgeTypes = inFactsByEdgeType.map(_._1)
+                val allowedEdgeTypes = inFactsByEdgeType.map(_._1) :+ NodeTypes.UNKNOWN
                 validateAllInEdgesTypes(dstNode, inEdges, allowedEdgeTypes)
               case _ => // Do nothing. Hence, we skip UNKNOWN nodes
             }
