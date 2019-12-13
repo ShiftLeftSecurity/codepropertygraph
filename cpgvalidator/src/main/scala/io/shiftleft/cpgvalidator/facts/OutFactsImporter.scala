@@ -12,6 +12,7 @@ class OutFactsImporter extends FactsImporter {
       NodeTypes.NAMESPACE_BLOCK has 0 to N outgoing EdgeTypes.AST to NodeTypes.METHOD,
       NodeTypes.NAMESPACE_BLOCK has 0 to N outgoing EdgeTypes.AST to NodeTypes.TYPE_DECL,
       NodeTypes.METHOD has 1 outgoing EdgeTypes.AST to NodeTypes.METHOD_RETURN,
+      NodeTypes.METHOD has 0 to N outgoing EdgeTypes.AST to NodeTypes.METHOD,
       NodeTypes.METHOD has 0 to N outgoing EdgeTypes.AST to NodeTypes.METHOD_PARAMETER_IN,
       NodeTypes.METHOD has 0 to N outgoing EdgeTypes.AST to NodeTypes.MODIFIER,
       NodeTypes.METHOD has 1 outgoing EdgeTypes.AST to NodeTypes.BLOCK,
@@ -41,7 +42,7 @@ class OutFactsImporter extends FactsImporter {
       NodeTypes.RETURN has 1 outgoing EdgeTypes.CFG to NodeTypes.METHOD_RETURN,
       NodeTypes.RETURN has 0 to 1 outgoing EdgeTypes.ARGUMENT to
         NodeTypes.CALL or NodeTypes.IDENTIFIER or NodeTypes.LITERAL or NodeTypes.METHOD_REF or NodeTypes.BLOCK,
-      NodeTypes.BLOCK has 0 to N outgoing EdgeTypes.AST to SuperTypes.Expression or NodeTypes.CONTROL_STRUCTURE or NodeTypes.LOCAL or NodeTypes.METHOD,
+      NodeTypes.BLOCK has 0 to N outgoing EdgeTypes.AST to SuperTypes.Expression or NodeTypes.CONTROL_STRUCTURE or NodeTypes.LOCAL,
       NodeTypes.BLOCK has 0 to N outgoing EdgeTypes.CFG to SuperTypes.Expression or NodeTypes.METHOD_RETURN,
       NodeTypes.METHOD_REF has 1 to N outgoing EdgeTypes.CFG to SuperTypes.Expression or NodeTypes.METHOD_RETURN,
       NodeTypes.METHOD_REF has 0 to N outgoing EdgeTypes.CAPTURE to NodeTypes.CLOSURE_BINDING,
