@@ -29,7 +29,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.comment.code($code)`
     * */
-  def comment(code : String) : Comment = comment.code(code)
+  def comment(code: String): Comment = comment.code(code)
 
   /**
     Traverse to all source files
@@ -40,7 +40,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.file.name($name)`
     * */
-  def file(name : String) : File = file.name(name)
+  def file(name: String): File = file.name(name)
 
   /**
     Traverse to all namespaces, e.g., packages in Java.
@@ -51,7 +51,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.namespace.name($name)`
     * */
-  def namespace(name : String) : Namespace  = namespace.name(name)
+  def namespace(name: String): Namespace = namespace.name(name)
 
   /**
   Traverse to all namespace blocks, e.g., packages in Java.
@@ -62,7 +62,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.namespaceBlock.name($name)`
     * */
-  def namespaceBlock(name : String) : NamespaceBlock = namespaceBlock.name(name)
+  def namespaceBlock(name: String): NamespaceBlock = namespaceBlock.name(name)
 
   /**
     Traverse to all types, e.g., Set<String>
@@ -73,7 +73,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.types.fullName($fullname)`
     * */
-  def types(fullName : String) : Type = types.fullName(fullName)
+  def types(fullName: String): Type = types.fullName(fullName)
 
   /**
     Traverse to all declarations, e.g., Set<T>
@@ -84,7 +84,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for cpg.typeDecl.fullName($fullName)
     * */
-  def typeDecl(fullName : String) : TypeDecl = typeDecl.fullName(fullName)
+  def typeDecl(fullName: String): TypeDecl = typeDecl.fullName(fullName)
 
   /**
     Traverse to all methods
@@ -95,7 +95,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.method.fullName($fullName)`
     * */
-  def method(fullName : String) : Method = method.fullName(fullName)
+  def method(fullName: String): Method = method.fullName(fullName)
 
   /**
     Traverse to all formal return parameters
@@ -112,7 +112,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.parameter.name($name)`
     * */
-  def parameter(name : String) : MethodParameter = parameter.name(name)
+  def parameter(name: String): MethodParameter = parameter.name(name)
 
   /**
     Traverse to all class members
@@ -123,7 +123,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.member.name($name)`
     * */
-  def member(name : String) : Member = member.name(name)
+  def member(name: String): Member = member.name(name)
 
   /**
     Traverse to all call sites
@@ -146,7 +146,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.local.name`
     * */
-  def local(name : String) : Local = local.name(name)
+  def local(name: String): Local = local.name(name)
 
   /**
     Traverse to all literals (constant strings and numbers provided directly in the code).
@@ -157,7 +157,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.literal.code($code)`
     * */
-  def literal(code : String) : Literal = literal.code(code)
+  def literal(code: String): Literal = literal.code(code)
 
   /**
     Traverse to all identifiers, e.g., occurrences of local variables or class members in method bodies.
@@ -168,7 +168,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.identifier.name($name)`
     * */
-  def identifier(name : String) : Identifier = identifier.name(name)
+  def identifier(name: String): Identifier = identifier.name(name)
 
   /**
     Traverse to all arguments passed to methods
@@ -179,7 +179,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.argument.code($code)`
     * */
-  def argument(code : String) : Expression = argument.code(code)
+  def argument(code: String): Expression = argument.code(code)
 
   /**
     * Traverse to all return expressions
@@ -190,7 +190,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `returns.code($code)`
     * */
-  def returns(code : String) : Return = returns.code(code)
+  def returns(code: String): Return = returns.code(code)
 
   /**
     * Traverse to all meta data entries
@@ -204,13 +204,13 @@ class NodeTypeStarters(cpg: Cpg) {
   def methodRef: MethodRef =
     new MethodRef(scalaGraph.V.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef])
 
-
   /**
     * Shorthand for `cpg.methodRef
     * .filter(_.referencedMethod.fullName(fullName))`
     * */
-  def methodRef(fullName : String) : MethodRef = methodRef
-    .filter(_.referencedMethod.fullName(fullName))
+  def methodRef(fullName: String): MethodRef =
+    methodRef
+      .filter(_.referencedMethod.fullName(fullName))
 
   /**
   Begin traversal at node with id.

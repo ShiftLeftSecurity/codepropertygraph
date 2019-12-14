@@ -126,7 +126,7 @@ package object language {
   implicit def toBinding(steps: Steps[nodes.Binding]): Binding =
     new Binding(steps.raw)
 
-  implicit def toComment(steps : Steps[nodes.Comment]) : Comment =
+  implicit def toComment(steps: Steps[nodes.Comment]): Comment =
     new Comment(steps.raw)
 
   implicit class GremlinScalaDeco[End](raw: GremlinScala[End]) {
