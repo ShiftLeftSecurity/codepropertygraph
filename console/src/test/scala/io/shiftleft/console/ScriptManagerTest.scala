@@ -39,20 +39,21 @@ class ScriptManagerTest extends WordSpec with Matchers with Inside {
       val scripts = scriptManager.scripts()
       val expected = List(
         ScriptCollections("general",
-          ScriptDescriptions(
-            "A collection of general purpose scripts.",
-            List(ScriptDescription("list-funcs", "Lists all functions."))
-          )),
+                          ScriptDescriptions(
+                            "A collection of general purpose scripts.",
+                            List(ScriptDescription("list-funcs", "Lists all functions."))
+                          )),
         ScriptCollections("java",
-          ScriptDescriptions(
-            "A collection of java-specific scripts.",
-            List(ScriptDescription("list-sl-ns", "Lists all shiftleft namespaces."))
-          )),
+                          ScriptDescriptions(
+                            "A collection of java-specific scripts.",
+                            List(ScriptDescription("list-sl-ns", "Lists all shiftleft namespaces."))
+                          )),
         ScriptCollections("general/general_plus",
-          ScriptDescriptions(
-            "Even more general purpose scripts.",
-            List.empty
-          )))
+                          ScriptDescriptions(
+                            "Even more general purpose scripts.",
+                            List.empty
+                          ))
+      )
 
       scripts should contain theSameElementsAs expected
     }
