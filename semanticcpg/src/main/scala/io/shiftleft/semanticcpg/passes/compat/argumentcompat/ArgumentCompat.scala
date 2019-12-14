@@ -18,7 +18,7 @@ class ArgumentCompat(cpg: Cpg) extends CpgPass(cpg) {
       val diffGraph = new DiffGraph
       val callIterator = cpg.call.toIterator()
       callIterator.foreach(addArgumentEdges(_, diffGraph))
-      val returnIterator = cpg.returnExpression.toIterator()
+      val returnIterator = cpg.returns.toIterator()
       returnIterator.foreach(addArgumentEdges(_, diffGraph))
       Iterator(diffGraph)
     } else {
