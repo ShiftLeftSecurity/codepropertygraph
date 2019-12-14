@@ -27,7 +27,7 @@ class NodeTypeStarters(cpg: Cpg) {
     new Comment(scalaGraph.V.hasLabel(NodeTypes.COMMENT).cast[nodes.Comment])
 
   /**
-    * Shorthand for `cpg.comment.code($code)`
+    * Shorthand for `cpg.comment.code(code)`
     * */
   def comment(code: String): Comment = comment.code(code)
 
@@ -38,7 +38,7 @@ class NodeTypeStarters(cpg: Cpg) {
     new File(scalaGraph.V.hasLabel(NodeTypes.FILE).cast[nodes.File])
 
   /**
-    * Shorthand for `cpg.file.name($name)`
+    * Shorthand for `cpg.file.name(name)`
     * */
   def file(name: String): File = file.name(name)
 
@@ -49,7 +49,7 @@ class NodeTypeStarters(cpg: Cpg) {
     new Namespace(scalaGraph.V.hasLabel(NodeTypes.NAMESPACE).cast[nodes.Namespace])
 
   /**
-    * Shorthand for `cpg.namespace.name($name)`
+    * Shorthand for `cpg.namespace.name(name)`
     * */
   def namespace(name: String): Namespace = namespace.name(name)
 
@@ -60,7 +60,7 @@ class NodeTypeStarters(cpg: Cpg) {
     new NamespaceBlock(scalaGraph.V.hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[nodes.NamespaceBlock])
 
   /**
-    * Shorthand for `cpg.namespaceBlock.name($name)`
+    * Shorthand for `cpg.namespaceBlock.name(name)`
     * */
   def namespaceBlock(name: String): NamespaceBlock = namespaceBlock.name(name)
 
@@ -71,7 +71,7 @@ class NodeTypeStarters(cpg: Cpg) {
     new Type(scalaGraph.V.hasLabel(NodeTypes.TYPE).cast[nodes.Type])
 
   /**
-    * Shorthand for `cpg.types.fullName($fullname)`
+    * Shorthand for `cpg.types.fullName(fullName)`
     * */
   def types(fullName: String): Type = types.fullName(fullName)
 
@@ -82,7 +82,7 @@ class NodeTypeStarters(cpg: Cpg) {
     new TypeDecl(scalaGraph.V.hasLabel(NodeTypes.TYPE_DECL).cast[nodes.TypeDecl])
 
   /**
-    * Shorthand for cpg.typeDecl.fullName($fullName)
+    * Shorthand for cpg.typeDecl.fullName(fullName)
     * */
   def typeDecl(fullName: String): TypeDecl = typeDecl.fullName(fullName)
 
@@ -93,7 +93,7 @@ class NodeTypeStarters(cpg: Cpg) {
     new Method(scalaGraph.V.hasLabel(NodeTypes.METHOD).cast[nodes.Method])
 
   /**
-    * Shorthand for `cpg.method.fullName($fullName)`
+    * Shorthand for `cpg.method.fullName(fullName)`
     * */
   def method(fullName: String): Method = method.fullName(fullName)
 
@@ -110,7 +110,7 @@ class NodeTypeStarters(cpg: Cpg) {
     new MethodParameter(scalaGraph.V.hasLabel(NodeTypes.METHOD_PARAMETER_IN).cast[nodes.MethodParameterIn])
 
   /**
-    * Shorthand for `cpg.parameter.name($name)`
+    * Shorthand for `cpg.parameter.name(name)`
     * */
   def parameter(name: String): MethodParameter = parameter.name(name)
 
@@ -121,7 +121,7 @@ class NodeTypeStarters(cpg: Cpg) {
     new Member(scalaGraph.V.hasLabel(NodeTypes.MEMBER).cast[nodes.Member])
 
   /**
-    * Shorthand for `cpg.member.name($name)`
+    * Shorthand for `cpg.member.name(name)`
     * */
   def member(name: String): Member = member.name(name)
 
@@ -132,7 +132,7 @@ class NodeTypeStarters(cpg: Cpg) {
     new Call(scalaGraph.V.hasLabel(NodeTypes.CALL).cast[nodes.Call])
 
   /**
-    * Shorthand for `cpg.call.name($name)`
+    * Shorthand for `cpg.call.name(name)`
     * */
   def call(name: String): Call = call.name(name)
 
@@ -155,7 +155,7 @@ class NodeTypeStarters(cpg: Cpg) {
     new Literal(scalaGraph.V.hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
 
   /**
-    * Shorthand for `cpg.literal.code($code)`
+    * Shorthand for `cpg.literal.code(code)`
     * */
   def literal(code: String): Literal = literal.code(code)
 
@@ -166,7 +166,7 @@ class NodeTypeStarters(cpg: Cpg) {
     new Identifier(scalaGraph.V.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
-    * Shorthand for `cpg.identifier.name($name)`
+    * Shorthand for `cpg.identifier.name(name)`
     * */
   def identifier(name: String): Identifier = identifier.name(name)
 
@@ -177,7 +177,7 @@ class NodeTypeStarters(cpg: Cpg) {
     call.argument
 
   /**
-    * Shorthand for `cpg.argument.code($code)`
+    * Shorthand for `cpg.argument.code(code)`
     * */
   def argument(code: String): Expression = argument.code(code)
 
@@ -188,7 +188,7 @@ class NodeTypeStarters(cpg: Cpg) {
     new Return(scalaGraph.V.hasLabel(NodeTypes.RETURN).cast[nodes.Return])
 
   /**
-    * Shorthand for `returns.code($code)`
+    * Shorthand for `returns.code(code)`
     * */
   def returns(code: String): Return = returns.code(code)
 
