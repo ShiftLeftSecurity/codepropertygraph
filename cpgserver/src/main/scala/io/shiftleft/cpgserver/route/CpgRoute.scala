@@ -1,11 +1,8 @@
 package io.shiftleft.cpgserver.route
 
-import java.nio.file.{Files, Paths}
-import java.util.UUID
 import cats.effect.IO
 import cats.implicits.catsStdInstancesForList
 import cats.syntax.foldable._
-import io.circe.Encoder
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s.circe._
@@ -13,10 +10,13 @@ import org.http4s.dsl.io._
 import org.http4s.{EntityDecoder, HttpRoutes, MessageBodyFailure, Response}
 import org.slf4j.LoggerFactory
 
-import io.shiftleft.console.query.{CpgOperationFailure, CpgOperationSuccess, CpgQueryExecutor}
 import io.shiftleft.cpgserver.cpg.CpgProvider
+import io.shiftleft.cpgserver.query.{CpgOperationFailure, CpgOperationSuccess, ServerAmmoniteExecutor}
 
-final class CpgRoute[T: Encoder](cpgProvider: CpgProvider, cpgQueryExecutor: CpgQueryExecutor[T])(
+import java.nio.file.{Files, Paths}
+import java.util.UUID
+
+final class CpgRoute(cpgProvider: CpgProvider, cpgQueryExecutor: ServerAmmoniteExecutor)(
     implicit httpErrorHandler: HttpErrorHandler) {
 
   import CpgRoute._
@@ -41,7 +41,6 @@ final class CpgRoute[T: Encoder](cpgProvider: CpgProvider, cpgQueryExecutor: Cpg
       }
   }
 
-  // TODO discuss with jacob: according to scalac this is unreachable... commenting for now since it probably never worked anyway
   private def createCpgQuery(cpgId: UUID, queryRequest: CreateCpgQueryRequest): IO[Response[IO]] = {
     cpgProvider
       .retrieveCpg(cpgId)
@@ -62,11 +61,11 @@ final class CpgRoute[T: Encoder](cpgProvider: CpgProvider, cpgQueryExecutor: Cpg
       .retrieveCpg(cpgId)
       .semiflatMap {
         case CpgOperationSuccess(_) =>
-          Ok(CpgOperationResponse[T](ready = true).asJson)
+          Ok(CpgOperationResponse(ready = true).asJson)
         case CpgOperationFailure(ex) =>
-          Ok(CpgOperationResponse[T](ready = true, error = Some(ex.getMessage)).asJson)
+          Ok(CpgOperationResponse(ready = true, error = Some(ex.getMessage)).asJson)
       }
-      .getOrElseF(Ok(CpgOperationResponse[T](ready = false).asJson))
+      .getOrElseF(Ok(CpgOperationResponse(ready = false).asJson))
   }
 
   private def retrieveQuery(queryId: UUID): IO[Response[IO]] = {
@@ -74,11 +73,11 @@ final class CpgRoute[T: Encoder](cpgProvider: CpgProvider, cpgQueryExecutor: Cpg
       .retrieveQueryResult(queryId)
       .semiflatMap {
         case CpgOperationSuccess(queryResult) =>
-          Ok(CpgOperationResponse[T](ready = true, result = Some(queryResult)).asJson)
+          Ok(CpgOperationResponse(ready = true, result = Some(queryResult)).asJson)
         case CpgOperationFailure(ex) =>
-          Ok(CpgOperationResponse[T](ready = true, error = Some(ex.getMessage)).asJson)
+          Ok(CpgOperationResponse(ready = true, error = Some(ex.getMessage)).asJson)
       }
-      .getOrElseF(Ok(CpgOperationResponse[T](ready = false).asJson))
+      .getOrElseF(Ok(CpgOperationResponse(ready = false).asJson))
   }
 
   private val unhandledCpgRoutes: HttpRoutes[IO] = HttpRoutes.of {
@@ -87,7 +86,6 @@ final class CpgRoute[T: Encoder](cpgProvider: CpgProvider, cpgQueryExecutor: Cpg
         .as[CreateCpgRequest]
         .flatMap(createCpg)
 
-    // TODO discuss with jacob: according to scalac this is unreachable... commenting for now since it probably never worked anyway
     case req @ POST -> Root / "v1" / "cpg" / UUIDVar(cpgId) / "query" =>
       req
         .as[CreateCpgQueryRequest]
@@ -105,9 +103,9 @@ final class CpgRoute[T: Encoder](cpgProvider: CpgProvider, cpgQueryExecutor: Cpg
 
 object CpgRoute {
 
-  def apply[T: Encoder](cpgProvider: CpgProvider, cpgQueryExecutor: CpgQueryExecutor[T])(
-      implicit httpErrorHandler: HttpErrorHandler): CpgRoute[T] = {
-    new CpgRoute[T](cpgProvider, cpgQueryExecutor)
+  def apply(cpgProvider: CpgProvider, ammoniteExecutor: ServerAmmoniteExecutor)(
+      implicit httpErrorHandler: HttpErrorHandler): CpgRoute = {
+    new CpgRoute(cpgProvider, ammoniteExecutor)
   }
 
   final case class ApiError(error: String)
@@ -115,7 +113,7 @@ object CpgRoute {
   final case class CreateCpgResponse(uuid: UUID)
   final case class CreateCpgQueryRequest(query: String)
   final case class CreateCpgQueryResponse(uuid: UUID)
-  final case class CpgOperationResponse[T](ready: Boolean, result: Option[T] = None, error: Option[String] = None)
+  final case class CpgOperationResponse(ready: Boolean, result: Option[String] = None, error: Option[String] = None)
 
   private[route] implicit val decodeCpgRequest: EntityDecoder[IO, CreateCpgRequest] = jsonOf
   private[route] implicit val decodeCpgQueryRequest: EntityDecoder[IO, CreateCpgQueryRequest] = jsonOf

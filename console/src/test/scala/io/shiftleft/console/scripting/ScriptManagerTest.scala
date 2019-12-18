@@ -62,12 +62,20 @@ class ScriptManagerTest extends WordSpec with Matchers with Inside {
 
   "running scripts" should {
     "be correct when explicitly specifying a CPG" in withScriptManager { scriptManager =>
-      val expected = "cpg.method.name.l"
+      val expected =
+        """|@main def main() = {
+           |  cpg.method.name.l
+           |}""".stripMargin
+
       scriptManager.runScript("general/list-funcs", Map.empty, Cpg.emptyCpg) shouldBe expected
     }
 
     "be correct when specifying a CPG filename" in withScriptManager { scriptManager =>
-      val expected = "cpg.method.name.l"
+      val expected =
+        """|@main def main() = {
+           |  cpg.method.name.l
+           |}""".stripMargin
+
       scriptManager.runScript("general/list-funcs", Map.empty, DEFAULT_CPG_NAME) shouldBe expected
     }
 

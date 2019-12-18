@@ -8,7 +8,8 @@ import cats.syntax.traverse._
 
 import io.shiftleft.codepropertygraph.Cpg
 
-import java.nio.file.Path
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Path}
 
 /**
   * Provides an interface for the execution of scripts using the
@@ -20,10 +21,10 @@ trait AmmoniteExecutor {
   protected def predef: String
 
   private lazy val ammoniteMain = ammonite.Main(predefCode = predef,
-    remoteLogging = false,
-    verboseOutput = false,
-    welcomeBanner = None,
-    storageBackend = Storage.InMemory())
+                                                remoteLogging = false,
+                                                verboseOutput = false,
+                                                welcomeBanner = None,
+                                                storageBackend = Storage.InMemory())
 
   /**
     * Runs the given script, passing any defined parameters in addition to bringing the target CPG
@@ -40,16 +41,15 @@ trait AmmoniteExecutor {
       repl <- IO.fromEither(replInstance.left.map { case (err, _) => new RuntimeException(err.msg) })
       ammoniteResult <- IO {
         repl.interp.initializePredef()
-        ammonite.main.Scripts.runScript(ammoniteMain.wd,
-          os.Path(scriptPath),
-          repl.interp,
-          parameters.map { case (k, v) => k -> Some(v) }.toSeq)
+        ammonite.main.Scripts.runScript(ammoniteMain.wd, os.Path(scriptPath), repl.interp, parameters.map {
+          case (k, v) => k -> Some(v)
+        }.toSeq)
       }
       result <- ammoniteResult match {
-        case Res.Success(res) => IO.pure(res)
+        case Res.Success(res)     => IO.pure(res)
         case Res.Exception(ex, _) => IO.raiseError(ex)
-        case Res.Failure(msg) => IO.raiseError(new RuntimeException(msg))
-        case _ => IO.pure(())
+        case Res.Failure(msg)     => IO.raiseError(new RuntimeException(msg))
+        case _                    => IO.pure(())
       }
     } yield result
   }
@@ -69,5 +69,28 @@ trait AmmoniteExecutor {
       val scriptParams = parameters.getOrElse(scriptPath, Map.empty)
       runScript(scriptPath, scriptParams, cpg)
     }.sequence
+  }
+
+  /**
+    * Runs a query against the provided CPG.
+    *
+    * @param query The query to run against the CPG.
+    * @param cpg The CPG made implicitly available in the query
+    * @return The result of running the query.
+    */
+  def runQuery(query: String, cpg: Cpg): IO[Any] = {
+    val sb = new StringBuilder
+    sb.append("@main def main() = {")
+    sb.append(System.lineSeparator)
+    sb.append(query)
+    sb.append(System.lineSeparator)
+    sb.append("}")
+    sb.append(System.lineSeparator)
+
+    for {
+      tempFile <- IO(Files.createTempFile("sl_query", ".sc"))
+      _ <- IO(Files.write(tempFile, sb.toString.getBytes(StandardCharsets.UTF_8)))
+      result <- runScript(tempFile, Map.empty, cpg)
+    } yield result
   }
 }

@@ -44,7 +44,7 @@ abstract class ScriptManager(executor: AmmoniteExecutor) {
   import ScriptManager._
 
   private val absoluteJarPathRegex = """jar:file:(.*)!/scripts""".r
-  private val scriptFileRegex      = """(scripts/.*)""".r
+  private val scriptFileRegex = """(scripts/.*)""".r
   private val scriptDir = "scripts"
 
   // This is to work around Ammonite failing to read resource files on the classpath.
@@ -96,8 +96,7 @@ abstract class ScriptManager(executor: AmmoniteExecutor) {
     val scriptPath = scriptsTempDir / s"$scriptName.sc"
     if (scriptPath.exists) {
       f(scriptPath)
-    }
-    else {
+    } else {
       IO.raiseError(new NoSuchFileException(s"Script [$scriptPath] was not found."))
     }
   }

@@ -1,1 +1,3 @@
-cpg.method.name.l
+@main def main() = {
+  cpg.method.name.l
+}

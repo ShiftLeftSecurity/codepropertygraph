@@ -8,3 +8,4 @@ private-key.pem
 travis_wait_*
 **/*.pyc
 /protoc
+project/.bloop

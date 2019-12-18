@@ -11,7 +11,7 @@ import cats.effect.{Blocker, ContextShift, IO}
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewMethod
-import io.shiftleft.console.query.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess}
+import io.shiftleft.cpgserver.query.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 

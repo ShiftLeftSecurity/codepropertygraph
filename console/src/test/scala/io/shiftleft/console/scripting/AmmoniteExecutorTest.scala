@@ -27,7 +27,7 @@ class AmmoniteExecutorTest extends WordSpec with Matchers {
     "execute a single script with an implicit cpg in scope" in withExecutor { executor =>
       val script = getScriptPath("scripts/general/list-funcs.sc")
 
-      executor.runScript(script, Map.empty, Cpg.emptyCpg).unsafeRunSync() shouldBe ()
+      executor.runScript(script, Map.empty, Cpg.emptyCpg).unsafeRunSync() shouldBe List()
     }
 
     "execute multiple scripts" in withExecutor { executor =>
@@ -35,7 +35,7 @@ class AmmoniteExecutorTest extends WordSpec with Matchers {
       val secondScript = getScriptPath("scripts/java/list-sl-ns.sc")
 
       executor.runScripts(List(script, secondScript), Map.empty, Cpg.emptyCpg).unsafeRunSync() shouldBe
-        List((), ())
+        List(List(), List())
     }
 
     "return a failure if the script can not be found" in withExecutor { executor =>
