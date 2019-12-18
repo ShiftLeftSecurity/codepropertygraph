@@ -2,7 +2,8 @@ name := "console"
 
 enablePlugins(JavaAppPackaging)
 
-dependsOn(Projects.codepropertygraph)
+dependsOn(Projects.codepropertygraph,
+          Projects.semanticcpg % "test -> test")
 
 scalacOptions ++= Seq(
   "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
@@ -48,6 +49,7 @@ val CatsVersion = "2.0.0"
 val CirceVersion = "0.12.2"
 val AmmoniteVersion = "1.8.1"
 val ScalatestVersion = "3.0.8"
+val ZeroturnaroundVersion = "1.13"
 
 libraryDependencies ++= Seq(
   "com.github.scopt"     %% "scopt"         % ScoptVersion,
@@ -56,6 +58,7 @@ libraryDependencies ++= Seq(
   "org.typelevel"        %% "cats-effect"   % CatsVersion,
   "io.circe"             %% "circe-generic" % CirceVersion,
   "io.circe"             %% "circe-parser"  % CirceVersion,
+  "org.zeroturnaround"   %  "zt-zip"        % ZeroturnaroundVersion,
   "com.lihaoyi"          %% "ammonite"      % AmmoniteVersion cross CrossVersion.full,
 
   "org.scalatest"        %% "scalatest"     % ScalatestVersion % Test,

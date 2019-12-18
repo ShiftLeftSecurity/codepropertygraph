@@ -1,28 +1,29 @@
-package io.shiftleft.console
+package io.shiftleft.console.scripting
 
-import java.util.UUID
 import better.files.File
-import cats.data.OptionT
 import cats.effect.IO
-
-import io.shiftleft.codepropertygraph.Cpg
 import org.scalatest.{Inside, Matchers, WordSpec}
 
-import io.shiftleft.console.ScriptManager.{ScriptCollections, ScriptDescription, ScriptDescriptions}
-import io.shiftleft.console.query.{CpgOperationResult, CpgOperationSuccess, CpgQueryExecutor}
+import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.console.scripting.ScriptManager.{ScriptCollections, ScriptDescription, ScriptDescriptions}
 
-import java.nio.file.NoSuchFileException
+import java.nio.file.{FileSystemNotFoundException, NoSuchFileException, Path}
+
+import scala.io.Source
+import scala.util.Try
 
 class ScriptManagerTest extends WordSpec with Matchers with Inside {
 
-  private object TestScriptExecutor extends CpgQueryExecutor[AnyRef] {
-    override def executeQuery(cpg: Cpg, query: String): IO[UUID] = ???
-
-    override def executeQuerySync(cpg: Cpg, query: String): IO[CpgOperationResult[AnyRef]] =
-      // Faking the actual execution by just returning the query itself
-      IO(CpgOperationSuccess(query))
-
-    override def retrieveQueryResult(queryId: UUID): OptionT[IO, CpgOperationResult[AnyRef]] = ???
+  private object TestScriptExecutor extends AmmoniteExecutor {
+    override protected def predef: String = ""
+    override def runScript(scriptPath: Path, parameters: Map[String, String], cpg: Cpg): IO[Any] = IO.fromTry(
+      Try {
+        val source = Source.fromFile(scriptPath.toFile)
+        val result = source.getLines.mkString(System.lineSeparator())
+        source.close()
+        result
+      }
+    )
   }
 
   private object TestScriptManager extends ScriptManager(TestScriptExecutor)
@@ -62,17 +63,23 @@ class ScriptManagerTest extends WordSpec with Matchers with Inside {
   "running scripts" should {
     "be correct when explicitly specifying a CPG" in withScriptManager { scriptManager =>
       val expected = "cpg.method.name.l"
-      scriptManager.runScript("general/list-funcs", Cpg.emptyCpg) shouldBe expected
+      scriptManager.runScript("general/list-funcs", Map.empty, Cpg.emptyCpg) shouldBe expected
     }
 
-    "be correctly when specifying a CPG filename" in withScriptManager { scriptManager =>
+    "be correct when specifying a CPG filename" in withScriptManager { scriptManager =>
       val expected = "cpg.method.name.l"
-      scriptManager.runScript("general/list-funcs", DEFAULT_CPG_NAME) shouldBe expected
+      scriptManager.runScript("general/list-funcs", Map.empty, DEFAULT_CPG_NAME) shouldBe expected
+    }
+
+    "throw an exception if the specified CPG can not be found" in withScriptManager { scriptManager =>
+      intercept[FileSystemNotFoundException] {
+        scriptManager.runScript("general/list-funcs", Map.empty, "cake.bin.zip")
+      }
     }
 
     "throw an exception if the specified script can not be found" in withScriptManager { scriptManager =>
       intercept[NoSuchFileException] {
-        scriptManager.runScript("list-funcs", Cpg.emptyCpg)
+        scriptManager.runScript("list-funcs", Map.empty, Cpg.emptyCpg)
       }
     }
   }
