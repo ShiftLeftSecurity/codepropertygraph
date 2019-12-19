@@ -55,5 +55,19 @@ class AmmoniteExecutorTest extends WordSpec with Matchers {
         executor.runScript(script, Map.empty, Cpg.emptyCpg).unsafeRunSync()
       }
     }
+
+    "run a string query" in withExecutor { executor =>
+      val query = "cpg.method.l"
+
+      executor.runQuery(query, Cpg.emptyCpg).unsafeRunSync() shouldBe List()
+    }
+
+    "propagate errors if the string query fails" in withExecutor { executor =>
+      val query = "cake"
+
+      intercept[RuntimeException] {
+        executor.runQuery(query, Cpg.emptyCpg).unsafeRunSync()
+      }
+    }
   }
 }

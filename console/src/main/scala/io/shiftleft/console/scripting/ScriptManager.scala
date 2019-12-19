@@ -92,7 +92,7 @@ abstract class ScriptManager(executor: AmmoniteExecutor) {
       .toList
   }
 
-  private def withScriptFile[T](scriptName: String)(f: File => IO[T]): IO[T] = {
+  protected def withScriptFile[T](scriptName: String)(f: File => IO[T]): IO[T] = {
     val scriptPath = scriptsTempDir / s"$scriptName.sc"
     if (scriptPath.exists) {
       f(scriptPath)
