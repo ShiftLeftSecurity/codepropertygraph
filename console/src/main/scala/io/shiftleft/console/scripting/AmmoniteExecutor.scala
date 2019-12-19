@@ -1,5 +1,6 @@
 package io.shiftleft.console.scripting
 
+import ammonite.Main
 import ammonite.runtime.Storage
 import ammonite.util.Res
 import cats.effect.IO
@@ -20,11 +21,11 @@ import java.nio.file.{Files, Path}
 trait AmmoniteExecutor {
   protected def predef: String
 
-  private lazy val ammoniteMain = ammonite.Main(predefCode = predef,
-                                                remoteLogging = false,
-                                                verboseOutput = false,
-                                                welcomeBanner = None,
-                                                storageBackend = Storage.InMemory())
+  protected lazy val ammoniteMain: Main = ammonite.Main(predefCode = predef,
+    remoteLogging = false,
+    verboseOutput = false,
+    welcomeBanner = None,
+    storageBackend = Storage.InMemory())
 
   /**
     * Runs the given script, passing any defined parameters in addition to bringing the target CPG
@@ -46,10 +47,10 @@ trait AmmoniteExecutor {
         }.toSeq)
       }
       result <- ammoniteResult match {
-        case Res.Success(res)     => IO.pure(res)
+        case Res.Success(res) => IO.pure(res)
         case Res.Exception(ex, _) => IO.raiseError(ex)
-        case Res.Failure(msg)     => IO.raiseError(new RuntimeException(msg))
-        case _                    => IO.pure(())
+        case Res.Failure(msg) => IO.raiseError(new RuntimeException(msg))
+        case _ => IO.pure(())
       }
     } yield result
   }
@@ -75,7 +76,7 @@ trait AmmoniteExecutor {
     * Runs a query against the provided CPG.
     *
     * @param query The query to run against the CPG.
-    * @param cpg The CPG made implicitly available in the query
+    * @param cpg   The CPG made implicitly available in the query
     * @return The result of running the query.
     */
   def runQuery(query: String, cpg: Cpg): IO[Any] = {
