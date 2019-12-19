@@ -27,7 +27,8 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
             neverOverriddenFlag.asInstanceOf[AnyRef]
           )
         } else {
-          logger.error("No binding typeDecl found in BindingMethodOverridesPass: " + method.name + " " + method.signature)
+          logger.error(
+            "No binding typeDecl found in BindingMethodOverridesPass: " + method.name + " " + method.signature)
           false
         }
       })
