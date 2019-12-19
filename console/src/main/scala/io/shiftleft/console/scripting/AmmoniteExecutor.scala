@@ -108,17 +108,15 @@ trait AmmoniteExecutor {
     * @return The result of running the query.
     */
   def runQuery(query: String, cpg: Cpg): IO[Any] = {
-    val sb = new StringBuilder
-    sb.append("@main def main() = {")
-    sb.append(System.lineSeparator)
-    sb.append(query)
-    sb.append(System.lineSeparator)
-    sb.append("}")
-    sb.append(System.lineSeparator)
+    val queryContent =
+      s"""|@main def main() = {
+          |$query
+          |}
+          |""".stripMargin
 
     for {
       tempFile <- IO(Files.createTempFile("sl_query", ".sc"))
-      _ <- IO(Files.write(tempFile, sb.toString.getBytes(StandardCharsets.UTF_8)))
+      _ <- IO(Files.write(tempFile, queryContent.getBytes(StandardCharsets.UTF_8)))
       result <- runScript(tempFile, Map.empty, cpg)
     } yield result
   }
