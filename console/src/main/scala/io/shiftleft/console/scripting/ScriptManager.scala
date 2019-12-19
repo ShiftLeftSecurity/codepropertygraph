@@ -32,10 +32,7 @@ object ScriptManager {
   *       |-- csharp
   *
   * To run `my-java-script.sc` you would run:
-  * `runScript("java/my-java-script", cpg)`
-  *
-  * Scripts *must* end with the `.sc` extension to be picked up by the script
-  * manager.
+  * `runScript("java/my-java-script.sc", cpg)`
   *
   * @param executor An executor that is used to run the managed scripts.
   */
@@ -93,7 +90,7 @@ abstract class ScriptManager(executor: AmmoniteExecutor) {
   }
 
   protected def withScriptFile[T](scriptName: String)(f: File => IO[T]): IO[T] = {
-    val scriptPath = scriptsTempDir / s"$scriptName.sc"
+    val scriptPath = scriptsTempDir / scriptName
     if (scriptPath.exists) {
       f(scriptPath)
     } else {
