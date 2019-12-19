@@ -29,7 +29,7 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
         } else {
           logger.error(
             "No binding typeDecl found in BindingMethodOverridesPass: " + method.name + " " + method.signature)
-          true 
+          true
         }
       })
     diff
