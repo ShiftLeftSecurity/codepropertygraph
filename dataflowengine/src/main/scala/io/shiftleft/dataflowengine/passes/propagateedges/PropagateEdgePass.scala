@@ -8,7 +8,7 @@ import io.shiftleft.dataflowengine.semanticsloader.Semantics
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   * Create PROPAGATE edges which mark parameters defined by a method.

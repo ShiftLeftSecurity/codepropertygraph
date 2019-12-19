@@ -36,7 +36,7 @@ class CallNameFixup(cpg: Cpg) extends CpgPass(cpg) {
 
   private def eraseTypeInformation(name: String): String = {
 
-    val dstStringBuilder = StringBuilder.newBuilder
+    val dstStringBuilder = new StringBuilder
 
     var openBracketCounter = 0
     for (i <- 0 until name.length) {

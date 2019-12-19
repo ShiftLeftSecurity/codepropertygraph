@@ -3,25 +3,34 @@ package io.shiftleft.cpgserver.route
 import java.nio.file.Files
 import java.util.UUID
 import cats.data.{Kleisli, OptionT}
-import cats.effect.IO
+import cats.effect.{ContextShift, IO}
 import org.http4s.implicits._
 import org.http4s._
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.console.query.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess, CpgQueryExecutor}
+import io.shiftleft.cpgserver.query.{
+  CpgOperationFailure,
+  CpgOperationResult,
+  CpgOperationSuccess,
+  ServerAmmoniteExecutor
+}
 import io.shiftleft.cpgserver.cpg.CpgProvider
 import io.shiftleft.cpgserver.route.CpgRoute.{ApiError, CpgOperationResponse, CreateCpgQueryResponse, CreateCpgResponse}
 
 class CpgRouteSpec extends Http4sSpec {
   import CpgRouteSpec._
 
+  private implicit val cs: ContextShift[IO] = IO.contextShift(scala.concurrent.ExecutionContext.global)
+
   private class DummyCpgProvider(uuid: UUID, cpg: OptionT[IO, CpgOperationResult[Cpg]]) extends CpgProvider {
     override def createCpg(fileNames: Set[String]): IO[UUID] = IO.pure(uuid)
     override def retrieveCpg(cpgId: UUID): OptionT[IO, CpgOperationResult[Cpg]] = cpg
   }
 
-  private class DummyCpgQueryExecutor(uuid: UUID, queryResult: OptionT[IO, CpgOperationResult[String]])
-      extends CpgQueryExecutor[String] {
+  private class DummyServerAmmoniteExecutor(uuid: UUID, queryResult: OptionT[IO, CpgOperationResult[String]])
+      extends ServerAmmoniteExecutor {
+
+    override protected lazy val predef: String = ""
     override def executeQuery(cpg: Cpg, query: String): IO[UUID] = IO.pure(uuid)
     override def retrieveQueryResult(queryId: UUID): OptionT[IO, CpgOperationResult[String]] = queryResult
     override def executeQuerySync(cpg: Cpg, query: String): IO[CpgOperationResult[String]] = ???
@@ -34,7 +43,7 @@ class CpgRouteSpec extends Http4sSpec {
       queryResult: OptionT[IO, CpgOperationResult[String]] = OptionT.pure(CpgOperationSuccess("")))(
       f: Kleisli[IO, Request[IO], Response[IO]] => T): T = {
     val cpgProvider = new DummyCpgProvider(cpgUuid, cpg)
-    val cpgQueryExecutor = new DummyCpgQueryExecutor(queryUuid, queryResult)
+    val cpgQueryExecutor = new DummyServerAmmoniteExecutor(queryUuid, queryResult)
     implicit val errorHandler: HttpErrorHandler = CpgRoute.CpgHttpErrorHandler
     f(new CpgRoute(cpgProvider, cpgQueryExecutor).routes.orNotFound)
   }
@@ -105,7 +114,7 @@ class CpgRouteSpec extends Http4sSpec {
       val request = Request[IO](method = Method.GET, uri = uri"/v1/cpg" / fixedCpgUuid.toString)
       val response = route.run(request)
 
-      check(response, Status.Ok, Some(CpgOperationResponse[String](ready = true))) shouldBe true
+      check(response, Status.Ok, Some(CpgOperationResponse(ready = true))) shouldBe true
     }
 
     "succeed with 200 OK if the CPG was unable to be created" in withRoute(
@@ -114,7 +123,7 @@ class CpgRouteSpec extends Http4sSpec {
       val request = Request[IO](method = Method.GET, uri = uri"/v1/cpg" / fixedCpgUuid.toString)
       val response = route.run(request)
 
-      check(response, Status.Ok, Some(CpgOperationResponse[String](ready = true, error = Some("Oh no!")))) shouldBe true
+      check(response, Status.Ok, Some(CpgOperationResponse(ready = true, error = Some("Oh no!")))) shouldBe true
     }
 
     "succeed with 200 OK if the CPG is not ready" in withRoute(
@@ -124,7 +133,7 @@ class CpgRouteSpec extends Http4sSpec {
       val request = Request[IO](method = Method.GET, uri = uri"/v1/cpg" / fixedCpgUuid.toString)
       val response = route.run(request)
 
-      check(response, Status.Ok, Some(CpgOperationResponse[String](ready = false))) shouldBe true
+      check(response, Status.Ok, Some(CpgOperationResponse(ready = false))) shouldBe true
     }
 
     "succeed with 200 OK if the referenced CPG does not exist" in withRoute(
@@ -133,7 +142,7 @@ class CpgRouteSpec extends Http4sSpec {
       val request = Request[IO](method = Method.GET, uri = uri"/v1/cpg" / UUID.randomUUID.toString)
       val response = route.run(request)
 
-      check(response, Status.Ok, Some(CpgOperationResponse[String](ready = false))) shouldBe true
+      check(response, Status.Ok, Some(CpgOperationResponse(ready = false))) shouldBe true
     }
   }
 
@@ -209,7 +218,7 @@ class CpgRouteSpec extends Http4sSpec {
       val request = Request[IO](method = Method.GET, uri = uri"/v1/query" / fixedQueryUuid.toString)
       val response = route.run(request)
 
-      check(response, Status.Ok, Some(CpgOperationResponse[String](ready = true, result = Some("result")))) shouldBe true
+      check(response, Status.Ok, Some(CpgOperationResponse(ready = true, result = Some("result")))) shouldBe true
     }
 
     "succeed with 200 OK with an error message if the CPG query failed" in withRoute(
@@ -219,7 +228,7 @@ class CpgRouteSpec extends Http4sSpec {
       val request = Request[IO](method = Method.GET, uri = uri"/v1/query" / fixedQueryUuid.toString)
       val response = route.run(request)
 
-      check(response, Status.Ok, Some(CpgOperationResponse[String](ready = true, error = Some("Oh noes!")))) shouldBe true
+      check(response, Status.Ok, Some(CpgOperationResponse(ready = true, error = Some("Oh noes!")))) shouldBe true
     }
 
     "succeed with 200 OK without the query result if the CPG query is not ready" in withRoute(
@@ -229,7 +238,7 @@ class CpgRouteSpec extends Http4sSpec {
       val request = Request[IO](method = Method.GET, uri = uri"/v1/query" / fixedQueryUuid.toString)
       val response = route.run(request)
 
-      check(response, Status.Ok, Some(CpgOperationResponse[String](ready = false))) shouldBe true
+      check(response, Status.Ok, Some(CpgOperationResponse(ready = false))) shouldBe true
     }
 
     "succeed with 200 OK if the referenced query does not exist" in withRoute(
@@ -238,7 +247,7 @@ class CpgRouteSpec extends Http4sSpec {
       val request = Request[IO](method = Method.GET, uri = uri"/v1/query" / UUID.randomUUID.toString)
       val response = route.run(request)
 
-      check(response, Status.Ok, Some(CpgOperationResponse[String](ready = false))) shouldBe true
+      check(response, Status.Ok, Some(CpgOperationResponse(ready = false))) shouldBe true
     }
   }
 
@@ -258,7 +267,7 @@ object CpgRouteSpec {
 
   implicit val createResponseDecoder: EntityDecoder[IO, CreateCpgResponse] = jsonOf
   implicit val apiErrorDecoder: EntityDecoder[IO, ApiError] = jsonOf
-  implicit val cpgOpResponseDecoder: EntityDecoder[IO, CpgOperationResponse[String]] = jsonOf
+  implicit val cpgOpResponseDecoder: EntityDecoder[IO, CpgOperationResponse] = jsonOf
   implicit val cpgCreateQueryResponse: EntityDecoder[IO, CreateCpgQueryResponse] = jsonOf
 
   val fixedCpgUuid: UUID = UUID.randomUUID

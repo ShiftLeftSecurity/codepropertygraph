@@ -56,14 +56,14 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       import org.apache.tinkerpop.gremlin.structure.Property
       import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
       import io.shiftleft.overflowdb.{EdgeLayoutInformation, EdgeFactory, NodeFactory, OdbEdge, OdbNode, OdbGraph, NodeRef}
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       import org.slf4j.LoggerFactory
 
       object PropertyErrorRegister {
         private var errorMap = Set[(Class[_], String)]()
         private val logger = LoggerFactory.getLogger(getClass)
 
-        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String) {
+        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
           if (!errorMap.contains((clazz, propertyName))) {
             logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
             errorMap += ((clazz, propertyName))
@@ -190,14 +190,14 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
       import io.shiftleft.overflowdb.{EdgeFactory, NodeFactory, NodeLayoutInformation, OdbNode, OdbGraph, OdbNodeProperty, NodeRef}
       import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       import org.slf4j.LoggerFactory
 
       object PropertyErrorRegister {
         private var errorMap = Set[(Class[_], String)]()
         private val logger = LoggerFactory.getLogger(getClass)
 
-        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String) {
+        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
           if (!errorMap.contains((clazz, propertyName))) {
             logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
             errorMap += ((clazz, propertyName))
@@ -208,8 +208,6 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       trait Node extends Product {
         def label: String
         def getId: JLong
-
-        def accept[T](visitor: NodeVisitor[T]): T = ???
 
         /** labels of product elements, used e.g. for pretty-printing */
         def productElementLabel(n: Int): String
@@ -239,16 +237,6 @@ $neighborAccesors
       }
 
       """
-
-      val nodeVisitor = s""" 
-        |/* Using pattern matching would be prettier than the visitor pattern, but because the matches would 
-        | * contain type checks, scalac cannot compile them down to jvm `lookupswitch|tableswitch` instructions, 
-        | * which would make them slower. 
-        | * See https://github.com/ShiftLeftSecurity/codepropertygraph/pull/317 for more details. */
-        |trait NodeVisitor[T] {
-        |  ${generateNodeVisitorMethods}
-        |  ${generateBaseTraitVisitorMethods}
-        |}\n""".stripMargin
 
       val nodeBaseTraits = schema.nodeBaseTraits.map { nodeBaseTrait =>
         val mixins = nodeBaseTrait.hasKeys.map { key =>
@@ -293,18 +281,8 @@ $neighborAccesors
         """
       }
 
-      staticHeader + nodeVisitor + nodeBaseTraits + keyBasedTraits + factories
+      staticHeader + nodeBaseTraits + keyBasedTraits + factories
     }
-
-    def generateNodeVisitorMethods =
-      schema.nodeTypes.map { nodeType =>
-        s"def visit(node: ${nodeType.className}): T = ???"
-      }.mkString("\n")
-
-    def generateBaseTraitVisitorMethods() =
-      schema.nodeBaseTraits.map { nodeBaseTrait: NodeBaseTrait =>
-        s"def visit(node: ${nodeBaseTrait.className}): T = ???"
-      }.mkString("\n")
 
     def edgeTypeByName: Map[String, EdgeType] =
       schema.edgeTypes.groupBy(_.name).mapValues(_.head)
@@ -429,7 +407,7 @@ $neighborAccesors
 
               s"""
               /** link to 'contained' node of type $containedNodeType */
-              lazy val ${containedNode.localName}: $completeType =
+              def ${containedNode.localName}: $completeType =
                 edges(Direction.OUT, "CONTAINS_NODE").asScala.toList
                   .filter(_.valueOption(EdgeKeys.LOCAL_NAME).map(_  == "${containedNode.localName}").getOrElse(false))
                   .sortBy(_.valueOption(EdgeKeys.INDEX))
@@ -485,7 +463,7 @@ $neighborAccesors
       val nodeBaseImpl = s"""
       |trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
       |  def asStored : StoredNode = this.asInstanceOf[StoredNode]
-      |  override def getId: JLong = -1l
+      |  override def getId: JLong = -1L
       |
       |  $abstractContainedNodeAccessors
       |
@@ -520,9 +498,6 @@ $neighborAccesors
           |$propertyDelegators
           |$delegatingContainedNodeAccessors
           |$neighborDelegators
-          |  override def accept[T](visitor: NodeVisitor[T]): T = {
-          |    visitor.visit(this)
-          |  }
           |  override def valueMap: JMap[String, AnyRef] = get.valueMap
           |  override def canEqual(that: Any): Boolean = get.canEqual(that)
           |  override def label: String = {
@@ -578,7 +553,7 @@ ${neighborAccesors}
                 case values: List[_] => 
                   values.map { value => 
                     new OdbNodeProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
-                  }.toIterator.asJava
+                  }.iterator.asJava
                 case value => IteratorUtils.of(new OdbNodeProperty(-1, this, key, value.asInstanceOf[A]))
               }
           }
@@ -706,8 +681,6 @@ ${neighborAccesors}
         override val label = "${nodeType.name}"
         override val properties: Map[String, Any] = $propertiesImpl
         override def containedNodesByLocalName: Map[String, List[Node]] = $containedNodesByLocalName
-
-        override def accept[T](visitor: NodeVisitor[T]): T = ???
       }
       """
     }

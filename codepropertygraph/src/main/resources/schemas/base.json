@@ -86,7 +86,7 @@
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["METHOD_RETURN", "METHOD_PARAMETER_IN",
                                              "MODIFIER", "BLOCK", "TYPE_PARAMETER"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
          ]
         },
 
@@ -196,7 +196,7 @@
          "is": ["EXPRESSION", "LOCAL_LIKE"],
          "outEdges" : [
              {"edgeName": "REF", "inNodes": ["LOCAL", "METHOD_PARAMETER_IN"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
          ]
         },
         {"id":30, "name": "RETURN",
@@ -239,7 +239,7 @@
           "comment":"Reference to a method instance",
          "is": ["EXPRESSION"],
           "outEdges": [
-            {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+            {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
           ]
         },
 

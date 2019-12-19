@@ -126,6 +126,9 @@ package object language {
   implicit def toBinding(steps: Steps[nodes.Binding]): Binding =
     new Binding(steps.raw)
 
+  implicit def toComment(steps: Steps[nodes.Comment]): Comment =
+    new Comment(steps.raw)
+
   implicit class GremlinScalaDeco[End](raw: GremlinScala[End]) {
     /* in some cases we cannot statically determine the type of the node, e.g. when traversing
      * from a known nodeType via AST edges, so we have to cast */
@@ -154,13 +157,13 @@ package object language {
       new NodeSteps[NodeType](newAnonymousTraversalWithAssociatedGraph(node))
   }
 
-  implicit class NodeTypeDecoForSeq[NodeType <: nodes.StoredNode](seq: Seq[NodeType]) {
+  implicit class NodeTypeDecoForIterable[NodeType <: nodes.StoredNode](iter: Iterable[NodeType]) {
 
     /**
     Start a new traversal from these nodes
       */
     def start: NodeSteps[NodeType] =
-      new NodeSteps[NodeType](newAnonymousTraversalWithAssociatedGraph(seq: _*))
+      new NodeSteps[NodeType](newAnonymousTraversalWithAssociatedGraph(iter.to(Seq): _*))
   }
 
   implicit class NewNodeTypeDeco[NodeType <: nodes.NewNode](node: NodeType) {
@@ -172,13 +175,13 @@ package object language {
       new NewNodeSteps[NodeType](__[NodeType](node))
   }
 
-  implicit class NewNodeTypeDecoForSeq[NodeType <: nodes.NewNode](seq: Seq[NodeType]) {
+  implicit class NewNodeTypeDecoForIterable[NodeType <: nodes.NewNode](iter: Iterable[NodeType]) {
 
     /**
     Start a new traversal from these nodes
       */
     def start: NewNodeSteps[NodeType] =
-      new NewNodeSteps[NodeType](__[NodeType](seq: _*))
+      new NewNodeSteps[NodeType](__[NodeType](iter.to(Seq): _*))
   }
 
   implicit class BaseNodeTypeDeco[NodeType <: nodes.Node](node: NodeType) {
@@ -190,13 +193,13 @@ package object language {
       new Steps[NodeType](__[NodeType](node))
   }
 
-  implicit class BaseNodeTypeDecoForSeq[NodeType <: nodes.Node](seq: Seq[NodeType]) {
+  implicit class BaseNodeTypeDecoForIterable[NodeType <: nodes.Node](iter: Iterable[NodeType]) {
 
     /**
     Start a new traversal from these nodes
       */
     def start: Steps[NodeType] =
-      new Steps[NodeType](__[NodeType](seq: _*))
+      new Steps[NodeType](__[NodeType](iter.to(Seq): _*))
   }
 
   // Call graph extension

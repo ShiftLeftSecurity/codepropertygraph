@@ -5,7 +5,7 @@ import cats.data.OptionT
 import cats.effect.IO
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.console.query.CpgOperationResult
+import io.shiftleft.cpgserver.query.CpgOperationResult
 
 trait CpgProvider {
 

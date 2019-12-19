@@ -41,7 +41,7 @@ class SerializedCpg() {
   @throws[IOException]
   def addOverlay(overlay: Cpg.CpgOverlay, name: String): Unit = {
     if (zipFileSystem == null) return
-    val pathInZip = zipFileSystem.getPath(counter + "_" + name)
+    val pathInZip = zipFileSystem.getPath(s"${counter}_${name}")
     counter += 1
     val outputStream = Files.newOutputStream(pathInZip)
     overlay.writeTo(outputStream)

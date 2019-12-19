@@ -8,8 +8,8 @@ import cats.effect.{ContextShift, IO}
 import org.scalatest.concurrent.Eventually
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.console.query.CpgOperationResult
 import io.shiftleft.cpgserver.BaseSpec
+import io.shiftleft.cpgserver.query.CpgOperationResult
 
 import scala.concurrent.duration._
 import scala.language.postfixOps

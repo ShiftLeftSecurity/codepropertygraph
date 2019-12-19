@@ -6,37 +6,37 @@ import java.nio.file.{Files, Path}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct}
 import org.apache.logging.log4j.LogManager
-import resource.{ManagedResource, managed}
 import java.util.{List => JList}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
+import scala.util.{Failure, Success, Try, Using}
 import io.shiftleft.overflowdb.OdbConfig
 
 object ProtoCpgLoader {
   private val logger = LogManager.getLogger(getClass)
 
-  def loadFromProtoZip(fileName: String, overflowDbConfig: OdbConfig = OdbConfig.withoutOverflow): Cpg = {
+  def loadFromProtoZip(fileName: String, overflowDbConfig: OdbConfig = OdbConfig.withoutOverflow): Cpg =
     measureAndReport {
       val builder = new ProtoToCpg(overflowDbConfig)
-      for {
-        zip <- managed(new ZipArchive(fileName))
-        entry <- zip.entries
-        inputStream <- managed(Files.newInputStream(entry))
-      } builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList)
-
-      /* second pass so we can stream for the edges
-       * -> holding them all in memory is potentially too much
-       * -> adding them as we go isn't an option because we may only have one of the adjacent vertices
-       */
-      for (zip <- managed(new ZipArchive(fileName));
-           entry <- zip.entries;
-           inputStream <- managed(Files.newInputStream(entry))) {
-        builder.addEdges(getNextProtoCpgFromStream(inputStream).getEdgeList)
+      Using.Manager { use =>
+        use(new ZipArchive(fileName)).entries.foreach { entry =>
+          val inputStream = use(Files.newInputStream(entry))
+          builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList)
+        }
+        /* second pass so we can stream for the edges
+         * -> holding them all in memory is potentially too much
+         * -> adding them as we go isn't an option because we may only have one of the adjacent vertices
+         * TODO double check: is that really so? protos don't really allow for streaming, so this may be unnecessary overhead
+         */
+        use(new ZipArchive(fileName)).entries.foreach { entry =>
+          val inputStream = use(Files.newInputStream(entry))
+          builder.addEdges(getNextProtoCpgFromStream(inputStream).getEdgeList)
+        }
+      } match {
+        case Failure(exception) => throw exception
+        case Success(_)         => builder.build()
       }
-
-      builder.build()
     }
-  }
 
   def loadFromListOfProtos(cpgs: Seq[CpgStruct], overflowDbConfig: OdbConfig): Cpg = {
     val builder = new ProtoToCpg(overflowDbConfig)
@@ -46,19 +46,18 @@ object ProtoCpgLoader {
   }
 
   def loadFromListOfProtos(cpgs: JList[CpgStruct], overflowDbConfig: OdbConfig): Cpg =
-    loadFromListOfProtos(cpgs.asScala, overflowDbConfig)
+    loadFromListOfProtos(cpgs.asScala.toSeq, overflowDbConfig)
 
-  def loadOverlays(fileName: String): ManagedResource[Iterator[CpgOverlay]] =
-    managed(new ZipArchive(fileName)).map(readOverlayEntries)
-
-  private def readOverlay(path: Path): CpgOverlay =
-    managed(Files.newInputStream(path)).map(CpgOverlay.parseFrom).tried.get
-
-  private def readOverlayEntries(zip: ZipArchive): Iterator[CpgOverlay] =
-    zip.entries
-      .sortWith(compareOverlayPath)
-      .iterator
-      .map(readOverlay)
+  def loadOverlays(fileName: String): Try[Iterator[CpgOverlay]] =
+    Using(new ZipArchive(fileName)) { zip =>
+      zip.entries
+        .sortWith(compareOverlayPath)
+        .map { path =>
+          val is = Files.newInputStream(path)
+          CpgOverlay.parseFrom(is)
+        }
+        .iterator
+    }
 
   private def compareOverlayPath(a: Path, b: Path): Boolean = {
     val file1Split: Array[String] = a.toString.replace("/", "").split("_")

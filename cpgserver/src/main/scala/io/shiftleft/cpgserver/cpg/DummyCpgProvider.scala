@@ -3,14 +3,14 @@ package io.shiftleft.cpgserver.cpg
 import java.util.UUID
 import java.util.concurrent.{ConcurrentHashMap, Executors}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.concurrent.Map
 import scala.concurrent.ExecutionContext
 import cats.data.OptionT
 import cats.effect.{Blocker, ContextShift, IO}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewMethod
-import io.shiftleft.console.query.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess}
+import io.shiftleft.cpgserver.query.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 

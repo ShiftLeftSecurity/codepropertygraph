@@ -13,7 +13,7 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import java.lang.{Long => JLong}
 
 import io.shiftleft.codepropertygraph.Cpg

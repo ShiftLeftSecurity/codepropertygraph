@@ -11,11 +11,11 @@ class CfgDominatorFrontier[Node](cfgAdapter: CfgAdapter[Node], domTreeAdapter: D
     * The used algorithm is from: "A Simple, Fast Dominance Algorithm" from
     * "Keith D. Cooper, Timothy J. Harvey, and Ken Kennedy".
     */
-  def calculate(allCfgNodes: Seq[Node]): mutable.MultiMap[Node, Node] = {
-    val domFrontier = new mutable.HashMap[Node, mutable.Set[Node]] with mutable.MultiMap[Node, Node]
+  def calculate(allCfgNodes: Seq[Node]): mutable.MultiDict[Node, Node] = {
+    val domFrontier = mutable.MultiDict.empty[Node, Node]
 
     allCfgNodes.foreach { joinCandiate =>
-      val predecessors = cfgAdapter.predecessors(joinCandiate).toSeq
+      val predecessors = cfgAdapter.predecessors(joinCandiate).iterator.to(Seq)
 
       if (predecessors.size > 1) {
         val joinNode = joinCandiate
@@ -26,7 +26,7 @@ class CfgDominatorFrontier[Node](cfgAdapter: CfgAdapter[Node], domTreeAdapter: D
               var currentPred = Option(predecessor)
 
               while (currentPred.isDefined && currentPred.get != immediateJoinNodeDom) {
-                domFrontier.addBinding(currentPred.get, joinNode)
+                domFrontier.addOne(currentPred.get, joinNode)
                 currentPred = domTreeAdapter.immediateDominator(currentPred.get)
               }
             }

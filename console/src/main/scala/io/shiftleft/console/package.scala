@@ -4,7 +4,7 @@ import better.files._
 
 package object console {
 
-  implicit class UnixUtils[A](content: Traversable[A]) {
+  implicit class UnixUtils[A](content: Iterable[A]) {
 
     /**
       * Iterate over left hand side operand
