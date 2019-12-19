@@ -1,3 +1,3 @@
 @main def main() = {
-  cpg.method.name.l
+  5 / 0
 }

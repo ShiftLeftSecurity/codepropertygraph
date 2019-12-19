@@ -16,7 +16,7 @@ scalacOptions ++= Seq(
   "-language:implicitConversions",     // Allow definition of implicit functions called views
   "-unchecked",                        // Enable additional warnings where generated code depends on assumptions.
   "-Xcheckinit",                       // Wrap field accessors to throw an exception on uninitialized access.
-  // "-Xfatal-warnings",                  // Fail the compilation if there are any warnings.
+  "-Xfatal-warnings",                  // Fail the compilation if there are any warnings.
   "-Xlint:adapted-args",               // Warn if an argument list is modified to match the receiver.
   "-Xlint:constant",                   // Evaluation of a constant arithmetic expression results in an error.
   "-Xlint:delayedinit-select",         // Selecting member of DelayedInit.
@@ -46,10 +46,7 @@ scalacOptions ++= Seq(
   "-Ywarn-value-discard"               // Warn when non-Unit expression results are unused.
 )
 
-// Re-enable fatal warnings once this Scala 2.13 issue is fixed: https://github.com/scala/bug/issues/11457
-scalacOptions -= "-Xfatal-warnings"
-
-val Http4sVersion = "0.21.0-M5"
+val Http4sVersion = "0.21.0-M6"
 val CirceVersion = "0.12.2"
 val PureconfigVersion = "0.12.1"
 val WebjarLocatorVersion = "0.37"
