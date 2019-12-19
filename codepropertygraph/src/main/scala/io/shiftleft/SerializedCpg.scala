@@ -7,11 +7,6 @@ import java.util
 
 import io.shiftleft.proto.cpg.Cpg
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
-import scala.concurrent.ExecutionContext.Implicits._
-import scala.concurrent.blocking
-
 class SerializedCpg() {
 
   /**
@@ -55,17 +50,9 @@ class SerializedCpg() {
 
   @throws[IOException]
   def addOverlay(overlays: Iterator[Cpg.CpgOverlay], name: String): Unit = {
-    overlays.zipWithIndex
-      .map {
-        case (overlay, i) =>
-          Future {
-            blocking {
-              addOverlay(overlay, name + "_" + i)
-            }
-          }
-      }
-      .toList
-      .foreach(Await.result(_, Duration.Inf))
+    overlays.zipWithIndex.map { 
+      case (overlay, i) => addOverlay(overlay, name + "_" + i)
+    }
   }
 
   @throws[IOException]
