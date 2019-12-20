@@ -1,12 +1,9 @@
 package io.shiftleft.semanticcpg.passes.containsedges
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
-import io.shiftleft.semanticcpg.language.Steps
-import io.shiftleft.semanticcpg.utils.ExpandTo
+import io.shiftleft.semanticcpg.language.{NodeTypeDeco, Steps}
 
 /**
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
@@ -16,25 +13,20 @@ class ContainsEdgePass(cpg: Cpg) extends CpgPass(cpg) {
   import ContainsEdgePass.{destinationTypes, sourceTypes}
 
   override def run(): Iterator[DiffGraph] = {
-    val sourceVerticesTraversal = cpg.graph.V.hasLabel(sourceTypes.head, sourceTypes.tail: _*)
+    val sourceVerticesTraversal = cpg.scalaGraph.V.hasLabel(sourceTypes.head, sourceTypes.tail: _*)
     val sourceVerticesIterator = new Steps(sourceVerticesTraversal).toIterator
-    new ParallelIteratorExecutor(sourceVerticesIterator).map(perSource)
+    new ParallelIteratorExecutor(sourceVerticesIterator).map(source => perSource(source.asInstanceOf[nodes.AstNode]))
   }
 
-  private def perSource(source: Vertex): DiffGraph = {
-    val dstGraph = new DiffGraph()
+  private def perSource(source: nodes.AstNode): DiffGraph = {
+    val dstGraph = new DiffGraph
 
-    ExpandTo
-      .walkAST(
-        source.start
-          .out(EdgeTypes.AST)
-          .until(v => v.hasLabel(sourceTypes.head, sourceTypes.tail: _*)))
-      .sideEffect(destination =>
-        if (destinationTypes.contains(destination.label)) {
-          dstGraph.addEdgeInOriginal(source.asInstanceOf[StoredNode],
-                                     destination.asInstanceOf[StoredNode],
-                                     EdgeTypes.CONTAINS)
-      })
+    source.start
+      .walkAstUntilReaching(sourceTypes)
+      .sideEffect { destination =>
+        if (destinationTypes.contains(destination.label))
+          dstGraph.addEdgeInOriginal(source, destination, EdgeTypes.CONTAINS)
+      }
       .iterate()
 
     dstGraph

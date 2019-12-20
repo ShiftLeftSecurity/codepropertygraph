@@ -11,20 +11,6 @@ class ContainsEdgePassTest extends WordSpec with Matchers {
 
   import ContainsEdgePassTest.Fixture
 
-  "foo" in {
-    implicit val graph: ScalaGraph = OverflowDbTestInstance.create
-    val fileVertex = graph + NodeTypes.FILE
-    val typeDeclVertex = graph + NodeTypes.TYPE_DECL
-//    fileVertex --- EdgeTypes.AST --> typeDeclVertex
-
-    graph.traversal.V(fileVertex).addE(EdgeTypes.AST).to(typeDeclVertex).toList //Nil
-    println(fileVertex.start.outE().toList()) //Nil
-
-    fileVertex.addEdge("AST", typeDeclVertex)
-    println(fileVertex.start.outE().toList()) //Nil
-
-  }
-
   "Files " can {
     "contain Methods" in Fixture { fixture =>
       fixture.methodVertex.in(EdgeTypes.CONTAINS).toList should contain only fixture.fileVertex
