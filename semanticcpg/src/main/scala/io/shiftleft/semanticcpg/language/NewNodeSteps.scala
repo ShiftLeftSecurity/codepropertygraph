@@ -1,12 +1,14 @@
 package io.shiftleft.semanticcpg.language
 
+import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node, StoredNode}
 import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
 import io.shiftleft.codepropertygraph.generated.EdgeKeys
-import gremlin.scala._
 import io.shiftleft.passes.DiffGraph
+import org.apache.logging.log4j.{LogManager, Logger}
 
 class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Steps[A](raw) {
+  import NewNodeSteps.logger
 
   def store()(implicit graph: DiffGraph): Unit =
     raw.sideEffect(storeRecursively).iterate()
@@ -41,7 +43,11 @@ class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Step
         graph.addEdgeFromOriginal(src, dst, label, properties)
       case (src: StoredNode, dst: StoredNode) =>
         graph.addEdgeInOriginal(src, dst, label, properties)
-      case (_, _) => throw new NotImplementedError("this should never happen")
+      case (src, dst) =>
+        val srcClassMaybe = Option(src).map(_.getClass)
+        val dstClassMaybe = Option(dst).map(_.getClass)
+        logger.warn(
+          s"unhandled case, likely produced by a fauly pass: src=$src, src.getClass=$srcClassMaybe, dst=$dst, dstClass=$dstClassMaybe")
     }
 
   /**
@@ -61,4 +67,8 @@ class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Step
     }
   }
 
+}
+
+object NewNodeSteps {
+  private val logger: Logger = LogManager.getLogger(classOf[NewNodeSteps[_]])
 }
