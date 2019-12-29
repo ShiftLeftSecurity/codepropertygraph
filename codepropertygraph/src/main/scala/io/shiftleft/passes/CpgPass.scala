@@ -74,24 +74,6 @@ abstract class CpgPass(cpg: Cpg) {
     }
   }
 
-  def createApplySerializeAndStoreAsync(serializedCpg: SerializedCpg, counter: Int = 0): Unit = {
-    val overlays: Iterator[CpgOverlay] = createApplyAndSerialize()
-    val futures: List[Future[Unit]] = overlays.zipWithIndex.map {
-      case (overlay, index) => {
-        if (overlay.getSerializedSize > 0) {
-          Future {
-            blocking {
-              serializedCpg.addOverlay(overlay, getClass.getSimpleName + counter.toString + "_" + index)
-            }
-          }
-        } else {
-          Future.unit
-        }
-      }
-    }.toList
-    futures.foreach(Await.result(_, Duration.Inf))
-  }
-
   /**
     * Execute and create a serialized overlay
     */

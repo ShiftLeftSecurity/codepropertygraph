@@ -50,7 +50,7 @@ class SerializedCpg() {
 
   @throws[IOException]
   def addOverlay(overlays: Iterator[Cpg.CpgOverlay], name: String): Unit = {
-    overlays.zipWithIndex.map { 
+    overlays.zipWithIndex.foreach { 
       case (overlay, i) => addOverlay(overlay, name + "_" + i)
     }
   }
