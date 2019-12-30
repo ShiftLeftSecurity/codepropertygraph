@@ -11,7 +11,7 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors.OrderAccessors
 class AstNode(raw: GremlinScala[nodes.AstNode])
     extends NodeSteps[nodes.AstNode](raw)
     with AstNodeBase[nodes.AstNode]
-    with OrderAccessors[nodes.AstNode] {}
+    with OrderAccessors[nodes.AstNode]
 
 trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
 
@@ -143,5 +143,14 @@ trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
   def isMethodRef: MethodRef = new MethodRef(
     raw.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef]
   )
+
+  def walkAstUntilReaching(labels: List[String]): NodeSteps[nodes.StoredNode] =
+    new NodeSteps[nodes.StoredNode](
+      raw
+        .repeat(_.out(EdgeTypes.AST))
+        .until(_.hasLabel(labels.head, labels.tail: _*))
+        .emit
+        .dedup
+        .cast)
 
 }

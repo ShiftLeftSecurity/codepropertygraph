@@ -19,7 +19,6 @@ import scala.collection.mutable
   * There are no constraints on the element types, unlike e.g. [[NodeSteps]]
   */
 class Steps[A](val raw: GremlinScala[A]) {
-
   implicit lazy val graph: Graph = raw.traversal.asAdmin.getGraph.get
 
   def toIterator(): Iterator[A] = {
@@ -52,6 +51,8 @@ class Steps[A](val raw: GremlinScala[A]) {
     @deprecated
     */
   def exec(): List[A] = toList()
+
+  def iterate(): Unit = raw.iterate()
 
   /**
     Execute the travel and convert it to a Java stream.

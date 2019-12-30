@@ -21,23 +21,13 @@
         {"id" : 115, "name" : "SOURCE_TYPE", "comment" : "", "valueType" : "string", "cardinality" : "one"},
         {"id" : 116, "name" : "SINK_TYPE", "comment" : "", "valueType" : "string", "cardinality" : "one"},
 
-	{"id" : 117, "name" : "CATEGORY", "comment" : "", "valueType" : "string", "cardinality" : "one"},
-	{"id" : 118, "name" : "TITLE", "comment" : "", "valueType" : "string", "cardinality" : "one"},
-	{"id" : 119, "name" : "DESCRIPTION", "comment" : "", "valueType" : "string", "cardinality" : "one"},
-	{"id" : 120, "name" : "SCORE", "comment" : "", "valueType" : "int", "cardinality" : "one"},
 	{"id" : 121, "name" : "PATH", "comment" : "", "valueType" : "string", "cardinality" : "one"},
 
 	{"id" : 122, "name" : "SPID", "comment" : "", "valueType": "string", "cardinality": "zeroOrOne"},
 	{"id" : 123, "name" : "LITERALS_TO_SINK", "comment" : "", "valueType" : "string", "cardinality" : "list"},
 
-	{"id" : 124, "name" : "LINK", "comment" : "", "valueType" : "string", "cardinality" : "one"},
-	{"id" : 125, "name" : "VULN_DESCR", "comment" : "", "valueType" : "string", "cardinality" : "one"},
-	{"id" : 126, "name" : "PARAMETER", "comment" : "", "valueType" : "string", "cardinality" : "one"},
-	{"id" : 127, "name" : "METHOD_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
-  {"id" : 128, "name" : "LINE_NO", "comment" : "", "valueType" : "string", "cardinality" : "one"},
-  {"id" : 129, "name" : "OWASP_LINK", "comment" : "", "valueType" : "string", "cardinality" : "one"},
-	{"id" : 130, "name" : "CWE_LINK", "comment" : "", "valueType" : "string", "cardinality" : "one"}
-
+	{"id" : 117, "name" : "CATEGORY", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+	{"id" : 131, "name" : "KEY", "comment" : "", "valueType" : "string", "cardinality" : "one"}
     ],
 
     "nodeTypes" : [
@@ -119,9 +109,11 @@
       {"localName" : "triggerMethods", "nodeType" : "METHOD", "cardinality" : "list"}
    ]
    },
-      {"id" : 214, "name" : "FINDING", "comment" : "", "keys" : ["NAME", "CATEGORY", "TITLE", "DESCRIPTION", "SCORE", "LINK", "VULN_DESCR", "PARAMETER", "METHOD_NAME", "LINE_NO", "FILENAME", "OWASP_LINK", "CWE_LINK"], "outEdges" : [], "containedNodes" : [
-      {"localName" : "ioflows", "nodeType" : "IOFLOW", "cardinality" : "list"},
-      {"localName" : "methods", "nodeType" : "METHOD", "cardinality" : "list"}
+      {"id" : 214, "name" : "FINDING", "comment" : "", "keys" : [], "outEdges" : [], "containedNodes" : [
+	  {"localName" : "ioflows", "nodeType" : "IOFLOW", "cardinality" : "list"},
+	  {"localName" : "methods", "nodeType" : "METHOD", "cardinality" : "list"},
+	  {"localName" : "flows", "nodeType" : "FLOW", "cardinality" : "list"},
+	  {"localName" : "keyValuePairs", "nodeType" : "KEY_VALUE_PAIR", "cardinality" : "list"}
    ]
    },
 	{"id" : 215, "name" : "ROUTE", "comment" : "", "keys": ["PATH"], "outEdges" : []},
@@ -174,6 +166,7 @@
        {"localName" : "tags", "nodeType": "TAG", "cardinality" : "list", "comment" : ""}
      ]
     },
+    {"id" : 217, "name" : "KEY_VALUE_PAIR", "comment" : "", "keys": ["KEY", "VALUE"], "outEdges" : [] },
 	// Modifications to existing node types
 	{"name" : "META_DATA", "keys" : ["SPID"], "outEdges" : []}
 

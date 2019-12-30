@@ -148,10 +148,6 @@ object ExpandTo {
     node.asInstanceOf[nodes.StoredNode]._refOut.nextOption
   }
 
-  def walkAST(expression: GremlinScala[Vertex]): GremlinScala[Vertex] = {
-    expression.emit.repeat(_.out(EdgeTypes.AST)).dedup()
-  }
-
   def implicitCallToMethod(implicitCall: nodes.ImplicitCall): nodes.Method = {
     implicitCall.vertices(Direction.IN, EdgeTypes.AST).next.asInstanceOf[nodes.Method]
   }
