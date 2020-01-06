@@ -55,10 +55,16 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
             .vertices(Direction.OUT, EdgeTypes.REF)
             .nextChecked
 
-          receiverTypeDecl.vertices(Direction.OUT, EdgeTypes.BINDS).asScala.collectFirst {
-            case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
-              binding.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method]
-          }
+          receiverTypeDecl
+            .vertices(Direction.OUT, EdgeTypes.BINDS)
+            .asScala
+            .flatMap {
+              case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
+                binding.vertices(Direction.OUT, EdgeTypes.REF).nextOption.map(_.asInstanceOf[nodes.Method])
+              case _ => None
+            }
+            .toList
+            .headOption
         } else {
           logger.warn(s"Missing receiver edge on CALL ${call.code}")
           None
