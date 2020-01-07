@@ -49,15 +49,21 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
         val receiverIt = call.vertices(Direction.OUT, EdgeTypes.RECEIVER)
         if (receiverIt.hasNext) {
           val receiver = receiverIt.next
-          val receiverTypeDecl = receiver
-            .vertices(Direction.OUT, EdgeTypes.EVAL_TYPE)
-            .nextChecked
-            .vertices(Direction.OUT, EdgeTypes.REF)
-            .nextChecked
 
-          receiverTypeDecl.vertices(Direction.OUT, EdgeTypes.BINDS).asScala.collectFirst {
-            case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
-              binding.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method]
+          receiver match {
+            case methodRefReceiver: nodes.MethodRef =>
+              Some(methodRefReceiver.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method])
+            case _ =>
+              val receiverTypeDecl = receiver
+                .vertices(Direction.OUT, EdgeTypes.EVAL_TYPE)
+                .nextChecked
+                .vertices(Direction.OUT, EdgeTypes.REF)
+                .nextChecked
+
+              receiverTypeDecl.vertices(Direction.OUT, EdgeTypes.BINDS).asScala.collectFirst {
+                case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
+                  binding.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method]
+              }
           }
         } else {
           logger.warn(s"Missing receiver edge on CALL ${call.code}")
