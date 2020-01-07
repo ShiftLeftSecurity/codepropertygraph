@@ -1,19 +1,15 @@
 package io.shiftleft.passes
 
-import java.lang.{Long => JLong}
 import java.util
-
-import gnu.trove.set.hash.TCustomHashSet
-import gnu.trove.strategy.IdentityHashingStrategy
 import gremlin.scala.{Edge, ScalaGraph}
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode, Node}
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 /**
   * A lightweight write-only graph used for creation of CPG graph overlays
@@ -24,168 +20,204 @@ import scala.jdk.CollectionConverters._
   * not sources or destinations of edges of the diff graph. When the CPG loader
   * adds nodes of the overlay, it therefor needs to reassign ids for nodes if they
   * are already used in the original CPG.
-  *
-  * TODO Michael: make DiffGraph extend tinkerpop.Graph to simplify and foolproof the model
-  * */
-class DiffGraph {
+  */
+sealed trait DiffGraph {
   import DiffGraph._
+  import Change.NodeKind._
 
-  private val _edges = mutable.ArrayBuffer.empty[EdgeInDiffGraph]
-  private val _edgesToOriginal = mutable.ArrayBuffer.empty[EdgeToOriginal]
-  private val _edgesFromOriginal = mutable.ArrayBuffer.empty[EdgeFromOriginal]
-  private val _edgesInOriginal = mutable.ArrayBuffer.empty[EdgeInOriginal]
-  private val _nodeProperties = mutable.ArrayBuffer.empty[NodeProperty]
-  private val _edgeProperties = mutable.ArrayBuffer.empty[EdgeProperty]
-
-  private var _nodes = new TCustomHashSet[NewNode](IdentityHashingStrategy.INSTANCE)
-
-  def nodes: Iterator[NewNode] = _nodes.iterator().asScala
-  def edges: Vector[EdgeInDiffGraph] = _edges.toVector
-  def edgesToOriginal: Vector[EdgeToOriginal] = _edgesToOriginal.toVector
-  def edgesFromOriginal: Vector[EdgeFromOriginal] = _edgesFromOriginal.toVector
-  def edgesInOriginal: Vector[EdgeInOriginal] = _edgesInOriginal.toVector
-  def nodeProperties: Vector[NodeProperty] = _nodeProperties.toVector
-  def edgeProperties: Vector[EdgeProperty] = _edgeProperties.toVector
-
-  def addNode(node: NewNode): Unit = {
-    _nodes.add(node)
-    incrementNodeCreatedCount()
-  }
-
-  def mergeFrom(other: DiffGraph): Unit = {
-    other.nodes.foreach(addNode)
-    _edges.appendAll(other._edges)
-    _edgesToOriginal.appendAll(other._edgesToOriginal)
-    _edgesInOriginal.appendAll(other._edgesInOriginal)
-    _nodeProperties.appendAll(other._nodeProperties)
-    _edgeProperties.appendAll(other._edgeProperties)
-  }
-
-  /**
-    * Add edge between nodes present in the diff graph
-    * */
-  def addEdge(srcNode: NewNode,
-              dstNode: NewNode,
-              edgeLabel: String,
-              properties: Seq[(String, AnyRef)] = List()): Unit = {
-    _edges += new EdgeInDiffGraph(srcNode, dstNode, edgeLabel, properties)
-    incrementEdgeCreatedCount()
-  }
-
-  /**
-    * Add edge from a node in the diff graph to a node in the original graph
-    * */
-  def addEdgeToOriginal(srcNode: NewNode,
-                        dstNode: StoredNode,
-                        edgeLabel: String,
-                        properties: Seq[(String, AnyRef)] = List()): Unit = {
-    _edgesToOriginal += new EdgeToOriginal(srcNode, dstNode, edgeLabel, properties)
-    incrementEdgeCreatedCount()
-  }
-
-  /**
-    * Add edge from a node in the original graph to a node in the diff graph
-    * */
-  def addEdgeFromOriginal(srcNode: StoredNode,
-                          dstNode: NewNode,
-                          edgeLabel: String,
-                          properties: Seq[(String, AnyRef)] = List()): Unit = {
-    _edgesFromOriginal += new EdgeFromOriginal(srcNode, dstNode, edgeLabel, properties)
-    incrementEdgeCreatedCount()
-  }
-
-  /**
-    * Add edge between nodes of the original graph
-    * */
-  def addEdgeInOriginal(srcNode: StoredNode,
-                        dstNode: StoredNode,
-                        edgeLabel: String,
-                        properties: Seq[(String, AnyRef)] = List()): Unit = {
-    _edgesInOriginal += new EdgeInOriginal(srcNode, dstNode, edgeLabel, properties)
-    incrementEdgeCreatedCount()
-  }
-
-  /**
-    * Add a property to an existing node
-    * */
-  def addNodeProperty(node: StoredNode, key: String, value: AnyRef) =
-    _nodeProperties += new NodeProperty(node, key, value)
-
-  /**
-    * Add a property to an existing edge
-    * */
-  def addEdgeProperty(edge: Edge, key: String, value: AnyRef) =
-    _edgeProperties += new EdgeProperty(edge, key, value)
-
-  override def toString() = {
-    val nodeCount = _nodes.size
-    val edgeCount = _edges.size + _edgesToOriginal.size + _edgesFromOriginal.size + _edgesInOriginal.size
-    val propertyCount = _nodeProperties.size + _edgeProperties.size
-    s"DiffGraph[nodes: $nodeCount, edges: $edgeCount, properties: $propertyCount]"
-  }
-
-  def apply(cpg: Cpg): AppliedDiffGraph = {
-    new DiffGraphApplier().applyDiff(this, cpg)
-  }
-
+  def size: Int
+  def iterator: Iterator[Change]
+  def +(other: DiffGraph): DiffGraph = ???
+  // compatibility
+  def nodes: Iterator[NewNode] =
+    iterator.collect { case Change.CreateNode(newNode) => newNode }
+  def edges: Vector[EdgeInDiffGraph] =
+    iterator.collect {
+      case c @ Change.CreateEdge(src, dst, label, _) if c.sourceNodeKind == New && c.destinationNodeKind == New =>
+        DiffGraph.EdgeInDiffGraph(src.asInstanceOf[NewNode], dst.asInstanceOf[NewNode], label, c.properties)
+    }.toVector
+  def edgesToOriginal: Vector[EdgeToOriginal] =
+    iterator.collect {
+      case c @ Change.CreateEdge(src, dst, label, _) if c.sourceNodeKind == New && c.destinationNodeKind == Existing =>
+        DiffGraph.EdgeToOriginal(src.asInstanceOf[NewNode], dst.asInstanceOf[StoredNode], label, c.properties)
+    }.toVector
+  def edgesFromOriginal: Vector[EdgeFromOriginal] =
+    iterator.collect {
+      case c @ Change.CreateEdge(src, dst, label, _) if c.sourceNodeKind == Existing && c.destinationNodeKind == New =>
+        DiffGraph.EdgeFromOriginal(src.asInstanceOf[StoredNode], dst.asInstanceOf[NewNode], label, c.properties)
+    }.toVector
+  def edgesInOriginal: Vector[EdgeInOriginal] =
+    iterator.collect {
+      case c @ Change.CreateEdge(src, dst, label, _)
+          if c.sourceNodeKind == Existing && c.destinationNodeKind == Existing =>
+        DiffGraph.EdgeInOriginal(src.asInstanceOf[StoredNode], dst.asInstanceOf[StoredNode], label, c.properties)
+    }.toVector
+  def nodeProperties: Vector[NodeProperty] =
+    iterator.collect {
+      case c @ Change.SetNodeProperty(node, key, value) =>
+        DiffGraph.NodeProperty(node, key, value)
+    }.toVector
+  def edgeProperties: Vector[EdgeProperty] =
+    iterator.collect {
+      case c @ Change.SetEdgeProperty(edge, key, value) =>
+        DiffGraph.EdgeProperty(edge, key, value)
+    }.toVector
 }
 
 object DiffGraph {
   private val logger = LogManager.getLogger(getClass)
-  private var nodesCreatedCount = 0
-  private var edgesCreatedCount = 0
-
-  def incrementNodeCreatedCount(): Unit = {
-    nodesCreatedCount += 1
-    if (nodesCreatedCount % 100000 == 0)
-      logger.debug(s"added $nodesCreatedCount nodes (total across all DiffGraphs)")
-  }
-
-  def incrementEdgeCreatedCount(): Unit = {
-    edgesCreatedCount += 1
-    if (edgesCreatedCount % 100000 == 0)
-      logger.debug(s"added $edgesCreatedCount edges (total across all DiffGraphs)")
-  }
-
-  abstract class DiffEdge {
-    def label: String
-    def properties: Seq[(String, AnyRef)]
-  }
-  case class NodeProperty(node: StoredNode, propertyKey: String, propertyValue: AnyRef)
-  case class EdgeProperty(edge: Edge, propertyKey: String, propertyValue: AnyRef)
   type Properties = Seq[(String, AnyRef)]
+  type PackedProperties = Array[Any]
+  object PackedProperties {
+    val Empty: Array[Any] = Array()
 
-  case class EdgeInDiffGraph(src: NewNode, dst: NewNode, label: String, properties: Properties) extends DiffEdge
-  case class EdgeToOriginal(src: NewNode, dst: StoredNode, label: String, properties: Properties) extends DiffEdge
-  case class EdgeFromOriginal(src: StoredNode, dst: NewNode, label: String, properties: Properties) extends DiffEdge
-  case class EdgeInOriginal(src: StoredNode, dst: StoredNode, label: String, properties: Properties) extends DiffEdge
-}
+    def pack(p: Properties): Array[Any] = {
+      if (p.isEmpty) {
+        Empty
+      } else {
+        val buffer = new ArrayBuffer[Any](p.size * 2)
+        p.foreach { pair =>
+          buffer += pair._1
+          buffer += pair._2
+        }
+        buffer.toArray
+      }
+    }
 
-/**
-  * Component to merge diff graphs into existing (loaded) OdbGraph
-  * */
-private class DiffGraphApplier {
-  import DiffGraphApplier.InternalProperty
-
-  private val overlayNodeToTinkerNode = new util.HashMap[IdentityHashWrapper[NewNode], Vertex]()
-
-  /**
-    * Applies diff to existing (loaded) OdbGraph
-    **/
-  def applyDiff(diffGraph: DiffGraph, cpg: Cpg): AppliedDiffGraph = {
-    val graph = cpg.graph
-    addNodes(diffGraph, graph)
-    addEdges(diffGraph, graph)
-    addNodeProperties(diffGraph, graph)
-    addEdgeProperties(diffGraph, graph)
-    AppliedDiffGraph(diffGraph, overlayNodeToTinkerNode)
+    def unpack(p: PackedProperties): Properties = {
+      val buffer = new ListBuffer[(String, AnyRef)]()
+      var i = 0
+      while (i < p.length) {
+        buffer += Tuple2(p(i).asInstanceOf[String], p(i + 1).asInstanceOf[AnyRef])
+        i += 2
+      }
+      buffer.toList
+    }
   }
 
-  // We are in luck: OdbGraph will assign ids to new nodes for us
-  private def addNodes(diffGraph: DiffGraph, graph: ScalaGraph): Unit = {
-    val nodeTinkerNodePairs = diffGraph.nodes.map { node =>
-      val newNode = graph.graph.addVertex(node.label)
+  sealed trait Change
+  object Change {
+    sealed trait NodeKind
+    object NodeKind {
+      case object New extends NodeKind
+      case object Existing extends NodeKind
+    }
 
+    final case class CreateNode(node: NewNode) extends Change
+    final case class SetNodeProperty(node: StoredNode, key: String, value: AnyRef) extends Change
+    final case class SetEdgeProperty(edge: Edge, propertyKey: String, propertyValue: AnyRef) extends Change
+    sealed case class CreateEdge(src: Node, dst: Node, label: String, packedProperties: PackedProperties)
+        extends Change {
+      def properties: Properties = PackedProperties.unpack(packedProperties)
+
+      def sourceNodeKind: NodeKind = src match {
+        case _: NewNode    => NodeKind.New
+        case _: StoredNode => NodeKind.Existing
+      }
+      def destinationNodeKind: NodeKind = dst match {
+        case _: NewNode    => NodeKind.New
+        case _: StoredNode => NodeKind.Existing
+      }
+    }
+    object CreateEdge {
+      def apply(src: Node, dst: Node, label: String, properties: Properties): CreateEdge =
+        CreateEdge(src, dst, label, PackedProperties.pack(properties))
+    }
+  }
+
+  def newBuilder: Builder = new Builder()
+
+  class Builder {
+    var _buffer: mutable.ArrayBuffer[Change] = _
+    private def buffer: mutable.ArrayBuffer[Change] = {
+      if (_buffer == null)
+        _buffer = new mutable.ArrayBuffer[Change]()
+      _buffer
+    }
+    def +=(node: NewNode): Unit = {
+      buffer += Change.CreateNode(node)
+    }
+    def addEdge(src: Node, dst: Node, edgeLabel: String, properties: Seq[(String, AnyRef)] = List()): Unit = {
+      buffer += Change.CreateEdge(src, dst, edgeLabel, properties)
+    }
+    def build(): DiffGraph = {
+      if (_buffer == null || _buffer.isEmpty)
+        EmptyChangeSet
+      else if (_buffer.size == 1)
+        SingleChangeSet(_buffer.head)
+      else
+        ArrayChangeSet(buffer.toArray)
+    }
+    // compatibility api
+    def addNode(node: NewNode): Unit = this += node
+    def addEdgeToOriginal(srcNode: NewNode,
+                          dstNode: StoredNode,
+                          edgeLabel: String,
+                          properties: Seq[(String, AnyRef)] = List()): Unit =
+      addEdge(srcNode, dstNode, edgeLabel, properties)
+    def addEdgeFromOriginal(srcNode: StoredNode,
+                            dstNode: NewNode,
+                            edgeLabel: String,
+                            properties: Seq[(String, AnyRef)] = List()): Unit =
+      addEdge(srcNode, dstNode, edgeLabel, properties)
+    def addEdgeInOriginal(srcNode: StoredNode,
+                          dstNode: StoredNode,
+                          edgeLabel: String,
+                          properties: Seq[(String, AnyRef)] = List()): Unit =
+      addEdge(srcNode, dstNode, edgeLabel, properties)
+    def addNodeProperty(node: StoredNode, key: String, value: AnyRef): Unit =
+      buffer += Change.SetNodeProperty(node, key, value)
+    def addEdgeProperty(edge: Edge, key: String, value: AnyRef): Unit =
+      buffer += Change.SetEdgeProperty(edge, key, value)
+  }
+
+  private class Applier {
+    import Applier.InternalProperty
+
+    private val overlayNodeToTinkerNode = new util.HashMap[IdentityHashWrapper[NewNode], Vertex]()
+
+    def applyDiff(diffGraph: DiffGraph, cpg: Cpg): AppliedDiffGraph = {
+      val graph = cpg.graph
+      diffGraph.iterator.foreach(change => applyChange(graph, change))
+      AppliedDiffGraph(diffGraph, overlayNodeToTinkerNode)
+    }
+
+    private def applyChange(graph: gremlin.scala.Graph, change: Change) = change match {
+      case Change.CreateNode(node) => addNode(graph, node)
+      case c: Change.CreateEdge    => addEdge(c)
+      case Change.SetNodeProperty(node, key, value) =>
+        node.property(key, value)
+      case Change.SetEdgeProperty(edge, key, value) =>
+        edge.property(key, value)
+    }
+
+    private def addEdge(edgeChange: Change.CreateEdge): Unit = {
+      val src = edgeChange.src
+      val dst = edgeChange.dst
+
+      val srcTinkerNode =
+        if (edgeChange.sourceNodeKind == Change.NodeKind.New)
+          overlayNodeToTinkerNode.get(IdentityHashWrapper(src))
+        else
+          src.asInstanceOf[StoredNode]
+      val dstTinkerNode =
+        if (edgeChange.destinationNodeKind == Change.NodeKind.New)
+          overlayNodeToTinkerNode.get(IdentityHashWrapper(dst))
+        else
+          dst.asInstanceOf[StoredNode]
+      tinkerAddEdge(srcTinkerNode, dstTinkerNode, edgeChange.label, edgeChange.properties)
+    }
+
+    private def tinkerAddEdge(src: Vertex, dst: Vertex, label: String, properties: Seq[(String, AnyRef)]): Unit = {
+      val tinkerEdge = src.addEdge(label, dst)
+      properties.foreach {
+        case (key, value) =>
+          tinkerEdge.property(key, value)
+      }
+    }
+
+    def addNode(graph: ScalaGraph, node: NewNode): Unit = {
+      val newNode = graph.graph.addVertex(node.label)
       node.properties.filter { case (key, _) => !key.startsWith(InternalProperty) }.foreach {
         case (key, value: Traversable[_]) =>
           value.foreach { value =>
@@ -194,65 +226,42 @@ private class DiffGraphApplier {
         case (key, value) =>
           newNode.property(key, value)
       }
-      (node, newNode)
-    }
-    nodeTinkerNodePairs.foreach {
-      case (node, tinkerNode) =>
-        overlayNodeToTinkerNode.put(IdentityHashWrapper(node), tinkerNode)
+      overlayNodeToTinkerNode.put(IdentityHashWrapper(node), newNode)
     }
   }
 
-  private def addEdges(diffGraph: DiffGraph, graph: ScalaGraph) = {
-    diffGraph.edges.foreach { edge =>
-      val srcTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.src))
-      val dstTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.dst))
-      tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
-    }
-
-    diffGraph.edgesFromOriginal.foreach { edge =>
-      val srcTinkerNode = edge.src
-      val dstTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.dst))
-      tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
-    }
-
-    diffGraph.edgesToOriginal.foreach { edge =>
-      val srcTinkerNode = overlayNodeToTinkerNode.get(IdentityHashWrapper(edge.src))
-      val dstTinkerNode = edge.dst
-      tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
-    }
-
-    diffGraph.edgesInOriginal.foreach { edge =>
-      val srcTinkerNode = edge.src
-      val dstTinkerNode = edge.dst
-      tinkerAddEdge(srcTinkerNode, dstTinkerNode, edge)
-    }
-
-    def tinkerAddEdge(src: Vertex, dst: Vertex, edge: DiffGraph.DiffEdge) = {
-      val tinkerEdge = src.addEdge(edge.label, dst)
-
-      edge.properties.foreach {
-        case (key, value) =>
-          tinkerEdge.property(key, value)
-      }
+  object Applier {
+    private val InternalProperty = "_"
+    def applyDiff(diff: DiffGraph, cpg: Cpg): AppliedDiffGraph = {
+      val applier = new Applier
+      applier.applyDiff(diff, cpg)
     }
   }
 
-  private def addNodeProperties(diffGraph: DiffGraph, graph: ScalaGraph): Unit = {
-    diffGraph.nodeProperties.foreach { property =>
-      val node = property.node
-      node.property(property.propertyKey, property.propertyValue)
-    }
+  case object EmptyChangeSet extends DiffGraph {
+    override def size: Int = 0
+    override def iterator: Iterator[Change] = Iterator.empty
   }
 
-  private def addEdgeProperties(diffGraph: DiffGraph, graph: ScalaGraph): Unit = {
-    diffGraph.edgeProperties.foreach { property =>
-      val edge = property.edge
-      edge.property(property.propertyKey, property.propertyValue)
-    }
+  case class SingleChangeSet(change: Change) extends DiffGraph {
+    override def size: Int = 1
+    override def iterator: Iterator[Change] = Iterator(change)
   }
 
-}
+  case class ArrayChangeSet(changes: Array[Change]) extends DiffGraph {
+    override def size: Int = changes.length
+    override def iterator: Iterator[Change] = changes.iterator
+  }
 
-private object DiffGraphApplier {
-  private val InternalProperty = "_"
+  // TODO: Remove those later, they are only here to keep old unit tests working
+  abstract class DiffEdge {
+    def label: String
+    def properties: Seq[(String, AnyRef)]
+  }
+  case class NodeProperty(node: StoredNode, propertyKey: String, propertyValue: AnyRef)
+  case class EdgeProperty(edge: Edge, propertyKey: String, propertyValue: AnyRef)
+  case class EdgeInDiffGraph(src: NewNode, dst: NewNode, label: String, properties: Properties) extends DiffEdge
+  case class EdgeToOriginal(src: NewNode, dst: StoredNode, label: String, properties: Properties) extends DiffEdge
+  case class EdgeFromOriginal(src: StoredNode, dst: NewNode, label: String, properties: Properties) extends DiffEdge
+  case class EdgeInOriginal(src: StoredNode, dst: StoredNode, label: String, properties: Properties) extends DiffEdge
 }

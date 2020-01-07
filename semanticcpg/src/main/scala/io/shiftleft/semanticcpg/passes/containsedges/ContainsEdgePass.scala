@@ -19,7 +19,7 @@ class ContainsEdgePass(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def perSource(source: nodes.AstNode): DiffGraph = {
-    val dstGraph = new DiffGraph
+    val dstGraph = DiffGraph.newBuilder
 
     source.start
       .walkAstUntilReaching(sourceTypes)
@@ -29,7 +29,7 @@ class ContainsEdgePass(cpg: Cpg) extends CpgPass(cpg) {
       }
       .iterate()
 
-    dstGraph
+    dstGraph.build()
   }
 }
 

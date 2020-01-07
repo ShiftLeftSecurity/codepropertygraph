@@ -14,7 +14,7 @@ class CapturingLinker(cpg: Cpg) extends CpgPass(cpg) {
   import CapturingLinker.logger
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = new DiffGraph
+    val dstGraph = DiffGraph.newBuilder
 
     val idToClosureBinding: Map[String, nodes.ClosureBinding] =
       cpg.graph.V
@@ -40,7 +40,7 @@ class CapturingLinker(cpg: Cpg) extends CpgPass(cpg) {
         case _ =>
       }
       .iterate()
-    Iterator(dstGraph)
+    Iterator(dstGraph.build())
   }
 }
 

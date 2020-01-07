@@ -33,7 +33,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def perMemberAccess(call: nodes.Call): DiffGraph = {
-    val dstGraph = new DiffGraph()
+    val dstGraph = DiffGraph.newBuilder
 
     if (!call.edges(Direction.OUT, EdgeTypes.REF).hasNext) {
       try {
@@ -80,7 +80,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
           s" a member access node and a member.")
       loggedDeprecationWarning = true
     }
-    dstGraph
+    dstGraph.build()
   }
 
   private def getTypeOfMemberAccessBase(call: nodes.Call): nodes.Type = {
