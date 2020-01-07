@@ -4,9 +4,8 @@ import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import scala.reflect.ClassTag
 
-class ParallelIteratorExecutor[T: ClassTag](iterator: Iterator[T]) {
+class ParallelIteratorExecutor[T](iterator: Iterator[T]) {
   def map[D <: DiffGraph](func: T => D): Iterator[D] = {
     val futures = Future.traverse(iterator) { element =>
       Future {

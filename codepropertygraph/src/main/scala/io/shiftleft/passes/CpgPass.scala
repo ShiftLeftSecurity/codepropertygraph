@@ -18,9 +18,6 @@ import java.lang.{Long => JLong}
 
 import io.shiftleft.codepropertygraph.Cpg
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future, blocking}
-
 /**
   * Base class for CPG pass - a program, which receives an input graph
   * and outputs a sequence of additive diff graphs. These diff graphs can
@@ -42,7 +39,6 @@ import scala.concurrent.{Await, ExecutionContext, Future, blocking}
   */
 abstract class CpgPass(cpg: Cpg) {
   import CpgPass.logger
-  implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
   /**
     * Main method of enhancement - to be implemented by child class
