@@ -8,7 +8,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
-import org.apache.tinkerpop.gremlin.structure.Direction
 import io.shiftleft.semanticcpg.language._
 
 import scala.jdk.CollectionConverters._
@@ -96,57 +95,56 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       .foreach(returnVertex => addEdge(returnVertex, methodReturn))
 
     outSet.foreach {
-      case (node, outDefs) =>
-        if (node.isInstanceOf[nodes.Call]) {
-          val usesInExpression = dfHelper.getUsesOfExpression(node)
-          val localRefsUses = usesInExpression.map(ExpandTo.reference(_)).filter(_ != None)
+      case (node: nodes.Call, outDefs) =>
+        val usesInExpression = dfHelper.getUsesOfExpression(node)
+        val localRefsUses = usesInExpression.map(ExpandTo.reference(_)).filter(_ != None)
 
-          /* if use is not an identifier, add edge, as we are going to visit the use separately */
-          usesInExpression.foreach { use =>
-            if (!use.isInstanceOf[nodes.Identifier] && !use.isInstanceOf[nodes.Literal]) {
-              addEdge(use, node)
+        /* if use is not an identifier, add edge, as we are going to visit the use separately */
+        usesInExpression.foreach { use =>
+          if (!use.isInstanceOf[nodes.Identifier] && !use.isInstanceOf[nodes.Literal]) {
+            addEdge(use, node)
 
-              /* handle indirect access uses: check if we have it in our out set and get
-               * the corresponding def expression from which the definition reaches the use
-               */
-              if (isIndirectAccess(use)) {
-                outDefs.filter(out => isIndirectAccess(out)).foreach { indirectOutDef =>
-                  if (indirectOutDef.asInstanceOf[nodes.Call].code == use.asInstanceOf[nodes.Call].code) {
-                    val expandedToCall = ExpandTo.argumentToCallOrReturn(indirectOutDef)
-                    addEdge(expandedToCall, use)
-                  }
+            /* handle indirect access uses: check if we have it in our out set and get
+             * the corresponding def expression from which the definition reaches the use
+             */
+            if (isIndirectAccess(use)) {
+              outDefs.filter(out => isIndirectAccess(out)).foreach { indirectOutDef =>
+                if (indirectOutDef.asInstanceOf[nodes.Call].code == use.asInstanceOf[nodes.Call].code) {
+                  val expandedToCall = node.toCallOrReturn
+                  addEdge(expandedToCall, use)
                 }
               }
             }
           }
+        }
 
-          val nodeIsOperandAssignment = isOperationAndAssignment(node)
-          if (nodeIsOperandAssignment) {
-            val localRefGens = dfHelper.getGensOfExpression(node).map(ExpandTo.reference(_))
-            inSet(node)
-              .filter(inElement => localRefGens.contains(ExpandTo.reference(inElement)))
-              .foreach { filteredInElement =>
-                dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, node))
-              }
-          }
-
-          for (elem <- outDefs) {
-            val localRefGen = ExpandTo.reference(elem)
-
-            dfHelper.getExpressionFromGen(elem).foreach { expressionOfElement =>
-              if (expressionOfElement != node && localRefsUses.contains(localRefGen)) {
-                addEdge(expressionOfElement, node)
-              }
-            }
-          }
-        } else if (node.isInstanceOf[nodes.Return]) {
-          node._astOut.asScala.foreach { returnExpr =>
-            val localRef = ExpandTo.reference(returnExpr)
-            inSet(node).filter(inElement => localRef == ExpandTo.reference(inElement)).foreach { filteredInElement =>
+        val nodeIsOperandAssignment = isOperationAndAssignment(node)
+        if (nodeIsOperandAssignment) {
+          val localRefGens = dfHelper.getGensOfExpression(node).map(ExpandTo.reference(_))
+          inSet(node)
+            .filter(inElement => localRefGens.contains(ExpandTo.reference(inElement)))
+            .foreach { filteredInElement =>
               dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, node))
+            }
+        }
+
+        for (elem <- outDefs) {
+          val localRefGen = ExpandTo.reference(elem)
+
+          dfHelper.getExpressionFromGen(elem).foreach { expressionOfElement =>
+            if (expressionOfElement != node && localRefsUses.contains(localRefGen)) {
+              addEdge(expressionOfElement, node)
             }
           }
         }
+      case (node: nodes.Return, _) =>
+        node._astOut.asScala.foreach { returnExpr =>
+          val localRef = ExpandTo.reference(returnExpr)
+          inSet(node).filter(inElement => localRef == ExpandTo.reference(inElement)).foreach { filteredInElement =>
+            dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, node))
+          }
+        }
+      case _ => //ignore
     }
   }
 

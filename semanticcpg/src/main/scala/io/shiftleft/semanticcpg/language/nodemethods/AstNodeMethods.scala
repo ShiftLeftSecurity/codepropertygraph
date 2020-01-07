@@ -1,9 +1,12 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.AstNode
-
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.utils.MemberAccess
+
+import scala.annotation.tailrec
 
 class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
@@ -53,6 +56,19 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
                        } else {
                          childDepths.max
                        })
+  }
+
+  def toCallOrReturn: nodes.Expression = _toCallOrReturn(node)
+
+  @tailrec
+  final def _toCallOrReturn(argument: nodes.AstNode): nodes.Expression = {
+    val parent = argument.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
+    parent match {
+      case call: nodes.Call if MemberAccess.isGenericMemberAccessName(call.name) =>
+        _toCallOrReturn(call)
+      case expression: nodes.Expression =>
+        expression
+    }
   }
 
 }
