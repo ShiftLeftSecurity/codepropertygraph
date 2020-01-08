@@ -18,7 +18,7 @@ import scala.jdk.CollectionConverters._
 class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
 
   override def run(): Iterator[DiffGraph] = {
-    val diffGraph = DiffGraph.newBuilder
+    val diffGraph = new DiffGraph
 
     if (cpg.graph.traversal.V().hasLabel(NodeTypes.BINDING).asScala.isEmpty) {
       cpg.typeDecl.toIterator().foreach { typeDecl =>
@@ -30,10 +30,10 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
       }
     }
 
-    Iterator(diffGraph.build())
+    Iterator(diffGraph)
   }
 
-  private def createBinding(typeDecl: nodes.TypeDecl, diffGraph: DiffGraph.Builder)(method: nodes.Method): Unit = {
+  private def createBinding(typeDecl: nodes.TypeDecl, diffGraph: DiffGraph)(method: nodes.Method): Unit = {
     // The csharp frontend creates method names which contain type parameters.
     // It is necessary to keep them because a class may define parametric and non-parametric
     // functions with the same name, i.e., `void f() {} and void f<T>() {}' is valid.

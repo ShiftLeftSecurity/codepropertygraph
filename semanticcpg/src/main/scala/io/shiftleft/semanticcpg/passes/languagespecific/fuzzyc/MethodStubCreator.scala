@@ -24,7 +24,7 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
   private var methodToParameterCount = Map[NameAndSignature, Int]()
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
+    val dstGraph = new DiffGraph
 
     init()
 
@@ -40,14 +40,14 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 
     }
 
-    Iterator(dstGraph.build())
+    Iterator(dstGraph)
   }
 
   private def createMethodStub(name: String,
                                fullName: String,
                                signature: String,
                                parameterCount: Int,
-                               dstGraph: DiffGraph.Builder): nodes.MethodBase = {
+                               dstGraph: DiffGraph): nodes.MethodBase = {
     val methodNode = new nodes.NewMethod(
       name,
       fullName,

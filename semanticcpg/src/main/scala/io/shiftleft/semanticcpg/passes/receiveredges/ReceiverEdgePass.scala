@@ -26,7 +26,7 @@ class ReceiverEdgePass(cpg: Cpg) extends CpgPass(cpg) {
 
   override def run(): Iterator[DiffGraph] = {
     var loggedDeprecationWarning = false
-    val dstGraph = DiffGraph.newBuilder
+    val dstGraph = new DiffGraph
 
     cpg.graph.V
       .hasLabel(NodeTypes.CALL)
@@ -50,7 +50,7 @@ class ReceiverEdgePass(cpg: Cpg) extends CpgPass(cpg) {
         }
       }
       .iterate()
-    Iterator(dstGraph.build())
+    Iterator(dstGraph)
   }
 }
 

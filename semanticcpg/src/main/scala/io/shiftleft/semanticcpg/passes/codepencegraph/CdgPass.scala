@@ -18,7 +18,7 @@ class CdgPass(cpg: Cpg) extends CpgPass(cpg) {
   import CdgPass.logger
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
+    val dstGraph = new DiffGraph
 
     val dominanceFrontier =
       new CfgDominatorFrontier(new ReverseCpgCfgAdapter(), new CpgPostDomTreeAdapter())
@@ -44,7 +44,7 @@ class CdgPass(cpg: Cpg) extends CpgPass(cpg) {
       }
     }
 
-    Iterator(dstGraph.build())
+    Iterator(dstGraph)
   }
 }
 
