@@ -25,7 +25,8 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
 
     val memberAccessIterator = cpg.call
       .filter(
-        _.nameExact(Operators.memberAccess, Operators.indirectMemberAccess)
+        _.nameExact(Operators.memberAccess, Operators.indirectMemberAccess,
+          Operators.fieldAccess, Operators.indirectFieldAccess)
       )
       .toIterator
 
