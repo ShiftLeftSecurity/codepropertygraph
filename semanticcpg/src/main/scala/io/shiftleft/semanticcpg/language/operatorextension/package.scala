@@ -1,5 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
+import gremlin.scala.GremlinScala
+
 import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Call, Expression}
 import io.shiftleft.semanticcpg.language.nodemethods.CallMethods
 import io.shiftleft.semanticcpg.language.types.expressions.Identifier
@@ -29,6 +31,9 @@ package object operatorextension {
 
     def assignments: AssignmentTrav =
       new AssignmentTrav(rawTravForPattern(NodeTypeStarters.assignmentPattern).raw)
+
+    def arithmetics: ArithmeticTrav =
+      new ArithmeticTrav(rawTravForPattern(NodeTypeStarters.arithmeticPattern).raw)
 
     private def rawTravForPattern(pattern: String): NodeSteps[Call] =
       node.ast.isCall.name(pattern)

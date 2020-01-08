@@ -5,6 +5,7 @@ import io.shiftleft.semanticcpg.language._
 
 object NodeTypeStarters {
   val assignmentPattern = "<operator>.(assignment.*)|(.*(increment|decrement))"
+  val arithmeticPattern = "<operator>.(addition|subtraction|division|multiplication|exponentiation|modulo)"
 }
 
 class NodeTypeStarters(cpg: Cpg) {
@@ -14,4 +15,6 @@ class NodeTypeStarters(cpg: Cpg) {
   def assignment: AssignmentTrav =
     new AssignmentTrav(cpg.call.name(assignmentPattern).raw)
 
+  def arithmetic: ArithmeticTrav =
+    new ArithmeticTrav(cpg.call.name(arithmeticPattern).raw)
 }

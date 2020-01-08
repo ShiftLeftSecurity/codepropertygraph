@@ -19,4 +19,9 @@ class OpAstNodeTrav[NodeType <: basenodes.AstNode](raw: GremlinScala[NodeType]) 
         .flatMap(_.assignments)
         .raw)
 
+  def arithmetics: ArithmeticTrav =
+    new ArithmeticTrav(
+      new AstNode(raw.cast[basenodes.AstNode])
+        .flatMap(_.arithmetics)
+        .raw)
 }

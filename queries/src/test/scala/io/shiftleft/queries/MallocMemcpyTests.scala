@@ -30,7 +30,7 @@ class MallocMemcpyTests extends WordSpec with Matchers {
       * */
     "find calls to malloc/memcpy system with different expressions in arguments" in {
 
-      val src = cpg.call("malloc").filter(_.argument(1)).l
+      val src = cpg.call("malloc").filter(_.argument(1).arithmetics).l
 
       cpg
         .call("memcpy")
