@@ -5,10 +5,10 @@ import io.shiftleft.codepropertygraph.generated.nodes.Expression
 import io.shiftleft.semanticcpg.language.Steps
 import io.shiftleft.semanticcpg.language._
 
-class Target(override val raw: GremlinScala[nodes.Target]) extends Steps[nodes.Target](raw) {
+class TargetTrav(override val raw: GremlinScala[Expression]) extends Steps[Expression](raw) {
 
   def isArrayAccess: ArrayAccessTrav =
-    new ArrayAccessTrav(raw.map(_.isArrayAccess.call.l).l.flatten.start.map(new nodes.ArrayAccess(_)).raw)
+    new ArrayAccessTrav(raw.map(_.isArrayAccess.call.l).l.flatten.start.raw)
 
   def expr: Steps[Expression] = map(_.expr)
 
