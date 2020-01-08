@@ -230,12 +230,12 @@
         {
             "operator":"fieldAccess",
             "name":"<operator>.fieldAccess",
-            "comment": "Returns or sets a field/member of a struct/class. Typically, the dot-operator. In terms of CPG, the first argument is the struct/class and the second argument is an IDENTIFIER node. The string contained in the NAME field of this IDENTIFIER node corresponds to the name of the field/member. Handling of this operator is special-cased in the back-end"
+            "comment": "Returns or sets a field/member of a struct/class. Typically, the dot-operator. In terms of CPG, the first argument is the struct/class and the second argument is a FIELD_IDENTIFIER node. The string contained in the CANONICAL_NAME field of this FIELD_IDENTIFIER node selects which field/member is accessed. Handling of this operator is special-cased in the back-end"
         },
         {
             "operator":"indirectFieldAccess",
             "name":"<operator>.indirectFieldAccess",
-            "comment": "Loads/stores to a field/member of a pointer to a struct/class. Typically, C/C++ arrow-operator. In terms of CPG, the first argument is the struct/class and the second argument is an IDENTIFIER node. The string contained in the NAME field of this IDENTIFIER node corresponds to the name of the field/member. For the sake of data-flow tracking, this is the same as first dereferencing the pointer and then accessing the field. Handling of this operator is special-cased in the back-end"
+            "comment": "Loads/stores to a field/member of a pointer to a struct/class. Typically, C/C++ arrow-operator. In terms of CPG, the first argument is the struct/class and the second argument is a FIELD_IDENTIFIER node. The string contained in the FULL_NAME field of this FIELD_IDENTIFIER node selects which field/member is accessed. For the sake of data-flow tracking, this is the same as first dereferencing the pointer and then accessing the field. Handling of this operator is special-cased in the back-end"
         },
         {
             "operator":"indexAccess",

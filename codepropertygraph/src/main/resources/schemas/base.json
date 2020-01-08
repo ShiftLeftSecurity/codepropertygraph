@@ -26,6 +26,7 @@
 
         {"id" : 5, "name": "NAME", "comment": "Name of represented object, e.g., method name (e.g. \"run\")", "valueType" : "string", "cardinality" : "one"},
         {"id" : 6, "name": "FULL_NAME", "comment" : "Full name of an element, e.g., the class name along, including its package (e.g. \"io.shiftleft.dataflowenging.layers.dataflows.DataFlowRunner.run\"). In theory, the FULL_NAME just needs to be unique and is used for linking references, so a consecutive integer would be valid. In practice, this should be human readable", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 2001092, "name": "CANONICAL_NAME", "comment" : "Canonical token of a FIELD_IDENTIFIER. Typically identical to the CODE field, but canonicalized according to source language semantics. Human readable names are preferable. FIELD_IDENTIFIERs must share share identical CANONICAL_NAME if and only if they alias, e.g. in C-style unions (if the aliasing relationship is unknown or there are partial overlaps, then one must make a reasonable guess, and trade off between false negatives and false positives)", "valueType" : "string", "cardinality" : "one"},
         {"id": 21, "name": "CODE", "comment": "The code snippet the node represents", "valueType" : "string", "cardinality" : "one"},
         {"id": 22, "name": "SIGNATURE", "comment": "Method signature. The format is defined by the language front-end, and the backend simply compares strings to resolve function overloading, i.e. match call-sites to METHODs. In theory, consecutive integers would be valid, but in practice this should be human readable", "valueType" : "string", "cardinality" : "one"},
         {"id": 26, "name" : "MODIFIER_TYPE", "comment" : "Indicates the modifier which is represented by a MODIFIER node. See modifierTypes", "valueType" : "string", "cardinality" : "one"},
@@ -86,7 +87,7 @@
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["METHOD_RETURN", "METHOD_PARAMETER_IN",
                                              "MODIFIER", "BLOCK", "TYPE_PARAMETER"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
          ]
         },
 
@@ -171,7 +172,7 @@
          "comment" : "Literal/Constant",
          "is": ["EXPRESSION"],
          "outEdges" : [
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
          ]
         },
         {"id": 15, "name" : "CALL",
@@ -179,10 +180,10 @@
          "comment" : "A (method)-call",
          "is": ["EXPRESSION", "CALL_REPR"],
          "outEdges" : [
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]},
-             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "CONTROL_STRUCTURE"]},
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]},
+             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "CONTROL_STRUCTURE"]},
              {"edgeName": "RECEIVER", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "BLOCK", "UNKNOWN"]},
-             {"edgeName": "ARGUMENT", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "BLOCK", "UNKNOWN"]}
+             {"edgeName": "ARGUMENT", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "BLOCK", "UNKNOWN"]}
          ]
         },
         {"id":23, "name" : "LOCAL",
@@ -196,10 +197,18 @@
          "is": ["EXPRESSION", "LOCAL_LIKE"],
          "outEdges" : [
              {"edgeName": "REF", "inNodes": ["LOCAL", "METHOD_PARAMETER_IN"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
          ]
         },
-        {"id":30, "name": "RETURN",
+        {"id":2001081, "name": "FIELD_IDENTIFIER",
+          "keys": ["CODE", "CANONICAL_NAME", "ORDER", "ARGUMENT_INDEX", "LINE_NUMBER", "COLUMN_NUMBER"],
+          "comment" : "A node that represents which field is accessed in a <operator>.fieldAccess, in e.g. obj.field. The CODE part is used for human display, and the CANONICAL_NAME is used for dataflow tracking; typically both coincide. However, suppose that two fields foo and bar are a C-style union; then CODE refers to whatever the programmer wrote (obj.foo or obj.bar), but both share the same CANONICAL_NAME (e.g. GENERATED_foo_bar)",
+          "is": ["EXPRESSION"],
+          "outEdges" : [
+            {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+          ]
+        },
+      {"id":30, "name": "RETURN",
          "keys": [ "LINE_NUMBER", "COLUMN_NUMBER", "ORDER", "ARGUMENT_INDEX", "CODE"],
          "comment" : "A return instruction",
          "is": [ "EXPRESSION"],
@@ -215,7 +224,7 @@
          "is": [ "EXPRESSION"],
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "LOCAL", "UNKNOWN", "CONTROL_STRUCTURE"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
          ]
         },
         // METHOD_INST is deprecated.
@@ -239,7 +248,7 @@
           "comment":"Reference to a method instance",
          "is": ["EXPRESSION"],
           "outEdges": [
-            {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
+            {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
           ]
         },
 
@@ -262,10 +271,10 @@
          "comment" : "A language-specific node",
          "is": ["EXPRESSION"],
          "outEdges" : [
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]},
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]},
              {"edgeName": "AST", "inNodes": ["LITERAL", "MEMBER",
                                              "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
-                                             "IDENTIFIER", "RETURN", "BLOCK", "UNKNOWN", "CONTROL_STRUCTURE"]}
+                                             "IDENTIFIER", "FIELD_IDENTIFIER", "RETURN", "BLOCK", "UNKNOWN", "CONTROL_STRUCTURE"]}
          ]
         }
     ],
