@@ -19,7 +19,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
     * Main method of enhancement - to be implemented by child class
     **/
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
+    val dstGraph = new DiffGraph()
 
     cpg.graph.V
       .hasLabel(NodeTypes.METHOD)
@@ -38,10 +38,10 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
       }
     }
 
-    Iterator(dstGraph.build())
+    Iterator(dstGraph)
   }
 
-  private def linkCall(call: nodes.Call, dstGraph: DiffGraph.Builder): Unit = {
+  private def linkCall(call: nodes.Call, dstGraph: DiffGraph): Unit = {
     val resolvedMethodOption =
       if (call.dispatchType == DispatchTypes.STATIC_DISPATCH) {
         methodFullNameToNode.get(call.methodFullName)

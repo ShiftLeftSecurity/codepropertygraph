@@ -22,7 +22,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
     dfHelper = new DataFlowFrameworkHelper(cpg.graph)
 
     new ParallelIteratorExecutor(methods).map { method =>
-      val dstGraph = DiffGraph.newBuilder
+      val dstGraph = new DiffGraph()
       var worklist = Set[nodes.StoredNode]()
       var out = Map[nodes.StoredNode, Set[nodes.StoredNode]]().withDefaultValue(Set[nodes.StoredNode]())
       var in = Map[nodes.StoredNode, Set[nodes.StoredNode]]().withDefaultValue(Set[nodes.StoredNode]())
@@ -65,14 +65,14 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       }
 
       addReachingDefEdge(dstGraph, method, out, in)
-      dstGraph.build()
+      dstGraph
     }
   }
 
   /** Pruned DDG, i.e., two call assignment vertices are adjacent if a
     * reaching definition edge reaches a vertex where the definition is used.
     * The final representation makes it straightforward to build def-use/use-def chains */
-  private def addReachingDefEdge(dstGraph: DiffGraph.Builder,
+  private def addReachingDefEdge(dstGraph: DiffGraph,
                                  method: nodes.StoredNode,
                                  outSet: Map[nodes.StoredNode, Set[nodes.StoredNode]],
                                  inSet: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Unit = {

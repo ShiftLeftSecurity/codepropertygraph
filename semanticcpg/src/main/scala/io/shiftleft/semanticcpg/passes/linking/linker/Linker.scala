@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language.Steps
 import io.shiftleft.Implicits.JavaIteratorDeco
+
 import io.shiftleft.codepropertygraph.Cpg
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
@@ -20,13 +21,12 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
   import Linker.logger
 
   private var typeDeclFullNameToNode = Map.empty[String, nodes.StoredNode]
-  private var typeFullNameToNode: collection.immutable.Map[String, nodes.StoredNode] =
-    Map.empty[String, nodes.StoredNode]
+  private var typeFullNameToNode = Map.empty[String, nodes.StoredNode]
   private var methodFullNameToNode = Map.empty[String, nodes.StoredNode]
   private var namespaceBlockFullNameToNode = Map.empty[String, nodes.StoredNode]
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
+    val dstGraph = new DiffGraph
 
     initMaps()
 
@@ -112,7 +112,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstGraph
     )
 
-    Iterator(dstGraph.build())
+    Iterator(dstGraph)
   }
 
   private def initMaps(): Unit = {
@@ -136,7 +136,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
                            edgeType: String,
                            dstNodeMap: Map[String, nodes.StoredNode],
                            dstFullNameKey: String,
-                           dstGraph: DiffGraph.Builder): Unit = {
+                           dstGraph: DiffGraph): Unit = {
     var loggedDeprecationWarning = false
     val sourceTraversal = cpg.graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*)
     val sourceIterator = new Steps(sourceTraversal).toIterator()
@@ -175,7 +175,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
                                                                 dstNodeMap: Map[String, nodes.StoredNode],
                                                                 getDstFullNames: SRC_NODE_TYPE => Iterable[String],
                                                                 dstFullNameKey: String,
-                                                                dstGraph: DiffGraph.Builder): Unit = {
+                                                                dstGraph: DiffGraph): Unit = {
     var loggedDeprecationWarning = false
     cpg.graph.V
       .hasLabel(srcLabels.head, srcLabels.tail: _*)
@@ -212,7 +212,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       .iterate()
   }
 
-  private def linkAstChildToParent(dstGraph: DiffGraph.Builder): Unit = {
+  private def linkAstChildToParent(dstGraph: DiffGraph): Unit = {
     var loggedDeprecationWarning = false
 
     cpg.graph.V

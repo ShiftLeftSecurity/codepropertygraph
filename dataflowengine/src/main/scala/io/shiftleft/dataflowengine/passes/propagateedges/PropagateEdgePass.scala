@@ -18,10 +18,10 @@ import scala.jdk.CollectionConverters._
 class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
   import PropagateEdgePass.logger
 
-  var dstGraph: DiffGraph.Builder = _
+  var dstGraph: DiffGraph = _
 
   override def run(): Iterator[DiffGraph] = {
-    dstGraph = DiffGraph.newBuilder
+    dstGraph = new DiffGraph()
 
     semantics.elements.foreach { semantic =>
       val methodOption =
@@ -34,7 +34,7 @@ class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
       }
     }
 
-    Iterator(dstGraph.build())
+    Iterator(dstGraph)
   }
 
   private def addSelfDefSemantic(method: Vertex, parameterIndex: Int): Unit = {

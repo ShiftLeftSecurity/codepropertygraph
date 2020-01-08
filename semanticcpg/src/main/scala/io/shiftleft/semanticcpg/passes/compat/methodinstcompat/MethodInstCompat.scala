@@ -18,7 +18,7 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
   private val methodInstFullNameToMethodFullName = mutable.Map.empty[String, String]
 
   override def run(): Iterator[DiffGraph] = {
-    val diffGraph = DiffGraph.newBuilder
+    val diffGraph = new DiffGraph
 
     if (cpg.graph.traversal.V().hasLabel(NodeTypes.METHOD_INST).asScala.nonEmpty) {
       MethodInstCompat.logger.warn("Using deprecated CPG format with METHOD_INST nodes.")
@@ -52,7 +52,7 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
       }
     }
 
-    Iterator(diffGraph.build())
+    Iterator(diffGraph)
   }
 
   private def init(): Unit = {
