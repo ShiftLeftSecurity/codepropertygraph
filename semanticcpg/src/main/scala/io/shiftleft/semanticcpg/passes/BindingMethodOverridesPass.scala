@@ -20,7 +20,7 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
       .foreach(binding => {
         val typeDecl: Option[nodes.TypeDecl] = binding.start.bindingTypeDecl.headOption()
         if (typeDecl.isDefined) {
-          val neverOverriddenFlag = isMethodNeverOverridden(typeDecl.get, method.name, method.signature)
+          val neverOverriddenFlag = isMethodNeverOverridden(typeDecl.get, binding.name, binding.signature)
           diff.addNodeProperty(
             binding,
             NodeKeys.IS_METHOD_NEVER_OVERRIDDEN.name,
@@ -34,9 +34,9 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
     diff
   }
 
-  def isMethodNeverOverridden(typeDecl: nodes.TypeDecl, methodName: String, methodSignature: String): Boolean = {
-    typeDecl.start.derivedTypeDeclTransitive.method
-      .filter(_.nameExact(methodName).signatureExact(methodSignature))
+  def isMethodNeverOverridden(typeDecl: nodes.TypeDecl, bindingName: String, bindingSignature: String): Boolean = {
+    typeDecl.start.derivedTypeDeclTransitive.methodBinding
+      .filter(_.nameExact(bindingName).signatureExact(bindingSignature))
       .headOption
       .isEmpty
   }
