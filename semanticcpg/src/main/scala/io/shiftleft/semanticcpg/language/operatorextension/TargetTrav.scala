@@ -8,7 +8,7 @@ import io.shiftleft.semanticcpg.language._
 class TargetTrav(override val raw: GremlinScala[Expression]) extends Steps[Expression](raw) {
 
   def isArrayAccess: ArrayAccessTrav =
-    new ArrayAccessTrav(raw.map(_.isArrayAccess.call.l).l.flatten.start.raw)
+    new ArrayAccessTrav(raw.map(_.isArrayAccess.l).l.flatten.start.raw)
 
   def expr: Steps[Expression] = map(_.expr)
 
