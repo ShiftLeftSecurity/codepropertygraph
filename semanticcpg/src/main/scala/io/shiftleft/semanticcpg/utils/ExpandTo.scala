@@ -26,6 +26,8 @@ object ExpandTo {
       .headOption
   }
 
+  def callReceiver(callNode: Vertex): nodes.StoredNode = callReceiverOption(callNode).get
+
   // TODO move into traversal dsl - used in codescience
   def callArguments(callNode: Vertex): Iterator[nodes.Expression] = {
     callNode.asInstanceOf[nodes.StoredNode]._argumentOut.asScala.map(_.asInstanceOf[nodes.Expression])
