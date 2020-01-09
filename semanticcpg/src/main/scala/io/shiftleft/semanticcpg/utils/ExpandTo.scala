@@ -33,16 +33,6 @@ object ExpandTo {
     callNode.asInstanceOf[nodes.StoredNode]._argumentOut.asScala.map(_.asInstanceOf[nodes.Expression])
   }
 
-  def argumentToCallOrReturn(argument: Vertex): nodes.Expression = {
-    val parent = argument.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
-    parent match {
-      case call: nodes.Call if MemberAccess.isGenericMemberAccessName(call.name) =>
-        argumentToCallOrReturn(call)
-      case expression: nodes.Expression =>
-        expression
-    }
-  }
-
   def typeCarrierToType(parameterNode: Vertex): nodes.StoredNode = {
     parameterNode.asInstanceOf[nodes.StoredNode]._evalTypeOut.nextChecked
   }

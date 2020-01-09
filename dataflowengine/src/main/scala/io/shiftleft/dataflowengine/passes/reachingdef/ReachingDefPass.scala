@@ -110,8 +110,9 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
                */
               if (isIndirectAccess(use)) {
                 outDefs.filter(out => isIndirectAccess(out)).foreach { indirectOutDef =>
-                  if (indirectOutDef.asInstanceOf[nodes.Call].code == use.asInstanceOf[nodes.Call].code) {
-                    val expandedToCall = ExpandTo.argumentToCallOrReturn(indirectOutDef)
+                  val indirectOutCall = indirectOutDef.asInstanceOf[nodes.Call]
+                  if (indirectOutCall.code == use.asInstanceOf[nodes.Call].code) {
+                    val expandedToCall = indirectOutCall.parentExpression
                     addEdge(expandedToCall, use)
                   }
                 }
