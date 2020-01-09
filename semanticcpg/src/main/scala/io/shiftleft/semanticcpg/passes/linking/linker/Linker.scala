@@ -213,8 +213,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def linkAstChildToParent(dstGraph: DiffGraph): Unit = {
-    var loggedDeprecationWarning = false
-
     cpg.graph.V
       .hasLabel(NodeTypes.METHOD, NodeTypes.TYPE_DECL)
       .sideEffect {
@@ -244,11 +242,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
                                      astChild.label,
                                      astChild.id.toString())
               }
-            case Some(astEdge) if !loggedDeprecationWarning =>
-              logger.info(
-                "Using deprecated CPG format with already existing AST edge between" +
-                  s" ${astEdge.outVertex.label} and ${astChild.label} node.")
-              loggedDeprecationWarning = true
             case _ =>
           }
       }
