@@ -58,14 +58,14 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
                        })
   }
 
-  def toCallOrReturn: nodes.Expression = _toCallOrReturn(node)
+  def parentExpression: nodes.Expression = _parentExpression(node)
 
   @tailrec
-  final def _toCallOrReturn(argument: nodes.AstNode): nodes.Expression = {
+  final def _parentExpression(argument: nodes.AstNode): nodes.Expression = {
     val parent = argument.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
     parent match {
       case call: nodes.Call if MemberAccess.isGenericMemberAccessName(call.name) =>
-        _toCallOrReturn(call)
+        _parentExpression(call)
       case expression: nodes.Expression =>
         expression
     }
