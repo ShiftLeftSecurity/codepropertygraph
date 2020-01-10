@@ -59,8 +59,8 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
   }
 
   /**
-    * Traverse to it's parent expression (e.g. call or return) by following the incoming AST nodes. 
-    * It's continuing it's walk until it hits an expression that's not a generic 
+    * Traverse to it's parent expression (e.g. call or return) by following the incoming AST nodes.
+    * It's continuing it's walk until it hits an expression that's not a generic
     * "member access operation", e.g., "<operator>.memberAccess".
     * */
   def parentExpression: nodes.Expression = _parentExpression(node)

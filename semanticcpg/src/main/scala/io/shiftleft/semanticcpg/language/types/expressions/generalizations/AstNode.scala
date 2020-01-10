@@ -75,8 +75,8 @@ trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
         .cast[nodes.AstNode])
 
   /**
-    * Traverse to it's parent expression (e.g. call or return) by following the incoming AST nodes. 
-    * It's continuing it's walk until it hits an expression that's not a generic 
+    * Traverse to it's parent expression (e.g. call or return) by following the incoming AST nodes.
+    * It's continuing it's walk until it hits an expression that's not a generic
     * "member access operation", e.g., "<operator>.memberAccess".
     * */
   def parentExpression: Expression =
