@@ -18,27 +18,26 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
     val diff = DiffGraph.newBuilder
     method.start.referencingBinding
       .toIterator()
-      .foreach(binding => processBinding(method, diff, binding))
+      .foreach(binding => {
+        val typeDecl: Option[nodes.TypeDecl] = binding.start.bindingTypeDecl.headOption()
+        if (typeDecl.isDefined) {
+          val neverOverriddenFlag = isMethodNeverOverridden(typeDecl.get, binding.name, binding.signature)
+          diff.addNodeProperty(
+            binding,
+            NodeKeys.IS_METHOD_NEVER_OVERRIDDEN.name,
+            neverOverriddenFlag.asInstanceOf[AnyRef]
+          )
+        } else {
+          logger.error(
+            "No binding typeDecl found in BindingMethodOverridesPass: " + method.name + " " + method.signature)
+        }
+      })
     diff.build()
   }
 
-  private def processBinding(method: nodes.Method, diff: DiffGraph.Builder, binding: nodes.Binding) = {
-    val typeDecl: Option[nodes.TypeDecl] = binding.start.bindingTypeDecl.headOption()
-    if (typeDecl.isDefined) {
-      val neverOverriddenFlag = isMethodNeverOverridden(typeDecl.get, method.name, method.signature)
-      diff.addNodeProperty(
-        binding,
-        NodeKeys.IS_METHOD_NEVER_OVERRIDDEN.name,
-        neverOverriddenFlag.asInstanceOf[AnyRef]
-      )
-    } else {
-      logger.error("No binding typeDecl found in BindingMethodOverridesPass: " + method.name + " " + method.signature)
-    }
-  }
-
-  def isMethodNeverOverridden(typeDecl: nodes.TypeDecl, methodName: String, methodSignature: String): Boolean = {
-    typeDecl.start.derivedTypeDeclTransitive.method
-      .filter(_.nameExact(methodName).signatureExact(methodSignature))
+  def isMethodNeverOverridden(typeDecl: nodes.TypeDecl, bindingName: String, bindingSignature: String): Boolean = {
+    typeDecl.start.derivedTypeDeclTransitive.methodBinding
+      .filter(_.nameExact(bindingName).signatureExact(bindingSignature))
       .headOption
       .isEmpty
   }

@@ -6,7 +6,7 @@ libraryDependencies ++= Seq(
   "org.apache.commons"  % "commons-lang3"    % "3.8",
   "org.json4s" %% "json4s-native" % "3.6.7",
   "com.massisframework" % "j-text-utils" % "0.3.4",
-  "com.michaelpollmeier" %% "scala-collection-contrib" % "0.2.1",
+  "org.scala-lang.modules" %% "scala-collection-contrib" % "0.2.1",
   "org.scalatest" %% "scalatest" % "3.0.8" % Test,
   "io.shiftleft" %% "fuzzyc2cpg" % Versions.fuzzyc2cpg % Test
 )

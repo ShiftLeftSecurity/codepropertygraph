@@ -69,7 +69,8 @@ trait ExpressionBase[NodeType <: nodes.Expression]
   def toParameter: MethodParameter = parameter
 
   /**
-    Traverse to related parameter
+    Traverse to related parameter, if the expression is an argument to a call and the call
+    can be resolved.
     */
   def parameter: MethodParameter = {
     new MethodParameter(

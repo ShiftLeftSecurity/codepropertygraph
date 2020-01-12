@@ -8,7 +8,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
-import org.apache.tinkerpop.gremlin.structure.Direction
 import io.shiftleft.semanticcpg.language._
 
 import scala.jdk.CollectionConverters._
@@ -111,8 +110,9 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
                */
               if (isIndirectAccess(use)) {
                 outDefs.filter(out => isIndirectAccess(out)).foreach { indirectOutDef =>
-                  if (indirectOutDef.asInstanceOf[nodes.Call].code == use.asInstanceOf[nodes.Call].code) {
-                    val expandedToCall = ExpandTo.argumentToCallOrReturn(indirectOutDef)
+                  val indirectOutCall = indirectOutDef.asInstanceOf[nodes.Call]
+                  if (indirectOutCall.code == use.asInstanceOf[nodes.Call].code) {
+                    val expandedToCall = indirectOutCall.parentExpression
                     addEdge(expandedToCall, use)
                   }
                 }
