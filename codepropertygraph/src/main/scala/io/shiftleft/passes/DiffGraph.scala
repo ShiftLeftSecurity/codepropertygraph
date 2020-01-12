@@ -1,9 +1,12 @@
 package io.shiftleft.passes
 
 import java.util
+
+import gnu.trove.set.hash.TCustomHashSet
+import gnu.trove.strategy.IdentityHashingStrategy
 import gremlin.scala.{Edge, ScalaGraph}
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode, Node}
+import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node, StoredNode}
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
@@ -128,14 +131,24 @@ object DiffGraph {
   def newBuilder: Builder = new Builder()
 
   class Builder {
-    var _buffer: mutable.ArrayBuffer[Change] = _
+    private var _buffer: mutable.ArrayBuffer[Change] = _
+    private var _nodeSet: TCustomHashSet[NewNode] = _
     private def buffer: mutable.ArrayBuffer[Change] = {
       if (_buffer == null)
         _buffer = new mutable.ArrayBuffer[Change]()
       _buffer
     }
+    private def nodeSet: TCustomHashSet[NewNode] = {
+      if (_nodeSet == null)
+        _nodeSet = new TCustomHashSet[NewNode](IdentityHashingStrategy.INSTANCE)
+      _nodeSet
+    }
+
     def +=(node: NewNode): Unit = {
-      buffer += Change.CreateNode(node)
+      if (!nodeSet.contains(node)) {
+        buffer += Change.CreateNode(node)
+        nodeSet.add(node)
+      }
     }
     def addEdge(src: Node, dst: Node, edgeLabel: String, properties: Seq[(String, AnyRef)] = List()): Unit = {
       buffer += Change.CreateEdge(src, dst, edgeLabel, properties)
