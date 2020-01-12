@@ -1,6 +1,5 @@
 package io.shiftleft.semanticcpg.utils
 
-import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated._
 import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex}
 import io.shiftleft.Implicits.JavaIteratorDeco
@@ -17,6 +16,7 @@ object ExpandTo {
   // For java, the call receiver is always an object instance.
   // For languages which make use of function pointers, this can also be the
   // pointer itself.
+  // TODO move into traversal dsl - used in codescience
   def callReceiverOption(callNode: Vertex): Option[nodes.StoredNode] = {
     callNode
       .asInstanceOf[nodes.StoredNode]
@@ -26,22 +26,11 @@ object ExpandTo {
       .headOption
   }
 
-  def callReceiver(callNode: Vertex): nodes.StoredNode = {
-    callReceiverOption(callNode).get
-  }
+  def callReceiver(callNode: Vertex): nodes.StoredNode = callReceiverOption(callNode).get
 
+  // TODO move into traversal dsl - used in codescience
   def callArguments(callNode: Vertex): Iterator[nodes.Expression] = {
     callNode.asInstanceOf[nodes.StoredNode]._argumentOut.asScala.map(_.asInstanceOf[nodes.Expression])
-  }
-
-  def argumentToCallOrReturn(argument: Vertex): nodes.Expression = {
-    val parent = argument.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
-    parent match {
-      case call: nodes.Call if MemberAccess.isGenericMemberAccessName(call.name) =>
-        argumentToCallOrReturn(call)
-      case expression: nodes.Expression =>
-        expression
-    }
   }
 
   def typeCarrierToType(parameterNode: Vertex): nodes.StoredNode = {
