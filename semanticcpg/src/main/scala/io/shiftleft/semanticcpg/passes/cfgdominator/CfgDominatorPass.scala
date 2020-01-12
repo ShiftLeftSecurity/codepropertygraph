@@ -14,7 +14,7 @@ import io.shiftleft.semanticcpg.utils.ExpandTo
 class CfgDominatorPass(cpg: Cpg) extends CpgPass(cpg) {
 
   override def run(): Iterator[DiffGraph] = {
-    val methodsIterator = cpg.method.toIterator
+    val methodsIterator = cpg.method.toIterator()
     new ParallelIteratorExecutor(methodsIterator).map(perMethod)
   }
 
@@ -25,7 +25,7 @@ class CfgDominatorPass(cpg: Cpg) extends CpgPass(cpg) {
     val reverseCfgAdapter = new ReverseCpgCfgAdapter()
     val postDominatorCalculator = new CfgDominator(reverseCfgAdapter)
 
-    val dstGraph = new DiffGraph()
+    val dstGraph = DiffGraph.newBuilder
 
     val cfgNodeToImmediateDominator = dominatorCalculator.calculate(method)
     addDomTreeEdges(dstGraph, cfgNodeToImmediateDominator)
@@ -34,10 +34,10 @@ class CfgDominatorPass(cpg: Cpg) extends CpgPass(cpg) {
       postDominatorCalculator.calculate(ExpandTo.methodToFormalReturn(method))
     addPostDomTreeEdges(dstGraph, cfgNodeToPostImmediateDominator)
 
-    dstGraph
+    dstGraph.build()
   }
 
-  private def addDomTreeEdges(dstGraph: DiffGraph, cfgNodeToImmediateDominator: Map[Vertex, Vertex]): Unit = {
+  private def addDomTreeEdges(dstGraph: DiffGraph.Builder, cfgNodeToImmediateDominator: Map[Vertex, Vertex]): Unit = {
     // TODO do not iterate over potential hash map to ensure same interation order for
     // edge creation.
     cfgNodeToImmediateDominator.foreach {
@@ -48,7 +48,8 @@ class CfgDominatorPass(cpg: Cpg) extends CpgPass(cpg) {
     }
   }
 
-  private def addPostDomTreeEdges(dstGraph: DiffGraph, cfgNodeToPostImmediateDominator: Map[Vertex, Vertex]): Unit = {
+  private def addPostDomTreeEdges(dstGraph: DiffGraph.Builder,
+                                  cfgNodeToPostImmediateDominator: Map[Vertex, Vertex]): Unit = {
     // TODO do not iterate over potential hash map to ensure same interation order for
     // edge creation.
     cfgNodeToPostImmediateDominator.foreach {
