@@ -62,10 +62,6 @@ object ExpandTo {
           astChild.asInstanceOf[nodes.Modifier].modifierType == modifierType)
   }
 
-  def astParent(expression: Vertex): nodes.StoredNode = {
-    expression.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
-  }
-
   def callToCalledMethod(call: Vertex): Seq[nodes.Method] = {
     call
       .asInstanceOf[nodes.StoredNode]

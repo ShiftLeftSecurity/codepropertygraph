@@ -11,10 +11,6 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 class MethodReturnMethods(val node: nodes.MethodReturn) extends AnyVal {
 
   def formalReturnToReturn: Seq[nodes.Return] =
-    node
-      ._cfgIn
-      .asScala
-      .collect { case r: nodes.Return => r }
-      .toSeq
+    node._cfgIn.asScala.collect { case r: nodes.Return => r }.toSeq
 
 }
