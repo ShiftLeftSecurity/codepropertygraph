@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, Operators, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.Implicits.JavaIteratorDeco
+import io.shiftleft.codepropertygraph.generated.nodes.{HasArgumentIndex, Identifier}
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 import io.shiftleft.semanticcpg.language._
@@ -14,94 +15,101 @@ import scala.jdk.CollectionConverters._
   * This pass has Linker as prerequisite.
   */
 class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
+
   import MemberAccessLinker.logger
 
+  val z = Map.empty[Int, Int]
   private[this] var loggedDeprecationWarning: Boolean = _
-  private[this] var loggedForTypeMemberCombination: Set[(nodes.Type, String)] = _
 
   override def run(): Iterator[DiffGraph] = {
     loggedDeprecationWarning = false
-    loggedForTypeMemberCombination = Set[(nodes.Type, String)]()
-
     val memberAccessIterator = cpg.call
       .filter(
         _.nameExact(Operators.memberAccess, Operators.indirectMemberAccess,
-          Operators.fieldAccess, Operators.indirectFieldAccess)
-      )
-      .toIterator
-
-    new ParallelIteratorExecutor(memberAccessIterator).map(perMemberAccess)
+          Operators.fieldAccess, Operators.indirectFieldAccess, Operators.getElementPtr)
+      ).toList
+    val cache = collection.mutable.Map.empty[Tuple2[nodes.Type, String], nodes.Member]
+    val dstGraph = new DiffGraph() // don't use parallel executor, caching is better
+    memberAccessIterator.map(ma => resolve(dstGraph, cache, ma))
+    List(dstGraph).iterator
   }
 
-  private def perMemberAccess(call: nodes.Call): DiffGraph = {
-    val dstGraph = new DiffGraph()
-
-    if (!call.edges(Direction.OUT, EdgeTypes.REF).hasNext) {
-      try {
-        val memberName = call
-          .vertices(Direction.OUT, EdgeTypes.ARGUMENT)
-          .asScala
-          .filter(_.value(NodeKeys.ORDER.name) == 2)
-          .asJava
-          .nextChecked
-          .asInstanceOf[nodes.Identifier]
-          .name
-
-        val typ = getTypeOfMemberAccessBase(call)
-
-        var worklist = List(typ)
-        var finished = false
-        while (!finished && worklist.nonEmpty) {
-          val typ = worklist.head
-          worklist = worklist.tail
-
-          findMemberOnType(typ, memberName) match {
-            case Some(member) =>
-              dstGraph.addEdgeInOriginal(call, member, EdgeTypes.REF)
-              finished = true
-            case None =>
-              val baseTypes = typ.start.baseType.l
-              worklist = worklist ++ baseTypes
-          }
-        }
-
-        if (!finished && !loggedForTypeMemberCombination.contains((typ, memberName))) {
-          loggedForTypeMemberCombination += ((typ, memberName))
-          logger.warn(s"Could not find type member. type=${typ.fullName}, member=$memberName")
-        }
-      } catch {
-        case exception: Exception =>
-          logger.warn(
-            s"Error while obtaining IDENTIFIER associated to member access." +
-              s" Reason: ${exception.getMessage}")
-      }
-    } else if (!loggedDeprecationWarning) {
+  private def resolve(diffGraph: DiffGraph, cache: collection.mutable.Map[Tuple2[nodes.Type, String], nodes.Member], call: nodes.Call): Unit = {
+    if (call._refOut.hasNext && !loggedDeprecationWarning) {
       logger.warn(
         s"Using deprecated CPG format with alreay existing REF edge between" +
           s" a member access node and a member.")
       loggedDeprecationWarning = true
     }
-    dstGraph
-  }
+    try {
+      // fixme: use argumentIndex once deprecation is over
+      val args = call._argumentOut.asScala.toList.asInstanceOf[List[nodes.HasOrder]].sortBy {
+        _.order
+      }.asInstanceOf[List[nodes.StoredNode]]
+      if (args.size != 2) throw new RuntimeException("member/field access-style operators need two arguments")
+      val typ = args(0)._evalTypeOut.nextOption match {
+        case Some(t: nodes.Type) => t
+        case _ => return
+      }
 
-  private def getTypeOfMemberAccessBase(call: nodes.Call): nodes.Type = {
-    val base = call.start.argument.order(1).head
-    base match {
-      case call: nodes.Call
-          if call.name == Operators.memberAccess ||
-            call.name == Operators.indirectComputedMemberAccess =>
-        call.start.argument.order(2).typ.head
-      case node: nodes.Expression =>
-        node.start.typ.head
+      val fieldref: String = call.name match {
+        case Operators.memberAccess | Operators.indirectMemberAccess =>
+          args(1) match {
+            case id: nodes.Identifier => id.name
+            case _ => throw new RuntimeException("memberAccess needs Identifier as second argument")
+          }
 
+        case Operators.fieldAccess | Operators.indirectIndexAccess | Operators.getElementPtr =>
+          args(1) match {
+            case id: nodes.FieldIdentifier => id.code // we intentionally don't use the CANONICAL_NAME field here.
+            case lit: nodes.Literal => lit.code
+            case _ => return
+          }
+        case _ => return
+      }
+      val member = getMember(cache, typ, fieldref, 0)
+      if (member != null) {
+        diffGraph.addEdgeInOriginal(call, member, EdgeTypes.REF)
+
+      }
+    } catch {
+      case exception: Exception =>
+        logger.warn(
+          s"Error while obtaining IDENTIFIER associated to member access at ${call}" +
+            s" Reason: ${exception.getMessage}")
     }
+
   }
 
-  private def findMemberOnType(typ: nodes.Type, memberName: String): Option[nodes.Member] = {
-    val members = typ.start.member.filter(_.nameExact(memberName)).l
+  private def getMember(cache: collection.mutable.Map[Tuple2[nodes.Type, String], nodes.Member], typ: nodes.Type, name: String, depth: Int = 0): nodes.Member = {
+    if (depth > 100) {
+      logger.warn("Maximum depth for member access resolution exceeded on type=${typ.fullName}, member=$name. Recursive inheritance?")
+      return null
+    }
+    cache.getOrElse((typ, name), {
+      cache.update((typ, name), null)
+      val members = typ.start.member.filter(_.nameExact(name)).l
+      val res = if (members.size > 0) {
+        cache.update((typ, name), members.head)
+        members.head
+      } else {
+        val recursive_res = typ.start.baseType.l.map { basetyp => getMember(cache, basetyp, name, depth + 1) }
+          .filter {
+            _ != null
+          }
 
-    members.headOption
+        if (recursive_res.size > 0) {
+          cache.update((typ, name), recursive_res.head)
+          recursive_res.head
+        } else null
+      }
+      if (depth == 0 && res == null) {
+        logger.warn(s"Could not find type member. type=${typ.fullName}, member=$name")
+      }
+      res
+    })
   }
+
 }
 
 object MemberAccessLinker {

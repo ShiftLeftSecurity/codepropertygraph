@@ -13,7 +13,7 @@ class Target(val expr: basenodes.Expression) extends AnyRef {
     new ArrayAccessStep(
       expr.ast.isCall
         .nameExact(Operators.computedMemberAccess, Operators.indirectComputedMemberAccess,
-          Operators.indexAccess, Operators.indirectIndexAccess)
+          Operators.indexAccess, Operators.indirectIndexAccess, Operators.pointerShift)
         .map(new nodes.ArrayAccess(_))
         .raw)
 

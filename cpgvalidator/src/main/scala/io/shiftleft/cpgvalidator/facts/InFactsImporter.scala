@@ -52,7 +52,7 @@ class InFactsImporter extends FactsImporter {
       NodeTypes.METHOD_REF has 0 to 1 incoming EdgeTypes.ARGUMENT from NodeTypes.CALL or NodeTypes.RETURN,
       NodeTypes.BINDING has 1 incoming EdgeTypes.BINDS from NodeTypes.TYPE_DECL,
       NodeTypes.FIELD_IDENTIFIER has 1 incoming EdgeTypes.ARGUMENT from NodeTypes.CALL,
-      NodeTypes.FIELD_IDENTIFIER has 0 to 1 incoming EdgeTypes.AST from NodeTypes.CALL
+      NodeTypes.FIELD_IDENTIFIER has 1 incoming EdgeTypes.AST from NodeTypes.CALL
     )
 
 }
