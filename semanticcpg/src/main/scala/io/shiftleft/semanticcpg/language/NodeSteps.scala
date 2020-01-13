@@ -61,9 +61,14 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
     new Steps[Map[String, Any]](raw.map(_.toMap))
 
   /**
-    * Execute traversal and create new (tag,node) pair.
+    * Execute traversal and create new (tag, "") pair.
     * */
-  def newTagNodePair(tagName: String, tagValue: String = ""): NewTagNodePair[NodeType] = {
+  def newTagNode(tagName: String): NewTagNodePair[NodeType] = newTagNodePair(tagName, "")
+
+  /**
+    * Execute traversal and create new (tag, node) pair.
+    * */
+  def newTagNodePair(tagName: String, tagValue: String): NewTagNodePair[NodeType] = {
     new NewTagNodePair[NodeType](
       raw.map { node =>
         nodes.NewTagNodePair(nodes.NewTag(tagName, tagValue), node)
