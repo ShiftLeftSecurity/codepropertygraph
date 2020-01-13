@@ -17,7 +17,7 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
   private var typeDeclFullNameToNode = Map[String, nodes.TypeDeclBase]()
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = new DiffGraph
+    val dstGraph = DiffGraph.newBuilder
 
     init()
 
@@ -35,7 +35,7 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
       }
       .iterate()
 
-    Iterator(dstGraph)
+    Iterator(dstGraph.build())
   }
 
   private def createTypeDeclStub(name: String, fullName: String): nodes.NewTypeDecl = {

@@ -23,7 +23,7 @@ class NamespaceCreator(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val namespaceBlocks = cpg.graph.V.hasLabel(NodeTypes.NAMESPACE_BLOCK).toBuffer
     val blocksByName = namespaceBlocks.groupBy(_.value2(NodeKeys.NAME))
-    val dstGraph = new DiffGraph
+    val dstGraph = DiffGraph.newBuilder
 
     blocksByName.foreach {
       case (name: String, blocks: mutable.Buffer[Vertex]) =>
@@ -34,6 +34,6 @@ class NamespaceCreator(cpg: Cpg) extends CpgPass(cpg) {
             dstGraph.addEdgeFromOriginal(block, namespace, EdgeTypes.REF)
         }
     }
-    Iterator(dstGraph)
+    Iterator(dstGraph.build())
   }
 }

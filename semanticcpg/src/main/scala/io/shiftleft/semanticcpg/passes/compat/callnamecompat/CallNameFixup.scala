@@ -25,7 +25,7 @@ class CallNameFixup(cpg: Cpg) extends CpgPass(cpg) {
           val unqualMethodName = qualMethodName.split("\\.").toList.last
 
           if (unqualMethodName != call.name) {
-            call.property(NodeKeyNames.NAME, unqualMethodName)
+            call.property(NodeKeyNames.NAME, unqualMethodName) // TODO: This should use diffgraph
           }
         }
       }

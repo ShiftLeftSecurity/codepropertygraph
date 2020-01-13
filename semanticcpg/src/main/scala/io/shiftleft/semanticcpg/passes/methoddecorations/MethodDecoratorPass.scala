@@ -24,7 +24,7 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   private[this] var loggedMissingTypeFullName = false
 
   override def run() = {
-    val dstGraph = new DiffGraph
+    val dstGraph = DiffGraph.newBuilder
 
     cpg.graph.V
       .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
@@ -64,7 +64,7 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
           }
       }
       .iterate
-    Iterator(dstGraph)
+    Iterator(dstGraph.build())
   }
 }
 

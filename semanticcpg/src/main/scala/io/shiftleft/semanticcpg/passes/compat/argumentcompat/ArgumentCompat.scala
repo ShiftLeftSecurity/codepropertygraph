@@ -15,18 +15,18 @@ class ArgumentCompat(cpg: Cpg) extends CpgPass(cpg) {
     if (oldFormat) {
       ArgumentCompat.logger.info(s"Using old CPG format not containing ARGUMENT edges.")
 
-      val diffGraph = new DiffGraph
+      val diffGraph = DiffGraph.newBuilder
       val callIterator = cpg.call.toIterator()
       callIterator.foreach(addArgumentEdges(_, diffGraph))
       val returnIterator = cpg.returns.toIterator()
       returnIterator.foreach(addArgumentEdges(_, diffGraph))
-      Iterator(diffGraph)
+      Iterator(diffGraph.build())
     } else {
       Iterator.empty
     }
   }
 
-  private def addArgumentEdges(callOrReturn: nodes.AstNode, diffGraph: DiffGraph): Unit = {
+  private def addArgumentEdges(callOrReturn: nodes.AstNode, diffGraph: DiffGraph.Builder): Unit = {
     callOrReturn._astOut.asScala.foreach { argument =>
       if (!argument._argumentIn().hasNext) {
         diffGraph.addEdgeInOriginal(callOrReturn, argument, EdgeTypes.ARGUMENT)

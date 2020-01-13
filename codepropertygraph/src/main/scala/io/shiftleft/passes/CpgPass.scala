@@ -77,7 +77,7 @@ abstract class CpgPass(cpg: Cpg) {
     try {
       logStart()
       run().map { dstGraph =>
-        val appliedDiffGraph = dstGraph.apply(cpg)
+        val appliedDiffGraph = DiffGraph.Applier.applyDiff(dstGraph, cpg)
         new DiffGraphProtoSerializer().serialize(appliedDiffGraph)
       }
     } finally {
@@ -91,7 +91,7 @@ abstract class CpgPass(cpg: Cpg) {
   def createAndApply(): Unit = {
     logStart()
     try {
-      run().foreach(_.apply(cpg))
+      run().foreach(diff => DiffGraph.Applier.applyDiff(diff, cpg))
     } finally {
       logEnd()
     }
