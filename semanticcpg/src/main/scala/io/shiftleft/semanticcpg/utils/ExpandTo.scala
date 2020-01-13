@@ -22,8 +22,7 @@ object ExpandTo {
       .asInstanceOf[nodes.StoredNode]
       ._receiverOut
       .asScala
-      .toList
-      .headOption
+      .nextOption
   }
 
   def callReceiver(callNode: Vertex): nodes.StoredNode = callReceiverOption(callNode).get
