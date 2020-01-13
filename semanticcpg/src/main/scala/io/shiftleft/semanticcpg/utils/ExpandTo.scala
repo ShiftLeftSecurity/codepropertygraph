@@ -48,16 +48,6 @@ object ExpandTo {
     returnExpression.asInstanceOf[nodes.StoredNode]._astOut.nextOption.map(_.asInstanceOf[nodes.Expression])
   }
 
-  def methodToFormalReturn(method: Vertex): nodes.StoredNode = {
-    method
-      .asInstanceOf[nodes.StoredNode]
-      ._astOut
-      .asScala
-      .filter(_.isInstanceOf[nodes.MethodReturn])
-      .asJava
-      .nextChecked
-  }
-
   def formalReturnToReturn(methodReturn: Vertex): Seq[nodes.StoredNode] = {
     methodReturn
       .asInstanceOf[nodes.StoredNode]

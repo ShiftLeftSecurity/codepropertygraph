@@ -5,12 +5,20 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.ControlStructure
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.AstNode
 import io.shiftleft.semanticcpg.language.types.structure.{Local, MethodParameter}
+import scala.jdk.CollectionConverters._
+import io.shiftleft.Implicits.JavaIteratorDeco
 
 class MethodMethods(val node: nodes.Method) extends AnyVal {
 
   def parameter: MethodParameter = node.start.parameter
 
   def methodReturn: nodes.MethodReturn = node.start.methodReturn.head
+
+  def formalReturn: nodes.MethodReturn =
+    node._astOut.asScala
+      .collect { case mr: nodes.MethodReturn => mr }
+      .asJava
+      .nextChecked
 
   def local: Local = node.start.local
 

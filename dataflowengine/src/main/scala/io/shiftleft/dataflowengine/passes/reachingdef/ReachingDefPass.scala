@@ -88,7 +88,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       }
     }
 
-    val methodReturn = ExpandTo.methodToFormalReturn(method)
+    val methodReturn = method.asInstanceOf[nodes.Method].formalReturn
 
     ExpandTo
       .formalReturnToReturn(methodReturn)
