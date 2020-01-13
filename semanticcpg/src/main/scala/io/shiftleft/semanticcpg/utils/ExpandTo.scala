@@ -52,10 +52,6 @@ object ExpandTo {
     expression.asInstanceOf[nodes.StoredNode]._containsIn.nextChecked
   }
 
-  def localToMethod(local: Vertex): nodes.StoredNode = {
-    local.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
-  }
-
   def hasModifier(methodNode: Vertex, modifierType: String): Boolean = {
     methodNode
       .asInstanceOf[nodes.StoredNode]
