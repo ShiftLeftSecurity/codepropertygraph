@@ -95,7 +95,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       case (node, outDefs) =>
         if (node.isInstanceOf[nodes.Call]) {
           val usesInExpression = dfHelper.getUsesOfExpression(node)
-          val localRefsUses = usesInExpression.map(ExpandTo.reference(_)).filter(_ != None)
+          val localRefsUses = usesInExpression.map(_.reference).filter(_ != None)
 
           /* if use is not an identifier, add edge, as we are going to visit the use separately */
           usesInExpression.foreach { use =>
@@ -119,16 +119,16 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
 
           val nodeIsOperandAssignment = isOperationAndAssignment(node)
           if (nodeIsOperandAssignment) {
-            val localRefGens = dfHelper.getGensOfExpression(node).map(ExpandTo.reference(_))
+            val localRefGens = dfHelper.getGensOfExpression(node).map(_.reference)
             inSet(node)
-              .filter(inElement => localRefGens.contains(ExpandTo.reference(inElement)))
+              .filter(inElement => localRefGens.contains(inElement.reference))
               .foreach { filteredInElement =>
                 dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, node))
               }
           }
 
           for (elem <- outDefs) {
-            val localRefGen = ExpandTo.reference(elem)
+            val localRefGen = elem.reference
 
             dfHelper.getExpressionFromGen(elem).foreach { expressionOfElement =>
               if (expressionOfElement != node && localRefsUses.contains(localRefGen)) {
@@ -138,8 +138,8 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
           }
         } else if (node.isInstanceOf[nodes.Return]) {
           node._astOut.asScala.foreach { returnExpr =>
-            val localRef = ExpandTo.reference(returnExpr)
-            inSet(node).filter(inElement => localRef == ExpandTo.reference(inElement)).foreach { filteredInElement =>
+            val localRef = returnExpr.reference
+            inSet(node).filter(inElement => localRef == inElement.reference).foreach { filteredInElement =>
               dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, node))
             }
           }

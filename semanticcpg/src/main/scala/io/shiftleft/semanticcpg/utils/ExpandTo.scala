@@ -21,7 +21,6 @@ object ExpandTo {
     callNode
       .asInstanceOf[nodes.StoredNode]
       ._receiverOut
-      .asScala
       .nextOption
   }
 
@@ -103,10 +102,6 @@ object ExpandTo {
 
   def allCfgNodesOfMethod(method: Vertex): IterableOnce[nodes.StoredNode] = {
     method.asInstanceOf[nodes.StoredNode]._containsOut.asScala
-  }
-
-  def reference(node: Vertex): Option[nodes.StoredNode] = {
-    node.asInstanceOf[nodes.StoredNode]._refOut.nextOption
   }
 
   def implicitCallToMethod(implicitCall: nodes.ImplicitCall): nodes.Method = {
