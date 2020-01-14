@@ -4,7 +4,8 @@
 
     "nodeKeys" : [
         {"id": 17, "name" : "DEPTH_FIRST_ORDER", "comment" : "The depth first ordering number used to detect back edges in reducible CFGs", "valueType" : "int", "cardinality" : "zeroOrOne"},
-        {"id": 23, "name": "HAS_MAPPING", "comment": "Marks that a method has at least one mapping defined from the policies", "valueType" : "boolean", "cardinality" : "zeroOrOne"}
+        {"id": 23, "name": "HAS_MAPPING", "comment": "Marks that a method has at least one mapping defined from the policies", "valueType" : "boolean", "cardinality" : "zeroOrOne"},
+        {"id": 78, "name": "INTERNAL_FLAGS", "comment": "Internal flags", "valueType" : "int", "cardinality" : "zeroOrOne"}
     ],
 
     // New edge keys introduced by enhancements
@@ -44,19 +45,19 @@
 
         // Modifications to existing node types
 
-        {"name" : "METHOD", "keys" : ["HAS_MAPPING", "DEPTH_FIRST_ORDER"],
+        {"name" : "METHOD", "keys" : ["HAS_MAPPING", "DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
          "outEdges" : [ 
            {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
            {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]}
          ]
         },
-        {"name" : "METHOD_RETURN", "keys" : ["DEPTH_FIRST_ORDER"],
+        {"name" : "METHOD_RETURN", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
          "outEdges" : [
            {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
            {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
            {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]}
         ]},
-        {"name" : "LITERAL", "keys" : ["DEPTH_FIRST_ORDER"],
+        {"name" : "LITERAL", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
         "outEdges" : [
             {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
@@ -75,7 +76,7 @@
         ]
         },
 
-        {"name" : "CALL", "keys" : ["DEPTH_FIRST_ORDER"],
+        {"name" : "CALL", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
          "outEdges" : [
              {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
              {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
@@ -84,7 +85,7 @@
              {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
          ]
         },
-        {"name" : "IDENTIFIER", "keys" : ["DEPTH_FIRST_ORDER"],
+        {"name" : "IDENTIFIER", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
         "outEdges" : [
             {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
@@ -100,13 +101,13 @@
          ]
         },
 
-        {"name" : "RETURN", "keys" : ["DEPTH_FIRST_ORDER"],
+        {"name" : "RETURN", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
             "outEdges": [
                 {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
                 {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]}
             ]
         },
-        {"name" : "BLOCK", "keys" : ["DEPTH_FIRST_ORDER"],
+        {"name" : "BLOCK", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
           "outEdges" : [
              {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
              {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
@@ -114,7 +115,7 @@
              {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
           ]
         },
-        {"name" : "UNKNOWN", "keys" : ["DEPTH_FIRST_ORDER"],
+        {"name" : "UNKNOWN", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
          "outEdges" : [
              {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
              {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
@@ -124,7 +125,7 @@
          ]
         },
         {
-            "name": "METHOD_REF", "keys" : ["DEPTH_FIRST_ORDER"],
+            "name": "METHOD_REF", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
             "outEdges": [
                 {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
                 {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
@@ -142,6 +143,18 @@
               {"localName" : "cfgNode", "nodeType" : "CFG_NODE", "cardinality" : "one"}
             ],
             "outEdges": []
+        },
+        {
+            "name": "CONTROL_STRUCTURE", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"]
+        },
+        {
+            "name": "IMPLICIT_CALL", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"]
+        },
+        {
+            "name": "ANNOTATION_LITERAL", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"]
+        },
+        {
+            "name": "ARRAY_INITIALIZER", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"]
         }
 
     ],
