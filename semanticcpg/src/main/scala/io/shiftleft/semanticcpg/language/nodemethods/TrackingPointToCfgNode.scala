@@ -2,13 +2,14 @@ package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
+import io.shiftleft.semanticcpg.language._
 
 object TrackingPointToCfgNode {
   def apply(node: nodes.TrackingPointBase): nodes.CfgNode =
     node match {
-      case node: nodes.Identifier => ExpandTo.argumentToCallOrReturn(node)
-      case node: nodes.MethodRef  => ExpandTo.argumentToCallOrReturn(node)
-      case node: nodes.Literal    => ExpandTo.argumentToCallOrReturn(node)
+      case node: nodes.Identifier => node.parentExpression
+      case node: nodes.MethodRef  => node.parentExpression
+      case node: nodes.Literal    => node.parentExpression
 
       case node: nodes.MethodParameterIn =>
         ExpandTo.parameterInToMethod(node).asInstanceOf[nodes.CfgNode]
@@ -19,7 +20,7 @@ object TrackingPointToCfgNode {
         methodReturn.asInstanceOf[nodes.CfgNode]
 
       case node: nodes.Call if MemberAccess.isGenericMemberAccessName(node.name) =>
-        ExpandTo.argumentToCallOrReturn(node)
+        node.parentExpression
 
       case node: nodes.Call         => node
       case node: nodes.ImplicitCall => node

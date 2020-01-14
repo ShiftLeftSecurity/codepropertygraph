@@ -15,7 +15,6 @@ import io.shiftleft.semanticcpg.language.nodemethods.{
   WithinMethodMethods
 }
 import io.shiftleft.semanticcpg.language.operatorextension.ArrayAccessTrav
-import io.shiftleft.semanticcpg.language.operatorextension.nodes.ArrayAccess
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
@@ -225,9 +224,6 @@ package object language {
   implicit def toOpsAstNodeTrav2[NodeType <: nodes.AstNode](
       steps: Steps[NodeType]): operatorextension.OpAstNodeTrav[NodeType] =
     new operatorextension.OpAstNodeTrav(steps.raw)
-
-  implicit def toOpAstNode(node: nodes.AstNode): operatorextension.nodes.OpAstNode =
-    new operatorextension.nodes.OpAstNode(node)
 
   // /Operator extension
 

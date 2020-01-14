@@ -5,7 +5,6 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language.Steps
 import io.shiftleft.Implicits.JavaIteratorDeco
-
 import io.shiftleft.codepropertygraph.Cpg
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
@@ -21,12 +20,13 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
   import Linker.logger
 
   private var typeDeclFullNameToNode = Map.empty[String, nodes.StoredNode]
-  private var typeFullNameToNode = Map.empty[String, nodes.StoredNode]
+  private var typeFullNameToNode: collection.immutable.Map[String, nodes.StoredNode] =
+    Map.empty[String, nodes.StoredNode]
   private var methodFullNameToNode = Map.empty[String, nodes.StoredNode]
   private var namespaceBlockFullNameToNode = Map.empty[String, nodes.StoredNode]
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = new DiffGraph
+    val dstGraph = DiffGraph.newBuilder
 
     initMaps()
 
@@ -112,7 +112,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstGraph
     )
 
-    Iterator(dstGraph)
+    Iterator(dstGraph.build())
   }
 
   private def initMaps(): Unit = {
@@ -136,7 +136,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
                            edgeType: String,
                            dstNodeMap: Map[String, nodes.StoredNode],
                            dstFullNameKey: String,
-                           dstGraph: DiffGraph): Unit = {
+                           dstGraph: DiffGraph.Builder): Unit = {
     var loggedDeprecationWarning = false
     val sourceTraversal = cpg.graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*)
     val sourceIterator = new Steps(sourceTraversal).toIterator()
@@ -175,7 +175,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
                                                                 dstNodeMap: Map[String, nodes.StoredNode],
                                                                 getDstFullNames: SRC_NODE_TYPE => Iterable[String],
                                                                 dstFullNameKey: String,
-                                                                dstGraph: DiffGraph): Unit = {
+                                                                dstGraph: DiffGraph.Builder): Unit = {
     var loggedDeprecationWarning = false
     cpg.graph.V
       .hasLabel(srcLabels.head, srcLabels.tail: _*)
@@ -212,9 +212,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       .iterate()
   }
 
-  private def linkAstChildToParent(dstGraph: DiffGraph): Unit = {
-    var loggedDeprecationWarning = false
-
+  private def linkAstChildToParent(dstGraph: DiffGraph.Builder): Unit = {
     cpg.graph.V
       .hasLabel(NodeTypes.METHOD, NodeTypes.TYPE_DECL)
       .sideEffect {
@@ -244,11 +242,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
                                      astChild.label,
                                      astChild.id.toString())
               }
-            case Some(astEdge) if !loggedDeprecationWarning =>
-              logger.info(
-                "Using deprecated CPG format with already existing AST edge between" +
-                  s" ${astEdge.outVertex.label} and ${astChild.label} node.")
-              loggedDeprecationWarning = true
             case _ =>
           }
       }

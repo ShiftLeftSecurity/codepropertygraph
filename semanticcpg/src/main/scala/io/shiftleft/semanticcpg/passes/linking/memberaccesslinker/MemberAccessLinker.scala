@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.linking.memberaccesslinker
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, Operators, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes.{HasArgumentIndex, Identifier}
 import org.apache.logging.log4j.{LogManager, Logger}
@@ -15,10 +15,8 @@ import scala.jdk.CollectionConverters._
   * This pass has Linker as prerequisite.
   */
 class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
-
   import MemberAccessLinker.logger
 
-  val z = Map.empty[Int, Int]
   private[this] var loggedDeprecationWarning: Boolean = _
 
   override def run(): Iterator[DiffGraph] = {
@@ -29,12 +27,12 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
           Operators.fieldAccess, Operators.indirectFieldAccess, Operators.getElementPtr)
       ).toList
     val cache = collection.mutable.Map.empty[Tuple2[nodes.Type, String], nodes.Member]
-    val dstGraph = new DiffGraph() // don't use parallel executor, caching is better
+    val dstGraph = DiffGraph.newBuilder // don't use parallel executor, caching is better
     memberAccessIterator.map(ma => resolve(dstGraph, cache, ma))
-    List(dstGraph).iterator
+    List(dstGraph.build()).iterator
   }
 
-  private def resolve(diffGraph: DiffGraph, cache: collection.mutable.Map[Tuple2[nodes.Type, String], nodes.Member], call: nodes.Call): Unit = {
+  private def resolve(diffGraph: DiffGraph.Builder, cache: collection.mutable.Map[Tuple2[nodes.Type, String], nodes.Member], call: nodes.Call): Unit = {
     if (call._refOut.hasNext && !loggedDeprecationWarning) {
       logger.warn(
         s"Using deprecated CPG format with alreay existing REF edge between" +
@@ -78,7 +76,6 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
           s"Error while obtaining IDENTIFIER associated to member access at ${call}" +
             s" Reason: ${exception.getMessage}")
     }
-
   }
 
   private def getMember(cache: collection.mutable.Map[Tuple2[nodes.Type, String], nodes.Member], typ: nodes.Type, name: String, depth: Int = 0): nodes.Member = {
@@ -109,7 +106,6 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
       res
     })
   }
-
 }
 
 object MemberAccessLinker {

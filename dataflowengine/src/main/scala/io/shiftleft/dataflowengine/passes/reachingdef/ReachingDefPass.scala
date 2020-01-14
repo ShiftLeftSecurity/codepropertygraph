@@ -8,7 +8,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
-import org.apache.tinkerpop.gremlin.structure.Direction
 import io.shiftleft.semanticcpg.language._
 
 import scala.jdk.CollectionConverters._
@@ -22,7 +21,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
     dfHelper = new DataFlowFrameworkHelper(cpg.graph)
 
     new ParallelIteratorExecutor(methods).map { method =>
-      val dstGraph = new DiffGraph()
+      val dstGraph = DiffGraph.newBuilder
       var worklist = Set[nodes.StoredNode]()
       var out = Map[nodes.StoredNode, Set[nodes.StoredNode]]().withDefaultValue(Set[nodes.StoredNode]())
       var in = Map[nodes.StoredNode, Set[nodes.StoredNode]]().withDefaultValue(Set[nodes.StoredNode]())
@@ -65,14 +64,14 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       }
 
       addReachingDefEdge(dstGraph, method, out, in)
-      dstGraph
+      dstGraph.build()
     }
   }
 
   /** Pruned DDG, i.e., two call assignment vertices are adjacent if a
     * reaching definition edge reaches a vertex where the definition is used.
     * The final representation makes it straightforward to build def-use/use-def chains */
-  private def addReachingDefEdge(dstGraph: DiffGraph,
+  private def addReachingDefEdge(dstGraph: DiffGraph.Builder,
                                  method: nodes.StoredNode,
                                  outSet: Map[nodes.StoredNode, Set[nodes.StoredNode]],
                                  inSet: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Unit = {
@@ -111,8 +110,9 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
                */
               if (isIndirectAccess(use)) {
                 outDefs.filter(out => isIndirectAccess(out)).foreach { indirectOutDef =>
-                  if (indirectOutDef.asInstanceOf[nodes.Call].code == use.asInstanceOf[nodes.Call].code) {
-                    val expandedToCall = ExpandTo.argumentToCallOrReturn(indirectOutDef)
+                  val indirectOutCall = indirectOutDef.asInstanceOf[nodes.Call]
+                  if (indirectOutCall.code == use.asInstanceOf[nodes.Call].code) {
+                    val expandedToCall = indirectOutCall.parentExpression
                     addEdge(expandedToCall, use)
                   }
                 }

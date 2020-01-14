@@ -19,7 +19,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
     * Main method of enhancement - to be implemented by child class
     **/
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = new DiffGraph()
+    val dstGraph = DiffGraph.newBuilder
 
     cpg.graph.V
       .hasLabel(NodeTypes.METHOD)
@@ -38,10 +38,10 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
       }
     }
 
-    Iterator(dstGraph)
+    Iterator(dstGraph.build())
   }
 
-  private def linkCall(call: nodes.Call, dstGraph: DiffGraph): Unit = {
+  private def linkCall(call: nodes.Call, dstGraph: DiffGraph.Builder): Unit = {
     val resolvedMethodOption =
       if (call.dispatchType == DispatchTypes.STATIC_DISPATCH) {
         methodFullNameToNode.get(call.methodFullName)
@@ -49,15 +49,21 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
         val receiverIt = call.vertices(Direction.OUT, EdgeTypes.RECEIVER)
         if (receiverIt.hasNext) {
           val receiver = receiverIt.next
-          val receiverTypeDecl = receiver
-            .vertices(Direction.OUT, EdgeTypes.EVAL_TYPE)
-            .nextChecked
-            .vertices(Direction.OUT, EdgeTypes.REF)
-            .nextChecked
 
-          receiverTypeDecl.vertices(Direction.OUT, EdgeTypes.BINDS).asScala.collectFirst {
-            case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
-              binding.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method]
+          receiver match {
+            case methodRefReceiver: nodes.MethodRef =>
+              Some(methodRefReceiver.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method])
+            case _ =>
+              val receiverTypeDecl = receiver
+                .vertices(Direction.OUT, EdgeTypes.EVAL_TYPE)
+                .nextChecked
+                .vertices(Direction.OUT, EdgeTypes.REF)
+                .nextChecked
+
+              receiverTypeDecl.vertices(Direction.OUT, EdgeTypes.BINDS).asScala.collectFirst {
+                case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
+                  binding.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method]
+              }
           }
         } else {
           logger.warn(s"Missing receiver edge on CALL ${call.code}")
