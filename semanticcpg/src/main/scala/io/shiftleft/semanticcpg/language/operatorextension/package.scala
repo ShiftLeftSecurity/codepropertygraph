@@ -44,7 +44,10 @@ package object operatorextension {
     def isArrayAccess: ArrayAccessTrav =
       new ArrayAccessTrav(
         expr.ast.isCall
-          .nameExact(Operators.computedMemberAccess, Operators.indirectComputedMemberAccess, Operators.indexAccess, Operators.indirectIndexAccess)
+          .nameExact(Operators.computedMemberAccess,
+                     Operators.indirectComputedMemberAccess,
+                     Operators.indexAccess,
+                     Operators.indirectIndexAccess)
           .raw)
 
   }
