@@ -195,7 +195,7 @@
         {
             "operator":"indirection",
             "name":"<operator>.indirection",
-            "comment":"Loads or stores to a pointer, i.e. dereferences it. Typically the star-operator in C/C++. Pairs of addressOf and indirection operators cancel each other. Handling of this operator is special-cased in the back-end"
+            "comment":"Accesses through a pointer (load/store), i.e. dereferences it. Typically the star-operator in C/C++. Pairs of addressOf and indirection operators cancel each other. Handling of this operator is special-cased in the back-end"
         },
         {
             "operator":"delete",
@@ -235,7 +235,7 @@
         {
             "operator":"indirectFieldAccess",
             "name":"<operator>.indirectFieldAccess",
-            "comment": "Loads/stores to a field/member of a pointer to a struct/class. Typically, C/C++ arrow-operator. The field selection works the same way as for fieldAccess. For the sake of data-flow tracking, this is the same as first dereferencing the pointer and then accessing the field. Handling of this operator is special-cased in the back-end"
+            "comment": "Accesses (loads/stores) to a field/member through a pointer to a struct/class. Typically, C/C++ arrow-operator. The field selection works the same way as for fieldAccess. For the sake of data-flow tracking, this is the same as first dereferencing the pointer and then accessing the field. Handling of this operator is special-cased in the back-end"
         },
         {
             "operator":"indexAccess",
