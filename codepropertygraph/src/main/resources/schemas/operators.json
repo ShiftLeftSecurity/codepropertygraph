@@ -175,30 +175,30 @@
         {
             "operator":"memberAccess",
             "name":"<operator>.memberAccess",
-            "comment":"E.g. in C: `a.b` but not! in Java"
+            "comment":"Deprecated. Formerly in C: `a.b` but not! in Java"
         },
         {
             "operator":"indirectMemberAccess",
             "name":"<operator>.indirectMemberAccess",
-            "comment":"E.g. in C: `a->b` and `a.b` in Java"
+            "comment":"Deprecated. Formerly in C: `a->b` and `a.b` in Java"
         },
         {
-          "operator":"computedMemberAccess",
-          "name":"<operator>.computedMemberAccess",
-          "comment":"E.g. in C: `a[b]` but not! in Java"
+            "operator":"computedMemberAccess",
+            "name":"<operator>.computedMemberAccess",
+            "comment":"Deprecated. Formerly in C: `a[b]` but not! in Java"
         },
         {
-          "operator":"indirectComputedMemberAccess",
-          "name":"<operator>.indirectComputedMemberAccess",
-          "comment":"E.g. in C++: `a->*b` and a[b] in Java"
+            "operator":"indirectComputedMemberAccess",
+            "name":"<operator>.indirectComputedMemberAccess",
+            "comment":"Deprecated. Formerly in C++: `a->*b` and a[b] in Java"
         },
         {
-          "operator":"indirection",
-          "name":"<operator>.indirection",
-          "comment":"E.g. in C: `*a`"
+            "operator":"indirection",
+            "name":"<operator>.indirection",
+            "comment":"Accesses through a pointer (load/store), i.e. dereferences it. Typically the star-operator in C/C++. Pairs of addressOf and indirection operators cancel each other. Handling of this operator is special-cased in the back-end"
         },
         {
-          "operator":"delete",
+            "operator":"delete",
             "name":"<operator>.delete",
             "comment":"Deletes a property from a namespace. E.g. `a=3; delete a; a == undefined;"
         },
@@ -220,12 +220,42 @@
         {
             "operator":"addressOf",
             "name":"<operator>.addressOf",
-            "comment": "Returns the address of a given object"
+            "comment": "Returns the address of a given object. Pairs of addressOf and indirection operators cancel each other. Handling of this operator is special-cased in the back-end"
         },
         {
             "operator":"sizeOf",
             "name":"<operator>.sizeOf",
             "comment": "Returns the size of a given object"
+        },
+        {
+            "operator":"fieldAccess",
+            "name":"<operator>.fieldAccess",
+            "comment": "Returns or sets a field/member of a struct/class. Typically, the dot-operator. In terms of CPG, the first argument is the struct/class and the second argument is either a FIELD_IDENTIFIER node, a LITERAL node or an arbitrary expression. If it is a FIELD_IDENTIFIER, then the string contained in the CANONICAL_NAME field of this FIELD_IDENTIFIER node selects which field/member is accessed. If it is a LITERAL node, then its CODE selects which field/member is selected. In any other case the access is considered unpredictable by the backend, and we overtaint. indexAccess and fieldAccess live in the same space, such that e.g. obj.field and obj[\"field\"] refer to the same target (as is correct in e.g. javascript). Handling of this operator is special-cased in the back-end"
+        },
+        {
+            "operator":"indirectFieldAccess",
+            "name":"<operator>.indirectFieldAccess",
+            "comment": "Accesses (loads/stores) to a field/member through a pointer to a struct/class. Typically, C/C++ arrow-operator. The field selection works the same way as for fieldAccess. For the sake of data-flow tracking, this is the same as first dereferencing the pointer and then accessing the field. Handling of this operator is special-cased in the back-end"
+        },
+        {
+            "operator":"indexAccess",
+            "name":"<operator>.indexAccess",
+            "comment": "Accesses a container (e.g. array or associative array / dict / map) at an index. The index selection works the same way as for fieldAccess. Handling of this operator is special-cased in the back-end"
+        },
+        {
+            "operator":"indirectIndexAccess",
+            "name":"<operator>.indirectIndexAccess",
+            "comment": "Accesses an element of an Array through a pointer. The index selection works similar as for fieldAccess: However, the index must be an integer. If the second argument is a FIELD_ACCESS resp. LITERAL then its CANONICAL_NAME resp. CODE field is parsed as an integer; on parsing failure, the access is considered unpredictable and we overtaint. This is equivalent to a pointerShift followed by an indirection. This operator is currently only used by C-style languages. This behavior allows the backend to infer that ptr[0] and *ptr refer to the same object. Handling of this operator is special-cased in the back-end"
+        },
+        {
+            "operator":"pointerShift",
+            "name":"<operator>.pointerShift",
+            "comment": "Shifts a pointer. In terms of CPG, the first argument is the pointer and the second argument is the index. The index selection works the same way as for indirectIndexAccess. This operator is currently only used directly by the LLVM language, but it is also used internally for C. For example, pointerShift(ptr, 7) is equivalent to &(ptr[7]). Handling of this operator is special-cased in the back-end"
+        },
+        {
+            "operator":"getElementPtr",
+            "name":"<operator>.getElementPtr",
+            "comment": "Derives a pointer to a field of a struct from a pointer to the entire struct. This corresponds to the C idiom &(ptr->field), which does not access memory. The field selection works the same way as for fieldAccess. This operator is currently only used directly by the LLVM language. Handling of this operator is special-cased in the back-end"
         }
-    ]
+        ]
 }

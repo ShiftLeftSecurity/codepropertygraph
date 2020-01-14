@@ -39,7 +39,7 @@ class CodeDumperTests extends WordSpec with Matchers {
     }
 
     "methodCode should return nothing on invalid filename" in {
-      CodeDumper.code("foo", 1, 2) shouldBe ""
+      CodeDumper.code("fooNonexisting", 1, 2) shouldBe ""
     }
 
     "should allow dumping via .dump" in {

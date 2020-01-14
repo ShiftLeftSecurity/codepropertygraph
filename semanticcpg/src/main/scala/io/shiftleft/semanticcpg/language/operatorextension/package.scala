@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
 import gremlin.scala.GremlinScala
-
+import io.shiftleft.codepropertygraph.generated.Operators
 import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Call, Expression}
 import io.shiftleft.semanticcpg.language.nodemethods.CallMethods
 import io.shiftleft.semanticcpg.language.types.expressions.Identifier
@@ -44,7 +44,10 @@ package object operatorextension {
     def isArrayAccess: ArrayAccessTrav =
       new ArrayAccessTrav(
         expr.ast.isCall
-          .nameExact("<operator>.computedMemberAccess")
+          .nameExact(Operators.computedMemberAccess,
+                     Operators.indirectComputedMemberAccess,
+                     Operators.indexAccess,
+                     Operators.indirectIndexAccess)
           .raw)
 
   }

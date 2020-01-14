@@ -13,7 +13,6 @@ class MemberAccessLinkerTests extends WordSpec with Matchers {
       .has(NodeKeys.NAME -> Operators.indirectMemberAccess)
       .out(EdgeTypes.REF)
       .toList()
-
     queryResult.size shouldBe 1
     queryResult.head.label shouldBe NodeTypes.MEMBER
     queryResult.head.value2(NodeKeys.NAME) shouldBe "aaa"
