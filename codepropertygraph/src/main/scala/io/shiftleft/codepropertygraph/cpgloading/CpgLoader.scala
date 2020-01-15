@@ -18,6 +18,24 @@ object CpgLoader {
     new CpgLoader().load(filename, config)
 
   /**
+    * Load Code Property Graph from an overflow DB file
+    *
+    * @param config loader config
+    *
+    *               This methods loads the CPG from an existing overflow DB file,
+    *               specified in config.overflowDbConfig. In particular, this config
+    *               specifies the filename. For example, to load the database at "foo.db",
+    *               you can issue the following:
+    *
+    * val odbConfig = OdbConfig.withDefaults().withStorageLocation(config.spPath)
+    * val config = CpgLoaderConfig().withOverflowConfig(odbConfig)
+    * CpgLoader.loadFromOverflowDb(config)
+    * */
+  def loadFromOverflowDb(config: CpgLoaderConfig = CpgLoaderConfig()): Cpg = {
+    new CpgLoader().loadFromOverflowDb(config)
+  }
+
+  /**
     * Create any indexes necessary for quick access.
     *
     * @param cpg the CPG to create indexes in
@@ -44,6 +62,12 @@ private class CpgLoader {
 
     val cpg =
       ProtoCpgLoader.loadFromProtoZip(filename, config.overflowDbConfig)
+    if (config.createIndexes) { createIndexes(cpg) }
+    cpg
+  }
+
+  def loadFromOverflowDb(config: CpgLoaderConfig = CpgLoaderConfig()): Cpg = {
+    val cpg = new ProtoToCpg(config.overflowDbConfig).build()
     if (config.createIndexes) { createIndexes(cpg) }
     cpg
   }
