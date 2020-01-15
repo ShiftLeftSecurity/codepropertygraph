@@ -16,7 +16,7 @@ object TrackingPointToCfgNode {
 
       case node: nodes.MethodParameterOut =>
         val method = ExpandTo.parameterInToMethod(node)
-        method.asInstanceOf[nodes.Method].formalReturn
+        method.asInstanceOf[nodes.Method].methodReturn
 
       case node: nodes.Call if MemberAccess.isGenericMemberAccessName(node.name) =>
         node.parentExpression

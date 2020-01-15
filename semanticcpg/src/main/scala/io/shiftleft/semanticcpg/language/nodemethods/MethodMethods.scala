@@ -12,9 +12,7 @@ class MethodMethods(val node: nodes.Method) extends AnyVal {
 
   def parameter: MethodParameter = node.start.parameter
 
-  def methodReturn: nodes.MethodReturn = node.start.methodReturn.head
-
-  def formalReturn: nodes.MethodReturn =
+  def methodReturn: nodes.MethodReturn =
     node._astOut.asScala
       .collect { case mr: nodes.MethodReturn => mr }
       .asJava

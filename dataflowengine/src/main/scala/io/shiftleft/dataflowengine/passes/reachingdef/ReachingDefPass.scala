@@ -88,7 +88,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       }
     }
 
-    val methodReturn = method.asInstanceOf[nodes.Method].formalReturn
+    val methodReturn = method.asInstanceOf[nodes.Method].methodReturn
     methodReturn.toReturn.foreach(returnVertex => addEdge(returnVertex, methodReturn))
 
     outSet.foreach {
