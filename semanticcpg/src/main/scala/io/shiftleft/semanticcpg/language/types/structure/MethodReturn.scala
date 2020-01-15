@@ -37,4 +37,9 @@ class MethodReturn(raw: GremlinScala[nodes.MethodReturn])
     * */
   def typ: Type =
     new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+
+  def toReturn: NodeSteps[nodes.Return] =
+    new NodeSteps(raw.flatMap { mr =>
+      __(mr.toReturn: _*)
+    })
 }
