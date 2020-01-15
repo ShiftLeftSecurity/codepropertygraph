@@ -76,7 +76,7 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
     }
   }
 
-  def parentAst: nodes.AstNode =
+  def astParent: nodes.AstNode =
     node._astIn.nextChecked.asInstanceOf[nodes.AstNode]
 
 }
