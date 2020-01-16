@@ -39,7 +39,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstNodeLabel = NodeTypes.TYPE_DECL,
       edgeType = EdgeTypes.REF,
       dstNodeMap = typeDeclFullNameToNode,
-      dstFullNameKey = nodes.Type.Keys.TypeDeclFullName,
+      dstFullNameKey = nodes.Type.PropertyNames.TypeDeclFullName,
       dstGraph
     )
 
@@ -74,7 +74,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstNodeLabel = NodeTypes.METHOD,
       edgeType = EdgeTypes.REF,
       dstNodeMap = methodFullNameToNode,
-      dstFullNameKey = nodes.MethodRef.Keys.MethodFullName,
+      dstFullNameKey = nodes.MethodRef.PropertyNames.MethodFullName,
       dstGraph
     )
 
@@ -93,7 +93,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
           Seq()
         }
       },
-      dstFullNameKey = nodes.TypeDecl.Keys.InheritsFromTypeFullName,
+      dstFullNameKey = nodes.TypeDecl.PropertyNames.InheritsFromTypeFullName,
       dstGraph
     )
 

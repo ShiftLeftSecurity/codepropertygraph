@@ -8,6 +8,6 @@ import io.shiftleft.overflowdb.OdbConfig
 object OverflowDbTestInstance {
 
   def create =
-    OdbGraph.open(OdbConfig.withoutOverflow, nodes.Factories.AllAsJava, edges.Factories.AllAsJava)
+    OdbGraph.open(OdbConfig.withoutOverflow, nodes.Factories.allAsJava, edges.Factories.allAsJava)
 
 }
