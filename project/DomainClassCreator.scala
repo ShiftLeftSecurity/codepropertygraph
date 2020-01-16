@@ -486,10 +486,15 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
           s"""override def $name = get().$name"""
         }.mkString("\n")
         val containedNodesDelegators = nodeType.containedNodes
-        s"""class ${nodeType.className}(graph: OdbGraph, id: Long) extends NodeRef[${nodeType.classNameDb}](graph, id) with ${nodeType.className}Base with StoredNode $mixinTraits {
-           |$propertyDelegators
-           |$delegatingContainedNodeAccessors
-           |$neighborDelegators
+        s"""class ${nodeType.className}(graph: OdbGraph, id: Long)
+           |  extends NodeRef[${nodeType.classNameDb}](graph, id)
+           |  with NodeRefOps[${nodeType.className}]
+           |  with ${nodeType.className}Base
+           |  with StoredNode
+           |  $mixinTraits {
+           |  $propertyDelegators
+           |  $delegatingContainedNodeAccessors
+           |  $neighborDelegators
            |  override def valueMap: JMap[String, AnyRef] = get.valueMap
            |  override def canEqual(that: Any): Boolean = get.canEqual(that)
            |  override def label: String = {
