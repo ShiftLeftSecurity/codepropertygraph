@@ -47,40 +47,39 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       schema.edgeTypes.map(edge => generateEdgeSource(edge, edge.keys.map(propertyByName)))
 
     def edgeHeader = {
-      val staticHeader = s"""
-      package $edgesPackage
-
-      import java.lang.{Boolean => JBoolean, Long => JLong}
-      import java.util.{Set => JSet}
-      import java.util.{List => JList}
-      import org.apache.tinkerpop.gremlin.structure.Property
-      import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
-      import io.shiftleft.overflowdb.{EdgeLayoutInformation, EdgeFactory, NodeFactory, OdbEdge, OdbNode, OdbGraph, NodeRef}
-      import scala.jdk.CollectionConverters._
-      import org.slf4j.LoggerFactory
-
-      object PropertyErrorRegister {
-        private var errorMap = Set[(Class[_], String)]()
-        private val logger = LoggerFactory.getLogger(getClass)
-
-        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
-          if (!errorMap.contains((clazz, propertyName))) {
-            logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
-            errorMap += ((clazz, propertyName))
-          }
-        }
-      }
-      """
+      val staticHeader =
+        s"""package $edgesPackage
+           | 
+           |import java.lang.{Boolean => JBoolean, Long => JLong}
+           |import java.util.{Set => JSet}
+           |import java.util.{List => JList}
+           |import org.apache.tinkerpop.gremlin.structure.Property
+           |import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
+           |import io.shiftleft.overflowdb.{EdgeLayoutInformation, EdgeFactory, NodeFactory, OdbEdge, OdbNode, OdbGraph, NodeRef}
+           |import scala.jdk.CollectionConverters._
+           |import org.slf4j.LoggerFactory
+           |
+           |object PropertyErrorRegister {
+           |  private var errorMap = Set[(Class[_], String)]()
+           |  private val logger = LoggerFactory.getLogger(getClass)
+           |
+           |  def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
+           |    if (!errorMap.contains((clazz, propertyName))) {
+           |      logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
+           |      errorMap += ((clazz, propertyName))
+           |    }
+           |  }
+           |}
+           |""".stripMargin
 
       val factories = {
         val edgeFactories: List[String] =
           schema.edgeTypes.map(edgeType => edgeType.className + ".Factory")
-        s"""
-        object Factories {
-          lazy val All: List[EdgeFactory[_]] = ${edgeFactories}
-          lazy val AllAsJava: java.util.List[EdgeFactory[_]] = All.asJava
-        }
-        """
+        s"""object Factories {
+           |  lazy val All: List[EdgeFactory[_]] = $edgeFactories
+           |  lazy val AllAsJava: java.util.List[EdgeFactory[_]] = All.asJava
+           |}
+           |""".stripMargin
       }
 
       staticHeader + factories
@@ -95,26 +94,26 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
         }
         .mkString(",\n")
 
-      val companionObject = s"""
-      |object $edgeClassName {
-      |  val Label = "${edgeType.name}"
-      |  object Keys {
-      |    val All: JSet[String] = Set(${keysQuoted.mkString(", ")}).asJava
-      |    val KeyToValue: Map[String, $edgeClassName => Any] = Map(
-      |      $keyToValueMap
-      |    )
-      |  }
-      |
-      |  val layoutInformation = new EdgeLayoutInformation(Label, Keys.All)
-      |
-      |  val Factory = new EdgeFactory[${edgeClassName}] {
-      |    override val forLabel = $edgeClassName.Label
-      |
-      |    override def createEdge(graph: OdbGraph, outNode: NodeRef[OdbNode], inNode: NodeRef[OdbNode]) =
-      |      new ${edgeClassName}(graph, outNode, inNode)
-      |  }
-      |}
-      """.stripMargin
+      val companionObject =
+        s"""object $edgeClassName {
+           |  val Label = "${edgeType.name}"
+           |  object Keys {
+           |    val All: JSet[String] = Set(${keysQuoted.mkString(", ")}).asJava
+           |    val KeyToValue: Map[String, $edgeClassName => Any] = Map(
+           |      $keyToValueMap
+           |    )
+           |  }
+           |
+           |  val layoutInformation = new EdgeLayoutInformation(Label, Keys.All)
+           |
+           |  val Factory = new EdgeFactory[${edgeClassName}] {
+           |    override val forLabel = $edgeClassName.Label
+           |
+           |    override def createEdge(graph: OdbGraph, outNode: NodeRef[OdbNode], inNode: NodeRef[OdbNode]) =
+           |      new ${edgeClassName}(graph, outNode, inNode)
+           |  }
+           |}
+           |""".stripMargin
 
       def propertyBasedFieldAccessors(properties: List[Property]): String =
         properties.map { property =>
@@ -142,13 +141,12 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
           }
         }.mkString("\n\n")
 
-      val classImpl = s"""
-      class ${edgeClassName}(_graph: OdbGraph, _outNode: NodeRef[OdbNode], _inNode: NodeRef[OdbNode])
-          extends OdbEdge(_graph, $edgeClassName.Label, _outNode, _inNode, $edgeClassName.Keys.All) {
-
-        ${propertyBasedFieldAccessors(keys)}
-      }
-      """
+      val classImpl =
+        s"""class ${edgeClassName}(_graph: OdbGraph, _outNode: NodeRef[OdbNode], _inNode: NodeRef[OdbNode])
+           |extends OdbEdge(_graph, $edgeClassName.Label, _outNode, _inNode, $edgeClassName.Keys.All) {
+           |${propertyBasedFieldAccessors(keys)}
+           |}
+           |""".stripMargin
 
       companionObject  + classImpl
     }
@@ -158,7 +156,6 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
   }
 
   def neighborAccessorName(edgetypename: String, direction: String) : String = {"_" + camelCase(edgetypename + "_" + direction)}
-
 
   def writeNodesFile(outputDir: JFile): JFile = {
     val propertyByName: Map[String, Property] =
@@ -178,65 +175,65 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
         s"def ${nbname}(): JIterator[StoredNode] = { JCollections.emptyIterator() }").mkString("\n")
 
 
-      val staticHeader = s"""
-      package $nodesPackage
-
-      import gremlin.scala._
-      import $basePackage.EdgeKeys
-      import $basePackage.edges
-      import $basePackage.edges._
-      import java.lang.{Boolean => JBoolean, Long => JLong}
-      import java.util.{Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
-      import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
-      import io.shiftleft.overflowdb.{EdgeFactory, NodeFactory, NodeLayoutInformation, OdbNode, OdbGraph, OdbNodeProperty, NodeRef}
-      import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
-      import scala.jdk.CollectionConverters._
-      import org.slf4j.LoggerFactory
-
-      object PropertyErrorRegister {
-        private var errorMap = Set[(Class[_], String)]()
-        private val logger = LoggerFactory.getLogger(getClass)
-
-        def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
-          if (!errorMap.contains((clazz, propertyName))) {
-            logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
-            errorMap += ((clazz, propertyName))
-          }
-        }
-      }
-
-      trait Node extends Product {
-        def label: String
-        def getId: JLong
-
-        /** labels of product elements, used e.g. for pretty-printing */
-        def productElementLabel(n: Int): String
-      }
-
-      /* a node that stored inside an OdbGraph (rather than e.g. DiffGraph) */
-      trait StoredNode extends Vertex with Node {
-        /* underlying vertex in the graph database. 
-         * since this is a StoredNode, this is always set */
-        def underlying: Vertex = this
-
-        // Java does not seem to be capable of calling methods from java classes if a scala trait is in the inheritance
-        // chain.
-        override def getId: JLong = underlying.id.asInstanceOf[JLong]
-
-        /* all properties plus label and id */
-        def toMap: Map[String, Any] = {
-          val map = valueMap
-          map.put("_label", label)
-          map.put("_id", getId)
-          map.asScala.toMap
-        }
-
-        /* all properties */
-        def valueMap: JMap[String, AnyRef]
-$neighborAccesors
-      }
-
-      """
+      val staticHeader =
+        s"""package $nodesPackage
+           |
+           |import gremlin.scala._
+           |import $basePackage.EdgeKeys
+           |import $basePackage.edges
+           |import $basePackage.edges._
+           |import java.lang.{Boolean => JBoolean, Long => JLong}
+           |import java.util.{Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
+           |import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
+           |import io.shiftleft.overflowdb.{EdgeFactory, NodeFactory, NodeLayoutInformation, OdbNode, OdbGraph, OdbNodeProperty, NodeRef}
+           |import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
+           |import scala.jdk.CollectionConverters._
+           |import org.slf4j.LoggerFactory
+           |
+           |object PropertyErrorRegister {
+           |  private var errorMap = Set[(Class[_], String)]()
+           |  private val logger = LoggerFactory.getLogger(getClass)
+           |
+           |  def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
+           |    if (!errorMap.contains((clazz, propertyName))) {
+           |      logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
+           |      errorMap += ((clazz, propertyName))
+           |    }
+           |  }
+           |}
+           |
+           |trait Node extends Product {
+           |  def label: String
+           |  def getId: JLong
+           |
+           |  /** labels of product elements, used e.g. for pretty-printing */
+           |  def productElementLabel(n: Int): String
+           |}
+           |
+           |/* a node that stored inside an OdbGraph (rather than e.g. DiffGraph) */
+           |trait StoredNode extends Vertex with Node {
+           |  /* underlying vertex in the graph database. 
+           |   * since this is a StoredNode, this is always set */
+           |  def underlying: Vertex = this
+           |
+           |  // Java does not seem to be capable of calling methods from java classes if a scala trait is in the inheritance
+           |  // chain.
+           |  override def getId: JLong = underlying.id.asInstanceOf[JLong]
+           |
+           |  /* all properties plus label and id */
+           |  def toMap: Map[String, Any] = {
+           |    val map = valueMap
+           |    map.put("_label", label)
+           |    map.put("_id", getId)
+           |    map.asScala.toMap
+           |  }
+           |
+           |  /* all properties */
+           |  def valueMap: JMap[String, AnyRef]
+           |
+           |  $neighborAccesors
+           |}
+           |""".stripMargin
 
       val nodeBaseTraits = schema.nodeBaseTraits.map { nodeBaseTrait =>
         val mixins = nodeBaseTrait.hasKeys.map { key =>
@@ -259,7 +256,7 @@ $neighborAccesors
 
         s"""trait ${nodeBaseTrait.className}Base extends Node $mixins $mixinTraitsForBase
            |trait ${nodeBaseTrait.className} extends StoredNode with ${nodeBaseTrait.className}Base $mixinTraits
-        """.stripMargin
+           |""".stripMargin
       }.mkString("\n")
 
       val keyBasedTraits =
@@ -268,17 +265,16 @@ $neighborAccesors
           val camelCaseCapitalized = camelCaseName.capitalize
           val tpe = getCompleteType(property)
           s"trait Has$camelCaseCapitalized { def $camelCaseName: $tpe }"
-        }.mkString("\n")
+        }.mkString("\n") + "\n"
 
       val factories = {
         val nodeFactories: List[String] =
           schema.nodeTypes.map(nodeType => nodeType.className + ".Factory")
-        s"""
-        object Factories {
-          lazy val All: List[NodeFactory[_]] = ${nodeFactories}
-          lazy val AllAsJava: java.util.List[NodeFactory[_]] = All.asJava
-        }
-        """
+        s"""object Factories {
+           |  lazy val All: List[NodeFactory[_]] = ${nodeFactories}
+           |  lazy val AllAsJava: java.util.List[NodeFactory[_]] = All.asJava
+           |}
+           |""".stripMargin
       }
 
       staticHeader + nodeBaseTraits + keyBasedTraits + factories
@@ -312,42 +308,39 @@ $neighborAccesors
       val outEdgeLayouts = outEdges.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
       val inEdgeLayouts = inEdges.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
 
-      val companionObject = s"""
-      object ${nodeType.className} {
-
-        def apply(graph: OdbGraph, id: Long) = new ${nodeType.className}(graph, id)
-
-        val layoutInformation = new NodeLayoutInformation(
-          Keys.All,
-          List($outEdgeLayouts).asJava,
-          List($inEdgeLayouts).asJava)
-
-        val Label = "${nodeType.name}"
-        object Keys {
-          $keyConstants
-          val All: JSet[String] = Set(${keys.map { key =>
-            camelCaseCaps(key.name)
-          }
-          .mkString(", ")}).asJava
-            val KeyToValue: Map[String, ${nodeType.classNameDb} => Any] = Map(
-              $keyToValueMap
-            )
-          }
-        object Edges {
-          val In: Array[String] = Array(${inEdges.map('"' + _ + '"').mkString(",")})
-          val Out: Array[String] = Array(${outEdges.map('"' + _ + '"').mkString(",")})
-        }
-
-        val Factory = new NodeFactory[${nodeType.classNameDb}] {
-          override val forLabel = ${nodeType.className}.Label
-
-          override def createNode(ref: NodeRef[${nodeType.classNameDb}]) =
-            new ${nodeType.classNameDb}(ref.asInstanceOf[NodeRef[OdbNode]])
-
-          override def createNodeRef(graph: OdbGraph, id: Long) = ${nodeType.className}(graph, id)
-        }
-      }
-      """
+      val companionObject =
+        s"""object ${nodeType.className} {
+           |
+           |  def apply(graph: OdbGraph, id: Long) = new ${nodeType.className}(graph, id)
+           |
+           |  val layoutInformation = new NodeLayoutInformation(
+           |    Keys.All,
+           |    List($outEdgeLayouts).asJava,
+           |    List($inEdgeLayouts).asJava)
+           |
+           |  val Label = "${nodeType.name}"
+           |  object Keys {
+           |    $keyConstants
+           |    val All: JSet[String] = Set(${keys.map { key => camelCaseCaps(key.name) }.mkString(", ") }).asJava
+           |      val KeyToValue: Map[String, ${nodeType.classNameDb} => Any] = Map(
+           |        $keyToValueMap
+           |      )
+           |    }
+           |  object Edges {
+           |    val In: Array[String] = Array(${inEdges.map('"' + _ + '"').mkString(",")})
+           |    val Out: Array[String] = Array(${outEdges.map('"' + _ + '"').mkString(",")})
+           |  }
+           |
+           |  val Factory = new NodeFactory[${nodeType.classNameDb}] {
+           |    override val forLabel = ${nodeType.className}.Label
+           |
+           |    override def createNode(ref: NodeRef[${nodeType.classNameDb}]) =
+           |      new ${nodeType.classNameDb}(ref.asInstanceOf[NodeRef[OdbNode]])
+           |
+           |    override def createNodeRef(graph: OdbGraph, id: Long) = ${nodeType.className}(graph, id)
+           |  }
+           |}
+           |""".stripMargin
 
       val mixinTraits: String =
         nodeType.is
@@ -405,15 +398,14 @@ $neighborAccesors
                 case Cardinality.List      => s".toList"
               }
 
-              s"""
-              /** link to 'contained' node of type $containedNodeType */
-              def ${containedNode.localName}: $completeType =
-                edges(Direction.OUT, "CONTAINS_NODE").asScala.toList
-                  .filter(_.valueOption(EdgeKeys.LOCAL_NAME).map(_  == "${containedNode.localName}").getOrElse(false))
-                  .sortBy(_.valueOption(EdgeKeys.INDEX))
-                  .map(_.inVertex.asInstanceOf[$containedNodeType])
-                  $traversalEnding
-              """
+              s"""/** link to 'contained' node of type $containedNodeType */
+                 |def ${containedNode.localName}: $completeType =
+                 |  edges(Direction.OUT, "CONTAINS_NODE").asScala.toList
+                 |    .filter(_.valueOption(EdgeKeys.LOCAL_NAME).map(_  == "${containedNode.localName}").getOrElse(false))
+                 |    .sortBy(_.valueOption(EdgeKeys.INDEX))
+                 |    .map(_.inVertex.asInstanceOf[$containedNodeType])
+                 |    $traversalEnding
+                 |""".stripMargin
             }.mkString("\n")
           }
           .getOrElse("")
@@ -460,29 +452,29 @@ $neighborAccesors
         }
         .getOrElse("")
 
-      val nodeBaseImpl = s"""
-      |trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
-      |  def asStored : StoredNode = this.asInstanceOf[StoredNode]
-      |  override def getId: JLong = -1L
-      |
-      |  $abstractContainedNodeAccessors
-      |
-      |  override def productElementLabel(n: Int): String =
-      |      n match {
-      |        case 0 => "id"
-      |        $productElementLabels
-      |      }
-
-      |  override def productElement(n: Int): Any =
-      |      n match {
-      |        case 0 => getId
-      |        $productElementAccessors
-      |      }
-      |
-      |  override def productPrefix = "${nodeType.className}"
-      |  override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
-      |  
-      |}""".stripMargin
+      val nodeBaseImpl =
+        s"""trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
+           |  def asStored : StoredNode = this.asInstanceOf[StoredNode]
+           |  override def getId: JLong = -1L
+           |
+           |  $abstractContainedNodeAccessors
+           |
+           |  override def productElementLabel(n: Int): String =
+           |      n match {
+           |        case 0 => "id"
+           |        $productElementLabels
+           |      }
+           |
+           |  override def productElement(n: Int): Any =
+           |      n match {
+           |        case 0 => getId
+           |        $productElementAccessors
+           |      }
+           |
+           |  override def productPrefix = "${nodeType.className}"
+           |  override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
+           |}
+           |""".stripMargin
 
       val neighborDelegators = (outEdges.map(edgetypename => neighborAccessorName(edgetypename, "OUT")) ++
                                 inEdges.map(edgetypename => neighborAccessorName(edgetypename, "IN"))).map(nbaName =>
@@ -493,83 +485,82 @@ $neighborAccesors
           s"""override def $name = get().$name"""
         }.mkString("\n")
         val containedNodesDelegators = nodeType.containedNodes
-        s"""
-          |class ${nodeType.className}(graph: OdbGraph, id: Long) extends NodeRef[${nodeType.classNameDb}](graph, id) with ${nodeType.className}Base with StoredNode $mixinTraits {
-          |$propertyDelegators
-          |$delegatingContainedNodeAccessors
-          |$neighborDelegators
-          |  override def valueMap: JMap[String, AnyRef] = get.valueMap
-          |  override def canEqual(that: Any): Boolean = get.canEqual(that)
-          |  override def label: String = {
-          |    ${nodeType.className}.Label
-          |  }
-          |}""".stripMargin
+        s"""class ${nodeType.className}(graph: OdbGraph, id: Long) extends NodeRef[${nodeType.classNameDb}](graph, id) with ${nodeType.className}Base with StoredNode $mixinTraits {
+           |$propertyDelegators
+           |$delegatingContainedNodeAccessors
+           |$neighborDelegators
+           |  override def valueMap: JMap[String, AnyRef] = get.valueMap
+           |  override def canEqual(that: Any): Boolean = get.canEqual(that)
+           |  override def label: String = {
+           |    ${nodeType.className}.Label
+           |  }
+           |}
+           |""".stripMargin
       }
       val neighborAccesors = (outEdges.map(edgetypename => neighborAccessorName(edgetypename, "OUT")) ++
         inEdges.map(edgetypename => neighborAccessorName(edgetypename, "IN")) ).zipWithIndex.map{case (nbaName: String, offsetPos: Int) =>
           s"override def $nbaName : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[StoredNode]]"
       }.mkString("\n")
 
-      val classImpl = s"""
-      class ${nodeType.classNameDb}(ref: NodeRef[OdbNode]) extends OdbNode(ref) with StoredNode 
-        $mixinTraits with ${nodeType.className}Base {
-
-        override def layoutInformation: NodeLayoutInformation = ${nodeType.className}.layoutInformation
-        override def getId = ref.id
-
-        /* all properties */
-        override def valueMap: JMap[String, AnyRef] = $valueMapImpl
-
-        ${propertyBasedFields(keys)}
-${neighborAccesors}
-
-
-        override def label: String = {
-          ${nodeType.className}.Label
-        }
-
-        override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[${nodeType.classNameDb}]
-
-        /* performance optimisation to save instantiating an iterator for each property lookup */
-        override protected def specificProperty[A](key: String): VertexProperty[A] = {
-          ${nodeType.className}.Keys.KeyToValue.get(key) match {
-            case None => VertexProperty.empty[A]
-            case Some(fieldAccess) => 
-              fieldAccess(this) match {
-                case null | None => VertexProperty.empty[A]
-                case values: List[_] => throw Vertex.Exceptions.multiplePropertiesExistForProvidedKey(key)
-                case Some(value) => new OdbNodeProperty(-1, this, key, value.asInstanceOf[A])
-                case value => new OdbNodeProperty(-1, this, key, value.asInstanceOf[A])
-              }
-          }
-        }
-
-        override protected def specificProperties[A](key: String): JIterator[VertexProperty[A]] = {
-          ${nodeType.className}.Keys.KeyToValue.get(key) match {
-            case None => JCollections.emptyIterator[VertexProperty[A]]
-            case Some(fieldAccess) => 
-              fieldAccess(this) match {
-                case null => JCollections.emptyIterator[VertexProperty[A]]
-                case values: List[_] => 
-                  values.map { value => 
-                    new OdbNodeProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
-                  }.iterator.asJava
-                case value => IteratorUtils.of(new OdbNodeProperty(-1, this, key, value.asInstanceOf[A]))
-              }
-          }
-        }
-
-        override protected def updateSpecificProperty[A](cardinality: VertexProperty.Cardinality, key: String, value: A): VertexProperty[A] = {
-          ${updateSpecificPropertyBody(keys)}
-          new OdbNodeProperty(-1, this, key, value)
-        }
-
-        override protected def removeSpecificProperty(key: String): Unit =
-          ${removeSpecificPropertyBody(keys)}
-
-        $containedNodesAsMembers
-      }
-      """
+      val classImpl =
+        s"""class ${nodeType.classNameDb}(ref: NodeRef[OdbNode]) extends OdbNode(ref) with StoredNode 
+           |  $mixinTraits with ${nodeType.className}Base {
+           |
+           |  override def layoutInformation: NodeLayoutInformation = ${nodeType.className}.layoutInformation
+           |  override def getId = ref.id
+           |
+           |  /* all properties */
+           |  override def valueMap: JMap[String, AnyRef] = $valueMapImpl
+           |
+           |  ${propertyBasedFields(keys)}
+           |  ${neighborAccesors}
+           |
+           |  override def label: String = {
+           |    ${nodeType.className}.Label
+           |  }
+           |
+           |  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[${nodeType.classNameDb}]
+           |
+           |  /* performance optimisation to save instantiating an iterator for each property lookup */
+           |  override protected def specificProperty[A](key: String): VertexProperty[A] = {
+           |    ${nodeType.className}.Keys.KeyToValue.get(key) match {
+           |      case None => VertexProperty.empty[A]
+           |      case Some(fieldAccess) => 
+           |        fieldAccess(this) match {
+           |          case null | None => VertexProperty.empty[A]
+           |          case values: List[_] => throw Vertex.Exceptions.multiplePropertiesExistForProvidedKey(key)
+           |          case Some(value) => new OdbNodeProperty(-1, this, key, value.asInstanceOf[A])
+           |          case value => new OdbNodeProperty(-1, this, key, value.asInstanceOf[A])
+           |        }
+           |    }
+           |  }
+           |
+           |  override protected def specificProperties[A](key: String): JIterator[VertexProperty[A]] = {
+           |    ${nodeType.className}.Keys.KeyToValue.get(key) match {
+           |      case None => JCollections.emptyIterator[VertexProperty[A]]
+           |      case Some(fieldAccess) => 
+           |        fieldAccess(this) match {
+           |          case null => JCollections.emptyIterator[VertexProperty[A]]
+           |          case values: List[_] => 
+           |            values.map { value => 
+           |              new OdbNodeProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
+           |            }.iterator.asJava
+           |          case value => IteratorUtils.of(new OdbNodeProperty(-1, this, key, value.asInstanceOf[A]))
+           |        }
+           |    }
+           |  }
+           |
+           |  override protected def updateSpecificProperty[A](cardinality: VertexProperty.Cardinality, key: String, value: A): VertexProperty[A] = {
+           |    ${updateSpecificPropertyBody(keys)}
+           |    new OdbNodeProperty(-1, this, key, value)
+           |  }
+           |
+           |  override protected def removeSpecificProperty(key: String): Unit =
+           |    ${removeSpecificPropertyBody(keys)}
+           |
+           |  $containedNodesAsMembers
+           |}
+      |""".stripMargin
 
       s"\n//${nodeType.name} BEGIN\n" + companionObject + nodeBaseImpl + nodeRefImpl + classImpl + s"\n//${nodeType.name} END\n"
     }
@@ -582,20 +573,20 @@ ${neighborAccesors}
     * this ability could have been added to the existing nodes, but it turned out as a different specialisation,
     * since e.g. `id` is not set before adding it to the graph */
   def writeNewNodesFile(outputDir: JFile): JFile = {
-    val staticHeader = s"""
-    |package $nodesPackage
-
-    |import java.lang.{Boolean => JBoolean, Long => JLong}
-    |import java.util.{Map => JMap, Set => JSet}
-
-    |/** base type for all nodes that can be added to a graph, e.g. the diffgraph */
-    |trait NewNode extends Node {
-    |  override def label: String
-    |  def properties: Map[String, Any]
-    |  def containedNodesByLocalName: Map[String, List[Node]]
-    |  def allContainedNodes: List[Node] = containedNodesByLocalName.values.flatten.toList
-    |}
-    """.stripMargin
+    val staticHeader =
+      s"""package $nodesPackage
+         |
+         |import java.lang.{Boolean => JBoolean, Long => JLong}
+         |import java.util.{Map => JMap, Set => JSet}
+         |
+         |/** base type for all nodes that can be added to a graph, e.g. the diffgraph */
+         |trait NewNode extends Node {
+         |  override def label: String
+         |  def properties: Map[String, Any]
+         |  def containedNodesByLocalName: Map[String, List[Node]]
+         |  def allContainedNodes: List[Node] = containedNodesByLocalName.values.flatten.toList
+         |}
+         |""".stripMargin
 
     val propertyByName: Map[String, Property] =
       schema.nodeKeys.map(prop => prop.name -> prop).toMap
@@ -644,17 +635,13 @@ ${neighborAccesors}
             }
             .mkString(",\n")
 
-          val baseCase = s"""
-            Map($forKeys).asInstanceOf[Map[String, Any]].filterNot { case (k,v) =>
-                v == null || v == None
-              }
-            """
+          val baseCase = s"""Map($forKeys).asInstanceOf[Map[String, Any]].filterNot { case (k,v) => v == null || v == None } """
           if (!containsOptionals) baseCase
           else baseCase + s""".map {
-              case (k, v: Option[_]) => (k,v.get)
-              case other => other
-            }
-          """
+                             |  case (k, v: Option[_]) => (k,v.get)
+                             |  case other => other
+                             |}
+                             |""".stripMargin
       }
 
       val containedNodesByLocalName: String = {
@@ -676,13 +663,12 @@ ${neighborAccesors}
       }
 
 
-      s"""
-      case class New${nodeType.className}($fields) extends NewNode with ${nodeType.className}Base {
-        override val label = "${nodeType.name}"
-        override val properties: Map[String, Any] = $propertiesImpl
-        override def containedNodesByLocalName: Map[String, List[Node]] = $containedNodesByLocalName
-      }
-      """
+      s"""case class New${nodeType.className}($fields) extends NewNode with ${nodeType.className}Base {
+         |  override val label = "${nodeType.name}"
+         |  override val properties: Map[String, Any] = $propertiesImpl
+         |  override def containedNodesByLocalName: Map[String, List[Node]] = $containedNodesByLocalName
+         |}
+         |""".stripMargin
     }
 
     val filename = outputDir.getPath + "/" + nodesPackage.replaceAll("\\.", "/") + "/NewNodes.scala"
@@ -832,20 +818,19 @@ object Helpers {
 
       getHigherType(property) match {
         case HigherValueType.None =>
-          s"""|private var _$name: $tpe = null
-              |def $name(): $tpe = _$name""".stripMargin
+          s"""private var _$name: $tpe = null
+             |def $name(): $tpe = _$name""".stripMargin
         case HigherValueType.Option =>
-          s"""|private var _$name: $tpe = None
-              |def $name(): $tpe = _$name""".stripMargin
+          s"""private var _$name: $tpe = None
+             |def $name(): $tpe = _$name""".stripMargin
         case HigherValueType.List =>
-          s"""|private var _$name: $tpe = Nil
-              |def $name(): $tpe = _$name""".stripMargin
+          s"""private var _$name: $tpe = Nil
+             |def $name(): $tpe = _$name""".stripMargin
       }
     }.mkString("\n\n")
 
   def updateSpecificPropertyBody(properties: List[Property]): String = {
-    val caseNotFound =
-      s"""PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)"""
+    val caseNotFound = "PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)"
     properties match {
       case Nil => caseNotFound
       case keys =>
@@ -858,14 +843,14 @@ object Helpers {
             case HigherValueType.List =>
               val memberName = "_" + camelCase(property.name)
               s"""if (key == "${property.name}") {
-                    if (cardinality == VertexProperty.Cardinality.list) {
-                      if (this.$memberName == null) { this.$memberName = Nil }
-                      this.$memberName = this.$memberName :+ value.asInstanceOf[${getBaseType(property)}]
-                    } else {
-                      this.$memberName = List(value.asInstanceOf[${getBaseType(property)}])
-                    }
-                  }
-              """
+                 |  if (cardinality == VertexProperty.Cardinality.list) {
+                 |    if (this.$memberName == null) { this.$memberName = Nil }
+                 |    this.$memberName = this.$memberName :+ value.asInstanceOf[${getBaseType(property)}]
+                 |  } else {
+                 |    this.$memberName = List(value.asInstanceOf[${getBaseType(property)}])
+                 |  }
+                 |}
+                 |""".stripMargin
           }
         }
         (casesForKeys :+ caseNotFound).mkString("\n else ")
@@ -874,7 +859,7 @@ object Helpers {
 
   def removeSpecificPropertyBody(properties: List[Property]): String = {
     val caseNotFound =
-      s"""throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to the schema...")"""
+      """throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to the schema...")"""
     properties match {
       case Nil => caseNotFound
       case keys =>
