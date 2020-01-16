@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import gremlin.scala._
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated._
+import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
 import io.shiftleft.semanticcpg.language._
@@ -88,17 +88,14 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       }
     }
 
-    val methodReturn = ExpandTo.methodToFormalReturn(method)
-
-    ExpandTo
-      .formalReturnToReturn(methodReturn)
-      .foreach(returnVertex => addEdge(returnVertex, methodReturn))
+    val methodReturn = method.asInstanceOf[nodes.Method].methodReturn
+    methodReturn.toReturn.foreach(returnVertex => addEdge(returnVertex, methodReturn))
 
     outSet.foreach {
       case (node, outDefs) =>
         if (node.isInstanceOf[nodes.Call]) {
           val usesInExpression = dfHelper.getUsesOfExpression(node)
-          val localRefsUses = usesInExpression.map(ExpandTo.reference(_)).filter(_ != None)
+          val localRefsUses = usesInExpression.map(reference).filter(_ != None)
 
           /* if use is not an identifier, add edge, as we are going to visit the use separately */
           usesInExpression.foreach { use =>
@@ -122,16 +119,16 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
 
           val nodeIsOperandAssignment = isOperationAndAssignment(node)
           if (nodeIsOperandAssignment) {
-            val localRefGens = dfHelper.getGensOfExpression(node).map(ExpandTo.reference(_))
+            val localRefGens = dfHelper.getGensOfExpression(node).map(reference)
             inSet(node)
-              .filter(inElement => localRefGens.contains(ExpandTo.reference(inElement)))
+              .filter(inElement => localRefGens.contains(reference(inElement)))
               .foreach { filteredInElement =>
                 dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, node))
               }
           }
 
           for (elem <- outDefs) {
-            val localRefGen = ExpandTo.reference(elem)
+            val localRefGen = reference(elem)
 
             dfHelper.getExpressionFromGen(elem).foreach { expressionOfElement =>
               if (expressionOfElement != node && localRefsUses.contains(localRefGen)) {
@@ -141,14 +138,17 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
           }
         } else if (node.isInstanceOf[nodes.Return]) {
           node._astOut.asScala.foreach { returnExpr =>
-            val localRef = ExpandTo.reference(returnExpr)
-            inSet(node).filter(inElement => localRef == ExpandTo.reference(inElement)).foreach { filteredInElement =>
+            val localRef = reference(returnExpr)
+            inSet(node).filter(inElement => localRef == reference(inElement)).foreach { filteredInElement =>
               dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, node))
             }
           }
         }
     }
   }
+
+  private def reference(node: nodes.StoredNode): Option[nodes.StoredNode] =
+    node._refOut.nextOption
 
   def toDot(graph: ScalaGraph): String = {
     val buf = new StringBuffer()

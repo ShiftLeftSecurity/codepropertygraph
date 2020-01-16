@@ -2,11 +2,10 @@ package io.shiftleft.semanticcpg.passes.cfgdominator
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.utils.ExpandTo
 
 /**
   * This pass has no prerequisites.
@@ -31,7 +30,7 @@ class CfgDominatorPass(cpg: Cpg) extends CpgPass(cpg) {
     addDomTreeEdges(dstGraph, cfgNodeToImmediateDominator)
 
     val cfgNodeToPostImmediateDominator =
-      postDominatorCalculator.calculate(ExpandTo.methodToFormalReturn(method))
+      postDominatorCalculator.calculate(method.asInstanceOf[nodes.Method].methodReturn)
     addPostDomTreeEdges(dstGraph, cfgNodeToPostImmediateDominator)
 
     dstGraph.build()

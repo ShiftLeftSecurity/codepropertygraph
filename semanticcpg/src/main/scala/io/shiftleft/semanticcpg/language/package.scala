@@ -11,6 +11,7 @@ import io.shiftleft.semanticcpg.language.nodemethods.{
   AstNodeMethods,
   CallMethods,
   MethodMethods,
+  MethodReturnMethods,
   NodeMethods,
   WithinMethodMethods
 }
@@ -44,6 +45,9 @@ package object language {
 
   implicit def toMethodMethods(node: nodes.Method): MethodMethods =
     new MethodMethods(node)
+
+  implicit def toMethodReturnMethods(node: nodes.MethodReturn): MethodReturnMethods =
+    new MethodReturnMethods(node)
 
   implicit def toCallMethods(node: nodes.Call): CallMethods =
     new CallMethods(node)

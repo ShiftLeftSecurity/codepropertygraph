@@ -21,9 +21,7 @@ object ExpandTo {
     callNode
       .asInstanceOf[nodes.StoredNode]
       ._receiverOut
-      .asScala
-      .toList
-      .headOption
+      .nextOption
   }
 
   def callReceiver(callNode: Vertex): nodes.StoredNode = callReceiverOption(callNode).get
@@ -49,31 +47,8 @@ object ExpandTo {
     returnExpression.asInstanceOf[nodes.StoredNode]._astOut.nextOption.map(_.asInstanceOf[nodes.Expression])
   }
 
-  def methodToFormalReturn(method: Vertex): nodes.StoredNode = {
-    method
-      .asInstanceOf[nodes.StoredNode]
-      ._astOut
-      .asScala
-      .filter(_.isInstanceOf[nodes.MethodReturn])
-      .asJava
-      .nextChecked
-  }
-
-  def formalReturnToReturn(methodReturn: Vertex): Seq[nodes.StoredNode] = {
-    methodReturn
-      .asInstanceOf[nodes.StoredNode]
-      ._cfgIn
-      .asScala
-      .filter(_.isInstanceOf[nodes.Return])
-      .toSeq
-  }
-
   def expressionToMethod(expression: Vertex): nodes.StoredNode = {
     expression.asInstanceOf[nodes.StoredNode]._containsIn.nextChecked
-  }
-
-  def localToMethod(local: Vertex): nodes.StoredNode = {
-    local.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
   }
 
   def hasModifier(methodNode: Vertex, modifierType: String): Boolean = {
@@ -84,10 +59,6 @@ object ExpandTo {
       .exists(astChild =>
         astChild.isInstanceOf[nodes.Modifier] &&
           astChild.asInstanceOf[nodes.Modifier].modifierType == modifierType)
-  }
-
-  def astParent(expression: Vertex): nodes.StoredNode = {
-    expression.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
   }
 
   def callToCalledMethod(call: Vertex): Seq[nodes.Method] = {
@@ -131,10 +102,6 @@ object ExpandTo {
 
   def allCfgNodesOfMethod(method: Vertex): IterableOnce[nodes.StoredNode] = {
     method.asInstanceOf[nodes.StoredNode]._containsOut.asScala
-  }
-
-  def reference(node: Vertex): Option[nodes.StoredNode] = {
-    node.asInstanceOf[nodes.StoredNode]._refOut.nextOption
   }
 
   def implicitCallToMethod(implicitCall: nodes.ImplicitCall): nodes.Method = {

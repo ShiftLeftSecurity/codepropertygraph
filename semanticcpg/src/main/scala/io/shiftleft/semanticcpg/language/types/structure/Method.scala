@@ -42,7 +42,7 @@ class Method(override val raw: GremlinScala[nodes.Method])
     * Traverse to formal return parameter
     * */
   def methodReturn: MethodReturn =
-    new MethodReturn(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.METHOD_RETURN).cast[nodes.MethodReturn])
+    new MethodReturn(raw.map(_.methodReturn))
 
   /**
     * Traverse to type decl which have this method bound to it.
