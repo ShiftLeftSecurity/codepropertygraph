@@ -74,7 +74,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
       val factories = {
         val edgeFactories: List[String] =
-          schema.edgeTypes.map(edgeType => edgeType.className + ".Factory")
+          schema.edgeTypes.map(edgeType => edgeType.className + ".factory")
         s"""object Factories {
            |  lazy val All: List[EdgeFactory[_]] = $edgeFactories
            |  lazy val AllAsJava: java.util.List[EdgeFactory[_]] = All.asJava
@@ -106,7 +106,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |
            |  val layoutInformation = new EdgeLayoutInformation(Label, Keys.All)
            |
-           |  val Factory = new EdgeFactory[${edgeClassName}] {
+           |  val factory = new EdgeFactory[${edgeClassName}] {
            |    override val forLabel = $edgeClassName.Label
            |
            |    override def createEdge(graph: OdbGraph, outNode: NodeRef[OdbNode], inNode: NodeRef[OdbNode]) =
@@ -186,6 +186,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |import java.util.{Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
            |import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
            |import io.shiftleft.overflowdb.{EdgeFactory, NodeFactory, NodeLayoutInformation, OdbNode, OdbGraph, OdbNodeProperty, NodeRef}
+           |import io.shiftleft.overflowdb.traversal.{NodeRefOps, PropertyKey, Traversal}
            |import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
            |import scala.jdk.CollectionConverters._
            |import org.slf4j.LoggerFactory
@@ -269,7 +270,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
       val factories = {
         val nodeFactories: List[String] =
-          schema.nodeTypes.map(nodeType => nodeType.className + ".Factory")
+          schema.nodeTypes.map(nodeType => nodeType.className + ".factory")
         s"""object Factories {
            |  lazy val All: List[NodeFactory[_]] = ${nodeFactories}
            |  lazy val AllAsJava: java.util.List[NodeFactory[_]] = All.asJava
@@ -331,7 +332,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |    val Out: Array[String] = Array(${outEdges.map('"' + _ + '"').mkString(",")})
            |  }
            |
-           |  val Factory = new NodeFactory[${nodeType.classNameDb}] {
+           |  val factory = new NodeFactory[${nodeType.classNameDb}] {
            |    override val forLabel = ${nodeType.className}.Label
            |
            |    override def createNode(ref: NodeRef[${nodeType.classNameDb}]) =

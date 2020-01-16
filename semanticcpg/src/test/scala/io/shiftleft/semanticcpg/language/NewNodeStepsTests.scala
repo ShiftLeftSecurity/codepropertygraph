@@ -27,7 +27,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
 
     "embedding a StoredNode and a NewNode" in {
       implicit val diffGraphBuilder = DiffGraph.newBuilder
-      val existingContainedNode = Modifier.Factory.createNode(OverflowDbTestInstance.create, 42L)
+      val existingContainedNode = Modifier.factory.createNode(OverflowDbTestInstance.create, 42L)
       existingContainedNode.property(Modifier.Keys.ModifierType, ModifierTypes.NATIVE)
 
       val newContainedNode = new TestNewNode
