@@ -13,7 +13,6 @@ class MethodParameterOut(raw: GremlinScala[nodes.MethodParameterOut])
     with CodeAccessors[nodes.MethodParameterOut]
     with NameAccessors[nodes.MethodParameterOut]
     with OrderAccessors[nodes.MethodParameterOut]
-    with LineNumberAccessors[nodes.MethodParameterOut]
     with EvalTypeAccessors[nodes.MethodParameterOut] {
 
   /* method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */

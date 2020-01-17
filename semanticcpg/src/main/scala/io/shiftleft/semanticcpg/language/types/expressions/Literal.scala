@@ -14,7 +14,6 @@ class Literal(raw: GremlinScala[nodes.Literal])
     extends NodeSteps[nodes.Literal](raw)
     with ExpressionBase[nodes.Literal]
     with CodeAccessors[nodes.Literal]
-    with LineNumberAccessors[nodes.Literal]
     with EvalTypeAccessors[nodes.Literal] {
 
   /**

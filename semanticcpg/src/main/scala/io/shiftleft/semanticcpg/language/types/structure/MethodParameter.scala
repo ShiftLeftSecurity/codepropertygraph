@@ -16,7 +16,6 @@ class MethodParameter(raw: GremlinScala[nodes.MethodParameterIn])
     with CodeAccessors[nodes.MethodParameterIn]
     with NameAccessors[nodes.MethodParameterIn]
     with OrderAccessors[nodes.MethodParameterIn]
-    with LineNumberAccessors[nodes.MethodParameterIn]
     with EvalTypeAccessors[nodes.MethodParameterIn] {
 
   /**

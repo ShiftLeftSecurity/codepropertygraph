@@ -7,7 +7,6 @@ import io.shiftleft.semanticcpg.language._
 
 class Comment(raw: GremlinScala[nodes.Comment])
     extends NodeSteps[nodes.Comment](raw)
-    with LineNumberAccessors[nodes.Comment]
     with CodeAccessors[nodes.Comment] {
 
   override def file: File =

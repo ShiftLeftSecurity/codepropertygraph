@@ -16,7 +16,6 @@ class Local(raw: GremlinScala[nodes.Local])
     with CodeAccessors[nodes.Local]
     with NameAccessors[nodes.Local]
     with OrderAccessors[nodes.Local]
-    with LineNumberAccessors[nodes.Local]
     with EvalTypeAccessors[nodes.Local] {
 
   /**

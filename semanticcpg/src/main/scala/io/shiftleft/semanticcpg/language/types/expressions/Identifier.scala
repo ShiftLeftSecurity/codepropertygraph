@@ -16,7 +16,6 @@ class Identifier(raw: GremlinScala[nodes.Identifier])
     with CodeAccessors[nodes.Identifier]
     with NameAccessors[nodes.Identifier]
     with OrderAccessors[nodes.Identifier]
-    with LineNumberAccessors[nodes.Identifier]
     with EvalTypeAccessors[nodes.Identifier] {
 
   /**

@@ -7,7 +7,6 @@ import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expre
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.{
   ArgumentIndexAccessors,
   CodeAccessors,
-  LineNumberAccessors,
   OrderAccessors
 }
 
@@ -16,7 +15,6 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors.{
 class Return(raw: GremlinScala[nodes.Return])
     extends NodeSteps[nodes.Return](raw)
     with ExpressionBase[nodes.Return]
-    with LineNumberAccessors[nodes.Return]
     with OrderAccessors[nodes.Return]
     with ArgumentIndexAccessors[nodes.Return]
     with CodeAccessors[nodes.Return] {}

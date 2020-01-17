@@ -19,7 +19,6 @@ class Call(raw: GremlinScala[nodes.Call])
     with OrderAccessors[nodes.Call]
     with SignatureAccessors[nodes.Call]
     with DispatchTypeAccessors[nodes.Call]
-    with LineNumberAccessors[nodes.Call]
     with EvalTypeAccessors[nodes.Call]
     with ExpressionBase[nodes.Call] {
 

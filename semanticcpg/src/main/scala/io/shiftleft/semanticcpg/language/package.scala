@@ -3,24 +3,16 @@ package io.shiftleft.semanticcpg
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.{HasLineNumberEnd, Node, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{HasLineNumber, HasLineNumberEnd, Node, StoredNode}
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.MethodDOT
-import io.shiftleft.semanticcpg.language.nodemethods.{
-  AstNodeMethods,
-  CallMethods,
-  MethodMethods,
-  MethodReturnMethods,
-  NodeMethods,
-  WithinMethodMethods
-}
-import io.shiftleft.semanticcpg.language.operatorextension.ArrayAccessTrav
+import io.shiftleft.semanticcpg.language.nodemethods.{AstNodeMethods, CallMethods, MethodMethods, MethodReturnMethods, NodeMethods, WithinMethodMethods}
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod}
 import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.LineNumberEndAccessors
+import io.shiftleft.semanticcpg.language.types.propertyaccessors.{LineNumberAccessors, LineNumberEndAccessors}
 
 /**
   Language for traversing the code property graph
@@ -131,6 +123,9 @@ package object language {
 
   implicit def toComment(steps: Steps[nodes.Comment]): Comment =
     new Comment(steps.raw)
+
+  implicit def toLineNumberAccessors[A <: StoredNode with HasLineNumber](steps: Steps[A]): LineNumberAccessors[A] =
+    new LineNumberAccessors(steps)
 
   implicit def toLineNumberEndAccessors[A <: StoredNode with HasLineNumberEnd](
       steps: Steps[A]): LineNumberEndAccessors[A] =

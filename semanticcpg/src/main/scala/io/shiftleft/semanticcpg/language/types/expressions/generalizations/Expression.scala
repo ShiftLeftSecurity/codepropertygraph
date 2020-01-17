@@ -20,7 +20,6 @@ trait ExpressionBase[NodeType <: nodes.Expression]
     with ArgumentIndexAccessors[NodeType]
     with EvalTypeAccessors[NodeType]
     with CodeAccessors[NodeType]
-    with LineNumberAccessors[NodeType]
     with AstNodeBase[NodeType] { this: NodeSteps[NodeType] =>
 
   /**
