@@ -5,6 +5,7 @@ import java.nio.file.Paths
 import gremlin.scala._
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.nodes.FieldIdentifier
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
@@ -99,7 +100,8 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
 
           /* if use is not an identifier, add edge, as we are going to visit the use separately */
           usesInExpression.foreach { use =>
-            if (!use.isInstanceOf[nodes.Identifier] && !use.isInstanceOf[nodes.Literal]) {
+            if (!use.isInstanceOf[nodes.Identifier] && !use.isInstanceOf[nodes.Literal] && !use
+                  .isInstanceOf[FieldIdentifier]) {
               addEdge(use, node)
 
               /* handle indirect access uses: check if we have it in our out set and get
@@ -160,7 +162,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       val outV = vertexToStr(e.outVertex).replace("\"", "\'")
       buf.append(s""" "$outV" -> "$inV";\n """)
     }
-    buf.append { "}" }
+    buf.append("}")
     buf.toString
   }
 
@@ -174,7 +176,9 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       }
 
       s"${Paths.get(fileName).getFileName.toString}: ${vertex.value2(NodeKeys.LINE_NUMBER).toString} ${vertex.value2(NodeKeys.CODE)}"
-    } catch { case _: Exception => "" }
+    } catch {
+      case _: Exception => ""
+    }
   }
 
   private def isOperationAndAssignment(vertex: nodes.StoredNode): Boolean = {
