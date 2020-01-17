@@ -23,7 +23,6 @@ class Method(override val raw: GremlinScala[nodes.Method])
     with FullNameAccessors[nodes.Method]
     with SignatureAccessors[nodes.Method]
     with LineNumberAccessors[nodes.Method]
-    with LineNumberEndAccessors[nodes.Method]
     with EvalTypeAccessors[nodes.Method]
     with AstNodeBase[nodes.Method]
     with ModifierAccessors[nodes.Method] {
