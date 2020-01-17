@@ -4,14 +4,11 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.NameAccessors
 
 /**
   * A namespace, e.g., Java package or C# namespace
   * */
-class Namespace(raw: GremlinScala[nodes.Namespace])
-    extends NodeSteps[nodes.Namespace](raw)
-    with NameAccessors[nodes.Namespace] {
+class Namespace(raw: GremlinScala[nodes.Namespace]) extends NodeSteps[nodes.Namespace](raw) {
 
   /**
     * The type declarations defined in this namespace

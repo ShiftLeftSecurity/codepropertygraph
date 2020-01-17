@@ -11,7 +11,6 @@ class MethodParameterOut(raw: GremlinScala[nodes.MethodParameterOut])
     extends NodeSteps[nodes.MethodParameterOut](raw)
     with DeclarationBase[nodes.MethodParameterOut]
     with CodeAccessors[nodes.MethodParameterOut]
-    with NameAccessors[nodes.MethodParameterOut]
     with OrderAccessors[nodes.MethodParameterOut]
     with EvalTypeAccessors[nodes.MethodParameterOut] {
 

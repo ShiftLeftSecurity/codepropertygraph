@@ -9,8 +9,7 @@ import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Decla
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.{
   CodeAccessors,
   EvalTypeAccessors,
-  ModifierAccessors,
-  NameAccessors
+  ModifierAccessors
 }
 
 /**
@@ -20,7 +19,6 @@ class Member(raw: GremlinScala[nodes.Member])
     extends NodeSteps[nodes.Member](raw)
     with DeclarationBase[nodes.Member]
     with CodeAccessors[nodes.Member]
-    with NameAccessors[nodes.Member]
     with EvalTypeAccessors[nodes.Member]
     with ModifierAccessors[nodes.Member] {
 

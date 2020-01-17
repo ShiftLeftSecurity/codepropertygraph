@@ -14,7 +14,6 @@ class MethodParameter(raw: GremlinScala[nodes.MethodParameterIn])
     extends NodeSteps[nodes.MethodParameterIn](raw)
     with DeclarationBase[nodes.MethodParameterIn]
     with CodeAccessors[nodes.MethodParameterIn]
-    with NameAccessors[nodes.MethodParameterIn]
     with OrderAccessors[nodes.MethodParameterIn]
     with EvalTypeAccessors[nodes.MethodParameterIn] {
 

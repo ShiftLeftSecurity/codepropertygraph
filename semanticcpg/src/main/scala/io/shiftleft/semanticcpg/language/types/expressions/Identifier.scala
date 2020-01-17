@@ -14,7 +14,6 @@ class Identifier(raw: GremlinScala[nodes.Identifier])
     extends NodeSteps[nodes.Identifier](raw)
     with ExpressionBase[nodes.Identifier]
     with CodeAccessors[nodes.Identifier]
-    with NameAccessors[nodes.Identifier]
     with OrderAccessors[nodes.Identifier]
     with EvalTypeAccessors[nodes.Identifier] {
 

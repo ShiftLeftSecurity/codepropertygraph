@@ -7,7 +7,6 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors.{NameAccessors,
 
 class Binding(raw: GremlinScala[nodes.Binding])
     extends NodeSteps[nodes.Binding](raw)
-    with NameAccessors[nodes.Binding]
     with SignatureAccessors[nodes.Binding] {
 
   /**
