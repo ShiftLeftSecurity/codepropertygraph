@@ -19,7 +19,6 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 class Method(override val raw: GremlinScala[nodes.Method])
     extends NodeSteps[nodes.Method](raw)
     with DeclarationBase[nodes.Method]
-    with FullNameAccessors[nodes.Method]
     with SignatureAccessors[nodes.Method]
     with EvalTypeAccessors[nodes.Method]
     with AstNodeBase[nodes.Method]

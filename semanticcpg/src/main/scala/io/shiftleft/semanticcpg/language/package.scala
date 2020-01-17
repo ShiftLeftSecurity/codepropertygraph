@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.{HasLineNumber, HasLineNumberEnd, HasName, Node, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{HasFullName, HasLineNumber, HasLineNumberEnd, HasName, Node, StoredNode}
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.MethodDOT
 import io.shiftleft.semanticcpg.language.nodemethods.{AstNodeMethods, CallMethods, MethodMethods, MethodReturnMethods, NodeMethods, WithinMethodMethods}
@@ -12,7 +12,7 @@ import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod}
 import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.{LineNumberAccessors, LineNumberEndAccessors, NameAccessors}
+import io.shiftleft.semanticcpg.language.types.propertyaccessors.{FullNameAccessors, LineNumberAccessors, LineNumberEndAccessors, NameAccessors}
 
 /**
   Language for traversing the code property graph
@@ -133,6 +133,9 @@ package object language {
 
   implicit def toNameAccessors[A <: StoredNode with HasName](steps: Steps[A]): NameAccessors[A] =
     new NameAccessors(steps)
+
+  implicit def toFullNameAccessors[A <: StoredNode with HasFullName](steps: Steps[A]): FullNameAccessors[A] =
+    new FullNameAccessors(steps)
 
   implicit class GremlinScalaDeco[End](raw: GremlinScala[End]) {
     /* in some cases we cannot statically determine the type of the node, e.g. when traversing

@@ -5,7 +5,6 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.{
-  FullNameAccessors,
   IsExternalAccessors,
   ModifierAccessors,
 }
@@ -16,7 +15,6 @@ import org.apache.tinkerpop.gremlin.structure.Direction
   * */
 class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
     extends NodeSteps[nodes.TypeDecl](raw)
-    with FullNameAccessors[nodes.TypeDecl]
     with IsExternalAccessors[nodes.TypeDecl]
     with ModifierAccessors[nodes.TypeDecl] {
   import TypeDecl._
