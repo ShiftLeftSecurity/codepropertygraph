@@ -42,7 +42,7 @@
           "outEdges" : [
              {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD", "METHOD_PARAMETER_OUT", "IMPLICIT_CALL"]},
              {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN"]},
-             {"edgeName": "CONTAINS", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]}
+             {"edgeName": "CONTAINS", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]}
           ]
         },
         { "name" : "BINDING",

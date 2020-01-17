@@ -38,6 +38,7 @@ object ContainsEdgePass {
   private val destinationTypes = List(
     NodeTypes.BLOCK,
     NodeTypes.IDENTIFIER,
+    NodeTypes.FIELD_IDENTIFIER,
     NodeTypes.RETURN,
     NodeTypes.METHOD,
     NodeTypes.TYPE_DECL,
