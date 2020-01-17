@@ -30,14 +30,14 @@ object Cpg {
   def withStorage(path: String): Cpg =
     new Cpg(
       OdbGraph.open(OdbConfig.withoutOverflow.withStorageLocation(path),
-                    nodes.Factories.AllAsJava,
-                    edges.Factories.AllAsJava))
+                    nodes.Factories.allAsJava,
+                    edges.Factories.allAsJava))
 
   /**
     * Returns a fresh, empty graph
     */
   private def emptyGraph: OdbGraph =
-    OdbGraph.open(OdbConfig.withoutOverflow, nodes.Factories.AllAsJava, edges.Factories.AllAsJava)
+    OdbGraph.open(OdbConfig.withoutOverflow, nodes.Factories.allAsJava, edges.Factories.allAsJava)
 }
 
 /**

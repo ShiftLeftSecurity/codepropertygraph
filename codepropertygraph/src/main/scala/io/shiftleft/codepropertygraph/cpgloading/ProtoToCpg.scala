@@ -51,8 +51,8 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
   private val nodeFilter = new NodeFilter
   private val odbGraph =
     OdbGraph.open(overflowConfig,
-                  io.shiftleft.codepropertygraph.generated.nodes.Factories.AllAsJava,
-                  io.shiftleft.codepropertygraph.generated.edges.Factories.AllAsJava)
+                  io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
+                  io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava)
   private val interner: StringInterner = StringInterner.makeStrongInterner()
 
   def addNodes(nodes: JCollection[Node]): Unit =

@@ -74,10 +74,10 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
       val factories = {
         val edgeFactories: List[String] =
-          schema.edgeTypes.map(edgeType => edgeType.className + ".Factory")
+          schema.edgeTypes.map(edgeType => edgeType.className + ".factory")
         s"""object Factories {
-           |  lazy val All: List[EdgeFactory[_]] = $edgeFactories
-           |  lazy val AllAsJava: java.util.List[EdgeFactory[_]] = All.asJava
+           |  lazy val all: List[EdgeFactory[_]] = $edgeFactories
+           |  lazy val allAsJava: java.util.List[EdgeFactory[_]] = all.asJava
            |}
            |""".stripMargin
       }
@@ -97,16 +97,21 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       val companionObject =
         s"""object $edgeClassName {
            |  val Label = "${edgeType.name}"
-           |  object Keys {
-           |    val All: JSet[String] = Set(${keysQuoted.mkString(", ")}).asJava
-           |    val KeyToValue: Map[String, $edgeClassName => Any] = Map(
+           |
+           |  object PropertyNames {
+           |    val all: Set[String] = Set(${keysQuoted.mkString(", ")})
+           |    val allAsJava: JSet[String] = all.asJava
+           |  }
+           |
+           |  object Properties {
+           |    val keyToValue: Map[String, $edgeClassName => Any] = Map(
            |      $keyToValueMap
            |    )
            |  }
            |
-           |  val layoutInformation = new EdgeLayoutInformation(Label, Keys.All)
+           |  val layoutInformation = new EdgeLayoutInformation(Label, PropertyNames.allAsJava)
            |
-           |  val Factory = new EdgeFactory[${edgeClassName}] {
+           |  val factory = new EdgeFactory[${edgeClassName}] {
            |    override val forLabel = $edgeClassName.Label
            |
            |    override def createEdge(graph: OdbGraph, outNode: NodeRef[OdbNode], inNode: NodeRef[OdbNode]) =
@@ -143,7 +148,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
       val classImpl =
         s"""class ${edgeClassName}(_graph: OdbGraph, _outNode: NodeRef[OdbNode], _inNode: NodeRef[OdbNode])
-           |extends OdbEdge(_graph, $edgeClassName.Label, _outNode, _inNode, $edgeClassName.Keys.All) {
+           |extends OdbEdge(_graph, $edgeClassName.Label, _outNode, _inNode, $edgeClassName.PropertyNames.allAsJava) {
            |${propertyBasedFieldAccessors(keys)}
            |}
            |""".stripMargin
@@ -186,6 +191,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |import java.util.{Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
            |import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
            |import io.shiftleft.overflowdb.{EdgeFactory, NodeFactory, NodeLayoutInformation, OdbNode, OdbGraph, OdbNodeProperty, NodeRef}
+           |import io.shiftleft.overflowdb.traversal.{NodeRefOps, PropertyKey, Traversal}
            |import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
            |import scala.jdk.CollectionConverters._
            |import org.slf4j.LoggerFactory
@@ -269,10 +275,10 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
       val factories = {
         val nodeFactories: List[String] =
-          schema.nodeTypes.map(nodeType => nodeType.className + ".Factory")
+          schema.nodeTypes.map(nodeType => nodeType.className + ".factory")
         s"""object Factories {
-           |  lazy val All: List[NodeFactory[_]] = ${nodeFactories}
-           |  lazy val AllAsJava: java.util.List[NodeFactory[_]] = All.asJava
+           |  lazy val all: List[NodeFactory[_]] = ${nodeFactories}
+           |  lazy val allAsJava: java.util.List[NodeFactory[_]] = all.asJava
            |}
            |""".stripMargin
       }
@@ -310,28 +316,33 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
       val companionObject =
         s"""object ${nodeType.className} {
-           |
            |  def apply(graph: OdbGraph, id: Long) = new ${nodeType.className}(graph, id)
            |
            |  val layoutInformation = new NodeLayoutInformation(
-           |    Keys.All,
+           |    PropertyNames.allAsJava,
            |    List($outEdgeLayouts).asJava,
            |    List($inEdgeLayouts).asJava)
            |
            |  val Label = "${nodeType.name}"
-           |  object Keys {
+           |
+           |  object PropertyNames {
            |    $keyConstants
-           |    val All: JSet[String] = Set(${keys.map { key => camelCaseCaps(key.name) }.mkString(", ") }).asJava
-           |      val KeyToValue: Map[String, ${nodeType.classNameDb} => Any] = Map(
-           |        $keyToValueMap
-           |      )
-           |    }
+           |    val all: Set[String] = Set(${keys.map { key => camelCaseCaps(key.name) }.mkString(", ") })
+           |    val allAsJava: JSet[String] = all.asJava
+           |  }
+           |
+           |  object Properties {
+           |    val keyToValue: Map[String, ${nodeType.classNameDb} => Any] = Map(
+           |      $keyToValueMap
+           |    )
+           |  }
+           |
            |  object Edges {
            |    val In: Array[String] = Array(${inEdges.map('"' + _ + '"').mkString(",")})
            |    val Out: Array[String] = Array(${outEdges.map('"' + _ + '"').mkString(",")})
            |  }
            |
-           |  val Factory = new NodeFactory[${nodeType.classNameDb}] {
+           |  val factory = new NodeFactory[${nodeType.classNameDb}] {
            |    override val forLabel = ${nodeType.className}.Label
            |
            |    override def createNode(ref: NodeRef[${nodeType.classNameDb}]) =
@@ -485,10 +496,16 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
           s"""override def $name = get().$name"""
         }.mkString("\n")
         val containedNodesDelegators = nodeType.containedNodes
-        s"""class ${nodeType.className}(graph: OdbGraph, id: Long) extends NodeRef[${nodeType.classNameDb}](graph, id) with ${nodeType.className}Base with StoredNode $mixinTraits {
-           |$propertyDelegators
-           |$delegatingContainedNodeAccessors
-           |$neighborDelegators
+        s"""class ${nodeType.className}(graph: OdbGraph, id: Long)
+           |  extends NodeRef[${nodeType.classNameDb}](graph, id)
+           | // TODO use once we're on the new traversal dsl:
+           | // with NodeRefOps[${nodeType.className}]
+           |  with ${nodeType.className}Base
+           |  with StoredNode
+           |  $mixinTraits {
+           |  $propertyDelegators
+           |  $delegatingContainedNodeAccessors
+           |  $neighborDelegators
            |  override def valueMap: JMap[String, AnyRef] = get.valueMap
            |  override def canEqual(that: Any): Boolean = get.canEqual(that)
            |  override def label: String = {
@@ -523,7 +540,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |
            |  /* performance optimisation to save instantiating an iterator for each property lookup */
            |  override protected def specificProperty[A](key: String): VertexProperty[A] = {
-           |    ${nodeType.className}.Keys.KeyToValue.get(key) match {
+           |    ${nodeType.className}.Properties.keyToValue.get(key) match {
            |      case None => VertexProperty.empty[A]
            |      case Some(fieldAccess) => 
            |        fieldAccess(this) match {
@@ -536,7 +553,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  }
            |
            |  override protected def specificProperties[A](key: String): JIterator[VertexProperty[A]] = {
-           |    ${nodeType.className}.Keys.KeyToValue.get(key) match {
+           |    ${nodeType.className}.Properties.keyToValue.get(key) match {
            |      case None => JCollections.emptyIterator[VertexProperty[A]]
            |      case Some(fieldAccess) => 
            |        fieldAccess(this) match {
