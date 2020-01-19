@@ -22,6 +22,9 @@ import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
 
 class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: Option[SerializedCpg] = None) {
+
+  def this(cpg: Cpg, language: String, serializedCpg: SerializedCpg) = this(cpg, language, Some(serializedCpg))
+
   private val enhancementExecList = createEnhancementExecList(language)
 
   private def createEnhancementExecList(language: String): List[CpgPass] = {
