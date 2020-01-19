@@ -1,6 +1,5 @@
 package io.shiftleft.dataflowengine.language
 
-import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.dataflowengine.layers.dataflows.DataFlowRunner
 import io.shiftleft.semanticcpg.layers.EnhancementRunner
@@ -17,7 +16,7 @@ object DataFlowCodeToCpgFixture {
   private def passes(cpg: Cpg): Unit = {
     new EnhancementRunner().run(cpg)
     val semantics = new SemanticsLoader("dataflowengine/src/test/resources/default.semantics").load()
-    new DataFlowRunner(semantics).run(cpg, new SerializedCpg())
+    new DataFlowRunner(semantics).run(cpg)
   }
 
 }

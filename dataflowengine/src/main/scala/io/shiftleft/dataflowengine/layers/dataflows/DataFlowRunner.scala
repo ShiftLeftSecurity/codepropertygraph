@@ -8,9 +8,16 @@ import io.shiftleft.dataflowengine.semanticsloader.Semantics
 
 class DataFlowRunner(semantics: Semantics) {
 
-  def run(cpg: Cpg, serializedCpg: SerializedCpg): Unit = {
+  def run(cpg: Cpg, serializedCpg: SerializedCpg): Unit = run(cpg, Some(serializedCpg))
+
+  def run(cpg: Cpg, serializedCpg: Option[SerializedCpg] = None): Unit = {
     val enhancementExecList = List(new PropagateEdgePass(cpg, semantics), new ReachingDefPass(cpg))
-    enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg))
+
+    if (serializedCpg.isDefined) {
+      enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg.get))
+    } else {
+      enhancementExecList.foreach(_.createAndApply())
+    }
   }
 
 }
