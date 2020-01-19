@@ -9,7 +9,6 @@ import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
 import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
 import io.shiftleft.semanticcpg.passes.compat.bindingtablecompat.BindingTableCompat
 import io.shiftleft.semanticcpg.passes.compat.argumentcompat.ArgumentCompat
-import io.shiftleft.semanticcpg.passes.compat.callnamecompat.CallNameFixup
 import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
 import io.shiftleft.semanticcpg.passes.linking.calllinker.CallLinker
@@ -22,7 +21,7 @@ import io.shiftleft.semanticcpg.passes.compat.methodinstcompat.MethodInstCompat
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
 
-class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedCpg) {
+class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: Option[SerializedCpg] = None) {
   private val enhancementExecList = createEnhancementExecList(language)
 
   private def createEnhancementExecList(language: String): List[CpgPass] = {
@@ -68,6 +67,10 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
   }
 
   def create(): Unit = {
-    enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg))
+    if (serializedCpg.isDefined) {
+      enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg.get))
+    } else {
+      enhancementExecList.foreach(_.createAndApply())
+    }
   }
 }
