@@ -12,6 +12,8 @@ import org.apache.tinkerpop.gremlin.structure.{T, Vertex, VertexProperty}
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 import gremlin.scala._
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
+import io.shiftleft.passes.DiffGraph
 import org.apache.logging.log4j.LogManager
 
 import scala.collection.mutable.ArrayBuffer
@@ -46,15 +48,33 @@ private[cpgloading] object CpgOverlayLoader {
 private class CpgOverlayApplier(graph: ScalaGraph) {
 
   private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Vertex] = mutable.HashMap()
+  private var inverseBuilder: DiffGraph.InverseBuilder = _
 
   /**
     * Applies diff to existing (loaded) OdbGraph
     */
   def applyDiff(overlay: CpgOverlay): Unit = {
+    inverseBuilder = makeInverseBuilder(false)
     addNodes(overlay)
     addEdges(overlay)
     addNodeProperties(overlay)
     addEdgeProperties(overlay)
+  }
+
+  def applyUndoableDiff(overlay: CpgOverlay): DiffGraph = {
+    inverseBuilder = makeInverseBuilder(true)
+    addNodes(overlay)
+    addEdges(overlay)
+    addNodeProperties(overlay)
+    addEdgeProperties(overlay)
+    inverseBuilder.build()
+  }
+
+  private def makeInverseBuilder(undoable: Boolean) = {
+    if (undoable)
+      DiffGraph.InverseBuilder.newBuilder
+    else
+      DiffGraph.InverseBuilder.noop
   }
 
   private def addNodes(overlay: CpgOverlay): Unit = {
@@ -74,7 +94,7 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
         ProtoToCpg.addProperties(keyValues, property.getName.name, property.getValue)
       }
       val newNode = graph.graph.addVertex(keyValues.toArray: _*)
-
+      inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
       overlayNodeIdToSrcGraphNode.put(id, newNode)
     }
   }
@@ -91,6 +111,7 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
       }
       val newEdge =
         srcTinkerNode.addEdge(edge.getType.toString, dstTinkerNode, keyValues.toArray: _*)
+      inverseBuilder.onNewEdge(newEdge)
     }
   }
 
@@ -120,6 +141,12 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
 
   private def addPropertyToElement(tinkerElement: Element, propertyName: String, propertyValue: PropertyValue): Unit = {
     import PropertyValue.ValueCase._
+    tinkerElement match {
+      case storedNode: StoredNode =>
+        inverseBuilder.onBeforeNodePropertyChange(storedNode, propertyName)
+      case edge: Edge =>
+        inverseBuilder.onBeforeEdgePropertyChange(edge, propertyName)
+    }
     propertyValue.getValueCase match {
       case INT_VALUE =>
         tinkerElement.property(propertyName, propertyValue.getIntValue)

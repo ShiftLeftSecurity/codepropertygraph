@@ -106,10 +106,14 @@ object DiffGraph {
       case object Existing extends NodeKind
     }
 
+    final case class RemoveNode(node: StoredNode) extends Change
+    final case class RemoveNodeProperty(node: StoredNode, propertyKey: String) extends Change
+    final case class RemoveEdge(edge: Edge) extends Change
+    final case class RemoveEdgeProperty(edge: Edge, propertyKey: String) extends Change
     final case class CreateNode(node: NewNode) extends Change
     final case class SetNodeProperty(node: StoredNode, key: String, value: AnyRef) extends Change
     final case class SetEdgeProperty(edge: Edge, propertyKey: String, propertyValue: AnyRef) extends Change
-    sealed case class CreateEdge(src: Node, dst: Node, label: String, packedProperties: PackedProperties)
+    final case class CreateEdge(src: Node, dst: Node, label: String, packedProperties: PackedProperties)
         extends Change {
       def properties: Properties = PackedProperties.unpack(packedProperties)
 
@@ -153,14 +157,17 @@ object DiffGraph {
     def addEdge(src: Node, dst: Node, edgeLabel: String, properties: Seq[(String, AnyRef)] = List()): Unit = {
       buffer += Change.CreateEdge(src, dst, edgeLabel, properties)
     }
-    def build(): DiffGraph = {
-      if (_buffer == null || _buffer.isEmpty)
+    def build(buf: mutable.ArrayBuffer[Change]) = {
+      if (buf == null || buf.isEmpty)
         EmptyChangeSet
-      else if (_buffer.size == 1)
-        SingleChangeSet(_buffer.head)
+      else if (buf.size == 1)
+        SingleChangeSet(buf.head)
       else
-        ArrayChangeSet(buffer.toArray)
+        ArrayChangeSet(buf.toArray)
     }
+
+    def build(): DiffGraph = build(_buffer)
+    def buildReverse(): DiffGraph = build(if (_buffer != null) _buffer.reverse else null)
     // compatibility api
     def addNode(node: NewNode): Unit = this += node
     def addEdgeToOriginal(srcNode: NewNode,
@@ -182,26 +189,99 @@ object DiffGraph {
       buffer += Change.SetNodeProperty(node, key, value)
     def addEdgeProperty(edge: Edge, key: String, value: AnyRef): Unit =
       buffer += Change.SetEdgeProperty(edge, key, value)
+    def removeNode(node: StoredNode): Unit = buffer += Change.RemoveNode(node)
+    def removeEdge(edge: Edge): Unit = buffer += Change.RemoveEdge(edge)
+    def removeNodeProperty(node: StoredNode, propertyKey: String): Unit = buffer += Change.RemoveNodeProperty(node, propertyKey)
+    def removeEdgeProperty(edge: Edge, propertyKey: String): Unit = buffer += Change.RemoveEdgeProperty(edge, propertyKey)
+  }
+
+  trait InverseBuilder {
+    def onNewNode(node: StoredNode): Unit
+    def onNewEdge(edge: Edge): Unit
+    def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String): Unit
+    def onBeforeEdgePropertyChange(edge: Edge, propertyKey: String): Unit
+    def build(): DiffGraph
+  }
+  object InverseBuilder {
+    def newBuilder: InverseBuilder = new InverseBuilder {
+      private val builder = DiffGraph.newBuilder
+      def onNewNode(node: StoredNode) = builder.removeNode(node)
+      def onNewEdge(edge: Edge) = builder.removeEdge(edge)
+      def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String) = {
+        val prop = node.property(propertyKey)
+        if (prop.isPresent)
+          builder.addNodeProperty(node, propertyKey, node.property(propertyKey).value())
+        else
+          builder.removeNodeProperty(node, propertyKey)
+      }
+      def onBeforeEdgePropertyChange(edge: Edge, propertyKey: String) = {
+        val prop = edge.property(propertyKey)
+        if (prop.isPresent)
+          builder.addEdgeProperty(edge, propertyKey, edge.property(propertyKey).value())
+        else
+          builder.removeEdgeProperty(edge, propertyKey)
+      }
+
+      def build(): DiffGraph = builder.buildReverse()
+    }
+    val noop: InverseBuilder = new InverseBuilder {
+      def onNewNode(node: StoredNode) = ()
+      def onNewEdge(edge: Edge) = ()
+      def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String) = ()
+      def onBeforeEdgePropertyChange(edge: Edge, propertyKey: String) = ()
+      def build(): DiffGraph = ???
+    }
   }
 
   private class Applier {
     import Applier.InternalProperty
 
     private val overlayNodeToTinkerNode = new util.HashMap[IdentityHashWrapper[NewNode], Vertex]()
+    private var inverseBuilder: InverseBuilder = _
 
-    def applyDiff(diffGraph: DiffGraph, cpg: Cpg): AppliedDiffGraph = {
-      val graph = cpg.graph
+    def applyDiff(diffGraph: DiffGraph, cpg: Cpg, undoable: Boolean = false): AppliedDiffGraph = {
+      applyDiff(diffGraph, cpg.graph, undoable)
+    }
+
+
+    private def applyDiff(diffGraph: DiffGraph, graph: gremlin.scala.Graph, undoable: Boolean): AppliedDiffGraph = {
+      if (undoable)
+        inverseBuilder = InverseBuilder.newBuilder
+      else
+        inverseBuilder = InverseBuilder.noop
       diffGraph.iterator.foreach(change => applyChange(graph, change))
-      AppliedDiffGraph(diffGraph, overlayNodeToTinkerNode)
+      AppliedDiffGraph(
+        diffGraph,
+        if (undoable) Some(inverseBuilder.build()) else None,
+        overlayNodeToTinkerNode
+      )
+    }
+
+    def unapplyDiff(graph: gremlin.scala.Graph, inverseDiff: DiffGraph): Unit = {
+      applyDiff(inverseDiff, graph, false)
     }
 
     private def applyChange(graph: gremlin.scala.Graph, change: Change) = change match {
       case Change.CreateNode(node) => addNode(graph, node)
       case c: Change.CreateEdge    => addEdge(c)
       case Change.SetNodeProperty(node, key, value) =>
-        node.property(key, value)
+        addNodeProperty(node, key, value)
       case Change.SetEdgeProperty(edge, key, value) =>
-        edge.property(key, value)
+        addEdgeProperty(edge, key, value)
+      case Change.RemoveEdge(edge) => edge.remove()
+      case Change.RemoveEdgeProperty(edge, propertyKey) => edge.property(propertyKey).remove()
+      case Change.RemoveNode(node) => node.remove()
+      case Change.RemoveNodeProperty(node, propertyKey) => node.property(propertyKey).remove()
+    }
+
+    private def addEdgeProperty(edge: Edge, key: String, value: AnyRef) = {
+      inverseBuilder.onBeforeEdgePropertyChange(edge, key)
+      edge.property(key, value)
+    }
+
+    private def addNodeProperty(node: StoredNode, key: String, value: AnyRef) = {
+      inverseBuilder.onBeforeNodePropertyChange(node, key)
+      node.property(key, value)
     }
 
     private def addEdge(edgeChange: Change.CreateEdge): Unit = {
@@ -223,14 +303,17 @@ object DiffGraph {
 
     private def tinkerAddEdge(src: Vertex, dst: Vertex, label: String, properties: Seq[(String, AnyRef)]): Unit = {
       val tinkerEdge = src.addEdge(label, dst)
+      inverseBuilder.onNewEdge(tinkerEdge)
       properties.foreach {
         case (key, value) =>
+          inverseBuilder.onBeforeEdgePropertyChange(tinkerEdge, key)
           tinkerEdge.property(key, value)
       }
     }
 
     def addNode(graph: ScalaGraph, node: NewNode): Unit = {
       val newNode = graph.graph.addVertex(node.label)
+      inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
       node.properties.filter { case (key, _) => !key.startsWith(InternalProperty) }.foreach {
         case (key, value: Traversable[_]) =>
           value.foreach { value =>
@@ -245,9 +328,21 @@ object DiffGraph {
 
   object Applier {
     private val InternalProperty = "_"
-    def applyDiff(diff: DiffGraph, cpg: Cpg): AppliedDiffGraph = {
+
+    def applyDiff(diff: DiffGraph, cpg: Cpg, undoable: Boolean = false): AppliedDiffGraph = {
       val applier = new Applier
-      applier.applyDiff(diff, cpg)
+      applier.applyDiff(diff, cpg, undoable)
+    }
+
+    def applyDiff(diff: DiffGraph, graph: gremlin.scala.Graph, undoable: Boolean): AppliedDiffGraph = {
+      val applier = new Applier
+      applier.applyDiff(diff, graph, undoable)
+    }
+
+
+    def unapplyDiff(graph: gremlin.scala.Graph, inverseDiff: DiffGraph): Unit = {
+      val applier = new Applier
+      applier.unapplyDiff(graph, inverseDiff)
     }
   }
 
