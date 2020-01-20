@@ -169,9 +169,9 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
     def entries: List[String] = {
       val nodeToInEdges = calculateNodeToInEdges(schema.nodeTypes)
 
-      schema.nodeTypes.map(node =>
-        generateNodeSource(node, node.keys.map(propertyByName), nodeToInEdges)
-      )
+      schema.nodeTypes.map { nodeType =>
+        generateNodeSource(nodeType, nodeType.keys.map(propertyByName), nodeToInEdges)
+      }
     }
 
     def nodeHeader = {
@@ -314,16 +314,21 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       val outEdgeLayouts = outEdges.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
       val inEdgeLayouts = inEdges.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
 
+      val className = nodeType.className
+      val classNameDb = nodeType.classNameDb
+
       val companionObject =
-        s"""object ${nodeType.className} {
-           |  def apply(graph: OdbGraph, id: Long) = new ${nodeType.className}(graph, id)
+        s"""object $className {
+           |  def apply(graph: OdbGraph, id: Long) = new $className(graph, id)
+           |
+           |  val Label = "${nodeType.name}"
+           |  val LabelId: Int = ${nodeType.id}
            |
            |  val layoutInformation = new NodeLayoutInformation(
+           |    LabelId,
            |    PropertyNames.allAsJava,
            |    List($outEdgeLayouts).asJava,
            |    List($inEdgeLayouts).asJava)
-           |
-           |  val Label = "${nodeType.name}"
            |
            |  object PropertyNames {
            |    $keyConstants
@@ -332,7 +337,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  }
            |
            |  object Properties {
-           |    val keyToValue: Map[String, ${nodeType.classNameDb} => Any] = Map(
+           |    val keyToValue: Map[String, $classNameDb => Any] = Map(
            |      $keyToValueMap
            |    )
            |  }
@@ -342,13 +347,14 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |    val Out: Array[String] = Array(${outEdges.map('"' + _ + '"').mkString(",")})
            |  }
            |
-           |  val factory = new NodeFactory[${nodeType.classNameDb}] {
-           |    override val forLabel = ${nodeType.className}.Label
+           |  val factory = new NodeFactory[$classNameDb] {
+           |    override val forLabel = $className.Label
+           |    override val forLabelId = $className.LabelId
            |
-           |    override def createNode(ref: NodeRef[${nodeType.classNameDb}]) =
-           |      new ${nodeType.classNameDb}(ref.asInstanceOf[NodeRef[OdbNode]])
+           |    override def createNode(ref: NodeRef[$classNameDb]) =
+           |      new $classNameDb(ref.asInstanceOf[NodeRef[OdbNode]])
            |
-           |    override def createNodeRef(graph: OdbGraph, id: Long) = ${nodeType.className}(graph, id)
+           |    override def createNodeRef(graph: OdbGraph, id: Long) = $className(graph, id)
            |  }
            |}
            |""".stripMargin
@@ -464,7 +470,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
         .getOrElse("")
 
       val nodeBaseImpl =
-        s"""trait ${nodeType.className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
+        s"""trait ${className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
            |  def asStored : StoredNode = this.asInstanceOf[StoredNode]
            |  override def getId: JLong = -1L
            |
@@ -482,7 +488,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |        $productElementAccessors
            |      }
            |
-           |  override def productPrefix = "${nodeType.className}"
+           |  override def productPrefix = "${className}"
            |  override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
            |}
            |""".stripMargin
@@ -496,11 +502,11 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
           s"""override def $name = get().$name"""
         }.mkString("\n")
         val containedNodesDelegators = nodeType.containedNodes
-        s"""class ${nodeType.className}(graph: OdbGraph, id: Long)
-           |  extends NodeRef[${nodeType.classNameDb}](graph, id)
+        s"""class ${className}(graph: OdbGraph, id: Long)
+           |  extends NodeRef[$classNameDb](graph, id)
            | // TODO use once we're on the new traversal dsl:
-           | // with NodeRefOps[${nodeType.className}]
-           |  with ${nodeType.className}Base
+           | // with NodeRefOps[$className]
+           |  with ${className}Base
            |  with StoredNode
            |  $mixinTraits {
            |  $propertyDelegators
@@ -509,7 +515,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  override def valueMap: JMap[String, AnyRef] = get.valueMap
            |  override def canEqual(that: Any): Boolean = get.canEqual(that)
            |  override def label: String = {
-           |    ${nodeType.className}.Label
+           |    $className.Label
            |  }
            |}
            |""".stripMargin
@@ -520,10 +526,10 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       }.mkString("\n")
 
       val classImpl =
-        s"""class ${nodeType.classNameDb}(ref: NodeRef[OdbNode]) extends OdbNode(ref) with StoredNode 
-           |  $mixinTraits with ${nodeType.className}Base {
+        s"""class $classNameDb(ref: NodeRef[OdbNode]) extends OdbNode(ref) with StoredNode 
+           |  $mixinTraits with ${className}Base {
            |
-           |  override def layoutInformation: NodeLayoutInformation = ${nodeType.className}.layoutInformation
+           |  override def layoutInformation: NodeLayoutInformation = $className.layoutInformation
            |  override def getId = ref.id
            |
            |  /* all properties */
@@ -533,14 +539,14 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  ${neighborAccesors}
            |
            |  override def label: String = {
-           |    ${nodeType.className}.Label
+           |    $className.Label
            |  }
            |
-           |  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[${nodeType.classNameDb}]
+           |  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[$classNameDb]
            |
            |  /* performance optimisation to save instantiating an iterator for each property lookup */
            |  override protected def specificProperty[A](key: String): VertexProperty[A] = {
-           |    ${nodeType.className}.Properties.keyToValue.get(key) match {
+           |    $className.Properties.keyToValue.get(key) match {
            |      case None => VertexProperty.empty[A]
            |      case Some(fieldAccess) => 
            |        fieldAccess(this) match {
@@ -553,7 +559,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  }
            |
            |  override protected def specificProperties[A](key: String): JIterator[VertexProperty[A]] = {
-           |    ${nodeType.className}.Properties.keyToValue.get(key) match {
+           |    $className.Properties.keyToValue.get(key) match {
            |      case None => JCollections.emptyIterator[VertexProperty[A]]
            |      case Some(fieldAccess) => 
            |        fieldAccess(this) match {
@@ -609,9 +615,9 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       schema.nodeKeys.map(prop => prop.name -> prop).toMap
 
     def entries: List[String] =
-      schema.nodeTypes.map(node => generateNodeSource(node, node.keys.map(propertyByName)))
+      schema.nodeTypes.map(node => generateNewNodeSource(node, node.keys.map(propertyByName)))
 
-    def generateNodeSource(nodeType: NodeType, keys: List[Property]) = {
+    def generateNewNodeSource(nodeType: NodeType, keys: List[Property]) = {
       val fields: String = {
         val forKeys = keys.map { key =>
           val optionalDefault =
@@ -730,6 +736,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 }
 
 case class NodeType(name: String,
+                    id: Int,
                     keys: List[String],
                     outEdges: List[OutEdgeEntry],
                     is: Option[List[String]],
