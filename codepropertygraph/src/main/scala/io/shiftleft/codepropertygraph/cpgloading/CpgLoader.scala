@@ -67,13 +67,7 @@ private class CpgLoader {
   }
 
   def loadFromOverflowDb(config: CpgLoaderConfig = CpgLoaderConfig()): Cpg = {
-    val odbGraph =
-      OdbGraph.open(
-        config.overflowDbConfig,
-        io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
-        io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava
-      )
-    val cpg = Cpg(odbGraph)
+    val cpg = new ProtoToCpg(config.overflowDbConfig).build()
     if (config.createIndexes) { createIndexes(cpg) }
     cpg
   }
