@@ -13,10 +13,7 @@ class DataFlowRunner(semantics: Semantics) {
   def run(cpg: Cpg, serializedCpg: Option[SerializedCpg] = None): Unit = {
     val enhancementExecList = List(new PropagateEdgePass(cpg, semantics), new ReachingDefPass(cpg))
 
-    serializedCpg match {
-      case Some(serializedCpg) => enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg))
-      case None =>                enhancementExecList.foreach(_.createAndApply)
-    }
+    if (serializedCpg.isDefined) {
       enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg.get))
     } else {
       enhancementExecList.foreach(_.createAndApply())
