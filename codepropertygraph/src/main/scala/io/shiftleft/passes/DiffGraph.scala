@@ -191,8 +191,10 @@ object DiffGraph {
       buffer += Change.SetEdgeProperty(edge, key, value)
     def removeNode(node: StoredNode): Unit = buffer += Change.RemoveNode(node)
     def removeEdge(edge: Edge): Unit = buffer += Change.RemoveEdge(edge)
-    def removeNodeProperty(node: StoredNode, propertyKey: String): Unit = buffer += Change.RemoveNodeProperty(node, propertyKey)
-    def removeEdgeProperty(edge: Edge, propertyKey: String): Unit = buffer += Change.RemoveEdgeProperty(edge, propertyKey)
+    def removeNodeProperty(node: StoredNode, propertyKey: String): Unit =
+      buffer += Change.RemoveNodeProperty(node, propertyKey)
+    def removeEdgeProperty(edge: Edge, propertyKey: String): Unit =
+      buffer += Change.RemoveEdgeProperty(edge, propertyKey)
   }
 
   trait InverseBuilder {
@@ -243,7 +245,6 @@ object DiffGraph {
       applyDiff(diffGraph, cpg.graph, undoable)
     }
 
-
     private def applyDiff(diffGraph: DiffGraph, graph: gremlin.scala.Graph, undoable: Boolean): AppliedDiffGraph = {
       if (undoable)
         inverseBuilder = InverseBuilder.newBuilder
@@ -268,9 +269,9 @@ object DiffGraph {
         addNodeProperty(node, key, value)
       case Change.SetEdgeProperty(edge, key, value) =>
         addEdgeProperty(edge, key, value)
-      case Change.RemoveEdge(edge) => edge.remove()
+      case Change.RemoveEdge(edge)                      => edge.remove()
       case Change.RemoveEdgeProperty(edge, propertyKey) => edge.property(propertyKey).remove()
-      case Change.RemoveNode(node) => node.remove()
+      case Change.RemoveNode(node)                      => node.remove()
       case Change.RemoveNodeProperty(node, propertyKey) => node.property(propertyKey).remove()
     }
 
@@ -338,7 +339,6 @@ object DiffGraph {
       val applier = new Applier
       applier.applyDiff(diff, graph, undoable)
     }
-
 
     def unapplyDiff(graph: gremlin.scala.Graph, inverseDiff: DiffGraph): Unit = {
       val applier = new Applier

@@ -1,6 +1,5 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-
 import gremlin.scala._
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
@@ -46,14 +45,14 @@ class DiffGraphTest extends WordSpec with Matchers {
       import DiffGraph.Change._
       val List(
         SetEdgeProperty(_, EdgeKeyNames.LOCAL_NAME, "old edge attr"), // restore old edge property value
-        SetNodeProperty(_,NodeKeyNames.CODE,"old y code"), // restore old Y property value
-        RemoveNodeProperty(_,NodeKeyNames.ORDER), // remove newly added property
+        SetNodeProperty(_, NodeKeyNames.CODE, "old y code"), // restore old Y property value
+        RemoveNodeProperty(_, NodeKeyNames.ORDER), // remove newly added property
         RemoveEdge(_), // remove x -> a
         RemoveEdge(_), // remove b -> c
         RemoveEdge(_), // remove a -> b
         RemoveNode(_), // remove c
         RemoveNode(_), // remove b
-        RemoveNode(_)  // remove a
+        RemoveNode(_) // remove a
       ) = changes
     }
 

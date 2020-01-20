@@ -28,9 +28,9 @@ class DiffGraphProtoSerializer() {
       case DiffGraph.Change.SetNodeProperty(node, key, value) =>
         addNodeProperty(node.getId, key, value, builder, appliedDiffGraph)
       case DiffGraph.Change.SetEdgeProperty(_, _, _) => ???
-      case DiffGraph.Change.RemoveNode(_) => ???
+      case DiffGraph.Change.RemoveNode(_)            => ???
       case DiffGraph.Change.RemoveNodeProperty(_, _) => ???
-      case DiffGraph.Change.RemoveEdge(_) => ???
+      case DiffGraph.Change.RemoveEdge(_)            => ???
       case DiffGraph.Change.RemoveEdgeProperty(_, _) => ???
     }
     val overlay = builder.build()
