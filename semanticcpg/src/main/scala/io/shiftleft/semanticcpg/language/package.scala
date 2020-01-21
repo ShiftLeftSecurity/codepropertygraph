@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.{HasDispatchType, HasFullName, HasIsExternal, HasLineNumber, HasLineNumberEnd, HasName, HasOrder, HasParserTypeName, HasSignature, HasValue, HasVersion, Node, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{HasDependencyGroupId, HasDispatchType, HasFullName, HasIsExternal, HasLineNumber, HasLineNumberEnd, HasName, HasOrder, HasParserTypeName, HasSignature, HasValue, HasVersion, Node, StoredNode}
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.MethodDOT
 import io.shiftleft.semanticcpg.language.nodemethods.{AstNodeMethods, CallMethods, MethodMethods, MethodReturnMethods, NodeMethods, WithinMethodMethods}
@@ -123,6 +123,9 @@ package object language {
 
   implicit def toComment(steps: Steps[nodes.Comment]): Comment =
     new Comment(steps.raw)
+
+  implicit def toDependencyGroupIdAccessors[A <: StoredNode with HasDependencyGroupId](steps: Steps[A]): DependencyGroupIdAccessors[A] =
+    new DependencyGroupIdAccessors(steps)
 
   implicit def toDispatchTypeAccessors[A <: StoredNode with HasDispatchType](steps: Steps[A]): DispatchTypeAccessors[A] =
     new DispatchTypeAccessors(steps)
