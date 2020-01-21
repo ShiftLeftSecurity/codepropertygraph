@@ -24,6 +24,8 @@ class SerializedCpg() {
     initZipFilesystem(filename)
   }
 
+  def isEmpty: Boolean = zipFileSystem == null
+
   @throws[URISyntaxException]
   @throws[IOException]
   private def initZipFilesystem(filename: String): Unit = {

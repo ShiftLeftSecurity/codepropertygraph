@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.testfixtures
 import java.io.{File, PrintWriter}
 import java.nio.file.Files
 
+import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.semanticcpg.layers.EnhancementRunner
@@ -18,7 +19,7 @@ object CodeToCpgFixture {
     new CodeToCpgFixture(frontend).buildCpg(sourceCode, passes)(fun)
 
   private def createEnhancements(cpg: Cpg): Unit = {
-    new EnhancementRunner().run(cpg)
+    new EnhancementRunner().run(cpg, new SerializedCpg())
   }
 
 }

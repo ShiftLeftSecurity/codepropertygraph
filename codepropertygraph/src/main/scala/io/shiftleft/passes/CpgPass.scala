@@ -60,11 +60,15 @@ abstract class CpgPass(cpg: Cpg) {
     * @param counter an optional integer to keep apart different runs of the same pass
     * */
   def createApplySerializeAndStore(serializedCpg: SerializedCpg, counter: Int = 0): Unit = {
-    val overlays = createApplyAndSerialize()
-    overlays.zipWithIndex.foreach {
-      case (overlay, index) => {
-        if (overlay.getSerializedSize > 0) {
-          serializedCpg.addOverlay(overlay, getClass.getSimpleName + counter.toString + "_" + index)
+    if (serializedCpg.isEmpty) {
+      createAndApply()
+    } else {
+      val overlays = createApplyAndSerialize()
+      overlays.zipWithIndex.foreach {
+        case (overlay, index) => {
+          if (overlay.getSerializedSize > 0) {
+            serializedCpg.addOverlay(overlay, getClass.getSimpleName + counter.toString + "_" + index)
+          }
         }
       }
     }
