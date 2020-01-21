@@ -46,27 +46,25 @@ private[cpgloading] object CpgOverlayLoader {
   * @param graph the existing (loaded) graph to apply overlay to
   */
 private class CpgOverlayApplier(graph: ScalaGraph) {
-
   private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Vertex] = mutable.HashMap()
-  private var inverseBuilder: DiffGraph.InverseBuilder = _
 
   /**
     * Applies diff to existing (loaded) OdbGraph
     */
   def applyDiff(overlay: CpgOverlay): Unit = {
-    inverseBuilder = makeInverseBuilder(false)
-    addNodes(overlay)
-    addEdges(overlay)
-    addNodeProperties(overlay)
-    addEdgeProperties(overlay)
+    val inverseBuilder: DiffGraph.InverseBuilder = DiffGraph.InverseBuilder.noop
+    addNodes(overlay, inverseBuilder)
+    addEdges(overlay, inverseBuilder)
+    addNodeProperties(overlay, inverseBuilder)
+    addEdgeProperties(overlay, inverseBuilder)
   }
 
   def applyUndoableDiff(overlay: CpgOverlay): DiffGraph = {
-    inverseBuilder = makeInverseBuilder(true)
-    addNodes(overlay)
-    addEdges(overlay)
-    addNodeProperties(overlay)
-    addEdgeProperties(overlay)
+    val inverseBuilder: DiffGraph.InverseBuilder = DiffGraph.InverseBuilder.newBuilder
+    addNodes(overlay, inverseBuilder)
+    addEdges(overlay, inverseBuilder)
+    addNodeProperties(overlay, inverseBuilder)
+    addEdgeProperties(overlay, inverseBuilder)
     inverseBuilder.build()
   }
 
@@ -77,7 +75,7 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
       DiffGraph.InverseBuilder.noop
   }
 
-  private def addNodes(overlay: CpgOverlay): Unit = {
+  private def addNodes(overlay: CpgOverlay, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
     assert(graph.graph.features.vertex.supportsUserSuppliedIds,
            "this currently only works for graphs that allow user supplied ids")
 
@@ -99,7 +97,7 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
     }
   }
 
-  private def addEdges(overlay: CpgOverlay) = {
+  private def addEdges(overlay: CpgOverlay, inverseBuilder: DiffGraph.InverseBuilder) = {
     overlay.getEdgeList.asScala.foreach { edge =>
       val srcTinkerNode = getVertexForOverlayId(edge.getSrc)
       val dstTinkerNode = getVertexForOverlayId(edge.getDst)
@@ -115,15 +113,15 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
     }
   }
 
-  private def addNodeProperties(overlay: CpgOverlay): Unit = {
+  private def addNodeProperties(overlay: CpgOverlay, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
     overlay.getNodePropertyList.asScala.foreach { additionalNodeProperty =>
       val property = additionalNodeProperty.getProperty
       val tinkerNode = getVertexForOverlayId(additionalNodeProperty.getNodeId)
-      addPropertyToElement(tinkerNode, property.getName.name, property.getValue)
+      addPropertyToElement(tinkerNode, property.getName.name, property.getValue, inverseBuilder)
     }
   }
 
-  private def addEdgeProperties(overlay: CpgOverlay): Unit = {
+  private def addEdgeProperties(overlay: CpgOverlay, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
     overlay.getEdgePropertyList.asScala.foreach { additionalEdgeProperty =>
       throw new RuntimeException("Not implemented.")
     }
@@ -139,7 +137,10 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
     }
   }
 
-  private def addPropertyToElement(tinkerElement: Element, propertyName: String, propertyValue: PropertyValue): Unit = {
+  private def addPropertyToElement(tinkerElement: Element,
+                                   propertyName: String,
+                                   propertyValue: PropertyValue,
+                                   inverseBuilder: DiffGraph.InverseBuilder): Unit = {
     import PropertyValue.ValueCase._
     tinkerElement match {
       case storedNode: StoredNode =>
