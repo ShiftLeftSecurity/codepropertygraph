@@ -7,7 +7,7 @@ import java.util
 
 import io.shiftleft.proto.cpg.Cpg
 
-class SerializedCpg() {
+class SerializedCpg extends AutoCloseable {
 
   /**
     * We allow creating a dummy serialized CPG that does not do anything.
@@ -28,7 +28,7 @@ class SerializedCpg() {
 
   @throws[URISyntaxException]
   @throws[IOException]
-  private def initZipFilesystem(filename: String): Unit = {
+  private[this] def initZipFilesystem(filename: String): Unit = {
     val env = new util.HashMap[String, String]
     // This ensures that the file is created if it does not exist
     env.put("create", "true")
@@ -42,12 +42,13 @@ class SerializedCpg() {
     **/
   @throws[IOException]
   def addOverlay(overlay: Cpg.CpgOverlay, name: String): Unit = {
-    if (zipFileSystem == null) return
-    val pathInZip = zipFileSystem.getPath(s"${counter}_${name}")
-    counter += 1
-    val outputStream = Files.newOutputStream(pathInZip)
-    overlay.writeTo(outputStream)
-    outputStream.close()
+    if (!isEmpty) {
+      val pathInZip = zipFileSystem.getPath(s"${counter}_${name}")
+      counter += 1
+      val outputStream = Files.newOutputStream(pathInZip)
+      overlay.writeTo(outputStream)
+      outputStream.close()
+    }
   }
 
   @throws[IOException]
@@ -58,8 +59,9 @@ class SerializedCpg() {
   }
 
   @throws[IOException]
-  def close(): Unit = {
-    if (zipFileSystem == null) return
-    zipFileSystem.close()
+  override def close(): Unit = {
+    if (!isEmpty) {
+      zipFileSystem.close()
+    }
   }
 }
