@@ -1,13 +1,13 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
 import io.shiftleft.codepropertygraph.generated.NodeKeys
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
+import io.shiftleft.codepropertygraph.generated.nodes.{HasIsExternal, StoredNode}
 import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
 import java.lang.{Boolean => JBoolean}
 
 import gremlin.scala.GremlinScala
 
-class IsExternalAccessors[A <: StoredNode](steps: Steps[A]) extends PropertyAccessors[A] {
+class IsExternalAccessors[A <: StoredNode with HasIsExternal](steps: Steps[A]) extends PropertyAccessors[A] {
   override val raw: GremlinScala[A] = steps.raw
 
   def isExternal(): Steps[JBoolean] =

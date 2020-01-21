@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.{HasFullName, HasIsExternal, HasLineNumber, HasLineNumberEnd, HasName, Node, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{HasFullName, HasIsExternal, HasLineNumber, HasLineNumberEnd, HasName, HasOrder, Node, StoredNode}
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.MethodDOT
 import io.shiftleft.semanticcpg.language.nodemethods.{AstNodeMethods, CallMethods, MethodMethods, MethodReturnMethods, NodeMethods, WithinMethodMethods}
@@ -139,6 +139,9 @@ package object language {
 
   implicit def toNameAccessors[A <: StoredNode with HasName](steps: Steps[A]): NameAccessors[A] =
     new NameAccessors(steps)
+
+  implicit def toOrderAccessors[A <: StoredNode with HasOrder](steps: Steps[A]): OrderAccessors[A] =
+    new OrderAccessors(steps)
 
   implicit class GremlinScalaDeco[End](raw: GremlinScala[End]) {
     /* in some cases we cannot statically determine the type of the node, e.g. when traversing

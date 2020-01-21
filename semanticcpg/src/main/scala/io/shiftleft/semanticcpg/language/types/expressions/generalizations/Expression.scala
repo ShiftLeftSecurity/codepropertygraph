@@ -16,8 +16,7 @@ class Expression(raw: GremlinScala[nodes.Expression])
     with ExpressionBase[nodes.Expression] {}
 
 trait ExpressionBase[NodeType <: nodes.Expression]
-    extends OrderAccessors[NodeType]
-    with ArgumentIndexAccessors[NodeType]
+    extends ArgumentIndexAccessors[NodeType]
     with EvalTypeAccessors[NodeType]
     with CodeAccessors[NodeType]
     with AstNodeBase[NodeType] { this: NodeSteps[NodeType] =>
