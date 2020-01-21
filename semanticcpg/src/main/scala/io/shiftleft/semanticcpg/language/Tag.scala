@@ -3,12 +3,10 @@ package io.shiftleft.semanticcpg.language
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language.types.expressions.{Call, Identifier, Literal}
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.ValueAccessors
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.{NodeSteps => OriginalNodeSteps}
 
-class Tag(override val raw: GremlinScala[nodes.Tag]) extends OriginalNodeSteps[nodes.Tag](raw)
-    with ValueAccessors[nodes.Tag] {
+class Tag(override val raw: GremlinScala[nodes.Tag]) extends OriginalNodeSteps[nodes.Tag](raw) {
 
   def method: Method =
     new Method(
