@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.language
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.nodes.{HasArgumentIndex, StoredNode}
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
@@ -173,13 +174,14 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     Traverse to all arguments passed to methods
     */
-  def argument: Expression =
+  def argument: NodeSteps[nodes.StoredNode with HasArgumentIndex] =
     call.argument
 
   /**
     * Shorthand for `cpg.argument.code(code)`
     * */
-  def argument(code: String): Expression = argument.code(code)
+  def argument(code: String): NodeSteps[StoredNode with HasArgumentIndex] =
+    argument.code(code)
 
   /**
     * Traverse to all return expressions

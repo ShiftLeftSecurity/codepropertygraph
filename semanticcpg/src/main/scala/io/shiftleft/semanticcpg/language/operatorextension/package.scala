@@ -1,8 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.Operators
-import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Call, Expression}
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Call, Expression, HasArgumentIndex, StoredNode}
 import io.shiftleft.semanticcpg.language.nodemethods.CallMethods
 import io.shiftleft.semanticcpg.language.types.expressions.Identifier
 
@@ -10,16 +9,20 @@ package object operatorextension {
 
   implicit class ArrayAccessExt(val call: Call) extends AnyVal {
 
-    def array: Expression = call.argument(1)
+    def array: StoredNode with HasArgumentIndex =
+      call.argument(1)
 
-    def subscripts: Identifier = call.argument(2).ast.isIdentifier
+    def subscripts: Identifier =
+      call.argument(2).ast.isIdentifier
   }
 
   implicit class AssignmentExt(val call: Call) extends AnyVal {
 
-    def target: Expression = new CallMethods(call).argument(1)
+    def target: StoredNode with HasArgumentIndex =
+      new CallMethods(call).argument(1)
 
-    def source: Expression = new CallMethods(call).argument(2)
+    def source: StoredNode with HasArgumentIndex =
+      new CallMethods(call).argument(2)
   }
 
   implicit class OpAstNodeExt(val node: AstNode) extends AnyVal {

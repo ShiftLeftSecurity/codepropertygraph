@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.language.types.expressions
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.HasArgumentIndex
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
@@ -44,13 +45,13 @@ class Call(raw: GremlinScala[nodes.Call])
   /**
     Arguments of the call
     */
-  def argument: Expression =
-    new Expression(raw.out(EdgeTypes.ARGUMENT).cast[nodes.Expression])
+  def argument: NodeSteps[nodes.StoredNode with HasArgumentIndex] =
+    new NodeSteps[nodes.StoredNode with HasArgumentIndex](raw.out(EdgeTypes.ARGUMENT).cast[nodes.StoredNode with HasArgumentIndex])
 
   /**
     `i'th` arguments of the call
     */
-  def argument(i: Integer): Expression =
+  def argument(i: Integer): NodeSteps[nodes.StoredNode with HasArgumentIndex] =
     argument.argIndex(i)
 
   /**
