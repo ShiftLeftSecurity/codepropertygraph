@@ -29,19 +29,19 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
                     Operators.indirectFieldAccess,
                     Operators.getElementPtr)
       )
-      .toList
-    val cache = collection.mutable.Map.empty[Tuple2[nodes.Type, String], nodes.Member]
+      .l
+    val cache = collection.mutable.Map.empty[(nodes.Type, String), nodes.Member]
     val dstGraph = DiffGraph.newBuilder // don't use parallel executor, caching is better
-    memberAccessIterator.map(ma => resolve(dstGraph, cache, ma))
+    memberAccessIterator.foreach(ma => resolve(dstGraph, cache, ma))
     List(dstGraph.build()).iterator
   }
 
   private def resolve(diffGraph: DiffGraph.Builder,
-                      cache: collection.mutable.Map[Tuple2[nodes.Type, String], nodes.Member],
+                      cache: collection.mutable.Map[(nodes.Type, String), nodes.Member],
                       call: nodes.Call): Unit = {
     if (call._refOut.hasNext && !loggedDeprecationWarning) {
       logger.warn(
-        s"Using deprecated CPG format with alreay existing REF edge between" +
+        s"Using deprecated CPG format with already existing REF edge between" +
           s" a member access node and a member.")
       loggedDeprecationWarning = true
     }
@@ -66,7 +66,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
             case _                    => throw new RuntimeException("memberAccess needs Identifier as second argument")
           }
 
-        case Operators.fieldAccess | Operators.indirectIndexAccess | Operators.getElementPtr =>
+        case Operators.fieldAccess | Operators.indirectFieldAccess | Operators.getElementPtr =>
           args(1) match {
             case id: nodes.FieldIdentifier => id.code // we intentionally don't use the CANONICAL_NAME field here.
             case lit: nodes.Literal        => lit.code
@@ -87,7 +87,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
     }
   }
 
-  private def getMember(cache: collection.mutable.Map[Tuple2[nodes.Type, String], nodes.Member],
+  private def getMember(cache: collection.mutable.Map[(nodes.Type, String), nodes.Member],
                         typ: nodes.Type,
                         name: String,
                         depth: Int = 0): nodes.Member = {
@@ -100,7 +100,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
       (typ, name), {
         cache.update((typ, name), null)
         val members = typ.start.member.filter(_.nameExact(name)).l
-        val res = if (members.size > 0) {
+        val res = if (members.nonEmpty) {
           cache.update((typ, name), members.head)
           members.head
         } else {
@@ -112,7 +112,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
               _ != null
             }
 
-          if (recursive_res.size > 0) {
+          if (recursive_res.nonEmpty) {
             cache.update((typ, name), recursive_res.head)
             recursive_res.head
           } else null
