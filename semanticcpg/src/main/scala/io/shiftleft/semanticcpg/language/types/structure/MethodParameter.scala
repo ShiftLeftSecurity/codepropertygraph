@@ -13,7 +13,6 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 class MethodParameter(raw: GremlinScala[nodes.MethodParameterIn])
     extends NodeSteps[nodes.MethodParameterIn](raw)
     with DeclarationBase[nodes.MethodParameterIn]
-    with CodeAccessors[nodes.MethodParameterIn]
     with EvalTypeAccessors[nodes.MethodParameterIn] {
 
   /**

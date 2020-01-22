@@ -3,10 +3,33 @@ package io.shiftleft.semanticcpg
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.{HasDependencyGroupId, HasDispatchType, HasFullName, HasIsExternal, HasLineNumber, HasLineNumberEnd, HasName, HasOrder, HasParserTypeName, HasSignature, HasValue, HasVersion, Node, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{
+  HasCode,
+  HasDependencyGroupId,
+  HasDispatchType,
+  HasFullName,
+  HasIsExternal,
+  HasLineNumber,
+  HasLineNumberEnd,
+  HasName,
+  HasOrder,
+  HasParserTypeName,
+  HasSignature,
+  HasValue,
+  HasVersion,
+  Node,
+  StoredNode
+}
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.MethodDOT
-import io.shiftleft.semanticcpg.language.nodemethods.{AstNodeMethods, CallMethods, MethodMethods, MethodReturnMethods, NodeMethods, WithinMethodMethods}
+import io.shiftleft.semanticcpg.language.nodemethods.{
+  AstNodeMethods,
+  CallMethods,
+  MethodMethods,
+  MethodReturnMethods,
+  NodeMethods,
+  WithinMethodMethods
+}
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
@@ -124,18 +147,23 @@ package object language {
   implicit def toComment(steps: Steps[nodes.Comment]): Comment =
     new Comment(steps.raw)
 
-  implicit def toDependencyGroupIdAccessors[A <: StoredNode with HasDependencyGroupId](steps: Steps[A]): DependencyGroupIdAccessors[A] =
+  implicit def toCodeAccessors[A <: StoredNode with HasCode](steps: Steps[A]): CodeAccessors[A] =
+    new CodeAccessors(steps)
+
+  implicit def toDependencyGroupIdAccessors[A <: StoredNode with HasDependencyGroupId](
+      steps: Steps[A]): DependencyGroupIdAccessors[A] =
     new DependencyGroupIdAccessors(steps)
 
-  implicit def toDispatchTypeAccessors[A <: StoredNode with HasDispatchType](steps: Steps[A]): DispatchTypeAccessors[A] =
+  implicit def toDispatchTypeAccessors[A <: StoredNode with HasDispatchType](
+      steps: Steps[A]): DispatchTypeAccessors[A] =
     new DispatchTypeAccessors(steps)
 
   implicit def toIsExternalAccessors[A <: StoredNode with HasIsExternal](steps: Steps[A]): IsExternalAccessors[A] =
     new IsExternalAccessors(steps)
-  
+
   implicit def toFullNameAccessors[A <: StoredNode with HasFullName](steps: Steps[A]): FullNameAccessors[A] =
     new FullNameAccessors(steps)
-  
+
   implicit def toLineNumberAccessors[A <: StoredNode with HasLineNumber](steps: Steps[A]): LineNumberAccessors[A] =
     new LineNumberAccessors(steps)
 
@@ -149,7 +177,8 @@ package object language {
   implicit def toOrderAccessors[A <: StoredNode with HasOrder](steps: Steps[A]): OrderAccessors[A] =
     new OrderAccessors(steps)
 
-  implicit def toParserTypeNameAccessors[A <: StoredNode with HasParserTypeName](steps: Steps[A]): ParserTypeNameAccessors[A] =
+  implicit def toParserTypeNameAccessors[A <: StoredNode with HasParserTypeName](
+      steps: Steps[A]): ParserTypeNameAccessors[A] =
     new ParserTypeNameAccessors(steps)
 
   implicit def toSignatureAccessors[A <: StoredNode with HasSignature](steps: Steps[A]): SignatureAccessors[A] =

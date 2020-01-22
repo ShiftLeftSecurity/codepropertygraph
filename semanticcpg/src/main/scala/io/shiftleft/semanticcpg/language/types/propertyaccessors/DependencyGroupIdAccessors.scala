@@ -5,7 +5,8 @@ import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.codepropertygraph.generated.nodes.{HasDependencyGroupId, StoredNode}
 import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
 
-class DependencyGroupIdAccessors[A <: StoredNode with HasDependencyGroupId](steps: Steps[A]) extends StringPropertyAccessors[A] {
+class DependencyGroupIdAccessors[A <: StoredNode with HasDependencyGroupId](steps: Steps[A])
+    extends StringPropertyAccessors[A] {
   override val raw: GremlinScala[A] = steps.raw
 
   def dependencyGroupId(): Steps[String] =

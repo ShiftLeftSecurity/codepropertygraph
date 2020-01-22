@@ -10,8 +10,9 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 /**
   * Type declaration - possibly a template that requires instantiation
   * */
-class TypeDecl(raw: GremlinScala[nodes.TypeDecl]) extends NodeSteps[nodes.TypeDecl](raw)
-  with ModifierAccessors[nodes.TypeDecl] {
+class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
+    extends NodeSteps[nodes.TypeDecl](raw)
+    with ModifierAccessors[nodes.TypeDecl] {
   import TypeDecl._
 
   /**

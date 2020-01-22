@@ -4,33 +4,33 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
 
-trait PropertyAccessors[T <: StoredNode] {
-  val raw: GremlinScala[T]
+trait PropertyAccessors[A <: StoredNode] {
+  def raw: GremlinScala[A]
 
   def property[P](property: Key[P]): Steps[P] =
     new Steps[P](raw.value(property))
 
-  def propertyFilter[Out, P](property: Key[P], value: P): NodeSteps[T] =
-    new NodeSteps[T](raw.has(property, value))
+  def propertyFilter[Out, P](property: Key[P], value: P): NodeSteps[A] =
+    new NodeSteps[A](raw.has(property, value))
 
-  def propertyFilterMultiple[Out, P](property: Key[P], values: P*): NodeSteps[T] =
+  def propertyFilterMultiple[Out, P](property: Key[P], values: P*): NodeSteps[A] =
     if (values.nonEmpty) {
-      new NodeSteps[T](raw.or(values.map { value => (trav: GremlinScala[T]) =>
+      new NodeSteps[A](raw.or(values.map { value => (trav: GremlinScala[A]) =>
         trav.has(property, value)
       }: _*))
     } else {
-      new NodeSteps[T](raw.filterOnEnd(_ => false))
+      new NodeSteps[A](raw.filterOnEnd(_ => false))
     }
 
-  def propertyFilterNot[Out, P](property: Key[P], value: P): NodeSteps[T] =
-    new NodeSteps[T](raw.hasNot(property, value))
+  def propertyFilterNot[Out, P](property: Key[P], value: P): NodeSteps[A] =
+    new NodeSteps[A](raw.hasNot(property, value))
 
-  def propertyFilterNotMultiple[Out, P](property: Key[P], values: P*): NodeSteps[T] =
+  def propertyFilterNotMultiple[Out, P](property: Key[P], values: P*): NodeSteps[A] =
     if (values.nonEmpty) {
-      new NodeSteps[T](raw.or(values.map { value => (trav: GremlinScala[T]) =>
+      new NodeSteps[A](raw.or(values.map { value => (trav: GremlinScala[A]) =>
         trav.hasNot(property, value)
       }: _*))
     } else {
-      new NodeSteps[T](raw)
+      new NodeSteps[A](raw)
     }
 }

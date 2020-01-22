@@ -14,7 +14,6 @@ import io.shiftleft.semanticcpg.language.types.structure.{Member, Method, Method
   */
 class Call(raw: GremlinScala[nodes.Call])
     extends NodeSteps[nodes.Call](raw)
-    with CodeAccessors[nodes.Call]
     with EvalTypeAccessors[nodes.Call]
     with ExpressionBase[nodes.Call] {
 

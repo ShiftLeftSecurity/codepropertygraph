@@ -13,7 +13,6 @@ import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
 class Identifier(raw: GremlinScala[nodes.Identifier])
     extends NodeSteps[nodes.Identifier](raw)
     with ExpressionBase[nodes.Identifier]
-    with CodeAccessors[nodes.Identifier]
     with EvalTypeAccessors[nodes.Identifier] {
 
   /**

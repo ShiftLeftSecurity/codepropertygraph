@@ -13,7 +13,6 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 class Local(raw: GremlinScala[nodes.Local])
     extends NodeSteps[nodes.Local](raw)
     with DeclarationBase[nodes.Local]
-    with CodeAccessors[nodes.Local]
     with EvalTypeAccessors[nodes.Local] {
 
   /**

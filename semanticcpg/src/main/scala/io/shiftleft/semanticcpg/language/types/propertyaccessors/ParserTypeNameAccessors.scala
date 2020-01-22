@@ -5,7 +5,8 @@ import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.codepropertygraph.generated.nodes.{HasParserTypeName, StoredNode}
 import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
 
-class ParserTypeNameAccessors[A <: StoredNode with HasParserTypeName](steps: Steps[A]) extends StringPropertyAccessors[A] {
+class ParserTypeNameAccessors[A <: StoredNode with HasParserTypeName](steps: Steps[A])
+    extends StringPropertyAccessors[A] {
   override val raw: GremlinScala[A] = steps.raw
 
   def parserTypeName(): Steps[String] =
