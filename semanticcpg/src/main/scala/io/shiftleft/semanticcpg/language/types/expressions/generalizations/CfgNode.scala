@@ -6,7 +6,7 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.Method
 import io.shiftleft.semanticcpg.utils.ExpandTo
 
-class CfgNode(raw: GremlinScala[nodes.CfgNode]) extends NodeSteps[nodes.CfgNode](raw) with AstNodeBase[nodes.CfgNode] {
+class CfgNode(raw: GremlinScala[nodes.CfgNode]) extends NodeSteps[nodes.CfgNode](raw) {
 
   /**
   Traverse to enclosing method

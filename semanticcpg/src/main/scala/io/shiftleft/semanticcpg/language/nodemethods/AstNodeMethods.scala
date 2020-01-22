@@ -13,13 +13,13 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
   /**
     * All nodes of the abstract syntax tree rooted in this node
     * */
-  def ast: AstNode = node.start.ast
+  def ast: AstNode[nodes.AstNode] = node.start.ast
 
   /**
     * All nodes of the abstract syntax tree rooted in this node,
     * minus this node.
     * */
-  def astMinusRoot: AstNode = node.start.astMinusRoot
+  def astMinusRoot: AstNode[nodes.AstNode] = node.start.astMinusRoot
 
   /**
     * Indicate whether the AST node represents a control structure,

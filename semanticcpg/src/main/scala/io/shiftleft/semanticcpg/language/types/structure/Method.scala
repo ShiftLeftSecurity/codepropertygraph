@@ -3,12 +3,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{
-  AstNodeBase,
-  CfgNode,
-  DeclarationBase,
-  Expression
-}
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{CfgNode, DeclarationBase, Expression}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.{Call, ControlStructure, Literal}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
@@ -20,7 +15,6 @@ class Method(override val raw: GremlinScala[nodes.Method])
     extends NodeSteps[nodes.Method](raw)
     with DeclarationBase[nodes.Method]
     with EvalTypeAccessors[nodes.Method]
-    with AstNodeBase[nodes.Method]
     with ModifierAccessors[nodes.Method] {
 
   /**
@@ -58,12 +52,14 @@ class Method(override val raw: GremlinScala[nodes.Method])
   /**
     * All control structures of this method
     * */
-  def controlStructure: ControlStructure = ast.isControlStructure
+  def controlStructure: ControlStructure =
+    this.ast.isControlStructure
 
   /**
     * Shorthand to traverse to control structures where condition matches `regex`
     * */
-  def controlStructure(regex: String): ControlStructure = ast.isControlStructure.code(regex)
+  def controlStructure(regex: String): ControlStructure =
+    this.ast.isControlStructure.code(regex)
 
   /**
     * Outgoing call sites
@@ -182,7 +178,7 @@ class Method(override val raw: GremlinScala[nodes.Method])
   /**
     * Traverse to literals of method
     * */
-  override def literal: Literal =
+  def literal: Literal =
     new Literal(raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
 
   def topLevelExpressions: Expression =

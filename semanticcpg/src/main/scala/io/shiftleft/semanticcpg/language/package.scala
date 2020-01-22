@@ -55,7 +55,7 @@ package object language {
   implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods =
     new WithinMethodMethods(node)
 
-  implicit def astNodeMethodsQp(node: nodes.AstNode): AstNodeMethods =
+  implicit def toAstNodeMethods(node: nodes.AstNode): AstNodeMethods =
     new AstNodeMethods(node)
 
   implicit def toMethodMethods(node: nodes.Method): MethodMethods =
@@ -126,7 +126,7 @@ package object language {
   implicit def toCfgNode(steps: Steps[nodes.CfgNode]): CfgNode =
     new CfgNode(steps.raw)
 
-  implicit def toAstNode(steps: Steps[nodes.AstNode]): AstNode =
+  implicit def toAstNode[A <: nodes.AstNode](steps: Steps[A]): AstNode[A] =
     new AstNode(steps.raw)
 
   implicit def toFile(steps: Steps[nodes.File]): File =

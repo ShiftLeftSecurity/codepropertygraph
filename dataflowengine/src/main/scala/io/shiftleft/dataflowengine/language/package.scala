@@ -24,6 +24,7 @@ package object language {
     case _                              => ??? //TODO markus/fabs?
   }
 
-  implicit def trackingPointToAstBase(trav: TrackingPoint): AstNode = new AstNode(trav.map(trackingPointToAstNode).raw)
+  implicit def trackingPointToAstBase(steps: NodeSteps[nodes.TrackingPoint]): AstNode[nodes.AstNode] =
+    new AstNode(steps.map(trackingPointToAstNode).raw)
 
 }
