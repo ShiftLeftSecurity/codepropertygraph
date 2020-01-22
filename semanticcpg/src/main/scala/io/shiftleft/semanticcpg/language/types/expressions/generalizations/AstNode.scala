@@ -6,12 +6,8 @@ import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language.types.structure.Block
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions._
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.OrderAccessors
 
-class AstNode(raw: GremlinScala[nodes.AstNode])
-    extends NodeSteps[nodes.AstNode](raw)
-    with AstNodeBase[nodes.AstNode]
-    with OrderAccessors[nodes.AstNode]
+class AstNode(raw: GremlinScala[nodes.AstNode]) extends NodeSteps[nodes.AstNode](raw) with AstNodeBase[nodes.AstNode]
 
 trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
 

@@ -3,11 +3,8 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.NameAccessors
 
-class NamespaceBlock(raw: GremlinScala[nodes.NamespaceBlock])
-    extends NodeSteps[nodes.NamespaceBlock](raw)
-    with NameAccessors[nodes.NamespaceBlock] {
+class NamespaceBlock(raw: GremlinScala[nodes.NamespaceBlock]) extends NodeSteps[nodes.NamespaceBlock](raw) {
 
   /**
     * Namespaces for namespace blocks.

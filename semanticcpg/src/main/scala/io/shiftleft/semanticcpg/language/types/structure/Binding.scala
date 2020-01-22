@@ -3,12 +3,8 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.{NameAccessors, SignatureAccessors}
 
-class Binding(raw: GremlinScala[nodes.Binding])
-    extends NodeSteps[nodes.Binding](raw)
-    with NameAccessors[nodes.Binding]
-    with SignatureAccessors[nodes.Binding] {
+class Binding(raw: GremlinScala[nodes.Binding]) extends NodeSteps[nodes.Binding](raw) {
 
   /**
     * Traverse to the method bound by this method binding.

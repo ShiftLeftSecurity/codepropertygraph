@@ -13,17 +13,13 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 class MethodParameter(raw: GremlinScala[nodes.MethodParameterIn])
     extends NodeSteps[nodes.MethodParameterIn](raw)
     with DeclarationBase[nodes.MethodParameterIn]
-    with CodeAccessors[nodes.MethodParameterIn]
-    with NameAccessors[nodes.MethodParameterIn]
-    with OrderAccessors[nodes.MethodParameterIn]
-    with LineNumberAccessors[nodes.MethodParameterIn]
     with EvalTypeAccessors[nodes.MethodParameterIn] {
 
   /**
     * Traverse to all `num`th parameters
     * */
   def index(num: Int): MethodParameter =
-    order(num)
+    this.order(num)
 
   /**
     * Traverse to all parameters with index greater or equal than `num`

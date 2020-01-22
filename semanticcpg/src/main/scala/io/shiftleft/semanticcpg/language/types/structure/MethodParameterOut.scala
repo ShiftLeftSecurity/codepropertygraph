@@ -10,15 +10,11 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 class MethodParameterOut(raw: GremlinScala[nodes.MethodParameterOut])
     extends NodeSteps[nodes.MethodParameterOut](raw)
     with DeclarationBase[nodes.MethodParameterOut]
-    with CodeAccessors[nodes.MethodParameterOut]
-    with NameAccessors[nodes.MethodParameterOut]
-    with OrderAccessors[nodes.MethodParameterOut]
-    with LineNumberAccessors[nodes.MethodParameterOut]
     with EvalTypeAccessors[nodes.MethodParameterOut] {
 
   /* method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
   def index(num: Int): MethodParameterOut =
-    order(num)
+    this.order(num)
 
   /* get all parameters from (and including)
    * method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */

@@ -4,19 +4,11 @@ import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.ExpressionBase
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.{
-  ArgumentIndexAccessors,
-  CodeAccessors,
-  LineNumberAccessors,
-  OrderAccessors
-}
+import io.shiftleft.semanticcpg.language.types.propertyaccessors.ArgumentIndexAccessors
 
 // TODO: ColumnNumberAccessor missing
 
 class Return(raw: GremlinScala[nodes.Return])
     extends NodeSteps[nodes.Return](raw)
     with ExpressionBase[nodes.Return]
-    with LineNumberAccessors[nodes.Return]
-    with OrderAccessors[nodes.Return]
-    with ArgumentIndexAccessors[nodes.Return]
-    with CodeAccessors[nodes.Return] {}
+    with ArgumentIndexAccessors[nodes.Return] {}

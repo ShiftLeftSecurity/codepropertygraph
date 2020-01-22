@@ -4,12 +4,11 @@ import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.NameAccessors
 
 /**
   * A compilation unit
   * */
-class File(raw: GremlinScala[nodes.File]) extends NodeSteps[nodes.File](raw) with NameAccessors[nodes.File] {
+class File(raw: GremlinScala[nodes.File]) extends NodeSteps[nodes.File](raw) {
 
   def typeDecl: TypeDecl =
     new TypeDecl(

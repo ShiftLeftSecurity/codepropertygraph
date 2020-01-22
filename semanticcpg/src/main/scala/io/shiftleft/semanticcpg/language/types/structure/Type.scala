@@ -5,12 +5,8 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.{FullNameAccessors, NameAccessors}
 
-class Type(raw: GremlinScala[nodes.Type])
-    extends NodeSteps[nodes.Type](raw)
-    with NameAccessors[nodes.Type]
-    with FullNameAccessors[nodes.Type] {
+class Type(raw: GremlinScala[nodes.Type]) extends NodeSteps[nodes.Type](raw) {
 
   /**
     * Namespaces in which the corresponding type declaration is defined.
