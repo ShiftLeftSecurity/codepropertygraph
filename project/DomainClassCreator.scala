@@ -26,7 +26,7 @@ class Schema(schemaFile: String) {
 }
 
 /** Generates a domain model for OverflowDb traversals based on your domain-specific json schema.
-  * 
+  *
   * @param schemaFile: path to the schema (json file)
   * @param basePackage: specific for your domain, e.g. `com.example.mydomain`
   */
@@ -153,14 +153,16 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |}
            |""".stripMargin
 
-      companionObject  + classImpl
+      companionObject + classImpl
     }
 
     val filename = outputDir.getPath + "/" + edgesPackage.replaceAll("\\.", "/") + "/Edges.scala"
     writeFile(filename, edgeHeader, entries)
   }
 
-  def neighborAccessorName(edgetypename: String, direction: String) : String = {"_" + camelCase(edgetypename + "_" + direction)}
+  def neighborAccessorName(edgetypename: String, direction: String): String = {
+    "_" + camelCase(edgetypename + "_" + direction)
+  }
 
   def writeNodesFile(outputDir: JFile): JFile = {
     val propertyByName: Map[String, Property] =
@@ -176,9 +178,9 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
     def nodeHeader = {
       val neighborAccesors = (schema.edgeTypes.map(edgetype => neighborAccessorName(edgetype.name, "IN")) ++
-        schema.edgeTypes.map(edgetype => neighborAccessorName(edgetype.name, "OUT"))).map(nbname =>
-        s"def ${nbname}(): JIterator[StoredNode] = { JCollections.emptyIterator() }").mkString("\n")
-
+        schema.edgeTypes.map(edgetype => neighborAccessorName(edgetype.name, "OUT")))
+        .map(nbname => s"def ${nbname}(): JIterator[StoredNode] = { JCollections.emptyIterator() }")
+        .mkString("\n")
 
       val staticHeader =
         s"""package $nodesPackage
@@ -494,13 +496,18 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |""".stripMargin
 
       val neighborDelegators = (outEdges.map(edgetypename => neighborAccessorName(edgetypename, "OUT")) ++
-                                inEdges.map(edgetypename => neighborAccessorName(edgetypename, "IN"))).map(nbaName =>
-        s"override def ${nbaName}(): JIterator[StoredNode] = get().${nbaName}()").mkString("\n")
+        inEdges.map(edgetypename => neighborAccessorName(edgetypename, "IN")))
+        .map(nbaName => s"override def ${nbaName}(): JIterator[StoredNode] = get().${nbaName}()")
+        .mkString("\n")
 
       val nodeRefImpl = {
-        val propertyDelegators = keys.map(_.name).map(camelCase).map { name =>
-          s"""override def $name = get().$name"""
-        }.mkString("\n")
+        val propertyDelegators = keys
+          .map(_.name)
+          .map(camelCase)
+          .map { name =>
+            s"""override def $name = get().$name"""
+          }
+          .mkString("\n")
         val containedNodesDelegators = nodeType.containedNodes
         s"""class ${className}(graph: OdbGraph, id: Long)
            |  extends NodeRef[$classNameDb](graph, id)
@@ -521,9 +528,12 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |""".stripMargin
       }
       val neighborAccesors = (outEdges.map(edgetypename => neighborAccessorName(edgetypename, "OUT")) ++
-        inEdges.map(edgetypename => neighborAccessorName(edgetypename, "IN")) ).zipWithIndex.map{case (nbaName: String, offsetPos: Int) =>
-          s"override def $nbaName : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[StoredNode]]"
-      }.mkString("\n")
+        inEdges.map(edgetypename => neighborAccessorName(edgetypename, "IN"))).zipWithIndex
+        .map {
+          case (nbaName: String, offsetPos: Int) =>
+            s"override def $nbaName : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[StoredNode]]"
+        }
+        .mkString("\n")
 
       val classImpl =
         s"""class $classNameDb(ref: NodeRef[OdbNode]) extends OdbNode(ref) with StoredNode 
@@ -635,7 +645,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
               val optionalDefault = Cardinality.fromName(containedNode.cardinality) match {
                 case Cardinality.List      => "= List()"
                 case Cardinality.ZeroOrOne => "= None"
-                case _ => ""
+                case _                     => ""
               }
 
               s"val ${containedNode.localName}: ${getCompleteType(containedNode)} $optionalDefault"
@@ -668,23 +678,23 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       }
 
       val containedNodesByLocalName: String = {
-        val mappedNodes = nodeType.containedNodes.getOrElse(Nil)
-        .map { containedNode =>
-          val localName = containedNode.localName
-          val value = Cardinality.fromName(containedNode.cardinality) match {
-            case Cardinality.One       => s"($localName :: Nil)"
-            case Cardinality.ZeroOrOne => s"$localName.toList"
-            case Cardinality.List      => localName
+        val mappedNodes = nodeType.containedNodes
+          .getOrElse(Nil)
+          .map { containedNode =>
+            val localName = containedNode.localName
+            val value = Cardinality.fromName(containedNode.cardinality) match {
+              case Cardinality.One       => s"($localName :: Nil)"
+              case Cardinality.ZeroOrOne => s"$localName.toList"
+              case Cardinality.List      => localName
+            }
+            s"""("$localName" -> $value)"""
           }
-          s"""("$localName" -> $value)"""
-        }
         if (mappedNodes.isEmpty) {
           "Map.empty"
         } else {
           mappedNodes.mkString("Map.empty + ", " + ", "")
         }
       }
-
 
       s"""case class New${nodeType.className}($fields) extends NewNode with ${nodeType.className}Base {
          |  override val label = "${nodeType.name}"
@@ -735,12 +745,14 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
   }
 }
 
-case class NodeType(name: String,
-                    id: Int,
-                    keys: List[String],
-                    outEdges: List[OutEdgeEntry],
-                    is: Option[List[String]],
-                    containedNodes: Option[List[ContainedNode]]) {
+case class NodeType(
+    name: String,
+    id: Int,
+    keys: List[String],
+    outEdges: List[OutEdgeEntry],
+    is: Option[List[String]],
+    containedNodes: Option[List[ContainedNode]]
+) {
   lazy val className = Helpers.camelCaseCaps(name)
   lazy val classNameDb = s"${className}Db"
 }
@@ -781,7 +793,7 @@ object HigherValueType extends Enumeration {
 
 object Helpers {
 
-  def isNodeBaseTrait(baseTraits: List[NodeBaseTrait], nodeName: String): Boolean = 
+  def isNodeBaseTrait(baseTraits: List[NodeBaseTrait], nodeName: String): Boolean =
     nodeName == "NODE" || baseTraits.map(_.name).contains(nodeName)
 
   def camelCaseCaps(snakeCase: String): String = camelCase(snakeCase).capitalize
