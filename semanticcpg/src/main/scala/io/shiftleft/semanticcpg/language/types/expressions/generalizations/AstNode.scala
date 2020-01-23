@@ -7,51 +7,55 @@ import io.shiftleft.semanticcpg.language.types.structure.Block
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions._
 
-class AstNode(raw: GremlinScala[nodes.AstNode]) extends NodeSteps[nodes.AstNode](raw) with AstNodeBase[nodes.AstNode]
-
-trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
+class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw) {
 
   /**
     * Nodes of the AST rooted in this node, including the node itself.
     * */
-  def ast: AstNode = new AstNode(raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
+  def ast: NodeSteps[nodes.AstNode] = new NodeSteps(raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
 
-  def containsCallTo(regex: String): Steps[NodeType] =
+  def containsCallTo(regex: String): NodeSteps[A] =
     where(_.ast.isCall.name(regex).size > 0)
 
-  def depth(p: nodes.AstNode => Boolean): Steps[Int] = map(_.depth(p))
+  def depth(p: nodes.AstNode => Boolean): Steps[Int] =
+    map(_.depth(p))
 
   def isCallTo(regex: String): Call = isCall.name(regex)
 
   /**
     * Nodes of the AST rooted in this node, minus the node itself
     * */
-  def astMinusRoot: AstNode = new AstNode(raw.repeat(_.out(EdgeTypes.AST)).emit.cast[nodes.AstNode])
+  def astMinusRoot: NodeSteps[nodes.AstNode] =
+    new AstNode(raw.repeat(_.out(EdgeTypes.AST)).emit.cast[nodes.AstNode])
 
   /**
     * Direct children of node in the AST
     * */
-  def astChildren: AstNode = new AstNode(raw.out(EdgeTypes.AST).cast[nodes.AstNode])
+  def astChildren: NodeSteps[nodes.AstNode] =
+    new NodeSteps(raw.out(EdgeTypes.AST).cast[nodes.AstNode])
 
   /**
     * Parent AST node
     * */
-  def astParent: AstNode = new AstNode(raw.in(EdgeTypes.AST).cast[nodes.AstNode])
+  def astParent: NodeSteps[nodes.AstNode] =
+    new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.AstNode])
 
   /**
     * Nodes of the AST obtained by expanding AST edges backwards until the method root is reached
     * */
-  def inAst: AstNode = inAst(null)
+  def inAst: NodeSteps[nodes.AstNode] =
+    inAst(null)
 
   /**
     * Nodes of the AST obtained by expanding AST edges backwards until the method root is reached, minus this node
     * */
-  def inAstMinusLeaf: AstNode = inAstMinusLeaf(null)
+  def inAstMinusLeaf: NodeSteps[nodes.AstNode] =
+    inAstMinusLeaf(null)
 
   /**
     * Nodes of the AST obtained by expanding AST edges backwards until `root` or the method root is reached
     * */
-  def inAst(root: nodes.AstNode): AstNode =
+  def inAst(root: nodes.AstNode): NodeSteps[nodes.AstNode] =
     new AstNode(
       raw.emit
         .until(_.or(_.hasLabel(NodeTypes.METHOD), _.filterOnEnd(n => root != null && root == n)))
@@ -62,7 +66,7 @@ trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
     * Nodes of the AST obtained by expanding AST edges backwards until `root` or the method root is reached,
     * minus this node
     * */
-  def inAstMinusLeaf(root: nodes.AstNode): AstNode =
+  def inAstMinusLeaf(root: nodes.AstNode): NodeSteps[nodes.AstNode] =
     new AstNode(
       raw
         .until(_.or(_.hasLabel(NodeTypes.METHOD), _.filterOnEnd(n => root != null && root == n)))
@@ -103,9 +107,6 @@ trait AstNodeBase[NodeType <: nodes.AstNode] { this: NodeSteps[NodeType] =>
   def isExpression: Expression = new Expression(
     raw.filterOnEnd(_.isInstanceOf[nodes.Expression]).cast[nodes.Expression]
   )
-
-  @deprecated("replaced by isLiteral", "July 19")
-  def literal: Literal = isLiteral
 
   /**
     * Traverse only to AST nodes that are calls

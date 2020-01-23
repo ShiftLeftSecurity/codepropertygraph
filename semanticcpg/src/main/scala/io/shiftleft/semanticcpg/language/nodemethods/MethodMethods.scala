@@ -22,7 +22,8 @@ class MethodMethods(val node: nodes.Method) extends AnyVal {
 
   def controlStructure: ControlStructure = node.start.controlStructure
 
-  def ast: AstNode = node.start.ast
+  def ast: NodeSteps[nodes.AstNode] =
+    node.start.ast
 
   def numberOfLines: Int = {
     if (node.lineNumber.isDefined && node.lineNumberEnd.isDefined) {

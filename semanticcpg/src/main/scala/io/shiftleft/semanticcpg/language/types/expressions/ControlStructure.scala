@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.types.expressions
 
 import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{AstNode, Expression, ExpressionBase}
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{Expression, ExpressionBase}
 import io.shiftleft.semanticcpg.language._
 
 object ControlStructure {
@@ -24,11 +24,11 @@ class ControlStructure(raw: GremlinScala[nodes.ControlStructure])
   def condition: Expression =
     new Expression(raw.out(EdgeTypes.CONDITION).cast[nodes.Expression])
 
-  def whenTrue: AstNode = new AstNode(
+  def whenTrue: NodeSteps[nodes.AstNode] = new NodeSteps(
     raw.out.has(NodeKeys.ORDER, secondChildIndex).cast[nodes.AstNode]
   )
 
-  def whenFalse: AstNode = new AstNode(
+  def whenFalse: NodeSteps[nodes.AstNode] = new NodeSteps(
     raw.out.has(NodeKeys.ORDER, thirdChildIndex).cast[nodes.AstNode]
   )
 
