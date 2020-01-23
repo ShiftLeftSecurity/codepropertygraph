@@ -138,9 +138,8 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to AST nodes that are return nodes
     * */
-  def isReturn: Return = new Return(
-    raw.hasLabel(NodeTypes.RETURN).cast[nodes.Return]
-  )
+  def isReturn: NodeSteps[nodes.Return] =
+    new NodeSteps(raw.hasLabel(NodeTypes.RETURN).cast[nodes.Return])
 
   /**
     * Traverse only to AST nodes that are method reference nodes.

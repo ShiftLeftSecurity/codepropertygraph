@@ -132,9 +132,6 @@ package object language {
   implicit def toBlock(steps: Steps[nodes.Block]): Block =
     new Block(steps.raw)
 
-  implicit def toReturn(steps: Steps[nodes.Return]): Return =
-    new Return(steps.raw)
-
   implicit def toMethodRef(steps: Steps[nodes.MethodRef]): MethodRef =
     new MethodRef(steps.raw)
 

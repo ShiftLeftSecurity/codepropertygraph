@@ -184,13 +184,14 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Traverse to all return expressions
     */
-  def returns: Return =
-    new Return(scalaGraph.V.hasLabel(NodeTypes.RETURN).cast[nodes.Return])
+  def returns: NodeSteps[nodes.Return] =
+    new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.RETURN).cast[nodes.Return])
 
   /**
     * Shorthand for `returns.code(code)`
     * */
-  def returns(code: String): Return = returns.code(code)
+  def returns(code: String): NodeSteps[nodes.Return] =
+    returns.code(code)
 
   /**
     * Traverse to all meta data entries
