@@ -114,9 +114,6 @@ package object language {
   implicit def toNamespaceBlock(steps: Steps[nodes.NamespaceBlock]): NamespaceBlock =
     new NamespaceBlock(steps.raw)
 
-  implicit def toModifier(steps: Steps[nodes.Modifier]): Modifier =
-    new Modifier(steps.raw)
-
   implicit def toExpression[A <: nodes.Expression](steps: Steps[A]): Expression[A] =
     new Expression[A](steps.raw)
 
