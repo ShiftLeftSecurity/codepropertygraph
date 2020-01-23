@@ -99,8 +99,8 @@ class Type(raw: GremlinScala[nodes.Type]) extends NodeSteps[nodes.Type](raw) {
   def localsOfType: Local =
     new Local(raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
 
-  def expressionOfType: Expression =
-    new Expression(
+  def expressionOfType: NodeSteps[nodes.Expression] =
+    new NodeSteps(
       raw
         .in(EdgeTypes.EVAL_TYPE)
         .hasLabel(NodeTypes.IDENTIFIER, NodeTypes.CALL, NodeTypes.LITERAL)

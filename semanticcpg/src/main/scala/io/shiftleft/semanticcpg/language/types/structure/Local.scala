@@ -9,9 +9,7 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 /**
   * A local variable
   * */
-class Local(raw: GremlinScala[nodes.Local])
-    extends NodeSteps[nodes.Local](raw)
-    with EvalTypeAccessors[nodes.Local] {
+class Local(raw: GremlinScala[nodes.Local]) extends NodeSteps[nodes.Local](raw) with EvalTypeAccessors[nodes.Local] {
 
   /**
     * The method hosting this local variable

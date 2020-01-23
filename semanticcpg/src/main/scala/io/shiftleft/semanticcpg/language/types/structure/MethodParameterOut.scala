@@ -28,8 +28,8 @@ class MethodParameterOut(raw: GremlinScala[nodes.MethodParameterOut])
   def method: Method =
     new Method(raw.in(EdgeTypes.AST).cast[nodes.Method])
 
-  def argument: Expression = {
-    new Expression(
+  def argument: NodeSteps[nodes.Expression] = {
+    new NodeSteps(
       raw
         .sack((_: Integer, node: nodes.MethodParameterOut) => node.value2(NodeKeys.ORDER))
         .in(EdgeTypes.AST)

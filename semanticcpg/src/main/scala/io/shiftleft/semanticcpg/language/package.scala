@@ -117,8 +117,8 @@ package object language {
   implicit def toModifier(steps: Steps[nodes.Modifier]): Modifier =
     new Modifier(steps.raw)
 
-  implicit def toExpression(steps: Steps[nodes.Expression]): Expression =
-    new Expression(steps.raw)
+  implicit def toExpression[A <: nodes.Expression](steps: Steps[A]): Expression[A] =
+    new Expression[A](steps.raw)
 
   implicit def toCfgNode(steps: Steps[nodes.CfgNode]): CfgNode =
     new CfgNode(steps.raw)

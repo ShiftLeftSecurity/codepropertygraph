@@ -25,10 +25,8 @@ class MethodReturn(raw: GremlinScala[nodes.MethodReturn])
     *  Traverse to last expressions in CFG.
     *  Can be multiple.
     */
-  def cfgLast: Expression =
-    new Expression(
-      raw.in(EdgeTypes.CFG).cast[nodes.Expression]
-    )
+  def cfgLast: NodeSteps[nodes.Expression] =
+    new NodeSteps(raw.in(EdgeTypes.CFG).cast[nodes.Expression])
 
   /**
     * Traverse to return type

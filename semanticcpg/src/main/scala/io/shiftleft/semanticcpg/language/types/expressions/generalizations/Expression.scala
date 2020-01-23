@@ -11,25 +11,22 @@ import io.shiftleft.semanticcpg.language.types.structure.{Method, MethodParamete
 /**
   An expression (base type)
   */
-class Expression(raw: GremlinScala[nodes.Expression])
-    extends NodeSteps[nodes.Expression](raw)
-    with ExpressionBase[nodes.Expression] {}
-
-trait ExpressionBase[NodeType <: nodes.Expression]
-    extends ArgumentIndexAccessors[NodeType]
-    with EvalTypeAccessors[NodeType] { this: NodeSteps[NodeType] =>
+class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
+    extends NodeSteps[NodeType](raw)
+    with ArgumentIndexAccessors[NodeType]
+    with EvalTypeAccessors[NodeType] {
 
   /**
     Traverse to enclosing expression
     */
-  def expressionUp: Expression =
-    new Expression(raw.in(EdgeTypes.AST).not(_.hasLabel(NodeTypes.LOCAL)).cast[nodes.Expression])
+  def expressionUp: NodeSteps[nodes.Expression] =
+    new NodeSteps(raw.in(EdgeTypes.AST).not(_.hasLabel(NodeTypes.LOCAL)).cast[nodes.Expression])
 
   /**
     Traverse to sub expressions
     */
-  def expressionDown: Expression =
-    new Expression(
+  def expressionDown: NodeSteps[nodes.Expression] =
+    new NodeSteps(
       raw
         .out(EdgeTypes.AST)
         .not(_.hasLabel(NodeTypes.LOCAL))
@@ -48,8 +45,8 @@ trait ExpressionBase[NodeType <: nodes.Expression]
   /**
     * Only those expressions which are (direct) arguments of a call
     * */
-  def isArgument: Expression =
-    new Expression(raw.filter(_.in(EdgeTypes.ARGUMENT)).cast[nodes.Expression])
+  def isArgument: NodeSteps[nodes.Expression] =
+    new NodeSteps(raw.filter(_.in(EdgeTypes.ARGUMENT)).cast[nodes.Expression])
 
   /**
     * Traverse to surrounding call
@@ -93,8 +90,8 @@ trait ExpressionBase[NodeType <: nodes.Expression]
   /**
     * Traverse to next expression in CFG.
     */
-  def cfgNext: Expression =
-    new Expression(
+  def cfgNext: NodeSteps[nodes.Expression] =
+    new NodeSteps(
       raw
         .out(EdgeTypes.CFG)
         .filterNot(_.hasLabel(NodeTypes.METHOD_RETURN))
@@ -104,8 +101,8 @@ trait ExpressionBase[NodeType <: nodes.Expression]
   /**
     * Traverse to previous expression in CFG.
     */
-  def cfgPrev: Expression =
-    new Expression(
+  def cfgPrev: NodeSteps[nodes.Expression] =
+    new NodeSteps(
       raw
         .in(EdgeTypes.CFG)
         .filterNot(_.hasLabel(NodeTypes.METHOD))

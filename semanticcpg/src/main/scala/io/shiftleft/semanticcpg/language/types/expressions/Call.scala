@@ -6,16 +6,12 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
 import io.shiftleft.semanticcpg.language.types.structure.{Member, Method, MethodReturn}
 
 /**
   A call site
   */
-class Call(raw: GremlinScala[nodes.Call])
-    extends NodeSteps[nodes.Call](raw)
-    with EvalTypeAccessors[nodes.Call]
-    with ExpressionBase[nodes.Call] {
+class Call(raw: GremlinScala[nodes.Call]) extends NodeSteps[nodes.Call](raw) with EvalTypeAccessors[nodes.Call] {
 
   /**
     Only statically dispatched calls
@@ -32,25 +28,25 @@ class Call(raw: GremlinScala[nodes.Call])
   /**
     The caller
     */
-  override def method: Method =
+  def method: Method =
     new Method(raw.in(EdgeTypes.CONTAINS).hasLabel(NodeTypes.METHOD).cast[nodes.Method])
 
   /**
     The receiver of a call if the call has a receiver associated.
     */
-  def receiver: Expression =
-    new Expression(raw.out(EdgeTypes.RECEIVER).cast[nodes.Expression])
+  def receiver: NodeSteps[nodes.Expression] =
+    new NodeSteps(raw.out(EdgeTypes.RECEIVER).cast[nodes.Expression])
 
   /**
     Arguments of the call
     */
-  def argument: Expression =
-    new Expression(raw.out(EdgeTypes.ARGUMENT).cast[nodes.Expression])
+  def argument: NodeSteps[nodes.Expression] =
+    new NodeSteps(raw.out(EdgeTypes.ARGUMENT).cast[nodes.Expression])
 
   /**
     `i'th` arguments of the call
     */
-  def argument(i: Integer): Expression =
+  def argument(i: Integer): NodeSteps[nodes.Expression] =
     argument.argIndex(i)
 
   /**

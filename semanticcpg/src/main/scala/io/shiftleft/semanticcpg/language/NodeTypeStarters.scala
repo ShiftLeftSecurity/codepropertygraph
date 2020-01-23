@@ -173,13 +173,14 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     Traverse to all arguments passed to methods
     */
-  def argument: Expression =
+  def argument: NodeSteps[nodes.Expression] =
     call.argument
 
   /**
     * Shorthand for `cpg.argument.code(code)`
     * */
-  def argument(code: String): Expression = argument.code(code)
+  def argument(code: String): NodeSteps[nodes.Expression] =
+    argument.code(code)
 
   /**
     * Traverse to all return expressions

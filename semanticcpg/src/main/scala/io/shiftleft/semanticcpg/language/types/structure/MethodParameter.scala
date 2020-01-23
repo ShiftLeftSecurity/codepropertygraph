@@ -41,8 +41,8 @@ class MethodParameter(raw: GremlinScala[nodes.MethodParameterIn])
   /**
     * Traverse to arguments (actual parameters) associated with this formal parameter
     * */
-  def argument(): Expression = {
-    new Expression(
+  def argument(): NodeSteps[nodes.Expression] = {
+    new NodeSteps(
       raw
         .sack((_: Integer, node: nodes.MethodParameterIn) => node.value2(NodeKeys.ORDER))
         .in(EdgeTypes.AST)

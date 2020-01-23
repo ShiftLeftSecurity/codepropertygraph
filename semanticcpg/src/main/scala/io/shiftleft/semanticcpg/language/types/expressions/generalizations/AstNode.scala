@@ -79,8 +79,8 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
     * It's continuing it's walk until it hits an expression that's not a generic
     * "member access operation", e.g., "<operator>.memberAccess".
     * */
-  def parentExpression: Expression =
-    new Expression(raw.map(_.parentExpression))
+  def parentExpression: NodeSteps[nodes.Expression] =
+    new NodeSteps(raw.map(_.parentExpression))
 
   /**
     * Traverse only to those AST nodes that are also control flow graph nodes
@@ -104,9 +104,8 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to AST nodes that are expressions
     * */
-  def isExpression: Expression = new Expression(
-    raw.filterOnEnd(_.isInstanceOf[nodes.Expression]).cast[nodes.Expression]
-  )
+  def isExpression: NodeSteps[nodes.Expression] =
+    new NodeSteps(raw.filterOnEnd(_.isInstanceOf[nodes.Expression]).cast[nodes.Expression])
 
   /**
     * Traverse only to AST nodes that are calls

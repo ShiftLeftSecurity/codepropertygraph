@@ -180,8 +180,8 @@ class Method(override val raw: GremlinScala[nodes.Method])
   def literal: Literal =
     new Literal(raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
 
-  def topLevelExpressions: Expression =
-    new Expression(
+  def topLevelExpressions: NodeSteps[nodes.Expression] =
+    new NodeSteps(
       raw
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.BLOCK)
@@ -198,16 +198,14 @@ class Method(override val raw: GremlinScala[nodes.Method])
     *  Traverse to first expressions in CFG.
     *  Can be multiple.
     */
-  def cfgFirst: Expression =
-    new Expression(
-      raw.out(EdgeTypes.CFG).cast[nodes.Expression]
-    )
+  def cfgFirst: NodeSteps[nodes.Expression] =
+    new NodeSteps(raw.out(EdgeTypes.CFG).cast[nodes.Expression])
 
   /**
     *  Traverse to last expressions in CFG.
     *  Can be multiple.
     */
-  def cfgLast: Expression =
+  def cfgLast: NodeSteps[nodes.Expression] =
     methodReturn.cfgLast
 
   /**
