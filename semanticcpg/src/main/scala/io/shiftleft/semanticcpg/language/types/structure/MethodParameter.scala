@@ -4,7 +4,7 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.Identifier
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{DeclarationBase, Expression}
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
 /**
@@ -12,7 +12,6 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
   * */
 class MethodParameter(raw: GremlinScala[nodes.MethodParameterIn])
     extends NodeSteps[nodes.MethodParameterIn](raw)
-    with DeclarationBase[nodes.MethodParameterIn]
     with EvalTypeAccessors[nodes.MethodParameterIn] {
 
   /**

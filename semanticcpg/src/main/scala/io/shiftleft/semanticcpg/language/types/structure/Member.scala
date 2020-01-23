@@ -5,7 +5,6 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.Call
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.DeclarationBase
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.{EvalTypeAccessors, ModifierAccessors}
 
 /**
@@ -13,7 +12,6 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors.{EvalTypeAccess
   * */
 class Member(raw: GremlinScala[nodes.Member])
     extends NodeSteps[nodes.Member](raw)
-    with DeclarationBase[nodes.Member]
     with EvalTypeAccessors[nodes.Member]
     with ModifierAccessors[nodes.Member] {
 

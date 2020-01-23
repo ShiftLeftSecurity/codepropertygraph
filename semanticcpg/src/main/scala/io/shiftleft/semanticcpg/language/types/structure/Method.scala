@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{CfgNode, DeclarationBase, Expression}
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{CfgNode, Expression}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.{Call, ControlStructure, Literal}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
@@ -13,7 +13,6 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
   * */
 class Method(override val raw: GremlinScala[nodes.Method])
     extends NodeSteps[nodes.Method](raw)
-    with DeclarationBase[nodes.Method]
     with EvalTypeAccessors[nodes.Method]
     with ModifierAccessors[nodes.Method] {
 

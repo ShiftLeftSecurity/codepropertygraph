@@ -4,7 +4,6 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.Identifier
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.DeclarationBase
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
 /**
@@ -12,7 +11,6 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
   * */
 class Local(raw: GremlinScala[nodes.Local])
     extends NodeSteps[nodes.Local](raw)
-    with DeclarationBase[nodes.Local]
     with EvalTypeAccessors[nodes.Local] {
 
   /**

@@ -120,9 +120,6 @@ package object language {
   implicit def toExpression(steps: Steps[nodes.Expression]): Expression =
     new Expression(steps.raw)
 
-  implicit def toDeclaration(steps: Steps[nodes.Declaration]): Declaration =
-    new Declaration(steps.raw)
-
   implicit def toCfgNode(steps: Steps[nodes.CfgNode]): CfgNode =
     new CfgNode(steps.raw)
 

@@ -18,7 +18,7 @@ class Identifier(raw: GremlinScala[nodes.Identifier])
   /**
     * Traverse to all declarations of this identifier
     * */
-  def refsTo: Declaration =
-    new Declaration(raw.out(EdgeTypes.REF).cast[nodes.Declaration])
+  def refsTo: NodeSteps[nodes.Declaration] =
+    new NodeSteps(raw.out(EdgeTypes.REF).cast[nodes.Declaration])
 
 }
