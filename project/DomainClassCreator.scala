@@ -177,7 +177,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
     }
 
     def nodeHeader = {
-      val neighborAccesors = (schema.edgeTypes.map(edgetype => neighborAccessorName(edgetype.name, "IN")) ++
+      val neighborAccessors = (schema.edgeTypes.map(edgetype => neighborAccessorName(edgetype.name, "IN")) ++
         schema.edgeTypes.map(edgetype => neighborAccessorName(edgetype.name, "OUT")))
         .map(nbname => s"def ${nbname}(): JIterator[StoredNode] = { JCollections.emptyIterator() }")
         .mkString("\n")
@@ -239,7 +239,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  /* all properties */
            |  def valueMap: JMap[String, AnyRef]
            |
-           |  $neighborAccesors
+           |  $neighborAccessors
            |}
            |""".stripMargin
 
@@ -527,7 +527,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |}
            |""".stripMargin
       }
-      val neighborAccesors = (outEdges.map(edgetypename => neighborAccessorName(edgetypename, "OUT")) ++
+      val neighborAccessors = (outEdges.map(edgetypename => neighborAccessorName(edgetypename, "OUT")) ++
         inEdges.map(edgetypename => neighborAccessorName(edgetypename, "IN"))).zipWithIndex
         .map {
           case (nbaName: String, offsetPos: Int) =>
@@ -546,7 +546,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  override def valueMap: JMap[String, AnyRef] = $valueMapImpl
            |
            |  ${propertyBasedFields(keys)}
-           |  ${neighborAccesors}
+           |  ${neighborAccessors}
            |
            |  override def label: String = {
            |    $className.Label
