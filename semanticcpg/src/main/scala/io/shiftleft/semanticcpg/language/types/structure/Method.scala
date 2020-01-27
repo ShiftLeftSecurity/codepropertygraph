@@ -177,8 +177,8 @@ class Method(override val raw: GremlinScala[nodes.Method])
   /**
     * Traverse to literals of method
     * */
-  def literal: Literal =
-    new Literal(raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
+  def literal: NodeSteps[nodes.Literal] =
+    new NodeSteps(raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
 
   def topLevelExpressions: NodeSteps[nodes.Expression] =
     new NodeSteps(

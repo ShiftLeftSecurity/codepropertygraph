@@ -68,11 +68,11 @@ package object language {
     new CallMethods(node)
 
   // Implicit conversions from Step[NodeType, Label] to corresponding Step classes.
-  // If you introduce a new Step-type, that is, one that inherits from `Steps[NodeType,Labels]`,
-  // then you need to add an implicit conversion from `Steps[NodeType,Labels]` to your type
+  // If you introduce a new Step-type, that is, one that inherits from `Steps[NodeType]`,
+  // then you need to add an implicit conversion from `Steps[NodeType]` to your type
   // here.
 
-  implicit def toLiteral(steps: Steps[nodes.Literal]): Literal =
+  implicit def toLiteral[A <: nodes.Literal](steps: Steps[A]): Literal[A] =
     new Literal(steps.raw)
 
   implicit def toType(steps: Steps[nodes.Type]): Type =

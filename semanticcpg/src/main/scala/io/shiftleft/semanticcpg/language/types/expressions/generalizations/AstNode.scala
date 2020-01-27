@@ -123,9 +123,8 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to AST nodes that are literals
     * */
-  def isLiteral: Literal = new Literal(
-    raw.hasLabel(NodeTypes.LITERAL).cast[nodes.Literal]
-  )
+  def isLiteral: NodeSteps[nodes.Literal] =
+    new NodeSteps(raw.hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
 
   /**
     * Traverse only to AST nodes that are identifier

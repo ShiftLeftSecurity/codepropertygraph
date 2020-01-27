@@ -152,13 +152,14 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     Traverse to all literals (constant strings and numbers provided directly in the code).
     */
-  def literal: Literal =
-    new Literal(scalaGraph.V.hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
+  def literal: NodeSteps[nodes.Literal] =
+    new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
 
   /**
     * Shorthand for `cpg.literal.code(code)`
     * */
-  def literal(code: String): Literal = literal.code(code)
+  def literal(code: String): NodeSteps[nodes.Literal] =
+    literal.code(code)
 
   /**
     Traverse to all identifiers, e.g., occurrences of local variables or class members in method bodies.

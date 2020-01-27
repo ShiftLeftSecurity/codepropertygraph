@@ -56,8 +56,8 @@ class Tag(override val raw: GremlinScala[nodes.Tag]) extends OriginalNodeSteps[n
         .order(By((x: Vertex) => x.id))
         .cast[nodes.Identifier])
 
-  def literal: Literal =
-    new Literal(
+  def literal: NodeSteps[nodes.Literal] =
+    new NodeSteps(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.LITERAL)
