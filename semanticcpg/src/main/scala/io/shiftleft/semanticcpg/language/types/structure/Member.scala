@@ -24,8 +24,8 @@ class Member(raw: GremlinScala[nodes.Member])
   /**
     * Places where
     * */
-  def ref: Call =
-    new Call(raw.in(EdgeTypes.REF).cast[nodes.Call])
+  def ref: NodeSteps[nodes.Call] =
+    new NodeSteps(raw.in(EdgeTypes.REF).cast[nodes.Call])
 
   /**
     * Public members

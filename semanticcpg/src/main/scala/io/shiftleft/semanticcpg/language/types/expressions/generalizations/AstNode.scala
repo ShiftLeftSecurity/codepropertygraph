@@ -20,7 +20,8 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   def depth(p: nodes.AstNode => Boolean): Steps[Int] =
     map(_.depth(p))
 
-  def isCallTo(regex: String): Call = isCall.name(regex)
+  def isCallTo(regex: String): NodeSteps[nodes.Call] =
+    isCall.name(regex)
 
   /**
     * Nodes of the AST rooted in this node, minus the node itself
@@ -98,8 +99,8 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to those AST nodes that are control structures
     * */
-  def isControlStructure: ControlStructure =
-    new ControlStructure(raw.hasLabel(NodeTypes.CONTROL_STRUCTURE).cast[nodes.ControlStructure])
+  def isControlStructure: NodeSteps[nodes.ControlStructure] =
+    new NodeSteps(raw.hasLabel(NodeTypes.CONTROL_STRUCTURE).cast[nodes.ControlStructure])
 
   /**
     * Traverse only to AST nodes that are expressions
@@ -110,14 +111,13 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to AST nodes that are calls
     * */
-  def isCall: Call = new Call(
-    raw.hasLabel(NodeTypes.CALL).cast[nodes.Call]
-  )
+  def isCall: NodeSteps[nodes.Call] =
+    new NodeSteps(raw.hasLabel(NodeTypes.CALL).cast[nodes.Call])
 
   /**
   Cast to call if applicable and filter on call code `calleeRegex`
     */
-  def isCall(calleeRegex: String): Call =
+  def isCall(calleeRegex: String): NodeSteps[nodes.Call] =
     isCall.filter(_.code(calleeRegex))
 
   /**
@@ -130,9 +130,8 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to AST nodes that are identifier
     * */
-  def isIdentifier: Identifier = new Identifier(
-    raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier]
-  )
+  def isIdentifier: NodeSteps[nodes.Identifier] =
+    new NodeSteps(raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
     * Traverse only to AST nodes that are return nodes

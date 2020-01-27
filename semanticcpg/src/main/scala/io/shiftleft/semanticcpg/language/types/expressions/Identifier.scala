@@ -9,9 +9,7 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 /**
   An identifier, e.g., an instance of a local variable, or a temporary variable
   */
-class Identifier(raw: GremlinScala[nodes.Identifier])
-    extends NodeSteps[nodes.Identifier](raw)
-    with EvalTypeAccessors[nodes.Identifier] {
+class Identifier[A <: nodes.Identifier](raw: GremlinScala[A]) extends NodeSteps[A](raw) with EvalTypeAccessors[A] {
 
   /**
     * Traverse to all declarations of this identifier

@@ -35,12 +35,8 @@ class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
   /**
     If the expression is used as receiver for a call, this traverses to the call.
     */
-  def receivedCall: Call =
-    new Call(
-      raw
-        .in(EdgeTypes.RECEIVER)
-        .cast[nodes.Call]
-    )
+  def receivedCall: NodeSteps[nodes.Call] =
+    new NodeSteps(raw.in(EdgeTypes.RECEIVER).cast[nodes.Call])
 
   /**
     * Only those expressions which are (direct) arguments of a call
@@ -51,9 +47,8 @@ class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
   /**
     * Traverse to surrounding call
     * */
-  def call: Call = new Call(
-    raw.repeat(_.in(EdgeTypes.ARGUMENT)).until(_.hasLabel(NodeTypes.CALL)).cast[nodes.Call]
-  )
+  def call: NodeSteps[nodes.Call] =
+    new NodeSteps(raw.repeat(_.in(EdgeTypes.ARGUMENT)).until(_.hasLabel(NodeTypes.CALL)).cast[nodes.Call])
 
   /**
   Traverse to related parameter

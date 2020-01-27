@@ -128,13 +128,14 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     Traverse to all call sites
     */
-  def call: Call =
-    new Call(scalaGraph.V.hasLabel(NodeTypes.CALL).cast[nodes.Call])
+  def call: NodeSteps[nodes.Call] =
+    new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.CALL).cast[nodes.Call])
 
   /**
     * Shorthand for `cpg.call.name(name)`
     * */
-  def call(name: String): Call = call.name(name)
+  def call(name: String): NodeSteps[nodes.Call] =
+    call.name(name)
 
   /**
     Traverse to all local variable declarations
@@ -162,13 +163,14 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     Traverse to all identifiers, e.g., occurrences of local variables or class members in method bodies.
     */
-  def identifier: Identifier =
-    new Identifier(scalaGraph.V.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
+  def identifier: NodeSteps[nodes.Identifier] =
+    new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
     * Shorthand for `cpg.identifier.name(name)`
     * */
-  def identifier(name: String): Identifier = identifier.name(name)
+  def identifier(name: String): NodeSteps[nodes.Identifier] =
+    identifier.name(name)
 
   /**
     Traverse to all arguments passed to methods

@@ -51,20 +51,20 @@ class Method(override val raw: GremlinScala[nodes.Method])
   /**
     * All control structures of this method
     * */
-  def controlStructure: ControlStructure =
+  def controlStructure: NodeSteps[nodes.ControlStructure] =
     this.ast.isControlStructure
 
   /**
     * Shorthand to traverse to control structures where condition matches `regex`
     * */
-  def controlStructure(regex: String): ControlStructure =
+  def controlStructure(regex: String): NodeSteps[nodes.ControlStructure] =
     this.ast.isControlStructure.code(regex)
 
   /**
     * Outgoing call sites
     * */
-  def callOut: Call =
-    new Call(raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.CALL).cast[nodes.Call])
+  def callOut: NodeSteps[nodes.Call] =
+    new NodeSteps(raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.CALL).cast[nodes.Call])
 
   /**
     * The type declaration associated with this method, e.g., the class it is defined in.

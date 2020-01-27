@@ -30,8 +30,8 @@ class Local(raw: GremlinScala[nodes.Local]) extends NodeSteps[nodes.Local](raw) 
   /**
     * Places (identifier) where this local is being referenced
     * */
-  def referencingIdentifiers: Identifier =
-    new Identifier(raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
+  def referencingIdentifiers: NodeSteps[nodes.Identifier] =
+    new NodeSteps(raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
     * The type of the local.

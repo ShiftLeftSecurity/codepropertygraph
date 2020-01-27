@@ -20,7 +20,8 @@ class MethodMethods(val node: nodes.Method) extends AnyVal {
 
   def local: Local = node.start.local
 
-  def controlStructure: ControlStructure = node.start.controlStructure
+  def controlStructure: NodeSteps[nodes.ControlStructure] =
+    node.start.controlStructure
 
   def ast: NodeSteps[nodes.AstNode] =
     node.start.ast

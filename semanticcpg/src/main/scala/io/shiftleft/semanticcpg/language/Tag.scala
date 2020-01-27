@@ -40,16 +40,16 @@ class Tag(override val raw: GremlinScala[nodes.Tag]) extends OriginalNodeSteps[n
         .order(By((x: Vertex) => x.id))
         .cast[nodes.MethodParameterOut])
 
-  def call: Call =
-    new Call(
+  def call: NodeSteps[nodes.Call] =
+    new NodeSteps(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.CALL)
         .order(By((x: Vertex) => x.id))
         .cast[nodes.Call])
 
-  def identifier: Identifier =
-    new Identifier(
+  def identifier: NodeSteps[nodes.Identifier] =
+    new NodeSteps(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.IDENTIFIER)

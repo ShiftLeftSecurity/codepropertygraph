@@ -81,13 +81,13 @@ package object language {
   implicit def toTypeDecl(steps: Steps[nodes.TypeDecl]): TypeDecl =
     new TypeDecl(steps.raw)
 
-  implicit def toCall(steps: Steps[nodes.Call]): OriginalCall =
+  implicit def toCall[A <: nodes.Call](steps: Steps[A]): OriginalCall[A] =
     new OriginalCall(steps.raw)
 
-  implicit def toControlStructure(steps: Steps[nodes.ControlStructure]): ControlStructure =
+  implicit def toControlStructure[A <: nodes.ControlStructure](steps: Steps[A]): ControlStructure[A] =
     new ControlStructure(steps.raw)
 
-  implicit def toIdentifier(steps: Steps[nodes.Identifier]): Identifier =
+  implicit def toIdentifier[A <: nodes.Identifier](steps: Steps[A]): Identifier[A] =
     new Identifier(steps.raw)
 
   implicit def toMember(steps: Steps[nodes.Member]): Member =

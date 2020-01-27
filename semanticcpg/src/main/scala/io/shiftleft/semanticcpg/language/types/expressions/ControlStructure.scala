@@ -9,7 +9,7 @@ object ControlStructure {
   val thirdChildIndex = new Integer(3)
 }
 
-class ControlStructure(raw: GremlinScala[nodes.ControlStructure]) extends NodeSteps[nodes.ControlStructure](raw) {
+class ControlStructure[A <: nodes.ControlStructure](raw: GremlinScala[A]) extends NodeSteps[A](raw) {
   import ControlStructure._
 
   /**
