@@ -75,10 +75,10 @@ package object language {
   implicit def toLiteral[A <: nodes.Literal](steps: Steps[A]): Literal[A] =
     new Literal(steps.raw)
 
-  implicit def toType(steps: Steps[nodes.Type]): Type =
+  implicit def toType[A <: nodes.Type](steps: Steps[A]): Type[A] =
     new Type(steps.raw)
 
-  implicit def toTypeDecl(steps: Steps[nodes.TypeDecl]): TypeDecl =
+  implicit def toTypeDecl[A <: nodes.TypeDecl](steps: Steps[A]): TypeDecl[A] =
     new TypeDecl(steps.raw)
 
   implicit def toCall[A <: nodes.Call](steps: Steps[A]): OriginalCall[A] =
@@ -93,22 +93,25 @@ package object language {
   implicit def toMember(steps: Steps[nodes.Member]): Member =
     new Member(steps.raw)
 
-  implicit def toLocal(steps: Steps[nodes.Local]): Local =
+  implicit def toMetaData[A <: nodes.MetaData](steps: Steps[A]): MetaData[A] =
+    new MetaData(steps.raw)
+
+  implicit def toLocal[A <: nodes.Local](steps: Steps[A]): Local[A] =
     new Local(steps.raw)
 
-  implicit def toMethod(steps: Steps[nodes.Method]): OriginalMethod =
+  implicit def toMethod[A <: nodes.Method](steps: Steps[A]): OriginalMethod[A] =
     new OriginalMethod(steps.raw)
 
-  implicit def toMethodParameter(steps: Steps[nodes.MethodParameterIn]): MethodParameter =
+  implicit def toMethodParameter[A <: nodes.MethodParameterIn](steps: Steps[A]): MethodParameter[A] =
     new MethodParameter(steps.raw)
 
-  implicit def toMethodParameterOut(steps: Steps[nodes.MethodParameterOut]): MethodParameterOut =
+  implicit def toMethodParameterOut[A <: nodes.MethodParameterOut](steps: Steps[A]): MethodParameterOut[A] =
     new MethodParameterOut(steps.raw)
 
   implicit def toMethodReturn[A <: nodes.MethodReturn](steps: Steps[A]): MethodReturn[A] =
     new MethodReturn(steps.raw)
 
-  implicit def toNamespace(steps: Steps[nodes.Namespace]): Namespace =
+  implicit def toNamespace[A <: nodes.Namespace](steps: Steps[A]): Namespace[A] =
     new Namespace(steps.raw)
 
   implicit def toNamespaceBlock(steps: Steps[nodes.NamespaceBlock]): NamespaceBlock =
@@ -126,7 +129,7 @@ package object language {
   implicit def toFile(steps: Steps[nodes.File]): File =
     new File(steps.raw)
 
-  implicit def toBlock(steps: Steps[nodes.Block]): Block =
+  implicit def toBlock[A <: nodes.Block](steps: Steps[A]): Block[A] =
     new Block(steps.raw)
 
   implicit def toMethodRef(steps: Steps[nodes.MethodRef]): MethodRef =

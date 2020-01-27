@@ -54,14 +54,14 @@ class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
   Traverse to related parameter
     */
   @deprecated("", "October 2019")
-  def toParameter: MethodParameter = parameter
+  def toParameter: NodeSteps[nodes.MethodParameterIn] = parameter
 
   /**
     Traverse to related parameter, if the expression is an argument to a call and the call
     can be resolved.
     */
-  def parameter: MethodParameter = {
-    new MethodParameter(
+  def parameter: NodeSteps[nodes.MethodParameterIn] = {
+    new NodeSteps(
       raw
         .sack((sack: Integer, node: nodes.Expression) => node.value2(NodeKeys.ARGUMENT_INDEX))
         .in(EdgeTypes.ARGUMENT)
@@ -79,8 +79,8 @@ class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
   /**
     Traverse to enclosing method
     */
-  def method: Method =
-    new Method(raw.in(EdgeTypes.CONTAINS).cast[nodes.Method])
+  def method: NodeSteps[nodes.Method] =
+    new NodeSteps(raw.in(EdgeTypes.CONTAINS).cast[nodes.Method])
 
   /**
     * Traverse to next expression in CFG.
@@ -107,6 +107,6 @@ class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
   /**
     * Traverse to expression evaluation type
     * */
-  def typ: Type =
-    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+  def typ: NodeSteps[nodes.Type] =
+    new NodeSteps(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 }

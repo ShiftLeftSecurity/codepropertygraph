@@ -86,15 +86,14 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to those AST nodes that are also control flow graph nodes
     * */
-  def isCfgNode: CfgNode =
-    new CfgNode(raw.filterOnEnd(_.isInstanceOf[nodes.CfgNode]).cast[nodes.CfgNode])
+  def isCfgNode: NodeSteps[nodes.CfgNode] =
+    new NodeSteps(raw.filterOnEnd(_.isInstanceOf[nodes.CfgNode]).cast[nodes.CfgNode])
 
   /**
     * Traverse only to those AST nodes that are blocks
     * */
-  def isBlock: Block = new Block(
-    raw.hasLabel(NodeTypes.BLOCK).cast[nodes.Block]
-  )
+  def isBlock: NodeSteps[nodes.Block] =
+    new NodeSteps(raw.hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
 
   /**
     * Traverse only to those AST nodes that are control structures

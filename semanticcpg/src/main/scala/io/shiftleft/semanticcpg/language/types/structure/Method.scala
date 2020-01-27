@@ -3,23 +3,22 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.CfgNode
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
 /**
   * A method, function, or procedure
   * */
-class Method(override val raw: GremlinScala[nodes.Method])
-    extends NodeSteps[nodes.Method](raw)
-    with EvalTypeAccessors[nodes.Method]
-    with ModifierAccessors[nodes.Method] {
+class Method[A <: nodes.Method](override val raw: GremlinScala[A])
+    extends NodeSteps[A](raw)
+    with EvalTypeAccessors[A]
+    with ModifierAccessors[A] {
 
   /**
     * Traverse to parameters of the method
     * */
-  def parameter: MethodParameter =
-    new MethodParameter(
+  def parameter: NodeSteps[nodes.MethodParameterIn] =
+    new NodeSteps(
       raw
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
@@ -34,18 +33,14 @@ class Method(override val raw: GremlinScala[nodes.Method])
   /**
     * Traverse to type decl which have this method bound to it.
     */
-  def bindingTypeDecl: TypeDecl = {
+  def bindingTypeDecl: NodeSteps[nodes.TypeDecl] =
     referencingBinding.bindingTypeDecl
-  }
 
   /**
     * Traverse to bindings which reference to this method.
     */
-  def referencingBinding: Binding = {
-    new Binding(
-      raw.in(EdgeTypes.REF).filter(_.hasLabel(NodeTypes.BINDING)).cast[nodes.Binding]
-    )
-  }
+  def referencingBinding: NodeSteps[nodes.Binding] =
+    new Binding(raw.in(EdgeTypes.REF).filter(_.hasLabel(NodeTypes.BINDING)).cast[nodes.Binding])
 
   /**
     * All control structures of this method
@@ -68,8 +63,8 @@ class Method(override val raw: GremlinScala[nodes.Method])
   /**
     * The type declaration associated with this method, e.g., the class it is defined in.
     * */
-  def definingTypeDecl: TypeDecl =
-    new TypeDecl(
+  def definingTypeDecl: NodeSteps[nodes.TypeDecl] =
+    new NodeSteps(
       raw
         .cast[nodes.StoredNode]
         .repeat(_.in(EdgeTypes.AST).cast[nodes.StoredNode])
@@ -79,8 +74,8 @@ class Method(override val raw: GremlinScala[nodes.Method])
   /**
     * The method in which this method is defined
     * */
-  def definingMethod: Method =
-    new Method(
+  def definingMethod: NodeSteps[nodes.Method] =
+    new NodeSteps(
       raw
         .cast[nodes.StoredNode]
         .repeat(_.in(EdgeTypes.AST).cast[nodes.StoredNode])
@@ -90,82 +85,82 @@ class Method(override val raw: GremlinScala[nodes.Method])
   /**
     * Traverse only to methods that are stubs, e.g., their code is not available
     * */
-  def isStub: Method =
-    new Method(raw.filter(_.not(_.out(EdgeTypes.CFG))))
+  def isStub: NodeSteps[A] =
+    new NodeSteps(raw.filter(_.not(_.out(EdgeTypes.CFG))))
 
   /**
     * Traverse only to methods that are not stubs.
     * */
-  def isNotStub: Method =
-    new Method(raw.filter(_.out(EdgeTypes.CFG)))
+  def isNotStub: NodeSteps[A]=
+    new NodeSteps(raw.filter(_.out(EdgeTypes.CFG)))
 
   /**
     * Traverse to public methods
     * */
-  def isPublic: Method =
+  def isPublic: NodeSteps[A] =
     hasModifier(ModifierTypes.PUBLIC)
 
   /**
     * Traverse to private methods
     * */
-  def isPrivate: Method =
+  def isPrivate: NodeSteps[A] =
     hasModifier(ModifierTypes.PRIVATE)
 
   /**
     * Traverse to protected methods
     * */
-  def isProtected: Method =
+  def isProtected: NodeSteps[A] =
     hasModifier(ModifierTypes.PROTECTED)
 
   /**
     * Traverse to abstract methods
     * */
-  def isAbstract: Method =
+  def isAbstract: NodeSteps[A] =
     hasModifier(ModifierTypes.ABSTRACT)
 
   /**
     * Traverse to static methods
     * */
-  def isStatic: Method =
+  def isStatic: NodeSteps[A] =
     hasModifier(ModifierTypes.STATIC)
 
   /**
     * Traverse to native methods
     * */
-  def isNative: Method =
+  def isNative: NodeSteps[A] =
     hasModifier(ModifierTypes.NATIVE)
 
   /**
     * Traverse to constructors, that is, keep methods that are constructors
     * */
-  def isConstructor: Method =
+  def isConstructor: NodeSteps[A] =
     hasModifier(ModifierTypes.CONSTRUCTOR)
 
   /**
     * Traverse to virtual method
     * */
-  def isVirtual: Method =
+  def isVirtual: NodeSteps[A] =
     hasModifier(ModifierTypes.VIRTUAL)
 
   /**
     * Traverse to external methods, that is, methods not present
     * but only referenced in the CPG.
     * */
-  def external: Method =
-    new Method(raw.has(NodeKeys.IS_EXTERNAL -> true))
+  def external: NodeSteps[A] =
+    new NodeSteps(raw.has(NodeKeys.IS_EXTERNAL -> true))
 
   /**
     * Traverse to internal methods, that is, methods for which
     * code is included in this CPG.
     * */
-  def internal: Method =
-    new Method(raw.has(NodeKeys.IS_EXTERNAL -> false))
+  def internal: NodeSteps[A] =
+    new NodeSteps(raw.has(NodeKeys.IS_EXTERNAL -> false))
 
   /**
     * Traverse to the methods local variables
     * */
-  def local: Local =
-    new Local(
+  def local: NodeSteps[nodes.Local] =
+    new NodeSteps(
       raw
         .out(EdgeTypes.CONTAINS)
         .hasLabel(NodeTypes.BLOCK)
@@ -188,8 +183,8 @@ class Method(override val raw: GremlinScala[nodes.Method])
         .not(_.hasLabel(NodeTypes.LOCAL))
         .cast[nodes.Expression])
 
-  def cfgNode: CfgNode =
-    new CfgNode(
+  def cfgNode: NodeSteps[nodes.CfgNode] =
+    new NodeSteps(
       raw.out(EdgeTypes.CONTAINS).filterOnEnd(_.isInstanceOf[nodes.CfgNode]).cast[nodes.CfgNode]
     )
 
@@ -210,19 +205,19 @@ class Method(override val raw: GremlinScala[nodes.Method])
   /**
     * Traverse to block
     * */
-  def block: Block =
-    new Block(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
+  def block: NodeSteps[nodes.Block] =
+    new NodeSteps(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
 
   /**
     * Traverse to method body (alias for `block`)
     * */
-  def body: Block = block
+  def body: NodeSteps[nodes.Block] = block
 
   /**
     * Traverse to namespace
     * */
-  def namespace: Namespace =
-    new Namespace(definingTypeDecl.namespace.raw)
+  def namespace: NodeSteps[nodes.Namespace] =
+    new NodeSteps(definingTypeDecl.namespace.raw)
 
   def numberOfLines: Steps[Int] = map(_.numberOfLines)
 

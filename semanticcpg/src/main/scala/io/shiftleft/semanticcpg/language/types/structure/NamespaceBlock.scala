@@ -9,14 +9,14 @@ class NamespaceBlock(raw: GremlinScala[nodes.NamespaceBlock]) extends NodeSteps[
   /**
     * Namespaces for namespace blocks.
     * */
-  def namespaces: Namespace =
-    new Namespace(raw.out(EdgeTypes.REF).cast[nodes.Namespace])
+  def namespaces: NodeSteps[nodes.Namespace] =
+    new NodeSteps(raw.out(EdgeTypes.REF).cast[nodes.Namespace])
 
   /**
     * The type declarations defined in this namespace
     * */
-  def typeDecl: TypeDecl =
-    new TypeDecl(
+  def typeDecl: NodeSteps[nodes.TypeDecl] =
+    new NodeSteps(
       raw
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.TYPE_DECL)

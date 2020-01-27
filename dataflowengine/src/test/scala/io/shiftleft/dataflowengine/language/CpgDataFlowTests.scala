@@ -13,10 +13,10 @@ class CpgDataFlowTests extends WordSpec with Matchers {
   protected implicit def int2IntegerOption(x: Int): Option[Integer] =
     Some(x)
 
-  protected def getMemberOfType(cpg: Cpg, typeName: String, memberName: String): Member =
+  protected def getMemberOfType(cpg: Cpg, typeName: String, memberName: String): NodeSteps[nodes.Member] =
     cpg.typeDecl.nameExact(typeName).member.nameExact(memberName)
 
-  protected def getMethodOfType(cpg: Cpg, typeName: String, methodName: String): Method =
+  protected def getMethodOfType(cpg: Cpg, typeName: String, methodName: String): NodeSteps[nodes.Method] =
     cpg.typeDecl.nameExact(typeName).method.nameExact(methodName)
 
   protected def getLiteralOfType(cpg: Cpg, typeName: String, literalName: String): NodeSteps[nodes.Literal] =

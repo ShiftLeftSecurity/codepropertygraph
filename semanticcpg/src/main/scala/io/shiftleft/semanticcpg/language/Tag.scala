@@ -8,8 +8,8 @@ import io.shiftleft.semanticcpg.language.{NodeSteps => OriginalNodeSteps}
 
 class Tag(override val raw: GremlinScala[nodes.Tag]) extends OriginalNodeSteps[nodes.Tag](raw) {
 
-  def method: Method =
-    new Method(
+  def method: NodeSteps[nodes.Method] =
+    new NodeSteps(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.METHOD)
@@ -24,16 +24,16 @@ class Tag(override val raw: GremlinScala[nodes.Tag]) extends OriginalNodeSteps[n
         .order(By((x: Vertex) => x.id))
         .cast[nodes.MethodReturn])
 
-  def parameter: MethodParameter =
-    new MethodParameter(
+  def parameter: NodeSteps[nodes.MethodParameterIn] =
+    new NodeSteps(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
         .order(By((x: Vertex) => x.id))
         .cast[nodes.MethodParameterIn])
 
-  def parameterOut: MethodParameterOut =
-    new MethodParameterOut(
+  def parameterOut: NodeSteps[nodes.MethodParameterOut] =
+    new NodeSteps(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.METHOD_PARAMETER_OUT)
@@ -64,8 +64,8 @@ class Tag(override val raw: GremlinScala[nodes.Tag]) extends OriginalNodeSteps[n
         .order(By((x: Vertex) => x.id))
         .cast[nodes.Literal])
 
-  def local: Local =
-    new Local(
+  def local: NodeSteps[nodes.Local] =
+    new NodeSteps(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.LOCAL)

@@ -4,7 +4,6 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.Call
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.{EvalTypeAccessors, ModifierAccessors}
 
 /**
@@ -18,8 +17,8 @@ class Member(raw: GremlinScala[nodes.Member])
   /**
     * The type declaration this member is defined in
     * */
-  def typeDecl: TypeDecl =
-    new TypeDecl(raw.in(EdgeTypes.AST).cast[nodes.TypeDecl])
+  def typeDecl: NodeSteps[nodes.TypeDecl] =
+    new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.TypeDecl])
 
   /**
     * Places where
@@ -54,6 +53,6 @@ class Member(raw: GremlinScala[nodes.Member])
   /**
     * Traverse to member type
     * */
-  def typ: Type =
-    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+  def typ: NodeSteps[nodes.Type] =
+    new NodeSteps(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 }
