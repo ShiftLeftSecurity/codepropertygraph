@@ -16,8 +16,8 @@ class Tag(override val raw: GremlinScala[nodes.Tag]) extends OriginalNodeSteps[n
         .order(By((x: Vertex) => x.id))
         .cast[nodes.Method])
 
-  def methodReturn: MethodReturn =
-    new MethodReturn(
+  def methodReturn: NodeSteps[nodes.MethodReturn] =
+    new NodeSteps(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.METHOD_RETURN)

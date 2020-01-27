@@ -100,8 +100,8 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     Traverse to all formal return parameters
     */
-  def methodReturn: MethodReturn =
-    new MethodReturn(scalaGraph.V.hasLabel(NodeTypes.METHOD_RETURN).cast[nodes.MethodReturn])
+  def methodReturn: NodeSteps[nodes.MethodReturn] =
+    new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.METHOD_RETURN).cast[nodes.MethodReturn])
 
   /**
     Traverse to all input parameters

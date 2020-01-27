@@ -3,9 +3,8 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{CfgNode, Expression}
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.CfgNode
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.{Call, ControlStructure, Literal}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
 /**
@@ -29,8 +28,8 @@ class Method(override val raw: GremlinScala[nodes.Method])
   /**
     * Traverse to formal return parameter
     * */
-  def methodReturn: MethodReturn =
-    new MethodReturn(raw.map(_.methodReturn))
+  def methodReturn: NodeSteps[nodes.MethodReturn] =
+    new NodeSteps(raw.map(_.methodReturn))
 
   /**
     * Traverse to type decl which have this method bound to it.

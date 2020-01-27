@@ -6,11 +6,10 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.EvalTypeAccessors
 
-class MethodReturn(raw: GremlinScala[nodes.MethodReturn])
-    extends NodeSteps[nodes.MethodReturn](raw) with EvalTypeAccessors[nodes.MethodReturn] {
+class MethodReturn[A <: nodes.MethodReturn](raw: GremlinScala[A]) extends NodeSteps[A](raw) with EvalTypeAccessors[A] {
 
-  def method: Method =
-    new Method(raw.in(EdgeTypes.AST).cast[nodes.Method])
+  def method: NodeSteps[nodes.Method] =
+    new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.Method])
 
   def returnUser: NodeSteps[nodes.Call] =
     new NodeSteps(raw.in(EdgeTypes.AST).in(EdgeTypes.CALL).cast[nodes.Call])
@@ -25,8 +24,8 @@ class MethodReturn(raw: GremlinScala[nodes.MethodReturn])
   /**
     * Traverse to return type
     * */
-  def typ: Type =
-    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+  def typ: NodeSteps[nodes.Type] =
+    new NodeSteps(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 
   def toReturn: NodeSteps[nodes.Return] =
     new NodeSteps(raw.flatMap { mr =>

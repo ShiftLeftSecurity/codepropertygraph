@@ -105,7 +105,7 @@ package object language {
   implicit def toMethodParameterOut(steps: Steps[nodes.MethodParameterOut]): MethodParameterOut =
     new MethodParameterOut(steps.raw)
 
-  implicit def toMethodReturn(steps: Steps[nodes.MethodReturn]): MethodReturn =
+  implicit def toMethodReturn[A <: nodes.MethodReturn](steps: Steps[A]): MethodReturn[A] =
     new MethodReturn(steps.raw)
 
   implicit def toNamespace(steps: Steps[nodes.Namespace]): Namespace =
