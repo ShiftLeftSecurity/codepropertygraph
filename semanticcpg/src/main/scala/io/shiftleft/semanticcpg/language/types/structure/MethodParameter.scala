@@ -8,8 +8,9 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 /**
   * Formal method input parameter
   * */
-class MethodParameter[A <: nodes.MethodParameterIn](raw: GremlinScala[A]) extends NodeSteps[A](raw)
-  with EvalTypeAccessors[A] {
+class MethodParameter[A <: nodes.MethodParameterIn](raw: GremlinScala[A])
+    extends NodeSteps[A](raw)
+    with EvalTypeAccessors[A] {
 
   /**
     * Traverse to all `num`th parameters

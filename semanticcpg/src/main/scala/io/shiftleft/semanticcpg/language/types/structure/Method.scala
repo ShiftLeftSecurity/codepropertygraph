@@ -91,7 +91,7 @@ class Method[A <: nodes.Method](override val raw: GremlinScala[A])
   /**
     * Traverse only to methods that are not stubs.
     * */
-  def isNotStub: NodeSteps[A]=
+  def isNotStub: NodeSteps[A] =
     new NodeSteps(raw.filter(_.out(EdgeTypes.CFG)))
 
   /**

@@ -20,8 +20,8 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
   /**
     * Traverse to source file
     * */
-  def file: File =
-    new File(
+  def file: NodeSteps[nodes.File] =
+    new NodeSteps(
       raw
         .choose(
           _.label.is(NodeTypes.NAMESPACE),

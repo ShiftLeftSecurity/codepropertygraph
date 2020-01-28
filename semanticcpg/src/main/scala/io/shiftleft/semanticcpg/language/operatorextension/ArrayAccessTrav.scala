@@ -14,5 +14,4 @@ class ArrayAccessTrav(raw: GremlinScala[Call]) extends Steps[Call](raw) {
   def subscripts: Steps[NodeSteps[nodes.Identifier]] =
     map(_.subscripts)
 
-
 }

@@ -8,7 +8,7 @@ import io.shiftleft.semanticcpg.language._
 /**
   * A compilation unit
   * */
-class File(raw: GremlinScala[nodes.File]) extends NodeSteps[nodes.File](raw) {
+class File[A <: nodes.File](raw: GremlinScala[A]) extends NodeSteps[A](raw) {
 
   def typeDecl: NodeSteps[nodes.TypeDecl] =
     new NodeSteps(
@@ -24,7 +24,7 @@ class File(raw: GremlinScala[nodes.File]) extends NodeSteps[nodes.File](raw) {
   def namespaceBlock: NodeSteps[nodes.NamespaceBlock] =
     new NodeSteps(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[nodes.NamespaceBlock])
 
-  def comment: NodeSteps[nodes.Comment] =
-    new NodeSteps(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.COMMENT).cast[nodes.Comment])
+  def comment: Comment[nodes.Comment] =
+    new Comment(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.COMMENT).cast[nodes.Comment])
 
 }

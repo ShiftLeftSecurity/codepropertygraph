@@ -4,7 +4,7 @@ import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 
-class Binding(raw: GremlinScala[nodes.Binding]) extends NodeSteps[nodes.Binding](raw) {
+class Binding[A <: nodes.Binding](raw: GremlinScala[A]) extends NodeSteps[A](raw) {
 
   /**
     * Traverse to the method bound by this method binding.

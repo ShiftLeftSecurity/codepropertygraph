@@ -4,7 +4,7 @@ import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 
-class MethodRef(raw: GremlinScala[nodes.MethodRef]) extends NodeSteps[nodes.MethodRef](raw) {
+class MethodRef[A <: nodes.MethodRef](raw: GremlinScala[A]) extends NodeSteps[A](raw) {
 
   /**
     * Traverse to referenced method.

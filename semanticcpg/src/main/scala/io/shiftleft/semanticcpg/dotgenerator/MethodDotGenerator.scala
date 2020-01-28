@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.dotgenerator
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.structure.Vertex
 
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.language._
@@ -19,7 +20,7 @@ object MethodDotGenerator {
     * @param methodStep A step resulting in a set of methods.
     * @return A java.lang.String containing a DOT graph for each internal method.
     */
-  def toDotGraph(methodStep: NodeSteps[Method]): List[String] =
+  def toDotGraph[A <: nodes.Method](methodStep: NodeSteps[A]): List[String] =
     methodStep.internal.l.map(generateDotFromMethod)
 
   private def generateDotFromMethod(method: Method): String = {

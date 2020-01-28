@@ -90,7 +90,7 @@ package object language {
   implicit def toIdentifier[A <: nodes.Identifier](steps: Steps[A]): Identifier[A] =
     new Identifier(steps.raw)
 
-  implicit def toMember(steps: Steps[nodes.Member]): Member =
+  implicit def toMember[A <: nodes.Member](steps: Steps[A]): Member[A] =
     new Member(steps.raw)
 
   implicit def toMetaData[A <: nodes.MetaData](steps: Steps[A]): MetaData[A] =
@@ -114,31 +114,31 @@ package object language {
   implicit def toNamespace[A <: nodes.Namespace](steps: Steps[A]): Namespace[A] =
     new Namespace(steps.raw)
 
-  implicit def toNamespaceBlock(steps: Steps[nodes.NamespaceBlock]): NamespaceBlock =
+  implicit def toNamespaceBlock[A <: nodes.NamespaceBlock](steps: Steps[A]): NamespaceBlock[A] =
     new NamespaceBlock(steps.raw)
 
   implicit def toExpression[A <: nodes.Expression](steps: Steps[A]): Expression[A] =
     new Expression[A](steps.raw)
 
-  implicit def toCfgNode(steps: Steps[nodes.CfgNode]): CfgNode =
+  implicit def toCfgNode[A <: nodes.CfgNode](steps: Steps[A]): CfgNode[A] =
     new CfgNode(steps.raw)
 
   implicit def toAstNode[A <: nodes.AstNode](steps: Steps[A]): AstNode[A] =
     new AstNode(steps.raw)
 
-  implicit def toFile(steps: Steps[nodes.File]): File =
+  implicit def toFile[A <: nodes.File](steps: Steps[A]): File[A] =
     new File(steps.raw)
 
   implicit def toBlock[A <: nodes.Block](steps: Steps[A]): Block[A] =
     new Block(steps.raw)
 
-  implicit def toMethodRef(steps: Steps[nodes.MethodRef]): MethodRef =
+  implicit def toMethodRef[A <: nodes.MethodRef](steps: Steps[A]): MethodRef[A] =
     new MethodRef(steps.raw)
 
-  implicit def toBinding(steps: Steps[nodes.Binding]): Binding =
+  implicit def toBinding[A <: nodes.Binding](steps: Steps[A]): Binding[A] =
     new Binding(steps.raw)
 
-  implicit def toComment(steps: Steps[nodes.Comment]): Comment =
+  implicit def toComment[A <: nodes.Comment](steps: Steps[A]): Comment[A] =
     new Comment(steps.raw)
 
   implicit def toCodeAccessors[A <: StoredNode with HasCode](steps: Steps[A]): CodeAccessors[A] =
@@ -262,7 +262,7 @@ package object language {
   implicit def toMethodForCallGraph(steps: Steps[nodes.Method]): Method =
     new Method(steps.raw)
 
-  implicit def toMethodDOTForCallGraph(steps: Steps[nodes.Method]): MethodDOT =
+  implicit def toMethodDOTForCallGraph[A <: nodes.Method](steps: Steps[A]): MethodDOT[A] =
     new MethodDOT(steps.raw)
 
   implicit def toCallForCallGraph(steps: Steps[nodes.Call]): Call =

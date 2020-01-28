@@ -7,7 +7,8 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
 class MethodParameterOut[A <: nodes.MethodParameterOut](raw: GremlinScala[A])
-    extends NodeSteps[A](raw) with EvalTypeAccessors[A] {
+    extends NodeSteps[A](raw)
+    with EvalTypeAccessors[A] {
 
   /* method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
   def index(num: Int): NodeSteps[A] =

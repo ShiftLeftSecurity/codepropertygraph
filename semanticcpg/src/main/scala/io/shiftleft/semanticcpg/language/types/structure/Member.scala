@@ -9,10 +9,10 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors.{EvalTypeAccess
 /**
   * A member variable of a class/type.
   * */
-class Member(raw: GremlinScala[nodes.Member])
-    extends NodeSteps[nodes.Member](raw)
-    with EvalTypeAccessors[nodes.Member]
-    with ModifierAccessors[nodes.Member] {
+class Member[A <: nodes.Member](raw: GremlinScala[A])
+    extends NodeSteps[A](raw)
+    with EvalTypeAccessors[A]
+    with ModifierAccessors[A] {
 
   /**
     * The type declaration this member is defined in
@@ -29,25 +29,25 @@ class Member(raw: GremlinScala[nodes.Member])
   /**
     * Public members
     * */
-  def isPublic: Member =
+  def isPublic: NodeSteps[A] =
     hasModifier(ModifierTypes.PUBLIC)
 
   /**
     * Private members
     * */
-  def isPrivate: Member =
+  def isPrivate: NodeSteps[A] =
     hasModifier(ModifierTypes.PRIVATE)
 
   /**
     * Protected members
     * */
-  def isProtected: Member =
+  def isProtected: NodeSteps[A] =
     hasModifier(ModifierTypes.PROTECTED)
 
   /**
     * Static members
     * */
-  def isStatic: Member =
+  def isStatic: NodeSteps[A] =
     hasModifier(ModifierTypes.STATIC)
 
   /**

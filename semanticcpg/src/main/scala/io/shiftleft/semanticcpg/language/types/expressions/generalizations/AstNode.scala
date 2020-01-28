@@ -140,9 +140,8 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to AST nodes that are method reference nodes.
     */
-  def isMethodRef: MethodRef = new MethodRef(
-    raw.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef]
-  )
+  def isMethodRef: NodeSteps[nodes.MethodRef] =
+    new NodeSteps(raw.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef])
 
   def walkAstUntilReaching(labels: List[String]): NodeSteps[nodes.StoredNode] =
     new NodeSteps[nodes.StoredNode](
