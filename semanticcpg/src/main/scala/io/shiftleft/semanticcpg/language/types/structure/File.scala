@@ -10,19 +10,19 @@ import io.shiftleft.semanticcpg.language._
   * */
 class File[A <: nodes.File](raw: GremlinScala[A]) extends NodeSteps[A](raw) {
 
-  def typeDecl: NodeSteps[nodes.TypeDecl] =
-    new NodeSteps(
+  def typeDecl: TypeDecl[nodes.TypeDecl] =
+    new TypeDecl(
       raw
         .out(EdgeTypes.AST)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.TYPE_DECL)
         .cast[nodes.TypeDecl])
 
-  def namespace: NodeSteps[nodes.Namespace] =
-    new NodeSteps(raw.out(EdgeTypes.AST).out(EdgeTypes.REF).cast[nodes.Namespace])
+  def namespace: Namespace[nodes.Namespace] =
+    new Namespace(raw.out(EdgeTypes.AST).out(EdgeTypes.REF).cast[nodes.Namespace])
 
-  def namespaceBlock: NodeSteps[nodes.NamespaceBlock] =
-    new NodeSteps(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[nodes.NamespaceBlock])
+  def namespaceBlock: NamespaceBlock[nodes.NamespaceBlock] =
+    new NamespaceBlock(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[nodes.NamespaceBlock])
 
   def comment: Comment[nodes.Comment] =
     new Comment(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.COMMENT).cast[nodes.Comment])

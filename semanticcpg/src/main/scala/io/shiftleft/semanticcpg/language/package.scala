@@ -259,13 +259,13 @@ package object language {
 
   // Call graph extension
 
-  implicit def toMethodForCallGraph(steps: Steps[nodes.Method]): Method =
+  implicit def toMethodForCallGraph[A <: nodes.Method](steps: Steps[A]): Method[A] =
     new Method(steps.raw)
 
   implicit def toMethodDOTForCallGraph[A <: nodes.Method](steps: Steps[A]): MethodDOT[A] =
     new MethodDOT(steps.raw)
 
-  implicit def toCallForCallGraph(steps: Steps[nodes.Call]): Call =
+  implicit def toCallForCallGraph[A <: nodes.Call](steps: Steps[A]): Call[A] =
     new Call(steps.raw)
 
   // / Call graph extension
@@ -286,7 +286,7 @@ package object language {
   implicit def toNodeStepsTag[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =
     new NodeSteps[NodeType](original.raw)
 
-  implicit def toTagTag(steps: Steps[nodes.Tag]): Tag =
+  implicit def toTagTag[A <: nodes.Tag](steps: Steps[A]): Tag[A] =
     new Tag(steps.raw)
 
 }

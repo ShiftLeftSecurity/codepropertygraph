@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.language.types.expressions
 import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{AstNode, Expression}
 
 object ControlStructure {
   val secondChildIndex = new Integer(2)
@@ -15,15 +16,13 @@ class ControlStructure[A <: nodes.ControlStructure](raw: GremlinScala[A]) extend
   /**
     * The expression introduced by this control structure, if any
     * */
-  def condition: NodeSteps[nodes.Expression] =
-    new NodeSteps(raw.out(EdgeTypes.CONDITION).cast[nodes.Expression])
+  def condition: Expression[nodes.Expression] =
+    new Expression(raw.out(EdgeTypes.CONDITION).cast[nodes.Expression])
 
-  def whenTrue: NodeSteps[nodes.AstNode] = new NodeSteps(
-    raw.out.has(NodeKeys.ORDER, secondChildIndex).cast[nodes.AstNode]
-  )
+  def whenTrue: AstNode[nodes.AstNode] =
+    new AstNode(raw.out.has(NodeKeys.ORDER, secondChildIndex).cast[nodes.AstNode])
 
-  def whenFalse: NodeSteps[nodes.AstNode] = new NodeSteps(
-    raw.out.has(NodeKeys.ORDER, thirdChildIndex).cast[nodes.AstNode]
-  )
+  def whenFalse: AstNode[nodes.AstNode] =
+    new AstNode(raw.out.has(NodeKeys.ORDER, thirdChildIndex).cast[nodes.AstNode])
 
 }

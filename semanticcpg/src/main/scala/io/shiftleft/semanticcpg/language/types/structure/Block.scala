@@ -10,6 +10,6 @@ class Block[A <: nodes.Block](raw: GremlinScala[A]) extends NodeSteps[A](raw) {
   /**
     * Traverse to locals of this block.
     */
-  def local: NodeSteps[nodes.Local] =
-    new NodeSteps(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
+  def local: Local[nodes.Local] =
+    new Local(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
 }

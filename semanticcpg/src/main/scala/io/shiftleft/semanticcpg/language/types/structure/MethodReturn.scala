@@ -4,28 +4,30 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.types.expressions.Call
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.EvalTypeAccessors
 
 class MethodReturn[A <: nodes.MethodReturn](raw: GremlinScala[A]) extends NodeSteps[A](raw) with EvalTypeAccessors[A] {
 
-  def method: NodeSteps[nodes.Method] =
-    new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.Method])
+  def method: Method[nodes.Method] =
+    new Method(raw.in(EdgeTypes.AST).cast[nodes.Method])
 
-  def returnUser: NodeSteps[nodes.Call] =
-    new NodeSteps(raw.in(EdgeTypes.AST).in(EdgeTypes.CALL).cast[nodes.Call])
+  def returnUser: Call[nodes.Call] =
+    new Call(raw.in(EdgeTypes.AST).in(EdgeTypes.CALL).cast[nodes.Call])
 
   /**
     *  Traverse to last expressions in CFG.
     *  Can be multiple.
     */
-  def cfgLast: NodeSteps[nodes.Expression] =
-    new NodeSteps(raw.in(EdgeTypes.CFG).cast[nodes.Expression])
+  def cfgLast: Expression[nodes.Expression] =
+    new Expression(raw.in(EdgeTypes.CFG).cast[nodes.Expression])
 
   /**
     * Traverse to return type
     * */
-  def typ: NodeSteps[nodes.Type] =
-    new NodeSteps(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+  def typ: Type[nodes.Type] =
+    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 
   def toReturn: NodeSteps[nodes.Return] =
     new NodeSteps(raw.flatMap { mr =>

@@ -23,8 +23,8 @@ class TrackingPoint(raw: GremlinScala[nodes.TrackingPoint]) extends NodeSteps[no
   /**
     * The enclosing method of the tracking point
     * */
-  def method: NodeSteps[nodes.Method] =
-    new NodeSteps(raw.map { dataFlowObject =>
+  def method: Method[nodes.Method] =
+    new Method(raw.map { dataFlowObject =>
       methodFast(dataFlowObject)
     })
 

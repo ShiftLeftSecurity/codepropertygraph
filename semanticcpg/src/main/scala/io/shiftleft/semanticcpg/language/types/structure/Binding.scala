@@ -9,12 +9,12 @@ class Binding[A <: nodes.Binding](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse to the method bound by this method binding.
     */
-  def boundMethod: NodeSteps[nodes.Method] =
-    new NodeSteps(raw.out(EdgeTypes.REF).cast[nodes.Method])
+  def boundMethod: Method[nodes.Method] =
+    new Method(raw.out(EdgeTypes.REF).cast[nodes.Method])
 
   /**
     * Traverse to the method bound by this method binding.
     */
-  def bindingTypeDecl: NodeSteps[nodes.TypeDecl] =
-    new NodeSteps(raw.in(EdgeTypes.BINDS).cast[nodes.TypeDecl])
+  def bindingTypeDecl: TypeDecl[nodes.TypeDecl] =
+    new TypeDecl(raw.in(EdgeTypes.BINDS).cast[nodes.TypeDecl])
 }

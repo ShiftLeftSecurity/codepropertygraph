@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod}
 
-class Method(override val raw: GremlinScala[nodes.Method]) extends Steps[nodes.Method](raw) {
+class Method[A <: nodes.Method](override val raw: GremlinScala[A]) extends Steps[A](raw) {
 
   /**
     * Intended for internal use!
@@ -55,7 +55,7 @@ class Method(override val raw: GremlinScala[nodes.Method]) extends Steps[nodes.M
   /**
     * Incoming call sites
     * */
-  def callIn(implicit callResolver: ICallResolver): Call = {
+  def callIn(implicit callResolver: ICallResolver): Call[nodes.Call] = {
     new Call(
       sideEffect(callResolver.resolveDynamicMethodCallSites).raw
         .in(EdgeTypes.CALL)

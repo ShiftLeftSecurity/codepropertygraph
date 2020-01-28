@@ -4,6 +4,7 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.types.expressions.Call
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.{EvalTypeAccessors, ModifierAccessors}
 
 /**
@@ -17,42 +18,42 @@ class Member[A <: nodes.Member](raw: GremlinScala[A])
   /**
     * The type declaration this member is defined in
     * */
-  def typeDecl: NodeSteps[nodes.TypeDecl] =
-    new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.TypeDecl])
+  def typeDecl: TypeDecl[nodes.TypeDecl] =
+    new TypeDecl(raw.in(EdgeTypes.AST).cast[nodes.TypeDecl])
 
   /**
     * Places where
     * */
-  def ref: NodeSteps[nodes.Call] =
-    new NodeSteps(raw.in(EdgeTypes.REF).cast[nodes.Call])
+  def ref: Call[nodes.Call] =
+    new Call(raw.in(EdgeTypes.REF).cast[nodes.Call])
 
   /**
     * Public members
     * */
-  def isPublic: NodeSteps[A] =
+  def isPublic: Member[A] =
     hasModifier(ModifierTypes.PUBLIC)
 
   /**
     * Private members
     * */
-  def isPrivate: NodeSteps[A] =
+  def isPrivate: Member[A] =
     hasModifier(ModifierTypes.PRIVATE)
 
   /**
     * Protected members
     * */
-  def isProtected: NodeSteps[A] =
+  def isProtected: Member[A] =
     hasModifier(ModifierTypes.PROTECTED)
 
   /**
     * Static members
     * */
-  def isStatic: NodeSteps[A] =
+  def isStatic: Member[A] =
     hasModifier(ModifierTypes.STATIC)
 
   /**
     * Traverse to member type
     * */
-  def typ: NodeSteps[nodes.Type] =
-    new NodeSteps(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+  def typ: Type[nodes.Type] =
+    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 }

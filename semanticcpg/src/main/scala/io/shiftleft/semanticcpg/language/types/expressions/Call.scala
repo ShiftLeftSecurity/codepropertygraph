@@ -5,7 +5,9 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
+import io.shiftleft.semanticcpg.language.types.structure.{Member, Method, MethodReturn}
 
 /**
   A call site
@@ -15,44 +17,44 @@ class Call[A <: nodes.Call](raw: GremlinScala[A]) extends NodeSteps[A](raw) with
   /**
     Only statically dispatched calls
     */
-  def isStatic: NodeSteps[A] =
+  def isStatic: Call[A] =
     this.dispatchType("STATIC_DISPATCH")
 
   /**
     Only dynamically dispatched calls
     */
-  def isDynamic: NodeSteps[A] =
+  def isDynamic: Call[A] =
     this.dispatchType("DYNAMIC_DISPATCH")
 
   /**
     The caller
     */
-  def method: NodeSteps[nodes.Method] =
-    new NodeSteps(raw.in(EdgeTypes.CONTAINS).hasLabel(NodeTypes.METHOD).cast[nodes.Method])
+  def method: Method[nodes.Method] =
+    new Method(raw.in(EdgeTypes.CONTAINS).hasLabel(NodeTypes.METHOD).cast[nodes.Method])
 
   /**
     The receiver of a call if the call has a receiver associated.
     */
-  def receiver: NodeSteps[nodes.Expression] =
-    new NodeSteps(raw.out(EdgeTypes.RECEIVER).cast[nodes.Expression])
+  def receiver: Expression[nodes.Expression] =
+    new Expression(raw.out(EdgeTypes.RECEIVER).cast[nodes.Expression])
 
   /**
     Arguments of the call
     */
-  def argument: NodeSteps[nodes.Expression] =
-    new NodeSteps(raw.out(EdgeTypes.ARGUMENT).cast[nodes.Expression])
+  def argument: Expression[nodes.Expression] =
+    new Expression(raw.out(EdgeTypes.ARGUMENT).cast[nodes.Expression])
 
   /**
     `i'th` arguments of the call
     */
-  def argument(i: Integer): NodeSteps[nodes.Expression] =
+  def argument(i: Integer): Expression[nodes.Expression] =
     argument.argIndex(i)
 
   /**
     To formal method return parameter
     */
-  def toMethodReturn: NodeSteps[nodes.MethodReturn] =
-    new NodeSteps(
+  def toMethodReturn: MethodReturn[nodes.MethodReturn] =
+    new MethodReturn(
       raw
         .out(EdgeTypes.CALL)
         .out(EdgeTypes.AST)
@@ -62,7 +64,7 @@ class Call[A <: nodes.Call](raw: GremlinScala[A]) extends NodeSteps[A](raw) with
   /**
     * Traverse to referenced members
     * */
-  def referencedMember: NodeSteps[nodes.Member] =
-    new NodeSteps(raw.out(EdgeTypes.REF).cast[nodes.Member])
+  def referencedMember: Member[nodes.Member] =
+    new Member(raw.out(EdgeTypes.REF).cast[nodes.Member])
 
 }

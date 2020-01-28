@@ -19,14 +19,14 @@ class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
   /**
     Traverse to enclosing expression
     */
-  def expressionUp: NodeSteps[nodes.Expression] =
-    new NodeSteps(raw.in(EdgeTypes.AST).not(_.hasLabel(NodeTypes.LOCAL)).cast[nodes.Expression])
+  def expressionUp: Expression[nodes.Expression] =
+    new Expression(raw.in(EdgeTypes.AST).not(_.hasLabel(NodeTypes.LOCAL)).cast[nodes.Expression])
 
   /**
     Traverse to sub expressions
     */
-  def expressionDown: NodeSteps[nodes.Expression] =
-    new NodeSteps(
+  def expressionDown: Expression[nodes.Expression] =
+    new Expression(
       raw
         .out(EdgeTypes.AST)
         .not(_.hasLabel(NodeTypes.LOCAL))
@@ -35,33 +35,33 @@ class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
   /**
     If the expression is used as receiver for a call, this traverses to the call.
     */
-  def receivedCall: NodeSteps[nodes.Call] =
-    new NodeSteps(raw.in(EdgeTypes.RECEIVER).cast[nodes.Call])
+  def receivedCall: Call[nodes.Call] =
+    new Call(raw.in(EdgeTypes.RECEIVER).cast[nodes.Call])
 
   /**
     * Only those expressions which are (direct) arguments of a call
     * */
-  def isArgument: NodeSteps[nodes.Expression] =
-    new NodeSteps(raw.filter(_.in(EdgeTypes.ARGUMENT)).cast[nodes.Expression])
+  def isArgument: Expression[nodes.Expression] =
+    new Expression(raw.filter(_.in(EdgeTypes.ARGUMENT)).cast[nodes.Expression])
 
   /**
     * Traverse to surrounding call
     * */
-  def call: NodeSteps[nodes.Call] =
-    new NodeSteps(raw.repeat(_.in(EdgeTypes.ARGUMENT)).until(_.hasLabel(NodeTypes.CALL)).cast[nodes.Call])
+  def call: Call[nodes.Call] =
+    new Call(raw.repeat(_.in(EdgeTypes.ARGUMENT)).until(_.hasLabel(NodeTypes.CALL)).cast[nodes.Call])
 
   /**
   Traverse to related parameter
     */
   @deprecated("", "October 2019")
-  def toParameter: NodeSteps[nodes.MethodParameterIn] = parameter
+  def toParameter: MethodParameter[nodes.MethodParameterIn] = parameter
 
   /**
     Traverse to related parameter, if the expression is an argument to a call and the call
     can be resolved.
     */
-  def parameter: NodeSteps[nodes.MethodParameterIn] = {
-    new NodeSteps(
+  def parameter: MethodParameter[nodes.MethodParameterIn] = {
+    new MethodParameter(
       raw
         .sack((sack: Integer, node: nodes.Expression) => node.value2(NodeKeys.ARGUMENT_INDEX))
         .in(EdgeTypes.ARGUMENT)
@@ -79,14 +79,14 @@ class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
   /**
     Traverse to enclosing method
     */
-  def method: NodeSteps[nodes.Method] =
-    new NodeSteps(raw.in(EdgeTypes.CONTAINS).cast[nodes.Method])
+  def method: Method[nodes.Method] =
+    new Method(raw.in(EdgeTypes.CONTAINS).cast[nodes.Method])
 
   /**
     * Traverse to next expression in CFG.
     */
-  def cfgNext: NodeSteps[nodes.Expression] =
-    new NodeSteps(
+  def cfgNext: Expression[nodes.Expression] =
+    new Expression(
       raw
         .out(EdgeTypes.CFG)
         .filterNot(_.hasLabel(NodeTypes.METHOD_RETURN))
@@ -96,8 +96,8 @@ class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
   /**
     * Traverse to previous expression in CFG.
     */
-  def cfgPrev: NodeSteps[nodes.Expression] =
-    new NodeSteps(
+  def cfgPrev: Expression[nodes.Expression] =
+    new Expression(
       raw
         .in(EdgeTypes.CFG)
         .filterNot(_.hasLabel(NodeTypes.METHOD))
@@ -107,6 +107,6 @@ class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
   /**
     * Traverse to expression evaluation type
     * */
-  def typ: NodeSteps[nodes.Type] =
-    new NodeSteps(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+  def typ: Type[nodes.Type] =
+    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 }

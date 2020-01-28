@@ -6,66 +6,66 @@ import io.shiftleft.semanticcpg.language.types.expressions.{Call, Identifier, Li
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.{NodeSteps => OriginalNodeSteps}
 
-class Tag(override val raw: GremlinScala[nodes.Tag]) extends OriginalNodeSteps[nodes.Tag](raw) {
+class Tag[A <: nodes.Tag](override val raw: GremlinScala[A]) extends OriginalNodeSteps[A](raw) {
 
-  def method: NodeSteps[nodes.Method] =
-    new NodeSteps(
+  def method: Method[nodes.Method] =
+    new Method(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.METHOD)
         .order(By((x: Vertex) => x.id))
         .cast[nodes.Method])
 
-  def methodReturn: NodeSteps[nodes.MethodReturn] =
-    new NodeSteps(
+  def methodReturn: MethodReturn[nodes.MethodReturn] =
+    new MethodReturn(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.METHOD_RETURN)
         .order(By((x: Vertex) => x.id))
         .cast[nodes.MethodReturn])
 
-  def parameter: NodeSteps[nodes.MethodParameterIn] =
-    new NodeSteps(
+  def parameter: MethodParameter[nodes.MethodParameterIn] =
+    new MethodParameter(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
         .order(By((x: Vertex) => x.id))
         .cast[nodes.MethodParameterIn])
 
-  def parameterOut: NodeSteps[nodes.MethodParameterOut] =
-    new NodeSteps(
+  def parameterOut: MethodParameterOut[nodes.MethodParameterOut] =
+    new MethodParameterOut(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.METHOD_PARAMETER_OUT)
         .order(By((x: Vertex) => x.id))
         .cast[nodes.MethodParameterOut])
 
-  def call: NodeSteps[nodes.Call] =
-    new NodeSteps(
+  def call: Call[nodes.Call] =
+    new Call(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.CALL)
         .order(By((x: Vertex) => x.id))
         .cast[nodes.Call])
 
-  def identifier: NodeSteps[nodes.Identifier] =
-    new NodeSteps(
+  def identifier: Identifier[nodes.Identifier] =
+    new Identifier(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.IDENTIFIER)
         .order(By((x: Vertex) => x.id))
         .cast[nodes.Identifier])
 
-  def literal: NodeSteps[nodes.Literal] =
-    new NodeSteps(
+  def literal: Literal[nodes.Literal] =
+    new Literal(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.LITERAL)
         .order(By((x: Vertex) => x.id))
         .cast[nodes.Literal])
 
-  def local: NodeSteps[nodes.Local] =
-    new NodeSteps(
+  def local: Local[nodes.Local] =
+    new Local(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.LOCAL)

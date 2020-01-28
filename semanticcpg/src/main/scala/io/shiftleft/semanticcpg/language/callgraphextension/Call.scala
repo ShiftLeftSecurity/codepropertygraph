@@ -4,13 +4,13 @@ import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 
-class Call(override val raw: GremlinScala[nodes.Call]) extends NodeSteps[nodes.Call](raw) {
+class Call[A <: nodes.Call](override val raw: GremlinScala[A]) extends NodeSteps[A](raw) {
 
   /**
   The callee method
     */
-  def calledMethod(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] = {
-    new NodeSteps[nodes.Method](
+  def calledMethod(implicit callResolver: ICallResolver): Method[nodes.Method] = {
+    new Method(
       sideEffect(callResolver.resolveDynamicCallSite).raw
         .out(EdgeTypes.CALL)
         .cast[nodes.Method])

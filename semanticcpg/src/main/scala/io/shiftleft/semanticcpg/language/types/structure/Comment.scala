@@ -6,7 +6,7 @@ import io.shiftleft.semanticcpg.language._
 
 class Comment[A <: nodes.Comment](raw: GremlinScala[A]) extends NodeSteps[A](raw) {
 
-  override def file: NodeSteps[nodes.File] =
-    new NodeSteps(raw.in(EdgeTypes.AST).hasLabel(NodeTypes.FILE).cast[nodes.File])
+  override def file: File[nodes.File] =
+    new File(raw.in(EdgeTypes.AST).hasLabel(NodeTypes.FILE).cast[nodes.File])
 
 }
