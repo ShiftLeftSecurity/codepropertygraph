@@ -79,7 +79,7 @@ private class CpgLoader {
   }
 
   def createIndexes(cpg: Cpg): Unit =
-    cpg.graph.asInstanceOf[OdbGraph].createIndex(NodeKeys.FULL_NAME.name, classOf[Vertex])
+    cpg.graph.asInstanceOf[OdbGraph].indexManager.createNodePropertyIndex(NodeKeys.FULL_NAME.name)
 
   def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit = {
     overlayFilenames.foreach { overlayFilename =>
