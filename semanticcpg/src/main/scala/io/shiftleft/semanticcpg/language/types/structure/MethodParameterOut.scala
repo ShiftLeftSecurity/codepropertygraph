@@ -4,12 +4,11 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{DeclarationBase, Expression}
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
 class MethodParameterOut(raw: GremlinScala[nodes.MethodParameterOut])
     extends NodeSteps[nodes.MethodParameterOut](raw)
-    with DeclarationBase[nodes.MethodParameterOut]
     with EvalTypeAccessors[nodes.MethodParameterOut] {
 
   /* method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
@@ -29,7 +28,7 @@ class MethodParameterOut(raw: GremlinScala[nodes.MethodParameterOut])
   def method: Method =
     new Method(raw.in(EdgeTypes.AST).cast[nodes.Method])
 
-  def argument: Expression = {
+  def argument: Expression[nodes.Expression] = {
     new Expression(
       raw
         .sack((_: Integer, node: nodes.MethodParameterOut) => node.value2(NodeKeys.ORDER))

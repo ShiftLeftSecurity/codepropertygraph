@@ -3,8 +3,8 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{CfgNode, DeclarationBase, Expression}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{CfgNode, Expression}
 import io.shiftleft.semanticcpg.language.types.expressions.{Call, ControlStructure, Literal}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
@@ -13,7 +13,6 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
   * */
 class Method(override val raw: GremlinScala[nodes.Method])
     extends NodeSteps[nodes.Method](raw)
-    with DeclarationBase[nodes.Method]
     with EvalTypeAccessors[nodes.Method]
     with ModifierAccessors[nodes.Method] {
 
@@ -36,18 +35,14 @@ class Method(override val raw: GremlinScala[nodes.Method])
   /**
     * Traverse to type decl which have this method bound to it.
     */
-  def bindingTypeDecl: TypeDecl = {
+  def bindingTypeDecl: TypeDecl =
     referencingBinding.bindingTypeDecl
-  }
 
   /**
     * Traverse to bindings which reference to this method.
     */
-  def referencingBinding: Binding = {
-    new Binding(
-      raw.in(EdgeTypes.REF).filter(_.hasLabel(NodeTypes.BINDING)).cast[nodes.Binding]
-    )
-  }
+  def referencingBinding: Binding =
+    new Binding(raw.in(EdgeTypes.REF).filter(_.hasLabel(NodeTypes.BINDING)).cast[nodes.Binding])
 
   /**
     * All control structures of this method
@@ -181,7 +176,7 @@ class Method(override val raw: GremlinScala[nodes.Method])
   def literal: Literal =
     new Literal(raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
 
-  def topLevelExpressions: Expression =
+  def topLevelExpressions: Expression[nodes.Expression] =
     new Expression(
       raw
         .out(EdgeTypes.AST)
@@ -190,25 +185,21 @@ class Method(override val raw: GremlinScala[nodes.Method])
         .not(_.hasLabel(NodeTypes.LOCAL))
         .cast[nodes.Expression])
 
-  def cfgNode: CfgNode =
-    new CfgNode(
-      raw.out(EdgeTypes.CONTAINS).filterOnEnd(_.isInstanceOf[nodes.CfgNode]).cast[nodes.CfgNode]
-    )
+  def cfgNode: CfgNode[nodes.CfgNode] =
+    new CfgNode(raw.out(EdgeTypes.CONTAINS).filterOnEnd(_.isInstanceOf[nodes.CfgNode]).cast[nodes.CfgNode])
 
   /**
     *  Traverse to first expressions in CFG.
     *  Can be multiple.
     */
-  def cfgFirst: Expression =
-    new Expression(
-      raw.out(EdgeTypes.CFG).cast[nodes.Expression]
-    )
+  def cfgFirst: Expression[nodes.Expression] =
+    new Expression(raw.out(EdgeTypes.CFG).cast[nodes.Expression])
 
   /**
     *  Traverse to last expressions in CFG.
     *  Can be multiple.
     */
-  def cfgLast: Expression =
+  def cfgLast: Expression[nodes.Expression] =
     methodReturn.cfgLast
 
   /**

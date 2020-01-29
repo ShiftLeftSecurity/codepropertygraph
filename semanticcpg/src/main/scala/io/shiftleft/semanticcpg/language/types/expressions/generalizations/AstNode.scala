@@ -12,7 +12,8 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Nodes of the AST rooted in this node, including the node itself.
     * */
-  def ast: NodeSteps[nodes.AstNode] = new NodeSteps(raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
+  def ast: NodeSteps[nodes.AstNode] =
+    new NodeSteps(raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
 
   def containsCallTo(regex: String): NodeSteps[A] =
     where(_.ast.isCall.name(regex).size > 0)
@@ -20,13 +21,14 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   def depth(p: nodes.AstNode => Boolean): Steps[Int] =
     map(_.depth(p))
 
-  def isCallTo(regex: String): Call = isCall.name(regex)
+  def isCallTo(regex: String): Call =
+    isCall.name(regex)
 
   /**
     * Nodes of the AST rooted in this node, minus the node itself
     * */
   def astMinusRoot: NodeSteps[nodes.AstNode] =
-    new AstNode(raw.repeat(_.out(EdgeTypes.AST)).emit.cast[nodes.AstNode])
+    new NodeSteps(raw.repeat(_.out(EdgeTypes.AST)).emit.cast[nodes.AstNode])
 
   /**
     * Direct children of node in the AST
@@ -56,7 +58,7 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
     * Nodes of the AST obtained by expanding AST edges backwards until `root` or the method root is reached
     * */
   def inAst(root: nodes.AstNode): NodeSteps[nodes.AstNode] =
-    new AstNode(
+    new NodeSteps(
       raw.emit
         .until(_.or(_.hasLabel(NodeTypes.METHOD), _.filterOnEnd(n => root != null && root == n)))
         .repeat(_.in(EdgeTypes.AST))
@@ -67,7 +69,7 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
     * minus this node
     * */
   def inAstMinusLeaf(root: nodes.AstNode): NodeSteps[nodes.AstNode] =
-    new AstNode(
+    new NodeSteps(
       raw
         .until(_.or(_.hasLabel(NodeTypes.METHOD), _.filterOnEnd(n => root != null && root == n)))
         .repeat(_.in(EdgeTypes.AST))
@@ -79,21 +81,20 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
     * It's continuing it's walk until it hits an expression that's not a generic
     * "member access operation", e.g., "<operator>.memberAccess".
     * */
-  def parentExpression: Expression =
+  def parentExpression: Expression[nodes.Expression] =
     new Expression(raw.map(_.parentExpression))
 
   /**
     * Traverse only to those AST nodes that are also control flow graph nodes
     * */
-  def isCfgNode: CfgNode =
+  def isCfgNode: CfgNode[nodes.CfgNode] =
     new CfgNode(raw.filterOnEnd(_.isInstanceOf[nodes.CfgNode]).cast[nodes.CfgNode])
 
   /**
     * Traverse only to those AST nodes that are blocks
     * */
-  def isBlock: Block = new Block(
-    raw.hasLabel(NodeTypes.BLOCK).cast[nodes.Block]
-  )
+  def isBlock: Block =
+    new Block(raw.hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
 
   /**
     * Traverse only to those AST nodes that are control structures
@@ -104,16 +105,14 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to AST nodes that are expressions
     * */
-  def isExpression: Expression = new Expression(
-    raw.filterOnEnd(_.isInstanceOf[nodes.Expression]).cast[nodes.Expression]
-  )
+  def isExpression: Expression[nodes.Expression] =
+    new Expression(raw.filterOnEnd(_.isInstanceOf[nodes.Expression]).cast[nodes.Expression])
 
   /**
     * Traverse only to AST nodes that are calls
     * */
-  def isCall: Call = new Call(
-    raw.hasLabel(NodeTypes.CALL).cast[nodes.Call]
-  )
+  def isCall: Call =
+    new Call(raw.hasLabel(NodeTypes.CALL).cast[nodes.Call])
 
   /**
   Cast to call if applicable and filter on call code `calleeRegex`
@@ -124,30 +123,26 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to AST nodes that are literals
     * */
-  def isLiteral: Literal = new Literal(
-    raw.hasLabel(NodeTypes.LITERAL).cast[nodes.Literal]
-  )
+  def isLiteral: Literal =
+    new Literal(raw.hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
 
   /**
     * Traverse only to AST nodes that are identifier
     * */
-  def isIdentifier: Identifier = new Identifier(
-    raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier]
-  )
+  def isIdentifier: Identifier =
+    new Identifier(raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
     * Traverse only to AST nodes that are return nodes
     * */
-  def isReturn: Return = new Return(
-    raw.hasLabel(NodeTypes.RETURN).cast[nodes.Return]
-  )
+  def isReturn: NodeSteps[nodes.Return] =
+    new NodeSteps(raw.hasLabel(NodeTypes.RETURN).cast[nodes.Return])
 
   /**
     * Traverse only to AST nodes that are method reference nodes.
     */
-  def isMethodRef: MethodRef = new MethodRef(
-    raw.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef]
-  )
+  def isMethodRef: MethodRef =
+    new MethodRef(raw.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef])
 
   def walkAstUntilReaching(labels: List[String]): NodeSteps[nodes.StoredNode] =
     new NodeSteps[nodes.StoredNode](

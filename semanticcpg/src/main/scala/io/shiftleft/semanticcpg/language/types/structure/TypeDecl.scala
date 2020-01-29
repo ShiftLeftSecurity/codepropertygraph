@@ -89,32 +89,26 @@ class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
   /**
     * Traverse to methods bound to this type decl.
     */
-  def boundMethod: Method = {
+  def boundMethod: Method =
     methodBinding.boundMethod
-  }
 
   /**
     * Traverse to the method bindings of this type declaration.
     */
-  def methodBinding: Binding = {
-    new Binding(
-      canonicalType.raw.out(EdgeTypes.BINDS).cast[nodes.Binding]
-    )
-  }
+  def methodBinding: Binding =
+    new Binding(canonicalType.raw.out(EdgeTypes.BINDS).cast[nodes.Binding])
 
   /**
     * Traverse to alias type declarations.
     */
-  def isAlias: TypeDecl = {
+  def isAlias: TypeDecl =
     new TypeDecl(raw.filterOnEnd(_.aliasTypeFullName.isDefined))
-  }
 
   /**
     * Traverse to canonical type declarations.
     */
-  def isCanonical: TypeDecl = {
+  def isCanonical: TypeDecl =
     new TypeDecl(raw.filterOnEnd(_.aliasTypeFullName.isEmpty))
-  }
 
   /**
     * If this is an alias type declaration, go to its underlying type declaration
@@ -166,16 +160,14 @@ class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
   /**
     *  Direct alias type declarations.
     */
-  def aliasTypeDecl: TypeDecl = {
+  def aliasTypeDecl: TypeDecl =
     referencingType.aliasTypeDecl
-  }
 
   /**
     *  Direct and transitive alias type declarations.
     */
-  def aliasTypeDeclTransitive: TypeDecl = {
+  def aliasTypeDeclTransitive: TypeDecl =
     repeat(_.aliasTypeDecl).emit()
-  }
 
 }
 

@@ -68,8 +68,8 @@ package object language {
     new CallMethods(node)
 
   // Implicit conversions from Step[NodeType, Label] to corresponding Step classes.
-  // If you introduce a new Step-type, that is, one that inherits from `Steps[NodeType,Labels]`,
-  // then you need to add an implicit conversion from `Steps[NodeType,Labels]` to your type
+  // If you introduce a new Step-type, that is, one that inherits from `Steps[NodeType]`,
+  // then you need to add an implicit conversion from `Steps[NodeType]` to your type
   // here.
 
   implicit def toLiteral(steps: Steps[nodes.Literal]): Literal =
@@ -93,6 +93,9 @@ package object language {
   implicit def toMember(steps: Steps[nodes.Member]): Member =
     new Member(steps.raw)
 
+  implicit def toMetaData(steps: Steps[nodes.MetaData]): MetaData =
+    new MetaData(steps.raw)
+
   implicit def toLocal(steps: Steps[nodes.Local]): Local =
     new Local(steps.raw)
 
@@ -114,16 +117,10 @@ package object language {
   implicit def toNamespaceBlock(steps: Steps[nodes.NamespaceBlock]): NamespaceBlock =
     new NamespaceBlock(steps.raw)
 
-  implicit def toModifier(steps: Steps[nodes.Modifier]): Modifier =
-    new Modifier(steps.raw)
+  implicit def toExpression[A <: nodes.Expression](steps: Steps[A]): Expression[A] =
+    new Expression[A](steps.raw)
 
-  implicit def toExpression(steps: Steps[nodes.Expression]): Expression =
-    new Expression(steps.raw)
-
-  implicit def toDeclaration(steps: Steps[nodes.Declaration]): Declaration =
-    new Declaration(steps.raw)
-
-  implicit def toCfgNode(steps: Steps[nodes.CfgNode]): CfgNode =
+  implicit def toCfgNode[A <: nodes.CfgNode](steps: Steps[A]): CfgNode[A] =
     new CfgNode(steps.raw)
 
   implicit def toAstNode[A <: nodes.AstNode](steps: Steps[A]): AstNode[A] =
@@ -134,9 +131,6 @@ package object language {
 
   implicit def toBlock(steps: Steps[nodes.Block]): Block =
     new Block(steps.raw)
-
-  implicit def toReturn(steps: Steps[nodes.Return]): Return =
-    new Return(steps.raw)
 
   implicit def toMethodRef(steps: Steps[nodes.MethodRef]): MethodRef =
     new MethodRef(steps.raw)

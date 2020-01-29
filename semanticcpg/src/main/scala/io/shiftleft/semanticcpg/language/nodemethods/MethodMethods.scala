@@ -10,7 +10,8 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 
 class MethodMethods(val node: nodes.Method) extends AnyVal {
 
-  def parameter: MethodParameter = node.start.parameter
+  def parameter: MethodParameter =
+    node.start.parameter
 
   def methodReturn: nodes.MethodReturn =
     node._astOut.asScala
@@ -18,9 +19,11 @@ class MethodMethods(val node: nodes.Method) extends AnyVal {
       .asJava
       .nextChecked
 
-  def local: Local = node.start.local
+  def local: Local =
+    node.start.local
 
-  def controlStructure: ControlStructure = node.start.controlStructure
+  def controlStructure: ControlStructure =
+    node.start.controlStructure
 
   def ast: NodeSteps[nodes.AstNode] =
     node.start.ast

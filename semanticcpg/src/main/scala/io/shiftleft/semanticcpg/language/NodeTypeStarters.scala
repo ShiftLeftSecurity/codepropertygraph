@@ -4,7 +4,7 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language.types.expressions._
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
 import io.shiftleft.semanticcpg.language.types.structure._
 
 class NodeTypeStarters(cpg: Cpg) {
@@ -18,7 +18,7 @@ class NodeTypeStarters(cpg: Cpg) {
     Traverse to all nodes.
     */
   def all: NodeSteps[nodes.StoredNode] =
-    new NodeSteps[nodes.StoredNode](scalaGraph.V.cast[nodes.StoredNode])
+    new NodeSteps(scalaGraph.V.cast[nodes.StoredNode])
 
   /**
     * Traverse to all comments in source-based CPGs.
@@ -29,7 +29,8 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.comment.code(code)`
     * */
-  def comment(code: String): Comment = comment.code(code)
+  def comment(code: String): Comment =
+    comment.code(code)
 
   /**
     Traverse to all source files
@@ -40,7 +41,8 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.file.name(name)`
     * */
-  def file(name: String): File = file.name(name)
+  def file(name: String): File =
+    file.name(name)
 
   /**
     Traverse to all namespaces, e.g., packages in Java.
@@ -51,7 +53,8 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.namespace.name(name)`
     * */
-  def namespace(name: String): Namespace = namespace.name(name)
+  def namespace(name: String): Namespace =
+    namespace.name(name)
 
   /**
   Traverse to all namespace blocks, e.g., packages in Java.
@@ -62,7 +65,8 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.namespaceBlock.name(name)`
     * */
-  def namespaceBlock(name: String): NamespaceBlock = namespaceBlock.name(name)
+  def namespaceBlock(name: String): NamespaceBlock =
+    namespaceBlock.name(name)
 
   /**
     Traverse to all types, e.g., Set<String>
@@ -73,7 +77,8 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.types.fullName(fullName)`
     * */
-  def types(fullName: String): Type = types.fullName(fullName)
+  def types(fullName: String): Type =
+    types.fullName(fullName)
 
   /**
     Traverse to all declarations, e.g., Set<T>
@@ -84,7 +89,8 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for cpg.typeDecl.fullName(fullName)
     * */
-  def typeDecl(fullName: String): TypeDecl = typeDecl.fullName(fullName)
+  def typeDecl(fullName: String): TypeDecl =
+    typeDecl.fullName(fullName)
 
   /**
     Traverse to all methods
@@ -95,7 +101,8 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.method.fullName(fullName)`
     * */
-  def method(fullName: String): Method = method.fullName(fullName)
+  def method(fullName: String): Method =
+    method.fullName(fullName)
 
   /**
     Traverse to all formal return parameters
@@ -112,7 +119,8 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.parameter.name(name)`
     * */
-  def parameter(name: String): MethodParameter = parameter.name(name)
+  def parameter(name: String): MethodParameter =
+    parameter.name(name)
 
   /**
     Traverse to all class members
@@ -123,7 +131,8 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.member.name(name)`
     * */
-  def member(name: String): Member = member.name(name)
+  def member(name: String): Member =
+    member.name(name)
 
   /**
     Traverse to all call sites
@@ -134,7 +143,8 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.call.name(name)`
     * */
-  def call(name: String): Call = call.name(name)
+  def call(name: String): Call =
+    call.name(name)
 
   /**
     Traverse to all local variable declarations
@@ -146,7 +156,8 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.local.name`
     * */
-  def local(name: String): Local = local.name(name)
+  def local(name: String): Local =
+    local.name(name)
 
   /**
     Traverse to all literals (constant strings and numbers provided directly in the code).
@@ -157,7 +168,8 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.literal.code(code)`
     * */
-  def literal(code: String): Literal = literal.code(code)
+  def literal(code: String): Literal =
+    literal.code(code)
 
   /**
     Traverse to all identifiers, e.g., occurrences of local variables or class members in method bodies.
@@ -168,29 +180,32 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Shorthand for `cpg.identifier.name(name)`
     * */
-  def identifier(name: String): Identifier = identifier.name(name)
+  def identifier(name: String): Identifier =
+    identifier.name(name)
 
   /**
     Traverse to all arguments passed to methods
     */
-  def argument: Expression =
+  def argument: Expression[nodes.Expression] =
     call.argument
 
   /**
     * Shorthand for `cpg.argument.code(code)`
     * */
-  def argument(code: String): Expression = argument.code(code)
+  def argument(code: String): Expression[nodes.Expression] =
+    argument.code(code)
 
   /**
     * Traverse to all return expressions
     */
-  def returns: Return =
-    new Return(scalaGraph.V.hasLabel(NodeTypes.RETURN).cast[nodes.Return])
+  def returns: NodeSteps[nodes.Return] =
+    new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.RETURN).cast[nodes.Return])
 
   /**
     * Shorthand for `returns.code(code)`
     * */
-  def returns(code: String): Return = returns.code(code)
+  def returns(code: String): NodeSteps[nodes.Return] =
+    returns.code(code)
 
   /**
     * Traverse to all meta data entries
@@ -209,8 +224,7 @@ class NodeTypeStarters(cpg: Cpg) {
     * .filter(_.referencedMethod.fullName(fullName))`
     * */
   def methodRef(fullName: String): MethodRef =
-    methodRef
-      .filter(_.referencedMethod.fullName(fullName))
+    methodRef.filter(_.referencedMethod.fullName(fullName))
 
   /**
   Begin traversal at node with id.
@@ -221,8 +235,8 @@ class NodeTypeStarters(cpg: Cpg) {
   Begin traversal at set of nodes - specified by their ids
     */
   def id[NodeType <: nodes.StoredNode](ids: Seq[Any]): NodeSteps[NodeType] =
-    if (ids.isEmpty) new NodeSteps[NodeType](scalaGraph.V(-1).cast[NodeType])
-    else new NodeSteps[NodeType](scalaGraph.V(ids: _*).cast[NodeType])
+    if (ids.isEmpty) new NodeSteps(scalaGraph.V(-1).cast[NodeType])
+    else new NodeSteps(scalaGraph.V(ids: _*).cast[NodeType])
 
   /**
   Traverse to all tags

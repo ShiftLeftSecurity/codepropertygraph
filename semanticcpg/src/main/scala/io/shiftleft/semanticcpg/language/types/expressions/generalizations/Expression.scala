@@ -11,24 +11,21 @@ import io.shiftleft.semanticcpg.language.types.structure.{Method, MethodParamete
 /**
   An expression (base type)
   */
-class Expression(raw: GremlinScala[nodes.Expression])
-    extends NodeSteps[nodes.Expression](raw)
-    with ExpressionBase[nodes.Expression] {}
-
-trait ExpressionBase[NodeType <: nodes.Expression]
-    extends ArgumentIndexAccessors[NodeType]
-    with EvalTypeAccessors[NodeType] { this: NodeSteps[NodeType] =>
+class Expression[A <: nodes.Expression](raw: GremlinScala[A])
+    extends NodeSteps[A](raw)
+    with ArgumentIndexAccessors[A]
+    with EvalTypeAccessors[A] {
 
   /**
     Traverse to enclosing expression
     */
-  def expressionUp: Expression =
+  def expressionUp: Expression[nodes.Expression] =
     new Expression(raw.in(EdgeTypes.AST).not(_.hasLabel(NodeTypes.LOCAL)).cast[nodes.Expression])
 
   /**
     Traverse to sub expressions
     */
-  def expressionDown: Expression =
+  def expressionDown: Expression[nodes.Expression] =
     new Expression(
       raw
         .out(EdgeTypes.AST)
@@ -39,24 +36,19 @@ trait ExpressionBase[NodeType <: nodes.Expression]
     If the expression is used as receiver for a call, this traverses to the call.
     */
   def receivedCall: Call =
-    new Call(
-      raw
-        .in(EdgeTypes.RECEIVER)
-        .cast[nodes.Call]
-    )
+    new Call(raw.in(EdgeTypes.RECEIVER).cast[nodes.Call])
 
   /**
     * Only those expressions which are (direct) arguments of a call
     * */
-  def isArgument: Expression =
+  def isArgument: Expression[nodes.Expression] =
     new Expression(raw.filter(_.in(EdgeTypes.ARGUMENT)).cast[nodes.Expression])
 
   /**
     * Traverse to surrounding call
     * */
-  def call: Call = new Call(
-    raw.repeat(_.in(EdgeTypes.ARGUMENT)).until(_.hasLabel(NodeTypes.CALL)).cast[nodes.Call]
-  )
+  def call: Call =
+    new Call(raw.repeat(_.in(EdgeTypes.ARGUMENT)).until(_.hasLabel(NodeTypes.CALL)).cast[nodes.Call])
 
   /**
   Traverse to related parameter
@@ -93,7 +85,7 @@ trait ExpressionBase[NodeType <: nodes.Expression]
   /**
     * Traverse to next expression in CFG.
     */
-  def cfgNext: Expression =
+  def cfgNext: Expression[nodes.Expression] =
     new Expression(
       raw
         .out(EdgeTypes.CFG)
@@ -104,7 +96,7 @@ trait ExpressionBase[NodeType <: nodes.Expression]
   /**
     * Traverse to previous expression in CFG.
     */
-  def cfgPrev: Expression =
+  def cfgPrev: Expression[nodes.Expression] =
     new Expression(
       raw
         .in(EdgeTypes.CFG)
