@@ -1,8 +1,6 @@
 import better.files.File
 import java.io.{FileInputStream, File => JFile}
-import scala.collection.JavaConverters._
 import play.api.libs.json._
-
 import scala.collection.mutable
 
 class Schema(schemaFile: String) {
@@ -143,7 +141,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
         }.mkString("\n\n")
 
       val classImpl =
-        s"""class ${edgeClassName}(_graph: OdbGraph, _outNode: NodeRef[OdbNode], _inNode: NodeRef[OdbNode])
+        s"""class $edgeClassName(_graph: OdbGraph, _outNode: NodeRef[OdbNode], _inNode: NodeRef[OdbNode])
            |extends OdbEdge(_graph, $edgeClassName.Label, _outNode, _inNode, $edgeClassName.PropertyNames.allAsJava) {
            |${propertyBasedFieldAccessors(keys)}
            |}
@@ -288,9 +286,6 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       staticHeader + nodeBaseTraits + keyBasedTraits + factories
     }
 
-    def edgeTypeByName: Map[String, EdgeType] =
-      schema.edgeTypes.groupBy(_.name).mapValues(_.head)
-
     def generateNodeSource(nodeType: NodeType,
                            keys: List[Property],
                            nodeToInEdges: mutable.MultiMap[String, String]) = {
@@ -306,15 +301,15 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
         }
         .mkString(",\n")
 
-      val outEdges: List[String] = nodeType.outEdges.map(_.edgeName)
-
-      val inEdges: List[String] = {
+      val outEdgeNames: List[String] = nodeType.outEdges.map(_.edgeName)
+      val inEdgeNames: List[String] = {
         val option = nodeToInEdges.get(nodeType.name)
         option.map(_.toList).getOrElse(Nil)
       }
 
-      val outEdgeLayouts = outEdges.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
-      val inEdgeLayouts = inEdges.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
+
+      val outEdgeLayouts = outEdgeNames.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
+      val inEdgeLayouts = inEdgeNames.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
 
       val className = nodeType.className
       val classNameDb = nodeType.classNameDb
@@ -345,8 +340,8 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  }
            |
            |  object Edges {
-           |    val In: Array[String] = Array(${inEdges.map('"' + _ + '"').mkString(",")})
-           |    val Out: Array[String] = Array(${outEdges.map('"' + _ + '"').mkString(",")})
+           |    val In: Array[String] = Array(${inEdgeNames.map('"' + _ + '"').mkString(",")})
+           |    val Out: Array[String] = Array(${outEdgeNames.map('"' + _ + '"').mkString(",")})
            |  }
            |
            |  val factory = new NodeFactory[$classNameDb] {
@@ -484,8 +479,8 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |""".stripMargin
 
       val neighborDelegators =
-        (outEdges.map(edge => neighborAccessorName(edge, "OUT")) ++
-          inEdges.map(edge => neighborAccessorName(edge, "IN")))
+        (outEdgeNames.map(edge => neighborAccessorName(edge, "OUT")) ++
+          inEdgeNames.map(edge => neighborAccessorName(edge, "IN")))
         .map { nbaName =>
           /* generic and specific neighbor accessors - as mentioned in comment above, we may not need generic ones (prefixed with `_`) in future */
           s"""def $nbaName: JIterator[StoredNode] = get().$nbaName
@@ -521,8 +516,8 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |""".stripMargin
       }
       val neighborAccessors =
-        (outEdges.map(edge => neighborAccessorName(edge, "OUT")) ++
-          inEdges.map(edge => neighborAccessorName(edge, "IN"))).zipWithIndex
+        (outEdgeNames.map(edge => neighborAccessorName(edge, "OUT")) ++
+          inEdgeNames.map(edge => neighborAccessorName(edge, "IN"))).zipWithIndex
         .map { case (nbaName: String, offsetPos: Int) =>
           /* generic and specific neighbor accessors - as mentioned in comment above, we may not need generic ones (prefixed with `_`) in future */
           s"""def $nbaName : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[StoredNode]]
