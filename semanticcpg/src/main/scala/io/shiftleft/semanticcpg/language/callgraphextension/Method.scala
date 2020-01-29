@@ -12,7 +12,7 @@ class Method(override val raw: GremlinScala[nodes.Method]) extends Steps[nodes.M
     * Traverse to direct and transitive callers of the method.
     */
   def calledByIncludingSink(sourceTrav: Steps[nodes.Method], resolve: Boolean = true)(
-      implicit callResolver: ICallResolver): OriginalMethod = {
+      implicit callResolver: ICallResolver): Steps[nodes.Method] = {
     val sourceMethods = sourceTrav.raw.toSet
     val sinkMethods = raw.dedup.toList()
 
@@ -43,13 +43,13 @@ class Method(override val raw: GremlinScala[nodes.Method]) extends Steps[nodes.M
   /**
     * Traverse to direct callers of this method
     * */
-  def caller(implicit callResolver: ICallResolver): OriginalMethod =
+  def caller(implicit callResolver: ICallResolver): Steps[nodes.Method] =
     callIn(callResolver).method
 
   /**
     * Traverse to methods called by this method
     * */
-  def callee(implicit callResolver: ICallResolver): OriginalMethod =
+  def callee(implicit callResolver: ICallResolver): Steps[nodes.Method] =
     new OriginalMethod(raw).callOut.calledMethod(callResolver)
 
   /**

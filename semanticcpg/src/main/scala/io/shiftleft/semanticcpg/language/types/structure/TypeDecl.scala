@@ -115,7 +115,7 @@ class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
     * else unchanged.
     */
   def unravelAlias: TypeDecl = {
-    new NodeSteps(raw.map { typeDecl =>
+    new TypeDecl(raw.map { typeDecl =>
       if (typeDecl.aliasTypeFullName.isDefined) {
         typeDecl
           .vertices(Direction.OUT, EdgeTypes.ALIAS_OF)
@@ -140,8 +140,8 @@ class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
     // step is used in other repeat steps we do not use it here.
     //until(_.isCanonical).repeat(_.unravelAlias)
 
-    new NodeSteps(raw.map { typeDecl =>
-      var currentTypeDecl: nodes.TypeDecl = typeDecl
+    new TypeDecl(raw.map { typeDecl =>
+      var currentTypeDecl = typeDecl
       var aliasExpansionCounter = 0
       while (currentTypeDecl.aliasTypeFullName.isDefined && aliasExpansionCounter < maxAliasExpansions) {
         currentTypeDecl = currentTypeDecl

@@ -67,19 +67,19 @@ class Type(raw: GremlinScala[nodes.Type]) extends NodeSteps[nodes.Type](raw) {
     * Type declaration which is referenced by this type.
     */
   def referencedTypeDecl: TypeDecl =
-    new NodeSteps(raw.out(EdgeTypes.REF).cast[nodes.TypeDecl])
+    new TypeDecl(raw.out(EdgeTypes.REF).cast[nodes.TypeDecl])
 
   /**
     * Type declarations which derive from this type.
     */
   def derivedTypeDecl: TypeDecl =
-    new NodeSteps(raw.in(EdgeTypes.INHERITS_FROM).cast[nodes.TypeDecl])
+    new TypeDecl(raw.in(EdgeTypes.INHERITS_FROM).cast[nodes.TypeDecl])
 
   /**
     * Direct alias type declarations.
     */
   def aliasTypeDecl: TypeDecl = {
-    new NodeSteps(raw.in(EdgeTypes.ALIAS_OF).cast[nodes.TypeDecl])
+    new TypeDecl(raw.in(EdgeTypes.ALIAS_OF).cast[nodes.TypeDecl])
   }
 
   /**
@@ -97,10 +97,10 @@ class Type(raw: GremlinScala[nodes.Type]) extends NodeSteps[nodes.Type](raw) {
   }
 
   def localsOfType: Local =
-    new NodeSteps(raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
+    new Local(raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
 
   def expressionOfType: Expression[nodes.Expression] =
-    new NodeSteps(
+    new Expression(
       raw
         .in(EdgeTypes.EVAL_TYPE)
         .hasLabel(NodeTypes.IDENTIFIER, NodeTypes.CALL, NodeTypes.LITERAL)

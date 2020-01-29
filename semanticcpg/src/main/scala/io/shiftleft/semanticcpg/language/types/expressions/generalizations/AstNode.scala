@@ -12,10 +12,10 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Nodes of the AST rooted in this node, including the node itself.
     * */
-  def ast: AstNode[nodes.AstNode] =
-    new AstNode(raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
+  def ast: NodeSteps[nodes.AstNode] =
+    new NodeSteps(raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
 
-  def containsCallTo(regex: String): AstNode[A] =
+  def containsCallTo(regex: String): NodeSteps[A] =
     where(_.ast.isCall.name(regex).size > 0)
 
   def depth(p: nodes.AstNode => Boolean): Steps[Int] =
@@ -27,38 +27,38 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Nodes of the AST rooted in this node, minus the node itself
     * */
-  def astMinusRoot: AstNode[nodes.AstNode] =
-    new AstNode(raw.repeat(_.out(EdgeTypes.AST)).emit.cast[nodes.AstNode])
+  def astMinusRoot: NodeSteps[nodes.AstNode] =
+    new NodeSteps(raw.repeat(_.out(EdgeTypes.AST)).emit.cast[nodes.AstNode])
 
   /**
     * Direct children of node in the AST
     * */
-  def astChildren: AstNode[nodes.AstNode] =
-    new AstNode(raw.out(EdgeTypes.AST).cast[nodes.AstNode])
+  def astChildren: NodeSteps[nodes.AstNode] =
+    new NodeSteps(raw.out(EdgeTypes.AST).cast[nodes.AstNode])
 
   /**
     * Parent AST node
     * */
-  def astParent: AstNode[nodes.AstNode] =
-    new AstNode(raw.in(EdgeTypes.AST).cast[nodes.AstNode])
+  def astParent: NodeSteps[nodes.AstNode] =
+    new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.AstNode])
 
   /**
     * Nodes of the AST obtained by expanding AST edges backwards until the method root is reached
     * */
-  def inAst: AstNode[nodes.AstNode] =
+  def inAst: NodeSteps[nodes.AstNode] =
     inAst(null)
 
   /**
     * Nodes of the AST obtained by expanding AST edges backwards until the method root is reached, minus this node
     * */
-  def inAstMinusLeaf: AstNode[nodes.AstNode] =
+  def inAstMinusLeaf: NodeSteps[nodes.AstNode] =
     inAstMinusLeaf(null)
 
   /**
     * Nodes of the AST obtained by expanding AST edges backwards until `root` or the method root is reached
     * */
-  def inAst(root: nodes.AstNode): AstNode[nodes.AstNode] =
-    new AstNode(
+  def inAst(root: nodes.AstNode): NodeSteps[nodes.AstNode] =
+    new NodeSteps(
       raw.emit
         .until(_.or(_.hasLabel(NodeTypes.METHOD), _.filterOnEnd(n => root != null && root == n)))
         .repeat(_.in(EdgeTypes.AST))
@@ -68,8 +68,8 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
     * Nodes of the AST obtained by expanding AST edges backwards until `root` or the method root is reached,
     * minus this node
     * */
-  def inAstMinusLeaf(root: nodes.AstNode): AstNode[nodes.AstNode] =
-    new AstNode(
+  def inAstMinusLeaf(root: nodes.AstNode): NodeSteps[nodes.AstNode] =
+    new NodeSteps(
       raw
         .until(_.or(_.hasLabel(NodeTypes.METHOD), _.filterOnEnd(n => root != null && root == n)))
         .repeat(_.in(EdgeTypes.AST))
@@ -111,7 +111,7 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to AST nodes that are calls
     * */
-  def isCall: NodeSteps[nodes.Call] =
+  def isCall: Call =
     new Call(raw.hasLabel(NodeTypes.CALL).cast[nodes.Call])
 
   /**

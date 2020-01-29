@@ -19,10 +19,10 @@ class ControlStructure(raw: GremlinScala[nodes.ControlStructure]) extends NodeSt
   def condition: Expression[nodes.Expression] =
     new Expression(raw.out(EdgeTypes.CONDITION).cast[nodes.Expression])
 
-  def whenTrue: AstNode[nodes.AstNode] =
-    new AstNode(raw.out.has(NodeKeys.ORDER, secondChildIndex).cast[nodes.AstNode])
+  def whenTrue: NodeSteps[nodes.AstNode] =
+    new NodeSteps(raw.out.has(NodeKeys.ORDER, secondChildIndex).cast[nodes.AstNode])
 
-  def whenFalse: AstNode[nodes.AstNode] =
-    new AstNode(raw.out.has(NodeKeys.ORDER, thirdChildIndex).cast[nodes.AstNode])
+  def whenFalse: NodeSteps[nodes.AstNode] =
+    new NodeSteps(raw.out.has(NodeKeys.ORDER, thirdChildIndex).cast[nodes.AstNode])
 
 }
