@@ -11,7 +11,7 @@ class CfgNode[A <: nodes.CfgNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
   Traverse to enclosing method
     */
-  def method: Method[nodes.Method] = {
+  def method: Method = {
     new Method(
       raw
         .map {

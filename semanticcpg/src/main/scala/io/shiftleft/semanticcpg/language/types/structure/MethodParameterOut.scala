@@ -7,25 +7,25 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
-class MethodParameterOut[A <: nodes.MethodParameterOut](raw: GremlinScala[A])
-    extends NodeSteps[A](raw)
-    with EvalTypeAccessors[A] {
+class MethodParameterOut(raw: GremlinScala[nodes.MethodParameterOut])
+    extends NodeSteps[nodes.MethodParameterOut](raw)
+    with EvalTypeAccessors[nodes.MethodParameterOut] {
 
   /* method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
-  def index(num: Int): MethodParameterOut[A] =
+  def index(num: Int): MethodParameterOut =
     this.order(num)
 
   /* get all parameters from (and including)
    * method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
-  def indexFrom(num: Int): MethodParameterOut[A] =
+  def indexFrom(num: Int): MethodParameterOut =
     new MethodParameterOut(raw.has(NodeKeys.METHOD_PARAMETER_OUT.ORDER, P.gte(num: Integer)))
 
   /* get all parameters up to (and including)
    * method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
-  def indexTo[Out](num: Int): MethodParameterOut[A] =
+  def indexTo[Out](num: Int): MethodParameterOut =
     new MethodParameterOut(raw.has(NodeKeys.METHOD_PARAMETER_OUT.ORDER, P.lte(num: Integer)))
 
-  def method: Method[nodes.Method] =
+  def method: Method =
     new Method(raw.in(EdgeTypes.AST).cast[nodes.Method])
 
   def argument: Expression[nodes.Expression] = {
@@ -43,12 +43,12 @@ class MethodParameterOut[A <: nodes.MethodParameterOut](raw: GremlinScala[A])
     )
   }
 
-  def asInput: MethodParameter[nodes.MethodParameterIn] =
+  def asInput: MethodParameter =
     new MethodParameter(raw.in(EdgeTypes.PARAMETER_LINK).cast[nodes.MethodParameterIn])
 
   /**
     * Traverse to parameter type
     * */
-  def typ: Type[nodes.Type] =
+  def typ: Type =
     new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 }

@@ -6,9 +6,9 @@ import io.shiftleft.semanticcpg.language.types.expressions.{Call, Identifier, Li
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.{NodeSteps => OriginalNodeSteps}
 
-class Tag[A <: nodes.Tag](override val raw: GremlinScala[A]) extends OriginalNodeSteps[A](raw) {
+class Tag(override val raw: GremlinScala[nodes.Tag]) extends OriginalNodeSteps[nodes.Tag](raw) {
 
-  def method: Method[nodes.Method] =
+  def method: Method =
     new Method(
       raw
         .in(EdgeTypes.TAGGED_BY)
@@ -16,7 +16,7 @@ class Tag[A <: nodes.Tag](override val raw: GremlinScala[A]) extends OriginalNod
         .order(By((x: Vertex) => x.id))
         .cast[nodes.Method])
 
-  def methodReturn: MethodReturn[nodes.MethodReturn] =
+  def methodReturn: MethodReturn =
     new MethodReturn(
       raw
         .in(EdgeTypes.TAGGED_BY)
@@ -24,7 +24,7 @@ class Tag[A <: nodes.Tag](override val raw: GremlinScala[A]) extends OriginalNod
         .order(By((x: Vertex) => x.id))
         .cast[nodes.MethodReturn])
 
-  def parameter: MethodParameter[nodes.MethodParameterIn] =
+  def parameter: MethodParameter =
     new MethodParameter(
       raw
         .in(EdgeTypes.TAGGED_BY)
@@ -32,7 +32,7 @@ class Tag[A <: nodes.Tag](override val raw: GremlinScala[A]) extends OriginalNod
         .order(By((x: Vertex) => x.id))
         .cast[nodes.MethodParameterIn])
 
-  def parameterOut: MethodParameterOut[nodes.MethodParameterOut] =
+  def parameterOut: MethodParameterOut =
     new MethodParameterOut(
       raw
         .in(EdgeTypes.TAGGED_BY)
@@ -40,7 +40,7 @@ class Tag[A <: nodes.Tag](override val raw: GremlinScala[A]) extends OriginalNod
         .order(By((x: Vertex) => x.id))
         .cast[nodes.MethodParameterOut])
 
-  def call: Call[nodes.Call] =
+  def call: Call =
     new Call(
       raw
         .in(EdgeTypes.TAGGED_BY)
@@ -48,7 +48,7 @@ class Tag[A <: nodes.Tag](override val raw: GremlinScala[A]) extends OriginalNod
         .order(By((x: Vertex) => x.id))
         .cast[nodes.Call])
 
-  def identifier: Identifier[nodes.Identifier] =
+  def identifier: Identifier =
     new Identifier(
       raw
         .in(EdgeTypes.TAGGED_BY)
@@ -56,7 +56,7 @@ class Tag[A <: nodes.Tag](override val raw: GremlinScala[A]) extends OriginalNod
         .order(By((x: Vertex) => x.id))
         .cast[nodes.Identifier])
 
-  def literal: Literal[nodes.Literal] =
+  def literal: Literal =
     new Literal(
       raw
         .in(EdgeTypes.TAGGED_BY)
@@ -64,7 +64,7 @@ class Tag[A <: nodes.Tag](override val raw: GremlinScala[A]) extends OriginalNod
         .order(By((x: Vertex) => x.id))
         .cast[nodes.Literal])
 
-  def local: Local[nodes.Local] =
+  def local: Local =
     new Local(
       raw
         .in(EdgeTypes.TAGGED_BY)

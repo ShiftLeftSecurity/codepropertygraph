@@ -9,7 +9,7 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 /**
   * A local variable
   * */
-class Local[A <: nodes.Local](raw: GremlinScala[A]) extends NodeSteps[A](raw) with EvalTypeAccessors[A] {
+class Local(raw: GremlinScala[nodes.Local]) extends NodeSteps[nodes.Local](raw) with EvalTypeAccessors[nodes.Local] {
 
   /**
     * The method hosting this local variable
@@ -24,13 +24,13 @@ class Local[A <: nodes.Local](raw: GremlinScala[A]) extends NodeSteps[A](raw) wi
   /**
     * The block in which local is declared.
     */
-  def definingBlock: Block[nodes.Block] =
+  def definingBlock: Block =
     new Block(raw.in(EdgeTypes.AST).cast[nodes.Block])
 
   /**
     * Places (identifier) where this local is being referenced
     * */
-  def referencingIdentifiers: Identifier[nodes.Identifier] =
+  def referencingIdentifiers: Identifier =
     new Identifier(raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
@@ -38,6 +38,6 @@ class Local[A <: nodes.Local](raw: GremlinScala[A]) extends NodeSteps[A](raw) wi
     *
     * Unfortunately, `type` is a keyword, so we use `typ` here.
     * */
-  def typ: Type[nodes.Type] =
+  def typ: Type =
     new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 }

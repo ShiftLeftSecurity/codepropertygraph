@@ -11,10 +11,10 @@ import io.shiftleft.semanticcpg.language.types.structure.{Method, MethodParamete
 /**
   An expression (base type)
   */
-class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
-    extends NodeSteps[NodeType](raw)
-    with ArgumentIndexAccessors[NodeType]
-    with EvalTypeAccessors[NodeType] {
+class Expression[A <: nodes.Expression](raw: GremlinScala[A])
+    extends NodeSteps[A](raw)
+    with ArgumentIndexAccessors[A]
+    with EvalTypeAccessors[A] {
 
   /**
     Traverse to enclosing expression
@@ -35,7 +35,7 @@ class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
   /**
     If the expression is used as receiver for a call, this traverses to the call.
     */
-  def receivedCall: Call[nodes.Call] =
+  def receivedCall: Call =
     new Call(raw.in(EdgeTypes.RECEIVER).cast[nodes.Call])
 
   /**
@@ -47,20 +47,20 @@ class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
   /**
     * Traverse to surrounding call
     * */
-  def call: Call[nodes.Call] =
+  def call: Call =
     new Call(raw.repeat(_.in(EdgeTypes.ARGUMENT)).until(_.hasLabel(NodeTypes.CALL)).cast[nodes.Call])
 
   /**
   Traverse to related parameter
     */
   @deprecated("", "October 2019")
-  def toParameter: MethodParameter[nodes.MethodParameterIn] = parameter
+  def toParameter: MethodParameter = parameter
 
   /**
     Traverse to related parameter, if the expression is an argument to a call and the call
     can be resolved.
     */
-  def parameter: MethodParameter[nodes.MethodParameterIn] = {
+  def parameter: MethodParameter = {
     new MethodParameter(
       raw
         .sack((sack: Integer, node: nodes.Expression) => node.value2(NodeKeys.ARGUMENT_INDEX))
@@ -79,7 +79,7 @@ class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
   /**
     Traverse to enclosing method
     */
-  def method: Method[nodes.Method] =
+  def method: Method =
     new Method(raw.in(EdgeTypes.CONTAINS).cast[nodes.Method])
 
   /**
@@ -107,6 +107,6 @@ class Expression[NodeType <: nodes.Expression](raw: GremlinScala[NodeType])
   /**
     * Traverse to expression evaluation type
     * */
-  def typ: Type[nodes.Type] =
+  def typ: Type =
     new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 }

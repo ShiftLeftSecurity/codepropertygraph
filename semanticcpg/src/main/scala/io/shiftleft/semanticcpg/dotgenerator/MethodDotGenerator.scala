@@ -20,7 +20,7 @@ object MethodDotGenerator {
     * @param methodStep A step resulting in a set of methods.
     * @return A java.lang.String containing a DOT graph for each internal method.
     */
-  def toDotGraph[A <: nodes.Method](methodStep: NodeSteps[A]): List[String] =
+  def toDotGraph(methodStep: NodeSteps[nodes.Method]): List[String] =
     methodStep.internal.l.map(generateDotFromMethod)
 
   private def generateDotFromMethod(method: Method): String = {

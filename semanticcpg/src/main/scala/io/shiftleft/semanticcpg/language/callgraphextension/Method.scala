@@ -5,14 +5,14 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod}
 
-class Method[A <: nodes.Method](override val raw: GremlinScala[A]) extends Steps[A](raw) {
+class Method(override val raw: GremlinScala[nodes.Method]) extends Steps[nodes.Method](raw) {
 
   /**
     * Intended for internal use!
     * Traverse to direct and transitive callers of the method.
     */
   def calledByIncludingSink(sourceTrav: Steps[nodes.Method], resolve: Boolean = true)(
-      implicit callResolver: ICallResolver): Steps[nodes.Method] = {
+      implicit callResolver: ICallResolver): OriginalMethod = {
     val sourceMethods = sourceTrav.raw.toSet
     val sinkMethods = raw.dedup.toList()
 
@@ -43,19 +43,19 @@ class Method[A <: nodes.Method](override val raw: GremlinScala[A]) extends Steps
   /**
     * Traverse to direct callers of this method
     * */
-  def caller(implicit callResolver: ICallResolver): Steps[nodes.Method] =
+  def caller(implicit callResolver: ICallResolver): OriginalMethod =
     callIn(callResolver).method
 
   /**
     * Traverse to methods called by this method
     * */
-  def callee(implicit callResolver: ICallResolver): Steps[nodes.Method] =
+  def callee(implicit callResolver: ICallResolver): OriginalMethod =
     new OriginalMethod(raw).callOut.calledMethod(callResolver)
 
   /**
     * Incoming call sites
     * */
-  def callIn(implicit callResolver: ICallResolver): Call[nodes.Call] = {
+  def callIn(implicit callResolver: ICallResolver): Call = {
     new Call(
       sideEffect(callResolver.resolveDynamicMethodCallSites).raw
         .in(EdgeTypes.CALL)

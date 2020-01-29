@@ -20,7 +20,7 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
   /**
     * Traverse to source file
     * */
-  def file: File[nodes.File] =
+  def file: File =
     new File(
       raw
         .choose(
@@ -87,7 +87,7 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
   /**
   Traverse to tags of nodes in enhanced graph
     */
-  def tag: Tag[nodes.Tag] =
+  def tag: Tag =
     new Tag(raw.out(EdgeTypes.TAGGED_BY).cast[nodes.Tag])
 
 }

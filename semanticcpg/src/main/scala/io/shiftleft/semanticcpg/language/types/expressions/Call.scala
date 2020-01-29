@@ -12,24 +12,24 @@ import io.shiftleft.semanticcpg.language.types.structure.{Member, Method, Method
 /**
   A call site
   */
-class Call[A <: nodes.Call](raw: GremlinScala[A]) extends NodeSteps[A](raw) with EvalTypeAccessors[A] {
+class Call(raw: GremlinScala[nodes.Call]) extends NodeSteps[nodes.Call](raw) with EvalTypeAccessors[nodes.Call] {
 
   /**
     Only statically dispatched calls
     */
-  def isStatic: Call[A] =
+  def isStatic: Call =
     this.dispatchType("STATIC_DISPATCH")
 
   /**
     Only dynamically dispatched calls
     */
-  def isDynamic: Call[A] =
+  def isDynamic: Call =
     this.dispatchType("DYNAMIC_DISPATCH")
 
   /**
     The caller
     */
-  def method: Method[nodes.Method] =
+  def method: Method =
     new Method(raw.in(EdgeTypes.CONTAINS).hasLabel(NodeTypes.METHOD).cast[nodes.Method])
 
   /**
@@ -53,7 +53,7 @@ class Call[A <: nodes.Call](raw: GremlinScala[A]) extends NodeSteps[A](raw) with
   /**
     To formal method return parameter
     */
-  def toMethodReturn: MethodReturn[nodes.MethodReturn] =
+  def toMethodReturn: MethodReturn =
     new MethodReturn(
       raw
         .out(EdgeTypes.CALL)
@@ -64,7 +64,7 @@ class Call[A <: nodes.Call](raw: GremlinScala[A]) extends NodeSteps[A](raw) with
   /**
     * Traverse to referenced members
     * */
-  def referencedMember: Member[nodes.Member] =
+  def referencedMember: Member =
     new Member(raw.out(EdgeTypes.REF).cast[nodes.Member])
 
 }

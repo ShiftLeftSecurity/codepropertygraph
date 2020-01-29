@@ -7,7 +7,7 @@ import io.shiftleft.semanticcpg.language.NodeSteps
 /**
   * A meta data entry
   * */
-class MetaData[A <: nodes.MetaData](raw: GremlinScala[A]) extends NodeSteps[A](raw) {
+class MetaData(raw: GremlinScala[nodes.MetaData]) extends NodeSteps[nodes.MetaData](raw) {
 
   /**
     * Returns the programming language of the code for which this CPG was

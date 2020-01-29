@@ -4,19 +4,19 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 
-class NamespaceBlock[A <: nodes.NamespaceBlock](raw: GremlinScala[A]) extends NodeSteps[A](raw) {
+class NamespaceBlock(raw: GremlinScala[nodes.NamespaceBlock]) extends NodeSteps[nodes.NamespaceBlock](raw) {
 
   /**
     * Namespaces for namespace blocks.
     * */
-  def namespaces: NodeSteps[nodes.Namespace] =
-    new NodeSteps(raw.out(EdgeTypes.REF).cast[nodes.Namespace])
+  def namespaces: Namespace =
+    new Namespace(raw.out(EdgeTypes.REF).cast[nodes.Namespace])
 
   /**
     * The type declarations defined in this namespace
     * */
-  def typeDecl: NodeSteps[nodes.TypeDecl] =
-    new NodeSteps(
+  def typeDecl: TypeDecl =
+    new TypeDecl(
       raw
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.TYPE_DECL)

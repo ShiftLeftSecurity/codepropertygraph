@@ -21,7 +21,7 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   def depth(p: nodes.AstNode => Boolean): Steps[Int] =
     map(_.depth(p))
 
-  def isCallTo(regex: String): Call[nodes.Call] =
+  def isCallTo(regex: String): Call =
     isCall.name(regex)
 
   /**
@@ -93,13 +93,13 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to those AST nodes that are blocks
     * */
-  def isBlock: Block[nodes.Block] =
+  def isBlock: Block =
     new Block(raw.hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
 
   /**
     * Traverse only to those AST nodes that are control structures
     * */
-  def isControlStructure: ControlStructure[nodes.ControlStructure] =
+  def isControlStructure: ControlStructure =
     new ControlStructure(raw.hasLabel(NodeTypes.CONTROL_STRUCTURE).cast[nodes.ControlStructure])
 
   /**
@@ -117,19 +117,19 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
   Cast to call if applicable and filter on call code `calleeRegex`
     */
-  def isCall(calleeRegex: String): Call[nodes.Call] =
+  def isCall(calleeRegex: String): Call =
     isCall.filter(_.code(calleeRegex))
 
   /**
     * Traverse only to AST nodes that are literals
     * */
-  def isLiteral: Literal[nodes.Literal] =
+  def isLiteral: Literal =
     new Literal(raw.hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
 
   /**
     * Traverse only to AST nodes that are identifier
     * */
-  def isIdentifier: Identifier[nodes.Identifier] =
+  def isIdentifier: Identifier =
     new Identifier(raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
@@ -141,7 +141,7 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to AST nodes that are method reference nodes.
     */
-  def isMethodRef: MethodRef[nodes.MethodRef] =
+  def isMethodRef: MethodRef =
     new MethodRef(raw.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef])
 
   def walkAstUntilReaching(labels: List[String]): NodeSteps[nodes.StoredNode] =
