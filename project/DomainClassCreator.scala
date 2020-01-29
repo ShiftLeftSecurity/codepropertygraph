@@ -488,7 +488,9 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
           inEdges.map(edge => neighborAccessorName(edge, "IN")))
         .map { nbaName =>
           /* generic and specific neighbor accessors - as mentioned in comment above, we may not need generic ones (prefixed with `_`) in future */
-          s"override def _$nbaName(): JIterator[StoredNode] = get()._$nbaName()"
+          s"""def $nbaName: JIterator[StoredNode] = get().$nbaName
+             |override def _$nbaName(): JIterator[StoredNode] = $nbaName
+             |""".stripMargin
         }.mkString("\n")
 
       val nodeRefImpl = {
@@ -522,7 +524,9 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
         (outEdges.map(edge => neighborAccessorName(edge, "OUT")) ++
           inEdges.map(edge => neighborAccessorName(edge, "IN"))).zipWithIndex
         .map { case (nbaName: String, offsetPos: Int) =>
-          s"override def _$nbaName : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[StoredNode]]"
+          /* generic and specific neighbor accessors - as mentioned in comment above, we may not need generic ones (prefixed with `_`) in future */
+          s"""def $nbaName : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[StoredNode]]
+             |override def _$nbaName : JIterator[StoredNode] = $nbaName""".stripMargin
         }.mkString("\n")
 
       val classImpl =
