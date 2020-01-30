@@ -1,8 +1,6 @@
 import better.files.File
 import java.io.{FileInputStream, File => JFile}
-import scala.collection.JavaConverters._
 import play.api.libs.json._
-
 import scala.collection.mutable
 
 class Schema(schemaFile: String) {
@@ -19,6 +17,28 @@ class Schema(schemaFile: String) {
   lazy val edgeTypes = (jsonRoot \ "edgeTypes").as[List[EdgeType]]
   lazy val nodeKeys = (jsonRoot \ "nodeKeys").as[List[Property]]
   lazy val edgeKeys = (jsonRoot \ "edgeKeys").as[List[Property]]
+
+  lazy val nodeTypeByName: Map[String, NodeType] =
+    nodeTypes.map { node => (node.name, node)}.toMap
+
+  /* schema only specifies `node.outEdges` - this builds a reverse map (essentially `node.inEdges`) */
+  lazy val nodeToInEdges: Map[NodeType, Set[String]] = {
+    val nodeToInEdges = new mutable.HashMap[NodeType, mutable.Set[String]] with mutable.MultiMap[NodeType, String]
+
+    for {
+      nodeType <- nodeTypes
+      outEdge  <- nodeType.outEdges
+      inNodeName   <- outEdge.inNodes
+      inNode = nodeTypeByName.get(inNodeName) if inNode.isDefined
+    } nodeToInEdges.addBinding(inNode.get, outEdge.edgeName)
+
+    // all nodes can have incoming `CONTAINS_NODE` edges
+    nodeTypes.foreach { nodeType =>
+      nodeToInEdges.addBinding(nodeType, "CONTAINS_NODE")
+    }
+
+    nodeToInEdges.mapValues(_.toSet).toMap
+  }
 }
 
 /** Generates a domain model for OverflowDb traversals based on your domain-specific json schema.
@@ -143,7 +163,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
         }.mkString("\n\n")
 
       val classImpl =
-        s"""class ${edgeClassName}(_graph: OdbGraph, _outNode: NodeRef[OdbNode], _inNode: NodeRef[OdbNode])
+        s"""class $edgeClassName(_graph: OdbGraph, _outNode: NodeRef[OdbNode], _inNode: NodeRef[OdbNode])
            |extends OdbEdge(_graph, $edgeClassName.Label, _outNode, _inNode, $edgeClassName.PropertyNames.allAsJava) {
            |${propertyBasedFieldAccessors(keys)}
            |}
@@ -163,15 +183,12 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
     val propertyByName: Map[String, Property] =
       schema.nodeKeys.map(prop => prop.name -> prop).toMap
 
-    def entries: List[String] = {
-      val nodeToInEdges = calculateNodeToInEdges(schema.nodeTypes)
-
+    lazy val entries: List[String] =
       schema.nodeTypes.map { nodeType =>
-        generateNodeSource(nodeType, nodeType.keys.map(propertyByName), nodeToInEdges)
+        generateNodeSource(nodeType, nodeType.keys.map(propertyByName))
       }
-    }
 
-    def nodeHeader = {
+    lazy val nodeHeader = {
       /* generic accessors for all potential neighbors. specific nodes override them, in case they really allow that edge type
        * TODO: resolve debate between Michael/Bernhard/Markus - these may not be needed. in the meantime, we also have
        * specific neighbor accessors driven by the schema, i.e. those are only available on the types that really allow the given edge type
@@ -288,12 +305,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       staticHeader + nodeBaseTraits + keyBasedTraits + factories
     }
 
-    def edgeTypeByName: Map[String, EdgeType] =
-      schema.edgeTypes.groupBy(_.name).mapValues(_.head)
-
-    def generateNodeSource(nodeType: NodeType,
-                           keys: List[Property],
-                           nodeToInEdges: mutable.MultiMap[String, String]) = {
+    def generateNodeSource(nodeType: NodeType, keys: List[Property]) = {
       val keyConstants = keys.map(key => s"""val ${camelCaseCaps(key.name)} = "${key.name}" """).mkString("\n")
       val keyToValueMap = keys
         .map { property: Property =>
@@ -306,15 +318,11 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
         }
         .mkString(",\n")
 
-      val outEdges: List[String] = nodeType.outEdges.map(_.edgeName)
+      val outEdgeNames: List[String] = nodeType.outEdges.map(_.edgeName)
+      val inEdgeNames:  List[String] = schema.nodeToInEdges.getOrElse(nodeType, Set.empty).toList
 
-      val inEdges: List[String] = {
-        val option = nodeToInEdges.get(nodeType.name)
-        option.map(_.toList).getOrElse(Nil)
-      }
-
-      val outEdgeLayouts = outEdges.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
-      val inEdgeLayouts = inEdges.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
+      val outEdgeLayouts = outEdgeNames.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
+      val inEdgeLayouts = inEdgeNames.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
 
       val className = nodeType.className
       val classNameDb = nodeType.classNameDb
@@ -345,8 +353,8 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  }
            |
            |  object Edges {
-           |    val In: Array[String] = Array(${inEdges.map('"' + _ + '"').mkString(",")})
-           |    val Out: Array[String] = Array(${outEdges.map('"' + _ + '"').mkString(",")})
+           |    val In: Array[String] = Array(${inEdgeNames.map('"' + _ + '"').mkString(",")})
+           |    val Out: Array[String] = Array(${outEdgeNames.map('"' + _ + '"').mkString(",")})
            |  }
            |
            |  val factory = new NodeFactory[$classNameDb] {
@@ -484,11 +492,13 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |""".stripMargin
 
       val neighborDelegators =
-        (outEdges.map(edge => neighborAccessorName(edge, "OUT")) ++
-          inEdges.map(edge => neighborAccessorName(edge, "IN")))
+        (outEdgeNames.map(edge => neighborAccessorName(edge, "OUT")) ++
+          inEdgeNames.map(edge => neighborAccessorName(edge, "IN")))
         .map { nbaName =>
           /* generic and specific neighbor accessors - as mentioned in comment above, we may not need generic ones (prefixed with `_`) in future */
-          s"override def _$nbaName(): JIterator[StoredNode] = get()._$nbaName()"
+          s"""def $nbaName: JIterator[StoredNode] = get().$nbaName
+             |override def _$nbaName(): JIterator[StoredNode] = $nbaName
+             |""".stripMargin
         }.mkString("\n")
 
       val nodeRefImpl = {
@@ -519,10 +529,12 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |""".stripMargin
       }
       val neighborAccessors =
-        (outEdges.map(edge => neighborAccessorName(edge, "OUT")) ++
-          inEdges.map(edge => neighborAccessorName(edge, "IN"))).zipWithIndex
+        (outEdgeNames.map(edge => neighborAccessorName(edge, "OUT")) ++
+          inEdgeNames.map(edge => neighborAccessorName(edge, "IN"))).zipWithIndex
         .map { case (nbaName: String, offsetPos: Int) =>
-          s"override def _$nbaName : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[StoredNode]]"
+          /* generic and specific neighbor accessors - as mentioned in comment above, we may not need generic ones (prefixed with `_`) in future */
+          s"""def $nbaName : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[StoredNode]]
+             |override def _$nbaName : JIterator[StoredNode] = $nbaName""".stripMargin
         }.mkString("\n")
 
       val classImpl =
@@ -709,30 +721,6 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
     println(s"writing results to $targetFile")
     outputFile.moveTo(targetFile)(File.CopyOptions(overwrite = true)).toJava
   }
-
-  def calculateNodeToInEdges(nodeTypes: List[NodeType]): mutable.MultiMap[String, String] = {
-    val nodeBaseTraitNames: List[String] =
-      schema.nodeBaseTraits.map(_.name) :+ "NODE"
-
-    val nodeToInEdges = new mutable.HashMap[String, mutable.Set[String]] with mutable.MultiMap[String, String]
-    val nodeTypeNamesSet = nodeTypes.map(_.name).toSet ++ nodeBaseTraitNames
-
-    for {
-      nodeType <- nodeTypes
-      outEdge  <- nodeType.outEdges
-      inNode   <- outEdge.inNodes
-    } {
-      assert(nodeTypeNamesSet.contains(inNode), s"Node with name $inNode is not defined.")
-      nodeToInEdges.addBinding(inNode, outEdge.edgeName)
-    }
-
-    // all nodes can have incoming `CONTAINS_NODE` edges
-    nodeTypes.foreach { nodeType =>
-      nodeToInEdges.addBinding(nodeType.name, "CONTAINS_NODE")
-    }
-
-    nodeToInEdges
-  }
 }
 
 case class NodeType(
@@ -741,8 +729,7 @@ case class NodeType(
     keys: List[String],
     outEdges: List[OutEdgeEntry],
     is: Option[List[String]],
-    containedNodes: Option[List[ContainedNode]]
-) {
+    containedNodes: Option[List[ContainedNode]]) {
   lazy val className = Helpers.camelCaseCaps(name)
   lazy val classNameDb = s"${className}Db"
 }
@@ -895,5 +882,4 @@ object Helpers {
         (casesForKeys :+ caseNotFound).mkString("\n else ")
     }
   }
-
 }
