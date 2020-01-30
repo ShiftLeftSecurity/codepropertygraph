@@ -22,19 +22,19 @@ class Schema(schemaFile: String) {
     nodeTypes.map { node => (node.name, node)}.toMap
 
   /* nodes only specify their `outEdges` - this builds a reverse map (essentially `node.inEdges`) */
-  lazy val nodeToInEdges: Map[String, Set[String]] = {
-    val nodeToInEdges = new mutable.HashMap[String, mutable.Set[String]] with mutable.MultiMap[String, String]
+  lazy val nodeToInEdges: Map[NodeType, Set[String]] = {
+    val nodeToInEdges = new mutable.HashMap[NodeType, mutable.Set[String]] with mutable.MultiMap[NodeType, String]
 
     for {
       nodeType <- nodeTypes
       outEdge  <- nodeType.outEdges
       inNodeName   <- outEdge.inNodes
-//      inNode = nodeTypeByName(inNodeName)
-    } nodeToInEdges.addBinding(inNodeName, outEdge.edgeName)
+      inNode = nodeTypeByName.get(inNodeName) if inNode.isDefined
+    } nodeToInEdges.addBinding(inNode.get, outEdge.edgeName)
 
     // all nodes can have incoming `CONTAINS_NODE` edges
     nodeTypes.foreach { nodeType =>
-      nodeToInEdges.addBinding(nodeType.name, "CONTAINS_NODE")
+      nodeToInEdges.addBinding(nodeType, "CONTAINS_NODE")
     }
 
     nodeToInEdges.mapValues(_.toSet).toMap
@@ -48,8 +48,8 @@ class Schema(schemaFile: String) {
       nodeType <- nodeTypes
       outEdge  <- nodeType.outEdges
       inNodeName   <- outEdge.inNodes
-      inNode = nodeTypeByName(inNodeName)
-    } nodeToInNodes.addBinding(inNode, nodeType.name)
+      inNode = nodeTypeByName.get(inNodeName) if inNode.isDefined
+    } nodeToInNodes.addBinding(inNode.get, nodeType.name)
 
     // all nodes can have incoming `CONTAINS_NODE` edges
     nodeTypes.foreach { nodeType =>
@@ -338,7 +338,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
         .mkString(",\n")
 
       val outEdgeNames: List[String] = nodeType.outEdges.map(_.edgeName)
-      val inEdgeNames:  List[String] = schema.nodeToInEdges.getOrElse(nodeType.name, Set.empty).toList
+      val inEdgeNames:  List[String] = schema.nodeToInEdges.getOrElse(nodeType, Set.empty).toList
 
       val outEdgeLayouts = outEdgeNames.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
       val inEdgeLayouts = inEdgeNames.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
