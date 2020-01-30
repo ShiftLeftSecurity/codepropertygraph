@@ -885,4 +885,21 @@ object Helpers {
     nodeToInEdges.mapValues(_.toSet).toMap
   }
 
+  /* nodes only specify their `outEdges.inNodes` - this builds a reverse map (essentially `node.inEdges.outNodes`) */
+  def calculateNodeToInNodes(nodeTypes: List[NodeType]): Map[String, Set[String]] = {
+    val nodeToInNodes = new mutable.HashMap[String, mutable.Set[String]] with mutable.MultiMap[String, String]
+
+    for {
+      nodeType <- nodeTypes
+      outEdge  <- nodeType.outEdges
+      inNode   <- outEdge.inNodes
+    } nodeToInNodes.addBinding(inNode, nodeType.name)
+
+    // all nodes can have incoming `CONTAINS_NODE` edges
+    nodeTypes.foreach { nodeType =>
+      nodeToInNodes.addBinding(nodeType.name, "CONTAINS_NODE")
+    }
+
+    nodeToInNodes.mapValues(_.toSet).toMap
+  }
 }
