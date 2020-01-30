@@ -21,7 +21,7 @@ class Schema(schemaFile: String) {
   lazy val nodeTypeByName: Map[String, NodeType] =
     nodeTypes.map { node => (node.name, node)}.toMap
 
-  /* nodes only specify their `outEdges` - this builds a reverse map (essentially `node.inEdges`) */
+  /* schema only specifies `node.outEdges` - this builds a reverse map (essentially `node.inEdges`) */
   lazy val nodeToInEdges: Map[NodeType, Set[String]] = {
     val nodeToInEdges = new mutable.HashMap[NodeType, mutable.Set[String]] with mutable.MultiMap[NodeType, String]
 
@@ -38,25 +38,6 @@ class Schema(schemaFile: String) {
     }
 
     nodeToInEdges.mapValues(_.toSet).toMap
-  }
-
-  /* nodes only specify their `outEdges.inNodes` - this builds a reverse map (essentially `node.inEdges.outNodes`) */
-  lazy val nodeToInNodes: Map[NodeType, Set[String]] = {
-    val nodeToInNodes = new mutable.HashMap[NodeType, mutable.Set[String]] with mutable.MultiMap[NodeType, String]
-
-    for {
-      nodeType <- nodeTypes
-      outEdge  <- nodeType.outEdges
-      inNodeName   <- outEdge.inNodes
-      inNode = nodeTypeByName.get(inNodeName) if inNode.isDefined
-    } nodeToInNodes.addBinding(inNode.get, nodeType.name)
-
-    // all nodes can have incoming `CONTAINS_NODE` edges
-    nodeTypes.foreach { nodeType =>
-      nodeToInNodes.addBinding(nodeType, "CONTAINS_NODE")
-    }
-
-    nodeToInNodes.mapValues(_.toSet).toMap
   }
 }
 
