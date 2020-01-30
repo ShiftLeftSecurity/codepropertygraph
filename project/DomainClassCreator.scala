@@ -289,7 +289,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
     def generateNodeSource(nodeType: NodeType,
                            keys: List[Property],
-                           nodeToInEdges: mutable.MultiMap[String, String]) = {
+                           nodeToInEdges: Map[String, Set[String]]) = {
       val keyConstants = keys.map(key => s"""val ${camelCaseCaps(key.name)} = "${key.name}" """).mkString("\n")
       val keyToValueMap = keys
         .map { property: Property =>
@@ -303,11 +303,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
         .mkString(",\n")
 
       val outEdgeNames: List[String] = nodeType.outEdges.map(_.edgeName)
-      val inEdgeNames: List[String] = {
-        val option = nodeToInEdges.get(nodeType.name)
-        option.map(_.toList).getOrElse(Nil)
-      }
-
+      val inEdgeNames:  List[String] = nodeToInEdges.getOrElse(nodeType.name, Set.empty).toList
 
       val outEdgeLayouts = outEdgeNames.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
       val inEdgeLayouts = inEdgeNames.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
@@ -872,8 +868,8 @@ object Helpers {
     }
   }
 
-  /* nodes only specify their `outEdges` - this builds a reverse map by iterating over all nodes */
-  def calculateNodeToInEdges(nodeTypes: List[NodeType], nodeBaseTraitNames: List[String]): mutable.MultiMap[String, String] = {
+  /* nodes only specify their `outEdges` - this builds a reverse map (essentially `node.inEdges`) by iterating over all nodes */
+  def calculateNodeToInEdges(nodeTypes: List[NodeType], nodeBaseTraitNames: List[String]): Map[String, Set[String]] = {
     val nodeToInEdges = new mutable.HashMap[String, mutable.Set[String]] with mutable.MultiMap[String, String]
     val nodeTypeNamesSet = nodeTypes.map(_.name).toSet ++ nodeBaseTraitNames
 
@@ -891,7 +887,7 @@ object Helpers {
       nodeToInEdges.addBinding(nodeType.name, "CONTAINS_NODE")
     }
 
-    nodeToInEdges
+    nodeToInEdges.mapValues(_.toSet).toMap
   }
 
 }
