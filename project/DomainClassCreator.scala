@@ -162,7 +162,8 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       schema.nodeKeys.map(prop => prop.name -> prop).toMap
 
     def entries: List[String] = {
-      val nodeToInEdges = calculateNodeToInEdges(schema.nodeTypes)
+      val nodeBaseTraitNames = schema.nodeBaseTraits.map(_.name) :+ "NODE"
+      val nodeToInEdges = calculateNodeToInEdges(schema.nodeTypes, nodeBaseTraitNames)
 
       schema.nodeTypes.map { nodeType =>
         generateNodeSource(nodeType, nodeType.keys.map(propertyByName), nodeToInEdges)
@@ -708,30 +709,6 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
     println(s"writing results to $targetFile")
     outputFile.moveTo(targetFile)(File.CopyOptions(overwrite = true)).toJava
   }
-
-  def calculateNodeToInEdges(nodeTypes: List[NodeType]): mutable.MultiMap[String, String] = {
-    val nodeBaseTraitNames: List[String] =
-      schema.nodeBaseTraits.map(_.name) :+ "NODE"
-
-    val nodeToInEdges = new mutable.HashMap[String, mutable.Set[String]] with mutable.MultiMap[String, String]
-    val nodeTypeNamesSet = nodeTypes.map(_.name).toSet ++ nodeBaseTraitNames
-
-    for {
-      nodeType <- nodeTypes
-      outEdge  <- nodeType.outEdges
-      inNode   <- outEdge.inNodes
-    } {
-      assert(nodeTypeNamesSet.contains(inNode), s"Node with name $inNode is not defined.")
-      nodeToInEdges.addBinding(inNode, outEdge.edgeName)
-    }
-
-    // all nodes can have incoming `CONTAINS_NODE` edges
-    nodeTypes.foreach { nodeType =>
-      nodeToInEdges.addBinding(nodeType.name, "CONTAINS_NODE")
-    }
-
-    nodeToInEdges
-  }
 }
 
 case class NodeType(
@@ -893,6 +870,28 @@ object Helpers {
         }
         (casesForKeys :+ caseNotFound).mkString("\n else ")
     }
+  }
+
+  /* nodes only specify their `outEdges` - this builds a reverse map by iterating over all nodes */
+  def calculateNodeToInEdges(nodeTypes: List[NodeType], nodeBaseTraitNames: List[String]): mutable.MultiMap[String, String] = {
+    val nodeToInEdges = new mutable.HashMap[String, mutable.Set[String]] with mutable.MultiMap[String, String]
+    val nodeTypeNamesSet = nodeTypes.map(_.name).toSet ++ nodeBaseTraitNames
+
+    for {
+      nodeType <- nodeTypes
+      outEdge  <- nodeType.outEdges
+      inNode   <- outEdge.inNodes
+    } {
+      assert(nodeTypeNamesSet.contains(inNode), s"Node with name $inNode is not defined.")
+      nodeToInEdges.addBinding(inNode, outEdge.edgeName)
+    }
+
+    // all nodes can have incoming `CONTAINS_NODE` edges
+    nodeTypes.foreach { nodeType =>
+      nodeToInEdges.addBinding(nodeType.name, "CONTAINS_NODE")
+    }
+
+    nodeToInEdges
   }
 
 }
