@@ -19,25 +19,33 @@ class Schema(schemaFile: String) {
   lazy val edgeKeys = (jsonRoot \ "edgeKeys").as[List[Property]]
 
   lazy val nodeTypeByName: Map[String, NodeType] =
-    nodeTypes.map { node => (node.name, node)}.toMap
+    nodeTypes.map { node => (node.name, node) }.toMap
 
-  /* schema only specifies `node.outEdges` - this builds a reverse map (essentially `node.inEdges`) */
-  lazy val nodeToInEdges: Map[NodeType, Set[String]] = {
-    val nodeToInEdges = new mutable.HashMap[NodeType, mutable.Set[String]] with mutable.MultiMap[NodeType, String]
+  /* schema only specifies `node.outEdges` - this builds a reverse map (essentially `node.inEdges`) along with the outNodes */
+  lazy val nodeToInEdgeContexts: Map[NodeType, Seq[InEdgeContext]] = {
+    val tuples: Seq[(NodeType, String, NodeType)] =
+      for {
+        nodeType <- nodeTypes
+        outEdge <- nodeType.outEdges
+        inNodeName <- outEdge.inNodes
+        inNode = nodeTypeByName.get(inNodeName) if inNode.isDefined
+      } yield (inNode.get, outEdge.edgeName, nodeType)
 
-    for {
-      nodeType <- nodeTypes
-      outEdge  <- nodeType.outEdges
-      inNodeName   <- outEdge.inNodes
-      inNode = nodeTypeByName.get(inNodeName) if inNode.isDefined
-    } nodeToInEdges.addBinding(inNode.get, outEdge.edgeName)
+    /* grouping above (node, inEdge, adjacentNode) tuples by `node` and `inEdge`
+     * would look nicer with scala 2.13's `groupMap`, but sbt is still on scala 2.12 :( */
+    val grouped: Map[NodeType, Map[String, Seq[NodeType]]] =
+      tuples.groupBy(_._1).mapValues(_.groupBy(_._2).mapValues(_.map(_._3)).toMap)
 
-    // all nodes can have incoming `CONTAINS_NODE` edges
-    nodeTypes.foreach { nodeType =>
-      nodeToInEdges.addBinding(nodeType, "CONTAINS_NODE")
+    grouped.mapValues { inEdgesWithAdjacentNodes =>
+      // all nodes can have incoming `CONTAINS_NODE` edges
+      val adjustedInEdgesWithAdjacentNodes =
+        if (inEdgesWithAdjacentNodes.contains("CONTAINS_NODE")) inEdgesWithAdjacentNodes
+        else inEdgesWithAdjacentNodes + ("CONTAINS_NODE" -> Set.empty)
+
+      adjustedInEdgesWithAdjacentNodes.map { case (edge, adjacentNodes) =>
+        InEdgeContext(edge, adjacentNodes.toSet)
+      }.toSeq
     }
-
-    nodeToInEdges.mapValues(_.toSet).toMap
   }
 }
 
@@ -307,19 +315,17 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
     def generateNodeSource(nodeType: NodeType, keys: List[Property]) = {
       val keyConstants = keys.map(key => s"""val ${camelCaseCaps(key.name)} = "${key.name}" """).mkString("\n")
-      val keyToValueMap = keys
-        .map { property: Property =>
-          getHigherType(property) match {
-            case HigherValueType.None | HigherValueType.List =>
-              s""" "${property.name}" -> { instance: ${nodeType.classNameDb} => instance.${camelCase(property.name)}}"""
-            case HigherValueType.Option =>
-              s""" "${property.name}" -> { instance: ${nodeType.classNameDb} => instance.${camelCase(property.name)}.orNull}"""
-          }
+      val keyToValueMap = keys.map { property: Property =>
+        getHigherType(property) match {
+          case HigherValueType.None | HigherValueType.List =>
+            s""" "${property.name}" -> { instance: ${nodeType.classNameDb} => instance.${camelCase(property.name)}}"""
+          case HigherValueType.Option =>
+            s""" "${property.name}" -> { instance: ${nodeType.classNameDb} => instance.${camelCase(property.name)}.orNull}"""
         }
-        .mkString(",\n")
+      }.mkString(",\n")
 
-      val outEdgeNames: List[String] = nodeType.outEdges.map(_.edgeName)
-      val inEdgeNames:  List[String] = schema.nodeToInEdges.getOrElse(nodeType, Set.empty).toList
+      val outEdgeNames: Seq[String] = nodeType.outEdges.map(_.edgeName)
+      val inEdgeNames:  Seq[String] = schema.nodeToInEdgeContexts.getOrElse(nodeType, Seq.empty).map(_.edgeName)
 
       val outEdgeLayouts = outEdgeNames.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
       val inEdgeLayouts = inEdgeNames.map(edge => s"edges.${camelCaseCaps(edge)}.layoutInformation").mkString(", ")
@@ -491,15 +497,41 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |}
            |""".stripMargin
 
-      val neighborDelegators =
-        (outEdgeNames.map(edge => neighborAccessorName(edge, "OUT")) ++
-          inEdgeNames.map(edge => neighborAccessorName(edge, "IN")))
-        .map { nbaName =>
-          /* generic and specific neighbor accessors - as mentioned in comment above, we may not need generic ones (prefixed with `_`) in future */
-          s"""def $nbaName: JIterator[StoredNode] = get().$nbaName
-             |override def _$nbaName(): JIterator[StoredNode] = $nbaName
-             |""".stripMargin
-        }.mkString("\n")
+      def neighborOut(toCode: NeighborInfo => String): String = {
+        nodeType.outEdges.map { case OutEdgeEntry(edgeName, inNodes) =>
+          val nbaName = neighborAccessorName(edgeName, "OUT")
+          val neighborNodeType: String =
+            if (inNodes.size == 1 && inNodes.head != "NODE") {
+              schema.nodeTypeByName(inNodes.head).className
+            } else "StoredNode"
+          toCode(NeighborInfo(nbaName, neighborNodeType))
+        }
+      }.mkString("\n")
+
+      def neighborIn(toCode: NeighborInfo => String): String = {
+        schema.nodeToInEdgeContexts.getOrElse(nodeType, Nil).map { case InEdgeContext(edgeName, outNodes) =>
+          val nbaName = neighborAccessorName(edgeName, "IN")
+          val neighborNodeType: String =
+            if (outNodes.size == 1) {
+              outNodes.head.className
+            } else "StoredNode"
+          toCode(NeighborInfo(nbaName, neighborNodeType))
+       }
+      }.mkString("\n")
+
+      val neighborDelegatorsOut = neighborOut { case NeighborInfo(nbaName, neighborNodeType) =>
+        /* generic and specific neighbor accessors - as mentioned in comment above, we may not need generic ones (prefixed with `_`) in future */
+        s"""def $nbaName: JIterator[$neighborNodeType] = get().$nbaName
+           |override def _$nbaName(): JIterator[StoredNode] = get()._$nbaName
+           |""".stripMargin
+      }
+
+      val neighborDelegatorsIn = neighborIn { case NeighborInfo(nbaName, neighborNodeType) =>
+        /* generic and specific neighbor accessors - as mentioned in comment above, we may not need generic ones (prefixed with `_`) in future */
+        s"""def $nbaName: JIterator[$neighborNodeType] = get().$nbaName
+           |override def _$nbaName(): JIterator[StoredNode] = get()._$nbaName
+           |""".stripMargin
+      }
 
       val nodeRefImpl = {
         val propertyDelegators = keys
@@ -519,7 +551,8 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  $mixinTraits {
            |  $propertyDelegators
            |  $delegatingContainedNodeAccessors
-           |  $neighborDelegators
+           |  $neighborDelegatorsOut
+           |  $neighborDelegatorsIn
            |  override def valueMap: JMap[String, AnyRef] = get.valueMap
            |  override def canEqual(that: Any): Boolean = get.canEqual(that)
            |  override def label: String = {
@@ -528,14 +561,20 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |}
            |""".stripMargin
       }
-      val neighborAccessors =
-        (outEdgeNames.map(edge => neighborAccessorName(edge, "OUT")) ++
-          inEdgeNames.map(edge => neighborAccessorName(edge, "IN"))).zipWithIndex
-        .map { case (nbaName: String, offsetPos: Int) =>
-          /* generic and specific neighbor accessors - as mentioned in comment above, we may not need generic ones (prefixed with `_`) in future */
-          s"""def $nbaName : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[StoredNode]]
-             |override def _$nbaName : JIterator[StoredNode] = $nbaName""".stripMargin
-        }.mkString("\n")
+
+      var offsetPos = -1
+      val neighborAccessorsOut = neighborOut { case NeighborInfo(nbaName, neighborNodeType) =>
+        offsetPos += 1
+        /* generic and specific neighbor accessors - as mentioned in comment above, we may not need generic ones (prefixed with `_`) in future */
+        s"""def $nbaName : JIterator[$neighborNodeType] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[$neighborNodeType]]
+           |override def _$nbaName : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[StoredNode]]""".stripMargin
+      }
+      val neighborAccessorsIn = neighborIn { case NeighborInfo(nbaName, neighborNodeType) =>
+        offsetPos += 1
+        /* generic and specific neighbor accessors - as mentioned in comment above, we may not need generic ones (prefixed with `_`) in future */
+        s"""def $nbaName : JIterator[$neighborNodeType] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[$neighborNodeType]]
+           |override def _$nbaName : JIterator[StoredNode] = createAdjacentNodeIteratorByOffSet($offsetPos).asInstanceOf[JIterator[StoredNode]]""".stripMargin
+      }
 
       val classImpl =
         s"""class $classNameDb(ref: NodeRef[OdbNode]) extends OdbNode(ref) with StoredNode 
@@ -548,7 +587,8 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  override def valueMap: JMap[String, AnyRef] = $valueMapImpl
            |
            |  ${propertyBasedFields(keys)}
-           |  $neighborAccessors
+           |  $neighborAccessorsOut
+           |  $neighborAccessorsIn
            |
            |  override def label: String = {
            |    $className.Label
@@ -762,6 +802,9 @@ case class NodeBaseTrait(name: String, hasKeys: List[String], `extends`: Option[
   lazy val extendz = `extends` //it's mapped from the key in json :(
   lazy val className = Helpers.camelCaseCaps(name)
 }
+
+case class InEdgeContext(edgeName: String, outNodes: Set[NodeType])
+case class NeighborInfo(neighborAccessorName: String, neighborNodeType: String)
 
 object HigherValueType extends Enumeration {
   type HigherValueType = Value
