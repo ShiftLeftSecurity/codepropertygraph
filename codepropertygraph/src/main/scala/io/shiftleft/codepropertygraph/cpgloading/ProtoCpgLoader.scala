@@ -11,6 +11,7 @@ import java.util.{List => JList}
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try, Using}
 import io.shiftleft.overflowdb.OdbConfig
+import scala.collection.parallel.CollectionConverters._
 
 object ProtoCpgLoader {
   private val logger = LogManager.getLogger(getClass)
@@ -19,7 +20,7 @@ object ProtoCpgLoader {
     measureAndReport {
       val builder = new ProtoToCpg(overflowDbConfig)
       Using.Manager { use =>
-        use(new ZipArchive(fileName)).entries.foreach { entry =>
+        use(new ZipArchive(fileName)).entries.toVector.par.foreach { entry =>
           val inputStream = use(Files.newInputStream(entry))
           builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList)
         }
@@ -28,7 +29,7 @@ object ProtoCpgLoader {
          * -> adding them as we go isn't an option because we may only have one of the adjacent vertices
          * TODO double check: is that really so? protos don't really allow for streaming, so this may be unnecessary overhead
          */
-        use(new ZipArchive(fileName)).entries.foreach { entry =>
+        use(new ZipArchive(fileName)).entries.toVector.par.foreach { entry =>
           val inputStream = use(Files.newInputStream(entry))
           builder.addEdges(getNextProtoCpgFromStream(inputStream).getEdgeList)
         }

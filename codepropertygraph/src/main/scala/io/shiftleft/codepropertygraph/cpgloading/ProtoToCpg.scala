@@ -14,7 +14,11 @@ import io.shiftleft.overflowdb.OdbGraph
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable.ArrayBuffer
 import io.shiftleft.overflowdb.OdbConfig
+import io.shiftleft.passes.ParallelIteratorExecutor
 import io.shiftleft.utils.StringInterner
+
+import scala.collection.parallel.CollectionConverters._
+
 
 object ProtoToCpg {
   val logger: Logger = LogManager.getLogger(classOf[ProtoToCpg])
@@ -24,24 +28,26 @@ object ProtoToCpg {
                     value: PropertyValue,
                     interner: StringInterner = StringInterner.noop): Unit = {
     import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase._
-    value.getValueCase match {
-      case INT_VALUE =>
-        keyValues += interner.intern(name)
-        keyValues += (value.getIntValue: JInt)
-      case STRING_VALUE =>
-        keyValues += interner.intern(name)
-        keyValues += interner.intern(value.getStringValue)
-      case BOOL_VALUE =>
-        keyValues += interner.intern(name)
-        keyValues += (value.getBoolValue: JBoolean)
-      case STRING_LIST =>
-        value.getStringList.getValuesList.asScala.foreach { elem: String =>
+    interner.synchronized {
+      value.getValueCase match {
+        case INT_VALUE =>
           keyValues += interner.intern(name)
-          keyValues += interner.intern(elem)
-        }
-      case VALUE_NOT_SET => ()
-      case _ =>
-        throw new RuntimeException("Error: unsupported property case: " + value.getValueCase.name)
+          keyValues += (value.getIntValue: JInt)
+        case STRING_VALUE =>
+          keyValues += interner.intern(name)
+          keyValues += interner.intern(value.getStringValue)
+        case BOOL_VALUE =>
+          keyValues += interner.intern(name)
+          keyValues += (value.getBoolValue: JBoolean)
+        case STRING_LIST =>
+          value.getStringList.getValuesList.asScala.foreach { elem: String =>
+            keyValues += interner.intern(name)
+            keyValues += interner.intern(elem)
+          }
+        case VALUE_NOT_SET => ()
+        case _ =>
+          throw new RuntimeException("Error: unsupported property case: " + value.getValueCase.name)
+      }
     }
   }
 }
@@ -59,8 +65,7 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     addNodes(nodes.asScala)
 
   def addNodes(nodes: Iterable[Node]): Unit =
-    nodes
-      .filter(nodeFilter.filterNode)
+    new ParallelIteratorExecutor(nodes.filter(nodeFilter.filterNode).iterator)
       .foreach(addVertexToOdbGraph)
 
   private def addVertexToOdbGraph(node: Node) = {
@@ -72,9 +77,9 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
   }
 
   def addEdges(protoEdges: JCollection[Edge]): Unit =
-    addEdges(protoEdges.asScala)
+    addEdges(protoEdges.asScala.toVector)
 
-  def addEdges(protoEdges: Iterable[Edge]): Unit = {
+  def addEdges(protoEdges: Vector[Edge]): Unit = {
     for (edge <- protoEdges) {
       val srcVertex = findVertexById(edge, edge.getSrc)
       val dstVertex = findVertexById(edge, edge.getDst)
@@ -118,7 +123,7 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     keyValues += T.label
     keyValues += node.getType.name()
     for (prop <- props.asScala) {
-      addProperties(keyValues, prop.getName.name, prop.getValue, interner)
+        addProperties(keyValues, prop.getName.name, prop.getValue, interner)
     }
     keyValues.toArray
   }
