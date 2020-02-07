@@ -75,7 +75,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
       case Some(method) =>
         dstGraph.addEdgeInOriginal(call, method, EdgeTypes.CALL)
       case None =>
-        logger.warn(
+        logger.info(
           s"Unable to link CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
             s"SIGNATURE ${call.signature}, CODE ${call.code}")
     }
