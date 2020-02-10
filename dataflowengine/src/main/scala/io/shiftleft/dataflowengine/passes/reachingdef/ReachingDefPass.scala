@@ -26,7 +26,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       var worklist = Set[nodes.StoredNode]()
       var out = Map[nodes.StoredNode, Set[nodes.StoredNode]]().withDefaultValue(Set[nodes.StoredNode]())
       var in = Map[nodes.StoredNode, Set[nodes.StoredNode]]().withDefaultValue(Set[nodes.StoredNode]())
-      val allCfgNodes = ExpandTo.allCfgNodesOfMethod(method).iterator.to(List)
+      val allCfgNodes = method.allCfgNodes.iterator.to(List)
 
       val mapExpressionsGens = dfHelper.expressionsToGenMap(method).withDefaultValue(Set[nodes.StoredNode]())
       val mapExpressionsKills = dfHelper.expressionsToKillMap(method).withDefaultValue(Set[nodes.StoredNode]())

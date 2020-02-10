@@ -36,4 +36,7 @@ class MethodMethods(val node: nodes.Method) extends AnyVal {
     }
   }
 
+  def allCfgNodes: IterableOnce[nodes.StoredNode] =
+    node.containsOut.asScala
+
 }
