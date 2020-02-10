@@ -196,14 +196,11 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
     }
   }
 
-  private def isIndirectAccess(vertex: nodes.StoredNode): Boolean = {
-    if (!vertex.isInstanceOf[nodes.Call]) {
-      return false
+  private def isIndirectAccess(node: nodes.StoredNode): Boolean =
+    node match {
+      case call: nodes.Call => MemberAccess.isGenericMemberAccessName(call.name)
+      case _ => false
     }
-
-    val callName = vertex.asInstanceOf[nodes.Call].name
-    MemberAccess.isGenericMemberAccessName(callName)
-  }
 
 }
 
