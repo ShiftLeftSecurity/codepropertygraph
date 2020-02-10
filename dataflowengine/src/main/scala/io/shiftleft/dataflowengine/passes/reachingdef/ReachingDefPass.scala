@@ -107,12 +107,12 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       /* if use is not an identifier, add edge, as we are going to visit the use separately */
       usesInExpression.foreach { use =>
         if (!use.isInstanceOf[Identifier] && !use.isInstanceOf[Literal] && !use
-          .isInstanceOf[FieldIdentifier]) {
+              .isInstanceOf[FieldIdentifier]) {
           addEdge(use, call)
 
           /* handle indirect access uses: check if we have it in our out set and get
-             * the corresponding def expression from which the definition reaches the use
-             */
+           * the corresponding def expression from which the definition reaches the use
+           */
           if (isIndirectAccess(use)) {
             outDefs.filter(out => isIndirectAccess(out)).foreach { indirectOutDef =>
               val indirectOutCall = indirectOutDef.asInstanceOf[Call]
@@ -199,7 +199,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
   private def isIndirectAccess(node: nodes.StoredNode): Boolean =
     node match {
       case call: nodes.Call => MemberAccess.isGenericMemberAccessName(call.name)
-      case _ => false
+      case _                => false
     }
 
 }
