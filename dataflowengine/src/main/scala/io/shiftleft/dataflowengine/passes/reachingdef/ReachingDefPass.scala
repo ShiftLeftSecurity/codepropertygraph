@@ -14,22 +14,20 @@ import io.shiftleft.semanticcpg.language._
 import scala.jdk.CollectionConverters._
 
 class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
-  var dfHelper: DataFlowFrameworkHelper = _
+  lazy val dfHelper: DataFlowFrameworkHelper = new DataFlowFrameworkHelper(cpg.graph)
 
   override def run(): Iterator[DiffGraph] = {
-    val methods = cpg.method.toIterator()
-
-    dfHelper = new DataFlowFrameworkHelper(cpg.graph)
+    val methods = cpg.method.toIterator
 
     new ParallelIteratorExecutor(methods).map { method =>
       val dstGraph = DiffGraph.newBuilder
-      var worklist = Set[nodes.StoredNode]()
-      var out = Map[nodes.StoredNode, Set[nodes.StoredNode]]().withDefaultValue(Set[nodes.StoredNode]())
-      var in = Map[nodes.StoredNode, Set[nodes.StoredNode]]().withDefaultValue(Set[nodes.StoredNode]())
+      var worklist = Set.empty[nodes.StoredNode]
+      var out = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
+      var in = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
       val allCfgNodes = method.allCfgNodes.iterator.to(List)
 
-      val mapExpressionsGens = dfHelper.expressionsToGenMap(method).withDefaultValue(Set[nodes.StoredNode]())
-      val mapExpressionsKills = dfHelper.expressionsToKillMap(method).withDefaultValue(Set[nodes.StoredNode]())
+      val mapExpressionsGens = dfHelper.expressionsToGenMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
+      val mapExpressionsKills = dfHelper.expressionsToKillMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
 
       /*Initialize the OUT sets*/
       allCfgNodes.foreach { cfgNode =>
