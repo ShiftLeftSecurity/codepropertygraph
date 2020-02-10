@@ -186,7 +186,9 @@ class Method(override val raw: GremlinScala[nodes.Method])
         .cast[nodes.Expression])
 
   def cfgNode: CfgNode[nodes.CfgNode] =
-    new CfgNode(raw.out(EdgeTypes.CONTAINS).filterOnEnd(_.isInstanceOf[nodes.CfgNode]).cast[nodes.CfgNode])
+    new CfgNode(raw.flatMap { method =>
+      __(method.cfgNode.to(Seq): _*)
+    })
 
   /**
     *  Traverse to first expressions in CFG.
