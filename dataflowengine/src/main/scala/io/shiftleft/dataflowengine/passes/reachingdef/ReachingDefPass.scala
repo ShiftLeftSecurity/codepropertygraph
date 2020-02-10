@@ -125,8 +125,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
         }
       }
 
-      val nodeIsOperandAssignment = isOperationAndAssignment(call)
-      if (nodeIsOperandAssignment) {
+      if (isOperationAndAssignment(call)) {
         val localRefGens = dfHelper.getGensOfExpression(call).map(reference)
         inSet(call)
           .filter(inElement => localRefGens.contains(reference(inElement)))
@@ -179,13 +178,8 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
     }
   }
 
-  private def isOperationAndAssignment(vertex: nodes.StoredNode): Boolean = {
-    if (!vertex.isInstanceOf[nodes.Call]) {
-      return false
-    }
-
-    val name = vertex.asInstanceOf[nodes.Call].name
-    name match {
+  private def isOperationAndAssignment(call: nodes.Call): Boolean = {
+    call.name match {
       case Operators.assignmentAnd                  => true
       case Operators.assignmentArithmeticShiftRight => true
       case Operators.assignmentDivision             => true
