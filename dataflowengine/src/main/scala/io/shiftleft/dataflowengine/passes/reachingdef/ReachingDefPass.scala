@@ -215,27 +215,8 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
     vertexList.filter(v => orderSeq.contains(v.asInstanceOf[nodes.HasArgumentIndex].argumentIndex.toInt))
   }
 
-  def getExpressions(method: nodes.StoredNode): List[nodes.StoredNode] = {
-    val callNodes = method._containsOut.asScala
-      .filter(_.isInstanceOf[nodes.Call])
-      .toList
-
-    callNodes
-  }
-
-  def getGenSet(method: nodes.StoredNode): Set[nodes.StoredNode] = {
-    var genSet = Set[nodes.StoredNode]()
-    getExpressions(method).foreach { genExpression =>
-      val methodParamOutsOrder = callToMethodParamOut(genExpression)
-        .filter(_._propagateIn.hasNext)
-        .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
-
-      val identifierWithOrder =
-        filterArgumentIndex(genExpression._argumentOut.asScala.toList, methodParamOutsOrder)
-      genSet ++= identifierWithOrder
-    }
-    genSet
-  }
+  def getExpressions(method: nodes.Method): List[nodes.Call] =
+    method.containsOut.asScala.collect { case call: nodes.Call => call }.to(List)
 
   def getGensOfExpression(expr: nodes.StoredNode): Set[nodes.StoredNode] = {
     var gens = Set[nodes.StoredNode]()
@@ -276,8 +257,8 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
     vertex.map(v => killsVertices(v)).fold(Set())((v1, v2) => v1.union(v2))
   }
 
-  def expressionsToKillMap(methodVertex: nodes.StoredNode): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
-    val genExpressions = getExpressions(methodVertex)
+  def expressionsToKillMap(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
+    val genExpressions = getExpressions(method)
 
     genExpressions.map { expression =>
       val gens = getGensOfExpression(expression)
@@ -285,24 +266,24 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
     }.toMap
   }
 
-  def expressionsToGenMap(methodVertex: nodes.StoredNode): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
+  def expressionsToGenMap(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
     /*genExpressions correspond to call assignment nodes*/
-    val genExpressions = getExpressions(methodVertex)
+    val genExpressions = getExpressions(method)
     genExpressions.map { genExpression =>
       genExpression -> getGensOfExpression(genExpression)
     }.toMap
   }
 
-  def getOperation(vertex: nodes.StoredNode): Option[nodes.StoredNode] = {
-    vertex match {
-      case _: nodes.Identifier =>
-        if (vertex._argumentIn().hasNext) {
-          getOperation(vertex._argumentIn().nextChecked)
+  def getOperation(node: nodes.StoredNode): Option[nodes.StoredNode] = {
+    node match {
+      case identifier: nodes.Identifier =>
+        if (identifier.argumentIn.hasNext) {
+          getOperation(identifier.argumentIn.nextChecked)
         } else {
           None
         }
-      case _: nodes.Call   => Some(vertex)
-      case _: nodes.Return => Some(vertex)
+      case _: nodes.Call   => Some(node)
+      case _: nodes.Return => Some(node)
       case _               => None
     }
   }
