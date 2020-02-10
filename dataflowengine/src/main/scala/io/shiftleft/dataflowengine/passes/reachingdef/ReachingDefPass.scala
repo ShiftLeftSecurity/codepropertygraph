@@ -11,6 +11,7 @@ import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
 import io.shiftleft.semanticcpg.language._
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
@@ -21,7 +22,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
 
     new ParallelIteratorExecutor(methods).map { method =>
       val dstGraph = DiffGraph.newBuilder
-      var worklist = Set.empty[nodes.StoredNode]
+      var worklist = mutable.Set.empty[nodes.CfgNode]
       var out = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
       var in = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
       val allCfgNodes = method.cfgNode.to(List)
@@ -44,9 +45,8 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
 
         var inSet = Set.empty[nodes.StoredNode]
 
-        val cfgPredecessors = currentCfgNode._cfgIn.asScala
-        cfgPredecessors.foreach { pred =>
-          inSet ++= inSet.union(out(pred))
+        currentCfgNode._cfgIn.asScala.foreach { cfgPredecessor =>
+          inSet ++= inSet.union(out(cfgPredecessor))
         }
 
         in += currentCfgNode -> inSet
@@ -59,7 +59,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
         val newSize = out(currentCfgNode).size
 
         if (oldSize != newSize)
-          worklist ++= currentCfgNode._cfgOut.asScala.toList
+          worklist ++= currentCfgNode._cfgOut.asScala.collect { case cfgNode: nodes.CfgNode => cfgNode }
       }
 
       addReachingDefEdge(dstGraph, method, out, in)
@@ -71,24 +71,21 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
     * reaching definition edge reaches a vertex where the definition is used.
     * The final representation makes it straightforward to build def-use/use-def chains */
   private def addReachingDefEdge(dstGraph: DiffGraph.Builder,
-                                 method: nodes.StoredNode,
+                                 method: nodes.Method,
                                  outSet: Map[nodes.StoredNode, Set[nodes.StoredNode]],
                                  inSet: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Unit = {
 
-    def addEdge(v0: nodes.StoredNode, v1: nodes.StoredNode): Unit = {
-      dstGraph.addEdgeInOriginal(v0, v1, EdgeTypes.REACHING_DEF)
-    }
+    def addEdge(fromNode: nodes.StoredNode, toNode: nodes.StoredNode): Unit =
+      dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF)
 
-    method._astOut.asScala.filter(_.isInstanceOf[nodes.MethodParameterIn]).foreach { methodParameterIn =>
-      methodParameterIn._refIn.asScala.foreach { refInIdentifier =>
-        dfHelper
-          .getOperation(refInIdentifier)
-          .foreach(operationNode => addEdge(methodParameterIn, operationNode))
-      }
-    }
+    for {
+      methodParameterIn <- method.astOut.asScala.collect { case paramIn: nodes.MethodParameterIn => paramIn }
+      refInIdentifier <- methodParameterIn.refIn.asScala
+      operationNode <- dfHelper.getOperation(refInIdentifier)
+    } addEdge(methodParameterIn, operationNode)
 
-    val methodReturn = method.asInstanceOf[nodes.Method].methodReturn
-    methodReturn.toReturn.foreach(returnVertex => addEdge(returnVertex, methodReturn))
+    val methodReturn = method.methodReturn
+    methodReturn.toReturn.foreach(returnNode => addEdge(returnNode, methodReturn))
 
     outSet.foreach {
       case (node, outDefs) =>
