@@ -15,7 +15,7 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
-  lazy val dfHelper: DataFlowFrameworkHelper = new DataFlowFrameworkHelper(cpg.graph)
+  val dfHelper = new DataFlowFrameworkHelper(cpg.graph)
 
   override def run(): Iterator[DiffGraph] = {
     val methods = cpg.method.toIterator
