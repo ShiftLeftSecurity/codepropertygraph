@@ -184,7 +184,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
     writeFile(filename, edgeHeader, entries)
   }
 
-  def neighborAccessorName(edgeTypeName: String, direction: String): String =
+  def neighborAccessorName(edgeTypeName: String, direction: Direction.Value): String =
     camelCase(edgeTypeName + "_" + direction)
 
   def writeNodesFile(outputDir: JFile): JFile = {
@@ -202,7 +202,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
        * specific neighbor accessors driven by the schema, i.e. those are only available on the types that really allow the given edge type
        */
       val genericNeighborAccessors = for {
-        direction <- List("IN", "OUT")
+        direction <- Direction.all
         edgeType <- schema.edgeTypes
         accessor = neighborAccessorName(edgeType.name, direction)
       } yield s"def _$accessor(): JIterator[StoredNode] = { JCollections.emptyIterator() }"
@@ -499,7 +499,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
       def neighborOut(toCode: NeighborInfo => String): String = {
         nodeType.outEdges.map { case OutEdgeEntry(edgeName, inNodes) =>
-          val nbaName = neighborAccessorName(edgeName, "OUT")
+          val nbaName = neighborAccessorName(edgeName, Direction.OUT)
           val neighborNodeType: String =
             if (inNodes.size == 1 && inNodes.head != "NODE") {
               schema.nodeTypeByName(inNodes.head).className
@@ -510,7 +510,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
       def neighborIn(toCode: NeighborInfo => String): String = {
         schema.nodeToInEdgeContexts.getOrElse(nodeType, Nil).map { case InEdgeContext(edgeName, outNodes) =>
-          val nbaName = neighborAccessorName(edgeName, "IN")
+          val nbaName = neighborAccessorName(edgeName, Direction.IN)
           val neighborNodeType: String =
             if (outNodes.size == 1) {
               outNodes.head.className
@@ -577,7 +577,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       }
 
       val classImpl =
-        s"""class $classNameDb(ref: NodeRef[OdbNode]) extends OdbNode(ref) with StoredNode 
+        s"""class $classNameDb(ref: NodeRef[OdbNode]) extends OdbNode(ref) with StoredNode
            |  $mixinTraits with ${className}Base {
            |
            |  override def layoutInformation: NodeLayoutInformation = $className.layoutInformation
@@ -600,7 +600,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  override protected def specificProperty[A](key: String): VertexProperty[A] = {
            |    $className.Properties.keyToValue.get(key) match {
            |      case None => VertexProperty.empty[A]
-           |      case Some(fieldAccess) => 
+           |      case Some(fieldAccess) =>
            |        fieldAccess(this) match {
            |          case null | None => VertexProperty.empty[A]
            |          case values: List[_] => throw Vertex.Exceptions.multiplePropertiesExistForProvidedKey(key)
@@ -613,11 +613,11 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  override protected def specificProperties[A](key: String): JIterator[VertexProperty[A]] = {
            |    $className.Properties.keyToValue.get(key) match {
            |      case None => JCollections.emptyIterator[VertexProperty[A]]
-           |      case Some(fieldAccess) => 
+           |      case Some(fieldAccess) =>
            |        fieldAccess(this) match {
            |          case null => JCollections.emptyIterator[VertexProperty[A]]
-           |          case values: List[_] => 
-           |            values.map { value => 
+           |          case values: List[_] =>
+           |            values.map { value =>
            |              new OdbNodeProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
            |            }.iterator.asJava
            |          case value => IteratorUtils.of(new OdbNodeProperty(-1, this, key, value.asInstanceOf[A]))
@@ -809,6 +809,11 @@ case class NeighborInfo(neighborAccessorName: String, neighborNodeType: String)
 object HigherValueType extends Enumeration {
   type HigherValueType = Value
   val None, Option, List = Value
+}
+
+object Direction extends Enumeration {
+  val IN, OUT = Value
+  val all = List(IN, OUT)
 }
 
 object Helpers {
