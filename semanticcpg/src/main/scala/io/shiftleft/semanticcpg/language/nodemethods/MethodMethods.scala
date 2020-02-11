@@ -36,4 +36,7 @@ class MethodMethods(val node: nodes.Method) extends AnyVal {
     }
   }
 
+  def cfgNode: Iterator[nodes.CfgNode] =
+    node.containsOut.asScala.collect { case cfgNode: nodes.CfgNode => cfgNode }
+
 }

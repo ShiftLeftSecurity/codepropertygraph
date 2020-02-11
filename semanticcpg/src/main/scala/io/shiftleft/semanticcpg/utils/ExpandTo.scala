@@ -100,10 +100,6 @@ object ExpandTo {
       .toSeq
   }
 
-  def allCfgNodesOfMethod(method: Vertex): IterableOnce[nodes.StoredNode] = {
-    method.asInstanceOf[nodes.StoredNode]._containsOut.asScala
-  }
-
   def implicitCallToMethod(implicitCall: nodes.ImplicitCall): nodes.Method = {
     implicitCall.vertices(Direction.IN, EdgeTypes.AST).next.asInstanceOf[nodes.Method]
   }
