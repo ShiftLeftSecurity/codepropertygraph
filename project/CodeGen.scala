@@ -62,44 +62,25 @@ class CodeGen(schemaFile: String, basePackage: String) {
   val schema = new Schema(schemaFile)
 
   def run(outputDir: JFile): List[JFile] =
-    List(writeEdgesFile(outputDir), writeNodesFile(outputDir), writeNewNodesFile(outputDir))
+    List(writeEdgeFiles(outputDir), writeNodesFile(outputDir), writeNewNodesFile(outputDir))
 
-  def writeEdgesFile(outputDir: JFile): JFile = {
-    val propertyByName: Map[String, Property] =
-      schema.edgeKeys.map(key => key.name -> key).toMap
+  def writeEdgeFiles(outputDir: JFile): JFile = {
+    val staticHeader =
+      s"""package $edgesPackage
+         |
+         |import java.lang.{Boolean => JBoolean, Long => JLong}
+         |import java.util.{Set => JSet}
+         |import java.util.{List => JList}
+         |import org.apache.tinkerpop.gremlin.structure.Property
+         |import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
+         |import io.shiftleft.overflowdb.{EdgeLayoutInformation, EdgeFactory, NodeFactory, OdbEdge, OdbNode, OdbGraph, NodeRef}
+         |import scala.jdk.CollectionConverters._
+         |import org.slf4j.LoggerFactory
+         |""".stripMargin
 
-    def entries: List[String] =
-      schema.edgeTypes.map(edge => generateEdgeSource(edge, edge.keys.map(propertyByName)))
-
-    def edgeHeader = {
-      val staticHeader =
-        s"""package $edgesPackage
-           | 
-           |import java.lang.{Boolean => JBoolean, Long => JLong}
-           |import java.util.{Set => JSet}
-           |import java.util.{List => JList}
-           |import org.apache.tinkerpop.gremlin.structure.Property
-           |import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
-           |import io.shiftleft.overflowdb.{EdgeLayoutInformation, EdgeFactory, NodeFactory, OdbEdge, OdbNode, OdbGraph, NodeRef}
-           |import scala.jdk.CollectionConverters._
-           |import org.slf4j.LoggerFactory
-           |
-           |object PropertyErrorRegister {
-           |  private var errorMap = Set[(Class[_], String)]()
-           |  private val logger = LoggerFactory.getLogger(getClass)
-           |
-           |  def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
-           |    if (!errorMap.contains((clazz, propertyName))) {
-           |      logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
-           |      errorMap += ((clazz, propertyName))
-           |    }
-           |  }
-           |}
-           |""".stripMargin
-
+    val packageObject = {
       val factories = {
-        val edgeFactories: List[String] =
-          schema.edgeTypes.map(edgeType => edgeType.className + ".factory")
+        val edgeFactories: List[String] = schema.edgeTypes.map(edgeType => edgeType.className + ".factory")
         s"""object Factories {
            |  lazy val all: List[EdgeFactory[_]] = $edgeFactories
            |  lazy val allAsJava: java.util.List[EdgeFactory[_]] = all.asJava
@@ -107,7 +88,10 @@ class CodeGen(schemaFile: String, basePackage: String) {
            |""".stripMargin
       }
 
-      staticHeader + factories
+      s"""$staticHeader
+         |$propertyErrorRegisterImpl
+         |$factories
+         |""".stripMargin
     }
 
     def generateEdgeSource(edgeType: EdgeType, keys: List[Property]) = {
@@ -178,11 +162,24 @@ class CodeGen(schemaFile: String, basePackage: String) {
            |}
            |""".stripMargin
 
-      companionObject + classImpl
+      s"""$staticHeader
+         |$companionObject
+         |$classImpl
+         |""".stripMargin
     }
 
-    val filename = outputDir.getPath + "/" + edgesPackage.replaceAll("\\.", "/") + "/Edges.scala"
-    writeFile(filename, edgeHeader, entries)
+    val propertyByName: Map[String, Property] = schema.edgeKeys.map(key => key.name -> key).toMap
+    val baseDir = File(outputDir.getPath + "/" + edgesPackage.replaceAll("\\.", "/"))
+    if (baseDir.exists) baseDir.delete()
+    baseDir.createDirectories()
+    baseDir.createChild("package.scala").write(packageObject)
+    schema.edgeTypes.foreach { edge =>
+      val src = generateEdgeSource(edge, edge.keys.map(propertyByName))
+      val srcFile = edge.className + ".scala"
+      baseDir.createChild(srcFile).write(src)
+    }
+    println(s"generated edge sources in $baseDir (${baseDir.list.size} files)")
+    baseDir.toJava
   }
 
   def neighborAccessorName(edgeTypeName: String, direction: Direction.Value): String =
@@ -224,17 +221,7 @@ class CodeGen(schemaFile: String, basePackage: String) {
            |import scala.jdk.CollectionConverters._
            |import org.slf4j.LoggerFactory
            |
-           |object PropertyErrorRegister {
-           |  private var errorMap = Set[(Class[_], String)]()
-           |  private val logger = LoggerFactory.getLogger(getClass)
-           |
-           |  def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
-           |    if (!errorMap.contains((clazz, propertyName))) {
-           |      logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
-           |      errorMap += ((clazz, propertyName))
-           |    }
-           |  }
-           |}
+           |$propertyErrorRegisterImpl
            |
            |trait Node extends Product {
            |  def label: String
@@ -751,6 +738,7 @@ class CodeGen(schemaFile: String, basePackage: String) {
     writeFile(filename, staticHeader, entries)
   }
 
+  // TODO RM
   def writeFile(fileName: String, header: String, entries: List[String]): JFile = {
     val outputFile = File.newTemporaryFile()
     outputFile.appendLine(header)
@@ -940,4 +928,18 @@ object Helpers {
         (casesForKeys :+ caseNotFound).mkString("\n else ")
     }
   }
+
+  val propertyErrorRegisterImpl =
+    s"""object PropertyErrorRegister {
+       |  private var errorMap = Set[(Class[_], String)]()
+       |  private val logger = LoggerFactory.getLogger(getClass)
+       |
+       |  def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
+       |    if (!errorMap.contains((clazz, propertyName))) {
+       |      logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
+       |      errorMap += ((clazz, propertyName))
+       |    }
+       |  }
+       |}
+       |""".stripMargin
 }
