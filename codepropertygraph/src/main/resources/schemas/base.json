@@ -72,7 +72,7 @@
          "keys": ["NAME", "ORDER"],
          "comment": "Node representing a source file. Often also the AST root",
          "outEdges": [
-             {"edgeName": "AST", "inNodes": ["NAMESPACE_BLOCK"]}
+           {"edgeName": "AST", "inNodes": ["NAMESPACE_BLOCK"], "cardinality": "oneToOne"}
          ],
 	 "is" : ["AST_NODE"]
         },
@@ -86,8 +86,11 @@
          "is": ["DECLARATION", "CFG_NODE", "AST_NODE"],
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["METHOD_RETURN", "METHOD_PARAMETER_IN",
-                                             "MODIFIER", "BLOCK", "TYPE_PARAMETER"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
+                                             "MODIFIER", "BLOCK", "TYPE_PARAMETER"],
+              "cardinality": "oneToMany"},
+             {"edgeName": "CFG", 
+              "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"],
+              "cardinality": "oneToOne" }
          ]
         },
 
@@ -122,8 +125,8 @@
          "keys" : ["NAME", "FULL_NAME", "IS_EXTERNAL", "INHERITS_FROM_TYPE_FULL_NAME", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME", "ALIAS_TYPE_FULL_NAME", "ORDER"],
          "comment" : "A type declaration",
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["TYPE_PARAMETER", "MEMBER", "MODIFIER"]},
-             {"edgeName": "BINDS", "inNodes": ["BINDING"]},
+             {"edgeName": "AST", "inNodes": ["TYPE_PARAMETER", "MEMBER", "MODIFIER"], "cardinality": "oneToMany"},
+             {"edgeName": "BINDS", "inNodes": ["BINDING"], "cardinality": "oneToMany"},
              {"edgeName": "VTABLE", "inNodes": ["METHOD"]}
          ],
 	 "is" : ["AST_NODE"]
