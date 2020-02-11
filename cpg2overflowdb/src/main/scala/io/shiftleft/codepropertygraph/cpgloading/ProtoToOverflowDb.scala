@@ -121,7 +121,7 @@ object ProtoToOverflowDb {
       logger.info(s"running ProtoToOverflowDb with cpg=${config.cpg}; writing results to $writeTo")
       if (writeTo.exists) writeTo.delete()
       val start = System.currentTimeMillis
-      val odbConfig = OdbConfig.withDefaults()
+      val odbConfig = OdbConfig.withDefaults().disableOverflow()
         .withStorageLocation(writeTo.getAbsolutePath)
       Using.Manager { use =>
         val cpg = CpgLoader.load(filename = config.cpg.getAbsolutePath, CpgLoaderConfig.withDefaults.withOverflowConfig(odbConfig).createIndexesOnLoad)
