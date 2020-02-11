@@ -1,7 +1,8 @@
+package overflowdb.codegen
+
 import better.files.File
 import java.io.{FileInputStream, File => JFile}
 import play.api.libs.json._
-import scala.collection.mutable
 
 class Schema(schemaFile: String) {
   implicit val nodeBaseTraitRead = Json.reads[NodeBaseTrait]
@@ -39,8 +40,8 @@ class Schema(schemaFile: String) {
     grouped.mapValues { inEdgesWithAdjacentNodes =>
       // all nodes can have incoming `CONTAINS_NODE` edges
       val adjustedInEdgesWithAdjacentNodes =
-        if (inEdgesWithAdjacentNodes.contains("CONTAINS_NODE")) inEdgesWithAdjacentNodes
-        else inEdgesWithAdjacentNodes + ("CONTAINS_NODE" -> Set.empty)
+        if (inEdgesWithAdjacentNodes.contains(DefaultEdgeTypes.ContainsNode)) inEdgesWithAdjacentNodes
+        else inEdgesWithAdjacentNodes + (DefaultEdgeTypes.ContainsNode -> Set.empty)
 
       adjustedInEdgesWithAdjacentNodes.map { case (edge, adjacentNodes) =>
         InEdgeContext(edge, adjacentNodes.toSet)
@@ -54,7 +55,7 @@ class Schema(schemaFile: String) {
   * @param schemaFile: path to the schema (json file)
   * @param basePackage: specific for your domain, e.g. `com.example.mydomain`
   */
-class DomainClassCreator(schemaFile: String, basePackage: String) {
+class CodeGen(schemaFile: String, basePackage: String) {
   import Helpers._
   val nodesPackage = s"$basePackage.nodes"
   val edgesPackage = s"$basePackage.edges"
@@ -184,7 +185,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
     writeFile(filename, edgeHeader, entries)
   }
 
-  def neighborAccessorName(edgeTypeName: String, direction: String): String =
+  def neighborAccessorName(edgeTypeName: String, direction: Direction.Value): String =
     camelCase(edgeTypeName + "_" + direction)
 
   def writeNodesFile(outputDir: JFile): JFile = {
@@ -202,7 +203,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
        * specific neighbor accessors driven by the schema, i.e. those are only available on the types that really allow the given edge type
        */
       val genericNeighborAccessors = for {
-        direction <- List("IN", "OUT")
+        direction <- Direction.all
         edgeType <- schema.edgeTypes
         accessor = neighborAccessorName(edgeType.name, direction)
       } yield s"def _$accessor(): JIterator[StoredNode] = { JCollections.emptyIterator() }"
@@ -433,7 +434,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
               s"""/** link to 'contained' node of type $containedNodeType */
                  |def ${containedNode.localName}: $completeType =
-                 |  edges(Direction.OUT, "CONTAINS_NODE").asScala.toList
+                 |  edges(Direction.OUT, "${DefaultEdgeTypes.ContainsNode}").asScala.toList
                  |    .filter(_.valueOption(EdgeKeys.LOCAL_NAME).map(_  == "${containedNode.localName}").getOrElse(false))
                  |    .sortBy(_.valueOption(EdgeKeys.INDEX))
                  |    .map(_.inVertex.asInstanceOf[$containedNodeType])
@@ -499,9 +500,9 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
       def neighborOut(toCode: NeighborInfo => String): String = {
         nodeType.outEdges.map { case OutEdgeEntry(edgeName, inNodes) =>
-          val nbaName = neighborAccessorName(edgeName, "OUT")
+          val nbaName = neighborAccessorName(edgeName, Direction.OUT)
           val neighborNodeType: String =
-            if (inNodes.size == 1 && inNodes.head != "NODE") {
+            if (inNodes.size == 1 && inNodes.head != DefaultNodeTypes.Node) {
               schema.nodeTypeByName(inNodes.head).className
             } else "StoredNode"
           toCode(NeighborInfo(nbaName, neighborNodeType))
@@ -510,7 +511,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
       def neighborIn(toCode: NeighborInfo => String): String = {
         schema.nodeToInEdgeContexts.getOrElse(nodeType, Nil).map { case InEdgeContext(edgeName, outNodes) =>
-          val nbaName = neighborAccessorName(edgeName, "IN")
+          val nbaName = neighborAccessorName(edgeName, Direction.IN)
           val neighborNodeType: String =
             if (outNodes.size == 1) {
               outNodes.head.className
@@ -577,7 +578,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
       }
 
       val classImpl =
-        s"""class $classNameDb(ref: NodeRef[OdbNode]) extends OdbNode(ref) with StoredNode 
+        s"""class $classNameDb(ref: NodeRef[OdbNode]) extends OdbNode(ref) with StoredNode
            |  $mixinTraits with ${className}Base {
            |
            |  override def layoutInformation: NodeLayoutInformation = $className.layoutInformation
@@ -600,7 +601,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  override protected def specificProperty[A](key: String): VertexProperty[A] = {
            |    $className.Properties.keyToValue.get(key) match {
            |      case None => VertexProperty.empty[A]
-           |      case Some(fieldAccess) => 
+           |      case Some(fieldAccess) =>
            |        fieldAccess(this) match {
            |          case null | None => VertexProperty.empty[A]
            |          case values: List[_] => throw Vertex.Exceptions.multiplePropertiesExistForProvidedKey(key)
@@ -613,11 +614,11 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
            |  override protected def specificProperties[A](key: String): JIterator[VertexProperty[A]] = {
            |    $className.Properties.keyToValue.get(key) match {
            |      case None => JCollections.emptyIterator[VertexProperty[A]]
-           |      case Some(fieldAccess) => 
+           |      case Some(fieldAccess) =>
            |        fieldAccess(this) match {
            |          case null => JCollections.emptyIterator[VertexProperty[A]]
-           |          case values: List[_] => 
-           |            values.map { value => 
+           |          case values: List[_] =>
+           |            values.map { value =>
            |              new OdbNodeProperty(-1, this, key, value).asInstanceOf[VertexProperty[A]]
            |            }.iterator.asJava
            |          case value => IteratorUtils.of(new OdbNodeProperty(-1, this, key, value.asInstanceOf[A]))
@@ -811,10 +812,24 @@ object HigherValueType extends Enumeration {
   val None, Option, List = Value
 }
 
+object Direction extends Enumeration {
+  val IN, OUT = Value
+  val all = List(IN, OUT)
+}
+
+object DefaultNodeTypes {
+  /** root type for all nodes */
+  val Node = "NODE"
+}
+
+object DefaultEdgeTypes {
+  val ContainsNode = "CONTAINS_NODE"
+}
+
 object Helpers {
 
   def isNodeBaseTrait(baseTraits: List[NodeBaseTrait], nodeName: String): Boolean =
-    nodeName == "NODE" || baseTraits.map(_.name).contains(nodeName)
+    nodeName == DefaultNodeTypes.Node || baseTraits.map(_.name).contains(nodeName)
 
   def camelCaseCaps(snakeCase: String): String = camelCase(snakeCase).capitalize
 
@@ -854,7 +869,7 @@ object Helpers {
     }
 
   def getCompleteType(containedNode: ContainedNode): String = {
-    val tpe = if (containedNode.nodeType != "NODE") {
+    val tpe = if (containedNode.nodeType != DefaultNodeTypes.Node) {
       containedNode.nodeTypeClassName + "Base"
     } else {
       containedNode.nodeTypeClassName
