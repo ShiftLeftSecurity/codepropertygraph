@@ -1,7 +1,6 @@
 import better.files.File
 import java.io.{FileInputStream, File => JFile}
 import play.api.libs.json._
-import scala.collection.mutable
 
 class Schema(schemaFile: String) {
   implicit val nodeBaseTraitRead = Json.reads[NodeBaseTrait]
@@ -39,8 +38,8 @@ class Schema(schemaFile: String) {
     grouped.mapValues { inEdgesWithAdjacentNodes =>
       // all nodes can have incoming `CONTAINS_NODE` edges
       val adjustedInEdgesWithAdjacentNodes =
-        if (inEdgesWithAdjacentNodes.contains("CONTAINS_NODE")) inEdgesWithAdjacentNodes
-        else inEdgesWithAdjacentNodes + ("CONTAINS_NODE" -> Set.empty)
+        if (inEdgesWithAdjacentNodes.contains(DefaultEdgeTypes.ContainsNode)) inEdgesWithAdjacentNodes
+        else inEdgesWithAdjacentNodes + (DefaultEdgeTypes.ContainsNode -> Set.empty)
 
       adjustedInEdgesWithAdjacentNodes.map { case (edge, adjacentNodes) =>
         InEdgeContext(edge, adjacentNodes.toSet)
@@ -433,7 +432,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
 
               s"""/** link to 'contained' node of type $containedNodeType */
                  |def ${containedNode.localName}: $completeType =
-                 |  edges(Direction.OUT, "CONTAINS_NODE").asScala.toList
+                 |  edges(Direction.OUT, "${DefaultEdgeTypes.ContainsNode}").asScala.toList
                  |    .filter(_.valueOption(EdgeKeys.LOCAL_NAME).map(_  == "${containedNode.localName}").getOrElse(false))
                  |    .sortBy(_.valueOption(EdgeKeys.INDEX))
                  |    .map(_.inVertex.asInstanceOf[$containedNodeType])
@@ -501,7 +500,7 @@ class DomainClassCreator(schemaFile: String, basePackage: String) {
         nodeType.outEdges.map { case OutEdgeEntry(edgeName, inNodes) =>
           val nbaName = neighborAccessorName(edgeName, Direction.OUT)
           val neighborNodeType: String =
-            if (inNodes.size == 1 && inNodes.head != "NODE") {
+            if (inNodes.size == 1 && inNodes.head != DefaultNodeTypes.Node) {
               schema.nodeTypeByName(inNodes.head).className
             } else "StoredNode"
           toCode(NeighborInfo(nbaName, neighborNodeType))
@@ -816,10 +815,19 @@ object Direction extends Enumeration {
   val all = List(IN, OUT)
 }
 
+object DefaultNodeTypes {
+  /** root type for all nodes */
+  val Node = "NODE"
+}
+
+object DefaultEdgeTypes {
+  val ContainsNode = "CONTAINS_NODE"
+}
+
 object Helpers {
 
   def isNodeBaseTrait(baseTraits: List[NodeBaseTrait], nodeName: String): Boolean =
-    nodeName == "NODE" || baseTraits.map(_.name).contains(nodeName)
+    nodeName == DefaultNodeTypes.Node || baseTraits.map(_.name).contains(nodeName)
 
   def camelCaseCaps(snakeCase: String): String = camelCase(snakeCase).capitalize
 
@@ -859,7 +867,7 @@ object Helpers {
     }
 
   def getCompleteType(containedNode: ContainedNode): String = {
-    val tpe = if (containedNode.nodeType != "NODE") {
+    val tpe = if (containedNode.nodeType != DefaultNodeTypes.Node) {
       containedNode.nodeTypeClassName + "Base"
     } else {
       containedNode.nodeTypeClassName
