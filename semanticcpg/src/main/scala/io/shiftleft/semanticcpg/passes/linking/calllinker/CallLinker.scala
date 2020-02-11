@@ -9,11 +9,12 @@ import io.shiftleft.Implicits._
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.logging.log4j.{LogManager, Logger}
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
   import CallLinker._
-  private var methodFullNameToNode = Map.empty[String, nodes.StoredNode]
+  private val methodFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
 
   /**
     * Main method of enhancement - to be implemented by child class
@@ -25,7 +26,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
       .hasLabel(NodeTypes.METHOD)
       .sideEffectWithTraverser { traverser =>
         val method = traverser.get.asInstanceOf[nodes.Method]
-        methodFullNameToNode += (method.fullName -> method)
+        methodFullNameToNode.put(method.fullName, method)
       }
       .iterate()
 

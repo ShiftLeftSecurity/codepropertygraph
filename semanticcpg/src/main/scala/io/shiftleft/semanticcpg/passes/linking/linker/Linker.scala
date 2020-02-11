@@ -10,6 +10,7 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.logging.log4j.{LogManager, Logger}
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 /**
@@ -19,11 +20,10 @@ import scala.jdk.CollectionConverters._
 class Linker(cpg: Cpg) extends CpgPass(cpg) {
   import Linker.logger
 
-  private var typeDeclFullNameToNode = Map.empty[String, nodes.StoredNode]
-  private var typeFullNameToNode: collection.immutable.Map[String, nodes.StoredNode] =
-    Map.empty[String, nodes.StoredNode]
-  private var methodFullNameToNode = Map.empty[String, nodes.StoredNode]
-  private var namespaceBlockFullNameToNode = Map.empty[String, nodes.StoredNode]
+  private val typeDeclFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
+  private val typeFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
+  private val methodFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
+  private val namespaceBlockFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
 
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
@@ -134,7 +134,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
   private def linkToSingle(srcLabels: List[String],
                            dstNodeLabel: String,
                            edgeType: String,
-                           dstNodeMap: Map[String, nodes.StoredNode],
+                           dstNodeMap: mutable.Map[String, nodes.StoredNode],
                            dstFullNameKey: String,
                            dstGraph: DiffGraph.Builder): Unit = {
     var loggedDeprecationWarning = false
@@ -172,7 +172,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
   private def linkToMultiple[SRC_NODE_TYPE <: nodes.StoredNode](srcLabels: List[String],
                                                                 dstNodeLabel: String,
                                                                 edgeType: String,
-                                                                dstNodeMap: Map[String, nodes.StoredNode],
+                                                                dstNodeMap: mutable.Map[String, nodes.StoredNode],
                                                                 getDstFullNames: SRC_NODE_TYPE => Iterable[String],
                                                                 dstFullNameKey: String,
                                                                 dstGraph: DiffGraph.Builder): Unit = {
