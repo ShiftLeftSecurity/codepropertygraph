@@ -17,8 +17,6 @@ import io.shiftleft.overflowdb.OdbConfig
 import io.shiftleft.passes.ParallelIteratorExecutor
 import io.shiftleft.utils.StringInterner
 
-import scala.collection.parallel.CollectionConverters._
-
 
 object ProtoToCpg {
   val logger: Logger = LogManager.getLogger(classOf[ProtoToCpg])
@@ -65,7 +63,9 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     addNodes(nodes.asScala)
 
   def addNodes(nodes: Iterable[Node]): Unit =
-    new ParallelIteratorExecutor(nodes.filter(nodeFilter.filterNode).iterator)
+//    new ParallelIteratorExecutor(nodes.filter(nodeFilter.filterNode).iterator)
+    nodes.iterator
+      .filter(nodeFilter.filterNode)
       .foreach(addVertexToOdbGraph)
 
   private def addVertexToOdbGraph(node: Node) = {
