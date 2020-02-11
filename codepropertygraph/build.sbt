@@ -39,7 +39,6 @@ mergeSchemaTask := {
 Compile / sourceGenerators += Def.task {
   val currentMd5 = FileUtils.md5(List(
     new File("codepropertygraph/codegen/src/main"),
-    new File("project/DomainClassCreator.scala"),
     new File("codepropertygraph/src/main/resources/schemas")))
   val outputRoot = new File(sourceManaged.in(Compile).value.getAbsolutePath + "/io/shiftleft/codepropertygraph/generated")
 
@@ -48,7 +47,7 @@ Compile / sourceGenerators += Def.task {
     println(s"generating domain classes from $schemaFile")
     val basePackage = "io.shiftleft.codepropertygraph.generated"
     val outputDir = (Compile / sourceManaged).value
-    new DomainClassCreator(schemaFile, basePackage).run(outputDir)
+    new overflowdb.codegen.CodeGen(schemaFile, basePackage).run(outputDir)
 
     // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
     val cmd = "codepropertygraph/codegen/src/main/python/generateJava.py"

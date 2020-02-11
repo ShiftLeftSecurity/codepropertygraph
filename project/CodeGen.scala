@@ -1,3 +1,5 @@
+package overflowdb.codegen
+
 import better.files.File
 import java.io.{FileInputStream, File => JFile}
 import play.api.libs.json._
@@ -53,7 +55,7 @@ class Schema(schemaFile: String) {
   * @param schemaFile: path to the schema (json file)
   * @param basePackage: specific for your domain, e.g. `com.example.mydomain`
   */
-class DomainClassCreator(schemaFile: String, basePackage: String) {
+class CodeGen(schemaFile: String, basePackage: String) {
   import Helpers._
   val nodesPackage = s"$basePackage.nodes"
   val edgesPackage = s"$basePackage.edges"
