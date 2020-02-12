@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala.{GremlinScala, P, Vertex}
+import gremlin.scala.{BranchCase, BranchOtherwise, GremlinScala, P, Vertex}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.codedumper.CodeDumper
 import io.shiftleft.semanticcpg.language.types.structure.File
@@ -24,9 +24,10 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
     new File(
       raw
         .choose(
-          _.label.is(NodeTypes.NAMESPACE),
-          onTrue = _.in(EdgeTypes.REF).in(EdgeTypes.AST),
-          onFalse = _.until(_.hasLabel(NodeTypes.FILE)).repeat(_.in(EdgeTypes.AST))
+          on = _.label,
+          BranchCase(NodeTypes.NAMESPACE, _.in(EdgeTypes.REF).in(EdgeTypes.AST)),
+          BranchCase(NodeTypes.COMMENT, _.in(EdgeTypes.AST).hasLabel(NodeTypes.FILE)),
+          BranchOtherwise(_.until(_.hasLabel(NodeTypes.FILE)).repeat(_.in(EdgeTypes.AST)))
         )
         .cast[nodes.File]
     )
