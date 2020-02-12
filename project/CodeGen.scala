@@ -20,7 +20,13 @@ class Schema(schemaFile: String) {
   lazy val edgeKeys = (jsonRoot \ "edgeKeys").as[List[Property]]
 
   lazy val nodeTypeByName: Map[String, NodeType] =
-    nodeTypes.map { node => (node.name, node) }.toMap
+    nodeTypes.map(node => node.name -> node).toMap
+
+  lazy val nodePropertyByName: Map[String, Property] =
+    nodeKeys.map(property => property.name -> property).toMap
+
+  lazy val edgePropertyByName: Map[String, Property] =
+    edgeKeys.map(property => property.name -> property).toMap
 
   /* schema only specifies `node.outEdges` - this builds a reverse map (essentially `node.inEdges`) along with the outNodes */
   lazy val nodeToInEdgeContexts: Map[NodeType, Seq[InEdgeContext]] = {
@@ -171,9 +177,8 @@ class CodeGen(schemaFile: String, basePackage: String) {
     if (baseDir.exists) baseDir.delete()
     baseDir.createDirectories()
     baseDir.createChild("package.scala").write(packageObject)
-    val propertyByName: Map[String, Property] = schema.edgeKeys.map(key => key.name -> key).toMap
     schema.edgeTypes.foreach { edge =>
-      val src = generateEdgeSource(edge, edge.keys.map(propertyByName))
+      val src = generateEdgeSource(edge, edge.keys.map(schema.edgePropertyByName))
       val srcFile = edge.className + ".scala"
       baseDir.createChild(srcFile).write(src)
     }
@@ -631,9 +636,8 @@ class CodeGen(schemaFile: String, basePackage: String) {
     if (baseDir.exists) baseDir.delete()
     baseDir.createDirectories()
     baseDir.createChild("package.scala").write(packageObject)
-    val propertyByName: Map[String, Property] = schema.nodeKeys.map(prop => prop.name -> prop).toMap
     schema.nodeTypes.foreach { nodeType =>
-      val src = generateNodeSource(nodeType, nodeType.keys.map(propertyByName))
+      val src = generateNodeSource(nodeType, nodeType.keys.map(schema.nodePropertyByName))
       val srcFile = nodeType.className + ".scala"
       baseDir.createChild(srcFile).write(src)
     }
@@ -659,12 +663,6 @@ class CodeGen(schemaFile: String, basePackage: String) {
          |  def allContainedNodes: List[Node] = containedNodesByLocalName.values.flatten.toList
          |}
          |""".stripMargin
-
-    val propertyByName: Map[String, Property] =
-      schema.nodeKeys.map(prop => prop.name -> prop).toMap
-
-    def entries: List[String] =
-      schema.nodeTypes.map(node => generateNewNodeSource(node, node.keys.map(propertyByName)))
 
     def generateNewNodeSource(nodeType: NodeType, keys: List[Property]) = {
       val fields: String = {
@@ -743,21 +741,17 @@ class CodeGen(schemaFile: String, basePackage: String) {
          |""".stripMargin
     }
 
-    val filename = outputDir.getPath + "/" + nodesPackage.replaceAll("\\.", "/") + "/NewNodes.scala"
-    writeFile(filename, staticHeader, entries)
-  }
-
-  // TODO RM
-  def writeFile(fileName: String, header: String, entries: List[String]): JFile = {
-    val outputFile = File.newTemporaryFile()
-    outputFile.appendLine(header)
-    entries.map(outputFile.appendLine)
-
-    val targetFile = File(fileName)
-    targetFile.createIfNotExists(createParents = true)
-
-    println(s"writing results to $targetFile")
-    outputFile.moveTo(targetFile)(File.CopyOptions(overwrite = true)).toJava
+    val outfile = File(outputDir.getPath + "/" + nodesPackage.replaceAll("\\.", "/") + "/NewNodes.scala")
+    if (outfile.exists) outfile.delete()
+    outfile.createFile()
+    val src = schema.nodeTypes.map { nodeType =>
+      generateNewNodeSource(nodeType, nodeType.keys.map(schema.nodePropertyByName))
+    }.mkString("\n")
+    outfile.write(s"""$staticHeader
+                     |$src
+                     |""".stripMargin)
+    println(s"generated NewNode sources in $outfile")
+    outfile.toJava
   }
 }
 
