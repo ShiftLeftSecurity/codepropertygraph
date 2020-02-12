@@ -129,8 +129,8 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to AST nodes that are identifier
     * */
-  def isIdentifier: Identifier =
-    new Identifier(raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
+  def isIdentifier: IdentifierTrav =
+    new IdentifierTrav(raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
     * Traverse only to AST nodes that are return nodes

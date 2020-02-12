@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.semanticcpg.language.types.expressions.{Call, Identifier, Literal}
+import io.shiftleft.semanticcpg.language.types.expressions.{Call, IdentifierTrav, Literal}
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.{NodeSteps => OriginalNodeSteps}
 
@@ -48,8 +48,8 @@ class Tag(override val raw: GremlinScala[nodes.Tag]) extends OriginalNodeSteps[n
         .order(By((x: Vertex) => x.id))
         .cast[nodes.Call])
 
-  def identifier: Identifier =
-    new Identifier(
+  def identifier: IdentifierTrav =
+    new IdentifierTrav(
       raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.IDENTIFIER)

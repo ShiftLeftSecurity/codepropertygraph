@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.Identifier
+import io.shiftleft.semanticcpg.language.types.expressions.IdentifierTrav
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
@@ -65,8 +65,8 @@ class MethodParameter(raw: GremlinScala[nodes.MethodParameterIn])
   /**
     * Places (identifier) where this parameter is being referenced
     * */
-  def referencingIdentifiers: Identifier =
-    new Identifier(raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
+  def referencingIdentifiers: IdentifierTrav =
+    new IdentifierTrav(raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
     * Traverse to parameter type

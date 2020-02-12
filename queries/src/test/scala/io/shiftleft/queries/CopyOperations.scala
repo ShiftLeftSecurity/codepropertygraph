@@ -27,8 +27,9 @@ class CopyOperations extends WordSpec with Matchers {
 
   CodeToCpgFixture(code) { cpg =>
     "find indexed buffer assigment targets" in {
-      cpg.assignment.target.isArrayAccess.subscripts.map(_.code.toSet).toSet shouldBe Set(Set("k"),
-                                                                                          Set("i", "j", "offset"))
+      cpg.assignment.target.isArrayAccess.toSet.map { arrAccess =>
+        arrAccess.subscripts.code.toSet
+      } shouldBe Set(Set("k"), Set("i", "j", "offset"))
     }
 
     "find indexed buffer assignment targets in loops where index is incremented" in {
