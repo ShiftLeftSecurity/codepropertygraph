@@ -23,13 +23,13 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Traverse to all comments in source-based CPGs.
     * */
-  def comment: Comment =
-    new Comment(scalaGraph.V.hasLabel(NodeTypes.COMMENT).cast[nodes.Comment])
+  def comment: NodeSteps[nodes.Comment] =
+    new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.COMMENT).cast[nodes.Comment])
 
   /**
     * Shorthand for `cpg.comment.code(code)`
     * */
-  def comment(code: String): Comment =
+  def comment(code: String): NodeSteps[nodes.Comment] =
     comment.code(code)
 
   /**

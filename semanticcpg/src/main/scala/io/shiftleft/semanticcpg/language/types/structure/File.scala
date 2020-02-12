@@ -24,7 +24,7 @@ class File(raw: GremlinScala[nodes.File]) extends NodeSteps[nodes.File](raw) {
   def namespaceBlock: NamespaceBlock =
     new NamespaceBlock(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[nodes.NamespaceBlock])
 
-  def comment: Comment =
-    new Comment(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.COMMENT).cast[nodes.Comment])
+  def comment: NodeSteps[nodes.Comment] =
+    new NodeSteps(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.COMMENT).cast[nodes.Comment])
 
 }

@@ -138,9 +138,6 @@ package object language {
   implicit def toBinding(steps: Steps[nodes.Binding]): Binding =
     new Binding(steps.raw)
 
-  implicit def toComment(steps: Steps[nodes.Comment]): Comment =
-    new Comment(steps.raw)
-
   implicit def toCodeAccessors[A <: StoredNode with HasCode](steps: Steps[A]): CodeAccessors[A] =
     new CodeAccessors(steps)
 
