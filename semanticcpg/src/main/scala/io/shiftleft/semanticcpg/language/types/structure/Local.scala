@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.Identifier
+import io.shiftleft.semanticcpg.language.types.expressions.IdentifierTrav
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
 /**
@@ -30,8 +30,8 @@ class Local(raw: GremlinScala[nodes.Local]) extends NodeSteps[nodes.Local](raw) 
   /**
     * Places (identifier) where this local is being referenced
     * */
-  def referencingIdentifiers: Identifier =
-    new Identifier(raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
+  def referencingIdentifiers: IdentifierTrav =
+    new IdentifierTrav(raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
     * The type of the local.

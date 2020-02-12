@@ -174,13 +174,13 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     Traverse to all identifiers, e.g., occurrences of local variables or class members in method bodies.
     */
-  def identifier: Identifier =
-    new Identifier(scalaGraph.V.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
+  def identifier: IdentifierTrav =
+    new IdentifierTrav(scalaGraph.V.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
     * Shorthand for `cpg.identifier.name(name)`
     * */
-  def identifier(name: String): Identifier =
+  def identifier(name: String): IdentifierTrav =
     identifier.name(name)
 
   /**
