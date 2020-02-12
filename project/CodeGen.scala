@@ -20,7 +20,13 @@ class Schema(schemaFile: String) {
   lazy val edgeKeys = (jsonRoot \ "edgeKeys").as[List[Property]]
 
   lazy val nodeTypeByName: Map[String, NodeType] =
-    nodeTypes.map { node => (node.name, node) }.toMap
+    nodeTypes.map(node => node.name -> node).toMap
+
+  lazy val nodePropertyByName: Map[String, Property] =
+    nodeKeys.map(property => property.name -> property).toMap
+
+  lazy val edgePropertyByName: Map[String, Property] =
+    edgeKeys.map(property => property.name -> property).toMap
 
   /* schema only specifies `node.outEdges` - this builds a reverse map (essentially `node.inEdges`) along with the outNodes */
   lazy val nodeToInEdgeContexts: Map[NodeType, Seq[InEdgeContext]] = {
@@ -62,44 +68,24 @@ class CodeGen(schemaFile: String, basePackage: String) {
   val schema = new Schema(schemaFile)
 
   def run(outputDir: JFile): List[JFile] =
-    List(writeEdgesFile(outputDir), writeNodesFile(outputDir), writeNewNodesFile(outputDir))
+    List(writeEdgeFiles(outputDir), writeNodeFiles(outputDir), writeNewNodeFiles(outputDir))
 
-  def writeEdgesFile(outputDir: JFile): JFile = {
-    val propertyByName: Map[String, Property] =
-      schema.edgeKeys.map(key => key.name -> key).toMap
+  def writeEdgeFiles(outputDir: JFile): JFile = {
+    val staticHeader =
+      s"""package $edgesPackage
+         |
+         |import java.lang.{Boolean => JBoolean, Long => JLong}
+         |import java.util.{Set => JSet}
+         |import java.util.{List => JList}
+         |import org.apache.tinkerpop.gremlin.structure.Property
+         |import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
+         |import io.shiftleft.overflowdb.{EdgeLayoutInformation, EdgeFactory, NodeFactory, OdbEdge, OdbNode, OdbGraph, NodeRef}
+         |import scala.jdk.CollectionConverters._
+         |""".stripMargin
 
-    def entries: List[String] =
-      schema.edgeTypes.map(edge => generateEdgeSource(edge, edge.keys.map(propertyByName)))
-
-    def edgeHeader = {
-      val staticHeader =
-        s"""package $edgesPackage
-           | 
-           |import java.lang.{Boolean => JBoolean, Long => JLong}
-           |import java.util.{Set => JSet}
-           |import java.util.{List => JList}
-           |import org.apache.tinkerpop.gremlin.structure.Property
-           |import org.apache.tinkerpop.gremlin.structure.{Vertex, VertexProperty}
-           |import io.shiftleft.overflowdb.{EdgeLayoutInformation, EdgeFactory, NodeFactory, OdbEdge, OdbNode, OdbGraph, NodeRef}
-           |import scala.jdk.CollectionConverters._
-           |import org.slf4j.LoggerFactory
-           |
-           |object PropertyErrorRegister {
-           |  private var errorMap = Set[(Class[_], String)]()
-           |  private val logger = LoggerFactory.getLogger(getClass)
-           |
-           |  def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
-           |    if (!errorMap.contains((clazz, propertyName))) {
-           |      logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
-           |      errorMap += ((clazz, propertyName))
-           |    }
-           |  }
-           |}
-           |""".stripMargin
-
+    val packageObject = {
       val factories = {
-        val edgeFactories: List[String] =
-          schema.edgeTypes.map(edgeType => edgeType.className + ".factory")
+        val edgeFactories: List[String] = schema.edgeTypes.map(edgeType => edgeType.className + ".factory")
         s"""object Factories {
            |  lazy val all: List[EdgeFactory[_]] = $edgeFactories
            |  lazy val allAsJava: java.util.List[EdgeFactory[_]] = all.asJava
@@ -107,7 +93,10 @@ class CodeGen(schemaFile: String, basePackage: String) {
            |""".stripMargin
       }
 
-      staticHeader + factories
+      s"""$staticHeader
+         |$propertyErrorRegisterImpl
+         |$factories
+         |""".stripMargin
     }
 
     def generateEdgeSource(edgeType: EdgeType, keys: List[Property]) = {
@@ -178,26 +167,45 @@ class CodeGen(schemaFile: String, basePackage: String) {
            |}
            |""".stripMargin
 
-      companionObject + classImpl
+      s"""$staticHeader
+         |$companionObject
+         |$classImpl
+         |""".stripMargin
     }
 
-    val filename = outputDir.getPath + "/" + edgesPackage.replaceAll("\\.", "/") + "/Edges.scala"
-    writeFile(filename, edgeHeader, entries)
+    val baseDir = File(outputDir.getPath + "/" + edgesPackage.replaceAll("\\.", "/"))
+    if (baseDir.exists) baseDir.delete()
+    baseDir.createDirectories()
+    baseDir.createChild("package.scala").write(packageObject)
+    schema.edgeTypes.foreach { edge =>
+      val src = generateEdgeSource(edge, edge.keys.map(schema.edgePropertyByName))
+      val srcFile = edge.className + ".scala"
+      baseDir.createChild(srcFile).write(src)
+    }
+    println(s"generated edge sources in $baseDir (${baseDir.list.size} files)")
+    baseDir.toJava
   }
 
   def neighborAccessorName(edgeTypeName: String, direction: Direction.Value): String =
     camelCase(edgeTypeName + "_" + direction)
 
-  def writeNodesFile(outputDir: JFile): JFile = {
-    val propertyByName: Map[String, Property] =
-      schema.nodeKeys.map(prop => prop.name -> prop).toMap
+  def writeNodeFiles(outputDir: JFile): JFile = {
+    val staticHeader =
+      s"""package $nodesPackage
+         |
+         |import gremlin.scala._
+         |import $basePackage.EdgeKeys
+         |import $edgesPackage
+         |import java.lang.{Boolean => JBoolean, Long => JLong}
+         |import java.util.{Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
+         |import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
+         |import io.shiftleft.overflowdb.{EdgeFactory, NodeFactory, NodeLayoutInformation, OdbNode, OdbGraph, OdbNodeProperty, NodeRef}
+         |import io.shiftleft.overflowdb.traversal.{NodeRefOps, PropertyKey, Traversal}
+         |import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
+         |import scala.jdk.CollectionConverters._
+         |""".stripMargin
 
-    lazy val entries: List[String] =
-      schema.nodeTypes.map { nodeType =>
-        generateNodeSource(nodeType, nodeType.keys.map(propertyByName))
-      }
-
-    lazy val nodeHeader = {
+    lazy val packageObject = {
       /* generic accessors for all potential neighbors. specific nodes override them, in case they really allow that edge type
        * TODO: resolve debate between Michael/Bernhard/Markus - these may not be needed. in the meantime, we also have
        * specific neighbor accessors driven by the schema, i.e. those are only available on the types that really allow the given edge type
@@ -208,33 +216,8 @@ class CodeGen(schemaFile: String, basePackage: String) {
         accessor = neighborAccessorName(edgeType.name, direction)
       } yield s"def _$accessor(): JIterator[StoredNode] = { JCollections.emptyIterator() }"
 
-      val staticHeader =
-        s"""package $nodesPackage
-           |
-           |import gremlin.scala._
-           |import $basePackage.EdgeKeys
-           |import $basePackage.edges
-           |import $basePackage.edges._
-           |import java.lang.{Boolean => JBoolean, Long => JLong}
-           |import java.util.{Collections => JCollections, HashMap => JHashMap, Iterator => JIterator, Map => JMap, Set => JSet}
-           |import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex, VertexProperty}
-           |import io.shiftleft.overflowdb.{EdgeFactory, NodeFactory, NodeLayoutInformation, OdbNode, OdbGraph, OdbNodeProperty, NodeRef}
-           |import io.shiftleft.overflowdb.traversal.{NodeRefOps, PropertyKey, Traversal}
-           |import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils
-           |import scala.jdk.CollectionConverters._
-           |import org.slf4j.LoggerFactory
-           |
-           |object PropertyErrorRegister {
-           |  private var errorMap = Set[(Class[_], String)]()
-           |  private val logger = LoggerFactory.getLogger(getClass)
-           |
-           |  def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
-           |    if (!errorMap.contains((clazz, propertyName))) {
-           |      logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
-           |      errorMap += ((clazz, propertyName))
-           |    }
-           |  }
-           |}
+      val rootTypes =
+        s"""$propertyErrorRegisterImpl
            |
            |trait Node extends Product {
            |  def label: String
@@ -246,7 +229,7 @@ class CodeGen(schemaFile: String, basePackage: String) {
            |
            |/* a node that stored inside an OdbGraph (rather than e.g. DiffGraph) */
            |trait StoredNode extends Vertex with Node {
-           |  /* underlying vertex in the graph database. 
+           |  /* underlying vertex in the graph database.
            |   * since this is a StoredNode, this is always set */
            |  def underlying: Vertex = this
            |
@@ -311,7 +294,12 @@ class CodeGen(schemaFile: String, basePackage: String) {
            |""".stripMargin
       }
 
-      staticHeader + nodeBaseTraits + keyBasedTraits + factories
+      s"""$staticHeader
+         |$rootTypes
+         |$nodeBaseTraits
+         |$keyBasedTraits
+         |$factories
+         |""".stripMargin
     }
 
     def generateNodeSource(nodeType: NodeType, keys: List[Property]) = {
@@ -383,6 +371,7 @@ class CodeGen(schemaFile: String, basePackage: String) {
             s"with ${camelCaseCaps(traitName)}"
           }
           .mkString(" ")
+
       val mixinTraitsForBase: String =
         nodeType.is
           .getOrElse(List())
@@ -469,7 +458,7 @@ class CodeGen(schemaFile: String, basePackage: String) {
       val delegatingContainedNodeAccessors = nodeType.containedNodes
         .map {
           _.map { containedNode =>
-            s"""def ${containedNode.localName} = get().${containedNode.localName}"""
+            s"""  def ${containedNode.localName} = get().${containedNode.localName}"""
           }.mkString("\n")
         }
         .getOrElse("")
@@ -539,14 +528,11 @@ class CodeGen(schemaFile: String, basePackage: String) {
           .map(_.name)
           .map(camelCase)
           .map { name =>
-            s"""override def $name = get().$name"""
+            s"""  override def $name = get().$name"""
           }
           .mkString("\n")
 
-        s"""class $className(graph: OdbGraph, id: Long)
-           |  extends NodeRef[$classNameDb](graph, id)
-           | // TODO use once we're on the new traversal dsl:
-           | // with NodeRefOps[$className]
+        s"""class $className(graph: OdbGraph, id: Long) extends NodeRef[$classNameDb](graph, id)
            |  with ${className}Base
            |  with StoredNode
            |  $mixinTraits {
@@ -638,17 +624,31 @@ class CodeGen(schemaFile: String, basePackage: String) {
            |}
       |""".stripMargin
 
-      s"\n//${nodeType.name} BEGIN\n" + companionObject + nodeBaseImpl + nodeRefImpl + classImpl + s"\n//${nodeType.name} END\n"
+      s"""$staticHeader
+         |$companionObject
+         |$nodeBaseImpl
+         |$nodeRefImpl
+         |$classImpl
+         |""".stripMargin
     }
 
-    val filename = outputDir.getPath + "/" + nodesPackage.replaceAll("\\.", "/") + "/Nodes.scala"
-    writeFile(filename, nodeHeader, entries)
+    val baseDir = File(outputDir.getPath + "/" + nodesPackage.replaceAll("\\.", "/"))
+    if (baseDir.exists) baseDir.delete()
+    baseDir.createDirectories()
+    baseDir.createChild("package.scala").write(packageObject)
+    schema.nodeTypes.foreach { nodeType =>
+      val src = generateNodeSource(nodeType, nodeType.keys.map(schema.nodePropertyByName))
+      val srcFile = nodeType.className + ".scala"
+      baseDir.createChild(srcFile).write(src)
+    }
+    println(s"generated node sources in $baseDir (${baseDir.list.size} files)")
+    baseDir.toJava
   }
 
   /** generates classes to easily add new nodes to the graph
     * this ability could have been added to the existing nodes, but it turned out as a different specialisation,
     * since e.g. `id` is not set before adding it to the graph */
-  def writeNewNodesFile(outputDir: JFile): JFile = {
+  def writeNewNodeFiles(outputDir: JFile): JFile = {
     val staticHeader =
       s"""package $nodesPackage
          |
@@ -663,12 +663,6 @@ class CodeGen(schemaFile: String, basePackage: String) {
          |  def allContainedNodes: List[Node] = containedNodesByLocalName.values.flatten.toList
          |}
          |""".stripMargin
-
-    val propertyByName: Map[String, Property] =
-      schema.nodeKeys.map(prop => prop.name -> prop).toMap
-
-    def entries: List[String] =
-      schema.nodeTypes.map(node => generateNewNodeSource(node, node.keys.map(propertyByName)))
 
     def generateNewNodeSource(nodeType: NodeType, keys: List[Property]) = {
       val fields: String = {
@@ -747,20 +741,17 @@ class CodeGen(schemaFile: String, basePackage: String) {
          |""".stripMargin
     }
 
-    val filename = outputDir.getPath + "/" + nodesPackage.replaceAll("\\.", "/") + "/NewNodes.scala"
-    writeFile(filename, staticHeader, entries)
-  }
-
-  def writeFile(fileName: String, header: String, entries: List[String]): JFile = {
-    val outputFile = File.newTemporaryFile()
-    outputFile.appendLine(header)
-    entries.map(outputFile.appendLine)
-
-    val targetFile = File(fileName)
-    targetFile.createIfNotExists(createParents = true)
-
-    println(s"writing results to $targetFile")
-    outputFile.moveTo(targetFile)(File.CopyOptions(overwrite = true)).toJava
+    val outfile = File(outputDir.getPath + "/" + nodesPackage.replaceAll("\\.", "/") + "/NewNodes.scala")
+    if (outfile.exists) outfile.delete()
+    outfile.createFile()
+    val src = schema.nodeTypes.map { nodeType =>
+      generateNewNodeSource(nodeType, nodeType.keys.map(schema.nodePropertyByName))
+    }.mkString("\n")
+    outfile.write(s"""$staticHeader
+                     |$src
+                     |""".stripMargin)
+    println(s"generated NewNode sources in $outfile")
+    outfile.toJava
   }
 }
 
@@ -940,4 +931,18 @@ object Helpers {
         (casesForKeys :+ caseNotFound).mkString("\n else ")
     }
   }
+
+  val propertyErrorRegisterImpl =
+    s"""object PropertyErrorRegister {
+       |  private var errorMap = Set[(Class[_], String)]()
+       |  private val logger = org.slf4j.LoggerFactory.getLogger(getClass)
+       |
+       |  def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
+       |    if (!errorMap.contains((clazz, propertyName))) {
+       |      logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
+       |      errorMap += ((clazz, propertyName))
+       |    }
+       |  }
+       |}
+       |""".stripMargin
 }
