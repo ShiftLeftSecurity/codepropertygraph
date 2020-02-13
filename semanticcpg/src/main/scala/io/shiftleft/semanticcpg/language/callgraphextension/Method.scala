@@ -5,22 +5,22 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod}
 
-class Method(override val raw: GremlinScala[nodes.Method]) extends Steps[nodes.Method](raw) {
+class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
 
   /**
     * Intended for internal use!
     * Traverse to direct and transitive callers of the method.
     */
-  def calledByIncludingSink(sourceTrav: Steps[nodes.Method], resolve: Boolean = true)(
-      implicit callResolver: ICallResolver): Steps[nodes.Method] = {
+  def calledByIncludingSink(sourceTrav: NodeSteps[nodes.Method], resolve: Boolean = true)(
+      implicit callResolver: ICallResolver): NodeSteps[nodes.Method] = {
     val sourceMethods = sourceTrav.raw.toSet
-    val sinkMethods = raw.dedup.toList()
+    val sinkMethods = wrapped.raw.dedup.toList()
 
     if (sourceMethods.isEmpty || sinkMethods.isEmpty) {
-      new Steps[nodes.Method](graph.V(-1).cast[nodes.Method])
+      new NodeSteps(wrapped.graph.V(-1).cast[nodes.Method])
     } else {
       val ids = sinkMethods.map(_.id)
-      val methodTrav = graph.V(ids: _*)
+      val methodTrav = wrapped.graph.V(ids: _*)
 
       new Steps[nodes.Method](
         methodTrav
@@ -43,21 +43,21 @@ class Method(override val raw: GremlinScala[nodes.Method]) extends Steps[nodes.M
   /**
     * Traverse to direct callers of this method
     * */
-  def caller(implicit callResolver: ICallResolver): Steps[nodes.Method] =
+  def caller(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] =
     callIn(callResolver).method
 
   /**
     * Traverse to methods called by this method
     * */
-  def callee(implicit callResolver: ICallResolver): Steps[nodes.Method] =
-    new OriginalMethod(raw).callOut.calledMethod(callResolver)
+  def callee(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] =
+    new OriginalMethod(wrapped.raw).callOut.calledMethod(callResolver)
 
   /**
     * Incoming call sites
     * */
   def callIn(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] = {
     new NodeSteps(
-      sideEffect(callResolver.resolveDynamicMethodCallSites).raw
+      wrapped.sideEffect(callResolver.resolveDynamicMethodCallSites).raw
         .in(EdgeTypes.CALL)
         .cast[nodes.Call])
   }
@@ -65,15 +65,15 @@ class Method(override val raw: GremlinScala[nodes.Method]) extends Steps[nodes.M
   /**
     * Traverse to direct and transitive callers of the method.
     * */
-  def calledBy(sourceTrav: Steps[nodes.Method])(implicit callResolver: ICallResolver): Steps[nodes.Method] = {
+  def calledBy(sourceTrav: Steps[nodes.Method])(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] = {
     caller(callResolver).calledByIncludingSink(sourceTrav)(callResolver)
   }
 
   /**
     * Outgoing call sites to methods where fullName matches `regex`.
     * */
-  def callOutRegex(regex: String)(implicit callResolver: ICallResolver): Steps[nodes.Call] = {
-    new OriginalMethod(raw).callOut.filter(_.calledMethod.fullName(regex))
+  def callOutRegex(regex: String)(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] = {
+    new OriginalMethod(wrapped.raw).callOut.filter(_.calledMethod.fullName(regex))
   }
 
 }
