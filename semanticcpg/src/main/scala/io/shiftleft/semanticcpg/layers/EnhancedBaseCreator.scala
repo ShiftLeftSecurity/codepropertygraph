@@ -11,6 +11,7 @@ import io.shiftleft.semanticcpg.passes.compat.bindingtablecompat.BindingTableCom
 import io.shiftleft.semanticcpg.passes.compat.argumentcompat.ArgumentCompat
 import io.shiftleft.semanticcpg.passes.compat.callnamecompat.CallNameFixup
 import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
+import io.shiftleft.semanticcpg.passes.trim.TrimPass
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
 import io.shiftleft.semanticcpg.passes.linking.calllinker.CallLinker
 import io.shiftleft.semanticcpg.passes.linking.capturinglinker.CapturingLinker
@@ -44,6 +45,7 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new NamespaceCreator(cpg),
           new CfgDominatorPass(cpg),
           new CdgPass(cpg),
+          new TrimPass(cpg),
         )
       case Languages.C =>
         List(
@@ -63,6 +65,7 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new NamespaceCreator(cpg),
           new CfgDominatorPass(cpg),
           new CdgPass(cpg),
+          new TrimPass(cpg),
         )
     }
   }
