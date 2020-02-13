@@ -6,11 +6,14 @@ import java.nio.file.{Files, Path}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct}
 import org.apache.logging.log4j.LogManager
-import java.util.{List => JList}
+import java.util.{List => JList, Collection => JCollection}
 
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try, Using}
 import io.shiftleft.overflowdb.OdbConfig
+import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge
+
+import scala.collection.mutable.ArrayBuffer
 
 object ProtoCpgLoader {
   private val logger = LogManager.getLogger(getClass)
@@ -19,19 +22,14 @@ object ProtoCpgLoader {
     measureAndReport {
       val builder = new ProtoToCpg(overflowDbConfig)
       Using.Manager { use =>
+        val edgeLists: ArrayBuffer[JCollection[Edge]] = ArrayBuffer.empty
         use(new ZipArchive(fileName)).entries.foreach { entry =>
           val inputStream = use(Files.newInputStream(entry))
-          builder.addNodes(getNextProtoCpgFromStream(inputStream).getNodeList)
+          val cpgStruct = getNextProtoCpgFromStream(inputStream)
+          builder.addNodes(cpgStruct.getNodeList)
+          edgeLists += cpgStruct.getEdgeList
         }
-        /* second pass so we can stream for the edges
-         * -> holding them all in memory is potentially too much
-         * -> adding them as we go isn't an option because we may only have one of the adjacent vertices
-         * TODO double check: is that really so? protos don't really allow for streaming, so this may be unnecessary overhead
-         */
-        use(new ZipArchive(fileName)).entries.foreach { entry =>
-          val inputStream = use(Files.newInputStream(entry))
-          builder.addEdges(getNextProtoCpgFromStream(inputStream).getEdgeList)
-        }
+        edgeLists.foreach(edgeCollection => builder.addEdges(edgeCollection))
       } match {
         case Failure(exception) => throw exception
         case Success(_)         => builder.build()
