@@ -54,24 +54,6 @@
              {"nodeType":"METHOD", "localName":"callerMethod", "cardinality":"one"}
                             ]
         },
-        {"id" : 202, "name" : "SOURCE", "comment" : "", "keys" : ["SOURCE_TYPE"], "comment" : "", "outEdges" : [], "containedNodes" : [
-            {"localName" : "node", "nodeType" : "TRACKING_POINT", "cardinality" : "one"},
-            {"localName" : "method", "nodeType" : "METHOD", "cardinality" : "one" },
-            {"localName" : "methodTags", "nodeType" : "TAG", "cardinality" : "list"},
-            {"localName" : "callingMethod", "nodeType" : "METHOD", "cardinality" : "zeroOrOne"},
-            {"localName" : "callsite", "nodeType" : "CALL", "cardinality" : "zeroOrOne"},
-            {"localName" : "tags", "nodeType" : "TAG", "cardinality" : "list"},
-            {"localName" : "nodeType", "nodeType" : "TYPE", "cardinality" : "one"}
-        ]},	{"id" : 203, "name" : "SINK", "comment" : "", "keys" : ["SINK_TYPE"], "comment" : "", "outEdges" : [], "containedNodes" : [
-            {"localName" : "node", "nodeType" : "TRACKING_POINT", "cardinality" : "one"},
-	    {"localName" : "nodeType", "nodeType" : "TYPE", "cardinality" : "one"},
-            {"localName" : "method", "nodeType" : "METHOD", "cardinality" : "one" },
-            {"localName" : "methodTags", "nodeType" : "TAG", "cardinality" : "list"},
-            {"localName" : "callingMethod", "nodeType" : "METHOD", "cardinality" : "zeroOrOne"},
-            {"localName" : "callsite", "nodeType" : "CALL", "cardinality" : "zeroOrOne"},
-            {"localName" : "parameterIn", "nodeType" : "METHOD_PARAMETER_IN", "cardinality" : "zeroOrOne"},
-	    {"localName" : "parameterInTags", "nodeType" : "TAG", "cardinality" : "list", "comment" : "This field also holds tags for output parameters and return parameters"}
-        ]},
 	{"id" : 213, "name" : "TRANSFORMATION", "comment" : "", "keys" : [], "outEdges" : [], "containedNodes" : [
 	 {"localName" : "node", "nodeType" : "TRACKING_POINT", "cardinality" : "one"}
 	]
@@ -133,27 +115,7 @@
 	   {"localName" : "calls", "nodeType" : "CALL", "cardinality": "list"}
 	 ]
 	},
-
-	{"id": 205, "name" : "PROGRAM_POINT", "comment" : "", "keys" : [], "outEdges" : [],
-	 "containedNodes" : [
-	   {"localName" : "elem", "nodeType" : "TRACKING_POINT", "cardinality" : "one"},
-           {"localName" : "method", "nodeType" : "METHOD", "cardinality" : "zeroOrOne"},
-	   {"localName" : "methodTags", "nodeType" : "TAG", "cardinality" : "list"},
-	   {"localName" : "paramTags", "nodeType" : "TAG", "cardinality" : "list"}
-	 ]
-	},
 	{"id" : 206, "name" : "VARIABLE_INFO", "comment" : "", "keys" : ["VAR_TYPE", "EVALUATION_TYPE", "PARAMETER_INDEX"], "outEdges" : [] },
-	{"id" : 207, "name" : "FLOW", "comment" : "", "keys" : [], "outEdges" : [],
-	 "containedNodes" :
-	 [
-	   {"localName" : "points", "nodeType" : "PROGRAM_POINT", "cardinality" : "list"},
-       {"localName" : "source", "nodeType" : "SOURCE", "cardinality" : "one"},
-       {"localName" : "sink", "nodeType" : "SINK", "cardinality" : "one"},
-       {"localName" : "transformations", "nodeType" : "TRANSFORMATION", "cardinality" : "list"},
-       {"localName" : "branchPoints", "nodeType" : "TRACKING_POINT", "cardinality" : "list"},
-       {"localName" : "cfgNodes", "nodeType" : "CFG_NODE", "cardinality" : "list"}
-	 ]
-	},
     {"id" : 208, "name" : "TAG_NODE_PAIR", "comment" : "", "keys" : [], "outEdges" : [],
      "containedNodes" :
      [
