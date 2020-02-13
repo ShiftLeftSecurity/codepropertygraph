@@ -55,25 +55,22 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   /**
     * Incoming call sites
     * */
-  def callIn(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] = {
+  def callIn(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] =
     new NodeSteps(
       wrapped.sideEffect(callResolver.resolveDynamicMethodCallSites).raw
         .in(EdgeTypes.CALL)
         .cast[nodes.Call])
-  }
 
   /**
     * Traverse to direct and transitive callers of the method.
     * */
-  def calledBy(sourceTrav: Steps[nodes.Method])(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] = {
+  def calledBy(sourceTrav: Steps[nodes.Method])(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] =
     caller(callResolver).calledByIncludingSink(sourceTrav)(callResolver)
-  }
 
   /**
     * Outgoing call sites to methods where fullName matches `regex`.
     * */
-  def callOutRegex(regex: String)(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] = {
+  def callOutRegex(regex: String)(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] =
     new OriginalMethod(wrapped.raw).callOut.filter(_.calledMethod.fullName(regex))
-  }
 
 }
