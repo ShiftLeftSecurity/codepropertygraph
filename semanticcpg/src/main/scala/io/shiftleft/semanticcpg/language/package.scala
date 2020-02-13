@@ -262,8 +262,7 @@ package object language {
   implicit def toMethodDOTForCallGraph(steps: Steps[nodes.Method]): MethodDOT =
     new MethodDOT(steps.raw)
 
-  implicit def toCallForCallGraph(steps: Steps[nodes.Call]): Call =
-    new Call(steps.raw)
+  implicit def toCallForCallGraph(steps: Steps[nodes.Call]): Call = new Call(steps)
 
   // / Call graph extension
 
