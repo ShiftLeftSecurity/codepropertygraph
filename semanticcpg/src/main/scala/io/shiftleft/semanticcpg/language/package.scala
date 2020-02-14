@@ -80,7 +80,7 @@ package object language {
   implicit def toTypeDecl(steps: Steps[nodes.TypeDecl]): TypeDecl = new TypeDecl(steps)
 
   implicit def toCall(steps: Steps[nodes.Call]): OriginalCall =
-    new OriginalCall(steps.raw)
+    new OriginalCall(steps)
 
   implicit def toControlStructure(steps: Steps[nodes.ControlStructure]): ControlStructure =
     new ControlStructure(steps.raw)

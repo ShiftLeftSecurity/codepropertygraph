@@ -12,19 +12,20 @@ import io.shiftleft.semanticcpg.language.types.structure.{Member, Method, Method
 /**
   A call site
   */
-class Call(raw: GremlinScala[nodes.Call]) extends NodeSteps[nodes.Call](raw) with EvalTypeAccessors[nodes.Call] {
+class Call(val wrapped: NodeSteps[nodes.Call]) extends EvalTypeAccessors[nodes.Call] {
+  override val raw: GremlinScala[nodes.Call] = wrapped.raw
 
   /**
     Only statically dispatched calls
     */
   def isStatic: NodeSteps[nodes.Call] =
-    this.dispatchType("STATIC_DISPATCH")
+    wrapped.dispatchType("STATIC_DISPATCH")
 
   /**
     Only dynamically dispatched calls
     */
   def isDynamic: NodeSteps[nodes.Call] =
-    this.dispatchType("DYNAMIC_DISPATCH")
+    wrapped.dispatchType("DYNAMIC_DISPATCH")
 
   /**
     The caller
