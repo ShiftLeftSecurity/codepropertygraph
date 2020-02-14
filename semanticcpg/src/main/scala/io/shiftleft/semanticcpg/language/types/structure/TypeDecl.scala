@@ -95,8 +95,8 @@ class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
   /**
     * Traverse to the method bindings of this type declaration.
     */
-  def methodBinding: Binding =
-    new Binding(canonicalType.raw.out(EdgeTypes.BINDS).cast[nodes.Binding])
+  def methodBinding: NodeSteps[nodes.Binding] =
+    new NodeSteps(canonicalType.raw.out(EdgeTypes.BINDS).cast[nodes.Binding])
 
   /**
     * Traverse to alias type declarations.

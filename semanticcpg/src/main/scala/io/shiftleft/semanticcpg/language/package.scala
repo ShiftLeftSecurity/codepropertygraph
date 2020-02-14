@@ -136,7 +136,7 @@ package object language {
     new MethodRef(steps.raw)
 
   implicit def toBinding(steps: Steps[nodes.Binding]): Binding =
-    new Binding(steps.raw)
+    new Binding(steps)
 
   implicit def toCodeAccessors[A <: StoredNode with HasCode](steps: Steps[A]): CodeAccessors[A] =
     new CodeAccessors(steps)
