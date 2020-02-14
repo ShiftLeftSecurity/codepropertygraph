@@ -121,7 +121,7 @@ package object language {
 
   implicit def toBlock(steps: Steps[nodes.Block]): Block = new Block(steps)
 
-  implicit def toMethodRef(steps: Steps[nodes.MethodRef]): MethodRef = new MethodRef(steps.raw)
+  implicit def toMethodRef(steps: Steps[nodes.MethodRef]): MethodRef = new MethodRef(steps)
 
   implicit def toBinding(steps: Steps[nodes.Binding]): Binding =
     new Binding(steps)
