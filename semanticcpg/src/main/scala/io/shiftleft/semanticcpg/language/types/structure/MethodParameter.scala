@@ -10,15 +10,15 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 /**
   * Formal method input parameter
   * */
-class MethodParameter(raw: GremlinScala[nodes.MethodParameterIn])
-    extends NodeSteps[nodes.MethodParameterIn](raw)
-    with EvalTypeAccessors[nodes.MethodParameterIn] {
+class MethodParameter(val wrapped: NodeSteps[nodes.MethodParameterIn])
+    extends EvalTypeAccessors[nodes.MethodParameterIn] {
+  override def raw: GremlinScala[nodes.MethodParameterIn] = wrapped.raw
 
   /**
     * Traverse to all `num`th parameters
     * */
   def index(num: Int): NodeSteps[nodes.MethodParameterIn] =
-    this.order(num)
+    wrapped.order(num)
 
   /**
     * Traverse to all parameters with index greater or equal than `num`

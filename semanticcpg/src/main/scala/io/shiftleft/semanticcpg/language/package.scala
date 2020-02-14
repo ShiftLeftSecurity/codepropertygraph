@@ -96,23 +96,19 @@ package object language {
 
   implicit def toLocal(steps: Steps[nodes.Local]): Local = new Local(steps)
 
-  implicit def toMethod(steps: Steps[nodes.Method]): OriginalMethod =
-    new OriginalMethod(steps.raw)
+  implicit def toMethod(steps: Steps[nodes.Method]): OriginalMethod = new OriginalMethod(steps)
 
   implicit def toMethodParameter(steps: Steps[nodes.MethodParameterIn]): MethodParameter =
-    new MethodParameter(steps.raw)
+    new MethodParameter(steps)
 
   implicit def toMethodParameterOut(steps: Steps[nodes.MethodParameterOut]): MethodParameterOut =
     new MethodParameterOut(steps)
 
-  implicit def toMethodReturn(steps: Steps[nodes.MethodReturn]): MethodReturn =
-    new MethodReturn(steps.raw)
+  implicit def toMethodReturn(steps: Steps[nodes.MethodReturn]): MethodReturn = new MethodReturn(steps)
 
-  implicit def toNamespace(steps: Steps[nodes.Namespace]): Namespace =
-    new Namespace(steps.raw)
+  implicit def toNamespace(steps: Steps[nodes.Namespace]): Namespace = new Namespace(steps)
 
-  implicit def toNamespaceBlock(steps: Steps[nodes.NamespaceBlock]): NamespaceBlock =
-    new NamespaceBlock(steps.raw)
+  implicit def toNamespaceBlock(steps: Steps[nodes.NamespaceBlock]): NamespaceBlock = new NamespaceBlock(steps)
 
   implicit def toExpression[A <: nodes.Expression](steps: Steps[A]): Expression[A] =
     new Expression[A](steps.raw)

@@ -8,9 +8,8 @@ import io.shiftleft.semanticcpg.language.types.expressions.Call
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
 import io.shiftleft.semanticcpg.language.types.propertyaccessors.EvalTypeAccessors
 
-class MethodReturn(raw: GremlinScala[nodes.MethodReturn])
-    extends NodeSteps[nodes.MethodReturn](raw)
-    with EvalTypeAccessors[nodes.MethodReturn] {
+class MethodReturn(val wrapped: NodeSteps[nodes.MethodReturn]) extends EvalTypeAccessors[nodes.MethodReturn] {
+  override val raw: GremlinScala[nodes.MethodReturn] = wrapped.raw
 
   def method: NodeSteps[nodes.Method] =
     new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.Method])

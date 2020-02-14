@@ -4,17 +4,15 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{CfgNode, Expression}
-import io.shiftleft.semanticcpg.language.types.expressions.{Call, ControlStructure, Literal}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
 /**
   * A method, function, or procedure
   * */
-class Method(override val raw: GremlinScala[nodes.Method])
-    extends NodeSteps[nodes.Method](raw)
-    with EvalTypeAccessors[nodes.Method]
+class Method(val wrapped: NodeSteps[nodes.Method])
+    extends EvalTypeAccessors[nodes.Method]
     with ModifierAccessors[nodes.Method] {
+  override val raw: GremlinScala[nodes.Method] = wrapped.raw
 
   /**
     * Traverse to parameters of the method
@@ -48,13 +46,13 @@ class Method(override val raw: GremlinScala[nodes.Method])
     * All control structures of this method
     * */
   def controlStructure: NodeSteps[nodes.ControlStructure] =
-    this.ast.isControlStructure
+    wrapped.ast.isControlStructure
 
   /**
     * Shorthand to traverse to control structures where condition matches `regex`
     * */
   def controlStructure(regex: String): NodeSteps[nodes.ControlStructure] =
-    this.ast.isControlStructure.code(regex)
+    wrapped.ast.isControlStructure.code(regex)
 
   /**
     * Outgoing call sites
@@ -221,6 +219,6 @@ class Method(override val raw: GremlinScala[nodes.Method])
   def namespace: NodeSteps[nodes.Namespace] =
     new NodeSteps(definingTypeDecl.namespace.raw)
 
-  def numberOfLines: Steps[Int] = map(_.numberOfLines)
+  def numberOfLines: Steps[Int] = wrapped.map(_.numberOfLines)
 
 }

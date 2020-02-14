@@ -23,15 +23,15 @@ class TrackingPoint(raw: GremlinScala[nodes.TrackingPoint]) extends NodeSteps[no
   /**
     * The enclosing method of the tracking point
     * */
-  def method: Method =
-    new Method(raw.map { dataFlowObject =>
+  def method: NodeSteps[nodes.Method] =
+    new NodeSteps(raw.map { dataFlowObject =>
       methodFast(dataFlowObject)
     })
 
   /**
     * Convert to nearest CFG node
     * */
-  def cfgNode: Steps[nodes.CfgNode] = map(_.cfgNode)
+  def cfgNode: NodeSteps[nodes.CfgNode] = map(_.cfgNode)
 
   def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*): Steps[NodeType] = {
     val pathReachables = reachableByInternal(sourceTravs)
