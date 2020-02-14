@@ -2,15 +2,12 @@ package io.shiftleft.semanticcpg.language.operatorextension
 
 import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.language.types.expressions.IdentifierTrav
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
-import io.shiftleft.semanticcpg.language.Steps
 import io.shiftleft.semanticcpg.language._
 
-class ArrayAccessTrav(raw: GremlinScala[nodes.Call]) extends Steps[nodes.Call](raw) {
+class ArrayAccessTrav(raw: GremlinScala[nodes.Call]) extends NodeSteps[nodes.Call](raw) {
 
-  def array: Expression[nodes.Expression] = map(_.array)
+  def array: NodeSteps[nodes.Expression] = map(_.array)
 
-  def subscripts: IdentifierTrav = flatMap(_.subscripts)
+  def subscripts: NodeSteps[nodes.Identifier] = flatMap(_.subscripts)
 
 }

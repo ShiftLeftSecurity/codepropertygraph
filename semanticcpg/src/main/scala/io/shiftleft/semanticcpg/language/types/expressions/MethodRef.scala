@@ -10,6 +10,6 @@ class MethodRef(raw: GremlinScala[nodes.MethodRef]) extends NodeSteps[nodes.Meth
   /**
     * Traverse to referenced method.
     * */
-  def referencedMethod: Method =
-    new Method(raw.out(EdgeTypes.REF).cast[nodes.Method])
+  def referencedMethod: NodeSteps[nodes.Method] =
+    new NodeSteps(raw.out(EdgeTypes.REF).cast[nodes.Method])
 }

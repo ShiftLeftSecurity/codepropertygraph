@@ -16,8 +16,8 @@ class Literal(raw: GremlinScala[nodes.Literal])
   /**
     * Traverse to method hosting this literal
     * */
-  def method: Method =
-    new Method(
+  def method: NodeSteps[nodes.Method] =
+    new NodeSteps(
       raw
         .cast[nodes.StoredNode]
         .repeat(_.in(EdgeTypes.AST).cast[nodes.StoredNode])
