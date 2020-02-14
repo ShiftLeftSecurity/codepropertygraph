@@ -92,8 +92,7 @@ package object language {
 
   implicit def toMember(steps: Steps[nodes.Member]): Member = new Member(steps)
 
-  implicit def toMetaData(steps: Steps[nodes.MetaData]): MetaData =
-    new MetaData(steps.raw)
+  implicit def toMetaData(steps: Steps[nodes.MetaData]): MetaData = new MetaData(steps)
 
   implicit def toLocal(steps: Steps[nodes.Local]): Local = new Local(steps)
 
