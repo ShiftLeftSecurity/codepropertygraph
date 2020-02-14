@@ -35,13 +35,13 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     Traverse to all source files
     */
-  def file: File =
-    new File(scalaGraph.V.hasLabel(NodeTypes.FILE).cast[nodes.File])
+  def file: NodeSteps[nodes.File] =
+    new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.FILE).cast[nodes.File])
 
   /**
     * Shorthand for `cpg.file.name(name)`
     * */
-  def file(name: String): File =
+  def file(name: String): NodeSteps[nodes.File] =
     file.name(name)
 
   /**

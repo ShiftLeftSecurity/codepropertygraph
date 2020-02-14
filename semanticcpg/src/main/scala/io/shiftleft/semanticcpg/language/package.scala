@@ -126,14 +126,11 @@ package object language {
   implicit def toAstNode[A <: nodes.AstNode](steps: Steps[A]): AstNode[A] =
     new AstNode(steps.raw)
 
-  implicit def toFile(steps: Steps[nodes.File]): File =
-    new File(steps.raw)
+  implicit def toFile(steps: Steps[nodes.File]): File = new File(steps)
 
-  implicit def toBlock(steps: Steps[nodes.Block]): Block =
-    new Block(steps)
+  implicit def toBlock(steps: Steps[nodes.Block]): Block = new Block(steps)
 
-  implicit def toMethodRef(steps: Steps[nodes.MethodRef]): MethodRef =
-    new MethodRef(steps.raw)
+  implicit def toMethodRef(steps: Steps[nodes.MethodRef]): MethodRef = new MethodRef(steps.raw)
 
   implicit def toBinding(steps: Steps[nodes.Binding]): Binding =
     new Binding(steps)
