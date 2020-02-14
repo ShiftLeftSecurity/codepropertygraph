@@ -207,13 +207,13 @@ class Method(override val raw: GremlinScala[nodes.Method])
   /**
     * Traverse to block
     * */
-  def block: Block =
-    new Block(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
+  def block: NodeSteps[nodes.Block] =
+    new NodeSteps(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
 
   /**
     * Traverse to method body (alias for `block`)
     * */
-  def body: Block = block
+  def body: NodeSteps[nodes.Block] = block
 
   /**
     * Traverse to namespace

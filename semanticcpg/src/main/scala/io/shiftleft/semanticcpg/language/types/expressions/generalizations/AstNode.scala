@@ -93,8 +93,8 @@ class AstNode[A <: nodes.AstNode](raw: GremlinScala[A]) extends NodeSteps[A](raw
   /**
     * Traverse only to those AST nodes that are blocks
     * */
-  def isBlock: Block =
-    new Block(raw.hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
+  def isBlock: NodeSteps[nodes.Block] =
+    new NodeSteps(raw.hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
 
   /**
     * Traverse only to those AST nodes that are control structures

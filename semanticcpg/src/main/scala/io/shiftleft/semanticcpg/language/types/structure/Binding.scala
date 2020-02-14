@@ -8,12 +8,12 @@ class Binding(val wrapped: NodeSteps[nodes.Binding]) extends AnyVal {
   /**
     * Traverse to the method bound by this method binding.
     */
-  def boundMethod: Method =
-    new Method(wrapped.raw.out(EdgeTypes.REF).cast[nodes.Method])
+  def boundMethod: NodeSteps[nodes.Method] =
+    new NodeSteps(wrapped.raw.out(EdgeTypes.REF).cast[nodes.Method])
 
   /**
     * Traverse to the method bound by this method binding.
     */
-  def bindingTypeDecl: TypeDecl =
-    new TypeDecl(wrapped.raw.in(EdgeTypes.BINDS).cast[nodes.TypeDecl])
+  def bindingTypeDecl: NodeSteps[nodes.TypeDecl] =
+    new NodeSteps(wrapped.raw.in(EdgeTypes.BINDS).cast[nodes.TypeDecl])
 }

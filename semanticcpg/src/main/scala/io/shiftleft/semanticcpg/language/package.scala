@@ -130,7 +130,7 @@ package object language {
     new File(steps.raw)
 
   implicit def toBlock(steps: Steps[nodes.Block]): Block =
-    new Block(steps.raw)
+    new Block(steps)
 
   implicit def toMethodRef(steps: Steps[nodes.MethodRef]): MethodRef =
     new MethodRef(steps.raw)
