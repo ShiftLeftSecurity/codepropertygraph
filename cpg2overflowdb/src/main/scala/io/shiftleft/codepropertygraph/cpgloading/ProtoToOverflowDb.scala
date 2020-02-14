@@ -5,26 +5,15 @@
  import org.apache.logging.log4j.LogManager
 
  /**
-   * converts cpg.bin.zip proto to OverflowDb, so we don't need to first import into Tinkergraph and then serialize it out again
-   * Useful especially for large cpgs. Uses scala parallel collections.
-   *
-   * Usage example: create the overflowdb and load it in ocular. This will load all references in memory, and accessed elements/properties will be lazily fetched from disk.
-   * ./proto2overflowdb.sh --cpg cpg.bin.zip --out overflowdb.bin
-   * ./ocular.sh
-   * Cpg.withStorage("overflowdb.bin")
+   * converts cpg.bin.zip proto to OverflowDb
+   * ./cpg2overflowdb.sh --cpg cpg.bin.zip --out overflowdb.bin
    */
  object ProtoToOverflowDb {
-   type NodeId = java.lang.Long
-   type EdgeLabel = String
-
    private lazy val logger = LogManager.getLogger(getClass)
- //  private lazy val edgeSerializer = new ProtoEdgeSerializer
-   private lazy val nodeFilter = new NodeFilter
-
+ 
    def main(args: Array[String]): Unit = {
      parseConfig(args).map(run)
    }
-
 
    def run(config: Config): File = {
      val writeTo = config.writeTo.getOrElse(new File("overflowdb.bin"))
