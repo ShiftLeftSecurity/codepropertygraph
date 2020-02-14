@@ -135,6 +135,7 @@
         {
             "name": "METHOD_REF", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
             "outEdges": [
+                {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
                 {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
                 {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
                 {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
