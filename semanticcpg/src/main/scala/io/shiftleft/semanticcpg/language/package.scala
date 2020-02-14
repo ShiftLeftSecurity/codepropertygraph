@@ -83,7 +83,7 @@ package object language {
     new OriginalCall(steps)
 
   implicit def toControlStructure(steps: Steps[nodes.ControlStructure]): ControlStructure =
-    new ControlStructure(steps.raw)
+    new ControlStructure(steps)
 
   implicit def toIdentifier(steps: Steps[nodes.Identifier]): IdentifierTrav =
     new IdentifierTrav(steps)
