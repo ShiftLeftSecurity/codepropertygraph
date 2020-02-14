@@ -90,8 +90,7 @@ package object language {
   implicit def toIdentifier(steps: Steps[nodes.Identifier]): IdentifierTrav =
     new IdentifierTrav(steps.raw)
 
-  implicit def toMember(steps: Steps[nodes.Member]): Member =
-    new Member(steps.raw)
+  implicit def toMember(steps: Steps[nodes.Member]): Member = new Member(steps)
 
   implicit def toMetaData(steps: Steps[nodes.MetaData]): MetaData =
     new MetaData(steps.raw)

@@ -64,7 +64,7 @@ class Call(raw: GremlinScala[nodes.Call]) extends NodeSteps[nodes.Call](raw) wit
   /**
     * Traverse to referenced members
     * */
-  def referencedMember: Member =
-    new Member(raw.out(EdgeTypes.REF).cast[nodes.Member])
+  def referencedMember: NodeSteps[nodes.Member] =
+    new NodeSteps(raw.out(EdgeTypes.REF).cast[nodes.Member])
 
 }

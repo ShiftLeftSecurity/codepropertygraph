@@ -35,7 +35,7 @@ class Type(raw: GremlinScala[nodes.Type]) extends NodeSteps[nodes.Type](raw) {
   /**
     * Member variables of the corresponding type declaration.
     * */
-  def member: Member =
+  def member: NodeSteps[nodes.Member] =
     referencedTypeDecl.member
 
   /**

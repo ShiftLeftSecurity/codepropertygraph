@@ -53,8 +53,8 @@ class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
   /**
     * Member variables
     * */
-  def member: Member =
-    new Member(canonicalType.raw.out().hasLabel(NodeTypes.MEMBER).cast[nodes.Member])
+  def member: NodeSteps[nodes.Member] =
+    new NodeSteps(canonicalType.raw.out().hasLabel(NodeTypes.MEMBER).cast[nodes.Member])
 
   /**
     * Direct base types in the inheritance graph.
