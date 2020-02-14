@@ -10,10 +10,9 @@ import org.apache.tinkerpop.gremlin.structure.Direction
 /**
   * Type declaration - possibly a template that requires instantiation
   * */
-class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
-    extends NodeSteps[nodes.TypeDecl](raw)
-    with ModifierAccessors[nodes.TypeDecl] {
+class TypeDecl(val wrapped: NodeSteps[nodes.TypeDecl]) extends ModifierAccessors[nodes.TypeDecl] {
   import TypeDecl._
+  override val raw: GremlinScala[nodes.TypeDecl] = wrapped.raw
 
   /**
     * Types referencing to this type declaration.
@@ -72,19 +71,19 @@ class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
     * Direct and transitive base type declaration.
     * */
   def derivedTypeDeclTransitive: NodeSteps[nodes.TypeDecl] =
-    repeat(_.derivedTypeDecl).emit()
+    wrapped.repeat(_.derivedTypeDecl).emit()
 
   /**
     * Direct base type declaration.
     */
   def baseTypeDecl: NodeSteps[nodes.TypeDecl] =
-    baseType.referencedTypeDecl
+    wrapped.baseType.referencedTypeDecl
 
   /**
     * Direct and transitive base type declaration.
     */
   def baseTypeDeclTransitive: NodeSteps[nodes.TypeDecl] =
-    repeat(_.baseTypeDecl).emit()
+    wrapped.repeat(_.baseTypeDecl).emit()
 
   /**
     * Traverse to methods bound to this type decl.
@@ -167,7 +166,7 @@ class TypeDecl(raw: GremlinScala[nodes.TypeDecl])
     *  Direct and transitive alias type declarations.
     */
   def aliasTypeDeclTransitive: NodeSteps[nodes.TypeDecl] =
-    repeat(_.aliasTypeDecl).emit()
+    wrapped.repeat(_.aliasTypeDecl).emit()
 
 }
 

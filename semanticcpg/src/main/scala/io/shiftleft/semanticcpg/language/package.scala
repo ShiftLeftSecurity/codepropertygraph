@@ -78,8 +78,7 @@ package object language {
   implicit def toType(steps: Steps[nodes.Type]): Type =
     new Type(steps.raw)
 
-  implicit def toTypeDecl(steps: Steps[nodes.TypeDecl]): TypeDecl =
-    new TypeDecl(steps.raw)
+  implicit def toTypeDecl(steps: Steps[nodes.TypeDecl]): TypeDecl = new TypeDecl(steps)
 
   implicit def toCall(steps: Steps[nodes.Call]): OriginalCall =
     new OriginalCall(steps.raw)
