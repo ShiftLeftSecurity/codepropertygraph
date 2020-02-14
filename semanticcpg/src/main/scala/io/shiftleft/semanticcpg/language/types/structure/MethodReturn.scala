@@ -12,24 +12,24 @@ class MethodReturn(raw: GremlinScala[nodes.MethodReturn])
     extends NodeSteps[nodes.MethodReturn](raw)
     with EvalTypeAccessors[nodes.MethodReturn] {
 
-  def method: Method =
-    new Method(raw.in(EdgeTypes.AST).cast[nodes.Method])
+  def method: NodeSteps[nodes.Method] =
+    new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.Method])
 
-  def returnUser: Call =
-    new Call(raw.in(EdgeTypes.AST).in(EdgeTypes.CALL).cast[nodes.Call])
+  def returnUser: NodeSteps[nodes.Call] =
+    new NodeSteps(raw.in(EdgeTypes.AST).in(EdgeTypes.CALL).cast[nodes.Call])
 
   /**
     *  Traverse to last expressions in CFG.
     *  Can be multiple.
     */
-  def cfgLast: Expression[nodes.Expression] =
-    new Expression(raw.in(EdgeTypes.CFG).cast[nodes.Expression])
+  def cfgLast: NodeSteps[nodes.Expression] =
+    new NodeSteps(raw.in(EdgeTypes.CFG).cast[nodes.Expression])
 
   /**
     * Traverse to return type
     * */
-  def typ: Type =
-    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+  def typ: NodeSteps[nodes.Type] =
+    new NodeSteps(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 
   def toReturn: NodeSteps[nodes.Return] =
     new NodeSteps(raw.flatMap { mr =>

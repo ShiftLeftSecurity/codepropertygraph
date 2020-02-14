@@ -13,8 +13,8 @@ class Namespace(raw: GremlinScala[nodes.Namespace]) extends NodeSteps[nodes.Name
   /**
     * The type declarations defined in this namespace
     * */
-  def typeDecl: TypeDecl =
-    new TypeDecl(
+  def typeDecl: NodeSteps[nodes.TypeDecl] =
+    new NodeSteps(
       raw
         .in(EdgeTypes.REF)
         .out(EdgeTypes.AST)
@@ -24,8 +24,8 @@ class Namespace(raw: GremlinScala[nodes.Namespace]) extends NodeSteps[nodes.Name
   /**
     * Methods defined in this namespace
     * */
-  def method: Method =
-    new Method(
+  def method: NodeSteps[nodes.Method] =
+    new NodeSteps(
       raw
         .in(EdgeTypes.REF)
         .out(EdgeTypes.AST)
@@ -36,14 +36,14 @@ class Namespace(raw: GremlinScala[nodes.Namespace]) extends NodeSteps[nodes.Name
     * External namespaces - any namespaces
     * which contain one or more external type.
     * */
-  def external: Namespace =
-    new Namespace(filter(_.typeDecl.external).raw)
+  def external: NodeSteps[nodes.Namespace] =
+    new NodeSteps(filter(_.typeDecl.external).raw)
 
   /**
     * Internal namespaces - any namespaces
     * which contain one or more internal type
     * */
-  def internal: Namespace =
-    new Namespace(filter(_.typeDecl.internal).raw)
+  def internal: NodeSteps[nodes.Namespace] =
+    new NodeSteps(filter(_.typeDecl.internal).raw)
 
 }

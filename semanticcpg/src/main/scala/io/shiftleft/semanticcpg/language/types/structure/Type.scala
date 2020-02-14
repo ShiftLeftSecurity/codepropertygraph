@@ -11,25 +11,25 @@ class Type(raw: GremlinScala[nodes.Type]) extends NodeSteps[nodes.Type](raw) {
   /**
     * Namespaces in which the corresponding type declaration is defined.
     * */
-  def namespace: Namespace =
+  def namespace: NodeSteps[nodes.Namespace] =
     referencedTypeDecl.namespace
 
   /**
     * Methods defined on the corresponding type declaration.
     * */
-  def method: Method =
+  def method: NodeSteps[nodes.Method] =
     referencedTypeDecl.method
 
   /**
     * Filter for types whos corresponding type declaration is in the analyzed jar.
     * */
-  def internal: Type =
+  def internal: NodeSteps[nodes.Type] =
     filter(_.referencedTypeDecl.internal)
 
   /**
     * Filter for types whos corresponding type declaration is not in the analyzed jar.
     * */
-  def external: Type =
+  def external: NodeSteps[nodes.Type] =
     filter(_.referencedTypeDecl.external)
 
   /**
@@ -41,66 +41,62 @@ class Type(raw: GremlinScala[nodes.Type]) extends NodeSteps[nodes.Type](raw) {
   /**
     * Direct base types of the corresponding type declaration in the inheritance graph.
     * */
-  def baseType: Type =
+  def baseType: NodeSteps[nodes.Type] =
     referencedTypeDecl.baseType
 
   /**
     * Direct and transitive base types of the corresponding type declaration.
     * */
-  def baseTypeTransitive: Type = {
+  def baseTypeTransitive: NodeSteps[nodes.Type] =
     repeat(_.baseType).emit()
-  }
 
   /**
     * Direct derived types.
     * */
-  def derivedType: Type =
+  def derivedType: NodeSteps[nodes.Type] =
     derivedTypeDecl.referencingType
 
   /**
     * Direct and transitive derived types.
     * */
-  def derivedTypeTransitive: Type =
+  def derivedTypeTransitive: NodeSteps[nodes.Type] =
     repeat(_.derivedType).emit()
 
   /**
     * Type declaration which is referenced by this type.
     */
-  def referencedTypeDecl: TypeDecl =
-    new TypeDecl(raw.out(EdgeTypes.REF).cast[nodes.TypeDecl])
+  def referencedTypeDecl: NodeSteps[nodes.TypeDecl] =
+    new NodeSteps(raw.out(EdgeTypes.REF).cast[nodes.TypeDecl])
 
   /**
     * Type declarations which derive from this type.
     */
-  def derivedTypeDecl: TypeDecl =
-    new TypeDecl(raw.in(EdgeTypes.INHERITS_FROM).cast[nodes.TypeDecl])
+  def derivedTypeDecl: NodeSteps[nodes.TypeDecl] =
+    new NodeSteps(raw.in(EdgeTypes.INHERITS_FROM).cast[nodes.TypeDecl])
 
   /**
     * Direct alias type declarations.
     */
-  def aliasTypeDecl: TypeDecl = {
-    new TypeDecl(raw.in(EdgeTypes.ALIAS_OF).cast[nodes.TypeDecl])
-  }
+  def aliasTypeDecl: NodeSteps[nodes.TypeDecl] =
+    new NodeSteps(raw.in(EdgeTypes.ALIAS_OF).cast[nodes.TypeDecl])
 
   /**
     * Direct alias types.
     */
-  def aliasType: Type = {
+  def aliasType: NodeSteps[nodes.Type] =
     aliasTypeDecl.referencingType
-  }
 
   /**
     * Direct and transitive alias types.
     */
-  def aliasTypeTransitive: Type = {
+  def aliasTypeTransitive: NodeSteps[nodes.Type] =
     repeat(_.aliasType).emit()
-  }
 
   def localsOfType: NodeSteps[nodes.Local] =
     new NodeSteps(raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
 
-  def expressionOfType: Expression[nodes.Expression] =
-    new Expression(
+  def expressionOfType: NodeSteps[nodes.Expression] =
+    new NodeSteps(
       raw
         .in(EdgeTypes.EVAL_TYPE)
         .hasLabel(NodeTypes.IDENTIFIER, NodeTypes.CALL, NodeTypes.LITERAL)
