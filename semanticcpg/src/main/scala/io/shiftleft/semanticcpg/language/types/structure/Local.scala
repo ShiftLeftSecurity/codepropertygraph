@@ -8,7 +8,7 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 /**
   * A local variable
   * */
-class Local(raw: GremlinScala[nodes.Local]) extends NodeSteps[nodes.Local](raw) with EvalTypeAccessors[nodes.Local] {
+class Local(val wrapped: NodeSteps[nodes.Local]) extends AnyVal {
 
   /**
     * The method hosting this local variable
@@ -16,7 +16,7 @@ class Local(raw: GremlinScala[nodes.Local]) extends NodeSteps[nodes.Local](raw) 
   def method: NodeSteps[nodes.Method] = {
     // TODO The following line of code is here for backwards compatibility.
     // Use the lower commented out line once not required anymore.
-    new Method(raw.repeat(_.in(EdgeTypes.AST)).until(_.hasLabel(NodeTypes.METHOD)).cast[nodes.Method])
+    new NodeSteps(wrapped.raw.repeat(_.in(EdgeTypes.AST)).until(_.hasLabel(NodeTypes.METHOD)).cast[nodes.Method])
     //definingBlock.method
   }
 
@@ -24,13 +24,13 @@ class Local(raw: GremlinScala[nodes.Local]) extends NodeSteps[nodes.Local](raw) 
     * The block in which local is declared.
     */
   def definingBlock: NodeSteps[nodes.Block] =
-    new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.Block])
+    new NodeSteps(wrapped.raw.in(EdgeTypes.AST).cast[nodes.Block])
 
   /**
     * Places (identifier) where this local is being referenced
     * */
   def referencingIdentifiers: NodeSteps[nodes.Identifier] =
-    new NodeSteps(raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
+    new NodeSteps(wrapped.raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
     * The type of the local.
@@ -38,5 +38,5 @@ class Local(raw: GremlinScala[nodes.Local]) extends NodeSteps[nodes.Local](raw) 
     * Unfortunately, `type` is a keyword, so we use `typ` here.
     * */
   def typ: NodeSteps[nodes.Type] =
-    new NodeSteps(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+    new NodeSteps(wrapped.raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 }

@@ -161,8 +161,8 @@ class Method(override val raw: GremlinScala[nodes.Method])
   /**
     * Traverse to the methods local variables
     * */
-  def local: Local =
-    new Local(
+  def local: NodeSteps[nodes.Local] =
+    new NodeSteps(
       raw
         .out(EdgeTypes.CONTAINS)
         .hasLabel(NodeTypes.BLOCK)
