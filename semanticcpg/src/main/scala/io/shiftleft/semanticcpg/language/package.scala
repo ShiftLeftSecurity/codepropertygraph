@@ -103,7 +103,7 @@ package object language {
     new MethodParameter(steps.raw)
 
   implicit def toMethodParameterOut(steps: Steps[nodes.MethodParameterOut]): MethodParameterOut =
-    new MethodParameterOut(steps.raw)
+    new MethodParameterOut(steps)
 
   implicit def toMethodReturn(steps: Steps[nodes.MethodReturn]): MethodReturn =
     new MethodReturn(steps.raw)

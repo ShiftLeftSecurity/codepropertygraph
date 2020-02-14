@@ -7,13 +7,12 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
-class MethodParameterOut(raw: GremlinScala[nodes.MethodParameterOut])
-    extends NodeSteps[nodes.MethodParameterOut](raw)
-    with EvalTypeAccessors[nodes.MethodParameterOut] {
+class MethodParameterOut(val wrapped: NodeSteps[nodes.MethodParameterOut]) extends EvalTypeAccessors[nodes.MethodParameterOut] {
+  override def raw: GremlinScala[nodes.MethodParameterOut] = wrapped.raw
 
   /* method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
   def index(num: Int): NodeSteps[nodes.MethodParameterOut] =
-    this.order(num)
+    wrapped.order(num)
 
   /* get all parameters from (and including)
    * method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
@@ -51,4 +50,5 @@ class MethodParameterOut(raw: GremlinScala[nodes.MethodParameterOut])
     * */
   def typ: NodeSteps[nodes.Type] =
     new NodeSteps(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+
 }
