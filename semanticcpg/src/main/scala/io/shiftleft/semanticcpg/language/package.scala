@@ -272,7 +272,6 @@ package object language {
   implicit def toNodeStepsTag[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =
     new NodeSteps[NodeType](original.raw)
 
-  implicit def toTagTag(steps: Steps[nodes.Tag]): Tag =
-    new Tag(steps.raw)
+  implicit def toTagTag(steps: Steps[nodes.Tag]): Tag = new Tag(steps)
 
 }
