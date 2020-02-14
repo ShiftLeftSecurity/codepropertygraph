@@ -9,7 +9,9 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors.{EvalTypeAccess
 /**
   * A member variable of a class/type.
   * */
-class Member(val wrapped: NodeSteps[nodes.Member]) extends EvalTypeAccessors[nodes.Member] with ModifierAccessors[nodes.Member] {
+class Member(val wrapped: NodeSteps[nodes.Member])
+    extends EvalTypeAccessors[nodes.Member]
+    with ModifierAccessors[nodes.Member] {
   override val raw: GremlinScala[nodes.Member] = wrapped.raw
 
   /**

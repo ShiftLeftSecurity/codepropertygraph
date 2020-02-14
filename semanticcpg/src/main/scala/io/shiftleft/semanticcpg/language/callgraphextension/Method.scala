@@ -57,7 +57,9 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
     * */
   def callIn(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] =
     new NodeSteps(
-      wrapped.sideEffect(callResolver.resolveDynamicMethodCallSites).raw
+      wrapped
+        .sideEffect(callResolver.resolveDynamicMethodCallSites)
+        .raw
         .in(EdgeTypes.CALL)
         .cast[nodes.Call])
 
