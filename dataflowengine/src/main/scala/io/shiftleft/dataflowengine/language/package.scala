@@ -25,6 +25,6 @@ package object language {
   }
 
   implicit def trackingPointToAstBase(steps: NodeSteps[nodes.TrackingPoint]): AstNode[nodes.AstNode] =
-    new AstNode(steps.map(trackingPointToAstNode).raw)
+    new AstNode(steps.map(trackingPointToAstNode))
 
 }

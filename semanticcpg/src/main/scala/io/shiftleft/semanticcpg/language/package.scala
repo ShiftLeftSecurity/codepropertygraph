@@ -108,14 +108,11 @@ package object language {
 
   implicit def toNamespaceBlock(steps: Steps[nodes.NamespaceBlock]): NamespaceBlock = new NamespaceBlock(steps)
 
-  implicit def toExpression[A <: nodes.Expression](steps: Steps[A]): Expression[A] =
-    new Expression[A](steps.raw)
+  implicit def toExpression[A <: nodes.Expression](steps: Steps[A]): Expression[A] = new Expression[A](steps)
 
-  implicit def toCfgNode[A <: nodes.CfgNode](steps: Steps[A]): CfgNode[A] =
-    new CfgNode(steps.raw)
+  implicit def toCfgNode[A <: nodes.CfgNode](steps: Steps[A]): CfgNode[A] = new CfgNode(steps)
 
-  implicit def toAstNode[A <: nodes.AstNode](steps: Steps[A]): AstNode[A] =
-    new AstNode(steps.raw)
+  implicit def toAstNode[A <: nodes.AstNode](steps: Steps[A]): AstNode[A] = new AstNode(steps)
 
   implicit def toFile(steps: Steps[nodes.File]): File = new File(steps)
 
