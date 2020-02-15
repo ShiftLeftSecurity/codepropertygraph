@@ -2,15 +2,12 @@ package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.ControlStructure
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.AstNode
-import io.shiftleft.semanticcpg.language.types.structure.{Local, MethodParameter}
 import scala.jdk.CollectionConverters._
 import io.shiftleft.Implicits.JavaIteratorDeco
 
 class MethodMethods(val node: nodes.Method) extends AnyVal {
 
-  def parameter: MethodParameter =
+  def parameter: NodeSteps[nodes.MethodParameterIn] =
     node.start.parameter
 
   def methodReturn: nodes.MethodReturn =
@@ -19,10 +16,10 @@ class MethodMethods(val node: nodes.Method) extends AnyVal {
       .asJava
       .nextChecked
 
-  def local: Local =
+  def local: NodeSteps[nodes.Local] =
     node.start.local
 
-  def controlStructure: ControlStructure =
+  def controlStructure: NodeSteps[nodes.ControlStructure] =
     node.start.controlStructure
 
   def ast: NodeSteps[nodes.AstNode] =

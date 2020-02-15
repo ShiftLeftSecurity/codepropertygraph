@@ -7,29 +7,29 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
-class MethodParameterOut(raw: GremlinScala[nodes.MethodParameterOut])
-    extends NodeSteps[nodes.MethodParameterOut](raw)
-    with EvalTypeAccessors[nodes.MethodParameterOut] {
+class MethodParameterOut(val wrapped: NodeSteps[nodes.MethodParameterOut])
+    extends EvalTypeAccessors[nodes.MethodParameterOut] {
+  override def raw: GremlinScala[nodes.MethodParameterOut] = wrapped.raw
 
   /* method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
-  def index(num: Int): MethodParameterOut =
-    this.order(num)
+  def index(num: Int): NodeSteps[nodes.MethodParameterOut] =
+    wrapped.order(num)
 
   /* get all parameters from (and including)
    * method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
-  def indexFrom(num: Int): MethodParameterOut =
-    new MethodParameterOut(raw.has(NodeKeys.METHOD_PARAMETER_OUT.ORDER, P.gte(num: Integer)))
+  def indexFrom(num: Int): NodeSteps[nodes.MethodParameterOut] =
+    new NodeSteps(raw.has(NodeKeys.METHOD_PARAMETER_OUT.ORDER, P.gte(num: Integer)))
 
   /* get all parameters up to (and including)
    * method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
-  def indexTo[Out](num: Int): MethodParameterOut =
-    new MethodParameterOut(raw.has(NodeKeys.METHOD_PARAMETER_OUT.ORDER, P.lte(num: Integer)))
+  def indexTo[Out](num: Int): NodeSteps[nodes.MethodParameterOut] =
+    new NodeSteps(raw.has(NodeKeys.METHOD_PARAMETER_OUT.ORDER, P.lte(num: Integer)))
 
-  def method: Method =
-    new Method(raw.in(EdgeTypes.AST).cast[nodes.Method])
+  def method: NodeSteps[nodes.Method] =
+    new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.Method])
 
-  def argument: Expression[nodes.Expression] = {
-    new Expression(
+  def argument: NodeSteps[nodes.Expression] = {
+    new NodeSteps(
       raw
         .sack((_: Integer, node: nodes.MethodParameterOut) => node.value2(NodeKeys.ORDER))
         .in(EdgeTypes.AST)
@@ -43,12 +43,13 @@ class MethodParameterOut(raw: GremlinScala[nodes.MethodParameterOut])
     )
   }
 
-  def asInput: MethodParameter =
-    new MethodParameter(raw.in(EdgeTypes.PARAMETER_LINK).cast[nodes.MethodParameterIn])
+  def asInput: NodeSteps[nodes.MethodParameterIn] =
+    new NodeSteps(raw.in(EdgeTypes.PARAMETER_LINK).cast[nodes.MethodParameterIn])
 
   /**
     * Traverse to parameter type
     * */
-  def typ: Type =
-    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+  def typ: NodeSteps[nodes.Type] =
+    new NodeSteps(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+
 }

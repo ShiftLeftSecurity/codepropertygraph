@@ -11,22 +11,22 @@ import io.shiftleft.semanticcpg.language.types.structure.{Method, MethodParamete
 /**
   An expression (base type)
   */
-class Expression[A <: nodes.Expression](raw: GremlinScala[A])
-    extends NodeSteps[A](raw)
-    with ArgumentIndexAccessors[A]
+class Expression[A <: nodes.Expression](val wrapped: NodeSteps[A])
+    extends ArgumentIndexAccessors[A]
     with EvalTypeAccessors[A] {
+  override val raw: GremlinScala[A] = wrapped.raw
 
   /**
     Traverse to enclosing expression
     */
-  def expressionUp: Expression[nodes.Expression] =
-    new Expression(raw.in(EdgeTypes.AST).not(_.hasLabel(NodeTypes.LOCAL)).cast[nodes.Expression])
+  def expressionUp: NodeSteps[nodes.Expression] =
+    new NodeSteps(raw.in(EdgeTypes.AST).not(_.hasLabel(NodeTypes.LOCAL)).cast[nodes.Expression])
 
   /**
     Traverse to sub expressions
     */
-  def expressionDown: Expression[nodes.Expression] =
-    new Expression(
+  def expressionDown: NodeSteps[nodes.Expression] =
+    new NodeSteps(
       raw
         .out(EdgeTypes.AST)
         .not(_.hasLabel(NodeTypes.LOCAL))
@@ -35,33 +35,33 @@ class Expression[A <: nodes.Expression](raw: GremlinScala[A])
   /**
     If the expression is used as receiver for a call, this traverses to the call.
     */
-  def receivedCall: Call =
-    new Call(raw.in(EdgeTypes.RECEIVER).cast[nodes.Call])
+  def receivedCall: NodeSteps[nodes.Call] =
+    new NodeSteps(raw.in(EdgeTypes.RECEIVER).cast[nodes.Call])
 
   /**
     * Only those expressions which are (direct) arguments of a call
     * */
-  def isArgument: Expression[nodes.Expression] =
-    new Expression(raw.filter(_.in(EdgeTypes.ARGUMENT)).cast[nodes.Expression])
+  def isArgument: NodeSteps[nodes.Expression] =
+    new NodeSteps(raw.filter(_.in(EdgeTypes.ARGUMENT)).cast[nodes.Expression])
 
   /**
     * Traverse to surrounding call
     * */
-  def call: Call =
-    new Call(raw.repeat(_.in(EdgeTypes.ARGUMENT)).until(_.hasLabel(NodeTypes.CALL)).cast[nodes.Call])
+  def call: NodeSteps[nodes.Call] =
+    new NodeSteps(raw.repeat(_.in(EdgeTypes.ARGUMENT)).until(_.hasLabel(NodeTypes.CALL)).cast[nodes.Call])
 
   /**
   Traverse to related parameter
     */
   @deprecated("", "October 2019")
-  def toParameter: MethodParameter = parameter
+  def toParameter: NodeSteps[nodes.MethodParameterIn] = parameter
 
   /**
     Traverse to related parameter, if the expression is an argument to a call and the call
     can be resolved.
     */
-  def parameter: MethodParameter = {
-    new MethodParameter(
+  def parameter: NodeSteps[nodes.MethodParameterIn] =
+    new NodeSteps(
       raw
         .sack((sack: Integer, node: nodes.Expression) => node.value2(NodeKeys.ARGUMENT_INDEX))
         .in(EdgeTypes.ARGUMENT)
@@ -74,19 +74,18 @@ class Expression[A <: nodes.Expression](raw: GremlinScala[A])
         }
         .cast[nodes.MethodParameterIn]
     )
-  }
 
   /**
     Traverse to enclosing method
     */
-  def method: Method =
-    new Method(raw.in(EdgeTypes.CONTAINS).cast[nodes.Method])
+  def method: NodeSteps[nodes.Method] =
+    new NodeSteps(raw.in(EdgeTypes.CONTAINS).cast[nodes.Method])
 
   /**
     * Traverse to next expression in CFG.
     */
-  def cfgNext: Expression[nodes.Expression] =
-    new Expression(
+  def cfgNext: NodeSteps[nodes.Expression] =
+    new NodeSteps(
       raw
         .out(EdgeTypes.CFG)
         .filterNot(_.hasLabel(NodeTypes.METHOD_RETURN))
@@ -96,8 +95,8 @@ class Expression[A <: nodes.Expression](raw: GremlinScala[A])
   /**
     * Traverse to previous expression in CFG.
     */
-  def cfgPrev: Expression[nodes.Expression] =
-    new Expression(
+  def cfgPrev: NodeSteps[nodes.Expression] =
+    new NodeSteps(
       raw
         .in(EdgeTypes.CFG)
         .filterNot(_.hasLabel(NodeTypes.METHOD))
@@ -107,6 +106,7 @@ class Expression[A <: nodes.Expression](raw: GremlinScala[A])
   /**
     * Traverse to expression evaluation type
     * */
-  def typ: Type =
-    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+  def typ: NodeSteps[nodes.Type] =
+    new NodeSteps(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+
 }

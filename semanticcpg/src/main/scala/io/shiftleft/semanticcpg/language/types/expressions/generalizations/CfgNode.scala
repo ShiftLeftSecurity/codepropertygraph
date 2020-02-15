@@ -1,19 +1,17 @@
 package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 
-import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.structure.Method
 import io.shiftleft.semanticcpg.utils.ExpandTo
 
-class CfgNode[A <: nodes.CfgNode](raw: GremlinScala[A]) extends NodeSteps[A](raw) {
+class CfgNode[A <: nodes.CfgNode](val wrapped: NodeSteps[A]) extends AnyVal {
 
   /**
   Traverse to enclosing method
     */
-  def method: Method = {
-    new Method(
-      raw
+  def method: NodeSteps[nodes.Method] = {
+    new NodeSteps(
+      wrapped.raw
         .map {
           case method: nodes.Method =>
             method

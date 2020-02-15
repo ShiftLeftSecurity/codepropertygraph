@@ -6,102 +6,98 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
 
-class Type(raw: GremlinScala[nodes.Type]) extends NodeSteps[nodes.Type](raw) {
+class Type(val wrapped: NodeSteps[nodes.Type]) extends AnyVal {
 
   /**
     * Namespaces in which the corresponding type declaration is defined.
     * */
-  def namespace: Namespace =
+  def namespace: NodeSteps[nodes.Namespace] =
     referencedTypeDecl.namespace
 
   /**
     * Methods defined on the corresponding type declaration.
     * */
-  def method: Method =
+  def method: NodeSteps[nodes.Method] =
     referencedTypeDecl.method
 
   /**
     * Filter for types whos corresponding type declaration is in the analyzed jar.
     * */
-  def internal: Type =
-    filter(_.referencedTypeDecl.internal)
+  def internal: NodeSteps[nodes.Type] =
+    wrapped.filter(_.referencedTypeDecl.internal)
 
   /**
     * Filter for types whos corresponding type declaration is not in the analyzed jar.
     * */
-  def external: Type =
-    filter(_.referencedTypeDecl.external)
+  def external: NodeSteps[nodes.Type] =
+    wrapped.filter(_.referencedTypeDecl.external)
 
   /**
     * Member variables of the corresponding type declaration.
     * */
-  def member: Member =
+  def member: NodeSteps[nodes.Member] =
     referencedTypeDecl.member
 
   /**
     * Direct base types of the corresponding type declaration in the inheritance graph.
     * */
-  def baseType: Type =
+  def baseType: NodeSteps[nodes.Type] =
     referencedTypeDecl.baseType
 
   /**
     * Direct and transitive base types of the corresponding type declaration.
     * */
-  def baseTypeTransitive: Type = {
-    repeat(_.baseType).emit()
-  }
+  def baseTypeTransitive: NodeSteps[nodes.Type] =
+    wrapped.repeat(_.baseType).emit()
 
   /**
     * Direct derived types.
     * */
-  def derivedType: Type =
+  def derivedType: NodeSteps[nodes.Type] =
     derivedTypeDecl.referencingType
 
   /**
     * Direct and transitive derived types.
     * */
-  def derivedTypeTransitive: Type =
-    repeat(_.derivedType).emit()
+  def derivedTypeTransitive: NodeSteps[nodes.Type] =
+    wrapped.repeat(_.derivedType).emit()
 
   /**
     * Type declaration which is referenced by this type.
     */
-  def referencedTypeDecl: TypeDecl =
-    new TypeDecl(raw.out(EdgeTypes.REF).cast[nodes.TypeDecl])
+  def referencedTypeDecl: NodeSteps[nodes.TypeDecl] =
+    new NodeSteps(wrapped.raw.out(EdgeTypes.REF).cast[nodes.TypeDecl])
 
   /**
     * Type declarations which derive from this type.
     */
-  def derivedTypeDecl: TypeDecl =
-    new TypeDecl(raw.in(EdgeTypes.INHERITS_FROM).cast[nodes.TypeDecl])
+  def derivedTypeDecl: NodeSteps[nodes.TypeDecl] =
+    new NodeSteps(wrapped.raw.in(EdgeTypes.INHERITS_FROM).cast[nodes.TypeDecl])
 
   /**
     * Direct alias type declarations.
     */
-  def aliasTypeDecl: TypeDecl = {
-    new TypeDecl(raw.in(EdgeTypes.ALIAS_OF).cast[nodes.TypeDecl])
-  }
+  def aliasTypeDecl: NodeSteps[nodes.TypeDecl] =
+    new NodeSteps(wrapped.raw.in(EdgeTypes.ALIAS_OF).cast[nodes.TypeDecl])
 
   /**
     * Direct alias types.
     */
-  def aliasType: Type = {
+  def aliasType: NodeSteps[nodes.Type] =
     aliasTypeDecl.referencingType
-  }
 
   /**
     * Direct and transitive alias types.
     */
-  def aliasTypeTransitive: Type = {
-    repeat(_.aliasType).emit()
-  }
+  def aliasTypeTransitive: NodeSteps[nodes.Type] =
+    wrapped.repeat(_.aliasType).emit()
 
-  def localsOfType: Local =
-    new Local(raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
+  def localsOfType: NodeSteps[nodes.Local] =
+    new NodeSteps(wrapped.raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
 
-  def expressionOfType: Expression[nodes.Expression] =
-    new Expression(
-      raw
+  def expressionOfType: NodeSteps[nodes.Expression] =
+    new NodeSteps(
+      wrapped.raw
         .in(EdgeTypes.EVAL_TYPE)
         .hasLabel(NodeTypes.IDENTIFIER, NodeTypes.CALL, NodeTypes.LITERAL)
         .cast[nodes.Expression])

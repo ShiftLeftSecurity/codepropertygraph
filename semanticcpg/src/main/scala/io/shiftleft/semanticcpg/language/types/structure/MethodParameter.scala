@@ -10,39 +10,39 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 /**
   * Formal method input parameter
   * */
-class MethodParameter(raw: GremlinScala[nodes.MethodParameterIn])
-    extends NodeSteps[nodes.MethodParameterIn](raw)
-    with EvalTypeAccessors[nodes.MethodParameterIn] {
+class MethodParameter(val wrapped: NodeSteps[nodes.MethodParameterIn])
+    extends EvalTypeAccessors[nodes.MethodParameterIn] {
+  override def raw: GremlinScala[nodes.MethodParameterIn] = wrapped.raw
 
   /**
     * Traverse to all `num`th parameters
     * */
-  def index(num: Int): MethodParameter =
-    this.order(num)
+  def index(num: Int): NodeSteps[nodes.MethodParameterIn] =
+    wrapped.order(num)
 
   /**
     * Traverse to all parameters with index greater or equal than `num`
     * */
-  def indexFrom(num: Int): MethodParameter =
-    new MethodParameter(raw.has(NodeKeys.METHOD_PARAMETER_IN.ORDER, P.gte(num: Integer)))
+  def indexFrom(num: Int): NodeSteps[nodes.MethodParameterIn] =
+    new NodeSteps(raw.has(NodeKeys.METHOD_PARAMETER_IN.ORDER, P.gte(num: Integer)))
 
   /**
     * Traverse to all parameters with index smaller or equal than `num`
     * */
-  def indexTo(num: Int): MethodParameter =
-    new MethodParameter(raw.has(NodeKeys.METHOD_PARAMETER_IN.ORDER, P.lte(num: Integer)))
+  def indexTo(num: Int): NodeSteps[nodes.MethodParameterIn] =
+    new NodeSteps(raw.has(NodeKeys.METHOD_PARAMETER_IN.ORDER, P.lte(num: Integer)))
 
   /**
     * Traverse to method associated with this formal parameter
     * */
-  def method: Method =
-    new Method(raw.in(EdgeTypes.AST).cast[nodes.Method])
+  def method: NodeSteps[nodes.Method] =
+    new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.Method])
 
   /**
     * Traverse to arguments (actual parameters) associated with this formal parameter
     * */
-  def argument(): Expression[nodes.Expression] = {
-    new Expression(
+  def argument(): NodeSteps[nodes.Expression] = {
+    new NodeSteps(
       raw
         .sack((_: Integer, node: nodes.MethodParameterIn) => node.value2(NodeKeys.ORDER))
         .in(EdgeTypes.AST)
@@ -59,19 +59,19 @@ class MethodParameter(raw: GremlinScala[nodes.MethodParameterIn])
   /**
     * Traverse to corresponding formal output parameter
     * */
-  def asOutput: MethodParameterOut =
-    new MethodParameterOut(raw.out(EdgeTypes.PARAMETER_LINK).cast[nodes.MethodParameterOut])
+  def asOutput: NodeSteps[nodes.MethodParameterOut] =
+    new NodeSteps(raw.out(EdgeTypes.PARAMETER_LINK).cast[nodes.MethodParameterOut])
 
   /**
     * Places (identifier) where this parameter is being referenced
     * */
-  def referencingIdentifiers: IdentifierTrav =
-    new IdentifierTrav(raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
+  def referencingIdentifiers: NodeSteps[nodes.Identifier] =
+    new NodeSteps(raw.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
     * Traverse to parameter type
     * */
-  def typ: Type =
-    new Type(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
+  def typ: NodeSteps[nodes.Type] =
+    new NodeSteps(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 
 }

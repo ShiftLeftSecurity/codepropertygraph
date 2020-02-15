@@ -1,20 +1,19 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 
-class Binding(raw: GremlinScala[nodes.Binding]) extends NodeSteps[nodes.Binding](raw) {
+class Binding(val wrapped: NodeSteps[nodes.Binding]) extends AnyVal {
 
   /**
     * Traverse to the method bound by this method binding.
     */
-  def boundMethod: Method =
-    new Method(raw.out(EdgeTypes.REF).cast[nodes.Method])
+  def boundMethod: NodeSteps[nodes.Method] =
+    new NodeSteps(wrapped.raw.out(EdgeTypes.REF).cast[nodes.Method])
 
   /**
     * Traverse to the method bound by this method binding.
     */
-  def bindingTypeDecl: TypeDecl =
-    new TypeDecl(raw.in(EdgeTypes.BINDS).cast[nodes.TypeDecl])
+  def bindingTypeDecl: NodeSteps[nodes.TypeDecl] =
+    new NodeSteps(wrapped.raw.in(EdgeTypes.BINDS).cast[nodes.TypeDecl])
 }

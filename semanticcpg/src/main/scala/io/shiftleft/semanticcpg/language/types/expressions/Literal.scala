@@ -9,15 +9,14 @@ import io.shiftleft.semanticcpg.language.types.structure.Method
 /**
   A literal, e.g., a constant string or number
   */
-class Literal(raw: GremlinScala[nodes.Literal])
-    extends NodeSteps[nodes.Literal](raw)
-    with EvalTypeAccessors[nodes.Literal] {
+class Literal(val wrapped: NodeSteps[nodes.Literal]) extends EvalTypeAccessors[nodes.Literal] {
+  override val raw: GremlinScala[nodes.Literal] = wrapped.raw
 
   /**
     * Traverse to method hosting this literal
     * */
-  def method: Method =
-    new Method(
+  def method: NodeSteps[nodes.Method] =
+    new NodeSteps(
       raw
         .cast[nodes.StoredNode]
         .repeat(_.in(EdgeTypes.AST).cast[nodes.StoredNode])
