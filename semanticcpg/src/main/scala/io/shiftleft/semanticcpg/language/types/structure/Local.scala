@@ -1,12 +1,15 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
+import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.types.propertyaccessors.EvalTypeAccessors
 
 /**
   * A local variable
   * */
-class Local(val wrapped: NodeSteps[nodes.Local]) extends AnyVal {
+class Local(val wrapped: NodeSteps[nodes.Local]) extends EvalTypeAccessors[nodes.Local] {
+  override val raw: GremlinScala[nodes.Local] = wrapped.raw
 
   /**
     * The method hosting this local variable
