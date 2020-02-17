@@ -1,6 +1,5 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.Operators
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language.nodemethods.CallMethods
@@ -12,9 +11,9 @@ package object operatorextension {
     def subscripts: NodeSteps[nodes.Identifier] = call.argument(2).ast.isIdentifier
   }
 
-  implicit class ArrayAccessTrav(raw: GremlinScala[nodes.Call]) extends NodeSteps[nodes.Call](raw) {
-    def array: NodeSteps[nodes.Expression] = map(_.array)
-    def subscripts: NodeSteps[nodes.Identifier] = flatMap(_.subscripts)
+  implicit class ArrayAccessTrav(val wrapped: Steps[nodes.Call]) extends AnyVal {
+    def array: NodeSteps[nodes.Expression] = wrapped.map(_.array)
+    def subscripts: NodeSteps[nodes.Identifier] = wrapped.flatMap(_.subscripts)
   }
 
   implicit class AssignmentExt(val call: nodes.Call) extends AnyVal {
@@ -54,11 +53,11 @@ package object operatorextension {
 
   implicit class TargetExt(val expr: nodes.Expression) extends AnyVal {
     def isArrayAccess: NodeSteps[nodes.Call] =
-        expr.ast.isCall
-          .nameExact(Operators.computedMemberAccess,
-                     Operators.indirectComputedMemberAccess,
-                     Operators.indexAccess,
-                     Operators.indirectIndexAccess)
+      expr.ast.isCall
+        .nameExact(Operators.computedMemberAccess,
+                   Operators.indirectComputedMemberAccess,
+                   Operators.indexAccess,
+                   Operators.indirectIndexAccess)
   }
 
   implicit class TargetTrav(val wrapped: NodeSteps[nodes.Expression]) extends AnyVal {
