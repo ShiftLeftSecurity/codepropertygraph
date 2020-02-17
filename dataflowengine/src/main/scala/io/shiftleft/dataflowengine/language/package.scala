@@ -9,11 +9,11 @@ import io.shiftleft.semanticcpg.language.types.expressions.generalizations.AstNo
 
 package object language {
 
-  implicit def trackingPointBaseMethodsQp[NodeType <: nodes.TrackingPointBase](node: NodeType): TrackingPointMethods =
+  implicit def trackingPointBaseMethodsQp[NodeType <: nodes.TrackingPoint](node: NodeType): TrackingPointMethods =
     new TrackingPointMethods(node.asInstanceOf[nodes.TrackingPoint])
 
   implicit def toTrackingPoint[NodeType <: nodes.TrackingPointBase](steps: Steps[NodeType]): TrackingPoint =
-    new TrackingPoint(steps.raw.cast[nodes.TrackingPoint])
+    new TrackingPoint(new NodeSteps(steps.raw.cast[nodes.TrackingPoint]))
 
   implicit def trackingPointToAstNodeMethods(node: nodes.TrackingPoint) =
     new AstNodeMethods(trackingPointToAstNode(node))
