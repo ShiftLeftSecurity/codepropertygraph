@@ -31,16 +31,20 @@ package object operatorextension {
   }
 
   implicit class TargetExt(val expr: nodes.Expression) extends AnyVal {
-    def isArrayAccess: ArrayAccessTrav =
-      new ArrayAccessTrav(
+    def isArrayAccess: NodeSteps[nodes.Call] =
         expr.ast.isCall
           .nameExact(Operators.computedMemberAccess,
                      Operators.indirectComputedMemberAccess,
                      Operators.indexAccess,
                      Operators.indirectIndexAccess)
-          .raw)
   }
 
   implicit def toAssignmentTrav(steps: Steps[nodes.Call]): AssignmentTrav = new AssignmentTrav(steps)
 
+  implicit class TargetTrav(val wrapped: NodeSteps[nodes.Expression]) extends AnyVal {
+    def isArrayAccess: NodeSteps[nodes.Call] =
+      wrapped.flatMap(_.isArrayAccess)
+
+    def expr: NodeSteps[nodes.Expression] = wrapped.map(_.expr)
+  }
 }
