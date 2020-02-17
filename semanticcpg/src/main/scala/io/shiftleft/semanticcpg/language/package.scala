@@ -43,8 +43,7 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
   Implicit conversions to specific steps, based on the node at hand.
   Automatically in scope when using anything in the `steps` package, e.g. `Steps`
   */
-package object language {
-
+package object language extends operatorextension.Implicits {
   // Implicit conversions from generated node types. We use these to add methods
   // to generated node types.
 
@@ -244,18 +243,6 @@ package object language {
   implicit def toMethodDOTForCallGraph(steps: Steps[nodes.Method]): MethodDOT = new MethodDOT(steps)
   implicit def toCallForCallGraph(steps: Steps[nodes.Call]): Call = new Call(steps)
   // / Call graph extension
-
-  // Operator extension
-
-  import io.shiftleft.semanticcpg.language.operatorextension.{NodeTypeStarters => OpNodeTypeStarters}
-
-  implicit def toNodeTypeStartersOps(cpg: Cpg): OpNodeTypeStarters =
-    new OpNodeTypeStarters(cpg)
-
-  implicit def toOpsAstNodeTrav2(steps: Steps[nodes.AstNode]): operatorextension.OpAstNodeTrav =
-    new operatorextension.OpAstNodeTrav(steps)
-
-  // /Operator extension
 
   implicit def toNodeStepsTag[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =
     new NodeSteps[NodeType](original.raw)
