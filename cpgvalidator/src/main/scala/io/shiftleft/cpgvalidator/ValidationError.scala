@@ -1,6 +1,7 @@
 package io.shiftleft.cpgvalidator
 
 import gremlin.scala._
+import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.Cardinality
 import org.apache.tinkerpop.gremlin.structure.Direction
 
@@ -101,5 +102,21 @@ case class KeyError(node: Vertex, nodeKeyType: String, cardinality: Cardinality)
 
   override def getCategory: ValidationErrorCategory = {
     KeyErrorCategory(this)
+  }
+}
+
+case class CfgEdgeError(srcNode: Vertex, dstNode: Vertex, srcNodeMethod: Vertex, dstNodeMethod: Vertex)
+    extends ValidationError {
+
+  override def toString: String = {
+    s"Found invalid CFG edge which stretches over method boundaries.\n" +
+      "\t" + s"cfg edge start in method: ${srcNodeMethod.value2(NodeKeys.FULL_NAME)}\n" +
+      "\t" + s"cfg edge start: ${ErrorHelper.getNodeDetails(srcNode)}\n" +
+      "\t" + s"cfg edge end in method: ${dstNodeMethod.value2(NodeKeys.FULL_NAME)}\n" +
+      "\t" + s"cfg edge end: ${ErrorHelper.getNodeDetails(dstNode)}\n"
+  }
+
+  override def getCategory: ValidationErrorCategory = {
+    CfgEdgeErrorCategory(this)
   }
 }

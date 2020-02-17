@@ -52,3 +52,11 @@ object KeyErrorCategory {
 
 case class KeyErrorCategory(nodeLabel: String, nodeKeyType: String, cardinality: Cardinality)
     extends ValidationErrorCategory
+
+object CfgEdgeErrorCategory {
+  def apply(error: CfgEdgeError): CfgEdgeErrorCategory = {
+    CfgEdgeErrorCategory()
+  }
+}
+
+case class CfgEdgeErrorCategory() extends ValidationErrorCategory {}
