@@ -22,12 +22,12 @@ package object operatorextension {
     def source: nodes.Expression = new CallMethods(call).argument(2)
   }
 
-  implicit class AssignmentTrav(val wrapped: NodeSteps[nodes.Call]) extends AnyVal {
+  implicit class AssignmentTrav(val wrapped: Steps[nodes.Call]) extends AnyVal {
     def target: NodeSteps[nodes.Expression] = wrapped.map(_.target)
     def source: NodeSteps[nodes.Expression] = wrapped.map(_.source)
   }
 
-  implicit class OpAstNodeExt(val node: nodes.AstNode) extends AnyVal {
+  implicit class OpAstNodeExt[A <: nodes.AstNode](val node: A) extends AnyVal {
     def inAssignment: NodeSteps[nodes.Call] =
       node.start.inAstMinusLeaf.isCall.name(NodeTypeStarters.assignmentPattern)
 
@@ -41,6 +41,17 @@ package object operatorextension {
       node.ast.isCall.name(pattern)
   }
 
+  implicit class OpAstNodeTrav[A <: nodes.AstNode](val wrapped: Steps[A]) extends AnyVal {
+    def inAssignment: NodeSteps[nodes.Call] =
+      wrapped.flatMap(_.inAssignment)
+
+    def assignments: NodeSteps[nodes.Call] =
+      wrapped.flatMap(_.assignments)
+
+    def arithmetics: NodeSteps[nodes.Call] =
+      wrapped.flatMap(_.arithmetics)
+  }
+
   implicit class TargetExt(val expr: nodes.Expression) extends AnyVal {
     def isArrayAccess: NodeSteps[nodes.Call] =
         expr.ast.isCall
@@ -49,8 +60,6 @@ package object operatorextension {
                      Operators.indexAccess,
                      Operators.indirectIndexAccess)
   }
-
-  implicit def toAssignmentTrav(steps: Steps[nodes.Call]): AssignmentTrav = new AssignmentTrav(steps)
 
   implicit class TargetTrav(val wrapped: NodeSteps[nodes.Expression]) extends AnyVal {
     def isArrayAccess: NodeSteps[nodes.Call] =
