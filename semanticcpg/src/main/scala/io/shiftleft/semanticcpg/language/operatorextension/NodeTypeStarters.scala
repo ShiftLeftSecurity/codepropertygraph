@@ -10,12 +10,11 @@ object NodeTypeStarters {
 }
 
 class NodeTypeStarters(cpg: Cpg) {
-
   import NodeTypeStarters._
 
   def assignment: NodeSteps[nodes.Call] =
     cpg.call.name(assignmentPattern)
 
-  def arithmetic: ArithmeticTrav =
-    new ArithmeticTrav(cpg.call.name(arithmeticPattern).raw)
+  def arithmetic: NodeSteps[nodes.Call] =
+    cpg.call.name(arithmeticPattern)
 }
