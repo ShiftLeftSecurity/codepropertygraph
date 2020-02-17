@@ -6,6 +6,7 @@
         {"id" : 102, "name" : "METHOD_SHORT_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
         {"id" : 103, "name" : "PACKAGE_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
         {"id" : 104, "name" : "CLASS_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 132, "name" : "CLASS_SHORT_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
         {"id" : 105, "name" : "NODE_LABEL", "comment" : "", "valueType" : "string", "cardinality" : "one"},
 
         {"id" : 106, "name" : "FILENAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
@@ -101,7 +102,7 @@
 	{"id" : 215, "name" : "ROUTE", "comment" : "", "keys": ["PATH"], "outEdges" : []},
 	{"id" : 25,
          "name" : "LOCATION",
-         "keys" : ["SYMBOL", "METHOD_FULL_NAME", "METHOD_SHORT_NAME", "PACKAGE_NAME", "LINE_NUMBER", "CLASS_NAME", "NODE_LABEL", "FILENAME"],
+         "keys" : ["SYMBOL", "METHOD_FULL_NAME", "METHOD_SHORT_NAME", "PACKAGE_NAME", "LINE_NUMBER", "CLASS_NAME", "CLASS_SHORT_NAME", "NODE_LABEL", "FILENAME"],
          "comment" : "",
          "outEdges" : [],
          "containedNodes" : [

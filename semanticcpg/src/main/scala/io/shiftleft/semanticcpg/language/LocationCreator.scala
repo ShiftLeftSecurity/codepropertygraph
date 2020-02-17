@@ -113,10 +113,11 @@ object LocationCreator {
             method: nodes.Method): nodes.NewLocation = {
 
     if (method == null) {
-      new nodes.NewLocation("", "", "", "", None, "", "", "", Some(node))
+      new nodes.NewLocation("", "", "", "", None, "", "", "", "", Some(node))
     } else {
       val typeOption = ExpandTo.methodToTypeDecl(method).map(_.asInstanceOf[nodes.TypeDecl])
       val typeName = typeOption.map(_.fullName).getOrElse("")
+      val typeShortName = typeOption.map(_.name).getOrElse("")
 
       val namespaceOptionVertex = typeOption.flatMap(
         _.vertices(Direction.IN, EdgeTypes.AST).asScala
@@ -137,6 +138,7 @@ object LocationCreator {
         packageName = namespaceName,
         lineNumber = lineNumber,
         className = typeName,
+        classShortName = typeShortName,
         nodeLabel = label,
         filename = fileName,
         node = Some(node)
@@ -145,6 +147,6 @@ object LocationCreator {
   }
 
   def emptyLocation(label: String, node: Option[nodes.Node]): nodes.NewLocation = {
-    new nodes.NewLocation("", "", "", "", None, "", label, "", node)
+    new nodes.NewLocation("", "", "", "", None, "", "", label, "", node)
   }
 }
