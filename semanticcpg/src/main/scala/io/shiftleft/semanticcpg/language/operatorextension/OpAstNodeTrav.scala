@@ -7,7 +7,8 @@ import io.shiftleft.semanticcpg.language._
 class OpAstNodeTrav[NodeType <: nodes.AstNode](raw: GremlinScala[NodeType]) {
 
   def inAssignment: NodeSteps[nodes.Call] =
-    new NodeSteps(astNode.flatMap(_.inAssignment).raw)
+    astNode.flatMap(_.inAssignment)
+//    new NodeSteps(astNode.flatMap(_.inAssignment).raw)
 
   def assignments: AssignmentTrav =
     new NodeSteps(astNode.flatMap(_.assignments).raw)

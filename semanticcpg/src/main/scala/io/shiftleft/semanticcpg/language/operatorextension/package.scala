@@ -17,16 +17,14 @@ package object operatorextension {
   }
 
   implicit class OpAstNodeExt(val node: nodes.AstNode) extends AnyVal {
-    def inAssignment: AssignmentTrav =
-      new AssignmentTrav(
-        node.start.inAstMinusLeaf.isCall.name(NodeTypeStarters.assignmentPattern).raw
-      )
+    def inAssignment: NodeSteps[nodes.Call] =
+      node.start.inAstMinusLeaf.isCall.name(NodeTypeStarters.assignmentPattern)
 
-    def assignments: AssignmentTrav =
-      new AssignmentTrav(rawTravForPattern(NodeTypeStarters.assignmentPattern).raw)
+    def assignments: NodeSteps[nodes.Call] =
+      rawTravForPattern(NodeTypeStarters.assignmentPattern)
 
-    def arithmetics: ArithmeticTrav =
-      new ArithmeticTrav(rawTravForPattern(NodeTypeStarters.arithmeticPattern).raw)
+    def arithmetics: NodeSteps[nodes.Call] =
+      rawTravForPattern(NodeTypeStarters.arithmeticPattern)
 
     private def rawTravForPattern(pattern: String): NodeSteps[nodes.Call] =
       node.ast.isCall.name(pattern)
@@ -43,6 +41,6 @@ package object operatorextension {
           .raw)
   }
 
-  implicit def toAssignmentTrav(steps: Steps[nodes.Call]): AssignmentTrav = new AssignmentTrav(steps.raw)
+  implicit def toAssignmentTrav(steps: Steps[nodes.Call]): AssignmentTrav = new AssignmentTrav(steps)
 
 }
