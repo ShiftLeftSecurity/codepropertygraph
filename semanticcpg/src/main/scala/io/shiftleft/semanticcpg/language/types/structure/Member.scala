@@ -24,30 +24,6 @@ class Member(val wrapped: NodeSteps[nodes.Member]) extends EvalTypeAccessors[nod
     new NodeSteps(raw.in(EdgeTypes.REF).cast[nodes.Call])
 
   /**
-    * Public members
-    * */
-  def isPublic: NodeSteps[nodes.Member] =
-    wrapped.hasModifier(ModifierTypes.PUBLIC)
-
-  /**
-    * Private members
-    * */
-  def isPrivate: NodeSteps[nodes.Member] =
-    wrapped.hasModifier(ModifierTypes.PRIVATE)
-
-  /**
-    * Protected members
-    * */
-  def isProtected: NodeSteps[nodes.Member] =
-    wrapped.hasModifier(ModifierTypes.PROTECTED)
-
-  /**
-    * Static members
-    * */
-  def isStatic: NodeSteps[nodes.Member] =
-    wrapped.hasModifier(ModifierTypes.STATIC)
-
-  /**
     * Traverse to member type
     * */
   def typ: NodeSteps[nodes.Type] =

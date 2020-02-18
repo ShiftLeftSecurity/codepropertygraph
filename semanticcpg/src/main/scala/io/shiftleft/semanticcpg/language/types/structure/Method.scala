@@ -93,54 +93,6 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends EvalTypeAccessors[nod
     new NodeSteps(raw.filter(_.out(EdgeTypes.CFG)))
 
   /**
-    * Traverse to public methods
-    * */
-  def isPublic: NodeSteps[nodes.Method] =
-    wrapped.hasModifier(ModifierTypes.PUBLIC)
-
-  /**
-    * Traverse to private methods
-    * */
-  def isPrivate: NodeSteps[nodes.Method] =
-    wrapped.hasModifier(ModifierTypes.PRIVATE)
-
-  /**
-    * Traverse to protected methods
-    * */
-  def isProtected: NodeSteps[nodes.Method] =
-    wrapped.hasModifier(ModifierTypes.PROTECTED)
-
-  /**
-    * Traverse to abstract methods
-    * */
-  def isAbstract: NodeSteps[nodes.Method] =
-    wrapped.hasModifier(ModifierTypes.ABSTRACT)
-
-  /**
-    * Traverse to static methods
-    * */
-  def isStatic: NodeSteps[nodes.Method] =
-    wrapped.hasModifier(ModifierTypes.STATIC)
-
-  /**
-    * Traverse to native methods
-    * */
-  def isNative: NodeSteps[nodes.Method] =
-    wrapped.hasModifier(ModifierTypes.NATIVE)
-
-  /**
-    * Traverse to constructors, that is, keep methods that are constructors
-    * */
-  def isConstructor: NodeSteps[nodes.Method] =
-    wrapped.hasModifier(ModifierTypes.CONSTRUCTOR)
-
-  /**
-    * Traverse to virtual method
-    * */
-  def isVirtual: NodeSteps[nodes.Method] =
-    wrapped.hasModifier(ModifierTypes.VIRTUAL)
-
-  /**
     * Traverse to external methods, that is, methods not present
     * but only referenced in the CPG.
     * */
