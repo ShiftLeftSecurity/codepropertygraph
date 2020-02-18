@@ -22,7 +22,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
 
     new ParallelIteratorExecutor(methods).map { method =>
       val dstGraph = DiffGraph.newBuilder
-      var worklist = mutable.Set.empty[nodes.CfgNode]
+      val worklist = mutable.Set.empty[nodes.CfgNode]
       var out = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
       var in = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
       val allCfgNodes = method.cfgNode.to(List)
@@ -41,7 +41,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
 
       while (worklist.nonEmpty) {
         val currentCfgNode = worklist.head
-        worklist = worklist.tail
+        worklist -= currentCfgNode
 
         var inSet = Set.empty[nodes.StoredNode]
 
