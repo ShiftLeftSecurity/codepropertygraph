@@ -35,7 +35,7 @@ import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod}
 import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
-import io.shiftleft.semanticcpg.language.types.propertyaccessors._
+import io.shiftleft.semanticcpg.language.types.propertyaccessors.{ArgumentIndexAccessors, _}
 
 /**
   Language for traversing the code property graph
@@ -247,16 +247,11 @@ package object language extends operatorextension.Implicits {
   implicit def toNodeStepsTag[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =
     new NodeSteps[NodeType](original.raw)
 
-  implicit def toTagTag(steps: Steps[nodes.Tag]): Tag = new Tag(steps)
+  implicit def toTagTraversal(steps: Steps[nodes.Tag]): Tag = new Tag(steps)
 
-  // ~ Modifier accessors
-  implicit def toModifierAccessorsMember(steps: Steps[nodes.Member]): ModifierAccessors[nodes.Member] =
-    new ModifierAccessors(steps)
-  implicit def toModifierAccessorsMethod(steps: Steps[nodes.Method]): ModifierAccessors[nodes.Method] =
-    new ModifierAccessors(steps)
-  implicit def toModifierAccessorsTypeDecl(steps: Steps[nodes.TypeDecl]): ModifierAccessors[nodes.TypeDecl] =
-    new ModifierAccessors(steps)
-  // Modifier accessors ~
+  implicit def toArgumentIndexAccessors[NodeType <: nodes.Expression](
+      steps: Steps[NodeType]): ArgumentIndexAccessors[NodeType] =
+    new ArgumentIndexAccessors(steps)
 
   // ~ EvalType accessors
   implicit def toEvalTypeAccessorsExpression(steps: Steps[nodes.Expression]): EvalTypeAccessors[nodes.Expression] =
@@ -283,4 +278,14 @@ package object language extends operatorextension.Implicits {
       steps: Steps[nodes.MethodReturn]): EvalTypeAccessors[nodes.MethodReturn] =
     new EvalTypeAccessors(steps)
   // EvalType accessors ~
+
+  // ~ Modifier accessors
+  implicit def toModifierAccessorsMember(steps: Steps[nodes.Member]): ModifierAccessors[nodes.Member] =
+    new ModifierAccessors(steps)
+  implicit def toModifierAccessorsMethod(steps: Steps[nodes.Method]): ModifierAccessors[nodes.Method] =
+    new ModifierAccessors(steps)
+  implicit def toModifierAccessorsTypeDecl(steps: Steps[nodes.TypeDecl]): ModifierAccessors[nodes.TypeDecl] =
+    new ModifierAccessors(steps)
+  // Modifier accessors ~
+
 }
