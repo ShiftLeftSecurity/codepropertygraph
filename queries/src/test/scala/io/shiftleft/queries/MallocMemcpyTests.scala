@@ -2,7 +2,6 @@ package io.shiftleft.queries
 
 import io.shiftleft.dataflowengine.language.{DataFlowCodeToCpgFixture, _}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.operatorextension._
 import org.scalatest.{Matchers, WordSpec}
 
 class MallocMemcpyTests extends WordSpec with Matchers {
