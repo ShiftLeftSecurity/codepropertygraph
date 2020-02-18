@@ -9,9 +9,7 @@ import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 /**
   * A method, function, or procedure
   * */
-class Method(val wrapped: NodeSteps[nodes.Method])
-    extends EvalTypeAccessors[nodes.Method]
-    with ModifierAccessors[nodes.Method] {
+class Method(val wrapped: NodeSteps[nodes.Method]) extends EvalTypeAccessors[nodes.Method] {
   override val raw: GremlinScala[nodes.Method] = wrapped.raw
 
   /**
@@ -98,49 +96,49 @@ class Method(val wrapped: NodeSteps[nodes.Method])
     * Traverse to public methods
     * */
   def isPublic: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.PUBLIC)
+    wrapped.hasModifier(ModifierTypes.PUBLIC)
 
   /**
     * Traverse to private methods
     * */
   def isPrivate: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.PRIVATE)
+    wrapped.hasModifier(ModifierTypes.PRIVATE)
 
   /**
     * Traverse to protected methods
     * */
   def isProtected: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.PROTECTED)
+    wrapped.hasModifier(ModifierTypes.PROTECTED)
 
   /**
     * Traverse to abstract methods
     * */
   def isAbstract: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.ABSTRACT)
+    wrapped.hasModifier(ModifierTypes.ABSTRACT)
 
   /**
     * Traverse to static methods
     * */
   def isStatic: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.STATIC)
+    wrapped.hasModifier(ModifierTypes.STATIC)
 
   /**
     * Traverse to native methods
     * */
   def isNative: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.NATIVE)
+    wrapped.hasModifier(ModifierTypes.NATIVE)
 
   /**
     * Traverse to constructors, that is, keep methods that are constructors
     * */
   def isConstructor: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.CONSTRUCTOR)
+    wrapped.hasModifier(ModifierTypes.CONSTRUCTOR)
 
   /**
     * Traverse to virtual method
     * */
   def isVirtual: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.VIRTUAL)
+    wrapped.hasModifier(ModifierTypes.VIRTUAL)
 
   /**
     * Traverse to external methods, that is, methods not present

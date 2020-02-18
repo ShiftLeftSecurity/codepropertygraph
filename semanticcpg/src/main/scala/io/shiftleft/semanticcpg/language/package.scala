@@ -249,4 +249,13 @@ package object language extends operatorextension.Implicits {
 
   implicit def toTagTag(steps: Steps[nodes.Tag]): Tag = new Tag(steps)
 
+  // ~ Modifier accessors
+  implicit def toModifierAccessorsMember(steps: Steps[nodes.Member]): ModifierAccessors[nodes.Member] =
+    new ModifierAccessors(steps)
+  implicit def toModifierAccessorsMethod(steps: Steps[nodes.Method]): ModifierAccessors[nodes.Method] =
+    new ModifierAccessors(steps)
+  implicit def toModifierAccessorsTypeDecl(steps: Steps[nodes.TypeDecl]): ModifierAccessors[nodes.TypeDecl] =
+    new ModifierAccessors(steps)
+  // Modifier accessors ~
+
 }

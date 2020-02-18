@@ -4,15 +4,14 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.ModifierAccessors
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 /**
   * Type declaration - possibly a template that requires instantiation
   * */
-class TypeDecl(val wrapped: NodeSteps[nodes.TypeDecl]) extends ModifierAccessors[nodes.TypeDecl] {
+class TypeDecl(val wrapped: NodeSteps[nodes.TypeDecl]) extends AnyVal {
   import TypeDecl._
-  override val raw: GremlinScala[nodes.TypeDecl] = wrapped.raw
+  def raw: GremlinScala[nodes.TypeDecl] = wrapped.raw
 
   /**
     * Types referencing to this type declaration.
