@@ -4,13 +4,12 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
 /**
   * A method, function, or procedure
   * */
-class Method(val wrapped: NodeSteps[nodes.Method]) extends EvalTypeAccessors[nodes.Method] {
-  override val raw: GremlinScala[nodes.Method] = wrapped.raw
+class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
+  def raw: GremlinScala[nodes.Method] = wrapped.raw
 
   /**
     * Traverse to parameters of the method

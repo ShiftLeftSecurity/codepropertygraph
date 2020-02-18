@@ -3,16 +3,12 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.IdentifierTrav
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
-import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
 /**
   * Formal method input parameter
   * */
-class MethodParameter(val wrapped: NodeSteps[nodes.MethodParameterIn])
-    extends EvalTypeAccessors[nodes.MethodParameterIn] {
-  override def raw: GremlinScala[nodes.MethodParameterIn] = wrapped.raw
+class MethodParameter(val wrapped: NodeSteps[nodes.MethodParameterIn]) extends AnyVal {
+  def raw: GremlinScala[nodes.MethodParameterIn] = wrapped.raw
 
   /**
     * Traverse to all `num`th parameters

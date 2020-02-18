@@ -1,15 +1,11 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.EdgeTypes
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.Call
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.EvalTypeAccessors
 
-class MethodReturn(val wrapped: NodeSteps[nodes.MethodReturn]) extends EvalTypeAccessors[nodes.MethodReturn] {
-  override val raw: GremlinScala[nodes.MethodReturn] = wrapped.raw
+class MethodReturn(val wrapped: NodeSteps[nodes.MethodReturn]) extends AnyVal {
+  def raw: GremlinScala[nodes.MethodReturn] = wrapped.raw
 
   def method: NodeSteps[nodes.Method] =
     new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.Method])

@@ -258,4 +258,29 @@ package object language extends operatorextension.Implicits {
     new ModifierAccessors(steps)
   // Modifier accessors ~
 
+  // ~ EvalType accessors
+  implicit def toEvalTypeAccessorsExpression(steps: Steps[nodes.Expression]): EvalTypeAccessors[nodes.Expression] =
+    new EvalTypeAccessors(steps)
+  implicit def toEvalTypeAccessorsIdentifier(steps: Steps[nodes.Identifier]): EvalTypeAccessors[nodes.Identifier] =
+    new EvalTypeAccessors(steps)
+  implicit def toEvalTypeAccessorsCall(steps: Steps[nodes.Call]): EvalTypeAccessors[nodes.Call] =
+    new EvalTypeAccessors(steps)
+  implicit def toEvalTypeAccessorsLiteral(steps: Steps[nodes.Literal]): EvalTypeAccessors[nodes.Literal] =
+    new EvalTypeAccessors(steps)
+  implicit def toEvalTypeAccessorsLocal(steps: Steps[nodes.Local]): EvalTypeAccessors[nodes.Local] =
+    new EvalTypeAccessors(steps)
+  implicit def toEvalTypeAccessorsMember(steps: Steps[nodes.Member]): EvalTypeAccessors[nodes.Member] =
+    new EvalTypeAccessors(steps)
+  implicit def toEvalTypeAccessorsMethod(steps: Steps[nodes.Method]): EvalTypeAccessors[nodes.Method] =
+    new EvalTypeAccessors(steps)
+  implicit def toEvalTypeAccessorsMethodParameterIn(
+      steps: Steps[nodes.MethodParameterIn]): EvalTypeAccessors[nodes.MethodParameterIn] =
+    new EvalTypeAccessors(steps)
+  implicit def toEvalTypeAccessorsMethodParameterOut(
+      steps: Steps[nodes.MethodParameterOut]): EvalTypeAccessors[nodes.MethodParameterOut] =
+    new EvalTypeAccessors(steps)
+  implicit def toEvalTypeAccessorsMethodReturn(
+      steps: Steps[nodes.MethodReturn]): EvalTypeAccessors[nodes.MethodReturn] =
+    new EvalTypeAccessors(steps)
+  // EvalType accessors ~
 }

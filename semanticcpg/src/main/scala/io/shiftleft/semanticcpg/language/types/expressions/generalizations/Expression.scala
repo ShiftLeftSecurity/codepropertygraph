@@ -11,9 +11,7 @@ import io.shiftleft.semanticcpg.language.types.structure.{Method, MethodParamete
 /**
   An expression (base type)
   */
-class Expression[A <: nodes.Expression](val wrapped: NodeSteps[A])
-    extends ArgumentIndexAccessors[A]
-    with EvalTypeAccessors[A] {
+class Expression[A <: nodes.Expression](val wrapped: NodeSteps[A]) extends ArgumentIndexAccessors[A] {
   override val raw: GremlinScala[A] = wrapped.raw
 
   /**

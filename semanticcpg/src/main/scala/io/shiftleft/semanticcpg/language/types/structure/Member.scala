@@ -3,13 +3,12 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.semanticcpg.language.{NodeSteps, _}
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.EvalTypeAccessors
 
 /**
   * A member variable of a class/type.
   * */
-class Member(val wrapped: NodeSteps[nodes.Member]) extends EvalTypeAccessors[nodes.Member] {
-  override val raw: GremlinScala[nodes.Member] = wrapped.raw
+class Member(val wrapped: NodeSteps[nodes.Member]) extends AnyVal {
+  def raw: GremlinScala[nodes.Member] = wrapped.raw
 
   /**
     * The type declaration this member is defined in

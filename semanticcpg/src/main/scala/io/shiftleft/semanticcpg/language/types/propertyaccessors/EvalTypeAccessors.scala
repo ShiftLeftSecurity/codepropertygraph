@@ -6,72 +6,72 @@ import io.shiftleft.codepropertygraph.predicates.Text.textRegex
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
 
-trait EvalTypeAccessors[A <: StoredNode] {
-  def raw: GremlinScala[A]
+class EvalTypeAccessors[NodeType <: StoredNode](val wrapped: NodeSteps[NodeType]) extends AnyVal {
+  def raw: GremlinScala[NodeType] = wrapped.raw
 
   def evalType(): Steps[String] =
     new Steps[String](raw.out(EdgeTypes.EVAL_TYPE).out(EdgeTypes.REF).value(NodeKeys.FULL_NAME))
 
-  def evalType(_value: String): NodeSteps[A] =
-    new NodeSteps[A](
+  def evalType(_value: String): NodeSteps[NodeType] =
+    new NodeSteps[NodeType](
       raw.filter(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
           .has(NodeKeys.FULL_NAME, textRegex(_value))))
 
-  def evalType(_values: String*): NodeSteps[A] =
+  def evalType(_values: String*): NodeSteps[NodeType] =
     if (_values.nonEmpty) {
-      new NodeSteps[A](
+      new NodeSteps[NodeType](
         raw.filter(
           _.out(EdgeTypes.EVAL_TYPE)
             .out(EdgeTypes.REF)
-            .asInstanceOf[GremlinScala[A]]
-            .or(_values.map { _value => (trav: GremlinScala[A]) =>
+            .asInstanceOf[GremlinScala[NodeType]]
+            .or(_values.map { _value => (trav: GremlinScala[NodeType]) =>
               trav.has(NodeKeys.FULL_NAME, textRegex(_value))
             }: _*)))
     } else {
-      new NodeSteps[A](raw.filterOnEnd(_ => false))
+      new NodeSteps[NodeType](raw.filterOnEnd(_ => false))
     }
 
-  def evalTypeExact(_value: String): NodeSteps[A] =
-    new NodeSteps[A](
+  def evalTypeExact(_value: String): NodeSteps[NodeType] =
+    new NodeSteps[NodeType](
       raw.filter(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
           .has(NodeKeys.FULL_NAME, _value)))
 
-  def evalTypeExact(_values: String*): NodeSteps[A] =
+  def evalTypeExact(_values: String*): NodeSteps[NodeType] =
     if (_values.nonEmpty) {
-      new NodeSteps[A](
+      new NodeSteps[NodeType](
         raw.filter(
           _.out(EdgeTypes.EVAL_TYPE)
             .out(EdgeTypes.REF)
-            .asInstanceOf[GremlinScala[A]]
-            .or(_values.map { _value => (trav: GremlinScala[A]) =>
+            .asInstanceOf[GremlinScala[NodeType]]
+            .or(_values.map { _value => (trav: GremlinScala[NodeType]) =>
               trav.has(NodeKeys.FULL_NAME, _value)
             }: _*)))
     } else {
-      new NodeSteps[A](raw.filterOnEnd(_ => false))
+      new NodeSteps[NodeType](raw.filterOnEnd(_ => false))
     }
 
-  def evalTypeNot(_value: String): NodeSteps[A] =
-    new NodeSteps[A](
+  def evalTypeNot(_value: String): NodeSteps[NodeType] =
+    new NodeSteps[NodeType](
       raw.filter(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
           .hasNot(NodeKeys.FULL_NAME, textRegex(_value))))
 
-  def evalTypeNot(_values: String*): NodeSteps[A] =
+  def evalTypeNot(_values: String*): NodeSteps[NodeType] =
     if (_values.nonEmpty) {
-      new NodeSteps[A](
+      new NodeSteps[NodeType](
         raw.filter(
           _.out(EdgeTypes.EVAL_TYPE)
             .out(EdgeTypes.REF)
-            .asInstanceOf[GremlinScala[A]]
-            .or(_values.map { _value => (trav: GremlinScala[A]) =>
+            .asInstanceOf[GremlinScala[NodeType]]
+            .or(_values.map { _value => (trav: GremlinScala[NodeType]) =>
               trav.hasNot(NodeKeys.FULL_NAME, textRegex(_value))
             }: _*)))
     } else {
-      new NodeSteps[A](raw)
+      new NodeSteps[NodeType](raw)
     }
 }
