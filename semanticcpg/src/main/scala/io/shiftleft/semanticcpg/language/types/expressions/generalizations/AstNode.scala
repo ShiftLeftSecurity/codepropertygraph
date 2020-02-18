@@ -1,16 +1,18 @@
 package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 
+import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language._
 
 class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
+  private def raw: GremlinScala[A] = wrapped.raw
 
   /**
     * Nodes of the AST rooted in this node, including the node itself.
     * */
   def ast: NodeSteps[nodes.AstNode] =
-    new NodeSteps(wrapped.raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
+    new NodeSteps(raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
 
   def containsCallTo(regex: String): NodeSteps[A] =
     wrapped.where(_.ast.isCall.name(regex).size > 0)
@@ -25,19 +27,19 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
     * Nodes of the AST rooted in this node, minus the node itself
     * */
   def astMinusRoot: NodeSteps[nodes.AstNode] =
-    new NodeSteps(wrapped.raw.repeat(_.out(EdgeTypes.AST)).emit.cast[nodes.AstNode])
+    new NodeSteps(raw.repeat(_.out(EdgeTypes.AST)).emit.cast[nodes.AstNode])
 
   /**
     * Direct children of node in the AST
     * */
   def astChildren: NodeSteps[nodes.AstNode] =
-    new NodeSteps(wrapped.raw.out(EdgeTypes.AST).cast[nodes.AstNode])
+    new NodeSteps(raw.out(EdgeTypes.AST).cast[nodes.AstNode])
 
   /**
     * Parent AST node
     * */
   def astParent: NodeSteps[nodes.AstNode] =
-    new NodeSteps(wrapped.raw.in(EdgeTypes.AST).cast[nodes.AstNode])
+    new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.AstNode])
 
   /**
     * Nodes of the AST obtained by expanding AST edges backwards until the method root is reached
@@ -56,7 +58,7 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
     * */
   def inAst(root: nodes.AstNode): NodeSteps[nodes.AstNode] =
     new NodeSteps(
-      wrapped.raw.emit
+      raw.emit
         .until(_.or(_.hasLabel(NodeTypes.METHOD), _.filterOnEnd(n => root != null && root == n)))
         .repeat(_.in(EdgeTypes.AST))
         .cast[nodes.AstNode])
@@ -67,7 +69,7 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
     * */
   def inAstMinusLeaf(root: nodes.AstNode): NodeSteps[nodes.AstNode] =
     new NodeSteps(
-      wrapped.raw
+      raw
         .until(_.or(_.hasLabel(NodeTypes.METHOD), _.filterOnEnd(n => root != null && root == n)))
         .repeat(_.in(EdgeTypes.AST))
         .emit
@@ -79,37 +81,37 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
     * "member access operation", e.g., "<operator>.memberAccess".
     * */
   def parentExpression: NodeSteps[nodes.Expression] =
-    new NodeSteps(wrapped.raw.map(_.parentExpression))
+    new NodeSteps(raw.map(_.parentExpression))
 
   /**
     * Traverse only to those AST nodes that are also control flow graph nodes
     * */
   def isCfgNode: NodeSteps[nodes.CfgNode] =
-    new NodeSteps(wrapped.raw.filterOnEnd(_.isInstanceOf[nodes.CfgNode]).cast[nodes.CfgNode])
+    new NodeSteps(raw.filterOnEnd(_.isInstanceOf[nodes.CfgNode]).cast[nodes.CfgNode])
 
   /**
     * Traverse only to those AST nodes that are blocks
     * */
   def isBlock: NodeSteps[nodes.Block] =
-    new NodeSteps(wrapped.raw.hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
+    new NodeSteps(raw.hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
 
   /**
     * Traverse only to those AST nodes that are control structures
     * */
   def isControlStructure: NodeSteps[nodes.ControlStructure] =
-    new NodeSteps(wrapped.raw.hasLabel(NodeTypes.CONTROL_STRUCTURE).cast[nodes.ControlStructure])
+    new NodeSteps(raw.hasLabel(NodeTypes.CONTROL_STRUCTURE).cast[nodes.ControlStructure])
 
   /**
     * Traverse only to AST nodes that are expressions
     * */
   def isExpression: NodeSteps[nodes.Expression] =
-    new NodeSteps(wrapped.raw.filterOnEnd(_.isInstanceOf[nodes.Expression]).cast[nodes.Expression])
+    new NodeSteps(raw.filterOnEnd(_.isInstanceOf[nodes.Expression]).cast[nodes.Expression])
 
   /**
     * Traverse only to AST nodes that are calls
     * */
   def isCall: NodeSteps[nodes.Call] =
-    new NodeSteps(wrapped.raw.hasLabel(NodeTypes.CALL).cast[nodes.Call])
+    new NodeSteps(raw.hasLabel(NodeTypes.CALL).cast[nodes.Call])
 
   /**
   Cast to call if applicable and filter on call code `calleeRegex`
@@ -121,29 +123,29 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
     * Traverse only to AST nodes that are literals
     * */
   def isLiteral: NodeSteps[nodes.Literal] =
-    new NodeSteps(wrapped.raw.hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
+    new NodeSteps(raw.hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
 
   /**
     * Traverse only to AST nodes that are identifier
     * */
   def isIdentifier: NodeSteps[nodes.Identifier] =
-    new NodeSteps(wrapped.raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
+    new NodeSteps(raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
     * Traverse only to AST nodes that are return nodes
     * */
   def isReturn: NodeSteps[nodes.Return] =
-    new NodeSteps(wrapped.raw.hasLabel(NodeTypes.RETURN).cast[nodes.Return])
+    new NodeSteps(raw.hasLabel(NodeTypes.RETURN).cast[nodes.Return])
 
   /**
     * Traverse only to AST nodes that are method reference nodes.
     */
   def isMethodRef: NodeSteps[nodes.MethodRef] =
-    new NodeSteps(wrapped.raw.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef])
+    new NodeSteps(raw.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef])
 
   def walkAstUntilReaching(labels: List[String]): NodeSteps[nodes.StoredNode] =
     new NodeSteps[nodes.StoredNode](
-      wrapped.raw
+      raw
         .repeat(_.out(EdgeTypes.AST))
         .until(_.hasLabel(labels.head, labels.tail: _*))
         .emit

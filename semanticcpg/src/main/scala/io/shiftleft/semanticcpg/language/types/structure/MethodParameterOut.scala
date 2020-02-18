@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
 import io.shiftleft.semanticcpg.language._
 
 class MethodParameterOut(val wrapped: NodeSteps[nodes.MethodParameterOut]) extends AnyVal {
-  def raw: GremlinScala[nodes.MethodParameterOut] = wrapped.raw
+  private def raw: GremlinScala[nodes.MethodParameterOut] = wrapped.raw
 
   /* method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
   def index(num: Int): NodeSteps[nodes.MethodParameterOut] =

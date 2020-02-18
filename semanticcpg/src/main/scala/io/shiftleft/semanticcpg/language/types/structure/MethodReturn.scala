@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 
 class MethodReturn(val wrapped: NodeSteps[nodes.MethodReturn]) extends AnyVal {
-  def raw: GremlinScala[nodes.MethodReturn] = wrapped.raw
+  private def raw: GremlinScala[nodes.MethodReturn] = wrapped.raw
 
   def method: NodeSteps[nodes.Method] =
     new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.Method])

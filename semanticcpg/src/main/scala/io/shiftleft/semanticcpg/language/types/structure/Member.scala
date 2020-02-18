@@ -8,7 +8,7 @@ import io.shiftleft.semanticcpg.language.{NodeSteps, _}
   * A member variable of a class/type.
   * */
 class Member(val wrapped: NodeSteps[nodes.Member]) extends AnyVal {
-  def raw: GremlinScala[nodes.Member] = wrapped.raw
+  private def raw: GremlinScala[nodes.Member] = wrapped.raw
 
   /**
     * The type declaration this member is defined in

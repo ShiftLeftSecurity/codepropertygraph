@@ -13,7 +13,7 @@ import io.shiftleft.semanticcpg.language.types.structure.{Member, Method, Method
   A call site
   */
 class Call(val wrapped: NodeSteps[nodes.Call]) extends AnyVal {
-  def raw: GremlinScala[nodes.Call] = wrapped.raw
+  private def raw: GremlinScala[nodes.Call] = wrapped.raw
 
   /**
     Only statically dispatched calls

@@ -11,7 +11,7 @@ import org.apache.tinkerpop.gremlin.structure.Direction
   * */
 class TypeDecl(val wrapped: NodeSteps[nodes.TypeDecl]) extends AnyVal {
   import TypeDecl._
-  def raw: GremlinScala[nodes.TypeDecl] = wrapped.raw
+  private def raw: GremlinScala[nodes.TypeDecl] = wrapped.raw
 
   /**
     * Types referencing to this type declaration.

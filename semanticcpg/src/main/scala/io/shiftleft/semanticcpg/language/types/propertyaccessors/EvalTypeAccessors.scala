@@ -7,7 +7,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
 
 class EvalTypeAccessors[NodeType <: StoredNode](val wrapped: NodeSteps[NodeType]) extends AnyVal {
-  def raw: GremlinScala[NodeType] = wrapped.raw
+  private def raw: GremlinScala[NodeType] = wrapped.raw
 
   def evalType(): Steps[String] =
     new Steps[String](raw.out(EdgeTypes.EVAL_TYPE).out(EdgeTypes.REF).value(NodeKeys.FULL_NAME))

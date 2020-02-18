@@ -6,6 +6,7 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod}
 
 class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
+  private def raw: GremlinScala[nodes.Method] = wrapped.raw
 
   /**
     * Intended for internal use!
@@ -14,7 +15,7 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   def calledByIncludingSink(sourceTrav: NodeSteps[nodes.Method], resolve: Boolean = true)(
       implicit callResolver: ICallResolver): NodeSteps[nodes.Method] = {
     val sourceMethods = sourceTrav.raw.toSet
-    val sinkMethods = wrapped.raw.dedup.toList()
+    val sinkMethods = raw.dedup.toList
 
     if (sourceMethods.isEmpty || sinkMethods.isEmpty) {
       new NodeSteps(wrapped.graph.V(-1).cast[nodes.Method])
@@ -33,7 +34,7 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
             }.in(EdgeTypes.CALL) // expand to call site
               .in(EdgeTypes.CONTAINS) // expand to method
               .dedup
-              .simplePath()
+              .simplePath
           )
           .cast[nodes.Method]
       )

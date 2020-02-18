@@ -12,7 +12,7 @@ import io.shiftleft.semanticcpg.language.types.structure.{Method, MethodParamete
   An expression (base type)
   */
 class Expression[NodeType <: nodes.Expression](val wrapped: NodeSteps[NodeType]) extends AnyVal {
-  def raw: GremlinScala[NodeType] = wrapped.raw
+  private def raw: GremlinScala[NodeType] = wrapped.raw
 
   /**
     Traverse to enclosing expression

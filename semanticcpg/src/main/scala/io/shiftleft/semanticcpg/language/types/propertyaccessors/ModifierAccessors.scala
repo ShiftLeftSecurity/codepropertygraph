@@ -1,10 +1,12 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
+import gremlin.scala.GremlinScala
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.codepropertygraph.generated.{ModifierTypes, NodeKeys, NodeTypes, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 
 class ModifierAccessors[NodeType <: StoredNode](val wrapped: NodeSteps[NodeType]) extends AnyVal {
+  private def raw: GremlinScala[NodeType] = wrapped.raw
 
   /** Filter: only `public` nodes */
   def isPublic: NodeSteps[NodeType] =
@@ -39,15 +41,13 @@ class ModifierAccessors[NodeType <: StoredNode](val wrapped: NodeSteps[NodeType]
     hasModifier(ModifierTypes.VIRTUAL)
 
   def hasModifier(modifier: String): NodeSteps[NodeType] =
-    new NodeSteps(wrapped.raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> modifier)))
+    new NodeSteps(raw.filter(_.out.hasLabel(NodeTypes.MODIFIER).has(NodeKeys.MODIFIER_TYPE -> modifier)))
 
   /**
     * Traverse to modifiers, e.g., "static", "public".
     * */
   def modifier: NodeSteps[nodes.Modifier] =
     new NodeSteps(
-      wrapped.raw.out
-        .hasLabel(NodeTypes.MODIFIER)
-        .cast[nodes.Modifier]
+      raw.out.hasLabel(NodeTypes.MODIFIER).cast[nodes.Modifier]
     )
 }

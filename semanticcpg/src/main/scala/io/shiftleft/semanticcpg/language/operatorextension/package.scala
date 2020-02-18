@@ -1,5 +1,6 @@
 package io.shiftleft.semanticcpg.language
 
+import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Operators
 import io.shiftleft.codepropertygraph.generated.nodes
@@ -24,6 +25,7 @@ package object operatorextension {
   }
 
   class ArrayAccessTrav(val wrapped: Steps[nodes.Call]) extends AnyVal {
+    private def raw: GremlinScala[nodes.Call] = wrapped.raw
     def array: NodeSteps[nodes.Expression] = wrapped.map(_.array)
     def subscripts: NodeSteps[nodes.Identifier] = wrapped.flatMap(_.subscripts)
   }
@@ -34,6 +36,7 @@ package object operatorextension {
   }
 
   class AssignmentTrav(val wrapped: Steps[nodes.Call]) extends AnyVal {
+    private def raw: GremlinScala[nodes.Call] = wrapped.raw
     def target: NodeSteps[nodes.Expression] = wrapped.map(_.target)
     def source: NodeSteps[nodes.Expression] = wrapped.map(_.source)
   }
@@ -53,6 +56,7 @@ package object operatorextension {
   }
 
   class OpAstNodeTrav[A <: nodes.AstNode](val wrapped: Steps[A]) extends AnyVal {
+    private def raw: GremlinScala[A] = wrapped.raw
     def inAssignment: NodeSteps[nodes.Call] = wrapped.flatMap(_.inAssignment)
     def assignments: NodeSteps[nodes.Call] = wrapped.flatMap(_.assignments)
     def arithmetics: NodeSteps[nodes.Call] = wrapped.flatMap(_.arithmetics)
@@ -68,6 +72,7 @@ package object operatorextension {
   }
 
   class TargetTrav(val wrapped: NodeSteps[nodes.Expression]) extends AnyVal {
+    private def raw: GremlinScala[nodes.Expression] = wrapped.raw
     def isArrayAccess: NodeSteps[nodes.Call] = wrapped.flatMap(_.isArrayAccess)
     def expr: NodeSteps[nodes.Expression] = wrapped.map(_.expr)
   }

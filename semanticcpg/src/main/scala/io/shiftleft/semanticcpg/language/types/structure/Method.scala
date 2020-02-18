@@ -9,7 +9,7 @@ import io.shiftleft.semanticcpg.language._
   * A method, function, or procedure
   * */
 class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
-  def raw: GremlinScala[nodes.Method] = wrapped.raw
+  private def raw: GremlinScala[nodes.Method] = wrapped.raw
 
   /**
     * Traverse to parameters of the method

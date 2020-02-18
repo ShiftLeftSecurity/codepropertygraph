@@ -7,6 +7,7 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
 
 class Type(val wrapped: NodeSteps[nodes.Type]) extends AnyVal {
+  private def raw: GremlinScala[nodes.Type] = wrapped.raw
 
   /**
     * Namespaces in which the corresponding type declaration is defined.
@@ -66,19 +67,19 @@ class Type(val wrapped: NodeSteps[nodes.Type]) extends AnyVal {
     * Type declaration which is referenced by this type.
     */
   def referencedTypeDecl: NodeSteps[nodes.TypeDecl] =
-    new NodeSteps(wrapped.raw.out(EdgeTypes.REF).cast[nodes.TypeDecl])
+    new NodeSteps(raw.out(EdgeTypes.REF).cast[nodes.TypeDecl])
 
   /**
     * Type declarations which derive from this type.
     */
   def derivedTypeDecl: NodeSteps[nodes.TypeDecl] =
-    new NodeSteps(wrapped.raw.in(EdgeTypes.INHERITS_FROM).cast[nodes.TypeDecl])
+    new NodeSteps(raw.in(EdgeTypes.INHERITS_FROM).cast[nodes.TypeDecl])
 
   /**
     * Direct alias type declarations.
     */
   def aliasTypeDecl: NodeSteps[nodes.TypeDecl] =
-    new NodeSteps(wrapped.raw.in(EdgeTypes.ALIAS_OF).cast[nodes.TypeDecl])
+    new NodeSteps(raw.in(EdgeTypes.ALIAS_OF).cast[nodes.TypeDecl])
 
   /**
     * Direct alias types.
@@ -93,11 +94,11 @@ class Type(val wrapped: NodeSteps[nodes.Type]) extends AnyVal {
     wrapped.repeat(_.aliasType).emit()
 
   def localsOfType: NodeSteps[nodes.Local] =
-    new NodeSteps(wrapped.raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
+    new NodeSteps(raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
 
   def expressionOfType: NodeSteps[nodes.Expression] =
     new NodeSteps(
-      wrapped.raw
+      raw
         .in(EdgeTypes.EVAL_TYPE)
         .hasLabel(NodeTypes.IDENTIFIER, NodeTypes.CALL, NodeTypes.LITERAL)
         .cast[nodes.Expression])

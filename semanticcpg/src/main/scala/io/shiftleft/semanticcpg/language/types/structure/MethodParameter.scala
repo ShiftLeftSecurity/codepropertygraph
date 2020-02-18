@@ -8,7 +8,7 @@ import io.shiftleft.semanticcpg.language._
   * Formal method input parameter
   * */
 class MethodParameter(val wrapped: NodeSteps[nodes.MethodParameterIn]) extends AnyVal {
-  def raw: GremlinScala[nodes.MethodParameterIn] = wrapped.raw
+  private def raw: GremlinScala[nodes.MethodParameterIn] = wrapped.raw
 
   /**
     * Traverse to all `num`th parameters

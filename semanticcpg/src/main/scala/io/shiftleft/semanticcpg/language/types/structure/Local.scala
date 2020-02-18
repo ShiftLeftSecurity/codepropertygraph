@@ -8,7 +8,7 @@ import io.shiftleft.semanticcpg.language._
   * A local variable
   * */
 class Local(val wrapped: NodeSteps[nodes.Local]) extends AnyVal {
-  def raw: GremlinScala[nodes.Local] = wrapped.raw
+  private def raw: GremlinScala[nodes.Local] = wrapped.raw
 
   /**
     * The method hosting this local variable
