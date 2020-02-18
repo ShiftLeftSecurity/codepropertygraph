@@ -6,7 +6,6 @@ import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
 import org.apache.tinkerpop.gremlin.structure.Vertex
-
 import scala.jdk.CollectionConverters._
 
 /**
@@ -17,8 +16,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   /**
     * The enclosing method of the tracking point
     * */
-  def method: NodeSteps[nodes.Method] =
-    new NodeSteps(wrapped.raw.map(methodFast))
+  def method: NodeSteps[nodes.Method] = wrapped.map(methodFast)
 
   /**
     * Convert to nearest CFG node
@@ -48,7 +46,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
     val sinkSymbols = wrapped.raw.clone.dedup.toList.sortBy { _.id.asInstanceOf[java.lang.Long] }
 
-    var pathReachables = List[ReachableByContainer]()
+    var pathReachables = List.empty[ReachableByContainer]
 
     def traverseDDGBack(path: List[nodes.TrackingPoint]): Unit = {
       val node = path.head
@@ -57,33 +55,23 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
         pathReachables = sack :: pathReachables
       }
 
-      val ddgPredecessors = node._reachingDefIn.asScala
-      ddgPredecessors.foreach { pred =>
-        getTrackingPoint(pred) match {
-          case Some(predTrackingPoint) =>
-            if (!path.contains(predTrackingPoint)) {
-              if (indirectAccess(node)) {
-                traverseDDGBack(predTrackingPoint :: path.tail)
-              } else {
-                traverseDDGBack(predTrackingPoint :: node :: path.tail)
-              }
-            }
-          case None =>
-        }
-      }
-
+      for {
+        ddgPredecessor <- node._reachingDefIn.asScala
+        predTrackingPoint <- getTrackingPoint(ddgPredecessor)
+        if !path.contains(predTrackingPoint)
+      } if (indirectAccess(node)) traverseDDGBack(predTrackingPoint :: path.tail)
+      else traverseDDGBack(predTrackingPoint :: node :: path.tail)
     }
 
-    sinkSymbols.foreach { sym =>
-      getTrackingPoint(sym.asInstanceOf[nodes.StoredNode]) match {
-        case Some(vertex) => traverseDDGBack(List(vertex))
-        case None         =>
-      }
+    sinkSymbols.map(getTrackingPoint).foreach {
+      case Some(trackingPoing) => traverseDDGBack(List(trackingPoing))
+      case None                =>
     }
+
     pathReachables
   }
 
-  private def getTrackingPoint(node: nodes.StoredNode): Option[nodes.TrackingPoint] = {
+  private def getTrackingPoint(node: nodes.StoredNode): Option[nodes.TrackingPoint] =
     node match {
       case identifier: nodes.Identifier =>
         getTrackingPoint(identifier._argumentIn().nextChecked)
@@ -94,7 +82,6 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
       case literal: nodes.Literal                 => getTrackingPoint(literal._argumentIn().nextChecked)
       case _                                      => None
     }
-  }
 
   private def methodFast(dataFlowObject: Vertex): nodes.Method = {
     val method =
