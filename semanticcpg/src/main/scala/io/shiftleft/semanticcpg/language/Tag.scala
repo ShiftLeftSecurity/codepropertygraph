@@ -6,10 +6,11 @@ import io.shiftleft.semanticcpg.language.types.expressions.{Call, IdentifierTrav
 import io.shiftleft.semanticcpg.language.types.structure._
 
 class Tag(val wrapped: NodeSteps[nodes.Tag]) extends AnyVal {
+  private def raw: GremlinScala[nodes.Tag] = wrapped.raw
 
   def method: NodeSteps[nodes.Method] =
     new NodeSteps(
-      wrapped.raw
+      raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.METHOD)
         .order(By((x: Vertex) => x.id))
@@ -17,7 +18,7 @@ class Tag(val wrapped: NodeSteps[nodes.Tag]) extends AnyVal {
 
   def methodReturn: NodeSteps[nodes.MethodReturn] =
     new NodeSteps(
-      wrapped.raw
+      raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.METHOD_RETURN)
         .order(By((x: Vertex) => x.id))
@@ -25,7 +26,7 @@ class Tag(val wrapped: NodeSteps[nodes.Tag]) extends AnyVal {
 
   def parameter: NodeSteps[nodes.MethodParameterIn] =
     new NodeSteps(
-      wrapped.raw
+      raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
         .order(By((x: Vertex) => x.id))
@@ -33,7 +34,7 @@ class Tag(val wrapped: NodeSteps[nodes.Tag]) extends AnyVal {
 
   def parameterOut: NodeSteps[nodes.MethodParameterOut] =
     new NodeSteps(
-      wrapped.raw
+      raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.METHOD_PARAMETER_OUT)
         .order(By((x: Vertex) => x.id))
@@ -41,7 +42,7 @@ class Tag(val wrapped: NodeSteps[nodes.Tag]) extends AnyVal {
 
   def call: NodeSteps[nodes.Call] =
     new NodeSteps(
-      wrapped.raw
+      raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.CALL)
         .order(By((x: Vertex) => x.id))
@@ -49,7 +50,7 @@ class Tag(val wrapped: NodeSteps[nodes.Tag]) extends AnyVal {
 
   def identifier: NodeSteps[nodes.Identifier] =
     new NodeSteps(
-      wrapped.raw
+      raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.IDENTIFIER)
         .order(By((x: Vertex) => x.id))
@@ -57,7 +58,7 @@ class Tag(val wrapped: NodeSteps[nodes.Tag]) extends AnyVal {
 
   def literal: NodeSteps[nodes.Literal] =
     new NodeSteps(
-      wrapped.raw
+      raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.LITERAL)
         .order(By((x: Vertex) => x.id))
@@ -65,7 +66,7 @@ class Tag(val wrapped: NodeSteps[nodes.Tag]) extends AnyVal {
 
   def local: NodeSteps[nodes.Local] =
     new NodeSteps(
-      wrapped.raw
+      raw
         .in(EdgeTypes.TAGGED_BY)
         .hasLabel(NodeTypes.LOCAL)
         .order(By((x: Vertex) => x.id))

@@ -9,13 +9,14 @@ import io.shiftleft.semanticcpg.language._
   * A namespace, e.g., Java package or C# namespace
   * */
 class Namespace(val wrapped: NodeSteps[nodes.Namespace]) extends AnyVal {
+  private def raw: GremlinScala[nodes.Namespace] = wrapped.raw
 
   /**
     * The type declarations defined in this namespace
     * */
   def typeDecl: NodeSteps[nodes.TypeDecl] =
     new NodeSteps(
-      wrapped.raw
+      raw
         .in(EdgeTypes.REF)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.TYPE_DECL)
@@ -26,7 +27,7 @@ class Namespace(val wrapped: NodeSteps[nodes.Namespace]) extends AnyVal {
     * */
   def method: NodeSteps[nodes.Method] =
     new NodeSteps(
-      wrapped.raw
+      raw
         .in(EdgeTypes.REF)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.METHOD)

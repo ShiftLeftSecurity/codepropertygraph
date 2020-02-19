@@ -1,15 +1,11 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys}
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
-import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
-class MethodParameterOut(val wrapped: NodeSteps[nodes.MethodParameterOut])
-    extends EvalTypeAccessors[nodes.MethodParameterOut] {
-  override def raw: GremlinScala[nodes.MethodParameterOut] = wrapped.raw
+class MethodParameterOut(val wrapped: NodeSteps[nodes.MethodParameterOut]) extends AnyVal {
+  private def raw: GremlinScala[nodes.MethodParameterOut] = wrapped.raw
 
   /* method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
   def index(num: Int): NodeSteps[nodes.MethodParameterOut] =

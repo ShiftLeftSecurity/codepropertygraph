@@ -4,15 +4,12 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
 /**
   * A method, function, or procedure
   * */
-class Method(val wrapped: NodeSteps[nodes.Method])
-    extends EvalTypeAccessors[nodes.Method]
-    with ModifierAccessors[nodes.Method] {
-  override val raw: GremlinScala[nodes.Method] = wrapped.raw
+class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
+  private def raw: GremlinScala[nodes.Method] = wrapped.raw
 
   /**
     * Traverse to parameters of the method
@@ -93,54 +90,6 @@ class Method(val wrapped: NodeSteps[nodes.Method])
     * */
   def isNotStub: NodeSteps[nodes.Method] =
     new NodeSteps(raw.filter(_.out(EdgeTypes.CFG)))
-
-  /**
-    * Traverse to public methods
-    * */
-  def isPublic: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.PUBLIC)
-
-  /**
-    * Traverse to private methods
-    * */
-  def isPrivate: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.PRIVATE)
-
-  /**
-    * Traverse to protected methods
-    * */
-  def isProtected: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.PROTECTED)
-
-  /**
-    * Traverse to abstract methods
-    * */
-  def isAbstract: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.ABSTRACT)
-
-  /**
-    * Traverse to static methods
-    * */
-  def isStatic: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.STATIC)
-
-  /**
-    * Traverse to native methods
-    * */
-  def isNative: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.NATIVE)
-
-  /**
-    * Traverse to constructors, that is, keep methods that are constructors
-    * */
-  def isConstructor: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.CONSTRUCTOR)
-
-  /**
-    * Traverse to virtual method
-    * */
-  def isVirtual: NodeSteps[nodes.Method] =
-    hasModifier(ModifierTypes.VIRTUAL)
 
   /**
     * Traverse to external methods, that is, methods not present

@@ -8,11 +8,12 @@ import io.shiftleft.semanticcpg.language.NodeSteps
   * A meta data entry
   * */
 class MetaData(val wrapped: NodeSteps[nodes.MetaData]) extends AnyVal {
+  private def raw: GremlinScala[nodes.MetaData] = wrapped.raw
 
   /**
     * Returns the programming language of the code for which this CPG was
     * generated from.
     * */
-  def language: GremlinScala[String] = wrapped.raw.map(_.language)
+  def language: GremlinScala[String] = raw.map(_.language)
 
 }
