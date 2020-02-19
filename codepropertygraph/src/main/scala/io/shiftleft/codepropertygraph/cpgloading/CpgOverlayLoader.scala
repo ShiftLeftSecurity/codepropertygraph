@@ -46,7 +46,7 @@ private[cpgloading] object CpgOverlayLoader {
   * @param graph the existing (loaded) graph to apply overlay to
   */
 private class CpgOverlayApplier(graph: ScalaGraph) {
-  private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Vertex] = mutable.HashMap()
+  private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Vertex] = mutable.HashMap.empty
 
   /**
     * Applies diff to existing (loaded) OdbGraph
@@ -76,16 +76,9 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
   }
 
   private def addNodes(overlay: CpgOverlay, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
-    assert(graph.graph.features.vertex.supportsUserSuppliedIds,
-           "this currently only works for graphs that allow user supplied ids")
-
     overlay.getNodeList.asScala.foreach { node =>
-      val id = node.getKey
       val properties = node.getPropertyList.asScala
-
-      val keyValues = new ArrayBuffer[AnyRef](4 + (2 * properties.size))
-      keyValues += T.id
-      keyValues += (node.getKey: JLong)
+      val keyValues = new ArrayBuffer[AnyRef](2 + (2 * properties.size))
       keyValues += T.label
       keyValues += node.getType.name
       properties.foreach { property =>
@@ -93,7 +86,7 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
       }
       val newNode = graph.graph.addVertex(keyValues.toArray: _*)
       inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
-      overlayNodeIdToSrcGraphNode.put(id, newNode)
+      overlayNodeIdToSrcGraphNode.put(node.getKey, newNode)
     }
   }
 
