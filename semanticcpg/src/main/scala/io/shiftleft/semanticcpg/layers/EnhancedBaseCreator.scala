@@ -49,7 +49,6 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
         )
       case Languages.C =>
         List(
-          new ArgumentCompat(cpg),
           new MethodInstCompat(cpg),
           new TypeDeclStubCreator(cpg),
           new MethodStubCreator(cpg),
