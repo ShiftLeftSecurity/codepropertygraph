@@ -1,7 +1,6 @@
 package io.shiftleft.semanticcpg.language.operatorextension
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 
 object NodeTypeStarters {
@@ -12,9 +11,9 @@ object NodeTypeStarters {
 class NodeTypeStarters(cpg: Cpg) {
   import NodeTypeStarters._
 
-  def assignment: NodeSteps[nodes.Call] =
-    cpg.call.name(assignmentPattern)
+  def assignment: NodeSteps[Assignment] =
+    cpg.call.name(assignmentPattern).map(new Assignment(_))
 
-  def arithmetic: NodeSteps[nodes.Call] =
-    cpg.call.name(arithmeticPattern)
+  def arithmetic: NodeSteps[Arithmetic] =
+    cpg.call.name(arithmeticPattern).map(new Arithmetic(_))
 }
