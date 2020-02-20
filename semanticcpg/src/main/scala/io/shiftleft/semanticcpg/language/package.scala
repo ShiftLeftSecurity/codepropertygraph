@@ -4,6 +4,7 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.{
+  HasCanonicalName,
   HasCode,
   HasDependencyGroupId,
   HasDispatchType,
@@ -124,6 +125,10 @@ package object language extends operatorextension.Implicits {
 
   implicit def toCodeAccessors[A <: StoredNode with HasCode](steps: Steps[A]): CodeAccessors[A] =
     new CodeAccessors(steps)
+
+  implicit def toCanonicalNameAccessors[A <: StoredNode with HasCanonicalName](
+      steps: Steps[A]): CanonicalNameAccessors[A] =
+    new CanonicalNameAccessors(steps)
 
   implicit def toDependencyGroupIdAccessors[A <: StoredNode with HasDependencyGroupId](
       steps: Steps[A]): DependencyGroupIdAccessors[A] =

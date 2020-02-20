@@ -132,6 +132,12 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
     new NodeSteps(raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
+    * Traverse only to AST nodes that are field identifier
+    * */
+  def isFieldIdentifier: NodeSteps[nodes.FieldIdentifier] =
+    new NodeSteps(raw.hasLabel(NodeTypes.FIELD_IDENTIFIER).cast[nodes.FieldIdentifier])
+
+  /**
     * Traverse only to AST nodes that are return nodes
     * */
   def isReturn: NodeSteps[nodes.Return] =
