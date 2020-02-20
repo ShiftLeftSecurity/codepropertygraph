@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.methoddecorations
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import org.apache.logging.log4j.{LogManager, Logger}
@@ -23,12 +23,17 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   private[this] var loggedDeprecatedWarning = false
   private[this] var loggedMissingTypeFullName = false
 
-  override def run() = {
-    val dstGraph = DiffGraph.newBuilder
+  override def run(): Iterator[DiffGraph] = {
 
-    cpg.graph.V
+    val CHUNK_SIZE = 128
+    val chunks: Iterator[List[Vertex]] = cpg.graph.V
       .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
-      .sideEffect {
+      .l
+      .grouped(CHUNK_SIZE)
+
+    new ParallelIteratorExecutor[List[Vertex]](chunks).map { group =>
+      implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
+      group.foreach {
         case parameterIn: nodes.MethodParameterIn =>
           if (!parameterIn.vertices(Direction.OUT, EdgeTypes.PARAMETER_LINK).hasNext) {
             val parameterOut = new nodes.NewMethodParameterOut(
@@ -63,8 +68,8 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
             loggedDeprecatedWarning = true
           }
       }
-      .iterate
-    Iterator(dstGraph.build())
+      dstGraph.build()
+    }
   }
 }
 
