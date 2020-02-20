@@ -50,7 +50,7 @@ trait AmmoniteExecutor {
         case Res.Success(res)     => IO.pure(res)
         case Res.Exception(ex, _) => IO.raiseError(ex)
         case Res.Failure(msg)     => IO.raiseError(new RuntimeException(msg))
-        case _                    => IO.pure(())
+        case _                    => IO.unit
       }
     } yield result
   }

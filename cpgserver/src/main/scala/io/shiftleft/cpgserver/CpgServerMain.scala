@@ -12,6 +12,15 @@ import io.shiftleft.cpgserver.route.{CpgRoute, HttpErrorHandler, SwaggerRoute}
 
 object CpgServerMain extends IOApp {
 
+  private val banner: String =
+    """ | ██████╗  ██████╗██╗   ██╗██╗      █████╗ ██████╗     ███████╗███████╗██████╗ ██╗   ██╗███████╗██████╗
+      |██╔═══██╗██╔════╝██║   ██║██║     ██╔══██╗██╔══██╗    ██╔════╝██╔════╝██╔══██╗██║   ██║██╔════╝██╔══██╗
+      |██║   ██║██║     ██║   ██║██║     ███████║██████╔╝    ███████╗█████╗  ██████╔╝██║   ██║█████╗  ██████╔╝
+      |██║   ██║██║     ██║   ██║██║     ██╔══██║██╔══██╗    ╚════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝██╔══╝  ██╔══██╗
+      |╚██████╔╝╚██████╗╚██████╔╝███████╗██║  ██║██║  ██║    ███████║███████╗██║  ██║ ╚████╔╝ ███████╗██║  ██║
+      | ╚═════╝  ╚═════╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝    ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝
+      |""".stripMargin
+
   private val cpgProvider: DummyCpgProvider =
     new DummyCpgProvider
 
@@ -22,13 +31,14 @@ object CpgServerMain extends IOApp {
     CpgRoute.CpgHttpErrorHandler
 
   private val serverConfig: ServerConfiguration =
-    ServerConfiguration.config.getOrElse(ServerConfiguration("127.0.0.1", 8080))
+    ServerConfiguration.config.getOrElse(ServerConfiguration.default)
 
   private val httpRoutes =
-    CpgRoute(cpgProvider, ammoniteExecutor).routes <+> SwaggerRoute().routes
+    CpgRoute(cpgProvider, ammoniteExecutor, serverConfig.files).routes <+> SwaggerRoute().routes
 
   override def run(args: List[String]): IO[ExitCode] = {
     BlazeServerBuilder[IO]
+      .withBanner(List(banner))
       .bindHttp(serverConfig.port, serverConfig.host)
       .withHttpApp(httpRoutes.orNotFound)
       .serve
