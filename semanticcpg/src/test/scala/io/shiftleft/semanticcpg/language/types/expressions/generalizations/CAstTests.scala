@@ -144,7 +144,7 @@ class CAstTests extends WordSpec with Matchers {
     "should find index `i` used for buf" in {
 
       cpg.call
-        .name("<operator>.computedMemberAccess")
+        .name("<operator>.indirectIndexAccess")
         .argument
         .argIndex(2)
         .code
@@ -154,7 +154,7 @@ class CAstTests extends WordSpec with Matchers {
     "should find that i is assigned as part of loop header" in {
 
       cpg.call
-        .name("<operator>.computedMemberAccess")
+        .name("<operator>.indirectIndexAccess")
         .argument
         .argIndex(2)
         .inAstMinusLeaf
@@ -166,7 +166,7 @@ class CAstTests extends WordSpec with Matchers {
 
     "should correctly identify condition of for loop" in {
       cpg.call
-        .name("<operator>.computedMemberAccess")
+        .name("<operator>.indirectIndexAccess")
         .argument
         .argIndex(2)
         .inAstMinusLeaf
