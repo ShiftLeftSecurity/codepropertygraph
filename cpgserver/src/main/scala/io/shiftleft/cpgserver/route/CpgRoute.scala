@@ -16,7 +16,7 @@ import io.shiftleft.cpgserver.config.ServerFilesConfiguration
 import io.shiftleft.cpgserver.cpg.CpgProvider
 import io.shiftleft.cpgserver.query.{CpgOperationFailure, CpgOperationSuccess, ServerAmmoniteExecutor}
 
-import java.nio.file.{Files, Paths}
+import java.nio.file.{Files, Path => JPath, Paths}
 import java.util.UUID
 import java.util.concurrent.Executors
 
@@ -83,7 +83,6 @@ final class CpgRoute(
     }
   }
 
-  import java.nio.file.{Path => JPath}
   private def persistUploadedFiles(directory: JPath, parts: Vector[Part[IO]], partSizeLimit: Long): IO[Unit] = {
     val stream = for {
       part <- fs2.Stream.emits(parts)
