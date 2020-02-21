@@ -4,7 +4,7 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
 import org.apache.logging.log4j.LogManager
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominatorFrontier, ReverseCpgCfgAdapter}
 import org.apache.tinkerpop.gremlin.structure.Direction
 import io.shiftleft.semanticcpg.language._
@@ -18,12 +18,12 @@ class CdgPass(cpg: Cpg) extends CpgPass(cpg) {
   import CdgPass.logger
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
 
     val dominanceFrontier =
       new CfgDominatorFrontier(new ReverseCpgCfgAdapter(), new CpgPostDomTreeAdapter())
 
-    cpg.method.l.foreach { method =>
+    new ParallelIteratorExecutor[nodes.Method](cpg.method.toIterator()).map { method =>
+      implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
       val cfgNodes = method.vertices(Direction.OUT, EdgeTypes.CONTAINS).asScala.toList
       val postDomFrontiers = dominanceFrontier.calculate(method :: cfgNodes)
 
@@ -42,9 +42,8 @@ class CdgPass(cpg: Cpg) extends CpgPass(cpg) {
                 s" number of outgoing CFG edges from $nodeLabel node: ${postDomFrontierNode.edges(Direction.OUT, EdgeTypes.CFG).asScala.size}")
           }
       }
+      dstGraph.build()
     }
-
-    Iterator(dstGraph.build())
   }
 }
 
