@@ -25,11 +25,11 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
 
   override def run(): Iterator[DiffGraph] = {
 
-    val CHUNK_SIZE = 128
+    val chunkSize = 128
     val chunks: Iterator[List[Vertex]] = cpg.graph.V
       .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
       .l
-      .grouped(CHUNK_SIZE)
+      .grouped(chunkSize)
 
     new ParallelIteratorExecutor[List[Vertex]](chunks).map { group =>
       implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder

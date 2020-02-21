@@ -6,6 +6,7 @@ import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.language._
 
+import scala.collection.concurrent.TrieMap
 import scala.collection.parallel.CollectionConverters._
 
 /**
@@ -16,19 +17,18 @@ import scala.collection.parallel.CollectionConverters._
   */
 class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 
-  private var typeDeclFullNameToNode =
-    scala.collection.concurrent.TrieMap[String, nodes.TypeDeclBase]()
+  private var typeDeclFullNameToNode = TrieMap.empty[String, nodes.TypeDeclBase]
 
   override def run(): Iterator[DiffGraph] = {
 
     init()
 
-    val CHUNK_SIZE = 128
+    val chunkSize = 128
     new ParallelIteratorExecutor[List[Vertex]](
       cpg.graph.V
         .hasLabel(NodeTypes.TYPE)
         .l
-        .grouped(CHUNK_SIZE)).map { group =>
+        .grouped(chunkSize)).map { group =>
       implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
       group.foreach { vertex =>
         val typ = vertex.asInstanceOf[nodes.Type]

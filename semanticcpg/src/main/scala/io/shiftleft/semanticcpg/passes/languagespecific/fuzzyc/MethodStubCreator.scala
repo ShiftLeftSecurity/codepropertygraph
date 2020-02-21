@@ -21,15 +21,15 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 
   // Since the method fullNames for fuzzyc are not unique, we do not have
   // a 1to1 relation and may overwrite some values. We deem this ok for now.
-  private var methodFullNameToNode = scala.collection.concurrent.TrieMap[String, nodes.MethodBase]()
-  private var methodToParameterCount = scala.collection.concurrent.TrieMap[NameAndSignature, Int]()
+  private var methodFullNameToNode = TrieMap[String, nodes.MethodBase]()
+  private var methodToParameterCount = TrieMap.empty[NameAndSignature, Int]
 
   override def run(): Iterator[DiffGraph] = {
 
     init()
 
-    val CHUNK_SIZE = 128
-    val chunks: Iterator[TrieMap[NameAndSignature, Int]] = methodToParameterCount.grouped(CHUNK_SIZE)
+    val chunkSize = 128
+    val chunks: Iterator[TrieMap[NameAndSignature, Int]] = methodToParameterCount.grouped(chunkSize)
     new ParallelIteratorExecutor[TrieMap[NameAndSignature, Int]](chunks).map { group =>
       implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
 
