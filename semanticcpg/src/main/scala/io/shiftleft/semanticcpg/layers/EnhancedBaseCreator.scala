@@ -62,7 +62,6 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new NamespaceCreator(cpg),
           new CfgDominatorPass(cpg),
           new CdgPass(cpg),
-          new TrimPass(cpg),
         )
     }
   }

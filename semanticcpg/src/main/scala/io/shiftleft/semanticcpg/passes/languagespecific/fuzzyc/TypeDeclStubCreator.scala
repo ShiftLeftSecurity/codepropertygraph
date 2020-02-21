@@ -3,8 +3,11 @@ package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.language._
+
+import scala.collection.concurrent.TrieMap
+import scala.collection.parallel.CollectionConverters._
 
 /**
   * This pass has no other pass as prerequisite.
@@ -14,17 +17,21 @@ import io.shiftleft.semanticcpg.language._
   */
 class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 
-  private var typeDeclFullNameToNode = Map[String, nodes.TypeDeclBase]()
+  private var typeDeclFullNameToNode = TrieMap.empty[String, nodes.TypeDeclBase]
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
 
     init()
 
-    cpg.graph.V
-      .hasLabel(NodeTypes.TYPE)
-      .sideEffectWithTraverser { traverser =>
-        val typ = traverser.get.asInstanceOf[nodes.Type]
+    val chunkSize = 128
+    new ParallelIteratorExecutor[List[Vertex]](
+      cpg.graph.V
+        .hasLabel(NodeTypes.TYPE)
+        .l
+        .grouped(chunkSize)).map { group =>
+      implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
+      group.foreach { vertex =>
+        val typ = vertex.asInstanceOf[nodes.Type]
         typeDeclFullNameToNode.get(typ.fullName) match {
           case Some(_) =>
           case None =>
@@ -33,9 +40,8 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
             dstGraph.addNode(newTypeDecl)
         }
       }
-      .iterate()
-
-    Iterator(dstGraph.build())
+      dstGraph.build()
+    }
   }
 
   private def createTypeDeclStub(name: String, fullName: String): nodes.NewTypeDecl = {
@@ -50,8 +56,8 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def init(): Unit = {
-    cpg.typeDecl.sideEffect { typeDecl =>
+    cpg.typeDecl.l.par.foreach { typeDecl =>
       typeDeclFullNameToNode += typeDecl.fullName -> typeDecl
-    }.exec
+    }
   }
 }
