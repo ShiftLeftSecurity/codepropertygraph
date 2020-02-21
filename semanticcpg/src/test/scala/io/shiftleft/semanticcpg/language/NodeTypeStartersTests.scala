@@ -106,7 +106,6 @@ class NodeTypeStartersTests extends WordSpec with Matchers {
         NodeTypes.LOCAL,
         NodeTypes.CALL,
         NodeTypes.LITERAL,
-        NodeTypes.METHOD_INST
       )
     }
 

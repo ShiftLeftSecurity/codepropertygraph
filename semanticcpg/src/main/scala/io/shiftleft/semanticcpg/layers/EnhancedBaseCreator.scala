@@ -9,7 +9,6 @@ import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
 import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
 import io.shiftleft.semanticcpg.passes.compat.bindingtablecompat.BindingTableCompat
 import io.shiftleft.semanticcpg.passes.compat.argumentcompat.ArgumentCompat
-import io.shiftleft.semanticcpg.passes.compat.callnamecompat.CallNameFixup
 import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
 import io.shiftleft.semanticcpg.passes.trim.TrimPass
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
@@ -49,8 +48,6 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
         )
       case Languages.C =>
         List(
-          new ArgumentCompat(cpg),
-          new MethodInstCompat(cpg),
           new TypeDeclStubCreator(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
