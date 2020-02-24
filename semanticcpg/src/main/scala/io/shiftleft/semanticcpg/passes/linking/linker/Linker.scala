@@ -114,7 +114,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     val sourceIterator = new Steps(sourceTraversal).toIterator()
 
     val chunkSize = 2048
-    new ParallelIteratorExecutor[Iterator[Vertex]](sourceIterator.grouped(chunkSize)).map { chunk =>
+    new ParallelIteratorExecutor[List[Vertex]](sourceIterator.toList.grouped(chunkSize)).map { chunk =>
       implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
 
       chunk.foreach { srcNode =>
