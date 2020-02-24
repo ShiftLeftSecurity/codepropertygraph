@@ -11,9 +11,9 @@ object NodeTypeStarters {
 class NodeTypeStarters(cpg: Cpg) {
   import NodeTypeStarters._
 
-  def assignment: NodeSteps[Assignment] =
-    cpg.call.name(assignmentPattern).map(new Assignment(_))
+  def assignment: NodeSteps[opnodes.Assignment] =
+    cpg.call.name(assignmentPattern).map(new opnodes.Assignment(_))
 
-  def arithmetic: NodeSteps[Arithmetic] =
-    cpg.call.name(arithmeticPattern).map(new Arithmetic(_))
+  def arithmetic: NodeSteps[opnodes.Arithmetic] =
+    cpg.call.name(arithmeticPattern).map(new opnodes.Arithmetic(_))
 }
