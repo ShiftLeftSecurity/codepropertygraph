@@ -3,48 +3,44 @@ package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewMethodReturn}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 import io.shiftleft.semanticcpg.language._
 
-import scala.collection.concurrent.TrieMap
 import scala.jdk.CollectionConverters._
-import scala.collection.parallel.CollectionConverters._
 
 /**
   * This pass has no other pass as prerequisite.
   */
 class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
+  import MethodStubCreator.logger
 
   private case class NameAndSignature(name: String, signature: String)
 
   // Since the method fullNames for fuzzyc are not unique, we do not have
   // a 1to1 relation and may overwrite some values. We deem this ok for now.
-  private var methodFullNameToNode = TrieMap[String, nodes.MethodBase]()
-  private var methodToParameterCount = TrieMap.empty[NameAndSignature, Int]
+  private var methodFullNameToNode = Map[String, nodes.MethodBase]()
+  private var methodToParameterCount = Map[NameAndSignature, Int]()
 
   override def run(): Iterator[DiffGraph] = {
+    val dstGraph = DiffGraph.newBuilder
 
     init()
 
-    val chunkSize = 128
-    val chunks: Iterator[TrieMap[NameAndSignature, Int]] = methodToParameterCount.grouped(chunkSize)
-    new ParallelIteratorExecutor[TrieMap[NameAndSignature, Int]](chunks).map { group =>
-      implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
+    // TODO bring in Receiver type. Just working on name and comparing to full name
+    // will only work for C because in C, name always equals full name.
+    methodToParameterCount.foreach {
+      case (NameAndSignature(name, signature), parameterCount) =>
+        methodFullNameToNode.get(name) match {
+          case None =>
+            createMethodStub(name, name, signature, parameterCount, dstGraph)
+          case _ =>
+        }
 
-      // TODO bring in Receiver type. Just working on name and comparing to full name
-      // will only work for C because in C, name always equals full name.
-      group.foreach {
-        case (NameAndSignature(name, signature), parameterCount) =>
-          methodFullNameToNode.get(name) match {
-            case None =>
-              createMethodStub(name, name, signature, parameterCount, dstGraph)
-            case _ =>
-          }
-      }
-      dstGraph.build()
     }
+
+    Iterator(dstGraph.build())
   }
 
   private def createMethodStub(name: String,
@@ -105,16 +101,18 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def init(): Unit = {
-    cpg.method.l.par
-      .foreach { method =>
+    cpg.method
+      .sideEffect { method =>
         methodFullNameToNode += method.fullName -> method
       }
+      .exec()
 
-    cpg.call.l.par
-      .foreach { call =>
+    cpg.call
+      .sideEffect { call =>
         methodToParameterCount +=
           NameAndSignature(call.name, call.signature) -> call.vertices(Direction.OUT, EdgeTypes.AST).asScala.size
       }
+      .exec()
   }
 }
 
