@@ -113,31 +113,35 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     val sourceTraversal = cpg.graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*)
     val sourceIterator = new Steps(sourceTraversal).toIterator()
 
-    new ParallelIteratorExecutor[Vertex](sourceIterator).map { srcNode =>
+    val chunkSize = 2048
+    new ParallelIteratorExecutor[Iterator[Vertex]](sourceIterator.grouped(chunkSize)).map { chunk =>
       implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
-      // If the source node does not have any outgoing edges of this type
-      // This check is just required for backward compatibility
-      if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
-        srcNode.valueOption[String](dstFullNameKey).foreach { dstFullName =>
-          // for `UNKNOWN` this is not always set, so we're using an Option here
-          val dstNode: Option[nodes.StoredNode] = dstNodeMap.get(dstFullName)
-          dstNode match {
-            case Some(dstNodeInner) =>
-              dstGraph
-                .addEdgeInOriginal(srcNode.asInstanceOf[nodes.StoredNode], dstNodeInner, edgeType)
-            case None =>
-              logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
+
+      chunk.foreach { srcNode =>
+        // If the source node does not have any outgoing edges of this type
+        // This check is just required for backward compatibility
+        if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
+          srcNode.valueOption[String](dstFullNameKey).foreach { dstFullName =>
+            // for `UNKNOWN` this is not always set, so we're using an Option here
+            val dstNode: Option[nodes.StoredNode] = dstNodeMap.get(dstFullName)
+            dstNode match {
+              case Some(dstNodeInner) =>
+                dstGraph
+                  .addEdgeInOriginal(srcNode.asInstanceOf[nodes.StoredNode], dstNodeInner, edgeType)
+              case None =>
+                logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
+            }
           }
-        }
-      } else {
-        val dstFullName =
-          srcNode.vertices(Direction.OUT, edgeType).nextChecked.value2(NodeKeys.FULL_NAME)
-        srcNode.property(dstFullNameKey, dstFullName)
-        if (!loggedDeprecationWarning) {
-          logger.warn(
-            s"Using deprecated CPG format with already existing $edgeType edge between" +
-              s" a source node of type $srcLabels and a $dstNodeLabel node.")
-          loggedDeprecationWarning = true
+        } else {
+          val dstFullName =
+            srcNode.vertices(Direction.OUT, edgeType).nextChecked.value2(NodeKeys.FULL_NAME)
+          srcNode.property(dstFullNameKey, dstFullName)
+          if (!loggedDeprecationWarning) {
+            logger.warn(
+              s"Using deprecated CPG format with already existing $edgeType edge between" +
+                s" a source node of type $srcLabels and a $dstNodeLabel node.")
+            loggedDeprecationWarning = true
+          }
         }
       }
       dstGraph.build()
@@ -189,7 +193,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def linkAstChildToParent(): Iterator[DiffGraph] = {
-    val chunkSize = 128
+    val chunkSize = 2048
     val chunk = cpg.graph.V
       .hasLabel(NodeTypes.METHOD, NodeTypes.TYPE_DECL)
       .l
