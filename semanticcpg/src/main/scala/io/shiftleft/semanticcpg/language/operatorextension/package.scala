@@ -7,6 +7,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.Call
 import io.shiftleft.overflowdb.OdbGraph
 
+
 package object operatorextension {
   class Assignment(call: Call) extends Call(call.graph.asInstanceOf[OdbGraph], call.id)
   class Arithmetic(call: Call) extends nodes.Call(call.graph.asInstanceOf[OdbGraph], call.id)
@@ -80,6 +81,5 @@ package object operatorextension {
   class TargetTrav(val wrapped: NodeSteps[nodes.Expression]) extends AnyVal {
     private def raw: GremlinScala[nodes.Expression] = wrapped.raw
     def isArrayAccess: NodeSteps[ArrayAccess] = wrapped.flatMap(_.isArrayAccess)
-    def expr: NodeSteps[nodes.Expression] = wrapped.map(_.expr)
   }
 }

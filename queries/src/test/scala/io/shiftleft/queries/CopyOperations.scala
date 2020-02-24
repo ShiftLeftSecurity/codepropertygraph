@@ -49,7 +49,6 @@ class CopyOperations extends WordSpec with Matchers {
               .filterNot(_.isBlock)
               .assignments
               .target
-              .expr
               .code
               .toSet
             (incIdentifiers & subscripts).nonEmpty
