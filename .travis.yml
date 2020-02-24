@@ -11,6 +11,7 @@ before_install:
 - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE" == "push" ]]; then openssl
   aes-256-cbc -K $encrypted_663dec309dc8_key -iv $encrypted_663dec309dc8_iv -in private-key.pem.enc
   -out private-key.pem -d; gpg --import --batch private-key.pem; fi
+-
 env:
   global:
   - secure: O33fw6sV6z2laegGMQ3qLPA0Eb+w9cHTXIC81q3Nw9G6nJLYGMAelexF0tx7h7zrfdz0HLDW6ZVqAWf44taqACzBu0JCPgBA/RCSlNxUKlINHNp/lapG26b4m2eNHt4KyfZ7QFcxRjRg6Y7z2XpKiNvUOxEWSh7cDxZcTY8fE9S33SDbefaBpIJsXj3tIxqBunu2ItTitE0p0B0pLfCtlC2YT9EG2FAaBxppYFmG0/TKw/tIAQAKdgiGmVCTk/ux/wEFjCqcrbqXfgRsRHe7o4TrRjEo4gFsj/mN5VLuQDH7sioMHfMI73rJAg5A7E1eFVz3iktKR4znFQxdW5JNoiHc3D6a8TA/o9IkHWOpNDHZgDvJecw5pCYS7odNNwoCa/U0THiyFonMEJEE6R+LZs0UPz1QpHc8VN+KEI+vOVdLT06w0mpUEpr1t3Q1hL4QZMg/Se2u9wmBnyBfOlOUW6h/j5N/E5hZG0lRKCSfmHtL5bdxCLC8C0xEjEz4oWf9ZdeA2JvgB6PLL+ipQ3yJ+XlNFPhIXrrb5Ea/ZPv/4BgGZ28tHGJfVeDUnGG0OPCmiwHYgIsgulPERz17MFRD7J3DTd3WnhryV0KXF/56soOUBuufJHEz/q6HxvNWWz4g1t3REPE2lAzhrmRN68CN9mJJ+AsQqXIwZQ3jL1k1hW4=
@@ -47,11 +48,12 @@ before_cache:
 - rm -rf $HOME/.ivy2/local
 cache:
   directories:
-  - "$HOME/.sbt/1.0/dependency"
-  - "$HOME/.sbt/boot/scala*"
-  - "$HOME/.sbt/launchers"
-  - "$HOME/.ivy2/cache"
-  - "$HOME/.coursier"
+    - $HOME/.sbt/1.0/dependency
+    - $HOME/.sbt/boot/scala*
+    - $HOME/.sbt/launchers
+    - $HOME/.ivy2/cache
+    - $HOME/.cache/coursier
+    - $HOME/.coursier
 notifications:
   slack:
     secure: HAZWVXDtRQiqSl0BiskghiLRMzi9+6q7DYhgBSmXTth8Ljex2n6ehsmxN7DdnL+OX8RqKWCIzSCURbPmVxJG77g4vQOi5a4FG//2NUAWMNBciLSwAJfyn6eC7tn4+iA9B1SKOSwdz7SCshnOL/9XupojYAwApjZgjvAFDGYOfFk9gv4Ezjrx3mX6Ge+VrkBVLIyFxTeBcMCsLYi/zsZWnzWpl7+ymqQIxhiburOU1ePDq/lHcFdvQSks3YWb1TlfsdNRt7hwkNrb60nfsZBxyt7pDk+GV4rdpgtZgolcZImqrVarnz7/UchOLn6Hl/bmkqFr3a+Aiaank7oph/fIWGBKqbTzoD8nY6mp1sLYtMbk8BZgKjr+DuqyIoJawMl7RvffJA2L149QPNdaR9uIkx+a2P5Wgs/DFiASOnyiX87S1Hfwok6ediO+NSrQJhGMyk87dRycDHywDaG0VuppHiFrDrqEo9kE/2iEL3/10xqVuoU1Yp/aLmeXSs2b0P7VZTLy23w8aCn6EEdyTgLkc0xRHPkA/c04UZ6vuQCK3JsBpEtT95Sot0y58vgbh1Er5DOlDXccOXL9qooBe9e84uJFj4qJx+/bIRBPKC0em1Dd3qtPP4MCfxY9+75r03ruwi1PPR/ifAjXbiBp9qfWu2XHXDmyHfoI73UJyClYLxI=

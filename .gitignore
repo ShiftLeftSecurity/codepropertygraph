@@ -9,3 +9,4 @@ travis_wait_*
 **/*.pyc
 /protoc
 project/.bloop
+.bloop

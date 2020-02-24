@@ -37,7 +37,9 @@ ThisBuild/scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
   "-Xfatal-warnings",
-  "-language:implicitConversions")
+  "-language:implicitConversions",
+  "-Ycache-macro-class-loader:last-modified",
+  "-Ybackend-parallelism", "4")
 ThisBuild/compile/javacOptions ++= Seq("-g") //debug symbols
 
 Global/onChangedBuildSource := ReloadOnSourceChanges
