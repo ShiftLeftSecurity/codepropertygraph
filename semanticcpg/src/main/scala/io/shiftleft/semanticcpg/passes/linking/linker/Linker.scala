@@ -29,36 +29,39 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
 
     initMaps()
 
-    linkAstChildToParent() ++ linkToSingle(
-      srcLabels = List(NodeTypes.TYPE),
-      dstNodeLabel = NodeTypes.TYPE_DECL,
-      edgeType = EdgeTypes.REF,
-      dstNodeMap = typeDeclFullNameToNode,
-      dstFullNameKey = nodes.Type.PropertyNames.TypeDeclFullName
-    ) ++ linkToSingle(
-      srcLabels = List(
-        NodeTypes.METHOD_PARAMETER_IN,
-        NodeTypes.METHOD_PARAMETER_OUT,
-        NodeTypes.METHOD_RETURN,
-        NodeTypes.MEMBER,
-        NodeTypes.LITERAL,
-        NodeTypes.CALL,
-        NodeTypes.LOCAL,
-        NodeTypes.IDENTIFIER,
-        NodeTypes.BLOCK,
-        NodeTypes.UNKNOWN
-      ),
-      dstNodeLabel = NodeTypes.TYPE,
-      edgeType = EdgeTypes.EVAL_TYPE,
-      dstNodeMap = typeFullNameToNode,
-      dstFullNameKey = "TYPE_FULL_NAME"
-    ) ++ linkToSingle(
-      srcLabels = List(NodeTypes.METHOD_REF),
-      dstNodeLabel = NodeTypes.METHOD,
-      edgeType = EdgeTypes.REF,
-      dstNodeMap = methodFullNameToNode,
-      dstFullNameKey = nodes.MethodRef.PropertyNames.MethodFullName,
-    ) ++
+    linkAstChildToParent() ++
+      linkToSingle(
+        srcLabels = List(NodeTypes.TYPE),
+        dstNodeLabel = NodeTypes.TYPE_DECL,
+        edgeType = EdgeTypes.REF,
+        dstNodeMap = typeDeclFullNameToNode,
+        dstFullNameKey = nodes.Type.PropertyNames.TypeDeclFullName
+      ) ++
+      linkToSingle(
+        srcLabels = List(
+          NodeTypes.METHOD_PARAMETER_IN,
+          NodeTypes.METHOD_PARAMETER_OUT,
+          NodeTypes.METHOD_RETURN,
+          NodeTypes.MEMBER,
+          NodeTypes.LITERAL,
+          NodeTypes.CALL,
+          NodeTypes.LOCAL,
+          NodeTypes.IDENTIFIER,
+          NodeTypes.BLOCK,
+          NodeTypes.UNKNOWN
+        ),
+        dstNodeLabel = NodeTypes.TYPE,
+        edgeType = EdgeTypes.EVAL_TYPE,
+        dstNodeMap = typeFullNameToNode,
+        dstFullNameKey = "TYPE_FULL_NAME"
+      ) ++
+      linkToSingle(
+        srcLabels = List(NodeTypes.METHOD_REF),
+        dstNodeLabel = NodeTypes.METHOD,
+        edgeType = EdgeTypes.REF,
+        dstNodeMap = methodFullNameToNode,
+        dstFullNameKey = nodes.MethodRef.PropertyNames.MethodFullName,
+      ) ++
       linkToMultiple(
         srcLabels = List(NodeTypes.TYPE_DECL),
         dstNodeLabel = NodeTypes.TYPE,
@@ -72,16 +75,17 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
           }
         },
         dstFullNameKey = nodes.TypeDecl.PropertyNames.InheritsFromTypeFullName
-      ) ++ linkToMultiple(
-      srcLabels = List(NodeTypes.TYPE_DECL),
-      dstNodeLabel = NodeTypes.TYPE,
-      edgeType = EdgeTypes.ALIAS_OF,
-      dstNodeMap = typeFullNameToNode,
-      getDstFullNames = (srcNode: nodes.TypeDecl) => {
-        srcNode.aliasTypeFullName
-      },
-      dstFullNameKey = NodeKeyNames.ALIAS_TYPE_FULL_NAME
-    )
+      ) ++
+      linkToMultiple(
+        srcLabels = List(NodeTypes.TYPE_DECL),
+        dstNodeLabel = NodeTypes.TYPE,
+        edgeType = EdgeTypes.ALIAS_OF,
+        dstNodeMap = typeFullNameToNode,
+        getDstFullNames = (srcNode: nodes.TypeDecl) => {
+          srcNode.aliasTypeFullName
+        },
+        dstFullNameKey = NodeKeyNames.ALIAS_TYPE_FULL_NAME
+      )
   }
 
   private def initMaps(): Unit = {
