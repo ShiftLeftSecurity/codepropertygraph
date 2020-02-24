@@ -46,11 +46,11 @@ scalacOptions ++= Seq(
   "-Ywarn-value-discard"               // Warn when non-Unit expression results are unused.
 )
 
-val Http4sVersion = "0.21.0-M6"
-val CirceVersion = "0.12.2"
-val PureconfigVersion = "0.12.1"
+val Http4sVersion = "0.21.1"
+val CirceVersion = "0.13.0"
+val PureconfigVersion = "0.12.2"
 val WebjarLocatorVersion = "0.37"
-val SwaggerVersion = "3.23.8"
+val SwaggerVersion = "3.25.0"
 val Slf4jVersion = "1.7.28"
 val LogbackVersion = "1.2.3"
 val ScalatestVersion = "3.0.8"

@@ -46,6 +46,45 @@ paths:
             application/json:
               schema:
                 $ref: '#components/schemas/APIError'
+  /v1/upload:
+    post:
+      summary: Create a new CPG from a set of uploaded source files.
+      tags:
+        - CPG Creation
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: A job to create the CPG has been scheduled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CPGResourceCreatedResponse'
+        '400':
+          description: A 'file' component with a 'filename' attribute must be specified.
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/APIError'
+        '413':
+          description: A file being uploaded exceeds the file size limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/APIError'
+        '422':
+          description: Unable to parse the multipart form data. Please check it is formatted correctly.
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/APIError'
   /v1/cpg/{uuid}:
     get:
       summary: Retrieve the status of a CPG creation.

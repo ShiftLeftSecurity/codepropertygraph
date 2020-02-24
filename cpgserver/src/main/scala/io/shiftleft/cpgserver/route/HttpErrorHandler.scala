@@ -10,11 +10,12 @@ trait HttpErrorHandler {
 
 object HttpErrorHandler {
 
-  def apply(routes: HttpRoutes[IO])(handler: Throwable => IO[Response[IO]]): HttpRoutes[IO] = {
+  def apply(routes: HttpRoutes[IO])(handler: PartialFunction[Throwable, IO[Response[IO]]]): HttpRoutes[IO] = {
     Kleisli { req: Request[IO] =>
       OptionT {
         routes.run(req).value.handleErrorWith { e =>
-          handler(e).map(Option(_))
+          if (handler.isDefinedAt(e)) handler(e).map(Option(_))
+          else IO.raiseError(e)
         }
       }
     }
