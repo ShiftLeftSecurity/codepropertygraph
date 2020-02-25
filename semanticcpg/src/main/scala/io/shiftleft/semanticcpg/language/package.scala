@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes.{
   HasCanonicalName,
   HasCode,
@@ -241,6 +241,16 @@ package object language extends operatorextension.Implicits {
       */
     def start: Steps[NodeType] =
       new Steps[NodeType](__[NodeType](iter.to(Seq): _*))
+  }
+
+  implicit class NodeStepsExt(steps: Steps[_ <: StoredNode]) {
+    private def raw: GremlinScala[_ <: StoredNode] = steps.raw
+
+    /**
+    Traverse to tags of nodes in enhanced graph
+      */
+    def tag: NodeSteps[nodes.Tag] =
+      new NodeSteps(raw.out(EdgeTypes.TAGGED_BY).cast[nodes.Tag])
   }
 
   // Call graph extension

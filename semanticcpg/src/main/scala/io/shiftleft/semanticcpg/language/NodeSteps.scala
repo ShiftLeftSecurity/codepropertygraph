@@ -85,10 +85,4 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
       taggedNode.tagList
     }.l
 
-  /**
-  Traverse to tags of nodes in enhanced graph
-    */
-  def tag: NodeSteps[nodes.Tag] =
-    new NodeSteps(raw.out(EdgeTypes.TAGGED_BY).cast[nodes.Tag])
-
 }
