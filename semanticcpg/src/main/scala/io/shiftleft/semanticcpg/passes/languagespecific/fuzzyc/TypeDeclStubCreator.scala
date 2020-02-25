@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.language._
 
 /**
@@ -17,25 +17,23 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
   private var typeDeclFullNameToNode = Map[String, nodes.TypeDeclBase]()
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
 
     init()
 
-    cpg.graph.V
-      .hasLabel(NodeTypes.TYPE)
-      .sideEffectWithTraverser { traverser =>
-        val typ = traverser.get.asInstanceOf[nodes.Type]
-        typeDeclFullNameToNode.get(typ.fullName) match {
-          case Some(_) =>
-          case None =>
-            val newTypeDecl = createTypeDeclStub(typ.name, typ.fullName)
-            typeDeclFullNameToNode += typ.fullName -> newTypeDecl
-            dstGraph.addNode(newTypeDecl)
-        }
-      }
-      .iterate()
+    val typeNodeIterator = cpg.graph.V.hasLabel(NodeTypes.TYPE).toIterator()
 
-    Iterator(dstGraph.build())
+    new ParallelIteratorExecutor[Vertex](typeNodeIterator).map { node =>
+      val typ = node.asInstanceOf[nodes.Type]
+      implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
+      typeDeclFullNameToNode.get(typ.fullName) match {
+        case Some(_) =>
+        case None =>
+          val newTypeDecl = createTypeDeclStub(typ.name, typ.fullName)
+          typeDeclFullNameToNode += typ.fullName -> newTypeDecl
+          dstGraph.addNode(newTypeDecl)
+      }
+      dstGraph.build()
+    }
   }
 
   private def createTypeDeclStub(name: String, fullName: String): nodes.NewTypeDecl = {
