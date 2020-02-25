@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewMethodReturn}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 import io.shiftleft.semanticcpg.language._
@@ -14,7 +14,6 @@ import scala.jdk.CollectionConverters._
   * This pass has no other pass as prerequisite.
   */
 class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
-  import MethodStubCreator.logger
 
   private case class NameAndSignature(name: String, signature: String)
 
@@ -24,23 +23,21 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
   private var methodToParameterCount = Map[NameAndSignature, Int]()
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
 
     init()
 
     // TODO bring in Receiver type. Just working on name and comparing to full name
     // will only work for C because in C, name always equals full name.
-    methodToParameterCount.foreach {
+    new ParallelIteratorExecutor[(NameAndSignature, Int)](methodToParameterCount.iterator).map {
       case (NameAndSignature(name, signature), parameterCount) =>
+        implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
         methodFullNameToNode.get(name) match {
           case None =>
             createMethodStub(name, name, signature, parameterCount, dstGraph)
           case _ =>
         }
-
+        dstGraph.build()
     }
-
-    Iterator(dstGraph.build())
   }
 
   private def createMethodStub(name: String,
