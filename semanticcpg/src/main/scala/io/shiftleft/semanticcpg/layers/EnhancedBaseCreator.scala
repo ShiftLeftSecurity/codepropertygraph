@@ -25,10 +25,10 @@ import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
 class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedCpg) {
   private val enhancementExecList = createEnhancementExecList(language)
 
-  private def createEnhancementExecList(language: String): List[CpgPass] = {
+  private def createEnhancementExecList(language: String): Iterator[CpgPass] = {
     language match {
       case Languages.JAVA =>
-        List(
+        Iterator(
           new ArgumentCompat(cpg),
           new MethodInstCompat(cpg),
           new ReceiverEdgePass(cpg),
@@ -47,7 +47,7 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new TrimPass(cpg),
         )
       case Languages.C =>
-        List(
+        Iterator(
           new TypeDeclStubCreator(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
