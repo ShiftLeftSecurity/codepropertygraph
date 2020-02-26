@@ -49,79 +49,41 @@ package object language extends operatorextension.Implicits {
   // to generated node types.
 
   implicit def cfgNodeToAstNode(node: nodes.CfgNode): AstNodeMethods = new AstNodeMethods(node)
-
   implicit def toExtendedNode(node: Node): NodeMethods = new NodeMethods(node)
-
-  implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods =
-    new WithinMethodMethods(node)
-
-  implicit def toAstNodeMethods(node: nodes.AstNode): AstNodeMethods =
-    new AstNodeMethods(node)
-
-  implicit def toMethodMethods(node: nodes.Method): MethodMethods =
-    new MethodMethods(node)
-
-  implicit def toMethodReturnMethods(node: nodes.MethodReturn): MethodReturnMethods =
-    new MethodReturnMethods(node)
-
-  implicit def toCallMethods(node: nodes.Call): CallMethods =
-    new CallMethods(node)
+  implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods = new WithinMethodMethods(node)
+  implicit def toAstNodeMethods(node: nodes.AstNode): AstNodeMethods = new AstNodeMethods(node)
+  implicit def toMethodMethods(node: nodes.Method): MethodMethods = new MethodMethods(node)
+  implicit def toMethodReturnMethods(node: nodes.MethodReturn): MethodReturnMethods = new MethodReturnMethods(node)
+  implicit def toCallMethods(node: nodes.Call): CallMethods = new CallMethods(node)
 
   // Implicit conversions from Step[NodeType, Label] to corresponding Step classes.
   // If you introduce a new Step-type, that is, one that inherits from `Steps[NodeType]`,
   // then you need to add an implicit conversion from `Steps[NodeType]` to your type
   // here.
 
-  implicit def toLiteral(steps: Steps[nodes.Literal]): Literal =
-    new Literal(steps)
-
+  implicit def toLiteral(steps: Steps[nodes.Literal]): Literal = new Literal(steps)
   implicit def toType(steps: Steps[nodes.Type]): Type = new Type(steps)
-
   implicit def toTypeDecl(steps: Steps[nodes.TypeDecl]): TypeDecl = new TypeDecl(steps)
-
-  implicit def toCall(steps: Steps[nodes.Call]): OriginalCall =
-    new OriginalCall(steps)
-
-  implicit def toControlStructure(steps: Steps[nodes.ControlStructure]): ControlStructure =
-    new ControlStructure(steps)
-
-  implicit def toIdentifier(steps: Steps[nodes.Identifier]): IdentifierTrav =
-    new IdentifierTrav(steps)
-
+  implicit def toCall(steps: Steps[nodes.Call]): OriginalCall = new OriginalCall(steps)
+  implicit def toControlStructure(steps: Steps[nodes.ControlStructure]): ControlStructure = new ControlStructure(steps)
+  implicit def toIdentifier(steps: Steps[nodes.Identifier]): IdentifierTrav = new IdentifierTrav(steps)
   implicit def toMember(steps: Steps[nodes.Member]): Member = new Member(steps)
-
   implicit def toMetaData(steps: Steps[nodes.MetaData]): MetaData = new MetaData(steps)
-
   implicit def toLocal(steps: Steps[nodes.Local]): Local = new Local(steps)
-
   implicit def toMethod(steps: Steps[nodes.Method]): OriginalMethod = new OriginalMethod(steps)
-
-  implicit def toMethodParameter(steps: Steps[nodes.MethodParameterIn]): MethodParameter =
-    new MethodParameter(steps)
-
+  implicit def toMethodParameter(steps: Steps[nodes.MethodParameterIn]): MethodParameter = new MethodParameter(steps)
   implicit def toMethodParameterOut(steps: Steps[nodes.MethodParameterOut]): MethodParameterOut =
     new MethodParameterOut(steps)
-
   implicit def toMethodReturn(steps: Steps[nodes.MethodReturn]): MethodReturn = new MethodReturn(steps)
-
   implicit def toNamespace(steps: Steps[nodes.Namespace]): Namespace = new Namespace(steps)
-
   implicit def toNamespaceBlock(steps: Steps[nodes.NamespaceBlock]): NamespaceBlock = new NamespaceBlock(steps)
-
   implicit def toExpression[A <: nodes.Expression](steps: Steps[A]): Expression[A] = new Expression[A](steps)
-
   implicit def toCfgNode[A <: nodes.CfgNode](steps: Steps[A]): CfgNode[A] = new CfgNode(steps)
-
   implicit def toAstNode[A <: nodes.AstNode](steps: Steps[A]): AstNode[A] = new AstNode(steps)
-
   implicit def toFile(steps: Steps[nodes.File]): File = new File(steps)
-
   implicit def toBlock(steps: Steps[nodes.Block]): Block = new Block(steps)
-
   implicit def toMethodRef(steps: Steps[nodes.MethodRef]): MethodRef = new MethodRef(steps)
-
-  implicit def toBinding(steps: Steps[nodes.Binding]): Binding =
-    new Binding(steps)
+  implicit def toBinding(steps: Steps[nodes.Binding]): Binding = new Binding(steps)
 
   implicit def toCodeAccessors[A <: StoredNode with HasCode](steps: Steps[A]): CodeAccessors[A] =
     new CodeAccessors(steps)
@@ -170,15 +132,12 @@ package object language extends operatorextension.Implicits {
   implicit def toVersionAccessors[A <: StoredNode with HasVersion](steps: Steps[A]): VersionAccessors[A] =
     new VersionAccessors(steps)
 
-  implicit class GremlinScalaDeco[End](raw: GremlinScala[End]) {
+  implicit class GremlinScalaDeco[End](val raw: GremlinScala[End]) extends AnyVal {
     /* in some cases we cannot statically determine the type of the node, e.g. when traversing
      * from a known nodeType via AST edges, so we have to cast */
     def cast[NodeType]: GremlinScala[NodeType] =
       raw.asInstanceOf[GremlinScala[NodeType]]
   }
-
-  implicit def toNodeTypeStarters(cpg: Cpg): NodeTypeStarters =
-    new NodeTypeStarters(cpg)
 
   private def newAnonymousTraversalWithAssociatedGraph[NodeType <: StoredNode](
       seq: NodeType*): GremlinScala[NodeType] = {
@@ -189,7 +148,7 @@ package object language extends operatorextension.Implicits {
     anonymousTraversal
   }
 
-  implicit class NodeTypeDeco[NodeType <: StoredNode](node: NodeType) {
+  implicit class NodeTypeDeco[NodeType <: StoredNode](val node: NodeType) extends AnyVal {
 
     /**
     Start a new traversal from this node
@@ -198,7 +157,7 @@ package object language extends operatorextension.Implicits {
       new NodeSteps[NodeType](newAnonymousTraversalWithAssociatedGraph(node))
   }
 
-  implicit class NodeTypeDecoForIterable[NodeType <: nodes.StoredNode](iter: Iterable[NodeType]) {
+  implicit class NodeTypeDecoForIterable[NodeType <: nodes.StoredNode](val iter: Iterable[NodeType]) extends AnyVal {
 
     /**
     Start a new traversal from these nodes
@@ -207,7 +166,7 @@ package object language extends operatorextension.Implicits {
       new NodeSteps[NodeType](newAnonymousTraversalWithAssociatedGraph(iter.to(Seq): _*))
   }
 
-  implicit class NewNodeTypeDeco[NodeType <: nodes.NewNode](node: NodeType) {
+  implicit class NewNodeTypeDeco[NodeType <: nodes.NewNode](val node: NodeType) extends AnyVal {
 
     /**
     Start a new traversal from this node
@@ -216,7 +175,7 @@ package object language extends operatorextension.Implicits {
       new NewNodeSteps[NodeType](__[NodeType](node))
   }
 
-  implicit class NewNodeTypeDecoForIterable[NodeType <: nodes.NewNode](iter: Iterable[NodeType]) {
+  implicit class NewNodeTypeDecoForIterable[NodeType <: nodes.NewNode](val iter: Iterable[NodeType]) extends AnyVal {
 
     /**
     Start a new traversal from these nodes
@@ -225,7 +184,7 @@ package object language extends operatorextension.Implicits {
       new NewNodeSteps[NodeType](__[NodeType](iter.to(Seq): _*))
   }
 
-  implicit class BaseNodeTypeDeco[NodeType <: nodes.Node](node: NodeType) {
+  implicit class BaseNodeTypeDeco[NodeType <: nodes.Node](val node: NodeType) extends AnyVal {
 
     /**
     Start a new traversal from this node
@@ -234,7 +193,7 @@ package object language extends operatorextension.Implicits {
       new Steps[NodeType](__[NodeType](node))
   }
 
-  implicit class BaseNodeTypeDecoForIterable[NodeType <: nodes.Node](iter: Iterable[NodeType]) {
+  implicit class BaseNodeTypeDecoForIterable[NodeType <: nodes.Node](val iter: Iterable[NodeType]) extends AnyVal {
 
     /**
     Start a new traversal from these nodes
@@ -243,7 +202,7 @@ package object language extends operatorextension.Implicits {
       new Steps[NodeType](__[NodeType](iter.to(Seq): _*))
   }
 
-  implicit class NodeStepsExt(steps: Steps[_ <: StoredNode]) {
+  implicit class NodeStepsExt(val steps: Steps[_ <: StoredNode]) extends AnyVal {
     private def raw: GremlinScala[_ <: StoredNode] = steps.raw
 
     /**
@@ -262,6 +221,7 @@ package object language extends operatorextension.Implicits {
   implicit def toNodeStepsTag[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =
     new NodeSteps[NodeType](original.raw)
 
+  implicit def toNodeTypeStarters(cpg: Cpg): NodeTypeStarters = new NodeTypeStarters(cpg)
   implicit def toTagTraversal(steps: Steps[nodes.Tag]): Tag = new Tag(steps)
 
   implicit def toArgumentIndexAccessors[NodeType <: nodes.Expression](
