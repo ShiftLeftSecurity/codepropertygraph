@@ -35,8 +35,8 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
   /**
     * Execute traversal and map each node to location.
     * */
-  def location: NewLocation =
-    new NewLocation(raw.map(x => x.location))
+  def location: NewNodeSteps[nodes.NewLocation] =
+    new NewNodeSteps(raw.map(_.location))
 
   /**
     * For methods, dump the method code. For expressions,
