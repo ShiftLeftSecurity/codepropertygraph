@@ -71,12 +71,16 @@ trait BridgeBase {
 
     config.scriptFile match {
       case None =>
+        val configurePPrinterMaybe =
+          if (config.nocolors) ""
+          else """val originalPPrinter = repl.pprinter()
+                 |repl.pprinter.update(io.shiftleft.console.pprinter.create(originalPPrinter))
+                 |""".stripMargin
+
+
         val replConfig = List(
           "repl.prompt() = \"" + promptStr() + "\"",
-          """
-            |val originalPPrinter = repl.pprinter()
-            |repl.pprinter.update(io.shiftleft.console.pprinter.create(originalPPrinter))
-            |""".stripMargin,
+          configurePPrinterMaybe,
           "banner()"
         )
         ammonite
