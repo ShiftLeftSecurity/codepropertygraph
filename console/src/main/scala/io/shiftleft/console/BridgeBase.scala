@@ -77,7 +77,6 @@ trait BridgeBase {
                  |repl.pprinter.update(io.shiftleft.console.pprinter.create(originalPPrinter))
                  |""".stripMargin
 
-
         val replConfig = List(
           "repl.prompt() = \"" + promptStr() + "\"",
           configurePPrinterMaybe,
