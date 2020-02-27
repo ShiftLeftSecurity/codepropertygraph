@@ -9,7 +9,7 @@ case class Config(
     scriptFile: Option[Path] = None,
     params: Map[String, String] = Map.empty,
     additionalImports: List[Path] = Nil,
-    colors: Option[Colors] = None,
+    nocolors: Boolean = false,
     command: Option[String] = None
 )
 
@@ -43,7 +43,7 @@ trait BridgeBase {
         .text("import additional additional script(s): will execute and keep console open")
 
       opt[Unit]("nocolors")
-        .action((_, c) => c.copy(colors = Some(Colors.BlackWhite)))
+        .action((_, c) => c.copy(nocolors = true))
         .text("turn off colors")
 
       opt[String]("command")
@@ -65,14 +65,22 @@ trait BridgeBase {
         readScript(file.toScala)
       }
 
+    val ammoniteColors =
+      if (config.nocolors) Colors.BlackWhite
+      else Colors.Default
+
     config.scriptFile match {
       case None =>
+        val configurePPrinterMaybe =
+          if (config.nocolors) ""
+          else """val originalPPrinter = repl.pprinter()
+                 |repl.pprinter.update(io.shiftleft.console.pprinter.create(originalPPrinter))
+                 |""".stripMargin
+
+
         val replConfig = List(
           "repl.prompt() = \"" + promptStr() + "\"",
-          """
-            |val originalPPrinter = repl.pprinter()
-            |repl.pprinter.update(io.shiftleft.console.pprinter.create(originalPPrinter))
-            |""".stripMargin,
+          configurePPrinterMaybe,
           "banner()"
         )
         ammonite
@@ -81,7 +89,7 @@ trait BridgeBase {
             welcomeBanner = Some("Welcome to ShiftLeft Ocular/Joern"),
             storageBackend = new StorageBackend(slProduct),
             remoteLogging = false,
-            colors = config.colors.getOrElse(Colors.Default)
+            colors = ammoniteColors
           )
           .run()
 
@@ -102,7 +110,7 @@ trait BridgeBase {
           .Main(
             predefCode = predefPlus(additionalImportCode ++ shutdownHooks),
             remoteLogging = false,
-            colors = config.colors.getOrElse(Colors.Default)
+            colors = ammoniteColors
           )
           .runScript(actualScriptFile, scriptArgs)
           ._1 match {
