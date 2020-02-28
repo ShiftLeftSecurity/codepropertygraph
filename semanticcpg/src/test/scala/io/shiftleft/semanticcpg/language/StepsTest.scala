@@ -1,11 +1,11 @@
 package io.shiftleft.semanticcpg.language
 
+import gremlin.scala.__
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.{Matchers, WordSpec}
-
 import scala.collection.mutable
 
 class StepsTest extends WordSpec with Matchers {
@@ -125,9 +125,50 @@ class StepsTest extends WordSpec with Matchers {
 
     "operating on primitive" in {
       val json = fixture.cpg.method.name(".*manyArgs.*").signature.toJson
-      println(json)
       val parsed = parse(json).children.head //exactly one result for the above query
       parsed shouldBe JString("java.lang.String(java.lang.String,java.lang.Integer,java.lang.Long,java.lang.Double)")
+    }
+  }
+
+  ".p for pretty printing" should {
+
+    "use Show.Default instance if nothing else applies" in {
+      case class Foo(i: Int)
+      val steps: Steps[Foo] = new Steps(__(Foo(42)))
+      steps.p2.head shouldBe "Foo(42)"
+    }
+
+    "use Show.ForNode instance for NodeSteps" in ExistingCpgFixture("splitmeup") { fixture =>
+      def mainMethods: Steps[nodes.Method] =
+        fixture.cpg.method.name("main")
+
+      val nodeId = mainMethods.head.id
+      mainMethods.p2.head shouldBe s"""(METHOD,$nodeId): AST_PARENT_FULL_NAME: io.shiftleft.testcode.splitmeup.TestGraph, AST_PARENT_TYPE: TYPE_DECL, BINARY_SIGNATURE: ([Ljava/lang/String;)V, FULL_NAME: io.shiftleft.testcode.splitmeup.TestGraph.main:void(java.lang.String[]), IS_EXTERNAL: false, LINE_NUMBER: 12, NAME: main, SIGNATURE: void(java.lang.String[])"""
+    }
+
+    "allows to provide custom Show instance" in ExistingCpgFixture("splitmeup") { fixture =>
+      def mainMethods: Steps[nodes.Method] =
+        fixture.cpg.method.name("main")
+
+      implicit val customShowInstance = new Show[nodes.Method] {
+        override def apply(node: nodes.Method): String = "my custom pretty printer"
+      }
+
+      mainMethods.p2.head shouldBe "my custom pretty printer"
+    }
+
+    "uses Show instance from package" in ExistingCpgFixture("splitmeup") { fixture =>
+      object SomePackage {
+        implicit def packageShowInstance: Show[nodes.Method] = { method: nodes.Method =>
+          "package defined pretty printer"
+        }
+      }
+
+      import SomePackage._
+      def mainMethods: Steps[nodes.Method] =
+        fixture.cpg.method.name("main")
+
+      mainMethods.p2.head shouldBe "package defined pretty printer"
     }
   }
 
