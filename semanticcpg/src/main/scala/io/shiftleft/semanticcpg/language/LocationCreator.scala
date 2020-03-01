@@ -126,6 +126,15 @@ object LocationCreator {
           .toList
           .headOption
       )
+      val namespaceOptionVertex2 = typeOption.flatMap(
+          _.astIn.asScala
+//          .filter(_.label == NodeTypes.NAMESPACE_BLOCK)
+          .collect { case nb: nodes.NamespaceBlock => nb }
+          .flatMap(_.refOut.asScala)
+//          .flatMap(_._refOut.asScala)
+          .toList
+          .headOption
+      )
       val namespaceOption = namespaceOptionVertex.map(_.asInstanceOf[nodes.Namespace])
       val namespaceName = namespaceOption.map(_.name).getOrElse("")
       val fileOption = ExpandTo.methodToFile(method).map(_.asInstanceOf[nodes.File])
