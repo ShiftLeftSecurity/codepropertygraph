@@ -113,34 +113,24 @@ object LocationCreator {
             method: nodes.Method): nodes.NewLocation = {
 
     if (method == null) {
-      new nodes.NewLocation("", "", "", "", None, "", "", "", "", Some(node))
+      nodes.NewLocation("", "", "", "", None, "", "", "", "", Some(node))
     } else {
       val typeOption = ExpandTo.methodToTypeDecl(method).map(_.asInstanceOf[nodes.TypeDecl])
       val typeName = typeOption.map(_.fullName).getOrElse("")
       val typeShortName = typeOption.map(_.name).getOrElse("")
 
-      val namespaceOptionVertex = typeOption.flatMap(
-        _.vertices(Direction.IN, EdgeTypes.AST).asScala
-          .filter(_.label == NodeTypes.NAMESPACE_BLOCK)
-          .flatMap(_.vertices(Direction.OUT, EdgeTypes.REF).asScala)
-          .toList
-          .headOption
-      )
-      val namespaceOptionVertex2 = typeOption.flatMap(
-          _.astIn.asScala
-//          .filter(_.label == NodeTypes.NAMESPACE_BLOCK)
+      val namespaceOption = typeOption.flatMap(
+        _.astIn.asScala
           .collect { case nb: nodes.NamespaceBlock => nb }
           .flatMap(_.refOut.asScala)
-//          .flatMap(_._refOut.asScala)
-          .toList
-          .headOption
+          .nextOption
       )
-      val namespaceOption = namespaceOptionVertex.map(_.asInstanceOf[nodes.Namespace])
+
       val namespaceName = namespaceOption.map(_.name).getOrElse("")
       val fileOption = ExpandTo.methodToFile(method).map(_.asInstanceOf[nodes.File])
       val fileName = fileOption.map(_.name).getOrElse("N/A")
 
-      new nodes.NewLocation(
+      nodes.NewLocation(
         symbol = symbol,
         methodFullName = method.fullName,
         methodShortName = method.name,
@@ -155,7 +145,6 @@ object LocationCreator {
     }
   }
 
-  def emptyLocation(label: String, node: Option[nodes.Node]): nodes.NewLocation = {
-    new nodes.NewLocation("", "", "", "", None, "", "", label, "", node)
-  }
+  def emptyLocation(label: String, node: Option[nodes.Node]): nodes.NewLocation =
+    nodes.NewLocation("", "", "", "", None, "", "", label, "", node)
 }
