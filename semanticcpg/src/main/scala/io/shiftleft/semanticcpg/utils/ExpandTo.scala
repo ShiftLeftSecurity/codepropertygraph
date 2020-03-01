@@ -32,10 +32,10 @@ object ExpandTo {
 
   def parameterInToMethod(parameterIn: nodes.MethodParameterIn): nodes.Method =
     parameterIn.astIn.nextChecked
-  
+
   def parameterOutToMethod(parameterOut: nodes.MethodParameterOut): nodes.Method =
     parameterOut.astIn.nextChecked
-  
+
   def methodReturnToMethod(formalReturnNode: nodes.MethodReturn): nodes.Method =
     formalReturnNode.astIn.nextChecked
 
@@ -81,16 +81,10 @@ object ExpandTo {
       case None                              => None
     }
 
-  def methodToOutParameters(method: Vertex): Seq[nodes.StoredNode] = {
-    method
-      .asInstanceOf[nodes.StoredNode]
-      ._astOut
-      .asScala
-      .filter(_.isInstanceOf[nodes.MethodParameterOut])
-      .toSeq
-  }
+  def methodToOutParameters(method: nodes.Method): Iterator[nodes.MethodParameterOut] =
+    method.astOut.asScala.collect { case paramOut: nodes.MethodParameterOut => paramOut }
 
   def implicitCallToMethod(implicitCall: nodes.ImplicitCall): nodes.Method =
-    implicitCall.vertices(Direction.IN, EdgeTypes.AST).next.asInstanceOf[nodes.Method]
+    implicitCall.astIn.nextChecked
 
 }

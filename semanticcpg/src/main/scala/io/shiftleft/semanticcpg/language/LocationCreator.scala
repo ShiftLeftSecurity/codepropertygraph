@@ -1,9 +1,8 @@
 package io.shiftleft.semanticcpg.language
 
 import gremlin.scala.Vertex
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.utils.ExpandTo
-import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.jdk.CollectionConverters._
 
@@ -18,7 +17,7 @@ object LocationCreator {
           paramIn.name,
           paramIn.label,
           paramIn.lineNumber,
-          ExpandTo.parameterInToMethod(paramIn).asInstanceOf[nodes.Method]
+          ExpandTo.parameterInToMethod(paramIn)
         )
       case paramOut: nodes.MethodParameterOut =>
         apply(
@@ -26,7 +25,7 @@ object LocationCreator {
           paramOut.name,
           paramOut.label,
           paramOut.lineNumber,
-          ExpandTo.parameterInToMethod(paramOut).asInstanceOf[nodes.Method]
+          ExpandTo.parameterOutToMethod(paramOut)
         )
       case methodReturn: nodes.MethodReturn =>
         apply(
@@ -34,7 +33,7 @@ object LocationCreator {
           "$ret",
           methodReturn.label,
           methodReturn.lineNumber,
-          ExpandTo.methodReturnToMethod(methodReturn).asInstanceOf[nodes.Method]
+          ExpandTo.methodReturnToMethod(methodReturn)
         )
       case call: nodes.Call =>
         apply(
@@ -42,7 +41,7 @@ object LocationCreator {
           call.code,
           call.label,
           call.lineNumber,
-          ExpandTo.expressionToMethod(call).asInstanceOf[nodes.Method]
+          ExpandTo.expressionToMethod(call)
         )
       case implicitCall: nodes.ImplicitCall =>
         apply(
@@ -66,7 +65,7 @@ object LocationCreator {
           identifier.name,
           identifier.label,
           identifier.lineNumber,
-          ExpandTo.expressionToMethod(identifier).asInstanceOf[nodes.Method]
+          ExpandTo.expressionToMethod(identifier)
         )
       case literal: nodes.Literal =>
         apply(
@@ -120,7 +119,7 @@ object LocationCreator {
       )
 
       val namespaceName = namespaceOption.map(_.name).getOrElse("")
-      val fileOption = ExpandTo.methodToFile(method).map(_.asInstanceOf[nodes.File])
+      val fileOption = ExpandTo.methodToFile(method)
       val fileName = fileOption.map(_.name).getOrElse("N/A")
 
       nodes.NewLocation(

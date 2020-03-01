@@ -84,20 +84,18 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
       case _                                      => None
     }
 
-  private def methodFast(dataFlowObject: Vertex): nodes.Method = {
-    val method =
-      dataFlowObject.label match {
-        case NodeTypes.METHOD_RETURN =>
-          ExpandTo.methodReturnToMethod(dataFlowObject)
-        case NodeTypes.METHOD_PARAMETER_IN =>
-          ExpandTo.parameterInToMethod(dataFlowObject)
-        case NodeTypes.METHOD_PARAMETER_OUT =>
-          ExpandTo.parameterInToMethod(dataFlowObject)
-        case NodeTypes.LITERAL | NodeTypes.CALL | NodeTypes.IDENTIFIER | NodeTypes.RETURN | NodeTypes.UNKNOWN =>
-          ExpandTo.expressionToMethod(dataFlowObject.asInstanceOf[nodes.Expression])
-      }
-    method.asInstanceOf[nodes.Method]
-  }
+  // TODO match on type rather than label: depends on https://github.com/ShiftLeftSecurity/codepropertygraph/issues/610
+  private def methodFast(dataFlowObject: nodes.TrackingPoint): nodes.Method =
+    dataFlowObject.label match {
+      case NodeTypes.METHOD_RETURN =>
+        ExpandTo.methodReturnToMethod(dataFlowObject.asInstanceOf[nodes.MethodReturn])
+      case NodeTypes.METHOD_PARAMETER_IN =>
+        ExpandTo.parameterInToMethod(dataFlowObject.asInstanceOf[nodes.MethodParameterIn])
+      case NodeTypes.METHOD_PARAMETER_OUT =>
+        ExpandTo.parameterOutToMethod(dataFlowObject.asInstanceOf[nodes.MethodParameterOut])
+      case NodeTypes.LITERAL | NodeTypes.CALL | NodeTypes.IDENTIFIER | NodeTypes.RETURN | NodeTypes.UNKNOWN =>
+        ExpandTo.expressionToMethod(dataFlowObject.asInstanceOf[nodes.Expression])
+    }
 
   private def indirectAccess(node: nodes.StoredNode): Boolean =
     node match {
