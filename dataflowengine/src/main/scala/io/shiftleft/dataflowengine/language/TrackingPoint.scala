@@ -2,9 +2,9 @@ package io.shiftleft.dataflowengine.language
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
+import io.shiftleft.semanticcpg.language._
 import io.shiftleft.Implicits.JavaIteratorDeco
-import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
+import io.shiftleft.semanticcpg.utils.MemberAccess
 import scala.jdk.CollectionConverters._
 
 /**
@@ -16,7 +16,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   /**
     * The enclosing method of the tracking point
     * */
-  def method: NodeSteps[nodes.Method] = wrapped.map(methodFast)
+  def method: NodeSteps[nodes.Method] = wrapped.map(_.method)
 
   /**
     * Convert to nearest CFG node
@@ -81,16 +81,6 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
       case methodParamIn: nodes.MethodParameterIn => Some(methodParamIn)
       case literal: nodes.Literal                 => getTrackingPoint(literal._argumentIn().nextChecked)
       case _                                      => None
-    }
-
-  private def methodFast(dataFlowObject: nodes.TrackingPoint): nodes.Method =
-    dataFlowObject match {
-      case methodReturn: nodes.MethodReturn             => ExpandTo.methodReturnToMethod(methodReturn)
-      case methodParameterIn: nodes.MethodParameterIn   => ExpandTo.parameterInToMethod(methodParameterIn)
-      case methodParameterOut: nodes.MethodParameterOut => ExpandTo.parameterOutToMethod(methodParameterOut)
-      case expression: nodes.Expression                 => ExpandTo.expressionToMethod(expression)
-      case other =>
-        throw new NotImplementedError(s".method not implemented for ${other.label}: $other") //e.g. free tracking point
     }
 
   private def indirectAccess(node: nodes.StoredNode): Boolean =
