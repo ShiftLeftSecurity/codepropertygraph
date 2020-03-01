@@ -19,7 +19,7 @@ class CfgNode[A <: nodes.CfgNode](val wrapped: NodeSteps[A]) extends AnyVal {
             method
           case methodReturn: nodes.MethodReturn =>
             ExpandTo.methodReturnToMethod(methodReturn)
-          case expression =>
+          case expression: nodes.Expression =>
             ExpandTo.expressionToMethod(expression)
         }
         .cast[nodes.Method])

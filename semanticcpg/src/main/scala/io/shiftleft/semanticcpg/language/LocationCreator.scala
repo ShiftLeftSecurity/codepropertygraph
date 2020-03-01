@@ -74,14 +74,7 @@ object LocationCreator {
           literal.code,
           literal.label,
           literal.lineNumber,
-          ExpandTo.expressionToMethod(literal) match {
-            case method: nodes.Method =>
-              method
-            case _: nodes.TypeDecl =>
-              // TODO - there are csharp CPGs that have
-              // typedecls here, which is invalid.
-              null
-          }
+          ExpandTo.expressionToMethod(literal)
         )
       case local: nodes.Local =>
         apply(

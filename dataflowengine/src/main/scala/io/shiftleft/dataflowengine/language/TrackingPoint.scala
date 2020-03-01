@@ -94,7 +94,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
         case NodeTypes.METHOD_PARAMETER_OUT =>
           ExpandTo.parameterInToMethod(dataFlowObject)
         case NodeTypes.LITERAL | NodeTypes.CALL | NodeTypes.IDENTIFIER | NodeTypes.RETURN | NodeTypes.UNKNOWN =>
-          ExpandTo.expressionToMethod(dataFlowObject)
+          ExpandTo.expressionToMethod(dataFlowObject.asInstanceOf[nodes.Expression])
       }
     method.asInstanceOf[nodes.Method]
   }
