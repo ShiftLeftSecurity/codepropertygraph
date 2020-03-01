@@ -5,7 +5,6 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
-import org.apache.tinkerpop.gremlin.structure.Vertex
 import scala.jdk.CollectionConverters._
 
 /**
@@ -99,9 +98,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
   private def indirectAccess(node: nodes.StoredNode): Boolean =
     node match {
-      case call: nodes.Call =>
-        val callName = call.value2(NodeKeys.NAME)
-        MemberAccess.isGenericMemberAccessName(callName)
+      case call: nodes.Call => MemberAccess.isGenericMemberAccessName(call.name)
       case _ => false
     }
 
