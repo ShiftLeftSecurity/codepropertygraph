@@ -17,29 +17,30 @@ object ExpandTo {
   // For languages which make use of function pointers, this can also be the
   // pointer itself.
   // TODO move into traversal dsl - used in codescience
-  def callReceiverOption(callNode: Vertex): Option[nodes.StoredNode] =
-    callNode
-      .asInstanceOf[nodes.StoredNode]
-      ._receiverOut
-      .nextOption
+  def callReceiverOption(callNode: nodes.Call): Option[nodes.StoredNode] =
+    callNode.receiverOut.nextOption
 
-  def callReceiver(callNode: Vertex): nodes.StoredNode = callReceiverOption(callNode).get
+  def callReceiver(callNode: nodes.Call): nodes.StoredNode =
+    callReceiverOption(callNode).get
 
   // TODO move into traversal dsl - used in codescience
-  def callArguments(callNode: Vertex): Iterator[nodes.Expression] =
-    callNode.asInstanceOf[nodes.StoredNode]._argumentOut.asScala.map(_.asInstanceOf[nodes.Expression])
+  def callArguments(callNode: nodes.Call): Iterator[nodes.Expression] =
+    callNode.argumentOut.asScala.map(_.asInstanceOf[nodes.Expression])
 
-  def typeCarrierToType(parameterNode: Vertex): nodes.StoredNode =
-    parameterNode.asInstanceOf[nodes.StoredNode]._evalTypeOut.nextChecked
+  def typeCarrierToType(parameterNode: nodes.StoredNode): nodes.Type =
+    parameterNode._evalTypeOut.nextChecked.asInstanceOf[nodes.Type]
 
-  def parameterInToMethod(parameterNode: Vertex): nodes.StoredNode =
-    parameterNode.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
+  def parameterInToMethod(parameterIn: nodes.MethodParameterIn): nodes.Method =
+    parameterIn.astIn.nextChecked
+  
+  def parameterOutToMethod(parameterOut: nodes.MethodParameterOut): nodes.Method =
+    parameterOut.astIn.nextChecked
+  
+  def methodReturnToMethod(formalReturnNode: nodes.MethodReturn): nodes.Method =
+    formalReturnNode.astIn.nextChecked
 
-  def methodReturnToMethod(formalReturnNode: Vertex): nodes.StoredNode =
-    formalReturnNode.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
-
-  def returnToReturnedExpression(returnExpression: Vertex): Option[nodes.Expression] =
-    returnExpression.asInstanceOf[nodes.StoredNode]._astOut.nextOption.map(_.asInstanceOf[nodes.Expression])
+  def returnToReturnedExpression(returnExpression: nodes.Return): Option[nodes.Expression] =
+    returnExpression.astOut.nextOption.map(_.asInstanceOf[nodes.Expression])
 
   def expressionToMethod(expression: nodes.Expression): nodes.Method =
     expression._containsIn.nextChecked match {
@@ -89,8 +90,7 @@ object ExpandTo {
       .toSeq
   }
 
-  def implicitCallToMethod(implicitCall: nodes.ImplicitCall): nodes.Method = {
+  def implicitCallToMethod(implicitCall: nodes.ImplicitCall): nodes.Method =
     implicitCall.vertices(Direction.IN, EdgeTypes.AST).next.asInstanceOf[nodes.Method]
-  }
 
 }
