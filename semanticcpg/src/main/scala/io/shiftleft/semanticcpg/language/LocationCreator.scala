@@ -1,9 +1,8 @@
 package io.shiftleft.semanticcpg.language
 
 import gremlin.scala.Vertex
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.utils.ExpandTo
-import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.jdk.CollectionConverters._
 
@@ -18,7 +17,7 @@ object LocationCreator {
           paramIn.name,
           paramIn.label,
           paramIn.lineNumber,
-          ExpandTo.parameterInToMethod(paramIn).asInstanceOf[nodes.Method]
+          ExpandTo.parameterInToMethod(paramIn)
         )
       case paramOut: nodes.MethodParameterOut =>
         apply(
@@ -26,7 +25,7 @@ object LocationCreator {
           paramOut.name,
           paramOut.label,
           paramOut.lineNumber,
-          ExpandTo.parameterInToMethod(paramOut).asInstanceOf[nodes.Method]
+          ExpandTo.parameterOutToMethod(paramOut)
         )
       case methodReturn: nodes.MethodReturn =>
         apply(
@@ -34,7 +33,7 @@ object LocationCreator {
           "$ret",
           methodReturn.label,
           methodReturn.lineNumber,
-          ExpandTo.methodReturnToMethod(methodReturn).asInstanceOf[nodes.Method]
+          ExpandTo.methodReturnToMethod(methodReturn)
         )
       case call: nodes.Call =>
         apply(
@@ -42,7 +41,7 @@ object LocationCreator {
           call.code,
           call.label,
           call.lineNumber,
-          ExpandTo.expressionToMethod(call).asInstanceOf[nodes.Method]
+          ExpandTo.expressionToMethod(call)
         )
       case implicitCall: nodes.ImplicitCall =>
         apply(
@@ -66,7 +65,7 @@ object LocationCreator {
           identifier.name,
           identifier.label,
           identifier.lineNumber,
-          ExpandTo.expressionToMethod(identifier).asInstanceOf[nodes.Method]
+          ExpandTo.expressionToMethod(identifier)
         )
       case literal: nodes.Literal =>
         apply(
@@ -74,14 +73,7 @@ object LocationCreator {
           literal.code,
           literal.label,
           literal.lineNumber,
-          ExpandTo.expressionToMethod(literal) match {
-            case method: nodes.Method =>
-              method
-            case _: nodes.TypeDecl =>
-              // TODO - there are csharp CPGs that have
-              // typedecls here, which is invalid.
-              null
-          }
+          ExpandTo.expressionToMethod(literal)
         )
       case local: nodes.Local =>
         apply(
@@ -113,25 +105,24 @@ object LocationCreator {
             method: nodes.Method): nodes.NewLocation = {
 
     if (method == null) {
-      new nodes.NewLocation("", "", "", "", None, "", "", "", "", Some(node))
+      nodes.NewLocation("", "", "", "", None, "", "", "", "", Some(node))
     } else {
       val typeOption = ExpandTo.methodToTypeDecl(method).map(_.asInstanceOf[nodes.TypeDecl])
       val typeName = typeOption.map(_.fullName).getOrElse("")
       val typeShortName = typeOption.map(_.name).getOrElse("")
 
-      val namespaceOptionVertex = typeOption.flatMap(
-        _.vertices(Direction.IN, EdgeTypes.AST).asScala
-          .filter(_.label == NodeTypes.NAMESPACE_BLOCK)
-          .flatMap(_.vertices(Direction.OUT, EdgeTypes.REF).asScala)
-          .toList
-          .headOption
+      val namespaceOption = typeOption.flatMap(
+        _.astIn.asScala
+          .collect { case nb: nodes.NamespaceBlock => nb }
+          .flatMap(_.refOut.asScala)
+          .nextOption
       )
-      val namespaceOption = namespaceOptionVertex.map(_.asInstanceOf[nodes.Namespace])
+
       val namespaceName = namespaceOption.map(_.name).getOrElse("")
-      val fileOption = ExpandTo.methodToFile(method).map(_.asInstanceOf[nodes.File])
+      val fileOption = ExpandTo.methodToFile(method)
       val fileName = fileOption.map(_.name).getOrElse("N/A")
 
-      new nodes.NewLocation(
+      nodes.NewLocation(
         symbol = symbol,
         methodFullName = method.fullName,
         methodShortName = method.name,
@@ -146,7 +137,6 @@ object LocationCreator {
     }
   }
 
-  def emptyLocation(label: String, node: Option[nodes.Node]): nodes.NewLocation = {
-    new nodes.NewLocation("", "", "", "", None, "", "", label, "", node)
-  }
+  def emptyLocation(label: String, node: Option[nodes.Node]): nodes.NewLocation =
+    nodes.NewLocation("", "", "", "", None, "", "", label, "", node)
 }

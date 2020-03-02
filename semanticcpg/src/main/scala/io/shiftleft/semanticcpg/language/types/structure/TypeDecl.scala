@@ -4,7 +4,6 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import org.apache.tinkerpop.gremlin.structure.Direction
 
 /**
   * Type declaration - possibly a template that requires instantiation
@@ -112,21 +111,13 @@ class TypeDecl(val wrapped: NodeSteps[nodes.TypeDecl]) extends AnyVal {
     * If this is an alias type declaration, go to its underlying type declaration
     * else unchanged.
     */
-  def unravelAlias: NodeSteps[nodes.TypeDecl] = {
-    new NodeSteps(raw.map { typeDecl =>
-      if (typeDecl.aliasTypeFullName.isDefined) {
+  def unravelAlias: NodeSteps[nodes.TypeDecl] =
+    wrapped.map { typeDecl =>
+      if (typeDecl.aliasTypeFullName.isDefined)
+        typeDecl.aliasOfOut.next.refOut.next
+      else
         typeDecl
-          .vertices(Direction.OUT, EdgeTypes.ALIAS_OF)
-          .next
-          .asInstanceOf[nodes.Type]
-          .vertices(Direction.OUT, EdgeTypes.REF)
-          .next
-          .asInstanceOf[nodes.TypeDecl]
-      } else {
-        typeDecl
-      }
-    })
-  }
+    }
 
   /**
     * Traverse to canonical type which means unravel aliases until we find
@@ -138,21 +129,15 @@ class TypeDecl(val wrapped: NodeSteps[nodes.TypeDecl]) extends AnyVal {
     // step is used in other repeat steps we do not use it here.
     //until(_.isCanonical).repeat(_.unravelAlias)
 
-    new NodeSteps(raw.map { typeDecl =>
+    wrapped.map { typeDecl =>
       var currentTypeDecl = typeDecl
       var aliasExpansionCounter = 0
       while (currentTypeDecl.aliasTypeFullName.isDefined && aliasExpansionCounter < maxAliasExpansions) {
-        currentTypeDecl = currentTypeDecl
-          .vertices(Direction.OUT, EdgeTypes.ALIAS_OF)
-          .next
-          .asInstanceOf[nodes.Type]
-          .vertices(Direction.OUT, EdgeTypes.REF)
-          .next
-          .asInstanceOf[nodes.TypeDecl]
+        currentTypeDecl = currentTypeDecl.aliasOfOut.next.refOut.next
         aliasExpansionCounter += 1
       }
       currentTypeDecl
-    })
+    }
   }
 
   /**

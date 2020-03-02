@@ -5,7 +5,6 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
-import org.apache.tinkerpop.gremlin.structure.Vertex
 import scala.jdk.CollectionConverters._
 
 /**
@@ -84,27 +83,20 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
       case _                                      => None
     }
 
-  private def methodFast(dataFlowObject: Vertex): nodes.Method = {
-    val method =
-      dataFlowObject.label match {
-        case NodeTypes.METHOD_RETURN =>
-          ExpandTo.methodReturnToMethod(dataFlowObject)
-        case NodeTypes.METHOD_PARAMETER_IN =>
-          ExpandTo.parameterInToMethod(dataFlowObject)
-        case NodeTypes.METHOD_PARAMETER_OUT =>
-          ExpandTo.parameterInToMethod(dataFlowObject)
-        case NodeTypes.LITERAL | NodeTypes.CALL | NodeTypes.IDENTIFIER | NodeTypes.RETURN | NodeTypes.UNKNOWN =>
-          ExpandTo.expressionToMethod(dataFlowObject)
-      }
-    method.asInstanceOf[nodes.Method]
-  }
+  private def methodFast(dataFlowObject: nodes.TrackingPoint): nodes.Method =
+    dataFlowObject match {
+      case methodReturn: nodes.MethodReturn             => ExpandTo.methodReturnToMethod(methodReturn)
+      case methodParameterIn: nodes.MethodParameterIn   => ExpandTo.parameterInToMethod(methodParameterIn)
+      case methodParameterOut: nodes.MethodParameterOut => ExpandTo.parameterOutToMethod(methodParameterOut)
+      case expression: nodes.Expression                 => ExpandTo.expressionToMethod(expression)
+      case other =>
+        throw new NotImplementedError(s".method not implemented for ${other.label}: $other") //e.g. free tracking point
+    }
 
   private def indirectAccess(node: nodes.StoredNode): Boolean =
     node match {
-      case call: nodes.Call =>
-        val callName = call.value2(NodeKeys.NAME)
-        MemberAccess.isGenericMemberAccessName(callName)
-      case _ => false
+      case call: nodes.Call => MemberAccess.isGenericMemberAccessName(call.name)
+      case _                => false
     }
 
 }
