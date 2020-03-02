@@ -4,8 +4,6 @@ import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
 import io.shiftleft.proto.cpg.Cpg._
 import java.lang.{Long => JLong}
-import scala.jdk.CollectionConverters._
-import org.apache.logging.log4j.{LogManager, Logger}
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
 
 /**
@@ -13,7 +11,6 @@ import io.shiftleft.codepropertygraph.generated.nodes.NewNode
   * to existing serialized CPGs as graph overlays.
   * */
 class DiffGraphProtoSerializer() {
-  private val logger = LogManager.getLogger(getClass)
 
   /**
     * Generates a serialized graph overlay representing this graph
@@ -59,7 +56,6 @@ class DiffGraphProtoSerializer() {
   private def addEdge(change: DiffGraph.Change.CreateEdge,
                       builder: CpgOverlay.Builder,
                       appliedDiffGraph: AppliedDiffGraph): Unit = {
-    val diffGraph = appliedDiffGraph.diffGraph
     val srcId =
       if (change.sourceNodeKind == DiffGraph.Change.NodeKind.New)
         appliedDiffGraph.nodeToGraphId(change.src.asInstanceOf[NewNode])
@@ -122,34 +118,33 @@ class DiffGraphProtoSerializer() {
   private def protoValue(value: Any): PropertyValue.Builder = {
     val builder = PropertyValue.newBuilder
     value match {
-      case t: Traversable[_] if t.isEmpty =>
-        builder //empty property
-      case t: Traversable[_] =>
+      case iterable: Iterable[_] if iterable.isEmpty => builder //empty property
+      case iterable: Iterable[_]                     =>
         // determine property list type based on first element - assuming it's a homogeneous list
-        t.head match {
+        iterable.head match {
           case _: String =>
             val b = StringList.newBuilder
-            t.foreach(value => b.addValues(value.asInstanceOf[String]))
+            iterable.asInstanceOf[Iterable[String]].foreach(b.addValues)
             builder.setStringList(b)
           case _: Boolean =>
             val b = BoolList.newBuilder
-            t.foreach(value => b.addValues(value.asInstanceOf[Boolean]))
+            iterable.asInstanceOf[Iterable[Boolean]].foreach(b.addValues)
             builder.setBoolList(b)
           case _: Int =>
             val b = IntList.newBuilder
-            t.foreach(value => b.addValues(value.asInstanceOf[Int]))
+            iterable.asInstanceOf[Iterable[Int]].foreach(b.addValues)
             builder.setIntList(b)
           case _: Long =>
             val b = LongList.newBuilder
-            t.foreach(value => b.addValues(value.asInstanceOf[Long]))
+            iterable.asInstanceOf[Iterable[Long]].foreach(b.addValues)
             builder.setLongList(b)
           case _: Float =>
             val b = FloatList.newBuilder
-            t.foreach(value => b.addValues(value.asInstanceOf[Float]))
+            iterable.asInstanceOf[Iterable[Float]].foreach(b.addValues)
             builder.setFloatList(b)
           case _: Double =>
             val b = DoubleList.newBuilder
-            t.foreach(value => b.addValues(value.asInstanceOf[Double]))
+            iterable.asInstanceOf[Iterable[Double]].foreach(b.addValues)
             builder.setDoubleList(b)
           case _ => throw new RuntimeException("Unsupported primitive value type " + value.getClass)
         }

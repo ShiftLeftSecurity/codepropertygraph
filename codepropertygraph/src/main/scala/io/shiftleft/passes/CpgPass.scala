@@ -1,22 +1,13 @@
 package io.shiftleft.passes
 
-import java.util
-
-import gremlin.scala.{Edge, ScalaGraph}
-import io.shiftleft.SerializedCpg
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
+import io.shiftleft.SerializedCpg
 import io.shiftleft.proto.cpg.Cpg._
+import java.util
+import java.lang.{Long => JLong}
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Vertex
-import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
-import io.shiftleft.Implicits.JavaIteratorDeco
-import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
-import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
-
-import scala.jdk.CollectionConverters._
-import java.lang.{Long => JLong}
-
-import io.shiftleft.codepropertygraph.Cpg
 
 /**
   * Base class for CPG pass - a program, which receives an input graph
@@ -77,47 +68,37 @@ abstract class CpgPass(cpg: Cpg) {
   /**
     * Execute and create a serialized overlay
     */
-  def createApplyAndSerialize(): Iterator[CpgOverlay] = {
-    try {
-      logStart()
-      run().map { dstGraph =>
-        val appliedDiffGraph = DiffGraph.Applier.applyDiff(dstGraph, cpg)
+  def createApplyAndSerialize(): Iterator[CpgOverlay] =
+    withStartEndTimesLogged {
+      run().map { diffGraph =>
+        val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg)
         new DiffGraphProtoSerializer().serialize(appliedDiffGraph)
       }
-    } finally {
-      logEnd()
     }
-  }
 
   /**
     * Execute the enhancement and apply result to the underlying graph
     */
-  def createAndApply(): Unit = {
-    logStart()
-    try {
-      run().foreach(diff => DiffGraph.Applier.applyDiff(diff, cpg))
-    } finally {
-      logEnd()
+  def createAndApply(): Unit =
+    withStartEndTimesLogged {
+      run().foreach(diffGraph => DiffGraph.Applier.applyDiff(diffGraph, cpg))
     }
-  }
 
-  private var startTime: Long = _
-
-  private def logStart(): Unit = {
-    logger.info(s"Start of enhancement: ${name}")
-    startTime = System.currentTimeMillis()
-  }
-
-  private def logEnd(): Unit = {
-    val endTime = System.currentTimeMillis()
-    logger.info(s"End of enhancement: ${name}, after ${endTime - startTime}ms")
+  private def withStartEndTimesLogged[A](fun: => A): A = {
+    logger.info(s"Start of enhancement: $name")
+    val startTime = System.currentTimeMillis
+    try {
+      fun
+    } finally {
+      val endTime = System.currentTimeMillis
+      logger.info(s"End of enhancement: $name, after ${endTime - startTime}ms")
+    }
   }
 
 }
 
 object CpgPass {
   private val logger: Logger = LogManager.getLogger(classOf[CpgPass])
-
 }
 
 /**
