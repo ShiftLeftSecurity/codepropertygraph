@@ -113,9 +113,10 @@ class TypeDecl(val wrapped: NodeSteps[nodes.TypeDecl]) extends AnyVal {
     */
   def unravelAlias: NodeSteps[nodes.TypeDecl] =
     wrapped.map { typeDecl =>
-      if (typeDecl.aliasTypeFullName.isDefined) {
+      if (typeDecl.aliasTypeFullName.isDefined)
         typeDecl.aliasOfOut.next.refOut.next
-      } else typeDecl
+      else
+        typeDecl
     }
 
   /**

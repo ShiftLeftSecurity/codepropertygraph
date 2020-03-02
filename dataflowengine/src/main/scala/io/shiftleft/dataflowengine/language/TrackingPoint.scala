@@ -99,7 +99,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   private def indirectAccess(node: nodes.StoredNode): Boolean =
     node match {
       case call: nodes.Call => MemberAccess.isGenericMemberAccessName(call.name)
-      case _ => false
+      case _                => false
     }
 
 }
