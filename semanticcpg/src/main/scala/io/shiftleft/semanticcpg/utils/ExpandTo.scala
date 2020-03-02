@@ -24,8 +24,8 @@ object ExpandTo {
     callReceiverOption(callNode).get
 
   // TODO move into traversal dsl - used in codescience
-  def callArguments(callNode: nodes.Call): Iterator[nodes.Expression] =
-    callNode.argumentOut.asScala.map(_.asInstanceOf[nodes.Expression])
+  def callArguments(callNode: nodes.CallRepr): Iterator[nodes.Expression] =
+    callNode._argumentOut.asScala.map(_.asInstanceOf[nodes.Expression])
 
   def typeCarrierToType(parameterNode: nodes.StoredNode): nodes.Type =
     parameterNode._evalTypeOut.nextChecked.asInstanceOf[nodes.Type]
