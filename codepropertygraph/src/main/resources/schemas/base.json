@@ -244,7 +244,7 @@
         },
 
         {"id":333, "name":"METHOD_REF",
-          "keys": ["CODE", "ORDER", "ARGUMENT_INDEX", "METHOD_INST_FULL_NAME", "METHOD_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+          "keys": ["CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "METHOD_INST_FULL_NAME", "METHOD_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
           "comment":"Reference to a method instance",
          "is": ["EXPRESSION"],
           "outEdges": [
