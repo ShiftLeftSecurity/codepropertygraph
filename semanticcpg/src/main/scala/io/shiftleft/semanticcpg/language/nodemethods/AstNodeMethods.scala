@@ -25,21 +25,23 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
     * Indicate whether the AST node represents a control structure,
     * e.g., `if`, `for`, `while`.
     * */
-  def isControlStructure: Boolean = node.start.isControlStructure.size == 1
+  def isControlStructure: Boolean = node.isInstanceOf[nodes.ControlStructure]
 
-  def isIdentifier: Boolean = node.start.isIdentifier.size == 1
+  def isIdentifier: Boolean = node.isInstanceOf[nodes.Identifier]
 
-  def isReturn: Boolean = node.start.isReturn.size == 1
+  def isFieldIdentifier: Boolean = node.isInstanceOf[nodes.FieldIdentifier]
 
-  def isLiteral: Boolean = node.start.isLiteral.size == 1
+  def isReturn: Boolean = node.isInstanceOf[nodes.Return]
 
-  def isCall: Boolean = node.start.isCall.size == 1
+  def isLiteral: Boolean = node.isInstanceOf[nodes.Literal]
 
-  def isExpression: Boolean = node.start.isExpression.size == 1
+  def isCall: Boolean = node.isInstanceOf[nodes.Call]
 
-  def isMethodRef: Boolean = node.start.isMethodRef.size == 1
+  def isExpression: Boolean = node.isInstanceOf[nodes.Expression]
 
-  def isBlock: Boolean = node.start.isBlock.size == 1
+  def isMethodRef: Boolean = node.isInstanceOf[nodes.MethodRef]
+
+  def isBlock: Boolean = node.isInstanceOf[nodes.Block]
 
   /**
     * The depth of the AST rooted in this node. Upon walking
@@ -67,7 +69,7 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
   @tailrec
   final def _parentExpression(argument: nodes.AstNode): nodes.Expression = {
-    val parent = argument.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
+    val parent = argument._astIn.nextChecked
     parent match {
       case call: nodes.Call if MemberAccess.isGenericMemberAccessName(call.name) =>
         _parentExpression(call)
