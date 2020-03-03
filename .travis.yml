@@ -51,6 +51,7 @@ cache:
     - $HOME/.sbt/1.0/dependency
     - $HOME/.sbt/boot/scala*
     - $HOME/.sbt/launchers
+    - $HOME/.ivy2/cache
     - $HOME/.cache/coursier
     - $HOME/.coursier
 notifications:
