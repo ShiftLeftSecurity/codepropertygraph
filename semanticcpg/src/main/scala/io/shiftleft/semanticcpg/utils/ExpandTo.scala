@@ -32,15 +32,15 @@ object ExpandTo {
   }
 
   def typeCarrierToType(parameterNode: Vertex): nodes.StoredNode = {
-    parameterNode.asInstanceOf[nodes.StoredNode]._evalTypeOut.nextChecked
+    parameterNode.asInstanceOf[nodes.StoredNode]._evalTypeOut.onlyChecked
   }
 
   def parameterInToMethod(parameterNode: Vertex): nodes.StoredNode = {
-    parameterNode.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
+    parameterNode.asInstanceOf[nodes.StoredNode]._astIn.onlyChecked
   }
 
   def methodReturnToMethod(formalReturnNode: Vertex): nodes.StoredNode = {
-    formalReturnNode.asInstanceOf[nodes.StoredNode]._astIn.nextChecked
+    formalReturnNode.asInstanceOf[nodes.StoredNode]._astIn.onlyChecked
   }
 
   def returnToReturnedExpression(returnExpression: Vertex): Option[nodes.Expression] = {
@@ -48,7 +48,7 @@ object ExpandTo {
   }
 
   def expressionToMethod(expression: Vertex): nodes.StoredNode = {
-    expression.asInstanceOf[nodes.StoredNode]._containsIn.nextChecked
+    expression.asInstanceOf[nodes.StoredNode]._containsIn.onlyChecked
   }
 
   def hasModifier(methodNode: Vertex, modifierType: String): Boolean = {

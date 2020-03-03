@@ -30,7 +30,7 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
       .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
       .sideEffect {
         case parameterIn: nodes.MethodParameterIn =>
-          if (!parameterIn.vertices(Direction.OUT, EdgeTypes.PARAMETER_LINK).hasNext) {
+          if (!parameterIn._parameterLinkOut().hasNext) {
             val parameterOut = new nodes.NewMethodParameterOut(
               parameterIn.code,
               parameterIn.order,
@@ -42,11 +42,9 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
             )
 
             val method =
-              parameterIn.vertices(Direction.IN, EdgeTypes.AST).nextChecked.asInstanceOf[nodes.Method]
+              parameterIn._astIn.onlyChecked.asInstanceOf[nodes.Method]
             if (parameterIn.typeFullName == null) {
-              val evalType = parameterIn
-                .vertices(Direction.OUT, EdgeTypes.EVAL_TYPE)
-                .nextChecked
+              val evalType = parameterIn._evalTypeOut.onlyChecked
                 .asInstanceOf[nodes.Type]
               dstGraph.addEdgeToOriginal(parameterOut, evalType, EdgeTypes.EVAL_TYPE)
               if (!loggedMissingTypeFullName) {

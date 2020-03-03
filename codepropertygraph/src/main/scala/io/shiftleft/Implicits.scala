@@ -19,6 +19,14 @@ object Implicits {
       }
     }
 
+    def onlyChecked: T = {
+      if (iterator.hasNext) {
+        val res = iterator.next
+        assert(!iterator.hasNext)
+        res
+      } else { throw new NoSuchElementException() }
+    }
+
     def nextOption: Option[T] = {
       if (iterator.hasNext) {
         Some(iterator.next)

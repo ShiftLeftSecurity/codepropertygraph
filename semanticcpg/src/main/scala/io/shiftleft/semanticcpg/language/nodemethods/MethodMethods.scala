@@ -14,7 +14,7 @@ class MethodMethods(val node: nodes.Method) extends AnyVal {
     node._astOut.asScala
       .collect { case mr: nodes.MethodReturn => mr }
       .asJava
-      .nextChecked
+      .onlyChecked
 
   def local: NodeSteps[nodes.Local] =
     node.start.local

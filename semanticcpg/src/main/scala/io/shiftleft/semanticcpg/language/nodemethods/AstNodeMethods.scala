@@ -69,7 +69,7 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
   @tailrec
   final def _parentExpression(argument: nodes.AstNode): nodes.Expression = {
-    val parent = argument._astIn.nextChecked
+    val parent = argument._astIn.onlyChecked
     parent match {
       case call: nodes.Call if MemberAccess.isGenericMemberAccessName(call.name) =>
         _parentExpression(call)
@@ -79,6 +79,6 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
   }
 
   def astParent: nodes.AstNode =
-    node._astIn.nextChecked.asInstanceOf[nodes.AstNode]
+    node._astIn.onlyChecked.asInstanceOf[nodes.AstNode]
 
 }
