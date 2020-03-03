@@ -278,9 +278,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
   def getOperation(node: nodes.StoredNode): Option[nodes.StoredNode] = {
     node match {
       case identifier: nodes.Identifier =>
-        identifier.argumentIn.nextOption match {
-          case None       => None
-          case Some(user) => getOperation(user)
+        identifier.argumentIn.nextOption.map(getOperation)
         }
       case _: nodes.Call   => Some(node)
       case _: nodes.Return => Some(node)
