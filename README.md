@@ -145,7 +145,7 @@ cpg.method.name("getAccountList").definingTypeDecl.toList.head
 # References
 
 [1]  Rodriguez and Neubauer - The Graph Traversal Pattern:
-   https://pdfs.semanticscholar.org/ae6d/dcba8c848dd0a30a30c5a895cbb491c9e445.pdf
+    https://pdfs.semanticscholar.org/ae6d/dcba8c848dd0a30a30c5a895cbb491c9e445.pdf
 
 [2] Yamaguchi et al. - Modeling and Discovering Vulnerabilities with Code Property Graphs
     https://www.sec.cs.tu-bs.de/pubs/2014-ieeesp.pdf
