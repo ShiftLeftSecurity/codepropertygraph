@@ -166,8 +166,8 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
   /** For debug purposes */
   def vertexToStr(vertex: Vertex): String = {
     try {
-      val methodVertex = ExpandTo.expressionToMethod(vertex)
-      val fileName = ExpandTo.methodToFile(methodVertex) match {
+      val method = ExpandTo.expressionToMethod(vertex.asInstanceOf[nodes.Expression])
+      val fileName = ExpandTo.methodToFile(method) match {
         case Some(objFile) => objFile.value2(NodeKeys.NAME)
         case None          => "NA"
       }

@@ -2,10 +2,9 @@ package io.shiftleft.dataflowengine.language
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
+import io.shiftleft.semanticcpg.language._
 import io.shiftleft.Implicits.JavaIteratorDeco
-import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
-import org.apache.tinkerpop.gremlin.structure.Vertex
+import io.shiftleft.semanticcpg.utils.MemberAccess
 import scala.jdk.CollectionConverters._
 
 /**
@@ -17,7 +16,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   /**
     * The enclosing method of the tracking point
     * */
-  def method: NodeSteps[nodes.Method] = wrapped.map(methodFast)
+  def method: NodeSteps[nodes.Method] = wrapped.map(_.method)
 
   /**
     * Convert to nearest CFG node
@@ -84,27 +83,10 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
       case _                                      => None
     }
 
-  private def methodFast(dataFlowObject: Vertex): nodes.Method = {
-    val method =
-      dataFlowObject.label match {
-        case NodeTypes.METHOD_RETURN =>
-          ExpandTo.methodReturnToMethod(dataFlowObject)
-        case NodeTypes.METHOD_PARAMETER_IN =>
-          ExpandTo.parameterInToMethod(dataFlowObject)
-        case NodeTypes.METHOD_PARAMETER_OUT =>
-          ExpandTo.parameterInToMethod(dataFlowObject)
-        case NodeTypes.LITERAL | NodeTypes.CALL | NodeTypes.IDENTIFIER | NodeTypes.RETURN | NodeTypes.UNKNOWN =>
-          ExpandTo.expressionToMethod(dataFlowObject)
-      }
-    method.asInstanceOf[nodes.Method]
-  }
-
   private def indirectAccess(node: nodes.StoredNode): Boolean =
     node match {
-      case call: nodes.Call =>
-        val callName = call.value2(NodeKeys.NAME)
-        MemberAccess.isGenericMemberAccessName(callName)
-      case _ => false
+      case call: nodes.Call => MemberAccess.isGenericMemberAccessName(call.name)
+      case _                => false
     }
 
 }

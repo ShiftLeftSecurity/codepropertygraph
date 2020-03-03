@@ -19,7 +19,7 @@ class DiffGraphTest extends WordSpec with Matchers {
       y.property(NodeKeyNames.CODE, "old y code")
       val x2y = x.addEdge(EdgeTypes.CONTAINS_NODE, y, EdgeKeyNames.LOCAL_NAME, "old edge attr")
       // make diffgraph
-      var diffBuilder = DiffGraph.newBuilder
+      val diffBuilder = DiffGraph.newBuilder
       // add a b c nodes to the DiffGraph.Builder
       val a = makeNode(g, "a")
       diffBuilder.addNode(a)
@@ -55,8 +55,8 @@ class DiffGraphTest extends WordSpec with Matchers {
         RemoveNode(_) // remove a
       ) = changes
     }
-
   }
+
   "should be able to revert DiffGraph and reapply again" in {
     withTestOdb { g =>
       var diffBuilder = DiffGraph.newBuilder
@@ -79,11 +79,13 @@ class DiffGraphTest extends WordSpec with Matchers {
       assert(g.V.has(NodeKeys.CODE, "b").head.out(EdgeTypes.AST).notExists())
     }
   }
+
   def withTestOdb[T](f: ScalaGraph => T): T = {
     val graph: ScalaGraph = OverflowDbTestInstance.create
     try f(graph)
     finally graph.close()
   }
+
   def makeNode(g: ScalaGraph, code: String) = new nodes.NewNode {
     override def containedNodesByLocalName = ???
     override def label = NodeTypes.UNKNOWN
@@ -94,12 +96,13 @@ class DiffGraphTest extends WordSpec with Matchers {
     def productElement(n: Int): Any = ???
     def productElementLabel(n: Int): String = ???
   }
+
   def makeEdgeBetweenExistingNodes(g: ScalaGraph, diff: DiffGraph.Builder, codeA: String, codeB: String) = {
     val a = g.V.has(NodeKeys.CODE, codeA).head
     val b = g.V.has(NodeKeys.CODE, codeB).head
     diff.addEdge(a.asInstanceOf[nodes.StoredNode], b.asInstanceOf[nodes.StoredNode], EdgeTypes.AST)
   }
-  def makeEdgeBetweenNewNodes(g: ScalaGraph, diff: DiffGraph.Builder, a: NewNode, b: NewNode) = {
+
+  def makeEdgeBetweenNewNodes(g: ScalaGraph, diff: DiffGraph.Builder, a: NewNode, b: NewNode) =
     diff.addEdge(a, b, EdgeTypes.AST)
-  }
 }
