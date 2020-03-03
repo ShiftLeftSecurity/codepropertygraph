@@ -48,6 +48,9 @@ before_cache:
 - rm -rf $HOME/.ivy2/local
 cache:
   directories:
+    - $HOME/.sbt/1.0/dependency
+    - $HOME/.sbt/boot/scala*
+    - $HOME/.sbt/launchers
     - $HOME/.cache/coursier
     - $HOME/.coursier
 notifications:
