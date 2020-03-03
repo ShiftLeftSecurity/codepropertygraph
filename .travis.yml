@@ -48,7 +48,6 @@ before_cache:
 - rm -rf $HOME/.ivy2/local
 cache:
   directories:
-    - $HOME/.ivy2/cache
     - $HOME/.cache/coursier
     - $HOME/.coursier
 notifications:
