@@ -46,6 +46,14 @@ before_cache:
 - find $HOME/.sbt -name "*.lock" -type f -delete
 - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
 - rm -rf $HOME/.ivy2/local
+cache:
+  directories:
+    - $HOME/.sbt/1.0/dependency
+    - $HOME/.sbt/boot/scala*
+    - $HOME/.sbt/launchers
+    - $HOME/.ivy2/cache
+    - $HOME/.cache/coursier
+    - $HOME/.coursier
 notifications:
   slack:
     secure: HAZWVXDtRQiqSl0BiskghiLRMzi9+6q7DYhgBSmXTth8Ljex2n6ehsmxN7DdnL+OX8RqKWCIzSCURbPmVxJG77g4vQOi5a4FG//2NUAWMNBciLSwAJfyn6eC7tn4+iA9B1SKOSwdz7SCshnOL/9XupojYAwApjZgjvAFDGYOfFk9gv4Ezjrx3mX6Ge+VrkBVLIyFxTeBcMCsLYi/zsZWnzWpl7+ymqQIxhiburOU1ePDq/lHcFdvQSks3YWb1TlfsdNRt7hwkNrb60nfsZBxyt7pDk+GV4rdpgtZgolcZImqrVarnz7/UchOLn6Hl/bmkqFr3a+Aiaank7oph/fIWGBKqbTzoD8nY6mp1sLYtMbk8BZgKjr+DuqyIoJawMl7RvffJA2L149QPNdaR9uIkx+a2P5Wgs/DFiASOnyiX87S1Hfwok6ediO+NSrQJhGMyk87dRycDHywDaG0VuppHiFrDrqEo9kE/2iEL3/10xqVuoU1Yp/aLmeXSs2b0P7VZTLy23w8aCn6EEdyTgLkc0xRHPkA/c04UZ6vuQCK3JsBpEtT95Sot0y58vgbh1Er5DOlDXccOXL9qooBe9e84uJFj4qJx+/bIRBPKC0em1Dd3qtPP4MCfxY9+75r03ruwi1PPR/ifAjXbiBp9qfWu2XHXDmyHfoI73UJyClYLxI=
