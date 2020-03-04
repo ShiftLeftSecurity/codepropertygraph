@@ -22,7 +22,7 @@ object Implicits {
     def onlyChecked: T = {
       if (iterator.hasNext) {
         val res = iterator.next
-        assert(!iterator.hasNext)
+        assert(!iterator.hasNext, "iterator was expected to have exactly one element, but it actually has more")
         res
       } else { throw new NoSuchElementException() }
     }
