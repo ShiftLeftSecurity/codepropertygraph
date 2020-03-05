@@ -42,7 +42,8 @@
           "outEdges" : [
              {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD", "METHOD_PARAMETER_OUT", "IMPLICIT_CALL"]},
              {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN"]},
-             {"edgeName": "CONTAINS", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]}
+             {"edgeName": "CONTAINS", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]},
+             {"edgeName": "SOURCE_FILE", "inNodes": ["FILE"]}
           ]
         },
         { "name" : "BINDING",
@@ -79,7 +80,8 @@
             "name": "NAMESPACE_BLOCK",
             "outEdges": [
               {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]},
-              {"edgeName": "REF", "inNodes": ["NAMESPACE"]}
+              {"edgeName": "REF", "inNodes": ["NAMESPACE"]},
+              {"edgeName": "SOURCE_FILE", "inNodes": ["FILE"]}
             ]
         },
         { "name": "METHOD_REF",
@@ -97,7 +99,8 @@
              {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]},
              {"edgeName": "INHERITS_FROM", "inNodes": ["TYPE"]},
              {"edgeName": "ALIAS_OF", "inNodes": ["TYPE"]},
-             {"edgeName": "CONTAINS", "inNodes": ["METHOD"]}
+             {"edgeName": "CONTAINS", "inNodes": ["METHOD"]},
+             {"edgeName": "SOURCE_FILE", "inNodes": ["FILE"]}
           ]
         },
         { "name": "MEMBER",
