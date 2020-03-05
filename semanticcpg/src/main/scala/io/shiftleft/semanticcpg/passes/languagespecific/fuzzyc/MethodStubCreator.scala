@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewMethodReturn}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
-import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 import io.shiftleft.semanticcpg.language._
 
@@ -45,52 +44,48 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
                                signature: String,
                                parameterCount: Int,
                                dstGraph: DiffGraph.Builder): nodes.MethodBase = {
-    val methodNode = new nodes.NewMethod(
-      name,
-      fullName,
-      true,
-      signature,
-      NodeTypes.NAMESPACE_BLOCK,
-      "<global>",
-      None,
-      None,
-      None,
-      None,
-      0,
-      None
+    val methodNode = nodes.NewMethod(
+      name = name,
+      fullName = fullName,
+      isExternal = true,
+      signature = signature,
+      astParentType = NodeTypes.NAMESPACE_BLOCK,
+      astParentFullName = "<global>",
+      order = 0
     )
     dstGraph.addNode(methodNode)
 
-    for (paramaterOrder <- 1 to parameterCount) {
-      val nameAndCode = s"p$paramaterOrder"
+    for (parameterOrder <- 1 to parameterCount) {
+      val nameAndCode = s"p$parameterOrder"
 
-      val methodParameterIn = new nodes.NewMethodParameterIn(
-        nameAndCode,
-        paramaterOrder,
-        nameAndCode,
-        EvaluationStrategies.BY_VALUE,
-        "ANY",
-        Nil,
-        None,
-        None,
+      val methodParameterIn = nodes.NewMethodParameterIn(
+        code = nameAndCode,
+        order = parameterOrder,
+        name = nameAndCode,
+        evaluationStrategy = EvaluationStrategies.BY_VALUE,
+        typeFullName = "ANY",
+        dynamicTypeHintFullName = Nil
       )
 
       dstGraph.addNode(methodParameterIn)
       dstGraph.addEdge(methodNode, methodParameterIn, EdgeTypes.AST)
     }
 
-    val methodReturn = new NewMethodReturn(
-      "RET",
-      EvaluationStrategies.BY_VALUE,
-      "ANY",
-      Nil,
-      None,
-      None,
+    val methodReturn = NewMethodReturn(
+      code = "RET",
+      evaluationStrategy = EvaluationStrategies.BY_VALUE,
+      typeFullName = "ANY",
+      dynamicTypeHintFullName = Nil
     )
     dstGraph.addNode(methodReturn)
     dstGraph.addEdge(methodNode, methodReturn, EdgeTypes.AST)
 
-    val blockNode = new NewBlock("", 1, 1, "ANY", Nil, None, None)
+    val blockNode = NewBlock(
+      order = 1,
+      argumentIndex = 1,
+      typeFullName = "ANY",
+      dynamicTypeHintFullName = Nil
+    )
     dstGraph.addNode(blockNode)
     dstGraph.addEdge(methodNode, blockNode, EdgeTypes.AST)
 
@@ -111,8 +106,4 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
       }
       .exec()
   }
-}
-
-object MethodStubCreator {
-  private val logger: Logger = LogManager.getLogger(classOf[MethodStubCreator])
 }
