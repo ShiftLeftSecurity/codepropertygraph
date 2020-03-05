@@ -47,7 +47,7 @@
 	    {"localName" : "routes", "nodeType": "ROUTE", "cardinality": "list" }
         ], "outEdges" : [] },
         {"id" : 200, "name" : "SP_ANNOTATION_PARAMETER", "comment" : "", "keys" : ["ANNOTATION_NAME", "ANNOTATION_FULL_NAME", "NAME", "VALUE"], "outEdges" : [] },
-        {"id" : 201, "name" : "CALL_SITE", "comment" : "", "keys" : [], "comment" : "", "outEdges" : [],
+        {"id" : 201, "name" : "CALL_SITE", "comment" : "", "keys" : [], "outEdges" : [],
           "containedNodes" : [
              {"nodeType":"METHOD", "localName":"method", "cardinality":"one"},
              {"nodeType":"CALL", "localName":"call", "cardinality":"one"},

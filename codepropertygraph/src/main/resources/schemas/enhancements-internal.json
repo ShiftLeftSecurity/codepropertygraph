@@ -176,11 +176,11 @@
         {"id" : 17, "name": "TAINT_REMOVE", "keys" : [], "comment" : "Indicates taint removal. Only present between corresponding METHOD_PARAMETER_IN and METHOD_PARAMETER_OUT nodes"},
         {"id" : 20, "name" : "DYNAMIC_TYPE", "keys": [], "comment" : "Indicates the dynamic type(s) of an entity. This comes initially from the frontend provided DYNAMIC_TYPE_HINT_FULL_NAME property and is extended by our type resolution" },
 
-        {"id" : 181, "name": "DOMINATE", "keys" : [], "comment" : "Points to dominated node in DOM tree", "keys" : []},
-        {"id" : 182, "name": "POST_DOMINATE", "keys" : [], "comment" : "Points to dominated node in post DOM tree", "keys" : []},
-        {"id" : 183, "name": "CDG", "keys" : [], "comment" : "Control dependency graph", "keys" : []},
+        {"id" : 181, "name": "DOMINATE", "keys" : [], "comment" : "Points to dominated node in DOM tree"},
+        {"id" : 182, "name": "POST_DOMINATE", "keys" : [], "comment" : "Points to dominated node in post DOM tree"},
+        {"id" : 183, "name": "CDG", "keys" : [], "comment" : "Control dependency graph"},
         // deprecated, c.f. CONFIG_FILE
-        {"id" : 18, "name": "ATTACHED_DATA", "keys" : [], "comment" : "Link between FRAMEWORK and FRAMEWORK_DATA nodes", "keys" : []}
+        {"id" : 18, "name": "ATTACHED_DATA", "keys" : [], "comment" : "Link between FRAMEWORK and FRAMEWORK_DATA nodes"}
 
         // Modifications to existing edge types
     ],
