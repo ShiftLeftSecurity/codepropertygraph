@@ -28,7 +28,6 @@ class FileLinker(cpg: Cpg) extends CpgPass(cpg) {
     def linkByFileName(node: nodes.StoredNode with nodes.HasFilename): Unit = {
       var filename = node.filename
       if (filename == null) {
-        // TODO: move traversal to here and replace global file traversal
         node.start.file.name.headOption().foreach { name =>
           filename = name
         }
