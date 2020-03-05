@@ -87,7 +87,8 @@
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["METHOD_RETURN", "METHOD_PARAMETER_IN",
                                              "MODIFIER", "BLOCK", "TYPE_PARAMETER"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
+             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]},
+             {"edgeName": "SOURCE_FILE", "inNodes": ["FILE"]}
          ]
         },
 
@@ -308,7 +309,8 @@
         {"id" : 55, "name": "RECEIVER", "comment" : "The receiver of a method call which is either an object or a pointer", "keys": []},
         {"id" : 56, "name": "CONDITION", "comment" : "Edge from control structure node to the expression that holds the condition", "keys" : []},
         {"id" : 155, "name": "BINDS", "comment" : "Relation between TYPE_DECL and BINDING node", "keys": []},
-        {"id" : 156, "name": "ARGUMENT", "comment" : "Relation between a CALL and its arguments and RETURN and the returned expression", "keys": []}
+        {"id" : 156, "name": "ARGUMENT", "comment" : "Relation between a CALL and its arguments and RETURN and the returned expression", "keys": []},
+        {"id" : 157, "name" : "SOURCE_FILE", "comment" : "Source file of a node, in which its LINE_NUMBER and COLUMN_NUMBER are valid", "keys" : []}
 
     ],
 
