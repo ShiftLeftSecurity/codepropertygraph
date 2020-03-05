@@ -85,13 +85,13 @@ abstract class CpgPass(cpg: Cpg) {
     }
 
   private def withStartEndTimesLogged[A](fun: => A): A = {
-    logger.info(s"Start of enhancement: $name")
+    logger.debug(s"Start of enhancement: $name")
     val startTime = System.currentTimeMillis
     try {
       fun
     } finally {
       val endTime = System.currentTimeMillis
-      logger.info(s"End of enhancement: $name, after ${endTime - startTime}ms")
+      logger.info(s"Enhancement $name completed in ${endTime - startTime}ms")
     }
   }
 
