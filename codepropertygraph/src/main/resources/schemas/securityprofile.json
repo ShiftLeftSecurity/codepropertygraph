@@ -9,7 +9,6 @@
         {"id" : 132, "name" : "CLASS_SHORT_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
         {"id" : 105, "name" : "NODE_LABEL", "comment" : "", "valueType" : "string", "cardinality" : "one"},
 
-        {"id" : 106, "name" : "FILENAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
 
         {"id" : 107, "name" : "ANNOTATION_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
         {"id" : 108, "name" : "ANNOTATION_FULL_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
