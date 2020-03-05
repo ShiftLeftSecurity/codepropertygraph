@@ -21,7 +21,7 @@ class CpgValidatorTest extends WordSpec with Matchers {
       val validator = new CpgValidator(errorRegistry)
       cpg.graph + NodeTypes.METHOD
       validator.validate(cpg) shouldBe false
-      errorRegistry.getErrorCount shouldBe 9
+      errorRegistry.getErrorCount shouldBe 10
     }
   }
 }
