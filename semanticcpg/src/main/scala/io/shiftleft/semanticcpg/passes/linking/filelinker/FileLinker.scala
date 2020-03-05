@@ -26,15 +26,21 @@ class FileLinker(cpg: Cpg) extends CpgPass(cpg) {
     val newFilesByName = mutable.Map[String, nodes.NewFile]()
 
     def linkByFileName(node: nodes.StoredNode with nodes.HasFilename): Unit = {
-      val name = node.filename
-      if (name != "") {
-        val originalFile = originalFilesByName.get(name)
+      var filename = node.filename
+      if (filename == null) {
+        // TODO: move traversal to here and replace global file traversal
+        node.start.file.name.headOption().foreach { name =>
+          filename = name
+        }
+      }
+      if (filename != "") {
+        val originalFile = originalFilesByName.get(filename)
         if (originalFile.isDefined) {
           dstGraph.addEdgeInOriginal(node, originalFile.get, EdgeTypes.SOURCE_FILE)
         } else {
-          val newFile = newFilesByName.getOrElseUpdate(name, {
+          val newFile = newFilesByName.getOrElseUpdate(filename, {
             maxOrder += 1
-            val file = nodes.NewFile(name = name, order = maxOrder)
+            val file = nodes.NewFile(name = filename, order = maxOrder)
             dstGraph.addNode(file)
             file
           })
