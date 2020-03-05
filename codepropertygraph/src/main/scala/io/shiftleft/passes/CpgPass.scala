@@ -8,6 +8,7 @@ import java.util
 import java.lang.{Long => JLong}
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Vertex
+import scala.concurrent.duration.DurationLong
 
 /**
   * Base class for CPG pass - a program, which receives an input graph
@@ -90,8 +91,8 @@ abstract class CpgPass(cpg: Cpg) {
     try {
       fun
     } finally {
-      val endTime = System.currentTimeMillis
-      logger.info(s"Enhancement $name completed in ${endTime - startTime}ms")
+      val duration = (System.currentTimeMillis - startTime).millis.toCoarsest
+      logger.info(s"Enhancement $name completed in $duration")
     }
   }
 
