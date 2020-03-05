@@ -19,6 +19,7 @@ class OutFactsImporter extends FactsImporter {
       NodeTypes.METHOD has 0 to N outgoing EdgeTypes.AST to NodeTypes.TYPE_PARAMETER,
       NodeTypes.METHOD has 0 to N outgoing EdgeTypes.AST to NodeTypes.ANNOTATION,
       NodeTypes.METHOD has 0 to N outgoing EdgeTypes.CFG to SuperTypes.Expression or NodeTypes.METHOD_RETURN,
+      NodeTypes.METHOD has 0 to 1 outgoing EdgeTypes.SOURCE_FILE to NodeTypes.FILE,
       NodeTypes.METHOD_PARAMETER_IN has 0 to N outgoing EdgeTypes.AST to NodeTypes.ANNOTATION,
       NodeTypes.TYPE has 0 to N outgoing EdgeTypes.AST to NodeTypes.TYPE_ARGUMENT,
       NodeTypes.TYPE_DECL has 0 to N outgoing EdgeTypes.AST to NodeTypes.TYPE_PARAMETER,
