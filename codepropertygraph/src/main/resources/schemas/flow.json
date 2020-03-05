@@ -22,7 +22,7 @@
 	 ]
 	},
 
-	{"id" : 202, "name" : "SOURCE", "comment" : "", "keys" : ["SOURCE_TYPE"], "comment" : "", "outEdges" : [], "containedNodes" : [
+	{"id" : 202, "name" : "SOURCE", "comment" : "", "keys" : ["SOURCE_TYPE"], "outEdges" : [], "containedNodes" : [
             {"localName" : "node", "nodeType" : "TRACKING_POINT", "cardinality" : "one"},
             {"localName" : "method", "nodeType" : "METHOD", "cardinality" : "one" },
             {"localName" : "methodTags", "nodeType" : "TAG", "cardinality" : "list"},
@@ -32,7 +32,7 @@
             {"localName" : "nodeType", "nodeType" : "TYPE", "cardinality" : "one"}
         ]},
 	
-	{"id" : 203, "name" : "SINK", "comment" : "", "keys" : ["SINK_TYPE"], "comment" : "", "outEdges" : [], "containedNodes" : [
+	{"id" : 203, "name" : "SINK", "comment" : "", "keys" : ["SINK_TYPE"], "outEdges" : [], "containedNodes" : [
             {"localName" : "node", "nodeType" : "TRACKING_POINT", "cardinality" : "one"},
 	    {"localName" : "nodeType", "nodeType" : "TYPE", "cardinality" : "one"},
             {"localName" : "method", "nodeType" : "METHOD", "cardinality" : "one" },
