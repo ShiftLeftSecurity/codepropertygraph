@@ -218,8 +218,11 @@ package object language extends operatorextension.Implicits {
   implicit def toCallForCallGraph(steps: Steps[nodes.Call]): Call = new Call(steps)
   // / Call graph extension
 
-  implicit def toNodeStepsTag[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =
+  implicit def toNodeSteps[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =
     new NodeSteps[NodeType](original.raw)
+
+  implicit def toNewNodeSteps[NodeType <: nodes.NewNode](original: Steps[NodeType]): NewNodeSteps[NodeType] =
+    new NewNodeSteps[NodeType](original.raw)
 
   implicit def toNodeTypeStarters(cpg: Cpg): NodeTypeStarters = new NodeTypeStarters(cpg)
   implicit def toTagTraversal(steps: Steps[nodes.Tag]): Tag = new Tag(steps)
