@@ -19,6 +19,7 @@ import io.shiftleft.semanticcpg.passes.linking.memberaccesslinker.MemberAccessLi
 import io.shiftleft.semanticcpg.passes.methoddecorations.MethodDecoratorPass
 import io.shiftleft.semanticcpg.passes.methodexternaldecorator.MethodExternalDecoratorPass
 import io.shiftleft.semanticcpg.passes.compat.methodinstcompat.MethodInstCompat
+import io.shiftleft.semanticcpg.passes.linking.filelinker.FileLinker
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
 
@@ -33,6 +34,7 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new MethodInstCompat(cpg),
           new ReceiverEdgePass(cpg),
           new MethodDecoratorPass(cpg),
+          new FileLinker(cpg),
           new CapturingLinker(cpg),
           new Linker(cpg),
           new BindingTableCompat(cpg),
@@ -51,6 +53,7 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
           new TypeDeclStubCreator(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
+          new FileLinker(cpg),
           new CapturingLinker(cpg),
           new Linker(cpg),
           new BindingTableCompat(cpg),
