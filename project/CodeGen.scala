@@ -429,14 +429,31 @@ class CodeGen(schemaFile: String, basePackage: String) {
              |""".stripMargin
         }.mkString("\n")
 
+      val productElements: List[ProductElement] = {
+        var currIndex = -1
+        def nextIdx = { currIndex += 1; currIndex }
+        val forId = ProductElement("id", "getId", nextIdx)
+        val forKeys = keys.map { key =>
+          val name = camelCase(key.name)
+          ProductElement(name, name, nextIdx)
+        }
+        val forContainedNodes = nodeType.containedNodesList.map { containedNode =>
+          ProductElement(
+            containedNode.localName,
+            containedNode.localName,
+            nextIdx)
+        }
+        forId +: (forKeys ++ forContainedNodes)
+      }
+
       val productElementLabels =
-        keys.zipWithIndex.map { case (key, idx) =>
-          s"""case ${idx + 1} => "${camelCase(key.name)}" """
+        productElements.map { case ProductElement(name, accessorSrc, index) =>
+          s"""case $index => "$name" """
         }.mkString("\n")
 
       val productElementAccessors =
-        keys.zipWithIndex.map { case (key, idx) =>
-          s"case ${idx + 1} => ${camelCase(key.name)}"
+        productElements.map { case ProductElement(name, accessorSrc, index) =>
+          s"case $index => $accessorSrc"
         }.mkString("\n")
 
       val abstractContainedNodeAccessors = nodeType.containedNodesList.map { containedNode =>
@@ -456,18 +473,16 @@ class CodeGen(schemaFile: String, basePackage: String) {
            |
            |  override def productElementLabel(n: Int): String =
            |      n match {
-           |        case 0 => "id"
            |        $productElementLabels
            |      }
            |
            |  override def productElement(n: Int): Any =
            |      n match {
-           |        case 0 => getId
            |        $productElementAccessors
            |      }
            |
            |  override def productPrefix = "$className"
-           |  override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
+           |  override def productArity = ${productElements.size}
            |}
            |""".stripMargin
 
@@ -790,6 +805,8 @@ object DefaultNodeTypes {
 object DefaultEdgeTypes {
   val ContainsNode = "CONTAINS_NODE"
 }
+
+case class ProductElement(name: String, accessorSrc: String, index: Int)
 
 object Helpers {
 
