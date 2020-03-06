@@ -26,7 +26,8 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
           on = _.label,
           BranchCase(NodeTypes.NAMESPACE, _.in(EdgeTypes.REF).out(EdgeTypes.SOURCE_FILE)),
           BranchCase(NodeTypes.COMMENT, _.in(EdgeTypes.AST).hasLabel(NodeTypes.FILE)),
-          BranchOtherwise(_.until(_.hasLabel(NodeTypes.FILE)).repeat(_.coalesce(_.out(EdgeTypes.SOURCE_FILE), _.in(EdgeTypes.AST)))),
+          BranchOtherwise(
+            _.until(_.hasLabel(NodeTypes.FILE)).repeat(_.coalesce(_.out(EdgeTypes.SOURCE_FILE), _.in(EdgeTypes.AST)))),
         )
         .cast[nodes.File]
     )

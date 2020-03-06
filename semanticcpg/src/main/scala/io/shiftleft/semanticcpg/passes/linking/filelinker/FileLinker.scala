@@ -11,7 +11,8 @@ import scala.collection.mutable
   * Creates FILE nodes and connects NAMESPACE_BLOCKs, TYPE_DECLs and
   * METHODs to them via the FILENAME property.
   *
-  * This pass has no other pass as prerequisite.
+  * This pass should come after AST edges have been reconstructed, that
+  * is, after Linker.
   */
 class FileLinker(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
@@ -32,7 +33,7 @@ class FileLinker(cpg: Cpg) extends CpgPass(cpg) {
           filename = name
         }
       }
-      if (filename != "") {
+      if (filename != null && filename != "") {
         val originalFile = originalFilesByName.get(filename)
         if (originalFile.isDefined) {
           dstGraph.addEdgeInOriginal(node, originalFile.get, EdgeTypes.SOURCE_FILE)
