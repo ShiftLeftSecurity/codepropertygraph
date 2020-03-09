@@ -18,7 +18,7 @@ import scala.jdk.CollectionConverters._
   * language frontends which do not provide method stubs and type decl stubs.
   */
 class Linker(cpg: Cpg) extends CpgPass(cpg) {
-  import Linker.logger
+  import Linker.linkToSingle, Linker.logFailedSrcLookup, Linker.logFailedDstLookup, Linker.logger
 
   private val typeDeclFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
   private val typeFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
@@ -35,6 +35,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     // Create REF edges from TYPE nodes to TYPE_DECL nodes.
 
     linkToSingle(
+      cpg,
       srcLabels = List(NodeTypes.TYPE),
       dstNodeLabel = NodeTypes.TYPE_DECL,
       edgeType = EdgeTypes.REF,
@@ -48,6 +49,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     // to TYPE nodes.
 
     linkToSingle(
+      cpg,
       srcLabels = List(
         NodeTypes.METHOD_PARAMETER_IN,
         NodeTypes.METHOD_PARAMETER_OUT,
@@ -73,6 +75,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     // METHOD nodes.
 
     linkToSingle(
+      cpg,
       srcLabels = List(NodeTypes.METHOD_REF),
       dstNodeLabel = NodeTypes.METHOD,
       edgeType = EdgeTypes.REF,
@@ -126,55 +129,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       case node: nodes.Method         => methodFullNameToNode += node.fullName -> node
       case node: nodes.NamespaceBlock => namespaceBlockFullNameToNode += node.fullName -> node
       case _                          => // ignore
-    }
-  }
-
-  /**
-    * For all nodes `n` with a label in `srcLabels`, determine
-    * the value of `n.$dstFullNameKey`, use that to lookup the
-    * destination node in `dstNodeMap`, and create an edge of type
-    * `edgeType` between `n` and the destination node.
-    * */
-  def linkToSingle(srcLabels: List[String],
-                   dstNodeLabel: String,
-                   edgeType: String,
-                   dstNodeMap: mutable.Map[String, nodes.StoredNode],
-                   dstFullNameKey: String,
-                   dstGraph: DiffGraph.Builder,
-                   dstNotExistsHandler: Option[(nodes.StoredNode, String) => Unit]): Unit = {
-    var loggedDeprecationWarning = false
-    val sourceTraversal = cpg.graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*)
-    val sourceIterator = new Steps(sourceTraversal).toIterator()
-    val actualDstNotExistsHandler = dstNotExistsHandler.getOrElse((srcNode: nodes.StoredNode, dstFullName: String) => {
-      logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
-    })
-    sourceIterator.foreach { srcNode =>
-      // If the source node does not have any outgoing edges of this type
-      // This check is just required for backward compatibility
-      if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
-        srcNode.valueOption[String](dstFullNameKey).foreach { dstFullName =>
-          // for `UNKNOWN` this is not always set, so we're using an Option here
-          val srcStoredNode = srcNode.asInstanceOf[nodes.StoredNode]
-          val dstNode: Option[nodes.StoredNode] = dstNodeMap.get(dstFullName)
-          dstNode match {
-            case Some(dstNodeInner) =>
-              dstGraph
-                .addEdgeInOriginal(srcStoredNode, dstNodeInner, edgeType)
-            case None =>
-              actualDstNotExistsHandler(srcStoredNode, dstFullName)
-          }
-        }
-      } else {
-        val dstFullName =
-          srcNode.vertices(Direction.OUT, edgeType).nextChecked.value2(NodeKeys.FULL_NAME)
-        srcNode.property(dstFullNameKey, dstFullName)
-        if (!loggedDeprecationWarning) {
-          logger.warn(
-            s"Using deprecated CPG format with already existing $edgeType edge between" +
-              s" a source node of type $srcLabels and a $dstNodeLabel node.")
-          loggedDeprecationWarning = true
-        }
-      }
     }
   }
 
@@ -256,6 +210,61 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       }
       .iterate()
   }
+}
+
+object Linker {
+  private val logger: Logger = LogManager.getLogger(classOf[Linker])
+
+  /**
+    * For all nodes `n` with a label in `srcLabels`, determine
+    * the value of `n.$dstFullNameKey`, use that to lookup the
+    * destination node in `dstNodeMap`, and create an edge of type
+    * `edgeType` between `n` and the destination node.
+    * */
+  def linkToSingle(cpg: Cpg,
+                   srcLabels: List[String],
+                   dstNodeLabel: String,
+                   edgeType: String,
+                   dstNodeMap: mutable.Map[String, nodes.StoredNode],
+                   dstFullNameKey: String,
+                   dstGraph: DiffGraph.Builder,
+                   dstNotExistsHandler: Option[(nodes.StoredNode, String) => Unit]): Unit = {
+    var loggedDeprecationWarning = false
+    val sourceTraversal = cpg.graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*)
+    val sourceIterator = new Steps(sourceTraversal).toIterator()
+    sourceIterator.foreach { srcNode =>
+      // If the source node does not have any outgoing edges of this type
+      // This check is just required for backward compatibility
+      if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
+        srcNode.valueOption[String](dstFullNameKey).foreach { dstFullName =>
+          // for `UNKNOWN` this is not always set, so we're using an Option here
+          val srcStoredNode = srcNode.asInstanceOf[nodes.StoredNode]
+          val dstNode: Option[nodes.StoredNode] = dstNodeMap.get(dstFullName)
+          dstNode match {
+            case Some(dstNodeInner) =>
+              dstGraph
+                .addEdgeInOriginal(srcStoredNode, dstNodeInner, edgeType)
+            case None =>
+              if (dstNotExistsHandler.isDefined) {
+                dstNotExistsHandler.get(srcStoredNode, dstFullName)
+              } else {
+                logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
+              }
+          }
+        }
+      } else {
+        val dstFullName =
+          srcNode.vertices(Direction.OUT, edgeType).nextChecked.value2(NodeKeys.FULL_NAME)
+        srcNode.property(dstFullNameKey, dstFullName)
+        if (!loggedDeprecationWarning) {
+          logger.warn(
+            s"Using deprecated CPG format with already existing $edgeType edge between" +
+              s" a source node of type $srcLabels and a $dstNodeLabel node.")
+          loggedDeprecationWarning = true
+        }
+      }
+    }
+  }
 
   @inline
   private def logFailedDstLookup(edgeType: String,
@@ -280,9 +289,4 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
         s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcFullName=$srcFullName, " +
         s"dstNodeType=$dstNodeType, dstNodeId=$dstNodeId")
   }
-
-}
-
-object Linker {
-  private val logger: Logger = LogManager.getLogger(classOf[Linker])
 }
