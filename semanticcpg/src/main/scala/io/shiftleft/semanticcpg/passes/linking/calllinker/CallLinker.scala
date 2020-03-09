@@ -47,23 +47,23 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
       if (call.dispatchType == DispatchTypes.STATIC_DISPATCH) {
         methodFullNameToNode.get(call.methodFullName)
       } else {
-        val receiverIt = call.vertices(Direction.OUT, EdgeTypes.RECEIVER)
+        val receiverIt = call.receiverOut
         if (receiverIt.hasNext) {
           val receiver = receiverIt.next
 
           receiver match {
             case methodRefReceiver: nodes.MethodRef =>
-              Some(methodRefReceiver.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method])
+              Some(methodRefReceiver._refOut.onlyChecked.asInstanceOf[nodes.Method])
             case _ =>
               val receiverTypeDecl = receiver
-                .vertices(Direction.OUT, EdgeTypes.EVAL_TYPE)
-                .nextChecked
-                .vertices(Direction.OUT, EdgeTypes.REF)
-                .nextChecked
+                ._evalTypeOut()
+                .onlyChecked
+                ._refOut
+                .onlyChecked
 
-              receiverTypeDecl.vertices(Direction.OUT, EdgeTypes.BINDS).asScala.collectFirst {
+              receiverTypeDecl._bindsOut.asScala.collectFirst {
                 case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
-                  binding.vertices(Direction.OUT, EdgeTypes.REF).nextChecked.asInstanceOf[nodes.Method]
+                  binding._refOut.onlyChecked.asInstanceOf[nodes.Method]
               }
           }
         } else {

@@ -74,12 +74,12 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   private def getTrackingPoint(node: nodes.StoredNode): Option[nodes.TrackingPoint] =
     node match {
       case identifier: nodes.Identifier =>
-        getTrackingPoint(identifier._argumentIn().nextChecked)
+        getTrackingPoint(identifier._argumentIn().onlyChecked)
       case call: nodes.Call                       => Some(call)
       case ret: nodes.Return                      => Some(ret)
       case methodReturn: nodes.MethodReturn       => Some(methodReturn)
       case methodParamIn: nodes.MethodParameterIn => Some(methodParamIn)
-      case literal: nodes.Literal                 => getTrackingPoint(literal._argumentIn().nextChecked)
+      case literal: nodes.Literal                 => getTrackingPoint(literal._argumentIn().onlyChecked)
       case _                                      => None
     }
 

@@ -11,6 +11,7 @@ import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
 import io.shiftleft.semanticcpg.language._
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
@@ -276,15 +277,10 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
 
   def getOperation(node: nodes.StoredNode): Option[nodes.StoredNode] = {
     node match {
-      case identifier: nodes.Identifier =>
-        if (identifier.argumentIn.hasNext) {
-          getOperation(identifier.argumentIn.nextChecked)
-        } else {
-          None
-        }
-      case _: nodes.Call   => Some(node)
-      case _: nodes.Return => Some(node)
-      case _               => None
+      case identifier: nodes.Identifier => identifier.argumentIn.nextOption.flatMap(getOperation)
+      case _: nodes.Call                => Some(node)
+      case _: nodes.Return              => Some(node)
+      case _                            => None
     }
   }
 }

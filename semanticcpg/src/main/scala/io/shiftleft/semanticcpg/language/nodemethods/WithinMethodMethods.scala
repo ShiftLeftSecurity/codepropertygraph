@@ -16,9 +16,9 @@ class WithinMethodMethods(val node: nodes.WithinMethod) extends AnyVal {
   }
 
   private def walkUpAst(node: nodes.WithinMethod): nodes.Method =
-    node._astIn.nextChecked.asInstanceOf[nodes.Method]
+    node._astIn.onlyChecked.asInstanceOf[nodes.Method]
 
   private def walkUpContainsEdges(node: nodes.WithinMethod): nodes.Method =
-    node._containsIn.nextChecked.asInstanceOf[nodes.Method]
+    node._containsIn.onlyChecked.asInstanceOf[nodes.Method]
 
 }

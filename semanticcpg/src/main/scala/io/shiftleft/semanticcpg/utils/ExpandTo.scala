@@ -21,29 +21,29 @@ object ExpandTo {
     callNode.receiverOut.nextOption
 
   def callReceiver(callNode: nodes.Call): nodes.StoredNode =
-    callReceiverOption(callNode).get
+    callNode.receiverOut.onlyChecked
 
   // TODO move into traversal dsl - used in codescience
   def callArguments(callNode: nodes.CallRepr): Iterator[nodes.Expression] =
     callNode._argumentOut.asScala.map(_.asInstanceOf[nodes.Expression])
 
   def typeCarrierToType(parameterNode: nodes.StoredNode): nodes.Type =
-    parameterNode._evalTypeOut.nextChecked.asInstanceOf[nodes.Type]
+    parameterNode._evalTypeOut.onlyChecked.asInstanceOf[nodes.Type]
 
   def parameterInToMethod(parameterIn: nodes.MethodParameterIn): nodes.Method =
-    parameterIn.astIn.nextChecked
+    parameterIn.astIn.onlyChecked
 
   def parameterOutToMethod(parameterOut: nodes.MethodParameterOut): nodes.Method =
-    parameterOut.astIn.nextChecked
+    parameterOut.astIn.onlyChecked
 
   def methodReturnToMethod(formalReturnNode: nodes.MethodReturn): nodes.Method =
-    formalReturnNode.astIn.nextChecked
+    formalReturnNode.astIn.onlyChecked
 
   def returnToReturnedExpression(returnExpression: nodes.Return): Option[nodes.Expression] =
-    returnExpression.astOut.nextOption.map(_.asInstanceOf[nodes.Expression])
+    returnExpression.astOut.nextOption.asInstanceOf[Option[nodes.Expression]]
 
   def expressionToMethod(expression: nodes.Expression): nodes.Method =
-    expression._containsIn.nextChecked match {
+    expression._containsIn.onlyChecked match {
       case method: nodes.Method => method
       case _: nodes.TypeDecl    =>
         // TODO - there are csharp CPGs that have typedecls here, which is invalid.
@@ -85,6 +85,6 @@ object ExpandTo {
     method.astOut.asScala.collect { case paramOut: nodes.MethodParameterOut => paramOut }
 
   def implicitCallToMethod(implicitCall: nodes.ImplicitCall): nodes.Method =
-    implicitCall.astIn.nextChecked
+    implicitCall.astIn.onlyChecked
 
 }
