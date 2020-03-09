@@ -40,7 +40,8 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       edgeType = EdgeTypes.REF,
       dstNodeMap = typeDeclFullNameToNode,
       dstFullNameKey = nodes.Type.PropertyNames.TypeDeclFullName,
-      dstGraph
+      dstGraph,
+      None
     )
 
     // Create EVAL_TYPE edges from nodes of various types
@@ -64,7 +65,8 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       edgeType = EdgeTypes.EVAL_TYPE,
       dstNodeMap = typeFullNameToNode,
       dstFullNameKey = "TYPE_FULL_NAME",
-      dstGraph
+      dstGraph,
+      None
     )
 
     // Create REF edges from METHOD_REFs to
@@ -76,7 +78,8 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       edgeType = EdgeTypes.REF,
       dstNodeMap = methodFullNameToNode,
       dstFullNameKey = nodes.MethodRef.PropertyNames.MethodFullName,
-      dstGraph
+      dstGraph,
+      None
     )
 
     // Create INHERITS_FROM nodes from TYPE_DECL
@@ -132,28 +135,33 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     * destination node in `dstNodeMap`, and create an edge of type
     * `edgeType` between `n` and the destination node.
     * */
-  private def linkToSingle(srcLabels: List[String],
-                           dstNodeLabel: String,
-                           edgeType: String,
-                           dstNodeMap: mutable.Map[String, nodes.StoredNode],
-                           dstFullNameKey: String,
-                           dstGraph: DiffGraph.Builder): Unit = {
+  def linkToSingle(srcLabels: List[String],
+                   dstNodeLabel: String,
+                   edgeType: String,
+                   dstNodeMap: mutable.Map[String, nodes.StoredNode],
+                   dstFullNameKey: String,
+                   dstGraph: DiffGraph.Builder,
+                   dstNotExistsHandler: Option[(nodes.StoredNode, String) => Unit]): Unit = {
     var loggedDeprecationWarning = false
     val sourceTraversal = cpg.graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*)
     val sourceIterator = new Steps(sourceTraversal).toIterator()
+    val actualDstNotExistsHandler = dstNotExistsHandler.getOrElse((srcNode: nodes.StoredNode, dstFullName: String) => {
+      logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
+    })
     sourceIterator.foreach { srcNode =>
       // If the source node does not have any outgoing edges of this type
       // This check is just required for backward compatibility
       if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
         srcNode.valueOption[String](dstFullNameKey).foreach { dstFullName =>
           // for `UNKNOWN` this is not always set, so we're using an Option here
+          val srcStoredNode = srcNode.asInstanceOf[nodes.StoredNode]
           val dstNode: Option[nodes.StoredNode] = dstNodeMap.get(dstFullName)
           dstNode match {
             case Some(dstNodeInner) =>
               dstGraph
-                .addEdgeInOriginal(srcNode.asInstanceOf[nodes.StoredNode], dstNodeInner, edgeType)
+                .addEdgeInOriginal(srcStoredNode, dstNodeInner, edgeType)
             case None =>
-              logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
+              actualDstNotExistsHandler(srcStoredNode, dstFullName)
           }
         }
       } else {
