@@ -217,7 +217,7 @@ object Linker {
 
   /**
     * For all nodes `n` with a label in `srcLabels`, determine
-    * the value of `n.$dstFullNameKey`, use that to lookup the
+    * the value of `n.\$dstFullNameKey`, use that to lookup the
     * destination node in `dstNodeMap`, and create an edge of type
     * `edgeType` between `n` and the destination node.
     * */
