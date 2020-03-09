@@ -405,63 +405,64 @@ class CodeGen(schemaFile: String, basePackage: String) {
       }
 
       val containedNodesAsMembers =
-        nodeType.containedNodes
-          .map {
-            _.map { containedNode =>
-              val containedNodeType = containedNode.nodeTypeClassName
-              val cardinality = Cardinality.fromName(containedNode.cardinality)
-              val completeType = cardinality match {
-                case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
-                case Cardinality.One       => containedNodeType
-                case Cardinality.List      => s"List[$containedNodeType]"
-              }
-              val traversalEnding = cardinality match {
-                case Cardinality.ZeroOrOne => s".headOption"
-                case Cardinality.One       => s".head"
-                case Cardinality.List      => s".toList"
-              }
-
-              s"""/** link to 'contained' node of type $containedNodeType */
-                 |def ${containedNode.localName}: $completeType =
-                 |  edges(Direction.OUT, "${DefaultEdgeTypes.ContainsNode}").asScala.toList
-                 |    .filter(_.valueOption(EdgeKeys.LOCAL_NAME).map(_  == "${containedNode.localName}").getOrElse(false))
-                 |    .sortBy(_.valueOption(EdgeKeys.INDEX))
-                 |    .map(_.inVertex.asInstanceOf[$containedNodeType])
-                 |    $traversalEnding
-                 |""".stripMargin
-            }.mkString("\n")
+        nodeType.containedNodesList.map { containedNode =>
+          val containedNodeType = containedNode.nodeTypeClassName
+          val cardinality = Cardinality.fromName(containedNode.cardinality)
+          val completeType = cardinality match {
+            case Cardinality.ZeroOrOne => s"Option[$containedNodeType]"
+            case Cardinality.One       => containedNodeType
+            case Cardinality.List      => s"List[$containedNodeType]"
           }
-          .getOrElse("")
+          val traversalEnding = cardinality match {
+            case Cardinality.ZeroOrOne => s".headOption"
+            case Cardinality.One       => s".head"
+            case Cardinality.List      => s".toList"
+          }
+
+          s"""/** link to 'contained' node of type $containedNodeType */
+             |def ${containedNode.localName}: $completeType =
+             |  edges(Direction.OUT, "${DefaultEdgeTypes.ContainsNode}").asScala.toList
+             |    .filter(_.valueOption(EdgeKeys.LOCAL_NAME).map(_  == "${containedNode.localName}").getOrElse(false))
+             |    .sortBy(_.valueOption(EdgeKeys.INDEX))
+             |    .map(_.inVertex.asInstanceOf[$containedNodeType])
+             |    $traversalEnding
+             |""".stripMargin
+        }.mkString("\n")
+
+      val productElements: List[ProductElement] = {
+        var currIndex = -1
+        def nextIdx = { currIndex += 1; currIndex }
+        val forId = ProductElement("id", "getId", nextIdx)
+        val forKeys = keys.map { key =>
+          val name = camelCase(key.name)
+          ProductElement(name, name, nextIdx)
+        }
+        val forContainedNodes = nodeType.containedNodesList.map { containedNode =>
+          ProductElement(
+            containedNode.localName,
+            containedNode.localName,
+            nextIdx)
+        }
+        forId +: (forKeys ++ forContainedNodes)
+      }
 
       val productElementLabels =
-        keys.zipWithIndex
-          .map { case (key, idx) =>
-            s"""case ${idx + 1} => "${camelCase(key.name)}" """
-          }
-          .mkString("\n")
+        productElements.map { case ProductElement(name, accessorSrc, index) =>
+          s"""case $index => "$name" """
+        }.mkString("\n")
 
       val productElementAccessors =
-        keys.zipWithIndex
-          .map { case (key, idx) =>
-            s"case ${idx + 1} => ${camelCase(key.name)}"
-          }
-          .mkString("\n")
+        productElements.map { case ProductElement(name, accessorSrc, index) =>
+          s"case $index => $accessorSrc"
+        }.mkString("\n")
 
-      val abstractContainedNodeAccessors = nodeType.containedNodes
-        .map {
-          _.map { containedNode =>
-            s"""def ${containedNode.localName}: ${getCompleteType(containedNode)}"""
-          }.mkString("\n")
-        }
-        .getOrElse("")
+      val abstractContainedNodeAccessors = nodeType.containedNodesList.map { containedNode =>
+        s"""def ${containedNode.localName}: ${getCompleteType(containedNode)}"""
+      }.mkString("\n")
 
-      val delegatingContainedNodeAccessors = nodeType.containedNodes
-        .map {
-          _.map { containedNode =>
-            s"""  def ${containedNode.localName} = get().${containedNode.localName}"""
-          }.mkString("\n")
-        }
-        .getOrElse("")
+      val delegatingContainedNodeAccessors = nodeType.containedNodesList.map { containedNode =>
+        s"""  def ${containedNode.localName} = get().${containedNode.localName}"""
+      }.mkString("\n")
 
       val nodeBaseImpl =
         s"""trait ${className}Base extends Node $mixinTraitsForBase $propertyBasedTraits {
@@ -472,18 +473,16 @@ class CodeGen(schemaFile: String, basePackage: String) {
            |
            |  override def productElementLabel(n: Int): String =
            |      n match {
-           |        case 0 => "id"
            |        $productElementLabels
            |      }
            |
            |  override def productElement(n: Int): Any =
            |      n match {
-           |        case 0 => getId
            |        $productElementAccessors
            |      }
            |
            |  override def productPrefix = "$className"
-           |  override def productArity = ${keys.size} + 1 // add one for id, leaving out `_graph`
+           |  override def productArity = ${productElements.size}
            |}
            |""".stripMargin
 
@@ -676,19 +675,15 @@ class CodeGen(schemaFile: String, basePackage: String) {
           s"${camelCase(key.name)}: ${getCompleteType(key)} $optionalDefault"
         }
 
-        val forContainedNodes: List[String] = nodeType.containedNodes
-          .map {
-            _.map { containedNode =>
-              val optionalDefault = Cardinality.fromName(containedNode.cardinality) match {
-                case Cardinality.List      => "= List()"
-                case Cardinality.ZeroOrOne => "= None"
-                case _                     => ""
-              }
-
-              s"val ${containedNode.localName}: ${getCompleteType(containedNode)} $optionalDefault"
-            }
+        val forContainedNodes: List[String] = nodeType.containedNodesList.map { containedNode =>
+          val optionalDefault = Cardinality.fromName(containedNode.cardinality) match {
+            case Cardinality.List      => "= List()"
+            case Cardinality.ZeroOrOne => "= None"
+            case _                     => ""
           }
-          .getOrElse(Nil)
+
+          s"val ${containedNode.localName}: ${getCompleteType(containedNode)} $optionalDefault"
+        }
 
         (forKeys ++ forContainedNodes).mkString(", ")
       }
@@ -699,11 +694,9 @@ class CodeGen(schemaFile: String, basePackage: String) {
           val containsOptionals = keys.exists { property =>
             Cardinality.fromName(property.cardinality) == Cardinality.ZeroOrOne
           }
-          val forKeys = keys
-            .map { key: Property =>
-              s"""("${key.name}" -> ${camelCase(key.name)} )"""
-            }
-            .mkString(",\n")
+          val forKeys = keys.map { key: Property =>
+            s"""("${key.name}" -> ${camelCase(key.name)} )"""
+          }.mkString(",\n")
 
           val baseCase = s"""Map($forKeys).asInstanceOf[Map[String, Any]].filterNot { case (k,v) => v == null || v == None } """
           if (!containsOptionals) baseCase
@@ -715,22 +708,17 @@ class CodeGen(schemaFile: String, basePackage: String) {
       }
 
       val containedNodesByLocalName: String = {
-        val mappedNodes = nodeType.containedNodes
-          .getOrElse(Nil)
-          .map { containedNode =>
-            val localName = containedNode.localName
-            val value = Cardinality.fromName(containedNode.cardinality) match {
-              case Cardinality.One       => s"($localName :: Nil)"
-              case Cardinality.ZeroOrOne => s"$localName.toList"
-              case Cardinality.List      => localName
-            }
-            s"""("$localName" -> $value)"""
+        val mappedNodes = nodeType.containedNodesList.map { containedNode =>
+          val localName = containedNode.localName
+          val value = Cardinality.fromName(containedNode.cardinality) match {
+            case Cardinality.One       => s"($localName :: Nil)"
+            case Cardinality.ZeroOrOne => s"$localName.toList"
+            case Cardinality.List      => localName
           }
-        if (mappedNodes.isEmpty) {
-          "Map.empty"
-        } else {
-          mappedNodes.mkString("Map.empty + ", " + ", "")
+          s"""("$localName" -> $value)"""
         }
+        if (mappedNodes.isEmpty) "Map.empty"
+        else mappedNodes.mkString("Map.empty + ", " + ", "")
       }
 
       s"""case class New${nodeType.className}($fields) extends NewNode with ${nodeType.className}Base {
@@ -764,6 +752,7 @@ case class NodeType(
     containedNodes: Option[List[ContainedNode]]) {
   lazy val className = Helpers.camelCaseCaps(name)
   lazy val classNameDb = s"${className}Db"
+  lazy val containedNodesList = containedNodes.getOrElse(Nil)
 }
 
 case class OutEdgeEntry(edgeName: String, inNodes: List[String])
@@ -816,6 +805,8 @@ object DefaultNodeTypes {
 object DefaultEdgeTypes {
   val ContainsNode = "CONTAINS_NODE"
 }
+
+case class ProductElement(name: String, accessorSrc: String, index: Int)
 
 object Helpers {
 
