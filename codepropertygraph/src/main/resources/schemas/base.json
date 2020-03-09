@@ -45,7 +45,8 @@
         {"id": 56, "name" : "AST_PARENT_TYPE", "comment" : "The type of the AST parent. Since this is only used in some parts of the graph the list does not include all possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK", "valueType" : "string", "cardinality" : "one"},
         {"id": 57, "name" : "AST_PARENT_FULL_NAME", "comment" : "The FULL_NAME of a the AST parent of an entity", "valueType" : "string", "cardinality" : "one"},
         {"id": 158, "name" : "ALIAS_TYPE_FULL_NAME", "comment" : "Type full name of which a TYPE_DECL is an alias of", "valueType" : "string", "cardinality" : "zeroOrOne"},
-        {"id": 1591, "name" : "DYNAMIC_TYPE_HINT_FULL_NAME", "comment" : "Type hint for the dynamic type", "valueType" : "string", "cardinality" : "list"}
+        {"id": 1591, "name" : "DYNAMIC_TYPE_HINT_FULL_NAME", "comment" : "Type hint for the dynamic type", "valueType" : "string", "cardinality" : "list"},
+        {"id" : 106, "name" : "FILENAME", "comment" : "Full path of canonical file that contained this node; will be linked into corresponding FILE nodes. Possible for METHOD, TYPE_DECL and NAMESPACE_BLOCK", "valueType" : "string", "cardinality" : "one"}
     ],
 
     // Keys for edge properties
@@ -81,7 +82,7 @@
 
         {"id" : 1, "name" : "METHOD",
          "keys": ["NAME", "FULL_NAME", "IS_EXTERNAL", "SIGNATURE", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME",
-		  "LINE_NUMBER", "COLUMN_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER_END", "ORDER"],
+		  "LINE_NUMBER", "COLUMN_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER_END", "ORDER", "FILENAME"],
          "comment" : "A method/function/procedure",
          "is": ["DECLARATION", "CFG_NODE", "AST_NODE"],
          "outEdges" : [
@@ -119,7 +120,7 @@
          ]
         },
         {"id" : 46, "name" : "TYPE_DECL",
-         "keys" : ["NAME", "FULL_NAME", "IS_EXTERNAL", "INHERITS_FROM_TYPE_FULL_NAME", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME", "ALIAS_TYPE_FULL_NAME", "ORDER"],
+         "keys" : ["NAME", "FULL_NAME", "IS_EXTERNAL", "INHERITS_FROM_TYPE_FULL_NAME", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME", "ALIAS_TYPE_FULL_NAME", "ORDER", "FILENAME"],
          "comment" : "A type declaration",
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["TYPE_PARAMETER", "MEMBER", "MODIFIER"]},
@@ -160,7 +161,7 @@
         {
             "id":41,
             "name": "NAMESPACE_BLOCK",
-            "keys": ["NAME", "FULL_NAME", "ORDER"],
+            "keys": ["NAME", "FULL_NAME", "ORDER", "FILENAME"],
             "comment": "A reference to a namespace",
 	    "is" : ["AST_NODE"]
         },
@@ -202,7 +203,7 @@
         },
         {"id":2001081, "name": "FIELD_IDENTIFIER",
           "keys": ["CODE", "CANONICAL_NAME", "ORDER", "ARGUMENT_INDEX", "LINE_NUMBER", "COLUMN_NUMBER"],
-          "comment" : "A node that represents which field is accessed in a <operator>.fieldAccess, in e.g. obj.field. The CODE part is used for human display and matching to MEM?BER nodes. The CANONICAL_NAME is used for dataflow tracking; typically both coincide. However, suppose that two fields foo and bar are a C-style union; then CODE refers to whatever the programmer wrote (obj.foo or obj.bar), but both share the same CANONICAL_NAME (e.g. GENERATED_foo_bar)",
+          "comment" : "A node that represents which field is accessed in a <operator>.fieldAccess, in e.g. obj.field. The CODE part is used for human display and matching to MEMBER nodes. The CANONICAL_NAME is used for dataflow tracking; typically both coincide. However, suppose that two fields foo and bar are a C-style union; then CODE refers to whatever the programmer wrote (obj.foo or obj.bar), but both share the same CANONICAL_NAME (e.g. GENERATED_foo_bar)",
           "is": ["EXPRESSION"],
           "outEdges" : [
             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
@@ -308,7 +309,8 @@
         {"id" : 55, "name": "RECEIVER", "comment" : "The receiver of a method call which is either an object or a pointer", "keys": []},
         {"id" : 56, "name": "CONDITION", "comment" : "Edge from control structure node to the expression that holds the condition", "keys" : []},
         {"id" : 155, "name": "BINDS", "comment" : "Relation between TYPE_DECL and BINDING node", "keys": []},
-        {"id" : 156, "name": "ARGUMENT", "comment" : "Relation between a CALL and its arguments and RETURN and the returned expression", "keys": []}
+        {"id" : 156, "name": "ARGUMENT", "comment" : "Relation between a CALL and its arguments and RETURN and the returned expression", "keys": []},
+        {"id" : 157, "name" : "SOURCE_FILE", "comment" : "Source file of a node, in which its LINE_NUMBER and COLUMN_NUMBER are valid", "keys" : []}
 
     ],
 

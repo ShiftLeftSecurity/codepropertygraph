@@ -57,6 +57,7 @@ class KeysValidatorTest extends WordSpec with Matchers {
       node.property("IS_EXTERNAL", false)
       node.property("ORDER", 1)
       node.property("FULL_NAME", "SomeTypeDecl")
+      node.property("FILENAME", "")
       validator.validate(cpg) shouldBe true
     }
   }
@@ -71,6 +72,7 @@ class KeysValidatorTest extends WordSpec with Matchers {
       node.property("IS_EXTERNAL", false)
       node.property("ORDER", 1)
       node.property("FULL_NAME", "SomeTypeDecl")
+      node.property("FILENAME", "")
       validator.validate(cpg) shouldBe true
     }
   }
@@ -86,6 +88,7 @@ class KeysValidatorTest extends WordSpec with Matchers {
       node.property("IS_EXTERNAL", false)
       node.property("ORDER", 1)
       node.property("FULL_NAME", "SomeTypeDecl")
+      node.property("FILENAME", "")
       validator.validate(cpg) shouldBe true
     }
   }

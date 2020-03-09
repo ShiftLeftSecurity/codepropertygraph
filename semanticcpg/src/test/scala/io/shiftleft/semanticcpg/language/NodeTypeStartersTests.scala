@@ -21,7 +21,7 @@ class NodeTypeStartersTests extends WordSpec with Matchers {
 
   CodeToCpgFixture(code) { cpg =>
     "should allow retrieving files" in {
-      cpg.file.name.l.head should endWith(".c")
+      atLeast(1, cpg.file.name.l) should endWith(".c")
     }
 
     /**

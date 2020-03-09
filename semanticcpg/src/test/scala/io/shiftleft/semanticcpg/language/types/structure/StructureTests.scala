@@ -25,7 +25,7 @@ class StructureTests extends WordSpec with Matchers {
     }
 
     "should allow traversing to type declarations" in {
-      cpg.file.typeDecl.name.toSet shouldBe Set("foo")
+      cpg.file.typeDecl.name.toSet shouldBe Set("foo", "void", "int")
     }
 
     "should allow traversing to methods in namespaces" in {
