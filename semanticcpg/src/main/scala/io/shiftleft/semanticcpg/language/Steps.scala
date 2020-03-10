@@ -105,7 +105,7 @@ class Steps[A](val raw: GremlinScala[A]) {
     * Pretty print traversal contents
     * TODO get PR feedback, then `mv p2 p`
     * */
-  def p2(implicit show: Show[A]): List[String] =
+  def p2(implicit show: Show[A] = Show.default): List[String] =
     toList.map(show.apply)
 
   /** Execute traversal and convert the result to json. */
