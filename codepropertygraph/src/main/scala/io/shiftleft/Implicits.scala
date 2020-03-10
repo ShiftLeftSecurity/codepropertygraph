@@ -14,7 +14,7 @@ object Implicits {
       try {
         iterator.next
       } catch {
-        case _: NoSuchElementException =>
+        case _: CpgNoSuchElementException =>
           throw new NoSuchElementException()
       }
     }
@@ -24,7 +24,7 @@ object Implicits {
         val res = iterator.next
         assert(!iterator.hasNext, "iterator was expected to have exactly one element, but it actually has more")
         res
-      } else { throw new NoSuchElementException() }
+      } else { throw new CpgNoSuchElementException() }
     }
 
     def nextOption: Option[T] = {
@@ -35,5 +35,7 @@ object Implicits {
       }
     }
   }
+
+  class CpgNoSuchElementException extends RuntimeException
 
 }
