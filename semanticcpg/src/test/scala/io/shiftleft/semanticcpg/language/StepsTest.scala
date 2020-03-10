@@ -143,7 +143,10 @@ class StepsTest extends WordSpec with Matchers {
         fixture.cpg.method.name("main")
 
       val nodeId = mainMethods.head.id
-      mainMethods.p2.head shouldBe s"""(METHOD,$nodeId): AST_PARENT_FULL_NAME: io.shiftleft.testcode.splitmeup.TestGraph, AST_PARENT_TYPE: TYPE_DECL, BINARY_SIGNATURE: ([Ljava/lang/String;)V, FULL_NAME: io.shiftleft.testcode.splitmeup.TestGraph.main:void(java.lang.String[]), IS_EXTERNAL: false, LINE_NUMBER: 12, NAME: main, SIGNATURE: void(java.lang.String[])"""
+      val printed = mainMethods.p2.head
+      printed.should(startWith(s"""(METHOD,$nodeId):"""))
+      printed.should(include("AST_PARENT_FULL_NAME: io.shiftleft.testcode.splitmeup.TestGraph"))
+      printed.should(include("FULL_NAME: io.shiftleft.testcode.splitmeup.TestGraph.main:void(java.lang.String[])"))
     }
 
     "allows to provide custom Show instance" in ExistingCpgFixture("splitmeup") { fixture =>
