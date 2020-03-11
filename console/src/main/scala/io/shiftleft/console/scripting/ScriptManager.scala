@@ -17,6 +17,8 @@ object ScriptManager {
   final case class ScriptCollections(collection: String, scripts: ScriptDescriptions)
   final case class ScriptDescriptions(description: String, scripts: List[ScriptDescription])
   final case class ScriptDescription(name: String, description: String)
+
+  private val SCRIPT_DESCS: String = "scripts.json"
 }
 
 /**
@@ -73,8 +75,6 @@ abstract class ScriptManager(executor: AmmoniteExecutor) {
 
     newScriptsDir / scriptDir
   }
-
-  private val SCRIPT_DESCS: String = "scripts.json"
 
   def scripts(): List[ScriptCollections] = {
     scriptsTempDir
