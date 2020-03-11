@@ -22,7 +22,7 @@ object Path {
 
       val rows = path.elements.map { trackingPoint =>
         val method = trackingPoint.method
-        val methodName= method.name
+        val methodName = method.name
         val lineNumber = trackingPoint.cfgNode.lineNumber.getOrElse("N/A")
         val fileName = method.start.file.name.headOption.getOrElse("N/A")
 
