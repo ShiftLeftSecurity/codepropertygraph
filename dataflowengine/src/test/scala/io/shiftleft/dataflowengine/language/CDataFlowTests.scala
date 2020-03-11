@@ -55,7 +55,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         )
 
       // pretty printing for flows
-      val flowsPretty = flows.p2.mkString
+      val flowsPretty = flows.p.mkString
       flowsPretty.should(include("sz = 20"))
       flowsPretty.should(include("read(fd, buff, sz)"))
       val tmpSourceFile = flows.head.elements.head.method.filename

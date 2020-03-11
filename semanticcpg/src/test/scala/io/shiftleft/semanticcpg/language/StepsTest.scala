@@ -135,7 +135,7 @@ class StepsTest extends WordSpec with Matchers {
     "use default `toString` if nothing else applies" in {
       case class Foo(i: Int)
       val steps: Steps[Foo] = new Steps(__(Foo(42)))
-      steps.p2.head shouldBe "Foo(42)"
+      steps.p.head shouldBe "Foo(42)"
     }
 
     "render nodes as `(label,id): properties`" in ExistingCpgFixture("splitmeup") { fixture =>
@@ -143,7 +143,7 @@ class StepsTest extends WordSpec with Matchers {
         fixture.cpg.method.name("main")
 
       val nodeId = mainMethods.head.id
-      val printed = mainMethods.p2.head
+      val printed = mainMethods.p.head
       printed.should(startWith(s"""(METHOD,$nodeId):"""))
       printed.should(include("AST_PARENT_FULL_NAME: io.shiftleft.testcode.splitmeup.TestGraph"))
       printed.should(include("FULL_NAME: io.shiftleft.testcode.splitmeup.TestGraph.main:void(java.lang.String[])"))
@@ -157,7 +157,7 @@ class StepsTest extends WordSpec with Matchers {
         override def apply(node: nodes.Method): String = "my custom pretty printer"
       }
 
-      mainMethods.p2.head shouldBe "my custom pretty printer"
+      mainMethods.p.head shouldBe "my custom pretty printer"
     }
 
     "uses Show instance from package" in ExistingCpgFixture("splitmeup") { fixture =>
@@ -171,7 +171,7 @@ class StepsTest extends WordSpec with Matchers {
       def mainMethods: Steps[nodes.Method] =
         fixture.cpg.method.name("main")
 
-      mainMethods.p2.head shouldBe "package defined pretty printer"
+      mainMethods.p.head shouldBe "package defined pretty printer"
     }
   }
 
