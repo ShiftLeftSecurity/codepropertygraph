@@ -1,7 +1,7 @@
 package io.shiftleft.dataflowengine.language
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated._
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.semanticcpg.utils.MemberAccess
@@ -29,10 +29,12 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     new NodeSteps[NodeType](__(reachedSources: _*).asInstanceOf[GremlinScala[NodeType]])
   }
 
-  def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: NodeSteps[A]*): Flows = {
+  def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: NodeSteps[A]*): Steps[Path] = {
     val pathReachables = reachableByInternal(sourceTravs)
-    val paths = pathReachables.map(_.path)
-    new Flows(new Steps[List[nodes.TrackingPoint]](__(paths: _*)))
+    val paths = pathReachables.map { reachableByContainer =>
+      Path(reachableByContainer.path)
+    }
+    new Steps(__(paths: _*))
   }
 
   private def reachableByInternal[NodeType <: nodes.TrackingPoint](

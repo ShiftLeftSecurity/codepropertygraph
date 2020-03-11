@@ -22,8 +22,8 @@ class CpgDataFlowTests extends WordSpec with Matchers {
   protected def getLiteralOfType(cpg: Cpg, typeName: String, literalName: String): NodeSteps[nodes.Literal] =
     cpg.typeDecl.nameExact(typeName).method.isLiteral.codeExact(literalName)
 
-  protected def flowToResultPairs(flow: List[nodes.TrackingPoint]): List[(String, Option[Integer])] = {
-    flow.map { point =>
+  protected def flowToResultPairs(path: Path): List[(String, Option[Integer])] = {
+    path.elements.map { point =>
       point match {
         case methodParamIn: nodes.MethodParameterIn => {
           val method = point.start.method.head

@@ -31,8 +31,7 @@ object Show {
     }
 
     private def propsToString(keyValues: Map[String, Any]): String = {
-      keyValues
-        .toList
+      keyValues.toList
         .filter(_._2.toString.nonEmpty)
         .sortBy(_._1)
         .map { case (key, value) => s"$key: $value" }

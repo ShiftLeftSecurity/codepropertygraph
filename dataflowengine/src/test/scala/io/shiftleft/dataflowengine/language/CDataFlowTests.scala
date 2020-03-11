@@ -21,13 +21,13 @@ class CDataFlowTests extends CpgDataFlowTests {
         | }
       """.stripMargin
     ) { cpg =>
-      val source = cpg.identifier.name("sz")
-      val sink = cpg.call.name("read")
-      val flows = sink.reachableByFlows(source).l
+      def source = cpg.identifier.name("sz")
+      def sink = cpg.call.name("read")
+      def flows = sink.reachableByFlows(source)
 
       flows.size shouldBe 6
 
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      flows.map(flowToResultPairs).toSet shouldBe
         Set(
           List[(String, Option[Integer])](
             ("sz = 200", 8),
@@ -53,6 +53,13 @@ class CDataFlowTests extends CpgDataFlowTests {
             ("read(fd, buff, sz)", 12)
           )
         )
+
+      // pretty printing for flows
+      val flowsPretty = flows.p2.mkString
+      flowsPretty.should(include("sz = 20"))
+      flowsPretty.should(include("read(fd, buff, sz)"))
+      val tmpSourceFile = flows.head.elements.head.method.filename
+      flowsPretty.should(include(tmpSourceFile))
     }
   }
 
@@ -78,7 +85,7 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.size shouldBe 5
 
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      flows.map(flowToResultPairs).toSet shouldBe
         Set(
           List[(String, Option[Integer])](
             ("*p = head", 8),
@@ -123,7 +130,7 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.size shouldBe 2
 
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      flows.map(flowToResultPairs).toSet shouldBe
         Set(List[(String, Option[Integer])](
               ("a = 10", 3),
               ("foo(a)", 5)
@@ -153,7 +160,7 @@ class CDataFlowTests extends CpgDataFlowTests {
       val flows = sink.reachableByFlows(source).l
 
       flows.size shouldBe 2
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      flows.map(flowToResultPairs).toSet shouldBe
         Set(
           List[(String, Option[Integer])](
             ("a = 0x37", 3),
@@ -187,7 +194,7 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.size shouldBe 1
 
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      flows.map(flowToResultPairs).toSet shouldBe
         Set(
           List[(String, Option[Integer])](
             ("z = a", 3),
@@ -221,7 +228,7 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.size shouldBe 1
 
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      flows.map(flowToResultPairs).toSet shouldBe
         Set(
           List[(String, Option[Integer])](
             ("x = a", 8),
@@ -253,7 +260,7 @@ class CDataFlowTests extends CpgDataFlowTests {
       val flows = sink.reachableByFlows(source).l
       flows.size shouldBe 3
 
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      flows.map(flowToResultPairs).toSet shouldBe
         Set(
           List[(String, Option[Integer])](
             ("x = z", 12),
@@ -287,7 +294,7 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.size shouldBe 2
 
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      flows.map(flowToResultPairs).toSet shouldBe
         Set(List[(String, Option[Integer])](
               ("a = x", 3),
               ("b = a", 4),
@@ -319,7 +326,7 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.size shouldBe 2
 
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      flows.map(flowToResultPairs).toSet shouldBe
         Set(List[(String, Option[Integer])](
               ("a = x", 3),
               ("b = a", 4),
@@ -352,7 +359,7 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.size shouldBe 2
 
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      flows.map(flowToResultPairs).toSet shouldBe
         Set(
           List[(String, Option[Integer])](
             ("x = 10", 8),
@@ -387,7 +394,7 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.size shouldBe 1
 
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      flows.map(flowToResultPairs).toSet shouldBe
         Set(
           List[(String, Option[Integer])](
             ("a = 0x37", 3),
@@ -416,7 +423,7 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.size shouldBe 2
 
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      flows.map(flowToResultPairs).toSet shouldBe
         Set(List[(String, Option[Integer])](
               ("a = 0x37", 3),
               ("b = a", 4),
@@ -448,7 +455,7 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.size shouldBe 2
 
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      flows.map(flowToResultPairs).toSet shouldBe
         Set(
           List[(String, Option[Integer])](
             ("a = 0x37", 3),
@@ -484,7 +491,7 @@ class CDataFlowTests extends CpgDataFlowTests {
 
       flows.size shouldBe 2
 
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+      flows.map(flowToResultPairs).toSet shouldBe
         Set(
           List[(String, Option[Integer])](
             ("main(int argc, char** argv)", 2),
@@ -500,6 +507,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         )
     }
   }
+
   "Test 15: conditional expressions (joern issue #91)" in {
     DataFlowCodeToCpgFixture(
       """
@@ -512,7 +520,7 @@ class CDataFlowTests extends CpgDataFlowTests {
       val source = cpg.method.parameter.name("y")
       val sink = cpg.identifier.name("z")
       val flows = sink.reachableByFlows(source).l
-      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe Set(
+      flows.map(flowToResultPairs).toSet shouldBe Set(
         List[(String, Option[Integer])](
           ("foo(bool x, void* y)", 2),
           ("g(y)", 3),
