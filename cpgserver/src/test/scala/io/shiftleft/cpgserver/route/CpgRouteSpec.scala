@@ -11,7 +11,12 @@ import org.http4s.multipart.{Multipart, Part}
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.cpgserver.config.{ServerConfiguration, ServerFilesConfiguration}
-import io.shiftleft.cpgserver.query.{CpgOperationFailure, CpgOperationResult, CpgOperationSuccess, ServerAmmoniteExecutor}
+import io.shiftleft.cpgserver.query.{
+  CpgOperationFailure,
+  CpgOperationResult,
+  CpgOperationSuccess,
+  ServerAmmoniteExecutor
+}
 import io.shiftleft.cpgserver.cpg.CpgProvider
 import io.shiftleft.cpgserver.route.CpgRoute.{ApiError, CpgOperationResponse, CreateCpgQueryResponse, CreateCpgResponse}
 
@@ -37,12 +42,11 @@ class CpgRouteSpec extends Http4sSpec {
     override def executeQuerySync(cpg: Cpg, query: String): IO[CpgOperationResult[String]] = ???
   }
 
-  private def withRoute[T](
-      cpgUuid: UUID = UUID.randomUUID(),
-      cpg: OptionT[IO, CpgOperationResult[Cpg]] = OptionT.pure(CpgOperationSuccess(Cpg.emptyCpg)),
-      queryUuid: UUID = UUID.randomUUID(),
-      queryResult: OptionT[IO, CpgOperationResult[String]] = OptionT.pure(CpgOperationSuccess("")),
-      config: ServerFilesConfiguration = ServerConfiguration.default.files)(
+  private def withRoute[T](cpgUuid: UUID = UUID.randomUUID(),
+                           cpg: OptionT[IO, CpgOperationResult[Cpg]] = OptionT.pure(CpgOperationSuccess(Cpg.emptyCpg)),
+                           queryUuid: UUID = UUID.randomUUID(),
+                           queryResult: OptionT[IO, CpgOperationResult[String]] = OptionT.pure(CpgOperationSuccess("")),
+                           config: ServerFilesConfiguration = ServerConfiguration.default.files)(
       f: Kleisli[IO, Request[IO], Response[IO]] => T): T = {
     val cpgProvider = new DummyCpgProvider(cpgUuid, cpg)
     val cpgQueryExecutor = new DummyServerAmmoniteExecutor(queryUuid, queryResult)
@@ -113,17 +117,17 @@ class CpgRouteSpec extends Http4sSpec {
 
   "Creating a CPG from a set of uploaded files" should {
 
-    "succeed with 201 ACCEPTED if all files were uploaded successfully for processing" in withRoute(cpgUuid = fixedCpgUuid) { route =>
+    "succeed with 201 ACCEPTED if all files were uploaded successfully for processing" in withRoute(
+      cpgUuid = fixedCpgUuid) { route =>
       val tempFile = Files.createTempFile("cpgserver_test", ".c").toUri.toURL
 
-      val requestContent = Multipart[IO](Vector(Part.fileData("file", tempFile, blocker, `Content-Type`(MediaType.text.plain))))
+      val requestContent =
+        Multipart[IO](Vector(Part.fileData("file", tempFile, blocker, `Content-Type`(MediaType.text.plain))))
       val request = Request[IO](method = Method.POST, uri = uri"/v1/upload", headers = requestContent.headers)
         .withEntity(requestContent)
       val response = route.run(request)
 
-      check(response,
-            Status.Accepted,
-            Some(CreateCpgResponse(fixedCpgUuid))) shouldBe true
+      check(response, Status.Accepted, Some(CreateCpgResponse(fixedCpgUuid))) shouldBe true
     }
 
     "fail with 413 PAYLOAD TOO LARGE if any file exceeds the specified size limit of 10MB" in withRoute(
@@ -132,20 +136,20 @@ class CpgRouteSpec extends Http4sSpec {
       val tempFile = Files.createTempFile("cpgserver_test", ".c")
       Files.write(tempFile, Array.fill(42)(1: Byte)) // Size check is inclusive of the limit.
 
-      val requestContent = Multipart[IO](Vector(Part.fileData("file", tempFile.toUri.toURL, blocker, `Content-Type`(MediaType.text.plain))))
+      val requestContent = Multipart[IO](
+        Vector(Part.fileData("file", tempFile.toUri.toURL, blocker, `Content-Type`(MediaType.text.plain))))
       val request = Request[IO](method = Method.POST, uri = uri"/v1/upload", headers = requestContent.headers)
         .withEntity(requestContent)
       val response = route.run(request)
 
-      check(response,
-            Status.PayloadTooLarge,
-            Some(ApiError("A provided file is larger than [42] bytes."))) shouldBe true
+      check(response, Status.PayloadTooLarge, Some(ApiError("A provided file is larger than [42] bytes."))) shouldBe true
     }
 
     "fail with 400 BAD REQUEST if no 'file' entries were specified" in withRoute() { route =>
       val tempFile = Files.createTempFile("cpgserver_test", ".c").toUri.toURL
 
-      val requestContent = Multipart[IO](Vector(Part.fileData("cake", tempFile, blocker, `Content-Type`(MediaType.text.plain))))
+      val requestContent =
+        Multipart[IO](Vector(Part.fileData("cake", tempFile, blocker, `Content-Type`(MediaType.text.plain))))
       val request = Request[IO](method = Method.POST, uri = uri"/v1/upload", headers = requestContent.headers)
         .withEntity(requestContent)
       val response = route.run(request)
@@ -153,23 +157,22 @@ class CpgRouteSpec extends Http4sSpec {
       check(response,
             Status.BadRequest,
             Some(ApiError("At least one 'file' must be specified for the CPG to be created"))) shouldBe true
-     }
+    }
 
     "fail with 400 BAD REQUEST if a 'file' is missing a 'filename'" in withRoute() { route =>
       val tempFile = Files.createTempFile("cpgserver_test", ".c").toUri.toURL
 
       val part = Part.fileData[IO]("file", tempFile, blocker, `Content-Type`(MediaType.text.plain))
       val dispositionHeader = part.headers.get(`Content-Disposition`).get
-      val headersWithoutFilename =  part.headers.put(dispositionHeader.copy(parameters =  dispositionHeader.parameters.removed("filename")))
+      val headersWithoutFilename =
+        part.headers.put(dispositionHeader.copy(parameters = dispositionHeader.parameters.removed("filename")))
 
       val requestContent = Multipart[IO](Vector(part.copy(headers = headersWithoutFilename)))
       val request = Request[IO](method = Method.POST, uri = uri"/v1/upload", headers = requestContent.headers)
         .withEntity(requestContent)
       val response = route.run(request)
 
-      check(response,
-        Status.BadRequest,
-        Some(ApiError("All parts must specify a filename."))) shouldBe true
+      check(response, Status.BadRequest, Some(ApiError("All parts must specify a filename."))) shouldBe true
     }
 
     "fail with 422 UNPROCESSABLE ENTITY if no multipart entries were specified" in withRoute() { route =>
@@ -178,9 +181,7 @@ class CpgRouteSpec extends Http4sSpec {
         .withEntity(requestContent)
       val response = route.run(request)
 
-      check(response,
-            Status.UnprocessableEntity,
-            Some(ApiError("Invalid Multipart body provided."))) shouldBe true
+      check(response, Status.UnprocessableEntity, Some(ApiError("Invalid Multipart body provided."))) shouldBe true
     }
   }
 

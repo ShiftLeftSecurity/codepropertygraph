@@ -86,20 +86,8 @@ class Steps[A](val raw: GremlinScala[A]) {
   /**
     * Pretty print vertices
     * */
-  def p(): List[String] = {
-    l.map {
-      case vertex: Vertex => {
-        val label = vertex.label
-        val id = vertex.id().toString
-        val keyValPairs = vertex.valueMap.toList
-          .filter(x => x._2.toString != "")
-          .sortBy(_._1)
-          .map(x => x._1 + ": " + x._2)
-        s"($label,$id): " + keyValPairs.mkString(", ")
-      }
-      case elem => elem.toString
-    }
-  }
+  def p(implicit show: Show[A] = Show.default): List[String] =
+    toList.map(show.apply)
 
   /** Execute traversal and convert the result to json. */
   def toJson: String = toJson(pretty = false)

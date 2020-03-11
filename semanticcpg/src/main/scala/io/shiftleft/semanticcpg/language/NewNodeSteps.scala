@@ -54,23 +54,6 @@ class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Step
           s"unhandled case, likely produced by a fauly pass: src=$src, src.getClass=$srcClassMaybe, dst=$dst, dstClass=$dstClassMaybe")
     }
 
-  /**
-    * Pretty print vertices
-    * */
-  override def p(): List[String] = {
-    l.map {
-      case node: NewNode => {
-        val label = node.label
-        val keyValPairs = node.properties.toList
-          .filter(x => x._2.toString != "")
-          .sortBy(_._1)
-          .map(x => x._1 + ": " + x._2)
-        s"($label): " + keyValPairs.mkString(", ")
-      }
-      case elem => elem.toString
-    }
-  }
-
 }
 
 object NewNodeSteps {
