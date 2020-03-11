@@ -132,13 +132,13 @@ class StepsTest extends WordSpec with Matchers {
 
   ".p for pretty printing" should {
 
-    "use Show.Default instance if nothing else applies" in {
+    "use default `toString` if nothing else applies" in {
       case class Foo(i: Int)
       val steps: Steps[Foo] = new Steps(__(Foo(42)))
       steps.p2.head shouldBe "Foo(42)"
     }
 
-    "use Show.ForNode instance for NodeSteps" in ExistingCpgFixture("splitmeup") { fixture =>
+    "render nodes as `(label,id): properties`" in ExistingCpgFixture("splitmeup") { fixture =>
       def mainMethods: Steps[nodes.Method] =
         fixture.cpg.method.name("main")
 
