@@ -11,6 +11,8 @@ import io.shiftleft.codepropertygraph.cpgloading.CpgLoader
 
 import java.nio.file.{Files, NoSuchFileException}
 
+import scala.util.Try
+
 object ScriptManager {
   final case class ScriptCollections(collection: String, scripts: ScriptDescriptions)
   final case class ScriptDescriptions(description: String, scripts: List[ScriptDescription])
@@ -80,9 +82,11 @@ abstract class ScriptManager(executor: AmmoniteExecutor) {
       .map { dir =>
         val relativeDir = scriptsTempDir.relativize(dir)
 
-        val scriptDescs = decode[ScriptDescriptions] {
-          (dir / SCRIPT_DESCS).lines.mkString(System.lineSeparator())
-        }.toOption.getOrElse(ScriptDescriptions("", List.empty))
+        val scriptDescs =
+          Try((dir / SCRIPT_DESCS).lines.mkString(System.lineSeparator())).toEither
+            .flatMap(v => decode[ScriptDescriptions](v))
+            .toOption
+            .getOrElse(ScriptDescriptions("", List.empty))
 
         ScriptCollections(relativeDir.toString, scriptDescs)
       }
