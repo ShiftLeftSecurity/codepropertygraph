@@ -2,6 +2,8 @@ package io.shiftleft
 
 object Implicits {
 
+  class NoSuchNodeException extends RuntimeException
+
   /**
     * A wrapper around a Java iterator that throws a proper NoSuchElementException.
     *
@@ -15,7 +17,7 @@ object Implicits {
         iterator.next
       } catch {
         case _: NoSuchElementException =>
-          throw new NoSuchElementException()
+          throw new NoSuchNodeException()
       }
     }
 
@@ -24,7 +26,7 @@ object Implicits {
         val res = iterator.next
         assert(!iterator.hasNext, "iterator was expected to have exactly one element, but it actually has more")
         res
-      } else { throw new NoSuchElementException() }
+      } else { throw new NoSuchNodeException() }
     }
 
     def nextOption: Option[T] = {
