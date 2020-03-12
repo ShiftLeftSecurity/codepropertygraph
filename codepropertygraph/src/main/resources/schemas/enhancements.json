@@ -86,7 +86,8 @@
         },
         { "name": "METHOD_REF",
           "outEdges" : [
-            {"edgeName": "REF", "inNodes": ["METHOD"]}
+            {"edgeName": "REF", "inNodes": ["METHOD"]},
+            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
           ]
         },
         { "name": "TYPE",
