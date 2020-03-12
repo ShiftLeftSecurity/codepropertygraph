@@ -87,6 +87,17 @@ class Steps[A](val raw: GremlinScala[A]) {
   def isEmpty: Boolean = !isDefined
 
   /**
+    * Print help/documentation about the current specific step - useful for REPL users
+    * */
+  def help(implicit helpProvider: Steps.Help[A] = Steps.defaultHelpInstance): String =
+    helpProvider()
+
+  /**
+    * Print help/documentation about generic steps - useful for REPL users
+    * */
+  def helpGeneric: String = Steps.genericHelpMsg
+
+  /**
     * Pretty print vertices
     * This may mean that not all properties of the node are displayed
     * or that some properties have undergone transformations to improve display.
@@ -319,4 +330,25 @@ class Steps[A](val raw: GremlinScala[A]) {
 
   def size: Int = l.size
 
+}
+
+object Steps {
+
+  /**
+    * Typeclass for getting help/documentation about a type - useful for REPL users
+    */
+  trait Help[A] {
+    def apply(): String
+  }
+
+  val genericHelpMsg =
+    """.l : execute this traversal and return a List
+      |.p : pretty print the results
+      |.toJson[Pretty]
+      |.map : transform the traversal
+      |""".stripMargin
+
+  def defaultHelpInstance[A]: Help[A] = () =>
+    s"""no help text for this specific type available. generic help:
+       |$genericHelpMsg""".stripMargin
 }
