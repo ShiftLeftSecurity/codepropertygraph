@@ -92,7 +92,9 @@
    ]
    },
       {"id" : 214, "name" : "FINDING", "comment" : "", "keys" : [], "outEdges" : [], "containedNodes" : [
-	  {"localName" : "evidence", "nodeType" : "NODE", "cardinality" : "list"},
+	  {"localName" : "ioflows", "nodeType" : "IOFLOW", "cardinality" : "list"},
+	  {"localName" : "methods", "nodeType" : "METHOD", "cardinality" : "list"},
+	  {"localName" : "flows", "nodeType" : "FLOW", "cardinality" : "list"},
 	  {"localName" : "keyValuePairs", "nodeType" : "KEY_VALUE_PAIR", "cardinality" : "list"}
    ]
    },
