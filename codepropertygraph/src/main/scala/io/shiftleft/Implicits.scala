@@ -2,12 +2,10 @@ package io.shiftleft
 
 object Implicits {
 
-  class NoSuchNodeException extends RuntimeException
-
   /**
-    * A wrapper around a Java iterator that throws a NoSuchNodeException.
+    * A wrapper around a Java iterator that throws a proper NoSuchElementException.
     *
-    * The exception includes a stack trace.
+    * Proper in this case means an exception with a stack trace.
     * This is intended to be used as a replacement for next() on the iterators
     * returned from TinkerPop since those are missing stack traces.
     */
@@ -17,7 +15,7 @@ object Implicits {
         iterator.next
       } catch {
         case _: NoSuchElementException =>
-          throw new NoSuchNodeException()
+          throw new NoSuchElementException()
       }
     }
 
@@ -26,7 +24,7 @@ object Implicits {
         val res = iterator.next
         assert(!iterator.hasNext, "iterator was expected to have exactly one element, but it actually has more")
         res
-      } else { throw new NoSuchNodeException() }
+      } else { throw new NoSuchElementException() }
     }
 
     def nextOption: Option[T] = {
