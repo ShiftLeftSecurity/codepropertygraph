@@ -1,11 +1,15 @@
 package io.shiftleft.semanticcpg.language
 
 import gremlin.scala.__
+import io.shiftleft.OverflowDbTestInstance
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.overflowdb.OdbGraph
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.{Matchers, WordSpec}
+
 import scala.collection.mutable
 
 class StepsTest extends WordSpec with Matchers {
@@ -172,6 +176,18 @@ class StepsTest extends WordSpec with Matchers {
         fixture.cpg.method.name("main")
 
       mainMethods.p.head shouldBe "package defined pretty printer"
+    }
+  }
+
+  ".help step" should {
+    val cpg = Cpg(OverflowDbTestInstance.create)
+
+    "always provides generic Steps help" in {
+      cpg.methodReturn.helpGeneric shouldBe Steps.genericHelpMsg
+    }
+
+    "return node-specific help text" in {
+      cpg.methodReturn.help shouldBe nodes.MethodReturn.helpMsg
     }
   }
 
