@@ -100,6 +100,13 @@ class Type(val wrapped: NodeSteps[nodes.Type]) extends AnyVal {
     new NodeSteps(
       raw
         .in(EdgeTypes.EVAL_TYPE)
-        .hasLabel(NodeTypes.IDENTIFIER, NodeTypes.CALL, NodeTypes.LITERAL)
+        .filterOnEnd(_.isInstanceOf[nodes.Expression])
         .cast[nodes.Expression])
+
+  def parameterOfType: NodeSteps[nodes.MethodParameterIn] =
+    new NodeSteps(
+      raw
+        .in(EdgeTypes.EVAL_TYPE)
+        .filterOnEnd(_.isInstanceOf[nodes.MethodParameterIn])
+        .cast[nodes.MethodParameterIn])
 }
