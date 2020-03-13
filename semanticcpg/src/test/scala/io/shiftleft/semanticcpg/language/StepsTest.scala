@@ -112,15 +112,15 @@ class StepsTest extends WordSpec with Matchers {
       val json = fixture.cpg.namespace.nameExact("io.shiftleft.testcode.splitmeup").toJson
       val parsed = parse(json).children.head //exactly one result for the above query
       (parsed \ "_label") shouldBe JString("NAMESPACE")
-      (parsed \ "NAME") shouldBe JString("io.shiftleft.testcode.splitmeup")
+      (parsed \ "name") shouldBe JString("io.shiftleft.testcode.splitmeup")
     }
 
     "operating on NewNode" in {
       val json = fixture.cpg.method.name(".*manyArgs.*").location.toJson
       val parsed = parse(json).children.head //exactly one result for the above query
-      (parsed \ "SYMBOL") shouldBe JString("manyArgs")
-      (parsed \ "CLASS_NAME") shouldBe JString("io.shiftleft.testcode.splitmeup.TestGraph")
-      (parsed \ "FILENAME") shouldBe JString("io/shiftleft/testcode/splitmeup/TestGraph.java")
+      (parsed \ "symbol") shouldBe JString("manyArgs")
+      (parsed \ "className") shouldBe JString("io.shiftleft.testcode.splitmeup.TestGraph")
+      (parsed \ "filename") shouldBe JString("io/shiftleft/testcode/splitmeup/TestGraph.java")
     }
 
     "operating on primitive" in {

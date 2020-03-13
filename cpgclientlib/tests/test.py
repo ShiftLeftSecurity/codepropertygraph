@@ -73,7 +73,7 @@ class TestStringMethods(unittest.TestCase):
         self.client.create_cpg(filename)
         response = self.client.query("cpg.method.toJson")
         jsonResponse = json.loads(response)
-        self.assertEqual("main", jsonResponse[0]["NAME"])
+        self.assertEqual("main", jsonResponse[0]["name"])
 
     @classmethod
     def tearDownClass(self):
