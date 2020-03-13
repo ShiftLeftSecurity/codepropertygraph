@@ -32,12 +32,9 @@ class CdgPass(cpg: Cpg) extends CpgPass(cpg) {
         case (node, postDomFrontierNode) =>
           postDomFrontierNode match {
             case _: nodes.Literal | _: nodes.Identifier | _: nodes.Call | _: nodes.MethodRef | _: nodes.Unknown => {
-              node match {
-                case _: nodes.MethodReturn =>
-                  logger.warn("Encountered METHOD_RETURN as destination for CDG edge. Skipping.")
-                case n: nodes.StoredNode =>
-                  dstGraph.addEdgeInOriginal(postDomFrontierNode.asInstanceOf[nodes.StoredNode], n, EdgeTypes.CDG)
-              }
+              dstGraph.addEdgeInOriginal(postDomFrontierNode.asInstanceOf[nodes.StoredNode],
+                                         node.asInstanceOf[nodes.StoredNode],
+                                         EdgeTypes.CDG)
             }
             case _ =>
               val method = postDomFrontierNode.vertices(Direction.IN, EdgeTypes.CONTAINS).next
