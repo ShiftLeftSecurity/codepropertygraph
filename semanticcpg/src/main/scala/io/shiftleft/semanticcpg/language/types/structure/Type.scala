@@ -96,10 +96,20 @@ class Type(val wrapped: NodeSteps[nodes.Type]) extends AnyVal {
   def localsOfType: NodeSteps[nodes.Local] =
     new NodeSteps(raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
 
-  def expressionOfType: NodeSteps[nodes.Expression] =
+  @deprecated("Use expression step instead.")
+  def expressionOfType: NodeSteps[nodes.Expression] = expression
+
+  def expression: NodeSteps[nodes.Expression] =
     new NodeSteps(
       raw
         .in(EdgeTypes.EVAL_TYPE)
-        .hasLabel(NodeTypes.IDENTIFIER, NodeTypes.CALL, NodeTypes.LITERAL)
+        .filterOnEnd(_.isInstanceOf[nodes.Expression])
         .cast[nodes.Expression])
+
+  def parameter: NodeSteps[nodes.MethodParameterIn] =
+    new NodeSteps(
+      raw
+        .in(EdgeTypes.EVAL_TYPE)
+        .filterOnEnd(_.isInstanceOf[nodes.MethodParameterIn])
+        .cast[nodes.MethodParameterIn])
 }
