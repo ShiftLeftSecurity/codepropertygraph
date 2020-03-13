@@ -107,7 +107,7 @@ class Steps[A](val raw: GremlinScala[A]) {
     implicit format =>
       (
         { case _ => ??? }, {
-          case node: StoredNode => {
+          case node: Node => {
             val elementMap = (0 until node.productArity).map { i =>
               val label = node.productElementLabel(i)
               val element = node.productElement(i)
@@ -115,7 +115,6 @@ class Steps[A](val raw: GremlinScala[A]) {
             }.toMap + ("_label" -> node.label)
             Extraction.decompose(elementMap)
           }
-          case node: NewNode => Extraction.decompose(node.properties)
         }
     ))
 
