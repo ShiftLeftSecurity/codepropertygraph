@@ -106,9 +106,16 @@ class Steps[A](val raw: GremlinScala[A]) {
   private lazy val nodeSerializer = new CustomSerializer[nodes.Node](
     implicit format =>
       (
-        { case _                => ??? }, {
-          case node: StoredNode => Extraction.decompose(node.toMap)
-          case node: NewNode    => Extraction.decompose(node.properties)
+        { case _ => ??? }, {
+          case node: StoredNode => {
+            val elementMap = (0 until node.productArity).map { i =>
+              val label = node.productElementLabel(i)
+              val element = node.productElement(i)
+              (label -> element)
+            }.toMap + ("_label" -> node.label)
+            Extraction.decompose(elementMap)
+          }
+          case node: NewNode => Extraction.decompose(node.properties)
         }
     ))
 
