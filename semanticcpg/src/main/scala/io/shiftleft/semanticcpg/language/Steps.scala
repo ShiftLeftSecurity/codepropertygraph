@@ -6,7 +6,6 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import java.util.{List => JList}
 
 import org.apache.tinkerpop.gremlin.process.traversal.Scope
-import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.json4s.CustomSerializer
 import org.json4s.native.Serialization.{write, writePretty}
 import org.json4s.Extraction
@@ -27,7 +26,11 @@ class Steps[A](val raw: GremlinScala[A]) {
   }
 
   /**
-    Execute the traversal and convert the result to a list
+    * Execute the traversal and convert the result to a list
+    * `toList` (inspection) evaluates and returns raw case classes.
+    * We use `toList` to allow the developer to view the raw CPG nodes
+    * returned by a query - including containedNodes - in a format that
+    * allows for easy inspection, but nonetheless, shows the data as-is.
     */
   def toList(): List[A] = raw.toList()
 
@@ -85,11 +88,21 @@ class Steps[A](val raw: GremlinScala[A]) {
 
   /**
     * Pretty print vertices
+    * This may mean that not all properties of the node are displayed
+    * or that some properties have undergone transformations to improve display.
+    * A good example is flow pretty-printing. This is the only three of the
+    * methods which we may modify on a per-node-type basis, typically via
+    * implicits of type Show[NodeType].
     * */
   def p(implicit show: Show[A] = Show.default): List[String] =
     toList.map(show.apply)
 
-  /** Execute traversal and convert the result to json. */
+  /** Execute traversal and convert the result to json.
+    * `toJson` (export) contains the exact same information as `toList`,
+    *  only in json format. Typically, the user will call this method upon
+    *  inspection of the results of `toList` in order to export the data
+    *  for processing with other tools.
+    * */
   def toJson: String = toJson(pretty = false)
 
   /** Execute traversal and convert the result to pretty json. */
