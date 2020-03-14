@@ -49,9 +49,8 @@ abstract class CpgPass(cpg: Cpg) {
     * from the class name of the pass.
     *
     * @param serializedCpg the destination serialized CPG to add overlays to
-    * @param counter an optional integer to keep apart different runs of the same pass
     * */
-  def createApplySerializeAndStore(serializedCpg: SerializedCpg, counter: Int = 0): Unit = {
+  def createApplySerializeAndStore(serializedCpg: SerializedCpg): Unit = {
     if (serializedCpg.isEmpty) {
       createAndApply()
     } else {
@@ -59,7 +58,7 @@ abstract class CpgPass(cpg: Cpg) {
       overlays.zipWithIndex.foreach {
         case (overlay, index) => {
           if (overlay.getSerializedSize > 0) {
-            serializedCpg.addOverlay(overlay, getClass.getSimpleName + counter.toString + "_" + index)
+            serializedCpg.addOverlay(overlay, getClass.getSimpleName + "_" + index)
           }
         }
       }
