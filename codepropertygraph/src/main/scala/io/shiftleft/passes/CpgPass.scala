@@ -41,7 +41,7 @@ abstract class CpgPass(cpg: Cpg) {
     * Name of the enhancement pass.
     * By default it is inferred from the name of the class, override if needed.
     */
-  def name: String = getClass.getSimpleName
+  def name: String = getClass.getName
 
   /**
     * Run a CPG pass to create diff graphs, apply diff graphs, create corresponding
@@ -59,7 +59,7 @@ abstract class CpgPass(cpg: Cpg) {
       overlays.zipWithIndex.foreach {
         case (overlay, index) => {
           if (overlay.getSerializedSize > 0) {
-            serializedCpg.addOverlay(overlay, name + counter.toString + "_" + index)
+            serializedCpg.addOverlay(overlay, getClass.getSimpleName + counter.toString + "_" + index)
           }
         }
       }
