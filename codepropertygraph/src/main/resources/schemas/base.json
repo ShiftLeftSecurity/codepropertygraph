@@ -8,6 +8,7 @@
 
         { "id": 19, "name" : "LANGUAGE", "comment" : "The programming language this graph originates from", "valueType" : "string", "cardinality" : "one"},
         { "id" : 13, "name": "VERSION", "comment" : "A version, given as a string", "valueType" : "string", "cardinality" : "one"},
+	{ "id" : 118, "name" : "OVERLAYS", "comment" : "Names of overlays applied to this graph, in order of application", "valueType" : "string", "cardinality" : "list"},
 
         // Properties that indicate where the code can be found
 
@@ -62,7 +63,7 @@
         {
             "id" : 39,
             "name" : "META_DATA",
-            "keys" : ["LANGUAGE", "VERSION"],
+            "keys" : ["LANGUAGE", "VERSION", "OVERLAYS"],
             "comment" : "Node to save meta data about the graph on its properties. Exactly one node of this type per graph",
             "outEdges" : []
         },
