@@ -29,7 +29,7 @@ import scala.concurrent.duration.DurationLong
   *
   * @param cpg the source CPG this pass traverses
   */
-abstract class CpgPass(cpg: Cpg) {
+abstract class CpgPass(cpg: Cpg, outputName: String = getClass.getSimpleName) {
   import CpgPass.logger
 
   /**
@@ -58,7 +58,7 @@ abstract class CpgPass(cpg: Cpg) {
       overlays.zipWithIndex.foreach {
         case (overlay, index) => {
           if (overlay.getSerializedSize > 0) {
-            serializedCpg.addOverlay(overlay, getClass.getSimpleName + "_" + index)
+            serializedCpg.addOverlay(overlay, outputName + "_" + index)
           }
         }
       }
