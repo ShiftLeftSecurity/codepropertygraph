@@ -3,6 +3,8 @@ package io.shiftleft.semanticcpg.utils
 import io.shiftleft.codepropertygraph.generated._
 import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex}
 import io.shiftleft.Implicits.JavaIteratorDeco
+import io.shiftleft.passes.DiffGraph.getClass
+import org.apache.logging.log4j.LogManager
 
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters._
@@ -13,6 +15,9 @@ import scala.jdk.CollectionConverters._
 // language appropriately.
 
 object ExpandTo {
+
+  private val logger = LogManager.getLogger(getClass)
+
   // For java, the call receiver is always an object instance.
   // For languages which make use of function pointers, this can also be the
   // pointer itself.
@@ -27,8 +32,15 @@ object ExpandTo {
   def callArguments(callNode: nodes.CallRepr): Iterator[nodes.Expression] =
     callNode._argumentOut.asScala.map(_.asInstanceOf[nodes.Expression])
 
-  def typeCarrierToType(parameterNode: nodes.StoredNode): nodes.Type =
-    parameterNode._evalTypeOut.onlyChecked.asInstanceOf[nodes.Type]
+  def typeCarrierToType(parameterNode: nodes.StoredNode): nodes.TypeBase = {
+    try {
+      parameterNode._evalTypeOut.onlyChecked.asInstanceOf[nodes.Type]
+    } catch {
+      case exc: NoSuchElementException =>
+        logger.warn("Invalid CPG `typeCarrierToType` unsuccessful: ", exc)
+        nodes.NewType(fullName = "")
+    }
+  }
 
   def parameterInToMethod(parameterIn: nodes.MethodParameterIn): nodes.Method =
     parameterIn.astIn.onlyChecked
