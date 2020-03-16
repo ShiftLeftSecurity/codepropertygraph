@@ -1,17 +1,12 @@
 package io.shiftleft.semanticcpg.passes.cfgdominator
 
-import gremlin.scala.Vertex
-import io.shiftleft.codepropertygraph.generated.EdgeTypes
-import org.apache.tinkerpop.gremlin.structure.Direction
-
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import scala.jdk.CollectionConverters._
 
-class ReverseCpgCfgAdapter extends CfgAdapter[Vertex] {
-  override def successors(node: Vertex): IterableOnce[Vertex] = {
-    node.vertices(Direction.IN, EdgeTypes.CFG).asScala
-  }
+class ReverseCpgCfgAdapter extends CfgAdapter[StoredNode] {
+  override def successors(node: StoredNode): IterableOnce[StoredNode] =
+    node._cfgIn.asScala
 
-  override def predecessors(node: Vertex): IterableOnce[Vertex] = {
-    node.vertices(Direction.OUT, EdgeTypes.CFG).asScala
-  }
+  override def predecessors(node: StoredNode): IterableOnce[StoredNode] =
+    node._cfgOut.asScala
 }

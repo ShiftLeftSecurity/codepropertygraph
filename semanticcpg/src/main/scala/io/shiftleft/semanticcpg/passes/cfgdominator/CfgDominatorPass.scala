@@ -17,7 +17,7 @@ class CfgDominatorPass(cpg: Cpg) extends CpgPass(cpg) {
     new ParallelIteratorExecutor(methodsIterator).map(perMethod)
   }
 
-  private def perMethod(method: Vertex): DiffGraph = {
+  private def perMethod(method: StoredNode): DiffGraph = {
     val cfgAdapter = new CpgCfgAdapter()
     val dominatorCalculator = new CfgDominator(cfgAdapter)
 
@@ -36,7 +36,8 @@ class CfgDominatorPass(cpg: Cpg) extends CpgPass(cpg) {
     dstGraph.build()
   }
 
-  private def addDomTreeEdges(dstGraph: DiffGraph.Builder, cfgNodeToImmediateDominator: Map[Vertex, Vertex]): Unit = {
+  private def addDomTreeEdges(dstGraph: DiffGraph.Builder,
+                              cfgNodeToImmediateDominator: Map[StoredNode, StoredNode]): Unit = {
     // TODO do not iterate over potential hash map to ensure same interation order for
     // edge creation.
     cfgNodeToImmediateDominator.foreach {
@@ -48,7 +49,7 @@ class CfgDominatorPass(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def addPostDomTreeEdges(dstGraph: DiffGraph.Builder,
-                                  cfgNodeToPostImmediateDominator: Map[Vertex, Vertex]): Unit = {
+                                  cfgNodeToPostImmediateDominator: Map[StoredNode, StoredNode]): Unit = {
     // TODO do not iterate over potential hash map to ensure same interation order for
     // edge creation.
     cfgNodeToPostImmediateDominator.foreach {

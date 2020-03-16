@@ -1,18 +1,12 @@
 package io.shiftleft.semanticcpg.passes.codepencegraph
 
-import gremlin.scala.Vertex
-import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.semanticcpg.passes.cfgdominator.DomTreeAdapter
-import org.apache.tinkerpop.gremlin.structure.Direction
+import scala.jdk.CollectionConverters._
 
-class CpgPostDomTreeAdapter extends DomTreeAdapter[Vertex] {
+class CpgPostDomTreeAdapter extends DomTreeAdapter[StoredNode] {
 
-  override def immediateDominator(cfgNode: Vertex): Option[Vertex] = {
-    val iterator = cfgNode.vertices(Direction.IN, EdgeTypes.POST_DOMINATE)
-    if (iterator.hasNext) {
-      Some(iterator.next)
-    } else {
-      None
-    }
-  }
+  override def immediateDominator(cfgNode: StoredNode): Option[StoredNode] =
+    cfgNode._postDominateIn.asScala.nextOption
+
 }

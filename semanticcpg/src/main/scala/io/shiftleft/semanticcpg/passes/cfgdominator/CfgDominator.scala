@@ -1,6 +1,8 @@
 package io.shiftleft.semanticcpg.passes.cfgdominator
 
-class CfgDominator[Node](adapter: CfgAdapter[Node]) {
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
+
+class CfgDominator[Node <: StoredNode](adapter: CfgAdapter[Node]) {
 
   /**
     * Calculates the immediate dominators of all CFG nodes reachable from cfgEntry.

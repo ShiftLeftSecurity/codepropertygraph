@@ -1,8 +1,9 @@
 package io.shiftleft.semanticcpg.passes.cfgdominator
 
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import scala.collection.mutable
 
-class CfgDominatorFrontier[Node](cfgAdapter: CfgAdapter[Node], domTreeAdapter: DomTreeAdapter[Node]) {
+class CfgDominatorFrontier[Node <: StoredNode](cfgAdapter: CfgAdapter[Node], domTreeAdapter: DomTreeAdapter[Node]) {
 
   /**
     * Calculates a the dominator frontier for a set of CFG nodes.
