@@ -6,8 +6,11 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.proto.cpg.Cpg._
 import java.util
 import java.lang.{Long => JLong}
+
+import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Vertex
+
 import scala.concurrent.duration.DurationLong
 
 /**
@@ -70,10 +73,12 @@ abstract class CpgPass(cpg: Cpg, outputName: String = getClass.getSimpleName) {
     */
   def createApplyAndSerialize(): Iterator[CpgOverlay] =
     withStartEndTimesLogged {
-      run().map { diffGraph =>
+      val overlays = run().map { diffGraph =>
         val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg)
         new DiffGraphProtoSerializer().serialize(appliedDiffGraph)
       }
+      appendOverlayNameToMetaData()
+      overlays
     }
 
   /**
@@ -82,7 +87,18 @@ abstract class CpgPass(cpg: Cpg, outputName: String = getClass.getSimpleName) {
   def createAndApply(): Unit =
     withStartEndTimesLogged {
       run().foreach(diffGraph => DiffGraph.Applier.applyDiff(diffGraph, cpg))
+      appendOverlayNameToMetaData()
     }
+
+  private def appendOverlayNameToMetaData(): Unit = {
+    val metaDataList = cpg.scalaGraph.V.hasLabel(NodeTypes.META_DATA).l
+    metaDataList match {
+      case (metaData: nodes.MetaData) :: Nil =>
+        metaData.property(NodeKeys.OVERLAYS.toString, metaData.overlays ++ List(outputName))
+      case _ =>
+        logger.warn("Invalid CPG: exactly 1 meta data block required")
+    }
+  }
 
   private def withStartEndTimesLogged[A](fun: => A): A = {
     logger.debug(s"Start of enhancement: $name")
