@@ -20,12 +20,12 @@ class CdgPass(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
 
     val dominanceFrontier =
-      new CfgDominatorFrontier(new ReverseCpgCfgAdapter(), new CpgPostDomTreeAdapter())
+      new CfgDominatorFrontier(new ReverseCpgCfgAdapter, new CpgPostDomTreeAdapter)
 
     new ParallelIteratorExecutor[nodes.Method](cpg.method.toIterator()).map { method =>
       implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
 
-      val cfgNodes = method.vertices(Direction.OUT, EdgeTypes.CONTAINS).asScala.toList
+      val cfgNodes = method._containsOut.asScala.toList
       val postDomFrontiers = dominanceFrontier.calculate(method :: cfgNodes)
 
       postDomFrontiers.foreach {

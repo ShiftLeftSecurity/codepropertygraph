@@ -52,14 +52,10 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
       return Nil
     }
 
-    val baseTypeDecls = typeDecl
-      .vertices(Direction.OUT, EdgeTypes.INHERITS_FROM)
-      .asScala
-      .flatMap(typ => typ.vertices(Direction.OUT, EdgeTypes.REF).asScala)
-      .toList
+    val baseTypeDecls = typeDecl.inheritsFromOut.asScala.flatMap(_.refOut.asScala).toList
 
     val nonConstructorMethodsOfBases = baseTypeDecls.flatMap { baseTypeDecl =>
-      getNonConstructorMethodsTransitive(baseTypeDecl.asInstanceOf[nodes.TypeDecl], alreadyVisitedTypeDecls + typeDecl)
+      getNonConstructorMethodsTransitive(baseTypeDecl, alreadyVisitedTypeDecls + typeDecl)
     }
 
     val ownNonConstructorMethods = getNonConstructorMethods(typeDecl)
@@ -74,17 +70,11 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
     notShadowedInheritedMethods ++ ownNonConstructorMethods
   }
 
-  private def getNonConstructorMethods(typeDecl: nodes.TypeDecl): List[nodes.Method] = {
-    typeDecl
-      .vertices(Direction.OUT, EdgeTypes.AST)
-      .asScala
-      .filter { method =>
-        method.isInstanceOf[nodes.Method] &&
-        method.asInstanceOf[nodes.Method].start.isConstructor.headOption().isEmpty
-      }
-      .map(_.asInstanceOf[nodes.Method])
+  private def getNonConstructorMethods(typeDecl: nodes.TypeDecl): List[nodes.Method] =
+    typeDecl._astOut.asScala
+      .collect { case method: nodes.Method => method }
+      .filter(_.start.isConstructor.headOption.isEmpty)
       .toList
-  }
 
 }
 

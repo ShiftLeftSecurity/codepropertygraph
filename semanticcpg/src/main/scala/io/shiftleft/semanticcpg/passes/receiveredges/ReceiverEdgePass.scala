@@ -2,11 +2,10 @@ package io.shiftleft.semanticcpg.passes.receiveredges
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys}
+import io.shiftleft.semanticcpg.language._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import org.apache.logging.log4j.{LogManager, Logger}
-import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.jdk.CollectionConverters._
 
@@ -28,29 +27,19 @@ class ReceiverEdgePass(cpg: Cpg) extends CpgPass(cpg) {
     var loggedDeprecationWarning = false
     val dstGraph = DiffGraph.newBuilder
 
-    cpg.graph.V
-      .hasLabel(NodeTypes.CALL)
-      .sideEffect { call =>
-        val instanceOption = call
-          .vertices(Direction.OUT, EdgeTypes.AST)
-          .asScala
-          .find(_.value2(NodeKeys.ARGUMENT_INDEX) == 0)
-
-        instanceOption.foreach { instance =>
-          if (!instance.edges(Direction.IN, EdgeTypes.RECEIVER).hasNext) {
-            dstGraph.addEdgeInOriginal(call.asInstanceOf[StoredNode],
-                                       instance.asInstanceOf[StoredNode],
-                                       EdgeTypes.RECEIVER)
-            if (!loggedDeprecationWarning) {
-              logger.warn(s"Using deprecated CPG format without RECEIVER edge between " +
-                s"CALL and instance nodes.")
-              loggedDeprecationWarning = true
-            }
+    cpg.call.sideEffect { call =>
+      call._astOut.asScala.find(_.value2(NodeKeys.ARGUMENT_INDEX) == 0).foreach { instance =>
+        if (!instance._receiverIn.hasNext) {
+          dstGraph.addEdgeInOriginal(call, instance, EdgeTypes.RECEIVER)
+          if (!loggedDeprecationWarning) {
+            logger.warn("Using deprecated CPG format without RECEIVER edge between CALL and instance nodes.")
+            loggedDeprecationWarning = true
           }
         }
       }
-      .iterate()
-    Iterator(dstGraph.build())
+    }.iterate
+
+    Iterator(dstGraph.build)
   }
 }
 

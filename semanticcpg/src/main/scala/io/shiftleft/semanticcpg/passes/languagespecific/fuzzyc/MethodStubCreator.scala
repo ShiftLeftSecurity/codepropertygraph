@@ -102,7 +102,7 @@ class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
     cpg.call
       .sideEffect { call =>
         methodToParameterCount +=
-          NameAndSignature(call.name, call.signature) -> call.vertices(Direction.OUT, EdgeTypes.AST).asScala.size
+          NameAndSignature(call.name, call.signature) -> call._astOut.asScala.size
       }
       .exec()
   }
