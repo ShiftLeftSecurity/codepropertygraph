@@ -6,8 +6,11 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.proto.cpg.Cpg._
 import java.util
 import java.lang.{Long => JLong}
+
+import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Vertex
+
 import scala.concurrent.duration.DurationLong
 
 /**
@@ -29,7 +32,7 @@ import scala.concurrent.duration.DurationLong
   *
   * @param cpg the source CPG this pass traverses
   */
-abstract class CpgPass(cpg: Cpg) {
+abstract class CpgPass(cpg: Cpg, outputName: String = getClass.getSimpleName) {
   import CpgPass.logger
 
   /**
@@ -49,9 +52,8 @@ abstract class CpgPass(cpg: Cpg) {
     * from the class name of the pass.
     *
     * @param serializedCpg the destination serialized CPG to add overlays to
-    * @param counter an optional integer to keep apart different runs of the same pass
     * */
-  def createApplySerializeAndStore(serializedCpg: SerializedCpg, counter: Int = 0): Unit = {
+  def createApplySerializeAndStore(serializedCpg: SerializedCpg): Unit = {
     if (serializedCpg.isEmpty) {
       createAndApply()
     } else {
@@ -59,7 +61,7 @@ abstract class CpgPass(cpg: Cpg) {
       overlays.zipWithIndex.foreach {
         case (overlay, index) => {
           if (overlay.getSerializedSize > 0) {
-            serializedCpg.addOverlay(overlay, getClass.getSimpleName + counter.toString + "_" + index)
+            serializedCpg.addOverlay(overlay, outputName + "_" + index)
           }
         }
       }
@@ -71,10 +73,12 @@ abstract class CpgPass(cpg: Cpg) {
     */
   def createApplyAndSerialize(): Iterator[CpgOverlay] =
     withStartEndTimesLogged {
-      run().map { diffGraph =>
+      val overlays = run().map { diffGraph =>
         val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg)
         new DiffGraphProtoSerializer().serialize(appliedDiffGraph)
       }
+      appendOverlayNameToMetaData()
+      overlays
     }
 
   /**
@@ -83,7 +87,18 @@ abstract class CpgPass(cpg: Cpg) {
   def createAndApply(): Unit =
     withStartEndTimesLogged {
       run().foreach(diffGraph => DiffGraph.Applier.applyDiff(diffGraph, cpg))
+      appendOverlayNameToMetaData()
     }
+
+  private def appendOverlayNameToMetaData(): Unit = {
+    val metaDataList = cpg.scalaGraph.V.hasLabel(NodeTypes.META_DATA).l
+    metaDataList match {
+      case (metaData: nodes.MetaData) :: Nil =>
+        metaData.property(NodeKeys.OVERLAYS.toString, metaData.overlays ++ List(outputName))
+      case _ =>
+        logger.warn("Invalid CPG: exactly 1 meta data block required")
+    }
+  }
 
   private def withStartEndTimesLogged[A](fun: => A): A = {
     logger.debug(s"Start of enhancement: $name")
