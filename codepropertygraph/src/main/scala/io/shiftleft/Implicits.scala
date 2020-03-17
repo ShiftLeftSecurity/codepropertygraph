@@ -43,5 +43,3 @@ object Implicits {
   }
 
 }
-
-class Implicits {}
