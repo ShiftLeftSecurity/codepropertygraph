@@ -4,7 +4,7 @@ import org.apache.logging.log4j.LogManager
 
 object Implicits {
 
-  private val logger = LogManager.getLogger(classOf[Implicits])
+  private val logger = LogManager.getLogger(getClass)
 
   /**
     * A wrapper around a Java iterator that throws a proper NoSuchElementException.
