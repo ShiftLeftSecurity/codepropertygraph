@@ -1,6 +1,10 @@
 package io.shiftleft
 
+import org.apache.logging.log4j.LogManager
+
 object Implicits {
+
+  private val logger = LogManager.getLogger(classOf[Implicits])
 
   /**
     * A wrapper around a Java iterator that throws a proper NoSuchElementException.
@@ -22,7 +26,9 @@ object Implicits {
     def onlyChecked: T = {
       if (iterator.hasNext) {
         val res = iterator.next
-        assert(!iterator.hasNext, "iterator was expected to have exactly one element, but it actually has more")
+        if (iterator.hasNext) {
+          logger.error("iterator was expected to have exactly one element, but it actually has more")
+        }
         res
       } else { throw new NoSuchElementException() }
     }
@@ -37,3 +43,5 @@ object Implicits {
   }
 
 }
+
+class Implicits {}
