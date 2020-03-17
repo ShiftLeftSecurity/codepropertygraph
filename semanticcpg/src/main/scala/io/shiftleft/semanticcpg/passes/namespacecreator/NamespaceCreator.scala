@@ -2,9 +2,9 @@ package io.shiftleft.semanticcpg.passes.namespacecreator
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.semanticcpg.language._
 
 import scala.collection.mutable
 
@@ -21,8 +21,7 @@ class NamespaceCreator(cpg: Cpg) extends CpgPass(cpg) {
     * to corresponding NAMESPACE nodes.
     * */
   override def run(): Iterator[DiffGraph] = {
-    val namespaceBlocks = cpg.graph.V.hasLabel(NodeTypes.NAMESPACE_BLOCK).toBuffer
-    val blocksByName = namespaceBlocks.groupBy(_.value2(NodeKeys.NAME))
+    val blocksByName = cpg.namespaceBlock.toBuffer.groupBy(_.name)
     val dstGraph = DiffGraph.newBuilder
 
     blocksByName.foreach {

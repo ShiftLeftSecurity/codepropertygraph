@@ -1,9 +1,9 @@
 package io.shiftleft.dataflowengine.passes.propagateedges
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.semanticcpg.language._
 import io.shiftleft.dataflowengine.semanticsloader.Semantics
 import org.apache.logging.log4j.{LogManager, Logger}
 
@@ -23,49 +23,33 @@ class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
     dstGraph = DiffGraph.newBuilder
 
     semantics.elements.foreach { semantic =>
-      val methodOption =
-        cpg.graph.V().hasLabel(NodeTypes.METHOD).has(NodeKeys.FULL_NAME -> semantic.methodFullName).headOption()
-
-      methodOption match {
-        case Some(method) =>
-          addSelfDefSemantic(method, semantic.parameterIndex)
-        case None =>
+      cpg.method.fullName(semantic.methodFullName).headOption.foreach { method =>
+        addSelfDefSemantic(method, semantic.parameterIndex)
       }
     }
 
     Iterator(dstGraph.build())
   }
 
-  private def addSelfDefSemantic(method: Vertex, parameterIndex: Int): Unit = {
+  private def addSelfDefSemantic(method: nodes.Method, parameterIndex: Int): Unit = {
     // From where the PROPAGATE edge is coming does not matter for the open source reachable by.
     // Thus we let it start from the corresponding METHOD_PARAMETER_IN.
-    val parameterInOption = method
-      .asInstanceOf[nodes.StoredNode]
-      ._astOut
-      .asScala
-      .find(node => node.label == NodeTypes.METHOD_PARAMETER_IN && node.value2(NodeKeys.ORDER) == parameterIndex)
-
-    val parameterOutOption = method
-      .asInstanceOf[nodes.StoredNode]
-      ._astOut
-      .asScala
-      .find(node => node.label == NodeTypes.METHOD_PARAMETER_OUT && node.value2(NodeKeys.ORDER) == parameterIndex)
+    val astOut = method._astOut.asScala.toList
+    val parameterInOption = astOut.find { case paramIn: nodes.MethodParameterIn   => paramIn.order == parameterIndex }
+    val parameterOutOption = astOut.find { case paramIn: nodes.MethodParameterOut => paramIn.order == parameterIndex }
 
     (parameterInOption, parameterOutOption) match {
       case (Some(parameterIn), Some(parameterOut)) =>
         addPropagateEdge(parameterIn, parameterOut, isAlias = false)
       case (None, _) =>
-        logger.warn(s"Could not find parameter $parameterIndex of ${method.value2(NodeKeys.FULL_NAME)}.")
+        logger.warn(s"Could not find parameter $parameterIndex of ${method.fullName}.")
       case _ =>
-        logger.warn(s"Could not find output parameter $parameterIndex of ${method.value2(NodeKeys.FULL_NAME)}.")
+        logger.warn(s"Could not find output parameter $parameterIndex of ${method.fullName}.")
     }
   }
 
-  private def addPropagateEdge(src: Vertex, dst: Vertex, isAlias: java.lang.Boolean): Unit = {
-    dstGraph.addEdgeInOriginal(src.asInstanceOf[nodes.StoredNode],
-                               dst.asInstanceOf[nodes.StoredNode],
-                               EdgeTypes.PROPAGATE,
-                               (EdgeKeyNames.ALIAS, isAlias) :: Nil)
+  private def addPropagateEdge(src: nodes.StoredNode, dst: nodes.StoredNode, isAlias: java.lang.Boolean): Unit = {
+    dstGraph.addEdgeInOriginal(src, dst, EdgeTypes.PROPAGATE, (EdgeKeyNames.ALIAS, isAlias) :: Nil)
   }
 }
 

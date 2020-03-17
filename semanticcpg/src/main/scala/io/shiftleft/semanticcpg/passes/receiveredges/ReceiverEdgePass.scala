@@ -1,10 +1,10 @@
 package io.shiftleft.semanticcpg.passes.receiveredges
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys}
-import io.shiftleft.semanticcpg.language._
+import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.codepropertygraph.generated.nodes.HasArgumentIndex
 import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.semanticcpg.language._
 import org.apache.logging.log4j.{LogManager, Logger}
 
 import scala.jdk.CollectionConverters._
@@ -28,7 +28,7 @@ class ReceiverEdgePass(cpg: Cpg) extends CpgPass(cpg) {
     val dstGraph = DiffGraph.newBuilder
 
     cpg.call.sideEffect { call =>
-      call._astOut.asScala.find(_.value2(NodeKeys.ARGUMENT_INDEX) == 0).foreach { instance =>
+      call._astOut.asScala.find { case node: HasArgumentIndex => node.argumentIndex == 0 }.foreach { instance =>
         if (!instance._receiverIn.hasNext) {
           dstGraph.addEdgeInOriginal(call, instance, EdgeTypes.RECEIVER)
           if (!loggedDeprecationWarning) {
