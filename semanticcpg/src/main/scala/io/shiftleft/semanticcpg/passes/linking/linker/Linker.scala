@@ -253,9 +253,11 @@ object Linker {
           }
         }
       } else {
-        val dstFullName =
-          srcNode.vertices(Direction.OUT, edgeType).nextChecked.value2(NodeKeys.FULL_NAME)
-        srcNode.property(dstFullNameKey, dstFullName)
+        val maybeDstFullName = srcNode.vertices(Direction.OUT, edgeType).nextOption.map(_.value2(NodeKeys.FULL_NAME))
+        maybeDstFullName match {
+          case Some(dstFullName) => srcNode.property(dstFullNameKey, dstFullName)
+          case None              => logger.error(s"Missing outgoing edge of type ${edgeType} from node ${srcNode}")
+        }
         if (!loggedDeprecationWarning) {
           logger.warn(
             s"Using deprecated CPG format with already existing $edgeType edge between" +
