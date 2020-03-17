@@ -35,8 +35,14 @@ class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
     // From where the PROPAGATE edge is coming does not matter for the open source reachable by.
     // Thus we let it start from the corresponding METHOD_PARAMETER_IN.
     val astOut = method._astOut.asScala.toList
-    val parameterInOption = astOut.find { case paramIn: nodes.MethodParameterIn   => paramIn.order == parameterIndex }
-    val parameterOutOption = astOut.find { case paramIn: nodes.MethodParameterOut => paramIn.order == parameterIndex }
+    val parameterInOption = astOut.find {
+      case paramIn: nodes.MethodParameterIn if paramIn.order == parameterIndex => true
+      case _                                                                   => false
+    }
+    val parameterOutOption = astOut.find {
+      case paramOut: nodes.MethodParameterOut if paramOut.order == parameterIndex => true
+      case _                                                                      => false
+    }
 
     (parameterInOption, parameterOutOption) match {
       case (Some(parameterIn), Some(parameterOut)) =>
