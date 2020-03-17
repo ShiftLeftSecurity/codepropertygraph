@@ -2,14 +2,30 @@ package io.shiftleft.semanticcpg.language
 
 import gremlin.scala.Vertex
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.NewLocation
 import io.shiftleft.semanticcpg.utils.ExpandTo
+import org.apache.logging.log4j.LogManager
 
 import scala.jdk.CollectionConverters._
 
 /* TODO MP: this should be part of the normal steps, rather than matching on the type at runtime
  * all (and only) steps extending DataFlowObject should/must have `newSink`, `newSource` and `newLocation` */
 object LocationCreator {
+
+  private val logger = LogManager.getLogger(getClass)
+
   def apply(vertex: Vertex): nodes.NewLocation = {
+    try {
+      location(vertex)
+    } catch {
+      case exc @ (_ : NoSuchElementException | _ : ClassCastException) => {
+        logger.error(s"Cannot determine location for ${vertex.label} due to broken CPG", exc)
+        emptyLocation(vertex.label, Some(vertex.asInstanceOf[nodes.Node]))
+      }
+    }
+  }
+
+  private def location(vertex : Vertex): NewLocation = {
     vertex match {
       case paramIn: nodes.MethodParameterIn =>
         apply(
@@ -17,7 +33,7 @@ object LocationCreator {
           paramIn.name,
           paramIn.label,
           paramIn.lineNumber,
-          ExpandTo.parameterInToMethod(paramIn)
+          paramIn.method
         )
       case paramOut: nodes.MethodParameterOut =>
         apply(
@@ -25,7 +41,7 @@ object LocationCreator {
           paramOut.name,
           paramOut.label,
           paramOut.lineNumber,
-          ExpandTo.parameterOutToMethod(paramOut)
+          paramOut.method
         )
       case methodReturn: nodes.MethodReturn =>
         apply(
@@ -33,7 +49,7 @@ object LocationCreator {
           "$ret",
           methodReturn.label,
           methodReturn.lineNumber,
-          ExpandTo.methodReturnToMethod(methodReturn)
+          methodReturn.method
         )
       case call: nodes.Call =>
         apply(
@@ -41,7 +57,7 @@ object LocationCreator {
           call.code,
           call.label,
           call.lineNumber,
-          ExpandTo.expressionToMethod(call)
+          call.method
         )
       case implicitCall: nodes.ImplicitCall =>
         apply(
@@ -49,7 +65,7 @@ object LocationCreator {
           implicitCall.code,
           implicitCall.label,
           implicitCall.lineNumber,
-          ExpandTo.implicitCallToMethod(implicitCall)
+          implicitCall.method
         )
       case method: nodes.Method =>
         apply(
@@ -65,7 +81,7 @@ object LocationCreator {
           identifier.name,
           identifier.label,
           identifier.lineNumber,
-          ExpandTo.expressionToMethod(identifier)
+          identifier.method
         )
       case literal: nodes.Literal =>
         apply(
@@ -73,7 +89,7 @@ object LocationCreator {
           literal.code,
           literal.label,
           literal.lineNumber,
-          ExpandTo.expressionToMethod(literal)
+          literal.method
         )
       case local: nodes.Local =>
         apply(
