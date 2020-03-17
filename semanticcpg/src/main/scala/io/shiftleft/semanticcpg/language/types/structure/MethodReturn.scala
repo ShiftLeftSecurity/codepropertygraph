@@ -31,3 +31,13 @@ class MethodReturn(val wrapped: NodeSteps[nodes.MethodReturn]) extends AnyVal {
       __(mr.toReturn: _*)
     })
 }
+
+object MethodReturn {
+  // TODO build as asci table?
+  val HelpMsg =
+    """.method // traverse to parent method
+      |.returnUser // ???
+      |...
+      |""".stripMargin
+}
+
