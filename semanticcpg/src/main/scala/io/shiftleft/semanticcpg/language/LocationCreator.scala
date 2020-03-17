@@ -18,14 +18,14 @@ object LocationCreator {
     try {
       location(vertex)
     } catch {
-      case exc @ (_ : NoSuchElementException | _ : ClassCastException) => {
+      case exc @ (_: NoSuchElementException | _: ClassCastException) => {
         logger.error(s"Cannot determine location for ${vertex.label} due to broken CPG", exc)
         emptyLocation(vertex.label, Some(vertex.asInstanceOf[nodes.Node]))
       }
     }
   }
 
-  private def location(vertex : Vertex): NewLocation = {
+  private def location(vertex: Vertex): NewLocation = {
     vertex match {
       case paramIn: nodes.MethodParameterIn =>
         apply(
