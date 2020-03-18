@@ -96,7 +96,8 @@ abstract class CpgPass(cpg: Cpg, outputName: String = getClass.getSimpleName) {
       case (metaData: nodes.MetaData) :: Nil =>
         metaData.property(NodeKeys.OVERLAYS.toString, metaData.overlays ++ List(outputName))
       case _ =>
-        logger.warn("Invalid CPG: exactly 1 meta data block required")
+        // TODO: make this a warning once all frontends are caught up.
+        logger.info("Invalid CPG: exactly 1 meta data block required")
     }
   }
 
