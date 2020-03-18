@@ -1,60 +1,7 @@
 package overflowdb.codegen
 
 import better.files.File
-import java.io.{FileInputStream, File => JFile}
-import play.api.libs.json._
-
-class Schema(schemaFile: String) {
-  implicit val nodeBaseTraitRead = Json.reads[NodeBaseTrait]
-  implicit val outEdgeEntryRead = Json.reads[OutEdgeEntry]
-  implicit val containedNodeRead = Json.reads[ContainedNode]
-  implicit val nodeTypesRead = Json.reads[NodeType]
-  implicit val propertyRead = Json.reads[Property]
-  implicit val edgeTypeRead = Json.reads[EdgeType]
-
-  private lazy val jsonRoot = Json.parse(new FileInputStream(schemaFile))
-  lazy val nodeBaseTraits = (jsonRoot \ "nodeBaseTraits").as[List[NodeBaseTrait]]
-  lazy val nodeTypes = (jsonRoot \ "nodeTypes").as[List[NodeType]]
-  lazy val edgeTypes = (jsonRoot \ "edgeTypes").as[List[EdgeType]]
-  lazy val nodeKeys = (jsonRoot \ "nodeKeys").as[List[Property]]
-  lazy val edgeKeys = (jsonRoot \ "edgeKeys").as[List[Property]]
-
-  lazy val nodeTypeByName: Map[String, NodeType] =
-    nodeTypes.map(node => node.name -> node).toMap
-
-  lazy val nodePropertyByName: Map[String, Property] =
-    nodeKeys.map(property => property.name -> property).toMap
-
-  lazy val edgePropertyByName: Map[String, Property] =
-    edgeKeys.map(property => property.name -> property).toMap
-
-  /* schema only specifies `node.outEdges` - this builds a reverse map (essentially `node.inEdges`) along with the outNodes */
-  lazy val nodeToInEdgeContexts: Map[NodeType, Seq[InEdgeContext]] = {
-    val tuples: Seq[(NodeType, String, NodeType)] =
-      for {
-        nodeType <- nodeTypes
-        outEdge <- nodeType.outEdges
-        inNodeName <- outEdge.inNodes
-        inNode = nodeTypeByName.get(inNodeName) if inNode.isDefined
-      } yield (inNode.get, outEdge.edgeName, nodeType)
-
-    /* grouping above (node, inEdge, adjacentNode) tuples by `node` and `inEdge`
-     * would look nicer with scala 2.13's `groupMap`, but sbt is still on scala 2.12 :( */
-    val grouped: Map[NodeType, Map[String, Seq[NodeType]]] =
-      tuples.groupBy(_._1).mapValues(_.groupBy(_._2).mapValues(_.map(_._3)).toMap)
-
-    grouped.mapValues { inEdgesWithAdjacentNodes =>
-      // all nodes can have incoming `CONTAINS_NODE` edges
-      val adjustedInEdgesWithAdjacentNodes =
-        if (inEdgesWithAdjacentNodes.contains(DefaultEdgeTypes.ContainsNode)) inEdgesWithAdjacentNodes
-        else inEdgesWithAdjacentNodes + (DefaultEdgeTypes.ContainsNode -> Set.empty)
-
-      adjustedInEdgesWithAdjacentNodes.map { case (edge, adjacentNodes) =>
-        InEdgeContext(edge, adjacentNodes.toSet)
-      }.toSeq
-    }
-  }
-}
+import java.io.{File => JFile}
 
 /** Generates a domain model for OverflowDb traversals based on your domain-specific json schema.
   *
@@ -101,7 +48,8 @@ class CodeGen(schemaFile: String, basePackage: String) {
 
     def generateEdgeSource(edgeType: EdgeType, keys: List[Property]) = {
       val edgeClassName = edgeType.className
-      val keysQuoted = keys.map('"' + _.name + '"')
+
+      val keysQuoted = quoted(keys.map(_.name))
       val keyToValueMap = keys
         .map { key =>
           s""" "${key.name}" -> { instance: $edgeClassName => instance.${camelCase(key.name)}()}"""
@@ -348,8 +296,8 @@ class CodeGen(schemaFile: String, basePackage: String) {
            |  }
            |
            |  object Edges {
-           |    val In: Array[String] = Array(${inEdgeNames.map('"' + _ + '"').mkString(",")})
-           |    val Out: Array[String] = Array(${outEdgeNames.map('"' + _ + '"').mkString(",")})
+           |    val In: Array[String] = Array(${quoted(inEdgeNames).mkString(",")})
+           |    val Out: Array[String] = Array(${quoted(outEdgeNames).mkString(",")})
            |  }
            |
            |  val factory = new NodeFactory[$classNameDb] {
@@ -741,199 +689,8 @@ class CodeGen(schemaFile: String, basePackage: String) {
     println(s"generated NewNode sources in $outfile")
     outfile.toJava
   }
-}
 
-case class NodeType(
-    name: String,
-    id: Int,
-    keys: List[String],
-    outEdges: List[OutEdgeEntry],
-    is: Option[List[String]],
-    containedNodes: Option[List[ContainedNode]]) {
-  lazy val className = Helpers.camelCaseCaps(name)
-  lazy val classNameDb = s"${className}Db"
-  lazy val containedNodesList = containedNodes.getOrElse(Nil)
-}
-
-case class OutEdgeEntry(edgeName: String, inNodes: List[String])
-
-case class ContainedNode(nodeType: String, localName: String, cardinality: String) {
-  lazy val nodeTypeClassName = Helpers.camelCaseCaps(nodeType)
-}
-
-sealed abstract class Cardinality(val name: String)
-object Cardinality {
-  case object ZeroOrOne extends Cardinality("zeroOrOne")
-  case object One extends Cardinality("one")
-  case object List extends Cardinality("list")
-
-  def fromName(name: String): Cardinality =
-    Seq(ZeroOrOne, One, List)
-      .find(_.name == name)
-      .getOrElse(throw new AssertionError(s"cardinality must be one of `zeroOrOne`, `one`, `list`, but was $name"))
-}
-
-case class EdgeType(name: String, keys: List[String]) {
-  lazy val className = Helpers.camelCaseCaps(name)
-}
-
-case class Property(name: String, comment: String, valueType: String, cardinality: String)
-
-case class NodeBaseTrait(name: String, hasKeys: List[String], `extends`: Option[List[String]]) {
-  lazy val extendz = `extends` //it's mapped from the key in json :(
-  lazy val className = Helpers.camelCaseCaps(name)
-}
-
-case class InEdgeContext(edgeName: String, outNodes: Set[NodeType])
-case class NeighborInfo(neighborAccessorName: String, neighborNodeType: String)
-
-object HigherValueType extends Enumeration {
-  type HigherValueType = Value
-  val None, Option, List = Value
-}
-
-object Direction extends Enumeration {
-  val IN, OUT = Value
-  val all = List(IN, OUT)
-}
-
-object DefaultNodeTypes {
-  /** root type for all nodes */
-  val Node = "NODE"
-}
-
-object DefaultEdgeTypes {
-  val ContainsNode = "CONTAINS_NODE"
-}
-
-case class ProductElement(name: String, accessorSrc: String, index: Int)
-
-object Helpers {
-
-  def isNodeBaseTrait(baseTraits: List[NodeBaseTrait], nodeName: String): Boolean =
-    nodeName == DefaultNodeTypes.Node || baseTraits.map(_.name).contains(nodeName)
-
-  def camelCaseCaps(snakeCase: String): String = camelCase(snakeCase).capitalize
-
-  def camelCase(snakeCase: String): String = {
-    val corrected = // correcting for internal keys, like "_KEY" -> drop leading underscore
-      if (snakeCase.startsWith("_")) snakeCase.drop(1)
-      else snakeCase
-
-    val elements: List[String] = corrected.split("_").map(_.toLowerCase).toList match {
-      case head :: tail => head :: tail.map(_.capitalize)
-      case Nil          => Nil
-    }
-    elements.mkString
-  }
-
-  def getHigherType(property: Property): HigherValueType.Value =
-    Cardinality.fromName(property.cardinality) match {
-      case Cardinality.One       => HigherValueType.None
-      case Cardinality.ZeroOrOne => HigherValueType.Option
-      case Cardinality.List      => HigherValueType.List
-    }
-
-  def getBaseType(property: Property): String = {
-    property.valueType match {
-      case "string"  => "String"
-      case "int"     => "Integer"
-      case "boolean" => "JBoolean"
-      case _         => "UNKNOWN"
-    }
-  }
-
-  def getCompleteType(property: Property): String =
-    getHigherType(property) match {
-      case HigherValueType.None   => getBaseType(property)
-      case HigherValueType.Option => s"Option[${getBaseType(property)}]"
-      case HigherValueType.List   => s"List[${getBaseType(property)}]"
-    }
-
-  def getCompleteType(containedNode: ContainedNode): String = {
-    val tpe = if (containedNode.nodeType != DefaultNodeTypes.Node) {
-      containedNode.nodeTypeClassName + "Base"
-    } else {
-      containedNode.nodeTypeClassName
-    }
-
-    Cardinality.fromName(containedNode.cardinality) match {
-      case Cardinality.ZeroOrOne => s"Option[$tpe]"
-      case Cardinality.One       => tpe
-      case Cardinality.List      => s"List[$tpe]"
-    }
-  }
-
-  def propertyBasedFields(properties: List[Property]): String =
-    properties.map { property =>
-      val name = camelCase(property.name)
-      val tpe = getCompleteType(property)
-
-      getHigherType(property) match {
-        case HigherValueType.None =>
-          s"""private var _$name: $tpe = null
-             |def $name(): $tpe = _$name""".stripMargin
-        case HigherValueType.Option =>
-          s"""private var _$name: $tpe = None
-             |def $name(): $tpe = _$name""".stripMargin
-        case HigherValueType.List =>
-          s"""private var _$name: $tpe = Nil
-             |def $name(): $tpe = _$name""".stripMargin
-      }
-    }.mkString("\n\n")
-
-  def updateSpecificPropertyBody(properties: List[Property]): String = {
-    val caseNotFound = "PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)"
-    properties match {
-      case Nil => caseNotFound
-      case keys =>
-        val casesForKeys: List[String] = keys.map { property =>
-          getHigherType(property) match {
-            case HigherValueType.None =>
-              s""" if (key == "${property.name}") this._${camelCase(property.name)} = value.asInstanceOf[${getBaseType(property)}] """
-            case HigherValueType.Option =>
-              s""" if (key == "${property.name}") this._${camelCase(property.name)} = Option(value).asInstanceOf[${getCompleteType(property)}] """
-            case HigherValueType.List =>
-              val memberName = "_" + camelCase(property.name)
-              s"""if (key == "${property.name}") {
-                 |  if (cardinality == VertexProperty.Cardinality.list) {
-                 |    if (this.$memberName == null) { this.$memberName = Nil }
-                 |    this.$memberName = this.$memberName :+ value.asInstanceOf[${getBaseType(property)}]
-                 |  } else {
-                 |    this.$memberName = List(value.asInstanceOf[${getBaseType(property)}])
-                 |  }
-                 |}
-                 |""".stripMargin
-          }
-        }
-        (casesForKeys :+ caseNotFound).mkString("\n else ")
-    }
-  }
-
-  def removeSpecificPropertyBody(properties: List[Property]): String = {
-    val caseNotFound =
-      """throw new RuntimeException("property with key=" + key + " not (yet) supported by " + this.getClass.getName + ". You may want to add it to the schema...")"""
-    properties match {
-      case Nil => caseNotFound
-      case keys =>
-        val casesForKeys: List[String] = keys.map { property =>
-          s""" if (key == "${property.name}") this._${camelCase(property.name)} = null """
-        }
-        (casesForKeys :+ caseNotFound).mkString("\n else ")
-    }
-  }
-
-  val propertyErrorRegisterImpl =
-    s"""object PropertyErrorRegister {
-       |  private var errorMap = Set[(Class[_], String)]()
-       |  private val logger = org.slf4j.LoggerFactory.getLogger(getClass)
-       |
-       |  def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
-       |    if (!errorMap.contains((clazz, propertyName))) {
-       |      logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
-       |      errorMap += ((clazz, propertyName))
-       |    }
-       |  }
-       |}
-       |""".stripMargin
+  /* surrounds input with `"` */
+  def quoted(strings: Iterable[String]): Iterable[String] =
+    strings.map(string => s""""$string"""")
 }
