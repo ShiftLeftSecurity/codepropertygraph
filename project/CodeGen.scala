@@ -22,31 +22,29 @@ class CodeGen(schemaFile: String, basePackage: String) {
       writeNewNodeFiles(outputDir))
 
 /* TODO refactor: this was adapted directly from generateJava.py... */
+
 def writeConstants(outputDir: JFile): JFile = {
+  case class NameAndComment(name: String, comment: String)
+
   val baseDir = File(outputDir.getPath + "/" + basePackage.replaceAll("\\.", "/")).createDirectories
 
-  //    def lineForStringEntry(entry: String): String =
-//      s"""String $entry = "entry";"""
-//    def lineForKeyEntry(entry: String): String =
-//      s"""Key<TODO> $entry = new Key<>("$entry");"""
+  def writeFile(className: String, entries: List[NameAndComment]): Unit = {
+    val entriesSrc = entries.map { entry =>
+      val javaDoc = Option(entry.comment).filter(_.nonEmpty).map(comment => s"""/** $comment */""").getOrElse("")
+      s""" $javaDoc
+         | public static final String ${entry.name} = "${entry.name}";
+         |""".stripMargin
+    }.mkString("\n")
 
-  val className = "NodeKeyNames"
-  val entries = schema.nodeKeys.map { property =>
-    val javaDoc = Option(property.comment).filter(_.nonEmpty).map(comment => s"""/** $comment */""").getOrElse("")
-    val name = property.name
-    s""" $javaDoc
-       | public static final String $name = "$name";
-       |""".stripMargin
+    baseDir.createChild(s"$className.java").write(
+      s"""package io.shiftleft.codepropertygraph.generated;
+         |public class $className {
+         |$entriesSrc
+         |}""".stripMargin
+    )
   }
 
- val src =
-   s"""package io.shiftleft.codepropertygraph.generated;
-      |import gremlin.scala.Key;
-      |
-      |class $className {
-      |${entries.mkString("\n")}
-      |}""".stripMargin
-  baseDir.createChild(s"NodeKeyNames.java").write(src)
+  writeFile("NodeKeyNames", schema.nodeKeys.map { property => NameAndComment(property.name, property.comment)})
 
   outputDir
 }
