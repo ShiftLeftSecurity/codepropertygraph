@@ -17,7 +17,6 @@ def generateJava(cpgDescr):
         nodeKeysByName[key["name"]] = key
 
     template = open('../resources/templates/javaTemplate.java').read()
-    writeJavaFile('EdgeKeyNames', cpgDescr['edgeKeys'], template, 'String')
     writeJavaFile('NodeTypes', cpgDescr['nodeTypes'], template, 'String')
     writeJavaFile('EdgeTypes', cpgDescr['edgeTypes'], template, 'String')
     writeJavaFile('EdgeKeys', cpgDescr['edgeKeys'], template, 'Key')

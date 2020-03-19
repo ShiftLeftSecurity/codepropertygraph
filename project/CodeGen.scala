@@ -22,7 +22,6 @@ class CodeGen(schemaFile: String, basePackage: String) {
       writeNewNodeFiles(outputDir))
 
 /* TODO refactor: this was adapted directly from generateJava.py... */
-
 def writeConstants(outputDir: JFile): JFile = {
   case class NameAndComment(name: String, comment: String)
 
@@ -45,6 +44,7 @@ def writeConstants(outputDir: JFile): JFile = {
   }
 
   writeFile("NodeKeyNames", schema.nodeKeys.map { property => NameAndComment(property.name, property.comment)})
+  writeFile("EdgeKeyNames", schema.edgeKeys.map { property => NameAndComment(property.name, property.comment)})
 
   outputDir
 }
