@@ -23,13 +23,13 @@ class CodeGen(schemaFile: String, basePackage: String) {
 
 /* TODO refactor: this was adapted directly from generateJava.py... */
 def writeConstants(outputDir: JFile): JFile = {
-  case class NameAndComment(name: String, comment: String)
+  case class NameAndComment(name: String, comment: Option[String])
 
   val baseDir = File(outputDir.getPath + "/" + basePackage.replaceAll("\\.", "/")).createDirectories
 
   def writeFile(className: String, entries: List[NameAndComment]): Unit = {
     val entriesSrc = entries.map { entry =>
-      val javaDoc = Option(entry.comment).filter(_.nonEmpty).map(comment => s"""/** $comment */""").getOrElse("")
+      val javaDoc = entry.comment.filter(_.nonEmpty).map(comment => s"""/** $comment */""").getOrElse("")
       s""" $javaDoc
          | public static final String ${entry.name} = "${entry.name}";
          |""".stripMargin
@@ -46,6 +46,7 @@ def writeConstants(outputDir: JFile): JFile = {
   writeFile("NodeKeyNames", schema.nodeKeys.map { property => NameAndComment(property.name, property.comment)})
   writeFile("EdgeKeyNames", schema.edgeKeys.map { property => NameAndComment(property.name, property.comment)})
   writeFile("NodeTypes", schema.nodeTypes.map { tpe => NameAndComment(tpe.name, tpe.comment)})
+  writeFile("EdgeTypes", schema.edgeTypes.map { tpe => NameAndComment(tpe.name, tpe.comment)})
 
   outputDir
 }
