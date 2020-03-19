@@ -1,6 +1,6 @@
 package overflowdb.codegen
 
-import better.files.File
+import better.files._
 import java.io.{File => JFile}
 
 /** Generates a domain model for OverflowDb traversals based on your domain-specific json schema.
@@ -15,7 +15,41 @@ class CodeGen(schemaFile: String, basePackage: String) {
   val schema = new Schema(schemaFile)
 
   def run(outputDir: JFile): List[JFile] =
-    List(writeEdgeFiles(outputDir), writeNodeFiles(outputDir), writeNewNodeFiles(outputDir))
+    List(
+      writeConstants(outputDir),
+      writeEdgeFiles(outputDir),
+      writeNodeFiles(outputDir),
+      writeNewNodeFiles(outputDir))
+
+/* TODO refactor: this was adapted directly from generateJava.py... */
+def writeConstants(outputDir: JFile): JFile = {
+  val baseDir = File(outputDir.getPath + "/" + basePackage.replaceAll("\\.", "/")).createDirectories
+
+  //    def lineForStringEntry(entry: String): String =
+//      s"""String $entry = "entry";"""
+//    def lineForKeyEntry(entry: String): String =
+//      s"""Key<TODO> $entry = new Key<>("$entry");"""
+
+  val className = "NodeKeyNames"
+  val entries = schema.nodeKeys.map { property =>
+    val javaDoc = Option(property.comment).filter(_.nonEmpty).map(comment => s"""/** $comment */""").getOrElse("")
+    val name = property.name
+    s""" $javaDoc
+       | public static final String $name = "$name";
+       |""".stripMargin
+  }
+
+ val src =
+   s"""package io.shiftleft.codepropertygraph.generated;
+      |import gremlin.scala.Key;
+      |
+      |class $className {
+      |${entries.mkString("\n")}
+      |}""".stripMargin
+  baseDir.createChild(s"NodeKeyNames.java").write(src)
+
+  outputDir
+}
 
   def writeEdgeFiles(outputDir: JFile): JFile = {
     val staticHeader =
