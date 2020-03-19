@@ -51,12 +51,13 @@ class Schema(schemaFile: String) {
       adjustedInEdgesWithAdjacentNodes.map { case (edge, adjacentNodes) =>
         InEdgeContext(edge, adjacentNodes.toSet)
       }.toSeq
-    }.toMap
+    }
   }
 }
 
 case class NodeType(
     name: String,
+    comment: String,
     id: Int,
     keys: List[String],
     outEdges: List[OutEdgeEntry],

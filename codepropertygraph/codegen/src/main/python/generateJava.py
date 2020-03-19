@@ -17,9 +17,7 @@ def generateJava(cpgDescr):
         nodeKeysByName[key["name"]] = key
 
     template = open('../resources/templates/javaTemplate.java').read()
-    writeJavaFile('NodeTypes', cpgDescr['nodeTypes'], template, 'String')
     writeJavaFile('EdgeTypes', cpgDescr['edgeTypes'], template, 'String')
-    writeJavaFile('EdgeKeys', cpgDescr['edgeKeys'], template, 'Key')
     writeJavaFile('EvaluationStrategies', cpgDescr['evaluationStrategies'], template, 'String')
     writeJavaFile('DispatchTypes', cpgDescr['dispatchTypes'], template, 'String')
     writeJavaFile('Languages', cpgDescr['languages'], template, 'String')
@@ -27,6 +25,7 @@ def generateJava(cpgDescr):
     writeJavaFile('Frameworks', cpgDescr['frameworks'], template, 'String')
     writeJavaFile('Operators', cpgDescr['operatorNames'], template, 'String', 'operator', 'name')
     writeNodeKeys('NodeKeys', cpgDescr['nodeTypes'], cpgDescr['nodeKeys'], template)
+    writeJavaFile('EdgeKeys', cpgDescr['edgeKeys'], template, 'Key')
     writeNodeKeyTypesFile('NodeKeyTypes', cpgDescr['nodeKeys'], template)
 
 def writeJavaFile(className, entryList, template, constantType, identifierField='name', valueField='name'):

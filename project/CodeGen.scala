@@ -45,6 +45,7 @@ def writeConstants(outputDir: JFile): JFile = {
 
   writeFile("NodeKeyNames", schema.nodeKeys.map { property => NameAndComment(property.name, property.comment)})
   writeFile("EdgeKeyNames", schema.edgeKeys.map { property => NameAndComment(property.name, property.comment)})
+  writeFile("NodeTypes", schema.nodeTypes.map { tpe => NameAndComment(tpe.name, tpe.comment)})
 
   outputDir
 }
