@@ -55,12 +55,14 @@ class Schema(schemaFile: String) {
     }
   }
 
-  implicit val nameAndCommentReads: Reads[NameAndComment] = (
-    (JsPath \ "name").read[String] and (JsPath \ "comment").readNullable[String]
-    )(NameAndComment.apply _)
+  implicit val constantReads: Reads[Constant] = (
+    (JsPath \ "name").read[String] and
+      (JsPath \ "name").read[String] and
+      (JsPath \ "comment").readNullable[String]
+    )(Constant.apply _)
 
-  def nameAndCommentsFromElement(rootElementName: String): List[NameAndComment] =
-    (jsonRoot \ rootElementName).get.validate[List[NameAndComment]].get
+  def constantsFromElement(rootElementName: String): List[Constant] =
+    (jsonRoot \ rootElementName).get.validate[List[Constant]].get
 }
 
 case class NodeType(
@@ -129,4 +131,4 @@ object DefaultEdgeTypes {
 
 case class ProductElement(name: String, accessorSrc: String, index: Int)
 
-case class NameAndComment(name: String, comment: Option[String])
+case class Constant(name: String, value: String, comment: Option[String])
