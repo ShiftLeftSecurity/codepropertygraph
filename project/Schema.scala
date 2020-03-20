@@ -2,6 +2,7 @@ package overflowdb.codegen
 
 import java.io.FileInputStream
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 class Schema(schemaFile: String) {
   implicit private val nodeBaseTraitRead = Json.reads[NodeBaseTrait]
@@ -11,7 +12,7 @@ class Schema(schemaFile: String) {
   implicit private val propertyRead = Json.reads[Property]
   implicit private val edgeTypeRead = Json.reads[EdgeType]
 
-  private lazy val jsonRoot = Json.parse(new FileInputStream(schemaFile))
+  lazy val jsonRoot = Json.parse(new FileInputStream(schemaFile))
   lazy val nodeBaseTraits = (jsonRoot \ "nodeBaseTraits").as[List[NodeBaseTrait]]
   lazy val nodeTypes = (jsonRoot \ "nodeTypes").as[List[NodeType]]
   lazy val edgeTypes = (jsonRoot \ "edgeTypes").as[List[EdgeType]]
@@ -53,6 +54,13 @@ class Schema(schemaFile: String) {
       }.toSeq
     }
   }
+
+  implicit val nameAndCommentReads: Reads[NameAndComment] = (
+    (JsPath \ "name").read[String] and (JsPath \ "comment").readNullable[String]
+    )(NameAndComment.apply _)
+
+  def nameAndCommentsFromElement(rootElementName: String): List[NameAndComment] =
+    (jsonRoot \ rootElementName).get.validate[List[NameAndComment]].get
 }
 
 case class NodeType(
@@ -120,3 +128,5 @@ object DefaultEdgeTypes {
 }
 
 case class ProductElement(name: String, accessorSrc: String, index: Int)
+
+case class NameAndComment(name: String, comment: Option[String])

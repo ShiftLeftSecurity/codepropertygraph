@@ -3,6 +3,8 @@ package overflowdb.codegen
 import better.files._
 import java.io.{File => JFile}
 
+import play.api.libs.json.Reads
+
 /** Generates a domain model for OverflowDb traversals based on your domain-specific json schema.
   *
   * @param schemaFile: path to the schema (json file)
@@ -23,7 +25,7 @@ class CodeGen(schemaFile: String, basePackage: String) {
 
 /* TODO refactor: this was adapted directly from generateJava.py... */
 def writeConstants(outputDir: JFile): JFile = {
-  case class NameAndComment(name: String, comment: Option[String])
+
 
   val baseDir = File(outputDir.getPath + "/" + basePackage.replaceAll("\\.", "/")).createDirectories
 
@@ -37,7 +39,9 @@ def writeConstants(outputDir: JFile): JFile = {
 
     baseDir.createChild(s"$className.java").write(
       s"""package io.shiftleft.codepropertygraph.generated;
+         |
          |public class $className {
+         |
          |$entriesSrc
          |}""".stripMargin
     )
@@ -47,6 +51,7 @@ def writeConstants(outputDir: JFile): JFile = {
   writeFile("EdgeKeyNames", schema.edgeKeys.map { property => NameAndComment(property.name, property.comment)})
   writeFile("NodeTypes", schema.nodeTypes.map { tpe => NameAndComment(tpe.name, tpe.comment)})
   writeFile("EdgeTypes", schema.edgeTypes.map { tpe => NameAndComment(tpe.name, tpe.comment)})
+  writeFile("DispatchTypes", schema.nameAndCommentsFromElement("dispatchTypes"))
 
   outputDir
 }
