@@ -55,13 +55,15 @@ class Schema(schemaFile: String) {
     }
   }
 
-  implicit val constantReads: Reads[Constant] = (
-    (JsPath \ "name").read[String] and
-      (JsPath \ "name").read[String] and
+  lazy val defaultConstantReads: Reads[Constant] = constantReads("name", "name")
+
+  def constantReads(nameField: String, valueField: String): Reads[Constant] = (
+    (JsPath \ nameField).read[String] and
+      (JsPath \ valueField).read[String] and
       (JsPath \ "comment").readNullable[String]
     )(Constant.apply _)
 
-  def constantsFromElement(rootElementName: String): List[Constant] =
+  def constantsFromElement(rootElementName: String)(implicit reads: Reads[Constant] = defaultConstantReads): List[Constant] =
     (jsonRoot \ rootElementName).get.validate[List[Constant]].get
 }
 

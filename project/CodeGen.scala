@@ -25,15 +25,13 @@ class CodeGen(schemaFile: String, basePackage: String) {
 
 /* TODO refactor: this was adapted directly from generateJava.py... */
 def writeConstants(outputDir: JFile): JFile = {
-
-
   val baseDir = File(outputDir.getPath + "/" + basePackage.replaceAll("\\.", "/")).createDirectories
 
-  def writeFile(className: String, entries: List[Constant]): Unit = {
-    val entriesSrc = entries.map { entry =>
-      val javaDoc = entry.comment.filter(_.nonEmpty).map(comment => s"""/** $comment */""").getOrElse("")
+  def writeFile(className: String, constants: List[Constant]): Unit = {
+    val constantsSrc = constants.map { constant =>
+      val javaDoc = constant.comment.filter(_.nonEmpty).map(comment => s"""/** $comment */""").getOrElse("")
       s""" $javaDoc
-         | public static final String ${entry.name} = "${entry.name}";
+         | public static final String ${constant.name} = "${constant.value}";
          |""".stripMargin
     }.mkString("\n")
 
@@ -42,13 +40,13 @@ def writeConstants(outputDir: JFile): JFile = {
          |
          |public class $className {
          |
-         |$entriesSrc
+         |$constantsSrc
          |}""".stripMargin
     )
   }
 
-  writeFile("NodeKeyNames", schema.nodeKeys.map { property => Constant(property.name, property.name, property.comment)})
-  writeFile("EdgeKeyNames", schema.edgeKeys.map { property => Constant(property.name, property.name, property.comment)})
+  writeFile("NodeKeyNames", schema.nodeKeys.map { prop => Constant(prop.name, prop.name, prop.comment)})
+  writeFile("EdgeKeyNames", schema.edgeKeys.map { prop => Constant(prop.name, prop.name, prop.comment)})
   writeFile("NodeTypes", schema.nodeTypes.map { tpe => Constant(tpe.name, tpe.name, tpe.comment)})
   writeFile("EdgeTypes", schema.edgeTypes.map { tpe => Constant(tpe.name, tpe.name, tpe.comment)})
   writeFile("DispatchTypes", schema.constantsFromElement("dispatchTypes"))
@@ -56,11 +54,7 @@ def writeConstants(outputDir: JFile): JFile = {
   writeFile("Languages", schema.constantsFromElement("languages"))
   writeFile("ModifierTypes", schema.constantsFromElement("modifierTypes"))
   writeFile("EvaluationStrategies", schema.constantsFromElement("evaluationStrategies"))
-
-//  schema.jsonRoot
-//  writeFile("Operators", schema.nameAndCommentsFromElement("evaluationStrategies"))
-
-    // writeJavaFile('Operators', cpgDescr['operatorNames'], template, 'String', 'operator', 'name')
+  writeFile("Operators", schema.constantsFromElement("operatorNames")(schema.constantReads("operator", "name")))
 
   outputDir
 }
