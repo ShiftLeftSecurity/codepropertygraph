@@ -27,10 +27,10 @@ class CodeGen(schemaFile: String, basePackage: String) {
 def writeConstants(outputDir: JFile): JFile = {
   val baseDir = File(outputDir.getPath + "/" + basePackage.replaceAll("\\.", "/")).createDirectories
 
-  def writeConstantsFile(className: String, constants: List[Constant]): Unit = {
-    val constantsSrc = constants.map { constant =>
-      val javaDoc = constant.comment.filter(_.nonEmpty).map(comment => s"""/** $comment */""").getOrElse("")
-      s""" $javaDoc
+  def writeStringConstants(className: String, constants: List[Constant]): Unit = {
+    val src = constants.map { constant =>
+      val documentation = constant.comment.filter(_.nonEmpty).map(comment => s"""/** $comment */""").getOrElse("")
+      s""" $documentation
          | public static final String ${constant.name} = "${constant.value}";
          |""".stripMargin
     }.mkString("\n")
@@ -40,21 +40,46 @@ def writeConstants(outputDir: JFile): JFile = {
          |
          |public class $className {
          |
-         |$constantsSrc
+         |$src
          |}""".stripMargin
     )
   }
 
-  writeConstantsFile("NodeKeyNames", schema.nodeKeys.map { prop => Constant(prop.name, prop.name, prop.comment)})
-  writeConstantsFile("EdgeKeyNames", schema.edgeKeys.map { prop => Constant(prop.name, prop.name, prop.comment)})
-  writeConstantsFile("NodeTypes", schema.nodeTypes.map { tpe => Constant(tpe.name, tpe.name, tpe.comment)})
-  writeConstantsFile("EdgeTypes", schema.edgeTypes.map { tpe => Constant(tpe.name, tpe.name, tpe.comment)})
-  writeConstantsFile("DispatchTypes", schema.constantsFromElement("dispatchTypes"))
-  writeConstantsFile("Frameworks", schema.constantsFromElement("frameworks"))
-  writeConstantsFile("Languages", schema.constantsFromElement("languages"))
-  writeConstantsFile("ModifierTypes", schema.constantsFromElement("modifierTypes"))
-  writeConstantsFile("EvaluationStrategies", schema.constantsFromElement("evaluationStrategies"))
-  writeConstantsFile("Operators", schema.constantsFromElement("operatorNames")(schema.constantReads("operator", "name")))
+  def writeKeyConstants(className: String, constants: List[Constant]): Unit = {
+    val src = constants.map { constant =>
+      val documentation = constant.comment.filter(_.nonEmpty).map(comment => s"""/** $comment */""").getOrElse("")
+      val tpe = constant.tpe.getOrElse(throw new AssertionError(s"`tpe` must be defined for Key constant - not the case for $constant"))
+      val javaType = tpe match {
+        case "string"  => "String"
+        case "int"     => "Integer"
+        case "boolean" => "Boolean"
+      }
+      s""" $documentation
+         | public static final gremlin.scala.Key<$javaType> ${constant.name} = new gremlin.scala.Key<>("${constant.value}");
+         |""".stripMargin
+    }.mkString("\n")
+
+    baseDir.createChild(s"$className.java").write(
+      s"""package io.shiftleft.codepropertygraph.generated;
+         |
+         |public class $className {
+         |
+         |$src
+         |}""".stripMargin
+    )
+  }
+
+  writeStringConstants("NodeKeyNames", schema.nodeKeys.map { prop => Constant(prop.name, prop.name, prop.comment)})
+  writeStringConstants("EdgeKeyNames", schema.edgeKeys.map { prop => Constant(prop.name, prop.name, prop.comment)})
+  writeStringConstants("NodeTypes", schema.nodeTypes.map { tpe => Constant(tpe.name, tpe.name, tpe.comment)})
+  writeStringConstants("EdgeTypes", schema.edgeTypes.map { tpe => Constant(tpe.name, tpe.name, tpe.comment)})
+  writeStringConstants("DispatchTypes", schema.constantsFromElement("dispatchTypes"))
+  writeStringConstants("Frameworks", schema.constantsFromElement("frameworks"))
+  writeStringConstants("Languages", schema.constantsFromElement("languages"))
+  writeStringConstants("ModifierTypes", schema.constantsFromElement("modifierTypes"))
+  writeStringConstants("EvaluationStrategies", schema.constantsFromElement("evaluationStrategies"))
+  writeStringConstants("Operators", schema.constantsFromElement("operatorNames")(schema.constantReads("operator", "name")))
+  writeKeyConstants("EdgeKeys", schema.constantsFromElement("edgeKeys"))
 
   outputDir
 }

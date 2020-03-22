@@ -22,7 +22,7 @@ def generateJava(cpgDescr):
     # writeJavaFile('ModifierTypes', cpgDescr['modifierTypes'], template, 'String')
     # writeJavaFile('EvaluationStrategies', cpgDescr['evaluationStrategies'], template, 'String')
     # writeJavaFile('Operators', cpgDescr['operatorNames'], template, 'String', 'operator', 'name')
-    writeJavaFile('EdgeKeys', cpgDescr['edgeKeys'], template, 'Key')
+    # writeJavaFile('EdgeKeys', cpgDescr['edgeKeys'], template, 'Key')
     writeNodeKeys('NodeKeys', cpgDescr['nodeTypes'], cpgDescr['nodeKeys'], template)
     writeNodeKeyTypesFile('NodeKeyTypes', cpgDescr['nodeKeys'], template)
 

@@ -60,7 +60,8 @@ class Schema(schemaFile: String) {
   def constantReads(nameField: String, valueField: String): Reads[Constant] = (
     (JsPath \ nameField).read[String] and
       (JsPath \ valueField).read[String] and
-      (JsPath \ "comment").readNullable[String]
+      (JsPath \ "comment").readNullable[String] and
+      (JsPath \ "valueType").readNullable[String]
     )(Constant.apply _)
 
   def constantsFromElement(rootElementName: String)(implicit reads: Reads[Constant] = defaultConstantReads): List[Constant] =
@@ -133,4 +134,4 @@ object DefaultEdgeTypes {
 
 case class ProductElement(name: String, accessorSrc: String, index: Int)
 
-case class Constant(name: String, value: String, comment: Option[String])
+case class Constant(name: String, value: String, comment: Option[String], tpe: Option[String] = None)
