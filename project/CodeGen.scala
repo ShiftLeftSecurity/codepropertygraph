@@ -27,7 +27,7 @@ class CodeGen(schemaFile: String, basePackage: String) {
 def writeConstants(outputDir: JFile): JFile = {
   val baseDir = File(outputDir.getPath + "/" + basePackage.replaceAll("\\.", "/")).createDirectories
 
-  def writeFile(className: String, constants: List[Constant]): Unit = {
+  def writeConstantsFile(className: String, constants: List[Constant]): Unit = {
     val constantsSrc = constants.map { constant =>
       val javaDoc = constant.comment.filter(_.nonEmpty).map(comment => s"""/** $comment */""").getOrElse("")
       s""" $javaDoc
@@ -45,16 +45,16 @@ def writeConstants(outputDir: JFile): JFile = {
     )
   }
 
-  writeFile("NodeKeyNames", schema.nodeKeys.map { prop => Constant(prop.name, prop.name, prop.comment)})
-  writeFile("EdgeKeyNames", schema.edgeKeys.map { prop => Constant(prop.name, prop.name, prop.comment)})
-  writeFile("NodeTypes", schema.nodeTypes.map { tpe => Constant(tpe.name, tpe.name, tpe.comment)})
-  writeFile("EdgeTypes", schema.edgeTypes.map { tpe => Constant(tpe.name, tpe.name, tpe.comment)})
-  writeFile("DispatchTypes", schema.constantsFromElement("dispatchTypes"))
-  writeFile("Frameworks", schema.constantsFromElement("frameworks"))
-  writeFile("Languages", schema.constantsFromElement("languages"))
-  writeFile("ModifierTypes", schema.constantsFromElement("modifierTypes"))
-  writeFile("EvaluationStrategies", schema.constantsFromElement("evaluationStrategies"))
-  writeFile("Operators", schema.constantsFromElement("operatorNames")(schema.constantReads("operator", "name")))
+  writeConstantsFile("NodeKeyNames", schema.nodeKeys.map { prop => Constant(prop.name, prop.name, prop.comment)})
+  writeConstantsFile("EdgeKeyNames", schema.edgeKeys.map { prop => Constant(prop.name, prop.name, prop.comment)})
+  writeConstantsFile("NodeTypes", schema.nodeTypes.map { tpe => Constant(tpe.name, tpe.name, tpe.comment)})
+  writeConstantsFile("EdgeTypes", schema.edgeTypes.map { tpe => Constant(tpe.name, tpe.name, tpe.comment)})
+  writeConstantsFile("DispatchTypes", schema.constantsFromElement("dispatchTypes"))
+  writeConstantsFile("Frameworks", schema.constantsFromElement("frameworks"))
+  writeConstantsFile("Languages", schema.constantsFromElement("languages"))
+  writeConstantsFile("ModifierTypes", schema.constantsFromElement("modifierTypes"))
+  writeConstantsFile("EvaluationStrategies", schema.constantsFromElement("evaluationStrategies"))
+  writeConstantsFile("Operators", schema.constantsFromElement("operatorNames")(schema.constantReads("operator", "name")))
 
   outputDir
 }
