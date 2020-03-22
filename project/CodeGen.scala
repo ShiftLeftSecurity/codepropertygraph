@@ -62,18 +62,18 @@ def writeConstants(outputDir: JFile): JFile = {
     }
   }
 
-  writeStringConstants("NodeKeyNames", schema.nodeKeys.map { prop => Constant(prop.name, prop.name, prop.comment)})
-  writeStringConstants("EdgeKeyNames", schema.edgeKeys.map { prop => Constant(prop.name, prop.name, prop.comment)})
-  writeStringConstants("NodeTypes", schema.nodeTypes.map { tpe => Constant(tpe.name, tpe.name, tpe.comment)})
-  writeStringConstants("EdgeTypes", schema.edgeTypes.map { tpe => Constant(tpe.name, tpe.name, tpe.comment)})
-  writeStringConstants("DispatchTypes", schema.constantsFromElement("dispatchTypes"))
-  writeStringConstants("Frameworks", schema.constantsFromElement("frameworks"))
-  writeStringConstants("Languages", schema.constantsFromElement("languages"))
-  writeStringConstants("ModifierTypes", schema.constantsFromElement("modifierTypes"))
-  writeStringConstants("EvaluationStrategies", schema.constantsFromElement("evaluationStrategies"))
+  writeStringConstants("NodeKeyNames", schema.nodeKeys.map(Constant.fromProperty))
+  writeStringConstants("EdgeKeyNames", schema.edgeKeys.map(Constant.fromProperty))
+  writeStringConstants("NodeTypes", schema.nodeTypes.map(Constant.fromNodeType))
+  writeStringConstants("EdgeTypes", schema.edgeTypes.map(Constant.fromEdgeType))
+
+  List("dispatchTypes", "frameworks", "languages", "modifierTypes", "evaluationStrategies").foreach { element =>
+    writeStringConstants(element.capitalize, schema.constantsFromElement(element))
+  }
+  List("edgeKeys", "nodeKeys").foreach { element =>
+    writeKeyConstants(element.capitalize, schema.constantsFromElement(element))
+  }
   writeStringConstants("Operators", schema.constantsFromElement("operatorNames")(schema.constantReads("operator", "name")))
-  writeKeyConstants("EdgeKeys", schema.constantsFromElement("edgeKeys"))
-  writeKeyConstants("NodeKeys", schema.constantsFromElement("nodeKeys"))
 
   outputDir
 }

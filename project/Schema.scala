@@ -135,3 +135,9 @@ object DefaultEdgeTypes {
 case class ProductElement(name: String, accessorSrc: String, index: Int)
 
 case class Constant(name: String, value: String, comment: Option[String], tpe: Option[String] = None)
+object Constant {
+  def fromProperty(property: Property) = Constant(property.name, property.name, property.comment)
+  def fromNodeType(property: Property) = Constant(property.name, property.name, property.comment)
+  def fromNodeType(tpe: NodeType) = Constant(tpe.name, tpe.name, tpe.comment)
+  def fromEdgeType(tpe: EdgeType) = Constant(tpe.name, tpe.name, tpe.comment)
+}
