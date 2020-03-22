@@ -73,6 +73,7 @@ def writeConstants(outputDir: JFile): JFile = {
   writeStringConstants("EvaluationStrategies", schema.constantsFromElement("evaluationStrategies"))
   writeStringConstants("Operators", schema.constantsFromElement("operatorNames")(schema.constantReads("operator", "name")))
   writeKeyConstants("EdgeKeys", schema.constantsFromElement("edgeKeys"))
+  writeKeyConstants("NodeKeys", schema.constantsFromElement("nodeKeys"))
 
   outputDir
 }
