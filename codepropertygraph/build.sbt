@@ -48,17 +48,6 @@ Compile / sourceGenerators += Def.task {
     val basePackage = "io.shiftleft.codepropertygraph.generated"
     val outputDir = (Compile / sourceManaged).value
     new overflowdb.codegen.CodeGen(schemaFile, basePackage).run(outputDir)
-
-    // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
-    val cmd = "codepropertygraph/codegen/src/main/python/generateJava.py"
-    val result = Seq(cmd).!
-    if (result == 0) {
-      val generateJavaTmpOutput = better.files.File("codepropertygraph/target/generateJava")
-      generateJavaTmpOutput.children.foreach(
-        _.copyToDirectory(better.files.File(outputRoot.toPath))(copyOptions = better.files.File.CopyOptions(overwrite = true)))
-      println(s"successfully generated java files in $outputRoot")
-    } else
-      throw new Exception(s"problem when calling $cmd. exitCode was $result")
   } else {
     println("no need to regenerate domain classes")
   }
