@@ -23,15 +23,14 @@ class CodeGen(schemaFile: String, basePackage: String) {
       writeNodeFiles(outputDir),
       writeNewNodeFiles(outputDir))
 
-/* TODO refactor: this was adapted directly from generateJava.py... */
 def writeConstants(outputDir: JFile): JFile = {
   val baseDir = File(outputDir.getPath + "/" + basePackage.replaceAll("\\.", "/")).createDirectories
 
-  def writeStringConstants(className: String, constants: List[Constant]): Unit = {
+  def writeConstantsFile(className: String, constants: List[Constant])(mkSrc: Constant => String): Unit = {
     val src = constants.map { constant =>
       val documentation = constant.comment.filter(_.nonEmpty).map(comment => s"""/** $comment */""").getOrElse("")
       s""" $documentation
-         | public static final String ${constant.name} = "${constant.value}";
+         | ${mkSrc(constant)}
          |""".stripMargin
     }.mkString("\n")
 
@@ -45,28 +44,22 @@ def writeConstants(outputDir: JFile): JFile = {
     )
   }
 
+  def writeStringConstants(className: String, constants: List[Constant]): Unit = {
+    writeConstantsFile(className, constants) { constant =>
+      s"""public static final String ${constant.name} = "${constant.value}";"""
+    }
+  }
+
   def writeKeyConstants(className: String, constants: List[Constant]): Unit = {
-    val src = constants.map { constant =>
-      val documentation = constant.comment.filter(_.nonEmpty).map(comment => s"""/** $comment */""").getOrElse("")
+    writeConstantsFile(className, constants) { constant =>
       val tpe = constant.tpe.getOrElse(throw new AssertionError(s"`tpe` must be defined for Key constant - not the case for $constant"))
       val javaType = tpe match {
         case "string"  => "String"
         case "int"     => "Integer"
         case "boolean" => "Boolean"
       }
-      s""" $documentation
-         | public static final gremlin.scala.Key<$javaType> ${constant.name} = new gremlin.scala.Key<>("${constant.value}");
-         |""".stripMargin
-    }.mkString("\n")
-
-    baseDir.createChild(s"$className.java").write(
-      s"""package io.shiftleft.codepropertygraph.generated;
-         |
-         |public class $className {
-         |
-         |$src
-         |}""".stripMargin
-    )
+      s"""public static final gremlin.scala.Key<$javaType> ${constant.name} = new gremlin.scala.Key<>("${constant.value}");"""
+    }
   }
 
   writeStringConstants("NodeKeyNames", schema.nodeKeys.map { prop => Constant(prop.name, prop.name, prop.comment)})
