@@ -20,13 +20,13 @@ class MethodParameter(val wrapped: NodeSteps[nodes.MethodParameterIn]) extends A
     * Traverse to all parameters with index greater or equal than `num`
     * */
   def indexFrom(num: Int): NodeSteps[nodes.MethodParameterIn] =
-    new NodeSteps(raw.has(NodeKeys.METHOD_PARAMETER_IN.ORDER, P.gte(num: Integer)))
+    wrapped.where(_.order >= num)
 
   /**
     * Traverse to all parameters with index smaller or equal than `num`
     * */
   def indexTo(num: Int): NodeSteps[nodes.MethodParameterIn] =
-    new NodeSteps(raw.has(NodeKeys.METHOD_PARAMETER_IN.ORDER, P.lte(num: Integer)))
+    wrapped.where(_.order <= num)
 
   /**
     * Traverse to method associated with this formal parameter
