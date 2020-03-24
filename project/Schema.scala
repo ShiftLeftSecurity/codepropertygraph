@@ -2,16 +2,17 @@ package overflowdb.codegen
 
 import java.io.FileInputStream
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 class Schema(schemaFile: String) {
-  implicit val nodeBaseTraitRead = Json.reads[NodeBaseTrait]
-  implicit val outEdgeEntryRead = Json.reads[OutEdgeEntry]
-  implicit val containedNodeRead = Json.reads[ContainedNode]
-  implicit val nodeTypesRead = Json.reads[NodeType]
-  implicit val propertyRead = Json.reads[Property]
-  implicit val edgeTypeRead = Json.reads[EdgeType]
+  implicit private val nodeBaseTraitRead = Json.reads[NodeBaseTrait]
+  implicit private val outEdgeEntryRead = Json.reads[OutEdgeEntry]
+  implicit private val containedNodeRead = Json.reads[ContainedNode]
+  implicit private val nodeTypesRead = Json.reads[NodeType]
+  implicit private val propertyRead = Json.reads[Property]
+  implicit private val edgeTypeRead = Json.reads[EdgeType]
 
-  private lazy val jsonRoot = Json.parse(new FileInputStream(schemaFile))
+  lazy val jsonRoot = Json.parse(new FileInputStream(schemaFile))
   lazy val nodeBaseTraits = (jsonRoot \ "nodeBaseTraits").as[List[NodeBaseTrait]]
   lazy val nodeTypes = (jsonRoot \ "nodeTypes").as[List[NodeType]]
   lazy val edgeTypes = (jsonRoot \ "edgeTypes").as[List[EdgeType]]
@@ -51,12 +52,25 @@ class Schema(schemaFile: String) {
       adjustedInEdgesWithAdjacentNodes.map { case (edge, adjacentNodes) =>
         InEdgeContext(edge, adjacentNodes.toSet)
       }.toSeq
-    }.toMap
+    }
   }
+
+  lazy val defaultConstantReads: Reads[Constant] = constantReads("name", "name")
+
+  def constantReads(nameField: String, valueField: String): Reads[Constant] = (
+    (JsPath \ nameField).read[String] and
+      (JsPath \ valueField).read[String] and
+      (JsPath \ "comment").readNullable[String] and
+      (JsPath \ "valueType").readNullable[String]
+    )(Constant.apply _)
+
+  def constantsFromElement(rootElementName: String)(implicit reads: Reads[Constant] = defaultConstantReads): List[Constant] =
+    (jsonRoot \ rootElementName).get.validate[List[Constant]].get
 }
 
 case class NodeType(
     name: String,
+    comment: Option[String],
     id: Int,
     keys: List[String],
     outEdges: List[OutEdgeEntry],
@@ -85,11 +99,11 @@ object Cardinality {
       .getOrElse(throw new AssertionError(s"cardinality must be one of `zeroOrOne`, `one`, `list`, but was $name"))
 }
 
-case class EdgeType(name: String, keys: List[String]) {
+case class EdgeType(name: String, keys: List[String], comment: Option[String]) {
   lazy val className = Helpers.camelCaseCaps(name)
 }
 
-case class Property(name: String, comment: String, valueType: String, cardinality: String)
+case class Property(name: String, comment: Option[String], valueType: String, cardinality: String)
 
 case class NodeBaseTrait(name: String, hasKeys: List[String], `extends`: Option[List[String]]) {
   lazy val extendz = `extends` //it's mapped from the key in json :(
@@ -119,3 +133,11 @@ object DefaultEdgeTypes {
 }
 
 case class ProductElement(name: String, accessorSrc: String, index: Int)
+
+case class Constant(name: String, value: String, comment: Option[String], tpe: Option[String] = None)
+object Constant {
+  def fromProperty(property: Property) = Constant(property.name, property.name, property.comment)
+  def fromNodeType(property: Property) = Constant(property.name, property.name, property.comment)
+  def fromNodeType(tpe: NodeType) = Constant(tpe.name, tpe.name, tpe.comment)
+  def fromEdgeType(tpe: EdgeType) = Constant(tpe.name, tpe.name, tpe.comment)
+}

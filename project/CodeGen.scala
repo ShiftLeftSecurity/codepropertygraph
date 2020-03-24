@@ -1,7 +1,9 @@
 package overflowdb.codegen
 
-import better.files.File
+import better.files._
 import java.io.{File => JFile}
+
+import play.api.libs.json.Reads
 
 /** Generates a domain model for OverflowDb traversals based on your domain-specific json schema.
   *
@@ -15,7 +17,66 @@ class CodeGen(schemaFile: String, basePackage: String) {
   val schema = new Schema(schemaFile)
 
   def run(outputDir: JFile): List[JFile] =
-    List(writeEdgeFiles(outputDir), writeNodeFiles(outputDir), writeNewNodeFiles(outputDir))
+    List(
+      writeConstants(outputDir),
+      writeEdgeFiles(outputDir),
+      writeNodeFiles(outputDir),
+      writeNewNodeFiles(outputDir))
+
+def writeConstants(outputDir: JFile): JFile = {
+  val baseDir = File(outputDir.getPath + "/" + basePackage.replaceAll("\\.", "/")).createDirectories
+
+  def writeConstantsFile(className: String, constants: List[Constant])(mkSrc: Constant => String): Unit = {
+    val src = constants.map { constant =>
+      val documentation = constant.comment.filter(_.nonEmpty).map(comment => s"""/** $comment */""").getOrElse("")
+      s""" $documentation
+         | ${mkSrc(constant)}
+         |""".stripMargin
+    }.mkString("\n")
+
+    baseDir.createChild(s"$className.java").write(
+      s"""package io.shiftleft.codepropertygraph.generated;
+         |
+         |public class $className {
+         |
+         |$src
+         |}""".stripMargin
+    )
+  }
+
+  def writeStringConstants(className: String, constants: List[Constant]): Unit = {
+    writeConstantsFile(className, constants) { constant =>
+      s"""public static final String ${constant.name} = "${constant.value}";"""
+    }
+  }
+
+  def writeKeyConstants(className: String, constants: List[Constant]): Unit = {
+    writeConstantsFile(className, constants) { constant =>
+      val tpe = constant.tpe.getOrElse(throw new AssertionError(s"`tpe` must be defined for Key constant - not the case for $constant"))
+      val javaType = tpe match {
+        case "string"  => "String"
+        case "int"     => "Integer"
+        case "boolean" => "Boolean"
+      }
+      s"""public static final gremlin.scala.Key<$javaType> ${constant.name} = new gremlin.scala.Key<>("${constant.value}");"""
+    }
+  }
+
+  writeStringConstants("NodeKeyNames", schema.nodeKeys.map(Constant.fromProperty))
+  writeStringConstants("EdgeKeyNames", schema.edgeKeys.map(Constant.fromProperty))
+  writeStringConstants("NodeTypes", schema.nodeTypes.map(Constant.fromNodeType))
+  writeStringConstants("EdgeTypes", schema.edgeTypes.map(Constant.fromEdgeType))
+
+  List("dispatchTypes", "frameworks", "languages", "modifierTypes", "evaluationStrategies").foreach { element =>
+    writeStringConstants(element.capitalize, schema.constantsFromElement(element))
+  }
+  List("edgeKeys", "nodeKeys").foreach { element =>
+    writeKeyConstants(element.capitalize, schema.constantsFromElement(element))
+  }
+  writeStringConstants("Operators", schema.constantsFromElement("operatorNames")(schema.constantReads("operator", "name")))
+
+  outputDir
+}
 
   def writeEdgeFiles(outputDir: JFile): JFile = {
     val staticHeader =

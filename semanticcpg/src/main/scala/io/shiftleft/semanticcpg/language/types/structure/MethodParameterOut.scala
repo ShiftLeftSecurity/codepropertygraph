@@ -14,12 +14,12 @@ class MethodParameterOut(val wrapped: NodeSteps[nodes.MethodParameterOut]) exten
   /* get all parameters from (and including)
    * method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
   def indexFrom(num: Int): NodeSteps[nodes.MethodParameterOut] =
-    new NodeSteps(raw.has(NodeKeys.METHOD_PARAMETER_OUT.ORDER, P.gte(num: Integer)))
+    wrapped.where(_.order >= num)
 
   /* get all parameters up to (and including)
    * method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
-  def indexTo[Out](num: Int): NodeSteps[nodes.MethodParameterOut] =
-    new NodeSteps(raw.has(NodeKeys.METHOD_PARAMETER_OUT.ORDER, P.lte(num: Integer)))
+  def indexTo(num: Int): NodeSteps[nodes.MethodParameterOut] =
+    wrapped.where(_.order <= num)
 
   def method: NodeSteps[nodes.Method] =
     new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.Method])
