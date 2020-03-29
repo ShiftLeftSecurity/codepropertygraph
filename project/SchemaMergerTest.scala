@@ -1,7 +1,6 @@
 // TODO uncomment once moved to separate library
 
 /*
-
 package jsonmerge
 
 import org.scalatest._
@@ -33,13 +32,13 @@ class SchemaMergerTest extends WordSpec with Matchers {
   }
 
   "combines elements with same `name`" in {
-    val jsonA = """{"nodeKeys": [{"name":"foo", "field1": "value1"}]}"""
-    val jsonB = """{"nodeKeys": [{"name":"foo", "field2": "value2"}]}"""
+    val jsonA = """{"nodeKeys": [{"name":"foo", "field1": "value1", "listField": ["one", "two"] }]}"""
+    val jsonB = """{"nodeKeys": [{"name":"foo", "field2": "value2", "listField": ["three"] }]}"""
 
     val result = merge(jsonA, jsonB)
     result shouldBe read(
       """{
-      "nodeKeys": [{"name":"foo", "field1": "value1", "field2": "value2"}]
+      "nodeKeys": [{"name":"foo", "field1": "value1", "field2": "value2", "listField": ["one", "two", "three"]}]
       }""")
   }
 
@@ -116,4 +115,5 @@ class SchemaMergerTest extends WordSpec with Matchers {
       Seq(jsonA, jsonB).map(json => Obj(read(json).obj))
     )
 }
+
  */

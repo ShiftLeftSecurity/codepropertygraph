@@ -48,7 +48,7 @@ object SchemaMerger {
   }
 
   /* for any node that has `containedNode` entries, automatically add the corresponding `outEdges`
-  * n.b. not strictly a `merge` feature, but closely related - in mergeSchemas.py before... */
+  * n.b. not strictly a `merge` feature, but closely related, and was in mergeSchemas.py before */
   def addMissingContainsEdges(json: Obj): Obj = {
     val result = ujson.copy(json).obj
     result("nodeTypes").arr.map(_.obj).foreach { nodeType =>
@@ -84,24 +84,35 @@ object SchemaMerger {
     result
   }
 
-
   private def mergeLists(oldValues: ArrayBuffer[Value], newValues: ArrayBuffer[Value]): Arr = {
     val combined = (oldValues ++ newValues).map(_.obj)
     val byName = combined.groupBy(_(FieldNames.Name))
     val combinedElements = byName.map { case (elementName, keyValues) =>
       val combinedElement = mutable.LinkedHashMap.empty[String, Value]
       keyValues.foreach(_.foreach { case (name, value) =>
-        combinedElement.put(name, value) match {
-          case Some(oldValue) if name != FieldNames.Name =>
-            throw new AssertionError(s"$elementName cannot be merged, because it defines the property " +
-              s"$name multiple times with different values: $oldValue, $value")
-          case _ => // new entry, i.e. no duplicate
-        }
+        val combinedValue = combine(elementName.str, name, combinedElement.get(name), value)
+        combinedElement.put(name, combinedValue)
       })
       combinedElement
     }
     Arr.from(combinedElements.map(Obj.from))
   }
+
+  private def combine(elementName: String, name: String, oldValue: Option[Value], newValue: Value): Value =
+    oldValue match {
+      case None =>
+        // field wasn't set before, take the new value
+        newValue
+      case Some(oldValue) if oldValue == newValue =>
+        // field was set before, but values are identical
+        newValue
+      case Some(Arr(oldValues)) =>
+        // field was set before, but since it's a list we can just join the new list
+        oldValues ++ newValue.arr
+      case Some(oldValue) =>
+        throw new AssertionError(s"$elementName cannot be merged, because it defines the property " +
+          s"$name multiple times with different values: $oldValue, $newValue")
+    }
 
   private def verifyNoDuplicateIds(collections: Iterator[(String, Value)]) =
     collections.foreach { case (collectionName, Arr(entries)) =>
