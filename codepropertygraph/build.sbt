@@ -17,21 +17,22 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.8" % Test
 )
 
+import better.files.FileExtensions
 import java.io.File
 import scala.sys.process._
 
 lazy val mergeSchemaTask = taskKey[Unit]("Merge schemas")
 mergeSchemaTask := {
-  val currentMd5 = FileUtils.md5(new File("codepropertygraph/src/main/resources/schemas"))
+  val schemasDir = new File("codepropertygraph/src/main/resources/schemas")
+  val currentMd5 = FileUtils.md5(schemasDir)
   if (MergeSchemaTaskGlobalState.lastMd5 == currentMd5) {
     println("schemas unchanged, no need to merge them again")
   } else {
-    val mergeCmd = "codepropertygraph/codegen/src/main/python/mergeSchemas.py"
-    val mergeResult = Seq(mergeCmd).!
-    if (mergeResult == 0)
-      println("successfully merged schemas to generate cpg.json")
-    else
-      throw new Exception(s"problem when calling $mergeCmd. exitCode was $mergeResult")
+    val schemaFiles = schemasDir.listFiles.toSeq
+    val mergedSchema = overflowdb.codegen.SchemaMerger.mergeCollections(schemaFiles)
+    val outputFile = new File("codepropertygraph/src/main/resources/cpg.json")
+    mergedSchema.toScala.copyTo(outputFile.toScala, overwrite = true)
+    println(s"successfully merged schemas into $outputFile")
   }
   MergeSchemaTaskGlobalState.lastMd5 = currentMd5
 }
