@@ -54,10 +54,10 @@ class Call(val wrapped: NodeSteps[nodes.Call]) extends AnyVal {
   /**
     To formal method return parameter
     */
-  def toMethodReturn: NodeSteps[nodes.MethodReturn] =
+  def toMethodReturn(implicit callResolver: ICallResolver): NodeSteps[nodes.MethodReturn] =
     new NodeSteps(
       raw
-        .out(EdgeTypes.CALL)
+        .flatMap(callResolver.getCalledMethods)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.METHOD_RETURN)
         .cast[nodes.MethodReturn])

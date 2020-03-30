@@ -31,7 +31,7 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
               if (resolve) {
                 callResolver.resolveDynamicMethodCallSites(method.asInstanceOf[nodes.Method])
               }
-            }.in(EdgeTypes.CALL) // expand to call site
+            }.flatMap(method => callResolver.getCallsites(method.asInstanceOf[nodes.Method]))
               .in(EdgeTypes.CONTAINS) // expand to method
               .dedup
               .simplePath
@@ -57,12 +57,12 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
     * Incoming call sites
     * */
   def callIn(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] =
-    new NodeSteps(
-      wrapped
-        .sideEffect(callResolver.resolveDynamicMethodCallSites)
-        .raw
-        .in(EdgeTypes.CALL)
-        .cast[nodes.Call])
+    new NodeSteps(wrapped.raw.flatMap { method =>
+      callResolver.resolveDynamicMethodCallSites(method)
+      callResolver
+        .getCallsites(method)
+        .asInstanceOf[GremlinScala[nodes.Call]]
+    })
 
   /**
     * Traverse to direct and transitive callers of the method.
