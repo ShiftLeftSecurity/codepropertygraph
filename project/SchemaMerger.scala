@@ -18,7 +18,7 @@ object SchemaMerger {
   def mergeCollections(inputFiles: Seq[File]): File = {
     import better.files.FileExtensions
 
-    val inputJsons = inputFiles.map { file =>
+    val inputJsons = inputFiles.sorted.map { file =>
       val jsonString = file.toScala.lines.filterNot(isComment).mkString("\n")
       Obj(ujson.read(jsonString).obj)
     }
