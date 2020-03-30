@@ -1,6 +1,7 @@
 // TODO uncomment once moved to separate library
 
 /*
+
 package jsonmerge
 
 import org.scalatest._
@@ -9,37 +10,54 @@ import ujson._
 class SchemaMergerTest extends WordSpec with Matchers {
 
   "adds independent elements" in {
-    val jsonA = """{"nodeKeys": [{"name":"foo", "field1":"value1"}]}"""
-    val jsonB = """{"edgeKeys": [{"name":"bar", "field2":"value2"}]}"""
+    val jsonA = """{"nodeTypes": [{"name":"foo", "field1":"value1"}]}"""
+    val jsonB = """{"edgeTypes": [{"name":"bar", "field2":"value2"}]}"""
 
     val result = merge(jsonA, jsonB)
     result shouldBe read(
       """{
-      "nodeKeys": [{"name":"foo", "field1":"value1"}],
-      "edgeKeys": [{"name":"bar", "field2":"value2"}]
+      "nodeTypes": [{"name":"foo", "field1":"value1"}],
+      "edgeTypes": [{"name":"bar", "field2":"value2"}]
       }""")
   }
 
   "joins separate elements from same collection" in {
-    val jsonA = """{"nodeKeys": [{"name":"foo", "field1":"value1"}]}"""
-    val jsonB = """{"nodeKeys": [{"name":"bar", "field2":"value2"}]}"""
+    val jsonA = """{"nodeTypes": [{"name":"foo", "field1":"value1"}]}"""
+    val jsonB = """{"nodeTypes": [{"name":"bar", "field2":"value2"}]}"""
 
     val result = merge(jsonA, jsonB)
     result shouldBe read(
       """{
-      "nodeKeys": [{"name":"bar", "field2":"value2"}, {"name":"foo", "field1":"value1"}]
+      "nodeTypes": [{"name":"bar", "field2":"value2"}, {"name":"foo", "field1":"value1"}]
       }""")
   }
 
   "combines elements with same `name`" in {
-    val jsonA = """{"nodeKeys": [{"name":"foo", "field1": "value1", "listField": ["one", "two"] }]}"""
-    val jsonB = """{"nodeKeys": [{"name":"foo", "field2": "value2", "listField": ["three"] }]}"""
+    val jsonA = """{"nodeTypes": [{"name":"foo", "field1": "value1", "listField": ["one", "two"] }]}"""
+    val jsonB = """{"nodeTypes": [{"name":"foo", "field2": "value2", "listField": ["three"] }]}"""
 
     val result = merge(jsonA, jsonB)
     result shouldBe read(
       """{
-      "nodeKeys": [{"name":"foo", "field1": "value1", "field2": "value2", "listField": ["one", "two", "three"]}]
+      "nodeTypes": [{"name":"foo", "field1": "value1", "field2": "value2", "listField": ["one", "two", "three"]}]
       }""")
+  }
+
+  "combines and deduplicates outEdges" in {
+    val jsonA = """{"nodeTypes": [ { "name": "TYPE_DECL", "outEdges": [
+           { "edgeName": "AST","inNodes": ["ANNOTATION"] },
+           { "edgeName": "ALIAS_OF","inNodes": ["TYPE"] } ]
+       }]}"""
+    val jsonB = """{"nodeTypes": [ { "name": "TYPE_DECL", "outEdges": [ { "edgeName": "AST","inNodes": ["TYPE_DECL","METHOD"] } ]}]}"""
+
+    val result = merge(jsonA, jsonB)
+    result shouldBe read(
+      """{"nodeTypes": [ { "name": "TYPE_DECL", "outEdges": [
+           { "edgeName": "AST","inNodes": ["ANNOTATION","TYPE_DECL","METHOD"] },
+           { "edgeName": "ALIAS_OF","inNodes": ["TYPE"] } ,
+           { "edgeName": "CONTAINS_NODE","inNodes":["NODE"]}
+         ]
+       }]}""")
   }
 
   "errors if same element has property defined multiple times with different values" in {
@@ -61,7 +79,7 @@ class SchemaMergerTest extends WordSpec with Matchers {
   }
 
   "for any node, automatically add a generic `CONTAINS_NODE` outEdge" in {
-    val json =
+    val jsonA =
       """{ "nodeTypes": [
            {
              "name":"CALL_SITE",
@@ -70,9 +88,9 @@ class SchemaMergerTest extends WordSpec with Matchers {
              ]
            }
          ]}"""
+    val jsonB = "{ }"
 
-    val result = SchemaMerger.addMissingContainsEdges(read(json).obj)
-    result shouldBe read(
+    merge(jsonA, jsonB) shouldBe read(
       """{ "nodeTypes": [
            {
              "name":"CALL_SITE",
@@ -86,7 +104,7 @@ class SchemaMergerTest extends WordSpec with Matchers {
 
 
   "for any node that has `containedNode` entries, automatically add the corresponding `outEdges`" in {
-    val json =
+    val jsonA =
       """{ "nodeTypes": [
            {
              "name":"CALL_SITE",
@@ -96,8 +114,9 @@ class SchemaMergerTest extends WordSpec with Matchers {
              ]
            }
          ]}"""
+    val jsonB = "{}"
 
-    SchemaMerger.addMissingContainsEdges(read(json).obj) shouldBe read(
+    merge(jsonA, jsonB) shouldBe read(
       """{ "nodeTypes": [
            {
              "name":"CALL_SITE",
@@ -115,5 +134,4 @@ class SchemaMergerTest extends WordSpec with Matchers {
       Seq(jsonA, jsonB).map(json => Obj(read(json).obj))
     )
 }
-
  */

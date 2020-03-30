@@ -2,7 +2,6 @@ package overflowdb.codegen
 
 import java.io.File
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 import ujson._
 
 object SchemaMerger {
@@ -12,6 +11,8 @@ object SchemaMerger {
 
     /* ids must not have duplicates within a given collection */
     val Id = "id"
+
+    val NodeTypes = "nodeTypes"
   }
 
   def mergeCollections(inputFiles: Seq[File]): File = {
@@ -44,47 +45,49 @@ object SchemaMerger {
     }
 
     verifyNoDuplicateIds(result.iterator)
-    Obj.from(result)
+    result.get(FieldNames.NodeTypes).map(_.arr).foreach(mergeOutEdgeLists)
+    withMissingContainsEdges(Obj(result))
   }
 
   /* for any node that has `containedNode` entries, automatically add the corresponding `outEdges`
   * n.b. not strictly a `merge` feature, but closely related, and was in mergeSchemas.py before */
-  def addMissingContainsEdges(json: Obj): Obj = {
+  private def withMissingContainsEdges(json: Obj): Obj = {
     val result = ujson.copy(json).obj
     result("nodeTypes").arr.map(_.obj).foreach { nodeType =>
-      val outEdges = nodeType("outEdges").arr
-      val outEdgeNames = outEdges.map(_.obj("edgeName").str).toSet
+      nodeType.get("outEdges").map(_.arr).foreach { outEdges =>
+        val outEdgeNames = outEdges.map(_.obj("edgeName").str).toSet
 
-      if (!outEdgeNames.contains("CONTAINS_NODE")) {
-        val containsNodeEntry = read(""" { "edgeName": "CONTAINS_NODE", "inNodes": ["NODE"] }""")
-        outEdges.append(containsNodeEntry)
-      }
+        if (!outEdgeNames.contains("CONTAINS_NODE")) {
+          val containsNodeEntry = read(""" { "edgeName": "CONTAINS_NODE", "inNodes": ["NODE"] }""")
+          outEdges.append(containsNodeEntry)
+        }
 
-      val requiredInNodesForContains = nodeType.get("containedNodes").map(_.arr).getOrElse(Nil).map { containedNode =>
-        containedNode.obj("nodeType").str
-      }
+        val requiredInNodesForContains = nodeType.get("containedNodes").map(_.arr).getOrElse(Nil).map { containedNode =>
+          containedNode.obj("nodeType").str
+        }
 
-      /* replace entry with `edge["edgeName"] == "CONTAINS_NODE"` if it exists, or add one if it doesn't.
+        /* replace entry with `edge["edgeName"] == "CONTAINS_NODE"` if it exists, or add one if it doesn't.
        * to do that, convert outEdges to Map<EdgeName, OutEdge> and back at the end */
-      val inNodesByOutEdgeName = outEdges.map { edge =>
-        edge.obj("edgeName").str -> edge.obj("inNodes").arr.map(_.str)
-      }.toMap
-      val containsInNodesBefore = inNodesByOutEdgeName.getOrElse("CONTAINS_NODE", Seq.empty)
-      val containsInNodes = (containsInNodesBefore ++ requiredInNodesForContains).distinct
+        val inNodesByOutEdgeName = outEdges.map { edge =>
+          edge.obj("edgeName").str -> edge.obj("inNodes").arr.map(_.str)
+        }.toMap
+        val containsInNodesBefore = inNodesByOutEdgeName.getOrElse("CONTAINS_NODE", Seq.empty)
+        val containsInNodes = (containsInNodesBefore ++ requiredInNodesForContains).distinct
 
-      outEdges.clear
-      inNodesByOutEdgeName.+("CONTAINS_NODE" -> containsInNodes).foreach { case (edgeName, inNodes) =>
-        outEdges.append(Obj(
-          "edgeName" -> edgeName,
-          "inNodes" -> inNodes
-        ))
+        outEdges.clear
+        inNodesByOutEdgeName.+("CONTAINS_NODE" -> containsInNodes).foreach { case (edgeName, inNodes) =>
+          outEdges.append(Obj(
+            "edgeName" -> edgeName,
+            "inNodes" -> inNodes
+          ))
+        }
       }
 
     }
     result
   }
 
-  private def mergeLists(oldValues: ArrayBuffer[Value], newValues: ArrayBuffer[Value]): Arr = {
+  private def mergeLists(oldValues: mutable.ArrayBuffer[Value], newValues: mutable.ArrayBuffer[Value]): Arr = {
     val combined = (oldValues ++ newValues).map(_.obj)
     val byName = combined.groupBy(_(FieldNames.Name))
     val combinedElements = byName.map { case (elementName, keyValues) =>
@@ -126,7 +129,45 @@ object SchemaMerger {
       }
     }
 
+  /** outEdges may contain duplicate entries - merge them by the `edgeName`. e.g.
+   * [{ "edgeName": "AST","inNodes": ["ANNOTATION"] },
+   *  { "edgeName": "ALIAS_OF","inNodes": ["TYPE"] },
+   *  { "edgeName": "AST","inNodes": ["TYPE_DECL","METHOD"] }]
+   *  will be combined to
+   * [{ "edgeName": "AST","inNodes": ["ANNOTATION","TYPE_DECL","METHOD"] },
+   *  { "edgeName": "ALIAS_OF","inNodes": ["TYPE"] }]
+   * */
+  private def mergeOutEdgeLists(nodeTypes: mutable.ArrayBuffer[Value]): Unit =
+    nodeTypes.foreach { nodeType =>
+      val outEdgesByName = mutable.Map.empty[String, Obj]
+      nodeType.obj.get("outEdges").map { outEdges =>
+        outEdges.arr.map(_.obj).foreach { outEdge =>
+          val edgeName = outEdge("edgeName").str
+          outEdgesByName.get(edgeName) match {
+            case None =>
+              // first time we encounter this outEdge, simply add it to the result
+              outEdgesByName.put(edgeName, outEdge)
+            case Some(oldValue) =>
+              // we've seen this outEdge before, merge the old and new ones
+              outEdgesByName.put(edgeName, mergeOutEdge(oldValue.value, outEdge))
+          }
+        }
+      }
+      if (outEdgesByName.values.nonEmpty) {
+        nodeType.obj.put("outEdges", outEdgesByName.values)
+      }
+    }
+
+  private def mergeOutEdge(oldValue: mutable.LinkedHashMap[String, Value], newValue: mutable.LinkedHashMap[String, Value]): Obj = {
+    newValue.foreach { case (name, value) =>
+      val combinedValue = combine("outEdges", name, oldValue.get(name), value)
+      oldValue.put(name, combinedValue)
+    }
+    oldValue
+  }
+
   private def isComment(line: String): Boolean =
     line.trim.startsWith("//")
 }
+
 
