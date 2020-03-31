@@ -10,6 +10,7 @@ import java.lang.{Long => JLong}
 import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Vertex
+import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 
 import scala.concurrent.duration.DurationLong
 
@@ -92,9 +93,13 @@ abstract class CpgPass(cpg: Cpg, outputName: String = getClass.getSimpleName) {
 
   private def appendOverlayNameToMetaData(): Unit = {
     val metaDataList = cpg.scalaGraph.V.hasLabel(NodeTypes.META_DATA).l
+
     metaDataList match {
-      case (metaData: nodes.MetaData) :: Nil =>
-        metaData.property(NodeKeys.OVERLAYS.toString, metaData.overlays ++ List(outputName))
+      case (metaData: nodes.MetaData) :: Nil => {
+        if (outputName != "Predef$") {
+          metaData.property(Cardinality.list, NodeKeys.OVERLAYS, outputName)
+        }
+      }
       case _ =>
         // TODO: make this a warning once all frontends are caught up.
         logger.info("Invalid CPG: exactly 1 meta data block required")

@@ -14,9 +14,15 @@ class CpgPassTests extends WordSpec with Matchers {
         override def run(): Iterator[DiffGraph] = {
           Iterator()
         }
-        new MyPass().run()
-        cpg.metaData.head.overlays shouldBe List("foo")
       }
+      class MyPass2 extends CpgPass(cpg, "bar") {
+        override def run(): Iterator[DiffGraph] = {
+          Iterator()
+        }
+      }
+      new MyPass().createAndApply()
+      new MyPass2().createAndApply()
+      cpg.metaData.head.overlays shouldBe List("foo", "bar")
     }
   }
 
