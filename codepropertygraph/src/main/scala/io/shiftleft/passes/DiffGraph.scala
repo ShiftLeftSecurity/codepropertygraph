@@ -282,14 +282,7 @@ object DiffGraph {
                                 value: AnyRef,
                                 inverseBuilder: DiffGraph.InverseBuilder) = {
       inverseBuilder.onBeforeNodePropertyChange(node, key)
-      value match {
-        case seq: Seq[_] =>
-          println(seq)
-          seq.foreach(p => node.property(Cardinality.list, key, p))
-          println(node.property(key))
-        case _ =>
-          node.property(key, value)
-      }
+      node.property(key, value)
     }
 
     private def addEdge(edgeChange: Change.CreateEdge, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
