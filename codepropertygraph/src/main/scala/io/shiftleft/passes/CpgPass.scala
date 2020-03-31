@@ -33,8 +33,16 @@ import scala.concurrent.duration.DurationLong
   *
   * @param cpg the source CPG this pass traverses
   */
-abstract class CpgPass(cpg: Cpg, outputName: String = getClass.getSimpleName) {
+abstract class CpgPass(cpg: Cpg, outName: String = "") {
   import CpgPass.logger
+
+  def outputName : String = {
+    if (outName.isEmpty) {
+      this.getClass.getSimpleName()
+    } else {
+     outName
+    }
+  }
 
   /**
     * Main method of enhancement - to be implemented by child class
@@ -78,7 +86,6 @@ abstract class CpgPass(cpg: Cpg, outputName: String = getClass.getSimpleName) {
         val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg)
         new DiffGraphProtoSerializer().serialize(appliedDiffGraph)
       }
-      appendOverlayNameToMetaData()
       overlays
     }
 
@@ -88,23 +95,7 @@ abstract class CpgPass(cpg: Cpg, outputName: String = getClass.getSimpleName) {
   def createAndApply(): Unit =
     withStartEndTimesLogged {
       run().foreach(diffGraph => DiffGraph.Applier.applyDiff(diffGraph, cpg))
-      appendOverlayNameToMetaData()
     }
-
-  private def appendOverlayNameToMetaData(): Unit = {
-    val metaDataList = cpg.scalaGraph.V.hasLabel(NodeTypes.META_DATA).l
-
-    metaDataList match {
-      case (metaData: nodes.MetaData) :: Nil => {
-        if (outputName != "Predef$") {
-          metaData.property(Cardinality.list, NodeKeys.OVERLAYS, outputName)
-        }
-      }
-      case _ =>
-        // TODO: make this a warning once all frontends are caught up.
-        logger.info("Invalid CPG: exactly 1 meta data block required")
-    }
-  }
 
   private def withStartEndTimesLogged[A](fun: => A): A = {
     logger.debug(s"Start of enhancement: $name")

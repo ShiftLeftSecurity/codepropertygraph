@@ -4,7 +4,7 @@ import java.util
 
 import gnu.trove.set.hash.TCustomHashSet
 import gnu.trove.strategy.IdentityHashingStrategy
-import gremlin.scala.{Edge, ScalaGraph}
+import gremlin.scala.{Edge, Key, ScalaGraph}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node, StoredNode}
 import org.apache.logging.log4j.LogManager
@@ -282,7 +282,14 @@ object DiffGraph {
                                 value: AnyRef,
                                 inverseBuilder: DiffGraph.InverseBuilder) = {
       inverseBuilder.onBeforeNodePropertyChange(node, key)
-      node.property(key, value)
+      value match {
+        case seq: Seq[_] =>
+          println(seq)
+          seq.foreach(p => node.property(Cardinality.list, key, p))
+          println(node.property(key))
+        case _ =>
+          node.property(key, value)
+      }
     }
 
     private def addEdge(edgeChange: Change.CreateEdge, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
