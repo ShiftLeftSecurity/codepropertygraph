@@ -4,7 +4,7 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes.{HasCanonicalName, HasCode, HasDependencyGroupId, HasDispatchType, HasFullName, HasIsExternal, HasLineNumber, HasLineNumberEnd, HasName, HasOrder, HasParserTypeName, HasSignature, HasValue, HasVersion, Node, StoredNode}
-import io.shiftleft.semanticcpg.language.Steps.Help
+import io.shiftleft.semanticcpg.language.Help
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.MethodDOT
 import io.shiftleft.semanticcpg.language.nodemethods.{AstNodeMethods, CallMethods, MethodMethods, MethodReturnMethods, NodeMethods, WithinMethodMethods}
@@ -243,9 +243,7 @@ package object language extends operatorextension.Implicits {
     new ModifierAccessors(steps)
   // Modifier accessors ~
 
-  implicit val methodReturnHelp: Help[nodes.MethodReturn] = new Help[nodes.MethodReturn] {
-    override def apply = MethodReturn.HelpMsg
-  }
+  implicit val methodReturnHelp: Help[nodes.MethodReturn] = MethodReturn.Help
   // TODO other implicits for the step extensions defined in this package
 
 }
