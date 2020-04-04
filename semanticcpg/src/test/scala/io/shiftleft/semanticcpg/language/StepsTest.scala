@@ -1,5 +1,8 @@
 package io.shiftleft.semanticcpg.language
 
+import java.io.{ByteArrayOutputStream, PrintStream}
+import java.nio.charset.StandardCharsets
+
 import gremlin.scala.__
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
@@ -12,6 +15,7 @@ import org.json4s.native.JsonMethods.parse
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.collection.mutable
+import scala.util.Using
 
 class StepsTest extends WordSpec with Matchers {
 
@@ -184,11 +188,15 @@ class StepsTest extends WordSpec with Matchers {
     val cpg = Cpg(OverflowDbTestInstance.create)
 
     "always provides generic help" in {
-      cpg.methodReturn.helpGeneric shouldBe Steps.genericHelpMsg
+      cpg.methodReturn.helpGeneric shouldBe Help.genericHelp.toText
     }
 
     "return node-specific help text (in case it's available)" in {
-      cpg.methodReturn.help shouldBe MethodReturn.HelpMsg
+      cpg.methodReturn.help shouldBe MethodReturn.Help.toText
+    }
+
+    "foo" in {
+      println(cpg.methodReturn.help)
     }
   }
 
