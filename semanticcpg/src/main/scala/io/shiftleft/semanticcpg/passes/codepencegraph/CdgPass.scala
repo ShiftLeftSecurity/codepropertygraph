@@ -37,7 +37,13 @@ class CdgPass(cpg: Cpg) extends CpgPass(cpg) {
                                          EdgeTypes.CDG)
             }
             case _ =>
-              val method = postDomFrontierNode.vertices(Direction.IN, EdgeTypes.CONTAINS).next
+              val method =
+                postDomFrontierNode match {
+                  case method: nodes.Method =>
+                    method
+                  case _ =>
+                    postDomFrontierNode.vertices(Direction.IN, EdgeTypes.CONTAINS).next
+                }
               val nodeLabel = postDomFrontierNode.label
               logger.warn(s"Found CDG edge starting at $nodeLabel node. This is most likely caused by an invalid CFG." +
                 s" Method: ${method.valueOption(NodeKeys.FULL_NAME)}" +
