@@ -63,7 +63,7 @@ class Expression[NodeType <: nodes.Expression](val wrapped: NodeSteps[NodeType])
       raw
         .sack((sack: Integer, node: nodes.Expression) => node.value2(NodeKeys.ARGUMENT_INDEX))
         .in(EdgeTypes.ARGUMENT)
-        .flatMap(call => callResolver.getCalledMethods(call.asInstanceOf[nodes.CallRepr]))
+        .flatMap(call => callResolver.getCalledMethodsAsTraversal(call.asInstanceOf[nodes.CallRepr]))
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
         .filterWithTraverser { traverser =>

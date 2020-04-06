@@ -10,8 +10,7 @@ class Call(val wrapped: NodeSteps[nodes.Call]) extends AnyVal {
   /** The callee method */
   def calledMethod(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] = {
     new NodeSteps(wrapped.raw.flatMap { call =>
-      callResolver.resolveDynamicCallSite(call)
-      callResolver.getCalledMethods(call)
+      callResolver.getCalledMethodsAsTraversal(call)
     })
   }
 

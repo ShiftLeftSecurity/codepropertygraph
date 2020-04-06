@@ -73,14 +73,6 @@ object ExpandTo {
         astChild.isInstanceOf[nodes.Modifier] &&
           astChild.asInstanceOf[nodes.Modifier].modifierType == modifierType)
 
-  def callToCalledMethod(call: nodes.Call, callResolver: ICallResolver): Iterable[nodes.Method] = {
-    val combined = mutable.ArrayBuffer.empty[nodes.Method]
-    call._callOut.asScala.foreach(method => combined.append(method.asInstanceOf[nodes.Method]))
-    combined.appendAll(callResolver.getResolvedCalledMethods(call))
-
-    combined
-  }
-
   def methodToTypeDecl(method: nodes.Method): Option[nodes.TypeDecl] =
     findVertex(method, _.isInstanceOf[nodes.TypeDecl]).map(_.asInstanceOf[nodes.TypeDecl])
 

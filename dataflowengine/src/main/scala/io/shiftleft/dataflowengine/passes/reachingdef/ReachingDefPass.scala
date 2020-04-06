@@ -209,8 +209,8 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
 class DataFlowFrameworkHelper(graph: ScalaGraph) {
 
   private def callToMethodParamOut(call: nodes.StoredNode): Iterable[nodes.StoredNode] = {
-    ExpandTo
-      .callToCalledMethod(call.asInstanceOf[nodes.Call], NoResolve)
+    NoResolve
+      .getCalledMethods(call.asInstanceOf[nodes.Call])
       .flatMap(method => ExpandTo.methodToOutParameters(method))
   }
 

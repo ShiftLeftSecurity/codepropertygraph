@@ -57,7 +57,7 @@ class Call(val wrapped: NodeSteps[nodes.Call]) extends AnyVal {
   def toMethodReturn(implicit callResolver: ICallResolver): NodeSteps[nodes.MethodReturn] =
     new NodeSteps(
       raw
-        .flatMap(callResolver.getCalledMethods)
+        .flatMap(callResolver.getCalledMethodsAsTraversal)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.METHOD_RETURN)
         .cast[nodes.MethodReturn])
