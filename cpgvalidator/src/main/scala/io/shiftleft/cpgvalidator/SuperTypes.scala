@@ -7,6 +7,7 @@ object SuperTypes {
     NodeTypes.BLOCK,
     NodeTypes.CALL,
     NodeTypes.IDENTIFIER,
+    NodeTypes.FIELD_IDENTIFIER,
     NodeTypes.LITERAL,
     NodeTypes.METHOD_REF,
     NodeTypes.RETURN,

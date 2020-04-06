@@ -138,15 +138,13 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
     })
 
   /**
-    *  Traverse to first expressions in CFG.
-    *  Can be multiple.
+    *  Traverse to first expression in CFG.
     */
   def cfgFirst: NodeSteps[nodes.Expression] =
     new NodeSteps(raw.out(EdgeTypes.CFG).cast[nodes.Expression])
 
   /**
-    *  Traverse to last expressions in CFG.
-    *  Can be multiple.
+    *  Traverse to last expression in CFG.
     */
   def cfgLast: NodeSteps[nodes.Expression] =
     methodReturn.cfgLast
