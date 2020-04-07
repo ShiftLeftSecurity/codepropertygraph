@@ -52,18 +52,18 @@ class Expression[NodeType <: nodes.Expression](val wrapped: NodeSteps[NodeType])
   Traverse to related parameter
     */
   @deprecated("", "October 2019")
-  def toParameter(implicit callResolver: ICallResolver): NodeSteps[nodes.MethodParameterIn] = parameter
+  def toParameter: NodeSteps[nodes.MethodParameterIn] = parameter
 
   /**
     Traverse to related parameter, if the expression is an argument to a call and the call
     can be resolved.
     */
-  def parameter(implicit callResolver: ICallResolver): NodeSteps[nodes.MethodParameterIn] =
+  def parameter: NodeSteps[nodes.MethodParameterIn] =
     new NodeSteps(
       raw
         .sack((sack: Integer, node: nodes.Expression) => node.value2(NodeKeys.ARGUMENT_INDEX))
         .in(EdgeTypes.ARGUMENT)
-        .flatMap(call => callResolver.getCalledMethodsAsTraversal(call.asInstanceOf[nodes.CallRepr]))
+        .out(EdgeTypes.CALL)
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
         .filterWithTraverser { traverser =>
