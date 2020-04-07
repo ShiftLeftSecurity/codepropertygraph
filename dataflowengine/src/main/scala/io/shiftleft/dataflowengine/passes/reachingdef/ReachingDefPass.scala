@@ -208,15 +208,12 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
 /** Common functionalities needed for data flow frameworks */
 class DataFlowFrameworkHelper(graph: ScalaGraph) {
 
-  private def callToMethodParamOut(call: nodes.StoredNode): Iterable[nodes.StoredNode] = {
-    NoResolve
-      .getCalledMethods(call.asInstanceOf[nodes.Call])
-      .flatMap(method => ExpandTo.methodToOutParameters(method))
+  private def callToMethodParamOut(call: nodes.StoredNode): Seq[nodes.StoredNode] = {
+    ExpandTo.callToCalledMethod(call).flatMap(method => ExpandTo.methodToOutParameters(method))
   }
 
-  private def filterArgumentIndex(vertexList: List[nodes.StoredNode],
-                                  orderSeq: Iterable[Int]): List[nodes.StoredNode] = {
-    vertexList.filter(v => orderSeq.exists(_ == v.asInstanceOf[nodes.HasArgumentIndex].argumentIndex.toInt))
+  private def filterArgumentIndex(vertexList: List[nodes.StoredNode], orderSeq: Seq[Int]): List[nodes.StoredNode] = {
+    vertexList.filter(v => orderSeq.contains(v.asInstanceOf[nodes.HasArgumentIndex].argumentIndex.toInt))
   }
 
   def getExpressions(method: nodes.Method): List[nodes.Call] =
