@@ -4,6 +4,7 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.CpgPass
+import io.shiftleft.semanticcpg.Overlays
 import io.shiftleft.semanticcpg.passes.BindingMethodOverridesPass
 import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
 import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
@@ -73,5 +74,10 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
 
   def create(): Unit = {
     enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg))
+    Overlays.appendOverlayName(cpg, EnhancedBaseCreator.overlayName)
   }
+}
+
+object EnhancedBaseCreator {
+  val overlayName = "semanticcpg"
 }
