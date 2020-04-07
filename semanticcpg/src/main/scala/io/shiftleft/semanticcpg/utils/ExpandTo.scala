@@ -4,9 +4,11 @@ import io.shiftleft.codepropertygraph.generated._
 import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex}
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.passes.DiffGraph.getClass
+import io.shiftleft.semanticcpg.language.ICallResolver
 import org.apache.logging.log4j.LogManager
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 // TODO This object is problematic. While it offers a few utility methods
@@ -70,14 +72,6 @@ object ExpandTo {
       .exists(astChild =>
         astChild.isInstanceOf[nodes.Modifier] &&
           astChild.asInstanceOf[nodes.Modifier].modifierType == modifierType)
-
-  def callToCalledMethod(call: Vertex): Seq[nodes.Method] =
-    call
-      .asInstanceOf[nodes.StoredNode]
-      ._callOut
-      .asScala
-      .map(_.asInstanceOf[nodes.Method])
-      .toSeq
 
   def methodToTypeDecl(method: nodes.Method): Option[nodes.TypeDecl] =
     findVertex(method, _.isInstanceOf[nodes.TypeDecl]).map(_.asInstanceOf[nodes.TypeDecl])
