@@ -33,7 +33,7 @@ class DiffGraphTest extends WordSpec with Matchers {
       // add edge from existing node "x" to new node "a" to the builder
       diffBuilder.addEdgeFromOriginal(x.asInstanceOf[StoredNode], a, EdgeTypes.AST)
       // modify property of existing node "y"
-      diffBuilder.addNodeProperty(y.asInstanceOf[StoredNode], NodeKeyNames.ORDER, new Integer(123))
+      diffBuilder.addNodeProperty(y.asInstanceOf[StoredNode], NodeKeyNames.ORDER, Int.box(123))
       diffBuilder.addNodeProperty(y.asInstanceOf[StoredNode], NodeKeyNames.CODE, "new y code")
 
       diffBuilder.addEdgeProperty(x2y, EdgeKeyNames.LOCAL_NAME, "new edge attr")

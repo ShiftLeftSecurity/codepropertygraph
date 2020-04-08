@@ -132,6 +132,9 @@ message AdditionalNodeProperty {
 message AdditionalEdgeProperty {
   int64 edge_id = 1;
   CpgStruct.Edge.Property property = 2;
+  int64 out_node_key = 3;
+  int64 in_node_key = 4;
+  CpgStruct.Edge.EdgeType edge_type = 5;
 }
 
 message CpgOverlay {
@@ -139,4 +142,44 @@ message CpgOverlay {
   repeated CpgStruct.Edge edge = 2;
   repeated AdditionalNodeProperty node_property = 3;
   repeated AdditionalEdgeProperty edge_property = 4;
+
+  message RemoveNode {
+    int64 key = 1;
+  }
+
+  message RemoveNodeProperty {
+    int64 key = 1;
+    NodePropertyName name = 2;
+  }
+
+  message RemoveEdge {
+    int64 out_node_key = 1;
+    int64 in_node_key = 2;
+    CpgStruct.Edge.EdgeType edge_type = 3;
+    // TODO: There is a possibility of the more than one edge between two nodes
+    //       with the same label but different properties.
+  }
+
+  message RemoveEdgeProperty {
+    int64 out_node_key = 1;
+    int64 in_node_key = 2;
+    CpgStruct.Edge.EdgeType edge_type = 3;
+    EdgePropertyName property_name = 5;
+    // TODO: There is a possibility of the more than one edge between two nodes
+    //       with the same label but different properties.
+  }
+
+  message InverseOverlay {
+      repeated CpgStruct.Node node = 1;
+      repeated CpgStruct.Edge edge = 2;
+      repeated AdditionalNodeProperty node_property = 3;
+      repeated AdditionalEdgeProperty edge_property = 4;
+      repeated RemoveNode remove_node = 5;
+      repeated RemoveNodeProperty remove_node_property = 6;
+      repeated RemoveEdge remove_edge = 7;
+      repeated RemoveEdgeProperty remove_edge_property = 8;
+  }
+
+
+  InverseOverlay inverse_overlay = 5;
 }
