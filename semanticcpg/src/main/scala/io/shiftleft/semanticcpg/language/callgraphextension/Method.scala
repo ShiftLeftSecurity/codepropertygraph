@@ -12,7 +12,7 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
     * Intended for internal use!
     * Traverse to direct and transitive callers of the method.
     */
-  def calledByIncludingSink(sourceTrav: NodeSteps[nodes.Method], resolve: Boolean = true)(
+  def calledByIncludingSink(sourceTrav: NodeSteps[nodes.Method])(
       implicit callResolver: ICallResolver): NodeSteps[nodes.Method] = {
     val sourceMethods = sourceTrav.raw.toSet
     val sinkMethods = raw.dedup.toList
@@ -27,11 +27,7 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
         methodTrav
           .emit(_.is(P.within(sourceMethods)))
           .repeat(
-            _.sideEffect { method =>
-              if (resolve) {
-                callResolver.resolveDynamicMethodCallSites(method.asInstanceOf[nodes.Method])
-              }
-            }.in(EdgeTypes.CALL) // expand to call site
+            _.flatMap(method => callResolver.getMethodCallsitesAsTraversal(method.asInstanceOf[nodes.Method]))
               .in(EdgeTypes.CONTAINS) // expand to method
               .dedup
               .simplePath
@@ -57,12 +53,11 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
     * Incoming call sites
     * */
   def callIn(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] =
-    new NodeSteps(
-      wrapped
-        .sideEffect(callResolver.resolveDynamicMethodCallSites)
-        .raw
-        .in(EdgeTypes.CALL)
-        .cast[nodes.Call])
+    new NodeSteps(wrapped.raw.flatMap { method =>
+      callResolver
+        .getMethodCallsitesAsTraversal(method)
+        .asInstanceOf[GremlinScala[nodes.Call]]
+    })
 
   /**
     * Traverse to direct and transitive callers of the method.
