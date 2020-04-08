@@ -106,7 +106,7 @@ object DiffGraph {
       case object Existing extends NodeKind
     }
 
-    final case class RemoveNode(node: StoredNode) extends Change
+    final case class RemoveNode(nodeId: Long) extends Change
     final case class RemoveNodeProperty(node: StoredNode, propertyKey: String) extends Change
     final case class RemoveEdge(edge: Edge) extends Change
     final case class RemoveEdgeProperty(edge: Edge, propertyKey: String) extends Change
@@ -189,7 +189,8 @@ object DiffGraph {
       buffer += Change.SetNodeProperty(node, key, value)
     def addEdgeProperty(edge: Edge, key: String, value: AnyRef): Unit =
       buffer += Change.SetEdgeProperty(edge, key, value)
-    def removeNode(node: StoredNode): Unit = buffer += Change.RemoveNode(node)
+    def removeNode(node: StoredNode): Unit =
+      buffer += Change.RemoveNode(node.id.asInstanceOf[Long])
     def removeEdge(edge: Edge): Unit = buffer += Change.RemoveEdge(edge)
     def removeNodeProperty(node: StoredNode, propertyKey: String): Unit =
       buffer += Change.RemoveNodeProperty(node, propertyKey)
@@ -268,7 +269,7 @@ object DiffGraph {
           addEdgeProperty(edge, key, value, inverseBuilder)
         case Change.RemoveEdge(edge)                      => edge.remove()
         case Change.RemoveEdgeProperty(edge, propertyKey) => edge.property(propertyKey).remove()
-        case Change.RemoveNode(node)                      => node.remove()
+        case Change.RemoveNode(nodeId)                      => graph.vertices(nodeId).next().remove()
         case Change.RemoveNodeProperty(node, propertyKey) => node.property(propertyKey).remove()
       }
 
@@ -282,7 +283,8 @@ object DiffGraph {
                                 value: AnyRef,
                                 inverseBuilder: DiffGraph.InverseBuilder) = {
       inverseBuilder.onBeforeNodePropertyChange(node, key)
-      node.property(key, value)
+      println("addNodeProperty", key, value)
+      node.property(Cardinality.single, key, value)
     }
 
     private def addEdge(edgeChange: Change.CreateEdge, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
