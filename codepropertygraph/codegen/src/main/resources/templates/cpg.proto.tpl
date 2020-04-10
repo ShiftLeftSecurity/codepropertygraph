@@ -156,8 +156,8 @@ message CpgOverlay {
     int64 out_node_key = 1;
     int64 in_node_key = 2;
     CpgStruct.Edge.EdgeType edge_type = 3;
-    // TODO: There is a possibility of the more than one edge between two nodes
-    //       with the same label but different properties.
+    // note: we do not currently support removing an edge if another edge with the same label between those nodes exist
+    // context: our edges do not currently have ids
   }
 
   message RemoveEdgeProperty {
@@ -165,8 +165,8 @@ message CpgOverlay {
     int64 in_node_key = 2;
     CpgStruct.Edge.EdgeType edge_type = 3;
     EdgePropertyName property_name = 5;
-    // TODO: There is a possibility of the more than one edge between two nodes
-    //       with the same label but different properties.
+    // note: we do not currently support removing an edge property if another edge with the same label and property between those nodes exist
+    // context: our edges do not currently have ids
   }
 
   message InverseOverlay {

@@ -26,7 +26,7 @@ class DiffGraphProtoSerializer() {
             .setValue(protoValue(value))))
   }
 
-  def serializeInverseGraph(builder: CpgOverlay.Builder, inverseGraph: DiffGraph): () = {
+  def serializeInverseGraph(builder: CpgOverlay.Builder, inverseGraph: DiffGraph): Unit = {
     inverseGraph.iterator.foreach {
       case c: DiffGraph.Change.CreateEdge       => ???
       case DiffGraph.Change.CreateNode(newNode) => ???
