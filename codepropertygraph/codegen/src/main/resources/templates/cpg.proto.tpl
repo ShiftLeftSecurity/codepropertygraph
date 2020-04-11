@@ -156,17 +156,15 @@ message CpgOverlay {
     int64 out_node_key = 1;
     int64 in_node_key = 2;
     CpgStruct.Edge.EdgeType edge_type = 3;
-    // note: we do not currently support removing an edge if another edge with the same label between those nodes exist
-    // context: our edges do not currently have ids
+    bytes propertiesHash = 4; // used to identify edges despite not having edge ids; only set if the edge does have properties
   }
 
   message RemoveEdgeProperty {
     int64 out_node_key = 1;
     int64 in_node_key = 2;
     CpgStruct.Edge.EdgeType edge_type = 3;
+    bytes propertiesHash = 4; // used to identify edges despite not having edge ids; only set if the edge does have properties
     EdgePropertyName property_name = 5;
-    // note: we do not currently support removing an edge property if another edge with the same label and property between those nodes exist
-    // context: our edges do not currently have ids
   }
 
   message InverseOverlay {
