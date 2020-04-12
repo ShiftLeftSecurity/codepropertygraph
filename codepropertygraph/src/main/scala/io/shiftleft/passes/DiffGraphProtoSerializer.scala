@@ -33,13 +33,22 @@ class DiffGraphProtoSerializer() {
     builder.build()
   }
 
-  /*
-  * TODO: WIP
-      case DiffGraph.Change.RemoveNode(nodeId)                    => builder.addRemoveNode(removeNodeProto(nodeId))
-      case DiffGraph.Change.RemoveNodeProperty(_, _) => ???
-      case DiffGraph.Change.RemoveEdge(edge)                      => builder.addRemoveEdge(removeEdgeProto(edge))
-      case DiffGraph.Change.RemoveEdgeProperty(_, _) => ???
+  /**
+    * Create a proto representation of a (potentially unapplied) DiffGraph (which may also be an
+    * The DiffGraph may not (yet) be applied, and it may be an InverseDiffGraph, e.g. as created by {{{DiffGraph.Applier.applyDiff(..., undoable = true) }}}
    */
+  def serialize(diffGraph: DiffGraph): DiffGraphProto = {
+    import DiffGraph.Change._
+    val builder = DiffGraphProto.newBuilder
+    diffGraph.iterator.foreach {
+      case RemoveNode(nodeId) => builder.addRemoveNode(removeNodeProto(nodeId))
+      case RemoveNodeProperty(_, _) => ???
+      case RemoveEdge(edge) => builder.addRemoveEdge(removeEdgeProto(edge))
+      case RemoveEdgeProperty(_, _) => ???
+      case _ => ???
+    }
+    builder.build()
+  }
 
   private def addNode(implicit builder: CpgOverlay.Builder, node: NewNode, appliedDiffGraph: AppliedDiffGraph): Unit = {
     val nodeId = appliedDiffGraph.nodeToGraphId(node)
