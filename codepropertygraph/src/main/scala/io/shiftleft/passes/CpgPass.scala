@@ -3,7 +3,7 @@ package io.shiftleft.passes
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
 import io.shiftleft.SerializedCpg
-import io.shiftleft.proto.cpg.Cpg._
+import io.shiftleft.proto.cpg.Cpg.CpgOverlay
 import java.util
 import java.lang.{Long => JLong}
 

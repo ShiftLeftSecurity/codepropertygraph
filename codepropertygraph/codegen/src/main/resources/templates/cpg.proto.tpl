@@ -123,14 +123,11 @@ message CpgStruct {
   repeated Edge edge = 2;
 }
 
-
-// only used inside CpgOverlay and should probably move in there, but this would be backwards incompatible :(
 message AdditionalNodeProperty {
   int64 node_id = 1;
   CpgStruct.Node.Property property = 2;
 }
 
-// only used inside CpgOverlay and should probably move in there, but this would be backwards incompatible :(
 message AdditionalEdgeProperty {
   int64 edge_id = 1;
   CpgStruct.Edge.Property property = 2;
@@ -139,7 +136,16 @@ message AdditionalEdgeProperty {
   CpgStruct.Edge.EdgeType edge_type = 5;
 }
 
+// Overlays can be stacked onto each other, therefor their node ids must be globally unique.
 message CpgOverlay {
+  repeated CpgStruct.Node node = 1;
+  repeated CpgStruct.Edge edge = 2;
+  repeated AdditionalNodeProperty node_property = 3;
+  repeated AdditionalEdgeProperty edge_property = 4;
+}
+
+// DiffGraphs can be created independently of each other and therefor each one has its own ID space
+message DiffGraph {
   message RemoveNode {
     int64 key = 1;
   }

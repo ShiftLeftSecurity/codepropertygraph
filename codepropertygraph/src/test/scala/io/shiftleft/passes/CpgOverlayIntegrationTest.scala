@@ -41,13 +41,14 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       val overlays = pass1.createApplyAndSerialize().toList
       overlays.size shouldBe 1
       val overlay = overlays.head
-      val inverseOverlay = overlay.getInverseOverlay
+      true shouldBe false
+//      val inverseOverlay = overlay.getInverseOverlay
 
-      println(s"inverseOverlay: $inverseOverlay")
-      println(inverseOverlay.getRemoveEdgeList)
+//      println(s"inverseOverlay: $inverseOverlay")
+//      println(inverseOverlay.getRemoveEdgeList)
 
-      cpg.graph.V.count.head shouldBe 2
-      initialNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass1NewNodeCode)
+//      cpg.graph.V.count.head shouldBe 2
+//      initialNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass1NewNodeCode)
 
     }
   }
