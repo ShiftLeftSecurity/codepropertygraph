@@ -2,7 +2,6 @@ package io.shiftleft.codepropertygraph.cpgloading
 
 import gremlin.scala._
 import io.shiftleft.OverflowDbTestInstance
-import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import io.shiftleft.passes.DiffGraph

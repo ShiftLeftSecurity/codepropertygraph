@@ -269,7 +269,7 @@ object DiffGraph {
           addEdgeProperty(edge, key, value, inverseBuilder)
         case Change.RemoveEdge(edge)                      => edge.remove()
         case Change.RemoveEdgeProperty(edge, propertyKey) => edge.property(propertyKey).remove()
-        case Change.RemoveNode(nodeId)                      => graph.vertices(nodeId).next().remove()
+        case Change.RemoveNode(nodeId)                    => graph.vertices(nodeId).next().remove()
         case Change.RemoveNodeProperty(node, propertyKey) => node.property(propertyKey).remove()
       }
 

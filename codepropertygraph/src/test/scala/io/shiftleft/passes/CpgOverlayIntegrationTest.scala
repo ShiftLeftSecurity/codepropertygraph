@@ -33,6 +33,25 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
     }
   }
 
+  "foo" in {
+    withNewBaseCpg { cpg =>
+      val initialNode = cpg.graph.V.has(NodeKeys.CODE, InitialNodeCode).head.asInstanceOf[nodes.StoredNode]
+      val pass1 = passAddsEdgeTo(initialNode, Pass1NewNodeCode, cpg)
+
+      val overlays = pass1.createApplyAndSerialize().toList
+      overlays.size shouldBe 1
+      val overlay = overlays.head
+      val inverseOverlay = overlay.getInverseOverlay
+
+      println(s"inverseOverlay: $inverseOverlay")
+      println(inverseOverlay.getRemoveEdgeList)
+
+      cpg.graph.V.count.head shouldBe 2
+      initialNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass1NewNodeCode)
+
+    }
+  }
+
   /* like a freshly deserialized cpg.bin.zip without any overlays applied */
   def withNewBaseCpg[T](fun: Cpg => T): T = {
     val graph: ScalaGraph = OverflowDbTestInstance.create
@@ -50,10 +69,6 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       override def properties = Map(NodeKeyNames.CODE -> propValue)
     }
     new CpgPass(cpg) {
-
-      /**
-        * Main method of enhancement - to be implemented by child class
-        **/
       override def run(): Iterator[DiffGraph] = {
         val dstGraph = DiffGraph.newBuilder
         dstGraph.addNode(newNode)

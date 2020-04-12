@@ -7,6 +7,7 @@ import java.lang.{Long => JLong}
 
 import gremlin.scala.Edge
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
+import io.shiftleft.proto.cpg.Cpg.CpgOverlay
 
 /**
   * Provides functionality to serialize diff graphs and add them
@@ -14,35 +15,10 @@ import io.shiftleft.codepropertygraph.generated.nodes.NewNode
   * */
 class DiffGraphProtoSerializer() {
 
-  def addEdgeProperty(builder: CpgOverlay.Builder, appliedDiffGraph: AppliedDiffGraph, edge: Edge, key: String, value: AnyRef): Unit = {
-    builder.addEdgeProperty(
-      AdditionalEdgeProperty.newBuilder()
-        .setOutNodeKey(edge.outVertex().id.asInstanceOf[Long])
-        .setInNodeKey(edge.inVertex().id.asInstanceOf[Long])
-        .setEdgeType(EdgeType.valueOf(edge.label()))
-        .setProperty(
-          CpgStruct.Edge.Property.newBuilder()
-            .setName(EdgePropertyName.valueOf(key))
-            .setValue(protoValue(value))))
-  }
-
-  def serializeInverseGraph(builder: CpgOverlay.Builder, inverseGraph: DiffGraph): Unit = {
-    inverseGraph.iterator.foreach {
-      case c: DiffGraph.Change.CreateEdge       => ???
-      case DiffGraph.Change.CreateNode(newNode) => ???
-      case DiffGraph.Change.SetNodeProperty(node, key, value) => ???
-      case DiffGraph.Change.SetEdgeProperty(edge, key, value) => ???
-      case DiffGraph.Change.RemoveNode(_) => ???
-      case DiffGraph.Change.RemoveNodeProperty(_, _) => ???
-      case DiffGraph.Change.RemoveEdge(_)            => ???
-      case DiffGraph.Change.RemoveEdgeProperty(_, _) => ???
-    }
-  }
-
   /**
     * Generates a serialized graph overlay representing this graph
     * */
-  def serialize(appliedDiffGraph: AppliedDiffGraph, includeInverseGraph: Boolean = false): CpgOverlay = {
+  def serialize(appliedDiffGraph: AppliedDiffGraph, includeInverseGraph: Boolean = true): CpgOverlay = {
     implicit val builder = CpgOverlay.newBuilder()
     implicit val graph = appliedDiffGraph
     val diff = appliedDiffGraph.diffGraph
@@ -53,20 +29,29 @@ class DiffGraphProtoSerializer() {
         addNodeProperty(node.getId, key, value, builder, appliedDiffGraph)
       case DiffGraph.Change.SetEdgeProperty(edge, key, value) =>
         addEdgeProperty(builder, appliedDiffGraph, edge, key, value)
-      case DiffGraph.Change.RemoveNode(_) => ???
+      case DiffGraph.Change.RemoveNode(_)            => ???
       case DiffGraph.Change.RemoveNodeProperty(_, _) => ???
       case DiffGraph.Change.RemoveEdge(_)            => ???
       case DiffGraph.Change.RemoveEdgeProperty(_, _) => ???
     }
-    if (includeInverseGraph) {
-      appliedDiffGraph.inverseDiffGraph.foreach(
-        inverseGraph => serializeInverseGraph(builder, inverseGraph)
-      )
+    if (includeInverseGraph && appliedDiffGraph.inverseDiffGraph.isDefined) {
+      serializeInverseGraph(builder.getInverseOverlayBuilder, appliedDiffGraph.inverseDiffGraph.get)
     }
 
-    val overlay = builder.build()
-    overlay
+    builder.build()
   }
+
+  private def serializeInverseGraph(builder: CpgOverlay.InverseOverlay.Builder, inverseGraph: DiffGraph): Unit =
+    inverseGraph.iterator.foreach {
+      case _: DiffGraph.Change.CreateEdge                         => ???
+      case DiffGraph.Change.CreateNode(newNode)                   => ???
+      case DiffGraph.Change.SetNodeProperty(node, key, value)     => ???
+      case DiffGraph.Change.SetEdgeProperty(edge, key, value)     => ???
+      case DiffGraph.Change.RemoveNode(nodeId)                    => builder.addRemoveNode(removeNodeProto(nodeId))
+      case DiffGraph.Change.RemoveNodeProperty(node, propertyKey) => ???
+      case DiffGraph.Change.RemoveEdge(edge)                      => builder.addRemoveEdge(removeEdgeProto(edge))
+      case DiffGraph.Change.RemoveEdgeProperty(edge, propertyKey) => ???
+    }
 
   private def addNode(implicit builder: CpgOverlay.Builder, node: NewNode, appliedDiffGraph: AppliedDiffGraph): Unit = {
     val nodeId = appliedDiffGraph.nodeToGraphId(node)
@@ -120,6 +105,15 @@ class DiffGraphProtoSerializer() {
     edgeBuilder.build()
   }
 
+  private def removeNodeProto(nodeId: Long) =
+    CpgOverlay.RemoveNode.newBuilder.setKey(nodeId).build
+
+  private def removeEdgeProto(edge: Edge) = {
+    val builder = CpgOverlay.RemoveEdge.newBuilder
+//      .setEdgeType(???)
+    builder.build
+  }
+
   private def nodeProperty(key: String, value: Any) = {
     CpgStruct.Node.Property
       .newBuilder()
@@ -147,6 +141,23 @@ class DiffGraphProtoSerializer() {
         .setProperty(nodeProperty(key, value))
         .build
     )
+  }
+
+  private def addEdgeProperty(builder: CpgOverlay.Builder,
+                              appliedDiffGraph: AppliedDiffGraph,
+                              edge: Edge,
+                              key: String,
+                              value: AnyRef): Unit = {
+    builder.addEdgeProperty(
+      AdditionalEdgeProperty
+        .newBuilder()
+        .setOutNodeKey(edge.outVertex().id.asInstanceOf[Long])
+        .setInNodeKey(edge.inVertex().id.asInstanceOf[Long])
+        .setEdgeType(EdgeType.valueOf(edge.label()))
+        .setProperty(CpgStruct.Edge.Property
+          .newBuilder()
+          .setName(EdgePropertyName.valueOf(key))
+          .setValue(protoValue(value))))
   }
 
   private def protoValue(value: Any): PropertyValue.Builder = {
