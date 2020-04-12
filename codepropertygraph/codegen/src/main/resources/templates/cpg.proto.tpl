@@ -124,11 +124,13 @@ message CpgStruct {
 }
 
 
+// only used inside CpgOverlay and should probably move in there, but this would be backwards incompatible :(
 message AdditionalNodeProperty {
   int64 node_id = 1;
   CpgStruct.Node.Property property = 2;
 }
 
+// only used inside CpgOverlay and should probably move in there, but this would be backwards incompatible :(
 message AdditionalEdgeProperty {
   int64 edge_id = 1;
   CpgStruct.Edge.Property property = 2;
@@ -138,11 +140,6 @@ message AdditionalEdgeProperty {
 }
 
 message CpgOverlay {
-  repeated CpgStruct.Node node = 1;
-  repeated CpgStruct.Edge edge = 2;
-  repeated AdditionalNodeProperty node_property = 3;
-  repeated AdditionalEdgeProperty edge_property = 4;
-
   message RemoveNode {
     int64 key = 1;
   }
@@ -156,28 +153,23 @@ message CpgOverlay {
     int64 out_node_key = 1;
     int64 in_node_key = 2;
     CpgStruct.Edge.EdgeType edge_type = 3;
-    bytes propertiesHash = 4; // used to identify edges despite not having edge ids; only set if the edge does have properties
+    bytes propertiesHash = 4; // used to identify edges (since our edges don't have ids)
   }
 
   message RemoveEdgeProperty {
     int64 out_node_key = 1;
     int64 in_node_key = 2;
     CpgStruct.Edge.EdgeType edge_type = 3;
-    bytes propertiesHash = 4; // used to identify edges despite not having edge ids; only set if the edge does have properties
+    bytes propertiesHash = 4; // used to identify edges (since our edges don't have ids)
     EdgePropertyName property_name = 5;
   }
 
-  message InverseOverlay {
-      repeated CpgStruct.Node node = 1;
-      repeated CpgStruct.Edge edge = 2;
-      repeated AdditionalNodeProperty node_property = 3;
-      repeated AdditionalEdgeProperty edge_property = 4;
-      repeated RemoveNode remove_node = 5;
-      repeated RemoveNodeProperty remove_node_property = 6;
-      repeated RemoveEdge remove_edge = 7;
-      repeated RemoveEdgeProperty remove_edge_property = 8;
-  }
-
-
-  InverseOverlay inverse_overlay = 5;
+  repeated CpgStruct.Node node = 1;
+  repeated CpgStruct.Edge edge = 2;
+  repeated AdditionalNodeProperty node_property = 3;
+  repeated AdditionalEdgeProperty edge_property = 4;
+  repeated RemoveNode remove_node = 5;
+  repeated RemoveNodeProperty remove_node_property = 6;
+  repeated RemoveEdge remove_edge = 7;
+  repeated RemoveEdgeProperty remove_edge_property = 8;
 }
