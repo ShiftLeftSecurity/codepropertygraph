@@ -60,6 +60,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") {
     * from the class name of the pass.
     *
     * @param serializedCpg the destination serialized CPG to add overlays to
+    * @param inverse invert the diffgraph before serializing
     * */
   def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false): Unit = {
     if (serializedCpg.isEmpty) {
@@ -78,6 +79,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") {
 
   /**
     * Execute and create a serialized overlay
+    * @param inverse invert the diffgraph before serializing
     */
   def createApplyAndSerialize(inverse: Boolean = false): Iterator[GeneratedMessageV3] =
     withStartEndTimesLogged {
