@@ -148,8 +148,8 @@ object DiffGraph {
 
       // TODO check if that's the right way around...
       val edge = cpg.scalaGraph.V(outNodeId).outE(edgeLabel).toList.filter(_.inVertex.id == inNodeId) match {
-        case Nil => throw new AssertionError(s"unable to find edge that is supposed to be removed: $removeEdge")
-        case edge :: Nil => edge
+        case Nil           => throw new AssertionError(s"unable to find edge that is supposed to be removed: $removeEdge")
+        case edge :: Nil   => edge
         case multipleEdges => ??? //TODO
       }
 
@@ -303,7 +303,8 @@ object DiffGraph {
         case Change.RemoveEdge(edge)                      => edge.remove()
         case Change.RemoveEdgeProperty(edge, propertyKey) => edge.property(propertyKey).remove()
         case Change.RemoveNode(nodeId)                    => graph.vertices(nodeId).next().remove()
-        case Change.RemoveNodeProperty(nodeId, propertyKey) => graph.vertices(nodeId).next.property(propertyKey).remove()
+        case Change.RemoveNodeProperty(nodeId, propertyKey) =>
+          graph.vertices(nodeId).next.property(propertyKey).remove()
       }
 
     private def addEdgeProperty(edge: Edge, key: String, value: AnyRef, inverseBuilder: DiffGraph.InverseBuilder) = {

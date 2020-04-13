@@ -6,7 +6,22 @@ import java.lang.{Long => JLong}
 
 import gremlin.scala.Edge
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
-import io.shiftleft.proto.cpg.Cpg.{AdditionalEdgeProperty, AdditionalNodeProperty, BoolList, CpgOverlay, CpgStruct, DoubleList, EdgePropertyName, FloatList, IntList, LongList, NodePropertyName, PropertyValue, StringList, DiffGraph => DiffGraphProto}
+import io.shiftleft.proto.cpg.Cpg.{
+  AdditionalEdgeProperty,
+  AdditionalNodeProperty,
+  BoolList,
+  CpgOverlay,
+  CpgStruct,
+  DoubleList,
+  EdgePropertyName,
+  FloatList,
+  IntList,
+  LongList,
+  NodePropertyName,
+  PropertyValue,
+  StringList,
+  DiffGraph => DiffGraphProto
+}
 
 /**
   * Provides functionality to serialize diff graphs and add them
@@ -28,7 +43,8 @@ class DiffGraphProtoSerializer {
       case SetEdgeProperty(edge, key, value) =>
         addEdgeProperty(builder, appliedDiffGraph, edge, key, value)
       case RemoveNode(_) | RemoveNodeProperty(_, _) | RemoveEdge(_) | RemoveEdgeProperty(_, _) =>
-        throw new UnsupportedOperationException("CpgOverlays can be stacked onto each other, therefor they cannot remove anything from the graph")
+        throw new UnsupportedOperationException(
+          "CpgOverlays can be stacked onto each other, therefor they cannot remove anything from the graph")
     }
     builder.build()
   }
@@ -36,15 +52,17 @@ class DiffGraphProtoSerializer {
   /**
     * Create a proto representation of a (potentially unapplied) DiffGraph (which may also be an
     * The DiffGraph may not (yet) be applied, and it may be an InverseDiffGraph, e.g. as created by {{{DiffGraph.Applier.applyDiff(..., undoable = true) }}}
-   */
+    */
   def serialize(diffGraph: DiffGraph): DiffGraphProto = {
     import DiffGraph.Change._
     val builder = DiffGraphProto.newBuilder
     diffGraph.iterator.foreach {
       case RemoveNode(nodeId) => builder.addRemoveNode(removeNodeProto(nodeId))
-      case RemoveEdge(edge) => builder.addRemoveEdge(removeEdgeProto(edge))
-      case RemoveNodeProperty(nodeId, propertyKey) => builder.addRemoveNodeProperty(removeNodePropertyProto(nodeId, propertyKey))
-      case RemoveEdgeProperty(edge, propertyKey) => builder.addRemoveEdgeProperty(removeEdgePropertyProto(edge, propertyKey))
+      case RemoveEdge(edge)   => builder.addRemoveEdge(removeEdgeProto(edge))
+      case RemoveNodeProperty(nodeId, propertyKey) =>
+        builder.addRemoveNodeProperty(removeNodePropertyProto(nodeId, propertyKey))
+      case RemoveEdgeProperty(edge, propertyKey) =>
+        builder.addRemoveEdgeProperty(removeEdgePropertyProto(edge, propertyKey))
       case _ => ???
     }
     builder.build()
@@ -106,11 +124,11 @@ class DiffGraphProtoSerializer {
     DiffGraphProto.RemoveNode.newBuilder.setKey(nodeId).build
 
   private def removeEdgeProto(edge: Edge) =
-     DiffGraphProto.RemoveEdge.newBuilder
-       .setOutNodeKey(edge.outVertex.id.asInstanceOf[Long])
-       .setInNodeKey(edge.inVertex.id.asInstanceOf[Long])
-       .setEdgeType(EdgeType.valueOf(edge.label))
-       .build
+    DiffGraphProto.RemoveEdge.newBuilder
+      .setOutNodeKey(edge.outVertex.id.asInstanceOf[Long])
+      .setInNodeKey(edge.inVertex.id.asInstanceOf[Long])
+      .setEdgeType(EdgeType.valueOf(edge.label))
+      .build
 
   private def removeNodePropertyProto(nodeId: Long, propertyKey: String) =
     DiffGraphProto.RemoveNodeProperty.newBuilder
