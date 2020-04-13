@@ -7,6 +7,7 @@ import gnu.trove.strategy.IdentityHashingStrategy
 import gremlin.scala.{Edge, ScalaGraph}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node, StoredNode}
+import io.shiftleft.proto.cpg.Cpg.{DiffGraph => DiffGraphProto}
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
@@ -132,6 +133,15 @@ object DiffGraph {
     }
   }
 
+  def fromProto(inverseDiffGraphProto: DiffGraphProto): DiffGraph = {
+    val builder = newBuilder
+    inverseDiffGraphProto.getRemoveNodeList.forEach { removeNodeProto =>
+      builder.removeNode(removeNodeProto.getKey)
+    }
+
+    builder.build()
+  }
+
   def newBuilder: Builder = new Builder()
 
   class Builder {
@@ -189,6 +199,8 @@ object DiffGraph {
       buffer += Change.SetNodeProperty(node, key, value)
     def addEdgeProperty(edge: Edge, key: String, value: AnyRef): Unit =
       buffer += Change.SetEdgeProperty(edge, key, value)
+    def removeNode(id: Long): Unit =
+      buffer += Change.RemoveNode(id)
     def removeNode(node: StoredNode): Unit =
       buffer += Change.RemoveNode(node.id.asInstanceOf[Long])
     def removeEdge(edge: Edge): Unit = buffer += Change.RemoveEdge(edge)

@@ -12,7 +12,7 @@ import io.shiftleft.proto.cpg.Cpg.{AdditionalEdgeProperty, AdditionalNodePropert
   * Provides functionality to serialize diff graphs and add them
   * to existing serialized CPGs as graph overlays.
   * */
-class DiffGraphProtoSerializer() {
+class DiffGraphProtoSerializer {
 
   /**
     * Generates a serialized graph overlay representing this graph
@@ -42,9 +42,9 @@ class DiffGraphProtoSerializer() {
     val builder = DiffGraphProto.newBuilder
     diffGraph.iterator.foreach {
       case RemoveNode(nodeId) => builder.addRemoveNode(removeNodeProto(nodeId))
-      case RemoveNodeProperty(_, _) => ???
+      case RemoveNodeProperty(node, propertyKey) => ???
       case RemoveEdge(edge) => builder.addRemoveEdge(removeEdgeProto(edge))
-      case RemoveEdgeProperty(_, _) => ???
+      case RemoveEdgeProperty(node, propertyKey) => ???
       case _ => ???
     }
     builder.build()
