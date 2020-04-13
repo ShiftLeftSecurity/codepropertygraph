@@ -39,42 +39,35 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       val initialNode = cpg.graph.V.has(NodeKeys.CODE, InitialNodeCode).head.asInstanceOf[nodes.StoredNode]
 
       // add a new node
-      val addNodeDiff = DiffGraph.newBuilder
-      addNodeDiff.addNode(new nodes.NewNode with DummyProduct {
-        override def containedNodesByLocalName = ???
-        override def label = NodeTypes.UNKNOWN
-        override def properties = Map.empty
-      })
-      val addNodeInverseDiff = applyThenSerializeAndDeserializeInverseDiffGraph(addNodeDiff.build, cpg)
+      val addNodeInverse = applyDiffAndGetInverse(cpg)(_.addNode(
+        new nodes.NewNode with DummyProduct {
+          override def containedNodesByLocalName = ???
+          override def label = NodeTypes.UNKNOWN
+          override def properties = Map.empty
+        }
+      ))
       cpg.graph.V.count.head shouldBe 2
       val node2 = cpg.graph.V.hasNot(NodeKeys.CODE).head.asInstanceOf[nodes.StoredNode]
 
       // add edge
-      val addEdgeDiff = DiffGraph.newBuilder
-      addEdgeDiff.addEdge(src = initialNode, dst = node2, edgeLabel = edges.ContainsNode.Label)
-      val addEdgeInverseDiff = applyThenSerializeAndDeserializeInverseDiffGraph(addEdgeDiff.build, cpg)
+      val addEdgeInverse = applyDiffAndGetInverse(cpg)(_.addEdge(src = initialNode, dst = node2, edgeLabel = edges.ContainsNode.Label))
       val initialNodeOutEdges = initialNode.outE.toList
       initialNodeOutEdges.size shouldBe 1
 
       // add edge property
-      val addEdgePropertyDiff = DiffGraph.newBuilder
-      addEdgePropertyDiff.addEdgeProperty(initialNodeOutEdges.head, EdgeKeyNames.INDEX, Int.box(1))
-      val addEdgePropertyInverseDiff = applyThenSerializeAndDeserializeInverseDiffGraph(addEdgePropertyDiff.build, cpg)
+      val addEdgePropertyInverse = applyDiffAndGetInverse(cpg)(_.addEdgeProperty(initialNodeOutEdges.head, EdgeKeyNames.INDEX, Int.box(1)))
       initialNode.start.outE.value(EdgeKeyNames.INDEX).toList shouldBe List(1)
 
       // add node property
-      val addNodePropertyDiff = DiffGraph.newBuilder
-      addNodePropertyDiff.addNodeProperty(node2, NodeKeyNames.CODE, "Node2Code")
-      val addNodePropertyInverseDiff = applyThenSerializeAndDeserializeInverseDiffGraph(addNodePropertyDiff.build, cpg)
+      val addNodePropertyInverse = applyDiffAndGetInverse(cpg)(_.addNodeProperty(node2, NodeKeyNames.CODE, "Node2Code"))
       node2.value2(NodeKeys.CODE) shouldBe "Node2Code"
-
 
       // now apply all inverse diffgraphs in the reverse order
       // TODO remove node property
       // TODO remove edge
 
       // remove node
-      DiffGraph.Applier.applyDiff(addNodeInverseDiff, cpg)
+      DiffGraph.Applier.applyDiff(addNodeInverse, cpg)
       cpg.graph.V.count.head shouldBe 1
     }
   }
@@ -89,9 +82,12 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
     finally cpg.close()
   }
 
-  /* apply DiffGraph, get the inverse, serialize and deserialize that one (to verify round-trip works) */
-  def applyThenSerializeAndDeserializeInverseDiffGraph(diffGraph: DiffGraph, cpg: Cpg): DiffGraph = {
-    val applied = DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = true)
+  /* applies DiffGraph, gets the inverse, serializes and deserializes the inverse (to verify round-trip works) */
+  def applyDiffAndGetInverse(cpg: Cpg)(fun: DiffGraph.Builder => Unit): DiffGraph = {
+    val builder = DiffGraph.newBuilder
+    fun(builder)
+    val diff = builder.build
+    val applied = DiffGraph.Applier.applyDiff(diff, cpg, undoable = true)
     val inverse = applied.inverseDiffGraph.get
     val inverseProto = new DiffGraphProtoSerializer().serialize(inverse)
     DiffGraph.fromProto(inverseProto)
