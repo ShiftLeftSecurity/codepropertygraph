@@ -7,7 +7,22 @@ import java.lang.{Long => JLong}
 import com.google.protobuf.ByteString
 import gremlin.scala.Edge
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
-import io.shiftleft.proto.cpg.Cpg.{AdditionalEdgeProperty, AdditionalNodeProperty, BoolList, CpgOverlay, CpgStruct, DoubleList, EdgePropertyName, FloatList, IntList, LongList, NodePropertyName, PropertyValue, StringList, DiffGraph => DiffGraphProto}
+import io.shiftleft.proto.cpg.Cpg.{
+  AdditionalEdgeProperty,
+  AdditionalNodeProperty,
+  BoolList,
+  CpgOverlay,
+  CpgStruct,
+  DoubleList,
+  EdgePropertyName,
+  FloatList,
+  IntList,
+  LongList,
+  NodePropertyName,
+  PropertyValue,
+  StringList,
+  DiffGraph => DiffGraphProto
+}
 
 /**
   * Provides functionality to serialize diff graphs and add them
