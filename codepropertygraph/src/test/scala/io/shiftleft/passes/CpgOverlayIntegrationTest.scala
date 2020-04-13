@@ -33,6 +33,60 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
     }
   }
 
+  "apply cpg pass, serialize the inverse DiffGraph, and apply the inverse to undo" in {
+    withNewBaseCpg { cpg =>
+      cpg.graph.V.count.head shouldBe 1
+      val initialNode = cpg.graph.V.has(NodeKeys.CODE, InitialNodeCode).head.asInstanceOf[nodes.StoredNode]
+
+      // 1) add a new node
+      val addNodeInverse = applyDiffAndGetInverse(cpg)(_.addNode(
+        new nodes.NewNode with DummyProduct {
+          override def containedNodesByLocalName = ???
+          override def label = NodeTypes.UNKNOWN
+          override def properties = Map.empty
+        }
+      ))
+      cpg.graph.V.count.head shouldBe 2
+      val additionalNode = cpg.graph.V.hasNot(NodeKeys.CODE).head.asInstanceOf[nodes.StoredNode]
+
+      // 2) add two edges with the same label but different properties (they'll later be disambiguated by their property hash, since edges don't have IDs
+      val addEdge1Inverse = applyDiffAndGetInverse(cpg)(_.addEdge(
+        src = initialNode, dst = additionalNode, edgeLabel = edges.ContainsNode.Label, properties = Seq(EdgeKeyNames.INDEX -> Int.box(1))))
+      val addEdge2Inverse = applyDiffAndGetInverse(cpg)(_.addEdge(
+        src = initialNode, dst = additionalNode, edgeLabel = edges.ContainsNode.Label, properties = Seq(EdgeKeyNames.INDEX -> Int.box(2))))
+      def initialNodeOutEdges = initialNode.outE.toList
+      initialNodeOutEdges.size shouldBe 2
+
+      // 3) add node property
+      val addNodePropertyInverse = applyDiffAndGetInverse(cpg)(_.addNodeProperty(additionalNode, NodeKeyNames.CODE, "Node2Code"))
+      additionalNode.value2(NodeKeys.CODE) shouldBe "Node2Code"
+
+      // TODO 4) add edge property - not needed for now?
+//      val addEdgePropertyInverse = applyDiffAndGetInverse(cpg)(_.addEdgeProperty(initialNodeOutEdges.head, EdgeKeyNames.INDEX, Int.box(1)))
+//      initialNode.start.outE.value(EdgeKeyNames.INDEX).toList shouldBe List(1)
+
+      // now apply all inverse diffgraphs in the reverse order...
+      // TODO 4) remove edge property - not needed for now?
+//      DiffGraph.Applier.applyDiff(addEdgePropertyInverse, cpg)
+//      initialNode.start.outE.value(EdgeKeyNames.INDEX).toList shouldBe List.empty
+
+      // 3) remove node property
+      DiffGraph.Applier.applyDiff(addNodePropertyInverse, cpg)
+      additionalNode.valueOption(NodeKeys.CODE) shouldBe None
+
+      // 2) remove edges - they don't have ids and are therefor disambiguated by their property hash
+      DiffGraph.Applier.applyDiff(addEdge2Inverse, cpg)
+      initialNodeOutEdges.size shouldBe 1
+      initialNode.outE.value(EdgeKeyNames.INDEX).toList shouldBe List(Int.box(1))
+      DiffGraph.Applier.applyDiff(addEdge1Inverse, cpg)
+      initialNodeOutEdges.size shouldBe 0
+
+      // 1) remove node
+      DiffGraph.Applier.applyDiff(addNodeInverse, cpg)
+      cpg.graph.V.count.head shouldBe 1
+    }
+  }
+
   /* like a freshly deserialized cpg.bin.zip without any overlays applied */
   def withNewBaseCpg[T](fun: Cpg => T): T = {
     val graph: ScalaGraph = OverflowDbTestInstance.create
@@ -43,6 +97,17 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
     finally cpg.close()
   }
 
+  /* applies DiffGraph, gets the inverse, serializes and deserializes the inverse (to verify round-trip works) */
+  def applyDiffAndGetInverse(cpg: Cpg)(fun: DiffGraph.Builder => Unit): DiffGraph = {
+    val builder = DiffGraph.newBuilder
+    fun(builder)
+    val diff = builder.build
+    val applied = DiffGraph.Applier.applyDiff(diff, cpg, undoable = true)
+    val inverse = applied.inverseDiffGraph.get
+    val inverseProto = new DiffGraphProtoSerializer().serialize(inverse)
+    DiffGraph.fromProto(inverseProto, cpg)
+  }
+
   def passAddsEdgeTo(from: nodes.StoredNode, propValue: String, cpg: Cpg): CpgPass = {
     val newNode = new nodes.NewNode with DummyProduct {
       override def containedNodesByLocalName = ???
@@ -50,10 +115,6 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       override def properties = Map(NodeKeyNames.CODE -> propValue)
     }
     new CpgPass(cpg) {
-
-      /**
-        * Main method of enhancement - to be implemented by child class
-        **/
       override def run(): Iterator[DiffGraph] = {
         val dstGraph = DiffGraph.newBuilder
         dstGraph.addNode(newNode)

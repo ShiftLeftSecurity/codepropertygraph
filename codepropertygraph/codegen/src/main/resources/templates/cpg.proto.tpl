@@ -123,7 +123,6 @@ message CpgStruct {
   repeated Edge edge = 2;
 }
 
-
 message AdditionalNodeProperty {
   int64 node_id = 1;
   CpgStruct.Node.Property property = 2;
@@ -132,11 +131,53 @@ message AdditionalNodeProperty {
 message AdditionalEdgeProperty {
   int64 edge_id = 1;
   CpgStruct.Edge.Property property = 2;
+  int64 out_node_key = 3;
+  int64 in_node_key = 4;
+  CpgStruct.Edge.EdgeType edge_type = 5;
 }
 
+// Overlays can be stacked onto each other, therefor their node ids must be globally unique.
 message CpgOverlay {
   repeated CpgStruct.Node node = 1;
   repeated CpgStruct.Edge edge = 2;
   repeated AdditionalNodeProperty node_property = 3;
   repeated AdditionalEdgeProperty edge_property = 4;
+}
+
+// DiffGraphs can be created independently of each other and therefor when _adding_ nodes|edges,
+// each DiffGraph has its own ID space. However, when removing nodes|edges, the nodeIds refer to the
+// globally unique graph id space.
+message DiffGraph {
+  message RemoveNode {
+    int64 key = 1;
+  }
+
+  message RemoveNodeProperty {
+    int64 key = 1;
+    NodePropertyName name = 2;
+  }
+
+  message RemoveEdge {
+    int64 out_node_key = 1;
+    int64 in_node_key = 2;
+    CpgStruct.Edge.EdgeType edge_type = 3;
+    bytes propertiesHash = 4; // used to identify edges (since our edges don't have ids)
+  }
+
+  message RemoveEdgeProperty {
+    int64 out_node_key = 1;
+    int64 in_node_key = 2;
+    CpgStruct.Edge.EdgeType edge_type = 3;
+    bytes propertiesHash = 4; // used to identify edges (since our edges don't have ids)
+    EdgePropertyName property_name = 5;
+  }
+
+  repeated CpgStruct.Node node = 1;
+  repeated CpgStruct.Edge edge = 2;
+  repeated AdditionalNodeProperty node_property = 3;
+  repeated AdditionalEdgeProperty edge_property = 4;
+  repeated RemoveNode remove_node = 5;
+  repeated RemoveNodeProperty remove_node_property = 6;
+  repeated RemoveEdge remove_edge = 7;
+  repeated RemoveEdgeProperty remove_edge_property = 8;
 }

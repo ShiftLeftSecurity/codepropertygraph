@@ -5,8 +5,8 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
 import io.shiftleft.semanticcpg.language._
 
 object ControlStructure {
-  val secondChildIndex = new Integer(2)
-  val thirdChildIndex = new Integer(3)
+  val secondChildIndex = Int.box(2)
+  val thirdChildIndex = Int.box(3)
 }
 
 class ControlStructure(val wrapped: NodeSteps[nodes.ControlStructure]) extends AnyVal {
