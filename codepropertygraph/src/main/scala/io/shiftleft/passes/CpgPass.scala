@@ -7,6 +7,7 @@ import io.shiftleft.proto.cpg.Cpg.CpgOverlay
 import java.util
 import java.lang.{Long => JLong}
 
+import com.google.protobuf.GeneratedMessageV3
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Vertex
 
@@ -60,11 +61,11 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") {
     *
     * @param serializedCpg the destination serialized CPG to add overlays to
     * */
-  def createApplySerializeAndStore(serializedCpg: SerializedCpg): Unit = {
+  def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false): Unit = {
     if (serializedCpg.isEmpty) {
       createAndApply()
     } else {
-      val overlays = createApplyAndSerialize()
+      val overlays = createApplyAndSerialize(inverse)
       overlays.zipWithIndex.foreach {
         case (overlay, index) => {
           if (overlay.getSerializedSize > 0) {
@@ -78,11 +79,15 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") {
   /**
     * Execute and create a serialized overlay
     */
-  def createApplyAndSerialize(): Iterator[CpgOverlay] =
+  def createApplyAndSerialize(inverse: Boolean = false): Iterator[GeneratedMessageV3] =
     withStartEndTimesLogged {
       val overlays = run().map { diffGraph =>
-        val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg)
-        new DiffGraphProtoSerializer().serialize(appliedDiffGraph)
+        val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse)
+        if (inverse) {
+          new DiffGraphProtoSerializer().serialize(appliedDiffGraph.inverseDiffGraph.get)
+        } else {
+          new DiffGraphProtoSerializer().serialize(appliedDiffGraph)
+        }
       }
       overlays
     }

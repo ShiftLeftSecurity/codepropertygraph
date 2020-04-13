@@ -5,6 +5,7 @@ import java.net.{URI, URISyntaxException}
 import java.nio.file.{FileSystem, FileSystems, Files}
 import java.util
 
+import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.proto.cpg.Cpg
 
 class SerializedCpg extends AutoCloseable {
@@ -41,7 +42,7 @@ class SerializedCpg extends AutoCloseable {
     * Add overlay graph named `name` to the zip file
     **/
   @throws[IOException]
-  def addOverlay(overlay: Cpg.CpgOverlay, name: String): Unit = {
+  def addOverlay(overlay: GeneratedMessageV3, name: String): Unit = {
     if (!isEmpty) {
       val pathInZip = zipFileSystem.getPath(s"${counter}_${name}")
       counter += 1
