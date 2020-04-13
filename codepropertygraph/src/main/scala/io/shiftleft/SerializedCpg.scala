@@ -6,7 +6,6 @@ import java.nio.file.{FileSystem, FileSystems, Files}
 import java.util
 
 import com.google.protobuf.GeneratedMessageV3
-import io.shiftleft.proto.cpg.Cpg
 
 class SerializedCpg extends AutoCloseable {
 

@@ -60,8 +60,11 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") {
     *
     * @param serializedCpg the destination serialized CPG to add overlays to
     * @param inverse invert the diffgraph before serializing
+    * @param prefix a prefix to add to the output name
     * */
-  def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false): Unit = {
+  def createApplySerializeAndStore(serializedCpg: SerializedCpg,
+                                   inverse: Boolean = false,
+                                   prefix: String = ""): Unit = {
     if (serializedCpg.isEmpty) {
       createAndApply()
     } else {
@@ -69,7 +72,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") {
       overlays.zipWithIndex.foreach {
         case (overlay, index) => {
           if (overlay.getSerializedSize > 0) {
-            serializedCpg.addOverlay(overlay, outputName + "_" + index)
+            serializedCpg.addOverlay(overlay, prefix + "_" + outputName + "_" + index)
           }
         }
       }
