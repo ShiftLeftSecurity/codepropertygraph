@@ -35,21 +35,27 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
 
   "apply cpg pass, serialize the inverse DiffGraph, and apply the inverse to undo" in {
     withNewBaseCpg { cpg =>
-      val initialNode = cpg.graph.V.has(NodeKeys.CODE, InitialNodeCode).head.asInstanceOf[nodes.StoredNode]
-      val pass1 = passAddsEdgeTo(initialNode, Pass1NewNodeCode, cpg)
-
-      val diffGraphs = pass1.run()
-      diffGraphs.size shouldBe 1
-
-      val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraphs.next, cpg, undoable = true)
-      cpg.graph.V.count.head shouldBe 2
-      initialNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass1NewNodeCode)
-
-      val inverseDiffGraph = appliedDiffGraph.inverseDiffGraph.get
-      val inverseDiffGraphProto = new DiffGraphProtoSerializer().serialize(inverseDiffGraph)
-      val inverseDiffGraphDeserialized = DiffGraph.fromProto(inverseDiffGraphProto)
-      DiffGraph.Applier.applyDiff(inverseDiffGraphDeserialized, cpg)
       cpg.graph.V.count.head shouldBe 1
+      val initialNode = cpg.graph.V.has(NodeKeys.CODE, InitialNodeCode).head.asInstanceOf[nodes.StoredNode]
+
+      // add a new node
+      val addNodeDiffGraph = DiffGraph.newBuilder
+      addNodeDiffGraph.addNode(new nodes.NewNode with DummyProduct {
+        override def containedNodesByLocalName = ???
+        override def label = NodeTypes.UNKNOWN
+        override def properties = Map.empty
+      })
+      val addNodeInverseDG = applyThenSerializeAndDeserializeInverseDiffGraph(addNodeDiffGraph.build, cpg)
+      cpg.graph.V.count.head shouldBe 2
+
+      // remove additional node again
+      DiffGraph.Applier.applyDiff(addNodeInverseDG, cpg)
+      cpg.graph.V.count.head shouldBe 1
+
+      // TODO
+//      initialNode.start.out.count.head shouldBe 1
+
+//      initialNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass1NewNodeCode)
     }
   }
 
@@ -61,6 +67,14 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
     val cpg = Cpg(graph.asJava())
     try fun(cpg)
     finally cpg.close()
+  }
+
+  /* apply DiffGraph, get the inverse, serialize and deserialize that one (to verify round-trip works) */
+  def applyThenSerializeAndDeserializeInverseDiffGraph(diffGraph: DiffGraph, cpg: Cpg): DiffGraph = {
+    val applied = DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = true)
+    val inverse = applied.inverseDiffGraph.get
+    val inverseProto = new DiffGraphProtoSerializer().serialize(inverse)
+    DiffGraph.fromProto(inverseProto)
   }
 
   def passAddsEdgeTo(from: nodes.StoredNode, propValue: String, cpg: Cpg): CpgPass = {
