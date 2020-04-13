@@ -5,7 +5,7 @@ import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
 import java.lang.{Long => JLong}
 
 import gremlin.scala.Edge
-import io.shiftleft.codepropertygraph.generated.nodes.NewNode
+import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import io.shiftleft.proto.cpg.Cpg.{AdditionalEdgeProperty, AdditionalNodeProperty, BoolList, CpgOverlay, CpgStruct, DoubleList, EdgePropertyName, FloatList, IntList, LongList, NodePropertyName, PropertyValue, StringList, DiffGraph => DiffGraphProto}
 
 /**
@@ -42,9 +42,9 @@ class DiffGraphProtoSerializer {
     val builder = DiffGraphProto.newBuilder
     diffGraph.iterator.foreach {
       case RemoveNode(nodeId) => builder.addRemoveNode(removeNodeProto(nodeId))
-      case RemoveNodeProperty(node, propertyKey) => ???
       case RemoveEdge(edge) => builder.addRemoveEdge(removeEdgeProto(edge))
-      case RemoveEdgeProperty(node, propertyKey) => ???
+      case RemoveNodeProperty(node, propertyKey) => builder.addRemoveNodeProperty(removeNodePropertyProto(node.getId, propertyKey))
+      case RemoveEdgeProperty(edge, propertyKey) => builder.addRemoveEdgeProperty(removeEdgePropertyProto(edge, propertyKey))
       case _ => ???
     }
     builder.build()
@@ -105,11 +105,21 @@ class DiffGraphProtoSerializer {
   private def removeNodeProto(nodeId: Long) =
     DiffGraphProto.RemoveNode.newBuilder.setKey(nodeId).build
 
-  private def removeEdgeProto(edge: Edge) = {
-    val builder = DiffGraphProto.RemoveEdge.newBuilder
+  private def removeEdgeProto(edge: Edge) =
+     DiffGraphProto.RemoveEdge.newBuilder
 //      .setEdgeType(???)
-    builder.build
-  }
+    .build
+
+  private def removeNodePropertyProto(nodeId: Long, propertyKey: String) =
+    DiffGraphProto.RemoveNodeProperty.newBuilder
+      .setKey(nodeId)
+      .setName(NodePropertyName.valueOf(propertyKey))
+      .build
+
+  private def removeEdgePropertyProto(edge: Edge, propertyKey: String) =
+    DiffGraphProto.RemoveEdgeProperty.newBuilder
+//      .set
+      .build
 
   private def nodeProperty(key: String, value: Any) = {
     CpgStruct.Node.Property
