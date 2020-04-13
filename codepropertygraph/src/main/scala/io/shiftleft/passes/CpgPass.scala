@@ -3,10 +3,10 @@ package io.shiftleft.passes
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
 import io.shiftleft.SerializedCpg
-import io.shiftleft.proto.cpg.Cpg.CpgOverlay
 import java.util
 import java.lang.{Long => JLong}
 
+import com.google.protobuf.GeneratedMessageV3
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Vertex
 
@@ -59,16 +59,20 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") {
     * from the class name of the pass.
     *
     * @param serializedCpg the destination serialized CPG to add overlays to
+    * @param inverse invert the diffgraph before serializing
+    * @param prefix a prefix to add to the output name
     * */
-  def createApplySerializeAndStore(serializedCpg: SerializedCpg): Unit = {
+  def createApplySerializeAndStore(serializedCpg: SerializedCpg,
+                                   inverse: Boolean = false,
+                                   prefix: String = ""): Unit = {
     if (serializedCpg.isEmpty) {
       createAndApply()
     } else {
-      val overlays = createApplyAndSerialize()
+      val overlays = createApplyAndSerialize(inverse)
       overlays.zipWithIndex.foreach {
         case (overlay, index) => {
           if (overlay.getSerializedSize > 0) {
-            serializedCpg.addOverlay(overlay, outputName + "_" + index)
+            serializedCpg.addOverlay(overlay, prefix + "_" + outputName + "_" + index)
           }
         }
       }
@@ -77,12 +81,17 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") {
 
   /**
     * Execute and create a serialized overlay
+    * @param inverse invert the diffgraph before serializing
     */
-  def createApplyAndSerialize(): Iterator[CpgOverlay] =
+  def createApplyAndSerialize(inverse: Boolean = false): Iterator[GeneratedMessageV3] =
     withStartEndTimesLogged {
       val overlays = run().map { diffGraph =>
-        val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg)
-        new DiffGraphProtoSerializer().serialize(appliedDiffGraph)
+        val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse)
+        if (inverse) {
+          new DiffGraphProtoSerializer().serialize(appliedDiffGraph.inverseDiffGraph.get)
+        } else {
+          new DiffGraphProtoSerializer().serialize(appliedDiffGraph)
+        }
       }
       overlays
     }
