@@ -108,7 +108,7 @@ object DiffGraph {
     }
 
     final case class RemoveNode(nodeId: Long) extends Change
-    final case class RemoveNodeProperty(node: StoredNode, propertyKey: String) extends Change
+    final case class RemoveNodeProperty(nodeId: Long, propertyKey: String) extends Change
     final case class RemoveEdge(edge: Edge) extends Change
     final case class RemoveEdgeProperty(edge: Edge, propertyKey: String) extends Change
     final case class CreateNode(node: NewNode) extends Change
@@ -133,10 +133,31 @@ object DiffGraph {
     }
   }
 
-  def fromProto(inverseDiffGraphProto: DiffGraphProto): DiffGraph = {
+  def fromProto(inverseDiffGraphProto: DiffGraphProto, cpg: Cpg): DiffGraph = {
     val builder = newBuilder
     inverseDiffGraphProto.getRemoveNodeList.forEach { removeNodeProto =>
       builder.removeNode(removeNodeProto.getKey)
+    }
+    inverseDiffGraphProto.getRemoveNodePropertyList.forEach { removeNodePropertyProto =>
+      builder.removeNodeProperty(removeNodePropertyProto.getKey, removeNodePropertyProto.getName.toString)
+    }
+    inverseDiffGraphProto.getRemoveEdgeList.forEach { removeEdge =>
+      val outNodeId = removeEdge.getOutNodeKey
+      val inNodeId = removeEdge.getInNodeKey
+      val edgeLabel = removeEdge.getEdgeType.toString
+
+      // TODO check if that's the right way around...
+      val edge = cpg.scalaGraph.V(outNodeId).outE(edgeLabel).toList.filter(_.inVertex.id == inNodeId) match {
+        case Nil => throw new AssertionError(s"unable to find edge that is supposed to be removed: $removeEdge")
+        case edge :: Nil => edge
+        case multipleEdges => ??? //TODO
+      }
+
+      builder.removeEdge(edge)
+    }
+    inverseDiffGraphProto.getRemoveEdgePropertyList.forEach { removeEdgeProperty =>
+//      ???
+      //      builder.removeEdgeProperty()
     }
 
     builder.build()
@@ -204,8 +225,8 @@ object DiffGraph {
     def removeNode(node: StoredNode): Unit =
       buffer += Change.RemoveNode(node.id.asInstanceOf[Long])
     def removeEdge(edge: Edge): Unit = buffer += Change.RemoveEdge(edge)
-    def removeNodeProperty(node: StoredNode, propertyKey: String): Unit =
-      buffer += Change.RemoveNodeProperty(node, propertyKey)
+    def removeNodeProperty(nodeId: Long, propertyKey: String): Unit =
+      buffer += Change.RemoveNodeProperty(nodeId, propertyKey)
     def removeEdgeProperty(edge: Edge, propertyKey: String): Unit =
       buffer += Change.RemoveEdgeProperty(edge, propertyKey)
   }
@@ -227,7 +248,7 @@ object DiffGraph {
         if (prop.isPresent)
           builder.addNodeProperty(node, propertyKey, node.property(propertyKey).value())
         else
-          builder.removeNodeProperty(node, propertyKey)
+          builder.removeNodeProperty(node.getId, propertyKey)
       }
       def onBeforeEdgePropertyChange(edge: Edge, propertyKey: String) = {
         val prop = edge.property(propertyKey)
@@ -282,7 +303,7 @@ object DiffGraph {
         case Change.RemoveEdge(edge)                      => edge.remove()
         case Change.RemoveEdgeProperty(edge, propertyKey) => edge.property(propertyKey).remove()
         case Change.RemoveNode(nodeId)                    => graph.vertices(nodeId).next().remove()
-        case Change.RemoveNodeProperty(node, propertyKey) => node.property(propertyKey).remove()
+        case Change.RemoveNodeProperty(nodeId, propertyKey) => graph.vertices(nodeId).next.property(propertyKey).remove()
       }
 
     private def addEdgeProperty(edge: Edge, key: String, value: AnyRef, inverseBuilder: DiffGraph.InverseBuilder) = {

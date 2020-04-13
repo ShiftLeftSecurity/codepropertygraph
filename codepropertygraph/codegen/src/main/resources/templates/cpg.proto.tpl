@@ -144,7 +144,9 @@ message CpgOverlay {
   repeated AdditionalEdgeProperty edge_property = 4;
 }
 
-// DiffGraphs can be created independently of each other and therefor each one has its own ID space
+// DiffGraphs can be created independently of each other and therefor when _adding_ nodes|edges,
+// each DiffGraph has its own ID space. However, when removing nodes|edges, the nodeIds refer to the
+// globally unique graph id space.
 message DiffGraph {
   message RemoveNode {
     int64 key = 1;

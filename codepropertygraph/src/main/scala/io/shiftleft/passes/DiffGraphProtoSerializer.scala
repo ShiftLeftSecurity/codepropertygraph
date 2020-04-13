@@ -43,7 +43,7 @@ class DiffGraphProtoSerializer {
     diffGraph.iterator.foreach {
       case RemoveNode(nodeId) => builder.addRemoveNode(removeNodeProto(nodeId))
       case RemoveEdge(edge) => builder.addRemoveEdge(removeEdgeProto(edge))
-      case RemoveNodeProperty(node, propertyKey) => builder.addRemoveNodeProperty(removeNodePropertyProto(node.getId, propertyKey))
+      case RemoveNodeProperty(nodeId, propertyKey) => builder.addRemoveNodeProperty(removeNodePropertyProto(nodeId, propertyKey))
       case RemoveEdgeProperty(edge, propertyKey) => builder.addRemoveEdgeProperty(removeEdgePropertyProto(edge, propertyKey))
       case _ => ???
     }
@@ -107,8 +107,10 @@ class DiffGraphProtoSerializer {
 
   private def removeEdgeProto(edge: Edge) =
      DiffGraphProto.RemoveEdge.newBuilder
-//      .setEdgeType(???)
-    .build
+       .setOutNodeKey(edge.outVertex.id.asInstanceOf[Long])
+       .setInNodeKey(edge.inVertex.id.asInstanceOf[Long])
+       .setEdgeType(EdgeType.valueOf(edge.label))
+       .build
 
   private def removeNodePropertyProto(nodeId: Long, propertyKey: String) =
     DiffGraphProto.RemoveNodeProperty.newBuilder
@@ -118,7 +120,10 @@ class DiffGraphProtoSerializer {
 
   private def removeEdgePropertyProto(edge: Edge, propertyKey: String) =
     DiffGraphProto.RemoveEdgeProperty.newBuilder
-//      .set
+      .setOutNodeKey(edge.outVertex.id.asInstanceOf[Long])
+      .setInNodeKey(edge.inVertex.id.asInstanceOf[Long])
+      .setEdgeType(EdgeType.valueOf(edge.label))
+      .setPropertyName(EdgePropertyName.valueOf(propertyKey))
       .build
 
   private def nodeProperty(key: String, value: Any) = {

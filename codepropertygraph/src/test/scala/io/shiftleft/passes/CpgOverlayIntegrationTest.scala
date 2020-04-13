@@ -47,23 +47,26 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
         }
       ))
       cpg.graph.V.count.head shouldBe 2
-      val node2 = cpg.graph.V.hasNot(NodeKeys.CODE).head.asInstanceOf[nodes.StoredNode]
+      val additionalNode = cpg.graph.V.hasNot(NodeKeys.CODE).head.asInstanceOf[nodes.StoredNode]
 
       // add edge
-      val addEdgeInverse = applyDiffAndGetInverse(cpg)(_.addEdge(src = initialNode, dst = node2, edgeLabel = edges.ContainsNode.Label))
+      val addEdgeInverse = applyDiffAndGetInverse(cpg)(_.addEdge(src = initialNode, dst = additionalNode, edgeLabel = edges.ContainsNode.Label))
       val initialNodeOutEdges = initialNode.outE.toList
       initialNodeOutEdges.size shouldBe 1
 
       // add edge property
-      val addEdgePropertyInverse = applyDiffAndGetInverse(cpg)(_.addEdgeProperty(initialNodeOutEdges.head, EdgeKeyNames.INDEX, Int.box(1)))
-      initialNode.start.outE.value(EdgeKeyNames.INDEX).toList shouldBe List(1)
+//      val addEdgePropertyInverse = applyDiffAndGetInverse(cpg)(_.addEdgeProperty(initialNodeOutEdges.head, EdgeKeyNames.INDEX, Int.box(1)))
+//      initialNode.start.outE.value(EdgeKeyNames.INDEX).toList shouldBe List(1)
 
       // add node property
-      val addNodePropertyInverse = applyDiffAndGetInverse(cpg)(_.addNodeProperty(node2, NodeKeyNames.CODE, "Node2Code"))
-      node2.value2(NodeKeys.CODE) shouldBe "Node2Code"
+//      val addNodePropertyInverse = applyDiffAndGetInverse(cpg)(_.addNodeProperty(additionalNode, NodeKeyNames.CODE, "Node2Code"))
+//      additionalNode.value2(NodeKeys.CODE) shouldBe "Node2Code"
 
-      // now apply all inverse diffgraphs in the reverse order
-      // TODO remove node property
+      // now apply all inverse diffgraphs in the reverse order...
+      // remove node property
+//      DiffGraph.Applier.applyDiff(addNodePropertyInverse, cpg)
+//      additionalNode.valueOption(NodeKeys.CODE) shouldBe None
+
       // TODO remove edge
 
       // remove node
@@ -90,7 +93,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
     val applied = DiffGraph.Applier.applyDiff(diff, cpg, undoable = true)
     val inverse = applied.inverseDiffGraph.get
     val inverseProto = new DiffGraphProtoSerializer().serialize(inverse)
-    DiffGraph.fromProto(inverseProto)
+    DiffGraph.fromProto(inverseProto, cpg)
   }
 
   def passAddsEdgeTo(from: nodes.StoredNode, propValue: String, cpg: Cpg): CpgPass = {
