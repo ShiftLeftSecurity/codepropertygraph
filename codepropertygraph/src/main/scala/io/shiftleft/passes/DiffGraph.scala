@@ -317,7 +317,6 @@ object DiffGraph {
                                 value: AnyRef,
                                 inverseBuilder: DiffGraph.InverseBuilder) = {
       inverseBuilder.onBeforeNodePropertyChange(node, key)
-      println("addNodeProperty", key, value)
       node.property(Cardinality.single, key, value)
     }
 

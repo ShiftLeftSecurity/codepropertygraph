@@ -38,7 +38,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       cpg.graph.V.count.head shouldBe 1
       val initialNode = cpg.graph.V.has(NodeKeys.CODE, InitialNodeCode).head.asInstanceOf[nodes.StoredNode]
 
-      // add a new node
+      // 1a) add a new node
       val addNodeInverse = applyDiffAndGetInverse(cpg)(_.addNode(
         new nodes.NewNode with DummyProduct {
           override def containedNodesByLocalName = ???
@@ -49,27 +49,31 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       cpg.graph.V.count.head shouldBe 2
       val additionalNode = cpg.graph.V.hasNot(NodeKeys.CODE).head.asInstanceOf[nodes.StoredNode]
 
-      // add edge
+      // 2a) add edge
       val addEdgeInverse = applyDiffAndGetInverse(cpg)(_.addEdge(src = initialNode, dst = additionalNode, edgeLabel = edges.ContainsNode.Label))
       val initialNodeOutEdges = initialNode.outE.toList
       initialNodeOutEdges.size shouldBe 1
 
-      // add edge property
+      // 3a) add node property
+      val addNodePropertyInverse = applyDiffAndGetInverse(cpg)(_.addNodeProperty(additionalNode, NodeKeyNames.CODE, "Node2Code"))
+      additionalNode.value2(NodeKeys.CODE) shouldBe "Node2Code"
+
+      // TODO 4a) add edge property - not needed for now?
 //      val addEdgePropertyInverse = applyDiffAndGetInverse(cpg)(_.addEdgeProperty(initialNodeOutEdges.head, EdgeKeyNames.INDEX, Int.box(1)))
 //      initialNode.start.outE.value(EdgeKeyNames.INDEX).toList shouldBe List(1)
 
-      // add node property
-//      val addNodePropertyInverse = applyDiffAndGetInverse(cpg)(_.addNodeProperty(additionalNode, NodeKeyNames.CODE, "Node2Code"))
-//      additionalNode.value2(NodeKeys.CODE) shouldBe "Node2Code"
-
       // now apply all inverse diffgraphs in the reverse order...
-      // remove node property
-//      DiffGraph.Applier.applyDiff(addNodePropertyInverse, cpg)
-//      additionalNode.valueOption(NodeKeys.CODE) shouldBe None
+      // TODO 4b) remove edge property - not needed for now?
+//      DiffGraph.Applier.applyDiff(addEdgePropertyInverse, cpg)
+//      initialNode.start.outE.value(EdgeKeyNames.INDEX).toList shouldBe List.empty
 
-      // TODO remove edge
+      // 3b) remove node property
+      DiffGraph.Applier.applyDiff(addNodePropertyInverse, cpg)
+      additionalNode.valueOption(NodeKeys.CODE) shouldBe None
 
-      // remove node
+      // TODO 2b) remove edge
+
+      // 1b) remove node
       DiffGraph.Applier.applyDiff(addNodeInverse, cpg)
       cpg.graph.V.count.head shouldBe 1
     }
