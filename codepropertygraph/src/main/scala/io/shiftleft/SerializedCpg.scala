@@ -54,8 +54,10 @@ class SerializedCpg extends AutoCloseable {
 
   @throws[IOException]
   def addOverlay(overlays: Iterator[GeneratedMessageV3], name: String): Unit = {
-    overlays.zipWithIndex.foreach {
-      case (overlay, i) => addOverlay(overlay, name + "_" + i)
+    if (!isEmpty) {
+      overlays.zipWithIndex.foreach {
+        case (overlay, i) => addOverlay(overlay, name + "_" + i)
+      }
     }
   }
 
