@@ -81,7 +81,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") {
   def createApplyAndSerialize(): Iterator[CpgOverlay] =
     withStartEndTimesLogged {
       val overlays = run().map { diffGraph =>
-        val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = true)
+        val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg)
         new DiffGraphProtoSerializer().serialize(appliedDiffGraph)
       }
       overlays
