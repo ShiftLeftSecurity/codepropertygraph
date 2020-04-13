@@ -1,5 +1,6 @@
 package io.shiftleft.passes
 
+import java.security.MessageDigest
 import java.util
 
 import gnu.trove.set.hash.TCustomHashSet
@@ -146,21 +147,33 @@ object DiffGraph {
       val inNodeId = removeEdge.getInNodeKey
       val edgeLabel = removeEdge.getEdgeType.toString
 
-      // TODO check if that's the right way around...
       val edge = cpg.scalaGraph.V(outNodeId).outE(edgeLabel).toList.filter(_.inVertex.id == inNodeId) match {
-        case Nil           => throw new AssertionError(s"unable to find edge that is supposed to be removed: $removeEdge")
         case edge :: Nil   => edge
-        case multipleEdges => ??? //TODO
+        case Nil           => throw new AssertionError(s"unable to find edge that is supposed to be removed: $removeEdge")
+        case candidates => // found multiple edges - try to disambiguate via propertiesHash
+          val wantedPropertiesHash: List[Byte] = removeEdge.getPropertiesHash.toByteArray.toList
+          candidates.filter(edge => propertiesHash(edge).toList == wantedPropertiesHash) match {
+            case edge :: Nil   => edge
+            case Nil           => throw new AssertionError(s"unable to find edge that is supposed to be removed: $removeEdge. n.b. before filtering on propertiesHash, multiple candidates have been found: $candidates")
+            case candidates => throw new AssertionError(s"unable to disambiguate the edge to be removed, since multiple edges match the filter conditions of $removeEdge. Candidates=$candidates")
+          }
       }
 
       builder.removeEdge(edge)
     }
     inverseDiffGraphProto.getRemoveEdgePropertyList.forEach { removeEdgeProperty =>
-//      ???
-      //      builder.removeEdgeProperty()
+//      TODO impl
     }
 
     builder.build()
+  }
+
+  def propertiesHash(edge: Edge): Array[Byte] = {
+    import scala.jdk.CollectionConverters._
+    val propertiesAsString = edge.properties[Any]().asScala.collect {
+      case prop if prop.isPresent => prop.key -> prop.value
+    }.toList.sortBy(_._1).mkString
+    MessageDigest.getInstance("MD5").digest(propertiesAsString.getBytes)
   }
 
   def newBuilder: Builder = new Builder()

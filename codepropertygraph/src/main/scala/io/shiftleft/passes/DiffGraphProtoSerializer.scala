@@ -4,24 +4,10 @@ import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
 import java.lang.{Long => JLong}
 
+import com.google.protobuf.ByteString
 import gremlin.scala.Edge
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
-import io.shiftleft.proto.cpg.Cpg.{
-  AdditionalEdgeProperty,
-  AdditionalNodeProperty,
-  BoolList,
-  CpgOverlay,
-  CpgStruct,
-  DoubleList,
-  EdgePropertyName,
-  FloatList,
-  IntList,
-  LongList,
-  NodePropertyName,
-  PropertyValue,
-  StringList,
-  DiffGraph => DiffGraphProto
-}
+import io.shiftleft.proto.cpg.Cpg.{AdditionalEdgeProperty, AdditionalNodeProperty, BoolList, CpgOverlay, CpgStruct, DoubleList, EdgePropertyName, FloatList, IntList, LongList, NodePropertyName, PropertyValue, StringList, DiffGraph => DiffGraphProto}
 
 /**
   * Provides functionality to serialize diff graphs and add them
@@ -128,6 +114,7 @@ class DiffGraphProtoSerializer {
       .setOutNodeKey(edge.outVertex.id.asInstanceOf[Long])
       .setInNodeKey(edge.inVertex.id.asInstanceOf[Long])
       .setEdgeType(EdgeType.valueOf(edge.label))
+      .setPropertiesHash(ByteString.copyFrom(DiffGraph.propertiesHash(edge)))
       .build
 
   private def removeNodePropertyProto(nodeId: Long, propertyKey: String) =

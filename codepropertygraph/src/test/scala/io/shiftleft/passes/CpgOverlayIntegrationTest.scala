@@ -52,10 +52,10 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       // 2) add two edges with the same label but different properties (they'll later be disambiguated by their property hash, since edges don't have IDs
       val addEdge1Inverse = applyDiffAndGetInverse(cpg)(_.addEdge(
         src = initialNode, dst = additionalNode, edgeLabel = edges.ContainsNode.Label, properties = Seq(EdgeKeyNames.INDEX -> Int.box(1))))
-//      val addEdge2Inverse = applyDiffAndGetInverse(cpg)(_.addEdge(
-//        src = initialNode, dst = additionalNode, edgeLabel = edges.ContainsNode.Label, properties = Seq(EdgeKeyNames.INDEX -> Int.box(2))))
+      val addEdge2Inverse = applyDiffAndGetInverse(cpg)(_.addEdge(
+        src = initialNode, dst = additionalNode, edgeLabel = edges.ContainsNode.Label, properties = Seq(EdgeKeyNames.INDEX -> Int.box(2))))
       def initialNodeOutEdges = initialNode.outE.toList
-      initialNodeOutEdges.size shouldBe 1
+      initialNodeOutEdges.size shouldBe 2
 
       // 3) add node property
       val addNodePropertyInverse = applyDiffAndGetInverse(cpg)(_.addNodeProperty(additionalNode, NodeKeyNames.CODE, "Node2Code"))
@@ -74,7 +74,10 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       DiffGraph.Applier.applyDiff(addNodePropertyInverse, cpg)
       additionalNode.valueOption(NodeKeys.CODE) shouldBe None
 
-      // 2) remove edge
+      // 2) remove edges - they don't have ids and are therefor disambiguated by their property hash
+      DiffGraph.Applier.applyDiff(addEdge2Inverse, cpg)
+      initialNodeOutEdges.size shouldBe 1
+      initialNode.outE.value(EdgeKeyNames.INDEX).toList shouldBe List(Int.box(1))
       DiffGraph.Applier.applyDiff(addEdge1Inverse, cpg)
       initialNodeOutEdges.size shouldBe 0
 
