@@ -37,12 +37,14 @@ class DiffGraphProtoSerializer {
     import DiffGraph.Change._
     val builder = CpgOverlay.newBuilder
     appliedDiffGraph.diffGraph.iterator.foreach {
-      case c: CreateEdge       => addEdge(c, builder, appliedDiffGraph)
-      case CreateNode(newNode) => addNode(builder, newNode, appliedDiffGraph)
+      case CreateNode(newNode) =>
+        builder.addNode(addNode(newNode, appliedDiffGraph))
+      case c: CreateEdge =>
+        builder.addEdge(addEdge(c, appliedDiffGraph))
       case SetNodeProperty(node, key, value) =>
         builder.addNodeProperty(addNodeProperty(node.getId, key, value))
       case SetEdgeProperty(edge, key, value) =>
-        addEdgeProperty(builder, appliedDiffGraph, edge, key, value)
+        builder.addEdgeProperty(addEdgeProperty(edge, key, value))
       case RemoveNode(_) | RemoveNodeProperty(_, _) | RemoveEdge(_) | RemoveEdgeProperty(_, _) =>
         throw new UnsupportedOperationException(
           "CpgOverlays can be stacked onto each other, therefor they cannot remove anything from the graph")
@@ -58,41 +60,38 @@ class DiffGraphProtoSerializer {
     import DiffGraph.Change._
     val builder = DiffGraphProto.newBuilder
     diffGraph.iterator.foreach {
+      case SetNodeProperty(node, key, value) =>
+        builder.addNodeProperty(addNodeProperty(node.getId, key, value))
+      case SetEdgeProperty(edge, key, value) =>
+        builder.addEdgeProperty(addEdgeProperty(edge, key, value))
       case RemoveNode(nodeId) => builder.addRemoveNode(removeNodeProto(nodeId))
       case RemoveEdge(edge)   => builder.addRemoveEdge(removeEdgeProto(edge))
       case RemoveNodeProperty(nodeId, propertyKey) =>
         builder.addRemoveNodeProperty(removeNodePropertyProto(nodeId, propertyKey))
       case RemoveEdgeProperty(edge, propertyKey) =>
         builder.addRemoveEdgeProperty(removeEdgePropertyProto(edge, propertyKey))
-      case SetNodeProperty(node, key, value) =>
-        builder.addNodeProperty(addNodeProperty(node.getId, key, value))
-      case other => throw new NotImplementedError(s"not yet supported: ${other.getClass}")
+      case other => throw new NotImplementedError(s"not (yet?) supported for DiffGraph: ${other.getClass}")
     }
     builder.build()
   }
 
-  private def addNode(implicit builder: CpgOverlay.Builder, node: NewNode, appliedDiffGraph: AppliedDiffGraph): Unit = {
+  private def addNode(node: NewNode, appliedDiffGraph: AppliedDiffGraph): CpgStruct.Node = {
     val nodeId = appliedDiffGraph.nodeToGraphId(node)
 
-    val nodeBuilder = CpgStruct.Node
-      .newBuilder() // TODO: Can we cache builders???
+    val nodeBuilder = CpgStruct.Node.newBuilder
       .setKey(nodeId)
       .setType(NodeType.valueOf(node.label))
 
-    node.properties
-      .foreach {
-        case (key, value) if !key.startsWith("_") =>
-          val property = nodeProperty(key, value)
-          nodeBuilder.addProperty(property)
-      }
+    node.properties.foreach {
+      case (key, value) if !key.startsWith("_") =>
+        val property = nodeProperty(key, value)
+        nodeBuilder.addProperty(property)
+    }
 
-    val finalNode = nodeBuilder.build()
-    builder.addNode(finalNode)
+    nodeBuilder.build
   }
 
-  private def addEdge(change: DiffGraph.Change.CreateEdge,
-                      builder: CpgOverlay.Builder,
-                      appliedDiffGraph: AppliedDiffGraph): Unit = {
+  private def addEdge(change: DiffGraph.Change.CreateEdge, appliedDiffGraph: AppliedDiffGraph): CpgStruct.Edge = {
     val srcId =
       if (change.sourceNodeKind == DiffGraph.Change.NodeKind.New)
         appliedDiffGraph.nodeToGraphId(change.src.asInstanceOf[NewNode])
@@ -105,7 +104,7 @@ class DiffGraphProtoSerializer {
       else
         change.dst.getId
 
-    builder.addEdge(makeEdge(change.label, srcId, dstId, change.properties))
+    makeEdge(change.label, srcId, dstId, change.properties)
   }
 
   private def makeEdge(label: String, srcId: Long, dstId: Long, properties: DiffGraph.Properties) = {
@@ -164,28 +163,20 @@ class DiffGraphProtoSerializer {
       .build()
 
   private def addNodeProperty(nodeId: Long, key: String, value: AnyRef): AdditionalNodeProperty =
-    AdditionalNodeProperty
-      .newBuilder
+    AdditionalNodeProperty.newBuilder
       .setNodeId(nodeId)
       .setProperty(nodeProperty(key, value))
       .build
 
-  private def addEdgeProperty(builder: CpgOverlay.Builder,
-                              appliedDiffGraph: AppliedDiffGraph,
-                              edge: Edge,
-                              key: String,
-                              value: AnyRef): Unit = {
-    builder.addEdgeProperty(
-      AdditionalEdgeProperty
-        .newBuilder()
-        .setOutNodeKey(edge.outVertex().id.asInstanceOf[Long])
-        .setInNodeKey(edge.inVertex().id.asInstanceOf[Long])
-        .setEdgeType(EdgeType.valueOf(edge.label()))
-        .setProperty(CpgStruct.Edge.Property
-          .newBuilder()
-          .setName(EdgePropertyName.valueOf(key))
-          .setValue(protoValue(value))))
-  }
+  private def addEdgeProperty(edge: Edge, key: String, value: AnyRef): AdditionalEdgeProperty =
+    AdditionalEdgeProperty.newBuilder
+      .setOutNodeKey(edge.outVertex.id.asInstanceOf[Long])
+      .setInNodeKey(edge.inVertex.id.asInstanceOf[Long])
+      .setEdgeType(EdgeType.valueOf(edge.label))
+      .setProperty(CpgStruct.Edge.Property.newBuilder
+        .setName(EdgePropertyName.valueOf(key))
+        .setValue(protoValue(value)))
+      .build
 
   private def protoValue(value: Any): PropertyValue.Builder = {
     val builder = PropertyValue.newBuilder
