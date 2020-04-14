@@ -331,4 +331,3 @@ class Steps[A](val raw: GremlinScala[A]) {
   def size: Int = l.size
 
 }
-

@@ -43,9 +43,7 @@ object MethodReturn {
       Entry(".typ", "traverse to return type"),
       Entry(".returnUser", "..."),
       Entry(".toReturn", "..."),
-    ),
-    "/io/shiftleft/queryprimitives/steps/types/structure/MethodReturn.html"
+    )
   )
 
 }
-

@@ -3,11 +3,35 @@ package io.shiftleft.semanticcpg
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.codepropertygraph.generated.nodes.{HasCanonicalName, HasCode, HasDependencyGroupId, HasDispatchType, HasFullName, HasIsExternal, HasLineNumber, HasLineNumberEnd, HasName, HasOrder, HasParserTypeName, HasSignature, HasValue, HasVersion, Node, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{
+  HasCanonicalName,
+  HasCode,
+  HasDependencyGroupId,
+  HasDispatchType,
+  HasFullName,
+  HasIsExternal,
+  HasLineNumber,
+  HasLineNumberEnd,
+  HasName,
+  HasOrder,
+  HasParserTypeName,
+  HasSignature,
+  HasValue,
+  HasVersion,
+  Node,
+  StoredNode
+}
 import io.shiftleft.semanticcpg.language.Help
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.MethodDOT
-import io.shiftleft.semanticcpg.language.nodemethods.{AstNodeMethods, CallMethods, MethodMethods, MethodReturnMethods, NodeMethods, WithinMethodMethods}
+import io.shiftleft.semanticcpg.language.nodemethods.{
+  AstNodeMethods,
+  CallMethods,
+  MethodMethods,
+  MethodReturnMethods,
+  NodeMethods,
+  WithinMethodMethods
+}
 import io.shiftleft.semanticcpg.language.types.structure._
 import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
