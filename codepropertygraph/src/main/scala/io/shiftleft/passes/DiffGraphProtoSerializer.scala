@@ -6,7 +6,7 @@ import java.lang.{Long => JLong}
 
 import com.google.protobuf.ByteString
 import gremlin.scala.Edge
-import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.NewNode
 import io.shiftleft.proto.cpg.Cpg.{
   AdditionalEdgeProperty,
   AdditionalNodeProperty,
@@ -40,7 +40,7 @@ class DiffGraphProtoSerializer {
       case c: CreateEdge       => addEdge(c, builder, appliedDiffGraph)
       case CreateNode(newNode) => addNode(builder, newNode, appliedDiffGraph)
       case SetNodeProperty(node, key, value) =>
-        addNodeProperty(node.getId, key, value, builder, appliedDiffGraph)
+        builder.addNodeProperty(addNodeProperty(node.getId, key, value))
       case SetEdgeProperty(edge, key, value) =>
         addEdgeProperty(builder, appliedDiffGraph, edge, key, value)
       case RemoveNode(_) | RemoveNodeProperty(_, _) | RemoveEdge(_) | RemoveEdgeProperty(_, _) =>
@@ -64,7 +64,9 @@ class DiffGraphProtoSerializer {
         builder.addRemoveNodeProperty(removeNodePropertyProto(nodeId, propertyKey))
       case RemoveEdgeProperty(edge, propertyKey) =>
         builder.addRemoveEdgeProperty(removeEdgePropertyProto(edge, propertyKey))
-      case _ => ???
+      case SetNodeProperty(node, key, value) =>
+        builder.addNodeProperty(addNodeProperty(node.getId, key, value))
+      case other => throw new NotImplementedError(s"not yet supported: ${other.getClass}")
     }
     builder.build()
   }
@@ -161,19 +163,12 @@ class DiffGraphProtoSerializer {
       .setValue(protoValue(value))
       .build()
 
-  private def addNodeProperty(nodeId: Long,
-                              key: String,
-                              value: AnyRef,
-                              builder: CpgOverlay.Builder,
-                              appliedDiffGraph: AppliedDiffGraph): Unit = {
-    builder.addNodeProperty(
-      AdditionalNodeProperty
-        .newBuilder()
-        .setNodeId(nodeId)
-        .setProperty(nodeProperty(key, value))
-        .build
-    )
-  }
+  private def addNodeProperty(nodeId: Long, key: String, value: AnyRef): AdditionalNodeProperty =
+    AdditionalNodeProperty
+      .newBuilder
+      .setNodeId(nodeId)
+      .setProperty(nodeProperty(key, value))
+      .build
 
   private def addEdgeProperty(builder: CpgOverlay.Builder,
                               appliedDiffGraph: AppliedDiffGraph,
