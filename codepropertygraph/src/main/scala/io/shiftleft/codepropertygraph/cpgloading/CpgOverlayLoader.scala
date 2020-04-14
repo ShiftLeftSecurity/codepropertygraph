@@ -28,7 +28,7 @@ private[cpgloading] object CpgOverlayLoader {
     val applier = new CpgOverlayApplier(baseCpg.graph)
     ProtoCpgLoader
       .loadOverlays(filename)
-      .map { overlays: Iterator[CpgOverlay] =>
+      .map { overlays =>
         overlays.foreach(applier.applyDiff)
       }
       .recover {
@@ -38,6 +38,23 @@ private[cpgloading] object CpgOverlayLoader {
       }
       .get
   }
+
+  def loadInverse(filename: String, baseCpg: Cpg): Unit = {
+    ProtoCpgLoader
+      .loadDiffGraphs(filename)
+      .map { diffGraphs =>
+        diffGraphs.toList.reverse.map { diffGraph =>
+          DiffGraph.Applier.applyDiff(DiffGraph.fromProto(diffGraph, baseCpg), baseCpg)
+        }
+      }
+      .recover {
+        case e: IOException =>
+          logger.error("Failed to load overlay from " + filename, e)
+          Nil
+      }
+      .get
+  }
+
 }
 
 /**
@@ -66,13 +83,6 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
     addNodeProperties(overlay, inverseBuilder)
     addEdgeProperties(overlay, inverseBuilder)
     inverseBuilder.build()
-  }
-
-  private def makeInverseBuilder(undoable: Boolean) = {
-    if (undoable)
-      DiffGraph.InverseBuilder.newBuilder
-    else
-      DiffGraph.InverseBuilder.noop
   }
 
   private def addNodes(overlay: CpgOverlay, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
