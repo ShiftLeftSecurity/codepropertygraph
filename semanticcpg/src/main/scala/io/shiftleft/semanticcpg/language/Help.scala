@@ -11,12 +11,9 @@ trait Help[A] {
 }
 
 object Help {
-  val ApiDocRoot = "https://ocular.shiftleft.io/api"
   val ColumnNames = Array("step", "description")
 
-  class ForNode[A](description: String,
-                   entries: List[Entry],
-                   apiDocPath: String = "/io/shiftleft/queryprimitives/steps/NodeSteps.html") extends Help[A] {
+  class ForNode[A](description: String, entries: List[Entry]) extends Help[A] {
 
     override def toText: String = {
       val entriesTable = Using.Manager { use =>
@@ -29,21 +26,22 @@ object Help {
 
       s"""$description
          |$entriesTable
-         |$ApiDocRoot/$apiDocPath
          |""".stripMargin
     }
   }
 
   case class Entry(step: String, description: String)
 
-  val genericHelp = new ForNode("generic NodeStep", List(
-    Entry(".l", "execute this traversal and return a List"),
-    Entry(".p", "pretty print"),
-    Entry(".toJson", ""),
-    Entry(".toJsonPretty", ""),
-    Entry(".map", "transform the traversal by a given function, e.g. `.map(_.toString)`"),
-  ))
+  val genericHelp = new ForNode(
+    "generic NodeStep",
+    List(
+      Entry(".l", "execute this traversal and return a List"),
+      Entry(".p", "pretty print"),
+      Entry(".toJson", ""),
+      Entry(".toJsonPretty", ""),
+      Entry(".map", "transform the traversal by a given function, e.g. `.map(_.toString)`"),
+    )
+  )
 
   def default[A]: Help[A] = genericHelp.asInstanceOf[Help[A]]
 }
-
