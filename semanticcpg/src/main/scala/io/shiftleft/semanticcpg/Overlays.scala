@@ -18,7 +18,7 @@ object Overlays {
   }
 
   def removeLastOverlayName(cpg: Cpg): Unit = {
-    cpg.metaData.l.headOption match {
+    cpg.metaData.headOption match {
       case Some(metaData) => {
         // This is currently sub-optimal: we do not have
         // and operation to simply set a list as a property,
