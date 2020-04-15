@@ -35,14 +35,14 @@
         },
 
         {"id" : 49, "name" : "ANNOTATION_LITERAL",
-         "keys" : ["CODE", "NAME", "ORDER", "COLUMN_NUMBER", "LINE_NUMBER"],
+         "keys" : ["CODE", "NAME", "ORDER", "ARGUMENT_INDEX", "COLUMN_NUMBER", "LINE_NUMBER"],
          "comment" : "A literal value assigned to an ANNOTATION_PARAMETER",
          "outEdges" : [ ],
           "is" : ["EXPRESSION"]
         },
 
         {"name" : "ARRAY_INITIALIZER",
-         "keys" : ["CODE", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER"],
+         "keys" : ["CODE", "ORDER", "ARGUMENT_INDEX", "COLUMN_NUMBER", "LINE_NUMBER"],
          "outEdges" : [
              {"edgeName": "AST", "inNodes": ["LITERAL"]},
              {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
