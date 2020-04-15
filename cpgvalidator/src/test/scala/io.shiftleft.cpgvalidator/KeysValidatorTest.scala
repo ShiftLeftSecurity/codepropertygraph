@@ -100,6 +100,7 @@ class KeysValidatorTest extends WordSpec with Matchers {
       node.property("LINE_NUMBER", 1)
       node.property("NAME", "SomeAnnotation")
       node.property("ORDER", 1)
+      node.property("ARGUMENT_INDEX", 1)
       node.property("CODE", "some code;")
       validator.validate(cpg) shouldBe true
     }
@@ -112,6 +113,7 @@ class KeysValidatorTest extends WordSpec with Matchers {
       node.property("LINE_NUMBER", Option.empty)
       node.property("NAME", "SomeAnnotation")
       node.property("ORDER", 1)
+      node.property("ARGUMENT_INDEX", 1)
       node.property("CODE", "some code;")
       validator.validate(cpg) shouldBe true
     }
@@ -123,6 +125,7 @@ class KeysValidatorTest extends WordSpec with Matchers {
       val node = cpg.graph + NodeTypes.ANNOTATION_LITERAL
       node.property("NAME", "SomeAnnotation")
       node.property("ORDER", 1)
+      node.property("ARGUMENT_INDEX", 1)
       node.property("CODE", "some code;")
       validator.validate(cpg) shouldBe true
     }
