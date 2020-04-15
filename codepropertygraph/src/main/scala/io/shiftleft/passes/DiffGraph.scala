@@ -136,8 +136,8 @@ object DiffGraph {
 
   def fromProto(inverseDiffGraphProto: DiffGraphProto, cpg: Cpg): DiffGraph = {
     val builder = newBuilder
-    inverseDiffGraphProto.getRemoveNodeList.forEach { removeNodeProto =>
-      builder.removeNode(removeNodeProto.getKey)
+    inverseDiffGraphProto.getRemoveEdgePropertyList.forEach { removeEdgeProperty =>
+      //      TODO impl
     }
     inverseDiffGraphProto.getRemoveNodePropertyList.forEach { removeNodePropertyProto =>
       builder.removeNodeProperty(removeNodePropertyProto.getKey, removeNodePropertyProto.getName.toString)
@@ -165,8 +165,8 @@ object DiffGraph {
 
       builder.removeEdge(edge)
     }
-    inverseDiffGraphProto.getRemoveEdgePropertyList.forEach { removeEdgeProperty =>
-//      TODO impl
+    inverseDiffGraphProto.getRemoveNodeList.forEach { removeNodeProto =>
+      builder.removeNode(removeNodeProto.getKey)
     }
 
     builder.build()
