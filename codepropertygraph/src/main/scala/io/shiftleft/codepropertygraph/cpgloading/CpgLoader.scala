@@ -52,7 +52,7 @@ object CpgLoader {
   def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit =
     new CpgLoader().addOverlays(overlayFilenames, cpg)
 
-  def addDiffGraphs(diffGraphFilenames : Seq[String], cpg : Cpg) : Unit =
+  def addDiffGraphs(diffGraphFilenames: Seq[String], cpg: Cpg): Unit =
     new CpgLoader().addDiffGraphs(diffGraphFilenames, cpg)
 
 }
