@@ -45,7 +45,13 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
   private def linkCall(call: nodes.Call, dstGraph: DiffGraph.Builder): Unit = {
     val resolvedMethodOption =
       if (call.dispatchType == DispatchTypes.STATIC_DISPATCH) {
-        methodFullNameToNode.get(call.methodFullName)
+        val res = methodFullNameToNode.get(call.methodFullName)
+        if (res == None) {
+          logger.info(
+            s"Unable to link static CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
+              s"SIGNATURE ${call.signature}, CODE ${call.code}")
+        }
+        res
       } else {
         val receiverIt = call.receiverOut
         if (receiverIt.hasNext) {
@@ -61,13 +67,19 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
                 ._refOut
                 .onlyChecked
 
-              receiverTypeDecl._bindsOut.asScala.collectFirst {
+              val res = receiverTypeDecl._bindsOut.asScala.collectFirst {
                 case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
                   binding._refOut.onlyChecked.asInstanceOf[nodes.Method]
               }
+              if (res == None) {
+                logger.debug(
+                  s"Unable to link dynamic CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
+                    s"SIGNATURE ${call.signature}, CODE ${call.code}")
+              }
+              res
           }
         } else {
-          logger.warn(s"Missing receiver edge on CALL ${call.code}")
+          logger.warn(s"Missing receiver edge on dynamic CALL ${call.code}")
           None
         }
       }
