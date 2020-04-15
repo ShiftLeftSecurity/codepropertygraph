@@ -31,7 +31,7 @@ class OverlaysTests extends WordSpec with Matchers {
       Overlays.removeLastOverlayName(cpg)
       Overlays.appliedOverlays(cpg) shouldBe List("foo")
       Overlays.removeLastOverlayName(cpg)
-      Overlays.appliedOverlays(cpg) shouldBe null
+      Overlays.appliedOverlays(cpg) shouldBe List()
     }
 
   }
