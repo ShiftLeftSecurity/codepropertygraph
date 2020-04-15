@@ -4,9 +4,11 @@ import java.io.InputStream
 import java.nio.file.{Files, Path}
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct}
+import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct, DiffGraph}
 import org.apache.logging.log4j.LogManager
-import java.util.{List => JList, Collection => JCollection}
+import java.util.{Collection => JCollection, List => JList}
+
+import com.google.protobuf.GeneratedMessageV3
 
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try, Using}
@@ -47,12 +49,18 @@ object ProtoCpgLoader {
     loadFromListOfProtos(cpgs.asScala.toSeq, overflowDbConfig)
 
   def loadOverlays(fileName: String): Try[Iterator[CpgOverlay]] =
+    loadOverlays(fileName, CpgOverlay.parseFrom)
+
+  def loadDiffGraphs(fileName: String): Try[Iterator[DiffGraph]] =
+    loadOverlays(fileName, DiffGraph.parseFrom)
+
+  private def loadOverlays[T <: GeneratedMessageV3](fileName: String, f: InputStream => T): Try[Iterator[T]] =
     Using(new ZipArchive(fileName)) { zip =>
       zip.entries
         .sortWith(compareOverlayPath)
         .map { path =>
           val is = Files.newInputStream(path)
-          CpgOverlay.parseFrom(is)
+          f(is)
         }
         .iterator
     }

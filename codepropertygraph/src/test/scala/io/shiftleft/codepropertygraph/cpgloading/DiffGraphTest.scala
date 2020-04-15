@@ -20,15 +20,15 @@ class DiffGraphTest extends WordSpec with Matchers {
       // make diffgraph
       val diffBuilder = DiffGraph.newBuilder
       // add a b c nodes to the DiffGraph.Builder
-      val a = makeNode(g, "a")
+      val a = makeNode("a")
       diffBuilder.addNode(a)
-      val b = makeNode(g, "b")
+      val b = makeNode("b")
       diffBuilder.addNode(b)
-      val c = makeNode(g, "c")
+      val c = makeNode("c")
       diffBuilder.addNode(c)
       // add edge a -> b -> c to the DiffGraph.Builder
-      makeEdgeBetweenNewNodes(g, diffBuilder, a, b)
-      makeEdgeBetweenNewNodes(g, diffBuilder, b, c)
+      makeEdgeBetweenNewNodes(diffBuilder, a, b)
+      makeEdgeBetweenNewNodes(diffBuilder, b, c)
       // add edge from existing node "x" to new node "a" to the builder
       diffBuilder.addEdgeFromOriginal(x.asInstanceOf[StoredNode], a, EdgeTypes.AST)
       // modify property of existing node "y"
@@ -59,9 +59,9 @@ class DiffGraphTest extends WordSpec with Matchers {
   "should be able to revert DiffGraph and reapply again" in {
     withTestOdb { g =>
       var diffBuilder = DiffGraph.newBuilder
-      diffBuilder.addNode(makeNode(g, "a"))
-      diffBuilder.addNode(makeNode(g, "b"))
-      diffBuilder.addNode(makeNode(g, "c"))
+      diffBuilder.addNode(makeNode("a"))
+      diffBuilder.addNode(makeNode("b"))
+      diffBuilder.addNode(makeNode("c"))
       val threeNodes = diffBuilder.build()
       val appliedDiff1 = DiffGraph.Applier.applyDiff(threeNodes, g.graph, true)
       assert(g.V.count.head == 3)
@@ -79,13 +79,50 @@ class DiffGraphTest extends WordSpec with Matchers {
     }
   }
 
+  "apply and revert DiffGraph with nodes _and_ edges" when {
+
+    "testing simple scenario" in withTestOdb { g =>
+      val diffBuilder = DiffGraph.newBuilder
+      val newNodeA = makeNode("a")
+      val newNodeB = makeNode("b")
+      diffBuilder.addNode(newNodeA)
+      diffBuilder.addNode(newNodeB)
+      diffBuilder.addEdge(newNodeA, newNodeB, EdgeTypes.AST)
+      val diff = diffBuilder.build()
+      val appliedDiff = DiffGraph.Applier.applyDiff(diff, g.graph, true)
+      assert(g.V.count.head == 2)
+      assert(g.E.count.head == 1)
+      DiffGraph.Applier.unapplyDiff(g.graph, appliedDiff.inverseDiffGraph.get)
+      assert(g.V.count.head == 0)
+    }
+
+    "testing more complex scenario" in withTestOdb { g =>
+      val diffBuilder = DiffGraph.newBuilder
+      val newNodeA = makeNode("a")
+      val newNodeB = makeNode("b")
+      diffBuilder.addNode(newNodeA)
+      diffBuilder.addNode(newNodeB)
+      diffBuilder.addEdge(newNodeA, newNodeB, EdgeTypes.AST)
+      val newNodeC = makeNode("c")
+      diffBuilder.addNode(newNodeC)
+      diffBuilder.addEdge(newNodeB, newNodeC, EdgeTypes.AST)
+      val diff = diffBuilder.build()
+      val appliedDiff = DiffGraph.Applier.applyDiff(diff, g.graph, true)
+      assert(g.V.count.head == 3)
+      assert(g.E.count.head == 2)
+      println(appliedDiff.inverseDiffGraph.get.iterator.toList)
+      DiffGraph.Applier.unapplyDiff(g.graph, appliedDiff.inverseDiffGraph.get)
+      assert(g.V.count.head == 0)
+    }
+  }
+
   def withTestOdb[T](f: ScalaGraph => T): T = {
     val graph: ScalaGraph = OverflowDbTestInstance.create
     try f(graph)
     finally graph.close()
   }
 
-  def makeNode(g: ScalaGraph, code: String) = new nodes.NewNode {
+  def makeNode(code: String) = new nodes.NewNode {
     override def containedNodesByLocalName = ???
     override def label = NodeTypes.UNKNOWN
     override def properties = Map(NodeKeyNames.CODE -> code)
@@ -102,6 +139,6 @@ class DiffGraphTest extends WordSpec with Matchers {
     diff.addEdge(a.asInstanceOf[nodes.StoredNode], b.asInstanceOf[nodes.StoredNode], EdgeTypes.AST)
   }
 
-  def makeEdgeBetweenNewNodes(g: ScalaGraph, diff: DiffGraph.Builder, a: NewNode, b: NewNode) =
+  def makeEdgeBetweenNewNodes(diff: DiffGraph.Builder, a: NewNode, b: NewNode) =
     diff.addEdge(a, b, EdgeTypes.AST)
 }

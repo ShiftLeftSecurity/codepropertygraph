@@ -22,6 +22,18 @@ class OverlaysTests extends WordSpec with Matchers {
       Overlays.appliedOverlays(cpg) shouldBe List("foo", "bar")
     }
 
+    "allow removing last overlay name" in {
+      val cpg = MockCpg().withMetaData().cpg
+      Overlays.appendOverlayName(cpg, "foo")
+      Overlays.appliedOverlays(cpg) shouldBe List("foo")
+      Overlays.appendOverlayName(cpg, "bar")
+      Overlays.appliedOverlays(cpg) shouldBe List("foo", "bar")
+      Overlays.removeLastOverlayName(cpg)
+      Overlays.appliedOverlays(cpg) shouldBe List("foo")
+      Overlays.removeLastOverlayName(cpg)
+      Overlays.appliedOverlays(cpg) shouldBe List()
+    }
+
   }
 
 }
