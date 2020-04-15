@@ -48,17 +48,11 @@ object ProtoCpgLoader {
   def loadFromListOfProtos(cpgs: JList[CpgStruct], overflowDbConfig: OdbConfig): Cpg =
     loadFromListOfProtos(cpgs.asScala.toSeq, overflowDbConfig)
 
-  def loadOverlays(fileName: String): Try[Iterator[CpgOverlay]] = {
-    loadOverlays(fileName, { is =>
-      CpgOverlay.parseFrom(is)
-    })
-  }
+  def loadOverlays(fileName: String): Try[Iterator[CpgOverlay]] =
+    loadOverlays(fileName, CpgOverlay.parseFrom)
 
-  def loadDiffGraphs(fileName: String): Try[Iterator[DiffGraph]] = {
-    loadOverlays(fileName, { is =>
-      DiffGraph.parseFrom(is)
-    })
-  }
+  def loadDiffGraphs(fileName: String): Try[Iterator[DiffGraph]] =
+    loadOverlays(fileName, DiffGraph.parseFrom)
 
   private def loadOverlays[T <: GeneratedMessageV3](fileName: String, f: InputStream => T): Try[Iterator[T]] =
     Using(new ZipArchive(fileName)) { zip =>
