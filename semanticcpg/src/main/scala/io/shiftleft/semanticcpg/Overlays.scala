@@ -42,7 +42,7 @@ object Overlays {
 
   def appliedOverlays(cpg: Cpg): List[String] = {
     cpg.metaData.l.headOption match {
-      case Some(metaData) => metaData.overlays
+      case Some(metaData) => Some(metaData.overlays).filter(_ != null).getOrElse(List())
       case None =>
         System.err.println("Missing metaData block")
         List()
