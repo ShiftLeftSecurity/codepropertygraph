@@ -13,7 +13,9 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
+
   import CallLinker._
+
   private val methodFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
 
   /**
@@ -43,20 +45,21 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def linkCall(call: nodes.Call, dstGraph: DiffGraph.Builder): Unit = {
-    val resolvedMethodOption =
-      if (call.dispatchType == DispatchTypes.STATIC_DISPATCH) {
-        val res = methodFullNameToNode.get(call.methodFullName)
-        if (res == None) {
+    call.dispatchType match {
+      case DispatchTypes.STATIC_DISPATCH =>
+        val resolvedMethodOption = methodFullNameToNode.get(call.methodFullName)
+        if (resolvedMethodOption.isDefined) {
+          dstGraph.addEdgeInOriginal(call, resolvedMethodOption.get, EdgeTypes.CALL)
+        }
+        else {
           logger.info(
             s"Unable to link static CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
               s"SIGNATURE ${call.signature}, CODE ${call.code}")
         }
-        res
-      } else {
+      case DispatchTypes.DYNAMIC_DISPATCH =>
         val receiverIt = call.receiverOut
         if (receiverIt.hasNext) {
           val receiver = receiverIt.next
-
           receiver match {
             case methodRefReceiver: nodes.MethodRef =>
               Some(methodRefReceiver._refOut.onlyChecked.asInstanceOf[nodes.Method])
@@ -67,30 +70,22 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
                 ._refOut
                 .onlyChecked
 
-              val res = receiverTypeDecl._bindsOut.asScala.collectFirst {
+              val resolvedMethodOption = receiverTypeDecl._bindsOut.asScala.collectFirst {
                 case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
                   binding._refOut.onlyChecked.asInstanceOf[nodes.Method]
               }
-              if (res == None) {
+              if (resolvedMethodOption.isDefined) {
+                dstGraph.addEdgeInOriginal(call, resolvedMethodOption.get, EdgeTypes.CALL)
+              } else {
                 logger.debug(
                   s"Unable to link dynamic CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
                     s"SIGNATURE ${call.signature}, CODE ${call.code}")
               }
-              res
           }
         } else {
           logger.warn(s"Missing receiver edge on dynamic CALL ${call.code}")
-          None
         }
-      }
-
-    resolvedMethodOption match {
-      case Some(method) =>
-        dstGraph.addEdgeInOriginal(call, method, EdgeTypes.CALL)
-      case None =>
-        logger.info(
-          s"Unable to link CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
-            s"SIGNATURE ${call.signature}, CODE ${call.code}")
+      case _ => logger.warn(s"Unknown dispatch type on dynamic CALL ${call.code}")
     }
   }
 }
