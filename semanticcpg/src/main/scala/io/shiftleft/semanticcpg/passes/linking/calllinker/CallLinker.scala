@@ -50,8 +50,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
         val resolvedMethodOption = methodFullNameToNode.get(call.methodFullName)
         if (resolvedMethodOption.isDefined) {
           dstGraph.addEdgeInOriginal(call, resolvedMethodOption.get, EdgeTypes.CALL)
-        }
-        else {
+        } else {
           logger.info(
             s"Unable to link static CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
               s"SIGNATURE ${call.signature}, CODE ${call.code}")
@@ -85,7 +84,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
                 logger.debug(
                   s"Unable to link dynamic CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
                     s"SIGNATURE ${call.signature}, CODE ${call.code}")
-                */
+               */
               }
           }
         } else {
