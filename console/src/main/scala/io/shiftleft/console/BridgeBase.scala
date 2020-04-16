@@ -85,7 +85,7 @@ trait BridgeBase {
         ammonite
           .Main(
             predefCode = predefPlus(additionalImportCode ++ replConfig ++ shutdownHooks),
-            welcomeBanner = Some("Welcome to ShiftLeft Ocular/Joern"),
+            welcomeBanner = None,
             storageBackend = new StorageBackend(slProduct),
             remoteLogging = false,
             colors = ammoniteColors
