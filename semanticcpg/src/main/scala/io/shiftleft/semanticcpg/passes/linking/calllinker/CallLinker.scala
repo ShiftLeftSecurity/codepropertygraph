@@ -77,9 +77,15 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
               if (resolvedMethodOption.isDefined) {
                 dstGraph.addEdgeInOriginal(call, resolvedMethodOption.get, EdgeTypes.CALL)
               } else {
+                /*
+                There is no binding that declares the VTable slot.
+                This is a valid possibility in message-passing style languages.
+
+                In JVM and .NET this should not happen -- place breakpoint or uncomment here when debugging frontends
                 logger.debug(
                   s"Unable to link dynamic CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
                     s"SIGNATURE ${call.signature}, CODE ${call.code}")
+                */
               }
           }
         } else {
