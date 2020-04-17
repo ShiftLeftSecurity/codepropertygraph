@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.testfixtures
 
 import java.io.{File, PrintWriter}
-import java.nio.file.Files
+import java.nio.file.{Files, Path}
 
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
@@ -33,7 +33,11 @@ class CodeToCpgFixture(frontend: LanguageFrontend) {
     */
   def buildCpg[T](sourceCode: String, passes: (Cpg => Unit) = CodeToCpgFixture.createEnhancements)(fun: Cpg => T): T = {
     val tmpDir = writeCodeToFile(sourceCode)
-    val cpgFile = frontend.execute(tmpDir)
+    buildCpgForFile[T](tmpDir, passes)(fun)
+  }
+
+  def buildCpgForFile[T](file: File, passes: (Cpg => Unit) = CodeToCpgFixture.createEnhancements)(fun: Cpg => T): T = {
+    val cpgFile = frontend.execute(file)
     val config = CpgLoaderConfig.withoutOverflow
     val cpg = CpgLoader.load(cpgFile.getAbsolutePath, config)
 
