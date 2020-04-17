@@ -32,8 +32,13 @@ class CodeToCpgFixture(frontend: LanguageFrontend) {
     * @param sourceCode code for which one wants to generate cpg
     */
   def buildCpg[T](sourceCode: String, passes: (Cpg => Unit) = CodeToCpgFixture.createEnhancements)(fun: Cpg => T): T = {
-    val tmpDir = writeCodeToFile(sourceCode)
-    buildCpgForFile[T](tmpDir, passes)(fun)
+    val tmpDir = better.files.File.newTemporaryDirectory("test")
+    (tmpDir / "test.c").write(sourceCode)
+    try {
+      buildCpgForFile[T](tmpDir.toJava, passes)(fun)
+    } finally {
+      tmpDir.delete()
+    }
   }
 
   def buildCpgForFile[T](file: File, passes: (Cpg => Unit) = CodeToCpgFixture.createEnhancements)(fun: Cpg => T): T = {
@@ -45,15 +50,6 @@ class CodeToCpgFixture(frontend: LanguageFrontend) {
 
     try fun(cpg)
     finally { cpg.close() }
-  }
-
-  private def writeCodeToFile(sourceCode: String): File = {
-    val tmpDir = Files.createTempDirectory("semanticcpgtest").toFile
-    tmpDir.deleteOnExit()
-    val codeFile = File.createTempFile("Test", frontend.fileSuffix, tmpDir)
-    codeFile.deleteOnExit()
-    new PrintWriter(codeFile) { write(sourceCode); close() }
-    tmpDir
   }
 
 }
