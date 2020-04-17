@@ -9,10 +9,10 @@ import io.shiftleft.semanticcpg.testfixtures.{CodeToCpgFixture, LanguageFrontend
 
 object DataFlowFileToCpgFixture {
 
-  def apply[T](sourceCode: String,
+  def apply[T](file: java.io.File,
                passes: (Cpg => Unit) = DataFlowFileToCpgFixture.passes,
                frontend: LanguageFrontend = LanguageFrontend.Fuzzyc)(fun: Cpg => T): T =
-    new CodeToCpgFixture(frontend).buildCpg(sourceCode, passes)(fun)
+    new CodeToCpgFixture(frontend).buildCpgForFile(file, passes)(fun)
 
   def passes(cpg: Cpg): Unit = {
     new EnhancementRunner().run(cpg, new SerializedCpg())
