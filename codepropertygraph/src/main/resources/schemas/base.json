@@ -285,7 +285,7 @@
     // common base traits for nodes
     "nodeBaseTraits" : [
       { "name" : "DECLARATION", "comment" : "", "hasKeys" : ["NAME"]},
-      { "name" : "EXPRESSION", "comment" : "Expression as a specialisation of tracking point", "hasKeys" : ["CODE", "ORDER"], "extends" : ["TRACKING_POINT", "CFG_NODE", "AST_NODE"]},
+      { "name" : "EXPRESSION", "comment" : "Expression as a specialisation of tracking point", "hasKeys" : ["CODE", "ORDER", "ARGUMENT_INDEX"], "extends" : ["TRACKING_POINT", "CFG_NODE", "AST_NODE"]},
       { "name" : "LOCAL_LIKE", "comment" : "Formal input parameters, locals, and identifiers", "hasKeys" : ["NAME"]},
       { "name" : "CFG_NODE", "comment" : "Any node that can occur as part of a control flow graph", "hasKeys" : ["LINE_NUMBER", "COLUMN_NUMBER", "INTERNAL_FLAGS"], "extends": ["WITHIN_METHOD", "AST_NODE"]},
       { "name" : "TRACKING_POINT", "comment" : "Any node that can occur in a data flow", "hasKeys" : [], "extends": ["WITHIN_METHOD"]},
