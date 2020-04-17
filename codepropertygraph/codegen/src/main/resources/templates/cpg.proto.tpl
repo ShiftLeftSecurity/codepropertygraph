@@ -172,12 +172,18 @@ message DiffGraph {
     EdgePropertyName property_name = 5;
   }
 
-  repeated CpgStruct.Node node = 1;
-  repeated CpgStruct.Edge edge = 2;
-  repeated AdditionalNodeProperty node_property = 3;
-  repeated AdditionalEdgeProperty edge_property = 4;
-  repeated RemoveNode remove_node = 5;
-  repeated RemoveNodeProperty remove_node_property = 6;
-  repeated RemoveEdge remove_edge = 7;
-  repeated RemoveEdgeProperty remove_edge_property = 8;
+  message Entry {
+    oneof value {
+      CpgStruct.Node node = 1;
+      CpgStruct.Edge edge = 2;
+      AdditionalNodeProperty node_property = 3;
+      AdditionalEdgeProperty edge_property = 4;
+      RemoveNode remove_node = 5;
+      RemoveNodeProperty remove_node_property = 6;
+      RemoveEdge remove_edge = 7;
+      RemoveEdgeProperty remove_edge_property = 8;
+    }
+  }
+
+  repeated Entry entries = 1;
 }
