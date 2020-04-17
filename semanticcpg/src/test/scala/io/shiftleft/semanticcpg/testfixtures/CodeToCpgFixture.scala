@@ -33,7 +33,11 @@ class CodeToCpgFixture(frontend: LanguageFrontend) {
     */
   def buildCpg[T](sourceCode: String, passes: (Cpg => Unit) = CodeToCpgFixture.createEnhancements)(fun: Cpg => T): T = {
     val tmpDir = writeCodeToFile(sourceCode)
-    val cpgFile = frontend.execute(tmpDir)
+    buildCpgForFile(tmpDir, passes)(fun)
+  }
+
+  def buildCpgForFile[T](dir: File, passes: (Cpg => Unit) = CodeToCpgFixture.createEnhancements)(fun: Cpg => T): T = {
+    val cpgFile = frontend.execute(dir)
     val config = CpgLoaderConfig.withoutOverflow
     val cpg = CpgLoader.load(cpgFile.getAbsolutePath, config)
 

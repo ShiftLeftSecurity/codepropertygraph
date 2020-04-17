@@ -14,7 +14,7 @@ object DataFlowCodeToCpgFixture {
                frontend: LanguageFrontend = LanguageFrontend.Fuzzyc)(fun: Cpg => T): T =
     new CodeToCpgFixture(frontend).buildCpg(sourceCode, passes)(fun)
 
-  private def passes(cpg: Cpg): Unit = {
+  def passes(cpg: Cpg): Unit = {
     new EnhancementRunner().run(cpg, new SerializedCpg())
     val semantics = new SemanticsLoader("dataflowengine/src/test/resources/default.semantics").load()
     new DataFlowRunner(semantics).run(cpg, new SerializedCpg())
