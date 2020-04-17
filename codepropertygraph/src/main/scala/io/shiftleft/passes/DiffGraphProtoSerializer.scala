@@ -60,19 +60,21 @@ class DiffGraphProtoSerializer {
     import DiffGraph.Change._
     val builder = DiffGraphProto.newBuilder
     def newEntry = DiffGraphProto.Entry.newBuilder
-    diffGraph.iterator.map {
-      case SetNodeProperty(node, key, value) =>
-        newEntry.setNodeProperty(addNodeProperty(node.getId, key, value))
-      case SetEdgeProperty(edge, key, value) =>
-        newEntry.setEdgeProperty(addEdgeProperty(edge, key, value))
-      case RemoveNode(nodeId) => newEntry.setRemoveNode(removeNodeProto(nodeId))
-      case RemoveEdge(edge)   => newEntry.setRemoveEdge(removeEdgeProto(edge))
-      case RemoveNodeProperty(nodeId, propertyKey) =>
-        newEntry.setRemoveNodeProperty(removeNodePropertyProto(nodeId, propertyKey))
-      case RemoveEdgeProperty(edge, propertyKey) =>
-        newEntry.setRemoveEdgeProperty(removeEdgePropertyProto(edge, propertyKey))
-      case other => throw new NotImplementedError(s"not (yet?) supported for DiffGraph: ${other.getClass}")
-    }.foreach(builder.addEntries)
+    diffGraph.iterator
+      .map {
+        case SetNodeProperty(node, key, value) =>
+          newEntry.setNodeProperty(addNodeProperty(node.getId, key, value))
+        case SetEdgeProperty(edge, key, value) =>
+          newEntry.setEdgeProperty(addEdgeProperty(edge, key, value))
+        case RemoveNode(nodeId) => newEntry.setRemoveNode(removeNodeProto(nodeId))
+        case RemoveEdge(edge)   => newEntry.setRemoveEdge(removeEdgeProto(edge))
+        case RemoveNodeProperty(nodeId, propertyKey) =>
+          newEntry.setRemoveNodeProperty(removeNodePropertyProto(nodeId, propertyKey))
+        case RemoveEdgeProperty(edge, propertyKey) =>
+          newEntry.setRemoveEdgeProperty(removeEdgePropertyProto(edge, propertyKey))
+        case other => throw new NotImplementedError(s"not (yet?) supported for DiffGraph: ${other.getClass}")
+      }
+      .foreach(builder.addEntries)
     builder.build()
   }
 
