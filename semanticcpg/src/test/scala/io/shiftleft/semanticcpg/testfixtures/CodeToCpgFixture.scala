@@ -6,7 +6,7 @@ import java.nio.file.Files
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
-import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Semanticcpg}
+import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
 
 object CodeToCpgFixture {
 
@@ -20,7 +20,7 @@ object CodeToCpgFixture {
 
   private def createEnhancements(cpg: Cpg): Unit = {
     val context = new LayerCreatorContext(cpg, new SerializedCpg())
-    new Semanticcpg().run(context)
+    new Scpg().run(context)
   }
 
 }
