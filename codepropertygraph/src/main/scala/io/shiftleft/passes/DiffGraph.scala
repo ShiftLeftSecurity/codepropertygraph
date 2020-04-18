@@ -135,38 +135,39 @@ object DiffGraph {
   }
 
   def fromProto(inverseDiffGraphProto: DiffGraphProto, cpg: Cpg): DiffGraph = {
+    import DiffGraphProto.Entry.ValueCase._
     val builder = newBuilder
-    inverseDiffGraphProto.getRemoveEdgePropertyList.forEach { removeEdgeProperty =>
-      //      TODO impl
-    }
-    inverseDiffGraphProto.getRemoveNodePropertyList.forEach { removeNodePropertyProto =>
-      builder.removeNodeProperty(removeNodePropertyProto.getKey, removeNodePropertyProto.getName.toString)
-    }
-    inverseDiffGraphProto.getRemoveEdgeList.forEach { removeEdge =>
-      val outNodeId = removeEdge.getOutNodeKey
-      val inNodeId = removeEdge.getInNodeKey
-      val edgeLabel = removeEdge.getEdgeType.toString
+    inverseDiffGraphProto.getEntriesList.forEach { entry =>
+      entry.getValueCase match {
+        case REMOVE_NODE =>
+          builder.removeNode(entry.getRemoveNode.getKey)
+        case REMOVE_NODE_PROPERTY =>
+          val proto = entry.getRemoveNodeProperty
+          builder.removeNodeProperty(proto.getKey, proto.getName.toString)
+        case REMOVE_EDGE =>
+          val proto = entry.getRemoveEdge
+          val outNodeId = proto.getOutNodeKey
+          val inNodeId = proto.getInNodeKey
+          val edgeLabel = proto.getEdgeType.toString
 
-      val edge = cpg.scalaGraph.V(outNodeId).outE(edgeLabel).toList.filter(_.inVertex.id == inNodeId) match {
-        case edge :: Nil => edge
-        case Nil         => throw new AssertionError(s"unable to find edge that is supposed to be removed: $removeEdge")
-        case candidates => // found multiple edges - try to disambiguate via propertiesHash
-          val wantedPropertiesHash: List[Byte] = removeEdge.getPropertiesHash.toByteArray.toList
-          candidates.filter(edge => propertiesHash(edge).toList == wantedPropertiesHash) match {
+          val edge = cpg.scalaGraph.V(outNodeId).outE(edgeLabel).toList.filter(_.inVertex.id == inNodeId) match {
             case edge :: Nil => edge
-            case Nil =>
-              throw new AssertionError(
-                s"unable to find edge that is supposed to be removed: $removeEdge. n.b. before filtering on propertiesHash, multiple candidates have been found: $candidates")
-            case candidates =>
-              throw new AssertionError(
-                s"unable to disambiguate the edge to be removed, since multiple edges match the filter conditions of $removeEdge. Candidates=$candidates")
+            case Nil         => throw new AssertionError(s"unable to find edge that is supposed to be removed: $proto")
+            case candidates => // found multiple edges - try to disambiguate via propertiesHash
+              val wantedPropertiesHash: List[Byte] = proto.getPropertiesHash.toByteArray.toList
+              candidates.filter(edge => propertiesHash(edge).toList == wantedPropertiesHash) match {
+                case edge :: Nil => edge
+                case Nil =>
+                  throw new AssertionError(
+                    s"unable to find edge that is supposed to be removed: $proto. n.b. before filtering on propertiesHash, multiple candidates have been found: $candidates")
+                case candidates =>
+                  throw new AssertionError(
+                    s"unable to disambiguate the edge to be removed, since multiple edges match the filter conditions of $proto. Candidates=$candidates")
+              }
           }
+          builder.removeEdge(edge)
+        case other => // TODO nasty, i know. sorry. yolo :(
       }
-
-      builder.removeEdge(edge)
-    }
-    inverseDiffGraphProto.getRemoveNodeList.forEach { removeNodeProto =>
-      builder.removeNode(removeNodeProto.getKey)
     }
 
     builder.build()
