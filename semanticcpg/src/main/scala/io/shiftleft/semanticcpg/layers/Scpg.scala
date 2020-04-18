@@ -24,15 +24,15 @@ import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
 import io.shiftleft.semanticcpg.language._
 
-object Semanticcpg {
+object Scpg {
   val overlayName: String = "semanticcpg"
   val description: String = "linked code property graph (OSS)"
 }
 
-class Semanticcpg() extends LayerCreator {
+class Scpg() extends LayerCreator {
 
-  override val overlayName: String = Semanticcpg.overlayName
-  override val description: String = Semanticcpg.description
+  override val overlayName: String = Scpg.overlayName
+  override val description: String = Scpg.description
 
   override def create(context: LayerCreatorContext,
                       options: Option[LayerCreatorOptions],
@@ -45,7 +45,7 @@ class Semanticcpg() extends LayerCreator {
 
     val enhancementExecList = createEnhancementExecList(cpg, language)
     enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg))
-    Overlays.appendOverlayName(cpg, Semanticcpg.overlayName)
+    Overlays.appendOverlayName(cpg, Scpg.overlayName)
   }
 
   private def createEnhancementExecList(cpg: Cpg, language: String): Iterator[CpgPass] = {

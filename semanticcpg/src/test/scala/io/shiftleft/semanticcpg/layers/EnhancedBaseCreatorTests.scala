@@ -12,8 +12,8 @@ class EnhancedBaseCreatorTests extends WordSpec with Matchers {
     "add name of overlay to metadata field" in {
       val cpg = MockCpg().withMetaData().cpg
       val context = new LayerCreatorContext(cpg, new SerializedCpg())
-      new Semanticcpg().run(context)
-      Overlays.appliedOverlays(cpg) shouldBe List(Semanticcpg.overlayName)
+      new Scpg().run(context)
+      Overlays.appliedOverlays(cpg) shouldBe List(Scpg.overlayName)
     }
 
   }

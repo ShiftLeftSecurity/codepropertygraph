@@ -3,7 +3,7 @@ package io.shiftleft.dataflowengine.language
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.dataflowengine.layers.dataflows.DataFlowRunner
-import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Semanticcpg}
+import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
 import io.shiftleft.semanticcpg.testfixtures.{CodeToCpgFixture, LanguageFrontend}
 import io.shiftleft.dataflowengine.semanticsloader.SemanticsLoader
 
@@ -16,7 +16,7 @@ object DataFlowCodeToCpgFixture {
 
   private def passes(cpg: Cpg): Unit = {
     val context = new LayerCreatorContext(cpg, new SerializedCpg())
-    new Semanticcpg().run(context)
+    new Scpg().run(context)
     val semantics = new SemanticsLoader("dataflowengine/src/test/resources/default.semantics").load()
     new DataFlowRunner(semantics).run(cpg, new SerializedCpg())
   }
