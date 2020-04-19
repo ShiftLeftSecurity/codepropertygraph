@@ -3,7 +3,7 @@ name := "console"
 enablePlugins(JavaAppPackaging)
 
 dependsOn(Projects.codepropertygraph,
-          Projects.semanticcpg % "test -> test")
+          Projects.semanticcpg)
 
 scalacOptions ++= Seq(
   "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
@@ -59,6 +59,8 @@ libraryDependencies ++= Seq(
   "io.circe"             %% "circe-parser"  % CirceVersion,
   "org.zeroturnaround"   %  "zt-zip"        % ZeroturnaroundVersion,
   "com.lihaoyi"          %% "ammonite"      % AmmoniteVersion cross CrossVersion.full,
+  "com.massisframework"  %  "j-text-utils"  % "0.3.4",
+  "org.reflections" % "reflections"           % "0.9.12",
 
   "org.scalatest"        %% "scalatest"     % ScalatestVersion % Test,
 )
