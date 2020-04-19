@@ -3,16 +3,14 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.{Doc, Doc2, StepsExt, StepsExtJ}
+import io.shiftleft.semanticcpg.{Doc, Traversal}
 import io.shiftleft.semanticcpg.language.Help.{Entry, ForNode}
 import io.shiftleft.semanticcpg.language._
 
 /**
   * A method, function, or procedure
   * */
-// using java annotation so i can use org.reflections. alternative might be ClassFinder
-@StepsExtJ(nodeType = classOf[nodes.Method])
-//@StepsExt
+@Traversal(elementType = classOf[nodes.Method])
 class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   private def raw: GremlinScala[nodes.Method] = wrapped.raw
 
@@ -160,21 +158,21 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   def block: NodeSteps[nodes.Block] =
     new NodeSteps(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
 
-  /**
-    * Traverse to method body (alias for `block`)
-    * */
+  @Doc(msg = "Traverse to method body (alias for `block`)")
   def body: NodeSteps[nodes.Block] = block
 
-  /**
-    * Traverse to namespace
-    * */
   @Doc(msg = "Traverse to namespace")
-  @Doc2("Traverse to namespace")
   def namespace: NodeSteps[nodes.Namespace] =
     new NodeSteps(definingTypeDecl.namespace.raw)
 
   def numberOfLines: Steps[Int] = wrapped.map(_.numberOfLines)
 
+}
+
+object Foo2 extends App {
+  println(new Steps[nodes.Method](null).help2)
+//  println(new Steps[nodes.Block](null).help2)
+//  println(new Steps[String](null).help2)
 }
 
 object DocReflectionMagic extends App {
@@ -188,9 +186,9 @@ object DocReflectionMagic extends App {
   import java.util
   import scala.jdk.CollectionConverters._
   val reflections = new Reflections("io.shiftleft")
-  val travExtHead = reflections.getTypesAnnotatedWith(classOf[StepsExtJ]).iterator.next
-  val annotation = travExtHead.getAnnotation(classOf[StepsExtJ])
-  val nodeType = annotation.nodeType
+  val travExtHead = reflections.getTypesAnnotatedWith(classOf[Traversal]).iterator.next
+  val annotation = travExtHead.getAnnotation(classOf[Traversal])
+  val nodeType = annotation.elementType
 //  println(travExtHead)
 //  println(annotation)
 //  println(nodeType)

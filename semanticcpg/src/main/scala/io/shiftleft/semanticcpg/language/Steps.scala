@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes._
 import java.util.{List => JList}
 
-import io.shiftleft.semanticcpg.{Doc, Doc2, StepsExtJ}
+import io.shiftleft.semanticcpg.{Doc, Traversal}
 import org.apache.tinkerpop.gremlin.process.traversal.Scope
 import org.json4s.CustomSerializer
 import org.json4s.native.Serialization.{write, writePretty}
@@ -14,6 +14,7 @@ import org.reflections.Reflections
 
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable
+import scala.reflect.ClassTag
 
 /** Base class for our DSL
   * These are the base steps available in all steps of the query language.
@@ -94,34 +95,32 @@ class Steps[A](val raw: GremlinScala[A]) {
   def help(implicit helpProvider: Help[A] = Help.default): String =
     helpProvider.toText
 
-  import scala.reflect.ClassTag
-  def help2(implicit ct: ClassTag[A]): String = {
-    val runtimeClassForA = ct.runtimeClass
+  def help2(implicit elementType: ClassTag[A]): String = {
+    // TODO move to static lazy val
+    case class StepDoc(traversalClassName: String, methodName: String, shortMsg: String, longMsg: Option[String] = None, example: Option[String] = None)
 
     val reflections = new Reflections("io.shiftleft")
-    val travExtHead = reflections.getTypesAnnotatedWith(classOf[StepsExtJ]).iterator.next
-    val annotation = travExtHead.getAnnotation(classOf[StepsExtJ])
-    val nodeType = annotation.nodeType
-//    println("help2: " + nodeType.isAssignableFrom(runtimeClassForA))
-//    println("help2: " + nodeType.equals(runtimeClassForA))
+    val stepDocsByElementType: Map[Class[_], List[StepDoc]] =
+      reflections.getTypesAnnotatedWith(classOf[Traversal]).iterator.asScala.toList.flatMap { traversal =>
+        val elementClass = traversal.getAnnotation(classOf[Traversal]).elementType
+        traversal.getMethods
+          .filterNot(m => java.lang.reflect.Modifier.isStatic(m.getModifiers))
+          .map(_.getAnnotation(classOf[Doc])).filter(_ != null).toList.map { doc =>
+            (elementClass, StepDoc(traversal.getName, "TODO methodName", doc.msg, Some(doc.longMsg), Some(doc.example)))
+        }
+      }.groupMap(_._1)(_._2)
 
-      travExtHead.getMethods.toList.foreach { method =>
-        val x = method.getDeclaredAnnotations.filter(a => a.annotationType() == classOf[Doc2]) // problem: classOf[Doc2] finds ALL of them..?
-        if (x.size > 0) println(method.getName) //all empty...
+//    stepDocsByElementType.foreach(println)
+    stepDocsByElementType.get(elementType.runtimeClass).getOrElse(Nil).foreach(println)
 
-        val x1 = method.getAnnotation(classOf[Doc])
-        if (x1 != null) println(x1)
-
-
-//        method.getDeclaredAnnotations.map { a =>
-//          println(a)
-//          println(a match {
-//            case a if a.annotationType == classOf[Doc2] => 23
-//            case a: Doc2 => a.short
-//          })
-//        }
-//        (method, docs)
-      }
+//    val nodeType = annotation.elementType
+////    println("help2: " + nodeType.isAssignableFrom(runtimeClassForA))
+////    println("help2: " + nodeType.equals(runtimeClassForA))
+//
+//      travExtHead.getMethods.toList.foreach { method =>
+//        val x1 = method.getAnnotation(classOf[Doc])
+//        if (x1 != null) println(x1)
+//      }
 //    travExtHead.getMethods.toList.filter(_.getDeclaredAnnotations.nonEmpty).flatMap(_.getDeclaredAnnotations.filter(_.annotationType() == classOf[Doc2]))
     //        println(s"$m ${m.getDeclaredAnnotations.toList}")
 //      }

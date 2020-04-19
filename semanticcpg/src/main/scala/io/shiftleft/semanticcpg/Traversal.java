@@ -4,6 +4,6 @@ import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface StepsExtJ {
-  public Class nodeType();
+public @interface Traversal {
+  public Class elementType();
 }
