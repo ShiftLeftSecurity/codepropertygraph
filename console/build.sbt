@@ -3,7 +3,7 @@ name := "console"
 enablePlugins(JavaAppPackaging)
 
 dependsOn(Projects.codepropertygraph,
-          Projects.semanticcpg % "test -> test")
+          Projects.semanticcpg)
 
 scalacOptions ++= Seq(
   "-deprecation",                      // Emit warning and location for usages of deprecated APIs.

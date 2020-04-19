@@ -30,9 +30,9 @@ object Run {
          |  val columnNames = List("name", "description")
          |  val rows =
          |   ${layerCreatorTypeNames.map {
-        case (varName, typeName) =>
-          s"""List("$varName",$typeName.description.trim)"""
-      }}.map(_.mkString("\\t"))
+           case (varName, typeName) =>
+             s"""List("$varName",$typeName.description.trim)"""
+         }}.map(_.mkString("\\t"))
          | Table.create(columnNames, rows)
          | }
          |""".stripMargin
