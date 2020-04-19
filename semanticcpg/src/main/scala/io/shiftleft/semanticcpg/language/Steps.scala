@@ -5,10 +5,12 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes._
 import java.util.{List => JList}
 
+import io.shiftleft.semanticcpg.{Doc, Doc2, StepsExtJ}
 import org.apache.tinkerpop.gremlin.process.traversal.Scope
 import org.json4s.CustomSerializer
 import org.json4s.native.Serialization.{write, writePretty}
 import org.json4s.Extraction
+import org.reflections.Reflections
 
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable
@@ -92,16 +94,37 @@ class Steps[A](val raw: GremlinScala[A]) {
   def help(implicit helpProvider: Help[A] = Help.default): String =
     helpProvider.toText
 
-  import scala.reflect.runtime.universe.TypeTag
   import scala.reflect.ClassTag
-  def help2(implicit tt: TypeTag[A], ct: ClassTag[A]): String = {
-    import scala.reflect.runtime.universe._
-//    import scala.tools.reflect.ToolBox
-//    val tb = runtimeMirror(this.getClass.getClassLoader).mkToolBox()
-//    classOf[A]
-    println("help2: class A=" + ct.runtimeClass)
-    println("help2: type A=" + typeOf[A])
-//    println(typeOf[A].decls)
+  def help2(implicit ct: ClassTag[A]): String = {
+    val runtimeClassForA = ct.runtimeClass
+
+    val reflections = new Reflections("io.shiftleft")
+    val travExtHead = reflections.getTypesAnnotatedWith(classOf[StepsExtJ]).iterator.next
+    val annotation = travExtHead.getAnnotation(classOf[StepsExtJ])
+    val nodeType = annotation.nodeType
+//    println("help2: " + nodeType.isAssignableFrom(runtimeClassForA))
+//    println("help2: " + nodeType.equals(runtimeClassForA))
+
+      travExtHead.getMethods.toList.foreach { method =>
+        val x = method.getDeclaredAnnotations.filter(a => a.annotationType() == classOf[Doc2]) // problem: classOf[Doc2] finds ALL of them..?
+        if (x.size > 0) println(method.getName) //all empty...
+
+        val x1 = method.getAnnotation(classOf[Doc])
+        if (x1 != null) println(x1)
+
+
+//        method.getDeclaredAnnotations.map { a =>
+//          println(a)
+//          println(a match {
+//            case a if a.annotationType == classOf[Doc2] => 23
+//            case a: Doc2 => a.short
+//          })
+//        }
+//        (method, docs)
+      }
+//    travExtHead.getMethods.toList.filter(_.getDeclaredAnnotations.nonEmpty).flatMap(_.getDeclaredAnnotations.filter(_.annotationType() == classOf[Doc2]))
+    //        println(s"$m ${m.getDeclaredAnnotations.toList}")
+//      }
     ""
   }
 

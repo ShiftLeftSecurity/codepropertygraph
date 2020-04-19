@@ -197,15 +197,15 @@ object DocReflectionMagic extends App {
 
   // TODO use the nodeType class in `help` impl to compute the correct help
   // ideas: typetag?
-  println(new Steps[nodes.Method](null).help2(nodeType))
+  println(new Steps[nodes.Method](null).help2)
 
   // get methods and their @Doc entries: easy
 //  travExtHead.getMethods.toList.filter(_.getDeclaredAnnotations.nonEmpty).foreach { m =>
 //    println(s"$m ${m.getDeclaredAnnotations.toList}")
 //  }
 
-  val mirror = runtimeMirror(this.getClass.getClassLoader)
-  val tb = mirror.mkToolBox()
+//  val mirror = runtimeMirror(this.getClass.getClassLoader)
+//  val tb = mirror.mkToolBox()
 //  mirror.classLoader.
 //  ru.
 
