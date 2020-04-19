@@ -103,28 +103,16 @@ class Steps[A](val raw: GremlinScala[A]) {
     val stepDocsByElementType: Map[Class[_], List[StepDoc]] =
       reflections.getTypesAnnotatedWith(classOf[Traversal]).iterator.asScala.toList.flatMap { traversal =>
         val elementClass = traversal.getAnnotation(classOf[Traversal]).elementType
-        traversal.getMethods
-          .filterNot(m => java.lang.reflect.Modifier.isStatic(m.getModifiers))
-          .map(_.getAnnotation(classOf[Doc])).filter(_ != null).toList.map { doc =>
-            (elementClass, StepDoc(traversal.getName, "TODO methodName", doc.msg, Some(doc.longMsg), Some(doc.example)))
+        traversal.getMethods.filterNot(m => java.lang.reflect.Modifier.isStatic(m.getModifiers)).flatMap { method =>
+          Option(method.getAnnotation(classOf[Doc])).map { doc =>
+            (elementClass, StepDoc(traversal.getName, method.getName, doc.msg, Some(doc.longMsg), Some(doc.example)))
+          }
         }
       }.groupMap(_._1)(_._2)
 
 //    stepDocsByElementType.foreach(println)
-    stepDocsByElementType.get(elementType.runtimeClass).getOrElse(Nil).foreach(println)
-
-//    val nodeType = annotation.elementType
-////    println("help2: " + nodeType.isAssignableFrom(runtimeClassForA))
-////    println("help2: " + nodeType.equals(runtimeClassForA))
-//
-//      travExtHead.getMethods.toList.foreach { method =>
-//        val x1 = method.getAnnotation(classOf[Doc])
-//        if (x1 != null) println(x1)
-//      }
-//    travExtHead.getMethods.toList.filter(_.getDeclaredAnnotations.nonEmpty).flatMap(_.getDeclaredAnnotations.filter(_.annotationType() == classOf[Doc2]))
-    //        println(s"$m ${m.getDeclaredAnnotations.toList}")
-//      }
-    ""
+    // TODO generate table
+    stepDocsByElementType.get(elementType.runtimeClass).getOrElse(Nil).mkString("\n")
   }
 
   /**
