@@ -92,6 +92,19 @@ class Steps[A](val raw: GremlinScala[A]) {
   def help(implicit helpProvider: Help[A] = Help.default): String =
     helpProvider.toText
 
+  import scala.reflect.runtime.universe.TypeTag
+  import scala.reflect.ClassTag
+  def help2(implicit tt: TypeTag[A], ct: ClassTag[A]): String = {
+    import scala.reflect.runtime.universe._
+//    import scala.tools.reflect.ToolBox
+//    val tb = runtimeMirror(this.getClass.getClassLoader).mkToolBox()
+//    classOf[A]
+    println("help2: class A=" + ct.runtimeClass)
+    println("help2: type A=" + typeOf[A])
+//    println(typeOf[A].decls)
+    ""
+  }
+
   /**
     * Print help/documentation about generic steps - useful for REPL users
     * */

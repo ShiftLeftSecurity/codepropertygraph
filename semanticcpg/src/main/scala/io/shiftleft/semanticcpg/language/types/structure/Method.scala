@@ -3,12 +3,16 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.semanticcpg.{Doc, Doc2, StepsExt, StepsExtJ}
 import io.shiftleft.semanticcpg.language.Help.{Entry, ForNode}
 import io.shiftleft.semanticcpg.language._
 
 /**
   * A method, function, or procedure
   * */
+// using java annotation so i can use org.reflections. alternative might be ClassFinder
+@StepsExtJ(nodeType = classOf[nodes.Method])
+//@StepsExt
 class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   private def raw: GremlinScala[nodes.Method] = wrapped.raw
 
@@ -164,6 +168,8 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   /**
     * Traverse to namespace
     * */
+  @Doc(msg = "Traverse to namespace")
+  @Doc2("Traverse to namespace")
   def namespace: NodeSteps[nodes.Namespace] =
     new NodeSteps(definingTypeDecl.namespace.raw)
 
@@ -171,7 +177,77 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
 
 }
 
+object DocReflectionMagic extends App {
+  import scala.reflect.runtime.{universe => ru}
+  import scala.reflect.runtime.universe._
+  import scala.tools.reflect.ToolBox
+  import org.reflections._
+  import org.reflections.util._
+  import org.reflections.scanners._
+  import java.lang.reflect.Field
+  import java.util
+  import scala.jdk.CollectionConverters._
+  val reflections = new Reflections("io.shiftleft")
+  val travExtHead = reflections.getTypesAnnotatedWith(classOf[StepsExtJ]).iterator.next
+  val annotation = travExtHead.getAnnotation(classOf[StepsExtJ])
+  val nodeType = annotation.nodeType
+//  println(travExtHead)
+//  println(annotation)
+//  println(nodeType)
+
+  // TODO use the nodeType class in `help` impl to compute the correct help
+  // ideas: typetag?
+  println(new Steps[nodes.Method](null).help2(nodeType))
+
+  // get methods and their @Doc entries: easy
+//  travExtHead.getMethods.toList.filter(_.getDeclaredAnnotations.nonEmpty).foreach { m =>
+//    println(s"$m ${m.getDeclaredAnnotations.toList}")
+//  }
+
+  val mirror = runtimeMirror(this.getClass.getClassLoader)
+  val tb = mirror.mkToolBox()
+//  mirror.classLoader.
+//  ru.
+
+//  org.reflections.ReflectionUtils.getAllMethods()
+
+
+  //  val r = new Reflections(new ConfigurationBuilder()
+//    .setUrls(ClasspathHelper.forPackage("io.shiftleft"))
+//    .setScanners(
+//      new MethodAnnotationsScanner()
+//      new SubTypesScanner(),
+//      new TypeAnnotationsScanner()
+//    )
+//  )
+//    println(r.getMethodsAnnotatedWith(classOf[Doc]))
+
+  // TODO use reflection to find all steps and it's extensions?
+  // alternative: central place to register all doc strings
+
+//  def funcNameDocPairs(): List[(String, Doc)] = {
+//    val tb = runtimeMirror(this.getClass.getClassLoader).mkToolBox()
+//    //    tb.mirror.classLoader.
+//    typeOf[io.shiftleft.semanticcpg.language.types.structure.Method].decls
+//      .filter(_.isPublic)
+//      .map { x =>
+//        (x.name.toString,
+//          x.annotations
+//            .filter(a => a.tree.tpe =:= typeOf[Doc])
+//            .map(a => tb.eval(tb.untypecheck(a.tree)).asInstanceOf[Doc])
+//            .headOption
+//            .orNull)}
+//      .filter(_._2 != null)
+//      .toList
+//  }
+//
+//  println(funcNameDocPairs())
+//  // TODO use reflection to find all steps and it's extensions? check what fabs did with Passes
+//  // alternative: central place to register all doc strings
+}
+
 object Method {
+
 
   val Help = new ForNode[nodes.Method](
     "method node",
@@ -203,3 +279,4 @@ object Method {
   )
 
 }
+
