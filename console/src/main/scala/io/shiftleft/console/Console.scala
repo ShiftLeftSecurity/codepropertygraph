@@ -1,6 +1,6 @@
 package io.shiftleft.console
 
-import better.files.Dsl.rm
+import better.files.Dsl.{cp, rm}
 import better.files.File
 import gremlin.scala.ScalaGraph
 import io.shiftleft.codepropertygraph.Cpg
@@ -9,6 +9,9 @@ import io.shiftleft.console.scripting.{AmmoniteExecutor, ScriptManager}
 import io.shiftleft.console.workspacehandling.{Project, WorkspaceLoader, WorkspaceManager}
 import io.shiftleft.semanticcpg.Overlays
 import io.shiftleft.semanticcpg.layers.LayerCreator
+import io.shiftleft.semanticcpg.language._
+
+import scala.util.Try
 
 abstract class Console(executor: AmmoniteExecutor, loader : WorkspaceLoader) extends ScriptManager(executor) {
 
@@ -18,6 +21,7 @@ abstract class Console(executor: AmmoniteExecutor, loader : WorkspaceLoader) ext
 
   protected val workspacePathName: String = config.install.rootPath.path.resolve("workspace").toString
   protected val workspaceManager        = new WorkspaceManager(workspacePathName, loader)
+  private val nameOfCpgInProject       = "cpg.bin"
 
   @Doc(
     "Access to the workspace directory",
@@ -175,7 +179,7 @@ abstract class Console(executor: AmmoniteExecutor, loader : WorkspaceLoader) ext
        |""".stripMargin,
     "undo"
   )
-  def undo: Unit = {
+  def undo: File = {
     project.overlayFiles.lastOption
       .map { file =>
         CpgLoader.addDiffGraphs(List(file.path.toString), cpg)
@@ -184,6 +188,82 @@ abstract class Console(executor: AmmoniteExecutor, loader : WorkspaceLoader) ext
       }
       .getOrElse(throw new RuntimeException("No overlays present"))
   }
+
+  @Doc(
+    "Create new project from existing CPG",
+    """
+      |importCpg(<inputPath>, [projectName])
+      |
+      |Import an existing CPG into Ocular. The CPG is stored as part
+      |of a new project and blanks are filled in by analyzing the CPG.
+      |If we find that default overlays have not been applied, these
+      |are applied to the CPG after loading it.
+      |
+      |Parameters:
+      |
+      |inputPath: path where the existing CPG (in overflowdb format)
+      |is stored
+      |
+      |projectName: name of the new project. If this parameter
+      |is omitted, the path is derived from `inputPath`
+      |""".stripMargin,
+    """importCpg("cpg.bin.zip")"""
+  )
+  def importCpg(inputPath: String, projectName: String = ""): Option[Cpg] = {
+    val name    = Option(projectName).filter(_.nonEmpty).getOrElse(deriveNameFromInputPath(inputPath))
+    val cpgFile = File(inputPath)
+
+    if (!cpgFile.exists) {
+      report(s"CPG at $inputPath does not exist. Bailing out.")
+      return None
+    }
+
+    System.err.println(s"Creating project `$name` for CPG at `$inputPath`")
+    val pathToProject         = workspace.createProject(inputPath, name)
+    val cpgDestinationPathOpt = pathToProject.map(_.resolve(nameOfCpgInProject))
+
+    if (cpgDestinationPathOpt.isEmpty) {
+      report(s"Error creating project for input path: `$inputPath`")
+      return None
+    }
+
+    val cpgDestinationPath = cpgDestinationPathOpt.get
+
+    if (isZipFile(cpgFile)) {
+      report("You have provided a legacy proto CPG. Attempting conversion.")
+      try {
+        CpgConverter.convertProtoCpgToOverflowDb(cpgFile.path.toString, cpgDestinationPath.toString)
+      } catch {
+        case exc: Exception =>
+          report("Error converting legacy CPG: " + exc.getMessage)
+          return None
+      }
+    } else {
+      cp(cpgFile, cpgDestinationPath)
+    }
+
+    val cpgOpt = open(name).flatMap(_.cpg)
+
+    if (cpgOpt.isEmpty) {
+      workspace.deleteProject(name)
+    }
+
+    cpgOpt
+      .filter(_.metaData.headOption().isDefined)
+      .foreach (applyDefaultOverlays)
+
+    cpgOpt
+  }
+
+  private def isZipFile(file: File): Boolean = {
+    val bytes = file.bytes
+    Try {
+      bytes.next() == 'P' && bytes.next() == 'K'
+    }.getOrElse(false)
+  }
+
+
+  def applyDefaultOverlays(cpg: Cpg): Unit
 
   protected def report(string: String): Unit = System.err.println(string)
 
