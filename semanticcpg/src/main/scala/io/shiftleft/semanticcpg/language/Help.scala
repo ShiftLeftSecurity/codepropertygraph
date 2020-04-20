@@ -28,10 +28,11 @@ object Help {
 
     val stepDocs = {
       val base = stepDocsByElementType.get(elementClass).getOrElse(Nil)
-      if (verbose) {
-        val baseVerbose = base ++ genericStepDocs
-        if (isNode) baseVerbose ++ genericNodeStepDocs else baseVerbose
-      } else base
+      if (!verbose) base
+      else {
+        if (isNode) base ++ genericNodeStepDocs
+        else base ++ genericStepDocs
+      }
     }
 
     val columnNames = if (verbose) ColumnNamesVerbose else ColumnNames
