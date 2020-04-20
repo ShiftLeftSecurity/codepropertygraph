@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes._
 import java.util.{List => JList}
 
+import io.shiftleft.semanticcpg.Doc
 import org.apache.tinkerpop.gremlin.process.traversal.Scope
 import org.json4s.CustomSerializer
 import org.json4s.native.Serialization.{write, writePretty}
@@ -26,18 +27,15 @@ class Steps[A](val raw: GremlinScala[A]) {
     iter.asScala
   }
 
-  /**
-    * Execute the traversal and convert the result to a list
-    * `toList` (inspection) evaluates and returns raw case classes.
-    * We use `toList` to allow the developer to view the raw CPG nodes
-    * returned by a query - including containedNodes - in a format that
-    * allows for easy inspection, but nonetheless, shows the data as-is.
-    */
+  @Doc(msg = """Execute the traversal and convert the result to a list.
+               |`toList` (inspection) evaluates and returns raw case classes.
+               |We use `toList` to allow the developer to view the raw CPG nodes
+               |returned by a query - including containedNodes - in a format that
+               |allows for easy inspection, but nonetheless, shows the data as-is.
+               |""")
   def toList(): List[A] = raw.toList()
 
-  /**
-    Shorthand for `toList`
-    */
+  @Doc(msg = "Shorthand for `toList`")
   def l(): List[A] = toList()
 
   /**
