@@ -7,10 +7,12 @@ import java.nio.charset.StandardCharsets
 import dnl.utils.text.table.TextTable
 import io.shiftleft.semanticcpg.{Doc, Traversal}
 import org.reflections.Reflections
+
 import scala.jdk.CollectionConverters._
 import scala.util.Using
 
 object Help {
+
   /**
     * The base package that we scan for @Traversal annotations.
     * Note that this restricts `.help` to only find @Doc annotations in classes in that namespace and it's children.
@@ -19,20 +21,6 @@ object Help {
   val StepsBasePackage = "io.shiftleft"
   val ColumnNames = Array("step", "description")
   val ColumnNamesVerbose = ColumnNames :+ "traversal name"
-
-  /**
-    * Scans the entire classpath for classes annotated with @Traversal (using java reflection),
-    * to then extract the @Doc annotations for all steps, and group them by the elementType (e.g. node.Method).
-    * Results are cached (hence lazy val).
-    */
-  lazy val stepDocsByElementType: Map[Class[_], List[StepDoc]] = {
-    for {
-      traversal <- new Reflections(StepsBasePackage).getTypesAnnotatedWith(classOf[Traversal]).iterator.asScala
-      elementType = traversal.getAnnotation(classOf[Traversal]).elementType
-      method <- traversal.getMethods.filterNot(m => isStatic(m.getModifiers))
-      doc <- Option(method.getAnnotation(classOf[Doc]))
-    } yield (elementType, StepDoc(traversal.getName, method.getName, doc.msg))
-  }.toList.groupMap(_._1)(_._2)
 
   def renderTable(elementClass: Class[_], verbose: Boolean): String = {
     val stepDocs = stepDocsByElementType.get(elementClass).getOrElse(Nil)
@@ -51,21 +39,34 @@ object Help {
       new String(baos.toByteArray, StandardCharsets.UTF_8)
     }.get
 
-      s"""Available steps for ${elementClass.getSimpleName}:
+    s"""Available steps for ${elementClass.getSimpleName}:
          |$entriesTable
          |""".stripMargin
   }
 
-//  val genericHelp = new ForNode(
-//    "generic NodeStep",
-//    List(
-//      Entry(".l", "execute this traversal and return a List"),
-//      Entry(".p", "pretty print"),
-//      Entry(".toJson", ""),
-//      Entry(".toJsonPretty", ""),
-//      Entry(".map", "transform the traversal by a given function, e.g. `.map(_.toString)`"),
-//    )
-//  )
+  /**
+    * Scans the entire classpath for classes annotated with @Traversal (using java reflection),
+    * to then extract the @Doc annotations for all steps, and group them by the elementType (e.g. node.Method).
+    */
+  lazy val stepDocsByElementType: Map[Class[_], List[StepDoc]] = {
+    for {
+      traversal <- new Reflections(StepsBasePackage).getTypesAnnotatedWith(classOf[Traversal]).iterator.asScala
+      stepDoc <- readDocAnnotations(traversal)
+      elementType = traversal.getAnnotation(classOf[Traversal]).elementType
+    } yield (elementType, stepDoc)
+  }.toList.groupMap(_._1)(_._2)
+
+  lazy val genericStepDocs: List[StepDoc] =
+    readDocAnnotations(classOf[Steps[_]])
+
+  lazy val genericNodeStepDocs: List[StepDoc] =
+    readDocAnnotations(classOf[NodeSteps[_]])
+
+  private def readDocAnnotations(traversal: Class[_]): List[StepDoc] =
+    for {
+      method <- traversal.getMethods.toList if !isStatic(method.getModifiers)
+      doc <- Option(method.getAnnotation(classOf[Doc]))
+    } yield StepDoc(traversal.getName, method.getName, doc.msg.stripMargin)
 
   case class StepDoc(traversalClassName: String, methodName: String, msg: String)
 }

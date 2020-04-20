@@ -209,17 +209,12 @@ class StepsTest extends WordSpec with Matchers {
       methodSteps.helpVerbose should include (".namespace")
     }
 
-//    "always provides generic help" in {
-//      cpg.methodReturn.helpGeneric shouldBe Help.genericHelp.toText
-//    }
-//
-//    "return node-specific help text (in case it's available)" in {
-//      cpg.methodReturn.help shouldBe MethodReturn.Help.toText
-//    }
-//
-//    "foo" in {
-//      println(cpg.methodReturn.help)
-//    }
+    "provides generic help (verbose mode)" in {
+      val methodSteps = new Steps[nodes.Method](null)
+      methodSteps.helpVerbose should include (".toList")
+      methodSteps.helpVerbose should include (".FFFFFFFFFFFFFFFFFFFFFFFFF")
+    }
+
   }
 
 }
