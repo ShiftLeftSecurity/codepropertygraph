@@ -5,12 +5,10 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes._
 import java.util.{List => JList}
 
-import io.shiftleft.semanticcpg.{Doc, Traversal}
 import org.apache.tinkerpop.gremlin.process.traversal.Scope
 import org.json4s.CustomSerializer
 import org.json4s.native.Serialization.{write, writePretty}
 import org.json4s.Extraction
-import org.reflections.Reflections
 
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable
@@ -92,24 +90,8 @@ class Steps[A](val raw: GremlinScala[A]) {
   /**
     * Print help/documentation about the current specific step
     * */
-  def help(implicit elementType: ClassTag[A]): String = {
-    // TODO move to static lazy val
-    case class StepDoc(traversalClassName: String, methodName: String, msg: String)
-
-    val reflections = new Reflections("io.shiftleft")
-    val stepDocsByElementType: Map[Class[_], List[StepDoc]] =
-      reflections.getTypesAnnotatedWith(classOf[Traversal]).iterator.asScala.toList.flatMap { traversal =>
-        val elementClass = traversal.getAnnotation(classOf[Traversal]).elementType
-        traversal.getMethods.filterNot(m => java.lang.reflect.Modifier.isStatic(m.getModifiers)).flatMap { method =>
-          Option(method.getAnnotation(classOf[Doc])).map { doc =>
-            (elementClass, StepDoc(traversal.getName, method.getName, doc.msg))
-          }
-        }
-      }.groupMap(_._1)(_._2)
-
-    // TODO generate table
-    stepDocsByElementType.get(elementType.runtimeClass).getOrElse(Nil).mkString("\n")
-  }
+  def help(implicit elementType: ClassTag[A]): String =
+    Help.renderTable(elementType.runtimeClass)
 
   /**
     * Pretty print vertices
