@@ -157,9 +157,11 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   def block: NodeSteps[nodes.Block] =
     new NodeSteps(raw.out(EdgeTypes.AST).hasLabel(NodeTypes.BLOCK).cast[nodes.Block])
 
+  /** Traverse to method body (alias for `block`) */
   @Doc(msg = "Traverse to method body (alias for `block`)")
   def body: NodeSteps[nodes.Block] = block
 
+  /** Traverse to namespace */
   @Doc(msg = "Traverse to namespace")
   def namespace: NodeSteps[nodes.Namespace] =
     new NodeSteps(definingTypeDecl.namespace.raw)
