@@ -19,7 +19,7 @@ object Help {
 
   def funcNameDocPairs[C](implicit tag: TypeTag[C]): List[(String, Doc)] = {
     val tb = runtimeMirror(this.getClass.getClassLoader).mkToolBox()
-    typeOf[C].decls
+    typeOf[C].members
       .filter(_.isPublic)
       .map(
         x =>

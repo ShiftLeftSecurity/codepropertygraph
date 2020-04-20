@@ -47,3 +47,4 @@ onLoad in Global := {
   assert(GitLFSUtils.isGitLFSEnabled(), "You need to install git-lfs and run 'git lfs pull'")
   (onLoad in Global).value
 }
+
