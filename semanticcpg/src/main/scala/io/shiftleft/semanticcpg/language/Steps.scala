@@ -93,8 +93,11 @@ class Steps[A](val raw: GremlinScala[A]) {
     * Note that this works independently of tab completion and implicit conversions in scope - it will simply list
     * all documented steps in the classpath
     * */
-  def help(verbose: Boolean = false)(implicit elementType: ClassTag[A]): String =
-    Help.renderTable(elementType.runtimeClass)
+  def help()(implicit elementType: ClassTag[A]): String =
+    Help.renderTable(elementType.runtimeClass, verbose = false)
+
+  def helpVerbose()(implicit elementType: ClassTag[A]): String =
+    Help.renderTable(elementType.runtimeClass, verbose = true)
 
   /**
     * Pretty print vertices
