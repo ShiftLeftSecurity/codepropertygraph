@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier.isStatic
 import java.nio.charset.StandardCharsets
 
 import dnl.utils.text.table.TextTable
+import io.shiftleft.codepropertygraph.generated.nodes.Node
 import io.shiftleft.semanticcpg.{Doc, Traversal}
 import org.reflections.Reflections
 
@@ -23,10 +24,18 @@ object Help {
   val ColumnNamesVerbose = ColumnNames :+ "traversal name"
 
   def renderTable(elementClass: Class[_], verbose: Boolean): String = {
-    val stepDocs = stepDocsByElementType.get(elementClass).getOrElse(Nil)
+    val isNode = classOf[Node].isAssignableFrom(elementClass)
+
+    val stepDocs = {
+      val base = stepDocsByElementType.get(elementClass).getOrElse(Nil)
+      if (verbose) {
+        val baseVerbose = base ++ genericStepDocs
+        if (isNode) baseVerbose ++ genericNodeStepDocs else baseVerbose
+      } else base
+    }
 
     val columnNames = if (verbose) ColumnNamesVerbose else ColumnNames
-    val rowData = stepDocs.toArray.map { stepDoc =>
+    val rowData = stepDocs.sortBy(_.methodName).toArray.map { stepDoc =>
       val baseColumns: Array[Object] = Array(s".${stepDoc.methodName}", stepDoc.msg)
       if (verbose) baseColumns :+ stepDoc.traversalClassName
       else baseColumns
@@ -66,7 +75,7 @@ object Help {
     for {
       method <- traversal.getMethods.toList if !isStatic(method.getModifiers)
       doc <- Option(method.getAnnotation(classOf[Doc]))
-    } yield StepDoc(traversal.getName, method.getName, doc.msg.stripMargin)
+    } yield StepDoc(traversal.getName, method.getName, doc.msg)
 
   case class StepDoc(traversalClassName: String, methodName: String, msg: String)
 }

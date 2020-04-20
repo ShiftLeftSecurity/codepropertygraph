@@ -209,10 +209,20 @@ class StepsTest extends WordSpec with Matchers {
       methodSteps.helpVerbose should include (".namespace")
     }
 
-    "provides generic help (verbose mode)" in {
-      val methodSteps = new Steps[nodes.Method](null)
-      methodSteps.helpVerbose should include (".toList")
-      methodSteps.helpVerbose should include (".FFFFFFFFFFFFFFFFFFFFFFFFF")
+    "provides generic help" when {
+      "using verbose mode" when {
+        "traversing nodes" in {
+          val methodSteps = new Steps[nodes.Method](null)
+          methodSteps.helpVerbose should include(".toList")
+          methodSteps.helpVerbose should include(".label")
+        }
+
+        "traversing non-nodes" in {
+          val stringSteps = new Steps[String](null)
+          stringSteps.helpVerbose should include(".toList")
+          stringSteps.helpVerbose should not include ".label"
+        }
+      }
     }
 
   }
