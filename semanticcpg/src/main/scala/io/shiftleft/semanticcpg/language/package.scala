@@ -21,7 +21,6 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   Node,
   StoredNode
 }
-import io.shiftleft.semanticcpg.language.Help
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.MethodDOT
 import io.shiftleft.semanticcpg.language.nodemethods.{
@@ -267,7 +266,7 @@ package object language extends operatorextension.Implicits {
     new ModifierAccessors(steps)
   // Modifier accessors ~
 
-  implicit val methodReturnHelp: Help[nodes.MethodReturn] = MethodReturn.Help
+//  implicit val methodReturnHelp: Help[nodes.MethodReturn] = MethodReturn.Help
   // TODO other implicits for the step extensions defined in this package
 
 }

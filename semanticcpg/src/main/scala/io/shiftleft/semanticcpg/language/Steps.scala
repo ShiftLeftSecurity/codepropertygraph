@@ -89,12 +89,12 @@ class Steps[A](val raw: GremlinScala[A]) {
 
   def isEmpty: Boolean = !isDefined
 
-  /**
-    * Print help/documentation about the current specific step - useful for REPL users
-    * */
-  def help(implicit helpProvider: Help[A] = Help.default): String =
-    helpProvider.toText
+//  def help(implicit helpProvider: Help[A] = Help.default): String =
+//    helpProvider.toText
 
+  /**
+    * Print help/documentation about the current specific step
+    * */
   def help2(implicit elementType: ClassTag[A]): String = {
     // TODO move to static lazy val
     case class StepDoc(traversalClassName: String, methodName: String, shortMsg: String, longMsg: Option[String] = None, example: Option[String] = None)
@@ -118,7 +118,7 @@ class Steps[A](val raw: GremlinScala[A]) {
   /**
     * Print help/documentation about generic steps - useful for REPL users
     * */
-  def helpGeneric: String = Help.genericHelp.toText
+//  def helpGeneric: String = Help.genericHelp.toText
 
   /**
     * Pretty print vertices

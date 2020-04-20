@@ -4,7 +4,6 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.{Doc, Traversal}
-import io.shiftleft.semanticcpg.language.Help.{Entry, ForNode}
 import io.shiftleft.semanticcpg.language._
 
 /**
@@ -169,112 +168,34 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
 
 }
 
-object Foo2 extends App {
-  println(new Steps[nodes.Method](null).help2)
-//  println(new Steps[nodes.Block](null).help2)
-//  println(new Steps[String](null).help2)
-}
-
-object DocReflectionMagic extends App {
-  import scala.reflect.runtime.{universe => ru}
-  import scala.reflect.runtime.universe._
-  import scala.tools.reflect.ToolBox
-  import org.reflections._
-  import org.reflections.util._
-  import org.reflections.scanners._
-  import java.lang.reflect.Field
-  import java.util
-  import scala.jdk.CollectionConverters._
-  val reflections = new Reflections("io.shiftleft")
-  val travExtHead = reflections.getTypesAnnotatedWith(classOf[Traversal]).iterator.next
-  val annotation = travExtHead.getAnnotation(classOf[Traversal])
-  val nodeType = annotation.elementType
-//  println(travExtHead)
-//  println(annotation)
-//  println(nodeType)
-
-  // TODO use the nodeType class in `help` impl to compute the correct help
-  // ideas: typetag?
-  println(new Steps[nodes.Method](null).help2)
-
-  // get methods and their @Doc entries: easy
-//  travExtHead.getMethods.toList.filter(_.getDeclaredAnnotations.nonEmpty).foreach { m =>
-//    println(s"$m ${m.getDeclaredAnnotations.toList}")
-//  }
-
-//  val mirror = runtimeMirror(this.getClass.getClassLoader)
-//  val tb = mirror.mkToolBox()
-//  mirror.classLoader.
-//  ru.
-
-//  org.reflections.ReflectionUtils.getAllMethods()
-
-
-  //  val r = new Reflections(new ConfigurationBuilder()
-//    .setUrls(ClasspathHelper.forPackage("io.shiftleft"))
-//    .setScanners(
-//      new MethodAnnotationsScanner()
-//      new SubTypesScanner(),
-//      new TypeAnnotationsScanner()
+//object Method {
+//  val Help = new ForNode[nodes.Method](
+//    "method node",
+//    List(
+//      Entry(".parameter", "Traverse to parameters of the method"),
+//      Entry(".methodReturn", "Traverse to formal return parameter"),
+//      Entry(".bindingTypeDecl", "Traverse to type decl which have this method bound to it."),
+//      Entry(".referencingBinding", "Traverse to bindings which reference to this method."),
+//      Entry(".controlStructure", "All control structures of this method"),
+//      Entry(".controlStructure", "Shorthand to traverse to control structures where condition matches `regex`"),
+//      Entry(".callOut", "Outgoing call sites"),
+//      Entry(".definingTypeDecl", "The type declaration associated with this method, e.g., the class it is defined in."),
+//      Entry(".definingMethod", "The method in which this method is defined"),
+//      Entry(".isStub", "Traverse only to methods that are stubs, e.g., their code is not available"),
+//      Entry(".isNotStub", "Traverse only to methods that are not stubs."),
+//      Entry(".external", "Traverse to external methods, that is, methods not present but only referenced in the CPG."),
+//      Entry(".internal", "Traverse to internal methods, that is, methods for which code is included in this CPG."),
+//      Entry(".local", "Traverse to the methods local variables"),
+//      Entry(".literal", "Traverse to literals of method"),
+//      Entry(".topLevelExpressions", ""),
+//      Entry(".cfgNode", ""),
+//      Entry(".cfgFirst", " Traverse to first expression in CFG."),
+//      Entry(".cfgLast", " Traverse to last expression in CFG."),
+//      Entry(".block", "Traverse to block"),
+//      Entry(".body", "Traverse to method body (alias for `block`)"),
+//      Entry(".namespace", "Traverse to namespace"),
+//      Entry(".numberOfLines", "Method's linecount")
 //    )
 //  )
-//    println(r.getMethodsAnnotatedWith(classOf[Doc]))
-
-  // TODO use reflection to find all steps and it's extensions?
-  // alternative: central place to register all doc strings
-
-//  def funcNameDocPairs(): List[(String, Doc)] = {
-//    val tb = runtimeMirror(this.getClass.getClassLoader).mkToolBox()
-//    //    tb.mirror.classLoader.
-//    typeOf[io.shiftleft.semanticcpg.language.types.structure.Method].decls
-//      .filter(_.isPublic)
-//      .map { x =>
-//        (x.name.toString,
-//          x.annotations
-//            .filter(a => a.tree.tpe =:= typeOf[Doc])
-//            .map(a => tb.eval(tb.untypecheck(a.tree)).asInstanceOf[Doc])
-//            .headOption
-//            .orNull)}
-//      .filter(_._2 != null)
-//      .toList
-//  }
-//
-//  println(funcNameDocPairs())
-//  // TODO use reflection to find all steps and it's extensions? check what fabs did with Passes
-//  // alternative: central place to register all doc strings
-}
-
-object Method {
-
-
-  val Help = new ForNode[nodes.Method](
-    "method node",
-    List(
-      Entry(".parameter", "Traverse to parameters of the method"),
-      Entry(".methodReturn", "Traverse to formal return parameter"),
-      Entry(".bindingTypeDecl", "Traverse to type decl which have this method bound to it."),
-      Entry(".referencingBinding", "Traverse to bindings which reference to this method."),
-      Entry(".controlStructure", "All control structures of this method"),
-      Entry(".controlStructure", "Shorthand to traverse to control structures where condition matches `regex`"),
-      Entry(".callOut", "Outgoing call sites"),
-      Entry(".definingTypeDecl", "The type declaration associated with this method, e.g., the class it is defined in."),
-      Entry(".definingMethod", "The method in which this method is defined"),
-      Entry(".isStub", "Traverse only to methods that are stubs, e.g., their code is not available"),
-      Entry(".isNotStub", "Traverse only to methods that are not stubs."),
-      Entry(".external", "Traverse to external methods, that is, methods not present but only referenced in the CPG."),
-      Entry(".internal", "Traverse to internal methods, that is, methods for which code is included in this CPG."),
-      Entry(".local", "Traverse to the methods local variables"),
-      Entry(".literal", "Traverse to literals of method"),
-      Entry(".topLevelExpressions", ""),
-      Entry(".cfgNode", ""),
-      Entry(".cfgFirst", " Traverse to first expression in CFG."),
-      Entry(".cfgLast", " Traverse to last expression in CFG."),
-      Entry(".block", "Traverse to block"),
-      Entry(".body", "Traverse to method body (alias for `block`)"),
-      Entry(".namespace", "Traverse to namespace"),
-      Entry(".numberOfLines", "Method's linecount")
-    )
-  )
-
-}
+//}
 
