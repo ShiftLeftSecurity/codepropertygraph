@@ -6,6 +6,4 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 public @interface Doc {
   public String msg();
-  public String longMsg() default "";
-  public String example() default "";
 }

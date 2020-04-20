@@ -89,15 +89,12 @@ class Steps[A](val raw: GremlinScala[A]) {
 
   def isEmpty: Boolean = !isDefined
 
-//  def help(implicit helpProvider: Help[A] = Help.default): String =
-//    helpProvider.toText
-
   /**
     * Print help/documentation about the current specific step
     * */
-  def help2(implicit elementType: ClassTag[A]): String = {
+  def help(implicit elementType: ClassTag[A]): String = {
     // TODO move to static lazy val
-    case class StepDoc(traversalClassName: String, methodName: String, shortMsg: String, longMsg: Option[String] = None, example: Option[String] = None)
+    case class StepDoc(traversalClassName: String, methodName: String, msg: String)
 
     val reflections = new Reflections("io.shiftleft")
     val stepDocsByElementType: Map[Class[_], List[StepDoc]] =
@@ -105,20 +102,14 @@ class Steps[A](val raw: GremlinScala[A]) {
         val elementClass = traversal.getAnnotation(classOf[Traversal]).elementType
         traversal.getMethods.filterNot(m => java.lang.reflect.Modifier.isStatic(m.getModifiers)).flatMap { method =>
           Option(method.getAnnotation(classOf[Doc])).map { doc =>
-            (elementClass, StepDoc(traversal.getName, method.getName, doc.msg, Some(doc.longMsg), Some(doc.example)))
+            (elementClass, StepDoc(traversal.getName, method.getName, doc.msg))
           }
         }
       }.groupMap(_._1)(_._2)
 
-//    stepDocsByElementType.foreach(println)
     // TODO generate table
     stepDocsByElementType.get(elementType.runtimeClass).getOrElse(Nil).mkString("\n")
   }
-
-  /**
-    * Print help/documentation about generic steps - useful for REPL users
-    * */
-//  def helpGeneric: String = Help.genericHelp.toText
 
   /**
     * Pretty print vertices
