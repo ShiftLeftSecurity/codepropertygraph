@@ -65,6 +65,7 @@ object Help {
       }
       .mkString("\n")
 
+    val overview = Help.overview[C](tag)
     s"""
        | class Helper() {
        |
@@ -72,7 +73,7 @@ object Help {
        |
        | def run : String = Help.runLongHelp
        |
-       |  override def toString : String = Help.overview
+       |  override def toString : String = \"\"\"${overview}\"\"\"
        | }
        |
        | val help = new Helper
