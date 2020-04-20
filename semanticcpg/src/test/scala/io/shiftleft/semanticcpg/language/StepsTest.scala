@@ -185,8 +185,6 @@ class StepsTest extends WordSpec with Matchers {
   }
 
   ".help step" can {
-    val cpg = Cpg(OverflowDbTestInstance.create)
-
 //    "always provides generic help" in {
 //      cpg.methodReturn.helpGeneric shouldBe Help.genericHelp.toText
 //    }

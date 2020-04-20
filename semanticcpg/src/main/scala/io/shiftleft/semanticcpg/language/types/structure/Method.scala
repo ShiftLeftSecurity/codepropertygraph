@@ -167,35 +167,3 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   def numberOfLines: Steps[Int] = wrapped.map(_.numberOfLines)
 
 }
-
-//object Method {
-//  val Help = new ForNode[nodes.Method](
-//    "method node",
-//    List(
-//      Entry(".parameter", "Traverse to parameters of the method"),
-//      Entry(".methodReturn", "Traverse to formal return parameter"),
-//      Entry(".bindingTypeDecl", "Traverse to type decl which have this method bound to it."),
-//      Entry(".referencingBinding", "Traverse to bindings which reference to this method."),
-//      Entry(".controlStructure", "All control structures of this method"),
-//      Entry(".controlStructure", "Shorthand to traverse to control structures where condition matches `regex`"),
-//      Entry(".callOut", "Outgoing call sites"),
-//      Entry(".definingTypeDecl", "The type declaration associated with this method, e.g., the class it is defined in."),
-//      Entry(".definingMethod", "The method in which this method is defined"),
-//      Entry(".isStub", "Traverse only to methods that are stubs, e.g., their code is not available"),
-//      Entry(".isNotStub", "Traverse only to methods that are not stubs."),
-//      Entry(".external", "Traverse to external methods, that is, methods not present but only referenced in the CPG."),
-//      Entry(".internal", "Traverse to internal methods, that is, methods for which code is included in this CPG."),
-//      Entry(".local", "Traverse to the methods local variables"),
-//      Entry(".literal", "Traverse to literals of method"),
-//      Entry(".topLevelExpressions", ""),
-//      Entry(".cfgNode", ""),
-//      Entry(".cfgFirst", " Traverse to first expression in CFG."),
-//      Entry(".cfgLast", " Traverse to last expression in CFG."),
-//      Entry(".block", "Traverse to block"),
-//      Entry(".body", "Traverse to method body (alias for `block`)"),
-//      Entry(".namespace", "Traverse to namespace"),
-//      Entry(".numberOfLines", "Method's linecount")
-//    )
-//  )
-//}
-

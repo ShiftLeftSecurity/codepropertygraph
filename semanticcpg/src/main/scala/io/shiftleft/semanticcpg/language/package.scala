@@ -266,7 +266,4 @@ package object language extends operatorextension.Implicits {
     new ModifierAccessors(steps)
   // Modifier accessors ~
 
-//  implicit val methodReturnHelp: Help[nodes.MethodReturn] = MethodReturn.Help
-  // TODO other implicits for the step extensions defined in this package
-
 }
