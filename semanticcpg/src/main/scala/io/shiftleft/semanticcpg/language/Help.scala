@@ -10,13 +10,6 @@ import org.reflections.Reflections
 import scala.jdk.CollectionConverters._
 import scala.util.Using
 
-object Foo extends App {
-  import io.shiftleft.codepropertygraph.generated.nodes
-  println(new Steps[nodes.Method](null).help)
-  println("verbose:")
-  println(new Steps[nodes.Method](null).helpVerbose)
-}
-
 object Help {
   /**
     * The base package that we scan for @Traversal annotations.
@@ -25,7 +18,7 @@ object Help {
     */
   val StepsBasePackage = "io.shiftleft"
   val ColumnNames = Array("step", "description")
-  val ColumnNamesVerbose = ColumnNames :+ "TraversalName"
+  val ColumnNamesVerbose = ColumnNames :+ "traversal name"
 
   /**
     * Scans the entire classpath for classes annotated with @Traversal (using java reflection),
@@ -35,10 +28,10 @@ object Help {
   lazy val stepDocsByElementType: Map[Class[_], List[StepDoc]] = {
     for {
       traversal <- new Reflections(StepsBasePackage).getTypesAnnotatedWith(classOf[Traversal]).iterator.asScala
-      elementClass = traversal.getAnnotation(classOf[Traversal]).elementType
+      elementType = traversal.getAnnotation(classOf[Traversal]).elementType
       method <- traversal.getMethods.filterNot(m => isStatic(m.getModifiers))
       doc <- Option(method.getAnnotation(classOf[Doc]))
-    } yield (elementClass, StepDoc(traversal.getName, method.getName, doc.msg))
+    } yield (elementType, StepDoc(traversal.getName, method.getName, doc.msg))
   }.toList.groupMap(_._1)(_._2)
 
   def renderTable(elementClass: Class[_], verbose: Boolean): String = {
