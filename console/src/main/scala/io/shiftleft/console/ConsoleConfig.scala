@@ -17,6 +17,4 @@ object InstallConfig {
   def apply(): InstallConfig = new InstallConfig()
 }
 
-class ConsoleConfig(val install: InstallConfig = InstallConfig()) {
-
-}
+class ConsoleConfig(val install: InstallConfig = InstallConfig()) {}

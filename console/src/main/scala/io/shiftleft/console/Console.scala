@@ -13,15 +13,15 @@ import io.shiftleft.semanticcpg.language._
 
 import scala.util.Try
 
-abstract class Console(executor: AmmoniteExecutor, loader : WorkspaceLoader) extends ScriptManager(executor) {
+abstract class Console(executor: AmmoniteExecutor, loader: WorkspaceLoader) extends ScriptManager(executor) {
 
   def _runAnalyzer(overlayCreators: LayerCreator*): Cpg
 
-  def config : ConsoleConfig
+  def config: ConsoleConfig
 
   protected val workspacePathName: String = config.install.rootPath.path.resolve("workspace").toString
-  protected val workspaceManager        = new WorkspaceManager(workspacePathName, loader)
-  private val nameOfCpgInProject       = "cpg.bin"
+  protected val workspaceManager = new WorkspaceManager(workspacePathName, loader)
+  private val nameOfCpgInProject = "cpg.bin"
 
   @Doc(
     "Access to the workspace directory",
@@ -56,7 +56,7 @@ abstract class Console(executor: AmmoniteExecutor, loader : WorkspaceLoader) ext
       |""".stripMargin,
     "workspace"
   )
-  def workspace: WorkspaceManager      = workspaceManager
+  def workspace: WorkspaceManager = workspaceManager
 
   @Doc("Currently active project", "", "project")
   def project: Project =
@@ -81,6 +81,21 @@ abstract class Console(executor: AmmoniteExecutor, loader : WorkspaceLoader) ext
     "cpg.method.l"
   )
   def cpg: Cpg = workspace.cpg
+
+  /**
+    * All cpgs loaded in the workspace
+    * */
+  def cpgs: Iterator[Cpg] = {
+    if (workspace.projects.lastOption.isEmpty) {
+      Iterator()
+    } else {
+      val activeProjectName = project.name
+      (workspace.projects.filter(_.cpg.isDefined).iterator.flatMap { project =>
+        open(project.name)
+        Some(project.cpg)
+      } ++ Iterator({ open(activeProjectName); None })).flatten
+    }
+  }
 
   implicit def graph: ScalaGraph = cpg.scalaGraph
 
@@ -131,7 +146,7 @@ abstract class Console(executor: AmmoniteExecutor, loader : WorkspaceLoader) ext
   }
 
   protected def deriveNameFromInputPath(inputPath: String): String = {
-    val name    = File(inputPath).name
+    val name = File(inputPath).name
     val project = workspace.project(name)
     if (project.isDefined && project.exists(_.inputPath != inputPath)) {
       var i = 1
@@ -210,7 +225,7 @@ abstract class Console(executor: AmmoniteExecutor, loader : WorkspaceLoader) ext
     """importCpg("cpg.bin.zip")"""
   )
   def importCpg(inputPath: String, projectName: String = ""): Option[Cpg] = {
-    val name    = Option(projectName).filter(_.nonEmpty).getOrElse(deriveNameFromInputPath(inputPath))
+    val name = Option(projectName).filter(_.nonEmpty).getOrElse(deriveNameFromInputPath(inputPath))
     val cpgFile = File(inputPath)
 
     if (!cpgFile.exists) {
@@ -219,7 +234,7 @@ abstract class Console(executor: AmmoniteExecutor, loader : WorkspaceLoader) ext
     }
 
     System.err.println(s"Creating project `$name` for CPG at `$inputPath`")
-    val pathToProject         = workspace.createProject(inputPath, name)
+    val pathToProject = workspace.createProject(inputPath, name)
     val cpgDestinationPathOpt = pathToProject.map(_.resolve(nameOfCpgInProject))
 
     if (cpgDestinationPathOpt.isEmpty) {
@@ -250,7 +265,7 @@ abstract class Console(executor: AmmoniteExecutor, loader : WorkspaceLoader) ext
 
     cpgOpt
       .filter(_.metaData.headOption().isDefined)
-      .foreach (applyDefaultOverlays)
+      .foreach(applyDefaultOverlays)
 
     cpgOpt
   }
@@ -261,7 +276,28 @@ abstract class Console(executor: AmmoniteExecutor, loader : WorkspaceLoader) ext
       bytes.next() == 'P' && bytes.next() == 'K'
     }.getOrElse(false)
   }
+  @Doc(
+    "Close project by name",
+    """|Close project. Resources are freed but the project remains on disk.
+       |The project remains active, that is, calling `cpg` now raises an
+       |exception. A different project can now be activated using `open`.
+       |""".stripMargin,
+    "close(projectName)"
+  )
+  def close(name: String): Option[Project] = {
+    defaultProjectNameIfEmpty(name).flatMap(workspace.closeProject)
+  }
 
+  def close: Option[Project] = close("")
+
+  /**
+    * Close the project and open it again.
+    *
+    * @param name the name of the project
+    * */
+  def reload(name: String): Option[Project] = {
+    close(name).flatMap(p => open(p.name))
+  }
 
   def applyDefaultOverlays(cpg: Cpg): Unit
 

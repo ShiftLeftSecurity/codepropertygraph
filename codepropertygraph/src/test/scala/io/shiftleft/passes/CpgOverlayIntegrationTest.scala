@@ -39,26 +39,34 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       val initialNode = cpg.graph.V.has(NodeKeys.CODE, InitialNodeCode).head.asInstanceOf[nodes.StoredNode]
 
       // 1) add a new node
-      val addNodeInverse = applyDiffAndGetInverse(cpg)(_.addNode(
-        new nodes.NewNode with DummyProduct {
-          override def containedNodesByLocalName = ???
-          override def label = NodeTypes.UNKNOWN
-          override def properties = Map.empty
-        }
-      ))
+      val addNodeInverse = applyDiffAndGetInverse(cpg)(
+        _.addNode(
+          new nodes.NewNode with DummyProduct {
+            override def containedNodesByLocalName = ???
+            override def label = NodeTypes.UNKNOWN
+            override def properties = Map.empty
+          }
+        ))
       cpg.graph.V.count.head shouldBe 2
       val additionalNode = cpg.graph.V.hasNot(NodeKeys.CODE).head.asInstanceOf[nodes.StoredNode]
 
       // 2) add two edges with the same label but different properties (they'll later be disambiguated by their property hash, since edges don't have IDs
-      val addEdge1Inverse = applyDiffAndGetInverse(cpg)(_.addEdge(
-        src = initialNode, dst = additionalNode, edgeLabel = edges.ContainsNode.Label, properties = Seq(EdgeKeyNames.INDEX -> Int.box(1))))
-      val addEdge2Inverse = applyDiffAndGetInverse(cpg)(_.addEdge(
-        src = initialNode, dst = additionalNode, edgeLabel = edges.ContainsNode.Label, properties = Seq(EdgeKeyNames.INDEX -> Int.box(2))))
+      val addEdge1Inverse = applyDiffAndGetInverse(cpg)(
+        _.addEdge(src = initialNode,
+                  dst = additionalNode,
+                  edgeLabel = edges.ContainsNode.Label,
+                  properties = Seq(EdgeKeyNames.INDEX -> Int.box(1))))
+      val addEdge2Inverse = applyDiffAndGetInverse(cpg)(
+        _.addEdge(src = initialNode,
+                  dst = additionalNode,
+                  edgeLabel = edges.ContainsNode.Label,
+                  properties = Seq(EdgeKeyNames.INDEX -> Int.box(2))))
       def initialNodeOutEdges = initialNode.outE.toList
       initialNodeOutEdges.size shouldBe 2
 
       // 3) add node property
-      val addNodePropertyInverse = applyDiffAndGetInverse(cpg)(_.addNodeProperty(additionalNode, NodeKeyNames.CODE, "Node2Code"))
+      val addNodePropertyInverse =
+        applyDiffAndGetInverse(cpg)(_.addNodeProperty(additionalNode, NodeKeyNames.CODE, "Node2Code"))
       additionalNode.value2(NodeKeys.CODE) shouldBe "Node2Code"
 
       // TODO 4) add edge property - not needed for now?
