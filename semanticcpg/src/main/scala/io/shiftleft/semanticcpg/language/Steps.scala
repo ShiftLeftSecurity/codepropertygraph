@@ -88,9 +88,12 @@ class Steps[A](val raw: GremlinScala[A]) {
   def isEmpty: Boolean = !isDefined
 
   /**
-    * Print help/documentation about the current specific step
+    * Print help/documentation based on the current elementType `A`.
+    * Relies on all step extensions being annotated with @Traversal / @Doc
+    * Note that this works independently of tab completion and implicit conversions in scope - it will simply list
+    * all documented steps in the classpath
     * */
-  def help(implicit elementType: ClassTag[A]): String =
+  def help(verbose: Boolean = false)(implicit elementType: ClassTag[A]): String =
     Help.renderTable(elementType.runtimeClass)
 
   /**
