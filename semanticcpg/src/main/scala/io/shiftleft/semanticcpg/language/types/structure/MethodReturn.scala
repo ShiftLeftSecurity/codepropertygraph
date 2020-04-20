@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.semanticcpg.language.Help.{Entry, ForNode}
+//import io.shiftleft.semanticcpg.language.Help.{Entry, ForNode}
 import io.shiftleft.semanticcpg.language._
 
 class MethodReturn(val wrapped: NodeSteps[nodes.MethodReturn]) extends AnyVal {
@@ -33,17 +33,17 @@ class MethodReturn(val wrapped: NodeSteps[nodes.MethodReturn]) extends AnyVal {
     })
 }
 
-object MethodReturn {
-
-  val Help = new ForNode[nodes.MethodReturn](
-    "method return node",
-    List(
-      Entry(".method", "traverse to parent method"),
-      Entry(".cfgLast", "traverse to last expressions in CFG (can be multiple)"),
-      Entry(".typ", "traverse to return type"),
-      Entry(".returnUser", "..."),
-      Entry(".toReturn", "..."),
-    )
-  )
-
-}
+//object MethodReturn {
+//
+//  val Help = new ForNode[nodes.MethodReturn](
+//    "method return node",
+//    List(
+//      Entry(".method", "traverse to parent method"),
+//      Entry(".cfgLast", "traverse to last expressions in CFG (can be multiple)"),
+//      Entry(".typ", "traverse to return type"),
+//      Entry(".returnUser", "..."),
+//      Entry(".toReturn", "..."),
+//    )
+//  )
+//
+//}
