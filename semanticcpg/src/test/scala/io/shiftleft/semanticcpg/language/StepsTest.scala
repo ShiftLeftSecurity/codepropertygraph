@@ -8,6 +8,7 @@ import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.overflowdb.OdbGraph
+import io.shiftleft.semanticcpg.{Doc, Traversal}
 import io.shiftleft.semanticcpg.language.types.structure.MethodReturn
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
@@ -184,7 +185,30 @@ class StepsTest extends WordSpec with Matchers {
     }
   }
 
-  ".help step" can {
+  ".help step" should {
+
+    "provide node-specific overview" in {
+      val methodSteps = new Steps[nodes.Method](null)
+      methodSteps.help should include ("Available steps for Method")
+      methodSteps.help should include (".namespace")
+
+      methodSteps.helpVerbose should include ("traversal name")
+      methodSteps.helpVerbose should include ("io.shiftleft.semanticcpg.language.types.structure.Method")
+    }
+
+    "picks up any traversal extensions" in {
+      @Traversal(elementType = classOf[nodes.Method])
+      class MyMethodExt {
+        @Doc(msg = "foo bar")
+        def myCustomStep = ???
+      }
+
+      val methodSteps = new Steps[nodes.Method](null)
+      methodSteps.helpVerbose should include ("MyMethodExt")
+      methodSteps.helpVerbose should include (".myCustomStep")
+      methodSteps.helpVerbose should include (".namespace")
+    }
+
 //    "always provides generic help" in {
 //      cpg.methodReturn.helpGeneric shouldBe Help.genericHelp.toText
 //    }
