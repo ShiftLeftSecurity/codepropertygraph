@@ -13,6 +13,8 @@ import scala.util.Using
 object Foo extends App {
   import io.shiftleft.codepropertygraph.generated.nodes
   println(new Steps[nodes.Method](null).help)
+  println("verbose:")
+  println(new Steps[nodes.Method](null).helpVerbose)
 }
 
 object Help {
@@ -23,6 +25,7 @@ object Help {
     */
   val StepsBasePackage = "io.shiftleft"
   val ColumnNames = Array("step", "description")
+  val ColumnNamesVerbose = ColumnNames :+ "TraversalName"
 
   /**
     * Scans the entire classpath for classes annotated with @Traversal (using java reflection),
@@ -38,13 +41,20 @@ object Help {
     } yield (elementClass, StepDoc(traversal.getName, method.getName, doc.msg))
   }.toList.groupMap(_._1)(_._2)
 
-  def renderTable(elementClass: Class[_]): String = {
+  def renderTable(elementClass: Class[_], verbose: Boolean): String = {
     val stepDocs = stepDocsByElementType.get(elementClass).getOrElse(Nil)
-    val rowData: Array[Array[Object]] = stepDocs.toArray.map(stepDoc => Array(s".${stepDoc.methodName}", stepDoc.msg))
+
+    val columnNames = if (verbose) ColumnNamesVerbose else ColumnNames
+    val rowData = stepDocs.toArray.map { stepDoc =>
+      val baseColumns: Array[Object] = Array(s".${stepDoc.methodName}", stepDoc.msg)
+      if (verbose) baseColumns :+ stepDoc.traversalClassName
+      else baseColumns
+    }
+
     val entriesTable = Using.Manager { use =>
       val baos = use(new ByteArrayOutputStream)
       val ps = use(new PrintStream(baos, true, "utf-8"))
-      new TextTable(ColumnNames, rowData).printTable(ps, 0)
+      new TextTable(columnNames, rowData).printTable(ps, 0)
       new String(baos.toByteArray, StandardCharsets.UTF_8)
     }.get
 
