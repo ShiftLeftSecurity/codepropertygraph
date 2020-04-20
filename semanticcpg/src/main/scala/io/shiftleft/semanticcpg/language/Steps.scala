@@ -27,14 +27,17 @@ class Steps[A](val raw: GremlinScala[A]) {
     iter.asScala
   }
 
-  @Doc(msg = """Execute the traversal and convert the result to a list.
-               |`toList` (inspection) evaluates and returns raw case classes.
-               |We use `toList` to allow the developer to view the raw CPG nodes
-               |returned by a query - including containedNodes - in a format that
-               |allows for easy inspection, but nonetheless, shows the data as-is.
-               |""")
+  /**
+    * Execute the traversal and convert the result to a list
+    * `toList` (inspection) evaluates and returns raw case classes.
+    * We use `toList` to allow the developer to view the raw CPG nodes
+    * returned by a query - including containedNodes - in a format that
+    * allows for easy inspection, but nonetheless, shows the data as-is.
+    */
+  @Doc(msg = "Execute the traversal and convert the result to a list.")
   def toList(): List[A] = raw.toList()
 
+  /** Shorthand for `toList` */
   @Doc(msg = "Shorthand for `toList`")
   def l(): List[A] = toList()
 
