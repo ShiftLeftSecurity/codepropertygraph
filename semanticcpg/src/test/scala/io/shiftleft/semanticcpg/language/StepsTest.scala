@@ -180,11 +180,11 @@ class StepsTest extends WordSpec with Matchers {
 
     "provide node-specific overview" in {
       val methodSteps = new Steps[nodes.Method](null)
-      methodSteps.help should include ("Available steps for Method")
-      methodSteps.help should include (".namespace")
+      methodSteps.help should include("Available steps for Method")
+      methodSteps.help should include(".namespace")
 
-      methodSteps.helpVerbose should include ("traversal name")
-      methodSteps.helpVerbose should include ("io.shiftleft.semanticcpg.language.types.structure.Method")
+      methodSteps.helpVerbose should include("traversal name")
+      methodSteps.helpVerbose should include("io.shiftleft.semanticcpg.language.types.structure.Method")
     }
 
     "provides generic help" when {

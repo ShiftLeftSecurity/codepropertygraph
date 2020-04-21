@@ -81,9 +81,12 @@ object Help {
     def toDoc(annotation: Annotation): Doc =
       mirrorToolbox.eval(mirrorToolbox.untypecheck(annotation.tree)).asInstanceOf[Doc]
 
-    traversalTpe.members.filter(_.isPublic).map { member =>
-      (member.name.toString, member.annotations.filter(_.tree.tpe =:= typeOf[Doc]).map(toDoc).headOption)
-    }.collect { case (methodName, Some(doc)) => StepDoc(traversal.getName, methodName, doc)}
+    traversalTpe.members
+      .filter(_.isPublic)
+      .map { member =>
+        (member.name.toString, member.annotations.filter(_.tree.tpe =:= typeOf[Doc]).map(toDoc).headOption)
+      }
+      .collect { case (methodName, Some(doc)) => StepDoc(traversal.getName, methodName, doc) }
   }
 
   case class StepDoc(traversalClassName: String, methodName: String, doc: Doc)
