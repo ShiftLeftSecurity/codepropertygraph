@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes._
 import java.util.{List => JList}
 
+import io.shiftleft.semanticcpg.Doc
 import org.apache.tinkerpop.gremlin.process.traversal.Scope
 import org.json4s.CustomSerializer
 import org.json4s.native.Serialization.{write, writePretty}
@@ -12,6 +13,7 @@ import org.json4s.Extraction
 
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable
+import scala.reflect.ClassTag
 
 /** Base class for our DSL
   * These are the base steps available in all steps of the query language.
@@ -32,11 +34,11 @@ class Steps[A](val raw: GremlinScala[A]) {
     * returned by a query - including containedNodes - in a format that
     * allows for easy inspection, but nonetheless, shows the data as-is.
     */
+  @Doc("Execute the traversal and convert the result to a list.")
   def toList(): List[A] = raw.toList()
 
-  /**
-    Shorthand for `toList`
-    */
+  /** Shorthand for `toList` */
+  @Doc("Shorthand for `toList`")
   def l(): List[A] = toList()
 
   /**
@@ -85,6 +87,18 @@ class Steps[A](val raw: GremlinScala[A]) {
   def isDefined: Boolean = headOption().isDefined
 
   def isEmpty: Boolean = !isDefined
+
+  /**
+    * Print help/documentation based on the current elementType `A`.
+    * Relies on all step extensions being annotated with @Traversal / @Doc
+    * Note that this works independently of tab completion and implicit conversions in scope - it will simply list
+    * all documented steps in the classpath
+    * */
+  def help()(implicit elementType: ClassTag[A]): String =
+    Help.renderTable(elementType.runtimeClass, verbose = false)
+
+  def helpVerbose()(implicit elementType: ClassTag[A]): String =
+    Help.renderTable(elementType.runtimeClass, verbose = true)
 
   /**
     * Pretty print vertices
