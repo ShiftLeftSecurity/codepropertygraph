@@ -127,6 +127,7 @@ class WorkspaceManagerTests extends WordSpec with Matchers {
         val projectName2 = "myproject2"
         WorkspaceTests.createFakeProject(workspaceFile, projectName2)
         val manager = new WorkspaceManager(workspaceFile.toString)
+        manager.setActiveProject(projectName2)
         manager.getActiveProject.exists(p => p.name == projectName2) shouldBe true
         manager.setActiveProject(projectName)
         manager.getActiveProject.exists(p => p.name == projectName) shouldBe true
