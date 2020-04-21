@@ -1,7 +1,6 @@
 package io.shiftleft.semanticcpg.language
 
 import java.io.{ByteArrayOutputStream, PrintStream}
-import java.lang.reflect.Modifier.isStatic
 import java.nio.charset.StandardCharsets
 
 import dnl.utils.text.table.TextTable
@@ -10,6 +9,8 @@ import io.shiftleft.semanticcpg.{Doc, Traversal}
 import org.reflections.Reflections
 
 import scala.jdk.CollectionConverters._
+import scala.reflect.runtime.universe._
+import scala.tools.reflect.ToolBox
 import scala.util.Using
 
 object Help {
@@ -37,7 +38,7 @@ object Help {
 
     val columnNames = if (verbose) ColumnNamesVerbose else ColumnNames
     val rowData = stepDocs.sortBy(_.methodName).toArray.map { stepDoc =>
-      val baseColumns: Array[Object] = Array(s".${stepDoc.methodName}", stepDoc.msg)
+      val baseColumns: Array[Object] = Array(s".${stepDoc.methodName}", stepDoc.doc.short)
       if (verbose) baseColumns :+ stepDoc.traversalClassName
       else baseColumns
     }
@@ -61,22 +62,29 @@ object Help {
   lazy val stepDocsByElementType: Map[Class[_], List[StepDoc]] = {
     for {
       traversal <- new Reflections(StepsBasePackage).getTypesAnnotatedWith(classOf[Traversal]).iterator.asScala
-      stepDoc <- readDocAnnotations(traversal)
       elementType = traversal.getAnnotation(classOf[Traversal]).elementType
+      stepDoc <- readDocAnnotations(traversal)
     } yield (elementType, stepDoc)
   }.toList.groupMap(_._1)(_._2)
 
-  lazy val genericStepDocs: List[StepDoc] =
+  lazy val genericStepDocs: Iterable[StepDoc] =
     readDocAnnotations(classOf[Steps[_]])
 
-  lazy val genericNodeStepDocs: List[StepDoc] =
+  lazy val genericNodeStepDocs: Iterable[StepDoc] =
     readDocAnnotations(classOf[NodeSteps[_]])
 
-  private def readDocAnnotations(traversal: Class[_]): List[StepDoc] =
-    for {
-      method <- traversal.getMethods.toList if !isStatic(method.getModifiers)
-      doc <- Option(method.getAnnotation(classOf[Doc]))
-    } yield StepDoc(traversal.getName, method.getName, doc.msg)
+  private val mirror = runtimeMirror(this.getClass.getClassLoader)
+  private val mirrorToolbox = mirror.mkToolBox()
 
-  case class StepDoc(traversalClassName: String, methodName: String, msg: String)
+  private def readDocAnnotations(traversal: Class[_]): Iterable[StepDoc] = {
+    val traversalTpe = mirror.classSymbol(traversal).toType
+    def toDoc(annotation: Annotation): Doc =
+      mirrorToolbox.eval(mirrorToolbox.untypecheck(annotation.tree)).asInstanceOf[Doc]
+
+    traversalTpe.members.filter(_.isPublic).map { member =>
+      (member.name.toString, member.annotations.filter(_.tree.tpe =:= typeOf[Doc]).map(toDoc).headOption)
+    }.collect { case (methodName, Some(doc)) => StepDoc(traversal.getName, methodName, doc)}
+  }
+
+  case class StepDoc(traversalClassName: String, methodName: String, doc: Doc)
 }

@@ -13,7 +13,7 @@ import io.shiftleft.semanticcpg.codedumper.CodeDumper
 class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) extends Steps[NodeType](raw) {
 
   /** Traverse to node labels */
-  @Doc(msg = "Traverse to node labels")
+  @Doc("Traverse to node labels")
   def label: Steps[String] = new Steps(raw.label)
 
   /**

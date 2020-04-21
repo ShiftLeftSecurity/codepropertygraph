@@ -1,22 +1,13 @@
 package io.shiftleft.semanticcpg.language
 
-import java.io.{ByteArrayOutputStream, PrintStream}
-import java.nio.charset.StandardCharsets
-
 import gremlin.scala.__
-import io.shiftleft.OverflowDbTestInstance
-import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.overflowdb.OdbGraph
-import io.shiftleft.semanticcpg.{Doc, Traversal}
-import io.shiftleft.semanticcpg.language.types.structure.MethodReturn
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.collection.mutable
-import scala.util.Using
 
 class StepsTest extends WordSpec with Matchers {
 
@@ -196,19 +187,6 @@ class StepsTest extends WordSpec with Matchers {
       methodSteps.helpVerbose should include ("io.shiftleft.semanticcpg.language.types.structure.Method")
     }
 
-    "picks up any traversal extensions" in {
-      @Traversal(elementType = classOf[nodes.Method])
-      class MyMethodExt {
-        @Doc(msg = "foo bar")
-        def myCustomStep = ???
-      }
-
-      val methodSteps = new Steps[nodes.Method](null)
-      methodSteps.helpVerbose should include ("MyMethodExt")
-      methodSteps.helpVerbose should include (".myCustomStep")
-      methodSteps.helpVerbose should include (".namespace")
-    }
-
     "provides generic help" when {
       "using verbose mode" when {
         "traversing nodes" in {
@@ -224,7 +202,6 @@ class StepsTest extends WordSpec with Matchers {
         }
       }
     }
-
   }
 
 }
