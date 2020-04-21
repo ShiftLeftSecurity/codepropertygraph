@@ -3,6 +3,7 @@ package io.shiftleft.console
 import better.files.Dsl.{cp, rm}
 import better.files.File
 import gremlin.scala.ScalaGraph
+import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.CpgLoader
 import io.shiftleft.console.scripting.{AmmoniteExecutor, ScriptManager}
@@ -13,14 +14,13 @@ import io.shiftleft.semanticcpg.language._
 
 import scala.util.Try
 
-abstract class Console(executor: AmmoniteExecutor, loader: WorkspaceLoader) extends ScriptManager(executor) {
-
-  def _runAnalyzer(overlayCreators: LayerCreator*): Cpg
+abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[T])
+    extends ScriptManager(executor) {
 
   def config: ConsoleConfig
 
   protected val workspacePathName: String = config.install.rootPath.path.resolve("workspace").toString
-  protected val workspaceManager = new WorkspaceManager(workspacePathName, loader)
+  protected val workspaceManager = new WorkspaceManager[T](workspacePathName, loader)
   private val nameOfCpgInProject = "cpg.bin"
 
   @Doc(
@@ -56,10 +56,10 @@ abstract class Console(executor: AmmoniteExecutor, loader: WorkspaceLoader) exte
       |""".stripMargin,
     "workspace"
   )
-  def workspace: WorkspaceManager = workspaceManager
+  def workspace: WorkspaceManager[T] = workspaceManager
 
   @Doc("Currently active project", "", "project")
-  def project: Project =
+  def project: T =
     workspace.projectByCpg(cpg).getOrElse(throw new RuntimeException("No active project"))
 
   @Doc(
@@ -302,5 +302,31 @@ abstract class Console(executor: AmmoniteExecutor, loader: WorkspaceLoader) exte
   def applyDefaultOverlays(cpg: Cpg): Unit
 
   protected def report(string: String): Unit = System.err.println(string)
+
+  // This is only public because we can't use the dynamically
+  // created `run` in unit tests.
+  def _runAnalyzer(overlayCreators: LayerCreator*): Cpg = {
+
+    overlayCreators.foreach { creator =>
+      val overlayOutFilename =
+        workspace.getNextOverlayFilename(cpg, creator.overlayName)
+
+      val projectOpt = workspace.projectByCpg(cpg)
+      if (projectOpt.isEmpty) {
+        throw new RuntimeException("No record for CPG. Please use `importCode`/`importCpg/open`")
+      }
+
+      if (projectOpt.get.appliedOverlays.contains(creator.overlayName)) {
+        report(s"Overlay ${creator.overlayName} already exists - skipping")
+      } else {
+        val serializedCpg = new SerializedCpg(overlayOutFilename)
+        runCreator(creator, serializedCpg)
+        serializedCpg.close()
+      }
+    }
+    cpg
+  }
+
+  protected def runCreator(creator: LayerCreator, serializedCpg: SerializedCpg): Unit
 
 }

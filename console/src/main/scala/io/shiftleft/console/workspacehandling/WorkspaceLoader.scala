@@ -10,23 +10,17 @@ import org.json4s.native.Serialization.{read => jsonRead}
 import scala.collection.mutable.ListBuffer
 import scala.util.{Failure, Success, Try}
 
-object WorkspaceLoader {
-
-  def apply() = new WorkspaceLoader()
-
-}
-
 /**
   * This component loads a workspace from disk and creates
   * a corresponding `Workspace` object.
   * */
-class WorkspaceLoader {
+abstract class WorkspaceLoader[ProjectType <: Project] {
 
   /**
     * Initialize workspace from a directory
     * @param path path to the directory
     * */
-  def load(path: String): Workspace = {
+  def load(path: String): Workspace[ProjectType] = {
     val dirFile = File(path)
     val dirPath = dirFile.path.toAbsolutePath
 
@@ -37,14 +31,14 @@ class WorkspaceLoader {
     new Workspace(ListBuffer.from(loadProjectsFromFs(dirPath)))
   }
 
-  private def loadProjectsFromFs(cpgsPath: Path): LazyList[Project] = {
+  private def loadProjectsFromFs(cpgsPath: Path): LazyList[ProjectType] = {
     cpgsPath.toFile.listFiles
       .filter(_.isDirectory)
       .to(LazyList)
       .flatMap(f => loadProject(f.toPath))
   }
 
-  def loadProject(path: Path): Option[Project] = {
+  def loadProject(path: Path): Option[ProjectType] = {
     Try {
       val projectFile = readProjectFile(path)
       createProject(projectFile, path)
@@ -57,9 +51,7 @@ class WorkspaceLoader {
     }
   }
 
-  def createProject(projectFile: ProjectFile, path: Path): Project = {
-    Project(projectFile, path)
-  }
+  def createProject(projectFile: ProjectFile, path: Path): ProjectType
 
   private val PROJECTFILE_NAME = "project.json"
   implicit val formats: DefaultFormats.type = DefaultFormats
