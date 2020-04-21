@@ -15,7 +15,7 @@ import scala.collection.mutable.ListBuffer
 import scala.reflect.io.Directory
 import scala.util.{Failure, Success, Try}
 
-class DefaultLoader extends WorkspaceLoader[Project] {
+object DefaultLoader extends WorkspaceLoader[Project] {
   override def createProject(projectFile: ProjectFile, path: Path): Project = {
     Project(projectFile, path)
   }
@@ -27,7 +27,7 @@ class DefaultLoader extends WorkspaceLoader[Project] {
   *
   * @param path path to to workspace.
   * */
-class WorkspaceManager[ProjectType <: Project](path: String, loader: WorkspaceLoader[ProjectType] = new DefaultLoader) {
+class WorkspaceManager[ProjectType <: Project](path: String, loader: WorkspaceLoader[ProjectType] = DefaultLoader) {
 
   def getPath: String = path
 
