@@ -9,7 +9,7 @@ import scala.collection.mutable.ListBuffer
   * a passive object that is managed by WorkspaceManager
   * @param projects list of projects present in this workspace
   * */
-class Workspace(var projects: ListBuffer[Project]) {
+class Workspace[ProjectType <: Project](var projects: ListBuffer[ProjectType]) {
 
   /**
     * Returns total number of projects in this workspace

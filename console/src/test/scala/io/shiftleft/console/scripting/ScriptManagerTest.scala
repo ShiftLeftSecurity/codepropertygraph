@@ -28,8 +28,13 @@ class ScriptManagerTest extends WordSpec with Matchers with Inside {
 
   private object TestScriptManager extends ScriptManager(TestScriptExecutor)
 
-  protected val DEFAULT_CPG_NAME: String =
-    (File("resources") / "testcode" / "cpgs" / "method" / "cpg.bin.zip").pathAsString
+  protected val DEFAULT_CPG_NAME: String = {
+    if (File(".").name == "console") {
+      (File("..") / "resources" / "testcode" / "cpgs" / "method" / "cpg.bin.zip").pathAsString
+    } else {
+      (File("resources") / "testcode" / "cpgs" / "method" / "cpg.bin.zip").pathAsString
+    }
+  }
 
   def withScriptManager(f: ScriptManager => Unit): Unit = {
     f(TestScriptManager)

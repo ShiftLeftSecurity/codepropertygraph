@@ -1,4 +1,5 @@
 name := "console"
+Test/fork := true
 
 enablePlugins(JavaAppPackaging)
 

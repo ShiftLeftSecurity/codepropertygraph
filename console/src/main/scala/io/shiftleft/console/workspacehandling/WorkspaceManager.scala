@@ -15,13 +15,19 @@ import scala.collection.mutable.ListBuffer
 import scala.reflect.io.Directory
 import scala.util.{Failure, Success, Try}
 
+object DefaultLoader extends WorkspaceLoader[Project] {
+  override def createProject(projectFile: ProjectFile, path: Path): Project = {
+    Project(projectFile, path)
+  }
+}
+
 /**
   * WorkspaceManager: a component, which loads and maintains the
   * list of projects made accessible via Ocular/Joern.
   *
   * @param path path to to workspace.
   * */
-class WorkspaceManager(path: String, loader: WorkspaceLoader = WorkspaceLoader()) {
+class WorkspaceManager[ProjectType <: Project](path: String, loader: WorkspaceLoader[ProjectType] = DefaultLoader) {
 
   def getPath: String = path
 
@@ -30,7 +36,7 @@ class WorkspaceManager(path: String, loader: WorkspaceLoader = WorkspaceLoader()
   /**
     * The workspace managed by this WorkspaceManager
     * */
-  private var workspace: Workspace = loader.load(path)
+  private var workspace: Workspace[ProjectType] = loader.load(path)
   private val dirPath = File(path).path.toAbsolutePath
 
   private val LEGACY_BASE_CPG_FILENAME = "cpg.bin.zip"
@@ -196,7 +202,7 @@ class WorkspaceManager(path: String, loader: WorkspaceLoader = WorkspaceLoader()
   /**
     * Record for the given name. None if it is not in the workspace.
     * */
-  private def projectByName(name: String): Option[Project] = {
+  private def projectByName(name: String): Option[ProjectType] = {
     workspace.projects.find(r => r.name == name)
   }
 
@@ -204,7 +210,7 @@ class WorkspaceManager(path: String, loader: WorkspaceLoader = WorkspaceLoader()
     * Workspace record for the CPG, or none,
     * if the CPG is not in the workspace
     * */
-  def projectByCpg(baseCpg: Cpg): Option[Project] =
+  def projectByCpg(baseCpg: Cpg): Option[ProjectType] =
     workspace.projects.find(_.cpg.contains(baseCpg))
 
   def projectExistsForCpg(baseCpg: Cpg): Boolean = projectByCpg(baseCpg).isDefined
@@ -240,7 +246,7 @@ class WorkspaceManager(path: String, loader: WorkspaceLoader = WorkspaceLoader()
     * Set active project to project with name `name`.
     * If a project with this name does not exist, does nothing.
     * */
-  def setActiveProject(name: String): Option[Project] = {
+  def setActiveProject(name: String): Option[ProjectType] = {
     val project = projectByName(name)
     if (project.isEmpty) {
       System.err.println(s"Error: project with name $name does not exist")
@@ -340,7 +346,7 @@ class WorkspaceManager(path: String, loader: WorkspaceLoader = WorkspaceLoader()
     }
   }
 
-  private def addProjectToProjectsList(project: Project): ListBuffer[Project] = {
+  private def addProjectToProjectsList(project: ProjectType): ListBuffer[ProjectType] = {
     workspace.projects += project
   }
 
@@ -407,7 +413,7 @@ class WorkspaceManager(path: String, loader: WorkspaceLoader = WorkspaceLoader()
     }
   }
 
-  private def removeProjectFromList(name: String): Option[Project] = {
+  private def removeProjectFromList(name: String): Option[ProjectType] = {
     workspace.projects.zipWithIndex
       .find {
         case (record, _) =>
