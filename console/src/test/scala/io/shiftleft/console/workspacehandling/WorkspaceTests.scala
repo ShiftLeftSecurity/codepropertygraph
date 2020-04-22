@@ -21,7 +21,7 @@ class WorkspaceTests extends WordSpec with Matchers {
         mkdir(project / "overlays")
         val inputPath = "/input/path"
         val projectFile = ProjectFile(inputPath, project.name)
-        val cpg = MockCpg().withMetaData("C", List("foo", "bar")).cpg
+        val cpg = MockCpg().withMetaData("C", List("foo", "bar"), List()).cpg
         val projects = ListBuffer(
           Project(projectFile, project.path, Some(cpg))
         )
