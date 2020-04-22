@@ -1,17 +1,13 @@
 package io.shiftleft.semanticcpg.language
 
-import java.io.{ByteArrayOutputStream, PrintStream}
-import java.nio.charset.StandardCharsets
-
-import dnl.utils.text.table.TextTable
 import io.shiftleft.codepropertygraph.generated.nodes.Node
+import io.shiftleft.semanticcpg.utils.Table
 import io.shiftleft.semanticcpg.{Doc, Traversal}
 import org.reflections.Reflections
 
 import scala.jdk.CollectionConverters._
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.ToolBox
-import scala.util.Using
 
 object Help {
 
@@ -36,22 +32,17 @@ object Help {
       }
     }
 
-    val columnNames = if (verbose) ColumnNamesVerbose else ColumnNames
-    val rowData = stepDocs.sortBy(_.methodName).toArray.map { stepDoc =>
-      val baseColumns: Array[Object] = Array(s".${stepDoc.methodName}", stepDoc.doc.short)
-      if (verbose) baseColumns :+ stepDoc.traversalClassName
-      else baseColumns
-    }
-
-    val entriesTable = Using.Manager { use =>
-      val baos = use(new ByteArrayOutputStream)
-      val ps = use(new PrintStream(baos, true, "utf-8"))
-      new TextTable(columnNames, rowData).printTable(ps, 0)
-      new String(baos.toByteArray, StandardCharsets.UTF_8)
-    }.get
+    val table = Table(
+      columnNames = if (verbose) ColumnNamesVerbose else ColumnNames,
+      rows = stepDocs.sortBy(_.methodName).map { stepDoc =>
+        val baseColumns = List(s".${stepDoc.methodName}", stepDoc.doc.short)
+        if (verbose) baseColumns :+ stepDoc.traversalClassName
+        else baseColumns
+      }
+    )
 
     s"""Available steps for ${elementClass.getSimpleName}:
-         |$entriesTable
+         |${table.render}
          |""".stripMargin
   }
 
