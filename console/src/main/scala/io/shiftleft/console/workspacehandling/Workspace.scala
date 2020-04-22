@@ -25,7 +25,7 @@ class Workspace[ProjectType <: Project](var projects: ListBuffer[ProjectType]) {
     } else {
       "\n" + Table(
         columnNames = List("name", "overlays", "inputPath", "open"),
-        rows = projects.map(_.toString).toList
+        rows = projects.map(_.toTableRow).toList
       ).render
     }
 

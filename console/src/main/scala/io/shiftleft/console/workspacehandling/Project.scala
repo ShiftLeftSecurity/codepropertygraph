@@ -27,12 +27,14 @@ case class Project(projectFile: ProjectFile, var path: Path, var cpg: Option[Cpg
     appliedOverlays.map(o => overlayDir / o)
   }
 
-  override def toString: String = {
+  override def toString: String =
+    toTableRow.mkString("\t")
+
+  def toTableRow: List[String] = {
     val cpgLoaded = cpg.isDefined
-    val overlays = appliedOverlays
-      .mkString(",")
+    val overlays = appliedOverlays.mkString(",")
     val inputPath = projectFile.inputPath
-    s"$name\t$overlays\t$inputPath\t$cpgLoaded"
+    List(name, overlays, inputPath, cpgLoaded.toString)
   }
 
   /**

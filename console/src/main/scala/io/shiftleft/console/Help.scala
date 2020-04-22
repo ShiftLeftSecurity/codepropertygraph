@@ -13,9 +13,9 @@ object Help {
   def overview[C](implicit tag: TypeTag[C]): String = {
     val columnNames = List("command", "description", "example")
     val rows = funcNameDocPairs[C].map {
-      case (name, doc) => s"$name\t${doc.short}\t${doc.example}"
+      case (name, doc) => List(name, doc.short, doc.example)
     } ++ List(runRow)
-    "\n" + Table(columnNames, rows.sorted).render
+    "\n" + Table(columnNames, rows.sortBy(_.head)).render
   }
 
   def funcNameDocPairs[C](implicit tag: TypeTag[C]): List[(String, Doc)] = {
@@ -43,9 +43,8 @@ object Help {
         .trim + "\"\"\""
   }
 
-  private def runRow: String = {
-    "run\tRun analyzer on active CPG\trun.securityprofile"
-  }
+  private def runRow: List[String] =
+    List("run", "Run analyzer on active CPG", "run.securityprofile")
 
   // Since `run` is generated dynamically, it's not picked up when looking
   // through methods via reflection, and therefore, we are adding
