@@ -26,14 +26,15 @@ object Run {
 
     val toStringCode =
       s"""
+         | import io.shiftleft.semanticcpg.utils.Table
          | override def toString() : String = {
          |  val columnNames = List("name", "description")
          |  val rows =
          |   ${layerCreatorTypeNames.map {
            case (varName, typeName) =>
              s"""List("$varName",$typeName.description.trim)"""
-         }}.map(_.mkString("\\t"))
-         | Table.create(columnNames, rows)
+         }}
+         | "\n" + Table(columnNames, rows).render
          | }
          |""".stripMargin
 
