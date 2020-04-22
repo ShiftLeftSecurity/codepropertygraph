@@ -43,7 +43,8 @@ object Help {
       else baseColumns
     }
 
-    val entriesTable = Using.Manager { use =>
+    val entriesTable =
+      Using.Manager { use =>
       val baos = use(new ByteArrayOutputStream)
       val ps = use(new PrintStream(baos, true, "utf-8"))
       new TextTable(columnNames, rowData).printTable(ps, 0)
