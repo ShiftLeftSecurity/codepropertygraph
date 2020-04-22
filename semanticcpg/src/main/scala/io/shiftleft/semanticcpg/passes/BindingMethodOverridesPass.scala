@@ -38,11 +38,12 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
                                 key = NodeKeyNames.IS_METHOD_NEVER_OVERRIDDEN,
                                 value = (!overwritten.contains(binding)).asInstanceOf[AnyRef])
     }
-    return Some(diffGraph.build()).iterator
+    return Iterator(diffGraph.build())
   }
 
   def markRecurse(binding: nodes.Binding): Unit = {
-    if (overwritten.add(binding)) {
+    val wasAlreadyOverwritten = overwritten.add(binding)
+    if (wasAlreadyOverwritten) {
       for (parentType <- binding.bindsIn.next.inheritsFromOut.asScala;
            parentTypeDecl <- parentType.refOut.asScala;
            parentBinding <- bindingTable.get((binding.name, binding.signature, parentTypeDecl))) {
