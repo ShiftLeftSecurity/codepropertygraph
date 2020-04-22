@@ -14,7 +14,7 @@ case class Table(columnNames: List[String], rows: List[String]) {
     new TextTable(columnNames.toArray, data).printTable(ps, 1)
     val content = new String(outStream.toByteArray, StandardCharsets.UTF_8)
     ps.close()
-    "\n" + content.toString
+    content
   }
 
 }

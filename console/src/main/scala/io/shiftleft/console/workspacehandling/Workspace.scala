@@ -23,7 +23,7 @@ class Workspace[ProjectType <: Project](var projects: ListBuffer[ProjectType]) {
     if (projects.isEmpty) {
       "empty"
     } else {
-      Table(
+      "\n" + Table(
         columnNames = List("name", "overlays", "inputPath", "open"),
         rows = projects.map(_.toString).toList
       ).render

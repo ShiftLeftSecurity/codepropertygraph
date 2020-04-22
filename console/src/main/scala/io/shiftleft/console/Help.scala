@@ -15,7 +15,7 @@ object Help {
     val rows = funcNameDocPairs[C].map {
       case (name, doc) => s"$name\t${doc.short}\t${doc.example}"
     } ++ List(runRow)
-    Table(columnNames, rows.sorted).render
+    "\n" + Table(columnNames, rows.sorted).render
   }
 
   def funcNameDocPairs[C](implicit tag: TypeTag[C]): List[(String, Doc)] = {
