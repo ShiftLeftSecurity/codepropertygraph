@@ -9,8 +9,8 @@ case class Path(elements: List[nodes.TrackingPoint])
 
 object Path {
 
-  implicit val show: Show[Path] =
-    (path: Path) => Table(
+  implicit val show: Show[Path] = { path: Path =>
+    Table(
       columnNames = Array("tracked", "lineNumber", "method", "file"),
       rows = path.elements.map { trackingPoint =>
         val method = trackingPoint.method
@@ -28,5 +28,6 @@ object Path {
         Array(trackedSymbol, lineNumber, methodName, fileName)
       }
     ).render
+  }
 
 }
