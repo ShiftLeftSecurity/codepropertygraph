@@ -1,12 +1,13 @@
-package io.shiftleft.console
+package io.shiftleft.semanticcpg.utils
 
-import dnl.utils.text.table.TextTable
 import java.io.{ByteArrayOutputStream, PrintStream}
 import java.nio.charset.StandardCharsets
 
-object Table {
+import dnl.utils.text.table.TextTable
 
-  def create(columnNames: List[String], rows: List[String]): String = {
+case class Table(columnNames: List[String], rows: List[String]) {
+
+  def render: String = {
     val outStream = new ByteArrayOutputStream()
     val ps = new PrintStream(outStream, true, "utf-8")
     val data = rows.map(_.split("\t").toArray).toArray.asInstanceOf[Array[Array[Object]]]

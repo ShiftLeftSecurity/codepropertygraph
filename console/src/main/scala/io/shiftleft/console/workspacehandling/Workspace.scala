@@ -1,6 +1,6 @@
 package io.shiftleft.console.workspacehandling
 
-import io.shiftleft.console.Table
+import io.shiftleft.semanticcpg.utils.Table
 
 import scala.collection.mutable.ListBuffer
 
@@ -23,9 +23,10 @@ class Workspace[ProjectType <: Project](var projects: ListBuffer[ProjectType]) {
     if (projects.isEmpty) {
       "empty"
     } else {
-      val rows = projects.map(_.toString).toList
-      val columnNames = List("name", "overlays", "inputPath", "open")
-      Table.create(columnNames, rows)
+      Table(
+        columnNames = List("name", "overlays", "inputPath", "open"),
+        rows = projects.map(_.toString).toList
+      ).render
     }
 
   }

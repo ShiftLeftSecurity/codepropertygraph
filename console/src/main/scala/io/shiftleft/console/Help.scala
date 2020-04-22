@@ -1,5 +1,6 @@
 package io.shiftleft.console
 
+import io.shiftleft.semanticcpg.utils.Table
 import org.apache.commons.lang.WordUtils
 
 import scala.reflect.runtime.universe._
@@ -14,7 +15,7 @@ object Help {
     val rows = funcNameDocPairs[C].map {
       case (name, doc) => s"$name\t${doc.short}\t${doc.example}"
     } ++ List(runRow)
-    Table.create(columnNames, rows.sorted)
+    Table(columnNames, rows.sorted).render
   }
 
   def funcNameDocPairs[C](implicit tag: TypeTag[C]): List[(String, Doc)] = {

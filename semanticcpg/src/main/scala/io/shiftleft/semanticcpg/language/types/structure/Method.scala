@@ -125,7 +125,7 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   def literal: NodeSteps[nodes.Literal] =
     new NodeSteps(raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
 
-  def topLevelExpressions: NodeSteps[nodes.Expression] =
+def topLevelExpressions: NodeSteps[nodes.Expression] =
     new NodeSteps(
       raw
         .out(EdgeTypes.AST)
