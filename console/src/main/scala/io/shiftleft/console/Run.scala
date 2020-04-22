@@ -34,7 +34,7 @@ object Run {
            case (varName, typeName) =>
              s"""List("$varName",$typeName.description.trim)"""
          }}
-         | "\n" + Table(columnNames, rows).render
+         | "\\n" + Table(columnNames, rows).render
          | }
          |""".stripMargin
 
