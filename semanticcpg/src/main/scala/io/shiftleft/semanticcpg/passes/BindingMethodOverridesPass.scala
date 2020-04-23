@@ -1,5 +1,5 @@
 package io.shiftleft.semanticcpg.passes
-
+import scala.collection.mutable
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{nodes, NodeKeyNames}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
