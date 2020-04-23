@@ -26,7 +26,8 @@ object Doc {
       .map { member =>
         val docAnnotationMaybe = member.annotations.filter(_.tree.tpe =:= typeOf[Doc]).map(toDoc).headOption
         (member.name.toString, docAnnotationMaybe)
-      }.collect { case (methodName, Some(doc)) => (methodName, doc) }
+      }
+      .collect { case (methodName, Some(doc)) => (methodName, doc) }
       .toMap
   }
 

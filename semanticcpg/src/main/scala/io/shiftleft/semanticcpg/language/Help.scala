@@ -68,8 +68,9 @@ object Help {
 
   private def findStepDocs(traversal: Class[_]): Iterable[StepDoc] = {
     val traversalTpe = mirror.classSymbol(traversal).toType
-    Doc.docByMethodName(traversalTpe).map { case (methodName, doc) =>
-      StepDoc(traversal.getName, methodName, doc)
+    Doc.docByMethodName(traversalTpe).map {
+      case (methodName, doc) =>
+        StepDoc(traversal.getName, methodName, doc)
     }
   }
 

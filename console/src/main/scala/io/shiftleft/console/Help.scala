@@ -12,9 +12,12 @@ object Help {
 
   def overview[C: TypeTag]: String = {
     val columnNames = List("command", "description", "example")
-    val rows = Doc.docByMethodName(typeOf[C]).map {
-      case (name, doc) => List(name, doc.short, doc.example)
-    }.toList ++ List(runRow)
+    val rows = Doc
+      .docByMethodName(typeOf[C])
+      .map {
+        case (name, doc) => List(name, doc.short, doc.example)
+      }
+      .toList ++ List(runRow)
     "\n" + Table(columnNames, rows.sortBy(_.head)).render
   }
 
@@ -41,10 +44,13 @@ object Help {
     )
 
   def codeForHelpCommand[C: TypeTag]: String = {
-    val membersCode = Doc.docByMethodName(typeOf[C]).map {
-      case (funcName, doc) =>
-        s"val $funcName : String = ${Help.format(doc.long)}"
-    }.mkString("\n")
+    val membersCode = Doc
+      .docByMethodName(typeOf[C])
+      .map {
+        case (funcName, doc) =>
+          s"val $funcName : String = ${Help.format(doc.long)}"
+      }
+      .mkString("\n")
 
     val overview = Help.overview[C]
     s"""
