@@ -324,6 +324,7 @@ abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: Workspa
         serializedCpg.close()
       }
     }
+    report("You may want to `save`")
     cpg
   }
 
