@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.Node
 import io.shiftleft.semanticcpg.utils.Table
 import io.shiftleft.semanticcpg.{Doc, Traversal}
 import org.reflections.Reflections
+import scala.reflect.runtime.universe.runtimeMirror
 
 import scala.jdk.CollectionConverters._
 
@@ -62,10 +63,14 @@ object Help {
   lazy val genericNodeStepDocs: Iterable[StepDoc] =
     findStepDocs(classOf[NodeSteps[_]])
 
-  private def findStepDocs(traversal: Class[_]): Iterable[StepDoc] =
-    Doc.docByMethodName(traversal).map { case (methodName, doc) =>
+  private lazy val mirror = runtimeMirror(this.getClass.getClassLoader)
+
+  private def findStepDocs(traversal: Class[_]): Iterable[StepDoc] = {
+    val traversalTpe = mirror.classSymbol(traversal).toType
+    Doc.docByMethodName(traversalTpe).map { case (methodName, doc) =>
       StepDoc(traversal.getName, methodName, doc)
     }
+  }
 
   case class StepDoc(traversalClassName: String, methodName: String, doc: Doc)
 }

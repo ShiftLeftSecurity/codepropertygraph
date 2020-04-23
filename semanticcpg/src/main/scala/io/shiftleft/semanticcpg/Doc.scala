@@ -17,12 +17,11 @@ object Doc {
   private lazy val mirror = runtimeMirror(this.getClass.getClassLoader)
   private lazy val mirrorToolbox = mirror.mkToolBox()
 
-  def docByMethodName(clazz: Class[_]): Map[String, Doc] = {
-    val traversalTpe = mirror.classSymbol(clazz).toType
+  def docByMethodName(tpe: Type): Map[String, Doc] = {
     def toDoc(annotation: Annotation): Doc =
       mirrorToolbox.eval(mirrorToolbox.untypecheck(annotation.tree)).asInstanceOf[Doc]
 
-    traversalTpe.members
+    tpe.members
       .filter(_.isPublic)
       .map { member =>
         val docAnnotationMaybe = member.annotations.filter(_.tree.tpe =:= typeOf[Doc]).map(toDoc).headOption
