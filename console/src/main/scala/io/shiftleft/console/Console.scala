@@ -324,6 +324,8 @@ abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: Workspa
         serializedCpg.close()
       }
     }
+    report(
+      "The graph has been modified. You may want to use the `save` command to persist changes to disk. Ocular will also auto-save all changes collectively when you exit")
     cpg
   }
 
