@@ -1,6 +1,8 @@
 package io.shiftleft.semanticcpg
 
 import scala.annotation.StaticAnnotation
+import scala.reflect.runtime.universe._
+import scala.tools.reflect.ToolBox
 
 /**
   * Annotation used for documentation.
@@ -10,3 +12,23 @@ import scala.annotation.StaticAnnotation
   * @example a short example for the overview table
   * */
 case class Doc(short: String, long: String = "", example: String = "") extends StaticAnnotation
+
+object Doc {
+  private lazy val mirror = runtimeMirror(this.getClass.getClassLoader)
+  private lazy val mirrorToolbox = mirror.mkToolBox()
+
+  def docByMethodName(clazz: Class[_]): Map[String, Doc] = {
+    val traversalTpe = mirror.classSymbol(clazz).toType
+    def toDoc(annotation: Annotation): Doc =
+      mirrorToolbox.eval(mirrorToolbox.untypecheck(annotation.tree)).asInstanceOf[Doc]
+
+    traversalTpe.members
+      .filter(_.isPublic)
+      .map { member =>
+        val docAnnotationMaybe = member.annotations.filter(_.tree.tpe =:= typeOf[Doc]).map(toDoc).headOption
+        (member.name.toString, docAnnotationMaybe)
+      }.collect { case (methodName, Some(doc)) => (methodName, doc) }
+      .toMap
+  }
+
+}
