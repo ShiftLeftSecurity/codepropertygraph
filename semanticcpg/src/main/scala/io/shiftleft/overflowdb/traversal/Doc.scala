@@ -1,4 +1,4 @@
-package io.shiftleft.semanticcpg
+package io.shiftleft.overflowdb.traversal
 
 import scala.annotation.StaticAnnotation
 import scala.reflect.runtime.universe._

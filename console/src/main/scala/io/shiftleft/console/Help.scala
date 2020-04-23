@@ -1,9 +1,10 @@
 package io.shiftleft.console
 
-import io.shiftleft.semanticcpg.Doc
+import io.shiftleft.overflowdb.traversal.Doc
 import io.shiftleft.semanticcpg.utils.Table
 import org.apache.commons.lang.WordUtils
-import scala.reflect.runtime.universe.{typeOf, TypeTag}
+
+import scala.reflect.runtime.universe.{TypeTag, typeOf}
 
 object Help {
 

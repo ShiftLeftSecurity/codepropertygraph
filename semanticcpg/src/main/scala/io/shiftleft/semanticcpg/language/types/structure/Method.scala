@@ -3,7 +3,8 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.{Doc, Traversal}
+import io.shiftleft.overflowdb.traversal.Doc
+import io.shiftleft.semanticcpg.Traversal
 import io.shiftleft.semanticcpg.language._
 
 /**

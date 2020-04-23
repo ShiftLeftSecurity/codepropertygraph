@@ -1,11 +1,12 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.generated.nodes.Node
+import io.shiftleft.overflowdb.traversal.Doc
 import io.shiftleft.semanticcpg.utils.Table
-import io.shiftleft.semanticcpg.{Doc, Traversal}
+import io.shiftleft.semanticcpg.Traversal
 import org.reflections.Reflections
-import scala.reflect.runtime.universe.runtimeMirror
 
+import scala.reflect.runtime.universe.runtimeMirror
 import scala.jdk.CollectionConverters._
 
 object Help {
