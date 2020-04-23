@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.generated.nodes.Node
+import io.shiftleft.semanticcpg.language.Help.StepDoc
 import io.shiftleft.semanticcpg.utils.Table
 import io.shiftleft.semanticcpg.{Doc, Traversal}
 import org.reflections.Reflections
@@ -54,20 +55,25 @@ object Help {
     for {
       traversal <- new Reflections(StepsBasePackage).getTypesAnnotatedWith(classOf[Traversal]).iterator.asScala
       elementType = traversal.getAnnotation(classOf[Traversal]).elementType
-      stepDoc <- readDocAnnotations(traversal)
+      stepDoc <- findStepDocs(traversal)
     } yield (elementType, stepDoc)
   }.toList.groupMap(_._1)(_._2)
 
   lazy val genericStepDocs: Iterable[StepDoc] =
-    readDocAnnotations(classOf[Steps[_]])
+    findStepDocs(classOf[Steps[_]])
 
   lazy val genericNodeStepDocs: Iterable[StepDoc] =
-    readDocAnnotations(classOf[NodeSteps[_]])
+    findStepDocs(classOf[NodeSteps[_]])
+
+  private def findStepDocs(traversal: Class[_]): Iterable[StepDoc] =
+    docAnnotationByMethodname(traversal).map { case (methodName, doc) =>
+      StepDoc(traversal.getName, methodName, doc)
+    }
 
   private val mirror = runtimeMirror(this.getClass.getClassLoader)
   private val mirrorToolbox = mirror.mkToolBox()
 
-  private def readDocAnnotations(traversal: Class[_]): Iterable[StepDoc] = {
+  private def docAnnotationByMethodname(traversal: Class[_]): Iterable[(String, Doc)] = {
     val traversalTpe = mirror.classSymbol(traversal).toType
     def toDoc(annotation: Annotation): Doc =
       mirrorToolbox.eval(mirrorToolbox.untypecheck(annotation.tree)).asInstanceOf[Doc]
@@ -75,9 +81,9 @@ object Help {
     traversalTpe.members
       .filter(_.isPublic)
       .map { member =>
-        (member.name.toString, member.annotations.filter(_.tree.tpe =:= typeOf[Doc]).map(toDoc).headOption)
-      }
-      .collect { case (methodName, Some(doc)) => StepDoc(traversal.getName, methodName, doc) }
+        val docAnnotationMaybe = member.annotations.filter(_.tree.tpe =:= typeOf[Doc]).map(toDoc).headOption
+        (member.name.toString, docAnnotationMaybe)
+      }.collect { case (methodName, Some(doc)) => (methodName, doc) }
   }
 
   case class StepDoc(traversalClassName: String, methodName: String, doc: Doc)
