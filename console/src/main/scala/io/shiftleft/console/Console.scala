@@ -206,6 +206,24 @@ abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: Workspa
   }
 
   @Doc(
+    "Write all changes to disk",
+    """
+      |Close and reopen all loaded CPGs. This ensures
+      |that changes have been flushed to disk.
+      |
+      |Returns list of affected projects
+      |""".stripMargin,
+    "save"
+  )
+  def save: List[Project] = {
+    report("Saving graphs on disk. This may take a while.")
+    workspace.projects.collect {
+      case p: Project if p.cpg.isDefined =>
+        p.close
+        workspace.openProject(p.name)
+    }.flatten
+  }
+  @Doc(
     "Create new project from existing CPG",
     """
       |importCpg(<inputPath>, [projectName])
