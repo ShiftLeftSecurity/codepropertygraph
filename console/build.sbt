@@ -60,6 +60,5 @@ libraryDependencies ++= Seq(
   "io.circe"             %% "circe-parser"  % CirceVersion,
   "org.zeroturnaround"   %  "zt-zip"        % ZeroturnaroundVersion,
   "com.lihaoyi"          %% "ammonite"      % AmmoniteVersion cross CrossVersion.full,
-  "org.reflections" % "reflections"           % "0.9.12",
   "org.scalatest"        %% "scalatest"     % ScalatestVersion % Test,
 )

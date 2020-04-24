@@ -1,9 +1,9 @@
 package io.shiftleft.dataflowengine.language
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.language.{Show, _}
+import io.shiftleft.overflowdb.traversal.help.Table
+import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.nodemethods.CfgNodeMethods
-import io.shiftleft.semanticcpg.utils.Table
 
 case class Path(elements: List[nodes.TrackingPoint])
 
