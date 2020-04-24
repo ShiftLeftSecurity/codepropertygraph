@@ -1,37 +1,24 @@
 package io.shiftleft.console
 
+import io.shiftleft.overflowdb.traversal.Doc
 import io.shiftleft.semanticcpg.utils.Table
 import org.apache.commons.lang.WordUtils
 
-import scala.reflect.runtime.universe._
-import scala.tools.reflect.ToolBox
+import scala.reflect.runtime.universe.{TypeTag, typeOf}
 
 object Help {
 
   private val width = 80
 
-  def overview[C](implicit tag: TypeTag[C]): String = {
+  def overview[C: TypeTag]: String = {
     val columnNames = List("command", "description", "example")
-    val rows = funcNameDocPairs[C].map {
-      case (name, doc) => List(name, doc.short, doc.example)
-    } ++ List(runRow)
+    val rows = Doc
+      .docByMethodName(typeOf[C])
+      .map {
+        case (name, doc) => List(name, doc.short, doc.example)
+      }
+      .toList ++ List(runRow)
     "\n" + Table(columnNames, rows.sortBy(_.head)).render
-  }
-
-  def funcNameDocPairs[C](implicit tag: TypeTag[C]): List[(String, Doc)] = {
-    val tb = runtimeMirror(this.getClass.getClassLoader).mkToolBox()
-    typeOf[C].members
-      .filter(_.isPublic)
-      .map(
-        x =>
-          (x.name.toString,
-           x.annotations
-             .filter(a => a.tree.tpe =:= typeOf[Doc])
-             .map(a => tb.eval(tb.untypecheck(a.tree)).asInstanceOf[Doc])
-             .headOption
-             .orNull))
-      .filter(_._2 != null)
-      .toList
   }
 
   def format(text: String): String = {
@@ -56,16 +43,16 @@ object Help {
         |""".stripMargin
     )
 
-  def codeForHelpCommand[C](implicit tag: TypeTag[C]): String = {
-    val membersCode = Help
-      .funcNameDocPairs[C]
+  def codeForHelpCommand[C: TypeTag]: String = {
+    val membersCode = Doc
+      .docByMethodName(typeOf[C])
       .map {
         case (funcName, doc) =>
           s"val $funcName : String = ${Help.format(doc.long)}"
       }
       .mkString("\n")
 
-    val overview = Help.overview[C](tag)
+    val overview = Help.overview[C]
     s"""
        | class Helper() {
        |

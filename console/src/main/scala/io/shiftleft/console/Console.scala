@@ -8,6 +8,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.CpgLoader
 import io.shiftleft.console.scripting.{AmmoniteExecutor, ScriptManager}
 import io.shiftleft.console.workspacehandling.{Project, WorkspaceLoader, WorkspaceManager}
+import io.shiftleft.overflowdb.traversal.Doc
 import io.shiftleft.semanticcpg.Overlays
 import io.shiftleft.semanticcpg.layers.LayerCreator
 import io.shiftleft.semanticcpg.language._
