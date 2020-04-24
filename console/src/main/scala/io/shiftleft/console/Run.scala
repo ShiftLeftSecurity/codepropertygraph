@@ -26,7 +26,7 @@ object Run {
 
     val toStringCode =
       s"""
-         | import io.shiftleft.semanticcpg.utils.Table
+         | import io.shiftleft.overflowdb.traversal.help.Table
          | override def toString() : String = {
          |  val columnNames = List("name", "description")
          |  val rows =
