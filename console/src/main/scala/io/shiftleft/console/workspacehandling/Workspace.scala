@@ -1,6 +1,6 @@
 package io.shiftleft.console.workspacehandling
 
-import io.shiftleft.semanticcpg.utils.Table
+import io.shiftleft.overflowdb.traversal.help.Table
 
 import scala.collection.mutable.ListBuffer
 

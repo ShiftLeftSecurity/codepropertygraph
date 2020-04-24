@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes._
 import java.util.{List => JList}
 
-import io.shiftleft.overflowdb.traversal.Doc
+import io.shiftleft.overflowdb.traversal.help.{Doc, TraversalHelp}
 import org.apache.tinkerpop.gremlin.process.traversal.Scope
 import org.json4s.CustomSerializer
 import org.json4s.native.Serialization.{write, writePretty}
@@ -90,15 +90,15 @@ class Steps[A](val raw: GremlinScala[A]) {
 
   /**
     * Print help/documentation based on the current elementType `A`.
-    * Relies on all step extensions being annotated with @Traversal / @Doc
+    * Relies on all step extensions being annotated with @TraversalExt / @Doc
     * Note that this works independently of tab completion and implicit conversions in scope - it will simply list
     * all documented steps in the classpath
     * */
   def help()(implicit elementType: ClassTag[A]): String =
-    Help.renderTable(elementType.runtimeClass, verbose = false)
+    Steps.help.renderTable(elementType.runtimeClass, verbose = false)
 
   def helpVerbose()(implicit elementType: ClassTag[A]): String =
-    Help.renderTable(elementType.runtimeClass, verbose = true)
+    Steps.help.renderTable(elementType.runtimeClass, verbose = true)
 
   /**
     * Pretty print vertices
@@ -333,4 +333,17 @@ class Steps[A](val raw: GremlinScala[A]) {
 
   def size: Int = l.size
 
+}
+
+object Steps {
+  val help = new TraversalHelp("io.shiftleft") {
+    // TODO remove once we migrated to overflowdb-traversal
+    override lazy val genericStepDocs: Iterable[StepDoc] =
+      findStepDocs(classOf[Steps[_]])
+
+    // TODO remove once we migrated to overflowdb-traversal
+    override lazy val genericNodeStepDocs: Iterable[StepDoc] =
+      findStepDocs(classOf[NodeSteps[_]])
+
+  }
 }
