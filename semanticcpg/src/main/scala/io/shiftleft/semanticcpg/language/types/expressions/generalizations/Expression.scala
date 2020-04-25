@@ -1,18 +1,22 @@
 package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.Call
-import io.shiftleft.semanticcpg.language.types.propertyaccessors._
-import io.shiftleft.semanticcpg.language.types.structure.{Method, MethodParameter, Type}
 
 /**
   An expression (base type)
   */
 class Expression[NodeType <: nodes.Expression](val wrapped: NodeSteps[NodeType]) extends AnyVal {
   private def raw: GremlinScala[NodeType] = wrapped.raw
+
+  /**
+    * Traverse to it's parent expression (e.g. call or return) by following the incoming AST nodes.
+    * It's continuing it's walk until it hits an expression that's not a generic
+    * "member access operation", e.g., "<operator>.memberAccess".
+    * */
+  def parentExpression: NodeSteps[nodes.Expression] =
+    new NodeSteps(raw.map(_.parentExpression))
 
   /**
     Traverse to enclosing expression
