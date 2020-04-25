@@ -13,15 +13,15 @@ import io.shiftleft.console.scripting.{AmmoniteExecutor, ScriptManager}
 import io.shiftleft.console.workspacehandling.{Project, WorkspaceLoader, WorkspaceManager}
 import io.shiftleft.overflowdb.traversal.help.{Doc, Table}
 import io.shiftleft.semanticcpg.Overlays
-import io.shiftleft.semanticcpg.layers.LayerCreator
+import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, Scpg}
 import io.shiftleft.semanticcpg.language._
 
 import scala.util.Try
 
-abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[T])
-    extends ScriptManager(executor) {
+class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[T]) extends ScriptManager(executor) {
 
-  def config: ConsoleConfig
+  private val _config = new ConsoleConfig()
+  def config: ConsoleConfig = _config
 
   protected val workspacePathName: String = config.install.rootPath.path.resolve("workspace").toString
   protected val workspaceManager = new WorkspaceManager[T](workspacePathName, loader)
@@ -227,7 +227,7 @@ abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: Workspa
     }.flatten
   }
 
-  protected val cpgGenerator           = new CpgGenerator(config)
+  protected val cpgGenerator = new CpgGenerator(config)
   private val nameOfLegacyCpgInProject = "cpg.bin.zip"
 
   @Doc(
@@ -289,25 +289,19 @@ abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: Workspa
         cpgGeneratorForLanguage(language, config.frontend, config.install.rootPath.path).get.isAvailable
       }
 
-      def apply(inputPath: String,
-                projectName: String = "",
-                namespaces: List[String] = List()): Option[Cpg] = {
+      def apply(inputPath: String, projectName: String = "", namespaces: List[String] = List()): Option[Cpg] = {
         val frontend =
           cpgGeneratorForLanguage(language, config.frontend, config.install.rootPath.path)
-        new ImportCode()(frontend.get,
-          inputPath,
-          projectName,
-          namespaces,
-          defaultOverlays)
+        new ImportCode()(frontend.get, inputPath, projectName, namespaces, defaultOverlays)
       }
     }
 
-    def c: Frontend          = new Frontend(Languages.C, "Fuzzy Parser for C/C++")
-    def llvm: Frontend       = new Frontend(Languages.LLVM, "LLVM Bitcode Frontend")
-    def jar: Frontend        = new Frontend(Languages.JAVA, "JVM/Dalvik Bytecode Frontend")
-    def golang: Frontend     = new Frontend(Languages.GOLANG, "Golang Source Frontend")
+    def c: Frontend = new Frontend(Languages.C, "Fuzzy Parser for C/C++")
+    def llvm: Frontend = new Frontend(Languages.LLVM, "LLVM Bitcode Frontend")
+    def jar: Frontend = new Frontend(Languages.JAVA, "JVM/Dalvik Bytecode Frontend")
+    def golang: Frontend = new Frontend(Languages.GOLANG, "Golang Source Frontend")
     def javascript: Frontend = new Frontend(Languages.JAVASCRIPT, "Javascript Source Frontend")
-    def csharp: Frontend     = new Frontend(Languages.CSHARP, "C# Source Frontend (Roslyn)")
+    def csharp: Frontend = new Frontend(Languages.CSHARP, "C# Source Frontend (Roslyn)")
 
     // TODO
     // def python: Frontend     = new Frontend(Languages.PYTHON)
@@ -331,7 +325,7 @@ abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: Workspa
       val name =
         Option(projectName).filter(_.nonEmpty).getOrElse(deriveNameFromInputPath(inputPath))
       report(s"Creating project `$name` for code at `$inputPath`")
-      val pathToProject         = workspace.createProject(inputPath, name)
+      val pathToProject = workspace.createProject(inputPath, name)
       val frontendCpgOutFileOpt = pathToProject.map(_.resolve(nameOfLegacyCpgInProject))
 
       if (frontendCpgOutFileOpt.isEmpty) {
@@ -354,12 +348,12 @@ abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: Workspa
     }
 
     def apply(
-               inputPath: String,
-               projectName: String,
-               namespaces: List[String],
-               overlayCreators: List[String],
-               language: String
-             ): Option[Cpg] = {
+        inputPath: String,
+        projectName: String,
+        namespaces: List[String],
+        overlayCreators: List[String],
+        language: String
+    ): Option[Cpg] = {
 
       var frontendOpt = cpgGenerator.createFrontendByLanguage(language)
       if (frontendOpt.isEmpty) {
@@ -371,9 +365,15 @@ abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: Workspa
     }
   }
 
-  def defaultOverlays : List[String]
+  def defaultOverlays: List[String] = List(Scpg.overlayName)
 
-  protected def overlayCreatorByName(name: String): Option[LayerCreator]
+  protected def overlayCreatorByName(name: String): Option[LayerCreator] = {
+    if (name == Scpg.overlayName) {
+      Some(new Scpg())
+    } else {
+      None
+    }
+  }
 
   @Doc(
     "Create new project from existing CPG",
@@ -470,7 +470,14 @@ abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: Workspa
     close(name).flatMap(p => open(p.name))
   }
 
-  def applyDefaultOverlays(cpg: Cpg): Unit
+  def applyDefaultOverlays(cpg: Cpg): Unit = {
+    val appliedOverlays = io.shiftleft.semanticcpg.Overlays.appliedOverlays(cpg)
+    if (appliedOverlays.isEmpty && !(new Scpg().probe(cpg))) {
+      report("Adding default overlays to base CPG")
+      val overlayCreators = List(new Scpg)
+      _runAnalyzer(overlayCreators: _*)
+    }
+  }
 
   protected def report(string: String): Unit = System.err.println(string)
 
@@ -500,6 +507,9 @@ abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: Workspa
     cpg
   }
 
-  protected def runCreator(creator: LayerCreator, serializedCpg: SerializedCpg): Unit
+  protected def runCreator(creator: LayerCreator, serializedCpg: SerializedCpg): Unit = {
+    val context = new LayerCreatorContext(cpg, serializedCpg)
+    creator.run(context, serializeInverse = true)
+  }
 
 }
