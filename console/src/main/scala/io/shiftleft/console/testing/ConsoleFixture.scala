@@ -12,7 +12,9 @@ import io.shiftleft.fuzzyc2cpg.FuzzyC2Cpg
 import io.shiftleft.proto.cpg.Cpg.CpgStruct
 
 object ConsoleFixture {
-  def apply()(fun: (TestConsole, File) => Unit): Unit = {
+  def apply[T <: Console[Project]](constructor: String => T = { x =>
+    new TestConsole(x)
+  })(fun: (T, File) => Unit): Unit = {
     File.usingTemporaryDirectory("console") { workspaceDir =>
       File.usingTemporaryDirectory("console") { codeDir =>
         mkdir(codeDir / "dir1")
@@ -20,18 +22,19 @@ object ConsoleFixture {
         (codeDir / "dir1" / "foo.c")
           .write("int main(int argc, char **argv) { char *ptr = 0x1 + argv; return argc; }")
         (codeDir / "dir2" / "bar.c").write("int bar(int x) { return x; }")
-        val console = new TestConsole(workspaceDir.toString)
+        val console = constructor(workspaceDir.toString)
         fun(console, codeDir)
       }
     }
   }
+
 }
 
 object TestWorkspaceLoader extends WorkspaceLoader[Project] {
   override def createProject(projectFile: ProjectFile, path: Path): Project = Project(projectFile, path)
 }
 
-private class TestConsole(workspaceDir: String) extends Console[Project](DefaultAmmoniteExecutor, TestWorkspaceLoader) {
+class TestConsole(workspaceDir: String) extends Console[Project](DefaultAmmoniteExecutor, TestWorkspaceLoader) {
   override def config = new ConsoleConfig(
     install = new InstallConfig(Map("SHIFTLEFT_CONSOLE_INSTALL_DIR" -> workspaceDir))
   )
@@ -42,8 +45,8 @@ private class TestConsole(workspaceDir: String) extends Console[Project](Default
 
 class TestCpgGenerator(config: ConsoleConfig) extends CpgGenerator(config) {
   override def createFrontendByPath(
-                                     inputPath: String,
-                                   ): Option[LanguageFrontend] = {
+      inputPath: String,
+  ): Option[LanguageFrontend] = {
     Some(new FuzzyCTestingFrontend)
   }
 
@@ -68,4 +71,3 @@ class TestCpgGenerator(config: ConsoleConfig) extends CpgGenerator(config) {
   }
 
 }
-
