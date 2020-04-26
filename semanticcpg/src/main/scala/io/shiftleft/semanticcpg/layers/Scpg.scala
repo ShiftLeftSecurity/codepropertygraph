@@ -44,7 +44,7 @@ class Scpg() extends LayerCreator {
       .getOrElse(throw new Exception("Meta node missing."))
 
     val enhancementExecList = createEnhancementExecList(cpg, language)
-    enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg))
+    enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg, serializeInverse))
     Overlays.appendOverlayName(cpg, Scpg.overlayName)
   }
 

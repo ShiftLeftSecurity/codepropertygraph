@@ -292,7 +292,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
       def apply(inputPath: String, projectName: String = "", namespaces: List[String] = List()): Option[Cpg] = {
         val frontend =
           cpgGeneratorForLanguage(language, config.frontend, config.install.rootPath.path)
-        new ImportCode()(frontend.get, inputPath, projectName, namespaces, defaultOverlays)
+        new ImportCode()(frontend.get, inputPath, projectName, namespaces)
       }
     }
 
@@ -306,22 +306,10 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     // TODO
     // def python: Frontend     = new Frontend(Languages.PYTHON)
 
-    def apply(inputPath: String,
-              projectName: String = "",
-              namespaces: List[String] = List(),
-              language: String = ""): Option[Cpg] = apply(
-      inputPath,
-      projectName,
-      namespaces,
-      defaultOverlays,
-      language
-    )
-
     private def apply(frontend: LanguageFrontend,
                       inputPath: String,
                       projectName: String,
-                      namespaces: List[String],
-                      overlayCreators: List[String]): Option[Cpg] = {
+                      namespaces: List[String]): Option[Cpg] = {
       val name =
         Option(projectName).filter(_.nonEmpty).getOrElse(deriveNameFromInputPath(inputPath))
       report(s"Creating project `$name` for code at `$inputPath`")
@@ -342,17 +330,18 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
               namespaces
             )
             .flatMap(_ => open(name).flatMap(_.cpg))
-            .map(_ => _runAnalyzer(overlayCreators.flatMap(overlayCreatorByName): _*))
+            .map { c =>
+              applyDefaultOverlays(c)
+            }
         }
       }
     }
 
     def apply(
         inputPath: String,
-        projectName: String,
-        namespaces: List[String],
-        overlayCreators: List[String],
-        language: String
+        projectName: String = "",
+        namespaces: List[String] = List(),
+        language: String = ""
     ): Option[Cpg] = {
 
       var frontendOpt = cpgGenerator.createFrontendByLanguage(language)
@@ -360,18 +349,8 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
         frontendOpt = cpgGenerator.createFrontendByPath(inputPath)
       }
       frontendOpt.flatMap { frontend =>
-        apply(frontend, inputPath, projectName, namespaces, overlayCreators)
+        apply(frontend, inputPath, projectName, namespaces)
       }
-    }
-  }
-
-  def defaultOverlays: List[String] = List(Scpg.overlayName)
-
-  protected def overlayCreatorByName(name: String): Option[LayerCreator] = {
-    if (name == Scpg.overlayName) {
-      Some(new Scpg())
-    } else {
-      None
     }
   }
 
@@ -470,13 +449,14 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     close(name).flatMap(p => open(p.name))
   }
 
-  def applyDefaultOverlays(cpg: Cpg): Unit = {
+  def applyDefaultOverlays(cpg: Cpg): Cpg = {
     val appliedOverlays = io.shiftleft.semanticcpg.Overlays.appliedOverlays(cpg)
     if (appliedOverlays.isEmpty && !(new Scpg().probe(cpg))) {
       report("Adding default overlays to base CPG")
       val overlayCreators = List(new Scpg)
       _runAnalyzer(overlayCreators: _*)
     }
+    cpg
   }
 
   protected def report(string: String): Unit = System.err.println(string)
@@ -503,7 +483,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
       }
     }
     report(
-      "The graph has been modified. You may want to use the `save` command to persist changes to disk. Ocular will also auto-save all changes collectively when you exit")
+      "The graph has been modified. You may want to use the `save` command to persist changes to disk.  All changes will also be saved collectively on exit")
     cpg
   }
 
