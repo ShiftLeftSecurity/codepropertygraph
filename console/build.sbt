@@ -61,4 +61,5 @@ libraryDependencies ++= Seq(
   "org.zeroturnaround"   %  "zt-zip"        % ZeroturnaroundVersion,
   "com.lihaoyi"          %% "ammonite"      % AmmoniteVersion cross CrossVersion.full,
   "org.scalatest"        %% "scalatest"     % ScalatestVersion % Test,
+  "io.shiftleft" %% "fuzzyc2cpg"            % Versions.fuzzyc2cpg % Test,
 )

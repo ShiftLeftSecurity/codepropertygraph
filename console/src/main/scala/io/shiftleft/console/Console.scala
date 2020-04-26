@@ -6,19 +6,22 @@ import gremlin.scala.ScalaGraph
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.CpgLoader
+import io.shiftleft.codepropertygraph.generated.Languages
+import io.shiftleft.console.LanguageHelper.cpgGeneratorForLanguage
+import io.shiftleft.console.cpgcreation.{CpgGenerator, LanguageFrontend}
 import io.shiftleft.console.scripting.{AmmoniteExecutor, ScriptManager}
 import io.shiftleft.console.workspacehandling.{Project, WorkspaceLoader, WorkspaceManager}
-import io.shiftleft.overflowdb.traversal.help.Doc
+import io.shiftleft.overflowdb.traversal.help.{Doc, Table}
 import io.shiftleft.semanticcpg.Overlays
-import io.shiftleft.semanticcpg.layers.LayerCreator
+import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, Scpg}
 import io.shiftleft.semanticcpg.language._
 
 import scala.util.Try
 
-abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[T])
-    extends ScriptManager(executor) {
+class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[T]) extends ScriptManager(executor) {
 
-  def config: ConsoleConfig
+  private val _config = new ConsoleConfig()
+  def config: ConsoleConfig = _config
 
   protected val workspacePathName: String = config.install.rootPath.path.resolve("workspace").toString
   protected val workspaceManager = new WorkspaceManager[T](workspacePathName, loader)
@@ -223,6 +226,134 @@ abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: Workspa
         workspace.openProject(p.name)
     }.flatten
   }
+
+  protected val cpgGenerator = new CpgGenerator(config)
+  private val nameOfLegacyCpgInProject = "cpg.bin.zip"
+
+  @Doc(
+    "Create new project from code",
+    """
+      |importCode(<inputPath>, [projectName], [namespaces], [language])
+      |
+      |Import code at `inputPath` into Ocular. Creates a new project, generates a CPG,
+      |and opens the project. Upon success, the CPG can be queried via the `cpg`
+      |object. Default overlays are already applied to the newly created CPG.
+      |Returns new CPG and ensures that `cpg` now refers to this new CPG.
+      |
+      |Parameters:
+      |
+      |-----------
+      |
+      |inputPath: location on disk of the code to analyze. e.g., a directory
+      |containing source code or a Java archive (JAR).
+      |
+      |projectName: a unique name used for project management. If this parameter
+      |is omitted, the name will be derived from `inputPath`
+      |
+      |namespaces: the whitelist of namespaces to analyse. Specifying this
+      |parameter is only effective if the language frontend supports it.
+      |If the list is omitted or empty, namespace selection is performed
+      |automatically via heuristics.
+      |
+      |language: the programming language which the code at `inputPath` is written in.
+      |If `language` is empty, the language used is guessed by inspecting
+      |the filename found and possibly by looking into the file/directory.
+      |
+      |""".stripMargin,
+    """importCode("example.jar")"""
+  )
+  def importCode = new ImportCode()
+
+  class ImportCode {
+
+    private def allFrontends: List[Frontend] = List(
+      c,
+      csharp,
+      golang,
+      jar,
+      javascript,
+      llvm,
+    )
+
+    override def toString: String = {
+      val cols = List("name", "description", "available")
+      val rows = allFrontends.map { frontend =>
+        List(frontend.language, frontend.description, frontend.isAvailable.toString)
+      }
+      "\n" + Table(cols, rows).render
+    }
+
+    class Frontend(val language: String, val description: String = "") {
+
+      def isAvailable: Boolean = {
+        cpgGeneratorForLanguage(language, config.frontend, config.install.rootPath.path).get.isAvailable
+      }
+
+      def apply(inputPath: String, projectName: String = "", namespaces: List[String] = List()): Option[Cpg] = {
+        val frontend =
+          cpgGeneratorForLanguage(language, config.frontend, config.install.rootPath.path)
+        new ImportCode()(frontend.get, inputPath, projectName, namespaces)
+      }
+    }
+
+    def c: Frontend = new Frontend(Languages.C, "Fuzzy Parser for C/C++")
+    def llvm: Frontend = new Frontend(Languages.LLVM, "LLVM Bitcode Frontend")
+    def jar: Frontend = new Frontend(Languages.JAVA, "JVM/Dalvik Bytecode Frontend")
+    def golang: Frontend = new Frontend(Languages.GOLANG, "Golang Source Frontend")
+    def javascript: Frontend = new Frontend(Languages.JAVASCRIPT, "Javascript Source Frontend")
+    def csharp: Frontend = new Frontend(Languages.CSHARP, "C# Source Frontend (Roslyn)")
+
+    // TODO
+    // def python: Frontend     = new Frontend(Languages.PYTHON)
+
+    private def apply(frontend: LanguageFrontend,
+                      inputPath: String,
+                      projectName: String,
+                      namespaces: List[String]): Option[Cpg] = {
+      val name =
+        Option(projectName).filter(_.nonEmpty).getOrElse(deriveNameFromInputPath(inputPath))
+      report(s"Creating project `$name` for code at `$inputPath`")
+      val pathToProject = workspace.createProject(inputPath, name)
+      val frontendCpgOutFileOpt = pathToProject.map(_.resolve(nameOfLegacyCpgInProject))
+
+      if (frontendCpgOutFileOpt.isEmpty) {
+        report(s"Error creating project for input path: `$inputPath`")
+      }
+
+      frontendCpgOutFileOpt.flatMap { frontendCpgOutFile =>
+        Some(frontend).flatMap { frontend =>
+          cpgGenerator
+            .runLanguageFrontend(
+              frontend,
+              inputPath,
+              frontendCpgOutFile.toString,
+              namespaces
+            )
+            .flatMap(_ => open(name).flatMap(_.cpg))
+            .map { c =>
+              applyDefaultOverlays(c)
+            }
+        }
+      }
+    }
+
+    def apply(
+        inputPath: String,
+        projectName: String = "",
+        namespaces: List[String] = List(),
+        language: String = ""
+    ): Option[Cpg] = {
+
+      var frontendOpt = cpgGenerator.createFrontendByLanguage(language)
+      if (frontendOpt.isEmpty) {
+        frontendOpt = cpgGenerator.createFrontendByPath(inputPath)
+      }
+      frontendOpt.flatMap { frontend =>
+        apply(frontend, inputPath, projectName, namespaces)
+      }
+    }
+  }
+
   @Doc(
     "Create new project from existing CPG",
     """
@@ -318,7 +449,15 @@ abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: Workspa
     close(name).flatMap(p => open(p.name))
   }
 
-  def applyDefaultOverlays(cpg: Cpg): Unit
+  def applyDefaultOverlays(cpg: Cpg): Cpg = {
+    val appliedOverlays = io.shiftleft.semanticcpg.Overlays.appliedOverlays(cpg)
+    if (appliedOverlays.isEmpty && !(new Scpg().probe(cpg))) {
+      report("Adding default overlays to base CPG")
+      val overlayCreators = List(new Scpg)
+      _runAnalyzer(overlayCreators: _*)
+    }
+    cpg
+  }
 
   protected def report(string: String): Unit = System.err.println(string)
 
@@ -344,10 +483,13 @@ abstract class Console[T <: Project](executor: AmmoniteExecutor, loader: Workspa
       }
     }
     report(
-      "The graph has been modified. You may want to use the `save` command to persist changes to disk. Ocular will also auto-save all changes collectively when you exit")
+      "The graph has been modified. You may want to use the `save` command to persist changes to disk.  All changes will also be saved collectively on exit")
     cpg
   }
 
-  protected def runCreator(creator: LayerCreator, serializedCpg: SerializedCpg): Unit
+  protected def runCreator(creator: LayerCreator, serializedCpg: SerializedCpg): Unit = {
+    val context = new LayerCreatorContext(cpg, serializedCpg)
+    creator.run(context, serializeInverse = true)
+  }
 
 }
