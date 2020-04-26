@@ -5,7 +5,6 @@ import java.util.zip.ZipOutputStream
 
 import better.files.Dsl.cp
 import better.files._
-import io.shiftleft.console.fixtures.ConsoleFixture
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.console.testing._
