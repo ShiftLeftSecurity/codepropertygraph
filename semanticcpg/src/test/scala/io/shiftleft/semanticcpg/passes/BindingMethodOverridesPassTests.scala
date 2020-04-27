@@ -7,21 +7,23 @@ import org.scalatest.{Matchers, WordSpec}
 
 class BindingMethodOverridesPassTests extends WordSpec with Matchers {
   "Binding propagation should not mark non-overwritten bindings" in {
-    val cpg = Cpg.emptyCpg
+    val cpg       = Cpg.emptyCpg
     val diffGraph = DiffGraph.newBuilder
-    val typA = nodes.NewType(name = "tA", fullName = "typA", typeDeclFullName = "typeDeclA")
-    val typB = nodes.NewType(name = "tB", fullName = "typB", typeDeclFullName = "typeDeclB")
-    val typeDeclA =
-      nodes.NewTypeDecl(name = "tdA", fullName = "typeDeclA", isExternal = false, inheritsFromTypeFullName = List())
+    val typA      = nodes.NewType(name = "tA", fullName = "typA", typeDeclFullName = "typeDeclA")
+    val typB      = nodes.NewType(name = "tB", fullName = "typB", typeDeclFullName = "typeDeclB")
+    val typeDeclA = nodes.NewTypeDecl(name = "tdA",
+      fullName = "typeDeclA",
+      isExternal = false,
+      inheritsFromTypeFullName = List())
     val typeDeclB = nodes.NewTypeDecl(name = "tdB",
-                                      fullName = "typeDeclB",
-                                      isExternal = false,
-                                      inheritsFromTypeFullName = List("typA"))
+      fullName = "typeDeclB",
+      isExternal = false,
+      inheritsFromTypeFullName = List("typA"))
 
     val bindingA = nodes.NewBinding(name = "name", signature = "signature")
     val bindingB = nodes.NewBinding(name = "name", signature = "signature")
-    val methodA = nodes.NewMethod(name = "name", fullName = "fullName", isExternal = false)
-    val methodB = nodes.NewMethod(name = "name", fullName = "fullNameB", isExternal = false)
+    val methodA  = nodes.NewMethod(name = "name", fullName = "fullName", isExternal = false)
+    val methodB  = nodes.NewMethod(name = "name", fullName = "fullNameB", isExternal = false)
 
     diffGraph.addNode(typA)
     diffGraph.addNode(typB)
@@ -46,21 +48,23 @@ class BindingMethodOverridesPassTests extends WordSpec with Matchers {
   }
 
   "Binding propagation should mark overwritten bindings" in {
-    val cpg = Cpg.emptyCpg
+    val cpg       = Cpg.emptyCpg
     val diffGraph = DiffGraph.newBuilder
-    val typA = nodes.NewType(name = "tA", fullName = "typA", typeDeclFullName = "typeDeclA")
-    val typB = nodes.NewType(name = "tB", fullName = "typB", typeDeclFullName = "typeDeclB")
-    val typeDeclA =
-      nodes.NewTypeDecl(name = "tdA", fullName = "typeDeclA", isExternal = false, inheritsFromTypeFullName = List())
+    val typA      = nodes.NewType(name = "tA", fullName = "typA", typeDeclFullName = "typeDeclA")
+    val typB      = nodes.NewType(name = "tB", fullName = "typB", typeDeclFullName = "typeDeclB")
+    val typeDeclA = nodes.NewTypeDecl(name = "tdA",
+      fullName = "typeDeclA",
+      isExternal = false,
+      inheritsFromTypeFullName = List())
     val typeDeclB = nodes.NewTypeDecl(name = "tdB",
-                                      fullName = "typeDeclB",
-                                      isExternal = false,
-                                      inheritsFromTypeFullName = List("typA"))
+      fullName = "typeDeclB",
+      isExternal = false,
+      inheritsFromTypeFullName = List("typA"))
 
     val bindingA = nodes.NewBinding(name = "name", signature = "signature")
     val bindingB = nodes.NewBinding(name = "name", signature = "signature")
-    val methodA = nodes.NewMethod(name = "name", fullName = "fullName", isExternal = false)
-    val methodB = nodes.NewMethod(name = "name", fullName = "fullNameB", isExternal = false)
+    val methodA  = nodes.NewMethod(name = "name", fullName = "fullName", isExternal = false)
+    val methodB  = nodes.NewMethod(name = "name", fullName = "fullNameB", isExternal = false)
 
     diffGraph.addNode(typA)
     diffGraph.addNode(typB)
