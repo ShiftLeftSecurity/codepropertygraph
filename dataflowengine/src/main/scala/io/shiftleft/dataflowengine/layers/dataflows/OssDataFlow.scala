@@ -6,12 +6,17 @@ import io.shiftleft.dataflowengine.passes.reachingdef.ReachingDefPass
 import io.shiftleft.dataflowengine.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, LayerCreatorOptions}
 
+object OssDataFlow {
+  val overlayName: String = "dataflowOss"
+  val description: String = "Layer to support the OSS lightweight data flow tracker"
+}
+
 class OssDataFlowOptions(val semantics: Semantics) extends LayerCreatorOptions {}
 
 class OssDataFlow() extends LayerCreator {
 
-  override val overlayName: String = "dataflowOSS"
-  override val description: String = """Layer to support the OSS lightweight data flow tracker"""
+  override val overlayName: String = OssDataFlow.overlayName
+  override val description: String = OssDataFlow.description
 
   override def create(context: LayerCreatorContext,
                       options: Option[LayerCreatorOptions],
