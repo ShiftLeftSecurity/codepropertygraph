@@ -6,6 +6,7 @@ import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.{Matchers, WordSpec}
+
 import scala.collection.mutable
 
 class StepsTest extends WordSpec with Matchers {
@@ -172,6 +173,34 @@ class StepsTest extends WordSpec with Matchers {
         fixture.cpg.method.name("main")
 
       mainMethods.p.head shouldBe "package defined pretty printer"
+    }
+  }
+
+  ".help step" should {
+
+    "provide node-specific overview" in {
+      val methodSteps = new Steps[nodes.Method](null)
+      methodSteps.help should include("Available steps for Method")
+      methodSteps.help should include(".namespace")
+
+      methodSteps.helpVerbose should include("traversal name")
+      methodSteps.helpVerbose should include("io.shiftleft.semanticcpg.language.types.structure.Method")
+    }
+
+    "provides generic help" when {
+      "using verbose mode" when {
+        "traversing nodes" in {
+          val methodSteps = new Steps[nodes.Method](null)
+          methodSteps.helpVerbose should include(".toList")
+          methodSteps.helpVerbose should include(".label")
+        }
+
+        "traversing non-nodes" in {
+          val stringSteps = new Steps[String](null)
+          stringSteps.helpVerbose should include(".toList")
+          stringSteps.helpVerbose should not include ".label"
+        }
+      }
     }
   }
 

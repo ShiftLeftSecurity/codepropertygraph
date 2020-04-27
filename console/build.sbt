@@ -1,9 +1,10 @@
 name := "console"
+Test/fork := true
 
 enablePlugins(JavaAppPackaging)
 
 dependsOn(Projects.codepropertygraph,
-          Projects.semanticcpg % "test -> test")
+          Projects.semanticcpg)
 
 scalacOptions ++= Seq(
   "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
@@ -59,6 +60,6 @@ libraryDependencies ++= Seq(
   "io.circe"             %% "circe-parser"  % CirceVersion,
   "org.zeroturnaround"   %  "zt-zip"        % ZeroturnaroundVersion,
   "com.lihaoyi"          %% "ammonite"      % AmmoniteVersion cross CrossVersion.full,
-
   "org.scalatest"        %% "scalatest"     % ScalatestVersion % Test,
+  "io.shiftleft" %% "fuzzyc2cpg"            % Versions.fuzzyc2cpg,
 )

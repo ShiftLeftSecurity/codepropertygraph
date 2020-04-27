@@ -5,10 +5,8 @@ import cats.effect.IO
 import io.circe.generic.auto._
 import io.circe.parser._
 import org.zeroturnaround.zip.{NameMapper, ZipUtil}
-
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.CpgLoader
-
 import java.nio.file.{Files, NoSuchFileException}
 
 import scala.util.Try
@@ -43,6 +41,28 @@ object ScriptManager {
 abstract class ScriptManager(executor: AmmoniteExecutor) {
 
   import ScriptManager._
+
+  implicit class CpgScriptRunner(cpg: Cpg) {
+
+    /**
+      * Run an arbitrary script over this CPG.
+      *
+      * @param name The name of the script to run.
+      * @return The result of running the script against this CPG.
+      */
+    def runScript(name: String): Any =
+      runScript(name, Map.empty)
+
+    /**
+      * Run an arbitrary script over this CPG with parameters.
+      *
+      * @param name       The name of the script to run.
+      * @param parameters The parameters to pass to the script.
+      * @return The result of running the script against this CPG.
+      */
+    def runScript(name: String, parameters: Map[String, String]): Any =
+      ScriptManager.this.runScript(name, parameters, cpg)
+  }
 
   private val absoluteJarPathRegex = """jar:file:(.*)!/scripts""".r
   private val scriptFileRegex = """(scripts/.*)""".r

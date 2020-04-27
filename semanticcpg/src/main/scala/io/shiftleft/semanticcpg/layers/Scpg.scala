@@ -1,8 +1,7 @@
 package io.shiftleft.semanticcpg.layers
 
-import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.Languages
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Languages, NodeTypes}
 import io.shiftleft.passes.CpgPass
 import io.shiftleft.semanticcpg.Overlays
 import io.shiftleft.semanticcpg.passes.BindingMethodOverridesPass
@@ -23,11 +22,33 @@ import io.shiftleft.semanticcpg.passes.compat.methodinstcompat.MethodInstCompat
 import io.shiftleft.semanticcpg.passes.linking.filecompat.{FileLinker, FileNameCompat}
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
+import io.shiftleft.semanticcpg.language._
 
-class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedCpg) {
-  private val enhancementExecList = createEnhancementExecList(language)
+object Scpg {
+  val overlayName: String = "semanticcpg"
+  val description: String = "linked code property graph (OSS)"
+}
 
-  private def createEnhancementExecList(language: String): Iterator[CpgPass] = {
+class Scpg() extends LayerCreator {
+
+  override val overlayName: String = Scpg.overlayName
+  override val description: String = Scpg.description
+
+  override def create(context: LayerCreatorContext,
+                      options: Option[LayerCreatorOptions],
+                      serializeInverse: Boolean): Unit = {
+    val cpg = context.cpg
+    val serializedCpg = context.serializedCpg
+    val language = cpg.metaData.language
+      .headOption()
+      .getOrElse(throw new Exception("Meta node missing."))
+
+    val enhancementExecList = createEnhancementExecList(cpg, language)
+    enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg, serializeInverse))
+    Overlays.appendOverlayName(cpg, Scpg.overlayName)
+  }
+
+  private def createEnhancementExecList(cpg: Cpg, language: String): Iterator[CpgPass] = {
     language match {
       case Languages.JAVA =>
         Iterator(
@@ -72,12 +93,9 @@ class EnhancedBaseCreator(cpg: Cpg, language: String, serializedCpg: SerializedC
     }
   }
 
-  def create(): Unit = {
-    enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg))
-    Overlays.appendOverlayName(cpg, EnhancedBaseCreator.overlayName)
+  override def probe(cpg: Cpg): Boolean = {
+    val methodDecoratorRan = cpg.scalaGraph.V.hasLabel(NodeTypes.METHOD_PARAMETER_OUT).exists()
+    val containsEdgePassRan = cpg.scalaGraph.E.hasLabel(EdgeTypes.CONTAINS).exists()
+    methodDecoratorRan || containsEdgePassRan
   }
-}
-
-object EnhancedBaseCreator {
-  val overlayName = "semanticcpg"
 }
