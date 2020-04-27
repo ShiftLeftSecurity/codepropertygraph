@@ -33,6 +33,6 @@ class MethodReturn(val wrapped: NodeSteps[nodes.MethodReturn]) extends AnyVal {
 
   def toReturn: NodeSteps[nodes.Return] =
     new NodeSteps(raw.flatMap { mr =>
-      __(mr.toReturn: _*)
+      __(mr.toReturn.toSeq: _*)
     })
 }

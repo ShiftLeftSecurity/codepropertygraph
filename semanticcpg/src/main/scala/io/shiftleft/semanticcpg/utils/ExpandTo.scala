@@ -1,14 +1,11 @@
 package io.shiftleft.semanticcpg.utils
 
+import io.shiftleft.Implicits._
 import io.shiftleft.codepropertygraph.generated._
-import org.apache.tinkerpop.gremlin.structure.{Direction, Vertex}
-import io.shiftleft.Implicits.JavaIteratorDeco
-import io.shiftleft.passes.DiffGraph.getClass
-import io.shiftleft.semanticcpg.language.ICallResolver
 import org.apache.logging.log4j.LogManager
+import org.apache.tinkerpop.gremlin.structure.Vertex
 
 import scala.annotation.tailrec
-import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 // TODO This object is problematic. While it offers a few utility methods
@@ -25,10 +22,10 @@ object ExpandTo {
   // pointer itself.
   // TODO move into traversal dsl - used in codescience
   def callReceiverOption(callNode: nodes.Call): Option[nodes.StoredNode] =
-    callNode.receiverOut.nextOption
+    callNode._receiverOut.nextOption
 
   def callReceiver(callNode: nodes.Call): nodes.StoredNode =
-    callNode.receiverOut.onlyChecked
+    callNode._receiverOut.onlyChecked
 
   // TODO move into traversal dsl - used in codescience
   def callArguments(callNode: nodes.CallRepr): Iterator[nodes.Expression] =
@@ -45,16 +42,16 @@ object ExpandTo {
   }
 
   def parameterInToMethod(parameterIn: nodes.MethodParameterIn): nodes.Method =
-    parameterIn.astIn.onlyChecked
+    parameterIn._methodViaAstIn.onlyChecked
 
   def parameterOutToMethod(parameterOut: nodes.MethodParameterOut): nodes.Method =
-    parameterOut.astIn.onlyChecked
+    parameterOut._methodViaAstIn.onlyChecked
 
   def methodReturnToMethod(formalReturnNode: nodes.MethodReturn): nodes.Method =
-    formalReturnNode.astIn.onlyChecked
+    formalReturnNode._methodViaAstIn.onlyChecked
 
   def returnToReturnedExpression(returnExpression: nodes.Return): Option[nodes.Expression] =
-    returnExpression.astOut.nextOption.asInstanceOf[Option[nodes.Expression]]
+    returnExpression._returnViaAstOut.nextOption
 
   def expressionToMethod(expression: nodes.Expression): nodes.Method =
     expression._containsIn.onlyChecked match {
@@ -88,9 +85,9 @@ object ExpandTo {
     }
 
   def methodToOutParameters(method: nodes.Method): Iterator[nodes.MethodParameterOut] =
-    method.astOut.asScala.collect { case paramOut: nodes.MethodParameterOut => paramOut }
+    method._methodParameterOutViaAstOut
 
   def implicitCallToMethod(implicitCall: nodes.ImplicitCall): nodes.Method =
-    implicitCall.astIn.onlyChecked
+    implicitCall._methodViaAstIn.onlyChecked
 
 }
