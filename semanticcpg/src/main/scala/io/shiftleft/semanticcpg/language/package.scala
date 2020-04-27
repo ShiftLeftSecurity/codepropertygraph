@@ -21,6 +21,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   Node,
   StoredNode
 }
+import io.shiftleft.overflowdb.traversal.Traversal
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.MethodDOT
 import io.shiftleft.semanticcpg.language.nodemethods.{
@@ -36,7 +37,7 @@ import io.shiftleft.semanticcpg.language.types.expressions._
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod}
 import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
-import io.shiftleft.semanticcpg.language.types.propertyaccessors.{ArgumentIndexAccessors, _}
+import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 
 /**
   Language for traversing the code property graph
@@ -265,5 +266,14 @@ package object language extends operatorextension.Implicits {
   implicit def toModifierAccessorsTypeDecl(steps: Steps[nodes.TypeDecl]): ModifierAccessors[nodes.TypeDecl] =
     new ModifierAccessors(steps)
   // Modifier accessors ~
+
+  // ~ cpg steps / overflowdb traversal interop
+  implicit def toOdbTraversal[A](steps: Steps[A]): Traversal[A] =
+    Traversal.from(steps.raw.toIterator)
+
+  /** tinkerpop doesn't allow to start from an iterator unfortunately, so this executes the traversal :( */
+  implicit def toCpgSteps[A](traversal: Traversal[A]): Steps[A] =
+    new Steps[A](gremlin.scala.__(traversal.to(Seq): _*))
+  // cpg steps / overflowdb traversal interop ~
 
 }
