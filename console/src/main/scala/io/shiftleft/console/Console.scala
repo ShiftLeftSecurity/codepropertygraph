@@ -69,13 +69,13 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
   @Doc(
     "CPG of the active project",
     """
-      |Upon importing code into Ocular, a project is created that holds
+      |Upon importing code, a project is created that holds
       |an intermediate representation called `Code Property Graph`. This
       |graph is a composition of low-level program representations such
       |as abstract syntax trees and control flow graphs, but it can be arbitrarily
       |extended to hold any information relevant in your audit, information
       |about HTTP entry points, IO routines, information flows, or locations
-      |of vulnerable code. Think of Ocular as a CPG editor.
+      |of vulnerable code. Think of Ocular and Joern as a CPG editors.
       |
       |In practice, `cpg` is the root object of the query language, that is, all
       |query language constructs can be invoked starting from `cpg`. For exanple,
@@ -235,7 +235,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     """
       |importCode(<inputPath>, [projectName], [namespaces], [language])
       |
-      |Import code at `inputPath` into Ocular. Creates a new project, generates a CPG,
+      |Import code at `inputPath`. Creates a new project, generates a CPG,
       |and opens the project. Upon success, the CPG can be queried via the `cpg`
       |object. Default overlays are already applied to the newly created CPG.
       |Returns new CPG and ensures that `cpg` now refers to this new CPG.
@@ -359,7 +359,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     """
       |importCpg(<inputPath>, [projectName])
       |
-      |Import an existing CPG into Ocular. The CPG is stored as part
+      |Import an existing CPG. The CPG is stored as part
       |of a new project and blanks are filled in by analyzing the CPG.
       |If we find that default overlays have not been applied, these
       |are applied to the CPG after loading it.
