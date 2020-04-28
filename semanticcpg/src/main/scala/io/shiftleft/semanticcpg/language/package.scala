@@ -27,6 +27,7 @@ import io.shiftleft.semanticcpg.language.dotextension.MethodDOT
 import io.shiftleft.semanticcpg.language.nodemethods.{
   AstNodeMethods,
   CallMethods,
+  ExpressionMethods,
   MethodMethods,
   MethodReturnMethods,
   NodeMethods,
@@ -53,6 +54,7 @@ package object language extends operatorextension.Implicits {
   implicit def toExtendedNode(node: Node): NodeMethods = new NodeMethods(node)
   implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods = new WithinMethodMethods(node)
   implicit def toAstNodeMethods(node: nodes.AstNode): AstNodeMethods = new AstNodeMethods(node)
+  implicit def toExpressionMethods(node: nodes.Expression): ExpressionMethods = new ExpressionMethods(node)
   implicit def toMethodMethods(node: nodes.Method): MethodMethods = new MethodMethods(node)
   implicit def toMethodReturnMethods(node: nodes.MethodReturn): MethodReturnMethods = new MethodReturnMethods(node)
   implicit def toCallMethods(node: nodes.Call): CallMethods = new CallMethods(node)

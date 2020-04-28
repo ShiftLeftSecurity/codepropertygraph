@@ -76,14 +76,6 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
         .cast[nodes.AstNode])
 
   /**
-    * Traverse to it's parent expression (e.g. call or return) by following the incoming AST nodes.
-    * It's continuing it's walk until it hits an expression that's not a generic
-    * "member access operation", e.g., "<operator>.memberAccess".
-    * */
-  def parentExpression: NodeSteps[nodes.Expression] =
-    new NodeSteps(raw.map(_.parentExpression))
-
-  /**
     * Traverse only to those AST nodes that are also control flow graph nodes
     * */
   def isCfgNode: NodeSteps[nodes.CfgNode] =
