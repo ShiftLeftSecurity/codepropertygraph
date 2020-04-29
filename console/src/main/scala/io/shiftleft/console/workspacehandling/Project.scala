@@ -22,6 +22,10 @@ case class Project(projectFile: ProjectFile, var path: Path, var cpg: Option[Cpg
     cpg.map(Overlays.appliedOverlays).getOrElse(List())
   }
 
+  def availableOverlays: List[String] = {
+    File(path.resolve("overlays")).list.map(_.name).toList
+  }
+
   def overlayFiles: List[File] = {
     val overlayDir = File(path.resolve("overlays"))
     appliedOverlays.map(o => overlayDir / o)
@@ -32,7 +36,7 @@ case class Project(projectFile: ProjectFile, var path: Path, var cpg: Option[Cpg
 
   def toTableRow: List[String] = {
     val cpgLoaded = cpg.isDefined
-    val overlays = appliedOverlays.mkString(",")
+    val overlays = availableOverlays.mkString(",")
     val inputPath = projectFile.inputPath
     List(name, overlays, inputPath, cpgLoaded.toString)
   }
