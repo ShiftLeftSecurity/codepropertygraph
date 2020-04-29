@@ -36,7 +36,7 @@ object TestWorkspaceLoader extends WorkspaceLoader[Project] {
 
 class TestConsole(workspaceDir: String) extends Console[Project](DefaultAmmoniteExecutor, TestWorkspaceLoader) {
   override def config = new ConsoleConfig(
-    install = new InstallConfig(Map("SHIFTLEFT_CONSOLE_INSTALL_DIR" -> workspaceDir))
+    install = new InstallConfig(Map("SHIFTLEFT_OCULAR_INSTALL_DIR" -> workspaceDir))
   )
 
   override val cpgGenerator = new TestCpgGenerator(config)
