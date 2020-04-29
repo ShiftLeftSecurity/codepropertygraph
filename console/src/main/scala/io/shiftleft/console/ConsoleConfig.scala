@@ -11,7 +11,7 @@ import scala.collection.mutable
   * */
 class InstallConfig(environment: Map[String, String] = sys.env) {
   var rootPath: File = environment
-    .getOrElse("SHIFTLEFT_CONSOLE_INSTALL_DIR", ".")
+    .getOrElse("SHIFTLEFT_OCULAR_INSTALL_DIR", ".")
     .toFile
 }
 
