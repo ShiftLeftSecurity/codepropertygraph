@@ -29,6 +29,7 @@ class ConsoleTests extends WordSpec with Matchers {
       console.workspace.numberOfProjects shouldBe 1
       Set("main", "bar").subsetOf(console.cpg.method.name.toSet)
       console.project.appliedOverlays shouldBe List("semanticcpg")
+      console.project.availableOverlays shouldBe List("semanticcpg")
     }
 
     "allow importing code and setting project name" in ConsoleFixture() { (console, codeDir) =>
