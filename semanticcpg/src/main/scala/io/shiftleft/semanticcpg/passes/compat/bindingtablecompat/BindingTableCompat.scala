@@ -52,7 +52,7 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
       return Nil
     }
 
-    val baseTypeDecls = typeDecl.inheritsFromOut.asScala.flatMap(_.refOut.asScala).toList
+    val baseTypeDecls = typeDecl._typeViaInheritsFromOut.flatMap(_._typeDeclViaRefOut).toList
 
     val nonConstructorMethodsOfBases = baseTypeDecls.flatMap { baseTypeDecl =>
       getNonConstructorMethodsTransitive(baseTypeDecl, alreadyVisitedTypeDecls + typeDecl)
@@ -71,8 +71,7 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def getNonConstructorMethods(typeDecl: nodes.TypeDecl): List[nodes.Method] =
-    typeDecl._astOut.asScala
-      .collect { case method: nodes.Method => method }
+    typeDecl._methodViaAstOut
       .filter(_.start.isConstructor.headOption.isEmpty)
       .toList
 

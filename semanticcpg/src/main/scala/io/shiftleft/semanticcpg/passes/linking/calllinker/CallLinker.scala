@@ -56,7 +56,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
               s"SIGNATURE ${call.signature}, CODE ${call.code}")
         }
       case DispatchTypes.DYNAMIC_DISPATCH =>
-        val receiverIt = call.receiverOut
+        val receiverIt = call._receiverOut
         if (receiverIt.hasNext) {
           val receiver = receiverIt.next
           receiver match {

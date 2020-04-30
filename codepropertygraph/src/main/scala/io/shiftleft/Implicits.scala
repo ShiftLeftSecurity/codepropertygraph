@@ -6,6 +6,18 @@ object Implicits {
 
   private val logger = LogManager.getLogger(getClass)
 
+  implicit class IteratorDeco[T](iterator: Iterator[T]) {
+    def onlyChecked: T = {
+      if (iterator.hasNext) {
+        val res = iterator.next
+        if (iterator.hasNext) {
+          logger.error("iterator was expected to have exactly one element, but it actually has more")
+        }
+        res
+      } else { throw new NoSuchElementException() }
+    }
+  }
+
   /**
     * A wrapper around a Java iterator that throws a proper NoSuchElementException.
     *
