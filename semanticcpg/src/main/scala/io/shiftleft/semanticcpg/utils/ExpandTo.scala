@@ -51,7 +51,7 @@ object ExpandTo {
     formalReturnNode._methodViaAstIn.onlyChecked
 
   def returnToReturnedExpression(returnExpression: nodes.Return): Option[nodes.Expression] =
-    returnExpression._returnViaAstOut.nextOption
+    returnExpression._astOut.nextOption.map(_.asInstanceOf[nodes.Expression])
 
   def expressionToMethod(expression: nodes.Expression): nodes.Method =
     expression._containsIn.onlyChecked match {
