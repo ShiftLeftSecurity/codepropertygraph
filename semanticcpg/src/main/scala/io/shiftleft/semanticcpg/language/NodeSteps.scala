@@ -12,13 +12,23 @@ import io.shiftleft.semanticcpg.codedumper.CodeDumper
   * */
 class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) extends Steps[NodeType](raw) {
 
-  /** Traverse to node labels */
-  @Doc("Traverse to node labels")
+  @Doc(
+    "Label of the node (its type)",
+    """
+      |Each node has at least a unique id and a string label. The label
+      |is a node type. Examples are `FILE`, `METHOD`, or `IDENTIFIER`.
+      |""".stripMargin
+  )
   def label: Steps[String] = new Steps(raw.label)
 
-  /**
-    * Traverse to source file
-    * */
+  @Doc(
+    "The source file this code is in",
+    """
+      |Not all but most node in the graph can be associated with
+      |a specific source file they appear in. `file` provides
+      |the file node that represents that source file.
+      |""".stripMargin
+  )
   def file: NodeSteps[nodes.File] =
     new NodeSteps(
       raw
@@ -32,24 +42,40 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
         .cast[nodes.File]
     )
 
-  /**
-    * Execute traversal and map each node to location.
-    * */
+  @Doc(
+    "Location, including filename and line number",
+    """
+      |Most nodes of the graph can be associated with a specific
+      |location in code, and `location` provides this location.
+      |The return value is an object providing, e.g., filename,
+      |line number, and method name, as opposed to being a flat
+      |string. For example `.location.lineNumber` provides access
+      |to the line number alone, without requiring any parsing
+      |on the user's side.
+      |""".stripMargin
+  )
   def location: NewNodeSteps[nodes.NewLocation] =
     new NewNodeSteps(raw.map(_.location))
 
-  /**
-    * For methods, dump the method code. For expressions,
-    * dump the method code along with an arrow pointing
-    * to the expression. Uses ansi-color highlighting.
-    * */
+  @Doc(
+    "Display code (with syntax highlighting)",
+    """
+      |For methods, dump the method code. For expressions,
+      |dump the method code along with an arrow pointing
+      |to the expression. Uses ansi-color highlighting.
+      |This only works for source frontends.
+      |""".stripMargin
+  )
   def dump: List[String] = CodeDumper.dump(this, true)
 
-  /**
-    * For methods, dump the method code. For expressions,
-    * dump the method code along with an arrow pointing
-    * to the expression. No color highlighting.
-    * */
+  @Doc(
+    "Display code (without syntax highlighting)",
+    """
+      |For methods, dump the method code. For expressions,
+      |dump the method code along with an arrow pointing
+      |to the expression. No color highlighting.
+      |""".stripMargin
+  )
   def dumpRaw: List[String] = CodeDumper.dump(this, false)
 
   /* follow the incoming edges of the given type as long as possible */
@@ -58,17 +84,21 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
       .repeat(_.in(edgeType))
       .until(_.in(edgeType).count.is(P.eq(0)))
 
-  def toMaps(): Steps[Map[String, Any]] =
-    new Steps[Map[String, Any]](raw.map(_.toMap))
-
-  /**
-    * Execute traversal and create new (tag, "") pair.
-    * */
+  @Doc(
+    "Tag node with `tagName`",
+    """
+      |This method can be used to tag nodes in the graph such that
+      |they can later be looked up easily via `cpg.tag`. Tags are
+      |key value pairs, and they can be created with `newTagNodePair`.
+      |Since in many cases, a key alone is sufficient, we provide the
+      |utility method `newTagNode(key)`, which is equivalent to
+      |`newTagNode(key, "")`.
+      |""".stripMargin,
+    """.newTagNode("foo")"""
+  )
   def newTagNode(tagName: String): NewTagNodePair[NodeType] = newTagNodePair(tagName, "")
 
-  /**
-    * Execute traversal and create new (tag, node) pair.
-    * */
+  @Doc("Tag node with (`tagName`, `tagValue`)", "", """.newTagNodePair("key","val")""")
   def newTagNodePair(tagName: String, tagValue: String): NewTagNodePair[NodeType] = {
     new NewTagNodePair[NodeType](
       raw.map { node =>
@@ -77,9 +107,7 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
     )
   }
 
-  /**
-  Execute traversal and map each node to the list of its associated tags.
-    */
+  @Doc("Tags at this node")
   def tagList: List[List[nodes.TagBase]] =
     raw.map { taggedNode =>
       taggedNode.tagList
