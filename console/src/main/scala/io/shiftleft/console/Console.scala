@@ -235,6 +235,8 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     """
       |importCode(<inputPath>, [projectName], [namespaces], [language])
       |
+      |Type `importCode` alone to get a list of all supported languages
+      |
       |Import code at `inputPath`. Creates a new project, generates a CPG,
       |and opens the project. Upon success, the CPG can be queried via the `cpg`
       |object. Default overlays are already applied to the newly created CPG.
@@ -270,7 +272,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
       c,
       csharp,
       golang,
-      jar,
+      java,
       javascript,
       llvm,
     )
@@ -278,7 +280,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     override def toString: String = {
       val cols = List("name", "description", "available")
       val rows = allFrontends.map { frontend =>
-        List(frontend.language, frontend.description, frontend.isAvailable.toString)
+        List(frontend.language.toLowerCase, frontend.description, frontend.isAvailable.toString)
       }
       "\n" + Table(cols, rows).render
     }
@@ -298,7 +300,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
 
     def c: Frontend = new Frontend(Languages.C, "Fuzzy Parser for C/C++")
     def llvm: Frontend = new Frontend(Languages.LLVM, "LLVM Bitcode Frontend")
-    def jar: Frontend = new Frontend(Languages.JAVA, "JVM/Dalvik Bytecode Frontend")
+    def java: Frontend = new Frontend(Languages.JAVA, "Java/Dalvik Bytecode Frontend")
     def golang: Frontend = new Frontend(Languages.GOLANG, "Golang Source Frontend")
     def javascript: Frontend = new Frontend(Languages.JAVASCRIPT, "Javascript Source Frontend")
     def csharp: Frontend = new Frontend(Languages.CSHARP, "C# Source Frontend (Roslyn)")

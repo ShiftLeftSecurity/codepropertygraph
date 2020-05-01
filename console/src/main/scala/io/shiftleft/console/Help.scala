@@ -17,7 +17,16 @@ object Help {
         case (name, doc) => List(name, doc.short, doc.example)
       }
       .toList ++ List(runRow)
-    "\n" + Table(columnNames, rows.sortBy(_.head)).render
+    format("""
+      |Welcome to the interactive help system. Below you find
+      |a table of all available top-level commands. To get
+      |more detailed help on a specific command, just type
+      |`help.<command>`.
+      |
+      |Try `help.importCode` to begin with.
+      |
+      |""".stripMargin) +
+      "\n" + Table(columnNames, rows.sortBy(_.head)).render
   }
 
   def format(text: String): String = {
