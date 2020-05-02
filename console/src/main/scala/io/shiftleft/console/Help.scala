@@ -19,6 +19,7 @@ object Help {
       .toList ++ List(runRow)
 
     val header = formatNoQuotes("""
+      |
       |Welcome to the interactive help system. Below you find
       |a table of all available top-level commands. To get
       |more detailed help on a specific command, just type

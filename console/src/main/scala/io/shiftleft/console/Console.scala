@@ -248,6 +248,13 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
       |object. Default overlays are already applied to the newly created CPG.
       |Returns new CPG and ensures that `cpg` now refers to this new CPG.
       |
+      |By default, `importCode` attempts to guess the source language of
+      |the code you provide. You can also specify the source language
+      |manually, by running `importCode.<language>`. For example, `importCode.c`
+      |runs the C/C++ frontend.
+      |
+      |Type `importCode` alone to get an overview of all available language modules.
+      |
       |Parameters:
       |
       |-----------
@@ -288,7 +295,8 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
       val rows = allFrontends.map { frontend =>
         List(frontend.language.toLowerCase, frontend.description, frontend.isAvailable.toString)
       }
-      "\n" + Table(cols, rows).render
+      "Type `importCode.<language>` to run a specific language frontend\n" +
+        "\n" + Table(cols, rows).render
     }
 
     class Frontend(val language: String, val description: String = "") {
