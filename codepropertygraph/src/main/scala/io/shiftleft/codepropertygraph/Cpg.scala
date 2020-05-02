@@ -4,6 +4,7 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{edges, nodes}
 import io.shiftleft.overflowdb.OdbGraph
 import io.shiftleft.overflowdb.OdbConfig
+import io.shiftleft.overflowdb.traversal.help.TraversalHelp
 
 object Cpg {
 
@@ -38,6 +39,7 @@ object Cpg {
     */
   private def emptyGraph: OdbGraph =
     OdbGraph.open(OdbConfig.withoutOverflow, nodes.Factories.allAsJava, edges.Factories.allAsJava)
+
 }
 
 /**
@@ -56,6 +58,8 @@ class Cpg(val graph: Graph = Cpg.emptyGraph) extends AutoCloseable {
     */
   implicit lazy val scalaGraph: ScalaGraph =
     graph.asScala
+
+  lazy val help: String = new TraversalHelp("io.shiftleft").forTraversalSources
 
   /**
     * Closes code property graph.
