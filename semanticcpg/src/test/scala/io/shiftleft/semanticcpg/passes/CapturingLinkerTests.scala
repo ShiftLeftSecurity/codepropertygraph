@@ -4,18 +4,18 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.semanticcpg.passes.linking.capturinglinker.CapturingLinker
-import io.shiftleft.semanticcpg.testfixtures.EmptyScalaGraphFixture
+import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class CapturingLinkerTests extends WordSpec with Matchers {
 
-  "link CLOSURE_BINDING and LOCALS with same CLOSURE_BINDING_IDs" in EmptyScalaGraphFixture { graph =>
+  "link CLOSURE_BINDING and LOCALS with same CLOSURE_BINDING_IDs" in EmptyGraphFixture { graph =>
     val closureBinding1 = graph + (NodeTypes.CLOSURE_BINDING, NodeKeys.CLOSURE_BINDING_ID -> "id1")
     val closureBinding2 = graph + (NodeTypes.CLOSURE_BINDING, NodeKeys.CLOSURE_BINDING_ID -> "id2")
     val local1 = graph + (NodeTypes.LOCAL, NodeKeys.CLOSURE_BINDING_ID -> "id1")
     val local2 = graph + (NodeTypes.LOCAL, NodeKeys.CLOSURE_BINDING_ID -> "id2")
 
-    val capturingLinker = new CapturingLinker(new Cpg(graph.graph))
+    val capturingLinker = new CapturingLinker(new Cpg(graph))
     capturingLinker.createAndApply()
 
     val capturedByDest1 = local1.out(EdgeTypes.CAPTURED_BY).toList()

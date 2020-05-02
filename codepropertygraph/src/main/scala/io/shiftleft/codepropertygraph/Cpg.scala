@@ -49,7 +49,7 @@ object Cpg {
   *
   * @param graph the underlying graph. An empty graph is created if this parameter is omitted.
   */
-class Cpg(val graph: Graph = Cpg.emptyGraph) extends AutoCloseable {
+class Cpg(val graph: OdbGraph = Cpg.emptyGraph) extends AutoCloseable {
 
   /**
     * The underlying graph.

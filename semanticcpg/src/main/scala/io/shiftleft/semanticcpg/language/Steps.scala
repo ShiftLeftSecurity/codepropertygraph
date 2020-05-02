@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes._
 import java.util.{List => JList}
 
+import io.shiftleft.overflowdb.OdbGraph
 import io.shiftleft.overflowdb.traversal.help.{Doc, TraversalHelp}
 import org.apache.tinkerpop.gremlin.process.traversal.Scope
 import org.json4s.CustomSerializer
@@ -20,7 +21,7 @@ import scala.reflect.ClassTag
   * There are no constraints on the element types, unlike e.g. [[NodeSteps]]
   */
 class Steps[A](val raw: GremlinScala[A]) {
-  implicit lazy val graph: Graph = raw.traversal.asAdmin.getGraph.get
+  implicit lazy val graph: OdbGraph = raw.traversal.asAdmin.getGraph.get.asInstanceOf[OdbGraph]
 
   def toIterator(): Iterator[A] = {
     val iter: java.util.Iterator[A] = raw.traversal
