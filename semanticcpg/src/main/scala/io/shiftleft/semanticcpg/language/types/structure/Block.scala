@@ -2,11 +2,12 @@ package io.shiftleft.semanticcpg.language.types.structure
 
 import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.overflowdb.traversal.help.{Doc, TraversalExt}
+import io.shiftleft.overflowdb.traversal.help
+import io.shiftleft.overflowdb.traversal.help.Doc
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language._
 
-@TraversalExt(elementType = classOf[nodes.Block])
+@help.Traversal(elementType = classOf[nodes.Block])
 class Block(val wrapped: NodeSteps[nodes.Block]) extends AnyVal {
   private def raw: GremlinScala[nodes.Block] = wrapped.raw
 
