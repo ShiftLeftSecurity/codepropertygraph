@@ -87,10 +87,29 @@
 		  "LINE_NUMBER", "COLUMN_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER_END", "ORDER", "FILENAME"],
          "comment" : "A method/function/procedure",
          "is": ["DECLARATION", "CFG_NODE", "AST_NODE"],
-         "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["METHOD_RETURN", "METHOD_PARAMETER_IN",
-                                             "MODIFIER", "BLOCK", "TYPE_PARAMETER"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
+         "outEdges": [
+           {"edgeName": "AST",
+            "inNodes": [
+              {"name": "METHOD_RETURN", "cardinality":"1:1"},
+              {"name": "METHOD_PARAMETER_IN"},
+              {"name": "MODIFIER"},
+              {"name": "BLOCK"},
+              {"name": "TYPE_PARAMETER"}
+            ]
+           },
+           {"edgeName": "CFG",
+            "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "METHOD_RETURN"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "UNKNOWN"}
+            ]
+           }
          ]
         },
 
