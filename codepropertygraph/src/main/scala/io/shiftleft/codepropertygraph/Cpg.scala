@@ -11,9 +11,9 @@ object Cpg {
   /**
     * Syntactic sugar for `new Cpg(graph)`.
     * Usage:
-    *   `Cpg(graph)` or simply `Cpg` if you have an `implicit Graph` in scope
+    *   `Cpg(graph)` or simply `Cpg` if you have an `implicit OdbGraph` in scope
     */
-  def apply(implicit graph: Graph) = new Cpg(graph)
+  def apply(implicit graph: OdbGraph) = new Cpg(graph)
 
   /**
     * Create an empty code property graph
