@@ -23,7 +23,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * Traverse to all comments in source-based CPGs.
     * */
-  @Doc("All comments (only available for source-code-based frontends)")
+  @Doc("All comments in source-based CPGs")
   def comment: NodeSteps[nodes.Comment] =
     new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.COMMENT).cast[nodes.Comment])
 

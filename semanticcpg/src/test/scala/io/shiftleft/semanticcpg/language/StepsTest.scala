@@ -182,9 +182,9 @@ class StepsTest extends WordSpec with Matchers {
     "show domain overview" in {
       val cpg = Cpg.emptyCpg
       cpg.help should include(".comment")
-      cpg.help should include("all comments in source-based CPGs")
+      cpg.help should include("All comments in source-based CPGs")
       cpg.help should include(".arithmetic")
-      cpg.help should include("all arithmetic operations")
+      cpg.help should include("All arithmetic operations")
     }
 
     "provide node-specific overview" in {
