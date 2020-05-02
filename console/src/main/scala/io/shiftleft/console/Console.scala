@@ -101,6 +101,12 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     }
   }
 
+  // Provide `.l` on iterators, specifically so
+  // that `cpgs.flatMap($query).l` is possible
+  implicit class ItExtend[X](it: Iterator[X]) {
+    def l: List[X] = it.toList
+  }
+
   implicit def graph: ScalaGraph = cpg.scalaGraph
 
   @Doc(
@@ -322,7 +328,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
         report(s"Error creating project for input path: `$inputPath`")
       }
 
-      frontendCpgOutFileOpt.flatMap { frontendCpgOutFile =>
+      val result = frontendCpgOutFileOpt.flatMap { frontendCpgOutFile =>
         Some(frontend).flatMap { frontend =>
           cpgGenerator
             .runLanguageFrontend(
@@ -337,6 +343,10 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
             }
         }
       }
+      if (result.isDefined) {
+        report("A new project has been created in the workspace for your code. Type `workspace` to inspect it")
+      }
+      result
     }
 
     def apply(
