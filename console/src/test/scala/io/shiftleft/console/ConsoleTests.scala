@@ -277,6 +277,13 @@ class ConsoleTests extends WordSpec with Matchers {
     }
   }
 
+  "cpg" should {
+    "provide .help command" in ConsoleFixture() { (console, codeDir) =>
+      console.importCode(codeDir.toString)
+      console.cpg.help.contains(".all") shouldBe true
+    }
+  }
+
   private def isZipFile(file: File): Boolean = {
     val bytes = file.bytes
     Try {

@@ -344,7 +344,10 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
         }
       }
       if (result.isDefined) {
-        report("A new project has been created in the workspace for your code. Type `workspace` to inspect it")
+        report(
+          """|Code successfully imported. You can now query it using `cpg`.
+             |For an overview of all imported code, type `workspace`.""".stripMargin
+        )
       }
       result
     }
