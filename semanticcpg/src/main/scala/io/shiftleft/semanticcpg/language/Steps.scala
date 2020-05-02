@@ -95,10 +95,10 @@ class Steps[A](val raw: GremlinScala[A]) {
     * all documented steps in the classpath
     * */
   def help()(implicit elementType: ClassTag[A]): String =
-    Steps.help.renderTable(elementType.runtimeClass, verbose = false)
+    Steps.help.forElementClass(elementType.runtimeClass, verbose = false)
 
   def helpVerbose()(implicit elementType: ClassTag[A]): String =
-    Steps.help.renderTable(elementType.runtimeClass, verbose = true)
+    Steps.help.forElementClass(elementType.runtimeClass, verbose = true)
 
   /**
     * Execute this traversal and pretty print the results.

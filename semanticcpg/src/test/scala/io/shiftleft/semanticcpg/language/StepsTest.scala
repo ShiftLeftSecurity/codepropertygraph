@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
 import gremlin.scala.__
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
@@ -177,6 +178,14 @@ class StepsTest extends WordSpec with Matchers {
   }
 
   ".help step" should {
+
+    "show domain overview" in {
+      val cpg = Cpg.emptyCpg
+      cpg.help should include(".comment")
+      cpg.help should include("all comments in source-based CPGs")
+      cpg.help should include(".arithmetic")
+      cpg.help should include("all arithmetic operations")
+    }
 
     "provide node-specific overview" in {
       val methodSteps = new Steps[nodes.Method](null)

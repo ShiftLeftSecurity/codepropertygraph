@@ -2,13 +2,14 @@ package io.shiftleft.semanticcpg.language.types.structure
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes, nodes}
-import io.shiftleft.overflowdb.traversal.help.TraversalExt
+import io.shiftleft.overflowdb.traversal.help
+import io.shiftleft.overflowdb.traversal.help.Doc
 import io.shiftleft.semanticcpg.language._
 
 /**
   * Formal method input parameter
   * */
-@TraversalExt(elementType = classOf[nodes.MethodParameterIn])
+@help.Traversal(elementType = classOf[nodes.MethodParameterIn])
 class MethodParameter(val wrapped: NodeSteps[nodes.MethodParameterIn]) extends AnyVal {
   private def raw: GremlinScala[nodes.MethodParameterIn] = wrapped.raw
 
