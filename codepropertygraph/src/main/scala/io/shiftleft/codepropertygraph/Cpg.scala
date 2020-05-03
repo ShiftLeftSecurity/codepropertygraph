@@ -51,14 +51,6 @@ object Cpg {
   */
 class Cpg(val graph: OdbGraph = Cpg.emptyGraph) extends AutoCloseable {
 
-  /**
-    * The underlying graph.
-    *
-    * This member provides raw access to the underlying graph.
-    */
-  implicit lazy val scalaGraph: ScalaGraph =
-    graph.asScala
-
   lazy val help: String =
     new TraversalHelp("io.shiftleft").forTraversalSources
 
