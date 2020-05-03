@@ -59,7 +59,7 @@ class Cpg(val graph: Graph = Cpg.emptyGraph) extends AutoCloseable {
   implicit lazy val scalaGraph: ScalaGraph =
     graph.asScala
 
-  lazy val help: String = new TraversalHelp("io.shiftleft").forSources
+  lazy val help: String = new TraversalHelp("io.shiftleft").forTraversalSources
 
   /**
     * Closes code property graph.
