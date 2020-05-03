@@ -15,7 +15,7 @@ import scala.jdk.CollectionConverters._
   */
 class NoLongJumpValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
   override def validate(notEnhancedCpg: Cpg): Boolean = {
-    notEnhancedCpg.scalaGraph.V().hasLabel(NodeTypes.METHOD).toIterator().foreach(perMethod)
+    notEnhancedCpg.graph.nodesByLabel(NodeTypes.METHOD).asScala.foreach(perMethod)
     errorRegistry.getErrorCount == 0
   }
 
