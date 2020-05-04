@@ -57,7 +57,8 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
 
   private def init(): Unit = {
     cpg.graph.nodesByLabel(NodeTypes.METHOD_INST).asScala.foreach {
-      case methodInst: nodes.MethodInst => methodInstFullNameToMethodFullName.put(methodInst.fullName, methodInst.methodFullName)
+      case methodInst: nodes.MethodInst =>
+        methodInstFullNameToMethodFullName.put(methodInst.fullName, methodInst.methodFullName)
     }
   }
 }

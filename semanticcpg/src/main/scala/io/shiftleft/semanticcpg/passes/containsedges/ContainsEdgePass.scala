@@ -6,7 +6,6 @@ import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.language.{NodeTypeDeco, Steps}
 import scala.jdk.CollectionConverters._
 
-
 /**
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
   * language frontends which do not provide method stubs and type decl stubs.

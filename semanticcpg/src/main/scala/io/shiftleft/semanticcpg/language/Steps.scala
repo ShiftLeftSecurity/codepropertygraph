@@ -23,7 +23,7 @@ import scala.reflect.ClassTag
   */
 class Steps[A](val raw: GremlinScala[A]) {
   lazy val graph: OdbGraph = raw.traversal.asAdmin.getGraph.get match {
-    case g: OdbGraph => g
+    case g: OdbGraph   => g
     case _: EmptyGraph =>
       // hacky workaround while we're still using Steps and Tinkerpop
       Cpg.emptyCpg.graph
