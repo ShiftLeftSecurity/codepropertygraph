@@ -97,10 +97,10 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
 
   /* like a freshly deserialized cpg.bin.zip without any overlays applied */
   def withNewBaseCpg[T](fun: Cpg => T): T = {
-    val graph: ScalaGraph = OverflowDbTestInstance.create
+    val graph = OverflowDbTestInstance.create
     val initialNode = graph + NodeTypes.UNKNOWN
     initialNode.setProperty(NodeKeys.CODE, InitialNodeCode)
-    val cpg = Cpg(graph.asJava())
+    val cpg = Cpg(graph)
     try fun(cpg)
     finally cpg.close()
   }

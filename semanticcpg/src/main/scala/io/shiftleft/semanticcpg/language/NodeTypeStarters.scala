@@ -11,7 +11,7 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
     * The underlying graph
     * */
-  def scalaGraph: ScalaGraph = cpg.scalaGraph
+  def scalaGraph: ScalaGraph = cpg.graph.asScala
 
   /**
     Traverse to all nodes.

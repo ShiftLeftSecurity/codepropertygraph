@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.language.{NodeTypeDeco, Steps}
+import scala.jdk.CollectionConverters._
 
 /**
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
@@ -13,8 +14,7 @@ class ContainsEdgePass(cpg: Cpg) extends CpgPass(cpg) {
   import ContainsEdgePass.{destinationTypes, sourceTypes}
 
   override def run(): Iterator[DiffGraph] = {
-    val sourceVerticesTraversal = cpg.scalaGraph.V.hasLabel(sourceTypes.head, sourceTypes.tail: _*)
-    val sourceVerticesIterator = new Steps(sourceVerticesTraversal).toIterator
+    val sourceVerticesIterator = cpg.graph.nodesByLabel(sourceTypes: _*).asScala
     new ParallelIteratorExecutor(sourceVerticesIterator).map(source => perSource(source.asInstanceOf[nodes.AstNode]))
   }
 

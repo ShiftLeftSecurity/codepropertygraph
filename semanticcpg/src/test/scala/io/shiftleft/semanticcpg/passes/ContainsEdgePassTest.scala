@@ -40,7 +40,8 @@ class ContainsEdgePassTest extends WordSpec with Matchers {
 
 object ContainsEdgePassTest {
   private class Fixture {
-    private implicit val graph: ScalaGraph = OverflowDbTestInstance.create
+    private val graph = OverflowDbTestInstance.create
+    private implicit val scalaGraph = graph.asScala
 
     val fileVertex = graph + NodeTypes.FILE
     val typeDeclVertex = graph + NodeTypes.TYPE_DECL
@@ -58,7 +59,7 @@ object ContainsEdgePassTest {
     methodVertex --- EdgeTypes.AST --> expressionVertex
     innerMethodVertex --- EdgeTypes.AST --> innerExpressionVertex
 
-    val containsEdgeCalculator = new ContainsEdgePass(new Cpg(graph.graph))
+    val containsEdgeCalculator = new ContainsEdgePass(new Cpg(graph))
     containsEdgeCalculator.createAndApply()
   }
 

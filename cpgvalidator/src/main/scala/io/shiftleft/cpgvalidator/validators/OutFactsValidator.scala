@@ -18,37 +18,30 @@ class OutFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validato
   }
 
   private def validateOutFacts(notEnhancedCpg: Cpg): Unit = {
-    val outFactsByEdgeTypeBySrcType = getOutFactByEdgeTypeBySrcType
-
-    outFactsByEdgeTypeBySrcType.foreach {
+    getOutFactByEdgeTypeBySrcType.foreach {
       case (srcType, outFactsByEdgeType) =>
-        notEnhancedCpg.scalaGraph.V
-          .hasLabel(srcType)
-          .sideEffectWithTraverser { traverser =>
-            traverser.get match {
-              case srcNode if srcNode.label() != NodeTypes.UNKNOWN =>
-                val outEdges = srcNode.edges(Direction.OUT).asScala.toList
-                outFactsByEdgeType.foreach {
-                  case (edgeType, outFacts) =>
-                    val actualDstNodes =
-                      outEdges.filter(_.label == edgeType).map(_.inVertex)
-                    outFacts.foreach { outFact =>
-                      validateOutDegree(srcNode, actualDstNodes, outFact)
-                    }
-
-                    validateAllDstNodeTypes(
-                      srcNode,
-                      edgeType,
-                      actualDstNodes,
-                      outFacts
-                    )
+        notEnhancedCpg.graph.nodesByLabel(srcType).asScala.foreach {
+          case srcNode if srcNode.label() != NodeTypes.UNKNOWN =>
+            val outEdges = srcNode.edges(Direction.OUT).asScala.toList
+            outFactsByEdgeType.foreach {
+              case (edgeType, outFacts) =>
+                val actualDstNodes =
+                  outEdges.filter(_.label == edgeType).map(_.inVertex)
+                outFacts.foreach { outFact =>
+                  validateOutDegree(srcNode, actualDstNodes, outFact)
                 }
-                val allowedEdgeTypes = outFactsByEdgeType.map(_._1) :+ NodeTypes.UNKNOWN
-                validateAllOutEdgesTypes(srcNode, outEdges, allowedEdgeTypes)
-              case _ => // Do nothing. Hence, we skip UNKNOWN nodes
+
+                validateAllDstNodeTypes(
+                  srcNode,
+                  edgeType,
+                  actualDstNodes,
+                  outFacts
+                )
             }
-          }
-          .iterate()
+            val allowedEdgeTypes = outFactsByEdgeType.map(_._1) :+ NodeTypes.UNKNOWN
+            validateAllOutEdgesTypes(srcNode, outEdges, allowedEdgeTypes)
+          case _ => // Do nothing. Hence, we skip UNKNOWN nodes
+        }
     }
   }
 

@@ -55,13 +55,13 @@ class CpgLoaderTests extends WordSpec with Matchers {
       val cpg = CpgLoader.load(filename, config)
 
       // ... execute lots of operations on the graph
-      val vertex = cpg.graph.addVertex("METHOD")
+      val vertex = cpg.graph.addNode("METHOD")
       // ...
 
-      cpg.graph.asInstanceOf[OdbGraph].indexManager.getIndexedNodeProperties.toArray shouldBe Array()
+      cpg.graph.indexManager.getIndexedNodeProperties.toArray shouldBe Array()
       // Now create indexes
       CpgLoader.createIndexes(cpg)
-      cpg.graph.asInstanceOf[OdbGraph].indexManager.getIndexedNodeProperties.toArray shouldBe Array("FULL_NAME")
+      cpg.graph.indexManager.getIndexedNodeProperties.toArray shouldBe Array("FULL_NAME")
     }
 
   }

@@ -1,5 +1,6 @@
 package io.shiftleft.semanticcpg.layers
 
+import gremlin.scala.GraphAsScala
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Languages, NodeTypes}
 import io.shiftleft.passes.CpgPass
@@ -94,8 +95,8 @@ class Scpg() extends LayerCreator {
   }
 
   override def probe(cpg: Cpg): Boolean = {
-    val methodDecoratorRan = cpg.scalaGraph.V.hasLabel(NodeTypes.METHOD_PARAMETER_OUT).exists()
-    val containsEdgePassRan = cpg.scalaGraph.E.hasLabel(EdgeTypes.CONTAINS).exists()
+    val methodDecoratorRan = cpg.graph.nodesByLabel(NodeTypes.METHOD_PARAMETER_OUT).hasNext
+    val containsEdgePassRan = cpg.graph.asScala.E.hasLabel(EdgeTypes.CONTAINS).exists()
     methodDecoratorRan || containsEdgePassRan
   }
 }
