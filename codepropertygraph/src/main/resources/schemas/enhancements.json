@@ -35,15 +35,35 @@
         },
         {
             "name" : "FILE", "outEdges" : [
-                {"edgeName": "CONTAINS", "inNodes": ["TYPE_DECL", "METHOD"]}
+                {"edgeName": "CONTAINS", "inNodes": [
+              {"name": "TYPE_DECL"},
+              {"name": "METHOD"}
+            ]}
             ]
         },
         { "name": "METHOD",
           "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD", "METHOD_PARAMETER_OUT", "IMPLICIT_CALL"]},
-             {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN"]},
-             {"edgeName": "CONTAINS", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]},
-             {"edgeName": "SOURCE_FILE", "inNodes": ["FILE"]}
+             {"edgeName": "AST", "inNodes": [
+              {"name": "TYPE_DECL"},
+              {"name": "METHOD"},
+              {"name": "METHOD_PARAMETER_OUT"},
+              {"name": "IMPLICIT_CALL"}
+            ]},
+             {"edgeName": "REACHING_DEF", "inNodes": [
+              {"name": "CALL"},
+              {"name": "RETURN"}
+            ]},
+             {"edgeName": "CONTAINS", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "RETURN"},
+              {"name": "METHOD_REF"},
+              {"name": "BLOCK"},
+              {"name": "UNKNOWN"}
+            ]},
+             {"edgeName": "SOURCE_FILE", "inNodes": [{"name": "FILE"}]}
           ]
         },
         { "name" : "BINDING",
@@ -51,15 +71,21 @@
         },
         { "name": "RETURN",
           "outEdges" : [
-             {"edgeName": "REACHING_DEF", "inNodes": ["METHOD_RETURN"]}
+             {"edgeName": "REACHING_DEF", "inNodes": [{"name": "METHOD_RETURN"}]}
           ]
         },
         { "name": "METHOD_PARAMETER_IN",
           "outEdges" : [
-            {"edgeName": "PROPAGATE", "inNodes": ["METHOD_PARAMETER_OUT", "METHOD_RETURN"]},
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]},
-            {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN"]},
-            {"edgeName": "PARAMETER_LINK", "inNodes": ["METHOD_PARAMETER_OUT"]}
+            {"edgeName": "PROPAGATE", "inNodes": [
+              {"name": "METHOD_PARAMETER_OUT"},
+              {"name": "METHOD_RETURN"}
+            ]},
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]},
+            {"edgeName": "REACHING_DEF", "inNodes": [
+              {"name": "CALL"},
+              {"name": "RETURN"}
+            ]},
+            {"edgeName": "PARAMETER_LINK", "inNodes": [{"name": "METHOD_PARAMETER_OUT"}]}
           ]
         },
         {"id" : 33, "name" : "METHOD_PARAMETER_OUT",
@@ -67,82 +93,98 @@
          "comment" : "This node represents a formal parameter going towards the caller side",
          "is": ["DECLARATION", "TRACKING_POINT", "AST_NODE"],
          "outEdges" : [
-           {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
-           {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+           {"edgeName": "TAGGED_BY", "inNodes": [{"name": "TAG"}]},
+           {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
          ]
         },
         { "name": "METHOD_RETURN",
           "outEdges" : [
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
         },
         {
             "name": "NAMESPACE_BLOCK",
             "outEdges": [
-              {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]},
-              {"edgeName": "REF", "inNodes": ["NAMESPACE"]},
-              {"edgeName": "SOURCE_FILE", "inNodes": ["FILE"]}
+              {"edgeName": "AST", "inNodes": [
+              {"name": "TYPE_DECL"},
+              {"name": "METHOD"}
+            ]},
+              {"edgeName": "REF", "inNodes": [{"name": "NAMESPACE"}]},
+              {"edgeName": "SOURCE_FILE", "inNodes": [{"name": "FILE"}]}
             ]
         },
         { "name": "METHOD_REF",
           "outEdges" : [
-            {"edgeName": "REF", "inNodes": ["METHOD"]},
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+            {"edgeName": "REF", "inNodes": [{"name": "METHOD"}]},
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
         },
         { "name": "TYPE",
           "outEdges" : [
-             {"edgeName": "REF", "inNodes": ["TYPE_DECL"]}
+             {"edgeName": "REF", "inNodes": [{"name": "TYPE_DECL"}]}
           ]
         },
         { "name": "TYPE_DECL",
           "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["TYPE_DECL", "METHOD"]},
-             {"edgeName": "INHERITS_FROM", "inNodes": ["TYPE"]},
-             {"edgeName": "ALIAS_OF", "inNodes": ["TYPE"]},
-             {"edgeName": "CONTAINS", "inNodes": ["METHOD"]},
-             {"edgeName": "SOURCE_FILE", "inNodes": ["FILE"]}
+             {"edgeName": "AST", "inNodes": [
+              {"name": "TYPE_DECL"},
+              {"name": "METHOD"}
+            ]},
+             {"edgeName": "INHERITS_FROM", "inNodes": [{"name": "TYPE"}]},
+             {"edgeName": "ALIAS_OF", "inNodes": [{"name": "TYPE"}]},
+             {"edgeName": "CONTAINS", "inNodes": [{"name": "METHOD"}]},
+             {"edgeName": "SOURCE_FILE", "inNodes": [{"name": "FILE"}]}
           ]
         },
         { "name": "MEMBER",
           "outEdges" : [
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
         },
         {"name" : "LITERAL",
           "outEdges" : [
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
         },
         { "name": "CALL",
           "outEdges" : [
-            {"edgeName": "REF", "inNodes": ["MEMBER"]},
-            {"edgeName": "CALL", "inNodes": ["METHOD"]},
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]},
-            {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN"]}
+            {"edgeName": "REF", "inNodes": [{"name": "MEMBER"}]},
+            {"edgeName": "CALL", "inNodes": [{"name": "METHOD"}]},
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]},
+            {"edgeName": "REACHING_DEF", "inNodes": [
+              {"name": "CALL"},
+              {"name": "RETURN"}
+            ]}
           ]
         },
         { "name": "LOCAL",
           "outEdges" : [
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]},
-            {"edgeName": "CAPTURED_BY", "inNodes": ["CLOSURE_BINDING"]}
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]},
+            {"edgeName": "CAPTURED_BY", "inNodes": [{"name": "CLOSURE_BINDING"}]}
           ]
         },
         {"name" : "IDENTIFIER",
           "outEdges" : [
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
         },
         {"name" : "BLOCK",
           "outEdges" : [
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]},
-	    {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN", "BLOCK"]}
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]},
+	    {"edgeName": "REACHING_DEF", "inNodes": [
+              {"name": "CALL"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"}
+            ]}
           ]
         },
         {"name" : "UNKNOWN",
           "outEdges" : [
-            {"edgeName": "REACHING_DEF", "inNodes": ["CALL", "RETURN"]},
-            {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+            {"edgeName": "REACHING_DEF", "inNodes": [
+              {"name": "CALL"},
+              {"name": "RETURN"}
+            ]},
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
         }
     ],

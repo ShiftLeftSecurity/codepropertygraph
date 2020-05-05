@@ -31,7 +31,7 @@
             "keys": ["NAME"],
             "comment": "Indicates the usage of a framework. E.g. java spring. The name key is one of the values from frameworks list",
             "outEdges": [
-                {"edgeName": "ATTACHED_DATA", "inNodes": ["FRAMEWORK_DATA"]}
+              {"edgeName": "ATTACHED_DATA", "inNodes": [{"name": "FRAMEWORK_DATA"}]}
             ]
         },
         // deprecated, c.f. CONFIG_FILE
@@ -47,103 +47,388 @@
 
         {"name" : "METHOD", "keys" : ["HAS_MAPPING", "DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
          "outEdges" : [ 
-           {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
-           {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]}
+           {"edgeName": "TAGGED_BY", "inNodes": [{"name": "TAG"}]},
+           {"edgeName": "DOMINATE", "inNodes": [
+             {"name": "CALL"},
+             {"name": "IDENTIFIER"},
+             {"name": "FIELD_IDENTIFIER"},
+             {"name": "LITERAL"},
+             {"name": "METHOD_REF"},
+             {"name": "RETURN"},
+             {"name": "BLOCK"},
+             {"name": "METHOD_RETURN"},
+             {"name": "UNKNOWN"}
+           ]}
          ]
         },
         {"name" : "METHOD_RETURN", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
          "outEdges" : [
-           {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
-           {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
-           {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]}
+           {"edgeName": "TAGGED_BY", "inNodes": [{"name": "TAG"}]},
+           {"edgeName": "DYNAMIC_TYPE", "inNodes": [
+             {"name": "TYPE_DECL"},
+             {"name": "METHOD"}
+           ]},
+           {"edgeName": "POST_DOMINATE", "inNodes": [
+             {"name": "CALL"},
+             {"name": "IDENTIFIER"},
+             {"name": "FIELD_IDENTIFIER"},
+             {"name": "LITERAL"},
+             {"name": "METHOD_REF"},
+             {"name": "RETURN"},
+             {"name": "BLOCK"},
+             {"name": "METHOD"},
+             {"name": "UNKNOWN"}
+           ]}
         ]},
         {"name" : "LITERAL", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
         "outEdges" : [
-            {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
-            {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
-            {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
-            {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
-             {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]}
+            {"edgeName": "TAGGED_BY", "inNodes": [
+              {"name": "TAG"}
+            ]},
+            {"edgeName": "DYNAMIC_TYPE", "inNodes": [
+              {"name": "TYPE_DECL"},
+              {"name": "METHOD"}
+            ]},
+            {"edgeName": "DOMINATE", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD_RETURN"},
+              {"name": "UNKNOWN"}
+            ]},
+            {"edgeName": "POST_DOMINATE", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD"},
+              {"name": "UNKNOWN"}
+            ]},
+            {"edgeName": "CDG", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD_RETURN"},
+              {"name": "UNKNOWN"}
+            ]}
         ]},
         {"name" : "LOCAL",
          "outEdges" : [
-             {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
-             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]}
+             {"edgeName": "TAGGED_BY", "inNodes": [
+              {"name": "TAG"}
+             ]},
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": [
+              {"name": "TYPE_DECL"},
+              {"name": "METHOD"}
+             ]}
          ]
         },
         {"name" : "MEMBER", "outEdges" : [
-            {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL"]}
+          {"edgeName": "DYNAMIC_TYPE", "inNodes": [{"name": "TYPE_DECL"}]}
         ]
         },
 
         {"name" : "CALL", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
          "outEdges" : [
-             {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
-             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
-             {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
-             {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
-             {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]}
+             {"edgeName": "TAGGED_BY", "inNodes": [{"name": "TAG"}]},
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": [
+              {"name": "TYPE_DECL"},
+              {"name": "METHOD"}
+            ]},
+             {"edgeName": "DOMINATE", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD_RETURN"},
+              {"name": "UNKNOWN"}
+            ]},
+             {"edgeName": "POST_DOMINATE", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD"},
+              {"name": "UNKNOWN"}
+            ]},
+             {"edgeName": "CDG", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD_RETURN"},
+              {"name": "UNKNOWN"}
+            ]}
          ]
         },
         {"name" : "IDENTIFIER", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
         "outEdges" : [
-            {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
-            {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
-            {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
-            {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
-             {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]}
+            {"edgeName": "TAGGED_BY", "inNodes": [{"name": "TAG"}]},
+            {"edgeName": "DYNAMIC_TYPE", "inNodes": [
+              {"name": "TYPE_DECL"},
+              {"name": "METHOD"}
+            ]},
+            {"edgeName": "DOMINATE", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD_RETURN"},
+              {"name": "UNKNOWN"}
+            ]},
+            {"edgeName": "POST_DOMINATE", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD"},
+              {"name": "UNKNOWN"}
+            ]},
+             {"edgeName": "CDG", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD_RETURN"},
+              {"name": "UNKNOWN"}
+            ]}
         ]},
         {"name" : "FIELD_IDENTIFIER", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
-            "outEdges" : [
-                {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
-                {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
-                {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
-                {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
-                {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]}
+          "outEdges" : [
+            {"edgeName": "TAGGED_BY", "inNodes": [{"name": "TAG"}]},
+            {"edgeName": "DYNAMIC_TYPE", "inNodes": [
+              {"name": "TYPE_DECL"},
+              {"name": "METHOD"}
             ]},
+            {"edgeName": "DOMINATE", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD_RETURN"},
+              {"name": "UNKNOWN"}
+            ]},
+            {"edgeName": "POST_DOMINATE", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD"},
+              {"name": "UNKNOWN"}
+            ]},
+            {"edgeName": "CDG", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD_RETURN"},
+              {"name": "UNKNOWN"}
+            ]}
+        ]},
         {"name" : "METHOD_PARAMETER_IN",
          "outEdges" : [
-             {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
-             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
-             {"edgeName": "TAINT_REMOVE", "inNodes": ["METHOD_PARAMETER_OUT"]}
+            {"edgeName": "TAGGED_BY", "inNodes": [{"name": "TAG"}]},
+            {"edgeName": "DYNAMIC_TYPE", "inNodes": [
+              {"name": "TYPE_DECL"},
+              {"name": "METHOD"}
+            ]},
+             {"edgeName": "TAINT_REMOVE", "inNodes": [{"name": "METHOD_PARAMETER_OUT"}]}
          ]
         },
 
         {"name" : "RETURN", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
-            "outEdges": [
-                {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
-                {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]}
-            ]
+          "outEdges": [
+            {"edgeName": "DOMINATE", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD_RETURN"},
+              {"name": "UNKNOWN"}
+            ]},
+            {"edgeName": "POST_DOMINATE", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD"},
+              {"name": "UNKNOWN"}
+            ]}
+          ]
         },
         {"name" : "BLOCK", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
           "outEdges" : [
-             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
-             {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
-             {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
-             {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]}
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": [
+              {"name": "TYPE_DECL"},
+              {"name": "METHOD"}
+            ]},
+             {"edgeName": "DOMINATE", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD_RETURN"},
+              {"name": "UNKNOWN"}
+            ]},
+             {"edgeName": "POST_DOMINATE", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD"},
+              {"name": "UNKNOWN"}
+            ]},
+             {"edgeName": "CDG", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD_RETURN"},
+              {"name": "UNKNOWN"}
+            ]}
           ]
         },
         {"name" : "UNKNOWN", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
          "outEdges" : [
-             {"edgeName": "TAGGED_BY", "inNodes": ["TAG"]},
-             {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
-             {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
-             {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
-             {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]}
+             {"edgeName": "TAGGED_BY", "inNodes": [
+              {"name": "TAG"}
+            ]},
+             {"edgeName": "DYNAMIC_TYPE", "inNodes": [
+              {"name": "TYPE_DECL"},
+              {"name": "METHOD"}
+            ]},
+             {"edgeName": "DOMINATE", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD_RETURN"},
+              {"name": "UNKNOWN"}
+            ]},
+             {"edgeName": "POST_DOMINATE", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD"},
+              {"name": "UNKNOWN"}
+            ]},
+             {"edgeName": "CDG", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD_RETURN"},
+              {"name": "UNKNOWN"}
+            ]}
          ]
         },
         {
             "name": "METHOD_REF", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
             "outEdges": [
-                {"edgeName": "DYNAMIC_TYPE", "inNodes": ["TYPE_DECL", "METHOD"]},
-                {"edgeName": "DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]},
-                {"edgeName": "POST_DOMINATE", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD", "UNKNOWN"]},
-                {"edgeName": "CDG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "METHOD_RETURN", "UNKNOWN"]}
+              {"edgeName": "DYNAMIC_TYPE", "inNodes": [
+                {"name": "TYPE_DECL"},
+                {"name": "METHOD"}
+              ]},
+              {"edgeName": "DOMINATE", "inNodes": [
+                {"name": "CALL"},
+                {"name": "IDENTIFIER"},
+                {"name": "FIELD_IDENTIFIER"},
+                {"name": "LITERAL"},
+                {"name": "METHOD_REF"},
+                {"name": "RETURN"},
+                {"name": "BLOCK"},
+                {"name": "METHOD_RETURN"},
+                {"name": "UNKNOWN"}
+              ]},
+              {"edgeName": "POST_DOMINATE", "inNodes": [
+                {"name": "CALL"},
+                {"name": "IDENTIFIER"},
+                {"name": "FIELD_IDENTIFIER"},
+                {"name": "LITERAL"},
+                {"name": "METHOD_REF"},
+                {"name": "RETURN"},
+                {"name": "BLOCK"},
+                {"name": "METHOD"},
+                {"name": "UNKNOWN"}
+              ]},
+              {"edgeName": "CDG", "inNodes": [
+                {"name": "CALL"},
+                {"name": "IDENTIFIER"},
+                {"name": "FIELD_IDENTIFIER"},
+                {"name": "LITERAL"},
+                {"name": "METHOD_REF"},
+                {"name": "RETURN"},
+                {"name": "BLOCK"},
+                {"name": "METHOD_RETURN"},
+                {"name": "UNKNOWN"}
+              ]}
             ]
         },
         {
-            "name": "CLOSURE_BINDING", "outEdges": [
-            ]
+            "name": "CLOSURE_BINDING", "outEdges": []
         },
         {
             "id": 1001, "name": "DETACHED_TRACKING_POINT", "comment": "", "keys": [],

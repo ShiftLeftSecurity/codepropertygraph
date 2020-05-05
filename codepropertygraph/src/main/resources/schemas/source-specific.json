@@ -8,7 +8,7 @@
 
 	{"name" : "FILE",
 	 "outEdges" : [
-	  {"edgeName": "AST", "inNodes": ["COMMENT"]}
+	   {"edgeName": "AST", "inNodes": [{"name": "COMMENT"}]}
 	 ]
 	}
     ]

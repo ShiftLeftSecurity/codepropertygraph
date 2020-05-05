@@ -5,7 +5,7 @@
 	 "comment" : "A node in a Document Object Model (Tree) as obtained from, e.g., an HTML parser",
 	 "keys" : ["NAME"],	 
 	 "outEdges" : [
-	     {"edgeName" : "AST", "inNodes": ["DOM_NODE"]}
+	   {"edgeName" : "AST", "inNodes": [{"name": "DOM_NODE"}]}
 	 ],
 	 "containedNodes" : [
 	     {"nodeType" : "DOM_ATTRIBUTE", "localName" : "attributes", "cardinality" : "list"}
@@ -18,7 +18,7 @@
 	 "outEdges" : []
 	},
 	{"name" : "CONFIG_FILE",
-	 "outEdges" : [{"edgeName" : "CONTAINS", "inNodes" : ["DOM_NODE"]}]
+	 "outEdges" : [{"edgeName" : "CONTAINS", "inNodes" : [{"name": "DOM_NODE"}]}]
 	}
     ]
 }

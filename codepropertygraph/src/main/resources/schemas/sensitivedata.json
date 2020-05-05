@@ -14,7 +14,7 @@
 	     {"localName" : "members", "nodeType" : "SENSITIVE_MEMBER", "cardinality" : "list"}
 	 ],
 	 "outEdges" : [
-	    {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF", "inNodes" : ["TYPE_DECL"]}
+	   {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF", "inNodes" : [{"name": "TYPE_DECL"}]}
 	 ]
 	},
 	
@@ -23,7 +23,10 @@
 	     {"localName" : "names", "nodeType" : "MATCH_INFO", "cardinality" : "list"}
 	 ],
 	 "outEdges" : [
-	     {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF", "inNodes" : ["TYPE", "MEMBER"]}
+	   {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF", "inNodes" : [
+       {"name": "TYPE"},
+       {"name": "MEMBER"}
+     ]}
 	 ]
 	},
 	{"id" : 54, "name" : "SENSITIVE_VARIABLE", "keys" : ["NAME", "EVAL_TYPE", "CATEGORIES"], "comment" : "",
@@ -32,16 +35,24 @@
 	 ], "outEdges" : [
 	     // "inNodes" : "LOCAL_LIKE" is what I want here, but it is currently necessary
 	     // to enumerate all child classes
-	     {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF", "inNodes" : ["METHOD_PARAMETER_IN", "LOCAL", "IDENTIFIER"] },
-	     {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF_REF", "inNodes" : ["SENSITIVE_REFERENCE"] },
-	     {"edgeName" : "IS_SENSITIVE_DATA_OF_TYPE", "inNodes" : ["SENSITIVE_DATA_TYPE"]}
+	     {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF", "inNodes" : [
+        {"name": "METHOD_PARAMETER_IN"},
+        {"name": "LOCAL"},
+        {"name": "IDENTIFIER"}
+       ] },
+	     {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF_REF", "inNodes" : [{"name": "SENSITIVE_REFERENCE"}] },
+	     {"edgeName" : "IS_SENSITIVE_DATA_OF_TYPE", "inNodes" : [{"name": "SENSITIVE_DATA_TYPE"}]}
 	 ]
 	},
 	{"id" : 55, "name" : "SENSITIVE_REFERENCE", "keys" : [], "comment" : "",
 	 "containedNodes" : [
 	     {"localName" : "ioflows", "nodeType" : "IOFLOW", "cardinality" : "list"}
 	 ], "outEdges" : [
-	   {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF_REF", "inNodes" : ["METHOD_PARAMETER_IN", "LOCAL", "IDENTIFIER"]}
+	   {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF_REF", "inNodes" : [
+      {"name": "METHOD_PARAMETER_IN"},
+      {"name": "LOCAL"},
+      {"name": "IDENTIFIER"}
+     ]}
 	 ]
 	}
     ],
