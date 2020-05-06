@@ -43,8 +43,10 @@ object MethodDotGenerator {
 
   private def stringRepr(vertex: nodes.AstNode): String = {
     vertex match {
-      case expr: nodes.Expression => (expr.label, expr.code).toString
-      case _                      => ""
+      case expr: nodes.Expression  => (expr.label, expr.code).toString
+      case method: nodes.Method    => (method.label, method.name).toString
+      case ret: nodes.MethodReturn => (ret.label).toString
+      case _                       => ""
     }
   }
 
