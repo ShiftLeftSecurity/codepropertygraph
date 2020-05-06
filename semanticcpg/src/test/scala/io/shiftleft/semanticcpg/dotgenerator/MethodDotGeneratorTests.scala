@@ -49,7 +49,7 @@ class MethodDotGeneratorTests extends WordSpec with Matchers {
 
         val expectedBoopRegex =
           """|digraph boop \{
-             | "\d+" -> "\d+" \[label="printf\("Boop!"\)"\];
+             | "\d+" -> "\d+" \[label="printf\(\\"Boop!\\"\)"\];
              | "\d+" -> "\d+" \[label="return;"\];
              |\}
              |""".stripMargin

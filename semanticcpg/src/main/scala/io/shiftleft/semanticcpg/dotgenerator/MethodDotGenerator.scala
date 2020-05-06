@@ -49,13 +49,13 @@ object MethodDotGenerator {
               val dotExpression = s""" "$parentId" -> "${ex.id}" [label="BLOCK"];"""
               go(getNestedTopLevelExpressions(ex) ::: tail, Some(ex), currentGraph :+ dotExpression)
             case ex: ControlStructure =>
-              val dotExpression = s""" "$parentId" -> "${ex.id}" [label="${ex.code}"];"""
+              val dotExpression = s""" "$parentId" -> "${ex.id}" [label="${escape(ex.code)}"];"""
               go(getNestedTopLevelExpressions(ex) ::: tail, Some(ex), currentGraph :+ dotExpression)
             case ex: Return =>
-              val dotExpression = s""" "$parentId" -> "${ex.id}" [label="${ex.code}"];"""
+              val dotExpression = s""" "$parentId" -> "${ex.id}" [label="${escape(ex.code)}"];"""
               go(tail, parentExpression, currentGraph :+ dotExpression)
             case ex: Call =>
-              val dotExpression = s""" "$parentId" -> "${ex.id}" [label="${ex.code}"];"""
+              val dotExpression = s""" "$parentId" -> "${ex.id}" [label="${escape(ex.code)}"];"""
               go(tail, parentExpression, currentGraph :+ dotExpression)
             case _ =>
               // Ignore all other node types.
@@ -73,6 +73,10 @@ object MethodDotGenerator {
       .l
 
     go(methodExpressions)
+  }
+
+  private def escape(str: String): String = {
+    str.replaceAllLiterally("\"", "\\\"")
   }
 
   private def getNestedTopLevelExpressions(vertex: Vertex): List[Expression] = {
