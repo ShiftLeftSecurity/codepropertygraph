@@ -32,19 +32,21 @@ class MethodDotGeneratorTests extends WordSpec with Matchers {
           case x :: _ =>
             x.startsWith("digraph my_func") shouldBe true
             x.contains("""[label = "(CONTROL_STRUCTURE,if (y > 42))" ]""") shouldBe true
-            x.endsWith("}")
+            x.endsWith("}") shouldBe true
         }
       }
 
       "allow selection method" in {
         cpg.method.name("boop").dot match {
-          case x :: _ => x.startsWith("digraph boop")
+          case x :: _ => x.startsWith("digraph boop") shouldBe true
+          case _ => fail
         }
       }
 
       "not include MethodParameterOut nodes" in {
         cpg.method.name("my_func").dot match {
           case x :: _ => x.contains("PARAM_OUT") shouldBe false
+          case _ => fail
         }
       }
 
