@@ -17,7 +17,7 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
       bindingTable.update((binding.name, binding.signature, typeDecl), binding)
     }
     for (typeDecl <- cpg.typeDecl.toIterator) {
-      val parentTypeDecls = typeDecl._typeViaInheritsFromOut.flatMap{_._typeDeclViaRefOut}.toList
+      val parentTypeDecls = typeDecl._typeViaInheritsFromOut.flatMap { _._typeDeclViaRefOut }.toList
       for (binding <- typeDecl._bindingViaBindsOut) {
         if (!overwritten.contains(binding)) {
           val method = binding._methodViaRefOut.next
