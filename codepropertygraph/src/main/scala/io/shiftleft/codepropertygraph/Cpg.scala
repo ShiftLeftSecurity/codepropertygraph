@@ -4,15 +4,16 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{edges, nodes}
 import io.shiftleft.overflowdb.OdbGraph
 import io.shiftleft.overflowdb.OdbConfig
+import io.shiftleft.overflowdb.traversal.help.TraversalHelp
 
 object Cpg {
 
   /**
     * Syntactic sugar for `new Cpg(graph)`.
     * Usage:
-    *   `Cpg(graph)` or simply `Cpg` if you have an `implicit Graph` in scope
+    *   `Cpg(graph)` or simply `Cpg` if you have an `implicit OdbGraph` in scope
     */
-  def apply(implicit graph: Graph) = new Cpg(graph)
+  def apply(implicit graph: OdbGraph) = new Cpg(graph)
 
   /**
     * Create an empty code property graph
@@ -38,6 +39,7 @@ object Cpg {
     */
   private def emptyGraph: OdbGraph =
     OdbGraph.open(OdbConfig.withoutOverflow, nodes.Factories.allAsJava, edges.Factories.allAsJava)
+
 }
 
 /**
@@ -47,15 +49,10 @@ object Cpg {
   *
   * @param graph the underlying graph. An empty graph is created if this parameter is omitted.
   */
-class Cpg(val graph: Graph = Cpg.emptyGraph) extends AutoCloseable {
+class Cpg(val graph: OdbGraph = Cpg.emptyGraph) extends AutoCloseable {
 
-  /**
-    * The underlying graph.
-    *
-    * This member provides raw access to the underlying graph.
-    */
-  implicit lazy val scalaGraph: ScalaGraph =
-    graph.asScala
+  lazy val help: String =
+    new TraversalHelp("io.shiftleft").forTraversalSources
 
   /**
     * Closes code property graph.

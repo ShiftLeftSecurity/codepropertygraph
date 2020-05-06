@@ -1,18 +1,20 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes._
 import java.util.{List => JList}
 
+import gremlin.scala._
+import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.overflowdb.OdbGraph
 import io.shiftleft.overflowdb.traversal.help.{Doc, TraversalHelp}
 import org.apache.tinkerpop.gremlin.process.traversal.Scope
-import org.json4s.CustomSerializer
+import org.apache.tinkerpop.gremlin.structure.util.empty.EmptyGraph
+import org.json4s.{CustomSerializer, Extraction}
 import org.json4s.native.Serialization.{write, writePretty}
-import org.json4s.Extraction
 
-import scala.jdk.CollectionConverters._
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
 
 /** Base class for our DSL
@@ -20,7 +22,12 @@ import scala.reflect.ClassTag
   * There are no constraints on the element types, unlike e.g. [[NodeSteps]]
   */
 class Steps[A](val raw: GremlinScala[A]) {
-  implicit lazy val graph: Graph = raw.traversal.asAdmin.getGraph.get
+  lazy val graph: OdbGraph = raw.traversal.asAdmin.getGraph.get match {
+    case g: OdbGraph   => g
+    case _: EmptyGraph =>
+      // hacky workaround while we're still using Steps and Tinkerpop
+      Cpg.emptyCpg.graph
+  }
 
   def toIterator(): Iterator[A] = {
     val iter: java.util.Iterator[A] = raw.traversal
@@ -95,10 +102,10 @@ class Steps[A](val raw: GremlinScala[A]) {
     * all documented steps in the classpath
     * */
   def help()(implicit elementType: ClassTag[A]): String =
-    Steps.help.renderTable(elementType.runtimeClass, verbose = false)
+    Steps.help.forElementSpecificSteps(elementType.runtimeClass, verbose = false)
 
   def helpVerbose()(implicit elementType: ClassTag[A]): String =
-    Steps.help.renderTable(elementType.runtimeClass, verbose = true)
+    Steps.help.forElementSpecificSteps(elementType.runtimeClass, verbose = true)
 
   /**
     * Execute this traversal and pretty print the results.

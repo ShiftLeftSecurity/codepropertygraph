@@ -2,10 +2,11 @@ package io.shiftleft.semanticcpg.language.types.structure
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.overflowdb.traversal.help.{Doc, TraversalExt}
+import io.shiftleft.overflowdb.traversal.help
+import io.shiftleft.overflowdb.traversal.help.Doc
 import io.shiftleft.semanticcpg.language._
 
-@TraversalExt(elementType = classOf[nodes.MethodReturn])
+@help.Traversal(elementType = classOf[nodes.MethodReturn])
 class MethodReturn(val wrapped: NodeSteps[nodes.MethodReturn]) extends AnyVal {
   private def raw: GremlinScala[nodes.MethodReturn] = wrapped.raw
 
@@ -33,6 +34,6 @@ class MethodReturn(val wrapped: NodeSteps[nodes.MethodReturn]) extends AnyVal {
 
   def toReturn: NodeSteps[nodes.Return] =
     new NodeSteps(raw.flatMap { mr =>
-      __(mr.toReturn: _*)
+      __(mr.toReturn.toSeq: _*)
     })
 }

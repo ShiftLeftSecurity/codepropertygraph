@@ -123,17 +123,15 @@ object LocationCreator {
     if (method == null) {
       nodes.NewLocation("", "", "", "", None, "", "", "", "", Some(node))
     } else {
-      val typeOption = ExpandTo.methodToTypeDecl(method).map(_.asInstanceOf[nodes.TypeDecl])
+      val typeOption = ExpandTo.methodToTypeDecl(method)
       val typeName = typeOption.map(_.fullName).getOrElse("")
       val typeShortName = typeOption.map(_.name).getOrElse("")
 
-      val namespaceOption = typeOption.flatMap(
-        _.astIn.asScala
-          .collect { case nb: nodes.NamespaceBlock => nb }
-          .flatMap(_.refOut.asScala)
+      val namespaceOption = typeOption.flatMap { tpe =>
+        tpe._namespaceBlockViaAstIn
+          .flatMap(_._namespaceViaRefOut)
           .nextOption
-      )
-
+      }
       val namespaceName = namespaceOption.map(_.name).getOrElse("")
       val fileOption = ExpandTo.methodToFile(method)
       val fileName = fileOption.map(_.name).getOrElse("N/A")

@@ -26,20 +26,15 @@ class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
       case Cardinality.List =>
         validateCardinalityList(node, nodeKeyType)
     }
+
   private def validateKeysFacts(notEnhancedCpg: Cpg): Unit = {
-    val keysFacts = new KeysFactsImporter().loadFacts
-    keysFacts.foreach {
+    new KeysFactsImporter().loadFacts.foreach {
       case KeysFact(nodeType, nodeKeyType, cardinality) =>
-        notEnhancedCpg.scalaGraph.V
-          .hasLabel(nodeType)
-          .sideEffectWithTraverser { traverser =>
-            traverser.get match {
-              case dstNode if dstNode.label() != NodeTypes.UNKNOWN =>
-                validateNode(dstNode, nodeKeyType, cardinality)
-              case _ => // Do nothing. Hence, we skip UNKNOWN nodes
-            }
-          }
-          .iterate()
+        notEnhancedCpg.graph.nodesByLabel(nodeType).asScala.foreach {
+          case dstNode if dstNode.label != NodeTypes.UNKNOWN =>
+            validateNode(dstNode, nodeKeyType, cardinality)
+          case _ => // Do nothing. Hence, we skip UNKNOWN nodes
+        }
     }
   }
 

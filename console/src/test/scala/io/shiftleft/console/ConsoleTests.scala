@@ -29,6 +29,7 @@ class ConsoleTests extends WordSpec with Matchers {
       console.workspace.numberOfProjects shouldBe 1
       Set("main", "bar").subsetOf(console.cpg.method.name.toSet)
       console.project.appliedOverlays shouldBe List("semanticcpg")
+      console.project.availableOverlays shouldBe List("semanticcpg")
     }
 
     "allow importing code and setting project name" in ConsoleFixture() { (console, codeDir) =>
@@ -273,6 +274,13 @@ class ConsoleTests extends WordSpec with Matchers {
       console.save
       console.workspace.project("project1").exists(_.cpg.isDefined) shouldBe true
       console.workspace.project("project2").exists(_.cpg.isDefined) shouldBe true
+    }
+  }
+
+  "cpg" should {
+    "provide .help command" in ConsoleFixture() { (console, codeDir) =>
+      console.importCode(codeDir.toString)
+      console.cpg.help.contains(".all") shouldBe true
     }
   }
 

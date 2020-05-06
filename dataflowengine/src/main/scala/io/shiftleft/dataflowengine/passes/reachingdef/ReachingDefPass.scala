@@ -80,8 +80,8 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF)
 
     for {
-      methodParameterIn <- method.astOut.asScala.collect { case paramIn: nodes.MethodParameterIn => paramIn }
-      refInIdentifier <- methodParameterIn.refIn.asScala
+      methodParameterIn <- method._methodParameterInViaAstOut
+      refInIdentifier <- methodParameterIn._refIn.asScala
       operationNode <- dfHelper.getOperation(refInIdentifier)
     } addEdge(methodParameterIn, operationNode)
 
@@ -92,7 +92,7 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
       case (call: nodes.Call, outDefs) =>
         handleCall(call, outDefs)
       case (ret: nodes.Return, _) =>
-        ret.astOut.asScala.foreach { returnExpr =>
+        ret._astOut.asScala.foreach { returnExpr =>
           val localRef = reference(returnExpr)
           inSet(ret).filter(inElement => localRef == reference(inElement)).foreach { filteredInElement =>
             dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, ret))
@@ -220,7 +220,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
   }
 
   def getExpressions(method: nodes.Method): List[nodes.Call] =
-    method.containsOut.asScala.collect { case call: nodes.Call => call }.to(List)
+    method._callViaContainsOut.to(List)
 
   def getGensOfExpression(expr: nodes.StoredNode): Set[nodes.StoredNode] = {
     var gens = Set[nodes.StoredNode]()
@@ -280,7 +280,7 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
 
   def getOperation(node: nodes.StoredNode): Option[nodes.StoredNode] = {
     node match {
-      case identifier: nodes.Identifier => identifier.argumentIn.nextOption.flatMap(getOperation)
+      case identifier: nodes.Identifier => identifier._argumentIn.nextOption.flatMap(getOperation)
       case _: nodes.Call                => Some(node)
       case _: nodes.Return              => Some(node)
       case _                            => None

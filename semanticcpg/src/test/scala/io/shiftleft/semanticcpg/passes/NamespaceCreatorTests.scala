@@ -4,16 +4,16 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
-import io.shiftleft.semanticcpg.testfixtures.EmptyScalaGraphFixture
+import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class NamespaceCreatorTests extends WordSpec with Matchers {
-  "NamespaceCreateor test " in EmptyScalaGraphFixture { graph =>
+  "NamespaceCreateor test " in EmptyGraphFixture { graph =>
     val block1 = graph + (NodeTypes.NAMESPACE_BLOCK, NodeKeys.NAME -> "namespace1")
     val block2 = graph + (NodeTypes.NAMESPACE_BLOCK, NodeKeys.NAME -> "namespace1")
     val block3 = graph + (NodeTypes.NAMESPACE_BLOCK, NodeKeys.NAME -> "namespace2")
 
-    val namespaceCreator = new NamespaceCreator(new Cpg(graph.graph))
+    val namespaceCreator = new NamespaceCreator(new Cpg(graph))
     namespaceCreator.createAndApply()
 
     val namespaces = graph.V().hasLabel(NodeTypes.NAMESPACE).toBuffer

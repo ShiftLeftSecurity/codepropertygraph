@@ -5,7 +5,7 @@ import java.util
 
 import gnu.trove.set.hash.TCustomHashSet
 import gnu.trove.strategy.IdentityHashingStrategy
-import gremlin.scala.{Edge, ScalaGraph}
+import gremlin.scala.{Edge, GraphAsScala, ScalaGraph}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node, StoredNode}
 import io.shiftleft.proto.cpg.Cpg.{DiffGraph => DiffGraphProto}
@@ -150,7 +150,7 @@ object DiffGraph {
           val inNodeId = proto.getInNodeKey
           val edgeLabel = proto.getEdgeType.toString
 
-          val edge = cpg.scalaGraph.V(outNodeId).outE(edgeLabel).toList.filter(_.inVertex.id == inNodeId) match {
+          val edge = cpg.graph.asScala.V(outNodeId).outE(edgeLabel).toList.filter(_.inVertex.id == inNodeId) match {
             case edge :: Nil => edge
             case Nil         => throw new AssertionError(s"unable to find edge that is supposed to be removed: $proto")
             case candidates => // found multiple edges - try to disambiguate via propertiesHash

@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.overflowdb.traversal.help
 import io.shiftleft.semanticcpg.utils.MemberAccess
 
 import scala.annotation.tailrec

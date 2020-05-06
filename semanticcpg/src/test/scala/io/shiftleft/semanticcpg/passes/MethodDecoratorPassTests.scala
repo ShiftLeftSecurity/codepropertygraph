@@ -4,12 +4,13 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeKeys, NodeTypes}
 import io.shiftleft.semanticcpg.passes.methoddecorations.MethodDecoratorPass
-import io.shiftleft.semanticcpg.testfixtures.EmptyScalaGraphFixture
+import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.scalatest.{Matchers, WordSpec}
 
 class MethodDecoratorPassTests extends WordSpec with Matchers {
-  "MethodDecoratorTest" in EmptyScalaGraphFixture { implicit graph =>
+  "MethodDecoratorTest" in EmptyGraphFixture { graph =>
+    implicit val scalaGraph: ScalaGraph = graph.asScala
     val method = graph + NodeTypes.METHOD
     val parameterIn = graph + (NodeTypes.METHOD_PARAMETER_IN,
     NodeKeys.CODE -> "p1",
@@ -22,7 +23,7 @@ class MethodDecoratorPassTests extends WordSpec with Matchers {
 
     method --- EdgeTypes.AST --> parameterIn
 
-    val methodDecorator = new MethodDecoratorPass(new Cpg(graph.graph))
+    val methodDecorator = new MethodDecoratorPass(new Cpg(graph))
     methodDecorator.createAndApply()
 
     val parameterOut = parameterIn.vertices(Direction.OUT, EdgeTypes.PARAMETER_LINK).next

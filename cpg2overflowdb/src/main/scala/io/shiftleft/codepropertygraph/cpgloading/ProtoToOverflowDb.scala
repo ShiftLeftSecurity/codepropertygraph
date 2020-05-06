@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import java.io.{File}
-import io.shiftleft.overflowdb.{OdbConfig, OdbGraph}
+import java.io.File
+import io.shiftleft.overflowdb.OdbConfig
 import org.apache.logging.log4j.LogManager
 
 /**
@@ -27,7 +27,7 @@ object ProtoToOverflowDb {
       odbConfig.disableOverflow()
     val cpg = CpgLoader.load(filename = config.cpg.getAbsolutePath,
                              CpgLoaderConfig.withDefaults.withOverflowConfig(odbConfig).createIndexesOnLoad)
-    cpg.graph.asInstanceOf[OdbGraph].close()
+    cpg.graph.close()
     logger.info("OverflowDb construction finished in " + (System.currentTimeMillis - start) + "ms.")
     writeTo
   }
