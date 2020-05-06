@@ -1,14 +1,7 @@
 package io.shiftleft.semanticcpg.dotgenerator
 
-import gremlin.scala._
-import org.apache.tinkerpop.gremlin.structure.Vertex
-
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.language._
-
-import scala.annotation.tailrec
 
 object MethodDotGenerator {
 
@@ -23,7 +16,7 @@ object MethodDotGenerator {
   def toDotGraph(methodStep: NodeSteps[nodes.Method]): List[String] =
     methodStep.internal.l.map(generateDotFromMethod)
 
-  private def generateDotFromMethod(method: Method): String = {
+  def generateDotFromMethod(method: nodes.Method): String = {
     val sb = new StringBuilder
     sb.append(s"digraph ${method.name} {\n")
     sb.append(dotFromMethod(method).mkString("\n"))
@@ -31,59 +24,37 @@ object MethodDotGenerator {
     sb.toString
   }
 
-  private def dotFromMethod(method: Method): List[String] = {
+  def dotFromMethod(method: nodes.Method): List[String] = {
 
-    @tailrec
-    def go(subExpressions: List[Expression],
-           parentExpression: Option[Expression] = None,
-           currentGraph: List[String] = List.empty): List[String] = {
+    def shouldBeDisplayed(v: nodes.AstNode): Boolean = !v.isInstanceOf[nodes.MethodParameterOut]
 
-      val parentId = parentExpression.map(_.id.toString).getOrElse(method.id)
+    val vertices = method.ast.where(shouldBeDisplayed).l
+    val edges = vertices.map(v => (v.getId, v.start.astChildren.where(shouldBeDisplayed).id.l))
 
-      subExpressions match {
-        case Nil =>
-          currentGraph
-        case expr :: tail =>
-          expr match {
-            case ex: Block =>
-              val dotExpression = s""" "$parentId" -> "${ex.id}" [label="BLOCK"];"""
-              go(getNestedTopLevelExpressions(ex) ::: tail, Some(ex), currentGraph :+ dotExpression)
-            case ex: ControlStructure =>
-              val dotExpression = s""" "$parentId" -> "${ex.id}" [label="${escape(ex.code)}"];"""
-              go(getNestedTopLevelExpressions(ex) ::: tail, Some(ex), currentGraph :+ dotExpression)
-            case ex: Return =>
-              val dotExpression = s""" "$parentId" -> "${ex.id}" [label="${escape(ex.code)}"];"""
-              go(tail, parentExpression, currentGraph :+ dotExpression)
-            case ex: Call =>
-              val dotExpression = s""" "$parentId" -> "${ex.id}" [label="${escape(ex.code)}"];"""
-              go(tail, parentExpression, currentGraph :+ dotExpression)
-            case _ =>
-              // Ignore all other node types.
-              go(tail, parentExpression, currentGraph)
-          }
-      }
+    val nodeStrings = vertices.map { node =>
+      s""""${node.getId}" [label = "${escape(stringRepr(node))}" ]""".stripMargin
     }
 
-    val methodExpressions = method
-      .out(EdgeTypes.AST)
-      .hasLabel(NodeTypes.BLOCK)
-      .out(EdgeTypes.AST)
-      .not(_.hasLabel(NodeTypes.LOCAL, NodeTypes.TYPE_DECL))
-      .cast[Expression]
-      .l
+    val edgeStrings = edges.flatMap {
+      case (id, childIds) =>
+        childIds.map(childId => s"""  "$id" -> "$childId"  """)
+    }
 
-    go(methodExpressions)
+    nodeStrings ++ edgeStrings
+  }
+
+  private def stringRepr(vertex: nodes.AstNode): String = {
+    vertex match {
+      case call: nodes.Call               => (call.name, call.code).toString
+      case expr: nodes.Expression         => (expr.label, expr.code).toString
+      case method: nodes.Method           => (method.label, method.name).toString
+      case ret: nodes.MethodReturn        => (ret.label, ret.typeFullName).toString
+      case param: nodes.MethodParameterIn => ("PARAM", param.code).toString
+      case _                              => ""
+    }
   }
 
   private def escape(str: String): String = {
     str.replaceAllLiterally("\"", "\\\"")
-  }
-
-  private def getNestedTopLevelExpressions(vertex: Vertex): List[Expression] = {
-    vertex
-      .out(EdgeTypes.AST)
-      .hasLabel(NodeTypes.BLOCK, NodeTypes.CONTROL_STRUCTURE, NodeTypes.RETURN, NodeTypes.CALL)
-      .cast[Expression]
-      .l
   }
 }
