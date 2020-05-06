@@ -1,48 +1,52 @@
 package io.shiftleft.semanticcpg.passes
-
+import scala.collection.mutable
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{NodeKeys, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
+import io.shiftleft.codepropertygraph.generated.{nodes, NodeKeyNames}
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import org.apache.logging.log4j.LogManager
+import scala.jdk.CollectionConverters._
 
 class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
-  import BindingMethodOverridesPass._
+  val overwritten = mutable.HashSet[nodes.Binding]()
+  val bindingTable = scala.collection.mutable.HashMap[(String, String, nodes.TypeDecl), nodes.Binding]()
 
   override def run(): Iterator[DiffGraph] = {
-    val methodIterator = cpg.method.toIterator()
-    new ParallelIteratorExecutor(methodIterator).map(processMethod)
-  }
-
-  private def processMethod(method: nodes.Method): DiffGraph = {
-    val diff = DiffGraph.newBuilder
-    method.start.referencingBinding
-      .toIterator()
-      .foreach(binding => {
-        val typeDecl: Option[nodes.TypeDecl] = binding.start.bindingTypeDecl.headOption()
-        if (typeDecl.isDefined) {
-          val neverOverriddenFlag = isMethodNeverOverridden(typeDecl.get, binding.name, binding.signature)
-          diff.addNodeProperty(
-            binding,
-            NodeKeys.IS_METHOD_NEVER_OVERRIDDEN.name,
-            neverOverriddenFlag.asInstanceOf[AnyRef]
-          )
-        } else {
-          logger.error(
-            "No binding typeDecl found in BindingMethodOverridesPass: " + method.name + " " + method.signature)
+    val diffGraph = DiffGraph.newBuilder
+    for (typeDecl <- cpg.typeDecl.toIterator;
+         binding <- typeDecl._bindingViaBindsOut) {
+      bindingTable.update((binding.name, binding.signature, typeDecl), binding)
+    }
+    for (typeDecl <- cpg.typeDecl.toIterator) {
+      val parentTypeDecls = typeDecl._typeViaInheritsFromOut.flatMap { _._typeDeclViaRefOut }.toList
+      for (binding <- typeDecl._bindingViaBindsOut) {
+        if (!overwritten.contains(binding)) {
+          val method = binding._methodViaRefOut.next
+          for (parentTypeDecl <- parentTypeDecls) {
+            val parentBinding = bindingTable.get((binding.name, binding.signature, parentTypeDecl))
+            if (parentBinding.isDefined && parentBinding.get._methodViaRefOut.next != method) {
+              markRecurse(parentBinding.get)
+            }
+          }
         }
-      })
-    diff.build()
+      }
+    }
+    for (typeDecl <- cpg.typeDecl.toIterator;
+         binding <- typeDecl._bindingViaBindsOut) {
+      diffGraph.addNodeProperty(node = binding,
+                                key = NodeKeyNames.IS_METHOD_NEVER_OVERRIDDEN,
+                                value = (!overwritten.contains(binding)).asInstanceOf[AnyRef])
+    }
+    return Iterator(diffGraph.build())
   }
 
-  def isMethodNeverOverridden(typeDecl: nodes.TypeDecl, bindingName: String, bindingSignature: String): Boolean = {
-    typeDecl.start.derivedTypeDeclTransitive.methodBinding
-      .filter(_.nameExact(bindingName).signatureExact(bindingSignature))
-      .headOption
-      .isEmpty
+  def markRecurse(binding: nodes.Binding): Unit = {
+    val wasAlreadyOverwritten = overwritten.add(binding)
+    if (wasAlreadyOverwritten) {
+      for (parentType <- binding._typeDeclViaBindsIn.next._typeViaInheritsFromOut;
+           parentTypeDecl <- parentType._typeDeclViaRefOut;
+           parentBinding <- bindingTable.get((binding.name, binding.signature, parentTypeDecl))) {
+        markRecurse(parentBinding)
+      }
+    }
   }
-}
-
-object BindingMethodOverridesPass {
-  private val logger = LogManager.getLogger(getClass)
 }
