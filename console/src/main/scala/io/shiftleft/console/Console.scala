@@ -1,6 +1,6 @@
 package io.shiftleft.console
 
-import better.files.Dsl.{cp, rm}
+import better.files.Dsl._
 import better.files.File
 import gremlin.scala.{GraphAsScala, ScalaGraph}
 import io.shiftleft.SerializedCpg
@@ -314,7 +314,19 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
       }
     }
 
-    def c: Frontend = new Frontend(Languages.C, "Fuzzy Parser for C/C++")
+    class CFrontend extends Frontend(Languages.C, "Fuzzy Parser for C/C++") {
+      def fromString(str: String): Option[Cpg] = {
+        val dir = File.newTemporaryDirectory("console")
+        val result = Try {
+          (dir / "tmp.c").write(str)
+          apply(dir.path.toString)
+        }.toOption.flatten
+        dir.delete()
+        result
+      }
+    }
+
+    def c: CFrontend = new CFrontend()
     def llvm: Frontend = new Frontend(Languages.LLVM, "LLVM Bitcode Frontend")
     def java: Frontend = new Frontend(Languages.JAVA, "Java/Dalvik Bytecode Frontend")
     def golang: Frontend = new Frontend(Languages.GOLANG, "Golang Source Frontend")
