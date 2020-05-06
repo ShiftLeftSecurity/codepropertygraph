@@ -26,8 +26,10 @@ object MethodDotGenerator {
 
   def dotFromMethod(method: nodes.Method): List[String] = {
 
-    val vertices = method.ast.l
-    val edges = vertices.map(v => (v.getId, v.start.astChildren.id.l))
+    def shouldBeDisplayed(v: nodes.AstNode): Boolean = !v.isInstanceOf[nodes.MethodParameterOut]
+
+    val vertices = method.ast.where(shouldBeDisplayed).l
+    val edges = vertices.map(v => (v.getId, v.start.astChildren.where(shouldBeDisplayed).id.l))
 
     val nodeStrings = vertices.map { node =>
       s""""${node.getId}" [label = "${escape(stringRepr(node))}" ]""".stripMargin
@@ -43,10 +45,12 @@ object MethodDotGenerator {
 
   private def stringRepr(vertex: nodes.AstNode): String = {
     vertex match {
-      case expr: nodes.Expression  => (expr.label, expr.code).toString
-      case method: nodes.Method    => (method.label, method.name).toString
-      case ret: nodes.MethodReturn => (ret.label).toString
-      case _                       => ""
+      case call: nodes.Call               => (call.name, call.code).toString
+      case expr: nodes.Expression         => (expr.label, expr.code).toString
+      case method: nodes.Method           => (method.label, method.name).toString
+      case ret: nodes.MethodReturn        => (ret.label, ret.typeFullName).toString
+      case param: nodes.MethodParameterIn => ("PARAM", param.code).toString
+      case _                              => ""
     }
   }
 

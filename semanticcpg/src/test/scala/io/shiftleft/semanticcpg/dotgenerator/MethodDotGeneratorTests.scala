@@ -28,18 +28,24 @@ class MethodDotGeneratorTests extends WordSpec with Matchers {
   "A MethodDotGenerator" should {
     CodeToCpgFixture(code) { cpg =>
       "generate dot graph" in {
-        val dotLines = cpg.method.name("my_func").dot
-        dotLines.size shouldBe 1
-        val myFuncDot = dotLines.head
-        myFuncDot.startsWith("digraph my_func") shouldBe true
-        myFuncDot.contains("""[label = "(CONTROL_STRUCTURE,if (y > 42))" ]""") shouldBe true
-        myFuncDot.endsWith("}")
+        cpg.method.name("my_func").dot match {
+          case x :: _ =>
+            x.startsWith("digraph my_func") shouldBe true
+            x.contains("""[label = "(CONTROL_STRUCTURE,if (y > 42))" ]""") shouldBe true
+            x.endsWith("}")
+        }
       }
 
       "allow selection method" in {
-        val dotLines = cpg.method.name("boop").dot
-        dotLines.size shouldBe 1
-        dotLines.head.startsWith("digraph boop")
+        cpg.method.name("boop").dot match {
+          case x :: _ => x.startsWith("digraph boop")
+        }
+      }
+
+      "not include MethodParameterOut nodes" in {
+        cpg.method.name("my_func").dot match {
+          case x :: _ => x.contains("PARAM_OUT") shouldBe false
+        }
       }
 
     }
