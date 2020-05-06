@@ -13,19 +13,17 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val diffGraph = DiffGraph.newBuilder
     for (typeDecl <- cpg.typeDecl.toIterator;
-         binding <- typeDecl.bindsOut.asScala) {
+         binding <- typeDecl._bindingViaBindsOut) {
       bindingTable.update((binding.name, binding.signature, typeDecl), binding)
     }
     for (typeDecl <- cpg.typeDecl.toIterator) {
-      val parentTypeDecls = typeDecl.inheritsFromOut.asScala.map {
-        _.refOut.next
-      }.toList
-      for (binding <- typeDecl.bindsOut.asScala) {
+      val parentTypeDecls = typeDecl._typeViaInheritsFromOut.flatMap{_._typeDeclViaRefOut}.toList
+      for (binding <- typeDecl._bindingViaBindsOut) {
         if (!overwritten.contains(binding)) {
-          val method = binding.refOut.next
+          val method = binding._methodViaRefOut.next
           for (parentTypeDecl <- parentTypeDecls) {
             val parentBinding = bindingTable.get((binding.name, binding.signature, parentTypeDecl))
-            if (parentBinding.isDefined && parentBinding.get.refOut.next != method) {
+            if (parentBinding.isDefined && parentBinding.get._methodViaRefOut.next != method) {
               markRecurse(parentBinding.get)
             }
           }
@@ -33,7 +31,7 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
       }
     }
     for (typeDecl <- cpg.typeDecl.toIterator;
-         binding <- typeDecl.bindsOut.asScala) {
+         binding <- typeDecl._bindingViaBindsOut) {
       diffGraph.addNodeProperty(node = binding,
                                 key = NodeKeyNames.IS_METHOD_NEVER_OVERRIDDEN,
                                 value = (!overwritten.contains(binding)).asInstanceOf[AnyRef])
@@ -44,8 +42,8 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
   def markRecurse(binding: nodes.Binding): Unit = {
     val wasAlreadyOverwritten = overwritten.add(binding)
     if (wasAlreadyOverwritten) {
-      for (parentType <- binding.bindsIn.next.inheritsFromOut.asScala;
-           parentTypeDecl <- parentType.refOut.asScala;
+      for (parentType <- binding._typeDeclViaBindsIn.next._typeViaInheritsFromOut;
+           parentTypeDecl <- parentType._typeDeclViaRefOut;
            parentBinding <- bindingTable.get((binding.name, binding.signature, parentTypeDecl))) {
         markRecurse(parentBinding)
       }
