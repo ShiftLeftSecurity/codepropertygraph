@@ -78,7 +78,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
       |of vulnerable code. Think of Ocular and Joern as a CPG editors.
       |
       |In practice, `cpg` is the root object of the query language, that is, all
-      |query language constructs can be invoked starting from `cpg`. For exanple,
+      |query language constructs can be invoked starting from `cpg`. For example,
       |`cpg.method.l` lists all methods, while `cpg.finding.l` lists all findings
       |of potentially vulnerable code.
       |""".stripMargin,
