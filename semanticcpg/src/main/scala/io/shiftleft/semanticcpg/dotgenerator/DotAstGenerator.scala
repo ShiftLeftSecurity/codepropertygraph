@@ -3,32 +3,27 @@ package io.shiftleft.semanticcpg.dotgenerator
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 
-object MethodDotGenerator {
+object DotAstGenerator {
 
-  /**
-    * Generates a java.lang.String representation of a DOT graph for
-    * each internal method contained in the set of methods selected in
-    * the previous node step(s).
-    *
-    * @param methodStep A step resulting in a set of methods.
-    * @return A java.lang.String containing a DOT graph for each internal method.
-    */
-  def toDotGraph(methodStep: NodeSteps[nodes.Method]): List[String] =
-    methodStep.internal.l.map(generateDotFromMethod)
+  def toDotAst[T <: nodes.AstNode](step: NodeSteps[T]): Steps[String] = step.map(dotAst)
 
-  def generateDotFromMethod(method: nodes.Method): String = {
+  def dotAst(astRoot: nodes.AstNode): String = {
     val sb = new StringBuilder
-    sb.append(s"digraph ${method.name} {\n")
-    sb.append(dotFromMethod(method).mkString("\n"))
+    val name = astRoot match {
+      case method: nodes.Method => method.name
+      case _                    => ""
+    }
+    sb.append(s"digraph $name {\n")
+    sb.append(nodesAndEdges(astRoot).mkString("\n"))
     sb.append("\n}\n")
     sb.toString
   }
 
-  def dotFromMethod(method: nodes.Method): List[String] = {
+  private def nodesAndEdges(astRoot: nodes.AstNode): List[String] = {
 
     def shouldBeDisplayed(v: nodes.AstNode): Boolean = !v.isInstanceOf[nodes.MethodParameterOut]
 
-    val vertices = method.ast.where(shouldBeDisplayed).l
+    val vertices = astRoot.ast.where(shouldBeDisplayed).l
     val edges = vertices.map(v => (v.getId, v.start.astChildren.where(shouldBeDisplayed).id.l))
 
     val nodeStrings = vertices.map { node =>
