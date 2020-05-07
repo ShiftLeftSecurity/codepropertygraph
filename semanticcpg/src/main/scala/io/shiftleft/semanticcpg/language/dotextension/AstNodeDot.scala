@@ -22,8 +22,7 @@ class AstNodeDot[NodeType <: nodes.AstNode](val wrapped: NodeSteps[NodeType]) ex
       File.usingTemporaryFile("semanticcpg") { dotFile =>
         File.usingTemporaryFile("semanticcpg") { svgFile =>
           dotFile.write(dotString)
-          createSvgFile(dotFile, svgFile)
-          viewer.view(svgFile.path.toAbsolutePath.toString)
+          createSvgFile(dotFile, svgFile).toOption.foreach(_ => viewer.view(svgFile.path.toAbsolutePath.toString))
         }
       }
     }

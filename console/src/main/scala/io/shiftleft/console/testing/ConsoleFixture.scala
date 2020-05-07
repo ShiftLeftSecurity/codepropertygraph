@@ -6,7 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import better.files.Dsl.mkdir
 import better.files.File
 import io.shiftleft.console.cpgcreation.{CpgGenerator, LanguageFrontend}
-import io.shiftleft.console.{Console, ConsoleConfig, DefaultAmmoniteExecutor, InstallConfig}
+import io.shiftleft.console.{Console, ConsoleConfig, DefaultAmmoniteExecutor, InstallConfig, ToolsConfig}
 import io.shiftleft.console.workspacehandling.{Project, ProjectFile, WorkspaceLoader}
 import io.shiftleft.fuzzyc2cpg.FuzzyC2Cpg
 import io.shiftleft.proto.cpg.Cpg.CpgStruct
