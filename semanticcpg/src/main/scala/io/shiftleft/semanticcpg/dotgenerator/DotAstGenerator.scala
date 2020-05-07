@@ -8,15 +8,9 @@ object DotAstGenerator {
   def toDotAst[T <: nodes.AstNode](step: NodeSteps[T]): Steps[String] = step.map(dotAst)
 
   def dotAst(astRoot: nodes.AstNode): String = {
-    val sb = new StringBuilder
-    val name = astRoot match {
-      case method: nodes.Method => method.name
-      case _                    => ""
-    }
-    sb.append(s"digraph $name {\n")
+    val sb = Shared.namedGraphBegin(astRoot)
     sb.append(nodesAndEdges(astRoot).mkString("\n"))
-    sb.append("\n}\n")
-    sb.toString
+    Shared.graphEnd(sb)
   }
 
   private def nodesAndEdges(astRoot: nodes.AstNode): List[String] = {
@@ -38,18 +32,4 @@ object DotAstGenerator {
     nodeStrings ++ edgeStrings
   }
 
-  private def stringRepr(vertex: nodes.AstNode): String = {
-    vertex match {
-      case call: nodes.Call               => (call.name, call.code).toString
-      case expr: nodes.Expression         => (expr.label, expr.code).toString
-      case method: nodes.Method           => (method.label, method.name).toString
-      case ret: nodes.MethodReturn        => (ret.label, ret.typeFullName).toString
-      case param: nodes.MethodParameterIn => ("PARAM", param.code).toString
-      case _                              => ""
-    }
-  }
-
-  private def escape(str: String): String = {
-    str.replaceAllLiterally("\"", "\\\"")
-  }
 }
