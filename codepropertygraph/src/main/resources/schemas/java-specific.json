@@ -13,7 +13,7 @@
          "keys": ["CODE", "NAME", "FULL_NAME", "ORDER"],
          "comment" : "A method annotation",
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["ANNOTATION_PARAMETER_ASSIGN"]}
+             {"edgeName": "AST", "inNodes": [{"name": "ANNOTATION_PARAMETER_ASSIGN"}]}
          ],
           "is" : ["AST_NODE"]
         },
@@ -22,7 +22,12 @@
          "keys" : ["CODE", "ORDER"],
          "comment" : "Assignment of annotation argument to annotation parameter",
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["ANNOTATION_PARAMETER", "ARRAY_INITIALIZER", "ANNOTATION_LITERAL", "ANNOTATION"]}
+           {"edgeName": "AST", "inNodes": [
+            {"name": "ANNOTATION_PARAMETER"},
+            {"name": "ARRAY_INITIALIZER"},
+            {"name": "ANNOTATION_LITERAL"},
+            {"name": "ANNOTATION"}
+          ]}
          ],
           "is" : ["AST_NODE"]
         },
@@ -44,28 +49,28 @@
         {"name" : "ARRAY_INITIALIZER",
          "keys" : ["CODE", "ORDER", "ARGUMENT_INDEX", "COLUMN_NUMBER", "LINE_NUMBER"],
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["LITERAL"]},
-             {"edgeName": "EVAL_TYPE", "inNodes": ["TYPE"]}
+            {"edgeName": "AST", "inNodes": [{"name": "LITERAL"}]},
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
          ],
-	 "is" : ["EXPRESSION"]
+         "is" : ["EXPRESSION"]
         },
 
         // Modifications to existing node types
 
         {"name" : "METHOD", "keys" : ["BINARY_SIGNATURE"],
-         "outEdges" : [ {"edgeName": "AST", "inNodes": ["ANNOTATION"]} ]
+         "outEdges" : [ {"edgeName": "AST", "inNodes": [{"name": "ANNOTATION"}]} ]
         },
         {
          "name" : "METHOD_PARAMETER_IN", "keys" : [],
-         "outEdges" : [{"edgeName" : "AST", "inNodes" : ["ANNOTATION"] }]
+         "outEdges" : [ {"edgeName": "AST", "inNodes": [{"name": "ANNOTATION"}]} ]
         },
         {
          "name" : "TYPE_DECL", "keys" : [],
-         "outEdges" : [{"edgeName" : "AST", "inNodes" : ["ANNOTATION"] }]
+         "outEdges" : [ {"edgeName": "AST", "inNodes": [{"name": "ANNOTATION"}]} ]
         },
         {
          "name" : "MEMBER", "keys" : [],
-         "outEdges" : [{"edgeName" : "AST", "inNodes" : ["ANNOTATION"] }]
+         "outEdges" : [ {"edgeName": "AST", "inNodes": [{"name": "ANNOTATION"}]} ]
         },
 
         // Node to store config files.

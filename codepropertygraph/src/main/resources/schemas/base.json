@@ -74,10 +74,8 @@
          "name": "FILE",
          "keys": ["NAME", "ORDER"],
          "comment": "Node representing a source file. Often also the AST root",
-         "outEdges": [
-             {"edgeName": "AST", "inNodes": ["NAMESPACE_BLOCK"]}
-         ],
-	 "is" : ["AST_NODE"]
+         "outEdges": [{"edgeName": "AST", "inNodes": [{"name": "NAMESPACE_BLOCK"}]}],
+         "is" : ["AST_NODE"]
         },
 
         // Nodes of method declarations
@@ -87,10 +85,29 @@
 		  "LINE_NUMBER", "COLUMN_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER_END", "ORDER", "FILENAME"],
          "comment" : "A method/function/procedure",
          "is": ["DECLARATION", "CFG_NODE", "AST_NODE"],
-         "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["METHOD_RETURN", "METHOD_PARAMETER_IN",
-                                             "MODIFIER", "BLOCK", "TYPE_PARAMETER"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
+         "outEdges": [
+           {"edgeName": "AST",
+            "inNodes": [
+              {"name": "METHOD_RETURN"},
+              {"name": "METHOD_PARAMETER_IN"},
+              {"name": "MODIFIER"},
+              {"name": "BLOCK"},
+              {"name": "TYPE_PARAMETER"}
+            ]
+           },
+           {"edgeName": "CFG",
+            "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "METHOD_RETURN"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "UNKNOWN"}
+            ]
+           }
          ]
         },
 
@@ -118,40 +135,44 @@
          "keys" : ["NAME", "FULL_NAME", "TYPE_DECL_FULL_NAME"],
          "comment" : "A type which always has to reference a type declaration and may have type argument children if the referred to type declaration is a template",
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["TYPE_ARGUMENT"]}
+           {"edgeName": "AST", "inNodes": [{"name":"TYPE_ARGUMENT"}]}
          ]
         },
         {"id" : 46, "name" : "TYPE_DECL",
          "keys" : ["NAME", "FULL_NAME", "IS_EXTERNAL", "INHERITS_FROM_TYPE_FULL_NAME", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME", "ALIAS_TYPE_FULL_NAME", "ORDER", "FILENAME"],
          "comment" : "A type declaration",
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["TYPE_PARAMETER", "MEMBER", "MODIFIER"]},
-             {"edgeName": "BINDS", "inNodes": ["BINDING"]},
-             {"edgeName": "VTABLE", "inNodes": ["METHOD"]}
+           {"edgeName": "AST", "inNodes": [
+             {"name": "TYPE_PARAMETER"},
+             {"name": "MEMBER"},
+             {"name": "MODIFIER"}
+           ]},
+           {"edgeName": "BINDS", "inNodes": [{"name":"BINDING"}]},
+           {"edgeName": "VTABLE", "inNodes": [{"name":"METHOD"}]}
          ],
-	 "is" : ["AST_NODE"]
+         "is" : ["AST_NODE"]
         },
         {"id" : 146, "name" : "BINDING",
          "keys" : ["NAME", "SIGNATURE"],
          "comment" : "A binding of a METHOD into a TYPE_DECL",
          "outEdges" : [
-             {"edgeName": "REF", "inNodes": ["METHOD"]}
+           {"edgeName": "REF", "inNodes": [{"name":"METHOD"}]}
          ]
         },
         {"id" : 47, "name" : "TYPE_PARAMETER",
          "keys" : ["NAME", "ORDER"],
          "comment" : "Type parameter of TYPE_DECL or METHOD",
          "outEdges" : [],
-	 "is" : ["AST_NODE"]
+         "is" : ["AST_NODE"]
         },
         {"id" : 48, "name" : "TYPE_ARGUMENT",
          "keys" : ["ORDER"],
          "comment" : "Argument for a TYPE_PARAMETER that belongs to a TYPE. It binds another TYPE to a TYPE_PARAMETER",
          "outEdges" : [
-             {"edgeName": "REF", "inNodes": ["TYPE"]},
-             {"edgeName": "BINDS_TO", "inNodes": ["TYPE_PARAMETER"]}
+             {"edgeName": "REF", "inNodes": [{"name":"TYPE"}]},
+             {"edgeName": "BINDS_TO", "inNodes": [{"name":"TYPE_PARAMETER"}]}
          ],
-	 "is" : ["AST_NODE"]
+         "is" : ["AST_NODE"]
         },
 
         {"id" : 9, "name" : "MEMBER",
@@ -175,7 +196,18 @@
          "comment" : "Literal/Constant",
          "is": ["EXPRESSION"],
          "outEdges" : [
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+           {"edgeName": "CFG",
+            "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "UNKNOWN"}
+            ]
+           }
          ]
         },
         {"id": 15, "name" : "CALL",
@@ -183,10 +215,43 @@
          "comment" : "A (method)-call",
          "is": ["EXPRESSION", "CALL_REPR"],
          "outEdges" : [
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]},
-             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "CONTROL_STRUCTURE"]},
-             {"edgeName": "RECEIVER", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "BLOCK", "UNKNOWN"]},
-             {"edgeName": "ARGUMENT", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "BLOCK", "UNKNOWN"]}
+           {"edgeName": "CFG", "inNodes": [
+             {"name": "CALL"},
+             {"name": "IDENTIFIER"},
+             {"name": "FIELD_IDENTIFIER"},
+             {"name": "LITERAL"},
+             {"name": "METHOD_REF"},
+             {"name": "RETURN"},
+             {"name": "BLOCK"},
+             {"name": "UNKNOWN"}
+           ]},
+           {"edgeName": "AST", "inNodes": [
+             {"name": "CALL"},
+             {"name": "IDENTIFIER"},
+             {"name": "FIELD_IDENTIFIER"},
+             {"name": "LITERAL"},
+             {"name": "METHOD_REF"},
+             {"name": "RETURN"},
+             {"name": "BLOCK"},
+             {"name": "CONTROL_STRUCTURE"}
+           ]},
+           {"edgeName": "RECEIVER", "inNodes": [
+             {"name": "CALL"},
+             {"name": "IDENTIFIER"},
+             {"name": "LITERAL"},
+             {"name": "METHOD_REF"},
+             {"name": "BLOCK"},
+             {"name": "UNKNOWN"}
+           ]},
+           {"edgeName": "ARGUMENT", "inNodes": [
+             {"name": "CALL"},
+             {"name": "IDENTIFIER"},
+             {"name": "FIELD_IDENTIFIER"},
+             {"name": "LITERAL"},
+             {"name": "METHOD_REF"},
+             {"name": "BLOCK"},
+             {"name": "UNKNOWN"}
+           ]}
          ]
         },
         {"id":23, "name" : "LOCAL",
@@ -199,8 +264,21 @@
          "comment" : "An arbitrary identifier/reference",
          "is": ["EXPRESSION", "LOCAL_LIKE"],
          "outEdges" : [
-             {"edgeName": "REF", "inNodes": ["LOCAL", "METHOD_PARAMETER_IN"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
+           {"edgeName": "REF", "inNodes": [
+             {"name": "LOCAL"},
+             {"name": "METHOD_PARAMETER_IN"}
+           ]},
+           {"edgeName": "CFG", "inNodes": [
+             {"name": "CALL"},
+             {"name": "IDENTIFIER"},
+             {"name": "FIELD_IDENTIFIER"},
+             {"name": "LITERAL"},
+             {"name": "METHOD_REF"},
+             {"name": "METHOD_RETURN"},
+             {"name": "RETURN"},
+             {"name": "BLOCK"},
+             {"name": "UNKNOWN"}
+           ]}
          ]
         },
         {"id":2001081, "name": "FIELD_IDENTIFIER",
@@ -208,7 +286,16 @@
           "comment" : "A node that represents which field is accessed in a <operator>.fieldAccess, in e.g. obj.field. The CODE part is used for human display and matching to MEMBER nodes. The CANONICAL_NAME is used for dataflow tracking; typically both coincide. However, suppose that two fields foo and bar are a C-style union; then CODE refers to whatever the programmer wrote (obj.foo or obj.bar), but both share the same CANONICAL_NAME (e.g. GENERATED_foo_bar)",
           "is": ["EXPRESSION"],
           "outEdges" : [
-            {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+            {"edgeName": "CFG", "inNodes": [
+             {"name": "CALL"},
+             {"name": "IDENTIFIER"},
+             {"name": "FIELD_IDENTIFIER"},
+             {"name": "LITERAL"},
+             {"name": "METHOD_REF"},
+             {"name": "RETURN"},
+             {"name": "BLOCK"},
+             {"name": "UNKNOWN"}
+            ]}
           ]
         },
       {"id":30, "name": "RETURN",
@@ -216,9 +303,26 @@
          "comment" : "A return instruction",
          "is": [ "EXPRESSION"],
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN", "CONTROL_STRUCTURE"]},
-             {"edgeName": "CFG", "inNodes": ["METHOD_RETURN"]},
-             {"edgeName": "ARGUMENT", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+             {"edgeName": "AST", "inNodes": [
+               {"name": "CALL"},
+               {"name": "IDENTIFIER"},
+               {"name": "LITERAL"},
+               {"name": "METHOD_REF"},
+               {"name": "RETURN"},
+               {"name": "BLOCK"},
+               {"name": "UNKNOWN"},
+               {"name": "CONTROL_STRUCTURE"}
+             ]},
+             {"edgeName": "CFG", "inNodes": [{"name": "METHOD_RETURN"}]},
+             {"edgeName": "ARGUMENT", "inNodes": [
+               {"name": "CALL"},
+               {"name": "IDENTIFIER"},
+               {"name": "LITERAL"},
+               {"name": "METHOD_REF"},
+               {"name": "RETURN"},
+               {"name": "BLOCK"},
+               {"name": "UNKNOWN"}
+             ]}
          ]
         },
         {"id":31, "name": "BLOCK",
@@ -226,8 +330,27 @@
          "comment" : "A structuring block in the AST",
          "is": [ "EXPRESSION"],
          "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["CALL", "IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "LOCAL", "UNKNOWN", "CONTROL_STRUCTURE"]},
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "RETURN", "BLOCK", "UNKNOWN"]}
+             {"edgeName": "AST", "inNodes": [
+               {"name": "CALL"},
+               {"name": "IDENTIFIER"},
+               {"name": "LITERAL"},
+               {"name": "METHOD_REF"},
+               {"name": "RETURN"},
+               {"name": "BLOCK"},
+               {"name": "LOCAL"},
+               {"name": "UNKNOWN"},
+               {"name": "CONTROL_STRUCTURE"}
+             ]},
+             {"edgeName": "CFG", "inNodes": [
+               {"name": "CALL"},
+               {"name": "IDENTIFIER"},
+               {"name": "FIELD_IDENTIFIER"},
+               {"name": "LITERAL"},
+               {"name": "METHOD_REF"},
+               {"name": "RETURN"},
+               {"name": "BLOCK"},
+               {"name": "UNKNOWN"}
+             ]}
          ]
         },
         // METHOD_INST is deprecated.
@@ -235,7 +358,7 @@
          "keys":["NAME", "SIGNATURE", "FULL_NAME", "METHOD_FULL_NAME", "ORDER"],
          "comment":"A method instance which always has to reference a method and may have type argument children if the referred to method is a template",
          "outEdges": [
-             {"edgeName": "AST", "inNodes": ["TYPE_ARGUMENT"]}
+             {"edgeName": "AST", "inNodes": [{"name": "TYPE_ARGUMENT"}]}
          ],
 	 "is" : ["AST_NODE"]
         },
@@ -243,7 +366,7 @@
          "keys":[],
          "outEdges": [],
          "comment" : "Initialization construct for arrays",
-	 "is" : ["AST_NODE"]
+         "is" : ["AST_NODE"]
         },
 
         {"id":333, "name":"METHOD_REF",
@@ -251,7 +374,17 @@
           "comment":"Reference to a method instance",
          "is": ["EXPRESSION"],
           "outEdges": [
-            {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "METHOD_REF", "METHOD_RETURN", "RETURN", "BLOCK", "UNKNOWN"]}
+            {"edgeName": "CFG", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "METHOD_RETURN"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "UNKNOWN"}
+             ]}
           ]
         },
 
@@ -260,10 +393,29 @@
 	 "comment" : "A control structure such as if, while, or for",
 	 "is" : ["EXPRESSION"],
 	 "outEdges" : [
-             {"edgeName": "AST", "inNodes": ["LITERAL",
-                                             "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
-                                             "IDENTIFIER", "RETURN", "BLOCK", "UNKNOWN", "CONTROL_STRUCTURE"]},
-	     {"edgeName" : "CONDITION", "inNodes" : ["LITERAL", "CALL", "IDENTIFIER", "RETURN", "BLOCK", "METHOD_REF", "CONTROL_STRUCTURE", "UNKNOWN", "ARRAY_INITIALIZER"] }
+     {"edgeName": "AST", "inNodes": [
+        {"name": "LITERAL"},
+        {"name": "MODIFIER"},
+        {"name": "ARRAY_INITIALIZER"},
+        {"name": "CALL"},
+        {"name": "LOCAL"},
+        {"name": "IDENTIFIER"},
+        {"name": "RETURN"},
+        {"name": "BLOCK"},
+        {"name": "UNKNOWN"},
+        {"name": "CONTROL_STRUCTURE"}
+     ]},
+	   {"edgeName" : "CONDITION", "inNodes" : [
+        {"name": "LITERAL"},
+        {"name": "CALL"},
+        {"name": "IDENTIFIER"},
+        {"name": "RETURN"},
+        {"name": "BLOCK"},
+        {"name": "METHOD_REF"},
+        {"name": "CONTROL_STRUCTURE"},
+        {"name": "UNKNOWN"},
+        {"name": "ARRAY_INITIALIZER"}
+     ] }
 	 ]
 	},
 
@@ -274,10 +426,30 @@
          "comment" : "A language-specific node",
          "is": ["EXPRESSION"],
          "outEdges" : [
-             {"edgeName": "CFG", "inNodes": ["CALL", "IDENTIFIER", "FIELD_IDENTIFIER", "LITERAL", "RETURN", "METHOD_REF", "BLOCK", "UNKNOWN"]},
-             {"edgeName": "AST", "inNodes": ["LITERAL", "MEMBER",
-                                             "MODIFIER", "ARRAY_INITIALIZER", "CALL", "LOCAL",
-                                             "IDENTIFIER", "FIELD_IDENTIFIER", "RETURN", "BLOCK", "UNKNOWN", "CONTROL_STRUCTURE"]}
+           {"edgeName": "CFG", "inNodes": [
+             {"name": "CALL"},
+             {"name": "IDENTIFIER"},
+             {"name": "FIELD_IDENTIFIER"},
+             {"name": "LITERAL"},
+             {"name": "RETURN"},
+             {"name": "METHOD_REF"},
+             {"name": "BLOCK"},
+             {"name": "UNKNOWN"}
+             ]},
+           {"edgeName": "AST", "inNodes": [
+             {"name": "LITERAL"},
+             {"name": "MEMBER"},
+             {"name": "MODIFIER"},
+             {"name": "ARRAY_INITIALIZER"},
+             {"name": "CALL"},
+             {"name": "LOCAL"},
+             {"name": "IDENTIFIER"},
+             {"name": "FIELD_IDENTIFIER"},
+             {"name": "RETURN"},
+             {"name": "BLOCK"},
+             {"name": "UNKNOWN"},
+             {"name": "CONTROL_STRUCTURE"}
+           ]}
          ]
         }
     ],

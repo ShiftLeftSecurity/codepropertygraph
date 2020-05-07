@@ -10,7 +10,9 @@ class KeysFactsImporter extends FactsImporter {
 
   case class NodeKey(name: String, comment: String, valueType: String, cardinality: String)
 
-  case class OutEdgeEntry(edgeName: String, inNodes: List[String])
+  case class OutEdgeEntry(edgeName: String, inNodes: List[InNode])
+
+  case class InNode(name: String, cardinality: Option[String])
 
   case class ContainedNode(nodeType: String, localName: String, cardinality: String)
 
@@ -20,14 +22,11 @@ class KeysFactsImporter extends FactsImporter {
                       is: Option[List[String]],
                       containedNodes: Option[List[ContainedNode]])
 
-  implicit val outEdgeEntryRead: Reads[OutEdgeEntry] =
-    Json.reads[OutEdgeEntry]
-  implicit val containedNodeRead: Reads[ContainedNode] =
-    Json.reads[ContainedNode]
-  implicit val nodeKeysRead: Reads[NodeKey] =
-    Json.reads[NodeKey]
-  implicit val nodeTypesRead: Reads[NodeType] =
-    Json.reads[NodeType]
+  implicit val inNodeRead = Json.reads[InNode]
+  implicit val outEdgeEntryRead: Reads[OutEdgeEntry] = Json.reads[OutEdgeEntry]
+  implicit val containedNodeRead: Reads[ContainedNode] = Json.reads[ContainedNode]
+  implicit val nodeKeysRead: Reads[NodeKey] = Json.reads[NodeKey]
+  implicit val nodeTypesRead: Reads[NodeType] = Json.reads[NodeType]
 
   override def loadFacts: List[KeysFact] = {
     val nodeTypes = allNodeTypesByNodeTypeName
