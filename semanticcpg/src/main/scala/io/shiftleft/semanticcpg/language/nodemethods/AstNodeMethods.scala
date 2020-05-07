@@ -2,17 +2,13 @@ package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.overflowdb.traversal.help
-import io.shiftleft.overflowdb.traversal.help.Doc
 import io.shiftleft.semanticcpg.language._
 
-@help.Traversal(elementType = classOf[nodes.AstNode])
 class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
   /**
     * All nodes of the abstract syntax tree rooted in this node
     * */
-  @Doc("All nodes of the abstract syntax tree")
   def ast: NodeSteps[nodes.AstNode] = node.start.ast
 
   /**
@@ -43,11 +39,7 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
   def isBlock: Boolean = node.isInstanceOf[nodes.Block]
 
-  @Doc("Depth of the abstract syntax tree")
-  def depth: Int =
-    depth({ _ =>
-      true
-    }): Int
+  def depth: Int = depth(_ => true)
 
   /**
     * The depth of the AST rooted in this node. Upon walking
@@ -55,7 +47,6 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
     * nodes where `p(node)` is true.
     * */
   def depth(p: nodes.AstNode => Boolean): Int = {
-
     val additionalDepth = if (p(node)) { 1 } else { 0 }
 
     val childDepths = node.start.astChildren.map(_.depth(p)).l

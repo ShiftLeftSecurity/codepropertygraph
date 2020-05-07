@@ -2,20 +2,28 @@ package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 
 import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.overflowdb.traversal.help
+import io.shiftleft.overflowdb.traversal.help.Doc
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language._
 
+@help.Traversal(elementType = classOf[nodes.AstNode])
 class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
   private def raw: GremlinScala[A] = wrapped.raw
 
   /**
     * Nodes of the AST rooted in this node, including the node itself.
     * */
+  @Doc("All nodes of the abstract syntax tree")
   def ast: NodeSteps[nodes.AstNode] =
     new NodeSteps(raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
 
   def containsCallTo(regex: String): NodeSteps[A] =
     wrapped.where(_.ast.isCall.name(regex).size > 0)
+
+  @Doc("Depth of the abstract syntax tree")
+  def depth: Steps[Int] =
+    wrapped.map(_.depth)
 
   def depth(p: nodes.AstNode => Boolean): Steps[Int] =
     wrapped.map(_.depth(p))
