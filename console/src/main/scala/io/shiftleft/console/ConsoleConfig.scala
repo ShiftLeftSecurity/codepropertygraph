@@ -20,7 +20,14 @@ object InstallConfig {
 }
 
 class ConsoleConfig(val install: InstallConfig = InstallConfig(),
-                    val frontend: LanguageFrontendConfig = LanguageFrontendConfig()) {}
+                    val frontend: LanguageFrontendConfig = LanguageFrontendConfig(),
+                    val tools: ToolsConfig = ToolsConfig()) {}
+
+object ToolsConfig {
+  def apply(): ToolsConfig = new ToolsConfig()
+}
+
+class ToolsConfig(var imageViewer: String = "xdg-open")
 
 object LanguageFrontendConfig {
   def apply(): LanguageFrontendConfig = new LanguageFrontendConfig()

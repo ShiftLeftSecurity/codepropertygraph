@@ -23,7 +23,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
 }
 import io.shiftleft.overflowdb.traversal.Traversal
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
-import io.shiftleft.semanticcpg.language.dotextension.MethodDot
+import io.shiftleft.semanticcpg.language.dotextension.AstNodeDot
 import io.shiftleft.semanticcpg.language.nodemethods.{
   AstNodeMethods,
   CallMethods,
@@ -217,9 +217,12 @@ package object language extends operatorextension.Implicits {
 
   // Call graph extension
   implicit def toMethodForCallGraph(steps: Steps[nodes.Method]): Method = new Method(steps)
-  implicit def toMethodDOTForCallGraph(steps: Steps[nodes.Method]): MethodDot = new MethodDot(steps)
   implicit def toCallForCallGraph(steps: Steps[nodes.Call]): Call = new Call(steps)
   // / Call graph extension
+
+  //
+  implicit def toMethodDOTForCallGraph[NodeType <: nodes.AstNode](steps: Steps[NodeType]): AstNodeDot[NodeType] =
+    new AstNodeDot(steps)
 
   implicit def toNodeSteps[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =
     new NodeSteps[NodeType](original.raw)
