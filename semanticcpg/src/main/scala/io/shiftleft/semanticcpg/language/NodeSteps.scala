@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.language
 
 import gremlin.scala.{BranchCase, BranchOtherwise, GremlinScala, P, Vertex}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.overflowdb.traversal.help
 import io.shiftleft.overflowdb.traversal.help.Doc
 import io.shiftleft.semanticcpg.codedumper.CodeDumper
 
@@ -10,6 +11,7 @@ import io.shiftleft.semanticcpg.codedumper.CodeDumper
   *
   * This is the base class for all steps defined on nodes.
   * */
+@help.Traversal(elementType = classOf[nodes.StoredNode])
 class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) extends Steps[NodeType](raw) {
 
   @Doc(
@@ -107,7 +109,7 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
     )
   }
 
-  @Doc("Tags at this node")
+  @Doc("Tags attached to this node")
   def tagList: List[List[nodes.TagBase]] =
     raw.map { taggedNode =>
       taggedNode.tagList
