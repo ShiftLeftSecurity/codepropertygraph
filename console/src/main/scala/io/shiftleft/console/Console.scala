@@ -14,9 +14,11 @@ import io.shiftleft.console.workspacehandling.{Project, WorkspaceLoader, Workspa
 import io.shiftleft.overflowdb.traversal.help.{Doc, Table}
 import io.shiftleft.semanticcpg.Overlays
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.dotextension.ImageViewer
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, Scpg}
 
-import scala.util.Try
+import scala.sys.process.Process
+import scala.util.{Failure, Success, Try}
 
 class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[T]) extends ScriptManager(executor) {
 
@@ -26,6 +28,20 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
   protected val workspacePathName: String = config.install.rootPath.path.resolve("workspace").toString
   protected val workspaceManager = new WorkspaceManager[T](workspacePathName, loader)
   private val nameOfCpgInProject = "cpg.bin"
+
+  implicit object ConsoleImageViewer extends ImageViewer {
+    def view(imagePathStr: String): Try[String] = {
+      Try {
+        Process(Seq(config.tools.imageViewer, imagePathStr)).!!
+      } match {
+        case Success(v) => Success(v)
+        case Failure(exc) =>
+          System.err.println("Executing image viewer failed. Is it installed? ")
+          System.err.println(exc)
+          Failure(exc)
+      }
+    }
+  }
 
   @Doc(
     "Access to the workspace directory",
