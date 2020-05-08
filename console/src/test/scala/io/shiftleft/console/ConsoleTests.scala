@@ -275,6 +275,16 @@ class ConsoleTests extends WordSpec with Matchers {
       console.workspace.project("project1").exists(_.cpg.isDefined) shouldBe true
       console.workspace.project("project2").exists(_.cpg.isDefined) shouldBe true
     }
+
+    "copy working copy to persistent copy" in ConsoleFixture() { (console, codeDir) =>
+      console.importCode(codeDir.toString, "project1")
+      val projectPath = console.project.path
+      console.save
+      val persistentCpgSize = projectPath.resolve("cpg.bin").toFile.length()
+      val workingCpgSize = projectPath.resolve("cpg.bin.tmp").toFile.length()
+      persistentCpgSize shouldBe workingCpgSize
+    }
+
   }
 
   "cpg" should {
