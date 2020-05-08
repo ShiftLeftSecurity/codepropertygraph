@@ -21,7 +21,7 @@ object DotAstGenerator {
     val edges = vertices.map(v => (v.getId, v.start.astChildren.where(shouldBeDisplayed).id.l))
 
     val nodeStrings = vertices.map { node =>
-      s""""${node.getId}" [label = "${escape(stringRepr(node))}" ]""".stripMargin
+      s""""${node.getId}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
     }
 
     val edgeStrings = edges.flatMap {
