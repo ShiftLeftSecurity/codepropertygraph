@@ -29,7 +29,6 @@ lazy val semanticcpg = Projects.semanticcpg
 lazy val dataflowengine = Projects.dataflowengine
 lazy val cpgserver = Projects.cpgserver
 lazy val cpgvalidator = Projects.cpgvalidator
-lazy val cpg2overflowdb = Projects.cpg2overflowdb
 lazy val console = Projects.console
 lazy val queries = Projects.queries
 
