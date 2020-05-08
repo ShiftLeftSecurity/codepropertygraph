@@ -2,7 +2,6 @@ package io.shiftleft.console.workspacehandling
 
 import java.nio.file.Path
 
-
 import better.files.File
 import better.files.Dsl._
 import io.shiftleft.codepropertygraph.Cpg
@@ -54,12 +53,12 @@ case class Project(projectFile: ProjectFile, var path: Path, var cpg: Option[Cpg
     * Close project if it is open and do nothing otherwise.
     * */
   def close: Project = {
-    cpg.foreach{ c =>
+    cpg.foreach { c =>
       c.close()
       System.err.println("Turning working copy into new persistent CPG")
       val workingCopy = path.resolve(workCpgFileName)
       val persistent = path.resolve(persistentCpgFileName)
-      cp (workingCopy, persistent)
+      cp(workingCopy, persistent)
     }
     cpg = None
     this
