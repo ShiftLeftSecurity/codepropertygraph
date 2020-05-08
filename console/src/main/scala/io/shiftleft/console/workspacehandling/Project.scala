@@ -2,9 +2,16 @@ package io.shiftleft.console.workspacehandling
 
 import java.nio.file.Path
 
+
 import better.files.File
+import better.files.Dsl._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.Overlays
+
+object Project {
+  val workCpgFileName = "cpg.bin.tmp"
+  val persistentCpgFileName = "cpg.bin"
+}
 
 case class ProjectFile(inputPath: String, name: String)
 
@@ -13,6 +20,8 @@ case class ProjectFile(inputPath: String, name: String)
   * @param cpg reference to loaded CPG or None, if the CPG is not loaded
   * */
 case class Project(projectFile: ProjectFile, var path: Path, var cpg: Option[Cpg] = None) {
+
+  import Project._
 
   def name: String = projectFile.name
 
@@ -45,7 +54,13 @@ case class Project(projectFile: ProjectFile, var path: Path, var cpg: Option[Cpg
     * Close project if it is open and do nothing otherwise.
     * */
   def close: Project = {
-    cpg.foreach(_.close)
+    cpg.foreach{ c =>
+      c.close()
+      System.err.println("Turning working copy into new persistent CPG")
+      val workingCopy = path.resolve(workCpgFileName)
+      val persistent = path.resolve(persistentCpgFileName)
+      cp (workingCopy, persistent)
+    }
     cpg = None
     this
   }

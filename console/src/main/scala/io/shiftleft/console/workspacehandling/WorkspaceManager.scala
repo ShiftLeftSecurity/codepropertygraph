@@ -172,7 +172,7 @@ class WorkspaceManager[ProjectType <: Project](path: String, loader: WorkspaceLo
   /**
     * Filename for the base CPG for @inputPath
     * */
-  def baseCpgFilename(inputPath: String, isLegacy: Boolean = false): String = {
+  private def baseCpgFilename(inputPath: String, isLegacy: Boolean = false): String = {
     val baseFileName = if (isLegacy) LEGACY_BASE_CPG_FILENAME else BASE_CPG_FILENAME
     projectDir(inputPath).resolve(baseFileName).toString
   }
@@ -291,12 +291,16 @@ class WorkspaceManager[ProjectType <: Project](path: String, loader: WorkspaceLo
       project(name)
     } else {
       val cpgFilename = baseCpgFilename(name)
-
-      report(s"Loading base CPG from: $cpgFilename")
+      report("Creating working copy of CPG to be safe")
+      val cpgFile = File(cpgFilename)
+      val workingCopyPath = projectDir(name).resolve(Project.workCpgFileName)
+      val workingCopyName = workingCopyPath.toAbsolutePath.toString
+      cp(cpgFile, workingCopyPath)
+      report(s"Loading base CPG from: $workingCopyName")
 
       val result = {
-        val newCpg = loader(cpgFilename)
-        val projectPath = File(cpgFilename).parent.path
+        val newCpg = loader(workingCopyName)
+        val projectPath = File(workingCopyName).parent.path
         newCpg.flatMap { c =>
           unloadCpgIfExists(name)
           setCpgForProject(c, projectPath)

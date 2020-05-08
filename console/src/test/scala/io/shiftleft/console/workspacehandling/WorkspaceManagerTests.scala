@@ -82,6 +82,26 @@ class WorkspaceManagerTests extends WordSpec with Matchers {
       }
     }
 
+    "automatically create and open a cpg working copy on open" in {
+      File.usingTemporaryDirectory(tmpDirPrefix) { workspaceFile =>
+        val projectName = "myproject"
+        WorkspaceTests.createFakeProject(workspaceFile, projectName)
+        val manager = new WorkspaceManager[Project](workspaceFile.toString)
+        manager.openProject(projectName, { fileName: String =>
+          fileName.endsWith("cpg.bin.tmp") shouldBe true
+          Some(Cpg.emptyCpg)
+        })
+
+        val project = manager.project(projectName)
+        project match {
+          case Some(p) =>
+            p.path.resolve("cpg.bin").toFile.exists() shouldBe true
+            p.path.resolve("cpg.bin.tmp").toFile.exists() shouldBe true
+          case _ => fail
+        }
+      }
+    }
+
     "allow closing an open project" in {
       File.usingTemporaryDirectory(tmpDirPrefix) { workspaceFile =>
         val projectName = "myproject"
