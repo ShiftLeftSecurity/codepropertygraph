@@ -286,7 +286,6 @@ class WorkspaceManager[ProjectType <: Project](path: String, loader: WorkspaceLo
       report(s"CPG for project $name does not exist at ${baseCpgFilename(name)}, bailing out")
       None
     } else if (project(name).exists(_.cpg.isDefined)) {
-      report(s"project $name is already open. Making sure it is active.")
       setActiveProject(name)
       project(name)
     } else {
