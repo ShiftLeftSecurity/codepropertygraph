@@ -135,8 +135,9 @@
          ]
         },
         {"name" : "MEMBER", "outEdges" : [
-          {"edgeName": "DYNAMIC_TYPE", "inNodes": [{"name": "TYPE_DECL"}]}
-        ]
+          {"edgeName": "DYNAMIC_TYPE", "inNodes": [{"name": "TYPE_DECL"}]},
+	  {"edgeName": "TAGGED_BY", "inNodes": [{"name": "TAG"}]}
+	]
         },
 
         {"name" : "CALL", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"],
