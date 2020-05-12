@@ -8,6 +8,15 @@ import io.shiftleft.semanticcpg.language.types.structure._
 class Tag(val wrapped: NodeSteps[nodes.Tag]) extends AnyVal {
   private def raw: GremlinScala[nodes.Tag] = wrapped.raw
 
+  def member: NodeSteps[nodes.Member] =
+    new NodeSteps(
+      raw
+        .in(EdgeTypes.TAGGED_BY)
+        .hasLabel(NodeTypes.MEMBER)
+        .order(By((x: Vertex) => x.id))
+        .cast[nodes.Member]
+    )
+
   def method: NodeSteps[nodes.Method] =
     new NodeSteps(
       raw
