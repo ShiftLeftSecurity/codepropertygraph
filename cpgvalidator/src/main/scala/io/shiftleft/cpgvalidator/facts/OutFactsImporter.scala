@@ -11,6 +11,7 @@ class OutFactsImporter extends FactsImporter {
       NodeTypes.FILE has 0 to N outgoing EdgeTypes.AST to NodeTypes.NAMESPACE_BLOCK,
       NodeTypes.NAMESPACE_BLOCK has 0 to N outgoing EdgeTypes.AST to NodeTypes.METHOD,
       NodeTypes.NAMESPACE_BLOCK has 0 to N outgoing EdgeTypes.AST to NodeTypes.TYPE_DECL,
+      NodeTypes.NAMESPACE_BLOCK has 0 to N outgoing EdgeTypes.AST to NodeTypes.NAMESPACE_BLOCK,
       NodeTypes.METHOD has 1 outgoing EdgeTypes.AST to NodeTypes.METHOD_RETURN,
       NodeTypes.METHOD has 0 to N outgoing EdgeTypes.AST to NodeTypes.METHOD,
       NodeTypes.METHOD has 0 to N outgoing EdgeTypes.AST to NodeTypes.METHOD_PARAMETER_IN,
