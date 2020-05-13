@@ -4,8 +4,8 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.dataflowengine.layers.dataflows.{OssDataFlow, OssDataFlowOptions}
 import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
-import io.shiftleft.semanticcpg.testfixtures.{CodeToCpgFixture, LanguageFrontend}
 import io.shiftleft.dataflowengine.semanticsloader.SemanticsLoader
+import io.shiftleft.semanticcpg.testfixtures.{CodeToCpgFixture, LanguageFrontend}
 
 object DataFlowCodeToCpgFixture {
 

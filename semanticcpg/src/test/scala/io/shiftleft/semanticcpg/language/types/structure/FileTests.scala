@@ -1,9 +1,9 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.scalatest.{LoneElement, Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 
 class FileTests extends WordSpec with Matchers with LoneElement {
   val fileName = "io/shiftleft/testcode/file/FileTest.java"
