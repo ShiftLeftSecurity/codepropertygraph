@@ -5,8 +5,9 @@ import io.shiftleft.cpgvalidator._
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.{Cardinality, KeysFact}
 import io.shiftleft.cpgvalidator.facts.KeysFactsImporter
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.NodeTypes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, NodeKeys}
 import org.apache.tinkerpop.gremlin.structure.VertexProperty
+import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.jdk.CollectionConverters._
 
@@ -41,6 +42,12 @@ class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
   private def validateCardinalityOne(dstNode: Vertex, nodeKeyType: String): Unit = {
     val property = dstNode.property(nodeKeyType)
     if (null == property || !property.isPresent) {
+      // AST_PARENT_FULL_NAME and AST_PARENT_TYPE have cardinality one in our base.json but are
+      // in fact optional iff they are provided via an actual edge
+      if (nodeKeyType == NodeKeys.AST_PARENT_FULL_NAME || nodeKeyType == NodeKeys.AST_PARENT_FULL_NAME) {
+        val inheritsFrom = dstNode.vertices(Direction.OUT, EdgeTypes.INHERITS_FROM)
+        if (inheritsFrom.asScala.nonEmpty) return
+      }
       errorRegistry.addError(KeyError(dstNode, nodeKeyType, Cardinality.One))
     }
   }
