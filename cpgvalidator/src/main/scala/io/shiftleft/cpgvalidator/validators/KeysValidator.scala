@@ -44,7 +44,7 @@ class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
     if (null == property || !property.isPresent) {
       // AST_PARENT_FULL_NAME and AST_PARENT_TYPE have cardinality one in our base.json but are
       // in fact optional iff they are provided via an actual edge
-      if (nodeKeyType == NodeKeys.AST_PARENT_FULL_NAME || nodeKeyType == NodeKeys.AST_PARENT_FULL_NAME) {
+      if (nodeKeyType == NodeKeys.AST_PARENT_FULL_NAME || nodeKeyType == NodeKeys.AST_PARENT_TYPE) {
         val inheritsFrom = dstNode.vertices(Direction.OUT, EdgeTypes.INHERITS_FROM)
         if (inheritsFrom.asScala.nonEmpty) return
       }
