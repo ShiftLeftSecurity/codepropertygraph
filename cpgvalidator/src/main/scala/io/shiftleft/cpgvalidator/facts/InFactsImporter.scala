@@ -8,6 +8,9 @@ class InFactsImporter extends FactsImporter {
 
   override def loadFacts: List[InFact] =
     List(
+      NodeTypes.TYPE_DECL has 0 to 1 incoming EdgeTypes.AST from NodeTypes.METHOD,
+      NodeTypes.TYPE_DECL has 0 to 1 incoming EdgeTypes.AST from NodeTypes.TYPE_DECL,
+      NodeTypes.TYPE_DECL has 0 to 1 incoming EdgeTypes.AST from NodeTypes.NAMESPACE_BLOCK,
       NodeTypes.METHOD has 0 to 1 incoming EdgeTypes.AST from NodeTypes.METHOD,
       NodeTypes.METHOD has 0 to 1 incoming EdgeTypes.AST from NodeTypes.TYPE_DECL,
       NodeTypes.METHOD has 0 to N incoming EdgeTypes.REF from NodeTypes.BINDING,
