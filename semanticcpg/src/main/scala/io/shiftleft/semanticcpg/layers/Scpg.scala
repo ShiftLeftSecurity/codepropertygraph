@@ -91,6 +91,25 @@ class Scpg() extends LayerCreator {
           new CfgDominatorPass(cpg),
           new CdgPass(cpg),
         )
+      case Languages.LLVM =>
+        Iterator(
+          new TypeDeclStubCreator(cpg),
+          new MethodStubCreator(cpg),
+          new MethodDecoratorPass(cpg),
+          new CapturingLinker(cpg),
+          new Linker(cpg),
+          new FileNameCompat(cpg),
+          new FileLinker(cpg),
+          new BindingTableCompat(cpg),
+          new BindingMethodOverridesPass(cpg),
+          new CallLinker(cpg),
+          new MemberAccessLinker(cpg),
+          new MethodExternalDecoratorPass(cpg),
+          new ContainsEdgePass(cpg),
+          new NamespaceCreator(cpg),
+          new CfgDominatorPass(cpg),
+          new CdgPass(cpg),
+        )
     }
   }
 
