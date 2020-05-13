@@ -43,10 +43,14 @@ class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
     val property = dstNode.property(nodeKeyType)
     if (null == property || !property.isPresent) {
       // AST_PARENT_FULL_NAME and AST_PARENT_TYPE have cardinality one in our base.json but are
-      // in fact optional iff they are provided via an actual edge
+      // in fact optional iff the related information is provided via an AST edge
       if (nodeKeyType == NodeKeys.AST_PARENT_FULL_NAME || nodeKeyType == NodeKeys.AST_PARENT_TYPE) {
-        val inheritsFrom = dstNode.vertices(Direction.OUT, EdgeTypes.INHERITS_FROM)
-        if (inheritsFrom.asScala.nonEmpty) return
+        val incomingAstVertices = dstNode.vertices(Direction.IN, EdgeTypes.AST)
+        if (incomingAstVertices.asScala.exists(
+              v =>
+                v.label() == NodeTypes.TYPE_DECL
+                  || v.label() == NodeTypes.METHOD
+                  || v.label() == NodeTypes.NAMESPACE_BLOCK)) return
       }
       errorRegistry.addError(KeyError(dstNode, nodeKeyType, Cardinality.One))
     }
