@@ -21,6 +21,7 @@ class InFactsImporter extends FactsImporter {
       NodeTypes.TYPE has 0 to N incoming EdgeTypes.REF from NodeTypes.TYPE_ARGUMENT,
       NodeTypes.TYPE_PARAMETER has 1 incoming EdgeTypes.AST from NodeTypes.METHOD or NodeTypes.TYPE_DECL,
       NodeTypes.TYPE_PARAMETER has 0 to N incoming EdgeTypes.BINDS_TO from NodeTypes.TYPE_ARGUMENT,
+      NodeTypes.TYPE_DECL has 0 to N incoming EdgeTypes.INHERITS_FROM from NodeTypes.TYPE_DECL,
       NodeTypes.MEMBER has 1 incoming EdgeTypes.AST from NodeTypes.TYPE_DECL,
       NodeTypes.NAMESPACE_BLOCK has 0 to 1 incoming EdgeTypes.AST from NodeTypes.FILE,
       NodeTypes.NAMESPACE_BLOCK has 0 to 1 incoming EdgeTypes.AST from NodeTypes.METHOD,
