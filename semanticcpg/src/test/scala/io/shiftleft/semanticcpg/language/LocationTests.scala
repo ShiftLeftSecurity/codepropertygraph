@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
-import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
+import org.scalatest.{Matchers, WordSpec}
 
 class LocationTests extends WordSpec with Matchers {
 

@@ -1,9 +1,8 @@
 package io.shiftleft.semanticcpg.dotgenerator
 
 import org.scalatest.{Matchers, WordSpec}
-
-import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
 
 class DotAstGeneratorTests extends WordSpec with Matchers {
 
