@@ -15,7 +15,7 @@ object OssDataFlow {
 
 class OssDataFlowOptions(var semanticsFilename: String) extends LayerCreatorOptions {}
 
-class OssDataFlow(optionFunc: () => LayerCreatorOptions) extends LayerCreator {
+class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
 
   override val overlayName: String = OssDataFlow.overlayName
   override val description: String = OssDataFlow.description
@@ -23,7 +23,6 @@ class OssDataFlow(optionFunc: () => LayerCreatorOptions) extends LayerCreator {
   override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
     val cpg = context.cpg
     val serializedCpg = context.serializedCpg
-    val opts = optionFunc().asInstanceOf[OssDataFlowOptions]
     val semantics = new SemanticsLoader(opts.semanticsFilename).load()
     val enhancementExecList = Iterator(new PropagateEdgePass(cpg, semantics), new ReachingDefPass(cpg))
     enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg))
