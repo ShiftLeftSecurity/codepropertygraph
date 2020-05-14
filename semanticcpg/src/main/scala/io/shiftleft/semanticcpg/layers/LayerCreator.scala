@@ -13,9 +13,7 @@ abstract class LayerCreator {
   val description: String
   val dependsOn: List[String] = List()
 
-  def run(context: LayerCreatorContext,
-          options: Option[LayerCreatorOptions] = None,
-          serializeInverse: Boolean = false): Unit = {
+  def run(context: LayerCreatorContext, serializeInverse: Boolean = false): Unit = {
     val appliedOverlays = Overlays.appliedOverlays(context.cpg).toSet
     if (!dependsOn.toSet.subsetOf(appliedOverlays)) {
       logger.warn(
@@ -23,13 +21,11 @@ abstract class LayerCreator {
     } else if (appliedOverlays.contains(overlayName)) {
       logger.warn(s"The overlay $overlayName already exists - skipping creation")
     } else {
-      create(context, options, serializeInverse)
+      create(context, serializeInverse)
     }
   }
 
-  def create(context: LayerCreatorContext,
-             options: Option[LayerCreatorOptions],
-             serializeInverse: Boolean = false): Unit
+  def create(context: LayerCreatorContext, serializeInverse: Boolean = false): Unit
 
   /**
     * Heuristically determine if overlay has been
