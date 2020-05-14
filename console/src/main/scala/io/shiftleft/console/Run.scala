@@ -20,8 +20,21 @@ object Run {
       .map(t => (t.getSimpleName.toLowerCase, t.getName))
       .filter(t => !exclude.contains(t._2))
 
+    val optsMembersCode = layerCreatorTypeNames
+      .map { case (varName, typeName) => s"val $varName = $typeName.defaultOpts" }
+      .mkString("\n")
+
+    val optsCode =
+      s"""
+        |class OptsDynamic {
+        | $optsMembersCode
+        |}
+        |
+        |val opts = new OptsDynamic()
+        |""".stripMargin
+
     val membersCode = layerCreatorTypeNames
-      .map { case (varName, typeName) => s"def $varName: Cpg = _runAnalyzer(new $typeName())" }
+      .map { case (varName, typeName) => s"def $varName: Cpg = _runAnalyzer(new $typeName({ () => opts.$varName}))" }
       .mkString("\n")
 
     val toStringCode =
@@ -38,7 +51,8 @@ object Run {
          | }
          |""".stripMargin
 
-    s"""
+    optsCode +
+      s"""
        | class OverlaysDynamic {
        |
        | $membersCode

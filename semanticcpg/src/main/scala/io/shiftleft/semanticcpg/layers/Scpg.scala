@@ -28,16 +28,18 @@ import io.shiftleft.semanticcpg.language._
 object Scpg {
   val overlayName: String = "semanticcpg"
   val description: String = "linked code property graph (OSS)"
+
+  def defaultOpts = new LayerCreatorOptions()
 }
 
-class Scpg() extends LayerCreator {
+class Scpg(options: () => LayerCreatorOptions = { () =>
+  null
+}) extends LayerCreator {
 
   override val overlayName: String = Scpg.overlayName
   override val description: String = Scpg.description
 
-  override def create(context: LayerCreatorContext,
-                      options: Option[LayerCreatorOptions],
-                      serializeInverse: Boolean): Unit = {
+  override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
     val cpg = context.cpg
     val serializedCpg = context.serializedCpg
     val language = cpg.metaData.language
