@@ -236,11 +236,11 @@
              {"name": "CONTROL_STRUCTURE"}
            ]},
            {"edgeName": "RECEIVER", "inNodes": [
-             {"name": "CALL"},
-             {"name": "IDENTIFIER"},
-             {"name": "LITERAL"},
-             {"name": "METHOD_REF"},
-             {"name": "BLOCK"},
+             {"name": "CALL", "cardinality": "0-1:0-1"},
+             {"name": "IDENTIFIER", "cardinality": "0-1:0-1"},
+             {"name": "LITERAL", "cardinality": "0-1:0-1"},
+             {"name": "METHOD_REF", "cardinality": "0-1:0-1"},
+             {"name": "BLOCK", "cardinality": "0-1:0-1"},
              {"name": "UNKNOWN"}
            ]},
            {"edgeName": "ARGUMENT", "inNodes": [
