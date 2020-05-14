@@ -265,8 +265,8 @@
          "is": ["EXPRESSION", "LOCAL_LIKE"],
          "outEdges" : [
            {"edgeName": "REF", "inNodes": [
-             {"name": "LOCAL"},
-             {"name": "METHOD_PARAMETER_IN"}
+             {"name": "LOCAL", "cardinality":"n:0-1"},
+             {"name": "METHOD_PARAMETER_IN", "cardinality":"n:0-1"}
            ]},
            {"edgeName": "CFG", "inNodes": [
              {"name": "CALL"},
