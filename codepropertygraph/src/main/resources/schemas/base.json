@@ -289,7 +289,7 @@
           "is": ["EXPRESSION"],
           "outEdges" : [
             {"edgeName": "CFG", "inNodes": [
-             {"name": "CALL"},
+             {"name": "CALL", "cardinality": "n:1"},
              {"name": "IDENTIFIER"},
              {"name": "FIELD_IDENTIFIER"},
              {"name": "LITERAL"},
