@@ -102,7 +102,7 @@
               {"name": "FIELD_IDENTIFIER"},
               {"name": "LITERAL"},
               {"name": "METHOD_REF"},
-              {"name": "METHOD_RETURN"},
+              {"name": "METHOD_RETURN", "cardinality":"n:0-1"},
               {"name": "RETURN"},
               {"name": "BLOCK"},
               {"name": "UNKNOWN"}
