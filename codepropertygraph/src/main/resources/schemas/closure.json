@@ -17,7 +17,7 @@
       "comment":"Represents the binding of a LOCAL or METHOD_PARAMETER_IN into the closure of a method",
       "outEdges": [
         {"edgeName": "REF", "inNodes": [
-          {"name": "LOCAL"},
+          {"name": "LOCAL", "cardinality": "n:1"},
           {"name": "METHOD_PARAMETER_IN"}
         ]}
       ]
