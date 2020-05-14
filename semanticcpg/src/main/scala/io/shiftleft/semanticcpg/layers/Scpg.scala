@@ -32,9 +32,7 @@ object Scpg {
   def defaultOpts = new LayerCreatorOptions()
 }
 
-class Scpg(options: () => LayerCreatorOptions = { () =>
-  null
-}) extends LayerCreator {
+class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
 
   override val overlayName: String = Scpg.overlayName
   override val description: String = Scpg.description

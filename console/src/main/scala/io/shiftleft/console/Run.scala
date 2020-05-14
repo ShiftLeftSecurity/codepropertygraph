@@ -34,7 +34,7 @@ object Run {
         |""".stripMargin
 
     val membersCode = layerCreatorTypeNames
-      .map { case (varName, typeName) => s"def $varName: Cpg = _runAnalyzer(new $typeName({ () => opts.$varName}))" }
+      .map { case (varName, typeName) => s"def $varName: Cpg = _runAnalyzer(new $typeName(opts.$varName))" }
       .mkString("\n")
 
     val toStringCode =
