@@ -91,7 +91,7 @@
               {"name": "METHOD_RETURN", "cardinality":"1:1"},
               {"name": "METHOD_PARAMETER_IN"},
               {"name": "MODIFIER"},
-              {"name": "BLOCK"},
+              {"name": "BLOCK", "cardinality":"1:1"},
               {"name": "TYPE_PARAMETER"}
             ]
            },
