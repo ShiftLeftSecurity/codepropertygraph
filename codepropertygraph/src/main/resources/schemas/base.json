@@ -317,12 +317,12 @@
                {"name": "METHOD_RETURN", "cardinality": "0-1:1"}
               ]},
              {"edgeName": "ARGUMENT", "inNodes": [
-               {"name": "CALL"},
-               {"name": "IDENTIFIER"},
-               {"name": "LITERAL"},
-               {"name": "METHOD_REF"},
-               {"name": "RETURN"},
-               {"name": "BLOCK"},
+               {"name": "CALL", "cardinality": "0-1:0-1"},
+               {"name": "IDENTIFIER", "cardinality": "0-1:0-1"},
+               {"name": "LITERAL", "cardinality": "0-1:0-1"},
+               {"name": "METHOD_REF", "cardinality": "0-1:0-1"},
+               {"name": "RETURN", "cardinality": "0-1:0-1"},
+               {"name": "BLOCK", "cardinality": "0-1:0-1"},
                {"name": "UNKNOWN"}
              ]}
          ]
