@@ -66,7 +66,7 @@
            {"edgeName": "TAGGED_BY", "inNodes": [{"name": "TAG"}]},
            {"edgeName": "DYNAMIC_TYPE", "inNodes": [
              {"name": "TYPE_DECL"},
-             {"name": "METHOD"}
+             {"name": "METHOD", "cardinality": "n:0-1"}
            ]},
            {"edgeName": "POST_DOMINATE", "inNodes": [
              {"name": "CALL"},
