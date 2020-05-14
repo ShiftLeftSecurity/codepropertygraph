@@ -313,7 +313,9 @@
                {"name": "UNKNOWN"},
                {"name": "CONTROL_STRUCTURE"}
              ]},
-             {"edgeName": "CFG", "inNodes": [{"name": "METHOD_RETURN"}]},
+             {"edgeName": "CFG", "inNodes": [
+               {"name": "METHOD_RETURN", "cardinality": "0-1:1"}
+              ]},
              {"edgeName": "ARGUMENT", "inNodes": [
                {"name": "CALL"},
                {"name": "IDENTIFIER"},
