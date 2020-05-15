@@ -91,7 +91,7 @@
               {"name": "METHOD_RETURN", "cardinality":"1:1"},
               {"name": "METHOD_PARAMETER_IN"},
               {"name": "MODIFIER"},
-              {"name": "BLOCK"},
+              {"name": "BLOCK", "cardinality":"1:1"},
               {"name": "TYPE_PARAMETER"}
             ]
            },
@@ -102,7 +102,7 @@
               {"name": "FIELD_IDENTIFIER"},
               {"name": "LITERAL"},
               {"name": "METHOD_REF"},
-              {"name": "METHOD_RETURN"},
+              {"name": "METHOD_RETURN", "cardinality":"0-1:0-1"},
               {"name": "RETURN"},
               {"name": "BLOCK"},
               {"name": "UNKNOWN"}
@@ -156,7 +156,9 @@
          "keys" : ["NAME", "SIGNATURE"],
          "comment" : "A binding of a METHOD into a TYPE_DECL",
          "outEdges" : [
-           {"edgeName": "REF", "inNodes": [{"name":"METHOD"}]}
+           {"edgeName": "REF", "inNodes": [
+            {"name":"METHOD", "cardinality": "n:1"}
+           ]}
          ]
         },
         {"id" : 47, "name" : "TYPE_PARAMETER",
@@ -236,11 +238,11 @@
              {"name": "CONTROL_STRUCTURE"}
            ]},
            {"edgeName": "RECEIVER", "inNodes": [
-             {"name": "CALL"},
-             {"name": "IDENTIFIER"},
-             {"name": "LITERAL"},
-             {"name": "METHOD_REF"},
-             {"name": "BLOCK"},
+             {"name": "CALL", "cardinality": "0-1:0-1"},
+             {"name": "IDENTIFIER", "cardinality": "0-1:0-1"},
+             {"name": "LITERAL", "cardinality": "0-1:0-1"},
+             {"name": "METHOD_REF", "cardinality": "0-1:0-1"},
+             {"name": "BLOCK", "cardinality": "0-1:0-1"},
              {"name": "UNKNOWN"}
            ]},
            {"edgeName": "ARGUMENT", "inNodes": [
@@ -265,8 +267,8 @@
          "is": ["EXPRESSION", "LOCAL_LIKE"],
          "outEdges" : [
            {"edgeName": "REF", "inNodes": [
-             {"name": "LOCAL"},
-             {"name": "METHOD_PARAMETER_IN"}
+             {"name": "LOCAL", "cardinality":"n:0-1"},
+             {"name": "METHOD_PARAMETER_IN", "cardinality":"n:0-1"}
            ]},
            {"edgeName": "CFG", "inNodes": [
              {"name": "CALL"},
@@ -287,7 +289,7 @@
           "is": ["EXPRESSION"],
           "outEdges" : [
             {"edgeName": "CFG", "inNodes": [
-             {"name": "CALL"},
+             {"name": "CALL", "cardinality": "0-1:1"},
              {"name": "IDENTIFIER"},
              {"name": "FIELD_IDENTIFIER"},
              {"name": "LITERAL"},
@@ -313,14 +315,16 @@
                {"name": "UNKNOWN"},
                {"name": "CONTROL_STRUCTURE"}
              ]},
-             {"edgeName": "CFG", "inNodes": [{"name": "METHOD_RETURN"}]},
+             {"edgeName": "CFG", "inNodes": [
+               {"name": "METHOD_RETURN", "cardinality": "0-1:1"}
+              ]},
              {"edgeName": "ARGUMENT", "inNodes": [
-               {"name": "CALL"},
-               {"name": "IDENTIFIER"},
-               {"name": "LITERAL"},
-               {"name": "METHOD_REF"},
-               {"name": "RETURN"},
-               {"name": "BLOCK"},
+               {"name": "CALL", "cardinality": "0-1:0-1"},
+               {"name": "IDENTIFIER", "cardinality": "0-1:0-1"},
+               {"name": "LITERAL", "cardinality": "0-1:0-1"},
+               {"name": "METHOD_REF", "cardinality": "0-1:0-1"},
+               {"name": "RETURN", "cardinality": "0-1:0-1"},
+               {"name": "BLOCK", "cardinality": "0-1:0-1"},
                {"name": "UNKNOWN"}
              ]}
          ]

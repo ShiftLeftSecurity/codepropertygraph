@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 
 class MethodReturnMethods(val node: nodes.MethodReturn) extends AnyVal {
 
-  def toReturn: Iterator[nodes.Return] =
+  def toReturn: Option[nodes.Return] =
     node._returnViaCfgIn
 
 }

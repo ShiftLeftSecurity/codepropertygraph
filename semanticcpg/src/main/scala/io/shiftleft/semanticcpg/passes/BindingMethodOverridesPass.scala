@@ -20,10 +20,10 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
       val parentTypeDecls = typeDecl._typeViaInheritsFromOut.flatMap { _._typeDeclViaRefOut }.toList
       for (binding <- typeDecl._bindingViaBindsOut) {
         if (!overwritten.contains(binding)) {
-          val method = binding._methodViaRefOut.next
+          val method = binding._methodViaRefOut.get
           for (parentTypeDecl <- parentTypeDecls) {
             val parentBinding = bindingTable.get((binding.name, binding.signature, parentTypeDecl))
-            if (parentBinding.isDefined && parentBinding.get._methodViaRefOut.next != method) {
+            if (parentBinding.isDefined && parentBinding.get._methodViaRefOut.get != method) {
               markRecurse(parentBinding.get)
             }
           }

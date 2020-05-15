@@ -33,7 +33,5 @@ class MethodReturn(val wrapped: NodeSteps[nodes.MethodReturn]) extends AnyVal {
     new NodeSteps(raw.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type])
 
   def toReturn: NodeSteps[nodes.Return] =
-    new NodeSteps(raw.flatMap { mr =>
-      __(mr.toReturn.toSeq: _*)
-    })
+    new NodeSteps(raw.map(_.toReturn).collect { case Some(ret) => ret })
 }
