@@ -13,7 +13,9 @@ class SerializedCpg extends AutoCloseable {
     * We allow creating a dummy serialized CPG that does not do anything.
     */
   private[this] var zipFileSystem: FileSystem = null
+  private[this] var fname: String = null
   private[this] var counter = 0
+  private[this] var bytesWritten = 0
 
   /**
     * Create Serialized CPG from existing file. If the file does not exist,
@@ -21,6 +23,7 @@ class SerializedCpg extends AutoCloseable {
     **/
   def this(filename: String) {
     this()
+    fname = filename
     initZipFilesystem(filename)
   }
 
@@ -42,12 +45,19 @@ class SerializedCpg extends AutoCloseable {
     **/
   @throws[IOException]
   def addOverlay(overlay: GeneratedMessageV3, name: String): Unit = {
+
     if (!isEmpty) {
       val pathInZip = zipFileSystem.getPath(s"${counter}_${name}")
       counter += 1
       val outputStream = Files.newOutputStream(pathInZip)
       overlay.writeTo(outputStream)
       outputStream.close()
+    }
+    val bytesUntilFlush = 500000;
+    bytesWritten += overlay.getSerializedSize
+    if (bytesWritten > bytesUntilFlush) {
+      flush
+      bytesWritten = 0
     }
   }
 
@@ -56,6 +66,12 @@ class SerializedCpg extends AutoCloseable {
     overlays.zipWithIndex.foreach {
       case (overlay, i) => addOverlay(overlay, name + "_" + i)
     }
+  }
+
+  @throws[IOException]
+  def flush: Unit = {
+    zipFileSystem.close()
+    initZipFilesystem(fname)
   }
 
   @throws[IOException]
