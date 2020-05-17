@@ -57,10 +57,12 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "") extends CpgPas
     } else {
       withStartEndTimesLogged {
         init()
-        val thread = startWriterThread(true, inverse, prefix, serializedCpg)
+        val shouldStore = true
+        val thread = startWriterThread(shouldStore, inverse, prefix, serializedCpg)
         try {
           val it = new ParallelIteratorExecutor(nodeIterator).map { node =>
-            writer.enqueue(Some(runOnNode(node)))
+            val diffGraph = Some(runOnNode(node))
+            writer.enqueue(diffGraph)
           }
           consume(it)
         } finally {
@@ -118,12 +120,13 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "") extends CpgPas
             terminate = true
           } else {
             val diffGraph = maybeDiffGraph.get
-            DiffGraph.Applier.applyDiff(diffGraph, cpg)
             if (shouldStore) {
               val overlay = diffGraphToSerialized(diffGraph, inverse)
               val name = prefix + "_" + outputName + "_" + index
               index += 1
               store(overlay, name, serializedCpg)
+            } else {
+              DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse)
             }
           }
         }
