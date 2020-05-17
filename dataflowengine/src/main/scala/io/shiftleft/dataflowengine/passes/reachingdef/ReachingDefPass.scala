@@ -7,21 +7,19 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{Call, FieldIdentifier, Identifier, Literal, StoredNode}
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
-import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
+import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
 import io.shiftleft.semanticcpg.language._
 
-import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
-class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
+class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   val dfHelper = new DataFlowFrameworkHelper(cpg.graph)
 
-  override def run(): Iterator[DiffGraph] = {
-    val methods = cpg.method.toIterator
+  override def nodeIterator: Iterator[nodes.Method] = cpg.method.toIterator
 
-    new ParallelIteratorExecutor(methods).map { method =>
+  override def runOnNode(method : nodes.Method): DiffGraph = {
       val dstGraph = DiffGraph.newBuilder
       val worklist = mutable.Set.empty[nodes.CfgNode]
       var out = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
@@ -65,7 +63,6 @@ class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
 
       addReachingDefEdge(dstGraph, method, out, in)
       dstGraph.build()
-    }
   }
 
   /** Pruned DDG, i.e., two call assignment vertices are adjacent if a

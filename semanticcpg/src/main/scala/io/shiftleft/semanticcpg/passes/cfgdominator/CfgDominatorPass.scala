@@ -4,20 +4,17 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
+import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
 /**
   * This pass has no prerequisites.
   */
-class CfgDominatorPass(cpg: Cpg) extends CpgPass(cpg) {
+class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[Vertex](cpg) {
 
-  override def run(): Iterator[DiffGraph] = {
-    val methodsIterator = cpg.method.toIterator()
-    new ParallelIteratorExecutor(methodsIterator).map(perMethod)
-  }
+  override def nodeIterator: Iterator[Vertex] = cpg.method.toIterator()
 
-  private def perMethod(method: Vertex): DiffGraph = {
+  override def runOnNode(method: Vertex): DiffGraph = {
     val cfgAdapter = new CpgCfgAdapter()
     val dominatorCalculator = new CfgDominator(cfgAdapter)
 
