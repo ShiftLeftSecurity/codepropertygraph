@@ -1,17 +1,21 @@
 package io.shiftleft
 
-import java.io.IOException
+import java.io.{File, IOException}
+import java.net.{URI, URISyntaxException}
+import java.nio.file.{FileSystem, FileSystems, Files}
+import java.util
+
 import com.google.protobuf.GeneratedMessageV3
-import better.files._
-import better.files.Dsl._
 
 class SerializedCpg extends AutoCloseable {
 
   /**
     * We allow creating a dummy serialized CPG that does not do anything.
     */
-  private[this] var counter = 0
+  private[this] var zipFileSystem: FileSystem = null
   private[this] var fname: String = null
+  private[this] var counter = 0
+  private[this] var bytesWritten = 0
 
   /**
     * Create Serialized CPG from existing file. If the file does not exist,
@@ -20,20 +24,41 @@ class SerializedCpg extends AutoCloseable {
   def this(filename: String) {
     this()
     fname = filename
-    mkdirs(File(filename))
+    initZipFilesystem(filename)
   }
 
-  def isEmpty: Boolean = fname == null
+  def isEmpty: Boolean = zipFileSystem == null
+
+  @throws[URISyntaxException]
+  @throws[IOException]
+  private[this] def initZipFilesystem(filename: String): Unit = {
+    val env = new util.HashMap[String, String]
+    // This ensures that the file is created if it does not exist
+    env.put("create", "true")
+    val fileUri = new File(filename).toURI
+    val outputUri = new URI("jar:" + fileUri.getScheme, null, fileUri.getPath, null)
+    zipFileSystem = FileSystems.newFileSystem(outputUri, env)
+  }
 
   /**
     * Add overlay graph named `name` to the zip file
     **/
   @throws[IOException]
   def addOverlay(overlay: GeneratedMessageV3, name: String): Unit = {
-    val outputStream = (File(fname) / s"${counter}_${name}").newOutputStream
-    counter += 1
-    overlay.writeTo(outputStream)
-    outputStream.close()
+
+    if (!isEmpty) {
+      val pathInZip = zipFileSystem.getPath(s"${counter}_${name}")
+      counter += 1
+      val outputStream = Files.newOutputStream(pathInZip)
+      overlay.writeTo(outputStream)
+      outputStream.close()
+    }
+    val bytesUntilFlush = 500000;
+    bytesWritten += overlay.getSerializedSize
+    if (bytesWritten > bytesUntilFlush) {
+      flush
+      bytesWritten = 0
+    }
   }
 
   @throws[IOException]
@@ -43,5 +68,16 @@ class SerializedCpg extends AutoCloseable {
     }
   }
 
-  override def close(): Unit = {}
+  @throws[IOException]
+  def flush: Unit = {
+    zipFileSystem.close()
+    initZipFilesystem(fname)
+  }
+
+  @throws[IOException]
+  override def close(): Unit = {
+    if (!isEmpty) {
+      zipFileSystem.close()
+    }
+  }
 }
