@@ -7,13 +7,13 @@ import overflowdb.codegen._
 import sys.process._
 
 /**
-  * Allows ocular users to extend the cpg schema, by providing additional json files.
+  * Allows to extend the cpg schema, by providing additional json files.
   * The user-provided json schema is are merged with the original cpg schema, and the generated nodefiles are compiled again.
-  * Then, these are classes are overridden in the repl fat jar (io.shiftleft.repl-*.jar).
-  * To enable the user to perform the same operation again, the original repl jar is backed up.
+  * Then, these are classes are overridden in the jar containing the old generated classes (must be passed in as parameter).
+  * To enable the user to perform the same operation again, the original jar is backed up.
   *  */
 object SchemaExtender extends App {
-  val ocularInstallDir  = ".." // "/home/mp/bin/ocular"
+  val ocularInstallDir  = ".."
   val schemaExtenderDir = s"$ocularInstallDir/schema-extender"
   val classesOutDir     = File(s"$schemaExtenderDir/generated/classes")
 
