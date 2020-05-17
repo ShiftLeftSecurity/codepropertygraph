@@ -57,7 +57,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "") extends CpgPas
     } else {
       withStartEndTimesLogged {
         init()
-        val thread = startWriterThread(false, inverse, prefix, serializedCpg)
+        val thread = startWriterThread(true, inverse, prefix, serializedCpg)
         try {
           val it = new ParallelIteratorExecutor(nodeIterator).map { node =>
             writer.enqueue(Some(runOnNode(node)))
