@@ -14,7 +14,8 @@ import scala.jdk.CollectionConverters._
 class ContainsEdgePass(cpg: Cpg) extends ParallelCpgPass[nodes.AstNode](cpg) {
   import ContainsEdgePass.{destinationTypes, sourceTypes}
 
-  override def nodeIterator: Iterator[nodes.AstNode] = cpg.graph.nodesByLabel(sourceTypes: _*).asScala.map(_.asInstanceOf[nodes.AstNode])
+  override def nodeIterator: Iterator[nodes.AstNode] =
+    cpg.graph.nodesByLabel(sourceTypes: _*).asScala.map(_.asInstanceOf[nodes.AstNode])
 
   override def runOnNode(source: nodes.AstNode): DiffGraph = {
     val dstGraph = DiffGraph.newBuilder

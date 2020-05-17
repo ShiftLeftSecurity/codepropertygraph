@@ -48,13 +48,13 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") extends CpgPassBase(cpg, 
     * @param prefix a prefix to add to the output name
     * */
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
-                                   inverse: Boolean = false,
-                                   prefix: String = ""): Unit = {
+                                            inverse: Boolean = false,
+                                            prefix: String = ""): Unit = {
     if (serializedCpg.isEmpty) {
       createAndApply()
     } else {
       val overlays = withStartEndTimesLogged {
-        run().map {diffGraphToSerialized(_, inverse)}
+        run().map { diffGraphToSerialized(_, inverse) }
       }
       overlays.zipWithIndex.foreach {
         case (overlay, index) => {
@@ -71,7 +71,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") extends CpgPassBase(cpg, 
     */
   override def createApplyAndSerialize(inverse: Boolean = false): Unit =
     withStartEndTimesLogged {
-      run().foreach {diffGraphToSerialized(_, inverse)}
+      run().foreach { diffGraphToSerialized(_, inverse) }
     }
 
   /**
@@ -111,16 +111,13 @@ private[passes] case class IdentityHashWrapper[T <: AnyRef](value: T) {
       (this.value eq other.asInstanceOf[IdentityHashWrapper[T]].value)
 }
 
-abstract class CpgPassBase(cpg : Cpg, outName : String) {
+abstract class CpgPassBase(cpg: Cpg, outName: String) {
 
   def createAndApply(): Unit
 
   def createApplyAndSerialize(inverse: Boolean = false): Unit
 
-  def createApplySerializeAndStore(serializedCpg: SerializedCpg,
-                                   inverse: Boolean = false,
-                                   prefix: String = ""): Unit
-
+  def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false, prefix: String = ""): Unit
 
   private val logger: Logger = LogManager.getLogger(classOf[CpgPassBase])
 
@@ -138,7 +135,7 @@ abstract class CpgPassBase(cpg : Cpg, outName : String) {
     }
   }
 
-  def diffGraphToSerialized(diffGraph : DiffGraph, inverse : Boolean) : GeneratedMessageV3 = {
+  def diffGraphToSerialized(diffGraph: DiffGraph, inverse: Boolean): GeneratedMessageV3 = {
     val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse)
     if (inverse) {
       new DiffGraphProtoSerializer().serialize(appliedDiffGraph.inverseDiffGraph.get)
@@ -147,7 +144,7 @@ abstract class CpgPassBase(cpg : Cpg, outName : String) {
     }
   }
 
-  def store(overlay: GeneratedMessageV3, name : String, serializedCpg: SerializedCpg): Unit = {
+  def store(overlay: GeneratedMessageV3, name: String, serializedCpg: SerializedCpg): Unit = {
     if (overlay.getSerializedSize > 0) {
       serializedCpg.addOverlay(overlay, name)
     }

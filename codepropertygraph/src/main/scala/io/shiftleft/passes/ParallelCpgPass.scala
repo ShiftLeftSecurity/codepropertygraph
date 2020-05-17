@@ -6,15 +6,15 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import org.slf4j.LoggerFactory
 
-abstract class ParallelCpgPass[T](cpg : Cpg, outName : String = "") extends CpgPassBase(cpg, outName) {
+abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "") extends CpgPassBase(cpg, outName) {
 
-  def nodeIterator : Iterator[T]
+  def nodeIterator: Iterator[T]
 
-  def runOnNode(node : T) : DiffGraph
+  def runOnNode(node: T): DiffGraph
 
   def init() = {}
 
-  var writer : SequentialDiffApplier = null
+  var writer: SequentialDiffApplier = null
 
   /**
     * Execute the enhancement and apply result to the underlying graph
@@ -50,26 +50,31 @@ abstract class ParallelCpgPass[T](cpg : Cpg, outName : String = "") extends CpgP
     * @param prefix a prefix to add to the output name
     * */
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
-                                   inverse: Boolean = false,
-                                   prefix: String = ""): Unit = {
+                                            inverse: Boolean = false,
+                                            prefix: String = ""): Unit = {
     if (serializedCpg.isEmpty) {
       createAndApply()
     } else {
-      init()
-      val thread = startWriterThread(false, inverse, prefix, serializedCpg)
-      try {
-        val it = new ParallelIteratorExecutor(nodeIterator).map { node =>
-          writer.enqueue(Some(runOnNode(node)))
+      withStartEndTimesLogged {
+        init()
+        val thread = startWriterThread(false, inverse, prefix, serializedCpg)
+        try {
+          val it = new ParallelIteratorExecutor(nodeIterator).map { node =>
+            writer.enqueue(Some(runOnNode(node)))
+          }
+          consume(it)
+        } finally {
+          stopWriterThread()
+          thread.join()
         }
-        consume(it)
-      } finally {
-        stopWriterThread()
-        thread.join()
       }
     }
   }
 
-  private def startWriterThread(shouldStore : Boolean, inverse : Boolean = false, prefix : String ="", serializedCpg: SerializedCpg = new SerializedCpg()) = {
+  private def startWriterThread(shouldStore: Boolean,
+                                inverse: Boolean = false,
+                                prefix: String = "",
+                                serializedCpg: SerializedCpg = new SerializedCpg()) = {
     writer = new SequentialDiffApplier(cpg, shouldStore, inverse, prefix, serializedCpg)
     val writerThread = new Thread(writer)
     writerThread.setName("DiffGraphWriter")
@@ -81,17 +86,22 @@ abstract class ParallelCpgPass[T](cpg : Cpg, outName : String = "") extends CpgP
     writer.enqueue(None)
   }
 
-  private def consume(it :Iterator[_]): Unit = {
-    while(it.hasNext) {
+  private def consume(it: Iterator[_]): Unit = {
+    while (it.hasNext) {
       it.next()
     }
   }
 
-  class SequentialDiffApplier(cpg : Cpg, shouldStore : Boolean, inverse : Boolean, prefix : String, serializedCpg: SerializedCpg) extends Runnable {
+  class SequentialDiffApplier(cpg: Cpg,
+                              shouldStore: Boolean,
+                              inverse: Boolean,
+                              prefix: String,
+                              serializedCpg: SerializedCpg)
+      extends Runnable {
 
     private val queue = new LinkedBlockingQueue[Option[DiffGraph]]()
 
-    def enqueue(diffGraph : Option[DiffGraph]): Unit = {
+    def enqueue(diffGraph: Option[DiffGraph]): Unit = {
       queue.put(diffGraph)
     }
 
@@ -100,7 +110,7 @@ abstract class ParallelCpgPass[T](cpg : Cpg, outName : String = "") extends CpgP
     override def run(): Unit = {
       try {
         var terminate = false;
-        var index : Int = 0
+        var index: Int = 0
         while (!terminate) {
           val maybeDiffGraph = queue.take()
           if (maybeDiffGraph.isEmpty) {
@@ -109,7 +119,7 @@ abstract class ParallelCpgPass[T](cpg : Cpg, outName : String = "") extends CpgP
           } else {
             val diffGraph = maybeDiffGraph.get
             DiffGraph.Applier.applyDiff(diffGraph, cpg)
-            if(shouldStore) {
+            if (shouldStore) {
               val overlay = diffGraphToSerialized(diffGraph, inverse)
               val name = prefix + "_" + outputName + "_" + index
               index += 1
@@ -123,7 +133,4 @@ abstract class ParallelCpgPass[T](cpg : Cpg, outName : String = "") extends CpgP
     }
   }
 
-
 }
-
-
