@@ -10,6 +10,8 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.console.testing._
 import io.shiftleft.semanticcpg.layers.Scpg
 
+import scala.util.Try
+
 class ConsoleTests extends WordSpec with Matchers {
 
   "importCode" should {
@@ -221,14 +223,14 @@ class ConsoleTests extends WordSpec with Matchers {
       console.project.path.resolve("overlays").toFile.list().size shouldBe numOverlayFilesBefore
     }
 
-    "store directory for each overlay in project" in ConsoleFixture() { (console, codeDir) =>
+    "store zip files for each overlay in project" in ConsoleFixture() { (console, codeDir) =>
       console.importCode(codeDir.toString)
       val overlayDir = console.project.path.resolve("overlays")
       overlayDir.toFile.list.toSet shouldBe Set("semanticcpg")
 
       val overlayFiles = overlayDir.toFile.listFiles()
       overlayFiles.foreach { file =>
-        File(file.getPath).isDirectory shouldBe true
+        isZipFile(File(file.getPath)) shouldBe true
       }
     }
   }
@@ -290,6 +292,13 @@ class ConsoleTests extends WordSpec with Matchers {
       console.importCode(codeDir.toString)
       console.cpg.help.contains(".all") shouldBe true
     }
+  }
+
+  private def isZipFile(file: File): Boolean = {
+    val bytes = file.bytes
+    Try {
+      bytes.next() == 'P' && bytes.next() == 'K'
+    }.getOrElse(false)
   }
 
 }

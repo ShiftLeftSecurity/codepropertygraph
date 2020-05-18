@@ -7,62 +7,65 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{Call, FieldIdentifier, Identifier, Literal, StoredNode}
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
-import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
+import io.shiftleft.passes.{CpgPass, DiffGraph, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
 import io.shiftleft.semanticcpg.language._
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
-class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
+class ReachingDefPass(cpg: Cpg) extends CpgPass(cpg) {
   val dfHelper = new DataFlowFrameworkHelper(cpg.graph)
 
-  override def nodeIterator: Iterator[nodes.Method] = cpg.method.toIterator
+  override def run(): Iterator[DiffGraph] = {
+    val methods = cpg.method.toIterator
 
-  override def runOnNode(method: nodes.Method): DiffGraph = {
-    val dstGraph = DiffGraph.newBuilder
-    val worklist = mutable.Set.empty[nodes.CfgNode]
-    var out = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
-    var in = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
-    val allCfgNodes = method.cfgNode.to(List)
+    new ParallelIteratorExecutor(methods).map { method =>
+      val dstGraph = DiffGraph.newBuilder
+      val worklist = mutable.Set.empty[nodes.CfgNode]
+      var out = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
+      var in = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
+      val allCfgNodes = method.cfgNode.to(List)
 
-    val mapExpressionsGens = dfHelper.expressionsToGenMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
-    val mapExpressionsKills = dfHelper.expressionsToKillMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
+      val mapExpressionsGens = dfHelper.expressionsToGenMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
+      val mapExpressionsKills = dfHelper.expressionsToKillMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
 
-    /*Initialize the OUT sets*/
-    allCfgNodes.foreach { cfgNode =>
-      if (mapExpressionsGens.contains(cfgNode)) {
-        out += cfgNode -> mapExpressionsGens(cfgNode)
-      }
-    }
-
-    worklist ++= allCfgNodes
-
-    while (worklist.nonEmpty) {
-      val currentCfgNode = worklist.head
-      worklist -= currentCfgNode
-
-      var inSet = Set.empty[nodes.StoredNode]
-
-      currentCfgNode._cfgIn.asScala.foreach { cfgPredecessor =>
-        inSet ++= inSet.union(out(cfgPredecessor))
+      /*Initialize the OUT sets*/
+      allCfgNodes.foreach { cfgNode =>
+        if (mapExpressionsGens.contains(cfgNode)) {
+          out += cfgNode -> mapExpressionsGens(cfgNode)
+        }
       }
 
-      in += currentCfgNode -> inSet
+      worklist ++= allCfgNodes
 
-      val oldSize = out(currentCfgNode).size
-      val gens = mapExpressionsGens(currentCfgNode)
-      val kills = mapExpressionsKills(currentCfgNode)
+      while (worklist.nonEmpty) {
+        val currentCfgNode = worklist.head
+        worklist -= currentCfgNode
 
-      out += currentCfgNode -> gens.union(inSet.diff(kills))
-      val newSize = out(currentCfgNode).size
+        var inSet = Set.empty[nodes.StoredNode]
 
-      if (oldSize != newSize)
-        worklist ++= currentCfgNode._cfgOut.asScala.collect { case cfgNode: nodes.CfgNode => cfgNode }
+        currentCfgNode._cfgIn.asScala.foreach { cfgPredecessor =>
+          inSet ++= inSet.union(out(cfgPredecessor))
+        }
+
+        in += currentCfgNode -> inSet
+
+        val oldSize = out(currentCfgNode).size
+        val gens = mapExpressionsGens(currentCfgNode)
+        val kills = mapExpressionsKills(currentCfgNode)
+
+        out += currentCfgNode -> gens.union(inSet.diff(kills))
+        val newSize = out(currentCfgNode).size
+
+        if (oldSize != newSize)
+          worklist ++= currentCfgNode._cfgOut.asScala.collect { case cfgNode: nodes.CfgNode => cfgNode }
+      }
+
+      addReachingDefEdge(dstGraph, method, out, in)
+      dstGraph.build()
     }
-
-    addReachingDefEdge(dstGraph, method, out, in)
-    dstGraph.build()
   }
 
   /** Pruned DDG, i.e., two call assignment vertices are adjacent if a

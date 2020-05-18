@@ -8,7 +8,6 @@ import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct, DiffGraph}
 import org.apache.logging.log4j.LogManager
 import java.util.{Collection => JCollection, List => JList}
 
-import better.files.File
 import com.google.protobuf.GeneratedMessageV3
 
 import scala.jdk.CollectionConverters._
@@ -55,23 +54,22 @@ object ProtoCpgLoader {
   def loadDiffGraphs(fileName: String): Try[Iterator[DiffGraph]] =
     loadOverlays(fileName, DiffGraph.parseFrom)
 
-  private def loadOverlays[T <: GeneratedMessageV3](fileName: String, f: InputStream => T): Try[Iterator[T]] = {
-    Try {
-      File(fileName).list.toList
+  private def loadOverlays[T <: GeneratedMessageV3](fileName: String, f: InputStream => T): Try[Iterator[T]] =
+    Using(new ZipArchive(fileName)) { zip =>
+      zip.entries
         .sortWith(compareOverlayPath)
-        .map { file =>
-          val is = Files.newInputStream(file.path)
+        .map { path =>
+          val is = Files.newInputStream(path)
           f(is)
         }
         .iterator
     }
-  }
 
-  private def compareOverlayPath(a: File, b: File): Boolean = {
-    val file1Split: Array[String] = a.name.replace("/", "").split("_")
-    val file2Split: Array[String] = b.name.replace("/", "").split("_")
+  private def compareOverlayPath(a: Path, b: Path): Boolean = {
+    val file1Split: Array[String] = a.toString.replace("/", "").split("_")
+    val file2Split: Array[String] = b.toString.replace("/", "").split("_")
     if (file1Split.length < 2 || file2Split.length < 2)
-      a.name < b.name
+      a.toString < b.toString
     else
       file1Split(0).toInt < file2Split(0).toInt
   }
