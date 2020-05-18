@@ -9,6 +9,13 @@ import scala.jdk.CollectionConverters._
 
 trait ICallResolver {
 
+  def getUnresolvedMethodFullNames(callsite: nodes.CallRepr): Iterable[String] = {
+    triggerCallsiteResolution(callsite)
+    getUnresolvedMethodFullNamesInternal(callsite)
+  }
+
+  def getUnresolvedMethodFullNamesInternal(callsite: nodes.CallRepr): Iterable[String]
+
   /**
     * Get methods called at the given callsite.
     * This internally calls triggerCallsiteResolution.
@@ -86,6 +93,10 @@ object NoResolve extends ICallResolver {
   }
 
   override def getResolvedMethodCallsites(method: Method): Iterable[CallRepr] = {
+    Iterable.empty
+  }
+
+  override def getUnresolvedMethodFullNamesInternal(callsite: CallRepr): Iterable[String] = {
     Iterable.empty
   }
 }
