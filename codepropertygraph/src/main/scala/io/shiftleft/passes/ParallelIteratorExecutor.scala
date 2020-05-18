@@ -5,7 +5,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 class ParallelIteratorExecutor[T](iterator: Iterator[T]) {
-  def map[D](func: T => D): Iterator[D] = {
+  def map[D <: DiffGraph](func: T => D): Iterator[D] = {
     val futures = Future.traverse(iterator) { element =>
       Future {
         func(element)

@@ -1,8 +1,9 @@
 package io.shiftleft.semanticcpg.layers
 
+import gremlin.scala.GraphAsScala
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes}
-import io.shiftleft.passes.CpgPassBase
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Languages, NodeTypes}
+import io.shiftleft.passes.CpgPass
 import io.shiftleft.semanticcpg.Overlays
 import io.shiftleft.semanticcpg.passes.BindingMethodOverridesPass
 import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
@@ -48,7 +49,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
     Overlays.appendOverlayName(cpg, Scpg.overlayName)
   }
 
-  private def createEnhancementExecList(cpg: Cpg, language: String): Iterator[CpgPassBase] = {
+  private def createEnhancementExecList(cpg: Cpg, language: String): Iterator[CpgPass] = {
     language match {
       case Languages.JAVA =>
         Iterator(
