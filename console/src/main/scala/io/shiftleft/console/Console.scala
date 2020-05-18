@@ -222,13 +222,23 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     "undo"
   )
   def undo: File = {
-    project.overlayFiles.lastOption
-      .map { file =>
-        CpgLoader.addDiffGraphs(List(file.path.toString), cpg)
+    project.overlayDirs.lastOption
+      .map { dir =>
+        val zipFiles = dir.list.toList.sortWith(compareFiles).reverse.map(_.path.toString)
+        CpgLoader.addDiffGraphs(zipFiles, cpg)
         Overlays.removeLastOverlayName(cpg)
-        rm(file)
+        dir.delete()
       }
       .getOrElse(throw new RuntimeException("No overlays present"))
+  }
+
+  private def compareFiles(a: File, b: File): Boolean = {
+    val splitA = a.name.split("_")
+    val splitB = b.name.split("_")
+    if (splitA.length < 2 || splitB.length < 2)
+      a.toString < b.toString
+    else
+      splitA(0).toInt < splitB(0).toInt
   }
 
   @Doc(
@@ -529,7 +539,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
       if (projectOpt.get.appliedOverlays.contains(creator.overlayName)) {
         report(s"Overlay ${creator.overlayName} already exists - skipping")
       } else {
-        // mkdirs(File(overlayDirName))
+        mkdirs(File(overlayDirName))
         val context = new LayerCreatorContext(cpg, Some(overlayDirName))
         creator.run(context, serializeInverse = true)
       }

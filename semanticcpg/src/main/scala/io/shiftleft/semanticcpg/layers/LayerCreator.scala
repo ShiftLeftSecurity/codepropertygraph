@@ -1,5 +1,7 @@
 package io.shiftleft.semanticcpg.layers
 
+import better.files.File
+import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import org.apache.logging.log4j.LogManager
 import io.shiftleft.semanticcpg.Overlays
@@ -21,6 +23,13 @@ abstract class LayerCreator {
       logger.warn(s"The overlay $overlayName already exists - skipping creation")
     } else {
       create(context, serializeInverse)
+    }
+  }
+
+  protected def initSerializedCpg(outputDir: Option[String], passName: String, index: Int): SerializedCpg = {
+    outputDir match {
+      case Some(dir) => new SerializedCpg((File(dir) / s"${index}_$passName").path.toAbsolutePath.toString)
+      case None      => new SerializedCpg()
     }
   }
 
