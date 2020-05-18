@@ -31,7 +31,6 @@ lazy val cpgserver = Projects.cpgserver
 lazy val cpgvalidator = Projects.cpgvalidator
 lazy val console = Projects.console
 lazy val queries = Projects.queries
-lazy val schemaExtender = Projects.schemaExtender
 
 ThisBuild/scalacOptions ++= Seq(
   "-deprecation",
