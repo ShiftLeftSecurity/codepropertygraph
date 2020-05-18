@@ -147,7 +147,7 @@
              {"name": "MEMBER", "cardinaliy": "n:1"},
              {"name": "MODIFIER", "cardinaliy": "n:1"}
            ]},
-           {"edgeName": "BINDS", "inNodes": [{"name":"BINDING"}]},
+           {"edgeName": "BINDS", "inNodes": [{"name":"BINDING", "cardinaliy": "n:1"}]},
            {"edgeName": "VTABLE", "inNodes": [{"name":"METHOD"}]}
          ],
          "is" : ["AST_NODE"]
@@ -230,7 +230,7 @@
            {"edgeName": "AST", "inNodes": [
              {"name": "CALL"},
              {"name": "IDENTIFIER"},
-             {"name": "FIELD_IDENTIFIER"},
+             {"name": "FIELD_IDENTIFIER", "cardinaliy": "n:1"},
              {"name": "LITERAL"},
              {"name": "METHOD_REF"},
              {"name": "RETURN"},
@@ -247,11 +247,11 @@
            ]},
            {"edgeName": "ARGUMENT", "inNodes": [
              {"name": "CALL", "cardinaliy": "n:0-1"},
-             {"name": "IDENTIFIER"},
-             {"name": "FIELD_IDENTIFIER"},
+             {"name": "IDENTIFIER", "cardinaliy": "n:0-1"},
+             {"name": "FIELD_IDENTIFIER", "cardinaliy": "n:1"},
              {"name": "LITERAL", "cardinaliy": "n:0-1"},
-             {"name": "METHOD_REF"},
-             {"name": "BLOCK"},
+             {"name": "METHOD_REF", "cardinaliy": "n:0-1"},
+             {"name": "BLOCK", "cardinaliy": "n:0-1"},
              {"name": "UNKNOWN"}
            ]}
          ]
@@ -340,7 +340,7 @@
                {"name": "LITERAL"},
                {"name": "METHOD_REF"},
                {"name": "RETURN"},
-               {"name": "BLOCK"},
+               {"name": "BLOCK", "cardinaliy": "n:1"},
                {"name": "LOCAL"},
                {"name": "UNKNOWN"},
                {"name": "CONTROL_STRUCTURE"}
@@ -403,11 +403,12 @@
         {"name": "ARRAY_INITIALIZER"},
         {"name": "CALL", "cardinaliy": "n:1"},
         {"name": "LOCAL"},
-        {"name": "IDENTIFIER"},
-        {"name": "RETURN"},
-        {"name": "BLOCK"},
+        {"name": "IDENTIFIER", "cardinaliy": "n:0-1"},
+        {"name": "RETURN", "cardinaliy": "n:0-1"},
+        {"name": "BLOCK", "cardinaliy": "n:0-1"},
         {"name": "UNKNOWN"},
-        {"name": "CONTROL_STRUCTURE"}
+        {"name": "CONTROL_STRUCTURE"},
+        {"name": "METHOD_REF", "cardinaliy": "n:1"}
      ]},
 	   {"edgeName" : "CONDITION", "inNodes" : [
         {"name": "LITERAL"},
