@@ -3,7 +3,7 @@ package io.shiftleft.dataflowengine.layers.dataflows
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.dataflowengine.passes.propagateedges.PropagateEdgePass
 import io.shiftleft.dataflowengine.passes.reachingdef.ReachingDefPass
-import io.shiftleft.dataflowengine.semanticsloader.{Semantics, SemanticsLoader}
+import io.shiftleft.dataflowengine.semanticsloader.SemanticsLoader
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, LayerCreatorOptions}
 
 object OssDataFlow {
@@ -22,10 +22,15 @@ class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
 
   override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
     val cpg = context.cpg
-    val serializedCpg = context.serializedCpg
+
     val semantics = new SemanticsLoader(opts.semanticsFilename).load()
     val enhancementExecList = Iterator(new PropagateEdgePass(cpg, semantics), new ReachingDefPass(cpg))
-    enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg))
+    enhancementExecList.zipWithIndex.foreach {
+      case (pass, index) =>
+        val serializedCpg = initSerializedCpg(context.outputDir, pass.name, index)
+        pass.createApplySerializeAndStore(serializedCpg)
+        serializedCpg.close()
+    }
   }
 
   override def probe(cpg: Cpg): Boolean = {

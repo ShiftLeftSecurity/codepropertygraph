@@ -1,5 +1,6 @@
 package io.shiftleft.semanticcpg.layers
 
+import better.files.File
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import org.apache.logging.log4j.LogManager
@@ -25,6 +26,13 @@ abstract class LayerCreator {
     }
   }
 
+  protected def initSerializedCpg(outputDir: Option[String], passName: String, index: Int): SerializedCpg = {
+    outputDir match {
+      case Some(dir) => new SerializedCpg((File(dir) / s"${index}_$passName").path.toAbsolutePath.toString)
+      case None      => new SerializedCpg()
+    }
+  }
+
   def create(context: LayerCreatorContext, serializeInverse: Boolean = false): Unit
 
   /**
@@ -37,5 +45,5 @@ abstract class LayerCreator {
 
 }
 
-class LayerCreatorContext(val cpg: Cpg, val serializedCpg: SerializedCpg = new SerializedCpg()) {}
+class LayerCreatorContext(val cpg: Cpg, val outputDir: Option[String] = None) {}
 class LayerCreatorOptions()

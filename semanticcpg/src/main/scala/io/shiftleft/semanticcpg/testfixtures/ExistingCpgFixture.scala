@@ -9,7 +9,7 @@ private class ExistingCpgFixture(projectName: String) {
   private val config = CpgLoaderConfig.withoutOverflow
   private val cpgFilename = s"resources/testcode/cpgs/$projectName/cpg.bin.zip"
   lazy val cpg = CpgLoader.load(cpgFilename, config)
-  val context = new LayerCreatorContext(cpg, new SerializedCpg())
+  val context = new LayerCreatorContext(cpg)
   new Scpg().run(context)
   implicit val graph: Graph = cpg.graph
   lazy val scalaGraph: ScalaGraph = graph

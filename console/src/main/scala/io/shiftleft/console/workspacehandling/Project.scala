@@ -34,7 +34,7 @@ case class Project(projectFile: ProjectFile, var path: Path, var cpg: Option[Cpg
     File(path.resolve("overlays")).list.map(_.name).toList
   }
 
-  def overlayFiles: List[File] = {
+  def overlayDirs: List[File] = {
     val overlayDir = File(path.resolve("overlays"))
     appliedOverlays.map(o => overlayDir / o)
   }

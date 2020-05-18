@@ -29,9 +29,10 @@ class SerializedCpg extends AutoCloseable {
   @throws[URISyntaxException]
   @throws[IOException]
   private[this] def initZipFilesystem(filename: String): Unit = {
-    val env = new util.HashMap[String, String]
+    val env = new util.HashMap[String, AnyRef]
     // This ensures that the file is created if it does not exist
     env.put("create", "true")
+    env.put("useTempFile", java.lang.Boolean.TRUE)
     val fileUri = new File(filename).toURI
     val outputUri = new URI("jar:" + fileUri.getScheme, null, fileUri.getPath, null)
     zipFileSystem = FileSystems.newFileSystem(outputUri, env)
