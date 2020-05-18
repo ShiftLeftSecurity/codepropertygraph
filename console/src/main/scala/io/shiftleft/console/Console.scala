@@ -540,13 +540,17 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
         report(s"Overlay ${creator.overlayName} already exists - skipping")
       } else {
         mkdirs(File(overlayDirName))
-        val context = new LayerCreatorContext(cpg, Some(overlayDirName))
-        creator.run(context, serializeInverse = true)
+        runCreator(creator, Some(overlayDirName))
       }
     }
     report(
       "The graph has been modified. You may want to use the `save` command to persist changes to disk.  All changes will also be saved collectively on exit")
     cpg
+  }
+
+  protected def runCreator(creator: LayerCreator, overlayDirName: Option[String]): Unit = {
+    val context = new LayerCreatorContext(cpg, overlayDirName)
+    creator.run(context, serializeInverse = true)
   }
 
 }
