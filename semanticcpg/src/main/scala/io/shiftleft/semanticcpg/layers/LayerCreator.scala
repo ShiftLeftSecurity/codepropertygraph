@@ -1,6 +1,5 @@
 package io.shiftleft.semanticcpg.layers
 
-import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import org.apache.logging.log4j.LogManager
 import io.shiftleft.semanticcpg.Overlays
@@ -37,5 +36,5 @@ abstract class LayerCreator {
 
 }
 
-class LayerCreatorContext(val cpg: Cpg, val serializedCpg: SerializedCpg = new SerializedCpg()) {}
+class LayerCreatorContext(val cpg: Cpg, val outputDir: Option[String] = None) {}
 class LayerCreatorOptions()

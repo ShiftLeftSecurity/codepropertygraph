@@ -215,7 +215,7 @@ class WorkspaceManager[ProjectType <: Project](path: String, loader: WorkspaceLo
 
   def projectExistsForCpg(baseCpg: Cpg): Boolean = projectByCpg(baseCpg).isDefined
 
-  def getNextOverlayFilename(baseCpg: Cpg, overlayName: String): String = {
+  def getNextOverlayDirName(baseCpg: Cpg, overlayName: String): String = {
     val project = projectByCpg(baseCpg).get
     val overlayDirectory = File(overlayDirByProjectName(project.name))
 

@@ -1,6 +1,5 @@
 package io.shiftleft.dataflowengine.language
 
-import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.dataflowengine.layers.dataflows.{OssDataFlow, OssDataFlowOptions}
 import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
@@ -14,7 +13,7 @@ object DataFlowCodeToCpgFixture {
     new CodeToCpgFixture(frontend).buildCpg(sourceCode, passes)(fun)
 
   private def passes(cpg: Cpg): Unit = {
-    val context = new LayerCreatorContext(cpg, new SerializedCpg())
+    val context = new LayerCreatorContext(cpg)
     new Scpg().run(context)
     val options = new OssDataFlowOptions("dataflowengine/src/test/resources/default.semantics")
     new OssDataFlow(options).run(context)

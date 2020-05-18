@@ -3,7 +3,6 @@ package io.shiftleft.console
 import better.files.Dsl._
 import better.files.File
 import gremlin.scala.{GraphAsScala, ScalaGraph}
-import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.CpgLoader
 import io.shiftleft.codepropertygraph.generated.Languages
@@ -519,8 +518,8 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
   def _runAnalyzer(overlayCreators: LayerCreator*): Cpg = {
 
     overlayCreators.foreach { creator =>
-      val overlayOutFilename =
-        workspace.getNextOverlayFilename(cpg, creator.overlayName)
+      val overlayDirName =
+        workspace.getNextOverlayDirName(cpg, creator.overlayName)
 
       val projectOpt = workspace.projectByCpg(cpg)
       if (projectOpt.isEmpty) {
@@ -530,19 +529,14 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
       if (projectOpt.get.appliedOverlays.contains(creator.overlayName)) {
         report(s"Overlay ${creator.overlayName} already exists - skipping")
       } else {
-        val serializedCpg = new SerializedCpg(overlayOutFilename)
-        runCreator(creator, serializedCpg)
-        serializedCpg.close()
+        // mkdirs(File(overlayDirName))
+        val context = new LayerCreatorContext(cpg, Some(overlayDirName))
+        creator.run(context, serializeInverse = true)
       }
     }
     report(
       "The graph has been modified. You may want to use the `save` command to persist changes to disk.  All changes will also be saved collectively on exit")
     cpg
-  }
-
-  protected def runCreator(creator: LayerCreator, serializedCpg: SerializedCpg): Unit = {
-    val context = new LayerCreatorContext(cpg, serializedCpg)
-    creator.run(context, serializeInverse = true)
   }
 
 }

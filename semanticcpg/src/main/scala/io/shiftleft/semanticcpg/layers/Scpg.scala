@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.layers
 
 import gremlin.scala.GraphAsScala
+import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Languages, NodeTypes}
 import io.shiftleft.passes.CpgPass
@@ -39,7 +40,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
 
   override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
     val cpg = context.cpg
-    val serializedCpg = context.serializedCpg
+    val serializedCpg = context.outputDir.map(new SerializedCpg(_)).getOrElse(new SerializedCpg())
     val language = cpg.metaData.language
       .headOption()
       .getOrElse(throw new Exception("Meta node missing."))
@@ -47,6 +48,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
     val enhancementExecList = createEnhancementExecList(cpg, language)
     enhancementExecList.foreach(_.createApplySerializeAndStore(serializedCpg, serializeInverse))
     Overlays.appendOverlayName(cpg, Scpg.overlayName)
+    serializedCpg.close()
   }
 
   private def createEnhancementExecList(cpg: Cpg, language: String): Iterator[CpgPass] = {

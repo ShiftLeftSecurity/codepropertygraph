@@ -19,7 +19,7 @@ object CodeToCpgFixture {
     new CodeToCpgFixture(frontend).buildCpg(sourceCode, passes)(fun)
 
   private def createEnhancements(cpg: Cpg): Unit = {
-    val context = new LayerCreatorContext(cpg, new SerializedCpg())
+    val context = new LayerCreatorContext(cpg)
     new Scpg().run(context)
   }
 
