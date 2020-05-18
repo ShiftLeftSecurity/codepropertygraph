@@ -19,7 +19,7 @@ case class FuzzyCLanguageFrontend(config: FuzzyCFrontendConfig, rootPath: Path) 
                         outputPath: String = "cpg.bin.zip",
                         namespaces: List[String] = List()): Option[String] = {
     val fuzzyc2cpgsh = rootPath.resolve("fuzzyc2cpg.sh").toString
-    val arguments = Seq(inputPath, "--output", outputPath) ++ config.cmdLineParams
+    val arguments = Seq(inputPath, "--output", outputPath, "--overflowdb") ++ config.cmdLineParams
     runShellCommand(fuzzyc2cpgsh, arguments).map(_ => outputPath)
   }
 
