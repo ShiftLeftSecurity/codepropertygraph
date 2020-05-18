@@ -3,7 +3,6 @@ package io.shiftleft.repl.schemaextender
 import org.zeroturnaround.zip._
 import better.files._
 import overflowdb.codegen._
-
 import sys.process._
 
 /**
@@ -13,40 +12,59 @@ import sys.process._
   * To enable the user to perform the same operation again, the original jar is backed up.
   *  */
 object SchemaExtender extends App {
-  val ocularInstallDir  = ".."
-  val schemaExtenderDir = s"$ocularInstallDir/schema-extender"
-  val classesOutDir     = File(s"$schemaExtenderDir/generated/classes")
+  case class Config(targetJar: File, scalacPath: String)
 
-  val sources    = generateDomainClassSources
-  val classFiles = compile(sources)
-  updateReplJar(classFiles)
-  println(
-    "finished successfully - you can now start ocular as usual, you will have your new schema in place")
+  def parseConfig =
+    new scopt.OptionParser[Config](getClass.getSimpleName) {
+      opt[String]("target").required
+        .action { (x, c) =>
+          c.copy(targetJar = File(x))
+        }
+        .validate { path =>
+          if (File(path).exists) success
+          else failure(s"$path does not exist")
+        }
+        .text("path to target jar which contains the generated nodes")
+      opt[String]("scalac").required
+        .action { (x, c) =>
+          c.copy(scalacPath = x)
+        }
+        .text("path to scalac (used to compile the generated sources)")
+        .validate { path =>
+          val path0 = File(path)
+          if (!path0.exists) failure(s"$path does not exist")
+          else if (!path0.isExecutable) failure(s"$path is not executable")
+          else success
+        }
+    }.parse(args, Config(null, null))
 
-  lazy val replJarBackup: File = {
-    val replJarBackup = File(s"$schemaExtenderDir/io.shiftleft.repl-backup.jar")
-    if (!replJarBackup.exists) {
-      findReplJar.copyTo(replJarBackup)
-      println(s"backed up original repl.jar to $replJarBackup")
-    }
-    replJarBackup
+  val (targetJar: File, scalacPath: String) = parseConfig match {
+    case None =>
+      // bad arguments, error message will have been displayed. exiting.
+      System.exit(1)
+    case Some(config) => (config.targetJar, config.scalacPath)
   }
 
-  lazy val findReplJar: File = {
-    File(s"$ocularInstallDir/repl/lib").children
-      .filter(_.name.startsWith("io.shiftleft.repl"))
-      .toList match {
-      case replJar :: Nil => replJar
-      case Nil            => throw new AssertionError("unable to find the repl jar")
-      case multiple =>
-        throw new AssertionError(s"expected exactly *one* repl jar, found found $multiple")
+  val schemasDir = File("schemas")
+  assert(schemasDir.exists, s"$schemasDir doesn't exist")
+
+  val classesOutDir = File("generated/classes")
+  val classFiles = compile(generateDomainClassSources)
+  updateTargetJar(classFiles)
+  println(s"finished successfully, $targetJar now contains generated classes for the schema defined in $schemasDir")
+
+  lazy val backupJar: File = {
+    val backup = File("backup.jar")
+    if (!backup.exists) {
+      targetJar.copyTo(backup)
+      println(s"backed up original $targetJar to $backup")
     }
+    backup
   }
 
   def generateDomainClassSources: Iterator[File] = {
-    val inputSchemaFiles =
-      File(s"$schemaExtenderDir/schemas").listRecursively.filter(_.name.endsWith(".json"))
-    val generatedSrcDir  = File(s"$schemaExtenderDir/generated/src")
+    val inputSchemaFiles = schemasDir.listRecursively.filter(_.name.endsWith(".json"))
+    val generatedSrcDir = File("generated/src")
     val mergedSchemaFile = SchemaMerger.mergeCollections(inputSchemaFiles.map(_.toJava).toSeq)
     new CodeGen(
       mergedSchemaFile.getAbsolutePath,
@@ -58,20 +76,18 @@ object SchemaExtender extends App {
   def compile(sources: Iterator[File]): Iterator[File] = {
     classesOutDir.createDirectories.children.foreach(_.delete())
     val exitCode =
-      s"""$ocularInstallDir/repl/bin/scalac -d $classesOutDir ${sources.mkString(" ")}""".!
+      s"""$scalacPath -d $classesOutDir ${sources.mkString(" ")}""".!
     assert(exitCode == 0, s"error while invoking scalac. exit code was $exitCode")
     classesOutDir.listRecursively.filter(_.isRegularFile)
   }
 
-  def updateReplJar(classFiles: Iterator[File]) = {
+  def updateTargetJar(classFiles: Iterator[File]) = {
     val newZipEntries: Array[ZipEntrySource] = classFiles.map { classFile =>
       val pathInJar = classesOutDir.relativize(classFile).toString
       new FileSource(pathInJar, classFile.toJava)
     }.toArray
 
-    val targetJar = findReplJar
-    ZipUtil.addOrReplaceEntries(replJarBackup.toJava, newZipEntries, targetJar.toJava)
+    ZipUtil.addOrReplaceEntries(backupJar.toJava, newZipEntries, targetJar.toJava)
     println(s"added/replaced ${newZipEntries.size} class files in $targetJar")
   }
-
 }
