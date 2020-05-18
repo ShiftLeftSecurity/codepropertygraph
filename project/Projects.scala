@@ -9,4 +9,5 @@ object Projects {
   lazy val cpgvalidator = project.in(file("cpgvalidator"))
   lazy val console = project.in(file("console"))
   lazy val queries = project.in(file("queries"))
+  lazy val schemaExtender = project.in(file("schema-extender"))
 }
