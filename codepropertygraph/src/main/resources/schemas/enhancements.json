@@ -44,8 +44,8 @@
         { "name": "METHOD",
           "outEdges" : [
              {"edgeName": "AST", "inNodes": [
-              {"name": "TYPE_DECL"},
-              {"name": "METHOD"},
+              {"name": "TYPE_DECL", "cardinaliy": "n:0-1"},
+              {"name": "METHOD", "cardinaliy": "n:0-1"},
               {"name": "METHOD_PARAMETER_OUT"},
               {"name": "IMPLICIT_CALL"}
             ]},
@@ -106,8 +106,8 @@
             "name": "NAMESPACE_BLOCK",
             "outEdges": [
               {"edgeName": "AST", "inNodes": [
-              {"name": "TYPE_DECL"},
-              {"name": "METHOD"}
+              {"name": "TYPE_DECL", "cardinaliy": "n:0-1"},
+              {"name": "METHOD", "cardinaliy": "n:0-1"}
             ]},
               {"edgeName": "REF", "inNodes": [{"name": "NAMESPACE"}]},
               {"edgeName": "SOURCE_FILE", "inNodes": [{"name": "FILE"}]}
@@ -127,8 +127,8 @@
         { "name": "TYPE_DECL",
           "outEdges" : [
              {"edgeName": "AST", "inNodes": [
-              {"name": "TYPE_DECL"},
-              {"name": "METHOD"}
+              {"name": "TYPE_DECL", "cardinaliy": "n:0-1"},
+              {"name": "METHOD", "cardinaliy": "n:0-1"}
             ]},
              {"edgeName": "INHERITS_FROM", "inNodes": [{"name": "TYPE"}]},
              {"edgeName": "ALIAS_OF", "inNodes": [{"name": "TYPE"}]},

@@ -1,0 +1,4344 @@
+{
+  "nodeTypes": [
+    {
+      "comment": "A local variable",
+      "id": 23,
+      "is": [
+        "DECLARATION",
+        "LOCAL_LIKE",
+        "AST_NODE"
+      ],
+      "keys": [
+        "CODE",
+        "NAME",
+        "CLOSURE_BINDING_ID",
+        "TYPE_FULL_NAME",
+        "DYNAMIC_TYPE_HINT_FULL_NAME",
+        "LINE_NUMBER",
+        "COLUMN_NUMBER",
+        "ORDER"
+      ],
+      "name": "LOCAL",
+      "outEdges": [
+        {
+          "edgeName": "TAGGED_BY",
+          "inNodes": [
+            {
+              "name": "TAG"
+            }
+          ]
+        },
+        {
+          "edgeName": "DYNAMIC_TYPE",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "CAPTURED_BY",
+          "inNodes": [
+            {
+              "name": "CLOSURE_BINDING"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        },
+        {
+          "edgeName": "EVAL_TYPE",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A comment",
+      "id": 511,
+      "keys": [
+        "LINE_NUMBER",
+        "CODE"
+      ],
+      "name": "COMMENT",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A method/function/procedure",
+      "id": 1,
+      "is": [
+        "DECLARATION",
+        "CFG_NODE",
+        "AST_NODE"
+      ],
+      "keys": [
+        "NAME",
+        "FULL_NAME",
+        "IS_EXTERNAL",
+        "SIGNATURE",
+        "AST_PARENT_TYPE",
+        "AST_PARENT_FULL_NAME",
+        "LINE_NUMBER",
+        "COLUMN_NUMBER",
+        "LINE_NUMBER_END",
+        "COLUMN_NUMBER_END",
+        "ORDER",
+        "FILENAME",
+        "HAS_MAPPING",
+        "DEPTH_FIRST_ORDER",
+        "INTERNAL_FLAGS",
+        "BINARY_SIGNATURE"
+      ],
+      "name": "METHOD",
+      "outEdges": [
+        {
+          "edgeName": "SOURCE_FILE",
+          "inNodes": [
+            {
+              "name": "FILE"
+            }
+          ]
+        },
+        {
+          "edgeName": "TAGGED_BY",
+          "inNodes": [
+            {
+              "name": "TAG"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "REACHING_DEF",
+          "inNodes": [
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "RETURN"
+            }
+          ]
+        },
+        {
+          "edgeName": "CFG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "cardinality": "0-1:0-1",
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "IMPLICIT_CALL"
+            },
+            {
+              "name": "TYPE_DECL"
+            },
+            {
+              "name": "MODIFIER"
+            },
+            {
+              "name": "METHOD_PARAMETER_IN"
+            },
+            {
+              "name": "ANNOTATION"
+            },
+            {
+              "name": "METHOD_PARAMETER_OUT"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE_PARAMETER"
+            },
+            {
+              "cardinality": "1:1",
+              "name": "METHOD_RETURN"
+            },
+            {
+              "cardinality": "1:1",
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A string tag",
+      "id": 24,
+      "keys": [
+        "NAME",
+        "VALUE"
+      ],
+      "name": "TAG",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A literal value assigned to an ANNOTATION_PARAMETER",
+      "id": 49,
+      "is": [
+        "EXPRESSION"
+      ],
+      "keys": [
+        "DEPTH_FIRST_ORDER",
+        "INTERNAL_FLAGS",
+        "CODE",
+        "NAME",
+        "ORDER",
+        "ARGUMENT_INDEX",
+        "COLUMN_NUMBER",
+        "LINE_NUMBER"
+      ],
+      "name": "ANNOTATION_LITERAL",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "list",
+          "localName": "dataTags",
+          "nodeType": "TAG"
+        },
+        {
+          "cardinality": "list",
+          "localName": "sourceDescriptorTags",
+          "nodeType": "TAG"
+        },
+        {
+          "cardinality": "list",
+          "localName": "sinkDescriptorTags",
+          "nodeType": "TAG"
+        },
+        {
+          "cardinality": "list",
+          "localName": "sourceTags",
+          "nodeType": "TAG"
+        },
+        {
+          "cardinality": "list",
+          "localName": "dstTags",
+          "nodeType": "TAG"
+        },
+        {
+          "cardinality": "one",
+          "localName": "source",
+          "nodeType": "SOURCE"
+        },
+        {
+          "cardinality": "one",
+          "localName": "sink",
+          "nodeType": "SINK"
+        },
+        {
+          "cardinality": "list",
+          "localName": "transforms",
+          "nodeType": "TRANSFORM"
+        },
+        {
+          "cardinality": "list",
+          "localName": "sourceDescriptorFlows",
+          "nodeType": "FLOW"
+        },
+        {
+          "cardinality": "list",
+          "localName": "sinkDescriptorFlows",
+          "nodeType": "FLOW"
+        },
+        {
+          "cardinality": "one",
+          "localName": "primaryFlow",
+          "nodeType": "FLOW"
+        },
+        {
+          "cardinality": "list",
+          "localName": "triggerMethods",
+          "nodeType": "METHOD"
+        }
+      ],
+      "id": 212,
+      "keys": [
+        "FINGERPRINT",
+        "LITERALS_TO_SINK"
+      ],
+      "name": "IOFLOW",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "SOURCE"
+            },
+            {
+              "name": "TAG"
+            },
+            {
+              "name": "FLOW"
+            },
+            {
+              "name": "TRANSFORM"
+            },
+            {
+              "name": "SINK"
+            },
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "METHOD"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "list",
+          "localName": "triggerCallChains",
+          "nodeType": "CALL_CHAIN"
+        },
+        {
+          "cardinality": "list",
+          "localName": "descriptorFlows",
+          "nodeType": "FLOW"
+        },
+        {
+          "cardinality": "one",
+          "localName": "call",
+          "nodeType": "CALL"
+        },
+        {
+          "cardinality": "one",
+          "localName": "sink",
+          "nodeType": "SINK"
+        }
+      ],
+      "id": 211,
+      "keys": [],
+      "name": "TRANSFORM",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "FLOW"
+            },
+            {
+              "name": "SINK"
+            },
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "CALL_CHAIN"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "list",
+          "localName": "triggerCallChains",
+          "nodeType": "CALL_CHAIN"
+        },
+        {
+          "cardinality": "list",
+          "localName": "descriptorFlows",
+          "nodeType": "FLOW"
+        },
+        {
+          "cardinality": "one",
+          "localName": "source",
+          "nodeType": "SOURCE"
+        }
+      ],
+      "id": 209,
+      "keys": [],
+      "name": "READ",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "CALL_CHAIN"
+            },
+            {
+              "name": "SOURCE"
+            },
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "FLOW"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "This node represents a formal parameter going towards the callee side",
+      "id": 34,
+      "is": [
+        "DECLARATION",
+        "LOCAL_LIKE",
+        "TRACKING_POINT",
+        "AST_NODE"
+      ],
+      "keys": [
+        "CODE",
+        "ORDER",
+        "NAME",
+        "EVALUATION_STRATEGY",
+        "TYPE_FULL_NAME",
+        "DYNAMIC_TYPE_HINT_FULL_NAME",
+        "LINE_NUMBER",
+        "COLUMN_NUMBER"
+      ],
+      "name": "METHOD_PARAMETER_IN",
+      "outEdges": [
+        {
+          "edgeName": "TAGGED_BY",
+          "inNodes": [
+            {
+              "name": "TAG"
+            }
+          ]
+        },
+        {
+          "edgeName": "REACHING_DEF",
+          "inNodes": [
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "RETURN"
+            }
+          ]
+        },
+        {
+          "edgeName": "DYNAMIC_TYPE",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "ANNOTATION"
+            }
+          ]
+        },
+        {
+          "edgeName": "TAINT_REMOVE",
+          "inNodes": [
+            {
+              "name": "METHOD_PARAMETER_OUT"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        },
+        {
+          "edgeName": "PROPAGATE",
+          "inNodes": [
+            {
+              "name": "METHOD_PARAMETER_OUT"
+            },
+            {
+              "name": "METHOD_RETURN"
+            }
+          ]
+        },
+        {
+          "edgeName": "PARAMETER_LINK",
+          "inNodes": [
+            {
+              "name": "METHOD_PARAMETER_OUT"
+            }
+          ]
+        },
+        {
+          "edgeName": "EVAL_TYPE",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "This node represents a namespace as a whole whereas the NAMESPACE_BLOCK is used for each grouping occurrence of a namespace in code. Single representing NAMESPACE node is required for easier navigation in the query language",
+      "id": 40,
+      "is": [
+        "AST_NODE"
+      ],
+      "keys": [
+        "NAME",
+        "ORDER"
+      ],
+      "name": "NAMESPACE",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "id": 206,
+      "keys": [
+        "VAR_TYPE",
+        "EVALUATION_TYPE",
+        "PARAMETER_INDEX"
+      ],
+      "name": "VARIABLE_INFO",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "list",
+          "localName": "points",
+          "nodeType": "PROGRAM_POINT"
+        },
+        {
+          "cardinality": "one",
+          "localName": "source",
+          "nodeType": "SOURCE"
+        },
+        {
+          "cardinality": "one",
+          "localName": "sink",
+          "nodeType": "SINK"
+        },
+        {
+          "cardinality": "list",
+          "localName": "transformations",
+          "nodeType": "TRANSFORMATION"
+        },
+        {
+          "cardinality": "list",
+          "localName": "branchPoints",
+          "nodeType": "TRACKING_POINT"
+        },
+        {
+          "cardinality": "list",
+          "localName": "cfgNodes",
+          "nodeType": "CFG_NODE"
+        }
+      ],
+      "id": 207,
+      "keys": [],
+      "name": "FLOW",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "TRACKING_POINT"
+            },
+            {
+              "name": "TRANSFORMATION"
+            },
+            {
+              "name": "SOURCE"
+            },
+            {
+              "name": "SINK"
+            },
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "PROGRAM_POINT"
+            },
+            {
+              "name": "CFG_NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Represents the binding of a LOCAL or METHOD_PARAMETER_IN into the closure of a method",
+      "id": 334,
+      "keys": [
+        "CLOSURE_BINDING_ID",
+        "EVALUATION_STRATEGY",
+        "CLOSURE_ORIGINAL_NAME"
+      ],
+      "name": "CLOSURE_BINDING",
+      "outEdges": [
+        {
+          "edgeName": "REF",
+          "inNodes": [
+            {
+              "cardinality": "n:1",
+              "name": "LOCAL"
+            },
+            {
+              "name": "METHOD_PARAMETER_IN"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A language-specific node",
+      "id": 44,
+      "is": [
+        "EXPRESSION"
+      ],
+      "keys": [
+        "CODE",
+        "PARSER_TYPE_NAME",
+        "ORDER",
+        "ARGUMENT_INDEX",
+        "TYPE_FULL_NAME",
+        "DYNAMIC_TYPE_HINT_FULL_NAME",
+        "LINE_NUMBER",
+        "COLUMN_NUMBER",
+        "DEPTH_FIRST_ORDER",
+        "INTERNAL_FLAGS"
+      ],
+      "name": "UNKNOWN",
+      "outEdges": [
+        {
+          "edgeName": "CDG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "TAGGED_BY",
+          "inNodes": [
+            {
+              "name": "TAG"
+            }
+          ]
+        },
+        {
+          "edgeName": "REACHING_DEF",
+          "inNodes": [
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "RETURN"
+            }
+          ]
+        },
+        {
+          "edgeName": "DYNAMIC_TYPE",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "CFG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "POST_DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "MEMBER"
+            },
+            {
+              "name": "MODIFIER"
+            },
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "ARRAY_INITIALIZER"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "LOCAL"
+            },
+            {
+              "name": "CONTROL_STRUCTURE"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        },
+        {
+          "edgeName": "EVAL_TYPE",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Formal annotation parameter",
+      "id": 7,
+      "is": [
+        "AST_NODE"
+      ],
+      "keys": [
+        "CODE",
+        "ORDER"
+      ],
+      "name": "ANNOTATION_PARAMETER",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "one",
+          "localName": "cfgNode",
+          "nodeType": "CFG_NODE"
+        }
+      ],
+      "id": 1001,
+      "is": [
+        "TRACKING_POINT"
+      ],
+      "keys": [],
+      "name": "DETACHED_TRACKING_POINT",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "CFG_NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "list",
+          "localName": "names",
+          "nodeType": "MATCH_INFO"
+        },
+        {
+          "cardinality": "list",
+          "localName": "members",
+          "nodeType": "SENSITIVE_MEMBER"
+        }
+      ],
+      "id": 52,
+      "keys": [
+        "FULL_NAME"
+      ],
+      "name": "SENSITIVE_DATA_TYPE",
+      "outEdges": [
+        {
+          "edgeName": "IS_SENSITIVE_DATA_DESCR_OF",
+          "inNodes": [
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "MATCH_INFO"
+            },
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "SENSITIVE_MEMBER"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Member of a class struct or union",
+      "id": 9,
+      "is": [
+        "DECLARATION",
+        "AST_NODE"
+      ],
+      "keys": [
+        "CODE",
+        "NAME",
+        "TYPE_FULL_NAME",
+        "DYNAMIC_TYPE_HINT_FULL_NAME",
+        "ORDER"
+      ],
+      "name": "MEMBER",
+      "outEdges": [
+        {
+          "edgeName": "TAGGED_BY",
+          "inNodes": [
+            {
+              "name": "TAG"
+            }
+          ]
+        },
+        {
+          "edgeName": "DYNAMIC_TYPE",
+          "inNodes": [
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "ANNOTATION"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        },
+        {
+          "edgeName": "EVAL_TYPE",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "one",
+          "localName": "method",
+          "nodeType": "METHOD"
+        },
+        {
+          "cardinality": "one",
+          "localName": "call",
+          "nodeType": "CALL"
+        },
+        {
+          "cardinality": "one",
+          "localName": "callerMethod",
+          "nodeType": "METHOD"
+        }
+      ],
+      "id": 201,
+      "keys": [],
+      "name": "CALL_SITE",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "METHOD"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A method instance which always has to reference a method and may have type argument children if the referred to method is a template",
+      "id": 32,
+      "is": [
+        "AST_NODE"
+      ],
+      "keys": [
+        "NAME",
+        "SIGNATURE",
+        "FULL_NAME",
+        "METHOD_FULL_NAME",
+        "ORDER"
+      ],
+      "name": "METHOD_INST",
+      "outEdges": [
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "TYPE_ARGUMENT"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Configuration file contents. Might be in use by a framework",
+      "id": 50,
+      "keys": [
+        "NAME",
+        "CONTENT"
+      ],
+      "name": "CONFIG_FILE",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS",
+          "inNodes": [
+            {
+              "name": "DOM_NODE"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "list",
+          "localName": "ioflows",
+          "nodeType": "IOFLOW"
+        }
+      ],
+      "id": 55,
+      "keys": [],
+      "name": "SENSITIVE_REFERENCE",
+      "outEdges": [
+        {
+          "edgeName": "IS_SENSITIVE_DATA_DESCR_OF_REF",
+          "inNodes": [
+            {
+              "name": "LOCAL"
+            },
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_PARAMETER_IN"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "IOFLOW"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "zeroOrOne",
+          "localName": "node",
+          "nodeType": "NODE"
+        }
+      ],
+      "id": 25,
+      "keys": [
+        "SYMBOL",
+        "METHOD_FULL_NAME",
+        "METHOD_SHORT_NAME",
+        "PACKAGE_NAME",
+        "LINE_NUMBER",
+        "CLASS_NAME",
+        "CLASS_SHORT_NAME",
+        "NODE_LABEL",
+        "FILENAME"
+      ],
+      "name": "LOCATION",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Node to save meta data about the graph on its properties. Exactly one node of this type per graph",
+      "id": 39,
+      "keys": [
+        "LANGUAGE",
+        "VERSION",
+        "OVERLAYS",
+        "POLICY_DIRECTORIES",
+        "SPID"
+      ],
+      "name": "META_DATA",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A return instruction",
+      "id": 30,
+      "is": [
+        "EXPRESSION"
+      ],
+      "keys": [
+        "LINE_NUMBER",
+        "COLUMN_NUMBER",
+        "ORDER",
+        "ARGUMENT_INDEX",
+        "CODE",
+        "DEPTH_FIRST_ORDER",
+        "INTERNAL_FLAGS"
+      ],
+      "name": "RETURN",
+      "outEdges": [
+        {
+          "edgeName": "ARGUMENT",
+          "inNodes": [
+            {
+              "cardinality": "0-1:0-1",
+              "name": "IDENTIFIER"
+            },
+            {
+              "cardinality": "0-1:0-1",
+              "name": "METHOD_REF"
+            },
+            {
+              "cardinality": "0-1:0-1",
+              "name": "CALL"
+            },
+            {
+              "cardinality": "0-1:0-1",
+              "name": "RETURN"
+            },
+            {
+              "cardinality": "0-1:0-1",
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "cardinality": "0-1:0-1",
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "REACHING_DEF",
+          "inNodes": [
+            {
+              "name": "METHOD_RETURN"
+            }
+          ]
+        },
+        {
+          "edgeName": "CFG",
+          "inNodes": [
+            {
+              "cardinality": "0-1:1",
+              "name": "METHOD_RETURN"
+            }
+          ]
+        },
+        {
+          "edgeName": "POST_DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "CONTROL_STRUCTURE"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "one",
+          "localName": "tag",
+          "nodeType": "TAG"
+        },
+        {
+          "cardinality": "one",
+          "localName": "node",
+          "nodeType": "NODE"
+        }
+      ],
+      "id": 208,
+      "keys": [],
+      "name": "TAG_NODE_PAIR",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "TAG"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Attribute of a DOM node",
+      "id": 601,
+      "keys": [
+        "NAME",
+        "VALUE"
+      ],
+      "name": "DOM_ATTRIBUTE",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Argument for a TYPE_PARAMETER that belongs to a TYPE. It binds another TYPE to a TYPE_PARAMETER",
+      "id": 48,
+      "is": [
+        "AST_NODE"
+      ],
+      "keys": [
+        "ORDER"
+      ],
+      "name": "TYPE_ARGUMENT",
+      "outEdges": [
+        {
+          "edgeName": "BINDS_TO",
+          "inNodes": [
+            {
+              "name": "TYPE_PARAMETER"
+            }
+          ]
+        },
+        {
+          "edgeName": "REF",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "one",
+          "localName": "node",
+          "nodeType": "TRACKING_POINT"
+        },
+        {
+          "cardinality": "one",
+          "localName": "method",
+          "nodeType": "METHOD"
+        },
+        {
+          "cardinality": "list",
+          "localName": "methodTags",
+          "nodeType": "TAG"
+        },
+        {
+          "cardinality": "zeroOrOne",
+          "localName": "callingMethod",
+          "nodeType": "METHOD"
+        },
+        {
+          "cardinality": "zeroOrOne",
+          "localName": "callsite",
+          "nodeType": "CALL"
+        },
+        {
+          "cardinality": "list",
+          "localName": "tags",
+          "nodeType": "TAG"
+        },
+        {
+          "cardinality": "one",
+          "localName": "nodeType",
+          "nodeType": "TYPE"
+        }
+      ],
+      "id": 202,
+      "keys": [
+        "SOURCE_TYPE"
+      ],
+      "name": "SOURCE",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "TRACKING_POINT"
+            },
+            {
+              "name": "TAG"
+            },
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "one",
+          "localName": "node",
+          "nodeType": "LOCAL_LIKE"
+        }
+      ],
+      "id": 54,
+      "keys": [
+        "NAME",
+        "EVAL_TYPE",
+        "CATEGORIES"
+      ],
+      "name": "SENSITIVE_VARIABLE",
+      "outEdges": [
+        {
+          "edgeName": "IS_SENSITIVE_DATA_DESCR_OF_REF",
+          "inNodes": [
+            {
+              "name": "SENSITIVE_REFERENCE"
+            }
+          ]
+        },
+        {
+          "edgeName": "IS_SENSITIVE_DATA_DESCR_OF",
+          "inNodes": [
+            {
+              "name": "LOCAL"
+            },
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_PARAMETER_IN"
+            }
+          ]
+        },
+        {
+          "edgeName": "IS_SENSITIVE_DATA_OF_TYPE",
+          "inNodes": [
+            {
+              "name": "SENSITIVE_DATA_TYPE"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "LOCAL_LIKE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A node that represents which field is accessed in a <operator>.fieldAccess, in e.g. obj.field. The CODE part is used for human display and matching to MEMBER nodes. The CANONICAL_NAME is used for dataflow tracking; typically both coincide. However, suppose that two fields foo and bar are a C-style union; then CODE refers to whatever the programmer wrote (obj.foo or obj.bar), but both share the same CANONICAL_NAME (e.g. GENERATED_foo_bar)",
+      "id": 2001081,
+      "is": [
+        "EXPRESSION"
+      ],
+      "keys": [
+        "CODE",
+        "CANONICAL_NAME",
+        "ORDER",
+        "ARGUMENT_INDEX",
+        "LINE_NUMBER",
+        "COLUMN_NUMBER",
+        "DEPTH_FIRST_ORDER",
+        "INTERNAL_FLAGS"
+      ],
+      "name": "FIELD_IDENTIFIER",
+      "outEdges": [
+        {
+          "edgeName": "CDG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "TAGGED_BY",
+          "inNodes": [
+            {
+              "name": "TAG"
+            }
+          ]
+        },
+        {
+          "edgeName": "DYNAMIC_TYPE",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "CFG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "cardinality": "0-1:1",
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "POST_DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "list",
+          "localName": "triggerCallChains",
+          "nodeType": "CALL_CHAIN"
+        },
+        {
+          "cardinality": "list",
+          "localName": "descriptorFlows",
+          "nodeType": "FLOW"
+        },
+        {
+          "cardinality": "one",
+          "localName": "sink",
+          "nodeType": "SINK"
+        },
+        {
+          "cardinality": "list",
+          "localName": "flows",
+          "nodeType": "FLOW"
+        }
+      ],
+      "id": 210,
+      "keys": [],
+      "name": "WRITE",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "CALL_CHAIN"
+            },
+            {
+              "name": "SINK"
+            },
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "FLOW"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "id": 217,
+      "keys": [
+        "KEY",
+        "VALUE"
+      ],
+      "name": "KEY_VALUE_PAIR",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A node in a Document Object Model (Tree) as obtained from, e.g., an HTML parser",
+      "containedNodes": [
+        {
+          "cardinality": "list",
+          "localName": "attributes",
+          "nodeType": "DOM_ATTRIBUTE"
+        }
+      ],
+      "id": 600,
+      "keys": [
+        "NAME"
+      ],
+      "name": "DOM_NODE",
+      "outEdges": [
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "DOM_NODE"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "DOM_ATTRIBUTE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "one",
+          "localName": "method",
+          "nodeType": "METHOD"
+        },
+        {
+          "cardinality": "list",
+          "localName": "parameters",
+          "nodeType": "METHOD_PARAMETER_IN"
+        },
+        {
+          "cardinality": "list",
+          "localName": "outParameters",
+          "nodeType": "METHOD_PARAMETER_OUT"
+        },
+        {
+          "cardinality": "one",
+          "localName": "returnParameter",
+          "nodeType": "METHOD_RETURN"
+        },
+        {
+          "cardinality": "list",
+          "localName": "paramTypes",
+          "nodeType": "TYPE"
+        },
+        {
+          "cardinality": "one",
+          "localName": "returnParameterType",
+          "nodeType": "TYPE"
+        },
+        {
+          "cardinality": "list",
+          "localName": "tags",
+          "nodeType": "TAG"
+        },
+        {
+          "cardinality": "list",
+          "localName": "paramTags",
+          "nodeType": "TAGS"
+        },
+        {
+          "cardinality": "list",
+          "localName": "outParamTags",
+          "nodeType": "TAGS"
+        },
+        {
+          "cardinality": "list",
+          "localName": "returnParamTags",
+          "nodeType": "TAG"
+        },
+        {
+          "cardinality": "list",
+          "localName": "annotationParameters",
+          "nodeType": "SP_ANNOTATION_PARAMETER"
+        },
+        {
+          "cardinality": "list",
+          "localName": "modifiers",
+          "nodeType": "MODIFIER"
+        },
+        {
+          "cardinality": "list",
+          "localName": "routes",
+          "nodeType": "ROUTE"
+        }
+      ],
+      "id": 199,
+      "keys": [
+        "IS_STATIC",
+        "IS_EXTERNAL",
+        "BINARY_SIGNATURE"
+      ],
+      "name": "METHOD_SUMMARY",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "MODIFIER"
+            },
+            {
+              "name": "METHOD_PARAMETER_IN"
+            },
+            {
+              "name": "TAG"
+            },
+            {
+              "name": "SP_ANNOTATION_PARAMETER"
+            },
+            {
+              "name": "METHOD_PARAMETER_OUT"
+            },
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "TAGS"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "ROUTE"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "TYPE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A reference to a namespace",
+      "id": 41,
+      "is": [
+        "AST_NODE"
+      ],
+      "keys": [
+        "NAME",
+        "FULL_NAME",
+        "ORDER",
+        "FILENAME"
+      ],
+      "name": "NAMESPACE_BLOCK",
+      "outEdges": [
+        {
+          "edgeName": "SOURCE_FILE",
+          "inNodes": [
+            {
+              "name": "FILE"
+            }
+          ]
+        },
+        {
+          "edgeName": "REF",
+          "inNodes": [
+            {
+              "name": "NAMESPACE"
+            }
+          ]
+        },
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Initialization construct for arrays",
+      "id": 14,
+      "is": [
+        "AST_NODE",
+        "EXPRESSION"
+      ],
+      "keys": [
+        "DEPTH_FIRST_ORDER",
+        "INTERNAL_FLAGS",
+        "CODE",
+        "ORDER",
+        "ARGUMENT_INDEX",
+        "COLUMN_NUMBER",
+        "LINE_NUMBER"
+      ],
+      "name": "ARRAY_INITIALIZER",
+      "outEdges": [
+        {
+          "edgeName": "EVAL_TYPE",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        },
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "LITERAL"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "one",
+          "localName": "elem",
+          "nodeType": "TRACKING_POINT"
+        },
+        {
+          "cardinality": "zeroOrOne",
+          "localName": "method",
+          "nodeType": "METHOD"
+        },
+        {
+          "cardinality": "list",
+          "localName": "methodTags",
+          "nodeType": "TAG"
+        },
+        {
+          "cardinality": "list",
+          "localName": "paramTags",
+          "nodeType": "TAG"
+        }
+      ],
+      "id": 205,
+      "keys": [],
+      "name": "PROGRAM_POINT",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TRACKING_POINT"
+            },
+            {
+              "name": "TAG"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A method annotation",
+      "id": 5,
+      "is": [
+        "AST_NODE"
+      ],
+      "keys": [
+        "CODE",
+        "NAME",
+        "FULL_NAME",
+        "ORDER"
+      ],
+      "name": "ANNOTATION",
+      "outEdges": [
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "ANNOTATION_PARAMETER_ASSIGN"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "list",
+          "localName": "names",
+          "nodeType": "MATCH_INFO"
+        }
+      ],
+      "id": 53,
+      "keys": [
+        "NAME"
+      ],
+      "name": "SENSITIVE_MEMBER",
+      "outEdges": [
+        {
+          "edgeName": "IS_SENSITIVE_DATA_DESCR_OF",
+          "inNodes": [
+            {
+              "name": "MEMBER"
+            },
+            {
+              "name": "TYPE"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "MATCH_INFO"
+            },
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "An arbitrary identifier/reference",
+      "id": 27,
+      "is": [
+        "EXPRESSION",
+        "LOCAL_LIKE"
+      ],
+      "keys": [
+        "CODE",
+        "NAME",
+        "ORDER",
+        "ARGUMENT_INDEX",
+        "TYPE_FULL_NAME",
+        "DYNAMIC_TYPE_HINT_FULL_NAME",
+        "LINE_NUMBER",
+        "COLUMN_NUMBER",
+        "DEPTH_FIRST_ORDER",
+        "INTERNAL_FLAGS"
+      ],
+      "name": "IDENTIFIER",
+      "outEdges": [
+        {
+          "edgeName": "CDG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "REF",
+          "inNodes": [
+            {
+              "cardinality": "n:0-1",
+              "name": "LOCAL"
+            },
+            {
+              "cardinality": "n:0-1",
+              "name": "METHOD_PARAMETER_IN"
+            }
+          ]
+        },
+        {
+          "edgeName": "TAGGED_BY",
+          "inNodes": [
+            {
+              "name": "TAG"
+            }
+          ]
+        },
+        {
+          "edgeName": "DYNAMIC_TYPE",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "CFG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "POST_DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        },
+        {
+          "edgeName": "EVAL_TYPE",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "one",
+          "localName": "node",
+          "nodeType": "TRACKING_POINT"
+        }
+      ],
+      "id": 213,
+      "keys": [],
+      "name": "TRANSFORMATION",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "TRACKING_POINT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Node representing a source file. Often also the AST root",
+      "id": 38,
+      "is": [
+        "AST_NODE"
+      ],
+      "keys": [
+        "NAME",
+        "ORDER"
+      ],
+      "name": "FILE",
+      "outEdges": [
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "COMMENT"
+            },
+            {
+              "name": "NAMESPACE_BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "This node represents a dependency",
+      "id": 35,
+      "keys": [
+        "VERSION",
+        "NAME",
+        "DEPENDENCY_GROUP_ID"
+      ],
+      "name": "DEPENDENCY",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "This node records what package prefix is most common to all analysed classes in the CPG",
+      "id": 36,
+      "keys": [
+        "VALUE"
+      ],
+      "name": "PACKAGE_PREFIX",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "An implicit call site hidden in a method indicated by METHOD_MAP policy entries",
+      "id": 307,
+      "is": [
+        "CALL_REPR",
+        "TRACKING_POINT"
+      ],
+      "keys": [
+        "DEPTH_FIRST_ORDER",
+        "INTERNAL_FLAGS",
+        "CODE",
+        "NAME",
+        "SIGNATURE",
+        "LINE_NUMBER",
+        "COLUMN_NUMBER",
+        "ORDER"
+      ],
+      "name": "IMPLICIT_CALL",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "id": 51,
+      "keys": [
+        "PATTERN",
+        "CATEGORY"
+      ],
+      "name": "MATCH_INFO",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Indicates the usage of a framework. E.g. java spring. The name key is one of the values from frameworks list",
+      "id": 42,
+      "keys": [
+        "NAME"
+      ],
+      "name": "FRAMEWORK",
+      "outEdges": [
+        {
+          "edgeName": "ATTACHED_DATA",
+          "inNodes": [
+            {
+              "name": "FRAMEWORK_DATA"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A modifier, e.g., static, public, private",
+      "id": 300,
+      "is": [
+        "AST_NODE"
+      ],
+      "keys": [
+        "MODIFIER_TYPE",
+        "ORDER"
+      ],
+      "name": "MODIFIER",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A control structure such as if, while, or for",
+      "id": 339,
+      "is": [
+        "EXPRESSION"
+      ],
+      "keys": [
+        "CODE",
+        "COLUMN_NUMBER",
+        "LINE_NUMBER",
+        "ORDER",
+        "PARSER_TYPE_NAME",
+        "ARGUMENT_INDEX",
+        "DEPTH_FIRST_ORDER",
+        "INTERNAL_FLAGS"
+      ],
+      "name": "CONTROL_STRUCTURE",
+      "outEdges": [
+        {
+          "edgeName": "CONDITION",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "ARRAY_INITIALIZER"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "CONTROL_STRUCTURE"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "MODIFIER"
+            },
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "ARRAY_INITIALIZER"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "LOCAL"
+            },
+            {
+              "name": "CONTROL_STRUCTURE"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A structuring block in the AST",
+      "id": 31,
+      "is": [
+        "EXPRESSION"
+      ],
+      "keys": [
+        "CODE",
+        "ORDER",
+        "ARGUMENT_INDEX",
+        "TYPE_FULL_NAME",
+        "DYNAMIC_TYPE_HINT_FULL_NAME",
+        "LINE_NUMBER",
+        "COLUMN_NUMBER",
+        "DEPTH_FIRST_ORDER",
+        "INTERNAL_FLAGS"
+      ],
+      "name": "BLOCK",
+      "outEdges": [
+        {
+          "edgeName": "CDG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "REACHING_DEF",
+          "inNodes": [
+            {
+              "name": "BLOCK"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "RETURN"
+            }
+          ]
+        },
+        {
+          "edgeName": "DYNAMIC_TYPE",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "CFG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "POST_DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "LOCAL"
+            },
+            {
+              "name": "CONTROL_STRUCTURE"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        },
+        {
+          "edgeName": "EVAL_TYPE",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "list",
+          "comment": "",
+          "localName": "tags",
+          "nodeType": "TAG"
+        }
+      ],
+      "id": 216,
+      "keys": [],
+      "name": "SP_BLACKLIST",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "TAG"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Data used by a framework",
+      "id": 43,
+      "keys": [
+        "NAME",
+        "CONTENT"
+      ],
+      "name": "FRAMEWORK_DATA",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Literal/Constant",
+      "id": 8,
+      "is": [
+        "EXPRESSION"
+      ],
+      "keys": [
+        "CODE",
+        "ORDER",
+        "ARGUMENT_INDEX",
+        "TYPE_FULL_NAME",
+        "DYNAMIC_TYPE_HINT_FULL_NAME",
+        "LINE_NUMBER",
+        "COLUMN_NUMBER",
+        "DEPTH_FIRST_ORDER",
+        "INTERNAL_FLAGS"
+      ],
+      "name": "LITERAL",
+      "outEdges": [
+        {
+          "edgeName": "CDG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "TAGGED_BY",
+          "inNodes": [
+            {
+              "name": "TAG"
+            }
+          ]
+        },
+        {
+          "edgeName": "DYNAMIC_TYPE",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "CFG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "POST_DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        },
+        {
+          "edgeName": "EVAL_TYPE",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "id": 215,
+      "keys": [
+        "PATH"
+      ],
+      "name": "ROUTE",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A formal method return",
+      "id": 3,
+      "is": [
+        "CFG_NODE",
+        "TRACKING_POINT"
+      ],
+      "keys": [
+        "CODE",
+        "EVALUATION_STRATEGY",
+        "TYPE_FULL_NAME",
+        "DYNAMIC_TYPE_HINT_FULL_NAME",
+        "LINE_NUMBER",
+        "COLUMN_NUMBER",
+        "ORDER",
+        "DEPTH_FIRST_ORDER",
+        "INTERNAL_FLAGS"
+      ],
+      "name": "METHOD_RETURN",
+      "outEdges": [
+        {
+          "edgeName": "TAGGED_BY",
+          "inNodes": [
+            {
+              "name": "TAG"
+            }
+          ]
+        },
+        {
+          "edgeName": "DYNAMIC_TYPE",
+          "inNodes": [
+            {
+              "cardinality": "n:0-1",
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "POST_DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        },
+        {
+          "edgeName": "EVAL_TYPE",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "This node represents a formal parameter going towards the caller side",
+      "id": 33,
+      "is": [
+        "DECLARATION",
+        "TRACKING_POINT",
+        "AST_NODE"
+      ],
+      "keys": [
+        "CODE",
+        "ORDER",
+        "NAME",
+        "EVALUATION_STRATEGY",
+        "TYPE_FULL_NAME",
+        "LINE_NUMBER",
+        "COLUMN_NUMBER"
+      ],
+      "name": "METHOD_PARAMETER_OUT",
+      "outEdges": [
+        {
+          "edgeName": "EVAL_TYPE",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        },
+        {
+          "edgeName": "TAGGED_BY",
+          "inNodes": [
+            {
+              "name": "TAG"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "list",
+          "localName": "methods",
+          "nodeType": "METHOD"
+        },
+        {
+          "cardinality": "list",
+          "localName": "calls",
+          "nodeType": "CALL"
+        }
+      ],
+      "id": 204,
+      "keys": [],
+      "name": "CALL_CHAIN",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "METHOD"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A type which always has to reference a type declaration and may have type argument children if the referred to type declaration is a template",
+      "id": 45,
+      "keys": [
+        "NAME",
+        "FULL_NAME",
+        "TYPE_DECL_FULL_NAME"
+      ],
+      "name": "TYPE",
+      "outEdges": [
+        {
+          "edgeName": "REF",
+          "inNodes": [
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "TYPE_ARGUMENT"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Reference to a method instance",
+      "id": 333,
+      "is": [
+        "EXPRESSION"
+      ],
+      "keys": [
+        "CODE",
+        "ORDER",
+        "ARGUMENT_INDEX",
+        "TYPE_FULL_NAME",
+        "DYNAMIC_TYPE_HINT_FULL_NAME",
+        "METHOD_INST_FULL_NAME",
+        "METHOD_FULL_NAME",
+        "LINE_NUMBER",
+        "COLUMN_NUMBER",
+        "DEPTH_FIRST_ORDER",
+        "INTERNAL_FLAGS"
+      ],
+      "name": "METHOD_REF",
+      "outEdges": [
+        {
+          "edgeName": "CAPTURE",
+          "inNodes": [
+            {
+              "name": "CLOSURE_BINDING"
+            }
+          ]
+        },
+        {
+          "edgeName": "CDG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "REF",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            }
+          ]
+        },
+        {
+          "edgeName": "DYNAMIC_TYPE",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "CFG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "POST_DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        },
+        {
+          "edgeName": "EVAL_TYPE",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A type declaration",
+      "id": 46,
+      "is": [
+        "AST_NODE"
+      ],
+      "keys": [
+        "NAME",
+        "FULL_NAME",
+        "IS_EXTERNAL",
+        "INHERITS_FROM_TYPE_FULL_NAME",
+        "AST_PARENT_TYPE",
+        "AST_PARENT_FULL_NAME",
+        "ALIAS_TYPE_FULL_NAME",
+        "ORDER",
+        "FILENAME"
+      ],
+      "name": "TYPE_DECL",
+      "outEdges": [
+        {
+          "edgeName": "VTABLE",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            }
+          ]
+        },
+        {
+          "edgeName": "SOURCE_FILE",
+          "inNodes": [
+            {
+              "name": "FILE"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            }
+          ]
+        },
+        {
+          "edgeName": "BINDS",
+          "inNodes": [
+            {
+              "name": "BINDING"
+            }
+          ]
+        },
+        {
+          "edgeName": "ALIAS_OF",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        },
+        {
+          "edgeName": "INHERITS_FROM",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        },
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "MEMBER"
+            },
+            {
+              "name": "TYPE_DECL"
+            },
+            {
+              "name": "MODIFIER"
+            },
+            {
+              "name": "ANNOTATION"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE_PARAMETER"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "one",
+          "localName": "node",
+          "nodeType": "TRACKING_POINT"
+        },
+        {
+          "cardinality": "one",
+          "localName": "nodeType",
+          "nodeType": "TYPE"
+        },
+        {
+          "cardinality": "one",
+          "localName": "method",
+          "nodeType": "METHOD"
+        },
+        {
+          "cardinality": "list",
+          "localName": "methodTags",
+          "nodeType": "TAG"
+        },
+        {
+          "cardinality": "zeroOrOne",
+          "localName": "callingMethod",
+          "nodeType": "METHOD"
+        },
+        {
+          "cardinality": "zeroOrOne",
+          "localName": "callsite",
+          "nodeType": "CALL"
+        },
+        {
+          "cardinality": "zeroOrOne",
+          "localName": "parameterIn",
+          "nodeType": "METHOD_PARAMETER_IN"
+        },
+        {
+          "cardinality": "list",
+          "comment": "This field also holds tags for output parameters and return parameters",
+          "localName": "parameterInTags",
+          "nodeType": "TAG"
+        }
+      ],
+      "id": 203,
+      "keys": [
+        "SINK_TYPE"
+      ],
+      "name": "SINK",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "TRACKING_POINT"
+            },
+            {
+              "name": "METHOD_PARAMETER_IN"
+            },
+            {
+              "name": "TAG"
+            },
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "id": 200,
+      "keys": [
+        "ANNOTATION_NAME",
+        "ANNOTATION_FULL_NAME",
+        "NAME",
+        "VALUE"
+      ],
+      "name": "SP_ANNOTATION_PARAMETER",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "",
+      "containedNodes": [
+        {
+          "cardinality": "list",
+          "localName": "evidence",
+          "nodeType": "NODE"
+        },
+        {
+          "cardinality": "list",
+          "localName": "keyValuePairs",
+          "nodeType": "KEY_VALUE_PAIR"
+        }
+      ],
+      "id": 214,
+      "keys": [],
+      "name": "FINDING",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "KEY_VALUE_PAIR"
+            },
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A (method)-call",
+      "id": 15,
+      "is": [
+        "EXPRESSION",
+        "CALL_REPR"
+      ],
+      "keys": [
+        "CODE",
+        "NAME",
+        "ORDER",
+        "METHOD_INST_FULL_NAME",
+        "METHOD_FULL_NAME",
+        "ARGUMENT_INDEX",
+        "DISPATCH_TYPE",
+        "SIGNATURE",
+        "TYPE_FULL_NAME",
+        "DYNAMIC_TYPE_HINT_FULL_NAME",
+        "LINE_NUMBER",
+        "COLUMN_NUMBER",
+        "RESOLVED",
+        "DEPTH_FIRST_ORDER",
+        "INTERNAL_FLAGS"
+      ],
+      "name": "CALL",
+      "outEdges": [
+        {
+          "edgeName": "RECEIVER",
+          "inNodes": [
+            {
+              "cardinality": "0-1:0-1",
+              "name": "IDENTIFIER"
+            },
+            {
+              "cardinality": "0-1:0-1",
+              "name": "METHOD_REF"
+            },
+            {
+              "cardinality": "0-1:0-1",
+              "name": "CALL"
+            },
+            {
+              "cardinality": "0-1:0-1",
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "cardinality": "0-1:0-1",
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "CDG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "ARGUMENT",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "REF",
+          "inNodes": [
+            {
+              "name": "MEMBER"
+            }
+          ]
+        },
+        {
+          "edgeName": "TAGGED_BY",
+          "inNodes": [
+            {
+              "name": "TAG"
+            }
+          ]
+        },
+        {
+          "edgeName": "REACHING_DEF",
+          "inNodes": [
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "RETURN"
+            }
+          ]
+        },
+        {
+          "edgeName": "CALL",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            }
+          ]
+        },
+        {
+          "edgeName": "DYNAMIC_TYPE",
+          "inNodes": [
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "TYPE_DECL"
+            }
+          ]
+        },
+        {
+          "edgeName": "CFG",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "POST_DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "METHOD"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "CONTROL_STRUCTURE"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "DOMINATE",
+          "inNodes": [
+            {
+              "name": "IDENTIFIER"
+            },
+            {
+              "name": "METHOD_REF"
+            },
+            {
+              "name": "CALL"
+            },
+            {
+              "name": "FIELD_IDENTIFIER"
+            },
+            {
+              "name": "RETURN"
+            },
+            {
+              "name": "LITERAL"
+            },
+            {
+              "name": "METHOD_RETURN"
+            },
+            {
+              "name": "UNKNOWN"
+            },
+            {
+              "name": "BLOCK"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        },
+        {
+          "edgeName": "EVAL_TYPE",
+          "inNodes": [
+            {
+              "name": "TYPE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Type parameter of TYPE_DECL or METHOD",
+      "id": 47,
+      "is": [
+        "AST_NODE"
+      ],
+      "keys": [
+        "NAME",
+        "ORDER"
+      ],
+      "name": "TYPE_PARAMETER",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Multiple tags",
+      "containedNodes": [
+        {
+          "cardinality": "list",
+          "localName": "tags",
+          "nodeType": "TAG"
+        }
+      ],
+      "id": 301,
+      "keys": [],
+      "name": "TAGS",
+      "outEdges": [
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            },
+            {
+              "name": "TAG"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Assignment of annotation argument to annotation parameter",
+      "id": 6,
+      "is": [
+        "AST_NODE"
+      ],
+      "keys": [
+        "CODE",
+        "ORDER"
+      ],
+      "name": "ANNOTATION_PARAMETER_ASSIGN",
+      "outEdges": [
+        {
+          "edgeName": "AST",
+          "inNodes": [
+            {
+              "name": "ANNOTATION_PARAMETER"
+            },
+            {
+              "name": "ANNOTATION_LITERAL"
+            },
+            {
+              "name": "ARRAY_INITIALIZER"
+            },
+            {
+              "name": "ANNOTATION"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "A binding of a METHOD into a TYPE_DECL",
+      "id": 146,
+      "keys": [
+        "NAME",
+        "SIGNATURE",
+        "IS_METHOD_NEVER_OVERRIDDEN"
+      ],
+      "name": "BINDING",
+      "outEdges": [
+        {
+          "edgeName": "REF",
+          "inNodes": [
+            {
+              "cardinality": "n:1",
+              "name": "METHOD"
+            }
+          ]
+        },
+        {
+          "edgeName": "CONTAINS_NODE",
+          "inNodes": [
+            {
+              "name": "NODE"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

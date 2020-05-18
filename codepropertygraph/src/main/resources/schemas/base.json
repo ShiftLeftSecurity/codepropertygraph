@@ -74,7 +74,7 @@
          "name": "FILE",
          "keys": ["NAME", "ORDER"],
          "comment": "Node representing a source file. Often also the AST root",
-         "outEdges": [{"edgeName": "AST", "inNodes": [{"name": "NAMESPACE_BLOCK"}]}],
+         "outEdges": [{"edgeName": "AST", "inNodes": [{"name": "NAMESPACE_BLOCK", "cardinaliy": "n:0-1"}]}],
          "is" : ["AST_NODE"]
         },
 
@@ -89,10 +89,10 @@
            {"edgeName": "AST",
             "inNodes": [
               {"name": "METHOD_RETURN", "cardinality":"1:1"},
-              {"name": "METHOD_PARAMETER_IN"},
-              {"name": "MODIFIER"},
+              {"name": "METHOD_PARAMETER_IN", "cardinaliy": "n:1"},
+              {"name": "MODIFIER", "cardinaliy": "n:1"},
               {"name": "BLOCK", "cardinality":"1:1"},
-              {"name": "TYPE_PARAMETER"}
+              {"name": "TYPE_PARAMETER", "cardinaliy": "n:1"}
             ]
            },
            {"edgeName": "CFG",
@@ -144,8 +144,8 @@
          "outEdges" : [
            {"edgeName": "AST", "inNodes": [
              {"name": "TYPE_PARAMETER"},
-             {"name": "MEMBER"},
-             {"name": "MODIFIER"}
+             {"name": "MEMBER", "cardinaliy": "n:1"},
+             {"name": "MODIFIER", "cardinaliy": "n:1"}
            ]},
            {"edgeName": "BINDS", "inNodes": [{"name":"BINDING"}]},
            {"edgeName": "VTABLE", "inNodes": [{"name":"METHOD"}]}
@@ -246,10 +246,10 @@
              {"name": "UNKNOWN"}
            ]},
            {"edgeName": "ARGUMENT", "inNodes": [
-             {"name": "CALL"},
+             {"name": "CALL", "cardinaliy": "n:0-1"},
              {"name": "IDENTIFIER"},
              {"name": "FIELD_IDENTIFIER"},
-             {"name": "LITERAL"},
+             {"name": "LITERAL", "cardinaliy": "n:0-1"},
              {"name": "METHOD_REF"},
              {"name": "BLOCK"},
              {"name": "UNKNOWN"}
@@ -398,10 +398,10 @@
 	 "is" : ["EXPRESSION"],
 	 "outEdges" : [
      {"edgeName": "AST", "inNodes": [
-        {"name": "LITERAL"},
+        {"name": "LITERAL", "cardinaliy": "n:1"},
         {"name": "MODIFIER"},
         {"name": "ARRAY_INITIALIZER"},
-        {"name": "CALL"},
+        {"name": "CALL", "cardinaliy": "n:1"},
         {"name": "LOCAL"},
         {"name": "IDENTIFIER"},
         {"name": "RETURN"},
