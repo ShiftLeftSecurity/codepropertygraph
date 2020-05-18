@@ -95,6 +95,8 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
   }
 
   override def probe(cpg: Cpg): Boolean = {
-    cpg.graph.nodesByLabel(NodeTypes.METHOD_PARAMETER_OUT).hasNext
+    val methodDecoratorRan = cpg.graph.nodesByLabel(NodeTypes.METHOD_PARAMETER_OUT).hasNext
+    val containsEdgePassRan = cpg.graph.asScala.E.hasLabel(EdgeTypes.CONTAINS).exists()
+    methodDecoratorRan || containsEdgePassRan
   }
 }
