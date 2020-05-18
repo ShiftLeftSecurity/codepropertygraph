@@ -43,15 +43,6 @@ object CpgLoader {
   def createIndexes(cpg: Cpg): Unit =
     new CpgLoader().createIndexes(cpg)
 
-  /**
-    * Load and apply overlays from archives to the given CPG.
-    *
-    * @param overlayFilenames filenames of proto archives
-    * @param cpg The CPG to apply overlays to
-    * */
-  def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit =
-    new CpgLoader().addOverlays(overlayFilenames, cpg)
-
   def addDiffGraphs(diffGraphFilenames: Seq[String], cpg: Cpg): Unit =
     new CpgLoader().addDiffGraphs(diffGraphFilenames, cpg)
 
@@ -84,12 +75,6 @@ private class CpgLoader {
 
   def createIndexes(cpg: Cpg): Unit =
     cpg.graph.indexManager.createNodePropertyIndex(NodeKeys.FULL_NAME.name)
-
-  def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit = {
-    overlayFilenames.foreach { overlayFilename =>
-      CpgOverlayLoader.load(overlayFilename, cpg)
-    }
-  }
 
   def addDiffGraphs(diffGraphFilenames: Seq[String], cpg: Cpg): Unit = {
     diffGraphFilenames.foreach { filename =>
