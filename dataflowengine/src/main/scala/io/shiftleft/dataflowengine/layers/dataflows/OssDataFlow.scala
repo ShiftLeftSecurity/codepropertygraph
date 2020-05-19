@@ -4,7 +4,8 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.dataflowengine.passes.propagateedges.PropagateEdgePass
 import io.shiftleft.dataflowengine.passes.reachingdef.ReachingDefPass
 import io.shiftleft.dataflowengine.semanticsloader.SemanticsLoader
-import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, LayerCreatorOptions}
+import io.shiftleft.semanticcpg.Overlays
+import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, LayerCreatorOptions, Scpg}
 
 object OssDataFlow {
   val overlayName: String = "dataflowOss"
@@ -31,6 +32,7 @@ class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
         pass.createApplySerializeAndStore(serializedCpg)
         serializedCpg.close()
     }
+    Overlays.appendOverlayName(cpg, OssDataFlow.overlayName)
   }
 
   override def probe(cpg: Cpg): Boolean = {
