@@ -223,7 +223,7 @@ class ConsoleTests extends WordSpec with Matchers {
       console.project.path.resolve("overlays").toFile.list().size shouldBe numOverlayFilesBefore
     }
 
-    "store directory of zip files each overlay in project" in ConsoleFixture() { (console, codeDir) =>
+    "store directory of zip files for each overlay in project" in ConsoleFixture() { (console, codeDir) =>
       console.importCode(codeDir.toString)
       val overlayParentDir = console.project.path.resolve("overlays")
       overlayParentDir.toFile.list.toSet shouldBe Set("semanticcpg")
