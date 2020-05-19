@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewMethodReturn}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes, nodes}
-import io.shiftleft.passes.{DiffGraph, ParallelCpgPass, ParallelIteratorExecutor}
+import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
 import scala.jdk.CollectionConverters._
