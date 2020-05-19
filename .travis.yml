@@ -28,9 +28,11 @@ jobs:
   - stage: test
     script:
     - sbt scalafmtCheck test
-    - cd schema-extender && sbt test
+    - cd schema-extender && sbt test && cd ..
   - stage: release
-    script: sbt ciReleaseTagNextVersion ciReleaseBintray
+    script:
+    - sbt ciReleaseTagNextVersion ciReleaseBintray
+    - cd schema-extender && sbt ciReleaseBintray && cd ..
   - stage: python-test-and-release
     script:
     - pip install requests
