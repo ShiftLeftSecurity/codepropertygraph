@@ -5,10 +5,12 @@ import java.util.zip.ZipOutputStream
 
 import better.files.Dsl.cp
 import better.files._
+import io.shiftleft.codepropertygraph.Cpg
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.console.testing._
-import io.shiftleft.semanticcpg.layers.Scpg
+import io.shiftleft.semanticcpg.Overlays
+import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, Scpg}
 
 import scala.util.Try
 
@@ -246,9 +248,22 @@ class ConsoleTests extends WordSpec with Matchers {
     }.getOrElse(false)
   }
 
+  class MockLayerCreator extends LayerCreator {
+    override val overlayName: String = "fooname"
+    override val description: String = "foodescr"
+
+    override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
+      Overlays.appendOverlayName(context.cpg, overlayName)
+    }
+    override def probe(cpg: Cpg): Boolean = false
+  }
+
   "undo" should {
     "remove layer from meta information" in ConsoleFixture() { (console, codeDir) =>
       console.importCode(codeDir.toString)
+      console._runAnalyzer(new MockLayerCreator)
+      console.project.appliedOverlays shouldBe List("semanticcpg", "fooname")
+      console.undo
       console.project.appliedOverlays shouldBe List("semanticcpg")
       console.undo
       console.project.appliedOverlays shouldBe List()
