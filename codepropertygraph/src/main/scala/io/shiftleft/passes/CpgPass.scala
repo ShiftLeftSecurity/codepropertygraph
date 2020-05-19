@@ -50,7 +50,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") extends CpgPassBase {
     * Execute and create a serialized overlay
     * @param inverse invert the diffgraph before serializing
     */
-  override def createApplyAndSerialize(inverse: Boolean = false): Iterator[GeneratedMessageV3] =
+  def createApplyAndSerialize(inverse: Boolean = false): Iterator[GeneratedMessageV3] =
     withStartEndTimesLogged {
       val overlays = run().map { diffGraph =>
         val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse)
@@ -86,13 +86,11 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") extends CpgPassBase {
 
 }
 
-abstract class CpgPassBase {
+trait CpgPassBase {
 
   private val logger: Logger = LogManager.getLogger(classOf[CpgPass])
 
   def createAndApply(): Unit
-
-  def createApplyAndSerialize(inverse: Boolean = false): Iterator[GeneratedMessageV3]
 
   def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false, prefix: String = ""): Unit
 
@@ -110,7 +108,7 @@ abstract class CpgPassBase {
     }
   }
 
-  protected def generateOutFileName(prefix: String, outName: String, index: Int) = {
+  protected def generateOutFileName(prefix: String, outName: String, index: Int): String = {
     val outputName = {
       if (outName.isEmpty) {
         this.getClass.getSimpleName
