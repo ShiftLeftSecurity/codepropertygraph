@@ -224,8 +224,13 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
   def undo: File = {
     project.overlayDirs.lastOption
       .map { dir =>
-        val zipFiles = dir.list.toList.sortWith(compareFiles).reverse.map(_.path.toString)
-        CpgLoader.addDiffGraphs(zipFiles, cpg)
+        if (dir.isRegularFile) {
+          System.err.println("Detected undo information in old format. That's ok.")
+          CpgLoader.addDiffGraphs(List(dir.path.toString), cpg)
+        } else {
+          val zipFiles = dir.list.toList.sortWith(compareFiles).reverse.map(_.path.toString)
+          CpgLoader.addDiffGraphs(zipFiles, cpg)
+        }
         Overlays.removeLastOverlayName(cpg)
         dir.delete()
       }
