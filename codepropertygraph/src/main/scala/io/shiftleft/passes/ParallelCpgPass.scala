@@ -14,7 +14,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "") extends CpgPas
 
   def partIterator: Iterator[T]
 
-  def runOnPart(part: T): DiffGraph
+  def runOnPart(part: T): Option[DiffGraph]
 
   override def createAndApply(): Unit = {
     withWriter() { writer =>
@@ -49,7 +49,10 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "") extends CpgPas
   private def enqueueInParallel(writer: Writer): Unit = {
     init()
     val it = new ParallelIteratorExecutor(partIterator).map { part =>
-      writer.enqueue(Some(runOnPart(part)))
+      // Note: write.enqueue(runOnPart(part)) would be wrong because
+      // it would terminate the writer as soon as a pass returns None
+      // as None is used as a termination symbol for the queue
+      runOnPart(part).foreach(diffGraph => writer.enqueue(Some(diffGraph)))
     }
     consume(it)
   }
