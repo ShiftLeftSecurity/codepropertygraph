@@ -36,7 +36,9 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "") extends CpgPas
     writerThread.setName("Writer")
     writerThread.start()
     try {
-      f(writer)
+      withStartEndTimesLogged {
+        f(writer)
+      }
     } catch {
       case exception: Exception =>
         logger.warn(exception)
