@@ -74,7 +74,7 @@
          "name": "FILE",
          "keys": ["NAME", "ORDER"],
          "comment": "Node representing a source file. Often also the AST root",
-         "outEdges": [{"edgeName": "AST", "inNodes": [{"name": "NAMESPACE_BLOCK", "cardinaliy": "0-1:n"}]}],
+         "outEdges": [{"edgeName": "AST", "inNodes": [{"name": "NAMESPACE_BLOCK", "cardinality": "0-1:n"}]}],
          "is" : ["AST_NODE"]
         },
 
@@ -89,10 +89,10 @@
            {"edgeName": "AST",
             "inNodes": [
               {"name": "METHOD_RETURN", "cardinality":"1:1"},
-              {"name": "METHOD_PARAMETER_IN", "cardinaliy": "1:n"},
-              {"name": "MODIFIER", "cardinaliy": "1:n"},
+              {"name": "METHOD_PARAMETER_IN", "cardinality": "1:n"},
+              {"name": "MODIFIER", "cardinality": "1:n"},
               {"name": "BLOCK", "cardinality":"1:1"},
-              {"name": "TYPE_PARAMETER", "cardinaliy": "1:n"}
+              {"name": "TYPE_PARAMETER", "cardinality": "1:n"}
             ]
            },
            {"edgeName": "CFG",
@@ -144,10 +144,10 @@
          "outEdges" : [
            {"edgeName": "AST", "inNodes": [
              {"name": "TYPE_PARAMETER"},
-             {"name": "MEMBER", "cardinaliy": "1:n"},
-             {"name": "MODIFIER", "cardinaliy": "1:n"}
+             {"name": "MEMBER", "cardinality": "1:n"},
+             {"name": "MODIFIER", "cardinality": "1:n"}
            ]},
-           {"edgeName": "BINDS", "inNodes": [{"name":"BINDING", "cardinaliy": "1:n"}]},
+           {"edgeName": "BINDS", "inNodes": [{"name":"BINDING", "cardinality": "1:n"}]},
            {"edgeName": "VTABLE", "inNodes": [{"name":"METHOD"}]}
          ],
          "is" : ["AST_NODE"]
@@ -230,7 +230,7 @@
            {"edgeName": "AST", "inNodes": [
              {"name": "CALL"},
              {"name": "IDENTIFIER"},
-             {"name": "FIELD_IDENTIFIER", "cardinaliy": "1:n"},
+             {"name": "FIELD_IDENTIFIER", "cardinality": "1:n"},
              {"name": "LITERAL"},
              {"name": "METHOD_REF"},
              {"name": "RETURN"},
@@ -246,12 +246,12 @@
              {"name": "UNKNOWN"}
            ]},
            {"edgeName": "ARGUMENT", "inNodes": [
-             {"name": "CALL", "cardinaliy": "0-1:n"},
-             {"name": "IDENTIFIER", "cardinaliy": "0-1:n"},
-             {"name": "FIELD_IDENTIFIER", "cardinaliy": "1:n"},
-             {"name": "LITERAL", "cardinaliy": "0-1:n"},
-             {"name": "METHOD_REF", "cardinaliy": "0-1:n"},
-             {"name": "BLOCK", "cardinaliy": "0-1:n"},
+             {"name": "CALL", "cardinality": "0-1:n"},
+             {"name": "IDENTIFIER", "cardinality": "0-1:n"},
+             {"name": "FIELD_IDENTIFIER", "cardinality": "1:n"},
+             {"name": "LITERAL", "cardinality": "0-1:n"},
+             {"name": "METHOD_REF", "cardinality": "0-1:n"},
+             {"name": "BLOCK", "cardinality": "0-1:n"},
              {"name": "UNKNOWN"}
            ]}
          ]
@@ -340,7 +340,7 @@
                {"name": "LITERAL"},
                {"name": "METHOD_REF"},
                {"name": "RETURN"},
-               {"name": "BLOCK", "cardinaliy": "1:n"},
+               {"name": "BLOCK", "cardinality": "1:n"},
                {"name": "LOCAL"},
                {"name": "UNKNOWN"},
                {"name": "CONTROL_STRUCTURE"}
@@ -398,17 +398,17 @@
 	 "is" : ["EXPRESSION"],
 	 "outEdges" : [
      {"edgeName": "AST", "inNodes": [
-        {"name": "LITERAL", "cardinaliy": "1:n"},
+        {"name": "LITERAL", "cardinality": "1:n"},
         {"name": "MODIFIER"},
         {"name": "ARRAY_INITIALIZER"},
-        {"name": "CALL", "cardinaliy": "1:n"},
+        {"name": "CALL", "cardinality": "1:n"},
         {"name": "LOCAL"},
-        {"name": "IDENTIFIER", "cardinaliy": "0-1:n"},
-        {"name": "RETURN", "cardinaliy": "0-1:n"},
-        {"name": "BLOCK", "cardinaliy": "0-1:n"},
+        {"name": "IDENTIFIER", "cardinality": "0-1:n"},
+        {"name": "RETURN", "cardinality": "0-1:n"},
+        {"name": "BLOCK", "cardinality": "0-1:n"},
         {"name": "UNKNOWN"},
         {"name": "CONTROL_STRUCTURE"},
-        {"name": "METHOD_REF", "cardinaliy": "1:n"}
+        {"name": "METHOD_REF", "cardinality": "1:n"}
      ]},
 	   {"edgeName" : "CONDITION", "inNodes" : [
         {"name": "LITERAL"},
