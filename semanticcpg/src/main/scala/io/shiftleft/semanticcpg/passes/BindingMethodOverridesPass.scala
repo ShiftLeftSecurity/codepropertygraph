@@ -42,7 +42,7 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
   def markRecurse(binding: nodes.Binding): Unit = {
     val wasAlreadyOverwritten = overwritten.add(binding)
     if (wasAlreadyOverwritten) {
-      for (parentType <- binding._typeDeclViaBindsIn.next._typeViaInheritsFromOut;
+      for (parentType <- binding._typeDeclViaBindsIn._typeViaInheritsFromOut;
            parentTypeDecl <- parentType._typeDeclViaRefOut;
            parentBinding <- bindingTable.get((binding.name, binding.signature, parentTypeDecl))) {
         markRecurse(parentBinding)
