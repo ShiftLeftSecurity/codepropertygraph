@@ -42,7 +42,7 @@ object ExpandTo {
   }
 
   def parameterInToMethod(parameterIn: nodes.MethodParameterIn): nodes.Method =
-    parameterIn._methodViaAstIn.onlyChecked
+    parameterIn._methodViaAstIn
 
   def parameterOutToMethod(parameterOut: nodes.MethodParameterOut): nodes.Method =
     parameterOut._methodViaAstIn.onlyChecked

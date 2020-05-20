@@ -127,12 +127,13 @@ object LocationCreator {
       val typeName = typeOption.map(_.fullName).getOrElse("")
       val typeShortName = typeOption.map(_.name).getOrElse("")
 
-      val namespaceOption = typeOption.flatMap { tpe =>
-        tpe._namespaceBlockViaAstIn
-          .flatMap(_._namespaceViaRefOut)
-          .nextOption
-      }
-      val namespaceName = namespaceOption.map(_.name).getOrElse("")
+      val namespaceOption = for {
+        tpe <- typeOption
+        namespaceBlock <- tpe._namespaceBlockViaAstIn
+        namespace <- namespaceBlock._namespaceViaRefOut.nextOption
+      } yield namespace.name
+      val namespaceName = namespaceOption.getOrElse("")
+
       val fileOption = ExpandTo.methodToFile(method)
       val fileName = fileOption.map(_.name).getOrElse("N/A")
 
