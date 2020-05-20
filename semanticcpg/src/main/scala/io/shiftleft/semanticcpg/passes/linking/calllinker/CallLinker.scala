@@ -30,9 +30,6 @@ class CallLinker(cpg: Cpg) extends ParallelCpgPass[nodes.Call](cpg) {
 
   override def partIterator: Iterator[nodes.Call] = cpg.call.toIterator()
 
-  /**
-    * Main method of enhancement - to be implemented by child class
-    **/
   override def runOnPart(call: nodes.Call): Option[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
