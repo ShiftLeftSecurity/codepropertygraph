@@ -45,54 +45,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     graphsFromAstPass ++ Iterator(dstGraph.build())
   }
 
-  private def linkToMultiple[SRC_NODE_TYPE <: nodes.StoredNode](srcLabels: List[String],
-                                                                dstNodeLabel: String,
-                                                                edgeType: String,
-                                                                dstNodeMap: mutable.Map[String, nodes.StoredNode],
-                                                                getDstFullNames: SRC_NODE_TYPE => Iterable[String],
-                                                                dstFullNameKey: String): Iterator[DiffGraph] = {
-    var loggedDeprecationWarning = false
-
-    def nodeIterator =
-      cpg.graph.V
-        .hasLabel(srcLabels.head, srcLabels.tail: _*)
-
-    nodeIterator
-      .map {
-        case srcNode: SRC_NODE_TYPE @unchecked =>
-          val dstGraph = DiffGraph.newBuilder
-          if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
-            getDstFullNames(srcNode).foreach { dstFullName =>
-              dstNodeMap.get(dstFullName) match {
-                case Some(dstNode) =>
-                  dstGraph.addEdgeInOriginal(srcNode, dstNode, edgeType)
-                case None =>
-                  logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
-              }
-            }
-          } else {
-            val dstFullNames = srcNode
-              .vertices(Direction.OUT, edgeType)
-              .asScala
-              .map(_.value2(NodeKeys.FULL_NAME))
-              .iterator
-              .to(Iterable)
-            srcNode.removeProperty(Key(dstFullNameKey))
-            dstFullNames.foreach { name =>
-              srcNode.property(Cardinality.list, dstFullNameKey, name)
-            }
-            if (!loggedDeprecationWarning) {
-              logger.warn(
-                s"Using deprecated CPG format with already existing $edgeType edge between" +
-                  s" a source node of type $srcLabels and a $dstNodeLabel node.")
-              loggedDeprecationWarning = true
-            }
-          }
-          dstGraph.build
-      }
-      .toIterator()
-  }
-
   /**
     * For each node and type decl, check if there is an incoming AST edge.
     * If there is not, look up parent node according to `parentType` field
