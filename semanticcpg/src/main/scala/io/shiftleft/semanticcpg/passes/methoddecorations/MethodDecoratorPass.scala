@@ -1,11 +1,12 @@
 package io.shiftleft.semanticcpg.passes.methoddecorations
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
+import gremlin.scala._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import org.apache.logging.log4j.{LogManager, Logger}
-import io.shiftleft.semanticcpg.language._
+import org.apache.tinkerpop.gremlin.structure.Direction
 
 /**
   * Adds a METHOD_PARAMETER_OUT for each METHOD_PARAMETER_IN to the graph and
@@ -16,49 +17,52 @@ import io.shiftleft.semanticcpg.language._
   * not provide method stubs.
   *
   */
-class MethodDecoratorPass(cpg: Cpg) extends ParallelCpgPass[nodes.MethodParameterIn](cpg) {
+class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   import MethodDecoratorPass.logger
 
   private[this] var loggedDeprecatedWarning = false
   private[this] var loggedMissingTypeFullName = false
 
-  override def partIterator: Iterator[nodes.MethodParameterIn] =
-    cpg.parameter.iterator
-
-  override def runOnPart(parameterIn: nodes.MethodParameterIn): Option[DiffGraph] = {
+  override def run() = {
     val dstGraph = DiffGraph.newBuilder
 
-    if (!parameterIn._parameterLinkOut().hasNext) {
-      val parameterOut = nodes.NewMethodParameterOut(
-        parameterIn.code,
-        parameterIn.order,
-        parameterIn.name,
-        parameterIn.evaluationStrategy,
-        parameterIn.typeFullName,
-        parameterIn.lineNumber,
-        parameterIn.columnNumber,
-      )
+    cpg.graph.V
+      .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
+      .sideEffect {
+        case parameterIn: nodes.MethodParameterIn =>
+          if (!parameterIn._parameterLinkOut().hasNext) {
+            val parameterOut = new nodes.NewMethodParameterOut(
+              parameterIn.code,
+              parameterIn.order,
+              parameterIn.name,
+              parameterIn.evaluationStrategy,
+              parameterIn.typeFullName,
+              parameterIn.lineNumber,
+              parameterIn.columnNumber,
+            )
 
-      val method =
-        parameterIn._astIn.onlyChecked.asInstanceOf[nodes.Method]
-      if (parameterIn.typeFullName == null) {
-        val evalType = parameterIn._evalTypeOut.onlyChecked
-          .asInstanceOf[nodes.Type]
-        dstGraph.addEdgeToOriginal(parameterOut, evalType, EdgeTypes.EVAL_TYPE)
-        if (!loggedMissingTypeFullName) {
-          logger.warn("Using deprecated CPG format with missing TYPE_FULL_NAME on METHOD_PARAMETER_IN nodes.")
-          loggedMissingTypeFullName = true
-        }
+            val method =
+              parameterIn._astIn.onlyChecked.asInstanceOf[nodes.Method]
+            if (parameterIn.typeFullName == null) {
+              val evalType = parameterIn._evalTypeOut.onlyChecked
+                .asInstanceOf[nodes.Type]
+              dstGraph.addEdgeToOriginal(parameterOut, evalType, EdgeTypes.EVAL_TYPE)
+              if (!loggedMissingTypeFullName) {
+                logger.warn("Using deprecated CPG format with missing TYPE_FULL_NAME on METHOD_PARAMETER_IN nodes.")
+                loggedMissingTypeFullName = true
+              }
+            }
+
+            dstGraph.addNode(parameterOut)
+            dstGraph.addEdgeFromOriginal(method, parameterOut, EdgeTypes.AST)
+            dstGraph.addEdgeFromOriginal(parameterIn, parameterOut, EdgeTypes.PARAMETER_LINK)
+          } else if (!loggedDeprecatedWarning) {
+            logger.warn("Using deprecated CPG format with PARAMETER_LINK edges")
+            loggedDeprecatedWarning = true
+          }
       }
-
-      dstGraph.addNode(parameterOut)
-      dstGraph.addEdgeFromOriginal(method, parameterOut, EdgeTypes.AST)
-      dstGraph.addEdgeFromOriginal(parameterIn, parameterOut, EdgeTypes.PARAMETER_LINK)
-    } else if (!loggedDeprecatedWarning) {
-      logger.warn("Using deprecated CPG format with PARAMETER_LINK edges")
-      loggedDeprecatedWarning = true
-    }
-    Some(dstGraph.build())
+      .iterate
+    Iterator(dstGraph.build())
   }
 }
 
