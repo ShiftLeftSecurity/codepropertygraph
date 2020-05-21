@@ -23,7 +23,7 @@ class LinkToSinglePass(cpg: Cpg,
   private var loggedDeprecationWarning = false
 
   def dstNotExistsHandler(srcNode: nodes.StoredNode, dstFullName: String, diffGraph: DiffGraph.Builder): Unit = {
-    Linker.logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
+    LinkerShared.logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
   }
 
   override def partIterator: Iterator[Vertex] = {

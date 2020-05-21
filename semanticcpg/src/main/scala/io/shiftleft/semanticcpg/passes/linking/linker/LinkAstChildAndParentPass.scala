@@ -50,11 +50,11 @@ class LinkAstChildAndParentPass(cpg: Cpg, maps: Maps) extends ParallelCpgPass[Ch
             case Some(astParent) =>
               dstGraph.addEdgeInOriginal(astParent, astChild, EdgeTypes.AST)
             case None =>
-              Linker.logFailedSrcLookup(EdgeTypes.AST,
-                                        astChild.astParentType,
-                                        astChild.astParentFullName,
-                                        astChild.label,
-                                        astChild.id.toString())
+              LinkerShared.logFailedSrcLookup(EdgeTypes.AST,
+                                              astChild.astParentType,
+                                              astChild.astParentFullName,
+                                              astChild.label,
+                                              astChild.id.toString())
           }
         case _ =>
       }

@@ -4,7 +4,7 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeKeys, nodes}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
-import io.shiftleft.semanticcpg.passes.linking.linker.Linker.logFailedDstLookup
+import io.shiftleft.semanticcpg.passes.linking.linker.LinkerShared.logFailedDstLookup
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
