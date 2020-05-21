@@ -17,7 +17,6 @@ import scala.collection.mutable
   */
 class FileLinker(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
 
     val originalFileNameToNode = mutable.Map.empty[String, nodes.StoredNode]
     val newFileNameToNode = mutable.Map.empty[String, nodes.NewFile]
@@ -29,7 +28,7 @@ class FileLinker(cpg: Cpg) extends CpgPass(cpg) {
       maxFileOrder = Math.max(maxFileOrder, node.order)
     }
 
-    def createFileIfDoesNotExist(srcNode: nodes.StoredNode, dstFullName: String): Unit = {
+    def createFileIfDoesNotExist(srcNode: nodes.StoredNode, dstFullName: String, dstGraph: DiffGraph.Builder): Unit = {
       val newFile = newFileNameToNode.getOrElseUpdate(dstFullName, {
         maxFileOrder += 1
         val file = nodes.NewFile(name = dstFullName, order = maxFileOrder)
@@ -42,7 +41,7 @@ class FileLinker(cpg: Cpg) extends CpgPass(cpg) {
     // Create SOURCE_FILE edges from nodes of various types
     // to FILE nodes.
 
-    Linker.linkToSingle(
+    val diffGraph = Linker.linkToSingle(
       cpg,
       srcLabels = List(
         NodeTypes.NAMESPACE_BLOCK,
@@ -53,10 +52,9 @@ class FileLinker(cpg: Cpg) extends CpgPass(cpg) {
       edgeType = EdgeTypes.SOURCE_FILE,
       dstNodeMap = originalFileNameToNode,
       dstFullNameKey = "FILENAME",
-      dstGraph,
       Some(createFileIfDoesNotExist)
     )
 
-    Iterator(dstGraph.build())
+    Iterator(diffGraph)
   }
 }

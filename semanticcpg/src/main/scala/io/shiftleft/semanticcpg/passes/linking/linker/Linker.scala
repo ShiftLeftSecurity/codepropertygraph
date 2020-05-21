@@ -42,57 +42,51 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
 
     val graphsFromAstPass = linkAstChildToParent()
 
-    // Create REF edges from TYPE nodes to TYPE_DECL nodes.
-
-    linkToSingle(
-      cpg,
-      srcLabels = List(NodeTypes.TYPE),
-      dstNodeLabel = NodeTypes.TYPE_DECL,
-      edgeType = EdgeTypes.REF,
-      dstNodeMap = typeDeclFullNameToNode,
-      dstFullNameKey = nodes.Type.PropertyNames.TypeDeclFullName,
-      dstGraph,
-      None
-    )
-
-    // Create EVAL_TYPE edges from nodes of various types
-    // to TYPE nodes.
-
-    linkToSingle(
-      cpg,
-      srcLabels = List(
-        NodeTypes.METHOD_PARAMETER_IN,
-        NodeTypes.METHOD_PARAMETER_OUT,
-        NodeTypes.METHOD_RETURN,
-        NodeTypes.MEMBER,
-        NodeTypes.LITERAL,
-        NodeTypes.CALL,
-        NodeTypes.LOCAL,
-        NodeTypes.IDENTIFIER,
-        NodeTypes.BLOCK,
-        NodeTypes.METHOD_REF,
-        NodeTypes.UNKNOWN
+    val linkToSingleGraphs = Iterator(
+      // Create REF edges from TYPE nodes to TYPE_DECL nodes.
+      linkToSingle(
+        cpg,
+        srcLabels = List(NodeTypes.TYPE),
+        dstNodeLabel = NodeTypes.TYPE_DECL,
+        edgeType = EdgeTypes.REF,
+        dstNodeMap = typeDeclFullNameToNode,
+        dstFullNameKey = nodes.Type.PropertyNames.TypeDeclFullName,
+        None
       ),
-      dstNodeLabel = NodeTypes.TYPE,
-      edgeType = EdgeTypes.EVAL_TYPE,
-      dstNodeMap = typeFullNameToNode,
-      dstFullNameKey = "TYPE_FULL_NAME",
-      dstGraph,
-      None
-    )
-
-    // Create REF edges from METHOD_REFs to
-    // METHOD nodes.
-
-    linkToSingle(
-      cpg,
-      srcLabels = List(NodeTypes.METHOD_REF),
-      dstNodeLabel = NodeTypes.METHOD,
-      edgeType = EdgeTypes.REF,
-      dstNodeMap = methodFullNameToNode,
-      dstFullNameKey = nodes.MethodRef.PropertyNames.MethodFullName,
-      dstGraph,
-      None
+      // Create EVAL_TYPE edges from nodes of various types
+      // to TYPE nodes.
+      linkToSingle(
+        cpg,
+        srcLabels = List(
+          NodeTypes.METHOD_PARAMETER_IN,
+          NodeTypes.METHOD_PARAMETER_OUT,
+          NodeTypes.METHOD_RETURN,
+          NodeTypes.MEMBER,
+          NodeTypes.LITERAL,
+          NodeTypes.CALL,
+          NodeTypes.LOCAL,
+          NodeTypes.IDENTIFIER,
+          NodeTypes.BLOCK,
+          NodeTypes.METHOD_REF,
+          NodeTypes.UNKNOWN
+        ),
+        dstNodeLabel = NodeTypes.TYPE,
+        edgeType = EdgeTypes.EVAL_TYPE,
+        dstNodeMap = typeFullNameToNode,
+        dstFullNameKey = "TYPE_FULL_NAME",
+        None
+      ),
+      // Create REF edges from METHOD_REFs to
+      // METHOD nodes.
+      linkToSingle(
+        cpg,
+        srcLabels = List(NodeTypes.METHOD_REF),
+        dstNodeLabel = NodeTypes.METHOD,
+        edgeType = EdgeTypes.REF,
+        dstNodeMap = methodFullNameToNode,
+        dstFullNameKey = nodes.MethodRef.PropertyNames.MethodFullName,
+        None
+      )
     )
 
     // Create INHERITS_FROM nodes from TYPE_DECL
@@ -129,7 +123,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstGraph
     )
 
-    graphsFromAstPass ++ Iterator(dstGraph.build())
+    graphsFromAstPass ++ linkToSingleGraphs ++ Iterator(dstGraph.build())
   }
 
   private def linkToMultiple[SRC_NODE_TYPE <: nodes.StoredNode](srcLabels: List[String],
@@ -245,11 +239,11 @@ object Linker {
                    edgeType: String,
                    dstNodeMap: mutable.Map[String, nodes.StoredNode],
                    dstFullNameKey: String,
-                   dstGraph: DiffGraph.Builder,
-                   dstNotExistsHandler: Option[(nodes.StoredNode, String) => Unit]): Unit = {
+                   dstNotExistsHandler: Option[(nodes.StoredNode, String, DiffGraph.Builder) => Unit]): DiffGraph = {
     var loggedDeprecationWarning = false
     val sourceTraversal = cpg.graph.V.hasLabel(srcLabels.head, srcLabels.tail: _*)
     val sourceIterator = new Steps(sourceTraversal).toIterator()
+    val dstGraph = DiffGraph.newBuilder
     sourceIterator.foreach { srcNode =>
       // If the source node does not have any outgoing edges of this type
       // This check is just required for backward compatibility
@@ -264,7 +258,7 @@ object Linker {
                 .addEdgeInOriginal(srcStoredNode, dstNodeInner, edgeType)
             case None =>
               if (dstNotExistsHandler.isDefined) {
-                dstNotExistsHandler.get(srcStoredNode, dstFullName)
+                dstNotExistsHandler.get(srcStoredNode, dstFullName, dstGraph)
               } else {
                 logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
               }
@@ -284,6 +278,7 @@ object Linker {
         }
       }
     }
+    dstGraph.build()
   }
 
   @inline
