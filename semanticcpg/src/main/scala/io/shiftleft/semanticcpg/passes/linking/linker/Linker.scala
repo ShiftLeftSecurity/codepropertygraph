@@ -30,7 +30,17 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
 
     initMaps()
 
-    linkAstChildToParent(dstGraph)
+    def initMaps(): Unit = {
+      cpg.graph.graph.vertices().asScala.foreach {
+        case node: nodes.TypeDecl       => typeDeclFullNameToNode += node.fullName -> node
+        case node: nodes.Type           => typeFullNameToNode += node.fullName -> node
+        case node: nodes.Method         => methodFullNameToNode += node.fullName -> node
+        case node: nodes.NamespaceBlock => namespaceBlockFullNameToNode += node.fullName -> node
+        case _                          => // ignore
+      }
+    }
+
+    val graphsFromAstPass = linkAstChildToParent()
 
     // Create REF edges from TYPE nodes to TYPE_DECL nodes.
 
@@ -119,17 +129,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstGraph
     )
 
-    Iterator(dstGraph.build())
-  }
-
-  private def initMaps(): Unit = {
-    cpg.graph.graph.vertices().asScala.foreach {
-      case node: nodes.TypeDecl       => typeDeclFullNameToNode += node.fullName -> node
-      case node: nodes.Type           => typeFullNameToNode += node.fullName -> node
-      case node: nodes.Method         => methodFullNameToNode += node.fullName -> node
-      case node: nodes.NamespaceBlock => namespaceBlockFullNameToNode += node.fullName -> node
-      case _                          => // ignore
-    }
+    graphsFromAstPass ++ Iterator(dstGraph.build())
   }
 
   private def linkToMultiple[SRC_NODE_TYPE <: nodes.StoredNode](srcLabels: List[String],
@@ -175,40 +175,58 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       .iterate()
   }
 
-  private def linkAstChildToParent(dstGraph: DiffGraph.Builder): Unit = {
-    cpg.graph.V
-      .hasLabel(NodeTypes.METHOD, NodeTypes.TYPE_DECL)
-      .sideEffect {
-        case astChild: nodes.HasAstParentType with nodes.HasAstParentFullName with nodes.StoredNode =>
-          astChild.edges(Direction.IN, EdgeTypes.AST).nextOption match {
-            case None =>
-              val astParentOption: Option[nodes.StoredNode] =
-                astChild.astParentType match {
-                  case NodeTypes.METHOD          => methodFullNameToNode.get(astChild.astParentFullName)
-                  case NodeTypes.TYPE_DECL       => typeDeclFullNameToNode.get(astChild.astParentFullName)
-                  case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode.get(astChild.astParentFullName)
-                  case _ =>
-                    logger.error(
-                      s"Invalid AST_PARENT_TYPE=${astChild.valueOption(NodeKeys.AST_PARENT_FULL_NAME)};" +
-                        s" astChild LABEL=${astChild.label};" +
-                        s" astChild FULL_NAME=${astChild.valueOption(NodeKeys.FULL_NAME)}")
-                    None
-                }
+  /**
+    * For each node and type decl, check if there is an incoming AST edge.
+    * If there is not, look up parent node according to `parentType` field
+    * in the corresponding table and add an AST edge from parent to child
+    * */
+  private def linkAstChildToParent(): Iterator[DiffGraph] = {
+    type ChildType = nodes.HasAstParentType with nodes.HasAstParentFullName with nodes.StoredNode
 
-              astParentOption match {
-                case Some(astParent) =>
-                  dstGraph.addEdgeInOriginal(astParent, astChild, EdgeTypes.AST)
-                case None =>
-                  logFailedSrcLookup(EdgeTypes.AST,
-                                     astChild.astParentType,
-                                     astChild.astParentFullName,
-                                     astChild.label,
-                                     astChild.id.toString())
+    def nodeIterator: Iterator[ChildType] =
+      cpg.graph.V
+        .hasLabel(NodeTypes.METHOD, NodeTypes.TYPE_DECL)
+        .toIterator()
+        .map(_.asInstanceOf[ChildType])
+
+    def runOnPart(astChild: ChildType): DiffGraph = {
+      val dstGraph = DiffGraph.newBuilder
+      try {
+        astChild.edges(Direction.IN, EdgeTypes.AST).nextOption match {
+          case None =>
+            val astParentOption: Option[nodes.StoredNode] =
+              astChild.astParentType match {
+                case NodeTypes.METHOD          => methodFullNameToNode.get(astChild.astParentFullName)
+                case NodeTypes.TYPE_DECL       => typeDeclFullNameToNode.get(astChild.astParentFullName)
+                case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode.get(astChild.astParentFullName)
+                case _ =>
+                  logger.error(
+                    s"Invalid AST_PARENT_TYPE=${astChild.valueOption(NodeKeys.AST_PARENT_FULL_NAME)};" +
+                      s" astChild LABEL=${astChild.label};" +
+                      s" astChild FULL_NAME=${astChild.valueOption(NodeKeys.FULL_NAME)}")
+                  None
               }
-            case _ =>
-          }
+
+            astParentOption match {
+              case Some(astParent) =>
+                dstGraph.addEdgeInOriginal(astParent, astChild, EdgeTypes.AST)
+              case None =>
+                logFailedSrcLookup(EdgeTypes.AST,
+                                   astChild.astParentType,
+                                   astChild.astParentFullName,
+                                   astChild.label,
+                                   astChild.id.toString())
+            }
+          case _ =>
+        }
+      } catch {
+        case _: NoSuchElementException =>
+          logger.info("No such element in `linkAstChildToParent`. Tinkerpop used to not tell us, now we know.")
       }
-      .iterate()
+      dstGraph.build()
+    }
+
+    nodeIterator.map(runOnPart)
   }
 }
 
