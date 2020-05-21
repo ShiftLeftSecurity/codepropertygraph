@@ -80,7 +80,7 @@
               {"name": "METHOD_PARAMETER_OUT"},
               {"name": "METHOD_RETURN"}
             ]},
-            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]},
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE", "cardinality": "n:1"}]},
             {"edgeName": "REACHING_DEF", "inNodes": [
               {"name": "CALL"},
               {"name": "RETURN"}
