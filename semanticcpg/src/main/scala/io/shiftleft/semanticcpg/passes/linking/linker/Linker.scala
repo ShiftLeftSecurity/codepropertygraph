@@ -42,52 +42,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
 
     val graphsFromAstPass = linkAstChildToParent()
 
-    val linkToSingleGraphs =
-      // Create REF edges from TYPE nodes to TYPE_DECL nodes.
-      linkToSingle(
-        cpg,
-        srcLabels = List(NodeTypes.TYPE),
-        dstNodeLabel = NodeTypes.TYPE_DECL,
-        edgeType = EdgeTypes.REF,
-        dstNodeMap = typeDeclFullNameToNode,
-        dstFullNameKey = nodes.Type.PropertyNames.TypeDeclFullName,
-        None
-      ) ++
-        // Create EVAL_TYPE edges from nodes of various types
-        // to TYPE nodes.
-        linkToSingle(
-          cpg,
-          srcLabels = List(
-            NodeTypes.METHOD_PARAMETER_IN,
-            NodeTypes.METHOD_PARAMETER_OUT,
-            NodeTypes.METHOD_RETURN,
-            NodeTypes.MEMBER,
-            NodeTypes.LITERAL,
-            NodeTypes.CALL,
-            NodeTypes.LOCAL,
-            NodeTypes.IDENTIFIER,
-            NodeTypes.BLOCK,
-            NodeTypes.METHOD_REF,
-            NodeTypes.UNKNOWN
-          ),
-          dstNodeLabel = NodeTypes.TYPE,
-          edgeType = EdgeTypes.EVAL_TYPE,
-          dstNodeMap = typeFullNameToNode,
-          dstFullNameKey = "TYPE_FULL_NAME",
-          None
-        ) ++
-        // Create REF edges from METHOD_REFs to
-        // METHOD nodes.
-        linkToSingle(
-          cpg,
-          srcLabels = List(NodeTypes.METHOD_REF),
-          dstNodeLabel = NodeTypes.METHOD,
-          edgeType = EdgeTypes.REF,
-          dstNodeMap = methodFullNameToNode,
-          dstFullNameKey = nodes.MethodRef.PropertyNames.MethodFullName,
-          None
-        )
-
     // Create INHERITS_FROM nodes from TYPE_DECL
     // nodes to TYPE nodes.
 
@@ -116,7 +70,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
         dstFullNameKey = NodeKeyNames.ALIAS_TYPE_FULL_NAME,
       )
 
-    graphsFromAstPass ++ linkToSingleGraphs ++ linkToMultipleGraphs ++ Iterator(dstGraph.build())
+    graphsFromAstPass ++ linkToMultipleGraphs ++ Iterator(dstGraph.build())
   }
 
   private def linkToMultiple[SRC_NODE_TYPE <: nodes.StoredNode](srcLabels: List[String],
@@ -126,8 +80,12 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
                                                                 getDstFullNames: SRC_NODE_TYPE => Iterable[String],
                                                                 dstFullNameKey: String): Iterator[DiffGraph] = {
     var loggedDeprecationWarning = false
-    cpg.graph.V
-      .hasLabel(srcLabels.head, srcLabels.tail: _*)
+
+    def nodeIterator =
+      cpg.graph.V
+        .hasLabel(srcLabels.head, srcLabels.tail: _*)
+
+    nodeIterator
       .map {
         case srcNode: SRC_NODE_TYPE @unchecked =>
           val dstGraph = DiffGraph.newBuilder
@@ -282,11 +240,11 @@ object Linker {
   }
 
   @inline
-  private def logFailedDstLookup(edgeType: String,
-                                 srcNodeType: String,
-                                 srcNodeId: String,
-                                 dstNodeType: String,
-                                 dstFullName: String): Unit = {
+  def logFailedDstLookup(edgeType: String,
+                         srcNodeType: String,
+                         srcNodeId: String,
+                         dstNodeType: String,
+                         dstFullName: String): Unit = {
     logger.error(
       "Could not create edge. Destination lookup failed. " +
         s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcNodeId=$srcNodeId, " +

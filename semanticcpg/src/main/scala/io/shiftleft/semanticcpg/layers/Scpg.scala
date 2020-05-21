@@ -15,7 +15,7 @@ import io.shiftleft.semanticcpg.passes.trim.TrimPass
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
 import io.shiftleft.semanticcpg.passes.linking.calllinker.CallLinker
 import io.shiftleft.semanticcpg.passes.linking.capturinglinker.CapturingLinker
-import io.shiftleft.semanticcpg.passes.linking.linker.Linker
+import io.shiftleft.semanticcpg.passes.linking.linker.{Linker, LinkerPass}
 import io.shiftleft.semanticcpg.passes.linking.memberaccesslinker.MemberAccessLinker
 import io.shiftleft.semanticcpg.passes.methoddecorations.MethodDecoratorPass
 import io.shiftleft.semanticcpg.passes.methodexternaldecorator.MethodExternalDecoratorPass
@@ -63,6 +63,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new ReceiverEdgePass(cpg),
           new MethodDecoratorPass(cpg),
           new CapturingLinker(cpg),
+          new LinkerPass(cpg),
           new Linker(cpg),
           new FileNameCompat(cpg),
           new FileLinker(cpg),
@@ -83,6 +84,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
           new CapturingLinker(cpg),
+          new LinkerPass(cpg),
           new Linker(cpg),
           new FileNameCompat(cpg),
           new FileLinker(cpg),
@@ -102,6 +104,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
           new CapturingLinker(cpg),
+          new LinkerPass(cpg),
           new Linker(cpg),
           new FileNameCompat(cpg),
           new FileLinker(cpg),
