@@ -19,11 +19,11 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
     * */
   @Doc("All parameters")
   def parameter: NodeSteps[nodes.MethodParameterIn] =
-    new NodeSteps(
-      raw
-        .out(EdgeTypes.AST)
-        .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
-        .cast[nodes.MethodParameterIn])
+    // TODO once we use OdbTraversal, this will simply become `wrapped.flatMap(_.parameter)` - for now it's not that simple :(
+    new NodeSteps(raw
+      .out(EdgeTypes.AST)
+      .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
+      .cast[nodes.MethodParameterIn])
 
   /**
     * Traverse to formal return parameter
