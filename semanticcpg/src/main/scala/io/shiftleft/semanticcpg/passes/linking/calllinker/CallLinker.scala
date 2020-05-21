@@ -56,40 +56,34 @@ class CallLinker(cpg: Cpg) extends ParallelCpgPass[nodes.Call](cpg) {
       case DispatchTypes.DYNAMIC_DISPATCH =>
         val receiverIt = call._receiverOut
         if (receiverIt.hasNext) {
-          try {
-            val receiver = receiverIt.next
-            receiver match {
-              case methodRefReceiver: nodes.MethodRef =>
-                Some(methodRefReceiver._refOut.onlyChecked.asInstanceOf[nodes.Method])
-              case _ =>
-                val receiverTypeDecl = receiver
-                  ._evalTypeOut()
-                  .onlyChecked
-                  ._refOut
-                  .onlyChecked
+          val receiver = receiverIt.next
+          receiver match {
+            case methodRefReceiver: nodes.MethodRef =>
+              Some(methodRefReceiver._refOut.onlyChecked.asInstanceOf[nodes.Method])
+            case _ =>
+              val receiverTypeDecl = receiver
+                ._evalTypeOut()
+                .onlyChecked
+                ._refOut
+                .onlyChecked
 
-                val resolvedMethodOption = receiverTypeDecl._bindsOut.asScala.collectFirst {
-                  case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
-                    binding._refOut.onlyChecked.asInstanceOf[nodes.Method]
-                }
-                if (resolvedMethodOption.isDefined) {
-                  dstGraph.addEdgeInOriginal(call, resolvedMethodOption.get, EdgeTypes.CALL)
-                } else {
-                  /*
-                  There is no binding that declares the VTable slot.
-                  This is a valid possibility in message-passing style languages.
+              val resolvedMethodOption = receiverTypeDecl._bindsOut.asScala.collectFirst {
+                case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
+                  binding._refOut.onlyChecked.asInstanceOf[nodes.Method]
+              }
+              if (resolvedMethodOption.isDefined) {
+                dstGraph.addEdgeInOriginal(call, resolvedMethodOption.get, EdgeTypes.CALL)
+              } else {
+                /*
+                There is no binding that declares the VTable slot.
+                This is a valid possibility in message-passing style languages.
 
-                  In JVM and .NET this should not happen -- place breakpoint or uncomment here when debugging frontends
-                  logger.debug(
-                    s"Unable to link dynamic CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
-                      s"SIGNATURE ${call.signature}, CODE ${call.code}")
-                 */
-                }
-            }
-          } catch {
-            case exc: NoSuchElementException =>
-              logger.info("NoSuchElementException in CallLinker, previously swallowed by Gremlin")
-              logger.info(exc)
+                In JVM and .NET this should not happen -- place breakpoint or uncomment here when debugging frontends
+                logger.debug(
+                  s"Unable to link dynamic CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
+                    s"SIGNATURE ${call.signature}, CODE ${call.code}")
+               */
+              }
           }
         } else {
           logger.warn(s"Missing receiver edge on dynamic CALL ${call.code}")
