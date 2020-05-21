@@ -1,8 +1,9 @@
 package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 
+import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
-import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
 /**
@@ -11,35 +12,34 @@ import io.shiftleft.semanticcpg.language._
   * node, this pass creates a `TYPE_DECL` node. The `TYPE_DECL` is
   * considered external.
   */
-class TypeDeclStubCreator(cpg: Cpg) extends ParallelCpgPass[nodes.Type](cpg) {
+class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 
   private var typeDeclFullNameToNode = Map[String, nodes.TypeDeclBase]()
 
-  override def init(): Unit = {
-    cpg.typeDecl
-      .sideEffect { typeDecl =>
-        typeDeclFullNameToNode += typeDecl.fullName -> typeDecl
-      }
-      .l()
-  }
-
-  override def partIterator: Iterator[nodes.Type] = cpg.types.iterator
-
-  override def runOnPart(typ: nodes.Type): Option[DiffGraph] = {
+  override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    typeDeclFullNameToNode.get(typ.fullName) match {
-      case Some(_) =>
-      case None =>
-        val newTypeDecl = createTypeDeclStub(typ.name, typ.fullName)
-        typeDeclFullNameToNode += typ.fullName -> newTypeDecl
-        dstGraph.addNode(newTypeDecl)
-    }
-    Some(dstGraph.build())
+    init()
+
+    cpg.graph.V
+      .hasLabel(NodeTypes.TYPE)
+      .sideEffectWithTraverser { traverser =>
+        val typ = traverser.get.asInstanceOf[nodes.Type]
+        typeDeclFullNameToNode.get(typ.fullName) match {
+          case Some(_) =>
+          case None =>
+            val newTypeDecl = createTypeDeclStub(typ.name, typ.fullName)
+            typeDeclFullNameToNode += typ.fullName -> newTypeDecl
+            dstGraph.addNode(newTypeDecl)
+        }
+      }
+      .iterate()
+
+    Iterator(dstGraph.build())
   }
 
   private def createTypeDeclStub(name: String, fullName: String): nodes.NewTypeDecl = {
-    nodes.NewTypeDecl(
+    new nodes.NewTypeDecl(
       name,
       fullName,
       isExternal = true,
@@ -49,4 +49,9 @@ class TypeDeclStubCreator(cpg: Cpg) extends ParallelCpgPass[nodes.Type](cpg) {
     )
   }
 
+  private def init(): Unit = {
+    cpg.typeDecl.sideEffect { typeDecl =>
+      typeDeclFullNameToNode += typeDecl.fullName -> typeDecl
+    }.exec
+  }
 }

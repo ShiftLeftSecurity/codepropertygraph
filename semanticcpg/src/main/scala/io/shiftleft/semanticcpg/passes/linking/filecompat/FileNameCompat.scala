@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.linking.filecompat
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
 /**
@@ -13,21 +13,22 @@ import io.shiftleft.semanticcpg.language._
   * This pass should come after AST edges have been reconstructed, that
   * is, after Linker.  Is used by FileLinker.
   */
-class FileNameCompat(cpg: Cpg) extends ParallelCpgPass[nodes.StoredNode with nodes.HasFilename](cpg) {
-
-  override def partIterator: Iterator[nodes.StoredNode with nodes.HasFilename] = {
-    cpg.namespaceBlock.toIterator() ++
-      cpg.typeDecl.toIterator() ++
-      cpg.method.toIterator()
-  }
-
-  override def runOnPart(node: nodes.StoredNode with nodes.HasFilename): Option[DiffGraph] = {
+class FileNameCompat(cpg: Cpg) extends CpgPass(cpg) {
+  override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
-    if (node.filename == null) {
-      node.start.file.name.headOption().foreach { name =>
-        dstGraph.addNodeProperty(node, "FILENAME", name)
+
+    def updateDefaultFileName(node: nodes.StoredNode with nodes.HasFilename): Unit = {
+      if (node.filename == null) {
+        node.start.file.name.headOption().foreach { name =>
+          dstGraph.addNodeProperty(node, "FILENAME", name)
+        }
       }
     }
-    Some(dstGraph.build())
+
+    cpg.namespaceBlock.toIterator().foreach(updateDefaultFileName)
+    cpg.typeDecl.toIterator().foreach(updateDefaultFileName)
+    cpg.method.toIterator().foreach(updateDefaultFileName)
+
+    Iterator(dstGraph.build())
   }
 }
