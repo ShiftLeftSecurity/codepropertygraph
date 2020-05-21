@@ -9,23 +9,23 @@ import gremlin.scala._
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 
-class LinkerPass(cpg: Cpg) extends CpgPassBase {
+class Maps(cpg: Cpg) {
+  val typeDeclFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
+  val typeFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
+  val methodFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
+  val namespaceBlockFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
 
-  class Maps {
-    val typeDeclFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
-    val typeFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
-    val methodFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
-    val namespaceBlockFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
-
-    cpg.graph.graph.vertices().asScala.foreach {
-      case node: nodes.TypeDecl       => typeDeclFullNameToNode += node.fullName -> node
-      case node: nodes.Type           => typeFullNameToNode += node.fullName -> node
-      case node: nodes.Method         => methodFullNameToNode += node.fullName -> node
-      case node: nodes.NamespaceBlock => namespaceBlockFullNameToNode += node.fullName -> node
-      case _                          => // ignore
-    }
-
+  cpg.graph.graph.vertices().asScala.foreach {
+    case node: nodes.TypeDecl       => typeDeclFullNameToNode += node.fullName -> node
+    case node: nodes.Type           => typeFullNameToNode += node.fullName -> node
+    case node: nodes.Method         => methodFullNameToNode += node.fullName -> node
+    case node: nodes.NamespaceBlock => namespaceBlockFullNameToNode += node.fullName -> node
+    case _                          => // ignore
   }
+
+}
+
+class LinkerPass(cpg: Cpg) extends CpgPassBase {
 
   class RefEdgePass(cpg: Cpg, typeDeclFullNameToNode: mutable.Map[String, nodes.StoredNode])
       extends LinkToSinglePass(
@@ -100,20 +100,22 @@ class LinkerPass(cpg: Cpg) extends CpgPassBase {
       )
 
   override def createAndApply(): Unit = {
-    val maps = new Maps()
+    val maps = new Maps(cpg)
     new RefEdgePass(cpg, maps.typeDeclFullNameToNode).createAndApply()
     new EvalTypePass(cpg, maps.typeFullNameToNode).createAndApply()
     new MethodRefsPass(cpg, maps.methodFullNameToNode).createAndApply()
     new InheritsFromPass(cpg, maps.typeFullNameToNode).createAndApply()
     new AliasOfPass(cpg, maps.typeFullNameToNode).createAndApply()
+    new LinkAstChildAndParentPass(cpg, maps).createAndApply()
   }
 
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean, prefix: String): Unit = {
-    val maps = new Maps()
+    val maps = new Maps(cpg)
     new RefEdgePass(cpg, maps.typeDeclFullNameToNode).createApplySerializeAndStore(serializedCpg, inverse, prefix)
     new EvalTypePass(cpg, maps.typeFullNameToNode).createApplySerializeAndStore(serializedCpg, inverse, prefix)
     new MethodRefsPass(cpg, maps.methodFullNameToNode).createApplySerializeAndStore(serializedCpg, inverse, prefix)
     new InheritsFromPass(cpg, maps.typeFullNameToNode).createApplySerializeAndStore(serializedCpg, inverse, prefix)
     new AliasOfPass(cpg, maps.typeFullNameToNode).createApplySerializeAndStore(serializedCpg, inverse, prefix)
+    new LinkAstChildAndParentPass(cpg, maps).createApplySerializeAndStore(serializedCpg, inverse, prefix)
   }
 }

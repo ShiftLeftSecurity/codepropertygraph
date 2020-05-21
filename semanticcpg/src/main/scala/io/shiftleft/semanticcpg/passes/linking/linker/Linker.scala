@@ -7,101 +7,12 @@ import io.shiftleft.semanticcpg.language.Steps
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import org.apache.tinkerpop.gremlin.structure.Direction
-import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.logging.log4j.{LogManager, Logger}
 
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
-
-/**
-  * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
-  * language frontends which do not provide method stubs and type decl stubs.
-  */
-class Linker(cpg: Cpg) extends CpgPass(cpg) {
-  import Linker.linkToSingle, Linker.logFailedSrcLookup, Linker.logFailedDstLookup, Linker.logger
-
-  private val typeDeclFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
-  private val typeFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
-  private val methodFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
-  private val namespaceBlockFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
-
-  override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
-
-    initMaps()
-
-    def initMaps(): Unit = {
-      cpg.graph.graph.vertices().asScala.foreach {
-        case node: nodes.TypeDecl       => typeDeclFullNameToNode += node.fullName -> node
-        case node: nodes.Type           => typeFullNameToNode += node.fullName -> node
-        case node: nodes.Method         => methodFullNameToNode += node.fullName -> node
-        case node: nodes.NamespaceBlock => namespaceBlockFullNameToNode += node.fullName -> node
-        case _                          => // ignore
-      }
-    }
-
-    val graphsFromAstPass = linkAstChildToParent()
-
-    graphsFromAstPass ++ Iterator(dstGraph.build())
-  }
-
-  /**
-    * For each node and type decl, check if there is an incoming AST edge.
-    * If there is not, look up parent node according to `parentType` field
-    * in the corresponding table and add an AST edge from parent to child
-    * */
-  private def linkAstChildToParent(): Iterator[DiffGraph] = {
-    type ChildType = nodes.HasAstParentType with nodes.HasAstParentFullName with nodes.StoredNode
-
-    def nodeIterator: Iterator[ChildType] =
-      cpg.graph.V
-        .hasLabel(NodeTypes.METHOD, NodeTypes.TYPE_DECL)
-        .toIterator()
-        .map(_.asInstanceOf[ChildType])
-
-    def runOnPart(astChild: ChildType): DiffGraph = {
-      val dstGraph = DiffGraph.newBuilder
-      try {
-        astChild.edges(Direction.IN, EdgeTypes.AST).nextOption match {
-          case None =>
-            val astParentOption: Option[nodes.StoredNode] =
-              astChild.astParentType match {
-                case NodeTypes.METHOD          => methodFullNameToNode.get(astChild.astParentFullName)
-                case NodeTypes.TYPE_DECL       => typeDeclFullNameToNode.get(astChild.astParentFullName)
-                case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode.get(astChild.astParentFullName)
-                case _ =>
-                  logger.error(
-                    s"Invalid AST_PARENT_TYPE=${astChild.valueOption(NodeKeys.AST_PARENT_FULL_NAME)};" +
-                      s" astChild LABEL=${astChild.label};" +
-                      s" astChild FULL_NAME=${astChild.valueOption(NodeKeys.FULL_NAME)}")
-                  None
-              }
-
-            astParentOption match {
-              case Some(astParent) =>
-                dstGraph.addEdgeInOriginal(astParent, astChild, EdgeTypes.AST)
-              case None =>
-                logFailedSrcLookup(EdgeTypes.AST,
-                                   astChild.astParentType,
-                                   astChild.astParentFullName,
-                                   astChild.label,
-                                   astChild.id.toString())
-            }
-          case _ =>
-        }
-      } catch {
-        case _: NoSuchElementException =>
-          logger.info("No such element in `linkAstChildToParent`. Tinkerpop used to not tell us, now we know.")
-      }
-      dstGraph.build()
-    }
-
-    nodeIterator.map(runOnPart)
-  }
-}
 
 object Linker {
-  private val logger: Logger = LogManager.getLogger(classOf[Linker])
+  private val logger: Logger = LogManager.getLogger(this)
 
   /**
     * For all nodes `n` with a label in `srcLabels`, determine
@@ -176,11 +87,11 @@ object Linker {
   }
 
   @inline
-  private def logFailedSrcLookup(edgeType: String,
-                                 srcNodeType: String,
-                                 srcFullName: String,
-                                 dstNodeType: String,
-                                 dstNodeId: String): Unit = {
+  def logFailedSrcLookup(edgeType: String,
+                         srcNodeType: String,
+                         srcFullName: String,
+                         dstNodeType: String,
+                         dstNodeId: String): Unit = {
     logger.error(
       "Could not create edge. Source lookup failed. " +
         s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcFullName=$srcFullName, " +
