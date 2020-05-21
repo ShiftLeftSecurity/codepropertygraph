@@ -7,7 +7,10 @@ import io.shiftleft.semanticcpg.passes.linking.linker.LinkAstChildAndParentPass.
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.structure.Direction
 import io.shiftleft.Implicits.JavaIteratorDeco
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import org.apache.logging.log4j.{LogManager, Logger}
+
+import scala.collection.mutable
 
 object LinkAstChildAndParentPass {
   type ChildType = nodes.HasAstParentType with nodes.HasAstParentFullName with nodes.StoredNode
@@ -18,7 +21,11 @@ object LinkAstChildAndParentPass {
   * If there is not, look up parent node according to `parentType` field
   * in the corresponding table and add an AST edge from parent to child
   * */
-class LinkAstChildAndParentPass(cpg: Cpg, maps: Maps) extends ParallelCpgPass[ChildType](cpg) {
+class LinkAstChildAndParentPass(cpg: Cpg,
+                                methodFullNameToNode: mutable.Map[String, StoredNode],
+                                typeDeclFullNameToNode: mutable.Map[String, StoredNode],
+                                namespaceBlockFullNameToNode: mutable.Map[String, StoredNode])
+    extends ParallelCpgPass[ChildType](cpg) {
 
   private val logger: Logger = LogManager.getLogger(classOf[LinkAstChildAndParentPass])
 
@@ -35,9 +42,9 @@ class LinkAstChildAndParentPass(cpg: Cpg, maps: Maps) extends ParallelCpgPass[Ch
         case None =>
           val astParentOption: Option[nodes.StoredNode] =
             astChild.astParentType match {
-              case NodeTypes.METHOD          => maps.methodFullNameToNode.get(astChild.astParentFullName)
-              case NodeTypes.TYPE_DECL       => maps.typeDeclFullNameToNode.get(astChild.astParentFullName)
-              case NodeTypes.NAMESPACE_BLOCK => maps.namespaceBlockFullNameToNode.get(astChild.astParentFullName)
+              case NodeTypes.METHOD          => methodFullNameToNode.get(astChild.astParentFullName)
+              case NodeTypes.TYPE_DECL       => typeDeclFullNameToNode.get(astChild.astParentFullName)
+              case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode.get(astChild.astParentFullName)
               case _ =>
                 logger.error(
                   s"Invalid AST_PARENT_TYPE=${astChild.valueOption(NodeKeys.AST_PARENT_FULL_NAME)};" +
