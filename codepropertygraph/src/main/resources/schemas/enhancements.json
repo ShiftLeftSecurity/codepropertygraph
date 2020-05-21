@@ -115,7 +115,7 @@
         },
         { "name": "METHOD_REF",
           "outEdges" : [
-            {"edgeName": "REF", "inNodes": [{"name": "METHOD"}]},
+            {"edgeName": "REF", "inNodes": [{"name": "METHOD", "cardinality": "n:1"}]},
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
         },
