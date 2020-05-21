@@ -11,10 +11,7 @@ class MethodMethods(val node: nodes.Method) extends AnyVal {
     node._methodParameterInViaAstOut
 
   def methodReturn: nodes.MethodReturn =
-    node._astOut.asScala
-      .collect { case mr: nodes.MethodReturn => mr }
-      .asJava
-      .onlyChecked
+    node._methodReturnViaAstOut
 
   def local: Iterator[nodes.Local] =
     node._blockViaContainsOut.flatMap(_._localViaAstOut)
