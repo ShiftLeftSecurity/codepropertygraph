@@ -41,8 +41,7 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
               parameterIn.columnNumber,
             )
 
-            val method =
-              parameterIn._astIn.onlyChecked.asInstanceOf[nodes.Method]
+            val method = parameterIn._methodViaAstIn
             if (parameterIn.typeFullName == null) {
               val evalType = parameterIn._evalTypeOut.onlyChecked
                 .asInstanceOf[nodes.Type]
