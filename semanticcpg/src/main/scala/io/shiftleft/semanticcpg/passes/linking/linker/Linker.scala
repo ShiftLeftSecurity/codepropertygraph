@@ -42,35 +42,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
 
     val graphsFromAstPass = linkAstChildToParent()
 
-    // Create INHERITS_FROM nodes from TYPE_DECL
-    // nodes to TYPE nodes.
-
-    val linkToMultipleGraphs =
-      linkToMultiple(
-        srcLabels = List(NodeTypes.TYPE_DECL),
-        dstNodeLabel = NodeTypes.TYPE,
-        edgeType = EdgeTypes.INHERITS_FROM,
-        dstNodeMap = typeFullNameToNode,
-        getDstFullNames = (srcNode: nodes.TypeDecl) => {
-          if (srcNode.inheritsFromTypeFullName != null) {
-            srcNode.inheritsFromTypeFullName
-          } else {
-            Seq()
-          }
-        },
-        dstFullNameKey = nodes.TypeDecl.PropertyNames.InheritsFromTypeFullName,
-      ) ++ linkToMultiple(
-        srcLabels = List(NodeTypes.TYPE_DECL),
-        dstNodeLabel = NodeTypes.TYPE,
-        edgeType = EdgeTypes.ALIAS_OF,
-        dstNodeMap = typeFullNameToNode,
-        getDstFullNames = (srcNode: nodes.TypeDecl) => {
-          srcNode.aliasTypeFullName
-        },
-        dstFullNameKey = NodeKeyNames.ALIAS_TYPE_FULL_NAME,
-      )
-
-    graphsFromAstPass ++ linkToMultipleGraphs ++ Iterator(dstGraph.build())
+    graphsFromAstPass ++ Iterator(dstGraph.build())
   }
 
   private def linkToMultiple[SRC_NODE_TYPE <: nodes.StoredNode](srcLabels: List[String],
