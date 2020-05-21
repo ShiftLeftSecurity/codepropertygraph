@@ -41,7 +41,7 @@ class FileLinker(cpg: Cpg) extends CpgPass(cpg) {
     // Create SOURCE_FILE edges from nodes of various types
     // to FILE nodes.
 
-    val diffGraph = Linker.linkToSingle(
+    val it = Linker.linkToSingle(
       cpg,
       srcLabels = List(
         NodeTypes.NAMESPACE_BLOCK,
@@ -54,7 +54,6 @@ class FileLinker(cpg: Cpg) extends CpgPass(cpg) {
       dstFullNameKey = "FILENAME",
       Some(createFileIfDoesNotExist)
     )
-
-    Iterator(diffGraph)
+    it
   }
 }
