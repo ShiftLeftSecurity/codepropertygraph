@@ -205,7 +205,7 @@ Program structure is concerned with the organization of programs into files, nam
 AST relation of methods (type METHOD) and type declarations (type TYPE_DECL) to their parents. The property FULL_NAME thereby must be a unique identifier for the three node types METHOD, TYPE_DECL and NAMESPACE_BLOCK. This figure shows how a
 Java class definition is represented in a CPG.
 
-<img alt="Program Structure" src={useBaseUrl('/img/program-structure.jpg')} />
+![Program Structure]('/img/program-structure.jpg')
 
 The concept of namespace blocks correspond to the equivalent concepts in the C++ programming language, where namespace blocks are used to place declarations into a namespace. Other languages, e.g., Java or Python, do not provide the same type of namespace blocks. However, they allow package declarations at the start of source files that serve the
 purpose of placing all remaining declarations of the source file into a namespace. Package declarations are translated into corresponding namespace blocks for these languages. So the name of a namespace block is the complete namespace of all the elements within the block and the full name of a namespace block is a unique identifier for a specific block. For Java, it is enough to prefix the file name to the namespace because there is only one namespace describing package statement per file.
@@ -216,7 +216,7 @@ Node types: TYPE_DECL, TYPE_PARAMETER, MEMBER, TYPE, TYPE_ARGUMENT
 
 Language constructs are expressed that declare types via *type declarations*. Examples of these constructs include classes, interfaces, structures, and enumerations. A type declaration consists of a name, an optional list for type parameters, member variables and methods. Inheritance relations with other types may be encoded in *type declarations*.
 
-<img alt="Program Structure" src={useBaseUrl('/img/type-declaration.jpg')} />
+![Program Structure]('/img/type-declaration.jpg')
 
 In the CPG, each type declaration is represented by a designated type-declaration node (type TYPE_DECL), with at least a
 full-name attribute. Member variables (type MEMBER), method declarations (type METHOD), and type parameters (type TYPE_PARAMETER) are connected to the type declaration via AST edges, originating at the type declaration. Inheritance relations are expressed via INHERITS_FROM edges to zero or more other type declarations (type TYPE_DECL), which indicate that the source type declaration inherits from the destination declaration.
@@ -234,7 +234,7 @@ Node types: METHOD, METHOD_PARAMETER_IN, METHOD_RETURN, LOCAL, BLOCK, MODIFIER
 
 The term *method* is used in object-oriented programming languages to refer to a procedure that is associated with a class. The term is used here in a broader sense to refer to any named block of code. This code may or may not be defined to be associated with a type. The method consists of a method header and a method body. The method header is given by a name, a formal return parameter and a list of formal input parameters and corresponding output parameters. The method body is simply a block of statements.
 
-<img alt="Method Header" src={useBaseUrl('/img/method-header.jpg')} />
+![Method Header]('/img/method-header.jpg')
 
 In the CPG, each method is represented by a designated method node (type METHOD) that contains the method name in particular. Methods are connected to their method input parameters (type METHOD_PARAMETER_IN), return parameter (type METHOD_RETURN), modifiers (type MODIFIER) and locals (type LOCAL) through AST edges. The method node is connected to a block node (type BLOCK), which represents the method body.
 
@@ -246,7 +246,7 @@ Method bodies contain the method implementation, given by the operations the met
 
 In the CPG, a method invocation is represented by a designated call node (type CALL). Arguments are either identifier (type IDENTIFIER), literals (type LITERAL), other calls (type CALL) or method references (type METHOD_REF). Each argument has an argument index property (type ARGUMENT_INDEX) to indicate with which parameter it is associated. Calls are connected to their arguments through outgoing AST edges, and are associated to the called method via their METHOD_FULL_NAME property.
 
-<img alt="Call Site" src={useBaseUrl('/img/call-site.jpg')} />
+![Call Site]('/img/call-site.jpg')
 
 In addition to identifiers, literals and calls, method references (type METHOD_REF) are allowed to represent locations in the code where a method is not called, but referenced, as is the case for programming languages where methods are first-class citizens. Method references are connected to method instances by reference edges (type REF).
 
