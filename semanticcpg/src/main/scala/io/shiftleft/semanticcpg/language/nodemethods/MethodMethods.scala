@@ -7,8 +7,8 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 
 class MethodMethods(val node: nodes.Method) extends AnyVal {
 
-  def parameter: NodeSteps[nodes.MethodParameterIn] =
-    node.start.parameter
+  def parameter: Iterator[nodes.MethodParameterIn] =
+    node._methodParameterInViaAstOut
 
   def methodReturn: nodes.MethodReturn =
     node._astOut.asScala
@@ -16,8 +16,8 @@ class MethodMethods(val node: nodes.Method) extends AnyVal {
       .asJava
       .onlyChecked
 
-  def local: NodeSteps[nodes.Local] =
-    node.start.local
+  def local: Iterator[nodes.Local] =
+    node._blockViaContainsOut.flatMap(_._localViaAstOut)
 
   def controlStructure: NodeSteps[nodes.ControlStructure] =
     node.start.controlStructure

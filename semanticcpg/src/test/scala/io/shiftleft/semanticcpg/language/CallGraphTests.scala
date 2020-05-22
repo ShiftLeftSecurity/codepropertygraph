@@ -35,7 +35,7 @@ class CallGraphTests extends WordSpec with Matchers {
     }
 
     "should find that argument '1+2' is passed to parameter 'x'" in {
-      cpg.parameter.name("x").argument().code.toSet shouldBe Set("1+2")
+      cpg.parameter.name("x").argument.code.toSet shouldBe Set("1+2")
     }
 
     "should allow traversing from argument to formal parameter" in {

@@ -1,25 +1,21 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
-import gremlin.scala._
-import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
-import org.apache.tinkerpop.gremlin.structure.Direction
+import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
 
 import scala.jdk.CollectionConverters._
 
 // Adding a `private` here triggers an exception in the compiler.
 object TrackingPointMethodsBase {
-  def lastExpressionInBlock(block: nodes.Block): Option[nodes.Expression] = {
-    block
-      .vertices(Direction.OUT, EdgeTypes.AST)
-      .asScala
-      .filterNot(vertex => vertex.isInstanceOf[nodes.Local] || vertex.isInstanceOf[nodes.Method])
+  def lastExpressionInBlock(block: nodes.Block): Option[nodes.Expression] =
+    block._astOut.asScala
+      .collect {
+        case node: nodes.Expression if !node.isInstanceOf[nodes.Local] && !node.isInstanceOf[nodes.Method] => node
+      }
       .toVector
-      .sortBy(_.value2(NodeKeys.ORDER))
+      .sortBy(_.order)
       .lastOption
-      .asInstanceOf[Option[nodes.Expression]]
-  }
 }
 
 object TrackingPointToCfgNode {

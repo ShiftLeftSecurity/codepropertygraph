@@ -19,6 +19,7 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
     * */
   @Doc("All parameters")
   def parameter: NodeSteps[nodes.MethodParameterIn] =
+    // TODO once we use OdbTraversal, this will simply become `wrapped.flatMap(_.parameter)` - for now it's not that simple :(
     new NodeSteps(
       raw
         .out(EdgeTypes.AST)
@@ -71,7 +72,6 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   def definingTypeDecl: NodeSteps[nodes.TypeDecl] =
     new NodeSteps(
       raw
-        .cast[nodes.StoredNode]
         .repeat(_.in(EdgeTypes.AST).cast[nodes.StoredNode])
         .until(_.hasLabel(NodeTypes.TYPE_DECL))
         .cast[nodes.TypeDecl])
@@ -83,7 +83,6 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   def definingMethod: NodeSteps[nodes.Method] =
     new NodeSteps(
       raw
-        .cast[nodes.StoredNode]
         .repeat(_.in(EdgeTypes.AST).cast[nodes.StoredNode])
         .until(_.hasLabel(NodeTypes.METHOD))
         .cast[nodes.Method])
