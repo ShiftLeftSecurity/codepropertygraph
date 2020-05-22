@@ -1,8 +1,10 @@
 package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
+
+import scala.jdk.CollectionConverters._
 
 /**
   An expression (base type)
@@ -62,20 +64,17 @@ class Expression[NodeType <: nodes.Expression](val wrapped: NodeSteps[NodeType])
     Traverse to related parameter, if the expression is an argument to a call and the call
     can be resolved.
     */
-  def parameter(implicit callResolver: ICallResolver): NodeSteps[nodes.MethodParameterIn] =
-    new NodeSteps(
-      raw
-        .sack((sack: Integer, node: nodes.Expression) => node.value2(NodeKeys.ARGUMENT_INDEX))
-        .in(EdgeTypes.ARGUMENT)
-        .flatMap(call => callResolver.getCalledMethodsAsTraversal(call.asInstanceOf[nodes.CallRepr]))
-        .out(EdgeTypes.AST)
-        .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
-        .filterWithTraverser { traverser =>
-          val parameterIndex = traverser.sack[Integer]
-          traverser.get.value2(NodeKeys.ORDER) == parameterIndex
-        }
-        .cast[nodes.MethodParameterIn]
-    )
+  def parameter(implicit callResolver: ICallResolver): NodeSteps[nodes.MethodParameterIn] = {
+    val trav = for {
+      expr <- raw.toIterator.collect { case node: nodes.HasArgumentIndex => node }
+      call <- expr._argumentIn.asScala
+      calledMethods <- callResolver.getCalledMethods(call.asInstanceOf[nodes.CallRepr])
+      paramIn <- calledMethods._astOut.asScala.collect { case node: nodes.MethodParameterIn => node }
+      if paramIn.order == expr.argumentIndex
+    } yield paramIn
+
+    new NodeSteps(__(trav.toSeq: _*))
+  }
 
   /**
     Traverse to enclosing method
