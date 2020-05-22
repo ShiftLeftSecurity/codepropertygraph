@@ -1,10 +1,11 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.overflowdb.traversal.help
-import io.shiftleft.overflowdb.traversal.help.Doc
 import io.shiftleft.semanticcpg.language._
+
+import scala.jdk.CollectionConverters._
 
 /**
   * Formal method input parameter
@@ -40,19 +41,15 @@ class MethodParameter(val wrapped: NodeSteps[nodes.MethodParameterIn]) extends A
   /**
     * Traverse to arguments (actual parameters) associated with this formal parameter
     * */
-  def argument(): NodeSteps[nodes.Expression] = {
-    new NodeSteps(
-      raw
-        .sack((_: Integer, node: nodes.MethodParameterIn) => node.value2(NodeKeys.ORDER))
-        .in(EdgeTypes.AST)
-        .in(EdgeTypes.CALL)
-        .out(EdgeTypes.ARGUMENT)
-        .filterWithTraverser { traverser =>
-          val argumentIndex = traverser.sack[Integer]
-          traverser.get.value2(NodeKeys.ARGUMENT_INDEX) == argumentIndex
-        }
-        .cast[nodes.Expression]
-    )
+  def argument: NodeSteps[nodes.Expression] = {
+    val trav = for {
+      paramIn <- raw.toIterator
+      call <- paramIn._methodViaAstIn._callViaCallIn
+      arg <- call._argumentOut.asScala.collect { case node: nodes.Expression with nodes.HasArgumentIndex => node }
+      if arg.argumentIndex == paramIn.order
+    } yield arg
+
+    new NodeSteps(__(trav.toSeq: _*))
   }
 
   /**
