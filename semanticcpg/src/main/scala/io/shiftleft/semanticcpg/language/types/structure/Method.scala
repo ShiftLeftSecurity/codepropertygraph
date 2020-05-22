@@ -72,7 +72,6 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   def definingTypeDecl: NodeSteps[nodes.TypeDecl] =
     new NodeSteps(
       raw
-        .cast[nodes.StoredNode]
         .repeat(_.in(EdgeTypes.AST).cast[nodes.StoredNode])
         .until(_.hasLabel(NodeTypes.TYPE_DECL))
         .cast[nodes.TypeDecl])
@@ -84,7 +83,6 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   def definingMethod: NodeSteps[nodes.Method] =
     new NodeSteps(
       raw
-        .cast[nodes.StoredNode]
         .repeat(_.in(EdgeTypes.AST).cast[nodes.StoredNode])
         .until(_.hasLabel(NodeTypes.METHOD))
         .cast[nodes.Method])

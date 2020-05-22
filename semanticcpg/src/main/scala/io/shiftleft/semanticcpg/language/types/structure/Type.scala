@@ -103,13 +103,11 @@ class Type(val wrapped: NodeSteps[nodes.Type]) extends AnyVal {
     new NodeSteps(
       raw
         .in(EdgeTypes.EVAL_TYPE)
-        .filterOnEnd(_.isInstanceOf[nodes.Expression])
-        .cast[nodes.Expression])
+        .collect { case node: nodes.Expression => node })
 
   def parameter: NodeSteps[nodes.MethodParameterIn] =
     new NodeSteps(
       raw
         .in(EdgeTypes.EVAL_TYPE)
-        .filterOnEnd(_.isInstanceOf[nodes.MethodParameterIn])
-        .cast[nodes.MethodParameterIn])
+        .collect { case node: nodes.MethodParameterIn => node })
 }
