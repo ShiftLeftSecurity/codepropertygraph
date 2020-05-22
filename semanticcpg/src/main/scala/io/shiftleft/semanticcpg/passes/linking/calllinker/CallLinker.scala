@@ -61,7 +61,8 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
           val receiver = receiverIt.next
           receiver match {
             case methodRefReceiver: nodes.MethodRef =>
-              Some(methodRefReceiver._refOut.onlyChecked.asInstanceOf[nodes.Method])
+              // TODO this doesn't do anything and may as well be dropped, no?
+              Option(methodRefReceiver._methodViaRefOut)
             case _ =>
               val receiverTypeDecl = receiver
                 ._evalTypeOut()
@@ -71,7 +72,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
 
               val resolvedMethodOption = receiverTypeDecl._bindsOut.asScala.collectFirst {
                 case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
-                  binding._refOut.onlyChecked.asInstanceOf[nodes.Method]
+                  binding._methodViaRefOut
               }
               if (resolvedMethodOption.isDefined) {
                 dstGraph.addEdgeInOriginal(call, resolvedMethodOption.get, EdgeTypes.CALL)
