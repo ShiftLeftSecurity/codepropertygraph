@@ -1,8 +1,10 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
+
+import scala.jdk.CollectionConverters._
 
 class MethodParameterOut(val wrapped: NodeSteps[nodes.MethodParameterOut]) extends AnyVal {
   private def raw: GremlinScala[nodes.MethodParameterOut] = wrapped.raw
@@ -25,18 +27,15 @@ class MethodParameterOut(val wrapped: NodeSteps[nodes.MethodParameterOut]) exten
     new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.Method])
 
   def argument: NodeSteps[nodes.Expression] = {
-    new NodeSteps(
-      raw
-        .sack((_: Integer, node: nodes.MethodParameterOut) => node.value2(NodeKeys.ORDER))
-        .in(EdgeTypes.AST)
-        .in(EdgeTypes.CALL)
-        .out(EdgeTypes.ARGUMENT)
-        .filterWithTraverser { traverser =>
-          val argumentIndex = traverser.sack[Integer]
-          traverser.get.value2(NodeKeys.ARGUMENT_INDEX) == argumentIndex
-        }
-        .cast[nodes.Expression]
-    )
+    val trav = for {
+      paramOut <- raw.toIterator
+      method <- paramOut._methodViaAstIn
+      call <- method._callViaCallIn
+      arg <- call._argumentOut.asScala.collect { case node: nodes.Expression with nodes.HasArgumentIndex => node }
+      if arg.argumentIndex == paramOut.order
+    } yield arg
+
+    new NodeSteps(__(trav.toSeq: _*))
   }
 
   def asInput: NodeSteps[nodes.MethodParameterIn] =
