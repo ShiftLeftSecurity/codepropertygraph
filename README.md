@@ -53,7 +53,7 @@ If you have cloned it already, additionally run `git lfs pull` (from within the 
 
 Additional build-time dependencies are automatically downloaded as
 part of the build process. To build and install into your local Maven
-cache, issue the command `sbt publishM2`.
+cache, issue the command `./publishLocal.sh`.
 
 This command will install the following artifacts:
 
