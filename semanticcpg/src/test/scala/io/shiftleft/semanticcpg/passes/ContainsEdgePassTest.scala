@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.passes
 
 import gremlin.scala._
+import io.shiftleft.overflowdb._
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
@@ -41,7 +42,6 @@ class ContainsEdgePassTest extends WordSpec with Matchers {
 object ContainsEdgePassTest {
   private class Fixture {
     private val graph = OverflowDbTestInstance.create
-    private implicit val scalaGraph = graph.asScala
 
     val fileVertex = graph + NodeTypes.FILE
     val typeDeclVertex = graph + NodeTypes.TYPE_DECL
