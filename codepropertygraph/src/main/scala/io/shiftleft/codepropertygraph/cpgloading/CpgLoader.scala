@@ -82,8 +82,10 @@ private class CpgLoader {
     cpg
   }
 
-  def createIndexes(cpg: Cpg): Unit =
+  def createIndexes(cpg: Cpg): Unit = {
+    cpg.graph.getStorage.getNodesMVMap.flushAndGetRoot()
     cpg.graph.indexManager.createNodePropertyIndex(NodeKeys.FULL_NAME.name)
+  }
 
   def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit = {
     overlayFilenames.foreach { overlayFilename =>
