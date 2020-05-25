@@ -24,7 +24,8 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
       raw
         .out(EdgeTypes.AST)
         .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
-        .cast[nodes.MethodParameterIn])
+        .cast[nodes.MethodParameterIn]
+    )
 
   /**
     * Traverse to formal return parameter

@@ -7,14 +7,16 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 
 class MethodMethods(val node: nodes.Method) extends AnyVal {
 
-  def parameter: Iterator[nodes.MethodParameterIn] =
-    node._methodParameterInViaAstOut
+  def parameter: NodeSteps[nodes.MethodParameterIn] =
+    // TODO once we use OdbTraversal, this will simply become `node._methodParameterInViaAstOut`
+    node.start.parameter
 
   def methodReturn: nodes.MethodReturn =
     node._methodReturnViaAstOut
 
-  def local: Iterator[nodes.Local] =
-    node._blockViaContainsOut.flatMap(_._localViaAstOut)
+  def local: NodeSteps[nodes.Local] =
+    // TODO once we use OdbTraversal, this will simply become `node._blockViaContainsOut.flatMap(_._localViaAstOut)`
+    node.start.local
 
   def controlStructure: NodeSteps[nodes.ControlStructure] =
     node.start.controlStructure
