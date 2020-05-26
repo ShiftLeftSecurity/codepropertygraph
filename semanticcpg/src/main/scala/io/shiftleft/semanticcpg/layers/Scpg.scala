@@ -1,8 +1,7 @@
 package io.shiftleft.semanticcpg.layers
 
-import gremlin.scala.GraphAsScala
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Languages, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes}
 import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.Overlays
 import io.shiftleft.semanticcpg.passes.BindingMethodOverridesPass
@@ -50,8 +49,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
         pass.createApplySerializeAndStore(serializedCpg, serializeInverse)
         serializedCpg.close()
     }
-
-    Overlays.appendOverlayName(cpg, Scpg.overlayName)
   }
 
   private def createEnhancementExecList(cpg: Cpg, language: String): Iterator[CpgPassBase] = {

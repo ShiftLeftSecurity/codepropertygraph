@@ -32,7 +32,6 @@ class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
         pass.createApplySerializeAndStore(serializedCpg)
         serializedCpg.close()
     }
-    Overlays.appendOverlayName(cpg, OssDataFlow.overlayName)
   }
 
   override def probe(cpg: Cpg): Boolean = {

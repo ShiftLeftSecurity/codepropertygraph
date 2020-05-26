@@ -23,6 +23,7 @@ abstract class LayerCreator {
       logger.warn(s"The overlay $overlayName already exists - skipping creation")
     } else {
       create(context, serializeInverse)
+      Overlays.appendOverlayName(context.cpg, overlayName)
     }
   }
 
