@@ -9,7 +9,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.console.testing._
-import io.shiftleft.semanticcpg.Overlays
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, Scpg}
 
 import scala.util.Try
@@ -252,9 +251,7 @@ class ConsoleTests extends WordSpec with Matchers {
     override val overlayName: String = "fooname"
     override val description: String = "foodescr"
 
-    override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
-      Overlays.appendOverlayName(context.cpg, overlayName)
-    }
+    override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {}
     override def probe(cpg: Cpg): Boolean = false
   }
 
