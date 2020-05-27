@@ -1,11 +1,37 @@
 package io.shiftleft.console
 
-import io.shiftleft.semanticcpg.layers.LayerCreator
+import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.semanticcpg.language.HasStoreMethod
+import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext}
 import org.reflections.Reflections
 
 import scala.jdk.CollectionConverters._
 
 object Run {
+
+  def runCustomQuery(console: Console[_], query: HasStoreMethod): Unit = {
+    console._runAnalyzer(
+      new LayerCreator {
+        override val overlayName: String = "custom"
+        override val description: String = "A custom pass"
+
+        override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
+          val serializedCpg = initSerializedCpg(context.outputDir, "custom", 0)
+          val pass = new CpgPass(console.cpg) {
+            override def run(): Iterator[DiffGraph] = {
+              implicit val diffGraph: DiffGraph.Builder = DiffGraph.newBuilder
+              query.store
+              Iterator(diffGraph.build())
+            }
+          }
+          pass.createApplySerializeAndStore(serializedCpg, inverse = true, "custom")
+          serializedCpg.close()
+        }
+        override def probe(cpg: Cpg): Boolean = false
+      }
+    )
+  }
 
   /**
     * Generate code for the run command
@@ -16,6 +42,7 @@ object Run {
     val layerCreatorTypeNames = r
       .getSubTypesOf(classOf[LayerCreator])
       .asScala
+      .filterNot(t => t.isAnonymousClass || t.isLocalClass || t.isMemberClass || t.isSynthetic)
       .toList
       .map(t => (t.getSimpleName.toLowerCase, t.getName))
       .filter(t => !exclude.contains(t._2))
@@ -54,6 +81,10 @@ object Run {
     optsCode +
       s"""
        | class OverlaysDynamic {
+       |
+       | def apply(query : io.shiftleft.semanticcpg.language.HasStoreMethod) {
+       |   io.shiftleft.console.Run.runCustomQuery(console, query)
+       | }
        |
        | $membersCode
        |

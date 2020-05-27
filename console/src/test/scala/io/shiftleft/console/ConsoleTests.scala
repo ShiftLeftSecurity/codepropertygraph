@@ -317,4 +317,16 @@ class ConsoleTests extends WordSpec with Matchers {
     }
   }
 
+  "runCustomQuery" should {
+    "allow running a custom query" in ConsoleFixture() { (console, codeDir) =>
+      console.importCode(codeDir.toString)
+      Run.runCustomQuery(console, console.cpg.method.newTagNode("mytag"))
+      console.cpg.tag.name("mytag").method.name.toSet should contain("main")
+      console.cpg.metaData.map(_.overlays).head.last shouldBe "custom"
+      console.undo
+      console.cpg.metaData.map(_.overlays).head.last shouldBe "semanticcpg"
+    }
+
+  }
+
 }

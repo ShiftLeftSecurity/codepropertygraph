@@ -23,6 +23,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
 
   private val _config = new ConsoleConfig()
   def config: ConsoleConfig = _config
+  def console: Console[T] = this
 
   protected val workspacePathName: String = config.install.rootPath.path.resolve("workspace").toString
   protected val workspaceManager = new WorkspaceManager[T](workspacePathName, loader)
@@ -528,8 +529,6 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
 
   protected def report(string: String): Unit = System.err.println(string)
 
-  // This is only public because we can't use the dynamically
-  // created `run` in unit tests.
   def _runAnalyzer(overlayCreators: LayerCreator*): Cpg = {
 
     overlayCreators.foreach { creator =>
