@@ -38,7 +38,8 @@
                 {"edgeName": "CONTAINS", "inNodes": [
               {"name": "TYPE_DECL"},
               {"name": "METHOD"}
-            ]}
+		]},
+	     {"edgeName": "TAGGED_BY", "inNodes": [{"name": "TAG"}]}
             ]
         },
         { "name": "METHOD",

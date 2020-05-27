@@ -81,4 +81,13 @@ class Tag(val wrapped: NodeSteps[nodes.Tag]) extends AnyVal {
         .order(By((x: Vertex) => x.id))
         .cast[nodes.Local])
 
+  def file: NodeSteps[nodes.File] =
+    new NodeSteps(
+      raw
+        .in(EdgeTypes.TAGGED_BY)
+        .hasLabel(NodeTypes.FILE)
+        .order(By((x: Vertex) => x.id))
+        .cast[nodes.File]
+    )
+
 }
