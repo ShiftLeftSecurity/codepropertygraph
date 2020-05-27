@@ -7,10 +7,14 @@ import io.shiftleft.codepropertygraph.generated.EdgeKeys
 import io.shiftleft.passes.DiffGraph
 import org.apache.logging.log4j.{LogManager, Logger}
 
-class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Steps[A](raw) {
+trait HasStoreMethod {
+  def store()(implicit diffBuilder: DiffGraph.Builder): Unit
+}
+
+class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Steps[A](raw) with HasStoreMethod {
   import NewNodeSteps.logger
 
-  def store()(implicit diffBuilder: DiffGraph.Builder): Unit =
+  override def store()(implicit diffBuilder: DiffGraph.Builder): Unit =
     raw.sideEffect(storeRecursively).iterate()
 
   private def storeRecursively(newNode: NewNode)(implicit diffBuilder: DiffGraph.Builder): Unit = {
