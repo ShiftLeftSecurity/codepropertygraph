@@ -17,7 +17,8 @@ class CfgDominatorFrontierTests extends WordSpec with Matchers {
       node.nodesIn("CFG").asScala
   }
 
-  private class TestDomTreeAdapter(immediateDominators: Map[NodeRef[_], NodeRef[_]]) extends DomTreeAdapter[NodeRef[_]] {
+  private class TestDomTreeAdapter(immediateDominators: Map[NodeRef[_], NodeRef[_]])
+      extends DomTreeAdapter[NodeRef[_]] {
     override def immediateDominator(cfgNode: NodeRef[_]): Option[NodeRef[_]] = {
       immediateDominators.get(cfgNode)
     }

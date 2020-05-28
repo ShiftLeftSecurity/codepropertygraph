@@ -58,6 +58,10 @@ object Run {
         |}
         |
         |val opts = new OptsDynamic()
+        |
+        | import io.shiftleft.passes.DiffGraph
+        | implicit def _diffGraph : DiffGraph.Builder = opts.commit.diffGraphBuilder
+        | def diffGraph = _diffGraph
         |""".stripMargin
 
     val membersCode = layerCreatorTypeNames
