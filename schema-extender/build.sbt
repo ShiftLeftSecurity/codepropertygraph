@@ -13,7 +13,7 @@ licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0
 scalaVersion := "2.12.11"
 
 libraryDependencies ++= Seq(
-  "io.shiftleft" %% "overflowdb-codegen" % "1.8",
+  "io.shiftleft" %% "overflowdb-codegen" % "1.10",
   "org.zeroturnaround" % "zt-zip" % "1.14",
   "com.github.pathikrit" %% "better-files" % "3.8.0",
   "com.github.scopt" %% "scopt" % "3.7.1",
