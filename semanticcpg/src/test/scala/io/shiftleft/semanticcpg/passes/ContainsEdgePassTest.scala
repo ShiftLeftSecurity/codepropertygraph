@@ -1,12 +1,12 @@
 package io.shiftleft.semanticcpg.passes
 
-import gremlin.scala._
 import io.shiftleft.overflowdb._
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
 import org.scalatest.{Matchers, WordSpec}
+import scala.jdk.CollectionConverters._
 
 class ContainsEdgePassTest extends WordSpec with Matchers {
 
@@ -14,26 +14,26 @@ class ContainsEdgePassTest extends WordSpec with Matchers {
 
   "Files " can {
     "contain Methods" in Fixture { fixture =>
-      fixture.methodVertex.in(EdgeTypes.CONTAINS).toList should contain only fixture.fileVertex
+      fixture.methodVertex.nodesIn(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.fileVertex)
     }
     "contain Classes" in Fixture { fixture =>
-      fixture.typeDeclVertex.in(EdgeTypes.CONTAINS).toList should contain only fixture.fileVertex
+      fixture.typeDeclVertex.nodesIn(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.fileVertex)
     }
   }
 
   "Classes " can {
     "contain Methods" in Fixture { fixture =>
-      fixture.typeMethodVertex.in(EdgeTypes.CONTAINS).toList should contain only fixture.typeDeclVertex
+      fixture.typeMethodVertex.nodesIn(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.typeDeclVertex)
     }
   }
 
   "Methods " can {
     "contain Methods" in Fixture { fixture =>
-      fixture.innerMethodVertex.in(EdgeTypes.CONTAINS).toList should contain only fixture.methodVertex
+      fixture.innerMethodVertex.nodesIn(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.methodVertex)
     }
     "contain expressions" in Fixture { fixture =>
-      fixture.expressionVertex.in(EdgeTypes.CONTAINS).toList should contain only fixture.methodVertex
-      fixture.innerExpressionVertex.in(EdgeTypes.CONTAINS).toList should contain only fixture.innerMethodVertex
+      fixture.expressionVertex.nodesIn(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.methodVertex)
+      fixture.innerExpressionVertex.nodesIn(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.innerMethodVertex)
     }
   }
 

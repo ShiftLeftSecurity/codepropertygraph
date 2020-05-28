@@ -1,26 +1,28 @@
 package io.shiftleft.semanticcpg.passes
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeysOdb, NodeTypes}
+import io.shiftleft.overflowdb._
+import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
 import org.scalatest.{Matchers, WordSpec}
 
 class NamespaceCreatorTests extends WordSpec with Matchers {
   "NamespaceCreateor test " in EmptyGraphFixture { graph =>
-    val block1 = graph + (NodeTypes.NAMESPACE_BLOCK, NodeKeys.NAME -> "namespace1")
-    val block2 = graph + (NodeTypes.NAMESPACE_BLOCK, NodeKeys.NAME -> "namespace1")
-    val block3 = graph + (NodeTypes.NAMESPACE_BLOCK, NodeKeys.NAME -> "namespace2")
+    val cpg = new Cpg(graph)
+    val block1 = graph + (NodeTypes.NAMESPACE_BLOCK, NodeKeysOdb.NAME -> "namespace1")
+    val block2 = graph + (NodeTypes.NAMESPACE_BLOCK, NodeKeysOdb.NAME -> "namespace1")
+    val block3 = graph + (NodeTypes.NAMESPACE_BLOCK, NodeKeysOdb.NAME -> "namespace2")
 
     val namespaceCreator = new NamespaceCreator(new Cpg(graph))
     namespaceCreator.createAndApply()
 
-    val namespaces = graph.V().hasLabel(NodeTypes.NAMESPACE).toBuffer
+    val namespaces = cpg.namespace.l
     namespaces.size shouldBe 2
-    namespaces.map(_.value2(NodeKeys.NAME)).toSet shouldBe Set("namespace1", "namespace2")
+    namespaces.map(_.name).toSet shouldBe Set("namespace1", "namespace2")
 
-    val namspaceBlocks = graph.V().hasLabel(NodeTypes.NAMESPACE).in(EdgeTypes.REF).toSet
+    val namspaceBlocks = cpg.namespace.toSet.flatMap(_._namespaceBlockViaRefIn)
     namspaceBlocks shouldBe Set(block1, block2, block3)
   }
 }

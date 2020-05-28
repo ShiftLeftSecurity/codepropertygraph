@@ -1,32 +1,30 @@
 package io.shiftleft.semanticcpg.passes
 
-import gremlin.scala._
 import io.shiftleft.OverflowDbTestInstance
+import io.shiftleft.overflowdb._
 import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominator, CfgDominatorFrontier, DomTreeAdapter, CfgAdapter}
-import org.apache.tinkerpop.gremlin.structure.Direction
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.jdk.CollectionConverters._
 
 class CfgDominatorFrontierTests extends WordSpec with Matchers {
 
-  private class TestCfgAdapter extends CfgAdapter[Vertex] {
-    override def successors(node: Vertex): IterableOnce[Vertex] = {
-      node.vertices(Direction.OUT, "CFG").asScala
-    }
-    override def predecessors(node: Vertex): IterableOnce[Vertex] = {
-      node.vertices(Direction.IN, "CFG").asScala
-    }
+  private class TestCfgAdapter extends CfgAdapter[NodeRef[_]] {
+    override def successors(node: NodeRef[_]): IterableOnce[NodeRef[_]] =
+      node.nodesOut("CFG").asScala
+
+    override def predecessors(node: NodeRef[_]): IterableOnce[NodeRef[_]] =
+      node.nodesIn("CFG").asScala
   }
 
-  private class TestDomTreeAdapter(immediateDominators: Map[Vertex, Vertex]) extends DomTreeAdapter[Vertex] {
-    override def immediateDominator(cfgNode: Vertex): Option[Vertex] = {
+  private class TestDomTreeAdapter(immediateDominators: Map[NodeRef[_], NodeRef[_]]) extends DomTreeAdapter[NodeRef[_]] {
+    override def immediateDominator(cfgNode: NodeRef[_]): Option[NodeRef[_]] = {
       immediateDominators.get(cfgNode)
     }
   }
 
   "Cfg dominance frontier test" in {
-    implicit val graph: ScalaGraph = OverflowDbTestInstance.create
+    val graph = OverflowDbTestInstance.create
 
     val v0 = graph + "UNKNOWN"
     val v1 = graph + "UNKNOWN"
@@ -51,7 +49,7 @@ class CfgDominatorFrontierTests extends WordSpec with Matchers {
 
     val domTreeAdapter = new TestDomTreeAdapter(immediateDominators)
     val cfgDominatorFrontier = new CfgDominatorFrontier(cfgAdapter, domTreeAdapter)
-    val dominanceFrontier = cfgDominatorFrontier.calculate(graph.V.l())
+    val dominanceFrontier = cfgDominatorFrontier.calculate(graph.nodes.asScala.toList)
 
     dominanceFrontier.get(v0) shouldBe Set.empty
     dominanceFrontier.get(v1) shouldBe Set.empty
@@ -63,7 +61,7 @@ class CfgDominatorFrontierTests extends WordSpec with Matchers {
   }
 
   "Cfg domiance frontier with dead code test" in {
-    implicit val graph: ScalaGraph = OverflowDbTestInstance.create
+    val graph = OverflowDbTestInstance.create
 
     val v0 = graph + "UNKNOWN"
     val v1 = graph + "UNKNOWN" // This node simulates dead code as it is not reachable from the entry v0.
@@ -78,7 +76,7 @@ class CfgDominatorFrontierTests extends WordSpec with Matchers {
 
     val domTreeAdapter = new TestDomTreeAdapter(immediateDominators)
     val cfgDominatorFrontier = new CfgDominatorFrontier(cfgAdapter, domTreeAdapter)
-    val dominanceFrontier = cfgDominatorFrontier.calculate(graph.V.l())
+    val dominanceFrontier = cfgDominatorFrontier.calculate(graph.nodes.asScala.toList)
 
     dominanceFrontier.get(v0) shouldBe Set.empty
     dominanceFrontier.get(v1) shouldBe Set(v2)
