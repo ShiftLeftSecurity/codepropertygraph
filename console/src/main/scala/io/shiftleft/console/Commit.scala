@@ -1,0 +1,33 @@
+package io.shiftleft.console
+
+import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, LayerCreatorOptions}
+
+object Commit {
+  val overlayName: String = "commit"
+  val description: String = "Apply current custom diffgraph"
+  def defaultOpts = new CommitOptions(DiffGraph.newBuilder)
+}
+
+class CommitOptions(var diffGraphBuilder: DiffGraph.Builder) extends LayerCreatorOptions
+
+class Commit(opts: CommitOptions) extends LayerCreator {
+
+  override val overlayName: String = Commit.overlayName
+  override val description: String = Commit.description
+
+  override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
+    val serializedCpg = initSerializedCpg(context.outputDir, "commit", 0)
+    new CpgPass(context.cpg) {
+
+      /**
+        * Main method of enhancement - to be implemented by child class
+        **/
+      override def run(): Iterator[DiffGraph] = Iterator(opts.diffGraphBuilder.build())
+    }.createApplySerializeAndStore(serializedCpg, serializeInverse)
+    opts.diffGraphBuilder = DiffGraph.newBuilder
+  }
+
+  override def probe(cpg: Cpg): Boolean = false
+}

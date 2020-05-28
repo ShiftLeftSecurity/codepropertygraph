@@ -10,13 +10,17 @@ import org.scalatest.{Matchers, WordSpec}
 class MethodDecoratorPassTests extends WordSpec with Matchers {
   "MethodDecoratorTest" in EmptyGraphFixture { graph =>
     val method = graph + NodeTypes.METHOD
-    val parameterIn = graph.+(NodeTypes.METHOD_PARAMETER_IN,
-      NodeKeysOdb.CODE -> "p1",
-      NodeKeysOdb.ORDER -> 1,
-      NodeKeysOdb.NAME -> "p1",
-      NodeKeysOdb.EVALUATION_STRATEGY -> EvaluationStrategies.BY_REFERENCE,
-      NodeKeysOdb.TYPE_FULL_NAME -> "some.Type",
-      NodeKeysOdb.LINE_NUMBER -> 10).asInstanceOf[nodes.MethodParameterIn]
+    val parameterIn = graph
+      .+(
+        NodeTypes.METHOD_PARAMETER_IN,
+        NodeKeysOdb.CODE -> "p1",
+        NodeKeysOdb.ORDER -> 1,
+        NodeKeysOdb.NAME -> "p1",
+        NodeKeysOdb.EVALUATION_STRATEGY -> EvaluationStrategies.BY_REFERENCE,
+        NodeKeysOdb.TYPE_FULL_NAME -> "some.Type",
+        NodeKeysOdb.LINE_NUMBER -> 10
+      )
+      .asInstanceOf[nodes.MethodParameterIn]
     val evalType = graph + NodeTypes.TYPE
 
     method --- EdgeTypes.AST --> parameterIn
