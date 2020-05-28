@@ -20,10 +20,6 @@ class Commit(opts: CommitOptions) extends LayerCreator {
   override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
     val serializedCpg = initSerializedCpg(context.outputDir, "commit", 0)
     new CpgPass(context.cpg) {
-
-      /**
-        * Main method of enhancement - to be implemented by child class
-        **/
       override def run(): Iterator[DiffGraph] = Iterator(opts.diffGraphBuilder.build())
     }.createApplySerializeAndStore(serializedCpg, serializeInverse)
     opts.diffGraphBuilder = DiffGraph.newBuilder
