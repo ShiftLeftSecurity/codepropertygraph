@@ -43,6 +43,7 @@ object Run {
       .getSubTypesOf(classOf[LayerCreator])
       .asScala
       .filterNot(t => t.isAnonymousClass || t.isLocalClass || t.isMemberClass || t.isSynthetic)
+      .filterNot(t => t.getName.startsWith("io.shiftleft.console.Run"))
       .toList
       .map(t => (t.getSimpleName.toLowerCase, t.getName))
       .filter(t => !exclude.contains(t._2))
