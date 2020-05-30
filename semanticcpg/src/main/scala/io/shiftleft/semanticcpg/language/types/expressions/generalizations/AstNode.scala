@@ -6,7 +6,6 @@ import io.shiftleft.overflowdb.traversal.help
 import io.shiftleft.overflowdb.traversal.help.Doc
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.Call
 
 @help.Traversal(elementType = classOf[nodes.AstNode])
 class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
@@ -27,7 +26,7 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
   def ast(predicate: nodes.AstNode => Boolean): NodeSteps[nodes.AstNode] =
     ast.where(predicate)
 
-  def call(regex: String): Call =
+  def call(regex: String): NodeSteps[nodes.Call] =
     wrapped.ast.isCall.name(regex)
 
   def containsCallTo(regex: String): NodeSteps[A] =
