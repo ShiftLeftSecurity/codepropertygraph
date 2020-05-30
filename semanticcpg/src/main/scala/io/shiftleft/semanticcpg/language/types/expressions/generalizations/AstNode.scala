@@ -27,7 +27,7 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
   def ast(predicate: nodes.AstNode => Boolean): NodeSteps[nodes.AstNode] =
     ast.where(predicate)
 
-  def containedCallTo(regex: String): Call =
+  def call(regex: String): Call =
     wrapped.ast.isCall.name(regex)
 
   def containsCallTo(regex: String): NodeSteps[A] =
