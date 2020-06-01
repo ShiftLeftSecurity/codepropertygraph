@@ -15,7 +15,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
 
   "cpg passes being serialised to and from overlay protobuf via DiffGraph" in {
     withNewBaseCpg { cpg =>
-      val initialNode = cpg.graph.asScala.V.has(NodeKeys.CODE, InitialNodeCode).head
+      val initialNode = cpg.scalaGraph.V.has(NodeKeys.CODE, InitialNodeCode).head
       val pass1 = passAddsEdgeTo(initialNode.asInstanceOf[nodes.StoredNode], Pass1NewNodeCode, cpg)
 
       val overlay1 = pass1.createApplyAndSerialize()
@@ -23,7 +23,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       cpg.graph.nodeCount shouldBe 2
       initialNode.start.out.value(NodeKeys.CODE).toList shouldBe List(Pass1NewNodeCode)
 
-      val pass1NewNode = cpg.graph.asScala.V.has(NodeKeys.CODE, Pass1NewNodeCode).head
+      val pass1NewNode = cpg.scalaGraph.V.has(NodeKeys.CODE, Pass1NewNodeCode).head
       val pass2 = passAddsEdgeTo(pass1NewNode.asInstanceOf[nodes.StoredNode], Pass2NewNodeCode, cpg)
 
       val overlay2 = pass2.createApplyAndSerialize()
@@ -36,7 +36,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
   "apply cpg pass, serialize the inverse DiffGraph, and apply the inverse to undo" in {
     withNewBaseCpg { cpg =>
       cpg.graph.nodeCount shouldBe 1
-      val initialNode = cpg.graph.asScala.V.has(NodeKeys.CODE, InitialNodeCode).head.asInstanceOf[nodes.StoredNode]
+      val initialNode = cpg.scalaGraph.V.has(NodeKeys.CODE, InitialNodeCode).head.asInstanceOf[nodes.StoredNode]
 
       // 1) add a new node
       val addNodeInverse = applyDiffAndGetInverse(cpg)(
@@ -48,7 +48,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
           }
         ))
       cpg.graph.nodeCount shouldBe 2
-      val additionalNode = cpg.graph.asScala.V.hasNot(NodeKeys.CODE).head.asInstanceOf[nodes.StoredNode]
+      val additionalNode = cpg.scalaGraph.V.hasNot(NodeKeys.CODE).head.asInstanceOf[nodes.StoredNode]
 
       // 2) add two edges with the same label but different properties (they'll later be disambiguated by their property hash, since edges don't have IDs
       val addEdge1Inverse = applyDiffAndGetInverse(cpg)(

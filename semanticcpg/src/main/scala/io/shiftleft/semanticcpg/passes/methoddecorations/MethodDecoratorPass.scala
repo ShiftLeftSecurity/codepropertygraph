@@ -26,7 +26,7 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   override def run() = {
     val dstGraph = DiffGraph.newBuilder
 
-    cpg.graph.asScala.V
+    cpg.scalaGraph.V
       .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
       .sideEffect {
         case parameterIn: nodes.MethodParameterIn =>

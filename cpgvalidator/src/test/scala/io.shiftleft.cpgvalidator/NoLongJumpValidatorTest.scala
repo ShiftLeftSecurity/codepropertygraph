@@ -25,7 +25,7 @@ class NoLongJumpValidatorTest extends WordSpec with Matchers {
   "report no cfg edge errors for simple correct graph" in {
     withNewBaseCpg { cpg =>
       val validator = new NoLongJumpValidator(new ValidationErrorRegistry)
-      implicit val graph = cpg.graph.asScala()
+      implicit val graph = cpg.scalaGraph
       val method1 = cpg.graph + NodeTypes.METHOD
       method1.property("FULL_NAME", "method1")
       val method2 = cpg.graph + NodeTypes.METHOD
@@ -45,7 +45,7 @@ class NoLongJumpValidatorTest extends WordSpec with Matchers {
   "report cfg edge errors for simple incorrect graph" in {
     withNewBaseCpg { cpg =>
       val validator = new NoLongJumpValidator(new ValidationErrorRegistry)
-      implicit val graph = cpg.graph.asScala()
+      implicit val graph = cpg.scalaGraph
       val method1 = cpg.graph + NodeTypes.METHOD
       method1.property("FULL_NAME", "method1")
       val method2 = cpg.graph + NodeTypes.METHOD

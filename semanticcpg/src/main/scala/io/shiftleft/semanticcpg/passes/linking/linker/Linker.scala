@@ -140,7 +140,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
                                                                 dstFullNameKey: String,
                                                                 dstGraph: DiffGraph.Builder): Unit = {
     var loggedDeprecationWarning = false
-    cpg.graph.asScala.V
+    cpg.scalaGraph.V
       .hasLabel(srcLabels.head, srcLabels.tail: _*)
       .sideEffect {
         case srcNode: SRC_NODE_TYPE @unchecked =>
@@ -176,7 +176,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def linkAstChildToParent(dstGraph: DiffGraph.Builder): Unit = {
-    cpg.graph.asScala.V
+    cpg.scalaGraph.V
       .hasLabel(NodeTypes.METHOD, NodeTypes.TYPE_DECL)
       .sideEffect {
         case astChild: nodes.HasAstParentType with nodes.HasAstParentFullName with nodes.StoredNode =>
@@ -230,7 +230,7 @@ object Linker {
                    dstGraph: DiffGraph.Builder,
                    dstNotExistsHandler: Option[(nodes.StoredNode, String) => Unit]): Unit = {
     var loggedDeprecationWarning = false
-    val sourceTraversal = cpg.graph.asScala.V.hasLabel(srcLabels.head, srcLabels.tail: _*)
+    val sourceTraversal = cpg.scalaGraph.V.hasLabel(srcLabels.head, srcLabels.tail: _*)
     val sourceIterator = new Steps(sourceTraversal).toIterator()
     sourceIterator.foreach { srcNode =>
       // If the source node does not have any outgoing edges of this type
