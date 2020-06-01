@@ -2,7 +2,7 @@ package io.shiftleft.console
 
 import better.files.Dsl._
 import better.files.File
-import gremlin.scala.{GraphAsScala, ScalaGraph}
+import gremlin.scala.ScalaGraph
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.CpgLoader
 import io.shiftleft.codepropertygraph.generated.Languages
@@ -125,7 +125,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
 
   /** allows the user to create nodes/edges with the pretty gremlin dsl
     * TODO remove once OverflowDB has a nice api for that too **/
-  implicit def graph: ScalaGraph = cpg.graph.asScala
+  implicit def graph: ScalaGraph = cpg.graph
 
   @Doc(
     "Open project",

@@ -17,7 +17,7 @@ class CapturingLinker(cpg: Cpg) extends CpgPass(cpg) {
     val dstGraph = DiffGraph.newBuilder
 
     val idToClosureBinding: Map[String, nodes.ClosureBinding] =
-      cpg.graph.V
+      cpg.scalaGraph.V
         .hasLabel(NodeTypes.CLOSURE_BINDING)
         .collect {
           case closureBinding: nodes.ClosureBinding =>
@@ -25,7 +25,7 @@ class CapturingLinker(cpg: Cpg) extends CpgPass(cpg) {
         }
         .toMap
 
-    cpg.graph.V
+    cpg.scalaGraph.V
       .hasLabel(NodeTypes.LOCAL)
       .sideEffect {
         case local: nodes.Local =>

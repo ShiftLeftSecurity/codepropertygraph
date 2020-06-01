@@ -36,44 +36,44 @@ class CfgDominatorPassTests extends WordSpec with Matchers {
     val dominatorTreePass = new CfgDominatorPass(cpg)
     dominatorTreePass.createAndApply()
 
-    val v0Dominates = v0.nodesOut(EdgeTypes.DOMINATE).asScala.toList
+    val v0Dominates = v0.out(EdgeTypes.DOMINATE).asScala.toList
     v0Dominates.size shouldBe 1
     v0Dominates.toSet shouldBe Set(v1)
-    val v1Dominates = v1.nodesOut(EdgeTypes.DOMINATE).asScala.toList
+    val v1Dominates = v1.out(EdgeTypes.DOMINATE).asScala.toList
     v1Dominates.size shouldBe 1
     v1Dominates.toSet shouldBe Set(v2)
-    val v2Dominates = v2.nodesOut(EdgeTypes.DOMINATE).asScala.toList
+    val v2Dominates = v2.out(EdgeTypes.DOMINATE).asScala.toList
     v2Dominates.size shouldBe 2
     v2Dominates.toSet shouldBe Set(v3, v5)
-    val v3Dominates = v3.nodesOut(EdgeTypes.DOMINATE).asScala.toList
+    val v3Dominates = v3.out(EdgeTypes.DOMINATE).asScala.toList
     v3Dominates.size shouldBe 1
     v3Dominates.toSet shouldBe Set(v4)
-    val v4Dominates = v4.nodesOut(EdgeTypes.DOMINATE).asScala.toList
+    val v4Dominates = v4.out(EdgeTypes.DOMINATE).asScala.toList
     v4Dominates.size shouldBe 0
-    val v5Dominates = v5.nodesOut(EdgeTypes.DOMINATE).asScala.toList
+    val v5Dominates = v5.out(EdgeTypes.DOMINATE).asScala.toList
     v5Dominates.size shouldBe 1
     v5Dominates.toSet shouldBe Set(v6)
-    val v6Dominates = v6.nodesOut(EdgeTypes.DOMINATE).asScala.toList
+    val v6Dominates = v6.out(EdgeTypes.DOMINATE).asScala.toList
     v6Dominates.size shouldBe 0
 
-    val v6PostDominates = v6.nodesOut(EdgeTypes.POST_DOMINATE).asScala.toList
+    val v6PostDominates = v6.out(EdgeTypes.POST_DOMINATE).asScala.toList
     v6PostDominates.size shouldBe 1
     v6PostDominates.toSet shouldBe Set(v5)
-    val v5PostDominates = v5.nodesOut(EdgeTypes.POST_DOMINATE).asScala.toList
+    val v5PostDominates = v5.out(EdgeTypes.POST_DOMINATE).asScala.toList
     v5PostDominates.size shouldBe 2
     v5PostDominates.toSet shouldBe Set(v2, v4)
-    val v4PostDominates = v4.nodesOut(EdgeTypes.POST_DOMINATE).asScala.toList
+    val v4PostDominates = v4.out(EdgeTypes.POST_DOMINATE).asScala.toList
     v4PostDominates.size shouldBe 1
     v4PostDominates.toSet shouldBe Set(v3)
-    val v3PostDominates = v3.nodesOut(EdgeTypes.POST_DOMINATE).asScala.toList
+    val v3PostDominates = v3.out(EdgeTypes.POST_DOMINATE).asScala.toList
     v3PostDominates.size shouldBe 0
-    val v2PostDominates = v2.nodesOut(EdgeTypes.POST_DOMINATE).asScala.toList
+    val v2PostDominates = v2.out(EdgeTypes.POST_DOMINATE).asScala.toList
     v2PostDominates.size shouldBe 1
     v2PostDominates.toSet shouldBe Set(v1)
-    val v1PostDominates = v1.nodesOut(EdgeTypes.POST_DOMINATE).asScala.toList
+    val v1PostDominates = v1.out(EdgeTypes.POST_DOMINATE).asScala.toList
     v1PostDominates.size shouldBe 1
     v1PostDominates.toSet shouldBe Set(v0)
-    val v0PostDominates = v0.nodesOut(EdgeTypes.POST_DOMINATE).asScala.toList
+    val v0PostDominates = v0.out(EdgeTypes.POST_DOMINATE).asScala.toList
     v0PostDominates.size shouldBe 0
   }
 }

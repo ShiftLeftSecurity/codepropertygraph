@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.layers
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes}
+import io.shiftleft.overflowdb.OdbGraph
 import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.Overlays
 import io.shiftleft.semanticcpg.passes.BindingMethodOverridesPass

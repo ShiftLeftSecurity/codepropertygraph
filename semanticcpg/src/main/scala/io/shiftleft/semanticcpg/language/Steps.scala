@@ -26,7 +26,7 @@ class Steps[A](val raw: GremlinScala[A]) {
     case g: OdbGraph   => g
     case _: EmptyGraph =>
       // hacky workaround while we're still using Steps and Tinkerpop
-      Cpg.emptyCpg.graph
+      Cpg.emptyCpg.graph.graph.asInstanceOf[OdbGraph]
   }
 
   def toIterator(): Iterator[A] = {

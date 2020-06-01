@@ -51,6 +51,8 @@ object Cpg {
   */
 class Cpg(val graph: OdbGraph = Cpg.emptyGraph) extends AutoCloseable {
 
+  lazy val scalaGraph: ScalaGraph = graph.asScala
+
   lazy val help: String =
     new TraversalHelp("io.shiftleft").forTraversalSources
 

@@ -49,7 +49,7 @@ class MethodExternalDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    cpg.graph.V
+    cpg.scalaGraph.V
       .hasLabel(NodeTypes.METHOD)
       .sideEffect {
         case method: nodes.Method if !isValidExternalFlag(method.isExternal) =>
