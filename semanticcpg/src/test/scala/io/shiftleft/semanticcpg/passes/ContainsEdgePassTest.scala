@@ -14,26 +14,26 @@ class ContainsEdgePassTest extends WordSpec with Matchers {
 
   "Files " can {
     "contain Methods" in Fixture { fixture =>
-      fixture.methodVertex.nodesIn(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.fileVertex)
+      fixture.methodVertex.in(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.fileVertex)
     }
     "contain Classes" in Fixture { fixture =>
-      fixture.typeDeclVertex.nodesIn(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.fileVertex)
+      fixture.typeDeclVertex.in(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.fileVertex)
     }
   }
 
   "Classes " can {
     "contain Methods" in Fixture { fixture =>
-      fixture.typeMethodVertex.nodesIn(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.typeDeclVertex)
+      fixture.typeMethodVertex.in(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.typeDeclVertex)
     }
   }
 
   "Methods " can {
     "contain Methods" in Fixture { fixture =>
-      fixture.innerMethodVertex.nodesIn(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.methodVertex)
+      fixture.innerMethodVertex.in(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.methodVertex)
     }
     "contain expressions" in Fixture { fixture =>
-      fixture.expressionVertex.nodesIn(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.methodVertex)
-      fixture.innerExpressionVertex.nodesIn(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.innerMethodVertex)
+      fixture.expressionVertex.in(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.methodVertex)
+      fixture.innerExpressionVertex.in(EdgeTypes.CONTAINS).asScala.toList shouldBe List(fixture.innerMethodVertex)
     }
   }
 

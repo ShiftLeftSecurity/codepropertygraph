@@ -20,10 +20,10 @@ class CapturingLinkerTests extends WordSpec with Matchers {
     val capturingLinker = new CapturingLinker(new Cpg(graph))
     capturingLinker.createAndApply()
 
-    val capturedByDest1 = local1.nodesOut(EdgeTypes.CAPTURED_BY).asScala.toList
+    val capturedByDest1 = local1.out(EdgeTypes.CAPTURED_BY).asScala.toList
     capturedByDest1 shouldBe List(closureBinding1)
 
-    val capturedByDest2 = local2.nodesOut(EdgeTypes.CAPTURED_BY).asScala.toList
+    val capturedByDest2 = local2.out(EdgeTypes.CAPTURED_BY).asScala.toList
     capturedByDest2 shouldBe List(closureBinding2)
   }
 }

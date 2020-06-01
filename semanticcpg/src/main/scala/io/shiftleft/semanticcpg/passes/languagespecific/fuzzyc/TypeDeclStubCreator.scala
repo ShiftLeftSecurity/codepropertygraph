@@ -21,7 +21,7 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 
     init()
 
-    cpg.graph.V
+    cpg.graph.asScala.V
       .hasLabel(NodeTypes.TYPE)
       .sideEffectWithTraverser { traverser =>
         val typ = traverser.get.asInstanceOf[nodes.Type]

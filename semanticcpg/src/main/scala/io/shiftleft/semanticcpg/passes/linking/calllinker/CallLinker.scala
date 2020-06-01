@@ -24,7 +24,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    cpg.graph.V
+    cpg.graph.asScala.V
       .hasLabel(NodeTypes.METHOD)
       .sideEffectWithTraverser { traverser =>
         val method = traverser.get.asInstanceOf[nodes.Method]
