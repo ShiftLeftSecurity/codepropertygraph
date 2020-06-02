@@ -41,6 +41,8 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
   def isMethodRef: Boolean = node.isInstanceOf[nodes.MethodRef]
 
+  def isMethod: Boolean = node.isInstanceOf[nodes.Method]
+
   def isBlock: Boolean = node.isInstanceOf[nodes.Block]
 
   @Doc("Depth of the abstract syntax tree")
