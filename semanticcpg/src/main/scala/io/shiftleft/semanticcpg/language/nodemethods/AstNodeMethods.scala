@@ -48,6 +48,8 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
   def isMethodRef: Boolean = node.isInstanceOf[nodes.MethodRef]
 
+  def isMethod: Boolean = node.isInstanceOf[nodes.Method]
+
   def isBlock: Boolean = node.isInstanceOf[nodes.Block]
 
   def depth: Int = depth(_ => true)
