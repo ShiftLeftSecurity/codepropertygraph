@@ -21,6 +21,7 @@ object Shared {
         case method: nodes.Method           => (method.label, method.name).toString
         case ret: nodes.MethodReturn        => (ret.label, ret.typeFullName).toString
         case param: nodes.MethodParameterIn => ("PARAM", param.code).toString
+        case local: nodes.Local             => (local.label, s"${local.code}: ${local.typeFullName}").toString
         case _                              => ""
       }
     )

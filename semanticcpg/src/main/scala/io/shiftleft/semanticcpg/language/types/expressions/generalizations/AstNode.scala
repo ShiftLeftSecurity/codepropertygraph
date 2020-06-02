@@ -18,6 +18,14 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
   def ast: NodeSteps[nodes.AstNode] =
     new NodeSteps(raw.emit.repeat(_.out(EdgeTypes.AST)).cast[nodes.AstNode])
 
+  /**
+    * All nodes of the abstract syntax tree rooted in this node,
+    * which match `predicate`. Equivalent of `match` in the original
+    * CPG paper.
+    * */
+  def ast(predicate: nodes.AstNode => Boolean): NodeSteps[nodes.AstNode] =
+    ast.where(predicate)
+
   def containsCallTo(regex: String): NodeSteps[A] =
     wrapped.where(_.ast.isCall.name(regex).size > 0)
 
@@ -124,6 +132,9 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
     * */
   def isLiteral: NodeSteps[nodes.Literal] =
     new NodeSteps(raw.hasLabel(NodeTypes.LITERAL).cast[nodes.Literal])
+
+  def isLocal: NodeSteps[nodes.Local] =
+    new NodeSteps(raw.hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
 
   /**
     * Traverse only to AST nodes that are identifier

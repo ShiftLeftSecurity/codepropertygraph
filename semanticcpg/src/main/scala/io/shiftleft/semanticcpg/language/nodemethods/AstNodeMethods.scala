@@ -7,9 +7,18 @@ import io.shiftleft.semanticcpg.language._
 class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
   /**
-    * All nodes of the abstract syntax tree rooted in this node
+    * All nodes of the abstract syntax tree rooted in this node.
+    * Equivalent of TNodes in the original CPG paper.
     * */
   def ast: NodeSteps[nodes.AstNode] = node.start.ast
+
+  /**
+    * All nodes of the abstract syntax tree rooted in this node,
+    * which match `predicate`. Equivalent of `match` in the original
+    * CPG paper.
+    * */
+  def ast(predicate: nodes.AstNode => Boolean): NodeSteps[nodes.AstNode] =
+    node.start.ast.where(predicate)
 
   /**
     * All nodes of the abstract syntax tree rooted in this node,
@@ -30,6 +39,8 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
   def isReturn: Boolean = node.isInstanceOf[nodes.Return]
 
   def isLiteral: Boolean = node.isInstanceOf[nodes.Literal]
+
+  def isLocal: Boolean = node.isInstanceOf[nodes.Local]
 
   def isCall: Boolean = node.isInstanceOf[nodes.Call]
 
