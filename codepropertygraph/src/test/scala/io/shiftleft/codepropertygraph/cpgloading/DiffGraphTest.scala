@@ -2,6 +2,8 @@ package io.shiftleft.codepropertygraph.cpgloading
 
 import gremlin.scala._
 import io.shiftleft.OverflowDbTestInstance
+import io.shiftleft.overflowdb._
+import io.shiftleft.overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import io.shiftleft.passes.DiffGraph
@@ -10,21 +12,23 @@ import org.scalatest.{Matchers, WordSpec}
 class DiffGraphTest extends WordSpec with Matchers {
   "should be able to build an inverse DiffGraph" in {
     withTestOdb { g =>
+      //TODO make the entire thing take an OdbGraph
+      val graph = g.graph.asInstanceOf[OdbGraph]
+
       // setup existing graph
       // add x and y nodes to graph
-      val x = g.addVertex(NodeTypes.UNKNOWN)
-      val y = g.addVertex(NodeTypes.UNKNOWN)
-      x.property(NodeKeyNames.CODE, "x")
-      y.property(NodeKeyNames.CODE, "old y code")
-      val x2y = x.addEdge(EdgeTypes.CONTAINS_NODE, y, EdgeKeyNames.LOCAL_NAME, "old edge attr")
+      val x = graph + (NodeTypes.UNKNOWN, NodeKeysOdb.CODE -> "x")
+      val y = graph + (NodeTypes.UNKNOWN, NodeKeysOdb.CODE -> "old y code")
+      val x2y = x --- (EdgeTypes.CONTAINS_NODE, EdgeKeysOdb.LOCAL_NAME -> "old edge attr") --> y
+
       // make diffgraph
       val diffBuilder = DiffGraph.newBuilder
       // add a b c nodes to the DiffGraph.Builder
-      val a = makeNode("a")
+      val a = createNewNode("a")
       diffBuilder.addNode(a)
-      val b = makeNode("b")
+      val b = createNewNode("b")
       diffBuilder.addNode(b)
-      val c = makeNode("c")
+      val c = createNewNode("c")
       diffBuilder.addNode(c)
       // add edge a -> b -> c to the DiffGraph.Builder
       makeEdgeBetweenNewNodes(diffBuilder, a, b)
@@ -58,58 +62,67 @@ class DiffGraphTest extends WordSpec with Matchers {
 
   "should be able to revert DiffGraph and reapply again" in {
     withTestOdb { g =>
+      //TODO make the entire thing take an OdbGraph
+      val graph = g.graph.asInstanceOf[OdbGraph]
+
       var diffBuilder = DiffGraph.newBuilder
-      diffBuilder.addNode(makeNode("a"))
-      diffBuilder.addNode(makeNode("b"))
-      diffBuilder.addNode(makeNode("c"))
+      diffBuilder.addNode(createNewNode("a"))
+      diffBuilder.addNode(createNewNode("b"))
+      diffBuilder.addNode(createNewNode("c"))
       val threeNodes = diffBuilder.build()
-      val appliedDiff1 = DiffGraph.Applier.applyDiff(threeNodes, g.graph, true)
-      assert(g.V.count.head == 3)
-      DiffGraph.Applier.unapplyDiff(g.graph, appliedDiff1.inverseDiffGraph.get)
-      assert(g.V.count.head == 0)
-      DiffGraph.Applier.applyDiff(threeNodes, g.graph, false)
+      val appliedDiff1 = DiffGraph.Applier.applyDiff(threeNodes, graph, true)
+      graph.nodeCount shouldBe 3
+      DiffGraph.Applier.unapplyDiff(graph, appliedDiff1.inverseDiffGraph.get)
+      graph.nodeCount shouldBe 0
+      DiffGraph.Applier.applyDiff(threeNodes, graph, false)
       diffBuilder = DiffGraph.newBuilder
       makeEdgeBetweenExistingNodes(g, diffBuilder, "a", "b")
       makeEdgeBetweenExistingNodes(g, diffBuilder, "b", "c")
-      val appliedDiff2 = DiffGraph.Applier.applyDiff(diffBuilder.build(), g.graph, true)
-      assert(g.V.has(NodeKeys.CODE, "a").head.out(EdgeTypes.AST).head().property(NodeKeys.CODE).value() == "b")
-      DiffGraph.Applier.unapplyDiff(g.graph, appliedDiff2.inverseDiffGraph.get)
-      assert(g.V.has(NodeKeys.CODE, "a").head.out(EdgeTypes.AST).notExists())
-      assert(g.V.has(NodeKeys.CODE, "b").head.out(EdgeTypes.AST).notExists())
+      val appliedDiff2 = DiffGraph.Applier.applyDiff(diffBuilder.build(), graph, true)
+      graph.V.has(NodeKeysOdb.CODE -> "a").head.out(EdgeTypes.AST).property(NodeKeysOdb.CODE).head shouldBe "b"
+      DiffGraph.Applier.unapplyDiff(graph, appliedDiff2.inverseDiffGraph.get)
+      graph.V.has(NodeKeysOdb.CODE -> "a").head.out(EdgeTypes.AST).l shouldBe Nil
+      graph.V.has(NodeKeysOdb.CODE, "b").head.out(EdgeTypes.AST).l shouldBe Nil
     }
   }
 
   "apply and revert DiffGraph with nodes _and_ edges" when {
 
     "testing simple scenario" in withTestOdb { g =>
+      //TODO make the entire thing take an OdbGraph
+      val graph = g.graph.asInstanceOf[OdbGraph]
+
       val diffBuilder = DiffGraph.newBuilder
-      val newNodeA = makeNode("a")
-      val newNodeB = makeNode("b")
+      val newNodeA = createNewNode("a")
+      val newNodeB = createNewNode("b")
       diffBuilder.addNode(newNodeA)
       diffBuilder.addNode(newNodeB)
       diffBuilder.addEdge(newNodeA, newNodeB, EdgeTypes.AST)
       val diff = diffBuilder.build()
-      val appliedDiff = DiffGraph.Applier.applyDiff(diff, g.graph, true)
-      assert(g.V.count.head == 2)
-      assert(g.E.count.head == 1)
+      val appliedDiff = DiffGraph.Applier.applyDiff(diff, graph, true)
+      graph.nodeCount shouldBe 2
+      graph.edgeCount shouldBe 1
       DiffGraph.Applier.unapplyDiff(g.graph, appliedDiff.inverseDiffGraph.get)
-      assert(g.V.count.head == 0)
+      graph.nodeCount shouldBe 0
     }
 
     "testing more complex scenario" in withTestOdb { g =>
+      //TODO make the entire thing take an OdbGraph
+      val graph = g.graph.asInstanceOf[OdbGraph]
+
       val diffBuilder = DiffGraph.newBuilder
-      val newNodeA = makeNode("a")
-      val newNodeB = makeNode("b")
+      val newNodeA = createNewNode("a")
+      val newNodeB = createNewNode("b")
       diffBuilder.addNode(newNodeA)
       diffBuilder.addNode(newNodeB)
       diffBuilder.addEdge(newNodeA, newNodeB, EdgeTypes.AST)
-      val newNodeC = makeNode("c")
+      val newNodeC = createNewNode("c")
       diffBuilder.addNode(newNodeC)
       diffBuilder.addEdge(newNodeB, newNodeC, EdgeTypes.AST)
       val diff = diffBuilder.build()
-      val appliedDiff = DiffGraph.Applier.applyDiff(diff, g.graph, true)
-      assert(g.V.count.head == 3)
-      assert(g.E.count.head == 2)
+      val appliedDiff = DiffGraph.Applier.applyDiff(diff, graph, true)
+      graph.nodeCount shouldBe 3
+      graph.edgeCount shouldBe 2
       println(appliedDiff.inverseDiffGraph.get.iterator.toList)
       DiffGraph.Applier.unapplyDiff(g.graph, appliedDiff.inverseDiffGraph.get)
       assert(g.V.count.head == 0)
@@ -122,7 +135,7 @@ class DiffGraphTest extends WordSpec with Matchers {
     finally graph.close()
   }
 
-  def makeNode(code: String) = new nodes.NewNode {
+  def createNewNode(code: String) = new nodes.NewNode {
     override def containedNodesByLocalName = ???
     override def label = NodeTypes.UNKNOWN
     override def properties = Map(NodeKeyNames.CODE -> code)
