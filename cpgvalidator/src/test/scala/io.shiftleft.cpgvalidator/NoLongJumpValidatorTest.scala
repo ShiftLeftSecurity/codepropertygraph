@@ -1,9 +1,9 @@
 package io.shiftleft.cpgvalidator
 
-import gremlin.scala._
+import io.shiftleft.overflowdb._
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeysOdb, NodeTypes}
 import io.shiftleft.cpgvalidator.validators.cfg.NoLongJumpValidator
 import org.scalatest.{Matchers, WordSpec}
 
@@ -25,14 +25,12 @@ class NoLongJumpValidatorTest extends WordSpec with Matchers {
   "report no cfg edge errors for simple correct graph" in {
     withNewBaseCpg { cpg =>
       val validator = new NoLongJumpValidator(new ValidationErrorRegistry)
-      implicit val graph = cpg.scalaGraph
-      val method1 = cpg.graph + NodeTypes.METHOD
-      method1.property("FULL_NAME", "method1")
-      val method2 = cpg.graph + NodeTypes.METHOD
-      method2.property("FULL_NAME", "method2")
+      val method1 = cpg.graph + (NodeTypes.METHOD, NodeKeysOdb.FULL_NAME -> "method1")
+      val method2 = cpg.graph + (NodeTypes.METHOD, NodeKeysOdb.FULL_NAME -> "method2")
+
       val nodeInMethod1 = cpg.graph + NodeTypes.CALL
-      method1 --- EdgeTypes.AST --> nodeInMethod1
       val nodeInMethod2 = cpg.graph + NodeTypes.CALL
+      method1 --- EdgeTypes.AST --> nodeInMethod1
       method2 --- EdgeTypes.AST --> nodeInMethod2
 
       method1 --- EdgeTypes.CFG --> nodeInMethod1
@@ -45,14 +43,12 @@ class NoLongJumpValidatorTest extends WordSpec with Matchers {
   "report cfg edge errors for simple incorrect graph" in {
     withNewBaseCpg { cpg =>
       val validator = new NoLongJumpValidator(new ValidationErrorRegistry)
-      implicit val graph = cpg.scalaGraph
-      val method1 = cpg.graph + NodeTypes.METHOD
-      method1.property("FULL_NAME", "method1")
-      val method2 = cpg.graph + NodeTypes.METHOD
-      method2.property("FULL_NAME", "method2")
+      val method1 = cpg.graph + (NodeTypes.METHOD, NodeKeysOdb.FULL_NAME -> "method1")
+      val method2 = cpg.graph + (NodeTypes.METHOD, NodeKeysOdb.FULL_NAME -> "method2")
+
       val nodeInMethod1 = cpg.graph + NodeTypes.CALL
-      method1 --- EdgeTypes.AST --> nodeInMethod1
       val nodeInMethod2 = cpg.graph + NodeTypes.CALL
+      method1 --- EdgeTypes.AST --> nodeInMethod1
       method2 --- EdgeTypes.AST --> nodeInMethod2
 
       method1 --- EdgeTypes.CFG --> nodeInMethod2

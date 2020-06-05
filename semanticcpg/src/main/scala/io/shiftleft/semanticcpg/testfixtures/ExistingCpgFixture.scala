@@ -1,7 +1,5 @@
 package io.shiftleft.semanticcpg.testfixtures
 
-import gremlin.scala._
-import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
 
@@ -11,8 +9,6 @@ private class ExistingCpgFixture(projectName: String) {
   lazy val cpg = CpgLoader.load(cpgFilename, config)
   val context = new LayerCreatorContext(cpg)
   new Scpg().run(context)
-  implicit val graph: Graph = cpg.graph
-  lazy val scalaGraph: ScalaGraph = graph
 }
 
 object ExistingCpgFixture {

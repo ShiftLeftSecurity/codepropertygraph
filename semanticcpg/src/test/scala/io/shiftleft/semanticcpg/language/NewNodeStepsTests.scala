@@ -2,14 +2,12 @@ package io.shiftleft.semanticcpg.language
 
 import gremlin.scala._
 import io.shiftleft.OverflowDbTestInstance
-import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.EdgeKeyNames
 import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, ModifierTypes}
 import io.shiftleft.passes.{DiffGraph}
 import io.shiftleft.passes.DiffGraph.{EdgeInDiffGraph, EdgeToOriginal}
-import io.shiftleft.overflowdb.OdbGraph
+import io.shiftleft.overflowdb._
 import org.scalatest.{Matchers, WordSpec}
 
 class NewNodeStepsTest extends WordSpec with Matchers {
@@ -31,7 +29,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
       existingContainedNode.property(Modifier.PropertyNames.ModifierType, ModifierTypes.NATIVE)
 
       val newContainedNode = new TestNewNode
-      val newNode = new TestNewNode(containedNodes = List(existingContainedNode, newContainedNode))
+      val newNode = TestNewNode(containedNodes = List(existingContainedNode, newContainedNode))
       new NewNodeSteps(__(newNode)).store
       val diffGraph = diffGraphBuilder.build
       diffGraph.nodes.toSet shouldBe Set(newNode, newContainedNode)
@@ -63,8 +61,8 @@ class NewNodeStepsTest extends WordSpec with Matchers {
     "embedding a NewNode recursively" in {
       implicit val diffGraphBuilder = DiffGraph.newBuilder
       val newContainedNodeL1 = new TestNewNode
-      val newContainedNodeL0 = new TestNewNode(containedNodes = List(newContainedNodeL1))
-      val newNode = new TestNewNode(containedNodes = List(newContainedNodeL0))
+      val newContainedNodeL0 = TestNewNode(containedNodes = List(newContainedNodeL1))
+      val newNode = TestNewNode(containedNodes = List(newContainedNodeL0))
       new NewNodeSteps(__(newNode)).store
       val diffGraph = diffGraphBuilder.build
 

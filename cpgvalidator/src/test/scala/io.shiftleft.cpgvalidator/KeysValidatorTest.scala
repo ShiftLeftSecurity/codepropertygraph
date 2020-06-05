@@ -1,8 +1,8 @@
 package io.shiftleft.cpgvalidator
 
-import io.shiftleft.codepropertygraph.generated.NodeTypes
+import io.shiftleft.overflowdb._
+import io.shiftleft.codepropertygraph.generated.{nodes, NodeKeysOdb, NodeTypes}
 import io.shiftleft.cpgvalidator.validators.KeysValidator
-import gremlin.scala._
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.Cardinality
@@ -24,12 +24,14 @@ class KeysValidatorTest extends WordSpec with Matchers {
   "report no validation errors for a key with Cardinality one" in {
     withNewBaseCpg { cpg =>
       val validator = new KeysValidator(new ValidationErrorRegistry)
-      val node = cpg.graph + NodeTypes.METHOD_PARAMETER_IN
-      node.property("NAME", "someMethod")
-      node.property("TYPE_FULL_NAME", "someMethod")
-      node.property("ORDER", 1)
-      node.property("CODE", "some code;")
-      node.property("EVALUATION_STRATEGY", "someStrategy")
+      cpg.graph + (
+        NodeTypes.METHOD_PARAMETER_IN,
+        NodeKeysOdb.NAME -> "someMethod",
+        NodeKeysOdb.TYPE_FULL_NAME -> "someMethod",
+        NodeKeysOdb.ORDER -> 1,
+        NodeKeysOdb.CODE -> "some code",
+        NodeKeysOdb.EVALUATION_STRATEGY -> "someStrategy"
+      )
       validator.validate(cpg) shouldBe true
     }
   }
@@ -48,47 +50,56 @@ class KeysValidatorTest extends WordSpec with Matchers {
 
   "report no validation errors for a key with Cardinality list (with some values)" in {
     withNewBaseCpg { cpg =>
+      import gremlin.scala._
       val validator = new KeysValidator(new ValidationErrorRegistry)
-      val node = cpg.graph + NodeTypes.TYPE_DECL
+      val node = cpg.graph + (
+        NodeTypes.TYPE_DECL,
+        NodeKeysOdb.NAME -> "SomeTypeDecl",
+        NodeKeysOdb.AST_PARENT_TYPE -> "SomeParentType",
+        NodeKeysOdb.AST_PARENT_FULL_NAME -> "SomeTypeDecl",
+        NodeKeysOdb.IS_EXTERNAL -> false,
+        NodeKeysOdb.ORDER -> 1,
+        NodeKeysOdb.FULL_NAME -> "SomeTypeDecl",
+        NodeKeysOdb.FILENAME -> "",
+      )
       node.setPropertyList("INHERITS_FROM_TYPE_FULL_NAME", List("a", "b"))
-      node.property("NAME", "SomeTypeDecl")
-      node.property("AST_PARENT_TYPE", "SomeParentType")
-      node.property("AST_PARENT_FULL_NAME", "SomeTypeDecl")
-      node.property("IS_EXTERNAL", false)
-      node.property("ORDER", 1)
-      node.property("FULL_NAME", "SomeTypeDecl")
-      node.property("FILENAME", "")
       validator.validate(cpg) shouldBe true
+      node.asInstanceOf[nodes.TypeDecl].inheritsFromTypeFullName shouldBe (List("a", "b"))
     }
   }
 
   "report no validation errors for a key with Cardinality list when this property is not set" in {
     withNewBaseCpg { cpg =>
       val validator = new KeysValidator(new ValidationErrorRegistry)
-      val node = cpg.graph + NodeTypes.TYPE_DECL
-      node.property("NAME", "SomeTypeDecl")
-      node.property("AST_PARENT_TYPE", "SomeParentType")
-      node.property("AST_PARENT_FULL_NAME", "SomeTypeDecl")
-      node.property("IS_EXTERNAL", false)
-      node.property("ORDER", 1)
-      node.property("FULL_NAME", "SomeTypeDecl")
-      node.property("FILENAME", "")
+      cpg.graph + (
+        NodeTypes.TYPE_DECL,
+        NodeKeysOdb.NAME -> "SomeTypeDecl",
+        NodeKeysOdb.AST_PARENT_TYPE -> "SomeParentType",
+        NodeKeysOdb.AST_PARENT_FULL_NAME -> "SomeTypeDecl",
+        NodeKeysOdb.IS_EXTERNAL -> false,
+        NodeKeysOdb.ORDER -> 1,
+        NodeKeysOdb.FULL_NAME -> "SomeTypeDecl",
+        NodeKeysOdb.FILENAME -> "",
+      )
       validator.validate(cpg) shouldBe true
     }
   }
 
   "report no validation errors for a key with Cardinality list when this list is empty)" in {
     withNewBaseCpg { cpg =>
+      import gremlin.scala._
       val validator = new KeysValidator(new ValidationErrorRegistry)
-      val node = cpg.graph + NodeTypes.TYPE_DECL
+      val node = cpg.graph + (
+        NodeTypes.TYPE_DECL,
+        NodeKeysOdb.NAME -> "SomeTypeDecl",
+        NodeKeysOdb.AST_PARENT_TYPE -> "SomeParentType",
+        NodeKeysOdb.AST_PARENT_FULL_NAME -> "SomeTypeDecl",
+        NodeKeysOdb.IS_EXTERNAL -> false,
+        NodeKeysOdb.ORDER -> 1,
+        NodeKeysOdb.FULL_NAME -> "SomeTypeDecl",
+        NodeKeysOdb.FILENAME -> "",
+      )
       node.setPropertyList("INHERITS_FROM_TYPE_FULL_NAME", List.empty)
-      node.property("NAME", "SomeTypeDecl")
-      node.property("AST_PARENT_TYPE", "SomeParentType")
-      node.property("AST_PARENT_FULL_NAME", "SomeTypeDecl")
-      node.property("IS_EXTERNAL", false)
-      node.property("ORDER", 1)
-      node.property("FULL_NAME", "SomeTypeDecl")
-      node.property("FILENAME", "")
       validator.validate(cpg) shouldBe true
     }
   }
@@ -96,12 +107,14 @@ class KeysValidatorTest extends WordSpec with Matchers {
   "report no validation errors for a key with Cardinality zeroOrOne when exactly 1 is present" in {
     withNewBaseCpg { cpg =>
       val validator = new KeysValidator(new ValidationErrorRegistry)
-      val node = cpg.graph + NodeTypes.ANNOTATION_LITERAL
-      node.property("LINE_NUMBER", 1)
-      node.property("NAME", "SomeAnnotation")
-      node.property("ORDER", 1)
-      node.property("ARGUMENT_INDEX", 1)
-      node.property("CODE", "some code;")
+      cpg.graph + (
+        NodeTypes.ANNOTATION_LITERAL,
+        NodeKeysOdb.LINE_NUMBER -> 1,
+        NodeKeysOdb.NAME -> "SomeAnnotation",
+        NodeKeysOdb.ORDER -> 1,
+        NodeKeysOdb.ARGUMENT_INDEX -> 1,
+        NodeKeysOdb.CODE -> "some code;"
+      )
       validator.validate(cpg) shouldBe true
     }
   }
@@ -109,12 +122,14 @@ class KeysValidatorTest extends WordSpec with Matchers {
   "report no validation errors for a key with Cardinality zeroOrOne when this property is empty" in {
     withNewBaseCpg { cpg =>
       val validator = new KeysValidator(new ValidationErrorRegistry)
-      val node = cpg.graph + NodeTypes.ANNOTATION_LITERAL
-      node.property("LINE_NUMBER", Option.empty)
-      node.property("NAME", "SomeAnnotation")
-      node.property("ORDER", 1)
-      node.property("ARGUMENT_INDEX", 1)
-      node.property("CODE", "some code;")
+      cpg.graph + (
+        NodeTypes.ANNOTATION_LITERAL,
+//        NodeKeysOdb.LINE_NUMBER intentionally not set
+        NodeKeysOdb.NAME -> "SomeAnnotation",
+        NodeKeysOdb.ORDER -> 1,
+        NodeKeysOdb.ARGUMENT_INDEX -> 1,
+        NodeKeysOdb.CODE -> "some code;"
+      )
       validator.validate(cpg) shouldBe true
     }
   }
@@ -122,11 +137,13 @@ class KeysValidatorTest extends WordSpec with Matchers {
   "report no validation errors for a key with Cardinality zeroOrOne when this property is not set" in {
     withNewBaseCpg { cpg =>
       val validator = new KeysValidator(new ValidationErrorRegistry)
-      val node = cpg.graph + NodeTypes.ANNOTATION_LITERAL
-      node.property("NAME", "SomeAnnotation")
-      node.property("ORDER", 1)
-      node.property("ARGUMENT_INDEX", 1)
-      node.property("CODE", "some code;")
+      cpg.graph + (
+        NodeTypes.ANNOTATION_LITERAL,
+        NodeKeysOdb.NAME -> "SomeAnnotation",
+        NodeKeysOdb.ORDER -> 1,
+        NodeKeysOdb.ARGUMENT_INDEX -> 1,
+        NodeKeysOdb.CODE -> "some code;"
+      )
       validator.validate(cpg) shouldBe true
     }
   }
