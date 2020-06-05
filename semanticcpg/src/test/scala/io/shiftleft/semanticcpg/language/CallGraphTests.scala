@@ -26,7 +26,7 @@ class CallGraphTests extends WordSpec with Matchers {
     }
 
     "should find three outgoing calls for main" in {
-      cpg.method.name("main").callOut.code.toSet shouldBe
+      cpg.method.name("main").call.code.toSet shouldBe
         Set("1+2", "add((1+2), 3)", "printf(\"%d\\n\", add((1+2), 3))")
     }
 

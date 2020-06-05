@@ -58,12 +58,14 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
     * */
   def controlStructure(regex: String): NodeSteps[nodes.ControlStructure] =
     wrapped.ast.isControlStructure.code(regex)
+  @deprecated("Use `call`", "")
+  def callOut: NodeSteps[nodes.Call] = call
 
   /**
     * Outgoing call sites
     * */
   @Doc("Call sites (outgoing calls)")
-  def callOut: NodeSteps[nodes.Call] =
+  def call: NodeSteps[nodes.Call] =
     new NodeSteps(raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.CALL).cast[nodes.Call])
 
   /**

@@ -47,7 +47,7 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
     * Traverse to methods called by this method
     * */
   def callee(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] =
-    new OriginalMethod(wrapped).callOut.calledMethod(callResolver)
+    new OriginalMethod(wrapped).call.calledMethod(callResolver)
 
   /**
     * Incoming call sites
@@ -69,6 +69,6 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
     * Outgoing call sites to methods where fullName matches `regex`.
     * */
   def callOutRegex(regex: String)(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] =
-    new OriginalMethod(wrapped).callOut.filter(_.calledMethod.fullName(regex))
+    new OriginalMethod(wrapped).call.filter(_.calledMethod.fullName(regex))
 
 }
