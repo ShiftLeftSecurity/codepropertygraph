@@ -105,7 +105,9 @@
               {"name": "METHOD_RETURN", "cardinality":"0-1:0-1"},
               {"name": "RETURN"},
               {"name": "BLOCK"},
-              {"name": "UNKNOWN"}
+	      {"name": "JUMP_TARGET"},
+	      {"name": "CONTROL_STRUCTURE"},
+	      {"name": "UNKNOWN"}
             ]
            }
          ]
@@ -207,6 +209,8 @@
               {"name": "METHOD_REF"},
               {"name": "RETURN"},
               {"name": "BLOCK"},
+	      {"name": "JUMP_TARGET"},
+	      {"name": "CONTROL_STRUCTURE"},
               {"name": "UNKNOWN"}
             ]
            }
@@ -225,7 +229,9 @@
              {"name": "METHOD_REF"},
              {"name": "RETURN"},
              {"name": "BLOCK"},
-             {"name": "UNKNOWN"}
+	     {"name": "JUMP_TARGET"},
+	     {"name": "CONTROL_STRUCTURE"},
+	     {"name": "UNKNOWN"}
            ]},
            {"edgeName": "AST", "inNodes": [
              {"name": "CALL"},
@@ -243,7 +249,9 @@
              {"name": "LITERAL", "cardinality": "0-1:0-1"},
              {"name": "METHOD_REF", "cardinality": "0-1:0-1"},
              {"name": "BLOCK", "cardinality": "0-1:0-1"},
-             {"name": "UNKNOWN"}
+             {"name": "JUMP_TARGET"},
+	     {"name": "CONTROL_STRUCTURE"},
+	     {"name": "UNKNOWN"}
            ]},
            {"edgeName": "ARGUMENT", "inNodes": [
              {"name": "CALL", "cardinality": "0-1:n"},
@@ -252,7 +260,9 @@
              {"name": "LITERAL", "cardinality": "0-1:n"},
              {"name": "METHOD_REF", "cardinality": "0-1:n"},
              {"name": "BLOCK", "cardinality": "0-1:n"},
-             {"name": "UNKNOWN"}
+	     {"name": "JUMP_TARGET"},
+	     {"name": "CONTROL_STRUCTURE"},
+	     {"name": "UNKNOWN"}
            ]}
          ]
         },
@@ -279,7 +289,9 @@
              {"name": "METHOD_RETURN"},
              {"name": "RETURN"},
              {"name": "BLOCK"},
-             {"name": "UNKNOWN"}
+	     {"name": "JUMP_TARGET"},
+	     {"name": "CONTROL_STRUCTURE"},
+	     {"name": "UNKNOWN"}
            ]}
          ]
         },
@@ -296,7 +308,9 @@
              {"name": "METHOD_REF"},
              {"name": "RETURN"},
              {"name": "BLOCK"},
-             {"name": "UNKNOWN"}
+	     {"name": "JUMP_TARGET"},
+	     {"name": "CONTROL_STRUCTURE"},
+	     {"name": "UNKNOWN"}
             ]}
           ]
         },
@@ -313,6 +327,7 @@
                {"name": "RETURN"},
                {"name": "BLOCK"},
                {"name": "UNKNOWN"},
+	       {"name": "JUMP_TARGET"},
                {"name": "CONTROL_STRUCTURE"}
              ]},
              {"edgeName": "CFG", "inNodes": [
@@ -325,7 +340,9 @@
                {"name": "METHOD_REF", "cardinality": "0-1:0-1"},
                {"name": "RETURN", "cardinality": "0-1:0-1"},
                {"name": "BLOCK", "cardinality": "0-1:0-1"},
-               {"name": "UNKNOWN"}
+	       {"name": "JUMP_TARGET"},
+	       {"name": "CONTROL_STRUCTURE"},
+	       {"name": "UNKNOWN"}
              ]}
          ]
         },
@@ -343,7 +360,8 @@
                {"name": "BLOCK", "cardinality": "1:n"},
                {"name": "LOCAL"},
                {"name": "UNKNOWN"},
-               {"name": "CONTROL_STRUCTURE"}
+	       {"name": "JUMP_TARGET"},
+	       {"name": "CONTROL_STRUCTURE"}
              ]},
              {"edgeName": "CFG", "inNodes": [
                {"name": "CALL"},
@@ -353,7 +371,9 @@
                {"name": "METHOD_REF"},
                {"name": "RETURN"},
                {"name": "BLOCK"},
-               {"name": "UNKNOWN"}
+	       {"name": "JUMP_TARGET"},
+	       {"name": "CONTROL_STRUCTURE"},
+	       {"name": "UNKNOWN"}
              ]}
          ]
         },
@@ -387,7 +407,9 @@
               {"name": "METHOD_RETURN"},
               {"name": "RETURN"},
               {"name": "BLOCK"},
-              {"name": "UNKNOWN"}
+	      {"name": "JUMP_TARGET"},
+	      {"name": "CONTROL_STRUCTURE"},
+	      {"name": "UNKNOWN"}
              ]}
           ]
         },
@@ -406,6 +428,7 @@
         {"name": "IDENTIFIER", "cardinality": "0-1:n"},
         {"name": "RETURN", "cardinality": "0-1:n"},
         {"name": "BLOCK", "cardinality": "0-1:n"},
+	{"name": "JUMP_TARGET"},
         {"name": "UNKNOWN"},
         {"name": "CONTROL_STRUCTURE"},
         {"name": "METHOD_REF", "cardinality": "1:n"}
@@ -418,7 +441,9 @@
         {"name": "BLOCK"},
         {"name": "METHOD_REF"},
         {"name": "CONTROL_STRUCTURE"},
+	{"name": "JUMP_TARGET"},
         {"name": "UNKNOWN"},
+        {"name": "CONTROL_STRUCTURE"},
         {"name": "ARRAY_INITIALIZER"}
      ] }
 	 ]
@@ -437,7 +462,9 @@
              {"name": "RETURN"},
              {"name": "METHOD_REF"},
              {"name": "BLOCK"},
-             {"name": "UNKNOWN"}
+	     {"name": "JUMP_TARGET"},
+	     {"name": "CONTROL_STRUCTURE"},
+	     {"name": "UNKNOWN"}
            ]}
 	 ]
 	},
@@ -457,7 +484,9 @@
              {"name": "RETURN"},
              {"name": "METHOD_REF"},
              {"name": "BLOCK"},
-             {"name": "UNKNOWN"}
+	     {"name": "JUMP_TARGET"},
+	     {"name": "CONTROL_STRUCTURE"},
+	     {"name": "UNKNOWN"}
              ]},
            {"edgeName": "AST", "inNodes": [
              {"name": "LITERAL"},
@@ -470,6 +499,7 @@
              {"name": "FIELD_IDENTIFIER"},
              {"name": "RETURN"},
              {"name": "BLOCK"},
+	     {"name": "JUMP_TARGET"},
              {"name": "UNKNOWN"},
              {"name": "CONTROL_STRUCTURE"}
            ]}
