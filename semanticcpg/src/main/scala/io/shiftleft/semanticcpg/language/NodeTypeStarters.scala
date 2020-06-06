@@ -47,6 +47,13 @@ class NodeTypeStarters(cpg: Cpg) {
     file.name(name)
 
   /**
+    * Traverse to all jump targets
+    * */
+  @Doc("All jump targets, i.e., labels")
+  def jumpTarget: NodeSteps[nodes.JumpTarget] =
+    new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.JUMP_TARGET).cast[nodes.JumpTarget])
+
+  /**
     Traverse to all namespaces, e.g., packages in Java.
     */
   @Doc("All namespaces")
