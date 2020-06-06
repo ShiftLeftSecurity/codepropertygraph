@@ -424,6 +424,24 @@
 	 ]
 	},
 
+	{"id" : 340, "name": "JUMP_TARGET",
+	 "comment" : "A jump target made explicit in the code using a label",
+	 "keys": ["NAME", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER", "PARSER_TYPE_NAME", "ARGUMENT_INDEX", "INTERNAL_FLAGS"],
+	 "is" : ["CFG_NODE", "AST_NODE"],
+	 "outEdges" : [
+           {"edgeName": "CFG", "inNodes": [
+             {"name": "CALL"},
+             {"name": "IDENTIFIER"},
+             {"name": "FIELD_IDENTIFIER"},
+             {"name": "LITERAL"},
+             {"name": "RETURN"},
+             {"name": "METHOD_REF"},
+             {"name": "BLOCK"},
+             {"name": "UNKNOWN"}
+           ]}
+	 ]
+	},
+
         // This is the "catch-all-others" node type.
 
         {"id" : 44, "name": "UNKNOWN",
