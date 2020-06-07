@@ -1,7 +1,7 @@
 package io.shiftleft.console
 
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
-import io.shiftleft.overflowdb.OdbConfig
+import overflowdb.OdbConfig
 
 object CpgConverter {
 

@@ -6,7 +6,7 @@ import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.InFact
 import io.shiftleft.cpgvalidator._
 import io.shiftleft.cpgvalidator.facts.InFactsImporter
-import io.shiftleft.overflowdb.OdbGraph
+import overflowdb.OdbGraph
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.jdk.CollectionConverters._

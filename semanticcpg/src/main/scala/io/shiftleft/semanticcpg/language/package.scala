@@ -21,7 +21,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   Node,
   StoredNode
 }
-import io.shiftleft.overflowdb.traversal.Traversal
+import overflowdb.traversal.Traversal
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.{AstNodeDot, CfgNodeDot}
 import io.shiftleft.semanticcpg.language.nodemethods.{

@@ -10,7 +10,7 @@ import io.shiftleft.console.LanguageHelper.cpgGeneratorForLanguage
 import io.shiftleft.console.cpgcreation.{CpgGenerator, LanguageFrontend}
 import io.shiftleft.console.scripting.{AmmoniteExecutor, ScriptManager}
 import io.shiftleft.console.workspacehandling.{Project, WorkspaceLoader, WorkspaceManager}
-import io.shiftleft.overflowdb.traversal.help.{Doc, Table}
+import overflowdb.traversal.help.{Doc, Table}
 import io.shiftleft.semanticcpg.Overlays
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.dotextension.ImageViewer

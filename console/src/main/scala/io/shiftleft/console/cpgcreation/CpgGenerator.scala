@@ -6,7 +6,7 @@ import better.files.Dsl._
 import better.files.File
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.console.ConsoleConfig
-import io.shiftleft.overflowdb.OdbConfig
+import overflowdb.OdbConfig
 import io.shiftleft.console.LanguageHelper.{cpgGeneratorForLanguage, languageIsKnown}
 
 import scala.util.Try

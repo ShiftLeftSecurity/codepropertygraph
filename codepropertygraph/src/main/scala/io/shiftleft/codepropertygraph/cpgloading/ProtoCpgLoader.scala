@@ -12,7 +12,7 @@ import com.google.protobuf.GeneratedMessageV3
 
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try, Using}
-import io.shiftleft.overflowdb.OdbConfig
+import overflowdb.OdbConfig
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge
 
 import scala.collection.mutable.ArrayBuffer

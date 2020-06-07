@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.containsedges
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.overflowdb.OdbGraph
+import overflowdb.OdbGraph
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language.NodeTypeDeco
 

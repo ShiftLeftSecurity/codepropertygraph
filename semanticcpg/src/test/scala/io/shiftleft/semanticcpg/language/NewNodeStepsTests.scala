@@ -7,7 +7,7 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, ModifierTypes}
 import io.shiftleft.passes.{DiffGraph}
 import io.shiftleft.passes.DiffGraph.{EdgeInDiffGraph, EdgeToOriginal}
-import io.shiftleft.overflowdb._
+import overflowdb._
 import org.scalatest.{Matchers, WordSpec}
 
 class NewNodeStepsTest extends WordSpec with Matchers {

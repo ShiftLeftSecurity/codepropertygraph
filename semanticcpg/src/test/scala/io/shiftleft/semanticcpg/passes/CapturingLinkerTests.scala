@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeysOdb, NodeTypes}
-import io.shiftleft.overflowdb._
+import overflowdb._
 import io.shiftleft.semanticcpg.passes.linking.capturinglinker.CapturingLinker
 import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
 import org.scalatest.{Matchers, WordSpec}

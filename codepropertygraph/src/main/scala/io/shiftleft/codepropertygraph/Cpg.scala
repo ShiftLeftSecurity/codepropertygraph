@@ -2,9 +2,9 @@ package io.shiftleft.codepropertygraph
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{edges, nodes}
-import io.shiftleft.overflowdb.OdbGraph
-import io.shiftleft.overflowdb.OdbConfig
-import io.shiftleft.overflowdb.traversal.help.TraversalHelp
+import overflowdb.OdbGraph
+import overflowdb.OdbConfig
+import overflowdb.traversal.help.TraversalHelp
 
 object Cpg {
 

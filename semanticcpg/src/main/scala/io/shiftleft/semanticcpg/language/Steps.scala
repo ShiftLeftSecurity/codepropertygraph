@@ -6,8 +6,8 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.overflowdb.OdbGraph
-import io.shiftleft.overflowdb.traversal.help.{Doc, TraversalHelp}
+import overflowdb.OdbGraph
+import overflowdb.traversal.help.{Doc, TraversalHelp}
 import org.apache.tinkerpop.gremlin.process.traversal.Scope
 import org.apache.tinkerpop.gremlin.structure.util.empty.EmptyGraph
 import org.json4s.{CustomSerializer, Extraction}

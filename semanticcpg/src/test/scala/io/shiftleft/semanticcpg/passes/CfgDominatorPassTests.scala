@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.OverflowDbTestInstance
-import io.shiftleft.overflowdb._
+import overflowdb._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass

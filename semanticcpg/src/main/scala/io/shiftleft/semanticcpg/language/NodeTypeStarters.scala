@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
-import io.shiftleft.overflowdb.traversal.help.{Doc, TraversalSource}
+import overflowdb.traversal.help.{Doc, TraversalSource}
 
 @TraversalSource
 class NodeTypeStarters(cpg: Cpg) {

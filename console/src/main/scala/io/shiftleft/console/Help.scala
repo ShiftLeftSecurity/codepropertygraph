@@ -1,6 +1,6 @@
 package io.shiftleft.console
 
-import io.shiftleft.overflowdb.traversal.help.{Doc, Table}
+import overflowdb.traversal.help.{Doc, Table}
 import org.apache.commons.lang.WordUtils
 
 import scala.reflect.runtime.universe.{TypeTag, typeOf}

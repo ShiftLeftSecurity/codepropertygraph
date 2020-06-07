@@ -2,7 +2,7 @@ package io.shiftleft.codepropertygraph.cpgloading
 
 import java.nio.file.FileSystemNotFoundException
 
-import io.shiftleft.overflowdb.{OdbConfig, OdbGraph}
+import overflowdb.{OdbConfig, OdbGraph}
 import org.scalatest.{Matchers, WordSpec}
 
 /**

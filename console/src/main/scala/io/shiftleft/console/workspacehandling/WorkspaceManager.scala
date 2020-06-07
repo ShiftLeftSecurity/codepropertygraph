@@ -7,7 +7,7 @@ import better.files.Dsl._
 import better.files._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
-import io.shiftleft.overflowdb.OdbConfig
+import overflowdb.OdbConfig
 import org.json4s.DefaultFormats
 import org.json4s.native.Serialization.{write => jsonWrite}
 

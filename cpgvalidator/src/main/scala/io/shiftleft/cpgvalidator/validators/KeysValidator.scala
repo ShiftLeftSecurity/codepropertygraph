@@ -6,7 +6,7 @@ import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.{Cardinality, Key
 import io.shiftleft.cpgvalidator.facts.KeysFactsImporter
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
-import io.shiftleft.overflowdb.OdbGraph
+import overflowdb.OdbGraph
 import org.apache.tinkerpop.gremlin.structure.VertexProperty
 import org.apache.tinkerpop.gremlin.structure.Direction
 
