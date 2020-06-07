@@ -6,6 +6,7 @@
 name := "schema-extender"
 organization := "io.shiftleft"
 resolvers += Resolver.bintrayRepo("shiftleft", "maven")
+resolvers += Resolver.bintrayRepo("mpollmeier", "maven")
 bintrayVcsUrl := Some("https://github.com/ShiftLeftSecurity/codepropertygraph")
 licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
 
@@ -13,7 +14,7 @@ licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0
 scalaVersion := "2.12.11"
 
 libraryDependencies ++= Seq(
-  "io.shiftleft" %% "overflowdb-codegen" % "1.11",
+  "io.shiftleft" %% "overflowdb-codegen" % "1.12",
   "org.zeroturnaround" % "zt-zip" % "1.14",
   "com.github.pathikrit" %% "better-files" % "3.8.0",
   "com.github.scopt" %% "scopt" % "3.7.1",

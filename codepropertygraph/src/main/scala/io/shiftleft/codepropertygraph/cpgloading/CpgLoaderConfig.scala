@@ -1,5 +1,5 @@
 package io.shiftleft.codepropertygraph.cpgloading
-import io.shiftleft.overflowdb.OdbConfig
+import overflowdb.OdbConfig
 
 object CpgLoaderConfig {
 

@@ -4,7 +4,7 @@ import java.io.File
 
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.cpgvalidator.validators.CpgValidator
-import io.shiftleft.overflowdb.OdbConfig
+import overflowdb.OdbConfig
 
 object CpgValidatorMain extends App {
   case class Config(cpgPath: String, isOldProtoCpg: Boolean = false)

@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.overflowdb.traversal.help
+import overflowdb.traversal.help
 import io.shiftleft.semanticcpg.language._
 
 import scala.jdk.CollectionConverters._

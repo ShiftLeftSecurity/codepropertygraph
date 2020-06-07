@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.cpgvalidator.{CfgEdgeError, ValidationErrorRegistry}
 import io.shiftleft.cpgvalidator.validators.Validator
-import io.shiftleft.overflowdb.OdbGraph
+import overflowdb.OdbGraph
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.collection.mutable

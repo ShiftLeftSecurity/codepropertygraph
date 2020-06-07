@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.testfixtures
 
 import io.shiftleft.OverflowDbTestInstance
-import io.shiftleft.overflowdb.OdbGraph
+import overflowdb.OdbGraph
 
 object EmptyGraphFixture {
   def apply[T](fun: OdbGraph => T): T = {

@@ -1,7 +1,7 @@
 package io.shiftleft
 
 import io.shiftleft.codepropertygraph.generated.{edges, nodes}
-import io.shiftleft.overflowdb.{OdbConfig, OdbGraph}
+import overflowdb.{OdbConfig, OdbGraph}
 
 object OverflowDbTestInstance {
 

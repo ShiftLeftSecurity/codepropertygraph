@@ -1,8 +1,8 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
 import io.shiftleft.OverflowDbTestInstance
-import io.shiftleft.overflowdb._
-import io.shiftleft.overflowdb.traversal._
+import overflowdb._
+import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import io.shiftleft.passes.DiffGraph

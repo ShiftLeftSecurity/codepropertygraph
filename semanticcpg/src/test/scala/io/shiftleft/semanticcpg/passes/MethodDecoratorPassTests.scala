@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.overflowdb._
+import overflowdb._
 import io.shiftleft.semanticcpg.passes.methoddecorations.MethodDecoratorPass
 import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
 import org.scalatest.{Matchers, WordSpec}

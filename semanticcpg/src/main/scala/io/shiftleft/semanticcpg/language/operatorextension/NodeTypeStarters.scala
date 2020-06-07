@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language.operatorextension
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.overflowdb.traversal.help.{Doc, TraversalSource}
+import overflowdb.traversal.help.{Doc, TraversalSource}
 import io.shiftleft.semanticcpg.language._
 
 object NodeTypeStarters {

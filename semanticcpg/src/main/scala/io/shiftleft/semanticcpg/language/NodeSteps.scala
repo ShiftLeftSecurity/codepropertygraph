@@ -2,8 +2,8 @@ package io.shiftleft.semanticcpg.language
 
 import gremlin.scala.{BranchCase, BranchOtherwise, GremlinScala, P, Vertex}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.overflowdb.traversal.help
-import io.shiftleft.overflowdb.traversal.help.Doc
+import overflowdb.traversal.help
+import overflowdb.traversal.help.Doc
 import io.shiftleft.semanticcpg.codedumper.CodeDumper
 
 /**

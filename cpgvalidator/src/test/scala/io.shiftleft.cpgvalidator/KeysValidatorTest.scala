@@ -1,6 +1,6 @@
 package io.shiftleft.cpgvalidator
 
-import io.shiftleft.overflowdb._
+import overflowdb._
 import io.shiftleft.codepropertygraph.generated.{nodes, NodeKeysOdb, NodeTypes}
 import io.shiftleft.cpgvalidator.validators.KeysValidator
 import io.shiftleft.OverflowDbTestInstance

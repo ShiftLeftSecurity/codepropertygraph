@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.types.expressions
 
 import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
-import io.shiftleft.overflowdb.traversal.help.Doc
+import overflowdb.traversal.help.Doc
 import io.shiftleft.semanticcpg.language._
 
 object ControlStructure {

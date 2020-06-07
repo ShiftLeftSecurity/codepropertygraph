@@ -9,6 +9,7 @@ inThisBuild(
     resolvers ++= Seq(
       Resolver.mavenLocal,
       Resolver.bintrayRepo("shiftleft", "maven"),
+      Resolver.bintrayRepo("mpollmeier", "maven"),
       "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
@@ -21,7 +22,7 @@ name := "codepropertygraph"
 publish / skip := true
 
 // parsed by project/Utils.scala
-val fuzzyc2cpgVersion = "1.1.41"
+val fuzzyc2cpgVersion = "5c917bb7709268af98c2eee351556fcf39f1a976"
 
 lazy val codepropertygraph = Projects.codepropertygraph
 lazy val protoBindings = Projects.protoBindings
