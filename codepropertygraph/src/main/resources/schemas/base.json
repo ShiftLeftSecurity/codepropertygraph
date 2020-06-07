@@ -445,7 +445,19 @@
         {"name": "UNKNOWN"},
         {"name": "CONTROL_STRUCTURE"},
         {"name": "ARRAY_INITIALIZER"}
-     ] }
+     ] },
+        {"edgeName" : "CFG", "inNodes" : [
+	{"name": "CALL"},
+        {"name": "IDENTIFIER"},
+        {"name": "FIELD_IDENTIFIER"},
+        {"name": "LITERAL"},
+        {"name": "RETURN"},
+        {"name": "METHOD_REF"},
+        {"name": "BLOCK"},
+	{"name": "JUMP_TARGET"},
+	{"name": "CONTROL_STRUCTURE"},
+	{"name": "UNKNOWN"}
+          ]}
 	 ]
 	},
 
