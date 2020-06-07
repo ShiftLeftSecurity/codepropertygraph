@@ -6,6 +6,7 @@
 name := "schema-extender"
 organization := "io.shiftleft"
 resolvers += Resolver.bintrayRepo("shiftleft", "maven")
+resolvers += Resolver.bintrayRepo("mpollmeier", "maven")
 bintrayVcsUrl := Some("https://github.com/ShiftLeftSecurity/codepropertygraph")
 licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
 
