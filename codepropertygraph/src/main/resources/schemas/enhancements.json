@@ -181,6 +181,15 @@
             ]}
           ]
         },
+	{"name" : "CONTROL_STRUCTURE",
+          "outEdges" : [
+            {"edgeName": "REACHING_DEF", "inNodes": [
+              {"name": "CALL"},
+              {"name": "RETURN"}
+            ]},
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
+          ]
+        },
         {"name" : "UNKNOWN",
           "outEdges" : [
             {"edgeName": "REACHING_DEF", "inNodes": [
