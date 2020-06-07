@@ -2,7 +2,7 @@ package io.shiftleft.cpgvalidator
 
 import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.cpgvalidator.validators.CpgValidator
-import gremlin.scala._
+import io.shiftleft.overflowdb._
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import org.scalatest.{Matchers, WordSpec}

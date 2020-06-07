@@ -1,6 +1,5 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import gremlin.scala._
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.overflowdb._
 import io.shiftleft.overflowdb.traversal._
@@ -11,10 +10,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class DiffGraphTest extends WordSpec with Matchers {
   "should be able to build an inverse DiffGraph" in {
-    withTestOdb { g =>
-      //TODO make the entire thing take an OdbGraph
-      val graph = g.graph.asInstanceOf[OdbGraph]
-
+    withTestOdb { graph =>
       // setup existing graph
       // add x and y nodes to graph
       val x = graph + (NodeTypes.UNKNOWN, NodeKeysOdb.CODE -> "x")
@@ -42,7 +38,7 @@ class DiffGraphTest extends WordSpec with Matchers {
       diffBuilder.addEdgeProperty(x2y, EdgeKeyNames.LOCAL_NAME, "new edge attr")
       val diffGraph = diffBuilder.build()
       // apply diffgraph with undoable = true
-      val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, g.graph, true)
+      val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, graph, true)
       val inverseDiffGraph = appliedDiffGraph.inverseDiffGraph.get
       val changes = inverseDiffGraph.iterator.toList
       import DiffGraph.Change._
@@ -61,10 +57,7 @@ class DiffGraphTest extends WordSpec with Matchers {
   }
 
   "should be able to revert DiffGraph and reapply again" in {
-    withTestOdb { g =>
-      //TODO make the entire thing take an OdbGraph
-      val graph = g.graph.asInstanceOf[OdbGraph]
-
+    withTestOdb { graph =>
       var diffBuilder = DiffGraph.newBuilder
       diffBuilder.addNode(createNewNode("a"))
       diffBuilder.addNode(createNewNode("b"))
@@ -76,8 +69,8 @@ class DiffGraphTest extends WordSpec with Matchers {
       graph.nodeCount shouldBe 0
       DiffGraph.Applier.applyDiff(threeNodes, graph, false)
       diffBuilder = DiffGraph.newBuilder
-      makeEdgeBetweenExistingNodes(g, diffBuilder, "a", "b")
-      makeEdgeBetweenExistingNodes(g, diffBuilder, "b", "c")
+      makeEdgeBetweenExistingNodes(graph, diffBuilder, "a", "b")
+      makeEdgeBetweenExistingNodes(graph, diffBuilder, "b", "c")
       val appliedDiff2 = DiffGraph.Applier.applyDiff(diffBuilder.build(), graph, true)
       graph.V.has(NodeKeysOdb.CODE -> "a").head.out(EdgeTypes.AST).property(NodeKeysOdb.CODE).head shouldBe "b"
       DiffGraph.Applier.unapplyDiff(graph, appliedDiff2.inverseDiffGraph.get)
@@ -88,10 +81,7 @@ class DiffGraphTest extends WordSpec with Matchers {
 
   "apply and revert DiffGraph with nodes _and_ edges" when {
 
-    "testing simple scenario" in withTestOdb { g =>
-      //TODO make the entire thing take an OdbGraph
-      val graph = g.graph.asInstanceOf[OdbGraph]
-
+    "testing simple scenario" in withTestOdb { graph =>
       val diffBuilder = DiffGraph.newBuilder
       val newNodeA = createNewNode("a")
       val newNodeB = createNewNode("b")
@@ -102,14 +92,11 @@ class DiffGraphTest extends WordSpec with Matchers {
       val appliedDiff = DiffGraph.Applier.applyDiff(diff, graph, true)
       graph.nodeCount shouldBe 2
       graph.edgeCount shouldBe 1
-      DiffGraph.Applier.unapplyDiff(g.graph, appliedDiff.inverseDiffGraph.get)
+      DiffGraph.Applier.unapplyDiff(graph, appliedDiff.inverseDiffGraph.get)
       graph.nodeCount shouldBe 0
     }
 
-    "testing more complex scenario" in withTestOdb { g =>
-      //TODO make the entire thing take an OdbGraph
-      val graph = g.graph.asInstanceOf[OdbGraph]
-
+    "testing more complex scenario" in withTestOdb { graph =>
       val diffBuilder = DiffGraph.newBuilder
       val newNodeA = createNewNode("a")
       val newNodeB = createNewNode("b")
@@ -124,13 +111,13 @@ class DiffGraphTest extends WordSpec with Matchers {
       graph.nodeCount shouldBe 3
       graph.edgeCount shouldBe 2
       println(appliedDiff.inverseDiffGraph.get.iterator.toList)
-      DiffGraph.Applier.unapplyDiff(g.graph, appliedDiff.inverseDiffGraph.get)
-      assert(g.V.count.head == 0)
+      DiffGraph.Applier.unapplyDiff(graph, appliedDiff.inverseDiffGraph.get)
+      graph.nodeCount shouldBe 0
     }
   }
 
-  def withTestOdb[T](f: ScalaGraph => T): T = {
-    val graph: ScalaGraph = OverflowDbTestInstance.create
+  def withTestOdb[T](f: OdbGraph => T): T = {
+    val graph = OverflowDbTestInstance.create
     try f(graph)
     finally graph.close()
   }
@@ -146,9 +133,9 @@ class DiffGraphTest extends WordSpec with Matchers {
     def productElementLabel(n: Int): String = ???
   }
 
-  def makeEdgeBetweenExistingNodes(g: ScalaGraph, diff: DiffGraph.Builder, codeA: String, codeB: String) = {
-    val a = g.V.has(NodeKeys.CODE, codeA).head
-    val b = g.V.has(NodeKeys.CODE, codeB).head
+  def makeEdgeBetweenExistingNodes(graph: OdbGraph, diff: DiffGraph.Builder, codeA: String, codeB: String) = {
+    val a = graph.V.has(NodeKeysOdb.CODE, codeA).head
+    val b = graph.V.has(NodeKeysOdb.CODE, codeB).head
     diff.addEdge(a.asInstanceOf[nodes.StoredNode], b.asInstanceOf[nodes.StoredNode], EdgeTypes.AST)
   }
 
