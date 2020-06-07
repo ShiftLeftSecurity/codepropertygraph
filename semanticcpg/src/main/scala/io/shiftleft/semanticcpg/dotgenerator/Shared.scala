@@ -22,6 +22,7 @@ object Shared {
         case ret: nodes.MethodReturn        => (ret.label, ret.typeFullName).toString
         case param: nodes.MethodParameterIn => ("PARAM", param.code).toString
         case local: nodes.Local             => (local.label, s"${local.code}: ${local.typeFullName}").toString
+        case target: nodes.JumpTarget       => (target.label, target.name).toString
         case _                              => ""
       }
     )

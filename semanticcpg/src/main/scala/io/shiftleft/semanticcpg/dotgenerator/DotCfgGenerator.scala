@@ -25,7 +25,9 @@ object DotCfgGenerator {
     def shouldBeDisplayed(v: nodes.Node): Boolean = !(
       v.isInstanceOf[nodes.Literal] ||
         v.isInstanceOf[nodes.Identifier] ||
-        v.isInstanceOf[nodes.Block]
+        v.isInstanceOf[nodes.Block] ||
+        v.isInstanceOf[nodes.ControlStructure] ||
+        v.isInstanceOf[nodes.JumpTarget]
     )
 
     val vertices = methodNode.start.cfgNode.l ++ List(methodNode, methodNode.methodReturn)
