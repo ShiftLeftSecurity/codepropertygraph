@@ -50,7 +50,6 @@ class KeysValidatorTest extends WordSpec with Matchers {
 
   "report no validation errors for a key with Cardinality list (with some values)" in {
     withNewBaseCpg { cpg =>
-      import gremlin.scala._
       val validator = new KeysValidator(new ValidationErrorRegistry)
       val node = cpg.graph + (
         NodeTypes.TYPE_DECL,
@@ -61,8 +60,8 @@ class KeysValidatorTest extends WordSpec with Matchers {
         NodeKeysOdb.ORDER -> 1,
         NodeKeysOdb.FULL_NAME -> "SomeTypeDecl",
         NodeKeysOdb.FILENAME -> "",
+        NodeKeysOdb.INHERITS_FROM_TYPE_FULL_NAME -> List("a", "b"),
       )
-      node.setPropertyList("INHERITS_FROM_TYPE_FULL_NAME", List("a", "b"))
       validator.validate(cpg) shouldBe true
       node.asInstanceOf[nodes.TypeDecl].inheritsFromTypeFullName shouldBe (List("a", "b"))
     }
@@ -87,9 +86,8 @@ class KeysValidatorTest extends WordSpec with Matchers {
 
   "report no validation errors for a key with Cardinality list when this list is empty)" in {
     withNewBaseCpg { cpg =>
-      import gremlin.scala._
       val validator = new KeysValidator(new ValidationErrorRegistry)
-      val node = cpg.graph + (
+      cpg.graph + (
         NodeTypes.TYPE_DECL,
         NodeKeysOdb.NAME -> "SomeTypeDecl",
         NodeKeysOdb.AST_PARENT_TYPE -> "SomeParentType",
@@ -98,8 +96,8 @@ class KeysValidatorTest extends WordSpec with Matchers {
         NodeKeysOdb.ORDER -> 1,
         NodeKeysOdb.FULL_NAME -> "SomeTypeDecl",
         NodeKeysOdb.FILENAME -> "",
+        NodeKeysOdb.INHERITS_FROM_TYPE_FULL_NAME -> Nil,
       )
-      node.setPropertyList("INHERITS_FROM_TYPE_FULL_NAME", List.empty)
       validator.validate(cpg) shouldBe true
     }
   }
