@@ -286,8 +286,8 @@ class Steps[A](val raw: GremlinScala[A]) {
   /**
     * And step that receives another complete traversal as an argument
     * */
-  def and[OtherNodeType <: Node](step: Steps[OtherNodeType]): Steps[OtherNodeType] =
-    new Steps[OtherNodeType](
+  def and[OtherType](step: Steps[OtherType]): Steps[OtherType] =
+    new Steps[OtherType](
       raw.flatMap { node =>
         step.raw
       }

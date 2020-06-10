@@ -22,7 +22,7 @@ object DotCfgGenerator {
 
   private def nodesAndEdges(methodNode: nodes.Method): List[String] = {
 
-    def shouldBeDisplayed(v: nodes.Node): Boolean = !(
+    def shouldBeDisplayed(v: gremlin.scala.Vertex): Boolean = !(
       v.isInstanceOf[nodes.Literal] ||
         v.isInstanceOf[nodes.Identifier] ||
         v.isInstanceOf[nodes.Block] ||
