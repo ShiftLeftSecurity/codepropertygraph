@@ -2,9 +2,9 @@ package io.shiftleft.semanticcpg.language
 
 import gremlin.scala.{BranchCase, BranchOtherwise, GremlinScala, P, Vertex}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.semanticcpg.codedumper.CodeDumper
 import overflowdb.traversal.help
 import overflowdb.traversal.help.Doc
-import io.shiftleft.semanticcpg.codedumper.CodeDumper
 
 /**
   * Steps for all node types
@@ -98,11 +98,11 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
       |""".stripMargin,
     """.newTagNode("foo")"""
   )
-  def newTagNode(tagName: String): NewTagNodePair[NodeType] = newTagNodePair(tagName, "")
+  def newTagNode(tagName: String): NewTagNodePair = newTagNodePair(tagName, "")
 
   @Doc("Tag node with (`tagName`, `tagValue`)", "", """.newTagNodePair("key","val")""")
-  def newTagNodePair(tagName: String, tagValue: String): NewTagNodePair[NodeType] = {
-    new NewTagNodePair[NodeType](
+  def newTagNodePair(tagName: String, tagValue: String): NewTagNodePair = {
+    new NewTagNodePair(
       raw.map { node =>
         nodes.NewTagNodePair(nodes.NewTag(tagName, tagValue), node)
       }
