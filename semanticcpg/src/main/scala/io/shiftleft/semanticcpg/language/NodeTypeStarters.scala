@@ -33,7 +33,7 @@ class NodeTypeStarters(cpg: Cpg) {
   def comment(code: String): NodeSteps[nodes.Comment] =
     comment.code(code)
 
-@Doc("All control structures (source-based frontends)")
+  @Doc("All control structures (source-based frontends)")
   def controlStructure: NodeSteps[nodes.ControlStructure] =
     new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.CONTROL_STRUCTURE).cast[nodes.ControlStructure])
 
