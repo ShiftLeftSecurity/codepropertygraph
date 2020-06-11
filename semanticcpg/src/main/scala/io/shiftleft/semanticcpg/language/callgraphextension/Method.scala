@@ -3,7 +3,6 @@ package io.shiftleft.semanticcpg.language.callgraphextension
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod}
 import overflowdb.traversal.help.Doc
 
 class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
