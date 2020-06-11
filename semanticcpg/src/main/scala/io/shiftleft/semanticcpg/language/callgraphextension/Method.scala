@@ -68,6 +68,10 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   @deprecated("Use call", "")
   def callOut: NodeSteps[nodes.Call] = call
 
+  @deprecated("Use call", "")
+  def callOutRegex(regex: String)(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] =
+    call(regex)
+
   /**
     * Outgoing call sites to methods where fullName matches `regex`.
     * */
