@@ -334,7 +334,7 @@ class Steps[A](val raw: GremlinScala[A]) {
 }
 
 object Steps {
-  private lazy val nodeSerializer = new CustomSerializer[nodes.Node](
+  private lazy val nodeSerializer = new CustomSerializer[nodes.StoredNode](
     implicit format =>
       (
         { case _ => ??? }, {
