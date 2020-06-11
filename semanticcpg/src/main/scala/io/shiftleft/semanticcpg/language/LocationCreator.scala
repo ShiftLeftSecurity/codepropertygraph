@@ -20,7 +20,7 @@ object LocationCreator {
     } catch {
       case exc @ (_: NoSuchElementException | _: ClassCastException) => {
         logger.error(s"Cannot determine location for ${vertex.label} due to broken CPG", exc)
-        emptyLocation(vertex.label, Some(vertex.asInstanceOf[nodes.StoredNode]))
+        emptyLocation(vertex.label, Some(vertex.asInstanceOf[nodes.Node]))
       }
     }
   }
@@ -110,7 +110,7 @@ object LocationCreator {
       case source: nodes.Source =>
         apply(source.node)
       case vertex: Vertex =>
-        emptyLocation(vertex.label, Some(vertex.asInstanceOf[nodes.StoredNode]))
+        emptyLocation(vertex.label, Some(vertex.asInstanceOf[nodes.Node]))
     }
   }
 
@@ -152,6 +152,6 @@ object LocationCreator {
     }
   }
 
-  def emptyLocation(label: String, node: Option[nodes.StoredNode]): nodes.NewLocation =
+  def emptyLocation(label: String, node: Option[nodes.Node]): nodes.NewLocation =
     nodes.NewLocation("", "", "", "", None, "", "", label, "", node)
 }
