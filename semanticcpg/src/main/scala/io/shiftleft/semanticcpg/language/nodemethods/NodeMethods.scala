@@ -6,7 +6,7 @@ import io.shiftleft.semanticcpg.language._
 
 import scala.jdk.CollectionConverters._
 
-class NodeMethods(val node: Node) extends AnyVal {
+class NodeMethods(val node: StoredNode) extends AnyVal {
 
   def location: nodes.NewLocation =
     node match {
