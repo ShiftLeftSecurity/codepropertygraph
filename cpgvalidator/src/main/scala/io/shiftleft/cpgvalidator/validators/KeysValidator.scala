@@ -1,14 +1,11 @@
 package io.shiftleft.cpgvalidator.validators
 
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeyNames, NodeTypes}
 import io.shiftleft.cpgvalidator._
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.{Cardinality, KeysFact}
 import io.shiftleft.cpgvalidator.facts.KeysFactsImporter
-import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
-import overflowdb.OdbGraph
-import org.apache.tinkerpop.gremlin.structure.VertexProperty
-import org.apache.tinkerpop.gremlin.structure.Direction
+import overflowdb._
 
 import scala.jdk.CollectionConverters._
 
@@ -19,7 +16,7 @@ class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
     errorRegistry.getErrorCount == 0
   }
 
-  private def validateNode(node: Vertex, nodeKeyType: String, cardinality: Cardinality): Unit =
+  private def validateNode(node: NodeRef[_], nodeKeyType: String, cardinality: Cardinality): Unit =
     cardinality match {
       case Cardinality.One =>
         validateCardinalityOne(node, nodeKeyType)
@@ -40,13 +37,13 @@ class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
     }
   }
 
-  private def validateCardinalityOne(dstNode: Vertex, nodeKeyType: String): Unit = {
-    val property = dstNode.property(nodeKeyType)
-    if (null == property || !property.isPresent) {
+  private def validateCardinalityOne(dstNode: NodeRef[_], nodeKeyType: String): Unit = {
+    val property = dstNode.propertyOption(PropertyKey(nodeKeyType))
+    if (property.isEmpty) {
       // AST_PARENT_FULL_NAME and AST_PARENT_TYPE have cardinality one in our base.json but are
       // in fact optional iff the related information is provided via an AST edge
-      if (nodeKeyType == NodeKeys.AST_PARENT_FULL_NAME.name || nodeKeyType == NodeKeys.AST_PARENT_TYPE.name) {
-        val incomingAstVertices = dstNode.vertices(Direction.IN, EdgeTypes.AST)
+      if (nodeKeyType == NodeKeyNames.AST_PARENT_FULL_NAME || nodeKeyType == NodeKeyNames.AST_PARENT_TYPE) {
+        val incomingAstVertices = dstNode.in(EdgeTypes.AST)
         if (incomingAstVertices.asScala.exists(
               v =>
                 v.label() == NodeTypes.TYPE_DECL
@@ -57,18 +54,18 @@ class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
     }
   }
 
-  private def validateCardinalityZeroOrOne(dstNode: Vertex, nodeKeyType: String): Unit = {
-    val property = dstNode.property(nodeKeyType)
-    if (null == property || !property.isInstanceOf[VertexProperty[_]]) {
+  private def validateCardinalityZeroOrOne(dstNode: NodeRef[_], nodeKeyType: String): Unit = {
+    val property = dstNode.propertyOption(PropertyKey(nodeKeyType))
+    if (null == property) {
       errorRegistry.addError(
         KeyError(dstNode, nodeKeyType, Cardinality.ZeroOrOne)
       )
     }
   }
 
-  private def validateCardinalityList(dstNode: Vertex, nodeKeyType: String): Unit = {
-    val properties = dstNode.properties(nodeKeyType).asScala.toList
-    if (null == properties || !properties.isInstanceOf[List[_]]) {
+  private def validateCardinalityList(dstNode: NodeRef[_], nodeKeyType: String): Unit = {
+    val property = dstNode.property2[List[_]](nodeKeyType)
+    if (null == property) {
       errorRegistry.addError(KeyError(dstNode, nodeKeyType, Cardinality.List))
     }
   }

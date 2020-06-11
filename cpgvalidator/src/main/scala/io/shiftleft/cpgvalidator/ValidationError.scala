@@ -1,28 +1,24 @@
 package io.shiftleft.cpgvalidator
 
-import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.NodeKeys
+import io.shiftleft.codepropertygraph.generated.NodeKeysOdb
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.Cardinality
 import org.apache.tinkerpop.gremlin.structure.Direction
+import overflowdb.{NodeRef, OdbEdge}
+import scala.jdk.CollectionConverters._
 
 sealed trait ValidationError {
   def getCategory: ValidationErrorCategory
 }
 
 object ErrorHelper {
-  def getNodeDetails(node: Vertex): String =
+  def getNodeDetails(node: NodeRef[_]): String =
     s"details for node ${node.label}:\n" +
       "\t\t" + s"id: ${node.id}\n" +
       "\t\t" + s"properties:\n" +
-      s"${node.valueMap
-        .map {
-          case (key, value) =>
-            s"\t\t\t$key -> $value"
-        }
-        .mkString("\n")}"
+      s"${node.propertyMap.asScala.map { case (key, value) => s"\t\t\t$key -> $value" }.mkString("\n")}"
 }
 
-case class EdgeDegreeError(node: Vertex,
+case class EdgeDegreeError(node: NodeRef[_],
                            edgeType: String,
                            direction: Direction,
                            invalidEdgeDegree: Int,
@@ -57,7 +53,10 @@ case class EdgeDegreeError(node: Vertex,
   }
 }
 
-case class NodeTypeError(node: Vertex, edgeType: String, direction: Direction, invalidOtherSideNodes: List[Vertex])
+case class NodeTypeError(node: NodeRef[_],
+                         edgeType: String,
+                         direction: Direction,
+                         invalidOtherSideNodes: List[NodeRef[_]])
     extends ValidationError {
   override def toString: String = direction match {
     case Direction.OUT =>
@@ -77,7 +76,7 @@ case class NodeTypeError(node: Vertex, edgeType: String, direction: Direction, i
   }
 }
 
-case class EdgeTypeError(node: Vertex, direction: Direction, invalidEdges: List[Edge]) extends ValidationError {
+case class EdgeTypeError(node: NodeRef[_], direction: Direction, invalidEdges: List[OdbEdge]) extends ValidationError {
   override def toString: String = direction match {
     case Direction.OUT =>
       s"Expected no outgoing ${invalidEdges.map(_.label).toSet.mkString(" or ")} edges\n" +
@@ -94,7 +93,7 @@ case class EdgeTypeError(node: Vertex, direction: Direction, invalidEdges: List[
   }
 }
 
-case class KeyError(node: Vertex, nodeKeyType: String, cardinality: Cardinality) extends ValidationError {
+case class KeyError(node: NodeRef[_], nodeKeyType: String, cardinality: Cardinality) extends ValidationError {
   override def toString: String =
     s"Cardinality $cardinality of NodeKeyType $nodeKeyType violated for:\n" +
       "\t" + s"node: ${node.label}\n" +
@@ -105,14 +104,14 @@ case class KeyError(node: Vertex, nodeKeyType: String, cardinality: Cardinality)
   }
 }
 
-case class CfgEdgeError(srcNode: Vertex, dstNode: Vertex, srcNodeMethod: Vertex, dstNodeMethod: Vertex)
+case class CfgEdgeError(srcNode: NodeRef[_], dstNode: NodeRef[_], srcNodeMethod: NodeRef[_], dstNodeMethod: NodeRef[_])
     extends ValidationError {
 
   override def toString: String = {
     s"Found invalid CFG edge which stretches over method boundaries.\n" +
-      "\t" + s"cfg edge start in method: ${srcNodeMethod.value2(NodeKeys.FULL_NAME)}\n" +
+      "\t" + s"cfg edge start in method: ${srcNodeMethod.property(NodeKeysOdb.FULL_NAME)}\n" +
       "\t" + s"cfg edge start: ${ErrorHelper.getNodeDetails(srcNode)}\n" +
-      "\t" + s"cfg edge end in method: ${dstNodeMethod.value2(NodeKeys.FULL_NAME)}\n" +
+      "\t" + s"cfg edge end in method: ${dstNodeMethod.property(NodeKeysOdb.FULL_NAME)}\n" +
       "\t" + s"cfg edge end: ${ErrorHelper.getNodeDetails(dstNode)}\n"
   }
 

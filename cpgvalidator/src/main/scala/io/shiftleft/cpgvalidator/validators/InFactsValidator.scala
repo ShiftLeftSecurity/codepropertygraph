@@ -1,12 +1,11 @@
 package io.shiftleft.cpgvalidator.validators
 
-import gremlin.scala.{Edge, Vertex}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.InFact
 import io.shiftleft.cpgvalidator._
 import io.shiftleft.cpgvalidator.facts.InFactsImporter
-import overflowdb.OdbGraph
+import overflowdb.{NodeRef, OdbEdge}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.jdk.CollectionConverters._
@@ -22,12 +21,11 @@ class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator
     getInFactByEdgeTypeByDstType.foreach {
       case (srcType, inFactsByEdgeType) =>
         notEnhancedCpg.graph.nodesByLabel(srcType).asScala.foreach {
-          case dstNode if dstNode.label() != NodeTypes.UNKNOWN =>
-            val inEdges = dstNode.edges(Direction.IN).asScala.toList
+          case dstNode if dstNode.label != NodeTypes.UNKNOWN =>
+            val inEdges = dstNode.inE.asScala.toList
             inFactsByEdgeType.foreach {
               case (edgeType, inFacts) =>
-                val actualSrcNodes =
-                  inEdges.filter(_.label == edgeType).map(_.outVertex)
+                val actualSrcNodes = inEdges.filter(_.label == edgeType).map(_.outNode)
                 inFacts.foreach { inFact =>
                   validateInDegree(dstNode, actualSrcNodes, inFact)
                 }
@@ -46,7 +44,7 @@ class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator
     }
   }
 
-  private def validateInDegree(dstNode: Vertex, actualSrcNode: List[Vertex], inFact: InFact): Unit = {
+  private def validateInDegree(dstNode: NodeRef[_], actualSrcNode: List[NodeRef[_]], inFact: InFact): Unit = {
     val actualInDegree =
       actualSrcNode.count(
         actualSrcNode => inFact.srcNodeTypes.contains(actualSrcNode.label)
@@ -66,9 +64,9 @@ class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator
     }
   }
 
-  private def validateAllSrcNodeTypes(dstNode: Vertex,
+  private def validateAllSrcNodeTypes(dstNode: NodeRef[_],
                                       edgeType: String,
-                                      actualSrcNodes: List[Vertex],
+                                      actualSrcNodes: List[NodeRef[_]],
                                       inFacts: List[InFact]): Unit = {
     val allAllowedSrcTypes = inFacts.flatMap(_.srcNodeTypes).distinct :+ NodeTypes.UNKNOWN
 
@@ -83,8 +81,8 @@ class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator
     }
   }
 
-  private def validateAllInEdgesTypes(dstNode: Vertex,
-                                      actualEdges: List[Edge],
+  private def validateAllInEdgesTypes(dstNode: NodeRef[_],
+                                      actualEdges: List[OdbEdge],
                                       allowedEdgeTypes: List[String]): Unit = {
     val invalidEdges = actualEdges.filter(
       actualEdge => !allowedEdgeTypes.contains(actualEdge.label)
