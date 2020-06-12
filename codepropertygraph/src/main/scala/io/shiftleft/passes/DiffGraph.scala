@@ -12,6 +12,7 @@ import io.shiftleft.proto.cpg.Cpg.{DiffGraph => DiffGraphProto}
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
+import overflowdb.NodeRef
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -272,7 +273,7 @@ object DiffGraph {
         if (prop.isPresent)
           builder.addNodeProperty(node, propertyKey, node.property(propertyKey).value())
         else
-          builder.removeNodeProperty(node.getId, propertyKey)
+          builder.removeNodeProperty(node.asInstanceOf[NodeRef[_]].id2, propertyKey)
       }
       def onBeforeEdgePropertyChange(edge: Edge, propertyKey: String) = {
         val prop = edge.property(propertyKey)

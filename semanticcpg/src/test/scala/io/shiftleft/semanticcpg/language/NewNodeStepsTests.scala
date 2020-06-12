@@ -95,7 +95,6 @@ class NewNodeStepsTest extends WordSpec with Matchers {
 object NewNodeNodeStepsTest {
 
   case class TestNewNode(containedNodes: List[Node] = Nil) extends NewNode {
-    override def getId: java.lang.Long = ???
     override def productElementLabel(n: Int): String = ???
     override val label = "TEST_LABEL"
     override val properties: Map[String, Any] = Map.empty
