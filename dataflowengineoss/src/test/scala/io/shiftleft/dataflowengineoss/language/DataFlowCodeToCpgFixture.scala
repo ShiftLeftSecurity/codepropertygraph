@@ -15,7 +15,7 @@ object DataFlowCodeToCpgFixture {
   private def passes(cpg: Cpg): Unit = {
     val context = new LayerCreatorContext(cpg)
     new Scpg().run(context)
-    val options = new OssDataFlowOptions("dataflowengine/src/test/resources/default.semantics")
+    val options = new OssDataFlowOptions("dataflowengineoss/src/test/resources/default.semantics")
     new OssDataFlow(options).run(context)
   }
 
