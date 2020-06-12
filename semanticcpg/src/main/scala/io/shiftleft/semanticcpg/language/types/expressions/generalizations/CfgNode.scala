@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 
 import gremlin.scala.GremlinScala
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import overflowdb.traversal.help
 import overflowdb.traversal.help.Doc
 import io.shiftleft.semanticcpg.language._
@@ -34,5 +34,30 @@ class CfgNode[A <: nodes.CfgNode](val wrapped: NodeSteps[A]) extends AnyVal {
             ExpandTo.expressionToMethod(expression)
         }
         .cast[nodes.Method])
+
+  /**
+    * Traverse to next expression in CFG.
+    */
+
+  @Doc("Nodes directly reachable via outgoing CFG edges")
+  def cfgNext: NodeSteps[nodes.CfgNode] =
+    new NodeSteps(
+      raw
+        .out(EdgeTypes.CFG)
+        .filterNot(_.hasLabel(NodeTypes.METHOD_RETURN))
+        .cast[nodes.CfgNode]
+    )
+
+  /**
+    * Traverse to previous expression in CFG.
+    */
+  @Doc("Nodes directly reachable via incoming CFG edges")
+  def cfgPrev: NodeSteps[nodes.CfgNode] =
+    new NodeSteps(
+      raw
+        .in(EdgeTypes.CFG)
+        .filterNot(_.hasLabel(NodeTypes.METHOD))
+        .cast[nodes.CfgNode]
+    )
 
 }

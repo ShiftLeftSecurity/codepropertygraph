@@ -83,28 +83,6 @@ class Expression[NodeType <: nodes.Expression](val wrapped: NodeSteps[NodeType])
     new NodeSteps(raw.in(EdgeTypes.CONTAINS).cast[nodes.Method])
 
   /**
-    * Traverse to next expression in CFG.
-    */
-  def cfgNext: NodeSteps[nodes.Expression] =
-    new NodeSteps(
-      raw
-        .out(EdgeTypes.CFG)
-        .filterNot(_.hasLabel(NodeTypes.METHOD_RETURN))
-        .cast[nodes.Expression]
-    )
-
-  /**
-    * Traverse to previous expression in CFG.
-    */
-  def cfgPrev: NodeSteps[nodes.Expression] =
-    new NodeSteps(
-      raw
-        .in(EdgeTypes.CFG)
-        .filterNot(_.hasLabel(NodeTypes.METHOD))
-        .cast[nodes.Expression]
-    )
-
-  /**
     * Traverse to expression evaluation type
     * */
   def typ: NodeSteps[nodes.Type] =
