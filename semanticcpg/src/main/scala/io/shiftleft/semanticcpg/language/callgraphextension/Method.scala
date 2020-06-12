@@ -1,9 +1,9 @@
 package io.shiftleft.semanticcpg.language.callgraphextension
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod}
+import overflowdb.traversal.help.Doc
 
 class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   private def raw: GremlinScala[nodes.Method] = wrapped.raw
@@ -47,7 +47,7 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
     * Traverse to methods called by this method
     * */
   def callee(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] =
-    new OriginalMethod(wrapped).call.calledMethod(callResolver)
+    call.callee(callResolver)
 
   /**
     * Incoming call sites
@@ -65,10 +65,24 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
   def calledBy(sourceTrav: Steps[nodes.Method])(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] =
     caller(callResolver).calledByIncludingSink(sourceTrav)(callResolver)
 
+  @deprecated("Use call", "")
+  def callOut: NodeSteps[nodes.Call] = call
+
+  @deprecated("Use call", "")
+  def callOutRegex(regex: String)(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] =
+    call(regex)
+
   /**
     * Outgoing call sites to methods where fullName matches `regex`.
     * */
-  def callOutRegex(regex: String)(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] =
-    new OriginalMethod(wrapped).call.filter(_.calledMethod.fullName(regex))
+  def call(regex: String)(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] =
+    call.filter(_.callee.fullName(regex))
+
+  /**
+    * Outgoing call sites
+    * */
+  @Doc("Call sites (outgoing calls)")
+  def call: NodeSteps[nodes.Call] =
+    new NodeSteps(raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.CALL).cast[nodes.Call])
 
 }
