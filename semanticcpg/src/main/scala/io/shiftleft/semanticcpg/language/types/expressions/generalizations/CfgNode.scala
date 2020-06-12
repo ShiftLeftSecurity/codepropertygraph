@@ -38,6 +38,8 @@ class CfgNode[A <: nodes.CfgNode](val wrapped: NodeSteps[A]) extends AnyVal {
   /**
     * Traverse to next expression in CFG.
     */
+
+  @Doc("Nodes directly reachable via outgoing CFG edges")
   def cfgNext: NodeSteps[nodes.CfgNode] =
     new NodeSteps(
       raw
@@ -49,6 +51,7 @@ class CfgNode[A <: nodes.CfgNode](val wrapped: NodeSteps[A]) extends AnyVal {
   /**
     * Traverse to previous expression in CFG.
     */
+  @Doc("Nodes directly reachable via incoming CFG edges")
   def cfgPrev: NodeSteps[nodes.CfgNode] =
     new NodeSteps(
       raw
