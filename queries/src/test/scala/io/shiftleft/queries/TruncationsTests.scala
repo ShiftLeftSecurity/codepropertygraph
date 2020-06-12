@@ -1,6 +1,6 @@
 package io.shiftleft.queries
 
-import io.shiftleft.dataflowengine.language.DataFlowCodeToCpgFixture
+import io.shiftleft.dataflowengineoss.language.DataFlowCodeToCpgFixture
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
 
