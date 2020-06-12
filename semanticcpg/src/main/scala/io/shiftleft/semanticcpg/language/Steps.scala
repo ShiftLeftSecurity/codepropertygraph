@@ -338,7 +338,7 @@ object Steps {
     implicit format =>
       (
         { case _ => ??? }, {
-          case node: Node =>
+          case node: StoredNode =>
             val elementMap = (0 until node.productArity).map { i =>
               val label = node.productElementLabel(i)
               val element = node.productElement(i)
