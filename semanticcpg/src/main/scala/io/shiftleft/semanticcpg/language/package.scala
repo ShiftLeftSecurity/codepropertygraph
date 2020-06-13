@@ -18,7 +18,6 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   HasSignature,
   HasValue,
   HasVersion,
-  Node,
   StoredNode
 }
 import overflowdb.traversal.Traversal
@@ -52,7 +51,7 @@ package object language extends operatorextension.Implicits {
   // to generated node types.
 
   implicit def cfgNodeToAstNode(node: nodes.CfgNode): AstNodeMethods = new AstNodeMethods(node)
-  implicit def toExtendedNode(node: Node): NodeMethods = new NodeMethods(node)
+  implicit def toExtendedNode(node: nodes.CpgNode): NodeMethods = new NodeMethods(node)
   implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods = new WithinMethodMethods(node)
   implicit def toAstNodeMethods(node: nodes.AstNode): AstNodeMethods = new AstNodeMethods(node)
   implicit def toCfgNodeMethods(node: nodes.CfgNode): CfgNodeMethods = new CfgNodeMethods(node)

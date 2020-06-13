@@ -94,11 +94,11 @@ class NewNodeStepsTest extends WordSpec with Matchers {
 
 object NewNodeNodeStepsTest {
 
-  case class TestNewNode(containedNodes: List[Node] = Nil) extends NewNode {
+  case class TestNewNode(containedNodes: List[CpgNode] = Nil) extends NewNode {
     override val label = "TEST_LABEL"
     override val properties: Map[String, Any] = Map.empty
     val testContainedLabel = "testContains"
-    override def containedNodesByLocalName: Map[String, List[Node]] =
+    override def containedNodesByLocalName: Map[String, List[CpgNode]] =
       Map(testContainedLabel -> containedNodes)
   }
 }
