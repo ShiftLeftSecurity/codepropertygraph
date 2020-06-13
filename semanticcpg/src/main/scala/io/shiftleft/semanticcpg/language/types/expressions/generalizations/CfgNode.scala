@@ -60,4 +60,11 @@ class CfgNode[A <: nodes.CfgNode](val wrapped: NodeSteps[A]) extends AnyVal {
         .cast[nodes.CfgNode]
     )
 
+  /**
+    * Recursively determine all nodes on which any of
+    * the nodes in this traversal are control dependent
+    * */
+  def controlledBy: NodeSteps[nodes.CfgNode] =
+    wrapped.flatMap(_.controlledBy)
+
 }
