@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.InFact
 import io.shiftleft.cpgvalidator._
 import io.shiftleft.cpgvalidator.facts.InFactsImporter
-import overflowdb.{NodeRef, OdbEdge}
+import overflowdb.{Node, OdbEdge}
 import org.apache.tinkerpop.gremlin.structure.Direction
 
 import scala.jdk.CollectionConverters._
@@ -44,7 +44,7 @@ class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator
     }
   }
 
-  private def validateInDegree(dstNode: NodeRef[_], actualSrcNode: List[NodeRef[_]], inFact: InFact): Unit = {
+  private def validateInDegree(dstNode: Node, actualSrcNode: List[Node], inFact: InFact): Unit = {
     val actualInDegree =
       actualSrcNode.count(
         actualSrcNode => inFact.srcNodeTypes.contains(actualSrcNode.label)
@@ -64,9 +64,9 @@ class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator
     }
   }
 
-  private def validateAllSrcNodeTypes(dstNode: NodeRef[_],
+  private def validateAllSrcNodeTypes(dstNode: Node,
                                       edgeType: String,
-                                      actualSrcNodes: List[NodeRef[_]],
+                                      actualSrcNodes: List[Node],
                                       inFacts: List[InFact]): Unit = {
     val allAllowedSrcTypes = inFacts.flatMap(_.srcNodeTypes).distinct :+ NodeTypes.UNKNOWN
 
@@ -81,7 +81,7 @@ class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator
     }
   }
 
-  private def validateAllInEdgesTypes(dstNode: NodeRef[_],
+  private def validateAllInEdgesTypes(dstNode: Node,
                                       actualEdges: List[OdbEdge],
                                       allowedEdgeTypes: List[String]): Unit = {
     val invalidEdges = actualEdges.filter(

@@ -8,7 +8,7 @@ import com.google.protobuf.ByteString
 import gremlin.scala.Edge
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.proto.cpg.Cpg.{AdditionalEdgeProperty, AdditionalNodeProperty, BoolList, CpgOverlay, CpgStruct, DoubleList, EdgePropertyName, FloatList, IntList, LongList, NodePropertyName, PropertyValue, StringList, DiffGraph => DiffGraphProto}
-import overflowdb.NodeRef
+import overflowdb.Node
 
 /**
   * Provides functionality to serialize diff graphs and add them
@@ -28,7 +28,7 @@ class DiffGraphProtoSerializer {
       case c: CreateEdge =>
         builder.addEdge(addEdge(c, appliedDiffGraph))
       case SetNodeProperty(node, key, value) =>
-        builder.addNodeProperty(addNodeProperty(node.asInstanceOf[NodeRef[_]].id2, key, value))
+        builder.addNodeProperty(addNodeProperty(node.id2, key, value))
       case SetEdgeProperty(edge, key, value) =>
         builder.addEdgeProperty(addEdgeProperty(edge, key, value))
       case RemoveNode(_) | RemoveNodeProperty(_, _) | RemoveEdge(_) | RemoveEdgeProperty(_, _) =>
@@ -49,7 +49,7 @@ class DiffGraphProtoSerializer {
     diffGraph.iterator
       .map {
         case SetNodeProperty(node, key, value) =>
-          newEntry.setNodeProperty(addNodeProperty(node.asInstanceOf[NodeRef[_]].id2, key, value))
+          newEntry.setNodeProperty(addNodeProperty(node.id2, key, value))
         case SetEdgeProperty(edge, key, value) =>
           newEntry.setEdgeProperty(addEdgeProperty(edge, key, value))
         case RemoveNode(nodeId) => newEntry.setRemoveNode(removeNodeProto(nodeId))
@@ -85,13 +85,13 @@ class DiffGraphProtoSerializer {
       if (change.sourceNodeKind == DiffGraph.Change.NodeKind.New)
         appliedDiffGraph.nodeToGraphId(change.src.asInstanceOf[nodes.NewNode])
       else
-        change.src.asInstanceOf[NodeRef[_]].id2
+        change.src.asInstanceOf[Node].id2
 
     val dstId: Long =
       if (change.destinationNodeKind == DiffGraph.Change.NodeKind.New)
         appliedDiffGraph.nodeToGraphId(change.dst.asInstanceOf[nodes.NewNode])
       else
-        change.dst.asInstanceOf[NodeRef[_]].id2
+        change.dst.asInstanceOf[Node].id2
 
     makeEdge(change.label, srcId, dstId, change.properties)
   }
