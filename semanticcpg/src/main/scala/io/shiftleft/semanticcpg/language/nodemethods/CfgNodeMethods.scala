@@ -23,6 +23,22 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * CFG node is control-dependent.
     * */
   def controlledBy: NodeSteps[nodes.CfgNode] = {
+    expandCdg({ v =>
+      v._cdgIn().asScala
+    })
+  }
+
+  /**
+    * Recursively determine all nodes which this
+    * CFG node controls
+    * */
+  def controls: NodeSteps[nodes.CfgNode] = {
+    expandCdg({ v =>
+      v._cdgOut().asScala
+    })
+  }
+
+  private def expandCdg(expand: nodes.CfgNode => Iterator[nodes.StoredNode]) = {
     var controllingNodes = List.empty[nodes.CfgNode]
     var visited = Set.empty + node
     var worklist = node :: Nil
@@ -31,7 +47,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
       val vertex = worklist.head
       worklist = worklist.tail
 
-      vertex._cdgIn.asScala.foreach {
+      expand(vertex).foreach {
         case controllingNode: nodes.CfgNode =>
           if (!visited.contains(controllingNode)) {
             visited += controllingNode

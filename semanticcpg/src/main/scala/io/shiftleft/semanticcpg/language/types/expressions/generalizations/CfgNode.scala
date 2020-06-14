@@ -67,4 +67,7 @@ class CfgNode[A <: nodes.CfgNode](val wrapped: NodeSteps[A]) extends AnyVal {
   def controlledBy: NodeSteps[nodes.CfgNode] =
     wrapped.flatMap(_.controlledBy)
 
+  def controls: NodeSteps[nodes.CfgNode] =
+    wrapped.flatMap(_.controls)
+
 }

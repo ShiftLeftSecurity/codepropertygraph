@@ -27,6 +27,10 @@ class CfgTests extends WordSpec with Matchers {
       controllerCalls.map(_.code) should contain("y < 10")
       controllerCalls.map(_.code) should contain("x < 10")
     }
+    "should find that first if controls `sink`" in {
+      val controlled = cpg.controlStructure.condition.code("y < 10").controls.isCall.name("sink").l.size shouldBe 1
+    }
+
   }
 
 }
