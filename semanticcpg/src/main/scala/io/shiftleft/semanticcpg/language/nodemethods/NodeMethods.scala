@@ -10,7 +10,7 @@ class NodeMethods(val node: nodes.CpgNode) extends AnyVal {
   def location: nodes.NewLocation =
     node match {
       case storedNode: nodes.StoredNode => LocationCreator(storedNode)
-      case _                      => LocationCreator.emptyLocation("", None)
+      case _                            => LocationCreator.emptyLocation("", None)
     }
 
   def tagList: List[nodes.TagBase] =

@@ -53,10 +53,7 @@ case class EdgeDegreeError(node: Node,
   }
 }
 
-case class NodeTypeError(node: Node,
-                         edgeType: String,
-                         direction: Direction,
-                         invalidOtherSideNodes: List[Node])
+case class NodeTypeError(node: Node, edgeType: String, direction: Direction, invalidOtherSideNodes: List[Node])
     extends ValidationError {
   override def toString: String = direction match {
     case Direction.OUT =>
