@@ -46,11 +46,11 @@ object DotCfgGenerator {
     }
 
     val edges = verticesToDisplay.map { v =>
-      (v.asNodeRef.id, visibleNeighbors(v).map(_.asNodeRef.id))
+      (v.id2, visibleNeighbors(v).map(_.id2))
     }
 
     val nodeStrings = verticesToDisplay.map { node =>
-      s""""${node.asNodeRef.id}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
+      s""""${node.id2}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
     }
 
     val edgeStrings = edges.flatMap {

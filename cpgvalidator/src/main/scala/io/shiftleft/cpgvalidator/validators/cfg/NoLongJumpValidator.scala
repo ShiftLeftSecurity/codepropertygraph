@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.cpgvalidator.{CfgEdgeError, ValidationErrorRegistry}
 import io.shiftleft.cpgvalidator.validators.Validator
-import overflowdb.NodeRef
+import overflowdb.Node
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -18,8 +18,8 @@ class NoLongJumpValidator(errorRegistry: ValidationErrorRegistry) extends Valida
     errorRegistry.getErrorCount == 0
   }
 
-  private def perMethod(method: NodeRef[_]): Unit = {
-    val allAstNodesInMethod = mutable.Set.empty[NodeRef[_]]
+  private def perMethod(method: Node): Unit = {
+    val allAstNodesInMethod = mutable.Set.empty[Node]
     getTransitiveAstChildren(method, allAstNodesInMethod)
 
     allAstNodesInMethod.foreach { astNode =>
@@ -40,14 +40,14 @@ class NoLongJumpValidator(errorRegistry: ValidationErrorRegistry) extends Valida
     }
   }
 
-  private def getTransitiveAstChildren(node: NodeRef[_], astChildren: mutable.Set[NodeRef[_]]): Unit = {
+  private def getTransitiveAstChildren(node: Node, astChildren: mutable.Set[Node]): Unit = {
     astChildren.add(node)
     node.out(EdgeTypes.AST).forEachRemaining { astChild =>
       getTransitiveAstChildren(astChild, astChildren)
     }
   }
 
-  private def getMethodOfAstNode(node: NodeRef[_]): NodeRef[_] = {
+  private def getMethodOfAstNode(node: Node): Node = {
     if (node.label == NodeTypes.METHOD) {
       node
     } else {
