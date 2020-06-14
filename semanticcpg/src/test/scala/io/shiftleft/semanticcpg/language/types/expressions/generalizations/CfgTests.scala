@@ -21,14 +21,12 @@ class CfgTests extends WordSpec with Matchers {
 
   CodeToCpgFixture(code) { cpg =>
     "should find that sink is control dependent on condition" in {
-      val controllers = cpg.call("sink").controlledBy.toSet
-      val controllerCalls = controllers.start.isCall.toSet()
-      controllers shouldBe controllerCalls
-      controllerCalls.map(_.code) should contain("y < 10")
-      controllerCalls.map(_.code) should contain("x < 10")
+      val controllers = cpg.call("sink").controlledBy.isCall.toSet
+      controllers.map(_.code) should contain("y < 10")
+      controllers.map(_.code) should contain("x < 10")
     }
     "should find that first if controls `sink`" in {
-      val controlled = cpg.controlStructure.condition.code("y < 10").controls.isCall.name("sink").l.size shouldBe 1
+      cpg.controlStructure.condition.code("y < 10").controls.isCall.name("sink").l.size shouldBe 1
     }
 
   }
