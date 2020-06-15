@@ -76,4 +76,36 @@ class CfgNode[A <: nodes.CfgNode](val wrapped: NodeSteps[A]) extends AnyVal {
   def controls: NodeSteps[nodes.CfgNode] =
     wrapped.flatMap(_.controls)
 
+  /**
+    * Recursively determine all nodes by which
+    * this node is dominated
+    * */
+  @Doc("All nodes by which this node is dominated")
+  def dominatedBy: NodeSteps[nodes.CfgNode] =
+    wrapped.flatMap(_.dominatedBy)
+
+  /**
+    * Recursively determine all nodes which
+    * this node dominates
+    * */
+  @Doc("All nodes that are dominated by this node")
+  def dominates: NodeSteps[nodes.CfgNode] =
+    wrapped.flatMap(_.dominates)
+
+  /**
+    * Recursively determine all nodes by which
+    * this node is post dominated
+    * */
+  @Doc("All nodes by which this node is post dominated")
+  def postDominatedBy: NodeSteps[nodes.CfgNode] =
+    wrapped.flatMap(_.postDominatedBy)
+
+  /**
+    * Recursively determine all nodes which
+    * this node post dominates
+    * */
+  @Doc("All nodes that are post dominated by this node")
+  def postDominates: NodeSteps[nodes.CfgNode] =
+    wrapped.flatMap(_.postDominates)
+
 }

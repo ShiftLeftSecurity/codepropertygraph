@@ -23,9 +23,9 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * CFG node is control-dependent.
     * */
   def controlledBy: NodeSteps[nodes.CfgNode] = {
-    expandCdg({ v =>
+    expandExhaustively { v =>
       v._cdgIn().asScala
-    })
+    }
   }
 
   /**
@@ -33,12 +33,52 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * CFG node controls
     * */
   def controls: NodeSteps[nodes.CfgNode] = {
-    expandCdg({ v =>
+    expandExhaustively { v =>
       v._cdgOut().asScala
-    })
+    }
   }
 
-  private def expandCdg(expand: nodes.CfgNode => Iterator[nodes.StoredNode]) = {
+  /**
+    * Recursively determine all nodes by which
+    * this node is dominated
+    * */
+  def dominatedBy: NodeSteps[nodes.CfgNode] = {
+    expandExhaustively { v =>
+      v._dominateIn().asScala
+    }
+  }
+
+  /**
+    * Recursively determine all nodes which
+    * are dominated by this node
+    * */
+  def dominates: NodeSteps[nodes.CfgNode] = {
+    expandExhaustively { v =>
+      v._dominateOut().asScala
+    }
+  }
+
+  /**
+    * Recursively determine all nodes by which
+    * this node is post dominated
+    * */
+  def postDominatedBy: NodeSteps[nodes.CfgNode] = {
+    expandExhaustively { v =>
+      v._postDominateIn().asScala
+    }
+  }
+
+  /**
+    * Recursively determine all nodes which
+    * are post dominated by this node
+    * */
+  def postDominates: NodeSteps[nodes.CfgNode] = {
+    expandExhaustively { v =>
+      v._postDominateOut().asScala
+    }
+  }
+
+  private def expandExhaustively(expand: nodes.CfgNode => Iterator[nodes.StoredNode]) = {
     var controllingNodes = List.empty[nodes.CfgNode]
     var visited = Set.empty + node
     var worklist = node :: Nil
