@@ -22,7 +22,7 @@ object DotCfgGenerator {
 
   private def nodesAndEdges(methodNode: nodes.Method): List[String] = {
 
-    def shouldBeDisplayed(v: nodes.Node): Boolean = !(
+    def shouldBeDisplayed(v: gremlin.scala.Vertex): Boolean = !(
       v.isInstanceOf[nodes.Literal] ||
         v.isInstanceOf[nodes.Identifier] ||
         v.isInstanceOf[nodes.Block] ||
@@ -46,11 +46,11 @@ object DotCfgGenerator {
     }
 
     val edges = verticesToDisplay.map { v =>
-      (v.getId, visibleNeighbors(v).map(_.getId))
+      (v.id2, visibleNeighbors(v).map(_.id2))
     }
 
     val nodeStrings = verticesToDisplay.map { node =>
-      s""""${node.getId}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
+      s""""${node.id2}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
     }
 
     val edgeStrings = edges.flatMap {

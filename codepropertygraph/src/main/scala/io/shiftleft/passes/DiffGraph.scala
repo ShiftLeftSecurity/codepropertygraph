@@ -5,9 +5,9 @@ import java.util
 
 import gnu.trove.set.hash.TCustomHashSet
 import gnu.trove.strategy.IdentityHashingStrategy
-import gremlin.scala.{Edge, GraphAsScala, ScalaGraph}
+import gremlin.scala.{Edge, ScalaGraph}
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, NewNode, StoredNode}
 import io.shiftleft.proto.cpg.Cpg.{DiffGraph => DiffGraphProto}
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Vertex
@@ -115,7 +115,7 @@ object DiffGraph {
     final case class CreateNode(node: NewNode) extends Change
     final case class SetNodeProperty(node: StoredNode, key: String, value: AnyRef) extends Change
     final case class SetEdgeProperty(edge: Edge, propertyKey: String, propertyValue: AnyRef) extends Change
-    final case class CreateEdge(src: Node, dst: Node, label: String, packedProperties: PackedProperties)
+    final case class CreateEdge(src: CpgNode, dst: CpgNode, label: String, packedProperties: PackedProperties)
         extends Change {
       def properties: Properties = PackedProperties.unpack(packedProperties)
 
@@ -129,7 +129,7 @@ object DiffGraph {
       }
     }
     object CreateEdge {
-      def apply(src: Node, dst: Node, label: String, properties: Properties): CreateEdge =
+      def apply(src: CpgNode, dst: CpgNode, label: String, properties: Properties): CreateEdge =
         CreateEdge(src, dst, label, PackedProperties.pack(properties))
     }
   }
@@ -209,7 +209,7 @@ object DiffGraph {
         nodeSet.add(node)
       }
     }
-    def addEdge(src: Node, dst: Node, edgeLabel: String, properties: Seq[(String, AnyRef)] = List()): Unit = {
+    def addEdge(src: CpgNode, dst: CpgNode, edgeLabel: String, properties: Seq[(String, AnyRef)] = List()): Unit = {
       buffer += Change.CreateEdge(src, dst, edgeLabel, properties)
     }
     def build(buf: mutable.ArrayBuffer[Change]) = {
@@ -272,7 +272,7 @@ object DiffGraph {
         if (prop.isPresent)
           builder.addNodeProperty(node, propertyKey, node.property(propertyKey).value())
         else
-          builder.removeNodeProperty(node.getId, propertyKey)
+          builder.removeNodeProperty(node.id2, propertyKey)
       }
       def onBeforeEdgePropertyChange(edge: Edge, propertyKey: String) = {
         val prop = edge.property(propertyKey)

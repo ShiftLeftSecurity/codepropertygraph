@@ -1,22 +1,21 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.{Node, StoredNode}
 import io.shiftleft.semanticcpg.language._
 
 import scala.jdk.CollectionConverters._
 
-class NodeMethods(val node: Node) extends AnyVal {
+class NodeMethods(val node: nodes.CpgNode) extends AnyVal {
 
   def location: nodes.NewLocation =
     node match {
-      case storedNode: StoredNode => LocationCreator(storedNode)
-      case _                      => LocationCreator.emptyLocation("", None)
+      case storedNode: nodes.StoredNode => LocationCreator(storedNode)
+      case _                            => LocationCreator.emptyLocation("", None)
     }
 
   def tagList: List[nodes.TagBase] =
     node match {
-      case storedNode: StoredNode =>
+      case storedNode: nodes.StoredNode =>
         storedNode._taggedByOut.asScala
           .map {
             case tagNode: nodes.HasName with nodes.HasValue =>

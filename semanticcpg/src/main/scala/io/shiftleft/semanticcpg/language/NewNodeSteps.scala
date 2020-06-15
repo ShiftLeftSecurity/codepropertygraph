@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
 import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, Node, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, CpgNode, StoredNode}
 import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
 import io.shiftleft.codepropertygraph.generated.EdgeKeys
 import io.shiftleft.passes.DiffGraph
@@ -39,8 +39,8 @@ class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Step
   }
 
   private def addEdge(diffBuilder: DiffGraph.Builder,
-                      src: Node,
-                      dst: Node,
+                      src: CpgNode,
+                      dst: CpgNode,
                       label: String,
                       properties: Seq[(String, AnyRef)]): Unit =
     (src, dst) match {

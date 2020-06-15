@@ -5,7 +5,7 @@ import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, ModifierTypes}
-import io.shiftleft.passes.{DiffGraph}
+import io.shiftleft.passes.DiffGraph
 import io.shiftleft.passes.DiffGraph.{EdgeInDiffGraph, EdgeToOriginal}
 import overflowdb._
 import org.scalatest.{Matchers, WordSpec}
@@ -94,13 +94,11 @@ class NewNodeStepsTest extends WordSpec with Matchers {
 
 object NewNodeNodeStepsTest {
 
-  case class TestNewNode(containedNodes: List[Node] = Nil) extends NewNode {
-    override def getId: java.lang.Long = ???
-    override def productElementLabel(n: Int): String = ???
+  case class TestNewNode(containedNodes: List[CpgNode] = Nil) extends NewNode {
     override val label = "TEST_LABEL"
     override val properties: Map[String, Any] = Map.empty
     val testContainedLabel = "testContains"
-    override def containedNodesByLocalName: Map[String, List[Node]] =
+    override def containedNodesByLocalName: Map[String, List[CpgNode]] =
       Map(testContainedLabel -> containedNodes)
   }
 }

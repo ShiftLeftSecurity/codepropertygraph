@@ -6,7 +6,7 @@ import java.lang.{Long => JLong}
 
 import com.google.protobuf.ByteString
 import gremlin.scala.Edge
-import io.shiftleft.codepropertygraph.generated.nodes.NewNode
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.proto.cpg.Cpg.{
   AdditionalEdgeProperty,
   AdditionalNodeProperty,
@@ -23,6 +23,7 @@ import io.shiftleft.proto.cpg.Cpg.{
   StringList,
   DiffGraph => DiffGraphProto
 }
+import overflowdb.Node
 
 /**
   * Provides functionality to serialize diff graphs and add them
@@ -42,7 +43,7 @@ class DiffGraphProtoSerializer {
       case c: CreateEdge =>
         builder.addEdge(addEdge(c, appliedDiffGraph))
       case SetNodeProperty(node, key, value) =>
-        builder.addNodeProperty(addNodeProperty(node.getId, key, value))
+        builder.addNodeProperty(addNodeProperty(node.id2, key, value))
       case SetEdgeProperty(edge, key, value) =>
         builder.addEdgeProperty(addEdgeProperty(edge, key, value))
       case RemoveNode(_) | RemoveNodeProperty(_, _) | RemoveEdge(_) | RemoveEdgeProperty(_, _) =>
@@ -63,7 +64,7 @@ class DiffGraphProtoSerializer {
     diffGraph.iterator
       .map {
         case SetNodeProperty(node, key, value) =>
-          newEntry.setNodeProperty(addNodeProperty(node.getId, key, value))
+          newEntry.setNodeProperty(addNodeProperty(node.id2, key, value))
         case SetEdgeProperty(edge, key, value) =>
           newEntry.setEdgeProperty(addEdgeProperty(edge, key, value))
         case RemoveNode(nodeId) => newEntry.setRemoveNode(removeNodeProto(nodeId))
@@ -78,7 +79,7 @@ class DiffGraphProtoSerializer {
     builder.build()
   }
 
-  private def addNode(node: NewNode, appliedDiffGraph: AppliedDiffGraph): CpgStruct.Node = {
+  private def addNode(node: nodes.NewNode, appliedDiffGraph: AppliedDiffGraph): CpgStruct.Node = {
     val nodeId = appliedDiffGraph.nodeToGraphId(node)
 
     val nodeBuilder = CpgStruct.Node.newBuilder
@@ -95,17 +96,17 @@ class DiffGraphProtoSerializer {
   }
 
   private def addEdge(change: DiffGraph.Change.CreateEdge, appliedDiffGraph: AppliedDiffGraph): CpgStruct.Edge = {
-    val srcId =
+    val srcId: Long =
       if (change.sourceNodeKind == DiffGraph.Change.NodeKind.New)
-        appliedDiffGraph.nodeToGraphId(change.src.asInstanceOf[NewNode])
+        appliedDiffGraph.nodeToGraphId(change.src.asInstanceOf[nodes.NewNode])
       else
-        change.src.getId
+        change.src.asInstanceOf[Node].id2
 
-    val dstId =
+    val dstId: Long =
       if (change.destinationNodeKind == DiffGraph.Change.NodeKind.New)
-        appliedDiffGraph.nodeToGraphId(change.dst.asInstanceOf[NewNode])
+        appliedDiffGraph.nodeToGraphId(change.dst.asInstanceOf[nodes.NewNode])
       else
-        change.dst.getId
+        change.dst.asInstanceOf[Node].id2
 
     makeEdge(change.label, srcId, dstId, change.properties)
   }

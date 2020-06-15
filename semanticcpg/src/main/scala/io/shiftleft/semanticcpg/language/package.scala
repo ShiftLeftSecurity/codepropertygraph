@@ -18,7 +18,6 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   HasSignature,
   HasValue,
   HasVersion,
-  Node,
   StoredNode
 }
 import overflowdb.traversal.Traversal
@@ -52,7 +51,7 @@ package object language extends operatorextension.Implicits {
   // to generated node types.
 
   implicit def cfgNodeToAstNode(node: nodes.CfgNode): AstNodeMethods = new AstNodeMethods(node)
-  implicit def toExtendedNode(node: Node): NodeMethods = new NodeMethods(node)
+  implicit def toExtendedNode(node: nodes.CpgNode): NodeMethods = new NodeMethods(node)
   implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods = new WithinMethodMethods(node)
   implicit def toAstNodeMethods(node: nodes.AstNode): AstNodeMethods = new AstNodeMethods(node)
   implicit def toCfgNodeMethods(node: nodes.CfgNode): CfgNodeMethods = new CfgNodeMethods(node)
@@ -189,7 +188,7 @@ package object language extends operatorextension.Implicits {
       new NewNodeSteps[NodeType](__[NodeType](iter.to(Seq): _*))
   }
 
-  implicit class BaseNodeTypeDeco[NodeType <: nodes.Node](val node: NodeType) extends AnyVal {
+  implicit class BaseNodeTypeDeco[NodeType](val node: NodeType) extends AnyVal {
 
     /**
     Start a new traversal from this node
@@ -198,7 +197,7 @@ package object language extends operatorextension.Implicits {
       new Steps[NodeType](__[NodeType](node))
   }
 
-  implicit class BaseNodeTypeDecoForIterable[NodeType <: nodes.Node](val iter: Iterable[NodeType]) extends AnyVal {
+  implicit class BaseNodeTypeDecoForIterable[NodeType](val iter: Iterable[NodeType]) extends AnyVal {
 
     /**
     Start a new traversal from these nodes

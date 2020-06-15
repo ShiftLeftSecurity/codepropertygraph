@@ -9,17 +9,17 @@ import scala.jdk.CollectionConverters._
 
 class CfgDominatorFrontierTests extends WordSpec with Matchers {
 
-  private class TestCfgAdapter extends CfgAdapter[NodeRef[_]] {
-    override def successors(node: NodeRef[_]): IterableOnce[NodeRef[_]] =
+  private class TestCfgAdapter extends CfgAdapter[Node] {
+    override def successors(node: Node): IterableOnce[Node] =
       node.out("CFG").asScala
 
-    override def predecessors(node: NodeRef[_]): IterableOnce[NodeRef[_]] =
+    override def predecessors(node: Node): IterableOnce[Node] =
       node.in("CFG").asScala
   }
 
-  private class TestDomTreeAdapter(immediateDominators: Map[NodeRef[_], NodeRef[_]])
-      extends DomTreeAdapter[NodeRef[_]] {
-    override def immediateDominator(cfgNode: NodeRef[_]): Option[NodeRef[_]] = {
+  private class TestDomTreeAdapter(immediateDominators: Map[Node, Node])
+      extends DomTreeAdapter[Node] {
+    override def immediateDominator(cfgNode: Node): Option[Node] = {
       immediateDominators.get(cfgNode)
     }
   }

@@ -6,7 +6,7 @@ import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.OutFact
 import io.shiftleft.cpgvalidator._
 import io.shiftleft.cpgvalidator.facts.OutFactsImporter
 import org.apache.tinkerpop.gremlin.structure.Direction
-import overflowdb.{NodeRef, OdbEdge}
+import overflowdb.{Node, OdbEdge}
 
 import scala.jdk.CollectionConverters._
 
@@ -66,7 +66,7 @@ class OutFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validato
       .sortBy(_._1) // Sort by srcType
   }
 
-  private def validateOutDegree(srcNode: NodeRef[_], actualDstNodes: List[NodeRef[_]], outFact: OutFact): Unit = {
+  private def validateOutDegree(srcNode: Node, actualDstNodes: List[Node], outFact: OutFact): Unit = {
     val actualOutDegree =
       actualDstNodes.count(
         actualDstNode => outFact.dstNodeTypes.contains(actualDstNode.label)
@@ -86,9 +86,9 @@ class OutFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validato
     }
   }
 
-  private def validateAllDstNodeTypes(srcNode: NodeRef[_],
+  private def validateAllDstNodeTypes(srcNode: Node,
                                       edgeType: String,
-                                      actualDstNodes: List[NodeRef[_]],
+                                      actualDstNodes: List[Node],
                                       outFacts: List[OutFact]): Unit = {
     val allAllowedDstTypes = outFacts.flatMap(_.dstNodeTypes).distinct :+ NodeTypes.UNKNOWN
 
@@ -103,7 +103,7 @@ class OutFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validato
     }
   }
 
-  private def validateAllOutEdgesTypes(srcNode: NodeRef[_],
+  private def validateAllOutEdgesTypes(srcNode: Node,
                                        actualEdges: List[OdbEdge],
                                        allowedEdgeTypes: List[String]): Unit = {
     val invalidEdges = actualEdges.filter(

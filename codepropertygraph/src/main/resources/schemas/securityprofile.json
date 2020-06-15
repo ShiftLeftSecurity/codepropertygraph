@@ -92,7 +92,7 @@
    ]
    },
       {"id" : 214, "name" : "FINDING", "comment" : "", "keys" : [], "outEdges" : [], "containedNodes" : [
-	  {"localName" : "evidence", "nodeType" : "NODE", "cardinality" : "list"},
+	  {"localName" : "evidence", "nodeType" : "CPG_NODE", "cardinality" : "list"},
 	  {"localName" : "keyValuePairs", "nodeType" : "KEY_VALUE_PAIR", "cardinality" : "list"}
    ]
    },
@@ -103,7 +103,7 @@
          "comment" : "",
          "outEdges" : [],
          "containedNodes" : [
-            {"localName" : "node", "nodeType" : "NODE", "cardinality" : "zeroOrOne"}
+            {"localName" : "node", "nodeType" : "CPG_NODE", "cardinality" : "zeroOrOne"}
          ]
         },
 
@@ -118,7 +118,7 @@
      "containedNodes" :
      [
       {"localName" : "tag", "nodeType" : "TAG", "cardinality" : "one"},
-      {"localName" : "node", "nodeType" : "NODE", "cardinality" : "one"}
+      {"localName" : "node", "nodeType" : "CPG_NODE", "cardinality" : "one"}
      ]
     },
     {"id" : 216, "name" : "SP_BLACKLIST", "comment" : "", "keys" : [], "outEdges" : [],
