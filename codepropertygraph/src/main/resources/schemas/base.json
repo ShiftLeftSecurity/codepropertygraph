@@ -81,7 +81,7 @@
         // Nodes of method declarations
 
         {"id" : 1, "name" : "METHOD",
-         "keys": ["NAME", "FULL_NAME", "IS_EXTERNAL", "SIGNATURE", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME",
+         "keys": ["CODE", "NAME", "FULL_NAME", "IS_EXTERNAL", "SIGNATURE", "AST_PARENT_TYPE", "AST_PARENT_FULL_NAME",
 		  "LINE_NUMBER", "COLUMN_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER_END", "ORDER", "FILENAME"],
          "comment" : "A method/function/procedure",
          "is": ["DECLARATION", "CFG_NODE", "AST_NODE"],
@@ -463,7 +463,7 @@
 
 	{"id" : 340, "name": "JUMP_TARGET",
 	 "comment" : "A jump target made explicit in the code using a label",
-	 "keys": ["NAME", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER", "PARSER_TYPE_NAME", "ARGUMENT_INDEX", "INTERNAL_FLAGS"],
+	 "keys": ["CODE", "NAME", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER", "PARSER_TYPE_NAME", "ARGUMENT_INDEX", "INTERNAL_FLAGS"],
 	 "is" : ["CFG_NODE", "AST_NODE"],
 	 "outEdges" : [
            {"edgeName": "CFG", "inNodes": [
@@ -524,7 +524,7 @@
       { "name" : "DECLARATION", "comment" : "", "hasKeys" : ["NAME"]},
       { "name" : "EXPRESSION", "comment" : "Expression as a specialisation of tracking point", "hasKeys" : ["CODE", "ORDER", "ARGUMENT_INDEX"], "extends" : ["TRACKING_POINT", "CFG_NODE", "AST_NODE"]},
       { "name" : "LOCAL_LIKE", "comment" : "Formal input parameters, locals, and identifiers", "hasKeys" : ["NAME"]},
-      { "name" : "CFG_NODE", "comment" : "Any node that can occur as part of a control flow graph", "hasKeys" : ["LINE_NUMBER", "COLUMN_NUMBER", "INTERNAL_FLAGS"], "extends": ["WITHIN_METHOD", "AST_NODE"]},
+      { "name" : "CFG_NODE", "comment" : "Any node that can occur as part of a control flow graph", "hasKeys" : ["LINE_NUMBER", "COLUMN_NUMBER", "INTERNAL_FLAGS", "CODE"], "extends": ["WITHIN_METHOD", "AST_NODE"]},
       { "name" : "TRACKING_POINT", "comment" : "Any node that can occur in a data flow", "hasKeys" : [], "extends": ["WITHIN_METHOD"]},
       { "name" : "WITHIN_METHOD", "comment" : "Any node that can exist in a method", "hasKeys" : []},
       { "name" : "AST_NODE", "comment": "Any node that can exist in an abstract syntax tree", "hasKeys" : ["ORDER"]},
