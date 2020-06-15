@@ -273,4 +273,7 @@ class NodeTypeStarters(cpg: Cpg) {
   def tag: NodeSteps[nodes.Tag] =
     new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.TAG).cast[nodes.Tag])
 
+  @Doc("All tags with given name")
+  def tag(name: String): NodeSteps[nodes.Tag] = tag.name(name)
+
 }
