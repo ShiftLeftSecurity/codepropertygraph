@@ -10,6 +10,7 @@ import io.shiftleft.passes.DiffGraph
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, PropertyValue}
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.{T, VertexProperty}
+import overflowdb._
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -109,7 +110,7 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
       }
       val newEdge =
         srcTinkerNode.addEdge(edge.getType.toString, dstTinkerNode, keyValues.toArray: _*)
-      inverseBuilder.onNewEdge(newEdge)
+      inverseBuilder.onNewEdge(newEdge.asInstanceOf[OdbEdge])
     }
   }
 
@@ -146,7 +147,7 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
       case storedNode: StoredNode =>
         inverseBuilder.onBeforeNodePropertyChange(storedNode, propertyName)
       case edge: Edge =>
-        inverseBuilder.onBeforeEdgePropertyChange(edge, propertyName)
+        inverseBuilder.onBeforeEdgePropertyChange(edge.asInstanceOf[OdbEdge], propertyName)
     }
     propertyValue.getValueCase match {
       case INT_VALUE =>
