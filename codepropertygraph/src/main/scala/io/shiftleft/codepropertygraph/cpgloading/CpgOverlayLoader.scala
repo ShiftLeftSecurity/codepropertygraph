@@ -1,22 +1,19 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
 import java.io.IOException
-
-import io.shiftleft.codepropertygraph.Cpg
-import java.lang.{Long => JLong}
 import java.util.{ArrayList => JArrayList}
 
-import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, PropertyValue}
-import org.apache.tinkerpop.gremlin.structure.{T, Vertex, VertexProperty}
-
-import scala.jdk.CollectionConverters._
-import scala.collection.mutable
 import gremlin.scala._
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.passes.DiffGraph
+import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, PropertyValue}
 import org.apache.logging.log4j.LogManager
+import org.apache.tinkerpop.gremlin.structure.{T, VertexProperty}
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import scala.jdk.CollectionConverters._
 
 private[cpgloading] object CpgOverlayLoader {
   private val logger = LogManager.getLogger(getClass)

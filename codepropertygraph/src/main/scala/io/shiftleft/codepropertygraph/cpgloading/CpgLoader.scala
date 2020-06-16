@@ -3,7 +3,6 @@ package io.shiftleft.codepropertygraph.cpgloading
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import org.apache.logging.log4j.LogManager
-import org.apache.tinkerpop.gremlin.structure.Vertex
 import overflowdb.OdbGraph
 
 object CpgLoader {
