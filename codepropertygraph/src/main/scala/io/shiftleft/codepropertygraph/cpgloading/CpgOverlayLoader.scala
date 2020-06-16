@@ -132,7 +132,9 @@ private class CpgOverlayApplier(graph: OdbGraph) {
     if (overlayNodeIdToSrcGraphNode.contains(id)) {
       overlayNodeIdToSrcGraphNode(id)
     } else {
-      graph.nodeOption(id).getOrElse(throw new AssertionError(s"node with id=$id neither found in overlay nodes, nor in existing graph"))
+      graph
+        .nodeOption(id)
+        .getOrElse(throw new AssertionError(s"node with id=$id neither found in overlay nodes, nor in existing graph"))
     }
   }
 
