@@ -101,12 +101,11 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     if (nodeId == -1)
       throw new IllegalArgumentException(
         "edge " + edge + " has illegal src|dst node. something seems wrong with the cpg")
-    Option(odbGraph.node(nodeId)) match {
-      case Some(node) => node
-      case None =>
+    odbGraph
+      .nodeOption(nodeId)
+      .getOrElse(
         throw new NoSuchElementException(
-          "Couldn't find src|dst node " + nodeId + " for edge " + edge + " of type " + edge.getType.name)
-    }
+          "Couldn't find src|dst node " + nodeId + " for edge " + edge + " of type " + edge.getType.name))
   }
 
   private def nodeToArray(node: Node): Array[AnyRef] = {
