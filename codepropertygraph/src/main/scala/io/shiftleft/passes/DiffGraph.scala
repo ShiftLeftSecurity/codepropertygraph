@@ -9,8 +9,8 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, NewNode, StoredNode}
 import io.shiftleft.proto.cpg.Cpg.{DiffGraph => DiffGraphProto}
 import org.apache.logging.log4j.LogManager
-import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import overflowdb._
+import overflowdb.traversal._
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -149,7 +149,7 @@ object DiffGraph {
           val inNodeId = proto.getInNodeKey
           val edgeLabel = proto.getEdgeType.toString
 
-          val edge = cpg.scalaGraph.V(outNodeId).outE(edgeLabel).toList.filter(_.inVertex.id == inNodeId) match {
+          val edge = cpg.graph.V(outNodeId).outE(edgeLabel).filter(_.inVertex.id == inNodeId).l match {
             case edge :: Nil => edge
             case Nil         => throw new AssertionError(s"unable to find edge that is supposed to be removed: $proto")
             case candidates => // found multiple edges - try to disambiguate via propertiesHash
@@ -340,7 +340,7 @@ object DiffGraph {
                                 value: AnyRef,
                                 inverseBuilder: DiffGraph.InverseBuilder) = {
       inverseBuilder.onBeforeNodePropertyChange(node, key)
-      node.property(Cardinality.single, key, value)
+      node.setProperty(key, value)
     }
 
     private def addEdge(edgeChange: Change.CreateEdge, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
