@@ -5,13 +5,14 @@ import java.util
 
 import gnu.trove.set.hash.TCustomHashSet
 import gnu.trove.strategy.IdentityHashingStrategy
-import gremlin.scala.{Edge, ScalaGraph}
+import gremlin.scala.Edge
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, NewNode, StoredNode}
 import io.shiftleft.proto.cpg.Cpg.{DiffGraph => DiffGraphProto}
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
+import overflowdb._
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -296,27 +297,27 @@ object DiffGraph {
   private class Applier {
     import Applier.InternalProperty
 
-    private val overlayNodeToTinkerNode = new util.HashMap[IdentityHashWrapper[NewNode], Vertex]()
+    private val overlayNodeToOdbNode = new util.HashMap[IdentityHashWrapper[NewNode], Node]()
 
     def applyDiff(diffGraph: DiffGraph, cpg: Cpg, undoable: Boolean = false): AppliedDiffGraph = {
       applyDiff(diffGraph, cpg.graph, undoable)
     }
 
-    private def applyDiff(diffGraph: DiffGraph, graph: gremlin.scala.Graph, undoable: Boolean): AppliedDiffGraph = {
+    private def applyDiff(diffGraph: DiffGraph, graph: OdbGraph, undoable: Boolean): AppliedDiffGraph = {
       val inverseBuilder: InverseBuilder = if (undoable) InverseBuilder.newBuilder else InverseBuilder.noop
       diffGraph.iterator.foreach(change => applyChange(graph, change, inverseBuilder))
       AppliedDiffGraph(
         diffGraph,
         if (undoable) Some(inverseBuilder.build()) else None,
-        overlayNodeToTinkerNode
+        overlayNodeToOdbNode
       )
     }
 
-    def unapplyDiff(graph: gremlin.scala.Graph, inverseDiff: DiffGraph): Unit = {
+    def unapplyDiff(graph: OdbGraph, inverseDiff: DiffGraph): Unit = {
       applyDiff(inverseDiff, graph, false)
     }
 
-    private def applyChange(graph: gremlin.scala.Graph, change: Change, inverseBuilder: DiffGraph.InverseBuilder) =
+    private def applyChange(graph: OdbGraph, change: Change, inverseBuilder: DiffGraph.InverseBuilder) =
       change match {
         case Change.CreateNode(node) => addNode(graph, node, inverseBuilder)
         case c: Change.CreateEdge    => addEdge(c, inverseBuilder)
@@ -350,12 +351,12 @@ object DiffGraph {
 
       val srcTinkerNode =
         if (edgeChange.sourceNodeKind == Change.NodeKind.New)
-          overlayNodeToTinkerNode.get(IdentityHashWrapper(src))
+          overlayNodeToOdbNode.get(IdentityHashWrapper(src))
         else
           src.asInstanceOf[StoredNode]
       val dstTinkerNode =
         if (edgeChange.destinationNodeKind == Change.NodeKind.New)
-          overlayNodeToTinkerNode.get(IdentityHashWrapper(dst))
+          overlayNodeToOdbNode.get(IdentityHashWrapper(dst))
         else
           dst.asInstanceOf[StoredNode]
       tinkerAddEdge(srcTinkerNode, dstTinkerNode, edgeChange.label, edgeChange.properties, inverseBuilder)
@@ -375,8 +376,8 @@ object DiffGraph {
       }
     }
 
-    private def addNode(graph: ScalaGraph, node: NewNode, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
-      val newNode = graph.graph.addVertex(node.label)
+    private def addNode(graph: OdbGraph, node: NewNode, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
+      val newNode = graph + node.label
       inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
       node.properties.filter { case (key, _) => !key.startsWith(InternalProperty) }.foreach {
         case (key, value: Traversable[_]) =>
@@ -387,7 +388,7 @@ object DiffGraph {
         case (key, value) =>
           newNode.property(key, value)
       }
-      overlayNodeToTinkerNode.put(IdentityHashWrapper(node), newNode)
+      overlayNodeToOdbNode.put(IdentityHashWrapper(node), newNode)
     }
   }
 
@@ -399,12 +400,12 @@ object DiffGraph {
       applier.applyDiff(diff, cpg, undoable)
     }
 
-    def applyDiff(diff: DiffGraph, graph: gremlin.scala.Graph, undoable: Boolean): AppliedDiffGraph = {
+    def applyDiff(diff: DiffGraph, graph: OdbGraph, undoable: Boolean): AppliedDiffGraph = {
       val applier = new Applier
       applier.applyDiff(diff, graph, undoable)
     }
 
-    def unapplyDiff(graph: gremlin.scala.Graph, inverseDiff: DiffGraph): Unit = {
+    def unapplyDiff(graph: OdbGraph, inverseDiff: DiffGraph): Unit = {
       val applier = new Applier
       applier.unapplyDiff(graph, inverseDiff)
     }
