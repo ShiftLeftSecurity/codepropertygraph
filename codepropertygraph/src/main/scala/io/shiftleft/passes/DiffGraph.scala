@@ -379,14 +379,9 @@ object DiffGraph {
     private def addNode(graph: OdbGraph, node: NewNode, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
       val newNode = graph + node.label
       inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
-      node.properties.filter { case (key, _) => !key.startsWith(InternalProperty) }.foreach {
-        case (key, value: Traversable[_]) =>
-          // tinkerpop has a suboptimal API for setting many properties at once.
-          // This code assumes that the underlying graph is CPG.
-          // we break the official API of tinkerpop/scalagraph: this will overwrite the old property with the list
-          newNode.property(Cardinality.list, key, value.toList)
-        case (key, value) =>
-          newNode.property(key, value)
+      node.properties.foreach {
+        case (key, value) if !key.startsWith(InternalProperty) =>
+          newNode.setProperty(key, value)
       }
       overlayNodeToOdbNode.put(IdentityHashWrapper(node), newNode)
     }
