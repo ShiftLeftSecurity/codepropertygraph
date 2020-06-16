@@ -1,15 +1,13 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
 import java.io.IOException
-import java.util.{ArrayList => JArrayList}
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, PropertyValue}
 import org.apache.logging.log4j.LogManager
-import org.apache.tinkerpop.gremlin.structure.{T, VertexProperty}
+import org.apache.tinkerpop.gremlin.structure.T
 import overflowdb._
 
 import scala.collection.mutable
@@ -60,8 +58,8 @@ private[cpgloading] object CpgOverlayLoader {
   *
   * @param graph the existing (loaded) graph to apply overlay to
   */
-private class CpgOverlayApplier(graph: ScalaGraph) {
-  private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Vertex] = mutable.HashMap.empty
+private class CpgOverlayApplier(graph: OdbGraph) {
+  private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Node] = mutable.HashMap.empty
 
   /**
     * Applies diff to existing (loaded) OdbGraph
@@ -85,6 +83,7 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
 
   private def addNodes(overlay: CpgOverlay, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
     overlay.getNodeList.asScala.foreach { node =>
+      // TODO use odb api: first refactor `ProtoToCpg.addProperties`
       val properties = node.getPropertyList.asScala
       val keyValues = new ArrayBuffer[AnyRef](2 + (2 * properties.size))
       keyValues += T.label
@@ -92,24 +91,25 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
       properties.foreach { property =>
         ProtoToCpg.addProperties(keyValues, property.getName.name, property.getValue)
       }
-      val newNode = graph.graph.addVertex(keyValues.toArray: _*)
-      inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
+      val newNode = graph.graph.addVertex(keyValues.toArray: _*).asInstanceOf[StoredNode]
+      inverseBuilder.onNewNode(newNode)
       overlayNodeIdToSrcGraphNode.put(node.getKey, newNode)
     }
   }
 
   private def addEdges(overlay: CpgOverlay, inverseBuilder: DiffGraph.InverseBuilder) = {
     overlay.getEdgeList.asScala.foreach { edge =>
-      val srcTinkerNode = getVertexForOverlayId(edge.getSrc)
-      val dstTinkerNode = getVertexForOverlayId(edge.getDst)
+      val srcOdbNode = getOdbNodeForOverlayId(edge.getSrc)
+      val dstOdbNode = getOdbNodeForOverlayId(edge.getDst)
 
       val properties = edge.getPropertyList.asScala
+      // TODO use odb api: first refactor `ProtoToCpg.addProperties`
       val keyValues = new ArrayBuffer[AnyRef](2 * properties.size)
       properties.foreach { property =>
         ProtoToCpg.addProperties(keyValues, property.getName.name, property.getValue)
       }
       val newEdge =
-        srcTinkerNode.addEdge(edge.getType.toString, dstTinkerNode, keyValues.toArray: _*)
+        srcOdbNode.addEdge(edge.getType.toString, dstOdbNode, keyValues.toArray: _*)
       inverseBuilder.onNewEdge(newEdge.asInstanceOf[OdbEdge])
     }
   }
@@ -117,8 +117,8 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
   private def addNodeProperties(overlay: CpgOverlay, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
     overlay.getNodePropertyList.asScala.foreach { additionalNodeProperty =>
       val property = additionalNodeProperty.getProperty
-      val tinkerNode = getVertexForOverlayId(additionalNodeProperty.getNodeId)
-      addPropertyToElement(tinkerNode, property.getName.name, property.getValue, inverseBuilder)
+      val odbNode = getOdbNodeForOverlayId(additionalNodeProperty.getNodeId)
+      addPropertyToElement(odbNode, property.getName.name, property.getValue, inverseBuilder)
     }
   }
 
@@ -128,56 +128,40 @@ private class CpgOverlayApplier(graph: ScalaGraph) {
     }
   }
 
-  private def getVertexForOverlayId(id: Long): Vertex = {
+  private def getOdbNodeForOverlayId(id: Long): Node = {
     if (overlayNodeIdToSrcGraphNode.contains(id)) {
       overlayNodeIdToSrcGraphNode(id)
     } else {
-      val iter = graph.graph.vertices(id.asInstanceOf[Object])
-      assert(iter.hasNext, s"node with id=$id neither found in overlay nodes, nor in existing graph")
-      nextChecked(iter)
+      graph.nodeOption(id).getOrElse(throw new AssertionError(s"node with id=$id neither found in overlay nodes, nor in existing graph"))
     }
   }
 
-  private def addPropertyToElement(tinkerElement: Element,
+  private def addPropertyToElement(odbElement: OdbElement,
                                    propertyName: String,
                                    propertyValue: PropertyValue,
                                    inverseBuilder: DiffGraph.InverseBuilder): Unit = {
     import PropertyValue.ValueCase._
-    tinkerElement match {
+    odbElement match {
       case storedNode: StoredNode =>
         inverseBuilder.onBeforeNodePropertyChange(storedNode, propertyName)
-      case edge: Edge =>
-        inverseBuilder.onBeforeEdgePropertyChange(edge.asInstanceOf[OdbEdge], propertyName)
+      case edge: OdbEdge =>
+        inverseBuilder.onBeforeEdgePropertyChange(edge, propertyName)
     }
+
     propertyValue.getValueCase match {
       case INT_VALUE =>
-        tinkerElement.property(propertyName, propertyValue.getIntValue)
+        odbElement.setProperty(propertyName, propertyValue.getIntValue)
       case STRING_VALUE =>
-        tinkerElement.property(propertyName, propertyValue.getStringValue)
+        odbElement.setProperty(propertyName, propertyValue.getStringValue)
       case BOOL_VALUE =>
-        tinkerElement.property(propertyName, propertyValue.getBoolValue)
-      case STRING_LIST if tinkerElement.isInstanceOf[Vertex] =>
-        propertyValue.getStringList.getValuesList.forEach { value: String =>
-          tinkerElement
-            .asInstanceOf[Vertex]
-            .property(VertexProperty.Cardinality.list, propertyName, value)
-        }
+        odbElement.setProperty(propertyName, propertyValue.getBoolValue)
       case STRING_LIST =>
-        val propertyList = new JArrayList[AnyRef]()
-        propertyList.addAll(propertyValue.getStringList.getValuesList)
-        tinkerElement.property(propertyName, propertyList)
+        val listBuilder = List.newBuilder[String]
+        propertyValue.getStringList.getValuesList.forEach(listBuilder.addOne)
+        odbElement.setProperty(propertyName, listBuilder.result)
       case VALUE_NOT_SET =>
       case valueCase =>
         throw new RuntimeException("Error: unsupported property case: " + valueCase)
-    }
-  }
-
-  private def nextChecked[T](iterator: java.util.Iterator[T]): T = {
-    try {
-      iterator.next
-    } catch {
-      case _: NoSuchElementException =>
-        throw new NoSuchElementException()
     }
   }
 

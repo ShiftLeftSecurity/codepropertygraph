@@ -347,17 +347,17 @@ object DiffGraph {
       val src = edgeChange.src
       val dst = edgeChange.dst
 
-      val srcTinkerNode =
+      val srcOdbNode =
         if (edgeChange.sourceNodeKind == Change.NodeKind.New)
           overlayNodeToOdbNode.get(IdentityHashWrapper(src))
         else
-          src.asInstanceOf[StoredNode]
-      val dstTinkerNode =
+          src.asInstanceOf[Node]
+      val dstOdbNode =
         if (edgeChange.destinationNodeKind == Change.NodeKind.New)
           overlayNodeToOdbNode.get(IdentityHashWrapper(dst))
         else
-          dst.asInstanceOf[StoredNode]
-      odbAddEdge(srcTinkerNode, dstTinkerNode, edgeChange.label, edgeChange.properties, inverseBuilder)
+          dst.asInstanceOf[Node]
+      odbAddEdge(srcOdbNode, dstOdbNode, edgeChange.label, edgeChange.properties, inverseBuilder)
     }
 
     private def odbAddEdge(src: Node,
