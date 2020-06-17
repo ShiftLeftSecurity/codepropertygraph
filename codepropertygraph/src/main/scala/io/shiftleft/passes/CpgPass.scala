@@ -8,7 +8,7 @@ import java.lang.{Long => JLong}
 
 import com.google.protobuf.GeneratedMessageV3
 import org.apache.logging.log4j.{LogManager, Logger}
-import org.apache.tinkerpop.gremlin.structure.Vertex
+import overflowdb.Node
 
 import scala.concurrent.duration.DurationLong
 
@@ -144,14 +144,14 @@ trait CpgPassBase {
   * */
 case class AppliedDiffGraph(diffGraph: DiffGraph,
                             inverseDiffGraph: Option[DiffGraph],
-                            private val nodeToTinkerNode: util.HashMap[IdentityHashWrapper[NewNode], Vertex]) {
+                            private val nodeToOdbNode: util.HashMap[IdentityHashWrapper[NewNode], Node]) {
 
   /**
     * Obtain the id this node has in the applied graph
     * */
   def nodeToGraphId(node: NewNode): JLong = {
     val wrappedNode = IdentityHashWrapper(node)
-    nodeToTinkerNode.get(wrappedNode).id.asInstanceOf[JLong]
+    nodeToOdbNode.get(wrappedNode).id2
   }
 }
 

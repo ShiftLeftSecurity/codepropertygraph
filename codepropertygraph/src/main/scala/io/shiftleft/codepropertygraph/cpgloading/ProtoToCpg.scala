@@ -1,20 +1,18 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
 import java.lang.{Boolean => JBoolean, Integer => JInt, Long => JLong}
-import java.util.{NoSuchElementException, Collection => JCollection, Iterator => JIterator}
+import java.util.{NoSuchElementException, Collection => JCollection}
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.{Edge, Node}
 import io.shiftleft.proto.cpg.Cpg.PropertyValue
-import org.apache.commons.configuration.Configuration
-import org.apache.logging.log4j.{LogManager, Logger}
-import org.apache.tinkerpop.gremlin.structure.{T, Vertex}
-import overflowdb.OdbGraph
-
-import scala.jdk.CollectionConverters._
-import scala.collection.mutable.ArrayBuffer
-import overflowdb.OdbConfig
 import io.shiftleft.utils.StringInterner
+import org.apache.logging.log4j.{LogManager, Logger}
+import org.apache.tinkerpop.gremlin.structure.T
+import overflowdb.{OdbConfig, OdbGraph}
+
+import scala.collection.mutable.ArrayBuffer
+import scala.jdk.CollectionConverters._
 
 object ProtoToCpg {
   val logger: Logger = LogManager.getLogger(classOf[ProtoToCpg])
@@ -76,8 +74,8 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
 
   def addEdges(protoEdges: Iterable[Edge]): Unit = {
     for (edge <- protoEdges) {
-      val srcVertex = findVertexById(edge, edge.getSrc)
-      val dstVertex = findVertexById(edge, edge.getDst)
+      val srcVertex = findNodeById(edge, edge.getSrc)
+      val dstVertex = findNodeById(edge, edge.getDst)
       val properties = edge.getPropertyList.asScala
       val keyValues = new ArrayBuffer[AnyRef](2 * properties.size)
       for (edgeProperty <- properties) {
@@ -99,15 +97,15 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
 
   def build(): Cpg = new Cpg(odbGraph)
 
-  private def findVertexById(edge: Edge, nodeId: Long): Vertex = {
+  private def findNodeById(edge: Edge, nodeId: Long): overflowdb.Node = {
     if (nodeId == -1)
       throw new IllegalArgumentException(
         "edge " + edge + " has illegal src|dst node. something seems wrong with the cpg")
-    val vertices: JIterator[Vertex] = odbGraph.vertices(nodeId: JLong)
-    if (!vertices.hasNext)
-      throw new NoSuchElementException(
-        "Couldn't find src|dst node " + nodeId + " for edge " + edge + " of type " + edge.getType.name)
-    vertices.next
+    odbGraph
+      .nodeOption(nodeId)
+      .getOrElse(
+        throw new NoSuchElementException(
+          "Couldn't find src|dst node " + nodeId + " for edge " + edge + " of type " + edge.getType.name))
   }
 
   private def nodeToArray(node: Node): Array[AnyRef] = {

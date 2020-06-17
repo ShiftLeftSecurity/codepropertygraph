@@ -23,7 +23,7 @@ import io.shiftleft.proto.cpg.Cpg.{
   StringList,
   DiffGraph => DiffGraphProto
 }
-import overflowdb.Node
+import overflowdb._
 
 /**
   * Provides functionality to serialize diff graphs and add them
@@ -134,7 +134,7 @@ class DiffGraphProtoSerializer {
       .setOutNodeKey(edge.outVertex.id.asInstanceOf[Long])
       .setInNodeKey(edge.inVertex.id.asInstanceOf[Long])
       .setEdgeType(EdgeType.valueOf(edge.label))
-      .setPropertiesHash(ByteString.copyFrom(DiffGraph.propertiesHash(edge)))
+      .setPropertiesHash(ByteString.copyFrom(DiffGraph.propertiesHash(edge.asInstanceOf[OdbEdge])))
       .build
 
   private def removeNodePropertyProto(nodeId: Long, propertyKey: String) =

@@ -1,12 +1,9 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala.Vertex
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.NewLocation
 import io.shiftleft.semanticcpg.utils.ExpandTo
 import org.apache.logging.log4j.LogManager
-
-import scala.jdk.CollectionConverters._
 
 /* TODO MP: this should be part of the normal steps, rather than matching on the type at runtime
  * all (and only) steps extending DataFlowObject should/must have `newSink`, `newSource` and `newLocation` */
@@ -14,19 +11,19 @@ object LocationCreator {
 
   private val logger = LogManager.getLogger(getClass)
 
-  def apply(vertex: Vertex): nodes.NewLocation = {
+  def apply(node: nodes.StoredNode): nodes.NewLocation = {
     try {
-      location(vertex)
+      location(node)
     } catch {
       case exc @ (_: NoSuchElementException | _: ClassCastException) => {
-        logger.error(s"Cannot determine location for ${vertex.label} due to broken CPG", exc)
-        emptyLocation(vertex.label, Some(vertex.asInstanceOf[nodes.CpgNode]))
+        logger.error(s"Cannot determine location for ${node.label} due to broken CPG", exc)
+        emptyLocation(node.label, Some(node))
       }
     }
   }
 
-  private def location(vertex: Vertex): NewLocation = {
-    vertex match {
+  private def location(node: nodes.StoredNode): NewLocation = {
+    node match {
       case paramIn: nodes.MethodParameterIn =>
         apply(
           paramIn,
@@ -109,8 +106,8 @@ object LocationCreator {
         )
       case source: nodes.Source =>
         apply(source.node)
-      case vertex: Vertex =>
-        emptyLocation(vertex.label, Some(vertex.asInstanceOf[nodes.CpgNode]))
+      case node =>
+        emptyLocation(node.label, Some(node))
     }
   }
 
