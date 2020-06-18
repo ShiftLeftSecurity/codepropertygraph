@@ -70,11 +70,30 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
   def addNodes(nodes: Iterable[Node]): Unit =
     nodes
       .filter(nodeFilter.filterNode)
-      .foreach(addVertexToOdbGraph)
+      .foreach(addNodeToOdb)
 
-  private def addVertexToOdbGraph(node: Node) = {
-    try odbGraph.addVertex(nodeToArray(node): _*)
-    catch {
+  private def addNodeToOdb(node: Node) = {
+    def nodeToArray(node: Node): Array[AnyRef] = {
+      val props = node.getPropertyList
+      val keyValues = new ArrayBuffer[AnyRef](4 + (2 * props.size()))
+      keyValues += T.id
+      keyValues += (node.getKey: JLong)
+      keyValues += T.label
+      keyValues += node.getType.name()
+      for (prop <- props.asScala) {
+        addProperties(keyValues, prop.getName.name, prop.getValue, interner)
+      }
+      keyValues.toArray
+    }
+
+    try {
+//      println("XXX0=" + node.getKey)
+      val res = odbGraph.addVertex(nodeToArray(node): _*)
+//      println("XXX1=" + res.id)
+      res
+//          val properties: Seq[Property[Any]] = Nil
+//      odbGraph + (node.getType.name, properties: _*)
+    } catch {
       case e: Exception =>
         throw new RuntimeException("Failed to insert a vertex. proto:\n" + node, e)
     }
@@ -117,16 +136,4 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
           "Couldn't find src|dst node " + nodeId + " for edge " + edge + " of type " + edge.getType.name))
   }
 
-  private def nodeToArray(node: Node): Array[AnyRef] = {
-    val props = node.getPropertyList
-    val keyValues = new ArrayBuffer[AnyRef](4 + (2 * props.size()))
-    keyValues += T.id
-    keyValues += (node.getKey: JLong)
-    keyValues += T.label
-    keyValues += node.getType.name()
-    for (prop <- props.asScala) {
-      addProperties(keyValues, prop.getName.name, prop.getValue, interner)
-    }
-    keyValues.toArray
-  }
 }
