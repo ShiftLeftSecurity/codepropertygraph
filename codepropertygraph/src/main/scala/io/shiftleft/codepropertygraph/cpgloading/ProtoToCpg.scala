@@ -1,16 +1,15 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import java.lang.{Boolean => JBoolean, Integer => JInt, Long => JLong}
+import java.lang.{Boolean => JBoolean, Integer => JInt}
 import java.util.{NoSuchElementException, Collection => JCollection}
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.{Edge, Node}
 import io.shiftleft.proto.cpg.Cpg.PropertyValue
+import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase._
 import io.shiftleft.utils.StringInterner
 import org.apache.logging.log4j.{LogManager, Logger}
-import org.apache.tinkerpop.gremlin.structure.T
 import overflowdb._
-import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase._
 
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
@@ -73,29 +72,13 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
       .foreach(addNodeToOdb)
 
   private def addNodeToOdb(node: Node) = {
-    def nodeToArray(node: Node): Array[AnyRef] = {
-      val props = node.getPropertyList
-      val keyValues = new ArrayBuffer[AnyRef](4 + (2 * props.size()))
-      keyValues += T.id
-      keyValues += (node.getKey: JLong)
-      keyValues += T.label
-      keyValues += node.getType.name()
-      for (prop <- props.asScala) {
-        addProperties(keyValues, prop.getName.name, prop.getValue, interner)
-      }
-      keyValues.toArray
+    val properties = node.getPropertyList.asScala.toSeq.map { prop =>
+      Property(prop.getName.name, toRegularType(prop.getValue))
     }
-
-    try {
-//      println("XXX0=" + node.getKey)
-      val res = odbGraph.addVertex(nodeToArray(node): _*)
-//      println("XXX1=" + res.id)
-      res
-//          val properties: Seq[Property[Any]] = Nil
-//      odbGraph + (node.getType.name, properties: _*)
-    } catch {
+    try odbGraph + (node.getType.name, node.getKey, properties: _*)
+    catch {
       case e: Exception =>
-        throw new RuntimeException("Failed to insert a vertex. proto:\n" + node, e)
+        throw new RuntimeException("Failed to insert a node. proto:\n" + node, e)
     }
   }
 
@@ -106,8 +89,8 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     for (edgeProto <- protoEdges) {
       val srcNode = findNodeById(edgeProto, edgeProto.getSrc)
       val dstNode = findNodeById(edgeProto, edgeProto.getDst)
-      val properties = edgeProto.getPropertyList.asScala.toSeq.map { edgeProperty =>
-        Property(edgeProperty.getName.name, toRegularType(edgeProperty.getValue))
+      val properties = edgeProto.getPropertyList.asScala.toSeq.map { prop =>
+        Property(prop.getName.name, toRegularType(prop.getValue))
       }
       try {
         srcNode --- (edgeProto.getType.name, properties: _*) --> dstNode
