@@ -127,7 +127,7 @@ class TypeTests extends WordSpec with Matchers {
     "ClassHierarchyTest for types" should {
       "have class Base as base class of class Derived" in {
         def queryResult: List[nodes.Type] =
-          fixture.cpg.types
+          fixture.cpg.typ
             .name(".*Derived")
             .baseType
             .name(".*Base")
@@ -138,7 +138,7 @@ class TypeTests extends WordSpec with Matchers {
 
       "have class Dervied as derived class of class Base" in {
         def queryResult: List[nodes.Type] =
-          fixture.cpg.types
+          fixture.cpg.typ
             .name(".*Base")
             .derivedType
             .name(".*Derived")
@@ -149,7 +149,7 @@ class TypeTests extends WordSpec with Matchers {
 
       "have classes Interface1, Interface2 and Object as base classes of class InterfaceImplementor" in {
         def queryResult: List[nodes.Type] =
-          fixture.cpg.types
+          fixture.cpg.typ
             .name(".*InterfaceImplementor")
             .baseType
             .toList
@@ -161,7 +161,7 @@ class TypeTests extends WordSpec with Matchers {
 
       "have class InterfaceImplementor as derived class of class Interface1" in {
         def queryResult: List[nodes.Type] =
-          fixture.cpg.types
+          fixture.cpg.typ
             .name(".*Interface1")
             .derivedType
             .name(".*InterfaceImplementor")
@@ -172,7 +172,7 @@ class TypeTests extends WordSpec with Matchers {
 
       "have class InterfaceImplementor as derived class of class Interface2" in {
         def queryResult: List[nodes.Type] =
-          fixture.cpg.types
+          fixture.cpg.typ
             .name(".*Interface2")
             .derivedType
             .name(".*InterfaceImplementor")
@@ -183,7 +183,7 @@ class TypeTests extends WordSpec with Matchers {
 
       "have Derived and Derived2 as transitive derived types of Base" in {
         def queryResult: List[nodes.Type] =
-          fixture.cpg.types
+          fixture.cpg.typ
             .name(".*Base")
             .derivedTypeTransitive
             .toList
@@ -193,7 +193,7 @@ class TypeTests extends WordSpec with Matchers {
 
       "have Base and Object as transitive base types of Derived" in {
         def queryResult: List[nodes.Type] =
-          fixture.cpg.types
+          fixture.cpg.typ
             .name(".*Derived")
             .baseTypeTransitive
             .toList

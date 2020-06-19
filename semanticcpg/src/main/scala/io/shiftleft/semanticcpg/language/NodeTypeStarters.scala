@@ -83,17 +83,31 @@ class NodeTypeStarters(cpg: Cpg) {
     namespaceBlock.name(name)
 
   /**
-    Traverse to all types, e.g., Set<String>
+  Traverse to all types, e.g., Set<String>
     */
   @Doc("All used types")
+  def typ: NodeSteps[nodes.Type] =
+    new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.TYPE).cast[nodes.Type])
+
+  /**
+    * Shorthand for `cpg.types.fullName(fullName)`
+    * */
+  def typ(fullName: String): NodeSteps[nodes.Type] =
+    typ.fullName(fullName)
+
+  /**
+    Traverse to all types, e.g., Set<String>
+    */
+  @deprecated("Use typ")
   def types: NodeSteps[nodes.Type] =
     new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.TYPE).cast[nodes.Type])
 
   /**
     * Shorthand for `cpg.types.fullName(fullName)`
     * */
+  @deprecated("Use typ")
   def types(fullName: String): NodeSteps[nodes.Type] =
-    types.fullName(fullName)
+    typ.fullName(fullName)
 
   /**
     Traverse to all declarations, e.g., Set<T>
@@ -224,14 +238,28 @@ class NodeTypeStarters(cpg: Cpg) {
     * Traverse to all return expressions
     */
   @Doc("All actual return parameters")
+  def ret: NodeSteps[nodes.Return] =
+    new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.RETURN).cast[nodes.Return])
+
+  /**
+    * Shorthand for `returns.code(code)`
+    * */
+  def ret(code: String): NodeSteps[nodes.Return] =
+    ret.code(code)
+
+  /**
+    * Traverse to all return expressions
+    */
+  @deprecated("Use ret")
   def returns: NodeSteps[nodes.Return] =
     new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.RETURN).cast[nodes.Return])
 
   /**
     * Shorthand for `returns.code(code)`
     * */
+  @deprecated("Use ret")
   def returns(code: String): NodeSteps[nodes.Return] =
-    returns.code(code)
+    ret.code(code)
 
   /**
     * Traverse to all meta data entries
