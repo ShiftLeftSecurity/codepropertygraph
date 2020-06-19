@@ -15,7 +15,10 @@ import scala.jdk.CollectionConverters._
 object ProtoToCpg {
   val logger: Logger = LogManager.getLogger(classOf[ProtoToCpg])
 
-  def toRegularType(value: PropertyValue)(implicit interner: StringInterner): Any =
+  def toProperty(keyValue: (String, PropertyValue))(implicit interner: StringInterner): Property[Any] =
+    Property(keyValue._1, toRegularType(keyValue._2))
+
+  private def toRegularType(value: PropertyValue)(implicit interner: StringInterner): Any =
     value.getValueCase match {
       case INT_VALUE => value.getIntValue
       case BOOL_VALUE => value.getBoolValue
@@ -45,9 +48,9 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
       .foreach(addNodeToOdb)
 
   private def addNodeToOdb(node: Node) = {
-    val properties = node.getPropertyList.asScala.toSeq.map { prop =>
-      Property(prop.getName.name, toRegularType(prop.getValue))
-    }
+    val properties = node.getPropertyList.asScala.toSeq
+      .map(prop => (prop.getName.name, prop.getValue))
+      .map(toProperty)
     try odbGraph + (node.getType.name, node.getKey, properties: _*)
     catch {
       case e: Exception =>
@@ -62,9 +65,9 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     for (edgeProto <- protoEdges) {
       val srcNode = findNodeById(edgeProto, edgeProto.getSrc)
       val dstNode = findNodeById(edgeProto, edgeProto.getDst)
-      val properties = edgeProto.getPropertyList.asScala.toSeq.map { prop =>
-        Property(prop.getName.name, toRegularType(prop.getValue))
-      }
+      val properties = edgeProto.getPropertyList.asScala.toSeq
+        .map(prop => (prop.getName.name, prop.getValue))
+        .map(toProperty)
       try {
         srcNode --- (edgeProto.getType.name, properties: _*) --> dstNode
       } catch {

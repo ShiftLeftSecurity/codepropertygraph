@@ -87,10 +87,10 @@ private class CpgOverlayApplier(graph: OdbGraph) {
 
   private def addNodes(overlay: CpgOverlay, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
     overlay.getNodeList.asScala.foreach { node =>
-      val properties = node.getPropertyList.asScala.toSeq.map { prop =>
-        Property(prop.getName.name, ProtoToCpg.toRegularType(prop.getValue))
-      }
-      val newNode = graph + (node.getType.name, properties: _*)
+      val properties = node.getPropertyList.asScala.toSeq
+        .map(prop => (prop.getName.name, prop.getValue))
+        .map(ProtoToCpg.toProperty)
+    val newNode = graph + (node.getType.name, properties: _*)
       inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
       overlayNodeIdToSrcGraphNode.put(node.getKey, newNode)
     }
@@ -101,9 +101,9 @@ private class CpgOverlayApplier(graph: OdbGraph) {
       val srcNode = getOdbNodeForOverlayId(edge.getSrc)
       val dstNode = getOdbNodeForOverlayId(edge.getDst)
 
-      val properties = edge.getPropertyList.asScala.toSeq.map { prop =>
-        Property(prop.getName.name, ProtoToCpg.toRegularType(prop.getValue))
-      }
+      val properties = edge.getPropertyList.asScala.toSeq
+        .map(prop => (prop.getName.name, prop.getValue))
+        .map(ProtoToCpg.toProperty)
       val newEdge = srcNode --- (edge.getType.name, properties: _*) --> dstNode
       inverseBuilder.onNewEdge(newEdge)
     }
