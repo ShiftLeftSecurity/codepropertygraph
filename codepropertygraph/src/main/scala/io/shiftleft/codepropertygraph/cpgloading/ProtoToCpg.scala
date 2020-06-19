@@ -1,47 +1,32 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import java.lang.{Boolean => JBoolean, Integer => JInt, Long => JLong}
 import java.util.{NoSuchElementException, Collection => JCollection}
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.{Edge, Node}
 import io.shiftleft.proto.cpg.Cpg.PropertyValue
+import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase._
 import io.shiftleft.utils.StringInterner
 import org.apache.logging.log4j.{LogManager, Logger}
-import org.apache.tinkerpop.gremlin.structure.T
-import overflowdb.{OdbConfig, OdbGraph}
+import overflowdb._
 
-import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 
 object ProtoToCpg {
   val logger: Logger = LogManager.getLogger(classOf[ProtoToCpg])
 
-  def addProperties(keyValues: ArrayBuffer[AnyRef],
-                    name: String,
-                    value: PropertyValue,
-                    interner: StringInterner = StringInterner.noop): Unit = {
-    import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase._
+  def toProperty(keyValue: (String, PropertyValue))(implicit interner: StringInterner): Property[Any] =
+    Property(keyValue._1, toRegularType(keyValue._2))
+
+  private def toRegularType(value: PropertyValue)(implicit interner: StringInterner): Any =
     value.getValueCase match {
-      case INT_VALUE =>
-        keyValues += interner.intern(name)
-        keyValues += (value.getIntValue: JInt)
-      case STRING_VALUE =>
-        keyValues += interner.intern(name)
-        keyValues += interner.intern(value.getStringValue)
-      case BOOL_VALUE =>
-        keyValues += interner.intern(name)
-        keyValues += (value.getBoolValue: JBoolean)
-      case STRING_LIST =>
-        value.getStringList.getValuesList.asScala.foreach { elem: String =>
-          keyValues += interner.intern(name)
-          keyValues += interner.intern(elem)
-        }
+      case INT_VALUE     => value.getIntValue
+      case BOOL_VALUE    => value.getBoolValue
+      case STRING_VALUE  => interner.intern(value.getStringValue)
+      case STRING_LIST   => value.getStringList.getValuesList.asScala.map(interner.intern).toList
       case VALUE_NOT_SET => ()
-      case _ =>
-        throw new RuntimeException("Error: unsupported property case: " + value.getValueCase.name)
+      case _             => throw new RuntimeException("Error: unsupported property case: " + value.getValueCase.name)
     }
-  }
 }
 
 class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
@@ -51,7 +36,8 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     OdbGraph.open(overflowConfig,
                   io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
                   io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava)
-  private val interner: StringInterner = StringInterner.makeStrongInterner()
+  // TODO use centralised string interner everywhere, maybe move to odb core - keep in mind strong references / GC.
+  implicit private val interner: StringInterner = StringInterner.makeStrongInterner()
 
   def addNodes(nodes: JCollection[Node]): Unit =
     addNodes(nodes.asScala)
@@ -59,13 +45,16 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
   def addNodes(nodes: Iterable[Node]): Unit =
     nodes
       .filter(nodeFilter.filterNode)
-      .foreach(addVertexToOdbGraph)
+      .foreach(addNodeToOdb)
 
-  private def addVertexToOdbGraph(node: Node) = {
-    try odbGraph.addVertex(nodeToArray(node): _*)
+  private def addNodeToOdb(node: Node) = {
+    val properties = node.getPropertyList.asScala.toSeq
+      .map(prop => (prop.getName.name, prop.getValue))
+      .map(toProperty)
+    try odbGraph + (node.getType.name, node.getKey, properties: _*)
     catch {
       case e: Exception =>
-        throw new RuntimeException("Failed to insert a vertex. proto:\n" + node, e)
+        throw new RuntimeException("Failed to insert a node. proto:\n" + node, e)
     }
   }
 
@@ -73,23 +62,21 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     addEdges(protoEdges.asScala)
 
   def addEdges(protoEdges: Iterable[Edge]): Unit = {
-    for (edge <- protoEdges) {
-      val srcVertex = findNodeById(edge, edge.getSrc)
-      val dstVertex = findNodeById(edge, edge.getDst)
-      val properties = edge.getPropertyList.asScala
-      val keyValues = new ArrayBuffer[AnyRef](2 * properties.size)
-      for (edgeProperty <- properties) {
-        addProperties(keyValues, edgeProperty.getName.name(), edgeProperty.getValue, interner)
-      }
+    for (edgeProto <- protoEdges) {
+      val srcNode = findNodeById(edgeProto, edgeProto.getSrc)
+      val dstNode = findNodeById(edgeProto, edgeProto.getDst)
+      val properties = edgeProto.getPropertyList.asScala.toSeq
+        .map(prop => (prop.getName.name, prop.getValue))
+        .map(toProperty)
       try {
-        srcVertex.addEdge(edge.getType.name(), dstVertex, keyValues.toArray: _*)
+        srcNode --- (edgeProto.getType.name, properties: _*) --> dstNode
       } catch {
         case e: IllegalArgumentException =>
-          val context = "label=" + edge.getType.name +
-            ", srcNodeId=" + edge.getSrc +
-            ", dstNodeId=" + edge.getDst +
-            ", srcVertex=" + srcVertex +
-            ", dstVertex=" + dstVertex
+          val context = "label=" + edgeProto.getType.name +
+            ", srcNodeId=" + edgeProto.getSrc +
+            ", dstNodeId=" + edgeProto.getDst +
+            ", srcNode=" + srcNode +
+            ", dstNode=" + dstNode
           logger.warn("Failed to insert an edge. context: " + context, e)
       }
     }
@@ -108,16 +95,4 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
           "Couldn't find src|dst node " + nodeId + " for edge " + edge + " of type " + edge.getType.name))
   }
 
-  private def nodeToArray(node: Node): Array[AnyRef] = {
-    val props = node.getPropertyList
-    val keyValues = new ArrayBuffer[AnyRef](4 + (2 * props.size()))
-    keyValues += T.id
-    keyValues += (node.getKey: JLong)
-    keyValues += T.label
-    keyValues += node.getType.name()
-    for (prop <- props.asScala) {
-      addProperties(keyValues, prop.getName.name, prop.getValue, interner)
-    }
-    keyValues.toArray
-  }
 }
