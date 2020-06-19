@@ -67,7 +67,7 @@ class NodeTypeStartersTests extends WordSpec with Matchers {
     }
 
     "should allow retrieving (used) types" in {
-      cpg.types.name.toSet shouldBe Set("ANY", "int", "void", "char * *")
+      cpg.typ.name.toSet shouldBe Set("ANY", "int", "void", "char * *")
     }
 
     "should allow retrieving namespaces" in {
