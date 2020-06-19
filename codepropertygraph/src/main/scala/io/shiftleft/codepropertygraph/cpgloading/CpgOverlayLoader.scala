@@ -90,7 +90,7 @@ private class CpgOverlayApplier(graph: OdbGraph) {
       val properties = node.getPropertyList.asScala.toSeq
         .map(prop => (prop.getName.name, prop.getValue))
         .map(ProtoToCpg.toProperty)
-    val newNode = graph + (node.getType.name, properties: _*)
+      val newNode = graph + (node.getType.name, properties: _*)
       inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
       overlayNodeIdToSrcGraphNode.put(node.getKey, newNode)
     }

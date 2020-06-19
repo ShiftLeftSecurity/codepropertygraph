@@ -20,12 +20,12 @@ object ProtoToCpg {
 
   private def toRegularType(value: PropertyValue)(implicit interner: StringInterner): Any =
     value.getValueCase match {
-      case INT_VALUE => value.getIntValue
-      case BOOL_VALUE => value.getBoolValue
-      case STRING_VALUE => interner.intern(value.getStringValue)
-      case STRING_LIST => value.getStringList.getValuesList.asScala.map(interner.intern).toList
+      case INT_VALUE     => value.getIntValue
+      case BOOL_VALUE    => value.getBoolValue
+      case STRING_VALUE  => interner.intern(value.getStringValue)
+      case STRING_LIST   => value.getStringList.getValuesList.asScala.map(interner.intern).toList
       case VALUE_NOT_SET => ()
-      case _ => throw new RuntimeException("Error: unsupported property case: " + value.getValueCase.name)
+      case _             => throw new RuntimeException("Error: unsupported property case: " + value.getValueCase.name)
     }
 }
 
