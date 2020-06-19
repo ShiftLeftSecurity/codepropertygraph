@@ -6,6 +6,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, PropertyValue}
+import io.shiftleft.utils.StringInterner
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.structure.T
 import overflowdb._
@@ -61,6 +62,9 @@ private[cpgloading] object CpgOverlayLoader {
 private class CpgOverlayApplier(graph: OdbGraph) {
   private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Node] = mutable.HashMap.empty
 
+  // TODO use centralised string interner everywhere, maybe move to odb core - keep in mind strong references / GC.
+  implicit val interner = StringInterner.noop
+
   /**
     * Applies diff to existing (loaded) OdbGraph
     */
@@ -83,34 +87,25 @@ private class CpgOverlayApplier(graph: OdbGraph) {
 
   private def addNodes(overlay: CpgOverlay, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
     overlay.getNodeList.asScala.foreach { node =>
-      // TODO use odb api: first refactor `ProtoToCpg.addProperties`
-      val properties = node.getPropertyList.asScala
-      val keyValues = new ArrayBuffer[AnyRef](2 + (2 * properties.size))
-      keyValues += T.label
-      keyValues += node.getType.name
-      properties.foreach { property =>
-        ProtoToCpg.addProperties(keyValues, property.getName.name, property.getValue)
+      val properties = node.getPropertyList.asScala.toSeq.map { prop =>
+        Property(prop.getName.name, ProtoToCpg.toRegularType(prop.getValue))
       }
-      val newNode = graph.graph.addVertex(keyValues.toArray: _*).asInstanceOf[StoredNode]
-      inverseBuilder.onNewNode(newNode)
+      val newNode = graph + (node.getType.name, properties: _*)
+      inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
       overlayNodeIdToSrcGraphNode.put(node.getKey, newNode)
     }
   }
 
   private def addEdges(overlay: CpgOverlay, inverseBuilder: DiffGraph.InverseBuilder) = {
     overlay.getEdgeList.asScala.foreach { edge =>
-      val srcOdbNode = getOdbNodeForOverlayId(edge.getSrc)
-      val dstOdbNode = getOdbNodeForOverlayId(edge.getDst)
+      val srcNode = getOdbNodeForOverlayId(edge.getSrc)
+      val dstNode = getOdbNodeForOverlayId(edge.getDst)
 
-      val properties = edge.getPropertyList.asScala
-      // TODO use odb api: first refactor `ProtoToCpg.addProperties`
-      val keyValues = new ArrayBuffer[AnyRef](2 * properties.size)
-      properties.foreach { property =>
-        ProtoToCpg.addProperties(keyValues, property.getName.name, property.getValue)
+      val properties = edge.getPropertyList.asScala.toSeq.map { prop =>
+        Property(prop.getName.name, ProtoToCpg.toRegularType(prop.getValue))
       }
-      val newEdge =
-        srcOdbNode.addEdge(edge.getType.toString, dstOdbNode, keyValues.toArray: _*)
-      inverseBuilder.onNewEdge(newEdge.asInstanceOf[OdbEdge])
+      val newEdge = srcNode --- (edge.getType.name, properties: _*) --> dstNode
+      inverseBuilder.onNewEdge(newEdge)
     }
   }
 

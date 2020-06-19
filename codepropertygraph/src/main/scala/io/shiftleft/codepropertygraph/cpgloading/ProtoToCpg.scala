@@ -1,6 +1,5 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import java.lang.{Boolean => JBoolean, Integer => JInt}
 import java.util.{NoSuchElementException, Collection => JCollection}
 
 import io.shiftleft.codepropertygraph.Cpg
@@ -11,37 +10,10 @@ import io.shiftleft.utils.StringInterner
 import org.apache.logging.log4j.{LogManager, Logger}
 import overflowdb._
 
-import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 
 object ProtoToCpg {
   val logger: Logger = LogManager.getLogger(classOf[ProtoToCpg])
-
-  def addProperties(keyValues: ArrayBuffer[AnyRef],
-                    name: String,
-                    value: PropertyValue,
-                    interner: StringInterner = StringInterner.noop): Unit = {
-    import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase._
-    value.getValueCase match {
-      case INT_VALUE =>
-        keyValues += interner.intern(name)
-        keyValues += (value.getIntValue: JInt)
-      case STRING_VALUE =>
-        keyValues += interner.intern(name)
-        keyValues += interner.intern(value.getStringValue)
-      case BOOL_VALUE =>
-        keyValues += interner.intern(name)
-        keyValues += (value.getBoolValue: JBoolean)
-      case STRING_LIST =>
-        value.getStringList.getValuesList.asScala.foreach { elem: String =>
-          keyValues += interner.intern(name)
-          keyValues += interner.intern(elem)
-        }
-      case VALUE_NOT_SET => ()
-      case _ =>
-        throw new RuntimeException("Error: unsupported property case: " + value.getValueCase.name)
-    }
-  }
 
   def toRegularType(value: PropertyValue)(implicit interner: StringInterner): Any =
     value.getValueCase match {
@@ -61,6 +33,7 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     OdbGraph.open(overflowConfig,
                   io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
                   io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava)
+  // TODO use centralised string interner everywhere, maybe move to odb core - keep in mind strong references / GC.
   implicit private val interner: StringInterner = StringInterner.makeStrongInterner()
 
   def addNodes(nodes: JCollection[Node]): Unit =
