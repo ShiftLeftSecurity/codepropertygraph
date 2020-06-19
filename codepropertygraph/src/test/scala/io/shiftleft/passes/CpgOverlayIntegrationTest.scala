@@ -144,7 +144,6 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
 
 object CpgOverlayIntegrationTest {
   private trait DummyProduct {
-    def getId: java.lang.Long = ???
     def canEqual(that: Any): Boolean = ???
     def productArity: Int = ???
     def productElement(n: Int): Any = ???

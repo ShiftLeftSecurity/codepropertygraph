@@ -126,7 +126,6 @@ class DiffGraphTest extends WordSpec with Matchers {
     override def containedNodesByLocalName = ???
     override def label = NodeTypes.UNKNOWN
     override def properties = Map(NodeKeyNames.CODE -> code)
-    def getId: java.lang.Long = ???
     def canEqual(that: Any): Boolean = ???
     def productArity: Int = ???
     def productElement(n: Int): Any = ???
