@@ -51,6 +51,13 @@ class Expression[NodeType <: nodes.Expression](val wrapped: NodeSteps[NodeType])
   /**
     * Traverse to surrounding call
     * */
+  def inCall: NodeSteps[nodes.Call] =
+    new NodeSteps(raw.repeat(_.in(EdgeTypes.ARGUMENT)).until(_.hasLabel(NodeTypes.CALL)).cast[nodes.Call])
+
+  /**
+    * Traverse to surrounding call
+    * */
+  @deprecated("Use inCall")
   def call: NodeSteps[nodes.Call] =
     new NodeSteps(raw.repeat(_.in(EdgeTypes.ARGUMENT)).until(_.hasLabel(NodeTypes.CALL)).cast[nodes.Call])
 

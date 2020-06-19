@@ -43,7 +43,7 @@ class CallGraphTests extends WordSpec with Matchers {
     }
 
     "should allow traversing from argument to call" in {
-      cpg.method.name("printf").callIn.argument.call.name.toSet shouldBe Set("printf")
+      cpg.method.name("printf").callIn.argument.inCall.name.toSet shouldBe Set("printf")
     }
 
   }
