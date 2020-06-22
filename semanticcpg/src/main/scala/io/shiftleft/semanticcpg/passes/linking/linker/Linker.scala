@@ -1,11 +1,9 @@
 package io.shiftleft.semanticcpg.passes.linking.linker
 
 import gremlin.scala._
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
-import io.shiftleft.semanticcpg.language.Steps
-import io.shiftleft.codepropertygraph.Cpg
-import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.logging.log4j.{LogManager, Logger}
 import overflowdb._
 import overflowdb.traversal._
@@ -18,7 +16,7 @@ import scala.jdk.CollectionConverters._
   * language frontends which do not provide method stubs and type decl stubs.
   */
 class Linker(cpg: Cpg) extends CpgPass(cpg) {
-  import Linker.linkToSingle, Linker.logFailedSrcLookup, Linker.logFailedDstLookup, Linker.logger
+  import Linker.{linkToSingle, logFailedDstLookup, logFailedSrcLookup, logger}
 
   private val typeDeclFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
   private val typeFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]

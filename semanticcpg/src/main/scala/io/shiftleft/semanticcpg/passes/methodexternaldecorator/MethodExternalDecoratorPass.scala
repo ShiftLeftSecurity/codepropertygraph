@@ -1,11 +1,11 @@
 package io.shiftleft.semanticcpg.passes.methodexternaldecorator
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.TypeDecl
 import io.shiftleft.codepropertygraph.generated.{NodeKeyNames, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import org.apache.logging.log4j.{LogManager, Logger}
+import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
 
@@ -24,7 +24,7 @@ class MethodExternalDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   private def isValidExternalFlag(isExternal: java.lang.Boolean): Boolean =
     isExternal != null
 
-  private def findMethodTypeDecl(method: nodes.Method): Option[Vertex] =
+  private def findMethodTypeDecl(method: nodes.Method): Option[nodes.StoredNode] =
     method._astIn.asScala.find(_.isInstanceOf[TypeDecl])
 
   private def methodTypeDeclHasIsExternal(method: nodes.Method): Boolean =
@@ -49,24 +49,23 @@ class MethodExternalDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    cpg.scalaGraph.V
-      .hasLabel(NodeTypes.METHOD)
-      .sideEffect {
-        case method: nodes.Method if !isValidExternalFlag(method.isExternal) =>
-          if (!methodTypeDeclHasIsExternal(method)) {
-            // default
-            setIsExtern(dstGraph, method, isExtern = false)
-          } else {
-            // take isExternal from type decl
-            setIsExtern(
-              dstGraph,
-              method,
-              isExtern = getExternalFromTypeDecl(method).getOrElse(false)
-            )
-          }
-        case _ => // all other methods are fine
+    // TODO MP use `cpg.method` once that's defined in odb api
+    Traversal(cpg.graph.nodesByLabel(NodeTypes.METHOD))
+      .cast[nodes.Method]
+      .filterNot(method => isValidExternalFlag(method.isExternal))
+      .foreach { method =>
+        if (!methodTypeDeclHasIsExternal(method)) {
+          // default
+          setIsExtern(dstGraph, method, isExtern = false)
+        } else {
+          // take isExternal from type decl
+          setIsExtern(
+            dstGraph,
+            method,
+            isExtern = getExternalFromTypeDecl(method).getOrElse(false)
+          )
+        }
       }
-      .iterate
 
     Iterator(dstGraph.build())
   }
