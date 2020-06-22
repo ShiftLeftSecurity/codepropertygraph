@@ -1,13 +1,12 @@
 package io.shiftleft.semanticcpg.passes.linking.calllinker
 
-import gremlin.scala._
+import io.shiftleft.Implicits._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.Implicits._
-import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.logging.log4j.{LogManager, Logger}
+import overflowdb.traversal.Traversal
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -24,13 +23,10 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    cpg.scalaGraph.V
-      .hasLabel(NodeTypes.METHOD)
-      .sideEffectWithTraverser { traverser =>
-        val method = traverser.get.asInstanceOf[nodes.Method]
-        methodFullNameToNode.put(method.fullName, method)
-      }
-      .iterate()
+    // TODO MP use `cpg.method` once that's defined in odb api
+    Traversal(cpg.graph.nodesByLabel(NodeTypes.METHOD)).cast[nodes.Method].foreach { method =>
+      methodFullNameToNode.put(method.fullName, method)
+    }
 
     cpg.call.toIterator().foreach { call =>
       try {
