@@ -4,11 +4,11 @@ import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language.Steps
-import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import org.apache.tinkerpop.gremlin.structure.Direction
-import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.logging.log4j.{LogManager, Logger}
+import overflowdb._
+import overflowdb.traversal._
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -140,75 +140,57 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
                                                                 dstFullNameKey: String,
                                                                 dstGraph: DiffGraph.Builder): Unit = {
     var loggedDeprecationWarning = false
-    cpg.scalaGraph.V
-      .hasLabel(srcLabels.head, srcLabels.tail: _*)
-      .sideEffect {
-        case srcNode: SRC_NODE_TYPE @unchecked =>
-          if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
-            getDstFullNames(srcNode).foreach { dstFullName =>
-              dstNodeMap.get(dstFullName) match {
-                case Some(dstNode) =>
-                  dstGraph.addEdgeInOriginal(srcNode, dstNode, edgeType)
-                case None =>
-                  logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
-              }
-            }
-          } else {
-            val dstFullNames = srcNode
-              .vertices(Direction.OUT, edgeType)
-              .asScala
-              .map(_.value2(NodeKeys.FULL_NAME))
-              .iterator
-              .to(Iterable)
-            srcNode.removeProperty(Key(dstFullNameKey))
-            dstFullNames.foreach { name =>
-              srcNode.property(Cardinality.list, dstFullNameKey, name)
-            }
-            if (!loggedDeprecationWarning) {
-              logger.warn(
-                s"Using deprecated CPG format with already existing $edgeType edge between" +
-                  s" a source node of type $srcLabels and a $dstNodeLabel node.")
-              loggedDeprecationWarning = true
-            }
+    // TODO MP use `cpg.local` once that's defined in odb api
+    Traversal(cpg.graph.nodesByLabel(srcLabels: _*)).cast[SRC_NODE_TYPE].foreach { srcNode =>
+      if (!srcNode.outE(edgeType).hasNext) {
+        getDstFullNames(srcNode).foreach { dstFullName =>
+          dstNodeMap.get(dstFullName) match {
+            case Some(dstNode) => dstGraph.addEdgeInOriginal(srcNode, dstNode, edgeType)
+            case None          => logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
           }
+        }
+      } else {
+        val dstFullNames = srcNode.out(edgeType).property(NodeKeysOdb.FULL_NAME).l
+        srcNode.setProperty(dstFullNameKey, dstFullNames)
+        if (!loggedDeprecationWarning) {
+          logger.warn(
+            s"Using deprecated CPG format with already existing $edgeType edge between" +
+              s" a source node of type $srcLabels and a $dstNodeLabel node.")
+          loggedDeprecationWarning = true
+        }
       }
-      .iterate()
+    }
   }
 
   private def linkAstChildToParent(dstGraph: DiffGraph.Builder): Unit = {
-    cpg.scalaGraph.V
-      .hasLabel(NodeTypes.METHOD, NodeTypes.TYPE_DECL)
-      .sideEffect {
-        case astChild: nodes.HasAstParentType with nodes.HasAstParentFullName with nodes.StoredNode =>
-          astChild.edges(Direction.IN, EdgeTypes.AST).nextOption match {
-            case None =>
-              val astParentOption: Option[nodes.StoredNode] =
-                astChild.astParentType match {
-                  case NodeTypes.METHOD          => methodFullNameToNode.get(astChild.astParentFullName)
-                  case NodeTypes.TYPE_DECL       => typeDeclFullNameToNode.get(astChild.astParentFullName)
-                  case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode.get(astChild.astParentFullName)
-                  case _ =>
-                    logger.error(
-                      s"Invalid AST_PARENT_TYPE=${astChild.valueOption(NodeKeys.AST_PARENT_FULL_NAME)};" +
-                        s" astChild LABEL=${astChild.label};" +
-                        s" astChild FULL_NAME=${astChild.valueOption(NodeKeys.FULL_NAME)}")
-                    None
-                }
-
-              astParentOption match {
-                case Some(astParent) =>
-                  dstGraph.addEdgeInOriginal(astParent, astChild, EdgeTypes.AST)
-                case None =>
-                  logFailedSrcLookup(EdgeTypes.AST,
-                                     astChild.astParentType,
-                                     astChild.astParentFullName,
-                                     astChild.label,
-                                     astChild.id.toString())
-              }
+    Traversal(cpg.graph.nodesByLabel(NodeTypes.METHOD, NodeTypes.TYPE_DECL))
+      .cast[nodes.HasAstParentType with nodes.HasAstParentFullName with nodes.StoredNode]
+      .filter(astChild => astChild.inE(EdgeTypes.AST).isEmpty)
+      .foreach { astChild =>
+        val astParentOption: Option[nodes.StoredNode] =
+          astChild.astParentType match {
+            case NodeTypes.METHOD          => methodFullNameToNode.get(astChild.astParentFullName)
+            case NodeTypes.TYPE_DECL       => typeDeclFullNameToNode.get(astChild.astParentFullName)
+            case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode.get(astChild.astParentFullName)
             case _ =>
+              logger.error(
+                s"Invalid AST_PARENT_TYPE=${astChild.valueOption(NodeKeys.AST_PARENT_FULL_NAME)};" +
+                  s" astChild LABEL=${astChild.label};" +
+                  s" astChild FULL_NAME=${astChild.valueOption(NodeKeys.FULL_NAME)}")
+              None
           }
+
+        astParentOption match {
+          case Some(astParent) =>
+            dstGraph.addEdgeInOriginal(astParent, astChild, EdgeTypes.AST)
+          case None =>
+            logFailedSrcLookup(EdgeTypes.AST,
+                               astChild.astParentType,
+                               astChild.astParentFullName,
+                               astChild.label,
+                               astChild.id.toString)
+        }
       }
-      .iterate()
   }
 }
 
@@ -230,20 +212,16 @@ object Linker {
                    dstGraph: DiffGraph.Builder,
                    dstNotExistsHandler: Option[(nodes.StoredNode, String) => Unit]): Unit = {
     var loggedDeprecationWarning = false
-    val sourceTraversal = cpg.scalaGraph.V.hasLabel(srcLabels.head, srcLabels.tail: _*)
-    val sourceIterator = new Steps(sourceTraversal).toIterator()
-    sourceIterator.foreach { srcNode =>
+    Traversal(cpg.graph.nodesByLabel(srcLabels: _*)).foreach { srcNode =>
       // If the source node does not have any outgoing edges of this type
       // This check is just required for backward compatibility
-      if (!srcNode.edges(Direction.OUT, edgeType).hasNext) {
-        srcNode.valueOption[String](dstFullNameKey).foreach { dstFullName =>
+      if (srcNode.outE(edgeType).isEmpty) {
+        srcNode.propertyOption(PropertyKey[String](dstFullNameKey)).foreach { dstFullName =>
           // for `UNKNOWN` this is not always set, so we're using an Option here
           val srcStoredNode = srcNode.asInstanceOf[nodes.StoredNode]
-          val dstNode: Option[nodes.StoredNode] = dstNodeMap.get(dstFullName)
-          dstNode match {
-            case Some(dstNodeInner) =>
-              dstGraph
-                .addEdgeInOriginal(srcStoredNode, dstNodeInner, edgeType)
+          dstNodeMap.get(dstFullName) match {
+            case Some(dstNode) =>
+              dstGraph.addEdgeInOriginal(srcStoredNode, dstNode, edgeType)
             case None =>
               if (dstNotExistsHandler.isDefined) {
                 dstNotExistsHandler.get(srcStoredNode, dstFullName)
@@ -253,8 +231,7 @@ object Linker {
           }
         }
       } else {
-        val maybeDstFullName = srcNode.vertices(Direction.OUT, edgeType).nextOption.map(_.value2(NodeKeys.FULL_NAME))
-        maybeDstFullName match {
+        srcNode.out(edgeType).property(NodeKeysOdb.FULL_NAME).nextOption match {
           case Some(dstFullName) => srcNode.property(dstFullNameKey, dstFullName)
           case None              => logger.error(s"Missing outgoing edge of type ${edgeType} from node ${srcNode}")
         }
