@@ -5,7 +5,6 @@ import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
 import java.lang.{Long => JLong}
 
 import com.google.protobuf.ByteString
-import gremlin.scala.Edge
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.proto.cpg.Cpg.{
   AdditionalEdgeProperty,
@@ -129,10 +128,10 @@ class DiffGraphProtoSerializer {
   private def removeNodeProto(nodeId: Long) =
     DiffGraphProto.RemoveNode.newBuilder.setKey(nodeId).build
 
-  private def removeEdgeProto(edge: Edge) =
+  private def removeEdgeProto(edge: OdbEdge) =
     DiffGraphProto.RemoveEdge.newBuilder
-      .setOutNodeKey(edge.outVertex.id.asInstanceOf[Long])
-      .setInNodeKey(edge.inVertex.id.asInstanceOf[Long])
+      .setOutNodeKey(edge.outNode.id2)
+      .setInNodeKey(edge.inNode.id2)
       .setEdgeType(EdgeType.valueOf(edge.label))
       .setPropertiesHash(ByteString.copyFrom(DiffGraph.propertiesHash(edge.asInstanceOf[OdbEdge])))
       .build
@@ -143,10 +142,10 @@ class DiffGraphProtoSerializer {
       .setName(NodePropertyName.valueOf(propertyKey))
       .build
 
-  private def removeEdgePropertyProto(edge: Edge, propertyKey: String) =
+  private def removeEdgePropertyProto(edge: OdbEdge, propertyKey: String) =
     DiffGraphProto.RemoveEdgeProperty.newBuilder
-      .setOutNodeKey(edge.outVertex.id.asInstanceOf[Long])
-      .setInNodeKey(edge.inVertex.id.asInstanceOf[Long])
+      .setOutNodeKey(edge.outNode.id2)
+      .setInNodeKey(edge.inNode.id2)
       .setEdgeType(EdgeType.valueOf(edge.label))
       .setPropertyName(EdgePropertyName.valueOf(propertyKey))
       .build
@@ -172,14 +171,15 @@ class DiffGraphProtoSerializer {
       .setProperty(nodeProperty(key, value))
       .build
 
-  private def addEdgeProperty(edge: Edge, key: String, value: AnyRef): AdditionalEdgeProperty =
+  private def addEdgeProperty(edge: OdbEdge, key: String, value: AnyRef): AdditionalEdgeProperty =
     AdditionalEdgeProperty.newBuilder
-      .setOutNodeKey(edge.outVertex.id.asInstanceOf[Long])
-      .setInNodeKey(edge.inVertex.id.asInstanceOf[Long])
+      .setOutNodeKey(edge.outNode.id2)
+      .setInNodeKey(edge.inNode.id2)
       .setEdgeType(EdgeType.valueOf(edge.label))
-      .setProperty(CpgStruct.Edge.Property.newBuilder
-        .setName(EdgePropertyName.valueOf(key))
-        .setValue(protoValue(value)))
+      .setProperty(
+        CpgStruct.Edge.Property.newBuilder
+          .setName(EdgePropertyName.valueOf(key))
+          .setValue(protoValue(value)))
       .build
 
   private def protoValue(value: Any): PropertyValue.Builder = {

@@ -1,14 +1,14 @@
 package io.shiftleft.semanticcpg.passes.codepencegraph
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.Method
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
-import org.apache.logging.log4j.LogManager
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeysOdb, nodes}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
-import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominatorFrontier, ReverseCpgCfgAdapter}
-import org.apache.tinkerpop.gremlin.structure.Direction
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominatorFrontier, ReverseCpgCfgAdapter}
+import org.apache.logging.log4j.LogManager
+import org.apache.tinkerpop.gremlin.structure.Direction
+import overflowdb._
 
 import scala.jdk.CollectionConverters._
 
@@ -38,11 +38,11 @@ class CdgPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
                                        EdgeTypes.CDG)
           }
           case _ =>
-            val method = postDomFrontierNode.vertices(Direction.IN, EdgeTypes.CONTAINS).next
+            val method = postDomFrontierNode.in(EdgeTypes.CONTAINS).next
             val nodeLabel = postDomFrontierNode.label
             logger.warn(s"Found CDG edge starting at $nodeLabel node. This is most likely caused by an invalid CFG." +
-              s" Method: ${method.valueOption(NodeKeys.FULL_NAME)}" +
-              s" number of outgoing CFG edges from $nodeLabel node: ${postDomFrontierNode.edges(Direction.OUT, EdgeTypes.CFG).asScala.size}")
+              s" Method: ${method.propertyOption(NodeKeysOdb.FULL_NAME)}" +
+              s" number of outgoing CFG edges from $nodeLabel node: ${postDomFrontierNode.outE(EdgeTypes.CFG).asScala.size}")
         }
     }
     Some(dstGraph.build())
