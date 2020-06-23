@@ -22,8 +22,7 @@ class CdgPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   override def runOnPart(method: nodes.Method): Option[DiffGraph] = {
 
-    val dominanceFrontier =
-      new CfgDominatorFrontier(new ReverseCpgCfgAdapter, new CpgPostDomTreeAdapter)
+    val dominanceFrontier = new CfgDominatorFrontier(new ReverseCpgCfgAdapter, new CpgPostDomTreeAdapter)
 
     implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
 
