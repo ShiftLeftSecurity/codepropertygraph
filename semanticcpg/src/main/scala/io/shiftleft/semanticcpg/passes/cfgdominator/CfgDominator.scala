@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.passes.cfgdominator
 
-class CfgDominator[N](adapter: CfgAdapter[N]) {
+class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
 
   /**
     * Calculates the immediate dominators of all CFG nodes reachable from cfgEntry.
@@ -10,7 +10,7 @@ class CfgDominator[N](adapter: CfgAdapter[N]) {
     * The used algorithm is from: "A Simple, Fast Dominance Algorithm" from
     * "Keith D. Cooper, Timothy J. Harvey, and Ken Kennedy".
     */
-  def calculate(cfgEntry: N): Map[N, N] = {
+  def calculate(cfgEntry: NodeType): Map[NodeType, NodeType] = {
     val UNDEFINED = -1
     val postOrderNumbering = createPostOrderNumbering(cfgEntry)
     val indexOf = postOrderNumbering.withDefaultValue(UNDEFINED) // Index of each node into dominators array.
@@ -87,10 +87,10 @@ class CfgDominator[N](adapter: CfgAdapter[N]) {
     finger1
   }
 
-  private def createPostOrderNumbering(cfgEntry: N): Map[N, Int] = {
+  private def createPostOrderNumbering(cfgEntry: NodeType): Map[NodeType, Int] = {
     var stack = (cfgEntry, adapter.successors(cfgEntry).iterator) :: Nil
-    var visited = Set.empty[N]
-    var numbering = Map.empty[N, Int]
+    var visited = Set.empty[NodeType]
+    var numbering = Map.empty[NodeType, Int]
     var nextNumber = 0
 
     while (stack.nonEmpty) {
