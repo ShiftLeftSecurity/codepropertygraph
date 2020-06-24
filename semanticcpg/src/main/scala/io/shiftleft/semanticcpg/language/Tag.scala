@@ -2,8 +2,6 @@ package io.shiftleft.semanticcpg.language
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.semanticcpg.language.types.expressions.{Call, IdentifierTrav, Literal}
-import io.shiftleft.semanticcpg.language.types.structure._
 
 class Tag(val wrapped: NodeSteps[nodes.Tag]) extends AnyVal {
   private def raw: GremlinScala[nodes.Tag] = wrapped.raw

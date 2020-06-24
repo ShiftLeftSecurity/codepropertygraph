@@ -1,11 +1,11 @@
 package io.shiftleft.semanticcpg.passes.cfgdominator
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
+import overflowdb.Node
 
 /**
   * This pass has no prerequisites.
@@ -26,14 +26,13 @@ class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val cfgNodeToImmediateDominator = dominatorCalculator.calculate(method)
     addDomTreeEdges(dstGraph, cfgNodeToImmediateDominator)
 
-    val cfgNodeToPostImmediateDominator =
-      postDominatorCalculator.calculate(method.asInstanceOf[nodes.Method].methodReturn)
+    val cfgNodeToPostImmediateDominator = postDominatorCalculator.calculate(method.methodReturn)
     addPostDomTreeEdges(dstGraph, cfgNodeToPostImmediateDominator)
 
     Some(dstGraph.build())
   }
 
-  private def addDomTreeEdges(dstGraph: DiffGraph.Builder, cfgNodeToImmediateDominator: Map[Vertex, Vertex]): Unit = {
+  private def addDomTreeEdges(dstGraph: DiffGraph.Builder, cfgNodeToImmediateDominator: Map[Node, Node]): Unit = {
     // TODO do not iterate over potential hash map to ensure same interation order for
     // edge creation.
     cfgNodeToImmediateDominator.foreach {
@@ -45,7 +44,7 @@ class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   }
 
   private def addPostDomTreeEdges(dstGraph: DiffGraph.Builder,
-                                  cfgNodeToPostImmediateDominator: Map[Vertex, Vertex]): Unit = {
+                                  cfgNodeToPostImmediateDominator: Map[Node, Node]): Unit = {
     // TODO do not iterate over potential hash map to ensure same interation order for
     // edge creation.
     cfgNodeToPostImmediateDominator.foreach {

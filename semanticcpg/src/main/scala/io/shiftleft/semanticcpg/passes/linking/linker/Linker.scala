@@ -1,6 +1,5 @@
 package io.shiftleft.semanticcpg.passes.linking.linker
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
@@ -172,9 +171,9 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
             case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode.get(astChild.astParentFullName)
             case _ =>
               logger.error(
-                s"Invalid AST_PARENT_TYPE=${astChild.valueOption(NodeKeys.AST_PARENT_FULL_NAME)};" +
+                s"Invalid AST_PARENT_TYPE=${astChild.propertyOption(NodeKeysOdb.AST_PARENT_FULL_NAME)};" +
                   s" astChild LABEL=${astChild.label};" +
-                  s" astChild FULL_NAME=${astChild.valueOption(NodeKeys.FULL_NAME)}")
+                  s" astChild FULL_NAME=${astChild.propertyOption(NodeKeysOdb.FULL_NAME)}")
               None
           }
 

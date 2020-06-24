@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.cfgdominator
 
 import scala.collection.mutable
 
-class CfgDominatorFrontier[Node](cfgAdapter: CfgAdapter[Node], domTreeAdapter: DomTreeAdapter[Node]) {
+class CfgDominatorFrontier[NodeType](cfgAdapter: CfgAdapter[NodeType], domTreeAdapter: DomTreeAdapter[NodeType]) {
 
   /**
     * Calculates a the dominator frontier for a set of CFG nodes.
@@ -11,8 +11,8 @@ class CfgDominatorFrontier[Node](cfgAdapter: CfgAdapter[Node], domTreeAdapter: D
     * The used algorithm is from: "A Simple, Fast Dominance Algorithm" from
     * "Keith D. Cooper, Timothy J. Harvey, and Ken Kennedy".
     */
-  def calculate(allCfgNodes: Seq[Node]): mutable.MultiDict[Node, Node] = {
-    val domFrontier = mutable.MultiDict.empty[Node, Node]
+  def calculate(allCfgNodes: Seq[NodeType]): mutable.MultiDict[NodeType, NodeType] = {
+    val domFrontier = mutable.MultiDict.empty[NodeType, NodeType]
 
     allCfgNodes.foreach { joinCandiate =>
       val predecessors = cfgAdapter.predecessors(joinCandiate).iterator.to(Seq)

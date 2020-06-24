@@ -2,20 +2,21 @@ package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import java.nio.file.Paths
 
-import gremlin.scala._
+import gremlin.scala.ScalaGraph
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{Call, FieldIdentifier, Identifier, Literal, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
-import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
+import overflowdb.{Node, OdbEdge}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
-  val dfHelper = new DataFlowFrameworkHelper(cpg.graph)
+  val dfHelper = new DataFlowFrameworkHelper
 
   override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
 
@@ -65,8 +66,8 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     Some(dstGraph.build())
   }
 
-  /** Pruned DDG, i.e., two call assignment vertices are adjacent if a
-    * reaching definition edge reaches a vertex where the definition is used.
+  /** Pruned DDG, i.e., two call assignment nodes are adjacent if a
+    * reaching definition edge reaches a node where the definition is used.
     * The final representation makes it straightforward to build def-use/use-def chains */
   private def addReachingDefEdge(dstGraph: DiffGraph.Builder,
                                  method: nodes.Method,
@@ -152,9 +153,9 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
     buf.append("digraph g {\n node[shape=plaintext];\n")
 
-    graph.E.hasLabel(EdgeTypes.REACHING_DEF).l.foreach { e =>
-      val inV = vertexToStr(e.inVertex).replace("\"", "\'")
-      val outV = vertexToStr(e.outVertex).replace("\"", "\'")
+    graph.E.hasLabel(EdgeTypes.REACHING_DEF).l.map(_.asInstanceOf[OdbEdge]).foreach { e =>
+      val inV = nodeToStr(e.inNode).replace("\"", "\'")
+      val outV = nodeToStr(e.outNode).replace("\"", "\'")
       buf.append(s""" "$outV" -> "$inV";\n """)
     }
     buf.append("}")
@@ -162,15 +163,15 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   }
 
   /** For debug purposes */
-  def vertexToStr(vertex: Vertex): String = {
+  def nodeToStr(node: Node): String = {
     try {
-      val method = ExpandTo.expressionToMethod(vertex.asInstanceOf[nodes.Expression])
+      val method = ExpandTo.expressionToMethod(node.asInstanceOf[nodes.Expression])
       val fileName = ExpandTo.methodToFile(method) match {
-        case Some(objFile) => objFile.value2(NodeKeys.NAME)
+        case Some(objFile) => objFile.name
         case None          => "NA"
       }
 
-      s"${Paths.get(fileName).getFileName.toString}: ${vertex.value2(NodeKeys.LINE_NUMBER).toString} ${vertex.value2(NodeKeys.CODE)}"
+      s"${Paths.get(fileName).getFileName.toString}: ${node.property2(NodeKeyNames.LINE_NUMBER)} ${node.property2(NodeKeyNames.CODE)}"
     } catch {
       case _: Exception => ""
     }
@@ -203,7 +204,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 }
 
 /** Common functionalities needed for data flow frameworks */
-class DataFlowFrameworkHelper(graph: ScalaGraph) {
+class DataFlowFrameworkHelper {
 
   private def callToMethodParamOut(call: nodes.StoredNode): Iterable[nodes.StoredNode] = {
     NoResolve
@@ -211,9 +212,8 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
       .flatMap(method => ExpandTo.methodToOutParameters(method))
   }
 
-  private def filterArgumentIndex(vertexList: List[nodes.StoredNode],
-                                  orderSeq: Iterable[Int]): List[nodes.StoredNode] = {
-    vertexList.filter(v => orderSeq.exists(_ == v.asInstanceOf[nodes.HasArgumentIndex].argumentIndex.toInt))
+  private def filterArgumentIndex(nodeList: List[nodes.StoredNode], orderSeq: Iterable[Int]): List[nodes.StoredNode] = {
+    nodeList.filter(node => orderSeq.exists(_ == node.asInstanceOf[nodes.HasArgumentIndex].argumentIndex.toInt))
   }
 
   def getExpressions(method: nodes.Method): List[nodes.Call] =
@@ -242,20 +242,20 @@ class DataFlowFrameworkHelper(graph: ScalaGraph) {
     getOperation(genVertex).filter(_.isInstanceOf[nodes.Call])
   }
 
-  /** Returns a set of vertices that are killed by the passed vertex */
-  def killsVertices(vertex: nodes.StoredNode): Set[nodes.StoredNode] = {
-    val localRefIt = vertex._refOut.asScala
+  /** Returns a set of nodes that are killed by the passed nodes */
+  def killsVertices(node: nodes.StoredNode): Set[nodes.StoredNode] = {
+    val localRefIt = node._refOut.asScala
 
     if (!localRefIt.hasNext) {
       Set()
     } else {
       val localRef = localRefIt.next
-      localRef._refIn.asScala.filter(_.id != vertex.id).toSet
+      localRef._refIn.asScala.filter(_.id != node.id2).toSet
     }
   }
 
-  def kills(vertex: Set[nodes.StoredNode]): Set[nodes.StoredNode] = {
-    vertex.map(v => killsVertices(v)).fold(Set())((v1, v2) => v1.union(v2))
+  def kills(node: Set[nodes.StoredNode]): Set[nodes.StoredNode] = {
+    node.map(v => killsVertices(v)).fold(Set())((v1, v2) => v1.union(v2))
   }
 
   def expressionsToKillMap(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
