@@ -2,8 +2,7 @@ package io.shiftleft.cpgvalidator
 
 import io.shiftleft.codepropertygraph.generated.NodeKeysOdb
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.Cardinality
-import org.apache.tinkerpop.gremlin.structure.Direction
-import overflowdb.{Node, OdbEdge}
+import overflowdb.{Direction, Node, OdbEdge}
 import scala.jdk.CollectionConverters._
 
 sealed trait ValidationError {

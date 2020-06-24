@@ -1,7 +1,7 @@
 package io.shiftleft.cpgvalidator
 
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.Cardinality
-import org.apache.tinkerpop.gremlin.structure.Direction
+import overflowdb.Direction
 
 sealed trait ValidationErrorCategory
 
