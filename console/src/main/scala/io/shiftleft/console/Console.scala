@@ -25,8 +25,10 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
   def config: ConsoleConfig = _config
   def console: Console[T] = this
 
-  protected val workspacePathName: String = config.install.rootPath.path.resolve("workspace").toString
-  protected val workspaceManager = new WorkspaceManager[T](workspacePathName, loader)
+  protected var workspaceManager: WorkspaceManager[T] = _
+  switchWorkspace(config.install.rootPath.path.resolve("workspace").toString)
+  protected def workspacePathName: String = workspaceManager.getPath
+
   private val nameOfCpgInProject = "cpg.bin"
 
   implicit object ConsoleImageViewer extends ImageViewer {
@@ -77,6 +79,27 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     "workspace"
   )
   def workspace: WorkspaceManager[T] = workspaceManager
+
+  @Doc(
+    "Close current workspace and open a different one",
+    """ | By default, the workspace in $INSTALL_DIR/workspace is used.
+      | This method allows specifying a different workspace directory
+      | via the `pathName` parameter.
+      | Before changing the workspace, the current workspace will be
+      | closed, saving any unsaved changes.
+      | If `pathName` points to a non-existing directory, then a new
+      | workspace is first created.
+      |""".stripMargin
+  )
+  def switchWorkspace(pathName: String): Unit = {
+    if (workspaceManager != null) {
+      report("Saving current workspace before changing workspace")
+      workspaceManager.projects.foreach { p =>
+        p.close
+      }
+    }
+    workspaceManager = new WorkspaceManager[T](pathName, loader)
+  }
 
   @Doc("Currently active project", "", "project")
   def project: T =

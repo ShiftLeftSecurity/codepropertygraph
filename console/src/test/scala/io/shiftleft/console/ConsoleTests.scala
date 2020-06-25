@@ -3,7 +3,7 @@ package io.shiftleft.console
 import java.io.FileOutputStream
 import java.util.zip.ZipOutputStream
 
-import better.files.Dsl.cp
+import better.files.Dsl._
 import better.files._
 import io.shiftleft.codepropertygraph.Cpg
 import org.scalatest.{Matchers, WordSpec}
@@ -326,7 +326,39 @@ class ConsoleTests extends WordSpec with Matchers {
       console.undo
       console.cpg.metaData.map(_.overlays).head.last shouldBe "semanticcpg"
     }
+  }
 
+  "switchWorkspace" should {
+
+    "create workspace if directory does not exist" in ConsoleFixture() { (console, _) =>
+      val otherWorkspaceDir = ("/tmp" / "workspace-doesNotExist")
+      try {
+        otherWorkspaceDir.exists shouldBe false
+        console.switchWorkspace(otherWorkspaceDir.path.toString)
+        otherWorkspaceDir.exists shouldBe true
+      } finally {
+        otherWorkspaceDir.delete()
+        otherWorkspaceDir.exists shouldBe false
+      }
+    }
+
+    "allow changing workspaces" in ConsoleFixture() { (console, codeDir) =>
+      val firstWorkspace = File(console.workspace.getPath)
+      File.usingTemporaryDirectory("console") { otherWorkspaceDir =>
+        console.importCode(codeDir.toString, "projectInFirstWorkspace")
+        console.workspace.numberOfProjects shouldBe 1
+        console.switchWorkspace(otherWorkspaceDir.path.toString)
+        console.workspace.numberOfProjects shouldBe 0
+
+        console.importCode(codeDir.toString, "projectInSecondWorkspace")
+        console.workspace.numberOfProjects shouldBe 1
+        console.project.name shouldBe "projectInSecondWorkspace"
+        console.switchWorkspace(firstWorkspace.path.toString)
+        console.workspace.numberOfProjects shouldBe 1
+        console.open("projectInFirstWorkspace")
+        console.project.name shouldBe "projectInFirstWorkspace"
+      }
+    }
   }
 
 }
