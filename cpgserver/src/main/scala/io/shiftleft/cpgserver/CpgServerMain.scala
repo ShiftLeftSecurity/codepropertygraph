@@ -34,7 +34,7 @@ object CpgServerMain extends IOApp {
     ServerConfiguration.config.getOrElse(ServerConfiguration.default)
 
   private val httpRoutes =
-    CpgRoute(cpgProvider, ammoniteExecutor, serverConfig.files).routes <+> SwaggerRoute().routes
+    CpgRoute(cpgProvider, ammoniteExecutor).routes <+> SwaggerRoute().routes
 
   override def run(args: List[String]): IO[ExitCode] = {
     BlazeServerBuilder[IO]
