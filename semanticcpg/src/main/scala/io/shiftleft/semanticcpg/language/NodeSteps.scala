@@ -23,6 +23,21 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
   )
   def label: Steps[String] = new Steps(raw.label)
 
+  @Doc("Traverse to ids of underlying nodes")
+  def id: Steps[Long] = new Steps(raw.map(_.id2))
+
+  @Doc("Filter: only keep node with given id")
+  def id(value: Long): Steps[NodeType] =
+    new Steps(raw.filterOnEnd(_.id2 == value))
+
+  @Doc("Filter: only keep nodes with given ids")
+  def id(values: Long*): Steps[NodeType] =
+    id(Set(values: _*))
+
+  @Doc("Filter: only keep nodes with given ids")
+  def id(values: Set[Long]): Steps[NodeType] =
+    new Steps(raw.filterOnEnd(node => values.contains(node.id2)))
+
   @Doc(
     "The source file this code is in",
     """
