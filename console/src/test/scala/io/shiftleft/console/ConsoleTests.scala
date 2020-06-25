@@ -328,13 +328,13 @@ class ConsoleTests extends WordSpec with Matchers {
     }
   }
 
-  "changeWorkspace" should {
+  "switchWorkspace" should {
 
     "create workspace if directory does not exist" in ConsoleFixture() { (console, _) =>
       val otherWorkspaceDir = ("/tmp" / "workspace-doesNotExist")
       try {
         otherWorkspaceDir.exists shouldBe false
-        console.changeWorkspace(otherWorkspaceDir.path.toString)
+        console.switchWorkspace(otherWorkspaceDir.path.toString)
         otherWorkspaceDir.exists shouldBe true
       } finally {
         otherWorkspaceDir.delete()
@@ -347,13 +347,13 @@ class ConsoleTests extends WordSpec with Matchers {
       File.usingTemporaryDirectory("console") { otherWorkspaceDir =>
         console.importCode(codeDir.toString, "projectInFirstWorkspace")
         console.workspace.numberOfProjects shouldBe 1
-        console.changeWorkspace(otherWorkspaceDir.path.toString)
+        console.switchWorkspace(otherWorkspaceDir.path.toString)
         console.workspace.numberOfProjects shouldBe 0
 
         console.importCode(codeDir.toString, "projectInSecondWorkspace")
         console.workspace.numberOfProjects shouldBe 1
         console.project.name shouldBe "projectInSecondWorkspace"
-        console.changeWorkspace(firstWorkspace.path.toString)
+        console.switchWorkspace(firstWorkspace.path.toString)
         console.workspace.numberOfProjects shouldBe 1
         console.open("projectInFirstWorkspace")
         console.project.name shouldBe "projectInFirstWorkspace"

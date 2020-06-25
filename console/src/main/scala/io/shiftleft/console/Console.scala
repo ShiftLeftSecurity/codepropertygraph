@@ -26,7 +26,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
   def console: Console[T] = this
 
   protected var workspaceManager: WorkspaceManager[T] = _
-  changeWorkspace(config.install.rootPath.path.resolve("workspace").toString)
+  switchWorkspace(config.install.rootPath.path.resolve("workspace").toString)
   protected def workspacePathName: String = workspaceManager.getPath
 
   private val nameOfCpgInProject = "cpg.bin"
@@ -91,7 +91,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
       | workspace is first created.
       |""".stripMargin
   )
-  def changeWorkspace(pathName: String): Unit = {
+  def switchWorkspace(pathName: String): Unit = {
     if (workspaceManager != null) {
       report("Saving current workspace before changing workspace")
       workspaceManager.projects.foreach { p =>
