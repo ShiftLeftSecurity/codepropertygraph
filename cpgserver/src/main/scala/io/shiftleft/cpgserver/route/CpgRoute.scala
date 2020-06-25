@@ -1,31 +1,26 @@
 package io.shiftleft.cpgserver.route
 
-import cats.effect.{Blocker, ContextShift, IO}
+import cats.effect.{ContextShift, IO}
 import cats.implicits.catsStdInstancesForList
 import cats.syntax.foldable._
-import fs2.Pipe
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s._
 import org.http4s.circe._
 import org.http4s.dsl.io._
-import org.http4s.multipart.{Multipart, Part}
 import org.slf4j.LoggerFactory
 
-import io.shiftleft.cpgserver.config.ServerFilesConfiguration
 import io.shiftleft.cpgserver.cpg.CpgProvider
 import io.shiftleft.cpgserver.query.{CpgOperationFailure, CpgOperationSuccess, ServerAmmoniteExecutor}
 
-import java.nio.file.{Files, Path => JPath, Paths}
+import java.nio.file.{Files, Paths}
 import java.util.UUID
-import java.util.concurrent.Executors
 
 import scala.util.control.NonFatal
 
-final class CpgRoute(
-    cpgProvider: CpgProvider,
-    cpgQueryExecutor: ServerAmmoniteExecutor,
-    config: ServerFilesConfiguration)(implicit httpErrorHandler: HttpErrorHandler, cs: ContextShift[IO]) {
+final class CpgRoute(cpgProvider: CpgProvider, cpgQueryExecutor: ServerAmmoniteExecutor)(
+    implicit httpErrorHandler: HttpErrorHandler,
+    cs: ContextShift[IO]) {
 
   import CpgRoute._
 
@@ -47,57 +42,6 @@ final class CpgRoute(
         case false =>
           BadRequest(ApiError("One or more of the specified files do not exist.").asJson)
       }
-  }
-
-  private lazy val fileWriteBlocker = Blocker.liftExecutorService(Executors.newScheduledThreadPool(2))
-
-  private def createCpgFromFiles(multipart: Multipart[IO]): IO[Response[IO]] = {
-    multipart.parts.filter(_.name.contains("file")) match {
-      case parts if parts.isEmpty =>
-        BadRequest(ApiError("At least one 'file' must be specified for the CPG to be created").asJson)
-      case parts =>
-        val fileStream = for {
-          tempDir <- IO(Files.createTempDirectory("cpgserver_upload"))
-          _ <- persistUploadedFiles(tempDir, parts, config.uploadFileSizeLimit)
-          cpgId <- cpgProvider.createCpg(Set(tempDir.toString))
-          response <- Accepted(CreateCpgResponse(cpgId).asJson)
-        } yield response
-
-        fileStream.handleErrorWith {
-          case FileNameMissingException(msg) =>
-            BadRequest(ApiError(msg).asJson)
-          case FileSizeException(msg) =>
-            PayloadTooLarge(ApiError(msg).asJson)
-        }
-    }
-  }
-
-  // TODO: Route for uploading a CPG (as opposed to source files).
-
-  private def fileSizeCheck(partSizeLimit: Long): Pipe[IO, Byte, Byte] = in => {
-    in.zipWithIndex.flatMap {
-      case (byte, count) =>
-        if (count + 1 >= partSizeLimit) {
-          fs2.Stream.raiseError[IO](FileSizeException(s"A provided file is larger than [$partSizeLimit] bytes."))
-        } else fs2.Stream.emit(byte)
-    }
-  }
-
-  private def persistUploadedFiles(directory: JPath, parts: Vector[Part[IO]], partSizeLimit: Long): IO[Unit] = {
-    val stream = for {
-      part <- fs2.Stream.emits(parts)
-
-      fileIo = if (part.filename.isDefined) {
-        IO(Files.createFile(directory.resolve(part.filename.get)))
-      } else IO.raiseError(FileNameMissingException("All parts must specify a filename."))
-
-      file <- fs2.Stream.eval(fileIo)
-      _ <- part.body
-        .through(fileSizeCheck(partSizeLimit))
-        .through(fs2.io.file.writeAll(file, fileWriteBlocker))
-    } yield ()
-
-    stream.compile.drain
   }
 
   private def createCpgQuery(cpgId: UUID, queryRequest: CreateCpgQueryRequest): IO[Response[IO]] = {
@@ -145,16 +89,6 @@ final class CpgRoute(
         .as[CreateCpgRequest]
         .flatMap(createCpg)
 
-    case req @ POST -> Root / "v1" / "upload" =>
-      req
-        .decode[Multipart[IO]](createCpgFromFiles)
-        .map { resp =>
-          // Unfortunately Http4s tries to be smart by providing its own error response. We overwrite this here.
-          if (resp.status == Status.UnprocessableEntity) {
-            resp.withEntity(ApiError("Invalid Multipart body provided.").asJson)
-          } else resp
-        }
-
     case req @ POST -> Root / "v1" / "cpg" / UUIDVar(cpgId) / "query" =>
       req
         .as[CreateCpgQueryRequest]
@@ -188,10 +122,10 @@ object CpgRoute {
   private[route] implicit val decodeCpgRequest: EntityDecoder[IO, CreateCpgRequest] = jsonOf
   private[route] implicit val decodeCpgQueryRequest: EntityDecoder[IO, CreateCpgQueryRequest] = jsonOf
 
-  def apply(cpgProvider: CpgProvider, ammoniteExecutor: ServerAmmoniteExecutor, config: ServerFilesConfiguration)(
+  def apply(cpgProvider: CpgProvider, ammoniteExecutor: ServerAmmoniteExecutor)(
       implicit httpErrorHandler: HttpErrorHandler,
       cs: ContextShift[IO]): CpgRoute = {
-    new CpgRoute(cpgProvider, ammoniteExecutor, config)
+    new CpgRoute(cpgProvider, ammoniteExecutor)
   }
 
   object CpgHttpErrorHandler extends HttpErrorHandler {
