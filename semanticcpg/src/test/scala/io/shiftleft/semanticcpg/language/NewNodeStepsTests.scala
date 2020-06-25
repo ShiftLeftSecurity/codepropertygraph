@@ -7,7 +7,6 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, ModifierTypes}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.passes.DiffGraph.{EdgeInDiffGraph, EdgeToOriginal}
-import overflowdb._
 import org.scalatest.{Matchers, WordSpec}
 
 class NewNodeStepsTest extends WordSpec with Matchers {
@@ -19,6 +18,12 @@ class NewNodeStepsTest extends WordSpec with Matchers {
     new NewNodeSteps(__(newNode)).store
     val diffGraph = diffGraphBuilder.build()
     diffGraph.nodes.toList shouldBe List(newNode)
+  }
+
+  "can access the node label" in {
+    implicit val diffGraphBuilder = DiffGraph.newBuilder
+    val newNode = new TestNewNode
+    new NewNodeSteps(__(newNode)).label.l shouldBe List(newNode.label)
   }
 
   "stores containedNodes and connecting edge" when {
