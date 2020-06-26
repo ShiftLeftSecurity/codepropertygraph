@@ -10,7 +10,7 @@ case class Config(
     params: Map[String, String] = Map.empty,
     additionalImports: List[Path] = Nil,
     nocolors: Boolean = false,
-    daemon: Boolean = false,
+    server: Boolean = false,
     command: Option[String] = None
 )
 
@@ -47,9 +47,9 @@ trait BridgeBase {
         .action((_, c) => c.copy(nocolors = true))
         .text("turn off colors")
 
-      opt[Unit]("daemon")
-        .action((_, c) => c.copy(daemon = true))
-        .text("run as daemon - controllable via HTTP")
+      opt[Unit]("server")
+        .action((_, c) => c.copy(server = true))
+        .text("run as HTTP server")
 
       opt[String]("command")
         .action((x, c) => c.copy(command = Some(x)))
@@ -65,8 +65,8 @@ trait BridgeBase {
   protected def runAmmonite(config: Config, slProduct: SLProduct = OcularProduct): Unit = {
     config.scriptFile match {
       case None =>
-        if (config.daemon) {
-          startHttpServerDaemon(config)
+        if (config.server) {
+          startHttpServer(config)
         } else {
           startInteractiveShell(config, slProduct)
         }
@@ -98,7 +98,7 @@ trait BridgeBase {
       .run()
   }
 
-  private def startHttpServerDaemon(config: Config) = {
+  private def startHttpServer(config: Config) = {
     ???
   }
 

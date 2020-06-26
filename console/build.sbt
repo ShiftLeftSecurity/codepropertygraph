@@ -50,6 +50,10 @@ val CirceVersion = "0.12.2"
 val AmmoniteVersion = "1.8.1"
 val ScalatestVersion = "3.0.8"
 val ZeroturnaroundVersion = "1.13"
+val Http4sVersion = "0.21.1"
+val PureconfigVersion = "0.12.2"
+val WebjarLocatorVersion = "0.37"
+val SwaggerVersion = "3.25.0"
 
 libraryDependencies ++= Seq(
   "com.github.scopt"     %% "scopt"         % ScoptVersion,
@@ -58,6 +62,13 @@ libraryDependencies ++= Seq(
   "org.typelevel"        %% "cats-effect"   % CatsVersion,
   "io.circe"             %% "circe-generic" % CirceVersion,
   "io.circe"             %% "circe-parser"  % CirceVersion,
+  "org.http4s"            %% "http4s-blaze-server" % Http4sVersion,
+  "org.http4s"            %% "http4s-blaze-client" % Http4sVersion,
+  "org.http4s"            %% "http4s-dsl"          % Http4sVersion,
+  "org.http4s"            %% "http4s-circe"        % Http4sVersion,
+  "com.github.pureconfig" %% "pureconfig"          % PureconfigVersion,
+  "org.webjars"           %  "webjars-locator"     % WebjarLocatorVersion,
+  "org.webjars"           %  "swagger-ui"          % SwaggerVersion,
   "org.zeroturnaround"   %  "zt-zip"        % ZeroturnaroundVersion,
   "com.lihaoyi"          %% "ammonite"      % AmmoniteVersion cross CrossVersion.full,
   "org.scalatest"        %% "scalatest"     % ScalatestVersion % Test,
