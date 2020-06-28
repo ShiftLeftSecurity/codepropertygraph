@@ -8,7 +8,6 @@ import org.http4s.circe._
 import org.http4s.dsl.io._
 import org.slf4j.LoggerFactory
 
-
 import scala.util.control.NonFatal
 
 object CpgHttpErrorHandler extends HttpErrorHandler {

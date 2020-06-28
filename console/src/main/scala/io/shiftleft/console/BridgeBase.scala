@@ -4,6 +4,7 @@ import ammonite.ops.pwd
 import ammonite.ops.Path
 import ammonite.util.{Colors, Res}
 import better.files._
+import io.shiftleft.console.httpserver.Server
 
 case class Config(
     scriptFile: Option[Path] = None,
@@ -66,7 +67,7 @@ trait BridgeBase {
     config.scriptFile match {
       case None =>
         if (config.server) {
-          startHttpServer(config)
+          startHttpServer()
         } else {
           startInteractiveShell(config, slProduct)
         }
@@ -98,8 +99,8 @@ trait BridgeBase {
       .run()
   }
 
-  private def startHttpServer(config: Config) = {
-    ???
+  private def startHttpServer(): Unit = {
+    Server.main(Array.empty)
   }
 
   private def runScript(scriptFile: Path, config: Config) = {

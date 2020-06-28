@@ -1,12 +1,12 @@
 package io.shiftleft.console.httpserver
 
-import cats.effect.{ContextShift, ExitCode, IO, Timer}
+import cats.effect.{ExitCode, IO, IOApp}
 import org.http4s.server.blaze.BlazeServerBuilder
-import scala.concurrent.ExecutionContext.global
+
 import cats.implicits._
 import org.http4s.implicits._
 
-object Server {
+object Server extends IOApp {
 
   private val banner: String =
     """| ██████╗██████╗  ██████╗     ███████╗███████╗██████╗ ██╗   ██╗███████╗██████╗
@@ -17,16 +17,12 @@ object Server {
        | ╚═════╝╚═╝      ╚═════╝     ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝
        |""".stripMargin
 
-
   private val serverConfig: ServerConfiguration =
     ServerConfiguration.config.getOrElse(ServerConfiguration.default)
 
   private val httpRoutes = SwaggerRoute().routes
 
-  def run(): IO[ExitCode] = {
-
-    implicit val cs: ContextShift[IO] = IO.contextShift(global)
-    implicit val timer: Timer[IO] = IO.timer(global)
+  def run(args: List[String]): IO[ExitCode] = {
 
     BlazeServerBuilder[IO]
       .withBanner(List(banner))
