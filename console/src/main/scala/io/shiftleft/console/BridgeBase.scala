@@ -1,5 +1,7 @@
 package io.shiftleft.console
 
+import java.io.{PipedInputStream, PipedOutputStream}
+
 import ammonite.ops.pwd
 import ammonite.ops.Path
 import ammonite.util.{Colors, Res}
@@ -67,7 +69,7 @@ trait BridgeBase {
     config.scriptFile match {
       case None =>
         if (config.server) {
-          startHttpServer()
+          startHttpServer(config, slProduct)
         } else {
           startInteractiveShell(config, slProduct)
         }
@@ -99,8 +101,44 @@ trait BridgeBase {
       .run()
   }
 
-  private def startHttpServer(): Unit = {
-    Server.main(Array.empty)
+  private def startHttpServer(config : Config, slProduct : SLProduct): Unit = {
+
+    println(config)
+    println(slProduct)
+
+    val toStdin = new PipedOutputStream()
+    val inStream = new PipedInputStream()
+    inStream.connect(toStdin)
+
+    val outStream = new PipedOutputStream()
+    val fromStdout = new PipedInputStream()
+    fromStdout.connect(outStream)
+
+    val errStream = new PipedOutputStream()
+    val fromStderr = new PipedInputStream()
+    fromStderr.connect(errStream)
+
+    object AmmoniteRunnable extends Runnable {
+      override def run(): Unit = {
+        val ammoniteShell =
+          ammonite
+          .Main(
+            predefCode = predefPlus(additionalImportCode(config)),
+            welcomeBanner = None,
+            remoteLogging = false,
+            colors = Colors.BlackWhite,
+            inputStream = inStream,
+            outputStream = outStream,
+            errorStream = errStream
+          )
+        ammoniteShell.run()
+      }
+    }
+
+    val shellThread = new Thread(AmmoniteRunnable)
+    shellThread.start()
+    new Server(toStdin, fromStdout, fromStdout).main(Array.empty)
+    shellThread.join()
   }
 
   private def runScript(scriptFile: Path, config: Config) = {

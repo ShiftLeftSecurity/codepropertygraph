@@ -1,12 +1,17 @@
 package io.shiftleft.console.httpserver
 
+import java.io.{PipedInputStream, PipedOutputStream}
+
 import cats.effect.{ExitCode, IO, IOApp}
 import org.http4s.server.blaze.BlazeServerBuilder
-
 import cats.implicits._
 import org.http4s.implicits._
 
-object Server extends IOApp {
+class Server(toStdin : PipedOutputStream, fromStdout : PipedInputStream, fromStderr : PipedInputStream) extends IOApp {
+
+  println(toStdin)
+  println(fromStdout)
+  println(fromStderr)
 
   private val banner: String =
     """| ██████╗██████╗  ██████╗     ███████╗███████╗██████╗ ██╗   ██╗███████╗██████╗
