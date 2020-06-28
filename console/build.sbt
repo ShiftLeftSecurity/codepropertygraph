@@ -47,7 +47,7 @@ val ScoptVersion = "3.7.1"
 val BetterFilesVersion = "3.8.0"
 val CatsVersion = "2.0.0"
 val CirceVersion = "0.12.2"
-val AmmoniteVersion = "1.8.1"
+val AmmoniteVersion = "2.1.4"
 val ScalatestVersion = "3.0.8"
 val ZeroturnaroundVersion = "1.13"
 

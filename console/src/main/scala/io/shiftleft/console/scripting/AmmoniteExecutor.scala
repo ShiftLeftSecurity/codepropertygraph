@@ -2,13 +2,11 @@ package io.shiftleft.console.scripting
 
 import ammonite.Main
 import ammonite.runtime.Storage
-import ammonite.util.{Bind, Res}
+import ammonite.util.{Bind, Name, PredefInfo, Res}
 import cats.effect.IO
 import cats.instances.list._
 import cats.syntax.traverse._
-
 import io.shiftleft.codepropertygraph.Cpg
-
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 
@@ -41,7 +39,16 @@ trait AmmoniteExecutor {
       replInstance <- IO(ammoniteMain.instantiateRepl(bindings))
       repl <- IO.fromEither(replInstance.left.map { case (err, _) => new RuntimeException(err.msg) })
       ammoniteResult <- IO {
-        repl.interp.initializePredef()
+
+        val basePredefs = Seq(
+          PredefInfo(Name("ArgsPredef"), repl.argString, false, None)
+        )
+
+        val customPredefs = Seq(
+          PredefInfo(Name("CodePredef"), predef, false, Some(repl.interp.wd / "(console)"))
+        )
+
+        repl.interp.initializePredef(basePredefs, customPredefs, repl.bridges)
         ammonite.main.Scripts.runScript(ammoniteMain.wd, os.Path(scriptPath), repl.interp, parameters.map {
           case (k, v) => k -> Some(v)
         }.toSeq)
