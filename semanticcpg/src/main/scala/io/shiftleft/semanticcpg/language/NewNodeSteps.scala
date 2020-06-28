@@ -58,6 +58,7 @@ class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Step
           s"unhandled case, likely produced by a fauly pass: src=$src, src.getClass=$srcClassMaybe, dst=$dst, dstClass=$dstClassMaybe")
     }
 
+  def label: Steps[String] = new Steps(raw.map(_.label))
 }
 
 object NewNodeSteps {
