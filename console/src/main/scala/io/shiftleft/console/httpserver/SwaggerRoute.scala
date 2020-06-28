@@ -30,7 +30,6 @@ final class SwaggerRoute {
     case GET -> Root / ("swagger-ui" | "docs") =>
       PermanentRedirect(Location(Uri.unsafeFromString("swagger-ui/index.html")))
 
-    // TODO discuss with jacob: according to scalac this is unreachable... commenting for now since it probably never worked anyway
     case req @ GET -> (Root | `swaggerUiPath`) / "swagger.yaml" =>
       StaticFile
         .fromResource("/swagger.yaml", blocker, Some(req))

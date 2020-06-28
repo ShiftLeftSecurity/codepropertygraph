@@ -1,9 +1,7 @@
 package io.shiftleft.console.httpserver
 
-import pureconfig.ConfigReader.Result
 import pureconfig.ConfigSource
 import pureconfig.ConfigReader.Result
-import pureconfig._
 import pureconfig.generic.auto._
 
 final case class ServerConfiguration(host: String, port: Int) {
