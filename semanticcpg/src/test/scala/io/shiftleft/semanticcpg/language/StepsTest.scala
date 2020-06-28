@@ -42,7 +42,7 @@ class StepsTest extends WordSpec with Matchers {
       "providing one" in ExistingCpgFixture("splitmeup") { fixture =>
         // find an arbitrary method so we can find it again in the next step
         val method: nodes.Method = fixture.cpg.method.toList.head
-        val results: List[nodes.Method] = fixture.cpg.method.id(method.underlying.id).toList
+        val results: List[nodes.Method] = fixture.cpg.method.id(method.id2).toList
 
         results.size shouldBe 1
         results.head.underlying.id
@@ -51,7 +51,7 @@ class StepsTest extends WordSpec with Matchers {
       "providing multiple" in ExistingCpgFixture("splitmeup") { fixture =>
         // find two arbitrary methods so we can find it again in the next step
         val methods: Set[nodes.Method] = fixture.cpg.method.toList.take(2).toSet
-        val results: List[nodes.Method] = fixture.cpg.method.id(methods.map(_.id())).toList
+        val results: List[nodes.Method] = fixture.cpg.method.id(methods.map(_.id2)).toList
 
         results.size shouldBe 2
         results.toSet shouldBe methods.toSet

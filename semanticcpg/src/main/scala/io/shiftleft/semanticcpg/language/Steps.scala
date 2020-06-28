@@ -168,23 +168,6 @@ class Steps[A](val raw: GremlinScala[A]) {
     new Steps[A](raw.dedup())
 
   /**
-    * Traverse to ids of underlying objects
-    * */
-  def id: Steps[AnyRef] = new Steps(raw.id)
-
-  /**
-    Step that selects only the node with the given id.
-    */
-  def id(key: AnyRef)(implicit isElement: A <:< Element): Steps[A] =
-    new Steps[A](raw.hasId(key))
-
-  /**
-    Step that selects only nodes in the given id set `keys`.
-    */
-  def id(keys: Set[AnyRef])(implicit isElement: A <:< Element): Steps[A] =
-    new Steps[A](raw.hasId(P.within(keys)))
-
-  /**
     Repeat the given traversal. This step can be combined with the until and emit steps to
     provide a termination and emit criteria.
     */
