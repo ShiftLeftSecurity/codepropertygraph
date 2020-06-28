@@ -23,7 +23,6 @@ object Server extends IOApp {
   private val httpRoutes = SwaggerRoute().routes
 
   def run(args: List[String]): IO[ExitCode] = {
-
     BlazeServerBuilder[IO]
       .withBanner(List(banner))
       .bindHttp(serverConfig.port, serverConfig.host)
