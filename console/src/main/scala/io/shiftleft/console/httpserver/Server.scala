@@ -25,7 +25,10 @@ class Server(toStdin: PipedOutputStream, fromStdout: PipedInputStream, fromStder
   private val serverConfig: ServerConfiguration =
     ServerConfiguration.config.getOrElse(ServerConfiguration.default)
 
-  private val httpRoutes = SwaggerRoute().routes
+  private implicit val httpErrorHandler: HttpErrorHandler =
+    CpgRoute.CpgHttpErrorHandler
+
+  private val httpRoutes = CpgRoute().routes <+> SwaggerRoute().routes
 
   override def run(args: List[String]): IO[ExitCode] = {
 

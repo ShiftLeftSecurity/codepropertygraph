@@ -69,7 +69,7 @@ trait BridgeBase {
     config.scriptFile match {
       case None =>
         if (config.server) {
-          startHttpServer(config, slProduct)
+          startHttpServer(config)
         } else {
           startInteractiveShell(config, slProduct)
         }
@@ -101,10 +101,7 @@ trait BridgeBase {
       .run()
   }
 
-  private def startHttpServer(config: Config, slProduct: SLProduct): Unit = {
-
-    println(config)
-    println(slProduct)
+  private def startHttpServer(config: Config): Unit = {
 
     val toStdin = new PipedOutputStream()
     val inStream = new PipedInputStream()
