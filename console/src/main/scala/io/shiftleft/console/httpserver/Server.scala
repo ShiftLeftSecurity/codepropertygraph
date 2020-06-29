@@ -1,17 +1,11 @@
 package io.shiftleft.console.httpserver
 
-import java.io.{PipedInputStream, PipedOutputStream}
-
 import cats.implicits._
 import cats.effect.{IO, _}
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.implicits._
 
-class Server(toStdin: PipedOutputStream, fromStdout: PipedInputStream, fromStderr: PipedInputStream) extends IOApp {
-
-  println(toStdin)
-  println(fromStdout)
-  println(fromStderr)
+class Server(executor: EmbeddedAmmonite) extends IOApp {
 
   private val banner: String =
     """| ██████╗██████╗  ██████╗     ███████╗███████╗██████╗ ██╗   ██╗███████╗██████╗
@@ -28,7 +22,7 @@ class Server(toStdin: PipedOutputStream, fromStdout: PipedInputStream, fromStder
   private implicit val httpErrorHandler: HttpErrorHandler =
     CpgRoute.CpgHttpErrorHandler
 
-  private val httpRoutes = CpgRoute().routes <+> SwaggerRoute().routes
+  private val httpRoutes = CpgRoute(executor).routes <+> SwaggerRoute().routes
 
   override def run(args: List[String]): IO[ExitCode] = {
 

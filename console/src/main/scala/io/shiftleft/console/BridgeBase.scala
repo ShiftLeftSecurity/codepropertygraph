@@ -1,12 +1,10 @@
 package io.shiftleft.console
 
-import java.io.{PipedInputStream, PipedOutputStream, PrintWriter}
-
 import ammonite.ops.pwd
 import ammonite.ops.Path
 import ammonite.util.{Colors, Res}
 import better.files._
-import io.shiftleft.console.httpserver.Server
+import io.shiftleft.console.httpserver.{EmbeddedAmmonite, Server}
 
 case class Config(
     scriptFile: Option[Path] = None,
@@ -102,51 +100,21 @@ trait BridgeBase {
   }
 
   private def startHttpServer(config: Config): Unit = {
+    val predef = predefPlus(additionalImportCode(config))
+    val ammonite = new EmbeddedAmmonite(predef)
+    ammonite.start()
 
-    val toStdin = new PipedOutputStream()
-    val inStream = new PipedInputStream()
-    inStream.connect(toStdin)
-
-    val outStream = new PipedOutputStream()
-    val fromStdout = new PipedInputStream()
-    fromStdout.connect(outStream)
-
-    val errStream = new PipedOutputStream()
-    val fromStderr = new PipedInputStream()
-    fromStderr.connect(errStream)
-
-    val shellThread = new Thread(() => {
-      val ammoniteShell =
-        ammonite
-          .Main(
-            predefCode = predefPlus(additionalImportCode(config)),
-            welcomeBanner = None,
-            remoteLogging = false,
-            colors = Colors.BlackWhite,
-            inputStream = inStream,
-            outputStream = outStream,
-            errorStream = errStream
-          )
-      ammoniteShell.run()
-    })
     val stdinThread = new Thread(() => {
       val CTRLC = 3
       while (System.in.read() != CTRLC) {}
-      val writer = new PrintWriter(toStdin)
-      // Send an `exit` to ammonite and wait
-      // until it terminates. This will restore
-      // terminal settings
-      writer.println("exit")
-      writer.close()
-      shellThread.join()
-      println("Shell terminated gracefully")
+      ammonite.shutdown()
       // Now shutdown the JVM, calling cleanup
       // code of the HTTP server
       System.exit(0)
     })
     stdinThread.start()
-    shellThread.start()
-    new Server(toStdin, fromStdout, fromStdout).main(Array.empty)
+
+    new Server(ammonite).main(Array.empty)
     // The call above eventually terminates the program, so, code
     // beyond this point is not reachable.
   }
