@@ -2,12 +2,12 @@ package io.shiftleft.console.httpserver
 
 import java.io.{PipedInputStream, PipedOutputStream}
 
-import cats.effect.{ExitCode, IO, IOApp}
-import org.http4s.server.blaze.BlazeServerBuilder
 import cats.implicits._
+import cats.effect.{IO, _}
+import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.implicits._
 
-class Server(toStdin : PipedOutputStream, fromStdout : PipedInputStream, fromStderr : PipedInputStream) extends IOApp {
+class Server(toStdin: PipedOutputStream, fromStdout: PipedInputStream, fromStderr: PipedInputStream) extends IOApp {
 
   println(toStdin)
   println(fromStdout)
@@ -27,12 +27,14 @@ class Server(toStdin : PipedOutputStream, fromStdout : PipedInputStream, fromStd
 
   private val httpRoutes = SwaggerRoute().routes
 
-  def run(args: List[String]): IO[ExitCode] = {
+  override def run(args: List[String]): IO[ExitCode] = {
+
     BlazeServerBuilder[IO]
       .withBanner(List(banner))
       .bindHttp(serverConfig.port, serverConfig.host)
       .withHttpApp(httpRoutes.orNotFound)
       .serve
+      .onFinalize(IO(println("Server terminated gracefully")))
       .compile
       .drain
       .as(ExitCode.Success)

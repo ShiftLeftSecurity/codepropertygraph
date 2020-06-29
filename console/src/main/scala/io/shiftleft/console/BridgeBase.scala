@@ -1,6 +1,6 @@
 package io.shiftleft.console
 
-import java.io.{PipedInputStream, PipedOutputStream}
+import java.io.{PipedInputStream, PipedOutputStream, PrintWriter}
 
 import ammonite.ops.pwd
 import ammonite.ops.Path
@@ -101,7 +101,7 @@ trait BridgeBase {
       .run()
   }
 
-  private def startHttpServer(config : Config, slProduct : SLProduct): Unit = {
+  private def startHttpServer(config: Config, slProduct: SLProduct): Unit = {
 
     println(config)
     println(slProduct)
@@ -118,10 +118,9 @@ trait BridgeBase {
     val fromStderr = new PipedInputStream()
     fromStderr.connect(errStream)
 
-    object AmmoniteRunnable extends Runnable {
-      override def run(): Unit = {
-        val ammoniteShell =
-          ammonite
+    val shellThread = new Thread(() => {
+      val ammoniteShell =
+        ammonite
           .Main(
             predefCode = predefPlus(additionalImportCode(config)),
             welcomeBanner = None,
@@ -131,14 +130,28 @@ trait BridgeBase {
             outputStream = outStream,
             errorStream = errStream
           )
-        ammoniteShell.run()
-      }
-    }
-
-    val shellThread = new Thread(AmmoniteRunnable)
+      ammoniteShell.run()
+    })
+    val stdinThread = new Thread(() => {
+      val CTRLC = 3
+      while (System.in.read() != CTRLC) {}
+      val writer = new PrintWriter(toStdin)
+      // Send an `exit` to ammonite and wait
+      // until it terminates. This will restore
+      // terminal settings
+      writer.println("exit")
+      writer.close()
+      shellThread.join()
+      println("Shell terminated gracefully")
+      // Now shutdown the JVM, calling cleanup
+      // code of the HTTP server
+      System.exit(0)
+    })
+    stdinThread.start()
     shellThread.start()
     new Server(toStdin, fromStdout, fromStdout).main(Array.empty)
-    shellThread.join()
+    // The call above eventually terminates the program, so, code
+    // beyond this point is not reachable.
   }
 
   private def runScript(scriptFile: Path, config: Config) = {
