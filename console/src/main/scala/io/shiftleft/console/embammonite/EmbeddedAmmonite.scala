@@ -31,50 +31,10 @@ class EmbeddedAmmonite(predef: String = "") {
   val reader = new BufferedReader(new InputStreamReader(fromStdout))
 
   val shellThread = new Thread(() => {
-    // The standard frontend attempts to query /dev/tty
-    // for terminal dimensions, which fails when running
-    // tests in intellij and in container environments
-    // (see https://github.com/lihaoyi/Ammonite/issues/276)
-    // Since terminal dimensions do not matter to us, we
-    // just set them manually.
-    val completePredef: String =
-      """
-      | class CustomFrontend extends ammonite.repl.AmmoniteFrontEnd() {
-      |   override def width = 100
-      |   override def height = 100
-      |
-      |  override def readLine(reader: java.io.Reader,
-      |                        output: java.io.OutputStream,
-      |                        prompt: String,
-      |                        colors: ammonite.util.Colors,
-      |                        compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-      |                        history: IndexedSeq[String]) = {
-      |
-      |  val writer = new java.io.OutputStreamWriter(output)
-      |
-      |  // Enter
-      | val multilineFilter = ammonite.terminal.Filter.action(
-      | ammonite.terminal.SpecialKeys.NewLine,
-      | ti => ammonite.interp.Parsers.split(ti.ts.buffer.mkString).isEmpty
-      | ){
-      | case ammonite.terminal.TermState(rest, b, c, _) => ammonite.terminal.filters.BasicFilters.injectNewLine(b, c, rest)
-      |}
-      |
-      |  val allFilters = ammonite.terminal.filters.BasicFilters.all
-      |
-      |  val res = new ammonite.terminal.LineReader(width, prompt, reader, writer, allFilters)
-      |  .readChar(ammonite.terminal.TermState(ammonite.terminal.LazyList.continually(reader.read()), Vector.empty, 0, ""), 0)
-      |  res
-      | }
-      |}
-      | repl.frontEnd() = new CustomFrontend()
-      |
-      |""".stripMargin + predef
-
     val ammoniteShell =
       ammonite
         .Main(
-          predefCode = completePredef,
+          predefCode = predef,
           welcomeBanner = None,
           remoteLogging = false,
           colors = Colors.BlackWhite,
