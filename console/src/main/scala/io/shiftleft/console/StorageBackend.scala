@@ -1,8 +1,8 @@
 package io.shiftleft.console
 
+import os.Path
 import ammonite.runtime.Storage
 import ammonite.util.Tag
-import os.Path
 
 /**
   * like the default ammonite folder storage (which gives us e.g. command history), but without the CodePredef

@@ -2,6 +2,7 @@ package io.shiftleft.console.httpserver
 
 import cats.implicits._
 import cats.effect.{IO, _}
+import io.shiftleft.console.embammonite.EmbeddedAmmonite
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.implicits._
 

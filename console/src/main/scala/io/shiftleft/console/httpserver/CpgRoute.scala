@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory
 import scala.util.control.NonFatal
 import io.circe.generic.auto._
 import io.circe.syntax._
+import io.shiftleft.console.embammonite.EmbeddedAmmonite
 import org.http4s.circe._
 import org.http4s.dsl.io._
 

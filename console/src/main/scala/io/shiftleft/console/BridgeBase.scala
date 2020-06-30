@@ -3,8 +3,10 @@ package io.shiftleft.console
 import ammonite.ops.pwd
 import ammonite.ops.Path
 import ammonite.util.{Colors, Res}
+
 import better.files._
-import io.shiftleft.console.httpserver.{EmbeddedAmmonite, Server}
+import io.shiftleft.console.embammonite.EmbeddedAmmonite
+import io.shiftleft.console.httpserver.Server
 
 case class Config(
     scriptFile: Option[Path] = None,
