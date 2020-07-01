@@ -60,7 +60,7 @@ class EmbeddedAmmoniteTests extends WordSpec with Matchers {
       val shell = new EmbeddedAmmonite(predef)
       shell.start()
       val uuid = UUID.randomUUID()
-      shell.enqueue(uuid, "help")
+      shell.enqueue(uuid, "val x = 1")
       shell.result(uuid)
       shell.shutdown()
     }

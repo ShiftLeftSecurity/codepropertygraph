@@ -30,6 +30,9 @@ class EmbeddedAmmonite(predef: String = "") {
   val writer = new PrintWriter(toStdin)
   val reader = new BufferedReader(new InputStreamReader(fromStdout))
 
+  val writerThread = new Thread(new WriterRunnable(jobQueue, writer))
+  val readerThread = new Thread(new ReaderRunnable(reader))
+
   val shellThread = new Thread(() => {
     val ammoniteShell =
       ammonite
@@ -39,40 +42,16 @@ class EmbeddedAmmonite(predef: String = "") {
           remoteLogging = false,
           colors = Colors.BlackWhite,
           inputStream = inStream,
-          // outputStream = outStream,
+          outputStream = outStream,
           // errorStream = errStream
         )
     ammoniteShell.run()
   })
 
-  class UserRunnable(queue: BlockingQueue[Job]) extends Runnable {
-    override def run(): Unit = {
-      try {
-        var terminate = false;
-        while (!terminate && !queue.isEmpty) {
-          val job = queue.take()
-          if (job.uuid == null && job.query == null) {
-            terminate = true
-          } else {
-            println(job.query.trim)
-            writer.println(job.query.trim)
-            writer.flush()
-          }
-        }
-      } catch {
-        case _: InterruptedException =>
-          println("Interrupted AmmoniteUserThread")
-      }
-      println("AmmoniteUserThread exited gracefully")
-    }
-  }
-
-  val userRunnable = new UserRunnable(jobQueue)
-  val userThread = new Thread(userRunnable)
-
   def start(): Unit = {
     shellThread.start()
-    userThread.start()
+    writerThread.start()
+    readerThread.start()
   }
 
   def enqueue(uuid: UUID, query: String): Unit = {
@@ -84,18 +63,21 @@ class EmbeddedAmmonite(predef: String = "") {
   }
 
   def shutdown(): Unit = {
-    shutdownShell()
-    // Terminate user thread
-    jobQueue.add(Job(null, null))
-    shellThread.join()
-    userThread.join()
+    shutdownWriterThread()
+    shutdownShellThread()
     println("Shell terminated gracefully")
-  }
+    outStream.close()
+    readerThread.join()
 
-  def shutdownShell(): Unit = {
-    writer.println("exit")
-    writer.close()
-    reader.close()
+    def shutdownWriterThread(): Unit = {
+      jobQueue.add(Job(null, null))
+      writerThread.join()
+    }
+    def shutdownShellThread(): Unit = {
+      writer.println("exit")
+      writer.close()
+      shellThread.join()
+    }
   }
 
 }
