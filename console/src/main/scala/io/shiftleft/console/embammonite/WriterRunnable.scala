@@ -13,7 +13,7 @@ class WriterRunnable(queue: BlockingQueue[Job], writer: PrintWriter) extends Run
           terminate = true
         } else {
           writer.println(job.query.trim)
-          writer.println(s"""println("${job.uuid}")""")
+          writer.println(s""""END: ${job.uuid}"""")
           writer.flush()
         }
       }

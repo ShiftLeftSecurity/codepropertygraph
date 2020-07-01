@@ -39,7 +39,7 @@ class EmbeddedAmmoniteTests extends WordSpec with Matchers {
     | case ammonite.terminal.TermState(rest, b, c, _) => ammonite.terminal.filters.BasicFilters.injectNewLine(b, c, rest)
     |}
     |
-    |  val allFilters = ammonite.terminal.filters.BasicFilters.all
+    |  val allFilters = ammonite.terminal.Filter.merge(extraFilters, multilineFilter, ammonite.terminal.filters.BasicFilters.all)
     |
     |  new ammonite.terminal.LineReader(width, prompt, reader, writer, allFilters)
     |  .readChar(ammonite.terminal.TermState(ammonite.terminal.LazyList.continually(reader.read()), Vector.empty, 0, ""), 0)
@@ -60,7 +60,7 @@ class EmbeddedAmmoniteTests extends WordSpec with Matchers {
       val shell = new EmbeddedAmmonite(predef)
       shell.start()
       val uuid = UUID.randomUUID()
-      shell.enqueue(uuid, "val x = 1")
+      shell.enqueue(uuid, "def foo() = {\n1\n}\n foo()")
       shell.result(uuid)
       shell.shutdown()
     }
