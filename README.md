@@ -78,7 +78,7 @@ protoc --cpp_out=cpp --python_out=python cpg.proto
 
 You can find the code property graph specification in [base.json](codepropertygraph/src/main/resources/schemas/base.json). A high level description is present in 
 
-https://docs.shiftleft.io/shiftleft/ocular/about/deep-dive
+https://docs.shiftleft.io/core-concepts/code-property-graph
 
 <!-- # Extending the specification -->
 
