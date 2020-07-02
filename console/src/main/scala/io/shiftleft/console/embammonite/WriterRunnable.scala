@@ -3,7 +3,12 @@ package io.shiftleft.console.embammonite
 import java.io.PrintWriter
 import java.util.concurrent.BlockingQueue
 
+import org.slf4j.LoggerFactory
+
 class WriterRunnable(queue: BlockingQueue[Job], writer: PrintWriter) extends Runnable {
+
+  private val logger = LoggerFactory.getLogger(this.getClass)
+
   override def run(): Unit = {
     try {
       var terminate = false;
@@ -19,8 +24,8 @@ class WriterRunnable(queue: BlockingQueue[Job], writer: PrintWriter) extends Run
       }
     } catch {
       case _: InterruptedException =>
-        println("Interrupted WriterThread")
+        logger.info("Interrupted WriterThread")
     }
-    println("WriterThread terminated gracefully")
+    logger.info("WriterThread terminated gracefully")
   }
 }
