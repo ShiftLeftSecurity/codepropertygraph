@@ -74,8 +74,7 @@ class EmbeddedAmmonite(predef: String = "") {
   val reader = new BufferedReader(new InputStreamReader(fromStdout))
   val errReader = new BufferedReader(new InputStreamReader(fromStderr))
 
-  val writerThread = new Thread(new WriterRunnable(jobQueue, writer, jobMap))
-  val readerThread = new Thread(new ReaderRunnable(reader, errReader, jobMap))
+  val writerThread = new Thread(new WriterRunnable(jobQueue, writer, reader, errReader))
 
   val shellThread = new Thread(() => {
     val ammoniteShell =
@@ -95,7 +94,6 @@ class EmbeddedAmmonite(predef: String = "") {
   def start(): Unit = {
     shellThread.start()
     writerThread.start()
-    readerThread.start()
   }
 
   /**
@@ -121,11 +119,9 @@ class EmbeddedAmmonite(predef: String = "") {
   }
 
   def shutdown(): Unit = {
-    shutdownWriterThread()
     shutdownShellThread()
     logger.info("Shell terminated gracefully")
-    outStream.close()
-    readerThread.join()
+    shutdownWriterThread()
 
     def shutdownWriterThread(): Unit = {
       jobQueue.add(Job(null, null, null))

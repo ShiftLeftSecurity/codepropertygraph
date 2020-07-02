@@ -32,7 +32,10 @@ class Server(executor: EmbeddedAmmonite) extends IOApp {
       .bindHttp(serverConfig.port, serverConfig.host)
       .withHttpApp(httpRoutes.orNotFound)
       .serve
-      .onFinalize(IO(println("Server terminated gracefully")))
+      .onFinalize(IO({
+        executor.shutdown()
+        println("Server terminated gracefully")
+      }))
       .compile
       .drain
       .as(ExitCode.Success)

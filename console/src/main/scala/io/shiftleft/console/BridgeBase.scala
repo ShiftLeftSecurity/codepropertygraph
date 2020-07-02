@@ -106,16 +106,6 @@ trait BridgeBase {
     val ammonite = new EmbeddedAmmonite(predef)
     ammonite.start()
 
-    val stdinThread = new Thread(() => {
-      val CTRLC = 3
-      while (System.in.read() != CTRLC) {}
-      ammonite.shutdown()
-      // Now shutdown the JVM, calling cleanup
-      // code of the HTTP server
-      System.exit(0)
-    })
-    stdinThread.start()
-
     new Server(ammonite).main(Array.empty)
     // The call above eventually terminates the program, so, code
     // beyond this point is not reachable.
