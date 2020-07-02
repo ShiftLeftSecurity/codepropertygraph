@@ -17,7 +17,7 @@ class EmbeddedAmmoniteTests extends WordSpec with Matchers {
       val shell = new EmbeddedAmmonite()
       shell.start()
       val result = shell.query("def foo() = {\n1\n}\n foo()")
-      result shouldBe
+      result.out shouldBe
         """defined function foo
           |res1: Int = 1
           |""".stripMargin

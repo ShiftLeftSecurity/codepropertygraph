@@ -4,14 +4,14 @@ import java.io.{BufferedReader, PrintWriter}
 import java.util.UUID
 import java.util.concurrent.BlockingQueue
 
-import org.slf4j.LoggerFactory
+import org.apache.logging.log4j.LogManager
 
 import scala.util.Try
 
-class WriterRunnable(queue: BlockingQueue[Job], writer: PrintWriter, reader: BufferedReader, errReader: BufferedReader)
+class UserRunnable(queue: BlockingQueue[Job], writer: PrintWriter, reader: BufferedReader, errReader: BufferedReader)
     extends Runnable {
 
-  private val logger = LoggerFactory.getLogger(this.getClass)
+  private val logger = LogManager.getLogger(this.getClass)
 
   private val magicEchoSeq: Seq[Char] = List(27, 91, 57, 57, 57, 57, 68, 27, 91, 48, 74, 64, 32).map(_.toChar)
   private val endMarker = """.*END: ([0-9a-f\-]+)""".r
@@ -26,9 +26,9 @@ class WriterRunnable(queue: BlockingQueue[Job], writer: PrintWriter, reader: Buf
         } else {
           sendQueryToAmmonite(job)
           val stdoutPair = stdOutUpToMarker()
-          val (uuid, stdOutput) = stdoutPair.get
+          val stdOutput = stdoutPair.get
           val errOutput = exhaustStderr()
-          val result = new Result(stdOutput, errOutput, uuid)
+          val result = new QueryResult(stdOutput, errOutput)
           job.observer(result)
         }
       }
@@ -50,7 +50,7 @@ class WriterRunnable(queue: BlockingQueue[Job], writer: PrintWriter, reader: Buf
     writer.flush()
   }
 
-  private def stdOutUpToMarker(): Option[(UUID, String)] = {
+  private def stdOutUpToMarker(): Option[String] = {
     var currentOutput: String = ""
     var line = reader.readLine()
     while (line != null) {
@@ -59,8 +59,7 @@ class WriterRunnable(queue: BlockingQueue[Job], writer: PrintWriter, reader: Buf
         if (uuid.isEmpty) {
           currentOutput += line + "\n"
         } else {
-          val actualUuid = uuid.next
-          return Some((actualUuid, currentOutput))
+          return Some(currentOutput)
         }
       }
       line = reader.readLine()

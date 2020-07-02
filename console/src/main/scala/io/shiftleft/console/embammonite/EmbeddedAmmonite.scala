@@ -2,29 +2,125 @@ package io.shiftleft.console.embammonite
 
 import java.io.{BufferedReader, InputStreamReader, PipedInputStream, PipedOutputStream, PrintWriter}
 import java.util.UUID
-import java.util.concurrent.{BlockingQueue, ConcurrentHashMap, LinkedBlockingQueue, Semaphore}
+import java.util.concurrent.{BlockingQueue, LinkedBlockingQueue, Semaphore}
 
 import ammonite.util.Colors
-import org.slf4j.LoggerFactory
+import org.apache.logging.log4j.LogManager
 
-case class Job(uuid: UUID, query: String, observer: Result => Unit)
-class Result(val out: String, val err: String, val uuid: UUID)
+/**
+  * Result of executing a query, containing in particular
+  * output received on standard out and on standard error.
+  * */
+class QueryResult(val out: String, val err: String)
+
+private[embammonite] case class Job(uuid: UUID, query: String, observer: QueryResult => Unit)
 
 class EmbeddedAmmonite(predef: String = "") {
 
-  private val logger = LoggerFactory.getLogger(this.getClass)
+  private val logger = LogManager.getLogger(this.getClass)
 
-  // The standard frontend attempts to query /dev/tty
-  // in multiple places, e.g., to query terminal dimensions.
-  // This does not work in intellij tests
-  // (see https://github.com/lihaoyi/Ammonite/issues/276)
-  // The below hack overrides the default frontend with
-  // a custom frontend that does not require /dev/tty.
-  // This also enables us to disable terminal echo
-  // by passing a `displayTransform` that returns
-  // an empty string on all input.
+  val jobQueue: BlockingQueue[Job] = new LinkedBlockingQueue[Job]()
 
-  private val embeddedAmmonitePredef =
+  val (inStream, toStdin) = pipePair()
+  val (fromStdout, outStream) = pipePair()
+  val (fromStderr, errStream) = pipePair()
+
+  val writer = new PrintWriter(toStdin)
+  val reader = new BufferedReader(new InputStreamReader(fromStdout))
+  val errReader = new BufferedReader(new InputStreamReader(fromStderr))
+
+  val userThread = new Thread(new UserRunnable(jobQueue, writer, reader, errReader))
+
+  val shellThread = new Thread(() => {
+    val ammoniteShell =
+      ammonite
+        .Main(
+          predefCode = EmbeddedAmmonite.predef + predef,
+          welcomeBanner = None,
+          remoteLogging = false,
+          colors = Colors.BlackWhite,
+          inputStream = inStream,
+          outputStream = outStream,
+          errorStream = errStream
+        )
+    ammoniteShell.run()
+  })
+
+  private def pipePair(): (PipedInputStream, PipedOutputStream) = {
+    val out = new PipedOutputStream()
+    val in = new PipedInputStream()
+    in.connect(out)
+    (in, out)
+  }
+
+  /**
+    * Start the embedded ammonite shell
+    * */
+  def start(): Unit = {
+    shellThread.start()
+    userThread.start()
+  }
+
+  /**
+    * Submit query `q` to shell and call `observer` when
+    * the result is ready.
+    * */
+  def queryAsync(q: String)(observer: QueryResult => Unit): UUID = {
+    val uuid = UUID.randomUUID()
+    jobQueue.add(Job(uuid, q, observer))
+    uuid
+  }
+
+  /**
+    * Submit query `q` to the shell and return result.
+    * */
+  def query(q: String): QueryResult = {
+    val mutex = new Semaphore(0)
+    var result: QueryResult = null
+    queryAsync(q) { r =>
+      result = r
+      mutex.release()
+    }
+    mutex.acquire()
+    result
+  }
+
+  /**
+    * Shutdown the embedded ammonite shell and
+    * associated threads.
+    * */
+  def shutdown(): Unit = {
+    shutdownShellThread()
+    logger.info("Shell terminated gracefully")
+    shutdownWriterThread()
+
+    def shutdownWriterThread(): Unit = {
+      jobQueue.add(Job(null, null, null))
+      userThread.join()
+    }
+    def shutdownShellThread(): Unit = {
+      writer.println("exit")
+      writer.close()
+      shellThread.join()
+    }
+  }
+
+}
+
+object EmbeddedAmmonite {
+
+  /* The standard frontend attempts to query /dev/tty
+      in multiple places, e.g., to query terminal dimensions.
+      This does not work in intellij tests
+      (see https://github.com/lihaoyi/Ammonite/issues/276)
+      The below hack overrides the default frontend with
+      a custom frontend that does not require /dev/tty.
+      This also enables us to disable terminal echo
+      by passing a `displayTransform` that returns
+      an empty string on all input.
+   */
+
+  val predef: String =
     """
       | class CustomFrontend extends ammonite.repl.AmmoniteFrontEnd() {
       |   override def width = 100
@@ -55,83 +151,4 @@ class EmbeddedAmmonite(predef: String = "") {
       | repl.frontEnd() = new CustomFrontend()
       |
       |""".stripMargin
-
-  val jobQueue: BlockingQueue[Job] = new LinkedBlockingQueue[Job]()
-  val jobMap = new ConcurrentHashMap[UUID, Job]()
-  val results = new ConcurrentHashMap[UUID, Result]
-
-  val toStdin = new PipedOutputStream()
-  val inStream = new PipedInputStream()
-  inStream.connect(toStdin)
-  val outStream = new PipedOutputStream()
-  val fromStdout = new PipedInputStream()
-  fromStdout.connect(outStream)
-  val errStream = new PipedOutputStream()
-  val fromStderr = new PipedInputStream()
-  fromStderr.connect(errStream)
-
-  val writer = new PrintWriter(toStdin)
-  val reader = new BufferedReader(new InputStreamReader(fromStdout))
-  val errReader = new BufferedReader(new InputStreamReader(fromStderr))
-
-  val writerThread = new Thread(new WriterRunnable(jobQueue, writer, reader, errReader))
-
-  val shellThread = new Thread(() => {
-    val ammoniteShell =
-      ammonite
-        .Main(
-          predefCode = embeddedAmmonitePredef + predef,
-          welcomeBanner = None,
-          remoteLogging = false,
-          colors = Colors.BlackWhite,
-          inputStream = inStream,
-          outputStream = outStream,
-          errorStream = errStream
-        )
-    ammoniteShell.run()
-  })
-
-  def start(): Unit = {
-    shellThread.start()
-    writerThread.start()
-  }
-
-  /**
-    * Ask for query to be run. Returns a query
-    * id (given by a uuid) and eventually calls
-    * observer.
-    * */
-  def queryAsync(q: String)(observer: Result => Unit): UUID = {
-    val uuid = UUID.randomUUID()
-    jobQueue.add(Job(uuid, q, observer))
-    uuid
-  }
-
-  def query(q: String): String = {
-    val mutex = new Semaphore(0)
-    var stdoutResult = ""
-    queryAsync(q) { result =>
-      stdoutResult = result.out
-      mutex.release()
-    }
-    mutex.acquire()
-    stdoutResult
-  }
-
-  def shutdown(): Unit = {
-    shutdownShellThread()
-    logger.info("Shell terminated gracefully")
-    shutdownWriterThread()
-
-    def shutdownWriterThread(): Unit = {
-      jobQueue.add(Job(null, null, null))
-      writerThread.join()
-    }
-    def shutdownShellThread(): Unit = {
-      writer.println("exit")
-      writer.close()
-      shellThread.join()
-    }
-  }
-
 }
