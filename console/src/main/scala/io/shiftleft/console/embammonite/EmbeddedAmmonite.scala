@@ -72,9 +72,10 @@ class EmbeddedAmmonite(predef: String = "") {
 
   val writer = new PrintWriter(toStdin)
   val reader = new BufferedReader(new InputStreamReader(fromStdout))
+  val errReader = new BufferedReader(new InputStreamReader(fromStderr))
 
   val writerThread = new Thread(new WriterRunnable(jobQueue, writer, jobMap))
-  val readerThread = new Thread(new ReaderRunnable(reader, jobMap))
+  val readerThread = new Thread(new ReaderRunnable(reader, errReader, jobMap))
 
   val shellThread = new Thread(() => {
     val ammoniteShell =

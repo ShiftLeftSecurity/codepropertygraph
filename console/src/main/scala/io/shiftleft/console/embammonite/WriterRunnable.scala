@@ -22,6 +22,7 @@ class WriterRunnable(queue: BlockingQueue[Job], writer: PrintWriter, jobMap: Con
           jobMap.put(job.uuid, job)
           writer.println(job.query.trim)
           writer.println(s""""END: ${job.uuid}"""")
+          writer.println(s"""throw new RuntimeException("END: ${job.uuid}")""")
           writer.flush()
         }
       }

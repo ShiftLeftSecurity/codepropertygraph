@@ -13,7 +13,7 @@ class EmbeddedAmmoniteTests extends WordSpec with Matchers {
       shell.shutdown()
     }
 
-    "execute a command synchronously and return output" in {
+    "execute a command synchronously" in {
       val shell = new EmbeddedAmmonite()
       shell.start()
       val result = shell.query("def foo() = {\n1\n}\n foo()")
