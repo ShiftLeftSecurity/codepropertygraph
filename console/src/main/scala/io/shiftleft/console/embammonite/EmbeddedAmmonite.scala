@@ -2,13 +2,13 @@ package io.shiftleft.console.embammonite
 
 import java.io.{BufferedReader, InputStreamReader, PipedInputStream, PipedOutputStream, PrintWriter}
 import java.util.UUID
-import java.util.concurrent.{BlockingQueue, ConcurrentHashMap, LinkedBlockingQueue}
+import java.util.concurrent.{BlockingQueue, ConcurrentHashMap, LinkedBlockingQueue, Semaphore}
 
 import ammonite.util.Colors
 import org.slf4j.LoggerFactory
 
-case class Job(uuid: UUID, query: String)
-class Result(val out: String = "", val err: String = "")
+case class Job(uuid: UUID, query: String, observer: Result => Unit)
+class Result(val out: String, val err: String, val uuid: UUID)
 
 class EmbeddedAmmonite(predef: String = "") {
 
@@ -57,6 +57,7 @@ class EmbeddedAmmonite(predef: String = "") {
       |""".stripMargin
 
   val jobQueue: BlockingQueue[Job] = new LinkedBlockingQueue[Job]()
+  val jobMap = new ConcurrentHashMap[UUID, Job]()
   val results = new ConcurrentHashMap[UUID, Result]
 
   val toStdin = new PipedOutputStream()
@@ -72,8 +73,8 @@ class EmbeddedAmmonite(predef: String = "") {
   val writer = new PrintWriter(toStdin)
   val reader = new BufferedReader(new InputStreamReader(fromStdout))
 
-  val writerThread = new Thread(new WriterRunnable(jobQueue, writer))
-  val readerThread = new Thread(new ReaderRunnable(reader, results))
+  val writerThread = new Thread(new WriterRunnable(jobQueue, writer, jobMap))
+  val readerThread = new Thread(new ReaderRunnable(reader, jobMap))
 
   val shellThread = new Thread(() => {
     val ammoniteShell =
@@ -96,12 +97,26 @@ class EmbeddedAmmonite(predef: String = "") {
     readerThread.start()
   }
 
-  def enqueue(uuid: UUID, query: String): Unit = {
-    jobQueue.add(Job(uuid, query))
+  /**
+    * Ask for query to be run. Returns a query
+    * id (given by a uuid) and eventually calls
+    * observer.
+    * */
+  def queryAsync(q: String)(observer: Result => Unit): UUID = {
+    val uuid = UUID.randomUUID()
+    jobQueue.add(Job(uuid, q, observer))
+    uuid
   }
 
-  def result(uuid: UUID): Option[Result] = {
-    Option(results.remove(uuid))
+  def query(q: String): String = {
+    val mutex = new Semaphore(0)
+    var stdoutResult = ""
+    queryAsync(q) { result =>
+      stdoutResult = result.out
+      mutex.release()
+    }
+    mutex.acquire()
+    stdoutResult
   }
 
   def shutdown(): Unit = {
@@ -112,7 +127,7 @@ class EmbeddedAmmonite(predef: String = "") {
     readerThread.join()
 
     def shutdownWriterThread(): Unit = {
-      jobQueue.add(Job(null, null))
+      jobQueue.add(Job(null, null, null))
       writerThread.join()
     }
     def shutdownShellThread(): Unit = {

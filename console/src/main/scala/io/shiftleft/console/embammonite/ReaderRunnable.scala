@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 
 import scala.util.Try
 
-class ReaderRunnable(reader: BufferedReader, results: ConcurrentHashMap[UUID, Result]) extends Runnable {
+class ReaderRunnable(reader: BufferedReader, jobMap: ConcurrentHashMap[UUID, Job]) extends Runnable {
 
   private val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -28,7 +28,10 @@ class ReaderRunnable(reader: BufferedReader, results: ConcurrentHashMap[UUID, Re
           if (uuid.isEmpty) {
             currentOutput += line + "\n"
           } else {
-            results.put(uuid.next, new Result(currentOutput))
+            val actualUuid = uuid.next
+            Option(jobMap.get(actualUuid)).foreach { job =>
+              job.observer(new Result(currentOutput, "", actualUuid))
+            }
             currentOutput = ""
           }
         }

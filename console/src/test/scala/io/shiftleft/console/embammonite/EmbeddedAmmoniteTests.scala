@@ -1,7 +1,5 @@
 package io.shiftleft.console.embammonite
 
-import java.util.UUID
-
 import org.scalatest.{Matchers, WordSpec}
 
 class EmbeddedAmmoniteTests extends WordSpec with Matchers {
@@ -13,12 +11,14 @@ class EmbeddedAmmoniteTests extends WordSpec with Matchers {
       shell.shutdown()
     }
 
-    "execute a command and return output" in {
+    "execute a command synchronously and return output" in {
       val shell = new EmbeddedAmmonite()
       shell.start()
-      val uuid = UUID.randomUUID()
-      shell.enqueue(uuid, "def foo() = {\n1\n}\n foo()")
-      println(shell.result(uuid))
+      val result = shell.query("def foo() = {\n1\n}\n foo()")
+      result shouldBe
+        """defined function foo
+          |res1: Int = 1
+          |""".stripMargin
       shell.shutdown()
     }
   }

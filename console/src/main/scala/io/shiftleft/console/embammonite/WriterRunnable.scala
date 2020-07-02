@@ -1,11 +1,13 @@
 package io.shiftleft.console.embammonite
 
 import java.io.PrintWriter
-import java.util.concurrent.BlockingQueue
+import java.util.UUID
+import java.util.concurrent.{BlockingQueue, ConcurrentHashMap}
 
 import org.slf4j.LoggerFactory
 
-class WriterRunnable(queue: BlockingQueue[Job], writer: PrintWriter) extends Runnable {
+class WriterRunnable(queue: BlockingQueue[Job], writer: PrintWriter, jobMap: ConcurrentHashMap[UUID, Job])
+    extends Runnable {
 
   private val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -17,6 +19,7 @@ class WriterRunnable(queue: BlockingQueue[Job], writer: PrintWriter) extends Run
         if (job.uuid == null && job.query == null) {
           terminate = true
         } else {
+          jobMap.put(job.uuid, job)
           writer.println(job.query.trim)
           writer.println(s""""END: ${job.uuid}"""")
           writer.flush()
