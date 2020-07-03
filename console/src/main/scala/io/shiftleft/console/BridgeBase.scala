@@ -3,9 +3,9 @@ package io.shiftleft.console
 import ammonite.ops.pwd
 import ammonite.ops.Path
 import ammonite.util.{Colors, Res}
-
 import better.files._
 import io.shiftleft.console.embammonite.EmbeddedAmmonite
+import io.shiftleft.console.wsserver.WebsocketServer
 
 case class Config(
     scriptFile: Option[Path] = None,
@@ -104,9 +104,11 @@ trait BridgeBase {
     val predef = predefPlus(additionalImportCode(config))
     val ammonite = new EmbeddedAmmonite(predef)
     ammonite.start()
-
-    // TODO start server
-    ammonite.shutdown()
+    Runtime.getRuntime.addShutdownHook(new Thread(() => {
+      ammonite.shutdown()
+    }))
+    val server = new WebsocketServer()
+    server.main(Array.empty)
   }
 
   private def runScript(scriptFile: Path, config: Config) = {
