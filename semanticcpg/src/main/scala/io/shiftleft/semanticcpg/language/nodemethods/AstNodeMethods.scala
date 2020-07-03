@@ -36,6 +36,8 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
   def isFieldIdentifier: Boolean = node.isInstanceOf[nodes.FieldIdentifier]
 
+  def isFile: Boolean = node.isInstanceOf[nodes.File]
+
   def isReturn: Boolean = node.isInstanceOf[nodes.Return]
 
   def isLiteral: Boolean = node.isInstanceOf[nodes.Literal]
@@ -46,11 +48,21 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
   def isExpression: Boolean = node.isInstanceOf[nodes.Expression]
 
+  def isMember: Boolean = node.isInstanceOf[nodes.Member]
+
   def isMethodRef: Boolean = node.isInstanceOf[nodes.MethodRef]
 
   def isMethod: Boolean = node.isInstanceOf[nodes.Method]
 
+  def isModifier: Boolean = node.isInstanceOf[nodes.Modifier]
+
+  def isNamespaceBlock: Boolean = node.isInstanceOf[nodes.NamespaceBlock]
+
   def isBlock: Boolean = node.isInstanceOf[nodes.Block]
+
+  def isParameter: Boolean = node.isInstanceOf[nodes.MethodParameterIn]
+
+  def isTypeDecl: Boolean = node.isInstanceOf[nodes.TypeDecl]
 
   def depth: Int = depth(_ => true)
 

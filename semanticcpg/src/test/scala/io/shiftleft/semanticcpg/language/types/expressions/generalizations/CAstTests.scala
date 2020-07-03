@@ -81,6 +81,15 @@ class CAstTests extends WordSpec with Matchers {
         .size shouldBe 1
     }
 
+    "should allow basic calling basic 'is' methods on AST node" in {
+      cpg.method.name("foo").ast.isFile.l.size shouldBe 0
+      cpg.method.name("foo").ast.isMember.l.size shouldBe 0
+      cpg.method.name("foo").ast.isModifier.l.size shouldBe 0
+      cpg.method.name("foo").ast.isNamespaceBlock.l.size shouldBe 0
+      cpg.method.name("foo").ast.isParameter.l.size shouldBe 1
+      cpg.method.name("foo").ast.isTypeDecl.l.size shouldBe 0
+    }
+
     "should identify conditions" in {
       cpg.method.name("foo").controlStructure.condition.code.l shouldBe List("x > 10", "y > x")
     }
