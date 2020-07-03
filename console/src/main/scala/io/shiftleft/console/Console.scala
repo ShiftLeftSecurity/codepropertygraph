@@ -187,7 +187,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
 
   protected def fixProjectNameAndComplainOnFix(name: String): String = {
     val projectName = Some(name)
-      .filter(_.contains(java.io.File.pathSeparator))
+      .filter(_.contains(java.io.File.separator))
       .map(deriveNameFromInputPath)
       .getOrElse(name)
     if (name != projectName) {
