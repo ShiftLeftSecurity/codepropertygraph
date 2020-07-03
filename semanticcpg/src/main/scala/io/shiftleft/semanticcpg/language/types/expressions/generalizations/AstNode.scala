@@ -143,6 +143,12 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
     new NodeSteps(raw.hasLabel(NodeTypes.IDENTIFIER).cast[nodes.Identifier])
 
   /**
+    * Traverse only to FILE AST nodes
+    * */
+  def isFile: NodeSteps[nodes.File] =
+    new NodeSteps(raw.hasLabel(NodeTypes.FILE).cast[nodes.File])
+
+  /**
     * Traverse only to AST nodes that are field identifier
     * */
   def isFieldIdentifier: NodeSteps[nodes.FieldIdentifier] =
@@ -155,10 +161,46 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
     new NodeSteps(raw.hasLabel(NodeTypes.RETURN).cast[nodes.Return])
 
   /**
+    * Traverse only to AST nodes that are MEMBER nodes.
+    */
+  def isMember: NodeSteps[nodes.Member] =
+    new NodeSteps(raw.hasLabel(NodeTypes.MEMBER).cast[nodes.Member])
+
+  /**
     * Traverse only to AST nodes that are method reference nodes.
     */
   def isMethodRef: NodeSteps[nodes.MethodRef] =
     new NodeSteps(raw.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef])
+
+  /**
+    * Traverse only to AST nodes that are METHOD nodes.
+    */
+  def isMethod: NodeSteps[nodes.Method] =
+    new NodeSteps(raw.hasLabel(NodeTypes.METHOD).cast[nodes.Method])
+
+  /**
+    * Traverse only to AST nodes that are MODIFIER nodes.
+    */
+  def isModifier: NodeSteps[nodes.Modifier] =
+    new NodeSteps(raw.hasLabel(NodeTypes.MODIFIER).cast[nodes.Modifier])
+
+  /**
+    * Traverse only to AST nodes that are NAMESPACE_BLOCK nodes.
+    */
+  def isNamespaceBlock: NodeSteps[nodes.NamespaceBlock] =
+    new NodeSteps(raw.hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[nodes.NamespaceBlock])
+
+  /**
+    * Traverse only to AST nodes that are METHOD_PARAMETER_IN nodes.
+    */
+  def isParameter: NodeSteps[nodes.MethodParameterIn] =
+    new NodeSteps(raw.hasLabel(NodeTypes.METHOD_PARAMETER_IN).cast[nodes.MethodParameterIn])
+
+  /**
+    * Traverse only to AST nodes that are TYPE_DECL nodes.
+    */
+  def isTypeDecl: NodeSteps[nodes.TypeDecl] =
+    new NodeSteps(raw.hasLabel(NodeTypes.TYPE_DECL).cast[nodes.TypeDecl])
 
   def walkAstUntilReaching(labels: List[String]): NodeSteps[nodes.StoredNode] =
     new NodeSteps[nodes.StoredNode](
