@@ -187,7 +187,7 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
   /**
     * Traverse only to AST nodes that are NAMESPACE_BLOCK nodes.
     */
-   def isNamespaceBlock: NodeSteps[nodes.NamespaceBlock] =
+  def isNamespaceBlock: NodeSteps[nodes.NamespaceBlock] =
     new NodeSteps(raw.hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[nodes.NamespaceBlock])
 
   /**
