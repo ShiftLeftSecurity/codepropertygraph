@@ -30,7 +30,7 @@ jobs:
     - sbt scalafmtCheck test
   - stage: release
     script:
-    - sbt ciReleaseTagNextVersion ciReleaseBintray
+    - sbt ciReleaseTagNextVersion ciReleaseSonatype
   - stage: python-test-and-release
     script:
     - pip install requests
