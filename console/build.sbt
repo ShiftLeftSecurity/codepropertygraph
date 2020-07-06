@@ -62,6 +62,8 @@ libraryDependencies ++= Seq(
   "org.zeroturnaround"   %  "zt-zip"        % ZeroturnaroundVersion,
   "com.lihaoyi"          %% "ammonite"      % AmmoniteVersion cross CrossVersion.full,
   "com.lihaoyi" 	 %% "cask" 	    % CaskVersion,
+  "io.shiftleft"         %% "fuzzyc2cpg"    % Versions.fuzzyc2cpg,
   "org.scalatest"        %% "scalatest"     % ScalatestVersion % Test,
-  "io.shiftleft" %% "fuzzyc2cpg"            % Versions.fuzzyc2cpg,
+  "com.lihaoyi"          %% "requests"          % "0.6.2" % Test,
+  "org.asynchttpclient"  % "async-http-client" % "2.5.2" % Test
 )
