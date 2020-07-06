@@ -11,7 +11,7 @@ import org.apache.logging.log4j.LogManager
   * Result of executing a query, containing in particular
   * output received on standard out and on standard error.
   * */
-class QueryResult(val out: String, val err: String)
+class QueryResult(val out: String, val err: String, val uuid: UUID)
 
 private[embammonite] case class Job(uuid: UUID, query: String, observer: QueryResult => Unit)
 

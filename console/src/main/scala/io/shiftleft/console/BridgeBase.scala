@@ -107,7 +107,7 @@ trait BridgeBase {
     Runtime.getRuntime.addShutdownHook(new Thread(() => {
       ammonite.shutdown()
     }))
-    val server = new WebsocketServer()
+    val server = new WebsocketServer(ammonite)
     server.main(Array.empty)
   }
 
