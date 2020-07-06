@@ -41,6 +41,9 @@ inThisBuild(
   )
 )
 
+ThisBuild/publishTo := sonatypePublishToBundle.value
+Global / useGpg := false
+
 name := "codepropertygraph"
 publish / skip := true
 
