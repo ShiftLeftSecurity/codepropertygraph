@@ -1,5 +1,6 @@
 [![Build Status](https://secure.travis-ci.org/ShiftLeftSecurity/codepropertygraph.png?branch=master)](http://travis-ci.org/ShiftLeftSecurity/codepropertygraph)
 [![bintray](https://api.bintray.com/packages/shiftleft/maven/codepropertygraph/images/download.svg)](https://bintray.com/shiftleft/maven/codepropertygraph/_latestVersion)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.shiftleft/codepropertygraph_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.shiftleft/codepropertygraph_2.13)
 
 # Code Property Graph - Specification and Tooling
 
@@ -24,9 +25,7 @@ application-specific data.
 `build.sbt`:
 ```
 libraryDependencies += "io.shiftleft" %% "codepropertygraph" % "x.y.z"
-resolvers += Resolver.bintrayRepo("shiftleft", "maven")
 ```
-Other build tools: see [bintray instructions](https://bintray.com/shiftleft/maven/codepropertygraph/_latestVersion).
 
 # Building the code
 
