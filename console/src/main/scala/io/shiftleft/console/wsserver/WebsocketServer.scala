@@ -34,7 +34,7 @@ class WebsocketServer(ammonite: EmbeddedAmmonite) extends cask.MainRoutes {
     ujson.Obj("success" -> true, "uuid" -> uuid.toString)
   }
 
-  @cask.get("/result/:uuid")
+  @cask.get("/result/:uuidStr")
   def getResult(uuidStr: String): Obj = {
     val uuid = UUID.fromString(uuidStr)
     val result = resultMap.remove(uuid)
