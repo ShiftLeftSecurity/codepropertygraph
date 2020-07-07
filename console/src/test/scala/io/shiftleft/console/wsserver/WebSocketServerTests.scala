@@ -6,14 +6,27 @@ import java.util.UUID
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent._
-import duration.Duration.Inf
 import castor.Context.Simple.global
 import cask.util.Logger.Console._
 import io.shiftleft.console.embammonite.EmbeddedAmmonite
+import ujson.Value.Value
 
+import scala.concurrent.duration._
 import scala.util.Try
 
 class WebSocketServerTests extends WordSpec with Matchers {
+
+  def postQuery(host: String): Value = {
+    val postResponse = requests.post(s"$host/query", data = ujson.Obj("query" -> "1").toString)
+    ujson.read(postResponse.contents)
+  }
+
+  def getResponse(host: String, uuid: UUID): Value = {
+    val uri = s"$host/result/${URLEncoder.encode(uuid.toString, "utf-8")}"
+    val getResponse = requests.get(uri)
+    ujson.read(getResponse.contents)
+  }
+
   "WebsocketServer" should {
 
     "allow connecting, posting a query, and fetching result" in Fixture() { host =>
@@ -21,17 +34,12 @@ class WebSocketServerTests extends WordSpec with Matchers {
       cask.util.WsClient.connect(s"$host/connect") {
         case cask.Ws.Text(msg) => wsPromise.success(msg)
       }
-
-      // Connect to websocket endpoint
-
-      val wsMsg = Await.result(wsPromise.future, Inf)
+      val wsMsg = Await.result(wsPromise.future, Duration(10, SECONDS))
       wsMsg shouldBe "connected"
 
       // Post a query and make sure to get back a uuid
 
-      wsPromise = scala.concurrent.Promise[String]
-      val postResponse = requests.post(s"$host/query", data = ujson.Obj("query" -> "1").toString)
-      val jsonResponse = ujson.read(postResponse.contents)
+      val jsonResponse = postQuery(host)
       val uuidFromPost = Try { UUID.fromString(jsonResponse("uuid").str) }.toOption match {
         case Some(num) => num
         case None      => fail
@@ -40,21 +48,28 @@ class WebSocketServerTests extends WordSpec with Matchers {
 
       // Wait until receiving the same uuid on the websocket
 
-      val wsMsg2 = Await.result(wsPromise.future, Inf)
+      wsPromise = scala.concurrent.Promise[String]
+      val wsMsg2 = Await.result(wsPromise.future, Duration(100, SECONDS))
       Try { UUID.fromString(wsMsg2) }.toOption match {
         case Some(num) => num shouldBe uuidFromPost
         case None      => fail
       }
 
-      // Fetch result using get
-
-      val uri = s"$host/result/${URLEncoder.encode(uuidFromPost.toString, "utf-8")}"
-      val getResponse = requests.get(uri)
-      val jsonGetResponse = ujson.read(getResponse.contents)
+      val jsonGetResponse = getResponse(host, uuidFromPost)
       jsonGetResponse("out").str shouldBe "res0: Int = 1\n"
     }
-
   }
+
+  "receive error when attempting to retrieve result with invalid uuid" in Fixture() { host =>
+    val wsPromise = scala.concurrent.Promise[String]
+    cask.util.WsClient.connect(s"$host/connect") {
+      case cask.Ws.Text(msg) => wsPromise.success(msg)
+    }
+    Await.result(wsPromise.future, Duration(100, SECONDS))
+    val jsonGetResponse = getResponse(host, UUID.randomUUID())
+    jsonGetResponse("success").bool shouldBe false
+  }
+
 }
 
 object Fixture {
