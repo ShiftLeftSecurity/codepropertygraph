@@ -2,7 +2,6 @@ package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import java.nio.file.Paths
 
-import gremlin.scala.ScalaGraph
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
@@ -10,7 +9,7 @@ import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
-import overflowdb.{Node, OdbEdge}
+import overflowdb.{Node, OdbEdge, OdbGraph}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -148,12 +147,12 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   private def reference(node: nodes.StoredNode): Option[nodes.StoredNode] =
     node._refOut.nextOption
 
-  def toDot(graph: ScalaGraph): String = {
+  def toDot(graph: OdbGraph): String = {
     val buf = new StringBuffer()
 
     buf.append("digraph g {\n node[shape=plaintext];\n")
 
-    graph.E.hasLabel(EdgeTypes.REACHING_DEF).l.map(_.asInstanceOf[OdbEdge]).foreach { e =>
+    graph.edges(EdgeTypes.REACHING_DEF).asScala.foreach { e =>
       val inV = nodeToStr(e.inNode).replace("\"", "\'")
       val outV = nodeToStr(e.outNode).replace("\"", "\'")
       buf.append(s""" "$outV" -> "$inV";\n """)
