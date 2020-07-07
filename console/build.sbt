@@ -45,6 +45,7 @@ scalacOptions ++= Seq(
 
 val ScoptVersion = "3.7.1"
 val BetterFilesVersion = "3.8.0"
+val CaskVersion = "0.6.7"
 val CatsVersion = "2.0.0"
 val CirceVersion = "0.12.2"
 val AmmoniteVersion = "1.8.1"
@@ -60,6 +61,7 @@ libraryDependencies ++= Seq(
   "io.circe"             %% "circe-parser"  % CirceVersion,
   "org.zeroturnaround"   %  "zt-zip"        % ZeroturnaroundVersion,
   "com.lihaoyi"          %% "ammonite"      % AmmoniteVersion cross CrossVersion.full,
-  "org.scalatest"        %% "scalatest"     % ScalatestVersion % Test,
-  "io.shiftleft" %% "fuzzyc2cpg"            % Versions.fuzzyc2cpg,
+  "com.lihaoyi" 	 %% "cask" 	    % CaskVersion,
+  "io.shiftleft"         %% "fuzzyc2cpg"    % Versions.fuzzyc2cpg,
+  "org.scalatest"        %% "scalatest"     % ScalatestVersion % Test
 )
