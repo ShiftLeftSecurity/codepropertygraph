@@ -297,13 +297,19 @@ object DiffGraph {
 
     private val overlayNodeToOdbNode = new util.HashMap[IdentityHashWrapper[NewNode], Node]()
 
-    def applyDiff(diffGraph: DiffGraph, cpg: Cpg, undoable: Boolean = false): AppliedDiffGraph = {
-      applyDiff(diffGraph, cpg.graph, undoable)
+    def applyDiff(diffGraph: DiffGraph,
+                  cpg: Cpg,
+                  undoable: Boolean = false,
+                  keyPool: Option[KeyPool] = None): AppliedDiffGraph = {
+      applyDiff(diffGraph, cpg.graph, undoable, keyPool)
     }
 
-    private def applyDiff(diffGraph: DiffGraph, graph: OdbGraph, undoable: Boolean): AppliedDiffGraph = {
+    private def applyDiff(diffGraph: DiffGraph,
+                          graph: OdbGraph,
+                          undoable: Boolean,
+                          keyPool: Option[KeyPool]): AppliedDiffGraph = {
       val inverseBuilder: InverseBuilder = if (undoable) InverseBuilder.newBuilder else InverseBuilder.noop
-      diffGraph.iterator.foreach(change => applyChange(graph, change, inverseBuilder))
+      diffGraph.iterator.foreach(change => applyChange(graph, change, inverseBuilder, keyPool))
       AppliedDiffGraph(
         diffGraph,
         if (undoable) Some(inverseBuilder.build()) else None,
@@ -312,12 +318,15 @@ object DiffGraph {
     }
 
     def unapplyDiff(graph: OdbGraph, inverseDiff: DiffGraph): Unit = {
-      applyDiff(inverseDiff, graph, false)
+      applyDiff(inverseDiff, graph, false, None)
     }
 
-    private def applyChange(graph: OdbGraph, change: Change, inverseBuilder: DiffGraph.InverseBuilder) =
+    private def applyChange(graph: OdbGraph,
+                            change: Change,
+                            inverseBuilder: DiffGraph.InverseBuilder,
+                            keyPool: Option[KeyPool]) =
       change match {
-        case Change.CreateNode(node) => addNode(graph, node, inverseBuilder)
+        case Change.CreateNode(node) => addNode(graph, node, inverseBuilder, keyPool)
         case c: Change.CreateEdge    => addEdge(c, inverseBuilder)
         case Change.SetNodeProperty(node, key, value) =>
           addNodeProperty(node, key, value, inverseBuilder)
@@ -374,8 +383,14 @@ object DiffGraph {
       }
     }
 
-    private def addNode(graph: OdbGraph, node: NewNode, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
-      val newNode = graph + node.label
+    private def addNode(graph: OdbGraph,
+                        node: NewNode,
+                        inverseBuilder: DiffGraph.InverseBuilder,
+                        keyPool: Option[KeyPool]): Unit = {
+      val newNode = keyPool match {
+        case Some(pool) => graph.addNode(pool.next, node.label)
+        case None       => graph + node.label
+      }
       inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
       node.properties.foreach {
         case (key, value) if !key.startsWith(InternalProperty) =>
@@ -388,14 +403,17 @@ object DiffGraph {
   object Applier {
     private val InternalProperty = "_"
 
-    def applyDiff(diff: DiffGraph, cpg: Cpg, undoable: Boolean = false): AppliedDiffGraph = {
+    def applyDiff(diff: DiffGraph,
+                  cpg: Cpg,
+                  undoable: Boolean = false,
+                  keyPool: Option[KeyPool] = None): AppliedDiffGraph = {
       val applier = new Applier
-      applier.applyDiff(diff, cpg, undoable)
+      applier.applyDiff(diff, cpg, undoable, keyPool)
     }
 
-    def applyDiff(diff: DiffGraph, graph: OdbGraph, undoable: Boolean): AppliedDiffGraph = {
+    def applyDiff(diff: DiffGraph, graph: OdbGraph, undoable: Boolean, keyPool: Option[KeyPool]): AppliedDiffGraph = {
       val applier = new Applier
-      applier.applyDiff(diff, graph, undoable)
+      applier.applyDiff(diff, graph, undoable, keyPool)
     }
 
     def unapplyDiff(graph: OdbGraph, inverseDiff: DiffGraph): Unit = {
