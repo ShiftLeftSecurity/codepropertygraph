@@ -4,7 +4,7 @@ import java.util.concurrent.{BlockingQueue, LinkedBlockingQueue}
 
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.DiffGraph
+import io.shiftleft.passes.{DiffGraph, KeyPool}
 import io.shiftleft.codepropertygraph.generated.nodes
 import org.slf4j.LoggerFactory
 import overflowdb.{OdbConfig, OdbGraph}
@@ -16,30 +16,46 @@ import scala.util.{Failure, Success, Try}
   * the database at `outputPath` consecutively. This thread implements
   * the "reduce" step in our "map-reduce" CPG generation.
   * */
-class DbWriter(outputPath: String) {
+class DbWriter {
 
-  private val queue = new LinkedBlockingQueue[DiffGraph]()
-  private val writer = new DbWriterRunnable(outputPath, queue)
-  private val thread = new Thread(writer)
+  private val queue = new LinkedBlockingQueue[(DiffGraph, KeyPool)]()
+  private var thread: Thread = _
 
-  def start(): Unit = {
+  /**
+    * Open the CPG at `outputPath` for writing, overwriting
+    * it if it already exists. Note that calling `close` when
+    * you are done is mandatory for program termination and
+    * obtaining a valid CPG.
+    * */
+  def open(outputPath: String): Unit = {
+    thread = new Thread(new DbWriterRunnable(outputPath, queue))
     thread.start()
   }
 
-  def add(diffGraph: DiffGraph): Unit = {
-    queue.put(diffGraph)
+  /**
+    * Merge `diffGraph` into CPG. Node ids are taken from the
+    * provided `keyPool`.
+    * */
+  def add(diffGraph: DiffGraph, keyPool: KeyPool): Unit = {
+    queue.put(diffGraph, keyPool)
   }
 
-  def stop(): Unit = {
-    val node = nodes.NewUnknown(parserTypeName = "terminate-db-writer")
-    val terminator = DiffGraph.newBuilder
-    terminator.addNode(node)
-    queue.put(terminator.build)
+  /**
+    * Close the CPG.
+    * */
+  def close(): Unit = {
+    if (thread != null) {
+      val node = nodes.NewUnknown(parserTypeName = "terminate-db-writer")
+      val terminator = DiffGraph.newBuilder
+      terminator.addNode(node)
+      queue.put(terminator.build(), null)
+      thread.join()
+    }
   }
 
 }
 
-private class DbWriterRunnable(outputPath: String, queue: BlockingQueue[DiffGraph]) extends Runnable {
+private class DbWriterRunnable(outputPath: String, queue: BlockingQueue[(DiffGraph, KeyPool)]) extends Runnable {
 
   private val logger = LoggerFactory.getLogger(getClass)
 
@@ -75,11 +91,11 @@ private class DbWriterRunnable(outputPath: String, queue: BlockingQueue[DiffGrap
     Try {
       var terminate = false
       while (!terminate) {
-        val diffGraph = queue.take()
+        val (diffGraph, keyPool) = queue.take()
         if (isTerminator(diffGraph)) {
           terminate = true
         } else {
-          DiffGraph.Applier.applyDiff(diffGraph, cpg)
+          DiffGraph.Applier.applyDiff(diffGraph, cpg, false, Some(keyPool))
         }
       }
     }
