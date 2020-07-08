@@ -123,7 +123,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
       |""".stripMargin,
     "cpg.method.l"
   )
-  def cpg: Cpg = workspace.cpg
+  implicit def cpg: Cpg = workspace.cpg
 
   /**
     * All cpgs loaded in the workspace
