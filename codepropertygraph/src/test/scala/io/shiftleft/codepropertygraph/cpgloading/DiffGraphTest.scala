@@ -38,7 +38,7 @@ class DiffGraphTest extends WordSpec with Matchers {
       diffBuilder.addEdgeProperty(x2y, EdgeKeyNames.LOCAL_NAME, "new edge attr")
       val diffGraph = diffBuilder.build()
       // apply diffgraph with undoable = true
-      val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, graph, true)
+      val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, graph, true, None)
       val inverseDiffGraph = appliedDiffGraph.inverseDiffGraph.get
       val changes = inverseDiffGraph.iterator.toList
       import DiffGraph.Change._
@@ -63,15 +63,15 @@ class DiffGraphTest extends WordSpec with Matchers {
       diffBuilder.addNode(createNewNode("b"))
       diffBuilder.addNode(createNewNode("c"))
       val threeNodes = diffBuilder.build()
-      val appliedDiff1 = DiffGraph.Applier.applyDiff(threeNodes, graph, true)
+      val appliedDiff1 = DiffGraph.Applier.applyDiff(threeNodes, graph, true, None)
       graph.nodeCount shouldBe 3
       DiffGraph.Applier.unapplyDiff(graph, appliedDiff1.inverseDiffGraph.get)
       graph.nodeCount shouldBe 0
-      DiffGraph.Applier.applyDiff(threeNodes, graph, false)
+      DiffGraph.Applier.applyDiff(threeNodes, graph, false, None)
       diffBuilder = DiffGraph.newBuilder
       makeEdgeBetweenExistingNodes(graph, diffBuilder, "a", "b")
       makeEdgeBetweenExistingNodes(graph, diffBuilder, "b", "c")
-      val appliedDiff2 = DiffGraph.Applier.applyDiff(diffBuilder.build(), graph, true)
+      val appliedDiff2 = DiffGraph.Applier.applyDiff(diffBuilder.build(), graph, true, None)
       graph.V.has(NodeKeysOdb.CODE -> "a").head.out(EdgeTypes.AST).property(NodeKeysOdb.CODE).head shouldBe "b"
       DiffGraph.Applier.unapplyDiff(graph, appliedDiff2.inverseDiffGraph.get)
       graph.V.has(NodeKeysOdb.CODE -> "a").head.out(EdgeTypes.AST).l shouldBe Nil
@@ -89,7 +89,7 @@ class DiffGraphTest extends WordSpec with Matchers {
       diffBuilder.addNode(newNodeB)
       diffBuilder.addEdge(newNodeA, newNodeB, EdgeTypes.AST)
       val diff = diffBuilder.build()
-      val appliedDiff = DiffGraph.Applier.applyDiff(diff, graph, true)
+      val appliedDiff = DiffGraph.Applier.applyDiff(diff, graph, true, None)
       graph.nodeCount shouldBe 2
       graph.edgeCount shouldBe 1
       DiffGraph.Applier.unapplyDiff(graph, appliedDiff.inverseDiffGraph.get)
@@ -107,7 +107,7 @@ class DiffGraphTest extends WordSpec with Matchers {
       diffBuilder.addNode(newNodeC)
       diffBuilder.addEdge(newNodeB, newNodeC, EdgeTypes.AST)
       val diff = diffBuilder.build()
-      val appliedDiff = DiffGraph.Applier.applyDiff(diff, graph, true)
+      val appliedDiff = DiffGraph.Applier.applyDiff(diff, graph, true, None)
       graph.nodeCount shouldBe 3
       graph.edgeCount shouldBe 2
       println(appliedDiff.inverseDiffGraph.get.iterator.toList)
