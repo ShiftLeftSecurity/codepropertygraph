@@ -29,7 +29,7 @@ class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
   private def validateKeysFacts(notEnhancedCpg: Cpg): Unit = {
     new KeysFactsImporter().loadFacts.foreach {
       case KeysFact(nodeType, nodeKeyType, cardinality) =>
-        notEnhancedCpg.graph.nodesByLabel(nodeType).asScala.foreach {
+        notEnhancedCpg.graph.nodes(nodeType).asScala.foreach {
           case dstNode if dstNode.label != NodeTypes.UNKNOWN =>
             validateNode(dstNode, nodeKeyType, cardinality)
           case _ => // Do nothing. Hence, we skip UNKNOWN nodes

@@ -16,7 +16,7 @@ class ContainsEdgePass(cpg: Cpg) extends ParallelCpgPass[nodes.AstNode](cpg) {
   import ContainsEdgePass.{destinationTypes, sourceTypes}
 
   override def partIterator: Iterator[nodes.AstNode] =
-    cpg.graph.nodesByLabel(sourceTypes: _*).asScala.map(_.asInstanceOf[nodes.AstNode])
+    cpg.graph.nodes(sourceTypes: _*).asScala.map(_.asInstanceOf[nodes.AstNode])
 
   override def runOnPart(source: nodes.AstNode): Option[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder

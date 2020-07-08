@@ -19,7 +19,7 @@ class OutFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validato
   private def validateOutFacts(notEnhancedCpg: Cpg): Unit = {
     getOutFactByEdgeTypeBySrcType.foreach {
       case (srcType, outFactsByEdgeType) =>
-        notEnhancedCpg.graph.nodesByLabel(srcType).asScala.foreach {
+        notEnhancedCpg.graph.nodes(srcType).asScala.foreach {
           case srcNode if srcNode.label != NodeTypes.UNKNOWN =>
             val outEdges = srcNode.outE.asScala.toList
             outFactsByEdgeType.foreach {

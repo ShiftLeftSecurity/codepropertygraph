@@ -18,7 +18,7 @@ class CapturingLinker(cpg: Cpg) extends CpgPass(cpg) {
 
     // TODO MP use `cpg.typ` once that's defined in odb api
     val idToClosureBinding: Map[String, nodes.ClosureBinding] =
-      Traversal(cpg.graph.nodesByLabel(NodeTypes.CLOSURE_BINDING))
+      Traversal(cpg.graph.nodes(NodeTypes.CLOSURE_BINDING))
         .cast[nodes.ClosureBinding]
         .map { closureBinding =>
           (closureBinding.closureBindingId.get, closureBinding)
@@ -26,7 +26,7 @@ class CapturingLinker(cpg: Cpg) extends CpgPass(cpg) {
         .toMap
 
     // TODO MP use `cpg.local` once that's defined in odb api
-    Traversal(cpg.graph.nodesByLabel(NodeTypes.LOCAL)).cast[nodes.Local].foreach { local =>
+    Traversal(cpg.graph.nodes(NodeTypes.LOCAL)).cast[nodes.Local].foreach { local =>
       local.closureBindingId.foreach { closureBindingId =>
         idToClosureBinding.get(closureBindingId) match {
           case Some(closureBindingNode) =>

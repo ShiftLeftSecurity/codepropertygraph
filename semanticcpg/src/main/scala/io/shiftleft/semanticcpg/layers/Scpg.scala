@@ -117,6 +117,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
   }
 
   override def probe(cpg: Cpg): Boolean = {
-    cpg.graph.nodesByLabel(NodeTypes.METHOD_PARAMETER_OUT).hasNext
+    cpg.graph.nodes(NodeTypes.METHOD_PARAMETER_OUT).hasNext
   }
 }
