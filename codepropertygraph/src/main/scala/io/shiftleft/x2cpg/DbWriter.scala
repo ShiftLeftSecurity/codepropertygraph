@@ -85,7 +85,7 @@ private class DbWriterRunnable(outputPath: String, queue: BlockingQueue[DiffGrap
     }
   }
 
-  def isTerminator(diffGraph: DiffGraph): Boolean = {
+  private def isTerminator(diffGraph: DiffGraph): Boolean = {
     diffGraph.nodes.size == 1 && {
       diffGraph.nodes.next match {
         case unknown: nodes.Unknown => unknown.parserTypeName == "terminate-db-writer"

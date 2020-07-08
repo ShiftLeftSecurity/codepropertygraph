@@ -10,8 +10,8 @@ object KeyIntervals {
     * compilation unit with a key interval. This method guarantees
     * that intervals do not overlap.
     * */
-  def assign[CompilationUnitType](compilationUnits: Seq[CompilationUnitType],
-                                  maxValue: Long = Long.MaxValue): Seq[(CompilationUnitType, KeyInterval)] = {
+  def assign[CompilationUnit](compilationUnits: List[CompilationUnit],
+                              maxValue: Long = Long.MaxValue): List[(CompilationUnit, KeyInterval)] = {
     val nIntervals: Int = Math.max(compilationUnits.size, 1)
     val intervalLen: Long = maxValue / nIntervals
     compilationUnits.zipWithIndex.map {
