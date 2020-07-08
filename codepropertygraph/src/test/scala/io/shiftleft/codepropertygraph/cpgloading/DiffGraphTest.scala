@@ -5,7 +5,7 @@ import overflowdb._
 import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
-import io.shiftleft.passes.DiffGraph
+import io.shiftleft.passes.{DiffGraph, KeyPool}
 import org.scalatest.{Matchers, WordSpec}
 
 class DiffGraphTest extends WordSpec with Matchers {
@@ -76,6 +76,23 @@ class DiffGraphTest extends WordSpec with Matchers {
       DiffGraph.Applier.unapplyDiff(graph, appliedDiff2.inverseDiffGraph.get)
       graph.V.has(NodeKeysOdb.CODE -> "a").head.out(EdgeTypes.AST).l shouldBe Nil
       graph.V.has(NodeKeysOdb.CODE, "b").head.out(EdgeTypes.AST).l shouldBe Nil
+    }
+  }
+
+  "should choose keys from provided KeyPool" in {
+    withTestOdb { graph =>
+      val builder = DiffGraph.newBuilder
+      val firstNode: NewNode = createNewNode("a")
+      val secondNode: NewNode = createNewNode("b")
+      val thirdNode: NewNode = createNewNode("c")
+      builder.addNode(firstNode)
+      builder.addNode(secondNode)
+      builder.addNode(thirdNode)
+      val keyPool = Some(new KeyPool(20, 30))
+      val appliedGraph = DiffGraph.Applier.applyDiff(builder.build, graph, true, keyPool)
+      appliedGraph.nodeToGraphId(firstNode) shouldBe 20
+      appliedGraph.nodeToGraphId(secondNode) shouldBe 21
+      appliedGraph.nodeToGraphId(thirdNode) shouldBe 22
     }
   }
 
