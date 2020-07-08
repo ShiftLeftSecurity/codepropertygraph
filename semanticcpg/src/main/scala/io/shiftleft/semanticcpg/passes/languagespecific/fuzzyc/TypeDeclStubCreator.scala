@@ -22,7 +22,7 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
     init()
 
     // TODO MP use `cpg.typ` once that's defined in odb api
-    Traversal(cpg.graph.nodesByLabel(NodeTypes.TYPE)).cast[nodes.Type].foreach { typ =>
+    Traversal(cpg.graph.nodes(NodeTypes.TYPE)).cast[nodes.Type].foreach { typ =>
       if (!typeDeclFullNameToNode.isDefinedAt(typ.fullName)) {
         val newTypeDecl = createTypeDeclStub(typ.name, typ.fullName)
         typeDeclFullNameToNode += typ.fullName -> newTypeDecl

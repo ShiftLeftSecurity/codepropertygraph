@@ -138,7 +138,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
                                                                 dstGraph: DiffGraph.Builder): Unit = {
     var loggedDeprecationWarning = false
     // TODO MP use `cpg.local` once that's defined in odb api
-    Traversal(cpg.graph.nodesByLabel(srcLabels: _*)).cast[SRC_NODE_TYPE].foreach { srcNode =>
+    Traversal(cpg.graph.nodes(srcLabels: _*)).cast[SRC_NODE_TYPE].foreach { srcNode =>
       if (!srcNode.outE(edgeType).hasNext) {
         getDstFullNames(srcNode).foreach { dstFullName =>
           dstNodeMap.get(dstFullName) match {
@@ -160,7 +160,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def linkAstChildToParent(dstGraph: DiffGraph.Builder): Unit = {
-    Traversal(cpg.graph.nodesByLabel(NodeTypes.METHOD, NodeTypes.TYPE_DECL))
+    Traversal(cpg.graph.nodes(NodeTypes.METHOD, NodeTypes.TYPE_DECL))
       .cast[nodes.HasAstParentType with nodes.HasAstParentFullName with nodes.StoredNode]
       .filter(astChild => astChild.inE(EdgeTypes.AST).isEmpty)
       .foreach { astChild =>
@@ -209,7 +209,7 @@ object Linker {
                    dstGraph: DiffGraph.Builder,
                    dstNotExistsHandler: Option[(nodes.StoredNode, String) => Unit]): Unit = {
     var loggedDeprecationWarning = false
-    Traversal(cpg.graph.nodesByLabel(srcLabels: _*)).foreach { srcNode =>
+    Traversal(cpg.graph.nodes(srcLabels: _*)).foreach { srcNode =>
       // If the source node does not have any outgoing edges of this type
       // This check is just required for backward compatibility
       if (srcNode.outE(edgeType).isEmpty) {

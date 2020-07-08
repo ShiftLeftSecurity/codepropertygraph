@@ -19,7 +19,7 @@ class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator
   private def validateInFacts(notEnhancedCpg: Cpg): Unit = {
     getInFactByEdgeTypeByDstType.foreach {
       case (srcType, inFactsByEdgeType) =>
-        notEnhancedCpg.graph.nodesByLabel(srcType).asScala.foreach {
+        notEnhancedCpg.graph.nodes(srcType).asScala.foreach {
           case dstNode if dstNode.label != NodeTypes.UNKNOWN =>
             val inEdges = dstNode.inE.asScala.toList
             inFactsByEdgeType.foreach {

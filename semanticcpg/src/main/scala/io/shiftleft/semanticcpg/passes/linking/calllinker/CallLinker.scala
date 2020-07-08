@@ -24,7 +24,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
     val dstGraph = DiffGraph.newBuilder
 
     // TODO MP use `cpg.method` once that's defined in odb api
-    Traversal(cpg.graph.nodesByLabel(NodeTypes.METHOD)).cast[nodes.Method].foreach { method =>
+    Traversal(cpg.graph.nodes(NodeTypes.METHOD)).cast[nodes.Method].foreach { method =>
       methodFullNameToNode.put(method.fullName, method)
     }
 
