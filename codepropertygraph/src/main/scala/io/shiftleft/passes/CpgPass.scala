@@ -1,13 +1,14 @@
 package io.shiftleft.passes
 
+import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
 import io.shiftleft.SerializedCpg
 import java.util
 import java.lang.{Long => JLong}
 
-import com.google.protobuf.GeneratedMessageV3
-import org.apache.logging.log4j.{LogManager, Logger}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import overflowdb.Node
 
 import scala.concurrent.duration.DurationLong
@@ -88,7 +89,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
 
 trait CpgPassBase {
 
-  private val logger: Logger = LogManager.getLogger(classOf[CpgPass])
+  private val logger: Logger = LoggerFactory.getLogger(classOf[CpgPass])
 
   def createAndApply(): Unit
 

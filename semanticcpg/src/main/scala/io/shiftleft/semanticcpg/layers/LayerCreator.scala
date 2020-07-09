@@ -3,12 +3,13 @@ package io.shiftleft.semanticcpg.layers
 import better.files.File
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import org.apache.logging.log4j.LogManager
 import io.shiftleft.semanticcpg.Overlays
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 abstract class LayerCreator {
 
-  private val logger = LogManager.getLogger(this.getClass)
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   val overlayName: String
   val description: String

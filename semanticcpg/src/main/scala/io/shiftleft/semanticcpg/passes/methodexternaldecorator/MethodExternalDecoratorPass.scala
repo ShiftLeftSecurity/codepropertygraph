@@ -4,7 +4,8 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.TypeDecl
 import io.shiftleft.codepropertygraph.generated.{NodeKeyNames, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
-import org.apache.logging.log4j.{LogManager, Logger}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
@@ -81,5 +82,5 @@ class MethodExternalDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
 }
 
 object MethodExternalDecoratorPass {
-  private val logger: Logger = LogManager.getLogger(classOf[MethodExternalDecoratorPass])
+  private val logger: Logger = LoggerFactory.getLogger(classOf[MethodExternalDecoratorPass])
 }

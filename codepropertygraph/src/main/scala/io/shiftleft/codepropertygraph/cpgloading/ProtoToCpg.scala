@@ -7,13 +7,15 @@ import io.shiftleft.proto.cpg.Cpg.CpgStruct.{Edge, Node}
 import io.shiftleft.proto.cpg.Cpg.PropertyValue
 import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase._
 import io.shiftleft.utils.StringInterner
-import org.apache.logging.log4j.{LogManager, Logger}
+
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import overflowdb._
 
 import scala.jdk.CollectionConverters._
 
 object ProtoToCpg {
-  val logger: Logger = LogManager.getLogger(classOf[ProtoToCpg])
+  val logger: Logger = LoggerFactory.getLogger(classOf[ProtoToCpg])
 
   def toProperty(keyValue: (String, PropertyValue))(implicit interner: StringInterner): Property[Any] =
     Property(keyValue._1, toRegularType(keyValue._2))

@@ -50,8 +50,6 @@ val CirceVersion = "0.13.0"
 val PureconfigVersion = "0.12.2"
 val WebjarLocatorVersion = "0.37"
 val SwaggerVersion = "3.25.0"
-val Slf4jVersion = "1.7.28"
-val LogbackVersion = "1.2.3"
 val ScalatestVersion = "3.0.8"
 libraryDependencies ++= Seq(
   "org.http4s"            %% "http4s-blaze-server" % Http4sVersion,
@@ -62,8 +60,6 @@ libraryDependencies ++= Seq(
   "com.github.pureconfig" %% "pureconfig"          % PureconfigVersion,
   "org.webjars"           %  "webjars-locator"     % WebjarLocatorVersion,
   "org.webjars"           %  "swagger-ui"          % SwaggerVersion,
-  "org.slf4j"             %  "slf4j-api"           % Slf4jVersion,
-  "ch.qos.logback"        %  "logback-classic"     % LogbackVersion,
 
   "org.scalatest"         %% "scalatest"           % ScalatestVersion % Test
 )
