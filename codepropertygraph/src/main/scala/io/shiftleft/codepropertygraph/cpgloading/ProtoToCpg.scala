@@ -39,6 +39,8 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
   // TODO use centralised string interner everywhere, maybe move to odb core - keep in mind strong references / GC.
   implicit private val interner: StringInterner = StringInterner.makeStrongInterner()
 
+  def graph : OdbGraph = odbGraph
+
   def addNodes(nodes: JCollection[Node]): Unit =
     addNodes(nodes.asScala)
 
