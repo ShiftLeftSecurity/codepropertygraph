@@ -15,7 +15,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
 
   def partIterator: Iterator[T]
 
-  def runOnPart(part: T): Option[DiffGraph]
+  def runOnPart(part: T): Iterator[DiffGraph]
 
   override def createAndApply(): Unit = {
     withWriter() { writer =>

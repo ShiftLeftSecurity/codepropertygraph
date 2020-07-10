@@ -14,7 +14,7 @@ class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
 
-  override def runOnPart(method: nodes.Method): Option[DiffGraph] = {
+  override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
     val cfgAdapter = new CpgCfgAdapter()
     val dominatorCalculator = new CfgDominator(cfgAdapter)
 
@@ -29,7 +29,7 @@ class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val cfgNodeToPostImmediateDominator = postDominatorCalculator.calculate(method.methodReturn)
     addPostDomTreeEdges(dstGraph, cfgNodeToPostImmediateDominator)
 
-    Some(dstGraph.build())
+    Iterator(dstGraph.build())
   }
 
   private def addDomTreeEdges(dstGraph: DiffGraph.Builder, cfgNodeToImmediateDominator: Map[Node, Node]): Unit = {

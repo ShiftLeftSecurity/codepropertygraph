@@ -39,7 +39,7 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
 
   // TODO bring in Receiver type. Just working on name and comparing to full name
   // will only work for C because in C, name always equals full name.
-  override def runOnPart(part: (NameAndSignature, Int)): Option[DiffGraph] = {
+  override def runOnPart(part: (NameAndSignature, Int)): Iterator[DiffGraph] = {
     val name = part._1.name
     val signature = part._1.signature
     val parameterCount = part._2
@@ -50,7 +50,7 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
         createMethodStub(name, name, signature, parameterCount, dstGraph)
       case _ =>
     }
-    Some(dstGraph.build())
+    Iterator(dstGraph.build())
   }
 
   private def createMethodStub(name: String,

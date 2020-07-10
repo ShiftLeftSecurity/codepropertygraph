@@ -18,10 +18,10 @@ class ParallelCpgPassTests extends WordSpec with Matchers {
           Iterator("foo", "bar")
         }
 
-        override def runOnPart(part: String): Option[DiffGraph] = {
+        override def runOnPart(part: String): Iterator[DiffGraph] = {
           val diffGraph = DiffGraph.newBuilder
           diffGraph.addNode(nodes.NewFile(name = part))
-          Some(diffGraph.build())
+          Iterator(diffGraph.build())
         }
       }
       val pass = new MyPass(cpg)
