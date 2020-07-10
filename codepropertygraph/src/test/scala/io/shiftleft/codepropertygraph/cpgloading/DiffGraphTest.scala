@@ -5,7 +5,7 @@ import overflowdb._
 import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
-import io.shiftleft.passes.{DiffGraph, KeyPool}
+import io.shiftleft.passes.{DiffGraph, IntervalKeyPool}
 import org.scalatest.{Matchers, WordSpec}
 
 class DiffGraphTest extends WordSpec with Matchers {
@@ -88,7 +88,7 @@ class DiffGraphTest extends WordSpec with Matchers {
       builder.addNode(firstNode)
       builder.addNode(secondNode)
       builder.addNode(thirdNode)
-      val keyPool = Some(new KeyPool(20, 30))
+      val keyPool = Some(new IntervalKeyPool(20, 30))
       val appliedGraph = DiffGraph.Applier.applyDiff(builder.build, graph, true, keyPool)
       appliedGraph.nodeToGraphId(firstNode) shouldBe 20
       appliedGraph.nodeToGraphId(secondNode) shouldBe 21
