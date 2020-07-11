@@ -19,7 +19,7 @@ class CdgPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   override def partIterator: Iterator[Method] = cpg.method.toIterator()
 
-  override def runOnPart(method: nodes.Method): Option[DiffGraph] = {
+  override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
 
     val dominanceFrontier = new CfgDominatorFrontier(new ReverseCpgCfgAdapter, new CpgPostDomTreeAdapter)
 
@@ -44,7 +44,7 @@ class CdgPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
               s" number of outgoing CFG edges from $nodeLabel node: ${postDomFrontierNode.outE(EdgeTypes.CFG).asScala.size}")
         }
     }
-    Some(dstGraph.build())
+    Iterator(dstGraph.build())
   }
 }
 

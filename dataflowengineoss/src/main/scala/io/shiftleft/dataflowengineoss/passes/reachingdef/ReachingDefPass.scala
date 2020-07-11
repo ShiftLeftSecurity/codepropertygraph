@@ -19,7 +19,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
 
-  override def runOnPart(method: nodes.Method): Option[DiffGraph] = {
+  override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
     val worklist = mutable.Set.empty[nodes.CfgNode]
     var out = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
@@ -62,7 +62,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     }
 
     addReachingDefEdge(dstGraph, method, out, in)
-    Some(dstGraph.build())
+    Iterator(dstGraph.build())
   }
 
   /** Pruned DDG, i.e., two call assignment nodes are adjacent if a

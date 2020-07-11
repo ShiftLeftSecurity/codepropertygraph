@@ -31,7 +31,7 @@ import scala.concurrent.duration.DurationLong
   *
   * @param cpg the source CPG this pass traverses
   */
-abstract class CpgPass(cpg: Cpg, outName: String = "") extends CpgPassBase {
+abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None) extends CpgPassBase {
 
   /**
     * Main method of enhancement - to be implemented by child class
@@ -43,7 +43,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") extends CpgPassBase {
     */
   override def createAndApply(): Unit =
     withStartEndTimesLogged {
-      run().foreach(diffGraph => DiffGraph.Applier.applyDiff(diffGraph, cpg))
+      run().foreach(diffGraph => DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool))
     }
 
   /**
@@ -53,7 +53,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") extends CpgPassBase {
   def createApplyAndSerialize(inverse: Boolean = false): Iterator[GeneratedMessageV3] =
     withStartEndTimesLogged {
       val overlays = run().map { diffGraph =>
-        val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse)
+        val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse, keyPool)
         serialize(appliedDiffGraph, inverse)
       }
       overlays

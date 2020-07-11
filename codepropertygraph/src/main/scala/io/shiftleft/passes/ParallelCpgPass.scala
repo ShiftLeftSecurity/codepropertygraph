@@ -6,7 +6,8 @@ import io.shiftleft.codepropertygraph.Cpg
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.slf4j.LoggerFactory
 
-abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "") extends CpgPassBase {
+abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Option[Iterator[KeyPool]] = None)
+    extends CpgPassBase {
 
   private val logger: Logger = LogManager.getLogger(classOf[ParallelCpgPass[T]])
 
@@ -14,7 +15,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "") extends CpgPas
 
   def partIterator: Iterator[T]
 
-  def runOnPart(part: T): Option[DiffGraph]
+  def runOnPart(part: T): Iterator[DiffGraph]
 
   override def createAndApply(): Unit = {
     withWriter() { writer =>
@@ -41,7 +42,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "") extends CpgPas
       case exception: Exception =>
         logger.warn(exception)
     } finally {
-      writer.enqueue(None)
+      writer.enqueue(None, None)
       writerThread.join()
     }
   }
@@ -49,10 +50,11 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "") extends CpgPas
   private def enqueueInParallel(writer: Writer): Unit = {
     init()
     val it = new ParallelIteratorExecutor(partIterator).map { part =>
+      val keyPool = keyPools.map(_.next)
       // Note: write.enqueue(runOnPart(part)) would be wrong because
       // it would terminate the writer as soon as a pass returns None
       // as None is used as a termination symbol for the queue
-      runOnPart(part).foreach(diffGraph => writer.enqueue(Some(diffGraph)))
+      runOnPart(part).foreach(diffGraph => writer.enqueue(Some(diffGraph), keyPool))
     }
     consume(it)
   }
@@ -65,12 +67,14 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "") extends CpgPas
 
   private class Writer(serializedCpg: SerializedCpg, prefix: String, inverse: Boolean) extends Runnable {
 
+    case class DiffGraphAndKeyPool(diffGraph: Option[DiffGraph], keyPool: Option[KeyPool])
+
     private val logger = LoggerFactory.getLogger(getClass)
 
-    private val queue = new LinkedBlockingQueue[Option[DiffGraph]]
+    private val queue = new LinkedBlockingQueue[DiffGraphAndKeyPool]
 
-    def enqueue(diffGraph: Option[DiffGraph]): Unit = {
-      queue.put(diffGraph)
+    def enqueue(diffGraph: Option[DiffGraph], keyPool: Option[KeyPool]): Unit = {
+      queue.put(DiffGraphAndKeyPool(diffGraph, keyPool))
     }
 
     override def run(): Unit = {
@@ -79,15 +83,15 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "") extends CpgPas
         var index: Int = 0
         while (!terminate) {
           queue.take() match {
-            case Some(diffGraph) =>
-              val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse)
+            case DiffGraphAndKeyPool(Some(diffGraph), keyPool) =>
+              val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse, keyPool)
               if (!serializedCpg.isEmpty) {
                 val overlay = serialize(appliedDiffGraph, inverse)
                 val name = generateOutFileName(prefix, outName, index)
                 index += 1
                 store(overlay, name, serializedCpg)
               }
-            case None =>
+            case DiffGraphAndKeyPool(None, _) =>
               logger.info("Shutting down WriterThread")
               terminate = true
           }
