@@ -12,12 +12,13 @@ import io.shiftleft.console.embammonite.EmbeddedAmmonite
 import ujson.Value.Value
 
 import scala.concurrent.duration._
-import scala.util.Try
 
 class WebSocketServerTests extends WordSpec with Matchers {
 
-  def postQuery(host: String): Value = {
-    val postResponse = requests.post(s"$host/query", data = ujson.Obj("query" -> "1").toString)
+  val DefaultPromiseAwaitTimeout = Duration(10, SECONDS)
+
+  def postQuery(host: String, query: String): Value = {
+    val postResponse = requests.post(s"$host/query", data = ujson.Obj("query" -> query).toString)
     ujson.read(postResponse.contents)
   }
 
@@ -29,58 +30,124 @@ class WebSocketServerTests extends WordSpec with Matchers {
 
   "WebsocketServer" should {
 
-    "allow connecting, posting a query, and fetching result" in Fixture() { host =>
-      var wsPromise = scala.concurrent.Promise[String]
+    "allow websocket connections to the `/connect` endpoint" in Fixture() { host =>
+      val webSocketTextMsg = scala.concurrent.Promise[String]
       cask.util.WsClient.connect(s"$host/connect") {
-        case cask.Ws.Text(msg) => wsPromise.success(msg)
+        case cask.Ws.Text(msg) => webSocketTextMsg.success(msg)
       }
-      val wsMsg = Await.result(wsPromise.future, Duration(10, SECONDS))
+      val wsMsg = Await.result(webSocketTextMsg.future, DefaultPromiseAwaitTimeout)
       wsMsg shouldBe "connected"
+    }
 
-      // Post a query and make sure to get back a uuid
+    "allow posting a simple query without any websocket connections established" in Fixture() { host =>
+      val postQueryResponse = postQuery(host, "1")
+      postQueryResponse.obj.keySet should contain("success")
+      val UUIDResponse = postQueryResponse("uuid").str
+      UUIDResponse should not be empty
+      postQueryResponse("success").bool shouldBe true
+    }
 
-      val jsonResponse = postQuery(host)
-      val uuidFromPost = Try { UUID.fromString(jsonResponse("uuid").str) }.toOption match {
-        case Some(num) => num
-        case None      => fail
+    "return a valid JSON response when trying to retrieve the result of a query without a connection" in Fixture() {
+      host =>
+        val postQueryResponse = postQuery(host, "1")
+        postQueryResponse.obj.keySet should contain("uuid")
+        val UUIDResponse = postQueryResponse("uuid").str
+        val getResultResponse = getResponse(host, UUIDResponse)
+        getResultResponse.obj.keySet should contain("success")
+        getResultResponse.obj.keySet should contain("err")
+        getResultResponse("success").bool shouldBe false
+        getResultResponse("err").str.length should not be (0)
+    }
+
+    "allow fetching the result of a completed query using its UUID" in Fixture() { host =>
+      var webSocketTextMsg = scala.concurrent.Promise[String]
+      cask.util.WsClient.connect(s"$host/connect") {
+        case cask.Ws.Text(msg) => webSocketTextMsg.success(msg)
       }
-      jsonResponse("success").bool shouldBe true
+      Await.result(webSocketTextMsg.future, DefaultPromiseAwaitTimeout)
+      val postQueryResponse = postQuery(host, "1")
+      val queryUUID = postQueryResponse("uuid").str
+      queryUUID.length should not be (0)
 
-      // Wait until receiving the same uuid on the websocket
+      webSocketTextMsg = scala.concurrent.Promise[String]
+      val queryResultWSMessage = Await.result(webSocketTextMsg.future, DefaultPromiseAwaitTimeout)
+      queryResultWSMessage.length should not be (0)
 
-      wsPromise = scala.concurrent.Promise[String]
-      val wsMsg2 = Await.result(wsPromise.future, Duration(100, SECONDS))
-      Try { UUID.fromString(wsMsg2) }.toOption match {
-        case Some(num) => num shouldBe uuidFromPost
-        case None      => fail
+      val getResultResponse = getResponse(host, queryUUID)
+      getResultResponse.obj.keySet should contain("success")
+      getResultResponse("out").str shouldBe "res0: Int = 1\n"
+      getResultResponse("uuid").str shouldBe queryResultWSMessage
+    }
+
+    "write a well-formatted message to a websocket connection when a query has finished evaluation" in Fixture() {
+      host =>
+        var webSocketTextMsg = scala.concurrent.Promise[String]
+        cask.util.WsClient.connect(s"$host/connect") {
+          case cask.Ws.Text(msg) => webSocketTextMsg.success(msg)
+        }
+        Await.result(webSocketTextMsg.future, DefaultPromiseAwaitTimeout)
+
+        val postQueryResponse = postQuery(host, "1")
+        val queryUUID = postQueryResponse("uuid").str
+        queryUUID.length should not be (0)
+
+        webSocketTextMsg = scala.concurrent.Promise[String]
+        val queryResultWSMessage = Await.result(webSocketTextMsg.future, DefaultPromiseAwaitTimeout)
+        queryResultWSMessage.length should not be (0)
+
+        val getResultResponse = getResponse(host, queryUUID)
+        getResultResponse.obj.keySet should contain("success")
+        getResultResponse("out").str shouldBe "res0: Int = 1\n"
+        getResultResponse("uuid").str shouldBe queryResultWSMessage
+    }
+
+    "write a well-formatted message to a websocket connection when a query failed evaluation" in Fixture() { host =>
+      var webSocketTextMsg = scala.concurrent.Promise[String]
+      cask.util.WsClient.connect(s"$host/connect") {
+        case cask.Ws.Text(msg) => webSocketTextMsg.success(msg)
       }
+      Await.result(webSocketTextMsg.future, DefaultPromiseAwaitTimeout)
 
-      val jsonGetResponse = getResponse(host, uuidFromPost.toString)
-      jsonGetResponse("out").str shouldBe "res0: Int = 1\n"
+      val postQueryResponse = postQuery(host, "if else for loop soup // i.e., an invalid Ammonite query")
+      val queryUUID = postQueryResponse("uuid").str
+      queryUUID.length should not be (0)
+
+      webSocketTextMsg = scala.concurrent.Promise[String]
+      val queryResultWSMessage = Await.result(webSocketTextMsg.future, DefaultPromiseAwaitTimeout)
+      queryResultWSMessage.length should not be (0)
+
+      val getResultResponse = getResponse(host, queryUUID)
+      getResultResponse.obj.keySet should contain("success")
+      getResultResponse("success").bool shouldBe true
+      getResultResponse("out").str shouldBe ""
+      getResultResponse("uuid").str shouldBe queryResultWSMessage
     }
   }
 
   "receive error when attempting to retrieve result with invalid uuid" in Fixture() { host =>
-    val wsPromise = scala.concurrent.Promise[String]
+    val webSocketTextMsg = scala.concurrent.Promise[String]
     cask.util.WsClient.connect(s"$host/connect") {
-      case cask.Ws.Text(msg) => wsPromise.success(msg)
+      case cask.Ws.Text(msg) => webSocketTextMsg.success(msg)
     }
-    Await.result(wsPromise.future, Duration(100, SECONDS))
-    val jsonGetResponse = getResponse(host, UUID.randomUUID().toString)
-    jsonGetResponse("success").bool shouldBe false
+    Await.result(webSocketTextMsg.future, Duration(100, SECONDS))
+    val getResultResponse = getResponse(host, UUID.randomUUID().toString)
+    getResultResponse.obj.keySet should contain("success")
+    getResultResponse.obj.keySet should contain("err")
+    getResultResponse("success").bool shouldBe false
   }
 
   "return a valid JSON response when calling /result with incorrectly-formatted UUID parameter" in Fixture() { host =>
-    val wsPromise = scala.concurrent.Promise[String]
+    val webSocketTextMsg = scala.concurrent.Promise[String]
     cask.util.WsClient.connect(s"$host/connect") {
-      case cask.Ws.Text(msg) => wsPromise.success(msg)
+      case cask.Ws.Text(msg) => webSocketTextMsg.success(msg)
     }
-    Await.result(wsPromise.future, Duration(100, SECONDS))
-    val jsonGetResponse = getResponse(host, "INCORRECTLY_FORMATTED_UUID_PARAM")
-    jsonGetResponse("success").bool shouldBe false
-    jsonGetResponse("err").str.length should not equal (0)
+    Await.result(webSocketTextMsg.future, Duration(100, SECONDS))
+    val getResultResponse = getResponse(host, "INCORRECTLY_FORMATTED_UUID_PARAM")
+    getResultResponse.obj.keySet should contain("success")
+    getResultResponse.obj.keySet should contain("err")
+    getResultResponse("success").bool shouldBe false
+    getResultResponse("err").str.length should not equal (0)
   }
-
 }
 
 object Fixture {
