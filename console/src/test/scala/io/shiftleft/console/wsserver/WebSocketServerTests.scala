@@ -21,8 +21,8 @@ class WebSocketServerTests extends WordSpec with Matchers {
     ujson.read(postResponse.contents)
   }
 
-  def getResponse(host: String, uuid: UUID): Value = {
-    val uri = s"$host/result/${URLEncoder.encode(uuid.toString, "utf-8")}"
+  def getResponse(host: String, uuidParam: String): Value = {
+    val uri = s"$host/result/${URLEncoder.encode(uuidParam, "utf-8")}"
     val getResponse = requests.get(uri)
     ujson.read(getResponse.contents)
   }
@@ -55,7 +55,7 @@ class WebSocketServerTests extends WordSpec with Matchers {
         case None      => fail
       }
 
-      val jsonGetResponse = getResponse(host, uuidFromPost)
+      val jsonGetResponse = getResponse(host, uuidFromPost.toString)
       jsonGetResponse("out").str shouldBe "res0: Int = 1\n"
     }
   }
@@ -66,8 +66,19 @@ class WebSocketServerTests extends WordSpec with Matchers {
       case cask.Ws.Text(msg) => wsPromise.success(msg)
     }
     Await.result(wsPromise.future, Duration(100, SECONDS))
-    val jsonGetResponse = getResponse(host, UUID.randomUUID())
+    val jsonGetResponse = getResponse(host, UUID.randomUUID().toString)
     jsonGetResponse("success").bool shouldBe false
+  }
+
+  "return a valid JSON response when calling /result with incorrectly-formatted UUID parameter" in Fixture() { host =>
+    val wsPromise = scala.concurrent.Promise[String]
+    cask.util.WsClient.connect(s"$host/connect") {
+      case cask.Ws.Text(msg) => wsPromise.success(msg)
+    }
+    Await.result(wsPromise.future, Duration(100, SECONDS))
+    val jsonGetResponse = getResponse(host, "INCORRECTLY_FORMATTED_UUID_PARAM")
+    jsonGetResponse("success").bool shouldBe false
+    jsonGetResponse("err").str.length should not equal (0)
   }
 
 }

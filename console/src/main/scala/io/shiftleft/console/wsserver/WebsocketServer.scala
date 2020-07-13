@@ -34,9 +34,19 @@ class WebsocketServer(ammonite: EmbeddedAmmonite) extends cask.MainRoutes {
     ujson.Obj("success" -> true, "uuid" -> uuid.toString)
   }
 
-  @cask.get("/result/:uuidStr")
-  def getResult(uuidStr: String): Obj = {
-    val uuid = UUID.fromString(uuidStr)
+  @cask.get("/result/:uuidParam")
+  def getResult(uuidParam: String): Obj = {
+    var uuid: java.util.UUID = null
+    try {
+      uuid = UUID.fromString(uuidParam)
+    } catch {
+      case _: IllegalArgumentException =>
+        return ujson.Obj("success" -> false, "err" -> "UUID parameter is incorrectly formatted")
+    }
+    if (uuid == null) {
+      return ujson.Obj("success" -> false, "err" -> "Internal Server Error")
+    }
+
     val result = resultMap.remove(uuid)
     if (result == null) {
       ujson.Obj("success" -> false)
