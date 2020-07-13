@@ -78,7 +78,7 @@ class WebSocketServerTests extends WordSpec with Matchers {
     Await.result(wsPromise.future, Duration(100, SECONDS))
     val jsonGetResponse = getResponse(host, "INCORRECTLY_FORMATTED_UUID_PARAM")
     jsonGetResponse("success").bool shouldBe false
-    jsonGetResponse("err").str.length should not equal(0)
+    jsonGetResponse("err").str.length should not equal (0)
   }
 
 }
