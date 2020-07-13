@@ -40,7 +40,8 @@ class WebsocketServer(ammonite: EmbeddedAmmonite) extends cask.MainRoutes {
     try {
       uuid = UUID.fromString(uuidParam)
     } catch {
-      case _: IllegalArgumentException => return ujson.Obj("success" -> false, "err" -> "UUID parameter is incorrectly formatted")
+      case _: IllegalArgumentException =>
+        return ujson.Obj("success" -> false, "err" -> "UUID parameter is incorrectly formatted")
     }
     if (uuid == null) {
       return ujson.Obj("success" -> false, "err" -> "Internal Server Error")
