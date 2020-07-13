@@ -49,7 +49,7 @@ class WebsocketServer(ammonite: EmbeddedAmmonite) extends cask.MainRoutes {
 
     val result = resultMap.remove(uuid)
     if (result == null) {
-      ujson.Obj("success" -> false)
+      ujson.Obj("success" -> false, "err" -> "No result found for specified UUID")
     } else {
       ujson.Obj("success" -> true, "uuid" -> result.uuid.toString, "out" -> result.out, "err" -> result.err)
     }
