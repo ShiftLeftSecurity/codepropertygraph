@@ -12,7 +12,6 @@ import io.shiftleft.console.embammonite.EmbeddedAmmonite
 import ujson.Value.Value
 
 import scala.concurrent.duration._
-// import scala.util.Try
 
 class WebSocketServerTests extends WordSpec with Matchers {
 
