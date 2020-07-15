@@ -1,4 +1,4 @@
-from cpgqls_client.client import CPGQLSClient
+from cpgqls_client import CPGQLSClient
 
 #### possible configuration
 # 0 retries
