@@ -2,6 +2,12 @@ import requests
 import websockets
 import asyncio
 
+### TODO
+#### possible configuration
+# 0 retries
+# set the timeout for the HTTP thing
+# set the timeout for the websocket thing
+
 class CPGQLSClient(object):
     HTTP_ENDPOINT_PREFIX = "http://"
     WS_ENDPOINT_PREFIX = "ws://"
