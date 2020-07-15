@@ -17,7 +17,6 @@ import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try, Using}
 
-
 object ProtoCpgLoader {
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
