@@ -15,6 +15,10 @@ class CPGQLSClient(object):
     WS_MSG_CONNECTED = "connected"
 
     def __init__(self, server_endpoint):
+        if server_endpoint is None:
+            raise ValueError("The server endpoint cannot be None")
+        if not isinstance(server_endpoint, str):
+            raise ValueError("The server_endpoint parameter has to be a string")
         self._server_endpoint = server_endpoint
 
         self._http_endpoint = self.HTTP_ENDPOINT_PREFIX + server_endpoint
