@@ -18,6 +18,6 @@ print(result['out'])
 # execute an `importCode` CPGQuery
 query = import_code_query("/home/user/code/x42/c", "my-project")
 result = client.execute(query)
-print(query)
+print(result['out'])
 
 
