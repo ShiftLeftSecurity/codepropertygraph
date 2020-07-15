@@ -16,8 +16,11 @@ result = client.execute(query)
 print(result['out'])
 
 # execute an `importCode` CPGQuery
-query = import_code_query("/home/user/code/x42/c", "my-project")
+query = import_code_query("/home/user/code/x42/c", "my-c-project")
 result = client.execute(query)
 print(result['out'])
 
+query = import_code_query("/home/user/code/x42/java/X42.jar", "my-java-project")
+result = client.execute(query)
+print(result['out'])
 

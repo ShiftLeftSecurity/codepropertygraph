@@ -1,6 +1,6 @@
 
 def import_code_query(path, project_name = None, language = None):
-    if path is None:
+    if not path:
         raise Exception('An importCode query requires a project path')
     if project_name and language:
         return "importCode(inputPath=\"%s\", projectName=\"%s\", language=\"%s\")" % (path, project_name, language)
