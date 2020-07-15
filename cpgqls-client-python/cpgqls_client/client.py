@@ -22,8 +22,8 @@ class CPGQLSClient(object):
     async def _send_query(self, query):
         async with websockets.connect(self._ws_connect_endpoint) as ws_conn:
             connected_msg = await ws_conn.recv()
-            if connected_msg == self.WS_MSG_CONNECTED:
-                self._ws_conn = ws_conn
+            if connected_msg != self.WS_MSG_CONNECTED:
+                raise Exception("Received unexpected first message on websocket endpoint")
             post_query_res = requests.post(self._http_post_query_endpoint, json = {"query": query})
             if post_query_res.status_code != 200:
                 raise Exception("Could not post query to the HTTP endpoint of the cpgserver")
