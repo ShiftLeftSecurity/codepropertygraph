@@ -1,7 +1,5 @@
 from cpgqls_client import CPGQLSClient, import_code_query, workspace_query
 
-
-# the client connects on the first call of `execute`
 server_endpoint = "localhost:8080"
 client = CPGQLSClient(server_endpoint)
 
