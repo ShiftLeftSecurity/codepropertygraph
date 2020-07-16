@@ -24,4 +24,3 @@ def test_import_code_query():
 
     out = import_code_query("/unix/path", "my-project", "c")
     assert len(out) > 0
-

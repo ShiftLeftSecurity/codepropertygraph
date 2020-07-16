@@ -4,6 +4,7 @@ import asyncio
 import pytest
 from unittest.mock import Mock
 
+
 class MockCPGQLTransportConnection(object):
     def __init__(self, first_recv_msg, second_recv_msg):
         self._num_recv_msgs = 0
@@ -53,10 +54,13 @@ class MockCPGQLSTransport(object):
 def test_basic_execution():
     event_loop = asyncio.new_event_loop()
     conn = MockCPGQLTransportConnection("connected", "received")
-    get_response_mock = Mock(status_code=200, **{'json.return_value':  {'uuid': 'one'}})
-    post_response_mock = Mock(status_code=200, **{'json.return_value':  {'uuid': 'one'}})
+    get_args = {'json.return_value':  {'uuid': 'one'}}
+    get_response_mock = Mock(status_code=200, **get_args)
+    post_args = {'json.return_value':  {'uuid': 'one'}}
+    post_response_mock = Mock(status_code=200, **post_args)
     mt = MockCPGQLSTransport(conn, get_response_mock, post_response_mock)
-    client = CPGQLSClient("localhost:8080", event_loop = event_loop, transport = mt)
+    endpoint = "localhost:8080"
+    client = CPGQLSClient(endpoint, event_loop=event_loop, transport=mt)
     res = client.execute("val a = 1")
     assert res == post_response_mock.json()
 
@@ -64,11 +68,12 @@ def test_basic_execution():
 def test_get_response_not_200():
     event_loop = asyncio.new_event_loop()
     conn = MockCPGQLTransportConnection("connected", "received")
-    get_response_mock = Mock(status_code=400, **{'json.return_value':  {'uuid': 'one'}})
-    post_response_mock = Mock(status_code=200, **{'json.return_value':  {'uuid': 'one'}})
+    get_args = {'json.return_value':  {'uuid': 'one'}}
+    get_response_mock = Mock(status_code=400, **get_args)
+    post_args = {'json.return_value':  {'uuid': 'one'}}
+    post_response_mock = Mock(status_code=200, **post_args)
     mt = MockCPGQLSTransport(conn, get_response_mock, post_response_mock)
-    client = CPGQLSClient("localhost:8080", event_loop = event_loop, transport = mt)
+    endpoint = "localhost:8080"
+    client = CPGQLSClient(endpoint, event_loop=event_loop, transport=mt)
     with pytest.raises(Exception):
-        res = client.execute("val a = 1")
-
-
+        client.execute("val a = 1")
