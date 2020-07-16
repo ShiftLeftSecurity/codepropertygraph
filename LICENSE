@@ -187,7 +187,7 @@
       same "printed page" as the copyright notice for easier
       identification within third-party archives.
 
-   Copyright 2019 ShiftLeft, Inc.
+   Copyright [2020] [ShiftLeft, Inc.]
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -201,13 +201,3 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-========================================================================
-MIT Licenses
-========================================================================
-
-The Apache TinkerPop project bundles the following components under the MIT License:
-
-     bootstrap/carousel 3.3.5 (http://getbootstrap.com/) - for details, see license/bootstrap
-     jquery 1.11.0 (https://jquery.com/) - for details, see license/jquery
-     normalize.css 2.1.2 (http://necolas.github.io/normalize.css/) - for details, see licenses/normalize
-     prism.css/js (http://prismjs.com) - for details, see licenses/prism
