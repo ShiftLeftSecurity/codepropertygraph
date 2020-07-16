@@ -46,17 +46,6 @@ class ParallelCpgPassTests extends WordSpec with Matchers {
         file.size should not be 0
       }
     }
-
-    val keyPools = Iterator(
-      new IntervalKeyPool(10, 20),
-      new IntervalKeyPool(30, 40)
-    )
-
-    "take into account KeyPools for createAndApply" in Fixture(Some(keyPools)) { (cpg, pass) =>
-      pass.createAndApply()
-      cpg.graph.V.asScala.map(_.id2()).toSet shouldBe Set(10, 30)
-    }
-
   }
 
 }
