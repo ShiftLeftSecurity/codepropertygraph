@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="cpgqls-client",
-    version="0.0.1",
+    version="0.0.2",
     author="ShiftLeft Inc.",
     author_email="support@shiftleft.io",
     description="A client library for CPGQL servers",
