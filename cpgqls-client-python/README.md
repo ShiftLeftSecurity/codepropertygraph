@@ -1,6 +1,6 @@
 ## cpgqls-client
 
-`cpgqls-client` is a simple Python library for communicating with an instace of
+`cpgqls-client` is a simple Python library for communicating with an instance of
 a Code Property Graph server.
 
 ### Requirements
