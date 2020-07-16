@@ -14,8 +14,16 @@ class MethodReturn(val wrapped: NodeSteps[nodes.MethodReturn]) extends AnyVal {
   def method: NodeSteps[nodes.Method] =
     new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.Method])
 
-  def returnUser: NodeSteps[nodes.Call] =
-    new NodeSteps(raw.in(EdgeTypes.AST).in(EdgeTypes.CALL).cast[nodes.Call])
+  def returnUser(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] = {
+    new NodeSteps(
+      raw
+        .in(EdgeTypes.AST)
+        .flatMap { method =>
+          val callsites = callResolver.getMethodCallsites(method.asInstanceOf[nodes.Method])
+          gremlin.scala.__(callsites.toSeq: _*)
+        }
+        .cast[nodes.Call])
+  }
 
   /**
     *  Traverse to last expressions in CFG.

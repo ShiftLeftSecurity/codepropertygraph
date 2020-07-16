@@ -41,10 +41,10 @@ class MethodParameter(val wrapped: NodeSteps[nodes.MethodParameterIn]) extends A
   /**
     * Traverse to arguments (actual parameters) associated with this formal parameter
     * */
-  def argument: NodeSteps[nodes.Expression] = {
+  def argument(implicit callResolver: ICallResolver): NodeSteps[nodes.Expression] = {
     val trav = for {
       paramIn <- raw.toIterator
-      call <- paramIn._methodViaAstIn._callViaCallIn
+      call <- callResolver.getMethodCallsites(paramIn._methodViaAstIn)
       arg <- call._argumentOut.asScala.collect { case node: nodes.Expression with nodes.HasArgumentIndex => node }
       if arg.argumentIndex == paramIn.order
     } yield arg
