@@ -26,7 +26,7 @@ class CPGQLSClient(object):
     HTTP_ENDPOINT_PREFIX = "http://"
     WS_ENDPOINT_PREFIX = "ws://"
 
-    WS_MSG_CONNECTED = "connected"
+    CPGQLS_MSG_CONNECTED = "connected"
 
     def __init__(self, server_endpoint, event_loop = None, transport = None):
         if server_endpoint is None:
@@ -50,7 +50,7 @@ class CPGQLSClient(object):
     async def _send_query(self, query):
         async with self._transport.connect(self._ws_connect_endpoint) as ws_conn:
             connected_msg = await ws_conn.recv()
-            if connected_msg != self.WS_MSG_CONNECTED:
+            if connected_msg != self.CPGQLS_MSG_CONNECTED:
                 raise Exception("Received unexpected first message on websocket endpoint")
             post_query_res = self._transport.post(self._http_post_query_endpoint, json = {"query": query})
             if post_query_res.status_code != 200:
