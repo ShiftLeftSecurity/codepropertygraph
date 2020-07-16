@@ -49,7 +49,7 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
     * Direct children of node in the AST
     * */
   def astChildren: NodeSteps[nodes.AstNode] =
-    new NodeSteps(raw.out(EdgeTypes.AST).cast[nodes.AstNode])
+    new NodeSteps(raw.out(EdgeTypes.AST).cast[nodes.AstNode]).orderBy(_.order)
 
   /**
     * Parent AST node
