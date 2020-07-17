@@ -7,13 +7,15 @@ import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.codepropertygraph.Cpg
 import overflowdb.OdbGraph
 import io.shiftleft.utils.{Source, SourceHighlighter}
-import org.apache.logging.log4j.LogManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import scala.util.Try
 
 object CodeDumper {
 
-  private val logger = LogManager.getLogger(CodeDumper)
+  private val logger: Logger = LoggerFactory.getLogger(getClass)
+
   val arrow: CharSequence = "/* <=== */ "
 
   /**

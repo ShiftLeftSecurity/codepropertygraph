@@ -6,7 +6,8 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeysOdb, nodes}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominatorFrontier, ReverseCpgCfgAdapter}
-import org.apache.logging.log4j.LogManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import overflowdb._
 
 import scala.jdk.CollectionConverters._
@@ -49,5 +50,5 @@ class CdgPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 }
 
 object CdgPass {
-  private val logger = LogManager.getLogger(classOf[CdgPass])
+  private val logger: Logger = LoggerFactory.getLogger(classOf[CdgPass])
 }

@@ -1,11 +1,12 @@
 package io.shiftleft.console.embammonite
 
+import ammonite.util.Colors
 import java.io.{BufferedReader, InputStreamReader, PipedInputStream, PipedOutputStream, PrintWriter}
 import java.util.UUID
 import java.util.concurrent.{BlockingQueue, LinkedBlockingQueue, Semaphore}
 
-import ammonite.util.Colors
-import org.apache.logging.log4j.LogManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
   * Result of executing a query, containing in particular
@@ -17,7 +18,7 @@ private[embammonite] case class Job(uuid: UUID, query: String, observer: QueryRe
 
 class EmbeddedAmmonite(predef: String = "") {
 
-  private val logger = LogManager.getLogger(this.getClass)
+  private val logger: Logger = LoggerFactory.getLogger(classOf[EmbeddedAmmonite])
 
   val jobQueue: BlockingQueue[Job] = new LinkedBlockingQueue[Job]()
 

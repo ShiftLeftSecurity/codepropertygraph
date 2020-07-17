@@ -2,10 +2,13 @@ package io.shiftleft.codepropertygraph.cpgloading
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.NodeKeys
-import org.apache.logging.log4j.LogManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import overflowdb.OdbGraph
 
 object CpgLoader {
+
+  private val logger: Logger = LoggerFactory.getLogger(classOf[CpgLoader])
 
   /**
     * Load a Code Property Graph
@@ -58,7 +61,7 @@ object CpgLoader {
 
 private class CpgLoader {
 
-  private val logger = LogManager.getLogger(getClass)
+  import CpgLoader.logger
 
   def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.withoutOverflow): Cpg = {
     logger.debug("Loading " + filename)

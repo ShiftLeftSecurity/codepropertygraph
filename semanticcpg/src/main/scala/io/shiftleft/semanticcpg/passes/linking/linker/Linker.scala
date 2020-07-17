@@ -3,7 +3,8 @@ package io.shiftleft.semanticcpg.passes.linking.linker
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
-import org.apache.logging.log4j.{LogManager, Logger}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import overflowdb._
 import overflowdb.traversal._
 
@@ -192,7 +193,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
 }
 
 object Linker {
-  private val logger: Logger = LogManager.getLogger(classOf[Linker])
+  private val logger: Logger = LoggerFactory.getLogger(classOf[Linker])
 
   /**
     * For all nodes `n` with a label in `srcLabels`, determine

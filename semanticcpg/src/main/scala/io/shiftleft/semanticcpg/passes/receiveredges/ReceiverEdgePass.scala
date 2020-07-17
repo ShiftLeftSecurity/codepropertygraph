@@ -5,7 +5,8 @@ import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.HasArgumentIndex
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import org.apache.logging.log4j.{LogManager, Logger}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
 
@@ -44,5 +45,5 @@ class ReceiverEdgePass(cpg: Cpg) extends CpgPass(cpg) {
 }
 
 object ReceiverEdgePass {
-  private val logger: Logger = LogManager.getLogger(classOf[ReceiverEdgePass])
+  private val logger: Logger = LoggerFactory.getLogger(classOf[ReceiverEdgePass])
 }

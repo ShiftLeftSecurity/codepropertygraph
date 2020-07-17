@@ -5,7 +5,8 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
-import org.apache.logging.log4j.{LogManager, Logger}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
 
@@ -60,5 +61,5 @@ class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
 }
 
 object PropagateEdgePass {
-  private val logger: Logger = LogManager.getLogger(classOf[PropagateEdgePass])
+  private val logger: Logger = LoggerFactory.getLogger(classOf[PropagateEdgePass])
 }

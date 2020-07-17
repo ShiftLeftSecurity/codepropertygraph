@@ -3,13 +3,13 @@ import java.util.concurrent.LinkedBlockingQueue
 
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import org.apache.logging.log4j.{LogManager, Logger}
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Option[Iterator[KeyPool]] = None)
     extends CpgPassBase {
 
-  private val logger: Logger = LogManager.getLogger(classOf[ParallelCpgPass[T]])
+  private val logger: Logger = LoggerFactory.getLogger(classOf[ParallelCpgPass[T]])
 
   def init(): Unit = {}
 
@@ -40,7 +40,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
       f(writer)
     } catch {
       case exception: Exception =>
-        logger.warn(exception)
+        logger.warn("pass failed", exception)
     } finally {
       writer.enqueue(None, None)
       writerThread.join()
@@ -70,7 +70,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
 
     case class DiffGraphAndKeyPool(diffGraph: Option[DiffGraph], keyPool: Option[KeyPool])
 
-    private val logger = LoggerFactory.getLogger(getClass)
+    private val logger = LoggerFactory.getLogger(classOf[Writer])
 
     private val queue = new LinkedBlockingQueue[DiffGraphAndKeyPool]
 

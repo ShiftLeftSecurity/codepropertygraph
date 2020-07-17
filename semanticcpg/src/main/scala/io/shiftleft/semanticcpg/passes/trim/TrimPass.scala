@@ -3,7 +3,8 @@ package io.shiftleft.semanticcpg.passes.trim
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import org.apache.logging.log4j.{LogManager, Logger}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import overflowdb.OdbNode
 
 class TrimPass(cpg: Cpg) extends CpgPass(cpg) {
@@ -23,5 +24,5 @@ class TrimPass(cpg: Cpg) extends CpgPass(cpg) {
 }
 
 object TrimPass {
-  private val logger: Logger = LogManager.getLogger(classOf[TrimPass])
+  private val logger: Logger = LoggerFactory.getLogger(classOf[TrimPass])
 }

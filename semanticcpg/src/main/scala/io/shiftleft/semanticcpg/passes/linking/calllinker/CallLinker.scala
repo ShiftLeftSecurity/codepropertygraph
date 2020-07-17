@@ -5,7 +5,8 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import org.apache.logging.log4j.{LogManager, Logger}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import overflowdb.traversal.Traversal
 
 import scala.collection.mutable
@@ -93,5 +94,5 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
 }
 
 object CallLinker {
-  private val logger: Logger = LogManager.getLogger(getClass)
+  private val logger: Logger = LoggerFactory.getLogger(classOf[CallLinker])
 }

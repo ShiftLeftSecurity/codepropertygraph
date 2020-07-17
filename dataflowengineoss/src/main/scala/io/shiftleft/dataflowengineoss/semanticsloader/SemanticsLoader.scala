@@ -1,6 +1,7 @@
 package io.shiftleft.dataflowengineoss.semanticsloader
 
-import org.apache.logging.log4j.LogManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import scala.io.Source
 
@@ -8,13 +9,15 @@ case class Semantic(methodFullName: String, parameterIndex: Int)
 case class Semantics(elements: List[Semantic])
 
 object SemanticsLoader {
+  private val logger: Logger = LoggerFactory.getLogger(classOf[SemanticsLoader])
+
   def emptySemantics: Semantics = {
     Semantics(Nil)
   }
 }
 
 class SemanticsLoader(filename: String) {
-  private val logger = LogManager.getLogger(getClass)
+  import SemanticsLoader.logger
 
   def load(): Semantics = {
     val bufferedReader = Source.fromFile(filename)

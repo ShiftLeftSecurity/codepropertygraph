@@ -2,7 +2,8 @@ package io.shiftleft.utils
 
 import better.files.File
 import io.shiftleft.codepropertygraph.generated.Languages
-import org.apache.logging.log4j.LogManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import scala.sys.process.Process
 
 /** language must be one of io.shiftleft.codepropertygraph.generated.Languages
@@ -10,7 +11,7 @@ import scala.sys.process.Process
 case class Source(code: String, language: String)
 
 object SourceHighlighter {
-  private val logger = LogManager.getLogger(this)
+  private val logger: Logger = LoggerFactory.getLogger(SourceHighlighter.getClass)
 
   def highlight(source: Source): Option[String] = {
     val langFlag = source.language match {
@@ -25,8 +26,7 @@ object SourceHighlighter {
       Some(highlightedCode)
     } catch {
       case exception: Exception =>
-        logger.info("syntax highlighting not working. Is `source-highlight` installed?")
-        logger.info(exception)
+        logger.info("syntax highlighting not working. Is `source-highlight` installed?", exception)
         Some(source.code)
     } finally {
       tmpSrcFile.delete()
