@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.Implicits.JavaIteratorDeco
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 
 class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
@@ -19,6 +19,11 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
     * */
   def ast(predicate: nodes.AstNode => Boolean): NodeSteps[nodes.AstNode] =
     node.start.ast.where(predicate)
+
+  /**
+    * Ordered list of direct AST children
+    * */
+  def astChildren: NodeSteps[nodes.AstNode] = node.start.astChildren
 
   /**
     * All nodes of the abstract syntax tree rooted in this node,
