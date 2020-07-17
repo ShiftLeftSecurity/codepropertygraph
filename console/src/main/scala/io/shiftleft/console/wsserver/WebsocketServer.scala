@@ -41,17 +41,17 @@ class WebsocketServer(ammonite: EmbeddedAmmonite) extends cask.MainRoutes {
       uuid = UUID.fromString(uuidParam)
     } catch {
       case _: IllegalArgumentException =>
-        return ujson.Obj("success" -> false, "err" -> "UUID parameter is incorrectly formatted")
+        return ujson.Obj("success" -> false, "stderr" -> "UUID parameter is incorrectly formatted")
     }
     if (uuid == null) {
-      return ujson.Obj("success" -> false, "err" -> "Internal Server Error")
+      return ujson.Obj("success" -> false, "stderr" -> "Internal Server Error")
     }
 
     val result = resultMap.remove(uuid)
     if (result == null) {
-      ujson.Obj("success" -> false, "err" -> "No result found for specified UUID")
+      ujson.Obj("success" -> false, "stderr" -> "No result found for specified UUID")
     } else {
-      ujson.Obj("success" -> true, "uuid" -> result.uuid.toString, "out" -> result.out, "err" -> result.err)
+      ujson.Obj("success" -> true, "uuid" -> result.uuid.toString, "stdout" -> result.out, "stderr" -> result.err)
     }
   }
 
