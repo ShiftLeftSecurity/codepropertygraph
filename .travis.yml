@@ -26,7 +26,7 @@ jobs:
     - sbt scalafmtCheck test
   - stage: release
     script:
-    - sbt ciReleaseTagNextVersion ciReleaseSonatype
+    - sbt ciReleaseTagNextVersion ciReleaseSonatype stage
 before_cache:
 - find $HOME/.sbt -name "*.lock" -type f -delete
 - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
