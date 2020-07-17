@@ -16,13 +16,9 @@ env:
   global:
   - secure: O33fw6sV6z2laegGMQ3qLPA0Eb+w9cHTXIC81q3Nw9G6nJLYGMAelexF0tx7h7zrfdz0HLDW6ZVqAWf44taqACzBu0JCPgBA/RCSlNxUKlINHNp/lapG26b4m2eNHt4KyfZ7QFcxRjRg6Y7z2XpKiNvUOxEWSh7cDxZcTY8fE9S33SDbefaBpIJsXj3tIxqBunu2ItTitE0p0B0pLfCtlC2YT9EG2FAaBxppYFmG0/TKw/tIAQAKdgiGmVCTk/ux/wEFjCqcrbqXfgRsRHe7o4TrRjEo4gFsj/mN5VLuQDH7sioMHfMI73rJAg5A7E1eFVz3iktKR4znFQxdW5JNoiHc3D6a8TA/o9IkHWOpNDHZgDvJecw5pCYS7odNNwoCa/U0THiyFonMEJEE6R+LZs0UPz1QpHc8VN+KEI+vOVdLT06w0mpUEpr1t3Q1hL4QZMg/Se2u9wmBnyBfOlOUW6h/j5N/E5hZG0lRKCSfmHtL5bdxCLC8C0xEjEz4oWf9ZdeA2JvgB6PLL+ipQ3yJ+XlNFPhIXrrb5Ea/ZPv/4BgGZ28tHGJfVeDUnGG0OPCmiwHYgIsgulPERz17MFRD7J3DTd3WnhryV0KXF/56soOUBuufJHEz/q6HxvNWWz4g1t3REPE2lAzhrmRN68CN9mJJ+AsQqXIwZQ3jL1k1hW4=
   - secure: WELN1ch6XMSPo96MvX26i0NziRh/4libPilj2JGUUXnPl7CXFBBTUDZDWR54+2eT35CaTboSIFFis5WywDB4eC6T6LaoM22GUXGdvmZVxlBrYkk3SQygqye7Cru6zjgWJt3Y0nC9eoT7Wsh9GeUPyJYJGjeW8ODNMTpwnuTEyfVBa/HfjwQdc0e6IDtZu0GzRbstt7k4/X6dQsUZQBnLfM39fOTk4QTHo4VMNgieavHFdg/EGTeDHz5UNuMN9Ep0HXFiyuM4+mS9z2UUT7h0NyJ352t/1GioJe3ry5pvSZnjKjpD07HKnBt3iL/7YB9POaWeb6NFysrQQByTZNrb4pKsXB3A9BjTSjc8oZRbamuxHd7ICjZMXukSKkxwqQtOl9lM5dTSSvsdkljlGCCxqbziP016xzx9RUiNHnYIiQFmjIExyMpo5QFs6NxjxAwsLrjnJiMFERmQmLLN5ubizzKPyVCYuEpyuBjPNhFANX083vax7uHp+PBGyP5Fd8HFpciD9tqo24E3kXsIV94p1P0l8Xqbf9jwfU9xKqGWU8A/1GZZmDtuh+HvvmNPe8L9JIqJthLbz+IjtX5a+PJQQbnlmSPBjEhZcqNCOQ/d4ljWiCYA8/ExcwbR9WH9XRmgGxY10gFDM75j1LjmZalGu/FmvQYPH53txWnZRw/IAJg=
-install:
-- python --version
 stages:
 - name: test
 - name: release
-  if: branch = master AND type = push
-- name: python-test-and-release
 jobs:
   include:
   - stage: test
@@ -30,20 +26,7 @@ jobs:
     - sbt scalafmtCheck test
   - stage: release
     script:
-    - sbt ciReleaseTagNextVersion ciReleaseSonatype
-  - stage: python-test-and-release
-    script:
-    - pip install requests
-    - sbt stage
-    - cd cpgclientlib
-    - "./runtests.sh"
-    deploy:
-      provider: pypi
-      user: fabsx00
-      password:
-        secure: z5qFzk8TezOPD/KUseNsP1hbf4UQb4WwxazAaQq8kK96jSdkfWefqCBF06MOzHz4xuLFvY6MdYJqB+ySLS9qmH4xSyQDZUkoD8pEY7Esa9gjw4P1mZn4efkFYVSoGrugbEHRYJU+5on6d3S+agyfaJMtlRIVGDFqnPWvyVoWsH20hJM+uIOb80Lo1oRqJ+YIVuuPTrN2NEBIqSny1gy7p4wUp5y5piLC3Qjq+wfVTaXEpaGVMfhjzf0wcbeFoxHHmoAnFT4WIDzyD3z//7zFnspMZb63JRfcooEMjWBpeGJeNPCnN9k3mmsKjOTZ9716i/8HL/dPPLBE6h/zKRxseBQU7fnKItPdYOSmaoOY3M8VTCTRNzPZm4pmunCn8I+dtJ+UiixYthc8SM9fWiewmpLA9gvCAm8yTZ9NxUu/k84vOgARUqlisVBcSRaLrxeg2BSSAnKkRcjWdXV8rklrBN4LN3BN736HGPinTK6b1TjncOljpsRsTPI+ZKmMl2QSoJSfNHT5veqiwfS2kzq3NNn7ka9yenmUwfE407kwe5HuLb23VDbUGw+yjRxMN0glcXpwRSAjEtIR2ZriET3GB+JQGLtILMrgKplSs4WmCNYqVArbpSIGUb9gM5rZOguXcCUFbPMxp5wK3lKMQLIwqbqp1ubEl/3DuPfnfKYk8wo=
-      on:
-        branch: master
+    - sbt ciReleaseTagNextVersion ciReleaseSonatype stage
 before_cache:
 - find $HOME/.sbt -name "*.lock" -type f -delete
 - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
