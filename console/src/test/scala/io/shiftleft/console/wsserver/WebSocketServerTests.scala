@@ -98,6 +98,8 @@ class WebSocketServerTests extends WordSpec with Matchers {
 
         val getResultResponse = getResponse(host, queryUUID)
         getResultResponse.obj.keySet should contain("success")
+        getResultResponse.obj.keySet should contain("stdout")
+        getResultResponse.obj.keySet should contain("stderr")
         getResultResponse("uuid").str shouldBe queryResultWSMessage
         getResultResponse("stdout").str shouldBe "res0: Int = 1\n"
         getResultResponse("stderr").str shouldBe ""
@@ -120,9 +122,12 @@ class WebSocketServerTests extends WordSpec with Matchers {
 
       val getResultResponse = getResponse(host, queryUUID)
       getResultResponse.obj.keySet should contain("success")
+      getResultResponse.obj.keySet should contain("stdout")
+      getResultResponse.obj.keySet should contain("stderr")
       getResultResponse("success").bool shouldBe true
       getResultResponse("uuid").str shouldBe queryResultWSMessage
       getResultResponse("stdout").str shouldBe ""
+      getResultResponse("stderr").str.length should not be(0)
     }
   }
 
