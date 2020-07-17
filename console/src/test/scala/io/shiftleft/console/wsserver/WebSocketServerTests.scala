@@ -54,9 +54,9 @@ class WebSocketServerTests extends WordSpec with Matchers {
         val UUIDResponse = postQueryResponse("uuid").str
         val getResultResponse = getResponse(host, UUIDResponse)
         getResultResponse.obj.keySet should contain("success")
-        getResultResponse.obj.keySet should contain("err")
+        getResultResponse.obj.keySet should contain("stderr")
         getResultResponse("success").bool shouldBe false
-        getResultResponse("err").str.length should not be (0)
+        getResultResponse("stderr").str.length should not be (0)
     }
 
     "allow fetching the result of a completed query using its UUID" in Fixture() { host =>
@@ -75,8 +75,9 @@ class WebSocketServerTests extends WordSpec with Matchers {
 
       val getResultResponse = getResponse(host, queryUUID)
       getResultResponse.obj.keySet should contain("success")
-      getResultResponse("out").str shouldBe "res0: Int = 1\n"
       getResultResponse("uuid").str shouldBe queryResultWSMessage
+      getResultResponse("stdout").str shouldBe "res0: Int = 1\n"
+      getResultResponse("stderr").str shouldBe ""
     }
 
     "write a well-formatted message to a websocket connection when a query has finished evaluation" in Fixture() {
@@ -97,8 +98,11 @@ class WebSocketServerTests extends WordSpec with Matchers {
 
         val getResultResponse = getResponse(host, queryUUID)
         getResultResponse.obj.keySet should contain("success")
-        getResultResponse("out").str shouldBe "res0: Int = 1\n"
+        getResultResponse.obj.keySet should contain("stdout")
+        getResultResponse.obj.keySet should contain("stderr")
         getResultResponse("uuid").str shouldBe queryResultWSMessage
+        getResultResponse("stdout").str shouldBe "res0: Int = 1\n"
+        getResultResponse("stderr").str shouldBe ""
     }
 
     "write a well-formatted message to a websocket connection when a query failed evaluation" in Fixture() { host =>
@@ -118,9 +122,12 @@ class WebSocketServerTests extends WordSpec with Matchers {
 
       val getResultResponse = getResponse(host, queryUUID)
       getResultResponse.obj.keySet should contain("success")
+      getResultResponse.obj.keySet should contain("stdout")
+      getResultResponse.obj.keySet should contain("stderr")
       getResultResponse("success").bool shouldBe true
-      getResultResponse("out").str shouldBe ""
       getResultResponse("uuid").str shouldBe queryResultWSMessage
+      getResultResponse("stdout").str shouldBe ""
+      getResultResponse("stderr").str.length should not be(0)
     }
   }
 
@@ -132,7 +139,7 @@ class WebSocketServerTests extends WordSpec with Matchers {
     Await.result(webSocketTextMsg.future, Duration(100, SECONDS))
     val getResultResponse = getResponse(host, UUID.randomUUID().toString)
     getResultResponse.obj.keySet should contain("success")
-    getResultResponse.obj.keySet should contain("err")
+    getResultResponse.obj.keySet should contain("stderr")
     getResultResponse("success").bool shouldBe false
   }
 
@@ -144,9 +151,9 @@ class WebSocketServerTests extends WordSpec with Matchers {
     Await.result(webSocketTextMsg.future, Duration(100, SECONDS))
     val getResultResponse = getResponse(host, "INCORRECTLY_FORMATTED_UUID_PARAM")
     getResultResponse.obj.keySet should contain("success")
-    getResultResponse.obj.keySet should contain("err")
+    getResultResponse.obj.keySet should contain("stderr")
     getResultResponse("success").bool shouldBe false
-    getResultResponse("err").str.length should not equal (0)
+    getResultResponse("stderr").str.length should not equal (0)
   }
 }
 
