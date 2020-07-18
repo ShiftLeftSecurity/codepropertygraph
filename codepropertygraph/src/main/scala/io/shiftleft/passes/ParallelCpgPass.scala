@@ -50,7 +50,10 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
   private def enqueueInParallel(writer: Writer): Unit = {
     init()
     val it = new ParallelIteratorExecutor(partIterator).map { part =>
-      val keyPool = this synchronized { keyPools.map(_.next) }
+      val keyPool = this synchronized { keyPools.flatMap(_.nextOption) }
+      if (keyPools.isDefined && keyPool.isEmpty) {
+        logger.warn("Not enough key pools provided. Ids may not be constant across runs")
+      }
 
       // Note: write.enqueue(runOnPart(part)) would be wrong because
       // it would terminate the writer as soon as a pass returns None
