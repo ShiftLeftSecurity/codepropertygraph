@@ -1,4 +1,4 @@
-package io.shiftleft.console.wsserver
+package io.shiftleft.console.cpgqlserver
 
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap
 import io.shiftleft.console.embammonite.{EmbeddedAmmonite, QueryResult}
 import ujson.Obj
 
-class WebsocketServer(ammonite: EmbeddedAmmonite) extends cask.MainRoutes {
+class CPGQLServer(ammonite: EmbeddedAmmonite) extends cask.MainRoutes {
 
   var openConnections = Set.empty[cask.WsChannelActor]
   val resultMap = new ConcurrentHashMap[UUID, QueryResult]()

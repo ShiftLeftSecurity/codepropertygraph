@@ -5,7 +5,7 @@ import ammonite.ops.Path
 import ammonite.util.{Colors, Res}
 import better.files._
 import io.shiftleft.console.embammonite.EmbeddedAmmonite
-import io.shiftleft.console.wsserver.WebsocketServer
+import io.shiftleft.console.cpgqlserver.CPGQLServer
 
 case class Config(
     scriptFile: Option[Path] = None,
@@ -107,7 +107,7 @@ trait BridgeBase {
     Runtime.getRuntime.addShutdownHook(new Thread(() => {
       ammonite.shutdown()
     }))
-    val server = new WebsocketServer(ammonite)
+    val server = new CPGQLServer(ammonite)
     server.main(Array.empty)
   }
 

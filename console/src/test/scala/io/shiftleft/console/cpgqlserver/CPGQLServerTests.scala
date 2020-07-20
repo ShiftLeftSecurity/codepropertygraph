@@ -1,4 +1,4 @@
-package io.shiftleft.console.wsserver
+package io.shiftleft.console.cpgqlserver
 
 import java.net.URLEncoder
 import java.util.UUID
@@ -13,7 +13,7 @@ import ujson.Value.Value
 
 import scala.concurrent.duration._
 
-class WebSocketServerTests extends WordSpec with Matchers {
+class CPGQLServerTests extends WordSpec with Matchers {
 
   val DefaultPromiseAwaitTimeout = Duration(10, SECONDS)
 
@@ -28,7 +28,7 @@ class WebSocketServerTests extends WordSpec with Matchers {
     ujson.read(getResponse.contents)
   }
 
-  "WebsocketServer" should {
+  "CPGQLServer" should {
 
     "allow websocket connections to the `/connect` endpoint" in Fixture() { host =>
       val webSocketTextMsg = scala.concurrent.Promise[String]
@@ -162,7 +162,7 @@ object Fixture {
   def apply[T]()(f: String => T): T = {
     val ammonite = new EmbeddedAmmonite()
     ammonite.start()
-    val ammServer = new WebsocketServer(ammonite)
+    val ammServer = new CPGQLServer(ammonite)
     val server = io.undertow.Undertow.builder
       .addHttpListener(8081, "localhost")
       .setHandler(ammServer.defaultHandler)
