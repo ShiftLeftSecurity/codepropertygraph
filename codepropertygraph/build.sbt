@@ -1,5 +1,6 @@
 name := "codepropertygraph"
 
+enablePlugins(JavaAppPackaging)
 dependsOn(Projects.protoBindings)
 
 libraryDependencies ++= Seq(
