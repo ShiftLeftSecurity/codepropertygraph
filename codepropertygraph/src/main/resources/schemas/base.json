@@ -55,7 +55,8 @@
 
     "edgeKeys" : [
       {"id" : 6, "name" : "LOCAL_NAME", "comment" : "Local name of referenced CONTAINED node", "valueType" : "string", "cardinality" : "zeroOrOne"},
-      {"id" : 8, "name" : "INDEX", "comment" : "Index of referenced CONTAINED node (0 based) - used together with cardinality=list", "valueType" : "int", "cardinality" : "zeroOrOne"}
+      {"id" : 8, "name" : "INDEX", "comment" : "Index of referenced CONTAINED node (0 based) - used together with cardinality=list", "valueType" : "int", "cardinality" : "zeroOrOne"},
+      {"id" : 9, "name" : "CFG_EDGE_TYPE", "comment" : "Sub type of CFG edges to indicate under which condition control flow occurs", "valueType" : "string", "cardinality" : "one" }
     ],
 
     // Types of nodes
@@ -534,7 +535,7 @@
     "edgeTypes" : [
 
         {"id" : 3, "name" : "AST", "comment" : "Syntax tree edge" , "keys" : [] },
-        {"id" : 19, "name" : "CFG", "comment" : "Control flow edge", "keys" : [] },
+        {"id" : 19, "name" : "CFG", "comment" : "Control flow edge", "keys" : ["CFG_EDGE_TYPE"] },
 
         {"id" : 9, "name" : "CONTAINS_NODE", "keys" : ["LOCAL_NAME", "INDEX"], "comment" : "Membership relation for a compound object"},
         {"id" : 41, "name": "CAPTURED_BY", "comment" : "Connection between a captured LOCAL and the corresponding CLOSURE_BINDING", "keys": []},
