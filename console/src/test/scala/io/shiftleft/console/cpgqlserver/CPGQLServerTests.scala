@@ -162,14 +162,18 @@ object Fixture {
   def apply[T]()(f: String => T): T = {
     val ammonite = new EmbeddedAmmonite()
     ammonite.start()
-    val ammServer = new CPGQLServer(ammonite)
+
+    val host = "localhost"
+    val port = 8081
+    val httpEndpoint = "http://" + host + ":" + port.toString()
+    val ammServer = new CPGQLServer(ammonite, host, port)
     val server = io.undertow.Undertow.builder
-      .addHttpListener(8081, "localhost")
+      .addHttpListener(ammServer.port, ammServer.host)
       .setHandler(ammServer.defaultHandler)
       .build
     server.start()
     val res =
-      try { f("http://localhost:8081") } finally {
+      try { f(httpEndpoint) } finally {
         server.stop()
         ammonite.shutdown()
       }
