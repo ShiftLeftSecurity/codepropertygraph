@@ -54,7 +54,6 @@ lazy val codepropertygraph = Projects.codepropertygraph
 lazy val protoBindings = Projects.protoBindings
 lazy val semanticcpg = Projects.semanticcpg
 lazy val dataflowengineoss = Projects.dataflowengineoss
-lazy val cpgserver = Projects.cpgserver
 lazy val cpgvalidator = Projects.cpgvalidator
 lazy val console = Projects.console
 lazy val queries = Projects.queries
