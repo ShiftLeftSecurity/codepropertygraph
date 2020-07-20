@@ -6,7 +6,15 @@ import java.util.concurrent.ConcurrentHashMap
 import io.shiftleft.console.embammonite.{EmbeddedAmmonite, QueryResult}
 import ujson.Obj
 
-class CPGQLServer(ammonite: EmbeddedAmmonite) extends cask.MainRoutes {
+class CPGQLServer(ammonite: EmbeddedAmmonite, serverHost: String, serverPort: Int) extends cask.MainRoutes {
+
+  override def port: Int = {
+    serverPort
+  }
+
+  override def host: String = {
+    serverHost
+  }
 
   var openConnections = Set.empty[cask.WsChannelActor]
   val resultMap = new ConcurrentHashMap[UUID, QueryResult]()
