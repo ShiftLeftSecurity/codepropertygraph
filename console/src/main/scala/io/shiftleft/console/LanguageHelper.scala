@@ -22,10 +22,12 @@ object LanguageHelper {
                               config: LanguageFrontendConfig,
                               rootPath: Path): Option[LanguageFrontend] = {
     language match {
-      case Languages.CSHARP     => Some(CSharpLanguageFrontend(config.csharp, rootPath))
-      case Languages.C          => Some(FuzzyCLanguageFrontend(config.fuzzyc, rootPath))
-      case Languages.LLVM       => Some(LlvmLanguageFrontend(config.llvm, rootPath))
-      case Languages.GOLANG     => Some(GoLanguageFrontend(config.go, rootPath))
+      case Languages.CSHARP => Some(CSharpLanguageFrontend(config.csharp, rootPath))
+      case Languages.C      => Some(FuzzyCLanguageFrontend(config.fuzzyc, rootPath))
+      case Languages.LLVM   => Some(LlvmLanguageFrontend(config.llvm, rootPath))
+      case Languages.GOLANG => Some(GoLanguageFrontend(config.go, rootPath))
+      // fallback for existing Go CPG's
+      case "GO"                 => Some(GoLanguageFrontend(config.go, rootPath))
       case Languages.JAVA       => Some(JavaLanguageFrontend(config.java, rootPath))
       case Languages.JAVASCRIPT => Some(JsLanguageFrontend(config.js, rootPath))
       case _                    => None
@@ -36,6 +38,7 @@ object LanguageHelper {
     Set(Languages.C,
         Languages.CSHARP,
         Languages.GOLANG,
+        "GO",
         Languages.JAVA,
         Languages.JAVASCRIPT,
         Languages.PYTHON,
