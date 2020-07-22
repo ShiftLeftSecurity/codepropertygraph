@@ -2,7 +2,8 @@ package io.shiftleft.semanticcpg.utils
 
 import io.shiftleft.Implicits._
 import io.shiftleft.codepropertygraph.generated._
-import org.apache.logging.log4j.LogManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.apache.tinkerpop.gremlin.structure.Vertex
 
 import scala.annotation.tailrec
@@ -15,7 +16,7 @@ import scala.jdk.CollectionConverters._
 
 object ExpandTo {
 
-  private val logger = LogManager.getLogger(getClass)
+  private val logger: Logger = LoggerFactory.getLogger(getClass)
 
   // For java, the call receiver is always an object instance.
   // For languages which make use of function pointers, this can also be the

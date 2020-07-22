@@ -5,7 +5,8 @@ import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, CpgNode, StoredN
 import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
 import io.shiftleft.codepropertygraph.generated.EdgeKeys
 import io.shiftleft.passes.DiffGraph
-import org.apache.logging.log4j.{LogManager, Logger}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 trait HasStoreMethod {
   def store()(implicit diffBuilder: DiffGraph.Builder): Unit
@@ -65,5 +66,5 @@ class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Step
 }
 
 object NewNodeSteps {
-  private val logger: Logger = LogManager.getLogger(classOf[NewNodeSteps[_]])
+  private val logger: Logger = LoggerFactory.getLogger(classOf[NewNodeSteps[_]])
 }

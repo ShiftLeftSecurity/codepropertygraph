@@ -9,7 +9,6 @@ import gnu.trove.strategy.IdentityHashingStrategy
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, NewNode, StoredNode}
 import io.shiftleft.proto.cpg.Cpg.{DiffGraph => DiffGraphProto}
-import org.apache.logging.log4j.LogManager
 import overflowdb._
 import overflowdb.traversal._
 
@@ -69,7 +68,6 @@ sealed trait DiffGraph {
 }
 
 object DiffGraph {
-  private val logger = LogManager.getLogger(getClass)
   type Properties = Seq[(String, AnyRef)]
   type PackedProperties = Array[Any]
 

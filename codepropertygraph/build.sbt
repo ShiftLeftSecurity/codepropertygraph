@@ -3,7 +3,7 @@ name := "codepropertygraph"
 dependsOn(Projects.protoBindings)
 
 libraryDependencies ++= Seq(
-  "io.shiftleft" %% "overflowdb-traversal" % "0.110",
+  "io.shiftleft" %% "overflowdb-traversal" % "0.113",
   "com.michaelpollmeier" %% "gremlin-scala" % "3.4.4.5",
   "com.google.guava" % "guava" % "21.0",
   "org.apache.commons" % "commons-lang3" % "3.5",
@@ -11,9 +11,8 @@ libraryDependencies ++= Seq(
   "com.github.pathikrit" %% "better-files"  % "3.8.0",
   "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0",
   "com.github.scopt" %% "scopt" % "3.7.1",
-  "org.apache.logging.log4j" % "log4j-api" % "2.11.0",
-  "org.apache.logging.log4j" % "log4j-core" % "2.11.0",
-  "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.11.2" % Runtime, //redirect tinkerpop's slf4j logging to log4j
+  "org.slf4j" % "slf4j-api" % "1.7.30",
+  "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.11.2" % Test,
   "org.scalatest" %% "scalatest" % "3.0.8" % Test
 )
 

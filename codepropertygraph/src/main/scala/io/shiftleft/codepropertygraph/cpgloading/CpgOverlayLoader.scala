@@ -7,7 +7,9 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, PropertyValue}
 import io.shiftleft.utils.StringInterner
-import org.apache.logging.log4j.LogManager
+
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.apache.tinkerpop.gremlin.structure.T
 import overflowdb._
 
@@ -16,7 +18,8 @@ import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 
 private[cpgloading] object CpgOverlayLoader {
-  private val logger = LogManager.getLogger(getClass)
+
+  private val logger: Logger = LoggerFactory.getLogger(getClass)
 
   /**
     * Load overlays stored in the file with the name `filename`.

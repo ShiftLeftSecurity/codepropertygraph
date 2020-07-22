@@ -45,11 +45,13 @@ class AstNode[A <: nodes.AstNode](val wrapped: NodeSteps[A]) extends AnyVal {
   def astMinusRoot: NodeSteps[nodes.AstNode] =
     new NodeSteps(raw.repeat(_.out(EdgeTypes.AST)).emit.cast[nodes.AstNode])
 
+  import scala.jdk.CollectionConverters._
+
   /**
-    * Direct children of node in the AST
+    * Direct children of node in the AST. Siblings are ordered by their `order` fields
     * */
   def astChildren: NodeSteps[nodes.AstNode] =
-    new NodeSteps(raw.out(EdgeTypes.AST).cast[nodes.AstNode])
+    new NodeSteps(raw.flatMap(_._astOut().asScala.toList.start.cast[nodes.AstNode].orderBy(_.order).raw))
 
   /**
     * Parent AST node

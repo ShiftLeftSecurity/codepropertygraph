@@ -11,6 +11,29 @@ class KeyPoolTests extends WordSpec with Matchers {
       assertThrows[RuntimeException] { keyPool.next }
       assertThrows[RuntimeException] { keyPool.next }
     }
+
+    "allow splitting into multiple pools" in {
+      val keyPool = new IntervalKeyPool(1, 1000)
+      val pools = keyPool.split(11).toList
+      assertThrows[IllegalStateException] { keyPool.next }
+      pools.size shouldBe 11
+      // Pools should all have the same size
+      pools
+        .map { x =>
+          (x.last - x.first)
+        }
+        .distinct
+        .size shouldBe 1
+      // Pools should be pairwise disjoint
+      val keySets = pools.map { x =>
+        (x.first to x.last).toSet
+      }
+      keySets.combinations(2).foreach {
+        case List(x: Set[Long], y: Set[Long]) =>
+          x.intersect(y).isEmpty shouldBe true
+      }
+    }
+
   }
 
   "SequenceKeyPool" should {

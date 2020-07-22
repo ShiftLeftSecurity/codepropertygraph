@@ -14,8 +14,20 @@ class MethodReturn(val wrapped: NodeSteps[nodes.MethodReturn]) extends AnyVal {
   def method: NodeSteps[nodes.Method] =
     new NodeSteps(raw.in(EdgeTypes.AST).cast[nodes.Method])
 
-  def returnUser: NodeSteps[nodes.Call] =
-    new NodeSteps(raw.in(EdgeTypes.AST).in(EdgeTypes.CALL).cast[nodes.Call])
+  def returnUser(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] = {
+    new NodeSteps(
+      raw
+        .in(EdgeTypes.AST)
+        .flatMap { method =>
+          val callsites = callResolver.getMethodCallsites(method.asInstanceOf[nodes.Method])
+          // TODO for now we filter away all implicit calls because a change of the
+          // return type to nodes.CallRepr would lead to a break in the API aka
+          // the DSL steps which are subsequently allowed to be called. Before
+          // we addressed this we can only return nodes.Call instances.
+          gremlin.scala.__(callsites.filter(_.isInstanceOf[nodes.Call]).toSeq: _*)
+        }
+        .cast[nodes.Call])
+  }
 
   /**
     *  Traverse to last expressions in CFG.

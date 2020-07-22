@@ -1,24 +1,24 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import java.io.InputStream
-import java.nio.file.{Files, Path}
+import com.google.protobuf.GeneratedMessageV3
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct, DiffGraph}
-import org.apache.logging.log4j.LogManager
-import java.util.{Collection => JCollection, List => JList}
-
-import com.google.protobuf.GeneratedMessageV3
-
-import scala.jdk.CollectionConverters._
-import scala.util.{Failure, Success, Try, Using}
-import overflowdb.OdbConfig
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge
+import java.util.{Collection => JCollection, List => JList}
+import java.io.InputStream
+import java.nio.file.{Files, Path}
+
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import overflowdb.OdbConfig
 
 import scala.collection.mutable.ArrayBuffer
+import scala.jdk.CollectionConverters._
+import scala.util.{Failure, Success, Try, Using}
 
 object ProtoCpgLoader {
-  private val logger = LogManager.getLogger(getClass)
+  private val logger: Logger = LoggerFactory.getLogger(getClass)
 
   def loadFromProtoZip(fileName: String, overflowDbConfig: OdbConfig = OdbConfig.withoutOverflow): Cpg =
     measureAndReport {

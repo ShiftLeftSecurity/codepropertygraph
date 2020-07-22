@@ -1,10 +1,11 @@
 package io.shiftleft
 
-import org.apache.logging.log4j.LogManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 object Implicits {
 
-  private val logger = LogManager.getLogger(getClass)
+  private val logger: Logger = LoggerFactory.getLogger(Implicits.getClass)
 
   implicit class IteratorDeco[T](iterator: Iterator[T]) {
     def onlyChecked: T = {

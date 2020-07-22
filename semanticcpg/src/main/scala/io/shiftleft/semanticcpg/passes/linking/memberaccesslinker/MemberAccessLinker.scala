@@ -5,7 +5,8 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Operators, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import org.apache.logging.log4j.{LogManager, Logger}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
 
@@ -125,5 +126,5 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
 }
 
 object MemberAccessLinker {
-  private val logger: Logger = LogManager.getLogger(classOf[MemberAccessLinker])
+  private val logger: Logger = LoggerFactory.getLogger(classOf[MemberAccessLinker])
 }

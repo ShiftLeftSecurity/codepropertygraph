@@ -4,7 +4,8 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeKeysOdb, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import org.apache.logging.log4j.LogManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import overflowdb._
 
 import scala.collection.mutable
@@ -64,5 +65,5 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
 }
 
 object MethodInstCompat {
-  private val logger = LogManager.getLogger(getClass)
+  private val logger: Logger = LoggerFactory.getLogger(classOf[MethodInstCompat])
 }

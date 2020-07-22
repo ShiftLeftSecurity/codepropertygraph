@@ -5,7 +5,7 @@ import ammonite.ops.Path
 import ammonite.util.{Colors, Res}
 import better.files._
 import io.shiftleft.console.embammonite.EmbeddedAmmonite
-import io.shiftleft.console.wsserver.WebsocketServer
+import io.shiftleft.console.cpgqlserver.CPGQLServer
 
 case class Config(
     scriptFile: Option[Path] = None,
@@ -13,6 +13,8 @@ case class Config(
     additionalImports: List[Path] = Nil,
     nocolors: Boolean = false,
     server: Boolean = false,
+    serverHost: String = "localhost",
+    serverPort: Int = 8080,
     command: Option[String] = None
 )
 
@@ -52,6 +54,14 @@ trait BridgeBase {
       opt[Unit]("server")
         .action((_, c) => c.copy(server = true))
         .text("run as HTTP server")
+
+      opt[String]("server-host")
+        .action((x, c) => c.copy(serverHost = x))
+        .text("Hostname on which to expose the CPGQL server")
+
+      opt[Int]("server-port")
+        .action((x, c) => c.copy(serverPort = x))
+        .text("Port on which to expose the CPGQL server")
 
       opt[String]("command")
         .action((x, c) => c.copy(command = Some(x)))
@@ -107,7 +117,7 @@ trait BridgeBase {
     Runtime.getRuntime.addShutdownHook(new Thread(() => {
       ammonite.shutdown()
     }))
-    val server = new WebsocketServer(ammonite)
+    val server = new CPGQLServer(ammonite, config.serverHost, config.serverPort)
     server.main(Array.empty)
   }
 

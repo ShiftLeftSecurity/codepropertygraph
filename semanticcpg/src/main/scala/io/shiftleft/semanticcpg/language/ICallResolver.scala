@@ -44,11 +44,15 @@ trait ICallResolver {
     */
   def getMethodCallsites(method: nodes.Method): Iterable[nodes.CallRepr] = {
     triggerMethodCallsiteResolution(method)
-    val combined = mutable.ArrayBuffer.empty[nodes.CallRepr]
-    method._callIn.asScala.foreach(call => combined.append(call.asInstanceOf[nodes.CallRepr]))
-    combined.appendAll(getResolvedMethodCallsites(method))
+    // The same call sites of a method can be found via static and dynamic lookup.
+    // This is for example the case for Java virtual call sites which are statically assert
+    // a certain method which could be overriden. If we are looking for the call sites of
+    // such a statically asserted method, we find it twice and thus deduplicate here.
+    val combined = mutable.LinkedHashSet.empty[nodes.CallRepr]
+    method._callIn.asScala.foreach(call => combined.add(call.asInstanceOf[nodes.CallRepr]))
+    combined.addAll(getResolvedMethodCallsites(method))
 
-    combined
+    combined.toBuffer
   }
 
   /**

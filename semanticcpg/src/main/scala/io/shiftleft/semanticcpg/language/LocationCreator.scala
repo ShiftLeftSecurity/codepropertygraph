@@ -3,13 +3,14 @@ package io.shiftleft.semanticcpg.language
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.NewLocation
 import io.shiftleft.semanticcpg.utils.ExpandTo
-import org.apache.logging.log4j.LogManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /* TODO MP: this should be part of the normal steps, rather than matching on the type at runtime
  * all (and only) steps extending DataFlowObject should/must have `newSink`, `newSource` and `newLocation` */
 object LocationCreator {
 
-  private val logger = LogManager.getLogger(getClass)
+  private val logger: Logger = LoggerFactory.getLogger(getClass)
 
   def apply(node: nodes.StoredNode): nodes.NewLocation = {
     try {

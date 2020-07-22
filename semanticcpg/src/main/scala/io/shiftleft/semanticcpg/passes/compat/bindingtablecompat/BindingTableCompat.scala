@@ -5,7 +5,8 @@ import io.shiftleft.codepropertygraph.generated.nodes.NewBinding
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
-import org.apache.logging.log4j.LogManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import scala.jdk.CollectionConverters._
 
 /**
@@ -76,5 +77,5 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
 }
 
 object BindingTableCompat {
-  private val logger = LogManager.getLogger(getClass)
+  private val logger: Logger = LoggerFactory.getLogger(classOf[BindingTableCompat])
 }

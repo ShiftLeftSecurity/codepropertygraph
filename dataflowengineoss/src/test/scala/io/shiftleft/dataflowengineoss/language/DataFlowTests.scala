@@ -37,6 +37,7 @@ class DataFlowTests extends WordSpec with Matchers {
 
   "should find flows to arguments of `free`" in
     DataFlowCodeToCpgFixture(code) { cpg =>
+      implicit val callResolver = NoResolve
       val source = cpg.identifier
       val sink = cpg.method.name("free").parameter.argument
       sink.reachableByFlows(source).l.size shouldBe 5

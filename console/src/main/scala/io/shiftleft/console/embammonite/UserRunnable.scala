@@ -4,14 +4,15 @@ import java.io.{BufferedReader, PrintWriter}
 import java.util.UUID
 import java.util.concurrent.BlockingQueue
 
-import org.apache.logging.log4j.LogManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import scala.util.Try
 
 class UserRunnable(queue: BlockingQueue[Job], writer: PrintWriter, reader: BufferedReader, errReader: BufferedReader)
     extends Runnable {
 
-  private val logger = LogManager.getLogger(this.getClass)
+  private val logger: Logger = LoggerFactory.getLogger(classOf[UserRunnable])
 
   private val magicEchoSeq: Seq[Char] = List(27, 91, 57, 57, 57, 57, 68, 27, 91, 48, 74, 64, 32).map(_.toChar)
   private val endMarker = """.*END: ([0-9a-f\-]+)""".r

@@ -79,6 +79,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         |}
       """.stripMargin
     ) { cpg =>
+      implicit val callResolver = NoResolve
       val source = cpg.identifier
       val sink = cpg.method.name("free").parameter.argument
       val flows = sink.reachableByFlows(source).l
@@ -124,6 +125,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         | }
       """.stripMargin
     ) { cpg =>
+      implicit val callResolver = NoResolve
       val source = cpg.identifier.name("a")
       val sink = cpg.method.name("foo").parameter.argument
       val flows = sink.reachableByFlows(source).l
@@ -288,6 +290,7 @@ class CDataFlowTests extends CpgDataFlowTests {
         |    int z = foo(b);
         |  }
       """.stripMargin) { cpg =>
+      implicit val callResolver = NoResolve
       val source = cpg.identifier.name("a")
       val sink = cpg.method.name("foo").parameter.argument
       val flows = sink.reachableByFlows(source).l
