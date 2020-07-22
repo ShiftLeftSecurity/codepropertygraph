@@ -20,7 +20,11 @@ class MethodReturn(val wrapped: NodeSteps[nodes.MethodReturn]) extends AnyVal {
         .in(EdgeTypes.AST)
         .flatMap { method =>
           val callsites = callResolver.getMethodCallsites(method.asInstanceOf[nodes.Method])
-          gremlin.scala.__(callsites.toSeq: _*)
+          // TODO for now we filter away all implicit calls because a change of the
+          // return type to nodes.CallRepr would lead to a break in the API aka
+          // the DSL steps which are subsequently allowed to be called. Before
+          // we addressed this we can only return nodes.Call instances.
+          gremlin.scala.__(callsites.filter(_.isInstanceOf[nodes.Call]).toSeq: _*)
         }
         .cast[nodes.Call])
   }
