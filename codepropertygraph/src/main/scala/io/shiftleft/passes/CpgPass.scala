@@ -1,15 +1,17 @@
 package io.shiftleft.passes
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.NewNode
+import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import io.shiftleft.SerializedCpg
 import java.util
 import java.lang.{Long => JLong}
 
 import com.google.protobuf.GeneratedMessageV3
+import gnu.trove.map.hash.THashMap
 import org.apache.logging.log4j.{LogManager, Logger}
 import overflowdb.Node
 
+import scala.collection.mutable
 import scala.concurrent.duration.DurationLong
 
 /**
@@ -144,14 +146,14 @@ trait CpgPassBase {
   * */
 case class AppliedDiffGraph(diffGraph: DiffGraph,
                             inverseDiffGraph: Option[DiffGraph],
-                            private val nodeToOdbNode: util.HashMap[IdentityHashWrapper[NewNode], Node]) {
+                            private val nodeToOdbNode: THashMap[NewNode, StoredNode]) {
 
   /**
     * Obtain the id this node has in the applied graph
     * */
   def nodeToGraphId(node: NewNode): JLong = {
     val wrappedNode = IdentityHashWrapper(node)
-    nodeToOdbNode.get(wrappedNode).id2
+    nodeToOdbNode.get(node).id2
   }
 }
 

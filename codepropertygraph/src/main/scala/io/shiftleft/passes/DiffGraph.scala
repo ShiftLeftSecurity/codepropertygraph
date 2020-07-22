@@ -3,6 +3,7 @@ package io.shiftleft.passes
 import java.security.MessageDigest
 import java.util
 
+import gnu.trove.map.hash.THashMap
 import gnu.trove.set.hash.TCustomHashSet
 import gnu.trove.strategy.IdentityHashingStrategy
 import io.shiftleft.codepropertygraph.Cpg
@@ -28,7 +29,6 @@ import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 sealed trait DiffGraph {
   import DiffGraph._
   import Change.NodeKind._
-
   def size: Int
   def iterator: Iterator[Change]
   def +(other: DiffGraph): DiffGraph = ???
@@ -72,6 +72,22 @@ object DiffGraph {
   private val logger = LogManager.getLogger(getClass)
   type Properties = Seq[(String, AnyRef)]
   type PackedProperties = Array[Any]
+
+  case object EmptyChangeSet extends DiffGraph {
+    override def size: Int = 0
+    override def iterator: Iterator[Change] = Iterator.empty
+  }
+
+  case class SingleChangeSet(change: Change) extends DiffGraph {
+    override def size: Int = 1
+    override def iterator: Iterator[Change] = Iterator(change)
+  }
+
+  case class ArrayChangeSet(changes: Array[Change]) extends DiffGraph {
+    override def size: Int = changes.length
+    override def iterator: Iterator[Change] = changes.iterator
+  }
+
   object PackedProperties {
     val Empty: Array[Any] = Array()
 
@@ -189,27 +205,21 @@ object DiffGraph {
   def newBuilder: Builder = new Builder()
 
   class Builder {
-    private var _buffer: mutable.ArrayBuffer[Change] = _
-    private var _nodeSet: TCustomHashSet[NewNode] = _
+    private var _buffer: mutable.ArrayBuffer[Change] = null
+    private var _nodeSet: mutable.HashSet[NewNode] = null
     private def buffer: mutable.ArrayBuffer[Change] = {
       if (_buffer == null)
         _buffer = new mutable.ArrayBuffer[Change]()
       _buffer
     }
-    private def nodeSet: TCustomHashSet[NewNode] = {
+    private def nodeSet: mutable.HashSet[NewNode] = {
       if (_nodeSet == null)
-        _nodeSet = new TCustomHashSet[NewNode](IdentityHashingStrategy.INSTANCE)
+        _nodeSet = mutable.HashSet[NewNode]()
       _nodeSet
     }
 
-    def +=(node: NewNode): Unit = {
-      if (!nodeSet.contains(node)) {
-        buffer += Change.CreateNode(node)
-        nodeSet.add(node)
-      }
-    }
     def addEdge(src: CpgNode, dst: CpgNode, edgeLabel: String, properties: Seq[(String, AnyRef)] = List()): Unit = {
-      buffer += Change.CreateEdge(src, dst, edgeLabel, properties)
+      buffer.append(Change.CreateEdge(src, dst, edgeLabel, properties))
     }
     def build(buf: mutable.ArrayBuffer[Change]) = {
       if (buf == null || buf.isEmpty)
@@ -222,8 +232,15 @@ object DiffGraph {
 
     def build(): DiffGraph = build(_buffer)
     def buildReverse(): DiffGraph = build(if (_buffer != null) _buffer.reverse else null)
-    // compatibility api
-    def addNode(node: NewNode): Unit = this += node
+
+    def addNode(node: NewNode): Boolean = {
+      val isNew = nodeSet.add(node)
+      if (isNew) {
+        buffer.append(Change.CreateNode(node))
+      }
+      isNew
+    }
+
     def addEdgeToOriginal(srcNode: NewNode,
                           dstNode: StoredNode,
                           edgeLabel: String,
@@ -240,21 +257,21 @@ object DiffGraph {
                           properties: Seq[(String, AnyRef)] = List()): Unit =
       addEdge(srcNode, dstNode, edgeLabel, properties)
     def addNodeProperty(node: StoredNode, key: String, value: AnyRef): Unit =
-      buffer += Change.SetNodeProperty(node, key, value)
+      buffer.append(Change.SetNodeProperty(node, key, value))
     def addEdgeProperty(edge: OdbEdge, key: String, value: AnyRef): Unit =
-      buffer += Change.SetEdgeProperty(edge, key, value)
+      buffer.append(Change.SetEdgeProperty(edge, key, value))
     def removeNode(id: Long): Unit =
-      buffer += Change.RemoveNode(id)
+      buffer.append(Change.RemoveNode(id))
     def removeNode(node: StoredNode): Unit =
-      buffer += Change.RemoveNode(node.id.asInstanceOf[Long])
+      buffer.append(Change.RemoveNode(node.id.asInstanceOf[Long]))
     def removeEdge(edge: OdbEdge): Unit = buffer += Change.RemoveEdge(edge)
     def removeNodeProperty(nodeId: Long, propertyKey: String): Unit =
-      buffer += Change.RemoveNodeProperty(nodeId, propertyKey)
+      buffer.append(Change.RemoveNodeProperty(nodeId, propertyKey))
     def removeEdgeProperty(edge: OdbEdge, propertyKey: String): Unit =
-      buffer += Change.RemoveEdgeProperty(edge, propertyKey)
+      buffer.append(Change.RemoveEdgeProperty(edge, propertyKey))
   }
 
-  trait InverseBuilder {
+  abstract class InverseBuilder {
     def onNewNode(node: StoredNode): Unit
     def onNewEdge(edge: OdbEdge): Unit
     def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String): Unit
@@ -262,40 +279,44 @@ object DiffGraph {
     def build(): DiffGraph
   }
   object InverseBuilder {
-    def newBuilder: InverseBuilder = new InverseBuilder {
-      private val builder = DiffGraph.newBuilder
-      def onNewNode(node: StoredNode) = builder.removeNode(node)
-      def onNewEdge(edge: OdbEdge) = builder.removeEdge(edge)
-      def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String) = {
-        val prop = node.property(propertyKey)
-        if (prop.isPresent)
-          builder.addNodeProperty(node, propertyKey, node.property(propertyKey).value())
-        else
-          builder.removeNodeProperty(node.id2, propertyKey)
-      }
-      def onBeforeEdgePropertyChange(edge: OdbEdge, propertyKey: String) = {
-        val prop = edge.property(propertyKey)
-        if (prop.isPresent)
-          builder.addEdgeProperty(edge, propertyKey, edge.property(propertyKey).value())
-        else
-          builder.removeEdgeProperty(edge, propertyKey)
-      }
+    def newBuilder: InverseBuilder = new InverseBuilderImpl
+    val noop = NoopInverseBuilder
+  }
 
-      def build(): DiffGraph = builder.buildReverse()
+  class InverseBuilderImpl extends InverseBuilder {
+    private val builder = DiffGraph.newBuilder
+    def onNewNode(node: StoredNode) = builder.removeNode(node)
+    def onNewEdge(edge: OdbEdge) = builder.removeEdge(edge)
+    def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String) = {
+      val prop = node.property(propertyKey)
+      if (prop.isPresent)
+        builder.addNodeProperty(node, propertyKey, node.property(propertyKey).value())
+      else
+        builder.removeNodeProperty(node.id2, propertyKey)
     }
-    val noop: InverseBuilder = new InverseBuilder {
-      def onNewNode(node: StoredNode) = ()
-      def onNewEdge(edge: OdbEdge) = ()
-      def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String) = ()
-      def onBeforeEdgePropertyChange(edge: OdbEdge, propertyKey: String) = ()
-      def build(): DiffGraph = ???
+    def onBeforeEdgePropertyChange(edge: OdbEdge, propertyKey: String) = {
+      val prop = edge.property(propertyKey)
+      if (prop.isPresent)
+        builder.addEdgeProperty(edge, propertyKey, edge.property(propertyKey).value())
+      else
+        builder.removeEdgeProperty(edge, propertyKey)
     }
+
+    def build(): DiffGraph = builder.buildReverse()
+  }
+
+  object NoopInverseBuilder extends InverseBuilder {
+    def onNewNode(node: StoredNode) = ()
+    def onNewEdge(edge: OdbEdge) = ()
+    def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String) = ()
+    def onBeforeEdgePropertyChange(edge: OdbEdge, propertyKey: String) = ()
+    def build(): DiffGraph = EmptyChangeSet
   }
 
   private class Applier {
     import Applier.InternalProperty
 
-    private val overlayNodeToOdbNode = new util.HashMap[IdentityHashWrapper[NewNode], Node]()
+    private val overlayNodeToOdbNode = new THashMap[NewNode, StoredNode]()
 
     def applyDiff(diffGraph: DiffGraph,
                   cpg: Cpg,
@@ -309,7 +330,26 @@ object DiffGraph {
                           undoable: Boolean,
                           keyPool: Option[KeyPool]): AppliedDiffGraph = {
       val inverseBuilder: InverseBuilder = if (undoable) InverseBuilder.newBuilder else InverseBuilder.noop
-      diffGraph.iterator.foreach(change => applyChange(graph, change, inverseBuilder, keyPool))
+      diffGraph.iterator.foreach {
+        case Change.CreateNode(node) => addNode(graph, node, inverseBuilder, keyPool)
+        case _                       =>
+      }
+
+      diffGraph.iterator.foreach {
+        case Change.CreateNode(node) => initNode(graph, node, inverseBuilder, keyPool)
+        case c: Change.CreateEdge    => addEdge(c, inverseBuilder)
+        case Change.SetNodeProperty(node, key, value) =>
+          addNodeProperty(node, key, value, inverseBuilder)
+        case Change.SetEdgeProperty(edge, key, value) =>
+          addEdgeProperty(edge, key, value, inverseBuilder)
+        case Change.RemoveEdge(edge)                      => edge.remove()
+        case Change.RemoveEdgeProperty(edge, propertyKey) => edge.property(propertyKey).remove()
+        case Change.RemoveNode(nodeId)                    => graph.vertices(nodeId).next().remove()
+        case Change.RemoveNodeProperty(nodeId, propertyKey) =>
+          graph.vertices(nodeId).next.property(propertyKey).remove()
+      }
+
+      //diffGraph.iterator.foreach(change => applyChange(graph, change, inverseBuilder, keyPool))
       AppliedDiffGraph(
         diffGraph,
         if (undoable) Some(inverseBuilder.build()) else None,
@@ -326,7 +366,7 @@ object DiffGraph {
                             inverseBuilder: DiffGraph.InverseBuilder,
                             keyPool: Option[KeyPool]) =
       change match {
-        case Change.CreateNode(node) => addNode(graph, node, inverseBuilder, keyPool)
+        case Change.CreateNode(node) => initNode(graph, node, inverseBuilder, keyPool)
         case c: Change.CreateEdge    => addEdge(c, inverseBuilder)
         case Change.SetNodeProperty(node, key, value) =>
           addNodeProperty(node, key, value, inverseBuilder)
@@ -358,12 +398,12 @@ object DiffGraph {
 
       val srcOdbNode =
         if (edgeChange.sourceNodeKind == Change.NodeKind.New)
-          overlayNodeToOdbNode.get(IdentityHashWrapper(src))
+          overlayNodeToOdbNode.get(src.asInstanceOf[NewNode])
         else
           src.asInstanceOf[Node]
       val dstOdbNode =
         if (edgeChange.destinationNodeKind == Change.NodeKind.New)
-          overlayNodeToOdbNode.get(IdentityHashWrapper(dst))
+          overlayNodeToOdbNode.get(dst.asInstanceOf[NewNode])
         else
           dst.asInstanceOf[Node]
       odbAddEdge(srcOdbNode, dstOdbNode, edgeChange.label, edgeChange.properties, inverseBuilder)
@@ -374,6 +414,9 @@ object DiffGraph {
                            label: String,
                            properties: Seq[(String, AnyRef)],
                            inverseBuilder: DiffGraph.InverseBuilder): Unit = {
+      if (src == null || dst == null || label == null) {
+        println("foo")
+      }
       val odbEdge = src --- label --> dst
       inverseBuilder.onNewEdge(odbEdge)
       properties.foreach {
@@ -387,16 +430,40 @@ object DiffGraph {
                         node: NewNode,
                         inverseBuilder: DiffGraph.InverseBuilder,
                         keyPool: Option[KeyPool]): Unit = {
+      if (overlayNodeToOdbNode.get(node) == null) {
+        val newNode = keyPool match {
+          case Some(pool) => graph.addNode(pool.next, node.label).asInstanceOf[StoredNode]
+          case None       => graph.addNode(node.label).asInstanceOf[StoredNode]
+        }
+        inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
+        if (newNode == null) {
+          println("fuck")
+        }
+        overlayNodeToOdbNode.put(node, newNode)
+      }
+    }
+
+    private def initNode(graph: OdbGraph,
+                         node: NewNode,
+                         inverseBuilder: DiffGraph.InverseBuilder,
+                         keyPool: Option[KeyPool]): Unit = {
+      val storedNode = overlayNodeToOdbNode.get(node)
+      if (storedNode == null) {
+        println("merde")
+      }
+      storedNode.fromNewNode(node, overlayNodeToOdbNode)
+      /*
       val newNode = keyPool match {
-        case Some(pool) => graph.addNode(pool.next, node.label)
-        case None       => graph + node.label
+        case Some(pool) => graph.addNode(pool.next, node.label).asInstanceOf[StoredNode]
+        case None       => graph.addNode(node.label).asInstanceOf[StoredNode]
       }
       inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
       node.properties.foreach {
         case (key, value) if !key.startsWith(InternalProperty) =>
           newNode.setProperty(key, value)
       }
-      overlayNodeToOdbNode.put(IdentityHashWrapper(node), newNode)
+      overlayNodeToOdbNode.put(node, newNode)
+     */
     }
   }
 
@@ -420,21 +487,6 @@ object DiffGraph {
       val applier = new Applier
       applier.unapplyDiff(graph, inverseDiff)
     }
-  }
-
-  case object EmptyChangeSet extends DiffGraph {
-    override def size: Int = 0
-    override def iterator: Iterator[Change] = Iterator.empty
-  }
-
-  case class SingleChangeSet(change: Change) extends DiffGraph {
-    override def size: Int = 1
-    override def iterator: Iterator[Change] = Iterator(change)
-  }
-
-  case class ArrayChangeSet(changes: Array[Change]) extends DiffGraph {
-    override def size: Int = changes.length
-    override def iterator: Iterator[Change] = changes.iterator
   }
 
   // TODO: Remove those later, they are only here to keep old unit tests working

@@ -9,6 +9,7 @@ import io.shiftleft.passes.{DiffGraph, IntervalKeyPool}
 import org.scalatest.{Matchers, WordSpec}
 
 class DiffGraphTest extends WordSpec with Matchers {
+
   "should be able to build an inverse DiffGraph" in {
     withTestOdb { graph =>
       // setup existing graph
@@ -139,15 +140,7 @@ class DiffGraphTest extends WordSpec with Matchers {
     finally graph.close()
   }
 
-  def createNewNode(code: String) = new nodes.NewNode {
-    override def containedNodesByLocalName = ???
-    override def label = NodeTypes.UNKNOWN
-    override def properties = Map(NodeKeyNames.CODE -> code)
-    def canEqual(that: Any): Boolean = ???
-    def productArity: Int = ???
-    def productElement(n: Int): Any = ???
-    def productElementLabel(n: Int): String = ???
-  }
+  def createNewNode(code: String) = nodes.NewUnknown(code = code)
 
   def makeEdgeBetweenExistingNodes(graph: OdbGraph, diff: DiffGraph.Builder, codeA: String, codeB: String) = {
     val a = graph.V.has(NodeKeysOdb.CODE, codeA).head

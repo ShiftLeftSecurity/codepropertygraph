@@ -6,33 +6,19 @@ import java.lang.{Long => JLong}
 
 import com.google.protobuf.ByteString
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.proto.cpg.Cpg.{
-  AdditionalEdgeProperty,
-  AdditionalNodeProperty,
-  BoolList,
-  CpgOverlay,
-  CpgStruct,
-  DoubleList,
-  EdgePropertyName,
-  FloatList,
-  IntList,
-  LongList,
-  NodePropertyName,
-  PropertyValue,
-  StringList,
-  DiffGraph => DiffGraphProto
-}
+import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, NewNode, StoredNode}
+import io.shiftleft.proto.cpg.Cpg.{AdditionalEdgeProperty, AdditionalNodeProperty, BoolList, ContainedRefs, CpgOverlay, CpgStruct, DoubleList, EdgePropertyName, FloatList, IntList, LongList, NodePropertyName, PropertyValue, StringList, DiffGraph => DiffGraphProto}
 import overflowdb._
 
 /**
   * Provides functionality to serialize diff graphs and add them
   * to existing serialized CPGs as graph overlays.
-  * */
+  **/
 class DiffGraphProtoSerializer {
 
   /**
     * Generates a serialized graph overlay representing this graph
-    * */
+    **/
   def serialize(appliedDiffGraph: AppliedDiffGraph): CpgOverlay = {
     import DiffGraph.Change._
     val builder = CpgOverlay.newBuilder
@@ -42,7 +28,7 @@ class DiffGraphProtoSerializer {
       case c: CreateEdge =>
         builder.addEdge(addEdge(c, appliedDiffGraph))
       case SetNodeProperty(node, key, value) =>
-        builder.addNodeProperty(addNodeProperty(node.id2, key, value))
+        builder.addNodeProperty(addNodeProperty(node.id2, key, value, appliedDiffGraph))
       case SetEdgeProperty(edge, key, value) =>
         builder.addEdgeProperty(addEdgeProperty(edge, key, value))
       case RemoveNode(_) | RemoveNodeProperty(_, _) | RemoveEdge(_) | RemoveEdgeProperty(_, _) =>
@@ -59,15 +45,17 @@ class DiffGraphProtoSerializer {
   def serialize(diffGraph: DiffGraph): DiffGraphProto = {
     import DiffGraph.Change._
     val builder = DiffGraphProto.newBuilder
+
     def newEntry = DiffGraphProto.Entry.newBuilder
+
     diffGraph.iterator
       .map {
         case SetNodeProperty(node, key, value) =>
-          newEntry.setNodeProperty(addNodeProperty(node.id2, key, value))
+          newEntry.setNodeProperty(addNodeProperty(node.id2, key, value, null))
         case SetEdgeProperty(edge, key, value) =>
           newEntry.setEdgeProperty(addEdgeProperty(edge, key, value))
         case RemoveNode(nodeId) => newEntry.setRemoveNode(removeNodeProto(nodeId))
-        case RemoveEdge(edge)   => newEntry.setRemoveEdge(removeEdgeProto(edge))
+        case RemoveEdge(edge) => newEntry.setRemoveEdge(removeEdgeProto(edge))
         case RemoveNodeProperty(nodeId, propertyKey) =>
           newEntry.setRemoveNodeProperty(removeNodePropertyProto(nodeId, propertyKey))
         case RemoveEdgeProperty(edge, propertyKey) =>
@@ -87,7 +75,7 @@ class DiffGraphProtoSerializer {
 
     node.properties.foreach {
       case (key, value) if !key.startsWith("_") =>
-        val property = nodeProperty(key, value)
+        val property = nodeProperty(key, value, appliedDiffGraph)
         nodeBuilder.addProperty(property)
     }
 
@@ -136,11 +124,21 @@ class DiffGraphProtoSerializer {
       .setPropertiesHash(ByteString.copyFrom(DiffGraph.propertiesHash(edge.asInstanceOf[OdbEdge])))
       .build
 
-  private def removeNodePropertyProto(nodeId: Long, propertyKey: String) =
-    DiffGraphProto.RemoveNodeProperty.newBuilder
-      .setKey(nodeId)
-      .setName(NodePropertyName.valueOf(propertyKey))
-      .build
+
+  private def removeNodePropertyProto(nodeId: Long, propertyKey: String) = {
+    if (propertyKey(0).isLower) {
+      DiffGraphProto.RemoveNodeProperty.newBuilder
+        .setKey(nodeId)
+        .setName(NodePropertyName.CONTAINED_REF)
+        .setLocalName(propertyKey)
+        .build
+    } else {
+      DiffGraphProto.RemoveNodeProperty.newBuilder
+        .setKey(nodeId)
+        .setName(NodePropertyName.valueOf(propertyKey))
+        .build
+    }
+  }
 
   private def removeEdgePropertyProto(edge: OdbEdge, propertyKey: String) =
     DiffGraphProto.RemoveEdgeProperty.newBuilder
@@ -150,12 +148,20 @@ class DiffGraphProtoSerializer {
       .setPropertyName(EdgePropertyName.valueOf(propertyKey))
       .build
 
-  private def nodeProperty(key: String, value: Any) = {
-    CpgStruct.Node.Property
-      .newBuilder()
-      .setName(NodePropertyName.valueOf(key))
-      .setValue(protoValue(value))
-      .build()
+  //fixme
+  private def nodeProperty(key: String, value: Any, appliedDiffGraph: AppliedDiffGraph) = {
+    if (key(0).isLower) {
+      CpgStruct.Node.Property
+        .newBuilder()
+        .setName(NodePropertyName.CONTAINED_REF)
+        .setValue(PropertyValue.newBuilder().setContainedRefs(protoForNodes(value, appliedDiffGraph).setLocalName(key).build)).build
+    } else {
+      CpgStruct.Node.Property
+        .newBuilder()
+        .setName(NodePropertyName.valueOf(key))
+        .setValue(protoValue(value))
+        .build()
+    }
   }
 
   private def edgeProperty(key: String, value: Any) =
@@ -165,10 +171,10 @@ class DiffGraphProtoSerializer {
       .setValue(protoValue(value))
       .build()
 
-  private def addNodeProperty(nodeId: Long, key: String, value: AnyRef): AdditionalNodeProperty =
+  private def addNodeProperty(nodeId: Long, key: String, value: AnyRef, appliedDiffGraph: AppliedDiffGraph): AdditionalNodeProperty =
     AdditionalNodeProperty.newBuilder
       .setNodeId(nodeId)
-      .setProperty(nodeProperty(key, value))
+      .setProperty(nodeProperty(key, value, appliedDiffGraph))
       .build
 
   private def addEdgeProperty(edge: OdbEdge, key: String, value: AnyRef): AdditionalEdgeProperty =
@@ -182,11 +188,32 @@ class DiffGraphProtoSerializer {
           .setValue(protoValue(value)))
       .build
 
+
+  private def protoForNodes(value: Any, appliedDiffGraph: AppliedDiffGraph): ContainedRefs.Builder = {
+    val builder = ContainedRefs.newBuilder
+    value match {
+      case iterable: Iterable[_] => iterable.foreach { node =>
+        node match {
+          case storedNode: StoredNode =>
+            builder.addRefs(storedNode.id2)
+          case newNode: NewNode =>
+            builder.addRefs(appliedDiffGraph.nodeToGraphId(newNode))
+        }
+      }
+      case storedNode: StoredNode =>
+        builder.addRefs(storedNode.id2)
+      case newNode: NewNode =>
+        builder.addRefs(appliedDiffGraph.nodeToGraphId(newNode))
+    }
+    builder
+  }
+
+
   private def protoValue(value: Any): PropertyValue.Builder = {
     val builder = PropertyValue.newBuilder
     value match {
       case iterable: Iterable[_] if iterable.isEmpty => builder //empty property
-      case iterable: Iterable[_]                     =>
+      case iterable: Iterable[_] =>
         // determine property list type based on first element - assuming it's a homogeneous list
         iterable.head match {
           case _: String =>
@@ -222,13 +249,13 @@ class DiffGraphProtoSerializer {
   private def protoValueForPrimitive(value: Any): PropertyValue.Builder = {
     val builder = PropertyValue.newBuilder
     value match {
-      case v: String  => builder.setStringValue(v)
+      case v: String => builder.setStringValue(v)
       case v: Boolean => builder.setBoolValue(v)
-      case v: Int     => builder.setIntValue(v)
-      case v: JLong   => builder.setLongValue(v)
-      case v: Float   => builder.setFloatValue(v)
-      case v: Double  => builder.setDoubleValue(v)
-      case _          => throw new RuntimeException("Unsupported primitive value type " + value.getClass)
+      case v: Int => builder.setIntValue(v)
+      case v: JLong => builder.setLongValue(v)
+      case v: Float => builder.setFloatValue(v)
+      case v: Double => builder.setDoubleValue(v)
+      case _ => throw new RuntimeException("Unsupported primitive value type " + value.getClass)
     }
   }
 

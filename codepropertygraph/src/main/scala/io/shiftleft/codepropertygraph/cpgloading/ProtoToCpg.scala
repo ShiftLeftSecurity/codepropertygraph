@@ -41,9 +41,6 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
 
   def graph: OdbGraph = odbGraph
 
-  def addNodes(nodes: JCollection[Node]): Unit =
-    addNodes(nodes.asScala)
-
   def addNodes(nodes: Iterable[Node]): Unit =
     nodes
       .filter(nodeFilter.filterNode)
@@ -53,7 +50,8 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     val properties = node.getPropertyList.asScala.toSeq
       .map(prop => (prop.getName.name, prop.getValue))
       .map(toProperty)
-    try odbGraph + (node.getType.name, node.getKey, properties: _*)
+    //odbGraph.addNode()
+    try odbGraph + (node.getType.name, node.getKey, properties: _*) //odbGraph.addNode(node.getKey, node.getType.name, properties: _*)
     catch {
       case e: Exception =>
         throw new RuntimeException("Failed to insert a node. proto:\n" + node, e)

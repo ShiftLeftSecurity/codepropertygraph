@@ -15,29 +15,11 @@ class NodeFilter {
   def filterNode(protoNode: Node): Boolean = {
     protoNode.getType match {
       case Node.NodeType.TYPE =>
-        filterTypeNode(protoNode.getPropertyList.asScala, NodePropertyName.FULL_NAME, typeFullNames)
-      case _ =>
-        true
-    }
-  }
-
-  private def filterTypeNode(properties: mutable.Buffer[Node.Property],
-                             filterByProperty: NodePropertyName,
-                             compareSet: mutable.Set[String]): Boolean = {
-    val propertyOption =
-      properties
-        .find(_.getName == filterByProperty)
-        .map(fullNameProperty => fullNameProperty.getValue.getStringValue)
-
-    propertyOption match {
-      case Some(property) =>
-        if (compareSet.contains(property)) {
-          false
-        } else {
-          compareSet += property
-          true
+        val fullNameOption = protoNode.getPropertyList.asScala.collectFirst {
+          case prop if prop.getName == NodePropertyName.FULL_NAME => prop.getValue.getStringValue
         }
-      case None =>
+        if (fullNameOption.isDefined) typeFullNames.add(fullNameOption.get) else true
+      case _ =>
         true
     }
   }

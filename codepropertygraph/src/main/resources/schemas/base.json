@@ -48,7 +48,10 @@
         {"id": 57, "name" : "AST_PARENT_FULL_NAME", "comment" : "The FULL_NAME of a the AST parent of an entity", "valueType" : "string", "cardinality" : "one"},
         {"id": 158, "name" : "ALIAS_TYPE_FULL_NAME", "comment" : "Type full name of which a TYPE_DECL is an alias of", "valueType" : "string", "cardinality" : "zeroOrOne"},
         {"id": 1591, "name" : "DYNAMIC_TYPE_HINT_FULL_NAME", "comment" : "Type hint for the dynamic type", "valueType" : "string", "cardinality" : "list"},
-        {"id" : 106, "name" : "FILENAME", "comment" : "Full path of canonical file that contained this node; will be linked into corresponding FILE nodes. Possible for METHOD, TYPE_DECL and NAMESPACE_BLOCK", "valueType" : "string", "cardinality" : "one"}
+        {"id" : 106, "name" : "FILENAME", "comment" : "Full path of canonical file that contained this node; will be linked into corresponding FILE nodes. Possible for METHOD, TYPE_DECL and NAMESPACE_BLOCK", "valueType" : "string", "cardinality" : "one"},
+        
+        // special properties
+        {"id": 2007161, "name": "CONTAINED_REF", "comment": "References to other nodes. This is not a real property; it exists here for the sake of proto serialization only. valueType and cardinality are meaningless.", "valueType": "string", "cardinality": "one"}
     ],
 
     // Keys for edge properties

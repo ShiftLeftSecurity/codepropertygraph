@@ -8,7 +8,6 @@ import io.shiftleft.codepropertygraph.generated._
 import org.scalatest.{Matchers, WordSpec}
 
 class CpgOverlayIntegrationTest extends WordSpec with Matchers {
-  import CpgOverlayIntegrationTest.DummyProduct
 
   val InitialNodeCode = "initialNode"
   val Pass1NewNodeCode = "pass1NewNodeCode"
@@ -42,15 +41,12 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       // 1) add a new node
       val addNodeInverse = applyDiffAndGetInverse(cpg)(
         _.addNode(
-          new nodes.NewNode with DummyProduct {
-            override def containedNodesByLocalName = ???
-            override def label = NodeTypes.UNKNOWN
-            override def properties = Map.empty
-          }
+          nodes.NewUnknown(code = null)
         ))
       cpg.graph.nodeCount shouldBe 2
-      val additionalNode = cpg.graph.V.hasNot(NodeKeysOdb.CODE).head
+      val additionalNode = cpg.graph.V.label("UNKNOWN").head
 
+      /* we don't need to support edges with properties any longer
       // 2) add two edges with the same label but different properties (they'll later be disambiguated by their property hash, since edges don't have IDs
       val addEdge1Inverse = applyDiffAndGetInverse(cpg)(
         _.addEdge(
@@ -68,7 +64,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
         ))
       def initialNodeOutEdges = initialNode.outE.toList
       initialNodeOutEdges.size shouldBe 2
-
+       */
       // 3) add node property
       val addNodePropertyInverse =
         applyDiffAndGetInverse(cpg)(
@@ -88,13 +84,14 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       DiffGraph.Applier.applyDiff(addNodePropertyInverse, cpg)
       additionalNode.propertyOption(NodeKeysOdb.CODE) shouldBe None
 
+      /*
       // 2) remove edges - they don't have ids and are therefor disambiguated by their property hash
       DiffGraph.Applier.applyDiff(addEdge2Inverse, cpg)
       initialNodeOutEdges.size shouldBe 1
       initialNode.outE.property(EdgeKeysOdb.INDEX).toList shouldBe List(Int.box(1))
       DiffGraph.Applier.applyDiff(addEdge1Inverse, cpg)
       initialNodeOutEdges.size shouldBe 0
-
+       */
       // 1) remove node
       DiffGraph.Applier.applyDiff(addNodeInverse, cpg)
       cpg.graph.nodeCount shouldBe 1
@@ -104,7 +101,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
   /* like a freshly deserialized cpg.bin.zip without any overlays applied */
   def withNewBaseCpg[T](fun: Cpg => T): T = {
     val graph = OverflowDbTestInstance.create
-    graph + (NodeTypes.UNKNOWN, NodeKeysOdb.CODE -> InitialNodeCode)
+    graph + (NodeTypes.METHOD, NodeKeysOdb.CODE -> InitialNodeCode)
     val cpg = Cpg(graph)
     try fun(cpg)
     finally cpg.close()
@@ -122,11 +119,9 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
   }
 
   def passAddsEdgeTo(from: nodes.StoredNode, propValue: String, cpg: Cpg): CpgPass = {
-    val newNode = new nodes.NewNode with DummyProduct {
-      override def containedNodesByLocalName = ???
-      override def label = NodeTypes.UNKNOWN
-      override def properties = Map(NodeKeyNames.CODE -> propValue)
-    }
+
+    val newNode = nodes.NewUnknown(code = propValue)
+
     new CpgPass(cpg) {
       override def run(): Iterator[DiffGraph] = {
         val dstGraph = DiffGraph.newBuilder
@@ -140,13 +135,4 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
   /** equivalent of what happens in `CpgPassRunner.createStoreAndApplyOverlay` */
   def fullyConsume(overlay: Iterator[_]): Unit =
     while (overlay.hasNext) overlay.next()
-}
-
-object CpgOverlayIntegrationTest {
-  private trait DummyProduct {
-    def canEqual(that: Any): Boolean = ???
-    def productArity: Int = ???
-    def productElement(n: Int): Any = ???
-    def productElementLabel(n: Int): String = ???
-  }
 }

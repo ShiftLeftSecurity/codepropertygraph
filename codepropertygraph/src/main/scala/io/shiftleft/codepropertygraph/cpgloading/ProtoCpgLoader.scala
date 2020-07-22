@@ -28,7 +28,7 @@ object ProtoCpgLoader {
         use(new ZipArchive(fileName)).entries.foreach { entry =>
           val inputStream = use(Files.newInputStream(entry))
           val cpgStruct = getNextProtoCpgFromStream(inputStream)
-          builder.addNodes(cpgStruct.getNodeList)
+          builder.addNodes(cpgStruct.getNodeList.asScala)
           edgeLists += cpgStruct.getEdgeList
         }
         edgeLists.foreach(edgeCollection => builder.addEdges(edgeCollection))
@@ -40,7 +40,7 @@ object ProtoCpgLoader {
 
   def loadFromListOfProtos(cpgs: Seq[CpgStruct], overflowDbConfig: OdbConfig): Cpg = {
     val builder = new ProtoToCpg(overflowDbConfig)
-    cpgs.foreach(cpg => builder.addNodes(cpg.getNodeList))
+    cpgs.foreach(cpg => builder.addNodes(cpg.getNodeList.asScala))
     cpgs.foreach(cpg => builder.addEdges(cpg.getEdgeList))
     builder.build()
   }

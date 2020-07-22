@@ -18,8 +18,9 @@ class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Step
     raw.sideEffect(storeRecursively).iterate()
 
   private def storeRecursively(newNode: NewNode)(implicit diffBuilder: DiffGraph.Builder): Unit = {
-    diffBuilder.addNode(newNode)
-
+    newNode.storeRecursively2(diffBuilder)
+    //diffBuilder.addNode(newNode)
+    /*
     // add all `contained` nodes that are NewNodes to the DiffGraph
     newNode.allContainedNodes.collect {
       case containedNode: NewNode => storeRecursively(containedNode)
@@ -35,9 +36,11 @@ class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Step
         EdgeKeys.INDEX -> index
       ).map { case KeyValue(key, value) => (key.name, value) }
       addEdge(diffBuilder, newNode, containedNode, ContainsNode.Label, properties)
-    }
+
+    }*/
   }
 
+  /*
   private def addEdge(diffBuilder: DiffGraph.Builder,
                       src: CpgNode,
                       dst: CpgNode,
@@ -56,7 +59,7 @@ class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Step
         val dstClassMaybe = Option(dst).map(_.getClass)
         logger.warn(
           s"unhandled case, likely produced by a fauly pass: src=$src, src.getClass=$srcClassMaybe, dst=$dst, dstClass=$dstClassMaybe")
-    }
+    } */
 
   def label: Steps[String] = new Steps(raw.map(_.label))
 }

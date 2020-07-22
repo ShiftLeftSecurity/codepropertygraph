@@ -10,8 +10,8 @@
 	
 	{"id" : 52, "name" : "SENSITIVE_DATA_TYPE", "keys" : ["FULL_NAME"], "comment" : "",
 	 "containedNodes" : [
-	     {"localName" : "names", "nodeType" : "MATCH_INFO", "cardinality" : "list"},
-	     {"localName" : "members", "nodeType" : "SENSITIVE_MEMBER", "cardinality" : "list"}
+	     {"localName" : "names", "nodeType" : "MATCH_INFO", "cardinality" : "list", "localTag": 1},
+	     {"localName" : "members", "nodeType" : "SENSITIVE_MEMBER", "cardinality" : "list", "localTag": 2}
 	 ],
 	 "outEdges" : [
 	   {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF", "inNodes" : [{"name": "TYPE_DECL"}]}
@@ -20,7 +20,7 @@
 	
 	{"id" : 53, "name" : "SENSITIVE_MEMBER", "keys" : ["NAME"], "comment" : "",
 	 "containedNodes" : [
-	     {"localName" : "names", "nodeType" : "MATCH_INFO", "cardinality" : "list"}
+	     {"localName" : "names", "nodeType" : "MATCH_INFO", "cardinality" : "list", "localTag": 1}
 	 ],
 	 "outEdges" : [
 	   {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF", "inNodes" : [
@@ -31,7 +31,7 @@
 	},
 	{"id" : 54, "name" : "SENSITIVE_VARIABLE", "keys" : ["NAME", "EVAL_TYPE", "CATEGORIES"], "comment" : "",
 	 "containedNodes" : [
-	     {"localName" : "node", "nodeType" : "LOCAL_LIKE", "cardinality" : "one" }
+	     {"localName" : "node", "nodeType" : "LOCAL_LIKE", "cardinality" : "one" , "localTag": 1}
 	 ], "outEdges" : [
 	     // "inNodes" : "LOCAL_LIKE" is what I want here, but it is currently necessary
 	     // to enumerate all child classes
@@ -46,7 +46,7 @@
 	},
 	{"id" : 55, "name" : "SENSITIVE_REFERENCE", "keys" : [], "comment" : "",
 	 "containedNodes" : [
-	     {"localName" : "ioflows", "nodeType" : "IOFLOW", "cardinality" : "list"}
+	     {"localName" : "ioflows", "nodeType" : "IOFLOW", "cardinality" : "list", "localTag": 1}
 	 ], "outEdges" : [
 	   {"edgeName" : "IS_SENSITIVE_DATA_DESCR_OF_REF", "inNodes" : [
       {"name": "METHOD_PARAMETER_IN"},
