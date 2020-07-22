@@ -27,6 +27,9 @@ class IntervalKeyPool(val first: Long, val last: Long) extends KeyPool {
     * number is larger than `last`
     * */
   def next: Long = {
+    if (!valid) {
+      throw new IllegalStateException("Call to `next` on invalidated IntervalKeyPool.")
+    }
     val n = cur.incrementAndGet()
     if (n > last) {
       throw new RuntimeException("Pool exhausted")
@@ -35,7 +38,24 @@ class IntervalKeyPool(val first: Long, val last: Long) extends KeyPool {
     }
   }
 
+  /**
+    * Split key pool into `numberOfPartitions` partitions
+    * of mostly equal size. Invalidates the current pool
+    * to ensure that the user does not continue to use both
+    * the original pool and pools derived from it via `split`.
+    **/
+  def split(numberOfPartitions: Int): Iterator[IntervalKeyPool] = {
+    valid = false
+    val first = cur.get()
+    val k = (last - first) / numberOfPartitions
+    (1 to numberOfPartitions).map { i =>
+      val poolFirst = first + (i - 1) * k
+      new IntervalKeyPool(poolFirst, poolFirst + k - 1)
+    }.iterator
+  }
+
   private val cur: AtomicLong = new AtomicLong(first - 1)
+  private var valid: Boolean = true
 }
 
 /**
