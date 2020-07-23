@@ -9,12 +9,9 @@ import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
   * */
 class CMethodTests extends WordSpec with Matchers {
 
-  val code = """
-       int main(int argc, char **argv) {
-       }
-    """
-
-  CodeToCpgFixture(code) { cpg =>
+  CodeToCpgFixture("""
+      |int main(int argc, char **argv) {
+      |}""".stripMargin) { cpg =>
     "should return correct function/method name" in {
       cpg.method.name.toSet shouldBe Set("main")
     }
@@ -59,7 +56,13 @@ class CMethodTests extends WordSpec with Matchers {
       cpg.method.where(_.parameter.size == 2).name.l shouldBe List("main")
       cpg.method.where(_.parameter.size == 1).name.l shouldBe List()
     }
+  }
 
+  CodeToCpgFixture("int foo(); int bar() { return 0; }") { cpg =>
+    "should identify method as stub" in {
+      cpg.method.isStub.name.l shouldBe List("foo")
+      cpg.method.isNotStub.name.l shouldBe List("bar")
+    }
   }
 
 }
