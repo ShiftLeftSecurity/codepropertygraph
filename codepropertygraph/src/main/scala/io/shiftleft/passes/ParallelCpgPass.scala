@@ -49,18 +49,30 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
 
   private def enqueueInParallel(writer: Writer): Unit = {
     init()
-    val it = new ParallelIteratorExecutor(partIterator).map { part =>
-      val keyPool = this synchronized { keyPools.flatMap(_.nextOption) }
-      if (keyPools.isDefined && keyPool.isEmpty) {
-        logger.warn("Not enough key pools provided. Ids may not be constant across runs")
-      }
-
-      // Note: write.enqueue(runOnPart(part)) would be wrong because
-      // it would terminate the writer as soon as a pass returns None
-      // as None is used as a termination symbol for the queue
-      runOnPart(part).foreach(diffGraph => writer.enqueue(Some(diffGraph), keyPool))
+    val it = new ParallelIteratorExecutor(itWithKeyPools()).map {
+      case (part, keyPool) =>
+        // Note: write.enqueue(runOnPart(part)) would be wrong because
+        // it would terminate the writer as soon as a pass returns None
+        // as None is used as a termination symbol for the queue
+        runOnPart(part).foreach(diffGraph => writer.enqueue(Some(diffGraph), keyPool))
     }
     consume(it)
+  }
+
+  private def itWithKeyPools(): Iterator[(T, Option[KeyPool])] = {
+    if (keyPools.isEmpty) {
+      partIterator.map(p => (p, None))
+    } else {
+      val pools = keyPools.get
+      partIterator.map { p =>
+        (p, pools.nextOption() match {
+          case Some(pool) => Some(pool)
+          case None =>
+            logger.warn("Not enough key pools provided. Ids may not be constant across runs")
+            None
+        })
+      }
+    }
   }
 
   private def consume(it: Iterator[_]): Unit = {
