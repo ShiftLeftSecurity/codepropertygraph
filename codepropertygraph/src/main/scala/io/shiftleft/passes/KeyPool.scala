@@ -46,12 +46,16 @@ class IntervalKeyPool(val first: Long, val last: Long) extends KeyPool {
     **/
   def split(numberOfPartitions: Int): Iterator[IntervalKeyPool] = {
     valid = false
-    val first = cur.get()
-    val k = (last - first) / numberOfPartitions
-    (1 to numberOfPartitions).map { i =>
-      val poolFirst = first + (i - 1) * k
-      new IntervalKeyPool(poolFirst, poolFirst + k - 1)
-    }.iterator
+    if (numberOfPartitions == 0) {
+      Iterator()
+    } else {
+      val curFirst = cur.get()
+      val k = (last - curFirst) / numberOfPartitions
+      (1 to numberOfPartitions).map { i =>
+        val poolFirst = curFirst + (i - 1) * k
+        new IntervalKeyPool(poolFirst, poolFirst + k - 1)
+      }.iterator
+    }
   }
 
   private val cur: AtomicLong = new AtomicLong(first - 1)
