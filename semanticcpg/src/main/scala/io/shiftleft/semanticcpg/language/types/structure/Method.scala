@@ -83,15 +83,16 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
 
   /**
     * Traverse only to methods that are stubs, e.g., their code is not available
+    * or the method body is empty.
     * */
   def isStub: NodeSteps[nodes.Method] =
-    new NodeSteps(raw.filter(_.not(_.out(EdgeTypes.CFG))))
+    new NodeSteps(raw.filter(_.not(_.out(EdgeTypes.CFG).filterNot(_.hasLabel(NodeTypes.METHOD_RETURN)))))
 
   /**
     * Traverse only to methods that are not stubs.
     * */
   def isNotStub: NodeSteps[nodes.Method] =
-    new NodeSteps(raw.filter(_.out(EdgeTypes.CFG)))
+    new NodeSteps(raw.filter(_.out(EdgeTypes.CFG).filterNot(_.hasLabel(NodeTypes.METHOD_RETURN))))
 
   /**
     * Traverse to external methods, that is, methods not present

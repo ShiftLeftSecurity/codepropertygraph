@@ -127,7 +127,7 @@ class CPGQLServerTests extends WordSpec with Matchers {
       getResultResponse("success").bool shouldBe true
       getResultResponse("uuid").str shouldBe queryResultWSMessage
       getResultResponse("stdout").str shouldBe ""
-      getResultResponse("stderr").str.length should not be(0)
+      getResultResponse("stderr").str.length should not be (0)
     }
   }
 
