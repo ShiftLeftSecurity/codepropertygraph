@@ -58,9 +58,9 @@ class CMethodTests extends WordSpec with Matchers {
     }
   }
 
-  CodeToCpgFixture("int foo(); int bar() { return 0; }") { cpg =>
+  CodeToCpgFixture("int foo(); int bar() { return woo(); }") { cpg =>
     "should identify method as stub" in {
-      cpg.method.isStub.name.l shouldBe List("foo")
+      cpg.method.isStub.name.toSet shouldBe Set("foo", "woo")
       cpg.method.isNotStub.name.l shouldBe List("bar")
     }
   }
