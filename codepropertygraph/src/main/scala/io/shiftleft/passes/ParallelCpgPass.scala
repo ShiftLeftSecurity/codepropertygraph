@@ -48,15 +48,17 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
   }
 
   private def enqueueInParallel(writer: Writer): Unit = {
-    init()
-    val it = new ParallelIteratorExecutor(itWithKeyPools()).map {
-      case (part, keyPool) =>
-        // Note: write.enqueue(runOnPart(part)) would be wrong because
-        // it would terminate the writer as soon as a pass returns None
-        // as None is used as a termination symbol for the queue
-        runOnPart(part).foreach(diffGraph => writer.enqueue(Some(diffGraph), keyPool))
+    withStartEndTimesLogged {
+      init()
+      val it = new ParallelIteratorExecutor(itWithKeyPools()).map {
+        case (part, keyPool) =>
+          // Note: write.enqueue(runOnPart(part)) would be wrong because
+          // it would terminate the writer as soon as a pass returns None
+          // as None is used as a termination symbol for the queue
+          runOnPart(part).foreach(diffGraph => writer.enqueue(Some(diffGraph), keyPool))
+      }
+      consume(it)
     }
-    consume(it)
   }
 
   private def itWithKeyPools(): Iterator[(T, Option[KeyPool])] = {
