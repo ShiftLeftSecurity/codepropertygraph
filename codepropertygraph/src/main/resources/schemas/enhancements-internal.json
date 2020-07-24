@@ -22,7 +22,7 @@
          "keys" : [],
          "comment" : "Multiple tags",
          "outEdges" : [],
-         "containedNodes" : [{"localName" : "tags", "nodeType" : "TAG", "cardinality" : "list", "localTag": 1}]
+         "containedNodes" : [{"localName" : "tags", "nodeType" : "TAG", "cardinality" : "list" }]
         },
         // deprecated, c.f. CONFIG_FILE
         {
@@ -533,7 +533,7 @@
             "id": 1001, "name": "DETACHED_TRACKING_POINT", "comment": "", "keys": [],
             "is": ["TRACKING_POINT"],
             "containedNodes": [
-              {"localName" : "cfgNode", "nodeType" : "CFG_NODE", "cardinality" : "one", "localTag": 1}
+              {"localName" : "cfgNode", "nodeType" : "CFG_NODE", "cardinality" : "one"}
             ],
             "outEdges": []
         },

@@ -8,7 +8,7 @@
 	   {"edgeName" : "AST", "inNodes": [{"name": "DOM_NODE"}]}
 	 ],
 	 "containedNodes" : [
-	     {"nodeType" : "DOM_ATTRIBUTE", "localName" : "attributes", "cardinality" : "list", "localTag": 1}
+	     {"nodeType" : "DOM_ATTRIBUTE", "localName" : "attributes", "cardinality" : "list"}
 	 ]
 	},
 	{"id" : 601,

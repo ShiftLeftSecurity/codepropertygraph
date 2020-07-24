@@ -56,9 +56,8 @@ message PropertyValue {
 }
 
 message ContainedRefs {
-  int32 local_tag = 1;
-  string local_name = 2;
-  repeated int64 refs = 3;
+  string local_name = 1;
+  repeated int64 refs = 2;
 }
 
 message StringList {
