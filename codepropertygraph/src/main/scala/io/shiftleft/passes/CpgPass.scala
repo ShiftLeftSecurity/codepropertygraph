@@ -127,7 +127,7 @@ trait CpgPassBase {
   }
 
   protected def withStartEndTimesLogged[A](fun: => A): A = {
-    logger.debug(s"Start of enhancement: $name")
+    logger.info(s"Start of enhancement: $name")
     val startTime = System.currentTimeMillis
     try {
       fun
