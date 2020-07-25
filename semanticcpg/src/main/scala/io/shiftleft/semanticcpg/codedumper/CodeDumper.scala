@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{Languages, nodes}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.codepropertygraph.Cpg
-import overflowdb.OdbGraph
+import overflowdb.{NodeRef, OdbGraph}
 import io.shiftleft.utils.{Source, SourceHighlighter}
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -23,14 +23,13 @@ object CodeDumper {
     * Dump code at those locations
     * */
   def dump[NodeType <: nodes.StoredNode](step: NodeSteps[NodeType], highlight: Boolean = true): List[String] = {
-    val cpg = new Cpg(step.graph)
-    step.location.l.map(dump(_, highlight, cpg))
+    step.location.l.map(dump(_, highlight))
   }
 
   /**
     * Dump string representation of code at given `location`.
     * */
-  private def dump(location: nodes.NewLocation, highlight: Boolean, cpg: Cpg): String = {
+  private def dump(location: nodes.NewLocation, highlight: Boolean): String = {
     val filename = location.filename
 
     if (location.node.isEmpty) {
@@ -39,9 +38,11 @@ object CodeDumper {
     }
 
     val node = location.node.get
-    val language = cpg.metaData.language.headOption()
+    val language: Option[String] = {
+      val graph = node.asInstanceOf[NodeRef[_]].graph
+      new Cpg(graph).metaData.language.headOption
+    }
     if (language.isEmpty || !Set(Languages.C).contains(language.get)) {
-      println(language)
       logger.info("dump not supported for this language or language not set in CPG")
       return ""
     }
