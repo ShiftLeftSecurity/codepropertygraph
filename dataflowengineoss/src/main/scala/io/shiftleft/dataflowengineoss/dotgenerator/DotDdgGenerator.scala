@@ -4,17 +4,15 @@ import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, EdgeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.dotgenerator.Shared
 import io.shiftleft.semanticcpg.dotgenerator.Shared.Edge
-import io.shiftleft.semanticcpg.language._
-import gremlin.scala._
+import overflowdb.traversal._
 import overflowdb.Node
 
 object DotDdgGenerator {
 
   def expand(v: nodes.StoredNode): Iterator[Edge] = {
-    (v.start.raw
+    v.start
       .outE(EdgeTypes.REACHING_DEF)
-      .map(x => Edge(v, x.inVertex().asInstanceOf[nodes.StoredNode], x.value[String](EdgeKeyNames.VARIABLE))))
-      .toList
+      .map(x => Edge(v, x.inNode.asInstanceOf[nodes.CfgNode], x.property2[String](EdgeKeyNames.VARIABLE)))
       .iterator
   }
 
@@ -25,7 +23,7 @@ object DotDdgGenerator {
       v.isInstanceOf[nodes.JumpTarget]
   )
 
-  def toDotDdg(step: NodeSteps[nodes.Method]): Steps[String] =
-    step.map(Shared.dotGraph(_, expand, cfgNodeShouldBeDisplayed))
+  def toDotDdg(traversal: Traversal[nodes.Method]): Traversal[String] =
+    traversal.map(Shared.dotGraph(_, expand, cfgNodeShouldBeDisplayed))
 
 }

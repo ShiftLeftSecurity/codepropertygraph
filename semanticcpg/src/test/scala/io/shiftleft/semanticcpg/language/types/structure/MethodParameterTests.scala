@@ -6,6 +6,7 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import overflowdb.traversal._
 
 class MethodParameterTests extends AnyWordSpec with Matchers {
 

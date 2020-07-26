@@ -5,8 +5,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal.Traversal
 
 import scala.collection.mutable
@@ -29,7 +28,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
       methodFullNameToNode.put(method.fullName, method)
     }
 
-    cpg.call.toIterator().foreach { call =>
+    cpg.call.foreach { call =>
       try {
         linkCall(call, dstGraph)
       } catch {

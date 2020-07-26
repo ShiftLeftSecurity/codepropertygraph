@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 
 import scala.jdk.CollectionConverters._
 import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal.Traversal
 
 class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
 
@@ -22,7 +23,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * Recursively determine all nodes on which this
     * CFG node is control-dependent.
     * */
-  def controlledBy: NodeSteps[nodes.CfgNode] = {
+  def controlledBy: Traversal[nodes.CfgNode] = {
     expandExhaustively { v =>
       v._cdgIn().asScala
     }
@@ -32,7 +33,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * Recursively determine all nodes which this
     * CFG node controls
     * */
-  def controls: NodeSteps[nodes.CfgNode] = {
+  def controls: Traversal[nodes.CfgNode] = {
     expandExhaustively { v =>
       v._cdgOut().asScala
     }
@@ -42,7 +43,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * Recursively determine all nodes by which
     * this node is dominated
     * */
-  def dominatedBy: NodeSteps[nodes.CfgNode] = {
+  def dominatedBy: Traversal[nodes.CfgNode] = {
     expandExhaustively { v =>
       v._dominateIn().asScala
     }
@@ -52,7 +53,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * Recursively determine all nodes which
     * are dominated by this node
     * */
-  def dominates: NodeSteps[nodes.CfgNode] = {
+  def dominates: Traversal[nodes.CfgNode] = {
     expandExhaustively { v =>
       v._dominateOut().asScala
     }
@@ -62,7 +63,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * Recursively determine all nodes by which
     * this node is post dominated
     * */
-  def postDominatedBy: NodeSteps[nodes.CfgNode] = {
+  def postDominatedBy: Traversal[nodes.CfgNode] = {
     expandExhaustively { v =>
       v._postDominateIn().asScala
     }
@@ -72,13 +73,13 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * Recursively determine all nodes which
     * are post dominated by this node
     * */
-  def postDominates: NodeSteps[nodes.CfgNode] = {
+  def postDominates: Traversal[nodes.CfgNode] = {
     expandExhaustively { v =>
       v._postDominateOut().asScala
     }
   }
 
-  private def expandExhaustively(expand: nodes.CfgNode => Iterator[nodes.StoredNode]) = {
+  private def expandExhaustively(expand: nodes.CfgNode => Iterator[nodes.StoredNode]): Traversal[nodes.CfgNode] = {
     var controllingNodes = List.empty[nodes.CfgNode]
     var visited = Set.empty + node
     var worklist = node :: Nil
@@ -96,7 +97,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
           }
       }
     }
-    controllingNodes.start
+    controllingNodes
   }
 
 }

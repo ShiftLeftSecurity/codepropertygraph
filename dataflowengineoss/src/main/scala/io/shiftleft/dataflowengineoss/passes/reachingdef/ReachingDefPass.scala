@@ -1,11 +1,11 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal._
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.jdk.CollectionConverters._
@@ -17,7 +17,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
+  override def partIterator: Iterator[nodes.Method] = cpg.method.iterator
 
   override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
     val problem = ReachingDefProblem.create(method)
@@ -131,7 +131,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   private def uses(node: nodes.StoredNode, gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Set[nodes.StoredNode] = {
     node match {
       case ret: nodes.Return =>
-        ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet()
+        ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet
       case call: nodes.Call =>
         val parameters = NoResolve.getCalledMethods(call).headOption.map(_.parameter.l).getOrElse(List())
         node

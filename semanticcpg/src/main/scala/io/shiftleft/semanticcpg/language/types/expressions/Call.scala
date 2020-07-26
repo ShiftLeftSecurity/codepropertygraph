@@ -1,71 +1,64 @@
 package io.shiftleft.semanticcpg.language.types.expressions
 
-import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.language.NodeSteps
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
-import io.shiftleft.semanticcpg.language.types.propertyaccessors._
-import io.shiftleft.semanticcpg.language.types.structure.{Member, Method, MethodReturn}
+import overflowdb.traversal.Traversal
 
 /**
   A call site
   */
-class Call(val wrapped: NodeSteps[nodes.Call]) extends AnyVal {
-  private def raw: GremlinScala[nodes.Call] = wrapped.raw
+class Call(val traversal: Traversal[nodes.Call]) extends AnyVal {
 
   /**
     Only statically dispatched calls
     */
-  def isStatic: NodeSteps[nodes.Call] =
-    wrapped.dispatchType("STATIC_DISPATCH")
+  def isStatic: Traversal[nodes.Call] =
+    traversal.dispatchType("STATIC_DISPATCH")
 
   /**
     Only dynamically dispatched calls
     */
-  def isDynamic: NodeSteps[nodes.Call] =
-    wrapped.dispatchType("DYNAMIC_DISPATCH")
+  def isDynamic: Traversal[nodes.Call] =
+    traversal.dispatchType("DYNAMIC_DISPATCH")
 
   /**
     The caller
     */
-  def method: NodeSteps[nodes.Method] =
-    new NodeSteps(raw.in(EdgeTypes.CONTAINS).hasLabel(NodeTypes.METHOD).cast[nodes.Method])
+  def method: Traversal[nodes.Method] =
+    traversal.in(EdgeTypes.CONTAINS).hasLabel(NodeTypes.METHOD).cast[nodes.Method]
 
   /**
     The receiver of a call if the call has a receiver associated.
     */
-  def receiver: NodeSteps[nodes.Expression] =
-    new NodeSteps(raw.out(EdgeTypes.RECEIVER).cast[nodes.Expression])
+  def receiver: Traversal[nodes.Expression] =
+    traversal.out(EdgeTypes.RECEIVER).cast[nodes.Expression]
 
   /**
     Arguments of the call
     */
-  def argument: NodeSteps[nodes.Expression] =
-    new NodeSteps(raw.out(EdgeTypes.ARGUMENT).cast[nodes.Expression])
+  def argument: Traversal[nodes.Expression] =
+    traversal.out(EdgeTypes.ARGUMENT).cast[nodes.Expression]
 
   /**
     `i'th` arguments of the call
     */
-  def argument(i: Integer): NodeSteps[nodes.Expression] =
+  def argument(i: Integer): Traversal[nodes.Expression] =
     argument.argIndex(i)
 
   /**
     To formal method return parameter
     */
-  def toMethodReturn(implicit callResolver: ICallResolver): NodeSteps[nodes.MethodReturn] =
-    new NodeSteps(
-      raw
-        .flatMap(callResolver.getCalledMethodsAsTraversal)
-        .out(EdgeTypes.AST)
-        .hasLabel(NodeTypes.METHOD_RETURN)
-        .cast[nodes.MethodReturn])
+  def toMethodReturn(implicit callResolver: ICallResolver): Traversal[nodes.MethodReturn] =
+    traversal
+      .flatMap(callResolver.getCalledMethodsAsTraversal)
+      .out(EdgeTypes.AST)
+      .hasLabel(NodeTypes.METHOD_RETURN)
+      .cast[nodes.MethodReturn]
 
   /**
     * Traverse to referenced members
     * */
-  def referencedMember: NodeSteps[nodes.Member] =
-    new NodeSteps(raw.out(EdgeTypes.REF).cast[nodes.Member])
+  def referencedMember: Traversal[nodes.Member] =
+    traversal.out(EdgeTypes.REF).cast[nodes.Member]
 
 }

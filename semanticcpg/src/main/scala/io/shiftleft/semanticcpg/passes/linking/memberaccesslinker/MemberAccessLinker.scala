@@ -1,12 +1,11 @@
 package io.shiftleft.semanticcpg.passes.linking.memberaccesslinker
 
-import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Operators, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
+import overflowdb.traversal._
 
 import scala.jdk.CollectionConverters._
 
@@ -21,7 +20,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     loggedDeprecationWarning = false
     val memberAccessIterator = cpg.call
-      .filter(
+      .where(
         _.nameExact(Operators.memberAccess,
                     Operators.indirectMemberAccess,
                     Operators.fieldAccess,
@@ -98,7 +97,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
     cache.getOrElse(
       (typ, name), {
         cache.update((typ, name), null)
-        val members = typ.start.member.filter(_.nameExact(name)).l
+        val members = typ.start.member.where(_.nameExact(name)).l
         val res = if (members.nonEmpty) {
           cache.update((typ, name), members.head)
           members.head
@@ -107,9 +106,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
             .map { basetyp =>
               getMember(cache, basetyp, name, depth + 1)
             }
-            .filter {
-              _ != null
-            }
+            .filter(_ != null)
 
           if (recursive_res.nonEmpty) {
             cache.update((typ, name), recursive_res.head)

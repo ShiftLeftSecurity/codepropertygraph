@@ -1,32 +1,31 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import gremlin.scala.GremlinScala
-import io.shiftleft.codepropertygraph.generated.NodeKeys
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
+import io.shiftleft.codepropertygraph.generated.NodeKeysOdb
+import io.shiftleft.codepropertygraph.generated.nodes.HasCanonicalName
+import overflowdb.Node
+import overflowdb.traversal.Traversal
 
-class CanonicalNameAccessors[A <: StoredNode](steps: Steps[A]) extends StringPropertyAccessors[A] {
-  override val raw: GremlinScala[A] = steps.raw
+class CanonicalNameAccessors[A <: Node with HasCanonicalName](val traversal: Traversal[A]) extends AnyVal {
 
-  def canonicalName(): Steps[String] =
-    stringProperty(NodeKeys.CANONICAL_NAME)
+  def canonicalName: Traversal[String] =
+    traversal.map(_.canonicalName)
 
-  def canonicalName(value: String): NodeSteps[A] =
-    stringPropertyFilter(NodeKeys.CANONICAL_NAME, value)
+  def canonicalName(value: String): Traversal[A] =
+    StringPropertyAccessors.filter(traversal, NodeKeysOdb.CANONICAL_NAME, value)
 
-  def canonicalName(value: String*): NodeSteps[A] =
-    stringPropertyFilterMultiple(NodeKeys.CANONICAL_NAME, value: _*)
+  def canonicalName(value: String*): Traversal[A] =
+    StringPropertyAccessors.filterMultiple(traversal, NodeKeysOdb.CANONICAL_NAME, value: _*)
 
-  def canonicalNameExact(value: String): NodeSteps[A] =
-    stringPropertyFilterExact(NodeKeys.CANONICAL_NAME, value)
+  def canonicalNameExact(value: String): Traversal[A] =
+    StringPropertyAccessors.filterExact(traversal, NodeKeysOdb.CANONICAL_NAME, value)
 
-  def canonicalNameExact(values: String*): NodeSteps[A] =
-    stringPropertyFilterExactMultiple(NodeKeys.CANONICAL_NAME, values: _*)
+  def canonicalNameExact(values: String*): Traversal[A] =
+    StringPropertyAccessors.filterExactMultiple(traversal, NodeKeysOdb.CANONICAL_NAME, values: _*)
 
-  def canonicalNameNot(value: String): NodeSteps[A] =
-    stringPropertyFilterNot(NodeKeys.CANONICAL_NAME, value)
+  def canonicalNameNot(value: String): Traversal[A] =
+    StringPropertyAccessors.filterNot(traversal, NodeKeysOdb.CANONICAL_NAME, value)
 
-  def canonicalNameNot(values: String*): NodeSteps[A] =
-    stringPropertyFilterNotMultiple(NodeKeys.CANONICAL_NAME, values: _*)
+  def canonicalNameNot(values: String*): Traversal[A] =
+    StringPropertyAccessors.filterNotMultiple(traversal, NodeKeysOdb.CANONICAL_NAME, values: _*)
 
 }

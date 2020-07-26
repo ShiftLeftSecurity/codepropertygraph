@@ -12,7 +12,7 @@ import io.shiftleft.semanticcpg.language._
   */
 class CallNameFixup(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
-    cpg.call.toIterator().foreach { call =>
+    cpg.call.foreach { call =>
       if (call.methodFullName != null) {
         val colonIndex = call.methodFullName.indexOf(":")
         if (colonIndex != -1) {
@@ -35,7 +35,6 @@ class CallNameFixup(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def eraseTypeInformation(name: String): String = {
-
     val dstStringBuilder = new StringBuilder
 
     var openBracketCounter = 0
