@@ -19,12 +19,16 @@ class NamespaceCreator(cpg: Cpg) extends CpgPass(cpg) {
     * */
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
-    cpg.namespaceBlock.toBuffer.groupBy(_.name).foreach {
-      case (name: String, blocks) =>
-        val namespace = new nodes.NewNamespace(name)
-        dstGraph.addNode(namespace)
-        blocks.foreach(block => dstGraph.addEdgeFromOriginal(block, namespace, EdgeTypes.REF))
-    }
+    cpg.namespaceBlock.toBuffer
+      .groupBy { nb: nodes.NamespaceBlock =>
+        nb.name
+      }
+      .foreach {
+        case (name: String, blocks) =>
+          val namespace = new nodes.NewNamespace(name)
+          dstGraph.addNode(namespace)
+          blocks.foreach(block => dstGraph.addEdgeFromOriginal(block, namespace, EdgeTypes.REF))
+      }
     Iterator(dstGraph.build())
   }
 }

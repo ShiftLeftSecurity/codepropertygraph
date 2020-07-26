@@ -1,19 +1,17 @@
 package io.shiftleft.semanticcpg.language.types.expressions
 
-import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal.Traversal
 
 /**
   An identifier, e.g., an instance of a local variable, or a temporary variable
   */
-class IdentifierTrav(val wrapped: NodeSteps[nodes.Identifier]) extends AnyVal {
-  private def raw: GremlinScala[nodes.Identifier] = wrapped.raw
+class IdentifierTrav(val traversal: Traversal[nodes.Identifier]) extends AnyVal {
 
   /**
     * Traverse to all declarations of this identifier
     * */
-  def refsTo: NodeSteps[nodes.Declaration] =
-    new NodeSteps(raw.out(EdgeTypes.REF).cast[nodes.Declaration])
+  def refsTo: Traversal[nodes.Declaration] =
+    traversal.out(EdgeTypes.REF).cast[nodes.Declaration]
 
 }

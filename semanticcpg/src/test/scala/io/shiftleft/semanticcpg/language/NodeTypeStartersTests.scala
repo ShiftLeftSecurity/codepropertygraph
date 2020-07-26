@@ -37,7 +37,7 @@ class NodeTypeStartersTests extends CodeToCpgSuite {
   }
 
   "should allow retrieving parameters" in {
-    cpg.parameter.filter(_.method.internal).name.toSet shouldBe Set("argc", "argv")
+    cpg.parameter.where(_.method.internal).name.toSet shouldBe Set("argc", "argv")
   }
 
   "should allow retrieving locals" in {

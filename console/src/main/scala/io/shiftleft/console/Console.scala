@@ -10,11 +10,11 @@ import io.shiftleft.console.LanguageHelper.cpgGeneratorForLanguage
 import io.shiftleft.console.cpgcreation.{CpgGenerator, LanguageFrontend}
 import io.shiftleft.console.scripting.{AmmoniteExecutor, ScriptManager}
 import io.shiftleft.console.workspacehandling.{Project, WorkspaceLoader, WorkspaceManager}
-import overflowdb.traversal.help.{Doc, Table}
 import io.shiftleft.semanticcpg.Overlays
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.dotextension.ImageViewer
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, Scpg}
+import overflowdb.traversal.help.{Doc, Table}
 
 import scala.sys.process.Process
 import scala.util.{Failure, Success, Try}
@@ -505,7 +505,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     }
 
     cpgOpt
-      .filter(_.metaData.headOption().isDefined)
+      .filter(_.metaData.hasNext)
       .foreach(applyDefaultOverlays)
 
     cpgOpt

@@ -1,10 +1,9 @@
 package io.shiftleft.semanticcpg.language.operatorextension
 
-import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal.Traversal
 
-class Target(val wrapped: NodeSteps[nodes.Expression]) extends AnyVal {
-  private def raw: GremlinScala[nodes.Expression] = wrapped.raw
-  def isArrayAccess: NodeSteps[opnodes.ArrayAccess] = wrapped.flatMap(_.isArrayAccess)
+class Target(val traversal: Traversal[nodes.Expression]) extends AnyVal {
+  def isArrayAccess: Traversal[opnodes.ArrayAccess] = traversal.flatMap(_.isArrayAccess)
 }

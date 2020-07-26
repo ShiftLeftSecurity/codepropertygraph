@@ -1,33 +1,31 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import gremlin.scala.GremlinScala
-import io.shiftleft.codepropertygraph.generated.NodeKeys
-import io.shiftleft.codepropertygraph.generated.nodes.{HasParserTypeName, StoredNode}
-import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
+import io.shiftleft.codepropertygraph.generated.NodeKeysOdb
+import io.shiftleft.codepropertygraph.generated.nodes.HasParserTypeName
+import overflowdb.Node
+import overflowdb.traversal.Traversal
 
-class ParserTypeNameAccessors[A <: StoredNode with HasParserTypeName](steps: Steps[A])
-    extends StringPropertyAccessors[A] {
-  override val raw: GremlinScala[A] = steps.raw
+class ParserTypeNameAccessors[A <: Node with HasParserTypeName](val traversal: Traversal[A]) extends AnyVal {
 
-  def parserTypeName(): Steps[String] =
-    stringProperty(NodeKeys.PARSER_TYPE_NAME)
+  def parserTypeName: Traversal[String] =
+    traversal.map(_.parserTypeName)
 
-  def parserTypeName(value: String): NodeSteps[A] =
-    stringPropertyFilter(NodeKeys.PARSER_TYPE_NAME, value)
+  def parserTypeName(value: String): Traversal[A] =
+    StringPropertyAccessors.filter(traversal, NodeKeysOdb.PARSER_TYPE_NAME, value)
 
-  def parserTypeName(value: String*): NodeSteps[A] =
-    stringPropertyFilterMultiple(NodeKeys.PARSER_TYPE_NAME, value: _*)
+  def parserTypeName(value: String*): Traversal[A] =
+    StringPropertyAccessors.filterMultiple(traversal, NodeKeysOdb.PARSER_TYPE_NAME, value: _*)
 
-  def parserTypeNameExact(value: String): NodeSteps[A] =
-    stringPropertyFilterExact(NodeKeys.PARSER_TYPE_NAME, value)
+  def parserTypeNameExact(value: String): Traversal[A] =
+    StringPropertyAccessors.filterExact(traversal, NodeKeysOdb.PARSER_TYPE_NAME, value)
 
-  def parserTypeNameExact(values: String*): NodeSteps[A] =
-    stringPropertyFilterExactMultiple(NodeKeys.PARSER_TYPE_NAME, values: _*)
+  def parserTypeNameExact(values: String*): Traversal[A] =
+    StringPropertyAccessors.filterExactMultiple(traversal, NodeKeysOdb.PARSER_TYPE_NAME, values: _*)
 
-  def parserTypeNameNot(value: String): NodeSteps[A] =
-    stringPropertyFilterNot(NodeKeys.PARSER_TYPE_NAME, value)
+  def parserTypeNameNot(value: String): Traversal[A] =
+    StringPropertyAccessors.filterNot(traversal, NodeKeysOdb.PARSER_TYPE_NAME, value)
 
-  def parserTypeNameNot(values: String*): NodeSteps[A] =
-    stringPropertyFilterNotMultiple(NodeKeys.PARSER_TYPE_NAME, values: _*)
+  def parserTypeNameNot(values: String*): Traversal[A] =
+    StringPropertyAccessors.filterNotMultiple(traversal, NodeKeysOdb.PARSER_TYPE_NAME, values: _*)
 
 }

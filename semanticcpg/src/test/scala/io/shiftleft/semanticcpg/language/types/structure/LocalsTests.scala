@@ -46,7 +46,7 @@ class LocalsTests extends CodeToCpgSuite {
   }
 
   "should allow finding filenames by local regex" in {
-    val filename = cpg.local.name("a*").file.name.headOption()
+    val filename = cpg.local.name("a*").file.name.headOption
     filename should not be empty
     filename.head.endsWith(".c") shouldBe true
   }

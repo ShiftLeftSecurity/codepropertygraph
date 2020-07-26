@@ -2,9 +2,9 @@ package io.shiftleft.semanticcpg.passes.linking.filecompat
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.semanticcpg.passes.linking.linker.Linker
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.passes.linking.linker.Linker
 
 import scala.collection.mutable
 
@@ -24,7 +24,7 @@ class FileLinker(cpg: Cpg) extends CpgPass(cpg) {
 
     var maxFileOrder = -1
 
-    cpg.file.toIterator().foreach { node =>
+    cpg.file.foreach { node =>
       originalFileNameToNode += node.name -> node
       maxFileOrder = Math.max(maxFileOrder, node.order)
     }

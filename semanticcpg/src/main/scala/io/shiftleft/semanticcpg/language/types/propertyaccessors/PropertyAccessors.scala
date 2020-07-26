@@ -1,36 +1,21 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
+import overflowdb._
+import overflowdb.traversal._
+import overflowdb.traversal.filter.P
 
-trait PropertyAccessors[A <: StoredNode] {
-  def raw: GremlinScala[A]
+object PropertyAccessors {
 
-  def property[P](property: Key[P]): Steps[P] =
-    new Steps[P](raw.value(property))
+  def filter[A <: Node, B](traversal: Traversal[A], property: PropertyKey[B], value: B): Traversal[A] =
+    traversal.has(property, value)
 
-  def propertyFilter[Out, P](property: Key[P], value: P): NodeSteps[A] =
-    new NodeSteps[A](raw.has(property, value))
+  def filterNot[A <: Node, B](traversal: Traversal[A], property: PropertyKey[B], value: B): Traversal[A] =
+    traversal.hasNot(property, value)
 
-  def propertyFilterMultiple[Out, P](property: Key[P], values: P*): NodeSteps[A] =
-    if (values.nonEmpty) {
-      new NodeSteps[A](raw.or(values.map { value => (trav: GremlinScala[A]) =>
-        trav.has(property, value)
-      }: _*))
-    } else {
-      new NodeSteps[A](raw.filterOnEnd(_ => false))
-    }
+  def filterMultiple[A <: Node, B](traversal: Traversal[A], property: PropertyKey[B], values: B*): Traversal[A] =
+    traversal.has(property.where(P.within(values.to(Set))))
 
-  def propertyFilterNot[Out, P](property: Key[P], value: P): NodeSteps[A] =
-    new NodeSteps[A](raw.hasNot(property, value))
+  def filterNotMultiple[A <: Node, B](traversal: Traversal[A], property: PropertyKey[B], values: B*): Traversal[A] =
+    traversal.hasNot(property.where(P.within(values.to(Set))))
 
-  def propertyFilterNotMultiple[Out, P](property: Key[P], values: P*): NodeSteps[A] =
-    if (values.nonEmpty) {
-      new NodeSteps[A](raw.or(values.map { value => (trav: GremlinScala[A]) =>
-        trav.hasNot(property, value)
-      }: _*))
-    } else {
-      new NodeSteps[A](raw)
-    }
 }

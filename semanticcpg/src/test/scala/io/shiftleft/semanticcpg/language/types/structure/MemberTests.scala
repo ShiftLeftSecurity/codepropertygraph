@@ -14,7 +14,7 @@ class MemberTests extends AnyWordSpec with Matchers {
     }
 
     "filter by modifier" in {
-      val member = fixture.cpg.member.hasModifier(ModifierTypes.STATIC).name.toSet()
+      val member = fixture.cpg.member.hasModifier(ModifierTypes.STATIC).name.toSet
       member shouldBe Set("static_member")
     }
   }
