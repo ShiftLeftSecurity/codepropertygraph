@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.language
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
+import overflowdb.traversal._
 import overflowdb.traversal.help.{Doc, TraversalSource}
 
 @TraversalSource
@@ -17,8 +18,8 @@ class NodeTypeStarters(cpg: Cpg) {
     Traverse to all nodes.
     */
   @Doc("All nodes of the graph")
-  def all: NodeSteps[nodes.StoredNode] =
-    new NodeSteps(scalaGraph.V.cast[nodes.StoredNode])
+  def all: Traversal[nodes.StoredNode] =
+    cpg.graph.nodes.cast[nodes.StoredNode]
 
   /**
     * Traverse to all comments in source-based CPGs.
