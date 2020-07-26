@@ -2,9 +2,7 @@ package io.shiftleft.semanticcpg.utils
 
 import io.shiftleft.Implicits._
 import io.shiftleft.codepropertygraph.generated._
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.apache.tinkerpop.gremlin.structure.Vertex
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters._
@@ -62,14 +60,12 @@ object ExpandTo {
         null
     }
 
-  def hasModifier(methodNode: Vertex, modifierType: String): Boolean =
-    methodNode
-      .asInstanceOf[nodes.StoredNode]
-      ._astOut
-      .asScala
-      .exists(astChild =>
-        astChild.isInstanceOf[nodes.Modifier] &&
-          astChild.asInstanceOf[nodes.Modifier].modifierType == modifierType)
+  def hasModifier(methodNode: nodes.StoredNode, modifierType: String): Boolean =
+    methodNode._astOut.asScala
+      .exists(
+        astChild =>
+          astChild.isInstanceOf[nodes.Modifier] &&
+            astChild.asInstanceOf[nodes.Modifier].modifierType == modifierType)
 
   def methodToTypeDecl(method: nodes.Method): Option[nodes.TypeDecl] =
     findVertex(method, _.isInstanceOf[nodes.TypeDecl]).map(_.asInstanceOf[nodes.TypeDecl])

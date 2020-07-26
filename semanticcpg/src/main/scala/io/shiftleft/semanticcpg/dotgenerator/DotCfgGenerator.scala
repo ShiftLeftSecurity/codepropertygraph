@@ -2,6 +2,8 @@ package io.shiftleft.semanticcpg.dotgenerator
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
+import overflowdb.Node
+
 import scala.jdk.CollectionConverters._
 
 object DotCfgGenerator {
@@ -22,7 +24,7 @@ object DotCfgGenerator {
 
   private def nodesAndEdges(methodNode: nodes.Method): List[String] = {
 
-    def shouldBeDisplayed(v: gremlin.scala.Vertex): Boolean = !(
+    def shouldBeDisplayed(v: Node): Boolean = !(
       v.isInstanceOf[nodes.Literal] ||
         v.isInstanceOf[nodes.Identifier] ||
         v.isInstanceOf[nodes.Block] ||
