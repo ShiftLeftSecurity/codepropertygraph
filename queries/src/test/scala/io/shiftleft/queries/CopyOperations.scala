@@ -2,6 +2,7 @@ package io.shiftleft.queries
 
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
+import overflowdb.traversal._
 
 class CopyOperations extends CodeToCpgSuite {
 
@@ -24,9 +25,9 @@ class CopyOperations extends CodeToCpgSuite {
     """
 
   "find indexed buffer assigment targets" in {
-    cpg.assignment.target.isArrayAccess.toSet.map { arrAccess =>
+    cpg.assignment.target.isArrayAccess.dedup.map { arrAccess =>
       arrAccess.subscripts.code.toSet
-    } shouldBe Set(Set("k"), Set("i", "j", "offset"))
+    }.toSet shouldBe Set(Set("k"), Set("i", "j", "offset"))
   }
 
   "find indexed buffer assignment targets in loops where index is incremented" in {
@@ -41,7 +42,7 @@ class CopyOperations extends CodeToCpgSuite {
       .map { access =>
         (access.array, access.subscripts.code.toSet)
       }
-      .where {
+      .filter {
         case (buf, subscripts) =>
           val incIdentifiers = buf.start.inAst.isControlStructure.astChildren
             .filterNot(_.isBlock)

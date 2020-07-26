@@ -5,7 +5,6 @@ import better.files._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class UnixUtilsTest extends AnyWordSpec with Matchers {
 
   "writes to file (overwrite)" when {

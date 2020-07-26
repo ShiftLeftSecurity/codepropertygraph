@@ -6,7 +6,6 @@ import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class MemberTests extends AnyWordSpec with Matchers {
 
   "Member traversals" should ExistingCpgFixture("type") { fixture =>
@@ -15,7 +14,7 @@ class MemberTests extends AnyWordSpec with Matchers {
     }
 
     "filter by modifier" in {
-      val member = fixture.cpg.member.hasModifier(ModifierTypes.STATIC).name.toSet()
+      val member = fixture.cpg.member.hasModifier(ModifierTypes.STATIC).name.toSet
       member shouldBe Set("static_member")
     }
   }

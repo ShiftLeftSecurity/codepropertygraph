@@ -6,7 +6,6 @@ import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 import scala.collection.mutable.ListBuffer
 
 class WorkspaceTests extends AnyWordSpec with Matchers {

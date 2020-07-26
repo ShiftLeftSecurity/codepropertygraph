@@ -3,7 +3,6 @@ package io.shiftleft.queries
 import io.shiftleft.dataflowengineoss.language.{DataFlowCodeToCpgSuite, _}
 import io.shiftleft.semanticcpg.language._
 
-
 class MallocMemcpyTests extends DataFlowCodeToCpgSuite {
 
   override val code: String =
@@ -28,15 +27,16 @@ class MallocMemcpyTests extends DataFlowCodeToCpgSuite {
     * buffer overflow in VLC's MP4 demuxer (CVE-2014-9626).
     * */
   "find calls to malloc/memcpy system with different expressions in arguments" in {
-    val src = cpg.call("malloc").filter(_.argument(1).arithmetics).l
+    val src = cpg.call("malloc").where(_.argument(1).arithmetics)
 
     cpg
       .call("memcpy")
-      .whereNonEmpty { call =>
+      .filter { call =>
         call
           .argument(1)
-          .reachableBy(src.start)
-          .filterNot(_.argument(1).codeExact(call.argument(3).code))
+          .reachableBy(src)
+          .not(_.argument(1).codeExact(call.argument(3).code))
+          .hasNext
       }
       .code
       .l shouldBe List("memcpy(dst, src, len + 7)")

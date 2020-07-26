@@ -2,14 +2,14 @@ package io.shiftleft.semanticcpg.language.dotextension
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.dotgenerator.DotCfgGenerator
-import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
+import overflowdb.traversal.Traversal
 
-class CfgNodeDot(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
+class CfgNodeDot(val traversal: Traversal[nodes.Method]) extends AnyVal {
 
-  def dotCfg: Steps[String] = DotCfgGenerator.toDotCfg(wrapped)
+  def dotCfg: Traversal[String] = DotCfgGenerator.toDotCfg(traversal)
 
   def plotDotCfg(implicit viewer: ImageViewer): Unit = {
-    Shared.plotAndDisplay(wrapped.dotCfg.l, viewer)
+    Shared.plotAndDisplay(dotCfg.l, viewer)
   }
 
 }

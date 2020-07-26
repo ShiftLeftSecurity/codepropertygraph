@@ -8,7 +8,6 @@ import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 import scala.jdk.CollectionConverters._
 
 class CapturingLinkerTests extends AnyWordSpec with Matchers {

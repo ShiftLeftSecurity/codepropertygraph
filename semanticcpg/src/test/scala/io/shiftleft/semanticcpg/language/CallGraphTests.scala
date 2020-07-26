@@ -2,7 +2,6 @@ package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
 
-
 class CallGraphTests extends CodeToCpgSuite {
 
   implicit val resolver = NoResolve

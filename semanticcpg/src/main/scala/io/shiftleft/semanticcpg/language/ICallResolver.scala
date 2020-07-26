@@ -1,8 +1,8 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.{CallRepr, Method}
+import overflowdb.traversal.Traversal
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -32,11 +32,8 @@ trait ICallResolver {
   /**
     * Same as getCalledMethods but with traversal return type.
     */
-  def getCalledMethodsAsTraversal(callsite: nodes.CallRepr): GremlinScala[nodes.Method] = {
-    val calledMethods = getCalledMethods(callsite)
-
-    gremlin.scala.__(calledMethods.toSeq: _*)
-  }
+  def getCalledMethodsAsTraversal(callsite: nodes.CallRepr): Traversal[nodes.Method] =
+    getCalledMethods(callsite).to(Traversal)
 
   /**
     * Get callsites of the given method.
@@ -58,11 +55,8 @@ trait ICallResolver {
   /**
     * Same as getMethodCallsites but with traversal return type.
     */
-  def getMethodCallsitesAsTraversal(method: nodes.Method): GremlinScala[nodes.CallRepr] = {
-    val methodCallsites = getMethodCallsites(method)
-
-    gremlin.scala.__(methodCallsites.toSeq: _*)
-  }
+  def getMethodCallsitesAsTraversal(method: nodes.Method): Traversal[nodes.CallRepr] =
+    getMethodCallsites(method).to(Traversal)
 
   /**
     * Starts data flow tracking to find all method which could be called at the given callsite.

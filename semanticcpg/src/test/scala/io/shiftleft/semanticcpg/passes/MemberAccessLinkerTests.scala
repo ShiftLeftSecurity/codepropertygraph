@@ -6,7 +6,6 @@ import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class MemberAccessLinkerTests extends AnyWordSpec with Matchers {
 
   "have a reference to correct member" in ExistingCpgFixture("memberaccesslinker") { fixture =>

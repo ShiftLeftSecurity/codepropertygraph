@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.dotgenerator
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import overflowdb.Node
+import overflowdb.traversal._
 import io.shiftleft.semanticcpg.language._
 
 object Shared {

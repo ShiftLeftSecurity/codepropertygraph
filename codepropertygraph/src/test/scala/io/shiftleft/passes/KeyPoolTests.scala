@@ -3,7 +3,6 @@ package io.shiftleft.passes
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class KeyPoolTests extends AnyWordSpec with Matchers {
 
   "IntervalKeyPool" should {

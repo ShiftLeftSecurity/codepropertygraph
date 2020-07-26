@@ -1,6 +1,5 @@
 package io.shiftleft.x2cpg
 
-
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import better.files.File

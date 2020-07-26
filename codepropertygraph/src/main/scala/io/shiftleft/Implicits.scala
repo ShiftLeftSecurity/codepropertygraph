@@ -45,14 +45,6 @@ object Implicits {
         res
       } else { throw new NoSuchElementException() }
     }
-
-    def nextOption: Option[T] = {
-      if (iterator.hasNext) {
-        Some(iterator.next)
-      } else {
-        None
-      }
-    }
   }
 
 }

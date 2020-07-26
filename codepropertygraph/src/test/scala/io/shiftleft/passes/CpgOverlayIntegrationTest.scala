@@ -8,7 +8,6 @@ import io.shiftleft.codepropertygraph.generated._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
   val InitialNodeCode = "initialNode"
   val Pass1NewNodeCode = "pass1NewNodeCode"

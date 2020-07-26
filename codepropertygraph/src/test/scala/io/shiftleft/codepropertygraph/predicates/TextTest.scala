@@ -2,8 +2,6 @@ package io.shiftleft.codepropertygraph.predicates
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
-
 class TextTest extends AnyWordSpec with Matchers {
   val name = "fully funny"
 

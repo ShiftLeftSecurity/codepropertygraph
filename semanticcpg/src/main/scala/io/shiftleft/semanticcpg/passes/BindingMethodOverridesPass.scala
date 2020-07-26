@@ -12,11 +12,11 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
 
   override def run(): Iterator[DiffGraph] = {
     val diffGraph = DiffGraph.newBuilder
-    for (typeDecl <- cpg.typeDecl.toIterator;
+    for (typeDecl <- cpg.typeDecl;
          binding <- typeDecl._bindingViaBindsOut) {
       bindingTable.update((binding.name, binding.signature, typeDecl), binding)
     }
-    for (typeDecl <- cpg.typeDecl.toIterator) {
+    for (typeDecl <- cpg.typeDecl) {
       val parentTypeDecls = typeDecl._typeViaInheritsFromOut.flatMap { _._typeDeclViaRefOut }.toList
       for (binding <- typeDecl._bindingViaBindsOut) {
         if (!overwritten.contains(binding)) {
@@ -30,13 +30,13 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
         }
       }
     }
-    for (typeDecl <- cpg.typeDecl.toIterator;
+    for (typeDecl <- cpg.typeDecl;
          binding <- typeDecl._bindingViaBindsOut) {
       diffGraph.addNodeProperty(node = binding,
                                 key = NodeKeyNames.IS_METHOD_NEVER_OVERRIDDEN,
                                 value = (!overwritten.contains(binding)).asInstanceOf[AnyRef])
     }
-    return Iterator(diffGraph.build())
+    Iterator(diffGraph.build())
   }
 
   def markRecurse(binding: nodes.Binding): Unit = {

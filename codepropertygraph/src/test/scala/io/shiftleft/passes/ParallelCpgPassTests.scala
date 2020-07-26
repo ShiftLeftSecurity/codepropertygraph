@@ -7,7 +7,6 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 import scala.jdk.CollectionConverters._
 
 class ParallelCpgPassTests extends AnyWordSpec with Matchers {

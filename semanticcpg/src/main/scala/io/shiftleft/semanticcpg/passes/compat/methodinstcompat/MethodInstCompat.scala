@@ -25,7 +25,7 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
       MethodInstCompat.logger.warn("Using deprecated CPG format with METHOD_INST nodes.")
       init()
 
-      cpg.call.toIterator.foreach { call =>
+      cpg.call.foreach { call =>
         call.methodInstFullName.foreach { methodInstFullName =>
           methodInstFullNameToMethodFullName.get(methodInstFullName) match {
             case Some(methodFullName) =>
@@ -39,7 +39,7 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
 
       }
 
-      cpg.methodRef.toIterator.foreach { methodRef =>
+      cpg.methodRef.foreach { methodRef =>
         methodRef.methodInstFullName.foreach { methodInstFullName =>
           methodInstFullNameToMethodFullName.get(methodInstFullName) match {
             case Some(methodFullName) =>

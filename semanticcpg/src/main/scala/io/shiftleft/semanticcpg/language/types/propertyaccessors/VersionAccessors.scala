@@ -1,32 +1,31 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import gremlin.scala.GremlinScala
-import io.shiftleft.codepropertygraph.generated.NodeKeys
-import io.shiftleft.codepropertygraph.generated.nodes.{HasVersion, StoredNode}
-import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
+import io.shiftleft.codepropertygraph.generated.NodeKeysOdb
+import io.shiftleft.codepropertygraph.generated.nodes.HasVersion
+import overflowdb.Node
+import overflowdb.traversal.Traversal
 
-class VersionAccessors[A <: StoredNode with HasVersion](steps: Steps[A]) extends StringPropertyAccessors[A] {
-  override val raw: GremlinScala[A] = steps.raw
+class VersionAccessors[A <: Node with HasVersion](val traversal: Traversal[A]) extends AnyVal {
 
-  def version(): Steps[String] =
-    stringProperty(NodeKeys.VERSION)
+  def version: Traversal[String] =
+    traversal.map(_.version)
 
-  def version(value: String): NodeSteps[A] =
-    stringPropertyFilter(NodeKeys.VERSION, value)
+  def version(value: String): Traversal[A] =
+    StringPropertyAccessors.filter(traversal, NodeKeysOdb.VERSION, value)
 
-  def version(value: String*): NodeSteps[A] =
-    stringPropertyFilterMultiple(NodeKeys.VERSION, value: _*)
+  def version(value: String*): Traversal[A] =
+    StringPropertyAccessors.filterMultiple(traversal, NodeKeysOdb.VERSION, value: _*)
 
-  def versionExact(value: String): NodeSteps[A] =
-    stringPropertyFilterExact(NodeKeys.VERSION, value)
+  def versionExact(value: String): Traversal[A] =
+    StringPropertyAccessors.filterExact(traversal, NodeKeysOdb.VERSION, value)
 
-  def versionExact(values: String*): NodeSteps[A] =
-    stringPropertyFilterExactMultiple(NodeKeys.VERSION, values: _*)
+  def versionExact(values: String*): Traversal[A] =
+    StringPropertyAccessors.filterExactMultiple(traversal, NodeKeysOdb.VERSION, values: _*)
 
-  def versionNot(value: String): NodeSteps[A] =
-    stringPropertyFilterNot(NodeKeys.VERSION, value)
+  def versionNot(value: String): Traversal[A] =
+    StringPropertyAccessors.filterNot(traversal, NodeKeysOdb.VERSION, value)
 
-  def versionNot(values: String*): NodeSteps[A] =
-    stringPropertyFilterNotMultiple(NodeKeys.VERSION, values: _*)
+  def versionNot(values: String*): Traversal[A] =
+    StringPropertyAccessors.filterNotMultiple(traversal, NodeKeysOdb.VERSION, values: _*)
 
 }

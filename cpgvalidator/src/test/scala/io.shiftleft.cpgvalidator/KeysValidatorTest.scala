@@ -9,7 +9,6 @@ import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.Cardinality
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class KeysValidatorTest extends AnyWordSpec with Matchers {
 
   private class TestValidationErrorRegistry extends ValidationErrorRegistry {

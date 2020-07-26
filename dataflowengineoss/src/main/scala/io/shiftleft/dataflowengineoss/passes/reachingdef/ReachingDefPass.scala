@@ -1,12 +1,12 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.MemberAccess
+import overflowdb.traversal._
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -24,7 +24,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
                               // we also do not want to compute it again
                               gen: Map[nodes.StoredNode, Set[nodes.StoredNode]])
 
-  override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
+  override def partIterator: Iterator[nodes.Method] = cpg.method.iterator
 
   override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
     val solution = calculateMopSolution(method)
@@ -136,7 +136,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       returnNode =>
         addEdge(returnNode,
                 methodReturn,
-                returnNode.astChildren.headOption().map(_.asInstanceOf[nodes.CfgNode].code).getOrElse("")))
+                returnNode.astChildren.headOption.map(_.asInstanceOf[nodes.CfgNode].code).getOrElse("")))
 
     // Now look at `out` for each node
     out.foreach {

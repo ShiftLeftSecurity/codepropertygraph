@@ -4,7 +4,6 @@ import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class CountStatementsTests extends AnyWordSpec with Matchers {
 
   "Class Statements" should ExistingCpgFixture("method") { fixture =>

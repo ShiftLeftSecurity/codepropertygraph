@@ -9,7 +9,6 @@ import io.shiftleft.console.cpgcreation.LlvmLanguageFrontend
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class LanguageHelperTests extends AnyWordSpec with Matchers {
 
   "LanguageHelper.guessLanguage" should {
