@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
 import gremlin.scala.{BranchCase, BranchOtherwise, GremlinScala, P, Vertex}
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.codedumper.CodeDumper
 import overflowdb.traversal.help
@@ -83,7 +84,8 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
       |This only works for source frontends.
       |""".stripMargin
   )
-  def dump: List[String] = CodeDumper.dump(this, true)
+  def dump: List[String] =
+    _dump(highlight = true)
 
   @Doc(
     "Display code (without syntax highlighting)",
@@ -93,7 +95,16 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
       |to the expression. No color highlighting.
       |""".stripMargin
   )
-  def dumpRaw: List[String] = CodeDumper.dump(this, false)
+  def dumpRaw: List[String] =
+    _dump(highlight = false)
+
+  private def _dump(highlight: Boolean): List[String] = {
+    var language: Option[String] = null // initialized on first element - need the graph for this
+    raw.l.map { node =>
+      if (language == null) language = new Cpg(node.graph2()).metaData.language.headOption()
+      CodeDumper.dump(node.location, language, highlight)
+    }
+  }
 
   /* follow the incoming edges of the given type as long as possible */
   protected def walkIn(edgeType: String): GremlinScala[Vertex] =

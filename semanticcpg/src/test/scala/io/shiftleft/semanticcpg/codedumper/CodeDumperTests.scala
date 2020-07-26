@@ -2,9 +2,9 @@ package io.shiftleft.semanticcpg.codedumper
 
 import java.util.regex.Pattern
 
-import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
+import org.scalatest.{Matchers, WordSpec}
 
 class CodeDumperTests extends WordSpec with Matchers {
 
@@ -16,23 +16,21 @@ class CodeDumperTests extends WordSpec with Matchers {
                 |}""".stripMargin
 
   CodeToCpgFixture(code) { cpg =>
+    val language = cpg.metaData.language.headOption
+
     "should return empty string for empty traversal" in {
-      CodeDumper
-        .dump(cpg.method.name("notinthere"), false)
-        .mkString("\n") shouldBe ""
+      cpg.method.name("notinthere").dump.mkString("\n") shouldBe ""
     }
 
     "should be able to dump complete function" in {
-      val query = cpg.method.name("my_func")
-      val code = CodeDumper.dump(query, false).mkString("\n")
+      val code = cpg.method.name("my_func").dumpRaw.mkString("\n")
       code should startWith("int my_func")
       code should include("foo(param1)")
       code should endWith("}")
     }
 
     "should dump method with arrow for expression (a call)" in {
-      val query = cpg.call.name("foo")
-      val code = CodeDumper.dump(query, false).mkString("\n")
+      val code = cpg.call.name("foo").dumpRaw.mkString("\n")
       code should startWith("int")
       code should include regex (".*" + "int x = foo" + ".*" + Pattern.quote(CodeDumper.arrow.toString) + ".*")
       code should endWith("}")
