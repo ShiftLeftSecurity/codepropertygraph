@@ -13,6 +13,7 @@ import overflowdb.traversal._
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.jdk.CollectionConverters._
 
 /**
   * A lightweight write-only graph used for creation of CPG graph overlays
@@ -147,7 +148,7 @@ object DiffGraph {
           val inNodeId = proto.getInNodeKey
           val edgeLabel = proto.getEdgeType.toString
 
-          val edge = cpg.graph.V(outNodeId).outE(edgeLabel).filter(_.inVertex.id == inNodeId).l match {
+          val edge = cpg.graph.V(outNodeId).outE(edgeLabel).filter(_.inNode.id == inNodeId).l match {
             case edge :: Nil => edge
             case Nil         => throw new AssertionError(s"unable to find edge that is supposed to be removed: $proto")
             case candidates => // found multiple edges - try to disambiguate via propertiesHash
@@ -171,16 +172,7 @@ object DiffGraph {
   }
 
   def propertiesHash(edge: OdbEdge): Array[Byte] = {
-    import scala.jdk.CollectionConverters._
-    val propertiesAsString = edge
-      .properties[Any]()
-      .asScala
-      .collect {
-        case prop if prop.isPresent => prop.key -> prop.value
-      }
-      .toList
-      .sortBy(_._1)
-      .mkString
+    val propertiesAsString = edge.propertyMap.asScala.toList.sortBy(_._1).mkString
     MessageDigest.getInstance("MD5").digest(propertiesAsString.getBytes)
   }
 
@@ -244,7 +236,7 @@ object DiffGraph {
     def removeNode(id: Long): Unit =
       buffer += Change.RemoveNode(id)
     def removeNode(node: StoredNode): Unit =
-      buffer += Change.RemoveNode(node.id.asInstanceOf[Long])
+      buffer += Change.RemoveNode(node.id2)
     def removeEdge(edge: OdbEdge): Unit = buffer += Change.RemoveEdge(edge)
     def removeNodeProperty(nodeId: Long, propertyKey: String): Unit =
       buffer += Change.RemoveNodeProperty(nodeId, propertyKey)

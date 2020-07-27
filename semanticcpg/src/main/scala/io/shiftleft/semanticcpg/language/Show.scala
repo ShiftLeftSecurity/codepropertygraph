@@ -1,7 +1,8 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
+import overflowdb.Node
+import scala.jdk.CollectionConverters._
 
 /**
   * Typeclass for (pretty) printing an object
@@ -17,21 +18,21 @@ object Show {
     override def apply(a: Any): String = a match {
       case node: NewNode => {
         val label = node.label
-        val properties = propsToString(node.properties)
+        val properties = propsToString(node.properties.toList)
         s"($label): $properties"
       }
 
-      case node: Vertex =>
+      case node: Node =>
         val label = node.label
         val id = node.id().toString
-        val properties = propsToString(node.valueMap)
+        val properties = propsToString(node.propertyMap.asScala.toList)
         s"($label,$id): $properties"
 
       case other => other.toString
     }
 
-    private def propsToString(keyValues: Map[String, Any]): String = {
-      keyValues.toList
+    private def propsToString(keyValues: List[(String, Any)]): String = {
+      keyValues
         .filter(_._2.toString.nonEmpty)
         .sortBy(_._1)
         .map { case (key, value) => s"$key: $value" }
