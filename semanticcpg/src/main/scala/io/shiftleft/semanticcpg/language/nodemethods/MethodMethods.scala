@@ -1,30 +1,26 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
-import io.shiftleft.Implicits.JavaIteratorDeco
-import overflowdb.traversal.Traversal
 
 class MethodMethods(val node: nodes.Method) extends AnyVal {
 
-  def parameter: NodeSteps[nodes.MethodParameterIn] =
-    // TODO once we use OdbTraversal, this will simply become `node._methodParameterInViaAstOut`
-    node.start.parameter
+  def parameter: Traversal[nodes.MethodParameterIn] =
+    node._methodParameterInViaAstOut
 
   def methodReturn: nodes.MethodReturn =
     node._methodReturnViaAstOut
 
-  def local: NodeSteps[nodes.Local] =
-    // TODO once we use OdbTraversal, this will simply become `node._blockViaContainsOut.flatMap(_._localViaAstOut)`
-    node.start.local
+  def local: Traversal[nodes.Local] =
+    node._blockViaContainsOut.flatMap(_._localViaAstOut)
 
   def controlStructure: Traversal[nodes.ControlStructure] =
-    node.start.controlStructure
+    Traversal.fromSingle(node).controlStructure
 
-  def ast: NodeSteps[nodes.AstNode] =
-    node.start.ast
+  def ast: Traversal[nodes.AstNode] =
+    Traversal.fromSingle(node).ast
 
   def numberOfLines: Int = {
     if (node.lineNumber.isDefined && node.lineNumberEnd.isDefined) {

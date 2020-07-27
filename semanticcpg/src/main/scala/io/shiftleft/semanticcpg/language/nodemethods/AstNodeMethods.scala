@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.language.nodemethods
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal.Traversal
 
 class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
@@ -10,26 +11,27 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
     * All nodes of the abstract syntax tree rooted in this node.
     * Equivalent of TNodes in the original CPG paper.
     * */
-  def ast: NodeSteps[nodes.AstNode] = node.start.ast
+  def ast: Traversal[nodes.AstNode] =
+    Traversal.fromSingle(node).ast
 
   /**
     * All nodes of the abstract syntax tree rooted in this node,
     * which match `predicate`. Equivalent of `match` in the original
     * CPG paper.
     * */
-  def ast(predicate: nodes.AstNode => Boolean): NodeSteps[nodes.AstNode] =
-    node.start.ast.where(predicate)
+  def ast(predicate: nodes.AstNode => Boolean): Traversal[nodes.AstNode] =
+    Traversal.fromSingle(node).ast.filter(predicate)
 
   /**
     * Ordered list of direct AST children
     * */
-  def astChildren: NodeSteps[nodes.AstNode] = node.start.astChildren
+  def astChildren: Traversal[nodes.AstNode] = Traversal.fromSingle(node).astChildren
 
   /**
     * All nodes of the abstract syntax tree rooted in this node,
     * minus this node.
     * */
-  def astMinusRoot: NodeSteps[nodes.AstNode] = node.start.astMinusRoot
+  def astMinusRoot: Traversal[nodes.AstNode] = Traversal.fromSingle(node).astMinusRoot
 
   /**
     * Indicate whether the AST node represents a control structure,
@@ -79,7 +81,7 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
   def depth(p: nodes.AstNode => Boolean): Int = {
     val additionalDepth = if (p(node)) { 1 } else { 0 }
 
-    val childDepths = node.start.astChildren.map(_.depth(p)).l
+    val childDepths = Traversal.fromSingle(node).astChildren.map(_.depth(p)).l
     additionalDepth + (if (childDepths.isEmpty) {
                          0
                        } else {

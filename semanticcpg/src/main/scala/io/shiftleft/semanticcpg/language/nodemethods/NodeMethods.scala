@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
 
@@ -13,7 +14,7 @@ class NodeMethods(val node: nodes.CpgNode) extends AnyVal {
       case _                            => LocationCreator.emptyLocation("", None)
     }
 
-  def tagList: List[nodes.TagBase] =
+  def tagList: Traversal[nodes.TagBase] =
     node match {
       case storedNode: nodes.StoredNode =>
         storedNode._taggedByOut.asScala
@@ -25,9 +26,8 @@ class NodeMethods(val node: nodes.CpgNode) extends AnyVal {
           .collect {
             case (name, Some(value)) => nodes.NewTag(name, value).asInstanceOf[nodes.TagBase]
           }
-          .toList
       case _ =>
-        Nil
+        Traversal.empty
     }
 
 }
