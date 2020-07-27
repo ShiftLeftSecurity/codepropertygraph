@@ -39,6 +39,7 @@ import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod}
 import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
+import overflowdb.Node
 
 /**
   Language for traversing the code property graph
@@ -92,6 +93,9 @@ package object language extends operatorextension.Implicits {
 
   implicit def toCodeAccessors[A <: StoredNode with HasCode](steps: Steps[A]): CodeAccessors[A] =
     new CodeAccessors(steps)
+
+  implicit def toCodeAccessors2[A <: Node with HasCode](traversal: Traversal[A]): CodeAccessors2[A] =
+    new CodeAccessors2(traversal)
 
   implicit def toCanonicalNameAccessors[A <: StoredNode with HasCanonicalName](
       steps: Steps[A]): CanonicalNameAccessors[A] =
