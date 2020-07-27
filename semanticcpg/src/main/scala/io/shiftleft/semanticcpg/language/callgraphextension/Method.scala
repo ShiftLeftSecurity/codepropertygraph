@@ -1,87 +1,75 @@
 package io.shiftleft.semanticcpg.language.callgraphextension
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal.Traversal
 import overflowdb.traversal.help.Doc
 
-class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
-  private def raw: GremlinScala[nodes.Method] = wrapped.raw
+class Method(val traversal: Traversal[nodes.Method]) extends AnyVal {
 
   /**
     * Intended for internal use!
     * Traverse to direct and transitive callers of the method.
     */
-  def calledByIncludingSink(sourceTrav: NodeSteps[nodes.Method])(
-      implicit callResolver: ICallResolver): NodeSteps[nodes.Method] = {
+  def calledByIncludingSink(sourceTrav: Traversal[nodes.Method])(
+      implicit callResolver: ICallResolver): Traversal[nodes.Method] = {
     val sourceMethods = sourceTrav.raw.toSet
-    val sinkMethods = raw.dedup.toList
+    val sinkMethods = traversal.dedup
 
     if (sourceMethods.isEmpty || sinkMethods.isEmpty) {
-      new NodeSteps(__())
+      Traversal.empty
     } else {
-      val methodTrav = sinkMethods.start.raw
-
-      new Steps[nodes.Method](
-        methodTrav
-          .emit(_.is(P.within(sourceMethods)))
-          .repeat(
-            _.flatMap(method => callResolver.getMethodCallsitesAsTraversal(method.asInstanceOf[nodes.Method]))
-              .in(EdgeTypes.CONTAINS) // expand to method
-              .dedup
-              .simplePath
-          )
-          .cast[nodes.Method]
-      )
+      sinkMethods.repeat(
+        _.flatMap(callResolver.getMethodCallsitesAsTraversal)
+          .in(EdgeTypes.CONTAINS) // expand to method
+          .dedup
+      ).cast[nodes.Method]
     }
   }
 
   /**
     * Traverse to direct callers of this method
     * */
-  def caller(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] =
+  def caller(implicit callResolver: ICallResolver): Traversal[nodes.Method] =
     callIn(callResolver).method
 
   /**
     * Traverse to methods called by this method
     * */
-  def callee(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] =
+  def callee(implicit callResolver: ICallResolver): Traversal[nodes.Method] =
     call.callee(callResolver)
 
   /**
     * Incoming call sites
     * */
-  def callIn(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] =
-    new NodeSteps(wrapped.raw.flatMap { method =>
-      callResolver
-        .getMethodCallsitesAsTraversal(method)
-        .asInstanceOf[GremlinScala[nodes.Call]]
-    })
+  def callIn(implicit callResolver: ICallResolver): Traversal[nodes.Call] =
+    traversal.flatMap(callResolver.getMethodCallsitesAsTraversal)
 
   /**
     * Traverse to direct and transitive callers of the method.
     * */
-  def calledBy(sourceTrav: Steps[nodes.Method])(implicit callResolver: ICallResolver): NodeSteps[nodes.Method] =
+  def calledBy(sourceTrav: Steps[nodes.Method])(implicit callResolver: ICallResolver): Traversal[nodes.Method] =
     caller(callResolver).calledByIncludingSink(sourceTrav)(callResolver)
 
   @deprecated("Use call", "")
-  def callOut: NodeSteps[nodes.Call] = call
+  def callOut: Traversal[nodes.Call] =
+    call
 
   @deprecated("Use call", "")
-  def callOutRegex(regex: String)(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] =
+  def callOutRegex(regex: String)(implicit callResolver: ICallResolver): Traversal[nodes.Call] =
     call(regex)
 
   /**
     * Outgoing call sites to methods where fullName matches `regex`.
     * */
-  def call(regex: String)(implicit callResolver: ICallResolver): NodeSteps[nodes.Call] =
-    call.filter(_.callee.fullName(regex))
+  def call(regex: String)(implicit callResolver: ICallResolver): Traversal[nodes.Call] =
+    call.where(_.callee.fullName(regex))
 
   /**
     * Outgoing call sites
     * */
   @Doc("Call sites (outgoing calls)")
-  def call: NodeSteps[nodes.Call] =
-    new NodeSteps(raw.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.CALL).cast[nodes.Call])
+  def call: Traversal[nodes.Call] =
+    traversal.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.CALL).cast[nodes.Call]
 
 }
