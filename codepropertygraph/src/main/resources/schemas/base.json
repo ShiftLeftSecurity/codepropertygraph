@@ -57,8 +57,8 @@
     // Keys for edge properties
 
     "edgeKeys" : [
-      {"id" : 6, "name" : "LOCAL_NAME", "comment" : "Local name of referenced CONTAINED node", "valueType" : "string", "cardinality" : "zeroOrOne"},
-      {"id" : 8, "name" : "INDEX", "comment" : "Index of referenced CONTAINED node (0 based) - used together with cardinality=list", "valueType" : "int", "cardinality" : "zeroOrOne"}
+      {"id" : 6, "name" : "LOCAL_NAME", "comment" : "Local name of referenced CONTAINED node. This key is deprecated.", "valueType" : "string", "cardinality" : "zeroOrOne"},
+      {"id" : 8, "name" : "INDEX", "comment" : "Index of referenced CONTAINED node (0 based) - used together with cardinality=list. This key is deprecated.", "valueType" : "int", "cardinality" : "zeroOrOne"}
     ],
 
     // Types of nodes
@@ -539,7 +539,7 @@
         {"id" : 3, "name" : "AST", "comment" : "Syntax tree edge" , "keys" : [] },
         {"id" : 19, "name" : "CFG", "comment" : "Control flow edge", "keys" : [] },
 
-        {"id" : 9, "name" : "CONTAINS_NODE", "keys" : ["LOCAL_NAME", "INDEX"], "comment" : "Membership relation for a compound object"},
+        {"id" : 9, "name" : "CONTAINS_NODE", "keys" : ["LOCAL_NAME", "INDEX"], "comment" : "Membership relation for a compound object. This edge is deprecated."},
         {"id" : 41, "name": "CAPTURED_BY", "comment" : "Connection between a captured LOCAL and the corresponding CLOSURE_BINDING", "keys": []},
 
         // Edges to represent type relations

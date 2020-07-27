@@ -47,7 +47,7 @@ class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
 
     (parameterInOption, parameterOutOption) match {
       case (Some(parameterIn), Some(parameterOut)) =>
-        addPropagateEdge(parameterIn, parameterOut, isAlias = false)
+        addPropagateEdge(parameterIn, parameterOut)
       case (None, _) =>
         logger.warn(s"Could not find parameter $parameterIndex of ${method.fullName}.")
       case _ =>
@@ -55,8 +55,8 @@ class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
     }
   }
 
-  private def addPropagateEdge(src: nodes.StoredNode, dst: nodes.StoredNode, isAlias: java.lang.Boolean): Unit = {
-    dstGraph.addEdgeInOriginal(src, dst, EdgeTypes.PROPAGATE, (EdgeKeyNames.ALIAS, isAlias) :: Nil)
+  private def addPropagateEdge(src: nodes.StoredNode, dst: nodes.StoredNode): Unit = {
+    dstGraph.addEdgeInOriginal(src, dst, EdgeTypes.PROPAGATE)
   }
 }
 

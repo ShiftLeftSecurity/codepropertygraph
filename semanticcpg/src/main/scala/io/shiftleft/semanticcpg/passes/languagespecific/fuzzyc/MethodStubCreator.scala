@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewMethodReturn}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{DiffGraph, ParallelCpgPass, ParallelIteratorExecutor}
 import io.shiftleft.semanticcpg.language._
 
 import scala.jdk.CollectionConverters._
@@ -13,26 +13,44 @@ case class NameAndSignature(name: String, signature: String)
 /**
   * This pass has no other pass as prerequisite.
   */
-class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
+class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int)](cpg) {
 
   // Since the method fullNames for fuzzyc are not unique, we do not have
   // a 1to1 relation and may overwrite some values. We deem this ok for now.
-  private val methodFullNameToNode = scala.collection.mutable.HashMap[String, nodes.MethodBase]()
-  private val methodToParameterCount = scala.collection.mutable.HashMap[NameAndSignature, Int]()
-  override def run(): Iterator[DiffGraph] = {
-    for (method <- cpg.method.toIterator) {
-      methodFullNameToNode.put(method.fullName, method)
-    }
-    for (call <- cpg.call.toIterator) {
-      if (!methodFullNameToNode.contains(call.name)) {
-        methodToParameterCount.put(NameAndSignature(call.name, call.signature), call._argumentOut.asScala.size)
+  private var methodFullNameToNode = Map[String, nodes.MethodBase]()
+  private var methodToParameterCount = Map[NameAndSignature, Int]()
+
+  override def init(): Unit = {
+    cpg.method
+      .sideEffect { method =>
+        methodFullNameToNode += method.fullName -> method
       }
+      .exec()
+
+    cpg.call
+      .sideEffect { call =>
+        methodToParameterCount +=
+          NameAndSignature(call.name, call.signature) -> call._astOut.asScala.size
+      }
+      .exec()
+  }
+
+  override def partIterator: Iterator[(NameAndSignature, Int)] = methodToParameterCount.iterator
+
+  // TODO bring in Receiver type. Just working on name and comparing to full name
+  // will only work for C because in C, name always equals full name.
+  override def runOnPart(part: (NameAndSignature, Int)): Iterator[DiffGraph] = {
+    val name = part._1.name
+    val signature = part._1.signature
+    val parameterCount = part._2
+
+    implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
+    methodFullNameToNode.get(name) match {
+      case None =>
+        createMethodStub(name, name, signature, parameterCount, dstGraph)
+      case _ =>
     }
-    val builder = DiffGraph.newBuilder
-    for ((NameAndSignature(name, signature), nargs) <- methodToParameterCount) {
-      createMethodStub(name = name, fullName = name, signature = signature, parameterCount = nargs, dstGraph = builder)
-    }
-    Iterator(builder.build)
+    Iterator(dstGraph.build())
   }
 
   private def createMethodStub(name: String,
