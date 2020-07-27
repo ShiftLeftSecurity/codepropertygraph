@@ -35,8 +35,8 @@ class NodeTypeStarters(cpg: Cpg) {
     comment.has(NodeKeysOdb.CODE -> code)
 
   @Doc("All control structures (source-based frontends)")
-  def controlStructure: NodeSteps[nodes.ControlStructure] =
-    new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.CONTROL_STRUCTURE).cast[nodes.ControlStructure])
+  def controlStructure: Traversal[nodes.ControlStructure] =
+    cpg.graph.nodes(NodeTypes.CONTROL_STRUCTURE).cast[nodes.ControlStructure]
 
   /**
     Traverse to all source files

@@ -71,7 +71,8 @@ package object language extends operatorextension.Implicits {
   implicit def toTypeDecl(steps: Steps[nodes.TypeDecl]): TypeDecl = new TypeDecl(steps)
   implicit def toCall(steps: Steps[nodes.Call]): OriginalCall = new OriginalCall(steps)
   implicit def toModifier(steps: Steps[nodes.Modifier]): Modifier = new Modifier(steps)
-  implicit def toControlStructure(steps: Steps[nodes.ControlStructure]): ControlStructure = new ControlStructure(steps)
+  implicit def toControlStructure(traversal: Traversal[nodes.ControlStructure]): ControlStructure =
+    new ControlStructure(traversal)
   implicit def toIdentifier(steps: Steps[nodes.Identifier]): IdentifierTrav = new IdentifierTrav(steps)
   implicit def toMember(steps: Steps[nodes.Member]): Member = new Member(steps)
   implicit def toMetaData(steps: Steps[nodes.MetaData]): MetaData = new MetaData(steps)

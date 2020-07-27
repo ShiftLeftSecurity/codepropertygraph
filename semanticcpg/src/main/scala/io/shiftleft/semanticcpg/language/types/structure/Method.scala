@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes
-import overflowdb.traversal.help
+import overflowdb.traversal.{Traversal, help}
 import overflowdb.traversal.help.Doc
 import io.shiftleft.semanticcpg.language._
 
@@ -50,13 +50,13 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
     * All control structures of this method
     * */
   @Doc("Control structures (source frontends only)")
-  def controlStructure: NodeSteps[nodes.ControlStructure] =
+  def controlStructure: Traversal[nodes.ControlStructure] =
     wrapped.ast.isControlStructure
 
   /**
     * Shorthand to traverse to control structures where condition matches `regex`
     * */
-  def controlStructure(regex: String): NodeSteps[nodes.ControlStructure] =
+  def controlStructure(regex: String): Traversal[nodes.ControlStructure] =
     wrapped.ast.isControlStructure.code(regex)
 
   /**
