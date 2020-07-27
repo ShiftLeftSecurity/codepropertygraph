@@ -171,7 +171,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
             case NodeTypes.TYPE_DECL       => typeDeclFullNameToNode.get(astChild.astParentFullName)
             case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode.get(astChild.astParentFullName)
             case _ =>
-              logger.error(
+              logger.warn(
                 s"Invalid AST_PARENT_TYPE=${astChild.propertyOption(NodeKeysOdb.AST_PARENT_FULL_NAME)};" +
                   s" astChild LABEL=${astChild.label};" +
                   s" astChild FULL_NAME=${astChild.propertyOption(NodeKeysOdb.FULL_NAME)}")
@@ -249,7 +249,7 @@ object Linker {
                                  srcNodeId: String,
                                  dstNodeType: String,
                                  dstFullName: String): Unit = {
-    logger.error(
+    logger.warn(
       "Could not create edge. Destination lookup failed. " +
         s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcNodeId=$srcNodeId, " +
         s"dstNodeType=$dstNodeType, dstFullName=$dstFullName")
@@ -261,7 +261,7 @@ object Linker {
                                  srcFullName: String,
                                  dstNodeType: String,
                                  dstNodeId: String): Unit = {
-    logger.error(
+    logger.warn(
       "Could not create edge. Source lookup failed. " +
         s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcFullName=$srcFullName, " +
         s"dstNodeType=$dstNodeType, dstNodeId=$dstNodeId")
