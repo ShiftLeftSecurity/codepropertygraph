@@ -2,10 +2,12 @@ package io.shiftleft.semanticcpg.dotgenerator
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal.Traversal
 
 object DotAstGenerator {
 
-  def toDotAst[T <: nodes.AstNode](step: NodeSteps[T]): Steps[String] = step.map(dotAst)
+  def toDotAst[T <: nodes.AstNode](traversal: Traversal[T]): Traversal[String] =
+    traversal.map(dotAst)
 
   def dotAst(astRoot: nodes.AstNode): String = {
     val sb = Shared.namedGraphBegin(astRoot)
