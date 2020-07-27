@@ -357,7 +357,6 @@ object DiffGraph {
         drainDeferred()
       }
 
-      //diffGraph.iterator.foreach(change => applyChange(graph, change, inverseBuilder, keyPool))
       AppliedDiffGraph(
         diffGraph,
         if (undoable) Some(inverseBuilder.build()) else None,
