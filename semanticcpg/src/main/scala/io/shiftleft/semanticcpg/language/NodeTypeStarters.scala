@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{NodeKeysOdb, NodeTypes, nodes}
 import overflowdb.traversal._
 import overflowdb.traversal.help.{Doc, TraversalSource}
 
@@ -25,14 +25,14 @@ class NodeTypeStarters(cpg: Cpg) {
     * Traverse to all comments in source-based CPGs.
     * */
   @Doc("All comments in source-based CPGs")
-  def comment: NodeSteps[nodes.Comment] =
-    new NodeSteps(scalaGraph.V.hasLabel(NodeTypes.COMMENT).cast[nodes.Comment])
+  def comment: Traversal[nodes.Comment] =
+    cpg.graph.nodes(NodeTypes.COMMENT).cast[nodes.Comment]
 
   /**
     * Shorthand for `cpg.comment.code(code)`
     * */
-  def comment(code: String): NodeSteps[nodes.Comment] =
-    comment.code(code)
+  def comment(code: String): Traversal[nodes.Comment] =
+    comment.has(NodeKeysOdb.CODE -> code)
 
   @Doc("All control structures (source-based frontends)")
   def controlStructure: NodeSteps[nodes.ControlStructure] =
