@@ -2,13 +2,9 @@ package io.shiftleft.semanticcpg.codedumper
 
 import better.files.File
 import io.shiftleft.codepropertygraph.generated.{Languages, nodes}
-import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.NodeSteps
-import io.shiftleft.codepropertygraph.Cpg
-import overflowdb.OdbGraph
+import io.shiftleft.semanticcpg.language.{NodeSteps, _}
 import io.shiftleft.utils.{Source, SourceHighlighter}
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.util.Try
 
@@ -19,18 +15,9 @@ object CodeDumper {
   val arrow: CharSequence = "/* <=== */ "
 
   /**
-    * Evaluate the `step` and determine associated locations.
-    * Dump code at those locations
-    * */
-  def dump[NodeType <: nodes.StoredNode](step: NodeSteps[NodeType], highlight: Boolean = true): List[String] = {
-    val cpg = new Cpg(step.graph)
-    step.location.l.map(dump(_, highlight, cpg))
-  }
-
-  /**
     * Dump string representation of code at given `location`.
     * */
-  private def dump(location: nodes.NewLocation, highlight: Boolean, cpg: Cpg): String = {
+  def dump(location: nodes.NewLocation, language: Option[String], highlight: Boolean): String = {
     val filename = location.filename
 
     if (location.node.isEmpty) {
@@ -39,9 +26,7 @@ object CodeDumper {
     }
 
     val node = location.node.get
-    val language = cpg.metaData.language.headOption()
     if (language.isEmpty || !Set(Languages.C).contains(language.get)) {
-      println(language)
       logger.info("dump not supported for this language or language not set in CPG")
       return ""
     }
