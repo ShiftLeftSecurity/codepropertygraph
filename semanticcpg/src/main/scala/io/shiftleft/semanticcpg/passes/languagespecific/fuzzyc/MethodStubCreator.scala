@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewMethodReturn
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
+import scala.collection.mutable
 
 import scala.jdk.CollectionConverters._
 
@@ -15,22 +16,21 @@ case class NameAndSignature(name: String, signature: String)
   */
 class MethodStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 
-  // Since the method fullNames for fuzzyc are not unique, we do not have
-  // a 1to1 relation and may overwrite some values. We deem this ok for now.
-  private val methodFullNameToNode = scala.collection.mutable.HashMap[String, nodes.MethodBase]()
-  private val methodToParameterCount = scala.collection.mutable.HashMap[NameAndSignature, Int]()
+  private val presentMethods = mutable.Set[String]()
   override def run(): Iterator[DiffGraph] = {
-    for (method <- cpg.method.toIterator) {
-      methodFullNameToNode.put(method.fullName, method)
-    }
-    for (call <- cpg.call.toIterator) {
-      if (!methodFullNameToNode.contains(call.name)) {
-        methodToParameterCount.put(NameAndSignature(call.name, call.signature), call._argumentOut.asScala.size)
-      }
-    }
     val builder = DiffGraph.newBuilder
-    for ((NameAndSignature(name, signature), nargs) <- methodToParameterCount) {
-      createMethodStub(name = name, fullName = name, signature = signature, parameterCount = nargs, dstGraph = builder)
+
+    for (method <- cpg.method.toIterator) {
+      presentMethods.add(method.fullName)
+    }
+    // Since the method fullNames for fuzzyc are not unique, we do not have
+    // a 1to1 relation and may lose some values. We deem this ok for now.
+    for (call <- cpg.call.toIterator if presentMethods.add(call.name)) {
+      createMethodStub(name = call.name,
+                       fullName = name,
+                       signature = call.signature,
+                       parameterCount = call._argumentOut.asScala.size,
+                       dstGraph = builder)
     }
     Iterator(builder.build)
   }
