@@ -1,49 +1,41 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.codepropertygraph.predicates.Text.textRegex
-import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
+import overflowdb._
+import overflowdb.traversal._
+import overflowdb.traversal.filter.P
 
-trait StringPropertyAccessors[A <: StoredNode] {
-  val raw: GremlinScala[A]
+object StringPropertyAccessors {
 
-  protected def stringProperty(property: Key[String]) =
-    new Steps[String](raw.value(property))
+  def filter[A <: Node](traversal: Traversal[A], property: PropertyKey[String], value: String): Traversal[A] =
+    traversal.has(property.where(_.matches(value)))
 
-  protected def stringPropertyFilter(property: Key[String], value: String): NodeSteps[A] =
-    new NodeSteps[A](raw.has(property, textRegex(value)))
+  def filterNot[A <: Node](traversal: Traversal[A], property: PropertyKey[String], value: String): Traversal[A] =
+    traversal.hasNot(property.where(_.matches(value)))
 
-  protected def stringPropertyFilterMultiple(property: Key[String], values: String*): NodeSteps[A] =
-    if (values.nonEmpty) {
-      new NodeSteps[A](raw.or(values.map { value => (trav: GremlinScala[A]) =>
-        trav.has(property, textRegex(value))
-      }: _*))
-    } else {
-      new NodeSteps[A](raw.filterOnEnd(_ => false))
-    }
+  def filterMultiple[A <: Node](traversal: Traversal[A],
+                                property: PropertyKey[String],
+                                values: String*): Traversal[A] = {
+    val regexes = values.toSet
+    traversal.has(property.where { value =>
+      regexes.exists(_.matches(value))
+    })
+  }
 
-  protected def stringPropertyFilterExact[Out](property: Key[String], _value: String): NodeSteps[A] =
-    new NodeSteps[A](raw.has(property, _value))
+  def filterNotMultiple[A <: Node](traversal: Traversal[A],
+                                   property: PropertyKey[String],
+                                   values: String*): Traversal[A] = {
+    val regexes = values.toSet
+    traversal.hasNot(property.where { value =>
+      regexes.exists(_.matches(value))
+    })
+  }
 
-  protected def stringPropertyFilterExactMultiple[Out](property: Key[String], values: String*): NodeSteps[A] =
-    if (values.nonEmpty) {
-      new NodeSteps[A](raw.or(values.map { value => (trav: GremlinScala[A]) =>
-        trav.has(property, value)
-      }: _*))
-    } else {
-      new NodeSteps[A](raw.filterOnEnd(_ => false))
-    }
+  def filterExact[A <: Node](traversal: Traversal[A], property: PropertyKey[String], value: String): Traversal[A] =
+    traversal.has(property, value)
 
-  protected def stringPropertyFilterNot[Out](property: Key[String], value: String): NodeSteps[A] =
-    new NodeSteps[A](raw.hasNot(property, textRegex(value)))
+  def filterExactMultiple[A <: Node](traversal: Traversal[A],
+                                     property: PropertyKey[String],
+                                     values: String*): Traversal[A] =
+    traversal.has(property.where(P.within(values)))
 
-  protected def stringPropertyFilterNotMultiple[Out](property: Key[String], values: String*): NodeSteps[A] =
-    if (values.nonEmpty) {
-      new NodeSteps[A](raw.or(values.map { value => (trav: GremlinScala[A]) =>
-        trav.hasNot(property, textRegex(value))
-      }: _*))
-    } else {
-      new NodeSteps[A](raw)
-    }
 }

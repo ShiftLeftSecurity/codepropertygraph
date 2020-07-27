@@ -1,32 +1,30 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import gremlin.scala.GremlinScala
-import io.shiftleft.codepropertygraph.generated.NodeKeys
-import io.shiftleft.codepropertygraph.generated.nodes.{HasDependencyGroupId, StoredNode}
-import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
+import io.shiftleft.codepropertygraph.generated.NodeKeysOdb
+import io.shiftleft.codepropertygraph.generated.nodes.HasDependencyGroupId
+import overflowdb.Node
+import overflowdb.traversal.Traversal
 
-class DependencyGroupIdAccessors[A <: StoredNode with HasDependencyGroupId](steps: Steps[A])
-    extends StringPropertyAccessors[A] {
-  override val raw: GremlinScala[A] = steps.raw
+class DependencyGroupIdAccessors[A <: Node with HasDependencyGroupId](val traversal: Traversal[A]) extends AnyVal {
 
-  def dependencyGroupId(): Steps[String] =
-    stringProperty(NodeKeys.DEPENDENCY_GROUP_ID)
+  def dependencyGroupId: Traversal[String] =
+    traversal.map(_.dependencyGroupId)
 
-  def dependencyGroupId(value: String): NodeSteps[A] =
-    stringPropertyFilter(NodeKeys.DEPENDENCY_GROUP_ID, value)
+  def dependencyGroupId(value: String): Traversal[A] =
+    StringPropertyAccessors.filter(traversal, NodeKeysOdb.DEPENDENCY_GROUP_ID, value)
 
-  def dependencyGroupId(value: String*): NodeSteps[A] =
-    stringPropertyFilterMultiple(NodeKeys.DEPENDENCY_GROUP_ID, value: _*)
+  def dependencyGroupId(value: String*): Traversal[A] =
+    StringPropertyAccessors.filterMultiple(traversal, NodeKeysOdb.DEPENDENCY_GROUP_ID, value: _*)
 
-  def dependencyGroupIdExact(value: String): NodeSteps[A] =
-    stringPropertyFilterExact(NodeKeys.DEPENDENCY_GROUP_ID, value)
+  def dependencyGroupIdExact(value: String): Traversal[A] =
+    StringPropertyAccessors.filterExact(traversal, NodeKeysOdb.DEPENDENCY_GROUP_ID, value)
 
-  def dependencyGroupIdExact(values: String*): NodeSteps[A] =
-    stringPropertyFilterExactMultiple(NodeKeys.DEPENDENCY_GROUP_ID, values: _*)
+  def dependencyGroupIdExact(values: String*): Traversal[A] =
+    StringPropertyAccessors.filterExactMultiple(traversal, NodeKeysOdb.DEPENDENCY_GROUP_ID, values: _*)
 
-  def dependencyGroupIdNot(value: String): NodeSteps[A] =
-    stringPropertyFilterNot(NodeKeys.DEPENDENCY_GROUP_ID, value)
+  def dependencyGroupIdNot(value: String): Traversal[A] =
+    StringPropertyAccessors.filterNot(traversal, NodeKeysOdb.DEPENDENCY_GROUP_ID, value)
 
-  def dependencyGroupIdNot(values: String*): NodeSteps[A] =
-    stringPropertyFilterNotMultiple(NodeKeys.DEPENDENCY_GROUP_ID, values: _*)
+  def dependencyGroupIdNot(values: String*): Traversal[A] =
+    StringPropertyAccessors.filterNotMultiple(traversal, NodeKeysOdb.DEPENDENCY_GROUP_ID, values: _*)
 }

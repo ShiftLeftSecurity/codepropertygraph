@@ -92,55 +92,52 @@ package object language extends operatorextension.Implicits {
   implicit def toMethodRef(steps: Steps[nodes.MethodRef]): MethodRef = new MethodRef(steps)
   implicit def toBinding(steps: Steps[nodes.Binding]): Binding = new Binding(steps)
 
-  implicit def toCodeAccessors[A <: StoredNode with HasCode](steps: Steps[A]): CodeAccessors[A] =
-    new CodeAccessors(steps)
+  implicit def toCodeAccessors[A <: Node with HasCode](traversal: Traversal[A]): CodeAccessors[A] =
+    new CodeAccessors(traversal)
 
-  implicit def toCodeAccessors2[A <: Node with HasCode](traversal: Traversal[A]): CodeAccessors2[A] =
-    new CodeAccessors2(traversal)
+  implicit def toCanonicalNameAccessors[A <: Node with HasCanonicalName](
+      traversal: Traversal[A]): CanonicalNameAccessors[A] =
+    new CanonicalNameAccessors(traversal)
 
-  implicit def toCanonicalNameAccessors[A <: StoredNode with HasCanonicalName](
-      steps: Steps[A]): CanonicalNameAccessors[A] =
-    new CanonicalNameAccessors(steps)
+  implicit def toDependencyGroupIdAccessors[A <: Node with HasDependencyGroupId](
+      traversal: Traversal[A]): DependencyGroupIdAccessors[A] =
+    new DependencyGroupIdAccessors(traversal)
 
-  implicit def toDependencyGroupIdAccessors[A <: StoredNode with HasDependencyGroupId](
-      steps: Steps[A]): DependencyGroupIdAccessors[A] =
-    new DependencyGroupIdAccessors(steps)
+  implicit def toDispatchTypeAccessors[A <: Node with HasDispatchType](
+      traversal: Traversal[A]): DispatchTypeAccessors[A] =
+    new DispatchTypeAccessors(traversal)
 
-  implicit def toDispatchTypeAccessors[A <: StoredNode with HasDispatchType](
-      steps: Steps[A]): DispatchTypeAccessors[A] =
-    new DispatchTypeAccessors(steps)
+  implicit def toIsExternalAccessors[A <: Node with HasIsExternal](traversal: Traversal[A]): IsExternalAccessors[A] =
+    new IsExternalAccessors(traversal)
 
-  implicit def toIsExternalAccessors[A <: StoredNode with HasIsExternal](steps: Steps[A]): IsExternalAccessors[A] =
-    new IsExternalAccessors(steps)
+  implicit def toFullNameAccessors[A <: Node with HasFullName](traversal: Traversal[A]): FullNameAccessors[A] =
+    new FullNameAccessors(traversal)
 
-  implicit def toFullNameAccessors[A <: StoredNode with HasFullName](steps: Steps[A]): FullNameAccessors[A] =
-    new FullNameAccessors(steps)
+  implicit def toLineNumberAccessors[A <: Node with HasLineNumber](traversal: Traversal[A]): LineNumberAccessors[A] =
+    new LineNumberAccessors(traversal)
 
-  implicit def toLineNumberAccessors[A <: StoredNode with HasLineNumber](steps: Steps[A]): LineNumberAccessors[A] =
-    new LineNumberAccessors(steps)
+  implicit def toLineNumberEndAccessors[A <: Node with HasLineNumberEnd](
+      traversal: Traversal[A]): LineNumberEndAccessors[A] =
+    new LineNumberEndAccessors(traversal)
 
-  implicit def toLineNumberEndAccessors[A <: StoredNode with HasLineNumberEnd](
-      steps: Steps[A]): LineNumberEndAccessors[A] =
-    new LineNumberEndAccessors(steps)
+  implicit def toNameAccessors[A <: Node with HasName](traversal: Traversal[A]): NameAccessors[A] =
+    new NameAccessors(traversal)
 
-  implicit def toNameAccessors[A <: StoredNode with HasName](steps: Steps[A]): NameAccessors[A] =
-    new NameAccessors(steps)
+  implicit def toOrderAccessors[A <: Node with HasOrder](traversal: Traversal[A]): OrderAccessors[A] =
+    new OrderAccessors(traversal)
 
-  implicit def toOrderAccessors[A <: StoredNode with HasOrder](steps: Steps[A]): OrderAccessors[A] =
-    new OrderAccessors(steps)
+  implicit def toParserTypeNameAccessors[A <: Node with HasParserTypeName](
+      traversal: Traversal[A]): ParserTypeNameAccessors[A] =
+    new ParserTypeNameAccessors(traversal)
 
-  implicit def toParserTypeNameAccessors[A <: StoredNode with HasParserTypeName](
-      steps: Steps[A]): ParserTypeNameAccessors[A] =
-    new ParserTypeNameAccessors(steps)
+  implicit def toSignatureAccessors[A <: Node with HasSignature](traversal: Traversal[A]): SignatureAccessors[A] =
+    new SignatureAccessors(traversal)
 
-  implicit def toSignatureAccessors[A <: StoredNode with HasSignature](steps: Steps[A]): SignatureAccessors[A] =
-    new SignatureAccessors(steps)
+  implicit def toValueAccessors[A <: Node with HasValue](traversal: Traversal[A]): ValueAccessors[A] =
+    new ValueAccessors(traversal)
 
-  implicit def toValueAccessors[A <: StoredNode with HasValue](steps: Steps[A]): ValueAccessors[A] =
-    new ValueAccessors(steps)
-
-  implicit def toVersionAccessors[A <: StoredNode with HasVersion](steps: Steps[A]): VersionAccessors[A] =
-    new VersionAccessors(steps)
+  implicit def toVersionAccessors[A <: Node with HasVersion](traversal: Traversal[A]): VersionAccessors[A] =
+    new VersionAccessors(traversal)
 
   implicit class GremlinScalaDeco[End](val raw: GremlinScala[End]) extends AnyVal {
     /* in some cases we cannot statically determine the type of the node, e.g. when traversing

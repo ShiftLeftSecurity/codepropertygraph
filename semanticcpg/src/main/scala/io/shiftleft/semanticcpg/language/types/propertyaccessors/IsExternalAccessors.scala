@@ -1,28 +1,19 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import io.shiftleft.codepropertygraph.generated.NodeKeys
-import io.shiftleft.codepropertygraph.generated.nodes.{HasIsExternal, StoredNode}
-import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
-import java.lang.{Boolean => JBoolean}
+import io.shiftleft.codepropertygraph.generated.NodeKeysOdb
+import io.shiftleft.codepropertygraph.generated.nodes.HasIsExternal
+import overflowdb.Node
+import overflowdb.traversal.Traversal
 
-import gremlin.scala.GremlinScala
+class IsExternalAccessors[A <: Node with HasIsExternal](val traversal: Traversal[A]) extends AnyVal {
 
-class IsExternalAccessors[A <: StoredNode with HasIsExternal](steps: Steps[A]) extends PropertyAccessors[A] {
-  override val raw: GremlinScala[A] = steps.raw
+  def isExternal: Traversal[Boolean] =
+    traversal.map(_.isExternal)
 
-  def isExternal(): Steps[JBoolean] =
-    property(NodeKeys.IS_EXTERNAL)
+  def isExternal(value: Boolean): Traversal[A] =
+    PropertyAccessors.filter(traversal, NodeKeysOdb.IS_EXTERNAL, value)
 
-  def isExternal(value: JBoolean): NodeSteps[A] =
-    propertyFilter(NodeKeys.IS_EXTERNAL, value)
-
-  def isExternal(value: JBoolean*): NodeSteps[A] =
-    propertyFilterMultiple(NodeKeys.IS_EXTERNAL, value: _*)
-
-  def isExternalNot(value: JBoolean): NodeSteps[A] =
-    propertyFilterNot(NodeKeys.IS_EXTERNAL, value)
-
-  def isExternalNot(values: JBoolean*): NodeSteps[A] =
-    propertyFilterNotMultiple(NodeKeys.IS_EXTERNAL, values: _*)
+  def isExternalNot(value: Boolean): Traversal[A] =
+    PropertyAccessors.filterNot(traversal, NodeKeysOdb.IS_EXTERNAL, value)
 
 }

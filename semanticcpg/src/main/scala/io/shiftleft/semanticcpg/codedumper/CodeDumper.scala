@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.codedumper
 import better.files.File
 import io.shiftleft.codepropertygraph.generated.{Languages, nodes}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.utils.{Source, SourceHighlighter}
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.util.Try

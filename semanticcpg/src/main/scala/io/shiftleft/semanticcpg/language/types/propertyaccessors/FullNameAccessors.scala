@@ -1,31 +1,31 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import gremlin.scala.GremlinScala
-import io.shiftleft.codepropertygraph.generated.NodeKeys
-import io.shiftleft.codepropertygraph.generated.nodes.{HasFullName, StoredNode}
-import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
+import io.shiftleft.codepropertygraph.generated.NodeKeysOdb
+import io.shiftleft.codepropertygraph.generated.nodes.HasFullName
+import io.shiftleft.semanticcpg.language.Steps
+import overflowdb.Node
+import overflowdb.traversal.Traversal
 
-class FullNameAccessors[A <: StoredNode with HasFullName](steps: Steps[A]) extends StringPropertyAccessors[A] {
-  override val raw: GremlinScala[A] = steps.raw
+class FullNameAccessors[A <: Node with HasFullName](val traversal: Traversal[A]) extends AnyVal {
 
-  def fullName(): Steps[String] =
-    stringProperty(NodeKeys.FULL_NAME)
+  def fullName: Steps[String] =
+    traversal.map(_.fullName)
 
-  def fullName(value: String): NodeSteps[A] =
-    stringPropertyFilter(NodeKeys.FULL_NAME, value)
+  def fullName(value: String): Traversal[A] =
+    StringPropertyAccessors.filter(traversal, NodeKeysOdb.FULL_NAME, value)
 
-  def fullName(value: String*): NodeSteps[A] =
-    stringPropertyFilterMultiple(NodeKeys.FULL_NAME, value: _*)
+  def fullName(value: String*): Traversal[A] =
+    StringPropertyAccessors.filterMultiple(traversal, NodeKeysOdb.FULL_NAME, value: _*)
 
-  def fullNameExact(value: String): NodeSteps[A] =
-    stringPropertyFilterExact(NodeKeys.FULL_NAME, value)
+  def fullNameExact(value: String): Traversal[A] =
+    StringPropertyAccessors.filterExact(traversal, NodeKeysOdb.FULL_NAME, value)
 
-  def fullNameExact(values: String*): NodeSteps[A] =
-    stringPropertyFilterExactMultiple(NodeKeys.FULL_NAME, values: _*)
+  def fullNameExact(values: String*): Traversal[A] =
+    StringPropertyAccessors.filterExactMultiple(traversal, NodeKeysOdb.FULL_NAME, values: _*)
 
-  def fullNameNot(value: String): NodeSteps[A] =
-    stringPropertyFilterNot(NodeKeys.FULL_NAME, value)
+  def fullNameNot(value: String): Traversal[A] =
+    StringPropertyAccessors.filterNot(traversal, NodeKeysOdb.FULL_NAME, value)
 
-  def fullNameNot(values: String*): NodeSteps[A] =
-    stringPropertyFilterNotMultiple(NodeKeys.FULL_NAME, values: _*)
+  def fullNameNot(values: String*): Traversal[A] =
+    StringPropertyAccessors.filterNotMultiple(traversal, NodeKeysOdb.FULL_NAME, values: _*)
 }
