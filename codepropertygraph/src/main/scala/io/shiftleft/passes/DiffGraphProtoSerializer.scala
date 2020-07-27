@@ -141,6 +141,7 @@ class DiffGraphProtoSerializer {
       .build
 
   private def removeNodePropertyProto(nodeId: Long, propertyKey: String) = {
+    //this way of distinguishing between "proper" and "localName"-style properties is super fishy. Apologies!
     if (propertyKey(0).isLower) {
       DiffGraphProto.RemoveNodeProperty.newBuilder
         .setKey(nodeId)
