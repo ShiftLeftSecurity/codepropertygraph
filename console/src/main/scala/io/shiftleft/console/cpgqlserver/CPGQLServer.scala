@@ -12,9 +12,10 @@ class CPGQLServer(ammonite: EmbeddedAmmonite,
                   serverHost: String,
                   serverPort: Int,
                   serverAuthUsername: String = "",
-                  serverAuthPassword: String = "") extends cask.MainRoutes {
+                  serverAuthPassword: String = "")
+    extends cask.MainRoutes {
 
-  class basicAuth extends cask.RawDecorator{
+  class basicAuth extends cask.RawDecorator {
     def wrapFunction(ctx: Request, delegate: Delegate) = {
       val authString = try {
         val authHeader = ctx.exchange.getRequestHeaders.get("authorization").getFirst
@@ -31,10 +32,11 @@ class CPGQLServer(ammonite: EmbeddedAmmonite,
           Array("", "")
         }
       }
-      val isAuthorized = if (serverAuthUsername == "" && serverAuthPassword == "")
-        true
-      else
-        (user == serverAuthUsername && password == serverAuthPassword)
+      val isAuthorized =
+        if (serverAuthUsername == "" && serverAuthPassword == "")
+          true
+        else
+          (user == serverAuthUsername && password == serverAuthPassword)
       delegate(Map("isAuthorized" -> isAuthorized))
     }
   }
@@ -65,7 +67,7 @@ class CPGQLServer(ammonite: EmbeddedAmmonite,
   @basicAuth()
   @cask.postJson("/query")
   def postQuery(query: String)(isAuthorized: Boolean) = {
-    val res = if(!isAuthorized) {
+    val res = if (!isAuthorized) {
       unauthorizedResponse
     } else {
       val uuid = ammonite.queryAsync(query) { result =>
@@ -85,7 +87,7 @@ class CPGQLServer(ammonite: EmbeddedAmmonite,
   def getResult(uuidParam: String)(isAuthorized: Boolean) = {
     val res = if (!isAuthorized) {
       unauthorizedResponse
-    }  else {
+    } else {
       val uuid = try {
         UUID.fromString(uuidParam)
       } catch {
@@ -99,9 +101,9 @@ class CPGQLServer(ammonite: EmbeddedAmmonite,
           ujson.Obj("success" -> false, "err" -> "No result found for specified UUID")
         } else {
           ujson.Obj("success" -> true,
-            "uuid" -> resFromMap.uuid.toString,
-            "stdout" -> resFromMap.out,
-            "stderr" -> resFromMap.err)
+                    "uuid" -> resFromMap.uuid.toString,
+                    "stdout" -> resFromMap.out,
+                    "stderr" -> resFromMap.err)
         }
       }
       Response(finalRes, 200)
@@ -111,4 +113,3 @@ class CPGQLServer(ammonite: EmbeddedAmmonite,
 
   initialize()
 }
-

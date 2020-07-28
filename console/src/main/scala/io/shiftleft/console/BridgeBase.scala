@@ -127,7 +127,11 @@ trait BridgeBase {
     Runtime.getRuntime.addShutdownHook(new Thread(() => {
       ammonite.shutdown()
     }))
-    val server = new CPGQLServer(ammonite, config.serverHost, config.serverPort, config.serverAuthUsername, config.serverAuthPassword)
+    val server = new CPGQLServer(ammonite,
+                                 config.serverHost,
+                                 config.serverPort,
+                                 config.serverAuthUsername,
+                                 config.serverAuthPassword)
     server.main(Array.empty)
   }
 
