@@ -7,8 +7,8 @@ import overflowdb.traversal.Traversal
 
 class LineNumberEndAccessors[A <: Node with HasLineNumberEnd](val traversal: Traversal[A]) extends AnyVal {
 
-  def lineNumberEnd(): Traversal[Integer] =
-    traversal.map(_.lineNumberEnd)
+  def lineNumberEnd: Traversal[Integer] =
+    traversal.flatMap(_.lineNumberEnd)
 
   def lineNumberEnd(value: Integer): Traversal[A] =
     PropertyAccessors.filter(traversal, NodeKeysOdb.LINE_NUMBER_END, value)

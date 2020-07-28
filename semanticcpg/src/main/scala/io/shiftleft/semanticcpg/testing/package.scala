@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Languages, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal.Traversal
 
 package object testing {
 
@@ -71,7 +72,7 @@ package object testing {
     def withLiteralInMethod(methodName: String, literalCode: String): MockCpg = {
       withCustom { (graph, cpg) =>
         val methodNode = cpg.method.head
-        val blockNode = methodNode.start.block.head
+        val blockNode = Traversal.fromSingle(methodNode).block.head
         val callNode = nodes.NewCall()
         val literalNode = nodes.NewLiteral(code = literalCode)
         graph.addNode(callNode)

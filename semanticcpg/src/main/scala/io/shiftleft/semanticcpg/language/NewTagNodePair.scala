@@ -1,14 +1,14 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.passes.DiffGraph
+import overflowdb.traversal.Traversal
 
-class NewTagNodePair(raw: GremlinScala[nodes.NewTagNodePair]) extends HasStoreMethod {
+class NewTagNodePair(traversal: Traversal[nodes.NewTagNodePair]) extends HasStoreMethod {
 
   override def store()(implicit diffGraph: DiffGraph.Builder): Unit = {
-    raw.toList.foreach { tagNodePair =>
+    traversal.toList.foreach { tagNodePair =>
       val tag = tagNodePair.tag
       val tagValue = tagNodePair.node
       diffGraph.addNode(tag.asInstanceOf[NewNode])

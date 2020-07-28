@@ -13,17 +13,19 @@ class Method(val traversal: Traversal[nodes.Method]) extends AnyVal {
     */
   def calledByIncludingSink(sourceTrav: Traversal[nodes.Method])(
       implicit callResolver: ICallResolver): Traversal[nodes.Method] = {
-    val sourceMethods = sourceTrav.raw.toSet
+    val sourceMethods = sourceTrav.toSet
     val sinkMethods = traversal.dedup
 
     if (sourceMethods.isEmpty || sinkMethods.isEmpty) {
       Traversal.empty
     } else {
-      sinkMethods.repeat(
-        _.flatMap(callResolver.getMethodCallsitesAsTraversal)
-          .in(EdgeTypes.CONTAINS) // expand to method
-          .dedup
-      ).cast[nodes.Method]
+      sinkMethods
+        .repeat(
+          _.flatMap(callResolver.getMethodCallsitesAsTraversal)
+            .in(EdgeTypes.CONTAINS) // expand to method
+            .dedup
+        )
+        .cast[nodes.Method]
     }
   }
 
@@ -43,12 +45,12 @@ class Method(val traversal: Traversal[nodes.Method]) extends AnyVal {
     * Incoming call sites
     * */
   def callIn(implicit callResolver: ICallResolver): Traversal[nodes.Call] =
-    traversal.flatMap(callResolver.getMethodCallsitesAsTraversal)
+    traversal.flatMap(method => callResolver.getMethodCallsitesAsTraversal(method).cast[nodes.Call])
 
   /**
     * Traverse to direct and transitive callers of the method.
     * */
-  def calledBy(sourceTrav: Steps[nodes.Method])(implicit callResolver: ICallResolver): Traversal[nodes.Method] =
+  def calledBy(sourceTrav: Traversal[nodes.Method])(implicit callResolver: ICallResolver): Traversal[nodes.Method] =
     caller(callResolver).calledByIncludingSink(sourceTrav)(callResolver)
 
   @deprecated("Use call", "")

@@ -34,7 +34,7 @@ class MethodParameter(val traversal: Traversal[nodes.MethodParameterIn]) extends
     * Traverse to method associated with this formal parameter
     * */
   def method: Traversal[nodes.Method] =
-    traversal.in(EdgeTypes.AST).cast[nodes.Method])
+    traversal.in(EdgeTypes.AST).cast[nodes.Method]
 
   /**
     * Traverse to arguments (actual parameters) associated with this formal parameter

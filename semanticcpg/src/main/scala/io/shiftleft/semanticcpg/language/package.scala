@@ -1,7 +1,23 @@
 package io.shiftleft.semanticcpg
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{HasCanonicalName, HasCode, HasDependencyGroupId, HasDispatchType, HasFullName, HasIsExternal, HasLineNumber, HasLineNumberEnd, HasName, HasOrder, HasParserTypeName, HasSignature, HasValue, HasVersion, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{
+  HasCanonicalName,
+  HasCode,
+  HasDependencyGroupId,
+  HasDispatchType,
+  HasFullName,
+  HasIsExternal,
+  HasLineNumber,
+  HasLineNumberEnd,
+  HasName,
+  HasOrder,
+  HasParserTypeName,
+  HasSignature,
+  HasValue,
+  HasVersion,
+  StoredNode
+}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.{AstNodeDot, CfgNodeDot}
@@ -66,12 +82,13 @@ package object language extends operatorextension.Implicits {
 
   implicit def toCodeAccessors[A <: Node with HasCode](trav: Traversal[A]): CodeAccessors[A] = new CodeAccessors(trav)
 
-  implicit def toCanonicalNameAccessors[A <: Node with HasCanonicalName](trav: Traversal[A]): CanonicalNameAccessors[A] = new CanonicalNameAccessors(trav)
+  implicit def toCanonicalNameAccessors[A <: Node with HasCanonicalName](
+      trav: Traversal[A]): CanonicalNameAccessors[A] = new CanonicalNameAccessors(trav)
 
-  implicit def toDependencyGroupIdAccessors[A <: Node with HasDependencyGroupId](trav: Traversal[A]): DependencyGroupIdAccessors[A] = new DependencyGroupIdAccessors(trav)
+  implicit def toDependencyGroupIdAccessors[A <: Node with HasDependencyGroupId](
+      trav: Traversal[A]): DependencyGroupIdAccessors[A] = new DependencyGroupIdAccessors(trav)
 
-  implicit def toDispatchTypeAccessors[A <: Node with HasDispatchType](
-      trav: Traversal[A]): DispatchTypeAccessors[A] =
+  implicit def toDispatchTypeAccessors[A <: Node with HasDispatchType](trav: Traversal[A]): DispatchTypeAccessors[A] =
     new DispatchTypeAccessors(trav)
 
   implicit def toIsExternalAccessors[A <: Node with HasIsExternal](trav: Traversal[A]): IsExternalAccessors[A] =
@@ -83,13 +100,16 @@ package object language extends operatorextension.Implicits {
   implicit def toLineNumberAccessors[A <: Node with HasLineNumber](trav: Traversal[A]): LineNumberAccessors[A] =
     new LineNumberAccessors(trav)
 
-  implicit def toLineNumberEndAccessors[A <: Node with HasLineNumberEnd](trav: Traversal[A]): LineNumberEndAccessors[A] = new LineNumberEndAccessors(trav)
+  implicit def toLineNumberEndAccessors[A <: Node with HasLineNumberEnd](
+      trav: Traversal[A]): LineNumberEndAccessors[A] = new LineNumberEndAccessors(trav)
 
   implicit def toNameAccessors[A <: Node with HasName](trav: Traversal[A]): NameAccessors[A] = new NameAccessors(trav)
 
-  implicit def toOrderAccessors[A <: Node with HasOrder](trav: Traversal[A]): OrderAccessors[A] = new OrderAccessors(trav)
+  implicit def toOrderAccessors[A <: Node with HasOrder](trav: Traversal[A]): OrderAccessors[A] =
+    new OrderAccessors(trav)
 
-  implicit def toParserTypeNameAccessors[A <: Node with HasParserTypeName](trav: Traversal[A]): ParserTypeNameAccessors[A] = new ParserTypeNameAccessors(trav)
+  implicit def toParserTypeNameAccessors[A <: Node with HasParserTypeName](
+      trav: Traversal[A]): ParserTypeNameAccessors[A] = new ParserTypeNameAccessors(trav)
 
   implicit def toSignatureAccessors[A <: Node with HasSignature](trav: Traversal[A]): SignatureAccessors[A] =
     new SignatureAccessors(trav)
@@ -114,18 +134,19 @@ package object language extends operatorextension.Implicits {
   implicit def toCallForCallGraph(trav: Traversal[nodes.Call]): Call = new Call(trav)
   // / Call graph extension
 
-  //
   implicit def toAstNodeDot[NodeType <: nodes.AstNode](trav: Traversal[NodeType]): AstNodeDot[NodeType] =
     new AstNodeDot(trav)
 
   implicit def toCfgNodeDot(trav: Traversal[nodes.Method]): CfgNodeDot =
     new CfgNodeDot(trav)
 
-  implicit def toNodeTrav[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =
-    new NodeSteps[NodeType](original.raw)
+  implicit def toSteps[A](trav: Traversal[A]): Steps[A] = new Steps(trav)
+
+  implicit def toNodeSteps[NodeType <: nodes.StoredNode](trav: Traversal[NodeType]): NodeSteps[NodeType] =
+    new NodeSteps[NodeType](trav)
 
   implicit def toNewNodeTrav[NodeType <: nodes.NewNode](original: Steps[NodeType]): NewNodeSteps[NodeType] =
-    new NewNodeSteps[NodeType](original.raw)
+    new NewNodeSteps[NodeType](original.traversal)
 
   implicit def toNodeTypeStarters(cpg: Cpg): NodeTypeStarters = new NodeTypeStarters(cpg)
   implicit def toTagTraversal(trav: Traversal[nodes.Tag]): Tag = new Tag(trav)

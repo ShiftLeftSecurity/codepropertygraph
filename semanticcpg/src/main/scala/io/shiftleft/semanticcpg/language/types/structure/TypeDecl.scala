@@ -20,11 +20,11 @@ class TypeDecl(val traversal: Traversal[nodes.TypeDecl]) extends AnyVal {
     * Namespace in which this type declaration is defined
     * */
   def namespace: Traversal[nodes.Namespace] =
-      traversal
-        .in(EdgeTypes.AST)
-        .hasLabel(NodeTypes.NAMESPACE_BLOCK)
-        .out(EdgeTypes.REF)
-        .cast[nodes.Namespace]
+    traversal
+      .in(EdgeTypes.AST)
+      .hasLabel(NodeTypes.NAMESPACE_BLOCK)
+      .out(EdgeTypes.REF)
+      .cast[nodes.Namespace]
 
   /**
     * Methods defined as part of this type

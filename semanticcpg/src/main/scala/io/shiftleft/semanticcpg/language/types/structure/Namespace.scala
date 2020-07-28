@@ -13,21 +13,21 @@ class Namespace(val traversal: Traversal[nodes.Namespace]) extends AnyVal {
     * The type declarations defined in this namespace
     * */
   def typeDecl: Traversal[nodes.TypeDecl] =
-      traversal
-        .in(EdgeTypes.REF)
-        .out(EdgeTypes.AST)
-        .hasLabel(NodeTypes.TYPE_DECL)
-        .cast[nodes.TypeDecl]
+    traversal
+      .in(EdgeTypes.REF)
+      .out(EdgeTypes.AST)
+      .hasLabel(NodeTypes.TYPE_DECL)
+      .cast[nodes.TypeDecl]
 
   /**
     * Methods defined in this namespace
     * */
   def method: Traversal[nodes.Method] =
-      traversal
-        .in(EdgeTypes.REF)
-        .out(EdgeTypes.AST)
-        .hasLabel(NodeTypes.METHOD)
-        .cast[nodes.Method]
+    traversal
+      .in(EdgeTypes.REF)
+      .out(EdgeTypes.AST)
+      .hasLabel(NodeTypes.METHOD)
+      .cast[nodes.Method]
 
   /**
     * External namespaces - any namespaces

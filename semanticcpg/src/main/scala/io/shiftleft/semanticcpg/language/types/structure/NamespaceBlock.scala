@@ -15,9 +15,9 @@ class NamespaceBlock(val traversal: Traversal[nodes.NamespaceBlock]) extends Any
     * The type declarations defined in this namespace
     * */
   def typeDecl: Traversal[nodes.TypeDecl] =
-      traversal
-        .out(EdgeTypes.AST)
-        .hasLabel(NodeTypes.TYPE_DECL)
-        .cast[nodes.TypeDecl]
+    traversal
+      .out(EdgeTypes.AST)
+      .hasLabel(NodeTypes.TYPE_DECL)
+      .cast[nodes.TypeDecl]
 
 }

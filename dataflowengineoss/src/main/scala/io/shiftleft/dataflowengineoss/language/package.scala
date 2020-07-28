@@ -14,7 +14,7 @@ package object language {
     new TrackingPointMethods(node.asInstanceOf[nodes.TrackingPoint])
 
   implicit def toTrackingPoint[NodeType <: nodes.TrackingPointBase](steps: Steps[NodeType]): TrackingPoint =
-    new TrackingPoint(new NodeSteps(steps.raw.cast[nodes.TrackingPoint]))
+    new TrackingPoint(new NodeSteps(steps.traversal.cast[nodes.TrackingPoint]))
 
   implicit def trackingPointToAstNodeMethods(node: nodes.TrackingPoint) =
     new AstNodeMethods(trackingPointToAstNode(node))

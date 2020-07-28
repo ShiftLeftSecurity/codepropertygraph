@@ -1,6 +1,5 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeKeysOdb, NodeTypes, nodes}
 import overflowdb.traversal._

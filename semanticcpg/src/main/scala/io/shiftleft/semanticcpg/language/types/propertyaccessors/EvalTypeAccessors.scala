@@ -26,8 +26,7 @@ class EvalTypeAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
           .out(EdgeTypes.REF)
           .has(NodeKeysOdb.FULL_NAME.where { value =>
             regexes.exists(_.matches(value))
-          }
-        )
+          })
       )
     }
 
@@ -61,8 +60,7 @@ class EvalTypeAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
           .out(EdgeTypes.REF)
           .hasNot(NodeKeysOdb.FULL_NAME.where { value =>
             regexes.exists(_.matches(value))
-          }
-        )
+          })
       )
     }
 }

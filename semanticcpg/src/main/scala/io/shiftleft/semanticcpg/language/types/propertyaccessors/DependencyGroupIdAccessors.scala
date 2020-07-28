@@ -8,7 +8,7 @@ import overflowdb.traversal.Traversal
 class DependencyGroupIdAccessors[A <: Node with HasDependencyGroupId](val traversal: Traversal[A]) extends AnyVal {
 
   def dependencyGroupId: Traversal[String] =
-    traversal.map(_.dependencyGroupId)
+    traversal.flatMap(_.dependencyGroupId)
 
   def dependencyGroupId(value: String): Traversal[A] =
     StringPropertyAccessors.filter(traversal, NodeKeysOdb.DEPENDENCY_GROUP_ID, value)

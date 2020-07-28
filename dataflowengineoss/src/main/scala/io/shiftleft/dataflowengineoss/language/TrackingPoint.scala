@@ -11,7 +11,7 @@ import scala.jdk.CollectionConverters._
   * Base class for nodes that can occur in data flows
   * */
 class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal {
-  private def raw: GremlinScala[nodes.TrackingPoint] = wrapped.raw
+  private def raw: GremlinScala[nodes.TrackingPoint] = wrapped.traversal
 
   /**
     * The enclosing method of the tracking point
@@ -40,7 +40,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   private def reachableByInternal[NodeType <: nodes.TrackingPoint](
       sourceTravs: Seq[Steps[NodeType]]): List[ReachableByContainer] = {
     val sourceSymbols = sourceTravs
-      .flatMap(_.raw.clone.toList)
+      .flatMap(_.traversal.clone.toList)
       .flatMap { elem =>
         getTrackingPoint(elem.asInstanceOf[nodes.TrackingPoint])
       }

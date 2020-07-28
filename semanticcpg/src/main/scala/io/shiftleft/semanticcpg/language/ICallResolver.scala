@@ -1,6 +1,5 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.{CallRepr, Method}
 import overflowdb.traversal.Traversal
@@ -57,7 +56,7 @@ trait ICallResolver {
     * Same as getMethodCallsites but with traversal return type.
     */
   def getMethodCallsitesAsTraversal(method: nodes.Method): Traversal[nodes.CallRepr] =
-     getMethodCallsites(method).to(Traversal)
+    getMethodCallsites(method).to(Traversal)
 
   /**
     * Starts data flow tracking to find all method which could be called at the given callsite.

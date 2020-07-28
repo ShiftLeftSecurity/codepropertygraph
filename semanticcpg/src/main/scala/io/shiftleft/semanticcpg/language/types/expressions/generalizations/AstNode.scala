@@ -24,7 +24,7 @@ class AstNode[A <: nodes.AstNode](val traversal: Traversal[A]) extends AnyVal {
     ast.filter(predicate)
 
   def containsCallTo(regex: String): Traversal[A] =
-    traversal.where(_.ast.isCall.name(regex).size.filter(_ > 0))
+    traversal.filter(_.ast.isCall.name(regex).size > 0)
 
   @Doc("Depth of the abstract syntax tree")
   def depth: Traversal[Int] =
@@ -46,7 +46,7 @@ class AstNode[A <: nodes.AstNode](val traversal: Traversal[A]) extends AnyVal {
     * Direct children of node in the AST. Siblings are ordered by their `order` fields
     * */
   def astChildren: Traversal[nodes.AstNode] =
-  // TODO MP add orderBy step to avoid conversion list/traversal
+    // TODO MP add orderBy step to avoid conversion list/traversal
     traversal.out(EdgeTypes.AST).cast[nodes.AstNode].l.sortBy(_.order).to(Traversal)
 
   /**
@@ -71,24 +71,30 @@ class AstNode[A <: nodes.AstNode](val traversal: Traversal[A]) extends AnyVal {
     * Nodes of the AST obtained by expanding AST edges backwards until `root` or the method root is reached
     * */
   def inAst(root: nodes.AstNode): Traversal[nodes.AstNode] =
-    traversal.repeat(_.in(EdgeTypes.AST))(
-      _.emit
-      .until(_.or(
-        _.hasLabel(NodeTypes.METHOD),
-        _.filter(n => root != null && root == n)
-      ))).cast[nodes.AstNode]
+    traversal
+      .repeat(_.in(EdgeTypes.AST))(
+        _.emit
+          .until(
+            _.or(
+              _.hasLabel(NodeTypes.METHOD),
+              _.filter(n => root != null && root == n)
+            )))
+      .cast[nodes.AstNode]
 
   /**
     * Nodes of the AST obtained by expanding AST edges backwards until `root` or the method root is reached,
     * minus this node
     * */
   def inAstMinusLeaf(root: nodes.AstNode): Traversal[nodes.AstNode] =
-    traversal.repeat(_.in(EdgeTypes.AST))(
-      _.emitAllButFirst
-        .until(_.or(
-          _.hasLabel(NodeTypes.METHOD),
-          _.filter(n => root != null && root == n)
-        ))).cast[nodes.AstNode]
+    traversal
+      .repeat(_.in(EdgeTypes.AST))(
+        _.emitAllButFirst
+          .until(
+            _.or(
+              _.hasLabel(NodeTypes.METHOD),
+              _.filter(n => root != null && root == n)
+            )))
+      .cast[nodes.AstNode]
 
   /**
     * Traverse only to those AST nodes that are also control flow graph nodes
@@ -205,8 +211,8 @@ class AstNode[A <: nodes.AstNode](val traversal: Traversal[A]) extends AnyVal {
     traversal
       .repeat(_.out(EdgeTypes.AST))(
         _.emitAllButFirst
-      .until(_.hasLabel(labels.head, labels.tail: _*)))
-    .dedup
-    .cast[nodes.StoredNode]
+          .until(_.hasLabel(labels.head, labels.tail: _*)))
+      .dedup
+      .cast[nodes.StoredNode]
 
 }

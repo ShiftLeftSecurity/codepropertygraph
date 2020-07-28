@@ -7,8 +7,8 @@ import overflowdb.traversal.Traversal
 
 class LineNumberAccessors[A <: Node with HasLineNumber](val traversal: Traversal[A]) extends AnyVal {
 
-  def lineNumber(): Traversal[Integer] =
-    traversal.map(_.lineNumber)
+  def lineNumber: Traversal[Integer] =
+    traversal.flatMap(_.lineNumber)
 
   def lineNumber(value: Integer): Traversal[A] =
     PropertyAccessors.filter(traversal, NodeKeysOdb.LINE_NUMBER, value)

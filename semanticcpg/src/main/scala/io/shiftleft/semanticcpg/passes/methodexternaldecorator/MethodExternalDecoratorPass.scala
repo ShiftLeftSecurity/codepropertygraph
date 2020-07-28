@@ -2,11 +2,10 @@ package io.shiftleft.semanticcpg.passes.methodexternaldecorator
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.TypeDecl
-import io.shiftleft.codepropertygraph.generated.{NodeKeyNames, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{NodeKeyNames, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import overflowdb.traversal.Traversal
+import io.shiftleft.semanticcpg.language._
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.jdk.CollectionConverters._
 
@@ -50,9 +49,7 @@ class MethodExternalDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    // TODO MP use `cpg.method` once that's defined in odb api
-    Traversal(cpg.graph.nodes(NodeTypes.METHOD))
-      .cast[nodes.Method]
+    cpg.method
       .filterNot(method => isValidExternalFlag(method.isExternal))
       .foreach { method =>
         if (!methodTypeDeclHasIsExternal(method)) {

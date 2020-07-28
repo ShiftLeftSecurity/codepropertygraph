@@ -11,9 +11,9 @@ class IsExternalAccessors[A <: Node with HasIsExternal](val traversal: Traversal
     traversal.map(_.isExternal)
 
   def isExternal(value: Boolean): Traversal[A] =
-    PropertyAccessors.filter(traversal, NodeKeysOdb.IS_EXTERNAL, value)
+    traversal.has(NodeKeysOdb.IS_EXTERNAL -> value)
 
   def isExternalNot(value: Boolean): Traversal[A] =
-    PropertyAccessors.filterNot(traversal, NodeKeysOdb.IS_EXTERNAL, value)
+    traversal.hasNot(NodeKeysOdb.IS_EXTERNAL -> value)
 
 }

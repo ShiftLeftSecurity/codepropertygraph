@@ -1,28 +1,28 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, CpgNode, StoredNode}
+import io.shiftleft.codepropertygraph.generated.EdgeKeysOdb
 import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
-import io.shiftleft.codepropertygraph.generated.EdgeKeys
+import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, NewNode, StoredNode}
 import io.shiftleft.passes.DiffGraph
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
+import overflowdb.Property
+import overflowdb.traversal.Traversal
 
 trait HasStoreMethod {
   def store()(implicit diffBuilder: DiffGraph.Builder): Unit
 }
 
-class NewNodeSteps[A <: NewNode](override val raw: GremlinScala[A]) extends Steps[A](raw) with HasStoreMethod {
+class NewNodeSteps[A <: NewNode](val traversal: Traversal[A]) extends HasStoreMethod {
   import NewNodeSteps.logger
 
   override def store()(implicit diffBuilder: DiffGraph.Builder): Unit =
-    raw.sideEffect(storeRecursively).iterate()
+    traversal.sideEffect(storeRecursively).iterate
 
   private def storeRecursively(newNode: NewNode)(implicit diffBuilder: DiffGraph.Builder): Unit = {
     diffBuilder.addNode(newNode)
   }
 
-  def label: Steps[String] = new Steps(raw.map(_.label))
+  def label: Steps[String] = new Steps(traversal.map(_.label))
 }
 
 object NewNodeSteps {

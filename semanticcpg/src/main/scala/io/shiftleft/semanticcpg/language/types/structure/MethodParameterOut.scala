@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
+import scala.jdk.CollectionConverters._
 
 class MethodParameterOut(val traversal: Traversal[nodes.MethodParameterOut]) extends AnyVal {
 
@@ -25,7 +26,7 @@ class MethodParameterOut(val traversal: Traversal[nodes.MethodParameterOut]) ext
 
   def argument: Traversal[nodes.Expression] =
     for {
-      paramOut <- raw.toIterator
+      paramOut <- traversal
       method <- paramOut._methodViaAstIn
       call <- method._callViaCallIn
       arg <- call._argumentOut.asScala.collect { case node: nodes.Expression with nodes.HasArgumentIndex => node }

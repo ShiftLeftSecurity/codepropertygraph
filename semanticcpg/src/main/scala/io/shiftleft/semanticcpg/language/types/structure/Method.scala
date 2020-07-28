@@ -55,8 +55,8 @@ class Method(val traversal: Traversal[nodes.Method]) extends AnyVal {
     * */
   @Doc("Type this method is defined in")
   def definingTypeDecl: Traversal[nodes.TypeDecl] =
-    traversal.repeat(_.in(EdgeTypes.AST))(
-      _.until(_.hasLabel(NodeTypes.TYPE_DECL)))
+    traversal
+      .repeat(_.in(EdgeTypes.AST))(_.until(_.hasLabel(NodeTypes.TYPE_DECL)))
       .cast[nodes.TypeDecl]
 
   /**
@@ -65,8 +65,7 @@ class Method(val traversal: Traversal[nodes.Method]) extends AnyVal {
   @Doc("Method this method is defined in")
   def definingMethod: Traversal[nodes.Method] =
     traversal
-      .repeat(_.in(EdgeTypes.AST))(
-        _.until(_.hasLabel(NodeTypes.METHOD)))
+      .repeat(_.in(EdgeTypes.AST))(_.until(_.hasLabel(NodeTypes.METHOD)))
       .cast[nodes.Method]
 
   /**
