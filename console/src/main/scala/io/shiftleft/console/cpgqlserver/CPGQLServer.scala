@@ -31,10 +31,10 @@ class CPGQLServer(ammonite: EmbeddedAmmonite,
           Array("", "")
         }
       }
-      val isAuthorized = {
-        (user == serverAuthUsername && password == serverAuthPassword) &&
-        (serverAuthUsername != "" && serverAuthPassword != "")
-      }
+      val isAuthorized = if (serverAuthUsername == "" && serverAuthPassword == "")
+        true
+      else
+        (user == serverAuthUsername && password == serverAuthPassword)
       delegate(Map("isAuthorized" -> isAuthorized))
     }
   }
