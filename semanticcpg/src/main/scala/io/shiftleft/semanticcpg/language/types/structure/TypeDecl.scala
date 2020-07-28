@@ -1,118 +1,115 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeysOdb, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal.Traversal
 
 /**
   * Type declaration - possibly a template that requires instantiation
   * */
-class TypeDecl(val wrapped: NodeSteps[nodes.TypeDecl]) extends AnyVal {
+class TypeDecl(val traversal: Traversal[nodes.TypeDecl]) extends AnyVal {
   import TypeDecl._
-  private def raw: GremlinScala[nodes.TypeDecl] = wrapped.raw
 
   /**
     * Types referencing to this type declaration.
     * */
-  def referencingType: NodeSteps[nodes.Type] =
-    new NodeSteps(raw.in(EdgeTypes.REF).cast[nodes.Type])
+  def referencingType: Traversal[nodes.Type] =
+    traversal.in(EdgeTypes.REF).cast[nodes.Type]
 
   /**
     * Namespace in which this type declaration is defined
     * */
-  def namespace: NodeSteps[nodes.Namespace] =
-    new NodeSteps(
-      raw
+  def namespace: Traversal[nodes.Namespace] =
+      traversal
         .in(EdgeTypes.AST)
         .hasLabel(NodeTypes.NAMESPACE_BLOCK)
         .out(EdgeTypes.REF)
-        .cast[nodes.Namespace])
+        .cast[nodes.Namespace]
 
   /**
     * Methods defined as part of this type
     * */
-  def method: NodeSteps[nodes.Method] =
-    new NodeSteps(canonicalType.raw.out(EdgeTypes.AST).hasLabel(NodeTypes.METHOD).cast[nodes.Method])
+  def method: Traversal[nodes.Method] =
+    canonicalType.out(EdgeTypes.AST).hasLabel(NodeTypes.METHOD).cast[nodes.Method]
 
   /**
     * Filter for type declarations contained in the analyzed code.
     * */
-  def internal: NodeSteps[nodes.TypeDecl] =
-    new NodeSteps(canonicalType.raw.has(NodeKeys.IS_EXTERNAL -> false))
+  def internal: Traversal[nodes.TypeDecl] =
+    canonicalType.has(NodeKeysOdb.IS_EXTERNAL -> false)
 
   /**
     * Filter for type declarations not contained in the analyzed code.
     * */
-  def external: NodeSteps[nodes.TypeDecl] =
-    new NodeSteps(canonicalType.raw.has(NodeKeys.IS_EXTERNAL -> true))
+  def external: Traversal[nodes.TypeDecl] =
+    canonicalType.has(NodeKeysOdb.IS_EXTERNAL -> true)
 
   /**
     * Member variables
     * */
-  def member: NodeSteps[nodes.Member] =
-    new NodeSteps(canonicalType.raw.out().hasLabel(NodeTypes.MEMBER).cast[nodes.Member])
+  def member: Traversal[nodes.Member] =
+    canonicalType.out.hasLabel(NodeTypes.MEMBER).cast[nodes.Member]
 
   /**
     * Direct base types in the inheritance graph.
     * */
-  def baseType: NodeSteps[nodes.Type] =
-    new NodeSteps(canonicalType.raw.out(EdgeTypes.INHERITS_FROM).cast[nodes.Type])
+  def baseType: Traversal[nodes.Type] =
+    canonicalType.out(EdgeTypes.INHERITS_FROM).cast[nodes.Type]
 
   /**
     * Direct base type declaration.
     * */
-  def derivedTypeDecl: NodeSteps[nodes.TypeDecl] =
+  def derivedTypeDecl: Traversal[nodes.TypeDecl] =
     referencingType.derivedTypeDecl
 
   /**
     * Direct and transitive base type declaration.
     * */
-  def derivedTypeDeclTransitive: NodeSteps[nodes.TypeDecl] =
-    wrapped.repeat(_.derivedTypeDecl).emit()
+  def derivedTypeDeclTransitive: Traversal[nodes.TypeDecl] =
+    traversal.repeat(_.derivedTypeDecl)(_.emitAllButFirst)
 
   /**
     * Direct base type declaration.
     */
-  def baseTypeDecl: NodeSteps[nodes.TypeDecl] =
-    wrapped.baseType.referencedTypeDecl
+  def baseTypeDecl: Traversal[nodes.TypeDecl] =
+    traversal.baseType.referencedTypeDecl
 
   /**
     * Direct and transitive base type declaration.
     */
-  def baseTypeDeclTransitive: NodeSteps[nodes.TypeDecl] =
-    wrapped.repeat(_.baseTypeDecl).emit()
+  def baseTypeDeclTransitive: Traversal[nodes.TypeDecl] =
+    traversal.repeat(_.baseTypeDecl)(_.emitAllButFirst)
 
   /**
     * Traverse to methods bound to this type decl.
     */
-  def boundMethod: NodeSteps[nodes.Method] =
+  def boundMethod: Traversal[nodes.Method] =
     methodBinding.boundMethod
 
   /**
     * Traverse to the method bindings of this type declaration.
     */
-  def methodBinding: NodeSteps[nodes.Binding] =
-    new NodeSteps(canonicalType.raw.out(EdgeTypes.BINDS).cast[nodes.Binding])
+  def methodBinding: Traversal[nodes.Binding] =
+    canonicalType.out(EdgeTypes.BINDS).cast[nodes.Binding]
 
   /**
     * Traverse to alias type declarations.
     */
-  def isAlias: NodeSteps[nodes.TypeDecl] =
-    new NodeSteps(raw.filterOnEnd(_.aliasTypeFullName.isDefined))
+  def isAlias: Traversal[nodes.TypeDecl] =
+    traversal.filter(_.aliasTypeFullName.isDefined)
 
   /**
     * Traverse to canonical type declarations.
     */
-  def isCanonical: NodeSteps[nodes.TypeDecl] =
-    new NodeSteps(raw.filterOnEnd(_.aliasTypeFullName.isEmpty))
+  def isCanonical: Traversal[nodes.TypeDecl] =
+    traversal.filter(_.aliasTypeFullName.isEmpty)
 
   /**
     * If this is an alias type declaration, go to its underlying type declaration
     * else unchanged.
     */
-  def unravelAlias: NodeSteps[nodes.TypeDecl] =
-    wrapped.map { typeDecl =>
+  def unravelAlias: Traversal[nodes.TypeDecl] =
+    traversal.map { typeDecl =>
       if (typeDecl.aliasTypeFullName.isDefined)
         typeDecl._typeViaAliasOfOut.next._typeDeclViaRefOut.next
       else
@@ -123,13 +120,13 @@ class TypeDecl(val wrapped: NodeSteps[nodes.TypeDecl]) extends AnyVal {
     * Traverse to canonical type which means unravel aliases until we find
     * a non alias type declaration.
     */
-  def canonicalType: NodeSteps[nodes.TypeDecl] = {
+  def canonicalType: Traversal[nodes.TypeDecl] = {
     // We cannot use this compact form because the gremlin implementation at least
     // in some case seems to have problems with nested "repeat" steps. Since this
     // step is used in other repeat steps we do not use it here.
     //until(_.isCanonical).repeat(_.unravelAlias)
 
-    wrapped.map { typeDecl =>
+    traversal.map { typeDecl =>
       var currentTypeDecl = typeDecl
       var aliasExpansionCounter = 0
       while (currentTypeDecl.aliasTypeFullName.isDefined && aliasExpansionCounter < maxAliasExpansions) {
@@ -143,14 +140,14 @@ class TypeDecl(val wrapped: NodeSteps[nodes.TypeDecl]) extends AnyVal {
   /**
     *  Direct alias type declarations.
     */
-  def aliasTypeDecl: NodeSteps[nodes.TypeDecl] =
+  def aliasTypeDecl: Traversal[nodes.TypeDecl] =
     referencingType.aliasTypeDecl
 
   /**
     *  Direct and transitive alias type declarations.
     */
-  def aliasTypeDeclTransitive: NodeSteps[nodes.TypeDecl] =
-    wrapped.repeat(_.aliasTypeDecl).emit()
+  def aliasTypeDeclTransitive: Traversal[nodes.TypeDecl] =
+    traversal.repeat(_.aliasTypeDecl)(_.emitAllButFirst)
 
 }
 

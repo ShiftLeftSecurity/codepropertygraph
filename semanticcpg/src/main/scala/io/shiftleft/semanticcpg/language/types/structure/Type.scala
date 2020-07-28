@@ -1,113 +1,108 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import gremlin.scala._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.Expression
+import overflowdb.traversal.Traversal
 
-class Type(val wrapped: NodeSteps[nodes.Type]) extends AnyVal {
-  private def raw: GremlinScala[nodes.Type] = wrapped.raw
+class Type(val traversal: Traversal[nodes.Type]) extends AnyVal {
 
   /**
     * Namespaces in which the corresponding type declaration is defined.
     * */
-  def namespace: NodeSteps[nodes.Namespace] =
+  def namespace: Traversal[nodes.Namespace] =
     referencedTypeDecl.namespace
 
   /**
     * Methods defined on the corresponding type declaration.
     * */
-  def method: NodeSteps[nodes.Method] =
+  def method: Traversal[nodes.Method] =
     referencedTypeDecl.method
 
   /**
     * Filter for types whos corresponding type declaration is in the analyzed jar.
     * */
-  def internal: NodeSteps[nodes.Type] =
-    wrapped.filter(_.referencedTypeDecl.internal)
+  def internal: Traversal[nodes.Type] =
+    traversal.where(_.referencedTypeDecl.internal)
 
   /**
     * Filter for types whos corresponding type declaration is not in the analyzed jar.
     * */
-  def external: NodeSteps[nodes.Type] =
-    wrapped.filter(_.referencedTypeDecl.external)
+  def external: Traversal[nodes.Type] =
+    traversal.where(_.referencedTypeDecl.external)
 
   /**
     * Member variables of the corresponding type declaration.
     * */
-  def member: NodeSteps[nodes.Member] =
+  def member: Traversal[nodes.Member] =
     referencedTypeDecl.member
 
   /**
     * Direct base types of the corresponding type declaration in the inheritance graph.
     * */
-  def baseType: NodeSteps[nodes.Type] =
+  def baseType: Traversal[nodes.Type] =
     referencedTypeDecl.baseType
 
   /**
     * Direct and transitive base types of the corresponding type declaration.
     * */
-  def baseTypeTransitive: NodeSteps[nodes.Type] =
-    wrapped.repeat(_.baseType).emit()
+  def baseTypeTransitive: Traversal[nodes.Type] =
+    traversal.repeat(_.baseType)(_.emitAllButFirst)
 
   /**
     * Direct derived types.
     * */
-  def derivedType: NodeSteps[nodes.Type] =
+  def derivedType: Traversal[nodes.Type] =
     derivedTypeDecl.referencingType
 
   /**
     * Direct and transitive derived types.
     * */
-  def derivedTypeTransitive: NodeSteps[nodes.Type] =
-    wrapped.repeat(_.derivedType).emit()
+  def derivedTypeTransitive: Traversal[nodes.Type] =
+    traversal.repeat(_.derivedType)(_.emitAllButFirst)
 
   /**
     * Type declaration which is referenced by this type.
     */
-  def referencedTypeDecl: NodeSteps[nodes.TypeDecl] =
-    new NodeSteps(raw.out(EdgeTypes.REF).cast[nodes.TypeDecl])
+  def referencedTypeDecl: Traversal[nodes.TypeDecl] =
+    traversal.out(EdgeTypes.REF).cast[nodes.TypeDecl]
 
   /**
     * Type declarations which derive from this type.
     */
-  def derivedTypeDecl: NodeSteps[nodes.TypeDecl] =
-    new NodeSteps(raw.in(EdgeTypes.INHERITS_FROM).cast[nodes.TypeDecl])
+  def derivedTypeDecl: Traversal[nodes.TypeDecl] =
+    traversal.in(EdgeTypes.INHERITS_FROM).cast[nodes.TypeDecl]
 
   /**
     * Direct alias type declarations.
     */
-  def aliasTypeDecl: NodeSteps[nodes.TypeDecl] =
-    new NodeSteps(raw.in(EdgeTypes.ALIAS_OF).cast[nodes.TypeDecl])
+  def aliasTypeDecl: Traversal[nodes.TypeDecl] =
+    traversal.in(EdgeTypes.ALIAS_OF).cast[nodes.TypeDecl]
 
   /**
     * Direct alias types.
     */
-  def aliasType: NodeSteps[nodes.Type] =
+  def aliasType: Traversal[nodes.Type] =
     aliasTypeDecl.referencingType
 
   /**
     * Direct and transitive alias types.
     */
-  def aliasTypeTransitive: NodeSteps[nodes.Type] =
-    wrapped.repeat(_.aliasType).emit()
+  def aliasTypeTransitive: Traversal[nodes.Type] =
+    traversal.repeat(_.aliasType)(_.emitAllButFirst)
 
-  def localsOfType: NodeSteps[nodes.Local] =
-    new NodeSteps(raw.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local])
+  def localsOfType: Traversal[nodes.Local] =
+    traversal.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local]
 
   @deprecated("Use expression step instead.")
-  def expressionOfType: NodeSteps[nodes.Expression] = expression
+  def expressionOfType: Traversal[nodes.Expression] = expression
 
-  def expression: NodeSteps[nodes.Expression] =
-    new NodeSteps(
-      raw
+  def expression: Traversal[nodes.Expression] =
+      traversal
         .in(EdgeTypes.EVAL_TYPE)
-        .collect { case node: nodes.Expression => node })
+        .collect { case node: nodes.Expression => node }
 
-  def parameter: NodeSteps[nodes.MethodParameterIn] =
-    new NodeSteps(
-      raw
+  def parameter: Traversal[nodes.MethodParameterIn] =
+      traversal
         .in(EdgeTypes.EVAL_TYPE)
-        .collect { case node: nodes.MethodParameterIn => node })
+        .collect { case node: nodes.MethodParameterIn => node }
 }
