@@ -15,6 +15,8 @@ case class Config(
     server: Boolean = false,
     serverHost: String = "localhost",
     serverPort: Int = 8080,
+    serverAuthUsername: String = "",
+    serverAuthPassword: String = "",
     command: Option[String] = None
 )
 
@@ -62,6 +64,14 @@ trait BridgeBase {
       opt[Int]("server-port")
         .action((x, c) => c.copy(serverPort = x))
         .text("Port on which to expose the CPGQL server")
+
+      opt[String]("server-auth-username")
+        .action((x, c) => c.copy(serverAuthUsername = x))
+        .text("Basic auth username for the CPGQL server")
+
+      opt[String]("server-auth-password")
+        .action((x, c) => c.copy(serverAuthPassword = x))
+        .text("Basic auth password for the CPGQL server")
 
       opt[String]("command")
         .action((x, c) => c.copy(command = Some(x)))
@@ -117,7 +127,11 @@ trait BridgeBase {
     Runtime.getRuntime.addShutdownHook(new Thread(() => {
       ammonite.shutdown()
     }))
-    val server = new CPGQLServer(ammonite, config.serverHost, config.serverPort)
+    val server = new CPGQLServer(ammonite,
+                                 config.serverHost,
+                                 config.serverPort,
+                                 config.serverAuthUsername,
+                                 config.serverAuthPassword)
     server.main(Array.empty)
   }
 
