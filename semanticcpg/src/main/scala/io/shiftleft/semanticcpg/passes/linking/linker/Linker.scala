@@ -231,7 +231,7 @@ object Linker {
       } else {
         srcNode.out(edgeType).property(NodeKeysOdb.FULL_NAME).nextOption match {
           case Some(dstFullName) => srcNode.property(dstFullNameKey, dstFullName)
-          case None              => logger.error(s"Missing outgoing edge of type ${edgeType} from node ${srcNode}")
+          case None              => logger.warn(s"Missing outgoing edge of type ${edgeType} from node ${srcNode}")
         }
         if (!loggedDeprecationWarning) {
           logger.warn(

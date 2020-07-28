@@ -33,7 +33,7 @@ class CapturingLinker(cpg: Cpg) extends CpgPass(cpg) {
           case Some(closureBindingNode) =>
             dstGraph.addEdgeInOriginal(local, closureBindingNode, EdgeTypes.CAPTURED_BY)
           case None =>
-            logger.error(s"Missing CLOSURE_BINDING node or invalid closureBindingId=$closureBindingId")
+            logger.warn(s"Missing CLOSURE_BINDING node or invalid closureBindingId=$closureBindingId")
         }
       }
     }

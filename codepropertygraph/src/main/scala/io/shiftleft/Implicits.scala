@@ -12,7 +12,7 @@ object Implicits {
       if (iterator.hasNext) {
         val res = iterator.next
         if (iterator.hasNext) {
-          logger.error("iterator was expected to have exactly one element, but it actually has more")
+          logger.warn("iterator was expected to have exactly one element, but it actually has more")
         }
         res
       } else { throw new NoSuchElementException() }
@@ -40,7 +40,7 @@ object Implicits {
       if (iterator.hasNext) {
         val res = iterator.next
         if (iterator.hasNext) {
-          logger.error("iterator was expected to have exactly one element, but it actually has more")
+          logger.warn("iterator was expected to have exactly one element, but it actually has more")
         }
         res
       } else { throw new NoSuchElementException() }
