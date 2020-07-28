@@ -2,29 +2,37 @@ package io.shiftleft.console.cpgqlserver
 
 import java.net.URLEncoder
 import java.util.UUID
+import scala.concurrent._
+import scala.concurrent.duration._
 
 import org.scalatest.{Matchers, WordSpec}
 
-import scala.concurrent._
-import castor.Context.Simple.global
 import cask.util.Logger.Console._
-import io.shiftleft.console.embammonite.EmbeddedAmmonite
+import castor.Context.Simple.global
 import ujson.Value.Value
 
-import scala.concurrent.duration._
+import io.shiftleft.console.embammonite.EmbeddedAmmonite
 
 class CPGQLServerTests extends WordSpec with Matchers {
+  val validBasicAuthHeaderVal = "Basic dXNlcm5hbWU6cGFzc3dvcmQ="
 
   val DefaultPromiseAwaitTimeout = Duration(10, SECONDS)
 
-  def postQuery(host: String, query: String): Value = {
-    val postResponse = requests.post(s"$host/query", data = ujson.Obj("query" -> query).toString)
-    ujson.read(postResponse.contents)
+  def postQuery(host: String, query: String, authHeaderVal: String = validBasicAuthHeaderVal): Value = {
+    val postResponse = requests.post(s"$host/query",
+      data = ujson.Obj("query" -> query).toString,
+      headers = Seq("authorization" -> authHeaderVal)
+    )
+    val res = if (postResponse.contents.length > 0)
+      ujson.read(postResponse.contents)
+     else
+      ujson.Obj()
+    res
   }
 
-  def getResponse(host: String, uuidParam: String): Value = {
+  def getResponse(host: String, uuidParam: String, authHeaderVal: String = validBasicAuthHeaderVal): Value = {
     val uri = s"$host/result/${URLEncoder.encode(uuidParam, "utf-8")}"
-    val getResponse = requests.get(uri)
+    val getResponse = requests.get(uri, headers = Seq("authorization" -> authHeaderVal))
     ujson.read(getResponse.contents)
   }
 
@@ -47,6 +55,12 @@ class CPGQLServerTests extends WordSpec with Matchers {
       postQueryResponse("success").bool shouldBe true
     }
 
+    "disallow posting a query when request headers do not include a valid authentication value" in Fixture() { host =>
+      val postQueryResponse = postQuery(host, "1", authHeaderVal = "Basic b4df00d")
+      postQueryResponse.obj.keySet should not contain("success")
+      postQueryResponse.obj.keySet should not contain("uuid")
+    }
+
     "return a valid JSON response when trying to retrieve the result of a query without a connection" in Fixture() {
       host =>
         val postQueryResponse = postQuery(host, "1")
@@ -54,9 +68,9 @@ class CPGQLServerTests extends WordSpec with Matchers {
         val UUIDResponse = postQueryResponse("uuid").str
         val getResultResponse = getResponse(host, UUIDResponse)
         getResultResponse.obj.keySet should contain("success")
-        getResultResponse.obj.keySet should contain("stderr")
+        getResultResponse.obj.keySet should contain("err")
         getResultResponse("success").bool shouldBe false
-        getResultResponse("stderr").str.length should not be (0)
+        getResultResponse("err").str.length should not be (0)
     }
 
     "allow fetching the result of a completed query using its UUID" in Fixture() { host =>
@@ -80,6 +94,27 @@ class CPGQLServerTests extends WordSpec with Matchers {
       getResultResponse("stderr").str shouldBe ""
     }
 
+    "disallow fetching the result of a completed query with an invalid auth header" in Fixture() { host =>
+      var webSocketTextMsg = scala.concurrent.Promise[String]
+      cask.util.WsClient.connect(s"$host/connect") {
+        case cask.Ws.Text(msg) => webSocketTextMsg.success(msg)
+      }
+      Await.result(webSocketTextMsg.future, DefaultPromiseAwaitTimeout)
+      val postQueryResponse = postQuery(host, "1")
+      val queryUUID = postQueryResponse("uuid").str
+      queryUUID.length should not be (0)
+
+      webSocketTextMsg = scala.concurrent.Promise[String]
+      val queryResultWSMessage = Await.result(webSocketTextMsg.future, DefaultPromiseAwaitTimeout)
+      queryResultWSMessage.length should not be (0)
+
+      val getResultResponse = getResponse(host, queryUUID, "Basic b4df00d")
+      getResultResponse.obj.keySet should not contain("success")
+      getResultResponse.obj.keySet should not contain("err")
+      getResultResponse.obj.keySet should not contain("stderr")
+      getResultResponse.obj.keySet should not contain("stdout")
+    }
+
     "write a well-formatted message to a websocket connection when a query has finished evaluation" in Fixture() {
       host =>
         var webSocketTextMsg = scala.concurrent.Promise[String]
@@ -100,6 +135,7 @@ class CPGQLServerTests extends WordSpec with Matchers {
         getResultResponse.obj.keySet should contain("success")
         getResultResponse.obj.keySet should contain("stdout")
         getResultResponse.obj.keySet should contain("stderr")
+        getResultResponse.obj.keySet should not contain("err")
         getResultResponse("uuid").str shouldBe queryResultWSMessage
         getResultResponse("stdout").str shouldBe "res0: Int = 1\n"
         getResultResponse("stderr").str shouldBe ""
@@ -124,6 +160,7 @@ class CPGQLServerTests extends WordSpec with Matchers {
       getResultResponse.obj.keySet should contain("success")
       getResultResponse.obj.keySet should contain("stdout")
       getResultResponse.obj.keySet should contain("stderr")
+      getResultResponse.obj.keySet should not contain("err")
       getResultResponse("success").bool shouldBe true
       getResultResponse("uuid").str shouldBe queryResultWSMessage
       getResultResponse("stdout").str shouldBe ""
@@ -139,7 +176,7 @@ class CPGQLServerTests extends WordSpec with Matchers {
     Await.result(webSocketTextMsg.future, Duration(100, SECONDS))
     val getResultResponse = getResponse(host, UUID.randomUUID().toString)
     getResultResponse.obj.keySet should contain("success")
-    getResultResponse.obj.keySet should contain("stderr")
+    getResultResponse.obj.keySet should contain("err")
     getResultResponse("success").bool shouldBe false
   }
 
@@ -151,9 +188,9 @@ class CPGQLServerTests extends WordSpec with Matchers {
     Await.result(webSocketTextMsg.future, Duration(100, SECONDS))
     val getResultResponse = getResponse(host, "INCORRECTLY_FORMATTED_UUID_PARAM")
     getResultResponse.obj.keySet should contain("success")
-    getResultResponse.obj.keySet should contain("stderr")
+    getResultResponse.obj.keySet should contain("err")
     getResultResponse("success").bool shouldBe false
-    getResultResponse("stderr").str.length should not equal (0)
+    getResultResponse("err").str.length should not equal (0)
   }
 }
 
@@ -165,8 +202,10 @@ object Fixture {
 
     val host = "localhost"
     val port = 8081
+    val authUsername = "username"
+    val authPassword = "password"
     val httpEndpoint = "http://" + host + ":" + port.toString()
-    val ammServer = new CPGQLServer(ammonite, host, port)
+    val ammServer = new CPGQLServer(ammonite, host, port, authUsername, authPassword)
     val server = io.undertow.Undertow.builder
       .addHttpListener(ammServer.port, ammServer.host)
       .setHandler(ammServer.defaultHandler)
