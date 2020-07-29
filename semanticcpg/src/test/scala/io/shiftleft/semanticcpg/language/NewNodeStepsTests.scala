@@ -10,6 +10,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, ModifierTypes}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.passes.DiffGraph.{EdgeInDiffGraph, EdgeToOriginal}
 import org.scalatest.{Matchers, WordSpec}
+import io.shiftleft.codepropertygraph.generated.NodeKeyNames
 
 import scala.jdk.CollectionConverters._
 
@@ -36,7 +37,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
       implicit val diffGraphBuilder = DiffGraph.newBuilder
       val cpg = Cpg.emptyCpg
       val existingContainedNode = cpg.graph.addNode(42L, "MODIFIER").asInstanceOf[nodes.StoredNode]
-      existingContainedNode.property(Modifier.PropertyNames.ModifierType, ModifierTypes.NATIVE)
+      existingContainedNode.property(NodeKeyNames.MODIFIER_TYPE, ModifierTypes.NATIVE)
       cpg.graph.V().asScala.toSet shouldBe Set(existingContainedNode)
 
       val newContainedNode = newTestNode()

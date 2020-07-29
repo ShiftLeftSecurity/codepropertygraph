@@ -204,16 +204,11 @@ object DiffGraph {
 
   class Builder {
     private var _buffer: mutable.ArrayBuffer[Change] = null
-    private var _nodeSet: mutable.HashSet[NewNode] = null
+    private var _nodeSet: java.util.IdentityHashMap[NewNode, NewNode] = null
     private def buffer: mutable.ArrayBuffer[Change] = {
       if (_buffer == null)
         _buffer = new mutable.ArrayBuffer[Change]()
       _buffer
-    }
-    private def nodeSet: mutable.HashSet[NewNode] = {
-      if (_nodeSet == null)
-        _nodeSet = mutable.HashSet[NewNode]()
-      _nodeSet
     }
 
     def addEdge(src: CpgNode, dst: CpgNode, edgeLabel: String, properties: Seq[(String, AnyRef)] = List()): Unit = {
@@ -232,11 +227,11 @@ object DiffGraph {
     def buildReverse(): DiffGraph = build(if (_buffer != null) _buffer.reverse else null)
 
     def addNode(node: NewNode): Boolean = {
-      val isNew = nodeSet.add(node)
-      if (isNew) {
+      if (_nodeSet == null) _nodeSet = new java.util.IdentityHashMap[NewNode, NewNode]()
+      if (_nodeSet.put(node, node) == null) {
         buffer.append(Change.CreateNode(node))
-      }
-      isNew
+        true
+      } else false
     }
 
     def addEdgeToOriginal(srcNode: NewNode,
@@ -313,7 +308,7 @@ object DiffGraph {
 
   private class Applier(diffGraph: DiffGraph, graph: OdbGraph, undoable: Boolean, keyPool: Option[KeyPool]) {
     import Applier.InternalProperty
-    private val overlayNodeToOdbNode = new THashMap[NewNode, StoredNode]()
+    private val overlayNodeToOdbNode = new java.util.IdentityHashMap[NewNode, StoredNode]()
     private val deferredInitList = scala.collection.mutable.ArrayDeque[NewNode]()
     val inverseBuilder: InverseBuilder = if (undoable) InverseBuilder.newBuilder else InverseBuilder.noop
 

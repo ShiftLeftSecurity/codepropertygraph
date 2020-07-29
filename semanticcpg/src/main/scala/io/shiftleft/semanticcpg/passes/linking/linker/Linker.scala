@@ -7,6 +7,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import overflowdb._
 import overflowdb.traversal._
+import io.shiftleft.codepropertygraph.generated.NodeKeyNames
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -38,7 +39,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstNodeLabel = NodeTypes.TYPE_DECL,
       edgeType = EdgeTypes.REF,
       dstNodeMap = typeDeclFullNameToNode,
-      dstFullNameKey = nodes.Type.PropertyNames.TypeDeclFullName,
+      dstFullNameKey = NodeKeyNames.TYPE_DECL_FULL_NAME,
       dstGraph,
       None
     )
@@ -78,7 +79,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstNodeLabel = NodeTypes.METHOD,
       edgeType = EdgeTypes.REF,
       dstNodeMap = methodFullNameToNode,
-      dstFullNameKey = nodes.MethodRef.PropertyNames.MethodFullName,
+      dstFullNameKey = NodeKeyNames.METHOD_FULL_NAME,
       dstGraph,
       None
     )
@@ -98,7 +99,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
           Seq()
         }
       },
-      dstFullNameKey = nodes.TypeDecl.PropertyNames.InheritsFromTypeFullName,
+      dstFullNameKey = NodeKeyNames.INHERITS_FROM_TYPE_FULL_NAME,
       dstGraph
     )
 

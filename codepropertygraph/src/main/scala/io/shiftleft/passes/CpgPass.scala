@@ -146,24 +146,12 @@ trait CpgPassBase {
   * */
 case class AppliedDiffGraph(diffGraph: DiffGraph,
                             inverseDiffGraph: Option[DiffGraph],
-                            private val nodeToOdbNode: THashMap[NewNode, StoredNode]) {
+                            private val nodeToOdbNode: java.util.IdentityHashMap[NewNode, StoredNode]) {
 
   /**
     * Obtain the id this node has in the applied graph
     * */
   def nodeToGraphId(node: NewNode): JLong = {
-    val wrappedNode = IdentityHashWrapper(node)
     nodeToOdbNode.get(node).id2
   }
-}
-
-private[passes] case class IdentityHashWrapper[T <: AnyRef](value: T) {
-  override def hashCode(): Int = {
-    System.identityHashCode(value)
-  }
-
-  override def equals(other: Any): Boolean =
-    other != null &&
-      other.isInstanceOf[IdentityHashWrapper[T]] &&
-      (this.value eq other.asInstanceOf[IdentityHashWrapper[T]].value)
 }
