@@ -313,20 +313,24 @@ object DiffGraph {
     val inverseBuilder: InverseBuilder = if (undoable) InverseBuilder.newBuilder else InverseBuilder.noop
 
     def nodeMapping(newNode: NewNode): StoredNode = {
-      val res = overlayNodeToOdbNode.get(newNode)
-      if (res == null) {
-        addNodeNoInit(newNode)
+      val alreadyStoredNode = overlayNodeToOdbNode.get(newNode)
+      if (alreadyStoredNode == null) {
+        val newlyStoredNode = keyPool match {
+          case Some(pool) => graph.addNode(pool.next, newNode.label).asInstanceOf[StoredNode]
+          case None       => graph.addNode(newNode.label).asInstanceOf[StoredNode]
+        }
+        overlayNodeToOdbNode.put(newNode, newlyStoredNode)
         deferredInitList.append(newNode)
-        val newRes = overlayNodeToOdbNode.get(newNode)
-        assert(newRes != null)
-        newRes
-      } else res
+        newlyStoredNode
+      } else alreadyStoredNode
     }
 
     def drainDeferred(): Unit = {
       while (deferredInitList.nonEmpty) {
-        val node = deferredInitList.removeHead()
-        overlayNodeToOdbNode.get(node).fromNewNode(node, nodeMapping)
+        val newNode = deferredInitList.removeHead()
+        val stored = overlayNodeToOdbNode.get(newNode)
+        stored.fromNewNode(newNode, nodeMapping)
+        inverseBuilder.onNewNode(stored)
       }
     }
 
@@ -411,18 +415,6 @@ object DiffGraph {
         inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
         newNode.fromNewNode(node, mapping = nodeMapping)
         overlayNodeToOdbNode.put(node, newNode)
-      }
-    }
-    private def addNodeNoInit(node: NewNode): Unit = {
-      if (overlayNodeToOdbNode.get(node) == null) {
-        val newNode = keyPool match {
-          case Some(pool) => graph.addNode(pool.next, node.label).asInstanceOf[StoredNode]
-          case None       => graph.addNode(node.label).asInstanceOf[StoredNode]
-        }
-        inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
-        overlayNodeToOdbNode.put(node, newNode)
-      } else {
-        throw new RuntimeException("something went wrong in diffgraph application")
       }
     }
   }

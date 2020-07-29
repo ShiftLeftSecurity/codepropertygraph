@@ -26,6 +26,10 @@ import io.shiftleft.proto.cpg.Cpg.{
 }
 import overflowdb._
 
+object DiffGraphProtoSerializer {
+  val nodePropertyNames: Set[String] = NodePropertyName.values().map { _.name() }.toSet
+}
+
 /**
   * Provides functionality to serialize diff graphs and add them
   * to existing serialized CPGs as graph overlays.
@@ -141,8 +145,7 @@ class DiffGraphProtoSerializer {
       .build
 
   private def removeNodePropertyProto(nodeId: Long, propertyKey: String) = {
-    //this way of distinguishing between "proper" and "localName"-style properties is super fishy. Apologies!
-    if (propertyKey(0).isLower) {
+    if (!DiffGraphProtoSerializer.nodePropertyNames.contains(propertyKey)) {
       DiffGraphProto.RemoveNodeProperty.newBuilder
         .setKey(nodeId)
         .setName(NodePropertyName.CONTAINED_REF)
@@ -165,8 +168,7 @@ class DiffGraphProtoSerializer {
       .build
 
   private def nodeProperty(key: String, value: Any, appliedDiffGraph: AppliedDiffGraph) = {
-    //this way of distinguishing between "proper" and "localName"-style properties is super fishy. Apologies!
-    if (key(0).isLower) {
+    if (!DiffGraphProtoSerializer.nodePropertyNames.contains(key)) {
       CpgStruct.Node.Property
         .newBuilder()
         .setName(NodePropertyName.CONTAINED_REF)
@@ -213,17 +215,23 @@ class DiffGraphProtoSerializer {
     val builder = ContainedRefs.newBuilder
     value match {
       case iterable: Iterable[_] =>
-        iterable.foreach { node =>
-          node match {
-            case storedNode: StoredNode =>
-              builder.addRefs(storedNode.id2)
-            case newNode: NewNode =>
-              builder.addRefs(appliedDiffGraph.nodeToGraphId(newNode))
-          }
+        iterable.foreach {
+          case storedNode: StoredNode =>
+            builder.addRefs(storedNode.id2)
+          case newNode: NewNode =>
+            if (appliedDiffGraph == null) {
+              throw new NullPointerException(
+                s"Cannot serialize references to NewNode ${newNode} without AppliedDiffGraph: NodeID is not yet assigned")
+            }
+            builder.addRefs(appliedDiffGraph.nodeToGraphId(newNode))
         }
       case storedNode: StoredNode =>
         builder.addRefs(storedNode.id2)
       case newNode: NewNode =>
+        if (appliedDiffGraph == null) {
+          throw new NullPointerException(
+            s"Cannot serialize references to NewNode ${newNode} without AppliedDiffGraph: NodeID is not yet assigned")
+        }
         builder.addRefs(appliedDiffGraph.nodeToGraphId(newNode))
     }
     builder
