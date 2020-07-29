@@ -33,12 +33,12 @@ object DiffGraphProtoSerializer {
 /**
   * Provides functionality to serialize diff graphs and add them
   * to existing serialized CPGs as graph overlays.
-  **/
+  * */
 class DiffGraphProtoSerializer {
 
   /**
     * Generates a serialized graph overlay representing this graph
-    **/
+    * */
   def serialize(appliedDiffGraph: AppliedDiffGraph): CpgOverlay = {
     import DiffGraph.Change._
     val builder = CpgOverlay.newBuilder

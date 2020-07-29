@@ -9,7 +9,6 @@ import io.shiftleft.passes.{DiffGraph, IntervalKeyPool}
 import org.scalatest.{Matchers, WordSpec}
 
 class DiffGraphTest extends WordSpec with Matchers {
-
   "should be able to build an inverse DiffGraph" in {
     withTestOdb { graph =>
       // setup existing graph
