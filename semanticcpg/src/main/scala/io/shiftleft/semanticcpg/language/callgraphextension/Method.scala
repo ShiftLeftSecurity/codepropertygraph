@@ -18,10 +18,9 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
     val sinkMethods = raw.dedup.toList
 
     if (sourceMethods.isEmpty || sinkMethods.isEmpty) {
-      new NodeSteps(wrapped.graph.asScala.V(-1).cast[nodes.Method])
+      new NodeSteps(__())
     } else {
-      val ids = sinkMethods.map(_.id)
-      val methodTrav = wrapped.graph.asScala.V(ids: _*)
+      val methodTrav = sinkMethods.start.raw
 
       new Steps[nodes.Method](
         methodTrav

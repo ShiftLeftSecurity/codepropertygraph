@@ -3,7 +3,6 @@ package io.shiftleft.passes
 import java.security.MessageDigest
 import java.util
 
-import gnu.trove.map.hash.THashMap
 import gnu.trove.set.hash.TCustomHashSet
 import gnu.trove.strategy.IdentityHashingStrategy
 import io.shiftleft.codepropertygraph.Cpg
@@ -14,6 +13,7 @@ import overflowdb.traversal._
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.jdk.CollectionConverters._
 
 /**
   * A lightweight write-only graph used for creation of CPG graph overlays
@@ -28,6 +28,7 @@ import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 sealed trait DiffGraph {
   import DiffGraph._
   import Change.NodeKind._
+
   def size: Int
   def iterator: Iterator[Change]
   def +(other: DiffGraph): DiffGraph = ???
@@ -163,7 +164,7 @@ object DiffGraph {
           val inNodeId = proto.getInNodeKey
           val edgeLabel = proto.getEdgeType.toString
 
-          val edge = cpg.graph.V(outNodeId).outE(edgeLabel).filter(_.inVertex.id == inNodeId).l match {
+          val edge = cpg.graph.V(outNodeId).outE(edgeLabel).filter(_.inNode.id == inNodeId).l match {
             case edge :: Nil => edge
             case Nil         => throw new AssertionError(s"unable to find edge that is supposed to be removed: $proto")
             case candidates => // found multiple edges - try to disambiguate via propertiesHash
@@ -187,16 +188,7 @@ object DiffGraph {
   }
 
   def propertiesHash(edge: OdbEdge): Array[Byte] = {
-    import scala.jdk.CollectionConverters._
-    val propertiesAsString = edge
-      .properties[Any]()
-      .asScala
-      .collect {
-        case prop if prop.isPresent => prop.key -> prop.value
-      }
-      .toList
-      .sortBy(_._1)
-      .mkString
+    val propertiesAsString = edge.propertyMap.asScala.toList.sortBy(_._1).mkString
     MessageDigest.getInstance("MD5").digest(propertiesAsString.getBytes)
   }
 
@@ -210,6 +202,8 @@ object DiffGraph {
         _buffer = new mutable.ArrayBuffer[Change]()
       _buffer
     }
+
+    def +=(node: NewNode): Unit = addNode(node)
 
     def addEdge(src: CpgNode, dst: CpgNode, edgeLabel: String, properties: Seq[(String, AnyRef)] = List()): Unit = {
       buffer.append(Change.CreateEdge(src, dst, edgeLabel, properties))
@@ -256,7 +250,7 @@ object DiffGraph {
     def removeNode(id: Long): Unit =
       buffer.append(Change.RemoveNode(id))
     def removeNode(node: StoredNode): Unit =
-      buffer.append(Change.RemoveNode(node.id.asInstanceOf[Long]))
+      buffer.append(Change.RemoveNode(node.id2))
     def removeEdge(edge: OdbEdge): Unit = buffer += Change.RemoveEdge(edge)
     def removeNodeProperty(nodeId: Long, propertyKey: String): Unit =
       buffer.append(Change.RemoveNodeProperty(nodeId, propertyKey))
@@ -309,7 +303,7 @@ object DiffGraph {
   private class Applier(diffGraph: DiffGraph, graph: OdbGraph, undoable: Boolean, keyPool: Option[KeyPool]) {
     import Applier.InternalProperty
     private val overlayNodeToOdbNode = new java.util.IdentityHashMap[NewNode, StoredNode]()
-    private val deferredInitList = scala.collection.mutable.ArrayDeque[NewNode]()
+    private val deferredInitList = mutable.ArrayDeque[NewNode]()
     val inverseBuilder: InverseBuilder = if (undoable) InverseBuilder.newBuilder else InverseBuilder.noop
 
     def nodeMapping(newNode: NewNode): StoredNode = {
@@ -395,9 +389,6 @@ object DiffGraph {
                            label: String,
                            properties: Seq[(String, AnyRef)],
                            inverseBuilder: DiffGraph.InverseBuilder): Unit = {
-      if (src == null || dst == null || label == null) {
-        println("foo")
-      }
       val odbEdge = src --- label --> dst
       inverseBuilder.onNewEdge(odbEdge)
       properties.foreach {
