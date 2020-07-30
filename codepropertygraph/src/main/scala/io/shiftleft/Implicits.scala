@@ -7,7 +7,7 @@ object Implicits {
 
   private val logger: Logger = LoggerFactory.getLogger(Implicits.getClass)
 
-  implicit class IteratorDeco[T](iterator: Iterator[T]) {
+  implicit class IteratorDeco[T](val iterator: Iterator[T]) extends AnyVal {
     def onlyChecked: T = {
       if (iterator.hasNext) {
         val res = iterator.next
@@ -26,7 +26,7 @@ object Implicits {
     * This is intended to be used as a replacement for next() on the iterators
     * returned from TinkerPop since those are missing stack traces.
     */
-  implicit class JavaIteratorDeco[T](iterator: java.util.Iterator[T]) {
+  implicit class JavaIteratorDeco[T](val iterator: java.util.Iterator[T]) extends AnyVal {
     def nextChecked: T = {
       try {
         iterator.next
