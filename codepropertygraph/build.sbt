@@ -3,12 +3,12 @@ name := "codepropertygraph"
 dependsOn(Projects.protoBindings)
 
 libraryDependencies ++= Seq(
-  "io.shiftleft" %% "overflowdb-traversal" % "021edaeca818856f6bc56afb65d4c4bf1ef6934f",
+  "io.shiftleft" %% "overflowdb-traversal" % "0.118",
   "com.michaelpollmeier" %% "gremlin-scala" % "3.4.4.5",
   "com.google.guava" % "guava" % "21.0",
   "org.apache.commons" % "commons-lang3" % "3.5",
   "commons-io" % "commons-io" % "2.5",
-  "com.github.pathikrit" %% "better-files" % "3.8.0",
+  "com.github.pathikrit" %% "better-files"  % "3.8.0",
   "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0",
   "com.github.scopt" %% "scopt" % "3.7.1",
   "org.slf4j" % "slf4j-api" % "1.7.30",
@@ -37,10 +37,10 @@ mergeSchemaTask := {
 }
 
 Compile / sourceGenerators += Def.task {
-  val currentMd5 = FileUtils.md5(
-    List(new File("codepropertygraph/codegen/src/main"), new File("codepropertygraph/src/main/resources/schemas")))
-  val outputRoot =
-    new File(sourceManaged.in(Compile).value.getAbsolutePath + "/io/shiftleft/codepropertygraph/generated")
+  val currentMd5 = FileUtils.md5(List(
+    new File("codepropertygraph/codegen/src/main"),
+    new File("codepropertygraph/src/main/resources/schemas")))
+  val outputRoot = new File(sourceManaged.in(Compile).value.getAbsolutePath + "/io/shiftleft/codepropertygraph/generated")
 
   if (!outputRoot.exists || CodeGenGlobalState.lastMd5 != currentMd5) {
     val schemaFile = "codepropertygraph/src/main/resources/cpg.json"
@@ -62,8 +62,9 @@ lazy val generateProtobuf = taskKey[File]("generate cpg.proto")
 generateProtobuf := {
   val output = better.files.File((resourceManaged.in(Compile).value / "cpg.proto").toPath)
 
-  val currentMd5 = FileUtils.md5(
-    List(new File("codepropertygraph/codegen/src/main"), new File("codepropertygraph/src/main/resources/schemas")))
+  val currentMd5 = FileUtils.md5(List(
+    new File("codepropertygraph/codegen/src/main"),
+    new File("codepropertygraph/src/main/resources/schemas")))
   if (!output.exists || GenerateProtobufTaskGlobalState.lastMd5 != currentMd5) {
     // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
     val cmd = "codepropertygraph/codegen/src/main/python/generateProtobuf.py"
