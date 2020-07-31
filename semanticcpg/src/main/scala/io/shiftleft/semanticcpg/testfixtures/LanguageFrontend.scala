@@ -2,8 +2,8 @@ package io.shiftleft.semanticcpg.testfixtures
 
 import java.io.File
 
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.fuzzyc2cpg.FuzzyC2Cpg
-import io.shiftleft.fuzzyc2cpg.output.protobuf.OutputModuleFactory
 
 /**
   * LanguageFrontend encapsulates the logic that translates the source code directory
@@ -22,18 +22,17 @@ abstract class LanguageFrontend {
     * @param sourceCodeFile directory where source code is located
     * @return CPG representation stored in a file
     */
-  def execute(sourceCodeFile: File): File
+  def execute(sourceCodeFile: File): Cpg
 }
 
 object LanguageFrontend {
 
   class FuzzycFrontend extends LanguageFrontend {
-    def execute(sourceCodePath: File): File = {
+    def execute(sourceCodePath: File): Cpg = {
       val cpgFile = File.createTempFile("fuzzyc", ".zip")
       cpgFile.deleteOnExit()
-      val fuzzyc2Cpg = new FuzzyC2Cpg(new OutputModuleFactory(cpgFile.getAbsolutePath, true))
-      fuzzyc2Cpg.runAndOutput(Set(sourceCodePath.getAbsolutePath), Set(".c"))
-      cpgFile
+      val fuzzyc2Cpg = new FuzzyC2Cpg()
+      fuzzyc2Cpg.runAndOutput(Set(sourceCodePath.getAbsolutePath), Set(fileSuffix), Some(cpgFile.getAbsolutePath))
     }
     override val fileSuffix: String = ".c"
   }
