@@ -8,8 +8,6 @@ import io.shiftleft.codepropertygraph.generated._
 import org.scalatest.{Matchers, WordSpec}
 
 class CpgOverlayIntegrationTest extends WordSpec with Matchers {
-  import CpgOverlayIntegrationTest.DummyProduct
-
   val InitialNodeCode = "initialNode"
   val Pass1NewNodeCode = "pass1NewNodeCode"
   val Pass2NewNodeCode = "pass2NewNodeCode"
@@ -42,14 +40,10 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
       // 1) add a new node
       val addNodeInverse = applyDiffAndGetInverse(cpg)(
         _.addNode(
-          new nodes.NewNode with DummyProduct {
-            override def containedNodesByLocalName = ???
-            override def label = NodeTypes.UNKNOWN
-            override def properties = Map.empty
-          }
+          nodes.NewUnknown(code = null)
         ))
       cpg.graph.nodeCount shouldBe 2
-      val additionalNode = cpg.graph.V.hasNot(NodeKeysOdb.CODE).head
+      val additionalNode = cpg.graph.V.label("UNKNOWN").l.filter { _.asInstanceOf[nodes.Unknown].code == null }.head
 
       // 2) add two edges with the same label but different properties (they'll later be disambiguated by their property hash, since edges don't have IDs
       val addEdge1Inverse = applyDiffAndGetInverse(cpg)(
@@ -122,11 +116,7 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
   }
 
   def passAddsEdgeTo(from: nodes.StoredNode, propValue: String, cpg: Cpg): CpgPass = {
-    val newNode = new nodes.NewNode with DummyProduct {
-      override def containedNodesByLocalName = ???
-      override def label = NodeTypes.UNKNOWN
-      override def properties = Map(NodeKeyNames.CODE -> propValue)
-    }
+    val newNode = nodes.NewUnknown(code = propValue)
     new CpgPass(cpg) {
       override def run(): Iterator[DiffGraph] = {
         val dstGraph = DiffGraph.newBuilder
@@ -140,13 +130,4 @@ class CpgOverlayIntegrationTest extends WordSpec with Matchers {
   /** equivalent of what happens in `CpgPassRunner.createStoreAndApplyOverlay` */
   def fullyConsume(overlay: Iterator[_]): Unit =
     while (overlay.hasNext) overlay.next()
-}
-
-object CpgOverlayIntegrationTest {
-  private trait DummyProduct {
-    def canEqual(that: Any): Boolean = ???
-    def productArity: Int = ???
-    def productElement(n: Int): Any = ???
-    def productElementLabel(n: Int): String = ???
-  }
 }

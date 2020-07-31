@@ -2,7 +2,7 @@ package io.shiftleft.passes
 
 import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.NewNode
+import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import io.shiftleft.SerializedCpg
 import java.util
 import java.lang.{Long => JLong}
@@ -10,7 +10,8 @@ import java.lang.{Long => JLong}
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import overflowdb.Node
-
+import gnu.trove.map.hash.THashMap
+import scala.collection.mutable
 import scala.concurrent.duration.DurationLong
 
 /**
@@ -145,24 +146,12 @@ trait CpgPassBase {
   * */
 case class AppliedDiffGraph(diffGraph: DiffGraph,
                             inverseDiffGraph: Option[DiffGraph],
-                            private val nodeToOdbNode: util.HashMap[IdentityHashWrapper[NewNode], Node]) {
+                            private val nodeToOdbNode: java.util.IdentityHashMap[NewNode, StoredNode]) {
 
   /**
     * Obtain the id this node has in the applied graph
     * */
   def nodeToGraphId(node: NewNode): JLong = {
-    val wrappedNode = IdentityHashWrapper(node)
-    nodeToOdbNode.get(wrappedNode).id2
+    nodeToOdbNode.get(node).id2
   }
-}
-
-private[passes] case class IdentityHashWrapper[T <: AnyRef](value: T) {
-  override def hashCode(): Int = {
-    System.identityHashCode(value)
-  }
-
-  override def equals(other: Any): Boolean =
-    other != null &&
-      other.isInstanceOf[IdentityHashWrapper[T]] &&
-      (this.value eq other.asInstanceOf[IdentityHashWrapper[T]].value)
 }

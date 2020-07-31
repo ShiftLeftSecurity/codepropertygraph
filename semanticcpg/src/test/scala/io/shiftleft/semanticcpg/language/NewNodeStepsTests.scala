@@ -2,19 +2,24 @@ package io.shiftleft.semanticcpg.language
 
 import gremlin.scala._
 import io.shiftleft.OverflowDbTestInstance
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
 import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, ModifierTypes}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.passes.DiffGraph.{EdgeInDiffGraph, EdgeToOriginal}
 import org.scalatest.{Matchers, WordSpec}
+import io.shiftleft.codepropertygraph.generated.NodeKeyNames
+
+import scala.jdk.CollectionConverters._
 
 class NewNodeStepsTest extends WordSpec with Matchers {
   import NewNodeNodeStepsTest._
 
   "stores NewNodes" in {
     implicit val diffGraphBuilder = DiffGraph.newBuilder
-    val newNode = new TestNewNode
+    val newNode = newTestNode()
     new NewNodeSteps(__(newNode)).store
     val diffGraph = diffGraphBuilder.build()
     diffGraph.nodes.toList shouldBe List(newNode)
@@ -22,7 +27,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
 
   "can access the node label" in {
     implicit val diffGraphBuilder = DiffGraph.newBuilder
-    val newNode = new TestNewNode
+    val newNode = newTestNode()
     new NewNodeSteps(__(newNode)).label.l shouldBe List(newNode.label)
   }
 
@@ -30,80 +35,40 @@ class NewNodeStepsTest extends WordSpec with Matchers {
 
     "embedding a StoredNode and a NewNode" in {
       implicit val diffGraphBuilder = DiffGraph.newBuilder
-      val existingContainedNode = Modifier.factory.createNode(OverflowDbTestInstance.create, 42L)
-      existingContainedNode.property(Modifier.PropertyNames.ModifierType, ModifierTypes.NATIVE)
+      val cpg = Cpg.emptyCpg
+      val existingContainedNode = cpg.graph.addNode(42L, "MODIFIER").asInstanceOf[nodes.StoredNode]
+      existingContainedNode.property(NodeKeyNames.MODIFIER_TYPE, ModifierTypes.NATIVE)
+      cpg.graph.V().asScala.toSet shouldBe Set(existingContainedNode)
 
-      val newContainedNode = new TestNewNode
-      val newNode = TestNewNode(containedNodes = List(existingContainedNode, newContainedNode))
+      val newContainedNode = newTestNode()
+      val newNode = newTestNode(containedNodes = List(existingContainedNode, newContainedNode))
       new NewNodeSteps(__(newNode)).store
       val diffGraph = diffGraphBuilder.build
-      diffGraph.nodes.toSet shouldBe Set(newNode, newContainedNode)
-      diffGraph.edgesToOriginal shouldBe List(
-        EdgeToOriginal(
-          src = newNode,
-          dst = existingContainedNode,
-          label = ContainsNode.Label,
-          properties = Seq(
-            (EdgeKeyNames.LOCAL_NAME -> newNode.testContainedLabel),
-            (EdgeKeyNames.INDEX -> (0: Integer))
-          )
-        )
-      )
+      diffGraph.nodes.toSet shouldBe Set(newNode)
+      diffGraph.edges shouldBe Nil
 
-      diffGraph.edges shouldBe List(
-        EdgeInDiffGraph(
-          src = newNode,
-          dst = newContainedNode,
-          label = ContainsNode.Label,
-          properties = Seq(
-            (EdgeKeyNames.LOCAL_NAME -> newNode.testContainedLabel),
-            (EdgeKeyNames.INDEX -> (1: Integer))
-          )
-        )
-      )
+      DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool = None)
+      cpg.graph.V().asScala.length shouldBe 3
     }
 
     "embedding a NewNode recursively" in {
       implicit val diffGraphBuilder = DiffGraph.newBuilder
-      val newContainedNodeL1 = new TestNewNode
-      val newContainedNodeL0 = TestNewNode(containedNodes = List(newContainedNodeL1))
-      val newNode = TestNewNode(containedNodes = List(newContainedNodeL0))
+      val cpg = Cpg.emptyCpg
+      val newContainedNodeL1 = newTestNode()
+      val newContainedNodeL0 = newTestNode(containedNodes = List(newContainedNodeL1))
+      val newNode = newTestNode(containedNodes = List(newContainedNodeL0))
       new NewNodeSteps(__(newNode)).store
       val diffGraph = diffGraphBuilder.build
 
-      diffGraph.nodes.toSet shouldBe Set(newNode, newContainedNodeL0, newContainedNodeL1)
-      diffGraph.edges.toSet shouldBe Set(
-        EdgeInDiffGraph(
-          src = newNode,
-          dst = newContainedNodeL0,
-          label = ContainsNode.Label,
-          properties = Seq(
-            (EdgeKeyNames.LOCAL_NAME -> newNode.testContainedLabel),
-            (EdgeKeyNames.INDEX -> (0: Integer))
-          )
-        ),
-        EdgeInDiffGraph(
-          src = newContainedNodeL0,
-          dst = newContainedNodeL1,
-          label = ContainsNode.Label,
-          properties = Seq(
-            (EdgeKeyNames.LOCAL_NAME -> newNode.testContainedLabel),
-            (EdgeKeyNames.INDEX -> (0: Integer))
-          )
-        )
-      )
+      diffGraph.nodes.toSet shouldBe Set(newNode)
+      diffGraph.edges.toSet shouldBe Set.empty
+      DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool = None)
+      cpg.graph.V().asScala.size shouldBe 3
     }
 
   }
 }
 
 object NewNodeNodeStepsTest {
-
-  case class TestNewNode(containedNodes: List[CpgNode] = Nil) extends NewNode {
-    override val label = "TEST_LABEL"
-    override val properties: Map[String, Any] = Map.empty
-    val testContainedLabel = "testContains"
-    override def containedNodesByLocalName: Map[String, List[CpgNode]] =
-      Map(testContainedLabel -> containedNodes)
-  }
+  def newTestNode(containedNodes: List[CpgNode] = Nil) = nodes.NewFinding(evidence = containedNodes)
 }

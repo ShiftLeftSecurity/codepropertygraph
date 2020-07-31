@@ -51,7 +51,13 @@ message PropertyValue {
     LongList long_list = 10;
     FloatList float_list = 11;
     DoubleList double_list = 12;
+    ContainedRefs contained_refs = 13;
   }
+}
+
+message ContainedRefs {
+  string local_name = 1;
+  repeated int64 refs = 2;
 }
 
 message StringList {
@@ -155,6 +161,7 @@ message DiffGraph {
   message RemoveNodeProperty {
     int64 key = 1;
     NodePropertyName name = 2;
+    string local_name = 3;
   }
 
   message RemoveEdge {
