@@ -18,7 +18,8 @@ class FileNameCompat(cpg: Cpg) extends CpgPass(cpg) {
     val dstGraph = DiffGraph.newBuilder
 
     def updateDefaultFileName(node: nodes.StoredNode with nodes.HasFilename): Unit = {
-      if (node.filename == null) {
+      // When creating nodes via NewNode classes, filename is "", not null.
+      if (node.filename == null || node.filename == "") {
         node.start.file.name.headOption().foreach { name =>
           dstGraph.addNodeProperty(node, "FILENAME", name)
         }
