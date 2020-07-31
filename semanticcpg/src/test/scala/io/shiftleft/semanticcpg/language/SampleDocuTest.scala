@@ -1,18 +1,15 @@
 package io.shiftleft.semanticcpg.language
 
-import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
-import org.scalatest.{Matchers, WordSpec}
+import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
 
-class SampleDocuTest extends WordSpec with Matchers {
+class SampleDocuTest extends CodeToCpgSuite {
 
-  val code = """
+  override val code = """
        int main(int argc, char **argv) { }
     """
 
-  CodeToCpgFixture(code) { cpg =>
-    "should return `main` as the only method" in {
-      cpg.method.name.toSet shouldBe Set("main")
-    }
+  "should return `main` as the only method" in {
+    cpg.method.name.toSet shouldBe Set("main")
   }
 
 }
