@@ -29,8 +29,8 @@ class CMethodTests extends CodeToCpgSuite {
     cpg.method.numberOfLines.l shouldBe List(2)
   }
 
-  "should have correct type signature" in {
-    cpg.method.signature.toSet shouldBe Set("int(int,char * *)")
+  "should have correct method signature" in {
+    cpg.method.signature.toSet shouldBe Set("int main (int,char * *)")
   }
 
   "should return correct number of parameters" in {
