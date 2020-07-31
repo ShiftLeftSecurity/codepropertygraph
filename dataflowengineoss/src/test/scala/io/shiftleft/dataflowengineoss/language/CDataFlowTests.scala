@@ -2,7 +2,7 @@ package io.shiftleft.dataflowengineoss.language
 
 import io.shiftleft.semanticcpg.language._
 
-class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
+class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
 
   override val code =
     """
@@ -63,7 +63,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
     flowsPretty.should(include(tmpSourceFile))
   }
 
-  class CDataFlowTests2 extends DataFlowCodeToCpgFixture {
+  class CDataFlowTests2 extends DataFlowCodeToCpgSuite {
     override val code =
       """
         |struct node {
@@ -115,7 +115,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
     }
   }
 
-  class CDataFlowTests3 extends DataFlowCodeToCpgFixture {
+  class CDataFlowTests3 extends DataFlowCodeToCpgSuite {
     override val code =
       """
         | int method(int y){
@@ -145,7 +145,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
     }
   }
 
-  class CDataFlowTests4 extends DataFlowCodeToCpgFixture {
+  class CDataFlowTests4 extends DataFlowCodeToCpgSuite {
     override val code =
       """
         | void flow(void) {
@@ -184,7 +184,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
     }
   }
 
-  class CDataFlowTests5 extends DataFlowCodeToCpgFixture {
+  class CDataFlowTests5 extends DataFlowCodeToCpgSuite {
     override val code =
       """
         | int flow(int a){
@@ -213,7 +213,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
     }
   }
 
-  class CDataFlowTests6 extends DataFlowCodeToCpgFixture {
+  class CDataFlowTests6 extends DataFlowCodeToCpgSuite {
     override val code =
       """
         | int nested(int a){
@@ -249,7 +249,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
     }
   }
 
-  class CDataFlowTests7 extends DataFlowCodeToCpgFixture {
+  class CDataFlowTests7 extends DataFlowCodeToCpgSuite {
     override val code =
       """
         | int nested(int a){
@@ -294,7 +294,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
     }
   }
 
-  class CDataFlowTests8 extends DataFlowCodeToCpgFixture {
+  class CDataFlowTests8 extends DataFlowCodeToCpgSuite {
     override val code =
       """
         | void param(int x){
@@ -330,7 +330,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
     }
   }
 
-  class CDataFlowTests9 extends DataFlowCodeToCpgFixture {
+  class CDataFlowTests9 extends DataFlowCodeToCpgSuite {
     override val code = """
                           | void param(int x){
                           |    int a = x;
@@ -359,7 +359,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
     }
   }
 
-  class CDataFlowTests10 extends DataFlowCodeToCpgFixture {
+  class CDataFlowTests10 extends DataFlowCodeToCpgSuite {
     override val code =
       """
         | struct node {
@@ -397,7 +397,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
     }
   }
 
-  class CDataFlowTests11 extends DataFlowCodeToCpgFixture {
+  class CDataFlowTests11 extends DataFlowCodeToCpgSuite {
     override val code =
       """
         | void flow(void) {
@@ -430,7 +430,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
     }
   }
 
-  class CDataFlowTests12 extends DataFlowCodeToCpgFixture {
+  class CDataFlowTests12 extends DataFlowCodeToCpgSuite {
     override val code =
       """
       | void flow(void) {
@@ -462,7 +462,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
     }
   }
 
-  class CDataFlowTests13 extends DataFlowCodeToCpgFixture {
+  class CDataFlowTests13 extends DataFlowCodeToCpgSuite {
     override val code =
       """
         | void flow(void) {
@@ -499,7 +499,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
     }
   }
 
-  class CDataFlowTests14 extends DataFlowCodeToCpgFixture {
+  class CDataFlowTests14 extends DataFlowCodeToCpgSuite {
     override val code =
       """
         | int main(int argc, char** argv){
@@ -535,7 +535,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgFixture {
     }
   }
 
-  class CDataFlowTests15 extends DataFlowCodeToCpgFixture {
+  class CDataFlowTests15 extends DataFlowCodeToCpgSuite {
     override val code =
       """
   void foo(bool x, void* y) {

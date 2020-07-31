@@ -2,7 +2,7 @@ package io.shiftleft.dataflowengineoss.language
 
 import io.shiftleft.semanticcpg.language._
 
-class FreeListDataFlowTests extends DataFlowCodeToCpgFixture {
+class FreeListDataFlowTests extends DataFlowCodeToCpgSuite {
 
   override val code = """| #include <stdlib.h>
                 | struct node {

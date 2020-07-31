@@ -1,9 +1,9 @@
 package io.shiftleft.queries
 
-import io.shiftleft.dataflowengineoss.language.DataFlowCodeToCpgFixture
+import io.shiftleft.dataflowengineoss.language.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
-class TruncationsTests extends DataFlowCodeToCpgFixture {
+class TruncationsTests extends DataFlowCodeToCpgSuite {
 
   override val code: String =
     """

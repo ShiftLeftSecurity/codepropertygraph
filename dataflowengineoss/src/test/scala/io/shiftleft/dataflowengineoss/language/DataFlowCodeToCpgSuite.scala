@@ -8,7 +8,7 @@ import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
-class DataFlowCodeToCpgFixture extends CodeToCpgSuite {
+class DataFlowCodeToCpgSuite extends CodeToCpgSuite {
 
   override def passes(cpg: Cpg): Unit = {
     val context = new LayerCreatorContext(cpg)
