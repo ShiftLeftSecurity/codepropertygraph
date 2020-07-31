@@ -1,12 +1,10 @@
 package io.shiftleft.dataflowengineoss.language
 
-import org.scalatest.{Matchers, WordSpec}
-
 import io.shiftleft.semanticcpg.language._
 
-class FreeListDataFlowTests extends WordSpec with Matchers {
+class FreeListDataFlowTests extends DataFlowCodeToCpgSuite {
 
-  val code = """| #include <stdlib.h>
+  override val code = """| #include <stdlib.h>
                 | struct node {
                 | int value;
                 | struct node *next;
@@ -31,27 +29,23 @@ class FreeListDataFlowTests extends WordSpec with Matchers {
              """.stripMargin
 
   "should identify all calls to `free`" in {
-    DataFlowCodeToCpgFixture(code) { cpg =>
-      cpg.call.name("free").code.toSet shouldBe Set("free(p)")
-    }
+    cpg.call.name("free").code.toSet shouldBe Set("free(p)")
   }
 
-  "should find flows to arguments of `free`" in
-    DataFlowCodeToCpgFixture(code) { cpg =>
-      implicit val callResolver = NoResolve
-      val source = cpg.identifier
-      val sink = cpg.method.name("free").parameter.argument
-      sink.reachableByFlows(source).l.size shouldBe 5
-    }
+  "should find flows to arguments of `free`" in {
+    implicit val callResolver = NoResolve
+    val source = cpg.identifier
+    val sink = cpg.method.name("free").parameter.argument
+    sink.reachableByFlows(source).l.size shouldBe 5
+  }
 
-  "should find flows to `free`" in
-    DataFlowCodeToCpgFixture(code) { cpg =>
-      val source = cpg.identifier
-      val sink = cpg.call.name("free")
-      sink.reachableByFlows(source).l.size shouldBe 5
+  "should find flows to `free`" in {
+    val source = cpg.identifier
+    val sink = cpg.call.name("free")
+    sink.reachableByFlows(source).l.size shouldBe 5
 
-      // Sample output
-      """
+    // Sample output
+    """
   _______________________________________________________________________________________________
  | tracked  | lineNumber| method   | file                                                       |
  |==============================================================================================|
@@ -84,16 +78,15 @@ class FreeListDataFlowTests extends WordSpec with Matchers {
  |============================================================================================|
  | free(p)| 11        | free_list| /tmp/dflowtest2108218431997346055/Test1030166153760116596.c|
 )"""
-    }
+  }
 
-  "should find flows from identifiers to return values of `flow`" in
-    DataFlowCodeToCpgFixture(code) { cpg =>
-      val source = cpg.identifier
-      val sink = cpg.method.name("flow").methodReturn
-      sink.reachableByFlows(source).l.size shouldBe 7
+  "should find flows from identifiers to return values of `flow`" in {
+    val source = cpg.identifier
+    val sink = cpg.method.name("flow").methodReturn
+    sink.reachableByFlows(source).l.size shouldBe 7
 
-      // Sample output
-      """
+    // Sample output
+    """
   ____________________________________________________________________________________________
  | tracked  | lineNumber| method| file                                                       |
  |===========================================================================================|
@@ -150,13 +143,12 @@ class FreeListDataFlowTests extends WordSpec with Matchers {
  | RET      | 14        | flow  | /tmp/dflowtest4491306753443006638/Test8956901754875487242.c|
 
     """
-    }
+  }
 
-  "find flows from z to method returns of flow" in
-    DataFlowCodeToCpgFixture(code) { cpg =>
-      val source = cpg.identifier.name("z")
-      val sink = cpg.method.name("flow").methodReturn
-      sink.reachableByFlows(source).l.size shouldBe 2
-    }
+  "find flows from z to method returns of flow" in {
+    val source = cpg.identifier.name("z")
+    val sink = cpg.method.name("flow").methodReturn
+    sink.reachableByFlows(source).l.size shouldBe 2
+  }
 
 }

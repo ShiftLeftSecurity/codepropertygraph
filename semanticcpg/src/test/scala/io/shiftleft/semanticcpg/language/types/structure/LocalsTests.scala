@@ -1,15 +1,14 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
+import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
 
 /**
   * Language primitives for navigating local variables
   * */
-class LocalsTests extends WordSpec with Matchers {
+class LocalsTests extends CodeToCpgSuite {
 
-  val code = """| #include <stdlib.h>
+  override val code = """| #include <stdlib.h>
                     | struct node {
                     | int value;
                     | struct node *next;
@@ -33,24 +32,22 @@ class LocalsTests extends WordSpec with Matchers {
                     |    }
                  """.stripMargin
 
-  CodeToCpgFixture().buildCpg(code) { cpg =>
-    "should allow to query for all locals" in {
-      cpg.local.name.toSet shouldBe Set("a", "b", "c", "z", "x", "q", "p")
-    }
+  "should allow to query for all locals" in {
+    cpg.local.name.toSet shouldBe Set("a", "b", "c", "z", "x", "q", "p")
+  }
 
-    "should allow to query for all locals in method `free_list`" in {
-      cpg.method.name("free_list").local.name.toSet shouldBe Set("q", "p")
-    }
+  "should allow to query for all locals in method `free_list`" in {
+    cpg.method.name("free_list").local.name.toSet shouldBe Set("q", "p")
+  }
 
-    "should prove correct (name, type) pairs for locals" in {
-      cpg.method.name("free_list").local.map(l => (l.name, l.typeFullName)).toSet shouldBe
-        Set(("q", "struct node *"), ("p", "struct node *"))
-    }
+  "should prove correct (name, type) pairs for locals" in {
+    cpg.method.name("free_list").local.map(l => (l.name, l.typeFullName)).toSet shouldBe
+      Set(("q", "struct node *"), ("p", "struct node *"))
+  }
 
-    "should allow finding filenames by local regex" in {
-      val filename = cpg.local.name("a*").file.name.headOption()
-      filename should not be empty
-      filename.head.endsWith(".c") shouldBe true
-    }
+  "should allow finding filenames by local regex" in {
+    val filename = cpg.local.name("a*").file.name.headOption()
+    filename should not be empty
+    filename.head.endsWith(".c") shouldBe true
   }
 }

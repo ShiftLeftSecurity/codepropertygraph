@@ -2,69 +2,69 @@ package io.shiftleft.dataflowengineoss.language
 
 import io.shiftleft.semanticcpg.language._
 
-class CDataFlowTests extends CpgDataFlowTests {
+class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
+
+  override val code =
+    """
+      |
+      | void flows1(FILE *fd, int mode) {
+      |     char buff[40];
+      |
+      |     int sz = 0;
+      |     if (mode == 1) sz = 20;
+      |     if (mode == 2) sz = 200;
+      |     if (mode == 3) sz = 41;
+      |     if (mode == 5) sz = -5;
+      |
+      |     read(fd, buff, sz);
+      | }
+      """.stripMargin
 
   "Test 1: flow from function call read to multiple versions of the same variable" in {
-    DataFlowCodeToCpgFixture(
-      """
-        |
-        | void flows1(FILE *fd, int mode) {
-        |     char buff[40];
-        |
-        |     int sz = 0;
-        |     if (mode == 1) sz = 20;
-        |     if (mode == 2) sz = 200;
-        |     if (mode == 3) sz = 41;
-        |     if (mode == 5) sz = -5;
-        |
-        |     read(fd, buff, sz);
-        | }
-      """.stripMargin
-    ) { cpg =>
-      def source = cpg.identifier.name("sz")
-      def sink = cpg.call.name("read")
-      def flows = sink.reachableByFlows(source)
 
-      flows.size shouldBe 6
+    def source = cpg.identifier.name("sz")
+    def sink = cpg.call.name("read")
+    def flows = sink.reachableByFlows(source)
 
-      flows.map(flowToResultPairs).toSet shouldBe
-        Set(
-          List[(String, Option[Integer])](
-            ("sz = 200", 8),
-            ("read(fd, buff, sz)", 12)
-          ),
-          List[(String, Option[Integer])](
-            ("sz = -5", 10),
-            ("read(fd, buff, sz)", 12)
-          ),
-          List[(String, Option[Integer])](
-            ("sz = 41", 9),
-            ("read(fd, buff, sz)", 12)
-          ),
-          List[(String, Option[Integer])](
-            ("sz = 0", 6),
-            ("read(fd, buff, sz)", 12)
-          ),
-          List[(String, Option[Integer])](
-            ("sz = 20", 7),
-            ("read(fd, buff, sz)", 12)
-          ),
-          List[(String, Option[Integer])](
-            ("read(fd, buff, sz)", 12)
-          )
+    flows.size shouldBe 6
+
+    flows.map(flowToResultPairs).toSet shouldBe
+      Set(
+        List[(String, Option[Integer])](
+          ("sz = 200", 8),
+          ("read(fd, buff, sz)", 12)
+        ),
+        List[(String, Option[Integer])](
+          ("sz = -5", 10),
+          ("read(fd, buff, sz)", 12)
+        ),
+        List[(String, Option[Integer])](
+          ("sz = 41", 9),
+          ("read(fd, buff, sz)", 12)
+        ),
+        List[(String, Option[Integer])](
+          ("sz = 0", 6),
+          ("read(fd, buff, sz)", 12)
+        ),
+        List[(String, Option[Integer])](
+          ("sz = 20", 7),
+          ("read(fd, buff, sz)", 12)
+        ),
+        List[(String, Option[Integer])](
+          ("read(fd, buff, sz)", 12)
         )
+      )
 
-      // pretty printing for flows
-      val flowsPretty = flows.p.mkString
-      flowsPretty.should(include("sz = 20"))
-      flowsPretty.should(include("read(fd, buff, sz)"))
-      val tmpSourceFile = flows.head.elements.head.method.filename
-      flowsPretty.should(include(tmpSourceFile))
-    }
+    // pretty printing for flows
+    val flowsPretty = flows.p.mkString
+    flowsPretty.should(include("sz = 20"))
+    flowsPretty.should(include("read(fd, buff, sz)"))
+    val tmpSourceFile = flows.head.elements.head.method.filename
+    flowsPretty.should(include(tmpSourceFile))
   }
 
-  "Test 2: flow with pointers" in {
-    DataFlowCodeToCpgFixture(
+  class CDataFlowTests2 extends DataFlowCodeToCpgSuite {
+    override val code =
       """
         |struct node {
         | int value;
@@ -78,7 +78,8 @@ class CDataFlowTests extends CpgDataFlowTests {
         | }
         |}
       """.stripMargin
-    ) { cpg =>
+
+    "Test 2: flow with pointers" in {
       implicit val callResolver = NoResolve
       val source = cpg.identifier
       val sink = cpg.method.name("free").parameter.argument
@@ -114,8 +115,8 @@ class CDataFlowTests extends CpgDataFlowTests {
     }
   }
 
-  "Test 3: flow from function call argument" in {
-    DataFlowCodeToCpgFixture(
+  class CDataFlowTests3 extends DataFlowCodeToCpgSuite {
+    override val code =
       """
         | int method(int y){
         |  int a = 10;
@@ -124,7 +125,8 @@ class CDataFlowTests extends CpgDataFlowTests {
         |  }
         | }
       """.stripMargin
-    ) { cpg =>
+
+    "Test 3: flow from function call argument" in {
       implicit val callResolver = NoResolve
       val source = cpg.identifier.name("a")
       val sink = cpg.method.name("foo").parameter.argument
@@ -143,8 +145,8 @@ class CDataFlowTests extends CpgDataFlowTests {
     }
   }
 
-  "Test 4: flow chains from x to a" in {
-    DataFlowCodeToCpgFixture(
+  class CDataFlowTests4 extends DataFlowCodeToCpgSuite {
+    override val code =
       """
         | void flow(void) {
         |   int a = 0x37;
@@ -156,7 +158,8 @@ class CDataFlowTests extends CpgDataFlowTests {
         |   int x = z;
         | }
       """.stripMargin
-    ) { cpg =>
+
+    "Test 4: flow chains from x to a" in {
       val source = cpg.identifier.name("a")
       val sink = cpg.identifier.name("x")
       val flows = sink.reachableByFlows(source).l
@@ -181,15 +184,18 @@ class CDataFlowTests extends CpgDataFlowTests {
     }
   }
 
-  "Test 5: flow from method return to a" in {
-    DataFlowCodeToCpgFixture("""
+  class CDataFlowTests5 extends DataFlowCodeToCpgSuite {
+    override val code =
+      """
         | int flow(int a){
         |   int z = a;
         |   int b = z;
         |
         |   return b;
         | }
-      """.stripMargin) { cpg =>
+      """.stripMargin
+
+    "Test 5: flow from method return to a" in {
       val source = cpg.identifier.name("a")
       val sink = cpg.methodReturn
       val flows = sink.reachableByFlows(source).l
@@ -207,8 +213,9 @@ class CDataFlowTests extends CpgDataFlowTests {
     }
   }
 
-  "Test 6: flow with nested if-statements from method return to a" in {
-    DataFlowCodeToCpgFixture("""
+  class CDataFlowTests6 extends DataFlowCodeToCpgSuite {
+    override val code =
+      """
         | int nested(int a){
         |   int x;
         |   int z = 0x37;
@@ -223,7 +230,9 @@ class CDataFlowTests extends CpgDataFlowTests {
         |
         |   return x;
         | }
-      """.stripMargin) { cpg =>
+      """.stripMargin
+
+    "Test 6: flow with nested if-statements from method return to a" in {
       val source = cpg.identifier.name("a")
       val sink = cpg.methodReturn
       val flows = sink.reachableByFlows(source).l
@@ -240,8 +249,9 @@ class CDataFlowTests extends CpgDataFlowTests {
     }
   }
 
-  "Test 7: flow with nested if-statements from method return to x" in {
-    DataFlowCodeToCpgFixture("""
+  class CDataFlowTests7 extends DataFlowCodeToCpgSuite {
+    override val code =
+      """
         | int nested(int a){
         |   int x;
         |   int z = 0x37;
@@ -256,7 +266,9 @@ class CDataFlowTests extends CpgDataFlowTests {
         |
         |   return x;
         | }
-      """.stripMargin) { cpg =>
+      """.stripMargin
+
+    "Test 7: flow with nested if-statements from method return to x" in {
       val source = cpg.identifier.name("x")
       val sink = cpg.methodReturn
       val flows = sink.reachableByFlows(source).l
@@ -282,14 +294,17 @@ class CDataFlowTests extends CpgDataFlowTests {
     }
   }
 
-  "Test 8: flow chain from function argument of foo to a" in {
-    DataFlowCodeToCpgFixture("""
+  class CDataFlowTests8 extends DataFlowCodeToCpgSuite {
+    override val code =
+      """
         | void param(int x){
         |    int a = x;
         |    int b = a;
         |    int z = foo(b);
         |  }
-      """.stripMargin) { cpg =>
+      """.stripMargin
+
+    "Test 8: flow chain from function argument of foo to a" in {
       implicit val callResolver = NoResolve
       val source = cpg.identifier.name("a")
       val sink = cpg.method.name("foo").parameter.argument
@@ -315,14 +330,16 @@ class CDataFlowTests extends CpgDataFlowTests {
     }
   }
 
-  "Test 9: flow from function foo to a" in {
-    DataFlowCodeToCpgFixture("""
-        | void param(int x){
-        |    int a = x;
-        |    int b = a;
-        |    int z = foo(b);
-        |  }
-      """.stripMargin) { cpg =>
+  class CDataFlowTests9 extends DataFlowCodeToCpgSuite {
+    override val code = """
+                          | void param(int x){
+                          |    int a = x;
+                          |    int b = a;
+                          |    int z = foo(b);
+                          |  }
+      """.stripMargin
+
+    "Test 9: flow from function foo to a" in {
       val source = cpg.identifier.name("a")
       val sink = cpg.call.name("foo")
       val flows = sink.reachableByFlows(source).l
@@ -342,8 +359,9 @@ class CDataFlowTests extends CpgDataFlowTests {
     }
   }
 
-  "Test 10: flow with member access in expression to identifier x" in {
-    DataFlowCodeToCpgFixture("""
+  class CDataFlowTests10 extends DataFlowCodeToCpgSuite {
+    override val code =
+      """
         | struct node {
         | int value1;
         | int value2;
@@ -355,7 +373,9 @@ class CDataFlowTests extends CpgDataFlowTests {
         |  n.value1 = x;
         |  n.value2 = n.value1;
         |}
-      """.stripMargin) { cpg =>
+      """.stripMargin
+
+    "Test 10: flow with member access in expression to identifier x" in {
       val source = cpg.identifier.name("x")
       val sink = cpg.call.code("n.value2 = n.value1")
       val flows = sink.reachableByFlows(source).l
@@ -377,8 +397,8 @@ class CDataFlowTests extends CpgDataFlowTests {
     }
   }
 
-  "Test 11: flow chain from x to literal 0x37" in {
-    DataFlowCodeToCpgFixture(
+  class CDataFlowTests11 extends DataFlowCodeToCpgSuite {
+    override val code =
       """
         | void flow(void) {
         |   int a = 0x37;
@@ -390,7 +410,8 @@ class CDataFlowTests extends CpgDataFlowTests {
         |   int x = z;
         | }
       """.stripMargin
-    ) { cpg =>
+
+    "Test 11: flow chain from x to literal 0x37" in {
       val source = cpg.literal.code("0x37")
       val sink = cpg.identifier.name("x")
       val flows = sink.reachableByFlows(source).l
@@ -409,17 +430,18 @@ class CDataFlowTests extends CpgDataFlowTests {
     }
   }
 
-  "Test 12: flow with short hand assignment operator" in {
-    DataFlowCodeToCpgFixture(
+  class CDataFlowTests12 extends DataFlowCodeToCpgSuite {
+    override val code =
       """
-         | void flow(void) {
-         |    int a = 0x37;
-         |    int b = a;
-         |    int z = b;
-         |    z+=a;
-         | }
+      | void flow(void) {
+      |    int a = 0x37;
+      |    int b = a;
+      |    int z = b;
+      |    z+=a;
+      | }
        """.stripMargin
-    ) { cpg =>
+
+    "Test 12: flow with short hand assignment operator" in {
       val source = cpg.call.code("a = 0x37")
       val sink = cpg.call.code("z\\+=a")
       val flows = sink.reachableByFlows(source).l
@@ -440,8 +462,8 @@ class CDataFlowTests extends CpgDataFlowTests {
     }
   }
 
-  "Test 13: flow after short hand assignment" in {
-    DataFlowCodeToCpgFixture(
+  class CDataFlowTests13 extends DataFlowCodeToCpgSuite {
+    override val code =
       """
         | void flow(void) {
         |    int a = 0x37;
@@ -451,7 +473,8 @@ class CDataFlowTests extends CpgDataFlowTests {
         |    int w = z;
         | }
       """.stripMargin
-    ) { cpg =>
+
+    "Test 13: flow after short hand assignment" in {
       val source = cpg.call.code("a = 0x37")
       val sink = cpg.identifier.name("w")
       val flows = sink.reachableByFlows(source).l
@@ -476,8 +499,8 @@ class CDataFlowTests extends CpgDataFlowTests {
     }
   }
 
-  "Test 14: flow from identifier to method parameter" in {
-    DataFlowCodeToCpgFixture(
+  class CDataFlowTests14 extends DataFlowCodeToCpgSuite {
+    override val code =
       """
         | int main(int argc, char** argv){
         |    int x = argv[1];
@@ -487,7 +510,8 @@ class CDataFlowTests extends CpgDataFlowTests {
         |    return 0;
         | }
       """.stripMargin
-    ) { cpg =>
+
+    "Test 14: flow from identifier to method parameter" in {
       val source = cpg.method.parameter
       val sink = cpg.identifier.name("y")
       val flows = sink.reachableByFlows(source).l
@@ -511,15 +535,16 @@ class CDataFlowTests extends CpgDataFlowTests {
     }
   }
 
-  "Test 15: conditional expressions (joern issue #91)" in {
-    DataFlowCodeToCpgFixture(
+  class CDataFlowTests15 extends DataFlowCodeToCpgSuite {
+    override val code =
       """
   void foo(bool x, void* y) {
     void* z =  x ? f(y) : g(y);
     return;
   }
       """.stripMargin
-    ) { cpg =>
+
+    "Test 15: conditional expressions (joern issue #91)" in {
       val source = cpg.method.parameter.name("y")
       val sink = cpg.identifier.name("z")
       val flows = sink.reachableByFlows(source).l

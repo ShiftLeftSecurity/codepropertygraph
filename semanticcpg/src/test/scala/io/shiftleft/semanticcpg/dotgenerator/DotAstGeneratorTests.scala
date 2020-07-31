@@ -2,11 +2,11 @@ package io.shiftleft.semanticcpg.dotgenerator
 
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
+import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
 
-class DotAstGeneratorTests extends WordSpec with Matchers {
+class DotAstGeneratorTests extends CodeToCpgSuite {
 
-  private val code =
+  override val code =
     """| // A comment
        |int my_func(int x)
        |{
@@ -25,41 +25,40 @@ class DotAstGeneratorTests extends WordSpec with Matchers {
        |""".stripMargin
 
   "An AstDotGenerator" should {
-    CodeToCpgFixture(code) { cpg =>
-      "generate dot graph" in {
-        cpg.method.name("my_func").dotAst.l match {
-          case x :: _ =>
-            x.startsWith("digraph my_func") shouldBe true
-            x.contains("""[label = "(CONTROL_STRUCTURE,if (y > 42))" ]""") shouldBe true
-            x.endsWith("}\n") shouldBe true
-          case _ => fail
-        }
-      }
 
-      "allow selection method" in {
-        cpg.method.name("boop").dotAst.l match {
-          case x :: _ => x.startsWith("digraph boop") shouldBe true
-          case _      => fail
-        }
+    "generate dot graph" in {
+      cpg.method.name("my_func").dotAst.l match {
+        case x :: _ =>
+          x.startsWith("digraph my_func") shouldBe true
+          x.contains("""[label = "(CONTROL_STRUCTURE,if (y > 42))" ]""") shouldBe true
+          x.endsWith("}\n") shouldBe true
+        case _ => fail
       }
-
-      "not include MethodParameterOut nodes" in {
-        cpg.method.name("my_func").dotAst.l match {
-          case x :: _ => x.contains("PARAM_OUT") shouldBe false
-          case _      => fail
-        }
-      }
-
-      "allow plotting sub trees of methods" in {
-        cpg.method.ast.isControlStructure.code(".*y > 42.*").dotAst.l match {
-          case x :: _ =>
-            x.contains("y > 42") shouldBe true
-            x.contains("IDENTIFIER,y") shouldBe true
-            x.contains("x * 2") shouldBe false
-          case _ => fail
-        }
-      }
-
     }
+
+    "allow selection method" in {
+      cpg.method.name("boop").dotAst.l match {
+        case x :: _ => x.startsWith("digraph boop") shouldBe true
+        case _      => fail
+      }
+    }
+
+    "not include MethodParameterOut nodes" in {
+      cpg.method.name("my_func").dotAst.l match {
+        case x :: _ => x.contains("PARAM_OUT") shouldBe false
+        case _      => fail
+      }
+    }
+
+    "allow plotting sub trees of methods" in {
+      cpg.method.ast.isControlStructure.code(".*y > 42.*").dotAst.l match {
+        case x :: _ =>
+          x.contains("y > 42") shouldBe true
+          x.contains("IDENTIFIER,y") shouldBe true
+          x.contains("x * 2") shouldBe false
+        case _ => fail
+      }
+    }
+
   }
 }

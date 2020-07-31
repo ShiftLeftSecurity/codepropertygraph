@@ -1,12 +1,11 @@
 package io.shiftleft.semanticcpg.dotgenerator
 
-import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.testfixtures.CodeToCpgFixture
+import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
 
-class DotCfgGeneratorTests extends WordSpec with Matchers {
+class DotCfgGeneratorTests extends CodeToCpgSuite {
 
-  private val code =
+  override val code =
     """
       |int main(int argc, char **argv) {
       |   int i = 0;
@@ -19,36 +18,35 @@ class DotCfgGeneratorTests extends WordSpec with Matchers {
       |""".stripMargin
 
   "A CfgDotGenerator" should {
-    CodeToCpgFixture(code) { cpg =>
-      "create a dot graph" in {
-        cpg.method.name("main").dotCfg.l match {
-          case x :: _ =>
-            x.startsWith("digraph main {") shouldBe true
-            x.contains("(<operator>.assignment,i = 0)") shouldBe true
-            x.endsWith("}\n") shouldBe true
-          case _ => fail
-        }
-      }
 
-      "not contain IDENTIFIER nodes" in {
-        cpg.method.name("main").dotCfg.l match {
-          case x :: _ =>
-            x.contains("IDENTIFIER") shouldBe false
-          case _ => fail
-        }
+    "create a dot graph" in {
+      cpg.method.name("main").dotCfg.l match {
+        case x :: _ =>
+          x.startsWith("digraph main {") shouldBe true
+          x.contains("(<operator>.assignment,i = 0)") shouldBe true
+          x.endsWith("}\n") shouldBe true
+        case _ => fail
       }
-
-      "contain seven nodes" in {
-        val dotStr = cpg.method.name("main").dotCfg.head
-        dotStr.split("\n").count(x => x.contains("label")) shouldBe 7
-      }
-
-      "contain seven edges" in {
-        val dotStr = cpg.method.name("main").dotCfg.head
-        dotStr.split("\n").count(x => x.contains("->")) shouldBe 7
-      }
-
     }
+
+    "not contain IDENTIFIER nodes" in {
+      cpg.method.name("main").dotCfg.l match {
+        case x :: _ =>
+          x.contains("IDENTIFIER") shouldBe false
+        case _ => fail
+      }
+    }
+
+    "contain seven nodes" in {
+      val dotStr = cpg.method.name("main").dotCfg.head
+      dotStr.split("\n").count(x => x.contains("label")) shouldBe 7
+    }
+
+    "contain seven edges" in {
+      val dotStr = cpg.method.name("main").dotCfg.head
+      dotStr.split("\n").count(x => x.contains("->")) shouldBe 7
+    }
+
   }
 
 }

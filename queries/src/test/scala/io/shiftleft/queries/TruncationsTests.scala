@@ -1,12 +1,11 @@
 package io.shiftleft.queries
 
-import io.shiftleft.dataflowengineoss.language.DataFlowCodeToCpgFixture
-import org.scalatest.{Matchers, WordSpec}
+import io.shiftleft.dataflowengineoss.language.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
-class TruncationsTests extends WordSpec with Matchers {
+class TruncationsTests extends DataFlowCodeToCpgSuite {
 
-  val code: String =
+  override val code: String =
     """
       int vulnerable(char *str) {
         int len;
@@ -19,7 +18,7 @@ class TruncationsTests extends WordSpec with Matchers {
       }
     """
 
-  DataFlowCodeToCpgFixture(code) { cpg =>
+  "truncation test should work" in {
     cpg.call("strlen").inAssignment.target.evalType("(g?)int").method.name.l shouldBe List("vulnerable")
   }
 

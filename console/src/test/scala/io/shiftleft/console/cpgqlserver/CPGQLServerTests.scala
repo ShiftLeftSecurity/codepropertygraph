@@ -20,13 +20,13 @@ class CPGQLServerTests extends WordSpec with Matchers {
 
   def postQuery(host: String, query: String, authHeaderVal: String = validBasicAuthHeaderVal): Value = {
     val postResponse = requests.post(s"$host/query",
-      data = ujson.Obj("query" -> query).toString,
-      headers = Seq("authorization" -> authHeaderVal)
-    )
-    val res = if (postResponse.contents.length > 0)
-      ujson.read(postResponse.contents)
-     else
-      ujson.Obj()
+                                     data = ujson.Obj("query" -> query).toString,
+                                     headers = Seq("authorization" -> authHeaderVal))
+    val res =
+      if (postResponse.contents.length > 0)
+        ujson.read(postResponse.contents)
+      else
+        ujson.Obj()
     res
   }
 
@@ -57,8 +57,8 @@ class CPGQLServerTests extends WordSpec with Matchers {
 
     "disallow posting a query when request headers do not include a valid authentication value" in Fixture() { host =>
       val postQueryResponse = postQuery(host, "1", authHeaderVal = "Basic b4df00d")
-      postQueryResponse.obj.keySet should not contain("success")
-      postQueryResponse.obj.keySet should not contain("uuid")
+      postQueryResponse.obj.keySet should not contain ("success")
+      postQueryResponse.obj.keySet should not contain ("uuid")
     }
 
     "return a valid JSON response when trying to retrieve the result of a query without a connection" in Fixture() {
@@ -109,10 +109,10 @@ class CPGQLServerTests extends WordSpec with Matchers {
       queryResultWSMessage.length should not be (0)
 
       val getResultResponse = getResponse(host, queryUUID, "Basic b4df00d")
-      getResultResponse.obj.keySet should not contain("success")
-      getResultResponse.obj.keySet should not contain("err")
-      getResultResponse.obj.keySet should not contain("stderr")
-      getResultResponse.obj.keySet should not contain("stdout")
+      getResultResponse.obj.keySet should not contain ("success")
+      getResultResponse.obj.keySet should not contain ("err")
+      getResultResponse.obj.keySet should not contain ("stderr")
+      getResultResponse.obj.keySet should not contain ("stdout")
     }
 
     "write a well-formatted message to a websocket connection when a query has finished evaluation" in Fixture() {
@@ -135,7 +135,7 @@ class CPGQLServerTests extends WordSpec with Matchers {
         getResultResponse.obj.keySet should contain("success")
         getResultResponse.obj.keySet should contain("stdout")
         getResultResponse.obj.keySet should contain("stderr")
-        getResultResponse.obj.keySet should not contain("err")
+        getResultResponse.obj.keySet should not contain ("err")
         getResultResponse("uuid").str shouldBe queryResultWSMessage
         getResultResponse("stdout").str shouldBe "res0: Int = 1\n"
         getResultResponse("stderr").str shouldBe ""
@@ -160,7 +160,7 @@ class CPGQLServerTests extends WordSpec with Matchers {
       getResultResponse.obj.keySet should contain("success")
       getResultResponse.obj.keySet should contain("stdout")
       getResultResponse.obj.keySet should contain("stderr")
-      getResultResponse.obj.keySet should not contain("err")
+      getResultResponse.obj.keySet should not contain ("err")
       getResultResponse("success").bool shouldBe true
       getResultResponse("uuid").str shouldBe queryResultWSMessage
       getResultResponse("stdout").str shouldBe ""
