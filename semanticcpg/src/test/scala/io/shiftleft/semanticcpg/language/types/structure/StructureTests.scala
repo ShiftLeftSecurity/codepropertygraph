@@ -1,6 +1,5 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
 
@@ -20,7 +19,7 @@ class StructureTests extends CodeToCpgSuite {
   }
 
   "should allow traversing to namespaces" in {
-    cpg.file.namespace.name("<global>").l.size shouldBe 1
+    cpg.file.namespace.name("<global>").l.size shouldBe 2
   }
 
   "should allow traversing to type declarations" in {

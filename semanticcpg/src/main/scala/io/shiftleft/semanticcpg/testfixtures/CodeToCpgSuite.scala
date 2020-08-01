@@ -4,7 +4,6 @@ import java.io.{File, PrintWriter}
 import java.nio.file.Files
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
 import io.shiftleft.semanticcpg.testfixtures.LanguageFrontend.FuzzycFrontend
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
@@ -27,9 +26,7 @@ class CodeToCpgSuite extends WordSpec with Matchers with BeforeAndAfterAll {
   }
 
   private def buildCpgForDir[T](dir: File): Unit = {
-    val cpgFile = frontend.execute(dir)
-    val config = CpgLoaderConfig.withoutOverflow
-    cpg = CpgLoader.load(cpgFile.getAbsolutePath, config)
+    cpg = frontend.execute(dir)
     passes(cpg)
   }
 

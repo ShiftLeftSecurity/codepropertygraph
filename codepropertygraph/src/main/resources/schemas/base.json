@@ -480,7 +480,44 @@
 	     {"name": "JUMP_TARGET"},
 	     {"name": "CONTROL_STRUCTURE"},
 	     {"name": "UNKNOWN"}
-           ]}
+           ]},
+	   {"edgeName": "DOMINATE", "inNodes": [
+             {"name": "CALL"},
+             {"name": "IDENTIFIER"},
+             {"name": "FIELD_IDENTIFIER"},
+             {"name": "LITERAL"},
+             {"name": "RETURN"},
+             {"name": "METHOD_REF"},
+             {"name": "BLOCK"},
+	     {"name": "JUMP_TARGET"},
+	     {"name": "CONTROL_STRUCTURE"},
+	     {"name": "UNKNOWN"}
+           ]},
+	   {"edgeName": "POST_DOMINATE", "inNodes": [
+             {"name": "CALL"},
+             {"name": "IDENTIFIER"},
+             {"name": "FIELD_IDENTIFIER"},
+             {"name": "LITERAL"},
+             {"name": "RETURN"},
+             {"name": "METHOD_REF"},
+             {"name": "BLOCK"},
+	     {"name": "JUMP_TARGET"},
+	     {"name": "CONTROL_STRUCTURE"},
+	     {"name": "UNKNOWN"}
+           ]},
+             {"edgeName": "CDG", "inNodes": [
+              {"name": "CALL"},
+              {"name": "IDENTIFIER"},
+              {"name": "FIELD_IDENTIFIER"},
+              {"name": "LITERAL"},
+              {"name": "METHOD_REF"},
+              {"name": "RETURN"},
+              {"name": "BLOCK"},
+              {"name": "METHOD_RETURN"},
+	      {"name" : "CONTROL_STRUCTURE"},
+	      {"name" : "JUMP_TARGET"},
+	      {"name": "UNKNOWN"}
+            ]}
 	 ]
 	},
 

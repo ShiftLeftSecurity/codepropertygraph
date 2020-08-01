@@ -114,14 +114,7 @@ class Method(val wrapped: NodeSteps[nodes.Method]) extends AnyVal {
     * Traverse to the methods local variables
     * */
   @Doc("Local variables declared in the method")
-  def local: NodeSteps[nodes.Local] =
-    new NodeSteps(
-      raw
-        .out(EdgeTypes.CONTAINS)
-        .hasLabel(NodeTypes.BLOCK)
-        .out(EdgeTypes.AST)
-        .hasLabel(NodeTypes.LOCAL)
-        .cast[nodes.Local])
+  def local: NodeSteps[nodes.Local] = block.ast.isLocal
 
   /**
     * Traverse to literals of method
