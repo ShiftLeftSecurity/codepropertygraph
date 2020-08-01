@@ -36,7 +36,6 @@ class FreeListDataFlowTests extends DataFlowCodeToCpgSuite {
     implicit val callResolver = NoResolve
     val source = cpg.identifier
     val sink = cpg.method.name("free").parameter.argument
-    cpg.method.name("free_list").dotCfg.foreach(println(_))
     sink.reachableByFlows(source).l.size shouldBe 5
   }
 
