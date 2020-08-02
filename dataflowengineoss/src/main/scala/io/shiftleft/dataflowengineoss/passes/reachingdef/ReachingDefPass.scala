@@ -9,7 +9,7 @@ import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
-import overflowdb.{Node, OdbEdge, OdbGraph}
+import overflowdb.{Node, OdbGraph}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
