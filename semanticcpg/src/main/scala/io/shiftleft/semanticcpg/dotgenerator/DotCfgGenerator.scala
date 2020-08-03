@@ -8,18 +8,12 @@ import scala.jdk.CollectionConverters._
 
 object DotCfgGenerator {
 
-  def toDotCfg[T <: nodes.CfgNode](step: NodeSteps[T]): Steps[String] = step.map(dotCfg)
+  def toDotCfg(step: NodeSteps[nodes.Method]): Steps[String] = step.map(dotCfg)
 
-  def dotCfg(cfgRoot: nodes.CfgNode): String = {
-    cfgRoot match {
-      case method: nodes.Method =>
-        val sb = Shared.namedGraphBegin(method)
-        sb.append(nodesAndEdges(method).mkString("\n"))
-        Shared.graphEnd(sb)
-      case _ =>
-        System.err.println("dotCfg only makes sense for methods")
-        ""
-    }
+  def dotCfg(method: nodes.Method): String = {
+    val sb = Shared.namedGraphBegin(method)
+    sb.append(nodesAndEdges(method).mkString("\n"))
+    Shared.graphEnd(sb)
   }
 
   private def nodesAndEdges(methodNode: nodes.Method): List[String] = {

@@ -226,7 +226,7 @@ package object language extends operatorextension.Implicits {
   implicit def toAstNodeDot[NodeType <: nodes.AstNode](steps: Steps[NodeType]): AstNodeDot[NodeType] =
     new AstNodeDot(steps)
 
-  implicit def toCfgNodeDot[NodeType <: nodes.CfgNode](steps: Steps[NodeType]): CfgNodeDot[NodeType] =
+  implicit def toCfgNodeDot(steps: Steps[nodes.Method]): CfgNodeDot =
     new CfgNodeDot(steps)
 
   implicit def toNodeSteps[NodeType <: nodes.StoredNode](original: Steps[NodeType]): NodeSteps[NodeType] =
