@@ -2,59 +2,18 @@ package io.shiftleft.semanticcpg.dotgenerator
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import overflowdb.Node
 
 import scala.jdk.CollectionConverters._
 
 object DotCfgGenerator {
 
-  def toDotCfg(step: NodeSteps[nodes.Method]): Steps[String] = step.map(dotCfg)
+  def toDotCfg(step: NodeSteps[nodes.Method]): Steps[String] = step.map(Shared.dotGraph(_, expand))
 
-  def dotCfg(method: nodes.Method): String = {
-    val sb = Shared.namedGraphBegin(method)
-    sb.append(nodesAndEdges(method).mkString("\n"))
-    Shared.graphEnd(sb)
-  }
-
-  private def nodesAndEdges(methodNode: nodes.Method): List[String] = {
-
-    def shouldBeDisplayed(v: Node): Boolean = !(
-      v.isInstanceOf[nodes.Literal] ||
-        v.isInstanceOf[nodes.Identifier] ||
-        v.isInstanceOf[nodes.Block] ||
-        v.isInstanceOf[nodes.ControlStructure] ||
-        v.isInstanceOf[nodes.JumpTarget]
-    )
-
-    val vertices = methodNode.start.cfgNode.l ++ List(methodNode, methodNode.methodReturn)
-    val verticesToDisplay = vertices.filter(shouldBeDisplayed)
-
-    def visibleNeighbors(v: nodes.CfgNode, visited: List[nodes.StoredNode] = List()): List[nodes.StoredNode] = {
-      if (visited.contains(v)) {
-        List()
-      } else {
-        val children = v._cfgOut().asScala.filter(vertices.contains)
-        val (visible, invisible) = children.partition(shouldBeDisplayed)
-        visible.toList ++ invisible.toList.flatMap { n =>
-          visibleNeighbors(n.asInstanceOf[nodes.CfgNode], visited ++ List(v))
-        }
-      }
-    }
-
-    val edges = verticesToDisplay.map { v =>
-      (v.id2, visibleNeighbors(v).map(_.id2))
-    }
-
-    val nodeStrings = verticesToDisplay.map { node =>
-      s""""${node.id2}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
-    }
-
-    val edgeStrings = edges.flatMap {
-      case (id, childIds) =>
-        childIds.map(childId => s"""  "$id" -> "$childId"  """)
-    }
-
-    nodeStrings ++ edgeStrings
+  protected def expand(v: nodes.CfgNode): Iterator[nodes.CfgNode] = {
+    v._cfgOut()
+      .asScala
+      .filter(_.isInstanceOf[nodes.CfgNode])
+      .map(_.asInstanceOf[nodes.CfgNode])
   }
 
 }

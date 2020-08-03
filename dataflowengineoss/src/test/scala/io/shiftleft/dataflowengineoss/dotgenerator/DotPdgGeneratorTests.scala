@@ -1,15 +1,18 @@
 package io.shiftleft.dataflowengineoss.dotgenerator
 
-import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
+import io.shiftleft.dataflowengineoss.language.DataFlowCodeToCpgSuite
+import io.shiftleft.semanticcpg.language._
+import io.shiftleft.dataflowengineoss.language._
 
-class DotPdgGeneratorTests extends CodeToCpgSuite {
+class DotPdgGeneratorTests extends DataFlowCodeToCpgSuite {
 
   override val code =
     """
       |int foo(int param1, char *param2) {
       |   int i = 0;
       |   while(i < 10) {
-      |     printf("Hello World");
+      |     char *boo = moo("%d\n", i + bar(i));
+      |     printf(boo);
       |     i++;
       |   }
       |   return 0;
@@ -18,7 +21,11 @@ class DotPdgGeneratorTests extends CodeToCpgSuite {
 
   "A CfgDotGenerator" should {
 
-    "create a dot graph" in {}
+    "create a dot graph" in {
+
+      cpg.method.name("foo").dotPdg.l.foreach(println)
+
+    }
   }
 
 }

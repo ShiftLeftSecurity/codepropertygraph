@@ -24,7 +24,7 @@ class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
     dstGraph = DiffGraph.newBuilder
 
     semantics.elements.foreach { semantic =>
-      cpg.method.fullName(semantic.methodFullName).headOption.foreach { method =>
+      cpg.method.fullNameExact(semantic.methodFullName).headOption.foreach { method =>
         addSelfDefSemantic(method, semantic.parameterIndex)
       }
     }

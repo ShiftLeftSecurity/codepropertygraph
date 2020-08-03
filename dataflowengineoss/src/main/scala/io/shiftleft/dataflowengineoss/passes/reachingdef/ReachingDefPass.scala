@@ -9,7 +9,7 @@ import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
-import overflowdb.{Node, OdbEdge, OdbGraph}
+import overflowdb.{Node, OdbGraph}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -19,32 +19,42 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
 
-  override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
-    val worklist = mutable.Set.empty[nodes.CfgNode]
+  private def initOut(allCfgNodes : List[nodes.CfgNode], mapExpressionsGens : Map[nodes.StoredNode, Set[nodes.StoredNode]], method : nodes.Method) = {
     var out = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
-    var in = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
-    val allCfgNodes = method.cfgNode.to(List)
 
-    val mapExpressionsGens = dfHelper.expressionsToGenMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
-    val mapExpressionsKills = dfHelper.expressionsToKillMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
-
-    /*Initialize the OUT sets*/
     allCfgNodes.foreach { cfgNode =>
       if (mapExpressionsGens.contains(cfgNode)) {
         out += cfgNode -> mapExpressionsGens(cfgNode)
       }
     }
 
-    worklist ++= allCfgNodes
+    out
+  }
 
+  private def initIn(): Map[StoredNode, Set[StoredNode]] = {
+    Map.empty[nodes.StoredNode, Set[nodes.StoredNode]]
+      .withDefaultValue(Set.empty[nodes.StoredNode])
+  }
+
+  override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
+    val dstGraph = DiffGraph.newBuilder
+    val worklist = mutable.Set.empty[nodes.CfgNode]
+
+    val allCfgNodes = method.cfgNode.toList ++ List(method)
+    val mapExpressionsGens = dfHelper.methodToGenMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
+    val mapExpressionsKills = dfHelper.methodToKillMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
+
+    var out = initOut(allCfgNodes, mapExpressionsGens, method)
+    var in = initIn()
+
+    worklist ++= allCfgNodes
     while (worklist.nonEmpty) {
       val currentCfgNode = worklist.head
       worklist -= currentCfgNode
 
       var inSet = Set.empty[nodes.StoredNode]
 
-      currentCfgNode._cfgIn.asScala.foreach { cfgPredecessor =>
+      currentCfgNode.start.cfgPrev.foreach { cfgPredecessor =>
         inSet ++= inSet.union(out(cfgPredecessor))
       }
 
@@ -58,7 +68,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       val newSize = out(currentCfgNode).size
 
       if (oldSize != newSize)
-        worklist ++= currentCfgNode._cfgOut.asScala.collect { case cfgNode: nodes.CfgNode => cfgNode }
+        worklist ++= currentCfgNode.start.cfgNext.l
     }
 
     addReachingDefEdge(dstGraph, method, out, in)
@@ -257,7 +267,7 @@ class DataFlowFrameworkHelper {
     node.map(v => killsVertices(v)).fold(Set())((v1, v2) => v1.union(v2))
   }
 
-  def expressionsToKillMap(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
+  def methodToKillMap(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
     val genExpressions = getExpressions(method)
 
     genExpressions.map { expression =>
@@ -266,12 +276,13 @@ class DataFlowFrameworkHelper {
     }.toMap
   }
 
-  def expressionsToGenMap(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
+  def methodToGenMap(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
     /*genExpressions correspond to call assignment nodes*/
     val genExpressions = getExpressions(method)
-    genExpressions.map { genExpression =>
+    val ret: Map[nodes.StoredNode, Set[StoredNode]] = genExpressions.map { genExpression =>
       genExpression -> getGensOfExpression(genExpression)
     }.toMap
+    ret + (method -> ret.values.to(List).reduceOption((x,y) => x.union(y)).getOrElse(Set()))
   }
 
   def getOperation(node: nodes.StoredNode): Option[nodes.StoredNode] = {
