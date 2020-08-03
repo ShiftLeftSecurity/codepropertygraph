@@ -1,6 +1,7 @@
 package io.shiftleft.dataflowengineoss
 
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.dataflowengineoss.language.dotextension.PdgNodeDot
 import io.shiftleft.dataflowengineoss.language.nodemethods.TrackingPointMethods
 import io.shiftleft.semanticcpg.language.Steps
 import io.shiftleft.semanticcpg.language._
@@ -26,5 +27,8 @@ package object language {
 
   implicit def trackingPointToAstBase(steps: NodeSteps[nodes.TrackingPoint]): AstNode[nodes.AstNode] =
     new AstNode(steps.map(trackingPointToAstNode))
+
+  implicit def toPdgNodeDot(steps: Steps[nodes.Method]): PdgNodeDot =
+    new PdgNodeDot(steps)
 
 }
