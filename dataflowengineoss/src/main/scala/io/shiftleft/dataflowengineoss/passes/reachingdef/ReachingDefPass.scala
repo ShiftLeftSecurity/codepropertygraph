@@ -25,17 +25,17 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val allCfgNodes = method.cfgNode.toList ++ List(entryNode, exitNode)
     val nodeToGens = methodToGenMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
     val nodeToKills = methodToKillMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
-    var out: Map[nodes.StoredNode, Set[nodes.StoredNode]] =
+    var out: Map[nodes.CfgNode, Set[nodes.StoredNode]] =
       allCfgNodes
         .filter(nodeToGens.contains)
         .map { cfgNode =>
-          cfgNode.asInstanceOf[nodes.StoredNode] -> nodeToGens(cfgNode)
+          cfgNode -> nodeToGens(cfgNode)
         }
         .toMap
         .withDefaultValue(Set.empty[nodes.StoredNode])
 
     var in = Map
-      .empty[nodes.StoredNode, Set[nodes.StoredNode]]
+      .empty[nodes.CfgNode, Set[nodes.StoredNode]]
       .withDefaultValue(Set.empty[nodes.StoredNode])
 
     val worklist = mutable.Set.empty[nodes.CfgNode]
@@ -65,20 +65,22 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     }
 
     val dstGraph = DiffGraph.newBuilder
-    addReachingDefEdge(dstGraph, method, out, in)
+    addReachingDefEdges(dstGraph, method, out, in)
     Iterator(dstGraph.build())
   }
 
   /** Pruned DDG, i.e., two call assignment nodes are adjacent if a
     * reaching definition edge reaches a node where the definition is used.
     * The final representation makes it straightforward to build def-use/use-def chains */
-  private def addReachingDefEdge(dstGraph: DiffGraph.Builder,
-                                 method: nodes.Method,
-                                 outSet: Map[nodes.StoredNode, Set[nodes.StoredNode]],
-                                 inSet: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Unit = {
+  private def addReachingDefEdges(dstGraph: DiffGraph.Builder,
+                                  method: nodes.Method,
+                                  outSet: Map[nodes.CfgNode, Set[nodes.StoredNode]],
+                                  inSet: Map[nodes.CfgNode, Set[nodes.StoredNode]]): Unit = {
 
-    def addEdge(fromNode: nodes.StoredNode, toNode: nodes.StoredNode): Unit =
-      dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF)
+    def addEdge(fromNode: nodes.StoredNode, toNode: nodes.StoredNode, variable: Option[String] = None): Unit = {
+      val properties = List((EdgeKeyNames.VARIABLE, variable))
+      dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF, properties)
+    }
 
     for {
       methodParameterIn <- method._methodParameterInViaAstOut
