@@ -19,31 +19,14 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
 
-  private def initOut(allCfgNodes : List[nodes.CfgNode], mapExpressionsGens : Map[nodes.StoredNode, Set[nodes.StoredNode]], method : nodes.Method) = {
-    var out = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
-
-    allCfgNodes.foreach { cfgNode =>
-      if (mapExpressionsGens.contains(cfgNode)) {
-        out += cfgNode -> mapExpressionsGens(cfgNode)
-      }
-    }
-
-    out
-  }
-
-  private def initIn(): Map[StoredNode, Set[StoredNode]] = {
-    Map.empty[nodes.StoredNode, Set[nodes.StoredNode]]
-      .withDefaultValue(Set.empty[nodes.StoredNode])
-  }
-
   override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
+
     val worklist = mutable.Set.empty[nodes.CfgNode]
 
     val allCfgNodes = method.cfgNode.toList ++ List(method)
     val mapExpressionsGens = dfHelper.methodToGenMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
     val mapExpressionsKills = dfHelper.methodToKillMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
-
     var out = initOut(allCfgNodes, mapExpressionsGens, method)
     var in = initIn()
 
@@ -75,6 +58,27 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     Iterator(dstGraph.build())
   }
 
+  private def initOut(allCfgNodes: List[nodes.CfgNode],
+                      mapExpressionsGens: Map[nodes.StoredNode, Set[nodes.StoredNode]],
+                      method: nodes.Method) = {
+    var out = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
+
+    allCfgNodes.foreach { cfgNode =>
+      if (mapExpressionsGens.contains(cfgNode)) {
+        out += cfgNode -> mapExpressionsGens(cfgNode)
+      }
+    }
+
+    out += method -> Set()
+    out
+  }
+
+  private def initIn(): Map[StoredNode, Set[StoredNode]] = {
+    Map
+      .empty[nodes.StoredNode, Set[nodes.StoredNode]]
+      .withDefaultValue(Set.empty[nodes.StoredNode])
+  }
+
   /** Pruned DDG, i.e., two call assignment nodes are adjacent if a
     * reaching definition edge reaches a node where the definition is used.
     * The final representation makes it straightforward to build def-use/use-def chains */
@@ -101,9 +105,14 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       case (ret: nodes.Return, _) =>
         ret._astOut.asScala.foreach { returnExpr =>
           val localRef = reference(returnExpr)
-          inSet(ret).filter(inElement => localRef == reference(inElement)).foreach { filteredInElement =>
-            dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, ret))
-          }
+          inSet(ret)
+            .filter(inElement => localRef == reference(inElement))
+            .toList
+            .flatMap { filteredInElement =>
+              dfHelper.getExpressionFromGen(filteredInElement).map(addEdge(_, ret))
+            }
+            .headOption
+            .getOrElse(addEdge(method, ret))
         }
       case _ => // ignore
     }
@@ -111,6 +120,10 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     def handleCall(call: Call, outDefs: Set[StoredNode]) = {
       val usesInExpression = dfHelper.getUsesOfExpression(call)
       val localRefsUses = usesInExpression.map(reference).filter(_ != None)
+
+      if (inSet(call).isEmpty) {
+        addEdge(method, call)
+      }
 
       /* if use is not an identifier, add edge, as we are going to visit the use separately */
       usesInExpression.foreach { use =>
@@ -282,7 +295,7 @@ class DataFlowFrameworkHelper {
     val ret: Map[nodes.StoredNode, Set[StoredNode]] = genExpressions.map { genExpression =>
       genExpression -> getGensOfExpression(genExpression)
     }.toMap
-    ret + (method -> ret.values.to(List).reduceOption((x,y) => x.union(y)).getOrElse(Set()))
+    ret + (method -> ret.values.to(List).reduceOption((x, y) => x.union(y)).getOrElse(Set()))
   }
 
   def getOperation(node: nodes.StoredNode): Option[nodes.StoredNode] = {
