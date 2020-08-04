@@ -77,8 +77,8 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
                                   outSet: Map[nodes.CfgNode, Set[nodes.StoredNode]],
                                   inSet: Map[nodes.CfgNode, Set[nodes.StoredNode]]): Unit = {
 
-    def addEdge(fromNode: nodes.StoredNode, toNode: nodes.StoredNode, variable: Option[String] = None): Unit = {
-      val properties = List((EdgeKeyNames.VARIABLE, variable.getOrElse("")))
+    def addEdge(fromNode: nodes.StoredNode, toNode: nodes.StoredNode, variable: String = ""): Unit = {
+      val properties = List((EdgeKeyNames.VARIABLE, variable))
       dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF, properties)
     }
 
@@ -86,7 +86,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       methodParameterIn <- method._methodParameterInViaAstOut
       refInIdentifier <- methodParameterIn._refIn.asScala
       operationNode <- getOperation(refInIdentifier)
-    } addEdge(methodParameterIn, operationNode)
+    } addEdge(methodParameterIn, operationNode, methodParameterIn.name)
 
     val methodReturn = method.methodReturn
     methodReturn.toReturn.foreach(returnNode => addEdge(returnNode, methodReturn))
@@ -143,7 +143,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
         inSet(call)
           .filter(inElement => localRefGens.contains(reference(inElement)))
           .foreach { filteredInElement =>
-            getExpressionFromGen(filteredInElement).foreach(addEdge(_, call))
+            getExpressionFromGen(filteredInElement).foreach(x => addEdge(x, call))
           }
       }
 
@@ -152,7 +152,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
         getExpressionFromGen(elem).foreach { expressionOfElement =>
           if (expressionOfElement != call && localRefsUses.contains(localRefGen)) {
-            addEdge(expressionOfElement, call)
+            addEdge(expressionOfElement, call, elem.asInstanceOf[nodes.CfgNode].code)
           }
         }
       }
