@@ -1,7 +1,5 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import java.nio.file.Paths
-
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
@@ -9,26 +7,38 @@ import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
-import overflowdb.{Node, OdbGraph}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
-  val dfHelper = new DataFlowFrameworkHelper
+
+  import DataFlowFrameworkHelper._
 
   override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
 
   override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
+
+    val entryNode = method
+    val exitNode = method.methodReturn
 
     val worklist = mutable.Set.empty[nodes.CfgNode]
 
-    val allCfgNodes = method.cfgNode.toList ++ List(method)
-    val mapExpressionsGens = dfHelper.methodToGenMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
-    val mapExpressionsKills = dfHelper.methodToKillMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
-    var out = initOut(allCfgNodes, mapExpressionsGens, method)
-    var in = initIn()
+    val allCfgNodes = method.cfgNode.toList ++ List(entryNode, exitNode)
+    val mapExpressionsGens = methodToGenMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
+    val mapExpressionsKills = methodToKillMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
+    var out: Map[nodes.StoredNode, Set[nodes.StoredNode]] =
+      allCfgNodes
+        .filter(mapExpressionsGens.contains)
+        .map { cfgNode =>
+          cfgNode.asInstanceOf[nodes.StoredNode] -> mapExpressionsGens(cfgNode)
+        }
+        .toMap
+        .withDefaultValue(Set.empty[nodes.StoredNode])
+
+    var in = Map
+      .empty[nodes.StoredNode, Set[nodes.StoredNode]]
+      .withDefaultValue(Set.empty[nodes.StoredNode])
 
     worklist ++= allCfgNodes
     while (worklist.nonEmpty) {
@@ -54,29 +64,9 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
         worklist ++= currentCfgNode.start.cfgNext.l
     }
 
+    val dstGraph = DiffGraph.newBuilder
     addReachingDefEdge(dstGraph, method, out, in)
     Iterator(dstGraph.build())
-  }
-
-  private def initOut(allCfgNodes: List[nodes.CfgNode],
-                      mapExpressionsGens: Map[nodes.StoredNode, Set[nodes.StoredNode]],
-                      method: nodes.Method) = {
-    var out = Map.empty[nodes.StoredNode, Set[nodes.StoredNode]].withDefaultValue(Set.empty[nodes.StoredNode])
-
-    allCfgNodes.foreach { cfgNode =>
-      if (mapExpressionsGens.contains(cfgNode)) {
-        out += cfgNode -> mapExpressionsGens(cfgNode)
-      }
-    }
-
-    out += method -> Set()
-    out
-  }
-
-  private def initIn(): Map[StoredNode, Set[StoredNode]] = {
-    Map
-      .empty[nodes.StoredNode, Set[nodes.StoredNode]]
-      .withDefaultValue(Set.empty[nodes.StoredNode])
   }
 
   /** Pruned DDG, i.e., two call assignment nodes are adjacent if a
@@ -93,7 +83,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     for {
       methodParameterIn <- method._methodParameterInViaAstOut
       refInIdentifier <- methodParameterIn._refIn.asScala
-      operationNode <- dfHelper.getOperation(refInIdentifier)
+      operationNode <- getOperation(refInIdentifier)
     } addEdge(methodParameterIn, operationNode)
 
     val methodReturn = method.methodReturn
@@ -109,7 +99,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
             .filter(inElement => localRef == reference(inElement))
             .toList
             .flatMap { filteredInElement =>
-              dfHelper.getExpressionFromGen(filteredInElement).map(addEdge(_, ret))
+              getExpressionFromGen(filteredInElement).map(addEdge(_, ret))
             }
             .headOption
             .getOrElse(addEdge(method, ret))
@@ -118,7 +108,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     }
 
     def handleCall(call: Call, outDefs: Set[StoredNode]) = {
-      val usesInExpression = dfHelper.getUsesOfExpression(call)
+      val usesInExpression = getUsesOfExpression(call)
       val localRefsUses = usesInExpression.map(reference).filter(_ != None)
 
       if (inSet(call).isEmpty) {
@@ -147,18 +137,18 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       }
 
       if (isOperationAndAssignment(call)) {
-        val localRefGens = dfHelper.getGensOfExpression(call).map(reference)
+        val localRefGens = getGensOfExpression(call).map(reference)
         inSet(call)
           .filter(inElement => localRefGens.contains(reference(inElement)))
           .foreach { filteredInElement =>
-            dfHelper.getExpressionFromGen(filteredInElement).foreach(addEdge(_, call))
+            getExpressionFromGen(filteredInElement).foreach(addEdge(_, call))
           }
       }
 
       for (elem <- outDefs) {
         val localRefGen = reference(elem)
 
-        dfHelper.getExpressionFromGen(elem).foreach { expressionOfElement =>
+        getExpressionFromGen(elem).foreach { expressionOfElement =>
           if (expressionOfElement != call && localRefsUses.contains(localRefGen)) {
             addEdge(expressionOfElement, call)
           }
@@ -169,35 +159,6 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   private def reference(node: nodes.StoredNode): Option[nodes.StoredNode] =
     node._refOut.nextOption
-
-  def toDot(graph: OdbGraph): String = {
-    val buf = new StringBuffer()
-
-    buf.append("digraph g {\n node[shape=plaintext];\n")
-
-    graph.edges(EdgeTypes.REACHING_DEF).asScala.foreach { e =>
-      val inV = nodeToStr(e.inNode).replace("\"", "\'")
-      val outV = nodeToStr(e.outNode).replace("\"", "\'")
-      buf.append(s""" "$outV" -> "$inV";\n """)
-    }
-    buf.append("}")
-    buf.toString
-  }
-
-  /** For debug purposes */
-  def nodeToStr(node: Node): String = {
-    try {
-      val method = ExpandTo.expressionToMethod(node.asInstanceOf[nodes.Expression])
-      val fileName = ExpandTo.methodToFile(method) match {
-        case Some(objFile) => objFile.name
-        case None          => "NA"
-      }
-
-      s"${Paths.get(fileName).getFileName.toString}: ${node.property2(NodeKeyNames.LINE_NUMBER)} ${node.property2(NodeKeyNames.CODE)}"
-    } catch {
-      case _: Exception => ""
-    }
-  }
 
   private def isOperationAndAssignment(call: nodes.Call): Boolean = {
     call.name match {
@@ -226,7 +187,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 }
 
 /** Common functionalities needed for data flow frameworks */
-class DataFlowFrameworkHelper {
+object DataFlowFrameworkHelper {
 
   private def callToMethodParamOut(call: nodes.StoredNode): Iterable[nodes.StoredNode] = {
     NoResolve
