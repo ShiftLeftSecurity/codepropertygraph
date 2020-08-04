@@ -6,7 +6,7 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
+import io.shiftleft.semanticcpg.utils.MemberAccess
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -22,16 +22,14 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val entryNode = method
     val exitNode = method.methodReturn
 
-    val worklist = mutable.Set.empty[nodes.CfgNode]
-
     val allCfgNodes = method.cfgNode.toList ++ List(entryNode, exitNode)
-    val mapExpressionsGens = methodToGenMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
-    val mapExpressionsKills = methodToKillMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
+    val nodeToGens = methodToGenMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
+    val nodeToKills = methodToKillMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
     var out: Map[nodes.StoredNode, Set[nodes.StoredNode]] =
       allCfgNodes
-        .filter(mapExpressionsGens.contains)
+        .filter(nodeToGens.contains)
         .map { cfgNode =>
-          cfgNode.asInstanceOf[nodes.StoredNode] -> mapExpressionsGens(cfgNode)
+          cfgNode.asInstanceOf[nodes.StoredNode] -> nodeToGens(cfgNode)
         }
         .toMap
         .withDefaultValue(Set.empty[nodes.StoredNode])
@@ -40,22 +38,24 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       .empty[nodes.StoredNode, Set[nodes.StoredNode]]
       .withDefaultValue(Set.empty[nodes.StoredNode])
 
+    val worklist = mutable.Set.empty[nodes.CfgNode]
     worklist ++= allCfgNodes
     while (worklist.nonEmpty) {
       val currentCfgNode = worklist.head
       worklist -= currentCfgNode
 
-      var inSet = Set.empty[nodes.StoredNode]
-
-      currentCfgNode.start.cfgPrev.foreach { cfgPredecessor =>
-        inSet ++= inSet.union(out(cfgPredecessor))
-      }
+      val inSet = currentCfgNode.start.cfgPrev
+        .map { cfgPredecessor =>
+          out(cfgPredecessor)
+        }
+        .reduceOption((x, y) => x.union(y))
+        .getOrElse(Set.empty[nodes.StoredNode])
 
       in += currentCfgNode -> inSet
 
       val oldSize = out(currentCfgNode).size
-      val gens = mapExpressionsGens(currentCfgNode)
-      val kills = mapExpressionsKills(currentCfgNode)
+      val gens = nodeToGens(currentCfgNode)
+      val kills = nodeToKills(currentCfgNode)
 
       out += currentCfgNode -> gens.union(inSet.diff(kills))
       val newSize = out(currentCfgNode).size
@@ -192,7 +192,7 @@ object DataFlowFrameworkHelper {
   private def callToMethodParamOut(call: nodes.StoredNode): Iterable[nodes.StoredNode] = {
     NoResolve
       .getCalledMethods(call.asInstanceOf[nodes.Call])
-      .flatMap(method => ExpandTo.methodToOutParameters(method))
+      .flatMap(method => method.parameter.asOutput)
   }
 
   private def filterArgumentIndex(nodeList: List[nodes.StoredNode], orderSeq: Iterable[Int]): List[nodes.StoredNode] = {
