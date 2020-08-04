@@ -124,8 +124,8 @@ object EmbeddedAmmonite {
   val predef: String =
     """
       | class CustomFrontend extends ammonite.repl.AmmoniteFrontEnd() {
-      |   override def width = 100
-      |   override def height = 100
+      |   override def width = 65536
+      |   override def height = 65536
       |
       |  override def readLine(reader: java.io.Reader,
       |                        output: java.io.OutputStream,
