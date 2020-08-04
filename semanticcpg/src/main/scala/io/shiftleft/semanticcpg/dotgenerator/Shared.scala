@@ -6,7 +6,9 @@ import io.shiftleft.semanticcpg.language._
 
 object Shared {
 
-  def dotGraph(method: nodes.Method, expand: nodes.CfgNode => Iterator[nodes.CfgNode]): String = {
+  case class Edge(src: nodes.CfgNode, dst: nodes.CfgNode, label: String = "")
+
+  def dotGraph(method: nodes.Method, expand: nodes.CfgNode => Iterator[Edge]): String = {
     val sb = Shared.namedGraphBegin(method)
     sb.append(nodesAndEdges(method, expand).mkString("\n"))
     Shared.graphEnd(sb)
@@ -20,34 +22,35 @@ object Shared {
       v.isInstanceOf[nodes.JumpTarget]
   )
 
-  private def nodesAndEdges(methodNode: nodes.Method,
-                            expand: nodes.CfgNode => Iterator[nodes.CfgNode]): List[String] = {
+  private def nodesAndEdges(methodNode: nodes.Method, expand: nodes.CfgNode => Iterator[Edge]): List[String] = {
     val vertices = methodNode.start.cfgNode.l ++ List(methodNode, methodNode.methodReturn)
     val verticesToDisplay = vertices.filter(cfgNodeShouldBeDisplayed)
 
-    def visibleNeighbors(v: nodes.CfgNode, visited: List[nodes.StoredNode] = List()): List[nodes.StoredNode] = {
-      if (visited.contains(v)) {
+    def edgesToDisplay(srcNode: nodes.CfgNode, visited: List[nodes.StoredNode] = List()): List[Edge] = {
+      if (visited.contains(srcNode)) {
         List()
       } else {
-        val children = expand(v).filter(vertices.contains)
-        val (visible, invisible) = children.partition(cfgNodeShouldBeDisplayed)
+        val children = expand(srcNode).filter(x => vertices.contains(x.dst))
+        val (visible, invisible) = children.partition(x => cfgNodeShouldBeDisplayed(x.dst))
         visible.toList ++ invisible.toList.flatMap { n =>
-          visibleNeighbors(n, visited ++ List(v))
+          edgesToDisplay(n.dst, visited ++ List(srcNode))
         }
       }
     }
 
     val edges = verticesToDisplay.map { v =>
-      (v.id2, visibleNeighbors(v).map(_.id2))
+      edgesToDisplay(v)
     }
 
     val nodeStrings = verticesToDisplay.map { node =>
       s""""${node.id2}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
     }
 
-    val edgeStrings = edges.flatMap {
-      case (id, childIds) =>
-        childIds.map(childId => s"""  "$id" -> "$childId"  """)
+    val edgeStrings = edges.flatMap { edges: List[Edge] =>
+      edges.map(
+        edge =>
+          s"""  "${edge.src.id2}" -> "${edge.dst.id2}" """ +
+            Some(s""" [ label = "${escape(edge.label)}"] """).filter(_ => edge.label != "").getOrElse(""))
     }
 
     nodeStrings ++ edgeStrings

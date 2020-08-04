@@ -9,7 +9,7 @@
 
     "edgeKeys" : [
       {"id": 1, "name" : "ALIAS", "comment" : "Defines whether a PROPAGATE edge creates an alias", "valueType"     : "boolean", "cardinality" : "one" },
-      {"id" : 11, "name" : "VARIABLE", "comment" : "A variable propagated by a reaching-def edge", "valueType" : "string", "cardinality" : "zeroOrOne"}
+      {"id" : 11, "name" : "VARIABLE", "comment" : "A variable propagated by a reaching-def edge", "valueType" : "string", "cardinality" : "one"}
     ],
 
     "nodeTypes" : [
