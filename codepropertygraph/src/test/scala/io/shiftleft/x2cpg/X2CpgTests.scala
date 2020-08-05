@@ -21,6 +21,7 @@ class X2CpgTests extends WordSpec with Matchers {
       val cpg = X2Cpg.newEmptyCpg(Some(file.path.toString))
       file.exists shouldBe true
       file.size should not be 0
+      cpg.close()
     }
 
     "overwrite existing file to create empty CPG" in {
