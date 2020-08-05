@@ -3,18 +3,17 @@ package io.shiftleft.dataflowengineoss
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.language.dotextension.DdgNodeDot
 import io.shiftleft.dataflowengineoss.language.nodemethods.TrackingPointMethods
-import io.shiftleft.semanticcpg.language.Steps
-import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.nodemethods.AstNodeMethods
 import io.shiftleft.semanticcpg.language.types.expressions.generalizations.AstNode
+import overflowdb.traversal.Traversal
 
 package object language {
 
-  implicit def trackingPointBaseMethodsQp[NodeType <: nodes.TrackingPoint](node: NodeType): TrackingPointMethods =
-    new TrackingPointMethods(node.asInstanceOf[nodes.TrackingPoint])
+  implicit def trackingPointBaseMethodsQp[NodeType <: nodes.TrackingPoint](node: NodeType): TrackingPointMethods[NodeType] =
+    new TrackingPointMethods(node)
 
-  implicit def toTrackingPoint[NodeType <: nodes.TrackingPointBase](steps: Steps[NodeType]): TrackingPoint =
-    new TrackingPoint(new NodeSteps(steps.traversal.cast[nodes.TrackingPoint]))
+  implicit def toTrackingPoint[NodeType <: nodes.TrackingPointBase](traversal: Traversal[NodeType]): TrackingPoint =
+    new TrackingPoint(traversal.cast[nodes.TrackingPoint])
 
   implicit def trackingPointToAstNodeMethods(node: nodes.TrackingPoint) =
     new AstNodeMethods(trackingPointToAstNode(node))
@@ -25,7 +24,7 @@ package object language {
     case _                              => ??? //TODO markus/fabs?
   }
 
-  implicit def trackingPointToAstBase(steps: NodeSteps[nodes.TrackingPoint]): AstNode[nodes.AstNode] =
+  implicit def trackingPointToAstBase(steps: Traversal[nodes.TrackingPoint]): AstNode[nodes.AstNode] =
     new AstNode(steps.map(trackingPointToAstNode))
 
   implicit def toDdgNodeDot(steps: Steps[nodes.Method]): DdgNodeDot =

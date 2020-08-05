@@ -7,6 +7,7 @@ import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.MemberAccess
+import overflowdb.{Node, OdbGraph}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -15,7 +16,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   import DataFlowFrameworkHelper._
 
-  override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
+  override def partIterator: Iterator[nodes.Method] = cpg.method.iterator
 
   override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
 

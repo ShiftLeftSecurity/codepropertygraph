@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
+import overflowdb.traversal.Traversal
 
 class CAstTests extends CodeToCpgSuite {
 
@@ -36,29 +37,30 @@ class CAstTests extends CodeToCpgSuite {
   }
 
   "should allow finding that addition is not a direct argument of moo" in {
-    implicit val resolver: ICallResolver = NoResolve
-
-    cpg.method
-      .name("moo")
-      .callIn
-      .argument(1)
-      .containsCallTo("<operator>.(addition|multiplication)")
-      .code
-      .l shouldBe List("boo(1+2)")
-
-    cpg.method
-      .name("moo")
-      .callIn
-      .argument(1)
-      .where(
-        arg =>
-          arg.start.ast
-            .isCallTo("<operator>.(addition|multiplication)")
-            .filterNot(_.inAstMinusLeaf(arg).isCall)
-            .l
-            .nonEmpty)
-      .code
-      .l shouldBe List()
+    false shouldBe true
+//    implicit val resolver: ICallResolver = NoResolve
+//
+//    cpg.method
+//      .name("moo")
+//      .callIn
+//      .argument(1)
+//      .containsCallTo("<operator>.(addition|multiplication)")
+//      .code
+//      .l shouldBe List("boo(1+2)")
+//
+//    cpg.method
+//      .name("moo")
+//      .callIn
+//      .argument(1)
+//      .where(
+//        arg =>
+//          Traversal.from(arg).ast
+//            .isCallTo("<operator>.(addition|multiplication)")
+//            .not(_.inAstMinusLeaf(arg).isCall)
+//            .l
+//            .nonEmpty)
+//      .code
+//      .l shouldBe List()
   }
 
   "should identify three control structures" in {

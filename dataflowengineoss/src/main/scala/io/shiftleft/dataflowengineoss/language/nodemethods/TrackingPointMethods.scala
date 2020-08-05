@@ -1,11 +1,11 @@
 package io.shiftleft.dataflowengineoss.language.nodemethods
 
-import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
-import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointToCfgNode
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.language._
+import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointToCfgNode
+import overflowdb.traversal.Traversal
 
-class TrackingPointMethods(val node: nodes.TrackingPointBase) extends AnyVal {
+class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) extends AnyVal {
 
   /**
     * Convert to nearest CFG node for flow pretty printing
@@ -22,7 +22,7 @@ class TrackingPointMethods(val node: nodes.TrackingPointBase) extends AnyVal {
       case _                              => ??? //TODO markus/fabs?
     }
 
-  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*): Steps[NodeType] =
-    node.start.reachableBy(sourceTravs: _*)
+  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Traversal[NodeType]*): Traversal[NodeType] =
+    Traversal.fromSingle(node).reachableBy(sourceTravs: _*)
 
 }
