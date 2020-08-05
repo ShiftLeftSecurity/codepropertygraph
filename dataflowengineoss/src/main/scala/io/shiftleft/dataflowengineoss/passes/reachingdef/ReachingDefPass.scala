@@ -21,19 +21,20 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
     val entryNode = method
     val exitNode = method.methodReturn
-
     val allCfgNodes = method.cfgNode.toList ++ List(entryNode, exitNode)
+
     val nodeToGens = methodToGenMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
     val nodeToKills = methodToKillMap(method).withDefaultValue(Set.empty[nodes.StoredNode])
+
+    // Out[n] = GEN[n] for all n in `allCfgNodes`
     var out: Map[nodes.CfgNode, Set[nodes.StoredNode]] =
       allCfgNodes
         .filter(nodeToGens.contains)
-        .map { cfgNode =>
-          cfgNode -> nodeToGens(cfgNode)
-        }
+        .map(cfgNode => cfgNode -> nodeToGens(cfgNode))
         .toMap
         .withDefaultValue(Set.empty[nodes.StoredNode])
 
+    // In[n] = empty for all n in `allCfgNodes`
     var in = Map
       .empty[nodes.CfgNode, Set[nodes.StoredNode]]
       .withDefaultValue(Set.empty[nodes.StoredNode])
@@ -83,9 +84,9 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     }
 
     for {
-      methodParameterIn <- method._methodParameterInViaAstOut
-      refInIdentifier <- methodParameterIn._refIn.asScala
-      operationNode <- getOperation(refInIdentifier)
+      methodParameterIn <- method.parameter.l
+      parameterReferences <- methodParameterIn._refIn.asScala
+      operationNode <- getOperation(parameterReferences)
     } addEdge(methodParameterIn, operationNode, methodParameterIn.name)
 
     val methodReturn = method.methodReturn
@@ -139,7 +140,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       }
 
       if (isOperationAndAssignment(call)) {
-        val localRefGens = getGensOfExpression(call).map(reference)
+        val localRefGens = getGensOfCall(call).map(reference)
         inSet(call)
           .filter(inElement => localRefGens.contains(reference(inElement)))
           .foreach { filteredInElement =>
@@ -201,25 +202,16 @@ object DataFlowFrameworkHelper {
     nodeList.filter(node => orderSeq.exists(_ == node.asInstanceOf[nodes.HasArgumentIndex].argumentIndex.toInt))
   }
 
-  def getExpressions(method: nodes.Method): List[nodes.Call] =
-    method._callViaContainsOut.to(List)
-
-  def getGensOfExpression(expr: nodes.StoredNode): Set[nodes.StoredNode] = {
-    var gens = Set[nodes.StoredNode]()
-    val methodParamOutsOrder = callToMethodParamOut(expr)
+  def getGensOfCall(call: nodes.StoredNode): Set[nodes.StoredNode] = {
+    val methodParamOutsOrder = callToMethodParamOut(call)
       .filter(methPO => methPO._propagateIn.hasNext)
       .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
-
-    val identifierWithOrder =
-      filterArgumentIndex(expr._argumentOut.asScala.toList, methodParamOutsOrder)
-    gens ++= identifierWithOrder
-
-    gens
+    filterArgumentIndex(call._argumentOut.asScala.toList, methodParamOutsOrder).toSet
   }
 
   def getUsesOfExpression(expr: nodes.StoredNode): Set[nodes.StoredNode] = {
     expr._argumentOut.asScala
-      .filter(!getGensOfExpression(expr).contains(_))
+      .filter(!getGensOfCall(expr).contains(_))
       .toSet
   }
 
@@ -235,7 +227,7 @@ object DataFlowFrameworkHelper {
       Set()
     } else {
       val localRef = localRefIt.next
-      localRef._refIn.asScala.filter(_.id != node.id2).toSet
+      localRef._refIn.asScala.filter(_.id2 != node.id2).toSet
     }
   }
 
@@ -243,22 +235,17 @@ object DataFlowFrameworkHelper {
     node.map(v => killsVertices(v)).fold(Set())((v1, v2) => v1.union(v2))
   }
 
-  def methodToKillMap(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
-    val genExpressions = getExpressions(method)
-
-    genExpressions.map { expression =>
-      val gens = getGensOfExpression(expression)
-      expression -> kills(gens)
+  def methodToGenMap(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
+    method.start.call.map { call =>
+      call -> getGensOfCall(call)
     }.toMap
   }
 
-  def methodToGenMap(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
-    /*genExpressions correspond to call assignment nodes*/
-    val genExpressions = getExpressions(method)
-    val ret: Map[nodes.StoredNode, Set[StoredNode]] = genExpressions.map { genExpression =>
-      genExpression -> getGensOfExpression(genExpression)
+  def methodToKillMap(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
+    method.start.call.map { call =>
+      val gens = getGensOfCall(call)
+      call -> kills(gens)
     }.toMap
-    ret + (method -> ret.values.to(List).reduceOption((x, y) => x.union(y)).getOrElse(Set()))
   }
 
   def getOperation(node: nodes.StoredNode): Option[nodes.StoredNode] = {
