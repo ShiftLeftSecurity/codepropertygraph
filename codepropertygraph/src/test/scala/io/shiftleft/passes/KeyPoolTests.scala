@@ -51,4 +51,21 @@ class KeyPoolTests extends WordSpec with Matchers {
     }
   }
 
+  "KeyPoolCreator" should {
+    "split into n pools and honor minimum value" in {
+      val minValue = 10
+      val pools = KeyPoolCreator.obtain(3, minValue)
+      pools.size shouldBe 3
+      pools match {
+        case List(pool1, pool2, pool3) =>
+          pool1.first shouldBe minValue
+          pool1.last should be < pool2.first
+          pool2.last should be < pool3.first
+          pool3.last shouldBe Long.MaxValue - 1
+        case _ => fail
+      }
+    }
+
+  }
+
 }
