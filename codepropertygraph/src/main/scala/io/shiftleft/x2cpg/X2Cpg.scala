@@ -13,7 +13,7 @@ object X2Cpg {
     * Create an empty CPG, backed by the file at `optionalOutputPath` or
     * in-memory if `optionalOutputPath` is empty.
     * */
-  def initCpg(optionalOutputPath: Option[String]): Cpg = {
+  def newEmptyCpg(optionalOutputPath: Option[String] = None): Cpg = {
     val odbConfig = optionalOutputPath
       .map { outputPath =>
         val outFile = File(outputPath)
