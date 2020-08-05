@@ -1,6 +1,5 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala._
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
@@ -11,6 +10,7 @@ import io.shiftleft.passes.DiffGraph
 import io.shiftleft.passes.DiffGraph.{EdgeInDiffGraph, EdgeToOriginal}
 import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.codepropertygraph.generated.NodeKeyNames
+import overflowdb.traversal._
 
 import scala.jdk.CollectionConverters._
 
@@ -20,7 +20,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
   "stores NewNodes" in {
     implicit val diffGraphBuilder = DiffGraph.newBuilder
     val newNode = newTestNode()
-    new NewNodeSteps(__(newNode)).store
+    new NewNodeSteps(Traversal.fromSingle(newNode)).store
     val diffGraph = diffGraphBuilder.build()
     diffGraph.nodes.toList shouldBe List(newNode)
   }
@@ -28,7 +28,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
   "can access the node label" in {
     implicit val diffGraphBuilder = DiffGraph.newBuilder
     val newNode = newTestNode()
-    new NewNodeSteps(__(newNode)).label.l shouldBe List(newNode.label)
+    new NewNodeSteps(Traversal.fromSingle(newNode)).label.l shouldBe List(newNode.label)
   }
 
   "stores containedNodes and connecting edge" when {
@@ -42,7 +42,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
 
       val newContainedNode = newTestNode()
       val newNode = newTestNode(containedNodes = List(existingContainedNode, newContainedNode))
-      new NewNodeSteps(__(newNode)).store
+      new NewNodeSteps(Traversal.fromSingle(newNode)).store
       val diffGraph = diffGraphBuilder.build
       diffGraph.nodes.toSet shouldBe Set(newNode)
       diffGraph.edges shouldBe Nil
@@ -57,7 +57,7 @@ class NewNodeStepsTest extends WordSpec with Matchers {
       val newContainedNodeL1 = newTestNode()
       val newContainedNodeL0 = newTestNode(containedNodes = List(newContainedNodeL1))
       val newNode = newTestNode(containedNodes = List(newContainedNodeL0))
-      new NewNodeSteps(__(newNode)).store
+      new NewNodeSteps(Traversal.fromSingle(newNode)).store
       val diffGraph = diffGraphBuilder.build
 
       diffGraph.nodes.toSet shouldBe Set(newNode)

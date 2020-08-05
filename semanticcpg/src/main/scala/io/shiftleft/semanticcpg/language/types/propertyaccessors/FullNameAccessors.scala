@@ -8,7 +8,7 @@ import overflowdb.traversal.Traversal
 
 class FullNameAccessors[A <: Node with HasFullName](val traversal: Traversal[A]) extends AnyVal {
 
-  def fullName: Steps[String] =
+  def fullName: Traversal[String] =
     traversal.map(_.fullName)
 
   def fullName(value: String): Traversal[A] =
