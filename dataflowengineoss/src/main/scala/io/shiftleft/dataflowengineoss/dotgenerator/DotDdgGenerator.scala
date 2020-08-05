@@ -7,7 +7,7 @@ import io.shiftleft.semanticcpg.dotgenerator.Shared.Edge
 import io.shiftleft.semanticcpg.language._
 import gremlin.scala._
 
-object DotPdgGenerator {
+object DotDdgGenerator {
 
   def expand(v: CfgNode): Iterator[Edge] = {
     (v.start.raw
@@ -17,6 +17,6 @@ object DotPdgGenerator {
       .iterator
   }
 
-  def toDotPdg(step: NodeSteps[nodes.Method]): Steps[String] = step.map(Shared.dotGraph(_, expand))
+  def toDotDdg(step: NodeSteps[nodes.Method]): Steps[String] = step.map(Shared.dotGraph(_, expand))
 
 }

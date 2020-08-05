@@ -29,10 +29,8 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     // Out[n] = GEN[n] for all n in `allCfgNodes`
     var out: Map[nodes.CfgNode, Set[nodes.StoredNode]] =
       allCfgNodes
-        .filter(nodeToGens.contains)
         .map(cfgNode => cfgNode -> nodeToGens(cfgNode))
         .toMap
-        .withDefaultValue(Set.empty[nodes.StoredNode])
 
     // In[n] = empty for all n in `allCfgNodes`
     var in = Map
@@ -46,9 +44,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       worklist -= currentCfgNode
 
       val inSet = currentCfgNode.start.cfgPrev
-        .map { cfgPredecessor =>
-          out(cfgPredecessor)
-        }
+        .map(out)
         .reduceOption((x, y) => x.union(y))
         .getOrElse(Set.empty[nodes.StoredNode])
 
@@ -83,20 +79,26 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF, properties)
     }
 
+    // Add edges from formal input parameters to all nodes they
+    // are used in. This assumes that formal parameters cannot
+    // be redefined in the method body. If it's false, then this
+    // is incorrect.
     for {
       methodParameterIn <- method.parameter.l
       parameterReferences <- methodParameterIn._refIn.asScala
       operationNode <- getOperation(parameterReferences)
     } addEdge(methodParameterIn, operationNode, methodParameterIn.name)
 
+    // Add edges from return nodes to formal method returns
     val methodReturn = method.methodReturn
     methodReturn.toReturn.foreach(returnNode => addEdge(returnNode, methodReturn))
 
+    // Now look at `out` for each node
     outSet.foreach {
       case (call: nodes.Call, outDefs) =>
         handleCall(call, outDefs)
       case (ret: nodes.Return, _) =>
-        ret._astOut.asScala.foreach { returnExpr =>
+        ret.astChildren.foreach { returnExpr =>
           val localRef = reference(returnExpr)
           inSet(ret)
             .filter(inElement => localRef == reference(inElement))
@@ -111,9 +113,11 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     }
 
     def handleCall(call: Call, outDefs: Set[StoredNode]) = {
-      val usesInExpression = getUsesOfExpression(call)
-      val localRefsUses = usesInExpression.map(reference).filter(_ != None)
+      val usesInExpression = getUsesOfCall(call)
+      val localRefsUses = usesInExpression.map(reference).filter(_.isDefined)
 
+      // Create edge from entry point to all nodes that are not
+      // reached by any other definitions.
       if (inSet(call).isEmpty) {
         addEdge(method, call)
       }
@@ -122,7 +126,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       usesInExpression.foreach { use =>
         if (!use.isInstanceOf[Identifier] && !use.isInstanceOf[Literal] && !use
               .isInstanceOf[FieldIdentifier]) {
-          addEdge(use, call)
+          addEdge(use, call, use.asInstanceOf[nodes.CfgNode].code)
 
           /* handle indirect access uses: check if we have it in our out set and get
            * the corresponding def expression from which the definition reaches the use
@@ -132,7 +136,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
               val indirectOutCall = indirectOutDef.asInstanceOf[Call]
               if (indirectOutCall.code == use.asInstanceOf[Call].code) {
                 val expandedToCall = indirectOutCall.parentExpression
-                addEdge(expandedToCall, use)
+                addEdge(expandedToCall, use, use.asInstanceOf[nodes.CfgNode].code)
               }
             }
           }
@@ -144,7 +148,8 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
         inSet(call)
           .filter(inElement => localRefGens.contains(reference(inElement)))
           .foreach { filteredInElement =>
-            getExpressionFromGen(filteredInElement).foreach(x => addEdge(x, call))
+            getExpressionFromGen(filteredInElement).foreach(x =>
+              addEdge(x, call, filteredInElement.asInstanceOf[nodes.CfgNode].code))
           }
       }
 
@@ -209,7 +214,7 @@ object DataFlowFrameworkHelper {
     filterArgumentIndex(call._argumentOut.asScala.toList, methodParamOutsOrder).toSet
   }
 
-  def getUsesOfExpression(expr: nodes.StoredNode): Set[nodes.StoredNode] = {
+  def getUsesOfCall(expr: nodes.StoredNode): Set[nodes.StoredNode] = {
     expr._argumentOut.asScala
       .filter(!getGensOfCall(expr).contains(_))
       .toSet
@@ -221,6 +226,7 @@ object DataFlowFrameworkHelper {
 
   /** Returns a set of nodes that are killed by the passed nodes */
   def killsVertices(node: nodes.StoredNode): Set[nodes.StoredNode] = {
+
     val localRefIt = node._refOut.asScala
 
     if (!localRefIt.hasNext) {
