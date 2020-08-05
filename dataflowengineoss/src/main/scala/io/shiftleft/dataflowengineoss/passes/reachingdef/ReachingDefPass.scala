@@ -91,7 +91,11 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
     // Add edges from return nodes to formal method returns
     val methodReturn = method.methodReturn
-    methodReturn.toReturn.foreach(returnNode => addEdge(returnNode, methodReturn))
+    methodReturn.toReturn.foreach(
+      returnNode =>
+        addEdge(returnNode,
+                methodReturn,
+                returnNode.astChildren.headOption().map(_.asInstanceOf[nodes.CfgNode].code).getOrElse("")))
 
     // Now look at `out` for each node
     outSet.foreach {
