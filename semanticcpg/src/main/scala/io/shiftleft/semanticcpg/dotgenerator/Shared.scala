@@ -10,7 +10,7 @@ object Shared {
       case method: nodes.Method => method.name
       case _                    => ""
     }
-    sb.append(s"digraph $name {\n")
+    sb.append(s"digraph $name { graph [bgcolor=transparent]; \n")
   }
 
   def stringRepr(vertex: nodes.AstNode): String = {
