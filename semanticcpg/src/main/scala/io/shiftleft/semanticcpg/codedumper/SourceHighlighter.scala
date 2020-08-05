@@ -1,9 +1,9 @@
-package io.shiftleft.utils
+package io.shiftleft.semanticcpg.codedumper
 
 import better.files.File
 import io.shiftleft.codepropertygraph.generated.Languages
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
+
 import scala.sys.process.Process
 
 /** language must be one of io.shiftleft.codepropertygraph.generated.Languages
