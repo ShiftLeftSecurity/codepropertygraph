@@ -3,7 +3,7 @@ package io.shiftleft.dataflowengineoss.language.nodemethods
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointToCfgNode
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) extends AnyVal {
 
@@ -23,6 +23,6 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
     }
 
   def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Traversal[NodeType]*): Traversal[NodeType] =
-    Traversal.fromSingle(node).reachableBy(sourceTravs: _*)
+    node.start.reachableBy(sourceTravs: _*)
 
 }

@@ -2,7 +2,7 @@ package io.shiftleft.queries
 
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 class CopyOperations extends CodeToCpgSuite {
 
@@ -44,7 +44,7 @@ class CopyOperations extends CodeToCpgSuite {
       }
       .filter {
         case (buf, subscripts) =>
-          val incIdentifiers = Traversal.fromSingle(buf).inAst.isControlStructure.astChildren
+          val incIdentifiers = buf.start.inAst.isControlStructure.astChildren
             .filterNot(_.isBlock)
             .assignments
             .target

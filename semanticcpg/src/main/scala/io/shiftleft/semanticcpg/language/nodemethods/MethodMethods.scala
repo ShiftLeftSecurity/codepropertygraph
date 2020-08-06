@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 import scala.jdk.CollectionConverters._
 
@@ -18,10 +18,10 @@ class MethodMethods(val method: nodes.Method) extends AnyVal {
     method._blockViaContainsOut.flatMap(_._localViaAstOut)
 
   def controlStructure: Traversal[nodes.ControlStructure] =
-    Traversal.fromSingle(method).controlStructure
+    method.start.controlStructure
 
   def ast: Traversal[nodes.AstNode] =
-    Traversal.fromSingle(method).ast
+    method.start.ast
 
   def numberOfLines: Int = {
     if (method.lineNumber.isDefined && method.lineNumberEnd.isDefined) {

@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 class CAstTests extends CodeToCpgSuite {
 
@@ -53,7 +53,7 @@ class CAstTests extends CodeToCpgSuite {
       .argument(1)
       .filter(
         arg =>
-          Traversal.fromSingle(arg).ast
+          arg.start.ast
             .isCallTo("<operator>.(addition|multiplication)")
             .not(_.inAstMinusLeaf(arg).isCall)
             .l

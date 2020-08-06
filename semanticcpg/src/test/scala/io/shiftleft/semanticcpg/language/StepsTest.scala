@@ -6,7 +6,7 @@ import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.{Matchers, WordSpec}
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 class StepsTest extends WordSpec with Matchers {
 
@@ -68,7 +68,7 @@ class StepsTest extends WordSpec with Matchers {
 
     val query = for {
       method <- fixture.cpg.method
-      param <- Traversal.fromSingle(method).parameter
+      param <- method.start.parameter
     } yield MethodParamPairs(method.name, param.name)
 
     val pairs: List[MethodParamPairs] = query.toList

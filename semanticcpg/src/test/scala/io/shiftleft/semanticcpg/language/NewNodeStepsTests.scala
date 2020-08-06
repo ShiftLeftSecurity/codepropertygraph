@@ -1,15 +1,10 @@
 package io.shiftleft.semanticcpg.language
 
-import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
+import io.shiftleft.codepropertygraph.generated.{ModifierTypes, NodeKeyNames, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, ModifierTypes}
 import io.shiftleft.passes.DiffGraph
-import io.shiftleft.passes.DiffGraph.{EdgeInDiffGraph, EdgeToOriginal}
 import org.scalatest.{Matchers, WordSpec}
-import io.shiftleft.codepropertygraph.generated.NodeKeyNames
 import overflowdb.traversal._
 
 import scala.jdk.CollectionConverters._

@@ -97,21 +97,15 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
     cache.getOrElse(
       (typ, name), {
         cache.update((typ, name), null)
-        val members = Traversal.fromSingle(typ).member.where(_.nameExact(name)).l
+        val members = typ.start.member.where(_.nameExact(name)).l
         val res = if (members.nonEmpty) {
           cache.update((typ, name), members.head)
           members.head
         } else {
-          val recursive_res = Traversal
-            .fromSingle(typ)
-            .baseType
-            .l
-            .map { basetyp =>
-              getMember(cache, basetyp, name, depth + 1)
-            }
-            .filter {
-              _ != null
-            }
+          val recursive_res = typ.start.baseType.l.map { basetyp =>
+            getMember(cache, basetyp, name, depth + 1)
+          }
+          .filter(_ != null)
 
           if (recursive_res.nonEmpty) {
             cache.update((typ, name), recursive_res.head)

@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.dotgenerator
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 object DotAstGenerator {
 
@@ -20,7 +20,7 @@ object DotAstGenerator {
     def shouldBeDisplayed(v: nodes.AstNode): Boolean = !v.isInstanceOf[nodes.MethodParameterOut]
 
     val vertices = astRoot.ast.filter(shouldBeDisplayed).l
-    val edges = vertices.map(v => (v.id2, Traversal.fromSingle(v).astChildren.filter(shouldBeDisplayed).id.l))
+    val edges = vertices.map(v => (v.id2, v.start.astChildren.filter(shouldBeDisplayed).id.l))
 
     val nodeStrings = vertices.map { node =>
       s""""${node.id2}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin

@@ -1,9 +1,9 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.Implicits.JavaIteratorDeco
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
@@ -12,7 +12,7 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
     * Equivalent of TNodes in the original CPG paper.
     * */
   def ast: Traversal[nodes.AstNode] =
-    Traversal.fromSingle(node).ast
+    node.start.ast
 
   /**
     * All nodes of the abstract syntax tree rooted in this node,
@@ -20,18 +20,18 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
     * CPG paper.
     * */
   def ast(predicate: nodes.AstNode => Boolean): Traversal[nodes.AstNode] =
-    Traversal.fromSingle(node).ast.filter(predicate)
+    node.start.ast.filter(predicate)
 
   /**
     * Ordered list of direct AST children
     * */
-  def astChildren: Traversal[nodes.AstNode] = Traversal.fromSingle(node).astChildren
+  def astChildren: Traversal[nodes.AstNode] = node.start.astChildren
 
   /**
     * All nodes of the abstract syntax tree rooted in this node,
     * minus this node.
     * */
-  def astMinusRoot: Traversal[nodes.AstNode] = Traversal.fromSingle(node).astMinusRoot
+  def astMinusRoot: Traversal[nodes.AstNode] = node.start.astMinusRoot
 
   /**
     * Indicate whether the AST node represents a control structure,
@@ -81,7 +81,7 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
   def depth(p: nodes.AstNode => Boolean): Int = {
     val additionalDepth = if (p(node)) { 1 } else { 0 }
 
-    val childDepths = Traversal.fromSingle(node).astChildren.map(_.depth(p)).l
+    val childDepths = node.start.astChildren.map(_.depth(p)).l
     additionalDepth + (if (childDepths.isEmpty) {
                          0
                        } else {

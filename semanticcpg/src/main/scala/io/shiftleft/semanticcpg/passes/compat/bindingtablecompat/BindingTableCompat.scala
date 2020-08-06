@@ -6,7 +6,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 import scala.jdk.CollectionConverters._
 
@@ -25,7 +25,7 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
         val nonConstructorMethods = getNonConstructorMethodsTransitive(typeDecl, Set.empty)
         nonConstructorMethods.foreach(createBinding(typeDecl, diffGraph))
 
-        val constructorMethods = Traversal.fromSingle(typeDecl).method.isConstructor
+        val constructorMethods = typeDecl.start.method.isConstructor
         constructorMethods.foreach(createBinding(typeDecl, diffGraph))
       }
     }
@@ -72,7 +72,7 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
 
   private def getNonConstructorMethods(typeDecl: nodes.TypeDecl): List[nodes.Method] =
     typeDecl._methodViaAstOut
-      .filter(method => Traversal.fromSingle(method).isConstructor.isEmpty)
+      .filter(method => method.start.isConstructor.isEmpty)
       .toList
 
 }
