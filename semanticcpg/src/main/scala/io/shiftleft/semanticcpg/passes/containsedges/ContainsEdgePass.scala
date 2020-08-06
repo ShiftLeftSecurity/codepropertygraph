@@ -25,8 +25,9 @@ class ContainsEdgePass(cpg: Cpg) extends ParallelCpgPass[nodes.AstNode](cpg) {
       .fromSingle(source)
       .walkAstUntilReaching(sourceTypes)
       .sideEffect { destination =>
-        if (destinationTypes.contains(destination.label))
+        if (destinationTypes.contains(destination.label)) {
           dstGraph.addEdgeInOriginal(source, destination, EdgeTypes.CONTAINS)
+        }
       }
       .iterate
 
