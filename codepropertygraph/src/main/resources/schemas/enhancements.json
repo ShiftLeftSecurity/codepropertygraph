@@ -8,7 +8,8 @@
     ],
 
     "edgeKeys" : [
-      {"id": 1, "name" : "ALIAS", "comment" : "Defines whether a PROPAGATE edge creates an alias", "valueType"     : "boolean", "cardinality" : "one" }
+      {"id": 1, "name" : "ALIAS", "comment" : "Defines whether a PROPAGATE edge creates an alias", "valueType"     : "boolean", "cardinality" : "one" },
+      {"id" : 11, "name" : "VARIABLE", "comment" : "A variable propagated by a reaching-def edge", "valueType" : "string", "cardinality" : "one"}
     ],
 
     "nodeTypes" : [
@@ -210,7 +211,7 @@
         {"id" : 23, "name" : "INHERITS_FROM", "comment" : "Inheritance relation between types", "keys" : [] },
         {"id" : 28, "name" : "CONTAINS", "keys" : [], "comment" : "Shortcut over multiple AST edges"},
         {"id" : 1, "name" : "PROPAGATE", "keys" : ["ALIAS"], "comment" : "Encodes propagation of data from on node to another. The ALIAS property is deprecated."},
-        {"id" : 137, "name": "REACHING_DEF", "comment" : "Reaching definition edge", "keys" : []},
+        {"id" : 137, "name": "REACHING_DEF", "comment" : "Reaching definition edge", "keys" : ["VARIABLE"]},
         {"id" : 138, "name" : "ALIAS_OF", "comment" : "Alias relation between types", "keys" : [] }
     ]
 
