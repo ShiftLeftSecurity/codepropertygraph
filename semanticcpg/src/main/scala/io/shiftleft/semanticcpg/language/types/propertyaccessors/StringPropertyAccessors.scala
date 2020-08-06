@@ -36,6 +36,6 @@ object StringPropertyAccessors {
   def filterExactMultiple[A <: Node](traversal: Traversal[A],
                                      property: PropertyKey[String],
                                      values: String*): Traversal[A] =
-    traversal.has(property.where(P.within(values)))
+    traversal.has(property.where(P.within(values.to(Set))))
 
 }

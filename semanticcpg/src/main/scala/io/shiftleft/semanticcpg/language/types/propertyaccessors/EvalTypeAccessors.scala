@@ -42,7 +42,7 @@ class EvalTypeAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
       traversal.where(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
-          .has(NodeKeysOdb.FULL_NAME.where(P.within(values))))
+          .has(NodeKeysOdb.FULL_NAME.where(P.within(values.to(Set)))))
     }
 
   def evalTypeNot(value: String): Traversal[A] =

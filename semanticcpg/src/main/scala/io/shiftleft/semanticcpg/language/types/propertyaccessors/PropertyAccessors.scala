@@ -13,9 +13,9 @@ object PropertyAccessors {
     traversal.hasNot(property, value)
 
   def filterMultiple[A <: Node, B](traversal: Traversal[A], property: PropertyKey[B], values: B*): Traversal[A] =
-    traversal.has(property.where(P.within(values)))
+    traversal.has(property.where(P.within(values.to(Set))))
 
   def filterNotMultiple[A <: Node, B](traversal: Traversal[A], property: PropertyKey[B], values: B*): Traversal[A] =
-    traversal.hasNot(property.where(P.within(values)))
+    traversal.hasNot(property.where(P.within(values.to(Set))))
 
 }
