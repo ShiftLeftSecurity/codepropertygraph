@@ -72,7 +72,7 @@ package object testing {
     def withLiteralInMethod(methodName: String, literalCode: String): MockCpg = {
       withCustom { (graph, cpg) =>
         val methodNode = cpg.method.head
-        val blockNode = Traversal.fromSingle(methodNode).block.head
+        val blockNode = methodNode.start.block.head
         val callNode = nodes.NewCall()
         val literalNode = nodes.NewLiteral(code = literalCode)
         graph.addNode(callNode)

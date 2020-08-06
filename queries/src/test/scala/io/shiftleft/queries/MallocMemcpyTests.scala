@@ -39,7 +39,9 @@ class MallocMemcpyTests extends DataFlowCodeToCpgSuite {
           .reachableBy(src)
           .not(_.argument(1).codeExact(call.argument(3).code))
           .hasNext
-      }.code.l shouldBe List("memcpy(dst, src, len + 7)")
+      }
+      .code
+      .l shouldBe List("memcpy(dst, src, len + 7)")
   }
 
 }

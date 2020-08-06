@@ -9,7 +9,8 @@ import overflowdb.traversal.Traversal
 
 package object language {
 
-  implicit def trackingPointBaseMethodsQp[NodeType <: nodes.TrackingPoint](node: NodeType): TrackingPointMethods[NodeType] =
+  implicit def trackingPointBaseMethodsQp[NodeType <: nodes.TrackingPoint](
+      node: NodeType): TrackingPointMethods[NodeType] =
     new TrackingPointMethods(node)
 
   implicit def toTrackingPoint[NodeType <: nodes.TrackingPointBase](traversal: Traversal[NodeType]): TrackingPoint =

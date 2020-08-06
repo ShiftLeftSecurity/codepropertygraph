@@ -121,6 +121,7 @@ package object language extends operatorextension.Implicits {
     new VersionAccessors(trav)
 
   implicit class NodeStepsExt(val traversal: Traversal[_ <: StoredNode]) extends AnyVal {
+
     /**
     Traverse to tags of nodes in enhanced graph
       */
