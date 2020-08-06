@@ -96,7 +96,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       returnNode =>
         addEdge(returnNode,
                 methodReturn,
-                returnNode.astChildren.headOption().map(_.asInstanceOf[nodes.CfgNode].code).getOrElse("")))
+                returnNode.astChildren.headOption.map(_.asInstanceOf[nodes.CfgNode].code).getOrElse("")))
 
     // Now look at `out` for each node
     outSet.foreach {

@@ -24,10 +24,10 @@ package object language {
     case _                              => ??? //TODO markus/fabs?
   }
 
-  implicit def trackingPointToAstBase(steps: Traversal[nodes.TrackingPoint]): AstNode[nodes.AstNode] =
-    new AstNode(steps.map(trackingPointToAstNode))
+  implicit def trackingPointToAstBase(trav: Traversal[nodes.TrackingPoint]): AstNode[nodes.AstNode] =
+    new AstNode(trav.map(trackingPointToAstNode))
 
-  implicit def toDdgNodeDot(steps: Steps[nodes.Method]): DdgNodeDot =
-    new DdgNodeDot(steps)
+  implicit def toDdgNodeDot(trav: Traversal[nodes.Method]): DdgNodeDot =
+    new DdgNodeDot(trav)
 
 }
