@@ -29,31 +29,17 @@ class MallocMemcpyTests extends DataFlowCodeToCpgSuite {
     * buffer overflow in VLC's MP4 demuxer (CVE-2014-9626).
     * */
   "find calls to malloc/memcpy system with different expressions in arguments" in {
-    val src = cpg.call("malloc").where(_.argument(1).arithmetics).l
+    val src = cpg.call("malloc").where(_.argument(1).arithmetics)
 
-//    cpg
-//      .call("memcpy")
-//      .not { call =>
-//        call
-//          .argument(1)
-//          .reachableBy(Traversal.fromSingle(src))
-//          .not(_.argument(1).codeExact(call.argument(3).code))
-//      }
-//      .code
-//      .l shouldBe List("memcpy(dst, src, len + 7)")
-
-    ???
-    true shouldBe false
-//    cpg
-//      .call("memcpy")
-//      .whereNonEmpty { call =>
-//        call
-//          .argument(1)
-//          .reachableBy(src.start)
-//          .filterNot(_.argument(1).codeExact(call.argument(3).code))
-//      }
-//      .code
-//      .l shouldBe List("memcpy(dst, src, len + 7)")
+    cpg
+      .call("memcpy")
+      .filter { call =>
+        call
+          .argument(1)
+          .reachableBy(src)
+          .not(_.argument(1).codeExact(call.argument(3).code))
+          .hasNext
+      }.code.l shouldBe List("memcpy(dst, src, len + 7)")
   }
 
 }
