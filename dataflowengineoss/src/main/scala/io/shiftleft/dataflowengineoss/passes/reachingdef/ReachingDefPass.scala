@@ -1,13 +1,12 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.MemberAccess
-import overflowdb.{Node, OdbGraph}
+import overflowdb.traversal._
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._

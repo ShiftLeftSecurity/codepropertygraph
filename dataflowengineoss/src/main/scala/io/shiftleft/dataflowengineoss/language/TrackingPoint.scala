@@ -4,7 +4,7 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.MemberAccess
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 import scala.jdk.CollectionConverters._
 
@@ -83,7 +83,7 @@ class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVa
       case ret: nodes.Return                      => Some(ret)
       case methodReturn: nodes.MethodReturn       => Some(methodReturn)
       case methodParamIn: nodes.MethodParameterIn => Some(methodParamIn)
-      case literal: nodes.Literal                 => getTrackingPoint(literal._argumentIn().onlyChecked)
+      case literal: nodes.Literal                 => getTrackingPoint(literal._argumentIn.onlyChecked)
       case _                                      => None
     }
 
