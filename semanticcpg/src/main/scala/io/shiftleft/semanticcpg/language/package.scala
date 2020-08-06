@@ -145,8 +145,8 @@ package object language extends operatorextension.Implicits {
   implicit def toNodeSteps[NodeType <: nodes.StoredNode](trav: Traversal[NodeType]): NodeSteps[NodeType] =
     new NodeSteps[NodeType](trav)
 
-  implicit def toNewNodeTrav[NodeType <: nodes.NewNode](original: Steps[NodeType]): NewNodeSteps[NodeType] =
-    new NewNodeSteps[NodeType](original.traversal)
+  implicit def toNewNodeTrav[NodeType <: nodes.NewNode](trav: Traversal[NodeType]): NewNodeSteps[NodeType] =
+    new NewNodeSteps[NodeType](trav)
 
   implicit def toNodeTypeStarters(cpg: Cpg): NodeTypeStarters = new NodeTypeStarters(cpg)
   implicit def toTagTraversal(trav: Traversal[nodes.Tag]): Tag = new Tag(trav)
