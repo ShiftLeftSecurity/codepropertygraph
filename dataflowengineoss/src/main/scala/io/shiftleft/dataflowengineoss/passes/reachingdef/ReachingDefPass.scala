@@ -19,7 +19,10 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   import DataFlowFrameworkHelper._
 
   private case class Solution(in: Map[nodes.CfgNode, Set[nodes.StoredNode]],
-                              out: Map[nodes.CfgNode, Set[nodes.StoredNode]])
+                              out: Map[nodes.CfgNode, Set[nodes.StoredNode]],
+                              // gen is not really part of the solution but
+                              // we also do not want to compute it again
+                              gen: Map[nodes.StoredNode, Set[nodes.StoredNode]])
 
   override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
 
@@ -43,7 +46,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     // Gen[n]: the definitions generated at node n
     // Kill[n]: the definitions killed at node n
     val gen = initGen(method).withDefaultValue(Set.empty[nodes.StoredNode])
-    val kill = initKill(method).withDefaultValue(Set.empty[nodes.StoredNode])
+    val kill = initKill(method, gen).withDefaultValue(Set.empty[nodes.StoredNode])
 
     // Out[n] = GEN[n] for all n in `allCfgNodes`
     var out: Map[nodes.CfgNode, Set[nodes.StoredNode]] =
@@ -78,18 +81,27 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       if (oldSize != out(n).size)
         worklist ++= n.start.cfgNext.l
     }
-    Solution(in, out)
+    Solution(in, out, gen)
   }
 
   def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
+
+    def getGensOfCall(call: nodes.StoredNode): Set[nodes.StoredNode] = {
+      val methodParamOutsOrder = callToMethodParamOut(call)
+        .filter(methPO => methPO._propagateIn().hasNext)
+        .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
+      filterArgumentIndex(call._argumentOut().asScala.toList, methodParamOutsOrder).toSet
+    }
+
     method.start.call.map { call =>
       call -> getGensOfCall(call)
     }.toMap
   }
 
-  def initKill(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
+  def initKill(method: nodes.Method,
+               gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
     method.start.call.map { call =>
-      val gens = getGensOfCall(call)
+      val gens = gen(call)
       call -> kills(gens)
     }.toMap
   }
@@ -107,6 +119,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
     val in = solution.in
     val out = solution.out
+    val gen = solution.gen
 
     // Add edges from formal input parameters to all nodes they
     // are used in. This assumes that formal parameters cannot
@@ -146,7 +159,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     }
 
     def handleCall(call: Call, outDefs: Set[StoredNode]): Unit = {
-      val usesInExpression = getUsesOfCall(call)
+      val usesInExpression = getUsesOfCall(call, gen)
       val localRefsUses = usesInExpression.map(reference).filter(_.isDefined)
 
       // Create edge from entry point to all nodes that are not
@@ -177,7 +190,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       }
 
       if (isOperationAndAssignment(call)) {
-        val localRefGens = getGensOfCall(call).map(reference)
+        val localRefGens = gen(call).map(reference)
         in(call)
           .filter(inElement => localRefGens.contains(reference(inElement)))
           .foreach { filteredInElement =>
@@ -196,6 +209,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
         }
       }
     }
+    dstGraph
   }
 
   private def reference(node: nodes.StoredNode): Option[nodes.StoredNode] =
@@ -230,28 +244,22 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 /** Common functionalities needed for data flow frameworks */
 object DataFlowFrameworkHelper {
 
-  private def callToMethodParamOut(call: nodes.StoredNode): Iterable[nodes.StoredNode] = {
+  def callToMethodParamOut(call: nodes.StoredNode): Iterable[nodes.StoredNode] = {
     NoResolve
       .getCalledMethods(call.asInstanceOf[nodes.Call])
       .flatMap(method => method.parameter.asOutput)
   }
 
-  private def filterArgumentIndex(nodeList: List[nodes.StoredNode], orderSeq: Iterable[Int]): List[nodes.StoredNode] = {
+  def filterArgumentIndex(nodeList: List[nodes.StoredNode], orderSeq: Iterable[Int]): List[nodes.StoredNode] = {
     nodeList.filter(node => orderSeq.exists(_ == node.asInstanceOf[nodes.HasArgumentIndex].argumentIndex.toInt))
   }
 
-  def getGensOfCall(call: nodes.StoredNode): Set[nodes.StoredNode] = {
-    val methodParamOutsOrder = callToMethodParamOut(call)
-      .filter(methPO => methPO._propagateIn().hasNext)
-      .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
-    filterArgumentIndex(call._argumentOut().asScala.toList, methodParamOutsOrder).toSet
-  }
-
-  def getUsesOfCall(expr: nodes.StoredNode): Set[nodes.StoredNode] = {
+  def getUsesOfCall(expr: nodes.StoredNode,
+                    gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Set[nodes.StoredNode] = {
     expr
       ._argumentOut()
       .asScala
-      .filter(!getGensOfCall(expr).contains(_))
+      .filter(!gen(expr).contains(_))
       .toSet
   }
 
