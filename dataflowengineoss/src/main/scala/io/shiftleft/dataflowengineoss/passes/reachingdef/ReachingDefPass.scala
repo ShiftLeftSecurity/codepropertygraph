@@ -86,7 +86,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
 
-    def getGensOfCall(call: nodes.StoredNode): Set[nodes.StoredNode] = {
+    def getGensOfCall(call: nodes.Call): Set[nodes.StoredNode] = {
       val methodParamOutsOrder = callToMethodParamOut(call)
         .filter(methPO => methPO._propagateIn().hasNext)
         .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
@@ -101,8 +101,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   def initKill(method: nodes.Method,
                gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
     method.start.call.map { call =>
-      val gens = gen(call)
-      call -> kills(gens)
+      call -> gen(call).map(v => killsVertices(v)).fold(Set())((v1, v2) => v1.union(v2))
     }.toMap
   }
 
@@ -244,9 +243,9 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 /** Common functionalities needed for data flow frameworks */
 object DataFlowFrameworkHelper {
 
-  def callToMethodParamOut(call: nodes.StoredNode): Iterable[nodes.StoredNode] = {
+  def callToMethodParamOut(call: nodes.Call): Iterable[nodes.StoredNode] = {
     NoResolve
-      .getCalledMethods(call.asInstanceOf[nodes.Call])
+      .getCalledMethods(call)
       .flatMap(method => method.parameter.asOutput)
   }
 
@@ -278,10 +277,6 @@ object DataFlowFrameworkHelper {
       val localRef = localRefIt.next
       localRef._refIn().asScala.filter(_.id2 != node.id2).toSet
     }
-  }
-
-  def kills(node: Set[nodes.StoredNode]): Set[nodes.StoredNode] = {
-    node.map(v => killsVertices(v)).fold(Set())((v1, v2) => v1.union(v2))
   }
 
   def getOperation(node: nodes.StoredNode): Option[nodes.StoredNode] = {
