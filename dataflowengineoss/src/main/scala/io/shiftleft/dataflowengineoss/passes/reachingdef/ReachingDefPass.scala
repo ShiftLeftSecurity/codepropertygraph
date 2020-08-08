@@ -47,7 +47,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
     val entryNode = method
     val exitNode = method.methodReturn
-    val allCfgNodes = method.cfgNode.toList ++ List(entryNode, exitNode) ++ method.parameter.l
+    val allCfgNodes = method.cfgNode.toList ++ List(entryNode, exitNode)
 
     // Successors and predecessors in the CFG
     val succ = initSucc(allCfgNodes)
@@ -98,19 +98,13 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       filterArgumentIndex(call._argumentOut().asScala.toList, methodParamOutsOrder).toSet
     }
 
-    (method.parameter.map{param =>
-      param -> Set(param.asInstanceOf[nodes.StoredNode])
-    } ++
     method.start.call.map { call =>
       call -> getGensOfCall(call)
-    }).toMap
+    }.toMap
   }
 
   def initKill(method: nodes.Method,
                gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
-
-    // Note that the method parameters do not kill anything
-
     method.start.call.map { call =>
       call -> gen(call).map(v => killsVertices(v)).fold(Set())((v1, v2) => v1.union(v2))
     }.toMap
@@ -119,7 +113,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   def initSucc(ns: List[nodes.StoredNode]): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
     ns.map {
       case n @ (cfgNode: CfgNode)               => n -> cfgNode.start.cfgNext.l
-      case n @ (param: nodes.MethodParameterIn) => n -> param.start.method.cfgFirst.l
+      case n @ (param: nodes.MethodParameterIn) => n -> param.start.method.block.l
       case n                                    => println("Shouldn't happen"); n -> List()
     }.toMap
   }
