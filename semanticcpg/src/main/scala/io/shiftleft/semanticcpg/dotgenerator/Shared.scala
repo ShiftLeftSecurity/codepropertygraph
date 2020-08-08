@@ -6,9 +6,9 @@ import io.shiftleft.semanticcpg.language._
 
 object Shared {
 
-  case class Edge(src: nodes.CfgNode, dst: nodes.CfgNode, label: String = "")
+  case class Edge(src: nodes.StoredNode, dst: nodes.StoredNode, label: String = "")
 
-  def dotGraph(method: nodes.Method, expand: nodes.CfgNode => Iterator[Edge]): String = {
+  def dotGraph(method: nodes.Method, expand: nodes.StoredNode => Iterator[Edge]): String = {
     val sb = Shared.namedGraphBegin(method)
     sb.append(nodesAndEdges(method, expand).mkString("\n"))
     Shared.graphEnd(sb)
@@ -22,11 +22,11 @@ object Shared {
       v.isInstanceOf[nodes.JumpTarget]
   )
 
-  private def nodesAndEdges(methodNode: nodes.Method, expand: nodes.CfgNode => Iterator[Edge]): List[String] = {
+  private def nodesAndEdges(methodNode: nodes.Method, expand: nodes.StoredNode => Iterator[Edge]): List[String] = {
     val vertices = methodNode.start.cfgNode.l ++ List(methodNode, methodNode.methodReturn)
     val verticesToDisplay = vertices.filter(cfgNodeShouldBeDisplayed)
 
-    def edgesToDisplay(srcNode: nodes.CfgNode, visited: List[nodes.StoredNode] = List()): List[Edge] = {
+    def edgesToDisplay(srcNode: nodes.StoredNode, visited: List[nodes.StoredNode] = List()): List[Edge] = {
       if (visited.contains(srcNode)) {
         List()
       } else {

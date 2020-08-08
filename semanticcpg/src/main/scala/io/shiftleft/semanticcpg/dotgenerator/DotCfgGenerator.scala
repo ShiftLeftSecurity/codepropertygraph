@@ -10,7 +10,7 @@ object DotCfgGenerator {
 
   def toDotCfg(step: NodeSteps[nodes.Method]): Steps[String] = step.map(Shared.dotGraph(_, expand))
 
-  protected def expand(v: nodes.CfgNode): Iterator[Edge] = {
+  protected def expand(v: nodes.StoredNode): Iterator[Edge] = {
     v._cfgOut()
       .asScala
       .filter(_.isInstanceOf[nodes.CfgNode])
