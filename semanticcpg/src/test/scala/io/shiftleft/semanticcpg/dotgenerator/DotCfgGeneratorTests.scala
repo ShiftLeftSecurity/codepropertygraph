@@ -37,9 +37,9 @@ class DotCfgGeneratorTests extends CodeToCpgSuite {
       }
     }
 
-    "contain eight nodes" in {
+    "contain seven nodes" in {
       val dotStr = cpg.method.name("main").dotCfg.head
-      dotStr.split("\n").count(x => x.contains("label")) shouldBe 8
+      dotStr.split("\n").count(x => x.contains("label")) shouldBe 7
     }
 
     "contain seven edges" in {
