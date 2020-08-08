@@ -86,8 +86,9 @@
             ]},
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE", "cardinality": "n:1"}]},
             {"edgeName": "REACHING_DEF", "inNodes": [
-              {"name": "CALL"},
-              {"name": "RETURN"}
+	    {"name": "CALL"},
+	    {"name": "RETURN"},
+	    {"name": "IDENTIFIER"}
             ]},
             {"edgeName": "PARAMETER_LINK", "inNodes": [{"name": "METHOD_PARAMETER_OUT"}]}
           ]

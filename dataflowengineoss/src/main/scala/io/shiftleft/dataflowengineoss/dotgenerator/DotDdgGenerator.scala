@@ -1,7 +1,6 @@
 package io.shiftleft.dataflowengineoss.dotgenerator
 
 import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, EdgeTypes, nodes}
-import io.shiftleft.codepropertygraph.generated.nodes.CfgNode
 import io.shiftleft.semanticcpg.dotgenerator.Shared
 import io.shiftleft.semanticcpg.dotgenerator.Shared.Edge
 import io.shiftleft.semanticcpg.language._
@@ -9,7 +8,7 @@ import gremlin.scala._
 
 object DotDdgGenerator {
 
-  def expand(v: CfgNode): Iterator[Edge] = {
+  def expand(v: nodes.StoredNode): Iterator[Edge] = {
     (v.start.raw
       .outE(EdgeTypes.REACHING_DEF)
       .map(x => Edge(v, x.inVertex().asInstanceOf[nodes.CfgNode], x.value[String](EdgeKeyNames.VARIABLE))))
@@ -17,6 +16,11 @@ object DotDdgGenerator {
       .iterator
   }
 
-  def toDotDdg(step: NodeSteps[nodes.Method]): Steps[String] = step.map(Shared.dotGraph(_, expand))
+  def toDotDdg(step: NodeSteps[nodes.Method]): Steps[String] = {
+    step.map { methodNode =>
+      val vertices = methodNode.start.cfgNode.l ++ List(methodNode, methodNode.methodReturn) ++ methodNode.parameter.l
+      Shared.dotGraph(methodNode, vertices, expand)
+    }
+  }
 
 }

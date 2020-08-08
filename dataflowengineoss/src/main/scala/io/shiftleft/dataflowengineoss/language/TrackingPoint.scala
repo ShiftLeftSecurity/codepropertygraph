@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.semanticcpg.utils.MemberAccess
+
 import scala.jdk.CollectionConverters._
 
 /**
@@ -22,6 +23,15 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     * Convert to nearest CFG node
     * */
   def cfgNode: NodeSteps[nodes.CfgNode] = wrapped.map(_.cfgNode)
+
+  def ddgNext : NodeSteps[nodes.TrackingPoint] = wrapped.flatMap{ n =>
+    n._reachingDefOut.asScala.toList.map(_.asInstanceOf[nodes.TrackingPoint]).start
+  }
+
+  def ddgPrev : NodeSteps[nodes.TrackingPoint] = wrapped.flatMap{ n =>
+    n._reachingDefIn.asScala.toList.map(_.asInstanceOf[nodes.TrackingPoint]).start
+  }
+
 
   def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*): NodeSteps[NodeType] = {
     val pathReachables = reachableByInternal(sourceTravs)
@@ -75,8 +85,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
   private def getTrackingPoint(node: nodes.StoredNode): Option[nodes.TrackingPoint] =
     node match {
-      case identifier: nodes.Identifier =>
-        identifier._argumentIn().nextOption.flatMap(getTrackingPoint)
+      case identifier: nodes.Identifier => Some(identifier)
       case call: nodes.Call                       => Some(call)
       case ret: nodes.Return                      => Some(ret)
       case methodReturn: nodes.MethodReturn       => Some(methodReturn)

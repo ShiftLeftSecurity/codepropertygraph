@@ -47,11 +47,11 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
     val entryNode = method
     val exitNode = method.methodReturn
-    val allCfgNodes = method.cfgNode.toList ++ List(entryNode, exitNode)
+    val allCfgNodes = method.cfgNode.toList ++ List(entryNode, exitNode) ++ method.parameter.l
 
     // Successors and predecessors in the CFG
     val succ = initSucc(allCfgNodes)
-    val pred = initPred(allCfgNodes)
+    val pred = initPred(allCfgNodes, method)
 
     // Out[n] = GEN[n] for all n in `allCfgNodes`
     var out: Map[nodes.StoredNode, Set[nodes.StoredNode]] =
@@ -89,37 +89,49 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     Solution(in, out, gen)
   }
 
+  /** For each node n in the CFG + parameters, initialize gen[n], that is,
+    * the definitions generated at node `n`.
+    *
+    * For calls, we place arguments into gen[n]. These may be nodes
+    * that represent entire expressions, e.g., `x->y`. For parameters,
+    * we place the parameter node itself into gen[n].
+    * */
   def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
-
-    def getGensOfCall(call: nodes.Call): Set[nodes.StoredNode] = {
-      val methodParamOutsOrder = callToMethodParamOut(call)
-        .filter(methPO => methPO._propagateIn().hasNext)
-        .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
-      filterArgumentIndex(call._argumentOut().asScala.toList, methodParamOutsOrder).toSet
+    val gensForParams = method.parameter.l.map { param =>
+      param -> Set(param.asInstanceOf[nodes.StoredNode])
     }
+    val gensForCalls = method.start.call.map { call =>
+      call -> definitionsInCall(call)
+    }
+    (gensForParams ++ gensForCalls).toMap
+  }
 
-    method.start.call.map { call =>
-      call -> getGensOfCall(call)
-    }.toMap
+  private def definitionsInCall(call: nodes.Call): Set[nodes.StoredNode] = {
+    val methodParamOutsOrder = callToMethodParamOut(call)
+      .filter(methPO => methPO._propagateIn().hasNext)
+      .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
+    call.start.argument.l.filter(n => methodParamOutsOrder.toSet.contains(n.order)).toSet
   }
 
   def initKill(method: nodes.Method,
                gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
     method.start.call.map { call =>
-      call -> gen(call).map(v => killsVertices(v)).fold(Set())((v1, v2) => v1.union(v2))
+      call -> gen(call).map(v => killedVertices(v)).fold(Set())((v1, v2) => v1.union(v2))
     }.toMap
   }
 
   def initSucc(ns: List[nodes.StoredNode]): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
     ns.map {
       case n @ (cfgNode: CfgNode)               => n -> cfgNode.start.cfgNext.l
-      case n @ (param: nodes.MethodParameterIn) => n -> param.start.method.block.l
+      case n @ (param: nodes.MethodParameterIn) => n -> param.start.method.cfgFirst.l
       case n                                    => println("Shouldn't happen"); n -> List()
     }.toMap
   }
 
-  def initPred(ns: List[nodes.StoredNode]): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
+  def initPred(ns: List[nodes.StoredNode], method: nodes.Method): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
     ns.map {
+      case n @ (cfgNode: CfgNode) if method.start.cfgFirst.l.exists(_.id2 == n.id2) =>
+        n -> (cfgNode.start.cfgPrev.l ++ method.parameter.l)
       case n @ (cfgNode: CfgNode)               => n -> cfgNode.start.cfgPrev.l
       case n @ (param: nodes.MethodParameterIn) => n -> param.start.method.l
       case n                                    => println("Shouldn't happen"); n -> List()
@@ -131,105 +143,51 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     * The final representation makes it straightforward to build def-use/use-def chains */
   private def addReachingDefEdges(method: nodes.Method, solution: Solution): DiffGraph.Builder = {
 
-    val dstGraph = DiffGraph.newBuilder
-    def addEdge(fromNode: nodes.StoredNode, toNode: nodes.StoredNode, variable: String = ""): Unit = {
-      val properties = List((EdgeKeyNames.VARIABLE, variable))
-      dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF, properties)
-    }
+    implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
 
     val in = solution.in
     val out = solution.out
     val gen = solution.gen
+    val allNodes = in.keys.toList
 
-    // Add edges from formal input parameters to all nodes they
-    // are used in. This assumes that formal parameters cannot
-    // be redefined in the method body. If it's false, then this
-    // is incorrect.
-    for {
-      methodParameterIn <- method.parameter.l
-      parameterReferences <- methodParameterIn._refIn.asScala
-      operationNode <- getOperation(parameterReferences)
-    } addEdge(methodParameterIn, operationNode, methodParameterIn.name)
+    allNodes.collect { case call : nodes.Call =>
+      in(call).foreach {
+        case param: nodes.MethodParameterIn =>
+          // We create an edge to all arguments of the call
+          // that mention the parameter AND "use" it, in the
+          // sense of not just redefining it. We also checked
+          // that it is in `in(call)` and thus reaches the call.
+          val mentions = param._refIn().asScala.toSet
+          mentions.intersect(use(call, gen)).foreach{ u =>
+            addEdge(param, u, param.name)
+          }
+        case identifier : nodes.Identifier =>
+          // This identifier could be an instance of a local or a parameter
 
-    // Add edges from return nodes to formal method returns
-    val methodReturn = method.methodReturn
-    methodReturn.toReturn.foreach(
-      returnNode =>
-        addEdge(returnNode,
-                methodReturn,
-                returnNode.astChildren.headOption().map(_.asInstanceOf[nodes.CfgNode].code).getOrElse("")))
-
-    // Now look at `out` for each node
-    out.foreach {
-      case (call: nodes.Call, outDefs) =>
-        handleCall(call, outDefs)
-      case (ret: nodes.Return, _) =>
-        ret.astChildren.foreach { returnExpr =>
-          val localRef = reference(returnExpr)
-          in(ret)
-            .filter(inElement => localRef == reference(inElement))
-            .toList
-            .flatMap { filteredInElement =>
-              getExpressionFromGen(filteredInElement).map(addEdge(_, ret))
+          val mentions = identifier._refOut().asScala.flatMap { node =>
+            node match {
+              case  x : nodes.MethodParameterIn =>
+                x.start.referencingIdentifiers.toSet
+              case x : nodes.Local =>
+                x.start.referencingIdentifiers.toSet
+              case _ => Set[nodes.StoredNode]()
             }
-            .headOption
-            .getOrElse(addEdge(method, ret))
-        }
-      case _ => // ignore
+          }.toSet
+
+          mentions.intersect(use(call, gen)).foreach{ u =>
+            addEdge(identifier, u, identifier.name)
+          }
+        case _ =>
+      }
     }
 
-    def handleCall(call: Call, outDefs: Set[StoredNode]): Unit = {
-      val usesInExpression = getUsesOfCall(call, gen)
-      val localRefsUses = usesInExpression.map(reference).filter(_.isDefined)
-
-      // Create edge from entry point to all nodes that are not
-      // reached by any other definitions.
-      if (in(call).isEmpty) {
-        addEdge(method, call)
-      }
-
-      /* if use is not an identifier, add edge, as we are going to visit the use separately */
-      usesInExpression.foreach { use =>
-        if (!use.isInstanceOf[Identifier] && !use.isInstanceOf[Literal] && !use
-              .isInstanceOf[FieldIdentifier]) {
-          addEdge(use, call, use.asInstanceOf[nodes.CfgNode].code)
-
-          /* handle indirect access uses: check if we have it in our out set and get
-           * the corresponding def expression from which the definition reaches the use
-           */
-          if (isIndirectAccess(use)) {
-            outDefs.filter(out => isIndirectAccess(out)).foreach { indirectOutDef =>
-              val indirectOutCall = indirectOutDef.asInstanceOf[Call]
-              if (indirectOutCall.code == use.asInstanceOf[Call].code) {
-                val expandedToCall = indirectOutCall.parentExpression
-                addEdge(expandedToCall, use, use.asInstanceOf[nodes.CfgNode].code)
-              }
-            }
-          }
-        }
-      }
-
-      if (isOperationAndAssignment(call)) {
-        val localRefGens = gen(call).map(reference)
-        in(call)
-          .filter(inElement => localRefGens.contains(reference(inElement)))
-          .foreach { filteredInElement =>
-            getExpressionFromGen(filteredInElement).foreach(x =>
-              addEdge(x, call, filteredInElement.asInstanceOf[nodes.CfgNode].code))
-          }
-      }
-
-      for (elem <- outDefs) {
-        val localRefGen = reference(elem)
-
-        getExpressionFromGen(elem).foreach { expressionOfElement =>
-          if (expressionOfElement != call && localRefsUses.contains(localRefGen)) {
-            addEdge(expressionOfElement, call, elem.asInstanceOf[nodes.CfgNode].code)
-          }
-        }
-      }
-    }
     dstGraph
+  }
+
+  private def addEdge(fromNode: nodes.StoredNode, toNode: nodes.StoredNode, variable: String = "")(
+      implicit dstGraph: DiffGraph.Builder): Unit = {
+    val properties = List((EdgeKeyNames.VARIABLE, variable))
+    dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF, properties)
   }
 
   private def reference(node: nodes.StoredNode): Option[nodes.StoredNode] =
@@ -270,42 +228,39 @@ object DataFlowFrameworkHelper {
       .flatMap(method => method.parameter.asOutput)
   }
 
-  def filterArgumentIndex(nodeList: List[nodes.StoredNode], orderSeq: Iterable[Int]): List[nodes.StoredNode] = {
-    nodeList.filter(node => orderSeq.exists(_ == node.asInstanceOf[nodes.HasArgumentIndex].argumentIndex.toInt))
-  }
-
-  def getUsesOfCall(expr: nodes.StoredNode,
-                    gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Set[nodes.StoredNode] = {
-    expr
+  def use(call: nodes.StoredNode, gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Set[nodes.StoredNode] = {
+    call
       ._argumentOut()
       .asScala
-      .filter(!gen(expr).contains(_))
+      .filter(!gen(call).contains(_))
       .toSet
   }
 
-  def getExpressionFromGen(genVertex: nodes.StoredNode): Option[nodes.StoredNode] = {
-    getOperation(genVertex).filter(_.isInstanceOf[nodes.Call])
+  def parentCallForDefinition(genVertex: nodes.StoredNode): Option[nodes.StoredNode] = {
+    parentCall(genVertex).filter(_.isInstanceOf[nodes.Call])
   }
 
-  /** Returns a set of nodes that are killed by the passed nodes */
-  def killsVertices(node: nodes.StoredNode): Set[nodes.StoredNode] = {
-
-    val localRefIt = node._refOut().asScala
-
-    if (!localRefIt.hasNext) {
-      Set()
-    } else {
-      val localRef = localRefIt.next
-      localRef._refIn().asScala.filter(_.id2 != node.id2).toSet
-    }
-  }
-
-  def getOperation(node: nodes.StoredNode): Option[nodes.StoredNode] = {
+  /**
+    * Walks up argument edges until the parent `Call` or `Return`
+    * is found
+    **/
+  def parentCall(node: nodes.StoredNode): Option[nodes.StoredNode] = {
     node match {
-      case identifier: nodes.Identifier => identifier._argumentIn().nextOption.flatMap(getOperation)
+      case identifier: nodes.Identifier => identifier._argumentIn().nextOption.flatMap(parentCall)
       case _: nodes.Call                => Some(node)
       case _: nodes.Return              => Some(node)
       case _                            => None
     }
   }
+
+  /** Returns a set of nodes that are killed by the passed nodes */
+  def killedVertices(node: nodes.StoredNode): Set[nodes.StoredNode] = {
+    // We kill anything that references the same local/param
+    val localsAndParamsReferenced = node._refOut().asScala.toList
+    localsAndParamsReferenced.flatMap { localRef =>
+      localRef._refIn().asScala.filter(_.id2 != node.id2).toSet ++
+        localsAndParamsReferenced.filter(_.isInstanceOf[nodes.MethodParameterIn]).toSet
+    }.toSet
+  }
+
 }

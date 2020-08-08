@@ -8,9 +8,13 @@ import scala.jdk.CollectionConverters._
 
 object DotCfgGenerator {
 
-  def toDotCfg(step: NodeSteps[nodes.Method]): Steps[String] = step.map(Shared.dotGraph(_, expand))
+  def toDotCfg(step: NodeSteps[nodes.Method]): Steps[String] =
+    step.map { methodNode =>
+      val vertices = methodNode.start.cfgNode.l ++ List(methodNode, methodNode.methodReturn)
+      Shared.dotGraph(methodNode, vertices, expand)
+    }
 
-  protected def expand(v: nodes.CfgNode): Iterator[Edge] = {
+  protected def expand(v: nodes.StoredNode): Iterator[Edge] = {
     v._cfgOut()
       .asScala
       .filter(_.isInstanceOf[nodes.CfgNode])
