@@ -17,9 +17,7 @@ object Shared {
   def cfgNodeShouldBeDisplayed(v: Node): Boolean = !(
     v.isInstanceOf[nodes.Literal] ||
       v.isInstanceOf[nodes.Identifier] ||
-      v.isInstanceOf[nodes.Block] ||
-      v.isInstanceOf[nodes.ControlStructure] ||
-      v.isInstanceOf[nodes.JumpTarget]
+      v.isInstanceOf[nodes.Block]
   )
 
   private def nodesAndEdges(methodNode: nodes.Method, expand: nodes.CfgNode => Iterator[Edge]): List[String] = {
