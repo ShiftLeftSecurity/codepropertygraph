@@ -33,7 +33,7 @@ object Shared {
         val children = expand(srcNode).filter(x => vertices.contains(x.dst))
         val (visible, invisible) = children.partition(x => cfgNodeShouldBeDisplayed(x.dst))
         visible.toList ++ invisible.toList.flatMap { n =>
-          edgesToDisplay(n.dst, visited ++ List(srcNode))
+          edgesToDisplay(n.dst, visited ++ List(srcNode)).map(y => Edge(srcNode, y.dst))
         }
       }
     }
@@ -62,7 +62,7 @@ object Shared {
       case method: nodes.Method => method.name
       case _                    => ""
     }
-    sb.append(s"digraph $name { graph [bgcolor=transparent]; \n")
+    sb.append(s"digraph $name {  \n")
   }
 
   def stringRepr(vertex: nodes.AstNode): String = {
