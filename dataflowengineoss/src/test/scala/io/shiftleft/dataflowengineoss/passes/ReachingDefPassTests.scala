@@ -45,17 +45,42 @@ class ReachingDefPassTests1 extends DataFlowCodeToCpgSuite {
   "Test 1.1: should return no flow when variable is overwritten" in {
     val src = cpg.parameter.name("x").l
     src.size shouldBe 1
-    src.start.ddgNext.l.size shouldBe 0
+    src.start.ddgNext.size shouldBe 0
     val snk = cpg.call("sink").argument(1).l
     snk.size shouldBe 1
     snk.start.reachableByFlows(src.start).l.size shouldBe 0
+    snk.start.reachableByFlows(cpg.call.name("sink")).size shouldBe 0
   }
 
   "Test 1.2: should return a flow from assignment's `x` to sink" in {
     val src = cpg.assignment.target.l
     src.size shouldBe 1
     val snk = cpg.call("sink").argument(1).l
-    println(snk.start.reachableByFlows(src.start).l)
+    snk.start.reachableByFlows(src.start).size shouldBe 1
+  }
+
+  "Test 1.3: should also identify flow if sink is the call" in {
+    val src = cpg.assignment.target.l
+    src.size shouldBe 1
+    val snk = cpg.call("sink")
+    println(snk.reachableByFlows(src.start).l)
+  }
+
+  "Test 1.4 should find flow from identifier to itself" in {
+    val src = cpg.assignment.target.l
+    val snk = src
+
+    snk.start.reachableByFlows(src.start).l match {
+      case List(p) => p.elements.size shouldBe 1
+        p.elements.head.asInstanceOf[nodes.Identifier].name shouldBe "x"
+      case _ => fail
+    }
+  }
+
+  "Test 1.5 should find flow from identifier to parent call" in {
+    val src = cpg.assignment.source.l
+    val snk = cpg.assignment.l
+    snk.start.reachableByFlows(src.start).size shouldBe 1
   }
 
 }

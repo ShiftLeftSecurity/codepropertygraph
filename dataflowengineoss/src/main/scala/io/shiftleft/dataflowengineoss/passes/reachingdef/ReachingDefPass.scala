@@ -151,6 +151,12 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val allNodes = in.keys.toList
 
     allNodes.collect { case call : nodes.Call =>
+
+      gen(call).union(use(call, gen)).foreach{ symbol =>
+        println(symbol.asInstanceOf[nodes.CfgNode].code + " taints " + call.code)
+        addEdge(symbol, call, symbol.asInstanceOf[nodes.CfgNode].code)
+      }
+
       in(call).foreach {
         case param: nodes.MethodParameterIn =>
           // We create an edge to all arguments of the call
@@ -161,10 +167,10 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           mentions.intersect(use(call, gen)).foreach{ u =>
             addEdge(param, u, param.name)
           }
-        case identifier : nodes.Identifier =>
+        case inIdentifier : nodes.Identifier =>
           // This identifier could be an instance of a local or a parameter
 
-          val mentions = identifier._refOut().asScala.flatMap { node =>
+          val mentions = inIdentifier._refOut().asScala.flatMap { node =>
             node match {
               case  x : nodes.MethodParameterIn =>
                 x.start.referencingIdentifiers.toSet
@@ -175,7 +181,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           }.toSet
 
           mentions.intersect(use(call, gen)).foreach{ u =>
-            addEdge(identifier, u, identifier.name)
+            addEdge(inIdentifier, u, inIdentifier.name)
           }
         case _ =>
       }

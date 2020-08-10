@@ -148,7 +148,10 @@
         },
         {"name" : "LITERAL",
           "outEdges" : [
-            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]},
+	     {"edgeName" : "REACHING_DEF", "inNodes" : [
+              {"name" : "CALL"}
+            ]}
           ]
         },
         { "name": "CALL",
@@ -170,7 +173,10 @@
         },
         {"name" : "IDENTIFIER",
           "outEdges" : [
-            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]},
+	    {"edgeName" : "REACHING_DEF", "inNodes" : [
+              {"name" : "IDENTIFIER"}
+            ]}
           ]
         },
         {"name" : "BLOCK",

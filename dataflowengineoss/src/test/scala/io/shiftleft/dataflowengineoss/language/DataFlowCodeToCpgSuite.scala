@@ -30,17 +30,15 @@ class DataFlowCodeToCpgSuite extends CodeToCpgSuite {
     cpg.typeDecl.nameExact(typeName).method.isLiteral.codeExact(literalName)
 
   protected def flowToResultPairs(path: Path): List[(String, Option[Integer])] = {
-    path.elements.map { point =>
-      point match {
-        case _: nodes.MethodParameterIn => {
+    path.elements
+      .map {
+        case point@(_: nodes.MethodParameterIn) =>
           val method = point.start.method.head
           val method_name = method.name
           val code = s"$method_name(${method.start.parameter.l.sortBy(_.order).map(_.code).mkString(", ")})"
           (code, point.cfgNode.lineNumber)
-        }
-        case _ => (point.cfgNode.repr, point.cfgNode.lineNumber)
+        case point => (point.cfgNode.repr, point.cfgNode.lineNumber)
       }
-    }
   }
 
 }
