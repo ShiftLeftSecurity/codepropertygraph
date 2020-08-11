@@ -3,11 +3,13 @@ package io.shiftleft.semanticcpg.passes
 import io.shiftleft.OverflowDbTestInstance
 import overflowdb._
 import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominator, CfgDominatorFrontier, DomTreeAdapter, CfgAdapter}
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+
 
 import scala.jdk.CollectionConverters._
 
-class CfgDominatorFrontierTests extends WordSpec with Matchers {
+class CfgDominatorFrontierTests extends AnyWordSpec with Matchers {
 
   private class TestCfgAdapter extends CfgAdapter[Node] {
     override def successors(node: Node): IterableOnce[Node] =

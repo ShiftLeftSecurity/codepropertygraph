@@ -5,9 +5,11 @@ import io.shiftleft.codepropertygraph.generated._
 import overflowdb._
 import io.shiftleft.semanticcpg.passes.methoddecorations.MethodDecoratorPass
 import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class MethodDecoratorPassTests extends WordSpec with Matchers {
+
+class MethodDecoratorPassTests extends AnyWordSpec with Matchers {
   "MethodDecoratorTest" in EmptyGraphFixture { graph =>
     val method = graph + NodeTypes.METHOD
     val parameterIn = graph

@@ -4,8 +4,10 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import org.scalatest.{LoneElement, Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class FileTests extends WordSpec with Matchers with LoneElement {
+class FileTests extends AnyWordSpec with Matchers with LoneElement {
   val fileName = "io/shiftleft/testcode/file/FileTest.java"
 
   "generic cpg" should ExistingCpgFixture("file") { fixture =>

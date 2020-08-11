@@ -6,11 +6,13 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+
 
 import scala.collection.mutable
 
-class StepsTest extends WordSpec with Matchers {
+class StepsTest extends AnyWordSpec with Matchers {
 
   "generic cpg" should {
 

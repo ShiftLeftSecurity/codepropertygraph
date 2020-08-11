@@ -5,11 +5,13 @@ import overflowdb._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+
 
 import scala.jdk.CollectionConverters._
 
-class CfgDominatorPassTests extends WordSpec with Matchers {
+class CfgDominatorPassTests extends AnyWordSpec with Matchers {
   "Have correct DOMINATE/POST_DOMINATE edges after CfgDominatorPass run." in {
     val graph = OverflowDbTestInstance.create
     val cpg = new Cpg(graph)

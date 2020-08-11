@@ -1,9 +1,11 @@
 package io.shiftleft.console
 
 import better.files.File
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ConsoleConfigTest extends WordSpec with Matchers {
+
+class ConsoleConfigTest extends AnyWordSpec with Matchers {
   "An InstallConfig" should {
     "set the rootPath to the current working directory by default" in {
       val config = new InstallConfig(environment = Map.empty)

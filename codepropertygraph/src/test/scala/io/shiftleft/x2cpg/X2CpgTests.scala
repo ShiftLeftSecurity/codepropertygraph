@@ -1,9 +1,11 @@
 package io.shiftleft.x2cpg
 
-import org.scalatest.{Matchers, WordSpec}
+
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import better.files.File
 
-class X2CpgTests extends WordSpec with Matchers {
+class X2CpgTests extends AnyWordSpec with Matchers {
 
   "initCpg" should {
 

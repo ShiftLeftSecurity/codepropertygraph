@@ -1,10 +1,12 @@
 package io.shiftleft.semanticcpg
 
 import io.shiftleft.semanticcpg.testing.MockCpg
-import org.scalatest.{Matchers, WordSpec}
+
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import io.shiftleft.semanticcpg.language._
 
-class OverlaysTests extends WordSpec with Matchers {
+class OverlaysTests extends AnyWordSpec with Matchers {
 
   "Overlays" should {
 

@@ -1,9 +1,11 @@
 package io.shiftleft.console
 
 import io.shiftleft.console.workspacehandling.Project
-import org.scalatest.{Matchers, WordSpec}
 
-class HelpTests extends WordSpec with Matchers {
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+
+class HelpTests extends AnyWordSpec with Matchers {
 
   "Help" should {
     "provide overview of commands as table" in {

@@ -1,11 +1,13 @@
 package io.shiftleft.semanticcpg.language.types.expressions
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import org.scalatest.{Matchers, WordSpec}
+
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ExpressionTests extends WordSpec with Matchers {
+class ExpressionTests extends AnyWordSpec with Matchers {
 
   "generic cpg" should ExistingCpgFixture("expression") { fixture =>
     "expand to next expression in CFG" in {

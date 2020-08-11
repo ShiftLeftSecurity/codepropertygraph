@@ -6,9 +6,11 @@ import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.console.LanguageHelper._
 import io.shiftleft.console.cpgcreation.LanguageGuesser._
 import io.shiftleft.console.cpgcreation.LlvmLanguageFrontend
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class LanguageHelperTests extends WordSpec with Matchers {
+
+class LanguageHelperTests extends AnyWordSpec with Matchers {
 
   "LanguageHelper.guessLanguage" should {
 

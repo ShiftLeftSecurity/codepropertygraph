@@ -5,15 +5,17 @@ import java.util.UUID
 import scala.concurrent._
 import scala.concurrent.duration._
 
-import org.scalatest.{Matchers, WordSpec}
+
 
 import cask.util.Logger.Console._
 import castor.Context.Simple.global
 import ujson.Value.Value
 
 import io.shiftleft.console.embammonite.EmbeddedAmmonite
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class CPGQLServerTests extends WordSpec with Matchers {
+class CPGQLServerTests extends AnyWordSpec with Matchers {
   val validBasicAuthHeaderVal = "Basic dXNlcm5hbWU6cGFzc3dvcmQ="
 
   val DefaultPromiseAwaitTimeout = Duration(10, SECONDS)

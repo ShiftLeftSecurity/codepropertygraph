@@ -9,12 +9,13 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, ModifierTypes}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.passes.DiffGraph.{EdgeInDiffGraph, EdgeToOriginal}
-import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.codepropertygraph.generated.NodeKeyNames
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.jdk.CollectionConverters._
 
-class NewNodeStepsTest extends WordSpec with Matchers {
+class NewNodeStepsTest extends AnyWordSpec with Matchers {
   import NewNodeNodeStepsTest._
 
   "stores NewNodes" in {

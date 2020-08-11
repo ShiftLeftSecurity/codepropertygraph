@@ -2,7 +2,7 @@ package io.shiftleft.queries
 
 import io.shiftleft.dataflowengineoss.language.{DataFlowCodeToCpgSuite, _}
 import io.shiftleft.semanticcpg.language._
-import org.scalatest.{Matchers, WordSpec}
+
 
 class MallocMemcpyTests extends DataFlowCodeToCpgSuite {
 

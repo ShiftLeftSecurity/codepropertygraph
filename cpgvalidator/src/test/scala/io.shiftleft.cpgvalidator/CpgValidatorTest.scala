@@ -5,9 +5,11 @@ import io.shiftleft.cpgvalidator.validators.CpgValidator
 import overflowdb._
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class CpgValidatorTest extends WordSpec with Matchers {
+
+class CpgValidatorTest extends AnyWordSpec with Matchers {
   private def withNewBaseCpg[T](fun: Cpg => T): T = {
     val graph = OverflowDbTestInstance.create
     val cpg = Cpg(graph)

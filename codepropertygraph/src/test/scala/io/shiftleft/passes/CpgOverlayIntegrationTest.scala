@@ -5,9 +5,11 @@ import overflowdb._
 import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class CpgOverlayIntegrationTest extends WordSpec with Matchers {
+
+class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
   val InitialNodeCode = "initialNode"
   val Pass1NewNodeCode = "pass1NewNodeCode"
   val Pass2NewNodeCode = "pass2NewNodeCode"

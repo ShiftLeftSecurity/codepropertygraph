@@ -1,11 +1,13 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import org.scalatest.{Matchers, WordSpec}
+
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class TypeTests extends WordSpec with Matchers {
+class TypeTests extends AnyWordSpec with Matchers {
   ExistingCpgFixture("type") { fixture =>
     "ClassMemberTest" should {
 

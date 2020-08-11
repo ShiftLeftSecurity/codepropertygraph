@@ -5,10 +5,12 @@ import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+
 import scala.jdk.CollectionConverters._
 
-class ContainsEdgePassTest extends WordSpec with Matchers {
+class ContainsEdgePassTest extends AnyWordSpec with Matchers {
 
   import ContainsEdgePassTest.Fixture
 

@@ -6,9 +6,11 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import io.shiftleft.passes.{DiffGraph, IntervalKeyPool}
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class DiffGraphTest extends WordSpec with Matchers {
+
+class DiffGraphTest extends AnyWordSpec with Matchers {
   "should be able to build an inverse DiffGraph" in {
     withTestOdb { graph =>
       // setup existing graph

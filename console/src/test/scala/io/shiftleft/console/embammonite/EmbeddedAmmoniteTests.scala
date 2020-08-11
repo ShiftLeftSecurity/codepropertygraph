@@ -2,9 +2,11 @@ package io.shiftleft.console.embammonite
 
 import java.util.concurrent.Semaphore
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class EmbeddedAmmoniteTests extends WordSpec with Matchers {
+
+class EmbeddedAmmoniteTests extends AnyWordSpec with Matchers {
 
   "EmbeddedAmmoniteShell" should {
     "start and shutdown without hanging" in {

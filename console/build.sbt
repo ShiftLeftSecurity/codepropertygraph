@@ -49,7 +49,7 @@ val CaskVersion = "0.6.7"
 val CatsVersion = "2.0.0"
 val CirceVersion = "0.12.2"
 val AmmoniteVersion = "1.8.1"
-val ScalatestVersion = "3.0.8"
+val ScalatestVersion = "3.1.1"
 val ZeroturnaroundVersion = "1.13"
 
 libraryDependencies ++= Seq(

@@ -1,8 +1,10 @@
 package io.shiftleft.codepropertygraph.predicates
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-import org.scalatest.{Matchers, WordSpec}
 
-class TextTest extends WordSpec with Matchers {
+
+class TextTest extends AnyWordSpec with Matchers {
   val name = "fully funny"
 
   "Text.textRegex" should {
