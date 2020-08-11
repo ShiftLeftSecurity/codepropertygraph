@@ -3,9 +3,11 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class BindingMethodOverridesPassTests extends WordSpec with Matchers {
+
+class BindingMethodOverridesPassTests extends AnyWordSpec with Matchers {
   "Binding propagation should not mark non-overwritten bindings" in {
     val cpg = Cpg.emptyCpg
     val diffGraph = DiffGraph.newBuilder

@@ -13,7 +13,7 @@ libraryDependencies ++= Seq(
   "com.github.scopt" %% "scopt" % "3.7.1",
   "org.slf4j" % "slf4j-api" % "1.7.30",
   "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.11.2" % Test,
-  "org.scalatest" %% "scalatest" % "3.0.8" % Test
+  "org.scalatest" %% "scalatest" % "3.1.1" % Test
 )
 
 import better.files.FileExtensions

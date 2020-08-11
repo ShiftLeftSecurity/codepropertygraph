@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
-import org.scalatest.{Matchers, WordSpec}
+
 
 class CallGraphTests extends CodeToCpgSuite {
 

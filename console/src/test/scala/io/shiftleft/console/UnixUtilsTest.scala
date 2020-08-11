@@ -2,9 +2,11 @@ package io.shiftleft.console
 
 import better.files._
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class UnixUtilsTest extends WordSpec with Matchers {
+
+class UnixUtilsTest extends AnyWordSpec with Matchers {
 
   "writes to file (overwrite)" when {
     "using String" in {

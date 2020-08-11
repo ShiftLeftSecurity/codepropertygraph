@@ -3,11 +3,13 @@ package io.shiftleft.console.workspacehandling
 import better.files.Dsl._
 import better.files.File
 import io.shiftleft.semanticcpg.testing.MockCpg
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+
 
 import scala.collection.mutable.ListBuffer
 
-class WorkspaceTests extends WordSpec with Matchers {
+class WorkspaceTests extends AnyWordSpec with Matchers {
 
   "toString" should {
 

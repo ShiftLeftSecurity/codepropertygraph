@@ -5,11 +5,13 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeysOdb, NodeTyp
 import overflowdb._
 import io.shiftleft.semanticcpg.passes.linking.capturinglinker.CapturingLinker
 import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+
 
 import scala.jdk.CollectionConverters._
 
-class CapturingLinkerTests extends WordSpec with Matchers {
+class CapturingLinkerTests extends AnyWordSpec with Matchers {
 
   "link CLOSURE_BINDING and LOCALS with same CLOSURE_BINDING_IDs" in EmptyGraphFixture { graph =>
     val closureBinding1 = graph + (NodeTypes.CLOSURE_BINDING, NodeKeysOdb.CLOSURE_BINDING_ID -> "id1")

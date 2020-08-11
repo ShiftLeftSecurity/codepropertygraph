@@ -2,11 +2,13 @@ package io.shiftleft.console.workspacehandling
 
 import better.files.Dsl.mkdir
 import better.files.File
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+
 
 import scala.reflect.io.Directory
 
-class WorkspaceLoaderTests extends WordSpec with Matchers {
+class WorkspaceLoaderTests extends AnyWordSpec with Matchers {
 
   private val tmpDirPrefix = "workspace-tests"
 

@@ -6,9 +6,11 @@ import java.nio.file.Files
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
 import io.shiftleft.semanticcpg.testfixtures.LanguageFrontend.FuzzycFrontend
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.matchers.should.Matchers
 
-class CodeToCpgSuite extends WordSpec with Matchers with BeforeAndAfterAll {
+class CodeToCpgSuite extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 
   val code = ""
   var cpg: Cpg = _

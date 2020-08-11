@@ -1,8 +1,10 @@
 package io.shiftleft.passes
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class KeyPoolTests extends WordSpec with Matchers {
+
+class KeyPoolTests extends AnyWordSpec with Matchers {
 
   "IntervalKeyPool" should {
     "return [first, ..., last] and then raise" in {

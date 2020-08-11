@@ -1,12 +1,14 @@
 package io.shiftleft.console.scripting
 
-import org.scalatest.{Matchers, WordSpec}
+
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import io.shiftleft.codepropertygraph.Cpg
 
 import java.nio.file.{Path, Paths}
 
-class AmmoniteExecutorTest extends WordSpec with Matchers {
+class AmmoniteExecutorTest extends AnyWordSpec with Matchers {
   private object TestAmmoniteExecutor extends AmmoniteExecutor {
     override protected def predef: String =
       """

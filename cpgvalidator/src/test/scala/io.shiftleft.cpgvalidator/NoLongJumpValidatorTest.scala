@@ -5,9 +5,11 @@ import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeysOdb, NodeTypes}
 import io.shiftleft.cpgvalidator.validators.cfg.NoLongJumpValidator
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class NoLongJumpValidatorTest extends WordSpec with Matchers {
+
+class NoLongJumpValidatorTest extends AnyWordSpec with Matchers {
   private def withNewBaseCpg[T](fun: Cpg => T): T = {
     val graph = OverflowDbTestInstance.create
     val cpg = Cpg(graph)

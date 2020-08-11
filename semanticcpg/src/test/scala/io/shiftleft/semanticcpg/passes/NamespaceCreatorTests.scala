@@ -6,9 +6,11 @@ import overflowdb._
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class NamespaceCreatorTests extends WordSpec with Matchers {
+
+class NamespaceCreatorTests extends AnyWordSpec with Matchers {
   "NamespaceCreateor test " in EmptyGraphFixture { graph =>
     val cpg = new Cpg(graph)
     val block1 = graph + (NodeTypes.NAMESPACE_BLOCK, NodeKeysOdb.NAME -> "namespace1")

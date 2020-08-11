@@ -4,11 +4,13 @@ import better.files.File
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
-import org.scalatest.{Matchers, WordSpec}
+
 
 import scala.jdk.CollectionConverters._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class CpgPassTests extends WordSpec with Matchers {
+class CpgPassTests extends AnyWordSpec with Matchers {
 
   private object Fixture {
     def apply(keyPool: Option[KeyPool] = None)(f: (Cpg, CpgPassBase) => Unit): Unit = {

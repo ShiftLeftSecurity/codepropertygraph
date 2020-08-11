@@ -3,7 +3,9 @@ package io.shiftleft.codepropertygraph.cpgloading
 import java.nio.file.FileSystemNotFoundException
 
 import overflowdb.{OdbConfig, OdbGraph}
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+
 
 /**
   * Specification of the CPGLoader. The loader allows CPGs to be loaded
@@ -11,7 +13,7 @@ import org.scalatest.{Matchers, WordSpec}
   * An optional `CpgLoaderConfig` can be passed to the loader to influence
   * the loading process.
   * */
-class CpgLoaderTests extends WordSpec with Matchers {
+class CpgLoaderTests extends AnyWordSpec with Matchers {
 
   val filename = "resources/testcode/cpgs/hello-shiftleft-0.0.5/cpg.bin.zip"
 

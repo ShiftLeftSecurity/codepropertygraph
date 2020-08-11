@@ -6,14 +6,16 @@ import java.util.zip.ZipOutputStream
 import better.files.Dsl._
 import better.files._
 import io.shiftleft.codepropertygraph.Cpg
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.console.testing._
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, Scpg}
 
 import scala.util.Try
 
-class ConsoleTests extends WordSpec with Matchers {
+class ConsoleTests extends AnyWordSpec with Matchers {
 
   "importCode" should {
     "provide overview of available language modules" in ConsoleFixture() { (console, _) =>

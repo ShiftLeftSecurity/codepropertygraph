@@ -2,9 +2,11 @@ package io.shiftleft.console.workspacehandling
 
 import better.files._
 import io.shiftleft.codepropertygraph.Cpg
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class WorkspaceManagerTests extends WordSpec with Matchers {
+
+class WorkspaceManagerTests extends AnyWordSpec with Matchers {
 
   private val tmpDirPrefix = "workspace-tests"
 

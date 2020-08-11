@@ -2,7 +2,7 @@ package io.shiftleft.console.scripting
 
 import better.files.File
 import cats.effect.IO
-import org.scalatest.{Inside, Matchers, WordSpec}
+import org.scalatest.{Inside}
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.console.scripting.ScriptManager.{ScriptCollections, ScriptDescription, ScriptDescriptions}
@@ -11,8 +11,10 @@ import java.nio.file.{FileSystemNotFoundException, NoSuchFileException, Path}
 
 import scala.io.Source
 import scala.util.Try
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ScriptManagerTest extends WordSpec with Matchers with Inside {
+class ScriptManagerTest extends AnyWordSpec with Matchers with Inside {
 
   private object TestScriptExecutor extends AmmoniteExecutor {
     override protected def predef: String = ""

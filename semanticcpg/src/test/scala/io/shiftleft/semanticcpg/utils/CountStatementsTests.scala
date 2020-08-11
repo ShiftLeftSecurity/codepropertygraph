@@ -1,9 +1,11 @@
 package io.shiftleft.semanticcpg.utils
 
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class CountStatementsTests extends WordSpec with Matchers {
+
+class CountStatementsTests extends AnyWordSpec with Matchers {
 
   "Class Statements" should ExistingCpgFixture("method") { fixture =>
     "count statements correctly" in {
