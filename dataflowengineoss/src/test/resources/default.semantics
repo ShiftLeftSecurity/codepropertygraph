@@ -11,7 +11,3 @@
 <operator>.assignmentPlus, 1
 <operator>.assignmentShiftLeft, 1
 <operator>.assignmentXor, 1
-<operator>.postIncrement, 1
-<operator>.preIncrement, 1
-<operator>.postDecrement, 1
-<operator>.preDecrement, 1

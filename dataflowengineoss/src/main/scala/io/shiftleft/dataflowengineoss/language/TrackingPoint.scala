@@ -76,7 +76,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     }
 
     sinkSymbols.map(getTrackingPoint).foreach {
-      case Some(trackingPoing) => traverseDDGBack(List(trackingPoing))
+      case Some(trackingPoint) => traverseDDGBack(List(trackingPoint))
       case None                =>
     }
 

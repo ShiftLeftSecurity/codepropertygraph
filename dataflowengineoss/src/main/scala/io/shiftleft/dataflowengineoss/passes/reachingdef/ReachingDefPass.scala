@@ -150,12 +150,12 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val gen = solution.gen
     val allNodes = in.keys.toList
 
-    allNodes.collect { case call : nodes.Call =>
+    allNodes.collect{ case ret : nodes.Return =>
+      addEdge(ret, method.methodReturn, ret.astChildren.order(1).where(_.isInstanceOf[nodes.CfgNode]).map(_.asInstanceOf[nodes.CfgNode]).code().headOption().getOrElse(""))
+    }
 
-      gen(call).union(use(call, gen)).foreach{ symbol =>
-        println(symbol.asInstanceOf[nodes.CfgNode].code + " taints " + call.code)
-        addEdge(symbol, call, symbol.asInstanceOf[nodes.CfgNode].code)
-      }
+    allNodes.collect { case call : nodes.StoredNode if (call.isInstanceOf[nodes.Call] || call.isInstanceOf[nodes.Return])  =>
+     createIntraCallReachingDefinitions(call)
 
       in(call).foreach {
         case param: nodes.MethodParameterIn =>
@@ -169,7 +169,6 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           }
         case inIdentifier : nodes.Identifier =>
           // This identifier could be an instance of a local or a parameter
-
           val mentions = inIdentifier._refOut().asScala.flatMap { node =>
             node match {
               case  x : nodes.MethodParameterIn =>
@@ -184,6 +183,26 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
             addEdge(inIdentifier, u, inIdentifier.name)
           }
         case _ =>
+      }
+    }
+
+    /**
+      * For each call, create reachable_by edges from each use to each def and
+      * from each use to the call itself (which represents the return value).
+      * The latter is an important design choice: we are saying that the return
+      * value is always influenced by the arguments of the function. This may not
+      * always be true, but when it isn't we can filter out these flows once
+      * they have been returned by the data flow tracker. This is in contrast
+      * to an approach where we only return flows through methods which we
+      * have specifically marked as methods that taint their return value
+      * based on their arguments.
+      * */
+    def createIntraCallReachingDefinitions(callOrReturn : nodes.StoredNode) : Unit = {
+      use(callOrReturn, gen).foreach{ useSymbol =>
+        gen(callOrReturn).foreach{ genSymbol =>
+          addEdge(useSymbol, genSymbol, useSymbol.asInstanceOf[nodes.CfgNode].code)
+        }
+        addEdge(useSymbol, callOrReturn, useSymbol.asInstanceOf[nodes.CfgNode].code)
       }
     }
 

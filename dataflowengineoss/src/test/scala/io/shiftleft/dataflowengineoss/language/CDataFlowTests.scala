@@ -164,13 +164,8 @@ class CDataFlowTests4 extends DataFlowCodeToCpgSuite {
 
   "Test 4: flow chains from a to x" in {
     val source = cpg.identifier.name("a")
-    val sink = cpg.identifier.name("b")
+    val sink = cpg.identifier.name("x")
     val flows = sink.reachableByFlows(source).l
-
-    flows.map(flowToResultPairs).foreach{ pair =>
-      println(pair)
-    }
-
 
     flows.size shouldBe 2
     flows.map(flowToResultPairs).toSet shouldBe
@@ -330,11 +325,6 @@ class CDataFlowTests8 extends DataFlowCodeToCpgSuite {
             ("b = a", 4),
             ("foo(b)", 5)
           ))
-
-    val source2 = cpg.identifier.name("a")
-    val sink2 = cpg.call.name("foo")
-    val flows2 = sink2.reachableByFlows(source2).l
-    flows shouldBe flows2
   }
 }
 

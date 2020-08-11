@@ -84,3 +84,22 @@ class ReachingDefPassTests1 extends DataFlowCodeToCpgSuite {
   }
 
 }
+
+class ReachingDefPassTests2 extends DataFlowCodeToCpgSuite {
+
+  override val code =
+    """
+      |int foo() {
+      | int x = 0x10;
+      | int y = x + 2;
+      | sink(y);
+      |}
+      |""".stripMargin
+
+  "should find flow from declaration to sink" in {
+    val src = cpg.identifier.name("x").filter(_.inCall.code(".*0x10.*"))
+    val snk = cpg.call("sink").argument
+    snk.reachableByFlows(src).foreach{ flow => flow.elements.foreach(println); println("===") }
+  }
+
+}
