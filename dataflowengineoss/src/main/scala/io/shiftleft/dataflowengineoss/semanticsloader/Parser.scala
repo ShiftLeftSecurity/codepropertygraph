@@ -1,7 +1,9 @@
 package io.shiftleft.dataflowengineoss.semanticsloader
 
+import java.io.InputStream
+
 import io.shiftleft.dataflowengineoss.{SemanticsBaseListener, SemanticsLexer, SemanticsParser}
-import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
+import org.antlr.v4.runtime.{CharStream, CharStreams, CommonTokenStream}
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 
 import scala.collection.mutable
@@ -12,9 +14,17 @@ case class FlowSemantic(methodFullName: String, mappings: List[(Int, Int)])
 class Parser() {
 
   def parse(input: String): List[FlowSemantic] = {
+    val charStream = CharStreams.fromString(input)
+    parseCharStream(charStream)
+  }
 
-    val stream = CharStreams.fromString(input)
-    val lexer = new SemanticsLexer(stream)
+  def parseFile(fileName: String): List[FlowSemantic] = {
+    val charStream = CharStreams.fromFileName(fileName)
+    parseCharStream(charStream)
+  }
+
+  private def parseCharStream(charStream: CharStream): List[FlowSemantic] = {
+    val lexer = new SemanticsLexer(charStream)
     val tokenStream = new CommonTokenStream(lexer)
     val parser = new SemanticsParser(tokenStream)
     val treeWalker = new ParseTreeWalker();
