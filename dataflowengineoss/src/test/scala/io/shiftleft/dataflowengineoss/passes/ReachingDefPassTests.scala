@@ -19,15 +19,15 @@ class ReachingDefPassTests extends DataFlowCodeToCpgSuite {
     val flows = snk.reachableByFlows(src).l
     flows.size shouldBe 1
     flows.head.elements match {
-      case List(first : nodes.MethodParameterIn, arg : nodes.Identifier) =>
+      case List(first: nodes.MethodParameterIn, arg: nodes.Identifier) =>
         first.name shouldBe "x"
         arg.code shouldBe "x"
       case _ => fail
     }
 
     cpg.parameter.name("x").ddgNext.l match {
-      case List(x : nodes.Identifier) => x.code shouldBe "x"
-      case _ => fail
+      case List(x: nodes.Identifier) => x.code shouldBe "x"
+      case _                         => fail
     }
   }
 }
@@ -71,7 +71,8 @@ class ReachingDefPassTests1 extends DataFlowCodeToCpgSuite {
     val snk = src
 
     snk.start.reachableByFlows(src.start).l match {
-      case List(p) => p.elements.size shouldBe 1
+      case List(p) =>
+        p.elements.size shouldBe 1
         p.elements.head.asInstanceOf[nodes.Identifier].name shouldBe "x"
       case _ => fail
     }
@@ -99,7 +100,9 @@ class ReachingDefPassTests2 extends DataFlowCodeToCpgSuite {
   "should find flow from declaration to sink" in {
     val src = cpg.identifier.name("x").filter(_.inCall.code(".*0x10.*"))
     val snk = cpg.call("sink").argument
-    snk.reachableByFlows(src).foreach{ flow => flow.elements.foreach(println); println("===") }
+    snk.reachableByFlows(src).foreach { flow =>
+      flow.elements.foreach(println); println("===")
+    }
   }
 
 }

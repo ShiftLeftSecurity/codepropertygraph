@@ -32,14 +32,14 @@ class DataFlowCodeToCpgSuite extends CodeToCpgSuite {
   protected def flowToResultPairs(path: Path): List[(String, Option[Integer])] = {
     val pairs = path.elements
       .map {
-        case point@(_: nodes.MethodParameterIn) =>
+        case point @ (_: nodes.MethodParameterIn) =>
           val method = point.start.method.head
           val method_name = method.name
           val code = s"$method_name(${method.start.parameter.l.sortBy(_.order).map(_.code).mkString(", ")})"
           (code, point.cfgNode.lineNumber)
         case point => (point.cfgNode.repr, point.cfgNode.lineNumber)
       }
-      pairs.headOption.map(x => x :: pairs.sliding(2).collect { case Seq(a,b) if a != b => b }.toList).getOrElse(List())
+    pairs.headOption.map(x => x :: pairs.sliding(2).collect { case Seq(a, b) if a != b => b }.toList).getOrElse(List())
   }
 
 }

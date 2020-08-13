@@ -150,40 +150,56 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val gen = solution.gen
     val allNodes = in.keys.toList
 
-    allNodes.collect{ case ret : nodes.Return =>
-      addEdge(ret, method.methodReturn, ret.astChildren.order(1).where(_.isInstanceOf[nodes.CfgNode]).map(_.asInstanceOf[nodes.CfgNode]).code().headOption().getOrElse(""))
+    allNodes.collect {
+      case ret: nodes.Return =>
+        addEdge(
+          ret,
+          method.methodReturn,
+          ret.astChildren
+            .order(1)
+            .where(_.isInstanceOf[nodes.CfgNode])
+            .map(_.asInstanceOf[nodes.CfgNode])
+            .code()
+            .headOption()
+            .getOrElse("")
+        )
     }
 
-    allNodes.collect { case call : nodes.StoredNode if (call.isInstanceOf[nodes.Call] || call.isInstanceOf[nodes.Return])  =>
-     createIntraCallReachingDefinitions(call)
+    allNodes.collect {
+      case call: nodes.StoredNode if (call.isInstanceOf[nodes.Call] || call.isInstanceOf[nodes.Return]) =>
+        createIntraCallReachingDefinitions(call)
 
-      in(call).foreach {
-        case param: nodes.MethodParameterIn =>
-          // We create an edge to all arguments of the call
-          // that mention the parameter AND "use" it, in the
-          // sense of not just redefining it. We also checked
-          // that it is in `in(call)` and thus reaches the call.
-          val mentions = param._refIn().asScala.toSet
-          mentions.intersect(use(call, gen)).foreach{ u =>
-            addEdge(param, u, param.name)
-          }
-        case inIdentifier : nodes.Identifier =>
-          // This identifier could be an instance of a local or a parameter
-          val mentions = inIdentifier._refOut().asScala.flatMap { node =>
-            node match {
-              case  x : nodes.MethodParameterIn =>
-                x.start.referencingIdentifiers.toSet
-              case x : nodes.Local =>
-                x.start.referencingIdentifiers.toSet
-              case _ => Set[nodes.StoredNode]()
+        in(call).foreach {
+          case param: nodes.MethodParameterIn =>
+            // We create an edge to all arguments of the call
+            // that mention the parameter AND "use" it, in the
+            // sense of not just redefining it. We also checked
+            // that it is in `in(call)` and thus reaches the call.
+            val mentions = param._refIn().asScala.toSet
+            mentions.intersect(use(call, gen)).foreach { u =>
+              addEdge(param, u, param.name)
             }
-          }.toSet
+          case inIdentifier: nodes.Identifier =>
+            // This identifier could be an instance of a local or a parameter
+            val mentions = inIdentifier
+              ._refOut()
+              .asScala
+              .flatMap { node =>
+                node match {
+                  case x: nodes.MethodParameterIn =>
+                    x.start.referencingIdentifiers.toSet
+                  case x: nodes.Local =>
+                    x.start.referencingIdentifiers.toSet
+                  case _ => Set[nodes.StoredNode]()
+                }
+              }
+              .toSet
 
-          mentions.intersect(use(call, gen)).foreach{ u =>
-            addEdge(inIdentifier, u, inIdentifier.name)
-          }
-        case _ =>
-      }
+            mentions.intersect(use(call, gen)).foreach { u =>
+              addEdge(inIdentifier, u, inIdentifier.name)
+            }
+          case _ =>
+        }
     }
 
     /**
@@ -197,9 +213,9 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       * have specifically marked as methods that taint their return value
       * based on their arguments.
       * */
-    def createIntraCallReachingDefinitions(callOrReturn : nodes.StoredNode) : Unit = {
-      use(callOrReturn, gen).foreach{ useSymbol =>
-        gen(callOrReturn).foreach{ genSymbol =>
+    def createIntraCallReachingDefinitions(callOrReturn: nodes.StoredNode): Unit = {
+      use(callOrReturn, gen).foreach { useSymbol =>
+        gen(callOrReturn).foreach { genSymbol =>
           addEdge(useSymbol, genSymbol, useSymbol.asInstanceOf[nodes.CfgNode].code)
         }
         addEdge(useSymbol, callOrReturn, useSymbol.asInstanceOf[nodes.CfgNode].code)
