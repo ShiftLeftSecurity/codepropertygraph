@@ -8,7 +8,6 @@ import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class MethodDecoratorPassTests extends AnyWordSpec with Matchers {
   "MethodDecoratorTest" in EmptyGraphFixture { graph =>
     val method = graph + NodeTypes.METHOD

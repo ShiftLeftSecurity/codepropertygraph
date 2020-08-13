@@ -8,7 +8,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class CpgValidatorTest extends AnyWordSpec with Matchers {
   private def withNewBaseCpg[T](fun: Cpg => T): T = {
     val graph = OverflowDbTestInstance.create

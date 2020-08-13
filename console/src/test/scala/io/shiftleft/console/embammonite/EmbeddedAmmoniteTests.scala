@@ -5,7 +5,6 @@ import java.util.concurrent.Semaphore
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class EmbeddedAmmoniteTests extends AnyWordSpec with Matchers {
 
   "EmbeddedAmmoniteShell" should {

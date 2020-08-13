@@ -5,8 +5,6 @@ import java.util.UUID
 import scala.concurrent._
 import scala.concurrent.duration._
 
-
-
 import cask.util.Logger.Console._
 import castor.Context.Simple.global
 import ujson.Value.Value

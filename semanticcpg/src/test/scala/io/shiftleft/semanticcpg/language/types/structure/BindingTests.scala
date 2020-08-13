@@ -6,7 +6,6 @@ import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class BindingTests extends AnyWordSpec with Matchers {
 
   "Binding steps" should ExistingCpgFixture("binding") { fixture =>

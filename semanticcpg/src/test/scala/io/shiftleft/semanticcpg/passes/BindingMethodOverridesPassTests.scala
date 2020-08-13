@@ -6,7 +6,6 @@ import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class BindingMethodOverridesPassTests extends AnyWordSpec with Matchers {
   "Binding propagation should not mark non-overwritten bindings" in {
     val cpg = Cpg.emptyCpg

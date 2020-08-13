@@ -6,7 +6,6 @@ import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominator, CfgDominatorF
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 import scala.jdk.CollectionConverters._
 
 class CfgDominatorFrontierTests extends AnyWordSpec with Matchers {

@@ -8,7 +8,6 @@ import io.shiftleft.cpgvalidator.validators.cfg.NoLongJumpValidator
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class NoLongJumpValidatorTest extends AnyWordSpec with Matchers {
   private def withNewBaseCpg[T](fun: Cpg => T): T = {
     val graph = OverflowDbTestInstance.create
