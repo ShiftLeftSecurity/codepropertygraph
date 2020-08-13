@@ -4,7 +4,6 @@ import better.files.File
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class ConsoleConfigTest extends AnyWordSpec with Matchers {
   "An InstallConfig" should {
     "set the rootPath to the current working directory by default" in {

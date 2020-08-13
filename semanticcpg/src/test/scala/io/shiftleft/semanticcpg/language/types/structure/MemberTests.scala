@@ -6,7 +6,6 @@ import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class MemberTests extends AnyWordSpec with Matchers {
 
   "Member traversals" should ExistingCpgFixture("type") { fixture =>

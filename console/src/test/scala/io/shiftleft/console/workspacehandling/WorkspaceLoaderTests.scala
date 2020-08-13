@@ -5,7 +5,6 @@ import better.files.File
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 import scala.reflect.io.Directory
 
 class WorkspaceLoaderTests extends AnyWordSpec with Matchers {

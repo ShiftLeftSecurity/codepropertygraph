@@ -9,7 +9,6 @@ import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-
 class NamespaceCreatorTests extends AnyWordSpec with Matchers {
   "NamespaceCreateor test " in EmptyGraphFixture { graph =>
     val cpg = new Cpg(graph)
