@@ -55,8 +55,12 @@ class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
     val properties = node.getPropertyList.asScala.toSeq
       .map(prop => (prop.getName.name, prop.getValue))
       .map(toProperty)
-    try odbGraph + (node.getType.name, node.getKey, properties: _*)
-    catch {
+    try {
+      if (node.getKey() == -1) {
+        throw new IllegalArgumentException("node has illegal key -1. Something is wrong with the cpg.")
+      }
+      odbGraph + (node.getType.name, node.getKey, properties: _*)
+    } catch {
       case e: Exception =>
         throw new RuntimeException("Failed to insert a node. proto:\n" + node, e)
     }
