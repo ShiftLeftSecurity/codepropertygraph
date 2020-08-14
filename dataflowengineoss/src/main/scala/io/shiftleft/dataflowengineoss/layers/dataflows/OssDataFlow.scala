@@ -3,7 +3,7 @@ package io.shiftleft.dataflowengineoss.layers.dataflows
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.dataflowengineoss.passes.propagateedges.PropagateEdgePass
 import io.shiftleft.dataflowengineoss.passes.reachingdef.ReachingDefPass
-import io.shiftleft.dataflowengineoss.semanticsloader.SemanticsLoader
+import io.shiftleft.dataflowengineoss.semanticsloader.{Parser, Semantics}
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, LayerCreatorOptions, Scpg}
 
 object OssDataFlow {
@@ -22,8 +22,7 @@ class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
 
   override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
     val cpg = context.cpg
-
-    val semantics = new SemanticsLoader(opts.semanticsFilename).load()
+    val semantics = Semantics(new Parser().parseFile(opts.semanticsFilename))
     val enhancementExecList = Iterator(new PropagateEdgePass(cpg, semantics), new ReachingDefPass(cpg))
     enhancementExecList.zipWithIndex.foreach {
       case (pass, index) =>
