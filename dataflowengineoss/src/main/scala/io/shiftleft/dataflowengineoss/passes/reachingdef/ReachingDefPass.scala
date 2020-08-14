@@ -7,6 +7,7 @@ import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.MemberAccess
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -18,8 +19,10 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   import DataFlowFrameworkHelper._
 
-  private case class Solution(in: Map[nodes.CfgNode, Set[nodes.StoredNode]],
-                              out: Map[nodes.CfgNode, Set[nodes.StoredNode]],
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
+  private case class Solution(in: Map[nodes.StoredNode, Set[nodes.StoredNode]],
+                              out: Map[nodes.StoredNode, Set[nodes.StoredNode]],
                               // gen is not really part of the solution but
                               // we also do not want to compute it again
                               gen: Map[nodes.StoredNode, Set[nodes.StoredNode]])
@@ -48,18 +51,21 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val gen = initGen(method).withDefaultValue(Set.empty[nodes.StoredNode])
     val kill = initKill(method, gen).withDefaultValue(Set.empty[nodes.StoredNode])
 
+    val succ = initSucc(allCfgNodes)
+    val pred = initPred(allCfgNodes)
+
     // Out[n] = GEN[n] for all n in `allCfgNodes`
-    var out: Map[nodes.CfgNode, Set[nodes.StoredNode]] =
+    var out: Map[nodes.StoredNode, Set[nodes.StoredNode]] =
       allCfgNodes
         .map(cfgNode => cfgNode -> gen(cfgNode))
         .toMap
 
     // In[n] = empty for all n in `allCfgNodes`
     var in = Map
-      .empty[nodes.CfgNode, Set[nodes.StoredNode]]
+      .empty[nodes.StoredNode, Set[nodes.StoredNode]]
       .withDefaultValue(Set.empty[nodes.StoredNode])
 
-    val worklist = mutable.Set.empty[nodes.CfgNode]
+    val worklist = mutable.Set.empty[nodes.StoredNode]
     worklist ++= allCfgNodes
     while (worklist.nonEmpty) {
       val n = worklist.head
@@ -67,8 +73,8 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
       // IN[n] = Union(OUT[i]) for all predecessors i
 
-      val inSet = n.start.cfgPrev
-        .map(out)
+      val inSet = pred(n)
+        .map(x => out(x))
         .reduceOption((x, y) => x.union(y))
         .getOrElse(Set.empty[nodes.StoredNode])
       in += n -> inSet
@@ -79,7 +85,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       out += n -> gen(n).union(inSet.diff(kill(n)))
 
       if (oldSize != out(n).size)
-        worklist ++= n.start.cfgNext.l
+        worklist ++= succ(n)
     }
     Solution(in, out, gen)
   }
@@ -102,6 +108,26 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
                gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
     method.start.call.map { call =>
       call -> gen(call).map(v => killsVertices(v)).fold(Set())((v1, v2) => v1.union(v2))
+    }.toMap
+  }
+
+  def initSucc(ns: List[nodes.StoredNode]): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
+    ns.map {
+      case n @ (cfgNode: CfgNode)               => n -> cfgNode.start.cfgNext.l
+      case n @ (param: nodes.MethodParameterIn) => n -> param.start.method.cfgFirst.l
+      case n =>
+        logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
+        n -> List()
+    }.toMap
+  }
+
+  def initPred(ns: List[nodes.StoredNode]): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
+    ns.map {
+      case n @ (cfgNode: CfgNode)               => n -> cfgNode.start.cfgPrev.l
+      case n @ (param: nodes.MethodParameterIn) => n -> param.start.method.l
+      case n =>
+        logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
+        n -> List()
     }.toMap
   }
 
