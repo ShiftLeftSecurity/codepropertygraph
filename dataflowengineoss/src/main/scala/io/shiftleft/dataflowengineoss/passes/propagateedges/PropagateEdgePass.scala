@@ -25,33 +25,37 @@ class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
 
     semantics.elements.foreach { semantic =>
       cpg.method.fullNameExact(semantic.methodFullName).headOption.foreach { method =>
-        addSelfDefSemantic(method, semantic.mappings.head._1)
+        semantic.mappings.foreach { mapping =>
+          addSelfDefSemantic(method, mapping._1, mapping._2)
+        }
       }
     }
 
     Iterator(dstGraph.build())
   }
 
-  private def addSelfDefSemantic(method: nodes.Method, parameterIndex: Int): Unit = {
-    // From where the PROPAGATE edge is coming does not matter for the open source reachable by.
-    // Thus we let it start from the corresponding METHOD_PARAMETER_IN.
-    val astOut = method._astOut.asScala.toList
-    val parameterInOption = astOut.find {
-      case paramIn: nodes.MethodParameterIn if paramIn.order == parameterIndex => true
-      case _                                                                   => false
-    }
-    val parameterOutOption = astOut.find {
-      case paramOut: nodes.MethodParameterOut if paramOut.order == parameterIndex => true
-      case _                                                                      => false
+  private def addSelfDefSemantic(method: nodes.Method, srcIndex: Int, dstIndex: Int): Unit = {
+
+    val srcNode: Option[nodes.StoredNode] = srcIndex match {
+      case -1 =>
+        logger.warn("Semantic with source index of -1 is invalid")
+        None
+      case _ => method.parameter.order(srcIndex).headOption
     }
 
-    (parameterInOption, parameterOutOption) match {
+    val dstNode: Option[nodes.StoredNode] = dstIndex match {
+      case -1 =>
+        Some(method.methodReturn)
+      case _ => method.parameter.order(dstIndex).asOutput.headOption
+    }
+
+    (srcNode, dstNode) match {
       case (Some(parameterIn), Some(parameterOut)) =>
         addPropagateEdge(parameterIn, parameterOut)
       case (None, _) =>
-        logger.warn(s"Could not find parameter $parameterIndex of ${method.fullName}.")
+        logger.warn(s"Could not find parameter $srcIndex of ${method.fullName}.")
       case _ =>
-        logger.warn(s"Could not find output parameter $parameterIndex of ${method.fullName}.")
+        logger.warn(s"Could not find output parameter $srcIndex of ${method.fullName}.")
     }
   }
 
