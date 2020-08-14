@@ -8,8 +8,6 @@ import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-import scala.jdk.CollectionConverters._
-
 /**
   * Create PROPAGATE edges which mark parameters defined by a method.
   * PROPAGATE edges can be picked up by the reachingdef pass to calculate
@@ -26,7 +24,7 @@ class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
     semantics.elements.foreach { semantic =>
       cpg.method.fullNameExact(semantic.methodFullName).headOption.foreach { method =>
         semantic.mappings.foreach { mapping =>
-          addSelfDefSemantic(method, mapping._1, mapping._2)
+          addEdgeBetweenFormalParameters(method, mapping._1, mapping._2)
         }
       }
     }
@@ -34,7 +32,7 @@ class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
     Iterator(dstGraph.build())
   }
 
-  private def addSelfDefSemantic(method: nodes.Method, srcIndex: Int, dstIndex: Int): Unit = {
+  private def addEdgeBetweenFormalParameters(method: nodes.Method, srcIndex: Int, dstIndex: Int): Unit = {
 
     val srcNode: Option[nodes.StoredNode] = srcIndex match {
       case -1 =>
