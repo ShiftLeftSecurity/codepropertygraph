@@ -23,8 +23,11 @@ class Method(val traversal: Traversal[nodes.Method]) extends AnyVal {
         .repeat(
           _.flatMap(callResolver.getMethodCallsitesAsTraversal)
             .in(EdgeTypes.CONTAINS) // expand to method
+            .cast[nodes.Method]
             .dedup
-        )
+        )(_.emit(_.collect {
+          case method: nodes.Method if sourceMethods.contains(method) => method
+        }))
         .cast[nodes.Method]
     }
   }
