@@ -25,7 +25,7 @@ class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
 
     semantics.elements.foreach { semantic =>
       cpg.method.fullNameExact(semantic.methodFullName).headOption.foreach { method =>
-        addSelfDefSemantic(method, semantic.parameterIndex)
+        addSelfDefSemantic(method, semantic.mappings.head._1)
       }
     }
 
