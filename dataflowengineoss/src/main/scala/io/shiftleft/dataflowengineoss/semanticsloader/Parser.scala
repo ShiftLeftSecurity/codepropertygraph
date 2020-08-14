@@ -1,7 +1,5 @@
 package io.shiftleft.dataflowengineoss.semanticsloader
 
-import java.io.InputStream
-
 import io.shiftleft.dataflowengineoss.{SemanticsBaseListener, SemanticsLexer, SemanticsParser}
 import org.antlr.v4.runtime.{CharStream, CharStreams, CommonTokenStream}
 import org.antlr.v4.runtime.tree.ParseTreeWalker
