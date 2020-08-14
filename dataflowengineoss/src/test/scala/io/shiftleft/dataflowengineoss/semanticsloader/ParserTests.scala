@@ -17,11 +17,11 @@ class ParserTests extends AnyWordSpec with Matchers {
     }
 
     "parse a method name followed by mappings" in new Fixture() {
-      private val semantics = parser.parse("\"foo\" 1->1 2->3\n")
+      private val semantics = parser.parse("\"foo\" 1->-1 2->3\n")
       semantics match {
         case List(x) =>
           x.methodFullName shouldBe "foo"
-          x.mappings shouldBe List((1, 1), (2, 3))
+          x.mappings shouldBe List((1, -1), (2, 3))
         case _ => fail
       }
     }

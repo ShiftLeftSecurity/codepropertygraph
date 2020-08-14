@@ -12,7 +12,7 @@ dst: NUMBER;
 // Lexing
 
  QUOTE : '"';
-NUMBER: [0-9]+;
+NUMBER: [-]?[0-9]+;
 NEWLINE          : '\r'? '\n';
 LINE_COMMENT : '#' .*? ('\n'|EOF)	-> channel(HIDDEN) ;
 WHITESPACE : [ \r\t\u000C\n]+ -> skip;

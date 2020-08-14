@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
+case class Semantics(elements: List[FlowSemantic])
 case class FlowSemantic(methodFullName: String, mappings: List[(Int, Int)])
 
 class Parser() {
