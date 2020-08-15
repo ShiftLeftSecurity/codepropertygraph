@@ -119,6 +119,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   def initSucc(ns: List[nodes.StoredNode]): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
     ns.map {
+      case n @ (ret: nodes.Return)              => n -> List(ret.method.methodReturn)
       case n @ (cfgNode: CfgNode)               => n -> cfgNode.start.cfgNext.l
       case n @ (param: nodes.MethodParameterIn) => n -> param.start.method.cfgFirst.l
       case n =>
@@ -129,7 +130,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   def initPred(ns: List[nodes.StoredNode], method: nodes.Method): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
     ns.map {
-      case n @ (cfgNode: CfgNode) if method.start.cfgFirst.headOption().contains(n) =>
+      case n @ (_: CfgNode) if method.start.cfgFirst.headOption().contains(n) =>
         n -> method.parameter.l.sortBy(_.order).lastOption.toList
       case n @ (cfgNode: CfgNode) => n -> cfgNode.start.cfgPrev.l
       case n @ (param: nodes.MethodParameterIn) =>
@@ -157,25 +158,27 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val out = solution.out
     val gen = solution.gen
 
-    in.foreach {
-      case (node, inDefs) =>
-        inDefs.foreach {
-          case (inNode: nodes.MethodParameterIn) =>
-            if (getUsesOfCall(node, gen).flatMap(_._refOut().asScala).contains(inNode)) {
-              addEdge(inNode, node, inNode.name)
-            }
-          case _ =>
-        }
-      case _ =>
-    }
+    val allNodes = in.keys.toList
 
-    // Add edges from return nodes to formal method returns
-    val methodReturn = method.methodReturn
-    methodReturn.toReturn.foreach(
-      returnNode =>
-        addEdge(returnNode,
-                methodReturn,
-                returnNode.astChildren.headOption().map(_.asInstanceOf[nodes.CfgNode].code).getOrElse("")))
+    allNodes.foreach { node: nodes.StoredNode =>
+      node match {
+        case methodReturn: nodes.MethodReturn =>
+          methodReturn.start.cfgPrev.isReturn.foreach { ret =>
+            addEdge(ret,
+                    methodReturn,
+                    ret.astChildren.headOption().map(_.asInstanceOf[nodes.CfgNode].code).getOrElse(""))
+          }
+        case _ =>
+          in(node).foreach {
+            case (inNode: nodes.MethodParameterIn) =>
+              val localsAndParamsUsed = getUsesOfCall(node, gen).flatMap(_._refOut().asScala)
+              if (localsAndParamsUsed.contains(inNode)) {
+                addEdge(inNode, node, inNode.name)
+              }
+            case _ =>
+          }
+      }
+    }
 
     // Now look at `out` for each node
     out.foreach {
