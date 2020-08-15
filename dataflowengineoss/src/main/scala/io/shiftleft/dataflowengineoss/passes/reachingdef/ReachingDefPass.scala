@@ -44,7 +44,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   private def calculateMopSolution(method: nodes.Method): Solution = {
     val entryNode = method
     val exitNode = method.methodReturn
-    val allCfgNodes = method.cfgNode.toList ++ List(entryNode, exitNode)
+    val allCfgNodes = method.cfgNode.toList ++ List(entryNode, exitNode) ++ method.parameter
 
     // Gen[n]: the definitions generated at node n
     // Kill[n]: the definitions killed at node n
@@ -52,7 +52,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val kill = initKill(method, gen).withDefaultValue(Set.empty[nodes.StoredNode])
 
     val succ = initSucc(allCfgNodes)
-    val pred = initPred(allCfgNodes)
+    val pred = initPred(allCfgNodes, method)
 
     // Out[n] = GEN[n] for all n in `allCfgNodes`
     var out: Map[nodes.StoredNode, Set[nodes.StoredNode]] =
@@ -99,9 +99,15 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       filterArgumentIndex(call._argumentOut().asScala.toList, methodParamOutsOrder).toSet
     }
 
-    method.start.call.map { call =>
-      call -> getGensOfCall(call)
+    val gensForParams = method.start.parameter.l.map { param =>
+      param -> Set(param.asInstanceOf[nodes.StoredNode])
     }.toMap
+
+    val gensForCalls = method.start.call.map { call =>
+      call -> getGensOfCall(call)
+    }
+
+    (gensForParams ++ gensForCalls).toMap
   }
 
   def initKill(method: nodes.Method,
@@ -121,10 +127,15 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     }.toMap
   }
 
-  def initPred(ns: List[nodes.StoredNode]): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
+  def initPred(ns: List[nodes.StoredNode], method: nodes.Method): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
     ns.map {
-      case n @ (cfgNode: CfgNode)               => n -> cfgNode.start.cfgPrev.l
-      case n @ (param: nodes.MethodParameterIn) => n -> param.start.method.l
+      case n @ (cfgNode: CfgNode) if method.start.cfgFirst.headOption().contains(n) =>
+        n -> method.parameter.l.sortBy(_.order).lastOption.toList
+      case n @ (cfgNode: CfgNode) => n -> cfgNode.start.cfgPrev.l
+      case n @ (param: nodes.MethodParameterIn) =>
+        if (param.order == 1) { n -> List(method) } else {
+          n -> method.parameter.order(param.order - 1).headOption.toList
+        }
       case n =>
         logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
         n -> List()
@@ -146,15 +157,17 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val out = solution.out
     val gen = solution.gen
 
-    // Add edges from formal input parameters to all nodes they
-    // are used in. This assumes that formal parameters cannot
-    // be redefined in the method body. If it's false, then this
-    // is incorrect.
-    for {
-      methodParameterIn <- method.parameter.l
-      parameterReferences <- methodParameterIn._refIn.asScala
-      operationNode <- getOperation(parameterReferences)
-    } addEdge(methodParameterIn, operationNode, methodParameterIn.name)
+    in.foreach {
+      case (node, inDefs) =>
+        inDefs.foreach {
+          case (inNode: nodes.MethodParameterIn) =>
+            if (getUsesOfCall(node, gen).flatMap(_._refOut().asScala).contains(inNode)) {
+              addEdge(inNode, node, inNode.name)
+            }
+          case _ =>
+        }
+      case _ =>
+    }
 
     // Add edges from return nodes to formal method returns
     val methodReturn = method.methodReturn
@@ -189,7 +202,10 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
       // Create edge from entry point to all nodes that are not
       // reached by any other definitions.
-      if (in(call).isEmpty) {
+      if (in(call).isEmpty || (in(call).filter(_.isInstanceOf[nodes.MethodParameterIn]) == in(call) && usesInExpression
+            .flatMap(reference)
+            .intersect(in(call))
+            .isEmpty)) {
         addEdge(method, call)
       }
 
