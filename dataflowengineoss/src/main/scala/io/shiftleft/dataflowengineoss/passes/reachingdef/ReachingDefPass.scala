@@ -7,6 +7,7 @@ import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.MemberAccess
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -18,8 +19,10 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   import DataFlowFrameworkHelper._
 
-  private case class Solution(in: Map[nodes.CfgNode, Set[nodes.StoredNode]],
-                              out: Map[nodes.CfgNode, Set[nodes.StoredNode]],
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
+  private case class Solution(in: Map[nodes.StoredNode, Set[nodes.StoredNode]],
+                              out: Map[nodes.StoredNode, Set[nodes.StoredNode]],
                               // gen is not really part of the solution but
                               // we also do not want to compute it again
                               gen: Map[nodes.StoredNode, Set[nodes.StoredNode]])
@@ -41,25 +44,28 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   private def calculateMopSolution(method: nodes.Method): Solution = {
     val entryNode = method
     val exitNode = method.methodReturn
-    val allCfgNodes = method.cfgNode.toList ++ List(entryNode, exitNode)
+    val allCfgNodes = method.cfgNode.toList ++ List(entryNode, exitNode) ++ method.parameter
 
     // Gen[n]: the definitions generated at node n
     // Kill[n]: the definitions killed at node n
     val gen = initGen(method).withDefaultValue(Set.empty[nodes.StoredNode])
     val kill = initKill(method, gen).withDefaultValue(Set.empty[nodes.StoredNode])
 
+    val succ = initSucc(allCfgNodes)
+    val pred = initPred(allCfgNodes, method)
+
     // Out[n] = GEN[n] for all n in `allCfgNodes`
-    var out: Map[nodes.CfgNode, Set[nodes.StoredNode]] =
+    var out: Map[nodes.StoredNode, Set[nodes.StoredNode]] =
       allCfgNodes
         .map(cfgNode => cfgNode -> gen(cfgNode))
         .toMap
 
     // In[n] = empty for all n in `allCfgNodes`
     var in = Map
-      .empty[nodes.CfgNode, Set[nodes.StoredNode]]
+      .empty[nodes.StoredNode, Set[nodes.StoredNode]]
       .withDefaultValue(Set.empty[nodes.StoredNode])
 
-    val worklist = mutable.Set.empty[nodes.CfgNode]
+    val worklist = mutable.Set.empty[nodes.StoredNode]
     worklist ++= allCfgNodes
     while (worklist.nonEmpty) {
       val n = worklist.head
@@ -67,8 +73,8 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
       // IN[n] = Union(OUT[i]) for all predecessors i
 
-      val inSet = n.start.cfgPrev
-        .map(out)
+      val inSet = pred(n)
+        .map(x => out(x))
         .reduceOption((x, y) => x.union(y))
         .getOrElse(Set.empty[nodes.StoredNode])
       in += n -> inSet
@@ -79,7 +85,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       out += n -> gen(n).union(inSet.diff(kill(n)))
 
       if (oldSize != out(n).size)
-        worklist ++= n.start.cfgNext.l
+        worklist ++= succ(n)
     }
     Solution(in, out, gen)
   }
@@ -93,15 +99,46 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       filterArgumentIndex(call._argumentOut().asScala.toList, methodParamOutsOrder).toSet
     }
 
-    method.start.call.map { call =>
-      call -> getGensOfCall(call)
+    val gensForParams = method.start.parameter.l.map { param =>
+      param -> Set(param.asInstanceOf[nodes.StoredNode])
     }.toMap
+
+    val gensForCalls = method.start.call.map { call =>
+      call -> getGensOfCall(call)
+    }
+
+    (gensForParams ++ gensForCalls).toMap
   }
 
   def initKill(method: nodes.Method,
                gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
     method.start.call.map { call =>
       call -> gen(call).map(v => killsVertices(v)).fold(Set())((v1, v2) => v1.union(v2))
+    }.toMap
+  }
+
+  def initSucc(ns: List[nodes.StoredNode]): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
+    ns.map {
+      case n @ (cfgNode: CfgNode)               => n -> cfgNode.start.cfgNext.l
+      case n @ (param: nodes.MethodParameterIn) => n -> param.start.method.cfgFirst.l
+      case n =>
+        logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
+        n -> List()
+    }.toMap
+  }
+
+  def initPred(ns: List[nodes.StoredNode], method: nodes.Method): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
+    ns.map {
+      case n @ (cfgNode: CfgNode) if method.start.cfgFirst.headOption().contains(n) =>
+        n -> method.parameter.l.sortBy(_.order).lastOption.toList
+      case n @ (cfgNode: CfgNode) => n -> cfgNode.start.cfgPrev.l
+      case n @ (param: nodes.MethodParameterIn) =>
+        if (param.order == 1) { n -> List(method) } else {
+          n -> method.parameter.order(param.order - 1).headOption.toList
+        }
+      case n =>
+        logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
+        n -> List()
     }.toMap
   }
 
@@ -120,15 +157,17 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val out = solution.out
     val gen = solution.gen
 
-    // Add edges from formal input parameters to all nodes they
-    // are used in. This assumes that formal parameters cannot
-    // be redefined in the method body. If it's false, then this
-    // is incorrect.
-    for {
-      methodParameterIn <- method.parameter.l
-      parameterReferences <- methodParameterIn._refIn.asScala
-      operationNode <- getOperation(parameterReferences)
-    } addEdge(methodParameterIn, operationNode, methodParameterIn.name)
+    in.foreach {
+      case (node, inDefs) =>
+        inDefs.foreach {
+          case (inNode: nodes.MethodParameterIn) =>
+            if (getUsesOfCall(node, gen).flatMap(_._refOut().asScala).contains(inNode)) {
+              addEdge(inNode, node, inNode.name)
+            }
+          case _ =>
+        }
+      case _ =>
+    }
 
     // Add edges from return nodes to formal method returns
     val methodReturn = method.methodReturn
@@ -163,7 +202,10 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
       // Create edge from entry point to all nodes that are not
       // reached by any other definitions.
-      if (in(call).isEmpty) {
+      if (in(call).isEmpty || (in(call).filter(_.isInstanceOf[nodes.MethodParameterIn]) == in(call) && usesInExpression
+            .flatMap(reference)
+            .intersect(in(call))
+            .isEmpty)) {
         addEdge(method, call)
       }
 
