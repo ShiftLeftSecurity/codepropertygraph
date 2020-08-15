@@ -83,7 +83,7 @@ class FreeListDataFlowTests extends DataFlowCodeToCpgSuite {
   "should find flows from identifiers to return values of `flow`" in {
     val source = cpg.identifier
     val sink = cpg.method.name("flow").methodReturn
-    sink.reachableByFlows(source).l.size shouldBe 7
+    sink.reachableByFlows(source).l.size shouldBe 8
 
     // Sample output
     """
@@ -148,7 +148,7 @@ class FreeListDataFlowTests extends DataFlowCodeToCpgSuite {
   "find flows from z to method returns of flow" in {
     val source = cpg.identifier.name("z")
     val sink = cpg.method.name("flow").methodReturn
-    sink.reachableByFlows(source).l.size shouldBe 2
+    sink.reachableByFlows(source).l.size shouldBe 3
   }
 
 }

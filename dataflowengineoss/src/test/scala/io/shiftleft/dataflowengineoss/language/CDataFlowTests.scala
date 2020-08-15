@@ -175,12 +175,14 @@ class CDataFlowTests4 extends DataFlowCodeToCpgSuite {
           ("b=a", 4),
           ("b + c", 6),
           ("z = b + c", 6),
+          ("z++", 7),
           ("x = z", 9)
         ),
         List[(String, Option[Integer])](
           ("b=a", 4),
           ("b + c", 6),
           ("z = b + c", 6),
+          ("z++", 7),
           ("x = z", 9)
         )
       )
@@ -428,6 +430,7 @@ class CDataFlowTests11 extends DataFlowCodeToCpgSuite {
           ("b=a", 4),
           ("b + c", 6),
           ("z = b + c", 6),
+          ("z++", Some(7)),
           ("x = z", 9)
         ))
   }
