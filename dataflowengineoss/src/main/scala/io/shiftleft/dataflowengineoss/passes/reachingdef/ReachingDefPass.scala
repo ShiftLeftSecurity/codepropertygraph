@@ -243,7 +243,10 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
         val localsGenerated = gen(call).map(reference)
         in(call).collect {
           case elem if localsGenerated.contains(reference(elem)) =>
-            getParentCallFromGen(elem).foreach(x => addEdge(x, call, elem.asInstanceOf[nodes.CfgNode].code))
+            getParentCallFromGen(elem)
+              .foreach { inParent =>
+                addEdge(inParent, call, elem.asInstanceOf[nodes.CfgNode].code)
+              }
         }
       }
 
@@ -268,25 +271,11 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     node._refOut().nextOption
 
   private def isOperationAndAssignment(call: nodes.Call): Boolean = {
-    call.name match {
-      case Operators.assignmentAnd                  => true
-      case Operators.assignmentArithmeticShiftRight => true
-      case Operators.assignmentDivision             => true
-      case Operators.assignmentExponentiation       => true
-      case Operators.assignmentLogicalShiftRight    => true
-      case Operators.assignmentMinus                => true
-      case Operators.assignmentModulo               => true
-      case Operators.assignmentMultiplication       => true
-      case Operators.assignmentOr                   => true
-      case Operators.assignmentPlus                 => true
-      case Operators.assignmentShiftLeft            => true
-      case Operators.assignmentXor                  => true
-      case Operators.postDecrement                  => true
-      case Operators.postIncrement                  => true
-      case Operators.preDecrement                   => true
-      case Operators.preIncrement                   => true
-      case _                                        => false
-    }
+    implicit val resolver: NoResolve.type = NoResolve
+    call.start.callee.parameter.asOutput.l.flatMap(_._propagateIn().asScala.toList).nonEmpty &&
+    call.start.callee.parameter.l
+      .flatMap(_._propagateOut().asScala.toList)
+      .nonEmpty && call.name != Operators.assignment
   }
 
   private def isIndirectAccess(node: nodes.StoredNode): Boolean =
