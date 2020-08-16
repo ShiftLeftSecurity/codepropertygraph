@@ -1,6 +1,10 @@
 package io.shiftleft.dataflowengineoss.language
 
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.dotextension.ImageViewer
+
+import scala.sys.process.Process
+import scala.util.Try
 
 class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
 
@@ -86,11 +90,15 @@ class CDataFlowTests2 extends DataFlowCodeToCpgSuite {
     implicit val callResolver = NoResolve
     val source = cpg.identifier
     val sink = cpg.method.name("free").parameter.argument
-    val flows = sink.reachableByFlows(source).l
+    val flows = sink
+      .reachableByFlows(source)
+      .l
+      .map(flowToResultPairs)
+      .distinct
 
     flows.size shouldBe 5
 
-    flows.map(flowToResultPairs).toSet shouldBe
+    flows.toSet shouldBe
       Set(
         List[(String, Option[Integer])](
           ("*p = head", 8),
@@ -277,6 +285,7 @@ class CDataFlowTests7 extends DataFlowCodeToCpgSuite {
     val source = cpg.identifier.name("x")
     val sink = cpg.methodReturn
     val flows = sink.reachableByFlows(source).l
+
     flows.size shouldBe 3
 
     flows.map(flowToResultPairs).toSet shouldBe
@@ -328,10 +337,6 @@ class CDataFlowTests8 extends DataFlowCodeToCpgSuite {
             ("foo(b)", 5)
           ))
 
-    val source2 = cpg.identifier.name("a")
-    val sink2 = cpg.call.name("foo")
-    val flows2 = sink2.reachableByFlows(source2).l
-    flows shouldBe flows2
   }
 }
 
@@ -382,7 +387,7 @@ class CDataFlowTests10 extends DataFlowCodeToCpgSuite {
 
   "Test 10: flow with member access in expression to identifier x" in {
     val source = cpg.identifier.name("x")
-    val sink = cpg.call.code("n.value2 = n.value1")
+    val sink = cpg.call.code("n.value2")
     val flows = sink.reachableByFlows(source).l
 
     flows.size shouldBe 2
@@ -449,7 +454,7 @@ class CDataFlowTests12 extends DataFlowCodeToCpgSuite {
 
   "Test 12: flow with short hand assignment operator" in {
     val source = cpg.call.code("a = 0x37")
-    val sink = cpg.call.code("z\\+=a")
+    val sink = cpg.call.code("z\\+=a").argument(1)
     val flows = sink.reachableByFlows(source).l
 
     flows.size shouldBe 2

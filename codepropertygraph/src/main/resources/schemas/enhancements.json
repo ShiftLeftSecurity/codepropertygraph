@@ -53,7 +53,8 @@
             ]},
              {"edgeName": "REACHING_DEF", "inNodes": [
               {"name": "CALL"},
-              {"name": "RETURN"}
+	      {"name": "RETURN"},
+	      {"name": "IDENTIFIER"}
             ]},
              {"edgeName": "CONTAINS", "inNodes": [
               {"name": "CALL"},
@@ -75,7 +76,7 @@
         },
         { "name": "RETURN",
           "outEdges" : [
-             {"edgeName": "REACHING_DEF", "inNodes": [{"name": "METHOD_RETURN"}]}
+             {"edgeName": "REACHING_DEF", "inNodes": [{"name": "METHOD_RETURN"},{"name": "IDENTIFIER"}]}
           ]
         },
         { "name": "METHOD_PARAMETER_IN",
@@ -87,7 +88,8 @@
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE", "cardinality": "n:1"}]},
             {"edgeName": "REACHING_DEF", "inNodes": [
               {"name": "CALL"},
-              {"name": "RETURN"}
+              {"name": "RETURN"},
+	      {"name": "IDENTIFIER"}
             ]},
             {"edgeName": "PARAMETER_LINK", "inNodes": [{"name": "METHOD_PARAMETER_OUT"}]}
           ]
@@ -147,7 +149,12 @@
         },
         {"name" : "LITERAL",
           "outEdges" : [
-            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]},
+	    {"edgeName": "REACHING_DEF", "inNodes": [
+              {"name": "CALL"},
+              {"name": "RETURN"},
+	      {"name": "IDENTIFIER"}
+            ]}
           ]
         },
         { "name": "CALL",
@@ -157,7 +164,8 @@
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]},
             {"edgeName": "REACHING_DEF", "inNodes": [
               {"name": "CALL"},
-              {"name": "RETURN"}
+              {"name": "RETURN"},
+	      {"name": "IDENTIFIER"}
             ]}
           ]
         },
@@ -169,7 +177,12 @@
         },
         {"name" : "IDENTIFIER",
           "outEdges" : [
-            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
+            {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]},
+	    {"edgeName": "REACHING_DEF", "inNodes": [
+              {"name": "CALL"},
+              {"name": "RETURN"},
+	      {"name": "IDENTIFIER"}
+            ]}
           ]
         },
         {"name" : "BLOCK",
@@ -178,7 +191,8 @@
 	    {"edgeName": "REACHING_DEF", "inNodes": [
               {"name": "CALL"},
               {"name": "RETURN"},
-              {"name": "BLOCK"}
+              {"name": "BLOCK"},
+	      {"name": "IDENTIFIER"}
             ]}
           ]
         },
@@ -186,7 +200,8 @@
           "outEdges" : [
             {"edgeName": "REACHING_DEF", "inNodes": [
               {"name": "CALL"},
-              {"name": "RETURN"}
+              {"name": "RETURN"},
+	      {"name": "IDENTIFIER"}
             ]},
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
@@ -195,7 +210,8 @@
           "outEdges" : [
             {"edgeName": "REACHING_DEF", "inNodes": [
               {"name": "CALL"},
-              {"name": "RETURN"}
+              {"name": "RETURN"},
+	      {"name": "IDENTIFIER"}
             ]},
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]

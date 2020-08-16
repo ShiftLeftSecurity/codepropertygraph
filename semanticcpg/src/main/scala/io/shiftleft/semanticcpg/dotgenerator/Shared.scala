@@ -8,22 +8,18 @@ object Shared {
 
   case class Edge(src: nodes.StoredNode, dst: nodes.StoredNode, label: String = "")
 
-  def dotGraph(method: nodes.Method, expand: nodes.StoredNode => Iterator[Edge]): String = {
+  def dotGraph(method: nodes.Method,
+               expand: nodes.StoredNode => Iterator[Edge],
+               cfgNodeShouldBeDisplayed: Node => Boolean,
+  ): String = {
     val sb = Shared.namedGraphBegin(method)
-    sb.append(nodesAndEdges(method, expand).mkString("\n"))
+    sb.append(nodesAndEdges(method, expand, cfgNodeShouldBeDisplayed).mkString("\n"))
     Shared.graphEnd(sb)
   }
 
-  def cfgNodeShouldBeDisplayed(v: Node): Boolean = !(
-    v.isInstanceOf[nodes.Literal] ||
-      v.isInstanceOf[nodes.Identifier] ||
-      v.isInstanceOf[nodes.Block] ||
-      v.isInstanceOf[nodes.ControlStructure] ||
-      v.isInstanceOf[nodes.JumpTarget] ||
-      v.isInstanceOf[nodes.MethodParameterIn]
-  )
-
-  private def nodesAndEdges(methodNode: nodes.Method, expand: nodes.StoredNode => Iterator[Edge]): List[String] = {
+  private def nodesAndEdges(methodNode: nodes.Method,
+                            expand: nodes.StoredNode => Iterator[Edge],
+                            cfgNodeShouldBeDisplayed: Node => Boolean): List[String] = {
     val vertices = methodNode.start.cfgNode.l ++ List(methodNode, methodNode.methodReturn) ++ methodNode.parameter.l
     val verticesToDisplay = vertices.filter(cfgNodeShouldBeDisplayed)
 

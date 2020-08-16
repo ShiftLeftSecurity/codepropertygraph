@@ -6,6 +6,7 @@ import io.shiftleft.semanticcpg.dotgenerator.Shared
 import io.shiftleft.semanticcpg.dotgenerator.Shared.Edge
 import io.shiftleft.semanticcpg.language._
 import gremlin.scala._
+import overflowdb.Node
 
 object DotDdgGenerator {
 
@@ -17,6 +18,13 @@ object DotDdgGenerator {
       .iterator
   }
 
-  def toDotDdg(step: NodeSteps[nodes.Method]): Steps[String] = step.map(Shared.dotGraph(_, expand))
+  def cfgNodeShouldBeDisplayed(v: Node): Boolean = !(
+    v.isInstanceOf[nodes.Block] ||
+      v.isInstanceOf[nodes.ControlStructure] ||
+      v.isInstanceOf[nodes.JumpTarget]
+  )
+
+  def toDotDdg(step: NodeSteps[nodes.Method]): Steps[String] =
+    step.map(Shared.dotGraph(_, expand, cfgNodeShouldBeDisplayed))
 
 }

@@ -6,7 +6,6 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.utils.MemberAccess
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
@@ -88,6 +87,16 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     Solution(in, out, gen)
   }
 
+  private def methodForCall(call: nodes.Call): Option[nodes.Method] = {
+    NoResolve.getCalledMethods(call).toList match {
+      case List(x) => Some(x)
+      case List()  => None
+      case list =>
+        logger.warn(s"Multiple methods with name: ${call.name}, using first one")
+        Some(list.head)
+    }
+  }
+
   def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
     def defsMadeByCall(call: nodes.Call): Set[nodes.StoredNode] = {
       val indicesOfDefinedOutputParams = NoResolve
@@ -101,7 +110,16 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
         .toList
         .filter(node =>
           indicesOfDefinedOutputParams.exists(_ == node.asInstanceOf[nodes.HasArgumentIndex].argumentIndex.toInt))
-        .toSet
+        .toSet ++ {
+        if (methodForCall(call)
+              .map(method => method.methodReturn)
+              .exists(methodReturn => methodReturn._propagateIn().hasNext) ||
+            !hasAnnotation(call)) {
+          Set(call)
+        } else {
+          Set()
+        }
+      }
     }
 
     val defsForParams = method.start.parameter.l.map { param =>
@@ -138,14 +156,25 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     node match {
       case ret: nodes.Return =>
         ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet()
-      case _ =>
+      case call: nodes.Call =>
+        val parameters = NoResolve.getCalledMethods(call).headOption.map(_.parameter.l).getOrElse(List())
         node
           ._argumentOut()
           .asScala
-          .filter(arg => arg._propagateOut().hasNext || !gen(node).contains(arg))
+          .filter(
+            arg =>
+              parameters
+                .filter(_.order == arg.asInstanceOf[HasOrder].order)
+                .flatMap(_._propagateOut().asScala.toList)
+                .nonEmpty || !gen(node).contains(arg))
           .toSet
+      case _ => Set()
     }
 
+  }
+
+  def hasAnnotation(call: nodes.Call): Boolean = {
+    methodForCall(call).exists(method => method.parameter.l.exists(x => x._propagateOut().hasNext))
   }
 
   /**
@@ -206,12 +235,61 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
     allNodes.foreach { node: nodes.StoredNode =>
       node match {
+        case call: nodes.Call =>
+          // Edges between arguments of call sites
+          useToIn(call).foreach {
+            case (use, ins) =>
+              ins.foreach { in =>
+                if (in != use) {
+                  addEdge(in,
+                          use,
+                          Some(in)
+                            .filter(_.isInstanceOf[nodes.CfgNode])
+                            .map(_.asInstanceOf[nodes.CfgNode].code)
+                            .getOrElse(""))
+                }
+              }
+          }
+
+          if (!hasAnnotation(call)) {
+            uses(call, gen).foreach { use =>
+              gen(call).foreach { g =>
+                addEdge(use, g)
+              }
+            }
+          } else {
+            // Copy propagate edges from formal method to call site
+            NoResolve
+              .getCalledMethods(call)
+              .flatMap { method =>
+                method.parameter.map { param =>
+                  (param.order, param._propagateOut().asScala.toList.map(_.asInstanceOf[nodes.HasOrder].order))
+                }.l
+              }
+              .foreach {
+                case (srcOrder, dstOrders) =>
+                  val srcNode = call.argument(srcOrder)
+                  val dstNodes = dstOrders.map {
+                    case dstOrder if dstOrder == -1 => call
+                    case dstOrder                   => call.argument(dstOrder)
+                  }
+                  dstNodes.foreach { dstNode =>
+                    addEdge(srcNode, dstNode, srcNode.code)
+                  }
+              }
+          }
+
+        case _ =>
+      }
+
+      node match {
         case ret: nodes.Return =>
           useToIn(ret).foreach {
             case (use, inElements) =>
+              addEdge(use, ret, use.asInstanceOf[nodes.CfgNode].code)
               inElements.foreach { inElement =>
                 getParentCallFromGen(inElement).foreach { parent =>
-                  addEdge(parent, ret)
+                  addEdge(inElement, ret)
                 }
               }
               if (inElements.isEmpty) {
@@ -220,59 +298,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           }
 
         case call: nodes.Call =>
-          /* if use is not an identifier, add edge, as we are going to visit the use separately */
-          uses(call, gen)
-            .filter(use =>
-              !use.isInstanceOf[Identifier] && !use.isInstanceOf[Literal] && !use
-                .isInstanceOf[FieldIdentifier])
-            .foreach { use =>
-              addEdge(use, call, use.asInstanceOf[nodes.CfgNode].code)
-
-              /* handle indirect access uses: check if we have it in our out set and get
-               * the corresponding def expression from which the definition reaches the use
-               */
-              if (isIndirectAccess(use)) {
-                out(call).filter(out => isIndirectAccess(out)).foreach { indirectOutDef =>
-                  val indirectOutCall = indirectOutDef.asInstanceOf[Call]
-                  if (indirectOutCall.code == use.asInstanceOf[Call].code) {
-                    val expandedToCall = indirectOutCall.parentExpression
-                    addEdge(expandedToCall, use, use.asInstanceOf[nodes.CfgNode].code)
-                  }
-                }
-              }
-            }
-
-          if (isOperationAndAssignment(call)) {
-            val declsGenerated = gen(call).map(declaration)
-            val redefsOfIncoming = in(call).filter { elem =>
-              declsGenerated.contains(declaration(elem))
-            }
-            redefsOfIncoming.foreach { elem =>
-              getParentCallFromGen(elem)
-                .foreach { inParent =>
-                  addEdge(inParent, call, elem.asInstanceOf[nodes.CfgNode].code)
-                }
-            }
-          }
-
           val localRefsUsed = declsOfUses(call, gen)
-
-          // Adds reaching def edges from any args generated
-          // by the call to the call itself, that is, we indicate
-          // that there is a flow from the output definition to
-          // the return value of the call. Strange.
-          out(call).foreach { elem =>
-            getParentCallFromGen(elem)
-              .filter { parent =>
-                parent != call
-              }
-              .filter { _ =>
-                localRefsUsed.contains(declaration(elem))
-              }
-              .foreach { parent =>
-                addEdge(parent, call, elem.asInstanceOf[nodes.CfgNode].code)
-              }
-          }
 
           // Create edge from entry point to all nodes that are not
           // reached by any other definitions.
@@ -290,15 +316,6 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
         case _ =>
       }
 
-      in(node).foreach {
-        case (inNode: nodes.MethodParameterIn) =>
-          val localsAndParamsUsed = uses(node, gen).flatMap(declaration)
-          if (localsAndParamsUsed.contains(declaration(inNode).get)) {
-            addEdge(inNode, node, inNode.name)
-          }
-        case _ =>
-      }
-
     }
     dstGraph
   }
@@ -310,23 +327,13 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     node match {
       case param: nodes.MethodParameterIn => Some(param)
       case _: nodes.Identifier            => node._refOut().nextOption
-      case _                              => None
+      case call: nodes.Call               =>
+        // We map to the first call that has the exact same code. We use
+        // this as a declaration
+        call.method.start.call.codeExact(call.code).headOption
+      case _ => None
     }
   }
-
-  private def isOperationAndAssignment(call: nodes.Call): Boolean = {
-    implicit val resolver: NoResolve.type = NoResolve
-    call.start.callee.parameter.asOutput.l.flatMap(_._propagateIn().asScala.toList).nonEmpty &&
-    call.start.callee.parameter.l
-      .flatMap(_._propagateOut().asScala.toList)
-      .nonEmpty && call.name != Operators.assignment
-  }
-
-  private def isIndirectAccess(node: nodes.StoredNode): Boolean =
-    node match {
-      case call: nodes.Call => MemberAccess.isGenericMemberAccessName(call.name)
-      case _                => false
-    }
 
   private def getParentCallFromGen(genVertex: nodes.StoredNode): Option[nodes.StoredNode] = {
     def getOperation(node: nodes.StoredNode): Option[nodes.StoredNode] = {

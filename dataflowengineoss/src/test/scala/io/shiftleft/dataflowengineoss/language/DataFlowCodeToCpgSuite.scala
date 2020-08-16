@@ -30,7 +30,7 @@ class DataFlowCodeToCpgSuite extends CodeToCpgSuite {
     cpg.typeDecl.nameExact(typeName).method.isLiteral.codeExact(literalName)
 
   protected def flowToResultPairs(path: Path): List[(String, Option[Integer])] = {
-    path.elements.map { point =>
+    val pairs = path.elements.map { point =>
       point match {
         case _: nodes.MethodParameterIn => {
           val method = point.start.method.head
@@ -41,6 +41,7 @@ class DataFlowCodeToCpgSuite extends CodeToCpgSuite {
         case _ => (point.cfgNode.repr, point.cfgNode.lineNumber)
       }
     }
+    pairs.headOption.map(x => x :: pairs.sliding(2).collect { case Seq(a, b) if a != b => b }.toList).getOrElse(List())
   }
 
 }
