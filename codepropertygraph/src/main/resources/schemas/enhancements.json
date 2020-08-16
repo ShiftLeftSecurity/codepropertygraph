@@ -54,7 +54,8 @@
              {"edgeName": "REACHING_DEF", "inNodes": [
               {"name": "CALL"},
 	      {"name": "RETURN"},
-	      {"name": "IDENTIFIER"}
+	      {"name": "IDENTIFIER"},
+	      {"name": "METHOD_PARAMETER_IN"}
             ]},
              {"edgeName": "CONTAINS", "inNodes": [
               {"name": "CALL"},

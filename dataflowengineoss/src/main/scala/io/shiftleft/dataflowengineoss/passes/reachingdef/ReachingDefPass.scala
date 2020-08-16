@@ -87,16 +87,6 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     Solution(in, out, gen)
   }
 
-  private def methodForCall(call: nodes.Call): Option[nodes.Method] = {
-    NoResolve.getCalledMethods(call).toList match {
-      case List(x) => Some(x)
-      case List()  => None
-      case list =>
-        logger.warn(s"Multiple methods with name: ${call.name}, using first one")
-        Some(list.head)
-    }
-  }
-
   def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
     def defsMadeByCall(call: nodes.Call): Set[nodes.StoredNode] = {
       val indicesOfDefinedOutputParams = NoResolve
@@ -222,7 +212,6 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     }
 
     val in = solution.in
-    val out = solution.out
     val gen = solution.gen
     val allNodes = in.keys.toList
 
@@ -279,49 +268,40 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
               }
           }
 
-        case _ =>
-      }
-
-      node match {
         case ret: nodes.Return =>
           useToIn(ret).foreach {
             case (use, inElements) =>
               addEdge(use, ret, use.asInstanceOf[nodes.CfgNode].code)
               inElements.foreach { inElement =>
-                getParentCallFromGen(inElement).foreach { parent =>
-                  addEdge(inElement, ret)
-                }
+                addEdge(inElement, ret)
               }
               if (inElements.isEmpty) {
                 addEdge(method, ret)
               }
           }
 
-        case call: nodes.Call =>
-          val localRefsUsed = declsOfUses(call, gen)
-
-          // Create edge from entry point to all nodes that are not
-          // reached by any other definitions.
-          val incomingParams = in(call).filter(_.isInstanceOf[nodes.MethodParameterIn])
-          if (in(call).isEmpty || incomingParams == in(call) && localRefsUsed.flatten
-                .intersect(incomingParams)
-                .isEmpty) {
-            addEdge(method, call)
-          }
-
         case methodReturn: nodes.MethodReturn =>
           methodReturn.start.cfgPrev.isReturn.foreach { ret =>
             addEdge(ret, methodReturn, "<RET>")
           }
+
         case _ =>
       }
-
     }
+
+    allNodes
+      .filterNot(
+        x =>
+          x.isInstanceOf[nodes.MethodReturn] || x.isInstanceOf[nodes.Method] || x.isInstanceOf[nodes.Literal] || x
+            .isInstanceOf[nodes.ControlStructure])
+      .foreach { node =>
+        if (in(node).size == in(node).count(_.isInstanceOf[nodes.MethodParameterIn])) {
+          addEdge(method, node)
+        }
+      }
+
     dstGraph
   }
-
-  private def declsOfUses(node: nodes.StoredNode, gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]) =
-    uses(node, gen).map(declaration).filter(_.isDefined)
 
   private def declaration(node: nodes.StoredNode): Option[nodes.StoredNode] = {
     node match {
@@ -335,16 +315,14 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     }
   }
 
-  private def getParentCallFromGen(genVertex: nodes.StoredNode): Option[nodes.StoredNode] = {
-    def getOperation(node: nodes.StoredNode): Option[nodes.StoredNode] = {
-      node match {
-        case identifier: nodes.Identifier => identifier._argumentIn().nextOption.flatMap(getOperation)
-        case _: nodes.Call                => Some(node)
-        case _: nodes.Return              => Some(node)
-        case _                            => None
-      }
+  private def methodForCall(call: nodes.Call): Option[nodes.Method] = {
+    NoResolve.getCalledMethods(call).toList match {
+      case List(x) => Some(x)
+      case List()  => None
+      case list =>
+        logger.warn(s"Multiple methods with name: ${call.name}, using first one")
+        Some(list.head)
     }
-    getOperation(genVertex).filter(_.isInstanceOf[nodes.Call])
   }
 
 }

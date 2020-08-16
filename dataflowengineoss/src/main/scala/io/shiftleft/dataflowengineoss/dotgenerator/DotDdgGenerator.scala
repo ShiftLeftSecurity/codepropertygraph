@@ -1,6 +1,6 @@
 package io.shiftleft.dataflowengineoss.dotgenerator
 
-import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, EdgeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.dotgenerator.Shared
 import io.shiftleft.semanticcpg.dotgenerator.Shared.Edge
@@ -19,7 +19,8 @@ object DotDdgGenerator {
   }
 
   def cfgNodeShouldBeDisplayed(v: Node): Boolean = !(
-    v.isInstanceOf[nodes.Block] ||
+    v.isInstanceOf[nodes.Literal] ||
+      v.isInstanceOf[nodes.Block] ||
       v.isInstanceOf[nodes.ControlStructure] ||
       v.isInstanceOf[nodes.JumpTarget]
   )

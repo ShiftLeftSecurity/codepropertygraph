@@ -26,18 +26,8 @@ class DotDdgGeneratorTests extends DataFlowCodeToCpgSuite {
   "A PdgDotGenerator" should {
     "create a dot graph with 15 edges" in {
       val lines = cpg.method.name("foo").dotDdg.l.head.split("\n")
-
-//      implicit val viewer = new ImageViewer {
-//        override def view(pathStr: String): Try[String] = {
-//          Try { Process(Seq("xdg-open", pathStr)).!! }
-//        }
-//      }
-//      cpg.method.name("foo").plotDotDdg
-//
-//      lines.foreach(println)
-
       lines.head.startsWith("digraph foo") shouldBe true
-      lines.count(x => x.contains("->")) shouldBe 15
+      lines.count(x => x.contains("->")) shouldBe 22
       lines.last.startsWith("}") shouldBe true
     }
   }

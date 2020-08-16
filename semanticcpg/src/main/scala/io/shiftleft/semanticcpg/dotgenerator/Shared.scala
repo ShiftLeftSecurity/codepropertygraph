@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.dotgenerator
 import io.shiftleft.codepropertygraph.generated.nodes
 import overflowdb.Node
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.utils.MemberAccess
 
 object Shared {
 
@@ -39,8 +40,16 @@ object Shared {
       edgesToDisplay(v)
     }
 
+    val allIdsReferencedByEdges = edges.flatten.flatMap { edge =>
+      Set(edge.src.id2, edge.dst.id2)
+    }
+
     val nodeStrings = verticesToDisplay.map { node =>
-      s""""${node.id2}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
+      if (allIdsReferencedByEdges.contains(node.id2)) {
+        s""""${node.id2}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
+      } else {
+        ""
+      }
     }
 
     val edgeStrings = edges.flatMap { edges: List[Edge] =>
@@ -66,7 +75,7 @@ object Shared {
     escape(
       vertex match {
         case call: nodes.Call               => (call.name, call.code).toString
-        case expr: nodes.Expression         => (expr.label, expr.code).toString
+        case expr: nodes.Expression         => (expr.label, toCfgNode(expr).code).toString
         case method: nodes.Method           => (method.label, method.name).toString
         case ret: nodes.MethodReturn        => (ret.label, ret.typeFullName).toString
         case param: nodes.MethodParameterIn => ("PARAM", param.code).toString
@@ -75,6 +84,27 @@ object Shared {
         case _                              => ""
       }
     )
+  }
+
+  def toCfgNode(node: nodes.StoredNode): nodes.CfgNode = {
+    node match {
+      case node: nodes.Identifier => node.parentExpression
+      case node: nodes.MethodRef  => node.parentExpression
+      case node: nodes.Literal    => node.parentExpression
+
+      case node: nodes.MethodParameterIn => node.method
+
+      case node: nodes.MethodParameterOut =>
+        node.method.methodReturn
+
+      case node: nodes.Call if MemberAccess.isGenericMemberAccessName(node.name) =>
+        node.parentExpression
+
+      case node: nodes.Call         => node
+      case node: nodes.ImplicitCall => node
+      case node: nodes.MethodReturn => node
+      case node: nodes.Expression   => node
+    }
   }
 
   private def escape(str: String): String = {
