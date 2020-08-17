@@ -11,7 +11,8 @@ class DataFlowProblem[V](val flowGraph: FlowGraph,
                          val transferFunction: TransferFunction[V],
                          val meet: (V, V) => V,
                          val inOutInit: InOutInit[V],
-                         val forward: Boolean)
+                         val forward: Boolean,
+                         val empty: V)
 
 /**
   * In essence, the flow graph is the control flow graph, however, we can
@@ -53,3 +54,9 @@ trait InOutInit[V] {
   def initOut: Map[nodes.StoredNode, V]
 
 }
+
+/**
+  * The solution consists of `in` and `out` for each
+  * node of the flow graph. We also attach the problem.
+  * */
+case class Solution[T](in: Map[nodes.StoredNode, T], out: Map[nodes.StoredNode, T], problem: DataFlowProblem[T])

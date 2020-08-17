@@ -8,7 +8,6 @@ import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
-import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 /**
@@ -18,79 +17,13 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private case class Solution[T](in: Map[nodes.StoredNode, T],
-                                 out: Map[nodes.StoredNode, T],
-                                 problem: DataFlowProblem[T])
-
   override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
 
   override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
-    val solution = calculateMopSolution(method)
+    val problem = ReachingDefProblem.create(method)
+    val solution = new DataFlowSolver().calculateMopSolution(problem)
     val dstGraph = addReachingDefEdges(method, solution)
     Iterator(dstGraph.build())
-  }
-
-  /**
-    * Calculate fix point solution via a standard work list algorithm.
-    * The result is given by two maps: `in` and `out`. These maps associate
-    * all CFG nodes with the set of definitions at node entry and node
-    * exit respectively.
-    * */
-  private def calculateMopSolution(method: nodes.Method): Solution[Set[nodes.StoredNode]] = {
-
-    val problem = ReachingDefProblem.create(method)
-
-    var out: Map[nodes.StoredNode, Set[nodes.StoredNode]] = problem.inOutInit.initOut
-    var in = problem.inOutInit.initIn
-
-    val worklist = mutable.Set.empty[nodes.StoredNode]
-    worklist ++= problem.flowGraph.allNodes
-    while (worklist.nonEmpty) {
-      val n = worklist.head
-      worklist -= n
-
-      // IN[n] = Union(OUT[i]) for all predecessors i
-
-      val inSet = problem.flowGraph
-        .pred(n)
-        .map(x => out(x))
-        .reduceOption((x, y) => problem.meet(x, y))
-        .getOrElse(Set.empty[nodes.StoredNode])
-      in += n -> inSet
-
-      val oldSize = out(n).size
-
-      out += n -> problem.transferFunction(n, inSet)
-
-      if (oldSize != out(n).size)
-        worklist ++= problem.flowGraph.succ(n)
-    }
-    Solution(in, out, problem)
-  }
-
-  def uses(node: nodes.StoredNode, gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Set[nodes.StoredNode] = {
-    node match {
-      case ret: nodes.Return =>
-        ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet()
-      case call: nodes.Call =>
-        val parameters = NoResolve.getCalledMethods(call).headOption.map(_.parameter.l).getOrElse(List())
-        node
-          ._argumentOut()
-          .asScala
-          .filter(
-            arg =>
-              parameters
-                .filter(_.order == arg.asInstanceOf[HasOrder].order)
-                .flatMap(_._propagateOut().asScala.toList)
-                .nonEmpty || !gen(node).contains(arg))
-          .toSet
-      case _ => Set()
-    }
-
-  }
-
-  def hasAnnotation(call: nodes.Call): Boolean = {
-    methodForCall(call).exists(method => method.parameter.l.exists(x => x._propagateOut().hasNext))
   }
 
   private def addReachingDefEdges(method: nodes.Method,
@@ -193,6 +126,31 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       }
 
     dstGraph
+  }
+
+  private def uses(node: nodes.StoredNode, gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Set[nodes.StoredNode] = {
+    node match {
+      case ret: nodes.Return =>
+        ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet()
+      case call: nodes.Call =>
+        val parameters = NoResolve.getCalledMethods(call).headOption.map(_.parameter.l).getOrElse(List())
+        node
+          ._argumentOut()
+          .asScala
+          .filter(
+            arg =>
+              parameters
+                .filter(_.order == arg.asInstanceOf[HasOrder].order)
+                .flatMap(_._propagateOut().asScala.toList)
+                .nonEmpty || !gen(node).contains(arg))
+          .toSet
+      case _ => Set()
+    }
+
+  }
+
+  private def hasAnnotation(call: nodes.Call): Boolean = {
+    methodForCall(call).exists(method => method.parameter.l.exists(x => x._propagateOut().hasNext))
   }
 
   private def declaration(node: nodes.StoredNode): Option[nodes.StoredNode] = {

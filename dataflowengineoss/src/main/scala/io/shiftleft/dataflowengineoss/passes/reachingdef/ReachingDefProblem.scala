@@ -16,7 +16,7 @@ object ReachingDefProblem {
     val init = new ReachingDefInit(transfer.gen)
     def meet: (Set[StoredNode], Set[StoredNode]) => Set[StoredNode] =
       (x: Set[StoredNode], y: Set[StoredNode]) => { x.union(y) }
-    new DataFlowProblem[Set[StoredNode]](flowGraph, transfer, meet, init, true)
+    new DataFlowProblem[Set[StoredNode]](flowGraph, transfer, meet, init, true, Set[nodes.StoredNode]())
   }
 
 }
