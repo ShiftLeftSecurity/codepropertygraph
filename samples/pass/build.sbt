@@ -4,11 +4,9 @@ organization := "io.shiftleft"
 val cpgVersion = "0.11.1"
 
 libraryDependencies ++= Seq(
-
-  "io.shiftleft" %% "codepropertygraph" % cpgVersion,
-  "io.shiftleft" %% "enhancements"  % cpgVersion,
-
-  "org.scalatest" %% "scalatest" % "3.1.1" % Test
+  "io.shiftleft"  %% "codepropertygraph" % cpgVersion,
+  "io.shiftleft"  %% "enhancements"      % cpgVersion,
+  "org.scalatest" %% "scalatest"         % Versions.scalatest % Test
 )
 
 ThisBuild / resolvers ++= Seq(
