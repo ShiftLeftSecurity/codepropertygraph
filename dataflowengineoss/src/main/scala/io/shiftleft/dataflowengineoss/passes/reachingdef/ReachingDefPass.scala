@@ -293,7 +293,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       .filterNot(
         x =>
           x.isInstanceOf[nodes.MethodReturn] || x.isInstanceOf[nodes.Method] || x.isInstanceOf[nodes.Literal] || x
-            .isInstanceOf[nodes.ControlStructure])
+            .isInstanceOf[nodes.ControlStructure] || x.isInstanceOf[nodes.FieldIdentifier])
       .foreach { node =>
         if (in(node).size == in(node).count(_.isInstanceOf[nodes.MethodParameterIn])) {
           addEdge(method, node)
