@@ -8,7 +8,6 @@ import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
-import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 /**
@@ -18,191 +17,17 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private case class Solution(in: Map[nodes.StoredNode, Set[nodes.StoredNode]],
-                              out: Map[nodes.StoredNode, Set[nodes.StoredNode]],
-                              // gen is not really part of the solution but
-                              // we also do not want to compute it again
-                              gen: Map[nodes.StoredNode, Set[nodes.StoredNode]])
-
   override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
 
   override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
-    val solution = calculateMopSolution(method)
+    val problem = ReachingDefProblem.create(method)
+    val solution = new DataFlowSolver().calculateMopSolution(problem)
     val dstGraph = addReachingDefEdges(method, solution)
     Iterator(dstGraph.build())
   }
 
-  /**
-    * Calculate fix point solution via a standard work list algorithm.
-    * The result is given by two maps: `in`` and `out`. These maps associate
-    * all CFG nodes with the set of definitions at node entry and node
-    * exit respectively.
-    * */
-  private def calculateMopSolution(method: nodes.Method): Solution = {
-    val entryNode = method
-    val exitNode = method.methodReturn
-    val allCfgNodes = method.cfgNode.toList ++ List(entryNode, exitNode) ++ method.parameter
-
-    // Gen[n]: the definitions generated at node n
-    // Kill[n]: the definitions killed at node n
-    val gen = initGen(method).withDefaultValue(Set.empty[nodes.StoredNode])
-    val kill = initKill(method, gen).withDefaultValue(Set.empty[nodes.StoredNode])
-
-    val succ = initSucc(allCfgNodes)
-    val pred = initPred(allCfgNodes, method)
-
-    // Out[n] = GEN[n] for all n in `allCfgNodes`
-    var out: Map[nodes.StoredNode, Set[nodes.StoredNode]] =
-      allCfgNodes
-        .map(cfgNode => cfgNode -> gen(cfgNode))
-        .toMap
-
-    // In[n] = empty for all n in `allCfgNodes`
-    var in = Map
-      .empty[nodes.StoredNode, Set[nodes.StoredNode]]
-      .withDefaultValue(Set.empty[nodes.StoredNode])
-
-    val worklist = mutable.Set.empty[nodes.StoredNode]
-    worklist ++= allCfgNodes
-    while (worklist.nonEmpty) {
-      val n = worklist.head
-      worklist -= n
-
-      // IN[n] = Union(OUT[i]) for all predecessors i
-
-      val inSet = pred(n)
-        .map(x => out(x))
-        .reduceOption((x, y) => x.union(y))
-        .getOrElse(Set.empty[nodes.StoredNode])
-      in += n -> inSet
-
-      val oldSize = out(n).size
-
-      // OUT[n] = GEN[n] + IN[n] \ KILL[N]
-      out += n -> gen(n).union(inSet.diff(kill(n)))
-
-      if (oldSize != out(n).size)
-        worklist ++= succ(n)
-    }
-    Solution(in, out, gen)
-  }
-
-  def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
-    def defsMadeByCall(call: nodes.Call): Set[nodes.StoredNode] = {
-      val indicesOfDefinedOutputParams = NoResolve
-        .getCalledMethods(call)
-        .flatMap(method => method.parameter.asOutput)
-        .filter(methPO => methPO._propagateIn().hasNext)
-        .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
-      call
-        ._argumentOut()
-        .asScala
-        .toList
-        .filter(node =>
-          indicesOfDefinedOutputParams.exists(_ == node.asInstanceOf[nodes.HasArgumentIndex].argumentIndex.toInt))
-        .toSet ++ {
-        if (methodForCall(call)
-              .map(method => method.methodReturn)
-              .exists(methodReturn => methodReturn._propagateIn().hasNext) ||
-            !hasAnnotation(call)) {
-          Set(call)
-        } else {
-          Set()
-        }
-      }
-    }
-
-    val defsForParams = method.start.parameter.l.map { param =>
-      param -> Set(param.asInstanceOf[nodes.StoredNode])
-    }
-
-    val defsForCalls = method.start.call.l.map { call =>
-      call -> defsMadeByCall(call)
-    }
-
-    (defsForParams ++ defsForCalls).toMap
-  }
-
-  def initKill(method: nodes.Method,
-               gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
-
-    def allOtherInstancesOf(node: nodes.StoredNode): Set[nodes.StoredNode] = {
-      declaration(node)
-        .flatMap(instances(_).headOption)
-        .filter(_.id2 != node.id2)
-        .toSet
-    }
-
-    method.start.call.map { call =>
-      call -> gen(call).map(v => allOtherInstancesOf(v)).fold(Set())((v1, v2) => v1.union(v2))
-    }.toMap
-  }
-
-  def instances(decl: nodes.StoredNode): List[nodes.StoredNode] = {
-    decl._refIn().asScala.toList
-  }
-
-  def uses(node: nodes.StoredNode, gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Set[nodes.StoredNode] = {
-    node match {
-      case ret: nodes.Return =>
-        ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet()
-      case call: nodes.Call =>
-        val parameters = NoResolve.getCalledMethods(call).headOption.map(_.parameter.l).getOrElse(List())
-        node
-          ._argumentOut()
-          .asScala
-          .filter(
-            arg =>
-              parameters
-                .filter(_.order == arg.asInstanceOf[HasOrder].order)
-                .flatMap(_._propagateOut().asScala.toList)
-                .nonEmpty || !gen(node).contains(arg))
-          .toSet
-      case _ => Set()
-    }
-
-  }
-
-  def hasAnnotation(call: nodes.Call): Boolean = {
-    methodForCall(call).exists(method => method.parameter.l.exists(x => x._propagateOut().hasNext))
-  }
-
-  /**
-    * Create a map that allows CFG successors to be retrieved for each node
-    * */
-  def initSucc(ns: List[nodes.StoredNode]): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
-    ns.map {
-      case n @ (ret: nodes.Return)              => n -> List(ret.method.methodReturn)
-      case n @ (cfgNode: CfgNode)               => n -> cfgNode.start.cfgNext.l
-      case n @ (param: nodes.MethodParameterIn) => n -> param.start.method.cfgFirst.l
-      case n =>
-        logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
-        n -> List()
-    }.toMap
-  }
-
-  /**
-    * Create a map that allows CFG predecessors to be retrieved for each node
-    * */
-  def initPred(ns: List[nodes.StoredNode], method: nodes.Method): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
-    ns.map {
-      case n @ (_: CfgNode) if method.start.cfgFirst.headOption().contains(n) =>
-        n -> method.parameter.l.sortBy(_.order).lastOption.toList
-      case n @ (cfgNode: CfgNode) => n -> cfgNode.start.cfgPrev.l
-      case n @ (param: nodes.MethodParameterIn) =>
-        if (param.order == 1) { n -> List(method) } else {
-          n -> method.parameter.order(param.order - 1).headOption.toList
-        }
-      case n =>
-        logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
-        n -> List()
-    }.toMap
-  }
-
-  /** Pruned DDG, i.e., two call assignment nodes are adjacent if a
-    * reaching definition edge reaches a node where the definition is used.
-    * The final representation makes it straightforward to build def-use/use-def chains */
-  private def addReachingDefEdges(method: nodes.Method, solution: Solution): DiffGraph.Builder = {
+  private def addReachingDefEdges(method: nodes.Method,
+                                  solution: Solution[Set[nodes.StoredNode]]): DiffGraph.Builder = {
 
     val dstGraph = DiffGraph.newBuilder
 
@@ -212,7 +37,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     }
 
     val in = solution.in
-    val gen = solution.gen
+    val gen = solution.problem.transferFunction.asInstanceOf[ReachingDefTransferFunction].gen
     val allNodes = in.keys.toList
 
     def useToIn(node: nodes.StoredNode) =
@@ -301,6 +126,31 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       }
 
     dstGraph
+  }
+
+  private def uses(node: nodes.StoredNode, gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Set[nodes.StoredNode] = {
+    node match {
+      case ret: nodes.Return =>
+        ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet()
+      case call: nodes.Call =>
+        val parameters = NoResolve.getCalledMethods(call).headOption.map(_.parameter.l).getOrElse(List())
+        node
+          ._argumentOut()
+          .asScala
+          .filter(
+            arg =>
+              parameters
+                .filter(_.order == arg.asInstanceOf[HasOrder].order)
+                .flatMap(_._propagateOut().asScala.toList)
+                .nonEmpty || !gen(node).contains(arg))
+          .toSet
+      case _ => Set()
+    }
+
+  }
+
+  private def hasAnnotation(call: nodes.Call): Boolean = {
+    methodForCall(call).exists(method => method.parameter.l.exists(x => x._propagateOut().hasNext))
   }
 
   private def declaration(node: nodes.StoredNode): Option[nodes.StoredNode] = {
