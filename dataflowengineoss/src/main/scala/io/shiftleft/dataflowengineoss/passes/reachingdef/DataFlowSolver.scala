@@ -21,19 +21,29 @@ class DataFlowSolver {
     while (worklist.nonEmpty) {
       val n = worklist.head
       worklist -= n
-
-      // IN[n] = Union(OUT[i]) for all predecessors i
-      val inSet = problem.flowGraph
-        .pred(n)
-        .map(x => out(x))
-        .reduceOption((x, y) => problem.meet(x, y))
-        .getOrElse(problem.empty)
-      in += n -> inSet
-
-      val oldSize = out(n).size
-      out += n -> problem.transferFunction(n, inSet)
-      if (oldSize != out(n).size)
-        worklist ++= problem.flowGraph.succ(n)
+      if (problem.forward) {
+        val inSet = problem.flowGraph
+          .pred(n)
+          .map(x => out(x))
+          .reduceOption((x, y) => problem.meet(x, y))
+          .getOrElse(problem.empty)
+        in += n -> inSet
+        val oldSize = out(n).size
+        out += n -> problem.transferFunction(n, inSet)
+        if (oldSize != out(n).size)
+          worklist ++= problem.flowGraph.succ(n)
+      } else {
+        val outSet = problem.flowGraph
+          .succ(n)
+          .map(x => in(x))
+          .reduceOption((x, y) => problem.meet(x, y))
+          .getOrElse(problem.empty)
+        out += n -> outSet
+        val oldSize = in(n).size
+        in += n -> problem.transferFunction(n, outSet)
+        if (oldSize != in(n).size)
+          worklist ++= problem.flowGraph.pred(n)
+      }
     }
     Solution(in, out, problem)
   }
