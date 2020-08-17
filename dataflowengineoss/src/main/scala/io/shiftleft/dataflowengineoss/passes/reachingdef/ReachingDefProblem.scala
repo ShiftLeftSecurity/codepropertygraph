@@ -3,8 +3,23 @@ package io.shiftleft.dataflowengineoss.passes.reachingdef
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
+
 import scala.jdk.CollectionConverters._
 import io.shiftleft.Implicits.JavaIteratorDeco
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
+
+object ReachingDefProblem {
+
+  def create(method: nodes.Method): DataFlowProblem[Set[nodes.StoredNode]] = {
+    val flowGraph = new ReachingDefFlowGraph(method)
+    val transfer = new ReachingDefTransferFunction(method)
+    val init = new ReachingDefInit(transfer.gen)
+    def meet: (Set[StoredNode], Set[StoredNode]) => Set[StoredNode] =
+      (x: Set[StoredNode], y: Set[StoredNode]) => { x.union(y) }
+    new DataFlowProblem[Set[StoredNode]](flowGraph, transfer, meet, init, true)
+  }
+
+}
 
 class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
 

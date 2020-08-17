@@ -7,11 +7,11 @@ import io.shiftleft.codepropertygraph.generated.nodes
   * on page 626, with mild modifications. In particular, instead of allowing only
   * for the specification of a boundary, we allow initialization of IN and OUT.
   */
-class DataFlowProblem[V](flowGraph: FlowGraph,
-                         transferFunction: TransferFunction[V],
-                         meet: V => V,
-                         inOutInit: InOutInit[V],
-                         forward: Boolean)
+class DataFlowProblem[V](val flowGraph: FlowGraph,
+                         val transferFunction: TransferFunction[V],
+                         val meet: (V, V) => V,
+                         val inOutInit: InOutInit[V],
+                         val forward: Boolean)
 
 /**
   * In essence, the flow graph is the control flow graph, however, we can
@@ -24,6 +24,7 @@ class DataFlowProblem[V](flowGraph: FlowGraph,
 trait FlowGraph {
   val entryNode: nodes.StoredNode
   val exitNode: nodes.StoredNode
+  val allNodes: List[nodes.StoredNode]
   val succ: Map[nodes.StoredNode, List[nodes.StoredNode]]
   val pred: Map[nodes.StoredNode, List[nodes.StoredNode]]
 }

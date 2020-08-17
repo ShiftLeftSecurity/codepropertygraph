@@ -18,11 +18,9 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private case class Solution(in: Map[nodes.StoredNode, Set[nodes.StoredNode]],
-                              out: Map[nodes.StoredNode, Set[nodes.StoredNode]],
-                              // gen is not really part of the solution but
-                              // we also do not want to compute it again
-                              gen: Map[nodes.StoredNode, Set[nodes.StoredNode]])
+  private case class Solution[T](in: Map[nodes.StoredNode, T],
+                                 out: Map[nodes.StoredNode, T],
+                                 problem: DataFlowProblem[T])
 
   override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
 
@@ -38,40 +36,36 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     * all CFG nodes with the set of definitions at node entry and node
     * exit respectively.
     * */
-  private def calculateMopSolution(method: nodes.Method): Solution = {
+  private def calculateMopSolution(method: nodes.Method): Solution[Set[nodes.StoredNode]] = {
 
-    val flowGraph = new ReachingDefFlowGraph(method)
-    val transfer = new ReachingDefTransferFunction(method)
-    val init = new ReachingDefInit(transfer.gen)
-    val meet: (Set[StoredNode], Set[StoredNode]) => Set[StoredNode] = {
-      case (x: Set[StoredNode], y: Set[StoredNode]) => x.union(y)
-    }
-    var out: Map[nodes.StoredNode, Set[nodes.StoredNode]] = init.initOut
-    var in = init.initIn
+    val problem = ReachingDefProblem.create(method)
+
+    var out: Map[nodes.StoredNode, Set[nodes.StoredNode]] = problem.inOutInit.initOut
+    var in = problem.inOutInit.initIn
 
     val worklist = mutable.Set.empty[nodes.StoredNode]
-    worklist ++= flowGraph.allNodes
+    worklist ++= problem.flowGraph.allNodes
     while (worklist.nonEmpty) {
       val n = worklist.head
       worklist -= n
 
       // IN[n] = Union(OUT[i]) for all predecessors i
 
-      val inSet = flowGraph
+      val inSet = problem.flowGraph
         .pred(n)
         .map(x => out(x))
-        .reduceOption((x, y) => meet(x, y))
+        .reduceOption((x, y) => problem.meet(x, y))
         .getOrElse(Set.empty[nodes.StoredNode])
       in += n -> inSet
 
       val oldSize = out(n).size
 
-      out += n -> transfer(n, inSet)
+      out += n -> problem.transferFunction(n, inSet)
 
       if (oldSize != out(n).size)
-        worklist ++= flowGraph.succ(n)
+        worklist ++= problem.flowGraph.succ(n)
     }
-    Solution(in, out, transfer.gen)
+    Solution(in, out, problem)
   }
 
   def uses(node: nodes.StoredNode, gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Set[nodes.StoredNode] = {
@@ -99,7 +93,8 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     methodForCall(call).exists(method => method.parameter.l.exists(x => x._propagateOut().hasNext))
   }
 
-  private def addReachingDefEdges(method: nodes.Method, solution: Solution): DiffGraph.Builder = {
+  private def addReachingDefEdges(method: nodes.Method,
+                                  solution: Solution[Set[nodes.StoredNode]]): DiffGraph.Builder = {
 
     val dstGraph = DiffGraph.newBuilder
 
@@ -109,7 +104,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     }
 
     val in = solution.in
-    val gen = solution.gen
+    val gen = solution.problem.transferFunction.asInstanceOf[ReachingDefTransferFunction].gen
     val allNodes = in.keys.toList
 
     def useToIn(node: nodes.StoredNode) =
