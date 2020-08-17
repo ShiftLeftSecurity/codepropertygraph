@@ -3,24 +3,27 @@ package io.shiftleft.semanticcpg.dotgenerator
 import io.shiftleft.codepropertygraph.generated.nodes
 import overflowdb.Node
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.utils.MemberAccess
 
 object Shared {
 
   case class Edge(src: nodes.StoredNode, dst: nodes.StoredNode, label: String = "")
 
-  def dotGraph(method: nodes.Method,
-               expand: nodes.StoredNode => Iterator[Edge],
-               cfgNodeShouldBeDisplayed: Node => Boolean,
-  ): String = {
+  def dotGraph(method: nodes.Method, expand: nodes.StoredNode => Iterator[Edge]): String = {
     val sb = Shared.namedGraphBegin(method)
-    sb.append(nodesAndEdges(method, expand, cfgNodeShouldBeDisplayed).mkString("\n"))
+    sb.append(nodesAndEdges(method, expand).mkString("\n"))
     Shared.graphEnd(sb)
   }
 
-  private def nodesAndEdges(methodNode: nodes.Method,
-                            expand: nodes.StoredNode => Iterator[Edge],
-                            cfgNodeShouldBeDisplayed: Node => Boolean): List[String] = {
+  def cfgNodeShouldBeDisplayed(v: Node): Boolean = !(
+    v.isInstanceOf[nodes.Literal] ||
+      v.isInstanceOf[nodes.Identifier] ||
+      v.isInstanceOf[nodes.Block] ||
+      v.isInstanceOf[nodes.ControlStructure] ||
+      v.isInstanceOf[nodes.JumpTarget] ||
+      v.isInstanceOf[nodes.MethodParameterIn]
+  )
+
+  private def nodesAndEdges(methodNode: nodes.Method, expand: nodes.StoredNode => Iterator[Edge]): List[String] = {
     val vertices = methodNode.start.cfgNode.l ++ List(methodNode, methodNode.methodReturn) ++ methodNode.parameter.l
     val verticesToDisplay = vertices.filter(cfgNodeShouldBeDisplayed)
 
@@ -40,16 +43,8 @@ object Shared {
       edgesToDisplay(v)
     }
 
-    val allIdsReferencedByEdges = edges.flatten.flatMap { edge =>
-      Set(edge.src.id2, edge.dst.id2)
-    }
-
     val nodeStrings = verticesToDisplay.map { node =>
-      if (allIdsReferencedByEdges.contains(node.id2)) {
-        s""""${node.id2}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
-      } else {
-        ""
-      }
+      s""""${node.id2}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
     }
 
     val edgeStrings = edges.flatMap { edges: List[Edge] =>
@@ -75,7 +70,7 @@ object Shared {
     escape(
       vertex match {
         case call: nodes.Call               => (call.name, call.code).toString
-        case expr: nodes.Expression         => (expr.label, toCfgNode(expr).code).toString
+        case expr: nodes.Expression         => (expr.label, expr.code).toString
         case method: nodes.Method           => (method.label, method.name).toString
         case ret: nodes.MethodReturn        => (ret.label, ret.typeFullName).toString
         case param: nodes.MethodParameterIn => ("PARAM", param.code).toString
@@ -84,27 +79,6 @@ object Shared {
         case _                              => ""
       }
     )
-  }
-
-  def toCfgNode(node: nodes.StoredNode): nodes.CfgNode = {
-    node match {
-      case node: nodes.Identifier => node.parentExpression
-      case node: nodes.MethodRef  => node.parentExpression
-      case node: nodes.Literal    => node.parentExpression
-
-      case node: nodes.MethodParameterIn => node.method
-
-      case node: nodes.MethodParameterOut =>
-        node.method.methodReturn
-
-      case node: nodes.Call if MemberAccess.isGenericMemberAccessName(node.name) =>
-        node.parentExpression
-
-      case node: nodes.Call         => node
-      case node: nodes.ImplicitCall => node
-      case node: nodes.MethodReturn => node
-      case node: nodes.Expression   => node
-    }
   }
 
   private def escape(str: String): String = {
