@@ -52,7 +52,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
     def traverseDDGBack(path: List[nodes.TrackingPoint]): Unit = {
       val node = path.head
-      if (sourceSymbols.contains(node)) {
+      if (!indirectAccess(node) && sourceSymbols.contains(node)) {
         val sack = new ReachableByContainer(node, path)
         pathReachables = sack :: pathReachables
       }
@@ -61,7 +61,8 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
         ddgPredecessor <- node._reachingDefIn.asScala
         predTrackingPoint <- getTrackingPoint(ddgPredecessor)
         if !path.contains(predTrackingPoint)
-      } traverseDDGBack(predTrackingPoint :: node :: path.tail)
+      } if (indirectAccess(node)) traverseDDGBack(predTrackingPoint :: path.tail)
+      else traverseDDGBack(predTrackingPoint :: node :: path.tail)
     }
 
     sinkSymbols.map(getTrackingPoint).foreach {
@@ -74,13 +75,20 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
   private def getTrackingPoint(node: nodes.StoredNode): Option[nodes.TrackingPoint] =
     node match {
-      case identifier: nodes.Identifier           => Some(identifier)
+      case identifier: nodes.Identifier =>
+        identifier._argumentIn().nextOption.flatMap(getTrackingPoint)
       case call: nodes.Call                       => Some(call)
       case ret: nodes.Return                      => Some(ret)
       case methodReturn: nodes.MethodReturn       => Some(methodReturn)
       case methodParamIn: nodes.MethodParameterIn => Some(methodParamIn)
       case literal: nodes.Literal                 => getTrackingPoint(literal._argumentIn().onlyChecked)
       case _                                      => None
+    }
+
+  private def indirectAccess(node: nodes.StoredNode): Boolean =
+    node match {
+      case call: nodes.Call => MemberAccess.isGenericMemberAccessName(call.name)
+      case _                => false
     }
 
 }
