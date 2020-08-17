@@ -5,8 +5,8 @@ import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.jdk.CollectionConverters._
-import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
+import overflowdb.traversal._
 
 object ReachingDefProblem {
 
@@ -52,7 +52,7 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
   private def initPred(ns: List[nodes.StoredNode],
                        method: nodes.Method): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
     ns.map {
-      case n @ (_: nodes.CfgNode) if method.start.cfgFirst.headOption().contains(n) =>
+      case n @ (_: nodes.CfgNode) if method.start.cfgFirst.headOption.contains(n) =>
         n -> method.parameter.l.sortBy(_.order).lastOption.toList
       case n @ (cfgNode: nodes.CfgNode) => n -> cfgNode.start.cfgPrev.l
       case n @ (param: nodes.MethodParameterIn) =>

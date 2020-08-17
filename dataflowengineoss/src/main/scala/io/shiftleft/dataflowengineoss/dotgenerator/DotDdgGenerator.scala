@@ -12,7 +12,7 @@ object DotDdgGenerator {
   def expand(v: nodes.StoredNode): Iterator[Edge] = {
     v.start
       .outE(EdgeTypes.REACHING_DEF)
-      .map(x => Edge(v, x.inNode.asInstanceOf[nodes.CfgNode], x.property2[String](EdgeKeyNames.VARIABLE)))
+      .map(x => Edge(v, x.inNode.asInstanceOf[nodes.StoredNode], x.property2[String](EdgeKeyNames.VARIABLE)))
       .iterator
   }
 
