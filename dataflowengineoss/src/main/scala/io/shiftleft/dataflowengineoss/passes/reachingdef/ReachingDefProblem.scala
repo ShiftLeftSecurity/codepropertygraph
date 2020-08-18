@@ -54,11 +54,8 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
     ns.map {
       case n @ (_: nodes.CfgNode) if method.start.cfgFirst.headOption().contains(n) =>
         n -> method.parameter.l.sortBy(_.order).lastOption.toList
-      case n @ (cfgNode: nodes.CfgNode) => n -> cfgNode.start.cfgPrev.l
-      case n @ (param: nodes.MethodParameterIn) =>
-        if (param.order == 1) { n -> List(method) } else {
-          n -> method.parameter.order(param.order - 1).headOption.toList
-        }
+      case n @ (cfgNode: nodes.CfgNode)     => n -> cfgNode.start.cfgPrev.l
+      case n @ (_: nodes.MethodParameterIn) => n -> List(method)
       case n =>
         logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
         n -> List()
@@ -75,24 +72,32 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
   val kill: Map[nodes.StoredNode, Set[nodes.StoredNode]] =
     initKill(method, gen).withDefaultValue(Set.empty[nodes.StoredNode])
 
+  /**
+    * For a given flow graph node `n` and set of definitions, apply the transfer
+    * function to obtain the updated set of definitions, considering `gen(n)`
+    * and `kill(n)`.
+    * */
+  override def apply(n: nodes.StoredNode, x: Set[nodes.StoredNode]): Set[nodes.StoredNode] = {
+    gen(n).union(x.diff(kill(n)))
+  }
+
+  /**
+    * Initialize the map `gen`, a map that contains generated
+    * definitions for each flow graph node.
+    * */
   def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
+
     def defsMadeByCall(call: nodes.Call): Set[nodes.StoredNode] = {
-      val indicesOfDefinedOutputParams = NoResolve
-        .getCalledMethods(call)
-        .flatMap(method => method.parameter.asOutput)
-        .filter(methPO => methPO._propagateIn().hasNext)
-        .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
-      call
-        ._argumentOut()
-        .asScala
-        .toList
-        .filter(node =>
-          indicesOfDefinedOutputParams.exists(_ == node.asInstanceOf[nodes.HasArgumentIndex].argumentIndex.toInt))
-        .toSet ++ {
+
+      val definedParams = methodsForCall(call).start.parameter.asOutput
+        .where(outParam => outParam._propagateIn().hasNext)
+        .order
+        .l
+
+      call.start.argument.l.filter(arg => definedParams.contains(arg.argumentIndex)).toSet ++ {
         if (methodForCall(call)
               .map(method => method.methodReturn)
-              .exists(methodReturn => methodReturn._propagateIn().hasNext) ||
-            !hasAnnotation(call)) {
+              .exists(methodReturn => methodReturn._propagateIn().hasNext) || !hasAnnotation(call)) {
           Set(call)
         } else {
           Set()
@@ -111,33 +116,49 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     (defsForParams ++ defsForCalls).toMap
   }
 
+  /**
+    * Initialize the map `kill`, a map that contains killed
+    * definitions for each flow graph node.
+    * */
   def initKill(method: nodes.Method,
                gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
 
     def allOtherInstancesOf(node: nodes.StoredNode): Set[nodes.StoredNode] = {
-      declaration(node)
-        .flatMap(instances(_).headOption)
+      declaration(node).toList
+        .flatMap(instances)
         .filter(_.id2 != node.id2)
         .toSet
     }
 
+    // We are also adding nodes here that may not even be definitions, but that's
+    // fine since `kill` is only subtracted
     method.start.call.map { call =>
       call -> gen(call).map(v => allOtherInstancesOf(v)).fold(Set())((v1, v2) => v1.union(v2))
     }.toMap
   }
 
   private def instances(decl: nodes.StoredNode): List[nodes.StoredNode] = {
-    decl._refIn().asScala.toList
+    decl._refIn().asScala.toList ++ {
+      if (decl.isInstanceOf[nodes.MethodParameterIn]) {
+        List(decl)
+      } else {
+        List()
+      }
+    }
   }
 
   private def methodForCall(call: nodes.Call): Option[nodes.Method] = {
-    NoResolve.getCalledMethods(call).toList match {
+    methodsForCall(call) match {
       case List(x) => Some(x)
       case List()  => None
       case list =>
         logger.warn(s"Multiple methods with name: ${call.name}, using first one")
         Some(list.head)
     }
+  }
+
+  private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
+    NoResolve.getCalledMethods(call).toList
   }
 
   private def declaration(node: nodes.StoredNode): Option[nodes.StoredNode] = {
@@ -152,13 +173,10 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     }
   }
 
-  def hasAnnotation(call: nodes.Call): Boolean = {
+  private def hasAnnotation(call: nodes.Call): Boolean = {
     methodForCall(call).exists(method => method.parameter.l.exists(x => x._propagateOut().hasNext))
   }
 
-  override def apply(n: nodes.StoredNode, x: Set[nodes.StoredNode]): Set[nodes.StoredNode] = {
-    gen(n).union(x.diff(kill(n)))
-  }
 }
 
 class ReachingDefInit(gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]) extends InOutInit[Set[nodes.StoredNode]] {
