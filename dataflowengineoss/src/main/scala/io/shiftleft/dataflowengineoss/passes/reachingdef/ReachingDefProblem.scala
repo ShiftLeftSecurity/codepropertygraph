@@ -54,11 +54,8 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
     ns.map {
       case n @ (_: nodes.CfgNode) if method.start.cfgFirst.headOption().contains(n) =>
         n -> method.parameter.l.sortBy(_.order).lastOption.toList
-      case n @ (cfgNode: nodes.CfgNode) => n -> cfgNode.start.cfgPrev.l
-      case n @ (param: nodes.MethodParameterIn) =>
-        if (param.order == 1) { n -> List(method) } else {
-          n -> method.parameter.order(param.order - 1).headOption.toList
-        }
+      case n @ (cfgNode: nodes.CfgNode)     => n -> cfgNode.start.cfgPrev.l
+      case n @ (_: nodes.MethodParameterIn) => n -> List(method)
       case n =>
         logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
         n -> List()
@@ -75,12 +72,25 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
   val kill: Map[nodes.StoredNode, Set[nodes.StoredNode]] =
     initKill(method, gen).withDefaultValue(Set.empty[nodes.StoredNode])
 
+  /**
+    * For a given flow graph node `n` and set of definitions, apply the transfer
+    * function to obtain the updated set of definitions, considering `gen(n)`
+    * and `kill(n)`.
+    * */
+  override def apply(n: nodes.StoredNode, x: Set[nodes.StoredNode]): Set[nodes.StoredNode] = {
+    gen(n).union(x.diff(kill(n)))
+  }
+
+  /**
+    * Initialize the map `gen`, a map that contains generated
+    * definitions for each flow graph node.
+    * */
   def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
     def defsMadeByCall(call: nodes.Call): Set[nodes.StoredNode] = {
       val indicesOfDefinedOutputParams = NoResolve
         .getCalledMethods(call)
         .flatMap(method => method.parameter.asOutput)
-        .filter(methPO => methPO._propagateIn().hasNext)
+        .filter(outParam => outParam._propagateIn().hasNext)
         .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
       call
         ._argumentOut()
@@ -111,6 +121,10 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     (defsForParams ++ defsForCalls).toMap
   }
 
+  /**
+    * Initialize the map `kill`, a map that contains killed
+    * definitions for each flow graph node.
+    * */
   def initKill(method: nodes.Method,
                gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
 
@@ -152,13 +166,10 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     }
   }
 
-  def hasAnnotation(call: nodes.Call): Boolean = {
+  private def hasAnnotation(call: nodes.Call): Boolean = {
     methodForCall(call).exists(method => method.parameter.l.exists(x => x._propagateOut().hasNext))
   }
 
-  override def apply(n: nodes.StoredNode, x: Set[nodes.StoredNode]): Set[nodes.StoredNode] = {
-    gen(n).union(x.diff(kill(n)))
-  }
 }
 
 class ReachingDefInit(gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]) extends InOutInit[Set[nodes.StoredNode]] {

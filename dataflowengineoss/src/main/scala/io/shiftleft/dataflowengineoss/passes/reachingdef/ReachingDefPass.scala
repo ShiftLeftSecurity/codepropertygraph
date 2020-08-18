@@ -133,7 +133,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       case ret: nodes.Return =>
         ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet()
       case call: nodes.Call =>
-        val parameters = NoResolve.getCalledMethods(call).headOption.map(_.parameter.l).getOrElse(List())
+        val parameters = methodForCall(call).map(_.parameter.l).getOrElse(List())
         node
           ._argumentOut()
           .asScala
