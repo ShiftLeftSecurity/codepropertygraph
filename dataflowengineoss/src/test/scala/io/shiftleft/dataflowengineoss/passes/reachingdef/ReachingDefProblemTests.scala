@@ -32,7 +32,7 @@ class ReachingDefProblemTests2 extends ReachingDefProblemSuite {
   override val code =
     """
       |int foo(int x, int y) {
-      |  int x = 10;
+      |  x = 10;
       |  int ret = escape(x,y);
       |}
       |""".stripMargin
@@ -62,7 +62,13 @@ class ReachingDefProblemTests2 extends ReachingDefProblemSuite {
       val call = method.start.call.name(Operators.assignment).head
       transfer.gen(call) shouldBe Set(call.argument(1))
     }
+  }
 
+  "ReachingDefTransferFunction's kill set" should {
+    "contain kill for parameter at assignment to x" in {
+      val call = method.start.call.name(Operators.assignment).head
+      transfer.kill(call).contains(method.parameter.name("x").head)
+    }
   }
 
 }

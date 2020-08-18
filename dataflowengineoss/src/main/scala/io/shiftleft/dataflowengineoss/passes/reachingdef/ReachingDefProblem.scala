@@ -124,19 +124,27 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
                gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
 
     def allOtherInstancesOf(node: nodes.StoredNode): Set[nodes.StoredNode] = {
-      declaration(node)
-        .flatMap(instances(_).headOption)
+      declaration(node).toList
+        .flatMap(instances)
         .filter(_.id2 != node.id2)
         .toSet
     }
 
+    // We are also adding nodes here that may not even be definitions, but that's
+    // fine since `kill` is only subtracted
     method.start.call.map { call =>
       call -> gen(call).map(v => allOtherInstancesOf(v)).fold(Set())((v1, v2) => v1.union(v2))
     }.toMap
   }
 
   private def instances(decl: nodes.StoredNode): List[nodes.StoredNode] = {
-    decl._refIn().asScala.toList
+    decl._refIn().asScala.toList ++ {
+      if (decl.isInstanceOf[nodes.MethodParameterIn]) {
+        List(decl)
+      } else {
+        List()
+      }
+    }
   }
 
   private def methodForCall(call: nodes.Call): Option[nodes.Method] = {
