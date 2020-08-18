@@ -33,13 +33,21 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[nodes.StoredNode]],
       case ret: nodes.Return =>
         ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet()
       case call: nodes.Call =>
-        val parameters = methodForCall(call).map(_.parameter.l).getOrElse(List())
-        call.start.argument
-          .where(arg => paramHasOutgoingPropagateEdge(arg, parameters) || !gen(node).contains(arg))
-          .toSet
-          .map(_.asInstanceOf[nodes.StoredNode])
+        if (!hasAnnotation(call)) {
+          call.start.argument.toSet.map(_.asInstanceOf[nodes.StoredNode])
+        } else {
+          val parameters = methodForCall(call).map(_.parameter.l).getOrElse(List())
+          call.start.argument
+            .where(arg => paramHasOutgoingPropagateEdge(arg, parameters) || !gen(node).contains(arg))
+            .toSet
+            .map(_.asInstanceOf[nodes.StoredNode])
+        }
       case _ => Set()
     }
+  }
+
+  private def hasAnnotation(call: nodes.Call): Boolean = {
+    methodForCall(call).exists(method => method.parameter.l.exists(x => x._propagateOut().hasNext))
   }
 
   private def paramHasOutgoingPropagateEdge(arg: nodes.Expression, parameters: List[nodes.MethodParameterIn]) = {
