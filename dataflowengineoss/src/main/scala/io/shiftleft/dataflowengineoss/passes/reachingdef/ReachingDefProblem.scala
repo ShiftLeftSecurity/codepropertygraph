@@ -86,23 +86,18 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     * definitions for each flow graph node.
     * */
   def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
+
     def defsMadeByCall(call: nodes.Call): Set[nodes.StoredNode] = {
-      val indicesOfDefinedOutputParams = NoResolve
-        .getCalledMethods(call)
-        .flatMap(method => method.parameter.asOutput)
-        .filter(outParam => outParam._propagateIn().hasNext)
-        .map(_.asInstanceOf[nodes.HasOrder].order.toInt)
-      call
-        ._argumentOut()
-        .asScala
-        .toList
-        .filter(node =>
-          indicesOfDefinedOutputParams.exists(_ == node.asInstanceOf[nodes.HasArgumentIndex].argumentIndex.toInt))
-        .toSet ++ {
+
+      val definedParams = methodsForCall(call).start.parameter.asOutput
+        .where(outParam => outParam._propagateIn().hasNext)
+        .order
+        .l
+
+      call.start.argument.l.filter(arg => definedParams.contains(arg.argumentIndex)).toSet ++ {
         if (methodForCall(call)
               .map(method => method.methodReturn)
-              .exists(methodReturn => methodReturn._propagateIn().hasNext) ||
-            !hasAnnotation(call)) {
+              .exists(methodReturn => methodReturn._propagateIn().hasNext) || !hasAnnotation(call)) {
           Set(call)
         } else {
           Set()
@@ -145,13 +140,17 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
   }
 
   private def methodForCall(call: nodes.Call): Option[nodes.Method] = {
-    NoResolve.getCalledMethods(call).toList match {
+    methodsForCall(call) match {
       case List(x) => Some(x)
       case List()  => None
       case list =>
         logger.warn(s"Multiple methods with name: ${call.name}, using first one")
         Some(list.head)
     }
+  }
+
+  private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
+    NoResolve.getCalledMethods(call).toList
   }
 
   private def declaration(node: nodes.StoredNode): Option[nodes.StoredNode] = {
