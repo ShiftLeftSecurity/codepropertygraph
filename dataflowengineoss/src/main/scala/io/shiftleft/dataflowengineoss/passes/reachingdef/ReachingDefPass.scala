@@ -1,8 +1,6 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
@@ -26,6 +24,11 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     Iterator(dstGraph.build())
   }
 
+  /**
+    * Once reaching definitions have been computed, we create a data dependence graph
+    * by seeing which of these reaching definitions are relevant in the sense that
+    * they are used.
+    * */
   private def addReachingDefEdges(method: nodes.Method,
                                   solution: Solution[Set[nodes.StoredNode]]): DiffGraph.Builder = {
 
@@ -39,34 +42,27 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val in = solution.in
     val gen = solution.problem.transferFunction.asInstanceOf[ReachingDefTransferFunction].gen
     val allNodes = in.keys.toList
-
-    def useToIn(node: nodes.StoredNode) =
-      uses(node, gen).map { use =>
-        use -> in(node).filter { inElement =>
-          declaration(use) == declaration(inElement)
-        }
-      }.toMap
+    val usageAnalyzer = new UsageAnalyzer(in, gen)
 
     allNodes.foreach { node: nodes.StoredNode =>
       node match {
         case call: nodes.Call =>
           // Edges between arguments of call sites
-          useToIn(call).foreach {
+          usageAnalyzer.usedIncomingDefs(call).foreach {
             case (use, ins) =>
               ins.foreach { in =>
                 if (in != use) {
-                  addEdge(in,
-                          use,
-                          Some(in)
-                            .filter(_.isInstanceOf[nodes.CfgNode])
-                            .map(_.asInstanceOf[nodes.CfgNode].code)
-                            .getOrElse(""))
+                  val edgeLabel = Some(in)
+                    .filter(_.isInstanceOf[nodes.CfgNode])
+                    .map(_.asInstanceOf[nodes.CfgNode].code)
+                    .getOrElse("")
+                  addEdge(in, use, edgeLabel)
                 }
               }
           }
 
           if (!hasAnnotation(call)) {
-            uses(call, gen).foreach { use =>
+            usageAnalyzer.uses(call, gen).foreach { use =>
               gen(call).foreach { g =>
                 addEdge(use, g)
               }
@@ -94,7 +90,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           }
 
         case ret: nodes.Return =>
-          useToIn(ret).foreach {
+          usageAnalyzer.usedIncomingDefs(ret).foreach {
             case (use, inElements) =>
               addEdge(use, ret, use.asInstanceOf[nodes.CfgNode].code)
               inElements.foreach { inElement =>
@@ -114,6 +110,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       }
     }
 
+    // Add edges from the entry node
     allNodes
       .filterNot(
         x =>
@@ -128,41 +125,8 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     dstGraph
   }
 
-  private def uses(node: nodes.StoredNode, gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Set[nodes.StoredNode] = {
-    node match {
-      case ret: nodes.Return =>
-        ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet()
-      case call: nodes.Call =>
-        val parameters = methodForCall(call).map(_.parameter.l).getOrElse(List())
-        node
-          ._argumentOut()
-          .asScala
-          .filter(
-            arg =>
-              parameters
-                .filter(_.order == arg.asInstanceOf[HasOrder].order)
-                .flatMap(_._propagateOut().asScala.toList)
-                .nonEmpty || !gen(node).contains(arg))
-          .toSet
-      case _ => Set()
-    }
-
-  }
-
   private def hasAnnotation(call: nodes.Call): Boolean = {
     methodForCall(call).exists(method => method.parameter.l.exists(x => x._propagateOut().hasNext))
-  }
-
-  private def declaration(node: nodes.StoredNode): Option[nodes.StoredNode] = {
-    node match {
-      case param: nodes.MethodParameterIn => Some(param)
-      case _: nodes.Identifier            => node._refOut().nextOption
-      case call: nodes.Call               =>
-        // We map to the first call that has the exact same code. We use
-        // this as a declaration
-        call.method.start.call.codeExact(call.code).headOption
-      case _ => None
-    }
   }
 
   private def methodForCall(call: nodes.Call): Option[nodes.Method] = {
