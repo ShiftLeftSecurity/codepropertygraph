@@ -94,15 +94,25 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
         .order
         .l
 
-      call.start.argument.l.filter(arg => definedParams.contains(arg.argumentIndex)).toSet ++ {
+      val explicitlyDefined = call.start.argument.l.filter(arg => definedParams.contains(arg.argumentIndex)).toSet ++ {
         if (methodForCall(call)
               .map(method => method.methodReturn)
-              .exists(methodReturn => methodReturn._propagateIn().hasNext) || !hasAnnotation(call)) {
+              .exists(methodReturn => methodReturn._propagateIn().hasNext)) {
           Set(call)
         } else {
           Set()
         }
       }
+
+      val implicilyDefined = {
+        if (!hasAnnotation(call)) {
+          Set(call) ++ call.start.argument.where(x => !x.isInstanceOf[nodes.Literal]).toSet
+        } else {
+          Set()
+        }
+      }
+
+      explicitlyDefined ++ implicilyDefined
     }
 
     val defsForParams = method.start.parameter.l.map { param =>

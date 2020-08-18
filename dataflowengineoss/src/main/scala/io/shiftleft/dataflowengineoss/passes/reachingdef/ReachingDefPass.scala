@@ -56,7 +56,8 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
                     .filter(_.isInstanceOf[nodes.CfgNode])
                     .map(_.asInstanceOf[nodes.CfgNode].code)
                     .getOrElse("")
-                  addEdge(in, use, edgeLabel)
+                  if (!use.isInstanceOf[nodes.FieldIdentifier])
+                    addEdge(in, use, edgeLabel)
                 }
               }
           }
@@ -64,7 +65,9 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           if (!hasAnnotation(call)) {
             usageAnalyzer.uses(call, gen).foreach { use =>
               gen(call).foreach { g =>
-                addEdge(use, g)
+                if (g == use || g == call) {
+                  addEdge(use, g)
+                }
               }
             }
           } else {

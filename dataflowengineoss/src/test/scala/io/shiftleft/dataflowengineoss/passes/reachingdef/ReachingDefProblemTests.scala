@@ -53,9 +53,9 @@ class ReachingDefProblemTests2 extends ReachingDefProblemSuite {
     "contain definitions of parameters for each parameter" in {
       method.parameter.l.map(transfer.gen(_)) shouldBe method.parameter.map(Set(_)).l
     }
-    "contain definition of return value for unannotated method" in {
+    "contain definition of return value and all arguments for unannotated method" in {
       val call = method.start.call.name("escape").head
-      transfer.gen(call) shouldBe Set(call)
+      transfer.gen(call) shouldBe Set(call) ++ method.start.call.name("escape").argument.toSet
     }
 
     "contain only correct argument for annotated method" in {
