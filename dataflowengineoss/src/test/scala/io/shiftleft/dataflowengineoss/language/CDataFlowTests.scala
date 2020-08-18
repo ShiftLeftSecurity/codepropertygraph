@@ -102,21 +102,22 @@ class CDataFlowTests2 extends DataFlowCodeToCpgSuite {
       Set(
         List[(String, Option[Integer])](
           ("*p = head", 8),
-          ("free(p)", 10)
-        ),
-        List[(String, Option[Integer])](
-          ("*p = head", 8),
-          ("q = p->next", 9),
-          ("p = q", 8),
+          ("p != NULL", 8),
           ("free(p)", 10)
         ),
         List[(String, Option[Integer])](
           ("q = p->next", 9),
           ("p = q", 8),
+          ("p != NULL", 8),
           ("free(p)", 10)
         ),
         List[(String, Option[Integer])](
           ("p = q", 8),
+          ("p != NULL", 8),
+          ("free(p)", 10)
+        ),
+        List[(String, Option[Integer])](
+          ("p != NULL", 8),
           ("free(p)", 10)
         ),
         List[(String, Option[Integer])](
@@ -143,16 +144,23 @@ class CDataFlowTests3 extends DataFlowCodeToCpgSuite {
     val sink = cpg.method.name("foo").parameter.argument
     val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 2
+    flows.size shouldBe 3
 
     flows.map(flowToResultPairs).toSet shouldBe
-      Set(List[(String, Option[Integer])](
-            ("a = 10", 3),
-            ("foo(a)", 5)
-          ),
-          List[(String, Option[Integer])](
-            ("foo(a)", 5)
-          ))
+      Set(
+        List[(String, Option[Integer])](
+          ("a = 10", 3),
+          ("a < y", 4),
+          ("foo(a)", 5)
+        ),
+        List[(String, Option[Integer])](
+          ("a < y", 4),
+          ("foo(a)", 5)
+        ),
+        List[(String, Option[Integer])](
+          ("foo(a)", 5)
+        ),
+      )
   }
 }
 
@@ -246,7 +254,7 @@ class CDataFlowTests6 extends DataFlowCodeToCpgSuite {
       """.stripMargin
 
   "Test 6: flow with nested if-statements from method return to a" in {
-    val source = cpg.identifier.name("a")
+    val source = cpg.call.code("a < 10").argument.code("a")
     val sink = cpg.methodReturn
     val flows = sink.reachableByFlows(source).l
 
@@ -255,6 +263,9 @@ class CDataFlowTests6 extends DataFlowCodeToCpgSuite {
     flows.map(flowToResultPairs).toSet shouldBe
       Set(
         List[(String, Option[Integer])](
+          ("a < 10", Some(5)),
+          ("a < 5", Some(6)),
+          ("a < 2", Some(7)),
           ("x = a", 8),
           ("return x;", 14),
           ("RET", 2)
