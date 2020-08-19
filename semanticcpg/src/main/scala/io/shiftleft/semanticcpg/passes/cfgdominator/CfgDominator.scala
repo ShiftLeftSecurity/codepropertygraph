@@ -91,8 +91,8 @@ class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
 
   private def createPostOrderNumbering(cfgEntry: NodeType): mutable.Map[NodeType, Int] = {
     var stack = (cfgEntry, adapter.successors(cfgEntry).iterator) :: Nil
-    var visited = mutable.Set.empty[NodeType]
-    var numbering = mutable.Map.empty[NodeType, Int]
+    val visited = mutable.Set.empty[NodeType]
+    val numbering = mutable.Map.empty[NodeType, Int]
     var nextNumber = 0
 
     while (stack.nonEmpty) {
