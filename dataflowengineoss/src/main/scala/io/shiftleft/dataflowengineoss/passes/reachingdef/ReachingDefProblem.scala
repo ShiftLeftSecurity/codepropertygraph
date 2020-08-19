@@ -112,7 +112,9 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
         }
       }
 
-      explicitlyDefined ++ implicilyDefined
+      (explicitlyDefined ++ implicilyDefined)
+        .filterNot(_.isInstanceOf[nodes.FieldIdentifier])
+        .map(_.asInstanceOf[nodes.StoredNode])
     }
 
     val defsForParams = method.start.parameter.l.map { param =>
