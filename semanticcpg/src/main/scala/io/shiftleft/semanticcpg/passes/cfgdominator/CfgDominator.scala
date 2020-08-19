@@ -1,5 +1,7 @@
 package io.shiftleft.semanticcpg.passes.cfgdominator
 
+import scala.collection.mutable
+
 class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
 
   /**
@@ -10,7 +12,7 @@ class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
     * The used algorithm is from: "A Simple, Fast Dominance Algorithm" from
     * "Keith D. Cooper, Timothy J. Harvey, and Ken Kennedy".
     */
-  def calculate(cfgEntry: NodeType): Map[NodeType, NodeType] = {
+  def calculate(cfgEntry: NodeType): mutable.Map[NodeType, NodeType] = {
     val UNDEFINED = -1
     val postOrderNumbering = createPostOrderNumbering(cfgEntry)
     val indexOf = postOrderNumbering.withDefaultValue(UNDEFINED) // Index of each node into dominators array.
@@ -87,10 +89,10 @@ class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
     finger1
   }
 
-  private def createPostOrderNumbering(cfgEntry: NodeType): Map[NodeType, Int] = {
+  private def createPostOrderNumbering(cfgEntry: NodeType): mutable.Map[NodeType, Int] = {
     var stack = (cfgEntry, adapter.successors(cfgEntry).iterator) :: Nil
-    var visited = Set.empty[NodeType]
-    var numbering = Map.empty[NodeType, Int]
+    var visited = mutable.Set.empty[NodeType]
+    var numbering = mutable.Map.empty[NodeType, Int]
     var nextNumber = 0
 
     while (stack.nonEmpty) {
