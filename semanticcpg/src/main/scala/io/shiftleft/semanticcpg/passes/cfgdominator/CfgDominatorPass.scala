@@ -7,6 +7,8 @@ import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.Node
 
+import scala.collection.mutable
+
 /**
   * This pass has no prerequisites.
   */
@@ -32,7 +34,8 @@ class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     Iterator(dstGraph.build())
   }
 
-  private def addDomTreeEdges(dstGraph: DiffGraph.Builder, cfgNodeToImmediateDominator: Map[Node, Node]): Unit = {
+  private def addDomTreeEdges(dstGraph: DiffGraph.Builder,
+                              cfgNodeToImmediateDominator: mutable.Map[Node, Node]): Unit = {
     // TODO do not iterate over potential hash map to ensure same interation order for
     // edge creation.
     cfgNodeToImmediateDominator.foreach {
@@ -44,7 +47,7 @@ class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   }
 
   private def addPostDomTreeEdges(dstGraph: DiffGraph.Builder,
-                                  cfgNodeToPostImmediateDominator: Map[Node, Node]): Unit = {
+                                  cfgNodeToPostImmediateDominator: mutable.Map[Node, Node]): Unit = {
     // TODO do not iterate over potential hash map to ensure same interation order for
     // edge creation.
     cfgNodeToPostImmediateDominator.foreach {

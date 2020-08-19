@@ -2,10 +2,11 @@ package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.OverflowDbTestInstance
 import overflowdb._
-import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominator, CfgDominatorFrontier, DomTreeAdapter, CfgAdapter}
+import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgAdapter, CfgDominator, CfgDominatorFrontier, DomTreeAdapter}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 class CfgDominatorFrontierTests extends AnyWordSpec with Matchers {
@@ -18,7 +19,7 @@ class CfgDominatorFrontierTests extends AnyWordSpec with Matchers {
       node.in("CFG").asScala
   }
 
-  private class TestDomTreeAdapter(immediateDominators: Map[Node, Node]) extends DomTreeAdapter[Node] {
+  private class TestDomTreeAdapter(immediateDominators: mutable.Map[Node, Node]) extends DomTreeAdapter[Node] {
     override def immediateDominator(cfgNode: Node): Option[Node] = {
       immediateDominators.get(cfgNode)
     }
