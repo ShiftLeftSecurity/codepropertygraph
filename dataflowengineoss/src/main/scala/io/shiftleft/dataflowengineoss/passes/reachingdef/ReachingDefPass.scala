@@ -36,6 +36,9 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
     def addEdge(fromNode: nodes.StoredNode, toNode: nodes.StoredNode, variable: String = ""): Unit = {
       val properties = List((EdgeKeyNames.VARIABLE, variable))
+      if (toNode.isInstanceOf[nodes.Literal] || fromNode.isInstanceOf[nodes.Unknown] || toNode
+            .isInstanceOf[nodes.Unknown])
+        return
       dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF, properties)
     }
 
@@ -56,8 +59,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
                     .filter(_.isInstanceOf[nodes.CfgNode])
                     .map(_.asInstanceOf[nodes.CfgNode].code)
                     .getOrElse("")
-                  if (!use.isInstanceOf[nodes.FieldIdentifier])
-                    addEdge(in, use, edgeLabel)
+                  addEdge(in, use, edgeLabel)
                 }
               }
           }

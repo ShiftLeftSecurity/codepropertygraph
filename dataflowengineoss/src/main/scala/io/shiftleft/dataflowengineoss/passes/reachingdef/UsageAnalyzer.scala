@@ -29,7 +29,7 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[nodes.StoredNode]],
   }
 
   def uses(node: nodes.StoredNode, gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Set[nodes.StoredNode] = {
-    node match {
+    val n = node match {
       case ret: nodes.Return =>
         ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet()
       case call: nodes.Call =>
@@ -44,6 +44,7 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[nodes.StoredNode]],
         }
       case _ => Set()
     }
+    n.filterNot(_.isInstanceOf[nodes.FieldIdentifier]).map(_.asInstanceOf[nodes.StoredNode])
   }
 
   private def hasAnnotation(call: nodes.Call): Boolean = {
