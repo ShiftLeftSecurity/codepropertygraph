@@ -29,8 +29,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     * by seeing which of these reaching definitions are relevant in the sense that
     * they are used.
     * */
-  private def addReachingDefEdges(method: nodes.Method,
-                                  solution: Solution[Set[nodes.StoredNode]]): DiffGraph.Builder = {
+  private def addReachingDefEdges(method: nodes.Method, solution: Solution[Set[Definition]]): DiffGraph.Builder = {
 
     val dstGraph = DiffGraph.newBuilder
 
@@ -54,12 +53,12 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           usageAnalyzer.usedIncomingDefs(call).foreach {
             case (use, ins) =>
               ins.foreach { in =>
-                if (in != use) {
+                if (in.node != use) {
                   val edgeLabel = Some(in)
                     .filter(_.isInstanceOf[nodes.CfgNode])
                     .map(_.asInstanceOf[nodes.CfgNode].code)
                     .getOrElse("")
-                  addEdge(in, use, edgeLabel)
+                  addEdge(in.node, use, edgeLabel)
                 }
               }
           }
@@ -67,8 +66,8 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           if (!hasAnnotation(call)) {
             usageAnalyzer.uses(call, gen).foreach { use =>
               gen(call).foreach { g =>
-                if (g == use || g == call) {
-                  addEdge(use, g)
+                if (g.node == use || g.node == call) {
+                  addEdge(use, g.node)
                 }
               }
             }
@@ -99,7 +98,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
             case (use, inElements) =>
               addEdge(use, ret, use.asInstanceOf[nodes.CfgNode].code)
               inElements.foreach { inElement =>
-                addEdge(inElement, ret)
+                addEdge(inElement.node, ret)
               }
               if (inElements.isEmpty) {
                 addEdge(method, ret)
@@ -122,7 +121,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           x.isInstanceOf[nodes.MethodReturn] || x.isInstanceOf[nodes.Method] || x.isInstanceOf[nodes.Literal] || x
             .isInstanceOf[nodes.ControlStructure] || x.isInstanceOf[nodes.FieldIdentifier])
       .foreach { node =>
-        if (in(node).size == in(node).count(_.isInstanceOf[nodes.MethodParameterIn])) {
+        if (in(node).size == in(node).count(_.node.isInstanceOf[nodes.MethodParameterIn])) {
           addEdge(method, node)
         }
       }

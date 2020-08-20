@@ -51,23 +51,27 @@ class ReachingDefProblemTests2 extends ReachingDefProblemSuite {
 
   "ReachingDefTransferFunction's gen set" should {
     "contain definitions of parameters for each parameter" in {
-      method.parameter.l.map(transfer.gen(_)) shouldBe method.parameter.map(Set(_)).l
+      method.parameter.l.map(transfer.gen(_)) shouldBe method.parameter.map(x => Set(Definition.fromNode(x))).l
     }
     "contain definition of return value and all arguments for unannotated method" in {
       val call = method.start.call.name("escape").head
-      transfer.gen(call) shouldBe Set(call) ++ method.start.call.name("escape").argument.toSet
+      transfer.gen(call) shouldBe Set(Definition.fromNode(call)) ++ method.start.call
+        .name("escape")
+        .argument
+        .map(x => Definition.fromNode(x))
+        .toSet
     }
 
     "contain only correct argument for annotated method" in {
       val call = method.start.call.name(Operators.assignment).head
-      transfer.gen(call) shouldBe Set(call.argument(1))
+      transfer.gen(call) shouldBe Set(call.argument(1)).map(x => Definition.fromNode(x))
     }
   }
 
   "ReachingDefTransferFunction's kill set" should {
     "contain kill for parameter at assignment to x" in {
       val call = method.start.call.name(Operators.assignment).head
-      transfer.kill(call).contains(method.parameter.name("x").head)
+      transfer.kill(call).contains(Definition.fromNode(method.parameter.name("x").head))
     }
   }
 

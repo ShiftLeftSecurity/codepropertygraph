@@ -1,10 +1,6 @@
 package io.shiftleft.dataflowengineoss.language
 
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.dotextension.ImageViewer
-
-import scala.sys.process.Process
-import scala.util.Try
 
 class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
 

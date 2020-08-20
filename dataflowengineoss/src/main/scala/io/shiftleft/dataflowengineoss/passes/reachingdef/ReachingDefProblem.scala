@@ -6,17 +6,26 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import scala.jdk.CollectionConverters._
 import io.shiftleft.Implicits.JavaIteratorDeco
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
+
+object Definition {
+
+  def fromNode(node: nodes.StoredNode): Definition = {
+    new Definition(node)
+  }
+
+}
+
+case class Definition(val node: nodes.StoredNode) {}
 
 object ReachingDefProblem {
 
-  def create(method: nodes.Method): DataFlowProblem[Set[nodes.StoredNode]] = {
+  def create(method: nodes.Method): DataFlowProblem[Set[Definition]] = {
     val flowGraph = new ReachingDefFlowGraph(method)
     val transfer = new ReachingDefTransferFunction(method)
     val init = new ReachingDefInit(transfer.gen)
-    def meet: (Set[StoredNode], Set[StoredNode]) => Set[StoredNode] =
-      (x: Set[StoredNode], y: Set[StoredNode]) => { x.union(y) }
-    new DataFlowProblem[Set[StoredNode]](flowGraph, transfer, meet, init, true, Set[nodes.StoredNode]())
+    def meet: (Set[Definition], Set[Definition]) => Set[Definition] =
+      (x: Set[Definition], y: Set[Definition]) => { x.union(y) }
+    new DataFlowProblem[Set[Definition]](flowGraph, transfer, meet, init, true, Set[Definition]())
   }
 
 }
@@ -64,20 +73,20 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
 
 }
 
-class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction[Set[nodes.StoredNode]] {
+class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction[Set[Definition]] {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  val gen: Map[nodes.StoredNode, Set[nodes.StoredNode]] = initGen(method).withDefaultValue(Set.empty[nodes.StoredNode])
-  val kill: Map[nodes.StoredNode, Set[nodes.StoredNode]] =
-    initKill(method, gen).withDefaultValue(Set.empty[nodes.StoredNode])
+  val gen: Map[nodes.StoredNode, Set[Definition]] = initGen(method).withDefaultValue(Set.empty[Definition])
+  val kill: Map[nodes.StoredNode, Set[Definition]] =
+    initKill(method, gen).withDefaultValue(Set.empty[Definition])
 
   /**
     * For a given flow graph node `n` and set of definitions, apply the transfer
     * function to obtain the updated set of definitions, considering `gen(n)`
     * and `kill(n)`.
     * */
-  override def apply(n: nodes.StoredNode, x: Set[nodes.StoredNode]): Set[nodes.StoredNode] = {
+  override def apply(n: nodes.StoredNode, x: Set[Definition]): Set[Definition] = {
     gen(n).union(x.diff(kill(n)))
   }
 
@@ -85,9 +94,9 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     * Initialize the map `gen`, a map that contains generated
     * definitions for each flow graph node.
     * */
-  def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
+  def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[Definition]] = {
 
-    def defsMadeByCall(call: nodes.Call): Set[nodes.StoredNode] = {
+    def defsMadeByCall(call: nodes.Call): Set[Definition] = {
 
       val definedParams = methodsForCall(call).start.parameter.asOutput
         .where(outParam => outParam._propagateIn().hasNext)
@@ -114,11 +123,11 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
 
       (explicitlyDefined ++ implicilyDefined)
         .filterNot(_.isInstanceOf[nodes.FieldIdentifier])
-        .map(_.asInstanceOf[nodes.StoredNode])
+        .map(x => Definition.fromNode(x.asInstanceOf[nodes.StoredNode]))
     }
 
     val defsForParams = method.start.parameter.l.map { param =>
-      param -> Set(param.asInstanceOf[nodes.StoredNode])
+      param -> Set(Definition.fromNode(param.asInstanceOf[nodes.StoredNode]))
     }
 
     val defsForCalls = method.start.call.l.map { call =>
@@ -133,7 +142,7 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     * definitions for each flow graph node.
     * */
   def initKill(method: nodes.Method,
-               gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]): Map[nodes.StoredNode, Set[nodes.StoredNode]] = {
+               gen: Map[nodes.StoredNode, Set[Definition]]): Map[nodes.StoredNode, Set[Definition]] = {
 
     def allOtherInstancesOf(node: nodes.StoredNode): Set[nodes.StoredNode] = {
       declaration(node).toList
@@ -145,7 +154,9 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     // We are also adding nodes here that may not even be definitions, but that's
     // fine since `kill` is only subtracted
     method.start.call.map { call =>
-      call -> gen(call).map(v => allOtherInstancesOf(v)).fold(Set())((v1, v2) => v1.union(v2))
+      call -> gen(call)
+        .map(d => allOtherInstancesOf(d.node).map(new Definition(_)))
+        .fold(Set())((v1, v2) => v1.union(v2))
     }.toMap
   }
 
@@ -191,11 +202,11 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
 
 }
 
-class ReachingDefInit(gen: Map[nodes.StoredNode, Set[nodes.StoredNode]]) extends InOutInit[Set[nodes.StoredNode]] {
-  override def initIn: Map[nodes.StoredNode, Set[nodes.StoredNode]] =
+class ReachingDefInit(gen: Map[nodes.StoredNode, Set[Definition]]) extends InOutInit[Set[Definition]] {
+  override def initIn: Map[nodes.StoredNode, Set[Definition]] =
     Map
-      .empty[nodes.StoredNode, Set[nodes.StoredNode]]
-      .withDefaultValue(Set.empty[nodes.StoredNode])
+      .empty[nodes.StoredNode, Set[Definition]]
+      .withDefaultValue(Set.empty[Definition])
 
-  override def initOut: Map[nodes.StoredNode, Set[nodes.StoredNode]] = gen
+  override def initOut: Map[nodes.StoredNode, Set[Definition]] = gen
 }
