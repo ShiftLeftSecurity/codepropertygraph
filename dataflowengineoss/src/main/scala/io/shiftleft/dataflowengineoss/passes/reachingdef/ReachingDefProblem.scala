@@ -197,7 +197,7 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
   }
 
   private def hasAnnotation(call: nodes.Call): Boolean = {
-    methodForCall(call).exists(method => method.parameter.l.exists(x => x._propagateOut().hasNext))
+    methodForCall(call).exists(method => method._propagateOut().hasNext)
   }
 
 }

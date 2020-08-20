@@ -2,7 +2,9 @@ package io.shiftleft.dataflowengineoss.language
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.language._
+
 import scala.jdk.CollectionConverters._
 
 /**
@@ -21,20 +23,22 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     * */
   def cfgNode: NodeSteps[nodes.CfgNode] = wrapped.map(_.cfgNode)
 
-  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*): NodeSteps[NodeType] = {
+  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*)(
+      implicit semantics: Semantics): NodeSteps[NodeType] = {
     val reachedSources = reachableByInternal(sourceTravs).map(_.reachedSource)
     new NodeSteps[NodeType](__(reachedSources: _*).asInstanceOf[GremlinScala[NodeType]])
   }
 
-  def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: NodeSteps[A]*): Steps[Path] = {
+  def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: NodeSteps[A]*)(
+      implicit semantics: Semantics): Steps[Path] = {
     val paths = reachableByInternal(sourceTravs).map { result =>
       Path(result.path)
     }
     new Steps(__(paths: _*))
   }
 
-  private def reachableByInternal[NodeType <: nodes.TrackingPoint](
-      sourceTravs: Seq[Steps[NodeType]]): List[ReachableByResult] = {
+  private def reachableByInternal[NodeType <: nodes.TrackingPoint](sourceTravs: Seq[Steps[NodeType]])(
+      implicit semantics: Semantics): List[ReachableByResult] = {
     val sourceSymbols = sourceTravs
       .flatMap(_.raw.clone.toList)
       .collect { case n: nodes.TrackingPoint => n }
@@ -62,19 +66,41 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     sinkSymbols.flatMap(s => traverseDdgBack(List(s)))
   }
 
-  private def ddgIn(node: nodes.TrackingPoint): Iterator[nodes.TrackingPoint] = {
-    val viaPropagate: List[nodes.TrackingPoint] = node match {
+  private def ddgIn(node: nodes.TrackingPoint)(implicit semantics: Semantics): Iterator[nodes.TrackingPoint] = {
+    node match {
       case n: nodes.Expression =>
         val inArgs = argToInArgsViaPropagate(n)
         val inCalls = Some(n).toList.collect {
           case call: nodes.Call =>
-            callToInArgsViaPropagate(call)
+            callToInArgs(call)
         }.flatten
-        inArgs ++ inCalls
-      case _ => List[nodes.TrackingPoint]()
+        (inArgs ++ inCalls ++ inReachingDefNonSiblings(n)).iterator
+      case x =>
+        inReachingDef(node)
     }
-    val viaReachingDef = node._reachingDefIn().asScala.collect { case n: nodes.TrackingPoint => n }.toList
-    (viaPropagate ++ viaReachingDef).iterator
+
+  }
+
+  private def inReachingDef(node: nodes.StoredNode) =
+    node._reachingDefIn().asScala.collect { case n: nodes.TrackingPoint => n }.toList.iterator
+
+  private def inReachingDefNonSiblings(node: nodes.StoredNode) = {
+    node match {
+      case n: nodes.Expression =>
+        val allArgsForCall = argToCall(n).toList.flatMap { call =>
+          call._argumentOut().asScala.toList.collect { case t: nodes.TrackingPoint => t }
+        }.toSet
+        (inReachingDef(n).toSet -- allArgsForCall).iterator
+      case _ =>
+        inReachingDef(node)
+    }
+  }
+
+  private def inReachingDefForSiblings(n: nodes.Expression) = {
+    val allArgsForCall = argToCall(n).toList.flatMap { call =>
+      call._argumentOut().asScala.toList.collect { case t: nodes.TrackingPoint => t }
+    }.toSet
+    (inReachingDef(n).toSet.intersect(allArgsForCall)).iterator
   }
 
   /**
@@ -89,15 +115,28 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     * we only have one node for both states, that is, the tracker will
     * need to keep a record of whether it is in the in- or out-state.
     * */
-  private def argToInArgsViaPropagate(n: nodes.Expression): List[nodes.Expression] = {
+  private def argToInArgsViaPropagate(n: nodes.Expression)(implicit semantics: Semantics): List[nodes.Expression] = {
     val parentCall = argToCall(n)
-    val inParams = argToParamIn(n)
-    val orders = inParams.start.order.l
-    parentCall.toList
-      .flatMap { call =>
-        orders.map(o => call.argument(o))
-      }
-      .collect { case t: nodes.TrackingPoint => t }
+    val methods = argToCall(n).toList.flatMap(x => methodsForCall(x))
+    val existingSemantics = methods.flatMap { method =>
+      semantics.forMethod(method.fullName)
+    }
+
+    if (existingSemantics.isEmpty) {
+      inReachingDefForSiblings(n).collect { case expr: nodes.Expression => expr }.toList
+    } else {
+      val indices = existingSemantics
+        .flatMap { semantic =>
+          semantic.mappings.collect { case (srcIndex, dstIndex) if dstIndex == n.order => srcIndex }
+        }
+      val inParams = methods.start.parameter.where(p => indices.contains(p.order)).l
+      val orders = inParams.start.order.l
+      parentCall.toList
+        .flatMap { call =>
+          orders.map(o => call.argument(o))
+        }
+        .collect { case t: nodes.TrackingPoint => t }
+    }
   }
 
   /**
@@ -105,24 +144,24 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     * determine arguments that influence the return value, taking into
     * account propagate edges.
     * */
-  private def callToInArgsViaPropagate(call: nodes.Call): List[nodes.Expression] = {
-    val inParams = methodsForCall(call).start.methodReturn.l.flatMap(_._propagateIn().asScala.toList).collect {
-      case p: nodes.MethodParameterIn => p
+  private def callToInArgs(call: nodes.Call)(implicit semantics: Semantics): List[nodes.Expression] = {
+    val existingSemantics = methodsForCall(call)
+      .flatMap { method =>
+        semantics.forMethod(method.fullName)
+      }
+    if (existingSemantics.isEmpty) {
+      inReachingDefForSiblings(call).collect { case expr: nodes.Expression => expr }.toList
+    } else {
+      val indices = existingSemantics
+        .flatMap { semantic =>
+          semantic.mappings.collect { case (srcIndex, dstIndex) if dstIndex == -1 => srcIndex }
+        }
+      indices.map(i => call.argument(i)).distinct
     }
-    inParams.start.order.map(o => call.argument(o)).l
   }
 
   private def argToCall(n: nodes.Expression) =
     n._argumentIn.asScala.collectFirst { case c: nodes.Call => c }
-
-  private def argToParamIn(arg: nodes.Expression) = {
-    val outParams = argToParamOut(arg)
-    outParams.flatMap(_._propagateIn().asScala).collect { case p: nodes.MethodParameterIn => p }
-  }
-
-  private def argToParamOut(arg: nodes.Expression) = {
-    argToCall(arg).toList.flatMap(x => methodsForCall(x).start.parameter.asOutput.order(arg.order))
-  }
 
   private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
     NoResolve.getCalledMethods(call).toList

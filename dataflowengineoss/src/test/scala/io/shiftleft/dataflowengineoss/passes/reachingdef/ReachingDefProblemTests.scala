@@ -24,7 +24,7 @@ class ReachingDefProblemTests1 extends ReachingDefProblemSuite {
 }
 
 class ReachingDefProblemTests2 extends ReachingDefProblemSuite {
-  override val semantics: Semantics = Semantics(
+  override val semantics: Semantics = Semantics.fromList(
     List(
       FlowSemantic(Operators.assignment, List((2, 1)))
     ))
@@ -78,7 +78,7 @@ class ReachingDefProblemTests2 extends ReachingDefProblemSuite {
 }
 
 class ReachingDefProblemSuite extends PropagateEdgeTestSuite {
-  override val semantics: Semantics = Semantics(List())
+  override val semantics: Semantics = Semantics.empty
 
   var method: nodes.Method = _
   var flowGraph: ReachingDefFlowGraph = _
