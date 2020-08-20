@@ -40,25 +40,24 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
       .map(_.asInstanceOf[nodes.TrackingPoint])
       .toSet
 
-    val sinkSymbols = raw.clone.dedup.toList.sortBy { _.id.asInstanceOf[java.lang.Long] }
-
     def traverseDdgBack(path: List[nodes.TrackingPoint]): List[ReachableByResult] = {
       val node = path.head
-      val resultsForNode = if (sourceSymbols.contains(node)) {
-        List(new ReachableByResult(node, path))
-      } else {
-        List[ReachableByResult]()
-      }
+
+      val resultsForNode = Some(node)
+        .filter(n => sourceSymbols.contains(n)).map{ n =>
+        new ReachableByResult(n, path)
+      }.toList
 
       val resultsForParents = incomingDdgNodes(node)
-        .filter(x => !path.contains(x))
-        .flatMap { p =>
-          traverseDdgBack(p :: node :: path.tail)
-        }
+        .filter(parent => !path.contains(parent))
+        .flatMap (parent =>
+          traverseDdgBack(parent :: node :: path.tail)
+        )
         .toList
       resultsForParents ++ resultsForNode
     }
 
+    val sinkSymbols = raw.clone.dedup.toList.sortBy { _.id.asInstanceOf[java.lang.Long] }
     sinkSymbols.flatMap(s => traverseDdgBack(List(s)))
   }
 
