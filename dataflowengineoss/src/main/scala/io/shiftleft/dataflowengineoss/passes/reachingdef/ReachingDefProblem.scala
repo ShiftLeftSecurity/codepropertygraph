@@ -15,7 +15,7 @@ object Definition {
 
 }
 
-case class Definition(val node: nodes.StoredNode) {}
+case class Definition private (node: nodes.StoredNode) {}
 
 object ReachingDefProblem {
 
@@ -155,7 +155,7 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     // fine since `kill` is only subtracted
     method.start.call.map { call =>
       call -> gen(call)
-        .map(d => allOtherInstancesOf(d.node).map(new Definition(_)))
+        .map(d => allOtherInstancesOf(d.node).map(x => Definition.fromNode(x)))
         .fold(Set())((v1, v2) => v1.union(v2))
     }.toMap
   }

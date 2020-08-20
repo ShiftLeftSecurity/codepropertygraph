@@ -460,7 +460,7 @@ class CDataFlowTests12 extends DataFlowCodeToCpgSuite {
        """.stripMargin
 
   "Test 12: flow with short hand assignment operator" in {
-    val source = cpg.call.code("a = 0x37")
+    val source = cpg.call.code("a = 0x37").argument(2)
     val sink = cpg.call.code("z\\+=a").argument(1)
     val flows = sink.reachableByFlows(source).l
 
@@ -493,7 +493,7 @@ class CDataFlowTests13 extends DataFlowCodeToCpgSuite {
       """.stripMargin
 
   "Test 13: flow after short hand assignment" in {
-    val source = cpg.call.code("a = 0x37")
+    val source = cpg.call.code("a = 0x37").argument(1)
     val sink = cpg.identifier.name("w")
     val flows = sink.reachableByFlows(source).l
 

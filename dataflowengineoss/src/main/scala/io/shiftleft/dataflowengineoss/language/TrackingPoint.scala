@@ -3,8 +3,6 @@ package io.shiftleft.dataflowengineoss.language
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.Implicits.JavaIteratorDeco
-import io.shiftleft.semanticcpg.utils.MemberAccess
 import scala.jdk.CollectionConverters._
 
 /**
@@ -24,69 +22,58 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   def cfgNode: NodeSteps[nodes.CfgNode] = wrapped.map(_.cfgNode)
 
   def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*): NodeSteps[NodeType] = {
-    val pathReachables = reachableByInternal(sourceTravs)
-    val reachedSources = pathReachables.map(_.reachedSource)
+    val reachedSources = reachableByInternal(sourceTravs).map(_.reachedSource)
     new NodeSteps[NodeType](__(reachedSources: _*).asInstanceOf[GremlinScala[NodeType]])
   }
 
   def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: NodeSteps[A]*): Steps[Path] = {
-    val pathReachables = reachableByInternal(sourceTravs)
-    val paths = pathReachables.map { reachableByContainer =>
-      Path(reachableByContainer.path)
+    val paths = reachableByInternal(sourceTravs).map { result =>
+      Path(result.path)
     }
     new Steps(__(paths: _*))
   }
 
   private def reachableByInternal[NodeType <: nodes.TrackingPoint](
-      sourceTravs: Seq[Steps[NodeType]]): List[ReachableByContainer] = {
+      sourceTravs: Seq[Steps[NodeType]]): List[ReachableByResult] = {
     val sourceSymbols = sourceTravs
       .flatMap(_.raw.clone.toList)
-      .flatMap { elem =>
-        getTrackingPoint(elem.asInstanceOf[nodes.TrackingPoint])
-      }
+      .map(_.asInstanceOf[nodes.TrackingPoint])
       .toSet
 
     val sinkSymbols = raw.clone.dedup.toList.sortBy { _.id.asInstanceOf[java.lang.Long] }
 
-    var pathReachables = List.empty[ReachableByContainer]
-
-    def traverseDDGBack(path: List[nodes.TrackingPoint]): Unit = {
+    def traverseDdgBack(path: List[nodes.TrackingPoint]): List[ReachableByResult] = {
       val node = path.head
-      if (sourceSymbols.contains(node)) {
-        val sack = new ReachableByContainer(node, path)
-        pathReachables = sack :: pathReachables
+      val resultsForNode = if (sourceSymbols.contains(node)) {
+        List(new ReachableByResult(node, path))
+      } else {
+        List[ReachableByResult]()
       }
 
-      for {
-        ddgPredecessor <- node._reachingDefIn.asScala
-        predTrackingPoint <- getTrackingPoint(ddgPredecessor)
-        if !path.contains(predTrackingPoint)
-      } traverseDDGBack(predTrackingPoint :: node :: path.tail)
+      val resultsForParents = incomingDdgNodes(node)
+        .filter(x => !path.contains(x))
+        .flatMap { p =>
+          traverseDdgBack(p :: node :: path.tail)
+        }
+        .toList
+      resultsForParents ++ resultsForNode
     }
 
-    sinkSymbols.map(getTrackingPoint).foreach {
-      case Some(trackingPoing) => traverseDDGBack(List(trackingPoing))
-      case None                =>
-    }
-
-    pathReachables
+    sinkSymbols.flatMap(s => traverseDdgBack(List(s)))
   }
 
-  private def getTrackingPoint(node: nodes.StoredNode): Option[nodes.TrackingPoint] =
-    node match {
-      case identifier: nodes.Identifier           => Some(identifier)
-      case call: nodes.Call                       => Some(call)
-      case ret: nodes.Return                      => Some(ret)
-      case methodReturn: nodes.MethodReturn       => Some(methodReturn)
-      case methodParamIn: nodes.MethodParameterIn => Some(methodParamIn)
-      case literal: nodes.Literal                 => getTrackingPoint(literal._argumentIn().onlyChecked)
-      case _                                      => None
-    }
+  private def incomingDdgNodes(node: nodes.TrackingPoint): Iterator[nodes.TrackingPoint] = {
+    node
+      ._reachingDefIn()
+      .asScala
+      .filter(_.isInstanceOf[nodes.TrackingPoint])
+      .map(_.asInstanceOf[nodes.TrackingPoint])
+  }
 
 }
 
-private class ReachableByContainer(val reachedSource: nodes.TrackingPoint, val path: List[nodes.TrackingPoint]) {
-  override def clone(): ReachableByContainer = {
-    new ReachableByContainer(reachedSource, path)
+private class ReachableByResult(val reachedSource: nodes.TrackingPoint, val path: List[nodes.TrackingPoint]) {
+  override def clone(): ReachableByResult = {
+    new ReachableByResult(reachedSource, path)
   }
 }
