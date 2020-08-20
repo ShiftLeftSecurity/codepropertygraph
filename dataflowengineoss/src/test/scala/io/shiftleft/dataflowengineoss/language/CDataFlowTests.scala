@@ -534,7 +534,7 @@ class CDataFlowTests14 extends DataFlowCodeToCpgSuite {
     val sink = cpg.identifier.name("y")
     val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 2
+    flows.size shouldBe 4
 
     flows.map(flowToResultPairs).toSet shouldBe
       Set(

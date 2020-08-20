@@ -4,16 +4,11 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
-import org.slf4j.{Logger, LoggerFactory}
-
-import scala.jdk.CollectionConverters._
 
 /**
   * A pass that calculates reaching definitions ("data dependencies").
   * */
 class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
-
-  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
 
@@ -63,12 +58,14 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
               }
           }
 
-          if (!hasAnnotation(call)) {
-            usageAnalyzer.uses(call).foreach { use =>
-              gen(call).foreach { g =>
-                if (g.node == use || g.node == call) {
-                  addEdge(use, g.node)
-                }
+          // For all calls, assume that each argument-in
+          // influences the corresponding argument-out
+          // and each argument influences the
+          // return value of the call.
+          usageAnalyzer.uses(call).foreach { use =>
+            gen(call).foreach { g =>
+              if (g.node == use || g.node == call) {
+                addEdge(use, g.node)
               }
             }
           }
@@ -107,20 +104,6 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       }
 
     dstGraph
-  }
-
-  private def hasAnnotation(call: nodes.Call): Boolean = {
-    methodForCall(call).exists(method => method.parameter.l.exists(x => x._propagateOut().hasNext))
-  }
-
-  private def methodForCall(call: nodes.Call): Option[nodes.Method] = {
-    NoResolve.getCalledMethods(call).toList match {
-      case List(x) => Some(x)
-      case List()  => None
-      case list =>
-        logger.warn(s"Multiple methods with name: ${call.name}, using first one")
-        Some(list.head)
-    }
   }
 
 }

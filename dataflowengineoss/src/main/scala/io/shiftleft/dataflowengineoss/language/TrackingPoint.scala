@@ -40,6 +40,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
       .collect { case n: nodes.TrackingPoint => n }
       .toSet
 
+    // Recursive part of this function
     def traverseDdgBack(path: List[nodes.TrackingPoint]): List[ReachableByResult] = {
       val node = path.head
 
@@ -62,37 +63,65 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   }
 
   private def ddgIn(node: nodes.TrackingPoint): Iterator[nodes.TrackingPoint] = {
-
-    // If we reach the argument of a call
-
     val viaPropagate: List[nodes.TrackingPoint] = node match {
       case n: nodes.Expression =>
-        val parentCall = n._argumentIn.asScala.collectFirst { case c: nodes.Call => c }
-        val outParams = parentCall.toList.flatMap(x => methodsForCall(x).start.parameter.asOutput.order(n.order))
-        val inParams = outParams.flatMap(_._propagateIn().asScala).collect { case p: nodes.MethodParameterIn => p }
-
-        val orders = inParams.start.order.l
-        val inArgs = parentCall
-          .map { call =>
-            orders.map(o => call.argument(o))
-          }
-          .toList
-          .flatten
-          .collect { case t: nodes.TrackingPoint => t }
-
-        val inCalls = n match {
+        val inArgs = argToInArgsViaPropagate(n)
+        val inCalls = Some(n).toList.collect {
           case call: nodes.Call =>
-            val inParams = methodsForCall(call).start.methodReturn.l.flatMap(_._propagateIn().asScala.toList).collect {
-              case p: nodes.MethodParameterIn => p
-            }
-            inParams.start.order.map(o => call.argument(o)).l
-          case _ => List()
-        }
+            callToInArgsViaPropagate(call)
+        }.flatten
         inArgs ++ inCalls
       case _ => List[nodes.TrackingPoint]()
     }
     val viaReachingDef = node._reachingDefIn().asScala.collect { case n: nodes.TrackingPoint => n }.toList
     (viaPropagate ++ viaReachingDef).iterator
+  }
+
+  /**
+    * At a given argument, determine arguments that influence
+    * it, taking into account propagate edges (created by
+    * annotation). This is achieved as follows:
+    * From the argument, traverse to the corresponding
+    * formal method out parameter and follow incoming propagate edges
+    * to formal input parameters. From there, traverse to the
+    * corresponding arguments. Note that in the CPG, we have dedicated
+    * nodes for formal input and output parameters, but for arguments,
+    * we only have one node for both states, that is, the tracker will
+    * need to keep a record of whether it is in the in- or out-state.
+    * */
+  private def argToInArgsViaPropagate(n: nodes.Expression): List[nodes.Expression] = {
+    val parentCall = argToCall(n)
+    val inParams = argToParamIn(n)
+    val orders = inParams.start.order.l
+    parentCall.toList
+      .flatMap { call =>
+        orders.map(o => call.argument(o))
+      }
+      .collect { case t: nodes.TrackingPoint => t }
+  }
+
+  /**
+    * From the call node (which represents the actual return as well),
+    * determine arguments that influence the return value, taking into
+    * account propagate edges.
+    * */
+  private def callToInArgsViaPropagate(call: nodes.Call): List[nodes.Expression] = {
+    val inParams = methodsForCall(call).start.methodReturn.l.flatMap(_._propagateIn().asScala.toList).collect {
+      case p: nodes.MethodParameterIn => p
+    }
+    inParams.start.order.map(o => call.argument(o)).l
+  }
+
+  private def argToCall(n: nodes.Expression) =
+    n._argumentIn.asScala.collectFirst { case c: nodes.Call => c }
+
+  private def argToParamIn(arg: nodes.Expression) = {
+    val outParams = argToParamOut(arg)
+    outParams.flatMap(_._propagateIn().asScala).collect { case p: nodes.MethodParameterIn => p }
+  }
+
+  private def argToParamOut(arg: nodes.Expression) = {
+    argToCall(arg).toList.flatMap(x => methodsForCall(x).start.parameter.asOutput.order(arg.order))
   }
 
   private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
