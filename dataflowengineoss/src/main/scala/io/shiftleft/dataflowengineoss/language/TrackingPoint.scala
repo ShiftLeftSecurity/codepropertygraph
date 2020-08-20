@@ -37,22 +37,22 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
       sourceTravs: Seq[Steps[NodeType]]): List[ReachableByResult] = {
     val sourceSymbols = sourceTravs
       .flatMap(_.raw.clone.toList)
-      .map(_.asInstanceOf[nodes.TrackingPoint])
+      .collect { case n: nodes.TrackingPoint => n }
       .toSet
 
     def traverseDdgBack(path: List[nodes.TrackingPoint]): List[ReachableByResult] = {
       val node = path.head
 
       val resultsForNode = Some(node)
-        .filter(n => sourceSymbols.contains(n)).map{ n =>
-        new ReachableByResult(n, path)
-      }.toList
+        .filter(n => sourceSymbols.contains(n))
+        .map { n =>
+          new ReachableByResult(n, path)
+        }
+        .toList
 
-      val resultsForParents = incomingDdgNodes(node)
+      val resultsForParents = ddgIn(node)
         .filter(parent => !path.contains(parent))
-        .flatMap (parent =>
-          traverseDdgBack(parent :: node :: path.tail)
-        )
+        .flatMap(parent => traverseDdgBack(parent :: node :: path.tail))
         .toList
       resultsForParents ++ resultsForNode
     }
@@ -61,12 +61,42 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     sinkSymbols.flatMap(s => traverseDdgBack(List(s)))
   }
 
-  private def incomingDdgNodes(node: nodes.TrackingPoint): Iterator[nodes.TrackingPoint] = {
-    node
-      ._reachingDefIn()
-      .asScala
-      .filter(_.isInstanceOf[nodes.TrackingPoint])
-      .map(_.asInstanceOf[nodes.TrackingPoint])
+  private def ddgIn(node: nodes.TrackingPoint): Iterator[nodes.TrackingPoint] = {
+
+    // If we reach the argument of a call
+
+    val viaPropagate: List[nodes.TrackingPoint] = node match {
+      case n: nodes.Expression =>
+        val parentCall = n._argumentIn.asScala.collectFirst { case c: nodes.Call => c }
+        val outParams = parentCall.toList.flatMap(x => methodsForCall(x).start.parameter.asOutput.order(n.order))
+        val inParams = outParams.flatMap(_._propagateIn().asScala).collect { case p: nodes.MethodParameterIn => p }
+
+        val orders = inParams.start.order.l
+        val inArgs = parentCall
+          .map { call =>
+            orders.map(o => call.argument(o))
+          }
+          .toList
+          .flatten
+          .collect { case t: nodes.TrackingPoint => t }
+
+        val inCalls = n match {
+          case call: nodes.Call =>
+            val inParams = methodsForCall(call).start.methodReturn.l.flatMap(_._propagateIn().asScala.toList).collect {
+              case p: nodes.MethodParameterIn => p
+            }
+            inParams.start.order.map(o => call.argument(o)).l
+          case _ => List()
+        }
+        inArgs ++ inCalls
+      case _ => List[nodes.TrackingPoint]()
+    }
+    val viaReachingDef = node._reachingDefIn().asScala.collect { case n: nodes.TrackingPoint => n }.toList
+    (viaPropagate ++ viaReachingDef).iterator
+  }
+
+  private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
+    NoResolve.getCalledMethods(call).toList
   }
 
 }

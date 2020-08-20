@@ -71,26 +71,6 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
                 }
               }
             }
-          } else {
-            // Copy propagate edges from formal method to call site
-            NoResolve
-              .getCalledMethods(call)
-              .flatMap { method =>
-                method.parameter.map { param =>
-                  (param.order, param._propagateOut().asScala.toList.map(_.asInstanceOf[nodes.HasOrder].order))
-                }.l
-              }
-              .foreach {
-                case (srcOrder, dstOrders) =>
-                  val srcNode = call.argument(srcOrder)
-                  val dstNodes = dstOrders.map {
-                    case dstOrder if dstOrder == -1 => call
-                    case dstOrder                   => call.argument(dstOrder)
-                  }
-                  dstNodes.foreach { dstNode =>
-                    addEdge(srcNode, dstNode, srcNode.code)
-                  }
-              }
           }
 
         case ret: nodes.Return =>
