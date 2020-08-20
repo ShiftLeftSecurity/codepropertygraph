@@ -8,7 +8,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import scala.jdk.CollectionConverters._
 
-class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]], gen: Map[nodes.StoredNode, Set[Definition]]) {
+class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -19,7 +19,7 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]], gen: Map[nodes.S
   def initUsedIncomingDefs(): Map[StoredNode, Map[StoredNode, Set[Definition]]] = {
     allNodes.map { node =>
       node ->
-        uses(node, gen).map { use =>
+        uses(node).map { use =>
           use -> in(node).filter { inElement =>
             declaration(use) == declaration(inElement.node)
           }
@@ -27,7 +27,7 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]], gen: Map[nodes.S
     }.toMap
   }
 
-  def uses(node: nodes.StoredNode, gen: Map[nodes.StoredNode, Set[Definition]]): Set[nodes.StoredNode] = {
+  def uses(node: nodes.StoredNode): Set[nodes.StoredNode] = {
     val n = node match {
       case ret: nodes.Return =>
         ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet()
@@ -37,8 +37,7 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]], gen: Map[nodes.S
         } else {
           val parameters = methodForCall(call).map(_.parameter.l).getOrElse(List())
           call.start.argument
-            .where(arg =>
-              paramHasOutgoingPropagateEdge(arg, parameters) || !gen(node).contains(Definition.fromNode(arg)))
+            .where(arg => paramHasOutgoingPropagateEdge(arg, parameters))
             .toSet
             .map(_.asInstanceOf[nodes.StoredNode])
         }

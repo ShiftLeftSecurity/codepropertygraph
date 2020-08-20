@@ -44,7 +44,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val in = solution.in
     val gen = solution.problem.transferFunction.asInstanceOf[ReachingDefTransferFunction].gen
     val allNodes = in.keys.toList
-    val usageAnalyzer = new UsageAnalyzer(in, gen)
+    val usageAnalyzer = new UsageAnalyzer(in)
 
     allNodes.foreach { node: nodes.StoredNode =>
       node match {
@@ -64,7 +64,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           }
 
           if (!hasAnnotation(call)) {
-            usageAnalyzer.uses(call, gen).foreach { use =>
+            usageAnalyzer.uses(call).foreach { use =>
               gen(call).foreach { g =>
                 if (g.node == use || g.node == call) {
                   addEdge(use, g.node)
