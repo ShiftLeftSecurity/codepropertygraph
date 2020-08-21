@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.callgraphextension
 
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal.Traversal
+import overflowdb.traversal.{PathAwareTraversal, Traversal}
 import overflowdb.traversal.help.Doc
 
 class Method(val traversal: Traversal[nodes.Method]) extends AnyVal {
@@ -17,7 +17,7 @@ class Method(val traversal: Traversal[nodes.Method]) extends AnyVal {
     val sinkMethods = traversal.dedup
 
     if (sourceMethods.isEmpty || sinkMethods.isEmpty) {
-      Traversal.empty
+      PathAwareTraversal.empty
     } else {
       sinkMethods
         .repeat(
