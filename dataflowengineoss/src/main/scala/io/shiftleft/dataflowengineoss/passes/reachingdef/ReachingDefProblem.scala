@@ -75,8 +75,6 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
 
 class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction[Set[Definition]] {
 
-  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
-
   val gen: Map[nodes.StoredNode, Set[Definition]] = initGen(method).withDefaultValue(Set.empty[Definition])
   val kill: Map[nodes.StoredNode, Set[Definition]] =
     initKill(method, gen).withDefaultValue(Set.empty[Definition])
@@ -97,41 +95,7 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
   def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[Definition]] = {
 
     def defsMadeByCall(call: nodes.Call): Set[Definition] = {
-
-      //  (1) We add an argument to the DEF(call) set if the corresponding
-      //      output parameter has an incoming propagate edge
-      //  (2) We add `call` (the return value) to the set if the corresponding
-      // METHOD_RETURN has an incoming propagate edge
-
-//      val definedParams = methodsForCall(call).start.parameter.asOutput
-//        .where(outParam => outParam._propagateIn().hasNext)
-//        .order
-//        .l
-//
-//      val explicitlyDefined = call.start.argument.l.filter(arg => definedParams.contains(arg.argumentIndex)).toSet ++ {
-//        if (methodForCall(call)
-//              .map(method => method.methodReturn)
-//              .exists(methodReturn => methodReturn._propagateIn().hasNext)) {
-//          Set(call)
-//        } else {
-//          Set()
-//        }
-//      }
-
-      val explicitlyDefined = Set()
-
-      // If we find no annotation, then we need to assume a default. The default
-      // is that a call generates definitions for all of its arguments.
-
-      val implicilyDefined = {
-        // if (!hasAnnotation(call)) {
-        Set(call) ++ call.start.argument.where(!_.isInstanceOf[nodes.Literal]).toSet
-//        } else {
-//          Set()
-//        }
-      }
-
-      (explicitlyDefined ++ implicilyDefined)
+      (Set(call) ++ call.start.argument.where(!_.isInstanceOf[nodes.Literal]).toSet)
         .filterNot(_.isInstanceOf[nodes.FieldIdentifier])
         .map(x => Definition.fromNode(x.asInstanceOf[nodes.StoredNode]))
     }
@@ -178,20 +142,6 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
         List()
       }
     }
-  }
-
-  private def methodForCall(call: nodes.Call): Option[nodes.Method] = {
-    methodsForCall(call) match {
-      case List(x) => Some(x)
-      case List()  => None
-      case list =>
-        logger.warn(s"Multiple methods with name: ${call.name}, using first one")
-        Some(list.head)
-    }
-  }
-
-  private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
-    NoResolve.getCalledMethods(call).toList
   }
 
   private def declaration(node: nodes.StoredNode): Option[nodes.StoredNode] = {
