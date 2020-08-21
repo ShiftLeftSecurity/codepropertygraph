@@ -98,27 +98,37 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
 
     def defsMadeByCall(call: nodes.Call): Set[Definition] = {
 
-      val definedParams = methodsForCall(call).start.parameter.asOutput
-        .where(outParam => outParam._propagateIn().hasNext)
-        .order
-        .l
+      //  (1) We add an argument to the DEF(call) set if the corresponding
+      //      output parameter has an incoming propagate edge
+      //  (2) We add `call` (the return value) to the set if the corresponding
+      // METHOD_RETURN has an incoming propagate edge
 
-      val explicitlyDefined = call.start.argument.l.filter(arg => definedParams.contains(arg.argumentIndex)).toSet ++ {
-        if (methodForCall(call)
-              .map(method => method.methodReturn)
-              .exists(methodReturn => methodReturn._propagateIn().hasNext)) {
-          Set(call)
-        } else {
-          Set()
-        }
-      }
+//      val definedParams = methodsForCall(call).start.parameter.asOutput
+//        .where(outParam => outParam._propagateIn().hasNext)
+//        .order
+//        .l
+//
+//      val explicitlyDefined = call.start.argument.l.filter(arg => definedParams.contains(arg.argumentIndex)).toSet ++ {
+//        if (methodForCall(call)
+//              .map(method => method.methodReturn)
+//              .exists(methodReturn => methodReturn._propagateIn().hasNext)) {
+//          Set(call)
+//        } else {
+//          Set()
+//        }
+//      }
+
+      val explicitlyDefined = Set()
+
+      // If we find no annotation, then we need to assume a default. The default
+      // is that a call generates definitions for all of its arguments.
 
       val implicilyDefined = {
-        if (!hasAnnotation(call)) {
-          Set(call) ++ call.start.argument.where(x => !x.isInstanceOf[nodes.Literal]).toSet
-        } else {
-          Set()
-        }
+        // if (!hasAnnotation(call)) {
+        Set(call) ++ call.start.argument.where(!_.isInstanceOf[nodes.Literal]).toSet
+//        } else {
+//          Set()
+//        }
       }
 
       (explicitlyDefined ++ implicilyDefined)
@@ -194,10 +204,6 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
         call.method.start.call.codeExact(call.code).headOption
       case _ => None
     }
-  }
-
-  private def hasAnnotation(call: nodes.Call): Boolean = {
-    methodForCall(call).exists(method => method.parameter.l.exists(x => x._propagateOut().hasNext))
   }
 
 }

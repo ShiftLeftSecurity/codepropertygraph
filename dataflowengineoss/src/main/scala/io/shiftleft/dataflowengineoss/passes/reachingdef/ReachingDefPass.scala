@@ -30,7 +30,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
     def addEdge(fromNode: nodes.StoredNode, toNode: nodes.StoredNode, variable: String = ""): Unit = {
       val properties = List((EdgeKeyNames.VARIABLE, variable))
-      if (toNode.isInstanceOf[nodes.Literal] || fromNode.isInstanceOf[nodes.Unknown] || toNode
+      if (fromNode.isInstanceOf[nodes.Unknown] || toNode
             .isInstanceOf[nodes.Unknown])
         return
       dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF, properties)
@@ -58,13 +58,12 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
               }
           }
 
-          // For all calls, assume that each argument-in
-          // influences the corresponding argument-out
-          // and each argument influences the
-          // return value of the call.
+          // For all calls, assume that input arguments
+          // taint corresponding output arguments
+          // and the return value
           usageAnalyzer.uses(call).foreach { use =>
             gen(call).foreach { g =>
-              if (g.node == use || g.node == call) {
+              if (use != g.node) {
                 addEdge(use, g.node)
               }
             }
@@ -95,10 +94,10 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     allNodes
       .filterNot(
         x =>
-          x.isInstanceOf[nodes.MethodReturn] || x.isInstanceOf[nodes.Method] || x.isInstanceOf[nodes.Literal] || x
+          x.isInstanceOf[nodes.Method] || x
             .isInstanceOf[nodes.ControlStructure] || x.isInstanceOf[nodes.FieldIdentifier])
       .foreach { node =>
-        if (in(node).size == in(node).count(_.node.isInstanceOf[nodes.MethodParameterIn])) {
+        if (usageAnalyzer.usedIncomingDefs(node).isEmpty) {
           addEdge(method, node)
         }
       }

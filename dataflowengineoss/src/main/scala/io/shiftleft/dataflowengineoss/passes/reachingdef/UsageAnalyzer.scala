@@ -32,15 +32,15 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
       case ret: nodes.Return =>
         ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet()
       case call: nodes.Call =>
-        if (!hasAnnotation(call)) {
-          call.start.argument.toSet.map(_.asInstanceOf[nodes.StoredNode])
-        } else {
-          val parameters = methodForCall(call).map(_.parameter.l).getOrElse(List())
-          call.start.argument
-            .where(arg => paramHasOutgoingPropagateEdge(arg, parameters))
-            .toSet
-            .map(_.asInstanceOf[nodes.StoredNode])
-        }
+//        if (!hasAnnotation(call)) {
+        call.start.argument.toSet.map(_.asInstanceOf[nodes.StoredNode])
+//        } else {
+//          val parameters = methodForCall(call).map(_.parameter.l).getOrElse(List())
+//          call.start.argument
+//            .where(arg => paramHasOutgoingPropagateEdge(arg, parameters))
+//            .toSet
+//            .map(_.asInstanceOf[nodes.StoredNode])
+//        }
       case _ => Set()
     }
     n.filterNot(_.isInstanceOf[nodes.FieldIdentifier]).map(_.asInstanceOf[nodes.StoredNode])

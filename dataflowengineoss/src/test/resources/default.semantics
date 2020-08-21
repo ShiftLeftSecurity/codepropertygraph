@@ -27,3 +27,4 @@
 "<operator>.indirectIndexAccess" 1->-1
 "<operator>.pointerShift" 1->-1
 "<operator>.getElementPtr" 1->-1
+"<operator>.addition" 1->-1 2->-1

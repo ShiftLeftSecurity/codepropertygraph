@@ -19,8 +19,7 @@ object DotDdgGenerator {
   }
 
   def cfgNodeShouldBeDisplayed(v: Node): Boolean = !(
-    v.isInstanceOf[nodes.Literal] ||
-      v.isInstanceOf[nodes.Block] ||
+    v.isInstanceOf[nodes.Block] ||
       v.isInstanceOf[nodes.ControlStructure] ||
       v.isInstanceOf[nodes.JumpTarget]
   )

@@ -7,8 +7,17 @@ import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.dotextension.ImageViewer
+
+import scala.sys.process.Process
+import scala.util.Try
 
 class DataFlowCodeToCpgSuite extends CodeToCpgSuite {
+
+  implicit val viewer: ImageViewer = (pathStr: String) =>
+    Try {
+      Process(Seq("xdg-open", pathStr)).!!
+  }
 
   override def passes(cpg: Cpg): Unit = {
     val context = new LayerCreatorContext(cpg)

@@ -1,5 +1,6 @@
 package io.shiftleft.dataflowengineoss.language
 
+import io.shiftleft.codepropertygraph.generated.nodes.CfgNode
 import io.shiftleft.semanticcpg.language._
 
 class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
@@ -27,6 +28,16 @@ class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
     def sink = cpg.call.name("read")
 
     def flows = sink.reachableByFlows(source)
+
+    flows.foreach { x =>
+      println("flow ======")
+      x.elements.foreach {
+        case n: CfgNode => println(n.code)
+        case _          => println("other")
+      }
+    }
+
+    cpg.method("flows1").plotDotDdg
 
     flows.size shouldBe 6
 
@@ -358,7 +369,7 @@ class CDataFlowTests9 extends DataFlowCodeToCpgSuite {
 
   "Test 9: flow from function foo to a" in {
     val source = cpg.identifier.name("a")
-    val sink = cpg.call.name("foo")
+    val sink = cpg.call.name("foo").argument(1)
     val flows = sink.reachableByFlows(source).l
 
     flows.size shouldBe 2
@@ -534,7 +545,7 @@ class CDataFlowTests14 extends DataFlowCodeToCpgSuite {
     val sink = cpg.identifier.name("y")
     val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 4
+    flows.size shouldBe 2
 
     flows.map(flowToResultPairs).toSet shouldBe
       Set(
@@ -566,6 +577,9 @@ class CDataFlowTests15 extends DataFlowCodeToCpgSuite {
     val source = cpg.method.parameter.name("y")
     val sink = cpg.identifier.name("z")
     val flows = sink.reachableByFlows(source).l
+
+    flows.map(flowToResultPairs).foreach(println)
+
     flows.map(flowToResultPairs).toSet shouldBe Set(
       List[(String, Option[Integer])](
         ("foo(bool x, void* y)", 2),
