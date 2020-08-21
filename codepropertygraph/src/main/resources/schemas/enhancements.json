@@ -69,8 +69,7 @@
 	      {"name" : "JUMP_TARGET"},
               {"name": "UNKNOWN"}
             ]},
-             {"edgeName": "SOURCE_FILE", "inNodes": [{"name": "FILE"}]},
-	     {"edgeName": "PROPAGATE", "inNodes" : [{"name" : "METHOD"}]}
+             {"edgeName": "SOURCE_FILE", "inNodes": [{"name": "FILE"}]}
           ]
         },
         { "name" : "BINDING",

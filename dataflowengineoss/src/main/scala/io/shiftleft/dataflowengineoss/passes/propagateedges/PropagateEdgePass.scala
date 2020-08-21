@@ -23,7 +23,6 @@ class PropagateEdgePass(cpg: Cpg, semantics: Semantics) extends CpgPass(cpg) {
 
     semantics.elements.foreach { semantic =>
       cpg.method.fullNameExact(semantic.methodFullName).foreach { method =>
-        addPropagateEdge(method, method)
         semantic.mappings.foreach { mapping =>
           addEdgeBetweenFormalParameters(method, mapping._1, mapping._2)
         }
