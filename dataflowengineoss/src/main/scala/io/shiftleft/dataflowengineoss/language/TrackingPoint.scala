@@ -56,7 +56,6 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
       val ddgParents = ddgIn(node).filter(parent => !path.map(_.node).contains(parent))
 
-      ///
       val dstParentCall = argToCall(node)
       val resultsForParents = ddgParents.flatMap { srcNode =>
         dstParentCall match {
@@ -64,7 +63,6 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
             srcNode match {
               case _: nodes.Expression =>
                 if (argToCall(srcNode) == dstParentCall) {
-                  println("Same call: " + dstParentCall.map(_.code))
                   val used = isUsed(srcNode)
                   val defined = isDefined(node)
 
@@ -73,7 +71,6 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
                     .filter(_ => defined)
                     .flatMap(x => traverseDdgBack(PathElement(x) :: pathHead :: path.tail))
                 } else {
-                  println("Different call: " + argToCall(srcNode).map(_.code))
                   val defined = isDefined(srcNode)
                   val used = isUsed(node)
                   if (!used) {
@@ -81,7 +78,6 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
                   } else if (defined) {
                     List(srcNode).flatMap(x => traverseDdgBack(PathElement(x) :: pathHead :: path.tail))
                   } else {
-                    println("Forwarding: " + srcNode.asInstanceOf[nodes.CfgNode].code)
                     traverseDdgBack(PathElement(srcNode, visible = false) :: pathHead :: path.tail)
                   }
                 }
@@ -145,48 +141,8 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     }
   }
 
-  /**
-    * At a given argument, determine arguments that influence
-    * it, taking into account propagate edges (created by
-    * annotation). This is achieved as follows:
-    * From the argument, traverse to the corresponding
-    * formal method out parameter and follow incoming propagate edges
-    * to formal input parameters. From there, traverse to the
-    * corresponding arguments. Note that in the CPG, we have dedicated
-    * nodes for formal input and output parameters, but for arguments,
-    * we only have one node for both states, that is, the tracker will
-    * need to keep a record of whether it is in the in- or out-state.
-    * */
-  private def argToInArgsViaPropagate(n: nodes.Expression): List[nodes.Expression] = {
-    val parentCall = argToCall(n)
-    val inParams = argToParamIn(n)
-    val orders = inParams.start.order.l
-    parentCall.toList
-      .flatMap { call =>
-        orders.map(o => call.argument(o))
-      }
-      .collect { case t: nodes.TrackingPoint => t }
-  }
-
-  /**
-    * From the call node (which represents the actual return as well),
-    * determine arguments that influence the return value, taking into
-    * account propagate edges.
-    * */
-  private def callToInArgsViaPropagate(call: nodes.Call): List[nodes.Expression] = {
-    val inParams = methodsForCall(call).start.methodReturn.l.flatMap(_._propagateIn().asScala.toList).collect {
-      case p: nodes.MethodParameterIn => p
-    }
-    inParams.start.order.map(o => call.argument(o)).l
-  }
-
   private def argToCall(n: nodes.TrackingPoint) =
     n._argumentIn.asScala.collectFirst { case c: nodes.Call => c }
-
-  private def argToParamIn(arg: nodes.Expression) = {
-    val outParams = argToParamOut(arg)
-    outParams.flatMap(_._propagateIn().asScala).collect { case p: nodes.MethodParameterIn => p }
-  }
 
   private def argToParamOut(arg: nodes.Expression) = {
     argToCall(arg).toList.flatMap(x => methodsForCall(x).start.parameter.asOutput.order(arg.order))
