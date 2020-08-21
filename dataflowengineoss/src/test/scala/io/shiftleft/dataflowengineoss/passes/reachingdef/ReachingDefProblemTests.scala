@@ -62,10 +62,6 @@ class ReachingDefProblemTests2 extends ReachingDefProblemSuite {
         .toSet
     }
 
-    "contain only correct argument for annotated method" in {
-      val call = method.start.call.name(Operators.assignment).head
-      transfer.gen(call) shouldBe Set(call.argument(1)).map(x => Definition.fromNode(x))
-    }
   }
 
   "ReachingDefTransferFunction's kill set" should {

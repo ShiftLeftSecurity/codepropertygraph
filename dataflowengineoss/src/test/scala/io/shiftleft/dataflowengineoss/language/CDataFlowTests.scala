@@ -29,17 +29,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
 
     def flows = sink.reachableByFlows(source)
 
-    flows.foreach { x =>
-      println("flow ======")
-      x.elements.foreach {
-        case n: CfgNode => println(n.code)
-        case _          => println("other")
-      }
-    }
-
-    cpg.method("flows1").plotDotDdg
-
-    flows.size shouldBe 6
+    flows.map(flowToResultPairs).toSet.size shouldBe 6
 
     flows.map(flowToResultPairs).toSet shouldBe
       Set(
@@ -577,8 +567,6 @@ class CDataFlowTests15 extends DataFlowCodeToCpgSuite {
     val source = cpg.method.parameter.name("y")
     val sink = cpg.identifier.name("z")
     val flows = sink.reachableByFlows(source).l
-
-    flows.map(flowToResultPairs).foreach(println)
 
     flows.map(flowToResultPairs).toSet shouldBe Set(
       List[(String, Option[Integer])](
