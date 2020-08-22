@@ -104,7 +104,9 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
           val methods = argToMethods(arg)
           atLeastOneMethodHasAnnotation(methods) || {
             methods.exists { method =>
-              method.parameter.order(arg.order).l.exists(p => p._propagateOut().hasNext)
+              semantics
+                .forMethod(method.fullName)
+                .exists(_.mappings.exists { case (srcIndex, _) => srcIndex == arg.order })
             }
           }
       }
@@ -118,21 +120,23 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
           val methods = argToMethods(arg)
           atLeastOneMethodHasAnnotation(methods) || {
             methods.exists { method =>
-              method.parameter.asOutput.order(arg.order).l.exists(p => p._propagateIn().hasNext)
+              semantics
+                .forMethod(method.fullName)
+                .exists(_.mappings.exists { case (_, dstIndex) => dstIndex == arg.order })
             }
           }
       }
       .getOrElse(true)
   }
 
-  private def atLeastOneMethodHasAnnotation(methods: List[nodes.Method]): Boolean = {
+  private def atLeastOneMethodHasAnnotation(methods: List[nodes.Method])(implicit semantics: Semantics): Boolean = {
     methods.nonEmpty && !methods.exists { m =>
       hasAnnotation(m)
     }
   }
 
-  private def hasAnnotation(method: nodes.Method): Boolean = {
-    method.parameter.l.exists(x => x._propagateOut().hasNext)
+  private def hasAnnotation(method: nodes.Method)(implicit semantics: Semantics): Boolean = {
+    semantics.forMethod(method.fullName).isDefined
   }
 
   private def argToMethods(arg: nodes.Expression) = {

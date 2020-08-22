@@ -22,9 +22,11 @@ object Semantics {
 
 }
 
-class Semantics private (val methodToSemantic: mutable.Map[String, FlowSemantic]) {
+class Semantics private (methodToSemantic: mutable.Map[String, FlowSemantic]) {
 
   def elements: List[FlowSemantic] = methodToSemantic.values.toList
+
+  def forMethod(fullName: String): Option[FlowSemantic] = methodToSemantic.get(fullName)
 
 }
 case class FlowSemantic(methodFullName: String, mappings: List[(Int, Int)])

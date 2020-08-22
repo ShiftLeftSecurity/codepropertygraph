@@ -23,7 +23,7 @@ class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
   override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
     val cpg = context.cpg
     val semantics = Semantics.fromList(new Parser().parseFile(opts.semanticsFilename))
-    val enhancementExecList = Iterator(new PropagateEdgePass(cpg, semantics), new ReachingDefPass(cpg))
+    val enhancementExecList = Iterator(new ReachingDefPass(cpg))
     enhancementExecList.zipWithIndex.foreach {
       case (pass, index) =>
         val serializedCpg = initSerializedCpg(context.outputDir, pass.name, index)
