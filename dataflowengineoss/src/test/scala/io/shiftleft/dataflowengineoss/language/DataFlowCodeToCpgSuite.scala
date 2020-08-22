@@ -3,6 +3,7 @@ package io.shiftleft.dataflowengineoss.language
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.layers.dataflows.{OssDataFlow, OssDataFlowOptions}
+import io.shiftleft.dataflowengineoss.semanticsloader.{Parser, Semantics}
 import io.shiftleft.semanticcpg.language.NodeSteps
 import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
 import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
@@ -14,6 +15,9 @@ import scala.util.Try
 
 class DataFlowCodeToCpgSuite extends CodeToCpgSuite {
 
+  val semanticsFilename = "dataflowengineoss/src/test/resources/default.semantics"
+  implicit val semantics: Semantics = Semantics.fromList(new Parser().parseFile(semanticsFilename))
+
   implicit val viewer: ImageViewer = (pathStr: String) =>
     Try {
       Process(Seq("xdg-open", pathStr)).!!
@@ -22,7 +26,7 @@ class DataFlowCodeToCpgSuite extends CodeToCpgSuite {
   override def passes(cpg: Cpg): Unit = {
     val context = new LayerCreatorContext(cpg)
     new Scpg().run(context)
-    val options = new OssDataFlowOptions("dataflowengineoss/src/test/resources/default.semantics")
+    val options = new OssDataFlowOptions(semanticsFilename)
     new OssDataFlow(options).run(context)
   }
 

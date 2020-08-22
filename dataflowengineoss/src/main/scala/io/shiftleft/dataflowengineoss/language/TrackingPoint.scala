@@ -2,7 +2,9 @@ package io.shiftleft.dataflowengineoss.language
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.language._
+
 import scala.jdk.CollectionConverters._
 
 case class PathElement(node: nodes.TrackingPoint, visible: Boolean = true)
@@ -23,20 +25,22 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     * */
   def cfgNode: NodeSteps[nodes.CfgNode] = wrapped.map(_.cfgNode)
 
-  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*): NodeSteps[NodeType] = {
+  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*)(
+      implicit semantics: Semantics): NodeSteps[NodeType] = {
     val reachedSources = reachableByInternal(sourceTravs).map(_.reachedSource)
     new NodeSteps[NodeType](__(reachedSources: _*).asInstanceOf[GremlinScala[NodeType]])
   }
 
-  def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: NodeSteps[A]*): Steps[Path] = {
+  def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: NodeSteps[A]*)(
+      implicit semantics: Semantics): Steps[Path] = {
     val paths = reachableByInternal(sourceTravs).map { result =>
       Path(result.path.filter(_.visible == true).map(_.node))
     }
     new Steps(__(paths: _*))
   }
 
-  private def reachableByInternal[NodeType <: nodes.TrackingPoint](
-      sourceTravs: Seq[Steps[NodeType]]): List[ReachableByResult] = {
+  private def reachableByInternal[NodeType <: nodes.TrackingPoint](sourceTravs: Seq[Steps[NodeType]])(
+      implicit semantics: Semantics): List[ReachableByResult] = {
 
     val sourceSymbols = sourceTravs
       .flatMap(_.raw.clone.toList)
@@ -93,7 +97,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     dstNode._reachingDefIn().asScala.collect { case n: nodes.TrackingPoint => n }
   }
 
-  private def isUsed(srcNode: nodes.StoredNode) = {
+  private def isUsed(srcNode: nodes.StoredNode)(implicit semantics: Semantics) = {
     Some(srcNode)
       .collect {
         case arg: nodes.Expression =>
@@ -107,7 +111,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
       .getOrElse(true)
   }
 
-  private def isDefined(srcNode: nodes.StoredNode) = {
+  private def isDefined(srcNode: nodes.StoredNode)(implicit semantics: Semantics) = {
     Some(srcNode)
       .collect {
         case arg: nodes.Expression =>

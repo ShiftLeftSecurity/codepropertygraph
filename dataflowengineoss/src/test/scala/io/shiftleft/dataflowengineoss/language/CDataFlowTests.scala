@@ -1,6 +1,5 @@
 package io.shiftleft.dataflowengineoss.language
 
-import io.shiftleft.codepropertygraph.generated.nodes.CfgNode
 import io.shiftleft.semanticcpg.language._
 
 class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
