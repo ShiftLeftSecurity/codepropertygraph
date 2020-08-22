@@ -26,7 +26,7 @@ class DataFlowCodeToCpgSuite extends CodeToCpgSuite {
   override def passes(cpg: Cpg): Unit = {
     val context = new LayerCreatorContext(cpg)
     new Scpg().run(context)
-    val options = new OssDataFlowOptions(semanticsFilename)
+    val options = new OssDataFlowOptions()
     new OssDataFlow(options).run(context)
   }
 

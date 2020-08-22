@@ -1,9 +1,9 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.dataflowengineoss.passes.propagateedges.PropagateEdgeTestSuite
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.codepropertygraph.generated.{Operators, nodes}
+import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
 
 class ReachingDefProblemTests1 extends ReachingDefProblemSuite {
   override val code =
@@ -74,8 +74,9 @@ class ReachingDefProblemTests2 extends ReachingDefProblemSuite {
 
 }
 
-class ReachingDefProblemSuite extends PropagateEdgeTestSuite {
-  override val semantics: Semantics = Semantics.empty
+class ReachingDefProblemSuite extends CodeToCpgSuite {
+
+  val semantics: Semantics = Semantics.empty
 
   var method: nodes.Method = _
   var flowGraph: ReachingDefFlowGraph = _

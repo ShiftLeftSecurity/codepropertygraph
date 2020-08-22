@@ -1,19 +1,17 @@
 package io.shiftleft.dataflowengineoss.layers.dataflows
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.dataflowengineoss.passes.propagateedges.PropagateEdgePass
 import io.shiftleft.dataflowengineoss.passes.reachingdef.ReachingDefPass
-import io.shiftleft.dataflowengineoss.semanticsloader.{Parser, Semantics}
-import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, LayerCreatorOptions, Scpg}
+import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, LayerCreatorOptions}
 
 object OssDataFlow {
   val overlayName: String = "dataflowOss"
   val description: String = "Layer to support the OSS lightweight data flow tracker"
 
-  def defaultOpts = new OssDataFlowOptions(null)
+  def defaultOpts = new OssDataFlowOptions()
 }
 
-class OssDataFlowOptions(var semanticsFilename: String) extends LayerCreatorOptions {}
+class OssDataFlowOptions() extends LayerCreatorOptions {}
 
 class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
 
@@ -22,7 +20,6 @@ class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
 
   override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
     val cpg = context.cpg
-    val semantics = Semantics.fromList(new Parser().parseFile(opts.semanticsFilename))
     val enhancementExecList = Iterator(new ReachingDefPass(cpg))
     enhancementExecList.zipWithIndex.foreach {
       case (pass, index) =>
