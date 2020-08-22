@@ -11,7 +11,7 @@ object OssDataFlow {
   def defaultOpts = new OssDataFlowOptions()
 }
 
-class OssDataFlowOptions(var semanticsFilename: String = "") extends LayerCreatorOptions {}
+class OssDataFlowOptions() extends LayerCreatorOptions {}
 
 class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
 
