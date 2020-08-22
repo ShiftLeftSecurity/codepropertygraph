@@ -59,7 +59,7 @@ class ReachingDefProblemTests2 extends ReachingDefProblemSuite {
       transfer.gen(call) shouldBe Set(Definition.fromNode(call)) ++ method.start.call
         .name("escape")
         .argument
-        .map(x => Definition.fromNode(x))
+        .map(Definition.fromNode)
         .toSet
     }
 

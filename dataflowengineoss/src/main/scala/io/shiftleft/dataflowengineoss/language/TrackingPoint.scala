@@ -67,14 +67,15 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
             srcNode match {
               case _: nodes.Expression =>
                 if (argToCall(srcNode) == curNodeParentCall) {
-                  List(srcNode)
-                    .filter(_ => isUsed(srcNode) && isDefined(curNode))
-                    .map(x => PathElement(x))
+                  if (isUsed(srcNode) && isDefined(curNode))
+                    List(PathElement(srcNode))
+                  else
+                    Nil
                 } else {
                   if (!isUsed(curNode)) {
                     List()
                   } else if (isDefined(srcNode)) {
-                    List(srcNode).map(x => PathElement(x))
+                    List(PathElement(srcNode))
                   } else { // curUsed && !srcDefined => pass through
                     List(PathElement(srcNode, visible = false))
                   }
