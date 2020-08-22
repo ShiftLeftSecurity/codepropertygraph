@@ -10,7 +10,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 
 class PropagateEdgePassTests extends PropagateEdgeTestSuite {
 
-  val semantics: Semantics = Semantics(
+  val semantics: Semantics = Semantics.fromList(
     List(
       FlowSemantic("copy", List((2, 1))),
       FlowSemantic("escape", List((1, -1)))

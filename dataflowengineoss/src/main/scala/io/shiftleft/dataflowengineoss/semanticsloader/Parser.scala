@@ -7,7 +7,26 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
-case class Semantics(elements: List[FlowSemantic])
+object Semantics {
+
+  def fromList(elements: List[FlowSemantic]): Semantics = {
+    new Semantics(
+      mutable.Map.newBuilder
+        .addAll(elements.map { e =>
+          e.methodFullName -> e
+        })
+        .result())
+  }
+
+  def empty: Semantics = fromList(List())
+
+}
+
+class Semantics private (val methodToSemantic: mutable.Map[String, FlowSemantic]) {
+
+  def elements: List[FlowSemantic] = methodToSemantic.values.toList
+
+}
 case class FlowSemantic(methodFullName: String, mappings: List[(Int, Int)])
 
 class Parser() {
