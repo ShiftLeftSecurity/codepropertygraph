@@ -44,8 +44,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
     // Recursive part of this function
     def traverseDdgBack(path: List[PathElement]): List[ReachableByResult] = {
-      val pathHead = path.head
-      val node = pathHead.node
+      val node = path.head.node
 
       val resultsForNode = Some(node)
         .filter(n => sourceSymbols.contains(n.asInstanceOf[NodeType]))
@@ -55,41 +54,38 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
         .toList
 
       val ddgParents = ddgIn(node).filter(parent => !path.map(_.node).contains(parent))
-
       val dstParentCall = argToCall(node)
+
       val resultsForParents = ddgParents.flatMap { srcNode =>
-        dstParentCall match {
-          case Some(_) =>
-            srcNode match {
-              case _: nodes.Expression =>
-                if (argToCall(srcNode) == dstParentCall) {
-                  val used = isUsed(srcNode)
-                  val defined = isDefined(node)
-
-                  List(srcNode)
-                    .filter(_ => used)
-                    .filter(_ => defined)
-                    .flatMap(x => traverseDdgBack(PathElement(x) :: pathHead :: path.tail))
-                } else {
-                  val defined = isDefined(srcNode)
-                  val used = isUsed(node)
-                  if (!used) {
-                    List()
-                  } else if (defined) {
-                    List(srcNode).flatMap(x => traverseDdgBack(PathElement(x) :: pathHead :: path.tail))
+        val newPathElems =
+          dstParentCall match {
+            case Some(_) =>
+              srcNode match {
+                case _: nodes.Expression =>
+                  if (argToCall(srcNode) == dstParentCall) {
+                    val used = isUsed(srcNode)
+                    val defined = isDefined(node)
+                    List(srcNode)
+                      .filter(_ => used && defined)
+                      .map(x => PathElement(x))
                   } else {
-                    traverseDdgBack(PathElement(srcNode, visible = false) :: pathHead :: path.tail)
+                    val defined = isDefined(srcNode)
+                    if (!isUsed(node)) {
+                      List()
+                    } else if (defined) {
+                      List(srcNode).map(x => PathElement(x))
+                    } else {
+                      List(PathElement(srcNode, visible = false))
+                    }
                   }
-                }
-              case x =>
-                traverseDdgBack(PathElement(x) :: pathHead :: path.tail)
-            }
-          case None =>
-            traverseDdgBack(PathElement(srcNode) :: pathHead :: path.tail)
-        }
-
+                case _ =>
+                  List(PathElement(srcNode))
+              }
+            case None =>
+              List(PathElement(srcNode))
+          }
+        newPathElems.flatMap(e => traverseDdgBack(e :: path))
       }
-
       (resultsForParents ++ resultsForNode).toList
     }
 

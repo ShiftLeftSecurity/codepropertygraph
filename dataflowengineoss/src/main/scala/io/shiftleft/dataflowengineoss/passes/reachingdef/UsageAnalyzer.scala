@@ -27,7 +27,7 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
       case ret: nodes.Return =>
         ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet()
       case call: nodes.Call =>
-        call.start.argument.toSet.map(_.asInstanceOf[nodes.StoredNode])
+        call.start.argument.map(_.asInstanceOf[nodes.StoredNode]).toSet()
       case _ => Set()
     }
     n.filterNot(_.isInstanceOf[nodes.FieldIdentifier]).map(_.asInstanceOf[nodes.StoredNode])

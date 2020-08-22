@@ -95,8 +95,9 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
   def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[Definition]] = {
 
     def defsMadeByCall(call: nodes.Call): Set[Definition] = {
-      (Set(call) ++ call.start.argument.where(!_.isInstanceOf[nodes.Literal]).toSet)
-        .filterNot(_.isInstanceOf[nodes.FieldIdentifier])
+      (Set(call) ++ call.start.argument.toSet
+        .filterNot(_.isInstanceOf[nodes.Literal])
+        .filterNot(_.isInstanceOf[nodes.FieldIdentifier]))
         .map(x => Definition.fromNode(x.asInstanceOf[nodes.StoredNode]))
     }
 
