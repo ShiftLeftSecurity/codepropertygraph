@@ -37,6 +37,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
   private def reachableByInternal[NodeType <: nodes.TrackingPoint](
       sourceTravs: Seq[Steps[NodeType]]): List[ReachableByResult] = {
+
     val sourceSymbols = sourceTravs
       .flatMap(_.raw.clone.toList)
       .collect { case n: nodes.TrackingPoint => n }
@@ -44,49 +45,44 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
     // Recursive part of this function
     def traverseDdgBack(path: List[PathElement]): List[ReachableByResult] = {
-      val node = path.head.node
+      val curNode = path.head.node
 
-      val resultsForNode = Some(node)
-        .filter(n => sourceSymbols.contains(n.asInstanceOf[NodeType]))
-        .map { n =>
+      val resultsForCurNode = Some(curNode).collect {
+        case n if sourceSymbols.contains(n.asInstanceOf[NodeType]) =>
           new ReachableByResult(n, path)
-        }
-        .toList
+      }.toList
 
-      val ddgParents = ddgIn(node).filter(parent => !path.map(_.node).contains(parent))
-      val dstParentCall = argToCall(node)
+      val resultsForParents = {
+        val ddgParents = ddgIn(curNode).filter(parent => !path.map(_.node).contains(parent))
 
-      val resultsForParents = ddgParents.flatMap { srcNode =>
-        val newPathElems =
-          dstParentCall match {
-            case Some(_) =>
-              srcNode match {
-                case _: nodes.Expression =>
-                  if (argToCall(srcNode) == dstParentCall) {
-                    val used = isUsed(srcNode)
-                    val defined = isDefined(node)
-                    List(srcNode)
-                      .filter(_ => used && defined)
-                      .map(x => PathElement(x))
-                  } else {
-                    val defined = isDefined(srcNode)
-                    if (!isUsed(node)) {
-                      List()
-                    } else if (defined) {
-                      List(srcNode).map(x => PathElement(x))
-                    } else {
-                      List(PathElement(srcNode, visible = false))
-                    }
+        ddgParents.flatMap { srcNode =>
+          val curNodeParentCall = argToCall(curNode)
+          val newPathElems = if (curNodeParentCall.isEmpty) {
+            List(PathElement(srcNode))
+          } else {
+            srcNode match {
+              case _: nodes.Expression =>
+                if (argToCall(srcNode) == curNodeParentCall) {
+                  List(srcNode)
+                    .filter(_ => isUsed(srcNode) && isDefined(curNode))
+                    .map(x => PathElement(x))
+                } else {
+                  if (!isUsed(curNode)) {
+                    List()
+                  } else if (isDefined(srcNode)) {
+                    List(srcNode).map(x => PathElement(x))
+                  } else { // curUsed && !srcDefined => pass through
+                    List(PathElement(srcNode, visible = false))
                   }
-                case _ =>
-                  List(PathElement(srcNode))
-              }
-            case None =>
-              List(PathElement(srcNode))
+                }
+              case _ =>
+                List(PathElement(srcNode))
+            }
           }
-        newPathElems.flatMap(e => traverseDdgBack(e :: path))
+          newPathElems.flatMap(e => traverseDdgBack(e :: path))
+        }
       }
-      (resultsForParents ++ resultsForNode).toList
+      (resultsForParents ++ resultsForCurNode).toList
     }
 
     val sinkSymbols = raw.clone.dedup.toList.sortBy { _.id.asInstanceOf[java.lang.Long] }
@@ -97,34 +93,38 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     dstNode._reachingDefIn().asScala.collect { case n: nodes.TrackingPoint => n }
   }
 
-  private def isUsed(srcNode: nodes.StoredNode) = srcNode match {
-    case arg: nodes.Expression =>
-      val methods = argToMethods(arg)
-      if (methods.nonEmpty && !methods.exists { m =>
-            hasAnnotation(m)
-          }) {
-        true
-      } else {
-        methods.exists { method =>
-          method.parameter.order(arg.order).l.exists(p => p._propagateOut().hasNext)
-        }
+  private def isUsed(srcNode: nodes.StoredNode) = {
+    Some(srcNode)
+      .collect {
+        case arg: nodes.Expression =>
+          val methods = argToMethods(arg)
+          atLeastOneMethodHasAnnotation(methods) || {
+            methods.exists { method =>
+              method.parameter.order(arg.order).l.exists(p => p._propagateOut().hasNext)
+            }
+          }
       }
-    case _ => true
+      .getOrElse(true)
   }
 
-  private def isDefined(srcNode: nodes.StoredNode) = srcNode match {
-    case arg: nodes.Expression =>
-      val methods = argToMethods(arg)
-      if (methods.nonEmpty && !methods.exists { m =>
-            hasAnnotation(m)
-          }) {
-        true
-      } else {
-        methods.exists { method =>
-          method.parameter.asOutput.order(arg.order).l.exists(p => p._propagateIn().hasNext)
-        }
+  private def isDefined(srcNode: nodes.StoredNode) = {
+    Some(srcNode)
+      .collect {
+        case arg: nodes.Expression =>
+          val methods = argToMethods(arg)
+          atLeastOneMethodHasAnnotation(methods) || {
+            methods.exists { method =>
+              method.parameter.asOutput.order(arg.order).l.exists(p => p._propagateIn().hasNext)
+            }
+          }
       }
-    case _ => true
+      .getOrElse(true)
+  }
+
+  private def atLeastOneMethodHasAnnotation(methods: List[nodes.Method]): Boolean = {
+    methods.nonEmpty && !methods.exists { m =>
+      hasAnnotation(m)
+    }
   }
 
   private def hasAnnotation(method: nodes.Method): Boolean = {
@@ -139,10 +139,6 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
   private def argToCall(n: nodes.TrackingPoint) =
     n._argumentIn.asScala.collectFirst { case c: nodes.Call => c }
-
-  private def argToParamOut(arg: nodes.Expression) = {
-    argToCall(arg).toList.flatMap(x => methodsForCall(x).start.parameter.asOutput.order(arg.order))
-  }
 
   private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
     NoResolve.getCalledMethods(call).toList
