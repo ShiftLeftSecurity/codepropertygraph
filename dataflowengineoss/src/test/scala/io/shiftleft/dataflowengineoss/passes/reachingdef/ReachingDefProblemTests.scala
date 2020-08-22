@@ -1,9 +1,9 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.dataflowengineoss.passes.propagateedges.PropagateEdgeTestSuite
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.codepropertygraph.generated.{Operators, nodes}
+import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
 
 class ReachingDefProblemTests1 extends ReachingDefProblemSuite {
   override val code =
@@ -24,10 +24,11 @@ class ReachingDefProblemTests1 extends ReachingDefProblemSuite {
 }
 
 class ReachingDefProblemTests2 extends ReachingDefProblemSuite {
-  override val semantics: Semantics = Semantics(
-    List(
-      FlowSemantic(Operators.assignment, List((2, 1)))
-    ))
+  override val semantics: Semantics = Semantics
+    .fromList(
+      List(
+        FlowSemantic(Operators.assignment, List((2, 1)))
+      ))
 
   override val code =
     """
@@ -51,30 +52,31 @@ class ReachingDefProblemTests2 extends ReachingDefProblemSuite {
 
   "ReachingDefTransferFunction's gen set" should {
     "contain definitions of parameters for each parameter" in {
-      method.parameter.l.map(transfer.gen(_)) shouldBe method.parameter.map(Set(_)).l
+      method.parameter.l.map(transfer.gen(_)) shouldBe method.parameter.map(x => Set(Definition.fromNode(x))).l
     }
     "contain definition of return value and all arguments for unannotated method" in {
       val call = method.start.call.name("escape").head
-      transfer.gen(call) shouldBe Set(call) ++ method.start.call.name("escape").argument.toSet
+      transfer.gen(call) shouldBe Set(Definition.fromNode(call)) ++ method.start.call
+        .name("escape")
+        .argument
+        .map(Definition.fromNode)
+        .toSet
     }
 
-    "contain only correct argument for annotated method" in {
-      val call = method.start.call.name(Operators.assignment).head
-      transfer.gen(call) shouldBe Set(call.argument(1))
-    }
   }
 
   "ReachingDefTransferFunction's kill set" should {
     "contain kill for parameter at assignment to x" in {
       val call = method.start.call.name(Operators.assignment).head
-      transfer.kill(call).contains(method.parameter.name("x").head)
+      transfer.kill(call).contains(Definition.fromNode(method.parameter.name("x").head))
     }
   }
 
 }
 
-class ReachingDefProblemSuite extends PropagateEdgeTestSuite {
-  override val semantics: Semantics = Semantics(List())
+class ReachingDefProblemSuite extends CodeToCpgSuite {
+
+  val semantics: Semantics = Semantics.empty
 
   var method: nodes.Method = _
   var flowGraph: ReachingDefFlowGraph = _

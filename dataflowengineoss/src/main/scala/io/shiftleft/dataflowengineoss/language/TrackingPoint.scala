@@ -2,10 +2,12 @@ package io.shiftleft.dataflowengineoss.language
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.Implicits.JavaIteratorDeco
-import io.shiftleft.semanticcpg.utils.MemberAccess
+
 import scala.jdk.CollectionConverters._
+
+case class PathElement(node: nodes.TrackingPoint, visible: Boolean = true)
 
 /**
   * Base class for nodes that can occur in data flows
@@ -23,70 +25,138 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     * */
   def cfgNode: NodeSteps[nodes.CfgNode] = wrapped.map(_.cfgNode)
 
-  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*): NodeSteps[NodeType] = {
-    val pathReachables = reachableByInternal(sourceTravs)
-    val reachedSources = pathReachables.map(_.reachedSource)
+  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*)(
+      implicit semantics: Semantics): NodeSteps[NodeType] = {
+    val reachedSources = reachableByInternal(sourceTravs).map(_.reachedSource)
     new NodeSteps[NodeType](__(reachedSources: _*).asInstanceOf[GremlinScala[NodeType]])
   }
 
-  def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: NodeSteps[A]*): Steps[Path] = {
-    val pathReachables = reachableByInternal(sourceTravs)
-    val paths = pathReachables.map { reachableByContainer =>
-      Path(reachableByContainer.path)
+  def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: NodeSteps[A]*)(
+      implicit semantics: Semantics): Steps[Path] = {
+    val paths = reachableByInternal(sourceTravs).map { result =>
+      Path(result.path.filter(_.visible == true).map(_.node))
     }
     new Steps(__(paths: _*))
   }
 
-  private def reachableByInternal[NodeType <: nodes.TrackingPoint](
-      sourceTravs: Seq[Steps[NodeType]]): List[ReachableByContainer] = {
+  private def reachableByInternal[NodeType <: nodes.TrackingPoint](sourceTravs: Seq[Steps[NodeType]])(
+      implicit semantics: Semantics): List[ReachableByResult] = {
+
     val sourceSymbols = sourceTravs
       .flatMap(_.raw.clone.toList)
-      .flatMap { elem =>
-        getTrackingPoint(elem.asInstanceOf[nodes.TrackingPoint])
-      }
+      .collect { case n: nodes.TrackingPoint => n }
       .toSet
 
-    val sinkSymbols = raw.clone.dedup.toList.sortBy { _.id.asInstanceOf[java.lang.Long] }
+    // Recursive part of this function
+    def traverseDdgBack(path: List[PathElement]): List[ReachableByResult] = {
+      val curNode = path.head.node
 
-    var pathReachables = List.empty[ReachableByContainer]
+      val resultsForCurNode = Some(curNode).collect {
+        case n if sourceSymbols.contains(n.asInstanceOf[NodeType]) =>
+          new ReachableByResult(n, path)
+      }.toList
 
-    def traverseDDGBack(path: List[nodes.TrackingPoint]): Unit = {
-      val node = path.head
-      if (sourceSymbols.contains(node)) {
-        val sack = new ReachableByContainer(node, path)
-        pathReachables = sack :: pathReachables
+      val resultsForParents = {
+        val ddgParents = ddgIn(curNode).filter(parent => !path.map(_.node).contains(parent))
+
+        ddgParents.flatMap { srcNode =>
+          val curNodeParentCall = argToCall(curNode)
+          val newPathElems = if (curNodeParentCall.isEmpty) {
+            List(PathElement(srcNode))
+          } else {
+            srcNode match {
+              case _: nodes.Expression =>
+                if (argToCall(srcNode) == curNodeParentCall) {
+                  if (isUsed(srcNode) && isDefined(curNode))
+                    List(PathElement(srcNode))
+                  else
+                    Nil
+                } else {
+                  if (!isUsed(curNode)) {
+                    List()
+                  } else if (isDefined(srcNode)) {
+                    List(PathElement(srcNode))
+                  } else { // curUsed && !srcDefined => pass through
+                    List(PathElement(srcNode, visible = false))
+                  }
+                }
+              case _ =>
+                List(PathElement(srcNode))
+            }
+          }
+          newPathElems.flatMap(e => traverseDdgBack(e :: path))
+        }
       }
-
-      for {
-        ddgPredecessor <- node._reachingDefIn.asScala
-        predTrackingPoint <- getTrackingPoint(ddgPredecessor)
-        if !path.contains(predTrackingPoint)
-      } traverseDDGBack(predTrackingPoint :: node :: path.tail)
+      (resultsForParents ++ resultsForCurNode).toList
     }
 
-    sinkSymbols.map(getTrackingPoint).foreach {
-      case Some(trackingPoing) => traverseDDGBack(List(trackingPoing))
-      case None                =>
-    }
-
-    pathReachables
+    val sinkSymbols = raw.clone.dedup.toList.sortBy { _.id.asInstanceOf[java.lang.Long] }
+    sinkSymbols.flatMap(s => traverseDdgBack(List(PathElement(s))))
   }
 
-  private def getTrackingPoint(node: nodes.StoredNode): Option[nodes.TrackingPoint] =
-    node match {
-      case identifier: nodes.Identifier           => Some(identifier)
-      case call: nodes.Call                       => Some(call)
-      case ret: nodes.Return                      => Some(ret)
-      case methodReturn: nodes.MethodReturn       => Some(methodReturn)
-      case methodParamIn: nodes.MethodParameterIn => Some(methodParamIn)
-      case literal: nodes.Literal                 => getTrackingPoint(literal._argumentIn().onlyChecked)
-      case _                                      => None
+  private def ddgIn(dstNode: nodes.TrackingPoint): Iterator[nodes.TrackingPoint] = {
+    dstNode._reachingDefIn().asScala.collect { case n: nodes.TrackingPoint => n }
+  }
+
+  private def isUsed(srcNode: nodes.StoredNode)(implicit semantics: Semantics) = {
+    Some(srcNode)
+      .collect {
+        case arg: nodes.Expression =>
+          val methods = argToMethods(arg)
+          atLeastOneMethodHasAnnotation(methods) || {
+            methods.exists { method =>
+              semantics
+                .forMethod(method.fullName)
+                .exists(_.mappings.exists { case (srcIndex, _) => srcIndex == arg.order })
+            }
+          }
+      }
+      .getOrElse(true)
+  }
+
+  private def isDefined(srcNode: nodes.StoredNode)(implicit semantics: Semantics) = {
+    Some(srcNode)
+      .collect {
+        case arg: nodes.Expression =>
+          val methods = argToMethods(arg)
+          atLeastOneMethodHasAnnotation(methods) || {
+            methods.exists { method =>
+              semantics
+                .forMethod(method.fullName)
+                .exists(_.mappings.exists { case (_, dstIndex) => dstIndex == arg.order })
+            }
+          }
+      }
+      .getOrElse(true)
+  }
+
+  private def atLeastOneMethodHasAnnotation(methods: List[nodes.Method])(implicit semantics: Semantics): Boolean = {
+    methods.nonEmpty && !methods.exists { m =>
+      hasAnnotation(m)
     }
+  }
+
+  private def hasAnnotation(method: nodes.Method)(implicit semantics: Semantics): Boolean = {
+    semantics.forMethod(method.fullName).isDefined
+  }
+
+  private def argToMethods(arg: nodes.Expression) = {
+    argToCall(arg).toList.flatMap { call =>
+      methodsForCall(call)
+    }
+  }
+
+  private def argToCall(n: nodes.TrackingPoint) =
+    n._argumentIn.asScala.collectFirst { case c: nodes.Call => c }
+
+  private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
+    NoResolve.getCalledMethods(call).toList
+  }
 
 }
 
-private class ReachableByContainer(val reachedSource: nodes.TrackingPoint, val path: List[nodes.TrackingPoint]) {
-  override def clone(): ReachableByContainer = {
-    new ReachableByContainer(reachedSource, path)
+private class ReachableByResult(val reachedSource: nodes.TrackingPoint, val path: List[PathElement]) {
+  override def clone(): ReachableByResult = {
+    new ReachableByResult(reachedSource, path)
   }
 }

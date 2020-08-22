@@ -4,16 +4,11 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
-import org.slf4j.{Logger, LoggerFactory}
-
-import scala.jdk.CollectionConverters._
 
 /**
   * A pass that calculates reaching definitions ("data dependencies").
   * */
 class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
-
-  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
 
@@ -29,14 +24,13 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     * by seeing which of these reaching definitions are relevant in the sense that
     * they are used.
     * */
-  private def addReachingDefEdges(method: nodes.Method,
-                                  solution: Solution[Set[nodes.StoredNode]]): DiffGraph.Builder = {
+  private def addReachingDefEdges(method: nodes.Method, solution: Solution[Set[Definition]]): DiffGraph.Builder = {
 
     val dstGraph = DiffGraph.newBuilder
 
     def addEdge(fromNode: nodes.StoredNode, toNode: nodes.StoredNode, variable: String = ""): Unit = {
       val properties = List((EdgeKeyNames.VARIABLE, variable))
-      if (toNode.isInstanceOf[nodes.Literal] || fromNode.isInstanceOf[nodes.Unknown] || toNode
+      if (fromNode.isInstanceOf[nodes.Unknown] || toNode
             .isInstanceOf[nodes.Unknown])
         return
       dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF, properties)
@@ -45,7 +39,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val in = solution.in
     val gen = solution.problem.transferFunction.asInstanceOf[ReachingDefTransferFunction].gen
     val allNodes = in.keys.toList
-    val usageAnalyzer = new UsageAnalyzer(in, gen)
+    val usageAnalyzer = new UsageAnalyzer(in)
 
     allNodes.foreach { node: nodes.StoredNode =>
       node match {
@@ -54,44 +48,25 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           usageAnalyzer.usedIncomingDefs(call).foreach {
             case (use, ins) =>
               ins.foreach { in =>
-                if (in != use) {
+                if (in.node != use) {
                   val edgeLabel = Some(in)
                     .filter(_.isInstanceOf[nodes.CfgNode])
                     .map(_.asInstanceOf[nodes.CfgNode].code)
                     .getOrElse("")
-                  addEdge(in, use, edgeLabel)
+                  addEdge(in.node, use, edgeLabel)
                 }
               }
           }
 
-          if (!hasAnnotation(call)) {
-            usageAnalyzer.uses(call, gen).foreach { use =>
-              gen(call).foreach { g =>
-                if (g == use || g == call) {
-                  addEdge(use, g)
-                }
+          // For all calls, assume that input arguments
+          // taint corresponding output arguments
+          // and the return value
+          usageAnalyzer.uses(call).foreach { use =>
+            gen(call).foreach { g =>
+              if (use != g.node) {
+                addEdge(use, g.node)
               }
             }
-          } else {
-            // Copy propagate edges from formal method to call site
-            NoResolve
-              .getCalledMethods(call)
-              .flatMap { method =>
-                method.parameter.map { param =>
-                  (param.order, param._propagateOut().asScala.toList.map(_.asInstanceOf[nodes.HasOrder].order))
-                }.l
-              }
-              .foreach {
-                case (srcOrder, dstOrders) =>
-                  val srcNode = call.argument(srcOrder)
-                  val dstNodes = dstOrders.map {
-                    case dstOrder if dstOrder == -1 => call
-                    case dstOrder                   => call.argument(dstOrder)
-                  }
-                  dstNodes.foreach { dstNode =>
-                    addEdge(srcNode, dstNode, srcNode.code)
-                  }
-              }
           }
 
         case ret: nodes.Return =>
@@ -99,7 +74,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
             case (use, inElements) =>
               addEdge(use, ret, use.asInstanceOf[nodes.CfgNode].code)
               inElements.foreach { inElement =>
-                addEdge(inElement, ret)
+                addEdge(inElement.node, ret)
               }
               if (inElements.isEmpty) {
                 addEdge(method, ret)
@@ -119,29 +94,15 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     allNodes
       .filterNot(
         x =>
-          x.isInstanceOf[nodes.MethodReturn] || x.isInstanceOf[nodes.Method] || x.isInstanceOf[nodes.Literal] || x
+          x.isInstanceOf[nodes.Method] || x
             .isInstanceOf[nodes.ControlStructure] || x.isInstanceOf[nodes.FieldIdentifier])
       .foreach { node =>
-        if (in(node).size == in(node).count(_.isInstanceOf[nodes.MethodParameterIn])) {
+        if (usageAnalyzer.usedIncomingDefs(node).isEmpty) {
           addEdge(method, node)
         }
       }
 
     dstGraph
-  }
-
-  private def hasAnnotation(call: nodes.Call): Boolean = {
-    methodForCall(call).exists(method => method.parameter.l.exists(x => x._propagateOut().hasNext))
-  }
-
-  private def methodForCall(call: nodes.Call): Option[nodes.Method] = {
-    NoResolve.getCalledMethods(call).toList match {
-      case List(x) => Some(x)
-      case List()  => None
-      case list =>
-        logger.warn(s"Multiple methods with name: ${call.name}, using first one")
-        Some(list.head)
-    }
   }
 
 }

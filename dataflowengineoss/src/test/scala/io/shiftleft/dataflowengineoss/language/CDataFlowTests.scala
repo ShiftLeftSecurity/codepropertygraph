@@ -1,10 +1,6 @@
 package io.shiftleft.dataflowengineoss.language
 
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.dotextension.ImageViewer
-
-import scala.sys.process.Process
-import scala.util.Try
 
 class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
 
@@ -32,7 +28,7 @@ class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
 
     def flows = sink.reachableByFlows(source)
 
-    flows.size shouldBe 6
+    flows.map(flowToResultPairs).toSet.size shouldBe 6
 
     flows.map(flowToResultPairs).toSet shouldBe
       Set(
@@ -362,7 +358,7 @@ class CDataFlowTests9 extends DataFlowCodeToCpgSuite {
 
   "Test 9: flow from function foo to a" in {
     val source = cpg.identifier.name("a")
-    val sink = cpg.call.name("foo")
+    val sink = cpg.call.name("foo").argument(1)
     val flows = sink.reachableByFlows(source).l
 
     flows.size shouldBe 2
@@ -464,7 +460,7 @@ class CDataFlowTests12 extends DataFlowCodeToCpgSuite {
        """.stripMargin
 
   "Test 12: flow with short hand assignment operator" in {
-    val source = cpg.call.code("a = 0x37")
+    val source = cpg.call.code("a = 0x37").argument(2)
     val sink = cpg.call.code("z\\+=a").argument(1)
     val flows = sink.reachableByFlows(source).l
 
@@ -497,7 +493,7 @@ class CDataFlowTests13 extends DataFlowCodeToCpgSuite {
       """.stripMargin
 
   "Test 13: flow after short hand assignment" in {
-    val source = cpg.call.code("a = 0x37")
+    val source = cpg.call.code("a = 0x37").argument(1)
     val sink = cpg.identifier.name("w")
     val flows = sink.reachableByFlows(source).l
 
@@ -570,6 +566,7 @@ class CDataFlowTests15 extends DataFlowCodeToCpgSuite {
     val source = cpg.method.parameter.name("y")
     val sink = cpg.identifier.name("z")
     val flows = sink.reachableByFlows(source).l
+
     flows.map(flowToResultPairs).toSet shouldBe Set(
       List[(String, Option[Integer])](
         ("foo(bool x, void* y)", 2),
