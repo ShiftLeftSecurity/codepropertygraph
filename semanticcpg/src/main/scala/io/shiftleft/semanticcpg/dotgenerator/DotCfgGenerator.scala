@@ -12,8 +12,7 @@ object DotCfgGenerator {
     traversal.map(Shared.dotGraph(_, expand, cfgNodeShouldBeDisplayed))
 
   protected def expand(v: nodes.StoredNode): Iterator[Edge] = {
-    v._cfgOut
-      .asScala
+    v._cfgOut.asScala
       .filter(_.isInstanceOf[nodes.StoredNode])
       .map(node => Edge(v, node))
   }
