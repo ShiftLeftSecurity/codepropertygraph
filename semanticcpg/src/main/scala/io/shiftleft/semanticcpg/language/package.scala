@@ -189,4 +189,14 @@ package object language extends operatorextension.Implicits {
   implicit def toModifierAccessorsTypeDecl(trav: Traversal[nodes.TypeDecl]): ModifierAccessors[nodes.TypeDecl] =
     new ModifierAccessors(trav)
   // Modifier accessors ~
+
+  implicit class NewNodeTypeDeco[NodeType <: nodes.NewNode](val node: NodeType) extends AnyVal {
+
+    /**
+    Start a new traversal from this node
+      */
+    def start: Traversal[NodeType] =
+      Traversal.fromSingle(node)
+  }
+
 }
