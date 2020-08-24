@@ -80,13 +80,13 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
         newPathElems.map { e =>
           if (cache.contains(e.node)) {
-            cache(e.node).map { r =>
-              val newPath = r.path.slice(0, r.path.indexOf(e)) ++ (e :: path)
+            e.node -> cache(e.node).map { r =>
+              val newPath = r.path.slice(0, r.path.map(_.node).indexOf(e.node)) ++ (e :: path)
               new ReachableByResult(r.reachedSource, newPath)
             }
+          } else {
+            e.node -> results(e :: path)
           }
-          e.node -> results(e :: path)
-
         }
       }
 
