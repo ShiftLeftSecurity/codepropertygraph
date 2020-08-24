@@ -57,37 +57,27 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
       }.toList
 
       val resultsForParents = {
-        val ddgParents = ddgIn(curNode).filter(parent => !path.map(_.node).contains(parent))
-
-        ddgParents.flatMap { srcNode =>
-          val curNodeParentCall = argToCall(curNode)
-          val newPathElems = if (curNodeParentCall.isEmpty) {
+        val ddgParents = ddgIn(curNode).filter(parent => !path.map(_.node).contains(parent)).toList
+        val newPathElems = if (argToCall(curNode).isEmpty) {
+          ddgParents.flatMap { srcNode =>
             List(PathElement(srcNode))
-          } else {
-            srcNode match {
-              case _: nodes.Expression =>
-                if (argToCall(srcNode) == curNodeParentCall) {
-                  if (isUsed(srcNode) && isDefined(curNode))
-                    List(PathElement(srcNode))
-                  else
-                    Nil
-                } else {
-                  if (!isUsed(curNode)) {
-                    List()
-                  } else if (isDefined(srcNode)) {
-                    List(PathElement(srcNode))
-                  } else { // curUsed && !srcDefined => pass through
-                    List(PathElement(srcNode, visible = false))
-                  }
-                }
-              case _ =>
-                List(PathElement(srcNode))
+          }
+        } else {
+          val (expressions, nonExpressions) = ddgParents.partition(_.isInstanceOf[nodes.Expression])
+          val elemsForExpressions = expressions.flatMap { srcNode: nodes.TrackingPoint =>
+            if (argToCall(srcNode) == argToCall(curNode)) {
+              List(PathElement(srcNode)).filter(_ => isUsed(srcNode) && isDefined(curNode))
+            } else {
+              val visible = isDefined(srcNode)
+              List(PathElement(srcNode, visible)).filter(_ => isUsed(curNode))
             }
           }
-          newPathElems.flatMap(e => traverseDdgBack(e :: path))
+          val elemsForNonExpressions = nonExpressions.map(x => PathElement(x))
+          elemsForExpressions ++ elemsForNonExpressions
         }
+        newPathElems.flatMap(e => traverseDdgBack(e :: path))
       }
-      (resultsForParents ++ resultsForCurNode).toList
+      (resultsForParents ++ resultsForCurNode)
     }
 
     val sinkSymbols = raw.clone.dedup.toList.sortBy { _.id.asInstanceOf[java.lang.Long] }
