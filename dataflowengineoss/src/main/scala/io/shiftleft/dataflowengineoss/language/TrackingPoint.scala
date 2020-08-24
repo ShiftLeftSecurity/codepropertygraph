@@ -2,7 +2,7 @@ package io.shiftleft.dataflowengineoss.language
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
+import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
 
 import scala.jdk.CollectionConverters._
@@ -67,27 +67,25 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
             List(PathElement(parentNode))
           }
         } else {
-          val (expressions, nonExpressions) = ddgParents.partition(_.isInstanceOf[nodes.Expression])
-          val elemsForExpressions = expressions.flatMap { parentNode: nodes.TrackingPoint =>
-            if (argToCall(parentNode) == argToCall(curNode)) {
-              List(PathElement(parentNode)).filter(_ => isUsed(parentNode) && isDefined(curNode))
-            } else {
-              List(PathElement(parentNode, isDefined(parentNode))).filter(_ => isUsed(curNode))
-            }
+          val (arguments, nonArguments) = ddgParents.partition(_.isInstanceOf[nodes.Expression])
+          val elemsForArguments = arguments.flatMap { parentNode =>
+            elemForArgument(parentNode, curNode)
           }
-          elemsForExpressions ++ nonExpressions.map(parentNode => PathElement(parentNode))
+          elemsForArguments ++ nonArguments.map(parentNode => PathElement(parentNode))
         }
 
-        newPathElems.map { e =>
-          if (cache.contains(e.node)) {
-            e.node -> cache(e.node).map { r =>
-              val newPath = r.path.slice(0, r.path.map(_.node).indexOf(e.node)) ++ (e :: path)
+        def fetchOrComputeResults(pathElement: PathElement): (nodes.TrackingPoint, List[ReachableByResult]) = {
+          if (cache.contains(pathElement.node)) {
+            pathElement.node -> cache(pathElement.node).map { r =>
+              val newPath = r.path.slice(0, r.path.map(_.node).indexOf(pathElement.node)) ++ (pathElement :: path)
               new ReachableByResult(r.reachedSource, newPath)
             }
           } else {
-            e.node -> results(e :: path)
+            pathElement.node -> results(pathElement :: path)
           }
         }
+
+        newPathElems.map(fetchOrComputeResults)
       }
 
       val resultsForCurNode = Some(curNode).collect {
@@ -105,6 +103,20 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     sinkSymbols.flatMap(s => results(List(PathElement(s))))
   }
 
+  /**
+    * For a given `(parentNode, curNode)` pair, determine whether to expand into
+    * `parentNode`. If so, return a corresponding path element or None if
+    * `parentNode` should not be followed.
+    * */
+  private def elemForArgument(parentNode: nodes.TrackingPoint, curNode: nodes.TrackingPoint)(
+      implicit semantics: Semantics): Option[PathElement] = {
+    if (argToCall(parentNode) == argToCall(curNode)) {
+      Some(PathElement(parentNode)).filter(_ => isUsed(parentNode) && isDefined(curNode))
+    } else {
+      Some(PathElement(parentNode, isDefined(parentNode))).filter(_ => isUsed(curNode))
+    }
+  }
+
   private def ddgIn(dstNode: nodes.TrackingPoint): Iterator[nodes.TrackingPoint] = {
     dstNode._reachingDefIn().asScala.collect { case n: nodes.TrackingPoint => n }
   }
@@ -113,14 +125,8 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     Some(srcNode)
       .collect {
         case arg: nodes.Expression =>
-          val methods = argToMethods(arg)
-          atLeastOneMethodHasAnnotation(methods) || {
-            methods.exists { method =>
-              semantics
-                .forMethod(method.fullName)
-                .exists(_.mappings.exists { case (srcIndex, _) => srcIndex == arg.order })
-            }
-          }
+          val s = semanticsForCallee(arg)
+          s.isEmpty || s.exists(_.mappings.exists { case (srcIndex, _) => srcIndex == arg.order })
       }
       .getOrElse(true)
   }
@@ -129,28 +135,19 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     Some(srcNode)
       .collect {
         case arg: nodes.Expression =>
-          val methods = argToMethods(arg)
-          atLeastOneMethodHasAnnotation(methods) || {
-            methods.exists { method =>
-              semantics
-                .forMethod(method.fullName)
-                .exists(_.mappings.exists { case (_, dstIndex) => dstIndex == arg.order })
-            }
-          }
+          val s = semanticsForCallee(arg)
+          s.isEmpty || s.exists(_.mappings.exists { case (_, dstIndex) => dstIndex == arg.order })
       }
       .getOrElse(true)
   }
 
-  private def atLeastOneMethodHasAnnotation(methods: List[nodes.Method])(implicit semantics: Semantics): Boolean = {
-    methods.nonEmpty && !methods.exists { m =>
-      hasAnnotation(m)
+  private def semanticsForCallee(arg : nodes.Expression)(implicit semantics: Semantics): List[FlowSemantic] = {
+    val methods = argToMethods(arg)
+    methods.flatMap { method =>
+      semantics
+        .forMethod(method.fullName)
     }
   }
-
-  private def hasAnnotation(method: nodes.Method)(implicit semantics: Semantics): Boolean = {
-    semantics.forMethod(method.fullName).isDefined
-  }
-
   private def argToMethods(arg: nodes.Expression) = {
     argToCall(arg).toList.flatMap { call =>
       methodsForCall(call)
