@@ -77,7 +77,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
         }
         newPathElems.flatMap(e => traverseDdgBack(e :: path))
       }
-      (resultsForParents ++ resultsForCurNode)
+      resultsForParents ++ resultsForCurNode
     }
 
     val sinkSymbols = raw.clone.dedup.toList.sortBy { _.id.asInstanceOf[java.lang.Long] }
