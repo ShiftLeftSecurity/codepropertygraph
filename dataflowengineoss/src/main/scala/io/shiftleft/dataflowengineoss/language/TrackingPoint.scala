@@ -69,7 +69,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
         } else {
           val (arguments, nonArguments) = ddgParents.partition(_.isInstanceOf[nodes.Expression])
           val elemsForArguments = arguments.flatMap { parentNode =>
-            elemForArgument(parentNode, curNode)
+            elemForArgument(parentNode.asInstanceOf[nodes.Expression], curNode)
           }
           elemsForArguments ++ nonArguments.map(parentNode => PathElement(parentNode))
         }
@@ -77,7 +77,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
         def fetchOrComputeResults(pathElement: PathElement): (nodes.TrackingPoint, List[ReachableByResult]) = {
           if (cache.contains(pathElement.node)) {
             pathElement.node -> cache(pathElement.node).map { r =>
-              val newPath = r.path.slice(0, r.path.map(_.node).indexOf(pathElement.node)) ++ (pathElement :: path)
+              val newPath = r.path ++ (pathElement :: path)
               new ReachableByResult(r.reachedSource, newPath)
             }
           } else {
@@ -93,8 +93,16 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
           new ReachableByResult(n, path)
       }.toList
 
-      cache.addAll(resultsForParents ++ resultsForCurNode.map { r =>
+      val resultsForCache = resultsForParents ++ resultsForCurNode.map { r =>
         curNode -> List(r)
+      }
+
+      cache.addAll(resultsForCache.map {
+        case (n, res) =>
+          n -> res.map { r =>
+            val shortenedPath = r.path.slice(0, r.path.map(_.node).indexOf(n))
+            new ReachableByResult(r.reachedSource, shortenedPath)
+          }
       })
       resultsForParents.flatMap(_._2) ++ resultsForCurNode
     }
@@ -108,10 +116,20 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     * `parentNode`. If so, return a corresponding path element or None if
     * `parentNode` should not be followed.
     * */
-  private def elemForArgument(parentNode: nodes.TrackingPoint, curNode: nodes.TrackingPoint)(
+  private def elemForArgument(parentNode: nodes.Expression, curNode: nodes.TrackingPoint)(
       implicit semantics: Semantics): Option[PathElement] = {
-    if (argToCall(parentNode) == argToCall(curNode)) {
-      Some(PathElement(parentNode)).filter(_ => isUsed(parentNode) && isDefined(curNode))
+    val parentNodeCall = argToCall(parentNode)
+    if (parentNodeCall == argToCall(curNode)) {
+      val callers = parentNodeCall.toList
+        .flatMap(x => methodsForCall(x))
+      if (semanticsForCallByArg(parentNode.asInstanceOf[nodes.Expression]).nonEmpty || callers.isEmpty) {
+        Some(PathElement(parentNode)).filter(_ => isUsed(parentNode) && isDefined(curNode))
+      } else {
+        // TODO There is no semantic and we can resolve the method, so, we'll have to
+        // analyze it, that is, we compute the result for the output parameter that
+        // corresponds to the argument.
+        Some(PathElement(parentNode)).filter(_ => isUsed(parentNode) && isDefined(curNode))
+      }
     } else {
       Some(PathElement(parentNode, isDefined(parentNode))).filter(_ => isUsed(curNode))
     }
@@ -125,7 +143,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     Some(srcNode)
       .collect {
         case arg: nodes.Expression =>
-          val s = semanticsForCallee(arg)
+          val s = semanticsForCallByArg(arg)
           s.isEmpty || s.exists(_.mappings.exists { case (srcIndex, _) => srcIndex == arg.order })
       }
       .getOrElse(true)
@@ -135,19 +153,22 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     Some(srcNode)
       .collect {
         case arg: nodes.Expression =>
-          val s = semanticsForCallee(arg)
+          val s = semanticsForCallByArg(arg)
           s.isEmpty || s.exists(_.mappings.exists { case (_, dstIndex) => dstIndex == arg.order })
       }
       .getOrElse(true)
   }
 
-  private def semanticsForCallee(arg : nodes.Expression)(implicit semantics: Semantics): List[FlowSemantic] = {
-    val methods = argToMethods(arg)
-    methods.flatMap { method =>
-      semantics
-        .forMethod(method.fullName)
+  private def semanticsForCallByArg(arg: nodes.Expression)(implicit semantics: Semantics): List[FlowSemantic] = {
+    argToMethods(arg).flatMap { method =>
+      semantics.forMethod(method.fullName)
     }
   }
+
+  private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
+    NoResolve.getCalledMethods(call).toList
+  }
+
   private def argToMethods(arg: nodes.Expression) = {
     argToCall(arg).toList.flatMap { call =>
       methodsForCall(call)
@@ -156,10 +177,6 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
   private def argToCall(n: nodes.TrackingPoint) =
     n._argumentIn.asScala.collectFirst { case c: nodes.Call => c }
-
-  private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
-    NoResolve.getCalledMethods(call).toList
-  }
 
 }
 
