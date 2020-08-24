@@ -42,46 +42,67 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   private def reachableByInternal[NodeType <: nodes.TrackingPoint](sourceTravs: Seq[Steps[NodeType]])(
       implicit semantics: Semantics): List[ReachableByResult] = {
 
+    val cache = new java.util.concurrent.ConcurrentHashMap[nodes.StoredNode, List[ReachableByResult]].asScala
+
     val sourceSymbols = sourceTravs
       .flatMap(_.raw.clone.toList)
       .collect { case n: nodes.TrackingPoint => n }
       .toSet
 
-    // Recursive part of this function
-    def traverseDdgBack(path: List[PathElement]): List[ReachableByResult] = {
+    /**
+      * Recursively expand the DDG backwards and return a list of all
+      * results, given by at least a source node in `sourceSymbols` and the
+      * path between the source symbol and the sink.
+      *
+      * @param path This is a path from a node to the sink. The first node
+      *             of the path is expanded by this method
+      * */
+    def results(path: List[PathElement]): List[ReachableByResult] = {
       val curNode = path.head.node
+
+      val resultsForParents: List[(nodes.StoredNode, List[ReachableByResult])] = {
+        val ddgParents = ddgIn(curNode).filter(parent => !path.map(_.node).contains(parent)).toList
+        val newPathElems = if (argToCall(curNode).isEmpty) {
+          ddgParents.flatMap { parentNode =>
+            List(PathElement(parentNode))
+          }
+        } else {
+          val (expressions, nonExpressions) = ddgParents.partition(_.isInstanceOf[nodes.Expression])
+          val elemsForExpressions = expressions.flatMap { parentNode: nodes.TrackingPoint =>
+            if (argToCall(parentNode) == argToCall(curNode)) {
+              List(PathElement(parentNode)).filter(_ => isUsed(parentNode) && isDefined(curNode))
+            } else {
+              List(PathElement(parentNode, isDefined(parentNode))).filter(_ => isUsed(curNode))
+            }
+          }
+          elemsForExpressions ++ nonExpressions.map(parentNode => PathElement(parentNode))
+        }
+
+        newPathElems.map { e =>
+          if (cache.contains(e.node)) {
+            e.node -> cache(e.node).map { r =>
+              val newPath = r.path.slice(0, r.path.map(_.node).indexOf(e.node)) ++ (e :: path)
+              new ReachableByResult(r.reachedSource, newPath)
+            }
+          } else {
+            e.node -> results(e :: path)
+          }
+        }
+      }
 
       val resultsForCurNode = Some(curNode).collect {
         case n if sourceSymbols.contains(n.asInstanceOf[NodeType]) =>
           new ReachableByResult(n, path)
       }.toList
 
-      val resultsForParents = {
-        val ddgParents = ddgIn(curNode).filter(parent => !path.map(_.node).contains(parent)).toList
-        val newPathElems = if (argToCall(curNode).isEmpty) {
-          ddgParents.flatMap { srcNode =>
-            List(PathElement(srcNode))
-          }
-        } else {
-          val (expressions, nonExpressions) = ddgParents.partition(_.isInstanceOf[nodes.Expression])
-          val elemsForExpressions = expressions.flatMap { srcNode: nodes.TrackingPoint =>
-            if (argToCall(srcNode) == argToCall(curNode)) {
-              List(PathElement(srcNode)).filter(_ => isUsed(srcNode) && isDefined(curNode))
-            } else {
-              val visible = isDefined(srcNode)
-              List(PathElement(srcNode, visible)).filter(_ => isUsed(curNode))
-            }
-          }
-          val elemsForNonExpressions = nonExpressions.map(x => PathElement(x))
-          elemsForExpressions ++ elemsForNonExpressions
-        }
-        newPathElems.flatMap(e => traverseDdgBack(e :: path))
-      }
-      resultsForParents ++ resultsForCurNode
+      cache.addAll(resultsForParents ++ resultsForCurNode.map { r =>
+        curNode -> List(r)
+      })
+      resultsForParents.flatMap(_._2) ++ resultsForCurNode
     }
 
     val sinkSymbols = raw.clone.dedup.toList.sortBy { _.id.asInstanceOf[java.lang.Long] }
-    sinkSymbols.flatMap(s => traverseDdgBack(List(PathElement(s))))
+    sinkSymbols.flatMap(s => results(List(PathElement(s))))
   }
 
   private def ddgIn(dstNode: nodes.TrackingPoint): Iterator[nodes.TrackingPoint] = {
