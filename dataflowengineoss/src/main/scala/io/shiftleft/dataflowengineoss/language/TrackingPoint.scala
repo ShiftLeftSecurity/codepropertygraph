@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
 
+import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 
 case class PathElement(node: nodes.TrackingPoint, visible: Boolean = true, resolved: Boolean = true)
@@ -48,13 +49,11 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
       .toSet
 
     val sinks = raw.clone.dedup.toList.sortBy(_.id2)
-    val res = sinks.flatMap { sink =>
+    sinks.par.flatMap { sink =>
       val cache = new ResultCache
       results(List(PathElement(sink)), sources, cache)
       cache.get(List(PathElement(sink))).get
-    }
-
-    res
+    }.toList
   }
 
   /**
