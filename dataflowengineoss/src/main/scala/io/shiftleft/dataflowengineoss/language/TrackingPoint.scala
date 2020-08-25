@@ -42,7 +42,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   private def reachableByInternal[NodeType <: nodes.TrackingPoint](sourceTravs: Seq[Steps[NodeType]])(
       implicit semantics: Semantics): List[ReachableByResult] = {
 
-    val cache = new java.util.concurrent.ConcurrentHashMap[nodes.StoredNode, List[ReachableByResult]].asScala
+    val cache = new ResultCache
 
     val sourceSymbols = sourceTravs
       .flatMap(_.raw.clone.toList)
@@ -75,12 +75,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
         }
 
         def fetchOrComputeResults(pathElement: PathElement): (nodes.TrackingPoint, List[ReachableByResult]) = {
-          if (cache.contains(pathElement.node)) {
-            pathElement.node -> cache(pathElement.node).map { r =>
-              val newPath = r.path ++ (pathElement :: path)
-              new ReachableByResult(r.reachedSource, newPath)
-            }
-          } else {
+          cache.createFromCache(pathElement, path).getOrElse {
             pathElement.node -> results(pathElement :: path)
           }
         }
@@ -97,13 +92,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
         curNode -> List(r)
       }
 
-      cache.addAll(resultsForCache.map {
-        case (n, res) =>
-          n -> res.map { r =>
-            val shortenedPath = r.path.slice(0, r.path.map(_.node).indexOf(n))
-            new ReachableByResult(r.reachedSource, shortenedPath)
-          }
-      })
+      cache.addAll(resultsForCache)
       resultsForParents.flatMap(_._2) ++ resultsForCurNode
     }
 
@@ -184,4 +173,31 @@ private class ReachableByResult(val reachedSource: nodes.TrackingPoint, val path
   override def clone(): ReachableByResult = {
     new ReachableByResult(reachedSource, path)
   }
+}
+
+private class ResultCache {
+
+  private val cache = new java.util.concurrent.ConcurrentHashMap[nodes.StoredNode, List[ReachableByResult]].asScala
+
+  def addAll(resultsForCache: List[(nodes.StoredNode, List[ReachableByResult])]): Unit = {
+    val resultsWithShortenedPaths = resultsForCache.map {
+      case (n, res) =>
+        n -> res.map { r =>
+          val shortenedPath = r.path.slice(0, r.path.map(_.node).indexOf(n))
+          new ReachableByResult(r.reachedSource, shortenedPath)
+        }
+    }
+    cache.addAll(resultsWithShortenedPaths)
+  }
+
+  def createFromCache(pathElement: PathElement,
+                      path: List[PathElement]): Option[(nodes.TrackingPoint, List[ReachableByResult])] = {
+    cache.get(pathElement.node).map { res =>
+      pathElement.node -> res.map { r =>
+        val newPath = r.path ++ (pathElement :: path)
+        new ReachableByResult(r.reachedSource, newPath)
+      }
+    }
+  }
+
 }
