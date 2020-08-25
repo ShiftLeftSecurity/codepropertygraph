@@ -51,6 +51,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     val res = sinks.flatMap { sink =>
       val cache = new ResultCache
       results(List(PathElement(sink)), sources, cache)
+      cache.get(List(PathElement(sink))).get
     }
 
     res
@@ -64,13 +65,12 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     * @param path This is a path from a node to the sink. The first node
     *             of the path is expanded by this method
     * */
-  private def results[NodeType <: nodes.TrackingPoint](
-      path: List[PathElement],
-      sources: Set[NodeType],
-      cache: ResultCache)(implicit semantics: Semantics): List[ReachableByResult] = {
+  private def results[NodeType <: nodes.TrackingPoint](path: List[PathElement],
+                                                       sources: Set[NodeType],
+                                                       cache: ResultCache)(implicit semantics: Semantics): Unit = {
     val curNode = path.head.node
 
-    val resultsForParents: List[(nodes.StoredNode, List[ReachableByResult])] = {
+    val resultsForParents: List[ReachableByResult] = {
       val ddgParents = ddgIn(curNode).filter(parent => !path.map(_.node).contains(parent)).toList
       val parentPathElements = if (argToCall(curNode).isEmpty) {
         ddgParents.flatMap { parentNode =>
@@ -84,9 +84,10 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
         elemsForArguments ++ nonArguments.map(parentNode => PathElement(parentNode))
       }
 
-      parentPathElements.map { parent =>
-        cache.createFromCache(parent, path).getOrElse {
-          parent.node -> results(parent :: path, sources, cache)
+      parentPathElements.flatMap { parent =>
+        cache.createFromCache(parent, path).map(_._2).getOrElse {
+          results(parent :: path, sources, cache)
+          cache.get(parent :: path).get
         }
       }
     }
@@ -96,12 +97,8 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
         ReachableByResult(path)
     }.toList
 
-    val nodeToResults = resultsForParents ++ resultsForCurNode.map { r =>
-      curNode -> List(r)
-    }
-
+    val nodeToResults = List(curNode -> (resultsForParents ++ resultsForCurNode))
     cache.addAll(nodeToResults)
-    nodeToResults.flatMap(_._2)
   }
 
   /**
@@ -194,19 +191,8 @@ private class ResultCache {
 
   private val cache = new java.util.concurrent.ConcurrentHashMap[nodes.StoredNode, List[ReachableByResult]].asScala
 
-  /**
-    * Add results to cache in a compressed form.
-    * */
   def addAll(results: List[(nodes.StoredNode, List[ReachableByResult])]): Unit = {
-    val resultsWithShortenedPaths = results.map {
-      case (keyNode, res) =>
-        keyNode -> res.map { r =>
-          // This is the path to the key node, excluding the key node
-          val pathToKeyNode = r.path.slice(0, r.path.map(_.node).indexOf(keyNode))
-          r.copy(path = pathToKeyNode)
-        }
-    }
-    cache.addAll(resultsWithShortenedPaths)
+    cache.addAll(results)
   }
 
   /**
@@ -220,10 +206,14 @@ private class ResultCache {
                       path: List[PathElement]): Option[(nodes.TrackingPoint, List[ReachableByResult])] = {
     cache.get(parent.node).map { res =>
       parent.node -> res.map { r =>
-        val completePath = r.path ++ (parent :: path)
+        val completePath = r.path.slice(0, r.path.map(_.node).indexOf(parent.node)) ++ (parent :: path)
         r.copy(path = completePath)
       }
     }
+  }
+
+  def get(path: List[PathElement]): Option[List[ReachableByResult]] = {
+    cache.get(path.head.node)
   }
 
 }
