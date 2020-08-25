@@ -2,12 +2,13 @@ package io.shiftleft.dataflowengineoss.language
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
+import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
 
+import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 
-case class PathElement(node: nodes.TrackingPoint, visible: Boolean = true)
+case class PathElement(node: nodes.TrackingPoint, visible: Boolean = true, resolved: Boolean = true)
 
 /**
   * Base class for nodes that can occur in data flows
@@ -27,7 +28,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
   def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*)(
       implicit semantics: Semantics): NodeSteps[NodeType] = {
-    val reachedSources = reachableByInternal(sourceTravs).map(_.reachedSource)
+    val reachedSources = reachableByInternal(sourceTravs).map(_.source)
     new NodeSteps[NodeType](__(reachedSources: _*).asInstanceOf[GremlinScala[NodeType]])
   }
 
@@ -42,67 +43,84 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   private def reachableByInternal[NodeType <: nodes.TrackingPoint](sourceTravs: Seq[Steps[NodeType]])(
       implicit semantics: Semantics): List[ReachableByResult] = {
 
-    val cache = new java.util.concurrent.ConcurrentHashMap[nodes.StoredNode, List[ReachableByResult]].asScala
-
-    val sourceSymbols = sourceTravs
+    val sources = sourceTravs
       .flatMap(_.raw.clone.toList)
       .collect { case n: nodes.TrackingPoint => n }
       .toSet
 
-    /**
-      * Recursively expand the DDG backwards and return a list of all
-      * results, given by at least a source node in `sourceSymbols` and the
-      * path between the source symbol and the sink.
-      *
-      * @param path This is a path from a node to the sink. The first node
-      *             of the path is expanded by this method
-      * */
-    def results(path: List[PathElement]): List[ReachableByResult] = {
-      val curNode = path.head.node
+    val sinks = raw.clone.dedup.toList.sortBy(_.id2)
+    sinks.par.flatMap { sink =>
+      val cache = new ResultCache
+      results(List(PathElement(sink)), sources, cache)
+      cache.get(List(PathElement(sink))).get
+    }.toList
+  }
 
-      val resultsForParents: List[(nodes.StoredNode, List[ReachableByResult])] = {
-        val ddgParents = ddgIn(curNode).filter(parent => !path.map(_.node).contains(parent)).toList
-        val newPathElems = if (argToCall(curNode).isEmpty) {
-          ddgParents.flatMap { parentNode =>
-            List(PathElement(parentNode))
-          }
-        } else {
-          val (expressions, nonExpressions) = ddgParents.partition(_.isInstanceOf[nodes.Expression])
-          val elemsForExpressions = expressions.flatMap { parentNode: nodes.TrackingPoint =>
-            if (argToCall(parentNode) == argToCall(curNode)) {
-              List(PathElement(parentNode)).filter(_ => isUsed(parentNode) && isDefined(curNode))
-            } else {
-              List(PathElement(parentNode, isDefined(parentNode))).filter(_ => isUsed(curNode))
-            }
-          }
-          elemsForExpressions ++ nonExpressions.map(parentNode => PathElement(parentNode))
-        }
+  /**
+    * Recursively expand the DDG backwards and return a list of all
+    * results, given by at least a source node in `sourceSymbols` and the
+    * path between the source symbol and the sink.
+    *
+    * @param path This is a path from a node to the sink. The first node
+    *             of the path is expanded by this method
+    * */
+  private def results[NodeType <: nodes.TrackingPoint](path: List[PathElement],
+                                                       sources: Set[NodeType],
+                                                       cache: ResultCache)(implicit semantics: Semantics): Unit = {
+    val curNode = path.head.node
 
-        newPathElems.map { e =>
-          if (cache.contains(e.node)) {
-            e.node -> cache(e.node).map { r =>
-              val newPath = r.path.slice(0, r.path.map(_.node).indexOf(e.node)) ++ (e :: path)
-              new ReachableByResult(r.reachedSource, newPath)
-            }
-          } else {
-            e.node -> results(e :: path)
-          }
+    val resultsForParents: List[ReachableByResult] = {
+      val ddgParents = ddgIn(curNode).filter(parent => !path.map(_.node).contains(parent)).toList
+      val parentPathElements = if (argToCall(curNode).isEmpty) {
+        ddgParents.flatMap { parentNode =>
+          List(PathElement(parentNode))
         }
+      } else {
+        val (arguments, nonArguments) = ddgParents.partition(_.isInstanceOf[nodes.Expression])
+        val elemsForArguments = arguments.flatMap { parentNode =>
+          elemForArgument(parentNode.asInstanceOf[nodes.Expression], curNode)
+        }
+        elemsForArguments ++ nonArguments.map(parentNode => PathElement(parentNode))
       }
 
-      val resultsForCurNode = Some(curNode).collect {
-        case n if sourceSymbols.contains(n.asInstanceOf[NodeType]) =>
-          new ReachableByResult(n, path)
-      }.toList
-
-      cache.addAll(resultsForParents ++ resultsForCurNode.map { r =>
-        curNode -> List(r)
-      })
-      resultsForParents.flatMap(_._2) ++ resultsForCurNode
+      parentPathElements.flatMap { parent =>
+        cache.createFromCache(parent, path).map(_._2).getOrElse {
+          results(parent :: path, sources, cache)
+          cache.get(parent :: path).get
+        }
+      }
     }
 
-    val sinkSymbols = raw.clone.dedup.toList.sortBy { _.id.asInstanceOf[java.lang.Long] }
-    sinkSymbols.flatMap(s => results(List(PathElement(s))))
+    val resultsForCurNode = Some(curNode).collect {
+      case n if sources.contains(n.asInstanceOf[NodeType]) =>
+        ReachableByResult(path)
+    }.toList
+
+    val nodeToResults = List(curNode -> (resultsForParents ++ resultsForCurNode))
+    cache.addAll(nodeToResults)
+  }
+
+  /**
+    * For a given `(parentNode, curNode)` pair, determine whether to expand into
+    * `parentNode`. If so, return a corresponding path element or None if
+    * `parentNode` should not be followed.
+    * */
+  private def elemForArgument(parentNode: nodes.Expression, curNode: nodes.TrackingPoint)(
+      implicit semantics: Semantics): Option[PathElement] = {
+    val parentNodeCall = argToCall(parentNode)
+    if (parentNodeCall == argToCall(curNode)) {
+      val callers = parentNodeCall.toList
+        .flatMap(x => methodsForCall(x))
+      if (semanticsForCallByArg(parentNode.asInstanceOf[nodes.Expression]).nonEmpty || callers.isEmpty) {
+        Some(PathElement(parentNode)).filter(_ => isUsed(parentNode) && isDefined(curNode))
+      } else {
+        // There is no semantic and we can resolve the method, so, this is an
+        // argument we would need to resolve. Report that, but don't take action for now
+        Some(PathElement(parentNode, resolved = false)).filter(_ => isUsed(parentNode) && isDefined(curNode))
+      }
+    } else {
+      Some(PathElement(parentNode, isDefined(parentNode))).filter(_ => isUsed(curNode))
+    }
   }
 
   private def ddgIn(dstNode: nodes.TrackingPoint): Iterator[nodes.TrackingPoint] = {
@@ -113,14 +131,8 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     Some(srcNode)
       .collect {
         case arg: nodes.Expression =>
-          val methods = argToMethods(arg)
-          atLeastOneMethodHasAnnotation(methods) || {
-            methods.exists { method =>
-              semantics
-                .forMethod(method.fullName)
-                .exists(_.mappings.exists { case (srcIndex, _) => srcIndex == arg.order })
-            }
-          }
+          val s = semanticsForCallByArg(arg)
+          s.isEmpty || s.exists(_.mappings.exists { case (srcIndex, _) => srcIndex == arg.order })
       }
       .getOrElse(true)
   }
@@ -129,26 +141,20 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     Some(srcNode)
       .collect {
         case arg: nodes.Expression =>
-          val methods = argToMethods(arg)
-          atLeastOneMethodHasAnnotation(methods) || {
-            methods.exists { method =>
-              semantics
-                .forMethod(method.fullName)
-                .exists(_.mappings.exists { case (_, dstIndex) => dstIndex == arg.order })
-            }
-          }
+          val s = semanticsForCallByArg(arg)
+          s.isEmpty || s.exists(_.mappings.exists { case (_, dstIndex) => dstIndex == arg.order })
       }
       .getOrElse(true)
   }
 
-  private def atLeastOneMethodHasAnnotation(methods: List[nodes.Method])(implicit semantics: Semantics): Boolean = {
-    methods.nonEmpty && !methods.exists { m =>
-      hasAnnotation(m)
+  private def semanticsForCallByArg(arg: nodes.Expression)(implicit semantics: Semantics): List[FlowSemantic] = {
+    argToMethods(arg).flatMap { method =>
+      semantics.forMethod(method.fullName)
     }
   }
 
-  private def hasAnnotation(method: nodes.Method)(implicit semantics: Semantics): Boolean = {
-    semantics.forMethod(method.fullName).isDefined
+  private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
+    NoResolve.getCalledMethods(call).toList
   }
 
   private def argToMethods(arg: nodes.Expression) = {
@@ -160,14 +166,53 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   private def argToCall(n: nodes.TrackingPoint) =
     n._argumentIn.asScala.collectFirst { case c: nodes.Call => c }
 
-  private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
-    NoResolve.getCalledMethods(call).toList
+}
+
+/**
+  * A partial result, informing about a path that exists from a source to another
+  * node in the graph.
+  *
+  * @param path this is the main result - a known path
+  *
+  * */
+private case class ReachableByResult(path: List[PathElement]) {
+
+  def source: nodes.TrackingPoint = path.head.node
+
+  def unresolvedArgs: List[nodes.TrackingPoint] = path.collect {
+    case elem if !elem.resolved =>
+      elem.node
   }
 
 }
 
-private class ReachableByResult(val reachedSource: nodes.TrackingPoint, val path: List[PathElement]) {
-  override def clone(): ReachableByResult = {
-    new ReachableByResult(reachedSource, path)
+private class ResultCache {
+
+  private val cache = new java.util.concurrent.ConcurrentHashMap[nodes.StoredNode, List[ReachableByResult]].asScala
+
+  def addAll(results: List[(nodes.StoredNode, List[ReachableByResult])]): Unit = {
+    cache.addAll(results)
   }
+
+  /**
+    * For a parent, given in the form of a path element, and the path
+    * to the current (child) node, check if a result exists for the parent,
+    * and if so, calculate a result for parent :: path, that is, the path
+    * from the parent all, via the current node, all the way back to the
+    * sink.
+    * */
+  def createFromCache(parent: PathElement,
+                      path: List[PathElement]): Option[(nodes.TrackingPoint, List[ReachableByResult])] = {
+    cache.get(parent.node).map { res =>
+      parent.node -> res.map { r =>
+        val completePath = r.path.slice(0, r.path.map(_.node).indexOf(parent.node)) ++ (parent :: path)
+        r.copy(path = completePath)
+      }
+    }
+  }
+
+  def get(path: List[PathElement]): Option[List[ReachableByResult]] = {
+    cache.get(path.head.node)
+  }
+
 }

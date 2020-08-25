@@ -6,6 +6,7 @@ val antlrVersion = "4.7.2"
 
 libraryDependencies ++= Seq(
   "org.antlr"     %  "antlr4-runtime" % antlrVersion,
+  "org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0",
   "org.scalatest" %% "scalatest"      % Versions.scalatest % Test,
   "io.shiftleft"  %% "fuzzyc2cpg"     % Versions.fuzzyc2cpg % Test
 )
