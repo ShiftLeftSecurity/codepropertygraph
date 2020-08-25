@@ -92,8 +92,6 @@ class CDataFlowTests2 extends DataFlowCodeToCpgSuite {
       .map(flowToResultPairs)
       .distinct
 
-    flows.foreach(println)
-
     flows.size shouldBe 5
 
     flows.toSet shouldBe
