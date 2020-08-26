@@ -49,13 +49,14 @@ class ResultTable {
   * @param path this is the main result - a known path
   *
   * */
-case class ReachableByResult(path: List[PathElement]) {
+case class ReachableByResult(path: List[PathElement], partial: Boolean = false) {
   def source: nodes.TrackingPoint = path.head.node
 
-  def unresolvedArgs: List[nodes.TrackingPoint] = path.collect {
-    case elem if !elem.resolved =>
-      elem.node
-  }
+  def unresolvedArgs: List[nodes.TrackingPoint] =
+    path.collect {
+      case elem if !elem.resolved =>
+        elem.node
+    }.distinct
 }
 
 case class PathElement(node: nodes.TrackingPoint, visible: Boolean = true, resolved: Boolean = true)

@@ -1,59 +1,99 @@
 package io.shiftleft.dataflowengineoss.queryengine
 
-import java.util.concurrent.{Callable, ExecutorCompletionService, Executors}
+import java.util.concurrent.{Callable, ExecutorCompletionService, ExecutorService, Executors}
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
-import io.shiftleft.semanticcpg.language.NoResolve
 import org.slf4j.{Logger, LoggerFactory}
+import io.shiftleft.semanticcpg.language._
 
 import scala.util.{Failure, Success, Try}
 import scala.jdk.CollectionConverters._
 
 private case class ReachableByTask(sink: nodes.TrackingPoint, sources: Set[nodes.TrackingPoint], table: ResultTable)
 
-class Engine {
+class Engine(context: EngineContext) {
 
   val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
+  var numberOfTasksRunning: Int = 0
+  val executorService: ExecutorService = Executors.newWorkStealingPool()
+  val completionService = new ExecutorCompletionService[List[ReachableByResult]](executorService)
 
   /**
     * Determine flows from sources to sinks by analyzing backwards from sinks.
     * */
-  def determineFlowsBackwards(sinks: List[nodes.TrackingPoint], sources: List[nodes.TrackingPoint])(
-      implicit semantics: Semantics): List[ReachableByResult] = {
+  def backwards(sinks: List[nodes.TrackingPoint], sources: List[nodes.TrackingPoint]): List[ReachableByResult] = {
     val sourcesSet = sources.toSet
-    val tasks = sinks.map { sink =>
-      ReachableByTask(sink, sourcesSet, new ResultTable)
-    }
 
-    val executorService = Executors.newWorkStealingPool()
-    val completionService = new ExecutorCompletionService[List[ReachableByResult]](executorService)
-    tasks.foreach { task =>
-      completionService.submit(new ReachableByCallable(task, semantics))
-    }
+    sinks
+      .map(sink => ReachableByTask(sink, sourcesSet, new ResultTable))
+      .foreach(task => submitTask(task))
 
     var result = List[ReachableByResult]()
-    for (_ <- 1 to tasks.size) {
+
+    while (numberOfTasksRunning > 0) {
       Try {
         completionService.take.get
       } match {
-        case Success(list) =>
-          result ++= list
+        case Success(resultsOfTask) =>
+          numberOfTasksRunning -= 1
+          result ++= resultsOfTask.filter(!_.partial)
+
         case Failure(exception) =>
+          numberOfTasksRunning -= 1
           logger.warn(exception.getMessage)
       }
     }
     result
   }
 
+  private def submitTask(task: ReachableByTask, path: List[PathElement] = List()): Unit = {
+    numberOfTasksRunning += 1
+    completionService.submit(new ReachableByCallable(task, context, path))
+  }
+
 }
 
-private class ReachableByCallable(task: ReachableByTask, semantics: Semantics)
+object Engine {
+
+  def argToMethods(arg: nodes.Expression): List[nodes.Method] = {
+    argToCall(arg).toList.flatMap { call =>
+      methodsForCall(call)
+    }
+  }
+
+  def argToCall(n: nodes.TrackingPoint): Option[nodes.Call] =
+    n._argumentIn().asScala.collectFirst { case c: nodes.Call => c }
+
+  def methodsForCall(call: nodes.Call): List[nodes.Method] = {
+    NoResolve.getCalledMethods(call).toList
+  }
+
+  def paramToArgs(param: nodes.MethodParameterIn): List[nodes.Expression] =
+    NoResolve
+      .getMethodCallsites(param.method)
+      .toList
+      .collect { case call: nodes.Call => call }
+      .start
+      .argument(param.order)
+      .l
+
+}
+
+case class EngineContext(semantics: Semantics, config: EngineConfig = EngineConfig())
+case class EngineConfig()
+
+private class ReachableByCallable(task: ReachableByTask,
+                                  context: EngineContext,
+                                  initialPath: List[PathElement] = List())
     extends Callable[List[ReachableByResult]] {
 
+  import Engine._
+
   override def call(): List[ReachableByResult] = {
-    implicit val sem: Semantics = semantics
-    results(List(PathElement(task.sink)), task.sources, task.table)
+    implicit val sem: Semantics = context.semantics
+    results(List(PathElement(task.sink)) ++ initialPath, task.sources, task.table)
     task.table.get(task.sink).get
   }
 
@@ -61,6 +101,10 @@ private class ReachableByCallable(task: ReachableByTask, semantics: Semantics)
     * Recursively expand the DDG backwards and return a list of all
     * results, given by at least a source node in `sourceSymbols` and the
     * path between the source symbol and the sink.
+    *
+    * This method stays within the method (intra-procedural analysis) but
+    * call sites which should be resolved are marked as such in the
+    * ResultTable.
     *
     * @param path This is a path from a node to the sink. The first node
     *             of the path is expanded by this method
@@ -92,10 +136,26 @@ private class ReachableByCallable(task: ReachableByTask, semantics: Semantics)
       }
     }
 
-    val resultsForCurNode = Some(curNode).collect {
-      case n if sources.contains(n.asInstanceOf[NodeType]) =>
-        ReachableByResult(path)
-    }.toList
+    val resultsForCurNode = {
+      val endStates = if (sources.contains(curNode.asInstanceOf[NodeType])) {
+        List(ReachableByResult(path))
+      } else if (curNode.isInstanceOf[nodes.MethodParameterIn]) {
+        List(ReachableByResult(path, partial = true))
+      } else {
+        List()
+      }
+
+      val retsToResolve: List[ReachableByResult] = curNode match {
+        case call: nodes.Call =>
+          if (methodsForCall(call).start.internal.l.nonEmpty && semanticsForCall(call).isEmpty) {
+            List(ReachableByResult(PathElement(path.head.node, resolved = false) :: path.tail))
+          } else {
+            List()
+          }
+        case _ => List()
+      }
+      endStates ++ retsToResolve
+    }
 
     table.add(curNode, resultsForParents ++ resultsForCurNode)
   }
@@ -109,9 +169,8 @@ private class ReachableByCallable(task: ReachableByTask, semantics: Semantics)
       implicit semantics: Semantics): Option[PathElement] = {
     val parentNodeCall = argToCall(parentNode)
     if (parentNodeCall == argToCall(curNode)) {
-      val callers = parentNodeCall.toList
-        .flatMap(x => methodsForCall(x))
-      if (semanticsForCallByArg(parentNode.asInstanceOf[nodes.Expression]).nonEmpty || callers.isEmpty) {
+      val internalMethodsForCall = parentNodeCall.toList.flatMap(x => methodsForCall(x)).start.internal.l
+      if (semanticsForCallByArg(parentNode.asInstanceOf[nodes.Expression]).nonEmpty || internalMethodsForCall.isEmpty) {
         Some(PathElement(parentNode)).filter(_ => isUsed(parentNode) && isDefined(curNode))
       } else {
         // There is no semantic and we can resolve the method, so, this is an
@@ -153,17 +212,10 @@ private class ReachableByCallable(task: ReachableByTask, semantics: Semantics)
     }
   }
 
-  private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
-    NoResolve.getCalledMethods(call).toList
-  }
-
-  private def argToMethods(arg: nodes.Expression) = {
-    argToCall(arg).toList.flatMap { call =>
-      methodsForCall(call)
+  private def semanticsForCall(call: nodes.Call)(implicit semantics: Semantics): List[FlowSemantic] = {
+    Engine.methodsForCall(call).flatMap { method =>
+      semantics.forMethod(method.fullName)
     }
   }
-
-  private def argToCall(n: nodes.TrackingPoint) =
-    n._argumentIn.asScala.collectFirst { case c: nodes.Call => c }
 
 }

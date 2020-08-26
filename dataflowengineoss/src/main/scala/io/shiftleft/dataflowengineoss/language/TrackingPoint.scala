@@ -2,8 +2,7 @@ package io.shiftleft.dataflowengineoss.language
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.dataflowengineoss.queryengine.{Engine, ReachableByResult}
-import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
+import io.shiftleft.dataflowengineoss.queryengine.{Engine, EngineContext, ReachableByResult}
 import io.shiftleft.semanticcpg.language._
 
 /**
@@ -23,13 +22,13 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   def cfgNode: NodeSteps[nodes.CfgNode] = wrapped.map(_.cfgNode)
 
   def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*)(
-      implicit semantics: Semantics): NodeSteps[NodeType] = {
+      implicit context: EngineContext): NodeSteps[NodeType] = {
     val reachedSources = reachableByInternal(sourceTravs).map(_.source)
     new NodeSteps[NodeType](__(reachedSources: _*).asInstanceOf[GremlinScala[NodeType]])
   }
 
   def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: NodeSteps[A]*)(
-      implicit semantics: Semantics): Steps[Path] = {
+      implicit context: EngineContext): Steps[Path] = {
     val paths = reachableByInternal(sourceTravs).map { result =>
       Path(result.path.filter(_.visible == true).map(_.node))
     }
@@ -37,7 +36,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   }
 
   private def reachableByInternal[NodeType <: nodes.TrackingPoint](sourceTravs: Seq[Steps[NodeType]])(
-      implicit semantics: Semantics): List[ReachableByResult] = {
+      implicit context: EngineContext): List[ReachableByResult] = {
 
     val sources: List[nodes.TrackingPoint] = sourceTravs
       .flatMap(_.raw.clone.toList)
@@ -46,7 +45,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
     val sinks = raw.clone.dedup.toList.sortBy(_.id2)
 
-    new Engine().determineFlowsBackwards(sinks, sources)
+    new Engine(context).backwards(sinks, sources)
   }
 
 }
