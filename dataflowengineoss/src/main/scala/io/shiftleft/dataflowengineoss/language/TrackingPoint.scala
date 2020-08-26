@@ -10,6 +10,10 @@ import scala.jdk.CollectionConverters._
 
 case class PathElement(node: nodes.TrackingPoint, visible: Boolean = true, resolved: Boolean = true)
 
+private case class ReachableByTask[NodeType <: nodes.TrackingPoint](sink: nodes.TrackingPoint,
+                                                                    sources: Set[NodeType],
+                                                                    table: ResultTable)
+
 /**
   * Base class for nodes that can occur in data flows
   * */
@@ -49,10 +53,14 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
       .toSet
 
     val sinks = raw.clone.dedup.toList.sortBy(_.id2)
-    sinks.par.flatMap { sink =>
-      val table = new ResultTable
-      results(List(PathElement(sink)), sources, table)
-      table.get(sink).get
+
+    val tasks = sinks.map { sink =>
+      ReachableByTask(sink, sources, new ResultTable)
+    }
+
+    tasks.par.flatMap { task =>
+      results(List(PathElement(task.sink)), task.sources, task.table)
+      task.table.get(task.sink).get
     }.toList
   }
 
@@ -191,6 +199,12 @@ private class ResultTable {
   private val table = new java.util.concurrent.ConcurrentHashMap[nodes.StoredNode, List[ReachableByResult]].asScala
 
   def addAll(results: List[(nodes.StoredNode, List[ReachableByResult])]): Unit = {
+    results.foreach {
+      case (key, value) =>
+        table.asJava.compute(key, { (_, existingValue) =>
+          Option(existingValue).toList.flatten ++ value
+        })
+    }
     table.addAll(results)
   }
 
