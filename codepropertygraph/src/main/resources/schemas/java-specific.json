@@ -78,7 +78,8 @@
           "name": "CONFIG_FILE",
           "keys": ["NAME", "CONTENT"],
           "comment": "Configuration file contents. Might be in use by a framework",
-          "outEdges": []
+          "outEdges": [],
+	  "is" : ["TRACKING_POINT"]
         }
 
 
