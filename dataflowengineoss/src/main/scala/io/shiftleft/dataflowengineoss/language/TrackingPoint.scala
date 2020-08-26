@@ -50,9 +50,9 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
     val sinks = raw.clone.dedup.toList.sortBy(_.id2)
     sinks.par.flatMap { sink =>
-      val cache = new ResultCache
-      results(List(PathElement(sink)), sources, cache)
-      cache.get(List(PathElement(sink))).get
+      val table = new ResultTable
+      results(List(PathElement(sink)), sources, table)
+      table.get(sink).get
     }.toList
   }
 
@@ -66,7 +66,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     * */
   private def results[NodeType <: nodes.TrackingPoint](path: List[PathElement],
                                                        sources: Set[NodeType],
-                                                       cache: ResultCache)(implicit semantics: Semantics): Unit = {
+                                                       table: ResultTable)(implicit semantics: Semantics): Unit = {
     val curNode = path.head.node
 
     val resultsForParents: List[ReachableByResult] = {
@@ -84,9 +84,9 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
       }
 
       parentPathElements.flatMap { parent =>
-        cache.createFromCache(parent, path).map(_._2).getOrElse {
-          results(parent :: path, sources, cache)
-          cache.get(parent :: path).get
+        table.createFromTable(parent :: path).map(_._2).getOrElse {
+          results(parent :: path, sources, table)
+          table.get(parent.node).get
         }
       }
     }
@@ -97,7 +97,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
     }.toList
 
     val nodeToResults = List(curNode -> (resultsForParents ++ resultsForCurNode))
-    cache.addAll(nodeToResults)
+    table.addAll(nodeToResults)
   }
 
   /**
@@ -186,33 +186,31 @@ private case class ReachableByResult(path: List[PathElement]) {
 
 }
 
-private class ResultCache {
+private class ResultTable {
 
-  private val cache = new java.util.concurrent.ConcurrentHashMap[nodes.StoredNode, List[ReachableByResult]].asScala
+  private val table = new java.util.concurrent.ConcurrentHashMap[nodes.StoredNode, List[ReachableByResult]].asScala
 
   def addAll(results: List[(nodes.StoredNode, List[ReachableByResult])]): Unit = {
-    cache.addAll(results)
+    table.addAll(results)
   }
 
   /**
-    * For a parent, given in the form of a path element, and the path
-    * to the current (child) node, check if a result exists for the parent,
-    * and if so, calculate a result for parent :: path, that is, the path
-    * from the parent all, via the current node, all the way back to the
-    * sink.
+    * For a given path, determine whether the first element (`first`) is in the cache, and if so,
+    * for each result stored in the cache, determine the path up to `first` and prepend it to
+    * `path`, giving us a new result via table lookup.
     * */
-  def createFromCache(parent: PathElement,
-                      path: List[PathElement]): Option[(nodes.TrackingPoint, List[ReachableByResult])] = {
-    cache.get(parent.node).map { res =>
-      parent.node -> res.map { r =>
-        val completePath = r.path.slice(0, r.path.map(_.node).indexOf(parent.node)) ++ (parent :: path)
+  def createFromTable(path: List[PathElement]): Option[(nodes.TrackingPoint, List[ReachableByResult])] = {
+    val first = path.head
+    table.get(first.node).map { res =>
+      first.node -> res.map { r =>
+        val completePath = r.path.slice(0, r.path.map(_.node).indexOf(first.node)) ++ path
         r.copy(path = completePath)
       }
     }
   }
 
-  def get(path: List[PathElement]): Option[List[ReachableByResult]] = {
-    cache.get(path.head.node)
+  def get(node: nodes.StoredNode): Option[List[ReachableByResult]] = {
+    table.get(node)
   }
 
 }
