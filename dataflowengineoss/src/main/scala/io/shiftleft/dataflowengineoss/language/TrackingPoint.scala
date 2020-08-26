@@ -104,8 +104,7 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
         ReachableByResult(path)
     }.toList
 
-    val nodeToResults = List(curNode -> (resultsForParents ++ resultsForCurNode))
-    table.addAll(nodeToResults)
+    table.add(curNode, resultsForParents ++ resultsForCurNode)
   }
 
   /**
@@ -198,14 +197,10 @@ private class ResultTable {
 
   private val table = new java.util.concurrent.ConcurrentHashMap[nodes.StoredNode, List[ReachableByResult]].asScala
 
-  def addAll(results: List[(nodes.StoredNode, List[ReachableByResult])]): Unit = {
-    results.foreach {
-      case (key, value) =>
-        table.asJava.compute(key, { (_, existingValue) =>
-          Option(existingValue).toList.flatten ++ value
-        })
-    }
-    table.addAll(results)
+  def add(key: nodes.StoredNode, value: List[ReachableByResult]): Unit = {
+    table.asJava.compute(key, { (_, existingValue) =>
+      Option(existingValue).toList.flatten ++ value
+    })
   }
 
   /**
