@@ -1,67 +1,26 @@
 package io.shiftleft.dataflowengineoss.language
 
+import java.util.concurrent.{Callable, ExecutorCompletionService, Executors}
+
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
+import org.slf4j.{Logger, LoggerFactory}
 
-import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
+import scala.util.{Failure, Success, Try}
 
 case class PathElement(node: nodes.TrackingPoint, visible: Boolean = true, resolved: Boolean = true)
 
-private case class ReachableByTask[NodeType <: nodes.TrackingPoint](sink: nodes.TrackingPoint,
-                                                                    sources: Set[NodeType],
-                                                                    table: ResultTable)
+private case class ReachableByTask(sink: nodes.TrackingPoint, sources: Set[nodes.TrackingPoint], table: ResultTable)
 
-/**
-  * Base class for nodes that can occur in data flows
-  * */
-class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal {
-  private def raw: GremlinScala[nodes.TrackingPoint] = wrapped.raw
-
-  /**
-    * The enclosing method of the tracking point
-    * */
-  def method: NodeSteps[nodes.Method] = wrapped.map(_.method)
-
-  /**
-    * Convert to nearest CFG node
-    * */
-  def cfgNode: NodeSteps[nodes.CfgNode] = wrapped.map(_.cfgNode)
-
-  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*)(
-      implicit semantics: Semantics): NodeSteps[NodeType] = {
-    val reachedSources = reachableByInternal(sourceTravs).map(_.source)
-    new NodeSteps[NodeType](__(reachedSources: _*).asInstanceOf[GremlinScala[NodeType]])
-  }
-
-  def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: NodeSteps[A]*)(
-      implicit semantics: Semantics): Steps[Path] = {
-    val paths = reachableByInternal(sourceTravs).map { result =>
-      Path(result.path.filter(_.visible == true).map(_.node))
-    }
-    new Steps(__(paths: _*))
-  }
-
-  private def reachableByInternal[NodeType <: nodes.TrackingPoint](sourceTravs: Seq[Steps[NodeType]])(
-      implicit semantics: Semantics): List[ReachableByResult] = {
-
-    val sources = sourceTravs
-      .flatMap(_.raw.clone.toList)
-      .collect { case n: nodes.TrackingPoint => n }
-      .toSet
-
-    val sinks = raw.clone.dedup.toList.sortBy(_.id2)
-
-    val tasks = sinks.map { sink =>
-      ReachableByTask(sink, sources, new ResultTable)
-    }
-
-    tasks.par.flatMap { task =>
-      results(List(PathElement(task.sink)), task.sources, task.table)
-      task.table.get(task.sink).get
-    }.toList
+private class ReachableByCallable(task: ReachableByTask, semantics: Semantics)
+    extends Callable[List[ReachableByResult]] {
+  override def call(): List[ReachableByResult] = {
+    implicit val sem: Semantics = semantics
+    results(List(PathElement(task.sink)), task.sources, task.table)
+    task.table.get(task.sink).get
   }
 
   /**
@@ -173,6 +132,78 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
   private def argToCall(n: nodes.TrackingPoint) =
     n._argumentIn.asScala.collectFirst { case c: nodes.Call => c }
 
+}
+
+/**
+  * Base class for nodes that can occur in data flows
+  * */
+class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal {
+  private def raw: GremlinScala[nodes.TrackingPoint] = wrapped.raw
+
+  import TrackingPoint._
+
+  /**
+    * The enclosing method of the tracking point
+    * */
+  def method: NodeSteps[nodes.Method] = wrapped.map(_.method)
+
+  /**
+    * Convert to nearest CFG node
+    * */
+  def cfgNode: NodeSteps[nodes.CfgNode] = wrapped.map(_.cfgNode)
+
+  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*)(
+      implicit semantics: Semantics): NodeSteps[NodeType] = {
+    val reachedSources = reachableByInternal(sourceTravs).map(_.source)
+    new NodeSteps[NodeType](__(reachedSources: _*).asInstanceOf[GremlinScala[NodeType]])
+  }
+
+  def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: NodeSteps[A]*)(
+      implicit semantics: Semantics): Steps[Path] = {
+    val paths = reachableByInternal(sourceTravs).map { result =>
+      Path(result.path.filter(_.visible == true).map(_.node))
+    }
+    new Steps(__(paths: _*))
+  }
+
+  private def reachableByInternal[NodeType <: nodes.TrackingPoint](sourceTravs: Seq[Steps[NodeType]])(
+      implicit semantics: Semantics): List[ReachableByResult] = {
+
+    val sources: Set[nodes.TrackingPoint] = sourceTravs
+      .flatMap(_.raw.clone.toList)
+      .collect { case n: nodes.TrackingPoint => n }
+      .toSet
+
+    val sinks = raw.clone.dedup.toList.sortBy(_.id2)
+
+    val tasks = sinks.map { sink =>
+      ReachableByTask(sink, sources, new ResultTable)
+    }
+
+    val executorService = Executors.newWorkStealingPool()
+    val completionService = new ExecutorCompletionService[List[ReachableByResult]](executorService)
+    tasks.foreach { task =>
+      completionService.submit(new ReachableByCallable(task, semantics))
+    }
+
+    var result = List[ReachableByResult]()
+    for (_ <- 1 to tasks.size) {
+      Try {
+        completionService.take.get
+      } match {
+        case Success(list) =>
+          result ++= list
+        case Failure(exception) =>
+          logger.warn(exception.getMessage)
+      }
+    }
+    result
+  }
+
+}
+
+object TrackingPoint {
+  val logger: Logger = LoggerFactory.getLogger(this.getClass)
 }
 
 /**
