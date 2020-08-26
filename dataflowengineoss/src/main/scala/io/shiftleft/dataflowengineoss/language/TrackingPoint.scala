@@ -4,14 +4,13 @@ import java.util.concurrent.{Callable, ExecutorCompletionService, Executors}
 
 import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.dataflowengineoss.queryengine.{PathElement, ReachableByResult, ResultTable}
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
-
-case class PathElement(node: nodes.TrackingPoint, visible: Boolean = true, resolved: Boolean = true)
 
 private case class ReachableByTask(sink: nodes.TrackingPoint, sources: Set[nodes.TrackingPoint], table: ResultTable)
 
@@ -51,7 +50,7 @@ private class ReachableByCallable(task: ReachableByTask, semantics: Semantics)
       }
 
       parentPathElements.flatMap { parent =>
-        table.createFromTable(parent :: path).map(_._2).getOrElse {
+        table.createFromTable(parent :: path).getOrElse {
           results(parent :: path, sources, table)
           table.get(parent.node).get
         }
@@ -204,53 +203,4 @@ class TrackingPoint(val wrapped: NodeSteps[nodes.TrackingPoint]) extends AnyVal 
 
 object TrackingPoint {
   val logger: Logger = LoggerFactory.getLogger(this.getClass)
-}
-
-/**
-  * A partial result, informing about a path that exists from a source to another
-  * node in the graph.
-  *
-  * @param path this is the main result - a known path
-  *
-  * */
-private case class ReachableByResult(path: List[PathElement]) {
-
-  def source: nodes.TrackingPoint = path.head.node
-
-  def unresolvedArgs: List[nodes.TrackingPoint] = path.collect {
-    case elem if !elem.resolved =>
-      elem.node
-  }
-
-}
-
-private class ResultTable {
-
-  private val table = new java.util.concurrent.ConcurrentHashMap[nodes.StoredNode, List[ReachableByResult]].asScala
-
-  def add(key: nodes.StoredNode, value: List[ReachableByResult]): Unit = {
-    table.asJava.compute(key, { (_, existingValue) =>
-      Option(existingValue).toList.flatten ++ value
-    })
-  }
-
-  /**
-    * For a given path, determine whether the first element (`first`) is in the cache, and if so,
-    * for each result stored in the cache, determine the path up to `first` and prepend it to
-    * `path`, giving us a new result via table lookup.
-    * */
-  def createFromTable(path: List[PathElement]): Option[(nodes.TrackingPoint, List[ReachableByResult])] = {
-    val first = path.head
-    table.get(first.node).map { res =>
-      first.node -> res.map { r =>
-        val completePath = r.path.slice(0, r.path.map(_.node).indexOf(first.node)) ++ path
-        r.copy(path = completePath)
-      }
-    }
-  }
-
-  def get(node: nodes.StoredNode): Option[List[ReachableByResult]] = {
-    table.get(node)
-  }
-
 }
