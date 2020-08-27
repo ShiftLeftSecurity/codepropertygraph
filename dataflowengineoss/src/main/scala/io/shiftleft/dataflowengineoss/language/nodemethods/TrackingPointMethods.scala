@@ -3,7 +3,7 @@ package io.shiftleft.dataflowengineoss.language.nodemethods
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.dataflowengineoss.language._
-import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
+import io.shiftleft.dataflowengineoss.queryengine.EngineContext
 import io.shiftleft.semanticcpg.utils.MemberAccess
 
 import scala.jdk.CollectionConverters._
@@ -26,7 +26,7 @@ class TrackingPointMethods(val node: nodes.TrackingPointBase) extends AnyVal {
     }
 
   def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*)(
-      implicit semantics: Semantics): Steps[NodeType] =
+      implicit context: EngineContext): Steps[NodeType] =
     node.start.reachableBy(sourceTravs: _*)
 
 }
