@@ -33,11 +33,10 @@ class DataFlowSolver {
             problem.flowGraph.succ(n)
           else
             List()
-        }.toList
+        }
         worklist.clear
         worklist ++= newEntries
       } else {
-
         val newEntries = worklist.flatMap { n =>
           val outSet = problem.flowGraph
             .succ(n)
