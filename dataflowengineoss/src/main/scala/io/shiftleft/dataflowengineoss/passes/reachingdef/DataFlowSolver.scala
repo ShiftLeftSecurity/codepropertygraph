@@ -19,30 +19,41 @@ class DataFlowSolver {
     val worklist = mutable.Set.empty[nodes.StoredNode]
     worklist ++= problem.flowGraph.allNodes
     while (worklist.nonEmpty) {
-      val n = worklist.head
-      worklist -= n
       if (problem.forward) {
-        val inSet = problem.flowGraph
-          .pred(n)
-          .map(x => out(x))
-          .reduceOption((x, y) => problem.meet(x, y))
-          .getOrElse(problem.empty)
-        in += n -> inSet
-        val oldSize = out(n).size
-        out += n -> problem.transferFunction(n, inSet)
-        if (oldSize != out(n).size)
-          worklist ++= problem.flowGraph.succ(n)
+        val newEntries = worklist.flatMap { n =>
+          val inSet = problem.flowGraph
+            .pred(n)
+            .map(x => out(x))
+            .reduceOption((x, y) => problem.meet(x, y))
+            .getOrElse(problem.empty)
+          in += n -> inSet
+          val oldSize = out(n).size
+          out += n -> problem.transferFunction(n, inSet)
+          if (oldSize != out(n).size)
+            problem.flowGraph.succ(n)
+          else
+            List()
+        }.toList
+        worklist.clear
+        worklist ++= newEntries
       } else {
-        val outSet = problem.flowGraph
-          .succ(n)
-          .map(x => in(x))
-          .reduceOption((x, y) => problem.meet(x, y))
-          .getOrElse(problem.empty)
-        out += n -> outSet
-        val oldSize = in(n).size
-        in += n -> problem.transferFunction(n, outSet)
-        if (oldSize != in(n).size)
-          worklist ++= problem.flowGraph.pred(n)
+
+        val newEntries = worklist.flatMap { n =>
+          val outSet = problem.flowGraph
+            .succ(n)
+            .map(x => in(x))
+            .reduceOption((x, y) => problem.meet(x, y))
+            .getOrElse(problem.empty)
+          out += n -> outSet
+          val oldSize = in(n).size
+          in += n -> problem.transferFunction(n, outSet)
+          if (oldSize != in(n).size)
+            problem.flowGraph.pred(n)
+          else
+            List()
+        }
+        worklist.clear
+        worklist ++= newEntries
       }
     }
     Solution(in, out, problem)
