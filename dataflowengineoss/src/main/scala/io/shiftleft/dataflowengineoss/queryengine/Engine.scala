@@ -148,7 +148,7 @@ private class ReachableByCallable(task: ReachableByTask,
       val retsToResolve: List[ReachableByResult] = curNode match {
         case call: nodes.Call =>
           if (methodsForCall(call).start.internal.l.nonEmpty && semanticsForCall(call).isEmpty) {
-            List(ReachableByResult(PathElement(path.head.node, resolved = false) :: path.tail))
+            List(ReachableByResult(PathElement(path.head.node, resolved = false) :: path.tail, partial = true))
           } else {
             List()
           }
