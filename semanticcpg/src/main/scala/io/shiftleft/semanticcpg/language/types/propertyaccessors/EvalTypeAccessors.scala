@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeysOdb}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys}
 import overflowdb.Node
 import overflowdb.traversal.Traversal
 import overflowdb.traversal.filter.P
@@ -8,13 +8,13 @@ import overflowdb.traversal.filter.P
 class EvalTypeAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
 
   def evalType: Traversal[String] =
-    traversal.out(EdgeTypes.EVAL_TYPE).out(EdgeTypes.REF).property(NodeKeysOdb.FULL_NAME)
+    traversal.out(EdgeTypes.EVAL_TYPE).out(EdgeTypes.REF).property(NodeKeys.FULL_NAME)
 
   def evalType(value: String): Traversal[A] =
     traversal.where(
       _.out(EdgeTypes.EVAL_TYPE)
         .out(EdgeTypes.REF)
-        .has(NodeKeysOdb.FULL_NAME.where(_.matches(value)))
+        .has(NodeKeys.FULL_NAME.where(_.matches(value)))
     )
 
   def evalType(values: String*): Traversal[A] =
@@ -24,7 +24,7 @@ class EvalTypeAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
       traversal.where(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
-          .has(NodeKeysOdb.FULL_NAME.where { value =>
+          .has(NodeKeys.FULL_NAME.where { value =>
             regexes.exists(_.matches(value))
           })
       )
@@ -34,7 +34,7 @@ class EvalTypeAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
     traversal.where(
       _.out(EdgeTypes.EVAL_TYPE)
         .out(EdgeTypes.REF)
-        .has(NodeKeysOdb.FULL_NAME, value))
+        .has(NodeKeys.FULL_NAME, value))
 
   def evalTypeExact(values: String*): Traversal[A] =
     if (values.isEmpty) Traversal.empty
@@ -42,14 +42,14 @@ class EvalTypeAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
       traversal.where(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
-          .has(NodeKeysOdb.FULL_NAME.where(P.within(values.to(Set)))))
+          .has(NodeKeys.FULL_NAME.where(P.within(values.to(Set)))))
     }
 
   def evalTypeNot(value: String): Traversal[A] =
     traversal.where(
       _.out(EdgeTypes.EVAL_TYPE)
         .out(EdgeTypes.REF)
-        .hasNot(NodeKeysOdb.FULL_NAME.where(_.matches(value))))
+        .hasNot(NodeKeys.FULL_NAME.where(_.matches(value))))
 
   def evalTypeNot(values: String*): Traversal[A] =
     if (values.isEmpty) Traversal.empty
@@ -58,7 +58,7 @@ class EvalTypeAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
       traversal.where(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
-          .hasNot(NodeKeysOdb.FULL_NAME.where { value =>
+          .hasNot(NodeKeys.FULL_NAME.where { value =>
             regexes.exists(_.matches(value))
           })
       )

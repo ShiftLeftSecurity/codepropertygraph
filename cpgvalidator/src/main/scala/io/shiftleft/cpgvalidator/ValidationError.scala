@@ -1,6 +1,6 @@
 package io.shiftleft.cpgvalidator
 
-import io.shiftleft.codepropertygraph.generated.NodeKeysOdb
+import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.Cardinality
 import overflowdb.{Direction, Node, Edge}
 import scala.jdk.CollectionConverters._
@@ -105,9 +105,9 @@ case class CfgEdgeError(srcNode: Node, dstNode: Node, srcNodeMethod: Node, dstNo
 
   override def toString: String = {
     s"Found invalid CFG edge which stretches over method boundaries.\n" +
-      "\t" + s"cfg edge start in method: ${srcNodeMethod.property(NodeKeysOdb.FULL_NAME)}\n" +
+      "\t" + s"cfg edge start in method: ${srcNodeMethod.property(NodeKeys.FULL_NAME)}\n" +
       "\t" + s"cfg edge start: ${ErrorHelper.getNodeDetails(srcNode)}\n" +
-      "\t" + s"cfg edge end in method: ${dstNodeMethod.property(NodeKeysOdb.FULL_NAME)}\n" +
+      "\t" + s"cfg edge end in method: ${dstNodeMethod.property(NodeKeys.FULL_NAME)}\n" +
       "\t" + s"cfg edge end: ${ErrorHelper.getNodeDetails(dstNode)}\n"
   }
 

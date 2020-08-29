@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.types.expressions
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeysOdb, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
 import overflowdb.traversal.help.Doc
@@ -23,10 +23,10 @@ class ControlStructure(val traversal: Traversal[nodes.ControlStructure]) extends
 
   @Doc("Sub tree taken when condition evaluates to true")
   def whenTrue: Traversal[nodes.AstNode] =
-    traversal.out.has(NodeKeysOdb.ORDER, secondChildIndex).cast[nodes.AstNode]
+    traversal.out.has(NodeKeys.ORDER, secondChildIndex).cast[nodes.AstNode]
 
   @Doc("Sub tree taken when condition evaluates to false")
   def whenFalse: Traversal[nodes.AstNode] =
-    traversal.out.has(NodeKeysOdb.ORDER, thirdChildIndex).cast[nodes.AstNode]
+    traversal.out.has(NodeKeys.ORDER, thirdChildIndex).cast[nodes.AstNode]
 
 }

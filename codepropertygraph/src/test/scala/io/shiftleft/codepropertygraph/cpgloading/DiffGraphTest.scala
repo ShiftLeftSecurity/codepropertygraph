@@ -14,9 +14,9 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
     withTestOdb { graph =>
       // setup existing graph
       // add x and y nodes to graph
-      val x = graph + (NodeTypes.UNKNOWN, NodeKeysOdb.CODE -> "x")
-      val y = graph + (NodeTypes.UNKNOWN, NodeKeysOdb.CODE -> "old y code")
-      val x2y = x --- (EdgeTypes.CONTAINS_NODE, EdgeKeysOdb.LOCAL_NAME -> "old edge attr") --> y
+      val x = graph + (NodeTypes.UNKNOWN, NodeKeys.CODE -> "x")
+      val y = graph + (NodeTypes.UNKNOWN, NodeKeys.CODE -> "old y code")
+      val x2y = x --- (EdgeTypes.CONTAINS_NODE, EdgeKeys.LOCAL_NAME -> "old edge attr") --> y
 
       // make diffgraph
       val diffBuilder = DiffGraph.newBuilder
@@ -73,10 +73,10 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
       makeEdgeBetweenExistingNodes(graph, diffBuilder, "a", "b")
       makeEdgeBetweenExistingNodes(graph, diffBuilder, "b", "c")
       val appliedDiff2 = DiffGraph.Applier.applyDiff(diffBuilder.build(), graph, true, None)
-      graph.V.has(NodeKeysOdb.CODE -> "a").head.out(EdgeTypes.AST).property(NodeKeysOdb.CODE).head shouldBe "b"
+      graph.V.has(NodeKeys.CODE -> "a").head.out(EdgeTypes.AST).property(NodeKeys.CODE).head shouldBe "b"
       DiffGraph.Applier.unapplyDiff(graph, appliedDiff2.inverseDiffGraph.get)
-      graph.V.has(NodeKeysOdb.CODE -> "a").head.out(EdgeTypes.AST).l shouldBe Nil
-      graph.V.has(NodeKeysOdb.CODE, "b").head.out(EdgeTypes.AST).l shouldBe Nil
+      graph.V.has(NodeKeys.CODE -> "a").head.out(EdgeTypes.AST).l shouldBe Nil
+      graph.V.has(NodeKeys.CODE, "b").head.out(EdgeTypes.AST).l shouldBe Nil
     }
   }
 
@@ -143,8 +143,8 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
   def createNewNode(code: String) = nodes.NewUnknown(code = code)
 
   def makeEdgeBetweenExistingNodes(graph: Graph, diff: DiffGraph.Builder, codeA: String, codeB: String) = {
-    val a = graph.V.has(NodeKeysOdb.CODE, codeA).head
-    val b = graph.V.has(NodeKeysOdb.CODE, codeB).head
+    val a = graph.V.has(NodeKeys.CODE, codeA).head
+    val b = graph.V.has(NodeKeys.CODE, codeB).head
     diff.addEdge(a.asInstanceOf[nodes.StoredNode], b.asInstanceOf[nodes.StoredNode], EdgeTypes.AST)
   }
 

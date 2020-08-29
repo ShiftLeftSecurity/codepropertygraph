@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import io.shiftleft.codepropertygraph.generated.NodeKeysOdb
+import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.codepropertygraph.generated.nodes.HasOrder
 import overflowdb.Node
 import overflowdb.traversal.Traversal
@@ -11,14 +11,14 @@ class OrderAccessors[A <: Node with HasOrder](val traversal: Traversal[A]) exten
     traversal.map(_.order)
 
   def order(value: Integer): Traversal[A] =
-    PropertyAccessors.filter(traversal, NodeKeysOdb.ORDER, value)
+    PropertyAccessors.filter(traversal, NodeKeys.ORDER, value)
 
   def order(value: Integer*): Traversal[A] =
-    PropertyAccessors.filterMultiple(traversal, NodeKeysOdb.ORDER, value: _*)
+    PropertyAccessors.filterMultiple(traversal, NodeKeys.ORDER, value: _*)
 
   def orderNot(value: Integer): Traversal[A] =
-    PropertyAccessors.filterNot(traversal, NodeKeysOdb.ORDER, value)
+    PropertyAccessors.filterNot(traversal, NodeKeys.ORDER, value)
 
   def orderNot(values: Integer*): Traversal[A] =
-    PropertyAccessors.filterNotMultiple(traversal, NodeKeysOdb.ORDER, values: _*)
+    PropertyAccessors.filterNotMultiple(traversal, NodeKeys.ORDER, values: _*)
 }

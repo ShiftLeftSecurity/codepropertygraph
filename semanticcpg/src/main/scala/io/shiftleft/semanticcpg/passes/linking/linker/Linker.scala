@@ -148,7 +148,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
           }
         }
       } else {
-        val dstFullNames = srcNode.out(edgeType).property(NodeKeysOdb.FULL_NAME).l
+        val dstFullNames = srcNode.out(edgeType).property(NodeKeys.FULL_NAME).l
         srcNode.setProperty(dstFullNameKey, dstFullNames)
         if (!loggedDeprecationWarning) {
           logger.warn(
@@ -172,9 +172,9 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
             case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode.get(astChild.astParentFullName)
             case _ =>
               logger.warn(
-                s"Invalid AST_PARENT_TYPE=${astChild.propertyOption(NodeKeysOdb.AST_PARENT_FULL_NAME)};" +
+                s"Invalid AST_PARENT_TYPE=${astChild.propertyOption(NodeKeys.AST_PARENT_FULL_NAME)};" +
                   s" astChild LABEL=${astChild.label};" +
-                  s" astChild FULL_NAME=${astChild.propertyOption(NodeKeysOdb.FULL_NAME)}")
+                  s" astChild FULL_NAME=${astChild.propertyOption(NodeKeys.FULL_NAME)}")
               None
           }
 
@@ -229,7 +229,7 @@ object Linker {
           }
         }
       } else {
-        srcNode.out(edgeType).property(NodeKeysOdb.FULL_NAME).nextOption match {
+        srcNode.out(edgeType).property(NodeKeys.FULL_NAME).nextOption match {
           case Some(dstFullName) => srcNode.property(dstFullNameKey, dstFullName)
           case None              => logger.warn(s"Missing outgoing edge of type ${edgeType} from node ${srcNode}")
         }

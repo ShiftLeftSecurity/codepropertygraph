@@ -3,9 +3,10 @@ package io.shiftleft.passes
 import better.files.File
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{NodeKeys, nodes}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import overflowdb.traversal._
 
 import scala.jdk.CollectionConverters._
 
@@ -33,7 +34,7 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
   "ParallelCpgPass" should {
     "allow creating and applying result of pass" in Fixture() { (cpg, pass) =>
       pass.createAndApply()
-      cpg.graph.V().asScala.map(_.property("NAME").value().toString).toSet shouldBe Set("foo", "bar")
+      cpg.graph.nodes.map(_.property(NodeKeys.NAME)).toSet shouldBe Set("foo", "bar")
     }
 
     "produce a serialized inverse CPG" in Fixture() { (_, pass) =>

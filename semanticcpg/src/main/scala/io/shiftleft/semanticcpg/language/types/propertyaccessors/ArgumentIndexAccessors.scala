@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import io.shiftleft.codepropertygraph.generated.NodeKeysOdb
+import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.codepropertygraph.generated.nodes.HasArgumentIndex
 import overflowdb.Node
 import overflowdb.traversal.Traversal
@@ -11,14 +11,14 @@ class ArgumentIndexAccessors[A <: Node with HasArgumentIndex](val traversal: Tra
     traversal.map(_.argumentIndex)
 
   def argIndex(value: Integer): Traversal[A] =
-    PropertyAccessors.filter(traversal, NodeKeysOdb.ARGUMENT_INDEX, value)
+    PropertyAccessors.filter(traversal, NodeKeys.ARGUMENT_INDEX, value)
 
   def argIndex(value: Integer*): Traversal[A] =
-    PropertyAccessors.filterMultiple(traversal, NodeKeysOdb.ARGUMENT_INDEX, value: _*)
+    PropertyAccessors.filterMultiple(traversal, NodeKeys.ARGUMENT_INDEX, value: _*)
 
   def argIndexNot(value: Integer): Traversal[A] =
-    PropertyAccessors.filterNot(traversal, NodeKeysOdb.ARGUMENT_INDEX, value)
+    PropertyAccessors.filterNot(traversal, NodeKeys.ARGUMENT_INDEX, value)
 
   def argIndexNot(values: Integer*): Traversal[A] =
-    PropertyAccessors.filterNotMultiple(traversal, NodeKeysOdb.ARGUMENT_INDEX, values: _*)
+    PropertyAccessors.filterNotMultiple(traversal, NodeKeys.ARGUMENT_INDEX, values: _*)
 }

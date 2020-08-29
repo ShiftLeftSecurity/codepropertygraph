@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import io.shiftleft.codepropertygraph.generated.NodeKeysOdb
+import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.codepropertygraph.generated.nodes.HasLineNumberEnd
 import overflowdb.Node
 import overflowdb.traversal.Traversal
@@ -11,15 +11,15 @@ class LineNumberEndAccessors[A <: Node with HasLineNumberEnd](val traversal: Tra
     traversal.flatMap(_.lineNumberEnd)
 
   def lineNumberEnd(value: Integer): Traversal[A] =
-    PropertyAccessors.filter(traversal, NodeKeysOdb.LINE_NUMBER_END, value)
+    PropertyAccessors.filter(traversal, NodeKeys.LINE_NUMBER_END, value)
 
   def lineNumberEnd(value: Integer*): Traversal[A] =
-    PropertyAccessors.filterMultiple(traversal, NodeKeysOdb.LINE_NUMBER_END, value: _*)
+    PropertyAccessors.filterMultiple(traversal, NodeKeys.LINE_NUMBER_END, value: _*)
 
   def lineNumberEndNot(value: Integer): Traversal[A] =
-    PropertyAccessors.filterNot(traversal, NodeKeysOdb.LINE_NUMBER_END, value)
+    PropertyAccessors.filterNot(traversal, NodeKeys.LINE_NUMBER_END, value)
 
   def lineNumberEndNot(values: Integer*): Traversal[A] =
-    PropertyAccessors.filterNotMultiple(traversal, NodeKeysOdb.LINE_NUMBER_END, values: _*)
+    PropertyAccessors.filterNotMultiple(traversal, NodeKeys.LINE_NUMBER_END, values: _*)
 
 }

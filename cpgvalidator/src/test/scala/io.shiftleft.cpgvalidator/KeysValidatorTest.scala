@@ -1,7 +1,7 @@
 package io.shiftleft.cpgvalidator
 
 import overflowdb._
-import io.shiftleft.codepropertygraph.generated.{nodes, NodeKeysOdb, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{nodes, NodeKeys, NodeTypes}
 import io.shiftleft.cpgvalidator.validators.KeysValidator
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
@@ -27,11 +27,11 @@ class KeysValidatorTest extends AnyWordSpec with Matchers {
       val validator = new KeysValidator(new ValidationErrorRegistry)
       cpg.graph + (
         NodeTypes.METHOD_PARAMETER_IN,
-        NodeKeysOdb.NAME -> "someMethod",
-        NodeKeysOdb.TYPE_FULL_NAME -> "someMethod",
-        NodeKeysOdb.ORDER -> 1,
-        NodeKeysOdb.CODE -> "some code",
-        NodeKeysOdb.EVALUATION_STRATEGY -> "someStrategy"
+        NodeKeys.NAME -> "someMethod",
+        NodeKeys.TYPE_FULL_NAME -> "someMethod",
+        NodeKeys.ORDER -> 1,
+        NodeKeys.CODE -> "some code",
+        NodeKeys.EVALUATION_STRATEGY -> "someStrategy"
       )
       validator.validate(cpg) shouldBe true
     }
@@ -54,14 +54,14 @@ class KeysValidatorTest extends AnyWordSpec with Matchers {
       val validator = new KeysValidator(new ValidationErrorRegistry)
       val node = cpg.graph + (
         NodeTypes.TYPE_DECL,
-        NodeKeysOdb.NAME -> "SomeTypeDecl",
-        NodeKeysOdb.AST_PARENT_TYPE -> "SomeParentType",
-        NodeKeysOdb.AST_PARENT_FULL_NAME -> "SomeTypeDecl",
-        NodeKeysOdb.IS_EXTERNAL -> false,
-        NodeKeysOdb.ORDER -> 1,
-        NodeKeysOdb.FULL_NAME -> "SomeTypeDecl",
-        NodeKeysOdb.FILENAME -> "",
-        NodeKeysOdb.INHERITS_FROM_TYPE_FULL_NAME -> List("a", "b"),
+        NodeKeys.NAME -> "SomeTypeDecl",
+        NodeKeys.AST_PARENT_TYPE -> "SomeParentType",
+        NodeKeys.AST_PARENT_FULL_NAME -> "SomeTypeDecl",
+        NodeKeys.IS_EXTERNAL -> false,
+        NodeKeys.ORDER -> 1,
+        NodeKeys.FULL_NAME -> "SomeTypeDecl",
+        NodeKeys.FILENAME -> "",
+        NodeKeys.INHERITS_FROM_TYPE_FULL_NAME -> List("a", "b"),
       )
       validator.validate(cpg) shouldBe true
       node.asInstanceOf[nodes.TypeDecl].inheritsFromTypeFullName shouldBe (List("a", "b"))
@@ -73,13 +73,13 @@ class KeysValidatorTest extends AnyWordSpec with Matchers {
       val validator = new KeysValidator(new ValidationErrorRegistry)
       cpg.graph + (
         NodeTypes.TYPE_DECL,
-        NodeKeysOdb.NAME -> "SomeTypeDecl",
-        NodeKeysOdb.AST_PARENT_TYPE -> "SomeParentType",
-        NodeKeysOdb.AST_PARENT_FULL_NAME -> "SomeTypeDecl",
-        NodeKeysOdb.IS_EXTERNAL -> false,
-        NodeKeysOdb.ORDER -> 1,
-        NodeKeysOdb.FULL_NAME -> "SomeTypeDecl",
-        NodeKeysOdb.FILENAME -> "",
+        NodeKeys.NAME -> "SomeTypeDecl",
+        NodeKeys.AST_PARENT_TYPE -> "SomeParentType",
+        NodeKeys.AST_PARENT_FULL_NAME -> "SomeTypeDecl",
+        NodeKeys.IS_EXTERNAL -> false,
+        NodeKeys.ORDER -> 1,
+        NodeKeys.FULL_NAME -> "SomeTypeDecl",
+        NodeKeys.FILENAME -> "",
       )
       validator.validate(cpg) shouldBe true
     }
@@ -90,14 +90,14 @@ class KeysValidatorTest extends AnyWordSpec with Matchers {
       val validator = new KeysValidator(new ValidationErrorRegistry)
       cpg.graph + (
         NodeTypes.TYPE_DECL,
-        NodeKeysOdb.NAME -> "SomeTypeDecl",
-        NodeKeysOdb.AST_PARENT_TYPE -> "SomeParentType",
-        NodeKeysOdb.AST_PARENT_FULL_NAME -> "SomeTypeDecl",
-        NodeKeysOdb.IS_EXTERNAL -> false,
-        NodeKeysOdb.ORDER -> 1,
-        NodeKeysOdb.FULL_NAME -> "SomeTypeDecl",
-        NodeKeysOdb.FILENAME -> "",
-        NodeKeysOdb.INHERITS_FROM_TYPE_FULL_NAME -> Nil,
+        NodeKeys.NAME -> "SomeTypeDecl",
+        NodeKeys.AST_PARENT_TYPE -> "SomeParentType",
+        NodeKeys.AST_PARENT_FULL_NAME -> "SomeTypeDecl",
+        NodeKeys.IS_EXTERNAL -> false,
+        NodeKeys.ORDER -> 1,
+        NodeKeys.FULL_NAME -> "SomeTypeDecl",
+        NodeKeys.FILENAME -> "",
+        NodeKeys.INHERITS_FROM_TYPE_FULL_NAME -> Nil,
       )
       validator.validate(cpg) shouldBe true
     }
@@ -108,11 +108,11 @@ class KeysValidatorTest extends AnyWordSpec with Matchers {
       val validator = new KeysValidator(new ValidationErrorRegistry)
       cpg.graph + (
         NodeTypes.ANNOTATION_LITERAL,
-        NodeKeysOdb.LINE_NUMBER -> 1,
-        NodeKeysOdb.NAME -> "SomeAnnotation",
-        NodeKeysOdb.ORDER -> 1,
-        NodeKeysOdb.ARGUMENT_INDEX -> 1,
-        NodeKeysOdb.CODE -> "some code;"
+        NodeKeys.LINE_NUMBER -> 1,
+        NodeKeys.NAME -> "SomeAnnotation",
+        NodeKeys.ORDER -> 1,
+        NodeKeys.ARGUMENT_INDEX -> 1,
+        NodeKeys.CODE -> "some code;"
       )
       validator.validate(cpg) shouldBe true
     }
@@ -123,11 +123,11 @@ class KeysValidatorTest extends AnyWordSpec with Matchers {
       val validator = new KeysValidator(new ValidationErrorRegistry)
       cpg.graph + (
         NodeTypes.ANNOTATION_LITERAL,
-//        NodeKeysOdb.LINE_NUMBER intentionally not set
-        NodeKeysOdb.NAME -> "SomeAnnotation",
-        NodeKeysOdb.ORDER -> 1,
-        NodeKeysOdb.ARGUMENT_INDEX -> 1,
-        NodeKeysOdb.CODE -> "some code;"
+//        NodeKeys.LINE_NUMBER intentionally not set
+        NodeKeys.NAME -> "SomeAnnotation",
+        NodeKeys.ORDER -> 1,
+        NodeKeys.ARGUMENT_INDEX -> 1,
+        NodeKeys.CODE -> "some code;"
       )
       validator.validate(cpg) shouldBe true
     }
@@ -138,10 +138,10 @@ class KeysValidatorTest extends AnyWordSpec with Matchers {
       val validator = new KeysValidator(new ValidationErrorRegistry)
       cpg.graph + (
         NodeTypes.ANNOTATION_LITERAL,
-        NodeKeysOdb.NAME -> "SomeAnnotation",
-        NodeKeysOdb.ORDER -> 1,
-        NodeKeysOdb.ARGUMENT_INDEX -> 1,
-        NodeKeysOdb.CODE -> "some code;"
+        NodeKeys.NAME -> "SomeAnnotation",
+        NodeKeys.ORDER -> 1,
+        NodeKeys.ARGUMENT_INDEX -> 1,
+        NodeKeys.CODE -> "some code;"
       )
       validator.validate(cpg) shouldBe true
     }
