@@ -6,7 +6,7 @@ import better.files.Dsl._
 import better.files.File
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.console.ConsoleConfig
-import overflowdb.OdbConfig
+import overflowdb.Config
 import io.shiftleft.console.LanguageHelper.{cpgGeneratorForLanguage, languageIsKnown}
 
 import scala.util.Try
@@ -66,7 +66,7 @@ class CpgGenerator(config: ConsoleConfig) {
   }
 
   def convertProtoCpgToOverflowDb(srcFilename: String, dstFilename: String): Unit = {
-    val odbConfig = OdbConfig.withDefaults.withStorageLocation(dstFilename)
+    val odbConfig = Config.withDefaults.withStorageLocation(dstFilename)
     val config = CpgLoaderConfig.withDefaults.doNotCreateIndexesOnLoad.withOverflowConfig(odbConfig)
     CpgLoader.load(srcFilename, config).close
     File(srcFilename).delete()

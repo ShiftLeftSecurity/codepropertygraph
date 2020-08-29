@@ -3,7 +3,7 @@ package io.shiftleft.x2cpg
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import org.slf4j.LoggerFactory
-import overflowdb.{OdbConfig, OdbGraph}
+import overflowdb.{Config, Graph}
 
 object X2Cpg {
 
@@ -21,13 +21,13 @@ object X2Cpg {
           logger.info("Output file exists, removing: " + outputPath)
           outFile.delete()
         }
-        OdbConfig.withDefaults.withStorageLocation(outputPath)
+        Config.withDefaults.withStorageLocation(outputPath)
       }
       .getOrElse {
-        OdbConfig.withDefaults()
+        Config.withDefaults()
       }
 
-    val graph = OdbGraph.open(odbConfig,
+    val graph = Graph.open(odbConfig,
                               io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
                               io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava)
     new Cpg(graph)

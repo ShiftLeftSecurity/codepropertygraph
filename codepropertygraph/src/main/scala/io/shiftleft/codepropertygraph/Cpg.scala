@@ -1,9 +1,8 @@
 package io.shiftleft.codepropertygraph
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{edges, nodes}
-import overflowdb.OdbGraph
-import overflowdb.OdbConfig
+import overflowdb.Graph
+import overflowdb.Config
 import overflowdb.traversal.help.TraversalHelp
 
 object Cpg {
@@ -11,9 +10,9 @@ object Cpg {
   /**
     * Syntactic sugar for `new Cpg(graph)`.
     * Usage:
-    *   `Cpg(graph)` or simply `Cpg` if you have an `implicit OdbGraph` in scope
+    *   `Cpg(graph)` or simply `Cpg` if you have an `implicit Graph` in scope
     */
-  def apply(implicit graph: OdbGraph) = new Cpg(graph)
+  def apply(implicit graph: Graph) = new Cpg(graph)
 
   /**
     * Create an empty code property graph
@@ -30,15 +29,15 @@ object Cpg {
     */
   def withStorage(path: String): Cpg =
     new Cpg(
-      OdbGraph.open(OdbConfig.withoutOverflow.withStorageLocation(path),
+      Graph.open(Config.withoutOverflow.withStorageLocation(path),
                     nodes.Factories.allAsJava,
                     edges.Factories.allAsJava))
 
   /**
     * Returns a fresh, empty graph
     */
-  private def emptyGraph: OdbGraph =
-    OdbGraph.open(OdbConfig.withoutOverflow, nodes.Factories.allAsJava, edges.Factories.allAsJava)
+  private def emptyGraph: Graph =
+    Graph.open(Config.withoutOverflow, nodes.Factories.allAsJava, edges.Factories.allAsJava)
 
 }
 
@@ -49,9 +48,7 @@ object Cpg {
   *
   * @param graph the underlying graph. An empty graph is created if this parameter is omitted.
   */
-class Cpg(val graph: OdbGraph = Cpg.emptyGraph) extends AutoCloseable {
-
-  lazy val scalaGraph: ScalaGraph = graph.asScala
+class Cpg(val graph: Graph = Cpg.emptyGraph) extends AutoCloseable {
 
   lazy val help: String =
     new TraversalHelp("io.shiftleft").forTraversalSources

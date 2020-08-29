@@ -42,12 +42,12 @@ object Shared {
     }
 
     val allIdsReferencedByEdges = edges.flatten.flatMap { edge =>
-      Set(edge.src.id2, edge.dst.id2)
+      Set(edge.src.id, edge.dst.id)
     }
 
     val nodeStrings = verticesToDisplay.map { node =>
-      if (allIdsReferencedByEdges.contains(node.id2)) {
-        s""""${node.id2}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
+      if (allIdsReferencedByEdges.contains(node.id)) {
+        s""""${node.id}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
       } else {
         ""
       }
@@ -56,7 +56,7 @@ object Shared {
     val edgeStrings = edges.flatMap { edges: List[Edge] =>
       edges.map(
         edge =>
-          s"""  "${edge.src.id2}" -> "${edge.dst.id2}" """ +
+          s"""  "${edge.src.id}" -> "${edge.dst.id}" """ +
             Some(s""" [ label = "${escape(edge.label)}"] """).filter(_ => edge.label != "").getOrElse(""))
     }
 

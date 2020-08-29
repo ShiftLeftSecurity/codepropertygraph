@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import overflowdb.OdbGraph
+import overflowdb.Graph
 
 import scala.util.Try
 
@@ -32,7 +32,7 @@ object CpgLoader {
     *               specifies the filename. For example, to load the database at "foo.db",
     *               you can issue the following:
     *
-    * val odbConfig = OdbConfig.withDefaults().withStorageLocation(config.spPath)
+    * val odbConfig = Config.withDefaults().withStorageLocation(config.spPath)
     * val config = CpgLoaderConfig().withOverflowConfig(odbConfig)
     * CpgLoader.loadFromOverflowDb(config)
     * */
@@ -97,7 +97,7 @@ private class CpgLoader {
 
   def loadFromOverflowDb(config: CpgLoaderConfig = CpgLoaderConfig()): Cpg = {
     val odbGraph =
-      OdbGraph.open(
+      Graph.open(
         config.overflowDbConfig,
         io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
         io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava

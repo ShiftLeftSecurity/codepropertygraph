@@ -10,7 +10,7 @@ class Tag(val traversal: Traversal[nodes.Tag]) extends AnyVal {
       .in(EdgeTypes.TAGGED_BY)
       .hasLabel(NodeTypes.MEMBER)
       .l
-      .sortBy(_.id2)
+      .sortBy(_.id)
       .to(Traversal) //TODO MP add orderBy/sortBy step
       .cast[nodes.Member]
 
@@ -19,7 +19,7 @@ class Tag(val traversal: Traversal[nodes.Tag]) extends AnyVal {
       .in(EdgeTypes.TAGGED_BY)
       .hasLabel(NodeTypes.METHOD)
       .l
-      .sortBy(_.id2)
+      .sortBy(_.id)
       .to(Traversal) //TODO MP add orderBy/sortBy step
       .cast[nodes.Method]
 
@@ -28,7 +28,7 @@ class Tag(val traversal: Traversal[nodes.Tag]) extends AnyVal {
       .in(EdgeTypes.TAGGED_BY)
       .hasLabel(NodeTypes.METHOD_RETURN)
       .l
-      .sortBy(_.id2)
+      .sortBy(_.id)
       .to(Traversal) //TODO MP add orderBy/sortBy step
       .cast[nodes.MethodReturn]
 
@@ -37,7 +37,7 @@ class Tag(val traversal: Traversal[nodes.Tag]) extends AnyVal {
       .in(EdgeTypes.TAGGED_BY)
       .hasLabel(NodeTypes.METHOD_PARAMETER_IN)
       .l
-      .sortBy(_.id2)
+      .sortBy(_.id)
       .to(Traversal) //TODO MP add orderBy/sortBy step
       .cast[nodes.MethodParameterIn]
 
@@ -46,7 +46,7 @@ class Tag(val traversal: Traversal[nodes.Tag]) extends AnyVal {
       .in(EdgeTypes.TAGGED_BY)
       .hasLabel(NodeTypes.METHOD_PARAMETER_OUT)
       .l
-      .sortBy(_.id2)
+      .sortBy(_.id)
       .to(Traversal) //TODO MP add orderBy/sortBy step
       .cast[nodes.MethodParameterOut]
 
@@ -55,7 +55,7 @@ class Tag(val traversal: Traversal[nodes.Tag]) extends AnyVal {
       .in(EdgeTypes.TAGGED_BY)
       .hasLabel(NodeTypes.CALL)
       .l
-      .sortBy(_.id2)
+      .sortBy(_.id)
       .to(Traversal) //TODO MP add orderBy/sortBy step
       .cast[nodes.Call]
 
@@ -64,7 +64,7 @@ class Tag(val traversal: Traversal[nodes.Tag]) extends AnyVal {
       .in(EdgeTypes.TAGGED_BY)
       .hasLabel(NodeTypes.IDENTIFIER)
       .l
-      .sortBy(_.id2)
+      .sortBy(_.id)
       .to(Traversal) //TODO MP add orderBy/sortBy step
       .cast[nodes.Identifier]
 
@@ -73,7 +73,7 @@ class Tag(val traversal: Traversal[nodes.Tag]) extends AnyVal {
       .in(EdgeTypes.TAGGED_BY)
       .hasLabel(NodeTypes.LITERAL)
       .l
-      .sortBy(_.id2)
+      .sortBy(_.id)
       .to(Traversal) //TODO MP add orderBy/sortBy step
       .cast[nodes.Literal]
 
@@ -82,7 +82,7 @@ class Tag(val traversal: Traversal[nodes.Tag]) extends AnyVal {
       .in(EdgeTypes.TAGGED_BY)
       .hasLabel(NodeTypes.LOCAL)
       .l
-      .sortBy(_.id2)
+      .sortBy(_.id)
       .to(Traversal) //TODO MP add orderBy/sortBy step
       .cast[nodes.Local]
 
@@ -91,7 +91,7 @@ class Tag(val traversal: Traversal[nodes.Tag]) extends AnyVal {
       .in(EdgeTypes.TAGGED_BY)
       .hasLabel(NodeTypes.FILE)
       .l
-      .sortBy(_.id2)
+      .sortBy(_.id)
       .to(Traversal) //TODO MP add orderBy/sortBy step
       .cast[nodes.File]
 

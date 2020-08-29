@@ -122,7 +122,7 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     def allOtherInstancesOf(node: nodes.StoredNode): Set[nodes.StoredNode] = {
       declaration(node).toList
         .flatMap(instances)
-        .filter(_.id2 != node.id2)
+        .filter(_.id != node.id)
         .toSet
     }
 

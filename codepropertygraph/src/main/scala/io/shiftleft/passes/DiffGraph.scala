@@ -1,10 +1,7 @@
 package io.shiftleft.passes
 
 import java.security.MessageDigest
-import java.util
 
-import gnu.trove.set.hash.TCustomHashSet
-import gnu.trove.strategy.IdentityHashingStrategy
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, NewNode, StoredNode}
 import io.shiftleft.proto.cpg.Cpg.{DiffGraph => DiffGraphProto}
@@ -124,11 +121,11 @@ object DiffGraph {
 
     final case class RemoveNode(nodeId: Long) extends Change
     final case class RemoveNodeProperty(nodeId: Long, propertyKey: String) extends Change
-    final case class RemoveEdge(edge: OdbEdge) extends Change
-    final case class RemoveEdgeProperty(edge: OdbEdge, propertyKey: String) extends Change
+    final case class RemoveEdge(edge: Edge) extends Change
+    final case class RemoveEdgeProperty(edge: Edge, propertyKey: String) extends Change
     final case class CreateNode(node: NewNode) extends Change
     final case class SetNodeProperty(node: StoredNode, key: String, value: AnyRef) extends Change
-    final case class SetEdgeProperty(edge: OdbEdge, propertyKey: String, propertyValue: AnyRef) extends Change
+    final case class SetEdgeProperty(edge: Edge, propertyKey: String, propertyValue: AnyRef) extends Change
     final case class CreateEdge(src: CpgNode, dst: CpgNode, label: String, packedProperties: PackedProperties)
         extends Change {
       def properties: Properties = PackedProperties.unpack(packedProperties)
@@ -169,7 +166,7 @@ object DiffGraph {
             case Nil         => throw new AssertionError(s"unable to find edge that is supposed to be removed: $proto")
             case candidates => // found multiple edges - try to disambiguate via propertiesHash
               val wantedPropertiesHash: List[Byte] = proto.getPropertiesHash.toByteArray.toList
-              candidates.filter(edge => propertiesHash(edge.asInstanceOf[OdbEdge]).toList == wantedPropertiesHash) match {
+              candidates.filter(edge => propertiesHash(edge.asInstanceOf[Edge]).toList == wantedPropertiesHash) match {
                 case edge :: Nil => edge
                 case Nil =>
                   throw new AssertionError(
@@ -179,7 +176,7 @@ object DiffGraph {
                     s"unable to disambiguate the edge to be removed, since multiple edges match the filter conditions of $proto. Candidates=$candidates")
               }
           }
-          builder.removeEdge(edge.asInstanceOf[OdbEdge])
+          builder.removeEdge(edge.asInstanceOf[Edge])
         case other => // TODO nasty, i know. sorry. yolo :(
       }
     }
@@ -187,7 +184,7 @@ object DiffGraph {
     builder.build()
   }
 
-  def propertiesHash(edge: OdbEdge): Array[Byte] = {
+  def propertiesHash(edge: Edge): Array[Byte] = {
     val propertiesAsString = edge.propertyMap.asScala.toList.sortBy(_._1).mkString
     MessageDigest.getInstance("MD5").digest(propertiesAsString.getBytes)
   }
@@ -245,24 +242,24 @@ object DiffGraph {
       addEdge(srcNode, dstNode, edgeLabel, properties)
     def addNodeProperty(node: StoredNode, key: String, value: AnyRef): Unit =
       buffer.append(Change.SetNodeProperty(node, key, value))
-    def addEdgeProperty(edge: OdbEdge, key: String, value: AnyRef): Unit =
+    def addEdgeProperty(edge: Edge, key: String, value: AnyRef): Unit =
       buffer.append(Change.SetEdgeProperty(edge, key, value))
     def removeNode(id: Long): Unit =
       buffer.append(Change.RemoveNode(id))
     def removeNode(node: StoredNode): Unit =
-      buffer.append(Change.RemoveNode(node.id2))
-    def removeEdge(edge: OdbEdge): Unit = buffer += Change.RemoveEdge(edge)
+      buffer.append(Change.RemoveNode(node.id))
+    def removeEdge(edge: Edge): Unit = buffer += Change.RemoveEdge(edge)
     def removeNodeProperty(nodeId: Long, propertyKey: String): Unit =
       buffer.append(Change.RemoveNodeProperty(nodeId, propertyKey))
-    def removeEdgeProperty(edge: OdbEdge, propertyKey: String): Unit =
+    def removeEdgeProperty(edge: Edge, propertyKey: String): Unit =
       buffer.append(Change.RemoveEdgeProperty(edge, propertyKey))
   }
 
   abstract class InverseBuilder {
     def onNewNode(node: StoredNode): Unit
-    def onNewEdge(edge: OdbEdge): Unit
+    def onNewEdge(edge: Edge): Unit
     def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String): Unit
-    def onBeforeEdgePropertyChange(edge: OdbEdge, propertyKey: String): Unit
+    def onBeforeEdgePropertyChange(edge: Edge, propertyKey: String): Unit
     def build(): DiffGraph
   }
   object InverseBuilder {
@@ -273,18 +270,18 @@ object DiffGraph {
   class InverseBuilderImpl extends InverseBuilder {
     private val builder = DiffGraph.newBuilder
     def onNewNode(node: StoredNode) = builder.removeNode(node)
-    def onNewEdge(edge: OdbEdge) = builder.removeEdge(edge)
+    def onNewEdge(edge: Edge) = builder.removeEdge(edge)
     def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String) = {
-      val prop = node.property(propertyKey)
+      val prop = node.propertyOption(propertyKey)
       if (prop.isPresent)
-        builder.addNodeProperty(node, propertyKey, node.property(propertyKey).value())
+        builder.addNodeProperty(node, propertyKey, prop.get())
       else
-        builder.removeNodeProperty(node.id2, propertyKey)
+        builder.removeNodeProperty(node.id, propertyKey)
     }
-    def onBeforeEdgePropertyChange(edge: OdbEdge, propertyKey: String) = {
-      val prop = edge.property(propertyKey)
+    def onBeforeEdgePropertyChange(edge: Edge, propertyKey: String) = {
+      val prop = edge.propertyOption(propertyKey)
       if (prop.isPresent)
-        builder.addEdgeProperty(edge, propertyKey, edge.property(propertyKey).value())
+        builder.addEdgeProperty(edge, propertyKey, prop.get)
       else
         builder.removeEdgeProperty(edge, propertyKey)
     }
@@ -294,14 +291,13 @@ object DiffGraph {
 
   object NoopInverseBuilder extends InverseBuilder {
     def onNewNode(node: StoredNode) = ()
-    def onNewEdge(edge: OdbEdge) = ()
+    def onNewEdge(edge: Edge) = ()
     def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String) = ()
-    def onBeforeEdgePropertyChange(edge: OdbEdge, propertyKey: String) = ()
+    def onBeforeEdgePropertyChange(edge: Edge, propertyKey: String) = ()
     def build(): DiffGraph = EmptyChangeSet
   }
 
-  private class Applier(diffGraph: DiffGraph, graph: OdbGraph, undoable: Boolean, keyPool: Option[KeyPool]) {
-    import Applier.InternalProperty
+  private class Applier(diffGraph: DiffGraph, graph: Graph, undoable: Boolean, keyPool: Option[KeyPool]) {
     private val overlayNodeToOdbNode = new java.util.IdentityHashMap[NewNode, StoredNode]()
     private val deferredInitList = mutable.ArrayDeque[NewNode]()
     val inverseBuilder: InverseBuilder = if (undoable) InverseBuilder.newBuilder else InverseBuilder.noop
@@ -342,10 +338,10 @@ object DiffGraph {
           case Change.RemoveEdge(edge)                      => edge.remove()
           case Change.RemoveEdgeProperty(edge, propertyKey) =>
             //deprecate?
-            edge.property(propertyKey).remove()
-          case Change.RemoveNode(nodeId) => graph.vertices(nodeId).next().remove()
+            edge.removeProperty(propertyKey)
+          case Change.RemoveNode(nodeId) => graph.node(nodeId).remove()
           case Change.RemoveNodeProperty(nodeId, propertyKey) =>
-            graph.vertices(nodeId).next.property(propertyKey).remove()
+            graph.node(nodeId).removeProperty(propertyKey)
         }
         drainDeferred()
       }
@@ -357,7 +353,7 @@ object DiffGraph {
       )
     }
 
-    private def addEdgeProperty(edge: OdbEdge, key: String, value: AnyRef, inverseBuilder: DiffGraph.InverseBuilder) = {
+    private def addEdgeProperty(edge: Edge, key: String, value: AnyRef, inverseBuilder: DiffGraph.InverseBuilder) = {
       inverseBuilder.onBeforeEdgePropertyChange(edge, key)
       edge.setProperty(key, value)
     }
@@ -394,7 +390,7 @@ object DiffGraph {
       properties.foreach {
         case (key, value) =>
           inverseBuilder.onBeforeEdgePropertyChange(odbEdge, key)
-          odbEdge.property(key, value)
+          odbEdge.setProperty(key, value)
       }
     }
     private def tryAddNodeInit(node: NewNode): Unit = {
@@ -421,12 +417,12 @@ object DiffGraph {
       applier.run()
     }
 
-    def applyDiff(diff: DiffGraph, graph: OdbGraph, undoable: Boolean, keyPool: Option[KeyPool]): AppliedDiffGraph = {
+    def applyDiff(diff: DiffGraph, graph: Graph, undoable: Boolean, keyPool: Option[KeyPool]): AppliedDiffGraph = {
       val applier = new Applier(diff, graph, undoable, keyPool)
       applier.run()
     }
 
-    def unapplyDiff(graph: OdbGraph, inverseDiff: DiffGraph): Unit = {
+    def unapplyDiff(graph: Graph, inverseDiff: DiffGraph): Unit = {
       val applier = new Applier(inverseDiff, graph, undoable = false, keyPool = None)
       applier.run()
     }
@@ -438,7 +434,7 @@ object DiffGraph {
     def properties: Seq[(String, AnyRef)]
   }
   case class NodeProperty(node: StoredNode, propertyKey: String, propertyValue: AnyRef)
-  case class EdgeProperty(edge: OdbEdge, propertyKey: String, propertyValue: AnyRef)
+  case class EdgeProperty(edge: Edge, propertyKey: String, propertyValue: AnyRef)
   case class EdgeInDiffGraph(src: NewNode, dst: NewNode, label: String, properties: Properties) extends DiffEdge
   case class EdgeToOriginal(src: NewNode, dst: StoredNode, label: String, properties: Properties) extends DiffEdge
   case class EdgeFromOriginal(src: StoredNode, dst: NewNode, label: String, properties: Properties) extends DiffEdge

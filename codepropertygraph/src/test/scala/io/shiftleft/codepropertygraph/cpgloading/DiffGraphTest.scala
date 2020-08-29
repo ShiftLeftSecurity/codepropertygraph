@@ -134,7 +134,7 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
     }
   }
 
-  def withTestOdb[T](f: OdbGraph => T): T = {
+  def withTestOdb[T](f: Graph => T): T = {
     val graph = OverflowDbTestInstance.create
     try f(graph)
     finally graph.close()
@@ -142,7 +142,7 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
 
   def createNewNode(code: String) = nodes.NewUnknown(code = code)
 
-  def makeEdgeBetweenExistingNodes(graph: OdbGraph, diff: DiffGraph.Builder, codeA: String, codeB: String) = {
+  def makeEdgeBetweenExistingNodes(graph: Graph, diff: DiffGraph.Builder, codeA: String, codeB: String) = {
     val a = graph.V.has(NodeKeysOdb.CODE, codeA).head
     val b = graph.V.has(NodeKeysOdb.CODE, codeB).head
     diff.addEdge(a.asInstanceOf[nodes.StoredNode], b.asInstanceOf[nodes.StoredNode], EdgeTypes.AST)

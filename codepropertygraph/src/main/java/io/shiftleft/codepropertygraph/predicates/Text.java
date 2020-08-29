@@ -1,7 +1,5 @@
 package io.shiftleft.codepropertygraph.predicates;
 
-import org.apache.tinkerpop.gremlin.process.traversal.P;
-
 import java.util.function.BiPredicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

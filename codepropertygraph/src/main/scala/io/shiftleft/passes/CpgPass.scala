@@ -152,6 +152,6 @@ case class AppliedDiffGraph(diffGraph: DiffGraph,
     * Obtain the id this node has in the applied graph
     * */
   def nodeToGraphId(node: NewNode): JLong = {
-    nodeToOdbNode.get(node).id2
+    nodeToOdbNode.get(node).id
   }
 }

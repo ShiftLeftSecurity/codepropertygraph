@@ -4,7 +4,7 @@ import java.io.File
 
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.cpgvalidator.validators.CpgValidator
-import overflowdb.OdbConfig
+import overflowdb.Config
 
 object CpgValidatorMain extends App {
   case class Config(cpgPath: String, isOldProtoCpg: Boolean = false)
@@ -30,7 +30,7 @@ object CpgValidatorMain extends App {
       else
         CpgLoader.loadFromOverflowDb(
           CpgLoaderConfig.withoutOverflow.doNotCreateIndexesOnLoad
-            .withOverflowConfig(OdbConfig.withoutOverflow.withStorageLocation(config.cpgPath)))
+            .withOverflowConfig(Config.withoutOverflow.withStorageLocation(config.cpgPath)))
 
     val errorRegistry = new ValidationErrorRegistry
     val validator = new CpgValidator(errorRegistry)

@@ -1,11 +1,11 @@
 package io.shiftleft
 
 import io.shiftleft.codepropertygraph.generated.{edges, nodes}
-import overflowdb.{OdbConfig, OdbGraph}
+import overflowdb.{Config, Graph}
 
 object OverflowDbTestInstance {
 
   def create =
-    OdbGraph.open(OdbConfig.withoutOverflow, nodes.Factories.allAsJava, edges.Factories.allAsJava)
+    Graph.open(Config.withoutOverflow, nodes.Factories.allAsJava, edges.Factories.allAsJava)
 
 }
