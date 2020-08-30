@@ -12,7 +12,7 @@ trait DummyNodeImpl extends StoredNode {
   def property[A](x$1: overflowdb.PropertyKey[A]): A = ???
   def property(x$1: String): Object = ???
   def propertyKeys(): java.util.Set[String] = ???
-  def propertyMap(): java.util.Map[String,Object] = ???
+  def propertyMap(): java.util.Map[String, Object] = ???
   def propertyOption(x$1: String): java.util.Optional[Object] = ???
   def propertyOption[A](x$1: overflowdb.PropertyKey[A]): java.util.Optional[A] = ???
   def remove(): Unit = ???
@@ -25,9 +25,9 @@ trait DummyNodeImpl extends StoredNode {
   def canEqual(that: Any): Boolean = ???
 
   // Members declared in overflowdb.Node
-  def addEdge(x$1: String, x$2: overflowdb.Node, x$3: java.util.Map[String,Object]): overflowdb.Edge = ???
+  def addEdge(x$1: String, x$2: overflowdb.Node, x$3: java.util.Map[String, Object]): overflowdb.Edge = ???
   def addEdge(x$1: String, x$2: overflowdb.Node, x$3: Object*): overflowdb.Edge = ???
-  def addEdgeSilent(x$1: String, x$2: overflowdb.Node, x$3: java.util.Map[String,Object]): Unit = ???
+  def addEdgeSilent(x$1: String, x$2: overflowdb.Node, x$3: java.util.Map[String, Object]): Unit = ???
   def addEdgeSilent(x$1: String, x$2: overflowdb.Node, x$3: Object*): Unit = ???
   def both(x$1: String*): java.util.Iterator[overflowdb.Node] = ???
   def both(): java.util.Iterator[overflowdb.Node] = ???
@@ -49,5 +49,5 @@ trait DummyNodeImpl extends StoredNode {
 
   // Members declared in io.shiftleft.codepropertygraph.generated.nodes.StoredNode
   def productElementLabel(n: Int): String = ???
-  def valueMap: java.util.Map[String,AnyRef] = ???
+  def valueMap: java.util.Map[String, AnyRef] = ???
 }
