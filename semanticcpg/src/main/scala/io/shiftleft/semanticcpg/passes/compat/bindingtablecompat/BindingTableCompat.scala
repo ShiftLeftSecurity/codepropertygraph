@@ -8,8 +8,6 @@ import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal._
 
-import scala.jdk.CollectionConverters._
-
 /**
   * Compatibility pass which calculates missing binding tables.
   * Prerequisite: Linking, but not yet call linking, must be done.
@@ -20,7 +18,7 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val diffGraph = DiffGraph.newBuilder
 
-    if (cpg.graph.traversal.V().hasLabel(NodeTypes.BINDING).asScala.isEmpty) {
+    if (cpg.graph.nodes(NodeTypes.BINDING).isEmpty) {
       cpg.typeDecl.foreach { typeDecl =>
         val nonConstructorMethods = getNonConstructorMethodsTransitive(typeDecl, Set.empty)
         nonConstructorMethods.foreach(createBinding(typeDecl, diffGraph))

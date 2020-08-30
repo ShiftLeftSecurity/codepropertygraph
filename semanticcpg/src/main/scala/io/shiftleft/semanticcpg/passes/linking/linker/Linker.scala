@@ -1,15 +1,13 @@
 package io.shiftleft.semanticcpg.passes.linking.linker
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated._
+import io.shiftleft.codepropertygraph.generated.{NodeKeyNames, _}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
 import overflowdb.traversal._
-import io.shiftleft.codepropertygraph.generated.NodeKeyNames
 
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
 
 /**
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
@@ -121,7 +119,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def initMaps(): Unit = {
-    cpg.graph.graph.vertices().asScala.foreach {
+    cpg.graph.nodes.foreach {
       case node: nodes.TypeDecl       => typeDeclFullNameToNode += node.fullName -> node
       case node: nodes.Type           => typeFullNameToNode += node.fullName -> node
       case node: nodes.Method         => methodFullNameToNode += node.fullName -> node
@@ -214,7 +212,7 @@ object Linker {
       // If the source node does not have any outgoing edges of this type
       // This check is just required for backward compatibility
       if (srcNode.outE(edgeType).isEmpty) {
-        srcNode.propertyOption(PropertyKey[String](dstFullNameKey)).foreach { dstFullName =>
+        srcNode.propertyOption(new PropertyKey[String](dstFullNameKey)).ifPresent { dstFullName =>
           // for `UNKNOWN` this is not always set, so we're using an Option here
           val srcStoredNode = srcNode.asInstanceOf[nodes.StoredNode]
           dstNodeMap.get(dstFullName) match {
@@ -230,7 +228,7 @@ object Linker {
         }
       } else {
         srcNode.out(edgeType).property(NodeKeys.FULL_NAME).nextOption match {
-          case Some(dstFullName) => srcNode.property(dstFullNameKey, dstFullName)
+          case Some(dstFullName) => srcNode.setProperty(dstFullNameKey, dstFullName)
           case None              => logger.warn(s"Missing outgoing edge of type ${edgeType} from node ${srcNode}")
         }
         if (!loggedDeprecationWarning) {

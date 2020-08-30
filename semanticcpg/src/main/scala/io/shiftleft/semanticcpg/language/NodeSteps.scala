@@ -74,7 +74,7 @@ class NodeSteps[NodeType <: nodes.StoredNode](val traversal: Traversal[NodeType]
   private def _dump(highlight: Boolean): List[String] = {
     var language: Option[String] = null // initialized on first element - need the graph for this
     traversal.map { node =>
-      if (language == null) language = new Cpg(node.graph2()).metaData.language.headOption
+      if (language == null) language = new Cpg(node.graph).metaData.language.headOption
       CodeDumper.dump(node.location, language, highlight)
     }.l
   }

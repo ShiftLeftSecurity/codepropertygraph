@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.codepropertygraph.generated.nodes.HasIsExternal
-import overflowdb.Node
+import overflowdb._
 import overflowdb.traversal.Traversal
 
 class IsExternalAccessors[A <: Node with HasIsExternal](val traversal: Traversal[A]) extends AnyVal {

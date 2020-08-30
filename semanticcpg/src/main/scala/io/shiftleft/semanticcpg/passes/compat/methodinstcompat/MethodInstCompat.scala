@@ -29,7 +29,7 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
         call.methodInstFullName.foreach { methodInstFullName =>
           methodInstFullNameToMethodFullName.get(methodInstFullName) match {
             case Some(methodFullName) =>
-              call.setProperty2(NodeKeys.METHOD_FULL_NAME -> methodFullName)
+              call.setProperty(NodeKeys.METHOD_FULL_NAME -> methodFullName)
             case None =>
               MethodInstCompat.logger.warn(
                 s"Unable to find method full name by " +
@@ -43,7 +43,7 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
         methodRef.methodInstFullName.foreach { methodInstFullName =>
           methodInstFullNameToMethodFullName.get(methodInstFullName) match {
             case Some(methodFullName) =>
-              methodRef.setProperty2(NodeKeys.METHOD_FULL_NAME -> methodFullName)
+              methodRef.setProperty(NodeKeys.METHOD_FULL_NAME -> methodFullName)
             case None =>
               MethodInstCompat.logger.warn(
                 s"Unable to find method full name by " +

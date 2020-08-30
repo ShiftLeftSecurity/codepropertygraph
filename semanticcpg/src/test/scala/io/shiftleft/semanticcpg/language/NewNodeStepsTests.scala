@@ -32,7 +32,7 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
       implicit val diffGraphBuilder = DiffGraph.newBuilder
       val cpg = Cpg.emptyCpg
       val existingContainedNode = cpg.graph.addNode(42L, "MODIFIER").asInstanceOf[nodes.StoredNode]
-      existingContainedNode.property(NodeKeyNames.MODIFIER_TYPE, ModifierTypes.NATIVE)
+      existingContainedNode.setProperty(NodeKeyNames.MODIFIER_TYPE, ModifierTypes.NATIVE)
       cpg.graph.V().asScala.toSet shouldBe Set(existingContainedNode)
 
       val newContainedNode = newTestNode()
