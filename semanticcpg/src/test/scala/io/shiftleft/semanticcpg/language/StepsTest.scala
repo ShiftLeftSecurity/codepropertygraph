@@ -8,7 +8,6 @@ import org.json4s.native.JsonMethods.parse
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.traversal._
-import scala.collection.mutable
 
 class StepsTest extends AnyWordSpec with Matchers {
 
