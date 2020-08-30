@@ -1,5 +1,7 @@
 package io.shiftleft.passes
 
+import java.util.Optional
+
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
@@ -81,7 +83,7 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
 
       // 3) remove node property
       DiffGraph.Applier.applyDiff(addNodePropertyInverse, cpg)
-      additionalNode.propertyOption(NodeKeys.CODE) shouldBe None
+      additionalNode.propertyOption(NodeKeys.CODE) shouldBe Optional.empty
 
       // 2) remove edges - they don't have ids and are therefor disambiguated by their property hash
       DiffGraph.Applier.applyDiff(addEdge2Inverse, cpg)
