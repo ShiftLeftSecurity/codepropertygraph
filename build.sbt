@@ -48,7 +48,7 @@ name := "codepropertygraph"
 publish / skip := true
 
 // parsed by project/Utils.scala
-val fuzzyc2cpgVersion = "7c3403711bf31ed553f89f2c60b8b2c6a241f82d"
+val fuzzyc2cpgVersion = "65ab85bacfaa7405fd65d92d0e87355d59fb1870"
 
 lazy val codepropertygraph = Projects.codepropertygraph
 lazy val protoBindings = Projects.protoBindings
