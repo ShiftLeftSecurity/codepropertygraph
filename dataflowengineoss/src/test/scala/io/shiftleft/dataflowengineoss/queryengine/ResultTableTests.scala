@@ -1,10 +1,10 @@
 package io.shiftleft.dataflowengineoss.queryengine
 
+import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.testing.MockCpg
-import io.shiftleft.semanticcpg.language._
 
 class ResultTableTests extends AnyWordSpec with Matchers {
 
@@ -27,7 +27,7 @@ class ResultTableTests extends AnyWordSpec with Matchers {
       table.add(node1, res2)
       table.get(node1) match {
         case Some(results) =>
-          results.flatMap(_.path.map(_.node.id2)) shouldBe List(node1.id2, node2.id2)
+          results.flatMap(_.path.map(_.node.id)) shouldBe List(node1.id, node2.id)
         case None => fail
       }
     }
@@ -56,7 +56,7 @@ class ResultTableTests extends AnyWordSpec with Matchers {
       table.add(pivotNode, List(ReachableByResult(pathContainingPivot)))
       table.createFromTable(pathFromPivot) match {
         case Some(List(ReachableByResult(path, _, _))) =>
-          path.map(_.node.id2) shouldBe List(node4.id2, pivotNode.id2, node1.id2)
+          path.map(_.node.id) shouldBe List(node4.id, pivotNode.id, node1.id)
         case None => fail
       }
     }

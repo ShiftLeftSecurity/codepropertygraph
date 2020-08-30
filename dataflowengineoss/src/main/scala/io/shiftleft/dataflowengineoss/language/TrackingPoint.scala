@@ -38,12 +38,13 @@ class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVa
 
   private def reachableByInternal[NodeType <: nodes.TrackingPoint](sourceTravs: Seq[Traversal[NodeType]])(
       implicit context: EngineContext): List[ReachableByResult] = {
-    val sourceSymbols = sourceTravs
-      .flatMap(_.toList)
-      .collect { case n: nodes.TrackingPoint => n }
-      .toList
+    val sources: List[nodes.TrackingPoint] =
+      sourceTravs
+        .flatMap(_.toList)
+        .collect { case n: nodes.TrackingPoint => n }
+        .toList
 
-    val sinks = raw.clone.dedup.toList.sortBy(_.id2)
+    val sinks = traversal.dedup.toList.sortBy(_.id)
 
     new Engine(context).backwards(sinks, sources)
   }
