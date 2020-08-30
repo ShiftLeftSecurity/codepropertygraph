@@ -80,9 +80,7 @@ class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator
     }
   }
 
-  private def validateAllInEdgesTypes(dstNode: Node,
-                                      actualEdges: List[Edge],
-                                      allowedEdgeTypes: List[String]): Unit = {
+  private def validateAllInEdgesTypes(dstNode: Node, actualEdges: List[Edge], allowedEdgeTypes: List[String]): Unit = {
     val invalidEdges = actualEdges.filter(
       actualEdge => !allowedEdgeTypes.contains(actualEdge.label)
     )

@@ -29,9 +29,8 @@ object Cpg {
     */
   def withStorage(path: String): Cpg =
     new Cpg(
-      Graph.open(Config.withoutOverflow.withStorageLocation(path),
-                    nodes.Factories.allAsJava,
-                    edges.Factories.allAsJava))
+      Graph
+        .open(Config.withoutOverflow.withStorageLocation(path), nodes.Factories.allAsJava, edges.Factories.allAsJava))
 
   /**
     * Returns a fresh, empty graph

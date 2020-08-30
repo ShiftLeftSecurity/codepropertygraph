@@ -102,9 +102,7 @@ class OutFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validato
     }
   }
 
-  private def validateAllOutEdgesTypes(srcNode: Node,
-                                       actualEdges: List[Edge],
-                                       allowedEdgeTypes: List[String]): Unit = {
+  private def validateAllOutEdgesTypes(srcNode: Node, actualEdges: List[Edge], allowedEdgeTypes: List[String]): Unit = {
     val invalidEdges = actualEdges.filter(
       actualEdge => !allowedEdgeTypes.contains(actualEdge.label)
     )

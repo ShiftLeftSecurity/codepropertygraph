@@ -36,8 +36,8 @@ class ProtoToCpg(overflowConfig: Config = Config.withoutOverflow) {
   private val nodeFilter = new NodeFilter
   private val odbGraph =
     Graph.open(overflowConfig,
-                  io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
-                  io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava)
+               io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
+               io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava)
   // TODO use centralised string interner everywhere, maybe move to odb core - keep in mind strong references / GC.
   implicit private val interner: StringInterner = StringInterner.makeStrongInterner()
 

@@ -28,8 +28,8 @@ object X2Cpg {
       }
 
     val graph = Graph.open(odbConfig,
-                              io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
-                              io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava)
+                           io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
+                           io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava)
     new Cpg(graph)
   }
 
