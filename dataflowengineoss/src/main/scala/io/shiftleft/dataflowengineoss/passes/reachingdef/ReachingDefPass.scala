@@ -14,7 +14,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
   override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
     val problem = ReachingDefProblem.create(method)
-    val solution = new DataFlowSolver().calculateMopSolution(problem)
+    val solution = new DataFlowSolver().calculateMopSolutionForwards(problem)
     val dstGraph = addReachingDefEdges(method, solution)
     Iterator(dstGraph.build())
   }
