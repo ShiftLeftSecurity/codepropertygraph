@@ -49,7 +49,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
             case (use, ins) =>
               ins.foreach { in =>
                 if (in.node != use) {
-                  val edgeLabel = Some(in)
+                  val edgeLabel = Some(in.node)
                     .filter(_.isInstanceOf[nodes.CfgNode])
                     .map(_.asInstanceOf[nodes.CfgNode].code)
                     .getOrElse("")
