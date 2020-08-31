@@ -583,3 +583,71 @@ class CDataFlowTests15 extends DataFlowCodeToCpgSuite {
     )
   }
 }
+
+class CDataFlowTests16 extends DataFlowCodeToCpgSuite {
+  override val code = """
+
+  int bar() {
+    int x = source();
+    foo(x);
+  }
+
+  void foo(int y) {
+    sink(y);
+  }
+
+  """.stripMargin
+
+  "Test 16: find source in caller" in {
+    val source = cpg.call("source")
+    val sink = cpg.call("sink").argument(1)
+    sink.reachableByFlows(source).l.map(flowToResultPairs).toSet shouldBe Set(
+      List(("source()", Some(4)),
+           ("x = source()", Some(4)),
+           ("foo(x)", Some(5)),
+           ("foo(int y)", Some(8)),
+           ("sink(y)", Some(9))))
+  }
+}
+
+class CDataFlowTests17 extends DataFlowCodeToCpgSuite {
+  override val code = """
+
+  int bar() {
+    return source();
+  }
+
+  void foo(int y) {
+    int y = bar();
+    sink(y);
+  }
+
+  """.stripMargin
+
+  "Test 17.1: find source in callee" in {
+    val source = cpg.call("source")
+    val sink = cpg.call("sink").argument(1)
+    sink.reachableByFlows(source).l.map(flowToResultPairs).toSet shouldBe Set(
+      List(("source()", Some(4)),
+           ("return source();", Some(4)),
+           ("RET", Some(3)),
+           ("bar()", Some(8)),
+           ("y = bar()", Some(8)),
+           ("sink(y)", Some(9)))
+    )
+  }
+
+  "Test 17.2 : allow using formal parameters as sink" in {
+    val source = cpg.call("source")
+    val sink = cpg.method("sink").parameter.index(1)
+    sink.reachableByFlows(source).l.map(flowToResultPairs).toSet shouldBe Set(
+      List(("source()", Some(4)),
+           ("return source();", Some(4)),
+           ("RET", Some(3)),
+           ("bar()", Some(8)),
+           ("y = bar()", Some(8)),
+           ("sink(y)", Some(9)),
+           ("sink(p1)", None))
+    )
+  }
+}

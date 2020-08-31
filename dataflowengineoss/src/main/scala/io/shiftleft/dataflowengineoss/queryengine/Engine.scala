@@ -14,11 +14,13 @@ private case class ReachableByTask(sink: nodes.TrackingPoint, sources: Set[nodes
 
 class Engine(context: EngineContext) {
 
+  import Engine._
+
   val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   var numberOfTasksRunning: Int = 0
   val executorService: ExecutorService = Executors.newWorkStealingPool()
-  val completionService = new ExecutorCompletionService[List[ReachableByResult]](executorService)
+  val completionService = new ExecutorCompletionService[(List[ReachableByResult], Int)](executorService)
 
   /**
     * Determine flows from sources to sinks by analyzing backwards from sinks.
@@ -28,7 +30,7 @@ class Engine(context: EngineContext) {
 
     sinks
       .map(sink => ReachableByTask(sink, sourcesSet, new ResultTable))
-      .foreach(task => submitTask(task))
+      .foreach(task => submitTask(task, callDepth = 0))
 
     var result = List[ReachableByResult]()
 
@@ -36,9 +38,12 @@ class Engine(context: EngineContext) {
       Try {
         completionService.take.get
       } match {
-        case Success(resultsOfTask) =>
+        case Success((resultsOfTask, callDepth)) =>
           numberOfTasksRunning -= 1
           result ++= resultsOfTask.filter(!_.partial)
+
+          submitTasksForPartialFlows(resultsOfTask, sourcesSet, callDepth)
+          submitTasksForUnresolvedOutArgs(resultsOfTask, sourcesSet, callDepth)
 
         case Failure(exception) =>
           numberOfTasksRunning -= 1
@@ -48,9 +53,69 @@ class Engine(context: EngineContext) {
     result
   }
 
-  private def submitTask(task: ReachableByTask, path: List[PathElement] = List()): Unit = {
+  private def submitTasksForPartialFlows(resultsOfTask: List[ReachableByResult],
+                                         sourcesSet: Set[nodes.TrackingPoint],
+                                         callDepth: Int): Unit = {
+    val pathsFromParams = resultsOfTask
+      .filter(_.partial)
+      .map(x => x.path)
+    pathsFromParams.foreach { path =>
+      val param = path.head.node
+      Some(param).collect {
+        case p: nodes.MethodParameterIn =>
+          val args = paramToArgs(p)
+          args.foreach { arg =>
+            submitTask(ReachableByTask(arg, sourcesSet, new ResultTable), path, callDepth)
+          }
+      }
+    }
+  }
+
+  private def submitTasksForUnresolvedOutArgs(resultsOfTask: List[ReachableByResult],
+                                              sourceSet: Set[nodes.TrackingPoint],
+                                              callDepth: Int): Unit = {
+
+    val outArgsAndCalls = resultsOfTask
+      .map(x => (x.unresolvedArgs.collect { case e: nodes.Expression => e }, x.path))
+      .distinct
+
+    val forCalls: List[(nodes.TrackingPoint, List[PathElement])] = outArgsAndCalls.flatMap {
+      case (args, path) =>
+        val outCalls = args.collect { case n: nodes.Call => n }
+        val methodReturns = outCalls
+          .flatMap { call =>
+            NoResolve.getCalledMethods(call)
+          }
+          .start
+          .methodReturn
+          .l
+        methodReturns.map { ret =>
+          (ret, path)
+        }
+    }
+
+    val forArgs: List[(nodes.TrackingPoint, List[PathElement])] = outArgsAndCalls.flatMap {
+      case (args, path) =>
+        args.flatMap { arg =>
+          argToMethods(arg).start.parameter.asOutput
+            .order(arg.order)
+            .map { p =>
+              (p, path)
+            }
+            .l
+        }
+    }
+
+    (forCalls ++ forArgs).foreach {
+      case (p: nodes.TrackingPoint, path: List[PathElement]) =>
+        val task = ReachableByTask(p, sourceSet, new ResultTable)
+        submitTask(task, path = path, callDepth = callDepth)
+    }
+  }
+
+  private def submitTask(task: ReachableByTask, path: List[PathElement] = List(), callDepth: Int): Unit = {
     numberOfTasksRunning += 1
-    completionService.submit(new ReachableByCallable(task, context, path))
+    completionService.submit(new ReachableByCallable(task, context.copy(callDepth = callDepth + 1), path))
   }
 
 }
@@ -81,20 +146,24 @@ object Engine {
 
 }
 
-case class EngineContext(semantics: Semantics, config: EngineConfig = EngineConfig())
-case class EngineConfig()
+case class EngineContext(semantics: Semantics, config: EngineConfig = EngineConfig(), callDepth: Int = 0)
+case class EngineConfig(maxCallDepth: Int = 4)
 
 private class ReachableByCallable(task: ReachableByTask,
                                   context: EngineContext,
                                   initialPath: List[PathElement] = List())
-    extends Callable[List[ReachableByResult]] {
+    extends Callable[(List[ReachableByResult], Int)] {
 
   import Engine._
 
-  override def call(): List[ReachableByResult] = {
-    implicit val sem: Semantics = context.semantics
-    results(List(PathElement(task.sink)) ++ initialPath, task.sources, task.table)
-    task.table.get(task.sink).get
+  override def call(): (List[ReachableByResult], Int) = {
+    if (context.callDepth > context.config.maxCallDepth) {
+      (List(), context.callDepth)
+    } else {
+      implicit val sem: Semantics = context.semantics
+      results(List(PathElement(task.sink)) ++ initialPath, task.sources, task.table)
+      (task.table.get(task.sink).get, context.callDepth)
+    }
   }
 
   /**
