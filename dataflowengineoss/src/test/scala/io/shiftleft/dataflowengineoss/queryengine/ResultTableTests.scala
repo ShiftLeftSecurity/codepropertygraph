@@ -55,7 +55,7 @@ class ResultTableTests extends AnyWordSpec with Matchers {
       val table = new ResultTable
       table.add(pivotNode, List(ReachableByResult(pathContainingPivot)))
       table.createFromTable(pathFromPivot) match {
-        case Some(List(ReachableByResult(path, _))) =>
+        case Some(List(ReachableByResult(path, _, _))) =>
           path.map(_.node.id2) shouldBe List(node4.id2, pivotNode.id2, node1.id2)
         case None => fail
       }

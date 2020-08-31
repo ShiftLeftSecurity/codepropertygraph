@@ -43,13 +43,14 @@ class ResultTable {
 }
 
 /**
-  * A partial result, informing about a path that exists from a source to another
+  * A (partial) result, informing about a path that exists from a source to another
   * node in the graph.
   *
   * @param path this is the main result - a known path
-  *
+  * @param partial indicate whether this result stands on its own or requires further analysis,
+  *                e.g., by expanding output arguments backwards into method output parameters.
   * */
-case class ReachableByResult(path: List[PathElement], partial: Boolean = false) {
+case class ReachableByResult(path: List[PathElement], callDepth: Int = 0, partial: Boolean = false) {
   def source: nodes.TrackingPoint = path.head.node
 
   def unresolvedArgs: List[nodes.TrackingPoint] =
