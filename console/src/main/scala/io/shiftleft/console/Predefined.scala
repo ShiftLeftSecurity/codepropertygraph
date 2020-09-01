@@ -5,7 +5,6 @@ object Predefined {
   /* ammonite tab completion is partly broken for scala > 2.12.8
    * applying workaround for package wildcard imports from https://github.com/lihaoyi/Ammonite/issues/1009 */
   val shared: String = """
-        |import gremlin.scala.{`package` => _, _}
         |import io.shiftleft.console.{`package` => _, _}
         |import io.shiftleft.codepropertygraph.Cpg
         |import io.shiftleft.codepropertygraph.cpgloading._
