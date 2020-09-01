@@ -70,9 +70,6 @@ object ExpandTo {
   def methodToTypeDecl(method: nodes.Method): Option[nodes.TypeDecl] =
     findVertex(method, _.isInstanceOf[nodes.TypeDecl]).map(_.asInstanceOf[nodes.TypeDecl])
 
-  def methodToFile(method: nodes.Method): Option[nodes.File] =
-    findVertex(method, _.isInstanceOf[nodes.File]).map(_.asInstanceOf[nodes.File])
-
   @tailrec
   private def findVertex(node: nodes.StoredNode, instanceCheck: nodes.StoredNode => Boolean): Option[nodes.StoredNode] =
     node._astIn.nextOption match {

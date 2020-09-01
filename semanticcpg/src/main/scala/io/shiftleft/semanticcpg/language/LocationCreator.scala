@@ -16,10 +16,9 @@ object LocationCreator {
     try {
       location(node)
     } catch {
-      case exc @ (_: NoSuchElementException | _: ClassCastException) => {
+      case exc @ (_: NoSuchElementException | _: ClassCastException) =>
         logger.error(s"Cannot determine location for ${node.label} due to broken CPG", exc)
         emptyLocation(node.label, Some(node))
-      }
     }
   }
 
@@ -112,11 +111,13 @@ object LocationCreator {
     }
   }
 
-  def apply(node: nodes.CpgNode,
-            symbol: String,
-            label: String,
-            lineNumber: Option[Integer],
-            method: nodes.Method): nodes.NewLocation = {
+  def apply(
+      node: nodes.CpgNode,
+      symbol: String,
+      label: String,
+      lineNumber: Option[Integer],
+      method: nodes.Method
+  ): nodes.NewLocation = {
 
     if (method == null) {
       nodes.NewLocation("", "", "", "", None, "", "", "", "", Some(node))
@@ -132,9 +133,6 @@ object LocationCreator {
       } yield namespace.name
       val namespaceName = namespaceOption.getOrElse("")
 
-      val fileOption = ExpandTo.methodToFile(method)
-      val fileName = fileOption.map(_.name).getOrElse("N/A")
-
       nodes.NewLocation(
         symbol = symbol,
         methodFullName = method.fullName,
@@ -144,7 +142,7 @@ object LocationCreator {
         className = typeName,
         classShortName = typeShortName,
         nodeLabel = label,
-        filename = fileName,
+        filename = if (method.filename.isEmpty) "N/A" else method.filename,
         node = Some(node)
       )
     }
