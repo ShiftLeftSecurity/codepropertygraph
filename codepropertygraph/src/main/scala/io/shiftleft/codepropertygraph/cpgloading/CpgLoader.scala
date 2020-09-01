@@ -1,10 +1,13 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
+import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import overflowdb.OdbGraph
+
+import scala.util.Try
 
 object CpgLoader {
 
@@ -56,6 +59,26 @@ object CpgLoader {
 
   def addDiffGraphs(diffGraphFilenames: Seq[String], cpg: Cpg): Unit =
     new CpgLoader().addDiffGraphs(diffGraphFilenames, cpg)
+
+  /**
+    * Determine whether the CPG is a legacy (proto) CPG
+    *
+    * @param filename name of the file to probe
+    * */
+  def isLegacyCpg(filename: String): Boolean =
+    isLegacyCpg(File(filename))
+
+  /**
+    * Determine whether the CPG is a legacy (proto) CPG
+    *
+    * @param file file to probe
+    * */
+  def isLegacyCpg(file: File): Boolean = {
+    val bytes = file.bytes
+    Try {
+      bytes.next() == 'P' && bytes.next() == 'K'
+    }.getOrElse(false)
+  }
 
 }
 
