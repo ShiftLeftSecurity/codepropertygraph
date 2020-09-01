@@ -485,7 +485,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
 
     val cpgDestinationPath = cpgDestinationPathOpt.get
 
-    if (isZipFile(cpgFile)) {
+    if (CpgLoader.isLegacyCpg(cpgFile)) {
       report("You have provided a legacy proto CPG. Attempting conversion.")
       try {
         CpgConverter.convertProtoCpgToOverflowDb(cpgFile.path.toString, cpgDestinationPath.toString)
@@ -511,12 +511,6 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     cpgOpt
   }
 
-  private def isZipFile(file: File): Boolean = {
-    val bytes = file.bytes
-    Try {
-      bytes.next() == 'P' && bytes.next() == 'K'
-    }.getOrElse(false)
-  }
   @Doc(
     "Close project by name",
     """|Close project. Resources are freed but the project remains on disk.
