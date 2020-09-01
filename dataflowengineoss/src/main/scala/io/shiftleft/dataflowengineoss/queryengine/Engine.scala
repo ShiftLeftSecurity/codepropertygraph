@@ -10,6 +10,13 @@ import io.shiftleft.semanticcpg.language._
 import scala.util.{Failure, Success, Try}
 import scala.jdk.CollectionConverters._
 
+case class EngineContext(semantics: Semantics, config: EngineConfig = EngineConfig(), callDepth: Int = 0)
+case class EngineConfig(var maxCallDepth: Int = 4)
+
+/**
+  * Backwards data flow task: from a `sink`, traverse the graph backwards to determine flows
+  * from any of the nodes in `sources`, using the pre-calculated results in `ResultTable`.
+  * */
 private case class ReachableByTask(sink: nodes.TrackingPoint, sources: Set[nodes.TrackingPoint], table: ResultTable)
 
 class Engine(context: EngineContext) {
@@ -59,52 +66,52 @@ class Engine(context: EngineContext) {
     result
   }
 
+  /**
+    * Partial results are flows originating from method input parameters.
+    * */
   private def submitTasksForPartialFlows(partialResults: List[ReachableByResult],
                                          sourcesSet: Set[nodes.TrackingPoint]): Unit = {
-    val pathsFromParams = partialResults.map(x => (x.path, x.callDepth))
-    pathsFromParams.foreach {
-      case (path, callDepth) =>
-        val param = path.head.node
-        Some(param).collect {
-          case p: nodes.MethodParameterIn =>
-            paramToArgs(p).foreach { arg =>
-              submitTask(ReachableByTask(arg, sourcesSet, new ResultTable), path, callDepth)
-            }
+    partialResults.map(result => (result, argsForPartial(result))).foreach {
+      case (result, args) =>
+        args.foreach { arg =>
+          submitTask(ReachableByTask(arg, sourcesSet, new ResultTable), result.path, result.callDepth)
         }
     }
+  }
+
+  /**
+    * Arguments associated with a partial flow, i.e., resolvable arguments corresponding
+    * to the method parameter that the partial flow begins with.
+    * */
+  private def argsForPartial(partialResult: ReachableByResult): List[nodes.Expression] = {
+    partialResult.path.headOption.toList
+      .map(_.node)
+      .collect {
+        case p: nodes.MethodParameterIn =>
+          paramToArgs(p)
+      }
+      .flatten
   }
 
   private def submitTasksForUnresolvedOutArgs(resultsOfTask: List[ReachableByResult],
                                               sourceSet: Set[nodes.TrackingPoint]): Unit = {
 
     val outArgsAndCalls = resultsOfTask
-      .map(x => (x.unresolvedArgs.collect { case e: nodes.Expression => e }, x.path, x.callDepth))
+      .map(x => (x.unresolvedArgs, x.path, x.callDepth))
       .distinct
 
-    val forCalls: List[(nodes.TrackingPoint, List[PathElement], Int)] = outArgsAndCalls.flatMap {
+    val forCalls = outArgsAndCalls.flatMap {
       case (args, path, callDepth) =>
         val outCalls = args.collect { case n: nodes.Call => n }
-        val methodReturns = outCalls
-          .flatMap { call =>
-            NoResolve.getCalledMethods(call)
-          }
-          .start
-          .methodReturn
-          .l
-        methodReturns.map { ret =>
+        outCalls.flatMap(formalReturnsForCall).map { ret =>
           (ret, path, callDepth)
         }
     }
 
-    val forArgs: List[(nodes.TrackingPoint, List[PathElement], Int)] = outArgsAndCalls.flatMap {
+    val forArgs = outArgsAndCalls.flatMap {
       case (args, path, callDepth) =>
-        args.flatMap { arg =>
-          argToMethods(arg).start.parameter.asOutput
-            .order(arg.order)
-            .map { p =>
-              (p, path, callDepth)
-            }
-            .l
+        args.flatMap(argToOutputParams).map { p =>
+          (p, path, callDepth)
         }
     }
 
@@ -123,6 +130,16 @@ class Engine(context: EngineContext) {
 }
 
 object Engine {
+
+  def formalReturnsForCall(call: nodes.Call): List[nodes.MethodReturn] = {
+    NoResolve.getCalledMethods(call).start.methodReturn.l
+  }
+
+  def argToOutputParams(arg: nodes.Expression): List[nodes.MethodParameterOut] = {
+    argToMethods(arg).start.parameter.asOutput
+      .order(arg.order)
+      .l
+  }
 
   def argToMethods(arg: nodes.Expression): List[nodes.Method] = {
     argToCall(arg).toList.flatMap { call =>
@@ -147,9 +164,6 @@ object Engine {
       .l
 
 }
-
-case class EngineContext(semantics: Semantics, config: EngineConfig = EngineConfig(), callDepth: Int = 0)
-case class EngineConfig(var maxCallDepth: Int = 4)
 
 private class ReachableByCallable(task: ReachableByTask,
                                   context: EngineContext,

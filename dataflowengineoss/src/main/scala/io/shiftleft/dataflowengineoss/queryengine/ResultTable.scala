@@ -53,10 +53,10 @@ class ResultTable {
 case class ReachableByResult(path: List[PathElement], callDepth: Int = 0, partial: Boolean = false) {
   def source: nodes.TrackingPoint = path.head.node
 
-  def unresolvedArgs: List[nodes.TrackingPoint] =
+  def unresolvedArgs: List[nodes.Expression] =
     path.collect {
-      case elem if !elem.resolved =>
-        elem.node
+      case elem if !elem.resolved && elem.node.isInstanceOf[nodes.Expression] =>
+        elem.node.asInstanceOf[nodes.Expression]
     }.distinct
 }
 
