@@ -65,7 +65,6 @@ can use to generate your own language-specific bindings. For instance, to create
 ```
 sbt package
 cd codepropertygraph/target
-unzip codepropertygraph-*.jar cpg.proto
 mkdir cpp python
 protoc --cpp_out=cpp --python_out=python cpg.proto
 ```
