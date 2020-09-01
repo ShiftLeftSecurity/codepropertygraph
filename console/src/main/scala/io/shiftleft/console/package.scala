@@ -4,14 +4,6 @@ import better.files._
 
 package object console {
 
-  /** ammonite doesn't seem to regard the order of the lines in the predef code blocks, which leads to problems with
-    * overlapping namespaces (concrete example being `help`). However, code blocks can be separated by `@`...
-    * see {{{ammonite.Main}}} */
-  val AmmoniteCodeBlockSeparator =
-    """
-      |@
-      |""".stripMargin
-
   implicit class UnixUtils[A](content: Iterable[A]) {
 
     /**
