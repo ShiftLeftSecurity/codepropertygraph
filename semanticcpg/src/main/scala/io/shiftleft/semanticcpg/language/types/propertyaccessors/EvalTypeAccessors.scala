@@ -1,77 +1,66 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import gremlin.scala._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys}
-import io.shiftleft.codepropertygraph.predicates.Text.textRegex
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
+import overflowdb.Node
+import overflowdb.traversal.Traversal
+import overflowdb.traversal.filter.P
 
-class EvalTypeAccessors[NodeType <: StoredNode](val wrapped: NodeSteps[NodeType]) extends AnyVal {
-  private def raw: GremlinScala[NodeType] = wrapped.raw
+class EvalTypeAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
 
-  def evalType(): Steps[String] =
-    new Steps[String](raw.out(EdgeTypes.EVAL_TYPE).out(EdgeTypes.REF).value(NodeKeys.FULL_NAME))
+  def evalType: Traversal[String] =
+    traversal.out(EdgeTypes.EVAL_TYPE).out(EdgeTypes.REF).property(NodeKeys.FULL_NAME)
 
-  def evalType(_value: String): NodeSteps[NodeType] =
-    new NodeSteps[NodeType](
-      raw.filter(
+  def evalType(value: String): Traversal[A] =
+    traversal.where(
+      _.out(EdgeTypes.EVAL_TYPE)
+        .out(EdgeTypes.REF)
+        .has(NodeKeys.FULL_NAME.where(_.matches(value)))
+    )
+
+  def evalType(values: String*): Traversal[A] =
+    if (values.isEmpty) Traversal.empty
+    else {
+      val regexes = values.toSet
+      traversal.where(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
-          .has(NodeKeys.FULL_NAME, textRegex(_value))))
-
-  def evalType(_values: String*): NodeSteps[NodeType] =
-    if (_values.nonEmpty) {
-      new NodeSteps[NodeType](
-        raw.filter(
-          _.out(EdgeTypes.EVAL_TYPE)
-            .out(EdgeTypes.REF)
-            .asInstanceOf[GremlinScala[NodeType]]
-            .or(_values.map { _value => (trav: GremlinScala[NodeType]) =>
-              trav.has(NodeKeys.FULL_NAME, textRegex(_value))
-            }: _*)))
-    } else {
-      new NodeSteps[NodeType](raw.filterOnEnd(_ => false))
+          .has(NodeKeys.FULL_NAME.where { value =>
+            regexes.exists(_.matches(value))
+          })
+      )
     }
 
-  def evalTypeExact(_value: String): NodeSteps[NodeType] =
-    new NodeSteps[NodeType](
-      raw.filter(
+  def evalTypeExact(value: String): Traversal[A] =
+    traversal.where(
+      _.out(EdgeTypes.EVAL_TYPE)
+        .out(EdgeTypes.REF)
+        .has(NodeKeys.FULL_NAME, value))
+
+  def evalTypeExact(values: String*): Traversal[A] =
+    if (values.isEmpty) Traversal.empty
+    else {
+      traversal.where(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
-          .has(NodeKeys.FULL_NAME, _value)))
-
-  def evalTypeExact(_values: String*): NodeSteps[NodeType] =
-    if (_values.nonEmpty) {
-      new NodeSteps[NodeType](
-        raw.filter(
-          _.out(EdgeTypes.EVAL_TYPE)
-            .out(EdgeTypes.REF)
-            .asInstanceOf[GremlinScala[NodeType]]
-            .or(_values.map { _value => (trav: GremlinScala[NodeType]) =>
-              trav.has(NodeKeys.FULL_NAME, _value)
-            }: _*)))
-    } else {
-      new NodeSteps[NodeType](raw.filterOnEnd(_ => false))
+          .has(NodeKeys.FULL_NAME.where(P.within(values.to(Set)))))
     }
 
-  def evalTypeNot(_value: String): NodeSteps[NodeType] =
-    new NodeSteps[NodeType](
-      raw.filter(
+  def evalTypeNot(value: String): Traversal[A] =
+    traversal.where(
+      _.out(EdgeTypes.EVAL_TYPE)
+        .out(EdgeTypes.REF)
+        .hasNot(NodeKeys.FULL_NAME.where(_.matches(value))))
+
+  def evalTypeNot(values: String*): Traversal[A] =
+    if (values.isEmpty) Traversal.empty
+    else {
+      val regexes = values.toSet
+      traversal.where(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
-          .hasNot(NodeKeys.FULL_NAME, textRegex(_value))))
-
-  def evalTypeNot(_values: String*): NodeSteps[NodeType] =
-    if (_values.nonEmpty) {
-      new NodeSteps[NodeType](
-        raw.filter(
-          _.out(EdgeTypes.EVAL_TYPE)
-            .out(EdgeTypes.REF)
-            .asInstanceOf[GremlinScala[NodeType]]
-            .or(_values.map { _value => (trav: GremlinScala[NodeType]) =>
-              trav.hasNot(NodeKeys.FULL_NAME, textRegex(_value))
-            }: _*)))
-    } else {
-      new NodeSteps[NodeType](raw)
+          .hasNot(NodeKeys.FULL_NAME.where { value =>
+            regexes.exists(_.matches(value))
+          })
+      )
     }
 }

@@ -3,18 +3,14 @@ package io.shiftleft.semanticcpg.passes.trim
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import overflowdb.OdbNode
+import org.slf4j.{Logger, LoggerFactory}
+import overflowdb._
 
 class TrimPass(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
-    val reduction = cpg.all
-      .toStream()
-      .mapToLong {
-        _.asInstanceOf[overflowdb.NodeRef[OdbNode]].get().trim()
-      }
-      .sum()
+    val reduction = cpg.all.iterator
+      .map(_.asInstanceOf[NodeRef[NodeDb]].get.trim())
+      .sum
     val oldSize = reduction >>> 32
     val newSize = reduction & 0x00000000ffffffffL
     TrimPass.logger.debug(

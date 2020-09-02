@@ -1,5 +1,5 @@
 package io.shiftleft.codepropertygraph.cpgloading
-import overflowdb.OdbConfig
+import overflowdb.Config
 
 object CpgLoaderConfig {
 
@@ -13,12 +13,12 @@ object CpgLoaderConfig {
   @deprecated("Use CpgLoaderConfig.withDefaults.withStorage instead", "")
   def withStorage(path: String) =
     new CpgLoaderConfig(
-      overflowDbConfig = OdbConfig.withoutOverflow.withStorageLocation(path),
+      overflowDbConfig = Config.withoutOverflow.withStorageLocation(path),
     )
 
   def withoutOverflow =
     new CpgLoaderConfig(
-      overflowDbConfig = OdbConfig.withoutOverflow
+      overflowDbConfig = Config.withoutOverflow
     )
 
 }
@@ -28,7 +28,7 @@ object CpgLoaderConfig {
   * @param createIndexes indicate whether to create indices or not
   * @param overflowDbConfig configuration for the on-disk-overflow feature
   */
-class CpgLoaderConfig(var createIndexes: Boolean = true, var overflowDbConfig: OdbConfig = OdbConfig.withoutOverflow) {
+class CpgLoaderConfig(var createIndexes: Boolean = true, var overflowDbConfig: Config = Config.withoutOverflow) {
 
   /**
     * Existing configuration without indexing on load.
@@ -49,7 +49,7 @@ class CpgLoaderConfig(var createIndexes: Boolean = true, var overflowDbConfig: O
   /**
     * Return existing configuration but with overflowdb config set to `overflowConfig`.
     * */
-  def withOverflowConfig(overflowConfig: OdbConfig): CpgLoaderConfig = {
+  def withOverflowConfig(overflowConfig: Config): CpgLoaderConfig = {
     this.overflowDbConfig = overflowConfig
     this
   }

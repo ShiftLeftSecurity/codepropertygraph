@@ -11,7 +11,7 @@ import java.nio.file.{Files, Path}
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import overflowdb.OdbConfig
+import overflowdb.Config
 
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
@@ -20,7 +20,7 @@ import scala.util.{Failure, Success, Try, Using}
 object ProtoCpgLoader {
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  def loadFromProtoZip(fileName: String, overflowDbConfig: OdbConfig = OdbConfig.withoutOverflow): Cpg =
+  def loadFromProtoZip(fileName: String, overflowDbConfig: Config = Config.withoutOverflow): Cpg =
     measureAndReport {
       val builder = new ProtoToCpg(overflowDbConfig)
       Using.Manager { use =>
@@ -38,14 +38,14 @@ object ProtoCpgLoader {
       }
     }
 
-  def loadFromListOfProtos(cpgs: Seq[CpgStruct], overflowDbConfig: OdbConfig): Cpg = {
+  def loadFromListOfProtos(cpgs: Seq[CpgStruct], overflowDbConfig: Config): Cpg = {
     val builder = new ProtoToCpg(overflowDbConfig)
     cpgs.foreach(cpg => builder.addNodes(cpg.getNodeList))
     cpgs.foreach(cpg => builder.addEdges(cpg.getEdgeList))
     builder.build()
   }
 
-  def loadFromListOfProtos(cpgs: JList[CpgStruct], overflowDbConfig: OdbConfig): Cpg =
+  def loadFromListOfProtos(cpgs: JList[CpgStruct], overflowDbConfig: Config): Cpg =
     loadFromListOfProtos(cpgs.asScala.toSeq, overflowDbConfig)
 
   def loadOverlays(fileName: String): Try[Iterator[CpgOverlay]] =

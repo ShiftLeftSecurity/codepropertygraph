@@ -18,7 +18,7 @@ object ProtoToCpg {
   val logger: Logger = LoggerFactory.getLogger(classOf[ProtoToCpg])
 
   def toProperty(keyValue: (String, PropertyValue))(implicit interner: StringInterner): Property[Any] =
-    Property(keyValue._1, toRegularType(keyValue._2))
+    new Property(keyValue._1, toRegularType(keyValue._2))
 
   private def toRegularType(value: PropertyValue)(implicit interner: StringInterner): Any =
     value.getValueCase match {
@@ -31,17 +31,17 @@ object ProtoToCpg {
     }
 }
 
-class ProtoToCpg(overflowConfig: OdbConfig = OdbConfig.withoutOverflow) {
+class ProtoToCpg(overflowConfig: Config = Config.withoutOverflow) {
   import ProtoToCpg._
   private val nodeFilter = new NodeFilter
   private val odbGraph =
-    OdbGraph.open(overflowConfig,
-                  io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
-                  io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava)
+    Graph.open(overflowConfig,
+               io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
+               io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava)
   // TODO use centralised string interner everywhere, maybe move to odb core - keep in mind strong references / GC.
   implicit private val interner: StringInterner = StringInterner.makeStrongInterner()
 
-  def graph: OdbGraph = odbGraph
+  def graph: Graph = odbGraph
 
   def addNodes(nodes: JCollection[Node]): Unit =
     addNodes(nodes.asScala)

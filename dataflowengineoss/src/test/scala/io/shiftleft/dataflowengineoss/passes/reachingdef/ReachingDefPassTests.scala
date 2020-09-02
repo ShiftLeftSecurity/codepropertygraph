@@ -1,10 +1,9 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
+import io.shiftleft.codepropertygraph.generated.EdgeKeys
 import io.shiftleft.dataflowengineoss.language.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
-import overflowdb._
 import overflowdb.traversal._
-import gremlin.scala._
 
 class ReachingDefPassTests extends DataFlowCodeToCpgSuite {
 
@@ -25,10 +24,9 @@ class ReachingDefPassTests extends DataFlowCodeToCpgSuite {
     cpg
       .call("printf")
       .argument(1)
-      .raw
       .inE("REACHING_DEF")
-      .value[String]("VARIABLE")
-      .toList
+      .property(EdgeKeys.VARIABLE)
+      .l
       .contains("boo") shouldBe true
   }
 

@@ -4,13 +4,14 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal._
 
 /**
   * A pass that calculates reaching definitions ("data dependencies").
   * */
 class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
 
-  override def partIterator: Iterator[nodes.Method] = cpg.method.toIterator()
+  override def partIterator: Iterator[nodes.Method] = cpg.method.iterator
 
   override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
     val problem = ReachingDefProblem.create(method)

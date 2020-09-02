@@ -4,11 +4,12 @@ import java.util.concurrent.{Callable, ExecutorCompletionService, ExecutorServic
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
-import org.slf4j.{Logger, LoggerFactory}
 import io.shiftleft.semanticcpg.language._
+import org.slf4j.{Logger, LoggerFactory}
+import overflowdb.traversal.Traversal
 
-import scala.util.{Failure, Success, Try}
 import scala.jdk.CollectionConverters._
+import scala.util.{Failure, Success, Try}
 
 private case class ReachableByTask(sink: nodes.TrackingPoint, sources: Set[nodes.TrackingPoint], table: ResultTable)
 
@@ -88,7 +89,7 @@ class Engine(context: EngineContext) {
           .flatMap { call =>
             NoResolve.getCalledMethods(call)
           }
-          .start
+          .to(Traversal)
           .methodReturn
           .l
         methodReturns.map { ret =>
@@ -99,7 +100,10 @@ class Engine(context: EngineContext) {
     val forArgs: List[(nodes.TrackingPoint, List[PathElement], Int)] = outArgsAndCalls.flatMap {
       case (args, path, callDepth) =>
         args.flatMap { arg =>
-          argToMethods(arg).start.parameter.asOutput
+          argToMethods(arg)
+            .to(Traversal)
+            .parameter
+            .asOutput
             .order(arg.order)
             .map { p =>
               (p, path, callDepth)
@@ -140,9 +144,8 @@ object Engine {
   def paramToArgs(param: nodes.MethodParameterIn): List[nodes.Expression] =
     NoResolve
       .getMethodCallsites(param.method)
-      .toList
+      .to(Traversal)
       .collect { case call: nodes.Call => call }
-      .start
       .argument(param.order)
       .l
 
@@ -222,7 +225,7 @@ private class ReachableByCallable(task: ReachableByTask,
 
       val retsToResolve = curNode match {
         case call: nodes.Call =>
-          if (methodsForCall(call).start.internal.l.nonEmpty && semanticsForCall(call).isEmpty) {
+          if (methodsForCall(call).to(Traversal).internal.nonEmpty && semanticsForCall(call).isEmpty) {
             List(ReachableByResult(PathElement(path.head.node, resolved = false) :: path.tail, partial = true))
           } else {
             List()
@@ -244,7 +247,7 @@ private class ReachableByCallable(task: ReachableByTask,
       implicit semantics: Semantics): Option[PathElement] = {
     val parentNodeCall = argToCall(parentNode)
     if (parentNodeCall == argToCall(curNode)) {
-      val internalMethodsForCall = parentNodeCall.toList.flatMap(x => methodsForCall(x)).start.internal.l
+      val internalMethodsForCall = parentNodeCall.toList.flatMap(methodsForCall).to(Traversal).internal.l
       if (semanticsForCallByArg(parentNode.asInstanceOf[nodes.Expression]).nonEmpty || internalMethodsForCall.isEmpty) {
         Some(PathElement(parentNode)).filter(_ => isUsed(parentNode) && isDefined(curNode))
       } else {

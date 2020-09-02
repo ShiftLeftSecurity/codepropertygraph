@@ -5,10 +5,10 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.queryengine.EngineContext
 import io.shiftleft.semanticcpg.utils.MemberAccess
-
+import overflowdb.traversal._
 import scala.jdk.CollectionConverters._
 
-class TrackingPointMethods(val node: nodes.TrackingPointBase) extends AnyVal {
+class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) extends AnyVal {
 
   /**
     * Convert to nearest CFG node for flow pretty printing
@@ -25,8 +25,8 @@ class TrackingPointMethods(val node: nodes.TrackingPointBase) extends AnyVal {
       case _                              => ??? //TODO markus/fabs?
     }
 
-  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Steps[NodeType]*)(
-      implicit context: EngineContext): Steps[NodeType] =
+  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Traversal[NodeType]*)(
+      implicit context: EngineContext): Traversal[NodeType] =
     node.start.reachableBy(sourceTravs: _*)
 
 }

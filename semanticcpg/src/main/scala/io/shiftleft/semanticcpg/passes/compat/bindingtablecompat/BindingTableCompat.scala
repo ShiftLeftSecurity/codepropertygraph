@@ -3,11 +3,10 @@ package io.shiftleft.semanticcpg.passes.compat.bindingtablecompat
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewBinding
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import io.shiftleft.semanticcpg.language._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import scala.jdk.CollectionConverters._
+import io.shiftleft.semanticcpg.language._
+import org.slf4j.{Logger, LoggerFactory}
+import overflowdb.traversal._
 
 /**
   * Compatibility pass which calculates missing binding tables.
@@ -19,12 +18,12 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val diffGraph = DiffGraph.newBuilder
 
-    if (cpg.graph.traversal.V().hasLabel(NodeTypes.BINDING).asScala.isEmpty) {
-      cpg.typeDecl.toIterator().foreach { typeDecl =>
+    if (cpg.graph.nodes(NodeTypes.BINDING).isEmpty) {
+      cpg.typeDecl.foreach { typeDecl =>
         val nonConstructorMethods = getNonConstructorMethodsTransitive(typeDecl, Set.empty)
         nonConstructorMethods.foreach(createBinding(typeDecl, diffGraph))
 
-        val constructorMethods = typeDecl.start.method.isConstructor.l
+        val constructorMethods = typeDecl.start.method.isConstructor
         constructorMethods.foreach(createBinding(typeDecl, diffGraph))
       }
     }
@@ -71,7 +70,7 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
 
   private def getNonConstructorMethods(typeDecl: nodes.TypeDecl): List[nodes.Method] =
     typeDecl._methodViaAstOut
-      .filter(_.start.isConstructor.headOption.isEmpty)
+      .filter(method => method.start.isConstructor.isEmpty)
       .toList
 
 }

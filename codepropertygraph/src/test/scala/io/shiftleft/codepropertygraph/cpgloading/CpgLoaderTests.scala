@@ -2,9 +2,9 @@ package io.shiftleft.codepropertygraph.cpgloading
 
 import java.nio.file.FileSystemNotFoundException
 
-import overflowdb.{OdbConfig, OdbGraph}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import overflowdb.Config
 
 /**
   * Specification of the CPGLoader. The loader allows CPGs to be loaded
@@ -24,7 +24,7 @@ class CpgLoaderTests extends AnyWordSpec with Matchers {
       */
     "allow loading of CPG from bin.zip file" in {
       val cpg = CpgLoader.load(filename)
-      cpg.graph.vertices().hasNext shouldBe true
+      cpg.graph.nodes.hasNext shouldBe true
     }
 
     "throw an appropriate exception if the provided filename that refers to a non-existing file" in {
@@ -37,9 +37,9 @@ class CpgLoaderTests extends AnyWordSpec with Matchers {
       * by passing a CpgLoaderConfig as follows.
       * */
     "allow disabling the overflowdb backend" in {
-      val config = new CpgLoaderConfig(overflowDbConfig = new OdbConfig())
+      val config = new CpgLoaderConfig(overflowDbConfig = new Config())
       val cpg = CpgLoader.load(filename, config)
-      cpg.graph.vertices().hasNext shouldBe true
+      cpg.graph.nodes.hasNext shouldBe true
     }
 
     /**

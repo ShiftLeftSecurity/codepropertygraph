@@ -48,7 +48,7 @@ class DiffGraphProtoSerializer {
       case c: CreateEdge =>
         builder.addEdge(addEdge(c, appliedDiffGraph))
       case SetNodeProperty(node, key, value) =>
-        builder.addNodeProperty(addNodeProperty(node.id2, key, value, appliedDiffGraph))
+        builder.addNodeProperty(addNodeProperty(node.id, key, value, appliedDiffGraph))
       case SetEdgeProperty(edge, key, value) =>
         builder.addEdgeProperty(addEdgeProperty(edge, key, value))
       case RemoveNode(_) | RemoveNodeProperty(_, _) | RemoveEdge(_) | RemoveEdgeProperty(_, _) =>
@@ -71,7 +71,7 @@ class DiffGraphProtoSerializer {
     diffGraph.iterator
       .map {
         case SetNodeProperty(node, key, value) =>
-          newEntry.setNodeProperty(addNodeProperty(node.id2, key, value, null))
+          newEntry.setNodeProperty(addNodeProperty(node.id, key, value, null))
         case SetEdgeProperty(edge, key, value) =>
           newEntry.setEdgeProperty(addEdgeProperty(edge, key, value))
         case RemoveNode(nodeId) => newEntry.setRemoveNode(removeNodeProto(nodeId))
@@ -107,13 +107,13 @@ class DiffGraphProtoSerializer {
       if (change.sourceNodeKind == DiffGraph.Change.NodeKind.New)
         appliedDiffGraph.nodeToGraphId(change.src.asInstanceOf[nodes.NewNode])
       else
-        change.src.asInstanceOf[Node].id2
+        change.src.asInstanceOf[Node].id
 
     val dstId: Long =
       if (change.destinationNodeKind == DiffGraph.Change.NodeKind.New)
         appliedDiffGraph.nodeToGraphId(change.dst.asInstanceOf[nodes.NewNode])
       else
-        change.dst.asInstanceOf[Node].id2
+        change.dst.asInstanceOf[Node].id
 
     makeEdge(change.label, srcId, dstId, change.properties)
   }
@@ -136,12 +136,12 @@ class DiffGraphProtoSerializer {
   private def removeNodeProto(nodeId: Long) =
     DiffGraphProto.RemoveNode.newBuilder.setKey(nodeId).build
 
-  private def removeEdgeProto(edge: OdbEdge) =
+  private def removeEdgeProto(edge: Edge) =
     DiffGraphProto.RemoveEdge.newBuilder
-      .setOutNodeKey(edge.outNode.id2)
-      .setInNodeKey(edge.inNode.id2)
+      .setOutNodeKey(edge.outNode.id)
+      .setInNodeKey(edge.inNode.id)
       .setEdgeType(EdgeType.valueOf(edge.label))
-      .setPropertiesHash(ByteString.copyFrom(DiffGraph.propertiesHash(edge.asInstanceOf[OdbEdge])))
+      .setPropertiesHash(ByteString.copyFrom(DiffGraph.propertiesHash(edge.asInstanceOf[Edge])))
       .build
 
   private def removeNodePropertyProto(nodeId: Long, propertyKey: String) = {
@@ -159,10 +159,10 @@ class DiffGraphProtoSerializer {
     }
   }
 
-  private def removeEdgePropertyProto(edge: OdbEdge, propertyKey: String) =
+  private def removeEdgePropertyProto(edge: Edge, propertyKey: String) =
     DiffGraphProto.RemoveEdgeProperty.newBuilder
-      .setOutNodeKey(edge.outNode.id2)
-      .setInNodeKey(edge.inNode.id2)
+      .setOutNodeKey(edge.outNode.id)
+      .setInNodeKey(edge.inNode.id)
       .setEdgeType(EdgeType.valueOf(edge.label))
       .setPropertyName(EdgePropertyName.valueOf(propertyKey))
       .build
@@ -200,10 +200,10 @@ class DiffGraphProtoSerializer {
       .setProperty(nodeProperty(key, value, appliedDiffGraph))
       .build
 
-  private def addEdgeProperty(edge: OdbEdge, key: String, value: AnyRef): AdditionalEdgeProperty =
+  private def addEdgeProperty(edge: Edge, key: String, value: AnyRef): AdditionalEdgeProperty =
     AdditionalEdgeProperty.newBuilder
-      .setOutNodeKey(edge.outNode.id2)
-      .setInNodeKey(edge.inNode.id2)
+      .setOutNodeKey(edge.outNode.id)
+      .setInNodeKey(edge.inNode.id)
       .setEdgeType(EdgeType.valueOf(edge.label))
       .setProperty(
         CpgStruct.Edge.Property.newBuilder
@@ -217,7 +217,7 @@ class DiffGraphProtoSerializer {
       case iterable: Iterable[_] =>
         iterable.foreach {
           case storedNode: StoredNode =>
-            builder.addRefs(storedNode.id2)
+            builder.addRefs(storedNode.id)
           case newNode: NewNode =>
             if (appliedDiffGraph == null) {
               throw new NullPointerException(
@@ -226,7 +226,7 @@ class DiffGraphProtoSerializer {
             builder.addRefs(appliedDiffGraph.nodeToGraphId(newNode))
         }
       case storedNode: StoredNode =>
-        builder.addRefs(storedNode.id2)
+        builder.addRefs(storedNode.id)
       case newNode: NewNode =>
         if (appliedDiffGraph == null) {
           throw new NullPointerException(

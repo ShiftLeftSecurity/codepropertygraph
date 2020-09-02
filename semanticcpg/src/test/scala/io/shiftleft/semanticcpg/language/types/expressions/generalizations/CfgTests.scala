@@ -23,6 +23,7 @@ class CfgTests extends CodeToCpgSuite {
     controllers.map(_.code) should contain("y < 10")
     controllers.map(_.code) should contain("x < 10")
   }
+
   "should find that first if controls `sink`" in {
     cpg.controlStructure.condition.code("y < 10").controls.isCall.name("sink").l.size shouldBe 1
   }

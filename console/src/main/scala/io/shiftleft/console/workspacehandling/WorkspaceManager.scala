@@ -7,7 +7,7 @@ import better.files.Dsl._
 import better.files._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
-import overflowdb.OdbConfig
+import overflowdb.Config
 import org.json4s.DefaultFormats
 import org.json4s.native.Serialization.{write => jsonWrite}
 
@@ -334,7 +334,7 @@ class WorkspaceManager[ProjectType <: Project](path: String, loader: WorkspaceLo
 
   private def loadCpgRaw(cpgFilename: String): Option[Cpg] = {
     Try {
-      val odbConfig = OdbConfig.withDefaults.withStorageLocation(cpgFilename)
+      val odbConfig = Config.withDefaults.withStorageLocation(cpgFilename)
       val config =
         CpgLoaderConfig.withDefaults.doNotCreateIndexesOnLoad.withOverflowConfig(odbConfig)
       val newCpg = CpgLoader.loadFromOverflowDb(config)

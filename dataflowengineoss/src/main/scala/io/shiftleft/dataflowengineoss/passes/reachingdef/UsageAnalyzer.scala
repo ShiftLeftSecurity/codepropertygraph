@@ -2,8 +2,8 @@ package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal._
 
 class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
 
@@ -25,9 +25,9 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
   def uses(node: nodes.StoredNode): Set[nodes.StoredNode] = {
     val n = node match {
       case ret: nodes.Return =>
-        ret.astChildren.map(_.asInstanceOf[nodes.StoredNode]).toSet()
+        ret.astChildren.toSet
       case call: nodes.Call =>
-        call.start.argument.map(_.asInstanceOf[nodes.StoredNode]).toSet()
+        call.start.argument.toSet
       case _ => Set()
     }
     n.filterNot(_.isInstanceOf[nodes.FieldIdentifier]).map(_.asInstanceOf[nodes.StoredNode])

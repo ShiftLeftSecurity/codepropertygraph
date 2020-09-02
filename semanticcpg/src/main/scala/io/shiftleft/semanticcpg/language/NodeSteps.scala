@@ -1,11 +1,11 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala.{BranchCase, BranchOtherwise, GremlinScala, P, Vertex}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.codedumper.CodeDumper
-import overflowdb.traversal.help
+import overflowdb.Node
 import overflowdb.traversal.help.Doc
+import overflowdb.traversal.{Traversal, help}
 
 /**
   * Steps for all node types
@@ -13,31 +13,7 @@ import overflowdb.traversal.help.Doc
   * This is the base class for all steps defined on nodes.
   * */
 @help.Traversal(elementType = classOf[nodes.StoredNode])
-class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) extends Steps[NodeType](raw) {
-
-  @Doc(
-    "Label of the node (its type)",
-    """
-      |Each node has at least a unique id and a string label. The label
-      |is a node type. Examples are `FILE`, `METHOD`, or `IDENTIFIER`.
-      |""".stripMargin
-  )
-  def label: Steps[String] = new Steps(raw.label)
-
-  @Doc("Traverse to ids of underlying nodes")
-  def id: Steps[Long] = new Steps(raw.map(_.id2))
-
-  @Doc("Filter: only keep node with given id")
-  def id(value: Long): Steps[NodeType] =
-    new Steps(raw.filterOnEnd(_.id2 == value))
-
-  @Doc("Filter: only keep nodes with given ids")
-  def id(values: Long*): Steps[NodeType] =
-    id(Set(values: _*))
-
-  @Doc("Filter: only keep nodes with given ids")
-  def id(values: Set[Long]): Steps[NodeType] =
-    new Steps(raw.filterOnEnd(node => values.contains(node.id2)))
+class NodeSteps[NodeType <: nodes.StoredNode](val traversal: Traversal[NodeType]) extends AnyVal {
 
   @Doc(
     "The source file this code is in",
@@ -47,18 +23,15 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
       |the file node that represents that source file.
       |""".stripMargin
   )
-  def file: NodeSteps[nodes.File] =
-    new NodeSteps(
-      raw
-        .choose(
-          on = _.label,
-          BranchCase(NodeTypes.NAMESPACE, _.in(EdgeTypes.REF).out(EdgeTypes.SOURCE_FILE)),
-          BranchCase(NodeTypes.COMMENT, _.in(EdgeTypes.AST).hasLabel(NodeTypes.FILE)),
-          BranchOtherwise(
-            _.until(_.hasLabel(NodeTypes.FILE)).repeat(_.coalesce(_.out(EdgeTypes.SOURCE_FILE), _.in(EdgeTypes.AST)))),
-        )
-        .cast[nodes.File]
-    )
+  def file: Traversal[nodes.File] =
+    traversal
+      .choose(_.label) {
+        case NodeTypes.NAMESPACE => _.in(EdgeTypes.REF).out(EdgeTypes.SOURCE_FILE)
+        case NodeTypes.COMMENT   => _.in(EdgeTypes.AST).hasLabel(NodeTypes.FILE)
+        case _ =>
+          _.repeat(_.coalesce(_.out(EdgeTypes.SOURCE_FILE), _.in(EdgeTypes.AST)))(_.until(_.hasLabel(NodeTypes.FILE)))
+      }
+      .cast[nodes.File]
 
   @Doc(
     "Location, including filename and line number",
@@ -72,8 +45,8 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
       |on the user's side.
       |""".stripMargin
   )
-  def location: NewNodeSteps[nodes.NewLocation] =
-    new NewNodeSteps(raw.map(_.location))
+  def location: Traversal[nodes.NewLocation] =
+    traversal.map(_.location)
 
   @Doc(
     "Display code (with syntax highlighting)",
@@ -100,17 +73,16 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
 
   private def _dump(highlight: Boolean): List[String] = {
     var language: Option[String] = null // initialized on first element - need the graph for this
-    raw.l.map { node =>
-      if (language == null) language = new Cpg(node.graph2()).metaData.language.headOption()
+    traversal.map { node =>
+      if (language == null) language = new Cpg(node.graph).metaData.language.headOption
       CodeDumper.dump(node.location, language, highlight)
-    }
+    }.l
   }
 
   /* follow the incoming edges of the given type as long as possible */
-  protected def walkIn(edgeType: String): GremlinScala[Vertex] =
-    raw
-      .repeat(_.in(edgeType))
-      .until(_.in(edgeType).count.is(P.eq(0)))
+  protected def walkIn(edgeType: String): Traversal[Node] =
+    traversal
+      .repeat(_.in(edgeType))(_.until(_.in(edgeType).count.filter(_ == 0)))
 
   @Doc(
     "Tag node with `tagName`",
@@ -129,7 +101,7 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
   @Doc("Tag node with (`tagName`, `tagValue`)", "", """.newTagNodePair("key","val")""")
   def newTagNodePair(tagName: String, tagValue: String): NewTagNodePair = {
     new NewTagNodePair(
-      raw.map { node =>
+      traversal.map { node =>
         nodes.NewTagNodePair(nodes.NewTag(tagName, tagValue), node)
       }
     )
@@ -137,8 +109,8 @@ class NodeSteps[NodeType <: nodes.StoredNode](raw: GremlinScala[NodeType]) exten
 
   @Doc("Tags attached to this node")
   def tagList: List[List[nodes.TagBase]] =
-    raw.map { taggedNode =>
-      taggedNode.tagList
+    traversal.map { taggedNode =>
+      taggedNode.tagList.l
     }.l
 
 }

@@ -2,7 +2,6 @@ package io.shiftleft.console
 
 import better.files.Dsl._
 import better.files.File
-import gremlin.scala.ScalaGraph
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.CpgLoader
 import io.shiftleft.codepropertygraph.generated.Languages
@@ -10,11 +9,11 @@ import io.shiftleft.console.LanguageHelper.cpgGeneratorForLanguage
 import io.shiftleft.console.cpgcreation.{CpgGenerator, LanguageFrontend}
 import io.shiftleft.console.scripting.{AmmoniteExecutor, ScriptManager}
 import io.shiftleft.console.workspacehandling.{Project, WorkspaceLoader, WorkspaceManager}
-import overflowdb.traversal.help.{Doc, Table}
 import io.shiftleft.semanticcpg.Overlays
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.dotextension.ImageViewer
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, Scpg}
+import overflowdb.traversal.help.{Doc, Table}
 
 import scala.sys.process.Process
 import scala.util.{Failure, Success, Try}
@@ -145,10 +144,6 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
   implicit class ItExtend[X](it: Iterator[X]) {
     def l: List[X] = it.toList
   }
-
-  /** allows the user to create nodes/edges with the pretty gremlin dsl
-    * TODO remove once OverflowDB has a nice api for that too **/
-  implicit def graph: ScalaGraph = cpg.graph
 
   @Doc(
     "Open project",
@@ -505,7 +500,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     }
 
     cpgOpt
-      .filter(_.metaData.headOption().isDefined)
+      .filter(_.metaData.hasNext)
       .foreach(applyDefaultOverlays)
 
     cpgOpt

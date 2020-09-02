@@ -1,15 +1,9 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala._
-import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.edges.ContainsNode
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.{EdgeKeyNames, ModifierTypes}
+import io.shiftleft.codepropertygraph.generated.{ModifierTypes, NodeKeyNames, nodes}
 import io.shiftleft.passes.DiffGraph
-import io.shiftleft.passes.DiffGraph.{EdgeInDiffGraph, EdgeToOriginal}
-import io.shiftleft.codepropertygraph.generated.NodeKeyNames
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -21,7 +15,7 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
   "stores NewNodes" in {
     implicit val diffGraphBuilder = DiffGraph.newBuilder
     val newNode = newTestNode()
-    new NewNodeSteps(__(newNode)).store
+    new NewNodeSteps(newNode.start).store
     val diffGraph = diffGraphBuilder.build()
     diffGraph.nodes.toList shouldBe List(newNode)
   }
@@ -29,7 +23,7 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
   "can access the node label" in {
     implicit val diffGraphBuilder = DiffGraph.newBuilder
     val newNode = newTestNode()
-    new NewNodeSteps(__(newNode)).label.l shouldBe List(newNode.label)
+    new NewNodeSteps(newNode.start).label.l shouldBe List(newNode.label)
   }
 
   "stores containedNodes and connecting edge" when {
@@ -38,12 +32,12 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
       implicit val diffGraphBuilder = DiffGraph.newBuilder
       val cpg = Cpg.emptyCpg
       val existingContainedNode = cpg.graph.addNode(42L, "MODIFIER").asInstanceOf[nodes.StoredNode]
-      existingContainedNode.property(NodeKeyNames.MODIFIER_TYPE, ModifierTypes.NATIVE)
+      existingContainedNode.setProperty(NodeKeyNames.MODIFIER_TYPE, ModifierTypes.NATIVE)
       cpg.graph.V().asScala.toSet shouldBe Set(existingContainedNode)
 
       val newContainedNode = newTestNode()
       val newNode = newTestNode(containedNodes = List(existingContainedNode, newContainedNode))
-      new NewNodeSteps(__(newNode)).store
+      new NewNodeSteps(newNode.start).store
       val diffGraph = diffGraphBuilder.build
       diffGraph.nodes.toSet shouldBe Set(newNode)
       diffGraph.edges shouldBe Nil
@@ -58,7 +52,7 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
       val newContainedNodeL1 = newTestNode()
       val newContainedNodeL0 = newTestNode(containedNodes = List(newContainedNodeL1))
       val newNode = newTestNode(containedNodes = List(newContainedNodeL0))
-      new NewNodeSteps(__(newNode)).store
+      new NewNodeSteps(newNode.start).store
       val diffGraph = diffGraphBuilder.build
 
       diffGraph.nodes.toSet shouldBe Set(newNode)

@@ -2,19 +2,17 @@ package io.shiftleft.semanticcpg.dotgenerator
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.dotgenerator.Shared.Edge
-import io.shiftleft.semanticcpg.language._
 import overflowdb.Node
-
+import overflowdb.traversal._
 import scala.jdk.CollectionConverters._
 
 object DotCfgGenerator {
 
-  def toDotCfg(step: NodeSteps[nodes.Method]): Steps[String] =
-    step.map(Shared.dotGraph(_, expand, cfgNodeShouldBeDisplayed))
+  def toDotCfg(traversal: Traversal[nodes.Method]): Traversal[String] =
+    traversal.map(Shared.dotGraph(_, expand, cfgNodeShouldBeDisplayed))
 
   protected def expand(v: nodes.StoredNode): Iterator[Edge] = {
-    v._cfgOut()
-      .asScala
+    v._cfgOut.asScala
       .filter(_.isInstanceOf[nodes.StoredNode])
       .map(node => Edge(v, node))
   }

@@ -3,8 +3,7 @@ package io.shiftleft.semanticcpg.passes.linking.capturinglinker
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal.Traversal
 
 /**

@@ -2,12 +2,11 @@ package io.shiftleft.semanticcpg.passes.codepencegraph
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.Method
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeysOdb, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominatorFrontier, ReverseCpgCfgAdapter}
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
 
 import scala.jdk.CollectionConverters._
@@ -18,7 +17,7 @@ import scala.jdk.CollectionConverters._
 class CdgPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   import CdgPass.logger
 
-  override def partIterator: Iterator[Method] = cpg.method.toIterator()
+  override def partIterator: Iterator[Method] = cpg.method.iterator
 
   override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
 
@@ -42,7 +41,7 @@ class CdgPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
             val method = postDomFrontierNode.in(EdgeTypes.CONTAINS).next
             val nodeLabel = postDomFrontierNode.label
             logger.warn(s"Found CDG edge starting at $nodeLabel node. This is most likely caused by an invalid CFG." +
-              s" Method: ${method.propertyOption(NodeKeysOdb.FULL_NAME)}" +
+              s" Method: ${method.propertyOption(NodeKeys.FULL_NAME)}" +
               s" number of outgoing CFG edges from $nodeLabel node: ${postDomFrontierNode.outE(EdgeTypes.CFG).asScala.size}")
         }
     }

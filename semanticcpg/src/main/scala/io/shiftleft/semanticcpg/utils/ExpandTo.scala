@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.utils
 import io.shiftleft.Implicits._
 import io.shiftleft.codepropertygraph.generated._
 import org.slf4j.{Logger, LoggerFactory}
+import overflowdb.traversal._
 
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters._

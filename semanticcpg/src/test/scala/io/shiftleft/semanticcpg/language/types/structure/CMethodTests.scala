@@ -54,8 +54,8 @@ class CMethodTests extends CodeToCpgSuite {
   }
 
   "should allow filtering by number of parameters" in {
-    cpg.method.where(_.parameter.size == 2).name.l shouldBe List("main")
-    cpg.method.where(_.parameter.size == 1).name.l shouldBe List()
+    cpg.method.filter(_.parameter.size == 2).name.l shouldBe List("main")
+    cpg.method.filter(_.parameter.size == 1).name.l shouldBe List()
   }
 }
 

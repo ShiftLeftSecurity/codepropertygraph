@@ -7,14 +7,10 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, PropertyValue}
 import io.shiftleft.utils.StringInterner
-
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.apache.tinkerpop.gremlin.structure.T
+import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
 
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 
 private[cpgloading] object CpgOverlayLoader {
@@ -62,14 +58,14 @@ private[cpgloading] object CpgOverlayLoader {
   *
   * @param graph the existing (loaded) graph to apply overlay to
   */
-private class CpgOverlayApplier(graph: OdbGraph) {
+private class CpgOverlayApplier(graph: Graph) {
   private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Node] = mutable.HashMap.empty
 
   // TODO use centralised string interner everywhere, maybe move to odb core - keep in mind strong references / GC.
   implicit val interner = StringInterner.noop
 
   /**
-    * Applies diff to existing (loaded) OdbGraph
+    * Applies diff to existing (loaded) Graph
     */
   def applyDiff(overlay: CpgOverlay): Unit = {
     val inverseBuilder: DiffGraph.InverseBuilder = DiffGraph.InverseBuilder.noop
@@ -136,29 +132,29 @@ private class CpgOverlayApplier(graph: OdbGraph) {
     }
   }
 
-  private def addPropertyToElement(odbElement: OdbElement,
+  private def addPropertyToElement(element: Element,
                                    propertyName: String,
                                    propertyValue: PropertyValue,
                                    inverseBuilder: DiffGraph.InverseBuilder): Unit = {
     import PropertyValue.ValueCase._
-    odbElement match {
+    element match {
       case storedNode: StoredNode =>
         inverseBuilder.onBeforeNodePropertyChange(storedNode, propertyName)
-      case edge: OdbEdge =>
+      case edge: Edge =>
         inverseBuilder.onBeforeEdgePropertyChange(edge, propertyName)
     }
 
     propertyValue.getValueCase match {
       case INT_VALUE =>
-        odbElement.setProperty(propertyName, propertyValue.getIntValue)
+        element.setProperty(propertyName, propertyValue.getIntValue)
       case STRING_VALUE =>
-        odbElement.setProperty(propertyName, propertyValue.getStringValue)
+        element.setProperty(propertyName, propertyValue.getStringValue)
       case BOOL_VALUE =>
-        odbElement.setProperty(propertyName, propertyValue.getBoolValue)
+        element.setProperty(propertyName, propertyValue.getBoolValue)
       case STRING_LIST =>
         val listBuilder = List.newBuilder[String]
         propertyValue.getStringList.getValuesList.forEach(listBuilder.addOne)
-        odbElement.setProperty(propertyName, listBuilder.result)
+        element.setProperty(propertyName, listBuilder.result)
       case VALUE_NOT_SET =>
       case valueCase =>
         throw new RuntimeException("Error: unsupported property case: " + valueCase)

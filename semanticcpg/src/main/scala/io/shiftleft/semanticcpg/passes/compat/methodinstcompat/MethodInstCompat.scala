@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes.compat.methodinstcompat
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{NodeKeysOdb, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.Logger
@@ -25,11 +25,11 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
       MethodInstCompat.logger.warn("Using deprecated CPG format with METHOD_INST nodes.")
       init()
 
-      cpg.call.toIterator.foreach { call =>
+      cpg.call.foreach { call =>
         call.methodInstFullName.foreach { methodInstFullName =>
           methodInstFullNameToMethodFullName.get(methodInstFullName) match {
             case Some(methodFullName) =>
-              call.setProperty2(NodeKeysOdb.METHOD_FULL_NAME -> methodFullName)
+              call.setProperty(NodeKeys.METHOD_FULL_NAME -> methodFullName)
             case None =>
               MethodInstCompat.logger.warn(
                 s"Unable to find method full name by " +
@@ -39,11 +39,11 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
 
       }
 
-      cpg.methodRef.toIterator.foreach { methodRef =>
+      cpg.methodRef.foreach { methodRef =>
         methodRef.methodInstFullName.foreach { methodInstFullName =>
           methodInstFullNameToMethodFullName.get(methodInstFullName) match {
             case Some(methodFullName) =>
-              methodRef.setProperty2(NodeKeysOdb.METHOD_FULL_NAME -> methodFullName)
+              methodRef.setProperty(NodeKeys.METHOD_FULL_NAME -> methodFullName)
             case None =>
               MethodInstCompat.logger.warn(
                 s"Unable to find method full name by " +

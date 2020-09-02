@@ -38,8 +38,8 @@ class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
   }
 
   private def validateCardinalityOne(dstNode: Node, nodeKeyType: String): Unit = {
-    val property = dstNode.propertyOption(PropertyKey(nodeKeyType))
-    if (property.isEmpty) {
+    val property = dstNode.propertyOption(new PropertyKey[Any](nodeKeyType))
+    if (!property.isPresent) {
       // AST_PARENT_FULL_NAME and AST_PARENT_TYPE have cardinality one in our base.json but are
       // in fact optional iff the related information is provided via an AST edge
       if (nodeKeyType == NodeKeyNames.AST_PARENT_FULL_NAME || nodeKeyType == NodeKeyNames.AST_PARENT_TYPE) {
@@ -55,7 +55,7 @@ class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
   }
 
   private def validateCardinalityZeroOrOne(dstNode: Node, nodeKeyType: String): Unit = {
-    val property = dstNode.propertyOption(PropertyKey(nodeKeyType))
+    val property = dstNode.propertyOption(new PropertyKey[Any](nodeKeyType))
     if (null == property) {
       errorRegistry.addError(
         KeyError(dstNode, nodeKeyType, Cardinality.ZeroOrOne)
@@ -64,7 +64,7 @@ class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
   }
 
   private def validateCardinalityList(dstNode: Node, nodeKeyType: String): Unit = {
-    val property = dstNode.property2[List[_]](nodeKeyType)
+    val property = dstNode.property(new PropertyKey[List[_]](nodeKeyType))
     if (null == property) {
       errorRegistry.addError(KeyError(dstNode, nodeKeyType, Cardinality.List))
     }

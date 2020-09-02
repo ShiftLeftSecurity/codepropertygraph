@@ -1,6 +1,5 @@
 package io.shiftleft.semanticcpg.language
 
-import gremlin.scala.__
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
@@ -8,8 +7,7 @@ import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-
-import scala.collection.mutable
+import overflowdb.traversal._
 
 class StepsTest extends AnyWordSpec with Matchers {
 
@@ -26,7 +24,7 @@ class StepsTest extends AnyWordSpec with Matchers {
       val mainMethods: List[nodes.Method] =
         fixture.cpg.method
           .name(".*")
-          .where(_.fullName.matches(".*main.*"))
+          .filter(_.fullName.matches(".*main.*"))
           .toList
 
       mainMethods.size shouldBe 1
@@ -34,7 +32,7 @@ class StepsTest extends AnyWordSpec with Matchers {
 
     "filter with traversal on cpg type" in ExistingCpgFixture("splitmeup") { fixture =>
       def allMethods = fixture.cpg.method
-      val publicMethods = allMethods.filter(_.isPublic)
+      val publicMethods = allMethods.where(_.isPublic)
 
       allMethods.toList.size should be > publicMethods.toList.size
     }
@@ -42,8 +40,8 @@ class StepsTest extends AnyWordSpec with Matchers {
     "filter on id" when {
       "providing one" in ExistingCpgFixture("splitmeup") { fixture =>
         // find an arbitrary method so we can find it again in the next step
-        val method: nodes.Method = fixture.cpg.method.toList.head
-        val results: List[nodes.Method] = fixture.cpg.method.id(method.id2).toList
+        val method: nodes.Method = fixture.cpg.method.head
+        val results: List[nodes.Method] = fixture.cpg.method.id(method.id).toList
 
         results.size shouldBe 1
         results.head.underlying.id
@@ -51,26 +49,12 @@ class StepsTest extends AnyWordSpec with Matchers {
 
       "providing multiple" in ExistingCpgFixture("splitmeup") { fixture =>
         // find two arbitrary methods so we can find it again in the next step
-        val methods: Set[nodes.Method] = fixture.cpg.method.toList.take(2).toSet
-        val results: List[nodes.Method] = fixture.cpg.method.id(methods.map(_.id2)).toList
+        val methods = fixture.cpg.method.toList.take(2)
+        val results: List[nodes.Method] = fixture.cpg.method.id(methods.map(_.id): _*).toList
 
         results.size shouldBe 2
         results.toSet shouldBe methods.toSet
       }
-    }
-
-    "aggregate intermediary results into a given collection" in ExistingCpgFixture("splitmeup") { fixture =>
-      val allMethods = mutable.ArrayBuffer.empty[nodes.Method]
-
-      val mainMethods: List[nodes.Method] =
-        fixture.cpg.method
-          .name(".*")
-          .aggregate(allMethods)
-          .where(_.fullName.matches(".*main.*"))
-          .toList
-
-      mainMethods.size shouldBe 1
-      allMethods.size should be > 1
     }
   }
 
@@ -94,7 +78,7 @@ class StepsTest extends AnyWordSpec with Matchers {
 
   "allow lists in map/flatMap/forComprehension" in ExistingCpgFixture("splitmeup") { fixture =>
     val query = fixture.cpg.method.isPublic.map { method =>
-      (method.name, method.start.parameter.toList)
+      (method.name, method.parameter.l)
     }
     val results: List[(String, List[nodes.MethodParameterIn])] = query.toList
     results.size should be > 1
@@ -137,12 +121,12 @@ class StepsTest extends AnyWordSpec with Matchers {
 
     "use default `toString` if nothing else applies" in {
       case class Foo(i: Int)
-      val steps: Steps[Foo] = new Steps(__(Foo(42)))
+      val steps: Steps[Foo] = new Steps(Traversal.fromSingle(Foo(42)))
       steps.p.head shouldBe "Foo(42)"
     }
 
     "render nodes as `(label,id): properties`" in ExistingCpgFixture("splitmeup") { fixture =>
-      def mainMethods: Steps[nodes.Method] =
+      def mainMethods: Traversal[nodes.Method] =
         fixture.cpg.method.name("main")
 
       val nodeId = mainMethods.head.id
@@ -201,15 +185,15 @@ class StepsTest extends AnyWordSpec with Matchers {
     "provides generic help" when {
       "using verbose mode" when {
         "traversing nodes" in {
-          val methodSteps = new Steps[nodes.Method](null)
-          methodSteps.helpVerbose should include(".toList")
-          methodSteps.helpVerbose should include(".label")
+          val methodTraversal = Traversal.empty[nodes.Method]
+          methodTraversal.helpVerbose should include(".l")
+          methodTraversal.helpVerbose should include(".label")
         }
 
         "traversing non-nodes" in {
-          val stringSteps = new Steps[String](null)
-          stringSteps.helpVerbose should include(".toList")
-          stringSteps.helpVerbose should not include ".label"
+          val stringTraversal = Traversal.empty[String]
+          stringTraversal.helpVerbose should include(".l")
+          stringTraversal.helpVerbose should not include ".label"
         }
       }
     }

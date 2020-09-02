@@ -1,8 +1,8 @@
 package io.shiftleft.cpgvalidator
 
-import io.shiftleft.codepropertygraph.generated.NodeKeysOdb
+import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.Cardinality
-import overflowdb.{Direction, Node, OdbEdge}
+import overflowdb.{Direction, Node, Edge}
 import scala.jdk.CollectionConverters._
 
 sealed trait ValidationError {
@@ -12,7 +12,7 @@ sealed trait ValidationError {
 object ErrorHelper {
   def getNodeDetails(node: Node): String =
     s"details for node ${node.label}:\n" +
-      "\t\t" + s"id: ${node.id2}\n" +
+      "\t\t" + s"id: ${node.id}\n" +
       "\t\t" + s"properties:\n" +
       s"${node.propertyMap.asScala.map { case (key, value) => s"\t\t\t$key -> $value" }.mkString("\n")}"
 }
@@ -72,7 +72,7 @@ case class NodeTypeError(node: Node, edgeType: String, direction: Direction, inv
   }
 }
 
-case class EdgeTypeError(node: Node, direction: Direction, invalidEdges: List[OdbEdge]) extends ValidationError {
+case class EdgeTypeError(node: Node, direction: Direction, invalidEdges: List[Edge]) extends ValidationError {
   override def toString: String = direction match {
     case Direction.OUT =>
       s"Expected no outgoing ${invalidEdges.map(_.label).toSet.mkString(" or ")} edges\n" +
@@ -105,9 +105,9 @@ case class CfgEdgeError(srcNode: Node, dstNode: Node, srcNodeMethod: Node, dstNo
 
   override def toString: String = {
     s"Found invalid CFG edge which stretches over method boundaries.\n" +
-      "\t" + s"cfg edge start in method: ${srcNodeMethod.property(NodeKeysOdb.FULL_NAME)}\n" +
+      "\t" + s"cfg edge start in method: ${srcNodeMethod.property(NodeKeys.FULL_NAME)}\n" +
       "\t" + s"cfg edge start: ${ErrorHelper.getNodeDetails(srcNode)}\n" +
-      "\t" + s"cfg edge end in method: ${dstNodeMethod.property(NodeKeysOdb.FULL_NAME)}\n" +
+      "\t" + s"cfg edge end in method: ${dstNodeMethod.property(NodeKeys.FULL_NAME)}\n" +
       "\t" + s"cfg edge end: ${ErrorHelper.getNodeDetails(dstNode)}\n"
   }
 

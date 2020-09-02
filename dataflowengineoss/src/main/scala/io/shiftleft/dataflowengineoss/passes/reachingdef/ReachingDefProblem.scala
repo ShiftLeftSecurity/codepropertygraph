@@ -5,7 +5,7 @@ import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.jdk.CollectionConverters._
-import io.shiftleft.Implicits.JavaIteratorDeco
+import overflowdb.traversal._
 
 object Definition {
 
@@ -61,7 +61,7 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
   private def initPred(ns: List[nodes.StoredNode],
                        method: nodes.Method): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
     ns.map {
-      case n @ (_: nodes.CfgNode) if method.start.cfgFirst.headOption().contains(n) =>
+      case n @ (_: nodes.CfgNode) if method.start.cfgFirst.headOption.contains(n) =>
         n -> method.parameter.l.sortBy(_.order).lastOption.toList
       case n @ (cfgNode: nodes.CfgNode)     => n -> cfgNode.start.cfgPrev.l
       case n @ (_: nodes.MethodParameterIn) => n -> List(method)
@@ -122,7 +122,7 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     def allOtherInstancesOf(node: nodes.StoredNode): Set[nodes.StoredNode] = {
       declaration(node).toList
         .flatMap(instances)
-        .filter(_.id2 != node.id2)
+        .filter(_.id != node.id)
         .toSet
     }
 

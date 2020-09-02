@@ -48,7 +48,7 @@ class CpgPassTests extends AnyWordSpec with Matchers {
 
     "take into account KeyPool for createAndApply" in Fixture(Some(new IntervalKeyPool(100, 120))) { (cpg, pass) =>
       pass.createAndApply()
-      cpg.graph.V.asScala.map(_.id2()).toSet shouldBe Set(100, 101)
+      cpg.graph.V.asScala.map(_.id()).toSet shouldBe Set(100, 101)
     }
   }
 

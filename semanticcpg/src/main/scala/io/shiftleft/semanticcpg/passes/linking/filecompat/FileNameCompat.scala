@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal._
 
 /**
   * Updates NAMESPACE_BLOCKs, TYPE_DECLs and METHODs so that they all
@@ -25,9 +26,9 @@ class FileNameCompat(cpg: Cpg) extends CpgPass(cpg) {
       }
     }
 
-    cpg.namespaceBlock.toIterator().foreach(updateDefaultFileName)
-    cpg.typeDecl.toIterator().foreach(updateDefaultFileName)
-    cpg.method.toIterator().foreach(updateDefaultFileName)
+    cpg.namespaceBlock.foreach(updateDefaultFileName)
+    cpg.typeDecl.foreach(updateDefaultFileName)
+    cpg.method.foreach(updateDefaultFileName)
 
     Iterator(dstGraph.build())
   }

@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.InFact
 import io.shiftleft.cpgvalidator._
 import io.shiftleft.cpgvalidator.facts.InFactsImporter
-import overflowdb.{Direction, Node, OdbEdge}
+import overflowdb.{Direction, Node, Edge}
 
 import scala.jdk.CollectionConverters._
 
@@ -80,9 +80,7 @@ class InFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validator
     }
   }
 
-  private def validateAllInEdgesTypes(dstNode: Node,
-                                      actualEdges: List[OdbEdge],
-                                      allowedEdgeTypes: List[String]): Unit = {
+  private def validateAllInEdgesTypes(dstNode: Node, actualEdges: List[Edge], allowedEdgeTypes: List[String]): Unit = {
     val invalidEdges = actualEdges.filter(
       actualEdge => !allowedEdgeTypes.contains(actualEdge.label)
     )

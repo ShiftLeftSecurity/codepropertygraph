@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.OutFact
 import io.shiftleft.cpgvalidator._
 import io.shiftleft.cpgvalidator.facts.OutFactsImporter
-import overflowdb.{Direction, Node, OdbEdge}
+import overflowdb.{Direction, Node, Edge}
 
 import scala.jdk.CollectionConverters._
 
@@ -102,9 +102,7 @@ class OutFactsValidator(errorRegistry: ValidationErrorRegistry) extends Validato
     }
   }
 
-  private def validateAllOutEdgesTypes(srcNode: Node,
-                                       actualEdges: List[OdbEdge],
-                                       allowedEdgeTypes: List[String]): Unit = {
+  private def validateAllOutEdgesTypes(srcNode: Node, actualEdges: List[Edge], allowedEdgeTypes: List[String]): Unit = {
     val invalidEdges = actualEdges.filter(
       actualEdge => !allowedEdgeTypes.contains(actualEdge.label)
     )

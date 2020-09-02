@@ -35,7 +35,7 @@ class TypeDeclTests extends CodeToCpgSuite {
   }
 
   "should allow traversing from type to enclosing file" in {
-    cpg.typeDecl.file.where(_.name.endsWith(".c")).l should not be empty
+    cpg.typeDecl.file.filter(_.name.endsWith(".c")).l should not be empty
   }
 
 }

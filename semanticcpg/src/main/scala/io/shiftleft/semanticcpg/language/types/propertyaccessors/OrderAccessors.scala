@@ -1,25 +1,24 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import gremlin.scala.GremlinScala
 import io.shiftleft.codepropertygraph.generated.NodeKeys
-import io.shiftleft.codepropertygraph.generated.nodes.{HasOrder, StoredNode}
-import io.shiftleft.semanticcpg.language.{NodeSteps, Steps}
+import io.shiftleft.codepropertygraph.generated.nodes.HasOrder
+import overflowdb.Node
+import overflowdb.traversal.Traversal
 
-class OrderAccessors[A <: StoredNode with HasOrder](steps: Steps[A]) extends PropertyAccessors[A] {
-  override val raw: GremlinScala[A] = steps.raw
+class OrderAccessors[A <: Node with HasOrder](val traversal: Traversal[A]) extends AnyVal {
 
-  def order(): Steps[Integer] =
-    property(NodeKeys.ORDER)
+  def order: Traversal[Integer] =
+    traversal.map(_.order)
 
-  def order(value: Integer): NodeSteps[A] =
-    propertyFilter(NodeKeys.ORDER, value)
+  def order(value: Integer): Traversal[A] =
+    PropertyAccessors.filter(traversal, NodeKeys.ORDER, value)
 
-  def order(value: Integer*): NodeSteps[A] =
-    propertyFilterMultiple(NodeKeys.ORDER, value: _*)
+  def order(value: Integer*): Traversal[A] =
+    PropertyAccessors.filterMultiple(traversal, NodeKeys.ORDER, value: _*)
 
-  def orderNot(value: Integer): NodeSteps[A] =
-    propertyFilterNot(NodeKeys.ORDER, value)
+  def orderNot(value: Integer): Traversal[A] =
+    PropertyAccessors.filterNot(traversal, NodeKeys.ORDER, value)
 
-  def orderNot(values: Integer*): NodeSteps[A] =
-    propertyFilterNotMultiple(NodeKeys.ORDER, values: _*)
+  def orderNot(values: Integer*): Traversal[A] =
+    PropertyAccessors.filterNotMultiple(traversal, NodeKeys.ORDER, values: _*)
 }
