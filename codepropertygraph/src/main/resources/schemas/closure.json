@@ -12,6 +12,13 @@
         ]}
       ]
     },
+    { "name" : "TYPE_REF",
+      "outEdges" : [
+        {"edgeName": "CAPTURE", "inNodes": [
+          {"name": "CLOSURE_BINDING"}
+        ]}
+      ]
+    },
     {"id":334, "name":"CLOSURE_BINDING",
       "keys": [ "CLOSURE_BINDING_ID", "EVALUATION_STRATEGY", "CLOSURE_ORIGINAL_NAME" ],
       "comment":"Represents the binding of a LOCAL or METHOD_PARAMETER_IN into the closure of a method",

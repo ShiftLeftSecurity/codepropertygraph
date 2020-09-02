@@ -10,6 +10,7 @@ object SuperTypes {
     NodeTypes.FIELD_IDENTIFIER,
     NodeTypes.LITERAL,
     NodeTypes.METHOD_REF,
+    NodeTypes.TYPE_REF,
     NodeTypes.RETURN,
     NodeTypes.UNKNOWN,
   )
