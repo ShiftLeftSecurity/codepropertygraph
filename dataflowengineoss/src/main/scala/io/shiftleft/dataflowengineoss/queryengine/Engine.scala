@@ -89,7 +89,7 @@ class Engine(context: EngineContext) {
           .flatMap { call =>
             NoResolve.getCalledMethods(call)
           }
-          .start
+          .to(Traversal)
           .methodReturn
           .l
         methodReturns.map { ret =>
@@ -100,7 +100,10 @@ class Engine(context: EngineContext) {
     val forArgs: List[(nodes.TrackingPoint, List[PathElement], Int)] = outArgsAndCalls.flatMap {
       case (args, path, callDepth) =>
         args.flatMap { arg =>
-          argToMethods(arg).start.parameter.asOutput
+          argToMethods(arg)
+            .to(Traversal)
+            .parameter
+            .asOutput
             .order(arg.order)
             .map { p =>
               (p, path, callDepth)
