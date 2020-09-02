@@ -65,6 +65,7 @@
               {"name": "LITERAL"},
               {"name": "RETURN"},
               {"name": "METHOD_REF"},
+               {"name": "TYPE_REF"},
               {"name": "BLOCK"},
 	      {"name" : "CONTROL_STRUCTURE"},
 	      {"name" : "JUMP_TARGET"},
@@ -128,7 +129,12 @@
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
         },
-        { "name": "TYPE",
+      { "name": "TYPE_REF",
+        "outEdges" : [
+          {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
+        ]
+      },
+      { "name": "TYPE",
           "outEdges" : [
              {"edgeName": "REF", "inNodes": [{"name": "TYPE_DECL"}]}
           ]

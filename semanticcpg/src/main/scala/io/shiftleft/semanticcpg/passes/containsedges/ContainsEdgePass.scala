@@ -45,6 +45,7 @@ object ContainsEdgePass {
     NodeTypes.CALL,
     NodeTypes.LITERAL,
     NodeTypes.METHOD_REF,
+    NodeTypes.TYPE_REF,
     NodeTypes.CONTROL_STRUCTURE,
     NodeTypes.JUMP_TARGET,
     NodeTypes.UNKNOWN
