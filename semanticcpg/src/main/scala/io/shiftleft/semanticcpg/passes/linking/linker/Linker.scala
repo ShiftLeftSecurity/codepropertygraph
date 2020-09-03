@@ -57,6 +57,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
         NodeTypes.IDENTIFIER,
         NodeTypes.BLOCK,
         NodeTypes.METHOD_REF,
+        NodeTypes.TYPE_REF,
         NodeTypes.UNKNOWN
       ),
       dstNodeLabel = NodeTypes.TYPE,
