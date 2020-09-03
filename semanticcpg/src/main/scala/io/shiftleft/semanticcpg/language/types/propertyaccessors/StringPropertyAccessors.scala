@@ -6,27 +6,31 @@ import overflowdb.traversal.filter.P
 
 object StringPropertyAccessors {
 
-  def filter[A <: Node](traversal: Traversal[A], property: PropertyKey[String], value: String): Traversal[A] =
-    traversal.has(property.where(_.matches(value)))
+  def filter[A <: Node](traversal: Traversal[A], property: PropertyKey[String], regex: String): Traversal[A] = {
+    val regex0 = regex.r
+    traversal.has(property.where(propValue => regex0.matches(propValue)))
+  }
 
-  def filterNot[A <: Node](traversal: Traversal[A], property: PropertyKey[String], value: String): Traversal[A] =
-    traversal.hasNot(property.where(_.matches(value)))
+  def filterNot[A <: Node](traversal: Traversal[A], property: PropertyKey[String], regex: String): Traversal[A] = {
+    val regex0 = regex.r
+    traversal.hasNot(property.where(propValue => regex0.matches(propValue)))
+  }
 
   def filterMultiple[A <: Node](traversal: Traversal[A],
                                 property: PropertyKey[String],
-                                values: String*): Traversal[A] = {
-    val regexes = values.toSet
-    traversal.has(property.where { value =>
-      regexes.exists(_.matches(value))
+                                regexes: String*): Traversal[A] = {
+    val regexes0 = regexes.map(_.r).toSet
+    traversal.has(property.where { propValue =>
+      regexes0.exists(_.matches(propValue))
     })
   }
 
   def filterNotMultiple[A <: Node](traversal: Traversal[A],
                                    property: PropertyKey[String],
-                                   values: String*): Traversal[A] = {
-    val regexes = values.toSet
-    traversal.hasNot(property.where { value =>
-      regexes.exists(_.matches(value))
+                                   regexes: String*): Traversal[A] = {
+    val regexes0 = regexes.map(_.r).toSet
+    traversal.hasNot(property.where { propValue =>
+      regexes0.exists(_.matches(propValue))
     })
   }
 
