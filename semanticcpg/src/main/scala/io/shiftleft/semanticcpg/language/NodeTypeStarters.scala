@@ -288,7 +288,9 @@ class NodeTypeStarters(cpg: Cpg) {
   /**
   Begin traversal at node with id.
     */
-  def id[NodeType <: nodes.StoredNode](anId: Any): Traversal[NodeType] = id(Seq(anId))
+  def id[NodeType <: nodes.StoredNode](anId: Long): Traversal[NodeType] = {
+    cpg.graph.nodes(anId).cast[NodeType]
+  }
 
   /**
   Begin traversal at set of nodes - specified by their ids
