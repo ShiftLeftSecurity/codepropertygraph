@@ -272,6 +272,13 @@ class NodeTypeStarters(cpg: Cpg) {
     cpg.graph.nodes(NodeTypes.METHOD_REF).cast[nodes.MethodRef]
 
   /**
+    * Traverse to all type references
+    * */
+  @Doc("All type references")
+  def typeRef: Traversal[nodes.TypeRef] =
+    cpg.graph.nodes(NodeTypes.TYPE_REF).cast[nodes.TypeRef]
+
+  /**
     * Shorthand for `cpg.methodRef
     * .filter(_.referencedMethod.fullName(fullName))`
     * */

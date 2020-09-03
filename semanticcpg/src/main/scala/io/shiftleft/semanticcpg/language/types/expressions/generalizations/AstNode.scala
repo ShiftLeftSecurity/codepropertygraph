@@ -178,6 +178,12 @@ class AstNode[A <: nodes.AstNode](val traversal: Traversal[A]) extends AnyVal {
     traversal.hasLabel(NodeTypes.METHOD_REF).cast[nodes.MethodRef]
 
   /**
+    * Traverse only to AST nodes that are type reference nodes.
+    */
+  def isTypeRef: Traversal[nodes.MethodRef] =
+    traversal.hasLabel(NodeTypes.TYPE_REF).cast[nodes.MethodRef]
+
+  /**
     * Traverse only to AST nodes that are METHOD nodes.
     */
   def isMethod: Traversal[nodes.Method] =
