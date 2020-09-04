@@ -60,3 +60,11 @@ object CfgEdgeErrorCategory {
 }
 
 case class CfgEdgeErrorCategory() extends ValidationErrorCategory {}
+
+object CallReceiverErrorCategory {
+  def apply(error: CallReceiverError): CallReceiverErrorCategory = {
+    CallReceiverErrorCategory()
+  }
+}
+
+case class CallReceiverErrorCategory() extends ValidationErrorCategory {}

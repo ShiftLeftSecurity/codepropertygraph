@@ -1,8 +1,9 @@
 package io.shiftleft.cpgvalidator
 
-import io.shiftleft.codepropertygraph.generated.NodeKeys
+import io.shiftleft.codepropertygraph.generated.{DispatchTypes, NodeKeys}
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.Cardinality
-import overflowdb.{Direction, Node, Edge}
+import overflowdb.{Direction, Edge, Node}
+
 import scala.jdk.CollectionConverters._
 
 sealed trait ValidationError {
@@ -104,7 +105,7 @@ case class CfgEdgeError(srcNode: Node, dstNode: Node, srcNodeMethod: Node, dstNo
     extends ValidationError {
 
   override def toString: String = {
-    s"Found invalid CFG edge which stretches over method boundaries.\n" +
+    s"Found invalid CFG edge which stretches over method boundaries:\n" +
       "\t" + s"cfg edge start in method: ${srcNodeMethod.property(NodeKeys.FULL_NAME)}\n" +
       "\t" + s"cfg edge start: ${ErrorHelper.getNodeDetails(srcNode)}\n" +
       "\t" + s"cfg edge end in method: ${dstNodeMethod.property(NodeKeys.FULL_NAME)}\n" +
@@ -113,5 +114,20 @@ case class CfgEdgeError(srcNode: Node, dstNode: Node, srcNodeMethod: Node, dstNo
 
   override def getCategory: ValidationErrorCategory = {
     CfgEdgeErrorCategory(this)
+  }
+}
+
+case class CallReceiverError(node: Node, dispatchType: String) extends ValidationError {
+
+  override def toString: String = {
+    val cardinality = if (dispatchType == DispatchTypes.DYNAMIC_DISPATCH) "an" else "no"
+    s"Found invalid CALL node:\n" +
+      "\t" + s"with dispatch type '$dispatchType' it should have $cardinality outgoing RECEIVER edge\n" +
+      "\t" + s"node: ${node.label}\n" +
+      "\t" + s"${ErrorHelper.getNodeDetails(node)}\n"
+  }
+
+  override def getCategory: ValidationErrorCategory = {
+    CallReceiverErrorCategory(this)
   }
 }
