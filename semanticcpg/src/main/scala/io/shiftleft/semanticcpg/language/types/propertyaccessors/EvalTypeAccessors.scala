@@ -10,22 +10,22 @@ class EvalTypeAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
   def evalType: Traversal[String] =
     traversal.out(EdgeTypes.EVAL_TYPE).out(EdgeTypes.REF).property(NodeKeys.FULL_NAME)
 
-  def evalType(value: String): Traversal[A] =
+  def evalType(regex: String): Traversal[A] =
     traversal.where(
       _.out(EdgeTypes.EVAL_TYPE)
         .out(EdgeTypes.REF)
-        .has(NodeKeys.FULL_NAME.where(_.matches(value)))
+        .has(NodeKeys.FULL_NAME.where(_.matches(regex)))
     )
 
   def evalType(values: String*): Traversal[A] =
     if (values.isEmpty) Traversal.empty
     else {
-      val regexes = values.toSet
+      val regexes0 = values.map(_.r).toSet
       traversal.where(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
           .has(NodeKeys.FULL_NAME.where { value =>
-            regexes.exists(_.matches(value))
+            regexes0.exists(_.matches(value))
           })
       )
     }
@@ -51,15 +51,15 @@ class EvalTypeAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
         .out(EdgeTypes.REF)
         .hasNot(NodeKeys.FULL_NAME.where(_.matches(value))))
 
-  def evalTypeNot(values: String*): Traversal[A] =
-    if (values.isEmpty) Traversal.empty
+  def evalTypeNot(regexes: String*): Traversal[A] =
+    if (regexes.isEmpty) Traversal.empty
     else {
-      val regexes = values.toSet
+      val regexes0 = regexes.map(_.r).toSet
       traversal.where(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
           .hasNot(NodeKeys.FULL_NAME.where { value =>
-            regexes.exists(_.matches(value))
+            regexes0.exists(_.matches(value))
           })
       )
     }
