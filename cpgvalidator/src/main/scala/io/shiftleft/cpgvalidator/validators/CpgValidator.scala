@@ -10,6 +10,7 @@ class CpgValidator(errorRegistry: ValidationErrorRegistry) {
     new InFactsValidator(errorRegistry),
     new KeysValidator(errorRegistry),
     new NoLongJumpValidator(errorRegistry),
+    new CallReceiverValidator(errorRegistry)
   )
 
   def validate(notEnhancedCpg: Cpg): Boolean = {
