@@ -4,12 +4,9 @@ dependsOn(Projects.protoBindings)
 
 libraryDependencies ++= Seq(
   "io.shiftleft"             %% "overflowdb-traversal" % "1.1",
-  "com.google.guava"         %  "guava"                % "21.0",
-  "org.apache.commons"       %  "commons-lang3"        % "3.5",
-  "commons-io"               %  "commons-io"           % "2.5",
+  "org.apache.commons"       %  "commons-lang3"        % "3.5", // TODO drop after https://github.com/ShiftLeftSecurity/fuzzyc2cpg/pull/229 is released
   "com.github.pathikrit"     %% "better-files"         % "3.8.0",
   "org.scala-lang.modules"   %% "scala-java8-compat"   % "0.9.0",
-  "com.github.scopt"         %% "scopt"                % "3.7.1",
   "org.slf4j"                %  "slf4j-api"            % "1.7.30",
   "org.apache.logging.log4j" %  "log4j-slf4j-impl"     % "2.11.2" % Test,
   "org.scalatest"            %% "scalatest"            % Versions.scalatest % Test
