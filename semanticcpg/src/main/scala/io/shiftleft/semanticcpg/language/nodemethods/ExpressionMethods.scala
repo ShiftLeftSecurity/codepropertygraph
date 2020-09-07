@@ -13,16 +13,18 @@ class ExpressionMethods(val node: nodes.AstNode) extends AnyVal {
     * It's continuing it's walk until it hits an expression that's not a generic
     * "member access operation", e.g., "<operator>.memberAccess".
     * */
-  def parentExpression: nodes.Expression = _parentExpression(node)
+  def parentExpression: Option[nodes.Expression] = _parentExpression(node)
 
   @tailrec
-  private final def _parentExpression(argument: nodes.AstNode): nodes.Expression = {
+  private final def _parentExpression(argument: nodes.AstNode): Option[nodes.Expression] = {
     val parent = argument._astIn.onlyChecked
     parent match {
       case call: nodes.Call if MemberAccess.isGenericMemberAccessName(call.name) =>
         _parentExpression(call)
       case expression: nodes.Expression =>
-        expression
+        Some(expression)
+      case _ =>
+        None
     }
   }
 

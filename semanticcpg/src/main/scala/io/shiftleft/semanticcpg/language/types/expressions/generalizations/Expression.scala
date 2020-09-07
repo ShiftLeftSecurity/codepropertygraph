@@ -17,7 +17,7 @@ class Expression[NodeType <: nodes.Expression](val traversal: Traversal[NodeType
     * "member access operation", e.g., "<operator>.memberAccess".
     * */
   def parentExpression: Traversal[nodes.Expression] =
-    traversal.map(_.parentExpression)
+    traversal.flatMap(_.parentExpression)
 
   /**
     Traverse to enclosing expression

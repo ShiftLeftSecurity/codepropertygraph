@@ -44,7 +44,7 @@ private object TrackingPointMethodsBase {
 
 private object TrackingPointToCfgNode {
   def apply(node: nodes.TrackingPointBase): nodes.CfgNode = {
-    applyInternal(node, _.parentExpression)
+    applyInternal(node, _.parentExpression.get)
   }
 
   private def applyInternal(node: nodes.TrackingPointBase,

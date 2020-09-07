@@ -89,9 +89,9 @@ object Shared {
 
   def toCfgNode(node: nodes.StoredNode): nodes.CfgNode = {
     node match {
-      case node: nodes.Identifier => node.parentExpression
-      case node: nodes.MethodRef  => node.parentExpression
-      case node: nodes.Literal    => node.parentExpression
+      case node: nodes.Identifier => node.parentExpression.get
+      case node: nodes.MethodRef  => node.parentExpression.get
+      case node: nodes.Literal    => node.parentExpression.get
 
       case node: nodes.MethodParameterIn => node.method
 
@@ -99,7 +99,7 @@ object Shared {
         node.method.methodReturn
 
       case node: nodes.Call if MemberAccess.isGenericMemberAccessName(node.name) =>
-        node.parentExpression
+        node.parentExpression.get
 
       case node: nodes.Call         => node
       case node: nodes.ImplicitCall => node
