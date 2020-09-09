@@ -1,12 +1,11 @@
 package io.shiftleft.dataflowengineoss.language.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.language._
-import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.queryengine.EngineContext
-import io.shiftleft.semanticcpg.utils.MemberAccess
+import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointToCfgNode
+import overflowdb.traversal.Traversal
 import overflowdb.traversal._
-import scala.jdk.CollectionConverters._
+import io.shiftleft.dataflowengineoss.language._
 
 class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) extends AnyVal {
 
@@ -29,50 +28,4 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
       implicit context: EngineContext): Traversal[NodeType] =
     node.start.reachableBy(sourceTravs: _*)
 
-}
-
-private object TrackingPointMethodsBase {
-  def lastExpressionInBlock(block: nodes.Block): Option[nodes.Expression] =
-    block._astOut.asScala
-      .collect {
-        case node: nodes.Expression if !node.isInstanceOf[nodes.Local] && !node.isInstanceOf[nodes.Method] => node
-      }
-      .toVector
-      .sortBy(_.order)
-      .lastOption
-}
-
-private object TrackingPointToCfgNode {
-  def apply(node: nodes.TrackingPointBase): nodes.CfgNode = {
-    applyInternal(node, _.parentExpression.get)
-  }
-
-  private def applyInternal(node: nodes.TrackingPointBase,
-                            parentExpansion: nodes.Expression => nodes.Expression): nodes.CfgNode = {
-
-    node match {
-      case node: nodes.Identifier => parentExpansion(node)
-      case node: nodes.MethodRef  => parentExpansion(node)
-      case node: nodes.Literal    => parentExpansion(node)
-
-      case node: nodes.MethodParameterIn => node.method
-
-      case node: nodes.MethodParameterOut =>
-        node.method.methodReturn
-
-      case node: nodes.Call if MemberAccess.isGenericMemberAccessName(node.name) =>
-        parentExpansion(node)
-
-      case node: nodes.Call         => node
-      case node: nodes.ImplicitCall => node
-      case node: nodes.MethodReturn => node
-      case block: nodes.Block       =>
-        // Just taking the lastExpressionInBlock is not quite correct because a BLOCK could have
-        // different return expressions. So we would need to expand via CFG.
-        // But currently the frontends do not even put the BLOCK into the CFG so this is the best
-        // we can do.
-        applyInternal(TrackingPointMethodsBase.lastExpressionInBlock(block).get, identity)
-      case node: nodes.Expression => node
-    }
-  }
 }
