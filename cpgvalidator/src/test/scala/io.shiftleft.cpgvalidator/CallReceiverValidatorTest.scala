@@ -23,7 +23,7 @@ class CallReceiverValidatorTest extends AnyWordSpec with Matchers {
     }
   }
 
-  "report no call receiver for simple correct graph" in {
+  "report no call receiver errors for simple correct graph" in {
     withNewBaseCpg { cpg =>
       val validator = new CallReceiverValidator(new ValidationErrorRegistry)
       val rec = cpg.graph + (NodeTypes.IDENTIFIER, NodeKeys.NAME -> "rec")
@@ -31,6 +31,19 @@ class CallReceiverValidatorTest extends AnyWordSpec with Matchers {
       val call2 = cpg.graph + (NodeTypes.CALL, NodeKeys.DISPATCH_TYPE -> DispatchTypes.STATIC_DISPATCH)
 
       call1 --- EdgeTypes.RECEIVER --> rec
+
+      validator.validate(cpg) shouldBe true
+    }
+  }
+
+  "report no call receiver errors for simple correct graph (with AST edge and argument index)" in {
+    withNewBaseCpg { cpg =>
+      val validator = new CallReceiverValidator(new ValidationErrorRegistry)
+      val rec = cpg.graph + (NodeTypes.IDENTIFIER, NodeKeys.NAME -> "rec", NodeKeys.ARGUMENT_INDEX -> 0)
+      val call1 = cpg.graph + (NodeTypes.CALL, NodeKeys.DISPATCH_TYPE -> DispatchTypes.DYNAMIC_DISPATCH)
+      val call2 = cpg.graph + (NodeTypes.CALL, NodeKeys.DISPATCH_TYPE -> DispatchTypes.STATIC_DISPATCH)
+
+      call1 --- EdgeTypes.AST --> rec
 
       validator.validate(cpg) shouldBe true
     }
