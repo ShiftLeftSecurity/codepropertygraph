@@ -9,7 +9,7 @@ object MatchResult extends Enumeration {
 }
 
 object AccessPath {
-  val noExclusions = List[Elements]()
+  val noExclusions: List[Elements] = List[Elements]()
   val empty = new AccessPath(Elements(), noExclusions)
   def apply(elements: Elements, exclusions: Seq[Elements]): AccessPath = {
     if (elements.isEmpty && exclusions.isEmpty) AccessPath.empty
@@ -30,7 +30,7 @@ object AccessPath {
 case class FullMatchResult(
                            /** The unaffected part of the accesspath. Some(this) for no match, None for perfect match;
                              * may have additional exclusions to this.*/
-                           val stepOverPath: Option[AccessPath],
+                           stepOverPath: Option[AccessPath],
                            //
                            /** The affected part of the accesspath, mapped to be relative to this.
                              *
@@ -40,13 +40,13 @@ case class FullMatchResult(
                              * Outside of overtainting, if stepIntoPath.isDefined && stepIntoPath.elements.nonEmpty then:
                              *    path.elements == other.elements ++ path.matchFull(other).stepIntoPath.get.elements
                              *    extensionDiff.isEmpty */
-                           val stepIntoPath: Option[AccessPath],
+                           stepIntoPath: Option[AccessPath],
                            //
                            /** extensionDiff.nonEmpty if and only if a proper subset is affected.
                              * Outside of overtainting, if extensionDiff.nonEmpty then:
                              *    path.elements ++ path.matchFull(other).extensionDiff == other.elements
                              *    path.matchFull(other).stepIntoPath.get.elements.isEmpty */
-                           val extensionDiff: Elements) {
+                           extensionDiff: Elements) {
   def hasMatch: Boolean = stepIntoPath.nonEmpty
 }
 
@@ -78,7 +78,7 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
     val res = this.matchFull(other.elements)
     if (res.extensionDiff.isEmpty && res.stepIntoPath.isDefined && isExtensionExcluded(other.exclusions,
                                                                                        res.stepIntoPath.get.elements)) {
-      return FullMatchResult(Some(this), None, Elements.empty)
+      FullMatchResult(Some(this), None, Elements.empty)
     } else res
   }
 

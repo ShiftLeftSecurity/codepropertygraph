@@ -9,7 +9,7 @@ object MemberAccessToElement {
 
   private val logger = LoggerFactory.getLogger(getClass)
 
-  def convert(memberAccess: nodes.Call): Elements = {
+  def apply(memberAccess: nodes.Call): Elements = {
     memberAccess.name match {
       case Operators.memberAccess | Operators.indirectMemberAccess => {
         val memberOption = memberAccess
@@ -86,10 +86,10 @@ object MemberAccessToElement {
         VariablePointerShift
       }
       case Some(literal: nodes.Literal) =>
-        literal.code.toIntOption.map { PointerShift(_) }.getOrElse(VariablePointerShift)
+        literal.code.toIntOption.map(PointerShift).getOrElse(VariablePointerShift)
       case Some(fieldIdentifier: nodes.FieldIdentifier) =>
         fieldIdentifier.canonicalName.toIntOption
-          .map { PointerShift(_) }
+          .map(PointerShift)
           .getOrElse(VariablePointerShift)
       case _ => VariablePointerShift
     }

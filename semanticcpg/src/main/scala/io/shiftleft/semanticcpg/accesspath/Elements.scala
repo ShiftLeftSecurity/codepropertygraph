@@ -46,29 +46,32 @@ object Elements {
     var idxLeft = -1
     while (idxRight < elems.length) {
       val nextE = elems(idxRight)
-      if (nextE.isInstanceOf[PointerShift] && nextE.asInstanceOf[PointerShift].logicalOffset == 0) {
+      nextE match {
+        case shift: PointerShift if shift.logicalOffset == 0 =>
         //nothing to do
-      } else if (idxLeft == -1) {
-        idxLeft = 0
-        elems(0) = nextE
-      } else {
-        val lastE = elems(idxLeft)
-        (lastE, nextE) match {
-          case (last: PointerShift, next: PointerShift) =>
-            val newShift = last.logicalOffset + next.logicalOffset
-            if (newShift != 0) elems(idxLeft) = PointerShift(newShift)
-            else idxLeft -= 1
-          case (VariablePointerShift, _: PointerShift) | (VariablePointerShift, VariablePointerShift) =>
-          case (_: PointerShift, VariablePointerShift) =>
-            elems(idxLeft) = VariablePointerShift
-          case (AddressOf, IndirectionAccess) =>
-            idxLeft -= 1
-          case (IndirectionAccess, AddressOf) =>
-            idxLeft -= 1 // WRONG but useful, cf comment for `Elements.:+`
-          case _ =>
-            idxLeft += 1
-            elems(idxLeft) = nextE
-        }
+        case _ =>
+          if (idxLeft == -1) {
+            idxLeft = 0
+            elems(0) = nextE
+          } else {
+            val lastE = elems(idxLeft)
+            (lastE, nextE) match {
+              case (last: PointerShift, next: PointerShift) =>
+                val newShift = last.logicalOffset + next.logicalOffset
+                if (newShift != 0) elems(idxLeft) = PointerShift(newShift)
+                else idxLeft -= 1
+              case (VariablePointerShift, _: PointerShift) | (VariablePointerShift, VariablePointerShift) =>
+              case (_: PointerShift, VariablePointerShift) =>
+                elems(idxLeft) = VariablePointerShift
+              case (AddressOf, IndirectionAccess) =>
+                idxLeft -= 1
+              case (IndirectionAccess, AddressOf) =>
+                idxLeft -= 1 // WRONG but useful, cf comment for `Elements.:+`
+              case _ =>
+                idxLeft += 1
+                elems(idxLeft) = nextE
+            }
+          }
       }
       idxRight += 1
     }
@@ -85,13 +88,11 @@ object Elements {
 
   def inverted(elems: Iterable[AccessElement]): Elements = {
     newIfNonEmpty(elems.toArray.reverse.map {
-      _ match {
-        case AddressOf            => IndirectionAccess
-        case IndirectionAccess    => AddressOf
-        case PointerShift(idx)    => PointerShift(-idx)
-        case VariablePointerShift => VariablePointerShift
-        case _                    => throw new RuntimeException(s"Cannot invert ${Elements.unnormalized(elems)}")
-      }
+      case AddressOf            => IndirectionAccess
+      case IndirectionAccess    => AddressOf
+      case PointerShift(idx)    => PointerShift(-idx)
+      case VariablePointerShift => VariablePointerShift
+      case _                    => throw new RuntimeException(s"Cannot invert ${Elements.unnormalized(elems)}")
     })
   }
 
@@ -111,8 +112,7 @@ final class Elements private (val elements: Array[AccessElement] = Array[AccessE
         case (VariablePointerShift | VariableAccess) => true
         case _                                       => false
       }
-      .map(_ => false)
-      .getOrElse(true)
+      .forall(_ => false)
   }
 
   def invertibleTailLength: Int = {
@@ -222,10 +222,10 @@ final class Elements private (val elements: Array[AccessElement] = Array[AccessE
           done = true
       }
     }
-    val sz = elements.length + otherSize - 2 * idx + (if (buf != None) 1 else 0)
+    val sz = elements.length + otherSize - 2 * idx + (if (buf.isDefined) 1 else 0)
     val res = Array.fill(sz) { null }: Array[AccessElement]
     elements.copyToArray(res, 0, elements.length - idx)
-    if (buf != None) {
+    if (buf.isDefined) {
       res(elements.length - idx) = buf.get
       java.lang.System.arraycopy(otherElements.elements, idx, res, elements.length - idx + 1, otherSize - idx)
     } else {
@@ -236,6 +236,6 @@ final class Elements private (val elements: Array[AccessElement] = Array[AccessE
 
   def isEmpty: Boolean = elements.isEmpty
 
-  override def toString(): String = s"Elements(${elements.mkString(",")})"
+  override def toString: String = s"Elements(${elements.mkString(",")})"
 
 }
