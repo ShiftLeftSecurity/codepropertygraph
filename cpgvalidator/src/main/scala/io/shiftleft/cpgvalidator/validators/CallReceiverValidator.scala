@@ -21,8 +21,16 @@ class CallReceiverValidator(errorRegistry: ValidationErrorRegistry) extends Vali
   private def perCall(call: Node): Unit = {
     val numOfOutgoingReceiverEdges = call.out(EdgeTypes.RECEIVER).asScala.size
     val dispatchType = call.property(NodeKeyNames.DISPATCH_TYPE).toString
+    val arg0 = call.out(EdgeTypes.AST).asScala.find {
+      case node if node.propertyOption(NodeKeyNames.ARGUMENT_INDEX).isPresent =>
+        node.property(NodeKeyNames.ARGUMENT_INDEX) == 0
+    }
     dispatchType match {
-      case DispatchTypes.DYNAMIC_DISPATCH if numOfOutgoingReceiverEdges != 1 =>
+      case DispatchTypes.DYNAMIC_DISPATCH
+          if numOfOutgoingReceiverEdges != 1
+          // TODO: Remove this once the ReceiverEdgePass is gone
+          // As we still have the ReceiverEdgePass in codepropertygraph this is valid as well
+            && arg0.isEmpty =>
         errorRegistry.addError(CallReceiverError(call, dispatchType))
       case DispatchTypes.STATIC_DISPATCH if numOfOutgoingReceiverEdges != 0 =>
         errorRegistry.addError(CallReceiverError(call, dispatchType))
