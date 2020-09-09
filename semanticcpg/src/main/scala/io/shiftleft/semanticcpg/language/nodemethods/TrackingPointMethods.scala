@@ -3,11 +3,10 @@ package io.shiftleft.semanticcpg.language.nodemethods
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.MemberAccess
-import overflowdb.traversal._
 
 import scala.jdk.CollectionConverters._
 
-private object TrackingPointMethodsBase {
+object TrackingPointMethodsBase {
   def lastExpressionInBlock(block: nodes.Block): Option[nodes.Expression] =
     block._astOut.asScala
       .collect {
@@ -30,6 +29,7 @@ object TrackingPointToCfgNode {
     node match {
       case node: nodes.Identifier => parentExpansion(node)
       case node: nodes.MethodRef  => parentExpansion(node)
+      case node: nodes.TypeRef    => parentExpansion(node)
       case node: nodes.Literal    => parentExpansion(node)
 
       case node: nodes.MethodParameterIn => node.method
