@@ -107,4 +107,12 @@ class NodeTypeStartersTests extends CodeToCpgSuite {
     )
   }
 
+  "should allow retrieving nodes by id" in {
+    val method1 = cpg.method.name("main").head
+    val method2 = cpg.method.name("libfunc").head
+
+    cpg.id(method1.id).l shouldBe Seq(method1)
+    cpg.id(Seq(method1.id, method2.id)).l shouldBe Seq(method1, method2)
+  }
+
 }
