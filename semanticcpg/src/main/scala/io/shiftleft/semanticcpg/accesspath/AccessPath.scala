@@ -6,8 +6,13 @@ object AccessPath {
 
   def apply(): AccessPath = empty
 
-  def apply(elements: Elements, exclusions: Seq[Elements]): AccessPath =
-    new AccessPath(elements, exclusions.toList)
+  def apply(elements: Elements, exclusions: Seq[Elements]): AccessPath = {
+    if (elements.isEmpty && exclusions.isEmpty) {
+      empty
+    } else {
+      new AccessPath(elements, exclusions.toList)
+    }
+  }
 
   def isExtensionExcluded(exclusions: Seq[Elements], extension: Elements): Boolean =
     exclusions.exists(e => extension.elements.startsWith(e.elements))
@@ -94,9 +99,9 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
       case MatchResult.NO_MATCH =>
         FullMatchResult(Some(this), None, Elements.empty)
       case MatchResult.PREFIX_MATCH | MatchResult.EXACT_MATCH =>
-        FullMatchResult(None, Some(AccessPath(matchDiff, this.exclusions).intern), Elements.empty)
+        FullMatchResult(None, Some(AccessPath(matchDiff, this.exclusions)), Elements.empty)
       case MatchResult.VARIABLE_PREFIX_MATCH | MatchResult.VARIABLE_EXACT_MATCH =>
-        FullMatchResult(Some(this), Some(AccessPath(matchDiff, this.exclusions).intern), Elements.empty)
+        FullMatchResult(Some(this), Some(AccessPath(matchDiff, this.exclusions)), Elements.empty)
       case MatchResult.EXTENDED_MATCH =>
         FullMatchResult(Some(this.addExclusion(matchDiff)),
                         Some(AccessPath(Elements.empty, exclusions).truncateExclusions(matchDiff)),
@@ -192,7 +197,7 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
       exclusions
         .filter(_.elements.startsWith(compareExclusion.elements))
         .map(exclusion => Elements.normalized(exclusion.elements.drop(size)))
-    new AccessPath(elements, newExclusions)
+    AccessPath(elements, newExclusions)
   }
 
   private def addExclusion(newExclusion: Elements): AccessPath = {
@@ -202,11 +207,6 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
       val unshadowed = exclusions.filter(!_.elements.startsWith(ex.elements))
       AccessPath(elements, unshadowed :+ ex)
     } else this
-  }
-
-  private def intern(): AccessPath = {
-    if (this == AccessPath.empty) AccessPath.empty
-    else this
   }
 
   def isExtensionExcluded(extension: Elements): Boolean = {
@@ -225,10 +225,10 @@ object MatchResult extends Enumeration {
 /**
   * Result of `matchFull` comparison
   *
-  * @param stepOverPath              the unaffected part of the accesspath. Some(this) for
+  * @param stepOverPath              the unaffected part of the access path. Some(this) for
   *                                  no match, None for perfect match; may have additional
   *                                  exclusions to this.
-  * @param stepIntoPath              The affected part of the accesspath, mapped to be relative to
+  * @param stepIntoPath              The affected part of the access path, mapped to be relative to
   *                                  this stepIntoPath.isDefined if and only if there is a match in
   *                                  paths, i.e. if the call can affect the tracked variable at all.
   *                                  Outside of overtainting, if stepIntoPath.isDefined &&
@@ -237,7 +237,7 @@ object MatchResult extends Enumeration {
   *                                  extensionDiff.isEmpty
   *
   * @param extensionDiff            extensionDiff is non empty if and only if a proper subset is
-  *                                 affected. Outside of overtainting, if extensionDiff is non empty then:
+  *                                 affected. Outside of over tainting, if extensionDiff is non empty then:
   *                                 path.elements ++ path.matchFull(other).extensionDiff == other.elements
   *                                 path.matchFull(other).stepIntoPath.get.elements.isEmpty
   *
