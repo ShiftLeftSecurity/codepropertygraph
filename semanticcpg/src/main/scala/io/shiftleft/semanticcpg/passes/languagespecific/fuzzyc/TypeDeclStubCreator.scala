@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal.Traversal
 
 /**
   * This pass has no other pass as prerequisite.
@@ -21,14 +20,13 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 
     init()
 
-    // TODO MP use `cpg.typ` once that's defined in odb api
-    Traversal(cpg.graph.nodes(NodeTypes.TYPE)).cast[nodes.Type].foreach { typ =>
-      if (!typeDeclFullNameToNode.isDefinedAt(typ.fullName)) {
+    cpg.typ
+      .filterNot(typ => typeDeclFullNameToNode.isDefinedAt(typ.fullName))
+      .foreach { typ =>
         val newTypeDecl = createTypeDeclStub(typ.name, typ.fullName)
         typeDeclFullNameToNode += typ.fullName -> newTypeDecl
         dstGraph.addNode(newTypeDecl)
       }
-    }
 
     Iterator(dstGraph.build())
   }

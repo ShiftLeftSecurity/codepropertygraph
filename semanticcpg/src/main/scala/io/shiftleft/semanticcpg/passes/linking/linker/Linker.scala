@@ -137,7 +137,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
                                                                 dstFullNameKey: String,
                                                                 dstGraph: DiffGraph.Builder): Unit = {
     var loggedDeprecationWarning = false
-    // TODO MP use `cpg.local` once that's defined in odb api
     Traversal(cpg.graph.nodes(srcLabels: _*)).cast[SRC_NODE_TYPE].foreach { srcNode =>
       if (!srcNode.outE(edgeType).hasNext) {
         getDstFullNames(srcNode).foreach { dstFullName =>
