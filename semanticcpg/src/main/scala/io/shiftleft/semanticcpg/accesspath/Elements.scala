@@ -81,7 +81,7 @@ object Elements {
   def unnormalized(elems: IterableOnce[AccessElement]): Elements =
     newIfNonEmpty(elems.iterator.toArray)
 
-  private def newIfNonEmpty(elems: Array[AccessElement]): Elements = {
+  def newIfNonEmpty(elems: Array[AccessElement]): Elements = {
     if (!elems.isEmpty) new Elements(elems)
     else empty
   }
@@ -103,7 +103,7 @@ object Elements {
     empty
 }
 
-final class Elements private (val elements: Array[AccessElement] = Array[AccessElement]()) {
+final class Elements(val elements: Array[AccessElement] = Array[AccessElement]()) {
 
   def noOvertaint(start: Int = 0, untilExclusive: Int = elements.length): Boolean = {
     elements
@@ -149,44 +149,6 @@ final class Elements private (val elements: Array[AccessElement] = Array[AccessE
   }
 
   override def hashCode(): Int = java.util.Arrays.hashCode(elements.asInstanceOf[Array[AnyRef]])
-
-  def :+(element: AccessElement): Elements = {
-    element match {
-      case _ if !elements.isEmpty =>
-        (elements.last, element) match {
-          case (last: PointerShift, elem: PointerShift) => {
-            val newOffset = last.logicalOffset + elem.logicalOffset
-
-            if (newOffset == 0) Elements.newIfNonEmpty(elements.dropRight(1))
-            else
-              Elements.newIfNonEmpty(elements.updated(elements.length - 1, PointerShift(newOffset)))
-          }
-          case (_: PointerShift, VariablePointerShift) => {
-            new Elements(elements.updated(elements.length - 1, VariablePointerShift))
-          }
-          case (VariablePointerShift, _: PointerShift) | (VariablePointerShift, VariablePointerShift) =>
-            this
-          case (AddressOf, IndirectionAccess) => {
-            Elements.newIfNonEmpty(elements.dropRight(1))
-          }
-          case (IndirectionAccess, AddressOf) => {
-
-            /** We also collapse *&. This is WRONG (you cannot deref a pointer and then un-deref the result).
-              * However, it is sometimes valid as a syntactic construct, and the language should make sure that this
-              * only occurs in such settings.
-              * I.e. valid code should only produce such paths when their contraction is valid.
-              * We still treat * as un-invertible, though!
-              */
-            Elements.newIfNonEmpty(elements.dropRight(1))
-          }
-          case _ => Elements.newIfNonEmpty(elements :+ element)
-        }
-      case PointerShift(0) =>
-        Elements.empty
-      case _ =>
-        Elements.newIfNonEmpty(Array(element))
-    }
-  }
 
   def ++(otherElements: Elements): Elements = {
 

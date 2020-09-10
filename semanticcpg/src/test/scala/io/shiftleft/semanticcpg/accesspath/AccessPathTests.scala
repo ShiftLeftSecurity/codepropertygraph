@@ -5,6 +5,52 @@ import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 
 class AccessPathTests extends AnyWordSpec {
+
+  implicit class ElementsWithOperators(el: Elements) {
+
+    def :+(element: AccessElement): Elements = {
+
+      val elements = el.elements
+
+      element match {
+        case _ if !elements.isEmpty =>
+          (elements.last, element) match {
+            case (last: PointerShift, elem: PointerShift) => {
+              val newOffset = last.logicalOffset + elem.logicalOffset
+
+              if (newOffset == 0) Elements.newIfNonEmpty(elements.dropRight(1))
+              else
+                Elements.newIfNonEmpty(elements.updated(elements.length - 1, PointerShift(newOffset)))
+            }
+            case (_: PointerShift, VariablePointerShift) => {
+              new Elements(elements.updated(elements.length - 1, VariablePointerShift))
+            }
+            case (VariablePointerShift, _: PointerShift) | (VariablePointerShift, VariablePointerShift) =>
+              this.el
+            case (AddressOf, IndirectionAccess) => {
+              Elements.newIfNonEmpty(elements.dropRight(1))
+            }
+            case (IndirectionAccess, AddressOf) => {
+
+              /** We also collapse *&. This is WRONG (you cannot deref a pointer and then un-deref the result).
+                * However, it is sometimes valid as a syntactic construct, and the language should make sure that this
+                * only occurs in such settings.
+                * I.e. valid code should only produce such paths when their contraction is valid.
+                * We still treat * as un-invertible, though!
+                */
+              Elements.newIfNonEmpty(elements.dropRight(1))
+            }
+            case _ => Elements.newIfNonEmpty(elements :+ element)
+          }
+        case PointerShift(0) =>
+          Elements.empty
+        case _ =>
+          Elements.newIfNonEmpty(Array(element))
+      }
+    }
+
+  }
+
   implicit def convert(constant: String): ConstantAccess = {
     ConstantAccess(constant)
   }
