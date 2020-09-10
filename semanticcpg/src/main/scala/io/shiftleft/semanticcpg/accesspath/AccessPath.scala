@@ -2,15 +2,15 @@ package io.shiftleft.semanticcpg.accesspath
 
 object AccessPath {
 
-  val empty = new AccessPath(Elements(), List[Elements]())
+  private val empty = new AccessPath(Elements(), List[Elements]())
 
-  def apply(elements: Elements, exclusions: Seq[Elements]): AccessPath = {
+  def apply(): AccessPath = empty
+
+  def apply(elements: Elements, exclusions: Seq[Elements]): AccessPath =
     new AccessPath(elements, exclusions.toList)
-  }
 
-  def isExtensionExcluded(exclusions: Seq[Elements], extension: Elements): Boolean = {
+  def isExtensionExcluded(exclusions: Seq[Elements], extension: Elements): Boolean =
     exclusions.exists(e => extension.elements.startsWith(e.elements))
-  }
 
   /**
     * This class contains operations on `Elements` that are only used in
@@ -61,22 +61,23 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
   def isEmpty: Boolean = this == AccessPath.empty
 
   // for handling of invertible elements, cf AccessPathAlgebra.md
+  //FIXME: may need to process invertible tail of `other` better
+
   def ++(other: Elements): Option[AccessPath] = {
-    if (isExtensionExcluded(other)) None
-    //fixme: may need to process invertible tail of other better
-    else Some(AccessPath(this.elements ++ other, this.truncateExclusions(other).exclusions))
+    Some(other)
+      .filterNot(isExtensionExcluded)
+      .map(_ => AccessPath(this.elements ++ other, this.truncateExclusions(other).exclusions))
   }
 
+  //FIXME: may need to process invertible tail of `other` better
   def ++(other: AccessPath): Option[AccessPath] = {
-    if (isExtensionExcluded(other.elements)) None
-    //fixme: may need to process invertible tail of other better
-    else {
-      var accessPath = AccessPath(this.elements ++ other.elements, this.truncateExclusions(other.elements).exclusions)
-      for (exclusion <- other.exclusions) {
-        accessPath = accessPath.addExclusion(exclusion)
+    Some(other.elements)
+      .filterNot(isExtensionExcluded)
+      .map { otherElems =>
+        exclusions.foldLeft(AccessPath(this.elements ++ otherElems, this.truncateExclusions(otherElems).exclusions)) {
+          case (x, y) => x.addExclusion(y)
+        }
       }
-      Some(accessPath)
-    }
   }
 
   def matchFull(other: AccessPath): FullMatchResult = {
@@ -131,8 +132,8 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
     var done = false
 
     /**
-      *  We now try to greedily match more elements. We know that one of the two pathes will only contain invertible
-      *  elements. The issue is the following:
+      *  We now try to greedily match more elements. We know that one of the two paths will
+      *  only contain invertible elements. The issue is the following:
       *   prefix <1> & x
       *   prefix <?> &
       *  With greedy matching, we end up with a diff: x.
@@ -159,8 +160,8 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
       val diff = Elements.inverted(other.elements.drop(idx)) ++ Elements.unnormalized(elements.elements.drop(idx))
 
       /**
-        * we don't need to overtaint if thisTail has variable PointerShift: They can still get excluded
-        * e.g. suppose we track "a" "b" <?> and encounter "a" <4>.
+        * we don't need to overtaint if thisTail has variable PointerShift: They can still
+        * get excluded e.g. suppose we track "a" "b" <?> and encounter "a" <4>.
         */
       overTainted |= !other.noOvertaint(otherHead)
       if (!overTainted & thisHead == otherHead) (MatchResult.EXACT_MATCH, diff)
@@ -174,7 +175,8 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
 
       /**
         * we need to overtaint if any either otherTail or thisTail has variable PointerShift:
-        * e.g. suppose we track "a" <4> and encounter "a" "b" <?> "c", or suppose that we track "a" <?> and encounter "a" "b"
+        * e.g. suppose we track "a" <4> and encounter "a" "b" <?> "c", or suppose that we track "a"
+        * <?> and encounter "a" "b"
         */
       overTainted |= !elements.noOvertaint(thisHead) | !other.noOvertaint(otherHead)
 
