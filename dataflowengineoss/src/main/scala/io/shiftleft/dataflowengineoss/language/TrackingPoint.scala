@@ -31,9 +31,13 @@ class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVa
   def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: Traversal[A]*)(
       implicit context: EngineContext): Traversal[Path] = {
     val paths = reachableByInternal(sourceTravs).map { result =>
-      Path(result.path.filter(_.visible == true).map(_.node))
-    }
+      Path(removeConsecutiveDuplicates(result.path.filter(_.visible == true).map(_.node)))
+    }.dedup
     paths.to(Traversal)
+  }
+
+  private def removeConsecutiveDuplicates[T](l: List[T]): List[T] = {
+    l.headOption.map(x => x :: l.sliding(2).collect { case Seq(a, b) if a != b => b }.toList).getOrElse(List())
   }
 
   private def reachableByInternal[NodeType <: nodes.TrackingPoint](sourceTravs: Seq[Traversal[NodeType]])(

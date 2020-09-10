@@ -651,3 +651,47 @@ class CDataFlowTests17 extends DataFlowCodeToCpgSuite {
     )
   }
 }
+
+class CDataFlowTests18 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      | struct Point {
+      |   int x;
+      |   int y;
+      | };
+      |
+      | double source () {
+      |   return 2.0;
+      | }
+      |
+      | int sink(int x) {
+      |   return 3;
+      | }
+      |
+      | void main() {
+      |   int k = source(2);
+      |   struct Point point;
+      |   point.x = k;
+      |   point.y = 2;
+      |   sink(point.x);
+      | }
+      |""".stripMargin
+
+  "Test 18: struct data flow" in {
+    val source = cpg.method.name("source").methodReturn
+    val sink = cpg.method.name("sink").parameter.name("x")
+
+    val flows = sink.reachableByFlows(source).l
+    flows.size shouldBe 1
+    flows.map(flowToResultPairs).toSet shouldBe Set(
+      List(("RET", Some(7)),
+           ("source(2)", Some(16)),
+           ("k = source(2)", Some(16)),
+           ("point.x = k", Some(18)),
+           ("sink(point.x)", Some(20)),
+           ("sink(int x)", Some(11)))
+    )
+
+  }
+
+}
