@@ -8,6 +8,14 @@ import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
 
+object TrackingPointToAccessPath {
+
+  def apply(node: nodes.TrackingPoint, exclusions: List[Elements] = List()): AccessPath = {
+    new AccessPath(TrackingPointToElements(node), exclusions)
+  }
+
+}
+
 object TrackingPointToElements {
 
   def apply(node: nodes.TrackingPoint): Elements = {
@@ -132,16 +140,6 @@ private object MemberAccessToElement {
           .getOrElse(VariablePointerShift)
       case _ => VariablePointerShift
     }
-  }
-
-}
-
-
-
-object TrackingPointToAccessPath {
-
-  def apply(node: nodes.TrackingPoint, exclusions: List[Elements] = List()): AccessPath = {
-    new AccessPath(TrackingPointToElements(node), exclusions)
   }
 
 }

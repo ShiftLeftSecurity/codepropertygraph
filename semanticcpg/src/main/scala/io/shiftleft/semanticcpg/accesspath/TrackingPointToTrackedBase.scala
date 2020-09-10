@@ -52,7 +52,7 @@ object TrackingPointToTrackedBase {
     case _: nodes.FieldIdentifier => TrackedUnknown
   }
 
-  def handleCall(call: nodes.Call): TrackedBase = {
+  private def handleCall(call: nodes.Call): TrackedBase = {
     if (MemberAccess.isGenericMemberAccessName(call.name)) {
       val trackingPoint = call
         .out(EdgeTypes.ARGUMENT)

@@ -9,7 +9,7 @@ object AccessPath {
   }
 
   def isExtensionExcluded(exclusions: Seq[Elements], extension: Elements): Boolean = {
-    exclusions.exists(exclusion => extension.elements.startsWith(exclusion.elements))
+    exclusions.exists(e => extension.elements.startsWith(e.elements))
   }
 }
 
@@ -18,8 +18,6 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
   def isExtensionExcluded(extension: Elements): Boolean = {
     AccessPath.isExtensionExcluded(this.exclusions, extension)
   }
-
-  def isTrivial: Boolean = isEmpty
 
   def isEmpty: Boolean = this == AccessPath.empty
 
@@ -41,8 +39,6 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
       Some(accessPath)
     }
   }
-
-  def prepend(other: Elements): AccessPath = AccessPath(other ++ this.elements, this.exclusions)
 
   def matchFull(other: AccessPath): FullMatchResult = {
     val res = this.matchFull(other.elements)
@@ -72,7 +68,6 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
     }
   }
 
-  //we track this and encounter compareAgainst. PREFIX means that this is longer, EXTENDED means that compareAgainst is longer
   def matchAndDiff(other: Elements): (MatchResult.MatchResult, Elements) = {
     val thisTail = elements.invertibleTailLength
     val otherTail = other.invertibleTailLength
@@ -150,7 +145,7 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
     }
   }
 
-  def truncateExclusions(compareExclusion: Elements): AccessPath = {
+  private def truncateExclusions(compareExclusion: Elements): AccessPath = {
     val size = compareExclusion.elements.length
     val newExclusions =
       exclusions
@@ -159,7 +154,7 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
     new AccessPath(elements, newExclusions)
   }
 
-  def addExclusion(newExclusion: Elements): AccessPath = {
+  private def addExclusion(newExclusion: Elements): AccessPath = {
     if (newExclusion.noOvertaint()) {
       val ex =
         Elements.unnormalized(newExclusion.elements.dropRight(newExclusion.invertibleTailLength))
@@ -167,7 +162,8 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
       AccessPath(elements, unshadowed :+ ex)
     } else this
   }
-  def intern(): AccessPath = {
+
+  private def intern(): AccessPath = {
     if (this == AccessPath.empty) AccessPath.empty
     else this
   }
@@ -182,30 +178,31 @@ object MatchResult extends Enumeration {
 }
 
 /**
+  * Result of `matchFull` comparison
+  *
+  * @param stepOverPath              the unaffected part of the accesspath. Some(this) for
+  *                                  no match, None for perfect match; may have additional
+  *                                  exclusions to this.
+  * @param stepIntoPath              The affected part of the accesspath, mapped to be relative to
+  *                                  this stepIntoPath.isDefined if and only if there is a match in
+  *                                  paths, i.e. if the call can affect the tracked variable at all.
+  *                                  Outside of overtainting, if stepIntoPath.isDefined &&
+  *                                  stepIntoPath.elements.nonEmpty then: path.elements ==
+  *                                  other.elements ++ path.matchFull(other).stepIntoPath.get.elements
+  *                                  extensionDiff.isEmpty
+  *
+  * @param extensionDiff            extensionDiff is non empty if and only if a proper subset is
+  *                                 affected. Outside of overtainting, if extensionDiff is non empty then:
+  *                                 path.elements ++ path.matchFull(other).extensionDiff == other.elements
+  *                                 path.matchFull(other).stepIntoPath.get.elements.isEmpty
+  *
   * Invariants:
   *   - Exclusions have no invertible tail
   *   - Only paths without overTaint can have exclusions
   *   TODO: Figure out sensible assertions to defend these invariants
   */
-case class FullMatchResult(
-                           /** The unaffected part of the accesspath. Some(this) for no match, None for perfect match;
-                             * may have additional exclusions to this.*/
-                           stepOverPath: Option[AccessPath],
-                           //
-                           /** The affected part of the accesspath, mapped to be relative to this.
-                             *
-                             * stepIntoPath.isDefined if and only if there is a match in pathes, i.e. if the call can
-                             * affect the tracked variable at all
-                             *
-                             * Outside of overtainting, if stepIntoPath.isDefined && stepIntoPath.elements.nonEmpty then:
-                             *    path.elements == other.elements ++ path.matchFull(other).stepIntoPath.get.elements
-                             *    extensionDiff.isEmpty */
+case class FullMatchResult(stepOverPath: Option[AccessPath],
                            stepIntoPath: Option[AccessPath],
-                           //
-                           /** extensionDiff.nonEmpty if and only if a proper subset is affected.
-                             * Outside of overtainting, if extensionDiff.nonEmpty then:
-                             *    path.elements ++ path.matchFull(other).extensionDiff == other.elements
-                             *    path.matchFull(other).stepIntoPath.get.elements.isEmpty */
                            extensionDiff: Elements) {
   def hasMatch: Boolean = stepIntoPath.nonEmpty
 }
