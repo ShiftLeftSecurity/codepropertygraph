@@ -1,11 +1,54 @@
 package io.shiftleft.semanticcpg.accesspath
 
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, Operators, nodes}
-import io.shiftleft.semanticcpg.utils.ExpandTo
+import io.shiftleft.codepropertygraph.generated.nodes.TrackingPoint
+import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase
+import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
 import org.slf4j.LoggerFactory
+
 import scala.jdk.CollectionConverters._
 
-object MemberAccessToElement {
+object TrackingPointToAccessPath {
+
+  def apply(node: nodes.TrackingPoint, exclusions: List[Elements] = List()): AccessPath = {
+    new AccessPath(TrackingPointToElements(node), exclusions)
+  }
+
+}
+
+object TrackingPointToElements {
+
+  def apply(node: nodes.TrackingPoint): Elements = {
+    node match {
+      case call: nodes.Call => convertCall(call)
+      case block: nodes.Block =>
+        val lastInBlock = TrackingPointMethodsBase.lastExpressionInBlock(block).get
+        TrackingPointToElements.apply(lastInBlock)
+      case _ => Elements()
+    }
+  }
+
+  private def convertCall(call: nodes.Call): Elements = {
+    if (MemberAccess.isGenericMemberAccessName(call.name)) {
+      val baseElements = TrackingPointToElements.apply(firstArgument(call))
+      baseElements ++ MemberAccessToElement(call)
+    } else {
+      Elements()
+    }
+  }
+
+  private def firstArgument(call: nodes.Call): TrackingPoint = {
+    call
+      .out(EdgeTypes.ARGUMENT)
+      .asScala
+      .find(_.property(NodeKeys.ARGUMENT_INDEX) == 1)
+      .get
+      .asInstanceOf[nodes.TrackingPoint]
+  }
+
+}
+
+private object MemberAccessToElement {
 
   private val logger = LoggerFactory.getLogger(getClass)
 

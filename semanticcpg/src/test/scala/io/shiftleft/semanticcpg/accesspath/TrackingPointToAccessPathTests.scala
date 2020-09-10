@@ -6,10 +6,10 @@ import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 
-class TrackingPointToElementsTests extends AnyWordSpec {
+class TrackingPointToAccessPathTests extends AnyWordSpec {
 
-  def E(elements: AccessElement*): Elements = {
-    Elements.normalized(elements)
+  def E(elements: AccessElement*): AccessPath = {
+    new AccessPath(Elements.normalized(elements), Nil)
   }
 
   private val V = VariableAccess
@@ -59,7 +59,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), C("a"))
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), C("a"))
     }
   }
 
@@ -71,7 +71,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), C("a"))
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), C("a"))
     }
   }
 
@@ -83,7 +83,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genLit(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), C("a"))
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), C("a"))
     }
     "overtaint with others" in {
       val call =
@@ -92,7 +92,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), V)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), V)
     }
   }
 
@@ -104,7 +104,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genLit(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), C("a"))
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), C("a"))
     }
     "overtaint with others" in {
       val call =
@@ -113,7 +113,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), V)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), V)
     }
 
   }
@@ -123,7 +123,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
       val call =
         genCALL(g, Operators.indirection, genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), I)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), I)
     }
   }
 
@@ -132,7 +132,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
       val call =
         genCALL(g, Operators.addressOf, genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), A)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), A)
     }
   }
   // new style
@@ -145,7 +145,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genLit(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), C("a"))
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), C("a"))
     }
 
     "work with FieldIdentifier" in {
@@ -155,7 +155,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genFID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), C("a"))
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), C("a"))
     }
 
     "overtaint with others" in {
@@ -165,7 +165,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), V)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), V)
     }
   }
 
@@ -177,7 +177,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genLit(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), I, C("a"))
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), I, C("a"))
     }
 
     "work with FieldIdentifier" in {
@@ -187,7 +187,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genFID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), I, C("a"))
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), I, C("a"))
     }
 
     "overtaint with others" in {
@@ -197,7 +197,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), I, V)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), I, V)
     }
   }
 
@@ -209,7 +209,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genLit(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), C("a"))
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), C("a"))
     }
 
     "work with FieldIdentifier" in {
@@ -219,7 +219,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genFID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), C("a"))
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), C("a"))
     }
 
     "overtaint with others" in {
@@ -229,7 +229,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), V)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), V)
     }
   }
 
@@ -241,7 +241,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genLit(g, "12"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), S(12), I)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), S(12), I)
     }
 
     "work with FieldIdentifier" in {
@@ -251,7 +251,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genFID(g, "12"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), S(12), I)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), S(12), I)
     }
 
     "overtaint with others" in {
@@ -261,7 +261,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), VS, I)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), VS, I)
     }
     "overtaint on parsing failure" in {
       val call =
@@ -270,7 +270,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genLit(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), VS, I)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), VS, I)
     }
 
   }
@@ -284,7 +284,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genLit(g, "12"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), S(12))
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), S(12))
     }
 
     "work with FieldIdentifier" in {
@@ -294,7 +294,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genFID(g, "12"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), S(12))
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), S(12))
     }
 
     "overtaint with others" in {
@@ -304,7 +304,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), VS)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), VS)
     }
     "overtaint with parsing fails" in {
       val call =
@@ -313,7 +313,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genLit(g, "abc"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), VS)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), VS)
     }
 
   }
@@ -327,7 +327,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genLit(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), I, C("a"), A)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), I, C("a"), A)
     }
 
     "work with FieldIdentifier" in {
@@ -337,7 +337,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genFID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), I, C("a"), A)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), I, C("a"), A)
     }
 
     "overtaint with others" in {
@@ -347,7 +347,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E(C("b"), I, V, A)
+      TrackingPointToAccessPath(call) shouldBe E(C("b"), I, V, A)
     }
   }
 
@@ -359,7 +359,7 @@ class TrackingPointToElementsTests extends AnyWordSpec {
                 genID(g, "a"),
                 genCALL(g, Operators.computedMemberAccess, genLit(g, "b"), genCALL(g, "foo")))
 
-      TrackingPointToElements(call) shouldBe E()
+      TrackingPointToAccessPath(call) shouldBe E()
     }
   }
 

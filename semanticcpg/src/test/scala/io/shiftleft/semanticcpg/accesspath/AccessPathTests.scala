@@ -5,6 +5,52 @@ import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 
 class AccessPathTests extends AnyWordSpec {
+
+  implicit class ElementsWithOperators(el: Elements) {
+
+    def :+(element: AccessElement): Elements = {
+
+      val elements = el.elements
+
+      element match {
+        case _ if !elements.isEmpty =>
+          (elements.last, element) match {
+            case (last: PointerShift, elem: PointerShift) => {
+              val newOffset = last.logicalOffset + elem.logicalOffset
+
+              if (newOffset == 0) Elements.newIfNonEmpty(elements.dropRight(1))
+              else
+                Elements.newIfNonEmpty(elements.updated(elements.length - 1, PointerShift(newOffset)))
+            }
+            case (_: PointerShift, VariablePointerShift) => {
+              new Elements(elements.updated(elements.length - 1, VariablePointerShift))
+            }
+            case (VariablePointerShift, _: PointerShift) | (VariablePointerShift, VariablePointerShift) =>
+              this.el
+            case (AddressOf, IndirectionAccess) => {
+              Elements.newIfNonEmpty(elements.dropRight(1))
+            }
+            case (IndirectionAccess, AddressOf) => {
+
+              /** We also collapse *&. This is WRONG (you cannot deref a pointer and then un-deref the result).
+                * However, it is sometimes valid as a syntactic construct, and the language should make sure that this
+                * only occurs in such settings.
+                * I.e. valid code should only produce such paths when their contraction is valid.
+                * We still treat * as un-invertible, though!
+                */
+              Elements.newIfNonEmpty(elements.dropRight(1))
+            }
+            case _ => Elements.newIfNonEmpty(elements :+ element)
+          }
+        case PointerShift(0) =>
+          Elements.empty
+        case _ =>
+          Elements.newIfNonEmpty(Array(element))
+      }
+    }
+
+  }
+
   implicit def convert(constant: String): ConstantAccess = {
     ConstantAccess(constant)
   }
@@ -19,7 +65,7 @@ class AccessPathTests extends AnyWordSpec {
   val A = AddressOf
   val VP = VariablePointerShift
 
-  "Test matchPath" in {
+  "Test matchAndDiff" in {
     AccessPath(E("a"), Seq()).matchAndDiff(E("b")) shouldBe (NO_MATCH, E())
     AccessPath(E("a", "b"), Seq()).matchAndDiff(E("b", "a")) shouldBe (NO_MATCH, E())
     AccessPath(E("a", "b"), Seq()).matchAndDiff(E("a", "c")) shouldBe (NO_MATCH, E())
@@ -74,7 +120,7 @@ class AccessPathTests extends AnyWordSpec {
     E(A, 1, VP, 2, I) shouldBe E(A, VP, I)
     E(I, "a", A) ++ E(I) shouldBe E(I, "a") //GEP
   }
-  "Test matchPath with inverses" in {
+  "Test matchAndDiff with inverses" in {
     //exact:
     AccessPath(E("a", 1, A, 2), Seq(E("c")))
       .matchAndDiff(E("a", 8, A, 16)) shouldBe (EXACT_MATCH, E(-16, I, -7, A, 2))
@@ -112,7 +158,7 @@ class AccessPathTests extends AnyWordSpec {
       .matchAndDiff(E("a", VP, A, 16, I)) shouldBe (VARIABLE_EXTENDED_MATCH, E(14, I))
   }
 
-  "Test FullMatch" in {
+  "Test matchFull" in {
     //no match
     AccessPath(E("a", "b"), Seq(E("c")))
       .matchFull(AccessPath(E("C"), Seq())) shouldBe FullMatchResult(stepOverPath =
