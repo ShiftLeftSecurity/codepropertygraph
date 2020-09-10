@@ -24,12 +24,16 @@ object TrackingPointToElements {
       case block: nodes.Block =>
         val lastInBlock = TrackingPointMethodsBase.lastExpressionInBlock(block).get
         TrackingPointToElements.apply(lastInBlock)
-      case _: nodes.MethodParameterIn  => Elements()
-      case _: nodes.MethodParameterOut => Elements()
-      case _: nodes.MethodReturn       => Elements()
-      case _: nodes.ImplicitCall       => Elements()
-      case _: nodes.Expression         => Elements()
-      case _: nodes.TrackingPoint      => Elements()
+      case _ => Elements()
+    }
+  }
+
+  private def convertCall(call: nodes.Call): Elements = {
+    if (MemberAccess.isGenericMemberAccessName(call.name)) {
+      val baseElements = TrackingPointToElements.apply(firstArgument(call))
+      baseElements ++ MemberAccessToElement(call)
+    } else {
+      Elements()
     }
   }
 
@@ -42,14 +46,6 @@ object TrackingPointToElements {
       .asInstanceOf[nodes.TrackingPoint]
   }
 
-  private def convertCall(call: nodes.Call): Elements = {
-    if (MemberAccess.isGenericMemberAccessName(call.name)) {
-      val baseElements = TrackingPointToElements.apply(firstArgument(call))
-      baseElements ++ MemberAccessToElement(call)
-    } else {
-      Elements()
-    }
-  }
 }
 
 private object MemberAccessToElement {
