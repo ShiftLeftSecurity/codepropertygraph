@@ -1,11 +1,10 @@
 package io.shiftleft.semanticcpg.passes.methoddecorations
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import overflowdb.traversal.Traversal
+import io.shiftleft.semanticcpg.language._
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
   * Adds a METHOD_PARAMETER_OUT for each METHOD_PARAMETER_IN to the graph and
@@ -25,8 +24,7 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   override def run() = {
     val dstGraph = DiffGraph.newBuilder
 
-    // TODO MP use `cpg.methodParamIn` once that's defined in odb api
-    Traversal(cpg.graph.nodes(NodeTypes.METHOD_PARAMETER_IN)).cast[nodes.MethodParameterIn].foreach { parameterIn =>
+    cpg.parameter.foreach { parameterIn =>
       if (!parameterIn._parameterLinkOut.hasNext) {
         val parameterOut = nodes.NewMethodParameterOut(
           parameterIn.code,

@@ -2,11 +2,10 @@ package io.shiftleft.semanticcpg.passes.linking.calllinker
 
 import io.shiftleft.Implicits._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
-import overflowdb.traversal.Traversal
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -23,8 +22,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    // TODO MP use `cpg.method` once that's defined in odb api
-    Traversal(cpg.graph.nodes(NodeTypes.METHOD)).cast[nodes.Method].foreach { method =>
+    cpg.method.foreach { method =>
       methodFullNameToNode.put(method.fullName, method)
     }
 
@@ -56,9 +54,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
         if (receiverIt.hasNext) {
           val receiver = receiverIt.next
           receiver match {
-            case methodRefReceiver: nodes.MethodRef =>
-              // TODO this doesn't do anything and may as well be dropped, no?
-              Option(methodRefReceiver._methodViaRefOut)
+            case methodRefReceiver: nodes.MethodRef => // nothing
             case _ =>
               val receiverTypeDecl = receiver
                 ._evalTypeOut()
