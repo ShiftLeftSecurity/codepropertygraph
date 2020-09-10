@@ -41,3 +41,11 @@ object TrackingPointToElements {
     }
   }
 }
+
+object TrackingPointToAccessPath {
+
+  def apply(node: nodes.TrackingPoint, exclusions: List[Elements] = List()): AccessPath = {
+    new AccessPath(TrackingPointToElements(node), exclusions)
+  }
+
+}
