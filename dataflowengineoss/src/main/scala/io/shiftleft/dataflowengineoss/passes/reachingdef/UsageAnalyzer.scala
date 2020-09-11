@@ -31,8 +31,9 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
         val useAccessPath = TrackingPointToAccessPath(u)
         val defAccessPath = TrackingPointToAccessPath(i)
         val (matchResult, elements) = useAccessPath.matchAndDiff(defAccessPath.elements)
-        (useBase == inBase) &&
-        (matchResult != MatchResult.EXTENDED_MATCH || !elements.elements.headOption.exists(_.toString == "*"))
+        (useBase == inBase) && // filter *x -> x
+        !(matchResult == MatchResult.EXTENDED_MATCH && elements.elements.length > 1 && elements.elements.headOption
+          .exists(_.toString == "*"))
       case _ => false
     }
   }

@@ -803,3 +803,23 @@ class CDataFlowTests22 extends DataFlowCodeToCpgSuite {
   }
 
 }
+
+class CDataFlowTests23 extends DataFlowCodeToCpgSuite {
+  override val code = """
+      | int source();
+      | void sink(int i);
+      |
+      | void foo(int* arg) {
+      |   arg[0] = source();
+      |   sink(*arg);
+      | }
+      |""".stripMargin
+
+  "Test 23: handle deref vs array access correctly" in {
+    val source = cpg.method.name("source").methodReturn
+    val sink = cpg.call.codeExact("*arg")
+    val flows = sink.reachableByFlows(source).l
+    flows.size shouldBe 1
+  }
+
+}
