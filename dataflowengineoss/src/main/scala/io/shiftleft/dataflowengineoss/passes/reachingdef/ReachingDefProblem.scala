@@ -1,6 +1,12 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.semanticcpg.accesspath.{
+  MatchResult,
+  TrackedBase,
+  TrackingPointToAccessPath,
+  TrackingPointToTrackedBase
+}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -119,19 +125,48 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
   def initKill(method: nodes.Method,
                gen: Map[nodes.StoredNode, Set[Definition]]): Map[nodes.StoredNode, Set[Definition]] = {
 
+    val baseToCalls: Map[TrackedBase, List[nodes.Call]] = method.start.call.l
+      .map { c =>
+        (TrackingPointToTrackedBase(c), c)
+      }
+      .groupBy(_._1)
+      .map { case (k, v) => (k, v.map(_._2)) }
+
     def allOtherInstancesOf(node: nodes.StoredNode): Set[nodes.StoredNode] = {
-      declaration(node).toList
-        .flatMap(instances)
-        .filter(_.id != node.id)
-        .toSet
+      node match {
+        case call: nodes.Call =>
+          val base = TrackingPointToTrackedBase(call)
+          val accessPath = TrackingPointToAccessPath(call)
+          val otherCallsWithSameBase = baseToCalls
+            .get(base)
+            .toList
+            .flatten[nodes.Call]
+            .filter(_.id != node.id)
+          otherCallsWithSameBase
+            .filter { n =>
+              val (matchResult, _) = TrackingPointToAccessPath(n).matchAndDiff(accessPath.elements)
+              matchResult == MatchResult.EXACT_MATCH
+            }
+            .toSet[nodes.StoredNode]
+        case _ =>
+          declaration(node).toList
+            .flatMap(instances)
+            .filter(_.id != node.id)
+            .toSet
+      }
     }
 
     // We are also adding nodes here that may not even be definitions, but that's
     // fine since `kill` is only subtracted
     method.start.call.map { call =>
-      call -> gen(call)
-        .map(d => allOtherInstancesOf(d.node).map(x => Definition.fromNode(x)))
+      val killedDefs = gen(call)
+        .map { d =>
+          allOtherInstancesOf(d.node)
+            .filter(d => call.id != d.id)
+            .map(x => Definition.fromNode(x))
+        }
         .fold(Set())((v1, v2) => v1.union(v2))
+      call -> killedDefs
     }.toMap
   }
 
@@ -149,11 +184,7 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     node match {
       case param: nodes.MethodParameterIn => Some(param)
       case _: nodes.Identifier            => node._refOut().nextOption
-      case call: nodes.Call               =>
-        // We map to the first call that has the exact same code. We use
-        // this as a declaration
-        call.method.start.call.codeExact(call.code).headOption
-      case _ => None
+      case _                              => None
     }
   }
 
