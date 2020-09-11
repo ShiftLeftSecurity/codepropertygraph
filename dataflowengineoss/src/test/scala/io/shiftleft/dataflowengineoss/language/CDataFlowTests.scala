@@ -693,5 +693,133 @@ class CDataFlowTests18 extends DataFlowCodeToCpgSuite {
     )
 
   }
+}
+
+class CDataFlowTests19 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      | struct Point {
+      |   int x;
+      |   int y;
+      | };
+      |
+      | struct Point source () {
+      |   struct Point point;
+      |   return point;
+      | }
+      |
+      | int sink(int x) {
+      |   return 0;
+      | }
+      |
+      | void main() {
+      |   struct Point point = source(2);
+      |   sink(point.x);
+      | }
+      |""".stripMargin
+
+  "Test 19: tainted struct" in {
+    val source = cpg.method.name("source").methodReturn
+    val sink = cpg.method.name("sink").parameter.name("x")
+    val flows = sink.reachableByFlows(source).l
+
+    flows.size shouldBe 1
+    flows.map(flowToResultPairs).toSet shouldBe Set(
+      List(("RET", Some(7)),
+           ("source(2)", Some(17)),
+           ("point = source(2)", Some(17)),
+           ("sink(point.x)", Some(18)),
+           ("sink(int x)", Some(12)))
+    )
+  }
+}
+
+class CDataFlowTests20 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      | typedef struct {
+      |   int len;
+      |   int* buf;
+      | } container;
+      |
+      | int source();
+      | void sink(container* cont);
+      |
+      | void foo(container* c, int idx) {
+      |   c->buf[idx] = source();
+      |   c->buf = 0;
+      |   sink(c);
+      | }
+      |""".stripMargin
+
+  "Test 20: should not find any flows" in {
+    val source = cpg.method.name("source").methodReturn
+    val sink = cpg.method.name("sink").parameter
+    val flows = sink.reachableByFlows(source).l
+    flows.size shouldBe 0
+  }
+}
+
+class CDataFlowTests21 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |
+      | int source();
+      | void sink(int* cont);
+      |
+      | void foo(int** c, int idx) {
+      |   c[1][2] = source();
+      |   c[idx][2] = 0;
+      |   sink(c[1]);
+      | }
+      |""".stripMargin
+
+  "Test 21: should find flow" in {
+    val source = cpg.method.name("source").methodReturn
+    val sink = cpg.method.name("sink").parameter
+    val flows = sink.reachableByFlows(source).l
+    flows.size shouldBe 1
+  }
+}
+
+class CDataFlowTests22 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |typedef struct {int field;} S;
+      | int source();
+      | void sink(int i);
+      |
+      | void foo(S* arg) {
+      |   arg->field = source();
+      |   sink((*arg).field);
+      | }
+      |""".stripMargin
+
+  "Test 22: find flows (pointer-to-struct/arrows vs star-dot)" in {
+    val source = cpg.method.name("source").methodReturn
+    val sink = cpg.method.name("sink").parameter
+    val flows = sink.reachableByFlows(source).l
+    flows.size shouldBe 1
+  }
+
+}
+
+class CDataFlowTests23 extends DataFlowCodeToCpgSuite {
+  override val code = """
+      | int source();
+      | void sink(int i);
+      |
+      | void foo(int* arg) {
+      |   arg[0] = source();
+      |   sink(*arg);
+      | }
+      |""".stripMargin
+
+  "Test 23: handle deref vs array access correctly" in {
+    val source = cpg.method.name("source").methodReturn
+    val sink = cpg.call.codeExact("*arg")
+    val flows = sink.reachableByFlows(source).l
+    flows.size shouldBe 1
+  }
 
 }
