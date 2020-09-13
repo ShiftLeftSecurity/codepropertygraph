@@ -19,7 +19,7 @@ class NamespaceCreator(cpg: Cpg) extends CpgPass(cpg) {
     * */
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
-    cpg.namespaceBlock.toBuffer
+    cpg.namespaceBlock
       .groupBy { nb: nodes.NamespaceBlock =>
         nb.name
       }
