@@ -99,10 +99,10 @@ class Type(val traversal: Traversal[nodes.Type]) extends AnyVal {
   def expression: Traversal[nodes.Expression] =
     traversal
       .in(EdgeTypes.EVAL_TYPE)
-      .collect { case node: nodes.Expression => node }
+      .collectAll[nodes.Expression]
 
   def parameter: Traversal[nodes.MethodParameterIn] =
     traversal
       .in(EdgeTypes.EVAL_TYPE)
-      .collect { case node: nodes.MethodParameterIn => node }
+      .collectAll[nodes.MethodParameterIn]
 }

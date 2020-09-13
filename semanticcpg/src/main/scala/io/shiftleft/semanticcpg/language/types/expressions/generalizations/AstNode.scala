@@ -99,7 +99,7 @@ class AstNode[A <: nodes.AstNode](val traversal: Traversal[A]) extends AnyVal {
     * Traverse only to those AST nodes that are also control flow graph nodes
     * */
   def isCfgNode: Traversal[nodes.CfgNode] =
-    traversal.collect { case node: nodes.CfgNode => node }
+    traversal.collectAll[nodes.CfgNode]
 
   /**
     * Traverse only to those AST nodes that are blocks
@@ -117,7 +117,7 @@ class AstNode[A <: nodes.AstNode](val traversal: Traversal[A]) extends AnyVal {
     * Traverse only to AST nodes that are expressions
     * */
   def isExpression: Traversal[nodes.Expression] =
-    traversal.collect { case node: nodes.Expression => node }
+    traversal.collectAll[nodes.Expression]
 
   /**
     * Traverse only to AST nodes that are calls

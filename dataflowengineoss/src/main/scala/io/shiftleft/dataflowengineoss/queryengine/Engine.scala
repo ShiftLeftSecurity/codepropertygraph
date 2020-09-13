@@ -145,7 +145,7 @@ object Engine {
     NoResolve
       .getMethodCallsites(param.method)
       .to(Traversal)
-      .collect { case call: nodes.Call => call }
+      .collectAll[nodes.Call]
       .argument(param.order)
       .l
 
