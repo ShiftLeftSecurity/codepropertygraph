@@ -96,12 +96,6 @@ class Steps[A](val traversal: Traversal[A]) extends AnyVal {
     else write(results)
   }
 
-  /** Aggregate all objects at this point into the given collection,
-    * e.g. `mutable.ArrayBuffer.empty[A]`
-    */
-  def aggregate(into: mutable.Buffer[A]): Steps[A] =
-    new Steps[A](traversal.sideEffect { into += _ })
-
 }
 
 object Steps {
