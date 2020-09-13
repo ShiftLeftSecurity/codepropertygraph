@@ -41,5 +41,5 @@ class MethodReturn(val traversal: Traversal[nodes.MethodReturn]) extends AnyVal 
     traversal.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type]
 
   def toReturn: Traversal[nodes.Return] =
-    traversal.map(_.toReturn).collect { case Some(ret) => ret }
+    traversal.flatMap(_.toReturn)
 }
