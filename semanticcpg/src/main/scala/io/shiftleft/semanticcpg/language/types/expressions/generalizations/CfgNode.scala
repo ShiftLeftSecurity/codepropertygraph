@@ -2,7 +2,6 @@ package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.utils.ExpandTo
 import overflowdb.traversal.help.Doc
 import overflowdb.traversal.{Traversal, help}
 
@@ -24,9 +23,9 @@ class CfgNode[A <: nodes.CfgNode](val traversal: Traversal[A]) extends AnyVal {
       case method: nodes.Method =>
         method
       case methodReturn: nodes.MethodReturn =>
-        ExpandTo.methodReturnToMethod(methodReturn)
+        methodReturn.method
       case expression: nodes.Expression =>
-        ExpandTo.expressionToMethod(expression)
+        expression.method
     }
 
   /**

@@ -3,7 +3,8 @@ package io.shiftleft.semanticcpg.accesspath
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, Operators, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes.TrackingPoint
 import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase
-import io.shiftleft.semanticcpg.utils.{ExpandTo, MemberAccess}
+import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.utils.MemberAccess
 import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
@@ -79,7 +80,7 @@ private object MemberAccessToElement {
             logger.warn(
               s"Invalid AST: Found member access without second argument." +
                 s" Member access CODE: ${memberAccess.code}" +
-                s" In method ${ExpandTo.expressionToMethod(memberAccess).property(NodeKeys.FULL_NAME)}")
+                s" In method ${memberAccess.method.fullName}")
             Elements.normalized(List(VariableAccess))
         }
       }
@@ -107,7 +108,7 @@ private object MemberAccessToElement {
         logger.warn(
           s"Invalid AST: Found member access without second argument." +
             s" Member access CODE: ${memberAccess.code}" +
-            s" In method ${ExpandTo.expressionToMethod(memberAccess).property(NodeKeys.FULL_NAME)}")
+            s" In method ${memberAccess.method.fullName}")
         VariableAccess
       }
       case Some(literal: nodes.Literal) => ConstantAccess(literal.code)
@@ -125,7 +126,7 @@ private object MemberAccessToElement {
         logger.warn(
           s"Invalid AST: Found member access without second argument." +
             s" Member access CODE: ${memberAccess.code}" +
-            s" In method ${ExpandTo.expressionToMethod(memberAccess).property(NodeKeys.FULL_NAME)}")
+            s" In method ${memberAccess.method.fullName}")
         VariablePointerShift
       }
       case Some(literal: nodes.Literal) =>

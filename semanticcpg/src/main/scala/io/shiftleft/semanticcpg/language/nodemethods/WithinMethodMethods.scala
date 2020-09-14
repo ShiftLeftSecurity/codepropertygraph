@@ -12,17 +12,18 @@ class WithinMethodMethods(val node: nodes.WithinMethod) extends AnyVal {
     case node: nodes.MethodParameterOut => walkUpAst(node)
     case node: nodes.MethodReturn       => walkUpAst(node)
     case node: nodes.ImplicitCall       => walkUpAst(node)
-    case node: nodes.Expression         => walkUpAstRecursively(node)
+    case node: nodes.Expression         => expressionToMethod(node)
   }
 
   private def walkUpAst(node: nodes.WithinMethod): nodes.Method =
     node._astIn.onlyChecked.asInstanceOf[nodes.Method]
 
-  @tailrec
-  private def walkUpAstRecursively(node: nodes.WithinMethod): nodes.Method =
-    node._astIn.onlyChecked match {
-      case method: nodes.Method      => method
-      case other: nodes.WithinMethod => walkUpAstRecursively(other)
+  private def expressionToMethod(expression: nodes.Expression): nodes.Method =
+    expression._containsIn.onlyChecked match {
+      case method: nodes.Method => method
+      case _: nodes.TypeDecl    =>
+        // TODO - there are csharp CPGs that have typedecls here, which is invalid.
+        null
     }
 
 }
