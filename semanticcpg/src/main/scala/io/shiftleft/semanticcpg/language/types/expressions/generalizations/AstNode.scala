@@ -46,8 +46,7 @@ class AstNode[A <: nodes.AstNode](val traversal: Traversal[A]) extends AnyVal {
     * Direct children of node in the AST. Siblings are ordered by their `order` fields
     * */
   def astChildren: Traversal[nodes.AstNode] =
-    // TODO MP add orderBy step to avoid conversion list/traversal
-    traversal.out(EdgeTypes.AST).cast[nodes.AstNode].l.sortBy(_.order).to(Traversal)
+    traversal.out(EdgeTypes.AST).cast[nodes.AstNode].sortBy(_.order)
 
   /**
     * Parent AST node
@@ -100,7 +99,7 @@ class AstNode[A <: nodes.AstNode](val traversal: Traversal[A]) extends AnyVal {
     * Traverse only to those AST nodes that are also control flow graph nodes
     * */
   def isCfgNode: Traversal[nodes.CfgNode] =
-    traversal.collect { case node: nodes.CfgNode => node }
+    traversal.collectAll[nodes.CfgNode]
 
   /**
     * Traverse only to those AST nodes that are blocks
@@ -118,7 +117,7 @@ class AstNode[A <: nodes.AstNode](val traversal: Traversal[A]) extends AnyVal {
     * Traverse only to AST nodes that are expressions
     * */
   def isExpression: Traversal[nodes.Expression] =
-    traversal.collect { case node: nodes.Expression => node }
+    traversal.collectAll[nodes.Expression]
 
   /**
     * Traverse only to AST nodes that are calls
