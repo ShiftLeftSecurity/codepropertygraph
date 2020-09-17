@@ -39,13 +39,15 @@ class Engine(context: EngineContext) {
     * */
   def backwards(sinks: List[nodes.TrackingPoint], sources: List[nodes.TrackingPoint]): List[ReachableByResult] = {
     val sourcesSet = sources.toSet
+    val tasks = sinks.map(sink => ReachableByTask(sink, sourcesSet, new ResultTable))
+    solveTasks(tasks, sourcesSet)
+  }
 
-    sinks
-      .map(sink => ReachableByTask(sink, sourcesSet, new ResultTable))
-      .foreach(task => submitTask(task))
+  private def solveTasks(tasks: List[ReachableByTask],
+                         sourcesSet: Set[nodes.TrackingPoint]): List[ReachableByResult] = {
 
+    tasks.foreach(submitTask)
     var result = List[ReachableByResult]()
-
     while (numberOfTasksRunning > 0) {
       Try {
         completionService.take.get
@@ -54,8 +56,8 @@ class Engine(context: EngineContext) {
           numberOfTasksRunning -= 1
           val (partial, complete) = resultsOfTask.partition(_.partial)
           result ++= complete
-          submitTasksForPartialFlows(partial, sourcesSet)
-          submitTasksForUnresolvedOutArgs(resultsOfTask, sourcesSet)
+          tasksForPartialResults(partial, sourcesSet).foreach(submitTask)
+          tasksForUnresolvedOutArgs(resultsOfTask, sourcesSet).foreach(submitTask)
         case Failure(exception) =>
           numberOfTasksRunning -= 1
           logger.warn(exception.getMessage)
@@ -64,23 +66,30 @@ class Engine(context: EngineContext) {
     result
   }
 
-  private def submitTasksForPartialFlows(partialResults: List[ReachableByResult],
-                                         sourcesSet: Set[nodes.TrackingPoint]): Unit = {
+  private def submitTask(task: ReachableByTask): Unit = {
+    numberOfTasksRunning += 1
+    completionService.submit(new ReachableByCallable(task, context))
+  }
+
+  private def tasksForPartialResults(partialResults: List[ReachableByResult],
+                                     sourcesSet: Set[nodes.TrackingPoint]): List[ReachableByTask] = {
     val pathsFromParams = partialResults.map(x => (x.path, x.callDepth))
-    pathsFromParams.foreach {
+    pathsFromParams.flatMap {
       case (path, callDepth) =>
         val param = path.head.node
-        Some(param).collect {
-          case p: nodes.MethodParameterIn =>
-            paramToArgs(p).foreach { arg =>
-              submitTask(ReachableByTask(arg, sourcesSet, new ResultTable, path, callDepth + 1))
-            }
-        }
+        Some(param)
+          .collect {
+            case p: nodes.MethodParameterIn =>
+              paramToArgs(p).map { arg =>
+                ReachableByTask(arg, sourcesSet, new ResultTable, path, callDepth + 1)
+              }
+          }
+          .getOrElse(List())
     }
   }
 
-  private def submitTasksForUnresolvedOutArgs(resultsOfTask: List[ReachableByResult],
-                                              sourceSet: Set[nodes.TrackingPoint]): Unit = {
+  private def tasksForUnresolvedOutArgs(resultsOfTask: List[ReachableByResult],
+                                        sourceSet: Set[nodes.TrackingPoint]): List[ReachableByTask] = {
 
     val outArgsAndCalls = resultsOfTask
       .map(x => (x.unresolvedArgs.collect { case e: nodes.Expression => e }, x.path, x.callDepth))
@@ -114,15 +123,7 @@ class Engine(context: EngineContext) {
         }
     }
 
-    (forCalls ++ forArgs).foreach {
-      case task: ReachableByTask =>
-        submitTask(task)
-    }
-  }
-
-  private def submitTask(task: ReachableByTask): Unit = {
-    numberOfTasksRunning += 1
-    completionService.submit(new ReachableByCallable(task, context))
+    (forCalls ++ forArgs)
   }
 
 }
