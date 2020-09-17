@@ -205,7 +205,6 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     val curNode = path.head.node
 
     val resultsForParents: List[ReachableByResult] = {
-      val ddgParents = ddgIn(curNode).filter(parent => !path.map(_.node).contains(parent)).toList
 
       def lookupOrCalculate(parent: PathElement) = {
         table.createFromTable(parent :: path).getOrElse {
@@ -214,17 +213,18 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
         }
       }
 
-      if (!curNode.isInstanceOf[nodes.Expression] || curNode.asInstanceOf[nodes.Expression].start.inCall.isEmpty) {
-        ddgParents.flatMap { parentNode =>
-          lookupOrCalculate(PathElement(parentNode))
-        }
-      } else {
-        val (arguments, nonArguments) = ddgParents.partition(_.isInstanceOf[nodes.Expression])
-        val elemsForArguments = arguments.flatMap { parentNode =>
-          elemForArgument(parentNode.asInstanceOf[nodes.Expression], curNode.asInstanceOf[nodes.Expression])
-        }
-        val elems = elemsForArguments ++ nonArguments.map(parentNode => PathElement(parentNode))
-        elems.flatMap(lookupOrCalculate)
+      curNode match {
+        case argument: nodes.Expression =>
+          val (arguments, nonArguments) = ddgIn(curNode, path).partition(_.isInstanceOf[nodes.Expression])
+          val elemsForArguments = arguments.flatMap { parentNode =>
+            elemForArgument(parentNode.asInstanceOf[nodes.Expression], argument)
+          }
+          val elems = elemsForArguments ++ nonArguments.map(parentNode => PathElement(parentNode))
+          elems.flatMap(lookupOrCalculate)
+        case _ =>
+          ddgIn(curNode, path).flatMap { parentNode =>
+            lookupOrCalculate(PathElement(parentNode))
+          }
       }
     }
 
@@ -252,6 +252,15 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     table.add(curNode, resultsForParents ++ resultsForCurNode)
   }
 
+  private def ddgIn(dstNode: nodes.TrackingPoint, path: List[PathElement]): List[nodes.TrackingPoint] = {
+    dstNode
+      ._reachingDefIn()
+      .asScala
+      .collect { case n: nodes.TrackingPoint => n }
+      .filter(parent => !path.map(_.node).contains(parent))
+      .toList
+  }
+
   /**
     * For a given `(parentNode, curNode)` pair, determine whether to expand into
     * `parentNode`. If so, return a corresponding path element or None if
@@ -260,22 +269,25 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
   private def elemForArgument(parentNode: nodes.Expression, curNode: nodes.Expression)(
       implicit semantics: Semantics): Option[PathElement] = {
     val parentNodeCall = parentNode.start.inCall.l
-    if (parentNodeCall == curNode.start.inCall.l) {
-      val internalMethodsForCall = parentNodeCall.flatMap(methodsForCall).to(Traversal).internal.l
-      if (semanticsForCallByArg(parentNode.asInstanceOf[nodes.Expression]).nonEmpty || internalMethodsForCall.isEmpty) {
-        Some(PathElement(parentNode)).filter(_ => isUsed(parentNode) && isDefined(curNode))
+    val sameCallSite = parentNodeCall == curNode.start.inCall.l
+
+    if (sameCallSite) {
+      val internalMethodsForCall = parentNodeCall.flatMap(methodsForCall).to(Traversal).internal
+      val semanticExists = semanticsForCallByArg(parentNode.asInstanceOf[nodes.Expression]).nonEmpty
+      val visible = (semanticExists || internalMethodsForCall.isEmpty)
+      if (isUsed(parentNode) && isDefined(curNode)) {
+        Some(PathElement(parentNode, visible))
       } else {
-        // There is no semantic and we can resolve the method, so, this is an
-        // argument we would need to resolve. Report that, but don't take action for now
-        Some(PathElement(parentNode, resolved = false)).filter(_ => isUsed(parentNode) && isDefined(curNode))
+        None
       }
     } else {
-      Some(PathElement(parentNode, isDefined(parentNode))).filter(_ => isUsed(curNode))
+      if (isUsed(curNode)) {
+        val visible = isDefined(parentNode)
+        Some(PathElement(parentNode, visible))
+      } else {
+        None
+      }
     }
-  }
-
-  private def ddgIn(dstNode: nodes.TrackingPoint): Iterator[nodes.TrackingPoint] = {
-    dstNode._reachingDefIn().asScala.collect { case n: nodes.TrackingPoint => n }
   }
 
   private def isUsed(srcNode: nodes.TrackingPoint)(implicit semantics: Semantics) = {
