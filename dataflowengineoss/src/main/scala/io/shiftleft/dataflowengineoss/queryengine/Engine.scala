@@ -6,7 +6,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
-import overflowdb.traversal.Traversal
+import overflowdb.traversal.{NodeOps, Traversal}
 
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
@@ -43,8 +43,7 @@ class Engine(context: EngineContext) {
     solveTasks(tasks, sourcesSet)
   }
 
-  private def solveTasks(tasks: List[ReachableByTask],
-                         sourcesSet: Set[nodes.TrackingPoint]): List[ReachableByResult] = {
+  private def solveTasks(tasks: List[ReachableByTask], sources: Set[nodes.TrackingPoint]): List[ReachableByResult] = {
 
     tasks.foreach(submitTask)
     var result = List[ReachableByResult]()
@@ -54,10 +53,10 @@ class Engine(context: EngineContext) {
       } match {
         case Success(resultsOfTask) =>
           numberOfTasksRunning -= 1
-          val (partial, complete) = resultsOfTask.partition(_.partial)
+          val complete = resultsOfTask.filterNot(_.partial)
           result ++= complete
-          tasksForPartialResults(partial, sourcesSet).foreach(submitTask)
-          tasksForUnresolvedOutArgs(resultsOfTask, sourcesSet).foreach(submitTask)
+          newTasksFromResults(resultsOfTask, sources)
+            .foreach(submitTask)
         case Failure(exception) =>
           numberOfTasksRunning -= 1
           logger.warn(exception.getMessage)
@@ -66,13 +65,19 @@ class Engine(context: EngineContext) {
     result
   }
 
+  private def newTasksFromResults(resultsOfTask: List[ReachableByResult],
+                                  sources: Set[nodes.TrackingPoint]): List[ReachableByTask] = {
+    tasksForPartialResults(resultsOfTask, sources) ++ tasksForUnresolvedOutArgs(resultsOfTask, sources)
+  }
+
   private def submitTask(task: ReachableByTask): Unit = {
     numberOfTasksRunning += 1
     completionService.submit(new ReachableByCallable(task, context))
   }
 
-  private def tasksForPartialResults(partialResults: List[ReachableByResult],
-                                     sourcesSet: Set[nodes.TrackingPoint]): List[ReachableByTask] = {
+  private def tasksForPartialResults(resultsOfTask: List[ReachableByResult],
+                                     sources: Set[nodes.TrackingPoint]): List[ReachableByTask] = {
+    val partialResults = resultsOfTask.filter(_.partial)
     val pathsFromParams = partialResults.map(x => (x.path, x.callDepth))
     pathsFromParams.flatMap {
       case (path, callDepth) =>
@@ -81,7 +86,7 @@ class Engine(context: EngineContext) {
           .collect {
             case p: nodes.MethodParameterIn =>
               paramToArgs(p).map { arg =>
-                ReachableByTask(arg, sourcesSet, new ResultTable, path, callDepth + 1)
+                ReachableByTask(arg, sources, new ResultTable, path, callDepth + 1)
               }
           }
           .getOrElse(List())
@@ -89,41 +94,33 @@ class Engine(context: EngineContext) {
   }
 
   private def tasksForUnresolvedOutArgs(resultsOfTask: List[ReachableByResult],
-                                        sourceSet: Set[nodes.TrackingPoint]): List[ReachableByTask] = {
+                                        sources: Set[nodes.TrackingPoint]): List[ReachableByTask] = {
 
     val outArgsAndCalls = resultsOfTask
       .map(x => (x.unresolvedArgs.collect { case e: nodes.Expression => e }, x.path, x.callDepth))
       .distinct
 
-    val forCalls: List[ReachableByTask] = outArgsAndCalls.flatMap {
+    val forCalls = outArgsAndCalls.flatMap {
       case (args, path, callDepth) =>
         val outCalls = args.collect { case n: nodes.Call => n }
         val methodReturns = outCalls
-          .flatMap { call =>
-            NoResolve.getCalledMethods(call)
-          }
+          .flatMap(NoResolve.getCalledMethods)
           .to(Traversal)
           .methodReturn
         methodReturns.map { ret =>
-          ReachableByTask(ret, sourceSet, new ResultTable, path, callDepth + 1)
+          ReachableByTask(ret, sources, new ResultTable, path, callDepth + 1)
         }
     }
 
-    val forArgs: List[ReachableByTask] = outArgsAndCalls.flatMap {
+    val forArgs = outArgsAndCalls.flatMap {
       case (args, path, callDepth) =>
         args.flatMap { arg =>
-          argToMethods(arg)
-            .to(Traversal)
-            .parameter
-            .asOutput
-            .order(arg.order)
-            .map { p =>
-              (ReachableByTask(p, sourceSet, new ResultTable, path, callDepth + 1))
-            }
+          argToOutputParams(arg)
+            .map(p => ReachableByTask(p, sources, new ResultTable, path, callDepth + 1))
         }
     }
 
-    (forCalls ++ forArgs)
+    forCalls ++ forArgs
   }
 
 }
@@ -131,13 +128,18 @@ class Engine(context: EngineContext) {
 object Engine {
 
   def argToMethods(arg: nodes.Expression): List[nodes.Method] = {
-    argToCall(arg).toList.flatMap { call =>
+    arg.start.inCall.l.flatMap { call =>
       methodsForCall(call)
     }
   }
 
-  def argToCall(n: nodes.TrackingPoint): Option[nodes.Call] =
-    n._argumentIn().asScala.collectFirst { case c: nodes.Call => c }
+  def argToOutputParams(arg: nodes.Expression): Traversal[nodes.MethodParameterOut] = {
+    argToMethods(arg)
+      .to(Traversal)
+      .parameter
+      .asOutput
+      .order(arg.order)
+  }
 
   def methodsForCall(call: nodes.Call): List[nodes.Method] = {
     NoResolve.getCalledMethods(call).toList
@@ -157,6 +159,8 @@ case class EngineContext(semantics: Semantics, config: EngineConfig = EngineConf
 case class EngineConfig(var maxCallDepth: Int = 4)
 
 /**
+  * Callable for solving a ReachableByTask
+  *
   * A Java Callable is "a task that returns a result and may throw an exception", and this
   * is the callable for calculating the result for `task`.
   *
@@ -168,6 +172,9 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
 
   import Engine._
 
+  /**
+    * Entry point of callable.
+    * */
   override def call(): List[ReachableByResult] = {
     if (task.callDepth > context.config.maxCallDepth) {
       List()
@@ -207,14 +214,14 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
         }
       }
 
-      if (argToCall(curNode).isEmpty) {
+      if (!curNode.isInstanceOf[nodes.Expression] || curNode.asInstanceOf[nodes.Expression].start.inCall.isEmpty) {
         ddgParents.flatMap { parentNode =>
           lookupOrCalculate(PathElement(parentNode))
         }
       } else {
         val (arguments, nonArguments) = ddgParents.partition(_.isInstanceOf[nodes.Expression])
         val elemsForArguments = arguments.flatMap { parentNode =>
-          elemForArgument(parentNode.asInstanceOf[nodes.Expression], curNode)
+          elemForArgument(parentNode.asInstanceOf[nodes.Expression], curNode.asInstanceOf[nodes.Expression])
         }
         val elems = elemsForArguments ++ nonArguments.map(parentNode => PathElement(parentNode))
         elems.flatMap(lookupOrCalculate)
@@ -250,11 +257,11 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     * `parentNode`. If so, return a corresponding path element or None if
     * `parentNode` should not be followed.
     * */
-  private def elemForArgument(parentNode: nodes.Expression, curNode: nodes.TrackingPoint)(
+  private def elemForArgument(parentNode: nodes.Expression, curNode: nodes.Expression)(
       implicit semantics: Semantics): Option[PathElement] = {
-    val parentNodeCall = argToCall(parentNode)
-    if (parentNodeCall == argToCall(curNode)) {
-      val internalMethodsForCall = parentNodeCall.toList.flatMap(methodsForCall).to(Traversal).internal.l
+    val parentNodeCall = parentNode.start.inCall.l
+    if (parentNodeCall == curNode.start.inCall.l) {
+      val internalMethodsForCall = parentNodeCall.flatMap(methodsForCall).to(Traversal).internal.l
       if (semanticsForCallByArg(parentNode.asInstanceOf[nodes.Expression]).nonEmpty || internalMethodsForCall.isEmpty) {
         Some(PathElement(parentNode)).filter(_ => isUsed(parentNode) && isDefined(curNode))
       } else {
@@ -271,7 +278,7 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     dstNode._reachingDefIn().asScala.collect { case n: nodes.TrackingPoint => n }
   }
 
-  private def isUsed(srcNode: nodes.StoredNode)(implicit semantics: Semantics) = {
+  private def isUsed(srcNode: nodes.TrackingPoint)(implicit semantics: Semantics) = {
     Some(srcNode)
       .collect {
         case arg: nodes.Expression =>
