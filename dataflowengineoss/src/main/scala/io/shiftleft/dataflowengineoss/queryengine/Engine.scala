@@ -11,7 +11,10 @@ import overflowdb.traversal.Traversal
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
 
-private case class ReachableByTask(sink: nodes.TrackingPoint, sources: Set[nodes.TrackingPoint], table: ResultTable)
+private case class ReachableByTask(sink: nodes.TrackingPoint,
+                                   sources: Set[nodes.TrackingPoint],
+                                   table: ResultTable,
+                                   initialPath: List[PathElement] = List())
 
 class Engine(context: EngineContext) {
 
@@ -69,7 +72,7 @@ class Engine(context: EngineContext) {
         Some(param).collect {
           case p: nodes.MethodParameterIn =>
             paramToArgs(p).foreach { arg =>
-              submitTask(ReachableByTask(arg, sourcesSet, new ResultTable), path, callDepth)
+              submitTask(ReachableByTask(arg, sourcesSet, new ResultTable, path), callDepth)
             }
         }
     }
@@ -114,14 +117,14 @@ class Engine(context: EngineContext) {
 
     (forCalls ++ forArgs).foreach {
       case (p: nodes.TrackingPoint, path: List[PathElement], callDepth) =>
-        val task = ReachableByTask(p, sourceSet, new ResultTable)
-        submitTask(task, path = path, callDepth = callDepth)
+        val task = ReachableByTask(p, sourceSet, new ResultTable, path)
+        submitTask(task, callDepth = callDepth)
     }
   }
 
-  private def submitTask(task: ReachableByTask, path: List[PathElement] = List(), callDepth: Int): Unit = {
+  private def submitTask(task: ReachableByTask, callDepth: Int): Unit = {
     numberOfTasksRunning += 1
-    completionService.submit(new ReachableByCallable(task, context.copy(callDepth = callDepth + 1), path))
+    completionService.submit(new ReachableByCallable(task, context.copy(callDepth = callDepth + 1)))
   }
 
 }
@@ -154,9 +157,14 @@ object Engine {
 case class EngineContext(semantics: Semantics, config: EngineConfig = EngineConfig(), callDepth: Int = 0)
 case class EngineConfig(var maxCallDepth: Int = 4)
 
-private class ReachableByCallable(task: ReachableByTask,
-                                  context: EngineContext,
-                                  initialPath: List[PathElement] = List())
+/**
+  * A Java Callable is "a task that returns a result and may throw an exception", and this
+  * is the callable for calculating the result for `task`.
+  *
+  * @param task the data flow problem to solve
+  * @param context state of the data flow engine
+  * */
+private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     extends Callable[List[ReachableByResult]] {
 
   import Engine._
@@ -166,7 +174,7 @@ private class ReachableByCallable(task: ReachableByTask,
       List()
     } else {
       implicit val sem: Semantics = context.semantics
-      results(List(PathElement(task.sink)) ++ initialPath, task.sources, task.table)
+      results(List(PathElement(task.sink)) ++ task.initialPath, task.sources, task.table)
       task.table.get(task.sink).get.map { r =>
         r.copy(callDepth = context.callDepth)
       }
