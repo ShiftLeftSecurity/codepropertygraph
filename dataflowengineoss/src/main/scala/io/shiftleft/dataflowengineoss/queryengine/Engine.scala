@@ -290,24 +290,14 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     }
   }
 
-  private def isUsed(srcNode: nodes.TrackingPoint)(implicit semantics: Semantics) = {
-    Some(srcNode)
-      .collect {
-        case arg: nodes.Expression =>
-          val s = semanticsForCallByArg(arg)
-          s.isEmpty || s.exists(_.mappings.exists { case (srcIndex, _) => srcIndex == arg.order })
-      }
-      .getOrElse(true)
+  private def isUsed(arg: nodes.Expression)(implicit semantics: Semantics) = {
+    val s = semanticsForCallByArg(arg)
+    s.isEmpty || s.exists(_.mappings.exists { case (srcIndex, _) => srcIndex == arg.order })
   }
 
-  private def isDefined(srcNode: nodes.StoredNode)(implicit semantics: Semantics) = {
-    Some(srcNode)
-      .collect {
-        case arg: nodes.Expression =>
-          val s = semanticsForCallByArg(arg)
-          s.isEmpty || s.exists(_.mappings.exists { case (_, dstIndex) => dstIndex == arg.order })
-      }
-      .getOrElse(true)
+  private def isDefined(arg: nodes.Expression)(implicit semantics: Semantics) = {
+    val s = semanticsForCallByArg(arg)
+    s.isEmpty || s.exists(_.mappings.exists { case (_, dstIndex) => dstIndex == arg.order })
   }
 
   private def semanticsForCallByArg(arg: nodes.Expression)(implicit semantics: Semantics): List[FlowSemantic] = {
