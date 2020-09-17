@@ -14,7 +14,8 @@ import scala.util.{Failure, Success, Try}
 private case class ReachableByTask(sink: nodes.TrackingPoint,
                                    sources: Set[nodes.TrackingPoint],
                                    table: ResultTable,
-                                   initialPath: List[PathElement] = List())
+                                   initialPath: List[PathElement] = List(),
+                                   callDepth: Int = 0)
 
 class Engine(context: EngineContext) {
 
@@ -41,7 +42,7 @@ class Engine(context: EngineContext) {
 
     sinks
       .map(sink => ReachableByTask(sink, sourcesSet, new ResultTable))
-      .foreach(task => submitTask(task, callDepth = 0))
+      .foreach(task => submitTask(task))
 
     var result = List[ReachableByResult]()
 
@@ -72,7 +73,7 @@ class Engine(context: EngineContext) {
         Some(param).collect {
           case p: nodes.MethodParameterIn =>
             paramToArgs(p).foreach { arg =>
-              submitTask(ReachableByTask(arg, sourcesSet, new ResultTable, path), callDepth)
+              submitTask(ReachableByTask(arg, sourcesSet, new ResultTable, path, callDepth + 1))
             }
         }
     }
@@ -85,7 +86,7 @@ class Engine(context: EngineContext) {
       .map(x => (x.unresolvedArgs.collect { case e: nodes.Expression => e }, x.path, x.callDepth))
       .distinct
 
-    val forCalls: List[(nodes.TrackingPoint, List[PathElement], Int)] = outArgsAndCalls.flatMap {
+    val forCalls: List[ReachableByTask] = outArgsAndCalls.flatMap {
       case (args, path, callDepth) =>
         val outCalls = args.collect { case n: nodes.Call => n }
         val methodReturns = outCalls
@@ -94,13 +95,12 @@ class Engine(context: EngineContext) {
           }
           .to(Traversal)
           .methodReturn
-          .l
         methodReturns.map { ret =>
-          (ret, path, callDepth)
+          ReachableByTask(ret, sourceSet, new ResultTable, path, callDepth + 1)
         }
     }
 
-    val forArgs: List[(nodes.TrackingPoint, List[PathElement], Int)] = outArgsAndCalls.flatMap {
+    val forArgs: List[ReachableByTask] = outArgsAndCalls.flatMap {
       case (args, path, callDepth) =>
         args.flatMap { arg =>
           argToMethods(arg)
@@ -109,22 +109,20 @@ class Engine(context: EngineContext) {
             .asOutput
             .order(arg.order)
             .map { p =>
-              (p, path, callDepth)
+              (ReachableByTask(p, sourceSet, new ResultTable, path, callDepth + 1))
             }
-            .l
         }
     }
 
     (forCalls ++ forArgs).foreach {
-      case (p: nodes.TrackingPoint, path: List[PathElement], callDepth) =>
-        val task = ReachableByTask(p, sourceSet, new ResultTable, path)
-        submitTask(task, callDepth = callDepth)
+      case task: ReachableByTask =>
+        submitTask(task)
     }
   }
 
-  private def submitTask(task: ReachableByTask, callDepth: Int): Unit = {
+  private def submitTask(task: ReachableByTask): Unit = {
     numberOfTasksRunning += 1
-    completionService.submit(new ReachableByCallable(task, context.copy(callDepth = callDepth + 1)))
+    completionService.submit(new ReachableByCallable(task, context))
   }
 
 }
@@ -154,7 +152,7 @@ object Engine {
 
 }
 
-case class EngineContext(semantics: Semantics, config: EngineConfig = EngineConfig(), callDepth: Int = 0)
+case class EngineContext(semantics: Semantics, config: EngineConfig = EngineConfig())
 case class EngineConfig(var maxCallDepth: Int = 4)
 
 /**
@@ -170,13 +168,13 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
   import Engine._
 
   override def call(): List[ReachableByResult] = {
-    if (context.callDepth > context.config.maxCallDepth) {
+    if (task.callDepth > context.config.maxCallDepth) {
       List()
     } else {
       implicit val sem: Semantics = context.semantics
       results(List(PathElement(task.sink)) ++ task.initialPath, task.sources, task.table)
       task.table.get(task.sink).get.map { r =>
-        r.copy(callDepth = context.callDepth)
+        r.copy(callDepth = task.callDepth)
       }
     }
   }
