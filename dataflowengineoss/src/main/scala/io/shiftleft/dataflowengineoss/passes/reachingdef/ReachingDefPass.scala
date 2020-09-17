@@ -50,11 +50,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
             case (use, ins) =>
               ins.foreach { in =>
                 if (in.node != use) {
-                  val edgeLabel = Some(in.node)
-                    .filter(_.isInstanceOf[nodes.CfgNode])
-                    .map(_.asInstanceOf[nodes.CfgNode].code)
-                    .getOrElse("")
-                  addEdge(in.node, use, edgeLabel)
+                  addEdge(in.node, use, nodeToEdgeLabel(in.node))
                 }
               }
           }
@@ -65,7 +61,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           usageAnalyzer.uses(call).foreach { use =>
             gen(call).foreach { g =>
               if (use != g.node) {
-                addEdge(use, g.node)
+                addEdge(use, g.node, nodeToEdgeLabel(g.node))
               }
             }
           }
@@ -75,7 +71,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
             case (use, inElements) =>
               addEdge(use, ret, use.asInstanceOf[nodes.CfgNode].code)
               inElements.foreach { inElement =>
-                addEdge(inElement.node, ret)
+                addEdge(inElement.node, ret, nodeToEdgeLabel(inElement.node))
               }
               if (inElements.isEmpty) {
                 addEdge(method, ret)
@@ -105,6 +101,10 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
       }
 
     dstGraph
+  }
+
+  private def nodeToEdgeLabel(node: nodes.StoredNode): String = {
+    Some(node).collect { case n: nodes.CfgNode => n.code }.getOrElse("")
   }
 
 }
