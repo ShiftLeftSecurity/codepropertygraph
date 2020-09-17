@@ -5,6 +5,7 @@ import java.util.concurrent.{Callable, ExecutorCompletionService, ExecutorServic
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.dataflowengineoss.language._
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal.{NodeOps, Traversal}
 
@@ -127,6 +128,59 @@ class Engine(context: EngineContext) {
 
 object Engine {
 
+  def expandIn(curNode: nodes.TrackingPoint, path: List[PathElement])(
+      implicit semantics: Semantics): List[PathElement] = {
+    curNode match {
+      case argument: nodes.Expression =>
+        val (arguments, nonArguments) = ddgIn(curNode, path).partition(_.isInstanceOf[nodes.Expression])
+        val elemsForArguments = arguments.flatMap { parentNode =>
+          elemForArgument(parentNode.asInstanceOf[nodes.Expression], argument)
+        }
+        val elems = elemsForArguments ++ nonArguments.map(parentNode => PathElement(parentNode))
+        elems
+      case _ =>
+        ddgIn(curNode, path).map(PathElement(_))
+    }
+  }
+
+  private def ddgIn(dstNode: nodes.TrackingPoint, path: List[PathElement]): List[nodes.TrackingPoint] = {
+    dstNode
+      ._reachingDefIn()
+      .asScala
+      .collect { case n: nodes.TrackingPoint => n }
+      .filter(parent => !path.map(_.node).contains(parent))
+      .toList
+  }
+
+  /**
+    * For a given `(parentNode, curNode)` pair, determine whether to expand into
+    * `parentNode`. If so, return a corresponding path element or None if
+    * `parentNode` should not be followed. The Path element contains a Boolean
+    * field to specify whether it should be visible in the flow or not, a decision
+    * that can also only be made by looking at both the parent and the child.
+    * */
+  private def elemForArgument(parentNode: nodes.Expression, curNode: nodes.Expression)(
+      implicit semantics: Semantics): Option[PathElement] = {
+    val parentNodeCall = parentNode.start.inCall.l
+    val sameCallSite = parentNode.start.inCall.l == curNode.start.inCall.l
+
+    if (sameCallSite && parentNode.isUsed && curNode.isDefined ||
+        !sameCallSite && curNode.isUsed) {
+
+      val visible = if (sameCallSite) {
+        val semanticExists = parentNode.asInstanceOf[nodes.Expression].semanticsForCallByArg.nonEmpty
+        val internalMethodsForCall = parentNodeCall.flatMap(methodsForCall).to(Traversal).internal
+        semanticExists || internalMethodsForCall.isEmpty
+      } else {
+        parentNode.isDefined
+      }
+
+      Some(PathElement(parentNode, visible))
+    } else {
+      None
+    }
+  }
+
   def argToMethods(arg: nodes.Expression): List[nodes.Method] = {
     arg.start.inCall.l.flatMap { call =>
       methodsForCall(call)
@@ -205,26 +259,11 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     val curNode = path.head.node
 
     val resultsForParents: List[ReachableByResult] = {
-
-      def lookupOrCalculate(parent: PathElement) = {
+      expandIn(curNode, path).flatMap { parent =>
         table.createFromTable(parent :: path).getOrElse {
           results(parent :: path, sources, table)
           table.get(parent.node).get
         }
-      }
-
-      curNode match {
-        case argument: nodes.Expression =>
-          val (arguments, nonArguments) = ddgIn(curNode, path).partition(_.isInstanceOf[nodes.Expression])
-          val elemsForArguments = arguments.flatMap { parentNode =>
-            elemForArgument(parentNode.asInstanceOf[nodes.Expression], argument)
-          }
-          val elems = elemsForArguments ++ nonArguments.map(parentNode => PathElement(parentNode))
-          elems.flatMap(lookupOrCalculate)
-        case _ =>
-          ddgIn(curNode, path).flatMap { parentNode =>
-            lookupOrCalculate(PathElement(parentNode))
-          }
       }
     }
 
@@ -250,60 +289,6 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     }
 
     table.add(curNode, resultsForParents ++ resultsForCurNode)
-  }
-
-  private def ddgIn(dstNode: nodes.TrackingPoint, path: List[PathElement]): List[nodes.TrackingPoint] = {
-    dstNode
-      ._reachingDefIn()
-      .asScala
-      .collect { case n: nodes.TrackingPoint => n }
-      .filter(parent => !path.map(_.node).contains(parent))
-      .toList
-  }
-
-  /**
-    * For a given `(parentNode, curNode)` pair, determine whether to expand into
-    * `parentNode`. If so, return a corresponding path element or None if
-    * `parentNode` should not be followed.
-    * */
-  private def elemForArgument(parentNode: nodes.Expression, curNode: nodes.Expression)(
-      implicit semantics: Semantics): Option[PathElement] = {
-    val parentNodeCall = parentNode.start.inCall.l
-    val sameCallSite = parentNodeCall == curNode.start.inCall.l
-
-    if (sameCallSite) {
-      val internalMethodsForCall = parentNodeCall.flatMap(methodsForCall).to(Traversal).internal
-      val semanticExists = semanticsForCallByArg(parentNode.asInstanceOf[nodes.Expression]).nonEmpty
-      val visible = (semanticExists || internalMethodsForCall.isEmpty)
-      if (isUsed(parentNode) && isDefined(curNode)) {
-        Some(PathElement(parentNode, visible))
-      } else {
-        None
-      }
-    } else {
-      if (isUsed(curNode)) {
-        val visible = isDefined(parentNode)
-        Some(PathElement(parentNode, visible))
-      } else {
-        None
-      }
-    }
-  }
-
-  private def isUsed(arg: nodes.Expression)(implicit semantics: Semantics) = {
-    val s = semanticsForCallByArg(arg)
-    s.isEmpty || s.exists(_.mappings.exists { case (srcIndex, _) => srcIndex == arg.order })
-  }
-
-  private def isDefined(arg: nodes.Expression)(implicit semantics: Semantics) = {
-    val s = semanticsForCallByArg(arg)
-    s.isEmpty || s.exists(_.mappings.exists { case (_, dstIndex) => dstIndex == arg.order })
-  }
-
-  private def semanticsForCallByArg(arg: nodes.Expression)(implicit semantics: Semantics): List[FlowSemantic] = {
-    argToMethods(arg).flatMap { method =>
-      semantics.forMethod(method.fullName)
-    }
   }
 
   private def semanticsForCall(call: nodes.Call)(implicit semantics: Semantics): List[FlowSemantic] = {
