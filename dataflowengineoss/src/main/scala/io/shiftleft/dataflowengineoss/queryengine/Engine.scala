@@ -135,9 +135,7 @@ object Engine {
       case argument: nodes.Expression =>
         val (arguments, nonArguments) = ddgInE(curNode, path).partition(_.outNode().isInstanceOf[nodes.Expression])
         val elemsForArguments = arguments.flatMap { e =>
-          val parentNode = e.outNode()
-          elemForArgument(parentNode.asInstanceOf[nodes.Expression], argument).map(x =>
-            x.copy(inEdgeLabel = Some(e.property(EdgeKeys.VARIABLE)).getOrElse("")))
+          elemForArgument(e, argument)
         }
         val elems = elemsForArguments ++ nonArguments.map(edgeToPathElement)
         elems
@@ -167,8 +165,9 @@ object Engine {
     * field to specify whether it should be visible in the flow or not, a decision
     * that can also only be made by looking at both the parent and the child.
     * */
-  private def elemForArgument(parentNode: nodes.Expression, curNode: nodes.Expression)(
+  private def elemForArgument(e: Edge, curNode: nodes.Expression)(
       implicit semantics: Semantics): Option[PathElement] = {
+    val parentNode = e.outNode().asInstanceOf[nodes.Expression]
     val parentNodeCall = parentNode.start.inCall.l
     val sameCallSite = parentNode.start.inCall.l == curNode.start.inCall.l
 
@@ -183,7 +182,7 @@ object Engine {
         parentNode.isDefined
       }
 
-      Some(PathElement(parentNode, visible))
+      Some(PathElement(parentNode, visible, inEdgeLabel = e.label()))
     } else {
       None
     }
