@@ -2,11 +2,12 @@ package io.shiftleft.dataflowengineoss.queryengine
 
 import java.util.concurrent.{Callable, ExecutorCompletionService, ExecutorService, Executors}
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{EdgeKeys, EdgeTypes, nodes}
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.dataflowengineoss.language._
 import org.slf4j.{Logger, LoggerFactory}
+import overflowdb.Edge
 import overflowdb.traversal.{NodeOps, Traversal}
 
 import scala.jdk.CollectionConverters._
@@ -132,23 +133,30 @@ object Engine {
       implicit semantics: Semantics): List[PathElement] = {
     curNode match {
       case argument: nodes.Expression =>
-        val (arguments, nonArguments) = ddgIn(curNode, path).partition(_.isInstanceOf[nodes.Expression])
-        val elemsForArguments = arguments.flatMap { parentNode =>
-          elemForArgument(parentNode.asInstanceOf[nodes.Expression], argument)
+        val (arguments, nonArguments) = ddgInE(curNode, path).partition(_.outNode().isInstanceOf[nodes.Expression])
+        val elemsForArguments = arguments.flatMap { e =>
+          val parentNode = e.outNode()
+          elemForArgument(parentNode.asInstanceOf[nodes.Expression], argument).map(x =>
+            x.copy(inEdgeLabel = Some(e.property(EdgeKeys.VARIABLE)).getOrElse("")))
         }
-        val elems = elemsForArguments ++ nonArguments.map(parentNode => PathElement(parentNode))
+        val elems = elemsForArguments ++ nonArguments.map(edgeToPathElement)
         elems
       case _ =>
-        ddgIn(curNode, path).map(PathElement(_))
+        ddgInE(curNode, path).map(edgeToPathElement)
     }
   }
 
-  private def ddgIn(dstNode: nodes.TrackingPoint, path: List[PathElement]): List[nodes.TrackingPoint] = {
+  private def edgeToPathElement(e: Edge): PathElement = {
+    PathElement(e.outNode().asInstanceOf[nodes.TrackingPoint],
+                inEdgeLabel = Some(e.property(EdgeKeys.VARIABLE)).getOrElse(""))
+  }
+
+  private def ddgInE(dstNode: nodes.TrackingPoint, path: List[PathElement]): List[Edge] = {
     dstNode
-      ._reachingDefIn()
+      .inE(EdgeTypes.REACHING_DEF)
       .asScala
-      .collect { case n: nodes.TrackingPoint => n }
-      .filter(parent => !path.map(_.node).contains(parent))
+      .filter(e => e.outNode().isInstanceOf[nodes.TrackingPoint])
+      .filter(e => !path.map(_.node).contains(e.outNode().asInstanceOf[nodes.TrackingPoint]))
       .toList
   }
 

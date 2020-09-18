@@ -20,10 +20,11 @@ class DotDdgGeneratorTests extends DataFlowCodeToCpgSuite {
       |""".stripMargin
 
   "A PdgDotGenerator" should {
-    "create a dot graph with 44 edges" in {
+    "create a dot graph with 40 edges" in {
+      implicit val s = semantics
       val lines = cpg.method.name("foo").dotDdg.l.head.split("\n")
       lines.head.startsWith("digraph foo") shouldBe true
-      lines.count(x => x.contains("->")) shouldBe 44
+      lines.count(x => x.contains("->")) shouldBe 40
       lines.last.startsWith("}") shouldBe true
     }
   }

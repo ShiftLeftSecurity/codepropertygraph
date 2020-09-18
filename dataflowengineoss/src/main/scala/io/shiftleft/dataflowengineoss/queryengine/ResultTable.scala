@@ -60,4 +60,7 @@ case class ReachableByResult(path: List[PathElement], callDepth: Int = 0, partia
     }.distinct
 }
 
-case class PathElement(node: nodes.TrackingPoint, visible: Boolean = true, resolved: Boolean = true)
+case class PathElement(node: nodes.TrackingPoint,
+                       visible: Boolean = true,
+                       resolved: Boolean = true,
+                       inEdgeLabel: String = "")
