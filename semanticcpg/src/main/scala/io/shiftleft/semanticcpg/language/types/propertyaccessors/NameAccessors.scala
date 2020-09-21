@@ -10,8 +10,8 @@ class NameAccessors[A <: Node with HasName](val traversal: Traversal[A]) extends
   /**
     * Traverse to name
     * */
-  def name: Traversal[String] =
-    traversal.map(_.name)
+  // def name: Traversal[String] =
+    // traversal.map(_.name)
 
   /**
     * Traverse to nodes where the name matches the regular expression `value`

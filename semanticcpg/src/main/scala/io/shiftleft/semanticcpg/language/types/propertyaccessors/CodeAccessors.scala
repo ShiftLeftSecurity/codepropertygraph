@@ -7,7 +7,7 @@ import overflowdb.traversal.Traversal
 
 class CodeAccessors[A <: Node with HasCode](val traversal: Traversal[A]) extends AnyVal {
 
-  def code(): Traversal[String] =
+  def code: Traversal[String] =
     traversal.map(_.code)
 
   def code(value: String): Traversal[A] =
