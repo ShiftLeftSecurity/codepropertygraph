@@ -3,7 +3,7 @@ name := "codepropertygraph"
 dependsOn(Projects.protoBindings)
 
 libraryDependencies ++= Seq(
-  "io.shiftleft"             %% "overflowdb-traversal" % "1.10",
+  "io.shiftleft"             %% "overflowdb-traversal" % "1.11",
   "com.github.pathikrit"     %% "better-files"         % "3.8.0",
   "org.scala-lang.modules"   %% "scala-java8-compat"   % "0.9.0",
   "org.slf4j"                %  "slf4j-api"            % "1.7.30",

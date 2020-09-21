@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language.HasStoreMethod
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext}
-import org.reflections.Reflections
+import org.reflections8.Reflections
 
 import scala.jdk.CollectionConverters._
 
