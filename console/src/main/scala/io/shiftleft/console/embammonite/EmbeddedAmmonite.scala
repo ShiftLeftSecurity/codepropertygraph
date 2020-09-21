@@ -18,7 +18,7 @@ private[embammonite] case class Job(uuid: UUID, query: String, observer: QueryRe
 
 class EmbeddedAmmonite(predef: String = "") {
 
-  private val logger: Logger = LoggerFactory.getLogger(classOf[EmbeddedAmmonite])
+  import EmbeddedAmmonite.logger
 
   val jobQueue: BlockingQueue[Job] = new LinkedBlockingQueue[Job]()
 
@@ -152,4 +152,6 @@ object EmbeddedAmmonite {
       | repl.frontEnd() = new CustomFrontend()
       |
       |""".stripMargin
+
+  private val logger: Logger = LoggerFactory.getLogger(classOf[EmbeddedAmmonite])
 }
