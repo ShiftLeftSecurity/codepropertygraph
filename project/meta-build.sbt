@@ -1,6 +1,6 @@
 libraryDependencies ++= Seq(
   "com.github.pathikrit" %% "better-files" % "3.8.0",
-  "io.shiftleft" %% "overflowdb-codegen" % "93c512b1b795ed859e6c3a7ba9fc8cbdf14cef09",
+  "io.shiftleft" %% "overflowdb-codegen" % "d9af53eada0ff20553e1b6b6021b38f77ade5ffe",
 )
 
 resolvers += Resolver.bintrayRepo("shiftleft", "maven")
