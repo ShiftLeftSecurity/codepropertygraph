@@ -90,15 +90,4 @@ class Expression[NodeType <: nodes.Expression](val traversal: Traversal[NodeType
   def typ: Traversal[nodes.Type] =
     traversal.out(EdgeTypes.EVAL_TYPE).cast[nodes.Type]
 
-
-  // TODO MP generate these property-based accessors
-  def code: Traversal[String] = ???
-  def code(value: String): Traversal[NodeType] = ???
-  def code(values: String*): Traversal[NodeType] = ???
-  def codeExact(value: String): Traversal[NodeType] = ???
-  def argIndex(value: Int): Traversal[NodeType] = ???
-  def argIndexNot(value: Int): Traversal[NodeType] = ???
-  def order(value: Int): Traversal[NodeType] = ???
-  def order(values: Int*): Traversal[NodeType] = ???
-
 }
