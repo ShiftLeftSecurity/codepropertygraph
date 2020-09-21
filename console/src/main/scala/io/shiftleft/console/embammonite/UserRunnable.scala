@@ -37,7 +37,7 @@ class UserRunnable(queue: BlockingQueue[Job], writer: PrintWriter, reader: Buffe
       case _: InterruptedException =>
         logger.info("Interrupted WriterThread")
     }
-    logger.info("WriterThread terminated gracefully")
+    logger.debug("WriterThread terminated gracefully")
   }
 
   private def isTerminationMarker(job: Job): Boolean = {

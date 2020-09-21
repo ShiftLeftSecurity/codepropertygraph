@@ -7,7 +7,6 @@ libraryDependencies ++= Seq(
   "com.github.pathikrit"     %% "better-files"         % "3.8.0",
   "org.scala-lang.modules"   %% "scala-java8-compat"   % "0.9.0",
   "org.slf4j"                %  "slf4j-api"            % "1.7.30",
-  "org.apache.logging.log4j" %  "log4j-slf4j-impl"     % "2.11.2" % Test,
   "org.scalatest"            %% "scalatest"            % Versions.scalatest % Test
 )
 

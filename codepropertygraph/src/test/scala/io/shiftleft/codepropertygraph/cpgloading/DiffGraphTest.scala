@@ -128,7 +128,6 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
       val appliedDiff = DiffGraph.Applier.applyDiff(diff, graph, true, None)
       graph.nodeCount shouldBe 3
       graph.edgeCount shouldBe 2
-      println(appliedDiff.inverseDiffGraph.get.iterator.toList)
       DiffGraph.Applier.unapplyDiff(graph, appliedDiff.inverseDiffGraph.get)
       graph.nodeCount shouldBe 0
     }
