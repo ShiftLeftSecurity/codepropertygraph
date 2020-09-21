@@ -10,7 +10,7 @@ class NameAccessors[A <: Node with HasName](val traversal: Traversal[A]) extends
   /**
     * Traverse to name
     * */
-  def name(): Traversal[String] =
+  def name: Traversal[String] =
     traversal.map(_.name)
 
   /**
