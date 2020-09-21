@@ -4,9 +4,7 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import overflowdb.Node
 import overflowdb.traversal.Traversal
 
-trait Implicits extends LowLowPrioImplicits
-
-trait LowLowPrioImplicits {
+trait Implicits {
   implicit def toCodeAccessors[A <: Node with HasCode](trav: Traversal[A]): CodeAccessors[A] = new CodeAccessors(trav)
 
   implicit def toCanonicalNameAccessors[A <: Node with HasCanonicalName](
