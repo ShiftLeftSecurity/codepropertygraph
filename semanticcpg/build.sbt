@@ -17,6 +17,7 @@ scalacOptions in (Compile, doc) ++= Seq(
 )
 
 compile / javacOptions ++= Seq("-g") //debug symbols
+publishArtifact in (Test, packageBin) := true
 
 // execute tests in root project so that they work in sbt *and* intellij
 Test / baseDirectory := (ThisBuild / Test / run / baseDirectory).value
