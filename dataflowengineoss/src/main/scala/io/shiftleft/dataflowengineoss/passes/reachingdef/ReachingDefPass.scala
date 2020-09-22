@@ -61,7 +61,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           usageAnalyzer.uses(call).foreach { use =>
             gen(call).foreach { g =>
               if (use != g.node) {
-                addEdge(use, g.node, nodeToEdgeLabel(g.node))
+                addEdge(use, g.node, nodeToEdgeLabel(use))
               }
             }
           }
