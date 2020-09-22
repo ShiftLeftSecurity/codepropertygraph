@@ -182,7 +182,7 @@ object Engine {
         parentNode.isDefined
       }
 
-      Some(PathElement(parentNode, visible, inEdgeLabel = e.label()))
+      Some(PathElement(parentNode, visible, inEdgeLabel = Some(e.property(EdgeKeys.VARIABLE)).getOrElse("")))
     } else {
       None
     }
