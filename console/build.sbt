@@ -64,3 +64,4 @@ libraryDependencies ++= Seq(
   "org.scalatest"        %% "scalatest"     % Versions.scalatest % Test
 )
 
+publishArtifact in (Test, packageBin) := true
