@@ -154,7 +154,7 @@ class CAstTests2 extends CodeToCpgSuite {
     cpg.call
       .name("<operator>.indirectIndexAccess")
       .argument
-      .argIndex(2)
+      .argumentIndex(2)
       .code
       .l shouldBe List("i")
   }
@@ -164,7 +164,7 @@ class CAstTests2 extends CodeToCpgSuite {
     cpg.call
       .name("<operator>.indirectIndexAccess")
       .argument
-      .argIndex(2)
+      .argumentIndex(2)
       .inAstMinusLeaf
       .isControlStructure
       .code
@@ -176,7 +176,7 @@ class CAstTests2 extends CodeToCpgSuite {
     cpg.call
       .name("<operator>.indirectIndexAccess")
       .argument
-      .argIndex(2)
+      .argumentIndex(2)
       .inAstMinusLeaf
       .isControlStructure
       .condition

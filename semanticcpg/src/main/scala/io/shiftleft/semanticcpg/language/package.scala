@@ -78,46 +78,6 @@ package object language extends operatorextension.Implicits {
   implicit def toMethodRef(trav: Traversal[nodes.MethodRef]): MethodRef = new MethodRef(trav)
   implicit def toBinding(trav: Traversal[nodes.Binding]): Binding = new Binding(trav)
 
-  implicit def toCodeAccessors[A <: Node with HasCode](trav: Traversal[A]): CodeAccessors[A] = new CodeAccessors(trav)
-
-  implicit def toCanonicalNameAccessors[A <: Node with HasCanonicalName](
-      trav: Traversal[A]): CanonicalNameAccessors[A] = new CanonicalNameAccessors(trav)
-
-  implicit def toDependencyGroupIdAccessors[A <: Node with HasDependencyGroupId](
-      trav: Traversal[A]): DependencyGroupIdAccessors[A] = new DependencyGroupIdAccessors(trav)
-
-  implicit def toDispatchTypeAccessors[A <: Node with HasDispatchType](trav: Traversal[A]): DispatchTypeAccessors[A] =
-    new DispatchTypeAccessors(trav)
-
-  implicit def toIsExternalAccessors[A <: Node with HasIsExternal](trav: Traversal[A]): IsExternalAccessors[A] =
-    new IsExternalAccessors(trav)
-
-  implicit def toFullNameAccessors[A <: Node with HasFullName](trav: Traversal[A]): FullNameAccessors[A] =
-    new FullNameAccessors(trav)
-
-  implicit def toLineNumberAccessors[A <: Node with HasLineNumber](trav: Traversal[A]): LineNumberAccessors[A] =
-    new LineNumberAccessors(trav)
-
-  implicit def toLineNumberEndAccessors[A <: Node with HasLineNumberEnd](
-      trav: Traversal[A]): LineNumberEndAccessors[A] = new LineNumberEndAccessors(trav)
-
-  implicit def toNameAccessors[A <: Node with HasName](trav: Traversal[A]): NameAccessors[A] = new NameAccessors(trav)
-
-  implicit def toOrderAccessors[A <: Node with HasOrder](trav: Traversal[A]): OrderAccessors[A] =
-    new OrderAccessors(trav)
-
-  implicit def toParserTypeNameAccessors[A <: Node with HasParserTypeName](
-      trav: Traversal[A]): ParserTypeNameAccessors[A] = new ParserTypeNameAccessors(trav)
-
-  implicit def toSignatureAccessors[A <: Node with HasSignature](trav: Traversal[A]): SignatureAccessors[A] =
-    new SignatureAccessors(trav)
-
-  implicit def toValueAccessors[A <: Node with HasValue](trav: Traversal[A]): ValueAccessors[A] =
-    new ValueAccessors(trav)
-
-  implicit def toVersionAccessors[A <: Node with HasVersion](trav: Traversal[A]): VersionAccessors[A] =
-    new VersionAccessors(trav)
-
   implicit class NodeStepsExt(val traversal: Traversal[_ <: StoredNode]) extends AnyVal {
 
     /**
@@ -148,10 +108,6 @@ package object language extends operatorextension.Implicits {
 
   implicit def toNodeTypeStarters(cpg: Cpg): NodeTypeStarters = new NodeTypeStarters(cpg)
   implicit def toTagTraversal(trav: Traversal[nodes.Tag]): Tag = new Tag(trav)
-
-  implicit def toArgumentIndexAccessors[NodeType <: nodes.Expression](
-      trav: Traversal[NodeType]): ArgumentIndexAccessors[NodeType] =
-    new ArgumentIndexAccessors(trav)
 
   // ~ EvalType accessors
   implicit def toEvalTypeAccessorsExpression(trav: Traversal[nodes.Expression]): EvalTypeAccessors[nodes.Expression] =
