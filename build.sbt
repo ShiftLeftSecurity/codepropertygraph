@@ -41,7 +41,7 @@ inThisBuild(
   )
 )
 
-// ThisBuild/publishTo := sonatypePublishToBundle.value
+ThisBuild/publishTo := sonatypePublishToBundle.value
 ThisBuild / Test / fork := true
 ThisBuild / Test / javaOptions += s"-Dlog4j2.configurationFile=file:${baseDirectory.in(ThisBuild).value}/resources/log4j2-test.xml"
 // If we fork we immediately stumble upon https://github.com/sbt/sbt/issues/3892 and https://github.com/sbt/sbt/issues/3892
