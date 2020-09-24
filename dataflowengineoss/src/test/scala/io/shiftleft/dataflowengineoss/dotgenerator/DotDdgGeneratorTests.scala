@@ -5,7 +5,6 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.dataflowengineoss.language._
 
 class DotDdgGeneratorTests extends DataFlowCodeToCpgSuite {
-
   override val code =
     """
       |int foo(int param1, char *param2) {
@@ -27,6 +26,23 @@ class DotDdgGeneratorTests extends DataFlowCodeToCpgSuite {
       lines.count(x => x.contains("->")) shouldBe 40
       lines.last.startsWith("}") shouldBe true
     }
+  }
+}
+
+class DotDdgGeneratorTests2 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |int foo() {
+      |int x = 42;
+      |woo(x);
+      |baz(x);
+      |}
+      |""".stripMargin
+
+  "create correct dot graph" in {
+    implicit val s = semantics
+    val lines = cpg.method.name("foo").dotDdg.l.head.split("\n")
+    lines.count(x => x.contains("->") && x.contains("\"x\"")) shouldBe 5
   }
 
 }
