@@ -30,3 +30,21 @@ class DotDdgGeneratorTests extends DataFlowCodeToCpgSuite {
   }
 
 }
+
+class DotDdgGeneratorTests2 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |int foo() {
+      |  int x = 10;
+      |  woo(x);
+      |  baz(x);
+      |}
+      |""".stripMargin
+
+  "foo" in {
+    implicit val s = semantics
+    cpg.method.name("foo").plotDotDdg
+  }
+
+
+}
