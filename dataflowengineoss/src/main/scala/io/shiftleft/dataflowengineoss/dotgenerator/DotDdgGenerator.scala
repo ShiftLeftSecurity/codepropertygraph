@@ -87,7 +87,7 @@ object DotDdgGenerator {
         edge =>
           s"""  "${edge.src.id}" -> "${edge.dst.id}" """ +
             Some(s""" [ label = "${Shared.escape(edge.label)}"] """).filter(_ => edge.label != "").getOrElse(""))
-    }
+    }.dedup
 
     nodeStrings ++ edgeStrings
   }
