@@ -5,7 +5,7 @@ import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class EnhancedBaseCreatorTests extends AnyWordSpec with Matchers {
+class ScpgTests extends AnyWordSpec with Matchers {
 
   "EnhancedBaseCreator" should {
 
