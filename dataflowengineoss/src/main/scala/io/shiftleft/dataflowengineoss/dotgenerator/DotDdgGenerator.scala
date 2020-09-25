@@ -25,7 +25,7 @@ object DotDdgGenerator {
     val paramNodes = methodNode.parameter.l
     val allOtherNodes = methodNode.start.cfgNode.l
     val exitNode = methodNode.methodReturn
-    val allNodes: List[nodes.StoredNode] = List(entryNode, exitNode) ++ allOtherNodes ++ paramNodes
+    val allNodes: List[nodes.StoredNode] = List(entryNode, exitNode) ++ paramNodes ++ allOtherNodes
     val visibleNodes = allNodes.filter(shouldBeDisplayed)
 
     val edges = visibleNodes.map { dstNode =>
@@ -36,19 +36,12 @@ object DotDdgGenerator {
       Set(edge.src.id, edge.dst.id)
     }
 
-    val nodeStrings = visibleNodes.map { node =>
-      if (allIdsReferencedByEdges.contains(node.id)) {
-        s""""${node.id}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
-      } else {
-        ""
-      }
-    }
+    val nodeStrings = visibleNodes
+      .filter(node => allIdsReferencedByEdges.contains(node.id))
+      .map(Shared.nodeToDot)
 
     val edgeStrings = edges.flatMap { edges: List[Edge] =>
-      edges.map(
-        edge =>
-          s"""  "${edge.src.id}" -> "${edge.dst.id}" """ +
-            Some(s""" [ label = "${Shared.escape(edge.label)}"] """).filter(_ => edge.label != "").getOrElse(""))
+      edges.map(Shared.edgeToDot)
     }
 
     nodeStrings ++ edgeStrings
