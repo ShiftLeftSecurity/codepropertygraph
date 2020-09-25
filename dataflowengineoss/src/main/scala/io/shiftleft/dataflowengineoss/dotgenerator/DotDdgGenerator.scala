@@ -1,43 +1,25 @@
 package io.shiftleft.dataflowengineoss.dotgenerator
 
-import io.shiftleft.codepropertygraph.generated.{EdgeKeys, EdgeTypes, nodes}
-import io.shiftleft.dataflowengineoss.language._
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.dotgenerator.Shared
 import io.shiftleft.semanticcpg.dotgenerator.Shared.Edge
-import overflowdb.Node
 import overflowdb.traversal._
+
+case class Ddg(vertices: List[nodes.StoredNode], edges: List[Edge])
 
 object DotDdgGenerator {
 
-  def expand(v: nodes.StoredNode)(implicit semantics: Semantics): Iterator[Edge] = {
-
-    val allInEdges = v
-      .inE(EdgeTypes.REACHING_DEF)
-      .map(x => Edge(x.outNode.asInstanceOf[nodes.StoredNode], v, x.property(EdgeKeys.VARIABLE)))
-
-    val edgesFromMethods = allInEdges.filter(_.src.isInstanceOf[nodes.Method])
-
-    v match {
-      case trackingPoint: nodes.TrackingPoint =>
-        trackingPoint.ddgInPathElem
-          .map(x => Edge(x.node.asInstanceOf[nodes.StoredNode], v, x.inEdgeLabel))
-          .iterator ++ edgesFromMethods.iterator
-      case _ =>
-        v.inE(EdgeTypes.REACHING_DEF)
-          .map(x => Edge(x.outNode.asInstanceOf[nodes.StoredNode], v, x.property(EdgeKeys.VARIABLE)))
-          .iterator
-    }
-
-  }
-
-  def cfgNodeShouldBeDisplayed(v: Node): Boolean = !(
-    v.isInstanceOf[nodes.Block] ||
-      v.isInstanceOf[nodes.ControlStructure] ||
-      v.isInstanceOf[nodes.JumpTarget]
-  )
-
   def toDotDdg(traversal: Traversal[nodes.Method])(implicit semantics: Semantics): Traversal[String] =
-    traversal.map(Shared.dotGraph(_, expand, cfgNodeShouldBeDisplayed))
+    traversal.map(dotGraphForMethod)
+
+  private def dotGraphForMethod(method: nodes.Method)(implicit semantics: Semantics): String = {
+    val sb = Shared.namedGraphBegin(method)
+    val ddgGenerator = new DdgGenerator()
+    val ddg = ddgGenerator.createDdg(method)
+    val lines = ddg.vertices.map(Shared.nodeToDot) ++ ddg.edges.map(Shared.edgeToDot)
+    sb.append(lines.mkString("\n"))
+    Shared.graphEnd(sb)
+  }
 
 }

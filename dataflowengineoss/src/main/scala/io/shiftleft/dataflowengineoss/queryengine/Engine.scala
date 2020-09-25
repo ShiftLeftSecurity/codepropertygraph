@@ -146,8 +146,9 @@ object Engine {
   }
 
   private def edgeToPathElement(e: Edge): PathElement = {
-    PathElement(e.outNode().asInstanceOf[nodes.TrackingPoint],
-                inEdgeLabel = Some(e.property(EdgeKeys.VARIABLE)).getOrElse(""))
+    val parentNode = e.outNode().asInstanceOf[nodes.TrackingPoint]
+    val outLabel = Some(e.property(EdgeKeys.VARIABLE)).getOrElse("")
+    PathElement(parentNode, outEdgeLabel = outLabel)
   }
 
   private def ddgInE(dstNode: nodes.TrackingPoint, path: List[PathElement]): List[Edge] = {
@@ -183,7 +184,7 @@ object Engine {
         parentNode.isDefined
       }
 
-      Some(PathElement(parentNode, visible, inEdgeLabel = Some(e.property(EdgeKeys.VARIABLE)).getOrElse("")))
+      Some(PathElement(parentNode, visible, outEdgeLabel = Some(e.property(EdgeKeys.VARIABLE)).getOrElse("")))
     } else {
       None
     }
