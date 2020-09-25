@@ -6,7 +6,7 @@ import overflowdb.traversal._
 
 object DotAstGenerator {
 
-  def toDotAst[T <: nodes.AstNode](traversal: Traversal[T]): Traversal[String] =
+  def dotAst[T <: nodes.AstNode](traversal: Traversal[T]): Traversal[String] =
     traversal.map(dotAst)
 
   def dotAst(astRoot: nodes.AstNode): String = {

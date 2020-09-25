@@ -6,7 +6,7 @@ import overflowdb.traversal.Traversal
 
 class CfgNodeDot(val traversal: Traversal[nodes.Method]) extends AnyVal {
 
-  def dotCfg: Traversal[String] = DotCfgGenerator.toDotCfg(traversal)
+  def dotCfg: Traversal[String] = DotCfgGenerator.dotCfg(traversal)
 
   def plotDotCfg(implicit viewer: ImageViewer): Unit = {
     Shared.plotAndDisplay(dotCfg.l, viewer)

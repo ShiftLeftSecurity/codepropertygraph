@@ -10,7 +10,7 @@ import scala.jdk.CollectionConverters._
 
 object DotCfgGenerator {
 
-  def toDotCfg(traversal: Traversal[nodes.Method]): Traversal[String] =
+  def dotCfg(traversal: Traversal[nodes.Method]): Traversal[String] =
     traversal.map(dotGraph(_, expand, cfgNodeShouldBeDisplayed))
 
   def dotGraph(method: nodes.Method,
