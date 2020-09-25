@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.semanticcpg.accesspath.FakeTrackingPoint
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.MemberAccess
 
@@ -21,7 +22,11 @@ object TrackingPointMethodsBase {
 
 object TrackingPointToCfgNode {
   def apply(node: nodes.TrackingPointBase): nodes.CfgNode = {
-    applyInternal(node, _.parentExpression.get)
+    node match {
+      case ftp: FakeTrackingPoint => ftp.trackedCfgNode
+      case _                      => applyInternal(node, _.parentExpression.get)
+    }
+
   }
 
   @scala.annotation.tailrec

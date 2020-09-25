@@ -15,4 +15,10 @@ class CallMethods(val node: nodes.Call) extends AnyVal {
 
   def argument(index: Int): nodes.Expression =
     arguments(index).head
+
+  def argumentOption(index: Int): Option[nodes.Expression] =
+    node._argumentOut.asScala
+      .collectFirst {
+        case expr: nodes.Expression if expr.argumentIndex == index => expr
+      }
 }
