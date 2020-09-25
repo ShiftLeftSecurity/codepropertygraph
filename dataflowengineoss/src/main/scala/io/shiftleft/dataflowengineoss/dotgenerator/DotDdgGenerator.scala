@@ -20,8 +20,7 @@ object DotDdgGenerator {
 
     v match {
       case trackingPoint: nodes.TrackingPoint =>
-        trackingPoint
-          .ddgInPathElem()
+        trackingPoint.ddgInPathElem
           .map(x => Edge(x.node.asInstanceOf[nodes.StoredNode], v, x.inEdgeLabel))
           .iterator ++ edgesFromMethods.iterator
       case _ =>
