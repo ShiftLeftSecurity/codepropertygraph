@@ -30,20 +30,24 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
       implicit context: EngineContext): Traversal[NodeType] =
     node.start.reachableBy(sourceTravs: _*)
 
+  def ddgIn(implicit semantics: Semantics): Traversal[TrackingPoint] = ddgIn(List())
+
+  def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = ddgInPathElem(List())
+
   /**
     * Traverse back in the data dependence graph by one step, taking into account semantics
-    * @param path optional list of path elements that have been expended already
+    * @param path optional list of path elements that have been expanded already
     * */
-  def ddgIn(path: List[PathElement] = List())(implicit semantics: Semantics): Traversal[TrackingPoint] = {
+  def ddgIn(path: List[PathElement])(implicit semantics: Semantics): Traversal[TrackingPoint] = {
     ddgInPathElem(path).map(_.node)
   }
 
   /**
     * Traverse back in the data dependence graph by one step and generate corresponding PathElement,
     * taking into account semantics
-    * @param path optional list of path elements that have been expended already
+    * @param path optional list of path elements that have been expanded already
     * */
-  def ddgInPathElem(path: List[PathElement] = List())(implicit semantics: Semantics): Traversal[PathElement] = {
+  def ddgInPathElem(path: List[PathElement])(implicit semantics: Semantics): Traversal[PathElement] = {
     Engine.expandIn(node, path).to(Traversal)
   }
 

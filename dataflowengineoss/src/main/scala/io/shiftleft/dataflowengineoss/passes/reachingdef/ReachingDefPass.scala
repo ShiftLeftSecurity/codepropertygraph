@@ -104,7 +104,11 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   }
 
   private def nodeToEdgeLabel(node: nodes.StoredNode): String = {
-    Some(node).collect { case n: nodes.CfgNode => n.code }.getOrElse("")
+    node match {
+      case n: nodes.CfgNode           => n.code
+      case n: nodes.MethodParameterIn => n.name
+      case _                          => ""
+    }
   }
 
 }
