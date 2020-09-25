@@ -1,7 +1,8 @@
 package io.shiftleft.dataflowengineoss.language
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.dataflowengineoss.queryengine.{Engine, EngineContext, ReachableByResult}
+import io.shiftleft.dataflowengineoss.queryengine.{Engine, EngineContext, PathElement, ReachableByResult}
+import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal._
 
@@ -21,6 +22,10 @@ class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVa
     * */
   def cfgNode: Traversal[nodes.CfgNode] =
     traversal.map(_.cfgNode)
+
+  def ddgIn(implicit semantics: Semantics): Traversal[nodes.TrackingPoint] = traversal.flatMap(_.ddgIn)
+
+  def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = traversal.flatMap(_.ddgInPathElem)
 
   def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Traversal[NodeType]*)(
       implicit context: EngineContext): Traversal[NodeType] = {

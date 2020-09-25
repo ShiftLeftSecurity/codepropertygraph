@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes.linking.filecompat
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal._
@@ -18,7 +18,7 @@ class FileNameCompat(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    def updateDefaultFileName(node: nodes.StoredNode with nodes.HasFilename): Unit = {
+    def updateDefaultFileName(node: StoredNode with HasFilename): Unit = {
       // When creating nodes via NewNode classes, filename is "", not null.
       // For operators, filename might also be null.
       if (node.filename == null || node.filename == "") {
