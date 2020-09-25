@@ -60,7 +60,17 @@ case class ReachableByResult(path: List[PathElement], callDepth: Int = 0, partia
     }.distinct
 }
 
+/**
+  * We represent data flows as sequences of path elements, where each
+  * path element consists of a node, flags and the label of its
+  * outgoing edge.
+  *
+  * @param node The parent node
+  * @param visible whether this path element should be shown in the flow
+  * @param resolved whether we have resolved the method call this argument belongs to
+  * @param outEdgeLabel label of the outgoing DDG edge
+  * */
 case class PathElement(node: nodes.TrackingPoint,
                        visible: Boolean = true,
                        resolved: Boolean = true,
-                       inEdgeLabel: String = "")
+                       outEdgeLabel: String = "")

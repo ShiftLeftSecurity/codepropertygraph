@@ -72,7 +72,7 @@ object Shared {
     sb.append(s"digraph $name {  \n")
   }
 
-  def stringRepr(vertex: nodes.AstNode): String = {
+  def stringRepr(vertex: nodes.StoredNode): String = {
     escape(
       vertex match {
         case call: nodes.Call               => (call.name, call.code).toString

@@ -12,39 +12,31 @@ import io.shiftleft.semanticcpg.language._
 object DotDdgGenerator {
 
   def toDotDdg(traversal: Traversal[nodes.Method])(implicit semantics: Semantics): Traversal[String] =
-    traversal.map(dotGraph)
+    traversal.map(dotGraphForMethod)
 
-  private def dotGraph(method: nodes.Method)(implicit semantics: Semantics): String = {
+  private def dotGraphForMethod(method: nodes.Method)(implicit semantics: Semantics): String = {
     val sb = Shared.namedGraphBegin(method)
     sb.append(nodesAndEdges(method).mkString("\n"))
     Shared.graphEnd(sb)
   }
 
   private def nodesAndEdges(methodNode: nodes.Method)(implicit semantics: Semantics): List[String] = {
-    val vertices = methodNode.start.cfgNode.l ++ List(methodNode, methodNode.methodReturn) ++ methodNode.parameter.l
-    val verticesToDisplay = vertices.filter(cfgNodeShouldBeDisplayed)
+    val entryNode = methodNode
+    val paramNodes = methodNode.parameter.l
+    val allOtherNodes = methodNode.start.cfgNode.l
+    val exitNode = methodNode.methodReturn
+    val allNodes: List[nodes.StoredNode] = List(entryNode, exitNode) ++ allOtherNodes ++ paramNodes
+    val visibleNodes = allNodes.filter(shouldBeDisplayed)
 
-    def edgesToDisplay(dstNode: nodes.StoredNode, visited: List[nodes.StoredNode] = List()): List[Edge] = {
-      if (visited.contains(dstNode)) {
-        List()
-      } else {
-        val parents = expand(dstNode).filter(x => vertices.contains(x.src))
-        val (visible, invisible) = parents.partition(x => cfgNodeShouldBeDisplayed(x.src))
-        visible.toList ++ invisible.toList.flatMap { n =>
-          edgesToDisplay(n.src, visited ++ List(dstNode)).map(y => Edge(y.src, dstNode))
-        }
-      }
+    val edges = visibleNodes.map { dstNode =>
+      inEdgesToDisplay(allNodes, dstNode)
     }
 
-    val edges = verticesToDisplay.map { v =>
-      edgesToDisplay(v)
-    }
-
-    val allIdsReferencedByEdges = edges.flatten.flatMap { edge =>
+    val allIdsReferencedByEdges = edges.flatten.flatMap { edge: Edge =>
       Set(edge.src.id, edge.dst.id)
     }
 
-    val nodeStrings = verticesToDisplay.map { node =>
+    val nodeStrings = visibleNodes.map { node =>
       if (allIdsReferencedByEdges.contains(node.id)) {
         s""""${node.id}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
       } else {
@@ -62,31 +54,41 @@ object DotDdgGenerator {
     nodeStrings ++ edgeStrings
   }
 
+  private def shouldBeDisplayed(v: Node): Boolean = !(
+    v.isInstanceOf[nodes.Block] ||
+      v.isInstanceOf[nodes.ControlStructure] ||
+      v.isInstanceOf[nodes.JumpTarget]
+  )
+
+  private def inEdgesToDisplay(vertices: List[nodes.StoredNode],
+                               dstNode: nodes.StoredNode,
+                               visited: List[nodes.StoredNode] = List())(implicit semantics: Semantics): List[Edge] = {
+    if (visited.contains(dstNode)) {
+      List()
+    } else {
+      val parents = expand(dstNode).filter(x => vertices.contains(x.src))
+      val (visible, invisible) = parents.partition(x => shouldBeDisplayed(x.src))
+      visible.toList ++ invisible.toList.flatMap { n =>
+        inEdgesToDisplay(vertices, n.src, visited ++ List(dstNode)).map(y => Edge(y.src, dstNode))
+      }
+    }
+  }
+
   private def expand(v: nodes.StoredNode)(implicit semantics: Semantics): Iterator[Edge] = {
 
     val allInEdges = v
       .inE(EdgeTypes.REACHING_DEF)
       .map(x => Edge(x.outNode.asInstanceOf[nodes.StoredNode], v, x.property(EdgeKeys.VARIABLE)))
 
-    val edgesFromMethods = allInEdges.filter(_.src.isInstanceOf[nodes.Method])
-
     v match {
       case trackingPoint: nodes.TrackingPoint =>
         trackingPoint.ddgInPathElem
-          .map(x => Edge(x.node.asInstanceOf[nodes.StoredNode], v, x.inEdgeLabel))
-          .iterator ++ edgesFromMethods.iterator
+          .map(x => Edge(x.node.asInstanceOf[nodes.StoredNode], v, x.outEdgeLabel))
+          .iterator ++ allInEdges.filter(_.src.isInstanceOf[nodes.Method]).iterator
       case _ =>
-        v.inE(EdgeTypes.REACHING_DEF)
-          .map(x => Edge(x.outNode.asInstanceOf[nodes.StoredNode], v, x.property(EdgeKeys.VARIABLE)))
-          .iterator
+        allInEdges.iterator
     }
 
   }
-
-  private def cfgNodeShouldBeDisplayed(v: Node): Boolean = !(
-    v.isInstanceOf[nodes.Block] ||
-      v.isInstanceOf[nodes.ControlStructure] ||
-      v.isInstanceOf[nodes.JumpTarget]
-  )
 
 }

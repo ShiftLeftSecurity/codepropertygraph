@@ -40,7 +40,7 @@ class TrackingPointTests extends DataFlowCodeToCpgSuite {
   "allow traversing from argument back to param while inspecting edge" in {
     cpg.method("sink").parameter.argument.ddgInPathElem.l match {
       case List(pathElem) =>
-        pathElem.inEdgeLabel shouldBe "y"
+        pathElem.outEdgeLabel shouldBe "y"
         pathElem.node.isInstanceOf[nodes.MethodParameterIn] shouldBe true
       case _ => fail
     }
