@@ -29,7 +29,7 @@ object DotDdgGenerator {
     val visibleNodes = allNodes.filter(shouldBeDisplayed)
 
     val edges = visibleNodes.map { dstNode =>
-      inEdgesToDisplay(allNodes, dstNode)
+      inEdgesToDisplay(dstNode)
     }
 
     val allIdsReferencedByEdges = edges.flatten.flatMap { edge: Edge =>
@@ -40,9 +40,7 @@ object DotDdgGenerator {
       .filter(node => allIdsReferencedByEdges.contains(node.id))
       .map(Shared.nodeToDot)
 
-    val edgeStrings = edges.flatMap { edges: List[Edge] =>
-      edges.map(Shared.edgeToDot)
-    }
+    val edgeStrings = edges.flatten.map(Shared.edgeToDot)
 
     nodeStrings ++ edgeStrings
   }
@@ -53,16 +51,15 @@ object DotDdgGenerator {
       v.isInstanceOf[nodes.JumpTarget]
   )
 
-  private def inEdgesToDisplay(vertices: List[nodes.StoredNode],
-                               dstNode: nodes.StoredNode,
-                               visited: List[nodes.StoredNode] = List())(implicit semantics: Semantics): List[Edge] = {
+  private def inEdgesToDisplay(dstNode: nodes.StoredNode, visited: List[nodes.StoredNode] = List())(
+      implicit semantics: Semantics): List[Edge] = {
     if (visited.contains(dstNode)) {
       List()
     } else {
-      val parents = expand(dstNode).filter(x => vertices.contains(x.src))
+      val parents = expand(dstNode)
       val (visible, invisible) = parents.partition(x => shouldBeDisplayed(x.src))
       visible.toList ++ invisible.toList.flatMap { n =>
-        inEdgesToDisplay(vertices, n.src, visited ++ List(dstNode)).map(y => Edge(y.src, dstNode))
+        inEdgesToDisplay(n.src, visited ++ List(dstNode)).map(y => Edge(y.src, dstNode))
       }
     }
   }
