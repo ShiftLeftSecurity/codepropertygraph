@@ -108,7 +108,7 @@ object Shared {
     }
   }
 
-  private def escape(str: String): String = {
+  def escape(str: String): String = {
     str.replaceAllLiterally("\"", "\\\"")
   }
 
