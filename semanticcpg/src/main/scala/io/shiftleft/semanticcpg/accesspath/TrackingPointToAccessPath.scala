@@ -18,6 +18,7 @@ trait FakeTrackingPoint {
 
 object TrackingPointMethods {
   private val logger = LoggerFactory.getLogger(getClass)
+  private var hasWarnedDeprecations = false
 
   def toTrackedBaseAndAccessPath(node: nodes.StoredNode): (TrackedBase, AccessPath) = {
     // assume: node isa nodes.TrackingPoint
@@ -61,10 +62,52 @@ object TrackingPointMethods {
       case memberAccess: nodes.Call =>
         //assume: MemberAccess.isGenericMemberAccessName(call.name)
         memberAccess.name match {
-          case Operators.memberAccess | Operators.indirectMemberAccess | Operators.computedMemberAccess |
-              Operators.indirectComputedMemberAccess =>
-            logger.warn(s"Deprecated Operator ${memberAccess} on ${memberAccess}")
-            (TrackedUnknown, Nil)
+          case Operators.memberAccess | Operators.indirectMemberAccess =>
+            if (!hasWarnedDeprecations) {
+              logger.warn(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
+              hasWarnedDeprecations = true
+            }
+            memberAccess
+              .argumentOption(1)
+              .map { toTrackedBaseAndAccessPathInternal }
+              .map {
+                case (base, tail) =>
+                  (base,
+                   memberAccess
+                     .argumentOption(2)
+                     .collect {
+                       case lit: nodes.Literal   => ConstantAccess(lit.code)
+                       case id: nodes.Identifier => ConstantAccess(id.name)
+                     }
+                     .getOrElse(VariableAccess) :: tail)
+              }
+              .getOrElse {
+                logger.warn(s"Missing argument on call ${memberAccess}.")
+                (TrackedUnknown, Nil)
+              }
+
+          case Operators.computedMemberAccess | Operators.indirectComputedMemberAccess =>
+            if (!hasWarnedDeprecations) {
+              logger.warn(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
+              hasWarnedDeprecations = true
+            }
+            memberAccess
+              .argumentOption(1)
+              .map { toTrackedBaseAndAccessPathInternal }
+              .map {
+                case (base, tail) =>
+                  (base,
+                   memberAccess
+                     .argumentOption(2)
+                     .collect {
+                       case lit: nodes.Literal => ConstantAccess(lit.code)
+                     }
+                     .getOrElse(VariableAccess) :: tail)
+              }
+              .getOrElse {
+                logger.warn(s"Missing argument on call ${memberAccess}.")
+                (TrackedUnknown, Nil)
+              }
           case Operators.indirection =>
             memberAccess
               .argumentOption(1)

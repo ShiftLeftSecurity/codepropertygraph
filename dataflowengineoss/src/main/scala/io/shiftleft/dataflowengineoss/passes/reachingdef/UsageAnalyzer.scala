@@ -2,7 +2,7 @@ package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.semanticcpg.accesspath.{MatchResult, TrackingPointMethods,}
+import io.shiftleft.semanticcpg.accesspath.{MatchResult, TrackingPointMethods}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal._
 
