@@ -14,4 +14,8 @@ class CfgNodeDot(val traversal: Traversal[nodes.Method]) extends AnyVal {
     Shared.plotAndDisplay(dotCfg.l, viewer)
   }
 
+  def plotDotCdg(implicit viewer: ImageViewer): Unit = {
+    Shared.plotAndDisplay(dotCdg.l, viewer)
+  }
+
 }
