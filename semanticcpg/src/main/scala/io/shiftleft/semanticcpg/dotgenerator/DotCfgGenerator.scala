@@ -1,10 +1,7 @@
 package io.shiftleft.semanticcpg.dotgenerator
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.dotgenerator.Shared.Edge
 import overflowdb.traversal._
-
-case class Cfg(vertices: List[nodes.StoredNode], edges: List[Edge])
 
 object DotCfgGenerator {
 
