@@ -6,7 +6,13 @@ import io.shiftleft.semanticcpg.utils.MemberAccess
 
 object DotSerializer {
 
-  case class Graph(vertices: List[nodes.StoredNode], edges: List[Edge])
+  case class Graph(vertices: List[nodes.StoredNode], edges: List[Edge]) {
+
+    def merge(other: Graph): Graph = {
+      Graph((this.vertices ++ other.vertices).distinct, (this.edges ++ other.edges).distinct)
+    }
+
+  }
   case class Edge(src: nodes.StoredNode, dst: nodes.StoredNode, label: String = "", edgeType: String = "")
 
   def dotGraph(root: nodes.AstNode, graph: Graph): String = {
