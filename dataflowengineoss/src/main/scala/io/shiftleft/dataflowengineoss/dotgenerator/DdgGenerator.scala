@@ -10,6 +10,8 @@ import io.shiftleft.dataflowengineoss.language._
 
 class DdgGenerator {
 
+  val edgeType = "DDG"
+
   def generate(methodNode: nodes.Method)(implicit semantics: Semantics): Graph = {
     val entryNode = methodNode
     val paramNodes = methodNode.parameter.l
@@ -60,7 +62,7 @@ class DdgGenerator {
       val parents = expand(dstNode)
       val (visible, invisible) = parents.partition(x => shouldBeDisplayed(x.src))
       visible.toList ++ invisible.toList.flatMap { n =>
-        inEdgesToDisplay(n.src, visited ++ List(dstNode)).map(y => Edge(y.src, dstNode))
+        inEdgesToDisplay(n.src, visited ++ List(dstNode)).map(y => Edge(y.src, dstNode, edgeType = edgeType))
       }
     }
   }
@@ -69,12 +71,12 @@ class DdgGenerator {
 
     val allInEdges = v
       .inE(EdgeTypes.REACHING_DEF)
-      .map(x => Edge(x.outNode.asInstanceOf[nodes.StoredNode], v, x.property(EdgeKeys.VARIABLE)))
+      .map(x => Edge(x.outNode.asInstanceOf[nodes.StoredNode], v, x.property(EdgeKeys.VARIABLE), edgeType))
 
     v match {
       case trackingPoint: nodes.TrackingPoint =>
         trackingPoint.ddgInPathElem
-          .map(x => Edge(x.node.asInstanceOf[nodes.StoredNode], v, x.outEdgeLabel))
+          .map(x => Edge(x.node.asInstanceOf[nodes.StoredNode], v, x.outEdgeLabel, edgeType))
           .iterator ++ allInEdges.filter(_.src.isInstanceOf[nodes.Method]).iterator
       case _ =>
         allInEdges.iterator
