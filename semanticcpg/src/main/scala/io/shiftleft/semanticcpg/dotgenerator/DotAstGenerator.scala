@@ -22,9 +22,7 @@ object DotAstGenerator {
     val vertices = astRoot.ast.filter(shouldBeDisplayed).l
     val edges = vertices.map(v => (v.id, v.start.astChildren.filter(shouldBeDisplayed).id.l))
 
-    val nodeStrings = vertices.map { node =>
-      s""""${node.id}" [label = "${Shared.stringRepr(node)}" ]""".stripMargin
-    }
+    val nodeStrings = vertices.map(Shared.nodeToDot)
 
     val edgeStrings = edges.flatMap {
       case (id, childIds) =>

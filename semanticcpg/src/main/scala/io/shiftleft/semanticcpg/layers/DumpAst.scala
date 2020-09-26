@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal._
 
-case class DumpOptions(var outDir: String) extends LayerCreatorOptions {}
+case class AstDumpOptions(var outDir: String) extends LayerCreatorOptions {}
 
 object DumpAst {
 
@@ -12,10 +12,10 @@ object DumpAst {
 
   val description = "Dump abstract syntax trees to out/"
 
-  def defaultOpts: DumpOptions = DumpOptions("out")
+  def defaultOpts: AstDumpOptions = AstDumpOptions("out")
 }
 
-class DumpAst(options: DumpOptions) extends LayerCreator {
+class DumpAst(options: AstDumpOptions) extends LayerCreator {
   override val overlayName: String = DumpAst.overlayName
   override val description: String = DumpAst.description
 

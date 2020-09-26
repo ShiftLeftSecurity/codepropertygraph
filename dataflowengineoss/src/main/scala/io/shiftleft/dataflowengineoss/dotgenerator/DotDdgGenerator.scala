@@ -16,7 +16,7 @@ object DotDdgGenerator {
   private def dotGraphForMethod(method: nodes.Method)(implicit semantics: Semantics): String = {
     val sb = Shared.namedGraphBegin(method)
     val ddgGenerator = new DdgGenerator()
-    val ddg = ddgGenerator.createDdg(method)
+    val ddg = ddgGenerator.generate(method)
     val lines = ddg.vertices.map(Shared.nodeToDot) ++ ddg.edges.map(Shared.edgeToDot)
     sb.append(lines.mkString("\n"))
     Shared.graphEnd(sb)

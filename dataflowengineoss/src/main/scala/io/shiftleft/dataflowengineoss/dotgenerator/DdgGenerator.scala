@@ -10,7 +10,7 @@ import io.shiftleft.dataflowengineoss.language._
 
 class DdgGenerator {
 
-  def createDdg(methodNode: nodes.Method)(implicit semantics: Semantics): Ddg = {
+  def generate(methodNode: nodes.Method)(implicit semantics: Semantics): Ddg = {
     val entryNode = methodNode
     val paramNodes = methodNode.parameter.l
     val allOtherNodes = methodNode.start.cfgNode.l
@@ -26,9 +26,24 @@ class DdgGenerator {
       Set(edge.src.id, edge.dst.id)
     }
 
-    Ddg(visibleNodes
-          .filter(node => allIdsReferencedByEdges.contains(node.id)),
-        edges.flatten)
+    val ddgNodes = visibleNodes
+      .filter(node => allIdsReferencedByEdges.contains(node.id))
+      .map(surroundingCall)
+    val ddgEdges = edges.flatten
+      .map { e: Edge =>
+        e.copy(src = surroundingCall(e.src), dst = surroundingCall(e.dst))
+      }
+      .filter(e => e.src != e.dst)
+      .dedup
+      .l
+    Ddg(ddgNodes, ddgEdges)
+  }
+
+  private def surroundingCall(node: nodes.StoredNode): nodes.StoredNode = {
+    node match {
+      case arg: nodes.Expression => arg.start.inCall.headOption.getOrElse(node)
+      case _                     => node
+    }
   }
 
   private def shouldBeDisplayed(v: Node): Boolean = !(
