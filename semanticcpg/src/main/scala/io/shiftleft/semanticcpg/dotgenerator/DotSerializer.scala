@@ -15,10 +15,10 @@ object DotSerializer {
   }
   case class Edge(src: nodes.StoredNode, dst: nodes.StoredNode, label: String = "", edgeType: String = "")
 
-  def dotGraph(root: nodes.AstNode, graph: Graph): String = {
+  def dotGraph(root: nodes.AstNode, graph: Graph, withEdgeTypes: Boolean = false): String = {
     val sb = DotSerializer.namedGraphBegin(root)
     val nodeStrings = graph.vertices.map(DotSerializer.nodeToDot)
-    val edgeStrings = graph.edges.map(DotSerializer.edgeToDot)
+    val edgeStrings = graph.edges.map(e => DotSerializer.edgeToDot(e, withEdgeTypes))
     sb.append((nodeStrings ++ edgeStrings).mkString("\n"))
     DotSerializer.graphEnd(sb)
   }
@@ -68,9 +68,14 @@ object DotSerializer {
     s""""${node.id}" [label = "${DotSerializer.stringRepr(node)}" ]""".stripMargin
   }
 
-  private def edgeToDot(edge: Edge): String = {
-    s"""  "${edge.src.id}" -> "${edge.dst.id}" """ +
-      Some(s""" [ label = "${DotSerializer.escape(edge.label)}"] """).filter(_ => edge.label != "").getOrElse("")
+  private def edgeToDot(edge: Edge, withEdgeTypes: Boolean): String = {
+    val edgeLabel = if (withEdgeTypes) {
+      edge.edgeType + ": " + DotSerializer.escape(edge.label)
+    } else {
+      DotSerializer.escape(edge.label)
+    }
+    val labelStr = Some(s""" [ label = "$edgeLabel"] """).filter(_ => edge.label != "").getOrElse("")
+    s"""  "${edge.src.id}" -> "${edge.dst.id}" """ + labelStr
   }
 
   private def escape(str: String): String = {
