@@ -8,7 +8,7 @@ object DotSerializer {
 
   case class Graph(vertices: List[nodes.StoredNode], edges: List[Edge]) {
 
-    def merge(other: Graph): Graph = {
+    def ++(other: Graph): Graph = {
       Graph((this.vertices ++ other.vertices).distinct, (this.edges ++ other.edges).distinct)
     }
 
