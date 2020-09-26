@@ -9,12 +9,8 @@ object DotCdgGenerator {
     traversal.map(dotCdg)
 
   def dotCdg(method: nodes.Method): String = {
-    val sb = Shared.namedGraphBegin(method)
     val cdg = new CdgGenerator().generate(method)
-    val nodeStrings = cdg.vertices.map(Shared.nodeToDot)
-    val edgeStrings = cdg.edges.map(Shared.edgeToDot)
-    sb.append((nodeStrings ++ edgeStrings).mkString("\n"))
-    Shared.graphEnd(sb)
+    DotSerializer.dotGraph(method, cdg)
   }
 
 }
