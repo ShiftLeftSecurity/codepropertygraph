@@ -8,7 +8,7 @@ object DotSerializer {
 
   case class Graph(vertices: List[nodes.StoredNode], edges: List[Edge]) {
 
-    def merge(other: Graph): Graph = {
+    def ++(other: Graph): Graph = {
       Graph((this.vertices ++ other.vertices).distinct, (this.edges ++ other.edges).distinct)
     }
 
@@ -74,7 +74,7 @@ object DotSerializer {
     } else {
       DotSerializer.escape(edge.label)
     }
-    val labelStr = Some(s""" [ label = "$edgeLabel"] """).filter(_ => edge.label != "").getOrElse("")
+    val labelStr = Some(s""" [ label = "$edgeLabel"] """).filter(_ => edgeLabel != "").getOrElse("")
     s"""  "${edge.src.id}" -> "${edge.dst.id}" """ + labelStr
   }
 

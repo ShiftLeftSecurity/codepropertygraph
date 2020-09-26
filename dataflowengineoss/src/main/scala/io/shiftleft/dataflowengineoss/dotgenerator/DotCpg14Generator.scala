@@ -2,18 +2,20 @@ package io.shiftleft.dataflowengineoss.dotgenerator
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
-import io.shiftleft.semanticcpg.dotgenerator.{CdgGenerator, DotSerializer}
+import io.shiftleft.semanticcpg.dotgenerator.{AstGenerator, CdgGenerator, CfgGenerator, DotSerializer}
 import overflowdb.traversal.Traversal
 
-object DotPdgGenerator {
+object DotCpg14Generator {
 
-  def toDotPdg(traversal: Traversal[nodes.Method])(implicit semantics: Semantics): Traversal[String] =
+  def toDotCpg14(traversal: Traversal[nodes.Method])(implicit semantics: Semantics): Traversal[String] =
     traversal.map(dotGraphForMethod)
 
   private def dotGraphForMethod(method: nodes.Method)(implicit semantics: Semantics): String = {
+    val ast = new AstGenerator().generate(method)
+    val cfg = new CfgGenerator().generate(method)
     val ddg = new DdgGenerator().generate(method)
     val cdg = new CdgGenerator().generate(method)
-    DotSerializer.dotGraph(method, ddg.++(cdg), withEdgeTypes = true)
+    DotSerializer.dotGraph(method, ast ++ cfg ++ ddg ++ cdg, withEdgeTypes = true)
   }
 
 }
