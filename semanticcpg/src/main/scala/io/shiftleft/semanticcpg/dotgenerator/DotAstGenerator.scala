@@ -9,12 +9,8 @@ object DotAstGenerator {
     traversal.map(dotAst)
 
   def dotAst(astRoot: nodes.AstNode): String = {
-    val sb = Shared.namedGraphBegin(astRoot)
     val ast = new AstGenerator().generate(astRoot)
-    val nodeStrings = ast.vertices.map(Shared.nodeToDot)
-    val edgeStrings = ast.edges.map(Shared.edgeToDot)
-    sb.append((nodeStrings ++ edgeStrings).mkString("\n"))
-    Shared.graphEnd(sb)
+    DotSerializer.dotGraph(astRoot, ast)
   }
 
 }

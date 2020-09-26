@@ -2,7 +2,7 @@ package io.shiftleft.dataflowengineoss.dotgenerator
 
 import io.shiftleft.codepropertygraph.generated.{EdgeKeys, EdgeTypes, nodes}
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
-import io.shiftleft.semanticcpg.dotgenerator.Shared.{Edge, Graph}
+import io.shiftleft.semanticcpg.dotgenerator.DotSerializer.{Edge, Graph}
 import overflowdb.Node
 import overflowdb.traversal._
 import io.shiftleft.semanticcpg.language._
