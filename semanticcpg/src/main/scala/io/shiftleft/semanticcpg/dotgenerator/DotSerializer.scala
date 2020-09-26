@@ -74,7 +74,7 @@ object DotSerializer {
     } else {
       DotSerializer.escape(edge.label)
     }
-    val labelStr = Some(s""" [ label = "$edgeLabel"] """).filter(_ => edge.label != "").getOrElse("")
+    val labelStr = Some(s""" [ label = "$edgeLabel"] """).filter(_ => edgeLabel != "").getOrElse("")
     s"""  "${edge.src.id}" -> "${edge.dst.id}" """ + labelStr
   }
 
