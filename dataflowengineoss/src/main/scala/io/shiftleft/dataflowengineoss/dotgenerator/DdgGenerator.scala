@@ -2,7 +2,7 @@ package io.shiftleft.dataflowengineoss.dotgenerator
 
 import io.shiftleft.codepropertygraph.generated.{EdgeKeys, EdgeTypes, nodes}
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
-import io.shiftleft.semanticcpg.dotgenerator.Shared.Edge
+import io.shiftleft.semanticcpg.dotgenerator.Shared.{Edge, Graph}
 import overflowdb.Node
 import overflowdb.traversal._
 import io.shiftleft.semanticcpg.language._
@@ -10,7 +10,7 @@ import io.shiftleft.dataflowengineoss.language._
 
 class DdgGenerator {
 
-  def generate(methodNode: nodes.Method)(implicit semantics: Semantics): Ddg = {
+  def generate(methodNode: nodes.Method)(implicit semantics: Semantics): Graph = {
     val entryNode = methodNode
     val paramNodes = methodNode.parameter.l
     val allOtherNodes = methodNode.start.cfgNode.l
@@ -36,7 +36,7 @@ class DdgGenerator {
       .filter(e => e.src != e.dst)
       .dedup
       .l
-    Ddg(ddgNodes, ddgEdges)
+    Graph(ddgNodes, ddgEdges)
   }
 
   private def surroundingCall(node: nodes.StoredNode): nodes.StoredNode = {

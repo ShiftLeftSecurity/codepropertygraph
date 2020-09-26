@@ -6,6 +6,7 @@ import io.shiftleft.semanticcpg.utils.MemberAccess
 
 object Shared {
 
+  case class Graph(vertices: List[nodes.StoredNode], edges: List[Edge])
   case class Edge(src: nodes.StoredNode, dst: nodes.StoredNode, label: String = "")
 
   def namedGraphBegin(root: nodes.AstNode): StringBuilder = {
