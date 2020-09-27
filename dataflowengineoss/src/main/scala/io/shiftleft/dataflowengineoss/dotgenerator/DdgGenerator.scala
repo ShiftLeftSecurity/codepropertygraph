@@ -68,7 +68,6 @@ class DdgGenerator {
   }
 
   private def expand(v: nodes.StoredNode)(implicit semantics: Semantics): Iterator[Edge] = {
-
     val allInEdges = v
       .inE(EdgeTypes.REACHING_DEF)
       .map(x => Edge(x.outNode.asInstanceOf[nodes.StoredNode], v, x.property(EdgeKeys.VARIABLE), edgeType))

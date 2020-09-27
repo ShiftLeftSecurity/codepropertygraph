@@ -2,7 +2,7 @@ package io.shiftleft.dataflowengineoss.language.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.TrackingPoint
-import io.shiftleft.dataflowengineoss.queryengine.{Engine, EngineContext, PathElement}
+import io.shiftleft.dataflowengineoss.queryengine.{Engine, EngineContext, PathElement, ReachingDefWalker}
 import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointToCfgNode
 import overflowdb.traversal.Traversal
 import overflowdb.traversal._
@@ -30,9 +30,9 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
       implicit context: EngineContext): Traversal[NodeType] =
     node.start.reachableBy(sourceTravs: _*)
 
-  def ddgIn(implicit semantics: Semantics): Traversal[TrackingPoint] = ddgIn(List())
+  def ddgIn(implicit semantics: Semantics): Traversal[TrackingPoint] = ddgIn(List(PathElement(node)))
 
-  def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = ddgInPathElem(List())
+  def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = ddgInPathElem(List(PathElement(node)))
 
   /**
     * Traverse back in the data dependence graph by one step, taking into account semantics
@@ -48,7 +48,7 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
     * @param path optional list of path elements that have been expanded already
     * */
   def ddgInPathElem(path: List[PathElement])(implicit semantics: Semantics): Traversal[PathElement] = {
-    Engine.expandIn(node, path).to(Traversal)
+    new ReachingDefWalker().expandIn(node, path).to(Traversal)
   }
 
 }

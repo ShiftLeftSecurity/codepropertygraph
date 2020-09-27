@@ -10,6 +10,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.Edge
 import overflowdb.traversal.{NodeOps, Traversal}
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
 
@@ -20,8 +21,6 @@ private case class ReachableByTask(sink: nodes.TrackingPoint,
                                    callDepth: Int = 0)
 
 class Engine(context: EngineContext) {
-
-  import Engine._
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private var numberOfTasksRunning: Int = 0
@@ -125,12 +124,45 @@ class Engine(context: EngineContext) {
     forCalls ++ forArgs
   }
 
+  private def paramToArgs(param: nodes.MethodParameterIn): List[nodes.Expression] =
+    NoResolve
+      .getMethodCallsites(param.method)
+      .to(Traversal)
+      .collectAll[nodes.Call]
+      .argument(param.order)
+      .l
+
+  private def argToOutputParams(arg: nodes.Expression): Traversal[nodes.MethodParameterOut] = {
+    argToMethods(arg)
+      .to(Traversal)
+      .parameter
+      .asOutput
+      .order(arg.order)
+  }
+
+  def argToMethods(arg: nodes.Expression): List[nodes.Method] = {
+    arg.start.inCall.l.flatMap { call =>
+      methodsForCall(call)
+    }
+  }
+
+  private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
+    NoResolve.getCalledMethods(call).toList
+  }
+
 }
 
-object Engine {
+class ReachingDefWalker {
+
+  private val knownParents = mutable.HashMap[nodes.TrackingPoint, List[PathElement]]()
 
   def expandIn(curNode: nodes.TrackingPoint, path: List[PathElement])(
       implicit semantics: Semantics): List[PathElement] = {
+
+    if (knownParents.contains(curNode)) {
+      return knownParents(curNode)
+    }
+
     val elems = curNode match {
       case argument: nodes.Expression =>
         val (arguments, nonArguments) = ddgInE(curNode, path).partition(_.outNode().isInstanceOf[nodes.Expression])
@@ -142,7 +174,10 @@ object Engine {
       case _ =>
         ddgInE(curNode, path).map(edgeToPathElement)
     }
-    elems.filter(_.visible) ++ elems.filterNot(_.visible).flatMap(x => expandIn(x.node, x :: path))
+
+    val result = elems.filter(_.visible) ++ elems.filterNot(_.visible).flatMap(x => expandIn(x.node, x :: path))
+    knownParents.put(curNode, result)
+    result
   }
 
   private def edgeToPathElement(e: Edge): PathElement = {
@@ -190,31 +225,9 @@ object Engine {
     }
   }
 
-  def argToMethods(arg: nodes.Expression): List[nodes.Method] = {
-    arg.start.inCall.l.flatMap { call =>
-      methodsForCall(call)
-    }
-  }
-
-  def argToOutputParams(arg: nodes.Expression): Traversal[nodes.MethodParameterOut] = {
-    argToMethods(arg)
-      .to(Traversal)
-      .parameter
-      .asOutput
-      .order(arg.order)
-  }
-
   def methodsForCall(call: nodes.Call): List[nodes.Method] = {
     NoResolve.getCalledMethods(call).toList
   }
-
-  def paramToArgs(param: nodes.MethodParameterIn): List[nodes.Expression] =
-    NoResolve
-      .getMethodCallsites(param.method)
-      .to(Traversal)
-      .collectAll[nodes.Call]
-      .argument(param.order)
-      .l
 
 }
 
@@ -232,8 +245,6 @@ case class EngineConfig(var maxCallDepth: Int = 4)
   * */
 private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     extends Callable[List[ReachableByResult]] {
-
-  import Engine._
 
   /**
     * Entry point of callable.
@@ -268,7 +279,7 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     val curNode = path.head.node
 
     val resultsForParents: List[ReachableByResult] = {
-      expandIn(curNode, path).flatMap { parent =>
+      new ReachingDefWalker().expandIn(curNode, path).flatMap { parent =>
         table.createFromTable(parent :: path).getOrElse {
           results(parent :: path, sources, table)
           table.get(parent.node).get
@@ -301,9 +312,13 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
   }
 
   private def semanticsForCall(call: nodes.Call)(implicit semantics: Semantics): List[FlowSemantic] = {
-    Engine.methodsForCall(call).flatMap { method =>
+    methodsForCall(call).flatMap { method =>
       semantics.forMethod(method.fullName)
     }
+  }
+
+  private def methodsForCall(call: nodes.Call): List[nodes.Method] = {
+    NoResolve.getCalledMethods(call).toList
   }
 
 }
