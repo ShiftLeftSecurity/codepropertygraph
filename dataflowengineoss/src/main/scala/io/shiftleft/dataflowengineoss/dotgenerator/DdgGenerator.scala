@@ -60,9 +60,9 @@ class DdgGenerator {
       List()
     } else {
       val parents = expand(dstNode)
-      val (visible, invisible) = parents.partition(x => shouldBeDisplayed(x.src))
+      val (visible, invisible) = parents.partition(x => shouldBeDisplayed(x.src) && x.srcVisible)
       visible.toList ++ invisible.toList.flatMap { n =>
-        inEdgesToDisplay(n.src, visited ++ List(dstNode)).map(y => Edge(y.src, dstNode, edgeType = edgeType))
+        inEdgesToDisplay(n.src, visited ++ List(dstNode)).map(y => Edge(y.src, dstNode, y.srcVisible, edgeType = edgeType, label = y.label))
       }
     }
   }
@@ -71,12 +71,12 @@ class DdgGenerator {
 
     val allInEdges = v
       .inE(EdgeTypes.REACHING_DEF)
-      .map(x => Edge(x.outNode.asInstanceOf[nodes.StoredNode], v, x.property(EdgeKeys.VARIABLE), edgeType))
+      .map(x => Edge(x.outNode.asInstanceOf[nodes.StoredNode], v, true, x.property(EdgeKeys.VARIABLE), edgeType))
 
     v match {
       case trackingPoint: nodes.TrackingPoint =>
-        trackingPoint.ddgInPathElem
-          .map(x => Edge(x.node.asInstanceOf[nodes.StoredNode], v, x.outEdgeLabel, edgeType))
+        trackingPoint.ddgInPathElem(withInvisible = true)
+          .map(x => Edge(x.node.asInstanceOf[nodes.StoredNode], v, x.visible, x.outEdgeLabel, edgeType))
           .iterator ++ allInEdges.filter(_.src.isInstanceOf[nodes.Method]).iterator
       case _ =>
         allInEdges.iterator
