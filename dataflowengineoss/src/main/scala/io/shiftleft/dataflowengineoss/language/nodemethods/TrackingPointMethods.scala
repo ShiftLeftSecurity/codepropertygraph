@@ -30,17 +30,21 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
       implicit context: EngineContext): Traversal[NodeType] =
     node.start.reachableBy(sourceTravs: _*)
 
-  def ddgIn(implicit semantics: Semantics): Traversal[TrackingPoint] = ddgIn(List(PathElement(node)), withInvisible = false)
+  def ddgIn(implicit semantics: Semantics): Traversal[TrackingPoint] =
+    ddgIn(List(PathElement(node)), withInvisible = false)
 
-  def ddgInPathElem(withInvisible : Boolean)(implicit semantics: Semantics): Traversal[PathElement] = ddgInPathElem(List(PathElement(node)), withInvisible)
+  def ddgInPathElem(withInvisible: Boolean)(implicit semantics: Semantics): Traversal[PathElement] =
+    ddgInPathElem(List(PathElement(node)), withInvisible)
 
-  def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = ddgInPathElem(List(PathElement(node)), withInvisible = false)
+  def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] =
+    ddgInPathElem(List(PathElement(node)), withInvisible = false)
 
   /**
     * Traverse back in the data dependence graph by one step, taking into account semantics
     * @param path optional list of path elements that have been expanded already
     * */
-  def ddgIn(path: List[PathElement], withInvisible: Boolean)(implicit semantics: Semantics): Traversal[TrackingPoint] = {
+  def ddgIn(path: List[PathElement], withInvisible: Boolean)(
+      implicit semantics: Semantics): Traversal[TrackingPoint] = {
     ddgInPathElem(path, withInvisible).map(_.node)
   }
 
@@ -49,11 +53,12 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
     * taking into account semantics
     * @param path optional list of path elements that have been expanded already
     * */
-  def ddgInPathElem(path: List[PathElement], withInvisible : Boolean)(implicit semantics: Semantics): Traversal[PathElement] = {
+  def ddgInPathElem(path: List[PathElement], withInvisible: Boolean)(
+      implicit semantics: Semantics): Traversal[PathElement] = {
     val elems = Engine.expandIn(node, path)
     if (withInvisible) {
       elems
-    } else{
+    } else {
       (elems.filter(_.visible) ++ elems
         .filterNot(_.visible)
         .flatMap(x => x.node.ddgInPathElem(x :: path, withInvisible = false))).distinct.to(Traversal)

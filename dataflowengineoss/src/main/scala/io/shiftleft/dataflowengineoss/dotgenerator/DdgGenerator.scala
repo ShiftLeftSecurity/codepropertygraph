@@ -8,9 +8,12 @@ import overflowdb.traversal._
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.dataflowengineoss.language._
 
+import scala.collection.mutable
+
 class DdgGenerator {
 
   val edgeType = "DDG"
+  private val edgeCache = mutable.Map[nodes.StoredNode, List[Edge]]()
 
   def generate(methodNode: nodes.Method)(implicit semantics: Semantics): Graph = {
     val entryNode = methodNode
@@ -38,6 +41,8 @@ class DdgGenerator {
       .filter(e => e.src != e.dst)
       .dedup
       .l
+
+    edgeCache.clear
     Graph(ddgNodes, ddgEdges)
   }
 
@@ -56,14 +61,22 @@ class DdgGenerator {
 
   private def inEdgesToDisplay(dstNode: nodes.StoredNode, visited: List[nodes.StoredNode] = List())(
       implicit semantics: Semantics): List[Edge] = {
+
+    if (edgeCache.contains(dstNode)) {
+      return edgeCache(dstNode)
+    }
+
     if (visited.contains(dstNode)) {
       List()
     } else {
       val parents = expand(dstNode)
       val (visible, invisible) = parents.partition(x => shouldBeDisplayed(x.src) && x.srcVisible)
-      visible.toList ++ invisible.toList.flatMap { n =>
-        inEdgesToDisplay(n.src, visited ++ List(dstNode)).map(y => Edge(y.src, dstNode, y.srcVisible, edgeType = edgeType, label = y.label))
-      }
+      val result = visible.toList ++ invisible.toList.flatMap { n =>
+        val parentInEdgesToDisplay = inEdgesToDisplay(n.src, visited ++ List(dstNode))
+        parentInEdgesToDisplay.map(y => Edge(y.src, dstNode, y.srcVisible, edgeType = edgeType, label = y.label))
+      }.distinct
+      edgeCache.put(dstNode, result)
+      result
     }
   }
 
@@ -75,7 +88,8 @@ class DdgGenerator {
 
     v match {
       case trackingPoint: nodes.TrackingPoint =>
-        trackingPoint.ddgInPathElem(withInvisible = true)
+        trackingPoint
+          .ddgInPathElem(withInvisible = true)
           .map(x => Edge(x.node.asInstanceOf[nodes.StoredNode], v, x.visible, x.outEdgeLabel, edgeType))
           .iterator ++ allInEdges.filter(_.src.isInstanceOf[nodes.Method]).iterator
       case _ =>
