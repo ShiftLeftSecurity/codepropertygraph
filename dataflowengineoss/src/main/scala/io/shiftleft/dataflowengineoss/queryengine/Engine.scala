@@ -129,7 +129,7 @@ class Engine(context: EngineContext) {
 
 object Engine {
 
-  def expandIn(curNode: nodes.TrackingPoint, path: List[PathElement])(
+  def expandIn(curNode: nodes.TrackingPoint, path: List[PathElement], withInvisible: Boolean = false)(
       implicit semantics: Semantics): List[PathElement] = {
     val elems = curNode match {
       case argument: nodes.Expression =>
@@ -142,7 +142,13 @@ object Engine {
       case _ =>
         ddgInE(curNode, path).map(edgeToPathElement)
     }
-    elems.filter(_.visible) ++ elems.filterNot(_.visible).flatMap(x => expandIn(x.node, x :: path))
+    if (withInvisible) {
+      elems
+    } else {
+      elems.filter(_.visible) ++ elems
+        .filterNot(_.visible)
+        .flatMap(x => expandIn(x.node, x :: path, withInvisible = false))
+    }
   }
 
   private def edgeToPathElement(e: Edge): PathElement = {
@@ -268,7 +274,7 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     val curNode = path.head.node
 
     val resultsForParents: List[ReachableByResult] = {
-      expandIn(curNode, path).flatMap { parent =>
+      expandIn(curNode, path, withInvisible = true).flatMap { parent =>
         table.createFromTable(parent :: path).getOrElse {
           results(parent :: path, sources, table)
           table.get(parent.node).get

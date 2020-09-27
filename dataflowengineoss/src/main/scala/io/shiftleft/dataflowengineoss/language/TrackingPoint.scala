@@ -35,9 +35,22 @@ class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVa
 
   def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: Traversal[A]*)(
       implicit context: EngineContext): Traversal[Path] = {
-    val paths = reachableByInternal(sourceTravs).map { result =>
-      Path(removeConsecutiveDuplicates(result.path.filter(_.visible == true).map(_.node)))
-    }.dedup
+    val paths = reachableByInternal(sourceTravs)
+      .map { result =>
+        // We can get back results that start in nodes that are invisible
+        // according to the semantic, e.g., arguments that are only used
+        // but not defined. We filter these results here prior to returning
+        val first = result.path.headOption
+        if (first.isDefined && !first.get.visible) {
+          None
+        } else {
+          val visiblePathElements = result.path.filter(_.visible)
+          Some(Path(removeConsecutiveDuplicates(visiblePathElements.map(_.node))))
+        }
+      }
+      .filter(_.isDefined)
+      .dedup
+      .flatten
     paths.to(Traversal)
   }
 
