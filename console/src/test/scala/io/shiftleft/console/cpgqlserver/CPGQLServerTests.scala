@@ -1,17 +1,16 @@
 package io.shiftleft.console.cpgqlserver
 
-import java.net.URLEncoder
-import java.util.UUID
-import scala.concurrent._
-import scala.concurrent.duration._
-
 import cask.util.Logger.Console._
 import castor.Context.Simple.global
-import ujson.Value.Value
-
 import io.shiftleft.console.embammonite.EmbeddedAmmonite
+import java.net.URLEncoder
+import java.util.UUID
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import requests.RequestFailedException
+import scala.concurrent._
+import scala.concurrent.duration._
+import ujson.Value.Value
 
 class CPGQLServerTests extends AnyWordSpec with Matchers {
   val validBasicAuthHeaderVal = "Basic dXNlcm5hbWU6cGFzc3dvcmQ="
@@ -23,8 +22,8 @@ class CPGQLServerTests extends AnyWordSpec with Matchers {
                                      data = ujson.Obj("query" -> query).toString,
                                      headers = Seq("authorization" -> authHeaderVal))
     val res =
-      if (postResponse.contents.length > 0)
-        ujson.read(postResponse.contents)
+      if (postResponse.bytes.length > 0)
+        ujson.read(postResponse.bytes)
       else
         ujson.Obj()
     res
@@ -33,7 +32,7 @@ class CPGQLServerTests extends AnyWordSpec with Matchers {
   def getResponse(host: String, uuidParam: String, authHeaderVal: String = validBasicAuthHeaderVal): Value = {
     val uri = s"$host/result/${URLEncoder.encode(uuidParam, "utf-8")}"
     val getResponse = requests.get(uri, headers = Seq("authorization" -> authHeaderVal))
-    ujson.read(getResponse.contents)
+    ujson.read(getResponse.bytes)
   }
 
   "CPGQLServer" should {
@@ -56,9 +55,9 @@ class CPGQLServerTests extends AnyWordSpec with Matchers {
     }
 
     "disallow posting a query when request headers do not include a valid authentication value" in Fixture() { host =>
-      val postQueryResponse = postQuery(host, "1", authHeaderVal = "Basic b4df00d")
-      postQueryResponse.obj.keySet should not contain ("success")
-      postQueryResponse.obj.keySet should not contain ("uuid")
+      assertThrows[RequestFailedException] {
+        postQuery(host, "1", authHeaderVal = "Basic b4df00d")
+      }
     }
 
     "return a valid JSON response when trying to retrieve the result of a query without a connection" in Fixture() {
@@ -108,11 +107,9 @@ class CPGQLServerTests extends AnyWordSpec with Matchers {
       val queryResultWSMessage = Await.result(webSocketTextMsg.future, DefaultPromiseAwaitTimeout)
       queryResultWSMessage.length should not be (0)
 
-      val getResultResponse = getResponse(host, queryUUID, "Basic b4df00d")
-      getResultResponse.obj.keySet should not contain ("success")
-      getResultResponse.obj.keySet should not contain ("err")
-      getResultResponse.obj.keySet should not contain ("stderr")
-      getResultResponse.obj.keySet should not contain ("stdout")
+      assertThrows[RequestFailedException] {
+        getResponse(host, queryUUID, "Basic b4df00d")
+      }
     }
 
     "write a well-formatted message to a websocket connection when a query has finished evaluation" in Fixture() {
