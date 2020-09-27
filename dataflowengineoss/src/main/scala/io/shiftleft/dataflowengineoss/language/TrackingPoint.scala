@@ -6,6 +6,8 @@ import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal._
 
+import scala.collection.mutable
+
 /**
   * Base class for nodes that can occur in data flows
   * */
@@ -23,9 +25,19 @@ class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVa
   def cfgNode: Traversal[nodes.CfgNode] =
     traversal.map(_.cfgNode)
 
-  def ddgIn(implicit semantics: Semantics): Traversal[nodes.TrackingPoint] = traversal.flatMap(_.ddgIn)
+  def ddgIn(implicit semantics: Semantics): Traversal[nodes.TrackingPoint] = {
+    val cache = mutable.HashMap[nodes.TrackingPoint, List[PathElement]]()
+    val result = traversal.flatMap(x => x.ddgIn(List(PathElement(x)), withInvisible = false, cache))
+    cache.clear
+    result
+  }
 
-  def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = traversal.flatMap(_.ddgInPathElem)
+  def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = {
+    val cache = mutable.HashMap[nodes.TrackingPoint, List[PathElement]]()
+    val result = traversal.flatMap(x => x.ddgInPathElem(List(PathElement(x)), withInvisible = false, cache))
+    cache.clear
+    result
+  }
 
   def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Traversal[NodeType]*)(
       implicit context: EngineContext): Traversal[NodeType] = {

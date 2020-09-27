@@ -32,22 +32,35 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
       implicit context: EngineContext): Traversal[NodeType] =
     node.start.reachableBy(sourceTravs: _*)
 
-  def ddgIn(implicit semantics: Semantics): Traversal[TrackingPoint] =
-    ddgIn(List(PathElement(node)), withInvisible = false)
+  def ddgIn(implicit semantics: Semantics): Traversal[TrackingPoint] = {
+    val cache = mutable.HashMap[nodes.TrackingPoint, List[PathElement]]()
+    val result = ddgIn(List(PathElement(node)), withInvisible = false, cache)
+    cache.clear()
+    result
+  }
 
-  def ddgInPathElem(withInvisible: Boolean)(implicit semantics: Semantics): Traversal[PathElement] =
-    ddgInPathElem(List(PathElement(node)), withInvisible)
+  def ddgInPathElem(withInvisible: Boolean,
+                    cache: mutable.HashMap[nodes.TrackingPoint, List[PathElement]] =
+                      mutable.HashMap[nodes.TrackingPoint, List[PathElement]]())(
+      implicit semantics: Semantics): Traversal[PathElement] =
+    ddgInPathElem(List(PathElement(node)), withInvisible, cache)
 
-  def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] =
-    ddgInPathElem(List(PathElement(node)), withInvisible = false)
+  def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = {
+    val cache = mutable.HashMap[nodes.TrackingPoint, List[PathElement]]()
+    val result = ddgInPathElem(List(PathElement(node)), withInvisible = false, cache)
+    cache.clear()
+    result
+  }
 
   /**
     * Traverse back in the data dependence graph by one step, taking into account semantics
     * @param path optional list of path elements that have been expanded already
     * */
-  def ddgIn(path: List[PathElement], withInvisible: Boolean)(
+  def ddgIn(path: List[PathElement],
+            withInvisible: Boolean,
+            cache: mutable.HashMap[nodes.TrackingPoint, List[PathElement]])(
       implicit semantics: Semantics): Traversal[TrackingPoint] = {
-    ddgInPathElem(path, withInvisible).map(_.node)
+    ddgInPathElem(path, withInvisible, cache).map(_.node)
   }
 
   /**
@@ -55,11 +68,11 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
     * taking into account semantics
     * @param path optional list of path elements that have been expanded already
     * */
-  def ddgInPathElem(path: List[PathElement], withInvisible: Boolean)(
+  def ddgInPathElem(path: List[PathElement],
+                    withInvisible: Boolean,
+                    cache: mutable.HashMap[nodes.TrackingPoint, List[PathElement]])(
       implicit semantics: Semantics): Traversal[PathElement] = {
-    val cache = mutable.HashMap[nodes.TrackingPoint, List[PathElement]]()
     val result = ddgInPathElemInternal(path, withInvisible, cache).to(Traversal)
-    cache.clear
     result
   }
 
@@ -78,7 +91,7 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
     } else {
       (elems.filter(_.visible) ++ elems
         .filterNot(_.visible)
-        .flatMap(x => x.node.ddgInPathElem(x :: path, withInvisible = false))).distinct
+        .flatMap(x => x.node.ddgInPathElem(x :: path, withInvisible = false, cache))).distinct
     }
     cache.put(node, result)
     result
