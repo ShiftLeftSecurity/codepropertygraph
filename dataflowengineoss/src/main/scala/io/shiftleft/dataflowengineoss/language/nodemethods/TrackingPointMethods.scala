@@ -30,9 +30,9 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
       implicit context: EngineContext): Traversal[NodeType] =
     node.start.reachableBy(sourceTravs: _*)
 
-  def ddgIn(implicit semantics: Semantics): Traversal[TrackingPoint] = ddgIn(List())
+  def ddgIn(implicit semantics: Semantics): Traversal[TrackingPoint] = ddgIn(List(PathElement(node)))
 
-  def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = ddgInPathElem(List())
+  def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = ddgInPathElem(List(PathElement(node)))
 
   /**
     * Traverse back in the data dependence graph by one step, taking into account semantics
