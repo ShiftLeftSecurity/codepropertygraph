@@ -9,6 +9,8 @@ import overflowdb.traversal._
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 
+import scala.collection.mutable
+
 class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) extends AnyVal {
 
   /**
@@ -55,14 +57,31 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
     * */
   def ddgInPathElem(path: List[PathElement], withInvisible: Boolean)(
       implicit semantics: Semantics): Traversal[PathElement] = {
+    val cache = mutable.HashMap[nodes.TrackingPoint, List[PathElement]]()
+    val result = ddgInPathElemInternal(path, withInvisible, cache).to(Traversal)
+    cache.clear
+    result
+  }
+
+  private def ddgInPathElemInternal(path: List[PathElement],
+                                    withInvisible: Boolean,
+                                    cache: mutable.HashMap[nodes.TrackingPoint, List[PathElement]])(
+      implicit semantics: Semantics): List[PathElement] = {
+
+    if (cache.contains(node)) {
+      return cache(node)
+    }
+
     val elems = Engine.expandIn(node, path)
-    if (withInvisible) {
+    val result = if (withInvisible) {
       elems
     } else {
       (elems.filter(_.visible) ++ elems
         .filterNot(_.visible)
-        .flatMap(x => x.node.ddgInPathElem(x :: path, withInvisible = false))).distinct.to(Traversal)
+        .flatMap(x => x.node.ddgInPathElem(x :: path, withInvisible = false))).distinct
     }
+    cache.put(node, result)
+    result
   }
 
 }
