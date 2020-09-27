@@ -48,7 +48,10 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
     * @param path optional list of path elements that have been expanded already
     * */
   def ddgInPathElem(path: List[PathElement])(implicit semantics: Semantics): Traversal[PathElement] = {
-    Engine.expandIn(node, path).to(Traversal)
+    val elems = Engine.expandIn(node, path)
+    (elems.filter(_.visible) ++ elems
+      .filterNot(_.visible)
+      .flatMap(x => x.node.ddgInPathElem(x :: path))).distinct.to(Traversal)
   }
 
 }

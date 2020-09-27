@@ -21,7 +21,9 @@ class TrackingPointTests extends DataFlowCodeToCpgSuite {
     cpg.method("sink").parameter.argument.ddgIn.l match {
       case List(param: nodes.MethodParameterIn) =>
         param.name shouldBe "y"
-      case _ => fail
+      case x =>
+        println(x)
+        fail
     }
   }
 

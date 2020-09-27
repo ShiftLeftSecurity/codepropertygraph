@@ -129,9 +129,9 @@ class Engine(context: EngineContext) {
 
 object Engine {
 
-  def expandIn(curNode: nodes.TrackingPoint, path: List[PathElement], withInvisible: Boolean = false)(
+  def expandIn(curNode: nodes.TrackingPoint, path: List[PathElement])(
       implicit semantics: Semantics): List[PathElement] = {
-    val elems = curNode match {
+    curNode match {
       case argument: nodes.Expression =>
         val (arguments, nonArguments) = ddgInE(curNode, path).partition(_.outNode().isInstanceOf[nodes.Expression])
         val elemsForArguments = arguments.flatMap { e =>
@@ -141,13 +141,6 @@ object Engine {
         elems
       case _ =>
         ddgInE(curNode, path).map(edgeToPathElement)
-    }
-    if (withInvisible) {
-      elems
-    } else {
-      elems.filter(_.visible) ++ elems
-        .filterNot(_.visible)
-        .flatMap(x => expandIn(x.node, x :: path, withInvisible = false))
     }
   }
 
@@ -274,7 +267,7 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     val curNode = path.head.node
 
     val resultsForParents: List[ReachableByResult] = {
-      expandIn(curNode, path, withInvisible = true).flatMap { parent =>
+      expandIn(curNode, path).flatMap { parent =>
         table.createFromTable(parent :: path).getOrElse {
           results(parent :: path, sources, table)
           table.get(parent.node).get
