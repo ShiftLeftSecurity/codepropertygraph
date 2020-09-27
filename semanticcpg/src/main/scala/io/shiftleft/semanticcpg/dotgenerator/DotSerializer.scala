@@ -13,7 +13,11 @@ object DotSerializer {
     }
 
   }
-  case class Edge(src: nodes.StoredNode, dst: nodes.StoredNode, label: String = "", edgeType: String = "")
+  case class Edge(src: nodes.StoredNode,
+                  dst: nodes.StoredNode,
+                  srcVisible: Boolean = true,
+                  label: String = "",
+                  edgeType: String = "")
 
   def dotGraph(root: nodes.AstNode, graph: Graph, withEdgeTypes: Boolean = false): String = {
     val sb = DotSerializer.namedGraphBegin(root)

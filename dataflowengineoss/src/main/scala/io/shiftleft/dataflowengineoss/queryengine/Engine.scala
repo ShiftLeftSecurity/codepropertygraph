@@ -131,7 +131,7 @@ object Engine {
 
   def expandIn(curNode: nodes.TrackingPoint, path: List[PathElement])(
       implicit semantics: Semantics): List[PathElement] = {
-    val elems = curNode match {
+    curNode match {
       case argument: nodes.Expression =>
         val (arguments, nonArguments) = ddgInE(curNode, path).partition(_.outNode().isInstanceOf[nodes.Expression])
         val elemsForArguments = arguments.flatMap { e =>
@@ -142,7 +142,6 @@ object Engine {
       case _ =>
         ddgInE(curNode, path).map(edgeToPathElement)
     }
-    elems.filter(_.visible) ++ elems.filterNot(_.visible).flatMap(x => expandIn(x.node, x :: path))
   }
 
   private def edgeToPathElement(e: Edge): PathElement = {
@@ -179,7 +178,7 @@ object Engine {
       val visible = if (sameCallSite) {
         val semanticExists = parentNode.asInstanceOf[nodes.Expression].semanticsForCallByArg.nonEmpty
         val internalMethodsForCall = parentNodeCall.flatMap(methodsForCall).to(Traversal).internal
-        semanticExists || internalMethodsForCall.isEmpty
+        (semanticExists && parentNode.isDefined) || internalMethodsForCall.isEmpty
       } else {
         parentNode.isDefined
       }
