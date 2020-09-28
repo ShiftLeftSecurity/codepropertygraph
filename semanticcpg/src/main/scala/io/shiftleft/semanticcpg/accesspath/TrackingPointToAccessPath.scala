@@ -9,6 +9,15 @@ import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
 
+/* The closed source tracker sometimes needs to opt out of the default handling of accessPaths.
+ * Instead of having two versions of the toTrackingPoint / toAccessPath functions, we define an interface to opt out.
+ *
+ * The open-sourced parts of the code currently have nothing that implements FakeTrackingPoint.
+ *
+ * If AccessPathOption or trackedBaseOption are set, then we use them; otherwise, we use trackedNode and the usual
+ * algorithm. trackedCfgNode is always used. If trackedBase and accessPath are both set, then trackedNode is permitted
+ *  to be null.
+ * */
 trait FakeTrackingPoint {
   def trackedBaseOption: Option[TrackedBase]
   def accessPathOption: Option[AccessPath]
@@ -38,7 +47,7 @@ object TrackingPointMethods {
   def toTrackedBase(node: nodes.StoredNode): TrackedBase = toTrackedBaseAndAccessPath(node)._1
   def toTrackedAccessPath(node: nodes.StoredNode): AccessPath = toTrackedBaseAndAccessPath(node)._2
 
-  private def toTrackedBaseAndAccessPathInternal(node: nodes.StoredNode): (TrackedBase, List[AccessElement]) = {
+  private def toTrackedBaseAndAccessPathInternal(node: nodes.StoredNode): (TrackedBase, List[AccessElement]) =
     node match {
       case node: nodes.MethodParameterIn  => (TrackedNamedVariable(node.name), Nil)
       case node: nodes.MethodParameterOut => (TrackedNamedVariable(node.name), Nil)
@@ -61,30 +70,25 @@ object TrackingPointMethods {
 
       case memberAccess: nodes.Call =>
         //assume: MemberAccess.isGenericMemberAccessName(call.name)
-        memberAccess.name match {
+        val argOne = memberAccess.argumentOption(1)
+        if (argOne.isEmpty) {
+          logger.warn(s"Missing first argument on call ${memberAccess}.")
+          return (TrackedUnknown, Nil)
+        }
+        val (base, tail) = toTrackedBaseAndAccessPathInternal(argOne.get)
+        val path = memberAccess.name match {
           case Operators.memberAccess | Operators.indirectMemberAccess =>
             if (!hasWarnedDeprecations) {
               logger.warn(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
               hasWarnedDeprecations = true
             }
             memberAccess
-              .argumentOption(1)
-              .map { toTrackedBaseAndAccessPathInternal }
-              .map {
-                case (base, tail) =>
-                  (base,
-                   memberAccess
-                     .argumentOption(2)
-                     .collect {
-                       case lit: nodes.Literal   => ConstantAccess(lit.code)
-                       case id: nodes.Identifier => ConstantAccess(id.name)
-                     }
-                     .getOrElse(VariableAccess) :: tail)
+              .argumentOption(2)
+              .collect {
+                case lit: nodes.Literal   => ConstantAccess(lit.code)
+                case id: nodes.Identifier => ConstantAccess(id.name)
               }
-              .getOrElse {
-                logger.warn(s"Missing argument on call ${memberAccess}.")
-                (TrackedUnknown, Nil)
-              }
+              .getOrElse(VariableAccess) :: tail
 
           case Operators.computedMemberAccess | Operators.indirectComputedMemberAccess =>
             if (!hasWarnedDeprecations) {
@@ -92,94 +96,31 @@ object TrackingPointMethods {
               hasWarnedDeprecations = true
             }
             memberAccess
-              .argumentOption(1)
-              .map { toTrackedBaseAndAccessPathInternal }
-              .map {
-                case (base, tail) =>
-                  (base,
-                   memberAccess
-                     .argumentOption(2)
-                     .collect {
-                       case lit: nodes.Literal => ConstantAccess(lit.code)
-                     }
-                     .getOrElse(VariableAccess) :: tail)
+              .argumentOption(2)
+              .collect {
+                case lit: nodes.Literal => ConstantAccess(lit.code)
               }
-              .getOrElse {
-                logger.warn(s"Missing argument on call ${memberAccess}.")
-                (TrackedUnknown, Nil)
-              }
+              .getOrElse(VariableAccess) :: tail
           case Operators.indirection =>
-            memberAccess
-              .argumentOption(1)
-              .map { toTrackedBaseAndAccessPathInternal }
-              .map { case (base, tail) => (base, IndirectionAccess :: tail) }
-              .getOrElse {
-                logger.warn(s"Missing argument on call ${memberAccess}.")
-                (TrackedUnknown, Nil)
-              }
+            IndirectionAccess :: tail
           case Operators.addressOf =>
-            memberAccess
-              .argumentOption(1)
-              .map { toTrackedBaseAndAccessPathInternal }
-              .map { case (base, tail) => (base, AddressOf :: tail) }
-              .getOrElse {
-                logger.warn(s"Missing argument on call ${memberAccess}.")
-                (TrackedUnknown, Nil)
-              }
+            AddressOf :: tail
           case Operators.fieldAccess | Operators.indexAccess =>
-            memberAccess
-              .argumentOption(1)
-              .map { toTrackedBaseAndAccessPathInternal }
-              .map { case (base, tail) => (base, extractAccessStringToken(memberAccess) :: tail) }
-              .getOrElse {
-                logger.warn(s"Missing argument on call ${memberAccess}.")
-                (TrackedUnknown, Nil)
-              }
+            extractAccessStringToken(memberAccess) :: tail
           case Operators.indirectFieldAccess =>
-            memberAccess
-              .argumentOption(1)
-              .map { toTrackedBaseAndAccessPathInternal }
-              // we will reverse the list in the end
-              .map { case (base, tail) => (base, extractAccessStringToken(memberAccess) :: IndirectionAccess :: tail) }
-              .getOrElse {
-                logger.warn(s"Missing argument on call ${memberAccess}.")
-                (TrackedUnknown, Nil)
-              }
+            // we will reverse the list in the end
+            extractAccessStringToken(memberAccess) :: IndirectionAccess :: tail
           case Operators.indirectIndexAccess =>
-            memberAccess
-              .argumentOption(1)
-              .map { toTrackedBaseAndAccessPathInternal }
-              // we will reverse the list in the end
-              .map { case (base, tail) => (base, IndirectionAccess :: extractAccessIntToken(memberAccess) :: tail) }
-              .getOrElse {
-                logger.warn(s"Missing argument on call ${memberAccess}.")
-                (TrackedUnknown, Nil)
-              }
+            // we will reverse the list in the end
+            IndirectionAccess :: extractAccessIntToken(memberAccess) :: tail
           case Operators.pointerShift =>
-            memberAccess
-              .argumentOption(1)
-              .map { toTrackedBaseAndAccessPathInternal }
-              .map { case (base, tail) => (base, extractAccessIntToken(memberAccess) :: tail) }
-              .getOrElse {
-                logger.warn(s"Missing argument on call ${memberAccess}.")
-                (TrackedUnknown, Nil)
-              }
+            extractAccessIntToken(memberAccess) :: tail
           case Operators.getElementPtr =>
-            memberAccess
-              .argumentOption(1)
-              .map { toTrackedBaseAndAccessPathInternal }
-              // we will reverse the list in the end
-              .map {
-                case (base, tail) =>
-                  (base, AddressOf :: extractAccessStringToken(memberAccess) :: IndirectionAccess :: tail)
-              }
-              .getOrElse {
-                logger.warn(s"Missing argument on call ${memberAccess}.")
-                (TrackedUnknown, Nil)
-              }
+            // we will reverse the list in the end
+            AddressOf :: extractAccessStringToken(memberAccess) :: IndirectionAccess :: tail
         }
+        (base, path)
     }
-  }
 
   private def extractAccessStringToken(memberAccess: nodes.Call): AccessElement = {
     memberAccess.argumentOption(2) match {
