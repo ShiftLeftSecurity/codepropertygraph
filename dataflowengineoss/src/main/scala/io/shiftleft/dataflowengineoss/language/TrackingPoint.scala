@@ -6,6 +6,8 @@ import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal._
 
+import scala.collection.mutable
+
 /**
   * Base class for nodes that can occur in data flows
   * */
@@ -23,9 +25,19 @@ class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVa
   def cfgNode: Traversal[nodes.CfgNode] =
     traversal.map(_.cfgNode)
 
-  def ddgIn(implicit semantics: Semantics): Traversal[nodes.TrackingPoint] = traversal.flatMap(_.ddgIn)
+  def ddgIn(implicit semantics: Semantics): Traversal[nodes.TrackingPoint] = {
+    val cache = mutable.HashMap[nodes.TrackingPoint, List[PathElement]]()
+    val result = traversal.flatMap(x => x.ddgIn(List(PathElement(x)), withInvisible = false, cache))
+    cache.clear
+    result
+  }
 
-  def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = traversal.flatMap(_.ddgInPathElem)
+  def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = {
+    val cache = mutable.HashMap[nodes.TrackingPoint, List[PathElement]]()
+    val result = traversal.flatMap(x => x.ddgInPathElem(List(PathElement(x)), withInvisible = false, cache))
+    cache.clear
+    result
+  }
 
   def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Traversal[NodeType]*)(
       implicit context: EngineContext): Traversal[NodeType] = {
@@ -35,9 +47,22 @@ class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVa
 
   def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: Traversal[A]*)(
       implicit context: EngineContext): Traversal[Path] = {
-    val paths = reachableByInternal(sourceTravs).map { result =>
-      Path(removeConsecutiveDuplicates(result.path.filter(_.visible == true).map(_.node)))
-    }.dedup
+    val paths = reachableByInternal(sourceTravs)
+      .map { result =>
+        // We can get back results that start in nodes that are invisible
+        // according to the semantic, e.g., arguments that are only used
+        // but not defined. We filter these results here prior to returning
+        val first = result.path.headOption
+        if (first.isDefined && !first.get.visible) {
+          None
+        } else {
+          val visiblePathElements = result.path.filter(_.visible)
+          Some(Path(removeConsecutiveDuplicates(visiblePathElements.map(_.node))))
+        }
+      }
+      .filter(_.isDefined)
+      .dedup
+      .flatten
     paths.to(Traversal)
   }
 

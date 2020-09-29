@@ -47,7 +47,7 @@ val BetterFilesVersion = "3.8.0"
 val CaskVersion = "0.6.7"
 val CatsVersion = "2.0.0"
 val CirceVersion = "0.12.2"
-val AmmoniteVersion = "1.8.1"
+val AmmoniteVersion = "2.0.4"
 val ZeroturnaroundVersion = "1.13"
 
 libraryDependencies ++= Seq(
