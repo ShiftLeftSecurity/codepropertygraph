@@ -3,7 +3,7 @@ package io.shiftleft.dataflowengineoss.language.nodemethods
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.TrackingPoint
 import io.shiftleft.dataflowengineoss.queryengine.{Engine, EngineContext, PathElement}
-import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointToCfgNode
+import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase
 import overflowdb.traversal.Traversal
 import overflowdb.traversal._
 import io.shiftleft.dataflowengineoss.language._
@@ -14,7 +14,7 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
   /**
     * Convert to nearest CFG node for flow pretty printing
     * */
-  def cfgNode: nodes.CfgNode = TrackingPointToCfgNode(node)
+  def cfgNode: nodes.CfgNode = TrackingPointMethodsBase.toCfgNode(node)
 
   /**
     * Convert to nearest AST node
