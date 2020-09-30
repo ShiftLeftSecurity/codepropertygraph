@@ -2,7 +2,8 @@ package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.semanticcpg.accesspath.{MatchResult, TrackingPointToAccessPath, TrackingPointToTrackedBase}
+import io.shiftleft.semanticcpg.accesspath.{MatchResult}
+import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase.ImplicitsAPI
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal._
 
@@ -26,10 +27,8 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
   private def usesContainer(useNode: nodes.StoredNode, inNode: nodes.StoredNode): Boolean = {
     (useNode, inNode) match {
       case (u: nodes.TrackingPoint, i: nodes.TrackingPoint) =>
-        val useBase = TrackingPointToTrackedBase(u)
-        val inBase = TrackingPointToTrackedBase(i)
-        val useAccessPath = TrackingPointToAccessPath(u)
-        val defAccessPath = TrackingPointToAccessPath(i)
+        val (useBase, useAccessPath) = u.trackedBaseAndAccessPath
+        val (inBase, defAccessPath) = i.trackedBaseAndAccessPath
         val (matchResult, elements) = useAccessPath.matchAndDiff(defAccessPath.elements)
         (useBase == inBase) && // filter *x -> x
         !(matchResult == MatchResult.EXTENDED_MATCH && elements.elements.length > 1 && elements.elements.headOption

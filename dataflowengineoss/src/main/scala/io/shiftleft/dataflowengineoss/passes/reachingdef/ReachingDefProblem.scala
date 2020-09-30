@@ -1,12 +1,8 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.semanticcpg.accesspath.{
-  MatchResult,
-  TrackedBase,
-  TrackingPointToAccessPath,
-  TrackingPointToTrackedBase
-}
+import io.shiftleft.semanticcpg.accesspath.{AccessPath, MatchResult, TrackedBase}
+import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase.ImplicitsAPI
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -125,9 +121,10 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
   def initKill(method: nodes.Method,
                gen: Map[nodes.StoredNode, Set[Definition]]): Map[nodes.StoredNode, Set[Definition]] = {
 
-    val baseToCalls: Map[TrackedBase, List[nodes.Call]] = method.start.call.l
-      .map { c =>
-        (TrackingPointToTrackedBase(c), c)
+    val baseToCalls: Map[TrackedBase, List[(nodes.Call, AccessPath)]] = method.start.call.l
+      .map { call =>
+        val (base, path) = call.trackedBaseAndAccessPath
+        (base, (call, path))
       }
       .groupBy(_._1)
       .map { case (k, v) => (k, v.map(_._2)) }
@@ -135,19 +132,16 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     def allOtherInstancesOf(node: nodes.StoredNode): Set[nodes.StoredNode] = {
       node match {
         case call: nodes.Call =>
-          val base = TrackingPointToTrackedBase(call)
-          val accessPath = TrackingPointToAccessPath(call)
-          val otherCallsWithSameBase = baseToCalls
-            .get(base)
-            .toList
-            .flatten[nodes.Call]
-            .filter(_.id != node.id)
-          otherCallsWithSameBase
-            .filter { n =>
-              val (matchResult, _) = TrackingPointToAccessPath(n).matchAndDiff(accessPath.elements)
-              matchResult == MatchResult.EXACT_MATCH
+          val (base, accessPath) = call.trackedBaseAndAccessPath
+          baseToCalls
+            .getOrElse(base, Nil)
+            .collect {
+              case (otherCall, otherPath)
+                  if node.id != node.id &&
+                    otherPath.matchAndDiff(accessPath.elements)._1 == MatchResult.EXACT_MATCH =>
+                otherCall
             }
-            .toSet[nodes.StoredNode]
+            .toSet
         case _ =>
           declaration(node).toList
             .flatMap(instances)
