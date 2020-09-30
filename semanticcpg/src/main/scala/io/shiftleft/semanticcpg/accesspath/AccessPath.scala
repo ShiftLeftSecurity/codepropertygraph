@@ -76,28 +76,13 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
 
   //FIXME: may need to process invertible tail of `other` better
   def ++(other: AccessPath): Option[AccessPath] = {
-    if (this.isExtensionExcluded(other.elements)) {
-      None
-    } else {
-      val elems = this.elements ++ other.elements
-      var newExclusions = this.truncateExclusions(other.elements).exclusions
-      if (other.exclusions.isEmpty) {
-        Some(AccessPath.apply(elems, exclusions))
-      } else {
-        newExclusions = exclusions.filter { exclusion =>
-          other.exclusions.exists { otherExclusion =>
-            otherExclusion.elements.size < exclusion.elements.size &&
-            exclusion.elements.startsWith(otherExclusion.elements)
-          }
+    Some(other.elements)
+      .filterNot(isExtensionExcluded)
+      .map { otherElems =>
+        exclusions.foldLeft(AccessPath(this.elements ++ otherElems, this.truncateExclusions(otherElems).exclusions)) {
+          case (x, y) => x.addExclusion(y)
         }
-        newExclusions = other.exclusions.filter { exclusion =>
-          newExclusions.exists { truncatedExclusion =>
-            truncatedExclusion.elements.startsWith(exclusion.elements)
-          }
-        } ++ newExclusions
-        Some(AccessPath.apply(elems, exclusions))
       }
-    }
   }
 
   def matchFull(other: AccessPath): FullMatchResult = {
@@ -207,7 +192,6 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
   }
 
   private def truncateExclusions(compareExclusion: Elements): AccessPath = {
-    if (compareExclusion.isEmpty) return this
     val size = compareExclusion.elements.length
     val newExclusions =
       exclusions
@@ -218,15 +202,10 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
 
   private def addExclusion(newExclusion: Elements): AccessPath = {
     if (newExclusion.noOvertaint()) {
-      val normalizedNewExclusion =
+      val ex =
         Elements.unnormalized(newExclusion.elements.dropRight(newExclusion.invertibleTailLength))
-      if (exclusions.exists { ex =>
-            normalizedNewExclusion.elements.startsWith(ex.elements)
-          }) {
-        return this
-      }
-      val unshadowed = exclusions.filter(!_.elements.startsWith(normalizedNewExclusion.elements))
-      AccessPath(elements, normalizedNewExclusion +: unshadowed)
+      val unshadowed = exclusions.filter(!_.elements.startsWith(ex.elements))
+      AccessPath(elements, unshadowed :+ ex)
     } else this
   }
 
