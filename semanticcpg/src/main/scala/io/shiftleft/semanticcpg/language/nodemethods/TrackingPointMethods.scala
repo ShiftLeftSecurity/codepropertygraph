@@ -131,6 +131,7 @@ object TrackingPointMethodsBase {
 
       case memberAccess: nodes.Call =>
         //assume: MemberAccess.isGenericMemberAccessName(call.name)
+        //FIXME: elevate debug to warn once csharp2cpg has managed to migrate.
         val argOne = memberAccess.argumentOption(1)
         if (argOne.isEmpty) {
           logger.warn(s"Missing first argument on call ${memberAccess}.")
@@ -140,20 +141,20 @@ object TrackingPointMethodsBase {
         val path = memberAccess.name match {
           case Operators.memberAccess | Operators.indirectMemberAccess =>
             if (!hasWarnedDeprecations) {
-              logger.warn(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
+              logger.info(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
               hasWarnedDeprecations = true
             }
             memberAccess
               .argumentOption(2)
               .collect {
-                case lit: nodes.Literal   => ConstantAccess(lit.code)
-                case id: nodes.Identifier => ConstantAccess(id.name)
+                case lit: nodes.Literal      => ConstantAccess(lit.code)
+                case withName: nodes.HasName => ConstantAccess(withName.name)
               }
               .getOrElse(VariableAccess) :: tail
 
           case Operators.computedMemberAccess | Operators.indirectComputedMemberAccess =>
             if (!hasWarnedDeprecations) {
-              logger.warn(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
+              logger.info(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
               hasWarnedDeprecations = true
             }
             memberAccess
