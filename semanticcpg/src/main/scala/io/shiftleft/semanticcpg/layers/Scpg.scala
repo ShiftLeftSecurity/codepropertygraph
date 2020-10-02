@@ -110,6 +110,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CfgDominatorPass(cpg),
           new CdgPass(cpg),
         )
+      case _ => Iterator()
     }
   }
 
