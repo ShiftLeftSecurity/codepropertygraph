@@ -656,7 +656,8 @@
         {"id" : 4, "name" : "CSHARP", "comment" : ""},
         {"id" : 5, "name" : "C", "comment" : ""},
         {"id" : 6, "name" : "PYTHON", "comment" : ""},
-	{"id" : 7, "name" : "LLVM", "comment" : ""}
+        {"id" : 7, "name" : "LLVM", "comment" : ""},
+        {"id" : 8, "name" : "PHP", "comment" : ""}
     ],
 
     "modifierTypes" : [
