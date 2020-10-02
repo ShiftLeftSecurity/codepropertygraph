@@ -668,7 +668,7 @@
         {"id" : 5, "name" : "ABSTRACT", "comment" : "The abstract modifier"},
         {"id" : 6, "name" : "NATIVE", "comment" : "The native modifier"},
         {"id" : 7, "name" : "CONSTRUCTOR", "comment" : "The constructor modifier"},
-        {"id" : 8, "name" : "VIRTUAL", "comment" : "The virtual modifier"}
+        {"id" : 8, "name" : "VIRTUAL", "comment" : "The virtual modifier"},
     ],
 
     // used in extensions
