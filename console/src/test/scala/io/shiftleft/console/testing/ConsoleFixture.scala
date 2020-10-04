@@ -8,6 +8,8 @@ import io.shiftleft.console.cpgcreation.{CpgGenerator, LanguageFrontend}
 import io.shiftleft.console.{Console, ConsoleConfig, DefaultAmmoniteExecutor, InstallConfig}
 import io.shiftleft.console.workspacehandling.{Project, ProjectFile, WorkspaceLoader}
 
+import scala.sys.process.Process
+
 object ConsoleFixture {
   def apply[T <: Console[Project]](constructor: String => T = { x =>
     new TestConsole(x)
@@ -44,27 +46,31 @@ class TestCpgGenerator(config: ConsoleConfig) extends CpgGenerator(config) {
   override def createFrontendByPath(
       inputPath: String,
   ): Option[LanguageFrontend] = {
-    // Some(new FuzzyCTestingFrontend)
-    ???
+    Some(new FuzzyCTestingFrontend)
   }
 
   override def createFrontendByLanguage(language: String): Option[LanguageFrontend] = {
-    // Some(new FuzzyCTestingFrontend)
-    ???
+    Some(new FuzzyCTestingFrontend)
   }
 
-  // private class FuzzyCTestingFrontend extends LanguageFrontend {
+  private class FuzzyCTestingFrontend extends LanguageFrontend {
 
-  //   override def generate(inputPath: String, outputPath: String, namespaces: List[String]): Option[String] = {
-  //     val fuzzyc = new FuzzyC2Cpg()
-  //     File(inputPath).list.foreach(println(_))
-  //     val cpg = fuzzyc.runAndOutput(Set(inputPath), Set(".c"), Some(outputPath))
-  //     cpg.close()
-  //     Some(outputPath)
-  //   }
+    override def generate(inputPath: String, outputPath: String, namespaces: List[String]): Option[String] = {
+      val p = Process(
+        List(
+          "./fuzzyc2cpg.sh",
+          inputPath,
+          "--output",
+          outputPath
+        )
+      ).run()
+      assert(p.exitValue() == 0, s"fuzzyc exited with code ${p.exitValue}")
 
-  //   def isAvailable: Boolean = true
+      Some(outputPath)
+    }
 
-  // }
+    def isAvailable: Boolean = true
+
+  }
 
 }
