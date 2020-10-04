@@ -1,8 +1,12 @@
 package io.shiftleft.semanticcpg.testfixtures
 
+import io.shiftleft.codepropertygraph.Cpg
 import java.io.File
 
-import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
+import overflowdb.Config
+
+import scala.sys.process.Process
 
 /**
   * LanguageFrontend encapsulates the logic that translates the source code directory
@@ -30,9 +34,21 @@ object LanguageFrontend {
     def execute(sourceCodePath: File): Cpg = {
       val cpgFile = File.createTempFile("fuzzyc", ".zip")
       cpgFile.deleteOnExit()
-      // val fuzzyc2Cpg = new FuzzyC2Cpg()
-      // fuzzyc2Cpg.runAndOutput(Set(sourceCodePath.getAbsolutePath), Set(fileSuffix), Some(cpgFile.getAbsolutePath))
-      ???
+
+      val p = Process(
+        List(
+          "./fuzzyc2cpg.sh",
+          sourceCodePath.toString,
+          "--output",
+          cpgFile.getAbsolutePath,
+          "--overflowdb"
+        )
+      ).run()
+      assert(p.exitValue() == 0, s"fuzzyc exited with code ${p.exitValue}")
+
+      val overflowConfig = new Config().withStorageLocation(cpgFile.getAbsolutePath)
+      val loaderConfig = CpgLoaderConfig().withOverflowConfig(overflowConfig)
+      CpgLoader.loadFromOverflowDb(loaderConfig)
     }
     override val fileSuffix: String = ".c"
   }
