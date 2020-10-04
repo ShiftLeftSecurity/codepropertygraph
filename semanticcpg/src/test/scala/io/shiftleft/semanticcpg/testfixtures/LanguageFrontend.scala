@@ -3,7 +3,6 @@ package io.shiftleft.semanticcpg.testfixtures
 import java.io.File
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.fuzzyc2cpg.FuzzyC2Cpg
 
 /**
   * LanguageFrontend encapsulates the logic that translates the source code directory
@@ -31,8 +30,9 @@ object LanguageFrontend {
     def execute(sourceCodePath: File): Cpg = {
       val cpgFile = File.createTempFile("fuzzyc", ".zip")
       cpgFile.deleteOnExit()
-      val fuzzyc2Cpg = new FuzzyC2Cpg()
-      fuzzyc2Cpg.runAndOutput(Set(sourceCodePath.getAbsolutePath), Set(fileSuffix), Some(cpgFile.getAbsolutePath))
+      // val fuzzyc2Cpg = new FuzzyC2Cpg()
+      // fuzzyc2Cpg.runAndOutput(Set(sourceCodePath.getAbsolutePath), Set(fileSuffix), Some(cpgFile.getAbsolutePath))
+      ???
     }
     override val fileSuffix: String = ".c"
   }

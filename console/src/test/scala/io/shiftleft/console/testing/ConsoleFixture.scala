@@ -7,7 +7,6 @@ import better.files.File
 import io.shiftleft.console.cpgcreation.{CpgGenerator, LanguageFrontend}
 import io.shiftleft.console.{Console, ConsoleConfig, DefaultAmmoniteExecutor, InstallConfig}
 import io.shiftleft.console.workspacehandling.{Project, ProjectFile, WorkspaceLoader}
-import io.shiftleft.fuzzyc2cpg.FuzzyC2Cpg
 
 object ConsoleFixture {
   def apply[T <: Console[Project]](constructor: String => T = { x =>
@@ -45,25 +44,27 @@ class TestCpgGenerator(config: ConsoleConfig) extends CpgGenerator(config) {
   override def createFrontendByPath(
       inputPath: String,
   ): Option[LanguageFrontend] = {
-    Some(new FuzzyCTestingFrontend)
+    // Some(new FuzzyCTestingFrontend)
+    ???
   }
 
   override def createFrontendByLanguage(language: String): Option[LanguageFrontend] = {
-    Some(new FuzzyCTestingFrontend)
+    // Some(new FuzzyCTestingFrontend)
+    ???
   }
 
-  private class FuzzyCTestingFrontend extends LanguageFrontend {
+  // private class FuzzyCTestingFrontend extends LanguageFrontend {
 
-    override def generate(inputPath: String, outputPath: String, namespaces: List[String]): Option[String] = {
-      val fuzzyc = new FuzzyC2Cpg()
-      File(inputPath).list.foreach(println(_))
-      val cpg = fuzzyc.runAndOutput(Set(inputPath), Set(".c"), Some(outputPath))
-      cpg.close()
-      Some(outputPath)
-    }
+  //   override def generate(inputPath: String, outputPath: String, namespaces: List[String]): Option[String] = {
+  //     val fuzzyc = new FuzzyC2Cpg()
+  //     File(inputPath).list.foreach(println(_))
+  //     val cpg = fuzzyc.runAndOutput(Set(inputPath), Set(".c"), Some(outputPath))
+  //     cpg.close()
+  //     Some(outputPath)
+  //   }
 
-    def isAvailable: Boolean = true
+  //   def isAvailable: Boolean = true
 
-  }
+  // }
 
 }
