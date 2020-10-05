@@ -195,7 +195,8 @@
               {"name": "RETURN"},
 	      {"name": "IDENTIFIER"},
 	      {"name": "LITERAL"}
-            ]}
+            ]},
+            {"edgeName": "MUST_ALIAS", "inNodes":  [{"name":  "CALL", "cardinality": "n:0-1"}]}
           ]
         },
         {"name" : "BLOCK",
@@ -245,7 +246,12 @@
         {"id" : 1, "name" : "PROPAGATE", "keys" : ["ALIAS"], "comment" : "Encodes propagation of data from on node to another. The ALIAS property is deprecated."},
         {"id" : 137, "name": "REACHING_DEF", "comment" : "Reaching definition edge", "keys" : ["VARIABLE"]},
         {"id" : 138, "name" : "ALIAS_OF", "comment" : "Alias relation between types", "keys" : [] },
-        {"id" : 139, "name" : "TYPE_DECL_ALIAS", "comment" : "Alias relation between two TYPE_DECL", "keys" : [] }
+        {"id" : 139, "name" : "TYPE_DECL_ALIAS", "comment" : "Alias relation between two TYPE_DECL", "keys" : [] },
+      {"id":  2010050,
+        "name": "MUST_ALIAS",
+        "comment": "Marks that two expressions (aka pointers) must alias, i.e. be identical. This must be a forest, pointing towards roots, and can be used by the dataflow tracker to normalize the src to the dst of the edge. For example, consider `bufPtr = structPtr->buf; memcpy(bufPtr, attackerControlled, len);`. Here, we can set a MUST_ALIAS edge from the first argument to the memcpy call (i.e. the IDENTIFIER `bufPtr`) to the `<operator>.idirectFieldAccess` call, in order to obtain identical results to e.g. `memcpy(structPtr->buf, attackerControlled, len);`, i.e. to ensure that we taint `structPtr->buf` instead of some temporary local variable. The MUST_ALIAS edge is experimental, and should not yet be emitted by frontends -- instead, backend passes can analyze the code and add these edges as required. This edge is especially relevant for JVM code, since javac/soot turns `taintFrom(dst.foo, tainted)` into `tmp = dst.foo; taintFrom(tmp, tainted)`.",
+        "keys": []
+      }
     ]
 
 }
