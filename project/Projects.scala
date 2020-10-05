@@ -8,4 +8,5 @@ object Projects {
   lazy val cpgvalidator = project.in(file("cpgvalidator"))
   lazy val console = project.in(file("console"))
   lazy val queries = project.in(file("queries"))
+  lazy val fuzzyc2cpg = project.in(file("fuzzyc2cpg"))
 }

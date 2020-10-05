@@ -60,8 +60,13 @@ libraryDependencies ++= Seq(
   "org.zeroturnaround"   %  "zt-zip"        % ZeroturnaroundVersion,
   "com.lihaoyi"          %% "ammonite"      % AmmoniteVersion cross CrossVersion.full,
   "com.lihaoyi" 	       %% "cask" 	        % CaskVersion,
-  "io.shiftleft"         %% "fuzzyc2cpg"    % Versions.fuzzyc2cpg % Test exclude("ch.qos.logback", "logback-classic"),
   "org.scalatest"        %% "scalatest"     % Versions.scalatest % Test
 )
 
 publishArtifact in (Test, packageBin) := true
+
+// execute tests in root project so that they work in sbt *and* intellij
+Test / baseDirectory := (ThisBuild / Test / run / baseDirectory).value
+
+// stage fuzzyc2cpg before test
+Test/compile := (Test/compile).dependsOn(Projects.fuzzyc2cpg/stage).value

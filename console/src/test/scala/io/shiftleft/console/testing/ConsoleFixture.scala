@@ -7,7 +7,8 @@ import better.files.File
 import io.shiftleft.console.cpgcreation.{CpgGenerator, LanguageFrontend}
 import io.shiftleft.console.{Console, ConsoleConfig, DefaultAmmoniteExecutor, InstallConfig}
 import io.shiftleft.console.workspacehandling.{Project, ProjectFile, WorkspaceLoader}
-import io.shiftleft.fuzzyc2cpg.FuzzyC2Cpg
+
+import scala.sys.process.Process
 
 object ConsoleFixture {
   def apply[T <: Console[Project]](constructor: String => T = { x =>
@@ -55,10 +56,16 @@ class TestCpgGenerator(config: ConsoleConfig) extends CpgGenerator(config) {
   private class FuzzyCTestingFrontend extends LanguageFrontend {
 
     override def generate(inputPath: String, outputPath: String, namespaces: List[String]): Option[String] = {
-      val fuzzyc = new FuzzyC2Cpg()
-      File(inputPath).list.foreach(println(_))
-      val cpg = fuzzyc.runAndOutput(Set(inputPath), Set(".c"), Some(outputPath))
-      cpg.close()
+      val p = Process(
+        List(
+          "./fuzzyc2cpg.sh",
+          inputPath,
+          "--output",
+          outputPath
+        )
+      ).run()
+      assert(p.exitValue() == 0, s"fuzzyc exited with code ${p.exitValue}")
+
       Some(outputPath)
     }
 
