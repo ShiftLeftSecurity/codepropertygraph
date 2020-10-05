@@ -110,12 +110,12 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
                 store(overlay, name, serializedCpg)
               }
             case DiffGraphAndKeyPool(None, _) =>
-              logger.info("Shutting down WriterThread")
+              logger.debug("Shutting down WriterThread")
               terminate = true
           }
         }
       } catch {
-        case _: InterruptedException => logger.info("Interrupted WriterThread")
+        case exception: InterruptedException => logger.warn("Interrupted WriterThread", exception)
       }
     }
   }
