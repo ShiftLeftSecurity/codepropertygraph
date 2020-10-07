@@ -58,6 +58,14 @@ class StepsTest extends AnyWordSpec with Matchers {
     }
   }
 
+  "access extension steps from Traversal and Node (via chained implicit)" in ExistingCpgFixture("splitmeup") { fixture =>
+    def literalTrav = fixture.cpg.literal.code(".*wow.*")
+    literalTrav.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
+
+    val literal = literalTrav.head
+//    literal.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
+  }
+
   "find that all method returns are linked to a method" in ExistingCpgFixture("splitmeup") { fixture =>
     val returnsWithMethods = fixture.cpg.method.methodReturn.l
     val returns = fixture.cpg.methodReturn.l
