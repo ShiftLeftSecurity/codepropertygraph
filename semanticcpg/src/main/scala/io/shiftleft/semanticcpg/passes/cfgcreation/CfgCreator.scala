@@ -372,7 +372,7 @@ class CfgCreator(entryNode: nodes.Method) {
   }
 
   /**
-    * CFG creation for switch statements of the form `switch{ case $x: ... }`.
+    * CFG creation for switch statements of the form `switch { case condition: ... }`.
     * */
   protected def cfgForSwitchStatement(node: nodes.ControlStructure): Cfg = {
     val conditionCfg = Traversal.fromSingle(node).condition.headOption.map(cfgFor).getOrElse(Cfg.empty)
