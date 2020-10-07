@@ -58,19 +58,6 @@ class StepsTest extends AnyWordSpec with Matchers {
     }
   }
 
-  "access extension steps from Traversal and Node (via chained implicit)" in ExistingCpgFixture("splitmeup") { fixture =>
-    def literalTrav = fixture.cpg.literal.code(".*wow.*")
-    literalTrav.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
-    /* n.b. interestingly, intellij puts some red squiggles on `.file` on the line above if one imports
-     * `overflowdb.traversal.iterableToTraversal`,  e.g. via `import overflowdb.traversal._`
-     * Looks like thats a bug in intellij's presentation compiler, esp. given that both sbt and intellij compile this
-     * code without errors, and intellij's autocomplete works.
-     */
-
-    val literal = literalTrav.head
-    literal.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
-  }
-
   "find that all method returns are linked to a method" in ExistingCpgFixture("splitmeup") { fixture =>
     val returnsWithMethods = fixture.cpg.method.methodReturn.l
     val returns = fixture.cpg.methodReturn.l
@@ -210,6 +197,27 @@ class StepsTest extends AnyWordSpec with Matchers {
         }
       }
     }
+  }
+
+  "provides extension steps for Traversals and Nodes" in ExistingCpgFixture("splitmeup") { fixture =>
+    /* n.b. interestingly, intellij puts some red squiggles on `Traversal.file` etc. if one imports
+     * `overflowdb.traversal.iterableToTraversal`,  e.g. via `import overflowdb.traversal._`
+     * Looks like thats a bug in intellij's presentation compiler, esp. given that both sbt and intellij compile this
+     * code without errors, and intellij's autocomplete works.
+     */
+    val cpg = fixture.cpg
+    def literalTrav = cpg.literal.code(".*wow.*")
+    val literal: nodes.Literal = literalTrav.head
+    literalTrav.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
+    literal.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
+
+    def typeDeclTrav = cpg.typeDecl.nameExact("TestGraph")
+    val typeDecl = typeDeclTrav.head
+    typeDeclTrav.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
+    typeDecl.namespace.name.foreach(println)
+
+
+//    literal.method
   }
 
 }
