@@ -211,12 +211,28 @@ class StepsTest extends AnyWordSpec with Matchers {
     literalTrav.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
     literal.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
 
+    def typeTrav = cpg.typ.nameExact("TestGraph")
+    val typ = typeTrav.head
+    typeTrav.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
+    typ.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
+
     def typeDeclTrav = cpg.typeDecl.nameExact("TestGraph")
     val typeDecl = typeDeclTrav.head
     typeDeclTrav.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
-    typeDecl.namespace.name.foreach(println)
+    typeDecl.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
 
+    def callTrav = cpg.call.nameExact("add")
+    val call = callTrav.head
+    callTrav.method.name.size shouldBe 3
+//    call.method.name.size shouldBe 3 // TODO discuss with markus: it's 27... different way to determine method?
 
+    // not testable in this cpg, but if it compiles it's good enough :)
+    def controlStructureTrav = cpg.controlStructure
+    val controlStructure = controlStructureTrav.headOption
+    controlStructureTrav.condition
+    controlStructure.map(_.condition)
+
+    // TODO literal, all other steps
 //    literal.method
   }
 
