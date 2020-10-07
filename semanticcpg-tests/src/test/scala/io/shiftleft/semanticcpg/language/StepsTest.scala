@@ -7,7 +7,7 @@ import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import overflowdb.traversal._
+import overflowdb.traversal.Traversal
 
 class StepsTest extends AnyWordSpec with Matchers {
 
@@ -61,9 +61,14 @@ class StepsTest extends AnyWordSpec with Matchers {
   "access extension steps from Traversal and Node (via chained implicit)" in ExistingCpgFixture("splitmeup") { fixture =>
     def literalTrav = fixture.cpg.literal.code(".*wow.*")
     literalTrav.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
+    /* n.b. interestingly, intellij puts some red squiggles on `.file` on the line above if one imports
+     * `overflowdb.traversal.iterableToTraversal`,  e.g. via `import overflowdb.traversal._`
+     * Looks like thats a bug in intellij's presentation compiler, esp. given that both sbt and intellij compile this
+     * code without errors, and intellij's autocomplete works.
+     */
 
     val literal = literalTrav.head
-//    literal.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
+    literal.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
   }
 
   "find that all method returns are linked to a method" in ExistingCpgFixture("splitmeup") { fixture =>
@@ -77,7 +82,7 @@ class StepsTest extends AnyWordSpec with Matchers {
 
     val query = for {
       method <- fixture.cpg.method
-      param <- method.start.parameter
+      param <- method.parameter
     } yield MethodParamPairs(method.name, param.name)
 
     val pairs: List[MethodParamPairs] = query.toList

@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, HasCanonicalName, HasCode, HasDependencyGroupId, HasDispatchType, HasFullName, HasIsExternal, HasLineNumber, HasLineNumberEnd, HasName, HasOrder, HasParserTypeName, HasSignature, HasValue, HasVersion, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, StoredNode}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.{AstNodeDot, CfgNodeDot}
@@ -10,7 +10,6 @@ import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
 import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall, _}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod, _}
-import overflowdb._
 import overflowdb.traversal.{Traversal, _}
 
 /**
@@ -79,7 +78,6 @@ package object language extends operatorextension.Implicits {
 
   implicit def toSteps[A](trav: Traversal[A]): Steps[A] = new Steps(trav)
 
-//  implicit def toNodeSteps[NodeType <: nodes.StoredNode](trav: Traversal[NodeType]): NodeSteps[NodeType] =
   implicit def toNodeSteps[A, NodeType <: StoredNode](a: A)(implicit f: A => Traversal[NodeType]): NodeSteps[NodeType] =
     new NodeSteps[NodeType](f(a))
 
