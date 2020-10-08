@@ -39,6 +39,9 @@ trait FakeTrackingPoint {
 object TrackingPointMethodsBase {
   private val logger = LoggerFactory.getLogger(getClass)
   private var hasWarnedDeprecations = false
+  //if this experimental flag is set, then we treat <operator>.cast like memberAccess
+  //this has relevant effects for e.g. taintMe(x.asInstanceOf[typ]) / aliasing.
+  var experimentalCastAsMemberAccess = false
 
   //we don't want to expose this API everywhere, only when explicitly imported
   implicit class ImplicitsAPI(val node: nodes.TrackingPoint) extends AnyVal {
@@ -113,13 +116,15 @@ object TrackingPointMethodsBase {
       case node: nodes.MethodParameterIn  => (TrackedNamedVariable(node.name), Nil)
       case node: nodes.MethodParameterOut => (TrackedNamedVariable(node.name), Nil)
       case node: nodes.ImplicitCall       => (TrackedReturnValue(node), Nil)
-      case node: nodes.Identifier         => (TrackedNamedVariable(node.name), Nil)
-      case node: nodes.Literal            => (TrackedLiteral(node), Nil)
-      case node: nodes.MethodRef          => (TrackedMethodOrTypeRef(node), Nil)
-      case node: nodes.TypeRef            => (TrackedMethodOrTypeRef(node), Nil)
-      case _: nodes.Return                => (TrackedFormalReturn, Nil)
-      case _: nodes.MethodReturn          => (TrackedFormalReturn, Nil)
-      case _: nodes.Unknown               => (TrackedUnknown, Nil)
+      case node: nodes.Identifier if node._callViaMustAliasOut.isDefined =>
+        toTrackedBaseAndAccessPathInternal(node._callViaMustAliasOut.get)
+      case node: nodes.Identifier => (TrackedNamedVariable(node.name), Nil)
+      case node: nodes.Literal    => (TrackedLiteral(node), Nil)
+      case node: nodes.MethodRef  => (TrackedMethodOrTypeRef(node), Nil)
+      case node: nodes.TypeRef    => (TrackedMethodOrTypeRef(node), Nil)
+      case _: nodes.Return        => (TrackedFormalReturn, Nil)
+      case _: nodes.MethodReturn  => (TrackedFormalReturn, Nil)
+      case _: nodes.Unknown       => (TrackedUnknown, Nil)
       // FieldIdentifiers are only fake arguments, hence should not be tracked
       case _: nodes.FieldIdentifier => (TrackedUnknown, Nil)
       case block: nodes.Block =>
@@ -128,7 +133,13 @@ object TrackingPointMethodsBase {
           .map { toTrackedBaseAndAccessPathInternal }
           .getOrElse((TrackedUnknown, Nil))
       case call: nodes.Call if !MemberAccess.isGenericMemberAccessName(call.name) => (TrackedReturnValue(call), Nil)
-
+      case cast: nodes.Call if experimentalCastAsMemberAccess && cast.name == Operators.cast =>
+        cast.argumentOption(2) match {
+          case None =>
+            logger.warn(s"Missing second argument on call ${cast}.")
+            (TrackedUnknown, Nil)
+          case Some(arg) => toTrackedBaseAndAccessPathInternal(arg)
+        }
       case memberAccess: nodes.Call =>
         //assume: MemberAccess.isGenericMemberAccessName(call.name)
         //FIXME: elevate debug to warn once csharp2cpg has managed to migrate.
