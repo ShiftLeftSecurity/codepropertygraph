@@ -622,7 +622,10 @@
         {
             "name": "IMPLICIT_CALL", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"]
         },
-        {
+      {
+        "name": "POST_EXECUTION_CALL", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"]
+      },
+      {
             "name": "ANNOTATION_LITERAL", "keys" : ["DEPTH_FIRST_ORDER", "INTERNAL_FLAGS"]
         },
         {
