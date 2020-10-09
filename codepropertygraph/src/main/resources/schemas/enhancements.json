@@ -20,17 +20,8 @@
         "is": ["CALL_REPR", "TRACKING_POINT"],
         "outEdges" : []
       },
-      {
-        "id":3071,"name" : "POST_EXECUTION_CALL",
-        "keys" : ["CODE", "NAME", "SIGNATURE", "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
-        "comment" : "Indicates the existence of a call executed on a return value or out parameter of a method after this method has been executed. This is used to model framework code calling functors returned from user code. The outgoing REF edge indicates on which returned entitity the call will happen.",
-        "is": ["CALL_REPR", "TRACKING_POINT"],
-        "outEdges" : [
-          {"edgeName": "REF", "inNodes": [{"name": "METHOD_RETURN"}, {"name": "METHOD_PARAMETER_OUT"}]}
-        ]
-      },
 
-      {"id":24, "name": "TAG",
+        {"id":24, "name": "TAG",
          "keys": ["NAME", "VALUE"],
          "comment": "A string tag",
          "outEdges": []
@@ -58,8 +49,7 @@
               {"name": "TYPE_DECL", "cardinality": "0-1:n"},
               {"name": "METHOD", "cardinality": "0-1:n"},
               {"name": "METHOD_PARAMETER_OUT"},
-              {"name": "IMPLICIT_CALL"},
-              {"name": "POST_EXECUTION_CALL"}
+              {"name": "IMPLICIT_CALL"}
             ]},
              {"edgeName": "REACHING_DEF", "inNodes": [
               {"name": "CALL"},
