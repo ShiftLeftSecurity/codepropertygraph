@@ -1,11 +1,12 @@
 package io.shiftleft.fuzzyc2cpg
 
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes, Operators}
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.traversal._
 import overflowdb.{Node, PropertyKey}
 
-class MethodCfgLayoutTests extends WordSpec with Matchers with TraversalUtils {
+class MethodCfgLayoutTests extends AnyWordSpec with Matchers with TraversalUtils {
   val fixture = CpgTestFixture("methodcfglayout")
 
   implicit class VertexListWrapper(vertexList: List[Node]) {

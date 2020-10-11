@@ -1,10 +1,11 @@
 package io.shiftleft.fuzzyc2cpg
 
 import io.shiftleft.codepropertygraph.generated._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 
-class MethodHeaderTests extends WordSpec with Matchers {
+class MethodHeaderTests extends AnyWordSpec with Matchers {
   val fixture = CpgTestFixture("methodheader")
 
   "Method header" should {

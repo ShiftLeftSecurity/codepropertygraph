@@ -3,11 +3,12 @@ package io.shiftleft.fuzzyc2cpg.passes
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.IntervalKeyPool
-import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class StubRemovalPassTests extends WordSpec with Matchers {
+class StubRemovalPassTests extends AnyWordSpec with Matchers {
 
   "StubRemovalPass" should {
     "remove stub if non-stub with same signature exists" in StubRemovalPassFixture("""

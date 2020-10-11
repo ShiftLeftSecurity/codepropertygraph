@@ -1,7 +1,7 @@
 package io.shiftleft.fuzzyc2cpg
 
 import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes}
-import org.scalatest.Matchers
+import org.scalatest.matchers.should.Matchers
 import overflowdb._
 
 trait TraversalUtils extends Matchers {

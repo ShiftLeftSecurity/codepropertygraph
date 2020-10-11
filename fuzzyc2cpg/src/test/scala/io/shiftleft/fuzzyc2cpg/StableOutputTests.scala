@@ -1,10 +1,10 @@
 package io.shiftleft.fuzzyc2cpg
 
-import org.scalatest.{Matchers, WordSpec}
-
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import scala.jdk.CollectionConverters._
 
-class StableOutputTests extends WordSpec with Matchers {
+class StableOutputTests extends AnyWordSpec with Matchers {
 
   def createNodeStrings(): String = {
     val projectName = "stableid"

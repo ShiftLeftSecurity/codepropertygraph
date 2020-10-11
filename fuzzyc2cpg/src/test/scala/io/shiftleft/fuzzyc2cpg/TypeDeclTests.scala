@@ -2,10 +2,11 @@ package io.shiftleft.fuzzyc2cpg
 
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 
-class TypeDeclTests extends WordSpec with Matchers {
+class TypeDeclTests extends AnyWordSpec with Matchers {
   val fixture = CpgTestFixture("typedecl")
 
   "Type decl test project" should {

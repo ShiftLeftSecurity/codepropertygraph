@@ -1,8 +1,9 @@
 package io.shiftleft.fuzzyc2cpg
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class TestTest extends WordSpec with Matchers {
+class TestTest extends AnyWordSpec with Matchers {
   val fixture = CpgTestFixture("testtest")
 
   "Tests" should {

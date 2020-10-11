@@ -4,10 +4,11 @@ import java.nio.file.Paths
 
 import io.shiftleft.codepropertygraph.generated.NodeKeys
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 
-class ProgramStructureTests extends WordSpec with Matchers {
+class ProgramStructureTests extends AnyWordSpec with Matchers {
   val fixture = CpgTestFixture("structure")
 
   "Program structure of test project" should {

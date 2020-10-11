@@ -4,11 +4,12 @@ import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import io.shiftleft.codepropertygraph.generated.{Operators, nodes}
 import overflowdb.traversal._
 
-class AstCreationPassTests extends WordSpec with Matchers {
+class AstCreationPassTests extends AnyWordSpec with Matchers {
 
   "AstCreationPass" should {
     val cpg = Cpg.emptyCpg

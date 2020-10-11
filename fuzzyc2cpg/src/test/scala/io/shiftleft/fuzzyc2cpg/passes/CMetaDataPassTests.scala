@@ -2,12 +2,13 @@ package io.shiftleft.fuzzyc2cpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.fuzzyc2cpg.Defines
-import org.scalatest.{Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.jdk.CollectionConverters._
 
-class CMetaDataPassTests extends WordSpec with Matchers {
+class CMetaDataPassTests extends AnyWordSpec with Matchers {
 
   "MetaDataPass" should {
     val cpg = Cpg.emptyCpg
