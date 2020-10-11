@@ -56,9 +56,6 @@ Global / useGpg := false
 name := "codepropertygraph"
 publish / skip := true
 
-// parsed by project/Utils.scala
-val fuzzyc2cpgVersion = "1.1.84"
-
 lazy val codepropertygraph = Projects.codepropertygraph
 lazy val protoBindings = Projects.protoBindings
 lazy val semanticcpg = Projects.semanticcpg
