@@ -21,6 +21,8 @@ excludeDependencies ++= Seq(
   ExclusionRule("org.slf4j", "slf4j-simple")
 )
 
+scalacOptions -= "-Xfatal-warnings" // some antl-generated sources prompt compiler warnings :(
+
 scalacOptions ++= Seq(
   "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
   "-encoding", "utf-8",                // Specify character encoding used by source files.
