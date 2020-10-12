@@ -18,17 +18,83 @@ env:
   - secure: WELN1ch6XMSPo96MvX26i0NziRh/4libPilj2JGUUXnPl7CXFBBTUDZDWR54+2eT35CaTboSIFFis5WywDB4eC6T6LaoM22GUXGdvmZVxlBrYkk3SQygqye7Cru6zjgWJt3Y0nC9eoT7Wsh9GeUPyJYJGjeW8ODNMTpwnuTEyfVBa/HfjwQdc0e6IDtZu0GzRbstt7k4/X6dQsUZQBnLfM39fOTk4QTHo4VMNgieavHFdg/EGTeDHz5UNuMN9Ep0HXFiyuM4+mS9z2UUT7h0NyJ352t/1GioJe3ry5pvSZnjKjpD07HKnBt3iL/7YB9POaWeb6NFysrQQByTZNrb4pKsXB3A9BjTSjc8oZRbamuxHd7ICjZMXukSKkxwqQtOl9lM5dTSSvsdkljlGCCxqbziP016xzx9RUiNHnYIiQFmjIExyMpo5QFs6NxjxAwsLrjnJiMFERmQmLLN5ubizzKPyVCYuEpyuBjPNhFANX083vax7uHp+PBGyP5Fd8HFpciD9tqo24E3kXsIV94p1P0l8Xqbf9jwfU9xKqGWU8A/1GZZmDtuh+HvvmNPe8L9JIqJthLbz+IjtX5a+PJQQbnlmSPBjEhZcqNCOQ/d4ljWiCYA8/ExcwbR9WH9XRmgGxY10gFDM75j1LjmZalGu/FmvQYPH53txWnZRw/IAJg=
 stages:
 - name: test
+- name: tag-release
+  if: branch = master AND type = push
 - name: release
   if: branch = master AND type = push
-- name: make-release
 jobs:
   include:
   - stage: test
+    name: Build and test cpg, FuzzyC2CPG JAR & preprocessor
+    addons:
+      apt:
+        sources:
+        - sourceline: ppa:ubuntu-toolchain-r/test
+        packages:
+        - cmake
+        - g++-8
     script:
     - sbt scalafmtCheck test
-  - stage: release
+    - cmake -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 ./fuzzypp
+    - cmake --build . -- -j4
+    - "./fuzzypp/bin/fuzzyppcli-tests"
+  - stage: test
+    name: Build and test Windows preprocessor
+    os: windows
+    env: YARN_GPG=no
+    language: cpp
     script:
-    - sbt ciReleaseTagNextVersion ciReleaseSonatype stage
+    - cmake -G "Visual Studio 15 2017" -A "x64" ./fuzzypp
+    - cmake --build . --config Release
+    - "./fuzzypp/bin/Release/fuzzyppcli-tests.exe"
+    after_script:
+    - ps -ef
+    - ps -Wla | sort
+    - gpgconf --kill gpg-agent
+    - ps -Wla | sort
+    - echo $$
+  - stage: tag-release
+    name: Tag release
+    script: sbt ciReleaseTagNextVersion
+  - stage: release
+    name: Release to shiftleft artifactory
+    script: sbt 'set publishTo := Some("releases" at "https://shiftleft.jfrog.io/shiftleft/libs-release-local")'
+      "set credentials += Credentials(\"Artifactory Realm\", \"shiftleft.jfrog.io\",
+      \"$JFROG_USER\", \"$JFROG_PASS\")" ciRelease
+  - stage: release
+    name: Release to sonatype
+    script: sbt ciReleaseSonatype
+  - stage: release
+    name: Release Unix preprocessor
+    script: skip
+    before_deploy: zip -j ./fuzzyppcli.zip ./fuzzypp/bin/fuzzyppcli
+    deploy:
+      edge: true
+      provider: releases
+      cleanup: false
+      token: "$GITHUB_TOKEN"
+      target_commitish: "$TRAVIS_COMMIT"
+      file:
+      - "./fuzzyppcli.zip"
+  - stage: release
+    name: Release Windows preprocessor
+    os: windows
+    env: YARN_GPG=no
+    language: cpp
+    script: skip
+    before_deploy:
+    - export TRAVIS_TAG=$(git describe --tags --abbrev=0)
+    - 7z a -r -tzip ./fuzzyppcli-win.zip ./fuzzypp/bin/Release/fuzzyppcli.exe
+    deploy:
+      edge: true
+      provider: releases
+      cleanup: false
+      token: "$GITHUB_TOKEN"
+      tag_name: "$TRAVIS_TAG"
+      target_commitish: "$TRAVIS_COMMIT"
+      file:
+      - "./fuzzyppcli-win.zip"
+    after_deploy: gpgconf --kill gpg-agent
 before_cache:
 - find $HOME/.sbt -name "*.lock" -type f -delete
 - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
@@ -41,6 +107,7 @@ cache:
     - $HOME/.ivy2/cache
     - $HOME/.cache/coursier
     - $HOME/.coursier
+    - "./fuzzypp/bin"
 notifications:
   slack:
     secure: HAZWVXDtRQiqSl0BiskghiLRMzi9+6q7DYhgBSmXTth8Ljex2n6ehsmxN7DdnL+OX8RqKWCIzSCURbPmVxJG77g4vQOi5a4FG//2NUAWMNBciLSwAJfyn6eC7tn4+iA9B1SKOSwdz7SCshnOL/9XupojYAwApjZgjvAFDGYOfFk9gv4Ezjrx3mX6Ge+VrkBVLIyFxTeBcMCsLYi/zsZWnzWpl7+ymqQIxhiburOU1ePDq/lHcFdvQSks3YWb1TlfsdNRt7hwkNrb60nfsZBxyt7pDk+GV4rdpgtZgolcZImqrVarnz7/UchOLn6Hl/bmkqFr3a+Aiaank7oph/fIWGBKqbTzoD8nY6mp1sLYtMbk8BZgKjr+DuqyIoJawMl7RvffJA2L149QPNdaR9uIkx+a2P5Wgs/DFiASOnyiX87S1Hfwok6ediO+NSrQJhGMyk87dRycDHywDaG0VuppHiFrDrqEo9kE/2iEL3/10xqVuoU1Yp/aLmeXSs2b0P7VZTLy23w8aCn6EEdyTgLkc0xRHPkA/c04UZ6vuQCK3JsBpEtT95Sot0y58vgbh1Er5DOlDXccOXL9qooBe9e84uJFj4qJx+/bIRBPKC0em1Dd3qtPP4MCfxY9+75r03ruwi1PPR/ifAjXbiBp9qfWu2XHXDmyHfoI73UJyClYLxI=
