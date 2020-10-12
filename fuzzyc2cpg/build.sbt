@@ -72,3 +72,6 @@ Antlr4 / antlr4Version := Versions.antlr
 Antlr4 / javaSource := (sourceManaged in Compile).value
 
 enablePlugins(JavaAppPackaging)
+
+// execute tests in root project so that they work in sbt *and* intellij
+Test / baseDirectory := (ThisBuild / Test / run / baseDirectory).value
