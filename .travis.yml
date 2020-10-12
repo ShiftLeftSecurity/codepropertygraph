@@ -94,16 +94,3 @@ jobs:
       file:
       - "./fuzzyppcli-win.zip"
     after_deploy: gpgconf --kill gpg-agent
-before_cache:
-- find $HOME/.sbt -name "*.lock" -type f -delete
-- find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
-- rm -rf $HOME/.ivy2/local
-cache:
-  directories:
-    - $HOME/.sbt/1.0/dependency
-    - $HOME/.sbt/boot/scala*
-    - $HOME/.sbt/launchers
-    - $HOME/.ivy2/cache
-    - $HOME/.cache/coursier
-    - $HOME/.coursier
-    - "./fuzzypp/bin"
