@@ -12,3 +12,5 @@ project/.bloop
 .bloop
 foo.c
 woo.c
+/CMakeCache.txt
+/CMakeFiles
