@@ -41,7 +41,6 @@ object LanguageFrontend {
           sourceCodePath.toString,
           "--output",
           cpgFile.getAbsolutePath,
-          "--overflowdb"
         )
       ).run()
       assert(p.exitValue() == 0, s"fuzzyc exited with code ${p.exitValue}")
