@@ -10,3 +10,5 @@ travis_wait_*
 /protoc
 project/.bloop
 .bloop
+foo.c
+woo.c
