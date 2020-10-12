@@ -10,7 +10,7 @@
         { "id" : 13, "name": "VERSION", "comment" : "A version, given as a string", "valueType" : "string", "cardinality" : "one"},
 	{ "id" : 118, "name" : "OVERLAYS", "comment" : "Names of overlays applied to this graph, in order of application", "valueType" : "string", "cardinality" : "list"},
 	{ "id" : 119, "name" : "POLICY_DIRECTORIES", "comment": "Sub directories of the policy directory that should be loaded when processing the CPG", "valueType" : "string", "cardinality" : "list"},
-	{ "id" : 120, "name" : "HASH", "comment" : "Hash value of the artifact that this CPG is built from.", "valueType": "string", "cardinality" : "one"},
+	{ "id" : 120, "name" : "HASH", "comment" : "Hash value of the artifact that this CPG is built from.", "valueType": "string", "cardinality" : "zeroOrOne"},
 
         // Properties that indicate where the code can be found
 
