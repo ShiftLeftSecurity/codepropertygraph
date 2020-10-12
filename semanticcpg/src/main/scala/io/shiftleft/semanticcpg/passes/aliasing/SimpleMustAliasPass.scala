@@ -31,9 +31,10 @@ object SimpleMustAliasPass {
     if (definitions.size == 1 && uses.size == 1) {
       val use = uses.head
       val definition = definitions.head
-      if (use.argumentIndex != 1 || use._callViaArgumentIn.fold(true) { user =>
-        user.name != Operators.assignment
-      }) Some(use, definition)
+      if (use.argumentIndex != 1 || ( use._callViaArgumentIn match {
+        case Some(user) => user.name != Operators.assignment
+        case None => true
+      })) Some((use, definition))
       else None
     } else None
 
@@ -44,7 +45,7 @@ object SimpleMustAliasPass {
     identifier._callViaArgumentIn match {
       case Some(call) if call.methodFullName == Operators.assignment =>
         call.argumentOption(2) match {
-          case memberAccess: nodes.Call
+          case Some(memberAccess: nodes.Call)
             if (isGenericMemberAccessName(memberAccess.methodFullName)
               || (TrackingPointMethodsBase.experimentalCastAsMemberAccess && memberAccess.methodFullName == Operators.cast)) =>
             Some(memberAccess)

@@ -40,7 +40,7 @@ object TrackingPointMethodsBase {
   private val logger = LoggerFactory.getLogger(getClass)
   private var hasWarnedDeprecations = false
   //if this experimental flag is set, then we treat <operator>.cast like memberAccess
-  //this has relevant effects for e.g. taintMe(x.asInstanceOf[typ]) / aliasing.
+  //this has relevant effects for e.g. taintMe(x.asInstanceOf[typ]), i.e. aliasing.
   var experimentalCastAsMemberAccess = false
 
   //we don't want to expose this API everywhere, only when explicitly imported
@@ -152,7 +152,7 @@ object TrackingPointMethodsBase {
         val path = memberAccess.name match {
           case Operators.memberAccess | Operators.indirectMemberAccess =>
             if (!hasWarnedDeprecations) {
-              logger.info(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
+              logger.info(s"deprecated Operator ${memberAccess.name} on ${memberAccess}")
               hasWarnedDeprecations = true
             }
             memberAccess
@@ -165,7 +165,7 @@ object TrackingPointMethodsBase {
 
           case Operators.computedMemberAccess | Operators.indirectComputedMemberAccess =>
             if (!hasWarnedDeprecations) {
-              logger.info(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
+              logger.info(s"deprecated Operator ${memberAccess.name} on ${memberAccess}")
               hasWarnedDeprecations = true
             }
             memberAccess
