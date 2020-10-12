@@ -9,16 +9,9 @@ libraryDependencies ++= Seq(
   "commons-cli"          %  "commons-cli"              % "1.4",
   "com.github.pathikrit" %% "better-files"             % "3.8.0",
   "org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0",
-  "ch.qos.logback"       %  "logback-classic"          % "1.2.3" % "test,runtime",
   "com.novocode"         %  "junit-interface"          % "0.11"  % Test,
   "junit"                %  "junit"                    % "4.12"  % Test,
   "org.scalatest"        %% "scalatest"                % Versions.scalatest % Test,
-)
-
-excludeDependencies ++= Seq(
-  // This project uses Logback in place of Log4j
-  ExclusionRule("org.apache.logging.log4j", "log4j-slf4j-impl"),
-  ExclusionRule("org.slf4j", "slf4j-simple")
 )
 
 scalacOptions -= "-Xfatal-warnings" // some antl-generated sources prompt compiler warnings :(
