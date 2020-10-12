@@ -11,8 +11,7 @@ class TypeDeclTests extends AnyWordSpec with Matchers {
 
   "Type decl test project" should {
     "contain one internal type decl node for Foo" in {
-      val typeDeclNodes = fixture
-        .traversalSource
+      val typeDeclNodes = fixture.traversalSource
         .label(NodeType.TYPE_DECL.toString)
         .has(NodeKeys.NAME -> "Foo")
         .l
@@ -25,8 +24,7 @@ class TypeDeclTests extends AnyWordSpec with Matchers {
     }
 
     "contain edges from Foo to three members" in {
-      val members = fixture
-        .traversalSource
+      val members = fixture.traversalSource
         .label(NodeType.TYPE_DECL.toString)
         .out("AST")
         .hasLabel(NodeType.MEMBER.toString)
@@ -35,7 +33,9 @@ class TypeDeclTests extends AnyWordSpec with Matchers {
     }
 
     "contain correct code fields for all members" in {
-      fixture.traversalSource.label(NodeType.MEMBER.toString).property(NodeKeys.CODE).toSet shouldBe Set("x", "y", "*foo")
+      fixture.traversalSource.label(NodeType.MEMBER.toString).property(NodeKeys.CODE).toSet shouldBe Set("x",
+                                                                                                         "y",
+                                                                                                         "*foo")
     }
 
   }

@@ -25,8 +25,7 @@ class MethodHeaderTests extends AnyWordSpec with Matchers {
     }
 
     "have correct METHOD_PARAMETER_IN nodes for method foo" in {
-      val parameters = fixture
-        .traversalSource
+      val parameters = fixture.traversalSource
         .label(NodeTypes.METHOD)
         .has(NodeKeys.NAME -> "foo")
         .out(EdgeTypes.AST)
@@ -53,8 +52,7 @@ class MethodHeaderTests extends AnyWordSpec with Matchers {
     }
 
     "have correct METHOD_RETURN node for method foo" in {
-      val methodReturn = fixture
-        .traversalSource
+      val methodReturn = fixture.traversalSource
         .label(NodeTypes.METHOD)
         .has(NodeKeys.NAME -> "foo")
         .out(EdgeTypes.AST)

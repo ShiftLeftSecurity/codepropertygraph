@@ -15,8 +15,7 @@ class ProgramStructureTests extends AnyWordSpec with Matchers {
 
     "contain <global> namespace block node" in {
       val namespaceBlocks =
-        fixture
-          .traversalSource
+        fixture.traversalSource
           .label(NodeType.NAMESPACE_BLOCK.toString)
           .has(NodeKeys.FULL_NAME -> Defines.globalNamespaceName)
           .l
@@ -25,8 +24,7 @@ class ProgramStructureTests extends AnyWordSpec with Matchers {
     }
 
     "contain one file node" in {
-      val fileName = fixture
-        .traversalSource
+      val fileName = fixture.traversalSource
         .label(NodeType.FILE.toString)
         .property(NodeKeys.NAME)
         .headOption
@@ -43,8 +41,7 @@ class ProgramStructureTests extends AnyWordSpec with Matchers {
     }
 
     "contain AST edge from file node to namespace block" in {
-      val nodes = fixture
-        .traversalSource
+      val nodes = fixture.traversalSource
         .label(NodeType.FILE.toString)
         .out("AST")
         .hasLabel(NodeType.NAMESPACE_BLOCK.toString)

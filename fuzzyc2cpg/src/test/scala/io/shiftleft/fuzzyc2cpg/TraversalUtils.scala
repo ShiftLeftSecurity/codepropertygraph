@@ -9,8 +9,7 @@ trait TraversalUtils extends Matchers {
 
   def getMethod(name: String): List[Node] = {
     val result =
-      fixture
-        .traversalSource
+      fixture.traversalSource
         .label(NodeTypes.METHOD)
         .has(NodeKeys.NAME -> name)
         .l

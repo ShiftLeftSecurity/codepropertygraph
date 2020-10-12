@@ -6,7 +6,6 @@ import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 import overflowdb.traversal._
 
-
 class MethodInternalLinkageTests extends AnyWordSpec with Matchers with TraversalUtils {
   val fixture = CpgTestFixture("methodinternallinkage")
 
@@ -24,7 +23,7 @@ class MethodInternalLinkageTests extends AnyWordSpec with Matchers with Traversa
     }
 
     def filterOrder(order: Int): List[Node] = {
-        vertexList.to(Traversal).has(NodeKeys.ORDER -> order).l
+      vertexList.to(Traversal).has(NodeKeys.ORDER -> order).l
     }
 
     def filterName(name: String): List[Node] = {
