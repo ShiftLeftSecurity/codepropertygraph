@@ -50,6 +50,8 @@ val CirceVersion = "0.12.2"
 val AmmoniteVersion = "2.0.4"
 val ZeroturnaroundVersion = "1.13"
 
+dependsOn(Projects.fuzzyc2cpg % Test)
+
 libraryDependencies ++= Seq(
   "com.github.scopt"     %% "scopt"         % ScoptVersion,
   "com.github.pathikrit" %% "better-files"  % BetterFilesVersion,
@@ -67,6 +69,3 @@ publishArtifact in (Test, packageBin) := true
 
 // execute tests in root project so that they work in sbt *and* intellij
 Test / baseDirectory := (ThisBuild / Test / run / baseDirectory).value
-
-// stage fuzzyc2cpg before test
-Test/compile := (Test/compile).dependsOn(Projects.fuzzyc2cpg/stage).value
