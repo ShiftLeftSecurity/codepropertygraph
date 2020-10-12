@@ -1,7 +1,7 @@
 name := "semanticcpg"
 
-dependsOn(Projects.codepropertygraph,
-          Projects.fuzzyc2cpg % Test)
+dependsOn(Projects.codepropertygraph)
+dependsOn(Projects.fuzzyc2cpg % Test)
 
 libraryDependencies ++= Seq(
   "org.json4s"             %% "json4s-native"            % "3.6.7",
