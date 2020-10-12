@@ -2,13 +2,10 @@ language: scala
 dist: xenial
 jdk: openjdk8
 if: tag IS blank
-git:
-  submodules: false
 branches:
   only:
   - master
 before_install:
-- git submodule update --init --recursive
 - git fetch --tags
 - git lfs fetch --all
 - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE" == "push" ]]; then openssl
