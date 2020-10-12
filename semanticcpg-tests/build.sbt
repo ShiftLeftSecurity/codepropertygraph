@@ -1,10 +1,10 @@
-name := "semanticcpg"
+name := "semanticcpg-tests"
 
-dependsOn(Projects.codepropertygraph)
+dependsOn(Projects.semanticcpg)
+dependsOn(Projects.fuzzyc2cpg % Test)
 
 libraryDependencies ++= Seq(
-  "org.json4s"             %% "json4s-native"            % "3.6.7",
-  "org.scala-lang.modules" %% "scala-collection-contrib" % "0.2.1",
+  "org.scalatest" %% "scalatest" % Versions.scalatest % Test,
 )
 
 scalacOptions in (Compile, doc) ++= Seq(

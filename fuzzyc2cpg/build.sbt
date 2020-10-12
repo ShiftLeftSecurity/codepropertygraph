@@ -1,6 +1,6 @@
 name := "fuzzyc2cpg"
 
-dependsOn(Projects.semanticcpg)
+dependsOn(Projects.semanticcpg % "compile->compile; test->test")
 
 libraryDependencies ++= Seq(
   "com.github.scopt"     %% "scopt"                    % "3.7.1",
@@ -12,7 +12,7 @@ libraryDependencies ++= Seq(
   "ch.qos.logback"       %  "logback-classic"          % "1.2.3" % "test,runtime",
   "com.novocode"         %  "junit-interface"          % "0.11"  % Test,
   "junit"                %  "junit"                    % "4.12"  % Test,
-  "org.scalatest"        %% "scalatest"                % "3.0.8" % Test,
+  "org.scalatest"        %% "scalatest"                % Versions.scalatest % Test,
 )
 
 excludeDependencies ++= Seq(
