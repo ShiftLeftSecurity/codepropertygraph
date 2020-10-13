@@ -245,7 +245,7 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
       List()
     } else {
       implicit val sem: Semantics = context.semantics
-      results(List(PathElement(task.sink)) ++ task.initialPath, task.sources, task.table)
+      results(PathElement(task.sink) :: task.initialPath, task.sources, task.table)
       task.table.get(task.sink).get.map { r =>
         r.copy(callDepth = task.callDepth)
       }
@@ -264,16 +264,17 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     * @param path This is a path from a node to the sink. The first node
     *             of the path is expanded by this method
     * */
-  private def results[NodeType <: nodes.TrackingPoint](path: List[PathElement],
-                                                       sources: Set[NodeType],
-                                                       table: ResultTable)(implicit semantics: Semantics): Unit = {
+  private def results[NodeType <: nodes.TrackingPoint](
+      path: List[PathElement],
+      sources: Set[NodeType],
+      table: ResultTable)(implicit semantics: Semantics): List[ReachableByResult] = {
     val curNode = path.head.node
 
     val resultsForParents: List[ReachableByResult] = {
       expandIn(curNode, path).iterator.flatMap { parent =>
-        table.createFromTable(parent :: path).getOrElse {
-          results(parent :: path, sources, table)
-          table.get(parent.node).get
+        val pathFromParent = parent :: path
+        table.createFromTable(pathFromParent).getOrElse {
+          results(pathFromParent, sources, table)
         }
       }.toList
     }
@@ -299,7 +300,9 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
       endStates ++ retsToResolve
     }
 
-    table.add(curNode, resultsForParents ++ resultsForCurNode)
+    val res = resultsForParents ++ resultsForCurNode
+    table.add(curNode, res)
+    res
   }
 
   private def semanticsForCall(call: nodes.Call)(implicit semantics: Semantics): List[FlowSemantic] = {
