@@ -65,6 +65,14 @@ object LocationCreator {
           implicitCall.lineNumber,
           implicitCall.method
         )
+      case postExecutionCall: nodes.PostExecutionCall =>
+        apply(
+          postExecutionCall,
+          postExecutionCall.code,
+          postExecutionCall.label,
+          postExecutionCall.lineNumber,
+          postExecutionCall.method
+        )
       case method: nodes.Method =>
         apply(
           method,
