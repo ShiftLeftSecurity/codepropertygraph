@@ -79,7 +79,10 @@ class Engine(context: EngineContext) {
 
   private def tasksForPartialResults(resultsOfTask: List[ReachableByResult],
                                      sources: Set[nodes.TrackingPoint]): List[ReachableByTask] = {
-    val partialResults = resultsOfTask.filter(_.partial)
+    // We used to just expand method parameters for partial results,
+    // but that means that we stop traversal as soon as the first viable
+    // source is found.
+    val partialResults = resultsOfTask //.filter(_.partial)
     val pathsFromParams = partialResults.map(x => (x.path, x.callDepth))
     pathsFromParams.flatMap {
       case (path, callDepth) =>
@@ -267,12 +270,12 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     val curNode = path.head.node
 
     val resultsForParents: List[ReachableByResult] = {
-      expandIn(curNode, path).flatMap { parent =>
+      expandIn(curNode, path).iterator.flatMap { parent =>
         table.createFromTable(parent :: path).getOrElse {
           results(parent :: path, sources, table)
           table.get(parent.node).get
         }
-      }
+      }.toList
     }
 
     val resultsForCurNode = {
