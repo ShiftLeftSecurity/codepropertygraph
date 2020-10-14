@@ -2,7 +2,7 @@ package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.semanticcpg.accesspath.{MatchResult}
+import io.shiftleft.semanticcpg.accesspath.MatchResult
 import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase.ImplicitsAPI
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal._
@@ -32,7 +32,7 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
         val (matchResult, elements) = useAccessPath.matchAndDiff(defAccessPath.elements)
         (useBase == inBase) && // filter *x -> x
         !(matchResult == MatchResult.EXTENDED_MATCH && elements.elements.length > 1 && elements.elements.headOption
-          .exists(_.toString == "*"))
+          .exists(_.toString == "*")) && matchResult != MatchResult.NO_MATCH
       case _ => false
     }
   }
