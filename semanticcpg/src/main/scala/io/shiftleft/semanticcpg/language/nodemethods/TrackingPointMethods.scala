@@ -39,9 +39,6 @@ trait FakeTrackingPoint {
 object TrackingPointMethodsBase {
   private val logger = LoggerFactory.getLogger(getClass)
   private var hasWarnedDeprecations = false
-  //if this experimental flag is set, then we treat <operator>.cast like memberAccess
-  //this has relevant effects for e.g. taintMe(x.asInstanceOf[typ]), i.e. aliasing.
-  var experimentalCastAsMemberAccess = false
 
   //we don't want to expose this API everywhere, only when explicitly imported
   implicit class ImplicitsAPI(val node: nodes.TrackingPoint) extends AnyVal {
@@ -133,7 +130,7 @@ object TrackingPointMethodsBase {
           .map { toTrackedBaseAndAccessPathInternal }
           .getOrElse((TrackedUnknown, Nil))
       case call: nodes.Call if !MemberAccess.isGenericMemberAccessName(call.name) => (TrackedReturnValue(call), Nil)
-      case cast: nodes.Call if experimentalCastAsMemberAccess && cast.name == Operators.cast =>
+      case cast: nodes.Call if cast.name == Operators.cast && cast._mustAliasIn.hasNext =>
         cast.argumentOption(2) match {
           case None =>
             logger.warn(s"Missing second argument on call ${cast}.")

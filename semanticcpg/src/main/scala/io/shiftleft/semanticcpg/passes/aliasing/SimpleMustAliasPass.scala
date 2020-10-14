@@ -12,48 +12,31 @@ import overflowdb.traversal.Traversal
 object SimpleMustAliasPass {
   private val logger = LoggerFactory.getLogger(getClass)
 
-  def getAliasPairs(method: nodes.Method): Traversal[(nodes.Identifier, nodes.Call)] = {
+  def getAliasPairs(method: nodes.Method): Traversal[(nodes.Call, nodes.Identifier)] = {
     for (local <- method.local if !local._closureBindingViaCapturedByOut.hasNext && !method.parameter.exists { _.name == local.name };
-         (use, definition) <- getAliasPair(local))
-      yield (use, definition)
+         defuse <- getAliasPair(local))
+      yield defuse
   }
 
-  private def getAliasPair(local: nodes.Local): Option[(nodes.Identifier, nodes.Call)] = {
-    val refs = local._identifierViaRefIn.toList
-    if (refs.size != 2) return None
-
-    val (definitions, uses) = refs.partitionMap { identifier =>
-      getAssignmentRhsIfMemberRead(identifier) match {
-        case Some(call) => Left(call)
-        case _          => Right(identifier)
-      }
-    }
+  private def getAliasPair(local: nodes.Local): Option[(nodes.Call, nodes.Identifier)] = {
+    val (definitions, uses) = defsUses(local)
     if (definitions.size == 1 && uses.size == 1) {
       val use = uses.head
       val definition = definitions.head
-      if (use.argumentIndex != 1 || ( use._callViaArgumentIn match {
-        case Some(user) => user.name != Operators.assignment
-        case None => true
-      })) Some((use, definition))
+      if (definition.name == Operators.cast || isGenericMemberAccessName(definition.name)) Some((definition, use))
       else None
     } else None
-
   }
 
-  private def getAssignmentRhsIfMemberRead(identifier: nodes.Identifier): Option[nodes.Call] = {
-    if (identifier.argumentIndex != 1) return None
-    identifier._callViaArgumentIn match {
-      case Some(call) if call.methodFullName == Operators.assignment =>
-        call.argumentOption(2) match {
-          case Some(memberAccess: nodes.Call)
-            if (isGenericMemberAccessName(memberAccess.methodFullName)
-              || (TrackingPointMethodsBase.experimentalCastAsMemberAccess && memberAccess.methodFullName == Operators.cast)) =>
-            Some(memberAccess)
-          case _ => None
-        }
-      case _ => None
-    }
+  def defsUses(local: nodes.Local): (List[nodes.Call], List[nodes.Identifier]) = local._identifierViaRefIn.toList.partitionMap { identifier =>
+    if(identifier.argumentIndex == 1)
+      identifier._callViaArgumentIn match {
+        case Some(call) if call.name == Operators.assignment => Left(call)
+        case _=>Right(identifier)
+      }
+    else Right(identifier)
   }
+
 
 }
 
@@ -113,7 +96,7 @@ class SimpleMustAliasPass(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val builder = DiffGraph.newBuilder
     for (method <- cpg.method;
-      (use, definition) <- getAliasPairs(method)) {
+      (definition, use) <- getAliasPairs(method)) {
       builder.addEdge(src = use, dst = definition, edgeLabel = EdgeTypes.MUST_ALIAS)
     }
     val res = builder.build
