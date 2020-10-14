@@ -301,7 +301,9 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
       endStates ++ retsToResolve
     }
 
-    val res = (resultsForParents ++ resultsForCurNode).distinct
+    val res = (resultsForParents ++ resultsForCurNode).distinctBy{ x =>
+      (x.path.headOption ++ x.path.lastOption, x.partial, x.callDepth)
+    }
     table.add(curNode, res)
     res
   }
