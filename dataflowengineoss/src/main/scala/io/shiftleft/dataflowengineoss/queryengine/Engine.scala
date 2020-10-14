@@ -280,7 +280,7 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     val resultsForCurNode = {
       val endStates = if (sources.contains(curNode.asInstanceOf[NodeType])) {
         List(ReachableByResult(path))
-      } else if (curNode.isInstanceOf[nodes.MethodParameterIn]) {
+      } else if ((task.callDepth != context.config.maxCallDepth) && curNode.isInstanceOf[nodes.MethodParameterIn]) {
         List(ReachableByResult(path, partial = true))
       } else {
         List()
@@ -288,7 +288,10 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
 
       val retsToResolve = curNode match {
         case call: nodes.Call =>
-          if (methodsForCall(call).to(Traversal).internal.nonEmpty && semanticsForCall(call).isEmpty) {
+          if ((task.callDepth != context.config.maxCallDepth) && methodsForCall(call)
+                .to(Traversal)
+                .internal
+                .nonEmpty && semanticsForCall(call).isEmpty) {
             List(ReachableByResult(PathElement(path.head.node, resolved = false) +: path.tail, partial = true))
           } else {
             List()
