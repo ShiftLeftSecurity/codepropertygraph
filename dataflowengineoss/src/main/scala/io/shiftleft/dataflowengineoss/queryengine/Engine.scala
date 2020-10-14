@@ -301,9 +301,28 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
       endStates ++ retsToResolve
     }
 
-    val res = (resultsForParents ++ resultsForCurNode).distinctBy{ x =>
-      (x.path.headOption ++ x.path.lastOption, x.partial, x.callDepth)
-    }
+    val res = (resultsForParents ++ resultsForCurNode)
+      .groupBy { x =>
+        (x.path.headOption ++ x.path.lastOption, x.partial, x.callDepth)
+      }
+      .map {
+        case (_, list) =>
+          val lenIdPathPairs = list.map(x => (x.path.length, x)).toList
+          val withMaxLength = (lenIdPathPairs.sortBy(_._1).reverse match {
+            case Nil    => Nil
+            case h :: t => h :: t.takeWhile(y => y._1 == h._1)
+          }).map(_._2)
+
+          if (withMaxLength.length == 1) {
+            withMaxLength.head
+          } else {
+            withMaxLength.minBy { x =>
+              x.path.map(_.node.id()).mkString("-")
+            }
+          }
+      }
+      .toVector
+
     table.add(curNode, res)
     res
   }
