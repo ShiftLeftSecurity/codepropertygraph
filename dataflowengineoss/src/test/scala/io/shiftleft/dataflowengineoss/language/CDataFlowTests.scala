@@ -464,19 +464,16 @@ class CDataFlowTests12 extends DataFlowCodeToCpgSuite {
     val sink = cpg.call.code("z\\+=a").argument(1)
     val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 2
+    flows.size shouldBe 1
 
     flows.map(flowToResultPairs).toSet shouldBe
-      Set(List[(String, Option[Integer])](
-            ("a = 0x37", 3),
-            ("b = a", 4),
-            ("z = b", 5),
-            ("z+=a", 6)
-          ),
-          List[(String, Option[Integer])](
-            ("a = 0x37", 3),
-            ("z+=a", 6)
-          ))
+      Set(
+        List[(String, Option[Integer])](
+          ("a = 0x37", 3),
+          ("b = a", 4),
+          ("z = b", 5),
+          ("z+=a", 6)
+        ))
   }
 }
 
@@ -497,7 +494,7 @@ class CDataFlowTests13 extends DataFlowCodeToCpgSuite {
     val sink = cpg.identifier.name("w")
     val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 2
+    flows.size shouldBe 1
 
     flows.map(flowToResultPairs).toSet shouldBe
       Set(
@@ -505,11 +502,6 @@ class CDataFlowTests13 extends DataFlowCodeToCpgSuite {
           ("a = 0x37", 3),
           ("b = a", 4),
           ("z = b", 5),
-          ("z+=a", 6),
-          ("w = z", 7)
-        ),
-        List[(String, Option[Integer])](
-          ("a = 0x37", 3),
           ("z+=a", 6),
           ("w = z", 7)
         )
@@ -566,21 +558,7 @@ class CDataFlowTests15 extends DataFlowCodeToCpgSuite {
     val source = cpg.method.parameter.name("y")
     val sink = cpg.identifier.name("z")
     val flows = sink.reachableByFlows(source).l
-
-    flows.map(flowToResultPairs).toSet shouldBe Set(
-      List[(String, Option[Integer])](
-        ("foo(bool x, void* y)", 2),
-        ("g(y)", 3),
-        ("x ? f(y) : g(y)", 3),
-        ("* z =  x ? f(y) : g(y)", 3)
-      ),
-      List[(String, Option[Integer])](
-        ("foo(bool x, void* y)", 2),
-        ("f(y)", 3),
-        ("x ? f(y) : g(y)", 3),
-        ("* z =  x ? f(y) : g(y)", 3)
-      )
-    )
+    flows.size shouldBe 1
   }
 }
 
