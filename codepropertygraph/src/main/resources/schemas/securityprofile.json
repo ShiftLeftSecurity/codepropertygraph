@@ -84,7 +84,7 @@
       {"localName": "dstTags", "nodeType" : "TAG", "cardinality": "list"},
       {"localName" : "source", "nodeType" : "SOURCE", "cardinality" : "one"},
       {"localName" : "sink", "nodeType" : "SINK", "cardinality" : "one"},
-      {"localName" : "transforms", "nodeType" : "TRANSFORM", "cardinality" : "iseq"},
+      {"localName" : "transforms", "nodeType" : "TRANSFORM", "cardinality" : "array"},
       {"localName" : "sourceDescriptorFlows", "nodeType" : "FLOW", "cardinality" : "list"},
       {"localName" : "sinkDescriptorFlows", "nodeType" : "FLOW", "cardinality" : "list"},
       {"localName" : "primaryFlow", "nodeType" : "FLOW", "cardinality" : "one"},
