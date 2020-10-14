@@ -22,11 +22,11 @@ class ResultTable {
     * table, and if so, for each result, determine the path up to `first` and prepend it to
     * `path`, giving us new results via table lookup.
     */
-  def createFromTable(first: PathElement, remainder: List[PathElement]): Option[List[ReachableByResult]] = {
+  def createFromTable(first: PathElement, remainder: Vector[PathElement]): Option[List[ReachableByResult]] = {
     table.get(first.node).map { res =>
       res.map { r =>
         val pathToFirstNode = r.path.slice(0, r.path.map(_.node).indexOf(first.node))
-        val completePath = pathToFirstNode ++ (first :: remainder)
+        val completePath = pathToFirstNode ++ (first +: remainder)
         r.copy(path = completePath)
       }
     }
@@ -50,10 +50,10 @@ class ResultTable {
   * @param partial indicate whether this result stands on its own or requires further analysis,
   *                e.g., by expanding output arguments backwards into method output parameters.
   * */
-case class ReachableByResult(path: List[PathElement], callDepth: Int = 0, partial: Boolean = false) {
+case class ReachableByResult(path: Vector[PathElement], callDepth: Int = 0, partial: Boolean = false) {
   def source: nodes.TrackingPoint = path.head.node
 
-  def unresolvedArgs: List[nodes.TrackingPoint] =
+  def unresolvedArgs: Vector[nodes.TrackingPoint] =
     path.collect {
       case elem if !elem.resolved =>
         elem.node

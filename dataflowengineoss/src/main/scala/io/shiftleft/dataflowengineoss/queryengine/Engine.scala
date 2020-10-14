@@ -16,7 +16,7 @@ import scala.util.{Failure, Success, Try}
 private case class ReachableByTask(sink: nodes.TrackingPoint,
                                    sources: Set[nodes.TrackingPoint],
                                    table: ResultTable,
-                                   initialPath: List[PathElement] = List(),
+                                   initialPath: Vector[PathElement] = Vector(),
                                    callDepth: Int = 0)
 
 class Engine(context: EngineContext) {
@@ -128,8 +128,8 @@ class Engine(context: EngineContext) {
 
 object Engine {
 
-  def expandIn(curNode: nodes.TrackingPoint, path: List[PathElement])(
-      implicit semantics: Semantics): List[PathElement] = {
+  def expandIn(curNode: nodes.TrackingPoint, path: Vector[PathElement])(
+      implicit semantics: Semantics): Vector[PathElement] = {
     curNode match {
       case argument: nodes.Expression =>
         val (arguments, nonArguments) = ddgInE(curNode, path).partition(_.outNode().isInstanceOf[nodes.Expression])
@@ -149,13 +149,13 @@ object Engine {
     PathElement(parentNode, outEdgeLabel = outLabel)
   }
 
-  private def ddgInE(dstNode: nodes.TrackingPoint, path: List[PathElement]): List[Edge] = {
+  private def ddgInE(dstNode: nodes.TrackingPoint, path: Vector[PathElement]): Vector[Edge] = {
     dstNode
       .inE(EdgeTypes.REACHING_DEF)
       .asScala
       .filter(e => e.outNode().isInstanceOf[nodes.TrackingPoint])
       .filter(e => !path.map(_.node).contains(e.outNode().asInstanceOf[nodes.TrackingPoint]))
-      .toList
+      .toVector
   }
 
   /**
@@ -241,7 +241,7 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
       List()
     } else {
       implicit val sem: Semantics = context.semantics
-      results(PathElement(task.sink) :: task.initialPath, task.sources, task.table)
+      results(PathElement(task.sink) +: task.initialPath, task.sources, task.table)
       task.table.get(task.sink).get.map { r =>
         r.copy(callDepth = task.callDepth)
       }
@@ -261,7 +261,7 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     *             of the path is expanded by this method
     * */
   private def results[NodeType <: nodes.TrackingPoint](
-      path: List[PathElement],
+      path: Vector[PathElement],
       sources: Set[NodeType],
       table: ResultTable)(implicit semantics: Semantics): List[ReachableByResult] = {
     val curNode = path.head.node
@@ -272,7 +272,7 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
         if (cachedResult.isDefined) {
           cachedResult.get
         } else {
-          results(parent :: path, sources, table)
+          results(parent +: path, sources, table)
         }
       }.toList
     }
@@ -289,7 +289,7 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
       val retsToResolve = curNode match {
         case call: nodes.Call =>
           if (methodsForCall(call).to(Traversal).internal.nonEmpty && semanticsForCall(call).isEmpty) {
-            List(ReachableByResult(PathElement(path.head.node, resolved = false) :: path.tail, partial = true))
+            List(ReachableByResult(PathElement(path.head.node, resolved = false) +: path.tail, partial = true))
           } else {
             List()
           }
