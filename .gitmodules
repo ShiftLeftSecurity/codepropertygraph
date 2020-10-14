@@ -1,0 +1,9 @@
+[submodule "fuzzypp/external/cxxopts"]
+	path = fuzzypp/external/cxxopts
+	url = https://github.com/jarro2783/cxxopts.git
+[submodule "fuzzypp/external/catch2"]
+	path = fuzzypp/external/catch2
+	url = https://github.com/catchorg/Catch2.git
+[submodule "fuzzypp/external/simplecpp"]
+	path = fuzzypp/external/simplecpp
+	url = https://github.com/ShiftLeftSecurity/simplecpp.git

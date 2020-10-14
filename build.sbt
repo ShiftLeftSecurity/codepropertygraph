@@ -48,7 +48,7 @@ ThisBuild / Test / javaOptions += s"-Dlog4j2.configurationFile=file:${baseDirect
 ThisBuild / Test / javaOptions += s"-Duser.dir=${baseDirectory.in(ThisBuild).value}"
 
 ThisBuild/libraryDependencies ++= Seq(
-  "org.apache.logging.log4j" %  "log4j-slf4j-impl"     % "2.11.2" % Test
+  "org.apache.logging.log4j" %  "log4j-slf4j-impl" % "2.11.2" % Test
 )
 
 Global / useGpg := false
@@ -56,12 +56,10 @@ Global / useGpg := false
 name := "codepropertygraph"
 publish / skip := true
 
-// parsed by project/Utils.scala
-val fuzzyc2cpgVersion = "1.1.84"
-
 lazy val codepropertygraph = Projects.codepropertygraph
 lazy val protoBindings = Projects.protoBindings
 lazy val semanticcpg = Projects.semanticcpg
+lazy val semanticcpgtests = Projects.semanticcpgtests
 lazy val dataflowengineoss = Projects.dataflowengineoss
 lazy val cpgvalidator = Projects.cpgvalidator
 lazy val console = Projects.console
