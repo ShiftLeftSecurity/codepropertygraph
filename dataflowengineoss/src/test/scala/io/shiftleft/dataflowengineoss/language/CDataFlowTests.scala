@@ -1,6 +1,8 @@
 package io.shiftleft.dataflowengineoss.language
 
+import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal.Traversal
 
 class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
 
@@ -798,6 +800,32 @@ class CDataFlowTests23 extends DataFlowCodeToCpgSuite {
     val sink = cpg.call.codeExact("*arg")
     val flows = sink.reachableByFlows(source).l
     flows.size shouldBe 1
+  }
+
+}
+
+class CDataFlowTests24 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |int foo() {
+      |  source(&a->c);
+      |  sink(a->b);
+      |}
+      |
+      |int bar() {
+      |  source(&a->b);
+      |  sink(a->b);
+      |}
+      |
+      |""".stripMargin
+
+  "Test 24: should not report flow if access path differs" in {
+    val source = cpg.call.name("source").argument.l
+    val sink = cpg.method.name("sink").parameter.l
+    implicit val s: Semantics = semantics
+    val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
+    flows.map(flowToResultPairs).toSet shouldBe Set(
+      List(("source(&a->b)", Some(8)), ("sink(a->b)", Some(9)), ("sink(p1)", None)))
   }
 
 }
