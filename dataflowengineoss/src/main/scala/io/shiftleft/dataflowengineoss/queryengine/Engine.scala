@@ -31,9 +31,9 @@ class Engine(context: EngineContext) {
     * Initialize a pool of workers and return a "completion service" that
     * we can query (in a blocking manner) for completed tasks.
     * */
-  private def initializeWorkerPool(): ExecutorCompletionService[List[ReachableByResult]] = {
+  private def initializeWorkerPool(): ExecutorCompletionService[Vector[ReachableByResult]] = {
     val executorService: ExecutorService = Executors.newWorkStealingPool()
-    new ExecutorCompletionService[List[ReachableByResult]](executorService)
+    new ExecutorCompletionService[Vector[ReachableByResult]](executorService)
   }
 
   /**
@@ -67,8 +67,8 @@ class Engine(context: EngineContext) {
     result
   }
 
-  private def newTasksFromResults(resultsOfTask: List[ReachableByResult],
-                                  sources: Set[nodes.TrackingPoint]): List[ReachableByTask] = {
+  private def newTasksFromResults(resultsOfTask: Vector[ReachableByResult],
+                                  sources: Set[nodes.TrackingPoint]): Vector[ReachableByTask] = {
     tasksForParams(resultsOfTask, sources) ++ tasksForUnresolvedOutArgs(resultsOfTask, sources)
   }
 
@@ -77,8 +77,8 @@ class Engine(context: EngineContext) {
     completionService.submit(new ReachableByCallable(task, context))
   }
 
-  private def tasksForParams(resultsOfTask: List[ReachableByResult],
-                             sources: Set[nodes.TrackingPoint]): List[ReachableByTask] = {
+  private def tasksForParams(resultsOfTask: Vector[ReachableByResult],
+                             sources: Set[nodes.TrackingPoint]): Vector[ReachableByTask] = {
     val pathsFromParams = resultsOfTask.map(x => (x.path, x.callDepth))
     pathsFromParams.flatMap {
       case (path, callDepth) =>
@@ -90,12 +90,12 @@ class Engine(context: EngineContext) {
                 ReachableByTask(arg, sources, new ResultTable, path, callDepth + 1)
               }
           }
-          .getOrElse(List())
+          .getOrElse(Vector())
     }
   }
 
-  private def tasksForUnresolvedOutArgs(resultsOfTask: List[ReachableByResult],
-                                        sources: Set[nodes.TrackingPoint]): List[ReachableByTask] = {
+  private def tasksForUnresolvedOutArgs(resultsOfTask: Vector[ReachableByResult],
+                                        sources: Set[nodes.TrackingPoint]): Vector[ReachableByTask] = {
 
     val outArgsAndCalls = resultsOfTask
       .map(x => (x.unresolvedArgs.collect { case e: nodes.Expression => e }, x.path, x.callDepth))
@@ -229,16 +229,16 @@ case class EngineConfig(var maxCallDepth: Int = 4)
   * @param context state of the data flow engine
   * */
 private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
-    extends Callable[List[ReachableByResult]] {
+    extends Callable[Vector[ReachableByResult]] {
 
   import Engine._
 
   /**
     * Entry point of callable.
     * */
-  override def call(): List[ReachableByResult] = {
+  override def call(): Vector[ReachableByResult] = {
     if (task.callDepth > context.config.maxCallDepth) {
-      List()
+      Vector()
     } else {
       implicit val sem: Semantics = context.semantics
       results(PathElement(task.sink) +: task.initialPath, task.sources, task.table)
@@ -263,10 +263,10 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
   private def results[NodeType <: nodes.TrackingPoint](
       path: Vector[PathElement],
       sources: Set[NodeType],
-      table: ResultTable)(implicit semantics: Semantics): List[ReachableByResult] = {
+      table: ResultTable)(implicit semantics: Semantics): Vector[ReachableByResult] = {
     val curNode = path.head.node
 
-    val resultsForParents: List[ReachableByResult] = {
+    val resultsForParents: Vector[ReachableByResult] = {
       expandIn(curNode, path).iterator.flatMap { parent =>
         val cachedResult = table.createFromTable(parent, path)
         if (cachedResult.isDefined) {
@@ -274,7 +274,7 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
         } else {
           results(parent +: path, sources, table)
         }
-      }.toList
+      }.toVector
     }
 
     val resultsForCurNode = {

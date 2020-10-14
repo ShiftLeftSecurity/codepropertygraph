@@ -5,15 +5,15 @@ import scala.jdk.CollectionConverters._
 
 class ResultTable {
 
-  private val table = new java.util.concurrent.ConcurrentHashMap[nodes.StoredNode, List[ReachableByResult]].asScala
+  private val table = new java.util.concurrent.ConcurrentHashMap[nodes.StoredNode, Vector[ReachableByResult]].asScala
 
   /**
     * Add all results in `value` to table entry at `key`, appending to existing
     * results.
     */
-  def add(key: nodes.StoredNode, value: List[ReachableByResult]): Unit = {
+  def add(key: nodes.StoredNode, value: Vector[ReachableByResult]): Unit = {
     table.asJava.compute(key, { (_, existingValue) =>
-      Option(existingValue).toList.flatten ++ value
+      Option(existingValue).toVector.flatten ++ value
     })
   }
 
@@ -22,7 +22,7 @@ class ResultTable {
     * table, and if so, for each result, determine the path up to `first` and prepend it to
     * `path`, giving us new results via table lookup.
     */
-  def createFromTable(first: PathElement, remainder: Vector[PathElement]): Option[List[ReachableByResult]] = {
+  def createFromTable(first: PathElement, remainder: Vector[PathElement]): Option[Vector[ReachableByResult]] = {
     table.get(first.node).map { res =>
       res.map { r =>
         val pathToFirstNode = r.path.slice(0, r.path.map(_.node).indexOf(first.node))
@@ -36,7 +36,7 @@ class ResultTable {
     * Retrieve list of results for `node` or None if they are not
     * available in the table.
     */
-  def get(node: nodes.StoredNode): Option[List[ReachableByResult]] = {
+  def get(node: nodes.StoredNode): Option[Vector[ReachableByResult]] = {
     table.get(node)
   }
 
