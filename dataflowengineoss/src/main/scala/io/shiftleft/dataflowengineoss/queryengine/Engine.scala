@@ -69,7 +69,7 @@ class Engine(context: EngineContext) {
 
   private def newTasksFromResults(resultsOfTask: List[ReachableByResult],
                                   sources: Set[nodes.TrackingPoint]): List[ReachableByTask] = {
-    tasksForPartialResults(resultsOfTask, sources) ++ tasksForUnresolvedOutArgs(resultsOfTask, sources)
+    tasksForParams(resultsOfTask, sources) ++ tasksForUnresolvedOutArgs(resultsOfTask, sources)
   }
 
   private def submitTask(task: ReachableByTask): Unit = {
@@ -77,13 +77,9 @@ class Engine(context: EngineContext) {
     completionService.submit(new ReachableByCallable(task, context))
   }
 
-  private def tasksForPartialResults(resultsOfTask: List[ReachableByResult],
-                                     sources: Set[nodes.TrackingPoint]): List[ReachableByTask] = {
-    // We used to just expand method parameters for partial results,
-    // but that means that we stop traversal as soon as the first viable
-    // source is found.
-    val partialResults = resultsOfTask //.filter(_.partial)
-    val pathsFromParams = partialResults.map(x => (x.path, x.callDepth))
+  private def tasksForParams(resultsOfTask: List[ReachableByResult],
+                             sources: Set[nodes.TrackingPoint]): List[ReachableByTask] = {
+    val pathsFromParams = resultsOfTask.map(x => (x.path, x.callDepth))
     pathsFromParams.flatMap {
       case (path, callDepth) =>
         val param = path.head.node
@@ -272,12 +268,11 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
 
     val resultsForParents: List[ReachableByResult] = {
       expandIn(curNode, path).iterator.flatMap { parent =>
-        val pathFromParent = parent :: path
-        val cachedResult = table.createFromTable(pathFromParent)
+        val cachedResult = table.createFromTable(parent, path)
         if (cachedResult.isDefined) {
           cachedResult.get
         } else {
-          results(pathFromParent, sources, table)
+          results(parent :: path, sources, table)
         }
       }.toList
     }

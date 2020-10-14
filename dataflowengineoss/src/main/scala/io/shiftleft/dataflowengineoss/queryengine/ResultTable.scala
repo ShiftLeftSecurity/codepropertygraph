@@ -22,12 +22,11 @@ class ResultTable {
     * table, and if so, for each result, determine the path up to `first` and prepend it to
     * `path`, giving us new results via table lookup.
     */
-  def createFromTable(path: List[PathElement]): Option[List[ReachableByResult]] = {
-    val first = path.head
+  def createFromTable(first: PathElement, remainder: List[PathElement]): Option[List[ReachableByResult]] = {
     table.get(first.node).map { res =>
       res.map { r =>
         val pathToFirstNode = r.path.slice(0, r.path.map(_.node).indexOf(first.node))
-        val completePath =  pathToFirstNode ++ path
+        val completePath = pathToFirstNode ++ (first :: remainder)
         r.copy(path = completePath)
       }
     }
