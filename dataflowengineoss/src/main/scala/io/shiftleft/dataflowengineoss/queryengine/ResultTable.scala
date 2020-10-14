@@ -26,7 +26,8 @@ class ResultTable {
     val first = path.head
     table.get(first.node).map { res =>
       res.map { r =>
-        val completePath = r.path.slice(0, r.path.map(_.node).indexOf(first.node)) ++ path
+        val pathToFirstNode = r.path.slice(0, r.path.map(_.node).indexOf(first.node))
+        val completePath =  pathToFirstNode ++ path
         r.copy(path = completePath)
       }
     }

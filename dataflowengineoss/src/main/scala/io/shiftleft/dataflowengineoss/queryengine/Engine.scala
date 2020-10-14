@@ -273,7 +273,10 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     val resultsForParents: List[ReachableByResult] = {
       expandIn(curNode, path).iterator.flatMap { parent =>
         val pathFromParent = parent :: path
-        table.createFromTable(pathFromParent).getOrElse {
+        val cachedResult = table.createFromTable(pathFromParent)
+        if (cachedResult.isDefined) {
+          cachedResult.get
+        } else {
           results(pathFromParent, sources, table)
         }
       }.toList
