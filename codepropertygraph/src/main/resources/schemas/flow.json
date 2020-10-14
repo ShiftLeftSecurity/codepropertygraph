@@ -3,12 +3,12 @@
 	{"id" : 207, "name" : "FLOW", "comment" : "", "keys" : [], "outEdges" : [],
 	 "containedNodes" :
 	 [
-	     {"localName" : "points", "nodeType" : "PROGRAM_POINT", "cardinality" : "list"},
+	     {"localName" : "points", "nodeType" : "PROGRAM_POINT", "cardinality" : "array"},
 	     {"localName" : "source", "nodeType" : "SOURCE", "cardinality" : "one"},
 	     {"localName" : "sink", "nodeType" : "SINK", "cardinality" : "one"},
-	     {"localName" : "transformations", "nodeType" : "TRANSFORMATION", "cardinality" : "list"},
-	     {"localName" : "branchPoints", "nodeType" : "TRACKING_POINT", "cardinality" : "list"},
-	     {"localName" : "cfgNodes", "nodeType" : "CFG_NODE", "cardinality" : "list"}
+	     {"localName" : "transformations", "nodeType" : "TRANSFORMATION", "cardinality" : "array"},
+	     {"localName" : "branchPoints", "nodeType" : "TRACKING_POINT", "cardinality" : "array"},
+	     {"localName" : "cfgNodes", "nodeType" : "CFG_NODE", "cardinality" : "array"}
 	 ]
 	},
 
