@@ -17,7 +17,7 @@ object Definition {
 
 }
 
-case class Definition private (node: nodes.StoredNode) {}
+class Definition private (val node: nodes.StoredNode) extends AnyVal {}
 
 object ReachingDefProblem {
 
@@ -136,9 +136,10 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
           baseToCalls
             .getOrElse(base, Nil)
             .collect {
-              case (otherCall, otherPath)
-                  if node.id != node.id &&
-                    otherPath.matchAndDiff(accessPath.elements)._1 == MatchResult.EXACT_MATCH =>
+              case (otherCall, otherPath) if node.id != otherCall.id && {
+                    val m = otherPath.matchAndDiff(accessPath.elements)
+                    m._1 == MatchResult.EXACT_MATCH && m._2.elements.length == 0
+                  } =>
                 otherCall
             }
             .toSet

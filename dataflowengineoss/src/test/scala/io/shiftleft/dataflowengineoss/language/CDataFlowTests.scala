@@ -811,12 +811,6 @@ class CDataFlowTests24 extends DataFlowCodeToCpgSuite {
       |  source(&a->c);
       |  sink(a->b);
       |}
-      |
-      |int bar() {
-      |  source(&a->b);
-      |  sink(a->b);
-      |}
-      |
       |""".stripMargin
 
   "Test 24: should not report flow if access path differs" in {
@@ -824,8 +818,49 @@ class CDataFlowTests24 extends DataFlowCodeToCpgSuite {
     val sink = cpg.method.name("sink").parameter.l
     implicit val s: Semantics = semantics
     val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
-    flows.map(flowToResultPairs).toSet shouldBe Set(
-      List(("source(&a->b)", Some(8)), ("sink(a->b)", Some(9)), ("sink(p1)", None)))
+    flows.size shouldBe 0
   }
+}
 
+class CDataFlowTests25 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |int bar() {
+      |  source(&a->b);
+      |  sink(a->b);
+      |}
+      |
+      |""".stripMargin
+
+  "Test 25: should not report flow if access path differs" in {
+    val source = cpg.call.name("source").argument.l
+    val sink = cpg.method.name("sink").parameter.l
+
+    implicit val s: Semantics = semantics
+    val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
+    flows.map(flowToResultPairs).toSet shouldBe Set(
+      List(("source(&a->b)", Some(3)), ("sink(a->b)", Some(4)), ("sink(p1)", None))
+    )
+  }
+}
+
+class CDataFlowTests26 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |int foo() {
+      |  a->b = source();
+      |  a->b = 10;
+      |  sink(a->b);
+      |}
+      |
+      |""".stripMargin
+
+  "Test 26: should not report flow" in {
+    val source = cpg.call.name("source").l
+    val sink = cpg.method.name("sink").parameter.l
+    implicit val s: Semantics = semantics
+    val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
+    println(flows.size)
+    flows.map(flowToResultPairs).toSet.foreach(println)
+  }
 }
