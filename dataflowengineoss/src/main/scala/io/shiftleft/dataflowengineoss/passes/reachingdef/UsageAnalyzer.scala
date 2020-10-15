@@ -30,9 +30,10 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
         val (useBase, useAccessPath) = u.trackedBaseAndAccessPath
         val (inBase, defAccessPath) = i.trackedBaseAndAccessPath
         val (matchResult, elements) = useAccessPath.matchAndDiff(defAccessPath.elements)
-        (useBase == inBase) && // filter *x -> x
+        (useBase == inBase) &&
+        matchResult != MatchResult.NO_MATCH && // filter *x -> x
         !(matchResult == MatchResult.EXTENDED_MATCH && elements.elements.length > 1 && elements.elements.headOption
-          .exists(_.toString == "*")) && matchResult != MatchResult.NO_MATCH
+          .exists(_.toString == "*"))
       case _ => false
     }
   }
