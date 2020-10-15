@@ -113,13 +113,15 @@ object TrackingPointMethodsBase {
       case node: nodes.MethodParameterIn  => (TrackedNamedVariable(node.name), Nil)
       case node: nodes.MethodParameterOut => (TrackedNamedVariable(node.name), Nil)
       case node: nodes.ImplicitCall       => (TrackedReturnValue(node), Nil)
-      case node: nodes.Identifier         => (TrackedNamedVariable(node.name), Nil)
-      case node: nodes.Literal            => (TrackedLiteral(node), Nil)
-      case node: nodes.MethodRef          => (TrackedMethodOrTypeRef(node), Nil)
-      case node: nodes.TypeRef            => (TrackedMethodOrTypeRef(node), Nil)
-      case _: nodes.Return                => (TrackedFormalReturn, Nil)
-      case _: nodes.MethodReturn          => (TrackedFormalReturn, Nil)
-      case _: nodes.Unknown               => (TrackedUnknown, Nil)
+      case node: nodes.PostExecutionCall =>
+        toTrackedBaseAndAccessPathInternal(node._refOut().next.asInstanceOf[nodes.TrackingPoint])
+      case node: nodes.Identifier => (TrackedNamedVariable(node.name), Nil)
+      case node: nodes.Literal    => (TrackedLiteral(node), Nil)
+      case node: nodes.MethodRef  => (TrackedMethodOrTypeRef(node), Nil)
+      case node: nodes.TypeRef    => (TrackedMethodOrTypeRef(node), Nil)
+      case _: nodes.Return        => (TrackedFormalReturn, Nil)
+      case _: nodes.MethodReturn  => (TrackedFormalReturn, Nil)
+      case _: nodes.Unknown       => (TrackedUnknown, Nil)
       // FieldIdentifiers are only fake arguments, hence should not be tracked
       case _: nodes.FieldIdentifier => (TrackedUnknown, Nil)
       case block: nodes.Block =>
