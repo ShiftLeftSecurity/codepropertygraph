@@ -64,7 +64,7 @@ class Engine(context: EngineContext) {
           logger.warn(exception.getMessage)
       }
     }
-    result
+    deduplicate(result.toVector).toList
   }
 
   private def newTasksFromResults(resultsOfTask: Vector[ReachableByResult],
@@ -214,6 +214,30 @@ object Engine {
       .argument(param.order)
       .l
 
+  def deduplicate(vec: Vector[ReachableByResult]): Vector[ReachableByResult] = {
+    vec
+      .groupBy { x =>
+        (x.path.headOption ++ x.path.lastOption, x.partial, x.callDepth)
+      }
+      .map {
+        case (_, list) =>
+          val lenIdPathPairs = list.map(x => (x.path.length, x)).toList
+          val withMaxLength = (lenIdPathPairs.sortBy(_._1).reverse match {
+            case Nil    => Nil
+            case h :: t => h :: t.takeWhile(y => y._1 == h._1)
+          }).map(_._2)
+
+          if (withMaxLength.length == 1) {
+            withMaxLength.head
+          } else {
+            withMaxLength.minBy { x =>
+              x.path.map(_.node.id()).mkString("-")
+            }
+          }
+      }
+      .toVector
+  }
+
 }
 
 case class EngineContext(semantics: Semantics, config: EngineConfig = EngineConfig())
@@ -301,28 +325,7 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
       endStates ++ retsToResolve
     }
 
-    val res = (resultsForParents ++ resultsForCurNode)
-      .groupBy { x =>
-        (x.path.headOption ++ x.path.lastOption, x.partial, x.callDepth)
-      }
-      .map {
-        case (_, list) =>
-          val lenIdPathPairs = list.map(x => (x.path.length, x)).toList
-          val withMaxLength = (lenIdPathPairs.sortBy(_._1).reverse match {
-            case Nil    => Nil
-            case h :: t => h :: t.takeWhile(y => y._1 == h._1)
-          }).map(_._2)
-
-          if (withMaxLength.length == 1) {
-            withMaxLength.head
-          } else {
-            withMaxLength.minBy { x =>
-              x.path.map(_.node.id()).mkString("-")
-            }
-          }
-      }
-      .toVector
-
+    val res = deduplicate(resultsForParents ++ resultsForCurNode)
     table.add(curNode, res)
     res
   }

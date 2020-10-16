@@ -271,4 +271,3 @@ A metadata block (type META_DATA) is included in CPG with two fields: a language
 
 [3] The ShiftLeft Tinkergraph
     https://github.com/ShiftLeftSecurity/tinkergraph-gremlin
-
