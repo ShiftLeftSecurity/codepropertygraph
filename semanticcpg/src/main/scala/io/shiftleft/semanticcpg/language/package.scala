@@ -41,6 +41,7 @@ package object language extends operatorextension.Implicits {
 
   implicit def cfgNodeToAstNode(node: nodes.CfgNode): AstNodeMethods = new AstNodeMethods(node)
   implicit def toExtendedNode(node: nodes.CpgNode): NodeMethods = new NodeMethods(node)
+  implicit def toExtendedStoredNode(node: nodes.StoredNode): StoredNodeMethods = new StoredNodeMethods(node)
   implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods = new WithinMethodMethods(node)
   implicit def toAstNodeMethods(node: nodes.AstNode): AstNodeMethods = new AstNodeMethods(node)
   implicit def toCfgNodeMethods(node: nodes.CfgNode): CfgNodeMethods = new CfgNodeMethods(node)
@@ -77,15 +78,6 @@ package object language extends operatorextension.Implicits {
   implicit def toBlock(trav: Traversal[nodes.Block]): Block = new Block(trav)
   implicit def toMethodRef(trav: Traversal[nodes.MethodRef]): MethodRef = new MethodRef(trav)
   implicit def toBinding(trav: Traversal[nodes.Binding]): Binding = new Binding(trav)
-
-  implicit class NodeStepsExt(val traversal: Traversal[_ <: StoredNode]) extends AnyVal {
-
-    /**
-    Traverse to tags of nodes in enhanced graph
-      */
-    def tag: Traversal[nodes.Tag] =
-      traversal.out(EdgeTypes.TAGGED_BY).cast[nodes.Tag]
-  }
 
   // Call graph extension
   implicit def toMethodForCallGraph(trav: Traversal[nodes.Method]): Method = new Method(trav)
