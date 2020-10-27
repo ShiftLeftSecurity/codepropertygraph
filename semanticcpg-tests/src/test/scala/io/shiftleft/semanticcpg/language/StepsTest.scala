@@ -222,11 +222,10 @@ class StepsTest extends AnyWordSpec with Matchers {
     typeDecl.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
 
     def callTrav = cpg.call.nameExact("add")
-    val call = callTrav.head
     callTrav.method.name.size shouldBe 3
-//    call.method.name.size shouldBe 3 // TODO discuss with markus: it's 27... different way to determine method?
+    callTrav.map(_.method.name).size shouldBe 3
 
-    // not testable in this cpg, but if it compiles it's good enough :)
+    // not testable in this cpg, but if it compiles it's probably fine
     def controlStructureTrav = cpg.controlStructure
     val controlStructure = controlStructureTrav.headOption
     controlStructureTrav.condition
