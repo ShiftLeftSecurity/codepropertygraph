@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{NodeKeys, nodes}
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
@@ -233,7 +233,11 @@ class StepsTest extends AnyWordSpec with Matchers {
     controlStructureTrav.condition
     controlStructure.map(_.condition)
 
-//    def literalTrav = cpg.literal.code(".*myLiteral1.*")
+    def identifierTrav = cpg.identifier.name("val1")
+    identifierTrav.refsTo.property(NodeKeys.LINE_NUMBER).head shouldBe 18
+    identifierTrav.head.refsTo.property(NodeKeys.LINE_NUMBER).head shouldBe 18
+
+    //    def literalTrav = cpg.literal.code(".*myLiteral1.*")
 //    literalTrav.
     // TODO literal, all other steps
 //    literal.method

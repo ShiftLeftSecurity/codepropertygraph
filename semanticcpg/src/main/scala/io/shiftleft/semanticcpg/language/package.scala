@@ -44,7 +44,7 @@ package object language extends operatorextension.Implicits {
   implicit def toTypeDecl[A](a: A)(implicit f: A => Traversal[nodes.TypeDecl]): TypeDecl = new TypeDecl(f(a))
   implicit def toCall[A](a: A)(implicit f: A => Traversal[nodes.Call]): OriginalCall = new OriginalCall(f(a))
   implicit def toControlStructure[A](a: A)(implicit f: A => Traversal[nodes.ControlStructure]): ControlStructure = new ControlStructure(f(a))
-  implicit def toIdentifier(trav: Traversal[nodes.Identifier]): IdentifierTrav = new IdentifierTrav(trav)
+  implicit def toIdentifier[A](a: A)(implicit f: A => Traversal[nodes.Identifier]): IdentifierTrav = new IdentifierTrav(f(a))
   implicit def toMember(trav: Traversal[nodes.Member]): Member = new Member(trav)
   implicit def toLocal(trav: Traversal[nodes.Local]): Local = new Local(trav)
   implicit def toMethod(trav: Traversal[nodes.Method]): OriginalMethod = new OriginalMethod(trav)
