@@ -210,6 +210,8 @@ class StepsTest extends AnyWordSpec with Matchers {
     val literal: nodes.Literal = literalTrav.head
     literalTrav.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
     literal.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
+    literalTrav.method.name.head shouldBe "manyArgs"
+    literal.method.name shouldBe "manyArgs"
 
     def typeTrav = cpg.typ.nameExact("TestGraph")
     val typ = typeTrav.head
@@ -231,6 +233,8 @@ class StepsTest extends AnyWordSpec with Matchers {
     controlStructureTrav.condition
     controlStructure.map(_.condition)
 
+//    def literalTrav = cpg.literal.code(".*myLiteral1.*")
+//    literalTrav.
     // TODO literal, all other steps
 //    literal.method
   }

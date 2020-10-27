@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, StoredNode}
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.{AstNodeDot, CfgNodeDot}
 import io.shiftleft.semanticcpg.language.nodemethods._
@@ -38,7 +38,7 @@ package object language extends operatorextension.Implicits {
   // then you need to add an implicit conversion from `Steps[NodeType]` to your type
   // here.
 
-  implicit def toLiteral(trav: Traversal[nodes.Literal]): Literal = new Literal(trav)
+  implicit def toLiteral[A](a: A)(implicit f: A => Traversal[nodes.Literal]): Literal = new Literal(f(a))
 
   implicit def toType[A](a: A)(implicit f: A => Traversal[nodes.Type]): Type = new Type(f(a))
   implicit def toTypeDecl[A](a: A)(implicit f: A => Traversal[nodes.TypeDecl]): TypeDecl = new TypeDecl(f(a))
