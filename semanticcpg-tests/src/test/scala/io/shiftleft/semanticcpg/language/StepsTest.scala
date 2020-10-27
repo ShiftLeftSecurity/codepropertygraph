@@ -206,41 +206,48 @@ class StepsTest extends AnyWordSpec with Matchers {
      * code without errors, and intellij's autocomplete works.
      */
     val cpg = fixture.cpg
-    def literalTrav = cpg.literal.code(".*wow.*")
-    val literal: nodes.Literal = literalTrav.head
-    literalTrav.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
+    def literal = cpg.literal.code(".*wow.*")
     literal.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
-    literalTrav.method.name.head shouldBe "manyArgs"
-    literal.method.name shouldBe "manyArgs"
+    literal.head.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
+    literal.method.name.head shouldBe "manyArgs"
+    literal.head.method.name shouldBe "manyArgs"
 
-    def typeTrav = cpg.typ.nameExact("TestGraph")
-    val typ = typeTrav.head
-    typeTrav.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
+    def typ = cpg.typ.nameExact("TestGraph")
     typ.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
+    typ.head.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
 
-    def typeDeclTrav = cpg.typeDecl.nameExact("TestGraph")
-    val typeDecl = typeDeclTrav.head
-    typeDeclTrav.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
+    def typeDecl = cpg.typeDecl.nameExact("TestGraph")
     typeDecl.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
+    typeDecl.head.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
 
-    def callTrav = cpg.call.nameExact("add")
-    callTrav.method.name.size shouldBe 3
-    callTrav.map(_.method.name).size shouldBe 3
+    def call = cpg.call.nameExact("add")
+    call.method.name.size shouldBe 3
+    call.map(_.method.name).size shouldBe 3
 
     // not testable in this cpg, but if it compiles it's probably fine
-    def controlStructureTrav = cpg.controlStructure
-    val controlStructure = controlStructureTrav.headOption
-    controlStructureTrav.condition
-    controlStructure.map(_.condition)
+    def controlStructure = cpg.controlStructure
+    controlStructure.condition
+    controlStructure.headOption.map(_.condition)
 
-    def identifierTrav = cpg.identifier.name("val1")
-    identifierTrav.refsTo.property(NodeKeys.LINE_NUMBER).head shouldBe 18
-    identifierTrav.head.refsTo.property(NodeKeys.LINE_NUMBER).head shouldBe 18
+    def identifier = cpg.identifier.name("val1")
+    identifier.refsTo.property(NodeKeys.LINE_NUMBER).head shouldBe 18
+    identifier.head.refsTo.property(NodeKeys.LINE_NUMBER).head shouldBe 18
 
-    //    def literalTrav = cpg.literal.code(".*myLiteral1.*")
-//    literalTrav.
-    // TODO literal, all other steps
-//    literal.method
+    def member = cpg.member.name("foo")
+    member.typeDecl.name.head shouldBe "TestGraph"
+    member.head.typeDecl.name.head shouldBe "TestGraph"
+
+    def local = cpg.local.name("two")
+    local.typ.name.head shouldBe "Integer"
+    local.head.typ.name.head shouldBe "Integer"
+
+    def method = cpg.method.name("add")
+    method.parameter.size shouldBe 2
+    method.head.parameter.size shouldBe 2
+
+    def methodParameterIn = cpg.parameter.name("one")
+    methodParameterIn.typ.name.head shouldBe "String"
+    methodParameterIn.head.typ.name.head shouldBe "String"
   }
 
 }
