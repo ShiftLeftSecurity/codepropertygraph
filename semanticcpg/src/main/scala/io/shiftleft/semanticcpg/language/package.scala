@@ -53,13 +53,14 @@ package object language extends operatorextension.Implicits {
   implicit def toMethodReturn[A](a: A)(implicit f: A => Traversal[nodes.MethodReturn]): MethodReturn = new MethodReturn(f(a))
   implicit def toNamespace[A](a: A)(implicit f: A => Traversal[nodes.Namespace]): Namespace = new Namespace(f(a))
   implicit def toNamespaceBlock[A](a: A)(implicit f: A => Traversal[nodes.NamespaceBlock]): NamespaceBlock = new NamespaceBlock(f(a))
-  implicit def toExpression[A <: nodes.Expression](trav: Traversal[A]): Expression[A] = new Expression[A](trav)
-  implicit def toCfgNode[A <: nodes.CfgNode](trav: Traversal[A]): CfgNode[A] = new CfgNode(trav)
-  implicit def toAstNode[A <: nodes.AstNode](trav: Traversal[A]): AstNode[A] = new AstNode(trav)
   implicit def toFile[A](a: A)(implicit f: A => Traversal[nodes.File]): File = new File(f(a))
   implicit def toBlock[A](a: A)(implicit f: A => Traversal[nodes.Block]): Block = new Block(f(a))
   implicit def toMethodRef[A](a: A)(implicit f: A => Traversal[nodes.MethodRef]): MethodRef = new MethodRef(f(a))
   implicit def toBinding[A](a: A)(implicit f: A => Traversal[nodes.Binding]): Binding = new Binding(f(a))
+
+  implicit def toExpression[A, NodeType <: nodes.Expression](a: A)(implicit f: A => Traversal[NodeType]): Expression[NodeType] = new Expression[NodeType](f(a))
+  implicit def toCfgNode[A <: nodes.CfgNode](trav: Traversal[A]): CfgNode[A] = new CfgNode(trav)
+  implicit def toAstNode[A, NodeType <: nodes.AstNode](a: A)(implicit f: A => Traversal[NodeType]): AstNode[NodeType] = new AstNode[NodeType](f(a))
 
   // Call graph extension
   implicit def toMethodForCallGraph(trav: Traversal[nodes.Method]): Method = new Method(trav)

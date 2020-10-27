@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, CfgNode, Expression}
 import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
@@ -282,6 +283,16 @@ class StepsTest extends AnyWordSpec with Matchers {
     def binding = cpg.graph.nodes(NodeTypes.BINDING).cast[nodes.Binding]
     binding.boundMethod
     binding.headOption.map(_.boundMethod)
+
+    def expression: Traversal[Expression] = cpg.identifier.name("val1")
+    expression.expressionUp.code.head shouldBe "val0  +  val1"
+    expression.head.expressionUp.code.head shouldBe "val0  +  val1"
+
+//    def cfg: Traversal[CfgNode] = cpg.method.name("add")
+
+    def ast: Traversal[AstNode] = cpg.method.name("add")
+    ast.astParent.property(NodeKeys.NAME).head shouldBe "InlineArguments"
+    ast.head.astParent.property(NodeKeys.NAME) shouldBe "InlineArguments"
   }
 
 }
