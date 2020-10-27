@@ -1,13 +1,13 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{NodeKeys, nodes}
+import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import overflowdb.traversal.Traversal
+import overflowdb.traversal.{Traversal, jIteratortoTraversal}
 
 class StepsTest extends AnyWordSpec with Matchers {
 
@@ -248,6 +248,40 @@ class StepsTest extends AnyWordSpec with Matchers {
     def methodParameterIn = cpg.parameter.name("one")
     methodParameterIn.typ.name.head shouldBe "String"
     methodParameterIn.head.typ.name.head shouldBe "String"
+
+    def methodParameterOut = cpg.graph.nodes(NodeTypes.METHOD_PARAMETER_OUT).cast[nodes.MethodParameterOut].name("two")
+    methodParameterOut.typ.name.head shouldBe "Integer"
+    methodParameterOut.head.typ.name.head shouldBe "Integer"
+
+    def methodReturn = cpg.methodReturn.typeFullNameExact("int")
+    methodReturn.method.name.toSet shouldBe Set("methodWithCycle", "add")
+    methodReturn.map(_.method.name).toSet shouldBe Set("methodWithCycle", "add")
+
+    def namespace = cpg.namespace.name("io.shiftleft.testcode.splitmeup")
+    namespace.typeDecl.name.toSet shouldBe Set("TestGraph", "InlineArguments")
+    namespace.head.typeDecl.name.toSet shouldBe Set("TestGraph", "InlineArguments")
+
+    def namespaceBlock = cpg.namespaceBlock.name("io.shiftleft.testcode.splitmeup")
+    namespaceBlock.typeDecl.name.toSet shouldBe Set("TestGraph", "InlineArguments")
+    namespaceBlock.flatMap(_.typeDecl.name).toSet shouldBe Set("TestGraph", "InlineArguments")
+
+    def file = cpg.file.name("io/shiftleft/testcode/splitmeup/TestGraph.java")
+    file.typeDecl.name.head shouldBe "TestGraph"
+    file.head.typeDecl.name.head shouldBe "TestGraph"
+
+    def block = cpg.graph.nodes(NodeTypes.BLOCK).cast[nodes.Block].typeFullName("int")
+    block.local.name.size shouldBe 6
+    block.flatMap(_.local.name).size shouldBe 6
+
+    // not testable in this cpg, but if it compiles it's probably fine
+    def methodRef = cpg.methodRef
+    methodRef.referencedMethod
+    methodRef.headOption.map(_.referencedMethod)
+
+    // not testable in this cpg, but if it compiles it's probably fine
+    def binding = cpg.graph.nodes(NodeTypes.BINDING).cast[nodes.Binding]
+    binding.boundMethod
+    binding.headOption.map(_.boundMethod)
   }
 
 }
