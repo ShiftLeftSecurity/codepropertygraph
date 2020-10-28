@@ -29,7 +29,7 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
     }
 
   def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Traversal[NodeType]*)(
-    implicit context: EngineContext): Traversal[NodeType] =
+      implicit context: EngineContext): Traversal[NodeType] =
     node.start.reachableBy(sourceTravs: _*)
 
   def ddgIn(implicit semantics: Semantics): Traversal[TrackingPoint] = {
@@ -41,8 +41,8 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
 
   def ddgInPathElem(withInvisible: Boolean,
                     cache: mutable.HashMap[nodes.TrackingPoint, Vector[PathElement]] =
-                    mutable.HashMap[nodes.TrackingPoint, Vector[PathElement]]())(
-                     implicit semantics: Semantics): Traversal[PathElement] =
+                      mutable.HashMap[nodes.TrackingPoint, Vector[PathElement]]())(
+      implicit semantics: Semantics): Traversal[PathElement] =
     ddgInPathElem(Vector(PathElement(node)), withInvisible, cache)
 
   def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = {
@@ -59,7 +59,7 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
   def ddgIn(path: Vector[PathElement],
             withInvisible: Boolean,
             cache: mutable.HashMap[nodes.TrackingPoint, Vector[PathElement]])(
-             implicit semantics: Semantics): Traversal[TrackingPoint] = {
+      implicit semantics: Semantics): Traversal[TrackingPoint] = {
     ddgInPathElem(path, withInvisible, cache).map(_.node)
   }
 
@@ -71,7 +71,7 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
   def ddgInPathElem(path: Vector[PathElement],
                     withInvisible: Boolean,
                     cache: mutable.HashMap[nodes.TrackingPoint, Vector[PathElement]])(
-                     implicit semantics: Semantics): Traversal[PathElement] = {
+      implicit semantics: Semantics): Traversal[PathElement] = {
     val result = ddgInPathElemInternal(path, withInvisible, cache).to(Traversal)
     result
   }
@@ -79,7 +79,7 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
   private def ddgInPathElemInternal(path: Vector[PathElement],
                                     withInvisible: Boolean,
                                     cache: mutable.HashMap[nodes.TrackingPoint, Vector[PathElement]])(
-                                     implicit semantics: Semantics): Vector[PathElement] = {
+      implicit semantics: Semantics): Vector[PathElement] = {
 
     if (cache.contains(node)) {
       return cache(node)

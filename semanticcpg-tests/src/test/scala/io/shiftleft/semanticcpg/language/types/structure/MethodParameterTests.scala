@@ -39,9 +39,7 @@ class MethodParameterTests extends AnyWordSpec with Matchers {
           val args: List[nodes.MethodParameterIn] =
             fixture.cpg.method.name("manyArgs").parameter.indexFrom(2).toList
 
-          args.map(_.typ.head.fullName).toSet shouldBe Set("java.lang.Integer",
-                                                                 "java.lang.Long",
-                                                                 "java.lang.Double")
+          args.map(_.typ.head.fullName).toSet shouldBe Set("java.lang.Integer", "java.lang.Long", "java.lang.Double")
         }
 
         "specifying index <= x" in {
