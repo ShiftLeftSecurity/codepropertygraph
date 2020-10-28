@@ -18,7 +18,7 @@ import overflowdb.traversal.{Traversal, _}
   Implicit conversions to specific steps, based on the node at hand.
   Automatically in scope when using anything in the `steps` package, e.g. `Steps`
   */
-package object language extends operatorextension.Implicits {
+package object language extends operatorextension.Implicits with LowPrioImplicits {
   // Implicit conversions from generated node types. We use these to add methods
   // to generated node types.
 
@@ -58,10 +58,6 @@ package object language extends operatorextension.Implicits {
   implicit def toMethodRef[A](a: A)(implicit f: A => Traversal[nodes.MethodRef]): MethodRef = new MethodRef(f(a))
   implicit def toBinding[A](a: A)(implicit f: A => Traversal[nodes.Binding]): Binding = new Binding(f(a))
 
-  implicit def toExpression[A, NodeType <: nodes.Expression](a: A)(implicit f: A => Traversal[NodeType]): Expression[NodeType] = new Expression[NodeType](f(a))
-  implicit def toCfgNode[A <: nodes.CfgNode](trav: Traversal[A]): CfgNode[A] = new CfgNode(trav)
-  implicit def toAstNode[A, NodeType <: nodes.AstNode](a: A)(implicit f: A => Traversal[NodeType]): AstNode[NodeType] = new AstNode[NodeType](f(a))
-
   // Call graph extension
   implicit def toMethodForCallGraph[A](a: A)(implicit f: A => Traversal[nodes.Method]): Method = new Method(f(a))
   implicit def toCallForCallGraph[A](a: A)(implicit f: A => Traversal[nodes.Call]): Call = new Call(f(a))
@@ -88,8 +84,6 @@ package object language extends operatorextension.Implicits {
   implicit def toTagTraversal(trav: Traversal[nodes.Tag]): Tag = new Tag(trav)
 
   // ~ EvalType accessors
-  implicit def toEvalTypeAccessorsExpression[A, NodeType <: nodes.Expression](a: A)(implicit f: A => Traversal[NodeType]): EvalTypeAccessors[NodeType] =
-    new EvalTypeAccessors(f(a))
   implicit def toEvalTypeAccessorsLocal[A](a: A)(implicit f: A => Traversal[nodes.Local]): EvalTypeAccessors[nodes.Local] =
     new EvalTypeAccessors(f(a))
   implicit def toEvalTypeAccessorsMember[A](a: A)(implicit f: A => Traversal[nodes.Member]): EvalTypeAccessors[nodes.Member] =
@@ -122,4 +116,16 @@ package object language extends operatorextension.Implicits {
       Traversal.fromSingle(node)
   }
 
+}
+
+trait LowPrioImplicits extends LowLowPrioImplicits {
+  implicit def toExpression[A, NodeType <: nodes.Expression](a: A)(implicit f: A => Traversal[NodeType]): Expression[NodeType] = new Expression[NodeType](f(a))
+
+  implicit def toEvalTypeAccessorsExpression[A, NodeType <: nodes.Expression](a: A)(implicit f: A => Traversal[NodeType]): EvalTypeAccessors[NodeType] =
+    new EvalTypeAccessors(f(a))
+}
+
+trait LowLowPrioImplicits {
+  implicit def toCfgNode[A, NodeType <: nodes.CfgNode](a: A)(implicit f: A => Traversal[NodeType]): CfgNode[NodeType] = new CfgNode(f(a))
+  implicit def toAstNode[A, NodeType <: nodes.AstNode](a: A)(implicit f: A => Traversal[NodeType]): AstNode[NodeType] = new AstNode[NodeType](f(a))
 }
