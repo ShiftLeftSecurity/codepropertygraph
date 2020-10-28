@@ -103,7 +103,7 @@ object LocationCreator {
           local.name,
           local.label,
           local.lineNumber,
-          local.start.method.head
+          local.method.head
         )
       case methodRef: nodes.MethodRef =>
         apply(

@@ -8,32 +8,6 @@ import overflowdb.traversal._
 class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 
   /**
-    * All nodes of the abstract syntax tree rooted in this node.
-    * Equivalent of TNodes in the original CPG paper.
-    * */
-  def ast: Traversal[nodes.AstNode] =
-    node.start.ast
-
-  /**
-    * All nodes of the abstract syntax tree rooted in this node,
-    * which match `predicate`. Equivalent of `match` in the original
-    * CPG paper.
-    * */
-  def ast(predicate: nodes.AstNode => Boolean): Traversal[nodes.AstNode] =
-    node.start.ast.filter(predicate)
-
-  /**
-    * Ordered list of direct AST children
-    * */
-  def astChildren: Traversal[nodes.AstNode] = node.start.astChildren
-
-  /**
-    * All nodes of the abstract syntax tree rooted in this node,
-    * minus this node.
-    * */
-  def astMinusRoot: Traversal[nodes.AstNode] = node.start.astMinusRoot
-
-  /**
     * Indicate whether the AST node represents a control structure,
     * e.g., `if`, `for`, `while`.
     * */
@@ -81,7 +55,7 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
   def depth(p: nodes.AstNode => Boolean): Int = {
     val additionalDepth = if (p(node)) { 1 } else { 0 }
 
-    val childDepths = node.start.astChildren.map(_.depth(p)).l
+    val childDepths = node.astChildren.map(_.depth(p)).l
     additionalDepth + (if (childDepths.isEmpty) {
                          0
                        } else {

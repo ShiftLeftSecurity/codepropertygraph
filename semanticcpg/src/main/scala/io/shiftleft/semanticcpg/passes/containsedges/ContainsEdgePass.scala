@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal._
 
 import scala.jdk.CollectionConverters._
 
@@ -21,7 +20,7 @@ class ContainsEdgePass(cpg: Cpg) extends ParallelCpgPass[nodes.AstNode](cpg) {
   override def runOnPart(source: nodes.AstNode): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    source.start
+    source
       .walkAstUntilReaching(sourceTypes)
       .sideEffect { destination =>
         if (destinationTypes.contains(destination.label)) {
