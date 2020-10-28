@@ -22,7 +22,7 @@ package object language extends operatorextension.Implicits {
   // Implicit conversions from generated node types. We use these to add methods
   // to generated node types.
 
-  implicit def cfgNodeToAstNode(node: nodes.CfgNode): AstNodeMethods = new AstNodeMethods(node)
+  implicit def cfgNodeToAsNode(node: nodes.CfgNode): AstNodeMethods = new AstNodeMethods(node)
   implicit def toExtendedNode(node: nodes.CpgNode): NodeMethods = new NodeMethods(node)
   implicit def toExtendedStoredNode(node: nodes.StoredNode): StoredNodeMethods = new StoredNodeMethods(node)
   implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods = new WithinMethodMethods(node)
@@ -63,15 +63,15 @@ package object language extends operatorextension.Implicits {
   implicit def toAstNode[A, NodeType <: nodes.AstNode](a: A)(implicit f: A => Traversal[NodeType]): AstNode[NodeType] = new AstNode[NodeType](f(a))
 
   // Call graph extension
-  implicit def toMethodForCallGraph(trav: Traversal[nodes.Method]): Method = new Method(trav)
-  implicit def toCallForCallGraph(trav: Traversal[nodes.Call]): Call = new Call(trav)
+  implicit def toMethodForCallGraph[A](a: A)(implicit f: A => Traversal[nodes.Method]): Method = new Method(f(a))
+  implicit def toCallForCallGraph[A](a: A)(implicit f: A => Traversal[nodes.Call]): Call = new Call(f(a))
   // / Call graph extension
 
-  implicit def toAstNodeDot[NodeType <: nodes.AstNode](trav: Traversal[NodeType]): AstNodeDot[NodeType] =
-    new AstNodeDot(trav)
+  implicit def toAstNodeDot[A, NodeType <: nodes.AstNode](a: A)(implicit f: A => Traversal[NodeType]): AstNodeDot[NodeType] =
+    new AstNodeDot(f(a))
 
-  implicit def toCfgNodeDot(trav: Traversal[nodes.Method]): CfgNodeDot =
-    new CfgNodeDot(trav)
+  implicit def toCfgNodeDot[A](a: A)(implicit f: A => Traversal[nodes.Method]): CfgNodeDot =
+    new CfgNodeDot(f(a))
 
   implicit def toTraversal[NodeType <: CpgNode](node: NodeType): Traversal[NodeType] =
     Traversal.fromSingle(node)
@@ -88,38 +88,35 @@ package object language extends operatorextension.Implicits {
   implicit def toTagTraversal(trav: Traversal[nodes.Tag]): Tag = new Tag(trav)
 
   // ~ EvalType accessors
-  implicit def toEvalTypeAccessorsExpression(trav: Traversal[nodes.Expression]): EvalTypeAccessors[nodes.Expression] =
-    new EvalTypeAccessors(trav)
-  implicit def toEvalTypeAccessorsIdentifier(trav: Traversal[nodes.Identifier]): EvalTypeAccessors[nodes.Identifier] =
-    new EvalTypeAccessors(trav)
-  implicit def toEvalTypeAccessorsCall(trav: Traversal[nodes.Call]): EvalTypeAccessors[nodes.Call] =
-    new EvalTypeAccessors(trav)
-  implicit def toEvalTypeAccessorsLiteral(trav: Traversal[nodes.Literal]): EvalTypeAccessors[nodes.Literal] =
-    new EvalTypeAccessors(trav)
-  implicit def toEvalTypeAccessorsLocal(trav: Traversal[nodes.Local]): EvalTypeAccessors[nodes.Local] =
-    new EvalTypeAccessors(trav)
-  implicit def toEvalTypeAccessorsMember(trav: Traversal[nodes.Member]): EvalTypeAccessors[nodes.Member] =
-    new EvalTypeAccessors(trav)
-  implicit def toEvalTypeAccessorsMethod(trav: Traversal[nodes.Method]): EvalTypeAccessors[nodes.Method] =
-    new EvalTypeAccessors(trav)
-  implicit def toEvalTypeAccessorsMethodParameterIn(
-      trav: Traversal[nodes.MethodParameterIn]): EvalTypeAccessors[nodes.MethodParameterIn] =
-    new EvalTypeAccessors(trav)
-  implicit def toEvalTypeAccessorsMethodParameterOut(
-      trav: Traversal[nodes.MethodParameterOut]): EvalTypeAccessors[nodes.MethodParameterOut] =
-    new EvalTypeAccessors(trav)
-  implicit def toEvalTypeAccessorsMethodReturn(
-      trav: Traversal[nodes.MethodReturn]): EvalTypeAccessors[nodes.MethodReturn] =
-    new EvalTypeAccessors(trav)
+  implicit def toEvalTypeAccessorsExpression[A](a: A)(implicit f: A => Traversal[nodes.Expression]): EvalTypeAccessors[nodes.Expression] =
+    new EvalTypeAccessors(f(a))
+  implicit def toEvalTypeAccessorsIdentifier[A](a: A)(implicit f: A => Traversal[nodes.Identifier]): EvalTypeAccessors[nodes.Identifier] =
+    new EvalTypeAccessors(f(a))
+  implicit def toEvalTypeAccessorsCall[A](a: A)(implicit f: A => Traversal[nodes.Call]): EvalTypeAccessors[nodes.Call] =
+    new EvalTypeAccessors(f(a))
+  implicit def toEvalTypeAccessorsLiteral[A](a: A)(implicit f: A => Traversal[nodes.Literal]): EvalTypeAccessors[nodes.Literal] =
+    new EvalTypeAccessors(f(a))
+  implicit def toEvalTypeAccessorsLocal[A](a: A)(implicit f: A => Traversal[nodes.Local]): EvalTypeAccessors[nodes.Local] =
+    new EvalTypeAccessors(f(a))
+  implicit def toEvalTypeAccessorsMember[A](a: A)(implicit f: A => Traversal[nodes.Member]): EvalTypeAccessors[nodes.Member] =
+    new EvalTypeAccessors(f(a))
+  implicit def toEvalTypeAccessorsMethod[A](a: A)(implicit f: A => Traversal[nodes.Method]): EvalTypeAccessors[nodes.Method] =
+    new EvalTypeAccessors(f(a))
+  implicit def toEvalTypeAccessorsMethodParameterIn[A](a: A)(implicit f: A => Traversal[nodes.MethodParameterIn]): EvalTypeAccessors[nodes.MethodParameterIn] =
+    new EvalTypeAccessors(f(a))
+  implicit def toEvalTypeAccessorsMethodParameterOut[A](a: A)(implicit f: A => Traversal[nodes.MethodParameterOut]): EvalTypeAccessors[nodes.MethodParameterOut] =
+    new EvalTypeAccessors(f(a))
+  implicit def toEvalTypeAccessorsMethodReturn[A](a: A)(implicit f: A => Traversal[nodes.MethodReturn]): EvalTypeAccessors[nodes.MethodReturn] =
+    new EvalTypeAccessors(f(a))
   // EvalType accessors ~
 
   // ~ Modifier accessors
-  implicit def toModifierAccessorsMember(trav: Traversal[nodes.Member]): ModifierAccessors[nodes.Member] =
-    new ModifierAccessors(trav)
-  implicit def toModifierAccessorsMethod(trav: Traversal[nodes.Method]): ModifierAccessors[nodes.Method] =
-    new ModifierAccessors(trav)
-  implicit def toModifierAccessorsTypeDecl(trav: Traversal[nodes.TypeDecl]): ModifierAccessors[nodes.TypeDecl] =
-    new ModifierAccessors(trav)
+  implicit def toModifierAccessorsMember[A](a: A)(implicit f: A => Traversal[nodes.Member]): ModifierAccessors[nodes.Member] =
+    new ModifierAccessors(f(a))
+  implicit def toModifierAccessorsMethod[A](a: A)(implicit f: A => Traversal[nodes.Method]): ModifierAccessors[nodes.Method] =
+    new ModifierAccessors(f(a))
+  implicit def toModifierAccessorsTypeDecl[A](a: A)(implicit f: A => Traversal[nodes.TypeDecl]): ModifierAccessors[nodes.TypeDecl] =
+    new ModifierAccessors(f(a))
   // Modifier accessors ~
 
   implicit class NewNodeTypeDeco[NodeType <: nodes.NewNode](val node: NodeType) extends AnyVal {

@@ -293,6 +293,30 @@ class StepsTest extends AnyWordSpec with Matchers {
     def ast: Traversal[AstNode] = cpg.method.name("add")
     ast.astParent.property(NodeKeys.NAME).head shouldBe "InlineArguments"
     ast.head.astParent.property(NodeKeys.NAME) shouldBe "InlineArguments"
+
+    // methodForCallGraph
+    method.call.size shouldBe 2
+    method.head.call.size shouldBe 2
+
+    // callForCallGraph - only verifying that it compiles
+    call.callee(NoResolve)
+    call.head.callee(NoResolve)
+
+    // AstNodeDot - only verifying that it compiles
+    ast.dotAst
+    ast.head.dotAst
+
+    // dotCfg
+    method.dotCfg.head.startsWith("digraph add {")
+    method.head.dotCfg.head.startsWith("digraph add {")
+
+    // evalType
+    local.evalType.head shouldBe "java.lang.Integer"
+    local.head.evalType.head shouldBe "java.lang.Integer"
+
+    // modifierAccessors
+    method.modifier.modifierType.toSet shouldBe Set("STATIC", "VIRTUAL")
+    method.head.modifier.modifierType.toSet shouldBe Set("STATIC", "VIRTUAL")
   }
 
 }
