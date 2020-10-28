@@ -88,13 +88,7 @@ package object language extends operatorextension.Implicits {
   implicit def toTagTraversal(trav: Traversal[nodes.Tag]): Tag = new Tag(trav)
 
   // ~ EvalType accessors
-  implicit def toEvalTypeAccessorsExpression[A](a: A)(implicit f: A => Traversal[nodes.Expression]): EvalTypeAccessors[nodes.Expression] =
-    new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsIdentifier[A](a: A)(implicit f: A => Traversal[nodes.Identifier]): EvalTypeAccessors[nodes.Identifier] =
-    new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsCall[A](a: A)(implicit f: A => Traversal[nodes.Call]): EvalTypeAccessors[nodes.Call] =
-    new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsLiteral[A](a: A)(implicit f: A => Traversal[nodes.Literal]): EvalTypeAccessors[nodes.Literal] =
+  implicit def toEvalTypeAccessorsExpression[A, NodeType <: nodes.Expression](a: A)(implicit f: A => Traversal[NodeType]): EvalTypeAccessors[NodeType] =
     new EvalTypeAccessors(f(a))
   implicit def toEvalTypeAccessorsLocal[A](a: A)(implicit f: A => Traversal[nodes.Local]): EvalTypeAccessors[nodes.Local] =
     new EvalTypeAccessors(f(a))
