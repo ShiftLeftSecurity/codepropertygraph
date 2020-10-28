@@ -5,7 +5,6 @@ import io.shiftleft.codepropertygraph.generated.nodes.TrackingPoint
 import io.shiftleft.dataflowengineoss.queryengine.{Engine, EngineContext, PathElement}
 import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase
 import overflowdb.traversal.Traversal
-import overflowdb.traversal._
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 
@@ -30,7 +29,7 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
 
   def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Traversal[NodeType]*)(
       implicit context: EngineContext): Traversal[NodeType] =
-    node.start.reachableBy(sourceTravs: _*)
+    node.reachableBy(sourceTravs: _*)
 
   def ddgIn(implicit semantics: Semantics): Traversal[TrackingPoint] = {
     val cache = mutable.HashMap[nodes.TrackingPoint, Vector[PathElement]]()

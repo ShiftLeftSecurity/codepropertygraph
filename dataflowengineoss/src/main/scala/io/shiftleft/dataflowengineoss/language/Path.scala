@@ -1,7 +1,6 @@
 package io.shiftleft.dataflowengineoss.language
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import overflowdb.traversal._
 import overflowdb.traversal.help.Table
 import io.shiftleft.semanticcpg.language._
 
@@ -16,7 +15,7 @@ object Path {
         val method = trackingPoint.method
         val methodName = method.name
         val lineNumber = trackingPoint.cfgNode.lineNumber.getOrElse("N/A").toString
-        val fileName = method.start.file.name.headOption.getOrElse("N/A")
+        val fileName = method.file.name.headOption.getOrElse("N/A")
 
         val trackedSymbol = trackingPoint match {
           case _: nodes.MethodParameterIn =>

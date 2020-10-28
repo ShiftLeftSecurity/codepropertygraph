@@ -4,9 +4,9 @@ import io.shiftleft.codepropertygraph.generated.{EdgeKeys, EdgeTypes, nodes}
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.dotgenerator.DotSerializer.{Edge, Graph}
 import overflowdb.Node
-import overflowdb.traversal._
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.dataflowengineoss.language._
+import overflowdb.traversal.jIteratortoTraversal
 
 import scala.collection.mutable
 
@@ -18,7 +18,7 @@ class DdgGenerator {
   def generate(methodNode: nodes.Method)(implicit semantics: Semantics): Graph = {
     val entryNode = methodNode
     val paramNodes = methodNode.parameter.l
-    val allOtherNodes = methodNode.start.cfgNode.l
+    val allOtherNodes = methodNode.cfgNode.l
     val exitNode = methodNode.methodReturn
     val allNodes: List[nodes.StoredNode] = List(entryNode, exitNode) ++ paramNodes ++ allOtherNodes
     val visibleNodes = allNodes.filter(shouldBeDisplayed)
@@ -39,8 +39,7 @@ class DdgGenerator {
         e.copy(src = surroundingCall(e.src), dst = surroundingCall(e.dst))
       }
       .filter(e => e.src != e.dst)
-      .dedup
-      .l
+      .distinct
 
     edgeCache.clear
     Graph(ddgNodes, ddgEdges)
@@ -48,7 +47,7 @@ class DdgGenerator {
 
   private def surroundingCall(node: nodes.StoredNode): nodes.StoredNode = {
     node match {
-      case arg: nodes.Expression => arg.start.inCall.headOption.getOrElse(node)
+      case arg: nodes.Expression => arg.inCall.headOption.getOrElse(node)
       case _                     => node
     }
   }
