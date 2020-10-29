@@ -3,7 +3,6 @@ package io.shiftleft.semanticcpg.layers
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal._
 
 case class CfgDumpOptions(var outDir: String) extends LayerCreatorOptions {}
 
@@ -24,7 +23,7 @@ class DumpCfg(options: CfgDumpOptions) extends LayerCreator {
     val cpg = context.cpg
     cpg.method.zipWithIndex.foreach {
       case (method, i) =>
-        val str = method.start.dotCfg.head
+        val str = method.dotCfg.head
         (File(options.outDir) / s"${i}-cfg.dot").write(str)
     }
   }

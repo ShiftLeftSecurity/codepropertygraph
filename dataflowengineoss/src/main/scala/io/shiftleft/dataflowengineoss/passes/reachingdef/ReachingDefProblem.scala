@@ -2,12 +2,12 @@ package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.accesspath.{AccessPath, MatchResult, TrackedBase}
-import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase.ImplicitsAPI
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase.ImplicitsAPI
 import org.slf4j.{Logger, LoggerFactory}
+import overflowdb.traversal._
 
 import scala.jdk.CollectionConverters._
-import overflowdb.traversal._
 
 object Definition {
 
@@ -49,8 +49,8 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
   private def initSucc(ns: List[nodes.StoredNode]): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
     ns.map {
       case n @ (ret: nodes.Return)              => n -> List(ret.method.methodReturn)
-      case n @ (cfgNode: nodes.CfgNode)         => n -> cfgNode.start.cfgNext.l
-      case n @ (param: nodes.MethodParameterIn) => n -> param.start.method.cfgFirst.l
+      case n @ (cfgNode: nodes.CfgNode)         => n -> cfgNode.cfgNext.l
+      case n @ (param: nodes.MethodParameterIn) => n -> param.method.cfgFirst.l
       case n =>
         logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
         n -> List()
@@ -63,9 +63,9 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
   private def initPred(ns: List[nodes.StoredNode],
                        method: nodes.Method): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
     ns.map {
-      case n @ (_: nodes.CfgNode) if method.start.cfgFirst.headOption.contains(n) =>
+      case n @ (_: nodes.CfgNode) if method.cfgFirst.headOption.contains(n) =>
         n -> method.parameter.l.sortBy(_.order).lastOption.toList
-      case n @ (cfgNode: nodes.CfgNode)     => n -> cfgNode.start.cfgPrev.l
+      case n @ (cfgNode: nodes.CfgNode)     => n -> cfgNode.cfgPrev.l
       case n @ (_: nodes.MethodParameterIn) => n -> List(method)
       case n =>
         logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
@@ -97,17 +97,17 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
   def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[Definition]] = {
 
     def defsMadeByCall(call: nodes.Call): Set[Definition] = {
-      (Set(call) ++ call.start.argument.toSet
+      (Set(call) ++ call.start.argument
         .filterNot(_.isInstanceOf[nodes.Literal])
         .filterNot(_.isInstanceOf[nodes.FieldIdentifier]))
         .map(x => Definition.fromNode(x.asInstanceOf[nodes.StoredNode]))
     }
 
-    val defsForParams = method.start.parameter.l.map { param =>
+    val defsForParams = method.parameter.l.map { param =>
       param -> Set(Definition.fromNode(param.asInstanceOf[nodes.StoredNode]))
     }
 
-    val defsForCalls = method.start.call.l.map { call =>
+    val defsForCalls = method.call.l.map { call =>
       call -> defsMadeByCall(call)
     }
 
@@ -121,7 +121,7 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
   def initKill(method: nodes.Method,
                gen: Map[nodes.StoredNode, Set[Definition]]): Map[nodes.StoredNode, Set[Definition]] = {
 
-    val baseToCalls: Map[TrackedBase, List[(nodes.Call, AccessPath)]] = method.start.call.l
+    val baseToCalls: Map[TrackedBase, List[(nodes.Call, AccessPath)]] = method.call.l
       .map { call =>
         val (base, path) = call.trackedBaseAndAccessPath
         (base, (call, path))
@@ -153,7 +153,7 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
 
     // We are also adding nodes here that may not even be definitions, but that's
     // fine since `kill` is only subtracted
-    method.start.call.map { call =>
+    method.call.map { call =>
       val killedDefs = gen(call)
         .map { d =>
           allOtherInstancesOf(d.node)

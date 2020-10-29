@@ -4,7 +4,6 @@ import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, LayerCreatorOptions}
-import overflowdb.traversal._
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 
@@ -27,7 +26,7 @@ class DumpPdg(options: PdgDumpOptions)(implicit semantics: Semantics) extends La
     val cpg = context.cpg
     cpg.method.zipWithIndex.foreach {
       case (method, i) =>
-        val str = method.start.dotPdg.head
+        val str = method.dotPdg.head
         (File(options.outDir) / s"${i}-pdg.dot").write(str)
     }
   }

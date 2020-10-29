@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal._
 
 /**
   * Updates NAMESPACE_BLOCKs, TYPE_DECLs and METHODs so that they all
@@ -22,7 +21,7 @@ class FileNameCompat(cpg: Cpg) extends CpgPass(cpg) {
       // When creating nodes via NewNode classes, filename is "", not null.
       // For operators, filename might also be null.
       if (node.filename == null || node.filename == "") {
-        dstGraph.addNodeProperty(node, "FILENAME", node.start.file.name.headOption.getOrElse(""))
+        dstGraph.addNodeProperty(node, "FILENAME", node.file.name.headOption.getOrElse(""))
       }
     }
 

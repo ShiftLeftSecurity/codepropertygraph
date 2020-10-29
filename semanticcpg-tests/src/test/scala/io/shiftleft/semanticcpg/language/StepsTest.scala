@@ -1,13 +1,14 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, CfgNode, Expression}
+import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import overflowdb.traversal._
+import overflowdb.traversal.{Traversal, jIteratortoTraversal}
 
 class StepsTest extends AnyWordSpec with Matchers {
 
@@ -69,7 +70,7 @@ class StepsTest extends AnyWordSpec with Matchers {
 
     val query = for {
       method <- fixture.cpg.method
-      param <- method.start.parameter
+      param <- method.parameter
     } yield MethodParamPairs(method.name, param.name)
 
     val pairs: List[MethodParamPairs] = query.toList
@@ -197,6 +198,125 @@ class StepsTest extends AnyWordSpec with Matchers {
         }
       }
     }
+  }
+
+  "provides extension steps for Traversals and Nodes" in ExistingCpgFixture("splitmeup") { fixture =>
+    /* n.b. interestingly, intellij puts some red squiggles on `Traversal.file` etc. if one imports
+     * `overflowdb.traversal.iterableToTraversal`,  e.g. via `import overflowdb.traversal._`
+     * Looks like thats a bug in intellij's presentation compiler, esp. given that both sbt and intellij compile this
+     * code without errors, and intellij's autocomplete works.
+     */
+    val cpg = fixture.cpg
+    def literal = cpg.literal.code(".*wow.*")
+    literal.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
+    literal.head.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
+    literal.method.name.head shouldBe "manyArgs"
+    literal.head.method.name shouldBe "manyArgs"
+
+    def typ = cpg.typ.nameExact("TestGraph")
+    typ.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
+    typ.head.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
+
+    def typeDecl = cpg.typeDecl.nameExact("TestGraph")
+    typeDecl.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
+    typeDecl.head.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
+
+    def call = cpg.call.nameExact("add")
+    call.method.name.size shouldBe 3
+    call.map(_.method.name).size shouldBe 3
+
+    // not testable in this cpg, but if it compiles it's probably fine
+    def controlStructure = cpg.controlStructure
+    controlStructure.condition
+    controlStructure.headOption.map(_.condition)
+
+    def identifier = cpg.identifier.name("val1")
+    identifier.refsTo.property(NodeKeys.LINE_NUMBER).head shouldBe 18
+    identifier.head.refsTo.property(NodeKeys.LINE_NUMBER).head shouldBe 18
+
+    def member = cpg.member.name("foo")
+    member.typeDecl.name.head shouldBe "TestGraph"
+    member.head.typeDecl.name.head shouldBe "TestGraph"
+
+    def local = cpg.local.name("two")
+    local.typ.name.head shouldBe "Integer"
+    local.head.typ.name.head shouldBe "Integer"
+
+    def method = cpg.method.name("add")
+    method.parameter.size shouldBe 2
+    method.head.parameter.size shouldBe 2
+
+    def methodParameterIn = cpg.parameter.name("one")
+    methodParameterIn.typ.name.head shouldBe "String"
+    methodParameterIn.head.typ.name.head shouldBe "String"
+
+    def methodParameterOut = cpg.graph.nodes(NodeTypes.METHOD_PARAMETER_OUT).cast[nodes.MethodParameterOut].name("two")
+    methodParameterOut.typ.name.head shouldBe "Integer"
+    methodParameterOut.head.typ.name.head shouldBe "Integer"
+
+    def methodReturn = cpg.methodReturn.typeFullNameExact("int")
+    methodReturn.method.name.toSet shouldBe Set("methodWithCycle", "add")
+    methodReturn.map(_.method.name).toSet shouldBe Set("methodWithCycle", "add")
+
+    def namespace = cpg.namespace.name("io.shiftleft.testcode.splitmeup")
+    namespace.typeDecl.name.toSet shouldBe Set("TestGraph", "InlineArguments")
+    namespace.head.typeDecl.name.toSet shouldBe Set("TestGraph", "InlineArguments")
+
+    def namespaceBlock = cpg.namespaceBlock.name("io.shiftleft.testcode.splitmeup")
+    namespaceBlock.typeDecl.name.toSet shouldBe Set("TestGraph", "InlineArguments")
+    namespaceBlock.flatMap(_.typeDecl.name).toSet shouldBe Set("TestGraph", "InlineArguments")
+
+    def file = cpg.file.name("io/shiftleft/testcode/splitmeup/TestGraph.java")
+    file.typeDecl.name.head shouldBe "TestGraph"
+    file.head.typeDecl.name.head shouldBe "TestGraph"
+
+    def block = cpg.graph.nodes(NodeTypes.BLOCK).cast[nodes.Block].typeFullName("int")
+    block.local.name.size shouldBe 6
+    block.flatMap(_.local.name).size shouldBe 6
+
+    // not testable in this cpg, but if it compiles it's probably fine
+    def methodRef = cpg.methodRef
+    methodRef.referencedMethod
+    methodRef.headOption.map(_.referencedMethod)
+
+    // not testable in this cpg, but if it compiles it's probably fine
+    def binding = cpg.graph.nodes(NodeTypes.BINDING).cast[nodes.Binding]
+    binding.boundMethod
+    binding.headOption.map(_.boundMethod)
+
+    def expression: Traversal[Expression] = cpg.identifier.name("val1")
+    expression.expressionUp.code.head shouldBe "val0  +  val1"
+    expression.head.expressionUp.code.head shouldBe "val0  +  val1"
+
+//    def cfg: Traversal[CfgNode] = cpg.method.name("add")
+
+    def ast: Traversal[AstNode] = cpg.method.name("add")
+    ast.astParent.property(NodeKeys.NAME).head shouldBe "InlineArguments"
+    ast.head.astParent.property(NodeKeys.NAME) shouldBe "InlineArguments"
+
+    // methodForCallGraph
+    method.call.size shouldBe 2
+    method.head.call.size shouldBe 2
+
+    // callForCallGraph - only verifying that it compiles
+    call.callee(NoResolve)
+    call.head.callee(NoResolve)
+
+    // AstNodeDot - only verifying that it compiles
+    ast.dotAst
+    ast.head.dotAst
+
+    // dotCfg
+    method.dotCfg.head.startsWith("digraph add {")
+    method.head.dotCfg.head.startsWith("digraph add {")
+
+    // evalType
+    local.evalType.head shouldBe "java.lang.Integer"
+    local.head.evalType.head shouldBe "java.lang.Integer"
+
+    // modifierAccessors
+    method.modifier.modifierType.toSet shouldBe Set("STATIC", "VIRTUAL")
+    method.head.modifier.modifierType.toSet shouldBe Set("STATIC", "VIRTUAL")
   }
 
 }

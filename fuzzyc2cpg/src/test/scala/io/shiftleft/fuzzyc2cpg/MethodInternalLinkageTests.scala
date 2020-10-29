@@ -12,14 +12,14 @@ class MethodInternalLinkageTests extends AnyWordSpec with Matchers with Traversa
   implicit class VertexListWrapper(vertexList: List[Node]) {
     def expandAst(filterLabels: String*): List[Node] = {
       if (filterLabels.nonEmpty) {
-        vertexList.flatMap(_.start.out(EdgeTypes.AST).hasLabel(filterLabels: _*).l)
+        vertexList.flatMap(_.out(EdgeTypes.AST).hasLabel(filterLabels: _*).l)
       } else {
-        vertexList.flatMap(_.start.out(EdgeTypes.AST).l)
+        vertexList.flatMap(_.out(EdgeTypes.AST).l)
       }
     }
 
     def expandRef(): List[Node] = {
-      vertexList.flatMap(_.start.out(EdgeTypes.REF).l)
+      vertexList.flatMap(_.out(EdgeTypes.REF).l)
     }
 
     def filterOrder(order: Int): List[Node] = {

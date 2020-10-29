@@ -56,7 +56,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           local.name shouldBe "local"
           local.typeFullName shouldBe "int"
           call.name shouldBe Operators.assignment
-          call.start.astChildren.l match {
+          call.astChildren.l match {
             case List(identifier: nodes.Identifier, literal: nodes.Literal) =>
               identifier.name shouldBe "local"
               identifier.typeFullName shouldBe "int"
@@ -128,7 +128,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         case List(assignment) =>
           assignment.target.code shouldBe "x"
           assignment.source.start.isCall.name.l shouldBe List(Operators.addition)
-          assignment.source.start.astChildren.l match {
+          assignment.source.astChildren.l match {
             case List(id1: nodes.Identifier, id2: nodes.Identifier) =>
               id1.order shouldBe 1
               id1.code shouldBe "y"
@@ -150,7 +150,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.method.name("method").block.astChildren.l match {
         case List(local: nodes.Local, innerBlock: nodes.Block) =>
           local.name shouldBe "x"
-          innerBlock.start.astChildren.l match {
+          innerBlock.astChildren.l match {
             case List(localInBlock: nodes.Local) =>
               localInBlock.name shouldBe "y"
             case _ => fail
@@ -170,12 +170,12 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         case List(controlStruct: nodes.ControlStructure) =>
           controlStruct.code shouldBe "while (x < 1)"
           controlStruct.parserTypeName shouldBe "WhileStatement"
-          controlStruct.start.condition.l match {
+          controlStruct.condition.l match {
             case List(cndNode) =>
               cndNode.code shouldBe "x < 1"
             case _ => fail
           }
-          controlStruct.start.whenTrue.assignments.code.l shouldBe List("x += 1")
+          controlStruct.whenTrue.assignments.code.l shouldBe List("x += 1")
         case _ => fail
       }
     }
@@ -193,13 +193,13 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           controlStruct.code shouldBe "if (x > 0)"
           controlStruct.parserTypeName shouldBe "IfStatement"
           // TODO improve query language: controlStruct.condition
-          controlStruct.start.condition.l match {
+          controlStruct.condition.l match {
             case List(cndNode) =>
               cndNode.code shouldBe "x > 0"
             case _ => fail
 
           }
-          controlStruct.start.whenTrue.assignments.code.l shouldBe List("y = 0")
+          controlStruct.whenTrue.assignments.code.l shouldBe List("y = 0")
         case _ => fail
       }
     }
@@ -221,17 +221,17 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           elseStmt.parserTypeName shouldBe "ElseStatement"
           elseStmt.code shouldBe "else"
 
-          ifStmt.start.condition.l match {
+          ifStmt.condition.l match {
             case List(cndNode) =>
               cndNode.code shouldBe "x > 0"
             case _ => fail
           }
 
-          // TODO .start.whenTrue => .whenTrue
-          ifStmt.start.whenTrue.assignments
+          // TODO .whenTrue => .whenTrue
+          ifStmt.whenTrue.assignments
             .map(x => (x.target.code, x.source.code))
             .headOption shouldBe Some(("y", "0"))
-          ifStmt.start.whenFalse.assignments
+          ifStmt.whenFalse.assignments
             .map(x => (x.target.code, x.source.code))
             .headOption shouldBe Some(("y", "1"))
         case _ => fail
@@ -250,7 +250,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.method.name("method").ast.isCall.name(Operators.conditional).l match {
         case List(call) =>
           call.code shouldBe "(foo == 1) ? bar : 0"
-          // TODO call.start.argument => call.argument
+          // TODO call.argument => call.argument
           call.start.argument.l match {
             case List(condition, trueBranch, falseBranch) =>
               condition.argumentIndex shouldBe 1
@@ -282,7 +282,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
             case _ => fail
           }
 
-          forStmt.start.condition.l shouldBe forStmt.astChildren.order(2).l
+          forStmt.condition.l shouldBe forStmt.astChildren.order(2).l
           childContainsAssignments(forStmt, 3, List("x += 1"))
           childContainsAssignments(forStmt, 4, List("z = 0"))
         case _ => fail
@@ -482,13 +482,13 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       """.stripMargin) { cpg =>
       cpg.typeDecl.name("foo").l match {
         case List(fooStruct: nodes.TypeDecl) =>
-          fooStruct.start.member.name("x").size shouldBe 1
+          fooStruct.member.name("x").size shouldBe 1
           fooStruct.astChildren.isTypeDecl.l match {
             case List(barStruct: nodes.TypeDecl) =>
-              barStruct.start.member.name("y").size shouldBe 1
+              barStruct.member.name("y").size shouldBe 1
               barStruct.astChildren.isTypeDecl.l match {
                 case List(foo2Struct: nodes.TypeDecl) =>
-                  foo2Struct.start.member.name("z").size shouldBe 1
+                  foo2Struct.member.name("z").size shouldBe 1
                 case _ => fail
               }
             case _ => fail

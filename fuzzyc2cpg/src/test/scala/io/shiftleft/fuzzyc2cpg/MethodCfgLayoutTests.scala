@@ -11,7 +11,7 @@ class MethodCfgLayoutTests extends AnyWordSpec with Matchers with TraversalUtils
 
   implicit class VertexListWrapper(vertexList: List[Node]) {
     def expandCfg(): List[Node] = {
-      vertexList.flatMap(_.start.out(EdgeTypes.CFG).l)
+      vertexList.flatMap(_.out(EdgeTypes.CFG).l)
     }
 
     def checkForSingleProperty(label: String, propertyKey: PropertyKey[String], value: String): Unit = {

@@ -168,8 +168,8 @@ object Engine {
   private def elemForArgument(e: Edge, curNode: nodes.Expression)(
       implicit semantics: Semantics): Option[PathElement] = {
     val parentNode = e.outNode().asInstanceOf[nodes.Expression]
-    val parentNodeCall = parentNode.start.inCall.l
-    val sameCallSite = parentNode.start.inCall.l == curNode.start.inCall.l
+    val parentNodeCall = parentNode.inCall.l
+    val sameCallSite = parentNode.inCall.l == curNode.start.inCall.l
 
     if (sameCallSite && parentNode.isUsed && curNode.isDefined ||
         !sameCallSite && curNode.isUsed) {
@@ -189,7 +189,7 @@ object Engine {
   }
 
   def argToMethods(arg: nodes.Expression): List[nodes.Method] = {
-    arg.start.inCall.l.flatMap { call =>
+    arg.inCall.l.flatMap { call =>
       methodsForCall(call)
     }
   }

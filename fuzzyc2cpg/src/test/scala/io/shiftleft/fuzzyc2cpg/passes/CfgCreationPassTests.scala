@@ -478,8 +478,7 @@ class CfgFixture(file1Code: String) {
 
   def expected(pairs: (String, CfgEdgeType)*): Set[String] = {
     pairs.map {
-      case (code, _) =>
-        codeToNode(code).start.code.head
+      case (code, _) => codeToNode(code).code
     }.toSet
   }
 
