@@ -23,6 +23,12 @@ case class TrackedMethodOrTypeRef(methodOrTypeRef: nodes.StoredNode with nodes.H
   }
 }
 
+case class TrackedAlias(argIndex: Int) extends TrackedBase {
+  override def toString: String = {
+    s"TrackedAlias($argIndex)"
+  }
+}
+
 object TrackedUnknown extends TrackedBase {
   override def toString: String = {
     "TrackedUnknown"
