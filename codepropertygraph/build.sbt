@@ -1,6 +1,6 @@
 name := "codepropertygraph"
 
-dependsOn(Projects.protoBindings, Projects.schema)
+dependsOn(Projects.protoBindings, Projects.domainClasses)
 
 libraryDependencies ++= Seq(
   "com.github.pathikrit"     %% "better-files"         % "3.8.0",
@@ -9,15 +9,14 @@ libraryDependencies ++= Seq(
   "org.scalatest"            %% "scalatest"            % Versions.scalatest % Test
 )
 
-import scala.sys.process._
+lazy val mergeSchemaTask = taskKey[File]("Merge schemas")
 
 lazy val generateProtobuf = taskKey[File]("generate cpg.proto")
 generateProtobuf := {
+  import scala.sys.process._
   val output = better.files.File((resourceManaged.in(Compile).value / "cpg.proto").toPath)
-
-  val currentMd5 = FileUtils.md5(List(
-    new File("codepropertygraph/codegen/src/main"),
-    new File("codepropertygraph/src/main/resources/schemas")))
+  val schemaFile = (Projects.schema/mergeSchemaTask).value
+  val currentMd5 = FileUtils.md5(List(new File("codepropertygraph/codegen/src/main"), schemaFile))
   if (!output.exists || GenerateProtobufTaskGlobalState.lastMd5 != currentMd5) {
     // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
     val cmd = "codepropertygraph/codegen/src/main/python/generateProtobuf.py"
