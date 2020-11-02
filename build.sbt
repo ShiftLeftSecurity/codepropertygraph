@@ -57,6 +57,7 @@ name := "codepropertygraph"
 publish / skip := true
 
 lazy val codepropertygraph = Projects.codepropertygraph
+lazy val schema = Projects.schema
 lazy val protoBindings = Projects.protoBindings
 lazy val semanticcpg = Projects.semanticcpg
 lazy val semanticcpgtests = Projects.semanticcpgtests
