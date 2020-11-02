@@ -10,7 +10,7 @@ mergeSchemaTask := {
   val outputRoot = new File(sourceManaged.in(Compile).value.getAbsolutePath)
   outputRoot.mkdirs
   val outputFile = outputRoot / "cpg.json"
-  if (MergeSchemaTaskGlobalState.lastMd5 == currentMd5) {
+  if (outputFile.exists && MergeSchemaTaskGlobalState.lastMd5 == currentMd5) {
     println("schemas unchanged, no need to merge them again")
   } else {
     val schemaFiles = schemasDir.listFiles.toSeq
