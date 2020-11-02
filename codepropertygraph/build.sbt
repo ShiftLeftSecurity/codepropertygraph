@@ -42,5 +42,5 @@ mappings in (Compile, packageSrc) ++= { // publish generated sources
   val srcs = (managedSources in Compile).value
   val sdirs = (managedSourceDirectories in Compile).value
   val base = baseDirectory.value
-  (((srcs --- sdirs --- base) pair (relativeTo(sdirs) | relativeTo(base) | flat)) toSeq)
+  (srcs --- sdirs --- base) pair (relativeTo(sdirs) | relativeTo(base) | flat)
 }

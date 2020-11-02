@@ -8,7 +8,7 @@ abstract class FactsImporter {
 
   protected lazy val cpgJson: JsValue =
     Json.parse(
-      new FileInputStream("codepropertygraph/src/main/resources/cpg.json")
+      new FileInputStream("./schema/target/scala-2.13/src_managed/main/cpg.json")
     )
 
   def loadFacts: List[FactConstructionClasses.Fact]
