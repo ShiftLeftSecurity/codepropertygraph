@@ -1,6 +1,6 @@
 name := "codepropertygraph-domain-classes"
 
-libraryDependencies += "io.shiftleft" %% "overflowdb-traversal" % "1.19"
+libraryDependencies += "io.shiftleft" %% "overflowdb-traversal" % Versions.overflowdb
 dependsOn(Projects.schema)
 
 lazy val mergeSchemaTask = taskKey[File]("Merge schemas")
