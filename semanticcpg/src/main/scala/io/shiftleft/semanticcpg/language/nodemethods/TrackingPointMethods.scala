@@ -94,6 +94,7 @@ object TrackingPointMethodsBase {
     }
   }
 
+  //warning: This follows MUST_ALIAS edges.
   def toTrackedBaseAndAccessPath(node: nodes.StoredNode): (TrackedBase, AccessPath) = {
     // assume: node isa nodes.TrackingPoint
     node match {
