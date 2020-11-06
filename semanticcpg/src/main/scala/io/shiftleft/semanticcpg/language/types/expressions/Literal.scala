@@ -16,4 +16,11 @@ class Literal(val traversal: Traversal[nodes.Literal]) extends AnyVal {
       .repeat(_.in(EdgeTypes.AST))(_.until(_.hasLabel(NodeTypes.METHOD)))
       .cast[nodes.Method]
 
+  /**
+    * Traverse to identifiers this literal is pointing to
+    * */
+  def identifier: Traversal[nodes.Identifier] =
+    traversal
+      .repeat(_.in(EdgeTypes.CFG))(_.until(_.hasLabel(NodeTypes.IDENTIFIER)))
+      .cast[nodes.Identifier]
 }
