@@ -12,6 +12,7 @@ class WithinMethodMethods(val node: nodes.WithinMethod) extends AnyVal {
     case node: nodes.MethodParameterOut => walkUpAst(node)
     case node: nodes.MethodReturn       => walkUpAst(node)
     case node: nodes.ImplicitCall       => walkUpAst(node)
+    case node: nodes.PostExecutionCall  => walkUpAst(node)
     case node: nodes.Expression         => expressionToMethod(node)
   }
 

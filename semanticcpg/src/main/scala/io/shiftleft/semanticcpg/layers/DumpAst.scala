@@ -2,7 +2,6 @@ package io.shiftleft.semanticcpg.layers
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal._
 
 case class AstDumpOptions(var outDir: String) extends LayerCreatorOptions {}
 
@@ -23,7 +22,7 @@ class DumpAst(options: AstDumpOptions) extends LayerCreator {
     val cpg = context.cpg
     cpg.method.zipWithIndex.foreach {
       case (method, i) =>
-        val str = method.start.dotAst.head
+        val str = method.dotAst.head
         (File(options.outDir) / s"${i}-ast.dot").write(str)
     }
   }

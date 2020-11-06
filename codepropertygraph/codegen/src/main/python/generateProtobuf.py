@@ -37,5 +37,5 @@ if __name__ == '__main__':
     dname = os.path.dirname(abspath)
     os.chdir(dname)
 
-    cpgDescr = json.loads(open('../../../../src/main/resources/cpg.json').read())
+    cpgDescr = json.loads(open('../../../../../schema/target/scala-2.13/src_managed/main/cpg.json').read())
     generateProtobuf(cpgDescr)

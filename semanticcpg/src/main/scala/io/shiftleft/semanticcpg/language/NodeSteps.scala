@@ -113,4 +113,11 @@ class NodeSteps[NodeType <: nodes.StoredNode](val traversal: Traversal[NodeType]
       taggedNode.tagList.l
     }.l
 
+  @Doc("Tags attached to this node")
+  def tag: Traversal[nodes.Tag] = {
+    traversal.flatMap { node =>
+      node.tag
+    }
+  }
+
 }

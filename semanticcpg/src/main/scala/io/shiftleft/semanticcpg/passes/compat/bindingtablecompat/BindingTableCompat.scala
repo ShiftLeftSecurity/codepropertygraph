@@ -23,7 +23,7 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
         val nonConstructorMethods = getNonConstructorMethodsTransitive(typeDecl, Set.empty)
         nonConstructorMethods.foreach(createBinding(typeDecl, diffGraph))
 
-        val constructorMethods = typeDecl.start.method.isConstructor
+        val constructorMethods = typeDecl.method.isConstructor
         constructorMethods.foreach(createBinding(typeDecl, diffGraph))
       }
     }
@@ -70,7 +70,7 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
 
   private def getNonConstructorMethods(typeDecl: nodes.TypeDecl): List[nodes.Method] =
     typeDecl._methodViaAstOut
-      .filter(method => method.start.isConstructor.isEmpty)
+      .filter(method => method.isConstructor.isEmpty)
       .toList
 
 }

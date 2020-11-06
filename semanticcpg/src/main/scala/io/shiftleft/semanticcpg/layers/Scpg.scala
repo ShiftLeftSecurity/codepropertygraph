@@ -110,6 +110,22 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CfgDominatorPass(cpg),
           new CdgPass(cpg),
         )
+      case Languages.JAVASCRIPT =>
+        Iterator(
+          new ArgumentCompat(cpg),
+          new MethodInstCompat(cpg),
+          new MethodStubCreator(cpg),
+          new MethodDecoratorPass(cpg),
+          new CapturingLinker(cpg),
+          new Linker(cpg),
+          new FileNameCompat(cpg),
+          new FileLinker(cpg),
+          new ContainsEdgePass(cpg),
+          new MethodExternalDecoratorPass(cpg),
+          new CfgDominatorPass(cpg),
+          new CdgPass(cpg),
+          new NamespaceCreator(cpg),
+        )
       case _ => Iterator()
     }
   }

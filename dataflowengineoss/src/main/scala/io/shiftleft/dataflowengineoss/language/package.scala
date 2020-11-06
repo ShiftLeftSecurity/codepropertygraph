@@ -16,8 +16,9 @@ package object language {
   implicit def expressionMethods[NodeType <: nodes.Expression](node: NodeType): ExpressionMethods[NodeType] =
     new ExpressionMethods(node)
 
-  implicit def toTrackingPoint[NodeType <: nodes.TrackingPointBase](traversal: Traversal[NodeType]): TrackingPoint =
-    new TrackingPoint(traversal.cast[nodes.TrackingPoint])
+  implicit def toTrackingPoint[A, NodeType <: nodes.TrackingPointBase](a: A)(
+      implicit f: A => Traversal[NodeType]): TrackingPoint =
+    new TrackingPoint(f(a).cast[nodes.TrackingPoint])
 
   implicit def trackingPointToAstNodeMethods(node: nodes.TrackingPoint) =
     new AstNodeMethods(trackingPointToAstNode(node))
@@ -28,10 +29,11 @@ package object language {
     case _                              => ??? //TODO markus/fabs?
   }
 
-  implicit def trackingPointToAstBase(trav: Traversal[nodes.TrackingPoint]): AstNode[nodes.AstNode] =
-    new AstNode(trav.map(trackingPointToAstNode))
+  implicit def trackingPointToAstBase[A](a: A)(
+      implicit f: A => Traversal[nodes.TrackingPoint]): AstNode[nodes.AstNode] =
+    new AstNode(f(a).map(trackingPointToAstNode))
 
-  implicit def toDdgNodeDot(trav: Traversal[nodes.Method]): DdgNodeDot =
-    new DdgNodeDot(trav)
+  implicit def toDdgNodeDot[A](a: A)(implicit f: A => Traversal[nodes.Method]): DdgNodeDot =
+    new DdgNodeDot(f(a))
 
 }

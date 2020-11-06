@@ -113,6 +113,8 @@ object TrackingPointMethodsBase {
       case node: nodes.MethodParameterIn  => (TrackedNamedVariable(node.name), Nil)
       case node: nodes.MethodParameterOut => (TrackedNamedVariable(node.name), Nil)
       case node: nodes.ImplicitCall       => (TrackedReturnValue(node), Nil)
+      case node: nodes.PostExecutionCall =>
+        toTrackedBaseAndAccessPathInternal(node._refOut().next.asInstanceOf[nodes.TrackingPoint])
       case node: nodes.Identifier if node._callViaMustAliasOut.isDefined =>
         toTrackedBaseAndAccessPathInternal(node._callViaMustAliasOut.get)
       case node: nodes.Identifier => (TrackedNamedVariable(node.name), Nil)
@@ -129,7 +131,6 @@ object TrackingPointMethodsBase {
           .lastExpressionInBlock(block)
           .map { toTrackedBaseAndAccessPathInternal }
           .getOrElse((TrackedUnknown, Nil))
-      case call: nodes.Call if !MemberAccess.isGenericMemberAccessName(call.name) => (TrackedReturnValue(call), Nil)
       case cast: nodes.Call if cast.name == Operators.cast && cast._mustAliasIn.hasNext =>
         cast.argumentOption(2) match {
           case None =>
@@ -137,7 +138,8 @@ object TrackingPointMethodsBase {
             (TrackedUnknown, Nil)
           case Some(arg) => toTrackedBaseAndAccessPathInternal(arg)
         }
-      case memberAccess: nodes.Call =>
+      case call: nodes.Call if !MemberAccess.isGenericMemberAccessName(call.name) => (TrackedReturnValue(call), Nil)
+      case memberAccess: nodes.Call                                               =>
         //assume: MemberAccess.isGenericMemberAccessName(call.name)
         //FIXME: elevate debug to warn once csharp2cpg has managed to migrate.
         val argOne = memberAccess.argumentOption(1)

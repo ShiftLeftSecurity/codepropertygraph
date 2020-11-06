@@ -44,7 +44,7 @@ class CopyOperations extends CodeToCpgSuite {
       }
       .filter {
         case (buf, subscripts) =>
-          val incIdentifiers = buf.start.inAst.isControlStructure.astChildren
+          val incIdentifiers = buf.inAst.isControlStructure.astChildren
             .filterNot(_.isBlock)
             .assignments
             .target

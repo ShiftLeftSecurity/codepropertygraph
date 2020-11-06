@@ -26,15 +26,15 @@ class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVa
     traversal.map(_.cfgNode)
 
   def ddgIn(implicit semantics: Semantics): Traversal[nodes.TrackingPoint] = {
-    val cache = mutable.HashMap[nodes.TrackingPoint, List[PathElement]]()
-    val result = traversal.flatMap(x => x.ddgIn(List(PathElement(x)), withInvisible = false, cache))
+    val cache = mutable.HashMap[nodes.TrackingPoint, Vector[PathElement]]()
+    val result = traversal.flatMap(x => x.ddgIn(Vector(PathElement(x)), withInvisible = false, cache))
     cache.clear
     result
   }
 
   def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = {
-    val cache = mutable.HashMap[nodes.TrackingPoint, List[PathElement]]()
-    val result = traversal.flatMap(x => x.ddgInPathElem(List(PathElement(x)), withInvisible = false, cache))
+    val cache = mutable.HashMap[nodes.TrackingPoint, Vector[PathElement]]()
+    val result = traversal.flatMap(x => x.ddgInPathElem(Vector(PathElement(x)), withInvisible = false, cache))
     cache.clear
     result
   }
@@ -66,7 +66,7 @@ class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVa
     paths.to(Traversal)
   }
 
-  private def removeConsecutiveDuplicates[T](l: List[T]): List[T] = {
+  private def removeConsecutiveDuplicates[T](l: Vector[T]): List[T] = {
     l.headOption.map(x => x :: l.sliding(2).collect { case Seq(a, b) if a != b => b }.toList).getOrElse(List())
   }
 

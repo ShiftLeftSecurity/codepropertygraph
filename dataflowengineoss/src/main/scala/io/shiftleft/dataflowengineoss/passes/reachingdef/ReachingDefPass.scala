@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal._
 
 /**
   * A pass that calculates reaching definitions ("data dependencies").
@@ -79,7 +78,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           }
 
         case methodReturn: nodes.MethodReturn =>
-          methodReturn.start.cfgPrev.isReturn.foreach { ret =>
+          methodReturn.cfgPrev.isReturn.foreach { ret =>
             addEdge(ret, methodReturn, "<RET>")
           }
 

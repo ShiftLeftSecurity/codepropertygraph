@@ -1,6 +1,8 @@
 package io.shiftleft.dataflowengineoss.language
 
+import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.language._
+import overflowdb.traversal.Traversal
 
 class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
 
@@ -464,19 +466,16 @@ class CDataFlowTests12 extends DataFlowCodeToCpgSuite {
     val sink = cpg.call.code("z\\+=a").argument(1)
     val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 2
+    flows.size shouldBe 1
 
     flows.map(flowToResultPairs).toSet shouldBe
-      Set(List[(String, Option[Integer])](
-            ("a = 0x37", 3),
-            ("b = a", 4),
-            ("z = b", 5),
-            ("z+=a", 6)
-          ),
-          List[(String, Option[Integer])](
-            ("a = 0x37", 3),
-            ("z+=a", 6)
-          ))
+      Set(
+        List[(String, Option[Integer])](
+          ("a = 0x37", 3),
+          ("b = a", 4),
+          ("z = b", 5),
+          ("z+=a", 6)
+        ))
   }
 }
 
@@ -497,7 +496,7 @@ class CDataFlowTests13 extends DataFlowCodeToCpgSuite {
     val sink = cpg.identifier.name("w")
     val flows = sink.reachableByFlows(source).l
 
-    flows.size shouldBe 2
+    flows.size shouldBe 1
 
     flows.map(flowToResultPairs).toSet shouldBe
       Set(
@@ -505,11 +504,6 @@ class CDataFlowTests13 extends DataFlowCodeToCpgSuite {
           ("a = 0x37", 3),
           ("b = a", 4),
           ("z = b", 5),
-          ("z+=a", 6),
-          ("w = z", 7)
-        ),
-        List[(String, Option[Integer])](
-          ("a = 0x37", 3),
           ("z+=a", 6),
           ("w = z", 7)
         )
@@ -566,21 +560,7 @@ class CDataFlowTests15 extends DataFlowCodeToCpgSuite {
     val source = cpg.method.parameter.name("y")
     val sink = cpg.identifier.name("z")
     val flows = sink.reachableByFlows(source).l
-
-    flows.map(flowToResultPairs).toSet shouldBe Set(
-      List[(String, Option[Integer])](
-        ("foo(bool x, void* y)", 2),
-        ("g(y)", 3),
-        ("x ? f(y) : g(y)", 3),
-        ("* z =  x ? f(y) : g(y)", 3)
-      ),
-      List[(String, Option[Integer])](
-        ("foo(bool x, void* y)", 2),
-        ("f(y)", 3),
-        ("x ? f(y) : g(y)", 3),
-        ("* z =  x ? f(y) : g(y)", 3)
-      )
-    )
+    flows.size shouldBe 1
   }
 }
 
@@ -822,4 +802,65 @@ class CDataFlowTests23 extends DataFlowCodeToCpgSuite {
     flows.size shouldBe 1
   }
 
+}
+
+class CDataFlowTests24 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |int foo() {
+      |  source(&a->c);
+      |  sink(a->b);
+      |}
+      |""".stripMargin
+
+  "Test 24: should not report flow if access path differs" in {
+    val source = cpg.call.name("source").argument.l
+    val sink = cpg.method.name("sink").parameter.l
+    implicit val s: Semantics = semantics
+    val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
+    flows.size shouldBe 0
+  }
+}
+
+class CDataFlowTests25 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |int bar() {
+      |  source(&a->b);
+      |  sink(a->b);
+      |}
+      |
+      |""".stripMargin
+
+  "Test 25: should not report flow if access path differs" in {
+    val source = cpg.call.name("source").argument.l
+    val sink = cpg.method.name("sink").parameter.l
+
+    implicit val s: Semantics = semantics
+    val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
+    flows.map(flowToResultPairs).toSet shouldBe Set(
+      List(("source(&a->b)", Some(3)), ("sink(a->b)", Some(4)), ("sink(p1)", None))
+    )
+  }
+}
+
+class CDataFlowTests26 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |int foo() {
+      |  a->b = source();
+      |  a->b = 10;
+      |  sink(a->b);
+      |}
+      |
+      |""".stripMargin
+
+  "Test 26: should not report flow" in {
+    val source = cpg.call.name("source").l
+    val sink = cpg.method.name("sink").parameter.l
+    implicit val s: Semantics = semantics
+    val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
+    println(flows.size)
+    flows.map(flowToResultPairs).toSet.foreach(println)
+  }
 }

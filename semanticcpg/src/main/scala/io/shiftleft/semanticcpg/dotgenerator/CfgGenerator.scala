@@ -2,9 +2,8 @@ package io.shiftleft.semanticcpg.dotgenerator
 
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.dotgenerator.DotSerializer.{Edge, Graph}
-import overflowdb.Node
-import overflowdb.traversal._
 import io.shiftleft.semanticcpg.language._
+import overflowdb.Node
 
 import scala.jdk.CollectionConverters._
 
@@ -13,7 +12,7 @@ class CfgGenerator {
   val edgeType: String = EdgeTypes.CFG
 
   def generate(methodNode: nodes.Method): Graph = {
-    val vertices = methodNode.start.cfgNode.l ++ List(methodNode, methodNode.methodReturn) ++ methodNode.parameter.l
+    val vertices = methodNode.cfgNode.l ++ List(methodNode, methodNode.methodReturn) ++ methodNode.parameter.l
     val verticesToDisplay = vertices.filter(cfgNodeShouldBeDisplayed)
 
     def edgesToDisplay(srcNode: nodes.StoredNode, visited: List[nodes.StoredNode] = List()): List[Edge] = {
