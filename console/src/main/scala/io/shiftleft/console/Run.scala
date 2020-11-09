@@ -38,7 +38,7 @@ object Run {
     * @param exclude list of analyzers to exclude (by full class name)
     * */
   def codeForRunCommand(exclude: List[String] = List()): String = {
-    val r = new Reflections("io.shiftleft")
+    val r = new Reflections("io")
     val layerCreatorTypeNames = r
       .getSubTypesOf(classOf[LayerCreator])
       .asScala
