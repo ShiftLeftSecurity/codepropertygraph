@@ -5,6 +5,7 @@ import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language.HasStoreMethod
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext}
 import org.reflections8.Reflections
+import org.reflections8.util.{ClasspathHelper, ConfigurationBuilder}
 
 import scala.jdk.CollectionConverters._
 
@@ -38,32 +39,43 @@ object Run {
     * @param exclude list of analyzers to exclude (by full class name)
     * */
   def codeForRunCommand(exclude: List[String] = List()): String = {
-    val r = new Reflections("io")
-    val layerCreatorTypeNames = r
-      .getSubTypesOf(classOf[LayerCreator])
+    val ioSlLayerCreators = creatorsFor("io.shiftleft", exclude)
+    val ioJoernLayerCreators = creatorsFor("io.joern", exclude)
+    codeForLayerCreators((ioSlLayerCreators ++ ioJoernLayerCreators).distinct)
+  }
+
+  private def creatorsFor(namespace: String, exclude: List[String]) = {
+    new Reflections(
+      new ConfigurationBuilder().setUrls(
+        ClasspathHelper.forPackage(namespace,
+                                   ClasspathHelper.contextClassLoader(),
+                                   ClasspathHelper.staticClassLoader()))
+    ).getSubTypesOf(classOf[LayerCreator])
       .asScala
       .filterNot(t => t.isAnonymousClass || t.isLocalClass || t.isMemberClass || t.isSynthetic)
       .filterNot(t => t.getName.startsWith("io.shiftleft.console.Run"))
       .toList
       .map(t => (t.getSimpleName.toLowerCase, t.getName))
       .filter(t => !exclude.contains(t._2))
+  }
 
+  private def codeForLayerCreators(layerCreatorTypeNames: List[(String, String)]): String = {
     val optsMembersCode = layerCreatorTypeNames
       .map { case (varName, typeName) => s"val $varName = $typeName.defaultOpts" }
       .mkString("\n")
 
     val optsCode =
       s"""
-        |class OptsDynamic {
-        | $optsMembersCode
-        |}
-        |
-        |val opts = new OptsDynamic()
-        |
-        | import io.shiftleft.passes.DiffGraph
-        | implicit def _diffGraph : DiffGraph.Builder = opts.commit.diffGraphBuilder
-        | def diffGraph = _diffGraph
-        |""".stripMargin
+         |class OptsDynamic {
+         | $optsMembersCode
+         |}
+         |
+         |val opts = new OptsDynamic()
+         |
+         | import io.shiftleft.passes.DiffGraph
+         | implicit def _diffGraph : DiffGraph.Builder = opts.commit.diffGraphBuilder
+         | def diffGraph = _diffGraph
+         |""".stripMargin
 
     val membersCode = layerCreatorTypeNames
       .map { case (varName, typeName) => s"def $varName: Cpg = _runAnalyzer(new $typeName(opts.$varName))" }
@@ -85,18 +97,18 @@ object Run {
 
     optsCode +
       s"""
-       | class OverlaysDynamic {
-       |
-       | def apply(query : io.shiftleft.semanticcpg.language.HasStoreMethod) {
-       |   io.shiftleft.console.Run.runCustomQuery(console, query)
-       | }
-       |
-       | $membersCode
-       |
-       | $toStringCode
-       | }
-       | val run = new OverlaysDynamic()
-       |""".stripMargin
+         | class OverlaysDynamic {
+         |
+         | def apply(query : io.shiftleft.semanticcpg.language.HasStoreMethod) {
+         |   io.shiftleft.console.Run.runCustomQuery(console, query)
+         | }
+         |
+         | $membersCode
+         |
+         | $toStringCode
+         | }
+         | val run = new OverlaysDynamic()
+         |""".stripMargin
   }
 
 }
