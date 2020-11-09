@@ -1,7 +1,6 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
 import com.google.protobuf.GeneratedMessageV3
-
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct, DiffGraph}
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge
@@ -13,6 +12,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import overflowdb.Config
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try, Using}
@@ -25,11 +25,17 @@ object ProtoCpgLoader {
       val builder = new ProtoToCpg(overflowDbConfig)
       Using.Manager { use =>
         val edgeLists: ArrayBuffer[JCollection[Edge]] = ArrayBuffer.empty
-        use(new ZipArchive(fileName)).entries.foreach { entry =>
-          val inputStream = use(Files.newInputStream(entry))
+        val zip = use(new java.util.zip.ZipFile(fileName))
+        val names = mutable.Set[String]()
+        for (zipEntry <- zip.entries().asScala) {
+          if (!names.add(zipEntry.getName)) {
+            logger.warn(
+              s"""Zip file contains multiple entries with name "${zipEntry.getName}" -- is this really intended?""")
+          }
+          val inputStream = use(zip.getInputStream(zipEntry))
           val cpgStruct = getNextProtoCpgFromStream(inputStream)
           builder.addNodes(cpgStruct.getNodeList)
-          edgeLists += cpgStruct.getEdgeList
+          edgeLists.addOne(cpgStruct.getEdgeList)
         }
         edgeLists.foreach(edgeCollection => builder.addEdges(edgeCollection))
       } match {
