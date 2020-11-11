@@ -7,7 +7,7 @@ import org.scalatest.{Inside}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.console.scripting.ScriptManager.{ScriptCollections, ScriptDescription, ScriptDescriptions}
 
-import java.nio.file.{FileSystemNotFoundException, NoSuchFileException, Path}
+import java.nio.file.{NoSuchFileException, Path}
 
 import scala.io.Source
 import scala.util.Try
@@ -87,7 +87,7 @@ class ScriptManagerTest extends AnyWordSpec with Matchers with Inside {
     }
 
     "throw an exception if the specified CPG can not be found" in withScriptManager { scriptManager =>
-      intercept[FileSystemNotFoundException] {
+      intercept[java.io.FileNotFoundException] {
         scriptManager.runScript("general/list-funcs.sc", Map.empty, "cake.bin.zip")
       }
     }

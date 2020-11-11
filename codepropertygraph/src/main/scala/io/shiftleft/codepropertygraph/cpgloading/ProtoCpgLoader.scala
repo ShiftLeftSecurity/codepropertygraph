@@ -27,7 +27,7 @@ object ProtoCpgLoader {
         val edgeLists: ArrayBuffer[JCollection[Edge]] = ArrayBuffer.empty
         val zip = use(new java.util.zip.ZipFile(fileName))
         val names = mutable.Set[String]()
-        for (zipEntry <- zip.entries().asScala) {
+        for (zipEntry <- zip.entries().asScala if !zipEntry.isDirectory) {
           if (!names.add(zipEntry.getName)) {
             logger.warn(
               s"""Zip file contains multiple entries with name "${zipEntry.getName}" -- is this really intended?""")

@@ -28,7 +28,7 @@ class CpgLoaderTests extends AnyWordSpec with Matchers {
     }
 
     "throw an appropriate exception if the provided filename that refers to a non-existing file" in {
-      an[FileSystemNotFoundException] should be thrownBy CpgLoader.load("invalid/path/cpg.bin.zip")
+      an[java.io.FileNotFoundException] should be thrownBy CpgLoader.load("invalid/path/cpg.bin.zip")
     }
 
     /**
