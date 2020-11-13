@@ -54,7 +54,6 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
         if (receiverIt.hasNext) {
           val receiver = receiverIt.next
           receiver match {
-            case methodRefReceiver: nodes.MethodRef => // nothing
             case _ =>
               val receiverTypeDecl = receiver
                 ._evalTypeOut()
