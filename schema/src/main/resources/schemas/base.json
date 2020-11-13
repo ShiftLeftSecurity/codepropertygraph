@@ -258,7 +258,6 @@
              {"name": "METHOD_REF", "cardinality": "0-1:0-1"},
              {"name": "TYPE_REF"},
              {"name": "BLOCK", "cardinality": "0-1:0-1"},
-             {"name": "JUMP_TARGET"},
 	     {"name": "CONTROL_STRUCTURE"},
 	     {"name": "UNKNOWN"}
            ]},
