@@ -37,13 +37,13 @@ class Call(val traversal: Traversal[nodes.Call]) extends AnyVal {
     Arguments of the call
     */
   def argument: Traversal[nodes.Expression] =
-    traversal.out(EdgeTypes.ARGUMENT).cast[nodes.Expression]
+    traversal.flatMap(_.argument)
 
   /**
     `i'th` arguments of the call
     */
   def argument(i: Integer): Traversal[nodes.Expression] =
-    argument.argumentIndex(i)
+    traversal.flatMap(_.argument(i))
 
   /**
     To formal method return parameter
