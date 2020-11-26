@@ -97,6 +97,8 @@ You can run `./regenerate-test-cpgs.sh` to update them, but this requires the pr
 sbt semanticcpg/console
 ```
 ```scala
+import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.semanticcpg.language._
 val cpg = io.shiftleft.codepropertygraph.cpgloading.CpgLoader.load("./resources/testcode/cpgs/hello-shiftleft-0.0.5/cpg.bin.zip")
 ```
 
