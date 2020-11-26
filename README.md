@@ -89,7 +89,7 @@ https://docs.shiftleft.io/core-concepts/code-property-graph
 
 Here's how you can load a cpg into ShiftLeft Tinkergraph [3] in the sbt console - the next section will list some queries you can interactively run from there.
 
-There are some sample cpgs in this repository in the `resources/cpgs` directory.
+There are some sample cpgs in this repository in the `resources/testcode/cpgs` directory.
 You can run `./regenerate-test-cpgs.sh` to update them, but this requires the proprietary java2cpg installed locally.
 
 ### [Tinkergraph (in memory reference db)](http://tinkerpop.apache.org/docs/current/reference/#tinkergraph-gremlin)
@@ -97,7 +97,9 @@ You can run `./regenerate-test-cpgs.sh` to update them, but this requires the pr
 sbt semanticcpg/console
 ```
 ```scala
-val cpg = io.shiftleft.codepropertygraph.cpgloading.CpgLoader.load("./resources/cpgs/helloshiftleft/cpg.bin.zip")
+import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.semanticcpg.language._
+val cpg = io.shiftleft.codepropertygraph.cpgloading.CpgLoader.load("./resources/testcode/cpgs/hello-shiftleft-0.0.5/cpg.bin.zip")
 ```
 
 # Querying the cpg
