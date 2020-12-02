@@ -10,7 +10,8 @@ import io.shiftleft.console.cpgcreation.{
   JavaLanguageFrontend,
   JsLanguageFrontend,
   LanguageFrontend,
-  LlvmLanguageFrontend
+  LlvmLanguageFrontend,
+  PythonLanguageFrontend
 }
 
 object LanguageHelper {
@@ -30,6 +31,7 @@ object LanguageHelper {
       case "GO"                 => Some(GoLanguageFrontend(config.go, rootPath))
       case Languages.JAVA       => Some(JavaLanguageFrontend(config.java, rootPath))
       case Languages.JAVASCRIPT => Some(JsLanguageFrontend(config.js, rootPath))
+      case Languages.PYTHON     => Some(PythonLanguageFrontend(config.python, rootPath))
       case _                    => None
     }
   }
