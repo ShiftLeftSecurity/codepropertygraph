@@ -13,6 +13,9 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Run tests
-      run: sbt test
-
+    - name: Run sbt tests
+      run: sbt scalafmtCheck test
+    - name: Run fuzzypp tests
+      run: cmake -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 ./fuzzypp
+      run: cmake --build . --config Release
+      run: ./fuzzypp/bin/fuzzyppcli-tests
