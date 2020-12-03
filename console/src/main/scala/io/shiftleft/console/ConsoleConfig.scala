@@ -41,7 +41,6 @@ class LanguageFrontendConfig(var csharp: CSharpFrontendConfig = CSharpFrontendCo
                              var llvm: LlvmFrontendConfig = LlvmFrontendConfig(),
                              var python: PythonFrontendConfig = PythonFrontendConfig())
 
-
 class CSharpFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 class FuzzyCFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 class GoFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
