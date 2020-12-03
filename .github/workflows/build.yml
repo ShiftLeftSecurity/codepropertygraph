@@ -5,6 +5,9 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    matrix:
+      strategy:
+        - { version: "2.13.0", binary-version: "2.13" }
 
   steps:
     - name: Checkout code
