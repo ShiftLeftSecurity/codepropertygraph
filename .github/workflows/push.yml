@@ -6,7 +6,7 @@ on:
 
 jobs:
   test-codepropertygraph:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
     - uses: actions/checkout@v2
@@ -24,7 +24,7 @@ jobs:
       run: sbt scalafmtCheck test
 
   test-fuzzypp-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
       - uses: actions/checkout@v2
@@ -49,7 +49,7 @@ jobs:
           path: ./fuzzyppcli.zip
 
   test-fuzzypp-windows:
-    runs-on: windows-latest
+    runs-on: windows-2019
 
     steps:
       - uses: actions/checkout@v2
@@ -73,7 +73,7 @@ jobs:
 
   release:
     needs: [test-codepropertygraph, test-fuzzypp-linux, test-fuzzypp-windows]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
       - uses: actions/checkout@v2
