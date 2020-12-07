@@ -93,7 +93,7 @@ jobs:
         run: export LATEST_TAG=$(git describe --tags --abbrev=0)
       - name: Echo git tag
         run: echo $LATEST_TAG
-      - run: sbt test ciReleaseTagNextVersion ciReleaseSonatype
+      - run: sbt ciReleaseTagNextVersion ciReleaseSonatype
         env:
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
           PGP_SECRET: ${{ secrets.PGP_SECRET }}
