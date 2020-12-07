@@ -31,11 +31,6 @@ TEST_CASE("1: Preprocess an input file, preserving comments", "preprocess") {
 }
 
 TEST_CASE("2: Preprocess an input file with an included file", "preprocess") {
-// TODO: remove the early return after the CI temp file path issue has been resolved
-#ifdef _WIN32
-  return;
-#endif
-
     const auto header_content = "int x = 5;";
     const auto source_content = "#include \"source.hpp\"\n"
                                 "int main ( ) { return x; } // A sight to behold!";
@@ -74,11 +69,6 @@ TEST_CASE("2: Preprocess an input file with an included file", "preprocess") {
 }
 
 TEST_CASE("3: Preprocess an input file with an included path", "preprocess") {
-// TODO: remove the early return after the CI temp file path issue has been resolved
-#ifdef _WIN32
-  return;
-#endif
-
     const auto header_content = "int x = 5;";
     const auto source_content = "#include <header.hpp>\n"
                                 "int main ( ) { return x; } // A sight to behold!";
@@ -306,11 +296,6 @@ TEST_CASE("9: Elide any defines which are also specified in the list of undefine
 }
 
 TEST_CASE("10: Correctly handle paths containing .", "preprocess") {
-// TODO: remove the early return after the CI temp file path issue has been resolved
-#ifdef _WIN32
-  return;
-#endif
-
     const auto header_content = "int x = 5;";
     const auto source_content = "#include <header.hpp>\n"
                                 "int main ( ) { return x; } // A sight to behold!";
