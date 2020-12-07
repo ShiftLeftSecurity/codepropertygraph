@@ -93,16 +93,12 @@ jobs:
         run: export LATEST_TAG=$(git describe --tags --abbrev=0)
       - name: Echo git tag
         run: echo $LATEST_TAG
-      - name: Tag release
-        run: sbt ciReleaseTagNextVersion
-      - name: Decrypt private-key.pem
-        run: openssl aes-256-cbc -K ${{ env.KEY_663dec309dc8 }} -iv ${{ env.IV_663dec309dc8 }} -in private-key.pem.enc -out private-key.pem -d
-      - name: Import GPG key
-        run: gpg --import --batch private-key.pem
-      - name: Publish `codepropertygraph` release to Sonatype
-        run: sbt ciReleaseSonatype
-      - name: Publish `codepropertygraph` release to ShiftLeft artifactory
-        run: sbt 'set publishTo := Some("releases" at "https://shiftleft.jfrog.io/shiftleft/libs-release-local")' "set credentials += Credentials(\"Artifactory Realm\", \"shiftleft.jfrog.io\", \"${{ secrets.JFROG_USER }}\", \"${{ secrets.JFROG_PASS }}\")" ciRelease
+      - run: sbt test ciReleaseTagNextVersion ciReleaseSonatype
+        env:
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
