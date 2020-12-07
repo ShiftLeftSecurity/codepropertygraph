@@ -76,7 +76,7 @@
 
         {"id" : 38,
          "name": "FILE",
-         "keys": ["NAME", "ORDER"],
+         "keys": ["NAME", "ORDER", "HASH"],
          "comment": "Node representing a source file. Often also the AST root",
          "outEdges": [{"edgeName": "AST", "inNodes": [{"name": "NAMESPACE_BLOCK", "cardinality": "0-1:n"}]}],
          "is" : ["AST_NODE"]
