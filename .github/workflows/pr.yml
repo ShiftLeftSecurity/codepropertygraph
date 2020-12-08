@@ -102,6 +102,9 @@ jobs:
       - name: Export ENV variables
         run:
           echo ::set-env name=LATEST_TAG::$(git describe --tags --abbrev=0)
+      - name: Export ENV vars using newer syntax
+        run:
+          echo "LATEST_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
