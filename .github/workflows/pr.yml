@@ -88,10 +88,6 @@ jobs:
         run: sudo apt-get install -y --allow-downgrades sbt=1.3.12
       - name: Print sbt version
         run: sbt --version
-      - name: Export git tag to ENVVAR
-        run: export LATEST_TAG=$(git describe --tags --abbrev=0)
-      - name: Echo git tag
-        run: echo $LATEST_TAG
       - name: Install gnupg
         run: sudo apt update && sudo apt install -y gnupg
       - name: Import GPG key
@@ -103,6 +99,9 @@ jobs:
         env:
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+      - name: Export ENV variables
+        run:
+          echo ::set-env name=LATEST_TAG::$(git describe --tags --abbrev=0)
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
