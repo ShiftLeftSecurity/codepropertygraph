@@ -55,8 +55,6 @@ ThisBuild/libraryDependencies ++= Seq(
   "org.apache.logging.log4j" %  "log4j-slf4j-impl" % "2.11.2" % Test
 )
 
-Global / useGpg := false
-
 name := "codepropertygraph"
 publish / skip := true
 
