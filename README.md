@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/ShiftLeftSecurity/codepropertygraph.png?branch=master)](http://travis-ci.org/ShiftLeftSecurity/codepropertygraph)
+[![Build Status](https://github.com/ShiftLeftSecurity/codepropertygraph/workflows/CI%20pipeline/badge.svg)](https://github.com/ShiftLeftSecurity/codepropertygraph)
 [![bintray](https://api.bintray.com/packages/shiftleft/maven/codepropertygraph/images/download.svg)](https://bintray.com/shiftleft/maven/codepropertygraph/_latestVersion)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.shiftleft/codepropertygraph_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.shiftleft/codepropertygraph_2.13)
 
