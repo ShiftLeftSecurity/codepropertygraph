@@ -53,7 +53,7 @@ abstract class LayerCreator {
     * when `metaData.overlays` is not present due
     * to conversion from legacy CPG.
     * */
-  def probe(cpg: Cpg): Boolean
+  def probe(cpg: Cpg): Boolean = false
 
 }
 
