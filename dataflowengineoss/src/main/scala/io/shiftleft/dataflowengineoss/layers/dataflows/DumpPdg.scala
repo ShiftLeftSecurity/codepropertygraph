@@ -21,8 +21,9 @@ object DumpPdg {
 class DumpPdg(options: PdgDumpOptions)(implicit semantics: Semantics) extends LayerCreator {
   override val overlayName: String = DumpPdg.overlayName
   override val description: String = DumpPdg.description
+  override val modifiesCpg: Boolean = false
 
-  override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
+  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
     val cpg = context.cpg
     cpg.method.zipWithIndex.foreach {
       case (method, i) =>

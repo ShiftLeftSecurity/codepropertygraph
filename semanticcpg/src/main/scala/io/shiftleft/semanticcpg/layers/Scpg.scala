@@ -35,7 +35,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
   override val overlayName: String = Scpg.overlayName
   override val description: String = Scpg.description
 
-  override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
+  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
     val cpg = context.cpg
     val language = cpg.metaData.language.headOption
       .getOrElse(throw new Exception("Meta node missing."))
@@ -43,9 +43,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
     val enhancementExecList = createEnhancementExecList(cpg, language)
     enhancementExecList.zipWithIndex.foreach {
       case (pass, index) =>
-        val serializedCpg = initSerializedCpg(context.outputDir, pass.name, index)
-        pass.createApplySerializeAndStore(serializedCpg, serializeInverse)
-        serializedCpg.close()
+        runPass(pass, context, storeUndoInfo, index)
     }
   }
 

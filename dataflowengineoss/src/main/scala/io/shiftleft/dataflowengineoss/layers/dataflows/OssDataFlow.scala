@@ -18,14 +18,12 @@ class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
   override val overlayName: String = OssDataFlow.overlayName
   override val description: String = OssDataFlow.description
 
-  override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
+  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
     val cpg = context.cpg
     val enhancementExecList = Iterator(new ReachingDefPass(cpg))
     enhancementExecList.zipWithIndex.foreach {
       case (pass, index) =>
-        val serializedCpg = initSerializedCpg(context.outputDir, pass.name, index)
-        pass.createApplySerializeAndStore(serializedCpg)
-        serializedCpg.close()
+        runPass(pass, context, storeUndoInfo, index)
     }
   }
 

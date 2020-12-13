@@ -568,7 +568,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
 
   protected def runCreator(creator: LayerCreator, overlayDirName: Option[String]): Unit = {
     val context = new LayerCreatorContext(cpg, overlayDirName)
-    creator.run(context, serializeInverse = true)
+    creator.run(context, storeUndoInfo = true)
   }
 
 }
