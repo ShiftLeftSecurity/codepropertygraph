@@ -18,7 +18,7 @@ object Run {
         override val description: String = "A custom pass"
 
         override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
-          val serializedCpg = initSerializedCpg(context.outputDir, "custom", 0)
+          val serializedCpg = initSerializedCpg(context.outputDir, "custom")
           val pass = new CpgPass(console.cpg) {
             override def run(): Iterator[DiffGraph] = {
               implicit val diffGraph: DiffGraph.Builder = DiffGraph.newBuilder

@@ -28,7 +28,7 @@ abstract class LayerCreator {
     }
   }
 
-  protected def initSerializedCpg(outputDir: Option[String], passName: String, index: Int): SerializedCpg = {
+  protected def initSerializedCpg(outputDir: Option[String], passName: String, index: Int = 0): SerializedCpg = {
     outputDir match {
       case Some(dir) => new SerializedCpg((File(dir) / s"${index}_$passName").path.toAbsolutePath.toString)
       case None      => new SerializedCpg()
