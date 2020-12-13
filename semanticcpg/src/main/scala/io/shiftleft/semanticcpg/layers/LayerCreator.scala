@@ -16,6 +16,13 @@ abstract class LayerCreator {
   val description: String
   val dependsOn: List[String] = List()
 
+  /**
+    * If the LayerCreator modifies the CPG, then we store its name
+    * in the CPGs metadata and disallow rerunning the creator,
+    * that is, applying the layer twice.
+    * */
+  protected val modifiesCpg: Boolean = true
+
   def run(context: LayerCreatorContext, storeUndoInfo: Boolean = false): Unit = {
     val appliedOverlays = Overlays.appliedOverlays(context.cpg).toSet
     if (!dependsOn.toSet.subsetOf(appliedOverlays)) {
@@ -25,7 +32,9 @@ abstract class LayerCreator {
       logger.warn(s"The overlay $overlayName already exists - skipping creation")
     } else {
       create(context, storeUndoInfo)
-      Overlays.appendOverlayName(context.cpg, overlayName)
+      if (modifiesCpg) {
+        Overlays.appendOverlayName(context.cpg, overlayName)
+      }
     }
   }
 
@@ -59,3 +68,7 @@ abstract class LayerCreator {
 
 class LayerCreatorContext(val cpg: Cpg, val outputDir: Option[String] = None) {}
 class LayerCreatorOptions()
+
+abstract class SideEffect extends LayerCreator {
+  override val modifiesCpg: Boolean = false
+}
