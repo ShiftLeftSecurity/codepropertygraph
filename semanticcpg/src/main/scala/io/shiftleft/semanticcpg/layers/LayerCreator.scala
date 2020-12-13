@@ -68,7 +68,3 @@ abstract class LayerCreator {
 
 class LayerCreatorContext(val cpg: Cpg, val outputDir: Option[String] = None) {}
 class LayerCreatorOptions()
-
-abstract class SideEffect extends LayerCreator {
-  override val modifiesCpg: Boolean = false
-}
