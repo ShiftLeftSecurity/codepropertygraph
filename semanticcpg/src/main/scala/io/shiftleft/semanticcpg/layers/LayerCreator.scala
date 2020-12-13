@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.layers
 import better.files.File
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.Overlays
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -15,7 +16,7 @@ abstract class LayerCreator {
   val description: String
   val dependsOn: List[String] = List()
 
-  def run(context: LayerCreatorContext, serializeInverse: Boolean = false): Unit = {
+  def run(context: LayerCreatorContext, storeUndoInfo: Boolean = false): Unit = {
     val appliedOverlays = Overlays.appliedOverlays(context.cpg).toSet
     if (!dependsOn.toSet.subsetOf(appliedOverlays)) {
       logger.warn(
@@ -23,7 +24,7 @@ abstract class LayerCreator {
     } else if (appliedOverlays.contains(overlayName)) {
       logger.warn(s"The overlay $overlayName already exists - skipping creation")
     } else {
-      create(context, serializeInverse)
+      create(context, storeUndoInfo)
       Overlays.appendOverlayName(context.cpg, overlayName)
     }
   }
@@ -35,7 +36,16 @@ abstract class LayerCreator {
     }
   }
 
-  def create(context: LayerCreatorContext, serializeInverse: Boolean = false): Unit
+  protected def runPass(pass: CpgPassBase,
+                        context: LayerCreatorContext,
+                        storeUndoInfo: Boolean,
+                        index: Int = 0): Unit = {
+    val serializedCpg = initSerializedCpg(context.outputDir, pass.name, index)
+    pass.createApplySerializeAndStore(serializedCpg, inverse = storeUndoInfo)
+    serializedCpg.close()
+  }
+
+  def create(context: LayerCreatorContext, storeUndoInfo: Boolean = false): Unit
 
   /**
     * Heuristically determine if overlay has been

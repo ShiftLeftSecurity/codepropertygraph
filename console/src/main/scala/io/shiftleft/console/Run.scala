@@ -17,17 +17,16 @@ object Run {
         override val overlayName: String = "custom"
         override val description: String = "A custom pass"
 
-        override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
-          val serializedCpg = initSerializedCpg(context.outputDir, "custom")
-          val pass = new CpgPass(console.cpg) {
+        override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
+          val pass: CpgPass = new CpgPass(console.cpg) {
+            override val name = "custom"
             override def run(): Iterator[DiffGraph] = {
               implicit val diffGraph: DiffGraph.Builder = DiffGraph.newBuilder
               query.store
               Iterator(diffGraph.build())
             }
           }
-          pass.createApplySerializeAndStore(serializedCpg, inverse = true, "custom")
-          serializedCpg.close()
+          runPass(pass, context, storeUndoInfo)
         }
         override def probe(cpg: Cpg): Boolean = false
       }

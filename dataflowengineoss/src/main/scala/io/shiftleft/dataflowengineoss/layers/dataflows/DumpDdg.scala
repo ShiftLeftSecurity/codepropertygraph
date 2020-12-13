@@ -22,7 +22,7 @@ class DumpDdg(options: DdgDumpOptions)(implicit semantics: Semantics) extends La
   override val overlayName: String = DumpDdg.overlayName
   override val description: String = DumpDdg.description
 
-  override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
+  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
     val cpg = context.cpg
     cpg.method.zipWithIndex.foreach {
       case (method, i) =>

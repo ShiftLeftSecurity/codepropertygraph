@@ -17,11 +17,12 @@ class Commit(opts: CommitOptions) extends LayerCreator {
   override val overlayName: String = Commit.overlayName
   override val description: String = Commit.description
 
-  override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
-    val serializedCpg = initSerializedCpg(context.outputDir, "commit")
-    new CpgPass(context.cpg) {
+  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
+    val pass: CpgPass = new CpgPass(context.cpg) {
+      override val name = "commit"
       override def run(): Iterator[DiffGraph] = Iterator(opts.diffGraphBuilder.build())
-    }.createApplySerializeAndStore(serializedCpg, serializeInverse)
+    }
+    runPass(pass, context, storeUndoInfo)
     opts.diffGraphBuilder = DiffGraph.newBuilder
   }
 

@@ -253,7 +253,7 @@ class ConsoleTests extends AnyWordSpec with Matchers {
     override val overlayName: String = "fooname"
     override val description: String = "foodescr"
 
-    override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {}
+    override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {}
     override def probe(cpg: Cpg): Boolean = false
   }
 
