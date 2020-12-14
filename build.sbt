@@ -65,6 +65,7 @@ lazy val protoBindings = Projects.protoBindings
 lazy val semanticcpg = Projects.semanticcpg
 lazy val semanticcpgtests = Projects.semanticcpgtests
 lazy val dataflowengineoss = Projects.dataflowengineoss
+lazy val dataflowengineosstests = Projects.dataflowengineosstests
 lazy val cpgvalidator = Projects.cpgvalidator
 lazy val console = Projects.console
 lazy val queries = Projects.queries
