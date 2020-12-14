@@ -16,9 +16,15 @@ import scala.util.Try
 
 class DataFlowCodeToCpgSuite extends CodeToCpgSuite {
 
-  val semanticsFilename = "dataflowengineoss/src/test/resources/default.semantics"
-  val semantics: Semantics = Semantics.fromList(new Parser().parseFile(semanticsFilename))
-  implicit val context = EngineContext(semantics)
+  var semanticsFilename = "dataflowengineoss/src/test/resources/default.semantics"
+  var semantics: Semantics = _
+  implicit var context: EngineContext = _
+
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    semantics = Semantics.fromList(new Parser().parseFile(semanticsFilename))
+    context = EngineContext(semantics)
+  }
 
   implicit val viewer: ImageViewer = (pathStr: String) =>
     Try {
