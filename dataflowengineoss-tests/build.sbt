@@ -1,6 +1,8 @@
 name := "dataflowengineoss-tests"
 
-dependsOn(Projects.semanticcpg)
+dependsOn(Projects.semanticcpg, Projects.semanticcpgtests % "test -> test",
+  Projects.dataflowengineoss,
+)
 dependsOn(Projects.fuzzyc2cpg % Test)
 
 libraryDependencies ++= Seq(
