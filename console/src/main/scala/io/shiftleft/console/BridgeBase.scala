@@ -9,6 +9,9 @@ import io.shiftleft.console.cpgqlserver.CPGQLServer
 
 case class Config(
     scriptFile: Option[Path] = None,
+    bundleToRun: Option[String] = None,
+    listBundles: Boolean = false,
+    src: Option[String] = None,
     params: Map[String, String] = Map.empty,
     additionalImports: List[Path] = Nil,
     nocolors: Boolean = false,
@@ -38,6 +41,15 @@ trait BridgeBase {
       opt[Path]("script")
         .action((x, c) => c.copy(scriptFile = Some(x)))
         .text("path to script file: will execute and exit")
+
+      opt[String]("run")
+        .action((x, c) => c.copy(bundleToRun = Some(x)))
+
+      opt[Unit]("bundles")
+        .action((_, c) => c.copy(listBundles = true))
+
+      opt[String]("src")
+        .action((x, c) => c.copy(src = Some(x)))
 
       opt[Map[String, String]]('p', "params")
         .valueName("k1=v1,k2=v2")
@@ -85,16 +97,55 @@ trait BridgeBase {
   }
 
   protected def runAmmonite(config: Config, slProduct: SLProduct = OcularProduct): Unit = {
+
+    if (config.listBundles) {
+      listBundles(config)
+      return
+    }
+
     config.scriptFile match {
       case None =>
         if (config.server) {
           startHttpServer(config)
+        } else if (config.bundleToRun.isDefined) {
+          runBundle(config)
         } else {
           startInteractiveShell(config, slProduct)
         }
       case Some(scriptFile) =>
         runScript(scriptFile, config)
     }
+  }
+
+  private def listBundles(config: Config): Unit = {
+    val code =
+      """
+        |println(run)
+        |
+        |""".stripMargin
+    withTemporaryScript(code) { file =>
+      runScript(os.Path(file.path.toString), config)
+    }
+  }
+
+  private def withTemporaryScript(code: String)(f: File => Unit): Unit = {
+    File.usingTemporaryDirectory("joern-runbundle") { dir =>
+      val file = (dir / "script.sc")
+      file.write(code)
+      f(file)
+    }
+  }
+
+  private def runBundle(config: Config): Unit = {
+
+    if (config.src.isEmpty) {
+      println("Supply a source directory with the --src flag")
+      return
+    }
+
+//    val bundleName = config.bundleToRun.get
+//    val src = config.src.get
+
   }
 
   private def startInteractiveShell(config: Config, slProduct: SLProduct) = {
