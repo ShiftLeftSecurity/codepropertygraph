@@ -6,7 +6,12 @@ import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 class TrackingPointTests extends DataFlowCodeToCpgSuite {
 
   implicit val resolver: NoResolve.type = NoResolve
-  implicit val s: Semantics = semantics
+  implicit var s: Semantics = _
+
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    s = semantics
+  }
 
   override val code =
     """

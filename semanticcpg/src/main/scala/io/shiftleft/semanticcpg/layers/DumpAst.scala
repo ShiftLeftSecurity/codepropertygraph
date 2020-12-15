@@ -17,8 +17,9 @@ object DumpAst {
 class DumpAst(options: AstDumpOptions) extends LayerCreator {
   override val overlayName: String = DumpAst.overlayName
   override val description: String = DumpAst.description
+  override val modifiesCpg: Boolean = false
 
-  override def create(context: LayerCreatorContext, serializeInverse: Boolean): Unit = {
+  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
     val cpg = context.cpg
     cpg.method.zipWithIndex.foreach {
       case (method, i) =>
