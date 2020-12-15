@@ -12,6 +12,7 @@ case class Config(
     bundleToRun: Option[String] = None,
     listBundles: Boolean = false,
     src: Option[String] = None,
+    overwrite: Boolean = false,
     params: Map[String, String] = Map.empty,
     additionalImports: List[Path] = Nil,
     nocolors: Boolean = false,
@@ -44,12 +45,19 @@ trait BridgeBase {
 
       opt[String]("run")
         .action((x, c) => c.copy(bundleToRun = Some(x)))
+        .text("Run bundle. Get a list via --bundles")
 
       opt[Unit]("bundles")
         .action((_, c) => c.copy(listBundles = true))
+        .text("List available bundles")
 
       opt[String]("src")
         .action((x, c) => c.copy(src = Some(x)))
+        .text("Source code directory to run bundle on")
+
+      opt[Unit]("overwrite")
+        .action((_, c) => c.copy(overwrite = true))
+        .text("Overwrite CPG if it already exists")
 
       opt[Map[String, String]]('p', "params")
         .valueName("k1=v1,k2=v2")
@@ -129,7 +137,7 @@ trait BridgeBase {
   }
 
   private def withTemporaryScript(code: String)(f: File => Unit): Unit = {
-    File.usingTemporaryDirectory("joern-runbundle") { dir =>
+    File.usingTemporaryDirectory("joern-bundle") { dir =>
       val file = (dir / "script.sc")
       file.write(code)
       f(file)
@@ -137,15 +145,28 @@ trait BridgeBase {
   }
 
   private def runBundle(config: Config): Unit = {
-
     if (config.src.isEmpty) {
-      println("Supply a source directory with the --src flag")
+      println("You must supply a source directory with the --src flag")
       return
     }
 
-//    val bundleName = config.bundleToRun.get
-//    val src = config.src.get
+    val bundleName = config.bundleToRun.get
+    val src = config.src.get
+    val code = s"""
+        | if (${config.overwrite} || !workspace.projectExists("../targets/vlc-3.0.8/lib")) {
+        |   importCode("$src")
+        | } else {
+        |    println("Using existing CPG - Use `--overwrite` if this is not what you want")
+        |    workspace.projects
+        |    .filter(x => x.inputPath == better.files.File("$src").path.toAbsolutePath.toString)
+        |    .map(_.name).map(open)
+        | }
+        | run.$bundleName
+        |""".stripMargin
 
+    withTemporaryScript(code) { file =>
+      runScript(os.Path(file.path.toString), config)
+    }
   }
 
   private def startInteractiveShell(config: Config, slProduct: SLProduct) = {
