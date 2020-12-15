@@ -164,8 +164,8 @@ There are 19 node types across five categories:
 | - | - |
 | Program structure | FILE, NAMESPACE_BLOCK |
 | Type declarations | TYPE_DECL, TYPE_PARAMETER, MEMBER, TYPE, TYPE_ARGUMENT |
-| Method header | METHOD, METHOD_PARAMETER_IN, METHOD_RETURN, LOCAL, BLOCK, MODIFIER |
-| Method body | LITERAL, IDENTIFIER, CALL, RETURN, METHOD_REF |
+| Method header | METHOD, METHOD_PARAMETER_IN, METHOD_RETURN, MODIFIER |
+| Method body | LITERAL, IDENTIFIER, CALL, RETURN, METHOD_REF, LOCAL, BLOCK |
 | Meta data | META_DATA |
 
 There are eight edge types:
