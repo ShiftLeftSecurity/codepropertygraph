@@ -14,10 +14,9 @@ import scala.util.Try
 class CpgGeneratorFactory(config: ConsoleConfig) {
 
   /**
-    * For a given input path, try to guess a suitable language
-    * frontend and return it
+    * For a given input path, try to guess a suitable generator and return it
     * */
-  def createFrontendByPath(inputPath: String): Option[CpgGenerator] = {
+  def createGeneratordByPath(inputPath: String): Option[CpgGenerator] = {
     guessLanguage(inputPath)
       .flatMap { l =>
         cpgGeneratorForLanguage(l, config.frontend, config.install.rootPath.path)
@@ -25,9 +24,9 @@ class CpgGeneratorFactory(config: ConsoleConfig) {
   }
 
   /**
-    * For a language, return the language frontend
+    * For a language, return the generator
     * */
-  def createFrontendByLanguage(language: String): Option[CpgGenerator] = {
+  def createGeneratorByLanguage(language: String): Option[CpgGenerator] = {
     Some(language)
       .filter(languageIsKnown)
       .flatMap(
@@ -49,10 +48,10 @@ class CpgGeneratorFactory(config: ConsoleConfig) {
         Languages.LLVM).contains(language)
   }
 
-  def runLanguageFrontend(frontend: CpgGenerator,
-                          inputPath: String,
-                          outputPath: String,
-                          namespaces: List[String] = List()): Option[Path] = {
+  def runGenerator(frontend: CpgGenerator,
+                   inputPath: String,
+                   outputPath: String,
+                   namespaces: List[String] = List()): Option[Path] = {
     val outputFileOpt: Option[File] =
       frontend.generate(inputPath, outputPath, namespaces).map(File(_))
     outputFileOpt.map { outFile =>

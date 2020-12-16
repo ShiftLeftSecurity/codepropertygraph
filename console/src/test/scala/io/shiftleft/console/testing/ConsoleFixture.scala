@@ -46,13 +46,13 @@ class TestConsole(workspaceDir: String) extends Console[Project](DefaultAmmonite
 }
 
 class TestCpgGeneratorFactory(config: ConsoleConfig) extends CpgGeneratorFactory(config) {
-  override def createFrontendByPath(
+  override def createGeneratordByPath(
       inputPath: String,
   ): Option[CpgGenerator] = {
     Some(new FuzzyCTestingFrontend)
   }
 
-  override def createFrontendByLanguage(language: String): Option[CpgGenerator] = {
+  override def createGeneratorByLanguage(language: String): Option[CpgGenerator] = {
     Some(new FuzzyCTestingFrontend)
   }
 

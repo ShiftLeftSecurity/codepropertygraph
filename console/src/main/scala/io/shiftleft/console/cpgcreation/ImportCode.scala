@@ -85,7 +85,7 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
     val result = frontendCpgOutFileOpt.flatMap { frontendCpgOutFile =>
       Some(frontend).flatMap { frontend =>
         generatorFactory
-          .runLanguageFrontend(
+          .runGenerator(
             frontend,
             inputPath,
             frontendCpgOutFile.toString,
@@ -116,9 +116,9 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
       language: String = ""
   ): Option[Cpg] = {
 
-    var frontendOpt = generatorFactory.createFrontendByLanguage(language)
+    var frontendOpt = generatorFactory.createGeneratorByLanguage(language)
     if (frontendOpt.isEmpty) {
-      frontendOpt = generatorFactory.createFrontendByPath(inputPath)
+      frontendOpt = generatorFactory.createGeneratordByPath(inputPath)
     }
     frontendOpt.flatMap { frontend =>
       apply(frontend, inputPath, projectName, namespaces)
