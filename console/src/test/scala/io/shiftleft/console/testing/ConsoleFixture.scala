@@ -4,7 +4,7 @@ import java.nio.file.Path
 
 import better.files.Dsl.mkdir
 import better.files.File
-import io.shiftleft.console.cpgcreation.{CpgGenerator, LanguageFrontend}
+import io.shiftleft.console.cpgcreation.{CpgGeneratorFactory, ImportCode, CpgGenerator}
 import io.shiftleft.console.{Console, ConsoleConfig, DefaultAmmoniteExecutor, InstallConfig}
 import io.shiftleft.console.workspacehandling.{Project, ProjectFile, WorkspaceLoader}
 import io.shiftleft.fuzzyc2cpg.FuzzyC2Cpg
@@ -37,22 +37,26 @@ class TestConsole(workspaceDir: String) extends Console[Project](DefaultAmmonite
     install = new InstallConfig(Map("SHIFTLEFT_OCULAR_INSTALL_DIR" -> workspaceDir))
   )
 
-  override val cpgGenerator = new TestCpgGenerator(config)
+  class MyImportCode[T <: Project](console: Console[T]) extends ImportCode(console) {
+    override val cpgGenerator = new TestCpgGeneratorFactory(config)
+  }
+
+  override def importCode = new MyImportCode(this)
 
 }
 
-class TestCpgGenerator(config: ConsoleConfig) extends CpgGenerator(config) {
+class TestCpgGeneratorFactory(config: ConsoleConfig) extends CpgGeneratorFactory(config) {
   override def createFrontendByPath(
       inputPath: String,
-  ): Option[LanguageFrontend] = {
+  ): Option[CpgGenerator] = {
     Some(new FuzzyCTestingFrontend)
   }
 
-  override def createFrontendByLanguage(language: String): Option[LanguageFrontend] = {
+  override def createFrontendByLanguage(language: String): Option[CpgGenerator] = {
     Some(new FuzzyCTestingFrontend)
   }
 
-  private class FuzzyCTestingFrontend extends LanguageFrontend {
+  private class FuzzyCTestingFrontend extends CpgGenerator {
 
     override def generate(inputPath: String, outputPath: String, namespaces: List[String]): Option[String] = {
       val fuzzyc = new FuzzyC2Cpg()

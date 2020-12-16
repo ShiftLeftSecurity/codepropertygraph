@@ -7,7 +7,7 @@ import io.shiftleft.console.JavaFrontendConfig
 /**
   * Language frontend for Java archives (JAR files). Translates Java archives into code property graphs.
   * */
-case class JavaLanguageFrontend(config: JavaFrontendConfig, rootPath: Path) extends LanguageFrontend {
+case class JavaCpgGenerator(config: JavaFrontendConfig, rootPath: Path) extends CpgGenerator {
 
   /**
     * Generate a CPG for the given input path.
@@ -36,8 +36,8 @@ case class JavaLanguageFrontend(config: JavaFrontendConfig, rootPath: Path) exte
   }
 
   private def jvmLanguages: List[String] = {
-    if (JavaLanguageFrontend.experimentalLanguages.nonEmpty) {
-      List("--experimental-langs", JavaLanguageFrontend.experimentalLanguages.mkString(","))
+    if (JavaCpgGenerator.experimentalLanguages.nonEmpty) {
+      List("--experimental-langs", JavaCpgGenerator.experimentalLanguages.mkString(","))
     } else Nil
   }
 
@@ -54,6 +54,6 @@ case class JavaLanguageFrontend(config: JavaFrontendConfig, rootPath: Path) exte
   override def isAvailable: Boolean = rootPath.resolve("java2cpg.sh").toFile.exists()
 }
 
-object JavaLanguageFrontend {
+object JavaCpgGenerator {
   private final val experimentalLanguages: List[String] = List("scala")
 }

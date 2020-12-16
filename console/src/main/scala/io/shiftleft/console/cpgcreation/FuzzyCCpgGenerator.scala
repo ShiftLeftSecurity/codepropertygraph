@@ -8,7 +8,7 @@ import io.shiftleft.console.FuzzyCFrontendConfig
   * Fuzzy C/C++ language frontend. Translates C/C++ source files
   * into code property graphs via fuzzy parsing.
   * */
-case class FuzzyCLanguageFrontend(config: FuzzyCFrontendConfig, rootPath: Path) extends LanguageFrontend {
+case class FuzzyCCpgGenerator(config: FuzzyCFrontendConfig, rootPath: Path) extends CpgGenerator {
 
   /**
     * Generate a CPG for the given input path.

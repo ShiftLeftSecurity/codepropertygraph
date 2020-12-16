@@ -4,7 +4,7 @@ import java.nio.file.Path
 
 import io.shiftleft.console.PythonFrontendConfig
 
-case class PythonLanguageFrontend(config: PythonFrontendConfig, rootPath: Path) extends LanguageFrontend {
+case class PythonCpgGenerator(config: PythonFrontendConfig, rootPath: Path) extends CpgGenerator {
 
   /**
     * Generate a CPG for the given input path.
