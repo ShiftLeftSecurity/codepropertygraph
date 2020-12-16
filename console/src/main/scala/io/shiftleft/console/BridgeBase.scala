@@ -12,6 +12,7 @@ case class Config(
     bundleToRun: Option[String] = None,
     listBundles: Boolean = false,
     src: Option[String] = None,
+    language: Option[String] = None,
     overwrite: Boolean = false,
     params: Map[String, String] = Map.empty,
     additionalImports: List[Path] = Nil,
@@ -37,27 +38,11 @@ trait BridgeBase {
     val parser = new scopt.OptionParser[Config]("(joern|ocular)") {
       override def errorOnUnknownArgument = false
 
-      head("cpg scripting")
+      note("Script execution")
 
       opt[Path]("script")
         .action((x, c) => c.copy(scriptFile = Some(x)))
         .text("path to script file: will execute and exit")
-
-      opt[String]("run")
-        .action((x, c) => c.copy(bundleToRun = Some(x)))
-        .text("Run bundle. Get a list via --bundles")
-
-      opt[Unit]("bundles")
-        .action((_, c) => c.copy(listBundles = true))
-        .text("List available bundles")
-
-      opt[String]("src")
-        .action((x, c) => c.copy(src = Some(x)))
-        .text("Source code directory to run bundle on")
-
-      opt[Unit]("overwrite")
-        .action((_, c) => c.copy(overwrite = true))
-        .text("Overwrite CPG if it already exists")
 
       opt[Map[String, String]]('p', "params")
         .valueName("k1=v1,k2=v2")
@@ -69,9 +54,35 @@ trait BridgeBase {
         .action((x, c) => c.copy(additionalImports = x.toList))
         .text("import additional additional script(s): will execute and keep console open")
 
-      opt[Unit]("nocolors")
-        .action((_, c) => c.copy(nocolors = true))
-        .text("turn off colors")
+      opt[String]("command")
+        .action((x, c) => c.copy(command = Some(x)))
+        .text("select one of multiple @main methods")
+
+      note("Bundle execution")
+
+      // Options for bundle execution
+
+      opt[Unit]("bundles")
+        .action((_, c) => c.copy(listBundles = true))
+        .text("List available bundles")
+
+      opt[String]("run")
+        .action((x, c) => c.copy(bundleToRun = Some(x)))
+        .text("Run bundle. Get a list via --bundles")
+
+      opt[String]("src")
+        .action((x, c) => c.copy(src = Some(x)))
+        .text("Source code directory to run bundle on")
+
+      opt[String]("language")
+        .action((x, c) => c.copy(language = Some(x)))
+        .text("Language to use in CPG creation")
+
+      opt[Unit]("overwrite")
+        .action((_, c) => c.copy(overwrite = true))
+        .text("Overwrite CPG if it already exists")
+
+      note("REST server mode")
 
       opt[Unit]("server")
         .action((_, c) => c.copy(server = true))
@@ -93,11 +104,14 @@ trait BridgeBase {
         .action((x, c) => c.copy(serverAuthPassword = x))
         .text("Basic auth password for the CPGQL server")
 
-      opt[String]("command")
-        .action((x, c) => c.copy(command = Some(x)))
-        .text("select one of multiple @main methods")
+      note("Misc")
+
+      opt[Unit]("nocolors")
+        .action((_, c) => c.copy(nocolors = true))
+        .text("turn off colors")
 
       help("help")
+        .text("Print this help text")
     }
 
     // note: if config is really `None` an error message would have been displayed earlier
@@ -105,23 +119,21 @@ trait BridgeBase {
   }
 
   protected def runAmmonite(config: Config, slProduct: SLProduct = OcularProduct): Unit = {
-
     if (config.listBundles) {
       listBundles(config)
-      return
-    }
-
-    config.scriptFile match {
-      case None =>
-        if (config.server) {
-          startHttpServer(config)
-        } else if (config.bundleToRun.isDefined) {
-          runBundle(config)
-        } else {
-          startInteractiveShell(config, slProduct)
-        }
-      case Some(scriptFile) =>
-        runScript(scriptFile, config)
+    } else {
+      config.scriptFile match {
+        case None =>
+          if (config.server) {
+            startHttpServer(config)
+          } else if (config.bundleToRun.isDefined) {
+            runBundle(config)
+          } else {
+            startInteractiveShell(config, slProduct)
+          }
+        case Some(scriptFile) =>
+          runScript(scriptFile, config)
+      }
     }
   }
 
@@ -152,9 +164,10 @@ trait BridgeBase {
 
     val bundleName = config.bundleToRun.get
     val src = config.src.get
+    val language = config.language.getOrElse("c")
     val code = s"""
         | if (${config.overwrite} || !workspace.projectExists("../targets/vlc-3.0.8/lib")) {
-        |   importCode("$src")
+        |   importCode.$language("$src")
         | } else {
         |    println("Using existing CPG - Use `--overwrite` if this is not what you want")
         |    workspace.projects
