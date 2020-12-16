@@ -104,11 +104,14 @@ trait BridgeBase {
         .action((x, c) => c.copy(serverAuthPassword = x))
         .text("Basic auth password for the CPGQL server")
 
+      note("Misc")
+
       opt[Unit]("nocolors")
         .action((_, c) => c.copy(nocolors = true))
         .text("turn off colors")
 
       help("help")
+        .text("Print this help text")
     }
 
     // note: if config is really `None` an error message would have been displayed earlier
