@@ -164,8 +164,8 @@ There are 19 node types across five categories:
 | - | - |
 | Program structure | FILE, NAMESPACE_BLOCK |
 | Type declarations | TYPE_DECL, TYPE_PARAMETER, MEMBER, TYPE, TYPE_ARGUMENT |
-| Method header | METHOD, METHOD_PARAMETER_IN, METHOD_RETURN, LOCAL, BLOCK, MODIFIER |
-| Method body | LITERAL, IDENTIFIER, CALL, RETURN, METHOD_REF |
+| Method header | METHOD, METHOD_PARAMETER_IN, METHOD_RETURN, MODIFIER |
+| Method body | LITERAL, IDENTIFIER, CALL, RETURN, METHOD_REF, LOCAL, BLOCK |
 | Meta data | META_DATA |
 
 There are eight edge types:
@@ -241,7 +241,7 @@ Node types: LITERAL, IDENTIFIER, CALL, RETURN, METHOD_REF
 
 Method bodies contain the method implementation, given by the operations the method carries out. Method bodies are represented as Control Flow graphs over method invocations, a representation used to provide a common ground for the instruction, statement, and expression concepts used across machine-level and high-level programming languages. The core elements of the method body representation are thus method invocations ("calls") and control flow edges.
 
-In the CPG, a method invocation is represented by a designated call node (type CALL). Arguments are either identifier (type IDENTIFIER), literals (type LITERAL), other calls (type CALL) or method references (type METHOD_REF). Each argument has an argument index property (type ARGUMENT_INDEX) to indicate with which parameter it is associated. Calls are connected to their arguments through outgoing AST edges, and are associated to the called method via their METHOD_FULL_NAME property.
+In the CPG, a method invocation is represented by a designated call node (type CALL). Arguments are either identifier (type IDENTIFIER), literals (type LITERAL), other calls (type CALL) or method references (type METHOD_REF). Each argument has an argument index property (type ARGUMENT_INDEX) to indicate which parameter it is associated with. Calls are connected to their arguments through outgoing AST edges, and are associated to the called method via their METHOD_FULL_NAME property.
 
 ![Call Site](img/call-site.jpg)
 
