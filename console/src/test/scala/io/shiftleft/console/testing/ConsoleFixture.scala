@@ -38,7 +38,7 @@ class TestConsole(workspaceDir: String) extends Console[Project](DefaultAmmonite
   )
 
   class MyImportCode[T <: Project](console: Console[T]) extends ImportCode(console) {
-    override val cpgGenerator = new TestCpgGeneratorFactory(config)
+    override val generatorFactory = new TestCpgGeneratorFactory(config)
   }
 
   override def importCode = new MyImportCode(this)

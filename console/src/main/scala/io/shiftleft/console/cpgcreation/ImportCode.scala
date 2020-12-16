@@ -12,9 +12,17 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
 
   import io.shiftleft.console.Console._
 
+  def c: CFrontend = new CFrontend()
+  def llvm: Frontend = new Frontend(Languages.LLVM, "LLVM Bitcode Frontend")
+  def java: Frontend = new Frontend(Languages.JAVA, "Java/Dalvik Bytecode Frontend")
+  def golang: Frontend = new Frontend(Languages.GOLANG, "Golang Source Frontend")
+  def javascript: Frontend = new Frontend(Languages.JAVASCRIPT, "Javascript Source Frontend")
+  def csharp: Frontend = new Frontend(Languages.CSHARP, "C# Source Frontend (Roslyn)")
+  def python: Frontend = new Frontend(Languages.PYTHON, "Python Source Frontend")
+
   private val config = console.config
   private val workspace = console.workspace
-  protected val cpgGenerator = new CpgGeneratorFactory(config)
+  protected val generatorFactory = new CpgGeneratorFactory(config)
 
   private def allFrontends: List[Frontend] = List(
     c,
@@ -60,14 +68,6 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
     }
   }
 
-  def c: CFrontend = new CFrontend()
-  def llvm: Frontend = new Frontend(Languages.LLVM, "LLVM Bitcode Frontend")
-  def java: Frontend = new Frontend(Languages.JAVA, "Java/Dalvik Bytecode Frontend")
-  def golang: Frontend = new Frontend(Languages.GOLANG, "Golang Source Frontend")
-  def javascript: Frontend = new Frontend(Languages.JAVASCRIPT, "Javascript Source Frontend")
-  def csharp: Frontend = new Frontend(Languages.CSHARP, "C# Source Frontend (Roslyn)")
-  def python: Frontend = new Frontend(Languages.PYTHON, "Python Source Frontend")
-
   private def apply(frontend: CpgGenerator,
                     inputPath: String,
                     projectName: String,
@@ -84,7 +84,7 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
 
     val result = frontendCpgOutFileOpt.flatMap { frontendCpgOutFile =>
       Some(frontend).flatMap { frontend =>
-        cpgGenerator
+        generatorFactory
           .runLanguageFrontend(
             frontend,
             inputPath,
@@ -106,6 +106,9 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
     result
   }
 
+  /**
+    * This is the `importCode(...)` method exposed on the console.
+    * */
   def apply(
       inputPath: String,
       projectName: String = "",
@@ -113,9 +116,9 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
       language: String = ""
   ): Option[Cpg] = {
 
-    var frontendOpt = cpgGenerator.createFrontendByLanguage(language)
+    var frontendOpt = generatorFactory.createFrontendByLanguage(language)
     if (frontendOpt.isEmpty) {
-      frontendOpt = cpgGenerator.createFrontendByPath(inputPath)
+      frontendOpt = generatorFactory.createFrontendByPath(inputPath)
     }
     frontendOpt.flatMap { frontend =>
       apply(frontend, inputPath, projectName, namespaces)
