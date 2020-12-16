@@ -17,6 +17,18 @@ case class JavaCpgGenerator(config: JavaFrontendConfig, rootPath: Path) extends 
   override def generate(inputPath: String,
                         outputPath: String = "cpg.bin.zip",
                         namespaces: List[String] = List()): Option[String] = {
+
+    if (commercialAvailable) {
+      generateCommercial(inputPath, outputPath, namespaces)
+    } else if (ossAvailable) {
+      generateOss(inputPath, outputPath, namespaces)
+    } else {
+      println("No Java language frontend present")
+      None
+    }
+  }
+
+  private def generateCommercial(inputPath: String, outputPath: String, namespaces: List[String]): Option[String] = {
     if (inputPath.endsWith(".apk")) {
       println("found .apk ending - will first transform it to a jar using dex2jar.sh")
       val dex2jar = rootPath.resolve("dex2jar.sh").toString
@@ -35,6 +47,13 @@ case class JavaCpgGenerator(config: JavaFrontendConfig, rootPath: Path) extends 
     }
   }
 
+  private def generateOss(inputPath: String, outputPath: String, namespaces: List[String]): Option[String] = {
+    println(inputPath)
+    println(outputPath)
+    println(namespaces)
+    None
+  }
+
   private def jvmLanguages: List[String] = {
     if (JavaCpgGenerator.experimentalLanguages.nonEmpty) {
       List("--experimental-langs", JavaCpgGenerator.experimentalLanguages.mkString(","))
@@ -51,7 +70,13 @@ case class JavaCpgGenerator(config: JavaFrontendConfig, rootPath: Path) extends 
     }
   }
 
-  override def isAvailable: Boolean = rootPath.resolve("java2cpg.sh").toFile.exists()
+  override def isAvailable: Boolean = {
+    commercialAvailable || ossAvailable
+  }
+
+  private def commercialAvailable: Boolean = rootPath.resolve("java2cpg.sh").toFile.exists()
+  private def ossAvailable: Boolean = rootPath.resolve("joern-parse").toFile.exists()
+
 }
 
 object JavaCpgGenerator {
