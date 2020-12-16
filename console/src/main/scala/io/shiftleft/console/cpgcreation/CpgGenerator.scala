@@ -6,7 +6,7 @@ import scala.sys.process._
 
 /**
   * A Cpg Generator code into code property graphs. Each
-  * supported language implements a LanguageFrontend, e.g., [[JavaCpgGenerator]]
+  * supported language implements a Generator, e.g., [[JavaCpgGenerator]]
   * implements Java Archive to CPG conversion, while [[CSharpCpgGenerator]]
   * translates C# projects into code property graphs.
   * */

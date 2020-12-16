@@ -5,12 +5,46 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.console.workspacehandling.Project
 import overflowdb.traversal.help.Table
-
 import scala.util.Try
 
 class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
-
   import io.shiftleft.console.Console._
+
+  private val config = console.config
+  private val workspace = console.workspace
+  protected val generatorFactory = new CpgGeneratorFactory(config)
+
+  /**
+    * This is the `importCode(...)` method exposed on the console. It attempts
+    * to find a suitable CPG generator first by looking at the `language`
+    * parameter and if no generator is found for the language, looking the
+    * contents at `inputPath` to determine heuristically which generator to use.
+    * */
+  def apply(inputPath: String,
+            projectName: String = "",
+            namespaces: List[String] = List(),
+            language: String = ""): Option[Cpg] = {
+
+    if (language != "") {
+      val generator = generatorFactory.forLanguage(language)
+      if (generator.isEmpty) {
+        report("No CPG generator exists for language: " + language)
+        return None
+      }
+      generator.flatMap { frontend =>
+        apply(frontend, inputPath, projectName, namespaces)
+      }
+    } else {
+      val generator = generatorFactory.forCodeAt(inputPath)
+      if (generator.isEmpty) {
+        report("No suitable CPG generator found for: " + inputPath)
+        return None
+      }
+      generator.flatMap { frontend =>
+        apply(frontend, inputPath, projectName, namespaces)
+      }
+    }
+  }
 
   def c: CFrontend = new CFrontend()
   def llvm: Frontend = new Frontend(Languages.LLVM, "LLVM Bitcode Frontend")
@@ -20,31 +54,7 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
   def csharp: Frontend = new Frontend(Languages.CSHARP, "C# Source Frontend (Roslyn)")
   def python: Frontend = new Frontend(Languages.PYTHON, "Python Source Frontend")
 
-  private val config = console.config
-  private val workspace = console.workspace
-  protected val generatorFactory = new CpgGeneratorFactory(config)
-
-  private def allFrontends: List[Frontend] = List(
-    c,
-    csharp,
-    golang,
-    java,
-    javascript,
-    llvm,
-    python
-  )
-
-  override def toString: String = {
-    val cols = List("name", "description", "available")
-    val rows = allFrontends.map { frontend =>
-      List(frontend.language.toLowerCase, frontend.description, frontend.isAvailable.toString)
-    }
-    "Type `importCode.<language>` to run a specific language frontend\n" +
-      "\n" + Table(cols, rows).render
-  }
-
   class Frontend(val language: String, val description: String = "") {
-
     def isAvailable: Boolean = {
       cpgGeneratorForLanguage(language, config.frontend, config.install.rootPath.path).get.isAvailable
     }
@@ -58,14 +68,42 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
 
   class CFrontend extends Frontend(Languages.C, "Fuzzy Parser for C/C++") {
     def fromString(str: String): Option[Cpg] = {
-      val dir = File.newTemporaryDirectory("console")
-      val result = Try {
-        (dir / "tmp.c").write(str)
+      withCodeInTmpFile(str, "tmp.c") { dir =>
         apply(dir.path.toString)
-      }.toOption.flatten
-      dir.delete()
-      result
+      }
     }
+  }
+
+  private def withCodeInTmpFile(str: String, filename: String)(f: File => Option[Cpg]): Option[Cpg] = {
+    val dir = File.newTemporaryDirectory("console")
+    val result = Try {
+      (dir / filename).write(str)
+      f(dir)
+    }.toOption.flatten
+    dir.delete()
+    result
+  }
+
+  private def allFrontends: List[Frontend] = List(
+    c,
+    csharp,
+    golang,
+    java,
+    javascript,
+    llvm,
+    python
+  )
+
+  /**
+    * Provide an overview of the available CPG generators (frontends)
+    * */
+  override def toString: String = {
+    val cols = List("name", "description", "available")
+    val rows = allFrontends.map { frontend =>
+      List(frontend.language.toLowerCase, frontend.description, frontend.isAvailable.toString)
+    }
+    "Type `importCode.<language>` to run a specific language frontend\n" +
+      "\n" + Table(cols, rows).render
   }
 
   private def apply(frontend: CpgGenerator,
@@ -106,22 +144,4 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
     result
   }
 
-  /**
-    * This is the `importCode(...)` method exposed on the console.
-    * */
-  def apply(
-      inputPath: String,
-      projectName: String = "",
-      namespaces: List[String] = List(),
-      language: String = ""
-  ): Option[Cpg] = {
-
-    var frontendOpt = generatorFactory.createGeneratorByLanguage(language)
-    if (frontendOpt.isEmpty) {
-      frontendOpt = generatorFactory.createGeneratordByPath(inputPath)
-    }
-    frontendOpt.flatMap { frontend =>
-      apply(frontend, inputPath, projectName, namespaces)
-    }
-  }
 }

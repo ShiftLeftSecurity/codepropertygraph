@@ -16,9 +16,10 @@ class CpgGeneratorFactory(config: ConsoleConfig) {
   /**
     * For a given input path, try to guess a suitable generator and return it
     * */
-  def createGeneratordByPath(inputPath: String): Option[CpgGenerator] = {
+  def forCodeAt(inputPath: String): Option[CpgGenerator] = {
     guessLanguage(inputPath)
       .flatMap { l =>
+        report("Using generator for language: " + l)
         cpgGeneratorForLanguage(l, config.frontend, config.install.rootPath.path)
       }
   }
@@ -26,7 +27,7 @@ class CpgGeneratorFactory(config: ConsoleConfig) {
   /**
     * For a language, return the generator
     * */
-  def createGeneratorByLanguage(language: String): Option[CpgGenerator] = {
+  def forLanguage(language: String): Option[CpgGenerator] = {
     Some(language)
       .filter(languageIsKnown)
       .flatMap(
