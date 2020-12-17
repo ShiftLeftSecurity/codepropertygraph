@@ -1,12 +1,12 @@
 package io.shiftleft.fuzzyc2cpg.querying
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
+import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
 /**
   * Language primitives for navigating local variables
   * */
-class LocalsTests extends CodeToCpgSuite {
+class LocalsTests extends FuzzyCCodeToCpgSuite {
 
   override val code = """| #include <stdlib.h>
                     | struct node {

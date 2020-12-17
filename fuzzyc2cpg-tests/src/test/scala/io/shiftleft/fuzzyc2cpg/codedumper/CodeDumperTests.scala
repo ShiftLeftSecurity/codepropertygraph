@@ -2,11 +2,11 @@ package io.shiftleft.fuzzyc2cpg.codedumper
 
 import java.util.regex.Pattern
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
+import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.codedumper.CodeDumper
 import io.shiftleft.semanticcpg.language._
 
-class CodeDumperTests extends CodeToCpgSuite {
+class CodeDumperTests extends FuzzyCCodeToCpgSuite {
 
   override val code = """
                 | // A comment

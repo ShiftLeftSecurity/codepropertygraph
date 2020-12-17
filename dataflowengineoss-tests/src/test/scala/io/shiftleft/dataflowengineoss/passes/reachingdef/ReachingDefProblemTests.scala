@@ -2,8 +2,8 @@ package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import io.shiftleft.codepropertygraph.generated.{Operators, nodes}
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
+import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
 
 class ReachingDefProblemTests1 extends ReachingDefProblemSuite {
   override val code =
@@ -74,7 +74,7 @@ class ReachingDefProblemTests2 extends ReachingDefProblemSuite {
 
 }
 
-class ReachingDefProblemSuite extends CodeToCpgSuite {
+class ReachingDefProblemSuite extends FuzzyCCodeToCpgSuite {
 
   val semantics: Semantics = Semantics.empty
 

@@ -1,7 +1,7 @@
 name := "fuzzyc2cpg-tests"
 
 dependsOn(Projects.semanticcpg,
-          Projects.semanticcpgtests % Test,
+          Projects.semanticcpgtests % "compile->compile; test->test",
           Projects.fuzzyc2cpg % Test)
 
 libraryDependencies ++= Seq(
