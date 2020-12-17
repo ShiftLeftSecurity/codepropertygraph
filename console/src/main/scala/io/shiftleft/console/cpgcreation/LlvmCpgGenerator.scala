@@ -7,7 +7,7 @@ import io.shiftleft.console.LlvmFrontendConfig
 /**
   * Language frontend for LLVM.  Translates LLVM bitcode into Code Property Graphs.
   */
-case class LlvmLanguageFrontend(config: LlvmFrontendConfig, rootPath: Path) extends LanguageFrontend {
+case class LlvmCpgGenerator(config: LlvmFrontendConfig, rootPath: Path) extends CpgGenerator {
 
   /**
     * Generate a CPG for the given input path.

@@ -9,20 +9,20 @@ import io.shiftleft.console.cpgqlserver.CPGQLServer
 
 case class Config(
     scriptFile: Option[Path] = None,
+    command: Option[String] = None,
+    params: Map[String, String] = Map.empty,
+    additionalImports: List[Path] = Nil,
     bundleToRun: Option[String] = None,
     listBundles: Boolean = false,
     src: Option[String] = None,
     language: Option[String] = None,
     overwrite: Boolean = false,
-    params: Map[String, String] = Map.empty,
-    additionalImports: List[Path] = Nil,
-    nocolors: Boolean = false,
     server: Boolean = false,
     serverHost: String = "localhost",
     serverPort: Int = 8080,
     serverAuthUsername: String = "",
     serverAuthPassword: String = "",
-    command: Option[String] = None
+    nocolors: Boolean = false
 )
 
 /**
@@ -59,8 +59,6 @@ trait BridgeBase {
         .text("select one of multiple @main methods")
 
       note("Bundle execution")
-
-      // Options for bundle execution
 
       opt[Unit]("bundles")
         .action((_, c) => c.copy(listBundles = true))

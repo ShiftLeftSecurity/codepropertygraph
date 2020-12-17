@@ -4,7 +4,7 @@ import java.nio.file.Path
 
 import io.shiftleft.console.JsFrontendConfig
 
-case class JsLanguageFrontend(config: JsFrontendConfig, rootPath: Path) extends LanguageFrontend {
+case class JsCpgGenerator(config: JsFrontendConfig, rootPath: Path) extends CpgGenerator {
 
   /**
     * Generate a CPG for the given input path.

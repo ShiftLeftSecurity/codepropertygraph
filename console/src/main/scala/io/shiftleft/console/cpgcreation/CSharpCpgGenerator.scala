@@ -7,7 +7,7 @@ import io.shiftleft.console.CSharpFrontendConfig
 /**
   * C# language frontend. Translates C# project files into code property graphs.
   * */
-case class CSharpLanguageFrontend(config: CSharpFrontendConfig, rootPath: Path) extends LanguageFrontend {
+case class CSharpCpgGenerator(config: CSharpFrontendConfig, rootPath: Path) extends CpgGenerator {
 
   private val dotnetFrameworkOpt = "--dotnet-framework"
   private val dotnetCoreOpt = "--dotnet-core"

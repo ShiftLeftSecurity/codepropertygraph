@@ -1,84 +1,43 @@
 package io.shiftleft.console.cpgcreation
 
-import java.nio.file.Path
-
-import better.files.Dsl._
 import better.files.File
-import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
-import io.shiftleft.console.ConsoleConfig
-import overflowdb.Config
-import io.shiftleft.console.LanguageHelper.{cpgGeneratorForLanguage, languageIsKnown}
 
-import scala.util.Try
+import scala.sys.process._
 
-class CpgGenerator(config: ConsoleConfig) {
+/**
+  * A CpgGenerator generates Code Property Graphs from code. Each
+  * supported language implements a Generator, e.g., [[JavaCpgGenerator]]
+  * implements Java Archive to CPG conversion, while [[CSharpCpgGenerator]]
+  * translates C# projects into code property graphs.
+  * */
+abstract class CpgGenerator() {
 
-  /**
-    * For a given input path, try to guess a suitable language
-    * frontend and return it
-    * */
-  def createFrontendByPath(inputPath: String): Option[LanguageFrontend] = {
-    LanguageGuesser
-      .guessLanguage(inputPath)
-      .flatMap { l =>
-        cpgGeneratorForLanguage(l, config.frontend, config.install.rootPath.path)
-      }
-  }
+  def isAvailable: Boolean
 
   /**
-    * For a language, return the language frontend
+    * Generate a CPG for the given input path.
+    * Returns the output path, or None, if no
+    * CPG was generated.
+    *
+    * This method appends command line options
+    * in config.frontend.cmdLineParams to the
+    * shell command.
     * */
-  def createFrontendByLanguage(language: String): Option[LanguageFrontend] = {
-    Some(language)
-      .filter(languageIsKnown)
-      .flatMap(
-        lang =>
-          cpgGeneratorForLanguage(
-            lang,
-            config.frontend,
-            config.install.rootPath.path
-        ))
-  }
+  def generate(inputPath: String, outputPath: String = "cpg.bin.zip", namespaces: List[String] = List()): Option[String]
 
-  def runLanguageFrontend(frontend: LanguageFrontend,
-                          inputPath: String,
-                          outputPath: String,
-                          namespaces: List[String] = List()): Option[Path] = {
-    val outputFileOpt: Option[File] =
-      frontend.generate(inputPath, outputPath, namespaces).map(File(_))
-    outputFileOpt.map { outFile =>
-      val parentPath = outFile.parent.path.toAbsolutePath
-      if (isZipFile(outFile)) {
-        report("Creating database from bin.zip")
-        val srcFilename = outFile.path.toAbsolutePath.toString
-        val dstFilename = parentPath.resolve("cpg.bin").toAbsolutePath.toString
-        // MemoryHelper.hintForInsufficientMemory(srcFilename).map(report)
-        convertProtoCpgToOverflowDb(srcFilename, dstFilename)
-      } else {
-        report("moving cpg.bin.zip to cpg.bin because it is already a database file")
-        val srcPath = parentPath.resolve("cpg.bin.zip")
-        if (srcPath.toFile.exists()) {
-          mv(srcPath, parentPath.resolve("cpg.bin"))
-        }
-      }
-      parentPath
+  protected def runShellCommand(program: String, arguments: Seq[String]): Option[String] = {
+    if (!File(program).exists) {
+      System.err.println("Support for this language is only available in ShiftLeft Ocular with an appropriate license")
+      return None
+    }
+    val cmd = Seq[String](program) ++ arguments
+    val exitValue = cmd.run.exitValue()
+    if (exitValue == 0) {
+      Some(cmd.toString)
+    } else {
+      System.err.println(s"Error running shell command: $cmd")
+      None
     }
   }
-
-  def convertProtoCpgToOverflowDb(srcFilename: String, dstFilename: String): Unit = {
-    val odbConfig = Config.withDefaults.withStorageLocation(dstFilename)
-    val config = CpgLoaderConfig.withDefaults.doNotCreateIndexesOnLoad.withOverflowConfig(odbConfig)
-    CpgLoader.load(srcFilename, config).close
-    File(srcFilename).delete()
-  }
-
-  def isZipFile(file: File): Boolean = {
-    val bytes = file.bytes
-    Try {
-      bytes.next() == 'P' && bytes.next() == 'K'
-    }.getOrElse(false)
-  }
-
-  private def report(str: String): Unit = System.err.println(str)
 
 }

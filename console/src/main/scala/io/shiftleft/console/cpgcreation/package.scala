@@ -1,11 +1,29 @@
-package io.shiftleft.console.cpgcreation
+package io.shiftleft.console
 
 import java.io.File
 import java.nio.file.Path
 
 import io.shiftleft.codepropertygraph.generated.Languages
 
-object LanguageGuesser {
+package object cpgcreation {
+
+  /**
+    * For a given language, return CPG generator script
+    * */
+  def cpgGeneratorForLanguage(language: String,
+                              config: LanguageFrontendConfig,
+                              rootPath: Path): Option[CpgGenerator] = {
+    language match {
+      case Languages.CSHARP     => Some(CSharpCpgGenerator(config.csharp, rootPath))
+      case Languages.C          => Some(FuzzyCCpgGenerator(config.fuzzyc, rootPath))
+      case Languages.LLVM       => Some(LlvmCpgGenerator(config.llvm, rootPath))
+      case Languages.GOLANG     => Some(GoCpgGenerator(config.go, rootPath))
+      case Languages.JAVA       => Some(JavaCpgGenerator(config.java, rootPath))
+      case Languages.JAVASCRIPT => Some(JsCpgGenerator(config.js, rootPath))
+      case Languages.PYTHON     => Some(PythonCpgGenerator(config.python, rootPath))
+      case _                    => None
+    }
+  }
 
   /**
     * Heuristically determines language by inspecting
@@ -30,6 +48,8 @@ object LanguageGuesser {
               f.endsWith(".go") || Set("Gopkg.lock", "Gopkg.toml", "go.mod", "go.sum")
                 .contains(f))) {
           Some(Languages.GOLANG)
+        } else if (files.exists(f => f.endsWith(".java") || f.endsWith(".class"))) {
+          Some(Languages.JAVA)
         } else if (files.exists(f => f.endsWith(".js") || Set("package.json").contains(f))) {
           Some(Languages.JAVASCRIPT)
         } else if (files.exists(f => isLlvmSrcFile(new File(f).toPath))) {

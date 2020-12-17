@@ -7,7 +7,7 @@ import io.shiftleft.console.GoFrontendConfig
 /**
   * Language frontend for Go code.  Translates Go source code into Code Property Graphs.
   */
-case class GoLanguageFrontend(config: GoFrontendConfig, rootPath: Path) extends LanguageFrontend {
+case class GoCpgGenerator(config: GoFrontendConfig, rootPath: Path) extends CpgGenerator {
 
   /**
     * Generate a CPG for the given input path.

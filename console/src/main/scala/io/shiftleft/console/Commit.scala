@@ -1,6 +1,5 @@
 package io.shiftleft.console
 
-import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, LayerCreatorOptions}
 
@@ -26,5 +25,4 @@ class Commit(opts: CommitOptions) extends LayerCreator {
     opts.diffGraphBuilder = DiffGraph.newBuilder
   }
 
-  override def probe(cpg: Cpg): Boolean = false
 }

@@ -7,7 +7,7 @@ import io.shiftleft.console.JavaFrontendConfig
 /**
   * Language frontend for Java archives (JAR files). Translates Java archives into code property graphs.
   * */
-case class JavaLanguageFrontend(config: JavaFrontendConfig, rootPath: Path) extends LanguageFrontend {
+case class JavaCpgGenerator(config: JavaFrontendConfig, rootPath: Path) extends CpgGenerator {
 
   /**
     * Generate a CPG for the given input path.
@@ -17,12 +17,24 @@ case class JavaLanguageFrontend(config: JavaFrontendConfig, rootPath: Path) exte
   override def generate(inputPath: String,
                         outputPath: String = "cpg.bin.zip",
                         namespaces: List[String] = List()): Option[String] = {
+
+    if (commercialAvailable) {
+      generateCommercial(inputPath, outputPath, namespaces)
+    } else if (ossAvailable) {
+      generateOss(inputPath, outputPath)
+    } else {
+      println("No Java language frontend present")
+      None
+    }
+  }
+
+  private def generateCommercial(inputPath: String, outputPath: String, namespaces: List[String]): Option[String] = {
     if (inputPath.endsWith(".apk")) {
       println("found .apk ending - will first transform it to a jar using dex2jar.sh")
       val dex2jar = rootPath.resolve("dex2jar.sh").toString
       runShellCommand(dex2jar, Seq(inputPath)).flatMap { _ =>
         val jarPath = s"${inputPath}.jar"
-        generate(jarPath, outputPath, namespaces)
+        generateCommercial(jarPath, outputPath, namespaces)
       }
     } else {
       var command = rootPath.resolve("java2cpg.sh").toString
@@ -35,9 +47,15 @@ case class JavaLanguageFrontend(config: JavaFrontendConfig, rootPath: Path) exte
     }
   }
 
+  private def generateOss(inputPath: String, outputPath: String): Option[String] = {
+    val command = rootPath.resolve("joern-parse").toString
+    val arguments = Seq(inputPath, "--out", outputPath, "--language", "java", "--noenhance")
+    runShellCommand(command, arguments).map(_ => outputPath)
+  }
+
   private def jvmLanguages: List[String] = {
-    if (JavaLanguageFrontend.experimentalLanguages.nonEmpty) {
-      List("--experimental-langs", JavaLanguageFrontend.experimentalLanguages.mkString(","))
+    if (JavaCpgGenerator.experimentalLanguages.nonEmpty) {
+      List("--experimental-langs", JavaCpgGenerator.experimentalLanguages.mkString(","))
     } else Nil
   }
 
@@ -51,9 +69,15 @@ case class JavaLanguageFrontend(config: JavaFrontendConfig, rootPath: Path) exte
     }
   }
 
-  override def isAvailable: Boolean = rootPath.resolve("java2cpg.sh").toFile.exists()
+  override def isAvailable: Boolean = {
+    commercialAvailable || ossAvailable
+  }
+
+  private def commercialAvailable: Boolean = rootPath.resolve("java2cpg.sh").toFile.exists()
+  private def ossAvailable: Boolean = rootPath.resolve("joern-parse").toFile.exists()
+
 }
 
-object JavaLanguageFrontend {
+object JavaCpgGenerator {
   private final val experimentalLanguages: List[String] = List("scala")
 }

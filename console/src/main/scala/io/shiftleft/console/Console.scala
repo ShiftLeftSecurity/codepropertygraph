@@ -4,21 +4,21 @@ import better.files.Dsl._
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.CpgLoader
-import io.shiftleft.codepropertygraph.generated.Languages
-import io.shiftleft.console.LanguageHelper.cpgGeneratorForLanguage
-import io.shiftleft.console.cpgcreation.{CpgGenerator, LanguageFrontend}
+import io.shiftleft.console.cpgcreation.ImportCode
 import io.shiftleft.console.scripting.{AmmoniteExecutor, ScriptManager}
 import io.shiftleft.console.workspacehandling.{Project, WorkspaceLoader, WorkspaceManager}
 import io.shiftleft.semanticcpg.Overlays
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.dotextension.ImageViewer
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, Scpg}
-import overflowdb.traversal.help.{Doc, Table}
+import overflowdb.traversal.help.Doc
 
 import scala.sys.process.Process
 import scala.util.{Failure, Success, Try}
 
 class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[T]) extends ScriptManager(executor) {
+
+  import Console._
 
   private val _config = new ConsoleConfig()
   def config: ConsoleConfig = _config
@@ -177,34 +177,6 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     }
   }
 
-  // We still tie the project name to the input path here
-  // if no project name has been provided.
-
-  protected def fixProjectNameAndComplainOnFix(name: String): String = {
-    val projectName = Some(name)
-      .filter(_.contains(java.io.File.separator))
-      .map(deriveNameFromInputPath)
-      .getOrElse(name)
-    if (name != projectName) {
-      System.err.println("Passing paths to `loadCpg` is deprecated, please use a project name")
-    }
-    projectName
-  }
-
-  protected def deriveNameFromInputPath(inputPath: String): String = {
-    val name = File(inputPath).name
-    val project = workspace.project(name)
-    if (project.isDefined && project.exists(_.inputPath != inputPath)) {
-      var i = 1
-      while (workspace.project(name + i).isDefined) {
-        i += 1
-      }
-      name + i
-    } else {
-      name
-    }
-  }
-
   /**
     * Delete project from disk and remove it from
     * the workspace manager. Returns the (now invalid)
@@ -284,9 +256,6 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     }.flatten
   }
 
-  protected val cpgGenerator = new CpgGenerator(config)
-  private val nameOfLegacyCpgInProject = "cpg.bin.zip"
-
   @Doc(
     "Create new project from code",
     """
@@ -328,119 +297,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
       |""".stripMargin,
     """importCode("example.jar")"""
   )
-  def importCode = new ImportCode()
-
-  class ImportCode {
-
-    private def allFrontends: List[Frontend] = List(
-      c,
-      csharp,
-      golang,
-      java,
-      javascript,
-      llvm,
-      python
-    )
-
-    override def toString: String = {
-      val cols = List("name", "description", "available")
-      val rows = allFrontends.map { frontend =>
-        List(frontend.language.toLowerCase, frontend.description, frontend.isAvailable.toString)
-      }
-      "Type `importCode.<language>` to run a specific language frontend\n" +
-        "\n" + Table(cols, rows).render
-    }
-
-    class Frontend(val language: String, val description: String = "") {
-
-      def isAvailable: Boolean = {
-        cpgGeneratorForLanguage(language, config.frontend, config.install.rootPath.path).get.isAvailable
-      }
-
-      def apply(inputPath: String, projectName: String = "", namespaces: List[String] = List()): Option[Cpg] = {
-        val frontend =
-          cpgGeneratorForLanguage(language, config.frontend, config.install.rootPath.path)
-        new ImportCode()(frontend.get, inputPath, projectName, namespaces)
-      }
-    }
-
-    class CFrontend extends Frontend(Languages.C, "Fuzzy Parser for C/C++") {
-      def fromString(str: String): Option[Cpg] = {
-        val dir = File.newTemporaryDirectory("console")
-        val result = Try {
-          (dir / "tmp.c").write(str)
-          apply(dir.path.toString)
-        }.toOption.flatten
-        dir.delete()
-        result
-      }
-    }
-
-    def c: CFrontend = new CFrontend()
-    def llvm: Frontend = new Frontend(Languages.LLVM, "LLVM Bitcode Frontend")
-    def java: Frontend = new Frontend(Languages.JAVA, "Java/Dalvik Bytecode Frontend")
-    def golang: Frontend = new Frontend(Languages.GOLANG, "Golang Source Frontend")
-    def javascript: Frontend = new Frontend(Languages.JAVASCRIPT, "Javascript Source Frontend")
-    def csharp: Frontend = new Frontend(Languages.CSHARP, "C# Source Frontend (Roslyn)")
-    def python: Frontend = new Frontend(Languages.PYTHON, "Python Source Frontend")
-
-    // TODO
-    // def python: Frontend     = new Frontend(Languages.PYTHON)
-
-    private def apply(frontend: LanguageFrontend,
-                      inputPath: String,
-                      projectName: String,
-                      namespaces: List[String]): Option[Cpg] = {
-      val name =
-        Option(projectName).filter(_.nonEmpty).getOrElse(deriveNameFromInputPath(inputPath))
-      report(s"Creating project `$name` for code at `$inputPath`")
-      val pathToProject = workspace.createProject(inputPath, name)
-      val frontendCpgOutFileOpt = pathToProject.map(_.resolve(nameOfLegacyCpgInProject))
-
-      if (frontendCpgOutFileOpt.isEmpty) {
-        report(s"Error creating project for input path: `$inputPath`")
-      }
-
-      val result = frontendCpgOutFileOpt.flatMap { frontendCpgOutFile =>
-        Some(frontend).flatMap { frontend =>
-          cpgGenerator
-            .runLanguageFrontend(
-              frontend,
-              inputPath,
-              frontendCpgOutFile.toString,
-              namespaces
-            )
-            .flatMap(_ => open(name).flatMap(_.cpg))
-            .map { c =>
-              applyDefaultOverlays(c)
-            }
-        }
-      }
-      if (result.isDefined) {
-        report(
-          """|Code successfully imported. You can now query it using `cpg`.
-             |For an overview of all imported code, type `workspace`.""".stripMargin
-        )
-      }
-      result
-    }
-
-    def apply(
-        inputPath: String,
-        projectName: String = "",
-        namespaces: List[String] = List(),
-        language: String = ""
-    ): Option[Cpg] = {
-
-      var frontendOpt = cpgGenerator.createFrontendByLanguage(language)
-      if (frontendOpt.isEmpty) {
-        frontendOpt = cpgGenerator.createFrontendByPath(inputPath)
-      }
-      frontendOpt.flatMap { frontend =>
-        apply(frontend, inputPath, projectName, namespaces)
-      }
-    }
-  }
+  def importCode = new ImportCode(this)
 
   @Doc(
     "Create new project from existing CPG",
@@ -463,7 +320,8 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     """importCpg("cpg.bin.zip")"""
   )
   def importCpg(inputPath: String, projectName: String = ""): Option[Cpg] = {
-    val name = Option(projectName).filter(_.nonEmpty).getOrElse(deriveNameFromInputPath(inputPath))
+    val name =
+      Option(projectName).filter(_.nonEmpty).getOrElse(deriveNameFromInputPath(inputPath, workspace))
     val cpgFile = File(inputPath)
 
     if (!cpgFile.exists) {
@@ -541,8 +399,6 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     cpg
   }
 
-  protected def report(string: String): Unit = System.err.println(string)
-
   def _runAnalyzer(overlayCreators: LayerCreator*): Cpg = {
 
     overlayCreators.foreach { creator =>
@@ -569,6 +425,42 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
   protected def runCreator(creator: LayerCreator, overlayDirName: Option[String]): Unit = {
     val context = new LayerCreatorContext(cpg, overlayDirName)
     creator.run(context, storeUndoInfo = true)
+  }
+
+  // We still tie the project name to the input path here
+  // if no project name has been provided.
+
+  def fixProjectNameAndComplainOnFix(name: String): String = {
+    val projectName = Some(name)
+      .filter(_.contains(java.io.File.separator))
+      .map(x => deriveNameFromInputPath(x, workspace))
+      .getOrElse(name)
+    if (name != projectName) {
+      System.err.println("Passing paths to `loadCpg` is deprecated, please use a project name")
+    }
+    projectName
+  }
+
+  def report(string: String): Unit = Console.report(string)
+
+}
+
+object Console {
+  def report(string: String): Unit = System.err.println(string)
+  val nameOfLegacyCpgInProject = "cpg.bin.zip"
+
+  def deriveNameFromInputPath[T <: Project](inputPath: String, workspace: WorkspaceManager[T]): String = {
+    val name = File(inputPath).name
+    val project = workspace.project(name)
+    if (project.isDefined && project.exists(_.inputPath != inputPath)) {
+      var i = 1
+      while (workspace.project(name + i).isDefined) {
+        i += 1
+      }
+      name + i
+    } else {
+      name
+    }
   }
 
 }

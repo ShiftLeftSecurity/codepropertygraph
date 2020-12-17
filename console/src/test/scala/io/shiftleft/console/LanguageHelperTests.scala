@@ -3,13 +3,13 @@ package io.shiftleft.console
 import better.files.Dsl._
 import better.files._
 import io.shiftleft.codepropertygraph.generated.Languages
-import io.shiftleft.console.LanguageHelper._
-import io.shiftleft.console.cpgcreation.LanguageGuesser._
-import io.shiftleft.console.cpgcreation.LlvmLanguageFrontend
+import io.shiftleft.console.cpgcreation.LlvmCpgGenerator
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class LanguageHelperTests extends AnyWordSpec with Matchers {
+
+  import io.shiftleft.console.cpgcreation.guessLanguage
 
   "LanguageHelper.guessLanguage" should {
 
@@ -66,12 +66,12 @@ class LanguageHelperTests extends AnyWordSpec with Matchers {
   "LanguageHelper.cpgGeneratorForLanguage" should {
 
     "select LLVM frontend for directories containing ll files" in {
-      val frontend = cpgGeneratorForLanguage(
+      val frontend = io.shiftleft.console.cpgcreation.cpgGeneratorForLanguage(
         Languages.LLVM,
         new LanguageFrontendConfig(),
         File(".").path
       )
-      frontend.get.isInstanceOf[LlvmLanguageFrontend] shouldBe true
+      frontend.get.isInstanceOf[LlvmCpgGenerator] shouldBe true
     }
   }
 
