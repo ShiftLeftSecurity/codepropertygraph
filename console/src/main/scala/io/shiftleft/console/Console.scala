@@ -441,6 +441,8 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
     projectName
   }
 
+  def report(string: String): Unit = Console.report(string)
+
 }
 
 object Console {
