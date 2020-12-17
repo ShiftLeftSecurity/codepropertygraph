@@ -5,7 +5,7 @@ import better.files.File
 import scala.sys.process._
 
 /**
-  * A Cpg Generator code into code property graphs. Each
+ * A CpgGenerator generates Code Property Graphs from code. Each
   * supported language implements a Generator, e.g., [[JavaCpgGenerator]]
   * implements Java Archive to CPG conversion, while [[CSharpCpgGenerator]]
   * translates C# projects into code property graphs.
