@@ -1,4 +1,4 @@
-package io.shiftleft.fuzzyc2cpg.language
+package io.shiftleft.fuzzyc2cpg.querying
 
 import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
