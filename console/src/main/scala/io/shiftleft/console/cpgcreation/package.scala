@@ -48,6 +48,8 @@ package object cpgcreation {
               f.endsWith(".go") || Set("Gopkg.lock", "Gopkg.toml", "go.mod", "go.sum")
                 .contains(f))) {
           Some(Languages.GOLANG)
+        } else if (files.exists(f => f.endsWith(".java") || f.endsWith(".class"))) {
+          Some(Languages.JAVA)
         } else if (files.exists(f => f.endsWith(".js") || Set("package.json").contains(f))) {
           Some(Languages.JAVASCRIPT)
         } else if (files.exists(f => isLlvmSrcFile(new File(f).toPath))) {
