@@ -1,20 +1,18 @@
-package io.shiftleft.fuzzyc2cpg.testfixtures
+package io.shiftleft.semanticcpg.testfixtures
 
 import java.io.{File, PrintWriter}
 import java.nio.file.Files
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
-import io.shiftleft.fuzzyc2cpg.testfixtures.LanguageFrontend.FuzzycFrontend
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class CodeToCpgSuite extends AnyWordSpec with Matchers with BeforeAndAfterAll {
+class CodeToCpgFixture(val frontend: LanguageFrontend) extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 
   val code = ""
   var cpg: Cpg = _
-  val frontend: LanguageFrontend = new FuzzycFrontend
   def passes(cpg: Cpg): Unit = createEnhancements(cpg)
 
   override def beforeAll(): Unit = {

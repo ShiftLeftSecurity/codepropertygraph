@@ -1,9 +1,9 @@
 package io.shiftleft.fuzzyc2cpg.dotgenerator
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
+import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
-class DotAstGeneratorTests extends CodeToCpgSuite {
+class DotAstGeneratorTests extends FuzzyCCodeToCpgSuite {
 
   override val code =
     """| // A comment

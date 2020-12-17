@@ -1,12 +1,12 @@
 package io.shiftleft.fuzzyc2cpg.querying
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
+import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
 /**
   * Language primitives for navigating method stubs
   * */
-class CMethodTests extends CodeToCpgSuite {
+class CMethodTests extends FuzzyCCodeToCpgSuite {
 
   override val code =
     """
@@ -59,7 +59,7 @@ class CMethodTests extends CodeToCpgSuite {
   }
 }
 
-class CMethodTests2 extends CodeToCpgSuite {
+class CMethodTests2 extends FuzzyCCodeToCpgSuite {
   override val code = "int foo(); int bar() { return woo(); }"
 
   "should identify method as stub" in {

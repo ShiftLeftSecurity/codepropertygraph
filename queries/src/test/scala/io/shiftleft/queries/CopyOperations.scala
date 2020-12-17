@@ -1,10 +1,10 @@
 package io.shiftleft.queries
 
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
+import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import overflowdb.traversal._
 
-class CopyOperations extends CodeToCpgSuite {
+class CopyOperations extends FuzzyCCodeToCpgSuite {
 
   override val code =
     """

@@ -1,9 +1,9 @@
 package io.shiftleft.fuzzyc2cpg.querying
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
+import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
-class CfgTests extends CodeToCpgSuite {
+class CfgTests extends FuzzyCCodeToCpgSuite {
 
   override val code =
     """

@@ -1,10 +1,10 @@
 package io.shiftleft.fuzzyc2cpg.querying
 
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
+import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language.NoResolve
 
-class CallGraphTests extends CodeToCpgSuite {
+class CallGraphTests extends FuzzyCCodeToCpgSuite {
 
   implicit val resolver = NoResolve
 
