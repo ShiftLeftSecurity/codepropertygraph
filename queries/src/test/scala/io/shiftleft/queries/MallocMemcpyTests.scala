@@ -1,6 +1,7 @@
 package io.shiftleft.queries
 
-import io.shiftleft.dataflowengineoss.language.{DataFlowCodeToCpgSuite, _}
+import io.shiftleft.dataflowengineoss.language._
+import io.shiftleft.fuzzyc2cpg.testfixtures.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
 class MallocMemcpyTests extends DataFlowCodeToCpgSuite {

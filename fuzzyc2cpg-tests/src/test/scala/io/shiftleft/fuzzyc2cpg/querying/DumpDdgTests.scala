@@ -1,7 +1,8 @@
-package io.shiftleft.dataflowengineoss.layers.dataflows
+package io.shiftleft.fuzzyc2cpg.querying
 
 import better.files.File
-import io.shiftleft.dataflowengineoss.language.DataFlowCodeToCpgSuite
+import io.shiftleft.dataflowengineoss.layers.dataflows.{DdgDumpOptions, DumpDdg}
+import io.shiftleft.fuzzyc2cpg.testfixtures.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.layers.LayerCreatorContext
 
 class DumpDdgTests extends DataFlowCodeToCpgSuite {
