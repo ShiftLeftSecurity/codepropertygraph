@@ -1,7 +1,7 @@
-package io.shiftleft.semanticcpg.dotgenerator
+package io.shiftleft.fuzzyc2cpg.dotgenerator
 
+import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
 
 class DotAstGeneratorTests extends CodeToCpgSuite {
 

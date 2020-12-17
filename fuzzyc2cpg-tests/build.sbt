@@ -1,6 +1,8 @@
-name := "semanticcpg-tests"
+name := "fuzzyc2cpg-tests"
 
-dependsOn(Projects.semanticcpg)
+dependsOn(Projects.semanticcpg,
+          Projects.semanticcpgtests % Test,
+          Projects.fuzzyc2cpg % Test)
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % Versions.scalatest % Test,

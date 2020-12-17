@@ -1,8 +1,7 @@
-package io.shiftleft.semanticcpg.language.types.expressions.generalizations
+package io.shiftleft.fuzzyc2cpg.querying
 
+import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
-import overflowdb.traversal._
 
 class CAstTests extends CodeToCpgSuite {
 
@@ -53,7 +52,7 @@ class CAstTests extends CodeToCpgSuite {
       .argument(1)
       .filter(
         arg =>
-          arg.start.ast
+          arg.ast
             .isCallTo("<operator>.(addition|multiplication)")
             .not(_.inAstMinusLeaf(arg).isCall)
             .l
