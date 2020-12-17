@@ -21,7 +21,7 @@ case class JavaCpgGenerator(config: JavaFrontendConfig, rootPath: Path) extends 
     if (commercialAvailable) {
       generateCommercial(inputPath, outputPath, namespaces)
     } else if (ossAvailable) {
-      generateOss(inputPath, outputPath, namespaces)
+      generateOss(inputPath, outputPath)
     } else {
       println("No Java language frontend present")
       None
@@ -34,7 +34,7 @@ case class JavaCpgGenerator(config: JavaFrontendConfig, rootPath: Path) extends 
       val dex2jar = rootPath.resolve("dex2jar.sh").toString
       runShellCommand(dex2jar, Seq(inputPath)).flatMap { _ =>
         val jarPath = s"${inputPath}.jar"
-        generate(jarPath, outputPath, namespaces)
+        generateCommercial(jarPath, outputPath, namespaces)
       }
     } else {
       var command = rootPath.resolve("java2cpg.sh").toString
@@ -47,11 +47,10 @@ case class JavaCpgGenerator(config: JavaFrontendConfig, rootPath: Path) extends 
     }
   }
 
-  private def generateOss(inputPath: String, outputPath: String, namespaces: List[String]): Option[String] = {
-    println(inputPath)
-    println(outputPath)
-    println(namespaces)
-    None
+  private def generateOss(inputPath: String, outputPath: String): Option[String] = {
+    val command = rootPath.resolve("joern-parse").toString
+    val arguments = Seq(inputPath, "--out", outputPath, "--language", "java", "--noenhance")
+    runShellCommand(command, arguments).map(_ => outputPath)
   }
 
   private def jvmLanguages: List[String] = {
