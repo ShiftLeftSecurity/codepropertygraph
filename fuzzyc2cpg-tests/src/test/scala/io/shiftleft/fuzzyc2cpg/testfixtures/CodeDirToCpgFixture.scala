@@ -1,10 +1,10 @@
-package io.shiftleft.semanticcpg.testfixtures
+package io.shiftleft.fuzzyc2cpg.testfixtures
 
 import java.io.File
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
-import io.shiftleft.semanticcpg.testfixtures.LanguageFrontend.FuzzycFrontend
+import io.shiftleft.fuzzyc2cpg.testfixtures.LanguageFrontend.FuzzycFrontend
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

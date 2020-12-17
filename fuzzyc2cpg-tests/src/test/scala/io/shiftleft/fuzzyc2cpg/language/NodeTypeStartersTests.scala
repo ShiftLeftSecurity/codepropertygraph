@@ -1,7 +1,8 @@
-package io.shiftleft.semanticcpg.language
+package io.shiftleft.fuzzyc2cpg.language
 
 import io.shiftleft.codepropertygraph.generated.NodeTypes
-import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
+import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
+import io.shiftleft.semanticcpg.language._
 
 /**
   * The following tests show in detail how queries can be started. For

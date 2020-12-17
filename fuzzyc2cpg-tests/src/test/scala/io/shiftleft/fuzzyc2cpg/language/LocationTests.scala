@@ -1,6 +1,7 @@
-package io.shiftleft.semanticcpg.language
+package io.shiftleft.fuzzyc2cpg.language
 
-import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
+import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
+import io.shiftleft.semanticcpg.language._
 
 class LocationTests extends CodeToCpgSuite {
 

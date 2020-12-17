@@ -1,4 +1,4 @@
-package io.shiftleft.semanticcpg.testfixtures
+package io.shiftleft.fuzzyc2cpg.testfixtures
 
 import java.io.File
 

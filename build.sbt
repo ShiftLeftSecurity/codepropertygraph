@@ -70,6 +70,7 @@ lazy val cpgvalidator = Projects.cpgvalidator
 lazy val console = Projects.console
 lazy val queries = Projects.queries
 lazy val fuzzyc2cpg = Projects.fuzzyc2cpg
+lazy val fuzzyc2cpgtests = Projects.fuzzyc2cpgtests
 
 ThisBuild/scalacOptions ++= Seq(
   "-deprecation",

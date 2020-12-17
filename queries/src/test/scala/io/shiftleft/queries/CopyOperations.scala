@@ -1,7 +1,7 @@
 package io.shiftleft.queries
 
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
+import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
 import overflowdb.traversal._
 
 class CopyOperations extends CodeToCpgSuite {

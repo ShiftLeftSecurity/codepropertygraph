@@ -1,7 +1,7 @@
-package io.shiftleft.semanticcpg.language.types.structure
+package io.shiftleft.fuzzyc2cpg.language.types.structure
 
+import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
 
 class TypeDeclTests extends CodeToCpgSuite {
 

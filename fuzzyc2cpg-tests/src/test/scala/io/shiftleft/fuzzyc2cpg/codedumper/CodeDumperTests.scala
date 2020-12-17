@@ -1,9 +1,10 @@
-package io.shiftleft.semanticcpg.codedumper
+package io.shiftleft.fuzzyc2cpg.codedumper
 
 import java.util.regex.Pattern
 
+import io.shiftleft.fuzzyc2cpg.testfixtures.CodeToCpgSuite
+import io.shiftleft.semanticcpg.codedumper.CodeDumper
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.testfixtures.CodeToCpgSuite
 
 class CodeDumperTests extends CodeToCpgSuite {
 
