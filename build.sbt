@@ -68,7 +68,6 @@ lazy val dataflowengineoss = Projects.dataflowengineoss
 lazy val dataflowengineosstests = Projects.dataflowengineosstests
 lazy val cpgvalidator = Projects.cpgvalidator
 lazy val console = Projects.console
-lazy val queries = Projects.queries
 lazy val fuzzyc2cpg = Projects.fuzzyc2cpg
 lazy val fuzzyc2cpgtests = Projects.fuzzyc2cpgtests
 
