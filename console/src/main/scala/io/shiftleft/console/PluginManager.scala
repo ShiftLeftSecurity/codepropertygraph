@@ -13,13 +13,16 @@ import scala.util.{Failure, Success, Try}
 class PluginManager(installDir: File) {
 
   def listPlugins(): List[String] = {
-    val installedPluginNames = pluginDir.toList.flatMap { dir =>
-      File(dir).list.toList.flatMap { f =>
-        "^joernext-(.*?)-.*$".r.findAllIn(f.name).matchData.map { m =>
-          m.group(1)
+    val installedPluginNames = pluginDir.toList
+      .flatMap { dir =>
+        File(dir).list.toList.flatMap { f =>
+          "^joernext-(.*?)-.*$".r.findAllIn(f.name).matchData.map { m =>
+            m.group(1)
+          }
         }
       }
-    }
+      .distinct
+      .sorted
     installedPluginNames.foreach(println)
     installedPluginNames
   }
