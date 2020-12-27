@@ -23,9 +23,17 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
       manager.add(testZipFileName)
       manager.pluginDir match {
         case Some(dir) =>
-          dir.toFile.list().toList shouldBe List("test-foo.jar")
+          dir.toFile.list().toList shouldBe List("joernext-test-foo.jar")
         case None => fail
       }
+    }
+  }
+
+  "PluginManager::listPlugins" should {
+    "display plugin after adding it" in Fixture() { manager =>
+      val testZipFileName = "console/src/test/resources/test.zip"
+      manager.add(testZipFileName)
+      manager.listPlugins() shouldBe "test"
     }
   }
 

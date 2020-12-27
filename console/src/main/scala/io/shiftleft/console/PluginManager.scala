@@ -12,7 +12,17 @@ import scala.util.{Failure, Success, Try}
   * */
 class PluginManager(installDir: File) {
 
-  def listPlugins(): Unit = {}
+  def listPlugins(): String = {
+    val installedPluginNames = pluginDir.toList.flatMap { dir =>
+      File(dir).list.toList.flatMap { f =>
+        "^joernext-(.*?)-.*$".r.findAllIn(f.name).matchData.map { m =>
+          m.group(1)
+        }
+      }
+    }
+    installedPluginNames.foreach(println)
+    installedPluginNames.mkString("\n")
+  }
 
   def add(filename: String): Unit = {
     if (pluginDir.isEmpty) {
@@ -36,7 +46,7 @@ class PluginManager(installDir: File) {
   private def addExistingUnzipped(file: File, pluginName: String): Unit = {
     file.listRecursively.filter(_.name.endsWith(".jar")).foreach { jar =>
       pluginDir.foreach { pDir =>
-        val dstFileName = s"$pluginName-${jar.name}"
+        val dstFileName = s"joernext-$pluginName-${jar.name}"
         val dstFile = pDir / dstFileName
         cp(jar, dstFile)
       }
