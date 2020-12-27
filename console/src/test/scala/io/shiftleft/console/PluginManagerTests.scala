@@ -7,10 +7,22 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class PluginManagerTests extends AnyWordSpec with Matchers {
 
-  "Plugin manager" should {
-    "foo" in Fixture() { manager =>
-      println(manager)
+  "PluginManager::add" should {
+    "not crash if file does not exist" in Fixture() { manager =>
+      val testZipFileName = "console/src/test/resources/doesnotexist.zip"
+      manager.add(testZipFileName)
     }
+
+    "not crash if file isn't a valid zip" in Fixture() { manager =>
+      val testZipFileName = "console/src/test/resources/nonzip.zip"
+      manager.add(testZipFileName)
+    }
+
+    "allow adding a plugin" in Fixture() { manager =>
+      val testZipFileName = "console/src/test/resources/test.zip"
+      manager.add(testZipFileName)
+    }
+
   }
 }
 
