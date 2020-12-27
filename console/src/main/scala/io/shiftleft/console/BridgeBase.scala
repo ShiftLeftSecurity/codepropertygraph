@@ -187,7 +187,7 @@ trait BridgeBase {
     val src = config.src.get
     val language = config.language.getOrElse("c")
     val code = s"""
-        | if (${config.overwrite} || !workspace.projectExists("../targets/vlc-3.0.8/lib")) {
+        | if (${config.overwrite} || !workspace.projectExists("$src")) {
         |   importCode.$language("$src")
         | } else {
         |    println("Using existing CPG - Use `--overwrite` if this is not what you want")
