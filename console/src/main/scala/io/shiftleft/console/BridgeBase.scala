@@ -137,11 +137,11 @@ trait BridgeBase {
     if (config.listBundles) {
       listBundles(config)
     } else if (config.listPlugins) {
-      PluginManager.listPlugins()
+      new PluginManager(InstallConfig().rootPath).listPlugins()
     } else if (config.addPlugin.isDefined) {
-      PluginManager.add(config.addPlugin.get)
+      new PluginManager(InstallConfig().rootPath).add(config.addPlugin.get)
     } else if (config.rmPlugin.isDefined) {
-      PluginManager.rm(config.rmPlugin.get)
+      new PluginManager(InstallConfig().rootPath).rm(config.rmPlugin.get)
     } else {
       config.scriptFile match {
         case None =>

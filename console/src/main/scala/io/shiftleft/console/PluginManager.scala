@@ -1,8 +1,17 @@
 package io.shiftleft.console
+import better.files.File
 
-object PluginManager {
+/**
+  * Plugin management component
+  * @param installDir the Joern/Ocular installation dir
+  * */
+class PluginManager(installDir: File) {
 
-  def listPlugins(): Unit = {}
+  println(installDir)
+
+  def listPlugins(): Unit = {
+    ???
+  }
 
   def add(filename: String): Unit = {
     ???
