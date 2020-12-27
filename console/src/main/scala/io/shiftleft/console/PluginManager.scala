@@ -57,7 +57,7 @@ class PluginManager(installDir: File) {
     ???
   }
 
-  private def pluginDir: Option[Path] = {
+  def pluginDir: Option[Path] = {
     val pathToPluginDir = installDir.path.resolve("lib")
     if (pathToPluginDir.toFile.exists()) {
       Some(pathToPluginDir)

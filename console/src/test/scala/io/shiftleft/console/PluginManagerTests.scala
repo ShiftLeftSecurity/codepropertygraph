@@ -18,12 +18,17 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
       manager.add(testZipFileName)
     }
 
-    "allow adding a plugin" in Fixture() { manager =>
+    "copy jar files in zip to plugin dir" in Fixture() { manager =>
       val testZipFileName = "console/src/test/resources/test.zip"
       manager.add(testZipFileName)
+      manager.pluginDir match {
+        case Some(dir) =>
+          dir.toFile.list().toList shouldBe List("test-foo.jar")
+        case None => fail
+      }
     }
-
   }
+
 }
 
 object Fixture {
