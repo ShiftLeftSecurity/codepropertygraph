@@ -22,7 +22,10 @@ case class Config(
     serverPort: Int = 8080,
     serverAuthUsername: String = "",
     serverAuthPassword: String = "",
-    nocolors: Boolean = false
+    nocolors: Boolean = false,
+    listPlugins: Boolean = false,
+    addPlugin: Option[String] = None,
+    rmPlugin: Option[String] = None
 )
 
 /**
@@ -101,6 +104,20 @@ trait BridgeBase {
       opt[String]("server-auth-password")
         .action((x, c) => c.copy(serverAuthPassword = x))
         .text("Basic auth password for the CPGQL server")
+
+      note("Plugin management")
+
+      opt[Unit]("plugins")
+        .action((_, c) => c.copy(listPlugins = true))
+        .text("List plugins")
+
+      opt[String]("add-plugin")
+        .action((x, c) => c.copy(addPlugin = Some(x)))
+        .text("A plugin to add to the installation")
+
+      opt[String]("remove-plugin")
+        .action((x, c) => c.copy(rmPlugin = Some(x)))
+        .text("A plugin to remove from the installation")
 
       note("Misc")
 
