@@ -7,6 +7,8 @@ import better.files._
 import io.shiftleft.console.embammonite.EmbeddedAmmonite
 import io.shiftleft.console.cpgqlserver.CPGQLServer
 
+import java.io.{FileOutputStream, PrintStream}
+
 case class Config(
     scriptFile: Option[Path] = None,
     command: Option[String] = None,
@@ -198,9 +200,14 @@ trait BridgeBase {
         | run.$bundleName
         |""".stripMargin
 
+    val file = new java.io.File("run-log.txt");
+    val fos = new FileOutputStream(file);
+    val ps = new PrintStream(fos);
+    System.setErr(ps)
     withTemporaryScript(code) { file =>
       runScript(os.Path(file.path.toString), config)
     }
+    ps.close()
   }
 
   private def startInteractiveShell(config: Config, slProduct: SLProduct) = {
@@ -243,7 +250,7 @@ trait BridgeBase {
 
   private def runScript(scriptFile: Path, config: Config) = {
     val isEncryptedScript = scriptFile.ext == "enc"
-    println(s"executing $scriptFile with params=${config.params}")
+    System.err.println(s"executing $scriptFile with params=${config.params}")
     val scriptArgs: Seq[(String, Option[String])] = {
       val commandArgs = config.command match {
         case Some(command) => Seq(command -> None)
@@ -263,8 +270,8 @@ trait BridgeBase {
       .runScript(actualScriptFile, scriptArgs)
       ._1 match {
       case Res.Success(r) =>
-        println(s"script finished successfully")
-        println(r)
+        System.err.println(s"script finished successfully")
+        System.err.println(r)
       case Res.Failure(msg) =>
         throw new AssertionError(s"script failed: $msg")
       case Res.Exception(e, msg) =>
