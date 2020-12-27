@@ -29,11 +29,34 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
     }
   }
 
+  "PluginManager::rm" should {
+
+    "not crash if name of to-be-removed plugin is incorrect" in Fixture() { manager =>
+      manager.rm("somename")
+    }
+
+    "remove existing plugin" in Fixture() { manager =>
+      val testZipFileName = "console/src/test/resources/test.zip"
+      manager.add(testZipFileName)
+      manager.rm("test") shouldBe List("joernext-test-foo.jar")
+      manager.listPlugins() shouldBe List()
+      manager.add(testZipFileName)
+      manager.rm("test") shouldBe List("joernext-test-foo.jar")
+      manager.listPlugins() shouldBe List()
+    }
+
+  }
+
   "PluginManager::listPlugins" should {
+
+    "display empty plugin list if no plugins exist" in Fixture() { manager =>
+      manager.listPlugins() shouldBe List()
+    }
+
     "display plugin after adding it" in Fixture() { manager =>
       val testZipFileName = "console/src/test/resources/test.zip"
       manager.add(testZipFileName)
-      manager.listPlugins() shouldBe "test"
+      manager.listPlugins() shouldBe List("test")
     }
   }
 

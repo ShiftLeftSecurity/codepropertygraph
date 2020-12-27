@@ -12,7 +12,7 @@ import scala.util.{Failure, Success, Try}
   * */
 class PluginManager(installDir: File) {
 
-  def listPlugins(): String = {
+  def listPlugins(): List[String] = {
     val installedPluginNames = pluginDir.toList.flatMap { dir =>
       File(dir).list.toList.flatMap { f =>
         "^joernext-(.*?)-.*$".r.findAllIn(f.name).matchData.map { m =>
@@ -21,7 +21,7 @@ class PluginManager(installDir: File) {
       }
     }
     installedPluginNames.foreach(println)
-    installedPluginNames.mkString("\n")
+    installedPluginNames
   }
 
   def add(filename: String): Unit = {
@@ -63,8 +63,19 @@ class PluginManager(installDir: File) {
     }
   }
 
-  def rm(name: String): Unit = {
-    ???
+  def rm(name: String): List[String] = {
+    if (!listPlugins().contains(name)) {
+      println(s"Plugin $name is not installed")
+      List()
+    } else {
+      val filesToRemove = pluginDir.toList.flatMap { dir =>
+        dir.list.filter { f =>
+          f.name.startsWith(s"joernext-$name")
+        }
+      }
+      filesToRemove.foreach(f => f.delete())
+      filesToRemove.map(_.name)
+    }
   }
 
   def pluginDir: Option[Path] = {
