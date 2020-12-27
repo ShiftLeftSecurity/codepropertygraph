@@ -22,7 +22,10 @@ case class Config(
     serverPort: Int = 8080,
     serverAuthUsername: String = "",
     serverAuthPassword: String = "",
-    nocolors: Boolean = false
+    nocolors: Boolean = false,
+    listPlugins: Boolean = false,
+    addPlugin: Option[String] = None,
+    rmPlugin: Option[String] = None
 )
 
 /**
@@ -102,6 +105,20 @@ trait BridgeBase {
         .action((x, c) => c.copy(serverAuthPassword = x))
         .text("Basic auth password for the CPGQL server")
 
+      note("Plugin management")
+
+      opt[Unit]("plugins")
+        .action((_, c) => c.copy(listPlugins = true))
+        .text("List plugins")
+
+      opt[String]("add-plugin")
+        .action((x, c) => c.copy(addPlugin = Some(x)))
+        .text("Plugin zip file to add to the installation")
+
+      opt[String]("remove-plugin")
+        .action((x, c) => c.copy(rmPlugin = Some(x)))
+        .text("Name of plugin to remove from the installation")
+
       note("Misc")
 
       opt[Unit]("nocolors")
@@ -119,6 +136,12 @@ trait BridgeBase {
   protected def runAmmonite(config: Config, slProduct: SLProduct = OcularProduct): Unit = {
     if (config.listBundles) {
       listBundles(config)
+    } else if (config.listPlugins) {
+      new PluginManager(InstallConfig().rootPath).listPlugins()
+    } else if (config.addPlugin.isDefined) {
+      new PluginManager(InstallConfig().rootPath).add(config.addPlugin.get)
+    } else if (config.rmPlugin.isDefined) {
+      new PluginManager(InstallConfig().rootPath).rm(config.rmPlugin.get)
     } else {
       config.scriptFile match {
         case None =>
