@@ -49,9 +49,11 @@ class PluginManager(installDir: File) {
   private def addExistingUnzipped(file: File, pluginName: String): Unit = {
     file.listRecursively.filter(_.name.endsWith(".jar")).foreach { jar =>
       pluginDir.foreach { pDir =>
-        val dstFileName = s"joernext-$pluginName-${jar.name}"
-        val dstFile = pDir / dstFileName
-        cp(jar, dstFile)
+        if (!(pDir / jar.name).exists) {
+          val dstFileName = s"joernext-$pluginName-${jar.name}"
+          val dstFile = pDir / dstFileName
+          cp(jar, dstFile)
+        }
       }
     }
   }
