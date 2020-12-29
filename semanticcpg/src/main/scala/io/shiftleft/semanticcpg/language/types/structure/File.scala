@@ -24,3 +24,9 @@ class File(val traversal: Traversal[nodes.File]) extends AnyVal {
     traversal.out(EdgeTypes.AST).hasLabel(NodeTypes.COMMENT).cast[nodes.Comment]
 
 }
+
+object File {
+
+  val UNKNOWN = "<unknown>"
+
+}

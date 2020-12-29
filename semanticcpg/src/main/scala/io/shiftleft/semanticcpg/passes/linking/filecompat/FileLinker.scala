@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.types.structure.File
 import io.shiftleft.semanticcpg.passes.linking.linker.Linker
 
 import scala.collection.mutable
@@ -22,17 +23,14 @@ class FileLinker(cpg: Cpg) extends CpgPass(cpg) {
     val originalFileNameToNode = mutable.Map.empty[String, nodes.StoredNode]
     val newFileNameToNode = mutable.Map.empty[String, nodes.NewFile]
 
-    var maxFileOrder = -1
-
     cpg.file.foreach { node =>
       originalFileNameToNode += node.name -> node
-      maxFileOrder = Math.max(maxFileOrder, node.order)
     }
 
-    def createFileIfDoesNotExist(srcNode: nodes.StoredNode, dstFullName: String): Unit = {
+    def createFileIfDoesNotExist(srcNode: nodes.StoredNode, destFullName: String): Unit = {
+      val dstFullName = if (destFullName == "") { File.UNKNOWN } else { destFullName }
       val newFile = newFileNameToNode.getOrElseUpdate(dstFullName, {
-        maxFileOrder += 1
-        val file = nodes.NewFile(name = dstFullName, order = maxFileOrder)
+        val file = nodes.NewFile(name = dstFullName, order = 0)
         dstGraph.addNode(file)
         file
       })

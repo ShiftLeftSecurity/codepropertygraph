@@ -23,7 +23,7 @@ class AstCreationPass(filenames: List[String], cpg: Cpg, keyPool: IntervalKeyPoo
 
     val diffGraph = DiffGraph.newBuilder
     val absolutePath = new java.io.File(filename).toPath.toAbsolutePath.normalize().toString
-    val fileNode = nodes.NewFile(name = absolutePath)
+    val fileNode = nodes.NewFile(name = absolutePath, order = 0)
     diffGraph.addNode(fileNode)
     val namespaceBlock = nodes.NewNamespaceBlock(
       name = Defines.globalNamespaceName,
