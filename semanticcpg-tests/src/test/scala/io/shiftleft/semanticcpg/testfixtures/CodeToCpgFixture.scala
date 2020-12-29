@@ -30,7 +30,7 @@ class CodeToCpgFixture(val frontend: LanguageFrontend) extends AnyWordSpec with 
     passes(cpg)
   }
 
-  private def writeCodeToFile(sourceCode: String): File = {
+  protected def writeCodeToFile(sourceCode: String): File = {
     val tmpDir = Files.createTempDirectory("semanticcpgtest").toFile
     tmpDir.deleteOnExit()
     val codeFile = File.createTempFile("Test", frontend.fileSuffix, tmpDir)
