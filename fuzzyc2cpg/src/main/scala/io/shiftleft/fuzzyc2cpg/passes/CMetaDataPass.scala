@@ -13,7 +13,7 @@ import io.shiftleft.passes.{CpgPass, DiffGraph, KeyPool}
 class CMetaDataPass(cpg: Cpg, keyPool: Option[KeyPool] = None) extends CpgPass(cpg, keyPool = keyPool) {
   override def run(): Iterator[DiffGraph] = {
     def addMetaDataNode(diffGraph: DiffGraph.Builder): Unit = {
-      val metaNode = nodes.NewMetaData(language = Languages.C)
+      val metaNode = nodes.NewMetaData(language = Languages.C, version = "0.1")
       diffGraph.addNode(metaNode)
     }
 
