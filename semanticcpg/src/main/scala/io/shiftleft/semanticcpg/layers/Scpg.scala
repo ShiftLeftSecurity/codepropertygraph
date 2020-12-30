@@ -77,7 +77,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new MethodDecoratorPass(cpg),
           new CapturingLinker(cpg),
           new Linker(cpg),
-          new FileNameCompat(cpg),
           new FileLinker(cpg),
           new BindingTableCompat(cpg),
           new BindingMethodOverridesPass(cpg),
