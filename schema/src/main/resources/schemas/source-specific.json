@@ -10,7 +10,6 @@
 
 	{"name" : "FILE",
 	 "outEdges" : [
-	   // TODO: remove AST edge here
 	   {"edgeName": "AST", "inNodes": [{"name": "COMMENT"}]}
 	 ]
 	}

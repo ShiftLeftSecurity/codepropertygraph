@@ -44,3 +44,9 @@ class Namespace(val traversal: Traversal[nodes.Namespace]) extends AnyVal {
     traversal.where(_.typeDecl.internal)
 
 }
+
+object Namespace {
+
+  val globalNamespaceName = "<global>"
+
+}

@@ -3,8 +3,9 @@ package io.shiftleft.fuzzyc2cpg.passes
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.fuzzyc2cpg.passes.astcreation.{AntlrCModuleParserDriver, AstVisitor}
-import io.shiftleft.fuzzyc2cpg.{Defines, Global}
+import io.shiftleft.fuzzyc2cpg.Global
 import io.shiftleft.passes.{DiffGraph, IntervalKeyPool, ParallelCpgPass}
+import io.shiftleft.semanticcpg.language.types.structure.Namespace
 import org.slf4j.LoggerFactory
 
 /**
@@ -24,9 +25,10 @@ class AstCreationPass(filenames: List[String], cpg: Cpg, keyPool: IntervalKeyPoo
     val diffGraph = DiffGraph.newBuilder
     val absolutePath = new java.io.File(filename).toPath.toAbsolutePath.normalize().toString
     val namespaceBlock = nodes.NewNamespaceBlock(
-      name = Defines.globalNamespaceName,
+      name = Namespace.globalNamespaceName,
       fullName = CMetaDataPass.getGlobalNamespaceBlockFullName(Some(absolutePath)),
-      filename = absolutePath
+      filename = absolutePath,
+      order = 0
     )
     diffGraph.addNode(namespaceBlock)
     val driver = createDriver(namespaceBlock)

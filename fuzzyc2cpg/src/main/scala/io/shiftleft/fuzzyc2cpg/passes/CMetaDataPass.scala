@@ -2,8 +2,8 @@ package io.shiftleft.fuzzyc2cpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{Languages, nodes}
-import io.shiftleft.fuzzyc2cpg.Defines
 import io.shiftleft.passes.{CpgPass, DiffGraph, KeyPool}
+import io.shiftleft.semanticcpg.language.types.structure.{File, Namespace}
 
 /**
   * A pass that creates a MetaData node, specifying that this
@@ -19,8 +19,10 @@ class CMetaDataPass(cpg: Cpg, keyPool: Option[KeyPool] = None) extends CpgPass(c
 
     def addAnyNamespaceBlock(diffGraph: DiffGraph.Builder): Unit = {
       val node = nodes.NewNamespaceBlock(
-        name = Defines.globalNamespaceName,
-        fullName = CMetaDataPass.getGlobalNamespaceBlockFullName(None)
+        name = Namespace.globalNamespaceName,
+        fullName = CMetaDataPass.getGlobalNamespaceBlockFullName(None),
+        filename = File.UNKNOWN,
+        order = 0
       )
       diffGraph.addNode(node)
     }
@@ -37,9 +39,9 @@ object CMetaDataPass {
   def getGlobalNamespaceBlockFullName(fileNameOption: Option[String]): String = {
     fileNameOption match {
       case Some(fileName) =>
-        s"$fileName:${Defines.globalNamespaceName}"
+        s"$fileName:${Namespace.globalNamespaceName}"
       case None =>
-        Defines.globalNamespaceName
+        Namespace.globalNamespaceName
     }
   }
 
