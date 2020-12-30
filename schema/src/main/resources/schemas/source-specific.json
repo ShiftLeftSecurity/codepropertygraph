@@ -1,13 +1,16 @@
 {
     "nodeTypes" : [
 	{"id" : 511, "name" : "COMMENT",
-	 "keys" : ["LINE_NUMBER", "CODE"],
+	 "keys" : ["LINE_NUMBER", "CODE", "FILENAME"],
 	 "comment" : "A comment",
-	 "outEdges" : []
+	 "outEdges" : [
+	   {"edgeName": "SOURCE_FILE", "inNodes": [{"name": "COMMENT"}]}
+	 ]
 	},
 
 	{"name" : "FILE",
 	 "outEdges" : [
+	   // TODO: remove AST edge here
 	   {"edgeName": "AST", "inNodes": [{"name": "COMMENT"}]}
 	 ]
 	}

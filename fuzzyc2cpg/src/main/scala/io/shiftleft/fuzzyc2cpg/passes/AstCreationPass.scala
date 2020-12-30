@@ -1,7 +1,7 @@
 package io.shiftleft.fuzzyc2cpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.fuzzyc2cpg.passes.astcreation.{AntlrCModuleParserDriver, AstVisitor}
 import io.shiftleft.fuzzyc2cpg.{Defines, Global}
 import io.shiftleft.passes.{DiffGraph, IntervalKeyPool, ParallelCpgPass}
@@ -23,26 +23,20 @@ class AstCreationPass(filenames: List[String], cpg: Cpg, keyPool: IntervalKeyPoo
 
     val diffGraph = DiffGraph.newBuilder
     val absolutePath = new java.io.File(filename).toPath.toAbsolutePath.normalize().toString
-    val fileNode = nodes.NewFile(name = absolutePath, order = 0)
-    diffGraph.addNode(fileNode)
     val namespaceBlock = nodes.NewNamespaceBlock(
       name = Defines.globalNamespaceName,
-      fullName = CMetaDataPass.getGlobalNamespaceBlockFullName(Some(fileNode.name))
+      fullName = CMetaDataPass.getGlobalNamespaceBlockFullName(Some(absolutePath)),
+      filename = absolutePath
     )
-    diffGraph.addNode(fileNode)
     diffGraph.addNode(namespaceBlock)
-    diffGraph.addEdge(fileNode, namespaceBlock, EdgeTypes.AST)
-
-    val driver = createDriver(fileNode, namespaceBlock)
+    val driver = createDriver(namespaceBlock)
     tryToParse(driver, filename, diffGraph)
   }
 
-  private def createDriver(fileNode: nodes.NewFile,
-                           namespaceBlock: nodes.NewNamespaceBlock): AntlrCModuleParserDriver = {
+  private def createDriver(namespaceBlock: nodes.NewNamespaceBlock): AntlrCModuleParserDriver = {
     val driver = new AntlrCModuleParserDriver()
     val astVisitor = new AstVisitor(driver, namespaceBlock, global)
     driver.addObserver(astVisitor)
-    driver.setFileNode(fileNode)
     driver
   }
 

@@ -53,15 +53,11 @@ abstract public class AntlrParserDriver {
     private CommonParserContext context = null;
     public DiffGraph.Builder cpg;
     private final List<AntlrParserDriverObserver> observers = new ArrayList<>();
-    private NewFile fileNode;
+
     private Parser antlrParser;
 
     public AntlrParserDriver() {
         super();
-    }
-
-    public void setFileNode(NewFile fileNode) {
-        this.fileNode = fileNode;
     }
 
     public abstract ParseTree parseTokenStreamImpl(TokenSubStream tokens);
@@ -95,10 +91,10 @@ abstract public class AntlrParserDriver {
             String text = token.getText();
             NewComment commentNode = new NewComment(
                     new Some<>(line),
-                    text
+                    text,
+                    filename
             );
             cpg.addNode(commentNode);
-            cpg.addEdge(fileNode, commentNode, EdgeTypes.AST, List$.MODULE$.empty());
         }
     }
 

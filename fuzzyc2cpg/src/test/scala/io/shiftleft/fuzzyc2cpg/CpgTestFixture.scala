@@ -5,6 +5,7 @@ import io.shiftleft.fuzzyc2cpg.passes.{AstCreationPass, CMetaDataPass, StubRemov
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
+import io.shiftleft.semanticcpg.passes.linking.filecompat.FileLinker
 import io.shiftleft.x2cpg.SourceFiles
 import overflowdb.traversal.TraversalSource
 
@@ -22,6 +23,7 @@ case class CpgTestFixture(projectName: String) {
     new CfgCreationPass(cpg, cfgKeyPool).createAndApply()
   }
   new StubRemovalPass(cpg).createAndApply()
+  new FileLinker(cpg).createAndApply()
 
   def traversalSource = TraversalSource(cpg.graph)
 

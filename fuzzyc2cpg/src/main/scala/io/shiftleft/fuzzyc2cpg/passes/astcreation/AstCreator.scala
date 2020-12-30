@@ -116,6 +116,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       lineNumberEnd = location.endLine,
       columnNumberEnd = location.endPos,
       signature = signature,
+      filename = namespaceBlock.filename
     )
 
     addAndConnectAsAstChild(method)
@@ -628,7 +629,8 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
         name = identifierDecl.getName.getEscapedCodeStr,
         fullName = identifierDecl.getName.getEscapedCodeStr,
         isExternal = false,
-        aliasTypeFullName = Some(registerType(declTypeName))
+        aliasTypeFullName = Some(registerType(declTypeName)),
+        filename = namespaceBlock.filename
       )
       diffGraph.addNode(aliasTypeDecl)
       connectAstChild(aliasTypeDecl)
@@ -785,7 +787,8 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       name = name,
       fullName = name,
       isExternal = false,
-      inheritsFromTypeFullName = baseClassList
+      inheritsFromTypeFullName = baseClassList,
+      filename = namespaceBlock.filename
     )
 
     diffGraph.addNode(typeDecl)

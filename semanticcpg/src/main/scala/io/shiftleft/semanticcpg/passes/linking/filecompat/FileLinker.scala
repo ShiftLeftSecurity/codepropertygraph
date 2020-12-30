@@ -45,7 +45,8 @@ class FileLinker(cpg: Cpg) extends CpgPass(cpg) {
       srcLabels = List(
         NodeTypes.NAMESPACE_BLOCK,
         NodeTypes.TYPE_DECL,
-        NodeTypes.METHOD
+        NodeTypes.METHOD,
+        NodeTypes.COMMENT
       ),
       dstNodeLabel = NodeTypes.FILE,
       edgeType = EdgeTypes.SOURCE_FILE,

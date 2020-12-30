@@ -22,10 +22,6 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       new AstCreationPass(filenames, cpg, new IntervalKeyPool(1, 1000))
         .createAndApply()
 
-      "create one File node per file name with absolute path in `name`" in {
-        cpg.file.name.toSet shouldBe expectedFilenameFields.toSet
-      }
-
       "create one NamespaceBlock per file" in {
         val expectedNamespaceFullNames = expectedFilenameFields.map(f => s"$f:<global>").toSet
         cpg.namespaceBlock.fullName.toSet shouldBe expectedNamespaceFullNames
