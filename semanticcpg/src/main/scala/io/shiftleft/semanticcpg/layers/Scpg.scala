@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes}
 import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.passes.BindingMethodOverridesPass
+import io.shiftleft.semanticcpg.passes.{BindingMethodOverridesPass, FileCreationPass}
 import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
 import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
 import io.shiftleft.semanticcpg.passes.compat.argumentcompat.ArgumentCompat
@@ -14,7 +14,7 @@ import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
 import io.shiftleft.semanticcpg.passes.linking.calllinker.CallLinker
 import io.shiftleft.semanticcpg.passes.linking.capturinglinker.CapturingLinker
-import io.shiftleft.semanticcpg.passes.linking.filecompat.{FileLinker, FileNameCompat}
+import io.shiftleft.semanticcpg.passes.linking.filecompat.FileNameCompat
 import io.shiftleft.semanticcpg.passes.linking.linker.Linker
 import io.shiftleft.semanticcpg.passes.linking.memberaccesslinker.MemberAccessLinker
 import io.shiftleft.semanticcpg.passes.methoddecorations.MethodDecoratorPass
@@ -58,7 +58,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CapturingLinker(cpg),
           new Linker(cpg),
           new FileNameCompat(cpg),
-          new FileLinker(cpg),
+          new FileCreationPass(cpg),
           new BindingTableCompat(cpg),
           new BindingMethodOverridesPass(cpg),
           new CallLinker(cpg),
@@ -77,8 +77,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new MethodDecoratorPass(cpg),
           new CapturingLinker(cpg),
           new Linker(cpg),
-          new FileNameCompat(cpg),
-          new FileLinker(cpg),
+          new FileCreationPass(cpg),
           new BindingTableCompat(cpg),
           new BindingMethodOverridesPass(cpg),
           new CallLinker(cpg),
@@ -97,7 +96,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CapturingLinker(cpg),
           new Linker(cpg),
           new FileNameCompat(cpg),
-          new FileLinker(cpg),
+          new FileCreationPass(cpg),
           new BindingTableCompat(cpg),
           new BindingMethodOverridesPass(cpg),
           new CallLinker(cpg),
@@ -117,7 +116,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CapturingLinker(cpg),
           new Linker(cpg),
           new FileNameCompat(cpg),
-          new FileLinker(cpg),
+          new FileCreationPass(cpg),
           new ContainsEdgePass(cpg),
           new MethodExternalDecoratorPass(cpg),
           new CfgDominatorPass(cpg),
