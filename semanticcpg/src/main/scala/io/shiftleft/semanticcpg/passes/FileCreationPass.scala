@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeyNames, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.File
@@ -10,11 +10,8 @@ import io.shiftleft.semanticcpg.passes.linking.linker.Linker
 import scala.collection.mutable
 
 /**
-  * Links NAMESPACE_BLOCKs, TYPE_DECLs and METHODs to their FILEs via
-  * SOURCE_FILE edges. Creates file nodes if required.
-  *
-  * This pass should come after FILENAME properties have been recovered,
-  * that is, after FileNameCompat.
+  * For all nodes with FILENAME fields, create corresponding FILE nodes
+  * and connect node with FILE node via outgoing SOURCE_FILE edges.
   */
 class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
@@ -51,7 +48,7 @@ class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
       dstNodeLabel = NodeTypes.FILE,
       edgeType = EdgeTypes.SOURCE_FILE,
       dstNodeMap = originalFileNameToNode,
-      dstFullNameKey = "FILENAME",
+      dstFullNameKey = NodeKeyNames.FILENAME,
       dstGraph,
       Some(createFileIfDoesNotExist)
     )
