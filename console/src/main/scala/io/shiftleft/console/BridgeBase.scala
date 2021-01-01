@@ -19,6 +19,7 @@ case class Config(
     src: Option[String] = None,
     language: Option[String] = None,
     overwrite: Boolean = false,
+    store: Boolean = false,
     server: Boolean = false,
     serverHost: String = "localhost",
     serverPort: Int = 8080,
@@ -84,6 +85,10 @@ trait BridgeBase {
       opt[Unit]("overwrite")
         .action((_, c) => c.copy(overwrite = true))
         .text("Overwrite CPG if it already exists")
+
+      opt[Unit]("store")
+        .action((_, c) => c.copy(store = true))
+        .text("Store graph changes made by bundle")
 
       note("REST server mode")
 
@@ -188,6 +193,7 @@ trait BridgeBase {
     val bundleName = config.bundleToRun.get
     val src = config.src.get
     val language = config.language.getOrElse("c")
+    val storeCode = if (config.store) { "save" } else { "" }
     val code = s"""
         | if (${config.overwrite} || !workspace.projectExists("$src")) {
         |   importCode.$language("$src")
@@ -199,6 +205,7 @@ trait BridgeBase {
         |    .map(_.name).map(open)
         | }
         | run.$bundleName
+        | $storeCode
         |""".stripMargin
 
     val file = new java.io.File("run-log.txt");
