@@ -191,6 +191,7 @@ trait BridgeBase {
     val code = s"""
         | if (${config.overwrite} || !workspace.projectExists("$src")) {
         |   importCode.$language("$src")
+        |   save
         | } else {
         |    println("Using existing CPG - Use `--overwrite` if this is not what you want")
         |    workspace.projects
