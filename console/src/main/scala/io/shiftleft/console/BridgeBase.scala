@@ -211,7 +211,7 @@ trait BridgeBase {
         | $storeCode
         |""".stripMargin
 
-    val logFileName = "run-log.txt"
+    val logFileName = "/tmp/joern-scan-log.txt"
     println(s"Detailed logs at: $logFileName")
     val file = new java.io.File(logFileName);
     val fos = new FileOutputStream(file);
