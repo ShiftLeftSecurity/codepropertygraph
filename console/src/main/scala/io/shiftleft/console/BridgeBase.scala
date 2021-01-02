@@ -191,17 +191,20 @@ trait BridgeBase {
     }
 
     val bundleName = config.bundleToRun.get
-    val src = config.src.get
+    val src = better.files.File(config.src.get).path.toAbsolutePath.toString
     val language = config.language.getOrElse("c")
     val storeCode = if (config.store) { "save" } else { "" }
     val code = s"""
         | if (${config.overwrite} || !workspace.projectExists("$src")) {
+        |   workspace.projects
+        |   .filter(_.inputPath == "$src")
+        |   .map(_.name).foreach(n => workspace.removeProject(n))
         |   importCode.$language("$src")
         |   save
         | } else {
         |    println("Using existing CPG - Use `--overwrite` if this is not what you want")
         |    workspace.projects
-        |    .filter(x => x.inputPath == better.files.File("$src").path.toAbsolutePath.toString)
+        |    .filter(x => x.inputPath == "$src")
         |    .map(_.name).map(open)
         | }
         | run.$bundleName
