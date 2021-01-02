@@ -23,7 +23,6 @@ class PluginManager(installDir: File) {
       }
       .distinct
       .sorted
-    installedPluginNames.foreach(println)
     installedPluginNames
   }
 
