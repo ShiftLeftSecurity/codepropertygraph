@@ -7,13 +7,13 @@ import java.nio.file.Path
 import scala.util.{Failure, Success, Try}
 
 /**
-  * Plugin management component
+  * Query bundle management component
   * @param installDir the Joern/Ocular installation dir
   * */
-class PluginManager(installDir: File) {
+class BundleManager(installDir: File) {
 
-  def listPlugins(): List[String] = {
-    val installedPluginNames = pluginDir.toList
+  def list(): List[String] = {
+    val installedPluginNames = libDir.toList
       .flatMap { dir =>
         File(dir).list.toList.flatMap { f =>
           "^joernext-(.*?)-.*$".r.findAllIn(f.name).matchData.map { m =>
@@ -27,7 +27,7 @@ class PluginManager(installDir: File) {
   }
 
   def add(filename: String): Unit = {
-    if (pluginDir.isEmpty) {
+    if (libDir.isEmpty) {
       println("Plugin directory does not exist")
       return
     }
@@ -47,7 +47,7 @@ class PluginManager(installDir: File) {
 
   private def addExistingUnzipped(file: File, pluginName: String): Unit = {
     file.listRecursively.filter(_.name.endsWith(".jar")).foreach { jar =>
-      pluginDir.foreach { pDir =>
+      libDir.foreach { pDir =>
         if (!(pDir / jar.name).exists) {
           val dstFileName = s"joernext-$pluginName-${jar.name}"
           val dstFile = pDir / dstFileName
@@ -68,11 +68,11 @@ class PluginManager(installDir: File) {
   }
 
   def rm(name: String): List[String] = {
-    if (!listPlugins().contains(name)) {
+    if (!list().contains(name)) {
       println(s"Plugin $name is not installed")
       List()
     } else {
-      val filesToRemove = pluginDir.toList.flatMap { dir =>
+      val filesToRemove = libDir.toList.flatMap { dir =>
         dir.list.filter { f =>
           f.name.startsWith(s"joernext-$name")
         }
@@ -82,7 +82,7 @@ class PluginManager(installDir: File) {
     }
   }
 
-  def pluginDir: Option[Path] = {
+  def libDir: Option[Path] = {
     val pathToPluginDir = installDir.path.resolve("lib")
     if (pathToPluginDir.toFile.exists()) {
       Some(pathToPluginDir)

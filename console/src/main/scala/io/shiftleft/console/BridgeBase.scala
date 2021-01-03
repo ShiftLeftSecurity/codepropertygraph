@@ -14,8 +14,8 @@ case class Config(
     command: Option[String] = None,
     params: Map[String, String] = Map.empty,
     additionalImports: List[Path] = Nil,
-    bundleToRun: Option[String] = None,
-    listBundles: Boolean = false,
+    extensionToRun: Option[String] = None,
+    listExtensions: Boolean = false,
     src: Option[String] = None,
     language: Option[String] = None,
     overwrite: Boolean = false,
@@ -26,9 +26,9 @@ case class Config(
     serverAuthUsername: String = "",
     serverAuthPassword: String = "",
     nocolors: Boolean = false,
-    listPlugins: Boolean = false,
-    addPlugin: Option[String] = None,
-    rmPlugin: Option[String] = None
+    listBundles: Boolean = false,
+    addBundle: Option[String] = None,
+    rmBundle: Option[String] = None
 )
 
 /**
@@ -67,11 +67,11 @@ trait BridgeBase {
       note("Extension execution")
 
       opt[Unit]("extensions")
-        .action((_, c) => c.copy(extensions = true))
+        .action((_, c) => c.copy(listExtensions = true))
         .text("List available extensions")
 
       opt[String]("run")
-        .action((x, c) => c.copy(extensionsToRun = Some(x)))
+        .action((x, c) => c.copy(extensionToRun = Some(x)))
         .text("Run extension. Get a list via --extensions")
 
       opt[String]("src")
@@ -112,18 +112,18 @@ trait BridgeBase {
         .action((x, c) => c.copy(serverAuthPassword = x))
         .text("Basic auth password for the CPGQL server")
 
-      note("Plugin management")
+      note("Query Bundle Management")
 
-      opt[Unit]("plugins")
-        .action((_, c) => c.copy(listPlugins = true))
-        .text("List plugins")
+      opt[Unit]("bundles")
+        .action((_, c) => c.copy(listBundles = true))
+        .text("List query bundles")
 
-      opt[String]("add-plugin")
-        .action((x, c) => c.copy(addPlugin = Some(x)))
+      opt[String]("add-bundle")
+        .action((x, c) => c.copy(addBundle = Some(x)))
         .text("Plugin zip file to add to the installation")
 
-      opt[String]("remove-plugin")
-        .action((x, c) => c.copy(rmPlugin = Some(x)))
+      opt[String]("remove-bundle")
+        .action((x, c) => c.copy(rmBundle = Some(x)))
         .text("Name of plugin to remove from the installation")
 
       note("Misc")
@@ -141,21 +141,21 @@ trait BridgeBase {
   }
 
   protected def runAmmonite(config: Config, slProduct: SLProduct = OcularProduct): Unit = {
-    if (config.listBundles) {
-      listBundles(config)
-    } else if (config.listPlugins) {
-      new PluginManager(InstallConfig().rootPath).listPlugins()
-    } else if (config.addPlugin.isDefined) {
-      new PluginManager(InstallConfig().rootPath).add(config.addPlugin.get)
-    } else if (config.rmPlugin.isDefined) {
-      new PluginManager(InstallConfig().rootPath).rm(config.rmPlugin.get)
+    if (config.listExtensions) {
+      listExtensions(config)
+    } else if (config.listBundles) {
+      new BundleManager(InstallConfig().rootPath).list().foreach(println)
+    } else if (config.addBundle.isDefined) {
+      new BundleManager(InstallConfig().rootPath).add(config.addBundle.get)
+    } else if (config.rmBundle.isDefined) {
+      new BundleManager(InstallConfig().rootPath).rm(config.rmBundle.get)
     } else {
       config.scriptFile match {
         case None =>
           if (config.server) {
             startHttpServer(config)
-          } else if (config.bundleToRun.isDefined) {
-            runBundle(config)
+          } else if (config.extensionToRun.isDefined) {
+            runExtension(config)
           } else {
             startInteractiveShell(config, slProduct)
           }
@@ -165,7 +165,7 @@ trait BridgeBase {
     }
   }
 
-  private def listBundles(config: Config): Unit = {
+  private def listExtensions(config: Config): Unit = {
     val code =
       """
         |println(run)
@@ -184,13 +184,13 @@ trait BridgeBase {
     }
   }
 
-  private def runBundle(config: Config): Unit = {
+  private def runExtension(config: Config): Unit = {
     if (config.src.isEmpty) {
       println("You must supply a source directory with the --src flag")
       return
     }
 
-    val bundleName = config.bundleToRun.get
+    val bundleName = config.extensionToRun.get
     val src = better.files.File(config.src.get).path.toAbsolutePath.toString
     val language = config.language.getOrElse("c")
     val storeCode = if (config.store) { "save" } else { "" }

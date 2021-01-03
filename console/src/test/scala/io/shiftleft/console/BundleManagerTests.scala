@@ -5,9 +5,9 @@ import better.files._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class PluginManagerTests extends AnyWordSpec with Matchers {
+class BundleManagerTests extends AnyWordSpec with Matchers {
 
-  "PluginManager::add" should {
+  "add" should {
     "not crash if file does not exist" in Fixture() { manager =>
       val testZipFileName = "console/src/test/resources/doesnotexist.zip"
       manager.add(testZipFileName)
@@ -21,7 +21,7 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
     "copy jar files in zip to plugin dir" in Fixture() { manager =>
       val testZipFileName = "console/src/test/resources/test.zip"
       manager.add(testZipFileName)
-      manager.pluginDir match {
+      manager.libDir match {
         case Some(dir) =>
           dir.toFile.list().toList shouldBe List("joernext-test-foo.jar")
         case None => fail
@@ -29,7 +29,7 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
     }
   }
 
-  "PluginManager::rm" should {
+  "rm" should {
 
     "not crash if name of to-be-removed plugin is incorrect" in Fixture() { manager =>
       manager.rm("somename")
@@ -39,24 +39,24 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
       val testZipFileName = "console/src/test/resources/test.zip"
       manager.add(testZipFileName)
       manager.rm("test") shouldBe List("joernext-test-foo.jar")
-      manager.listPlugins() shouldBe List()
+      manager.list() shouldBe List()
       manager.add(testZipFileName)
       manager.rm("test") shouldBe List("joernext-test-foo.jar")
-      manager.listPlugins() shouldBe List()
+      manager.list() shouldBe List()
     }
 
   }
 
-  "PluginManager::listPlugins" should {
+  "list" should {
 
     "display empty plugin list if no plugins exist" in Fixture() { manager =>
-      manager.listPlugins() shouldBe List()
+      manager.list() shouldBe List()
     }
 
     "display plugin after adding it" in Fixture() { manager =>
       val testZipFileName = "console/src/test/resources/test.zip"
       manager.add(testZipFileName)
-      manager.listPlugins() shouldBe List("test")
+      manager.list() shouldBe List("test")
     }
   }
 
@@ -64,10 +64,10 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
 
 object Fixture {
 
-  def apply[T]()(f: PluginManager => T): T = {
+  def apply[T]()(f: BundleManager => T): T = {
     val dir = File.newTemporaryDirectory("pluginmantests")
     mkdir(dir / "lib")
-    val result = f(new PluginManager(dir))
+    val result = f(new BundleManager(dir))
     dir.delete()
     result
   }
