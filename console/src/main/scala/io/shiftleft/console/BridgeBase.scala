@@ -26,7 +26,6 @@ case class Config(
     serverAuthUsername: String = "",
     serverAuthPassword: String = "",
     nocolors: Boolean = false,
-    listPlugins: Boolean = false,
     addPlugin: Option[String] = None,
     rmPlugin: Option[String] = None
 )
@@ -114,10 +113,6 @@ trait BridgeBase {
 
       note("Plugin management")
 
-      opt[Unit]("plugins")
-        .action((_, c) => c.copy(listPlugins = true))
-        .text("List plugins")
-
       opt[String]("add-plugin")
         .action((x, c) => c.copy(addPlugin = Some(x)))
         .text("Plugin zip file to add to the installation")
@@ -143,8 +138,6 @@ trait BridgeBase {
   protected def runAmmonite(config: Config, slProduct: SLProduct = OcularProduct): Unit = {
     if (config.listBundles) {
       listBundles(config)
-    } else if (config.listPlugins) {
-      new PluginManager(InstallConfig().rootPath).listPlugins()
     } else if (config.addPlugin.isDefined) {
       new PluginManager(InstallConfig().rootPath).add(config.addPlugin.get)
     } else if (config.rmPlugin.isDefined) {
@@ -166,6 +159,11 @@ trait BridgeBase {
   }
 
   private def listBundles(config: Config): Unit = {
+    println("Installed extensions:")
+    println("======================")
+    new PluginManager(InstallConfig().rootPath).listPlugins().foreach(println)
+    println("Available capabilities (LayerCreators)")
+    println()
     val code =
       """
         |println(run)
