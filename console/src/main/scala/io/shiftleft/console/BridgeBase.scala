@@ -64,19 +64,19 @@ trait BridgeBase {
         .action((x, c) => c.copy(command = Some(x)))
         .text("select one of multiple @main methods")
 
-      note("Bundle execution")
+      note("Extension execution")
 
-      opt[Unit]("bundles")
-        .action((_, c) => c.copy(listBundles = true))
-        .text("List available bundles")
+      opt[Unit]("extensions")
+        .action((_, c) => c.copy(extensions = true))
+        .text("List available extensions")
 
       opt[String]("run")
-        .action((x, c) => c.copy(bundleToRun = Some(x)))
-        .text("Run bundle. Get a list via --bundles")
+        .action((x, c) => c.copy(extensionsToRun = Some(x)))
+        .text("Run extension. Get a list via --extensions")
 
       opt[String]("src")
         .action((x, c) => c.copy(src = Some(x)))
-        .text("Source code directory to run bundle on")
+        .text("Source code directory to run extension on")
 
       opt[String]("language")
         .action((x, c) => c.copy(language = Some(x)))
@@ -88,7 +88,7 @@ trait BridgeBase {
 
       opt[Unit]("store")
         .action((_, c) => c.copy(store = true))
-        .text("Store graph changes made by bundle")
+        .text("Store graph changes made by extension")
 
       note("REST server mode")
 
