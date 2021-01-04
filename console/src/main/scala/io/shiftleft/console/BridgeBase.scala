@@ -14,8 +14,10 @@ case class Config(
     command: Option[String] = None,
     params: Map[String, String] = Map.empty,
     additionalImports: List[Path] = Nil,
-    bundleToRun: Option[String] = None,
-    listBundles: Boolean = false,
+    addPlugin: Option[String] = None,
+    rmPlugin: Option[String] = None,
+    pluginToRun: Option[String] = None,
+    listPlugins: Boolean = false,
     src: Option[String] = None,
     language: Option[String] = None,
     overwrite: Boolean = false,
@@ -25,10 +27,7 @@ case class Config(
     serverPort: Int = 8080,
     serverAuthUsername: String = "",
     serverAuthPassword: String = "",
-    nocolors: Boolean = false,
-    listPlugins: Boolean = false,
-    addPlugin: Option[String] = None,
-    rmPlugin: Option[String] = None
+    nocolors: Boolean = false
 )
 
 /**
@@ -64,19 +63,27 @@ trait BridgeBase {
         .action((x, c) => c.copy(command = Some(x)))
         .text("select one of multiple @main methods")
 
-      note("Bundle execution")
+      note("Plugin Management")
 
-      opt[Unit]("bundles")
-        .action((_, c) => c.copy(listBundles = true))
-        .text("List available bundles")
+      opt[String]("add-plugin")
+        .action((x, c) => c.copy(addPlugin = Some(x)))
+        .text("Plugin zip file to add to the installation")
+
+      opt[String]("remove-plugin")
+        .action((x, c) => c.copy(rmPlugin = Some(x)))
+        .text("Name of plugin to remove from the installation")
+
+      opt[Unit]("plugins")
+        .action((_, c) => c.copy(listPlugins = true))
+        .text("List available plugins and layer creators")
 
       opt[String]("run")
-        .action((x, c) => c.copy(bundleToRun = Some(x)))
-        .text("Run bundle. Get a list via --bundles")
+        .action((x, c) => c.copy(pluginToRun = Some(x)))
+        .text("Run layer creator. Get a list via --plugins")
 
       opt[String]("src")
         .action((x, c) => c.copy(src = Some(x)))
-        .text("Source code directory to run bundle on")
+        .text("Source code directory to run layer creator on")
 
       opt[String]("language")
         .action((x, c) => c.copy(language = Some(x)))
@@ -112,20 +119,6 @@ trait BridgeBase {
         .action((x, c) => c.copy(serverAuthPassword = x))
         .text("Basic auth password for the CPGQL server")
 
-      note("Plugin management")
-
-      opt[Unit]("plugins")
-        .action((_, c) => c.copy(listPlugins = true))
-        .text("List plugins")
-
-      opt[String]("add-plugin")
-        .action((x, c) => c.copy(addPlugin = Some(x)))
-        .text("Plugin zip file to add to the installation")
-
-      opt[String]("remove-plugin")
-        .action((x, c) => c.copy(rmPlugin = Some(x)))
-        .text("Name of plugin to remove from the installation")
-
       note("Misc")
 
       opt[Unit]("nocolors")
@@ -141,10 +134,8 @@ trait BridgeBase {
   }
 
   protected def runAmmonite(config: Config, slProduct: SLProduct = OcularProduct): Unit = {
-    if (config.listBundles) {
-      listBundles(config)
-    } else if (config.listPlugins) {
-      new PluginManager(InstallConfig().rootPath).listPlugins()
+    if (config.listPlugins) {
+      listPluginsAndLayerCreators(config)
     } else if (config.addPlugin.isDefined) {
       new PluginManager(InstallConfig().rootPath).add(config.addPlugin.get)
     } else if (config.rmPlugin.isDefined) {
@@ -154,7 +145,7 @@ trait BridgeBase {
         case None =>
           if (config.server) {
             startHttpServer(config)
-          } else if (config.bundleToRun.isDefined) {
+          } else if (config.pluginToRun.isDefined) {
             runBundle(config)
           } else {
             startInteractiveShell(config, slProduct)
@@ -165,7 +156,12 @@ trait BridgeBase {
     }
   }
 
-  private def listBundles(config: Config): Unit = {
+  private def listPluginsAndLayerCreators(config: Config): Unit = {
+    println("Installed plugins:")
+    println("==================")
+    new PluginManager(InstallConfig().rootPath).listPlugins().foreach(println)
+    println("Available layer creators")
+    println()
     val code =
       """
         |println(run)
@@ -190,7 +186,7 @@ trait BridgeBase {
       return
     }
 
-    val bundleName = config.bundleToRun.get
+    val bundleName = config.pluginToRun.get
     val src = better.files.File(config.src.get).path.toAbsolutePath.toString
     val language = config.language.getOrElse("c")
     val storeCode = if (config.store) { "save" } else { "" }
