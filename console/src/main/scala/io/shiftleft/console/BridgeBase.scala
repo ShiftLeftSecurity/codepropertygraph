@@ -146,7 +146,7 @@ trait BridgeBase {
           if (config.server) {
             startHttpServer(config)
           } else if (config.pluginToRun.isDefined) {
-            runBundle(config)
+            runPlugin(config)
           } else {
             startInteractiveShell(config, slProduct)
           }
@@ -180,7 +180,7 @@ trait BridgeBase {
     }
   }
 
-  private def runBundle(config: Config): Unit = {
+  private def runPlugin(config: Config): Unit = {
     if (config.src.isEmpty) {
       println("You must supply a source directory with the --src flag")
       return
@@ -196,6 +196,7 @@ trait BridgeBase {
         |   .filter(_.inputPath == "$src")
         |   .map(_.name).foreach(n => workspace.removeProject(n))
         |   importCode.$language("$src")
+        |   run.ossdataflow
         |   save
         | } else {
         |    println("Using existing CPG - Use `--overwrite` if this is not what you want")
