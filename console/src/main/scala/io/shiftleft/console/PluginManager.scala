@@ -4,13 +4,14 @@ import better.files.Dsl._
 import better.files.File.apply
 
 import java.nio.file.Path
+import scala.sys.process.Process
 import scala.util.{Failure, Success, Try}
 
 /**
   * Plugin management component
   * @param installDir the Joern/Ocular installation dir
   * */
-class PluginManager(installDir: File) {
+class PluginManager(val installDir: File) {
 
   def listPlugins(): List[String] = {
     val installedPluginNames = pluginDir.toList
@@ -55,10 +56,10 @@ class PluginManager(installDir: File) {
         }
       }
     }
-    installSchemaExtensions(file, pluginName)
+    installSchemaExtensions(file)
   }
 
-  private def installSchemaExtensions(file: File, pluginName: String): Unit = {
+  private def installSchemaExtensions(file: File): Unit = {
     file.listRecursively
       .filter(_.path.toString.contains("schema"))
       .filter(_.name.endsWith(".json"))
@@ -68,7 +69,7 @@ class PluginManager(installDir: File) {
           cp(json, pDir / name)
         }
       }
-    // Now run the schema extender
+    Process("./schema-extender.sh", installDir.toJava).!!
   }
 
   private def extractToTemporaryDir(file: File) = {
