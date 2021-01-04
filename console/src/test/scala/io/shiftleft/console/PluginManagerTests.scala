@@ -5,6 +5,8 @@ import better.files._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import java.nio.file.attribute.PosixFilePermission
+
 class PluginManagerTests extends AnyWordSpec with Matchers {
 
   "PluginManager::add" should {
@@ -27,6 +29,18 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
         case None => fail
       }
     }
+
+    "copy schema file in zip to schema dir and execute schema extender" in Fixture() { manager =>
+      val testZipFileName = "console/src/test/resources/test.zip"
+      manager.add(testZipFileName)
+      manager.schemaDir match {
+        case Some(dir) =>
+          dir.toFile.list().toList shouldBe List("joernext-test-foo.json")
+          (manager.installDir / "out.txt").exists shouldBe true
+        case None => fail
+      }
+    }
+
   }
 
   "PluginManager::rm" should {
@@ -38,10 +52,10 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
     "remove existing plugin" in Fixture() { manager =>
       val testZipFileName = "console/src/test/resources/test.zip"
       manager.add(testZipFileName)
-      manager.rm("test") shouldBe List("joernext-test-foo.jar")
+      manager.rm("test").map(x => File(x).name).toSet shouldBe Set("joernext-test-foo.jar", "joernext-test-foo.json")
       manager.listPlugins() shouldBe List()
       manager.add(testZipFileName)
-      manager.rm("test") shouldBe List("joernext-test-foo.jar")
+      manager.rm("test").map(x => File(x).name).toSet shouldBe Set("joernext-test-foo.jar", "joernext-test-foo.json")
       manager.listPlugins() shouldBe List()
     }
 
@@ -67,6 +81,11 @@ object Fixture {
   def apply[T]()(f: PluginManager => T): T = {
     val dir = File.newTemporaryDirectory("pluginmantests")
     mkdir(dir / "lib")
+    mkdirs(dir / "schema-extender" / "schemas")
+    val extender = dir / "schema-extender.sh"
+    val extenderContents = "#!/bin/sh\necho 'foo' > " + (dir / "out.txt")
+    extender.write(extenderContents)
+    chmod_+(PosixFilePermission.OWNER_EXECUTE, extender)
     val result = f(new PluginManager(dir))
     dir.delete()
     result

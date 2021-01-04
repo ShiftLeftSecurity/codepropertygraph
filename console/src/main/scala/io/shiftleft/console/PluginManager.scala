@@ -4,13 +4,14 @@ import better.files.Dsl._
 import better.files.File.apply
 
 import java.nio.file.Path
+import scala.sys.process.Process
 import scala.util.{Failure, Success, Try}
 
 /**
   * Plugin management component
   * @param installDir the Joern/Ocular installation dir
   * */
-class PluginManager(installDir: File) {
+class PluginManager(val installDir: File) {
 
   def listPlugins(): List[String] = {
     val installedPluginNames = pluginDir.toList
@@ -55,6 +56,26 @@ class PluginManager(installDir: File) {
         }
       }
     }
+    installSchemaExtensions(file, pluginName)
+  }
+
+  private def installSchemaExtensions(file: File, pluginName: String): Unit = {
+    schemaDir.foreach { sDir =>
+      file.listRecursively
+        .filter(_.path.toString.contains("schema"))
+        .filter(_.name.endsWith(".json"))
+        .foreach { json =>
+          val name = json.name
+          val dstFileName = s"joernext-$pluginName-$name"
+          cp(json, sDir / dstFileName)
+        }
+    }
+    try {
+      Process("./schema-extender.sh", installDir.toJava).!!
+    } catch {
+      case e: Exception =>
+        System.err.println(s"Error running schema-extender: ${e.getMessage}")
+    }
   }
 
   private def extractToTemporaryDir(file: File) = {
@@ -76,9 +97,13 @@ class PluginManager(installDir: File) {
         dir.list.filter { f =>
           f.name.startsWith(s"joernext-$name")
         }
+      } ++ schemaDir.toList.flatMap { dir =>
+        dir.list.filter { f =>
+          f.name.startsWith(s"joernext-$name")
+        }
       }
       filesToRemove.foreach(f => f.delete())
-      filesToRemove.map(_.name)
+      filesToRemove.map(_.pathAsString)
     }
   }
 
@@ -88,6 +113,16 @@ class PluginManager(installDir: File) {
       Some(pathToPluginDir)
     } else {
       println(s"Plugin directory at $pathToPluginDir does not exist")
+      None
+    }
+  }
+
+  def schemaDir: Option[Path] = {
+    val pathToSchemaDir = installDir.path.resolve("schema-extender/schemas/")
+    if (pathToSchemaDir.toFile.exists()) {
+      Some(pathToSchemaDir)
+    } else {
+      println(s"Schema directory at $pathToSchemaDir does not exist")
       None
     }
   }
