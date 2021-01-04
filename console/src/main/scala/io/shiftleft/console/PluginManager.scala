@@ -55,6 +55,20 @@ class PluginManager(installDir: File) {
         }
       }
     }
+    installSchemaExtensions(file, pluginName)
+  }
+
+  private def installSchemaExtensions(file: File, pluginName: String): Unit = {
+    file.listRecursively
+      .filter(_.path.toString.contains("schema"))
+      .filter(_.name.endsWith(".json"))
+      .foreach { json =>
+        schemaDir.foreach { pDir =>
+          val name = json.name
+          cp(json, pDir / name)
+        }
+      }
+    // Now run the schema extender
   }
 
   private def extractToTemporaryDir(file: File) = {
@@ -88,6 +102,16 @@ class PluginManager(installDir: File) {
       Some(pathToPluginDir)
     } else {
       println(s"Plugin directory at $pathToPluginDir does not exist")
+      None
+    }
+  }
+
+  def schemaDir: Option[Path] = {
+    val pathToSchemaDir = installDir.path.resolve("schema-extender/schemas/")
+    if (pathToSchemaDir.toFile.exists()) {
+      Some(pathToSchemaDir)
+    } else {
+      println(s"Schema directory at $pathToSchemaDir does not exist")
       None
     }
   }
