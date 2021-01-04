@@ -35,7 +35,7 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
       manager.add(testZipFileName)
       manager.schemaDir match {
         case Some(dir) =>
-          dir.toFile.list().toList shouldBe List("foo.json")
+          dir.toFile.list().toList shouldBe List("joernext-test-foo.json")
           (manager.installDir / "out.txt").exists shouldBe true
         case None => fail
       }
@@ -52,10 +52,10 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
     "remove existing plugin" in Fixture() { manager =>
       val testZipFileName = "console/src/test/resources/test.zip"
       manager.add(testZipFileName)
-      manager.rm("test") shouldBe List("joernext-test-foo.jar")
+      manager.rm("test").map(x => File(x).name).toSet shouldBe Set("joernext-test-foo.jar", "joernext-test-foo.json")
       manager.listPlugins() shouldBe List()
       manager.add(testZipFileName)
-      manager.rm("test") shouldBe List("joernext-test-foo.jar")
+      manager.rm("test").map(x => File(x).name).toSet shouldBe Set("joernext-test-foo.jar", "joernext-test-foo.json")
       manager.listPlugins() shouldBe List()
     }
 

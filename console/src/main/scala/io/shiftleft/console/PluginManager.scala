@@ -56,20 +56,26 @@ class PluginManager(val installDir: File) {
         }
       }
     }
-    installSchemaExtensions(file)
+    installSchemaExtensions(file, pluginName)
   }
 
-  private def installSchemaExtensions(file: File): Unit = {
-    file.listRecursively
-      .filter(_.path.toString.contains("schema"))
-      .filter(_.name.endsWith(".json"))
-      .foreach { json =>
-        schemaDir.foreach { pDir =>
+  private def installSchemaExtensions(file: File, pluginName: String): Unit = {
+    schemaDir.foreach { sDir =>
+      file.listRecursively
+        .filter(_.path.toString.contains("schema"))
+        .filter(_.name.endsWith(".json"))
+        .foreach { json =>
           val name = json.name
-          cp(json, pDir / name)
+          val dstFileName = s"joernext-$pluginName-$name"
+          cp(json, sDir / dstFileName)
         }
-      }
-    Process("./schema-extender.sh", installDir.toJava).!!
+    }
+    try {
+      Process("./schema-extender.sh", installDir.toJava).!!
+    } catch {
+      case e: Exception =>
+        System.err.println(s"Error running schema-extender: ${e.getMessage}")
+    }
   }
 
   private def extractToTemporaryDir(file: File) = {
@@ -91,9 +97,13 @@ class PluginManager(val installDir: File) {
         dir.list.filter { f =>
           f.name.startsWith(s"joernext-$name")
         }
+      } ++ schemaDir.toList.flatMap { dir =>
+        dir.list.filter { f =>
+          f.name.startsWith(s"joernext-$name")
+        }
       }
       filesToRemove.foreach(f => f.delete())
-      filesToRemove.map(_.name)
+      filesToRemove.map(_.pathAsString)
     }
   }
 
