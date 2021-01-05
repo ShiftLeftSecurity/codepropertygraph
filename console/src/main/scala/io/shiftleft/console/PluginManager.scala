@@ -60,21 +60,26 @@ class PluginManager(val installDir: File) {
   }
 
   private def installSchemaExtensions(file: File, pluginName: String): Unit = {
-    schemaDir.foreach { sDir =>
-      file.listRecursively
+    val copyOps = schemaDir.toList.flatMap { sDir =>
+      file.listRecursively.toList
         .filter(_.path.toString.contains("schema"))
         .filter(_.name.endsWith(".json"))
-        .foreach { json =>
+        .map { json =>
           val name = json.name
           val dstFileName = s"joernext-$pluginName-$name"
           cp(json, sDir / dstFileName)
+          json
         }
     }
-    try {
-      Process("./schema-extender.sh", installDir.toJava).!!
-    } catch {
-      case e: Exception =>
-        System.err.println(s"Error running schema-extender: ${e.getMessage}")
+
+    if (copyOps.nonEmpty) {
+      println("Plugin modifies the schema. Running schema extender.")
+      try {
+        Process("./schema-extender.sh", installDir.toJava).!!
+      } catch {
+        case e: Exception =>
+          System.err.println(s"Error running schema-extender: ${e.getMessage}")
+      }
     }
   }
 
