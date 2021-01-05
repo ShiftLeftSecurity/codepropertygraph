@@ -14,12 +14,6 @@ import scala.collection.mutable
 class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVal {
 
   /**
-    * The enclosing method of the tracking point
-    * */
-  def method: Traversal[nodes.Method] =
-    traversal.map(_.method)
-
-  /**
     * Convert to nearest CFG node
     * */
   def cfgNode: Traversal[nodes.CfgNode] =

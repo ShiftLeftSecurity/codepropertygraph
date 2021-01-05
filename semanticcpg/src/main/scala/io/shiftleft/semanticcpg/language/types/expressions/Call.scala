@@ -22,12 +22,6 @@ class Call(val traversal: Traversal[nodes.Call]) extends AnyVal {
     traversal.dispatchType("DYNAMIC_DISPATCH")
 
   /**
-    The caller
-    */
-  def method: Traversal[nodes.Method] =
-    traversal.in(EdgeTypes.CONTAINS).hasLabel(NodeTypes.METHOD).cast[nodes.Method]
-
-  /**
     The receiver of a call if the call has a receiver associated.
     */
   def receiver: Traversal[nodes.Expression] =
