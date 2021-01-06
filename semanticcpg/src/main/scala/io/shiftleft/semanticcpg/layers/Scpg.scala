@@ -41,9 +41,8 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
       .getOrElse(throw new Exception("Meta node missing."))
 
     val enhancementExecList = createEnhancementExecList(cpg, language)
-    enhancementExecList.zipWithIndex.foreach {
-      case (pass, index) =>
-        runPass(pass, context, storeUndoInfo, index)
+    enhancementExecList.zipWithIndex.foreach { case (pass, index) =>
+      runPass(pass, context, storeUndoInfo, index)
     }
   }
 
@@ -52,78 +51,93 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
       case Languages.JAVA =>
         Iterator(
           new ArgumentCompat(cpg),
-          new MethodInstCompat(cpg),
-          new ReceiverEdgePass(cpg),
-          new MethodDecoratorPass(cpg),
-          new CapturingLinker(cpg),
-          new Linker(cpg),
-          new FileNameCompat(cpg),
-          new FileCreationPass(cpg),
-          new BindingTableCompat(cpg),
           new BindingMethodOverridesPass(cpg),
+          new BindingTableCompat(cpg),
           new CallLinker(cpg),
-          new MemberAccessLinker(cpg),
-          new MethodExternalDecoratorPass(cpg),
-          new ContainsEdgePass(cpg),
-          new NamespaceCreator(cpg),
-          new CfgDominatorPass(cpg),
+          new CapturingLinker(cpg),
           new CdgPass(cpg),
-          new TrimPass(cpg),
+          new CfgDominatorPass(cpg),
+          new ContainsEdgePass(cpg),
+          new FileCreationPass(cpg),
+          new FileNameCompat(cpg),
+          new Linker(cpg),
+          new MemberAccessLinker(cpg),
+          new MethodDecoratorPass(cpg),
+          new MethodExternalDecoratorPass(cpg),
+          new MethodInstCompat(cpg),
+          new NamespaceCreator(cpg),
+          new ReceiverEdgePass(cpg),
+          new TrimPass(cpg)
         )
       case Languages.C =>
         Iterator(
-          new TypeDeclStubCreator(cpg),
-          new MethodStubCreator(cpg),
-          new MethodDecoratorPass(cpg),
-          new CapturingLinker(cpg),
-          new Linker(cpg),
-          new FileCreationPass(cpg),
-          new BindingTableCompat(cpg),
           new BindingMethodOverridesPass(cpg),
+          new BindingTableCompat(cpg),
           new CallLinker(cpg),
-          new MemberAccessLinker(cpg),
-          new MethodExternalDecoratorPass(cpg),
-          new ContainsEdgePass(cpg),
-          new NamespaceCreator(cpg),
-          new CfgDominatorPass(cpg),
+          new CapturingLinker(cpg),
           new CdgPass(cpg),
+          new CfgDominatorPass(cpg),
+          new ContainsEdgePass(cpg),
+          new FileCreationPass(cpg),
+          new Linker(cpg),
+          new MemberAccessLinker(cpg),
+          new MethodDecoratorPass(cpg),
+          new MethodExternalDecoratorPass(cpg),
+          new MethodStubCreator(cpg),
+          new NamespaceCreator(cpg),
+          new TypeDeclStubCreator(cpg)
         )
       case Languages.LLVM =>
         Iterator(
-          new TypeDeclStubCreator(cpg),
-          new MethodStubCreator(cpg),
-          new MethodDecoratorPass(cpg),
-          new CapturingLinker(cpg),
-          new Linker(cpg),
-          new FileNameCompat(cpg),
-          new FileCreationPass(cpg),
-          new BindingTableCompat(cpg),
           new BindingMethodOverridesPass(cpg),
+          new BindingTableCompat(cpg),
           new CallLinker(cpg),
-          new MemberAccessLinker(cpg),
-          new MethodExternalDecoratorPass(cpg),
-          new ContainsEdgePass(cpg),
-          new NamespaceCreator(cpg),
-          new CfgDominatorPass(cpg),
+          new CapturingLinker(cpg),
           new CdgPass(cpg),
+          new CfgDominatorPass(cpg),
+          new ContainsEdgePass(cpg),
+          new FileCreationPass(cpg),
+          new FileNameCompat(cpg),
+          new Linker(cpg),
+          new MemberAccessLinker(cpg),
+          new MethodDecoratorPass(cpg),
+          new MethodExternalDecoratorPass(cpg),
+          new MethodStubCreator(cpg),
+          new NamespaceCreator(cpg),
+          new TypeDeclStubCreator(cpg)
         )
       case Languages.JAVASCRIPT =>
         Iterator(
           new ArgumentCompat(cpg),
+          new CapturingLinker(cpg),
+          new CdgPass(cpg),
+          new CfgDominatorPass(cpg),
+          new ContainsEdgePass(cpg),
+          new FileCreationPass(cpg),
+          new FileNameCompat(cpg),
+          new Linker(cpg),
+          new MethodDecoratorPass(cpg),
+          new MethodExternalDecoratorPass(cpg),
           new MethodInstCompat(cpg),
           new MethodStubCreator(cpg),
-          new MethodDecoratorPass(cpg),
-          new CapturingLinker(cpg),
-          new Linker(cpg),
-          new FileNameCompat(cpg),
-          new FileCreationPass(cpg),
-          new ContainsEdgePass(cpg),
-          new MethodExternalDecoratorPass(cpg),
-          new CfgDominatorPass(cpg),
-          new CdgPass(cpg),
-          new NamespaceCreator(cpg),
+          new NamespaceCreator(cpg)
         )
-      case _ => Iterator()
+      case _ =>
+        Iterator(
+          new CallLinker(cpg),
+          new CapturingLinker(cpg),
+          new CdgPass(cpg),
+          new CfgDominatorPass(cpg),
+          new ContainsEdgePass(cpg),
+          new FileCreationPass(cpg),
+          new Linker(cpg),
+          new MemberAccessLinker(cpg),
+          new MethodDecoratorPass(cpg),
+          new MethodExternalDecoratorPass(cpg),
+          new MethodStubCreator(cpg),
+          new NamespaceCreator(cpg),
+          new TypeDeclStubCreator(cpg)
+        )
     }
   }
 
