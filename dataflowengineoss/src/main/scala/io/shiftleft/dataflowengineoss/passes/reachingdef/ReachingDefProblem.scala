@@ -1,6 +1,6 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.accesspath.{AccessPath, MatchResult, TrackedBase}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase.ImplicitsAPI
@@ -48,8 +48,11 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
     * */
   private def initSucc(ns: List[nodes.StoredNode]): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
     ns.map {
-      case n @ (ret: nodes.Return)              => n -> List(ret.method.methodReturn)
-      case n @ (cfgNode: nodes.CfgNode)         => n -> cfgNode.cfgNext.l
+      case n @ (ret: nodes.Return) => n -> List(ret.method.methodReturn)
+      case n @ (cfgNode: nodes.CfgNode) =>
+        n ->
+          // `.cfgNext` would be wrong here because it filters `METHOD_RETURN`
+          cfgNode.out(EdgeTypes.CFG).map(_.asInstanceOf[nodes.StoredNode]).l
       case n @ (param: nodes.MethodParameterIn) => n -> param.method.cfgFirst.l
       case n =>
         logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
@@ -110,7 +113,6 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     val defsForCalls = method.call.l.map { call =>
       call -> defsMadeByCall(call)
     }
-
     (defsForParams ++ defsForCalls).toMap
   }
 

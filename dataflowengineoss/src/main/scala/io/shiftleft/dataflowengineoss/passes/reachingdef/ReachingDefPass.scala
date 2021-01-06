@@ -5,6 +5,8 @@ import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
+import scala.collection.mutable
+
 /**
   * A pass that calculates reaching definitions ("data dependencies").
   * */
@@ -27,12 +29,14 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   private def addReachingDefEdges(method: nodes.Method, solution: Solution[Set[Definition]]): DiffGraph.Builder = {
 
     val dstGraph = DiffGraph.newBuilder
+    val nodesWithOutgoingEdges: mutable.Set[nodes.StoredNode] = mutable.Set()
 
     def addEdge(fromNode: nodes.StoredNode, toNode: nodes.StoredNode, variable: String = ""): Unit = {
       val properties = List((EdgeKeyNames.VARIABLE, variable))
       if (fromNode.isInstanceOf[nodes.Unknown] || toNode
             .isInstanceOf[nodes.Unknown])
         return
+      nodesWithOutgoingEdges += fromNode
       dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF, properties)
     }
 
@@ -76,11 +80,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
                 addEdge(method, ret)
               }
           }
-
-        case methodReturn: nodes.MethodReturn =>
-          methodReturn.cfgPrev.isReturn.foreach { ret =>
-            addEdge(ret, methodReturn, "<RET>")
-          }
+          addEdge(ret, method.methodReturn, "<RET>")
 
         case _ =>
       }
@@ -92,13 +92,27 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
         x =>
           x.isInstanceOf[nodes.Method] || x
             .isInstanceOf[nodes.ControlStructure] || x.isInstanceOf[nodes.FieldIdentifier] || x
-            .isInstanceOf[nodes.JumpTarget])
+            .isInstanceOf[nodes.JumpTarget] || x.isInstanceOf[nodes.MethodReturn] || x.isInstanceOf[nodes.Block])
       .foreach { node =>
         if (usageAnalyzer.usedIncomingDefs(node).isEmpty) {
+          println(method, node)
           addEdge(method, node)
         }
       }
 
+    // Add edges to exit node
+    val exitNode = method.methodReturn
+    (allNodes.toSet -- nodesWithOutgoingEdges).toList
+      .filter(_ != exitNode)
+      .filter(_ != method)
+      .filterNot(
+        x =>
+          x.isInstanceOf[nodes.Method] || x
+            .isInstanceOf[nodes.ControlStructure] || x.isInstanceOf[nodes.FieldIdentifier] || x
+            .isInstanceOf[nodes.JumpTarget] || x.isInstanceOf[nodes.MethodReturn])
+      .foreach { from =>
+        addEdge(from, exitNode)
+      }
     dstGraph
   }
 
