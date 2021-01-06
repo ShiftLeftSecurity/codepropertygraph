@@ -41,8 +41,9 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
       .getOrElse(throw new Exception("Meta node missing."))
 
     val enhancementExecList = createEnhancementExecList(cpg, language)
-    enhancementExecList.zipWithIndex.foreach { case (pass, index) =>
-      runPass(pass, context, storeUndoInfo, index)
+    enhancementExecList.zipWithIndex.foreach {
+      case (pass, index) =>
+        runPass(pass, context, storeUndoInfo, index)
     }
   }
 
