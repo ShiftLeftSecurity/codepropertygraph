@@ -95,7 +95,6 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
             .isInstanceOf[nodes.JumpTarget] || x.isInstanceOf[nodes.MethodReturn] || x.isInstanceOf[nodes.Block])
       .foreach { node =>
         if (usageAnalyzer.usedIncomingDefs(node).isEmpty) {
-          println(method, node)
           addEdge(method, node)
         }
       }
