@@ -218,7 +218,7 @@ class CDataFlowTests5 extends DataFlowCodeToCpgSuite {
 
   "Test 5: flow from method return to a" in {
     val source = cpg.identifier.name("a")
-    val sink = cpg.methodReturn
+    val sink = cpg.method("flow").ast.isReturn
     val flows = sink.reachableByFlows(source).l
 
     flows.size shouldBe 1
@@ -229,7 +229,6 @@ class CDataFlowTests5 extends DataFlowCodeToCpgSuite {
           ("z = a", 3),
           ("b = z", 4),
           ("return b;", 6),
-          ("RET", 2)
         ))
   }
 }
@@ -255,7 +254,7 @@ class CDataFlowTests6 extends DataFlowCodeToCpgSuite {
 
   "Test 6: flow with nested if-statements from method return to a" in {
     val source = cpg.call.code("a < 10").argument.code("a")
-    val sink = cpg.methodReturn
+    val sink = cpg.method("nested").ast.isReturn
     val flows = sink.reachableByFlows(source).l
 
     flows.size shouldBe 1
@@ -268,7 +267,6 @@ class CDataFlowTests6 extends DataFlowCodeToCpgSuite {
           ("a < 2", Some(7)),
           ("x = a", 8),
           ("return x;", 14),
-          ("RET", 2)
         ))
   }
 }
@@ -292,9 +290,9 @@ class CDataFlowTests7 extends DataFlowCodeToCpgSuite {
         | }
       """.stripMargin
 
-  "Test 7: flow with nested if-statements from method return to x" in {
+  "Test 7: flow with nested if-statements to `return x`" in {
     val source = cpg.identifier.name("x")
-    val sink = cpg.methodReturn
+    val sink = cpg.method("nested").ast.isReturn
     val flows = sink.reachableByFlows(source).l
 
     flows.size shouldBe 3
@@ -304,16 +302,13 @@ class CDataFlowTests7 extends DataFlowCodeToCpgSuite {
         List[(String, Option[Integer])](
           ("x = z", 12),
           ("return x;", 14),
-          ("RET", 2)
         ),
         List[(String, Option[Integer])](
           ("x = a", 8),
           ("return x;", 14),
-          ("RET", 2)
         ),
         List[(String, Option[Integer])](
           ("return x;", 14),
-          ("RET", 2)
         )
       )
   }
@@ -862,7 +857,29 @@ class CDataFlowTests26 extends DataFlowCodeToCpgSuite {
     val sink = cpg.method.name("sink").parameter.l
     implicit val s: Semantics = semantics
     val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
-    println(flows.size)
-    flows.map(flowToResultPairs).toSet.foreach(println)
+    flows.size shouldBe 0
+  }
+}
+
+class CDataFlowTests27 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |int foo() {
+      |  free(y);
+      |  free(x);
+      |}
+      |
+      |""".stripMargin
+
+  "Test 27: find flows of last statements to METHOD_RETURN" in {
+    val source = cpg.call("free")
+    val sink = cpg.method("foo").methodReturn
+    implicit val s: Semantics = semantics
+    val flows = sink.reachableByFlows(source).l
+
+    flows.map(flowToResultPairs).toSet shouldBe Set(
+      List(("free(x)", Some(4)), ("RET", Some(2))),
+      List(("free(y)", Some(3)), ("RET", Some(2)))
+    )
   }
 }
