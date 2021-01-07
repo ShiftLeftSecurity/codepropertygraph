@@ -26,13 +26,9 @@ class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
 
   "Test 1: flow from function call read to multiple versions of the same variable" in {
 
-    def source = cpg.identifier.name("sz")
-
-    def sink = cpg.call.name("read")
-
+    val source = cpg.identifier.name("sz").l
+    val sink = cpg.call.name("read").l
     def flows = sink.reachableByFlows(source)
-
-    flows.map(flowToResultPairs).toSet.size shouldBe 6
 
     flows.map(flowToResultPairs).toSet shouldBe
       Set(
@@ -872,7 +868,7 @@ class CDataFlowTests27 extends DataFlowCodeToCpgSuite {
       |""".stripMargin
 
   "Test 27: find flows of last statements to METHOD_RETURN" in {
-    val source = cpg.call("free")
+    val source = cpg.call("free").argument(1)
     val sink = cpg.method("foo").methodReturn
     implicit val s: Semantics = semantics
     val flows = sink.reachableByFlows(source).l
@@ -881,5 +877,46 @@ class CDataFlowTests27 extends DataFlowCodeToCpgSuite {
       List(("free(x)", Some(4)), ("RET", Some(2))),
       List(("free(y)", Some(3)), ("RET", Some(2)))
     )
+  }
+}
+
+class CDataFlowTests28 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |int foo() {
+      |   int y = 1;
+      |   y = something_else;
+      |   y = 10;
+      |}
+      |
+      |""".stripMargin
+
+  "Test 28: find that there is no flow from `y = 1` to exit node" in {
+    val source = cpg.literal("1").l
+    val sink = cpg.method("foo").methodReturn
+
+    val flows = sink.reachableByFlows(source).l
+    flows.size shouldBe 0
+  }
+}
+
+class CDataFlowTests29 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |int foo() {
+      |   char * y = malloc(10);
+      |   free(y);
+      |   y = 10;
+      |}
+      |
+      |""".stripMargin
+
+  "Test 29: find that there is no flow from free(y) to exit node" in {
+    val source = cpg.call("free").argument(1).l
+    val sink = cpg.method("foo").methodReturn.l
+
+    implicit val s: Semantics = semantics
+    val flows = sink.reachableByFlows(source).l
+    flows.size shouldBe 0
   }
 }

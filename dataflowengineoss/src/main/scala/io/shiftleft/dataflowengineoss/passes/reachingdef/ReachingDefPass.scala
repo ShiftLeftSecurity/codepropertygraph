@@ -4,8 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{nodes, _}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
-
-import scala.collection.mutable
+import overflowdb.traversal.Traversal
 
 /**
   * A pass that calculates reaching definitions ("data dependencies").
@@ -29,14 +28,12 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   private def addReachingDefEdges(method: nodes.Method, solution: Solution[Set[Definition]]): DiffGraph.Builder = {
 
     val dstGraph = DiffGraph.newBuilder
-    val nodesWithOutgoingEdges: mutable.Set[nodes.StoredNode] = mutable.Set()
 
     def addEdge(fromNode: nodes.StoredNode, toNode: nodes.StoredNode, variable: String = ""): Unit = {
       val properties = List((EdgeKeyNames.VARIABLE, variable))
       if (fromNode.isInstanceOf[nodes.Unknown] || toNode
             .isInstanceOf[nodes.Unknown])
         return
-      nodesWithOutgoingEdges += fromNode
       dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF, properties)
     }
 
@@ -61,9 +58,9 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           // For all calls, assume that input arguments
           // taint corresponding output arguments
           // and the return value
-          usageAnalyzer.uses(call).foreach { use =>
-            gen(call).foreach { g =>
-              if (use != g.node) {
+          usageAnalyzer.uses(node).foreach { use =>
+            gen(node).foreach { g =>
+              if (use != g.node && nodeMayBeSource(use)) {
                 addEdge(use, g.node, nodeToEdgeLabel(use))
               }
             }
@@ -82,37 +79,31 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           }
           addEdge(ret, method.methodReturn, "<RET>")
 
+        case exitNode: nodes.MethodReturn =>
+          in(exitNode).foreach { i =>
+            addEdge(i.node, exitNode, nodeToEdgeLabel(i.node))
+          }
         case _ =>
       }
     }
 
     // Add edges from the entry node
     allNodes
-      .filterNot(
-        x =>
-          x.isInstanceOf[nodes.Method] || x
-            .isInstanceOf[nodes.ControlStructure] || x.isInstanceOf[nodes.FieldIdentifier] || x
-            .isInstanceOf[nodes.JumpTarget] || x.isInstanceOf[nodes.MethodReturn] || x.isInstanceOf[nodes.Block])
+      .filter(nodeMayBeSource)
       .foreach { node =>
         if (usageAnalyzer.usedIncomingDefs(node).isEmpty) {
           addEdge(method, node)
         }
       }
-
-    // Add edges to exit node
-    val exitNode = method.methodReturn
-    (allNodes.toSet -- nodesWithOutgoingEdges).toList
-      .filter(_ != exitNode)
-      .filter(_ != method)
-      .filterNot(
-        x =>
-          x.isInstanceOf[nodes.Method] || x
-            .isInstanceOf[nodes.ControlStructure] || x.isInstanceOf[nodes.FieldIdentifier] || x
-            .isInstanceOf[nodes.JumpTarget] || x.isInstanceOf[nodes.MethodReturn])
-      .foreach { from =>
-        addEdge(from, exitNode)
-      }
     dstGraph
+  }
+
+  private def nodeMayBeSource(x: nodes.StoredNode): Boolean = {
+    !(
+      x.isInstanceOf[nodes.Method] || x
+        .isInstanceOf[nodes.ControlStructure] || x.isInstanceOf[nodes.FieldIdentifier] || x
+        .isInstanceOf[nodes.JumpTarget] || x.isInstanceOf[nodes.MethodReturn] || x.isInstanceOf[nodes.Block]
+    )
   }
 
   private def nodeToEdgeLabel(node: nodes.StoredNode): String = {

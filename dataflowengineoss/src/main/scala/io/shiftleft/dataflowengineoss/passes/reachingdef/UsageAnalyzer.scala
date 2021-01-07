@@ -40,7 +40,6 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
 
   def uses(node: nodes.StoredNode): Set[nodes.StoredNode] = {
     val n = node match {
-      // case methodRet: nodes.MethodReturn => methodRet.start.method.cfgNode.toSet
       case ret: nodes.Return =>
         ret.astChildren.toSet
       case call: nodes.Call =>
