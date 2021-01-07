@@ -22,7 +22,12 @@ class ExpressionMethods[NodeType <: nodes.Expression](val node: NodeType) extend
     * */
   def isDefined(implicit semantics: Semantics): Boolean = {
     val s = semanticsForCallByArg
-    s.isEmpty || s.exists(_.mappings.exists { case (_, dstIndex) => dstIndex == node.order })
+    s.isEmpty || s.exists { semantic =>
+      semantic.mappings.exists {
+        case (_, dstIndex) =>
+          dstIndex == node.order
+      }
+    }
   }
 
   /**

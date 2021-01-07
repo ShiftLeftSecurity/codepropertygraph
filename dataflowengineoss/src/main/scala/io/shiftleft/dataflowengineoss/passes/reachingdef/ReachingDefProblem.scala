@@ -27,6 +27,7 @@ object ReachingDefProblem {
     val init = new ReachingDefInit(transfer.gen)
     def meet: (Set[Definition], Set[Definition]) => Set[Definition] =
       (x: Set[Definition], y: Set[Definition]) => { x.union(y) }
+
     new DataFlowProblem[Set[Definition]](flowGraph, transfer, meet, init, true, Set[Definition]())
   }
 

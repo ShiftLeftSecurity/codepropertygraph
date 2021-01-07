@@ -1,7 +1,8 @@
 package io.shiftleft.dataflowengineoss.queryengine
 
-import java.util.concurrent.{Callable, ExecutorCompletionService, ExecutorService, Executors}
+import io.shiftleft.codepropertygraph.generated.nodes.Call
 
+import java.util.concurrent.{Callable, ExecutorCompletionService, ExecutorService, Executors}
 import io.shiftleft.codepropertygraph.generated.{EdgeKeys, EdgeTypes, nodes}
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
@@ -132,14 +133,22 @@ object Engine {
       implicit semantics: Semantics): Vector[PathElement] = {
     curNode match {
       case argument: nodes.Expression =>
-        val (arguments, nonArguments) = ddgInE(curNode, path).partition(_.outNode().isInstanceOf[nodes.Expression])
+        val (arguments, nonArguments) = ddgInE(curNode, path)
+          .filter { edge =>
+            !isCallRetvalThatShouldNotPropagate(edge.outNode().asInstanceOf[nodes.StoredNode])
+          }
+          .partition(_.outNode().isInstanceOf[nodes.Expression])
         val elemsForArguments = arguments.flatMap { e =>
           elemForArgument(e, argument)
         }
         val elems = elemsForArguments ++ nonArguments.map(edgeToPathElement)
         elems
       case _ =>
-        ddgInE(curNode, path).map(edgeToPathElement)
+        ddgInE(curNode, path)
+          .filter { edge =>
+            !isCallRetvalThatShouldNotPropagate(edge.outNode().asInstanceOf[nodes.StoredNode])
+          }
+          .map(edgeToPathElement)
     }
   }
 
@@ -156,6 +165,16 @@ object Engine {
       .filter(e => e.outNode().isInstanceOf[nodes.TrackingPoint])
       .filter(e => !path.map(_.node).contains(e.outNode().asInstanceOf[nodes.TrackingPoint]))
       .toVector
+  }
+
+  def isCallRetvalThatShouldNotPropagate(parentNode: nodes.StoredNode)(implicit semantics: Semantics): Boolean = {
+    parentNode match {
+      case call: Call =>
+        val sem = semantics.forMethod(call.methodFullName)
+        (sem.isDefined && !(sem.get.mappings.map(_._2).contains(-1)))
+      case _ =>
+        false
+    }
   }
 
   /**
