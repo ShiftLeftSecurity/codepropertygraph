@@ -10,6 +10,7 @@ import io.shiftleft.fuzzyc2cpg.ast.AstNodeBuilder;
 import io.shiftleft.fuzzyc2cpg.ast.logical.statements.CompoundStatement;
 import io.shiftleft.fuzzyc2cpg.parser.AntlrParserDriverObserver;
 import io.shiftleft.fuzzyc2cpg.parser.CommonParserContext;
+import io.shiftleft.fuzzyc2cpg.parser.ParserException;
 import io.shiftleft.fuzzyc2cpg.parser.TokenSubStream;
 import io.shiftleft.passes.DiffGraph;
 import java.io.IOException;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.function.Consumer;
-import jdk.nashorn.internal.runtime.ParserException;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -129,7 +129,7 @@ abstract public class AntlrParserDriver {
             throws ParserException {
         ParseTree returnTree = parseTokenStreamImpl(tokens);
         if (returnTree == null) {
-            throw new ParserException("");
+            throw new ParserException();
         }
         return returnTree;
     }
