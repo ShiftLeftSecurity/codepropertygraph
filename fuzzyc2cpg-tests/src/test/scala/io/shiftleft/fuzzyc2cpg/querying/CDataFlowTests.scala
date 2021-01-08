@@ -826,12 +826,12 @@ class CDataFlowTests25 extends DataFlowCodeToCpgSuite {
       |
       |""".stripMargin
 
-  "Test 25: should not report flow if access path differs" in {
-    val source = cpg.call.name("source").argument.l
+  "Test 25: should report flow if address passed to source" in {
+    val source = cpg.call("source").argument.l
     val sink = cpg.method.name("sink").parameter.l
 
     implicit val s: Semantics = semantics
-    val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
+    val flows = sink.reachableByFlows(source).l
     flows.map(flowToResultPairs).toSet shouldBe Set(
       List(("source(&a->b)", Some(3)), ("sink(a->b)", Some(4)), ("sink(p1)", None))
     )
