@@ -70,7 +70,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           usageAnalyzer.usedIncomingDefs(ret).foreach {
             case (use, inElements) =>
               addEdge(use, ret, use.asInstanceOf[nodes.CfgNode].code)
-              inElements.foreach { inElement =>
+              inElements.filter(x => x.node != use).foreach { inElement =>
                 addEdge(inElement.node, ret, nodeToEdgeLabel(inElement.node))
               }
               if (inElements.isEmpty) {
