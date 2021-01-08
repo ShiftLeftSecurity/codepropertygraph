@@ -960,7 +960,8 @@ class CDataFlowTests31 extends DataFlowCodeToCpgSuite {
   override val code =
     """
       |int foo() {
-      | return bar();
+      |   return bar();
+      |}
     """
 
   "Test 31: should not create edges from call to ret twice" in {
@@ -971,4 +972,3 @@ class CDataFlowTests31 extends DataFlowCodeToCpgSuite {
       .count(_.inNode() == cpg.ret.head) shouldBe 1
   }
 }
-
