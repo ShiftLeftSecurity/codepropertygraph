@@ -1,7 +1,7 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
+import io.shiftleft.codepropertygraph.generated.nodes.{Identifier, StoredNode}
 import io.shiftleft.semanticcpg.accesspath.MatchResult
 import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase.ImplicitsAPI
 import io.shiftleft.semanticcpg.language._
@@ -30,10 +30,21 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
         val (useBase, useAccessPath) = u.trackedBaseAndAccessPath
         val (inBase, defAccessPath) = i.trackedBaseAndAccessPath
         val (matchResult, elements) = useAccessPath.matchAndDiff(defAccessPath.elements)
-        (useBase == inBase) &&
-        matchResult != MatchResult.NO_MATCH && // filter *x -> x
-        !(matchResult == MatchResult.EXTENDED_MATCH && elements.elements.length > 1 && elements.elements.headOption
-          .exists(_.toString == "*"))
+
+        if (useBase != inBase) {
+          return false
+        }
+
+        matchResult match {
+          case MatchResult.NO_MATCH =>
+            false
+          case MatchResult.EXTENDED_MATCH =>
+            elements.elements.length <= 1 || !elements.elements.headOption
+              .exists(_.toString == "*")
+          case _ =>
+            true
+        }
+
       case _ => false
     }
   }
@@ -61,8 +72,16 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
   private def declaration(node: nodes.StoredNode): Option[nodes.StoredNode] = {
     node match {
       case param: nodes.MethodParameterIn => Some(param)
-      case _: nodes.Identifier            => node._refOut().nextOption
-      case _                              => None
+      case id: nodes.Identifier => {
+        val decl = node._refOut().nextOption
+        if (decl.isEmpty) {
+          id.method.ast.isIdentifier.nameExact(id.name).headOption
+        } else {
+          decl
+        }
+      }
+
+      case _ => None
     }
   }
 

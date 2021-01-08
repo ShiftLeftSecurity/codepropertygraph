@@ -169,11 +169,17 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
   }
 
   private def instances(decl: nodes.StoredNode): List[nodes.StoredNode] = {
-    decl._refIn().asScala.toList ++ {
-      if (decl.isInstanceOf[nodes.MethodParameterIn]) {
-        List(decl)
-      } else {
-        List()
+
+    if (decl._refIn().isEmpty && decl.isInstanceOf[nodes.Identifier]) {
+      val id = decl.asInstanceOf[nodes.Identifier]
+      id.method.ast.isIdentifier.nameExact(id.name).l
+    } else {
+      decl._refIn().asScala.toList ++ {
+        if (decl.isInstanceOf[nodes.MethodParameterIn]) {
+          List(decl)
+        } else {
+          List()
+        }
       }
     }
   }
@@ -181,8 +187,15 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
   private def declaration(node: nodes.StoredNode): Option[nodes.StoredNode] = {
     node match {
       case param: nodes.MethodParameterIn => Some(param)
-      case _: nodes.Identifier            => node._refOut().nextOption
-      case _                              => None
+      case id: nodes.Identifier => {
+        val decl = node._refOut().nextOption
+        if (decl.isEmpty) {
+          id.method.ast.isIdentifier.nameExact(id.name).headOption
+        } else {
+          decl
+        }
+      }
+      case _ => None
     }
   }
 
