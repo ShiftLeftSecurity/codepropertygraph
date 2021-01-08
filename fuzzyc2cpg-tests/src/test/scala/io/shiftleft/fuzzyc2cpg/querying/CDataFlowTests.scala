@@ -1,5 +1,6 @@
 package io.shiftleft.fuzzyc2cpg.querying
 
+import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.fuzzyc2cpg.testfixtures.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
@@ -918,5 +919,23 @@ class CDataFlowTests29 extends DataFlowCodeToCpgSuite {
     implicit val s: Semantics = semantics
     val flows = sink.reachableByFlows(source).l
     flows.size shouldBe 0
+  }
+}
+
+class CDataFlowTests31 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |int foo() {
+      | return bar();
+      |}
+      |
+      |""".stripMargin
+
+  "Test 31: should not create edges from call to ret twice" in {
+    implicit val s: Semantics = semantics
+    cpg
+      .call("bar")
+      .outE(EdgeTypes.REACHING_DEF)
+      .count(_.inNode() == cpg.ret.head) shouldBe 1
   }
 }
