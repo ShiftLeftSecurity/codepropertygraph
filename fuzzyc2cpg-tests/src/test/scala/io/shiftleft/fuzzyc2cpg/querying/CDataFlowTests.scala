@@ -517,11 +517,10 @@ class CDataFlowTests14 extends DataFlowCodeToCpgSuite {
         | }
       """.stripMargin
 
-  "Test 14: flow from identifier to method parameter" in {
+  "Test 14: flow from array method parameter to identifier" in {
     val source = cpg.method.parameter
     val sink = cpg.identifier.name("y")
     val flows = sink.reachableByFlows(source).l
-
     flows.size shouldBe 2
 
     flows.map(flowToResultPairs).toSet shouldBe

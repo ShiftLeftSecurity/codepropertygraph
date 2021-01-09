@@ -1,6 +1,6 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Operators, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal._
 import io.shiftleft.semanticcpg.language._
