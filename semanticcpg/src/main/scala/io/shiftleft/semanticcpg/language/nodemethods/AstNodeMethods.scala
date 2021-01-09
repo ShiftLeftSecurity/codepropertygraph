@@ -3,7 +3,6 @@ package io.shiftleft.semanticcpg.language.nodemethods
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal._
 
 class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
 

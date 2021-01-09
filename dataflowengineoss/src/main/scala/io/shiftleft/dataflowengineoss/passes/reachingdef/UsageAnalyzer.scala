@@ -2,86 +2,57 @@ package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.semanticcpg.accesspath.MatchResult
-import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase.ImplicitsAPI
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal._
 
+/**
+  * Upon calculating reaching definitions, we find ourselves with
+  * a set of incoming definitions `in(n)` for each node `n` of the
+  * flow graph. This component determines those of the incoming
+  * definitions that are relevant as the value they define is
+  * actually used by `n`.
+  * */
 class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
 
   private val allNodes = in.keys.toList
-
   val usedIncomingDefs: Map[StoredNode, Map[StoredNode, Set[Definition]]] = initUsedIncomingDefs()
 
   def initUsedIncomingDefs(): Map[StoredNode, Map[StoredNode, Set[Definition]]] = {
     allNodes.map { node =>
-      node ->
-        uses(node).map { use =>
-          use -> in(node).filter { inElement =>
-            sameDeclaration(use, inElement.node) || usesContainer(use, inElement.node)
-          }
-        }.toMap
+      node -> usedIncomingDefsForNode(node)
     }.toMap
   }
 
-  private def usesContainer(useNode: nodes.StoredNode, inNode: nodes.StoredNode): Boolean = {
-    (useNode, inNode) match {
-      case (u: nodes.TrackingPoint, i: nodes.TrackingPoint) =>
-        val (useBase, useAccessPath) = u.trackedBaseAndAccessPath
-        val (inBase, defAccessPath) = i.trackedBaseAndAccessPath
-        val (matchResult, elements) = useAccessPath.matchAndDiff(defAccessPath.elements)
-
-        if (useBase != inBase) {
-          return false
-        }
-
-        matchResult match {
-          case MatchResult.NO_MATCH =>
-            false
-          case MatchResult.EXTENDED_MATCH =>
-            elements.elements.length <= 1 || !elements.elements.headOption
-              .exists(_.toString == "*")
-          case _ =>
-            true
-        }
-
-      case _ => false
-    }
+  private def usedIncomingDefsForNode(node: nodes.StoredNode): Map[nodes.StoredNode, Set[Definition]] = {
+    uses(node).map { use =>
+      use -> in(node).filter { inElement =>
+        sameVariable(use, inElement.node)
+      }
+    }.toMap
   }
 
-  def uses(node: nodes.StoredNode): Set[nodes.StoredNode] = {
+  def uses(node: nodes.StoredNode): Set[nodes.Expression] = {
     val n = node match {
       case ret: nodes.Return =>
-        ret.astChildren.toSet
+        ret.astChildren.collect { case x: nodes.Expression => x }.toSet
       case call: nodes.Call =>
-        call.start.argument.toSet
+        call.argument.toSet
       case _ => Set()
     }
-    n.filterNot(_.isInstanceOf[nodes.FieldIdentifier]).map(_.asInstanceOf[nodes.StoredNode])
+    n.filterNot(_.isInstanceOf[nodes.FieldIdentifier]).map(_.asInstanceOf[nodes.Expression])
   }
 
-  def sameDeclaration(node1: StoredNode, node2: StoredNode): Boolean = {
-    if (node1.isInstanceOf[nodes.Call] || node2.isInstanceOf[nodes.Call]) {
-      node1.isInstanceOf[nodes.Call] && node2.isInstanceOf[nodes.Call] &&
-      node1.asInstanceOf[nodes.Call].code == node2.asInstanceOf[nodes.Call].code
-    } else {
-      (declaration(node1) == declaration(node2)) && declaration(node1).isDefined
-    }
-  }
-
-  private def declaration(node: nodes.StoredNode): Option[nodes.StoredNode] = {
-    node match {
-      case param: nodes.MethodParameterIn => Some(param)
-      case id: nodes.Identifier => {
-        val decl = node._refOut().nextOption
-        if (decl.isEmpty) {
-          id.method.ast.isIdentifier.nameExact(id.name).headOption
-        } else {
-          decl
-        }
-      }
-
-      case _ => None
+  /**
+    * Compares arguments of calls with incoming definitions
+    * to see if they refer to the same variable
+    * */
+  def sameVariable(use: nodes.Expression, incoming: StoredNode): Boolean = {
+    incoming match {
+      case param: nodes.MethodParameterIn =>
+        use.code == param.name
+      case call: nodes.Call =>
+        use.code == call.code
+      case identifier: nodes.Identifier => use.code == identifier.code
+      case _                            => false
     }
   }
 
