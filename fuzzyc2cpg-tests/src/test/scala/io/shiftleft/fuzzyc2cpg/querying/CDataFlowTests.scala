@@ -851,17 +851,14 @@ class CDataFlowTests26 extends DataFlowCodeToCpgSuite {
   "Test 26: should not report flow" in {
     val source = cpg.call.name("source").l
     val sink = cpg.method.name("sink").parameter.l
-    implicit val s: Semantics = semantics
     val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
     flows.size shouldBe 0
 
-    // TODO
-//    val source2 = cpg.assignment.codeExact("a->b = 10").target.l
-//    val sink2 = cpg.method.name("sink").parameter.l
-//    source2.size shouldBe 1
-//    sink2.size shouldBe 1
-//    cpg.method("foo").plotDotDdg
-//    sink2.reachableBy(source2).size shouldBe 1
+    val source2 = cpg.assignment.codeExact("a->b = 10").target.l
+    val sink2 = cpg.method.name("sink").parameter.l
+    source2.size shouldBe 1
+    sink2.size shouldBe 1
+    sink2.reachableBy(source2).size shouldBe 1
   }
 }
 
