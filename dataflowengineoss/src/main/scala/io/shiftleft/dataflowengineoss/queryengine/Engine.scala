@@ -26,15 +26,11 @@ class Engine(context: EngineContext) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private var numberOfTasksRunning: Int = 0
-  private val completionService = initializeWorkerPool()
+  private val executorService: ExecutorService = Executors.newWorkStealingPool()
+  private val completionService = new ExecutorCompletionService[Vector[ReachableByResult]](executorService)
 
-  /**
-    * Initialize a pool of workers and return a "completion service" that
-    * we can query (in a blocking manner) for completed tasks.
-    * */
-  private def initializeWorkerPool(): ExecutorCompletionService[Vector[ReachableByResult]] = {
-    val executorService: ExecutorService = Executors.newWorkStealingPool()
-    new ExecutorCompletionService[Vector[ReachableByResult]](executorService)
+  def shutdown(): Unit = {
+    executorService.shutdown()
   }
 
   /**

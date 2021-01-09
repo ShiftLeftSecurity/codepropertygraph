@@ -73,7 +73,10 @@ class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVa
         .toList
 
     val sinks = traversal.dedup.toList.sortBy(_.id)
-    new Engine(context).backwards(sinks, sources)
+    val engine = new Engine(context)
+    val result = engine.backwards(sinks, sources)
+    engine.shutdown()
+    result
   }
 
 }
