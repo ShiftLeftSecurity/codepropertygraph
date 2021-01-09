@@ -1,23 +1,27 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.semanticcpg.accesspath.{AccessPath, MatchResult, TrackedBase}
-import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase.ImplicitsAPI
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal._
+import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.utils.MemberAccess.isGenericMemberAccessName
 
-import scala.jdk.CollectionConverters._
-
+/**
+  * The variables defined/used in the reaching def problem can
+  * all be represented via nodes in the graph, however, that's
+  * pretty confusing because it is then unclear that variables
+  * and nodes are actually two separate domains. To make the
+  * definition domain visible, we wrap nodes in `Definition`
+  * classes. From a computational standpoint, this is not necessary,
+  * but it greatly improves readability.
+  * */
 object Definition {
-
   def fromNode(node: nodes.StoredNode): Definition = {
     new Definition(node)
   }
-
 }
 
-class Definition private (val node: nodes.StoredNode) extends AnyVal {}
+case class Definition(node: nodes.StoredNode) {}
 
 object ReachingDefProblem {
 
@@ -33,6 +37,9 @@ object ReachingDefProblem {
 
 }
 
+/**
+  * The control flow graph as viewed by the data flow solver.
+  * */
 class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
@@ -49,7 +56,7 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
     * */
   private def initSucc(ns: List[nodes.StoredNode]): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
     ns.map {
-      case n @ (ret: nodes.Return) => n -> List(ret.method.methodReturn)
+      case n @ (_: nodes.Return) => n -> List(exitNode)
       case n @ (cfgNode: nodes.CfgNode) =>
         n ->
           // `.cfgNext` would be wrong here because it filters `METHOD_RETURN`
@@ -79,6 +86,10 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
 
 }
 
+/**
+  * For each node of the graph, this transfer function defines how it affects
+  * the propagation of definitions.
+  * */
 class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction[Set[Definition]] {
 
   val gen: Map[nodes.StoredNode, Set[Definition]] = initGen(method).withDefaultValue(Set.empty[Definition])
@@ -100,90 +111,96 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     * */
   def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[Definition]] = {
 
-    def defsMadeByCall(call: nodes.Call): Set[Definition] = {
-      (Set(call) ++ call.start.argument
-        .filterNot(_.isInstanceOf[nodes.Literal])
-        .filterNot(_.isInstanceOf[nodes.FieldIdentifier]))
-        .map(x => Definition.fromNode(x.asInstanceOf[nodes.StoredNode]))
-    }
-
     val defsForParams = method.parameter.l.map { param =>
       param -> Set(Definition.fromNode(param.asInstanceOf[nodes.StoredNode]))
     }
 
-    val defsForCalls = method.call.l.map { call =>
-      call -> defsMadeByCall(call)
-    }
+    // We filter out field accesses to ensure that they propagate
+    // taint unharmed.
+
+    val defsForCalls = method.call
+      .filterNot(x => isGenericMemberAccessName(x.name))
+      .l
+      .map { call =>
+        call -> {
+          val retVal = Set(call)
+          val args = call.argument.filter(hasValidGenType)
+          (retVal ++ args)
+            .map(x => Definition.fromNode(x.asInstanceOf[nodes.StoredNode]))
+        }
+      }
     (defsForParams ++ defsForCalls).toMap
+  }
+
+  /**
+    * Restricts the types of nodes that represent definitions.
+    * */
+  private def hasValidGenType(node: nodes.Expression): Boolean = {
+    node match {
+      case _: nodes.Call       => true
+      case _: nodes.Identifier => true
+      case _                   => false
+    }
   }
 
   /**
     * Initialize the map `kill`, a map that contains killed
     * definitions for each flow graph node.
+    *
+    * All operations in our graph are represented by calls and non-operations
+    * such as identifiers or field-identifiers have empty gen and kill sets,
+    * meaning that they just pass on definitions unaltered.
     * */
-  def initKill(method: nodes.Method,
-               gen: Map[nodes.StoredNode, Set[Definition]]): Map[nodes.StoredNode, Set[Definition]] = {
+  private def initKill(method: nodes.Method,
+                       gen: Map[nodes.StoredNode, Set[Definition]]): Map[nodes.StoredNode, Set[Definition]] = {
 
-    val baseToCalls: Map[TrackedBase, List[(nodes.Call, AccessPath)]] = method.call.l
+    // We filter out field accesses to ensure that they propagate
+    // taint unharmed.
+
+    method.call
+      .filterNot(x => isGenericMemberAccessName(x.name))
       .map { call =>
-        val (base, path) = call.trackedBaseAndAccessPath
-        (base, (call, path))
+        call -> killsForGens(gen(call))
       }
-      .groupBy(_._1)
-      .map { case (k, v) => (k, v.map(_._2)) }
-
-    def allOtherInstancesOf(node: nodes.StoredNode): Set[nodes.StoredNode] = {
-      node match {
-        case call: nodes.Call =>
-          val (base, accessPath) = call.trackedBaseAndAccessPath
-          baseToCalls
-            .getOrElse(base, Nil)
-            .collect {
-              case (otherCall, otherPath) if node.id != otherCall.id && {
-                    val m = otherPath.matchAndDiff(accessPath.elements)
-                    m._1 == MatchResult.EXACT_MATCH && m._2.elements.length == 0
-                  } =>
-                otherCall
-            }
-            .toSet
-        case _ =>
-          declaration(node).toList
-            .flatMap(instances)
-            .filter(_.id != node.id)
-            .toSet
-      }
-    }
-
-    // We are also adding nodes here that may not even be definitions, but that's
-    // fine since `kill` is only subtracted
-    method.call.map { call =>
-      val killedDefs = gen(call)
-        .map { d =>
-          allOtherInstancesOf(d.node)
-            .filter(d => call.id != d.id)
-            .map(x => Definition.fromNode(x))
-        }
-        .fold(Set())((v1, v2) => v1.union(v2))
-      call -> killedDefs
-    }.toMap
+      .toMap
   }
 
-  private def instances(decl: nodes.StoredNode): List[nodes.StoredNode] = {
-    decl._refIn().asScala.toList ++ {
-      if (decl.isInstanceOf[nodes.MethodParameterIn]) {
-        List(decl)
-      } else {
-        List()
-      }
+  /**
+    * The only way in which a call can kill another definition is by
+    * generating a new definition for the same variable. Given the
+    * set of generated definitions `gens`, we calculate definitions
+    * of the same variable for each, that is, we calculate kill(call)
+    * based on gen(call).
+    * */
+  private def killsForGens(genOfCall: Set[Definition]): Set[Definition] = {
+    genOfCall.flatMap { definition =>
+      definitionsOfSameVariable(definition)
     }
   }
 
-  private def declaration(node: nodes.StoredNode): Option[nodes.StoredNode] = {
-    node match {
-      case param: nodes.MethodParameterIn => Some(param)
-      case _: nodes.Identifier            => node._refOut().nextOption
-      case _                              => None
+  private def definitionsOfSameVariable(definition: Definition): Set[Definition] = {
+    val definedNodes = definition.node match {
+      case param: nodes.MethodParameterIn =>
+        method.cfgNode
+          .filter(x => x.id != param.id)
+          .isIdentifier
+          .nameExact(param.name)
+          .toSet
+      case identifier: nodes.Identifier =>
+        method.cfgNode
+          .filter(x => x.id != identifier.id)
+          .isIdentifier
+          .nameExact(identifier.name)
+          .toSet
+      case call: nodes.Call =>
+        method.cfgNode
+          .filter(x => x.id != call.id)
+          .isCall
+          .codeExact(call.code)
+          .toSet
+      case _ => Set()
     }
+    definedNodes.map(x => Definition.fromNode(x))
   }
 
 }

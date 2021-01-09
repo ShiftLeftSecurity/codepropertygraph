@@ -517,11 +517,10 @@ class CDataFlowTests14 extends DataFlowCodeToCpgSuite {
         | }
       """.stripMargin
 
-  "Test 14: flow from identifier to method parameter" in {
+  "Test 14: flow from array method parameter to identifier" in {
     val source = cpg.method.parameter
     val sink = cpg.identifier.name("y")
     val flows = sink.reachableByFlows(source).l
-
     flows.size shouldBe 2
 
     flows.map(flowToResultPairs).toSet shouldBe
@@ -826,12 +825,12 @@ class CDataFlowTests25 extends DataFlowCodeToCpgSuite {
       |
       |""".stripMargin
 
-  "Test 25: should not report flow if access path differs" in {
-    val source = cpg.call.name("source").argument.l
+  "Test 25: should report flow if address passed to source" in {
+    val source = cpg.call("source").argument.l
     val sink = cpg.method.name("sink").parameter.l
 
     implicit val s: Semantics = semantics
-    val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
+    val flows = sink.reachableByFlows(source).l
     flows.map(flowToResultPairs).toSet shouldBe Set(
       List(("source(&a->b)", Some(3)), ("sink(a->b)", Some(4)), ("sink(p1)", None))
     )
@@ -852,9 +851,14 @@ class CDataFlowTests26 extends DataFlowCodeToCpgSuite {
   "Test 26: should not report flow" in {
     val source = cpg.call.name("source").l
     val sink = cpg.method.name("sink").parameter.l
-    implicit val s: Semantics = semantics
     val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
     flows.size shouldBe 0
+
+    val source2 = cpg.assignment.codeExact("a->b = 10").target.l
+    val sink2 = cpg.method.name("sink").parameter.l
+    source2.size shouldBe 1
+    sink2.size shouldBe 1
+    sink2.reachableBy(source2).size shouldBe 1
   }
 }
 
@@ -922,14 +926,39 @@ class CDataFlowTests29 extends DataFlowCodeToCpgSuite {
   }
 }
 
+class CDataFlowTests30 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+      |int foo() {
+      |  b = source();
+      |  b = 10;
+      |  sink(b);
+      |}
+      |
+      |""".stripMargin
+
+  "Test 30: should block flow even if variable decl cannot be found" in {
+    val source = cpg.call.name("source").l
+    val sink = cpg.method.name("sink").parameter.l
+    implicit val s: Semantics = semantics
+    val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
+    flows.size shouldBe 0
+
+    val source2 = cpg.assignment.codeExact("b = 10").target.l
+    val sink2 = cpg.method.name("sink").parameter.l
+    source2.size shouldBe 1
+    sink2.size shouldBe 1
+    sink2.reachableBy(source2).size shouldBe 1
+  }
+}
+
 class CDataFlowTests31 extends DataFlowCodeToCpgSuite {
   override val code =
     """
       |int foo() {
-      | return bar();
+      |   return bar();
       |}
-      |
-      |""".stripMargin
+    """
 
   "Test 31: should not create edges from call to ret twice" in {
     implicit val s: Semantics = semantics
