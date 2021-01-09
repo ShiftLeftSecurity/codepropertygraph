@@ -166,6 +166,9 @@ class NewCDataFlowTests8 extends DataFlowCodeToCpgSuite {
     val sink = cpg.call("sink").l
     val flows = sink.reachableByFlows(source).l
 
+    implicit val sem = semantics
+    cpg.method("foo").plotDotDdg
+
     flows.size shouldBe 0
     val flows2 = sink.reachableByFlows(assignment.target).l
     flows2.size shouldBe 1

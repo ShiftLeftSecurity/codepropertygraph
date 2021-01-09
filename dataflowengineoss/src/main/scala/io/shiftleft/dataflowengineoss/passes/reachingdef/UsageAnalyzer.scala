@@ -31,14 +31,14 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
   }
 
   def uses(node: nodes.StoredNode): Set[nodes.Expression] = {
-    val n = node match {
+    val n: Set[nodes.Expression] = node match {
       case ret: nodes.Return =>
         ret.astChildren.collect { case x: nodes.Expression => x }.toSet
       case call: nodes.Call =>
         call.argument.toSet
       case _ => Set()
     }
-    n.filterNot(_.isInstanceOf[nodes.FieldIdentifier]).map(_.asInstanceOf[nodes.Expression])
+    n.filterNot(_.isInstanceOf[nodes.FieldIdentifier])
   }
 
   /**

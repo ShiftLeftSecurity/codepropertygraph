@@ -1,11 +1,12 @@
 package io.shiftleft.dataflowengineoss.dotgenerator
 
-import io.shiftleft.codepropertygraph.generated.{EdgeKeys, EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeKeys, EdgeTypes, Operators, nodes}
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.dotgenerator.DotSerializer.{Edge, Graph}
 import overflowdb.Node
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.dataflowengineoss.language._
+import io.shiftleft.semanticcpg.utils.MemberAccess.isGenericMemberAccessName
 import overflowdb.traversal.jIteratortoTraversal
 
 import scala.collection.mutable
@@ -34,11 +35,15 @@ class DdgGenerator {
     val ddgNodes = visibleNodes
       .filter(node => allIdsReferencedByEdges.contains(node.id))
       .map(surroundingCall)
+      .filterNot(node => node.isInstanceOf[nodes.Call] && isGenericMemberAccessName(node.asInstanceOf[nodes.Call].name))
+
     val ddgEdges = edges.flatten
       .map { e: Edge =>
         e.copy(src = surroundingCall(e.src), dst = surroundingCall(e.dst))
       }
       .filter(e => e.src != e.dst)
+      .filterNot(e => e.dst.isInstanceOf[nodes.Call] && isGenericMemberAccessName(e.dst.asInstanceOf[nodes.Call].name))
+      .filterNot(e => e.src.isInstanceOf[nodes.Call] && isGenericMemberAccessName(e.src.asInstanceOf[nodes.Call].name))
       .distinct
 
     edgeCache.clear

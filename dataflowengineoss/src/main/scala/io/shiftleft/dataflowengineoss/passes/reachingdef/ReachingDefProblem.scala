@@ -1,9 +1,10 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Operators, nodes}
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal._
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.utils.MemberAccess.isGenericMemberAccessName
 
 /**
   * The variables defined/used in the reaching def problem can
@@ -114,14 +115,20 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
       param -> Set(Definition.fromNode(param.asInstanceOf[nodes.StoredNode]))
     }
 
-    val defsForCalls = method.call.l.map { call =>
-      call -> {
-        val retVal = Set(call)
-        val args = call.argument.filter(hasValidGenType)
-        (retVal ++ args)
-          .map(x => Definition.fromNode(x.asInstanceOf[nodes.StoredNode]))
+    // We filter out field accesses to ensure that they propagate
+    // taint unharmed.
+
+    val defsForCalls = method.call
+      .filterNot(x => isGenericMemberAccessName(x.name))
+      .l
+      .map { call =>
+        call -> {
+          val retVal = Set(call)
+          val args = call.argument.filter(hasValidGenType)
+          (retVal ++ args)
+            .map(x => Definition.fromNode(x.asInstanceOf[nodes.StoredNode]))
+        }
       }
-    }
     (defsForParams ++ defsForCalls).toMap
   }
 
@@ -147,9 +154,15 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
   private def initKill(method: nodes.Method,
                        gen: Map[nodes.StoredNode, Set[Definition]]): Map[nodes.StoredNode, Set[Definition]] = {
 
-    method.call.map { call =>
-      call -> killsForGens(gen(call))
-    }.toMap
+    // We filter out field accesses to ensure that they propagate
+    // taint unharmed.
+
+    method.call
+      .filterNot(x => isGenericMemberAccessName(x.name))
+      .map { call =>
+        call -> killsForGens(gen(call))
+      }
+      .toMap
   }
 
   /**
