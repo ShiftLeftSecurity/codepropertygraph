@@ -3,6 +3,7 @@ package io.shiftleft.console
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should
 import org.scalatest.wordspec.AnyWordSpec
+import io.shiftleft.macros.PrintTree._
 
 object TestBundle extends QueryBundle {
   @q def foo(n: Int = 4): Query = Query(
