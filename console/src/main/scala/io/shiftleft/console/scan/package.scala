@@ -18,7 +18,7 @@ package object scan {
       * Obtain list of findings by running query on CPG
       * */
     def apply(cpg: Cpg): List[nodes.NewFinding] = {
-      q.f(cpg)
+      q.traversal(cpg)
         .map(
           evidence =>
             finding(evidence = evidence,
