@@ -10,7 +10,7 @@ object TestBundle extends QueryBundle {
     author = "an-author",
     title = "a-title",
     description = s"a-description $n",
-    score = 2.0, { cpg =>
+    score = 2.0, traversal = { cpg =>
       cpg.method
     }
   )
