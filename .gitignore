@@ -19,6 +19,7 @@ project/.bloop
 /target
 /foo.c
 /woo.c
+/.bsp
 
 foo.c
 woo.c
