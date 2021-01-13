@@ -11,8 +11,19 @@ object PrintTree {
 
   def printExactMacro(c: Context)(expr: c.Tree) = {
     import c.universe._
-    val code = showCode(expr)
-    q"""println("code: " + $code)"""
+
+    val fileContent = new String(expr.pos.source.content)
+    val start = expr.pos.start
+    val end = expr.pos.end
+
+    q"""println("code: " + $fileContent + " start: " + $start.toString + " end: " + $end.toString)"""
+  }
+
+  def duplicateBlock(expr: Any): String  = macro duplicateBlockImpl
+
+  def duplicateBlockImpl(c: Context)(expr: c.Tree) = {
+    import c.universe._
+    q"""$expr """
   }
 }
 
