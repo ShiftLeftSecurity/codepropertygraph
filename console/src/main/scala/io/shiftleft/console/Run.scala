@@ -22,7 +22,7 @@ object Run {
             override val name = "custom"
             override def run(): Iterator[DiffGraph] = {
               implicit val diffGraph: DiffGraph.Builder = DiffGraph.newBuilder
-              query.store
+              query.store()
               Iterator(diffGraph.build())
             }
           }
@@ -83,7 +83,7 @@ object Run {
     val toStringCode =
       s"""
          | import overflowdb.traversal.help.Table
-         | override def toString() : String = {
+         | override def toString : String = {
          |  val columnNames = List("name", "description")
          |  val rows =
          |   ${layerCreatorTypeNames.map {

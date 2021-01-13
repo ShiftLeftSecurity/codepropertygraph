@@ -261,12 +261,18 @@ trait BridgeBase {
   private def runScript(scriptFile: Path, config: Config) = {
     val isEncryptedScript = scriptFile.ext == "enc"
     System.err.println(s"executing $scriptFile with params=${config.params}")
-    val scriptArgs: Seq[(String, Option[String])] = {
-      val commandArgs = config.command match {
-        case Some(command) => Seq(command -> None)
-        case _             => Nil
-      }
-      commandArgs ++ config.params.view.mapValues(Option.apply).toSeq
+//    val scriptArgs0: Seq[(String, Option[String])] = {
+//      val commandArgs = config.command match {
+//        case Some(command) => Seq(command -> None)
+//        case _             => Nil
+//      }
+//      commandArgs ++ config.params.view.mapValues(Option.apply).toSeq
+//    }
+    val scriptArgs: Seq[String] = {
+//      val commandArgs = config.command.toList
+//      commandArgs ++ config.params.view.mapValues(Option.apply).toSeq
+        Nil
+//      ???
     }
     val actualScriptFile =
       if (isEncryptedScript) decryptedScript(scriptFile)

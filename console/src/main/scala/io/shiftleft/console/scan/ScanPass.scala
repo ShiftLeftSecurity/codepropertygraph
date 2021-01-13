@@ -13,6 +13,6 @@ class ScanPass(cpg: Cpg, queries: List[Query])
   override def runOnPart(query: Query): Iterator[DiffGraph] = {
     val diffGraph = DiffGraph.newBuilder
     query(cpg).foreach(diffGraph.addNode)
-    Iterator(diffGraph.build)
+    Iterator(diffGraph.build())
   }
 }

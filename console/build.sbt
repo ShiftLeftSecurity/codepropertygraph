@@ -24,7 +24,6 @@ scalacOptions ++= Seq(
   "-Xlint:inaccessible",               // Warn about inaccessible types in method signatures.
   "-Xlint:infer-any",                  // Warn when a type argument is inferred to be `Any`.
   "-Xlint:missing-interpolator",       // A string literal appears to be missing an interpolator id.
-  "-Xlint:nullary-unit",               // Warn when nullary methods return Unit.
   "-Xlint:option-implicit",            // Option.apply used implicit view.
   "-Xlint:package-object-classes",     // Class or object defined in package object.
   "-Xlint:poly-implicit-overload",     // Parameterized overloaded implicit methods are not visible as view bounds.
@@ -47,7 +46,7 @@ val BetterFilesVersion = "3.8.0"
 val CaskVersion = "0.6.7"
 val CatsVersion = "2.0.0"
 val CirceVersion = "0.12.2"
-val AmmoniteVersion = "2.0.4"
+val AmmoniteVersion = "2.3.8-4-88785969"
 val ZeroturnaroundVersion = "1.13"
 
 dependsOn(Projects.fuzzyc2cpg % Test)
