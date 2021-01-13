@@ -15,8 +15,9 @@ object PrintTree {
     val fileContent = new String(expr.pos.source.content)
     val start = expr.pos.start
     val end = expr.pos.end
+    val src = fileContent.slice(start, end)
 
-    q"""println("code: " + $fileContent + " start: " + $start.toString + " end: " + $end.toString)"""
+    q"""println($src)"""
   }
 
   def duplicateBlock(expr: Any): String  = macro duplicateBlockImpl

@@ -9,7 +9,7 @@ inThisBuild(
     /* n.b. skip 2.13.1, it has a regression https://github.com/scala/bug/issues/11754,
      * which is fixed in https://github.com/scala/scala/pull/8447, i.e. we can upgrade
      * to 2.13.2 once that's released */
-    scalaVersion := "2.13.0",
+    scalaVersion := "2.13.4",
     resolvers ++= Seq(
       Resolver.mavenLocal,
       Resolver.bintrayRepo("shiftleft", "maven"),
@@ -67,15 +67,16 @@ lazy val semanticcpgtests = Projects.semanticcpgtests
 lazy val dataflowengineoss = Projects.dataflowengineoss
 lazy val dataflowengineosstests = Projects.dataflowengineosstests
 lazy val cpgvalidator = Projects.cpgvalidator
-lazy val console = Projects.console
+// lazy val console = Projects.console
+lazy val console2 = Projects.console2
 lazy val fuzzyc2cpg = Projects.fuzzyc2cpg
 lazy val fuzzyc2cpgtests = Projects.fuzzyc2cpgtests
 lazy val macros = Projects.macros
 
 ThisBuild/scalacOptions ++= Seq(
-  "-deprecation",
+  // "-deprecation",
   "-feature",
-  "-Xfatal-warnings",
+  // "-Xfatal-warnings",
   "-language:implicitConversions",
   "-Ycache-macro-class-loader:last-modified",
   "-Ybackend-parallelism", "4")
