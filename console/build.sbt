@@ -43,7 +43,7 @@ scalacOptions ++= Seq(
 
 val ScoptVersion = "3.7.1"
 val BetterFilesVersion = "3.8.0"
-val CaskVersion = "0.6.7"
+val CaskVersion = "0.7.8"
 val CatsVersion = "2.0.0"
 val CirceVersion = "0.12.2"
 val AmmoniteVersion = "2.3.8-4-88785969"
