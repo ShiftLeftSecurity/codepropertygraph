@@ -263,7 +263,7 @@ trait BridgeBase {
     System.err.println(s"executing $scriptFile with params=${config.params}")
     val scriptArgs: Seq[String] = {
       val commandArgs = config.command.toList
-      val parameterArgs = config.params.flatMap { case (a, b) => Seq(a, b) }
+      val parameterArgs = config.params.flatMap { case (key, value) => Seq(s"--$key", value) }
       commandArgs ++ parameterArgs
     }
     val actualScriptFile =
