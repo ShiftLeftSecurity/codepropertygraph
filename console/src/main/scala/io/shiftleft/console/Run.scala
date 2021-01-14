@@ -83,7 +83,7 @@ object Run {
     val toStringCode =
       s"""
          | import overflowdb.traversal.help.Table
-         | override def toString : String = {
+         | override def toString() : String = {
          |  val columnNames = List("name", "description")
          |  val rows =
          |   ${layerCreatorTypeNames.map {

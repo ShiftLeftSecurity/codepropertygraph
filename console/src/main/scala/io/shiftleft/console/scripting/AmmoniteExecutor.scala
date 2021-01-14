@@ -35,11 +35,7 @@ trait AmmoniteExecutor {
     * @return The result of running the script.
     */
   def runScript(scriptPath: Path, parameters: Map[String, String], bindings: IndexedSeq[Bind[_]]): IO[Any] = {
-    println("xxxx0" + parameters)
     val args: Seq[String] = parameters.flatMap { case (a, b) => Seq(a, b)}.toSeq
-//    parameters.map {
-//      case (k, v) => k -> Some(v)
-//    }.toSeq)
     for {
       replInstance <- IO(ammoniteMain.instantiateRepl(bindings))
       repl <- IO.fromEither(replInstance.left.map { case (err, _) => new RuntimeException(err.msg) })
