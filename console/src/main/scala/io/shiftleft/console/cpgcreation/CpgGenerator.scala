@@ -31,7 +31,7 @@ abstract class CpgGenerator() {
       return None
     }
     val cmd = Seq[String](program) ++ arguments
-    val exitValue = cmd.run.exitValue()
+    val exitValue = cmd.run().exitValue()
     if (exitValue == 0) {
       Some(cmd.toString)
     } else {

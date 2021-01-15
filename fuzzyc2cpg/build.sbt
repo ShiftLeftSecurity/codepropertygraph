@@ -43,7 +43,6 @@ scalacOptions ++= Seq(
   "-Xlint:type-parameter-shadow",      // A local type parameter shadows a type already in scope.
   "-Ywarn-dead-code",                  // Warn when dead code is identified.
   "-Ywarn-extra-implicit",             // Warn when more than one implicit parameter section is defined.
-  "-Xlint:nullary-override",           // Warn when non-nullary def f() overrides nullary def f.
   "-Xlint:nullary-unit",               // Warn when nullary methods return Unit.
   "-Ywarn-numeric-widen",              // Warn when numerics are widened.
   "-Ywarn-unused:implicits",           // Warn if an implicit parameter is unused.

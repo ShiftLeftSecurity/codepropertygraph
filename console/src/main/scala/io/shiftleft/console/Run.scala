@@ -22,7 +22,7 @@ object Run {
             override val name = "custom"
             override def run(): Iterator[DiffGraph] = {
               implicit val diffGraph: DiffGraph.Builder = DiffGraph.newBuilder
-              query.store
+              query.store()
               Iterator(diffGraph.build())
             }
           }

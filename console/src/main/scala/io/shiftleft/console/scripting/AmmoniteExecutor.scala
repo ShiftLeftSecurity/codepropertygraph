@@ -35,14 +35,13 @@ trait AmmoniteExecutor {
     * @return The result of running the script.
     */
   def runScript(scriptPath: Path, parameters: Map[String, String], bindings: IndexedSeq[Bind[_]]): IO[Any] = {
+    val args: Seq[String] = parameters.flatMap { case (key, value) => Seq(s"--$key", value) }.toSeq
     for {
       replInstance <- IO(ammoniteMain.instantiateRepl(bindings))
       repl <- IO.fromEither(replInstance.left.map { case (err, _) => new RuntimeException(err.msg) })
       ammoniteResult <- IO {
-        repl.interp.initializePredef()
-        ammonite.main.Scripts.runScript(ammoniteMain.wd, os.Path(scriptPath), repl.interp, parameters.map {
-          case (k, v) => k -> Some(v)
-        }.toSeq)
+        repl.initializePredef()
+        ammonite.main.Scripts.runScript(ammoniteMain.wd, os.Path(scriptPath), repl.interp, args)
       }
       result <- ammoniteResult match {
         case Res.Success(res)     => IO.pure(res)
