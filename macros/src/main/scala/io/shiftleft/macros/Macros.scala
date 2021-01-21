@@ -22,7 +22,7 @@ object QueryMacros {
     title: c.Tree,
     description: c.Tree,
     score: c.Tree,
-    traversal: c.Tree) : c.Tree = {
+    traversal: c.Tree) : c.Expr[Unit] = {
     import c.universe._
     val fileContent = new String(traversal.pos.source.content)
     val start = traversal.pos.start
@@ -30,11 +30,15 @@ object QueryMacros {
     val traversalAsString: String = fileContent.slice(start, end)
 
     val one = q"val traversal: Cpg => overflowdb.traversal.Traversal[io.shiftleft.codepropertygraph.generated.nodes.StoredNode] = { $traversalAsString }"
-    println(one)
-    q"""
+    // println(one)
+    // q"""
+    //   println($one)
+    //   ???
+    // """
+    c.Expr[Unit](q"""
       println($one)
       ???
-    """
+    """)
 
     // doesn't work:
     // q"""

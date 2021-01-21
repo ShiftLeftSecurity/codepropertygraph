@@ -3,27 +3,25 @@ package io.shiftleft.console
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should
 import org.scalatest.wordspec.AnyWordSpec
-import io.shiftleft.macros.QueryMacros.queryInit
-import io.shiftleft.codepropertygraph.Cpg
 
-object TestBundle extends QueryBundle {
-  @q def foo(n: Int = 4): Query = Query(
-    name = "a-name",
-    author = "an-author",
-    title = "a-title",
-    description = s"a-description $n",
-    score = 2.0,
-    cpg => cpg.method
-  )
-}
+// object TestBundle extends QueryBundle {
+//   @q def foo(n: Int = 4): Query = Query(
+//     name = "a-name",
+//     author = "an-author",
+//     title = "a-title",
+//     description = s"a-description $n",
+//     score = 2.0,
+//     cpg => cpg.method
+//   )
+// }
 
 class QueryDatabaseTests extends AnyWordSpec with should.Matchers {
   "QueryDatabase" should {
-    "contain Metrics bundle" in {
-      new QueryDatabase(namespace = "io.shiftleft.console").allBundles.count { bundle =>
-        bundle.getName.endsWith("TestBundle$")
-      } shouldBe 1
-    }
+  //   "contain Metrics bundle" in {
+  //     new QueryDatabase(namespace = "io.shiftleft.console").allBundles.count { bundle =>
+  //       bundle.getName.endsWith("TestBundle$")
+  //     } shouldBe 1
+  //   }
 
     "contain `foo` query" in {
       // val qdb = new QueryDatabase(namespace = "io.shiftleft.console")
@@ -40,7 +38,20 @@ class QueryDatabaseTests extends AnyWordSpec with should.Matchers {
       // }
 
       // intended usage
-      queryInit("a-name", "an-author", "a-title", "a-description", 2.0, {cpg: Cpg => cpg.method.l} )
+// import io.shiftleft.macros.QueryMacros.queryInit
+import io.shiftleft.codepropertygraph.Cpg
+      // queryInit("a-name", "an-author", "a-title", "a-description", 2.0, {cpg: Cpg => cpg.method.l} )
+
+      // simplified: Macros2: Int => String impl
+      val testString = io.shiftleft.macros.Macros2.foo()(5)
+      println(testString)
+
+import overflowdb.traversal.Traversal
+import io.shiftleft.codepropertygraph.generated.nodes
+      val testTrav: Cpg => Traversal[nodes.StoredNode] = io.shiftleft.macros.Macros2.query2()
+      println(testTrav)
+      // val testTrav2: Cpg => Traversal[nodes.StoredNode] = { cpg: Cpg => cpg.method }
+      // println(testTrav2)
     }
   }
 }
