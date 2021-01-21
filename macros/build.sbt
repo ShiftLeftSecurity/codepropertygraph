@@ -2,6 +2,7 @@ name := "macros"
 
 enablePlugins(JavaAppPackaging)
 
+dependsOn(Projects.codepropertygraph)
 scalacOptions ++= Seq( "-Yrangepos" )
 
 libraryDependencies ++= Seq(
