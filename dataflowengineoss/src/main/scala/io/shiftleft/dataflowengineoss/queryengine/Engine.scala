@@ -256,7 +256,7 @@ object Engine {
 }
 
 case class EngineContext(semantics: Semantics, config: EngineConfig = EngineConfig())
-case class EngineConfig(var maxCallDepth: Int = 4)
+case class EngineConfig(var maxCallDepth: Int = 2)
 
 /**
   * Callable for solving a ReachableByTask
