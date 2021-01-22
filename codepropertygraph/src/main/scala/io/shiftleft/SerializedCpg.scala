@@ -19,7 +19,7 @@ class SerializedCpg extends AutoCloseable {
     * Create Serialized CPG from existing file. If the file does not exist,
     * an empty Serialized CPG is created.
     **/
-  def this(filename: String) {
+  def this(filename: String) = {
     this()
     initZipFilesystem(filename)
   }

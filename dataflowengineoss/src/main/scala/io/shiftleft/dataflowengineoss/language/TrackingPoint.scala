@@ -22,14 +22,14 @@ class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVa
   def ddgIn(implicit semantics: Semantics): Traversal[nodes.TrackingPoint] = {
     val cache = mutable.HashMap[nodes.TrackingPoint, Vector[PathElement]]()
     val result = traversal.flatMap(x => x.ddgIn(Vector(PathElement(x)), withInvisible = false, cache))
-    cache.clear
+    cache.clear()
     result
   }
 
   def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = {
     val cache = mutable.HashMap[nodes.TrackingPoint, Vector[PathElement]]()
     val result = traversal.flatMap(x => x.ddgInPathElem(Vector(PathElement(x)), withInvisible = false, cache))
-    cache.clear
+    cache.clear()
     result
   }
 

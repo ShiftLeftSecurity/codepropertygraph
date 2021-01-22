@@ -33,7 +33,7 @@ class DataFlowSolver {
         else
           List()
       }
-      workList.clear
+      workList.clear()
       workList ++= newEntries
     }
     Solution(in, out, problem)
@@ -66,7 +66,7 @@ class DataFlowSolver {
         else
           List()
       }
-      workList.clear
+      workList.clear()
       workList ++= newEntries
     }
     Solution(in, out, problem)
