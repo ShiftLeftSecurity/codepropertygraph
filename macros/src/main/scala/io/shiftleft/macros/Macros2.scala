@@ -22,9 +22,9 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import overflowdb.traversal.Traversal
 
-  def query3(src: String): Cpg => Traversal[nodes.StoredNode] = macro query3Impl
+  def query3(src: String): Cpg => Traversal[_] = macro query3Impl
 
-  def query3Impl(c: whitebox.Context)(src: c.Expr[String]): c.Expr[Cpg => Traversal[nodes.StoredNode]] = {
+  def query3Impl(c: whitebox.Context)(src: c.Expr[String]): c.Expr[Cpg => Traversal[_]] = {
     import c.universe._
     val src2 = src.tree.asInstanceOf[Literal]
     val src3 = src2.value.value.asInstanceOf[String]
