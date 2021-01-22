@@ -101,7 +101,7 @@ class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
       visited += node
 
       if (successorIt.hasNext) {
-        val successor = successorIt.next
+        val successor = successorIt.next()
         if (!visited.contains(successor)) {
           stack = (successor, adapter.successors(successor).iterator) :: stack
         }

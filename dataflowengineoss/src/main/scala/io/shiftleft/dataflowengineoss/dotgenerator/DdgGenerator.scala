@@ -46,7 +46,7 @@ class DdgGenerator {
       .filterNot(e => e.src.isInstanceOf[nodes.Call] && isGenericMemberAccessName(e.src.asInstanceOf[nodes.Call].name))
       .distinct
 
-    edgeCache.clear
+    edgeCache.clear()
     Graph(ddgNodes, ddgEdges)
   }
 

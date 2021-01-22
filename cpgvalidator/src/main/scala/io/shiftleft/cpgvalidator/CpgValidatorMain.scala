@@ -10,14 +10,16 @@ object CpgValidatorMain extends App {
 
   def parseConfig: Option[Config] =
     new scopt.OptionParser[Config](getClass.getSimpleName) {
-      opt[String]("cpg").required
+      opt[String]("cpg")
+        .required()
         .action((x, c) => c.copy(cpgPath = x))
         .text("path to cpg")
         .validate { cpgPath =>
           if (new File(cpgPath).exists) success
           else failure(s"$cpgPath does not exist")
         }
-      opt[Unit]("oldProtoCpg").optional
+      opt[Unit]("oldProtoCpg")
+        .optional()
         .action((x, c) => c.copy(isOldProtoCpg = true))
         .text("set flag if input is an old cpg proto (usually cpg.bin.zip)")
       help("help").text("prints this usage text")

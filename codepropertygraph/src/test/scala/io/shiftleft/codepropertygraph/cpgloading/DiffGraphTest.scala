@@ -90,7 +90,7 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
       builder.addNode(secondNode)
       builder.addNode(thirdNode)
       val keyPool = Some(new IntervalKeyPool(20, 30))
-      val appliedGraph = DiffGraph.Applier.applyDiff(builder.build, graph, true, keyPool)
+      val appliedGraph = DiffGraph.Applier.applyDiff(builder.build(), graph, true, keyPool)
       appliedGraph.nodeToGraphId(firstNode) shouldBe 20
       appliedGraph.nodeToGraphId(secondNode) shouldBe 21
       appliedGraph.nodeToGraphId(thirdNode) shouldBe 22

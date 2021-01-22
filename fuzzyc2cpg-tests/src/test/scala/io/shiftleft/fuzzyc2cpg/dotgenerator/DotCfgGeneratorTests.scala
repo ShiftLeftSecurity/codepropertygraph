@@ -25,7 +25,7 @@ class DotCfgGeneratorTests extends FuzzyCCodeToCpgSuite {
           x.startsWith("digraph main {") shouldBe true
           x.contains("(<operator>.assignment,i = 0)") shouldBe true
           x.endsWith("}\n") shouldBe true
-        case _ => fail
+        case _ => fail()
       }
     }
 
@@ -33,7 +33,7 @@ class DotCfgGeneratorTests extends FuzzyCCodeToCpgSuite {
       cpg.method.name("main").dotCfg.l match {
         case x :: _ =>
           x.contains("IDENTIFIER") shouldBe false
-        case _ => fail
+        case _ => fail()
       }
     }
 

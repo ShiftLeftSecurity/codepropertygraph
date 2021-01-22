@@ -154,7 +154,7 @@ private class CpgOverlayApplier(graph: Graph) {
       case STRING_LIST =>
         val listBuilder = List.newBuilder[String]
         propertyValue.getStringList.getValuesList.forEach(listBuilder.addOne)
-        element.setProperty(propertyName, listBuilder.result)
+        element.setProperty(propertyName, listBuilder.result())
       case VALUE_NOT_SET =>
       case valueCase =>
         throw new RuntimeException("Error: unsupported property case: " + valueCase)

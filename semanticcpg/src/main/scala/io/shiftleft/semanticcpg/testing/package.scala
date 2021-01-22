@@ -60,11 +60,11 @@ package object testing {
         implicit val diffGraph: DiffGraph.Builder = graph
         methodTags.foreach {
           case (k, v) =>
-            cpg.method.name(methodName).newTagNodePair(k, v).store
+            cpg.method.name(methodName).newTagNodePair(k, v).store()
         }
         paramTags.foreach {
           case (k, v) =>
-            cpg.method.name(methodName).parameter.newTagNodePair(k, v).store
+            cpg.method.name(methodName).parameter.newTagNodePair(k, v).store()
         }
       }
 

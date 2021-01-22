@@ -15,7 +15,7 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
   "stores NewNodes" in {
     implicit val diffGraphBuilder = DiffGraph.newBuilder
     val newNode = newTestNode()
-    new NewNodeSteps(newNode.start).store
+    new NewNodeSteps(newNode.start).store()
     val diffGraph = diffGraphBuilder.build()
     diffGraph.nodes.toList shouldBe List(newNode)
   }
@@ -37,8 +37,8 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
 
       val newContainedNode = newTestNode()
       val newNode = newTestNode(containedNodes = List(existingContainedNode, newContainedNode))
-      new NewNodeSteps(newNode.start).store
-      val diffGraph = diffGraphBuilder.build
+      new NewNodeSteps(newNode.start).store()
+      val diffGraph = diffGraphBuilder.build()
       diffGraph.nodes.toSet shouldBe Set(newNode)
       diffGraph.edges shouldBe Nil
 
@@ -52,8 +52,8 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
       val newContainedNodeL1 = newTestNode()
       val newContainedNodeL0 = newTestNode(containedNodes = List(newContainedNodeL1))
       val newNode = newTestNode(containedNodes = List(newContainedNodeL0))
-      new NewNodeSteps(newNode.start).store
-      val diffGraph = diffGraphBuilder.build
+      new NewNodeSteps(newNode.start).store()
+      val diffGraph = diffGraphBuilder.build()
 
       diffGraph.nodes.toSet shouldBe Set(newNode)
       diffGraph.edges.toSet shouldBe Set.empty

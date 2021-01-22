@@ -28,7 +28,7 @@ class ResultTableTests extends AnyWordSpec with Matchers {
       table.get(node1) match {
         case Some(results) =>
           results.flatMap(_.path.map(_.node.id)) shouldBe List(node1.id, node2.id)
-        case None => fail
+        case None => fail()
       }
     }
 
@@ -56,7 +56,7 @@ class ResultTableTests extends AnyWordSpec with Matchers {
       table.createFromTable(PathElement(pivotNode), Vector(PathElement(node1))) match {
         case Some(Vector(ReachableByResult(path, _, _))) =>
           path.map(_.node.id) shouldBe List(node4.id, pivotNode.id, node1.id)
-        case None => fail
+        case _ => fail()
       }
     }
   }

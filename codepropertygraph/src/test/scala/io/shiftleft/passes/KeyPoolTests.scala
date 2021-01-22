@@ -32,6 +32,8 @@ class KeyPoolTests extends AnyWordSpec with Matchers {
       keySets.combinations(2).foreach {
         case List(x: Set[Long], y: Set[Long]) =>
           x.intersect(y).isEmpty shouldBe true
+        case _ =>
+          fail()
       }
     }
 
@@ -63,7 +65,7 @@ class KeyPoolTests extends AnyWordSpec with Matchers {
           pool1.last should be < pool2.first
           pool2.last should be < pool3.first
           pool3.last shouldBe Long.MaxValue - 1
-        case _ => fail
+        case _ => fail()
       }
     }
 

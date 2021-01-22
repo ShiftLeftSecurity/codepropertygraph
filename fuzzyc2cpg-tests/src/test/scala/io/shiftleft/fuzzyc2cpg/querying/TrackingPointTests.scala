@@ -29,7 +29,7 @@ class TrackingPointTests extends DataFlowCodeToCpgSuite {
     cpg.method("sink").parameter.argument.ddgIn.l match {
       case List(param: nodes.MethodParameterIn) =>
         param.name shouldBe "y"
-      case _ => fail
+      case _ => fail()
     }
   }
 
@@ -40,8 +40,10 @@ class TrackingPointTests extends DataFlowCodeToCpgSuite {
         t.ddgIn.l match {
           case List(param: nodes.MethodParameterIn) =>
             param.name shouldBe "y"
+          case _ =>
+            fail()
         }
-      case _ => fail
+      case _ => fail()
     }
   }
 
@@ -50,7 +52,7 @@ class TrackingPointTests extends DataFlowCodeToCpgSuite {
       case List(pathElem) =>
         pathElem.outEdgeLabel shouldBe "y"
         pathElem.node.isInstanceOf[nodes.MethodParameterIn] shouldBe true
-      case _ => fail
+      case _ => fail()
     }
   }
 

@@ -38,7 +38,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           ret.typeFullName shouldBe "void"
           param.typeFullName shouldBe "int"
           param.name shouldBe "x"
-        case _ => fail
+        case _ => fail()
       }
     }
 
@@ -62,8 +62,9 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
               literal.typeFullName shouldBe "int"
               literal.order shouldBe 2
               literal.argumentIndex shouldBe 2
+            case _ => fail()
           }
-        case _ => fail
+        case _ => fail()
       }
     }
 
@@ -78,7 +79,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
             identifier.typeFullName shouldBe "int"
             identifier.order shouldBe 2
             identifier.argumentIndex shouldBe 2
-          case _ => fail
+          case _ => fail()
         }
       }
 
@@ -98,14 +99,14 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
             local1.typeFullName shouldBe "int"
             local2.name shouldBe "local2"
             local2.typeFullName shouldBe "int"
-          case _ => fail
+          case _ => fail()
         }
 
         cpg.assignment.l.sortBy(_.order) match {
           case List(a1, a2) =>
             List(a1.target.code, a1.source.code) shouldBe List("local", "x")
             List(a2.target.code, a2.source.code) shouldBe List("local2", "y")
-          case _ => fail
+          case _ => fail()
         }
       }
 
@@ -130,8 +131,9 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
               id1.code shouldBe "y"
               id2.order shouldBe 2
               id2.code shouldBe "z"
+            case _ => fail()
           }
-        case _ => fail
+        case _ => fail()
       }
     }
 
@@ -149,9 +151,9 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           innerBlock.astChildren.l match {
             case List(localInBlock: nodes.Local) =>
               localInBlock.name shouldBe "y"
-            case _ => fail
+            case _ => fail()
           }
-        case _ => fail
+        case _ => fail()
       }
     }
 
@@ -169,10 +171,10 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           controlStruct.condition.l match {
             case List(cndNode) =>
               cndNode.code shouldBe "x < 1"
-            case _ => fail
+            case _ => fail()
           }
           controlStruct.whenTrue.assignments.code.l shouldBe List("x += 1")
-        case _ => fail
+        case _ => fail()
       }
     }
 
@@ -192,11 +194,11 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           controlStruct.condition.l match {
             case List(cndNode) =>
               cndNode.code shouldBe "x > 0"
-            case _ => fail
+            case _ => fail()
 
           }
           controlStruct.whenTrue.assignments.code.l shouldBe List("y = 0")
-        case _ => fail
+        case _ => fail()
       }
     }
 
@@ -220,7 +222,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           ifStmt.condition.l match {
             case List(cndNode) =>
               cndNode.code shouldBe "x > 0"
-            case _ => fail
+            case _ => fail()
           }
 
           // TODO .whenTrue => .whenTrue
@@ -230,7 +232,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           ifStmt.whenFalse.assignments
             .map(x => (x.target.code, x.source.code))
             .headOption shouldBe Some(("y", "1"))
-        case _ => fail
+        case _ => fail()
       }
     }
 
@@ -255,9 +257,9 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
               trueBranch.code shouldBe "bar"
               falseBranch.argumentIndex shouldBe 3
               falseBranch.code shouldBe "0"
-            case _ => fail
+            case _ => fail()
           }
-        case _ => fail
+        case _ => fail()
       }
     }
 
@@ -275,13 +277,13 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           forStmt.astChildren.order(2).l match {
             case List(condition: nodes.Expression) =>
               condition.code shouldBe "x < 1"
-            case _ => fail
+            case _ => fail()
           }
 
           forStmt.condition.l shouldBe forStmt.astChildren.order(2).l
           childContainsAssignments(forStmt, 3, List("x += 1"))
           childContainsAssignments(forStmt, 4, List("z = 0"))
-        case _ => fail
+        case _ => fail()
       }
     }
 
@@ -289,7 +291,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       node.astChildren.order(i).l match {
         case List(child) =>
           child.assignments.code.l shouldBe list
-        case _ => fail
+        case _ => fail()
       }
     }
 
@@ -339,7 +341,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           arg2.argumentIndex shouldBe 2
           arg2.asInstanceOf[nodes.FieldIdentifier].code shouldBe "a"
           arg2.asInstanceOf[nodes.FieldIdentifier].canonicalName shouldBe "a"
-        case _ => fail
+        case _ => fail()
       }
     }
 
@@ -359,7 +361,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           arg2.argumentIndex shouldBe 2
           arg2.asInstanceOf[nodes.FieldIdentifier].code shouldBe "a"
           arg2.asInstanceOf[nodes.FieldIdentifier].canonicalName shouldBe "a"
-        case _ => fail
+        case _ => fail()
       }
     }
 
@@ -485,11 +487,11 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
               barStruct.astChildren.isTypeDecl.l match {
                 case List(foo2Struct: nodes.TypeDecl) =>
                   foo2Struct.member.name("z").size shouldBe 1
-                case _ => fail
+                case _ => fail()
               }
-            case _ => fail
+            case _ => fail()
           }
-        case _ => fail
+        case _ => fail()
       }
     }
 

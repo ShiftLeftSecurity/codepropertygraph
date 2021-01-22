@@ -10,7 +10,7 @@ object Implicits {
   implicit class IteratorDeco[T](val iterator: Iterator[T]) extends AnyVal {
     def onlyChecked: T = {
       if (iterator.hasNext) {
-        val res = iterator.next
+        val res = iterator.next()
         if (iterator.hasNext) {
           logger.warn("iterator was expected to have exactly one element, but it actually has more")
         }

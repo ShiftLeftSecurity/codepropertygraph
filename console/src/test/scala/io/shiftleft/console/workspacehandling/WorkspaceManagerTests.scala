@@ -78,7 +78,7 @@ class WorkspaceManagerTests extends AnyWordSpec with Matchers {
           case Some(p) =>
             p.name shouldBe projectName
             p.cpg should not be empty
-          case _ => fail
+          case _ => fail()
         }
       }
     }
@@ -98,7 +98,7 @@ class WorkspaceManagerTests extends AnyWordSpec with Matchers {
           case Some(p) =>
             p.path.resolve("cpg.bin").toFile.exists() shouldBe true
             p.path.resolve("cpg.bin.tmp").toFile.exists() shouldBe true
-          case _ => fail
+          case _ => fail()
         }
       }
     }
@@ -135,7 +135,7 @@ class WorkspaceManagerTests extends AnyWordSpec with Matchers {
           case Some(p) =>
             p.name shouldBe projectName
             p.cpg shouldBe None
-          case None => fail
+          case None => fail()
         }
         a[RuntimeException] should be thrownBy manager.cpg
       }

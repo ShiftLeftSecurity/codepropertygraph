@@ -39,7 +39,7 @@ class ReceiverEdgePass(cpg: Cpg) extends CpgPass(cpg) {
       }
     }.iterate
 
-    Iterator(dstGraph.build)
+    Iterator(dstGraph.build())
   }
 }
 

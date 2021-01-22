@@ -22,7 +22,7 @@ class ParserTests extends AnyWordSpec with Matchers {
         case List(x) =>
           x.methodFullName shouldBe "foo"
           x.mappings shouldBe List((1, -1), (2, 3))
-        case _ => fail
+        case _ => fail()
       }
     }
 
@@ -42,7 +42,7 @@ class ParserTests extends AnyWordSpec with Matchers {
         case List(x, y) =>
           x.methodFullName shouldBe "abc"
           y.methodFullName shouldBe "bar"
-        case _ => fail
+        case _ => fail()
       }
     }
   }
