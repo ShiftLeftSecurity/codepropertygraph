@@ -22,6 +22,6 @@ class StubRemovalPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   override def runOnPart(stub: Method): Iterator[DiffGraph] = {
     val diffGraph = DiffGraph.newBuilder
     stub.ast.foreach(diffGraph.removeNode)
-    Iterator(diffGraph.build)
+    Iterator(diffGraph.build())
   }
 }

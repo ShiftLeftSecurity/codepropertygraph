@@ -112,7 +112,7 @@ class TypeDecl(val traversal: Traversal[nodes.TypeDecl]) extends AnyVal {
   def unravelAlias: Traversal[nodes.TypeDecl] =
     traversal.map { typeDecl =>
       if (typeDecl.aliasTypeFullName.isDefined)
-        typeDecl._typeViaAliasOfOut.next._typeDeclViaRefOut.next
+        typeDecl._typeViaAliasOfOut.next()._typeDeclViaRefOut.next()
       else
         typeDecl
     }
@@ -131,7 +131,7 @@ class TypeDecl(val traversal: Traversal[nodes.TypeDecl]) extends AnyVal {
       var currentTypeDecl = typeDecl
       var aliasExpansionCounter = 0
       while (currentTypeDecl.aliasTypeFullName.isDefined && aliasExpansionCounter < maxAliasExpansions) {
-        currentTypeDecl = currentTypeDecl._typeViaAliasOfOut.next._typeDeclViaRefOut.next
+        currentTypeDecl = currentTypeDecl._typeViaAliasOfOut.next()._typeDeclViaRefOut.next()
         aliasExpansionCounter += 1
       }
       currentTypeDecl

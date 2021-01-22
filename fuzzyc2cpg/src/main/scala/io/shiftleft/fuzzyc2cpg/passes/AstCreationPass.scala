@@ -47,7 +47,7 @@ class AstCreationPass(filenames: List[String], cpg: Cpg, keyPool: IntervalKeyPoo
                          diffGraph: DiffGraph.Builder): Iterator[DiffGraph] = {
     try {
       driver.parseAndWalkFile(filename, diffGraph)
-      Iterator(diffGraph.build)
+      Iterator(diffGraph.build())
     } catch {
       case ex: RuntimeException => {
         logger.warn("Cannot parse module: " + filename + ", skipping")

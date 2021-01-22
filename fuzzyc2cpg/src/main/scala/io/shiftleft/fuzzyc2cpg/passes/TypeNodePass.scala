@@ -16,6 +16,6 @@ class TypeNodePass(usedTypes: List[String], cpg: Cpg, keyPool: Option[KeyPool] =
       )
       diffGraph.addNode(node)
     }
-    Iterator(diffGraph.build)
+    Iterator(diffGraph.build())
   }
 }
