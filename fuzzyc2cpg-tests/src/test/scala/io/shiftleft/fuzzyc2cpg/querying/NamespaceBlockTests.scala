@@ -24,7 +24,7 @@ class NamespaceBlockTests extends FuzzyCCodeToCpgSuite {
         x.name shouldBe Namespace.globalNamespaceName
         x.fullName shouldBe Namespace.globalNamespaceName
         x.order shouldBe 0
-      case _ => fail
+      case _ => fail()
     }
   }
 
@@ -34,7 +34,7 @@ class NamespaceBlockTests extends FuzzyCCodeToCpgSuite {
         x.name shouldBe Namespace.globalNamespaceName
         x.fullName shouldBe s"${x.filename}:${Namespace.globalNamespaceName}"
         x.order shouldBe 0
-      case _ => fail
+      case _ => fail()
     }
   }
 

@@ -21,7 +21,7 @@ class FileNodeTests extends FuzzyCCodeToCpgSuite {
     cpg.file(File.UNKNOWN).l match {
       case List(x) =>
         x.order shouldBe 0
-      case _ => fail
+      case _ => fail()
     }
   }
 
@@ -29,7 +29,7 @@ class FileNodeTests extends FuzzyCCodeToCpgSuite {
     cpg.file.nameNot(File.UNKNOWN).l match {
       case List(x) =>
         x.name should startWith("/")
-      case _ => fail
+      case _ => fail()
     }
   }
 

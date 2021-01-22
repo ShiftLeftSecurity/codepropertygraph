@@ -26,7 +26,7 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
       manager.pluginDir match {
         case Some(dir) =>
           dir.toFile.list().toList shouldBe List("joernext-test-foo.jar")
-        case None => fail
+        case None => fail()
       }
     }
 
@@ -37,7 +37,7 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
         case Some(dir) =>
           dir.toFile.list().toList shouldBe List("joernext-test-foo.json")
           (manager.installDir / "out.txt").exists shouldBe true
-        case None => fail
+        case None => fail()
       }
     }
 

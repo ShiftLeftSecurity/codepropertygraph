@@ -16,7 +16,7 @@ class MetaDataNodeTests extends FuzzyCCodeToCpgSuite {
         x.language shouldBe "C"
         x.version shouldBe "0.1"
         x.overlays shouldBe List("semanticcpg")
-      case _ => fail
+      case _ => fail()
     }
   }
 

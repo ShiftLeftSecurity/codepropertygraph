@@ -169,7 +169,7 @@ class ConsoleTests extends AnyWordSpec with Matchers {
         case Some(p) =>
           p.name shouldBe projectName
           console.workspace.projectByCpg(p.cpg.get).map(_.name) shouldBe Some(projectName)
-        case None => fail
+        case None => fail()
       }
     }
 

@@ -42,7 +42,7 @@ class WorkspaceLoaderTests extends AnyWordSpec with Matchers {
             p.name shouldBe "foo"
             p.inputPath shouldBe "foo"
             p.cpg shouldBe None
-          case None => fail
+          case None => fail()
         }
       }
     }

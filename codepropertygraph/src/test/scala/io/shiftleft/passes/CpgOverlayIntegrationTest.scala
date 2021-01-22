@@ -111,7 +111,7 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
   def applyDiffAndGetInverse(cpg: Cpg)(fun: DiffGraph.Builder => Unit): DiffGraph = {
     val builder = DiffGraph.newBuilder
     fun(builder)
-    val diff = builder.build
+    val diff = builder.build()
     val applied = DiffGraph.Applier.applyDiff(diff, cpg, undoable = true)
     val inverse = applied.inverseDiffGraph.get
     val inverseProto = new DiffGraphProtoSerializer().serialize(inverse)
