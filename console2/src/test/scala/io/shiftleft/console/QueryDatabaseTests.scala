@@ -43,15 +43,17 @@ import io.shiftleft.codepropertygraph.Cpg
       // queryInit("a-name", "an-author", "a-title", "a-description", 2.0, {cpg: Cpg => cpg.method.l} )
 
       // simplified: Macros2: Int => String impl
-      val testString = io.shiftleft.macros.Macros2.foo()(5)
-      println(testString)
+      // val testString = io.shiftleft.macros.Macros2.foo()(5)
+      // println(testString) //5
 
 import overflowdb.traversal.Traversal
 import io.shiftleft.codepropertygraph.generated.nodes
-      val testTrav: Cpg => Traversal[nodes.StoredNode] = io.shiftleft.macros.Macros2.query2()
-      println(testTrav)
-      // val testTrav2: Cpg => Traversal[nodes.StoredNode] = { cpg: Cpg => cpg.method }
-      // println(testTrav2)
+      // val testTrav: Cpg => Traversal[nodes.StoredNode] = io.shiftleft.macros.Macros2.query2()
+      // println(testTrav) // Lambda...
+
+      // pass it a string, get back a Cpg => Traversal[nodes.StoredNode]
+      val testTrav2: Cpg => Traversal[nodes.StoredNode] = io.shiftleft.macros.Macros2.query3("{ cpg: Cpg => cpg.method.cast[nodes.StoredNode] }")
+      println(testTrav2(Cpg.emptyCpg).l)
     }
   }
 }

@@ -69,7 +69,7 @@ lazy val console2 = Projects.console2
 lazy val fuzzyc2cpg = Projects.fuzzyc2cpg
 lazy val fuzzyc2cpgtests = Projects.fuzzyc2cpgtests
 lazy val macros = Projects.macros
-lazy val macrosSm = Projects.macrosSm
+// lazy val macrosSm = Projects.macrosSm
 
 ThisBuild/scalacOptions ++= Seq(
   // "-deprecation",
