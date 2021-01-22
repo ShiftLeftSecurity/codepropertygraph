@@ -40,6 +40,8 @@ class TrackingPointTests extends DataFlowCodeToCpgSuite {
         t.ddgIn.l match {
           case List(param: nodes.MethodParameterIn) =>
             param.name shouldBe "y"
+          case _ =>
+            fail()
         }
       case _ => fail()
     }

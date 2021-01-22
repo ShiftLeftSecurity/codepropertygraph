@@ -87,7 +87,7 @@ class StepsTest extends AnyWordSpec with Matchers {
 
   "allow side effects" in ExistingCpgFixture("splitmeup") { fixture =>
     var i = 0
-    fixture.cpg.method.sideEffect(_ => i = i + 1).exec
+    fixture.cpg.method.sideEffect(_ => i = i + 1).exec()
     i should be > 0
   }
 

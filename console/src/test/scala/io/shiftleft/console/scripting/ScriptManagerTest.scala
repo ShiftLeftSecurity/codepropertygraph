@@ -21,7 +21,7 @@ class ScriptManagerTest extends AnyWordSpec with Matchers with Inside {
     override def runScript(scriptPath: Path, parameters: Map[String, String], cpg: Cpg): IO[Any] = IO.fromTry(
       Try {
         val source = Source.fromFile(scriptPath.toFile)
-        val result = source.getLines.mkString(System.lineSeparator())
+        val result = source.getLines().mkString(System.lineSeparator())
         source.close()
         result
       }
