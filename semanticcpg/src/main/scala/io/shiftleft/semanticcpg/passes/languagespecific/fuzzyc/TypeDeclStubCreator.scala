@@ -43,8 +43,10 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def init(): Unit = {
-    cpg.typeDecl.sideEffect { typeDecl =>
-      typeDeclFullNameToNode += typeDecl.fullName -> typeDecl
-    }.exec()
+    cpg.typeDecl
+      .sideEffect { typeDecl =>
+        typeDeclFullNameToNode += typeDecl.fullName -> typeDecl
+      }
+      .exec()
   }
 }
