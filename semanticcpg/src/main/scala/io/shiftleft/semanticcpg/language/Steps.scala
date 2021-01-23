@@ -57,10 +57,10 @@ class Steps[A](val traversal: Traversal[A]) extends AnyVal {
     * Note that this works independently of tab completion and implicit conversions in scope - it will simply list
     * all documented steps in the classpath
     * */
-  def help()(implicit elementType: ClassTag[A]): String =
+  def help(implicit elementType: ClassTag[A]): String =
     Steps.help.forElementSpecificSteps(elementType.runtimeClass, verbose = false)
 
-  def helpVerbose()(implicit elementType: ClassTag[A]): String =
+  def helpVerbose(implicit elementType: ClassTag[A]): String =
     Steps.help.forElementSpecificSteps(elementType.runtimeClass, verbose = true)
 
   /**
