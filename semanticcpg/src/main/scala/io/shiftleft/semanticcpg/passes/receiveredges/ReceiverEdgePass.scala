@@ -27,17 +27,19 @@ class ReceiverEdgePass(cpg: Cpg) extends CpgPass(cpg) {
     var loggedDeprecationWarning = false
     val dstGraph = DiffGraph.newBuilder
 
-    cpg.call.sideEffect { call =>
-      call._astOut.asScala.find { case node: HasArgumentIndex => node.argumentIndex == 0 }.foreach { instance =>
-        if (!instance._receiverIn.hasNext) {
-          dstGraph.addEdgeInOriginal(call, instance, EdgeTypes.RECEIVER)
-          if (!loggedDeprecationWarning) {
-            logger.warn("Using deprecated CPG format without RECEIVER edge between CALL and instance nodes.")
-            loggedDeprecationWarning = true
+    cpg.call
+      .sideEffect { call =>
+        call._astOut.asScala.find { case node: HasArgumentIndex => node.argumentIndex == 0 }.foreach { instance =>
+          if (!instance._receiverIn.hasNext) {
+            dstGraph.addEdgeInOriginal(call, instance, EdgeTypes.RECEIVER)
+            if (!loggedDeprecationWarning) {
+              logger.warn("Using deprecated CPG format without RECEIVER edge between CALL and instance nodes.")
+              loggedDeprecationWarning = true
+            }
           }
         }
       }
-    }.iterate()
+      .iterate()
 
     Iterator(dstGraph.build())
   }
