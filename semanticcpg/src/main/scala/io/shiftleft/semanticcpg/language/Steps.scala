@@ -49,7 +49,7 @@ class Steps[A](val traversal: Traversal[A]) extends AnyVal {
     Execute the traversal and convert it into a Java list (as opposed
     to the Scala list obtained via `toList`)
     */
-  def jl(): JList[A] = b.asJava
+  def jl(): JList[A] = b().asJava
 
   /**
     * Print help/documentation based on the current elementType `A`.

@@ -111,7 +111,7 @@ object LocationCreator {
           methodRef.code,
           methodRef.label,
           methodRef.lineNumber,
-          methodRef._methodViaContainsIn.next
+          methodRef._methodViaContainsIn.next()
         )
       case source: nodes.Source =>
         apply(source.node)
@@ -138,7 +138,7 @@ object LocationCreator {
       val namespaceOption = for {
         tpe <- typeOption
         namespaceBlock <- tpe._namespaceBlockViaAstIn
-        namespace <- namespaceBlock._namespaceViaRefOut.nextOption
+        namespace <- namespaceBlock._namespaceViaRefOut.nextOption()
       } yield namespace.name
       val namespaceName = namespaceOption.getOrElse("")
 
@@ -162,7 +162,7 @@ object LocationCreator {
 
   @tailrec
   private def findVertex(node: nodes.StoredNode, instanceCheck: nodes.StoredNode => Boolean): Option[nodes.StoredNode] =
-    node._astIn.nextOption match {
+    node._astIn.nextOption() match {
       case Some(head) if instanceCheck(head) => Some(head)
       case Some(head)                        => findVertex(head, instanceCheck)
       case None                              => None
