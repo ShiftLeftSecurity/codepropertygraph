@@ -114,7 +114,7 @@ object TrackingPointMethodsBase {
       case node: nodes.MethodParameterOut => (TrackedNamedVariable(node.name), Nil)
       case node: nodes.ImplicitCall       => (TrackedReturnValue(node), Nil)
       case node: nodes.PostExecutionCall =>
-        toTrackedBaseAndAccessPathInternal(node._refOut().next.asInstanceOf[nodes.TrackingPoint])
+        toTrackedBaseAndAccessPathInternal(node._refOut.next().asInstanceOf[nodes.TrackingPoint])
       case node: nodes.Identifier    => (TrackedNamedVariable(node.name), Nil)
       case node: nodes.Literal       => (TrackedLiteral(node), Nil)
       case node: nodes.MethodRef     => (TrackedMethodOrTypeRef(node), Nil)

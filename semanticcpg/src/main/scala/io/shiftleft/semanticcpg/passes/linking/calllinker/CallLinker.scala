@@ -56,7 +56,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
           receiver match {
             case _ =>
               val receiverTypeDecl = receiver
-                ._evalTypeOut()
+                ._evalTypeOut
                 .onlyChecked
                 ._refOut
                 .onlyChecked

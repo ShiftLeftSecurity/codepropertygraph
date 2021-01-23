@@ -27,7 +27,7 @@ class ContainsEdgePass(cpg: Cpg) extends ParallelCpgPass[nodes.AstNode](cpg) {
           dstGraph.addEdgeInOriginal(source, destination, EdgeTypes.CONTAINS)
         }
       }
-      .iterate
+      .iterate()
 
     Iterator(dstGraph.build())
   }
