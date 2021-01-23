@@ -71,7 +71,7 @@ lazy val fuzzyc2cpgtests = Projects.fuzzyc2cpgtests
 ThisBuild/scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
-  // "-Xfatal-warnings",   // TODO MP reenable
+  "-Xfatal-warnings",
   "-language:implicitConversions",
   "-Ycache-macro-class-loader:last-modified",
   "-Ybackend-parallelism", "4")
