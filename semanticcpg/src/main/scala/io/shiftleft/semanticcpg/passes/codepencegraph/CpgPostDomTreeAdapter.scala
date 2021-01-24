@@ -8,6 +8,6 @@ import overflowdb.traversal._
 class CpgPostDomTreeAdapter extends DomTreeAdapter[Node] {
 
   override def immediateDominator(cfgNode: Node): Option[Node] = {
-    cfgNode.in(EdgeTypes.POST_DOMINATE).nextOption
+    cfgNode.in(EdgeTypes.POST_DOMINATE).nextOption()
   }
 }

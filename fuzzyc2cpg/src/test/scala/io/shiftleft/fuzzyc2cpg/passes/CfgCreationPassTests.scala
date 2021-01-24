@@ -483,9 +483,7 @@ class CfgFixture(file1Code: String) {
   }
 
   def succOf(code: String): Set[String] = {
-    codeToNode(code)
-      ._cfgOut()
-      .asScala
+    codeToNode(code)._cfgOut.asScala
       .map(_.asInstanceOf[nodes.CfgNode])
       .toSet
       .map[String](_.code)

@@ -34,7 +34,9 @@ class AmmoniteExecutorTest extends AnyWordSpec with Matchers {
     "pass arguments to a script" in withExecutor { executor =>
       val script = getScriptPath("scripts/general/arguments-concatenate.sc")
 
-      executor.runScript(script, Map("one" -> "hello", "two" -> "world"), Cpg.emptyCpg).unsafeRunSync() shouldBe "hello world"
+      executor
+        .runScript(script, Map("one" -> "hello", "two" -> "world"), Cpg.emptyCpg)
+        .unsafeRunSync() shouldBe "hello world"
     }
 
     "execute multiple scripts" in withExecutor { executor =>

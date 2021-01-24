@@ -52,7 +52,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
         }
         .asInstanceOf[List[nodes.StoredNode]]
       if (args.size != 2) throw new RuntimeException("member/field access-style operators need two arguments")
-      val typ = args(0)._evalTypeOut.nextOption match {
+      val typ = args(0)._evalTypeOut.nextOption() match {
         case Some(t: nodes.Type) => t
         case _                   => return
       }

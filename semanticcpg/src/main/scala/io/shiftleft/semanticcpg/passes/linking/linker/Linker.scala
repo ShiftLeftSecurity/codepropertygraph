@@ -227,7 +227,7 @@ object Linker {
           }
         }
       } else {
-        srcNode.out(edgeType).property(NodeKeys.FULL_NAME).nextOption match {
+        srcNode.out(edgeType).property(NodeKeys.FULL_NAME).nextOption() match {
           case Some(dstFullName) => srcNode.setProperty(dstFullNameKey, dstFullName)
           case None              => logger.warn(s"Missing outgoing edge of type ${edgeType} from node ${srcNode}")
         }

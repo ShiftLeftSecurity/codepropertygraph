@@ -11,7 +11,7 @@ trait HasStoreMethod {
 class NewNodeSteps[A <: NewNode](val traversal: Traversal[A]) extends HasStoreMethod {
 
   override def store()(implicit diffBuilder: DiffGraph.Builder): Unit =
-    traversal.sideEffect(storeRecursively).iterate
+    traversal.sideEffect(storeRecursively).iterate()
 
   private def storeRecursively(newNode: NewNode)(implicit diffBuilder: DiffGraph.Builder): Unit = {
     diffBuilder.addNode(newNode)

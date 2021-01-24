@@ -55,11 +55,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
           val receiver = receiverIt.next
           receiver match {
             case _ =>
-              val receiverTypeDecl = receiver
-                ._evalTypeOut()
-                .onlyChecked
-                ._refOut
-                .onlyChecked
+              val receiverTypeDecl = receiver._evalTypeOut.onlyChecked._refOut.onlyChecked
 
               val resolvedMethodOption = receiverTypeDecl._bindsOut.asScala.collectFirst {
                 case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>

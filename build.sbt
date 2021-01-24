@@ -1,7 +1,7 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val overflowdbVersion = "1.29"
+val overflowdbVersion = "1.30"
 
 inThisBuild(
   List(
@@ -71,7 +71,7 @@ lazy val fuzzyc2cpgtests = Projects.fuzzyc2cpgtests
 ThisBuild/scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
-  // "-Xfatal-warnings", // TODO MP reenable
+  "-Xfatal-warnings",
   "-language:implicitConversions",
   "-Ycache-macro-class-loader:last-modified",
   "-Ybackend-parallelism", "4")

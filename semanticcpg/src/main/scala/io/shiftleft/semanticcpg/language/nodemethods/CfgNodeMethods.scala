@@ -25,7 +25,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * */
   def controlledBy: Traversal[nodes.CfgNode] = {
     expandExhaustively { v =>
-      v._cdgIn().asScala
+      v._cdgIn.asScala
     }
   }
 
@@ -35,7 +35,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * */
   def controls: Traversal[nodes.CfgNode] = {
     expandExhaustively { v =>
-      v._cdgOut().asScala
+      v._cdgOut.asScala
     }
   }
 
@@ -45,7 +45,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * */
   def dominatedBy: Traversal[nodes.CfgNode] = {
     expandExhaustively { v =>
-      v._dominateIn().asScala
+      v._dominateIn.asScala
     }
   }
 
@@ -55,7 +55,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * */
   def dominates: Traversal[nodes.CfgNode] = {
     expandExhaustively { v =>
-      v._dominateOut().asScala
+      v._dominateOut.asScala
     }
   }
 
@@ -65,7 +65,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * */
   def postDominatedBy: Traversal[nodes.CfgNode] = {
     expandExhaustively { v =>
-      v._postDominateIn().asScala
+      v._postDominateIn.asScala
     }
   }
 
@@ -75,7 +75,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     * */
   def postDominates: Traversal[nodes.CfgNode] = {
     expandExhaustively { v =>
-      v._postDominateOut().asScala
+      v._postDominateOut.asScala
     }
   }
 

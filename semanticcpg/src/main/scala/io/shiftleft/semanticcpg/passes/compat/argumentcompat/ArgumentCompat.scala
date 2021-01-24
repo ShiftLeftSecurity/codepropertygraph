@@ -26,7 +26,7 @@ class ArgumentCompat(cpg: Cpg) extends CpgPass(cpg) {
 
   private def addArgumentEdges(callOrReturn: nodes.AstNode, diffGraph: DiffGraph.Builder): Unit = {
     callOrReturn._astOut.asScala.foreach { argument =>
-      if (!argument._argumentIn().hasNext) {
+      if (!argument._argumentIn.hasNext) {
         diffGraph.addEdgeInOriginal(callOrReturn, argument, EdgeTypes.ARGUMENT)
       }
     }
