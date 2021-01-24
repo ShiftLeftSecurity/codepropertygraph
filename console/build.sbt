@@ -16,7 +16,7 @@ scalacOptions ++= Seq(
   "-language:implicitConversions",     // Allow definition of implicit functions called views
   "-unchecked",                        // Enable additional warnings where generated code depends on assumptions.
   "-Xcheckinit",                       // Wrap field accessors to throw an exception on uninitialized access.
-  // "-Xfatal-warnings",   // TODO MP reenable               // Fail the compilation if there are any warnings.
+  // "-Xfatal-warnings",               // fail for warnings - would love to reenable, but somehow StorageBackend.scala triggers a strange `[warn] method with a single empty parameter list overrides method without any parameter list` that doesn't make sense to me...
   "-Xlint:adapted-args",               // Warn if an argument list is modified to match the receiver.
   "-Xlint:constant",                   // Evaluation of a constant arithmetic expression results in an error.
   "-Xlint:delayedinit-select",         // Selecting member of DelayedInit.
