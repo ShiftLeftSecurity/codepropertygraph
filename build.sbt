@@ -70,7 +70,7 @@ lazy val fuzzyc2cpgtests = Projects.fuzzyc2cpgtests
 lazy val macros = Projects.macros
 
 ThisBuild/scalacOptions ++= Seq(
-  // "-deprecation",
+  "-deprecation",
   "-feature",
   "-Xfatal-warnings",
   "-language:implicitConversions",
