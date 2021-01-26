@@ -38,16 +38,14 @@ class QueryDatabaseTests extends AnyWordSpec with should.Matchers {
     }
 
     "serialize traversal to string" in {
-      val travSrc = QueryMacros.queryInit("a-name", "an-author", "a-title", "a-description", 2.0, {cpg: Cpg => cpg.method} )
-      travSrc shouldBe "cpg: Cpg => cpg.method"
-    }
-
-    "deserialize traversal from string" in {
-      val cpg = Cpg.emptyCpg
-      cpg.graph.addNode("METHOD")
-
-      val testTrav: Cpg => Traversal[_] = QueryMacros.deserializeTraversal("{ cpg: Cpg => cpg.method }")
-      testTrav(cpg).l.size shouldBe 1
+      val query = QueryMacros.queryInit(
+        "a-name",
+        "an-author",
+        "a-title",
+        "a-description",
+        2.0, { cpg: Cpg => cpg.method }).asInstanceOf[Query]
+      query.title shouldBe "a-title"
+      query.traversalAsString shouldBe "cpg: Cpg => cpg.method"
     }
   }
 }

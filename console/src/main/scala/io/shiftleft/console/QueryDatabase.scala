@@ -21,6 +21,7 @@ case class Query(name: String,
                  description: String,
                  score: Double,
                  traversal: Cpg => Traversal[nodes.StoredNode],
+                 traversalAsString: String = "",
                  tags: List[String] = List())
 
 class QueryDatabase(defaultArgumentProvider: DefaultArgumentProvider = new DefaultArgumentProvider,
