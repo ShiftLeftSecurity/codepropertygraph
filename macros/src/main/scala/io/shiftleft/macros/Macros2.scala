@@ -30,9 +30,6 @@ import overflowdb.traversal.Traversal
     val src3 = src2.value.value.asInstanceOf[String]
     val src4 = c.parse(src3)
 
-    // c.Expr[Cpg => Traversal[nodes.StoredNode]](q"""
-    //   { cpg: io.shiftleft.codepropertygraph.Cpg => cpg.method.asInstanceOf[Traversal[nodes.StoredNode]] }
-    // """)
     c.Expr[Cpg => Traversal[nodes.StoredNode]](q"$src4")
   }
 }

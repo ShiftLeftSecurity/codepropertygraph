@@ -20,7 +20,8 @@ case class Query(name: String,
                  title: String,
                  description: String,
                  score: Double,
-                 f: Cpg => Traversal[nodes.StoredNode])
+                 traversal: Cpg => Traversal[nodes.StoredNode],
+                 tags: List[String] = List())
 
 class QueryDatabase(defaultArgumentProvider: DefaultArgumentProvider = new DefaultArgumentProvider,
                     namespace: String = "io.joern.scanners") {
