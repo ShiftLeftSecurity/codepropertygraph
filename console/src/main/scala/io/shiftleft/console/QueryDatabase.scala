@@ -27,6 +27,7 @@ case class Query(name: String,
                  docEndLine: Int = 0,
                  // intended to be filled by com.lihaoyi.sourcecode.FileName
                  docFileName: String = "",
+                 traversalAsString: String = "",
                  tags: List[String] = List())
 
 class QueryDatabase(defaultArgumentProvider: DefaultArgumentProvider = new DefaultArgumentProvider,

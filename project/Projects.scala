@@ -13,4 +13,5 @@ object Projects {
   lazy val console = project.in(file("console"))
   lazy val fuzzyc2cpg = project.in(file("fuzzyc2cpg"))
   lazy val fuzzyc2cpgtests = project.in(file("fuzzyc2cpg-tests"))
+  lazy val macros = project.in(file("macros"))
 }

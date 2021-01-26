@@ -1,8 +1,11 @@
 package io.shiftleft.console
 
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.codepropertygraph.Cpg
 import org.scalatest.matchers.should
 import org.scalatest.wordspec.AnyWordSpec
+import overflowdb.traversal.Traversal
+import io.shiftleft.macros.QueryMacros
 
 object TestBundle extends QueryBundle {
   @q def foo(n: Int = 4): Query = Query(
@@ -11,9 +14,7 @@ object TestBundle extends QueryBundle {
     title = "a-title",
     description = s"a-description $n",
     score = 2.0,
-    traversal = { cpg =>
-      cpg.method
-    }
+    traversal = { cpg => cpg.method }
   )
 }
 
@@ -34,6 +35,17 @@ class QueryDatabaseTests extends AnyWordSpec with should.Matchers {
       val testBundle = testBundles.head
       val queries = qdb.queriesInBundle(testBundle)
       queries.count(_.title == "a-title") shouldBe 1
+    }
+
+    "serialize traversal to string" in {
+      val query = QueryMacros.queryInit(
+        "a-name",
+        "an-author",
+        "a-title",
+        "a-description",
+        2.0, { cpg: Cpg => cpg.method }).asInstanceOf[Query]
+      query.title shouldBe "a-title"
+      query.traversalAsString shouldBe "cpg: Cpg => cpg.method"
     }
   }
 }

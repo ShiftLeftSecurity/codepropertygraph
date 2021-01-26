@@ -3,7 +3,8 @@ name := "console"
 enablePlugins(JavaAppPackaging)
 
 dependsOn(Projects.codepropertygraph,
-          Projects.semanticcpg)
+          Projects.semanticcpg,
+          Projects.macros)
 
 scalacOptions ++= Seq(
   "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
@@ -37,7 +38,8 @@ scalacOptions ++= Seq(
   "-Ywarn-unused:locals",              // Warn if a local definition is unused.
   "-Ywarn-unused:params",              // Warn if a value parameter is unused.
   "-Ywarn-unused:patvars",             // Warn if a variable bound in a pattern is unused.
-  "-Ywarn-unused:privates"             // Warn if a private member is unused.
+  "-Ywarn-unused:privates",             // Warn if a private member is unused.
+  "-Yrangepos"
 )
 
 // would love to reenable, but somehow StorageBackend.scala triggers a strange `[warn] method with a single empty parameter list overrides method without any parameter list` that doesn't make sense to me...
