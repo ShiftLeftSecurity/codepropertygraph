@@ -1,11 +1,25 @@
 package io.shiftleft.macros
 
-import scala.language.experimental.macros
-import scala.reflect.macros.blackbox.Context
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.nodes
 import overflowdb.traversal.Traversal
+import scala.language.experimental.macros
+import scala.reflect.macros.whitebox
 
 object QueryMacros {
+
+  def deserializeTraversal(src: String): Cpg => Traversal[_] = macro deserializeTraversalImpl
+
+  def deserializeTraversalImpl(c: whitebox.Context)(src: c.Expr[String]): c.Expr[Cpg => Traversal[_]] = {
+    import c.universe._
+    val literal = src.tree.asInstanceOf[Literal]
+    val srcString = literal.value.value.asInstanceOf[String]
+    val parsedTree = c.parse(srcString)
+
+    c.Expr[Cpg => Traversal[nodes.StoredNode]](q"$parsedTree")
+  }
+
+
   def queryInit(
     name: String,
     author: String,
@@ -14,7 +28,7 @@ object QueryMacros {
     score: Double,
     traversal: Cpg => Traversal[_]): String = macro queryInitImpl
 
-  def queryInitImpl(c: Context)(
+  def queryInitImpl(c: whitebox.Context)(
     name: c.Tree,
     author: c.Tree,
     title: c.Tree,

@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import org.scalatest.matchers.should
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.traversal.Traversal
-import io.shiftleft.macros.QueryMacros.queryInit
+import io.shiftleft.macros.QueryMacros
 
 object TestBundle extends QueryBundle {
   @q def foo(n: Int = 4): Query = Query(
@@ -38,7 +38,7 @@ class QueryDatabaseTests extends AnyWordSpec with should.Matchers {
     }
 
     "serialize traversal to string" in {
-      val travSrc = queryInit("a-name", "an-author", "a-title", "a-description", 2.0, {cpg: Cpg => cpg.method} )
+      val travSrc = QueryMacros.queryInit("a-name", "an-author", "a-title", "a-description", 2.0, {cpg: Cpg => cpg.method} )
       travSrc shouldBe "cpg: Cpg => cpg.method"
     }
 
@@ -46,7 +46,7 @@ class QueryDatabaseTests extends AnyWordSpec with should.Matchers {
       val cpg = Cpg.emptyCpg
       cpg.graph.addNode("METHOD")
 
-      val testTrav: Cpg => Traversal[_] = io.shiftleft.macros.Macros2.deserializeTraversal("{ cpg: Cpg => cpg.method }")
+      val testTrav: Cpg => Traversal[_] = QueryMacros.deserializeTraversal("{ cpg: Cpg => cpg.method }")
       testTrav(cpg).l.size shouldBe 1
     }
   }
