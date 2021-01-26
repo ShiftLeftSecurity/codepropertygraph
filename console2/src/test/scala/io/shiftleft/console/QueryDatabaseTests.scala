@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import org.scalatest.matchers.should
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.traversal.Traversal
+import io.shiftleft.macros.QueryMacros.queryInit
 
 object TestBundle extends QueryBundle {
   @q def foo(n: Int = 4): Query = Query(
@@ -37,28 +38,15 @@ class QueryDatabaseTests extends AnyWordSpec with should.Matchers {
     }
 
     "serialize traversal to string" in {
-      import io.shiftleft.macros.QueryMacros.queryInit
-      queryInit("a-name", "an-author", "a-title", "a-description", 2.0, {cpg: Cpg => cpg.method} )
-
-      // simplified: Macros2: Int => String impl
-      // val testString = io.shiftleft.macros.Macros2.foo()(5)
-      // println(testString) //5
-
-// import io.shiftleft.codepropertygraph.generated.nodes
-      // val testTrav: Cpg => Traversal[nodes.StoredNode] = io.shiftleft.macros.Macros2.query2()
-      // println(testTrav) // Lambda...
-
-      // pass it a string, get back a Cpg => Traversal[nodes.StoredNode]
-      // val testTrav2: Cpg => Traversal[_] = io.shiftleft.macros.Macros2.query3("{ cpg: Cpg => cpg.method }")
-      // println(testTrav2(Cpg.emptyCpg).l)
-    
+      val travSrc = queryInit("a-name", "an-author", "a-title", "a-description", 2.0, {cpg: Cpg => cpg.method} )
+      travSrc shouldBe "cpg: Cpg => cpg.method"
     }
 
     "deserialize traversal from string" in {
       val cpg = Cpg.emptyCpg
       cpg.graph.addNode("METHOD")
 
-      val testTrav: Cpg => Traversal[_] = io.shiftleft.macros.Macros2.query3("{ cpg: Cpg => cpg.method }")
+      val testTrav: Cpg => Traversal[_] = io.shiftleft.macros.Macros2.deserializeTraversal("{ cpg: Cpg => cpg.method }")
       testTrav(cpg).l.size shouldBe 1
     }
   }
