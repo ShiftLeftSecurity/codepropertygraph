@@ -1,12 +1,8 @@
 package io.shiftleft.console
 
-import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes
 import org.reflections8.Reflections
 import org.reflections8.util.{ClasspathHelper, ConfigurationBuilder}
 import org.slf4j.{Logger, LoggerFactory}
-import overflowdb.traversal.Traversal
-
 import scala.annotation.{StaticAnnotation, unused}
 import scala.jdk.CollectionConverters._
 import scala.reflect.runtime.universe._
@@ -14,21 +10,6 @@ import scala.reflect.runtime.{universe => ru}
 
 trait QueryBundle
 class q() extends StaticAnnotation
-
-case class Query(name: String,
-                 author: String,
-                 title: String,
-                 description: String,
-                 score: Double,
-                 // intended to be filled by com.lihaoyi.sourcecode.Line
-                 docStartLine: Int = 0,
-                 traversal: Cpg => Traversal[nodes.StoredNode],
-                 // intended to be filled by com.lihaoyi.sourcecode.Line
-                 docEndLine: Int = 0,
-                 // intended to be filled by com.lihaoyi.sourcecode.FileName
-                 docFileName: String = "",
-                 traversalAsString: String = "",
-                 tags: List[String] = List())
 
 class QueryDatabase(defaultArgumentProvider: DefaultArgumentProvider = new DefaultArgumentProvider,
                     namespace: String = "io.joern.scanners") {

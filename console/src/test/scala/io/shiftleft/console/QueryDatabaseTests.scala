@@ -4,7 +4,6 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.codepropertygraph.Cpg
 import org.scalatest.matchers.should
 import org.scalatest.wordspec.AnyWordSpec
-import overflowdb.traversal.Traversal
 import io.shiftleft.macros.QueryMacros
 
 object TestBundle extends QueryBundle {
@@ -43,7 +42,9 @@ class QueryDatabaseTests extends AnyWordSpec with should.Matchers {
         "an-author",
         "a-title",
         "a-description",
-        2.0, { cpg: Cpg => cpg.method }).asInstanceOf[Query]
+        2.0,
+        { cpg: Cpg => cpg.method }
+      )
       query.title shouldBe "a-title"
       query.traversalAsString shouldBe "cpg: Cpg => cpg.method"
     }
