@@ -3,7 +3,6 @@ package io.shiftleft.console.scripting
 import scala.reflect.runtime.currentMirror
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto
 
-
 /** a workaround for a scala reflect bug, where the first invocation of scala reflect fails
   * idea: invoke this at the very start to trigger the bug. future invocations should be fine
   * i asked to move the retry logic into scala reflect as a better way to handle this
@@ -17,7 +16,9 @@ object ScalaReflectWorkaround {
   def workaroundScalaReflectBugByTriggeringReflection() = {
     if (!applied) {
       try {
-        currentMirror.reflectModule(currentMirror.staticModule("io.shiftleft.console.scripting.ScalaReflectWorkaround$")).instance
+        currentMirror
+          .reflectModule(currentMirror.staticModule("io.shiftleft.console.scripting.ScalaReflectWorkaround$"))
+          .instance
       } catch {
         case t: Throwable => // that's what we want to trigger - it happens the first time, then works - all good
       }
