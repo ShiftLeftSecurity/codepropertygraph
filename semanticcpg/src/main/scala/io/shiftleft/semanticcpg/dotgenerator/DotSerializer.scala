@@ -34,6 +34,7 @@ object DotSerializer {
       case _                    => ""
     }
     sb.append(s"digraph $name {  \n")
+    sb.append("  rankdir=LR\n")
   }
 
   private def stringRepr(vertex: nodes.StoredNode): String = {
