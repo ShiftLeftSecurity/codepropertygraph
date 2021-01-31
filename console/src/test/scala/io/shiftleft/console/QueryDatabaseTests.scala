@@ -13,9 +13,7 @@ object TestBundle extends QueryBundle {
     title = "a-title",
     description = s"a-description $n",
     score = 2.0,
-    traversal = { cpg =>
-      cpg.method
-    }
+    traversal = { cpg => cpg.method }
   )
 }
 
@@ -44,9 +42,8 @@ class QueryDatabaseTests extends AnyWordSpec with should.Matchers {
         "an-author",
         "a-title",
         "a-description",
-        2.0, { cpg: Cpg =>
-          cpg.method
-        }
+        2.0,
+        { cpg: Cpg => cpg.method }
       )
       query.title shouldBe "a-title"
       query.traversalAsString shouldBe "cpg: Cpg => cpg.method"
