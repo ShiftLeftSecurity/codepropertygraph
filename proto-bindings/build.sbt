@@ -35,7 +35,7 @@ copyLatestCpgProto := {
   */
 lazy val generateCsharpBindings = taskKey[File]("generate csharp proto bindings")
 generateCsharpBindings := {
-  (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
+  val dependsOn = (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
   val dotnetVersion = System.getProperty("dotnet-version")
   assert(dotnetVersion != null && !dotnetVersion.trim.isEmpty, "you must define the dotnet version via a jvm system property, e.g. via `-Ddotnet-version=1.0.0`")
   println(s"building and publishing csharp proto version $dotnetVersion")
@@ -74,7 +74,7 @@ installProtoc := {
 
 lazy val generateGoBindings = taskKey[File]("generate go proto bindings (doesn't publish them anywhere)")
 generateGoBindings := {
-  (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
+  val dependsOn = (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
   val protocBinary = installProtoc.value
   // protoc requires a relative path...
   val protoFile = "codepropertygraph/target/cpg.proto"
@@ -88,7 +88,7 @@ generateGoBindings := {
 
 lazy val generatePythonBindings = taskKey[File]("generate Python proto bindings")
 generatePythonBindings := {
-  (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
+  val dependsOn = (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
   val protocBinary = installProtoc.value
   // protoc requires a relative path...
   val protoFile = "codepropertygraph/target/cpg.proto"
