@@ -5,7 +5,8 @@
     "nodeKeys" : [
       {"id" : 8, "name": "VALUE", "comment" : "Tag value", "valueType" : "string", "cardinality" : "one"},
       {"id" : 1002, "name": "IS_METHOD_NEVER_OVERRIDDEN", "comment" : "True if the referenced method is never overridden by the subclasses and false otherwise", "valueType" : "boolean", "cardinality" : "zeroOrOne"},
-      { "id" : 119, "name" : "POLICY_DIRECTORIES", "comment": "Sub directories of the policy directory that should be loaded when processing the CPG", "valueType" : "string", "cardinality" : "list"}
+      { "id" : 119, "name" : "POLICY_DIRECTORIES", "comment": "Sub directories of the policy directory that should be loaded when processing the CPG", "valueType" : "string", "cardinality" : "list"},
+      {"id": 15, "name" : "EVALUATION_STRATEGY", "comment" : "Evaluation strategy for function parameters and return values. One of the values in \"evaluationStrategies\"", "valueType" : "string", "cardinality" : "one"}
     ],
 
     "edgeKeys" : [
@@ -104,6 +105,7 @@
           ]
         },
         { "name": "METHOD_PARAMETER_IN",
+	  "keys": ["EVALUATION_STRATEGY"],
           "outEdges" : [
             {"edgeName": "PROPAGATE", "inNodes": [
               {"name": "METHOD_PARAMETER_OUT"},
@@ -129,6 +131,7 @@
          ]
         },
         { "name": "METHOD_RETURN",
+	  "keys": ["EVALUATION_STRATEGY"],
           "outEdges" : [
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
@@ -273,6 +276,14 @@
         {"id" : 138, "name" : "ALIAS_OF", "comment" : "Alias relation between types", "keys" : [] },
         {"id" : 139, "name" : "TYPE_DECL_ALIAS", "comment" : "Alias relation between two TYPE_DECL", "keys" : [] },
 	{"id" : 155, "name": "BINDS", "comment" : "Relation between TYPE_DECL and BINDING node", "keys": []}
+    ],
+
+    // Enums
+
+    "evaluationStrategies" : [
+        {"id" : 1, "name" : "BY_REFERENCE", "comment" : "A parameter or return of a function is passed by reference which means an address is used behind the scenes"},
+        {"id" : 2, "name" : "BY_SHARING", "comment" : "Only applicable to object parameter or return values. The pointer to the object is passed by value but the object itself is not copied and changes to it are thus propagated out of the method context"},
+        {"id" : 3, "name" : "BY_VALUE", "comment" : "A parameter or return of a function passed by value which means a flat copy is used"}
     ]
 
 }

@@ -49,7 +49,7 @@ class QueryDatabaseTests extends AnyWordSpec with should.Matchers {
         }
       )
       query.title shouldBe "a-title"
-      query.traversalAsString shouldBe "cpg: Cpg => cpg.method"
+      query.traversalAsString.endsWith("cpg.method") shouldBe true
     }
   }
 }
