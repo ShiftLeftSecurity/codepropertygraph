@@ -12,6 +12,8 @@ class NamespaceBlockTests extends FuzzyCCodeToCpgSuite {
 
   override val code: String =
     """
+      |int foo() {}
+      |struct my_struct{};
       |""".stripMargin
 
   "should contain two namespace blocks in total" in {
@@ -36,6 +38,18 @@ class NamespaceBlockTests extends FuzzyCCodeToCpgSuite {
         x.order shouldBe 0
       case _ => fail()
     }
+  }
+
+  "should allow traversing from namespace block to method" in {
+    cpg.namespaceBlock.filenameNot(File.UNKNOWN).method.name.l shouldBe List("foo")
+  }
+
+  "should allow traversing from namespace block to type declaration" in {
+    cpg.namespaceBlock.filenameNot(File.UNKNOWN).typeDecl.name.l shouldBe List("my_struct")
+  }
+
+  "should allow traversing from namespace block to namespace" in {
+    cpg.namespaceBlock.filenameNot(File.UNKNOWN).namespace.name.l shouldBe List(Namespace.globalNamespaceName)
   }
 
 }

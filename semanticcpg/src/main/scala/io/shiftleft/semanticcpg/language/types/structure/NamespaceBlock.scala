@@ -8,7 +8,7 @@ class NamespaceBlock(val traversal: Traversal[nodes.NamespaceBlock]) extends Any
   /**
     * Namespaces for namespace blocks.
     * */
-  def namespaces: Traversal[nodes.Namespace] =
+  def namespace: Traversal[nodes.Namespace] =
     traversal.out(EdgeTypes.REF).cast[nodes.Namespace]
 
   /**
@@ -20,4 +20,9 @@ class NamespaceBlock(val traversal: Traversal[nodes.NamespaceBlock]) extends Any
       .hasLabel(NodeTypes.TYPE_DECL)
       .cast[nodes.TypeDecl]
 
+  def method : Traversal[nodes.Method] =
+    traversal
+      .out(EdgeTypes.AST)
+      .hasLabel(NodeTypes.METHOD)
+      .cast[nodes.Method]
 }
