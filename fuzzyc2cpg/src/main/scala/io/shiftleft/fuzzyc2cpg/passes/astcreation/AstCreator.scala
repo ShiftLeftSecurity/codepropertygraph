@@ -144,8 +144,12 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
 
     astFunction.getContent.accept(this)
 
+    val retCode = Option(astFunction.getReturnType)
+      .map(_.getEscapedCodeStr)
+      .getOrElse("RET")
+
     val methodReturn = nodes.NewMethodReturn(
-      code = "RET",
+      code = retCode,
       evaluationStrategy = EvaluationStrategies.BY_VALUE.name(),
       typeFullName = registerType(returnType),
       lineNumber = methodReturnLocation.startLine,
