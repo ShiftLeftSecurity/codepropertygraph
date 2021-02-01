@@ -7,8 +7,8 @@ import com.google.protobuf.DescriptorProtos.FileDescriptorProto
   * idea: invoke this at the very start to trigger the bug. future invocations should be fine
   * i asked to move the retry logic into scala reflect as a better way to handle this
   * https://github.com/scala/bug/issues/12038#issuecomment-760629585
-  * 
-  * to reproduce the issue, comment out this workaround, publish cpg locally and run the following in the codescience repo: 
+  *
+  * to reproduce the issue, comment out this workaround, publish cpg locally and run the following in the codescience repo:
   * `cpg2sp/testOnly *PolicyAmmoniteExecutorTest`
   * if the above is green without this workaround, we don't need it any more
   */
