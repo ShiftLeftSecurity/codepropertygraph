@@ -8,7 +8,9 @@ class FileTests extends FuzzyCCodeToCpgSuite {
 
   override val code: String =
     """
-      |
+      | int foo() {}
+      | int bar() {}
+      | struct my_struct { int x; };
       |""".stripMargin
 
   "should contain two file nodes in total, both with order=0" in {
@@ -31,6 +33,18 @@ class FileTests extends FuzzyCCodeToCpgSuite {
         x.name should startWith("/")
       case _ => fail()
     }
+  }
+
+  "should allow traversing from file to its namespace blocks" in {
+    cpg.file.nameNot(File.UNKNOWN).namespaceBlock.name.toSet shouldBe Set("<global>")
+  }
+
+  "should allow traversing from file to its methods" in {
+    cpg.file.nameNot(File.UNKNOWN).method.name.toSet shouldBe Set("foo", "bar")
+  }
+
+  "should allow traversing from file to its type declarations" in {
+    cpg.file.nameNot(File.UNKNOWN).typeDecl.name.toSet shouldBe Set("my_struct")
   }
 
 }
