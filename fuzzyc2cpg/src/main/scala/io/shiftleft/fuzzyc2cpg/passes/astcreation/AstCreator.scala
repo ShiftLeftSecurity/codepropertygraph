@@ -117,7 +117,8 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       lineNumberEnd = location.endLine,
       columnNumberEnd = location.endPos,
       signature = signature,
-      filename = namespaceBlock.filename
+      filename = namespaceBlock.filename,
+      order = context.childNum
     )
 
     addAndConnectAsAstChild(method)

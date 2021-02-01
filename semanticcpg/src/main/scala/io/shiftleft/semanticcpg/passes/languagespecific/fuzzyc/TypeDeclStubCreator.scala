@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.types.structure.Namespace
 
 /**
   * This pass has no other pass as prerequisite.
@@ -37,9 +38,8 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
       fullName = fullName,
       isExternal = true,
       inheritsFromTypeFullName = Nil,
-      // TODO: don't set these two at all and assume them as default
       astParentType = NodeTypes.NAMESPACE_BLOCK,
-      astParentFullName = "<global>"
+      astParentFullName = Namespace.globalNamespaceName
     )
   }
 
