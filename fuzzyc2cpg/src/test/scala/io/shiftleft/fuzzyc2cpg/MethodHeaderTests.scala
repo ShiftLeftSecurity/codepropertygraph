@@ -60,7 +60,7 @@ class MethodHeaderTests extends AnyWordSpec with Matchers {
         .l
 
       methodReturn.size shouldBe 1
-      methodReturn.head.property(NodeKeys.CODE) shouldBe "RET"
+      methodReturn.head.property(NodeKeys.CODE) shouldBe "int"
       methodReturn.head.property(NodeKeys.EVALUATION_STRATEGY) shouldBe EvaluationStrategies.BY_VALUE
       methodReturn.head.property(NodeKeys.LINE_NUMBER) shouldBe 1
       methodReturn.head.property(NodeKeys.COLUMN_NUMBER) shouldBe 0

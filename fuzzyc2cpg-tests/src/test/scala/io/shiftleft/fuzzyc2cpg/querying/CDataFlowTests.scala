@@ -603,7 +603,7 @@ class CDataFlowTests17 extends DataFlowCodeToCpgSuite {
     sink.reachableByFlows(source).l.map(flowToResultPairs).toSet shouldBe Set(
       List(("source()", Some(4)),
            ("return source();", Some(4)),
-           ("RET", Some(3)),
+           ("int", Some(3)),
            ("bar()", Some(8)),
            ("y = bar()", Some(8)),
            ("sink(y)", Some(9)))
@@ -616,7 +616,7 @@ class CDataFlowTests17 extends DataFlowCodeToCpgSuite {
     sink.reachableByFlows(source).l.map(flowToResultPairs).toSet shouldBe Set(
       List(("source()", Some(4)),
            ("return source();", Some(4)),
-           ("RET", Some(3)),
+           ("int", Some(3)),
            ("bar()", Some(8)),
            ("y = bar()", Some(8)),
            ("sink(y)", Some(9)),
@@ -657,7 +657,7 @@ class CDataFlowTests18 extends DataFlowCodeToCpgSuite {
     val flows = sink.reachableByFlows(source).l
     flows.size shouldBe 1
     flows.map(flowToResultPairs).toSet shouldBe Set(
-      List(("RET", Some(7)),
+      List(("double", Some(7)),
            ("source(2)", Some(16)),
            ("k = source(2)", Some(16)),
            ("point.x = k", Some(18)),
@@ -698,7 +698,7 @@ class CDataFlowTests19 extends DataFlowCodeToCpgSuite {
 
     flows.size shouldBe 1
     flows.map(flowToResultPairs).toSet shouldBe Set(
-      List(("RET", Some(7)),
+      List(("struct Point", Some(7)),
            ("source(2)", Some(17)),
            ("point = source(2)", Some(17)),
            ("sink(point.x)", Some(18)),
@@ -879,8 +879,8 @@ class CDataFlowTests27 extends DataFlowCodeToCpgSuite {
     val flows = sink.reachableByFlows(source).l
 
     flows.map(flowToResultPairs).toSet shouldBe Set(
-      List(("free(x)", Some(4)), ("RET", Some(2))),
-      List(("free(y)", Some(3)), ("RET", Some(2)))
+      List(("free(x)", Some(4)), ("int", Some(2))),
+      List(("free(y)", Some(3)), ("int", Some(2)))
     )
   }
 }

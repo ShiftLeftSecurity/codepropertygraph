@@ -463,7 +463,7 @@ class CfgFixture(file1Code: String) {
 
   File.usingTemporaryDirectory("fuzzyctest") { dir =>
     val file1 = dir / "file1.c"
-    file1.write(s"int func() { $file1Code }")
+    file1.write(s"RET func() { $file1Code }")
     val keyPoolFile1 = new IntervalKeyPool(1001, 2000)
     val cfgKeyPool = new IntervalKeyPool(2001, 3000)
     val filenames = List(file1.path.toAbsolutePath.toString)
