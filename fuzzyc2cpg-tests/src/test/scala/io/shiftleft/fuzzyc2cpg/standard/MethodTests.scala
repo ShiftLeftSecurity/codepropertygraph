@@ -1,4 +1,4 @@
-package io.shiftleft.fuzzyc2cpg.querying
+package io.shiftleft.fuzzyc2cpg.standard
 
 import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
@@ -6,7 +6,7 @@ import io.shiftleft.semanticcpg.language._
 /**
   * Language primitives for navigating method stubs
   * */
-class CMethodTests extends FuzzyCCodeToCpgSuite {
+class MethodTests extends FuzzyCCodeToCpgSuite {
 
   override val code =
     """

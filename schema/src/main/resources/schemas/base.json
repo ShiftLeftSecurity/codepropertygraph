@@ -153,19 +153,9 @@
              {"name": "MEMBER", "cardinality": "1:n"},
              {"name": "MODIFIER", "cardinality": "1:n"}
            ]},
-           {"edgeName": "BINDS", "inNodes": [{"name":"BINDING", "cardinality": "1:n"}]},
            {"edgeName": "VTABLE", "inNodes": [{"name":"METHOD"}]}
          ],
          "is" : ["AST_NODE"]
-        },
-        {"id" : 146, "name" : "BINDING",
-         "keys" : ["NAME", "SIGNATURE"],
-         "comment" : "A binding of a METHOD into a TYPE_DECL",
-         "outEdges" : [
-           {"edgeName": "REF", "inNodes": [
-            {"name":"METHOD", "cardinality": "n:1"}
-           ]}
-         ]
         },
         {"id" : 47, "name" : "TYPE_PARAMETER",
          "keys" : ["NAME", "ORDER"],
@@ -627,8 +617,7 @@
         // VTABLE edge is deprecated.
         {"id" : 30, "name": "VTABLE", "comment" : "Indicates that a method is part of the vtable of a certain type declaration", "keys": []},
         {"id" : 55, "name": "RECEIVER", "comment" : "The receiver of a method call which is either an object or a pointer", "keys": []},
-        {"id" : 56, "name": "CONDITION", "comment" : "Edge from control structure node to the expression that holds the condition", "keys" : []},
-        {"id" : 155, "name": "BINDS", "comment" : "Relation between TYPE_DECL and BINDING node", "keys": []},
+        {"id" : 56, "name": "CONDITION", "comment" : "Edge from control structure node to the expression that holds the condition", "keys" : []},        
         {"id" : 156, "name": "ARGUMENT", "comment" : "Relation between a CALL and its arguments and RETURN and the returned expression", "keys": []},
         {"id" : 157, "name" : "SOURCE_FILE", "comment" : "Source file of a node, in which its LINE_NUMBER and COLUMN_NUMBER are valid", "keys" : []}
 

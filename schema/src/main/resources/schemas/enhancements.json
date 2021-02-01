@@ -14,6 +14,16 @@
     ],
 
     "nodeTypes" : [
+    
+      {"id" : 146, "name" : "BINDING",
+       	 "keys" : ["NAME", "SIGNATURE"],
+         "comment" : "A binding of a METHOD into a TYPE_DECL",
+         "outEdges" : [
+           {"edgeName": "REF", "inNodes": [
+            {"name":"METHOD", "cardinality": "n:1"}
+           ]}
+         ]
+      },
       {
         "id":307,"name" : "IMPLICIT_CALL",
           "keys" : ["CODE", "NAME", "SIGNATURE", "LINE_NUMBER", "COLUMN_NUMBER", "ORDER"],
@@ -160,7 +170,8 @@
              {"edgeName": "ALIAS_OF", "inNodes": [{"name": "TYPE"}]},
              {"edgeName": "CONTAINS", "inNodes": [{"name": "METHOD"}]},
              {"edgeName": "SOURCE_FILE", "inNodes": [{"name": "FILE"}]},
-             {"edgeName": "TYPE_DECL_ALIAS", "inNodes": [{"name": "TYPE_DECL"}]}
+             {"edgeName": "TYPE_DECL_ALIAS", "inNodes": [{"name": "TYPE_DECL"}]},
+	     {"edgeName": "BINDS", "inNodes": [{"name":"BINDING", "cardinality": "1:n"}]}
           ]
         },
         { "name": "MEMBER",
@@ -260,7 +271,8 @@
         {"id" : 1, "name" : "PROPAGATE", "keys" : ["ALIAS"], "comment" : "Encodes propagation of data from on node to another. The ALIAS property is deprecated."},
         {"id" : 137, "name": "REACHING_DEF", "comment" : "Reaching definition edge", "keys" : ["VARIABLE"]},
         {"id" : 138, "name" : "ALIAS_OF", "comment" : "Alias relation between types", "keys" : [] },
-        {"id" : 139, "name" : "TYPE_DECL_ALIAS", "comment" : "Alias relation between two TYPE_DECL", "keys" : [] }
+        {"id" : 139, "name" : "TYPE_DECL_ALIAS", "comment" : "Alias relation between two TYPE_DECL", "keys" : [] },
+	{"id" : 155, "name": "BINDS", "comment" : "Relation between TYPE_DECL and BINDING node", "keys": []}
     ]
 
 }
