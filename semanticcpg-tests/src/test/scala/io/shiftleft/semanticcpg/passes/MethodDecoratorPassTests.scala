@@ -22,7 +22,6 @@ class MethodDecoratorPassTests extends AnyWordSpec with Matchers {
         NodeKeys.LINE_NUMBER -> 10
       )
       .asInstanceOf[nodes.MethodParameterIn]
-    val evalType = graph + NodeTypes.TYPE
 
     method --- EdgeTypes.AST --> parameterIn
 

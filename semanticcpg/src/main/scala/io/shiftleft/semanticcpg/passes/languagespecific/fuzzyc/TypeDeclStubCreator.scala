@@ -33,12 +33,13 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 
   private def createTypeDeclStub(name: String, fullName: String): nodes.NewTypeDecl = {
     nodes.NewTypeDecl(
-      name,
-      fullName,
+      name = name,
+      fullName = fullName,
       isExternal = true,
       inheritsFromTypeFullName = Nil,
-      NodeTypes.NAMESPACE_BLOCK,
-      "<global>"
+      // TODO: don't set these two at all and assume them as default
+      astParentType = NodeTypes.NAMESPACE_BLOCK,
+      astParentFullName = "<global>"
     )
   }
 

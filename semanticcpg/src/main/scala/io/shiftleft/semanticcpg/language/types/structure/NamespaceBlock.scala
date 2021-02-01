@@ -20,7 +20,7 @@ class NamespaceBlock(val traversal: Traversal[nodes.NamespaceBlock]) extends Any
       .hasLabel(NodeTypes.TYPE_DECL)
       .cast[nodes.TypeDecl]
 
-  def method : Traversal[nodes.Method] =
+  def method: Traversal[nodes.Method] =
     traversal
       .out(EdgeTypes.AST)
       .hasLabel(NodeTypes.METHOD)

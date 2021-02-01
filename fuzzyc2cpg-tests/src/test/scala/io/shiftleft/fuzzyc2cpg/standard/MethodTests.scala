@@ -3,15 +3,23 @@ package io.shiftleft.fuzzyc2cpg.standard
 import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
-/**
-  * Language primitives for navigating method stubs
-  * */
 class MethodTests extends FuzzyCCodeToCpgSuite {
 
   override val code =
     """
       |int main(int argc, char **argv) {
       |}""".stripMargin
+
+  "should contain exactly one method node with correct fields" in {
+    cpg.method.l match {
+      case List(x) =>
+        x.name shouldBe "main"
+        x.fullName shouldBe "main"
+        x.code shouldBe "int main (int argc,char **argv)"
+        x.signature shouldBe "int main (int,char * *)"
+      case _ => fail()
+    }
+  }
 
   "should return correct function/method name" in {
     cpg.method.name.toSet shouldBe Set("main")
@@ -39,14 +47,14 @@ class MethodTests extends FuzzyCCodeToCpgSuite {
   }
 
   "should return correct parameter types" in {
-    cpg.parameter.name("argc").evalType.l shouldBe List("int")
-    cpg.parameter.name("argv").evalType.l shouldBe List("char * *")
+    cpg.parameter.name("argc").typeFullName.l shouldBe List("int")
+    cpg.parameter.name("argv").typeFullName.l shouldBe List("char * *")
   }
 
   "should return correct return type" in {
-    cpg.methodReturn.evalType.l shouldBe List("int")
-    cpg.method.name("main").methodReturn.evalType.l shouldBe List("int")
-    cpg.parameter.name("argc").method.methodReturn.evalType.l shouldBe List("int")
+    cpg.methodReturn.typeFullName.l shouldBe List("int")
+    cpg.method.name("main").methodReturn.typeFullName.l shouldBe List("int")
+    cpg.parameter.name("argc").method.methodReturn.typeFullName.l shouldBe List("int")
   }
 
   "should return a filename for method 'main'" in {

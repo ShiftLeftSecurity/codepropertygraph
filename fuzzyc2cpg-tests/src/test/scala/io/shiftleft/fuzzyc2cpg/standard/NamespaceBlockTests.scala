@@ -34,6 +34,7 @@ class NamespaceBlockTests extends FuzzyCCodeToCpgSuite {
     cpg.namespaceBlock.filenameNot(File.UNKNOWN).l match {
       case List(x) =>
         x.name shouldBe Namespace.globalNamespaceName
+        x.filename should not be ""
         x.fullName shouldBe s"${x.filename}:${Namespace.globalNamespaceName}"
         x.order shouldBe 0
       case _ => fail()

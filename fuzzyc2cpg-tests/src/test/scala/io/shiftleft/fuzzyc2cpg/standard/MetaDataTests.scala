@@ -16,8 +16,17 @@ class MetaDataTests extends FuzzyCCodeToCpgSuite {
         x.language shouldBe "C"
         x.version shouldBe "0.1"
         x.overlays shouldBe List("semanticcpg")
+        // C-frontend does not set hash for entire CPG.
+        // Change this assertion if it is supposed to.
+        x.hash shouldBe None
       case _ => fail()
     }
+  }
+
+  "should not have any incoming or outgoing edges" in {
+    cpg.metaData.size shouldBe 1
+    cpg.metaData.in.l shouldBe List()
+    cpg.metaData.out.l shouldBe List()
   }
 
 }

@@ -2,9 +2,7 @@ package io.shiftleft.fuzzyc2cpg.passes.astcreation;
 
 import static org.antlr.v4.runtime.Token.EOF;
 
-import io.shiftleft.codepropertygraph.generated.EdgeTypes;
 import io.shiftleft.codepropertygraph.generated.nodes.NewComment;
-import io.shiftleft.codepropertygraph.generated.nodes.NewFile;
 import io.shiftleft.fuzzyc2cpg.ast.AstNode;
 import io.shiftleft.fuzzyc2cpg.ast.AstNodeBuilder;
 import io.shiftleft.fuzzyc2cpg.ast.logical.statements.CompoundStatement;
@@ -34,7 +32,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import scala.Some;
-import scala.collection.immutable.List$;
 
 abstract public class AntlrParserDriver {
     // TODO: This class does two things:

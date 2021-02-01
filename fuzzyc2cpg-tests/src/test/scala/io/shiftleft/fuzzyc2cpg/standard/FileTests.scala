@@ -20,17 +20,17 @@ class FileTests extends FuzzyCCodeToCpgSuite {
   }
 
   "should contain exactly one placeholder file node with `name=\"<unknown>\"/order=0`" in {
-    cpg.file(File.UNKNOWN).l match {
-      case List(x) =>
-        x.order shouldBe 0
-      case _ => fail()
-    }
+    cpg.file(File.UNKNOWN).order.l shouldBe List(0)
+    cpg.file(File.UNKNOWN).hash.l shouldBe List()
   }
 
   "should contain exactly one non-placeholder file with absolute path in `name`" in {
     cpg.file.nameNot(File.UNKNOWN).l match {
       case List(x) =>
         x.name should startWith("/")
+        // C-frontend currently does not set hash but should do so
+        // in the future
+        x.hash shouldBe None
       case _ => fail()
     }
   }
@@ -39,11 +39,11 @@ class FileTests extends FuzzyCCodeToCpgSuite {
     cpg.file.nameNot(File.UNKNOWN).namespaceBlock.name.toSet shouldBe Set("<global>")
   }
 
-  "should allow traversing from file to its methods" in {
+  "should allow traversing from file to its methods via namespace block" in {
     cpg.file.nameNot(File.UNKNOWN).method.name.toSet shouldBe Set("foo", "bar")
   }
 
-  "should allow traversing from file to its type declarations" in {
+  "should allow traversing from file to its type declarations via namespace block" in {
     cpg.file.nameNot(File.UNKNOWN).typeDecl.name.toSet shouldBe Set("my_struct")
   }
 
