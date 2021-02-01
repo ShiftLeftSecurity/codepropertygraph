@@ -25,4 +25,8 @@ class MethodReturnTests extends FuzzyCCodeToCpgSuite {
     }
   }
 
+  "should allow traversing to method" in {
+    cpg.methodReturn.method.name.l shouldBe List("foo")
+  }
+
 }
