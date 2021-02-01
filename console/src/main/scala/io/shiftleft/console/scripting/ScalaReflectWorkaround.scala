@@ -11,7 +11,11 @@ import com.google.protobuf.DescriptorProtos.FileDescriptorProto
 object ScalaReflectWorkaround {
   var applied = false
 
-  def fromJava(t: FileDescriptorProto): Unit = ()
+  def fromJava(t: FileDescriptorProto): Unit = {
+    println(t)
+    // this is just here to suppress a warnings - it is never invoked by anything afaik,
+    // but for whatever reason essential to trigger the scala reflection bug...
+  }
 
   def workaroundScalaReflectBugByTriggeringReflection() = {
     if (!applied) {
@@ -20,7 +24,7 @@ object ScalaReflectWorkaround {
           .reflectModule(currentMirror.staticModule("io.shiftleft.console.scripting.ScalaReflectWorkaround$"))
           .instance
       } catch {
-        case t: Throwable => // that's what we want to trigger - it happens the first time, then works - all good
+        case _: Throwable => // that's what we want to trigger - it happens the first time, then works - all good
       }
       applied = true
     }
