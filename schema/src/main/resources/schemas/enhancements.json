@@ -6,7 +6,8 @@
       {"id" : 8, "name": "VALUE", "comment" : "Tag value", "valueType" : "string", "cardinality" : "one"},
       {"id" : 1002, "name": "IS_METHOD_NEVER_OVERRIDDEN", "comment" : "True if the referenced method is never overridden by the subclasses and false otherwise", "valueType" : "boolean", "cardinality" : "zeroOrOne"},
       { "id" : 119, "name" : "POLICY_DIRECTORIES", "comment": "Sub directories of the policy directory that should be loaded when processing the CPG", "valueType" : "string", "cardinality" : "list"},
-      {"id": 15, "name" : "EVALUATION_STRATEGY", "comment" : "Evaluation strategy for function parameters and return values. One of the values in \"evaluationStrategies\"", "valueType" : "string", "cardinality" : "one"}
+      {"id": 15, "name" : "EVALUATION_STRATEGY", "comment" : "Evaluation strategy for function parameters and return values. One of the values in \"evaluationStrategies\"", "valueType" : "string", "cardinality" : "one"},
+      {"id": 25, "name": "DISPATCH_TYPE", "comment": "The dispatch type of a call, which is either static or dynamic. See dispatchTypes", "valueType" : "string", "cardinality" : "one"}
     ],
 
     "edgeKeys" : [
@@ -64,6 +65,9 @@
 	     {"edgeName": "TAGGED_BY", "inNodes": [{"name": "TAG"}]}
             ]
         },
+	{ "name": "CALL",
+	  "keys" : ["DISPATCH_TYPE"]
+	},
         { "name": "METHOD",
           "outEdges" : [
              {"edgeName": "AST", "inNodes": [
@@ -279,6 +283,11 @@
     ],
 
     // Enums
+
+    "dispatchTypes" : [
+        {"id" : 1, "name" : "STATIC_DISPATCH", "comment": "For statically dispatched calls the call target is known before program execution"},
+        {"id" : 2, "name" : "DYNAMIC_DISPATCH", "comment": "For dynamically dispatched calls the target is determined during runtime"}
+    ],
 
     "evaluationStrategies" : [
         {"id" : 1, "name" : "BY_REFERENCE", "comment" : "A parameter or return of a function is passed by reference which means an address is used behind the scenes"},

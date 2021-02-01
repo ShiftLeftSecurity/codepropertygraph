@@ -32,11 +32,6 @@
         {"id": 21, "name": "CODE", "comment": "The code snippet the node represents", "valueType" : "string", "cardinality" : "one"},
         {"id": 22, "name": "SIGNATURE", "comment": "Method signature. The format is defined by the language front-end, and the backend simply compares strings to resolve function overloading, i.e. match call-sites to METHODs. In theory, consecutive integers would be valid, but in practice this should be human readable", "valueType" : "string", "cardinality" : "one"},
         {"id": 26, "name" : "MODIFIER_TYPE", "comment" : "Indicates the modifier which is represented by a MODIFIER node. See modifierTypes", "valueType" : "string", "cardinality" : "one"},
-
-        // Properties to characterize call-sites
-
-        {"id": 25, "name": "DISPATCH_TYPE", "comment": "The dispatch type of a call, which is either static or dynamic. See dispatchTypes", "valueType" : "string", "cardinality" : "one"},
-
         // Properties used to link nodes in the backend
         {"id": 51, "name" : "TYPE_FULL_NAME", "comment" : "The static type of an entity. E.g. expressions, local, parameters etc. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME", "valueType" : "string", "cardinality" : "one"},
         {"id": 52, "name" : "TYPE_DECL_FULL_NAME", "comment" : "The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME", "valueType" : "string", "cardinality" : "one"},
@@ -211,7 +206,7 @@
          ]
         },
         {"id": 15, "name" : "CALL",
-         "keys": ["CODE", "NAME", "ORDER", "METHOD_INST_FULL_NAME", "METHOD_FULL_NAME", "ARGUMENT_INDEX", "DISPATCH_TYPE", "SIGNATURE", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys": ["CODE", "NAME", "ORDER", "METHOD_INST_FULL_NAME", "METHOD_FULL_NAME", "ARGUMENT_INDEX", "SIGNATURE", "TYPE_FULL_NAME", "DYNAMIC_TYPE_HINT_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "A (method)-call",
          "is": ["EXPRESSION", "CALL_REPR"],
          "outEdges" : [
@@ -623,11 +618,6 @@
     ],
 
     // Enums
-
-    "dispatchTypes" : [
-        {"id" : 1, "name" : "STATIC_DISPATCH", "comment": "For statically dispatched calls the call target is known before program execution"},
-        {"id" : 2, "name" : "DYNAMIC_DISPATCH", "comment": "For dynamically dispatched calls the target is determined during runtime"}
-    ],
 
     // TODO rename to "frontends"
     "languages" : [
