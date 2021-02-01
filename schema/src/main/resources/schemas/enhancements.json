@@ -7,9 +7,10 @@
       {"id" : 1002, "name": "IS_METHOD_NEVER_OVERRIDDEN", "comment" : "True if the referenced method is never overridden by the subclasses and false otherwise", "valueType" : "boolean", "cardinality" : "zeroOrOne"},
       { "id" : 119, "name" : "POLICY_DIRECTORIES", "comment": "Sub directories of the policy directory that should be loaded when processing the CPG", "valueType" : "string", "cardinality" : "list"},
       {"id": 15, "name" : "EVALUATION_STRATEGY", "comment" : "Evaluation strategy for function parameters and return values. One of the values in \"evaluationStrategies\"", "valueType" : "string", "cardinality" : "one"},
-      {"id": 25, "name": "DISPATCH_TYPE", "comment": "The dispatch type of a call, which is either static or dynamic. See dispatchTypes", "valueType" : "string", "cardinality" : "one"}
+      {"id": 25, "name": "DISPATCH_TYPE", "comment": "The dispatch type of a call, which is either static or dynamic. See dispatchTypes", "valueType" : "string", "cardinality" : "one"},
+      {"id": 1591, "name" : "DYNAMIC_TYPE_HINT_FULL_NAME", "comment" : "Type hint for the dynamic type", "valueType" : "string", "cardinality" : "list"}
     ],
-
+    
     "edgeKeys" : [
       {"id": 1, "name" : "ALIAS", "comment" : "Defines whether a PROPAGATE edge creates an alias", "valueType"     : "boolean", "cardinality" : "one" },
       {"id" : 11, "name" : "VARIABLE", "comment" : "A variable propagated by a reaching-def edge", "valueType" : "string", "cardinality" : "one"}
@@ -66,7 +67,7 @@
             ]
         },
 	{ "name": "CALL",
-	  "keys" : ["DISPATCH_TYPE"]
+	  "keys" : ["DISPATCH_TYPE", "DYNAMIC_TYPE_HINT_FULL_NAME"]
 	},
         { "name": "METHOD",
           "outEdges" : [
@@ -109,7 +110,7 @@
           ]
         },
         { "name": "METHOD_PARAMETER_IN",
-	  "keys": ["EVALUATION_STRATEGY"],
+	  "keys": ["EVALUATION_STRATEGY", "DYNAMIC_TYPE_HINT_FULL_NAME"],
           "outEdges" : [
             {"edgeName": "PROPAGATE", "inNodes": [
               {"name": "METHOD_PARAMETER_OUT"},
@@ -135,7 +136,7 @@
          ]
         },
         { "name": "METHOD_RETURN",
-	  "keys": ["EVALUATION_STRATEGY"],
+	  "keys": ["EVALUATION_STRATEGY", "DYNAMIC_TYPE_HINT_FULL_NAME"],
           "outEdges" : [
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
@@ -152,12 +153,14 @@
             ]
         },
         { "name": "METHOD_REF",
+	  "keys" : ["DYNAMIC_TYPE_HINT_FULL_NAME"],
           "outEdges" : [
             {"edgeName": "REF", "inNodes": [{"name": "METHOD", "cardinality": "n:1"}]},
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
         },
       { "name": "TYPE_REF",
+        "keys" : ["DYNAMIC_TYPE_HINT_FULL_NAME"],
         "outEdges" : [
           {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
         ]
@@ -182,11 +185,13 @@
           ]
         },
         { "name": "MEMBER",
+	  "keys" : ["DYNAMIC_TYPE_HINT_FULL_NAME"],
           "outEdges" : [
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
         },
         {"name" : "LITERAL",
+	  "keys" : ["DYNAMIC_TYPE_HINT_FULL_NAME"],
           "outEdges" : [
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]},
 	    {"edgeName": "REACHING_DEF", "inNodes": [
@@ -211,12 +216,14 @@
           ]
         },
         { "name": "LOCAL",
+	  "keys" : ["DYNAMIC_TYPE_HINT_FULL_NAME"],
           "outEdges" : [
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]},
             {"edgeName": "CAPTURED_BY", "inNodes": [{"name": "CLOSURE_BINDING"}]}
           ]
         },
         {"name" : "IDENTIFIER",
+	  "keys" : ["DYNAMIC_TYPE_HINT_FULL_NAME"],
           "outEdges" : [
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]},
 	    {"edgeName": "REACHING_DEF", "inNodes": [
@@ -228,6 +235,7 @@
           ]
         },
         {"name" : "BLOCK",
+	  "keys" : ["DYNAMIC_TYPE_HINT_FULL_NAME"],
           "outEdges" : [
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]},
 	    {"edgeName": "REACHING_DEF", "inNodes": [
@@ -251,6 +259,7 @@
           ]
         },
         {"name" : "UNKNOWN",
+	 "keys" : ["DYNAMIC_TYPE_HINT_FULL_NAME"],
           "outEdges" : [
             {"edgeName": "REACHING_DEF", "inNodes": [
               {"name": "CALL"},
