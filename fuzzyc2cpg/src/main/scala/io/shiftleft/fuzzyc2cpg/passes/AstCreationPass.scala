@@ -28,7 +28,7 @@ class AstCreationPass(filenames: List[String], cpg: Cpg, keyPool: IntervalKeyPoo
       name = Namespace.globalNamespaceName,
       fullName = CMetaDataPass.getGlobalNamespaceBlockFullName(Some(absolutePath)),
       filename = absolutePath,
-      order = 0
+      order = 1
     )
     diffGraph.addNode(namespaceBlock)
     val driver = createDriver(namespaceBlock)

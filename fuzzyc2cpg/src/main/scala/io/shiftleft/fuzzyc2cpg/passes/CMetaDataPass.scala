@@ -22,7 +22,7 @@ class CMetaDataPass(cpg: Cpg, keyPool: Option[KeyPool] = None) extends CpgPass(c
         name = Namespace.globalNamespaceName,
         fullName = CMetaDataPass.getGlobalNamespaceBlockFullName(None),
         filename = File.UNKNOWN,
-        order = 0
+        order = 1
       )
       diffGraph.addNode(node)
     }
