@@ -21,7 +21,7 @@ class MethodHeaderTests extends AnyWordSpec with Matchers {
       method.property(NodeKeys.COLUMN_NUMBER) shouldBe 0
       method.property(NodeKeys.LINE_NUMBER_END) shouldBe 3
       method.property(NodeKeys.COLUMN_NUMBER_END) shouldBe 0
-      method.property(NodeKeys.CODE) shouldBe "foo (int x,int y)"
+      method.property(NodeKeys.CODE) shouldBe "int foo (int x,int y)"
     }
 
     "have correct METHOD_PARAMETER_IN nodes for method foo" in {

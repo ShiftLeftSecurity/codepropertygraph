@@ -104,11 +104,12 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
     }
 
     val signature = returnType + " " + astFunction.getFunctionSignature(false)
+    val code = returnType + " " + astFunction.getFunctionSignature(true)
 
     val location = astFunction.getLocation
     val method = nodes.NewMethod(
       name = astFunction.getName,
-      code = astFunction.getEscapedCodeStr,
+      code = code,
       isExternal = false,
       fullName = astFunction.getName,
       lineNumber = location.startLine,
@@ -116,7 +117,8 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       lineNumberEnd = location.endLine,
       columnNumberEnd = location.endPos,
       signature = signature,
-      filename = namespaceBlock.filename
+      filename = namespaceBlock.filename,
+      order = context.childNum
     )
 
     addAndConnectAsAstChild(method)

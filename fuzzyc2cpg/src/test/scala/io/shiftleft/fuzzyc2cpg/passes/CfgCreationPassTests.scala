@@ -10,20 +10,19 @@ import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.semanticcpg.passes.cfgcreation.Cfg.{AlwaysEdge, CaseEdge, CfgEdgeType, FalseEdge, TrueEdge}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import overflowdb.traversal._
 
 class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
   "Cfg" should {
 
     "contain an entry and exit node at least" in new CfgFixture("") {
-      succOf("func ()") shouldBe expected(("RET", AlwaysEdge))
+      succOf("RET func ()") shouldBe expected(("RET", AlwaysEdge))
       succOf("RET") shouldBe expected()
     }
 
     "be correct for decl statement with assignment" in
       new CfgFixture("int x = 1;") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("1", AlwaysEdge))
         succOf("1") shouldBe expected(("x = 1", AlwaysEdge))
         succOf("x = 1") shouldBe expected(("RET", AlwaysEdge))
@@ -31,7 +30,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct for nested expression" in
       new CfgFixture("x = y + 1;") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("1", AlwaysEdge))
         succOf("1") shouldBe expected(("y + 1", AlwaysEdge))
@@ -41,14 +40,14 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct for return statement" in
       new CfgFixture("return x;") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("return x;", AlwaysEdge))
         succOf("return x;") shouldBe expected(("RET", AlwaysEdge))
       }
 
     "be correct for consecutive return statements" in
       new CfgFixture("return x; return y;") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("return x;", AlwaysEdge))
         succOf("y") shouldBe expected(("return y;", AlwaysEdge))
         succOf("return x;") shouldBe expected(("RET", AlwaysEdge))
@@ -57,13 +56,13 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct for void return statement" in
       new CfgFixture("return;") {
-        succOf("func ()") shouldBe expected(("return;", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("return;", AlwaysEdge))
         succOf("return;") shouldBe expected(("RET", AlwaysEdge))
       }
 
     "be correct for call expression" in
       new CfgFixture("foo(a + 1, b);") {
-        succOf("func ()") shouldBe expected(("a", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("a", AlwaysEdge))
         succOf("a") shouldBe expected(("1", AlwaysEdge))
         succOf("1") shouldBe expected(("a + 1", AlwaysEdge))
         succOf("a + 1") shouldBe expected(("b", AlwaysEdge))
@@ -73,21 +72,21 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct for unary expression '+'" in
       new CfgFixture("+x;") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("+x", AlwaysEdge))
         succOf("+x") shouldBe expected(("RET", AlwaysEdge))
       }
 
     "be correct for unary expression '++'" in
       new CfgFixture("++x;") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("++x", AlwaysEdge))
         succOf("++x") shouldBe expected(("RET", AlwaysEdge))
       }
 
     "be correct for conditional expression" in
       new CfgFixture("x ? y : z;") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("y", TrueEdge), ("z", FalseEdge))
         succOf("y") shouldBe expected(("x ? y : z", AlwaysEdge))
         succOf("z") shouldBe expected(("x ? y : z", AlwaysEdge))
@@ -97,7 +96,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
     "be correct for short-circuit AND expression" in
       // TODO: Broken by supporting move params?
       new CfgFixture("x && y;") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("y", TrueEdge), ("x && y", FalseEdge))
         succOf("y") shouldBe expected(("x && y", AlwaysEdge))
         succOf("x && y") shouldBe expected(("RET", AlwaysEdge))
@@ -105,7 +104,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct for short-circuit OR expression" in
       new CfgFixture("x || y;") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("y", FalseEdge), ("x || y", TrueEdge))
         succOf("y") shouldBe expected(("x || y", AlwaysEdge))
         succOf("x || y") shouldBe expected(("RET", AlwaysEdge))
@@ -115,7 +114,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
   "Cfg for while-loop" should {
     "be correct" in
       new CfgFixture("while (x < 1) { y = 2; }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("1", AlwaysEdge))
         succOf("1") shouldBe expected(("x < 1", AlwaysEdge))
         succOf("x < 1") shouldBe expected(("y", TrueEdge), ("RET", FalseEdge))
@@ -126,7 +125,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with break" in
       new CfgFixture("while (x < 1) { break; y; }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("1", AlwaysEdge))
         succOf("1") shouldBe expected(("x < 1", AlwaysEdge))
         succOf("x < 1") shouldBe expected(("break;", TrueEdge), ("RET", FalseEdge))
@@ -136,7 +135,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with continue" in
       new CfgFixture("while (x < 1) { continue; y; }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("1", AlwaysEdge))
         succOf("1") shouldBe expected(("x < 1", AlwaysEdge))
         succOf("x < 1") shouldBe expected(("continue;", TrueEdge), ("RET", FalseEdge))
@@ -146,7 +145,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with nested while-loop" in
       new CfgFixture("while (x) { while (y) { z; }}") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("y", TrueEdge), ("RET", FalseEdge))
         succOf("y") shouldBe expected(("z", TrueEdge), ("x", FalseEdge))
         succOf("z") shouldBe expected(("y", AlwaysEdge))
@@ -156,7 +155,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
   "Cfg for do-while-loop" should {
     "be correct" in
       new CfgFixture("do { y = 2; } while (x < 1);") {
-        succOf("func ()") shouldBe expected(("y", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("2", AlwaysEdge))
         succOf("2") shouldBe expected(("y = 2", AlwaysEdge))
         succOf("y = 2") shouldBe expected(("x", AlwaysEdge))
@@ -167,7 +166,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with break" in
       new CfgFixture("do { break; y; } while (x < 1);") {
-        succOf("func ()") shouldBe expected(("break;", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("break;", AlwaysEdge))
         succOf("break;") shouldBe expected(("RET", AlwaysEdge))
         succOf("y") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("1", AlwaysEdge))
@@ -177,7 +176,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with continue" in
       new CfgFixture("do { continue; y; } while (x < 1);") {
-        succOf("func ()") shouldBe expected(("continue;", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("continue;", AlwaysEdge))
         succOf("continue;") shouldBe expected(("x", AlwaysEdge))
         succOf("y") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("1", AlwaysEdge))
@@ -187,7 +186,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with nested do-while-loop" in
       new CfgFixture("do { do { x; } while (y); } while (z);") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("x", TrueEdge), ("z", FalseEdge))
         succOf("z") shouldBe expected(("x", TrueEdge), ("RET", FalseEdge))
@@ -195,7 +194,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct for do-while-loop with empty body" in
       new CfgFixture("do { } while(x > 1);") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("1") shouldBe expected(("x > 1", AlwaysEdge))
         succOf("x > 1") shouldBe expected(("x", TrueEdge), ("RET", FalseEdge))
       }
@@ -205,7 +204,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
   "Cfg for for-loop" should {
     "be correct" in
       new CfgFixture("for (x = 0; y < 1; z += 2) { a = 3; }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("0", AlwaysEdge))
         succOf("0") shouldBe expected(("x = 0", AlwaysEdge))
         succOf("x = 0") shouldBe expected(("y", AlwaysEdge))
@@ -222,7 +221,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with break" in
       new CfgFixture("for (x = 0; y < 1; z += 2) { break; a = 3; }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("0", AlwaysEdge))
         succOf("x = 0") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("1", AlwaysEdge))
@@ -239,7 +238,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with continue" in
       new CfgFixture("for (x = 0; y < 1; z += 2) { continue; a = 3; }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("0", AlwaysEdge))
         succOf("0") shouldBe expected(("x = 0", AlwaysEdge))
         succOf("x = 0") shouldBe expected(("y", AlwaysEdge))
@@ -257,7 +256,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with nested for-loop" in
       new CfgFixture("for (x; y; z) { for (a; b; c) { u; } }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("a", TrueEdge), ("RET", FalseEdge))
         succOf("z") shouldBe expected(("y", AlwaysEdge))
@@ -269,7 +268,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with empty condition" in
       new CfgFixture("for (;;) { a = 1; }") {
-        succOf("func ()") shouldBe expected(("a", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("a", AlwaysEdge))
         succOf("a") shouldBe expected(("1", AlwaysEdge))
         succOf("1") shouldBe expected(("a = 1", AlwaysEdge))
         succOf("a = 1") shouldBe expected(("a", AlwaysEdge))
@@ -277,36 +276,36 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with empty condition with break" in
       new CfgFixture("for (;;) { break; }") {
-        succOf("func ()") shouldBe expected(("break;", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("break;", AlwaysEdge))
         succOf("break;") shouldBe expected(("RET", AlwaysEdge))
       }
 
     "be correct with empty condition with continue" in
       new CfgFixture("for (;;) { continue ; }") {
-        succOf("func ()") shouldBe expected(("continue ;", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("continue ;", AlwaysEdge))
         succOf("continue ;") shouldBe expected(("continue ;", AlwaysEdge))
       }
 
     "be correct with empty condition with nested empty for-loop" in
       new CfgFixture("for (;;) { for (;;) { x; } }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("x", AlwaysEdge))
       }
 
     "be correct with empty condition with empty block" in
       new CfgFixture("for (;;) ;") {
-        succOf("func ()") shouldBe expected(("RET", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("RET", AlwaysEdge))
       }
 
     "be correct when empty for-loop is skipped" in
       new CfgFixture("for (;;) {}; return;") {
-        succOf("func ()") shouldBe expected(("return;", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("return;", AlwaysEdge))
         succOf("return;") shouldBe expected(("RET", AlwaysEdge))
       }
 
     "be correct with function call condition with empty block" in
       new CfgFixture("for (; x(1);) ;") {
-        succOf("func ()") shouldBe expected(("1", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("1", AlwaysEdge))
         succOf("1") shouldBe expected(("x(1)", AlwaysEdge))
         succOf("x(1)") shouldBe expected(("1", TrueEdge), ("RET", FalseEdge))
       }
@@ -315,7 +314,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
   "Cfg for goto" should {
     "be correct for single label" in
       new CfgFixture("x; goto l1; y; l1:") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("goto l1;", AlwaysEdge))
         succOf("goto l1;") shouldBe expected(("l1:", AlwaysEdge))
         succOf("l1:") shouldBe expected(("RET", AlwaysEdge))
@@ -324,7 +323,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct for multiple labels" in
       new CfgFixture("x;goto l1; l2: y; l1:") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("goto l1;", AlwaysEdge))
         succOf("goto l1;") shouldBe expected(("l1:", AlwaysEdge))
         succOf("y") shouldBe expected(("l1:", AlwaysEdge))
@@ -333,7 +332,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct for multiple labels on same spot" in
       new CfgFixture("x;goto l2;y;l1:l2:") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("goto l2;", AlwaysEdge))
         succOf("goto l2;") shouldBe expected(("l2:", AlwaysEdge))
         succOf("y") shouldBe expected(("l1:", AlwaysEdge))
@@ -343,7 +342,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "work correctly with if block" in
       new CfgFixture("if(foo) goto end; if(bar) { f(x); } end:") {
-        succOf("func ()") shouldBe expected(("foo", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("foo", AlwaysEdge))
         succOf("goto end;") shouldBe expected(("end:", AlwaysEdge))
       }
 
@@ -352,7 +351,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
   "Cfg for switch" should {
     "be correct with one case" in
       new CfgFixture("switch (x) { case 1: y; }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("case 1:", CaseEdge), ("RET", CaseEdge))
         succOf("case 1:") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("RET", AlwaysEdge))
@@ -360,7 +359,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with multiple cases" in
       new CfgFixture("switch (x) { case 1: y; case 2: z;}") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("case 1:", CaseEdge), ("case 2:", CaseEdge), ("RET", CaseEdge))
         succOf("case 1:") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("case 2:", AlwaysEdge))
@@ -370,7 +369,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with multiple cases on same spot" in
       new CfgFixture("switch (x) { case 1: case 2: y; }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("case 1:", CaseEdge), ("case 2:", CaseEdge), ("RET", CaseEdge))
         succOf("case 1:") shouldBe expected(("case 2:", AlwaysEdge))
         succOf("y") shouldBe expected(("RET", AlwaysEdge))
@@ -378,7 +377,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with multiple cases and multiple cases on same spot" in
       new CfgFixture("switch (x) { case 1: case 2: y; case 3: z;}") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("case 1:", CaseEdge),
                                       ("case 2:", CaseEdge),
                                       ("case 3:", CaseEdge),
@@ -392,7 +391,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with default case" in
       new CfgFixture("switch (x) { default: y; }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("default:", CaseEdge))
         succOf("default:") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("RET", AlwaysEdge))
@@ -400,7 +399,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct for case and default combined" in
       new CfgFixture("switch (x) { case 1: y; break; default: z;}") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("case 1:", CaseEdge), ("default:", CaseEdge))
         succOf("case 1:") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("break;", AlwaysEdge))
@@ -411,7 +410,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct for nested switch" in
       new CfgFixture("switch (x) { case 1: switch(y) { default: z; } }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("case 1:", CaseEdge), ("default:", CaseEdge))
         succOf("case 1:") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("default:", CaseEdge))
@@ -423,14 +422,14 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
   "Cfg for if" should {
     "be correct" in
       new CfgFixture("if (x) { y; }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("y", TrueEdge), ("RET", FalseEdge))
         succOf("y") shouldBe expected(("RET", AlwaysEdge))
       }
 
     "be correct with else block" in
       new CfgFixture("if (x) { y; } else { z; }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("y", TrueEdge), ("z", FalseEdge))
         succOf("y") shouldBe expected(("RET", AlwaysEdge))
         succOf("z") shouldBe expected(("RET", AlwaysEdge))
@@ -438,7 +437,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with nested if" in
       new CfgFixture("if (x) { if (y) { z; } }") {
-        succOf("func ()") shouldBe expected(("x", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("y", TrueEdge), ("RET", FalseEdge))
         succOf("y") shouldBe expected(("z", TrueEdge), ("RET", FalseEdge))
         succOf("z") shouldBe expected(("RET", AlwaysEdge))
@@ -446,7 +445,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct with else if chain" in
       new CfgFixture("if (a) { b; } else if (c) { d;} else { e; }") {
-        succOf("func ()") shouldBe expected(("a", AlwaysEdge))
+        succOf("RET func ()") shouldBe expected(("a", AlwaysEdge))
         succOf("a") shouldBe expected(("b", TrueEdge), ("c", FalseEdge))
         succOf("b") shouldBe expected(("RET", AlwaysEdge))
         succOf("c") shouldBe expected(("d", TrueEdge), ("e", FalseEdge))

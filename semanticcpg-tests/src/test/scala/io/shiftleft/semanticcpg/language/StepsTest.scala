@@ -310,9 +310,9 @@ class StepsTest extends AnyWordSpec with Matchers {
     method.dotCfg.head.startsWith("digraph add {")
     method.head.dotCfg.head.startsWith("digraph add {")
 
-    // evalType
-    local.evalType.head shouldBe "java.lang.Integer"
-    local.head.evalType.head shouldBe "java.lang.Integer"
+    // typeFullName
+    local.typeFullName.head shouldBe "java.lang.Integer"
+    local.head.typeFullName shouldBe "java.lang.Integer"
 
     // modifierAccessors
     method.modifier.modifierType.toSet shouldBe Set("STATIC", "VIRTUAL")
