@@ -25,14 +25,11 @@ class FileTests extends FuzzyCCodeToCpgSuite {
   }
 
   "should contain exactly one non-placeholder file with absolute path in `name`" in {
-    cpg.file.nameNot(File.UNKNOWN).l match {
-      case List(x) =>
-        x.name should startWith("/")
-        // C-frontend currently does not set hash but should do so
-        // in the future
-        x.hash shouldBe None
-      case _ => fail()
-    }
+    val List(x) = cpg.file.nameNot(File.UNKNOWN).l
+    x.name should startWith("/")
+    // C-frontend currently does not set hash but should do so
+    // in the future
+    x.hash shouldBe None
   }
 
   "should allow traversing from file to its namespace blocks" in {

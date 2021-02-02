@@ -11,22 +11,19 @@ class MethodTests extends FuzzyCCodeToCpgSuite {
       | }""".stripMargin
 
   "should contain exactly one method node with correct fields" in {
-    cpg.method.l match {
-      case List(x) =>
-        x.name shouldBe "main"
-        x.fullName shouldBe "main"
-        x.code shouldBe "int main (int argc,char **argv)"
-        x.signature shouldBe "int main (int,char * *)"
-        x.isExternal shouldBe false
-        x.order shouldBe 1
-        x.filename.startsWith("/") shouldBe true
-        x.filename.endsWith(".c") shouldBe true
-        x.lineNumber shouldBe Some(2)
-        x.lineNumberEnd shouldBe Some(3)
-        x.columnNumber shouldBe Some(2)
-        x.columnNumberEnd shouldBe Some(1)
-      case _ => fail()
-    }
+    val List(x) = cpg.method.l
+    x.name shouldBe "main"
+    x.fullName shouldBe "main"
+    x.code shouldBe "int main (int argc,char **argv)"
+    x.signature shouldBe "int main (int,char * *)"
+    x.isExternal shouldBe false
+    x.order shouldBe 1
+    x.filename.startsWith("/") shouldBe true
+    x.filename.endsWith(".c") shouldBe true
+    x.lineNumber shouldBe Some(2)
+    x.lineNumberEnd shouldBe Some(3)
+    x.columnNumber shouldBe Some(2)
+    x.columnNumberEnd shouldBe Some(1)
   }
 
   "should return correct number of lines" in {

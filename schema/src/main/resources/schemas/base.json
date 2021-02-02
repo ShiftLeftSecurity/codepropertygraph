@@ -124,6 +124,7 @@
          "comment" : "A formal method return",
          "is": ["CFG_NODE", "TRACKING_POINT"]
         },
+
         {"id" : 300, "name" : "MODIFIER",
          "keys" : ["MODIFIER_TYPE", "ORDER"],
          "comment" : "A modifier, e.g., static, public, private",
