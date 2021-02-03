@@ -61,7 +61,8 @@ import scala.jdk.CollectionConverters._
 
 private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
                                       namespaceBlock: nodes.NewNamespaceBlock,
-                                      global: Global)
+                                      global: Global,
+                                      childNum: Int)
     extends ASTNodeVisitor {
 
   implicit def int2IntegerOpt(x: Option[Int]): Option[Integer] = x.map(java.lang.Integer.valueOf)
@@ -72,7 +73,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
   private var contextStack = List[Context]()
   private val scope = new Scope[String, (nodes.CpgNode, String), nodes.CpgNode]()
 
-  pushContext(namespaceBlock, 1)
+  pushContext(namespaceBlock, childNum)
 
   private class Context(val cpgParent: nodes.CpgNode,
                         var childNum: Int,
@@ -636,7 +637,8 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
         fullName = identifierDecl.getName.getEscapedCodeStr,
         isExternal = false,
         aliasTypeFullName = Some(registerType(declTypeName)),
-        filename = namespaceBlock.filename
+        filename = namespaceBlock.filename,
+        order = context.childNum
       )
       diffGraph.addNode(aliasTypeDecl)
       connectAstChild(aliasTypeDecl)
@@ -794,7 +796,8 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       fullName = name,
       isExternal = false,
       inheritsFromTypeFullName = baseClassList,
-      filename = namespaceBlock.filename
+      filename = namespaceBlock.filename,
+      order = context.childNum
     )
 
     diffGraph.addNode(typeDecl)

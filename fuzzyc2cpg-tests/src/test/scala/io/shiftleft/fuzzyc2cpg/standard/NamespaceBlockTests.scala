@@ -24,7 +24,7 @@ class NamespaceBlockTests extends FuzzyCCodeToCpgSuite {
     val List(x) = cpg.namespaceBlock.filename(File.UNKNOWN).l
     x.name shouldBe Namespace.globalNamespaceName
     x.fullName shouldBe Namespace.globalNamespaceName
-    x.order shouldBe 0
+    x.order shouldBe 1
   }
 
   "should contain correct namespace block for known file" in {
@@ -32,7 +32,7 @@ class NamespaceBlockTests extends FuzzyCCodeToCpgSuite {
     x.name shouldBe Namespace.globalNamespaceName
     x.filename should not be ""
     x.fullName shouldBe s"${x.filename}:${Namespace.globalNamespaceName}"
-    x.order shouldBe 0
+    x.order shouldBe 1
   }
 
   "should allow traversing from namespace block to method" in {

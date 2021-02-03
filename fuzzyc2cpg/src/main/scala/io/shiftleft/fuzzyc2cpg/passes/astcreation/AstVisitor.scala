@@ -15,17 +15,21 @@ class AstVisitor(driver: AntlrCModuleParserDriver, astParentNode: nodes.NewNames
     with AntlrParserDriverObserver {
 
   var filenameOption: Option[String] = _
+  var childNum: Int = 0
 
   override def visit(functionDef: FunctionDef): Unit = {
-    new AstCreator(driver.cpg, astParentNode, global).convert(functionDef)
+    childNum += 1
+    new AstCreator(driver.cpg, astParentNode, global, childNum).convert(functionDef)
   }
 
   override def visit(classDefStatement: ClassDefStatement): Unit = {
-    new AstCreator(driver.cpg, astParentNode, global).convert(classDefStatement)
+    childNum += 1
+    new AstCreator(driver.cpg, astParentNode, global, childNum).convert(classDefStatement)
   }
 
   override def visit(identifierDeclStmt: IdentifierDeclStatement): Unit = {
-    new AstCreator(driver.cpg, astParentNode, global).convert(identifierDeclStmt)
+    childNum += 1
+    new AstCreator(driver.cpg, astParentNode, global, childNum).convert(identifierDeclStmt)
   }
 
   override def begin(): Unit = {}
