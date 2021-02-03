@@ -123,6 +123,12 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CdgPass(cpg),
           new NamespaceCreator(cpg),
         )
+      case "Plume" =>
+        Iterator(
+          new FileCreationPass(cpg),
+          new Linker(cpg),
+          new NamespaceCreator(cpg),
+        )
       case _ => Iterator()
     }
   }
