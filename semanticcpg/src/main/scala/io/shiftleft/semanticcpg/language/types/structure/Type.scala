@@ -90,10 +90,26 @@ class Type(val traversal: Traversal[nodes.Type]) extends AnyVal {
   def aliasTypeTransitive: Traversal[nodes.Type] =
     traversal.repeat(_.aliasType)(_.emitAllButFirst)
 
-  def localsOfType: Traversal[nodes.Local] =
+  def localOfType: Traversal[nodes.Local] =
     traversal.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.LOCAL).cast[nodes.Local]
 
-  @deprecated("Use expression step instead.")
+  def memberOfType: Traversal[nodes.Member] =
+    traversal.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.MEMBER).cast[nodes.Member]
+
+  @deprecated("Please use `parameterOfType`")
+  def parameter: Traversal[nodes.MethodParameterIn] = parameterOfType
+
+  def parameterOfType: Traversal[nodes.MethodParameterIn] =
+    traversal
+      .in(EdgeTypes.EVAL_TYPE)
+      .collectAll[nodes.MethodParameterIn]
+
+  def methodReturnOfType: Traversal[nodes.MethodReturn] =
+    traversal
+      .in(EdgeTypes.EVAL_TYPE)
+      .hasLabel(NodeTypes.METHOD_RETURN)
+      .cast[nodes.MethodReturn]
+
   def expressionOfType: Traversal[nodes.Expression] = expression
 
   def expression: Traversal[nodes.Expression] =
@@ -101,8 +117,4 @@ class Type(val traversal: Traversal[nodes.Type]) extends AnyVal {
       .in(EdgeTypes.EVAL_TYPE)
       .collectAll[nodes.Expression]
 
-  def parameter: Traversal[nodes.MethodParameterIn] =
-    traversal
-      .in(EdgeTypes.EVAL_TYPE)
-      .collectAll[nodes.MethodParameterIn]
 }
