@@ -96,6 +96,9 @@ class Type(val traversal: Traversal[nodes.Type]) extends AnyVal {
   def memberOfType: Traversal[nodes.Member] =
     traversal.in(EdgeTypes.EVAL_TYPE).hasLabel(NodeTypes.MEMBER).cast[nodes.Member]
 
+  @deprecated("Please use `parameterOfType`")
+  def parameter: Traversal[nodes.MethodParameterIn] = parameterOfType
+
   def parameterOfType: Traversal[nodes.MethodParameterIn] =
     traversal
       .in(EdgeTypes.EVAL_TYPE)
