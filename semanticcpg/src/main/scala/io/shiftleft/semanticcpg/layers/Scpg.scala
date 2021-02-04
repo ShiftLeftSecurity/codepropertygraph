@@ -125,6 +125,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
         )
       case "Plume" =>
         Iterator(
+          new TypeDeclStubCreator(cpg),
           new FileCreationPass(cpg),
           new Linker(cpg),
           new NamespaceCreator(cpg),
