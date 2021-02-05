@@ -20,4 +20,9 @@ class MemberTests extends FuzzyCCodeToCpgSuite {
     x.order shouldBe 1
   }
 
+  "should allow traversing from MEMBER to TYPE_DECL" in {
+    val List(x) = cpg.member.typeDecl.l
+    x.name shouldBe "foo"
+  }
+
 }
