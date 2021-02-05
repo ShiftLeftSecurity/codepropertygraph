@@ -647,7 +647,8 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
         nodes.NewMember(
           code = identifierDecl.getEscapedCodeStr,
           name = identifierDecl.getName.getEscapedCodeStr,
-          typeFullName = registerType(declTypeName)
+          typeFullName = registerType(declTypeName),
+          order = context.childNum
         )
       diffGraph.addNode(member)
       connectAstChild(member)
@@ -889,8 +890,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
     nodes.NewCall(
       name = methodName,
       dispatchType = DispatchTypes.STATIC_DISPATCH.name(),
-      signature = "TODO assignment signature",
-      typeFullName = registerType(Defines.anyTypeName),
+      signature = "TODO",
       methodFullName = methodName,
       code = astNode.getEscapedCodeStr,
       order = context.childNum,

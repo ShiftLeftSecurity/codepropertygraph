@@ -44,4 +44,8 @@ class FileTests extends FuzzyCCodeToCpgSuite {
     cpg.file.nameNot(File.UNKNOWN).typeDecl.name.toSet shouldBe Set("my_struct")
   }
 
+  "should allow traversing to namespaces" in {
+    cpg.file.namespace.name("<global>").l.size shouldBe 2
+  }
+
 }
