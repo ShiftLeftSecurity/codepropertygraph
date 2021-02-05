@@ -27,7 +27,7 @@ class Steps[A](val traversal: Traversal[A]) extends AnyVal {
   /**
     Shorthand for `toBuffer`
     */
-  def b(): mutable.Buffer[A] = toBuffer()
+  def b: mutable.Buffer[A] = toBuffer()
 
   /**
     Alias for `toList`
@@ -43,13 +43,13 @@ class Steps[A](val traversal: Traversal[A]) extends AnyVal {
   /**
     Alias for `toStream`
     */
-  def s(): LazyList[A] = toStream()
+  def s: LazyList[A] = toStream()
 
   /**
     Execute the traversal and convert it into a Java list (as opposed
     to the Scala list obtained via `toList`)
     */
-  def jl(): JList[A] = b().asJava
+  def jl: JList[A] = b.asJava
 
   /**
     * Print help/documentation based on the current elementType `A`.
