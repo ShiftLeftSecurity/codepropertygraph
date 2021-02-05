@@ -647,7 +647,8 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
         nodes.NewMember(
           code = identifierDecl.getEscapedCodeStr,
           name = identifierDecl.getName.getEscapedCodeStr,
-          typeFullName = registerType(declTypeName)
+          typeFullName = registerType(declTypeName),
+          order = context.childNum
         )
       diffGraph.addNode(member)
       connectAstChild(member)
