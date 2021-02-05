@@ -60,4 +60,9 @@ class CallTests extends FuzzyCCodeToCpgSuite {
     x.name shouldBe "add"
   }
 
+  "should allow traversing from argument to parameter" in {
+    val List(x) = cpg.call("add").argument(1).parameter.l
+    x.name shouldBe "x"
+  }
+
 }
