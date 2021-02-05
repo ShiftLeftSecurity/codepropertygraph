@@ -129,6 +129,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new FileCreationPass(cpg),
           new Linker(cpg),
           new NamespaceCreator(cpg),
+          new ContainsEdgePass(cpg),
         )
       case _ => Iterator()
     }
