@@ -3,7 +3,7 @@ package io.shiftleft.fuzzyc2cpg.passes.astcreation
 import io.shiftleft.fuzzyc2cpg.ast.AstNode
 import io.shiftleft.fuzzyc2cpg.ast.walking.ASTNodeVisitor
 import org.slf4j.LoggerFactory
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Operators, nodes}
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
 import io.shiftleft.fuzzyc2cpg.{Defines, Global}
 import io.shiftleft.fuzzyc2cpg.ast.declarations.{ClassDefStatement, IdentifierDecl}
@@ -914,8 +914,21 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
 
   private def newControlStructureNode(astNode: AstNode): nodes.NewControlStructure = {
     val location = astNode.getLocation
+    val controlStructureType = astNode.getClass.getSimpleName match {
+      case "BreakStatement"    => ControlStructureTypes.BREAK
+      case "ContinueStatement" => ControlStructureTypes.CONTINUE
+      case "WhileStatement"    => ControlStructureTypes.WHILE
+      case "DoStatement"       => ControlStructureTypes.DO
+      case "ForStatement"      => ControlStructureTypes.FOR
+      case "GotoStatement"     => ControlStructureTypes.GOTO
+      case "IfStatement"       => ControlStructureTypes.IF
+      case "ElseStatement"     => ControlStructureTypes.ELSE
+      case "SwitchStatement"   => ControlStructureTypes.SWITCH
+      case someThingElse       => someThingElse
+    }
     nodes.NewControlStructure(
       parserTypeName = astNode.getClass.getSimpleName,
+      controlStructureType = controlStructureType,
       code = astNode.getEscapedCodeStr,
       order = context.childNum,
       argumentIndex = context.childNum,

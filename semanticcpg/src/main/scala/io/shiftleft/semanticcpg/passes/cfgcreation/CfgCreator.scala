@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.passes.cfgcreation
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Operators, nodes}
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes.CfgNode
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language._
@@ -150,26 +150,26 @@ class CfgCreator(entryNode: nodes.Method) {
     * separate function to increase readability.
     * */
   protected def cfgForControlStructure(node: nodes.ControlStructure): Cfg =
-    node.parserTypeName match {
-      case "BreakStatement" =>
+    node.controlStructureType match {
+      case ControlStructureTypes.BREAK =>
         cfgForBreakStatement(node)
-      case "ContinueStatement" =>
+      case ControlStructureTypes.CONTINUE =>
         cfgForContinueStatement(node)
-      case "WhileStatement" =>
+      case ControlStructureTypes.WHILE =>
         cfgForWhileStatement(node)
-      case "DoStatement" =>
+      case ControlStructureTypes.DO =>
         cfgForDoStatement(node)
-      case "ForStatement" =>
+      case ControlStructureTypes.FOR =>
         cfgForForStatement(node)
-      case "GotoStatement" =>
+      case ControlStructureTypes.GOTO =>
         cfgForGotoStatement(node)
-      case "IfStatement" =>
+      case ControlStructureTypes.IF =>
         cfgForIfStatement(node)
-      case "ElseStatement" =>
+      case ControlStructureTypes.ELSE =>
         cfgForChildren(node)
-      case "SwitchStatement" =>
+      case ControlStructureTypes.SWITCH =>
         cfgForSwitchStatement(node)
-      case "TryStatement" =>
+      case ControlStructureTypes.TRY =>
         cfgForTryStatement(node)
       case _ =>
         Cfg.empty

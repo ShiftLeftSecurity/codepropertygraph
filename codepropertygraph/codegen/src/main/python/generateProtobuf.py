@@ -13,6 +13,7 @@ def generateProtobuf(cpgDescr):
     protoStr = protoStr.replace('$evaluationStrategies', entryListToProtobufEnumVal(cpgDescr['evaluationStrategies']))
     protoStr = protoStr.replace('$dispatchTypes', entryListToProtobufEnumVal(cpgDescr['dispatchTypes']))
     protoStr = protoStr.replace('$languages', entryListToProtobufEnumVal(cpgDescr['languages']))
+    protoStr = protoStr.replace('$controlStructureTypes', entryListToProtobufEnumVal(cpgDescr['controlStructureTypes']))
     protoStr = protoStr.replace('$frameworks', entryListToProtobufEnumVal(cpgDescr['frameworks']))
 
     try:
