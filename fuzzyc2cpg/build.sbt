@@ -7,7 +7,7 @@ libraryDependencies ++= Seq(
   "org.antlr"            %  "antlr4-runtime"           % Versions.antlr,
   "org.apache.commons"   %  "commons-lang3"            % "3.5",
   "commons-cli"          %  "commons-cli"              % "1.4",
-  "com.github.pathikrit" %% "better-files"             % "3.8.0",
+  "com.github.pathikrit" %% "better-files"             % "3.9.1",
   "org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0",
   "com.novocode"         %  "junit-interface"          % "0.11"  % Test,
   "junit"                %  "junit"                    % "4.12"  % Test,
