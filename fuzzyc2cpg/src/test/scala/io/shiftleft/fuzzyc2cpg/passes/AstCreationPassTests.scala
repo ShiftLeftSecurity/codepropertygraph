@@ -6,7 +6,7 @@ import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import io.shiftleft.codepropertygraph.generated.{Operators, nodes}
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, Operators, nodes}
 import overflowdb.traversal._
 
 class AstCreationPassTests extends AnyWordSpec with Matchers {
@@ -168,6 +168,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         case List(controlStruct: nodes.ControlStructure) =>
           controlStruct.code shouldBe "while (x < 1)"
           controlStruct.parserTypeName shouldBe "WhileStatement"
+          controlStruct.controlStructureType shouldBe ControlStructureTypes.WHILE
           controlStruct.condition.l match {
             case List(cndNode) =>
               cndNode.code shouldBe "x < 1"
@@ -190,6 +191,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         case List(controlStruct: nodes.ControlStructure) =>
           controlStruct.code shouldBe "if (x > 0)"
           controlStruct.parserTypeName shouldBe "IfStatement"
+          controlStruct.controlStructureType shouldBe ControlStructureTypes.IF
           // TODO improve query language: controlStruct.condition
           controlStruct.condition.l match {
             case List(cndNode) =>
@@ -215,8 +217,10 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.method.name("method").controlStructure.l match {
         case List(ifStmt, elseStmt) =>
           ifStmt.parserTypeName shouldBe "IfStatement"
+          ifStmt.controlStructureType shouldBe ControlStructureTypes.IF
           ifStmt.code shouldBe "if (x > 0)"
           elseStmt.parserTypeName shouldBe "ElseStatement"
+          elseStmt.controlStructureType shouldBe ControlStructureTypes.ELSE
           elseStmt.code shouldBe "else"
 
           ifStmt.condition.l match {
@@ -272,6 +276,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       """.stripMargin) { cpg =>
       cpg.method.name("method").controlStructure.l match {
         case List(forStmt) =>
+          forStmt.parserTypeName shouldBe "ForStatement"
+          forStmt.controlStructureType shouldBe ControlStructureTypes.FOR
           childContainsAssignments(forStmt, 1, List("x = 0", "y = 0"))
 
           forStmt.astChildren.order(2).l match {
