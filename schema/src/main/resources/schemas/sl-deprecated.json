@@ -1,0 +1,13 @@
+{
+  "nodeTypes" : [
+    { "name" : "CALL",
+      "keys": [ "METHOD_INST_FULL_NAME", "TYPE_FULL_NAME"]
+    },
+
+    {"id" : 36, "name" : "PACKAGE_PREFIX",
+      "keys": ["VALUE"],
+      "comment" : "This node records what package prefix is most common to all analysed classes in the CPG",
+      "outEdges": []
+    }
+  ]
+}

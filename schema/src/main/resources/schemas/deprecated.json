@@ -1,7 +1,0 @@
-{
-  "nodeTypes" : [
-    { "name" : "CALL",
-      "keys": [ "METHOD_INST_FULL_NAME", "TYPE_FULL_NAME"]
-    }
-  ]
-}

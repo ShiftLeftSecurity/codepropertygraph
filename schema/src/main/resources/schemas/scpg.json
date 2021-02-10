@@ -10,7 +10,19 @@
       {"id": 25, "name": "DISPATCH_TYPE", "comment": "The dispatch type of a call, which is either static or dynamic. See dispatchTypes", "valueType" : "string", "cardinality" : "one"},
       {"id": 1591, "name" : "DYNAMIC_TYPE_HINT_FULL_NAME", "comment" : "Type hint for the dynamic type", "valueType" : "string", "cardinality" : "list"},
       {"id": 56, "name" : "AST_PARENT_TYPE", "comment" : "The type of the AST parent. Since this is only used in some parts of the graph the list does not include all possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK", "valueType" : "string", "cardinality" : "one"},
-      {"id": 57, "name" : "AST_PARENT_FULL_NAME", "comment" : "The FULL_NAME of a the AST parent of an entity", "valueType" : "string", "cardinality" : "one"}
+      {"id": 57, "name" : "AST_PARENT_FULL_NAME", "comment" : "The FULL_NAME of a the AST parent of an entity", "valueType" : "string", "cardinality" : "one"},
+
+      {"id" : 131, "name" : "KEY", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+
+      {"id" : 100, "name" : "SYMBOL", "comment" : "", "valueType" : "string" , "cardinality" : "one"},
+      {"id" : 102, "name" : "METHOD_SHORT_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+      {"id" : 103, "name" : "PACKAGE_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+      {"id" : 104, "name" : "CLASS_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+      {"id" : 132, "name" : "CLASS_SHORT_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+      {"id" : 105, "name" : "NODE_LABEL", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+
+      {"id" : 115, "name" : "SOURCE_TYPE", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+      {"id" : 116, "name" : "SINK_TYPE", "comment" : "", "valueType" : "string", "cardinality" : "one"}
     ],
     
     "edgeKeys" : [
@@ -19,7 +31,55 @@
     ],
 
     "nodeTypes" : [
-    
+
+      	{"id" : 25,
+         "name" : "LOCATION",
+         "keys" : ["SYMBOL", "METHOD_FULL_NAME", "METHOD_SHORT_NAME", "PACKAGE_NAME", "LINE_NUMBER", "CLASS_NAME", "CLASS_SHORT_NAME", "NODE_LABEL", "FILENAME"],
+         "comment" : "",
+         "outEdges" : [],
+         "containedNodes" : [
+            {"localName" : "node", "nodeType" : "CPG_NODE", "cardinality" : "zeroOrOne"}
+         ]
+        },
+
+      {"id" : 208, "name" : "TAG_NODE_PAIR", "comment" : "", "keys" : [], "outEdges" : [],
+     "containedNodes" :
+      [
+        {"localName" : "tag", "nodeType" : "TAG", "cardinality" : "one"},
+        {"localName" : "node", "nodeType" : "CPG_NODE", "cardinality" : "one"}
+      ]
+      },
+
+      {"id" : 214, "name" : "FINDING", "comment" : "", "keys" : [], "outEdges" : [], "containedNodes" : [
+        {"localName" : "evidence", "nodeType" : "CPG_NODE", "cardinality" : "list"},
+        {"localName" : "keyValuePairs", "nodeType" : "KEY_VALUE_PAIR", "cardinality" : "list"}
+      ]
+      },
+
+      {"id" : 217, "name" : "KEY_VALUE_PAIR", "comment" : "", "keys": ["KEY", "VALUE"], "outEdges" : [] },
+
+      	{"id" : 202, "name" : "SOURCE", "comment" : "", "keys" : ["SOURCE_TYPE"], "outEdges" : [], "containedNodes" : [
+            {"localName" : "node", "nodeType" : "TRACKING_POINT", "cardinality" : "one"},
+            {"localName" : "method", "nodeType" : "METHOD", "cardinality" : "one" },
+            {"localName" : "methodTags", "nodeType" : "TAG", "cardinality" : "list"},
+            {"localName" : "callingMethod", "nodeType" : "METHOD", "cardinality" : "zeroOrOne"},
+            {"localName" : "callsite", "nodeType" : "CALL", "cardinality" : "zeroOrOne"},
+            {"localName" : "tags", "nodeType" : "TAG", "cardinality" : "list"},
+            {"localName" : "nodeType", "nodeType" : "TYPE", "cardinality" : "one"}
+        ]},
+
+	{"id" : 203, "name" : "SINK", "comment" : "", "keys" : ["SINK_TYPE"], "outEdges" : [], "containedNodes" : [
+            {"localName" : "node", "nodeType" : "TRACKING_POINT", "cardinality" : "one"},
+	    {"localName" : "nodeType", "nodeType" : "TYPE", "cardinality" : "one"},
+            {"localName" : "method", "nodeType" : "METHOD", "cardinality" : "one" },
+            {"localName" : "methodTags", "nodeType" : "TAG", "cardinality" : "list"},
+            {"localName" : "callingMethod", "nodeType" : "METHOD", "cardinality" : "zeroOrOne"},
+            {"localName" : "callsite", "nodeType" : "CALL", "cardinality" : "zeroOrOne"},
+            {"localName" : "parameterIn", "nodeType" : "METHOD_PARAMETER_IN", "cardinality" : "zeroOrOne"},
+	    {"localName" : "parameterInTags", "nodeType" : "TAG", "cardinality" : "list", "comment" : "This field also holds tags for output parameters and return parameters"}
+        ]
+  },
+
       {"id" : 146, "name" : "BINDING",
        	 "keys" : ["NAME", "SIGNATURE"],
          "comment" : "A binding of a METHOD into a TYPE_DECL",
