@@ -15,6 +15,8 @@ jobs:
         fetch-depth: 0
     - name: Clone submodules
       run: git submodule update --init --recursive
+    - name: apt-get update
+      run: sudo apt-get update
     - name: Set up JDK 1.8
       run: sudo apt-get install openjdk-8-jdk
     - name: Install specific sbt version
