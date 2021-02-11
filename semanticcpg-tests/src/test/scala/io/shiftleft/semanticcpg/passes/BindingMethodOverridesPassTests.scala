@@ -13,12 +13,18 @@ class BindingMethodOverridesPassTests extends AnyWordSpec with Matchers {
     val typA = nodes.NewType().name("tA").fullName("typA").typeDeclFullName("typeDeclA")
     val typB = nodes.NewType().name("tB").fullName("typB").typeDeclFullName("typeDeclB")
     val typeDeclA =
-      nodes.NewTypeDecl().name("tdA").fullName("typeDeclA").isExternal(false)
+      nodes
+        .NewTypeDecl()
+        .name("tdA")
+        .fullName("typeDeclA")
+        .isExternal(false)
         .inheritsFromTypeFullName(List())
-    val typeDeclB = nodes.NewTypeDecl().name("tdB")
-                                      .fullName("typeDeclB")
-                                      .isExternal(false)
-                                      .inheritsFromTypeFullName(List("typA"))
+    val typeDeclB = nodes
+      .NewTypeDecl()
+      .name("tdB")
+      .fullName("typeDeclB")
+      .isExternal(false)
+      .inheritsFromTypeFullName(List("typA"))
 
     val bindingA = nodes.NewBinding().name("name").signature("signature")
     val bindingB = nodes.NewBinding().name("name").signature("signature")
@@ -53,12 +59,18 @@ class BindingMethodOverridesPassTests extends AnyWordSpec with Matchers {
     val typA = nodes.NewType().name("tA").fullName("typA").typeDeclFullName("typeDeclA")
     val typB = nodes.NewType().name("tB").fullName("typB").typeDeclFullName("typeDeclB")
     val typeDeclA =
-      nodes.NewTypeDecl().name("tdA").fullName("typeDeclA").isExternal(false)
+      nodes
+        .NewTypeDecl()
+        .name("tdA")
+        .fullName("typeDeclA")
+        .isExternal(false)
         .inheritsFromTypeFullName(List())
-    val typeDeclB = nodes.NewTypeDecl().name("tdB")
-                                      .fullName("typeDeclB")
-                                      .isExternal(false)
-                                      .inheritsFromTypeFullName(List("typA"))
+    val typeDeclB = nodes
+      .NewTypeDecl()
+      .name("tdB")
+      .fullName("typeDeclB")
+      .isExternal(false)
+      .inheritsFromTypeFullName(List("typA"))
 
     val bindingA = nodes.NewBinding().name("name").signature("signature")
     val bindingB = nodes.NewBinding().name("name").signature("signature")
