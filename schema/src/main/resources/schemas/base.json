@@ -34,6 +34,7 @@
         {"id": 21, "name": "CODE", "comment": "The code snippet the node represents", "valueType" : "string", "cardinality" : "one"},
         {"id": 22, "name": "SIGNATURE", "comment": "Method signature. The format is defined by the language front-end, and the backend simply compares strings to resolve function overloading, i.e. match call-sites to METHODs. In theory, consecutive integers would be valid, but in practice this should be human readable", "valueType" : "string", "cardinality" : "one"},
         {"id": 26, "name" : "MODIFIER_TYPE", "comment" : "Indicates the modifier which is represented by a MODIFIER node. See modifierTypes", "valueType" : "string", "cardinality" : "one"},
+        {"id": 27, "name" : "CONTROL_STRUCTURE_TYPE", "comment" : "Indicates the control structure type. See controlStructureTypes", "valueType" : "string", "cardinality" : "one"},
 
         // Properties used to link nodes in the backend
 
@@ -44,7 +45,7 @@
         {"id": 55, "name" : "METHOD_INST_FULL_NAME", "comment" : "Deprecated", "valueType" : "string", "cardinality" : "zeroOrOne"},
         {"id": 158, "name" : "ALIAS_TYPE_FULL_NAME", "comment" : "Type full name of which a TYPE_DECL is an alias of", "valueType" : "string", "cardinality" : "zeroOrOne"},
         {"id" : 106, "name" : "FILENAME", "comment" : "Full path of canonical file that contained this node; will be linked into corresponding FILE nodes. Possible for METHOD, TYPE_DECL and NAMESPACE_BLOCK", "valueType" : "string", "cardinality" : "one"},
-        
+
         // special properties
         {"id": 2007161, "name": "CONTAINED_REF", "comment": "References to other nodes. This is not a real property; it exists here for the sake of proto serialization only. valueType and cardinality are meaningless.", "valueType": "string", "cardinality": "one"}
     ],
@@ -440,7 +441,7 @@
       },
 
       {"id" : 339, "name" : "CONTROL_STRUCTURE",
-	 "keys" : ["CODE", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER", "PARSER_TYPE_NAME", "ARGUMENT_INDEX"],
+	 "keys" : ["CODE", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER", "PARSER_TYPE_NAME", "CONTROL_STRUCTURE_TYPE", "ARGUMENT_INDEX"],
 	 "comment" : "A control structure such as if, while, or for",
 	 "is" : ["EXPRESSION"],
 	 "outEdges" : [
@@ -616,7 +617,7 @@
         // VTABLE edge is deprecated.
         {"id" : 30, "name": "VTABLE", "comment" : "Indicates that a method is part of the vtable of a certain type declaration", "keys": []},
         {"id" : 55, "name": "RECEIVER", "comment" : "The receiver of a method call which is either an object or a pointer", "keys": []},
-        {"id" : 56, "name": "CONDITION", "comment" : "Edge from control structure node to the expression that holds the condition", "keys" : []},        
+        {"id" : 56, "name": "CONDITION", "comment" : "Edge from control structure node to the expression that holds the condition", "keys" : []},
         {"id" : 156, "name": "ARGUMENT", "comment" : "Relation between a CALL and its arguments and RETURN and the returned expression", "keys": []},
         {"id" : 157, "name" : "SOURCE_FILE", "comment" : "Source file of a node, in which its LINE_NUMBER and COLUMN_NUMBER are valid", "keys" : []}
 
@@ -647,7 +648,21 @@
         {"id" : 8, "name" : "VIRTUAL", "comment" : "The virtual modifier"}
     ],
 
-    // used in extensions
+    "controlStructureTypes" : [
+        {"id" : 1, "name" : "BREAK", "comment" : "Represents a break statement"},
+        {"id" : 2, "name" : "CONTINUE", "comment" : "Represents a continue statement"},
+        {"id" : 3, "name" : "WHILE", "comment" : "Represents a while statement"},
+        {"id" : 4, "name" : "DO", "comment" : "Represents a do statement"},
+        {"id" : 5, "name" : "FOR", "comment" : "Represents a for statement"},
+        {"id" : 6, "name" : "GOTO", "comment" : "Represents a goto statement"},
+        {"id" : 7, "name" : "IF", "comment" : "Represents an if statement"},
+        {"id" : 8, "name" : "ELSE", "comment" : "Represents an else statement"},
+        {"id" : 9, "name" : "SWITCH", "comment" : "Represents a switch statement"},
+        {"id" : 10, "name" : "TRY", "comment" : "Represents a try statement"}
+    ],
+
+
+  // used in extensions
     "frameworks" : [],
     "operatorNames" : []
 

@@ -13,7 +13,7 @@ enum NodePropertyName {
 }
 
 enum EdgePropertyName {
-  UNKNOWN_EDGE_PROPERT = 0;
+  UNKNOWN_EDGE_PROPERTY = 0;
   $edgeKeys
 }
 
@@ -30,6 +30,11 @@ enum DispatchTypes {
 enum LANGUAGES {
   UNKNOWN_LANGUAGE = 0;
   $languages
+}
+
+enum CONTROL_STRUCTURE_TYPES {
+  UNKNOWN_CONTROL_STRUCTURE_TYPE = 0;
+  $controlStructureTypes
 }
 
 enum FRAMEWORKS {
