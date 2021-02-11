@@ -12,8 +12,8 @@ class ResultTableTests extends AnyWordSpec with Matchers {
 
     val cpg = MockCpg()
       .withCustom({ (diffGraph, _) =>
-        diffGraph.addNode(nodes.NewLiteral("foo"))
-        diffGraph.addNode(nodes.NewLiteral("bar"))
+        diffGraph.addNode(nodes.NewLiteral().code("foo"))
+        diffGraph.addNode(nodes.NewLiteral().code("bar"))
       })
       .cpg
 
@@ -38,10 +38,10 @@ class ResultTableTests extends AnyWordSpec with Matchers {
 
     val cpg = MockCpg()
       .withCustom({ (diffGraph, _) =>
-        diffGraph.addNode(nodes.NewLiteral("foo"))
-        diffGraph.addNode(nodes.NewLiteral("bar"))
-        diffGraph.addNode(nodes.NewLiteral("woo"))
-        diffGraph.addNode(nodes.NewLiteral("moo"))
+        diffGraph.addNode(nodes.NewLiteral().code("foo"))
+        diffGraph.addNode(nodes.NewLiteral().code("bar"))
+        diffGraph.addNode(nodes.NewLiteral().code("woo"))
+        diffGraph.addNode(nodes.NewLiteral().code("moo"))
       })
       .cpg
 

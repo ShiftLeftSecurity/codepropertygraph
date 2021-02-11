@@ -25,7 +25,7 @@ class NamespaceCreator(cpg: Cpg) extends CpgPass(cpg) {
       }
       .foreach {
         case (name: String, blocks) =>
-          val namespace = new nodes.NewNamespace(name)
+          val namespace = nodes.NewNamespace().name(name)
           dstGraph.addNode(namespace)
           blocks.foreach(block => dstGraph.addEdgeFromOriginal(block, namespace, EdgeTypes.REF))
       }

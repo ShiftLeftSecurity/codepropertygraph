@@ -26,15 +26,15 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
 
     cpg.parameter.foreach { parameterIn =>
       if (!parameterIn._parameterLinkOut.hasNext) {
-        val parameterOut = nodes.NewMethodParameterOut(
-          parameterIn.code,
-          parameterIn.order,
-          parameterIn.name,
-          parameterIn.evaluationStrategy,
-          parameterIn.typeFullName,
-          parameterIn.lineNumber,
-          parameterIn.columnNumber,
-        )
+        val parameterOut = nodes
+          .NewMethodParameterOut()
+          .code(parameterIn.code)
+          .order(parameterIn.order)
+          .name(parameterIn.name)
+          .evaluationStrategy(parameterIn.evaluationStrategy)
+          .typeFullName(parameterIn.typeFullName)
+          .lineNumber(parameterIn.lineNumber)
+          .columnNumber(parameterIn.columnNumber)
 
         val method = parameterIn._methodViaAstIn
         if (parameterIn.typeFullName == null) {

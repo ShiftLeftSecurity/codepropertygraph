@@ -102,7 +102,10 @@ class NodeSteps[NodeType <: nodes.StoredNode](val traversal: Traversal[NodeType]
   def newTagNodePair(tagName: String, tagValue: String): NewTagNodePair = {
     new NewTagNodePair(
       traversal.map { node =>
-        nodes.NewTagNodePair(nodes.NewTag(tagName, tagValue), node)
+        nodes
+          .NewTagNodePair()
+          .tag(nodes.NewTag().name(tagName).value(tagValue))
+          .node(node)
       }
     )
   }

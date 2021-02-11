@@ -24,7 +24,12 @@ class NodeMethods(val node: nodes.CpgNode) extends AnyVal {
           }
           .distinct
           .collect {
-            case (name, Some(value)) => nodes.NewTag(name, value).asInstanceOf[nodes.TagBase]
+            case (name, Some(value)) =>
+              nodes
+                .NewTag()
+                .name(name)
+                .value(value)
+                .asInstanceOf[nodes.TagBase]
           }
       case _ =>
         Traversal.empty

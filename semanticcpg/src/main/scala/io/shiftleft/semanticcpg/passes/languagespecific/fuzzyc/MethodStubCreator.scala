@@ -58,48 +58,49 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
                                signature: String,
                                parameterCount: Int,
                                dstGraph: DiffGraph.Builder): nodes.MethodBase = {
-    val methodNode = nodes.NewMethod(
-      name = name,
-      fullName = fullName,
-      isExternal = true,
-      signature = signature,
-      astParentType = NodeTypes.NAMESPACE_BLOCK,
-      astParentFullName = "<global>",
-      order = 0
-    )
+    val methodNode = nodes
+      .NewMethod()
+      .name(name)
+      .fullName(fullName)
+      .isExternal(true)
+      .signature(signature)
+      .astParentType(NodeTypes.NAMESPACE_BLOCK)
+      .astParentFullName("<global>")
+      .order(0)
+
     dstGraph.addNode(methodNode)
 
     for (parameterOrder <- 1 to parameterCount) {
       val nameAndCode = s"p$parameterOrder"
 
-      val methodParameterIn = nodes.NewMethodParameterIn(
-        code = nameAndCode,
-        order = parameterOrder,
-        name = nameAndCode,
-        evaluationStrategy = EvaluationStrategies.BY_VALUE,
-        typeFullName = "ANY",
-        dynamicTypeHintFullName = Nil
-      )
+      val methodParameterIn = nodes
+        .NewMethodParameterIn()
+        .code(nameAndCode)
+        .order(parameterOrder)
+        .name(nameAndCode)
+        .evaluationStrategy(EvaluationStrategies.BY_VALUE)
+        .typeFullName("ANY")
+        .dynamicTypeHintFullName(Nil)
 
       dstGraph.addNode(methodParameterIn)
       dstGraph.addEdge(methodNode, methodParameterIn, EdgeTypes.AST)
     }
 
-    val methodReturn = NewMethodReturn(
-      code = "RET",
-      evaluationStrategy = EvaluationStrategies.BY_VALUE,
-      typeFullName = "ANY",
-      dynamicTypeHintFullName = Nil
-    )
+    val methodReturn = NewMethodReturn()
+      .code("RET")
+      .evaluationStrategy(EvaluationStrategies.BY_VALUE)
+      .typeFullName("ANY")
+      .dynamicTypeHintFullName(Nil)
+
     dstGraph.addNode(methodReturn)
     dstGraph.addEdge(methodNode, methodReturn, EdgeTypes.AST)
 
-    val blockNode = NewBlock(
-      order = 1,
-      argumentIndex = 1,
-      typeFullName = "ANY",
-      dynamicTypeHintFullName = Nil
-    )
+    val blockNode = NewBlock()
+      .order(1)
+      .argumentIndex(1)
+      .typeFullName("ANY")
+      .dynamicTypeHintFullName(Nil)
+
     dstGraph.addNode(blockNode)
     dstGraph.addEdge(methodNode, blockNode, EdgeTypes.AST)
 

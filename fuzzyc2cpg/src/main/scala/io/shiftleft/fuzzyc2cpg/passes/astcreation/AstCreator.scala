@@ -108,19 +108,19 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
     val code = returnType + " " + astFunction.getFunctionSignature(true)
 
     val location = astFunction.getLocation
-    val method = nodes.NewMethod(
-      name = astFunction.getName,
-      code = code,
-      isExternal = false,
-      fullName = astFunction.getName,
-      lineNumber = location.startLine,
-      columnNumber = location.startPos,
-      lineNumberEnd = location.endLine,
-      columnNumberEnd = location.endPos,
-      signature = signature,
-      filename = namespaceBlock.filename,
-      order = context.childNum
-    )
+    val method = nodes
+      .NewMethod()
+      .name(astFunction.getName)
+      .code(code)
+      .isExternal(false)
+      .fullName(astFunction.getName)
+      .lineNumber(location.startLine)
+      .columnNumber(location.startPos)
+      .lineNumberEnd(location.endLine)
+      .columnNumberEnd(location.endPos)
+      .signature(signature)
+      .filename(namespaceBlock.filename)
+      .order(context.childNum)
 
     addAndConnectAsAstChild(method)
 
@@ -151,14 +151,14 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       .map(_.getEscapedCodeStr)
       .getOrElse("RET")
 
-    val methodReturn = nodes.NewMethodReturn(
-      code = retCode,
-      evaluationStrategy = EvaluationStrategies.BY_VALUE.name(),
-      typeFullName = registerType(returnType),
-      lineNumber = methodReturnLocation.startLine,
-      columnNumber = methodReturnLocation.startPos,
-      order = context.childNum
-    )
+    val methodReturn = nodes
+      .NewMethodReturn()
+      .code(retCode)
+      .evaluationStrategy(EvaluationStrategies.BY_VALUE.name())
+      .typeFullName(registerType(returnType))
+      .lineNumber(methodReturnLocation.startLine)
+      .columnNumber(methodReturnLocation.startPos)
+      .order(context.childNum)
 
     addAndConnectAsAstChild(methodReturn)
 
@@ -173,15 +173,16 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       "int"
     }
     val location = astParameter.getLocation
-    val parameter = nodes.NewMethodParameterIn(
-      code = astParameter.getEscapedCodeStr,
-      name = astParameter.getName,
-      order = astParameter.getChildNumber + 1,
-      evaluationStrategy = EvaluationStrategies.BY_VALUE.name(),
-      typeFullName = registerType(parameterType),
-      lineNumber = location.startLine,
-      columnNumber = location.startPos
-    )
+    val parameter = nodes
+      .NewMethodParameterIn()
+      .code(astParameter.getEscapedCodeStr)
+      .name(astParameter.getName)
+      .order(astParameter.getChildNumber + 1)
+      .evaluationStrategy(EvaluationStrategies.BY_VALUE.name())
+      .typeFullName(registerType(parameterType))
+      .lineNumber(location.startLine)
+      .columnNumber(location.startPos)
+
     diffGraph.addNode(parameter)
     scope.addToScope(astParameter.getName, (parameter, parameterType))
     connectAstChild(parameter)
@@ -368,14 +369,14 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
 
   override def visit(astConstant: Constant): Unit = {
     val constantType = deriveConstantTypeFromCode(astConstant.getEscapedCodeStr)
-    val cpgConstant = nodes.NewLiteral(
-      typeFullName = registerType(constantType),
-      code = astConstant.getEscapedCodeStr,
-      order = context.childNum,
-      argumentIndex = context.childNum,
-      lineNumber = astConstant.getLocation.startLine,
-      columnNumber = astConstant.getLocation.startPos
-    )
+    val cpgConstant = nodes
+      .NewLiteral()
+      .typeFullName(registerType(constantType))
+      .code(astConstant.getEscapedCodeStr)
+      .order(context.childNum)
+      .argumentIndex(context.childNum)
+      .lineNumber(astConstant.getLocation.startLine)
+      .columnNumber(astConstant.getLocation.startPos)
     diffGraph.addNode(cpgConstant)
     connectAstChild(cpgConstant)
   }
@@ -402,14 +403,14 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
     val identifierName = astIdentifier.getEscapedCodeStr
 
     if (contextStack.nonEmpty && contextStack.head.parentIsMemberAccess && contextStack.head.childNum == 2) {
-      val cpgFieldIdentifier = nodes.NewFieldIdentifier(
-        canonicalName = identifierName,
-        code = astIdentifier.getEscapedCodeStr,
-        order = context.childNum,
-        argumentIndex = context.childNum,
-        lineNumber = astIdentifier.getLocation.startLine,
-        columnNumber = astIdentifier.getLocation.startPos
-      )
+      val cpgFieldIdentifier = nodes
+        .NewFieldIdentifier()
+        .canonicalName(identifierName)
+        .code(astIdentifier.getEscapedCodeStr)
+        .order(context.childNum)
+        .argumentIndex(context.childNum)
+        .lineNumber(astIdentifier.getLocation.startLine)
+        .columnNumber(astIdentifier.getLocation.startPos)
       diffGraph.addNode(cpgFieldIdentifier)
       connectAstChild(cpgFieldIdentifier)
       return
@@ -423,15 +424,16 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
         Defines.anyTypeName
     }
 
-    val cpgIdentifier = nodes.NewIdentifier(
-      name = identifierName,
-      typeFullName = registerType(identifierTypeName),
-      code = astIdentifier.getEscapedCodeStr,
-      order = context.childNum,
-      argumentIndex = context.childNum,
-      lineNumber = astIdentifier.getLocation.startLine,
-      columnNumber = astIdentifier.getLocation.startPos
-    )
+    val cpgIdentifier = nodes
+      .NewIdentifier()
+      .name(identifierName)
+      .typeFullName(registerType(identifierTypeName))
+      .code(astIdentifier.getEscapedCodeStr)
+      .order(context.childNum)
+      .argumentIndex(context.childNum)
+      .lineNumber(astIdentifier.getLocation.startLine)
+      .columnNumber(astIdentifier.getLocation.startPos)
+
     diffGraph.addNode(cpgIdentifier)
     connectAstChild(cpgIdentifier)
 
@@ -479,14 +481,14 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
           s"but ${classOfExpression.getSimpleName} found")
     }
 
-    val cpgBlock = nodes.NewBlock(
-      code = "",
-      order = context.childNum,
-      argumentIndex = context.childNum,
-      typeFullName = registerType(Defines.anyTypeName),
-      lineNumber = expression.getLocation.startLine,
-      columnNumber = expression.getLocation.startPos
-    )
+    val cpgBlock = nodes
+      .NewBlock()
+      .code("")
+      .order(context.childNum)
+      .argumentIndex(context.childNum)
+      .typeFullName(registerType(Defines.anyTypeName))
+      .lineNumber(expression.getLocation.startLine)
+      .columnNumber(expression.getLocation.startPos)
 
     diffGraph.addNode(cpgBlock)
     connectAstChild(cpgBlock)
@@ -582,14 +584,15 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
         statement.accept(this)
       }
     } else {
-      val block = nodes.NewBlock(
-        code = "",
-        order = context.childNum,
-        argumentIndex = context.childNum,
-        typeFullName = registerType(Defines.voidTypeName),
-        lineNumber = astBlock.getLocation.startLine,
-        columnNumber = astBlock.getLocation.startPos
-      )
+      val block = nodes
+        .NewBlock()
+        .code("")
+        .order(context.childNum)
+        .argumentIndex(context.childNum)
+        .typeFullName(registerType(Defines.voidTypeName))
+        .lineNumber(astBlock.getLocation.startLine)
+        .columnNumber(astBlock.getLocation.startPos)
+
       diffGraph.addNode(block)
       connectAstChild(block)
 
@@ -604,13 +607,13 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
   }
 
   override def visit(astNode: ReturnStatement): Unit = {
-    val cpgReturn = nodes.NewReturn(
-      code = astNode.getEscapedCodeStr,
-      order = context.childNum,
-      argumentIndex = context.childNum,
-      lineNumber = astNode.getLocation.startLine,
-      columnNumber = astNode.getLocation.startPos
-    )
+    val cpgReturn = nodes
+      .NewReturn()
+      .code(astNode.getEscapedCodeStr)
+      .order(context.childNum)
+      .argumentIndex(context.childNum)
+      .lineNumber(astNode.getLocation.startLine)
+      .columnNumber(astNode.getLocation.startPos)
 
     addAndConnectAsAstChild(cpgReturn)
 
@@ -632,24 +635,25 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
     val declTypeName = identifierDecl.getType.getEscapedCodeStr
 
     if (identifierDecl.isTypedef) {
-      val aliasTypeDecl = nodes.NewTypeDecl(
-        name = identifierDecl.getName.getEscapedCodeStr,
-        fullName = identifierDecl.getName.getEscapedCodeStr,
-        isExternal = false,
-        aliasTypeFullName = Some(registerType(declTypeName)),
-        filename = namespaceBlock.filename,
-        order = context.childNum
-      )
+      val aliasTypeDecl = nodes
+        .NewTypeDecl()
+        .name(identifierDecl.getName.getEscapedCodeStr)
+        .fullName(identifierDecl.getName.getEscapedCodeStr)
+        .isExternal(false)
+        .aliasTypeFullName(Some(registerType(declTypeName)))
+        .filename(namespaceBlock.filename)
+        .order(context.childNum)
+
       diffGraph.addNode(aliasTypeDecl)
       connectAstChild(aliasTypeDecl)
     } else if (context.parentIsClassDef) {
       val member =
-        nodes.NewMember(
-          code = identifierDecl.getEscapedCodeStr,
-          name = identifierDecl.getName.getEscapedCodeStr,
-          typeFullName = registerType(declTypeName),
-          order = context.childNum
-        )
+        nodes
+          .NewMember()
+          .code(identifierDecl.getEscapedCodeStr)
+          .name(identifierDecl.getName.getEscapedCodeStr)
+          .typeFullName(registerType(declTypeName))
+          .order(context.childNum)
       diffGraph.addNode(member)
       connectAstChild(member)
     } else {
@@ -657,12 +661,13 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       // Everything else is ignored.
       if (!scope.isEmpty) {
         val localName = identifierDecl.getName.getEscapedCodeStr
-        val local = nodes.NewLocal(
-          code = localName,
-          name = localName,
-          typeFullName = registerType(declTypeName),
-          order = context.childNum
-        )
+        val local = nodes
+          .NewLocal()
+          .code(localName)
+          .name(localName)
+          .typeFullName(registerType(declTypeName))
+          .order(context.childNum)
+
         diffGraph.addNode(local)
         scope.addToScope(localName, (local, declTypeName))
         connectAstChild(local)
@@ -701,15 +706,15 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
   }
 
   override def visit(astLabel: Label): Unit = {
-    val cpgLabel = nodes.NewJumpTarget(
-      parserTypeName = astLabel.getClass.getSimpleName,
-      name = astLabel.getLabelName,
-      code = astLabel.getEscapedCodeStr,
-      order = context.childNum,
-      argumentIndex = context.childNum,
-      lineNumber = astLabel.getLocation.startLine,
-      columnNumber = astLabel.getLocation.startPos
-    )
+    val cpgLabel = nodes
+      .NewJumpTarget()
+      .parserTypeName(astLabel.getClass.getSimpleName)
+      .name(astLabel.getLabelName)
+      .code(astLabel.getEscapedCodeStr)
+      .order(context.childNum)
+      .argumentIndex(context.childNum)
+      .lineNumber(astLabel.getLocation.startLine)
+      .columnNumber(astLabel.getLocation.startPos)
     addAndConnectAsAstChild(cpgLabel)
   }
 
@@ -792,14 +797,14 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
 
     baseClassList.foreach(registerType)
 
-    val typeDecl = nodes.NewTypeDecl(
-      name = name,
-      fullName = name,
-      isExternal = false,
-      inheritsFromTypeFullName = baseClassList,
-      filename = namespaceBlock.filename,
-      order = context.childNum
-    )
+    val typeDecl = nodes
+      .NewTypeDecl()
+      .name(name)
+      .fullName(name)
+      .isExternal(false)
+      .inheritsFromTypeFullName(baseClassList)
+      .filename(namespaceBlock.filename)
+      .order(context.childNum)
 
     diffGraph.addNode(typeDecl)
     connectAstChild(typeDecl)
@@ -887,29 +892,29 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
 
   private def newCallNode(astNode: AstNode, methodName: String): nodes.NewCall = {
     val location = astNode.getLocation
-    nodes.NewCall(
-      name = methodName,
-      dispatchType = DispatchTypes.STATIC_DISPATCH.name(),
-      signature = "TODO",
-      methodFullName = methodName,
-      code = astNode.getEscapedCodeStr,
-      order = context.childNum,
-      argumentIndex = context.childNum,
-      lineNumber = location.startLine,
-      columnNumber = location.startPos
-    )
+    nodes
+      .NewCall()
+      .name(methodName)
+      .dispatchType(DispatchTypes.STATIC_DISPATCH.name())
+      .signature("TODO")
+      .methodFullName(methodName)
+      .code(astNode.getEscapedCodeStr)
+      .order(context.childNum)
+      .argumentIndex(context.childNum)
+      .lineNumber(location.startLine)
+      .columnNumber(location.startPos)
   }
 
   private def newUnknownNode(astNode: AstNode): nodes.NewUnknown = {
     val location = astNode.getLocation
-    nodes.NewUnknown(
-      parserTypeName = astNode.getClass.getSimpleName,
-      code = astNode.getEscapedCodeStr,
-      order = context.childNum,
-      argumentIndex = context.childNum,
-      lineNumber = location.startLine,
-      columnNumber = location.startPos
-    )
+    nodes
+      .NewUnknown()
+      .parserTypeName(astNode.getClass.getSimpleName)
+      .code(astNode.getEscapedCodeStr)
+      .order(context.childNum)
+      .argumentIndex(context.childNum)
+      .lineNumber(location.startLine)
+      .columnNumber(location.startPos)
   }
 
   private def newControlStructureNode(astNode: AstNode): nodes.NewControlStructure = {
@@ -926,15 +931,15 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       case "SwitchStatement"   => ControlStructureTypes.SWITCH
       case someThingElse       => someThingElse
     }
-    nodes.NewControlStructure(
-      parserTypeName = astNode.getClass.getSimpleName,
-      controlStructureType = controlStructureType,
-      code = astNode.getEscapedCodeStr,
-      order = context.childNum,
-      argumentIndex = context.childNum,
-      lineNumber = location.startLine,
-      columnNumber = location.startPos
-    )
+    nodes
+      .NewControlStructure()
+      .parserTypeName(astNode.getClass.getSimpleName)
+      .controlStructureType(controlStructureType)
+      .code(astNode.getEscapedCodeStr)
+      .order(context.childNum)
+      .argumentIndex(context.childNum)
+      .lineNumber(location.startLine)
+      .columnNumber(location.startPos)
   }
 
 }
