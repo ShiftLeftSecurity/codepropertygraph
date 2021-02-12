@@ -76,16 +76,16 @@ package object scan {
                       title: String,
                       description: String,
                       score: Double): nodes.NewFinding = {
-    nodes.NewFinding(
-      evidence = List(evidence),
-      keyValuePairs = List(
-        nodes.NewKeyValuePair(FindingKeys.name, name),
-        nodes.NewKeyValuePair(FindingKeys.author, author),
-        nodes.NewKeyValuePair(FindingKeys.title, title),
-        nodes.NewKeyValuePair(FindingKeys.description, description),
-        nodes.NewKeyValuePair(FindingKeys.score, score.toString)
-      )
-    )
+    nodes
+      .NewFinding()
+      .evidence(List(evidence))
+      .keyValuePairs(List(
+        nodes.NewKeyValuePair().key(FindingKeys.name).value(name),
+        nodes.NewKeyValuePair().key(FindingKeys.author).value(author),
+        nodes.NewKeyValuePair().key(FindingKeys.title).value(title),
+        nodes.NewKeyValuePair().key(FindingKeys.description).value(description),
+        nodes.NewKeyValuePair().key(FindingKeys.score).value(score.toString)
+      ))
   }
 
   /**

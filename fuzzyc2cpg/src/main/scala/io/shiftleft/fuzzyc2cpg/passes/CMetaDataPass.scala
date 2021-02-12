@@ -13,17 +13,17 @@ import io.shiftleft.semanticcpg.language.types.structure.{File, Namespace}
 class CMetaDataPass(cpg: Cpg, keyPool: Option[KeyPool] = None) extends CpgPass(cpg, keyPool = keyPool) {
   override def run(): Iterator[DiffGraph] = {
     def addMetaDataNode(diffGraph: DiffGraph.Builder): Unit = {
-      val metaNode = nodes.NewMetaData(language = Languages.C, version = "0.1")
+      val metaNode = nodes.NewMetaData().language(Languages.C).version("0.1")
       diffGraph.addNode(metaNode)
     }
 
     def addAnyNamespaceBlock(diffGraph: DiffGraph.Builder): Unit = {
-      val node = nodes.NewNamespaceBlock(
-        name = Namespace.globalNamespaceName,
-        fullName = CMetaDataPass.getGlobalNamespaceBlockFullName(None),
-        filename = File.UNKNOWN,
-        order = 1
-      )
+      val node = nodes
+        .NewNamespaceBlock()
+        .name(Namespace.globalNamespaceName)
+        .fullName(CMetaDataPass.getGlobalNamespaceBlockFullName(None))
+        .filename(File.UNKNOWN)
+        .order(1)
       diffGraph.addNode(node)
     }
 

@@ -43,7 +43,7 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
       // 1) add a new node
       val addNodeInverse = applyDiffAndGetInverse(cpg)(
         _.addNode(
-          nodes.NewUnknown(code = null)
+          nodes.NewUnknown().code(null)
         ))
       cpg.graph.nodeCount shouldBe 2
       val additionalNode = cpg.graph.V.label("UNKNOWN").l.filter { _.asInstanceOf[nodes.Unknown].code == null }.head
@@ -119,7 +119,7 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
   }
 
   def passAddsEdgeTo(from: nodes.StoredNode, propValue: String, cpg: Cpg): CpgPass = {
-    val newNode = nodes.NewUnknown(code = propValue)
+    val newNode = nodes.NewUnknown().code(propValue)
     new CpgPass(cpg) {
       override def run(): Iterator[DiffGraph] = {
         val dstGraph = DiffGraph.newBuilder

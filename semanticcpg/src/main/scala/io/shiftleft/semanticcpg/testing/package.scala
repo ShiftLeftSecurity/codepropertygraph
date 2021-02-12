@@ -23,7 +23,7 @@ package object testing {
     def withMetaData(language: String, overlays: List[String], policyDirs: List[String]): MockCpg = {
       withCustom { (diffGraph, _) =>
         diffGraph.addNode(
-          nodes.NewMetaData(language = language, overlays = overlays, policyDirectories = policyDirs)
+          nodes.NewMetaData().language(language).overlays(overlays).policyDirectories(policyDirs)
         )
       }
     }
@@ -31,10 +31,14 @@ package object testing {
     def withMethod(name: String, external: Boolean = false, inTypeDecl: Boolean = true): MockCpg =
       withCustom { (graph, _) =>
         val retParam = nodes.NewMethodReturn()
-        val param = nodes.NewMethodParameterIn(order = 1, name = "param1")
-        val paramOut = nodes.NewMethodParameterOut(order = 1)
-        val method = nodes.NewMethod(isExternal = external, name = name)
-        val clazz = nodes.NewTypeDecl(name = "AClass", fullName = "AClass", isExternal = external)
+        val param = nodes.NewMethodParameterIn().order(1).name("param1")
+        val paramOut = nodes.NewMethodParameterOut().order(1)
+        val method = nodes.NewMethod().isExternal(external).name(name)
+        val clazz = nodes
+          .NewTypeDecl()
+          .name("AClass")
+          .fullName("AClass")
+          .isExternal(external)
         val block = nodes.NewBlock()
 
         graph.addNode(method)
@@ -73,7 +77,7 @@ package object testing {
         val methodNode = cpg.method.head
         val blockNode = methodNode.block.head
         val callNode = nodes.NewCall()
-        val literalNode = nodes.NewLiteral(code = literalCode)
+        val literalNode = nodes.NewLiteral().code(literalCode)
         graph.addNode(callNode)
         graph.addNode(literalNode)
         graph.addEdge(blockNode, callNode, EdgeTypes.AST)

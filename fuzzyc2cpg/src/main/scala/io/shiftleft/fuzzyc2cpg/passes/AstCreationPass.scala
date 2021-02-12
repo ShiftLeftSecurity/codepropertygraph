@@ -24,12 +24,13 @@ class AstCreationPass(filenames: List[String], cpg: Cpg, keyPool: IntervalKeyPoo
 
     val diffGraph = DiffGraph.newBuilder
     val absolutePath = new java.io.File(filename).toPath.toAbsolutePath.normalize().toString
-    val namespaceBlock = nodes.NewNamespaceBlock(
-      name = Namespace.globalNamespaceName,
-      fullName = CMetaDataPass.getGlobalNamespaceBlockFullName(Some(absolutePath)),
-      filename = absolutePath,
-      order = 1
-    )
+    val namespaceBlock = nodes
+      .NewNamespaceBlock()
+      .name(Namespace.globalNamespaceName)
+      .fullName(CMetaDataPass.getGlobalNamespaceBlockFullName(Some(absolutePath)))
+      .filename(absolutePath)
+      .order(1)
+
     diffGraph.addNode(namespaceBlock)
     val driver = createDriver(namespaceBlock)
     tryToParse(driver, filename, diffGraph)

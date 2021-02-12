@@ -27,7 +27,7 @@ class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
     def createFileIfDoesNotExist(srcNode: nodes.StoredNode, destFullName: String): Unit = {
       val dstFullName = if (destFullName == "") { File.UNKNOWN } else { destFullName }
       val newFile = newFileNameToNode.getOrElseUpdate(dstFullName, {
-        val file = nodes.NewFile(name = dstFullName, order = 0)
+        val file = nodes.NewFile().name(dstFullName).order(0)
         dstGraph.addNode(file)
         file
       })

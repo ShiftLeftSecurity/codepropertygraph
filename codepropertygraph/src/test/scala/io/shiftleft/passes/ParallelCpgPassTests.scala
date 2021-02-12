@@ -22,7 +22,7 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
 
         override def runOnPart(part: String): Iterator[DiffGraph] = {
           val diffGraph = DiffGraph.newBuilder
-          diffGraph.addNode(nodes.NewFile(name = part))
+          diffGraph.addNode(nodes.NewFile().name(part))
           Iterator(diffGraph.build())
         }
       }

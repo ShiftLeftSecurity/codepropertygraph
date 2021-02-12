@@ -139,7 +139,7 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
     finally graph.close()
   }
 
-  def createNewNode(code: String) = nodes.NewUnknown(code = code)
+  def createNewNode(code: String): nodes.NewUnknown = nodes.NewUnknown().code(code)
 
   def makeEdgeBetweenExistingNodes(graph: Graph, diff: DiffGraph.Builder, codeA: String, codeB: String) = {
     val a = graph.V.has(NodeKeys.CODE, codeA).head

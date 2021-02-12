@@ -129,7 +129,7 @@ object LocationCreator {
   ): nodes.NewLocation = {
 
     if (method == null) {
-      nodes.NewLocation("", "", "", "", None, "", "", "", "", Some(node))
+      nodes.NewLocation().node(Some(node))
     } else {
       val typeOption = methodToTypeDecl(method)
       val typeName = typeOption.map(_.fullName).getOrElse("")
@@ -142,18 +142,18 @@ object LocationCreator {
       } yield namespace.name
       val namespaceName = namespaceOption.getOrElse("")
 
-      nodes.NewLocation(
-        symbol = symbol,
-        methodFullName = method.fullName,
-        methodShortName = method.name,
-        packageName = namespaceName,
-        lineNumber = lineNumber,
-        className = typeName,
-        classShortName = typeShortName,
-        nodeLabel = label,
-        filename = if (method.filename.isEmpty) "N/A" else method.filename,
-        node = Some(node)
-      )
+      nodes
+        .NewLocation()
+        .symbol(symbol)
+        .methodFullName(method.fullName)
+        .methodShortName(method.name)
+        .packageName(namespaceName)
+        .lineNumber(lineNumber)
+        .className(typeName)
+        .classShortName(typeShortName)
+        .nodeLabel(label)
+        .filename(if (method.filename.isEmpty) "N/A" else method.filename)
+        .node(Some(node))
     }
   }
 
@@ -169,5 +169,5 @@ object LocationCreator {
     }
 
   def emptyLocation(label: String, node: Option[nodes.CpgNode]): nodes.NewLocation =
-    nodes.NewLocation("", "", "", "", None, "", "", label, "", node)
+    nodes.NewLocation().nodeLabel(label).node(node)
 }

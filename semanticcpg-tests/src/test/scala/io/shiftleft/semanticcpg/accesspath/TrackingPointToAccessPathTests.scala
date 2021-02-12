@@ -29,7 +29,7 @@ class TrackingPointToAccessPathTests extends AnyWordSpec {
       val arg = argTup._1
       val idx = argTup._2
       ret --- EdgeTypes.ARGUMENT --> arg
-      val javaInt : java.lang.Integer = idx + 1
+      val javaInt: java.lang.Integer = idx + 1
       arg.setProperty(NodeKeys.ARGUMENT_INDEX, javaInt)
     }
     ret.asInstanceOf[nodes.Call]
