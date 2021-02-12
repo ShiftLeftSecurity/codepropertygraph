@@ -29,6 +29,7 @@ class NodeMethods(val node: nodes.CpgNode) extends AnyVal {
                 .NewTag()
                 .name(name)
                 .value(value)
+                .build
                 .asInstanceOf[nodes.TagBase]
           }
       case _ =>
