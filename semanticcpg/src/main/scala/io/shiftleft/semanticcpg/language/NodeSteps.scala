@@ -105,7 +105,8 @@ class NodeSteps[NodeType <: nodes.StoredNode](val traversal: Traversal[NodeType]
         nodes
           .NewTagNodePair()
           .tag(nodes.NewTag().name(tagName).value(tagValue))
-          .node(node).build
+          .node(node)
+          .build
       }
     )
   }
