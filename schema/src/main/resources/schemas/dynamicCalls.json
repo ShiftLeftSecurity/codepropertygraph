@@ -1,9 +1,0 @@
-{
-    "nodeKeys" : [
-        {"id": 24, "name": "RESOLVED", "comment": "Indicates whether a call was already resolved. If not set this means not yet resolved", "valueType" : "boolean", "cardinality" : "zeroOrOne"}
-    ],
-
-    "nodeTypes" : [
-        { "name" : "CALL", "keys" : ["RESOLVED"] }
-    ]
-}
