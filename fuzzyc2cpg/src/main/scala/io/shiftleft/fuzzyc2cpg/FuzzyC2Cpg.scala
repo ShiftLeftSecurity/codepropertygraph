@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.fuzzyc2cpg.passes.{AstCreationPass, CMetaDataPass, StubRemovalPass, TypeNodePass}
-import io.shiftleft.passes.IntervalKeyPool
+import io.shiftleft.passes.{IntervalKeyPool, KeyPoolCreator}
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.x2cpg.SourceFiles
 import overflowdb.{Config, Graph}
@@ -72,7 +72,7 @@ class FuzzyC2Cpg() {
                    optionalOutputPath: Option[String] = None): Cpg = {
     val metaDataKeyPool = new IntervalKeyPool(1, 100)
     val typesKeyPool = new IntervalKeyPool(100, 1000100)
-    val functionKeyPools = KeyPools.obtain(2, 1000101)
+    val functionKeyPools = KeyPoolCreator.obtain(2, 1000101)
 
     val cpg = initCpg(optionalOutputPath)
     val sourceFileNames = SourceFiles.determine(sourcePaths, sourceFileExtensions)
