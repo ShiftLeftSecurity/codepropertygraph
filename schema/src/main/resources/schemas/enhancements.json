@@ -86,7 +86,8 @@
 	      {"name": "RETURN"},
 	      {"name": "IDENTIFIER"},
 	      {"name": "METHOD_PARAMETER_IN"},
-	      {"name": "LITERAL"}
+	      {"name": "LITERAL"},
+        {"name" :  "METHOD_REF"}
             ]},
              {"edgeName": "CONTAINS", "inNodes": [
               {"name": "CALL"},
@@ -109,8 +110,19 @@
         },
         { "name": "RETURN",
           "outEdges" : [
-             {"edgeName": "REACHING_DEF", "inNodes": [{"name": "METHOD_RETURN"},{"name": "IDENTIFIER"}]}
+             {"edgeName": "REACHING_DEF", "inNodes": [{"name": "METHOD_RETURN"},{"name": "IDENTIFIER"}, {"name" :  "METHOD_REF"}]}
           ]
+        },
+        { "name" : "METHOD_REF",
+           "outEdges" : [
+             {"edgeName" :  "REACHING_DEF", "inNodes" :  [
+               {"name": "CALL"},
+               {"name": "RETURN"},
+               {"name": "IDENTIFIER"},
+               {"name": "LITERAL"},
+               {"name" :  "METHOD_REF"}
+             ]}
+           ]
         },
         { "name": "METHOD_PARAMETER_IN",
 	  "keys": ["EVALUATION_STRATEGY", "DYNAMIC_TYPE_HINT_FULL_NAME"],
@@ -124,7 +136,8 @@
               {"name": "CALL"},
               {"name": "RETURN"},
 	      {"name": "IDENTIFIER"},
-	      {"name": "LITERAL"}
+	      {"name": "LITERAL"},
+              {"name" :  "METHOD_REF"}
             ]},
             {"edgeName": "PARAMETER_LINK", "inNodes": [{"name": "METHOD_PARAMETER_OUT"}]}
           ]
@@ -202,7 +215,8 @@
               {"name": "CALL"},
               {"name": "RETURN"},
 	      {"name": "IDENTIFIER"},
-	      {"name" : "LITERAL"}
+	      {"name" : "LITERAL"},
+        {"name" :  "METHOD_REF"}
             ]}
           ]
         },
@@ -215,7 +229,8 @@
               {"name": "CALL"},
               {"name": "RETURN"},
 	      {"name": "IDENTIFIER"},
-	      {"name": "LITERAL"}
+	      {"name": "LITERAL"},
+              {"name" :  "METHOD_REF"}
             ]}
           ]
         },
@@ -234,7 +249,8 @@
               {"name": "CALL"},
               {"name": "RETURN"},
 	      {"name": "IDENTIFIER"},
-	      {"name": "LITERAL"}
+	      {"name": "LITERAL"},
+        {"name" :  "METHOD_REF"}
             ]}
           ]
         },
@@ -247,7 +263,8 @@
               {"name": "RETURN"},
               {"name": "BLOCK"},
 	      {"name": "IDENTIFIER"},
-	      {"name": "LITERAL"}
+	      {"name": "LITERAL"},
+        {"name" :  "METHOD_REF"}
             ]}
           ]
         },
@@ -257,7 +274,8 @@
               {"name": "CALL"},
               {"name": "RETURN"},
 	      {"name": "IDENTIFIER"},
-	      {"name": "LITERAL"}
+	      {"name": "LITERAL"},
+              {"name" :  "METHOD_REF"}
             ]},
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
@@ -269,7 +287,8 @@
               {"name": "CALL"},
               {"name": "RETURN"},
 	      {"name": "IDENTIFIER"},
-	      {"name": "LITERAL"}
+	      {"name": "LITERAL"},
+              {"name" :  "METHOD_REF"}
             ]},
             {"edgeName": "EVAL_TYPE", "inNodes": [{"name": "TYPE"}]}
           ]
