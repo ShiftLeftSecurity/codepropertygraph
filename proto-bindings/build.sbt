@@ -1,6 +1,6 @@
 name := "codepropertygraph-protos"
 
-lazy val generateProtobuf = taskKey[File]("generate cpg.proto")
+lazy val generateProtobuf = taskKey[File]("generate protobuf definitions: cpg.proto")
 
 enablePlugins(ProtobufPlugin)
 val protocLocalDir = "protoc"
