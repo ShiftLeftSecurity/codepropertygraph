@@ -1,0 +1,135 @@
+{
+
+    "nodeKeys" : [
+        {"id" : 99, "name" : "NODE_ID", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 100, "name" : "SYMBOL", "comment" : "", "valueType" : "string" , "cardinality" : "one"},
+        {"id" : 102, "name" : "METHOD_SHORT_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 103, "name" : "PACKAGE_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 104, "name" : "CLASS_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 132, "name" : "CLASS_SHORT_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 105, "name" : "NODE_LABEL", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+
+
+        {"id" : 107, "name" : "ANNOTATION_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 108, "name" : "ANNOTATION_FULL_NAME", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 110, "name" : "IS_STATIC", "comment" : "", "valueType" : "boolean", "cardinality" : "one"},
+
+	{"id" : 111, "name" : "VAR_TYPE", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+	{"id" : 112, "name" : "EVALUATION_TYPE", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+	{"id" : 113, "name" : "PARAMETER_INDEX", "comment" : "", "valueType" : "int", "cardinality" : "zeroOrOne"},
+	{"id" : 114, "name" : "FINGERPRINT", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 115, "name" : "SOURCE_TYPE", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+        {"id" : 116, "name" : "SINK_TYPE", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+
+	{"id" : 121, "name" : "PATH", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+
+	{"id" : 122, "name" : "SPID", "comment" : "", "valueType": "string", "cardinality": "zeroOrOne"},
+	{"id" : 123, "name" : "LITERALS_TO_SINK", "comment" : "", "valueType" : "string", "cardinality" : "list"},
+
+	{"id" : 117, "name" : "CATEGORY", "comment" : "", "valueType" : "string", "cardinality" : "one"},
+	{"id" : 131, "name" : "KEY", "comment" : "", "valueType" : "string", "cardinality" : "one"}
+    ],
+
+    "nodeTypes" : [
+        {"id" : 199, "name" : "METHOD_SUMMARY", "comment" : "", "keys" : ["IS_STATIC", "IS_EXTERNAL", "BINARY_SIGNATURE"], "containedNodes" : [ 
+            {"localName" : "method", "nodeType" : "METHOD", "cardinality" : "one"},
+            {"localName" : "parameters", "nodeType" : "METHOD_PARAMETER_IN", "cardinality" : "list"},
+            {"localName" : "outParameters", "nodeType" : "METHOD_PARAMETER_OUT", "cardinality" : "list"},
+            {"localName" : "returnParameter", "nodeType" : "METHOD_RETURN", "cardinality" : "one"},
+            {"localName" : "paramTypes", "nodeType" : "TYPE", "cardinality" : "list"},
+            {"localName" : "returnParameterType", "nodeType" : "TYPE", "cardinality" : "one"},
+            {"localName" : "tags", "nodeType" : "TAG", "cardinality" : "list"},
+            {"localName" : "paramTags", "nodeType" : "TAGS", "cardinality" : "list"},
+            {"localName" : "outParamTags", "nodeType" : "TAGS", "cardinality" : "list"},
+            {"localName" : "returnParamTags", "nodeType" : "TAG", "cardinality" : "list"},
+            {"localName" : "annotationParameters", "nodeType" : "SP_ANNOTATION_PARAMETER", "cardinality" : "list"},
+            {"localName" : "modifiers", "nodeType" : "MODIFIER", "cardinality" : "list"},
+	    {"localName" : "routes", "nodeType": "ROUTE", "cardinality": "list" }
+        ], "outEdges" : [] },
+        {"id" : 200, "name" : "SP_ANNOTATION_PARAMETER", "comment" : "", "keys" : ["ANNOTATION_NAME", "ANNOTATION_FULL_NAME", "NAME", "VALUE"], "outEdges" : [] },
+        {"id" : 201, "name" : "CALL_SITE", "comment" : "", "keys" : [], "outEdges" : [],
+          "containedNodes" : [
+             {"nodeType":"METHOD", "localName":"method", "cardinality":"one"},
+             {"nodeType":"CALL", "localName":"call", "cardinality":"one"},
+             {"nodeType":"METHOD", "localName":"callerMethod", "cardinality":"one"}
+                            ]
+        },
+	{"id" : 213, "name" : "TRANSFORMATION", "comment" : "", "keys" : [], "outEdges" : [], "containedNodes" : [
+	 {"localName" : "node", "nodeType" : "TRACKING_POINT", "cardinality" : "one"}
+	]
+	},
+   {"id" : 209, "name" : "READ", "comment" : "", "keys" : [], "outEdges" : [], "containedNodes" : [
+       {"localName" : "triggerCallChains", "nodeType" : "CALL_CHAIN", "cardinality" : "list" },
+       {"localName" : "descriptorFlows", "nodeType" : "FLOW", "cardinality" : "list"},
+       {"localName" : "source", "nodeType" : "SOURCE", "cardinality" : "one"}
+   ]
+   },
+   {"id" : 210, "name" : "WRITE", "comment" : "", "keys" : [], "outEdges" : [], "containedNodes" : [
+       {"localName" : "triggerCallChains", "nodeType" : "CALL_CHAIN", "cardinality" : "list" },
+       {"localName" : "descriptorFlows", "nodeType" : "FLOW", "cardinality" : "list"},
+       {"localName" : "sink", "nodeType" : "SINK", "cardinality" : "one"},
+       {"localName" : "flows", "nodeType" : "FLOW", "cardinality" : "list"}
+   ]},
+   {"id" : 211, "name": "TRANSFORM", "comment" : "", "keys" : [], "outEdges" : [], "containedNodes" : [
+       {"localName" : "triggerCallChains", "nodeType" : "CALL_CHAIN", "cardinality" : "list" },
+       {"localName" : "descriptorFlows", "nodeType" : "FLOW", "cardinality" : "list"},
+       {"localName" : "call", "nodeType" : "CALL", "cardinality" : "one"},
+       {"localName" : "sink", "nodeType" : "SINK", "cardinality" : "one" }
+   ]},
+   {"id" : 212, "name" : "IOFLOW", "comment" : "", "keys" : ["FINGERPRINT", "LITERALS_TO_SINK"], "outEdges" : [], "containedNodes" :  [
+      {"localName": "dataTags", "nodeType" : "TAG", "cardinality" : "list"},
+      {"localName": "sourceDescriptorTags", "nodeType" : "TAG", "cardinality" : "list"},
+      {"localName": "sinkDescriptorTags", "nodeType" : "TAG", "cardinality" : "list"},
+      {"localName": "sourceTags", "nodeType" : "TAG", "cardinality" : "list"},
+      {"localName": "dstTags", "nodeType" : "TAG", "cardinality": "list"},
+      {"localName" : "source", "nodeType" : "SOURCE", "cardinality" : "one"},
+      {"localName" : "sink", "nodeType" : "SINK", "cardinality" : "one"},
+      {"localName" : "transforms", "nodeType" : "TRANSFORM", "cardinality" : "array"},
+      {"localName" : "sourceDescriptorFlows", "nodeType" : "FLOW", "cardinality" : "list"},
+      {"localName" : "sinkDescriptorFlows", "nodeType" : "FLOW", "cardinality" : "list"},
+      {"localName" : "primaryFlow", "nodeType" : "FLOW", "cardinality" : "one"},
+      {"localName" : "triggerMethods", "nodeType" : "METHOD", "cardinality" : "list"}
+   ]
+   },
+      {"id" : 214, "name" : "FINDING", "comment" : "", "keys" : [], "outEdges" : [], "containedNodes" : [
+	  {"localName" : "evidence", "nodeType" : "CPG_NODE", "cardinality" : "list"},
+	  {"localName" : "keyValuePairs", "nodeType" : "KEY_VALUE_PAIR", "cardinality" : "list"}
+   ]
+   },
+	{"id" : 215, "name" : "ROUTE", "comment" : "", "keys": ["PATH"], "outEdges" : []},
+	{"id" : 25,
+         "name" : "LOCATION",
+         "keys" : ["SYMBOL", "METHOD_FULL_NAME", "METHOD_SHORT_NAME", "PACKAGE_NAME", "LINE_NUMBER", "CLASS_NAME", "CLASS_SHORT_NAME", "NODE_LABEL", "FILENAME"],
+         "comment" : "",
+         "outEdges" : [],
+         "containedNodes" : [
+            {"localName" : "node", "nodeType" : "CPG_NODE", "cardinality" : "zeroOrOne"}
+         ]
+        },
+
+	{"id": 204, "name" : "CALL_CHAIN", "comment" : "", "keys" : [], "outEdges" : [],
+	 "containedNodes" : [
+	   {"localName" : "methods", "nodeType" : "METHOD", "cardinality": "list"},
+	   {"localName" : "calls", "nodeType" : "CALL", "cardinality": "list"}
+	 ]
+	},
+	{"id" : 206, "name" : "VARIABLE_INFO", "comment" : "", "keys" : ["VAR_TYPE", "EVALUATION_TYPE", "PARAMETER_INDEX"], "outEdges" : [] },
+    {"id" : 208, "name" : "TAG_NODE_PAIR", "comment" : "", "keys" : [], "outEdges" : [],
+     "containedNodes" :
+     [
+      {"localName" : "tag", "nodeType" : "TAG", "cardinality" : "one"},
+      {"localName" : "node", "nodeType" : "CPG_NODE", "cardinality" : "one"}
+     ]
+    },
+    {"id" : 216, "name" : "SP_BLACKLIST", "comment" : "", "keys" : [], "outEdges" : [],
+     "containedNodes" : [
+       {"localName" : "tags", "nodeType": "TAG", "cardinality" : "list", "comment" : ""}
+     ]
+    },
+    {"id" : 217, "name" : "KEY_VALUE_PAIR", "comment" : "", "keys": ["KEY", "VALUE"], "outEdges" : [] },
+	// Modifications to existing node types
+	{"name" : "META_DATA", "keys" : ["SPID"], "outEdges" : []}
+
+    ]
+
+}
