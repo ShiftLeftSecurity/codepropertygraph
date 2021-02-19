@@ -1,0 +1,47 @@
+{
+    "nodeTypes" : [
+	{"id" : 207, "name" : "FLOW", "comment" : "", "keys" : [], "outEdges" : [],
+	 "containedNodes" :
+	 [
+	     {"localName" : "points", "nodeType" : "PROGRAM_POINT", "cardinality" : "array"},
+	     {"localName" : "source", "nodeType" : "SOURCE", "cardinality" : "one"},
+	     {"localName" : "sink", "nodeType" : "SINK", "cardinality" : "one"},
+	     {"localName" : "transformations", "nodeType" : "TRANSFORMATION", "cardinality" : "array"},
+	     {"localName" : "branchPoints", "nodeType" : "TRACKING_POINT", "cardinality" : "array"},
+	     {"localName" : "cfgNodes", "nodeType" : "CFG_NODE", "cardinality" : "array"}
+	 ]
+	},
+
+	
+	{"id": 205, "name" : "PROGRAM_POINT", "comment" : "", "keys" : [], "outEdges" : [],
+	 "containedNodes" : [
+	     {"localName" : "elem", "nodeType" : "TRACKING_POINT", "cardinality" : "one"},
+             {"localName" : "method", "nodeType" : "METHOD", "cardinality" : "zeroOrOne"},
+	     {"localName" : "methodTags", "nodeType" : "TAG", "cardinality" : "list"},
+	     {"localName" : "paramTags", "nodeType" : "TAG", "cardinality" : "list"}
+	 ]
+	},
+
+	{"id" : 202, "name" : "SOURCE", "comment" : "", "keys" : ["SOURCE_TYPE"], "outEdges" : [], "containedNodes" : [
+            {"localName" : "node", "nodeType" : "TRACKING_POINT", "cardinality" : "one"},
+            {"localName" : "method", "nodeType" : "METHOD", "cardinality" : "one" },
+            {"localName" : "methodTags", "nodeType" : "TAG", "cardinality" : "list"},
+            {"localName" : "callingMethod", "nodeType" : "METHOD", "cardinality" : "zeroOrOne"},
+            {"localName" : "callsite", "nodeType" : "CALL", "cardinality" : "zeroOrOne"},
+            {"localName" : "tags", "nodeType" : "TAG", "cardinality" : "list"},
+            {"localName" : "nodeType", "nodeType" : "TYPE", "cardinality" : "one"}
+        ]},
+	
+	{"id" : 203, "name" : "SINK", "comment" : "", "keys" : ["SINK_TYPE"], "outEdges" : [], "containedNodes" : [
+            {"localName" : "node", "nodeType" : "TRACKING_POINT", "cardinality" : "one"},
+	    {"localName" : "nodeType", "nodeType" : "TYPE", "cardinality" : "one"},
+            {"localName" : "method", "nodeType" : "METHOD", "cardinality" : "one" },
+            {"localName" : "methodTags", "nodeType" : "TAG", "cardinality" : "list"},
+            {"localName" : "callingMethod", "nodeType" : "METHOD", "cardinality" : "zeroOrOne"},
+            {"localName" : "callsite", "nodeType" : "CALL", "cardinality" : "zeroOrOne"},
+            {"localName" : "parameterIn", "nodeType" : "METHOD_PARAMETER_IN", "cardinality" : "zeroOrOne"},
+	    {"localName" : "parameterInTags", "nodeType" : "TAG", "cardinality" : "list", "comment" : "This field also holds tags for output parameters and return parameters"}
+        ]}
+	
+    ]
+}
