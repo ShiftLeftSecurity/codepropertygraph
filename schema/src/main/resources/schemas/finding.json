@@ -1,0 +1,12 @@
+{
+  "nodeKeys" : [
+    {"id" : 131, "name" : "KEY", "comment" : "", "valueType" : "string", "cardinality" : "one"}
+  ],
+  "nodeTypes" : [
+    {"id" : 214, "name" : "FINDING", "comment" : "", "keys" : [], "outEdges" : [], "containedNodes" : [
+	  {"localName" : "evidence", "nodeType" : "CPG_NODE", "cardinality" : "list"},
+	  {"localName" : "keyValuePairs", "nodeType" : "KEY_VALUE_PAIR", "cardinality" : "list"}
+    ]},
+    {"id" : 217, "name" : "KEY_VALUE_PAIR", "comment" : "", "keys": ["KEY", "VALUE"], "outEdges" : [] }
+    ]
+}

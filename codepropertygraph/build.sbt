@@ -11,7 +11,7 @@ libraryDependencies ++= Seq(
 
 lazy val mergeSchemaTask = taskKey[File]("Merge schemas")
 
-lazy val generateProtobuf = taskKey[File]("generate cpg.proto")
+lazy val generateProtobuf = taskKey[File]("generate protobuf definitions: cpg.proto")
 generateProtobuf := {
   import scala.sys.process._
   val output = better.files.File((resourceManaged.in(Compile).value / "cpg.proto").toPath)
