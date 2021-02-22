@@ -8,7 +8,7 @@ import scala.util.{Failure, Success, Try, Using}
 
 object PlumeCpgGenerator {
 
-  def createCpgForJava(inputPaths : List[String], outputPath : String): Unit = {
+  def createCpgForJava(inputPaths: List[String], outputPath: String): Unit = {
     val (existing, nonExisting) = inputPaths.partition(inputPath => File(inputPath).exists)
     nonExisting.foreach(inputPath => println(s"Error: $inputPath does not exist"))
     if (existing.isEmpty) { Try { throw new RuntimeException("Not valid input paths for CPG generation") } }
@@ -28,7 +28,7 @@ object PlumeCpgGenerator {
     }
   }
 
-  private def createCpgForInputPath(inputPath: String, outputCpgFile : String): Unit = {
+  private def createCpgForInputPath(inputPath: String, outputCpgFile: String): Unit = {
     println(s"Creating CPG for: $inputPath")
     Using(DriverFactory.invoke(GraphDatabase.OVERFLOWDB).asInstanceOf[OverflowDbDriver]) { driver =>
       deleteIfExists(outputCpgFile)
