@@ -2,6 +2,7 @@ package io.shiftleft.console.cpgcreation
 
 import java.nio.file.Path
 
+import io.joern.plume.PlumeCpgGenerator
 import io.shiftleft.console.JavaFrontendConfig
 
 /**
@@ -48,9 +49,8 @@ case class JavaCpgGenerator(config: JavaFrontendConfig, rootPath: Path) extends 
   }
 
   private def generateOss(inputPath: String, outputPath: String): Option[String] = {
-    val command = rootPath.resolve("joern-parse").toString
-    val arguments = Seq(inputPath, "--out", outputPath, "--language", "java", "--noenhance")
-    runShellCommand(command, arguments).map(_ => outputPath)
+    PlumeCpgGenerator.createCpgForJava(List(inputPath), outputPath)
+    Some(outputPath)
   }
 
   private def jvmLanguages: List[String] = {
