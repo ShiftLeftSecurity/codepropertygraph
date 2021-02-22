@@ -60,7 +60,6 @@ class TestCpgGeneratorFactory(config: ConsoleConfig) extends CpgGeneratorFactory
 
     override def generate(inputPath: String, outputPath: String, namespaces: List[String]): Option[String] = {
       val fuzzyc = new FuzzyC2Cpg()
-      File(inputPath).list.foreach(println(_))
       val cpg = fuzzyc.runAndOutput(Set(inputPath), Set(".c"), Some(outputPath))
       cpg.close()
       Some(outputPath)
