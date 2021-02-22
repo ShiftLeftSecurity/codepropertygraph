@@ -66,6 +66,7 @@ libraryDependencies ++= Seq(
   "org.zeroturnaround"   %  "zt-zip"        % ZeroturnaroundVersion,
   "com.lihaoyi"          %% "ammonite"      % AmmoniteVersion cross CrossVersion.full,
   "com.lihaoyi" 	       %% "cask" 	        % CaskVersion,
+  "io.github.plume-oss"    % "plume" % "0.1.8" exclude("io.github.plume-oss", "cpgconv"),
   "org.scalatest"        %% "scalatest"     % Versions.scalatest % Test
 )
 
