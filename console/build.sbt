@@ -4,7 +4,8 @@ enablePlugins(JavaAppPackaging)
 
 dependsOn(Projects.codepropertygraph,
           Projects.semanticcpg,
-          Projects.macros)
+          Projects.macros,
+          Projects.fuzzyc2cpg)
 
 scalacOptions ++= Seq(
   "-deprecation",                      // Emit warning and location for usages of deprecated APIs.

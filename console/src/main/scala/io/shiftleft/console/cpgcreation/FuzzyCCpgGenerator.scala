@@ -3,6 +3,7 @@ package io.shiftleft.console.cpgcreation
 import java.nio.file.Path
 
 import io.shiftleft.console.FuzzyCFrontendConfig
+import io.shiftleft.fuzzyc2cpg.FuzzyC2Cpg
 
 /**
   * Fuzzy C/C++ language frontend. Translates C/C++ source files
@@ -18,10 +19,11 @@ case class FuzzyCCpgGenerator(config: FuzzyCFrontendConfig, rootPath: Path) exte
   override def generate(inputPath: String,
                         outputPath: String = "cpg.bin.zip",
                         namespaces: List[String] = List()): Option[String] = {
-    val fuzzyc2cpgsh = rootPath.resolve("fuzzyc2cpg.sh").toString
-    val arguments = Seq(inputPath, "--output", outputPath) ++ config.cmdLineParams
-    runShellCommand(fuzzyc2cpgsh, arguments).map(_ => outputPath)
+    val fuzzyc = new FuzzyC2Cpg()
+    val cpg = fuzzyc.runAndOutput(Set(inputPath), Set(".c"), Some(outputPath))
+    cpg.close()
+    Some(outputPath)
   }
 
-  override def isAvailable: Boolean = rootPath.resolve("fuzzyc2cpg.sh").toFile.exists
+  override def isAvailable: Boolean = true
 }
