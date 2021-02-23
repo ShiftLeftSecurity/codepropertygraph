@@ -53,6 +53,7 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
   def javascript: Frontend = new Frontend(Languages.JAVASCRIPT, "Javascript Source Frontend")
   def csharp: Frontend = new Frontend(Languages.CSHARP, "C# Source Frontend (Roslyn)")
   def python: Frontend = new Frontend(Languages.PYTHON, "Python Source Frontend")
+  def php: Frontend = new Frontend(Languages.PHP, "PHP bytecode frontend")
 
   class Frontend(val language: String, val description: String = "") {
     def isAvailable: Boolean = {
