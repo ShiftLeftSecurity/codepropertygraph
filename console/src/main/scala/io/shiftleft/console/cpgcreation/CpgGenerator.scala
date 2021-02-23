@@ -27,7 +27,7 @@ abstract class CpgGenerator() {
 
   protected def runShellCommand(program: String, arguments: Seq[String]): Option[String] = {
     if (!File(program).exists) {
-      System.err.println("Support for this language is only available in ShiftLeft Ocular with an appropriate license")
+      System.err.println(s"CPG generator does not exist at: $program")
       return None
     }
     val cmd = Seq[String](program) ++ arguments
