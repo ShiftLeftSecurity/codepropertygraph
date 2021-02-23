@@ -46,7 +46,8 @@ class CpgGeneratorFactory(config: ConsoleConfig) {
         Languages.JAVA,
         Languages.JAVASCRIPT,
         Languages.PYTHON,
-        Languages.LLVM).contains(language)
+        Languages.LLVM,
+        Languages.PHP).contains(language)
   }
 
   def runGenerator(frontend: CpgGenerator,
