@@ -21,6 +21,7 @@ package object cpgcreation {
       case Languages.JAVA       => Some(JavaCpgGenerator(config.java, rootPath))
       case Languages.JAVASCRIPT => Some(JsCpgGenerator(config.js, rootPath))
       case Languages.PYTHON     => Some(PythonCpgGenerator(config.python, rootPath))
+      case Languages.PHP        => Some(PhpCpgGenerator(config.php, rootPath))
       case _                    => None
     }
   }
@@ -50,6 +51,8 @@ package object cpgcreation {
           Some(Languages.GOLANG)
         } else if (files.exists(f => f.endsWith(".java") || f.endsWith(".class"))) {
           Some(Languages.JAVA)
+        } else if (files.exists(f => f.endsWith(".php"))) {
+          Some(Languages.PHP)
         } else if (files.exists(f => f.endsWith(".js") || Set("package.json").contains(f))) {
           Some(Languages.JAVASCRIPT)
         } else if (files.exists(f => isLlvmSrcFile(new File(f).toPath))) {

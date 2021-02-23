@@ -39,7 +39,8 @@ class LanguageFrontendConfig(var csharp: CSharpFrontendConfig = CSharpFrontendCo
                              var java: JavaFrontendConfig = JavaFrontendConfig(),
                              var js: JsFrontendConfig = JsFrontendConfig(),
                              var llvm: LlvmFrontendConfig = LlvmFrontendConfig(),
-                             var python: PythonFrontendConfig = PythonFrontendConfig())
+                             var python: PythonFrontendConfig = PythonFrontendConfig(),
+                             var php: PhpFrontendConfig = PhpFrontendConfig())
 
 class CSharpFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 class FuzzyCFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
@@ -48,6 +49,7 @@ class JavaFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 class JsFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 class LlvmFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 class PythonFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
+class PhpFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 
 object CSharpFrontendConfig {
   def apply(): CSharpFrontendConfig = new CSharpFrontendConfig()
@@ -75,4 +77,8 @@ object LlvmFrontendConfig {
 
 object PythonFrontendConfig {
   def apply(): PythonFrontendConfig = new PythonFrontendConfig()
+}
+
+object PhpFrontendConfig {
+  def apply(): PhpFrontendConfig = new PhpFrontendConfig()
 }
