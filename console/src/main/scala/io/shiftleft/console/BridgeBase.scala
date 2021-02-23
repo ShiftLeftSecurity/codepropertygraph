@@ -188,7 +188,11 @@ trait BridgeBase {
 
     val bundleName = config.pluginToRun.get
     val src = better.files.File(config.src.get).path.toAbsolutePath.toString
-    val language = config.language.getOrElse(io.shiftleft.console.cpgcreation.guessLanguage(src).getOrElse("c"))
+    val language = config.language.getOrElse(
+      io.shiftleft.console.cpgcreation
+        .guessLanguage(src)
+        .map(_.toLowerCase)
+        .getOrElse("c"))
     val storeCode = if (config.store) { "save" } else { "" }
     val code = s"""
         | if (${config.overwrite} || !workspace.projectExists("$src")) {
