@@ -1,5 +1,6 @@
 package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 
+import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.help.Doc
@@ -26,6 +27,8 @@ class CfgNode[A <: nodes.CfgNode](val traversal: Traversal[A]) extends AnyVal {
         methodReturn.method
       case expression: nodes.Expression =>
         expression.method
+      case implicitCall: nodes.ImplicitCall =>
+        implicitCall._astIn.onlyChecked.asInstanceOf[nodes.Method]
     }
 
   /**
