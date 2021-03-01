@@ -1,8 +1,8 @@
 package io.shiftleft.x2cpg
 
+import better.files.File
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import better.files.File
 
 class X2CpgTests extends AnyWordSpec with Matchers {
 

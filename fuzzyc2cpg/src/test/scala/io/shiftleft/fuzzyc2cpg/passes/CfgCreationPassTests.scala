@@ -2,14 +2,15 @@ package io.shiftleft.fuzzyc2cpg.passes
 
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
-import scala.jdk.CollectionConverters._
-import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.semanticcpg.passes.cfgcreation.Cfg.{AlwaysEdge, CaseEdge, CfgEdgeType, FalseEdge, TrueEdge}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+
+import scala.jdk.CollectionConverters._
 
 class CfgCreationPassTests extends AnyWordSpec with Matchers {
 

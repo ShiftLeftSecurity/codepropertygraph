@@ -1,11 +1,11 @@
 package io.shiftleft
 
+import com.google.protobuf.GeneratedMessageV3
+
 import java.io.{File, IOException}
 import java.net.{URI, URISyntaxException}
 import java.nio.file.{FileSystem, FileSystems, Files}
 import java.util
-
-import com.google.protobuf.GeneratedMessageV3
 
 class SerializedCpg extends AutoCloseable {
 

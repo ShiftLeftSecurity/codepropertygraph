@@ -1,8 +1,8 @@
 package io.shiftleft.console.cpgcreation
 
-import java.nio.file.Path
-
 import io.shiftleft.console.JavaFrontendConfig
+
+import java.nio.file.Path
 
 /**
   * Language frontend for Java archives (JAR files). Translates Java archives into code property graphs.

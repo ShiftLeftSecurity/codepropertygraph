@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.language.dotextension.DdgNodeDot
 import io.shiftleft.dataflowengineoss.language.nodemethods.{ExpressionMethods, TrackingPointMethods}
 import io.shiftleft.semanticcpg.language.nodemethods.AstNodeMethods
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.AstNode
 import overflowdb.traversal.Traversal
 
 package object language {

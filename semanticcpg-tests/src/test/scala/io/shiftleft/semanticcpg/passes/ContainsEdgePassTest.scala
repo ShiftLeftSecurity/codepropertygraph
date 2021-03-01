@@ -1,12 +1,12 @@
 package io.shiftleft.semanticcpg.passes
 
-import overflowdb._
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import overflowdb._
 
 import scala.jdk.CollectionConverters._
 

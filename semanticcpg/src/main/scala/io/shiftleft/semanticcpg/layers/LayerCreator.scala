@@ -5,8 +5,7 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.Overlays
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 
 abstract class LayerCreator {
 

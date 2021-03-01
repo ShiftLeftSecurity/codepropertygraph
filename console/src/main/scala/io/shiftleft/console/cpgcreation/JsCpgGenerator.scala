@@ -1,8 +1,8 @@
 package io.shiftleft.console.cpgcreation
 
-import java.nio.file.Path
-
 import io.shiftleft.console.JsFrontendConfig
+
+import java.nio.file.Path
 
 case class JsCpgGenerator(config: JsFrontendConfig, rootPath: Path) extends CpgGenerator {
 

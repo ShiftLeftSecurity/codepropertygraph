@@ -1,8 +1,8 @@
 package io.shiftleft.semanticcpg.testfixtures
 
-import java.io.File
-
 import io.shiftleft.codepropertygraph.Cpg
+
+import java.io.File
 
 /**
   * LanguageFrontend encapsulates the logic that translates the source code directory

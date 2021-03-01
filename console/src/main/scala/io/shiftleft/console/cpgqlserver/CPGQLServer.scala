@@ -1,12 +1,10 @@
 package io.shiftleft.console.cpgqlserver
 
-import java.util.Base64
-import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
-
 import cask.model.{Request, Response}
-
 import io.shiftleft.console.embammonite.{EmbeddedAmmonite, QueryResult}
+
+import java.util.concurrent.ConcurrentHashMap
+import java.util.{Base64, UUID}
 
 class CPGQLServer(ammonite: EmbeddedAmmonite,
                   serverHost: String,

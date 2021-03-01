@@ -1,8 +1,8 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
+
 import scala.jdk.CollectionConverters._
 
 class MethodParameterOut(val traversal: Traversal[nodes.MethodParameterOut]) extends AnyVal {

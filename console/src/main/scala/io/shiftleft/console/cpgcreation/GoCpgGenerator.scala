@@ -1,8 +1,8 @@
 package io.shiftleft.console.cpgcreation
 
-import java.nio.file.Path
-
 import io.shiftleft.console.GoFrontendConfig
+
+import java.nio.file.Path
 
 /**
   * Language frontend for Go code.  Translates Go source code into Code Property Graphs.

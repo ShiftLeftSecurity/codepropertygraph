@@ -7,6 +7,7 @@ import cats.effect.IO
 import cats.instances.list._
 import cats.syntax.traverse._
 import io.shiftleft.codepropertygraph.Cpg
+
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 

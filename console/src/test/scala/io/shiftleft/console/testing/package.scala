@@ -2,6 +2,7 @@ package io.shiftleft.console
 import better.files.Dsl._
 import better.files._
 import io.shiftleft.console.workspacehandling.Project
+
 import scala.util.{Failure, Success, Try}
 
 package object testing {

@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.console.workspacehandling.Project
 import overflowdb.traversal.help.Table
+
 import scala.util.Try
 
 class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {

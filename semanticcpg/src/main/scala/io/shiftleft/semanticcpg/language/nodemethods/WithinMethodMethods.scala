@@ -3,8 +3,6 @@ package io.shiftleft.semanticcpg.language.nodemethods
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes
 
-import scala.annotation.tailrec
-
 class WithinMethodMethods(val node: nodes.WithinMethod) extends AnyVal {
   def method: nodes.Method = node match {
     case node: nodes.Method             => node

@@ -3,14 +3,15 @@ package io.shiftleft.console.cpgqlserver
 import cask.util.Logger.Console._
 import castor.Context.Simple.global
 import io.shiftleft.console.embammonite.EmbeddedAmmonite
-import java.net.URLEncoder
-import java.util.UUID
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import requests.RequestFailedException
+import ujson.Value.Value
+
+import java.net.URLEncoder
+import java.util.UUID
 import scala.concurrent._
 import scala.concurrent.duration._
-import ujson.Value.Value
 
 class CPGQLServerTests extends AnyWordSpec with Matchers {
   val validBasicAuthHeaderVal = "Basic dXNlcm5hbWU6cGFzc3dvcmQ="

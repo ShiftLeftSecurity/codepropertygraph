@@ -1,7 +1,5 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import java.io.IOException
-
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.passes.DiffGraph
@@ -10,6 +8,7 @@ import io.shiftleft.utils.StringInterner
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
 
+import java.io.IOException
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 

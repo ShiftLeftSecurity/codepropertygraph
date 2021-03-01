@@ -1,16 +1,15 @@
 package io.shiftleft.console.workspacehandling
 
-import java.net.URLEncoder
-import java.nio.file.Path
-
 import better.files.Dsl._
 import better.files._
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
-import overflowdb.Config
 import org.json4s.DefaultFormats
 import org.json4s.native.Serialization.{write => jsonWrite}
+import overflowdb.Config
 
+import java.net.URLEncoder
+import java.nio.file.Path
 import scala.collection.mutable.ListBuffer
 import scala.reflect.io.Directory
 import scala.util.{Failure, Success, Try}

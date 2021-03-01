@@ -1,9 +1,8 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
-import overflowdb.traversal.Traversal
-import overflowdb.traversal.help
 import overflowdb.traversal.help.Doc
+import overflowdb.traversal.{Traversal, help}
 
 @help.Traversal(elementType = classOf[nodes.Block])
 class Block(val traversal: Traversal[nodes.Block]) extends AnyVal {

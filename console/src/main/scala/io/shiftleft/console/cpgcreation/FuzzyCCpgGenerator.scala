@@ -1,9 +1,9 @@
 package io.shiftleft.console.cpgcreation
 
-import java.nio.file.Path
-
 import io.shiftleft.console.FuzzyCFrontendConfig
 import io.shiftleft.fuzzyc2cpg.FuzzyC2Cpg
+
+import java.nio.file.Path
 
 /**
   * Fuzzy C/C++ language frontend. Translates C/C++ source files

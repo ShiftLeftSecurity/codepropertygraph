@@ -1,8 +1,8 @@
 package io.shiftleft.console.cpgcreation
 
-import java.nio.file.Path
-
 import io.shiftleft.console.LlvmFrontendConfig
+
+import java.nio.file.Path
 
 /**
   * Language frontend for LLVM.  Translates LLVM bitcode into Code Property Graphs.

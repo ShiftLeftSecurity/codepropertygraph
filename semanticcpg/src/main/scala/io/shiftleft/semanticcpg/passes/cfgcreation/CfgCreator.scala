@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes.cfgcreation
 
-import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes.CfgNode
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators, nodes}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgcreation.Cfg.CfgEdgeType

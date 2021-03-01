@@ -1,18 +1,16 @@
 package io.shiftleft.console
 
-import java.io.FileOutputStream
-import java.util.zip.ZipOutputStream
-
 import better.files.Dsl._
 import better.files._
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.console.testing._
+import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, Scpg}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-import io.shiftleft.semanticcpg.language._
-import io.shiftleft.console.testing._
-import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, Scpg}
-
+import java.io.FileOutputStream
+import java.util.zip.ZipOutputStream
 import scala.util.Try
 
 class ConsoleTests extends AnyWordSpec with Matchers {

@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.console.Query
 import overflowdb.traversal.Traversal
+
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox
 

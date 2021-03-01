@@ -1,8 +1,8 @@
 package io.shiftleft.cpgvalidator.facts
 
-import java.io.FileInputStream
-
 import play.api.libs.json.{JsValue, Json}
+
+import java.io.FileInputStream
 
 abstract class FactsImporter {
 

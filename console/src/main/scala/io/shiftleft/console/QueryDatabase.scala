@@ -3,6 +3,7 @@ package io.shiftleft.console
 import org.reflections8.Reflections
 import org.reflections8.util.{ClasspathHelper, ConfigurationBuilder}
 import org.slf4j.{Logger, LoggerFactory}
+
 import scala.annotation.{StaticAnnotation, unused}
 import scala.jdk.CollectionConverters._
 import scala.reflect.runtime.universe._

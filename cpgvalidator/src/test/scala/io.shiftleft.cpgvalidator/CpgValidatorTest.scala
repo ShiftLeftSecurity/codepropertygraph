@@ -1,12 +1,12 @@
 package io.shiftleft.cpgvalidator
 
-import io.shiftleft.codepropertygraph.generated.NodeTypes
-import io.shiftleft.cpgvalidator.validators.CpgValidator
-import overflowdb._
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.NodeTypes
+import io.shiftleft.cpgvalidator.validators.CpgValidator
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import overflowdb._
 
 class CpgValidatorTest extends AnyWordSpec with Matchers {
   private def withNewBaseCpg[T](fun: Cpg => T): T = {

@@ -4,9 +4,10 @@ import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
-import scala.jdk.CollectionConverters._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+
+import scala.jdk.CollectionConverters._
 
 class TypeNodePassTests extends AnyWordSpec with Matchers {
   "TypeNodePass" should {

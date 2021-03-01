@@ -2,8 +2,8 @@ package io.shiftleft.fuzzyc2cpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.fuzzyc2cpg.passes.astcreation.{AntlrCModuleParserDriver, AstVisitor}
 import io.shiftleft.fuzzyc2cpg.Global
+import io.shiftleft.fuzzyc2cpg.passes.astcreation.{AntlrCModuleParserDriver, AstVisitor}
 import io.shiftleft.passes.{DiffGraph, IntervalKeyPool, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language.types.structure.Namespace
 import org.slf4j.LoggerFactory

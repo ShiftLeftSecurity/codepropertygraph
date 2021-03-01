@@ -2,11 +2,11 @@ package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
-import overflowdb._
 import io.shiftleft.semanticcpg.passes.linking.capturinglinker.CapturingLinker
 import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import overflowdb._
 
 import scala.jdk.CollectionConverters._
 

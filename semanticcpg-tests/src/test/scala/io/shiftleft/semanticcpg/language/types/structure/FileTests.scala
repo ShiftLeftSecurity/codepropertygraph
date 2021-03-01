@@ -1,9 +1,9 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import org.scalatest.{LoneElement, Matchers, WordSpec}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
+import org.scalatest.LoneElement
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 

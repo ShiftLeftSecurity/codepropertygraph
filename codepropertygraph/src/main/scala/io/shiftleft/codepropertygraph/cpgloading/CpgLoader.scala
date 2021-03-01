@@ -3,8 +3,7 @@ package io.shiftleft.codepropertygraph.cpgloading
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.NodeKeys
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.Graph
 
 import scala.util.Try

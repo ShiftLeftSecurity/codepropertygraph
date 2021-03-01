@@ -4,8 +4,6 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.dotgenerator.DotAstGenerator
 import overflowdb.traversal.Traversal
 
-import scala.language.postfixOps
-
 class AstNodeDot[NodeType <: nodes.AstNode](val traversal: Traversal[NodeType]) extends AnyVal {
 
   def dotAst: Traversal[String] = DotAstGenerator.dotAst(traversal)

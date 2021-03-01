@@ -1,12 +1,11 @@
 package io.shiftleft.console.workspacehandling
 
-import java.nio.file.Path
-
 import better.files.Dsl.mkdirs
 import better.files.File
 import org.json4s.DefaultFormats
 import org.json4s.native.Serialization.{read => jsonRead}
 
+import java.nio.file.Path
 import scala.collection.mutable.ListBuffer
 import scala.util.{Failure, Success, Try}
 

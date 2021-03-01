@@ -1,7 +1,7 @@
 package io.shiftleft.fuzzyc2cpg.standard
 
-import io.shiftleft.semanticcpg.language._
 import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
+import io.shiftleft.semanticcpg.language._
 
 class MethodReturnTests extends FuzzyCCodeToCpgSuite {
 

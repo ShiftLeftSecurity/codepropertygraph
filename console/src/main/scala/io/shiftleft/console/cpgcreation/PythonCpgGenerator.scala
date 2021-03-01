@@ -1,8 +1,8 @@
 package io.shiftleft.console.cpgcreation
 
-import java.nio.file.Path
-
 import io.shiftleft.console.PythonFrontendConfig
+
+import java.nio.file.Path
 
 case class PythonCpgGenerator(config: PythonFrontendConfig, rootPath: Path) extends CpgGenerator {
 

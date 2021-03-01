@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, CfgNode, Expression}
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Expression}
 import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
 import org.json4s.JString

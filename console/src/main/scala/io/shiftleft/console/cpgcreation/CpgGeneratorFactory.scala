@@ -1,7 +1,5 @@
 package io.shiftleft.console.cpgcreation
 
-import java.nio.file.Path
-
 import better.files.Dsl._
 import better.files.File
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
@@ -9,6 +7,7 @@ import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.console.ConsoleConfig
 import overflowdb.Config
 
+import java.nio.file.Path
 import scala.util.Try
 
 class CpgGeneratorFactory(config: ConsoleConfig) {

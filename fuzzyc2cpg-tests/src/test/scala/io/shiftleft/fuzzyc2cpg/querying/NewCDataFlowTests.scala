@@ -1,9 +1,8 @@
 package io.shiftleft.fuzzyc2cpg.querying
 
+import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.fuzzyc2cpg.testfixtures.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.dataflowengineoss.language._
-import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 
 class NewCDataFlowTests1 extends DataFlowCodeToCpgSuite {
   override val code =

@@ -1,9 +1,8 @@
 package io.shiftleft.console.scripting
 
+import io.shiftleft.codepropertygraph.Cpg
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-
-import io.shiftleft.codepropertygraph.Cpg
 
 import java.nio.file.{Path, Paths}
 

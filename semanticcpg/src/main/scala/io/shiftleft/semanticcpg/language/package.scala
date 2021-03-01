@@ -1,8 +1,8 @@
 package io.shiftleft.semanticcpg
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, StoredNode}
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, StoredNode}
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.{AstNodeDot, CfgNodeDot}
 import io.shiftleft.semanticcpg.language.nodemethods._
@@ -10,7 +10,7 @@ import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
 import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall, _}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod, _}
-import overflowdb.traversal.{Traversal, _}
+import overflowdb.traversal.Traversal
 
 /**
   Language for traversing the code property graph

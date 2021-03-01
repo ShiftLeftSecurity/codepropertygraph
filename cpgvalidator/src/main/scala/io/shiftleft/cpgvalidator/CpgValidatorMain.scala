@@ -1,9 +1,9 @@
 package io.shiftleft.cpgvalidator
 
-import java.io.File
-
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.cpgvalidator.validators.CpgValidator
+
+import java.io.File
 
 object CpgValidatorMain extends App {
   case class Config(cpgPath: String, isOldProtoCpg: Boolean = false)
