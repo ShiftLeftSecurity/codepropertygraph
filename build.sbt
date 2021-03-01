@@ -59,7 +59,7 @@ ThisBuild / libraryDependencies ++= Seq(
 
 // Scalafix / imports check setup
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0-alpha.1"
-ThisBuild / semanticdbEnabled := true // enable SemanticDB
+ThisBuild / semanticdbEnabled := true
 ThisBuild / semanticdbVersion := scalafixSemanticdb.revision // use Scalafix compatible version
 
 name := "codepropertygraph"
