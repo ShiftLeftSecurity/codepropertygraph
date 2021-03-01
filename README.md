@@ -35,14 +35,10 @@ The build process has been verified on Linux and it should be possible
 to build on OS X and BSD systems as well. The build process requires
 the following prerequisites:
 
-* Java runtime 8
-  - Link: http://openjdk.java.net/install/
-* Scala build tool (sbt)
-  - Link: https://www.scala-sbt.org/
-* Git-lfs
-  - Link: https://git-lfs.github.com/
-* Protoc
-  - Link: https://github.com/protocolbuffers/protobuf/releases
+* [Java runtime 8](http://openjdk.java.net/install/)
+* [Scala build tool (SBT)](https://www.scala-sbt.org/)
+* [Git-lfs](https://git-lfs.github.com/)
+* [Protocol Buffer](https://github.com/protocolbuffers/protobuf/releases)
 
 Some binary files required for testing are managed through `git-lfs`. If you haven't cloned this repository yet, simply run `git lfs install`.
 If you have cloned it already, additionally run `git lfs pull` (from within the repository).
@@ -56,6 +52,15 @@ This command will install the following artifacts:
 * _codepropertygraph-VERSION.jar_: Java and Scala classes to be used in combination with the ShiftLeft Tinkergraph [3].
 
 * _codepropertygraph-protos-VERSION.jar_: Java bindings for Google's Protocol Buffer definitions
+
+# Code style
+
+Code style is automatically verified by external tools:
+
+* [scalafmt](https://github.com/scalameta/scalafmt)
+* [scalafix](https://github.com/scalacenter/scalafix)
+
+If your PR build fails code formatting check, simply run `sbt format` and submit the change along with the rest of the code. The commands runs necessary formatting in the right order.
 
 # Creating Protocol Buffer bindings for different languages
 
