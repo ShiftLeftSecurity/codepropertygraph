@@ -1,17 +1,12 @@
 package io.shiftleft.passes
 
 import com.google.protobuf.GeneratedMessageV3
+import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
-import io.shiftleft.SerializedCpg
-import java.util
-import java.lang.{Long => JLong}
+import org.slf4j.{Logger, LoggerFactory}
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import overflowdb.Node
-import gnu.trove.map.hash.THashMap
-import scala.collection.mutable
+import java.lang.{Long => JLong}
 import scala.concurrent.duration.DurationLong
 
 /**

@@ -2,8 +2,8 @@ package io.shiftleft.cpgvalidator.validators.cfg
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import io.shiftleft.cpgvalidator.{CfgEdgeError, ValidationErrorRegistry}
 import io.shiftleft.cpgvalidator.validators.Validator
+import io.shiftleft.cpgvalidator.{CfgEdgeError, ValidationErrorRegistry}
 import overflowdb.Node
 
 import scala.collection.mutable

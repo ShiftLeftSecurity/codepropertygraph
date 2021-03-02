@@ -4,11 +4,11 @@ import better.files._
 import cats.effect.IO
 import io.circe.generic.auto._
 import io.circe.parser._
-import org.zeroturnaround.zip.{NameMapper, ZipUtil}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.CpgLoader
-import java.nio.file.{Files, NoSuchFileException}
+import org.zeroturnaround.zip.{NameMapper, ZipUtil}
 
+import java.nio.file.{Files, NoSuchFileException}
 import scala.util.Try
 
 object ScriptManager {

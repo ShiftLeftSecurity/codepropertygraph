@@ -1,13 +1,13 @@
 package io.shiftleft.semanticcpg.testfixtures
 
-import java.io.{File, PrintWriter}
-import java.nio.file.Files
-
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+
+import java.io.{File, PrintWriter}
+import java.nio.file.Files
 
 class CodeToCpgFixture(val frontend: LanguageFrontend) extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 

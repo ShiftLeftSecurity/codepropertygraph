@@ -1,11 +1,11 @@
 package io.shiftleft.console.workspacehandling
 
-import java.nio.file.Path
-
-import better.files.File
 import better.files.Dsl._
+import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.Overlays
+
+import java.nio.file.Path
 
 object Project {
   val workCpgFileName = "cpg.bin.tmp"

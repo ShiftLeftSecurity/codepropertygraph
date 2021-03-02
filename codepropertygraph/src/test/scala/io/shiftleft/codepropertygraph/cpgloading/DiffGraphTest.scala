@@ -1,13 +1,13 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
 import io.shiftleft.OverflowDbTestInstance
-import overflowdb._
-import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import io.shiftleft.passes.{DiffGraph, IntervalKeyPool}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import overflowdb._
+import overflowdb.traversal._
 
 class DiffGraphTest extends AnyWordSpec with Matchers {
   "should be able to build an inverse DiffGraph" in {

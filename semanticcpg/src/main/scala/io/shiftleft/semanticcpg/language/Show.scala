@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
 import overflowdb.Node
+
 import scala.jdk.CollectionConverters._
 
 /**

@@ -1,17 +1,14 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import java.util.{NoSuchElementException, Collection => JCollection}
-
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.{Edge, Node}
 import io.shiftleft.proto.cpg.Cpg.PropertyValue
 import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase._
 import io.shiftleft.utils.StringInterner
-
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
 
+import java.util.{Collection => JCollection, NoSuchElementException}
 import scala.jdk.CollectionConverters._
 
 object ProtoToCpg {

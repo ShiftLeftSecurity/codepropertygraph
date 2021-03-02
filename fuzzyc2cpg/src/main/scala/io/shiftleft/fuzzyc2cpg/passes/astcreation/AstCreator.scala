@@ -1,11 +1,8 @@
 package io.shiftleft.fuzzyc2cpg.passes.astcreation
 
-import io.shiftleft.fuzzyc2cpg.ast.AstNode
-import io.shiftleft.fuzzyc2cpg.ast.walking.ASTNodeVisitor
-import org.slf4j.LoggerFactory
-import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators, nodes}
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
-import io.shiftleft.fuzzyc2cpg.{Defines, Global}
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators, nodes}
+import io.shiftleft.fuzzyc2cpg.ast.AstNode
 import io.shiftleft.fuzzyc2cpg.ast.declarations.{ClassDefStatement, IdentifierDecl}
 import io.shiftleft.fuzzyc2cpg.ast.expressions.{
   AdditiveExpression,
@@ -54,8 +51,11 @@ import io.shiftleft.fuzzyc2cpg.ast.statements.jump.{
   ThrowStatement
 }
 import io.shiftleft.fuzzyc2cpg.ast.statements.{ExpressionStatement, IdentifierDeclStatement}
+import io.shiftleft.fuzzyc2cpg.ast.walking.ASTNodeVisitor
+import io.shiftleft.fuzzyc2cpg.{Defines, Global}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.proto.cpg.Cpg.{DispatchTypes, EvaluationStrategies}
+import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
 

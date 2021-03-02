@@ -1,13 +1,13 @@
 package io.shiftleft.fuzzyc2cpg.testfixtures
 
-import java.io.File
-
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
 import io.shiftleft.semanticcpg.testfixtures.LanguageFrontend
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+
+import java.io.File
 
 class CodeDirToCpgFixture extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 

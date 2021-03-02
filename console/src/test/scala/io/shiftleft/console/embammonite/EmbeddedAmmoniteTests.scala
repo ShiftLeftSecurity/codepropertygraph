@@ -1,9 +1,9 @@
 package io.shiftleft.console.embammonite
 
-import java.util.concurrent.Semaphore
-
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+
+import java.util.concurrent.Semaphore
 
 class EmbeddedAmmoniteTests extends AnyWordSpec with Matchers {
 

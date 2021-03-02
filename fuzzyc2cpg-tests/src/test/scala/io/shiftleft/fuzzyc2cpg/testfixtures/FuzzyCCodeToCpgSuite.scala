@@ -1,9 +1,10 @@
 package io.shiftleft.fuzzyc2cpg.testfixtures
 
-import java.io.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.fuzzyc2cpg.FuzzyC2Cpg
 import io.shiftleft.semanticcpg.testfixtures.{CodeToCpgFixture, LanguageFrontend}
+
+import java.io.File
 
 class FuzzycFrontend extends LanguageFrontend {
   def execute(sourceCodePath: File): Cpg = {

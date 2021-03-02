@@ -1,10 +1,10 @@
 package io.shiftleft.semanticcpg.passes
-import scala.collection.mutable
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{nodes, NodeKeyNames}
+import io.shiftleft.codepropertygraph.generated.{NodeKeyNames, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import scala.jdk.CollectionConverters._
+
+import scala.collection.mutable
 
 class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
   val overwritten = mutable.HashSet[nodes.Binding]()

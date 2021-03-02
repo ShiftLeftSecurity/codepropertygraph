@@ -1,20 +1,19 @@
 package io.shiftleft.fuzzyc2cpg
 
-import org.slf4j.LoggerFactory
-import java.nio.file.Files
-import java.util.concurrent.ConcurrentHashMap
-
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.fuzzyc2cpg.passes.{AstCreationPass, CMetaDataPass, StubRemovalPass, TypeNodePass}
 import io.shiftleft.passes.{IntervalKeyPool, KeyPoolCreator}
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.x2cpg.SourceFiles
+import org.slf4j.LoggerFactory
 import overflowdb.{Config, Graph}
 
+import java.nio.file.Files
+import java.util.concurrent.ConcurrentHashMap
 import scala.collection.mutable.ListBuffer
-import scala.util.control.NonFatal
 import scala.jdk.CollectionConverters._
+import scala.util.control.NonFatal
 
 case class Global(usedTypes: ConcurrentHashMap[String, Boolean] = new ConcurrentHashMap[String, Boolean]())
 

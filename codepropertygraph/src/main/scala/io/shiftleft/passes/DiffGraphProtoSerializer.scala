@@ -1,12 +1,10 @@
 package io.shiftleft.passes
 
-import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
-import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
-import java.lang.{Long => JLong}
-
 import com.google.protobuf.ByteString
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, NewNode, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
+import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
+import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
 import io.shiftleft.proto.cpg.Cpg.{
   AdditionalEdgeProperty,
   AdditionalNodeProperty,
@@ -14,6 +12,7 @@ import io.shiftleft.proto.cpg.Cpg.{
   ContainedRefs,
   CpgOverlay,
   CpgStruct,
+  DiffGraph => DiffGraphProto,
   DoubleList,
   EdgePropertyName,
   FloatList,
@@ -21,10 +20,11 @@ import io.shiftleft.proto.cpg.Cpg.{
   LongList,
   NodePropertyName,
   PropertyValue,
-  StringList,
-  DiffGraph => DiffGraphProto
+  StringList
 }
 import overflowdb._
+
+import java.lang.{Long => JLong}
 
 object DiffGraphProtoSerializer {
   val nodePropertyNames: Set[String] = NodePropertyName.values().map { _.name() }.toSet

@@ -2,10 +2,10 @@ package io.shiftleft.semanticcpg.accesspath
 
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.generated._
+import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase.toTrackedAccessPath
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
-import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase.toTrackedAccessPath
 
 class TrackingPointToAccessPathTests extends AnyWordSpec {
 

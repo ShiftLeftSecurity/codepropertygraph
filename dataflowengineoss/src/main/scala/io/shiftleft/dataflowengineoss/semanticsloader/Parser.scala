@@ -1,8 +1,8 @@
 package io.shiftleft.dataflowengineoss.semanticsloader
 
 import io.shiftleft.dataflowengineoss.{SemanticsBaseListener, SemanticsLexer, SemanticsParser}
-import org.antlr.v4.runtime.{CharStream, CharStreams, CommonTokenStream}
 import org.antlr.v4.runtime.tree.ParseTreeWalker
+import org.antlr.v4.runtime.{CharStream, CharStreams, CommonTokenStream}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._

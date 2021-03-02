@@ -6,6 +6,7 @@ import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal._
+
 import scala.jdk.CollectionConverters._
 
 class ArgumentCompat(cpg: Cpg) extends CpgPass(cpg) {

@@ -1,12 +1,11 @@
 package io.shiftleft.console.embammonite
 
 import ammonite.util.Colors
+import org.slf4j.{Logger, LoggerFactory}
+
 import java.io.{BufferedReader, InputStreamReader, PipedInputStream, PipedOutputStream, PrintWriter}
 import java.util.UUID
 import java.util.concurrent.{BlockingQueue, LinkedBlockingQueue, Semaphore}
-
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 /**
   * Result of executing a query, containing in particular

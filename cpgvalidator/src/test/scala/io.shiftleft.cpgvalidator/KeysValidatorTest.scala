@@ -1,13 +1,13 @@
 package io.shiftleft.cpgvalidator
 
-import overflowdb._
-import io.shiftleft.codepropertygraph.generated.{nodes, NodeKeys, NodeTypes}
-import io.shiftleft.cpgvalidator.validators.KeysValidator
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.Cardinality
+import io.shiftleft.cpgvalidator.validators.KeysValidator
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import overflowdb._
 
 class KeysValidatorTest extends AnyWordSpec with Matchers {
 

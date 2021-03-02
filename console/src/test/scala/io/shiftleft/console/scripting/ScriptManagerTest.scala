@@ -2,17 +2,15 @@ package io.shiftleft.console.scripting
 
 import better.files.File
 import cats.effect.IO
-import org.scalatest.{Inside}
-
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.console.scripting.ScriptManager.{ScriptCollections, ScriptDescription, ScriptDescriptions}
-
-import java.nio.file.{FileSystemNotFoundException, NoSuchFileException, Path}
-
-import scala.io.Source
-import scala.util.Try
+import org.scalatest.Inside
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+
+import java.nio.file.{FileSystemNotFoundException, NoSuchFileException, Path}
+import scala.io.Source
+import scala.util.Try
 
 class ScriptManagerTest extends AnyWordSpec with Matchers with Inside {
 

@@ -1,12 +1,10 @@
 package io.shiftleft.console.embammonite
 
+import org.slf4j.{Logger, LoggerFactory}
+
 import java.io.{BufferedReader, PrintWriter}
 import java.util.UUID
 import java.util.concurrent.BlockingQueue
-
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
 import scala.util.Try
 
 class UserRunnable(queue: BlockingQueue[Job], writer: PrintWriter, reader: BufferedReader, errReader: BufferedReader)

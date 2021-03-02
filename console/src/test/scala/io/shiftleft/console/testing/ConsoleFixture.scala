@@ -1,13 +1,13 @@
 package io.shiftleft.console.testing
 
-import java.nio.file.Path
-
 import better.files.Dsl.mkdir
 import better.files.File
-import io.shiftleft.console.cpgcreation.{CpgGeneratorFactory, ImportCode, CpgGenerator}
-import io.shiftleft.console.{Console, ConsoleConfig, DefaultAmmoniteExecutor, InstallConfig}
+import io.shiftleft.console.cpgcreation.{CpgGenerator, CpgGeneratorFactory, ImportCode}
 import io.shiftleft.console.workspacehandling.{Project, ProjectFile, WorkspaceLoader}
+import io.shiftleft.console.{Console, ConsoleConfig, DefaultAmmoniteExecutor, InstallConfig}
 import io.shiftleft.fuzzyc2cpg.FuzzyC2Cpg
+
+import java.nio.file.Path
 
 object ConsoleFixture {
   def apply[T <: Console[Project]](constructor: String => T = { x =>

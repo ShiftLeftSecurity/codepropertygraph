@@ -2,11 +2,11 @@ package io.shiftleft.fuzzyc2cpg.passes
 
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, Operators, nodes}
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, Operators, nodes}
 import overflowdb.traversal._
 
 class AstCreationPassTests extends AnyWordSpec with Matchers {

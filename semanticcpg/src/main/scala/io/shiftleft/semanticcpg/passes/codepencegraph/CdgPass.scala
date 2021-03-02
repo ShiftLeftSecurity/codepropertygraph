@@ -7,7 +7,6 @@ import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominatorFrontier, ReverseCpgCfgAdapter}
 import org.slf4j.{Logger, LoggerFactory}
-import overflowdb._
 
 import scala.jdk.CollectionConverters._
 

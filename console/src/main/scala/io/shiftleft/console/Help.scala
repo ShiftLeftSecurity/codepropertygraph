@@ -1,7 +1,7 @@
 package io.shiftleft.console
 
-import overflowdb.traversal.help.{Doc, Table}
 import org.apache.commons.lang.WordUtils
+import overflowdb.traversal.help.{Doc, Table}
 
 import scala.reflect.runtime.universe.{TypeTag, typeOf}
 

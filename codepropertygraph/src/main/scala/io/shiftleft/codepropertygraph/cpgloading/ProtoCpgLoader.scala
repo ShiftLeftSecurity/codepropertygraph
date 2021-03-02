@@ -1,18 +1,15 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
 import com.google.protobuf.GeneratedMessageV3
-
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct, DiffGraph}
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge
-import java.util.{Collection => JCollection, List => JList}
-import java.io.InputStream
-import java.nio.file.{Files, Path}
-
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct, DiffGraph}
+import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.Config
 
+import java.io.InputStream
+import java.nio.file.{Files, Path}
+import java.util.{Collection => JCollection, List => JList}
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try, Using}

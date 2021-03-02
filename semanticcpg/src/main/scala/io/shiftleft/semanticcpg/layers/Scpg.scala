@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes}
 import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.passes.{BindingMethodOverridesPass, FileCreationPass}
 import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
 import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
 import io.shiftleft.semanticcpg.passes.compat.argumentcompat.ArgumentCompat
@@ -22,6 +21,7 @@ import io.shiftleft.semanticcpg.passes.methodexternaldecorator.MethodExternalDec
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
 import io.shiftleft.semanticcpg.passes.trim.TrimPass
+import io.shiftleft.semanticcpg.passes.{BindingMethodOverridesPass, FileCreationPass}
 
 object Scpg {
   val overlayName: String = "semanticcpg"

@@ -23,8 +23,12 @@ jobs:
       run: sudo apt-get install -y --allow-downgrades sbt=1.3.12
     - name: Print sbt version
       run: sbt --version
-    - name: Run tests
-      run: sbt scalafmtCheck test
+    - name: Compile and run tests
+      run: sbt compile test
+    - name: Check formatting
+      run: sbt scalafmtCheck test:scalafmtCheck "scalafixAll --check OrganizeImports"
+    - run: echo "Previous step failed because code is not formatted. Run `sbt format`"
+      if: ${{ failure() }}
 
   test-fuzzypp-linux:
     runs-on: ubuntu-18.04

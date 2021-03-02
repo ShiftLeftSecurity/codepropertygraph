@@ -1,11 +1,10 @@
 package io.shiftleft.console
 
-import ammonite.ops.pwd
-import ammonite.ops.Path
+import ammonite.ops.{Path, pwd}
 import ammonite.util.{Colors, Res}
 import better.files._
-import io.shiftleft.console.embammonite.EmbeddedAmmonite
 import io.shiftleft.console.cpgqlserver.CPGQLServer
+import io.shiftleft.console.embammonite.EmbeddedAmmonite
 
 import java.io.{FileOutputStream, PrintStream}
 

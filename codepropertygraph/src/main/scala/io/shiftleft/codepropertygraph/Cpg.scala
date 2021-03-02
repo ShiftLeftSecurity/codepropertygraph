@@ -1,9 +1,8 @@
 package io.shiftleft.codepropertygraph
 
 import io.shiftleft.codepropertygraph.generated.{edges, nodes}
-import overflowdb.Graph
-import overflowdb.Config
 import overflowdb.traversal.help.TraversalHelp
+import overflowdb.{Config, Graph}
 
 object Cpg {
 

@@ -1,7 +1,5 @@
 package io.shiftleft.passes
 
-import java.util.Optional
-
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
@@ -9,6 +7,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 import overflowdb.traversal._
+
+import java.util.Optional
 
 class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
   val InitialNodeCode = "initialNode"

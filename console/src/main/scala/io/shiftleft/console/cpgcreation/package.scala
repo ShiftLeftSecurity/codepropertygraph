@@ -1,9 +1,9 @@
 package io.shiftleft.console
 
+import io.shiftleft.codepropertygraph.generated.Languages
+
 import java.io.File
 import java.nio.file.Path
-
-import io.shiftleft.codepropertygraph.generated.Languages
 
 package object cpgcreation {
 

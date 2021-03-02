@@ -3,8 +3,8 @@ package io.shiftleft.codepropertygraph.cpgloading
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node
 import io.shiftleft.proto.cpg.Cpg.NodePropertyName
 
-import scala.jdk.CollectionConverters._
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 
 /**
   * Removes duplicate nodes to avoid uniqueness restriction for parallel frontends.

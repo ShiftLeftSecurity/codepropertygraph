@@ -1,11 +1,11 @@
 package io.shiftleft.fuzzyc2cpg.querying
 
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.dataflowengineoss.language._
+import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.fuzzyc2cpg.testfixtures.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
-import io.shiftleft.dataflowengineoss.language._
-import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 
 class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
 

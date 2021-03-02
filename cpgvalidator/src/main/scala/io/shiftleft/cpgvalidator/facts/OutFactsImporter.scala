@@ -2,6 +2,7 @@ package io.shiftleft.cpgvalidator.facts
 
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.cpgvalidator.SuperTypes
+
 import FactConstructionClasses._
 
 class OutFactsImporter extends FactsImporter {

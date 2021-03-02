@@ -1,7 +1,6 @@
 package io.shiftleft.console
 
 import io.shiftleft.console.workspacehandling.Project
-
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 

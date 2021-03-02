@@ -1,8 +1,8 @@
 package io.shiftleft.console.cpgcreation
 
-import java.nio.file.Path
-
 import io.shiftleft.console.CSharpFrontendConfig
+
+import java.nio.file.Path
 
 /**
   * C# language frontend. Translates C# project files into code property graphs.

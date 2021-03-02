@@ -1,7 +1,8 @@
 package io.shiftleft.console.scripting
 
-import scala.reflect.runtime.currentMirror
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto
+
+import scala.reflect.runtime.currentMirror
 
 /** a workaround for a scala reflect bug, where the first invocation of scala reflect fails
   * idea: invoke this at the very start to trigger the bug. future invocations should be fine

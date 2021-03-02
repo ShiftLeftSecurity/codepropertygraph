@@ -2,10 +2,10 @@ package io.shiftleft.cpgvalidator.validators
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.NodeTypes
-import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.InFact
 import io.shiftleft.cpgvalidator._
+import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.InFact
 import io.shiftleft.cpgvalidator.facts.InFactsImporter
-import overflowdb.{Direction, Node, Edge}
+import overflowdb.{Direction, Edge, Node}
 
 import scala.jdk.CollectionConverters._
 

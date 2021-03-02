@@ -1,7 +1,7 @@
 package io.shiftleft.console
 
-import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.nodes
 import overflowdb.traversal.Traversal
 
 case class Query(name: String,

@@ -1,6 +1,7 @@
 package io.shiftleft.dataflowengineoss.queryengine
 
 import io.shiftleft.codepropertygraph.generated.nodes
+
 import scala.jdk.CollectionConverters._
 
 class ResultTable {

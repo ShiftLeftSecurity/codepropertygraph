@@ -1,8 +1,5 @@
 package io.shiftleft
 
-import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.Operators
-
 /**
   * Domain specific language for querying code property graphs
   *

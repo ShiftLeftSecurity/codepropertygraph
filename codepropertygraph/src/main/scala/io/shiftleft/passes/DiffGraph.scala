@@ -1,13 +1,12 @@
 package io.shiftleft.passes
 
-import java.security.MessageDigest
-
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, NewNode, StoredNode}
 import io.shiftleft.proto.cpg.Cpg.{DiffGraph => DiffGraphProto}
 import overflowdb._
 import overflowdb.traversal._
 
+import java.security.MessageDigest
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.jdk.CollectionConverters._

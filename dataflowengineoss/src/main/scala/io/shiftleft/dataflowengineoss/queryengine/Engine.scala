@@ -1,16 +1,15 @@
 package io.shiftleft.dataflowengineoss.queryengine
 
 import io.shiftleft.codepropertygraph.generated.nodes.Call
-
-import java.util.concurrent.{Callable, ExecutorCompletionService, ExecutorService, Executors}
 import io.shiftleft.codepropertygraph.generated.{EdgeKeys, EdgeTypes, nodes}
+import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.dataflowengineoss.language._
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.Edge
 import overflowdb.traversal.{NodeOps, Traversal}
 
+import java.util.concurrent.{Callable, ExecutorCompletionService, ExecutorService, Executors}
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
 

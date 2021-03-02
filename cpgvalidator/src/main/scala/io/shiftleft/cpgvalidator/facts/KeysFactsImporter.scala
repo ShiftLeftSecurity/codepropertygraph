@@ -1,8 +1,7 @@
 package io.shiftleft.cpgvalidator.facts
 
-import play.api.libs.json.{Json, Reads}
-
 import play.api.libs.json.Reads._
+import play.api.libs.json.{Json, Reads}
 
 class KeysFactsImporter extends FactsImporter {
 

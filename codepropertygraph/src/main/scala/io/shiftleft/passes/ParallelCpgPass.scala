@@ -1,10 +1,9 @@
 package io.shiftleft.passes
-import java.util.concurrent.LinkedBlockingQueue
-
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
+
+import java.util.concurrent.LinkedBlockingQueue
 
 abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Option[Iterator[KeyPool]] = None)
     extends CpgPassBase {

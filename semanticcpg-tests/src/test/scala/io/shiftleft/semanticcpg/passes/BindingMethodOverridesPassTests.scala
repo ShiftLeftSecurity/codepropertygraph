@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.passes
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should.Matchers

@@ -1,10 +1,10 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import java.nio.file.FileSystemNotFoundException
-
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.Config
+
+import java.nio.file.FileSystemNotFoundException
 
 /**
   * Specification of the CPGLoader. The loader allows CPGs to be loaded

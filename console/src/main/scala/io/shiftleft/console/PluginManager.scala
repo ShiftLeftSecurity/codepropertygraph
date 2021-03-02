@@ -1,6 +1,6 @@
 package io.shiftleft.console
-import better.files.File
 import better.files.Dsl._
+import better.files.File
 import better.files.File.apply
 
 import java.nio.file.Path

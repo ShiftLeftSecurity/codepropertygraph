@@ -1,8 +1,8 @@
 package io.shiftleft.fuzzyc2cpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.{CpgPass, DiffGraph, KeyPool}
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.passes.{CpgPass, DiffGraph, KeyPool}
 
 class TypeNodePass(usedTypes: List[String], cpg: Cpg, keyPool: Option[KeyPool] = None)
     extends CpgPass(cpg, "types", keyPool) {

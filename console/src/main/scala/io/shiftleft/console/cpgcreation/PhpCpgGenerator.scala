@@ -1,8 +1,8 @@
 package io.shiftleft.console.cpgcreation
 
-import java.nio.file.Path
-
 import io.shiftleft.console.PhpFrontendConfig
+
+import java.nio.file.Path
 
 case class PhpCpgGenerator(config: PhpFrontendConfig, rootPath: Path) extends CpgGenerator {
 

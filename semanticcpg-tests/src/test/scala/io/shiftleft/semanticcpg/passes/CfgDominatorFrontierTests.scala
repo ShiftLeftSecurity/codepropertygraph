@@ -1,10 +1,10 @@
 package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.OverflowDbTestInstance
-import overflowdb._
 import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgAdapter, CfgDominator, CfgDominatorFrontier, DomTreeAdapter}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import overflowdb._
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
