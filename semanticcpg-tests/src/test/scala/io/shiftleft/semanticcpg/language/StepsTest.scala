@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Expression}
 import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
-import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
+import io.shiftleft.semanticcpg.testing.MockCpg
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.matchers.should.Matchers
@@ -12,46 +12,49 @@ import overflowdb.traversal.{Traversal, jIteratortoTraversal}
 
 class StepsTest extends AnyWordSpec with Matchers {
 
+  val cpg = MockCpg()
+    .withFile("afile.c")
+    .withNamespace("anamespace")
+    .withTypeDecl("AClass", inNamespace = Some("anamespace"), inFile = Some("afile.c"))
+    .withMethod("foo", inTypeDecl = Some("AClass"))
+    .withMethod("woo", inTypeDecl = Some("AClass"))
+    .withCallInMethod("foo", "acall")
+    .withLocalInMethod("foo", "local")
+    .withLiteralArgument("acall", "moo")
+    .withIdentifierArgument("acall", "anidentifier")
+    .cpg
+
   "generic cpg" should {
 
-    "filter by regex" in ExistingCpgFixture("splitmeup") { fixture =>
-      val queryResult: List[nodes.Literal] =
-        fixture.cpg.literal.code(".*").toList
-
-      queryResult.size should be > 1
+    "filter by regex" in {
+      cpg.literal.code(".*").size shouldBe 1
     }
 
-    "filter on cpg type" in ExistingCpgFixture("splitmeup") { fixture =>
-      val mainMethods: List[nodes.Method] =
-        fixture.cpg.method
-          .name(".*")
-          .filter(_.fullName.matches(".*main.*"))
-          .toList
-
-      mainMethods.size shouldBe 1
+    "filter on cpg type" in {
+      cpg.method
+        .name(".*")
+        .count(_.fullName.matches(".*woo.*")) shouldBe 1
     }
 
-    "filter with traversal on cpg type" in ExistingCpgFixture("splitmeup") { fixture =>
-      def allMethods = fixture.cpg.method
-      val publicMethods = allMethods.where(_.isPublic)
-
-      allMethods.toList.size should be > publicMethods.toList.size
+    "filter with traversal on cpg type" in {
+      def allMethods = cpg.method.l
+      val publicMethods = allMethods.to(Traversal).where(_.isPublic)
+      allMethods.size should be > publicMethods.toList.size
     }
 
     "filter on id" when {
-      "providing one" in ExistingCpgFixture("splitmeup") { fixture =>
+      "providing one" in {
         // find an arbitrary method so we can find it again in the next step
-        val method: nodes.Method = fixture.cpg.method.head
-        val results: List[nodes.Method] = fixture.cpg.method.id(method.id).toList
-
+        val method: nodes.Method = cpg.method.head
+        val results: List[nodes.Method] = cpg.method.id(method.id).toList
         results.size shouldBe 1
         results.head.underlying.id
       }
 
-      "providing multiple" in ExistingCpgFixture("splitmeup") { fixture =>
+      "providing multiple" in {
         // find two arbitrary methods so we can find it again in the next step
-        val methods = fixture.cpg.method.toList.take(2)
-        val results: List[nodes.Method] = fixture.cpg.method.id(methods.map(_.id): _*).toList
+        val methods = cpg.method.toList.take(2)
+        val results: List[nodes.Method] = cpg.method.id(methods.map(_.id): _*).toList
 
         results.size shouldBe 2
         results.toSet shouldBe methods.toSet
@@ -59,17 +62,17 @@ class StepsTest extends AnyWordSpec with Matchers {
     }
   }
 
-  "find that all method returns are linked to a method" in ExistingCpgFixture("splitmeup") { fixture =>
-    val returnsWithMethods = fixture.cpg.method.methodReturn.l
-    val returns = fixture.cpg.methodReturn.l
+  "find that all method returns are linked to a method" in {
+    val returnsWithMethods = cpg.method.methodReturn.l
+    val returns = cpg.methodReturn.l
     returnsWithMethods.size shouldBe returns.size
   }
 
-  "allow for comprehensions" in ExistingCpgFixture("splitmeup") { fixture =>
+  "allow for comprehensions" in {
     case class MethodParamPairs(methodName: String, paramName: String)
 
     val query = for {
-      method <- fixture.cpg.method
+      method <- cpg.method
       param <- method.parameter
     } yield MethodParamPairs(method.name, param.name)
 
@@ -77,44 +80,42 @@ class StepsTest extends AnyWordSpec with Matchers {
     pairs.size should be > 0
   }
 
-  "allow lists in map/flatMap/forComprehension" in ExistingCpgFixture("splitmeup") { fixture =>
-    val query = fixture.cpg.method.isPublic.map { method =>
+  "allow lists in map/flatMap/forComprehension" in {
+    cpg.method.map { method =>
       (method.name, method.parameter.l)
-    }
-    val results: List[(String, List[nodes.MethodParameterIn])] = query.toList
-    results.size should be > 1
+    }.size should be > 1
   }
 
-  "allow side effects" in ExistingCpgFixture("splitmeup") { fixture =>
+  "allow side effects" in {
     var i = 0
-    fixture.cpg.method.sideEffect(_ => i = i + 1).exec()
+    cpg.method.sideEffect(_ => i = i + 1).exec()
     i should be > 0
   }
 
-  "allow retrieving ids" in ExistingCpgFixture("splitmeup") { fixture =>
-    fixture.cpg.method.id.l should not be empty
+  "allow retrieving ids" in {
+    cpg.method.id.l should not be empty
   }
 
-  "toJson" when ExistingCpgFixture("splitmeup") { fixture =>
+  "toJson" when {
     "operating on StoredNode" in {
-      val json = fixture.cpg.namespace.nameExact("io.shiftleft.testcode.splitmeup").toJson
+      val json = cpg.method.nameExact("foo").toJson
       val parsed = parse(json).children.head //exactly one result for the above query
-      (parsed \ "_label") shouldBe JString("NAMESPACE")
-      (parsed \ "name") shouldBe JString("io.shiftleft.testcode.splitmeup")
+      (parsed \ "_label") shouldBe JString("METHOD")
+      (parsed \ "name") shouldBe JString("foo")
     }
 
     "operating on NewNode" in {
-      val json = fixture.cpg.method.name(".*manyArgs.*").location.toJson
+      val json = cpg.method.name("foo").location.toJson
       val parsed = parse(json).children.head //exactly one result for the above query
-      (parsed \ "symbol") shouldBe JString("manyArgs")
-      (parsed \ "className") shouldBe JString("io.shiftleft.testcode.splitmeup.TestGraph")
-      (parsed \ "filename") shouldBe JString("io/shiftleft/testcode/splitmeup/TestGraph.java")
+      (parsed \ "symbol") shouldBe JString("foo")
+      (parsed \ "className") shouldBe JString("AClass")
+      (parsed \ "filename") shouldBe JString("N/A")
     }
 
     "operating on primitive" in {
-      val json = fixture.cpg.method.name(".*manyArgs.*").signature.toJson
+      val json = cpg.method.name("foo").signature.toJson
       val parsed = parse(json).children.head //exactly one result for the above query
-      parsed shouldBe JString("java.lang.String(java.lang.String,java.lang.Integer,java.lang.Long,java.lang.Double)")
+      parsed shouldBe JString("asignature")
     }
   }
 
@@ -126,20 +127,19 @@ class StepsTest extends AnyWordSpec with Matchers {
       steps.p.head shouldBe "Foo(42)"
     }
 
-    "render nodes as `(label,id): properties`" in ExistingCpgFixture("splitmeup") { fixture =>
-      def mainMethods: Traversal[nodes.Method] =
-        fixture.cpg.method.name("main")
+    "render nodes as `(label,id): properties`" in {
+      def mainMethods: Traversal[nodes.Method] = cpg.method.name("woo")
 
       val nodeId = mainMethods.head.id
       val printed = mainMethods.p.head
       printed.should(startWith(s"""(METHOD,$nodeId):"""))
-      printed.should(include("AST_PARENT_FULL_NAME: io.shiftleft.testcode.splitmeup.TestGraph"))
-      printed.should(include("FULL_NAME: io.shiftleft.testcode.splitmeup.TestGraph.main:void(java.lang.String[])"))
+      printed.should(include("IS_EXTERNAL: false"))
+      printed.should(include("FULL_NAME: woo"))
     }
 
-    "allows to provide custom Show instance" in ExistingCpgFixture("splitmeup") { fixture =>
+    "allows to provide custom Show instance" in {
       def mainMethods: Steps[nodes.Method] =
-        fixture.cpg.method.name("main")
+        cpg.method.name("woo")
 
       implicit val customShowInstance = new Show[nodes.Method] {
         override def apply(node: nodes.Method): String = "my custom pretty printer"
@@ -148,7 +148,7 @@ class StepsTest extends AnyWordSpec with Matchers {
       mainMethods.p.head shouldBe "my custom pretty printer"
     }
 
-    "uses Show instance from package" in ExistingCpgFixture("splitmeup") { fixture =>
+    "uses Show instance from package" in {
       object SomePackage {
         implicit def packageShowInstance: Show[nodes.Method] = { method: nodes.Method =>
           "package defined pretty printer"
@@ -157,7 +157,7 @@ class StepsTest extends AnyWordSpec with Matchers {
 
       import SomePackage._
       def mainMethods: Steps[nodes.Method] =
-        fixture.cpg.method.name("main")
+        cpg.method.name("woo")
 
       mainMethods.p.head shouldBe "package defined pretty printer"
     }
@@ -200,79 +200,80 @@ class StepsTest extends AnyWordSpec with Matchers {
     }
   }
 
-  "provides extension steps for Traversals and Nodes" in ExistingCpgFixture("splitmeup") { fixture =>
+  "provides extension steps for Traversals and Nodes" in {
     /* n.b. interestingly, intellij puts some red squiggles on `Traversal.file` etc. if one imports
      * `overflowdb.traversal.iterableToTraversal`,  e.g. via `import overflowdb.traversal._`
      * Looks like thats a bug in intellij's presentation compiler, esp. given that both sbt and intellij compile this
      * code without errors, and intellij's autocomplete works.
      */
-    val cpg = fixture.cpg
-    def literal = cpg.literal.code(".*wow.*")
-    literal.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
-    literal.head.file.name.head shouldBe "io/shiftleft/testcode/splitmeup/TestGraph.java"
-    literal.method.name.head shouldBe "manyArgs"
-    literal.head.method.name shouldBe "manyArgs"
+    def literal = cpg.literal.code("moo")
+    literal.method.name.head shouldBe "foo"
+    literal.head.method.name shouldBe "foo"
 
-    def typ = cpg.typ.nameExact("TestGraph")
-    typ.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
-    typ.head.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
+    def typ = cpg.typ.nameExact("AClass")
+    typ.namespace.name.head shouldBe "anamespace"
+    typ.head.namespace.name.head shouldBe "anamespace"
 
-    def typeDecl = cpg.typeDecl.nameExact("TestGraph")
-    typeDecl.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
-    typeDecl.head.namespace.name.head shouldBe "io.shiftleft.testcode.splitmeup"
+    def typeDecl = cpg.typeDecl.nameExact("AClass")
+    typeDecl.namespace.name.head shouldBe "anamespace"
+    typeDecl.head.namespace.name.head shouldBe "anamespace"
 
-    def call = cpg.call.nameExact("add")
-    call.method.name.size shouldBe 3
-    call.map(_.method.name).size shouldBe 3
+    def call = cpg.call.nameExact("acall")
+    call.method.name.size shouldBe 1
+    call.map(_.method.name).size shouldBe 1
 
     // not testable in this cpg, but if it compiles it's probably fine
     def controlStructure = cpg.controlStructure
     controlStructure.condition
     controlStructure.headOption.map(_.condition)
 
-    def identifier = cpg.identifier.name("val1")
-    identifier.refsTo.property(NodeKeys.LINE_NUMBER).head shouldBe 18
-    identifier.head.refsTo.property(NodeKeys.LINE_NUMBER).head shouldBe 18
+    def identifier = cpg.identifier.name("anidentifier")
+    identifier.refsTo.size shouldBe 1
+    identifier.head.refsTo.size shouldBe 1
 
-    def member = cpg.member.name("foo")
-    member.typeDecl.name.head shouldBe "TestGraph"
-    member.head.typeDecl.name.head shouldBe "TestGraph"
+    def member = cpg.member.name("amember")
+    member.typeDecl.name.head shouldBe "AClass"
+    member.head.typeDecl.name.head shouldBe "AClass"
 
-    def local = cpg.local.name("two")
-    local.typ.name.head shouldBe "Integer"
-    local.head.typ.name.head shouldBe "Integer"
+    def local = cpg.local.name("local")
+    local.typ.name.head shouldBe "alocaltype"
+    local.head.typ.name.head shouldBe "alocaltype"
 
-    def method = cpg.method.name("add")
-    method.parameter.size shouldBe 2
-    method.head.parameter.size shouldBe 2
+    def method = cpg.method.name("foo")
+    method.parameter.size shouldBe 1
+    method.head.parameter.size shouldBe 1
 
-    def methodParameterIn = cpg.parameter.name("one")
-    methodParameterIn.typ.name.head shouldBe "String"
-    methodParameterIn.head.typ.name.head shouldBe "String"
+    def methodParameterIn = cpg.parameter.name("param1")
+    methodParameterIn.typ.name.head shouldBe "paramtype"
+    methodParameterIn.head.typ.name.head shouldBe "paramtype"
 
-    def methodParameterOut = cpg.graph.nodes(NodeTypes.METHOD_PARAMETER_OUT).cast[nodes.MethodParameterOut].name("two")
-    methodParameterOut.typ.name.head shouldBe "Integer"
-    methodParameterOut.head.typ.name.head shouldBe "Integer"
+    def methodParameterOut =
+      cpg.graph
+        .nodes(NodeTypes.METHOD_PARAMETER_OUT)
+        .cast[nodes.MethodParameterOut]
+        .name("param1")
+    methodParameterOut.typ.name.head shouldBe "paramtype"
+    methodParameterOut.head.typ.name.head shouldBe "paramtype"
 
     def methodReturn = cpg.methodReturn.typeFullNameExact("int")
-    methodReturn.method.name.toSet shouldBe Set("methodWithCycle", "add")
-    methodReturn.map(_.method.name).toSet shouldBe Set("methodWithCycle", "add")
+    methodReturn.method.name.toSet shouldBe Set("foo", "woo")
+    methodReturn.map(_.method.name).toSet shouldBe Set("foo", "woo")
 
-    def namespace = cpg.namespace.name("io.shiftleft.testcode.splitmeup")
-    namespace.typeDecl.name.toSet shouldBe Set("TestGraph", "InlineArguments")
-    namespace.head.typeDecl.name.toSet shouldBe Set("TestGraph", "InlineArguments")
+    def namespace = cpg.namespace.name("anamespace")
+    namespace.typeDecl.name.toSet shouldBe Set("AClass")
+    namespace.head.typeDecl.name.toSet shouldBe Set("AClass")
 
-    def namespaceBlock = cpg.namespaceBlock.name("io.shiftleft.testcode.splitmeup")
-    namespaceBlock.typeDecl.name.toSet shouldBe Set("TestGraph", "InlineArguments")
-    namespaceBlock.flatMap(_.typeDecl.name).toSet shouldBe Set("TestGraph", "InlineArguments")
+    def namespaceBlock = cpg.namespaceBlock.name("anamespace")
+    namespaceBlock.typeDecl.name.toSet shouldBe Set("AClass")
+    namespaceBlock.flatMap(_.typeDecl.name).toSet shouldBe Set("AClass")
 
-    def file = cpg.file.name("io/shiftleft/testcode/splitmeup/TestGraph.java")
-    file.typeDecl.name.head shouldBe "TestGraph"
-    file.head.typeDecl.name.head shouldBe "TestGraph"
+    def file = cpg.file.name("afile.c")
+    file.typeDecl.name.head shouldBe "AClass"
+    file.head.typeDecl.name.head shouldBe "AClass"
 
     def block = cpg.graph.nodes(NodeTypes.BLOCK).cast[nodes.Block].typeFullName("int")
-    block.local.name.size shouldBe 6
-    block.flatMap(_.local.name).size shouldBe 6
+    block.local.name.size shouldBe 1
+    block.flatMap(_.local.name).size shouldBe 1
 
     // not testable in this cpg, but if it compiles it's probably fine
     def methodRef = cpg.methodRef
@@ -284,19 +285,19 @@ class StepsTest extends AnyWordSpec with Matchers {
     binding.boundMethod
     binding.headOption.map(_.boundMethod)
 
-    def expression: Traversal[Expression] = cpg.identifier.name("val1")
-    expression.expressionUp.code.head shouldBe "val0  +  val1"
-    expression.head.expressionUp.code.head shouldBe "val0  +  val1"
+    def expression: Traversal[Expression] = cpg.identifier.name("anidentifier")
+    expression.expressionUp.isCall.size shouldBe 1
+    expression.head.expressionUp.isCall.size shouldBe 1
 
 //    def cfg: Traversal[CfgNode] = cpg.method.name("add")
 
-    def ast: Traversal[AstNode] = cpg.method.name("add")
-    ast.astParent.property(NodeKeys.NAME).head shouldBe "InlineArguments"
-    ast.head.astParent.property(NodeKeys.NAME) shouldBe "InlineArguments"
+    def ast: Traversal[AstNode] = cpg.method.name("foo")
+    ast.astParent.property(NodeKeys.NAME).head shouldBe "AClass"
+    ast.head.astParent.property(NodeKeys.NAME) shouldBe "AClass"
 
     // methodForCallGraph
-    method.call.size shouldBe 2
-    method.head.call.size shouldBe 2
+    method.call.size shouldBe 1
+    method.head.call.size shouldBe 1
 
     // callForCallGraph - only verifying that it compiles
     call.callee(NoResolve)
@@ -311,12 +312,12 @@ class StepsTest extends AnyWordSpec with Matchers {
     method.head.dotCfg.head.startsWith("digraph add {")
 
     // typeFullName
-    local.typeFullName.head shouldBe "java.lang.Integer"
-    local.head.typeFullName shouldBe "java.lang.Integer"
+    local.typeFullName.head shouldBe "alocaltype"
+    local.head.typeFullName shouldBe "alocaltype"
 
     // modifierAccessors
-    method.modifier.modifierType.toSet shouldBe Set("STATIC", "VIRTUAL")
-    method.head.modifier.modifierType.toSet shouldBe Set("STATIC", "VIRTUAL")
+    method.modifier.modifierType.toSet shouldBe Set("modifiertype")
+    method.head.modifier.modifierType.toSet shouldBe Set("modifiertype")
   }
 
 }
