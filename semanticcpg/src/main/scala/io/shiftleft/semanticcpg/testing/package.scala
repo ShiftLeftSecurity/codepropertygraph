@@ -3,7 +3,6 @@ package io.shiftleft.semanticcpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Languages, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
-import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.semanticcpg.language._
 
 package object testing {
