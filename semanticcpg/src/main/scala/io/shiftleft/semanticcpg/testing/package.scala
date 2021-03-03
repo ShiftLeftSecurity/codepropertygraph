@@ -34,7 +34,7 @@ package object testing {
         )
       }
 
-    def withNamespace(name: String): MockCpg =
+    def withNamespace(name: String, inFile: Option[String] = None): MockCpg =
       withCustom { (graph, _) =>
         {
           val namespaceBlock = nodes.NewNamespaceBlock().name(name)
@@ -42,6 +42,10 @@ package object testing {
           graph.addNode(namespaceBlock)
           graph.addNode(namespace)
           graph.addEdge(namespaceBlock, namespace, EdgeTypes.REF)
+          if (inFile.isDefined) {
+            val fileNode = cpg.file.name(inFile.get).head
+            graph.addEdge(namespaceBlock, fileNode, EdgeTypes.SOURCE_FILE)
+          }
         }
       }
 
