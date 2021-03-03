@@ -26,7 +26,7 @@ jobs:
       run: sbt compile test
     - name: Check formatting
       run: sbt scalafmtCheck test:scalafmtCheck "scalafixAll --check OrganizeImports"
-    - run: echo "Previous step failed because code is not formatted. Run `sbt format`"
+    - run: echo "Previous step failed because code is not formatted. Run 'sbt format'"
       if: ${{ failure() }}
 
   test-fuzzypp-linux:
