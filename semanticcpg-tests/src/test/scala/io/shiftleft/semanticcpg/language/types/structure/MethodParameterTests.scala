@@ -2,63 +2,64 @@ package io.shiftleft.semanticcpg.language.types.structure
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
+import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class MethodParameterTests extends AnyWordSpec with Matchers {
 
-  "generic cpg" should ExistingCpgFixture("methodparameter") { fixture =>
+  val cpg = MockCpg()
+    .withMethod("foo")
+    .cpg
+
+  "generic cpg" should {
     "find parameters" when {
       "asking for all parameters" in {
         val args: List[nodes.MethodParameterIn] =
-          fixture.cpg.method.name("manyArgs").parameter.toList
+          cpg.method.name("foo").parameter.toList
 
-        args.size shouldBe 4
-        args.sortBy(_.order).map(_.typ.head.fullName) shouldBe
-          List("java.lang.String", "java.lang.Integer", "java.lang.Long", "java.lang.Double")
+        args.size shouldBe 1
+        args.sortBy(_.order).map(_.typ.head.name) shouldBe
+          List("paramtype")
       }
 
       "filtering by name" in {
         val queryResult: List[nodes.MethodParameterIn] =
-          fixture.cpg.method.parameter.name(".*").toList
-
-        queryResult.size should be > 1
+          cpg.method.parameter.name(".*").toList
+        queryResult.size shouldBe 1
       }
 
       "finding parameter by index" when {
         "specifying number" in {
           val args: List[nodes.MethodParameterIn] =
-            fixture.cpg.method.name("manyArgs").parameter.index(num = 1).toList
+            cpg.method.name("foo").parameter.index(num = 1).toList
 
           args.size shouldBe 1
-          args.head.typ.head.fullName shouldBe "java.lang.String"
+          args.head.typ.head.name shouldBe "paramtype"
         }
 
         "specifying index >= x" in {
           val args: List[nodes.MethodParameterIn] =
-            fixture.cpg.method.name("manyArgs").parameter.indexFrom(2).toList
+            cpg.method.name("foo").parameter.indexFrom(1).toList
 
-          args.map(_.typ.head.fullName).toSet shouldBe Set("java.lang.Integer", "java.lang.Long", "java.lang.Double")
+          args.map(_.typ.head.name).toSet shouldBe Set("paramtype")
         }
 
         "specifying index <= x" in {
           val args: List[nodes.MethodParameterIn] =
-            fixture.cpg.method.name("manyArgs").parameter.indexTo(2).toList
+            cpg.method.name("foo").parameter.indexTo(2).toList
 
-          args.map(_.typ.head.fullName).toSet shouldBe Set("java.lang.String", "java.lang.Integer")
+          args.map(_.typ.head.name).toSet shouldBe Set("paramtype")
         }
       }
     }
 
     "find method that a MethodParameter belongs to" in {
       val methods: List[nodes.Method] =
-        fixture.cpg.method.name("manyArgs").parameter.index(num = 1).method.toList
+        cpg.method.name("foo").parameter.index(num = 1).method.toList
 
       methods.size shouldBe 1
-      methods.head.fullName shouldBe
-        "io.shiftleft.testcode.methodparameter.MethodParameterTest.manyArgs:java.lang.String" +
-          "(java.lang.String,java.lang.Integer,java.lang.Long,java.lang.Double)"
+      methods.head.name shouldBe "foo"
     }
   }
 }
