@@ -46,7 +46,12 @@ class AstNode[A <: nodes.AstNode](val traversal: Traversal[A]) extends AnyVal {
     * Direct children of node in the AST. Siblings are ordered by their `order` fields
     * */
   def astChildren: Traversal[nodes.AstNode] =
-    traversal.out(EdgeTypes.AST).cast[nodes.AstNode].sortBy(_.order)
+    traversal.out(EdgeTypes.AST).cast[nodes.AstNode].sortBy { c =>
+      {
+        val o = c.order
+        if (o == null) new Integer(-2) else o
+      }
+    }
 
   /**
     * Parent AST node
