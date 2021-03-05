@@ -49,7 +49,8 @@ class AstNode[A <: nodes.AstNode](val traversal: Traversal[A]) extends AnyVal {
     traversal.out(EdgeTypes.AST).cast[nodes.AstNode].sortBy { c =>
       {
         val o = c.order
-        /** using `Integer` here to prevent boxing during sorting */ 
+
+        /** using `Integer` here to prevent boxing during sorting */
         if (o == null) new Integer(-2) else o
       }
     }
