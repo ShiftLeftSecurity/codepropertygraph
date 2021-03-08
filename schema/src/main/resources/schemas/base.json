@@ -42,7 +42,6 @@
         {"id": 52, "name" : "TYPE_DECL_FULL_NAME", "comment" : "The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME", "valueType" : "string", "cardinality" : "one"},
         {"id": 53, "name" : "INHERITS_FROM_TYPE_FULL_NAME", "comment" : "The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME", "valueType" : "string", "cardinality" : "list"},
         {"id": 54, "name" : "METHOD_FULL_NAME", "comment" : "The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node for each METHOD_FULL_NAME", "valueType" : "string", "cardinality" : "one"},
-        {"id": 55, "name" : "METHOD_INST_FULL_NAME", "comment" : "Deprecated", "valueType" : "string", "cardinality" : "zeroOrOne"},
         {"id": 158, "name" : "ALIAS_TYPE_FULL_NAME", "comment" : "Type full name of which a TYPE_DECL is an alias of", "valueType" : "string", "cardinality" : "zeroOrOne"},
         {"id" : 106, "name" : "FILENAME", "comment" : "Full path of canonical file that contained this node; will be linked into corresponding FILE nodes. Possible for METHOD, TYPE_DECL and NAMESPACE_BLOCK", "valueType" : "string", "cardinality" : "one"},
 
@@ -379,16 +378,6 @@
              ]}
          ]
         },
-        // METHOD_INST is deprecated.
-
-       {"id":32, "name":"METHOD_INST",
-         "keys":["NAME", "SIGNATURE", "FULL_NAME", "METHOD_FULL_NAME", "ORDER"],
-         "comment":"A method instance which always has to reference a method and may have type argument children if the referred to method is a template",
-         "outEdges": [
-             {"edgeName": "AST", "inNodes": [{"name": "TYPE_ARGUMENT"}]}
-         ],
-	 "is" : ["AST_NODE"]
-        },
 
         {"id" : 14, "name" : "ARRAY_INITIALIZER",
          "keys":[],
@@ -398,7 +387,7 @@
         },
 
         {"id":333, "name":"METHOD_REF",
-          "keys": ["CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "METHOD_INST_FULL_NAME", "METHOD_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
+          "keys": ["CODE", "ORDER", "ARGUMENT_INDEX", "TYPE_FULL_NAME", "METHOD_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
           "comment":"Reference to a method instance",
          "is": ["EXPRESSION"],
           "outEdges": [
