@@ -59,7 +59,7 @@ class ProtoToCpg(overflowConfig: Config = Config.withoutOverflow) {
       odbGraph + (node.getType.name, node.getKey, properties: _*)
     } catch {
       case e: Exception =>
-        throw new RuntimeException("Failed to insert a node. proto:\n" + node, e)
+        logger.warn("Failed to insert a node. proto:\n" + node, e)
     }
   }
 

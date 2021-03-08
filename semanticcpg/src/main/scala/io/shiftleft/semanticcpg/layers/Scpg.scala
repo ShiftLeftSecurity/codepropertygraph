@@ -8,7 +8,6 @@ import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
 import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
 import io.shiftleft.semanticcpg.passes.compat.argumentcompat.ArgumentCompat
 import io.shiftleft.semanticcpg.passes.compat.bindingtablecompat.BindingTableCompat
-import io.shiftleft.semanticcpg.passes.compat.methodinstcompat.MethodInstCompat
 import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
 import io.shiftleft.semanticcpg.passes.linking.calllinker.CallLinker
@@ -52,7 +51,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
       case Languages.JAVA =>
         Iterator(
           new ArgumentCompat(cpg),
-          new MethodInstCompat(cpg),
           new ReceiverEdgePass(cpg),
           new MethodDecoratorPass(cpg),
           new CapturingLinker(cpg),
@@ -110,7 +108,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
       case Languages.JAVASCRIPT =>
         Iterator(
           new ArgumentCompat(cpg),
-          new MethodInstCompat(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
           new CapturingLinker(cpg),
