@@ -135,7 +135,7 @@ package object testing {
       withCustom { (graph, cpg) =>
         val methodNode = cpg.method.name(methodName).head
         val blockNode = methodNode.block.head
-        val callNode = nodes.NewCall().name(callName)
+        val callNode = nodes.NewCall().name(callName).code(callName)
         graph.addNode(callNode)
         graph.addEdge(blockNode, callNode, EdgeTypes.AST)
         graph.addEdge(methodNode, callNode, EdgeTypes.CONTAINS)

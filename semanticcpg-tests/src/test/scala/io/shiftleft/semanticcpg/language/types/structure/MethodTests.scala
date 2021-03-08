@@ -1,100 +1,116 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import io.shiftleft.codepropertygraph.generated.{ModifierTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.testfixtures.ExistingCpgFixture
+import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class MethodTests extends AnyWordSpec with Matchers {
 
-  "Method traversals" should ExistingCpgFixture("method") { fixture =>
+  val cpg = MockCpg()
+    .withNamespace("namespace")
+    .withTypeDecl("TypeDecl", inNamespace = Some("namespace"))
+    .withMethod("foo", inTypeDecl = Some("TypeDecl"), external = false)
+    .withMethod("bar", inTypeDecl = Some("TypeDecl"), external = true)
+    .withCallInMethod("foo", "call")
+    .withCallInMethod("foo", "call2")
+    .withLiteralArgument("call", "literal")
+    .withCustom {
+      case (graph, cpg) =>
+        val method = cpg.method("foo").head
+        val call = cpg.call.name("call").head
+        val methodReturn = cpg.method("foo").methodReturn.head
+        graph.addEdge(method, call, EdgeTypes.CFG)
+        graph.addEdge(call, methodReturn, EdgeTypes.CFG)
+    }
+    .cpg
+
+  "Method traversals" should {
     "expand to type declaration" in {
       val queryResult: List[nodes.TypeDecl] =
-        fixture.cpg.method.name("methodWithLiteral").definingTypeDecl.toList
+        cpg.method.name("foo").definingTypeDecl.toList
 
       queryResult.size shouldBe 1
-      queryResult.head.name shouldBe "TestGraph"
+      queryResult.head.name shouldBe "TypeDecl"
     }
 
     "expand to literal" in {
       val queryResult: List[nodes.Literal] =
-        fixture.cpg.method.name("methodWithLiteral").literal.toList
+        cpg.method.name("foo").literal.toList
 
       queryResult.size shouldBe 1
-      queryResult.head.code shouldBe "\"myLiteral\""
+      queryResult.head.code shouldBe "literal"
     }
 
     "expand to namespace" in {
-      val queryResult: Set[String] = fixture.cpg.method.namespace.name.l.distinct.toSet
-      queryResult shouldBe Set("io.shiftleft.testcode.method", "java.lang")
+      val queryResult: Set[String] = cpg.method.namespace.name.l.distinct.toSet
+      queryResult shouldBe Set("namespace")
     }
 
     "filter by name" in {
       val methods: List[nodes.Method] =
-        fixture.cpg.method.name("methodWithLiteral").toList
+        cpg.method.name("foo").toList
       methods.size shouldBe 1
       verifyMainMethod(methods.head)
     }
 
     "filter by name with regex" in {
       val methods: List[nodes.Method] =
-        fixture.cpg.method.name(".*methodWithLiteral.*").toList
+        cpg.method.name(".*foo.*").toList
       methods.size shouldBe 1
       verifyMainMethod(methods.head)
     }
 
     def verifyMainMethod(main: nodes.Method) = {
-      main.name shouldBe "methodWithLiteral"
-      main.fullName shouldBe
-        "io.shiftleft.testcode.method.TestGraph.methodWithLiteral:java.lang.String()"
+      main.name shouldBe "foo"
+      main.fullName shouldBe "foo"
     }
 
     "expand to top level expressions" in {
       val expressions: List[nodes.Expression] =
-        fixture.cpg.method.name("multipleTopLevelExpressionMethod").topLevelExpressions.toList
+        cpg.method.name("foo").topLevelExpressions.toList
 
-      expressions.size shouldBe 3
+      expressions.size shouldBe 2
       expressions.map(_.code).toSet shouldBe
-        Set("this.someFunction(\"FOO\")", "this.someFunction(\"BAR\")", "return")
+        Set("call", "call2")
     }
 
     "expand to first expression" in {
       val expressions: List[nodes.Expression] =
-        fixture.cpg.method.name("methodForCfgTest").cfgFirst.toList
+        cpg.method.name("foo").cfgFirst.toList
 
       expressions.size shouldBe 1
-      expressions.head.code shouldBe "temp"
+      expressions.head.code shouldBe "call"
     }
 
     "expand to last expression" in {
       val expressions: List[nodes.Expression] =
-        fixture.cpg.method.name("methodForCfgTest").cfgLast.toList
+        cpg.method.name("foo").cfgLast.toList
 
       expressions.size shouldBe 1
-      expressions.head.code shouldBe "return"
+      expressions.head.code shouldBe "call"
     }
 
     "filter for external/internal methods" in {
-      val externals = fixture.cpg.method.external.fullName.l
+      val externals = cpg.method.external.fullName.l
       externals.size should be > 0
       externals should contain allElementsOf Seq(
-        "java.lang.Object.<init>:void()",
-        "java.lang.Object.toString:java.lang.String()"
+        "bar"
       )
 
-      val internals = fixture.cpg.method.internal.fullName.l
+      val internals = cpg.method.internal.fullName.l
       internals.size should be > 0
-      internals should not contain "java.lang.Object.<init>:void()"
+      internals should not contain "bar"
 
-      val allMethods = fixture.cpg.method.fullName.l
+      val allMethods = cpg.method.fullName.l
       allMethods should contain allElementsOf internals
       allMethods should contain allElementsOf externals
     }
 
     "get the isExternal property (true) for external method calls" in {
       val methods: List[nodes.Method] =
-        fixture.cpg.method.name("toString").toList
+        cpg.method.name("bar").toList
 
       methods.size shouldBe 1
       methods.head.isExternal shouldBe true
@@ -102,7 +118,7 @@ class MethodTests extends AnyWordSpec with Matchers {
 
     "get the isExternal property (false) for non-external method calls" in {
       val methods: List[nodes.Method] =
-        fixture.cpg.method.name("someInternalFunction").toList
+        cpg.method.name("foo").toList
 
       methods.size shouldBe 1
       methods.head.isExternal shouldBe false
@@ -110,15 +126,8 @@ class MethodTests extends AnyWordSpec with Matchers {
 
     "filter by modifier" in {
       val internalMethod: List[nodes.Method] =
-        fixture.cpg.method.name("someInternalFunction").hasModifier(ModifierTypes.PRIVATE).toList
+        cpg.method.name("foo").hasModifier("modifiertype").toList
       internalMethod.size shouldBe 1
-
-      val methodForCfgTest = fixture.cpg.method
-        .name("methodForCfgTest")
-        .hasModifier(ModifierTypes.PUBLIC)
-        .hasModifier(ModifierTypes.VIRTUAL)
-        .toList
-      methodForCfgTest.size shouldBe 1
     }
   }
 
