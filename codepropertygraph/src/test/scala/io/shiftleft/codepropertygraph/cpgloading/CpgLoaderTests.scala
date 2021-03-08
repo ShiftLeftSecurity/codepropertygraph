@@ -14,7 +14,7 @@ import java.nio.file.FileSystemNotFoundException
   * */
 class CpgLoaderTests extends AnyWordSpec with Matchers {
 
-  val filename = "resources/testcode/cpgs/hello-shiftleft-0.0.5/cpg.bin.zip"
+  val filename = "resources/testcode/cpgs/method/cpg.bin.zip"
 
   "CpgLoader" should {
 
