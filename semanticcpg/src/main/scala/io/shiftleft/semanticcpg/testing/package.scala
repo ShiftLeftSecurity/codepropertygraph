@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Languages, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Languages, ModifierTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
@@ -63,12 +63,15 @@ package object testing {
             .isExternal(isExternal)
 
           val member = nodes.NewMember().name("amember")
+          val modifier = nodes.NewModifier().modifierType(ModifierTypes.STATIC)
 
           graph.addNode(typeDeclNode)
           graph.addNode(typeNode)
           graph.addNode(member)
+          graph.addNode(modifier)
           graph.addEdge(typeNode, typeDeclNode, EdgeTypes.REF)
           graph.addEdge(typeDeclNode, member, EdgeTypes.AST)
+          graph.addEdge(member, modifier, EdgeTypes.AST)
 
           if (inNamespace.isDefined) {
             val namespaceBlock = cpg.namespaceBlock(inNamespace.get).head
