@@ -83,6 +83,8 @@ class ProtoToCpg(overflowConfig: Config = Config.withoutOverflow) {
             ", srcNode=" + srcNode +
             ", dstNode=" + dstNode
           logger.warn("Failed to insert an edge. context: " + context, e)
+        case e: Exception =>
+          logger.warn(e.getMessage)
       }
     }
   }
