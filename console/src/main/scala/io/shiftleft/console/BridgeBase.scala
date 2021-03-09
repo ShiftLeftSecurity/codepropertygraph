@@ -27,7 +27,7 @@ case class Config(
     serverPort: Int = 8080,
     serverAuthUsername: String = "",
     serverAuthPassword: String = "",
-    qdbwServe: Boolean = true,
+    qdbwServe: Boolean = false,
     qdbwServeHost: String = "localhost",
     qdbwServePort: Int = 8081,
     nocolors: Boolean = false
