@@ -46,7 +46,8 @@ class QueryDatabaseTests extends AnyWordSpec with should.Matchers {
         "a-description",
         2.0, { cpg: Cpg =>
           cpg.method
-        }
+        },
+        List()
       )
       query.title shouldBe "a-title"
       query.traversalAsString.endsWith("cpg.method") shouldBe true

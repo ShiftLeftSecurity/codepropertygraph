@@ -15,14 +15,16 @@ object QueryMacros {
                 title: String,
                 description: String,
                 score: Double,
-                traversal: Cpg => Traversal[nodes.StoredNode]): Query = macro queryInitImpl
+                traversal: Cpg => Traversal[nodes.StoredNode],
+                tags: List[String]): Query = macro queryInitImpl
 
   def queryInitImpl(c: whitebox.Context)(name: c.Tree,
                                          author: c.Tree,
                                          title: c.Tree,
                                          description: c.Tree,
                                          score: c.Tree,
-                                         traversal: c.Tree): c.Expr[Query] = {
+                                         traversal: c.Tree,
+                                         tags: c.Tree): c.Expr[Query] = {
     import c.universe._
     val fileContent = new String(traversal.pos.source.content)
     val start = traversal.pos.start
@@ -38,7 +40,8 @@ object QueryMacros {
           description = $description,
           score = $score,
           traversal = $traversal,
-          traversalAsString = $traversalAsString
+          traversalAsString = $traversalAsString,
+          tags = $tags
         )
      """
     )
