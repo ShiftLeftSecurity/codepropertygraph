@@ -5,8 +5,9 @@ import ammonite.util.{Colors, Res}
 import better.files._
 import io.shiftleft.console.cpgqlserver.CPGQLServer
 import io.shiftleft.console.embammonite.EmbeddedAmmonite
+import io.shiftleft.console.qdbwserver.QDBWServer
 
-import java.io.{FileOutputStream, PrintStream}
+import java.io.{FileOutputStream, IOException, PrintStream}
 
 case class Config(
     scriptFile: Option[Path] = None,
@@ -26,6 +27,9 @@ case class Config(
     serverPort: Int = 8080,
     serverAuthUsername: String = "",
     serverAuthPassword: String = "",
+    qdbwServe: Boolean = true,
+    qdbwServeHost: String = "localhost",
+    qdbwServePort: Int = 8081,
     nocolors: Boolean = false
 )
 
@@ -118,6 +122,20 @@ trait BridgeBase {
         .action((x, c) => c.copy(serverAuthPassword = x))
         .text("Basic auth password for the CPGQL server")
 
+      note("Query Database Website server mode")
+
+      opt[Unit]("qdbw-serve")
+        .action((_, c) => c.copy(qdbwServe = true))
+        .text("Serve Query Database Website")
+
+      opt[String]("qdbw-serve-host")
+        .action((x, c) => c.copy(qdbwServeHost = x))
+        .text("Hostname on which to expose the Query Database Website server")
+
+      opt[Int]("qdbw-serve-port")
+        .action((x, c) => c.copy(qdbwServePort = x))
+        .text("Port on which to serve the Query Database Website server")
+
       note("Misc")
 
       opt[Unit]("nocolors")
@@ -144,6 +162,8 @@ trait BridgeBase {
         case None =>
           if (config.server) {
             startHttpServer(config)
+          } else if (config.qdbwServe) {
+            serveQueryDatabaseWebsite(InstallConfig().rootPath, config)
           } else if (config.pluginToRun.isDefined) {
             runPlugin(config)
           } else {
@@ -244,6 +264,34 @@ trait BridgeBase {
         colors = ammoniteColors(config)
       )
       .run()
+  }
+
+  private def serveQueryDatabaseWebsite(installDir: File, config: Config): Unit = {
+    val websiteZip = installDir / "qdb-website.zip"
+    if (!websiteZip.exists) {
+      println("Could not find the Query Database Website content zip. Exitting...")
+      System.exit(1)
+    }
+
+    val contentDirName = "qdb-website"
+    val websiteContentDir = installDir / contentDirName
+    if (websiteContentDir.exists) {
+      try {
+        websiteContentDir.delete()
+      } catch {
+        case e: IOException => {
+          println("Could not remove query database website content folder. Exitting...")
+          System.exit(1)
+        }
+      }
+    }
+    websiteZip.unzipTo(websiteContentDir)
+
+    val server = new QDBWServer(config.qdbwServeHost, config.qdbwServePort, contentDirName)
+    println("Serving Query Database Website...")
+    println(
+      s"Open the following URL in your browser: http://${config.qdbwServeHost}:${config.qdbwServePort}/index.html")
+    server.main(Array.empty)
   }
 
   private def startHttpServer(config: Config): Unit = {
