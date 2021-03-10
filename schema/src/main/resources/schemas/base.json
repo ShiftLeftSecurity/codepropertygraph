@@ -210,7 +210,7 @@
          ]
         },
         {"id": 15, "name" : "CALL",
-         "keys": ["CODE", "NAME", "ORDER", "METHOD_FULL_NAME", "ARGUMENT_INDEX", "SIGNATURE", "LINE_NUMBER", "COLUMN_NUMBER"],
+         "keys": ["CODE", "NAME", "ORDER", "METHOD_FULL_NAME", "ARGUMENT_INDEX", "SIGNATURE", "TYPE_FULL_NAME", "LINE_NUMBER", "COLUMN_NUMBER"],
          "comment" : "A (method)-call",
          "is": ["EXPRESSION", "CALL_REPR"],
          "outEdges" : [
