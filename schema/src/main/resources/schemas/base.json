@@ -82,7 +82,7 @@
 
         {"id" : 1, "name" : "METHOD",
          "keys": ["CODE", "NAME", "FULL_NAME", "IS_EXTERNAL", "SIGNATURE",
-		  "LINE_NUMBER", "COLUMN_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER_END", "ORDER", "FILENAME"],
+		  "LINE_NUMBER", "COLUMN_NUMBER", "LINE_NUMBER_END", "COLUMN_NUMBER_END", "ORDER", "FILENAME", "HASH"],
          "comment" : "A method/function/procedure",
          "is": ["DECLARATION", "CFG_NODE", "AST_NODE"],
          "outEdges": [
