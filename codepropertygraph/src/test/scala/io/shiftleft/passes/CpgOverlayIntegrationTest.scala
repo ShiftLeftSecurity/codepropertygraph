@@ -3,7 +3,8 @@ package io.shiftleft.passes
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
+import io.shiftleft.codepropertygraph.generated.edges.Propagate
+import io.shiftleft.codepropertygraph.generated.nodes.{MethodParameterIn, MethodParameterOut, StoredNode}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
@@ -44,25 +45,27 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
       // 1) add a new node
       val addNodeInverse = applyDiffAndGetInverse(cpg)(
         _.addNode(
-          nodes.NewUnknown().code(null)
+          nodes.NewMethodParameterOut().code(null)
         ))
       cpg.graph.nodeCount shouldBe 2
-      val additionalNode = cpg.graph.V.label("UNKNOWN").l.filter { _.asInstanceOf[nodes.Unknown].code == null }.head.asInstanceOf[StoredNode]
+      val additionalNode = cpg.graph.V.label(MethodParameterOut.Label).collectFirst {
+        case mpe: MethodParameterOut if mpe.code == null => mpe
+      }.get.asInstanceOf[StoredNode]
 
       // 2) add two edges with the same label but different properties (they'll later be disambiguated by their property hash, since edges don't have IDs
       val addEdge1Inverse = applyDiffAndGetInverse(cpg)(
         _.addEdge(
           src = initialNode,
           dst = additionalNode,
-          edgeLabel = edges.ContainsNode.Label,
-          properties = Seq(EdgeKeyNames.INDEX -> Int.box(1))
+          edgeLabel = Propagate.Label,
+          properties = Seq(Propagate.PropertyNames.Alias -> Boolean.box(true))
         ))
       val addEdge2Inverse = applyDiffAndGetInverse(cpg)(
         _.addEdge(
           src = initialNode,
           dst = additionalNode,
-          edgeLabel = edges.ContainsNode.Label,
-          properties = Seq(EdgeKeyNames.INDEX -> Int.box(2))
+          edgeLabel = Propagate.Label,
+          properties = Seq(Propagate.PropertyNames.Alias -> Boolean.box(false))
         ))
       def initialNodeOutEdges = initialNode.outE.toList
       initialNodeOutEdges.size shouldBe 2
@@ -74,13 +77,13 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
       additionalNode.property(NodeKeys.CODE) shouldBe "Node2Code"
 
       // TODO 4) add edge property - not needed for now?
-//      val addEdgePropertyInverse = applyDiffAndGetInverse(cpg)(_.addEdgeProperty(initialNodeOutEdges.head, EdgeKeyNames.INDEX, Int.box(1)))
-//      initialNode.start.outE.value(EdgeKeyNames.INDEX).toList shouldBe List(1)
+//      val addEdgePropertyInverse = applyDiffAndGetInverse(cpg)(_.addEdgeProperty(initialNodeOutEdges.head, EdgeKeyNames.ALIAS, true))
+//      initialNode.start.outE.value(EdgeKeyNames.ALIAS).toList shouldBe List(1)
 
       // now apply all inverse diffgraphs in the reverse order...
       // TODO 4) remove edge property - not needed for now?
 //      DiffGraph.Applier.applyDiff(addEdgePropertyInverse, cpg)
-//      initialNode.start.outE.value(EdgeKeyNames.INDEX).toList shouldBe List.empty
+//      initialNode.start.outE.value(EdgeKeyNames.ALIAS).toList shouldBe List.empty
 
       // 3) remove node property
       DiffGraph.Applier.applyDiff(addNodePropertyInverse, cpg)
@@ -89,7 +92,7 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
       // 2) remove edges - they don't have ids and are therefor disambiguated by their property hash
       DiffGraph.Applier.applyDiff(addEdge2Inverse, cpg)
       initialNodeOutEdges.size shouldBe 1
-      initialNode.outE.property(EdgeKeys.INDEX).toList shouldBe List(Int.box(1))
+      initialNode.outE.property(EdgeKeys.ALIAS).toList shouldBe List(true)
       DiffGraph.Applier.applyDiff(addEdge1Inverse, cpg)
       initialNodeOutEdges.size shouldBe 0
 
@@ -102,7 +105,7 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
   /* like a freshly deserialized cpg.bin.zip without any overlays applied */
   def withNewBaseCpg[T](fun: Cpg => T): T = {
     val graph = OverflowDbTestInstance.create
-    graph + (NodeTypes.UNKNOWN, NodeKeys.CODE -> InitialNodeCode)
+    graph + (MethodParameterIn.Label, MethodParameterIn.Properties.Code -> InitialNodeCode)
     val cpg = Cpg(graph)
     try fun(cpg)
     finally cpg.close()
