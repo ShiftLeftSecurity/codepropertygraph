@@ -86,11 +86,7 @@ abstract public class AntlrParserDriver {
             }
             int line = token.getLine();
             String text = token.getText();
-            NewComment commentNode = new NewComment(
-                    new Some<>(line),
-                    text,
-                    filename
-            );
+            NewComment commentNode = NewComment.apply().lineNumber(new Some<>(line)).code(text).filename(filename).build();
             cpg.addNode(commentNode);
         }
     }
