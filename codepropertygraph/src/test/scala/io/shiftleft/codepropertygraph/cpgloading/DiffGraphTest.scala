@@ -2,8 +2,10 @@ package io.shiftleft.codepropertygraph.cpgloading
 
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
+import io.shiftleft.codepropertygraph.generated.edges.Propagate
+import io.shiftleft.codepropertygraph.generated.nodes.{MethodParameterIn, MethodParameterOut, NewNode, StoredNode}
 import io.shiftleft.passes.{DiffGraph, IntervalKeyPool}
+import java.lang.{Boolean => JBoolean}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
@@ -14,9 +16,9 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
     withTestOdb { graph =>
       // setup existing graph
       // add x and y nodes to graph
-      val x = graph + (NodeTypes.UNKNOWN, NodeKeys.CODE -> "x")
-      val y = graph + (NodeTypes.UNKNOWN, NodeKeys.CODE -> "old y code")
-      val x2y = x --- (EdgeTypes.CONTAINS_NODE, EdgeKeys.LOCAL_NAME -> "old edge attr") --> y
+      val x = graph + (MethodParameterIn.Label, MethodParameterIn.Properties.Code -> "x")
+      val y = graph + (MethodParameterOut.Label, MethodParameterOut.Properties.Code -> "old y code")
+      val x2y = x --- (Propagate.Label, Propagate.Properties.Alias -> true) --> y
 
       // make diffgraph
       val diffBuilder = DiffGraph.newBuilder
@@ -36,7 +38,7 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
       diffBuilder.addNodeProperty(y.asInstanceOf[StoredNode], NodeKeyNames.ORDER, Int.box(123))
       diffBuilder.addNodeProperty(y.asInstanceOf[StoredNode], NodeKeyNames.CODE, "new y code")
 
-      diffBuilder.addEdgeProperty(x2y, EdgeKeyNames.LOCAL_NAME, "new edge attr")
+      diffBuilder.addEdgeProperty(x2y, EdgeKeyNames.ALIAS, JBoolean.FALSE)
       val diffGraph = diffBuilder.build()
       // apply diffgraph with undoable = true
       val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, graph, true, None)
@@ -44,7 +46,7 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
       val changes = inverseDiffGraph.iterator.toList
       import DiffGraph.Change._
       val List(
-        SetEdgeProperty(_, EdgeKeyNames.LOCAL_NAME, "old edge attr"), // restore old edge property value
+        SetEdgeProperty(_, EdgeKeyNames.ALIAS, JBoolean.TRUE), // restore old edge property value
         SetNodeProperty(_, NodeKeyNames.CODE, "old y code"), // restore old Y property value
         RemoveNodeProperty(_, NodeKeyNames.ORDER), // remove newly added property
         RemoveEdge(_), // remove x -> a
