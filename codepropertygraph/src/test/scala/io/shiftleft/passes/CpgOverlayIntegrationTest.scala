@@ -3,6 +3,7 @@ package io.shiftleft.passes
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
@@ -17,16 +18,16 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
 
   "cpg passes being serialised to and from overlay protobuf via DiffGraph" in {
     withNewBaseCpg { cpg =>
-      val initialNode = cpg.graph.V.has(NodeKeys.CODE -> InitialNodeCode).head
-      val pass1 = passAddsEdgeTo(initialNode.asInstanceOf[nodes.StoredNode], Pass1NewNodeCode, cpg)
+      val initialNode = cpg.graph.V.has(NodeKeys.CODE -> InitialNodeCode).head.asInstanceOf[StoredNode]
+      val pass1 = passAddsEdgeTo(initialNode, Pass1NewNodeCode, cpg)
 
       val overlay1 = pass1.createApplyAndSerialize()
       fullyConsume(overlay1)
       cpg.graph.nodeCount shouldBe 2
       initialNode.out.property(NodeKeys.CODE).toList shouldBe List(Pass1NewNodeCode)
 
-      val pass1NewNode = cpg.graph.V.has(NodeKeys.CODE -> Pass1NewNodeCode).head
-      val pass2 = passAddsEdgeTo(pass1NewNode.asInstanceOf[nodes.StoredNode], Pass2NewNodeCode, cpg)
+      val pass1NewNode = cpg.graph.V.has(NodeKeys.CODE -> Pass1NewNodeCode).head.asInstanceOf[StoredNode]
+      val pass2 = passAddsEdgeTo(pass1NewNode, Pass2NewNodeCode, cpg)
 
       val overlay2 = pass2.createApplyAndSerialize()
       fullyConsume(overlay2)
@@ -38,7 +39,7 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
   "apply cpg pass, serialize the inverse DiffGraph, and apply the inverse to undo" in {
     withNewBaseCpg { cpg =>
       cpg.graph.nodeCount shouldBe 1
-      val initialNode = cpg.graph.V.has(NodeKeys.CODE, InitialNodeCode).head
+      val initialNode = cpg.graph.V.has(NodeKeys.CODE, InitialNodeCode).head.asInstanceOf[StoredNode]
 
       // 1) add a new node
       val addNodeInverse = applyDiffAndGetInverse(cpg)(
@@ -46,20 +47,20 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
           nodes.NewUnknown().code(null)
         ))
       cpg.graph.nodeCount shouldBe 2
-      val additionalNode = cpg.graph.V.label("UNKNOWN").l.filter { _.asInstanceOf[nodes.Unknown].code == null }.head
+      val additionalNode = cpg.graph.V.label("UNKNOWN").l.filter { _.asInstanceOf[nodes.Unknown].code == null }.head.asInstanceOf[StoredNode]
 
       // 2) add two edges with the same label but different properties (they'll later be disambiguated by their property hash, since edges don't have IDs
       val addEdge1Inverse = applyDiffAndGetInverse(cpg)(
         _.addEdge(
-          src = initialNode.asInstanceOf[nodes.StoredNode],
-          dst = additionalNode.asInstanceOf[nodes.StoredNode],
+          src = initialNode,
+          dst = additionalNode,
           edgeLabel = edges.ContainsNode.Label,
           properties = Seq(EdgeKeyNames.INDEX -> Int.box(1))
         ))
       val addEdge2Inverse = applyDiffAndGetInverse(cpg)(
         _.addEdge(
-          src = initialNode.asInstanceOf[nodes.StoredNode],
-          dst = additionalNode.asInstanceOf[nodes.StoredNode],
+          src = initialNode,
+          dst = additionalNode,
           edgeLabel = edges.ContainsNode.Label,
           properties = Seq(EdgeKeyNames.INDEX -> Int.box(2))
         ))
@@ -69,7 +70,7 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
       // 3) add node property
       val addNodePropertyInverse =
         applyDiffAndGetInverse(cpg)(
-          _.addNodeProperty(additionalNode.asInstanceOf[nodes.StoredNode], NodeKeyNames.CODE, "Node2Code"))
+          _.addNodeProperty(additionalNode, NodeKeyNames.CODE, "Node2Code"))
       additionalNode.property(NodeKeys.CODE) shouldBe "Node2Code"
 
       // TODO 4) add edge property - not needed for now?
