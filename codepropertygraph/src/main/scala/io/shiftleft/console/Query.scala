@@ -11,4 +11,5 @@ case class Query(name: String,
                  score: Double,
                  traversal: Cpg => Traversal[nodes.StoredNode],
                  traversalAsString: String = "",
-                 tags: List[String] = List())
+                 tags: List[String] = List(),
+                 language: String = "")
