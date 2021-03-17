@@ -49,7 +49,13 @@ class QueryDatabase(defaultArgumentProvider: DefaultArgumentProvider = new Defau
         val query = method.apply(args: _*).asInstanceOf[Query]
         val bundleNamespace = classToType(bundle).typeSymbol.fullName.toString
         // the namespace currently looks like `io.joern.scanners.c.CopyLoops`
-        val language = bundleNamespace.split('.')(3)
+        val namespaceParts = bundleNamespace.split('.')
+        var language =
+          if (namespaceParts.size > 3) {
+            namespaceParts(3)
+          } else {
+            ""
+          }
         query.copy(language = language)
       }
     }
