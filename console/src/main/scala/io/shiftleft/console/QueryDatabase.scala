@@ -45,8 +45,13 @@ class QueryDatabase(defaultArgumentProvider: DefaultArgumentProvider = new Defau
     * */
   def queriesInBundle[T <: QueryBundle](bundle: Class[T]): List[Query] = {
     queryCreatorsInBundle(bundle).map {
-      case (method, args) =>
-        method.apply(args: _*).asInstanceOf[Query]
+      case (method, args) => {
+        val query = method.apply(args: _*).asInstanceOf[Query]
+        val bundleNamespace = classToType(bundle).typeSymbol.fullName.toString
+        // the namespace currently looks like `io.joern.scanners.c.CopyLoops`
+        val language = bundleNamespace.split('.')(3)
+        query.copy(language = language)
+      }
     }
   }
 
