@@ -14,8 +14,8 @@ lazy val mergeSchemaTask = taskKey[File]("Merge schemas")
 lazy val generateProtobuf = taskKey[File]("generate protobuf definitions: cpg.proto")
 generateProtobuf := {
   import scala.sys.process._
-  val output = better.files.File((resourceManaged.in(Compile).value / "cpg.proto").toPath)
   // TODO bring back in
+  // val output = better.files.File((resourceManaged.in(Compile).value / "cpg.proto").toPath)
   // val schemaFile = (Projects.schema/mergeSchemaTask).value
   // val currentMd5 = FileUtils.md5(List(new File("codepropertygraph/codegen/src/main"), schemaFile))
   // if (!output.exists || GenerateProtobufTaskGlobalState.lastMd5 != currentMd5) {
@@ -32,7 +32,8 @@ generateProtobuf := {
   //   println("no need to regenerate protobuf")
   // }
   // GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
-  output.toJava
+  // output.toJava
+  ???
 }
 
 // note: this is only invoked on `package`, `publish` etc. since it's not needed for `compile`

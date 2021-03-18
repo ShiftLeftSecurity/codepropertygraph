@@ -49,7 +49,7 @@ generateCsharpBindings := {
 lazy val installProtoc = taskKey[File]("downloads configured protoc version for your platform, unless already available")
 installProtoc := {
   import sys.process._
-  import better.files.FileExtensions
+  // import better.files.FileExtensions
   val protocVersion = (ProtobufConfig/version).value
   val protocBinary = new File(protocBinaryPath)
   val isAlreadyInstalled = protocBinary.exists && s"$protocBinaryPath --version".!!.contains(protocVersion)
@@ -65,9 +65,9 @@ installProtoc := {
 
     println(s"downloading $url and extracting into $protocLocalDir")
     val outdir = new File(protocLocalDir)
-    if (outdir.exists) outdir.toScala.delete()
+    FileUtils.deleteRecursively(outdir)
     IO.unzipURL(url, outdir)
-    protocBinary.toScala.addPermission(java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE)
+    protocBinary.addPermission(java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE)
   }
   protocBinary
 }

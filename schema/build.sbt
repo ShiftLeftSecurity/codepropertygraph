@@ -5,6 +5,8 @@ libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "cfb6ef4560cbf65
 val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
 
 generateDomainClasses := {
+  val outputRoot = target.value / "odb-codegen"
+  FileUtils.deleteRecursively(outputRoot)
   val invoked = (Compile/runMain).toTask(s" io.shiftleft.codepropertygraph.schema.CpgSchema schema/target/odb-codegen").value
-  FileUtils.listFilesRecursively(new File("schema/target/odb-codegen"))
+  FileUtils.listFilesRecursively(outputRoot)
 }
