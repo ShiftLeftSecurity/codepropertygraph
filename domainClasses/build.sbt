@@ -1,12 +1,12 @@
 name := "codepropertygraph-domain-classes"
 
 libraryDependencies += "io.shiftleft" %% "overflowdb-traversal" % Versions.overflowdb
-dependsOn(Projects.schema)
 
-lazy val mergeSchemaTask = taskKey[File]("Merge schemas")
+val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
+
+Compile / sourceGenerators += Projects.schema / generateDomainClasses
 
 // Compile / sourceGenerators += Def.task {
-//   val schemaFile = (Projects.schema/mergeSchemaTask).value
 //   val currentMd5 = FileUtils.md5(List(new File("codepropertygraph/codegen/src/main"), schemaFile))
 //   val outputRoot = new File(sourceManaged.in(Compile).value.getAbsolutePath + "/io/shiftleft/codepropertygraph/generated")
 
@@ -14,11 +14,11 @@ lazy val mergeSchemaTask = taskKey[File]("Merge schemas")
 //     println(s"generating domain classes from $schemaFile")
 //     val basePackage = "io.shiftleft.codepropertygraph.generated"
 //     val outputDir = (Compile / sourceManaged).value
-//     new overflowdb.codegen.CodeGen(schemaFile.getAbsolutePath, basePackage).run(outputDir)
+//     val schema = new CpgSchema
+//     new overflowdb.codegen.CodeGen(schema).run(outputDir)
 //   } else {
 //     println("no need to regenerate domain classes")
 //   }
 //   CodeGenGlobalState.lastMd5 = currentMd5
-
 //   FileUtils.listFilesRecursively(outputRoot)
 // }.taskValue

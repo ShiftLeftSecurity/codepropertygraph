@@ -1,27 +1,18 @@
 name := "codepropertygraph-schema"
 
-import better.files.FileExtensions
+libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "cfb6ef4560cbf65394e8f30c3bd0db5e0e789599"
 
-lazy val mergeSchemaTask = taskKey[File]("Merge schemas")
-mergeSchemaTask := {
-  // merge schemas into one cpg.json
-  val schemasDir = new File("schema/src/main/resources/schemas")
-  val currentMd5 = FileUtils.md5(schemasDir)
-  val outputRoot = new File(sourceManaged.in(Compile).value.getAbsolutePath)
-  outputRoot.mkdirs
-  val outputFile = outputRoot / "cpg.json"
-  if (outputFile.exists && MergeSchemaTaskGlobalState.lastMd5 == currentMd5) {
-    println("schemas unchanged, no need to merge them again")
+val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
+
+generateDomainClasses := Def.taskDyn {
+  val schemaChecksum = FileUtils.md5(new File("schema/src/main"))
+  val outputRoot = target.value / "odb-codegen"
+
+  if (!outputRoot.exists || CodeGenGlobalState.lastMd5 != schemaChecksum) {
+    val generated = (Compile/runMain).toTask(s" io.shiftleft.codepropertygraph.schema.CpgSchema schema/target/odb-codegen").value
   } else {
-    val schemaFiles = schemasDir.listFiles.toSeq
-    val mergedSchema = overflowdb.codegen.SchemaMerger.mergeCollections(schemaFiles)
-    mergedSchema.toScala.copyTo(outputFile.toScala, overwrite = true)
-    println(s"successfully merged schemas into $outputFile")
+    println("no need to regenerate domain classes")
   }
-  MergeSchemaTaskGlobalState.lastMd5 = currentMd5
-  outputFile
-}
-
-Compile / resourceGenerators += Def.task {
-  Seq(mergeSchemaTask.value)
-}.taskValue
+  CodeGenGlobalState.lastMd5 = schemaChecksum
+  Def.task(FileUtils.listFilesRecursively(outputRoot))
+}.value

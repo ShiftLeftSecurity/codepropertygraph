@@ -36,11 +36,6 @@ object CodeGenGlobalState {
   var lastMd5: String = ""
 }
 
-object MergeSchemaTaskGlobalState {
-  // this is very ugly, but I can't define it like that in the build.sbt
-  var lastMd5: String = ""
-}
-
 object GenerateProtobufTaskGlobalState {
   // this is very ugly, but I can't define it like that in the build.sbt
   var lastMd5: String = ""

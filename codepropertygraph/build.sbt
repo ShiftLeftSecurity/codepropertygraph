@@ -15,22 +15,23 @@ lazy val generateProtobuf = taskKey[File]("generate protobuf definitions: cpg.pr
 generateProtobuf := {
   import scala.sys.process._
   val output = better.files.File((resourceManaged.in(Compile).value / "cpg.proto").toPath)
-  val schemaFile = (Projects.schema/mergeSchemaTask).value
-  val currentMd5 = FileUtils.md5(List(new File("codepropertygraph/codegen/src/main"), schemaFile))
-  if (!output.exists || GenerateProtobufTaskGlobalState.lastMd5 != currentMd5) {
-    // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
-    val cmd = "codepropertygraph/codegen/src/main/python/generateProtobuf.py"
-    val result = Seq(cmd).!
-    val scriptOutputFile = better.files.File("codepropertygraph/target/cpg.proto")
-    if (result == 0 && scriptOutputFile.exists) {
-      output.createIfNotExists(createParents = true)
-      scriptOutputFile.copyTo(output)(better.files.File.CopyOptions(overwrite = true))
-      println(s"successfully wrote protobuf to $scriptOutputFile")
-    } else throw new Exception(s"problem when calling $cmd. exitCode was $result")
-  } else {
-    println("no need to regenerate protobuf")
-  }
-  GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
+  // TODO bring back in
+  // val schemaFile = (Projects.schema/mergeSchemaTask).value
+  // val currentMd5 = FileUtils.md5(List(new File("codepropertygraph/codegen/src/main"), schemaFile))
+  // if (!output.exists || GenerateProtobufTaskGlobalState.lastMd5 != currentMd5) {
+  //   // TODO: port python to jpython, scala or java to avoid system call and pass values in/out
+  //   val cmd = "codepropertygraph/codegen/src/main/python/generateProtobuf.py"
+  //   val result = Seq(cmd).!
+  //   val scriptOutputFile = better.files.File("codepropertygraph/target/cpg.proto")
+  //   if (result == 0 && scriptOutputFile.exists) {
+  //     output.createIfNotExists(createParents = true)
+  //     scriptOutputFile.copyTo(output)(better.files.File.CopyOptions(overwrite = true))
+  //     println(s"successfully wrote protobuf to $scriptOutputFile")
+  //   } else throw new Exception(s"problem when calling $cmd. exitCode was $result")
+  // } else {
+  //   println("no need to regenerate protobuf")
+  // }
+  // GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
   output.toJava
 }
 
