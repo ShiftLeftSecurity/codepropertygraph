@@ -14,7 +14,6 @@ lazy val mergeSchemaTask = taskKey[File]("Merge schemas")
 lazy val generateProtobuf = taskKey[File]("generate protobuf definitions: cpg.proto")
 generateProtobuf := {
   import scala.sys.process._
-  // TODO bring back in
   // val output = better.files.File((resourceManaged.in(Compile).value / "cpg.proto").toPath)
   // val schemaFile = (Projects.schema/mergeSchemaTask).value
   // val currentMd5 = FileUtils.md5(List(new File("codepropertygraph/codegen/src/main"), schemaFile))
@@ -33,7 +32,9 @@ generateProtobuf := {
   // }
   // GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
   // output.toJava
-  ???
+
+  // TODO bring back in - dummy version for now to enable rest of testing
+  new File("/home/mp/Projects/shiftleft/codepropertygraph.1/codepropertygraph/target/cpg.proto")
 }
 
 // note: this is only invoked on `package`, `publish` etc. since it's not needed for `compile`
