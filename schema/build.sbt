@@ -7,6 +7,6 @@ val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain class
 generateDomainClasses := {
   val outputRoot = target.value / "odb-codegen"
   FileUtils.deleteRecursively(outputRoot)
-  val invoked = (Compile/runMain).toTask(s" io.shiftleft.codepropertygraph.schema.CpgSchema schema/target/odb-codegen").value
+  val invoked = (Compile/runMain).toTask(s" io.shiftleft.codepropertygraph.schema.Codegen schema/target/odb-codegen").value
   FileUtils.listFilesRecursively(outputRoot)
 }
