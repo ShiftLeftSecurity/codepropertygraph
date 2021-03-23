@@ -1,5 +1,6 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
+import io.shiftleft.utils.ProjectRoot
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.Config
@@ -14,7 +15,7 @@ import java.nio.file.FileSystemNotFoundException
   * */
 class CpgLoaderTests extends AnyWordSpec with Matchers {
 
-  val filename = "resources/testcode/cpgs/hello-shiftleft-0.0.5/cpg.bin.zip"
+  val filename = ProjectRoot.relativise("resources/testcode/cpgs/hello-shiftleft-0.0.5/cpg.bin.zip")
 
   "CpgLoader" should {
 

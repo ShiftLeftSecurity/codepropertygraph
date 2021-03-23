@@ -1,9 +1,9 @@
 package io.shiftleft.console.scripting
 
-import better.files.File
 import cats.effect.IO
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.console.scripting.ScriptManager.{ScriptCollections, ScriptDescription, ScriptDescriptions}
+import io.shiftleft.utils.ProjectRoot
 import org.scalatest.Inside
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -28,13 +28,7 @@ class ScriptManagerTest extends AnyWordSpec with Matchers with Inside {
 
   private object TestScriptManager extends ScriptManager(TestScriptExecutor)
 
-  protected val DEFAULT_CPG_NAME: String = {
-    if (File(".").name == "console") {
-      (File("..") / "resources" / "testcode" / "cpgs" / "method" / "cpg.bin.zip").pathAsString
-    } else {
-      (File("resources") / "testcode" / "cpgs" / "method" / "cpg.bin.zip").pathAsString
-    }
-  }
+  protected val DEFAULT_CPG_NAME = ProjectRoot.relativise("resources/testcode/cpgs/method/cpg.bin.zip")
 
   def withScriptManager(f: ScriptManager => Unit): Unit = {
     f(TestScriptManager)
