@@ -21,7 +21,7 @@ object QueryMacros {
 
     c.Expr(
       q"""
-        TraversalWithMeta($traversal, $traversalAsString)
+        TraversalWithStrRep($traversal, $traversalAsString)
        """
     )
   }
