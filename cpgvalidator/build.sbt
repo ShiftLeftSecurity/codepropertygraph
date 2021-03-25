@@ -10,6 +10,3 @@ libraryDependencies ++= Seq(
   "com.typesafe.play"        %% "play-json"       % "2.7.4",
   "org.scalatest"            %% "scalatest"       % Versions.scalatest % Test
 )
-
-// execute tests in root project so that they work in sbt *and* intellij
-Test / baseDirectory := (ThisBuild / Test / run / baseDirectory).value

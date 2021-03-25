@@ -2,6 +2,7 @@ package io.shiftleft.console
 
 import better.files.Dsl._
 import better.files._
+import io.shiftleft.utils.ProjectRoot
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -16,12 +17,12 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
     }
 
     "not crash if file isn't a valid zip" in Fixture() { manager =>
-      val testZipFileName = "console/src/test/resources/nonzip.zip"
+      val testZipFileName = ProjectRoot.relativise("console/src/test/resources/nonzip.zip")
       manager.add(testZipFileName)
     }
 
     "copy jar files in zip to plugin dir" in Fixture() { manager =>
-      val testZipFileName = "console/src/test/resources/test.zip"
+      val testZipFileName = ProjectRoot.relativise("console/src/test/resources/test.zip")
       manager.add(testZipFileName)
       manager.pluginDir match {
         case Some(dir) =>
@@ -31,7 +32,7 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
     }
 
     "copy schema file in zip to schema dir and execute schema extender" in Fixture() { manager =>
-      val testZipFileName = "console/src/test/resources/test.zip"
+      val testZipFileName = ProjectRoot.relativise("console/src/test/resources/test.zip")
       manager.add(testZipFileName)
       manager.schemaDir match {
         case Some(dir) =>
@@ -50,7 +51,7 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
     }
 
     "remove existing plugin" in Fixture() { manager =>
-      val testZipFileName = "console/src/test/resources/test.zip"
+      val testZipFileName = ProjectRoot.relativise("console/src/test/resources/test.zip")
       manager.add(testZipFileName)
       manager.rm("test").map(x => File(x).name).toSet shouldBe Set("joernext-test-foo.jar", "joernext-test-foo.json")
       manager.listPlugins() shouldBe List()
@@ -68,7 +69,7 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
     }
 
     "display plugin after adding it" in Fixture() { manager =>
-      val testZipFileName = "console/src/test/resources/test.zip"
+      val testZipFileName = ProjectRoot.relativise("console/src/test/resources/test.zip")
       manager.add(testZipFileName)
       manager.listPlugins() shouldBe List("test")
     }
