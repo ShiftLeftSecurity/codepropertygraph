@@ -13,3 +13,26 @@ case class Query(name: String,
                  traversalAsString: String = "",
                  tags: List[String] = List(),
                  language: String = "")
+
+object Query {
+  def make(name: String,
+           author: String,
+           title: String,
+           description: String,
+           score: Double,
+           traversalWithStrRep: TraversalWithStrRep,
+           tags: List[String] = List()): Query = {
+    Query(
+      name = name,
+      author = author,
+      title = title,
+      description = description,
+      score = score,
+      traversal = traversalWithStrRep.traversal,
+      traversalAsString = traversalWithStrRep.strRep,
+      tags = tags,
+    )
+  }
+}
+
+case class TraversalWithStrRep(traversal: Cpg => Traversal[nodes.StoredNode], strRep: String = "")
