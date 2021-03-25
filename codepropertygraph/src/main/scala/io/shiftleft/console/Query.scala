@@ -12,7 +12,9 @@ case class Query(name: String,
                  traversal: Cpg => Traversal[nodes.StoredNode],
                  traversalAsString: String = "",
                  tags: List[String] = List(),
-                 language: String = "") {
+                 language: String = "")
+
+object Query {
   def make(name: String,
            author: String,
            title: String,
