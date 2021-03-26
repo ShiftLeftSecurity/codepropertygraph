@@ -152,7 +152,7 @@ trait BridgeBase {
 
   protected def runAmmonite(config: Config, slProduct: SLProduct = OcularProduct): Unit = {
     if (config.listPlugins) {
-      listPluginsAndLayerCreators(config)
+      listPluginsAndLayerCreators(config, slProduct)
     } else if (config.addPlugin.isDefined) {
       new PluginManager(InstallConfig().rootPath).add(config.addPlugin.get)
     } else if (config.rmPlugin.isDefined) {
@@ -165,7 +165,7 @@ trait BridgeBase {
           } else if (config.qdbwServe) {
             serveQueryDatabaseWebsite(InstallConfig().rootPath, config)
           } else if (config.pluginToRun.isDefined) {
-            runPlugin(config)
+            runPlugin(config, slProduct)
           } else {
             startInteractiveShell(config, slProduct)
           }
@@ -175,7 +175,7 @@ trait BridgeBase {
     }
   }
 
-  private def listPluginsAndLayerCreators(config: Config): Unit = {
+  private def listPluginsAndLayerCreators(config: Config, slProduct: SLProduct): Unit = {
     println("Installed plugins:")
     println("==================")
     new PluginManager(InstallConfig().rootPath).listPlugins().foreach(println)
@@ -186,20 +186,20 @@ trait BridgeBase {
         |println(run)
         |
         |""".stripMargin
-    withTemporaryScript(code) { file =>
+    withTemporaryScript(code, slProduct) { file =>
       runScript(os.Path(file.path.toString), config)
     }
   }
 
-  private def withTemporaryScript(code: String)(f: File => Unit): Unit = {
-    File.usingTemporaryDirectory("joern-bundle") { dir =>
+  private def withTemporaryScript(code: String, slProduct: SLProduct)(f: File => Unit): Unit = {
+    File.usingTemporaryDirectory(slProduct.toString + "-bundle") { dir =>
       val file = (dir / "script.sc")
       file.write(code)
       f(file)
     }
   }
 
-  private def runPlugin(config: Config): Unit = {
+  private def runPlugin(config: Config, slProduct: SLProduct): Unit = {
     if (config.src.isEmpty) {
       println("You must supply a source directory with the --src flag")
       return
@@ -231,13 +231,13 @@ trait BridgeBase {
         | $storeCode
         |""".stripMargin
 
-    val logFileName = "/tmp/joern-scan-log.txt"
+    val logFileName = "/tmp/" + slProduct.toString + "-scan-log.txt"
     println(s"Detailed logs at: $logFileName")
     val file = new java.io.File(logFileName);
     val fos = new FileOutputStream(file);
     val ps = new PrintStream(fos);
     System.setErr(ps)
-    withTemporaryScript(code) { file =>
+    withTemporaryScript(code, slProduct) { file =>
       runScript(os.Path(file.path.toString), config)
     }
     ps.close()
