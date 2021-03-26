@@ -74,7 +74,7 @@ installProtoc := {
 
 lazy val generateGoBindings = taskKey[File]("generate go proto bindings (doesn't publish them anywhere)")
 generateGoBindings := {
-  val dependsOn = (Projects.codepropertygraph/generateProtobuf).value //ensures this is being run beforehand
+  // we don't depend on generateProtobuf, since we want to be able to replace it with one derived from the codescience repository instead!
   val protocBinary = installProtoc.value
   // protoc requires a relative path...
   val protoFile = "codepropertygraph/target/cpg.proto"
