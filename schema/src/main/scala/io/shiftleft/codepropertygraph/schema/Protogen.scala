@@ -15,6 +15,11 @@ object Protogen extends App {
     javaPackage = "io.shiftleft.proto.cpg",
     goPackage = "github.com/ShiftLeftSecurity/proto/cpg",
     csharpNamespace = "io.shiftleft.proto.cpg",
+    uncommonProtoEnumNameMappings = Map(
+      "Languages" -> "LANGUAGES",
+      "ControlStructureTypes" -> "CONTROL_STRUCTURE_TYPES",
+      "Frameworks" -> "FRAMEWORKS",
+    )
   ))
   val cpgSchema = new CpgSchema(builder)
 
