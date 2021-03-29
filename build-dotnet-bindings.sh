@@ -27,7 +27,7 @@ fi
 echo "generating csharp protoc bindings for cpg.proto"
 rm -rf target/csharp
 mkdir -p target/csharp/io/shiftleft/proto
-cp codepropertygraph/target/cpg.proto target/csharp
+cp schema/target/protos/cpg.proto target/csharp
 cp proto-bindings/cpg-proto-bindings.csproj target/csharp
 cd target/csharp
 protoc --csharp_out=io/shiftleft/proto cpg.proto
