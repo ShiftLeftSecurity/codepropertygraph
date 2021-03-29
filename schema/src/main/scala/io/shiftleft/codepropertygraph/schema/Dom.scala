@@ -22,31 +22,29 @@ object Dom {
     import enhancements._
 
 // node types
-val domNode: NodeType = builder.addNodeType(
-  name = "DOM_NODE",
-  comment = "A node in a Document Object Model (Tree) as obtained from, e.g., an HTML parser"
-).protoId(600)
+    val domNode: NodeType = builder
+      .addNodeType(
+        name = "DOM_NODE",
+        comment = "A node in a Document Object Model (Tree) as obtained from, e.g., an HTML parser"
+      )
+      .protoId(600)
+      .addProperties(name)
 
-.addProperties(name)
-
-
-val domAttribute: NodeType = builder.addNodeType(
-  name = "DOM_ATTRIBUTE",
-  comment = "Attribute of a DOM node"
-).protoId(601)
-
-.addProperties(name, value)
-
+    val domAttribute: NodeType = builder
+      .addNodeType(
+        name = "DOM_ATTRIBUTE",
+        comment = "Attribute of a DOM node"
+      )
+      .protoId(601)
+      .addProperties(name, value)
 
 // node relations
-domNode
-.addOutEdge(edge = ast, inNode = domNode)
-.addContainedNode(domAttribute, "attributes", Cardinality.List)
+    domNode
+      .addOutEdge(edge = ast, inNode = domNode)
+      .addContainedNode(domAttribute, "attributes", Cardinality.List)
 
-configFile
-.addOutEdge(edge = contains, inNode = domNode)
-
-
+    configFile
+      .addOutEdge(edge = contains, inNode = domNode)
 // constants
 
   }

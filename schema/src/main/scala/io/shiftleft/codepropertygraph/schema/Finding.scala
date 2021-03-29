@@ -11,35 +11,36 @@ object Finding {
     import enhancements._
 
 // node properties
-val key = builder.addNodeProperty(
-  name = "KEY",
-  valueType = ValueTypes.STRING,
-  cardinality = Cardinality.One,
-  comment = ""
-).protoId(131)
+    val key = builder
+      .addNodeProperty(
+        name = "KEY",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = ""
+      )
+      .protoId(131)
 
 // node types
-val finding: NodeType = builder.addNodeType(
-  name = "FINDING",
-  comment = ""
-).protoId(214)
+    val finding: NodeType = builder
+      .addNodeType(
+        name = "FINDING",
+        comment = ""
+      )
+      .protoId(214)
+      .addProperties()
 
-.addProperties()
-
-
-val keyValuePair: NodeType = builder.addNodeType(
-  name = "KEY_VALUE_PAIR",
-  comment = ""
-).protoId(217)
-
-.addProperties(key, value)
-
+    val keyValuePair: NodeType = builder
+      .addNodeType(
+        name = "KEY_VALUE_PAIR",
+        comment = ""
+      )
+      .protoId(217)
+      .addProperties(key, value)
 
 // node relations
-finding
-
-.addContainedNode(builder.anyNode, "evidence", Cardinality.List)
-.addContainedNode(keyValuePair, "keyValuePairs", Cardinality.List)
+    finding
+      .addContainedNode(builder.anyNode, "evidence", Cardinality.List)
+      .addContainedNode(keyValuePair, "keyValuePairs", Cardinality.List)
 
 // constants
 

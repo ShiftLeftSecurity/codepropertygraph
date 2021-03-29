@@ -48,9 +48,13 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
           nodes.NewMethodParameterOut().code(null)
         ))
       cpg.graph.nodeCount shouldBe 2
-      val additionalNode = cpg.graph.V.label(MethodParameterOut.Label).collectFirst {
-        case mpe: MethodParameterOut if mpe.code == null => mpe
-      }.get.asInstanceOf[StoredNode]
+      val additionalNode = cpg.graph.V
+        .label(MethodParameterOut.Label)
+        .collectFirst {
+          case mpe: MethodParameterOut if mpe.code == null => mpe
+        }
+        .get
+        .asInstanceOf[StoredNode]
 
       // 2) add two edges with the same label but different properties (they'll later be disambiguated by their property hash, since edges don't have IDs
       val addEdge1Inverse = applyDiffAndGetInverse(cpg)(
@@ -72,8 +76,7 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
 
       // 3) add node property
       val addNodePropertyInverse =
-        applyDiffAndGetInverse(cpg)(
-          _.addNodeProperty(additionalNode, NodeKeyNames.CODE, "Node2Code"))
+        applyDiffAndGetInverse(cpg)(_.addNodeProperty(additionalNode, NodeKeyNames.CODE, "Node2Code"))
       additionalNode.property(NodeKeys.CODE) shouldBe "Node2Code"
 
       // TODO 4) add edge property - not needed for now?

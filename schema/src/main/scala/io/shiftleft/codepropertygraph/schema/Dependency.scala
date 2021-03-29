@@ -10,21 +10,23 @@ object Dependency {
     import base._
 
 // node properties
-val dependencyGroupId = builder.addNodeProperty(
-  name = "DEPENDENCY_GROUP_ID",
-  valueType = ValueTypes.STRING,
-  cardinality = Cardinality.ZeroOrOne,
-  comment = "The group ID for a dependency"
-).protoId(58)
+    val dependencyGroupId = builder
+      .addNodeProperty(
+        name = "DEPENDENCY_GROUP_ID",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.ZeroOrOne,
+        comment = "The group ID for a dependency"
+      )
+      .protoId(58)
 
 // node types
-val dependency: NodeType = builder.addNodeType(
-  name = "DEPENDENCY",
-  comment = "This node represents a dependency"
-).protoId(35)
-
-.addProperties(version, name, dependencyGroupId)
-
+    val dependency: NodeType = builder
+      .addNodeType(
+        name = "DEPENDENCY",
+        comment = "This node represents a dependency"
+      )
+      .protoId(35)
+      .addProperties(version, name, dependencyGroupId)
 
   }
 
