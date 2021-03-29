@@ -51,7 +51,9 @@ class QueryDatabase(defaultArgumentProvider: DefaultArgumentProvider = new Defau
         // the namespace currently looks like `io.joern.scanners.c.CopyLoops`
         val namespaceParts = bundleNamespace.split('.')
         var language =
-          if (namespaceParts.size > 3) {
+          if (bundleNamespace.startsWith("io.shiftleft.ocular.scanners")) {
+            namespaceParts(4)
+          } else if (namespaceParts.size > 3) {
             namespaceParts(3)
           } else {
             ""
