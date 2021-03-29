@@ -165,7 +165,7 @@ trait BridgeBase {
           } else if (config.qdbwServe) {
             serveQueryDatabaseWebsite(InstallConfig().rootPath, config)
           } else if (config.pluginToRun.isDefined) {
-            runPlugin(config, slProduct)
+            runPlugin(config, slProduct.name)
           } else {
             startInteractiveShell(config, slProduct)
           }
@@ -186,20 +186,20 @@ trait BridgeBase {
         |println(run)
         |
         |""".stripMargin
-    withTemporaryScript(code, slProduct) { file =>
+    withTemporaryScript(code, slProduct.name) { file =>
       runScript(os.Path(file.path.toString), config)
     }
   }
 
-  private def withTemporaryScript(code: String, slProduct: SLProduct)(f: File => Unit): Unit = {
-    File.usingTemporaryDirectory(slProduct.toString + "-bundle") { dir =>
+  private def withTemporaryScript(code: String, prefix: String)(f: File => Unit): Unit = {
+    File.usingTemporaryDirectory(prefix + "-bundle") { dir =>
       val file = (dir / "script.sc")
       file.write(code)
       f(file)
     }
   }
 
-  private def runPlugin(config: Config, slProduct: SLProduct): Unit = {
+  private def runPlugin(config: Config, productName: String): Unit = {
     if (config.src.isEmpty) {
       println("You must supply a source directory with the --src flag")
       return
@@ -213,13 +213,14 @@ trait BridgeBase {
         .map(_.toLowerCase)
         .getOrElse("c"))
     val storeCode = if (config.store) { "save" } else { "" }
+    val runDataflow = if (productName == "ocular") { "run.dataflow" } else { "run.ossdataflow" }
     val code = s"""
         | if (${config.overwrite} || !workspace.projectExists("$src")) {
         |   workspace.projects
         |   .filter(_.inputPath == "$src")
         |   .map(_.name).foreach(n => workspace.removeProject(n))
         |   importCode.$language("$src")
-        |   run.ossdataflow
+        |   $runDataflow
         |   save
         | } else {
         |    println("Using existing CPG - Use `--overwrite` if this is not what you want")
@@ -231,13 +232,13 @@ trait BridgeBase {
         | $storeCode
         |""".stripMargin
 
-    val logFileName = "/tmp/" + slProduct.toString + "-scan-log.txt"
+    val logFileName = "/tmp/" + productName + "-scan-log.txt"
     println(s"Detailed logs at: $logFileName")
     val file = new java.io.File(logFileName);
     val fos = new FileOutputStream(file);
     val ps = new PrintStream(fos);
     System.setErr(ps)
-    withTemporaryScript(code, slProduct) { file =>
+    withTemporaryScript(code, productName) { file =>
       runScript(os.Path(file.path.toString), config)
     }
     ps.close()
