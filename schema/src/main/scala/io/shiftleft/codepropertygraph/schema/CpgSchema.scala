@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.SchemaBuilder
+import overflowdb.schema.{Schema, SchemaBuilder}
 
 /**
   * Schema for the base code property graph
@@ -23,4 +23,12 @@ class CpgSchema(builder: SchemaBuilder) {
   val sourceSpecific = SourceSpecific(builder, base)
   val splitting = Splitting(builder, enhancements)
   val tagsAndLocation = TagsAndLocation(builder, base, enhancements)
+}
+
+object CpgSchema {
+  val instance: Schema = {
+    val builder = new SchemaBuilder("io.shiftleft.codepropertygraph.generated")
+    val cpgSchema = new CpgSchema(builder)
+    builder.build
+  }
 }
