@@ -1,9 +1,8 @@
 package io.shiftleft.fuzzyc2cpg.querying
 
-import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal.jIteratortoTraversal
 
 /**
   * The following tests show in detail how queries can be started. For

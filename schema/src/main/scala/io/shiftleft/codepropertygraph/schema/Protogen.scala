@@ -1,8 +1,9 @@
 package io.shiftleft.codepropertygraph.schema
 
-import java.io.File
 import overflowdb.codegen.ProtoGen
-import overflowdb.schema.{SchemaBuilder, ProtoOptions}
+import overflowdb.schema.{ProtoOptions, SchemaBuilder}
+
+import java.io.File
 
 object Protogen extends App {
   val outputDir =

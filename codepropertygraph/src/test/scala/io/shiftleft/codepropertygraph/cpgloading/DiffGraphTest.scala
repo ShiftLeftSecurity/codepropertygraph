@@ -5,11 +5,12 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.edges.Propagate
 import io.shiftleft.codepropertygraph.generated.nodes.{MethodParameterIn, MethodParameterOut, NewNode, StoredNode}
 import io.shiftleft.passes.{DiffGraph, IntervalKeyPool}
-import java.lang.{Boolean => JBoolean}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 import overflowdb.traversal._
+
+import java.lang.{Boolean => JBoolean}
 
 class DiffGraphTest extends AnyWordSpec with Matchers {
   "should be able to build an inverse DiffGraph" in {
