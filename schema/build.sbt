@@ -1,27 +1,45 @@
 name := "codepropertygraph-schema"
 
-import better.files.FileExtensions
+libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "1.51"
 
-lazy val mergeSchemaTask = taskKey[File]("Merge schemas")
-mergeSchemaTask := {
-  // merge schemas into one cpg.json
-  val schemasDir = new File("schema/src/main/resources/schemas")
-  val currentMd5 = FileUtils.md5(schemasDir)
-  val outputRoot = new File(sourceManaged.in(Compile).value.getAbsolutePath)
-  outputRoot.mkdirs
-  val outputFile = outputRoot / "cpg.json"
-  if (outputFile.exists && MergeSchemaTaskGlobalState.lastMd5 == currentMd5) {
-    println("schemas unchanged, no need to merge them again")
+val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
+
+generateDomainClasses := Def.taskDyn {
+  val outputRoot = target.value / "odb-codegen"
+  val currentMd5 = FileUtils.md5(sourceDirectory.value)
+
+  if (!outputRoot.exists || CodeGenGlobalState.lastMd5 != currentMd5) {
+    Def.task {
+      FileUtils.deleteRecursively(outputRoot)
+      val invoked = (Compile/runMain).toTask(s" io.shiftleft.codepropertygraph.schema.Codegen schema/target/odb-codegen").value
+      CodeGenGlobalState.lastMd5 = currentMd5
+      FileUtils.listFilesRecursively(outputRoot)
+    }
   } else {
-    val schemaFiles = schemasDir.listFiles.toSeq
-    val mergedSchema = overflowdb.codegen.SchemaMerger.mergeCollections(schemaFiles)
-    mergedSchema.toScala.copyTo(outputFile.toScala, overwrite = true)
-    println(s"successfully merged schemas into $outputFile")
+    Def.task {
+      CodeGenGlobalState.lastMd5 = currentMd5
+      FileUtils.listFilesRecursively(outputRoot)
+    }
   }
-  MergeSchemaTaskGlobalState.lastMd5 = currentMd5
-  outputFile
-}
+}.value
 
-Compile / resourceGenerators += Def.task {
-  Seq(mergeSchemaTask.value)
-}.taskValue
+val generateProtobuf = taskKey[File]("generate protobuf definitions: cpg.proto")
+generateProtobuf := Def.taskDyn {
+  val outputRoot = target.value / "protos"
+  val outputFile = outputRoot / "cpg.proto"
+  val currentMd5 = FileUtils.md5(sourceDirectory.value)
+
+  if (!outputRoot.exists || GenerateProtobufTaskGlobalState.lastMd5 != currentMd5) {
+    Def.task {
+      FileUtils.deleteRecursively(outputRoot)
+      val invoked = (Compile/runMain).toTask(s" io.shiftleft.codepropertygraph.schema.Protogen schema/target/protos").value
+      GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
+      outputFile
+    }
+  } else {
+    Def.task {
+      GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
+      outputFile
+    }
+  }
+}.value

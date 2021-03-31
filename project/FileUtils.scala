@@ -11,6 +11,15 @@ object FileUtils {
     }
   }
 
+  def deleteRecursively(root: File): Unit = {
+    if (root.exists) {
+      Files.walk(root.toPath).iterator.asScala.map(_.toFile).collect {
+        case file if (file.isDirectory) => deleteRecursively(file)
+        case file => file.delete()
+      }
+    }
+  }
+
   def md5(root: File): String =
     md5(List(root))
 
@@ -32,11 +41,6 @@ object FileUtils {
 }
 
 object CodeGenGlobalState {
-  // this is very ugly, but I can't define it like that in the build.sbt
-  var lastMd5: String = ""
-}
-
-object MergeSchemaTaskGlobalState {
   // this is very ugly, but I can't define it like that in the build.sbt
   var lastMd5: String = ""
 }
