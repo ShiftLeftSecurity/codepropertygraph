@@ -48,7 +48,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
     val language = cpg.metaData.language.headOption
       .getOrElse(throw new Exception("Meta node missing."))
 
-    val enhancementExecList = createEnhancementExecList(cpg, language) ++ cfgCreationPass(cpg)
+    val enhancementExecList = cfgCreationPass(cpg) ++ createEnhancementExecList(cpg, language)
     enhancementExecList.zipWithIndex.foreach {
       case (pass, index) =>
         runPass(pass, context, storeUndoInfo, index)
