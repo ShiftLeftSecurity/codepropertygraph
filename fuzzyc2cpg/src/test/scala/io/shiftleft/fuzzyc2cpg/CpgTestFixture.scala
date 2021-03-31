@@ -14,13 +14,12 @@ case class CpgTestFixture(projectName: String) {
   val cpg: Cpg = Cpg.emptyCpg
   val dirName = ProjectRoot.relativise(s"fuzzyc2cpg/src/test/resources/testcode/$projectName")
   val keyPoolFile1 = new IntervalKeyPool(1001, 2000)
-  val cfgKeyPool = new IntervalKeyPool(2001, 3000)
   val filenames = SourceFiles.determine(Set(dirName), Set(".c"))
 
   new CMetaDataPass(cpg).createAndApply()
   new AstCreationPass(filenames, cpg, keyPoolFile1).createAndApply()
   if (cpg.method.nonEmpty) {
-    new CfgCreationPass(cpg, cfgKeyPool).createAndApply()
+    new CfgCreationPass(cpg).createAndApply()
   }
   new StubRemovalPass(cpg).createAndApply()
   new FileCreationPass(cpg).createAndApply()

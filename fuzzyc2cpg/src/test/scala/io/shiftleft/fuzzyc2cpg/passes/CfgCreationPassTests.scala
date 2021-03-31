@@ -465,10 +465,9 @@ class CfgFixture(file1Code: String) {
     val file1 = dir / "file1.c"
     file1.write(s"RET func() { $file1Code }")
     val keyPoolFile1 = new IntervalKeyPool(1001, 2000)
-    val cfgKeyPool = new IntervalKeyPool(2001, 3000)
     val filenames = List(file1.path.toAbsolutePath.toString)
     new AstCreationPass(filenames, cpg, keyPoolFile1).createAndApply()
-    new CfgCreationPass(cpg, cfgKeyPool).createAndApply()
+    new CfgCreationPass(cpg).createAndApply()
   }
 
   val codeToNode: Map[String, nodes.CfgNode] =
