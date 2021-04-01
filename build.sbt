@@ -9,8 +9,6 @@ inThisBuild(
     scalaVersion := "2.13.4",
     resolvers ++= Seq(
       Resolver.mavenLocal,
-      Resolver.bintrayRepo("shiftleft", "maven"),
-      Resolver.bintrayRepo("mpollmeier", "maven"),
       "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"
     ),
     packageDoc / publishArtifact := true,
