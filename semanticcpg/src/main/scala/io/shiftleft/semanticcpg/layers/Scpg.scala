@@ -36,7 +36,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
   override val description: String = Scpg.description
 
   private def cfgCreationPass(cpg: Cpg): Iterator[CpgPassBase] = {
-    if (cpg.graph.nodeCount != 0 && !cpg.graph.edges(EdgeTypes.CFG).hasNext) {
+    if (!cpg.graph.edges(EdgeTypes.CFG).hasNext) {
       Iterator(new CfgCreationPass(cpg))
     } else {
       Iterator.empty
