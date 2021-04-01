@@ -20,7 +20,7 @@ case class FuzzyCCpgGenerator(config: FuzzyCFrontendConfig, rootPath: Path) exte
                         outputPath: String = "cpg.bin.zip",
                         namespaces: List[String] = List()): Option[String] = {
     val fuzzyc = new FuzzyC2Cpg()
-    val cpg = fuzzyc.runAndOutput(Set(inputPath), Set(".c"), Some(outputPath))
+    val cpg = fuzzyc.runAndOutput(Set(inputPath), Set(".c", ".cc", ".cpp", ".h", ".hpp"), Some(outputPath))
     cpg.close()
     Some(outputPath)
   }
