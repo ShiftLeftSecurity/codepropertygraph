@@ -24,11 +24,11 @@ class UserRunnable(queue: BlockingQueue[Job], writer: PrintWriter, reader: Buffe
           terminate = true
         } else {
           sendQueryToAmmonite(job)
-          val stdoutPair = stdOutUpToMarker()
-          val stdOutput = stdoutPair.get
-          val errOutput = exhaustStderr()
-          val result = new QueryResult(stdOutput, errOutput, job.uuid)
-          job.observer(result)
+          stdOutUpToMarker().map { stdOutput =>
+            val errOutput = exhaustStderr()
+            val result = new QueryResult(stdOutput, errOutput, job.uuid)
+            job.observer(result)
+          }
         }
       }
     } catch {
@@ -51,7 +51,10 @@ class UserRunnable(queue: BlockingQueue[Job], writer: PrintWriter, reader: Buffe
 
   private def stdOutUpToMarker(): Option[String] = {
     var currentOutput: String = ""
-    var line = reader.readLine()
+    var line =
+      if (reader.ready) reader.readLine()
+      else null
+
     while (line != null) {
       if (!line.startsWith(magicEchoSeq) && !line.isEmpty) {
         val uuid = uuidFromLine(line)
