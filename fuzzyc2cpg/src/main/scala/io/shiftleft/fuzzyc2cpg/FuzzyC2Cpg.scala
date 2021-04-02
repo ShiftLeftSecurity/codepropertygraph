@@ -3,7 +3,7 @@ package io.shiftleft.fuzzyc2cpg
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.fuzzyc2cpg.passes.{AstCreationPass, CMetaDataPass, StubRemovalPass, TypeNodePass}
-import io.shiftleft.passes.{IntervalKeyPool, KeyPoolCreator}
+import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.x2cpg.SourceFiles
 import org.slf4j.LoggerFactory
@@ -71,15 +71,15 @@ class FuzzyC2Cpg() {
                    optionalOutputPath: Option[String] = None): Cpg = {
     val metaDataKeyPool = new IntervalKeyPool(1, 100)
     val typesKeyPool = new IntervalKeyPool(100, 1000100)
-    val functionKeyPools = KeyPoolCreator.obtain(2, 1000101)
+    val functionKeyPool = new IntervalKeyPool(1000100, Long.MaxValue)
 
     val cpg = initCpg(optionalOutputPath)
     val sourceFileNames = SourceFiles.determine(sourcePaths, sourceFileExtensions)
 
     new CMetaDataPass(cpg, Some(metaDataKeyPool)).createAndApply()
-    val astCreator = new AstCreationPass(sourceFileNames, cpg, functionKeyPools.head)
+    val astCreator = new AstCreationPass(sourceFileNames, cpg, functionKeyPool)
     astCreator.createAndApply()
-    new CfgCreationPass(cpg, functionKeyPools.last).createAndApply()
+    new CfgCreationPass(cpg).createAndApply()
     new StubRemovalPass(cpg).createAndApply()
     new TypeNodePass(astCreator.global.usedTypes.keys().asScala.toList, cpg, Some(typesKeyPool)).createAndApply()
     cpg

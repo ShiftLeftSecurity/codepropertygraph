@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.layers
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Languages, NodeTypes}
 import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
@@ -21,7 +21,7 @@ import io.shiftleft.semanticcpg.passes.methodexternaldecorator.MethodExternalDec
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
 import io.shiftleft.semanticcpg.passes.trim.TrimPass
-import io.shiftleft.semanticcpg.passes.{BindingMethodOverridesPass, FileCreationPass}
+import io.shiftleft.semanticcpg.passes.{BindingMethodOverridesPass, CfgCreationPass, FileCreationPass}
 
 object Scpg {
   val overlayName: String = "semanticcpg"
@@ -35,12 +35,20 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
   override val overlayName: String = Scpg.overlayName
   override val description: String = Scpg.description
 
+  private def cfgCreationPass(cpg: Cpg): Iterator[CpgPassBase] = {
+    if (!cpg.graph.edges(EdgeTypes.CFG).hasNext) {
+      Iterator(new CfgCreationPass(cpg))
+    } else {
+      Iterator.empty
+    }
+  }
+
   override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
     val cpg = context.cpg
     val language = cpg.metaData.language.headOption
       .getOrElse(throw new Exception("Meta node missing."))
 
-    val enhancementExecList = createEnhancementExecList(cpg, language)
+    val enhancementExecList = cfgCreationPass(cpg) ++ createEnhancementExecList(cpg, language)
     enhancementExecList.zipWithIndex.foreach {
       case (pass, index) =>
         runPass(pass, context, storeUndoInfo, index)

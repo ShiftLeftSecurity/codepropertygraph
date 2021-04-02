@@ -57,8 +57,7 @@ object StubRemovalPassFixture {
       val keyPool = new IntervalKeyPool(1001, 2000)
       val filenames = List(file1.path.toAbsolutePath.toString)
       new AstCreationPass(filenames, cpg, keyPool).createAndApply()
-      val cfgKeyPool = new IntervalKeyPool(2001, 3000)
-      new CfgCreationPass(cpg, cfgKeyPool).createAndApply()
+      new CfgCreationPass(cpg).createAndApply()
       new StubRemovalPass(cpg).createAndApply()
       f(cpg)
     }
