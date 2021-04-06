@@ -96,8 +96,8 @@ object EnhancementsInternal {
       .protoId(18)
 
 // node types
-    cfgNode.addProperties(internalFlags)
-    jumpTarget.addProperties(internalFlags)
+    cfgNode.addProperties(internalFlags, depthFirstOrder)
+    jumpTarget.addProperties(internalFlags, depthFirstOrder)
 
     val tags: NodeType = builder
       .addNodeType(
