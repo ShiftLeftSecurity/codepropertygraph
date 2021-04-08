@@ -46,7 +46,7 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
 
   val entryNode: nodes.StoredNode = method
   val exitNode: nodes.StoredNode = method.methodReturn
-  val allNodes: List[nodes.StoredNode] = method.cfgNode.toList ++ List(entryNode, exitNode) ++ method.parameter
+  val allNodes: List[nodes.StoredNode] = method.cfgNode.toList ++ List(entryNode, exitNode) ++ method.parameter.toList
 
   val succ: Map[nodes.StoredNode, List[nodes.StoredNode]] = initSucc(allNodes)
   val pred: Map[nodes.StoredNode, List[nodes.StoredNode]] = initPred(allNodes, method)
@@ -61,7 +61,11 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
         n ->
           // `.cfgNext` would be wrong here because it filters `METHOD_RETURN`
           cfgNode.out(EdgeTypes.CFG).map(_.asInstanceOf[nodes.StoredNode]).l
-      case n @ (param: nodes.MethodParameterIn) => n -> param.method.cfgFirst.l
+      case n @ (param: nodes.MethodParameterIn) =>
+        n -> {
+          val nextParam = param.method.parameter.order(param.order + 1).headOption
+          if (nextParam.isDefined) { nextParam.toList } else { param.method.cfgFirst.l }
+        }
       case n =>
         logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
         n -> List()
@@ -76,8 +80,12 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
     ns.map {
       case n @ (_: nodes.CfgNode) if method.cfgFirst.headOption.contains(n) =>
         n -> method.parameter.l.sortBy(_.order).lastOption.toList
-      case n @ (cfgNode: nodes.CfgNode)     => n -> cfgNode.cfgPrev.l
-      case n @ (_: nodes.MethodParameterIn) => n -> List(method)
+      case n @ (cfgNode: nodes.CfgNode) => n -> cfgNode.cfgPrev.l
+      case n @ (param: nodes.MethodParameterIn) =>
+        n -> {
+          val prevParam = param.method.parameter.order(param.order - 1).headOption
+          if (prevParam.isDefined) { prevParam.toList } else { List(method) }
+        }
       case n =>
         logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
         n -> List()
