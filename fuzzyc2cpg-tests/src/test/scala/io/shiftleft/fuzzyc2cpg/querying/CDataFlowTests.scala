@@ -968,3 +968,22 @@ class CDataFlowTests31 extends DataFlowCodeToCpgSuite {
       .count(_.inNode() == cpg.ret.head) shouldBe 1
   }
 }
+
+class CDataFlowTests32 extends DataFlowCodeToCpgSuite {
+  override val code =
+    """
+       void f(int x, int y)
+        {
+          g(x, y);
+        }
+    """
+
+  "Test 32: should find flow from outer params to inner params" in {
+    implicit val s: Semantics = semantics
+    def source = cpg.method.name("f").parameter
+    def sink = cpg.method.name("g").parameter
+    sink.size shouldBe 2
+    source.size shouldBe 2
+    sink.reachableBy(source).size shouldBe 4
+  }
+}
