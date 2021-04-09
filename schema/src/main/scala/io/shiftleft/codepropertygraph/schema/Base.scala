@@ -454,7 +454,8 @@ object Base {
                      lineNumberEnd,
                      columnNumberEnd,
                      order,
-                     filename)
+                     filename,
+                     hash)
       .extendz(declaration, cfgNode, astNode)
 
     val methodParameterIn: NodeType = builder
