@@ -97,7 +97,6 @@ object EnhancementsInternal {
 
 // node types
     cfgNode.addProperties(internalFlags, depthFirstOrder)
-    jumpTarget.addProperties(internalFlags, depthFirstOrder)
 
     val tags: NodeType = builder
       .addNodeType(
@@ -124,37 +123,7 @@ object EnhancementsInternal {
       .protoId(43)
       .addProperties(name, content)
 
-    method
-      .addProperties(hasMapping, depthFirstOrder, internalFlags)
-
-    methodReturn
-      .addProperties(depthFirstOrder, internalFlags)
-
-    literal
-      .addProperties(depthFirstOrder, internalFlags)
-
-    callNode.addProperties(depthFirstOrder, internalFlags)
-
-    identifier
-      .addProperties(depthFirstOrder, internalFlags)
-
-    fieldIdentifier
-      .addProperties(depthFirstOrder, internalFlags)
-
-    ret
-      .addProperties(depthFirstOrder, internalFlags)
-
-    block
-      .addProperties(depthFirstOrder, internalFlags)
-
-    unknown
-      .addProperties(depthFirstOrder, internalFlags)
-
-    methodRef
-      .addProperties(depthFirstOrder, internalFlags)
-
-    typeRef
-      .addProperties(depthFirstOrder, internalFlags)
+    method.addProperties(hasMapping)
 
     val detachedTrackingPoint: NodeType = builder
       .addNodeType(
@@ -164,21 +133,6 @@ object EnhancementsInternal {
       .protoId(1001)
       .addProperties()
       .extendz(trackingPoint)
-
-    controlStructure
-      .addProperties(depthFirstOrder, internalFlags)
-
-    implicitCall
-      .addProperties(depthFirstOrder, internalFlags)
-
-    postExecutionCall
-      .addProperties(depthFirstOrder, internalFlags)
-
-    annotationLiteral
-      .addProperties(depthFirstOrder, internalFlags)
-
-    arrayInitializer
-      .addProperties(depthFirstOrder, internalFlags)
 
 // node relations
     tags

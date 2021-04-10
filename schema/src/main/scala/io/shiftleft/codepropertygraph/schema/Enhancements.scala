@@ -202,7 +202,6 @@ object Enhancements {
         comment = "An implicit call site hidden in a method indicated by METHOD_MAP policy entries"
       )
       .protoId(307)
-      .addProperties(code, name, signature, lineNumber, columnNumber, order)
       .extendz(callRepr, trackingPoint)
 
     val postExecutionCall: NodeType = builder
@@ -212,7 +211,6 @@ object Enhancements {
           "Indicates the existence of a call executed on a return value or out parameter of a method after this method has been executed. This is used to model framework code calling functors returned from user code. The outgoing REF edge indicates on which returned entitity the call will happen."
       )
       .protoId(3071)
-      .addProperties(code, name, signature, lineNumber, columnNumber, order)
       .extendz(callRepr, trackingPoint)
 
     val tag: NodeType = builder
@@ -230,7 +228,7 @@ object Enhancements {
           "This node represents a namespace as a whole whereas the NAMESPACE_BLOCK is used for each grouping occurrence of a namespace in code. Single representing NAMESPACE node is required for easier navigation in the query language"
       )
       .protoId(40)
-      .addProperties(name, order)
+      .addProperties(name)
       .extendz(astNode)
 
     callNode
@@ -251,7 +249,7 @@ object Enhancements {
         comment = "This node represents a formal parameter going towards the caller side"
       )
       .protoId(33)
-      .addProperties(code, order, name, evaluationStrategy, typeFullName, lineNumber, columnNumber)
+      .addProperties(code, evaluationStrategy, typeFullName, lineNumber, columnNumber)
       .extendz(declaration, trackingPoint, astNode)
 
     methodReturn

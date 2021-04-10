@@ -40,7 +40,7 @@ object JavaSpecific {
         comment = "A method annotation"
       )
       .protoId(5)
-      .addProperties(code, name, fullName, order)
+      .addProperties(code, name, fullName)
       .extendz(astNode)
 
     val annotationParameterAssign: NodeType = builder
@@ -49,7 +49,7 @@ object JavaSpecific {
         comment = "Assignment of annotation argument to annotation parameter"
       )
       .protoId(6)
-      .addProperties(code, order)
+      .addProperties(code)
       .extendz(astNode)
 
     val annotationParameter: NodeType = builder
@@ -58,7 +58,7 @@ object JavaSpecific {
         comment = "Formal annotation parameter"
       )
       .protoId(7)
-      .addProperties(code, order)
+      .addProperties(code)
       .extendz(astNode)
 
     val annotationLiteral: NodeType = builder
@@ -67,11 +67,10 @@ object JavaSpecific {
         comment = "A literal value assigned to an ANNOTATION_PARAMETER"
       )
       .protoId(49)
-      .addProperties(code, name, order, argumentIndex, columnNumber, lineNumber)
+      .addProperties(name)
       .extendz(expression)
 
     arrayInitializer
-      .addProperties(code, order, argumentIndex, columnNumber, lineNumber)
       .extendz(expression)
 
     method

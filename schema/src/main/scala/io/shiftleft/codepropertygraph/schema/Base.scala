@@ -409,7 +409,7 @@ object Base {
         name = "EXPRESSION",
         comment = "Expression as a specialisation of tracking point"
       )
-      .addProperties(code, order, argumentIndex)
+      .addProperties(argumentIndex)
       .extendz(trackingPoint, cfgNode, astNode)
 
     val callRepr = builder
@@ -417,7 +417,7 @@ object Base {
         name = "CALL_REPR",
         comment = "Call representation"
       )
-      .addProperties(code, name, signature)
+      .addProperties(name, signature)
       .extendz(cfgNode)
 
 // node types
@@ -435,7 +435,7 @@ object Base {
         comment = "Node representing a source file - the root of the AST"
       )
       .protoId(38)
-      .addProperties(name, order, hash)
+      .addProperties(name, hash)
       .extendz(astNode)
 
     val method: NodeType = builder
@@ -444,18 +444,7 @@ object Base {
         comment = "A method/function/procedure"
       )
       .protoId(1)
-      .addProperties(code,
-                     name,
-                     fullName,
-                     isExternal,
-                     signature,
-                     lineNumber,
-                     columnNumber,
-                     lineNumberEnd,
-                     columnNumberEnd,
-                     order,
-                     filename,
-                     hash)
+      .addProperties(fullName, isExternal, signature, lineNumberEnd, columnNumberEnd, filename, hash)
       .extendz(declaration, cfgNode, astNode)
 
     val methodParameterIn: NodeType = builder
@@ -464,7 +453,7 @@ object Base {
         comment = "This node represents a formal parameter going towards the callee side"
       )
       .protoId(34)
-      .addProperties(code, order, name, typeFullName, lineNumber, columnNumber)
+      .addProperties(code, typeFullName, lineNumber, columnNumber)
       .extendz(declaration, localLike, trackingPoint, astNode)
 
     val methodReturn: NodeType = builder
@@ -473,7 +462,7 @@ object Base {
         comment = "A formal method return"
       )
       .protoId(3)
-      .addProperties(code, typeFullName, lineNumber, columnNumber, order)
+      .addProperties(typeFullName)
       .extendz(cfgNode, trackingPoint)
 
     val modifier: NodeType = builder
@@ -482,7 +471,7 @@ object Base {
         comment = "A modifier, e.g., static, public, private"
       )
       .protoId(300)
-      .addProperties(modifierType, order)
+      .addProperties(modifierType)
       .extendz(astNode)
 
     val tpe: NodeType = builder
@@ -500,7 +489,7 @@ object Base {
         comment = "A type declaration"
       )
       .protoId(46)
-      .addProperties(name, fullName, isExternal, inheritsFromTypeFullName, aliasTypeFullName, order, filename)
+      .addProperties(name, fullName, isExternal, inheritsFromTypeFullName, aliasTypeFullName, filename)
       .extendz(astNode)
 
     val typeParameter: NodeType = builder
@@ -509,7 +498,7 @@ object Base {
         comment = "Type parameter of TYPE_DECL or METHOD"
       )
       .protoId(47)
-      .addProperties(name, order)
+      .addProperties(name)
       .extendz(astNode)
 
     val typeArgument: NodeType = builder
@@ -518,7 +507,6 @@ object Base {
         comment = "Argument for a TYPE_PARAMETER that belongs to a TYPE. It binds another TYPE to a TYPE_PARAMETER"
       )
       .protoId(48)
-      .addProperties(order)
       .extendz(astNode)
 
     val member: NodeType = builder
@@ -527,7 +515,7 @@ object Base {
         comment = "Member of a class struct or union"
       )
       .protoId(9)
-      .addProperties(code, name, typeFullName, order)
+      .addProperties(code, typeFullName)
       .extendz(declaration, astNode)
 
     val namespaceBlock: NodeType = builder
@@ -536,7 +524,7 @@ object Base {
         comment = "A reference to a namespace"
       )
       .protoId(41)
-      .addProperties(name, fullName, order, filename)
+      .addProperties(name, fullName, filename)
       .extendz(astNode)
 
     val literal: NodeType = builder
@@ -545,7 +533,7 @@ object Base {
         comment = "Literal/Constant"
       )
       .protoId(8)
-      .addProperties(code, order, argumentIndex, typeFullName, lineNumber, columnNumber)
+      .addProperties(typeFullName)
       .extendz(expression)
 
     val callNode: NodeType = builder
@@ -554,7 +542,7 @@ object Base {
         comment = "A (method)-call"
       )
       .protoId(15)
-      .addProperties(code, name, order, methodFullName, argumentIndex, signature, lineNumber, columnNumber)
+      .addProperties(methodFullName)
       .extendz(expression, callRepr)
 
     val local: NodeType = builder
@@ -563,7 +551,7 @@ object Base {
         comment = "A local variable"
       )
       .protoId(23)
-      .addProperties(code, name, typeFullName, lineNumber, columnNumber, order)
+      .addProperties(code, typeFullName, lineNumber, columnNumber)
       .extendz(declaration, localLike, astNode)
 
     val identifier: NodeType = builder
@@ -572,7 +560,7 @@ object Base {
         comment = "An arbitrary identifier/reference"
       )
       .protoId(27)
-      .addProperties(code, name, order, argumentIndex, typeFullName, lineNumber, columnNumber)
+      .addProperties(typeFullName)
       .extendz(expression, localLike)
 
     val fieldIdentifier: NodeType = builder
@@ -582,7 +570,7 @@ object Base {
           "A node that represents which field is accessed in a <operator>.fieldAccess, in e.g. obj.field. The CODE part is used for human display and matching to MEMBER nodes. The CANONICAL_NAME is used for dataflow tracking; typically both coincide. However, suppose that two fields foo and bar are a C-style union; then CODE refers to whatever the programmer wrote (obj.foo or obj.bar), but both share the same CANONICAL_NAME (e.g. GENERATED_foo_bar)"
       )
       .protoId(2001081)
-      .addProperties(code, canonicalName, order, argumentIndex, lineNumber, columnNumber)
+      .addProperties(canonicalName)
       .extendz(expression)
 
     val ret: NodeType = builder
@@ -591,7 +579,6 @@ object Base {
         comment = "A return instruction"
       )
       .protoId(30)
-      .addProperties(lineNumber, columnNumber, order, argumentIndex, code)
       .extendz(expression)
 
     val block: NodeType = builder
@@ -600,7 +587,7 @@ object Base {
         comment = "A structuring block in the AST"
       )
       .protoId(31)
-      .addProperties(code, order, argumentIndex, typeFullName, lineNumber, columnNumber)
+      .addProperties(typeFullName)
       .extendz(expression)
 
     val methodInst: NodeType = builder
@@ -610,7 +597,7 @@ object Base {
           "A method instance which always has to reference a method and may have type argument children if the referred to method is a template"
       )
       .protoId(32)
-      .addProperties(name, signature, fullName, methodFullName, order)
+      .addProperties(name, signature, fullName, methodFullName)
       .extendz(astNode)
 
     val arrayInitializer: NodeType = builder
@@ -619,7 +606,6 @@ object Base {
         comment = "Initialization construct for arrays"
       )
       .protoId(14)
-      .addProperties()
       .extendz(astNode)
 
     val methodRef: NodeType = builder
@@ -628,14 +614,7 @@ object Base {
         comment = "Reference to a method instance"
       )
       .protoId(333)
-      .addProperties(code,
-                     order,
-                     argumentIndex,
-                     typeFullName,
-                     methodInstFullName,
-                     methodFullName,
-                     lineNumber,
-                     columnNumber)
+      .addProperties(typeFullName, methodInstFullName, methodFullName)
       .extendz(expression)
 
     val typeRef: NodeType = builder
@@ -644,7 +623,7 @@ object Base {
         comment = "Reference to a type/class"
       )
       .protoId(335)
-      .addProperties(code, order, argumentIndex, typeFullName, lineNumber, columnNumber)
+      .addProperties(typeFullName)
       .extendz(expression)
 
     val controlStructure: NodeType = builder
@@ -653,7 +632,7 @@ object Base {
         comment = "A control structure such as if, while, or for"
       )
       .protoId(339)
-      .addProperties(code, columnNumber, lineNumber, order, parserTypeName, controlStructureType, argumentIndex)
+      .addProperties(parserTypeName, controlStructureType)
       .extendz(expression)
 
     val jumpTarget: NodeType = builder
@@ -662,7 +641,7 @@ object Base {
         comment = "A jump target made explicit in the code using a label"
       )
       .protoId(340)
-      .addProperties(code, name, columnNumber, lineNumber, order, parserTypeName, argumentIndex)
+      .addProperties(name, parserTypeName, argumentIndex)
       .extendz(cfgNode, astNode)
 
     val unknown: NodeType = builder
@@ -671,7 +650,7 @@ object Base {
         comment = "A language-specific node"
       )
       .protoId(44)
-      .addProperties(code, parserTypeName, order, argumentIndex, typeFullName, lineNumber, columnNumber)
+      .addProperties(parserTypeName, typeFullName)
       .extendz(expression)
 
 // node relations
