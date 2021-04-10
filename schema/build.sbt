@@ -43,3 +43,5 @@ generateProtobuf := Def.taskDyn {
     }
   }
 }.value
+
+scalacOptions += "-Xfatal-warnings"
