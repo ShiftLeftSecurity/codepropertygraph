@@ -225,15 +225,6 @@ object Base {
       )
       .protoId(54)
 
-    val methodInstFullName = builder
-      .addNodeProperty(
-        name = "METHOD_INST_FULL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "Deprecated"
-      )
-      .protoId(55)
-
     val aliasTypeFullName = builder
       .addNodeProperty(
         name = "ALIAS_TYPE_FULL_NAME",
@@ -614,7 +605,7 @@ object Base {
         comment = "Reference to a method instance"
       )
       .protoId(333)
-      .addProperties(typeFullName, methodInstFullName, methodFullName)
+      .addProperties(typeFullName, methodFullName)
       .extendz(expression)
 
     val typeRef: NodeType = builder
