@@ -7,40 +7,25 @@ object Base {
   def apply(builder: SchemaBuilder) = new Schema(builder)
 
   class Schema(builder: SchemaBuilder) {
-// node properties
-    val language = builder
-      .addNodeProperty(
-        name = "LANGUAGE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = "The programming language this graph originates from"
-      )
-      .protoId(19)
+
+    // Properties used by more than one node type
 
     val version = builder
       .addNodeProperty(
         name = "VERSION",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = "A version, given as a string"
+        comment =
+          "A version, given as a string. Used, for example, in the META_DATA node to indicate which version of the CPG spec this CPG conforms to."
       )
       .protoId(13)
-
-    val overlays = builder
-      .addNodeProperty(
-        name = "OVERLAYS",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.List,
-        comment = "Names of overlays applied to this graph, in order of application"
-      )
-      .protoId(118)
 
     val hash = builder
       .addNodeProperty(
         name = "HASH",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,
-        comment = "Hash value of the artifact that this CPG is built from."
+        comment = "Hash value. Used, for example, to store the hash of the artifact that this CPG is built from."
       )
       .protoId(120)
 
@@ -62,42 +47,14 @@ object Base {
       )
       .protoId(11)
 
-    val lineNumberEnd = builder
-      .addNodeProperty(
-        name = "LINE_NUMBER_END",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "Line where the code ends"
-      )
-      .protoId(12)
-
-    val columnNumberEnd = builder
-      .addNodeProperty(
-        name = "COLUMN_NUMBER_END",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "Column where the code ends"
-      )
-      .protoId(16)
-
     val parserTypeName = builder
       .addNodeProperty(
         name = "PARSER_TYPE_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = "Type name emitted by parser, only present for logical type UNKNOWN"
+        comment = "AST node type name emitted by parser."
       )
       .protoId(3)
-
-    val order = builder
-      .addNodeProperty(
-        name = "ORDER",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.One,
-        comment =
-          "General ordering property, such that the children of each AST-node are typically numbered from 1, ..., N (this is not enforced). The ordering has no technical meaning, but is used for pretty printing and OUGHT TO reflect order in the source code"
-      )
-      .protoId(4)
 
     val argumentIndex = builder
       .addNodeProperty(
@@ -137,16 +94,6 @@ object Base {
           "Full name of an element, e.g., the class name along, including its package (e.g. \"io.shiftleft.dataflowenging.layers.dataflows.DataFlowRunner.run\"). In theory, the FULL_NAME just needs to be unique and is used for linking references, so a consecutive integer would be valid. In practice, this should be human readable"
       )
       .protoId(6)
-
-    val canonicalName = builder
-      .addNodeProperty(
-        name = "CANONICAL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment =
-          "Canonical token of a FIELD_IDENTIFIER. Typically identical to the CODE field, but canonicalized according to source language semantics. Human readable names are preferable. FIELD_IDENTIFIERs must share identical CANONICAL_NAME if and only if they alias, e.g. in C-style unions (if the aliasing relationship is unknown or there are partial overlaps, then one must make a reasonable guess, and trade off between false negatives and false positives)"
-      )
-      .protoId(2001092)
 
     val code = builder
       .addNodeProperty(
@@ -352,6 +299,16 @@ object Base {
       )
       .addProperties(name)
 
+    val order = builder
+      .addNodeProperty(
+        name = "ORDER",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.One,
+        comment =
+          "General ordering property, such that the children of each AST-node are typically numbered from 1, ..., N (this is not enforced)."
+      )
+      .protoId(4)
+
     val astNode = builder
       .addNodeBaseType(
         name = "AST_NODE",
@@ -383,7 +340,24 @@ object Base {
       .addProperties(name, signature)
       .extendz(cfgNode)
 
-// node types
+    val language = builder
+      .addNodeProperty(
+        name = "LANGUAGE",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = "the CPG language frontend that generated this CPG"
+      )
+      .protoId(19)
+
+    val overlays = builder
+      .addNodeProperty(
+        name = "OVERLAYS",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.List,
+        comment = "Names of overlays applied to this graph, in order of application"
+      )
+      .protoId(118)
+
     val metaData: NodeType = builder
       .addNodeType(
         name = "META_DATA",
@@ -400,6 +374,24 @@ object Base {
       .protoId(38)
       .addProperties(name, hash)
       .extendz(astNode)
+
+    val lineNumberEnd = builder
+      .addNodeProperty(
+        name = "LINE_NUMBER_END",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.ZeroOrOne,
+        comment = "Line where the code ends"
+      )
+      .protoId(12)
+
+    val columnNumberEnd = builder
+      .addNodeProperty(
+        name = "COLUMN_NUMBER_END",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.ZeroOrOne,
+        comment = "Column where the code ends"
+      )
+      .protoId(16)
 
     val method: NodeType = builder
       .addNodeType(
@@ -525,6 +517,16 @@ object Base {
       .protoId(27)
       .addProperties(typeFullName)
       .extendz(expression, localLike)
+
+    val canonicalName = builder
+      .addNodeProperty(
+        name = "CANONICAL_NAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment =
+          "Canonical token of a FIELD_IDENTIFIER. Typically identical to the CODE field, but canonicalized according to source language semantics. Human readable names are preferable. FIELD_IDENTIFIERs must share identical CANONICAL_NAME if and only if they alias, e.g. in C-style unions (if the aliasing relationship is unknown or there are partial overlaps, then one must make a reasonable guess, and trade off between false negatives and false positives)"
+      )
+      .protoId(2001092)
 
     val fieldIdentifier: NodeType = builder
       .addNodeType(
