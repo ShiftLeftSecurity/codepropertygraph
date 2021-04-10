@@ -13,6 +13,7 @@ class CpgSchema(builder: SchemaBuilder) {
   val javaSpecific = JavaSpecific(builder, base, enhancements)
 
   // everything else
+  val protoSerialize = ProtoSerialize(builder)
   val closure = Closure(builder, base, enhancements)
   val dependency = Dependency(builder, base)
   val deprecated = Deprecated(builder, base)

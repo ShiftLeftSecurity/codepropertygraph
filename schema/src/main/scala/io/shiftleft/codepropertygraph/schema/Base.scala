@@ -3,6 +3,10 @@ package io.shiftleft.codepropertygraph.schema
 import overflowdb.schema._
 import overflowdb.storage.ValueTypes
 
+/**
+  * The Base Layer of the Code Property Graph. This is the specification relevant
+  * for implementers of language frontends.
+  * */
 object Base {
   def apply(builder: SchemaBuilder) = new Schema(builder)
 
@@ -29,6 +33,25 @@ object Base {
       )
       .protoId(120)
 
+    val code = builder
+      .addNodeProperty(
+        name = "CODE",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = "The code snippet the node represents"
+      )
+      .protoId(21)
+
+    val filename = builder
+      .addNodeProperty(
+        name = "FILENAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment =
+          "Full path of canonical file that contained this node; will be linked into corresponding FILE nodes. Possible for METHOD, TYPE_DECL and NAMESPACE_BLOCK"
+      )
+      .protoId(106)
+
     val lineNumber = builder
       .addNodeProperty(
         name = "LINE_NUMBER",
@@ -46,25 +69,6 @@ object Base {
         comment = "Column where the code starts"
       )
       .protoId(11)
-
-    val parserTypeName = builder
-      .addNodeProperty(
-        name = "PARSER_TYPE_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = "AST node type name emitted by parser."
-      )
-      .protoId(3)
-
-    val argumentIndex = builder
-      .addNodeProperty(
-        name = "ARGUMENT_INDEX",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.One,
-        comment =
-          "AST-children of CALL nodes have an argument index, that is used to match call-site arguments with callee parameters. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this parameter. CALLs without implicit parameter therefore have arguments starting with index 1. AST-children of BLOCK nodes may have an argument index as well; in this case, the last argument index determines the return-value of a BLOCK expression"
-      )
-      .protoId(40)
 
     val isExternal = builder
       .addNodeProperty(
@@ -95,14 +99,24 @@ object Base {
       )
       .protoId(6)
 
-    val code = builder
+    val parserTypeName = builder
       .addNodeProperty(
-        name = "CODE",
+        name = "PARSER_TYPE_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = "The code snippet the node represents"
+        comment = "AST node type name emitted by parser."
       )
-      .protoId(21)
+      .protoId(3)
+
+    val argumentIndex = builder
+      .addNodeProperty(
+        name = "ARGUMENT_INDEX",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.One,
+        comment =
+          "AST-children of CALL nodes have an argument index, that is used to match call-site arguments with callee parameters. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this parameter. CALLs without implicit parameter therefore have arguments starting with index 1. AST-children of BLOCK nodes may have an argument index as well; in this case, the last argument index determines the return-value of a BLOCK expression"
+      )
+      .protoId(40)
 
     val signature = builder
       .addNodeProperty(
@@ -114,23 +128,7 @@ object Base {
       )
       .protoId(22)
 
-    val modifierType = builder
-      .addNodeProperty(
-        name = "MODIFIER_TYPE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = "Indicates the modifier which is represented by a MODIFIER node. See modifierTypes"
-      )
-      .protoId(26)
-
-    val controlStructureType = builder
-      .addNodeProperty(
-        name = "CONTROL_STRUCTURE_TYPE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = "Indicates the control structure type. See controlStructureTypes"
-      )
-      .protoId(27)
+    // The following fields are used to create edges between nodes in later processing stages.
 
     val typeFullName = builder
       .addNodeProperty(
@@ -152,16 +150,6 @@ object Base {
       )
       .protoId(52)
 
-    val inheritsFromTypeFullName = builder
-      .addNodeProperty(
-        name = "INHERITS_FROM_TYPE_FULL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.List,
-        comment =
-          "The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME"
-      )
-      .protoId(53)
-
     val methodFullName = builder
       .addNodeProperty(
         name = "METHOD_FULL_NAME",
@@ -171,35 +159,6 @@ object Base {
           "The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node for each METHOD_FULL_NAME"
       )
       .protoId(54)
-
-    val aliasTypeFullName = builder
-      .addNodeProperty(
-        name = "ALIAS_TYPE_FULL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "Type full name of which a TYPE_DECL is an alias of"
-      )
-      .protoId(158)
-
-    val filename = builder
-      .addNodeProperty(
-        name = "FILENAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment =
-          "Full path of canonical file that contained this node; will be linked into corresponding FILE nodes. Possible for METHOD, TYPE_DECL and NAMESPACE_BLOCK"
-      )
-      .protoId(106)
-
-    val containedRef = builder
-      .addNodeProperty(
-        name = "CONTAINED_REF",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment =
-          "References to other nodes. This is not a real property; it exists here for the sake of proto serialization only. valueType and cardinality are meaningless."
-      )
-      .protoId(2007161)
 
 // edge types
     val ast = builder
@@ -215,6 +174,27 @@ object Base {
         comment = "Control flow edge"
       )
       .protoId(19)
+
+    val condition = builder
+      .addEdgeType(
+        name = "CONDITION",
+        comment = "Edge from control structure node to the expression that holds the condition"
+      )
+      .protoId(56)
+
+    val argument = builder
+      .addEdgeType(
+        name = "ARGUMENT",
+        comment = "Relation between a CALL and its arguments and RETURN and the returned expression"
+      )
+      .protoId(156)
+
+    val sourceFile = builder
+      .addEdgeType(
+        name = "SOURCE_FILE",
+        comment = "Source file of a node, in which its LINE_NUMBER and COLUMN_NUMBER are valid"
+      )
+      .protoId(157)
 
     val capturedBy = builder
       .addEdgeType(
@@ -250,27 +230,6 @@ object Base {
         comment = "The receiver of a method call which is either an object or a pointer"
       )
       .protoId(55)
-
-    val condition = builder
-      .addEdgeType(
-        name = "CONDITION",
-        comment = "Edge from control structure node to the expression that holds the condition"
-      )
-      .protoId(56)
-
-    val argument = builder
-      .addEdgeType(
-        name = "ARGUMENT",
-        comment = "Relation between a CALL and its arguments and RETURN and the returned expression"
-      )
-      .protoId(156)
-
-    val sourceFile = builder
-      .addEdgeType(
-        name = "SOURCE_FILE",
-        comment = "Source file of a node, in which its LINE_NUMBER and COLUMN_NUMBER are valid"
-      )
-      .protoId(157)
 
 // node base types
     val withinMethod = builder.addNodeBaseType(
@@ -420,6 +379,15 @@ object Base {
       .addProperties(typeFullName)
       .extendz(cfgNode, trackingPoint)
 
+    val modifierType = builder
+      .addNodeProperty(
+        name = "MODIFIER_TYPE",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = "Indicates the modifier which is represented by a MODIFIER node. See modifierTypes"
+      )
+      .protoId(26)
+
     val modifier: NodeType = builder
       .addNodeType(
         name = "MODIFIER",
@@ -437,6 +405,25 @@ object Base {
       )
       .protoId(45)
       .addProperties(name, fullName, typeDeclFullName)
+
+    val inheritsFromTypeFullName = builder
+      .addNodeProperty(
+        name = "INHERITS_FROM_TYPE_FULL_NAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.List,
+        comment =
+          "The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME"
+      )
+      .protoId(53)
+
+    val aliasTypeFullName = builder
+      .addNodeProperty(
+        name = "ALIAS_TYPE_FULL_NAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.ZeroOrOne,
+        comment = "Type full name of which a TYPE_DECL is an alias of"
+      )
+      .protoId(158)
 
     val typeDecl: NodeType = builder
       .addNodeType(
@@ -590,6 +577,15 @@ object Base {
       .protoId(335)
       .addProperties(typeFullName)
       .extendz(expression)
+
+    val controlStructureType = builder
+      .addNodeProperty(
+        name = "CONTROL_STRUCTURE_TYPE",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = "Indicates the control structure type. See controlStructureTypes"
+      )
+      .protoId(27)
 
     val controlStructure: NodeType = builder
       .addNodeType(
