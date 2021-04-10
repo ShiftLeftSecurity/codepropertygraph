@@ -254,26 +254,6 @@ object Base {
       )
       .protoId(2007161)
 
-// edge properties
-    val localName = builder
-      .addEdgeProperty(
-        name = "LOCAL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "Local name of referenced CONTAINED node. This key is deprecated."
-      )
-      .protoId(6)
-
-    val index = builder
-      .addEdgeProperty(
-        name = "INDEX",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
-        comment =
-          "Index of referenced CONTAINED node (0 based) - used together with cardinality=list. This key is deprecated."
-      )
-      .protoId(8)
-
 // edge types
     val ast = builder
       .addEdgeType(
@@ -288,14 +268,6 @@ object Base {
         comment = "Control flow edge"
       )
       .protoId(19)
-
-    val containsNode = builder
-      .addEdgeType(
-        name = "CONTAINS_NODE",
-        comment = "Membership relation for a compound object. This edge is deprecated."
-      )
-      .protoId(9)
-      .addProperties(localName, index)
 
     val capturedBy = builder
       .addEdgeType(
