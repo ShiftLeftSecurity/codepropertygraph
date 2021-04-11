@@ -19,8 +19,9 @@ object Base {
         name = "VERSION",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment =
-          "A version, given as a string. Used, for example, in the META_DATA node to indicate which version of the CPG spec this CPG conforms to."
+        comment = """A version, given as a string. Used, for example, in the META_DATA node to
+            |indicate which version of the CPG spec this CPG conforms to
+            |""".stripMargin
       )
       .protoId(13)
 
@@ -29,7 +30,8 @@ object Base {
         name = "HASH",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,
-        comment = "Hash value. Used, for example, to store the hash of the artifact that this CPG is built from."
+        comment = """Hash value. Used, for example, to store the hash of the
+            |artifact that this CPG is built from""".stripMargin
       )
       .protoId(120)
 
@@ -47,8 +49,8 @@ object Base {
         name = "FILENAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment =
-          "Full path of canonical file that contained this node; will be linked into corresponding FILE nodes. Possible for METHOD, TYPE_DECL and NAMESPACE_BLOCK"
+        comment = """Full path of canonical file that contained this node; will be linked into
+            |corresponding FILE nodes. Possible for METHOD, TYPE_DECL and NAMESPACE_BLOCK""".stripMargin
       )
       .protoId(106)
 
@@ -75,8 +77,10 @@ object Base {
         name = "IS_EXTERNAL",
         valueType = ValueTypes.BOOLEAN,
         cardinality = Cardinality.One,
-        comment =
-          "Indicates that the construct (METHOD or TYPE_DECL) is external, that is, it is referenced but not defined in the code (applies both to insular parsing and to library functions where we have header files only)"
+        comment = """Indicates that the construct (METHOD or TYPE_DECL) is external, that is,
+            |it is referenced but not defined in the code (applies both to insular
+            |parsing and to library functions where we have header files only)
+            |""".stripMargin
       )
       .protoId(7)
 
@@ -94,8 +98,11 @@ object Base {
         name = "FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment =
-          "Full name of an element, e.g., the class name along, including its package (e.g. \"io.shiftleft.dataflowenging.layers.dataflows.DataFlowRunner.run\"). In theory, the FULL_NAME just needs to be unique and is used for linking references, so a consecutive integer would be valid. In practice, this should be human readable"
+        comment = """Full name of an element, e.g., the class name along, including its package
+            |(e.g. \"io.shiftleft.dataflowenging.layers.dataflows.DataFlowRunner.run\").
+            |In theory, the FULL_NAME just needs to be unique and is used for linking references,
+            |so a consecutive integer would be valid. In practice, this should be human readable
+            |""".stripMargin
       )
       .protoId(6)
 
@@ -113,8 +120,13 @@ object Base {
         name = "ARGUMENT_INDEX",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.One,
-        comment =
-          "AST-children of CALL nodes have an argument index, that is used to match call-site arguments with callee parameters. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this parameter. CALLs without implicit parameter therefore have arguments starting with index 1. AST-children of BLOCK nodes may have an argument index as well; in this case, the last argument index determines the return-value of a BLOCK expression"
+        comment = """AST-children of CALL nodes have an argument index, that is used to match
+            |call-site arguments with callee parameters. Explicit parameters are numbered
+            |from 1 to N, while index 0 is reserved for implicit self / this parameter.
+            |CALLs without implicit parameter therefore have arguments starting with index 1.
+            |AST-children of BLOCK nodes may have an argument index as well; in this case,
+            |the last argument index determines the return-value of a BLOCK expression
+            |""".stripMargin
       )
       .protoId(40)
 
@@ -123,8 +135,11 @@ object Base {
         name = "SIGNATURE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment =
-          "Method signature. The format is defined by the language front-end, and the backend simply compares strings to resolve function overloading, i.e. match call-sites to METHODs. In theory, consecutive integers would be valid, but in practice this should be human readable"
+        comment = """Method signature. The format is defined by the language front-end, and the
+            |backend simply compares strings to resolve function overloading, i.e. match
+            |call-sites to METHODs. In theory, consecutive integers would be valid,
+            |but in practice this should be human readable
+            |""".stripMargin
       )
       .protoId(22)
 
@@ -135,8 +150,10 @@ object Base {
         name = "TYPE_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment =
-          "The static type of an entity. E.g. expressions, local, parameters etc. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME"
+        comment = """The static type of an entity. E.g. expressions, local, parameters etc.
+            |This property is matched against the FULL_NAME of TYPE nodes and thus it
+            |is required to have at least one TYPE node for each TYPE_FULL_NAME
+            |""".stripMargin
       )
       .protoId(51)
 
@@ -145,8 +162,9 @@ object Base {
         name = "TYPE_DECL_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment =
-          "The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME"
+        comment = """The static type decl of a TYPE. This property is matched against the FULL_NAME
+            |of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each
+            |different TYPE_DECL_FULL_NAME""".stripMargin
       )
       .protoId(52)
 
@@ -155,8 +173,8 @@ object Base {
         name = "METHOD_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment =
-          "The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node for each METHOD_FULL_NAME"
+        comment = """The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required
+            |to have exactly one METHOD node for each METHOD_FULL_NAME""".stripMargin
       )
       .protoId(54)
 
@@ -263,8 +281,8 @@ object Base {
         name = "ORDER",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.One,
-        comment =
-          "General ordering property, such that the children of each AST-node are typically numbered from 1, ..., N (this is not enforced)."
+        comment = """General ordering property, such that the children of each AST-node are
+            |typically numbered from 1, ..., N (this is not enforced).""".stripMargin
       )
       .protoId(4)
 
@@ -320,7 +338,8 @@ object Base {
     val metaData: NodeType = builder
       .addNodeType(
         name = "META_DATA",
-        comment = "Node to save meta data about the graph on its properties. Exactly one node of this type per graph"
+        comment = """Node to save meta data about the graph on its properties.
+            |Exactly one node of this type per graph""".stripMargin
       )
       .protoId(39)
       .addProperties(language, version, overlays, hash)
@@ -400,8 +419,8 @@ object Base {
     val tpe: NodeType = builder
       .addNodeType(
         name = "TYPE",
-        comment =
-          "A type which always has to reference a type declaration and may have type argument children if the referred to type declaration is a template"
+        comment = """A type which always has to reference a type declaration and may have type
+            |argument children if the referred to type declaration is a template""".stripMargin
       )
       .protoId(45)
       .addProperties(name, fullName, typeDeclFullName)
@@ -411,8 +430,9 @@ object Base {
         name = "INHERITS_FROM_TYPE_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.List,
-        comment =
-          "The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node for each TYPE_FULL_NAME"
+        comment = """The static types a TYPE_DECL inherits from. This property is matched against the
+            |FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node
+            |for each TYPE_FULL_NAME""".stripMargin
       )
       .protoId(53)
 
@@ -446,7 +466,9 @@ object Base {
     val typeArgument: NodeType = builder
       .addNodeType(
         name = "TYPE_ARGUMENT",
-        comment = "Argument for a TYPE_PARAMETER that belongs to a TYPE. It binds another TYPE to a TYPE_PARAMETER"
+        comment = """Argument for a TYPE_PARAMETER that belongs to a TYPE. It binds another
+            |TYPE to a TYPE_PARAMETER
+            |""".stripMargin
       )
       .protoId(48)
       .extendz(astNode)
@@ -510,16 +532,26 @@ object Base {
         name = "CANONICAL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment =
-          "Canonical token of a FIELD_IDENTIFIER. Typically identical to the CODE field, but canonicalized according to source language semantics. Human readable names are preferable. FIELD_IDENTIFIERs must share identical CANONICAL_NAME if and only if they alias, e.g. in C-style unions (if the aliasing relationship is unknown or there are partial overlaps, then one must make a reasonable guess, and trade off between false negatives and false positives)"
+        comment = """Canonical token of a FIELD_IDENTIFIER. Typically identical to the CODE field,
+            |but canonicalized according to source language semantics. Human readable names
+            |are preferable. FIELD_IDENTIFIERs must share identical CANONICAL_NAME if and
+            |only if they alias, e.g. in C-style unions (if the aliasing relationship is
+            |unknown or there are partial overlaps, then one must make a reasonable guess,
+            |and trade off between false negatives and false positives)
+            |""".stripMargin
       )
       .protoId(2001092)
 
     val fieldIdentifier: NodeType = builder
       .addNodeType(
         name = "FIELD_IDENTIFIER",
-        comment =
-          "A node that represents which field is accessed in a <operator>.fieldAccess, in e.g. obj.field. The CODE part is used for human display and matching to MEMBER nodes. The CANONICAL_NAME is used for dataflow tracking; typically both coincide. However, suppose that two fields foo and bar are a C-style union; then CODE refers to whatever the programmer wrote (obj.foo or obj.bar), but both share the same CANONICAL_NAME (e.g. GENERATED_foo_bar)"
+        comment = """A node that represents which field is accessed in a <operator>.fieldAccess, in
+            |e.g. obj.field. The CODE part is used for human display and matching to MEMBER nodes.
+            |The CANONICAL_NAME is used for dataflow tracking; typically both coincide.
+            |However, suppose that two fields foo and bar are a C-style union; then CODE refers
+            |to whatever the programmer wrote (obj.foo or obj.bar), but both share the same
+            |CANONICAL_NAME (e.g. GENERATED_foo_bar)
+            |""".stripMargin
       )
       .protoId(2001081)
       .addProperties(canonicalName)
@@ -545,8 +577,9 @@ object Base {
     val methodInst: NodeType = builder
       .addNodeType(
         name = "METHOD_INST",
-        comment =
-          "A method instance which always has to reference a method and may have type argument children if the referred to method is a template"
+        comment = """A method instance which always has to reference a method and may have type
+            |argument children if the referred to method is a template
+            |""".stripMargin
       )
       .protoId(32)
       .addProperties(name, signature, fullName, methodFullName)
