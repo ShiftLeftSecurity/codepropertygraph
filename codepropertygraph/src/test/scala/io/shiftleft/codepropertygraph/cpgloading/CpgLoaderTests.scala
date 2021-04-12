@@ -1,13 +1,10 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import io.shiftleft.proto.cpg.Cpg
-import io.shiftleft.proto.cpg.Cpg.CpgStruct
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.Config
 
-import java.io.FileOutputStream
 import java.nio.file.FileSystemNotFoundException
 
 /**
@@ -18,43 +15,13 @@ import java.nio.file.FileSystemNotFoundException
   * */
 class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 
-  var outDir: better.files.File = _
   var zipFile: better.files.File = _
-  var filename: String = _
 
   override def beforeAll(): Unit = {
-    outDir = better.files.File.newTemporaryDirectory("cpgloadertests")
-    val outStream = new FileOutputStream((outDir / "1.proto").pathAsString)
-    CpgStruct
-      .newBuilder()
-      .addNode(
-        CpgStruct.Node
-          .newBuilder()
-          .setKey(1)
-          .setType(CpgStruct.Node.NodeType.valueOf("METHOD"))
-          .addProperty(
-            CpgStruct.Node.Property
-              .newBuilder()
-              .setName(Cpg.NodePropertyName.valueOf("FULL_NAME"))
-              .setValue(Cpg.PropertyValue
-                .newBuilder()
-                .setStringValue("foo")
-                .build())
-              .build
-          )
-          .build())
-      .build()
-      .writeTo(outStream)
-    outStream.close()
-
-    zipFile = better.files.File.newTemporaryFile("cpgloadertests", ".bin.zip")
-    outDir.zipTo(zipFile)
-    zipFile.exists shouldBe true
-    filename = zipFile.pathAsString
+    zipFile = TestProtoCpg.createTestProtoCpg
   }
 
   override def afterAll(): Unit = {
-    outDir.delete()
     zipFile.delete()
   }
 
@@ -66,7 +33,7 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
       */
     "allow loading of CPG from bin.zip file" in {
       zipFile.exists shouldBe true
-      val cpg = CpgLoader.load(filename)
+      val cpg = CpgLoader.load(zipFile.pathAsString)
       cpg.graph.nodes.hasNext shouldBe true
     }
 
@@ -81,7 +48,7 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
       * */
     "allow disabling the overflowdb backend" in {
       val config = new CpgLoaderConfig(overflowDbConfig = new Config())
-      val cpg = CpgLoader.load(filename, config)
+      val cpg = CpgLoader.load(zipFile.pathAsString, config)
       cpg.graph.nodes.hasNext shouldBe true
     }
 
@@ -96,7 +63,7 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
     "allow late creation of indexes" in {
       // Do not create indexes on load
       val config = new CpgLoaderConfig(createIndexes = false)
-      val cpg = CpgLoader.load(filename, config)
+      val cpg = CpgLoader.load(zipFile.pathAsString, config)
 
       // ... execute lots of operations on the graph
       val vertex = cpg.graph.addNode("METHOD")

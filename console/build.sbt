@@ -2,7 +2,7 @@ name := "console"
 
 enablePlugins(JavaAppPackaging)
 
-dependsOn(Projects.codepropertygraph,
+dependsOn(Projects.codepropertygraph % "compile ->compile; test -> test",
           Projects.semanticcpg,
           Projects.macros,
           Projects.fuzzyc2cpg)
