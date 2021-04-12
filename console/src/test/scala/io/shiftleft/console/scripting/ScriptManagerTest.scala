@@ -2,17 +2,29 @@ package io.shiftleft.console.scripting
 
 import cats.effect.IO
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.cpgloading.TestProtoCpg
 import io.shiftleft.console.scripting.ScriptManager.{ScriptCollections, ScriptDescription, ScriptDescriptions}
-import io.shiftleft.utils.ProjectRoot
-import org.scalatest.Inside
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.{BeforeAndAfterAll, Inside}
 
 import java.nio.file.{FileSystemNotFoundException, NoSuchFileException, Path}
 import scala.io.Source
 import scala.util.Try
 
-class ScriptManagerTest extends AnyWordSpec with Matchers with Inside {
+class ScriptManagerTest extends AnyWordSpec with Matchers with Inside with BeforeAndAfterAll {
+
+  var zipFile: better.files.File = _
+  protected var DEFAULT_CPG_NAME: String = _
+
+  override def beforeAll(): Unit = {
+    zipFile = TestProtoCpg.createTestProtoCpg
+    DEFAULT_CPG_NAME = zipFile.pathAsString
+  }
+
+  override def afterAll(): Unit = {
+    zipFile.delete()
+  }
 
   private object TestScriptExecutor extends AmmoniteExecutor {
     override protected def predef: String = ""
@@ -27,8 +39,6 @@ class ScriptManagerTest extends AnyWordSpec with Matchers with Inside {
   }
 
   private object TestScriptManager extends ScriptManager(TestScriptExecutor)
-
-  protected val DEFAULT_CPG_NAME = ProjectRoot.relativise("resources/testcode/cpgs/method/cpg.bin.zip")
 
   def withScriptManager(f: ScriptManager => Unit): Unit = {
     f(TestScriptManager)

@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import io.shiftleft.utils.ProjectRoot
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.Config
@@ -13,9 +13,17 @@ import java.nio.file.FileSystemNotFoundException
   * An optional `CpgLoaderConfig` can be passed to the loader to influence
   * the loading process.
   * */
-class CpgLoaderTests extends AnyWordSpec with Matchers {
+class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 
-  val filename = ProjectRoot.relativise("resources/testcode/cpgs/hello-shiftleft-0.0.5/cpg.bin.zip")
+  var zipFile: better.files.File = _
+
+  override def beforeAll(): Unit = {
+    zipFile = TestProtoCpg.createTestProtoCpg
+  }
+
+  override def afterAll(): Unit = {
+    zipFile.delete()
+  }
 
   "CpgLoader" should {
 
@@ -24,7 +32,8 @@ class CpgLoaderTests extends AnyWordSpec with Matchers {
       * is to be loaded.
       */
     "allow loading of CPG from bin.zip file" in {
-      val cpg = CpgLoader.load(filename)
+      zipFile.exists shouldBe true
+      val cpg = CpgLoader.load(zipFile.pathAsString)
       cpg.graph.nodes.hasNext shouldBe true
     }
 
@@ -39,7 +48,7 @@ class CpgLoaderTests extends AnyWordSpec with Matchers {
       * */
     "allow disabling the overflowdb backend" in {
       val config = new CpgLoaderConfig(overflowDbConfig = new Config())
-      val cpg = CpgLoader.load(filename, config)
+      val cpg = CpgLoader.load(zipFile.pathAsString, config)
       cpg.graph.nodes.hasNext shouldBe true
     }
 
@@ -54,7 +63,7 @@ class CpgLoaderTests extends AnyWordSpec with Matchers {
     "allow late creation of indexes" in {
       // Do not create indexes on load
       val config = new CpgLoaderConfig(createIndexes = false)
-      val cpg = CpgLoader.load(filename, config)
+      val cpg = CpgLoader.load(zipFile.pathAsString, config)
 
       // ... execute lots of operations on the graph
       val vertex = cpg.graph.addNode("METHOD")
