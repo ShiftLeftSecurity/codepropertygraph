@@ -352,22 +352,25 @@ class CfgCreator(entryNode: nodes.Method) {
   }
 
   /**
-    * CFG creation for while statements of the form `while(condition) body`
-    * where body is optional.
+    * CFG creation for while statements of the form `while(condition) body1 else body2`
+    * where body1 and the else block are optional.
     * */
   protected def cfgForWhileStatement(node: nodes.ControlStructure): Cfg = {
     val conditionCfg = Traversal.fromSingle(node).condition.headOption.map(cfgFor).getOrElse(Cfg.empty)
     val trueCfg = Traversal.fromSingle(node).whenTrue.headOption.map(cfgFor).getOrElse(Cfg.empty)
+    val falseCfg = Traversal.fromSingle(node).whenFalse.headOption.map(cfgFor).getOrElse(Cfg.empty)
+
     val diffGraphs = edgesFromFringeTo(conditionCfg, trueCfg.entryNode) ++
+      edgesFromFringeTo(trueCfg, falseCfg.entryNode) ++
       edgesFromFringeTo(trueCfg, conditionCfg.entryNode) ++
       edges(trueCfg.continues, conditionCfg.entryNode)
 
     Cfg
-      .from(conditionCfg, trueCfg)
+      .from(conditionCfg, trueCfg, falseCfg)
       .copy(
         entryNode = conditionCfg.entryNode,
-        edges = diffGraphs ++ conditionCfg.edges ++ trueCfg.edges,
-        fringe = conditionCfg.fringe.withEdgeType(FalseEdge) ++ trueCfg.breaks.map((_, AlwaysEdge))
+        edges = diffGraphs ++ conditionCfg.edges ++ trueCfg.edges ++ falseCfg.edges,
+        fringe = conditionCfg.fringe.withEdgeType(FalseEdge) ++ trueCfg.breaks.map((_, AlwaysEdge)) ++ falseCfg.fringe
       )
   }
 
