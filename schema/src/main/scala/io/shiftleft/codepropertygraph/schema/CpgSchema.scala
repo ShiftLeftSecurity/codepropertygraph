@@ -22,7 +22,6 @@ class CpgSchema(builder: SchemaBuilder) {
   val finding = Finding(builder, enhancements)
   val operators = Operators(builder)
   val sourceSpecific = SourceSpecific(builder, base)
-  val splitting = Splitting(builder, enhancements)
   val tagsAndLocation = TagsAndLocation(builder, base, enhancements)
 }
 
