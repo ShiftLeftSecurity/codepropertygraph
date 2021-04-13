@@ -50,7 +50,14 @@ object Closure {
       .protoId(334)
       .addProperties(closureBindingId, evaluationStrategy, closureOriginalName)
 
-// node relations
+    val capturedBy = builder
+      .addEdgeType(
+        name = "CAPTURED_BY",
+        comment = "Connection between a captured LOCAL and the corresponding CLOSURE_BINDING"
+      )
+      .protoId(41)
+
+    // node relations
     local.addOutEdge(edge = capturedBy, inNode = closureBinding)
 
     methodRef

@@ -32,15 +32,6 @@ object Enhancements {
       )
       .protoId(1002)
 
-    val policyDirectories = builder
-      .addProperty(
-        name = "POLICY_DIRECTORIES",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.List,
-        comment = "Sub directories of the policy directory that should be loaded when processing the CPG"
-      )
-      .protoId(119)
-
     val evaluationStrategy = builder
       .addProperty(
         name = "EVALUATION_STRATEGY",
@@ -59,15 +50,6 @@ object Enhancements {
         comment = "The dispatch type of a call, which is either static or dynamic. See dispatchTypes"
       )
       .protoId(25)
-
-    val dynamicTypeHintFullName = builder
-      .addProperty(
-        name = "DYNAMIC_TYPE_HINT_FULL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.List,
-        comment = "Type hint for the dynamic type"
-      )
-      .protoId(1591)
 
     val astParentType = builder
       .addProperty(
@@ -107,6 +89,28 @@ object Enhancements {
       .protoId(11)
 
 // edge types
+
+    val dominate = builder
+      .addEdgeType(
+        name = "DOMINATE",
+        comment = "Points to dominated node in DOM tree"
+      )
+      .protoId(181)
+
+    val postDominate = builder
+      .addEdgeType(
+        name = "POST_DOMINATE",
+        comment = "Points to dominated node in post DOM tree"
+      )
+      .protoId(182)
+
+    val cdg = builder
+      .addEdgeType(
+        name = "CDG",
+        comment = "Control dependency graph"
+      )
+      .protoId(183)
+
     val parameterLink = builder
       .addEdgeType(
         name = "PARAMETER_LINK",
@@ -187,6 +191,19 @@ object Enhancements {
       .protoId(155)
 
 // node types
+
+    val detachedTrackingPoint: NodeType = builder
+      .addNodeType(
+        name = "DETACHED_TRACKING_POINT",
+        comment = ""
+      )
+      .protoId(1001)
+      .addProperties()
+      .extendz(trackingPoint)
+
+    detachedTrackingPoint
+      .addContainedNode(cfgNode, "cfgNode", Cardinality.One)
+
     val binding: NodeType = builder
       .addNodeType(
         name = "BINDING",
@@ -231,7 +248,7 @@ object Enhancements {
       .extendz(astNode)
 
     callNode
-      .addProperties(dispatchType, dynamicTypeHintFullName)
+      .addProperties(dispatchType)
 
     method
       .addProperties(astParentType, astParentFullName)
@@ -240,7 +257,7 @@ object Enhancements {
       .addProperties(isMethodNeverOverridden)
 
     methodParameterIn
-      .addProperties(evaluationStrategy, dynamicTypeHintFullName)
+      .addProperties(evaluationStrategy)
 
     val methodParameterOut: NodeType = builder
       .addNodeType(
@@ -252,39 +269,466 @@ object Enhancements {
       .extendz(declaration, trackingPoint, astNode)
 
     methodReturn
-      .addProperties(evaluationStrategy, dynamicTypeHintFullName)
-
-    methodRef
-      .addProperties(dynamicTypeHintFullName)
-
-    typeRef
-      .addProperties(dynamicTypeHintFullName)
+      .addProperties(evaluationStrategy)
 
     typeDecl
       .addProperties(astParentType, astParentFullName)
 
-    member
-      .addProperties(dynamicTypeHintFullName)
+// node relations
+
+    method
+      .addOutEdge(edge = taggedBy, inNode = tag)
+      .addOutEdge(edge = dominate, inNode = callNode)
+      .addOutEdge(edge = dominate, inNode = identifier)
+      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = dominate, inNode = literal)
+      .addOutEdge(edge = dominate, inNode = methodRef)
+      .addOutEdge(edge = dominate, inNode = typeRef)
+      .addOutEdge(edge = dominate, inNode = ret)
+      .addOutEdge(edge = dominate, inNode = block)
+      .addOutEdge(edge = dominate, inNode = methodReturn)
+      .addOutEdge(edge = dominate, inNode = unknown)
+
+    methodReturn
+      .addOutEdge(edge = taggedBy, inNode = tag)
+      .addOutEdge(edge = postDominate, inNode = callNode)
+      .addOutEdge(edge = postDominate, inNode = identifier)
+      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = postDominate, inNode = literal)
+      .addOutEdge(edge = postDominate, inNode = methodRef)
+      .addOutEdge(edge = postDominate, inNode = typeRef)
+      .addOutEdge(edge = postDominate, inNode = ret)
+      .addOutEdge(edge = postDominate, inNode = block)
+      .addOutEdge(edge = postDominate, inNode = method)
+      .addOutEdge(edge = postDominate, inNode = controlStructure)
+      .addOutEdge(edge = postDominate, inNode = jumpTarget)
+      .addOutEdge(edge = postDominate, inNode = unknown)
 
     literal
-      .addProperties(dynamicTypeHintFullName)
+      .addOutEdge(edge = taggedBy, inNode = tag)
+      .addOutEdge(edge = dominate, inNode = callNode)
+      .addOutEdge(edge = dominate, inNode = identifier)
+      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = dominate, inNode = literal)
+      .addOutEdge(edge = dominate, inNode = methodRef)
+      .addOutEdge(edge = dominate, inNode = typeRef)
+      .addOutEdge(edge = dominate, inNode = ret)
+      .addOutEdge(edge = dominate, inNode = block)
+      .addOutEdge(edge = dominate, inNode = methodReturn)
+      .addOutEdge(edge = dominate, inNode = controlStructure)
+      .addOutEdge(edge = dominate, inNode = jumpTarget)
+      .addOutEdge(edge = dominate, inNode = unknown)
+      .addOutEdge(edge = postDominate, inNode = callNode)
+      .addOutEdge(edge = postDominate, inNode = identifier)
+      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = postDominate, inNode = literal)
+      .addOutEdge(edge = postDominate, inNode = methodRef)
+      .addOutEdge(edge = postDominate, inNode = typeRef)
+      .addOutEdge(edge = postDominate, inNode = ret)
+      .addOutEdge(edge = postDominate, inNode = block)
+      .addOutEdge(edge = postDominate, inNode = method)
+      .addOutEdge(edge = postDominate, inNode = controlStructure)
+      .addOutEdge(edge = postDominate, inNode = jumpTarget)
+      .addOutEdge(edge = postDominate, inNode = unknown)
+      .addOutEdge(edge = cdg, inNode = callNode)
+      .addOutEdge(edge = cdg, inNode = identifier)
+      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
+      .addOutEdge(edge = cdg, inNode = literal)
+      .addOutEdge(edge = cdg, inNode = methodRef)
+      .addOutEdge(edge = cdg, inNode = typeRef)
+      .addOutEdge(edge = cdg, inNode = ret)
+      .addOutEdge(edge = cdg, inNode = block)
+      .addOutEdge(edge = cdg, inNode = methodReturn)
+      .addOutEdge(edge = cdg, inNode = controlStructure)
+      .addOutEdge(edge = cdg, inNode = jumpTarget)
+      .addOutEdge(edge = cdg, inNode = unknown)
 
     local
-      .addProperties(dynamicTypeHintFullName)
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    member
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    callNode
+      .addOutEdge(edge = taggedBy, inNode = tag)
+      .addOutEdge(edge = taggedBy, inNode = tag)
+      .addOutEdge(edge = dominate, inNode = callNode)
+      .addOutEdge(edge = dominate, inNode = identifier)
+      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = dominate, inNode = literal)
+      .addOutEdge(edge = dominate, inNode = methodRef)
+      .addOutEdge(edge = dominate, inNode = typeRef)
+      .addOutEdge(edge = dominate, inNode = ret)
+      .addOutEdge(edge = dominate, inNode = block)
+      .addOutEdge(edge = dominate, inNode = methodReturn)
+      .addOutEdge(edge = dominate, inNode = controlStructure)
+      .addOutEdge(edge = dominate, inNode = jumpTarget)
+      .addOutEdge(edge = dominate, inNode = unknown)
+      .addOutEdge(edge = postDominate, inNode = callNode)
+      .addOutEdge(edge = postDominate, inNode = identifier)
+      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = postDominate, inNode = literal)
+      .addOutEdge(edge = postDominate, inNode = methodRef)
+      .addOutEdge(edge = postDominate, inNode = typeRef)
+      .addOutEdge(edge = postDominate, inNode = ret)
+      .addOutEdge(edge = postDominate, inNode = block)
+      .addOutEdge(edge = postDominate, inNode = method)
+      .addOutEdge(edge = postDominate, inNode = controlStructure)
+      .addOutEdge(edge = postDominate, inNode = jumpTarget)
+      .addOutEdge(edge = postDominate, inNode = unknown)
+      .addOutEdge(edge = cdg, inNode = callNode)
+      .addOutEdge(edge = cdg, inNode = identifier)
+      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
+      .addOutEdge(edge = cdg, inNode = literal)
+      .addOutEdge(edge = cdg, inNode = methodRef)
+      .addOutEdge(edge = cdg, inNode = typeRef)
+      .addOutEdge(edge = cdg, inNode = ret)
+      .addOutEdge(edge = cdg, inNode = block)
+      .addOutEdge(edge = cdg, inNode = methodReturn)
+      .addOutEdge(edge = cdg, inNode = controlStructure)
+      .addOutEdge(edge = cdg, inNode = jumpTarget)
+      .addOutEdge(edge = cdg, inNode = unknown)
 
     identifier
-      .addProperties(dynamicTypeHintFullName)
+      .addOutEdge(edge = taggedBy, inNode = tag)
+      .addOutEdge(edge = dominate, inNode = callNode)
+      .addOutEdge(edge = dominate, inNode = identifier)
+      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = dominate, inNode = literal)
+      .addOutEdge(edge = dominate, inNode = methodRef)
+      .addOutEdge(edge = dominate, inNode = typeRef)
+      .addOutEdge(edge = dominate, inNode = ret)
+      .addOutEdge(edge = dominate, inNode = block)
+      .addOutEdge(edge = dominate, inNode = methodReturn)
+      .addOutEdge(edge = dominate, inNode = controlStructure)
+      .addOutEdge(edge = dominate, inNode = jumpTarget)
+      .addOutEdge(edge = dominate, inNode = unknown)
+      .addOutEdge(edge = postDominate, inNode = callNode)
+      .addOutEdge(edge = postDominate, inNode = identifier)
+      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = postDominate, inNode = literal)
+      .addOutEdge(edge = postDominate, inNode = methodRef)
+      .addOutEdge(edge = postDominate, inNode = typeRef)
+      .addOutEdge(edge = postDominate, inNode = ret)
+      .addOutEdge(edge = postDominate, inNode = block)
+      .addOutEdge(edge = postDominate, inNode = method)
+      .addOutEdge(edge = postDominate, inNode = controlStructure)
+      .addOutEdge(edge = postDominate, inNode = jumpTarget)
+      .addOutEdge(edge = postDominate, inNode = unknown)
+      .addOutEdge(edge = cdg, inNode = callNode)
+      .addOutEdge(edge = cdg, inNode = identifier)
+      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
+      .addOutEdge(edge = cdg, inNode = literal)
+      .addOutEdge(edge = cdg, inNode = methodRef)
+      .addOutEdge(edge = cdg, inNode = typeRef)
+      .addOutEdge(edge = cdg, inNode = ret)
+      .addOutEdge(edge = cdg, inNode = block)
+      .addOutEdge(edge = cdg, inNode = methodReturn)
+      .addOutEdge(edge = cdg, inNode = controlStructure)
+      .addOutEdge(edge = cdg, inNode = jumpTarget)
+      .addOutEdge(edge = cdg, inNode = unknown)
+
+    fieldIdentifier
+      .addOutEdge(edge = taggedBy, inNode = tag)
+      .addOutEdge(edge = dominate, inNode = callNode)
+      .addOutEdge(edge = dominate, inNode = identifier)
+      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = dominate, inNode = literal)
+      .addOutEdge(edge = dominate, inNode = methodRef)
+      .addOutEdge(edge = dominate, inNode = typeRef)
+      .addOutEdge(edge = dominate, inNode = ret)
+      .addOutEdge(edge = dominate, inNode = block)
+      .addOutEdge(edge = dominate, inNode = methodReturn)
+      .addOutEdge(edge = dominate, inNode = controlStructure)
+      .addOutEdge(edge = dominate, inNode = jumpTarget)
+      .addOutEdge(edge = dominate, inNode = unknown)
+      .addOutEdge(edge = postDominate, inNode = callNode)
+      .addOutEdge(edge = postDominate, inNode = identifier)
+      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = postDominate, inNode = literal)
+      .addOutEdge(edge = postDominate, inNode = methodRef)
+      .addOutEdge(edge = postDominate, inNode = typeRef)
+      .addOutEdge(edge = postDominate, inNode = ret)
+      .addOutEdge(edge = postDominate, inNode = block)
+      .addOutEdge(edge = postDominate, inNode = method)
+      .addOutEdge(edge = postDominate, inNode = controlStructure)
+      .addOutEdge(edge = postDominate, inNode = jumpTarget)
+      .addOutEdge(edge = postDominate, inNode = unknown)
+      .addOutEdge(edge = cdg, inNode = callNode)
+      .addOutEdge(edge = cdg, inNode = identifier)
+      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
+      .addOutEdge(edge = cdg, inNode = literal)
+      .addOutEdge(edge = cdg, inNode = methodRef)
+      .addOutEdge(edge = cdg, inNode = typeRef)
+      .addOutEdge(edge = cdg, inNode = ret)
+      .addOutEdge(edge = cdg, inNode = block)
+      .addOutEdge(edge = cdg, inNode = methodReturn)
+      .addOutEdge(edge = cdg, inNode = controlStructure)
+      .addOutEdge(edge = cdg, inNode = jumpTarget)
+      .addOutEdge(edge = cdg, inNode = unknown)
+
+    methodParameterIn
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    ret
+      .addOutEdge(edge = taggedBy, inNode = tag)
+      .addOutEdge(edge = dominate, inNode = callNode)
+      .addOutEdge(edge = dominate, inNode = identifier)
+      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = dominate, inNode = literal)
+      .addOutEdge(edge = dominate, inNode = methodRef)
+      .addOutEdge(edge = dominate, inNode = typeRef)
+      .addOutEdge(edge = dominate, inNode = ret)
+      .addOutEdge(edge = dominate, inNode = block)
+      .addOutEdge(edge = dominate, inNode = methodReturn)
+      .addOutEdge(edge = dominate, inNode = controlStructure)
+      .addOutEdge(edge = dominate, inNode = jumpTarget)
+      .addOutEdge(edge = dominate, inNode = unknown)
+      .addOutEdge(edge = postDominate, inNode = callNode)
+      .addOutEdge(edge = postDominate, inNode = identifier)
+      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = postDominate, inNode = literal)
+      .addOutEdge(edge = postDominate, inNode = methodRef)
+      .addOutEdge(edge = postDominate, inNode = typeRef)
+      .addOutEdge(edge = postDominate, inNode = ret)
+      .addOutEdge(edge = postDominate, inNode = block)
+      .addOutEdge(edge = postDominate, inNode = method)
+      .addOutEdge(edge = postDominate, inNode = controlStructure)
+      .addOutEdge(edge = postDominate, inNode = jumpTarget)
+      .addOutEdge(edge = postDominate, inNode = unknown)
 
     block
-      .addProperties(dynamicTypeHintFullName)
+      .addOutEdge(edge = taggedBy, inNode = tag)
+      .addOutEdge(edge = dominate, inNode = callNode)
+      .addOutEdge(edge = dominate, inNode = identifier)
+      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = dominate, inNode = literal)
+      .addOutEdge(edge = dominate, inNode = methodRef)
+      .addOutEdge(edge = dominate, inNode = typeRef)
+      .addOutEdge(edge = dominate, inNode = ret)
+      .addOutEdge(edge = dominate, inNode = block)
+      .addOutEdge(edge = dominate, inNode = methodReturn)
+      .addOutEdge(edge = dominate, inNode = controlStructure)
+      .addOutEdge(edge = dominate, inNode = jumpTarget)
+      .addOutEdge(edge = dominate, inNode = unknown)
+      .addOutEdge(edge = postDominate, inNode = callNode)
+      .addOutEdge(edge = postDominate, inNode = identifier)
+      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = postDominate, inNode = literal)
+      .addOutEdge(edge = postDominate, inNode = methodRef)
+      .addOutEdge(edge = postDominate, inNode = typeRef)
+      .addOutEdge(edge = postDominate, inNode = ret)
+      .addOutEdge(edge = postDominate, inNode = block)
+      .addOutEdge(edge = postDominate, inNode = method)
+      .addOutEdge(edge = postDominate, inNode = controlStructure)
+      .addOutEdge(edge = postDominate, inNode = jumpTarget)
+      .addOutEdge(edge = postDominate, inNode = unknown)
+      .addOutEdge(edge = cdg, inNode = callNode)
+      .addOutEdge(edge = cdg, inNode = identifier)
+      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
+      .addOutEdge(edge = cdg, inNode = literal)
+      .addOutEdge(edge = cdg, inNode = methodRef)
+      .addOutEdge(edge = cdg, inNode = typeRef)
+      .addOutEdge(edge = cdg, inNode = ret)
+      .addOutEdge(edge = cdg, inNode = block)
+      .addOutEdge(edge = cdg, inNode = methodReturn)
+      .addOutEdge(edge = cdg, inNode = controlStructure)
+      .addOutEdge(edge = cdg, inNode = jumpTarget)
+      .addOutEdge(edge = cdg, inNode = unknown)
 
     unknown
-      .addProperties(dynamicTypeHintFullName)
+      .addOutEdge(edge = taggedBy, inNode = tag)
+      .addOutEdge(edge = dominate, inNode = callNode)
+      .addOutEdge(edge = dominate, inNode = identifier)
+      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = dominate, inNode = literal)
+      .addOutEdge(edge = dominate, inNode = methodRef)
+      .addOutEdge(edge = dominate, inNode = typeRef)
+      .addOutEdge(edge = dominate, inNode = ret)
+      .addOutEdge(edge = dominate, inNode = block)
+      .addOutEdge(edge = dominate, inNode = methodReturn)
+      .addOutEdge(edge = dominate, inNode = controlStructure)
+      .addOutEdge(edge = dominate, inNode = jumpTarget)
+      .addOutEdge(edge = dominate, inNode = unknown)
+      .addOutEdge(edge = postDominate, inNode = callNode)
+      .addOutEdge(edge = postDominate, inNode = identifier)
+      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = postDominate, inNode = literal)
+      .addOutEdge(edge = postDominate, inNode = methodRef)
+      .addOutEdge(edge = postDominate, inNode = typeRef)
+      .addOutEdge(edge = postDominate, inNode = ret)
+      .addOutEdge(edge = postDominate, inNode = block)
+      .addOutEdge(edge = postDominate, inNode = method)
+      .addOutEdge(edge = postDominate, inNode = controlStructure)
+      .addOutEdge(edge = postDominate, inNode = jumpTarget)
+      .addOutEdge(edge = postDominate, inNode = unknown)
+      .addOutEdge(edge = cdg, inNode = callNode)
+      .addOutEdge(edge = cdg, inNode = identifier)
+      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
+      .addOutEdge(edge = cdg, inNode = literal)
+      .addOutEdge(edge = cdg, inNode = methodRef)
+      .addOutEdge(edge = cdg, inNode = typeRef)
+      .addOutEdge(edge = cdg, inNode = ret)
+      .addOutEdge(edge = cdg, inNode = block)
+      .addOutEdge(edge = cdg, inNode = methodReturn)
+      .addOutEdge(edge = cdg, inNode = controlStructure)
+      .addOutEdge(edge = cdg, inNode = jumpTarget)
+      .addOutEdge(edge = cdg, inNode = unknown)
 
-    metaData
-      .addProperties(policyDirectories)
+    controlStructure
+      .addOutEdge(edge = taggedBy, inNode = tag)
+      .addOutEdge(edge = dominate, inNode = callNode)
+      .addOutEdge(edge = dominate, inNode = identifier)
+      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = dominate, inNode = literal)
+      .addOutEdge(edge = dominate, inNode = methodRef)
+      .addOutEdge(edge = dominate, inNode = typeRef)
+      .addOutEdge(edge = dominate, inNode = ret)
+      .addOutEdge(edge = dominate, inNode = block)
+      .addOutEdge(edge = dominate, inNode = methodReturn)
+      .addOutEdge(edge = dominate, inNode = controlStructure)
+      .addOutEdge(edge = dominate, inNode = jumpTarget)
+      .addOutEdge(edge = dominate, inNode = unknown)
+      .addOutEdge(edge = postDominate, inNode = callNode)
+      .addOutEdge(edge = postDominate, inNode = identifier)
+      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = postDominate, inNode = literal)
+      .addOutEdge(edge = postDominate, inNode = methodRef)
+      .addOutEdge(edge = postDominate, inNode = typeRef)
+      .addOutEdge(edge = postDominate, inNode = ret)
+      .addOutEdge(edge = postDominate, inNode = block)
+      .addOutEdge(edge = postDominate, inNode = method)
+      .addOutEdge(edge = postDominate, inNode = controlStructure)
+      .addOutEdge(edge = postDominate, inNode = jumpTarget)
+      .addOutEdge(edge = postDominate, inNode = unknown)
+      .addOutEdge(edge = cdg, inNode = callNode)
+      .addOutEdge(edge = cdg, inNode = identifier)
+      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
+      .addOutEdge(edge = cdg, inNode = literal)
+      .addOutEdge(edge = cdg, inNode = methodRef)
+      .addOutEdge(edge = cdg, inNode = typeRef)
+      .addOutEdge(edge = cdg, inNode = ret)
+      .addOutEdge(edge = cdg, inNode = block)
+      .addOutEdge(edge = cdg, inNode = methodReturn)
+      .addOutEdge(edge = cdg, inNode = controlStructure)
+      .addOutEdge(edge = cdg, inNode = jumpTarget)
+      .addOutEdge(edge = cdg, inNode = unknown)
 
-// node relations
+    methodRef
+      .addOutEdge(edge = taggedBy, inNode = tag)
+      .addOutEdge(edge = dominate, inNode = callNode)
+      .addOutEdge(edge = dominate, inNode = identifier)
+      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = dominate, inNode = literal)
+      .addOutEdge(edge = dominate, inNode = methodRef)
+      .addOutEdge(edge = dominate, inNode = typeRef)
+      .addOutEdge(edge = dominate, inNode = ret)
+      .addOutEdge(edge = dominate, inNode = block)
+      .addOutEdge(edge = dominate, inNode = methodReturn)
+      .addOutEdge(edge = dominate, inNode = controlStructure)
+      .addOutEdge(edge = dominate, inNode = jumpTarget)
+      .addOutEdge(edge = dominate, inNode = unknown)
+      .addOutEdge(edge = postDominate, inNode = callNode)
+      .addOutEdge(edge = postDominate, inNode = identifier)
+      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = postDominate, inNode = literal)
+      .addOutEdge(edge = postDominate, inNode = methodRef)
+      .addOutEdge(edge = postDominate, inNode = typeRef)
+      .addOutEdge(edge = postDominate, inNode = ret)
+      .addOutEdge(edge = postDominate, inNode = block)
+      .addOutEdge(edge = postDominate, inNode = method)
+      .addOutEdge(edge = postDominate, inNode = controlStructure)
+      .addOutEdge(edge = postDominate, inNode = jumpTarget)
+      .addOutEdge(edge = postDominate, inNode = unknown)
+      .addOutEdge(edge = cdg, inNode = callNode)
+      .addOutEdge(edge = cdg, inNode = identifier)
+      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
+      .addOutEdge(edge = cdg, inNode = literal)
+      .addOutEdge(edge = cdg, inNode = methodRef)
+      .addOutEdge(edge = cdg, inNode = typeRef)
+      .addOutEdge(edge = cdg, inNode = ret)
+      .addOutEdge(edge = cdg, inNode = block)
+      .addOutEdge(edge = cdg, inNode = methodReturn)
+      .addOutEdge(edge = cdg, inNode = controlStructure)
+      .addOutEdge(edge = cdg, inNode = jumpTarget)
+      .addOutEdge(edge = cdg, inNode = unknown)
+
+    typeRef
+      .addOutEdge(edge = taggedBy, inNode = tag)
+      .addOutEdge(edge = dominate, inNode = callNode)
+      .addOutEdge(edge = dominate, inNode = identifier)
+      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = dominate, inNode = literal)
+      .addOutEdge(edge = dominate, inNode = methodRef)
+      .addOutEdge(edge = dominate, inNode = typeRef)
+      .addOutEdge(edge = dominate, inNode = ret)
+      .addOutEdge(edge = dominate, inNode = block)
+      .addOutEdge(edge = dominate, inNode = methodReturn)
+      .addOutEdge(edge = dominate, inNode = controlStructure)
+      .addOutEdge(edge = dominate, inNode = jumpTarget)
+      .addOutEdge(edge = dominate, inNode = unknown)
+      .addOutEdge(edge = postDominate, inNode = callNode)
+      .addOutEdge(edge = postDominate, inNode = identifier)
+      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = postDominate, inNode = literal)
+      .addOutEdge(edge = postDominate, inNode = methodRef)
+      .addOutEdge(edge = postDominate, inNode = typeRef)
+      .addOutEdge(edge = postDominate, inNode = ret)
+      .addOutEdge(edge = postDominate, inNode = block)
+      .addOutEdge(edge = postDominate, inNode = method)
+      .addOutEdge(edge = postDominate, inNode = controlStructure)
+      .addOutEdge(edge = postDominate, inNode = jumpTarget)
+      .addOutEdge(edge = postDominate, inNode = unknown)
+      .addOutEdge(edge = cdg, inNode = callNode)
+      .addOutEdge(edge = cdg, inNode = identifier)
+      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
+      .addOutEdge(edge = cdg, inNode = literal)
+      .addOutEdge(edge = cdg, inNode = methodRef)
+      .addOutEdge(edge = cdg, inNode = typeRef)
+      .addOutEdge(edge = cdg, inNode = ret)
+      .addOutEdge(edge = cdg, inNode = block)
+      .addOutEdge(edge = cdg, inNode = methodReturn)
+      .addOutEdge(edge = cdg, inNode = controlStructure)
+      .addOutEdge(edge = cdg, inNode = jumpTarget)
+      .addOutEdge(edge = cdg, inNode = unknown)
+
+    jumpTarget
+      .addOutEdge(edge = taggedBy, inNode = tag)
+      .addOutEdge(edge = dominate, inNode = callNode)
+      .addOutEdge(edge = dominate, inNode = identifier)
+      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = dominate, inNode = literal)
+      .addOutEdge(edge = dominate, inNode = ret)
+      .addOutEdge(edge = dominate, inNode = methodRef)
+      .addOutEdge(edge = dominate, inNode = typeRef)
+      .addOutEdge(edge = dominate, inNode = block)
+      .addOutEdge(edge = dominate, inNode = jumpTarget)
+      .addOutEdge(edge = dominate, inNode = controlStructure)
+      .addOutEdge(edge = dominate, inNode = unknown)
+      .addOutEdge(edge = postDominate, inNode = callNode)
+      .addOutEdge(edge = postDominate, inNode = identifier)
+      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
+      .addOutEdge(edge = postDominate, inNode = literal)
+      .addOutEdge(edge = postDominate, inNode = ret)
+      .addOutEdge(edge = postDominate, inNode = methodRef)
+      .addOutEdge(edge = postDominate, inNode = typeRef)
+      .addOutEdge(edge = postDominate, inNode = block)
+      .addOutEdge(edge = postDominate, inNode = jumpTarget)
+      .addOutEdge(edge = postDominate, inNode = controlStructure)
+      .addOutEdge(edge = postDominate, inNode = unknown)
+      .addOutEdge(edge = cdg, inNode = callNode)
+      .addOutEdge(edge = cdg, inNode = identifier)
+      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
+      .addOutEdge(edge = cdg, inNode = literal)
+      .addOutEdge(edge = cdg, inNode = methodRef)
+      .addOutEdge(edge = cdg, inNode = typeRef)
+      .addOutEdge(edge = cdg, inNode = ret)
+      .addOutEdge(edge = cdg, inNode = block)
+      .addOutEdge(edge = cdg, inNode = methodReturn)
+      .addOutEdge(edge = cdg, inNode = controlStructure)
+      .addOutEdge(edge = cdg, inNode = jumpTarget)
+      .addOutEdge(edge = cdg, inNode = unknown)
+
     binding
       .addOutEdge(edge = ref, inNode = method, cardinalityOut = Cardinality.One)
 

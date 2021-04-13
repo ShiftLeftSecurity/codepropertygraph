@@ -15,14 +15,9 @@ class CpgSchema(builder: SchemaBuilder) {
   // everything else
   val protoSerialize = ProtoSerialize(builder, base)
   val closure = Closure(builder, base, enhancements)
-  val dependency = Dependency(builder, base)
-  val deprecated = Deprecated(builder, base)
-  val dom = Dom(builder, base, enhancements, javaSpecific)
-  val enhancementsInternal = EnhancementsInternal(builder, base, enhancements, javaSpecific)
   val finding = Finding(builder, enhancements)
   val operators = Operators(builder)
   val sourceSpecific = SourceSpecific(builder, base)
-  val splitting = Splitting(builder, enhancements)
   val tagsAndLocation = TagsAndLocation(builder, base, enhancements)
 }
 
