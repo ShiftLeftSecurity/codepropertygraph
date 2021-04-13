@@ -39,7 +39,7 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
       diffBuilder.addNodeProperty(y.asInstanceOf[StoredNode], PropertyNames.ORDER, Int.box(123))
       diffBuilder.addNodeProperty(y.asInstanceOf[StoredNode], PropertyNames.CODE, "new y code")
 
-      diffBuilder.addEdgeProperty(x2y, EdgeKeyNames.ALIAS, JBoolean.FALSE)
+      diffBuilder.addEdgeProperty(x2y, PropertyNames.ALIAS, JBoolean.FALSE)
       val diffGraph = diffBuilder.build()
       // apply diffgraph with undoable = true
       val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, graph, true, None)
@@ -47,7 +47,7 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
       val changes = inverseDiffGraph.iterator.toList
       import DiffGraph.Change._
       val List(
-        SetEdgeProperty(_, EdgeKeyNames.ALIAS, JBoolean.TRUE), // restore old edge property value
+        SetEdgeProperty(_, PropertyNames.ALIAS, JBoolean.TRUE), // restore old edge property value
         SetNodeProperty(_, PropertyNames.CODE, "old y code"), // restore old Y property value
         RemoveNodeProperty(_, PropertyNames.ORDER), // remove newly added property
         RemoveEdge(_), // remove x -> a

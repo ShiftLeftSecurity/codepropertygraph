@@ -1,6 +1,6 @@
 package io.shiftleft.dataflowengineoss.dotgenerator
 
-import io.shiftleft.codepropertygraph.generated.{EdgeKeys, EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{Properties, EdgeTypes, nodes}
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.dotgenerator.DotSerializer.{Edge, Graph}
@@ -88,7 +88,7 @@ class DdgGenerator {
 
     val allInEdges = v
       .inE(EdgeTypes.REACHING_DEF)
-      .map(x => Edge(x.outNode.asInstanceOf[nodes.StoredNode], v, true, x.property(EdgeKeys.VARIABLE), edgeType))
+      .map(x => Edge(x.outNode.asInstanceOf[nodes.StoredNode], v, true, x.property(Properties.VARIABLE), edgeType))
 
     v match {
       case trackingPoint: nodes.TrackingPoint =>

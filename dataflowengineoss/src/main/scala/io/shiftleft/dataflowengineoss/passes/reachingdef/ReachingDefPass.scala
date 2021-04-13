@@ -29,7 +29,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val dstGraph = DiffGraph.newBuilder
 
     def addEdge(fromNode: nodes.StoredNode, toNode: nodes.StoredNode, variable: String = ""): Unit = {
-      val properties = List((EdgeKeyNames.VARIABLE, variable))
+      val properties = List((PropertyNames.VARIABLE, variable))
       if (fromNode.isInstanceOf[nodes.Unknown] || toNode
             .isInstanceOf[nodes.Unknown])
         return

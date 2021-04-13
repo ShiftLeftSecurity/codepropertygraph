@@ -80,13 +80,13 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
       additionalNode.property(Properties.CODE) shouldBe "Node2Code"
 
       // TODO 4) add edge property - not needed for now?
-//      val addEdgePropertyInverse = applyDiffAndGetInverse(cpg)(_.addEdgeProperty(initialNodeOutEdges.head, EdgeKeyNames.ALIAS, true))
-//      initialNode.start.outE.value(EdgeKeyNames.ALIAS).toList shouldBe List(1)
+//      val addEdgePropertyInverse = applyDiffAndGetInverse(cpg)(_.addEdgeProperty(initialNodeOutEdges.head, PropertyNames.ALIAS, true))
+//      initialNode.start.outE.value(PropertyNames.ALIAS).toList shouldBe List(1)
 
       // now apply all inverse diffgraphs in the reverse order...
       // TODO 4) remove edge property - not needed for now?
 //      DiffGraph.Applier.applyDiff(addEdgePropertyInverse, cpg)
-//      initialNode.start.outE.value(EdgeKeyNames.ALIAS).toList shouldBe List.empty
+//      initialNode.start.outE.value(PropertyNames.ALIAS).toList shouldBe List.empty
 
       // 3) remove node property
       DiffGraph.Applier.applyDiff(addNodePropertyInverse, cpg)
@@ -95,7 +95,7 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
       // 2) remove edges - they don't have ids and are therefor disambiguated by their property hash
       DiffGraph.Applier.applyDiff(addEdge2Inverse, cpg)
       initialNodeOutEdges.size shouldBe 1
-      initialNode.outE.property(EdgeKeys.ALIAS).toList shouldBe List(true)
+      initialNode.outE.property(Properties.ALIAS).toList shouldBe List(true)
       DiffGraph.Applier.applyDiff(addEdge1Inverse, cpg)
       initialNodeOutEdges.size shouldBe 0
 
