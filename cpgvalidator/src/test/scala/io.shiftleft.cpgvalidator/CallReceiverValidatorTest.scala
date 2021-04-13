@@ -2,7 +2,7 @@ package io.shiftleft.cpgvalidator
 
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, Properties, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, NodeTypes, Properties}
 import io.shiftleft.cpgvalidator.validators.CallReceiverValidator
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

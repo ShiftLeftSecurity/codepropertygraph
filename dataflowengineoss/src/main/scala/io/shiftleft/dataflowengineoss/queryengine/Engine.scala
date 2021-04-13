@@ -1,7 +1,7 @@
 package io.shiftleft.dataflowengineoss.queryengine
 
 import io.shiftleft.codepropertygraph.generated.nodes.Call
-import io.shiftleft.codepropertygraph.generated.{Properties, EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties, nodes}
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._

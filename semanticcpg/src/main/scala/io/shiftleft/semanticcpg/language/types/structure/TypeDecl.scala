@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, Properties, nodes}
 import io.shiftleft.semanticcpg.language._
 import overflowdb._
 import overflowdb.traversal.Traversal

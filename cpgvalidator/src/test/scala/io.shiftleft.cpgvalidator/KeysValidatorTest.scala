@@ -2,7 +2,7 @@ package io.shiftleft.cpgvalidator
 
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{Properties, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties, nodes}
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.Cardinality
 import io.shiftleft.cpgvalidator.validators.KeysValidator
 import org.scalatest.matchers.should.Matchers

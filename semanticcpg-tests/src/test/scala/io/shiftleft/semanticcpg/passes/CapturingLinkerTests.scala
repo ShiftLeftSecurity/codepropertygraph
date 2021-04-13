@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, Properties}
 import io.shiftleft.semanticcpg.passes.linking.capturinglinker.CapturingLinker
 import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
 import org.scalatest.matchers.should.Matchers

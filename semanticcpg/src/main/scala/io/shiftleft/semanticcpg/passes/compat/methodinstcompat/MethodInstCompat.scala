@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes.compat.methodinstcompat
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{Properties, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}

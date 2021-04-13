@@ -1,6 +1,6 @@
 package io.shiftleft.dataflowengineoss.dotgenerator
 
-import io.shiftleft.codepropertygraph.generated.{Properties, EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties, nodes}
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.dotgenerator.DotSerializer.{Edge, Graph}

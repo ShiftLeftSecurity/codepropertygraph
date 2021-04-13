@@ -1,7 +1,7 @@
 package io.shiftleft.cpgvalidator.validators
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, PropertyNames, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, NodeTypes, PropertyNames}
 import io.shiftleft.cpgvalidator.{CallReceiverError, ValidationErrorRegistry}
 import overflowdb.Node
 

@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
-import io.shiftleft.codepropertygraph.generated.{ModifierTypes, Properties, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{ModifierTypes, NodeTypes, Properties, nodes}
 import overflowdb._
 import overflowdb.traversal.Traversal
 

@@ -2,7 +2,7 @@ package io.shiftleft.cpgvalidator
 
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, Properties}
 import io.shiftleft.cpgvalidator.validators.cfg.NoLongJumpValidator
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

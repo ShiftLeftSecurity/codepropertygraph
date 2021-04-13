@@ -1,7 +1,7 @@
 package io.shiftleft.cpgvalidator.validators
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, PropertyNames, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, PropertyNames}
 import io.shiftleft.cpgvalidator._
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.{Cardinality, KeysFact}
 import io.shiftleft.cpgvalidator.facts.KeysFactsImporter
