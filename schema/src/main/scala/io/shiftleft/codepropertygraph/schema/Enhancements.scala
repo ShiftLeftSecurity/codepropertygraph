@@ -32,15 +32,6 @@ object Enhancements {
       )
       .protoId(1002)
 
-    val policyDirectories = builder
-      .addProperty(
-        name = "POLICY_DIRECTORIES",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.List,
-        comment = "Sub directories of the policy directory that should be loaded when processing the CPG"
-      )
-      .protoId(119)
-
     val evaluationStrategy = builder
       .addProperty(
         name = "EVALUATION_STRATEGY",
@@ -59,15 +50,6 @@ object Enhancements {
         comment = "The dispatch type of a call, which is either static or dynamic. See dispatchTypes"
       )
       .protoId(25)
-
-    val dynamicTypeHintFullName = builder
-      .addProperty(
-        name = "DYNAMIC_TYPE_HINT_FULL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.List,
-        comment = "Type hint for the dynamic type"
-      )
-      .protoId(1591)
 
     val astParentType = builder
       .addProperty(
@@ -266,7 +248,7 @@ object Enhancements {
       .extendz(astNode)
 
     callNode
-      .addProperties(dispatchType, dynamicTypeHintFullName)
+      .addProperties(dispatchType)
 
     method
       .addProperties(astParentType, astParentFullName)
@@ -275,7 +257,7 @@ object Enhancements {
       .addProperties(isMethodNeverOverridden)
 
     methodParameterIn
-      .addProperties(evaluationStrategy, dynamicTypeHintFullName)
+      .addProperties(evaluationStrategy)
 
     val methodParameterOut: NodeType = builder
       .addNodeType(
@@ -287,37 +269,10 @@ object Enhancements {
       .extendz(declaration, trackingPoint, astNode)
 
     methodReturn
-      .addProperties(evaluationStrategy, dynamicTypeHintFullName)
-
-    methodRef
-      .addProperties(dynamicTypeHintFullName)
-
-    typeRef
-      .addProperties(dynamicTypeHintFullName)
+      .addProperties(evaluationStrategy)
 
     typeDecl
       .addProperties(astParentType, astParentFullName)
-
-    member
-      .addProperties(dynamicTypeHintFullName)
-
-    literal
-      .addProperties(dynamicTypeHintFullName)
-
-    local
-      .addProperties(dynamicTypeHintFullName)
-
-    identifier
-      .addProperties(dynamicTypeHintFullName)
-
-    block
-      .addProperties(dynamicTypeHintFullName)
-
-    unknown
-      .addProperties(dynamicTypeHintFullName)
-
-    metaData
-      .addProperties(policyDirectories)
 
 // node relations
 
