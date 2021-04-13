@@ -898,7 +898,6 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       .dispatchType(DispatchTypes.STATIC_DISPATCH.name())
       .signature("TODO")
       .methodFullName(methodName)
-      .typeFullName(registerType(Defines.anyTypeName))
       .code(astNode.getEscapedCodeStr)
       .order(context.childNum)
       .argumentIndex(context.childNum)

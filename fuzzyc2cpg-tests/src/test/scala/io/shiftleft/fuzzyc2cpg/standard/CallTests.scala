@@ -22,7 +22,6 @@ class CallTests extends FuzzyCCodeToCpgSuite {
     x.code shouldBe "add((1+2), 3)"
     x.name shouldBe "add"
     x.order shouldBe 2
-    x.methodInstFullName shouldBe None // Deprecated
     x.methodFullName shouldBe "add"
     x.argumentIndex shouldBe 2
     // TODO x.signature
