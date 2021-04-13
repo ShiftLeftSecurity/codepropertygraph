@@ -34,8 +34,8 @@ class TypeDeclTests extends AnyWordSpec with Matchers {
 
     "contain correct code fields for all members" in {
       fixture.traversalSource.label(NodeType.MEMBER.toString).property(Properties.CODE).toSet shouldBe Set("x",
-                                                                                                         "y",
-                                                                                                         "*foo")
+                                                                                                           "y",
+                                                                                                           "*foo")
     }
 
   }
