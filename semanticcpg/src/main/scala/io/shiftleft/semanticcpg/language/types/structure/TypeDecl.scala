@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, Properties, nodes}
 import io.shiftleft.semanticcpg.language._
 import overflowdb._
 import overflowdb.traversal.Traversal
@@ -37,13 +37,13 @@ class TypeDecl(val traversal: Traversal[nodes.TypeDecl]) extends AnyVal {
     * Filter for type declarations contained in the analyzed code.
     * */
   def internal: Traversal[nodes.TypeDecl] =
-    canonicalType.has(NodeKeys.IS_EXTERNAL -> false)
+    canonicalType.has(Properties.IS_EXTERNAL -> false)
 
   /**
     * Filter for type declarations not contained in the analyzed code.
     * */
   def external: Traversal[nodes.TypeDecl] =
-    canonicalType.has(NodeKeys.IS_EXTERNAL -> true)
+    canonicalType.has(Properties.IS_EXTERNAL -> true)
 
   /**
     * Member variables

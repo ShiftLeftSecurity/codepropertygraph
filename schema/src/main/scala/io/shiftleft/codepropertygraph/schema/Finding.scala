@@ -12,7 +12,7 @@ object Finding {
 
 // node properties
     val key = builder
-      .addNodeProperty(
+      .addProperty(
         name = "KEY",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,

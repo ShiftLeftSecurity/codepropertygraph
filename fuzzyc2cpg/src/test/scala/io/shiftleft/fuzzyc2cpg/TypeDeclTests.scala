@@ -1,6 +1,6 @@
 package io.shiftleft.fuzzyc2cpg
 
-import io.shiftleft.codepropertygraph.generated.NodeKeys
+import io.shiftleft.codepropertygraph.generated.Properties
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -13,10 +13,10 @@ class TypeDeclTests extends AnyWordSpec with Matchers {
     "contain one internal type decl node for Foo" in {
       val typeDeclNodes = fixture.traversalSource
         .label(NodeType.TYPE_DECL.toString)
-        .has(NodeKeys.NAME -> "Foo")
+        .has(Properties.NAME -> "Foo")
         .l
       typeDeclNodes.size shouldBe 1
-      typeDeclNodes.head.property(NodeKeys.IS_EXTERNAL) shouldBe false
+      typeDeclNodes.head.property(Properties.IS_EXTERNAL) shouldBe false
     }
 
     "contain three member nodes" in {
@@ -33,9 +33,9 @@ class TypeDeclTests extends AnyWordSpec with Matchers {
     }
 
     "contain correct code fields for all members" in {
-      fixture.traversalSource.label(NodeType.MEMBER.toString).property(NodeKeys.CODE).toSet shouldBe Set("x",
-                                                                                                         "y",
-                                                                                                         "*foo")
+      fixture.traversalSource.label(NodeType.MEMBER.toString).property(Properties.CODE).toSet shouldBe Set("x",
+                                                                                                           "y",
+                                                                                                           "*foo")
     }
 
   }

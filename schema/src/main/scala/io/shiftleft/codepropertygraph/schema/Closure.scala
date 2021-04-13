@@ -13,7 +13,7 @@ object Closure {
 
 // node properties
     val closureBindingId = builder
-      .addNodeProperty(
+      .addProperty(
         name = "CLOSURE_BINDING_ID",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,
@@ -23,7 +23,7 @@ object Closure {
       .protoId(50)
 
     val closureOriginalName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "CLOSURE_ORIGINAL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,

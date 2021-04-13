@@ -1,6 +1,6 @@
 package io.shiftleft.fuzzyc2cpg
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes, Operators}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, Operators, Properties}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.traversal._
@@ -29,13 +29,13 @@ class MethodCfgLayoutTests extends AnyWordSpec with Matchers with TraversalUtils
   "CFG layout" should {
     "be correct for decl assignment in method1" in {
       var result = getMethod("method1").expandCfg()
-      result.checkForSingleProperty(NodeTypes.IDENTIFIER, NodeKeys.NAME, "x")
+      result.checkForSingleProperty(NodeTypes.IDENTIFIER, Properties.NAME, "x")
 
       result = result.expandCfg()
-      result.checkForSingleProperty(NodeTypes.LITERAL, NodeKeys.CODE, "1")
+      result.checkForSingleProperty(NodeTypes.LITERAL, Properties.CODE, "1")
 
       result = result.expandCfg()
-      result.checkForSingleProperty(NodeTypes.CALL, NodeKeys.NAME, Operators.assignment)
+      result.checkForSingleProperty(NodeTypes.CALL, Properties.NAME, Operators.assignment)
 
       result = result.expandCfg()
       result.checkForSingle(NodeTypes.METHOD_RETURN)
@@ -43,19 +43,19 @@ class MethodCfgLayoutTests extends AnyWordSpec with Matchers with TraversalUtils
 
     "be correct for nested expression in method2" in {
       var result = getMethod("method2").expandCfg()
-      result.checkForSingleProperty(NodeTypes.IDENTIFIER, NodeKeys.NAME, "x")
+      result.checkForSingleProperty(NodeTypes.IDENTIFIER, Properties.NAME, "x")
 
       result = result.expandCfg()
-      result.checkForSingleProperty(NodeTypes.IDENTIFIER, NodeKeys.NAME, "y")
+      result.checkForSingleProperty(NodeTypes.IDENTIFIER, Properties.NAME, "y")
 
       result = result.expandCfg()
-      result.checkForSingleProperty(NodeTypes.IDENTIFIER, NodeKeys.NAME, "z")
+      result.checkForSingleProperty(NodeTypes.IDENTIFIER, Properties.NAME, "z")
 
       result = result.expandCfg()
-      result.checkForSingleProperty(NodeTypes.CALL, NodeKeys.NAME, Operators.addition)
+      result.checkForSingleProperty(NodeTypes.CALL, Properties.NAME, Operators.addition)
 
       result = result.expandCfg()
-      result.checkForSingleProperty(NodeTypes.CALL, NodeKeys.NAME, Operators.assignment)
+      result.checkForSingleProperty(NodeTypes.CALL, Properties.NAME, Operators.assignment)
 
       result = result.expandCfg()
       result.checkForSingle(NodeTypes.METHOD_RETURN)

@@ -15,7 +15,7 @@ object Enhancements {
 
 // node properties
     val value = builder
-      .addNodeProperty(
+      .addProperty(
         name = "VALUE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -24,7 +24,7 @@ object Enhancements {
       .protoId(8)
 
     val isMethodNeverOverridden = builder
-      .addNodeProperty(
+      .addProperty(
         name = "IS_METHOD_NEVER_OVERRIDDEN",
         valueType = ValueTypes.BOOLEAN,
         cardinality = Cardinality.ZeroOrOne,
@@ -33,7 +33,7 @@ object Enhancements {
       .protoId(1002)
 
     val policyDirectories = builder
-      .addNodeProperty(
+      .addProperty(
         name = "POLICY_DIRECTORIES",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.List,
@@ -42,7 +42,7 @@ object Enhancements {
       .protoId(119)
 
     val evaluationStrategy = builder
-      .addNodeProperty(
+      .addProperty(
         name = "EVALUATION_STRATEGY",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -52,7 +52,7 @@ object Enhancements {
       .protoId(15)
 
     val dispatchType = builder
-      .addNodeProperty(
+      .addProperty(
         name = "DISPATCH_TYPE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -61,7 +61,7 @@ object Enhancements {
       .protoId(25)
 
     val dynamicTypeHintFullName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "DYNAMIC_TYPE_HINT_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.List,
@@ -70,7 +70,7 @@ object Enhancements {
       .protoId(1591)
 
     val astParentType = builder
-      .addNodeProperty(
+      .addProperty(
         name = "AST_PARENT_TYPE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -80,7 +80,7 @@ object Enhancements {
       .protoId(56)
 
     val astParentFullName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "AST_PARENT_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -88,9 +88,8 @@ object Enhancements {
       )
       .protoId(57)
 
-// edge properties
     val alias = builder
-      .addEdgeProperty(
+      .addProperty(
         name = "ALIAS",
         valueType = ValueTypes.BOOLEAN,
         cardinality = Cardinality.One,
@@ -99,7 +98,7 @@ object Enhancements {
       .protoId(1)
 
     val variable = builder
-      .addEdgeProperty(
+      .addProperty(
         name = "VARIABLE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,

@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes.linking.linker
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{NodeKeyNames, _}
+import io.shiftleft.codepropertygraph.generated.{PropertyNames, _}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
@@ -36,7 +36,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstNodeLabel = NodeTypes.TYPE_DECL,
       edgeType = EdgeTypes.REF,
       dstNodeMap = typeDeclFullNameToNode,
-      dstFullNameKey = NodeKeyNames.TYPE_DECL_FULL_NAME,
+      dstFullNameKey = PropertyNames.TYPE_DECL_FULL_NAME,
       dstGraph,
       None
     )
@@ -77,7 +77,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       dstNodeLabel = NodeTypes.METHOD,
       edgeType = EdgeTypes.REF,
       dstNodeMap = methodFullNameToNode,
-      dstFullNameKey = NodeKeyNames.METHOD_FULL_NAME,
+      dstFullNameKey = PropertyNames.METHOD_FULL_NAME,
       dstGraph,
       None
     )
@@ -97,7 +97,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
           Seq()
         }
       },
-      dstFullNameKey = NodeKeyNames.INHERITS_FROM_TYPE_FULL_NAME,
+      dstFullNameKey = PropertyNames.INHERITS_FROM_TYPE_FULL_NAME,
       dstGraph
     )
 
@@ -112,7 +112,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       getDstFullNames = (srcNode: nodes.TypeDecl) => {
         srcNode.aliasTypeFullName
       },
-      dstFullNameKey = NodeKeyNames.ALIAS_TYPE_FULL_NAME,
+      dstFullNameKey = PropertyNames.ALIAS_TYPE_FULL_NAME,
       dstGraph
     )
 
@@ -146,7 +146,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
           }
         }
       } else {
-        val dstFullNames = srcNode.out(edgeType).property(NodeKeys.FULL_NAME).l
+        val dstFullNames = srcNode.out(edgeType).property(Properties.FULL_NAME).l
         srcNode.setProperty(dstFullNameKey, dstFullNames)
         if (!loggedDeprecationWarning) {
           logger.warn(
@@ -170,9 +170,9 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
             case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode.get(astChild.astParentFullName)
             case _ =>
               logger.warn(
-                s"Invalid AST_PARENT_TYPE=${astChild.propertyOption(NodeKeys.AST_PARENT_FULL_NAME)};" +
+                s"Invalid AST_PARENT_TYPE=${astChild.propertyOption(Properties.AST_PARENT_FULL_NAME)};" +
                   s" astChild LABEL=${astChild.label};" +
-                  s" astChild FULL_NAME=${astChild.propertyOption(NodeKeys.FULL_NAME)}")
+                  s" astChild FULL_NAME=${astChild.propertyOption(Properties.FULL_NAME)}")
               None
           }
 
@@ -227,7 +227,7 @@ object Linker {
           }
         }
       } else {
-        srcNode.out(edgeType).property(NodeKeys.FULL_NAME).nextOption() match {
+        srcNode.out(edgeType).property(Properties.FULL_NAME).nextOption() match {
           case Some(dstFullName) => srcNode.setProperty(dstFullNameKey, dstFullName)
           case None              => logger.warn(s"Missing outgoing edge of type ${edgeType} from node ${srcNode}")
         }

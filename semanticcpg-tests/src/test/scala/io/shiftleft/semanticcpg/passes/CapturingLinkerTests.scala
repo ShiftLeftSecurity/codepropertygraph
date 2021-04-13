@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, Properties}
 import io.shiftleft.semanticcpg.passes.linking.capturinglinker.CapturingLinker
 import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
 import org.scalatest.matchers.should.Matchers
@@ -13,10 +13,10 @@ import scala.jdk.CollectionConverters._
 class CapturingLinkerTests extends AnyWordSpec with Matchers {
 
   "link CLOSURE_BINDING and LOCALS with same CLOSURE_BINDING_IDs" in EmptyGraphFixture { graph =>
-    val closureBinding1 = graph + (NodeTypes.CLOSURE_BINDING, NodeKeys.CLOSURE_BINDING_ID -> "id1")
-    val closureBinding2 = graph + (NodeTypes.CLOSURE_BINDING, NodeKeys.CLOSURE_BINDING_ID -> "id2")
-    val local1 = graph + (NodeTypes.LOCAL, NodeKeys.CLOSURE_BINDING_ID -> "id1")
-    val local2 = graph + (NodeTypes.LOCAL, NodeKeys.CLOSURE_BINDING_ID -> "id2")
+    val closureBinding1 = graph + (NodeTypes.CLOSURE_BINDING, Properties.CLOSURE_BINDING_ID -> "id1")
+    val closureBinding2 = graph + (NodeTypes.CLOSURE_BINDING, Properties.CLOSURE_BINDING_ID -> "id2")
+    val local1 = graph + (NodeTypes.LOCAL, Properties.CLOSURE_BINDING_ID -> "id1")
+    val local2 = graph + (NodeTypes.LOCAL, Properties.CLOSURE_BINDING_ID -> "id2")
 
     val capturingLinker = new CapturingLinker(new Cpg(graph))
     capturingLinker.createAndApply()

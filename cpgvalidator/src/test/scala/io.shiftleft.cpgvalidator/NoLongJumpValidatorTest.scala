@@ -2,7 +2,7 @@ package io.shiftleft.cpgvalidator
 
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, Properties}
 import io.shiftleft.cpgvalidator.validators.cfg.NoLongJumpValidator
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -26,8 +26,8 @@ class NoLongJumpValidatorTest extends AnyWordSpec with Matchers {
   "report no cfg edge errors for simple correct graph" in {
     withNewBaseCpg { cpg =>
       val validator = new NoLongJumpValidator(new ValidationErrorRegistry)
-      val method1 = cpg.graph + (NodeTypes.METHOD, NodeKeys.FULL_NAME -> "method1")
-      val method2 = cpg.graph + (NodeTypes.METHOD, NodeKeys.FULL_NAME -> "method2")
+      val method1 = cpg.graph + (NodeTypes.METHOD, Properties.FULL_NAME -> "method1")
+      val method2 = cpg.graph + (NodeTypes.METHOD, Properties.FULL_NAME -> "method2")
 
       val nodeInMethod1 = cpg.graph + NodeTypes.CALL
       val nodeInMethod2 = cpg.graph + NodeTypes.CALL
@@ -44,8 +44,8 @@ class NoLongJumpValidatorTest extends AnyWordSpec with Matchers {
   "report cfg edge errors for simple incorrect graph" in {
     withNewBaseCpg { cpg =>
       val validator = new NoLongJumpValidator(new ValidationErrorRegistry)
-      val method1 = cpg.graph + (NodeTypes.METHOD, NodeKeys.FULL_NAME -> "method1")
-      val method2 = cpg.graph + (NodeTypes.METHOD, NodeKeys.FULL_NAME -> "method2")
+      val method1 = cpg.graph + (NodeTypes.METHOD, Properties.FULL_NAME -> "method1")
+      val method2 = cpg.graph + (NodeTypes.METHOD, Properties.FULL_NAME -> "method2")
 
       val nodeInMethod1 = cpg.graph + NodeTypes.CALL
       val nodeInMethod2 = cpg.graph + NodeTypes.CALL

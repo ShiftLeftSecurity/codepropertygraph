@@ -10,7 +10,7 @@ object Deprecated {
     import base._
 
     val localName = builder
-      .addEdgeProperty(
+      .addProperty(
         name = "LOCAL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,
@@ -19,7 +19,7 @@ object Deprecated {
       .protoId(6)
 
     val index = builder
-      .addEdgeProperty(
+      .addProperty(
         name = "INDEX",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.ZeroOrOne,
@@ -37,7 +37,7 @@ object Deprecated {
       .addProperties(localName, index)
 
     val methodInstFullName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "METHOD_INST_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,

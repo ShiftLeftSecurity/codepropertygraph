@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Expression}
-import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties, nodes}
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
@@ -292,8 +292,8 @@ class StepsTest extends AnyWordSpec with Matchers {
 //    def cfg: Traversal[CfgNode] = cpg.method.name("add")
 
     def ast: Traversal[AstNode] = cpg.method.name("foo")
-    ast.astParent.property(NodeKeys.NAME).head shouldBe "AClass"
-    ast.head.astParent.property(NodeKeys.NAME) shouldBe "AClass"
+    ast.astParent.property(Properties.NAME).head shouldBe "AClass"
+    ast.head.astParent.property(Properties.NAME) shouldBe "AClass"
 
     // methodForCallGraph
     method.call.size shouldBe 1

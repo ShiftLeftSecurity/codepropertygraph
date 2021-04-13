@@ -1,7 +1,7 @@
 package io.shiftleft.dataflowengineoss.queryengine
 
 import io.shiftleft.codepropertygraph.generated.nodes.Call
-import io.shiftleft.codepropertygraph.generated.{EdgeKeys, EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties, nodes}
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
@@ -149,7 +149,7 @@ object Engine {
 
   private def edgeToPathElement(e: Edge): PathElement = {
     val parentNode = e.outNode().asInstanceOf[nodes.TrackingPoint]
-    val outLabel = Some(e.property(EdgeKeys.VARIABLE)).getOrElse("")
+    val outLabel = Some(e.property(Properties.VARIABLE)).getOrElse("")
     PathElement(parentNode, outEdgeLabel = outLabel)
   }
 
@@ -196,7 +196,7 @@ object Engine {
         parentNode.isDefined
       }
 
-      Some(PathElement(parentNode, visible, outEdgeLabel = Some(e.property(EdgeKeys.VARIABLE)).getOrElse("")))
+      Some(PathElement(parentNode, visible, outEdgeLabel = Some(e.property(Properties.VARIABLE)).getOrElse("")))
     } else {
       None
     }

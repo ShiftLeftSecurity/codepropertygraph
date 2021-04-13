@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes.compat.callnamecompat
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.NodeKeyNames
+import io.shiftleft.codepropertygraph.generated.PropertyNames
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
@@ -25,7 +25,7 @@ class CallNameFixup(cpg: Cpg) extends CpgPass(cpg) {
           val unqualMethodName = qualMethodName.split("\\.").toList.last
 
           if (unqualMethodName != call.name) {
-            call.setProperty(NodeKeyNames.NAME, unqualMethodName) // TODO: This should use diffgraph
+            call.setProperty(PropertyNames.NAME, unqualMethodName) // TODO: This should use diffgraph
           }
         }
       }

@@ -88,7 +88,7 @@ class Method(val traversal: Traversal[nodes.Method]) extends AnyVal {
     * */
   @Doc("External methods (called, but no body available)")
   def external: Traversal[nodes.Method] =
-    traversal.has(NodeKeys.IS_EXTERNAL -> true)
+    traversal.has(Properties.IS_EXTERNAL -> true)
 
   /**
     * Traverse to internal methods, that is, methods for which
@@ -96,7 +96,7 @@ class Method(val traversal: Traversal[nodes.Method]) extends AnyVal {
     * */
   @Doc("Internal methods, i.e., a body is available")
   def internal: Traversal[nodes.Method] =
-    traversal.has(NodeKeys.IS_EXTERNAL -> false)
+    traversal.has(Properties.IS_EXTERNAL -> false)
 
   /**
     * Traverse to the methods local variables

@@ -16,7 +16,7 @@ object JavaSpecific {
 
 // node properties
     val binarySignature = builder
-      .addNodeProperty(
+      .addProperty(
         name = "BINARY_SIGNATURE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,
@@ -25,7 +25,7 @@ object JavaSpecific {
       .protoId(14)
 
     val content = builder
-      .addNodeProperty(
+      .addProperty(
         name = "CONTENT",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
