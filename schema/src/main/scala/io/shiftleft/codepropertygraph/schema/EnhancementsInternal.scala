@@ -24,7 +24,7 @@ object EnhancementsInternal {
 
 // node properties
     val depthFirstOrder = builder
-      .addNodeProperty(
+      .addProperty(
         name = "DEPTH_FIRST_ORDER",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.ZeroOrOne,
@@ -33,7 +33,7 @@ object EnhancementsInternal {
       .protoId(17)
 
     val hasMapping = builder
-      .addNodeProperty(
+      .addProperty(
         name = "HAS_MAPPING",
         valueType = ValueTypes.BOOLEAN,
         cardinality = Cardinality.ZeroOrOne,
@@ -42,7 +42,7 @@ object EnhancementsInternal {
       .protoId(23)
 
     val internalFlags = builder
-      .addNodeProperty(
+      .addProperty(
         name = "INTERNAL_FLAGS",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.ZeroOrOne,

@@ -15,7 +15,7 @@ object Base {
     // Properties used by more than one node type
 
     val version = builder
-      .addNodeProperty(
+      .addProperty(
         name = "VERSION",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -26,7 +26,7 @@ object Base {
       .protoId(13)
 
     val hash = builder
-      .addNodeProperty(
+      .addProperty(
         name = "HASH",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,
@@ -36,7 +36,7 @@ object Base {
       .protoId(120)
 
     val code = builder
-      .addNodeProperty(
+      .addProperty(
         name = "CODE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -45,7 +45,7 @@ object Base {
       .protoId(21)
 
     val filename = builder
-      .addNodeProperty(
+      .addProperty(
         name = "FILENAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -55,7 +55,7 @@ object Base {
       .protoId(106)
 
     val lineNumber = builder
-      .addNodeProperty(
+      .addProperty(
         name = "LINE_NUMBER",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.ZeroOrOne,
@@ -64,7 +64,7 @@ object Base {
       .protoId(2)
 
     val columnNumber = builder
-      .addNodeProperty(
+      .addProperty(
         name = "COLUMN_NUMBER",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.ZeroOrOne,
@@ -73,7 +73,7 @@ object Base {
       .protoId(11)
 
     val isExternal = builder
-      .addNodeProperty(
+      .addProperty(
         name = "IS_EXTERNAL",
         valueType = ValueTypes.BOOLEAN,
         cardinality = Cardinality.One,
@@ -85,7 +85,7 @@ object Base {
       .protoId(7)
 
     val name = builder
-      .addNodeProperty(
+      .addProperty(
         name = "NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -94,7 +94,7 @@ object Base {
       .protoId(5)
 
     val fullName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -107,7 +107,7 @@ object Base {
       .protoId(6)
 
     val parserTypeName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "PARSER_TYPE_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -116,7 +116,7 @@ object Base {
       .protoId(3)
 
     val argumentIndex = builder
-      .addNodeProperty(
+      .addProperty(
         name = "ARGUMENT_INDEX",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.One,
@@ -131,7 +131,7 @@ object Base {
       .protoId(40)
 
     val signature = builder
-      .addNodeProperty(
+      .addProperty(
         name = "SIGNATURE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -146,7 +146,7 @@ object Base {
     // The following fields are used to create edges between nodes in later processing stages.
 
     val typeFullName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "TYPE_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -158,7 +158,7 @@ object Base {
       .protoId(51)
 
     val typeDeclFullName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "TYPE_DECL_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -169,7 +169,7 @@ object Base {
       .protoId(52)
 
     val methodFullName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "METHOD_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -277,7 +277,7 @@ object Base {
       .addProperties(name)
 
     val order = builder
-      .addNodeProperty(
+      .addProperty(
         name = "ORDER",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.One,
@@ -318,7 +318,7 @@ object Base {
       .extendz(cfgNode)
 
     val language = builder
-      .addNodeProperty(
+      .addProperty(
         name = "LANGUAGE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -327,7 +327,7 @@ object Base {
       .protoId(19)
 
     val overlays = builder
-      .addNodeProperty(
+      .addProperty(
         name = "OVERLAYS",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.List,
@@ -354,7 +354,7 @@ object Base {
       .extendz(astNode)
 
     val lineNumberEnd = builder
-      .addNodeProperty(
+      .addProperty(
         name = "LINE_NUMBER_END",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.ZeroOrOne,
@@ -363,7 +363,7 @@ object Base {
       .protoId(12)
 
     val columnNumberEnd = builder
-      .addNodeProperty(
+      .addProperty(
         name = "COLUMN_NUMBER_END",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.ZeroOrOne,
@@ -399,7 +399,7 @@ object Base {
       .extendz(cfgNode, trackingPoint)
 
     val modifierType = builder
-      .addNodeProperty(
+      .addProperty(
         name = "MODIFIER_TYPE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -426,7 +426,7 @@ object Base {
       .addProperties(name, fullName, typeDeclFullName)
 
     val inheritsFromTypeFullName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "INHERITS_FROM_TYPE_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.List,
@@ -437,7 +437,7 @@ object Base {
       .protoId(53)
 
     val aliasTypeFullName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "ALIAS_TYPE_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,
@@ -528,7 +528,7 @@ object Base {
       .extendz(expression, localLike)
 
     val canonicalName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "CANONICAL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -612,7 +612,7 @@ object Base {
       .extendz(expression)
 
     val controlStructureType = builder
-      .addNodeProperty(
+      .addProperty(
         name = "CONTROL_STRUCTURE_TYPE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,

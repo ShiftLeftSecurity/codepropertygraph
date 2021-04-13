@@ -10,7 +10,7 @@ object ProtoSerialize {
   class Schema(builder: SchemaBuilder) {
 
     val containedRef = builder
-      .addNodeProperty(
+      .addProperty(
         name = "CONTAINED_REF",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,

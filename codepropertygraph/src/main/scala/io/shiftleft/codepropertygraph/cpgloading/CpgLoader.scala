@@ -2,7 +2,7 @@ package io.shiftleft.codepropertygraph.cpgloading
 
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.NodeKeys
+import io.shiftleft.codepropertygraph.generated.PropertyNames
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.Graph
 
@@ -107,7 +107,7 @@ private class CpgLoader {
   }
 
   def createIndexes(cpg: Cpg): Unit =
-    cpg.graph.indexManager.createNodePropertyIndex(NodeKeys.FULL_NAME.name)
+    cpg.graph.indexManager.createNodePropertyIndex(PropertyNames.FULL_NAME)
 
   def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit = {
     overlayFilenames.foreach { overlayFilename =>

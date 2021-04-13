@@ -13,7 +13,7 @@ object TagsAndLocation {
 
 // node properties
     val symbol = builder
-      .addNodeProperty(
+      .addProperty(
         name = "SYMBOL",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -22,7 +22,7 @@ object TagsAndLocation {
       .protoId(100)
 
     val methodShortName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "METHOD_SHORT_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -31,7 +31,7 @@ object TagsAndLocation {
       .protoId(102)
 
     val packageName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "PACKAGE_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -40,7 +40,7 @@ object TagsAndLocation {
       .protoId(103)
 
     val className = builder
-      .addNodeProperty(
+      .addProperty(
         name = "CLASS_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -49,7 +49,7 @@ object TagsAndLocation {
       .protoId(104)
 
     val classShortName = builder
-      .addNodeProperty(
+      .addProperty(
         name = "CLASS_SHORT_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -58,7 +58,7 @@ object TagsAndLocation {
       .protoId(132)
 
     val nodeLabel = builder
-      .addNodeProperty(
+      .addProperty(
         name = "NODE_LABEL",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -67,7 +67,7 @@ object TagsAndLocation {
       .protoId(105)
 
     val sourceType = builder
-      .addNodeProperty(
+      .addProperty(
         name = "SOURCE_TYPE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
@@ -76,7 +76,7 @@ object TagsAndLocation {
       .protoId(115)
 
     val sinkType = builder
-      .addNodeProperty(
+      .addProperty(
         name = "SINK_TYPE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,

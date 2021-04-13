@@ -11,7 +11,7 @@ object Dependency {
 
 // node properties
     val dependencyGroupId = builder
-      .addNodeProperty(
+      .addProperty(
         name = "DEPENDENCY_GROUP_ID",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,
