@@ -1,7 +1,7 @@
 package io.shiftleft.cpgvalidator.validators
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, NodeKeyNames, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, PropertyNames, NodeTypes}
 import io.shiftleft.cpgvalidator.{CallReceiverError, ValidationErrorRegistry}
 import overflowdb.Node
 
@@ -20,10 +20,10 @@ class CallReceiverValidator(errorRegistry: ValidationErrorRegistry) extends Vali
 
   private def perCall(call: Node): Unit = {
     val numOfOutgoingReceiverEdges = call.out(EdgeTypes.RECEIVER).asScala.size
-    val dispatchType = call.property(NodeKeyNames.DISPATCH_TYPE).toString
+    val dispatchType = call.property(PropertyNames.DISPATCH_TYPE).toString
     val arg0 = call.out(EdgeTypes.AST).asScala.find {
-      case node if node.propertyOption(NodeKeyNames.ARGUMENT_INDEX).isPresent =>
-        node.property(NodeKeyNames.ARGUMENT_INDEX) == 0
+      case node if node.propertyOption(PropertyNames.ARGUMENT_INDEX).isPresent =>
+        node.property(PropertyNames.ARGUMENT_INDEX) == 0
     }
     dispatchType match {
       case DispatchTypes.DYNAMIC_DISPATCH

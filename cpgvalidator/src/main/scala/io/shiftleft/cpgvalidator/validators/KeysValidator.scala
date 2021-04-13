@@ -1,7 +1,7 @@
 package io.shiftleft.cpgvalidator.validators
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeyNames, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, PropertyNames, NodeTypes}
 import io.shiftleft.cpgvalidator._
 import io.shiftleft.cpgvalidator.facts.FactConstructionClasses.{Cardinality, KeysFact}
 import io.shiftleft.cpgvalidator.facts.KeysFactsImporter
@@ -42,7 +42,7 @@ class KeysValidator(errorRegistry: ValidationErrorRegistry) extends Validator {
     if (!property.isPresent) {
       // AST_PARENT_FULL_NAME and AST_PARENT_TYPE have cardinality one in our base.json but are
       // in fact optional iff the related information is provided via an AST edge
-      if (nodeKeyType == NodeKeyNames.AST_PARENT_FULL_NAME || nodeKeyType == NodeKeyNames.AST_PARENT_TYPE) {
+      if (nodeKeyType == PropertyNames.AST_PARENT_FULL_NAME || nodeKeyType == PropertyNames.AST_PARENT_TYPE) {
         val incomingAstVertices = dstNode.in(EdgeTypes.AST)
         if (incomingAstVertices.asScala.exists(
               v =>
