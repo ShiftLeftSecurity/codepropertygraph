@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{Properties, NodeTypes, nodes}
 import overflowdb._
 import overflowdb.traversal._
 import overflowdb.traversal.help.{Doc, TraversalSource}
@@ -27,7 +27,7 @@ class NodeTypeStarters(cpg: Cpg) {
     * Shorthand for `cpg.comment.code(code)`
     * */
   def comment(code: String): Traversal[nodes.Comment] =
-    comment.has(NodeKeys.CODE -> code)
+    comment.has(Properties.CODE -> code)
 
   @Doc("All control structures (source-based frontends)")
   def controlStructure: Traversal[nodes.ControlStructure] =

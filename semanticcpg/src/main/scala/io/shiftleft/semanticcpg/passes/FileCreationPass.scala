@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeyNames, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, PropertyNames, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.File
@@ -48,7 +48,7 @@ class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
       dstNodeLabel = NodeTypes.FILE,
       edgeType = EdgeTypes.SOURCE_FILE,
       dstNodeMap = originalFileNameToNode,
-      dstFullNameKey = NodeKeyNames.FILENAME,
+      dstFullNameKey = PropertyNames.FILENAME,
       dstGraph,
       Some(createFileIfDoesNotExist)
     )

@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.codepencegraph
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.Method
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeKeys, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties, nodes}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominatorFrontier, ReverseCpgCfgAdapter}
@@ -40,7 +40,7 @@ class CdgPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
             val method = postDomFrontierNode.in(EdgeTypes.CONTAINS).next
             val nodeLabel = postDomFrontierNode.label
             logger.warn(s"Found CDG edge starting at $nodeLabel node. This is most likely caused by an invalid CFG." +
-              s" Method: ${method.propertyOption(NodeKeys.FULL_NAME)}" +
+              s" Method: ${method.propertyOption(Properties.FULL_NAME)}" +
               s" number of outgoing CFG edges from $nodeLabel node: ${postDomFrontierNode.outE(EdgeTypes.CFG).asScala.size}")
         }
     }

@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes.compat.methodinstcompat
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{NodeKeys, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{Properties, NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
@@ -28,7 +28,7 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
         call.methodInstFullName.foreach { methodInstFullName =>
           methodInstFullNameToMethodFullName.get(methodInstFullName) match {
             case Some(methodFullName) =>
-              call.setProperty(NodeKeys.METHOD_FULL_NAME -> methodFullName)
+              call.setProperty(Properties.METHOD_FULL_NAME -> methodFullName)
             case None =>
               MethodInstCompat.logger.warn(
                 s"Unable to find method full name by " +
@@ -42,7 +42,7 @@ class MethodInstCompat(cpg: Cpg) extends CpgPass(cpg) {
         methodRef.methodInstFullName.foreach { methodInstFullName =>
           methodInstFullNameToMethodFullName.get(methodInstFullName) match {
             case Some(methodFullName) =>
-              methodRef.setProperty(NodeKeys.METHOD_FULL_NAME -> methodFullName)
+              methodRef.setProperty(Properties.METHOD_FULL_NAME -> methodFullName)
             case None =>
               MethodInstCompat.logger.warn(
                 s"Unable to find method full name by " +

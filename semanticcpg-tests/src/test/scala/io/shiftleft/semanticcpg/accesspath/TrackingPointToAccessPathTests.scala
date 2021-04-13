@@ -23,33 +23,33 @@ class TrackingPointToAccessPathTests extends AnyWordSpec {
   private val g = OverflowDbTestInstance.create
 
   private def genCALL(graph: Graph, op: String, args: Node*): nodes.Call = {
-    val ret = graph + NodeTypes.CALL //(NodeTypes.CALL, NodeKeys.NAME -> op)
-    ret.setProperty(NodeKeys.NAME, op)
+    val ret = graph + NodeTypes.CALL //(NodeTypes.CALL, Properties.NAME -> op)
+    ret.setProperty(Properties.NAME, op)
     args.reverse.zipWithIndex.foreach { argTup =>
       val arg = argTup._1
       val idx = argTup._2
       ret --- EdgeTypes.ARGUMENT --> arg
       val javaInt: java.lang.Integer = idx + 1
-      arg.setProperty(NodeKeys.ARGUMENT_INDEX, javaInt)
+      arg.setProperty(Properties.ARGUMENT_INDEX, javaInt)
     }
     ret.asInstanceOf[nodes.Call]
   }
 
   private def genLit(graph: Graph, payload: String): nodes.Literal = {
     val ret = graph + NodeTypes.LITERAL
-    ret.setProperty(NodeKeys.CODE, payload)
+    ret.setProperty(Properties.CODE, payload)
     ret.asInstanceOf[nodes.Literal]
   }
 
   private def genID(graph: Graph, payload: String): nodes.Identifier = {
     val ret = graph + NodeTypes.IDENTIFIER
-    ret.setProperty(NodeKeys.NAME, payload)
+    ret.setProperty(Properties.NAME, payload)
     ret.asInstanceOf[nodes.Identifier]
   }
 
   private def genFID(graph: Graph, payload: String): nodes.FieldIdentifier = {
     val ret = graph + NodeTypes.FIELD_IDENTIFIER
-    ret.setProperty(NodeKeys.CANONICAL_NAME, payload)
+    ret.setProperty(Properties.CANONICAL_NAME, payload)
     ret.asInstanceOf[nodes.FieldIdentifier]
   }
 

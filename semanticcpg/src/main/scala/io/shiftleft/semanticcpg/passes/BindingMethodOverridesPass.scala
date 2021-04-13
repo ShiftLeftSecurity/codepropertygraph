@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.passes
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{NodeKeyNames, nodes}
+import io.shiftleft.codepropertygraph.generated.{PropertyNames, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
@@ -33,7 +33,7 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
     for (typeDecl <- cpg.typeDecl;
          binding <- typeDecl._bindingViaBindsOut) {
       diffGraph.addNodeProperty(node = binding,
-                                key = NodeKeyNames.IS_METHOD_NEVER_OVERRIDDEN,
+                                key = PropertyNames.IS_METHOD_NEVER_OVERRIDDEN,
                                 value = (!overwritten.contains(binding)).asInstanceOf[AnyRef])
     }
     Iterator(diffGraph.build())

@@ -36,8 +36,8 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
       // add edge from existing node "x" to new node "a" to the builder
       diffBuilder.addEdgeFromOriginal(x.asInstanceOf[StoredNode], a, EdgeTypes.AST)
       // modify property of existing node "y"
-      diffBuilder.addNodeProperty(y.asInstanceOf[StoredNode], NodeKeyNames.ORDER, Int.box(123))
-      diffBuilder.addNodeProperty(y.asInstanceOf[StoredNode], NodeKeyNames.CODE, "new y code")
+      diffBuilder.addNodeProperty(y.asInstanceOf[StoredNode], PropertyNames.ORDER, Int.box(123))
+      diffBuilder.addNodeProperty(y.asInstanceOf[StoredNode], PropertyNames.CODE, "new y code")
 
       diffBuilder.addEdgeProperty(x2y, EdgeKeyNames.ALIAS, JBoolean.FALSE)
       val diffGraph = diffBuilder.build()
@@ -48,8 +48,8 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
       import DiffGraph.Change._
       val List(
         SetEdgeProperty(_, EdgeKeyNames.ALIAS, JBoolean.TRUE), // restore old edge property value
-        SetNodeProperty(_, NodeKeyNames.CODE, "old y code"), // restore old Y property value
-        RemoveNodeProperty(_, NodeKeyNames.ORDER), // remove newly added property
+        SetNodeProperty(_, PropertyNames.CODE, "old y code"), // restore old Y property value
+        RemoveNodeProperty(_, PropertyNames.ORDER), // remove newly added property
         RemoveEdge(_), // remove x -> a
         RemoveEdge(_), // remove b -> c
         RemoveEdge(_), // remove a -> b
@@ -76,10 +76,10 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
       makeEdgeBetweenExistingNodes(graph, diffBuilder, "a", "b")
       makeEdgeBetweenExistingNodes(graph, diffBuilder, "b", "c")
       val appliedDiff2 = DiffGraph.Applier.applyDiff(diffBuilder.build(), graph, true, None)
-      graph.V.has(NodeKeys.CODE -> "a").head.out(EdgeTypes.AST).property(NodeKeys.CODE).head shouldBe "b"
+      graph.V.has(Properties.CODE -> "a").head.out(EdgeTypes.AST).property(Properties.CODE).head shouldBe "b"
       DiffGraph.Applier.unapplyDiff(graph, appliedDiff2.inverseDiffGraph.get)
-      graph.V.has(NodeKeys.CODE -> "a").head.out(EdgeTypes.AST).l shouldBe Nil
-      graph.V.has(NodeKeys.CODE, "b").head.out(EdgeTypes.AST).l shouldBe Nil
+      graph.V.has(Properties.CODE -> "a").head.out(EdgeTypes.AST).l shouldBe Nil
+      graph.V.has(Properties.CODE, "b").head.out(EdgeTypes.AST).l shouldBe Nil
     }
   }
 
@@ -145,8 +145,8 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
   def createNewNode(code: String): nodes.NewUnknown = nodes.NewUnknown().code(code)
 
   def makeEdgeBetweenExistingNodes(graph: Graph, diff: DiffGraph.Builder, codeA: String, codeB: String) = {
-    val a = graph.V.has(NodeKeys.CODE, codeA).head
-    val b = graph.V.has(NodeKeys.CODE, codeB).head
+    val a = graph.V.has(Properties.CODE, codeA).head
+    val b = graph.V.has(Properties.CODE, codeB).head
     diff.addEdge(a.asInstanceOf[nodes.StoredNode], b.asInstanceOf[nodes.StoredNode], EdgeTypes.AST)
   }
 

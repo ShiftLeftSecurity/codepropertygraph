@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.methodexternaldecorator
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.TypeDecl
-import io.shiftleft.codepropertygraph.generated.{NodeKeyNames, nodes}
+import io.shiftleft.codepropertygraph.generated.{PropertyNames, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
@@ -41,7 +41,7 @@ class MethodExternalDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
     log("Using deprecated CPG format with missing IS_EXTERNAL property on METHOD node.")
     dstGraph.addNodeProperty(
       method,
-      NodeKeyNames.IS_EXTERNAL,
+      PropertyNames.IS_EXTERNAL,
       value = Boolean.box(isExtern)
     )
   }
