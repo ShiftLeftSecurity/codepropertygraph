@@ -16,7 +16,6 @@ class CpgSchema(builder: SchemaBuilder) {
   val protoSerialize = ProtoSerialize(builder, base)
   val closure = Closure(builder, base, enhancements)
   val dependency = Dependency(builder, base)
-  val dom = Dom(builder, base, enhancements, javaSpecific)
   val enhancementsInternal = EnhancementsInternal(builder, base, enhancements, javaSpecific)
   val finding = Finding(builder, enhancements)
   val operators = Operators(builder)

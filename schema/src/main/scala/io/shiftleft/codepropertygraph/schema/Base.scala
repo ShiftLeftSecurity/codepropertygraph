@@ -214,13 +214,6 @@ object Base {
       )
       .protoId(157)
 
-    val capturedBy = builder
-      .addEdgeType(
-        name = "CAPTURED_BY",
-        comment = "Connection between a captured LOCAL and the corresponding CLOSURE_BINDING"
-      )
-      .protoId(41)
-
     val bindsTo = builder
       .addEdgeType(
         name = "BINDS_TO",
