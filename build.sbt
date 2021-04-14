@@ -66,7 +66,6 @@ publish / skip := true
 lazy val codepropertygraph = Projects.codepropertygraph
 lazy val schema = Projects.schema
 lazy val domainClasses = Projects.domainClasses
-lazy val protoBindings = Projects.protoBindings
 lazy val semanticcpg = Projects.semanticcpg
 lazy val semanticcpgtests = Projects.semanticcpgtests
 lazy val dataflowengineoss = Projects.dataflowengineoss

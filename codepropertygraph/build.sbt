@@ -1,6 +1,6 @@
 name := "codepropertygraph"
 
-dependsOn(Projects.protoBindings, Projects.domainClasses)
+dependsOn(Projects.domainClasses)
 
 libraryDependencies ++= Seq(
   "com.github.pathikrit"     %% "better-files"         % "3.9.1",
