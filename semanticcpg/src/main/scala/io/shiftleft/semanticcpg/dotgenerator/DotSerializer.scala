@@ -83,7 +83,11 @@ object DotSerializer {
   }
 
   private def escape(str: String): String = {
-    str.replace("\"", "\\\"")
+    if (str == null) {
+      ""
+    } else {
+      str.replace("\"", "\\\"")
+    }
   }
 
   private def graphEnd(sb: StringBuilder): String = {
