@@ -42,10 +42,10 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
     "remove existing plugin" in Fixture() { manager =>
       val testZipFileName = ProjectRoot.relativise("console/src/test/resources/test.zip")
       manager.add(testZipFileName)
-      manager.rm("test").map(x => File(x).name).toSet shouldBe Set("joernext-test-foo.jar", "joernext-test-foo.json")
+      manager.rm("test").map(x => File(x).name).toSet shouldBe Set("joernext-test-foo.jar")
       manager.listPlugins() shouldBe List()
       manager.add(testZipFileName)
-      manager.rm("test").map(x => File(x).name).toSet shouldBe Set("joernext-test-foo.jar", "joernext-test-foo.json")
+      manager.rm("test").map(x => File(x).name).toSet shouldBe Set("joernext-test-foo.jar")
       manager.listPlugins() shouldBe List()
     }
 

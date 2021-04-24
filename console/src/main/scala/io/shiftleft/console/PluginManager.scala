@@ -77,10 +77,6 @@ class PluginManager(val installDir: File) {
         dir.list.filter { f =>
           f.name.startsWith(s"joernext-$name")
         }
-      }.flatMap { dir =>
-        dir.list.filter { f =>
-          f.name.startsWith(s"joernext-$name")
-        }
       }
       filesToRemove.foreach(f => f.delete())
       filesToRemove.map(_.pathAsString)
