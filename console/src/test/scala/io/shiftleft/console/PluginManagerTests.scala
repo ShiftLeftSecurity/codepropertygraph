@@ -31,17 +31,6 @@ class PluginManagerTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "copy schema file in zip to schema dir and execute schema extender" in Fixture() { manager =>
-      val testZipFileName = ProjectRoot.relativise("console/src/test/resources/test.zip")
-      manager.add(testZipFileName)
-      manager.schemaDir match {
-        case Some(dir) =>
-          dir.toFile.list().toList shouldBe List("joernext-test-foo.json")
-          (manager.installDir / "out.txt").exists shouldBe true
-        case None => fail()
-      }
-    }
-
   }
 
   "PluginManager::rm" should {
