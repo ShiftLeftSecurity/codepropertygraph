@@ -4,7 +4,6 @@ import better.files.File
 import better.files.File.apply
 
 import java.nio.file.Path
-import scala.sys.process.Process
 import scala.util.{Failure, Success, Try}
 
 /**
