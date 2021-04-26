@@ -4,7 +4,6 @@ import better.files.File
 import better.files.File.apply
 
 import java.nio.file.Path
-import scala.sys.process.Process
 import scala.util.{Failure, Success, Try}
 
 /**
@@ -56,31 +55,6 @@ class PluginManager(val installDir: File) {
         }
       }
     }
-    installSchemaExtensions(file, pluginName)
-  }
-
-  private def installSchemaExtensions(file: File, pluginName: String): Unit = {
-    val copyOps = schemaDir.toList.flatMap { sDir =>
-      file.listRecursively.toList
-        .filter(_.path.toString.contains("schema"))
-        .filter(_.name.endsWith(".json"))
-        .map { json =>
-          val name = json.name
-          val dstFileName = s"joernext-$pluginName-$name"
-          cp(json, sDir / dstFileName)
-          json
-        }
-    }
-
-    if (copyOps.nonEmpty) {
-      println("Plugin modifies the schema. Running schema extender.")
-      try {
-        Process("./schema-extender.sh", installDir.toJava).!!
-      } catch {
-        case e: Exception =>
-          System.err.println(s"Error running schema-extender: ${e.getMessage}")
-      }
-    }
   }
 
   private def extractToTemporaryDir(file: File) = {
@@ -102,10 +76,6 @@ class PluginManager(val installDir: File) {
         dir.list.filter { f =>
           f.name.startsWith(s"joernext-$name")
         }
-      } ++ schemaDir.toList.flatMap { dir =>
-        dir.list.filter { f =>
-          f.name.startsWith(s"joernext-$name")
-        }
       }
       filesToRemove.foreach(f => f.delete())
       filesToRemove.map(_.pathAsString)
@@ -118,16 +88,6 @@ class PluginManager(val installDir: File) {
       Some(pathToPluginDir)
     } else {
       println(s"Plugin directory at $pathToPluginDir does not exist")
-      None
-    }
-  }
-
-  def schemaDir: Option[Path] = {
-    val pathToSchemaDir = installDir.path.resolve("schema-extender/schemas/")
-    if (pathToSchemaDir.toFile.exists()) {
-      Some(pathToSchemaDir)
-    } else {
-      println(s"Schema directory at $pathToSchemaDir does not exist")
       None
     }
   }
