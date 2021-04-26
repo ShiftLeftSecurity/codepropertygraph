@@ -13,7 +13,7 @@ object OssDataFlow {
 
 class OssDataFlowOptions() extends LayerCreatorOptions {}
 
-class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
+class OssDataFlow extends LayerCreator {
 
   override val overlayName: String = OssDataFlow.overlayName
   override val description: String = OssDataFlow.description

@@ -280,7 +280,7 @@ trait BridgeBase {
       try {
         websiteContentDir.delete()
       } catch {
-        case e: IOException => {
+        case _: IOException => {
           println("Could not remove query database website content folder. Exitting...")
           System.exit(1)
         }

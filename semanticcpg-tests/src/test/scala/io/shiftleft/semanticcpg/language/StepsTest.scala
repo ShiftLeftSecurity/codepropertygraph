@@ -150,7 +150,7 @@ class StepsTest extends AnyWordSpec with Matchers {
 
     "uses Show instance from package" in {
       object SomePackage {
-        implicit def packageShowInstance: Show[nodes.Method] = { method: nodes.Method =>
+        implicit def packageShowInstance: Show[nodes.Method] = { _ =>
           "package defined pretty printer"
         }
       }

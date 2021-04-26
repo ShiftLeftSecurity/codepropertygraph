@@ -66,7 +66,7 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
       val cpg = CpgLoader.load(zipFile.pathAsString, config)
 
       // ... execute lots of operations on the graph
-      val vertex = cpg.graph.addNode("METHOD")
+      cpg.graph.addNode("METHOD")
       // ...
 
       cpg.graph.indexManager.getIndexedNodeProperties.toArray shouldBe Array()

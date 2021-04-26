@@ -7,6 +7,8 @@ import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.Overlays
 import org.slf4j.{Logger, LoggerFactory}
 
+import scala.annotation.nowarn
+
 abstract class LayerCreator {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
@@ -61,6 +63,7 @@ abstract class LayerCreator {
     * when `metaData.overlays` is not present due
     * to conversion from legacy CPG.
     * */
+  @nowarn
   def probe(cpg: Cpg): Boolean = false
 
 }

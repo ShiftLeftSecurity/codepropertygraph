@@ -21,7 +21,6 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
   }
 
   "can access the node label" in {
-    implicit val diffGraphBuilder = DiffGraph.newBuilder
     val newNode = newTestNode()
     new NewNodeSteps(newNode.start).label.l shouldBe List(newNode.label)
   }

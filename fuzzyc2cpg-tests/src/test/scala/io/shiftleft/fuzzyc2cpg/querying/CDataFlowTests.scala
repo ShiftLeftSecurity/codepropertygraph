@@ -2,7 +2,6 @@ package io.shiftleft.fuzzyc2cpg.querying
 
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.dataflowengineoss.language._
-import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.fuzzyc2cpg.testfixtures.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
@@ -809,7 +808,6 @@ class CDataFlowTests24 extends DataFlowCodeToCpgSuite {
   "Test 24: should not report flow if access path differs" in {
     val source = cpg.call.name("source").argument.l
     val sink = cpg.method.name("sink").parameter.l
-    implicit val s: Semantics = semantics
     val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
     flows.size shouldBe 0
   }
@@ -829,7 +827,6 @@ class CDataFlowTests25 extends DataFlowCodeToCpgSuite {
     val source = cpg.call("source").argument.l
     val sink = cpg.method.name("sink").parameter.l
 
-    implicit val s: Semantics = semantics
     val flows = sink.reachableByFlows(source).l
     flows.map(flowToResultPairs).toSet shouldBe Set(
       List(("source(&a->b)", Some(3)), ("sink(a->b)", Some(4)), ("sink(p1)", None))
@@ -875,7 +872,6 @@ class CDataFlowTests27 extends DataFlowCodeToCpgSuite {
   "Test 27: find flows of last statements to METHOD_RETURN" in {
     val source = cpg.call("free").argument(1)
     val sink = cpg.method("foo").methodReturn
-    implicit val s: Semantics = semantics
     val flows = sink.reachableByFlows(source).l
 
     flows.map(flowToResultPairs).toSet shouldBe Set(
@@ -920,7 +916,6 @@ class CDataFlowTests29 extends DataFlowCodeToCpgSuite {
     val source = cpg.call("free").argument(1).l
     val sink = cpg.method("foo").methodReturn.l
 
-    implicit val s: Semantics = semantics
     val flows = sink.reachableByFlows(source).l
     flows.size shouldBe 0
   }
@@ -940,7 +935,6 @@ class CDataFlowTests30 extends DataFlowCodeToCpgSuite {
   "Test 30: should block flow even if variable decl cannot be found" in {
     val source = cpg.call.name("source").l
     val sink = cpg.method.name("sink").parameter.l
-    implicit val s: Semantics = semantics
     val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
     flows.size shouldBe 0
 
@@ -961,7 +955,6 @@ class CDataFlowTests31 extends DataFlowCodeToCpgSuite {
     """
 
   "Test 31: should not create edges from call to ret twice" in {
-    implicit val s: Semantics = semantics
     cpg
       .call("bar")
       .outE(EdgeTypes.REACHING_DEF)
@@ -979,7 +972,6 @@ class CDataFlowTests32 extends DataFlowCodeToCpgSuite {
     """
 
   "Test 32: should find flow from outer params to inner params" in {
-    implicit val s: Semantics = semantics
     def source = cpg.method.name("f").parameter
     def sink = cpg.method.name("g").parameter
     sink.size shouldBe 2

@@ -20,8 +20,8 @@ class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
     // code nodes are not numbered but may be touched
     // as predecessors of reachable nodes.
     val nodesInReversePostOrder = postOrderNumbering.toList // Does not contain entry.
-      .sortBy { case (node, index) => -index }
-      .map { case (node, index) => node }
+      .sortBy { case (_, index) => -index }
+      .map { case (node, _) => node }
       .filter { _ != cfgEntry }
     val dominators = Array.fill(indexOf.size)(UNDEFINED)
 
