@@ -21,6 +21,7 @@ import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
 import io.shiftleft.semanticcpg.passes.trim.TrimPass
 import io.shiftleft.semanticcpg.passes.{BindingMethodOverridesPass, CfgCreationPass, FileCreationPass}
+import scala.annotation.nowarn
 
 object Scpg {
   val overlayName: String = "semanticcpg"
@@ -29,7 +30,8 @@ object Scpg {
   def defaultOpts = new LayerCreatorOptions()
 }
 
-class Scpg extends LayerCreator {
+@nowarn
+class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
 
   override val overlayName: String = Scpg.overlayName
   override val description: String = Scpg.description
