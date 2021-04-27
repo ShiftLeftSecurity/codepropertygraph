@@ -88,6 +88,17 @@ object Enhancements {
       )
       .protoId(11)
 
+    val isoHash = builder
+      .addProperty(
+        name = "ISOHASH",
+        valueType = ValueTypes.LONG,
+        cardinality = Cardinality.One,
+        comment =
+          "An isomorphism-invariant hash-code that describes a CfgNode and its position inside the method body. The ISOHASH of METHOD nodes can be used to quickly heuristically check whether a method has changed between two CPGs emitted by the same frontend. Thw ISOHASH of cfgnodes can be used as a stable (albeit collision-prone) way to identify a specific node within a method. Line-numbers, filenames, etc are intentionally excluded from the hash computation. If a method body contains automorphisms, then one will get stable collisions: In e.g. `if(condition) foo(); else foo();`, the two `foo()` calls are indistinguishable. The ISOHASH is not intended to be stable under varying frontend versions; it e.g incorporates names of local variables (which can be a frontend lowering decision, when e.g. translating a DUP instruction from a stack machine). The ISOHASH is not designed to be used to detect differences from unreasonable frontend changes (i.e. bugfixes or bug introductions). The 8 most significant bits mark the version of the hash computation algorithm, and the lower 56 bits should look like pseudo-random."
+      )
+      .protoId(317)
+    cfgNode.addProperty(isoHash)
+
 // edge types
 
     val dominate = builder
