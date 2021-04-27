@@ -7,7 +7,7 @@ val protocLocalDir = "protoc"
 val protocBinaryPath = s"$protocLocalDir/bin/protoc"
 ProtobufConfig / protobufProtoc := protocBinaryPath
 ProtobufConfig / version := "3.10.0"
-sourceDirectories in ProtobufConfig += (protobufExternalIncludePath in ProtobufConfig).value
+ProtobufConfig/sourceDirectories += (ProtobufConfig/protobufExternalIncludePath).value
 ProtobufConfig / protobufGenerate := (ProtobufConfig/protobufGenerate).dependsOn(copyLatestCpgProto).dependsOn(installProtoc).value
 
 lazy val copyLatestCpgProto = taskKey[Unit]("copy latest cpg.proto to externalIncludePath")
