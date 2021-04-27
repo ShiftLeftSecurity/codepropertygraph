@@ -499,7 +499,7 @@ object Base {
         comment = "A (method)-call"
       )
       .protoId(15)
-      .addProperties(methodFullName)
+      .addProperties(methodFullName, typeFullName)
       .extendz(expression, callRepr)
 
     val local: NodeType = builder
