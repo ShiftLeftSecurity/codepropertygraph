@@ -71,7 +71,7 @@ private class CpgOverlayApplier(graph: Graph) {
     addNodes(overlay, inverseBuilder)
     addEdges(overlay, inverseBuilder)
     addNodeProperties(overlay, inverseBuilder)
-    addEdgeProperties(overlay, inverseBuilder)
+    addEdgeProperties(overlay)
   }
 
   def applyUndoableDiff(overlay: CpgOverlay): DiffGraph = {
@@ -79,7 +79,7 @@ private class CpgOverlayApplier(graph: Graph) {
     addNodes(overlay, inverseBuilder)
     addEdges(overlay, inverseBuilder)
     addNodeProperties(overlay, inverseBuilder)
-    addEdgeProperties(overlay, inverseBuilder)
+    addEdgeProperties(overlay)
     inverseBuilder.build()
   }
 
@@ -115,8 +115,8 @@ private class CpgOverlayApplier(graph: Graph) {
     }
   }
 
-  private def addEdgeProperties(overlay: CpgOverlay, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
-    overlay.getEdgePropertyList.asScala.foreach { additionalEdgeProperty =>
+  private def addEdgeProperties(overlay: CpgOverlay): Unit = {
+    overlay.getEdgePropertyList.asScala.foreach { _ =>
       throw new RuntimeException("Not implemented.")
     }
   }

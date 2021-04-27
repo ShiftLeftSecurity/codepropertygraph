@@ -88,7 +88,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
   private def getMember(cache: collection.mutable.Map[(nodes.Type, String), nodes.Member],
                         typ: nodes.Type,
                         name: String,
-                        depth: Int = 0): nodes.Member = {
+                        depth: Int): nodes.Member = {
     if (depth > 100) {
       logger.warn(
         "Maximum depth for member access resolution exceeded on type=${typ.fullName}, member=$name. Recursive inheritance?")

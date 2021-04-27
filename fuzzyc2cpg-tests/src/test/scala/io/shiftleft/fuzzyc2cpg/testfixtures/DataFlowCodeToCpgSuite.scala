@@ -3,7 +3,7 @@ package io.shiftleft.fuzzyc2cpg.testfixtures
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.language._
-import io.shiftleft.dataflowengineoss.layers.dataflows.{OssDataFlow, OssDataFlowOptions}
+import io.shiftleft.dataflowengineoss.layers.dataflows.OssDataFlow
 import io.shiftleft.dataflowengineoss.queryengine.EngineContext
 import io.shiftleft.dataflowengineoss.semanticsloader.{Parser, Semantics}
 import io.shiftleft.semanticcpg.language._
@@ -34,8 +34,7 @@ class DataFlowCodeToCpgSuite extends FuzzyCCodeToCpgSuite {
   override def passes(cpg: Cpg): Unit = {
     val context = new LayerCreatorContext(cpg)
     new Scpg().run(context)
-    val options = new OssDataFlowOptions()
-    new OssDataFlow(options).run(context)
+    new OssDataFlow().run(context)
   }
 
   protected implicit def int2IntegerOption(x: Int): Option[Integer] =

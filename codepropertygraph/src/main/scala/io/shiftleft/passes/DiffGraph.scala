@@ -54,12 +54,12 @@ sealed trait DiffGraph {
     }.toVector
   def nodeProperties: Vector[NodeProperty] =
     iterator.collect {
-      case c @ Change.SetNodeProperty(node, key, value) =>
+      case Change.SetNodeProperty(node, key, value) =>
         DiffGraph.NodeProperty(node, key, value)
     }.toVector
   def edgeProperties: Vector[EdgeProperty] =
     iterator.collect {
-      case c @ Change.SetEdgeProperty(edge, key, value) =>
+      case Change.SetEdgeProperty(edge, key, value) =>
         DiffGraph.EdgeProperty(edge, key, value)
     }.toVector
 }
@@ -176,7 +176,7 @@ object DiffGraph {
               }
           }
           builder.removeEdge(edge.asInstanceOf[Edge])
-        case other => // TODO nasty, i know. sorry. yolo :(
+        case _ => // TODO nasty, i know. sorry. yolo :(
       }
     }
 
@@ -406,8 +406,6 @@ object DiffGraph {
   }
 
   object Applier {
-    private val InternalProperty = "_"
-
     def applyDiff(diff: DiffGraph,
                   cpg: Cpg,
                   undoable: Boolean = false,
