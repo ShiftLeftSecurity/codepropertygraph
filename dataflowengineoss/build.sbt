@@ -13,5 +13,5 @@ enablePlugins(Antlr4Plugin)
 
 Antlr4 / antlr4PackageName := Some("io.shiftleft.dataflowengineoss")
 Antlr4 / antlr4Version := Versions.antlr
-Antlr4 / javaSource := (sourceManaged in Compile).value
-sources in (Compile, doc) ~= (_ filter (_ => false))
+Antlr4 / javaSource := (Compile / sourceManaged).value
+Compile/doc/sources ~= (_ filter (_ => false))

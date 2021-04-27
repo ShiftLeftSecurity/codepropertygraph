@@ -9,7 +9,7 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % Versions.scalatest % Test,
 )
 
-scalacOptions in (Compile, doc) ++= Seq(
+Compile / doc / scalacOptions ++= Seq(
   "-doc-title",
   "semanticcpg apidocs",
   "-doc-version",
@@ -17,4 +17,4 @@ scalacOptions in (Compile, doc) ++= Seq(
 )
 
 compile / javacOptions ++= Seq("-g") //debug symbols
-publishArtifact in (Test, packageBin) := true
+Test / packageBin / publishArtifact := true

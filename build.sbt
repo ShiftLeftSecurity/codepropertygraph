@@ -47,9 +47,9 @@ inThisBuild(
 
 ThisBuild / publishTo := sonatypePublishToBundle.value
 ThisBuild / Test / fork := true
-ThisBuild / Test / javaOptions += s"-Dlog4j2.configurationFile=file:${baseDirectory.in(ThisBuild).value}/resources/log4j2-test.xml"
+ThisBuild / Test / javaOptions += s"-Dlog4j2.configurationFile=file:${(ThisBuild/baseDirectory).value}/resources/log4j2-test.xml"
 // If we fork we immediately stumble upon https://github.com/sbt/sbt/issues/3892 and https://github.com/sbt/sbt/issues/3892
-ThisBuild / Test / javaOptions += s"-Duser.dir=${baseDirectory.in(ThisBuild).value}"
+ThisBuild / Test / javaOptions += s"-Duser.dir=${(ThisBuild/baseDirectory).value}"
 
 ThisBuild / libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.11.2" % Test
@@ -92,7 +92,7 @@ ThisBuild / scalacOptions ++= Seq(
 ThisBuild / compile / javacOptions ++= Seq("-g") //debug symbols
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
-onLoad in Global := {
+Global / onLoad := {
   assert(GitLFSUtils.isGitLFSEnabled(), "You need to install git-lfs and run 'git lfs pull'")
-  (onLoad in Global).value
+  (Global / onLoad).value
 }
