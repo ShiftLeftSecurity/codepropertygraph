@@ -4,6 +4,8 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.dataflowengineoss.passes.reachingdef.ReachingDefPass
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, LayerCreatorOptions}
 
+import scala.annotation.nowarn
+
 object OssDataFlow {
   val overlayName: String = "dataflowOss"
   val description: String = "Layer to support the OSS lightweight data flow tracker"
@@ -13,7 +15,8 @@ object OssDataFlow {
 
 class OssDataFlowOptions() extends LayerCreatorOptions {}
 
-class OssDataFlow extends LayerCreator {
+@nowarn
+class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
 
   override val overlayName: String = OssDataFlow.overlayName
   override val description: String = OssDataFlow.description
