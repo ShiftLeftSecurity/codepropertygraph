@@ -21,6 +21,7 @@ import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
 import io.shiftleft.semanticcpg.passes.trim.TrimPass
 import io.shiftleft.semanticcpg.passes.{BindingMethodOverridesPass, CfgCreationPass, FileCreationPass}
+
 import scala.annotation.nowarn
 
 object Scpg {
