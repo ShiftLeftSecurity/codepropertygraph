@@ -145,6 +145,20 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CdgPass(cpg),
           new NamespaceCreator(cpg),
         )
+      case Languages.FUZZY_TEST_LANG =>
+        Iterator(
+          new MethodStubCreator(cpg),
+          new MethodDecoratorPass(cpg),
+          new CapturingLinker(cpg),
+          new Linker(cpg),
+          new FileNameCompat(cpg),
+          new FileCreationPass(cpg),
+          new ContainsEdgePass(cpg),
+          new MethodExternalDecoratorPass(cpg),
+          new CfgDominatorPass(cpg),
+          new CdgPass(cpg),
+          new NamespaceCreator(cpg),
+        )
       case _ => Iterator()
     }
   }
