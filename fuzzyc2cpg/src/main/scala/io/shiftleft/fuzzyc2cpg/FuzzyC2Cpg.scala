@@ -148,14 +148,13 @@ object FuzzyC2Cpg {
   }
 
   final case class Config(inputPaths: Set[String] = Set.empty,
-                          outputPath: String = "cpg.bin.zip",
+                          outputPath: String = "cpg.bin",
                           sourceFileExtensions: Set[String] = Set(".c", ".cc", ".cpp", ".h", ".hpp"),
                           includeFiles: Set[String] = Set.empty,
                           includePaths: Set[String] = Set.empty,
                           defines: Set[String] = Set.empty,
                           undefines: Set[String] = Set.empty,
-                          preprocessorExecutable: String = "./fuzzypp/bin/fuzzyppcli",
-                          overflowDb: Boolean = false) {
+                          preprocessorExecutable: String = "./fuzzypp/bin/fuzzyppcli") {
     lazy val usePreprocessor: Boolean =
       includeFiles.nonEmpty || includePaths.nonEmpty || defines.nonEmpty || undefines.nonEmpty
   }
@@ -200,9 +199,6 @@ object FuzzyC2Cpg {
         .text("path to the preprocessor executable")
         .action((s, cfg) => cfg.copy(preprocessorExecutable = s))
       help("help").text("display this help message")
-      opt[Unit]("overflowdb")
-        .text("create overflowdb")
-        .action((_, cfg) => cfg.copy(overflowDb = true))
     }.parse(args, Config())
 
 }
