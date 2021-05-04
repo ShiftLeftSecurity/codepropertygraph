@@ -90,7 +90,7 @@ object Enhancements {
 
     val isoHash = builder
       .addProperty(
-        name = "ISOHASH",
+        name = "ISO_HASH",
         valueType = ValueTypes.LONG,
         cardinality = Cardinality.One,
         comment =
@@ -98,6 +98,7 @@ object Enhancements {
       )
       .protoId(317)
     cfgNode.addProperty(isoHash)
+    methodParameterIn.addProperty(isoHash)
 
 // edge types
 
@@ -276,7 +277,7 @@ object Enhancements {
         comment = "This node represents a formal parameter going towards the caller side"
       )
       .protoId(33)
-      .addProperties(code, evaluationStrategy, typeFullName, lineNumber, columnNumber)
+      .addProperties(code, evaluationStrategy, typeFullName, lineNumber, columnNumber, isoHash)
       .extendz(declaration, trackingPoint, astNode)
 
     methodReturn
