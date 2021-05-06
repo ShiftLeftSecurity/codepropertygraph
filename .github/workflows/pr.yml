@@ -7,6 +7,9 @@ on:
 jobs:
   test-codepropertygraph:
     runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        java-version: [1.8, 1.11]
 
     steps:
     - uses: actions/checkout@v2
@@ -16,8 +19,10 @@ jobs:
       run: git submodule update --init --recursive
     - name: apt-get update
       run: sudo apt-get update
-    - name: Set up JDK 1.8
-      run: sudo apt-get install openjdk-8-jdk
+    - name: Set up JDK ${{ matrix.java-version }}
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java-version }}
     - name: Print sbt version
       run: sbt --version
     - name: Compile and run tests

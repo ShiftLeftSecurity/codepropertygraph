@@ -51,7 +51,7 @@ class AstNode[A <: nodes.AstNode](val traversal: Traversal[A]) extends AnyVal {
         val o = c.order
 
         /** using `Integer` here to prevent boxing during sorting */
-        if (o == null) new Integer(-2) else o
+        if (o == null) Integer.valueOf(-2) else o
       }
     }
 
