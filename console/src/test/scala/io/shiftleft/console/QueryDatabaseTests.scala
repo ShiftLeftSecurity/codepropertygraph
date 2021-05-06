@@ -1,7 +1,7 @@
 package io.shiftleft.console
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.macros.QueryMacros
+import io.shiftleft.macros.QueryMacros.withStrRep
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should
 import org.scalatest.wordspec.AnyWordSpec
@@ -39,18 +39,17 @@ class QueryDatabaseTests extends AnyWordSpec with should.Matchers {
     }
 
     "serialize traversal to string" in {
-      val query = QueryMacros.queryInit(
-        "a-name",
-        "an-author",
-        "a-title",
-        "a-description",
-        2.0, { cpg: Cpg =>
+      val query = Query(
+        name = "a-name",
+        author = "an-author",
+        title = "a-title",
+        description = "a-description",
+        score = 2.0,
+        traversal = { cpg: Cpg =>
           cpg.method
-        },
-        List()
+        }
       )
       query.title shouldBe "a-title"
-      query.traversalAsString.endsWith("cpg.method") shouldBe true
     }
   }
 }
