@@ -39,14 +39,17 @@ class CpgGeneratorFactory(config: ConsoleConfig) {
   }
 
   def languageIsKnown(language: String): Boolean = {
-    Set(Languages.C,
-        Languages.CSHARP,
-        Languages.GOLANG,
-        Languages.JAVA,
-        Languages.JAVASCRIPT,
-        Languages.PYTHON,
-        Languages.LLVM,
-        Languages.PHP).contains(language)
+    Set(
+      Languages.C,
+      Languages.CSHARP,
+      Languages.GOLANG,
+      Languages.JAVA,
+      Languages.JAVASCRIPT,
+      Languages.PYTHON,
+      Languages.FUZZY_TEST_LANG,
+      Languages.LLVM,
+      Languages.PHP
+    ).contains(language)
   }
 
   def runGenerator(frontend: CpgGenerator,
