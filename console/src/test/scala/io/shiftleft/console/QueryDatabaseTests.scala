@@ -1,7 +1,6 @@
 package io.shiftleft.console
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.macros.QueryMacros.withStrRep
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should
 import org.scalatest.wordspec.AnyWordSpec
