@@ -2,7 +2,7 @@ package io.shiftleft.macros
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.console.{TraversalWithStrRep}
+import io.shiftleft.console.TraversalWithStrRep
 import overflowdb.traversal.Traversal
 
 import scala.language.experimental.macros
