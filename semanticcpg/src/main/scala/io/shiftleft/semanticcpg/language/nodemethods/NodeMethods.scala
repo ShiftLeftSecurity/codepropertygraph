@@ -6,7 +6,7 @@ import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
 
-class NodeMethods(val node: nodes.CpgNode) extends AnyVal {
+class NodeMethods(val node: nodes.AbstractNode) extends AnyVal {
 
   def location: nodes.NewLocation =
     node match {

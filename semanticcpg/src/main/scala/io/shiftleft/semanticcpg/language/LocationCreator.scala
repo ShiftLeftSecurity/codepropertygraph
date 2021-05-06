@@ -121,7 +121,7 @@ object LocationCreator {
   }
 
   def apply(
-      node: nodes.CpgNode,
+      node: nodes.AbstractNode,
       symbol: String,
       label: String,
       lineNumber: Option[Integer],
@@ -168,6 +168,6 @@ object LocationCreator {
       case None                              => None
     }
 
-  def emptyLocation(label: String, node: Option[nodes.CpgNode]): nodes.NewLocation =
+  def emptyLocation(label: String, node: Option[nodes.AbstractNode]): nodes.NewLocation =
     nodes.NewLocation().nodeLabel(label).node(node)
 }
