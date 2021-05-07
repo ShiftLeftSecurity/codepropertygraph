@@ -3,8 +3,8 @@ package io.shiftleft.passes
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.codepropertygraph.generated.edges.Propagate
-import io.shiftleft.codepropertygraph.generated.nodes.{MethodParameterIn, MethodParameterOut, StoredNode}
+import io.shiftleft.codepropertygraph.generated.edges.ReachingDef
+import io.shiftleft.codepropertygraph.generated.nodes.{Identifier, MethodParameterIn, StoredNode}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
@@ -45,13 +45,13 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
       // 1) add a new node
       val addNodeInverse = applyDiffAndGetInverse(cpg)(
         _.addNode(
-          nodes.NewMethodParameterOut().code(null)
+          nodes.NewIdentifier().code(null)
         ))
       cpg.graph.nodeCount shouldBe 2
       val additionalNode = cpg.graph.V
-        .label(MethodParameterOut.Label)
+        .label(Identifier.Label)
         .collectFirst {
-          case mpe: MethodParameterOut if mpe.code == null => mpe
+          case mpe: nodes.Identifier if mpe.code == null => mpe
         }
         .get
         .asInstanceOf[StoredNode]
@@ -61,15 +61,15 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
         _.addEdge(
           src = initialNode,
           dst = additionalNode,
-          edgeLabel = Propagate.Label,
-          properties = Seq(Propagate.PropertyNames.Alias -> Boolean.box(true))
+          edgeLabel = ReachingDef.Label,
+          properties = Seq(ReachingDef.PropertyNames.Variable -> "true")
         ))
       val addEdge2Inverse = applyDiffAndGetInverse(cpg)(
         _.addEdge(
           src = initialNode,
           dst = additionalNode,
-          edgeLabel = Propagate.Label,
-          properties = Seq(Propagate.PropertyNames.Alias -> Boolean.box(false))
+          edgeLabel = ReachingDef.Label,
+          properties = Seq(ReachingDef.PropertyNames.Variable -> "false")
         ))
       def initialNodeOutEdges = initialNode.outE.toList
       initialNodeOutEdges.size shouldBe 2
@@ -95,7 +95,7 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
       // 2) remove edges - they don't have ids and are therefor disambiguated by their property hash
       DiffGraph.Applier.applyDiff(addEdge2Inverse, cpg)
       initialNodeOutEdges.size shouldBe 1
-      initialNode.outE.property(Properties.ALIAS).toList shouldBe List(true)
+      initialNode.outE.property(Properties.VARIABLE).toList shouldBe List("true")
       DiffGraph.Applier.applyDiff(addEdge1Inverse, cpg)
       initialNodeOutEdges.size shouldBe 0
 
