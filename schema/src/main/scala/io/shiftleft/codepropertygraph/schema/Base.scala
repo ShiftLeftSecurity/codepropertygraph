@@ -679,6 +679,8 @@ object Base {
       .addOutEdge(edge = ref, inNode = tpe)
       .addOutEdge(edge = bindsTo, inNode = typeParameter)
 
+    member.addOutEdge(edge = ast, inNode = modifier)
+
     literal
       .addOutEdge(edge = cfg, inNode = callNode)
       .addOutEdge(edge = cfg, inNode = identifier)
@@ -762,6 +764,8 @@ object Base {
       .addOutEdge(edge = cfg, inNode = jumpTarget)
       .addOutEdge(edge = cfg, inNode = controlStructure)
       .addOutEdge(edge = cfg, inNode = unknown)
+
+    methodParameterIn.addOutEdge(edge = ast, inNode = unknown)
 
     fieldIdentifier
       .addOutEdge(edge = cfg,
