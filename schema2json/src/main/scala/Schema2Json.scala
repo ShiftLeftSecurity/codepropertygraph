@@ -9,19 +9,30 @@ object Schema2Json extends App {
   val schema = CpgSchema.instance
 
   implicit val formats: AnyRef with Formats =
-      Serialization.formats(NoTypeHints)
+    Serialization.formats(NoTypeHints)
 
-  val json = schema.nodeTypes.map{ nodeType =>
+  val json = schema.nodeTypes.map { nodeType =>
+    val baseTypeNames = nodeType.extendz.map(_.name)
+    val allProperties = nodeType.properties.map { prop =>
+      prop.name
+    }
+    val inheritedProperties = nodeType.extendz.flatMap { base =>
+      base.properties.map(_.name).map(x => (("baseType" -> base.name), ("name" -> x)))
+    }
+    val inheritedPropertyNames = inheritedProperties.map(_._2._2)
+    val nonInheritedProperties = allProperties.filterNot(x => inheritedPropertyNames.contains(x))
     ("name" -> nodeType.name) ~
       ("comment" -> nodeType.comment) ~
-      ("properties" -> nodeType.properties.map{ prop => prop.name } )
+      ("extends" -> baseTypeNames) ~
+      ("inheritedProperties" -> inheritedProperties.map(x => x._1 ~ x._2)) ~
+      ("properties" -> nonInheritedProperties)
   }
 
   val outFileName = "/tmp/schema.json"
-    better.files
-      .File(outFileName)
-      .write(
-        compact(render(json))
-      )
-    println(s"Schema written to: $outFileName")
+  better.files
+    .File(outFileName)
+    .write(
+      compact(render(json))
+    )
+  println(s"Schema written to: $outFileName")
 }
