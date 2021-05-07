@@ -15,14 +15,6 @@ object JavaSpecific {
     import enhancements._
 
 // node properties
-    val binarySignature = builder
-      .addProperty(
-        name = "BINARY_SIGNATURE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "Binary type signature"
-      )
-      .protoId(14)
 
     val content = builder
       .addProperty(
@@ -72,9 +64,6 @@ object JavaSpecific {
 
     arrayInitializer
       .extendz(expression)
-
-    method
-      .addProperties(binarySignature)
 
     methodParameterIn
       .addProperties()
