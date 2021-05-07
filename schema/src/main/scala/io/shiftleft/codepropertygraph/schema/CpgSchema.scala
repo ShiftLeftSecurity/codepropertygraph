@@ -10,7 +10,6 @@ class CpgSchema(builder: SchemaBuilder) {
   // the foundation
   val base = Base(builder)
   val enhancements = Enhancements(builder, base)
-  val javaSpecific = JavaSpecific(builder, base, enhancements)
 
   // everything else
   val protoSerialize = ProtoSerialize(builder, base)
