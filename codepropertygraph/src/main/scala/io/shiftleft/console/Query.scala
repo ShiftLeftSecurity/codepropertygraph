@@ -4,6 +4,8 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
 import overflowdb.traversal.Traversal
 
+case class CodeExamples(positive: List[String], negative: List[String])
+
 case class Query(name: String,
                  author: String,
                  title: String,
@@ -12,7 +14,8 @@ case class Query(name: String,
                  traversal: Cpg => Traversal[nodes.StoredNode],
                  traversalAsString: String = "",
                  tags: List[String] = List(),
-                 language: String = "")
+                 language: String = "",
+                 codeExamples: CodeExamples = CodeExamples(List(), List()))
 
 object Query {
   def make(name: String,
@@ -21,7 +24,8 @@ object Query {
            description: String,
            score: Double,
            traversalWithStrRep: TraversalWithStrRep,
-           tags: List[String] = List()): Query = {
+           tags: List[String] = List(),
+           codeExamples: CodeExamples = CodeExamples(List(), List())): Query = {
     Query(
       name = name,
       author = author,
@@ -31,6 +35,7 @@ object Query {
       traversal = traversalWithStrRep.traversal,
       traversalAsString = traversalWithStrRep.strRep,
       tags = tags,
+      codeExamples = codeExamples
     )
   }
 }
