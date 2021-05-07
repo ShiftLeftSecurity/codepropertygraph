@@ -1,7 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema._
-import overflowdb.storage.ValueTypes
 
 /**
   * This is only intended for Java.
@@ -13,17 +12,6 @@ object JavaSpecific {
   class Schema(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) {
     import base._
     import enhancements._
-
-// node properties
-
-    val content = builder
-      .addProperty(
-        name = "CONTENT",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = "Content of CONFIG_FILE node"
-      )
-      .protoId(20)
 
 // node types
     val annotation: NodeType = builder
@@ -73,15 +61,6 @@ object JavaSpecific {
 
     member
       .addProperties()
-
-    val configFile: NodeType = builder
-      .addNodeType(
-        name = "CONFIG_FILE",
-        comment = "Configuration file contents. Might be in use by a framework"
-      )
-      .protoId(50)
-      .addProperties(name, content)
-      .extendz(trackingPoint)
 
 // node relations
     annotation
