@@ -578,14 +578,6 @@ object Base {
       .addProperties(name, signature, fullName, methodFullName)
       .extendz(astNode)
 
-    val arrayInitializer: NodeType = builder
-      .addNodeType(
-        name = "ARRAY_INITIALIZER",
-        comment = "Initialization construct for arrays"
-      )
-      .protoId(14)
-      .extendz(astNode)
-
     val methodRef: NodeType = builder
       .addNodeType(
         name = "METHOD_REF",
@@ -885,7 +877,6 @@ object Base {
     controlStructure
       .addOutEdge(edge = ast, inNode = literal, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = modifier)
-      .addOutEdge(edge = ast, inNode = arrayInitializer)
       .addOutEdge(edge = ast, inNode = callNode, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = local)
       .addOutEdge(edge = ast, inNode = identifier, cardinalityIn = Cardinality.ZeroOrOne)
@@ -907,7 +898,6 @@ object Base {
       .addOutEdge(edge = condition, inNode = jumpTarget)
       .addOutEdge(edge = condition, inNode = unknown)
       .addOutEdge(edge = condition, inNode = controlStructure)
-      .addOutEdge(edge = condition, inNode = arrayInitializer)
       .addOutEdge(edge = cfg, inNode = callNode)
       .addOutEdge(edge = cfg, inNode = identifier)
       .addOutEdge(edge = cfg, inNode = fieldIdentifier)
@@ -948,7 +938,6 @@ object Base {
       .addOutEdge(edge = ast, inNode = literal)
       .addOutEdge(edge = ast, inNode = member)
       .addOutEdge(edge = ast, inNode = modifier)
-      .addOutEdge(edge = ast, inNode = arrayInitializer)
       .addOutEdge(edge = ast, inNode = callNode)
       .addOutEdge(edge = ast, inNode = local)
       .addOutEdge(edge = ast, inNode = identifier)
