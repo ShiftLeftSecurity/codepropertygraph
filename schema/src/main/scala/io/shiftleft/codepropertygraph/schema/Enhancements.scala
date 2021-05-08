@@ -175,18 +175,6 @@ object Enhancements {
 
 // node types
 
-    val detachedTrackingPoint: NodeType = builder
-      .addNodeType(
-        name = "DETACHED_TRACKING_POINT",
-        comment = ""
-      )
-      .protoId(1001)
-      .addProperties()
-      .extendz(trackingPoint)
-
-    detachedTrackingPoint
-      .addContainedNode(cfgNode, "cfgNode", Cardinality.One)
-
     val binding: NodeType = builder
       .addNodeType(
         name = "BINDING",
