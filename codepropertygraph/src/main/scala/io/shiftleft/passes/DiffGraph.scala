@@ -1,7 +1,7 @@
 package io.shiftleft.passes
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, NewNode, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{AbstractNode, NewNode, StoredNode}
 import io.shiftleft.proto.cpg.Cpg.{DiffGraph => DiffGraphProto}
 import overflowdb._
 import overflowdb.traversal._
@@ -125,7 +125,7 @@ object DiffGraph {
     final case class CreateNode(node: NewNode) extends Change
     final case class SetNodeProperty(node: StoredNode, key: String, value: AnyRef) extends Change
     final case class SetEdgeProperty(edge: Edge, propertyKey: String, propertyValue: AnyRef) extends Change
-    final case class CreateEdge(src: CpgNode, dst: CpgNode, label: String, packedProperties: PackedProperties)
+    final case class CreateEdge(src: AbstractNode, dst: AbstractNode, label: String, packedProperties: PackedProperties)
         extends Change {
       def properties: Properties = PackedProperties.unpack(packedProperties)
 
@@ -139,7 +139,7 @@ object DiffGraph {
       }
     }
     object CreateEdge {
-      def apply(src: CpgNode, dst: CpgNode, label: String, properties: Properties): CreateEdge =
+      def apply(src: AbstractNode, dst: AbstractNode, label: String, properties: Properties): CreateEdge =
         CreateEdge(src, dst, label, PackedProperties.pack(properties))
     }
   }
@@ -201,7 +201,10 @@ object DiffGraph {
 
     def +=(node: NewNode): Unit = addNode(node)
 
-    def addEdge(src: CpgNode, dst: CpgNode, edgeLabel: String, properties: Seq[(String, AnyRef)] = List()): Unit = {
+    def addEdge(src: AbstractNode,
+                dst: AbstractNode,
+                edgeLabel: String,
+                properties: Seq[(String, AnyRef)] = List()): Unit = {
       buffer.append(Change.CreateEdge(src, dst, edgeLabel, properties))
     }
     def build(buf: mutable.ArrayBuffer[Change]) = {

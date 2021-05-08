@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.{CpgNode, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{AbstractNode, StoredNode}
 import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
 import io.shiftleft.semanticcpg.language.dotextension.{AstNodeDot, CfgNodeDot}
 import io.shiftleft.semanticcpg.language.nodemethods._
@@ -23,7 +23,7 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
   // to generated node types.
 
   implicit def cfgNodeToAsNode(node: nodes.CfgNode): AstNodeMethods = new AstNodeMethods(node)
-  implicit def toExtendedNode(node: nodes.CpgNode): NodeMethods = new NodeMethods(node)
+  implicit def toExtendedNode(node: nodes.AbstractNode): NodeMethods = new NodeMethods(node)
   implicit def toExtendedStoredNode(node: nodes.StoredNode): StoredNodeMethods = new StoredNodeMethods(node)
   implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods = new WithinMethodMethods(node)
   implicit def toAstNodeMethods(node: nodes.AstNode): AstNodeMethods = new AstNodeMethods(node)
@@ -76,7 +76,7 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
   implicit def toCfgNodeDot[A](a: A)(implicit f: A => Traversal[nodes.Method]): CfgNodeDot =
     new CfgNodeDot(f(a))
 
-  implicit def toTraversal[NodeType <: CpgNode](node: NodeType): Traversal[NodeType] =
+  implicit def toTraversal[NodeType <: AbstractNode](node: NodeType): Traversal[NodeType] =
     Traversal.fromSingle(node)
 
   implicit def toSteps[A](trav: Traversal[A]): Steps[A] = new Steps(trav)

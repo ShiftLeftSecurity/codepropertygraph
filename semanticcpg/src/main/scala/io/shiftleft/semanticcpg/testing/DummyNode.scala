@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 
 /** mixin trait for test nodes */
 trait DummyNodeImpl extends StoredNode {
-  // Members declared in io.shiftleft.codepropertygraph.generated.nodes.CpgNode
+  // Members declared in io.shiftleft.codepropertygraph.generated.nodes.AbstractNode
   def label: String = ???
 
   // Members declared in overflowdb.Element

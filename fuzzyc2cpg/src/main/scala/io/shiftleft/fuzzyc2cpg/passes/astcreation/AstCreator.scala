@@ -71,18 +71,18 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
   private val logger = LoggerFactory.getLogger(getClass)
 
   private var contextStack = List[Context]()
-  private val scope = new Scope[String, (nodes.CpgNode, String), nodes.CpgNode]()
+  private val scope = new Scope[String, (nodes.AbstractNode, String), nodes.AbstractNode]()
 
   pushContext(namespaceBlock, childNum)
 
-  private class Context(val cpgParent: nodes.CpgNode,
+  private class Context(val cpgParent: nodes.AbstractNode,
                         var childNum: Int,
                         val parentIsClassDef: Boolean,
                         val parentIsMemberAccess: Boolean = false,
                         var addConditionEdgeOnNextAstEdge: Boolean = false,
                         var addArgumentEdgeOnNextAstEdge: Boolean = false) {}
 
-  private def pushContext(cpgParent: nodes.CpgNode,
+  private def pushContext(cpgParent: nodes.AbstractNode,
                           startChildNum: Int,
                           parentIsClassDef: Boolean = false,
                           parentIsMemberAccess: Boolean = false): Unit = {
