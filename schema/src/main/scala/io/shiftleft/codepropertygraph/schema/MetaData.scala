@@ -10,17 +10,6 @@ object MetaData {
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
     import base._
 
-    val version = builder
-      .addProperty(
-        name = "VERSION",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = """A version, given as a string. Used, for example, in the META_DATA node to
-                    |indicate which version of the CPG spec this CPG conforms to
-                    |""".stripMargin
-      )
-      .protoId(13)
-
     val overlays = builder
       .addProperty(
         name = "OVERLAYS",

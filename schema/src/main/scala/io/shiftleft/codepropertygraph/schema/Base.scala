@@ -14,6 +14,17 @@ object Base {
 
     // Properties used by more than one node type
 
+    val version = builder
+      .addProperty(
+        name = "VERSION",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = """A version, given as a string. Used, for example, in the META_DATA node to
+                    |indicate which version of the CPG spec this CPG conforms to
+                    |""".stripMargin
+      )
+      .protoId(13)
+
     val hash = builder
       .addProperty(
         name = "HASH",
