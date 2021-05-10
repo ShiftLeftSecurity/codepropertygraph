@@ -9,6 +9,7 @@ import overflowdb.schema.{Schema, SchemaBuilder}
 class CpgSchema(builder: SchemaBuilder) {
   // the foundation
   val base = Base(builder)
+  val metaData = MetaData(builder, base)
   val enhancements = Enhancements(builder, base)
 
   // everything else

@@ -75,6 +75,7 @@ lazy val console = Projects.console
 lazy val fuzzyc2cpg = Projects.fuzzyc2cpg
 lazy val fuzzyc2cpgtests = Projects.fuzzyc2cpgtests
 lazy val macros = Projects.macros
+lazy val schema2json = Projects.schema2json
 
 // Once sbt-scalafmt is at version > 2.x, use scalafmtAll
 addCommandAlias("format", ";scalafixAll OrganizeImports;scalafmt;test:scalafmt")

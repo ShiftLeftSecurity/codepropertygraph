@@ -20,8 +20,8 @@ object Base {
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
         comment = """A version, given as a string. Used, for example, in the META_DATA node to
-            |indicate which version of the CPG spec this CPG conforms to
-            |""".stripMargin
+                    |indicate which version of the CPG spec this CPG conforms to
+                    |""".stripMargin
       )
       .protoId(13)
 
@@ -310,33 +310,6 @@ object Base {
       .addProperties(name, signature)
       .extendz(cfgNode)
 
-    val language = builder
-      .addProperty(
-        name = "LANGUAGE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = "the CPG language frontend that generated this CPG"
-      )
-      .protoId(19)
-
-    val overlays = builder
-      .addProperty(
-        name = "OVERLAYS",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.List,
-        comment = "Names of overlays applied to this graph, in order of application"
-      )
-      .protoId(118)
-
-    val metaData: NodeType = builder
-      .addNodeType(
-        name = "META_DATA",
-        comment = """Node to save meta data about the graph on its properties.
-            |Exactly one node of this type per graph""".stripMargin
-      )
-      .protoId(39)
-      .addProperties(language, version, overlays, hash)
-
     val file: NodeType = builder
       .addNodeType(
         name = "FILE",
@@ -576,14 +549,6 @@ object Base {
       )
       .protoId(32)
       .addProperties(name, signature, fullName, methodFullName)
-      .extendz(astNode)
-
-    val arrayInitializer: NodeType = builder
-      .addNodeType(
-        name = "ARRAY_INITIALIZER",
-        comment = "Initialization construct for arrays"
-      )
-      .protoId(14)
       .extendz(astNode)
 
     val methodRef: NodeType = builder
@@ -885,7 +850,6 @@ object Base {
     controlStructure
       .addOutEdge(edge = ast, inNode = literal, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = modifier)
-      .addOutEdge(edge = ast, inNode = arrayInitializer)
       .addOutEdge(edge = ast, inNode = callNode, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = local)
       .addOutEdge(edge = ast, inNode = identifier, cardinalityIn = Cardinality.ZeroOrOne)
@@ -907,7 +871,6 @@ object Base {
       .addOutEdge(edge = condition, inNode = jumpTarget)
       .addOutEdge(edge = condition, inNode = unknown)
       .addOutEdge(edge = condition, inNode = controlStructure)
-      .addOutEdge(edge = condition, inNode = arrayInitializer)
       .addOutEdge(edge = cfg, inNode = callNode)
       .addOutEdge(edge = cfg, inNode = identifier)
       .addOutEdge(edge = cfg, inNode = fieldIdentifier)
@@ -948,7 +911,6 @@ object Base {
       .addOutEdge(edge = ast, inNode = literal)
       .addOutEdge(edge = ast, inNode = member)
       .addOutEdge(edge = ast, inNode = modifier)
-      .addOutEdge(edge = ast, inNode = arrayInitializer)
       .addOutEdge(edge = ast, inNode = callNode)
       .addOutEdge(edge = ast, inNode = local)
       .addOutEdge(edge = ast, inNode = identifier)

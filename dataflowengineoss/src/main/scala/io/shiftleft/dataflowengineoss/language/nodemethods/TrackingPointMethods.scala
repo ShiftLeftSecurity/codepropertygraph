@@ -22,9 +22,8 @@ class TrackingPointMethods[NodeType <: nodes.TrackingPoint](val node: NodeType) 
     * */
   def astNode: nodes.AstNode =
     node match {
-      case n: nodes.AstNode               => n
-      case n: nodes.DetachedTrackingPoint => n.cfgNode
-      case _                              => ??? //TODO markus/fabs?
+      case n: nodes.AstNode => n
+      case _                => ??? //TODO markus/fabs?
     }
 
   def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Traversal[NodeType]*)(

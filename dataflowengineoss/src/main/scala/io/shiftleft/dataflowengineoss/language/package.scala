@@ -22,12 +22,9 @@ package object language {
   implicit def trackingPointToAstNodeMethods(node: nodes.TrackingPoint) =
     new AstNodeMethods(trackingPointToAstNode(node))
 
-  implicit def trackingPointToAstNode(node: nodes.TrackingPoint): nodes.AstNode =
-    node match {
-      case n: nodes.AstNode               => n
-      case n: nodes.DetachedTrackingPoint => n.cfgNode
-      case _                              => ??? //TODO markus/fabs?
-    }
+  implicit def trackingPointToAstNode(node: nodes.TrackingPoint): nodes.AstNode = {
+    node.astNode
+  }
 
   implicit def toDdgNodeDot[A](a: A)(implicit f: A => Traversal[nodes.Method]): DdgNodeDot =
     new DdgNodeDot(f(a))

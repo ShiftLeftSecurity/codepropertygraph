@@ -70,15 +70,6 @@ object Enhancements {
       )
       .protoId(57)
 
-    val alias = builder
-      .addProperty(
-        name = "ALIAS",
-        valueType = ValueTypes.BOOLEAN,
-        cardinality = Cardinality.One,
-        comment = "Defines whether a PROPAGATE edge creates an alias"
-      )
-      .protoId(1)
-
     val variable = builder
       .addProperty(
         name = "VARIABLE",
@@ -153,14 +144,6 @@ object Enhancements {
       )
       .protoId(28)
 
-    val propagate = builder
-      .addEdgeType(
-        name = "PROPAGATE",
-        comment = "Encodes propagation of data from on node to another. The ALIAS property is deprecated."
-      )
-      .protoId(1)
-      .addProperties(alias)
-
     val reachingDef = builder
       .addEdgeType(
         name = "REACHING_DEF",
@@ -191,18 +174,6 @@ object Enhancements {
       .protoId(155)
 
 // node types
-
-    val detachedTrackingPoint: NodeType = builder
-      .addNodeType(
-        name = "DETACHED_TRACKING_POINT",
-        comment = ""
-      )
-      .protoId(1001)
-      .addProperties()
-      .extendz(trackingPoint)
-
-    detachedTrackingPoint
-      .addContainedNode(cfgNode, "cfgNode", Cardinality.One)
 
     val binding: NodeType = builder
       .addNodeType(
@@ -779,8 +750,6 @@ object Enhancements {
       .addOutEdge(edge = reachingDef, inNode = methodRef)
 
     methodParameterIn
-      .addOutEdge(edge = propagate, inNode = methodParameterOut)
-      .addOutEdge(edge = propagate, inNode = methodReturn)
       .addOutEdge(edge = evalType, inNode = tpe, cardinalityOut = Cardinality.One)
       .addOutEdge(edge = reachingDef, inNode = callNode)
       .addOutEdge(edge = reachingDef, inNode = ret)
