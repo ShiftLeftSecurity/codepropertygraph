@@ -1,8 +1,8 @@
 import io.shiftleft.codepropertygraph.schema.CpgSchema
-import org.json4s.{Formats, NoTypeHints}
-import org.json4s.native.Serialization
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
+import org.json4s.native.Serialization
+import org.json4s.{Formats, NoTypeHints}
 
 object Schema2Json extends App {
 
