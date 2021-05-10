@@ -4,7 +4,7 @@ import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
-import org.slf4j.{Logger, LoggerFactory}
+import org.slf4j.{Logger, LoggerFactory, MDC}
 
 import java.lang.{Long => JLong}
 import scala.concurrent.duration.DurationLong
@@ -129,7 +129,9 @@ trait CpgPassBase {
       fun
     } finally {
       val duration = (System.currentTimeMillis - startTime).millis.toCoarsest
+      MDC.put("time", duration.toString())
       logger.info(s"Enhancement $name completed in $duration")
+      MDC.remove("time")
     }
   }
 
