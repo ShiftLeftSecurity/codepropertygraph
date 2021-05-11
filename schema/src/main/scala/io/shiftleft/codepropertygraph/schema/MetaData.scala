@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Cardinality, NodeType, SchemaBuilder}
+import overflowdb.schema.{Cardinality, NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
 object MetaData {
@@ -9,6 +9,7 @@ object MetaData {
 
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
     import base._
+    implicit val schemaInfo = SchemaInfo.forClass(getClass)
 
     val overlays = builder
       .addProperty(

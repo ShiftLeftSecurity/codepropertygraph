@@ -11,9 +11,9 @@ object Base {
   def apply(builder: SchemaBuilder) = new Schema(builder)
 
   class Schema(builder: SchemaBuilder) {
+    implicit val schemaInfo = SchemaInfo.forClass(getClass)
 
     // Properties used by more than one node type
-
     val version = builder
       .addProperty(
         name = "VERSION",
