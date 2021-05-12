@@ -9,7 +9,7 @@ object Finding {
 
   class Schema(builder: SchemaBuilder, enhancements: Enhancements.Schema) {
     import enhancements._
-    implicit val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
 // node properties
     val key = builder

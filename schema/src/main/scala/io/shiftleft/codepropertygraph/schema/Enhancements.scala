@@ -12,7 +12,7 @@ object Enhancements {
 
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
     import base._
-    implicit val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
 // node properties
     val value = builder
