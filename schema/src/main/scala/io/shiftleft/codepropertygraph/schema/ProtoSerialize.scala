@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Cardinality, SchemaBuilder}
+import overflowdb.schema.{Cardinality, SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
 object ProtoSerialize {
@@ -9,6 +9,7 @@ object ProtoSerialize {
 
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
     import base._
+    implicit val schemaInfo = SchemaInfo.forClass(getClass)
 
     val containedRef = builder
       .addProperty(

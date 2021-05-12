@@ -10,8 +10,9 @@ object Closure {
   class Schema(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) {
     import base._
     import enhancements._
+    implicit val schemaInfo = SchemaInfo.forClass(getClass)
 
-// node properties
+    // node properties
     val closureBindingId = builder
       .addProperty(
         name = "CLOSURE_BINDING_ID",

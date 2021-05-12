@@ -7,6 +7,7 @@ object Operators {
   def apply(builder: SchemaBuilder) = new Schema(builder)
 
   class Schema(builder: SchemaBuilder) {
+    implicit val schemaInfo = SchemaInfo.forClass(getClass)
 // constants
     val operators = builder.addConstants(
       category = "Operators",
