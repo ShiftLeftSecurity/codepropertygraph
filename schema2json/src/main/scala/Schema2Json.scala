@@ -12,6 +12,10 @@ object Schema2Json extends App {
     Serialization.formats(NoTypeHints)
 
   val json = schema.nodeTypes.map { nodeType =>
+
+    println(nodeType.name)
+    println(nodeType.schemaInfo)
+
     val baseTypeNames = nodeType.extendz.map(_.name)
     val allProperties = nodeType.properties.map { prop =>
       prop.name
