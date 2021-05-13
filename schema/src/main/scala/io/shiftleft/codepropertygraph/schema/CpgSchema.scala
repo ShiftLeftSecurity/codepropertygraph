@@ -11,16 +11,19 @@ class CpgSchema(builder: SchemaBuilder) {
   val base = Base(builder)
   val typeDecl = TypeDecl(builder, base)
   val method = Method(builder, base, typeDecl)
+  val methodBody = MethodBody(builder, base, method, typeDecl)
+
   val metaData = MetaData(builder, base)
-  val enhancements = Enhancements(builder, base, method, typeDecl)
+
+  val enhancements = Enhancements(builder, base, method, methodBody, typeDecl)
 
   // everything else
-  val protoSerialize = ProtoSerialize(builder, base)
-  val closure = Closure(builder, base, method, enhancements)
+  val protoSerialize = ProtoSerialize(builder, methodBody)
+  val closure = Closure(builder, base, method, methodBody, enhancements)
   val finding = Finding(builder, enhancements)
   val operators = Operators(builder)
   val sourceSpecific = Comment(builder, base, enhancements)
-  val tagsAndLocation = TagsAndLocation(builder, base, typeDecl, method, enhancements)
+  val tagsAndLocation = TagsAndLocation(builder, base, typeDecl, method, methodBody, enhancements)
 }
 
 object CpgSchema {

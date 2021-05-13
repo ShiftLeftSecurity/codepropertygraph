@@ -12,16 +12,23 @@ object Closure extends SchemaBase {
       |
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, enhancements: Enhancements.Schema) =
-    new Schema(builder, base, methodSchema, enhancements)
+  def apply(builder: SchemaBuilder,
+            base: Base.Schema,
+            methodSchema: Method.Schema,
+            methodBody: MethodBody.Schema,
+            enhancements: Enhancements.Schema) =
+    new Schema(builder, base, methodSchema, methodBody, enhancements)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                methodSchema: Method.Schema,
+               methodBody: MethodBody.Schema,
                enhancements: Enhancements.Schema) {
     import base._
     import enhancements._
     import methodSchema._
+    import methodBody._
+
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     // node properties

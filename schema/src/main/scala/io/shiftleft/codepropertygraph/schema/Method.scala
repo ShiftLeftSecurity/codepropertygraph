@@ -8,6 +8,7 @@ object Method extends SchemaBase {
     new Schema(builder, base, typeDeclSchema)
 
   override def index: Int = 2
+  override def providedByFrontend: Boolean = true
 
   override def description: String =
     """
@@ -50,43 +51,14 @@ object Method extends SchemaBase {
       .addOutEdge(edge = ast, inNode = methodReturn, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = methodParameterIn, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = block, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = typeParameter, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
       .addOutEdge(edge = cfg,
                   inNode = methodReturn,
                   cardinalityOut = Cardinality.ZeroOrOne,
                   cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
 
     typeDecl
       .addOutEdge(edge = vtable, inNode = method)
-
-    methodParameterIn.addOutEdge(edge = ast, inNode = unknown)
-
-    identifier
-      .addOutEdge(edge = ref, inNode = methodParameterIn, cardinalityOut = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = cfg, inNode = methodReturn)
-
-    ret.addOutEdge(edge = cfg,
-                   inNode = methodReturn,
-                   cardinalityOut = Cardinality.One,
-                   cardinalityIn = Cardinality.ZeroOrOne)
-
-    methodRef
-      .addOutEdge(edge = cfg, inNode = methodReturn)
-
-    typeRef
-      .addOutEdge(edge = cfg, inNode = methodReturn)
 
   }
 

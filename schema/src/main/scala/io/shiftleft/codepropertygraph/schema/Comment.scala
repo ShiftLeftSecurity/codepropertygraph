@@ -5,10 +5,10 @@ import overflowdb.schema._
 object Comment extends SchemaBase {
 
   override def index: Int = 6
+  override def providedByFrontend: Boolean = true
 
   override def description: String =
     """
-      | The Comment Layer is provided by the frontend.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) =

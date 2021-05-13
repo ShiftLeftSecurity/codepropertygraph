@@ -1,20 +1,43 @@
 package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema.{Cardinality, NodeType, SchemaBuilder}
+import overflowdb.storage.ValueTypes
 
 object TypeDecl extends SchemaBase {
 
   def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
 
   override def index: Int = 2
+  override def providedByFrontend: Boolean = true
 
   override def description: String =
     """
-      |
+      | Type layer.
       |""".stripMargin
 
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
     import base._
+    // import methodBody._
+
+    val aliasTypeFullName = builder
+      .addProperty(
+        name = "ALIAS_TYPE_FULL_NAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.ZeroOrOne,
+        comment = "Type full name of which a TYPE_DECL is an alias of"
+      )
+      .protoId(158)
+
+    val inheritsFromTypeFullName = builder
+      .addProperty(
+        name = "INHERITS_FROM_TYPE_FULL_NAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.List,
+        comment = """The static types a TYPE_DECL inherits from. This property is matched against the
+                    |FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node
+                    |for each TYPE_FULL_NAME""".stripMargin
+      )
+      .protoId(53)
 
     val typeDecl: NodeType = builder
       .addNodeType(
@@ -77,12 +100,6 @@ object TypeDecl extends SchemaBase {
       .addOutEdge(edge = ast, inNode = typeParameter)
       .addOutEdge(edge = ast, inNode = member, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
-
-    methodInst
-      .addOutEdge(edge = ast, inNode = typeArgument)
-
-    unknown
-      .addOutEdge(edge = ast, inNode = member)
 
   }
 
