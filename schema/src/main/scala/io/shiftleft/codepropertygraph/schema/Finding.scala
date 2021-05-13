@@ -7,6 +7,11 @@ object Finding extends SchemaBase {
 
   override def index: Int = 5
 
+  override def description: String =
+    """
+      |
+      |""".stripMargin
+
   def apply(builder: SchemaBuilder, enhancements: Enhancements.Schema) =
     new Schema(builder, enhancements)
 

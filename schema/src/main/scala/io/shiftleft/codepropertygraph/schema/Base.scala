@@ -3,13 +3,15 @@ package io.shiftleft.codepropertygraph.schema
 import overflowdb.schema._
 import overflowdb.storage.ValueTypes
 
-/**
-  * The Base Layer of the Code Property Graph. This is the specification relevant
-  * for implementers of language frontends.
-  * */
 object Base extends SchemaBase {
 
   override def index: Int = 2
+
+  override def description: String =
+    """
+      |The Base Layer of the Code Property Graph. This is the specification relevant
+      |for implementers of language frontends.
+      |""".stripMargin
 
   def apply(builder: SchemaBuilder) = new Schema(builder)
 

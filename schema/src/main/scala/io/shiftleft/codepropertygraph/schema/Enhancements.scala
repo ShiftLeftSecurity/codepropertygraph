@@ -3,13 +3,15 @@ package io.shiftleft.codepropertygraph.schema
 import overflowdb.schema._
 import overflowdb.storage.ValueTypes
 
-/**
-  * enhancement nodes/edges that will automatically be derived from the cpg
-  * note: these should *NOT* be written by the language frontend.
-  */
 object Enhancements extends SchemaBase {
 
   override def index: Int = 3
+
+  override def description: String =
+    """
+      | Enhancement nodes/edges that will automatically be derived from the cpg
+      | Note: these should *NOT* be written by the language frontend.
+      |""".stripMargin
 
   def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
 

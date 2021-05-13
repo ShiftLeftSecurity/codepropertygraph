@@ -7,6 +7,11 @@ object Operators extends SchemaBase {
 
   override def index: Int = 6
 
+  override def description: String =
+    """
+      |
+      |""".stripMargin
+
   def apply(builder: SchemaBuilder) = new Schema(builder)
 
   class Schema(builder: SchemaBuilder) {

@@ -7,6 +7,11 @@ object TagsAndLocation extends SchemaBase {
 
   override def index: Int = 7
 
+  override def description: String =
+    """
+      |
+      |""".stripMargin
+
   def apply(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) =
     new Schema(builder, base, enhancements)
 

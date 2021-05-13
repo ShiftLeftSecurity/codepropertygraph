@@ -7,6 +7,11 @@ object ProtoSerialize extends SchemaBase {
 
   override def index: Int = Int.MaxValue
 
+  override def description: String =
+    """
+      |
+      |""".stripMargin
+
   def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
 
   class Schema(builder: SchemaBuilder, base: Base.Schema) {

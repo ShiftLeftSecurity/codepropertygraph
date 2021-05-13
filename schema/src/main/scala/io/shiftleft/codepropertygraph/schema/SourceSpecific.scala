@@ -6,6 +6,11 @@ object SourceSpecific extends SchemaBase {
 
   override def index: Int = 6
 
+  override def description: String =
+    """
+      |
+      |""".stripMargin
+
   def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
 
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
