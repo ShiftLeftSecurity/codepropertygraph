@@ -9,16 +9,17 @@ import overflowdb.schema.{Schema, SchemaBuilder}
 class CpgSchema(builder: SchemaBuilder) {
   // the foundation
   val base = Base(builder)
+  val structure = Method(builder, base)
   val metaData = MetaData(builder, base)
-  val enhancements = Enhancements(builder, base)
+  val enhancements = Enhancements(builder, base, structure)
 
   // everything else
   val protoSerialize = ProtoSerialize(builder, base)
-  val closure = Closure(builder, base, enhancements)
+  val closure = Closure(builder, base, structure, enhancements)
   val finding = Finding(builder, enhancements)
   val operators = Operators(builder)
-  val sourceSpecific = SourceSpecific(builder, base, enhancements)
-  val tagsAndLocation = TagsAndLocation(builder, base, enhancements)
+  val sourceSpecific = Comment(builder, base, enhancements)
+  val tagsAndLocation = TagsAndLocation(builder, base, structure, enhancements)
 }
 
 object CpgSchema {

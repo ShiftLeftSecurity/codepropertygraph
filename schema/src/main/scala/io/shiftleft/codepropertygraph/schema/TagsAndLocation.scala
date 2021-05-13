@@ -12,11 +12,12 @@ object TagsAndLocation extends SchemaBase {
       |
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) =
-    new Schema(builder, base, enhancements)
+  def apply(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, enhancements: Enhancements.Schema) =
+    new Schema(builder, base, methodSchema, enhancements)
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) {
+  class Schema(builder: SchemaBuilder, base: Base.Schema, structure: Method.Schema, enhancements: Enhancements.Schema) {
     import base._
+    import structure._
     import enhancements._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 

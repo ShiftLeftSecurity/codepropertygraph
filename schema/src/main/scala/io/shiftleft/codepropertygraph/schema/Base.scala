@@ -340,33 +340,6 @@ object Base extends SchemaBase {
       )
       .protoId(16)
 
-    val method: NodeType = builder
-      .addNodeType(
-        name = "METHOD",
-        comment = "A method/function/procedure"
-      )
-      .protoId(1)
-      .addProperties(fullName, isExternal, signature, lineNumberEnd, columnNumberEnd, filename, hash)
-      .extendz(declaration, cfgNode, astNode)
-
-    val methodParameterIn: NodeType = builder
-      .addNodeType(
-        name = "METHOD_PARAMETER_IN",
-        comment = "This node represents a formal parameter going towards the callee side"
-      )
-      .protoId(34)
-      .addProperties(code, typeFullName, lineNumber, columnNumber)
-      .extendz(declaration, localLike, trackingPoint, astNode)
-
-    val methodReturn: NodeType = builder
-      .addNodeType(
-        name = "METHOD_RETURN",
-        comment = "A formal method return"
-      )
-      .protoId(3)
-      .addProperties(typeFullName)
-      .extendz(cfgNode, trackingPoint)
-
     val modifierType = builder
       .addProperty(
         name = "MODIFIER_TYPE",
@@ -414,15 +387,6 @@ object Base extends SchemaBase {
       )
       .protoId(158)
 
-    val typeDecl: NodeType = builder
-      .addNodeType(
-        name = "TYPE_DECL",
-        comment = "A type declaration"
-      )
-      .protoId(46)
-      .addProperties(name, fullName, isExternal, inheritsFromTypeFullName, aliasTypeFullName, filename)
-      .extendz(astNode)
-
     val typeParameter: NodeType = builder
       .addNodeType(
         name = "TYPE_PARAMETER",
@@ -442,6 +406,29 @@ object Base extends SchemaBase {
       .protoId(48)
       .extendz(astNode)
 
+    val namespaceBlock: NodeType = builder
+      .addNodeType(
+        name = "NAMESPACE_BLOCK",
+        comment = """A reference to a namespace.
+                    |We borrow the concept of a "namespace block" from C++, that is, a namespace block
+                    |is a block of code that has been placed in the same namespace by a programmer.
+                    |This block may be introduced via a `package` statement in Java or
+                    |a `namespace{ }` statement in C++.
+                    |""".stripMargin
+      )
+      .protoId(41)
+      .addProperties(name, fullName, filename)
+      .extendz(astNode)
+
+    val typeDecl: NodeType = builder
+      .addNodeType(
+        name = "TYPE_DECL",
+        comment = "A type declaration"
+      )
+      .protoId(46)
+      .addProperties(name, fullName, isExternal, inheritsFromTypeFullName, aliasTypeFullName, filename)
+      .extendz(astNode)
+
     val member: NodeType = builder
       .addNodeType(
         name = "MEMBER",
@@ -450,15 +437,6 @@ object Base extends SchemaBase {
       .protoId(9)
       .addProperties(code, typeFullName)
       .extendz(declaration, astNode)
-
-    val namespaceBlock: NodeType = builder
-      .addNodeType(
-        name = "NAMESPACE_BLOCK",
-        comment = "A reference to a namespace"
-      )
-      .protoId(41)
-      .addProperties(name, fullName, filename)
-      .extendz(astNode)
 
     val literal: NodeType = builder
       .addNodeType(
@@ -628,28 +606,6 @@ object Base extends SchemaBase {
 
 // node relations
 
-    method
-      .addOutEdge(edge = ast, inNode = methodReturn, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = methodParameterIn, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = block, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = typeParameter, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg,
-                  inNode = methodReturn,
-                  cardinalityOut = Cardinality.ZeroOrOne,
-                  cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-
     tpe
       .addOutEdge(edge = ast, inNode = typeArgument)
 
@@ -657,7 +613,6 @@ object Base extends SchemaBase {
       .addOutEdge(edge = ast, inNode = typeParameter)
       .addOutEdge(edge = ast, inNode = member, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = vtable, inNode = method)
 
     typeArgument
       .addOutEdge(edge = ref, inNode = tpe)
@@ -735,21 +690,17 @@ object Base extends SchemaBase {
 
     identifier
       .addOutEdge(edge = ref, inNode = local, cardinalityOut = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = ref, inNode = methodParameterIn, cardinalityOut = Cardinality.ZeroOrOne)
       .addOutEdge(edge = cfg, inNode = callNode)
       .addOutEdge(edge = cfg, inNode = identifier)
       .addOutEdge(edge = cfg, inNode = fieldIdentifier)
       .addOutEdge(edge = cfg, inNode = literal)
       .addOutEdge(edge = cfg, inNode = methodRef)
       .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = methodReturn)
       .addOutEdge(edge = cfg, inNode = ret)
       .addOutEdge(edge = cfg, inNode = block)
       .addOutEdge(edge = cfg, inNode = jumpTarget)
       .addOutEdge(edge = cfg, inNode = controlStructure)
       .addOutEdge(edge = cfg, inNode = unknown)
-
-    methodParameterIn.addOutEdge(edge = ast, inNode = unknown)
 
     fieldIdentifier
       .addOutEdge(edge = cfg,
@@ -778,10 +729,6 @@ object Base extends SchemaBase {
       .addOutEdge(edge = ast, inNode = unknown)
       .addOutEdge(edge = ast, inNode = jumpTarget)
       .addOutEdge(edge = ast, inNode = controlStructure)
-      .addOutEdge(edge = cfg,
-                  inNode = methodReturn,
-                  cardinalityOut = Cardinality.One,
-                  cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = argument,
                   inNode = callNode,
                   cardinalityOut = Cardinality.ZeroOrOne,
@@ -845,7 +792,6 @@ object Base extends SchemaBase {
       .addOutEdge(edge = cfg, inNode = literal)
       .addOutEdge(edge = cfg, inNode = methodRef)
       .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = methodReturn)
       .addOutEdge(edge = cfg, inNode = ret)
       .addOutEdge(edge = cfg, inNode = block)
       .addOutEdge(edge = cfg, inNode = jumpTarget)
@@ -859,7 +805,6 @@ object Base extends SchemaBase {
       .addOutEdge(edge = cfg, inNode = literal)
       .addOutEdge(edge = cfg, inNode = methodRef)
       .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = methodReturn)
       .addOutEdge(edge = cfg, inNode = ret)
       .addOutEdge(edge = cfg, inNode = block)
       .addOutEdge(edge = cfg, inNode = jumpTarget)

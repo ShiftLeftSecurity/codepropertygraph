@@ -9,7 +9,8 @@ object MetaData extends SchemaBase {
 
   override def description: String =
     """
-      |
+      |The MetaData Layer is provided by the frontend and may be modified
+      |modified by passes.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)

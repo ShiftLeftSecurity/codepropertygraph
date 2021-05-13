@@ -2,13 +2,13 @@ package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema._
 
-object SourceSpecific extends SchemaBase {
+object Comment extends SchemaBase {
 
   override def index: Int = 6
 
   override def description: String =
     """
-      |
+      | The Comment Layer is provided by the frontend.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) =
@@ -23,7 +23,7 @@ object SourceSpecific extends SchemaBase {
     val comment: NodeType = builder
       .addNodeType(
         name = "COMMENT",
-        comment = "A comment"
+        comment = "A source code comment"
       )
       .protoId(511)
       .addProperties(lineNumber, code, filename)
