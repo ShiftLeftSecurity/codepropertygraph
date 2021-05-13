@@ -289,10 +289,11 @@ object Base extends SchemaBase {
       .addNodeBaseType(
         name = "AST_NODE",
         comment = """Base type for all nodes are (in particular) nodes of the abstract syntax tree.
-            |As syntax trees are ordered trees, AST nodes have an `order` property containing
-            |an integer that indicates the nodes position among its siblings. This allows
-            |these ASTs to be stored in backends that do not guarantee edges to always be
-            |returned in the same order.
+            |In a syntax tree, sibling nodes (nodes who share a parent node) are ordered.
+            |As some graph databases do not guarantee the order in which siblings are returned to
+            |be stable, we make the ordering explicit by storing the position of each node relative
+            |to its siblings in the order field. In the left most sibling, order is set to 0,
+            |while in the right-most sibling, it is set to n-1 where n is the number of siblings.
             |""".stripMargin
       )
       .addProperties(order)
@@ -320,15 +321,6 @@ object Base extends SchemaBase {
       )
       .addProperties(name, signature)
       .extendz(cfgNode)
-
-    val file: NodeType = builder
-      .addNodeType(
-        name = "FILE",
-        comment = "Node representing a source file - the root of the AST"
-      )
-      .protoId(38)
-      .addProperties(name, hash)
-      .extendz(astNode)
 
     val lineNumberEnd = builder
       .addProperty(
@@ -635,8 +627,6 @@ object Base extends SchemaBase {
       .extendz(expression)
 
 // node relations
-    file
-      .addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
 
     method
       .addOutEdge(edge = ast, inNode = methodReturn, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)

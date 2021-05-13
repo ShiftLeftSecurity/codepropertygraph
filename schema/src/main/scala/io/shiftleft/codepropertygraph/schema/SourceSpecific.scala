@@ -11,10 +11,12 @@ object SourceSpecific extends SchemaBase {
       |
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
+  def apply(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) =
+    new Schema(builder, base, enhancements)
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema) {
+  class Schema(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) {
     import base._
+    import enhancements._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
 // node types
