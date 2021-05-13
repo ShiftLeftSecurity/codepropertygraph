@@ -534,7 +534,11 @@ object Base {
     val block: NodeType = builder
       .addNodeType(
         name = "BLOCK",
-        comment = "A structuring block in the AST"
+        comment = """A compound statement. Compound statements are used in many languages to allow
+            |grouping a sequence of statements. For example, in C/Java, compound statements
+            |are statements enclosed by curly braces. Function/Method bodies are compound
+            |statements.
+            |""".stripMargin
       )
       .protoId(31)
       .addProperties(typeFullName)
