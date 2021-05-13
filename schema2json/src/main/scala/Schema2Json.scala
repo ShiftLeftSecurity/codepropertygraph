@@ -12,9 +12,7 @@ object Schema2Json extends App {
     Serialization.formats(NoTypeHints)
 
   val json = schema.nodeTypes.map { nodeType =>
-
-    println(nodeType.name)
-    println(nodeType.schemaInfo)
+    val schemaName = nodeType.schemaInfo.definedIn.map(_.getDeclaringClass.getSimpleName).getOrElse("unknown")
 
     val baseTypeNames = nodeType.extendz.map(_.name)
     val allProperties = nodeType.properties.map { prop =>
@@ -29,7 +27,8 @@ object Schema2Json extends App {
       ("comment" -> nodeType.comment) ~
       ("extends" -> baseTypeNames) ~
       ("inheritedProperties" -> inheritedProperties.map(x => x._1 ~ x._2)) ~
-      ("properties" -> nonInheritedProperties)
+      ("properties" -> nonInheritedProperties) ~
+      ("schema" -> schemaName)
   }
 
   val outFileName = "/tmp/schema.json"
