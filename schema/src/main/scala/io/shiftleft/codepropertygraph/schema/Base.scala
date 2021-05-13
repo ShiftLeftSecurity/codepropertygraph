@@ -282,7 +282,12 @@ object Base {
     val astNode = builder
       .addNodeBaseType(
         name = "AST_NODE",
-        comment = "Any node that can exist in an abstract syntax tree"
+        comment = """Base type for all nodes are (in particular) nodes of the abstract syntax tree.
+            |As syntax trees are ordered trees, AST nodes have an `order` property containing
+            |an integer that indicates the nodes position among its siblings. This allows
+            |these ASTs to be stored in backends that do not guarantee edges to always be
+            |returned in the same order.
+            |""".stripMargin
       )
       .addProperties(order)
 
