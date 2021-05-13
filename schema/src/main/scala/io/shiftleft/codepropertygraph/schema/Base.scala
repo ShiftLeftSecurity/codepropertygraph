@@ -5,7 +5,7 @@ import overflowdb.storage.ValueTypes
 
 object Base extends SchemaBase {
 
-  override def index: Int = 2
+  def index: Int = 5
   override def providedByFrontend: Boolean = true
   override def description: String =
     """
@@ -121,21 +121,6 @@ object Base extends SchemaBase {
       )
       .protoId(3)
 
-    val argumentIndex = builder
-      .addProperty(
-        name = "ARGUMENT_INDEX",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.One,
-        comment = """AST-children of CALL nodes have an argument index, that is used to match
-            |call-site arguments with callee parameters. Explicit parameters are numbered
-            |from 1 to N, while index 0 is reserved for implicit self / this parameter.
-            |CALLs without implicit parameter therefore have arguments starting with index 1.
-            |AST-children of BLOCK nodes may have an argument index as well; in this case,
-            |the last argument index determines the return-value of a BLOCK expression
-            |""".stripMargin
-      )
-      .protoId(40)
-
     val signature = builder
       .addProperty(
         name = "SIGNATURE",
@@ -184,7 +169,17 @@ object Base extends SchemaBase {
       )
       .protoId(54)
 
-// edge types
+    val order = builder
+      .addProperty(
+        name = "ORDER",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.One,
+        comment = """General ordering property, such that the children of each AST-node are
+                    |typically numbered from 1, ..., N (this is not enforced).""".stripMargin
+      )
+      .protoId(4)
+
+    // edge types
     val ast = builder
       .addEdgeType(
         name = "AST",
@@ -199,20 +194,6 @@ object Base extends SchemaBase {
       )
       .protoId(19)
 
-    val condition = builder
-      .addEdgeType(
-        name = "CONDITION",
-        comment = "Edge from control structure node to the expression that holds the condition"
-      )
-      .protoId(56)
-
-    val argument = builder
-      .addEdgeType(
-        name = "ARGUMENT",
-        comment = "Relation between a CALL and its arguments and RETURN and the returned expression"
-      )
-      .protoId(156)
-
     val sourceFile = builder
       .addEdgeType(
         name = "SOURCE_FILE",
@@ -220,33 +201,12 @@ object Base extends SchemaBase {
       )
       .protoId(157)
 
-    val bindsTo = builder
-      .addEdgeType(
-        name = "BINDS_TO",
-        comment = "Type argument binding to a type parameter"
-      )
-      .protoId(22)
-
     val ref = builder
       .addEdgeType(
         name = "REF",
         comment = "A reference to e.g. a LOCAL"
       )
       .protoId(10)
-
-    val vtable = builder
-      .addEdgeType(
-        name = "VTABLE",
-        comment = "Indicates that a method is part of the vtable of a certain type declaration"
-      )
-      .protoId(30)
-
-    val receiver = builder
-      .addEdgeType(
-        name = "RECEIVER",
-        comment = "The receiver of a method call which is either an object or a pointer"
-      )
-      .protoId(55)
 
 // node base types
 
@@ -261,16 +221,6 @@ object Base extends SchemaBase {
         comment = "Any node that can occur in a data flow"
       )
       .extendz(withinMethod)
-
-    val order = builder
-      .addProperty(
-        name = "ORDER",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.One,
-        comment = """General ordering property, such that the children of each AST-node are
-                    |typically numbered from 1, ..., N (this is not enforced).""".stripMargin
-      )
-      .protoId(4)
 
     val astNode = builder
       .addNodeBaseType(

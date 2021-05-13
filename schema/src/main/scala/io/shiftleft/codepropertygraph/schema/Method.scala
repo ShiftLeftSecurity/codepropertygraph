@@ -1,13 +1,13 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Cardinality, NodeType, SchemaBuilder}
+import overflowdb.schema.{Cardinality, NodeType, SchemaBuilder, SchemaInfo}
 
 object Method extends SchemaBase {
 
   def apply(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: TypeDecl.Schema) =
     new Schema(builder, base, typeDeclSchema)
 
-  override def index: Int = 2
+  def index: Int = 2
   override def providedByFrontend: Boolean = true
 
   override def description: String =
@@ -19,6 +19,7 @@ object Method extends SchemaBase {
   class Schema(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: TypeDecl.Schema) {
     import base._
     import typeDeclSchema._
+    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     val method: NodeType = builder
       .addNodeType(
@@ -56,6 +57,13 @@ object Method extends SchemaBase {
                   inNode = methodReturn,
                   cardinalityOut = Cardinality.ZeroOrOne,
                   cardinalityIn = Cardinality.ZeroOrOne)
+
+    val vtable = builder
+      .addEdgeType(
+        name = "VTABLE",
+        comment = "Indicates that a method is part of the vtable of a certain type declaration"
+      )
+      .protoId(30)
 
     typeDecl
       .addOutEdge(edge = vtable, inNode = method)

@@ -1,13 +1,13 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Cardinality, NodeType, SchemaBuilder}
+import overflowdb.schema.{Cardinality, NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
 object TypeDecl extends SchemaBase {
 
   def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
 
-  override def index: Int = 2
+  def index: Int = 3
   override def providedByFrontend: Boolean = true
 
   override def description: String =
@@ -17,7 +17,7 @@ object TypeDecl extends SchemaBase {
 
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
     import base._
-    // import methodBody._
+    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     val aliasTypeFullName = builder
       .addProperty(
@@ -38,6 +38,13 @@ object TypeDecl extends SchemaBase {
                     |for each TYPE_FULL_NAME""".stripMargin
       )
       .protoId(53)
+
+    val bindsTo = builder
+      .addEdgeType(
+        name = "BINDS_TO",
+        comment = "Type argument binding to a type parameter"
+      )
+      .protoId(22)
 
     val typeDecl: NodeType = builder
       .addNodeType(

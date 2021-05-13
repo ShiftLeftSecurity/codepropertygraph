@@ -1,24 +1,60 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Cardinality, Constant, NodeType, SchemaBuilder}
+import overflowdb.schema.{Cardinality, Constant, NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
 object MethodBody extends SchemaBase {
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, typeDecl: TypeDecl.Schema) =
-    new Schema(builder, base, methodSchema, typeDecl)
-
-  override def index: Int = 2
+  def index: Int = 4
   override def providedByFrontend: Boolean = true
-
   override def description: String =
     """
       |""".stripMargin
+
+  def apply(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, typeDecl: TypeDecl.Schema) =
+    new Schema(builder, base, methodSchema, typeDecl)
 
   class Schema(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, typeDecl: TypeDecl.Schema) {
     import base._
     import methodSchema._
     import typeDecl._
+    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+
+    val argumentIndex = builder
+      .addProperty(
+        name = "ARGUMENT_INDEX",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.One,
+        comment = """AST-children of CALL nodes have an argument index, that is used to match
+                    |call-site arguments with callee parameters. Explicit parameters are numbered
+                    |from 1 to N, while index 0 is reserved for implicit self / this parameter.
+                    |CALLs without implicit parameter therefore have arguments starting with index 1.
+                    |AST-children of BLOCK nodes may have an argument index as well; in this case,
+                    |the last argument index determines the return-value of a BLOCK expression
+                    |""".stripMargin
+      )
+      .protoId(40)
+
+    val condition = builder
+      .addEdgeType(
+        name = "CONDITION",
+        comment = "Edge from control structure node to the expression that holds the condition"
+      )
+      .protoId(56)
+
+    val argument = builder
+      .addEdgeType(
+        name = "ARGUMENT",
+        comment = "Relation between a CALL and its arguments and RETURN and the returned expression"
+      )
+      .protoId(156)
+
+    val receiver = builder
+      .addEdgeType(
+        name = "RECEIVER",
+        comment = "The receiver of a method call which is either an object or a pointer"
+      )
+      .protoId(55)
 
     val expression = builder
       .addNodeBaseType(

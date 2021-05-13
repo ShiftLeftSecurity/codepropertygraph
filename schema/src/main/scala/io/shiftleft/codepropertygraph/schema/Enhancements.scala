@@ -5,7 +5,7 @@ import overflowdb.storage.ValueTypes
 
 object Enhancements extends SchemaBase {
 
-  override def index: Int = 3
+  def index: Int = 3
 
   override def description: String =
     """
