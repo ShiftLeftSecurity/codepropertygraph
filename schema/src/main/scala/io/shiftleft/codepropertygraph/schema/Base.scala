@@ -535,9 +535,14 @@ object Base {
       .addNodeType(
         name = "BLOCK",
         comment = """A compound statement. Compound statements are used in many languages to allow
-            |grouping a sequence of statements. For example, in C/Java, compound statements
+            |grouping a sequence of statements. For example, in C and Java, compound statements
             |are statements enclosed by curly braces. Function/Method bodies are compound
-            |statements.
+            |statements. We do not use the term "compound statement" because "statement" would
+            |imply that the block does not yield a value upon evaluation, that is, that it is
+            |not an expression. This is true in languages such as C and Java, but not for languages
+            |such as Scala where the value of the block is given by that of the last expression it
+            |contains. In fact, the Scala grammar uses the term \"BlockExpr\" (short for
+            |\"block expression\") to describe what in the CPG spec we just call \"Block\".
             |""".stripMargin
       )
       .protoId(31)
