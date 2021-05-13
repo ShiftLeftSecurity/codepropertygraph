@@ -10,7 +10,7 @@ object TagsAndLocation {
   class Schema(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) {
     import base._
     import enhancements._
-    implicit val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
 // node properties
     val symbol = builder
