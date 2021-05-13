@@ -4,7 +4,8 @@ import overflowdb.schema.{Cardinality, NodeType, SchemaBuilder}
 
 object Method extends SchemaBase {
 
-  def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
+  def apply(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: TypeDecl.Schema) =
+    new Schema(builder, base, typeDeclSchema)
 
   override def index: Int = 2
 
@@ -14,8 +15,9 @@ object Method extends SchemaBase {
       | This layer is provided by the frontend and may be modified by passes.
       |""".stripMargin
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema) {
+  class Schema(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: TypeDecl.Schema) {
     import base._
+    import typeDeclSchema._
 
     val method: NodeType = builder
       .addNodeType(

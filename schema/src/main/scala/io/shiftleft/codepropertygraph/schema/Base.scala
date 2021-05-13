@@ -358,15 +358,6 @@ object Base extends SchemaBase {
       .addProperties(modifierType)
       .extendz(astNode)
 
-    val tpe: NodeType = builder
-      .addNodeType(
-        name = "TYPE",
-        comment = """A type which always has to reference a type declaration and may have type
-            |argument children if the referred to type declaration is a template""".stripMargin
-      )
-      .protoId(45)
-      .addProperties(name, fullName, typeDeclFullName)
-
     val inheritsFromTypeFullName = builder
       .addProperty(
         name = "INHERITS_FROM_TYPE_FULL_NAME",
@@ -387,25 +378,6 @@ object Base extends SchemaBase {
       )
       .protoId(158)
 
-    val typeParameter: NodeType = builder
-      .addNodeType(
-        name = "TYPE_PARAMETER",
-        comment = "Type parameter of TYPE_DECL or METHOD"
-      )
-      .protoId(47)
-      .addProperties(name)
-      .extendz(astNode)
-
-    val typeArgument: NodeType = builder
-      .addNodeType(
-        name = "TYPE_ARGUMENT",
-        comment = """Argument for a TYPE_PARAMETER that belongs to a TYPE. It binds another
-            |TYPE to a TYPE_PARAMETER
-            |""".stripMargin
-      )
-      .protoId(48)
-      .extendz(astNode)
-
     val namespaceBlock: NodeType = builder
       .addNodeType(
         name = "NAMESPACE_BLOCK",
@@ -419,24 +391,6 @@ object Base extends SchemaBase {
       .protoId(41)
       .addProperties(name, fullName, filename)
       .extendz(astNode)
-
-    val typeDecl: NodeType = builder
-      .addNodeType(
-        name = "TYPE_DECL",
-        comment = "A type declaration"
-      )
-      .protoId(46)
-      .addProperties(name, fullName, isExternal, inheritsFromTypeFullName, aliasTypeFullName, filename)
-      .extendz(astNode)
-
-    val member: NodeType = builder
-      .addNodeType(
-        name = "MEMBER",
-        comment = "Member of a class struct or union"
-      )
-      .protoId(9)
-      .addProperties(code, typeFullName)
-      .extendz(declaration, astNode)
 
     val literal: NodeType = builder
       .addNodeType(
@@ -606,20 +560,6 @@ object Base extends SchemaBase {
 
 // node relations
 
-    tpe
-      .addOutEdge(edge = ast, inNode = typeArgument)
-
-    typeDecl
-      .addOutEdge(edge = ast, inNode = typeParameter)
-      .addOutEdge(edge = ast, inNode = member, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
-
-    typeArgument
-      .addOutEdge(edge = ref, inNode = tpe)
-      .addOutEdge(edge = bindsTo, inNode = typeParameter)
-
-    member.addOutEdge(edge = ast, inNode = modifier)
-
     literal
       .addOutEdge(edge = cfg, inNode = callNode)
       .addOutEdge(edge = cfg, inNode = identifier)
@@ -782,9 +722,6 @@ object Base extends SchemaBase {
       .addOutEdge(edge = cfg, inNode = controlStructure)
       .addOutEdge(edge = cfg, inNode = unknown)
 
-    methodInst
-      .addOutEdge(edge = ast, inNode = typeArgument)
-
     methodRef
       .addOutEdge(edge = cfg, inNode = callNode)
       .addOutEdge(edge = cfg, inNode = identifier)
@@ -873,7 +810,6 @@ object Base extends SchemaBase {
       .addOutEdge(edge = cfg, inNode = controlStructure)
       .addOutEdge(edge = cfg, inNode = unknown)
       .addOutEdge(edge = ast, inNode = literal)
-      .addOutEdge(edge = ast, inNode = member)
       .addOutEdge(edge = ast, inNode = modifier)
       .addOutEdge(edge = ast, inNode = callNode)
       .addOutEdge(edge = ast, inNode = local)

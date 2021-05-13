@@ -13,13 +13,17 @@ object Enhancements extends SchemaBase {
       | Note: these should *NOT* be written by the language frontend.
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema) =
-    new Schema(builder, base, methodSchema)
+  def apply(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, typeDeclSchema: TypeDecl.Schema) =
+    new Schema(builder, base, methodSchema, typeDeclSchema)
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema) {
+  class Schema(builder: SchemaBuilder,
+               base: Base.Schema,
+               methodSchema: Method.Schema,
+               typeDeclSchema: TypeDecl.Schema) {
 
     import base._
     import methodSchema._
+    import typeDeclSchema._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
 // node properties
