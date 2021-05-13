@@ -3,11 +3,14 @@ package io.shiftleft.codepropertygraph.schema
 import overflowdb.schema.{Cardinality, NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
-object MetaData {
+object MetaData extends SchemaBase {
+
+  def index: Int = 1
 
   def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
 
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
+
     import base._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 

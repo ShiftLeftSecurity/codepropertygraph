@@ -7,10 +7,14 @@ import overflowdb.storage.ValueTypes
   * The Base Layer of the Code Property Graph. This is the specification relevant
   * for implementers of language frontends.
   * */
-object Base {
+object Base extends SchemaBase {
+
+  override def index: Int = 2
+
   def apply(builder: SchemaBuilder) = new Schema(builder)
 
   class Schema(builder: SchemaBuilder) {
+
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     // Properties used by more than one node type

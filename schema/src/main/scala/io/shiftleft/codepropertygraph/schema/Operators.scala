@@ -3,7 +3,10 @@ package io.shiftleft.codepropertygraph.schema
 import overflowdb.schema._
 import overflowdb.storage.ValueTypes
 
-object Operators {
+object Operators extends SchemaBase {
+
+  override def index: Int = 6
+
   def apply(builder: SchemaBuilder) = new Schema(builder)
 
   class Schema(builder: SchemaBuilder) {

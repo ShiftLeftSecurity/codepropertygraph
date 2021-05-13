@@ -25,9 +25,14 @@ object Schema2Json extends App {
   private def schemaName(nodeType: AbstractNodeType): String =
     nodeType.schemaInfo.definedIn.map(_.getDeclaringClass.getSimpleName).getOrElse("unknown")
 
+  private def schemaIndex(nodeType: AbstractNodeType): Int =
+    nodeType.schemaInfo.definedIn
+      .map(_.getDeclaringClass.getDeclaredMethod("index").invoke(null).asInstanceOf[Int])
+      .getOrElse(Int.MaxValue)
+
   private def nodeTypesAsJson: Seq[JsonAST.JObject] =
     (schema.nodeTypes ++ schema.nodeBaseTypes)
-      .sortBy(x => (schemaName(x), x.name))
+      .sortBy(x => (schemaIndex(x), x.name))
       .map { nodeType =>
         val baseTypeNames = nodeType.extendz.map(_.name)
         val allProperties = nodeType.properties.map(_.name)

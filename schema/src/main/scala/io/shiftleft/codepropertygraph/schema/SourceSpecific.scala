@@ -2,7 +2,10 @@ package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema._
 
-object SourceSpecific {
+object SourceSpecific extends SchemaBase {
+
+  override def index: Int = 6
+
   def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
 
   class Schema(builder: SchemaBuilder, base: Base.Schema) {

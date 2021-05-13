@@ -7,10 +7,14 @@ import overflowdb.storage.ValueTypes
   * enhancement nodes/edges that will automatically be derived from the cpg
   * note: these should *NOT* be written by the language frontend.
   */
-object Enhancements {
+object Enhancements extends SchemaBase {
+
+  override def index: Int = 3
+
   def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
 
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
+
     import base._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
