@@ -305,7 +305,7 @@ object Base {
     val callRepr = builder
       .addNodeBaseType(
         name = "CALL_REPR",
-        comment = "Call representation"
+        comment = "A base class for nodes that represent different types of calls"
       )
       .addProperties(name, signature)
       .extendz(cfgNode)
@@ -469,7 +469,16 @@ object Base {
     val callNode: NodeType = builder
       .addNodeType(
         name = "CALL",
-        comment = "A (method)-call"
+        comment = """A (function/method) call. The `methodFullName` property is the name of the
+            |invoked method (the callee) while the `typeFullName` is its return type, and
+            |therefore, the return type of the call when viewing it as an expression. For
+            |languages like Javascript, it is common that we may know the (short-) name
+            |of the invoked method, but we do not know at compile time which method
+            |will actually be invoked, e.g., because it depends on a dynamic import.
+            |In this case, we leave `methodFullName` blank but at least fill out `name`,
+            |which contains the method's (short-) name and `signature`, which contains
+            |any information we may have about the types of arguments and return value.
+            |""".stripMargin
       )
       .protoId(15)
       .addProperties(methodFullName, typeFullName)
