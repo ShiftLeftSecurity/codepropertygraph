@@ -48,6 +48,7 @@ object Schema2Json extends App {
           ("inheritedProperties" -> inheritedProperties.map(x => x._1 ~ x._2)) ~
           ("properties" -> nonInheritedProperties) ~
           ("schema" -> schemaName(nodeType)) ~
+          ("schemaIndex" -> schemaIndex(nodeType)) ~
           ("isAbstract" -> nodeType.isInstanceOf[NodeBaseType])
       }
 
