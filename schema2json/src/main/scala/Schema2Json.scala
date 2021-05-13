@@ -2,7 +2,8 @@ import io.shiftleft.codepropertygraph.schema.CpgSchema
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization
-import org.json4s.{Formats, NoTypeHints}
+import org.json4s.{Formats, JsonAST, NoTypeHints}
+import overflowdb.schema.AbstractNodeType
 
 object Schema2Json extends App {
 
@@ -11,18 +12,25 @@ object Schema2Json extends App {
   implicit val formats: AnyRef with Formats =
     Serialization.formats(NoTypeHints)
 
-  val json = schema.nodeTypes
-    .map { nodeType =>
-      val schemaName = nodeType.schemaInfo.definedIn.map(_.getDeclaringClass.getSimpleName).getOrElse("unknown")
-      (nodeType, schemaName)
-    }
-    .sortBy(_._2)
-    .map {
-      case (nodeType, schemaName) =>
+  val json = nodeTypesAsJson
+
+  val outFileName = "/tmp/schema.json"
+  better.files
+    .File(outFileName)
+    .write(
+      compact(render(json))
+    )
+  println(s"Schema written to: $outFileName")
+
+  private def schemaName(nodeType: AbstractNodeType): String =
+    nodeType.schemaInfo.definedIn.map(_.getDeclaringClass.getSimpleName).getOrElse("unknown")
+
+  private def nodeTypesAsJson: Seq[JsonAST.JObject] =
+    (schema.nodeTypes ++ schema.nodeBaseTypes)
+      .sortBy(x => schemaName(x))
+      .map { nodeType =>
         val baseTypeNames = nodeType.extendz.map(_.name)
-        val allProperties = nodeType.properties.map { prop =>
-          prop.name
-        }
+        val allProperties = nodeType.properties.map(_.name)
         val inheritedProperties = nodeType.extendz.flatMap { base =>
           base.properties.map(_.name).map(x => (("baseType" -> base.name), ("name" -> x)))
         }
@@ -33,14 +41,7 @@ object Schema2Json extends App {
           ("extends" -> baseTypeNames) ~
           ("inheritedProperties" -> inheritedProperties.map(x => x._1 ~ x._2)) ~
           ("properties" -> nonInheritedProperties) ~
-          ("schema" -> schemaName)
-    }
+          ("schema" -> schemaName(nodeType))
+      }
 
-  val outFileName = "/tmp/schema.json"
-  better.files
-    .File(outFileName)
-    .write(
-      compact(render(json))
-    )
-  println(s"Schema written to: $outFileName")
 }
