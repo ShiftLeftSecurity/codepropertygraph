@@ -2,18 +2,28 @@ package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema._
 
-object SourceSpecific {
-  def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
+object Comment extends SchemaBase {
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema) {
+  def index: Int = 6
+  override def providedByFrontend: Boolean = true
+
+  override def description: String =
+    """
+      |""".stripMargin
+
+  def apply(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) =
+    new Schema(builder, base, enhancements)
+
+  class Schema(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) {
     import base._
+    import enhancements._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
 // node types
     val comment: NodeType = builder
       .addNodeType(
         name = "COMMENT",
-        comment = "A comment"
+        comment = "A source code comment"
       )
       .protoId(511)
       .addProperties(lineNumber, code, filename)

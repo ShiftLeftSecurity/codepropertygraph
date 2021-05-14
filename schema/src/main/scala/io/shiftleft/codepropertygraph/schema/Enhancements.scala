@@ -3,15 +3,33 @@ package io.shiftleft.codepropertygraph.schema
 import overflowdb.schema._
 import overflowdb.storage.ValueTypes
 
-/**
-  * enhancement nodes/edges that will automatically be derived from the cpg
-  * note: these should *NOT* be written by the language frontend.
-  */
-object Enhancements {
-  def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
+object Enhancements extends SchemaBase {
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema) {
+  def index: Int = 3
+
+  override def description: String =
+    """
+      | Enhancement nodes/edges that will automatically be derived from the cpg
+      | Note: these should *NOT* be written by the language frontend.
+      |""".stripMargin
+
+  def apply(builder: SchemaBuilder,
+            base: Base.Schema,
+            methodSchema: Method.Schema,
+            methodBody: MethodBody.Schema,
+            typeDeclSchema: TypeDecl.Schema) =
+    new Schema(builder, base, methodSchema, methodBody, typeDeclSchema)
+
+  class Schema(builder: SchemaBuilder,
+               base: Base.Schema,
+               methodSchema: Method.Schema,
+               methodBody: MethodBody.Schema,
+               typeDeclSchema: TypeDecl.Schema) {
+
     import base._
+    import methodSchema._
+    import methodBody._
+    import typeDeclSchema._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
 // node properties
@@ -175,6 +193,36 @@ object Enhancements {
       .protoId(155)
 
 // node types
+
+    val file: NodeType = builder
+      .addNodeType(
+        name = "FILE",
+        comment = """Node representing a source file - the root of the AST.
+            |Code property graphs are created from sets of files.
+            |Information about these files is stored in the graph to enable queries to map nodes
+            |of the graph back to the files that contain the code they represent.
+            |For each file, the graph must contain exactly one File.
+            |As file nodes are root nodes of abstract syntax tress, they are AstNodes and their
+            |order field is set to 0.
+            |
+            |Each code property graph must contain a special file node with name set to
+            |"<unknown>". This node is a placeholder used in cases where a file cannot be
+            |determined at compile time. As an example, consider the case where an external
+            |type is introduced only at link time.
+            |Conceptually file nodes serve as indices, e.g., they map all filenames to the
+            |list of methods they contain.
+            |
+            |File nodes MUST NOT be created by the language frontend. Instead, the language
+            |frontend is assumed to fill out the FILENAME field wherever possible,
+            |allowing File nodes to be created automatically when the semantic CPG layer is created.
+            |""".stripMargin
+      )
+      .protoId(38)
+      .addProperties(name, hash)
+      .extendz(astNode)
+
+    file
+      .addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
 
     val binding: NodeType = builder
       .addNodeType(

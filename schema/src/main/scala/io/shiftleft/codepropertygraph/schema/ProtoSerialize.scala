@@ -3,12 +3,20 @@ package io.shiftleft.codepropertygraph.schema
 import overflowdb.schema.{Cardinality, SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
-object ProtoSerialize {
+object ProtoSerialize extends SchemaBase {
 
-  def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
+  override def index: Int = Int.MaxValue
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema) {
-    import base._
+  override def description: String =
+    """
+      |
+      |""".stripMargin
+
+  def apply(builder: SchemaBuilder, methodBody: MethodBody.Schema) = new Schema(builder, methodBody)
+
+  class Schema(builder: SchemaBuilder, methodBody: MethodBody.Schema) {
+
+    import methodBody._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     val containedRef = builder

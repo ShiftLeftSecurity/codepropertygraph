@@ -3,13 +3,32 @@ package io.shiftleft.codepropertygraph.schema
 import overflowdb.schema._
 import overflowdb.storage.ValueTypes
 
-object Closure {
-  def apply(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) =
-    new Schema(builder, base, enhancements)
+object Closure extends SchemaBase {
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) {
+  def index: Int = 4
+
+  override def description: String =
+    """
+      |
+      |""".stripMargin
+
+  def apply(builder: SchemaBuilder,
+            base: Base.Schema,
+            methodSchema: Method.Schema,
+            methodBody: MethodBody.Schema,
+            enhancements: Enhancements.Schema) =
+    new Schema(builder, base, methodSchema, methodBody, enhancements)
+
+  class Schema(builder: SchemaBuilder,
+               base: Base.Schema,
+               methodSchema: Method.Schema,
+               methodBody: MethodBody.Schema,
+               enhancements: Enhancements.Schema) {
     import base._
     import enhancements._
+    import methodSchema._
+    import methodBody._
+
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     // node properties
