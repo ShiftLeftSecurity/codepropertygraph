@@ -1,7 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema._
-import overflowdb.storage.ValueTypes
 
 object Enhancements extends SchemaBase {
 
@@ -34,24 +33,6 @@ object Enhancements extends SchemaBase {
 
 // node properties
 
-    val variable = builder
-      .addProperty(
-        name = "VARIABLE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = "A variable propagated by a reaching-def edge"
-      )
-      .protoId(11)
-
-// edge types
-
-    val cdg = builder
-      .addEdgeType(
-        name = "CDG",
-        comment = "Control dependency graph"
-      )
-      .protoId(183)
-
     val parameterLink = builder
       .addEdgeType(
         name = "PARAMETER_LINK",
@@ -79,14 +60,6 @@ object Enhancements extends SchemaBase {
         comment = "Shortcut over multiple AST edges"
       )
       .protoId(28)
-
-    val reachingDef = builder
-      .addEdgeType(
-        name = "REACHING_DEF",
-        comment = "Reaching definition edge"
-      )
-      .protoId(137)
-      .addProperties(variable)
 
     val aliasOf = builder
       .addEdgeType(
@@ -163,146 +136,6 @@ object Enhancements extends SchemaBase {
 
 // node relations
 
-    literal
-      .addOutEdge(edge = cdg, inNode = callNode)
-      .addOutEdge(edge = cdg, inNode = identifier)
-      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cdg, inNode = literal)
-      .addOutEdge(edge = cdg, inNode = methodRef)
-      .addOutEdge(edge = cdg, inNode = typeRef)
-      .addOutEdge(edge = cdg, inNode = ret)
-      .addOutEdge(edge = cdg, inNode = block)
-      .addOutEdge(edge = cdg, inNode = methodReturn)
-      .addOutEdge(edge = cdg, inNode = controlStructure)
-      .addOutEdge(edge = cdg, inNode = jumpTarget)
-      .addOutEdge(edge = cdg, inNode = unknown)
-
-    callNode
-      .addOutEdge(edge = cdg, inNode = callNode)
-      .addOutEdge(edge = cdg, inNode = identifier)
-      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cdg, inNode = literal)
-      .addOutEdge(edge = cdg, inNode = methodRef)
-      .addOutEdge(edge = cdg, inNode = typeRef)
-      .addOutEdge(edge = cdg, inNode = ret)
-      .addOutEdge(edge = cdg, inNode = block)
-      .addOutEdge(edge = cdg, inNode = methodReturn)
-      .addOutEdge(edge = cdg, inNode = controlStructure)
-      .addOutEdge(edge = cdg, inNode = jumpTarget)
-      .addOutEdge(edge = cdg, inNode = unknown)
-
-    identifier
-      .addOutEdge(edge = cdg, inNode = callNode)
-      .addOutEdge(edge = cdg, inNode = identifier)
-      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cdg, inNode = literal)
-      .addOutEdge(edge = cdg, inNode = methodRef)
-      .addOutEdge(edge = cdg, inNode = typeRef)
-      .addOutEdge(edge = cdg, inNode = ret)
-      .addOutEdge(edge = cdg, inNode = block)
-      .addOutEdge(edge = cdg, inNode = methodReturn)
-      .addOutEdge(edge = cdg, inNode = controlStructure)
-      .addOutEdge(edge = cdg, inNode = jumpTarget)
-      .addOutEdge(edge = cdg, inNode = unknown)
-
-    fieldIdentifier
-      .addOutEdge(edge = cdg, inNode = callNode)
-      .addOutEdge(edge = cdg, inNode = identifier)
-      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cdg, inNode = literal)
-      .addOutEdge(edge = cdg, inNode = methodRef)
-      .addOutEdge(edge = cdg, inNode = typeRef)
-      .addOutEdge(edge = cdg, inNode = ret)
-      .addOutEdge(edge = cdg, inNode = block)
-      .addOutEdge(edge = cdg, inNode = methodReturn)
-      .addOutEdge(edge = cdg, inNode = controlStructure)
-      .addOutEdge(edge = cdg, inNode = jumpTarget)
-      .addOutEdge(edge = cdg, inNode = unknown)
-
-    block
-      .addOutEdge(edge = cdg, inNode = callNode)
-      .addOutEdge(edge = cdg, inNode = identifier)
-      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cdg, inNode = literal)
-      .addOutEdge(edge = cdg, inNode = methodRef)
-      .addOutEdge(edge = cdg, inNode = typeRef)
-      .addOutEdge(edge = cdg, inNode = ret)
-      .addOutEdge(edge = cdg, inNode = block)
-      .addOutEdge(edge = cdg, inNode = methodReturn)
-      .addOutEdge(edge = cdg, inNode = controlStructure)
-      .addOutEdge(edge = cdg, inNode = jumpTarget)
-      .addOutEdge(edge = cdg, inNode = unknown)
-
-    unknown
-      .addOutEdge(edge = cdg, inNode = callNode)
-      .addOutEdge(edge = cdg, inNode = identifier)
-      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cdg, inNode = literal)
-      .addOutEdge(edge = cdg, inNode = methodRef)
-      .addOutEdge(edge = cdg, inNode = typeRef)
-      .addOutEdge(edge = cdg, inNode = ret)
-      .addOutEdge(edge = cdg, inNode = block)
-      .addOutEdge(edge = cdg, inNode = methodReturn)
-      .addOutEdge(edge = cdg, inNode = controlStructure)
-      .addOutEdge(edge = cdg, inNode = jumpTarget)
-      .addOutEdge(edge = cdg, inNode = unknown)
-
-    controlStructure
-      .addOutEdge(edge = cdg, inNode = callNode)
-      .addOutEdge(edge = cdg, inNode = identifier)
-      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cdg, inNode = literal)
-      .addOutEdge(edge = cdg, inNode = methodRef)
-      .addOutEdge(edge = cdg, inNode = typeRef)
-      .addOutEdge(edge = cdg, inNode = ret)
-      .addOutEdge(edge = cdg, inNode = block)
-      .addOutEdge(edge = cdg, inNode = methodReturn)
-      .addOutEdge(edge = cdg, inNode = controlStructure)
-      .addOutEdge(edge = cdg, inNode = jumpTarget)
-      .addOutEdge(edge = cdg, inNode = unknown)
-
-    methodRef
-      .addOutEdge(edge = cdg, inNode = callNode)
-      .addOutEdge(edge = cdg, inNode = identifier)
-      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cdg, inNode = literal)
-      .addOutEdge(edge = cdg, inNode = methodRef)
-      .addOutEdge(edge = cdg, inNode = typeRef)
-      .addOutEdge(edge = cdg, inNode = ret)
-      .addOutEdge(edge = cdg, inNode = block)
-      .addOutEdge(edge = cdg, inNode = methodReturn)
-      .addOutEdge(edge = cdg, inNode = controlStructure)
-      .addOutEdge(edge = cdg, inNode = jumpTarget)
-      .addOutEdge(edge = cdg, inNode = unknown)
-
-    typeRef
-      .addOutEdge(edge = cdg, inNode = callNode)
-      .addOutEdge(edge = cdg, inNode = identifier)
-      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cdg, inNode = literal)
-      .addOutEdge(edge = cdg, inNode = methodRef)
-      .addOutEdge(edge = cdg, inNode = typeRef)
-      .addOutEdge(edge = cdg, inNode = ret)
-      .addOutEdge(edge = cdg, inNode = block)
-      .addOutEdge(edge = cdg, inNode = methodReturn)
-      .addOutEdge(edge = cdg, inNode = controlStructure)
-      .addOutEdge(edge = cdg, inNode = jumpTarget)
-      .addOutEdge(edge = cdg, inNode = unknown)
-
-    jumpTarget
-      .addOutEdge(edge = cdg, inNode = callNode)
-      .addOutEdge(edge = cdg, inNode = identifier)
-      .addOutEdge(edge = cdg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cdg, inNode = literal)
-      .addOutEdge(edge = cdg, inNode = methodRef)
-      .addOutEdge(edge = cdg, inNode = typeRef)
-      .addOutEdge(edge = cdg, inNode = ret)
-      .addOutEdge(edge = cdg, inNode = block)
-      .addOutEdge(edge = cdg, inNode = methodReturn)
-      .addOutEdge(edge = cdg, inNode = controlStructure)
-      .addOutEdge(edge = cdg, inNode = jumpTarget)
-      .addOutEdge(edge = cdg, inNode = unknown)
-
     binding
       .addOutEdge(edge = ref, inNode = method, cardinalityOut = Cardinality.One)
 
@@ -320,12 +153,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = ast, inNode = implicitCall)
       .addOutEdge(edge = ast, inNode = postExecutionCall)
-      .addOutEdge(edge = reachingDef, inNode = callNode)
-      .addOutEdge(edge = reachingDef, inNode = ret)
-      .addOutEdge(edge = reachingDef, inNode = identifier)
-      .addOutEdge(edge = reachingDef, inNode = methodParameterIn)
-      .addOutEdge(edge = reachingDef, inNode = literal)
-      .addOutEdge(edge = reachingDef, inNode = methodRef)
       .addOutEdge(edge = contains, inNode = callNode)
       .addOutEdge(edge = contains, inNode = identifier)
       .addOutEdge(edge = contains, inNode = fieldIdentifier)
@@ -339,25 +166,8 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = contains, inNode = unknown)
       .addOutEdge(edge = sourceFile, inNode = file)
 
-    ret
-      .addOutEdge(edge = reachingDef, inNode = methodReturn)
-      .addOutEdge(edge = reachingDef, inNode = identifier)
-      .addOutEdge(edge = reachingDef, inNode = methodRef)
-
-    methodRef
-      .addOutEdge(edge = reachingDef, inNode = callNode)
-      .addOutEdge(edge = reachingDef, inNode = ret)
-      .addOutEdge(edge = reachingDef, inNode = identifier)
-      .addOutEdge(edge = reachingDef, inNode = literal)
-      .addOutEdge(edge = reachingDef, inNode = methodRef)
-
     methodParameterIn
       .addOutEdge(edge = evalType, inNode = tpe, cardinalityOut = Cardinality.One)
-      .addOutEdge(edge = reachingDef, inNode = callNode)
-      .addOutEdge(edge = reachingDef, inNode = ret)
-      .addOutEdge(edge = reachingDef, inNode = identifier)
-      .addOutEdge(edge = reachingDef, inNode = literal)
-      .addOutEdge(edge = reachingDef, inNode = methodRef)
       .addOutEdge(edge = parameterLink, inNode = methodParameterOut)
 
     methodParameterOut
@@ -396,55 +206,24 @@ object Enhancements extends SchemaBase {
 
     literal
       .addOutEdge(edge = evalType, inNode = tpe)
-      .addOutEdge(edge = reachingDef, inNode = callNode)
-      .addOutEdge(edge = reachingDef, inNode = ret)
-      .addOutEdge(edge = reachingDef, inNode = identifier)
-      .addOutEdge(edge = reachingDef, inNode = literal)
-      .addOutEdge(edge = reachingDef, inNode = methodRef)
 
     callNode
       .addOutEdge(edge = ref, inNode = member)
       .addOutEdge(edge = evalType, inNode = tpe)
-      .addOutEdge(edge = reachingDef, inNode = callNode)
-      .addOutEdge(edge = reachingDef, inNode = ret)
-      .addOutEdge(edge = reachingDef, inNode = identifier)
-      .addOutEdge(edge = reachingDef, inNode = literal)
-      .addOutEdge(edge = reachingDef, inNode = methodRef)
 
     local
       .addOutEdge(edge = evalType, inNode = tpe)
 
     identifier
       .addOutEdge(edge = evalType, inNode = tpe)
-      .addOutEdge(edge = reachingDef, inNode = callNode)
-      .addOutEdge(edge = reachingDef, inNode = ret)
-      .addOutEdge(edge = reachingDef, inNode = identifier)
-      .addOutEdge(edge = reachingDef, inNode = literal)
-      .addOutEdge(edge = reachingDef, inNode = methodRef)
 
     block
       .addOutEdge(edge = evalType, inNode = tpe)
-      .addOutEdge(edge = reachingDef, inNode = callNode)
-      .addOutEdge(edge = reachingDef, inNode = ret)
-      .addOutEdge(edge = reachingDef, inNode = block)
-      .addOutEdge(edge = reachingDef, inNode = identifier)
-      .addOutEdge(edge = reachingDef, inNode = literal)
-      .addOutEdge(edge = reachingDef, inNode = methodRef)
 
     controlStructure
-      .addOutEdge(edge = reachingDef, inNode = callNode)
-      .addOutEdge(edge = reachingDef, inNode = ret)
-      .addOutEdge(edge = reachingDef, inNode = identifier)
-      .addOutEdge(edge = reachingDef, inNode = literal)
-      .addOutEdge(edge = reachingDef, inNode = methodRef)
       .addOutEdge(edge = evalType, inNode = tpe)
 
     unknown
-      .addOutEdge(edge = reachingDef, inNode = callNode)
-      .addOutEdge(edge = reachingDef, inNode = ret)
-      .addOutEdge(edge = reachingDef, inNode = identifier)
-      .addOutEdge(edge = reachingDef, inNode = literal)
-      .addOutEdge(edge = reachingDef, inNode = methodRef)
       .addOutEdge(edge = evalType, inNode = tpe)
 
   }

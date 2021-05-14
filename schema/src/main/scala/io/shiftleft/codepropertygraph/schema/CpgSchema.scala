@@ -17,6 +17,7 @@ class CpgSchema(builder: SchemaBuilder) {
 
   val callGraph = CallGraph(builder, method, methodBody)
   val dominators = Dominators(builder, method, methodBody)
+  val pdg = Pdg(builder, method, methodBody)
 
   val enhancements = Enhancements(builder, base, method, methodBody, typeDecl)
 
