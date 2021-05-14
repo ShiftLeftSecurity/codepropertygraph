@@ -68,13 +68,6 @@ object Enhancements extends SchemaBase {
       )
       .protoId(138)
 
-    val binds = builder
-      .addEdgeType(
-        name = "BINDS",
-        comment = "Relation between TYPE_DECL and BINDING node"
-      )
-      .protoId(155)
-
 // node types
 
     val file: NodeType = builder
@@ -117,31 +110,10 @@ object Enhancements extends SchemaBase {
     file
       .addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
 
-    val implicitCall: NodeType = builder
-      .addNodeType(
-        name = "IMPLICIT_CALL",
-        comment = "An implicit call site hidden in a method indicated by METHOD_MAP policy entries"
-      )
-      .protoId(307)
-      .extendz(callRepr, trackingPoint)
-
-    val postExecutionCall: NodeType = builder
-      .addNodeType(
-        name = "POST_EXECUTION_CALL",
-        comment =
-          "Indicates the existence of a call executed on a return value or out parameter of a method after this method has been executed. This is used to model framework code calling functors returned from user code. The outgoing REF edge indicates on which returned entitity the call will happen."
-      )
-      .protoId(3071)
-      .extendz(callRepr, trackingPoint)
-
 // node relations
 
     binding
       .addOutEdge(edge = ref, inNode = method, cardinalityOut = Cardinality.One)
-
-    postExecutionCall
-      .addOutEdge(edge = ref, inNode = methodReturn)
-      .addOutEdge(edge = ref, inNode = methodParameterOut)
 
     file
       .addOutEdge(edge = contains, inNode = typeDecl)
@@ -151,8 +123,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = ast, inNode = methodParameterOut)
       .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = ast, inNode = implicitCall)
-      .addOutEdge(edge = ast, inNode = postExecutionCall)
       .addOutEdge(edge = contains, inNode = callNode)
       .addOutEdge(edge = contains, inNode = identifier)
       .addOutEdge(edge = contains, inNode = fieldIdentifier)
@@ -193,13 +163,12 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = ref, inNode = typeDecl)
 
     typeDecl
+      .addOutEdge(edge = inheritsFrom, inNode = tpe)
       .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = inheritsFrom, inNode = tpe)
       .addOutEdge(edge = aliasOf, inNode = tpe)
       .addOutEdge(edge = contains, inNode = method)
       .addOutEdge(edge = sourceFile, inNode = file)
-      .addOutEdge(edge = binds, inNode = binding, cardinalityIn = Cardinality.One)
 
     member
       .addOutEdge(edge = evalType, inNode = tpe)
@@ -225,6 +194,31 @@ object Enhancements extends SchemaBase {
 
     unknown
       .addOutEdge(edge = evalType, inNode = tpe)
+
+    val implicitCall: NodeType = builder
+      .addNodeType(
+        name = "IMPLICIT_CALL",
+        comment = "An implicit call site hidden in a method indicated by METHOD_MAP policy entries"
+      )
+      .protoId(307)
+      .extendz(callRepr, trackingPoint)
+
+    val postExecutionCall: NodeType = builder
+      .addNodeType(
+        name = "POST_EXECUTION_CALL",
+        comment =
+          "Indicates the existence of a call executed on a return value or out parameter of a method after this method has been executed. This is used to model framework code calling functors returned from user code. The outgoing REF edge indicates on which returned entitity the call will happen."
+      )
+      .protoId(3071)
+      .extendz(callRepr, trackingPoint)
+
+    postExecutionCall
+      .addOutEdge(edge = ref, inNode = methodReturn)
+      .addOutEdge(edge = ref, inNode = methodParameterOut)
+
+    method
+      .addOutEdge(edge = ast, inNode = implicitCall)
+      .addOutEdge(edge = ast, inNode = postExecutionCall)
 
   }
 

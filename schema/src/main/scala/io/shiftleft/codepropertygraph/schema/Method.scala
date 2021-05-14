@@ -115,6 +115,16 @@ object Method extends SchemaBase {
     typeDecl
       .addOutEdge(edge = vtable, inNode = method)
 
+    val binds = builder
+      .addEdgeType(
+        name = "BINDS",
+        comment = "Relation between TYPE_DECL and BINDING node"
+      )
+      .protoId(155)
+
+    typeDecl
+      .addOutEdge(edge = binds, inNode = binding, cardinalityIn = Cardinality.One)
+
   }
 
 }

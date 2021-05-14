@@ -12,7 +12,7 @@ object TypeDecl extends SchemaBase {
 
   override def description: String =
     """
-      | Type layer.
+      | Type layer (local).
       |""".stripMargin
 
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
