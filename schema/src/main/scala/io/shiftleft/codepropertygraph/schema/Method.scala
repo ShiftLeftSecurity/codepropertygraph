@@ -1,6 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema.{Cardinality, NodeType, SchemaBuilder, SchemaInfo}
+import overflowdb.storage.ValueTypes
 
 object Method extends SchemaBase {
 
@@ -20,6 +21,19 @@ object Method extends SchemaBase {
     import base._
     import typeDeclSchema._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+
+    val signature = builder
+      .addProperty(
+        name = "SIGNATURE",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = """Method signature. The format is defined by the language front-end, and the
+                    |backend simply compares strings to resolve function overloading, i.e. match
+                    |call-sites to METHODs. In theory, consecutive integers would be valid,
+                    |but in practice this should be human readable
+                    |""".stripMargin
+      )
+      .protoId(22)
 
     val method: NodeType = builder
       .addNodeType(
@@ -47,6 +61,14 @@ object Method extends SchemaBase {
       .protoId(3)
       .addProperties(typeFullName)
       .extendz(cfgNode, trackingPoint)
+
+    val binding: NodeType = builder
+      .addNodeType(
+        name = "BINDING",
+        comment = "A binding of a METHOD into a TYPE_DECL"
+      )
+      .protoId(146)
+      .addProperties(name, signature)
 
     method
       .addOutEdge(edge = ast, inNode = methodReturn, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)

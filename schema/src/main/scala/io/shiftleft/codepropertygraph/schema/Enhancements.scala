@@ -33,14 +33,6 @@ object Enhancements extends SchemaBase {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
 // node properties
-    val value = builder
-      .addProperty(
-        name = "VALUE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = "Tag value"
-      )
-      .protoId(8)
 
     val isMethodNeverOverridden = builder
       .addProperty(
@@ -50,6 +42,9 @@ object Enhancements extends SchemaBase {
         comment = "True if the referenced method is never overridden by the subclasses and false otherwise"
       )
       .protoId(1002)
+
+    binding
+      .addProperties(isMethodNeverOverridden)
 
     val evaluationStrategy = builder
       .addProperty(
@@ -214,16 +209,18 @@ object Enhancements extends SchemaBase {
       .addProperties(name, hash)
       .extendz(astNode)
 
+    val namespace: NodeType = builder
+      .addNodeType(
+        name = "NAMESPACE",
+        comment =
+          "This node represents a namespace as a whole whereas the NAMESPACE_BLOCK is used for each grouping occurrence of a namespace in code. Single representing NAMESPACE node is required for easier navigation in the query language"
+      )
+      .protoId(40)
+      .addProperties(name)
+      .extendz(astNode)
+
     file
       .addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
-
-    val binding: NodeType = builder
-      .addNodeType(
-        name = "BINDING",
-        comment = "A binding of a METHOD into a TYPE_DECL"
-      )
-      .protoId(146)
-      .addProperties(name, signature)
 
     val implicitCall: NodeType = builder
       .addNodeType(
@@ -242,24 +239,11 @@ object Enhancements extends SchemaBase {
       .protoId(3071)
       .extendz(callRepr, trackingPoint)
 
-    val namespace: NodeType = builder
-      .addNodeType(
-        name = "NAMESPACE",
-        comment =
-          "This node represents a namespace as a whole whereas the NAMESPACE_BLOCK is used for each grouping occurrence of a namespace in code. Single representing NAMESPACE node is required for easier navigation in the query language"
-      )
-      .protoId(40)
-      .addProperties(name)
-      .extendz(astNode)
-
     callNode
       .addProperties(dispatchType)
 
     method
       .addProperties(astParentType, astParentFullName)
-
-    binding
-      .addProperties(isMethodNeverOverridden)
 
     methodParameterIn
       .addProperties(evaluationStrategy)

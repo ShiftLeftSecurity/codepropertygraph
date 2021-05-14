@@ -121,19 +121,6 @@ object Base extends SchemaBase {
       )
       .protoId(3)
 
-    val signature = builder
-      .addProperty(
-        name = "SIGNATURE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = """Method signature. The format is defined by the language front-end, and the
-            |backend simply compares strings to resolve function overloading, i.e. match
-            |call-sites to METHODs. In theory, consecutive integers would be valid,
-            |but in practice this should be human readable
-            |""".stripMargin
-      )
-      .protoId(22)
-
     // The following fields are used to create edges between nodes in later processing stages.
 
     val typeFullName = builder
@@ -178,6 +165,15 @@ object Base extends SchemaBase {
                     |typically numbered from 1, ..., N (this is not enforced).""".stripMargin
       )
       .protoId(4)
+
+    val value = builder
+      .addProperty(
+        name = "VALUE",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = "Generic node property"
+      )
+      .protoId(8)
 
     // edge types
     val ast = builder

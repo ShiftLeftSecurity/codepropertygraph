@@ -20,7 +20,7 @@ class CpgSchema(builder: SchemaBuilder) {
   // everything else
   val protoSerialize = ProtoSerialize(builder, methodBody)
   val closure = Closure(builder, base, method, methodBody, enhancements)
-  val finding = Finding(builder, enhancements)
+  val finding = Finding(builder, base)
   val operators = Operators(builder)
   val sourceSpecific = Comment(builder, base, enhancements)
   val tagsAndLocation = TagsAndLocation(builder, base, typeDecl, method, methodBody, enhancements)
