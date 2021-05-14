@@ -34,56 +34,6 @@ object Enhancements extends SchemaBase {
 
 // node properties
 
-    val isMethodNeverOverridden = builder
-      .addProperty(
-        name = "IS_METHOD_NEVER_OVERRIDDEN",
-        valueType = ValueTypes.BOOLEAN,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "True if the referenced method is never overridden by the subclasses and false otherwise"
-      )
-      .protoId(1002)
-
-    binding
-      .addProperties(isMethodNeverOverridden)
-
-    val evaluationStrategy = builder
-      .addProperty(
-        name = "EVALUATION_STRATEGY",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment =
-          "Evaluation strategy for function parameters and return values. One of the values in \"evaluationStrategies\""
-      )
-      .protoId(15)
-
-    val dispatchType = builder
-      .addProperty(
-        name = "DISPATCH_TYPE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = "The dispatch type of a call, which is either static or dynamic. See dispatchTypes"
-      )
-      .protoId(25)
-
-    val astParentType = builder
-      .addProperty(
-        name = "AST_PARENT_TYPE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment =
-          "The type of the AST parent. Since this is only used in some parts of the graph the list does not include all possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK"
-      )
-      .protoId(56)
-
-    val astParentFullName = builder
-      .addProperty(
-        name = "AST_PARENT_FULL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = "The FULL_NAME of a the AST parent of an entity"
-      )
-      .protoId(57)
-
     val variable = builder
       .addProperty(
         name = "VARIABLE",
@@ -94,20 +44,6 @@ object Enhancements extends SchemaBase {
       .protoId(11)
 
 // edge types
-
-    val dominate = builder
-      .addEdgeType(
-        name = "DOMINATE",
-        comment = "Points to dominated node in DOM tree"
-      )
-      .protoId(181)
-
-    val postDominate = builder
-      .addEdgeType(
-        name = "POST_DOMINATE",
-        comment = "Points to dominated node in post DOM tree"
-      )
-      .protoId(182)
 
     val cdg = builder
       .addEdgeType(
@@ -122,13 +58,6 @@ object Enhancements extends SchemaBase {
         comment = "Links together corresponding METHOD_PARAMETER_IN and METHOD_PARAMETER_OUT nodes"
       )
       .protoId(12)
-
-    val call = builder
-      .addEdgeType(
-        name = "CALL",
-        comment = "Referencing to e.g. a LOCAL"
-      )
-      .protoId(6)
 
     val evalType = builder
       .addEdgeType(
@@ -165,13 +94,6 @@ object Enhancements extends SchemaBase {
         comment = "Alias relation between types"
       )
       .protoId(138)
-
-    val typeDeclAlias = builder
-      .addEdgeType(
-        name = "TYPE_DECL_ALIAS",
-        comment = "Alias relation between two TYPE_DECL"
-      )
-      .protoId(139)
 
     val binds = builder
       .addEdgeType(
@@ -239,83 +161,9 @@ object Enhancements extends SchemaBase {
       .protoId(3071)
       .extendz(callRepr, trackingPoint)
 
-    callNode
-      .addProperties(dispatchType)
-
-    method
-      .addProperties(astParentType, astParentFullName)
-
-    methodParameterIn
-      .addProperties(evaluationStrategy)
-
-    val methodParameterOut: NodeType = builder
-      .addNodeType(
-        name = "METHOD_PARAMETER_OUT",
-        comment = "This node represents a formal parameter going towards the caller side"
-      )
-      .protoId(33)
-      .addProperties(code, evaluationStrategy, typeFullName, lineNumber, columnNumber)
-      .extendz(declaration, trackingPoint, astNode)
-
-    methodReturn
-      .addProperties(evaluationStrategy)
-
-    typeDecl
-      .addProperties(astParentType, astParentFullName)
-
 // node relations
 
-    method
-      .addOutEdge(edge = dominate, inNode = callNode)
-      .addOutEdge(edge = dominate, inNode = identifier)
-      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = dominate, inNode = literal)
-      .addOutEdge(edge = dominate, inNode = methodRef)
-      .addOutEdge(edge = dominate, inNode = typeRef)
-      .addOutEdge(edge = dominate, inNode = ret)
-      .addOutEdge(edge = dominate, inNode = block)
-      .addOutEdge(edge = dominate, inNode = methodReturn)
-      .addOutEdge(edge = dominate, inNode = unknown)
-
-    methodReturn
-      .addOutEdge(edge = postDominate, inNode = callNode)
-      .addOutEdge(edge = postDominate, inNode = identifier)
-      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = postDominate, inNode = literal)
-      .addOutEdge(edge = postDominate, inNode = methodRef)
-      .addOutEdge(edge = postDominate, inNode = typeRef)
-      .addOutEdge(edge = postDominate, inNode = ret)
-      .addOutEdge(edge = postDominate, inNode = block)
-      .addOutEdge(edge = postDominate, inNode = method)
-      .addOutEdge(edge = postDominate, inNode = controlStructure)
-      .addOutEdge(edge = postDominate, inNode = jumpTarget)
-      .addOutEdge(edge = postDominate, inNode = unknown)
-
     literal
-      .addOutEdge(edge = dominate, inNode = callNode)
-      .addOutEdge(edge = dominate, inNode = identifier)
-      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = dominate, inNode = literal)
-      .addOutEdge(edge = dominate, inNode = methodRef)
-      .addOutEdge(edge = dominate, inNode = typeRef)
-      .addOutEdge(edge = dominate, inNode = ret)
-      .addOutEdge(edge = dominate, inNode = block)
-      .addOutEdge(edge = dominate, inNode = methodReturn)
-      .addOutEdge(edge = dominate, inNode = controlStructure)
-      .addOutEdge(edge = dominate, inNode = jumpTarget)
-      .addOutEdge(edge = dominate, inNode = unknown)
-      .addOutEdge(edge = postDominate, inNode = callNode)
-      .addOutEdge(edge = postDominate, inNode = identifier)
-      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = postDominate, inNode = literal)
-      .addOutEdge(edge = postDominate, inNode = methodRef)
-      .addOutEdge(edge = postDominate, inNode = typeRef)
-      .addOutEdge(edge = postDominate, inNode = ret)
-      .addOutEdge(edge = postDominate, inNode = block)
-      .addOutEdge(edge = postDominate, inNode = method)
-      .addOutEdge(edge = postDominate, inNode = controlStructure)
-      .addOutEdge(edge = postDominate, inNode = jumpTarget)
-      .addOutEdge(edge = postDominate, inNode = unknown)
       .addOutEdge(edge = cdg, inNode = callNode)
       .addOutEdge(edge = cdg, inNode = identifier)
       .addOutEdge(edge = cdg, inNode = fieldIdentifier)
@@ -330,30 +178,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     callNode
-      .addOutEdge(edge = dominate, inNode = callNode)
-      .addOutEdge(edge = dominate, inNode = identifier)
-      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = dominate, inNode = literal)
-      .addOutEdge(edge = dominate, inNode = methodRef)
-      .addOutEdge(edge = dominate, inNode = typeRef)
-      .addOutEdge(edge = dominate, inNode = ret)
-      .addOutEdge(edge = dominate, inNode = block)
-      .addOutEdge(edge = dominate, inNode = methodReturn)
-      .addOutEdge(edge = dominate, inNode = controlStructure)
-      .addOutEdge(edge = dominate, inNode = jumpTarget)
-      .addOutEdge(edge = dominate, inNode = unknown)
-      .addOutEdge(edge = postDominate, inNode = callNode)
-      .addOutEdge(edge = postDominate, inNode = identifier)
-      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = postDominate, inNode = literal)
-      .addOutEdge(edge = postDominate, inNode = methodRef)
-      .addOutEdge(edge = postDominate, inNode = typeRef)
-      .addOutEdge(edge = postDominate, inNode = ret)
-      .addOutEdge(edge = postDominate, inNode = block)
-      .addOutEdge(edge = postDominate, inNode = method)
-      .addOutEdge(edge = postDominate, inNode = controlStructure)
-      .addOutEdge(edge = postDominate, inNode = jumpTarget)
-      .addOutEdge(edge = postDominate, inNode = unknown)
       .addOutEdge(edge = cdg, inNode = callNode)
       .addOutEdge(edge = cdg, inNode = identifier)
       .addOutEdge(edge = cdg, inNode = fieldIdentifier)
@@ -368,30 +192,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     identifier
-      .addOutEdge(edge = dominate, inNode = callNode)
-      .addOutEdge(edge = dominate, inNode = identifier)
-      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = dominate, inNode = literal)
-      .addOutEdge(edge = dominate, inNode = methodRef)
-      .addOutEdge(edge = dominate, inNode = typeRef)
-      .addOutEdge(edge = dominate, inNode = ret)
-      .addOutEdge(edge = dominate, inNode = block)
-      .addOutEdge(edge = dominate, inNode = methodReturn)
-      .addOutEdge(edge = dominate, inNode = controlStructure)
-      .addOutEdge(edge = dominate, inNode = jumpTarget)
-      .addOutEdge(edge = dominate, inNode = unknown)
-      .addOutEdge(edge = postDominate, inNode = callNode)
-      .addOutEdge(edge = postDominate, inNode = identifier)
-      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = postDominate, inNode = literal)
-      .addOutEdge(edge = postDominate, inNode = methodRef)
-      .addOutEdge(edge = postDominate, inNode = typeRef)
-      .addOutEdge(edge = postDominate, inNode = ret)
-      .addOutEdge(edge = postDominate, inNode = block)
-      .addOutEdge(edge = postDominate, inNode = method)
-      .addOutEdge(edge = postDominate, inNode = controlStructure)
-      .addOutEdge(edge = postDominate, inNode = jumpTarget)
-      .addOutEdge(edge = postDominate, inNode = unknown)
       .addOutEdge(edge = cdg, inNode = callNode)
       .addOutEdge(edge = cdg, inNode = identifier)
       .addOutEdge(edge = cdg, inNode = fieldIdentifier)
@@ -406,30 +206,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     fieldIdentifier
-      .addOutEdge(edge = dominate, inNode = callNode)
-      .addOutEdge(edge = dominate, inNode = identifier)
-      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = dominate, inNode = literal)
-      .addOutEdge(edge = dominate, inNode = methodRef)
-      .addOutEdge(edge = dominate, inNode = typeRef)
-      .addOutEdge(edge = dominate, inNode = ret)
-      .addOutEdge(edge = dominate, inNode = block)
-      .addOutEdge(edge = dominate, inNode = methodReturn)
-      .addOutEdge(edge = dominate, inNode = controlStructure)
-      .addOutEdge(edge = dominate, inNode = jumpTarget)
-      .addOutEdge(edge = dominate, inNode = unknown)
-      .addOutEdge(edge = postDominate, inNode = callNode)
-      .addOutEdge(edge = postDominate, inNode = identifier)
-      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = postDominate, inNode = literal)
-      .addOutEdge(edge = postDominate, inNode = methodRef)
-      .addOutEdge(edge = postDominate, inNode = typeRef)
-      .addOutEdge(edge = postDominate, inNode = ret)
-      .addOutEdge(edge = postDominate, inNode = block)
-      .addOutEdge(edge = postDominate, inNode = method)
-      .addOutEdge(edge = postDominate, inNode = controlStructure)
-      .addOutEdge(edge = postDominate, inNode = jumpTarget)
-      .addOutEdge(edge = postDominate, inNode = unknown)
       .addOutEdge(edge = cdg, inNode = callNode)
       .addOutEdge(edge = cdg, inNode = identifier)
       .addOutEdge(edge = cdg, inNode = fieldIdentifier)
@@ -443,57 +219,7 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = jumpTarget)
       .addOutEdge(edge = cdg, inNode = unknown)
 
-    ret
-      .addOutEdge(edge = dominate, inNode = callNode)
-      .addOutEdge(edge = dominate, inNode = identifier)
-      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = dominate, inNode = literal)
-      .addOutEdge(edge = dominate, inNode = methodRef)
-      .addOutEdge(edge = dominate, inNode = typeRef)
-      .addOutEdge(edge = dominate, inNode = ret)
-      .addOutEdge(edge = dominate, inNode = block)
-      .addOutEdge(edge = dominate, inNode = methodReturn)
-      .addOutEdge(edge = dominate, inNode = controlStructure)
-      .addOutEdge(edge = dominate, inNode = jumpTarget)
-      .addOutEdge(edge = dominate, inNode = unknown)
-      .addOutEdge(edge = postDominate, inNode = callNode)
-      .addOutEdge(edge = postDominate, inNode = identifier)
-      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = postDominate, inNode = literal)
-      .addOutEdge(edge = postDominate, inNode = methodRef)
-      .addOutEdge(edge = postDominate, inNode = typeRef)
-      .addOutEdge(edge = postDominate, inNode = ret)
-      .addOutEdge(edge = postDominate, inNode = block)
-      .addOutEdge(edge = postDominate, inNode = method)
-      .addOutEdge(edge = postDominate, inNode = controlStructure)
-      .addOutEdge(edge = postDominate, inNode = jumpTarget)
-      .addOutEdge(edge = postDominate, inNode = unknown)
-
     block
-      .addOutEdge(edge = dominate, inNode = callNode)
-      .addOutEdge(edge = dominate, inNode = identifier)
-      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = dominate, inNode = literal)
-      .addOutEdge(edge = dominate, inNode = methodRef)
-      .addOutEdge(edge = dominate, inNode = typeRef)
-      .addOutEdge(edge = dominate, inNode = ret)
-      .addOutEdge(edge = dominate, inNode = block)
-      .addOutEdge(edge = dominate, inNode = methodReturn)
-      .addOutEdge(edge = dominate, inNode = controlStructure)
-      .addOutEdge(edge = dominate, inNode = jumpTarget)
-      .addOutEdge(edge = dominate, inNode = unknown)
-      .addOutEdge(edge = postDominate, inNode = callNode)
-      .addOutEdge(edge = postDominate, inNode = identifier)
-      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = postDominate, inNode = literal)
-      .addOutEdge(edge = postDominate, inNode = methodRef)
-      .addOutEdge(edge = postDominate, inNode = typeRef)
-      .addOutEdge(edge = postDominate, inNode = ret)
-      .addOutEdge(edge = postDominate, inNode = block)
-      .addOutEdge(edge = postDominate, inNode = method)
-      .addOutEdge(edge = postDominate, inNode = controlStructure)
-      .addOutEdge(edge = postDominate, inNode = jumpTarget)
-      .addOutEdge(edge = postDominate, inNode = unknown)
       .addOutEdge(edge = cdg, inNode = callNode)
       .addOutEdge(edge = cdg, inNode = identifier)
       .addOutEdge(edge = cdg, inNode = fieldIdentifier)
@@ -508,30 +234,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     unknown
-      .addOutEdge(edge = dominate, inNode = callNode)
-      .addOutEdge(edge = dominate, inNode = identifier)
-      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = dominate, inNode = literal)
-      .addOutEdge(edge = dominate, inNode = methodRef)
-      .addOutEdge(edge = dominate, inNode = typeRef)
-      .addOutEdge(edge = dominate, inNode = ret)
-      .addOutEdge(edge = dominate, inNode = block)
-      .addOutEdge(edge = dominate, inNode = methodReturn)
-      .addOutEdge(edge = dominate, inNode = controlStructure)
-      .addOutEdge(edge = dominate, inNode = jumpTarget)
-      .addOutEdge(edge = dominate, inNode = unknown)
-      .addOutEdge(edge = postDominate, inNode = callNode)
-      .addOutEdge(edge = postDominate, inNode = identifier)
-      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = postDominate, inNode = literal)
-      .addOutEdge(edge = postDominate, inNode = methodRef)
-      .addOutEdge(edge = postDominate, inNode = typeRef)
-      .addOutEdge(edge = postDominate, inNode = ret)
-      .addOutEdge(edge = postDominate, inNode = block)
-      .addOutEdge(edge = postDominate, inNode = method)
-      .addOutEdge(edge = postDominate, inNode = controlStructure)
-      .addOutEdge(edge = postDominate, inNode = jumpTarget)
-      .addOutEdge(edge = postDominate, inNode = unknown)
       .addOutEdge(edge = cdg, inNode = callNode)
       .addOutEdge(edge = cdg, inNode = identifier)
       .addOutEdge(edge = cdg, inNode = fieldIdentifier)
@@ -546,30 +248,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     controlStructure
-      .addOutEdge(edge = dominate, inNode = callNode)
-      .addOutEdge(edge = dominate, inNode = identifier)
-      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = dominate, inNode = literal)
-      .addOutEdge(edge = dominate, inNode = methodRef)
-      .addOutEdge(edge = dominate, inNode = typeRef)
-      .addOutEdge(edge = dominate, inNode = ret)
-      .addOutEdge(edge = dominate, inNode = block)
-      .addOutEdge(edge = dominate, inNode = methodReturn)
-      .addOutEdge(edge = dominate, inNode = controlStructure)
-      .addOutEdge(edge = dominate, inNode = jumpTarget)
-      .addOutEdge(edge = dominate, inNode = unknown)
-      .addOutEdge(edge = postDominate, inNode = callNode)
-      .addOutEdge(edge = postDominate, inNode = identifier)
-      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = postDominate, inNode = literal)
-      .addOutEdge(edge = postDominate, inNode = methodRef)
-      .addOutEdge(edge = postDominate, inNode = typeRef)
-      .addOutEdge(edge = postDominate, inNode = ret)
-      .addOutEdge(edge = postDominate, inNode = block)
-      .addOutEdge(edge = postDominate, inNode = method)
-      .addOutEdge(edge = postDominate, inNode = controlStructure)
-      .addOutEdge(edge = postDominate, inNode = jumpTarget)
-      .addOutEdge(edge = postDominate, inNode = unknown)
       .addOutEdge(edge = cdg, inNode = callNode)
       .addOutEdge(edge = cdg, inNode = identifier)
       .addOutEdge(edge = cdg, inNode = fieldIdentifier)
@@ -584,30 +262,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     methodRef
-      .addOutEdge(edge = dominate, inNode = callNode)
-      .addOutEdge(edge = dominate, inNode = identifier)
-      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = dominate, inNode = literal)
-      .addOutEdge(edge = dominate, inNode = methodRef)
-      .addOutEdge(edge = dominate, inNode = typeRef)
-      .addOutEdge(edge = dominate, inNode = ret)
-      .addOutEdge(edge = dominate, inNode = block)
-      .addOutEdge(edge = dominate, inNode = methodReturn)
-      .addOutEdge(edge = dominate, inNode = controlStructure)
-      .addOutEdge(edge = dominate, inNode = jumpTarget)
-      .addOutEdge(edge = dominate, inNode = unknown)
-      .addOutEdge(edge = postDominate, inNode = callNode)
-      .addOutEdge(edge = postDominate, inNode = identifier)
-      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = postDominate, inNode = literal)
-      .addOutEdge(edge = postDominate, inNode = methodRef)
-      .addOutEdge(edge = postDominate, inNode = typeRef)
-      .addOutEdge(edge = postDominate, inNode = ret)
-      .addOutEdge(edge = postDominate, inNode = block)
-      .addOutEdge(edge = postDominate, inNode = method)
-      .addOutEdge(edge = postDominate, inNode = controlStructure)
-      .addOutEdge(edge = postDominate, inNode = jumpTarget)
-      .addOutEdge(edge = postDominate, inNode = unknown)
       .addOutEdge(edge = cdg, inNode = callNode)
       .addOutEdge(edge = cdg, inNode = identifier)
       .addOutEdge(edge = cdg, inNode = fieldIdentifier)
@@ -622,30 +276,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     typeRef
-      .addOutEdge(edge = dominate, inNode = callNode)
-      .addOutEdge(edge = dominate, inNode = identifier)
-      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = dominate, inNode = literal)
-      .addOutEdge(edge = dominate, inNode = methodRef)
-      .addOutEdge(edge = dominate, inNode = typeRef)
-      .addOutEdge(edge = dominate, inNode = ret)
-      .addOutEdge(edge = dominate, inNode = block)
-      .addOutEdge(edge = dominate, inNode = methodReturn)
-      .addOutEdge(edge = dominate, inNode = controlStructure)
-      .addOutEdge(edge = dominate, inNode = jumpTarget)
-      .addOutEdge(edge = dominate, inNode = unknown)
-      .addOutEdge(edge = postDominate, inNode = callNode)
-      .addOutEdge(edge = postDominate, inNode = identifier)
-      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = postDominate, inNode = literal)
-      .addOutEdge(edge = postDominate, inNode = methodRef)
-      .addOutEdge(edge = postDominate, inNode = typeRef)
-      .addOutEdge(edge = postDominate, inNode = ret)
-      .addOutEdge(edge = postDominate, inNode = block)
-      .addOutEdge(edge = postDominate, inNode = method)
-      .addOutEdge(edge = postDominate, inNode = controlStructure)
-      .addOutEdge(edge = postDominate, inNode = jumpTarget)
-      .addOutEdge(edge = postDominate, inNode = unknown)
       .addOutEdge(edge = cdg, inNode = callNode)
       .addOutEdge(edge = cdg, inNode = identifier)
       .addOutEdge(edge = cdg, inNode = fieldIdentifier)
@@ -660,28 +290,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     jumpTarget
-      .addOutEdge(edge = dominate, inNode = callNode)
-      .addOutEdge(edge = dominate, inNode = identifier)
-      .addOutEdge(edge = dominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = dominate, inNode = literal)
-      .addOutEdge(edge = dominate, inNode = ret)
-      .addOutEdge(edge = dominate, inNode = methodRef)
-      .addOutEdge(edge = dominate, inNode = typeRef)
-      .addOutEdge(edge = dominate, inNode = block)
-      .addOutEdge(edge = dominate, inNode = jumpTarget)
-      .addOutEdge(edge = dominate, inNode = controlStructure)
-      .addOutEdge(edge = dominate, inNode = unknown)
-      .addOutEdge(edge = postDominate, inNode = callNode)
-      .addOutEdge(edge = postDominate, inNode = identifier)
-      .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
-      .addOutEdge(edge = postDominate, inNode = literal)
-      .addOutEdge(edge = postDominate, inNode = ret)
-      .addOutEdge(edge = postDominate, inNode = methodRef)
-      .addOutEdge(edge = postDominate, inNode = typeRef)
-      .addOutEdge(edge = postDominate, inNode = block)
-      .addOutEdge(edge = postDominate, inNode = jumpTarget)
-      .addOutEdge(edge = postDominate, inNode = controlStructure)
-      .addOutEdge(edge = postDominate, inNode = unknown)
       .addOutEdge(edge = cdg, inNode = callNode)
       .addOutEdge(edge = cdg, inNode = identifier)
       .addOutEdge(edge = cdg, inNode = fieldIdentifier)
@@ -707,9 +315,9 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = contains, inNode = method)
 
     method
+      .addOutEdge(edge = ast, inNode = methodParameterOut)
       .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = ast, inNode = methodParameterOut)
       .addOutEdge(edge = ast, inNode = implicitCall)
       .addOutEdge(edge = ast, inNode = postExecutionCall)
       .addOutEdge(edge = reachingDef, inNode = callNode)
@@ -781,7 +389,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = aliasOf, inNode = tpe)
       .addOutEdge(edge = contains, inNode = method)
       .addOutEdge(edge = sourceFile, inNode = file)
-      .addOutEdge(edge = typeDeclAlias, inNode = typeDecl)
       .addOutEdge(edge = binds, inNode = binding, cardinalityIn = Cardinality.One)
 
     member
@@ -797,7 +404,6 @@ object Enhancements extends SchemaBase {
 
     callNode
       .addOutEdge(edge = ref, inNode = member)
-      .addOutEdge(edge = call, inNode = method)
       .addOutEdge(edge = evalType, inNode = tpe)
       .addOutEdge(edge = reachingDef, inNode = callNode)
       .addOutEdge(edge = reachingDef, inNode = ret)
@@ -840,47 +446,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = reachingDef, inNode = literal)
       .addOutEdge(edge = reachingDef, inNode = methodRef)
       .addOutEdge(edge = evalType, inNode = tpe)
-
-// constants
-    val dispatchTypes = builder.addConstants(
-      category = "DispatchTypes",
-      Constant(
-        name = "STATIC_DISPATCH",
-        value = "STATIC_DISPATCH",
-        valueType = ValueTypes.STRING,
-        comment = "For statically dispatched calls the call target is known before program execution"
-      ).protoId(1),
-      Constant(
-        name = "DYNAMIC_DISPATCH",
-        value = "DYNAMIC_DISPATCH",
-        valueType = ValueTypes.STRING,
-        comment = "For dynamically dispatched calls the target is determined during runtime"
-      ).protoId(2),
-    )
-
-    val evaluationStrategies = builder.addConstants(
-      category = "EvaluationStrategies",
-      Constant(
-        name = "BY_REFERENCE",
-        value = "BY_REFERENCE",
-        valueType = ValueTypes.STRING,
-        comment =
-          "A parameter or return of a function is passed by reference which means an address is used behind the scenes"
-      ).protoId(1),
-      Constant(
-        name = "BY_SHARING",
-        value = "BY_SHARING",
-        valueType = ValueTypes.STRING,
-        comment =
-          "Only applicable to object parameter or return values. The pointer to the object is passed by value but the object itself is not copied and changes to it are thus propagated out of the method context"
-      ).protoId(2),
-      Constant(
-        name = "BY_VALUE",
-        value = "BY_VALUE",
-        valueType = ValueTypes.STRING,
-        comment = "A parameter or return of a function passed by value which means a flat copy is used"
-      ).protoId(3),
-    )
 
   }
 

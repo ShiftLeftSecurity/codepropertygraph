@@ -46,6 +46,13 @@ object TypeDecl extends SchemaBase {
       )
       .protoId(22)
 
+    val typeDeclAlias = builder
+      .addEdgeType(
+        name = "TYPE_DECL_ALIAS",
+        comment = "Alias relation between two TYPE_DECL"
+      )
+      .protoId(139)
+
     val typeDecl: NodeType = builder
       .addNodeType(
         name = "TYPE_DECL",
@@ -54,6 +61,9 @@ object TypeDecl extends SchemaBase {
       .protoId(46)
       .addProperties(name, fullName, isExternal, inheritsFromTypeFullName, aliasTypeFullName, filename)
       .extendz(astNode)
+
+    typeDecl
+      .addProperties(astParentType, astParentFullName)
 
     val member: NodeType = builder
       .addNodeType(
@@ -107,6 +117,9 @@ object TypeDecl extends SchemaBase {
       .addOutEdge(edge = ast, inNode = typeParameter)
       .addOutEdge(edge = ast, inNode = member, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
+
+    typeDecl
+      .addOutEdge(edge = typeDeclAlias, inNode = typeDecl)
 
   }
 

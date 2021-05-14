@@ -44,6 +44,9 @@ object Method extends SchemaBase {
       .addProperties(fullName, isExternal, signature, lineNumberEnd, columnNumberEnd, filename, hash)
       .extendz(declaration, cfgNode, astNode)
 
+    method
+      .addProperties(astParentType, astParentFullName)
+
     val methodParameterIn: NodeType = builder
       .addNodeType(
         name = "METHOD_PARAMETER_IN",
@@ -52,6 +55,15 @@ object Method extends SchemaBase {
       .protoId(34)
       .addProperties(code, typeFullName, lineNumber, columnNumber)
       .extendz(declaration, localLike, trackingPoint, astNode)
+
+    val methodParameterOut: NodeType = builder
+      .addNodeType(
+        name = "METHOD_PARAMETER_OUT",
+        comment = "This node represents a formal output parameter. It does not need to be created by the frontend."
+      )
+      .protoId(33)
+      .addProperties(code, typeFullName, lineNumber, columnNumber)
+      .extendz(declaration, trackingPoint, astNode)
 
     val methodReturn: NodeType = builder
       .addNodeType(
@@ -69,6 +81,19 @@ object Method extends SchemaBase {
       )
       .protoId(146)
       .addProperties(name, signature)
+
+    val isMethodNeverOverridden = builder
+      .addProperty(
+        name = "IS_METHOD_NEVER_OVERRIDDEN",
+        valueType = ValueTypes.BOOLEAN,
+        cardinality = Cardinality.ZeroOrOne,
+        comment =
+          "True if the referenced method is never overridden by the subclasses and false otherwise. This can be left blank by the frontend."
+      )
+      .protoId(1002)
+
+    binding
+      .addProperties(isMethodNeverOverridden)
 
     method
       .addOutEdge(edge = ast, inNode = methodReturn, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)

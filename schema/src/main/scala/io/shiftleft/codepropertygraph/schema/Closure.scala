@@ -16,16 +16,16 @@ object Closure extends SchemaBase {
             base: Base.Schema,
             methodSchema: Method.Schema,
             methodBody: MethodBody.Schema,
-            enhancements: Enhancements.Schema) =
-    new Schema(builder, base, methodSchema, methodBody, enhancements)
+            callGraph: CallGraph.Schema) =
+    new Schema(builder, base, methodSchema, methodBody, callGraph)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                methodSchema: Method.Schema,
                methodBody: MethodBody.Schema,
-               enhancements: Enhancements.Schema) {
+               callGraph: CallGraph.Schema) {
     import base._
-    import enhancements._
+    import callGraph._
     import methodSchema._
     import methodBody._
 

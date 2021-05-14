@@ -175,6 +175,25 @@ object Base extends SchemaBase {
       )
       .protoId(8)
 
+    val astParentType = builder
+      .addProperty(
+        name = "AST_PARENT_TYPE",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment =
+          "The type of the AST parent. Since this is only used in some parts of the graph the list does not include all possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK"
+      )
+      .protoId(56)
+
+    val astParentFullName = builder
+      .addProperty(
+        name = "AST_PARENT_FULL_NAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = "The FULL_NAME of a the AST parent of an entity"
+      )
+      .protoId(57)
+
     // edge types
     val ast = builder
       .addEdgeType(
