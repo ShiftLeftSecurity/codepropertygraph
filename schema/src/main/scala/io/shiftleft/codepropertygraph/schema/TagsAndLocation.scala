@@ -106,7 +106,23 @@ object TagsAndLocation extends SchemaBase {
       )
       .protoId(116)
 
-// node tpes
+    val taggedBy = builder
+      .addEdgeType(
+        name = "TAGGED_BY",
+        comment = "Edges from nodes to tags"
+      )
+      .protoId(11)
+
+    // node tpes
+
+    val tag: NodeType = builder
+      .addNodeType(
+        name = "TAG",
+        comment = "A string tag"
+      )
+      .protoId(24)
+      .addProperties(name, value)
+
     val location: NodeType = builder
       .addNodeType(
         name = "LOCATION",
@@ -173,6 +189,60 @@ object TagsAndLocation extends SchemaBase {
       .addContainedNode(callNode, "callsite", Cardinality.ZeroOrOne)
       .addContainedNode(methodParameterIn, "parameterIn", Cardinality.ZeroOrOne)
       .addContainedNode(tag, "parameterInTags", Cardinality.List)
+
+    method
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    methodReturn
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    literal
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    local
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    member
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    callNode
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    identifier
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    fieldIdentifier
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    methodParameterIn
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    ret
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    block
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    unknown
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    controlStructure
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    methodRef
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    typeRef
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    jumpTarget
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    file
+      .addOutEdge(edge = taggedBy, inNode = tag)
+
+    methodParameterOut
+      .addOutEdge(edge = taggedBy, inNode = tag)
 
 // constants
 

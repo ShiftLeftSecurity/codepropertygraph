@@ -135,13 +135,6 @@ object Enhancements extends SchemaBase {
       )
       .protoId(6)
 
-    val taggedBy = builder
-      .addEdgeType(
-        name = "TAGGED_BY",
-        comment = "Edges from nodes to tags"
-      )
-      .protoId(11)
-
     val evalType = builder
       .addEdgeType(
         name = "EVAL_TYPE",
@@ -249,14 +242,6 @@ object Enhancements extends SchemaBase {
       .protoId(3071)
       .extendz(callRepr, trackingPoint)
 
-    val tag: NodeType = builder
-      .addNodeType(
-        name = "TAG",
-        comment = "A string tag"
-      )
-      .protoId(24)
-      .addProperties(name, value)
-
     val namespace: NodeType = builder
       .addNodeType(
         name = "NAMESPACE",
@@ -297,7 +282,6 @@ object Enhancements extends SchemaBase {
 // node relations
 
     method
-      .addOutEdge(edge = taggedBy, inNode = tag)
       .addOutEdge(edge = dominate, inNode = callNode)
       .addOutEdge(edge = dominate, inNode = identifier)
       .addOutEdge(edge = dominate, inNode = fieldIdentifier)
@@ -310,7 +294,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = dominate, inNode = unknown)
 
     methodReturn
-      .addOutEdge(edge = taggedBy, inNode = tag)
       .addOutEdge(edge = postDominate, inNode = callNode)
       .addOutEdge(edge = postDominate, inNode = identifier)
       .addOutEdge(edge = postDominate, inNode = fieldIdentifier)
@@ -325,7 +308,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = postDominate, inNode = unknown)
 
     literal
-      .addOutEdge(edge = taggedBy, inNode = tag)
       .addOutEdge(edge = dominate, inNode = callNode)
       .addOutEdge(edge = dominate, inNode = identifier)
       .addOutEdge(edge = dominate, inNode = fieldIdentifier)
@@ -363,15 +345,7 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = jumpTarget)
       .addOutEdge(edge = cdg, inNode = unknown)
 
-    local
-      .addOutEdge(edge = taggedBy, inNode = tag)
-
-    member
-      .addOutEdge(edge = taggedBy, inNode = tag)
-
     callNode
-      .addOutEdge(edge = taggedBy, inNode = tag)
-      .addOutEdge(edge = taggedBy, inNode = tag)
       .addOutEdge(edge = dominate, inNode = callNode)
       .addOutEdge(edge = dominate, inNode = identifier)
       .addOutEdge(edge = dominate, inNode = fieldIdentifier)
@@ -410,7 +384,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     identifier
-      .addOutEdge(edge = taggedBy, inNode = tag)
       .addOutEdge(edge = dominate, inNode = callNode)
       .addOutEdge(edge = dominate, inNode = identifier)
       .addOutEdge(edge = dominate, inNode = fieldIdentifier)
@@ -449,7 +422,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     fieldIdentifier
-      .addOutEdge(edge = taggedBy, inNode = tag)
       .addOutEdge(edge = dominate, inNode = callNode)
       .addOutEdge(edge = dominate, inNode = identifier)
       .addOutEdge(edge = dominate, inNode = fieldIdentifier)
@@ -487,11 +459,7 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = jumpTarget)
       .addOutEdge(edge = cdg, inNode = unknown)
 
-    methodParameterIn
-      .addOutEdge(edge = taggedBy, inNode = tag)
-
     ret
-      .addOutEdge(edge = taggedBy, inNode = tag)
       .addOutEdge(edge = dominate, inNode = callNode)
       .addOutEdge(edge = dominate, inNode = identifier)
       .addOutEdge(edge = dominate, inNode = fieldIdentifier)
@@ -518,7 +486,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = postDominate, inNode = unknown)
 
     block
-      .addOutEdge(edge = taggedBy, inNode = tag)
       .addOutEdge(edge = dominate, inNode = callNode)
       .addOutEdge(edge = dominate, inNode = identifier)
       .addOutEdge(edge = dominate, inNode = fieldIdentifier)
@@ -557,7 +524,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     unknown
-      .addOutEdge(edge = taggedBy, inNode = tag)
       .addOutEdge(edge = dominate, inNode = callNode)
       .addOutEdge(edge = dominate, inNode = identifier)
       .addOutEdge(edge = dominate, inNode = fieldIdentifier)
@@ -596,7 +562,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     controlStructure
-      .addOutEdge(edge = taggedBy, inNode = tag)
       .addOutEdge(edge = dominate, inNode = callNode)
       .addOutEdge(edge = dominate, inNode = identifier)
       .addOutEdge(edge = dominate, inNode = fieldIdentifier)
@@ -635,7 +600,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     methodRef
-      .addOutEdge(edge = taggedBy, inNode = tag)
       .addOutEdge(edge = dominate, inNode = callNode)
       .addOutEdge(edge = dominate, inNode = identifier)
       .addOutEdge(edge = dominate, inNode = fieldIdentifier)
@@ -674,7 +638,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     typeRef
-      .addOutEdge(edge = taggedBy, inNode = tag)
       .addOutEdge(edge = dominate, inNode = callNode)
       .addOutEdge(edge = dominate, inNode = identifier)
       .addOutEdge(edge = dominate, inNode = fieldIdentifier)
@@ -713,7 +676,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = cdg, inNode = unknown)
 
     jumpTarget
-      .addOutEdge(edge = taggedBy, inNode = tag)
       .addOutEdge(edge = dominate, inNode = callNode)
       .addOutEdge(edge = dominate, inNode = identifier)
       .addOutEdge(edge = dominate, inNode = fieldIdentifier)
@@ -759,7 +721,6 @@ object Enhancements extends SchemaBase {
     file
       .addOutEdge(edge = contains, inNode = typeDecl)
       .addOutEdge(edge = contains, inNode = method)
-      .addOutEdge(edge = taggedBy, inNode = tag)
 
     method
       .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)
@@ -808,7 +769,6 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = parameterLink, inNode = methodParameterOut)
 
     methodParameterOut
-      .addOutEdge(edge = taggedBy, inNode = tag)
       .addOutEdge(edge = evalType, inNode = tpe)
 
     methodReturn
