@@ -9,8 +9,6 @@ object Base extends SchemaBase {
   override def providedByFrontend: Boolean = true
   override def description: String =
     """
-      |The Base Layer of the Code Property Graph. This is the specification relevant
-      |for implementers of language frontends.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder) = new Schema(builder)
@@ -194,9 +192,7 @@ object Base extends SchemaBase {
       )
       .protoId(57)
 
-    // edge types
-
-// node base types
+    // node base types
 
     val withinMethod = builder.addNodeBaseType(
       name = "WITHIN_METHOD",
@@ -224,39 +220,14 @@ object Base extends SchemaBase {
       )
       .addProperties(name)
 
+    // Edge types
+
     val ref = builder
       .addEdgeType(
         name = "REF",
         comment = "A reference to e.g. a LOCAL"
       )
       .protoId(10)
-
-    // Node types
-
-    val namespaceBlock: NodeType = builder
-      .addNodeType(
-        name = "NAMESPACE_BLOCK",
-        comment = """A reference to a namespace.
-                    |We borrow the concept of a "namespace block" from C++, that is, a namespace block
-                    |is a block of code that has been placed in the same namespace by a programmer.
-                    |This block may be introduced via a `package` statement in Java or
-                    |a `namespace{ }` statement in C++.
-                    |""".stripMargin
-      )
-      .protoId(41)
-      .addProperties(name, fullName, filename)
-
-    val namespace: NodeType = builder
-      .addNodeType(
-        name = "NAMESPACE",
-        comment = """This node represents a namespace as a whole whereas the NAMESPACE_BLOCK is used
-                    |for each grouping occurrence of a namespace in code.
-                    |Single representing NAMESPACE node is required for easier navigation in
-                    |the query language.
-                    |""".stripMargin
-      )
-      .protoId(40)
-      .addProperties(name)
 
   }
 

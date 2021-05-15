@@ -10,23 +10,27 @@ object Ast extends SchemaBase {
 
   override def description: String =
     """
+      |Abstract syntax tree layer.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
+            namespaces: Namespaces.Schema,
             methodSchema: Method.Schema,
             typeDeclSchema: TypeDecl.Schema,
             fs: FileSystem.Schema) =
-    new Schema(builder, base, methodSchema, typeDeclSchema, fs)
+    new Schema(builder, base, namespaces, methodSchema, typeDeclSchema, fs)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
+               namespaces: Namespaces.Schema,
                methodSchema: Method.Schema,
                typeDeclSchema: TypeDecl.Schema,
                fs: FileSystem.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import base._
+    import namespaces._
     import typeDeclSchema._
     import fs._
 
@@ -66,8 +70,7 @@ object Ast extends SchemaBase {
     typeParameter.extendz(astNode)
     typeArgument.extendz(astNode)
 
-    namespaceBlock
-      .extendz(astNode)
+    namespaceBlock.extendz(astNode)
 
     val expression = builder
       .addNodeBaseType(
