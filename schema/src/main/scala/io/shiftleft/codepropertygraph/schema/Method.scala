@@ -5,11 +5,8 @@ import overflowdb.storage.ValueTypes
 
 object Method extends SchemaBase {
 
-  def apply(builder: SchemaBuilder,
-            base: Base.Schema,
-            common: CommonProperties.Schema,
-            typeDeclSchema: TypeDecl.Schema) =
-    new Schema(builder, base, common, typeDeclSchema)
+  def apply(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: TypeDecl.Schema) =
+    new Schema(builder, base, typeDeclSchema)
 
   def index: Int = 2
   override def providedByFrontend: Boolean = true
@@ -20,12 +17,8 @@ object Method extends SchemaBase {
       | This layer is provided by the frontend and may be modified by passes.
       |""".stripMargin
 
-  class Schema(builder: SchemaBuilder,
-               base: Base.Schema,
-               common: CommonProperties.Schema,
-               typeDeclSchema: TypeDecl.Schema) {
+  class Schema(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: TypeDecl.Schema) {
     import base._
-    import common._
     import typeDeclSchema._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
@@ -129,6 +122,9 @@ object Method extends SchemaBase {
     binding
       .addProperties(isMethodNeverOverridden)
 
+    binding
+      .addOutEdge(edge = ref, inNode = method, cardinalityOut = Cardinality.One)
+
     val binds = builder
       .addEdgeType(
         name = "BINDS",
@@ -138,6 +134,16 @@ object Method extends SchemaBase {
 
     typeDecl
       .addOutEdge(edge = binds, inNode = binding, cardinalityIn = Cardinality.One)
+
+    val parameterLink = builder
+      .addEdgeType(
+        name = "PARAMETER_LINK",
+        comment = "Links together corresponding METHOD_PARAMETER_IN and METHOD_PARAMETER_OUT nodes. Created by backend."
+      )
+      .protoId(12)
+
+    methodParameterIn
+      .addOutEdge(edge = parameterLink, inNode = methodParameterOut)
 
     // To be removed
 

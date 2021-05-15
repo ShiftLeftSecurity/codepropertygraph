@@ -8,28 +8,30 @@ import overflowdb.schema.{Schema, SchemaBuilder}
   */
 class CpgSchema(builder: SchemaBuilder) {
   // the foundation
-  val common = CommonProperties(builder)
-  val base = Base(builder, common)
-  val metaData = MetaData(builder, common)
-  val typeDecl = TypeDecl(builder, base, common)
-  val method = Method(builder, base, common, typeDecl)
 
-  val fs = FileSystem(builder, base, common, method, typeDecl)
-  val ast = Ast(builder, base, method, common, typeDecl, fs)
+  val base = Base(builder)
+  val operators = Operators(builder)
+
+  val metaData = MetaData(builder, base)
+  val typeDecl = TypeDecl(builder, base)
+  val finding = Finding(builder, base)
+
+  val method = Method(builder, base, typeDecl)
+  val fs = FileSystem(builder, base, method, typeDecl)
+  val ast = Ast(builder, base, method, typeDecl, fs)
+
   val callGraph = CallGraph(builder, method, ast)
-  val cfg = ControlFlowGraph(builder, base, method, ast, common)
+
+  val cfg = ControlFlowGraph(builder, base, method, ast)
   val dominators = Dominators(builder, method, ast)
   val pdg = Pdg(builder, method, ast)
 
-  val enhancements = Enhancements(builder, method, ast, typeDecl, fs)
+  val shortcuts = Shortcuts(builder, base, method, ast, typeDecl, fs)
 
-  // everything else
+  val sourceSpecific = Comment(builder, base, ast, fs)
+  val closure = Closure(builder, base, method, ast, callGraph)
+  val tagsAndLocation = TagsAndLocation(builder, base, typeDecl, method, ast, fs)
   val protoSerialize = ProtoSerialize(builder, ast)
-  val closure = Closure(builder, method, ast, callGraph)
-  val finding = Finding(builder, common)
-  val operators = Operators(builder)
-  val sourceSpecific = Comment(builder, common, ast, fs)
-  val tagsAndLocation = TagsAndLocation(builder, base, typeDecl, method, ast, fs, common)
 }
 
 object CpgSchema {

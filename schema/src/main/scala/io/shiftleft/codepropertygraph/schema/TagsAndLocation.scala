@@ -17,22 +17,19 @@ object TagsAndLocation extends SchemaBase {
             typeDeclSchema: TypeDecl.Schema,
             methodSchema: Method.Schema,
             ast: Ast.Schema,
-            fs: FileSystem.Schema,
-            common: CommonProperties.Schema) =
-    new Schema(builder, base, typeDeclSchema, methodSchema, ast, fs, common)
+            fs: FileSystem.Schema) =
+    new Schema(builder, base, typeDeclSchema, methodSchema, ast, fs)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                typeDeclSchema: TypeDecl.Schema,
                methodSchema: Method.Schema,
                ast: Ast.Schema,
-               fs: FileSystem.Schema,
-               common: CommonProperties.Schema) {
+               fs: FileSystem.Schema) {
     import base._
     import typeDeclSchema._
     import methodSchema._
     import ast._
-    import common._
     import fs._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 

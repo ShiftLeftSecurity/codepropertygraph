@@ -9,12 +9,14 @@ object FileSystem extends SchemaBase {
     """
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, base : Base.Schema, common: CommonProperties.Schema, methodSchema : Method.Schema, typeDeclSchema: TypeDecl.Schema) =
-    new Schema(builder, base, common, methodSchema, typeDeclSchema)
+  def apply(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, typeDeclSchema: TypeDecl.Schema) =
+    new Schema(builder, base, methodSchema, typeDeclSchema)
 
-  class Schema(builder: SchemaBuilder, base : Base.Schema, common: CommonProperties.Schema, methodSchema : Method.Schema, typeDeclSchema: TypeDecl.Schema) {
+  class Schema(builder: SchemaBuilder,
+               base: Base.Schema,
+               methodSchema: Method.Schema,
+               typeDeclSchema: TypeDecl.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
-    import common._
     import methodSchema._
     import typeDeclSchema._
     import base._

@@ -12,12 +12,12 @@ object Finding extends SchemaBase {
       |
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, common: CommonProperties.Schema) =
-    new Schema(builder, common)
+  def apply(builder: SchemaBuilder, base: Base.Schema) =
+    new Schema(builder, base)
 
-  class Schema(builder: SchemaBuilder, common: CommonProperties.Schema) {
+  class Schema(builder: SchemaBuilder, base: Base.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
-    import common._
+    import base._
 
 // node properties
     val key = builder

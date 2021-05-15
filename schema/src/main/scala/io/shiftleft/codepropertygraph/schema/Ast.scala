@@ -15,19 +15,16 @@ object Ast extends SchemaBase {
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
             methodSchema: Method.Schema,
-            common: CommonProperties.Schema,
             typeDeclSchema: TypeDecl.Schema,
-            fs : FileSystem.Schema) =
-    new Schema(builder, base, methodSchema, common, typeDeclSchema, fs)
+            fs: FileSystem.Schema) =
+    new Schema(builder, base, methodSchema, typeDeclSchema, fs)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                methodSchema: Method.Schema,
-               common: CommonProperties.Schema,
                typeDeclSchema: TypeDecl.Schema,
-               fs : FileSystem.Schema) {
+               fs: FileSystem.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
-    import common._
     import methodSchema._
     import base._
     import typeDeclSchema._
@@ -47,7 +44,6 @@ object Ast extends SchemaBase {
                     |""".stripMargin
       )
       .addProperties(order)
-
 
     val callRepr = builder
       .addNodeBaseType(
@@ -384,6 +380,15 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = condition, inNode = unknown)
       .addOutEdge(edge = condition, inNode = controlStructure)
 
+    typeDecl
+      .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
+
+    method
+      .addOutEdge(edge = ast, inNode = methodParameterOut)
+      .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
+
     val controlStructureTypes = builder.addConstants(
       category = "ControlStructureTypes",
       Constant(name = "BREAK", value = "BREAK", valueType = ValueTypes.STRING, comment = "Represents a break statement")
@@ -419,9 +424,9 @@ object Ast extends SchemaBase {
       Constant(name = "PUBLIC", value = "PUBLIC", valueType = ValueTypes.STRING, comment = "The public modifier")
         .protoId(2),
       Constant(name = "PROTECTED",
-        value = "PROTECTED",
-        valueType = ValueTypes.STRING,
-        comment = "The protected modifier").protoId(3),
+               value = "PROTECTED",
+               valueType = ValueTypes.STRING,
+               comment = "The protected modifier").protoId(3),
       Constant(name = "PRIVATE", value = "PRIVATE", valueType = ValueTypes.STRING, comment = "The private modifier")
         .protoId(4),
       Constant(name = "ABSTRACT", value = "ABSTRACT", valueType = ValueTypes.STRING, comment = "The abstract modifier")
@@ -429,21 +434,14 @@ object Ast extends SchemaBase {
       Constant(name = "NATIVE", value = "NATIVE", valueType = ValueTypes.STRING, comment = "The native modifier")
         .protoId(6),
       Constant(name = "CONSTRUCTOR",
-        value = "CONSTRUCTOR",
-        valueType = ValueTypes.STRING,
-        comment = "The constructor modifier").protoId(7),
+               value = "CONSTRUCTOR",
+               valueType = ValueTypes.STRING,
+               comment = "The constructor modifier").protoId(7),
       Constant(name = "VIRTUAL", value = "VIRTUAL", valueType = ValueTypes.STRING, comment = "The virtual modifier")
         .protoId(8),
     )
 
     // To refactor
-
-    val ref = builder
-      .addEdgeType(
-        name = "REF",
-        comment = "A reference to e.g. a LOCAL"
-      )
-      .protoId(10)
 
     typeArgument.addOutEdge(edge = ref, inNode = tpe)
 

@@ -10,22 +10,13 @@ object ControlFlowGraph extends SchemaBase {
     """
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder,
-            base: Base.Schema,
-            methodSchema: Method.Schema,
-            ast: Ast.Schema,
-            common: CommonProperties.Schema) =
-    new Schema(builder, base, methodSchema, ast, common)
+  def apply(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, ast: Ast.Schema) =
+    new Schema(builder, base, methodSchema, ast)
 
-  class Schema(builder: SchemaBuilder,
-               base: Base.Schema,
-               methodSchema: Method.Schema,
-               ast: Ast.Schema,
-               common: CommonProperties.Schema) {
+  class Schema(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, ast: Ast.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import ast._
-    import common._
     import base._
 
     val cfgNode = builder

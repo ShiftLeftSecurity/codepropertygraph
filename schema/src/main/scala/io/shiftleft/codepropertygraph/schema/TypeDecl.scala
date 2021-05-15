@@ -5,8 +5,8 @@ import overflowdb.storage.ValueTypes
 
 object TypeDecl extends SchemaBase {
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, common: CommonProperties.Schema) =
-    new Schema(builder, base, common)
+  def apply(builder: SchemaBuilder, base: Base.Schema) =
+    new Schema(builder, base)
 
   def index: Int = 3
   override def providedByFrontend: Boolean = true
@@ -16,9 +16,8 @@ object TypeDecl extends SchemaBase {
       | Type layer (local).
       |""".stripMargin
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema, common: CommonProperties.Schema) {
+  class Schema(builder: SchemaBuilder, base: Base.Schema) {
     import base._
-    import common._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     val aliasTypeFullName = builder
@@ -54,6 +53,20 @@ object TypeDecl extends SchemaBase {
         comment = "Alias relation between two TYPE_DECL"
       )
       .protoId(139)
+
+    val aliasOf = builder
+      .addEdgeType(
+        name = "ALIAS_OF",
+        comment = "Alias relation between types. Created by backend passes."
+      )
+      .protoId(138)
+
+    val inheritsFrom = builder
+      .addEdgeType(
+        name = "INHERITS_FROM",
+        comment = "Inheritance relation between types"
+      )
+      .protoId(23)
 
     val typeDecl: NodeType = builder
       .addNodeType(
@@ -101,11 +114,17 @@ object TypeDecl extends SchemaBase {
       .protoId(45)
       .addProperties(name, fullName, typeDeclFullName)
 
+    typeDecl
+      .addOutEdge(edge = inheritsFrom, inNode = tpe)
+
     typeArgument
       .addOutEdge(edge = bindsTo, inNode = typeParameter)
 
     typeDecl
       .addOutEdge(edge = typeDeclAlias, inNode = typeDecl)
+
+    typeDecl
+      .addOutEdge(edge = aliasOf, inNode = tpe)
 
   }
 

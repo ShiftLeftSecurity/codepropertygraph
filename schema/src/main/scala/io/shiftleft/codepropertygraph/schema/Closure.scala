@@ -12,10 +12,19 @@ object Closure extends SchemaBase {
       |
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema, callGraph: CallGraph.Schema) =
-    new Schema(builder, methodSchema, ast, callGraph)
+  def apply(builder: SchemaBuilder,
+            base: Base.Schema,
+            methodSchema: Method.Schema,
+            ast: Ast.Schema,
+            callGraph: CallGraph.Schema) =
+    new Schema(builder, base, methodSchema, ast, callGraph)
 
-  class Schema(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema, callGraph: CallGraph.Schema) {
+  class Schema(builder: SchemaBuilder,
+               base: Base.Schema,
+               methodSchema: Method.Schema,
+               ast: Ast.Schema,
+               callGraph: CallGraph.Schema) {
+    import base._
     import callGraph._
     import methodSchema._
     import ast._
