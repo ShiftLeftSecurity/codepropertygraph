@@ -42,6 +42,24 @@ object Method extends SchemaBase {
       )
       .protoId(22)
 
+    val lineNumberEnd = builder
+      .addProperty(
+        name = "LINE_NUMBER_END",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.ZeroOrOne,
+        comment = "Line where the code ends"
+      )
+      .protoId(12)
+
+    val columnNumberEnd = builder
+      .addProperty(
+        name = "COLUMN_NUMBER_END",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.ZeroOrOne,
+        comment = "Column where the code ends"
+      )
+      .protoId(16)
+
     val method: NodeType = builder
       .addNodeType(
         name = "METHOD",
@@ -111,16 +129,6 @@ object Method extends SchemaBase {
     binding
       .addProperties(isMethodNeverOverridden)
 
-    val vtable = builder
-      .addEdgeType(
-        name = "VTABLE",
-        comment = "Indicates that a method is part of the vtable of a certain type declaration"
-      )
-      .protoId(30)
-
-    typeDecl
-      .addOutEdge(edge = vtable, inNode = method)
-
     val binds = builder
       .addEdgeType(
         name = "BINDS",
@@ -130,6 +138,17 @@ object Method extends SchemaBase {
 
     typeDecl
       .addOutEdge(edge = binds, inNode = binding, cardinalityIn = Cardinality.One)
+
+    // To be removed
+
+    val vtable = builder
+      .addEdgeType(
+        name = "VTABLE",
+        comment = "Indicates that a method is part of the vtable of a certain type declaration"
+      )
+      .protoId(30)
+
+    typeDecl.addOutEdge(edge = vtable, inNode = method)
 
   }
 

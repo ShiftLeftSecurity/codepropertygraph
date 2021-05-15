@@ -78,13 +78,6 @@ object Base extends SchemaBase {
 
     // edge types
 
-    val sourceFile = builder
-      .addEdgeType(
-        name = "SOURCE_FILE",
-        comment = "Source file of a node, in which its LINE_NUMBER and COLUMN_NUMBER are valid"
-      )
-      .protoId(157)
-
 // node base types
 
     val withinMethod = builder.addNodeBaseType(
@@ -113,58 +106,33 @@ object Base extends SchemaBase {
       )
       .addProperties(name)
 
-    val lineNumberEnd = builder
-      .addProperty(
-        name = "LINE_NUMBER_END",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "Line where the code ends"
+
+    // Node types
+
+    val namespaceBlock: NodeType = builder
+      .addNodeType(
+        name = "NAMESPACE_BLOCK",
+        comment = """A reference to a namespace.
+                    |We borrow the concept of a "namespace block" from C++, that is, a namespace block
+                    |is a block of code that has been placed in the same namespace by a programmer.
+                    |This block may be introduced via a `package` statement in Java or
+                    |a `namespace{ }` statement in C++.
+                    |""".stripMargin
       )
-      .protoId(12)
+      .protoId(41)
+      .addProperties(name, fullName, filename)
 
-    val columnNumberEnd = builder
-      .addProperty(
-        name = "COLUMN_NUMBER_END",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "Column where the code ends"
+    val namespace: NodeType = builder
+      .addNodeType(
+        name = "NAMESPACE",
+        comment = """This node represents a namespace as a whole whereas the NAMESPACE_BLOCK is used
+                    |for each grouping occurrence of a namespace in code.
+                    |Single representing NAMESPACE node is required for easier navigation in
+                    |the query language.
+                    |""".stripMargin
       )
-      .protoId(16)
-
-    val modifierType = builder
-      .addProperty(
-        name = "MODIFIER_TYPE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = "Indicates the modifier which is represented by a MODIFIER node. See modifierTypes"
-      )
-      .protoId(26)
-
-// constants
-
-    val modifierTypes = builder.addConstants(
-      category = "ModifierTypes",
-      Constant(name = "STATIC", value = "STATIC", valueType = ValueTypes.STRING, comment = "The static modifier")
-        .protoId(1),
-      Constant(name = "PUBLIC", value = "PUBLIC", valueType = ValueTypes.STRING, comment = "The public modifier")
-        .protoId(2),
-      Constant(name = "PROTECTED",
-               value = "PROTECTED",
-               valueType = ValueTypes.STRING,
-               comment = "The protected modifier").protoId(3),
-      Constant(name = "PRIVATE", value = "PRIVATE", valueType = ValueTypes.STRING, comment = "The private modifier")
-        .protoId(4),
-      Constant(name = "ABSTRACT", value = "ABSTRACT", valueType = ValueTypes.STRING, comment = "The abstract modifier")
-        .protoId(5),
-      Constant(name = "NATIVE", value = "NATIVE", valueType = ValueTypes.STRING, comment = "The native modifier")
-        .protoId(6),
-      Constant(name = "CONSTRUCTOR",
-               value = "CONSTRUCTOR",
-               valueType = ValueTypes.STRING,
-               comment = "The constructor modifier").protoId(7),
-      Constant(name = "VIRTUAL", value = "VIRTUAL", valueType = ValueTypes.STRING, comment = "The virtual modifier")
-        .protoId(8),
-    )
+      .protoId(40)
+      .addProperties(name)
 
   }
 

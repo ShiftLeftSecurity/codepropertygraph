@@ -6,6 +6,7 @@ import overflowdb.storage.ValueTypes
 object Ast extends SchemaBase {
 
   def index: Int = 6
+  override def providedByFrontend: Boolean = true
 
   override def description: String =
     """
@@ -15,19 +16,24 @@ object Ast extends SchemaBase {
             base: Base.Schema,
             methodSchema: Method.Schema,
             common: CommonProperties.Schema,
-            typeDeclSchema: TypeDecl.Schema) =
-    new Schema(builder, base, methodSchema, common, typeDeclSchema)
+            typeDeclSchema: TypeDecl.Schema,
+            fs : FileSystem.Schema) =
+    new Schema(builder, base, methodSchema, common, typeDeclSchema, fs)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                methodSchema: Method.Schema,
                common: CommonProperties.Schema,
-               typeDeclSchema: TypeDecl.Schema) {
+               typeDeclSchema: TypeDecl.Schema,
+               fs : FileSystem.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import common._
     import methodSchema._
     import base._
     import typeDeclSchema._
+    import fs._
+
+    // Base types
 
     val astNode = builder
       .addNodeBaseType(
@@ -42,40 +48,39 @@ object Ast extends SchemaBase {
       )
       .addProperties(order)
 
-    val expression = builder
+
+    val callRepr = builder
       .addNodeBaseType(
-        name = "EXPRESSION",
-        comment = "Expression as a specialisation of tracking point"
+        name = "CALL_REPR",
+        comment = "A base class for nodes that represent different types of calls"
       )
-      .extendz(trackingPoint, astNode)
+      .addProperties(name, signature)
 
-    val namespaceBlock: NodeType = builder
-      .addNodeType(
-        name = "NAMESPACE_BLOCK",
-        comment = """A reference to a namespace.
-                    |We borrow the concept of a "namespace block" from C++, that is, a namespace block
-                    |is a block of code that has been placed in the same namespace by a programmer.
-                    |This block may be introduced via a `package` statement in Java or
-                    |a `namespace{ }` statement in C++.
-                    |""".stripMargin
-      )
-      .protoId(41)
-      .addProperties(name, fullName, filename)
-      .extendz(astNode)
-
-    val modifier: NodeType = builder
-      .addNodeType(
-        name = "MODIFIER",
-        comment = "A modifier, e.g., static, public, private"
-      )
-      .protoId(300)
-      .addProperties(modifierType)
-      .extendz(astNode)
+    // Method-related nodes that are part of the AST
 
     method.extendz(astNode)
     methodParameterIn.extendz(astNode)
     methodParameterOut.extendz(astNode)
     local.extendz(astNode)
+
+    // Type-related nodes that are part of the AST
+
+    typeDecl.extendz(astNode)
+    member.extendz(astNode)
+    typeParameter.extendz(astNode)
+    typeArgument.extendz(astNode)
+
+    namespaceBlock
+      .extendz(astNode)
+
+    val expression = builder
+      .addNodeBaseType(
+        name = "EXPRESSION",
+        comment = "Expression as a specialisation of tracking point"
+      )
+      .extendz(trackingPoint)
+
+    expression.extendz(astNode)
 
     val block: NodeType = builder
       .addNodeType(
@@ -94,6 +99,42 @@ object Ast extends SchemaBase {
       .protoId(31)
       .addProperties(typeFullName)
       .extendz(expression)
+
+    val literal: NodeType = builder
+      .addNodeType(
+        name = "LITERAL",
+        comment = "Literal/Constant"
+      )
+      .protoId(8)
+      .addProperties(typeFullName)
+      .extendz(expression)
+
+    val callNode: NodeType = builder
+      .addNodeType(
+        name = "CALL",
+        comment = """A (function/method) call. The `methodFullName` property is the name of the
+                    |invoked method (the callee) while the `typeFullName` is its return type, and
+                    |therefore, the return type of the call when viewing it as an expression. For
+                    |languages like Javascript, it is common that we may know the (short-) name
+                    |of the invoked method, but we do not know at compile time which method
+                    |will actually be invoked, e.g., because it depends on a dynamic import.
+                    |In this case, we leave `methodFullName` blank but at least fill out `name`,
+                    |which contains the method's (short-) name and `signature`, which contains
+                    |any information we may have about the types of arguments and return value.
+                    |""".stripMargin
+      )
+      .protoId(15)
+      .extendz(callRepr, expression)
+      .addProperties(methodFullName, typeFullName)
+
+    val identifier: NodeType = builder
+      .addNodeType(
+        name = "IDENTIFIER",
+        comment = "An arbitrary identifier/reference"
+      )
+      .protoId(27)
+      .addProperties(typeFullName)
+      .extendz(expression, localLike)
 
     val canonicalName = builder
       .addProperty(
@@ -125,66 +166,23 @@ object Ast extends SchemaBase {
       .addProperties(canonicalName)
       .extendz(expression)
 
-    val literal: NodeType = builder
-      .addNodeType(
-        name = "LITERAL",
-        comment = "Literal/Constant"
-      )
-      .protoId(8)
-      .addProperties(typeFullName)
-      .extendz(expression)
-
-    val callRepr = builder
-      .addNodeBaseType(
-        name = "CALL_REPR",
-        comment = "A base class for nodes that represent different types of calls"
-      )
-      .addProperties(name, signature)
-
-    val callNode: NodeType = builder
-      .addNodeType(
-        name = "CALL",
-        comment = """A (function/method) call. The `methodFullName` property is the name of the
-                    |invoked method (the callee) while the `typeFullName` is its return type, and
-                    |therefore, the return type of the call when viewing it as an expression. For
-                    |languages like Javascript, it is common that we may know the (short-) name
-                    |of the invoked method, but we do not know at compile time which method
-                    |will actually be invoked, e.g., because it depends on a dynamic import.
-                    |In this case, we leave `methodFullName` blank but at least fill out `name`,
-                    |which contains the method's (short-) name and `signature`, which contains
-                    |any information we may have about the types of arguments and return value.
-                    |""".stripMargin
-      )
-      .protoId(15)
-      .extendz(callRepr, expression)
-      .addProperties(methodFullName, typeFullName)
-
-    val identifier: NodeType = builder
-      .addNodeType(
-        name = "IDENTIFIER",
-        comment = "An arbitrary identifier/reference"
-      )
-      .protoId(27)
-      .addProperties(typeFullName)
-      .extendz(expression, localLike)
-
-    val controlStructureType = builder
+    val modifierType = builder
       .addProperty(
-        name = "CONTROL_STRUCTURE_TYPE",
+        name = "MODIFIER_TYPE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = "Indicates the control structure type. See controlStructureTypes"
+        comment = "Indicates the modifier which is represented by a MODIFIER node. See modifierTypes"
       )
-      .protoId(27)
+      .protoId(26)
 
-    val controlStructure: NodeType = builder
+    val modifier: NodeType = builder
       .addNodeType(
-        name = "CONTROL_STRUCTURE",
-        comment = "A control structure such as if, while, or for"
+        name = "MODIFIER",
+        comment = "A modifier, e.g., static, public, private"
       )
-      .protoId(339)
-      .addProperties(parserTypeName, controlStructureType)
-      .extendz(expression)
+      .protoId(300)
+      .addProperties(modifierType)
+      .extendz(astNode)
 
     val jumpTarget: NodeType = builder
       .addNodeType(
@@ -193,6 +191,17 @@ object Ast extends SchemaBase {
       )
       .protoId(340)
       .addProperties(name, parserTypeName)
+      .extendz(astNode)
+
+    val methodInst: NodeType = builder
+      .addNodeType(
+        name = "METHOD_INST",
+        comment = """A method instance which always has to reference a method and may have type
+                    |argument children if the referred to method is a template
+                    |""".stripMargin
+      )
+      .protoId(32)
+      .addProperties(name, signature, fullName, methodFullName)
       .extendz(astNode)
 
     val methodRef: NodeType = builder
@@ -221,6 +230,24 @@ object Ast extends SchemaBase {
       .protoId(30)
       .extendz(expression)
 
+    val controlStructureType = builder
+      .addProperty(
+        name = "CONTROL_STRUCTURE_TYPE",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = "Indicates the control structure type. See controlStructureTypes"
+      )
+      .protoId(27)
+
+    val controlStructure: NodeType = builder
+      .addNodeType(
+        name = "CONTROL_STRUCTURE",
+        comment = "A control structure such as if, while, or for"
+      )
+      .protoId(339)
+      .addProperties(parserTypeName, controlStructureType)
+      .extendz(expression)
+
     val unknown: NodeType = builder
       .addNodeType(
         name = "UNKNOWN",
@@ -230,16 +257,7 @@ object Ast extends SchemaBase {
       .addProperties(parserTypeName, typeFullName)
       .extendz(expression)
 
-    val methodInst: NodeType = builder
-      .addNodeType(
-        name = "METHOD_INST",
-        comment = """A method instance which always has to reference a method and may have type
-                    |argument children if the referred to method is a template
-                    |""".stripMargin
-      )
-      .protoId(32)
-      .addProperties(name, signature, fullName, methodFullName)
-      .extendz(astNode)
+    // Edge types
 
     val ast = builder
       .addEdgeType(
@@ -255,13 +273,14 @@ object Ast extends SchemaBase {
       )
       .protoId(56)
 
-    member.extendz(astNode)
-    typeDecl.extendz(astNode)
+    file
+      .addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
+
+    file
+      .extendz(astNode)
+
     member.addOutEdge(edge = ast, inNode = modifier)
-    typeParameter.extendz(astNode)
-    typeArgument.extendz(astNode)
-    tpe
-      .addOutEdge(edge = ast, inNode = typeArgument)
+    tpe.addOutEdge(edge = ast, inNode = typeArgument)
 
     typeDecl
       .addOutEdge(edge = ast, inNode = typeParameter)
@@ -346,6 +365,12 @@ object Ast extends SchemaBase {
 
     methodParameterIn.addOutEdge(edge = ast, inNode = unknown)
 
+    namespaceBlock
+      .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
+
+    namespace.extendz(astNode)
+
     controlStructure
       .addOutEdge(edge = condition, inNode = literal)
       .addOutEdge(edge = condition, inNode = callNode)
@@ -387,6 +412,32 @@ object Ast extends SchemaBase {
         .protoId(10),
     )
 
+    val modifierTypes = builder.addConstants(
+      category = "ModifierTypes",
+      Constant(name = "STATIC", value = "STATIC", valueType = ValueTypes.STRING, comment = "The static modifier")
+        .protoId(1),
+      Constant(name = "PUBLIC", value = "PUBLIC", valueType = ValueTypes.STRING, comment = "The public modifier")
+        .protoId(2),
+      Constant(name = "PROTECTED",
+        value = "PROTECTED",
+        valueType = ValueTypes.STRING,
+        comment = "The protected modifier").protoId(3),
+      Constant(name = "PRIVATE", value = "PRIVATE", valueType = ValueTypes.STRING, comment = "The private modifier")
+        .protoId(4),
+      Constant(name = "ABSTRACT", value = "ABSTRACT", valueType = ValueTypes.STRING, comment = "The abstract modifier")
+        .protoId(5),
+      Constant(name = "NATIVE", value = "NATIVE", valueType = ValueTypes.STRING, comment = "The native modifier")
+        .protoId(6),
+      Constant(name = "CONSTRUCTOR",
+        value = "CONSTRUCTOR",
+        valueType = ValueTypes.STRING,
+        comment = "The constructor modifier").protoId(7),
+      Constant(name = "VIRTUAL", value = "VIRTUAL", valueType = ValueTypes.STRING, comment = "The virtual modifier")
+        .protoId(8),
+    )
+
+    // To refactor
+
     val ref = builder
       .addEdgeType(
         name = "REF",
@@ -394,14 +445,14 @@ object Ast extends SchemaBase {
       )
       .protoId(10)
 
-    typeArgument
-      .addOutEdge(edge = ref, inNode = tpe)
+    typeArgument.addOutEdge(edge = ref, inNode = tpe)
 
     identifier
       .addOutEdge(edge = ref, inNode = local, cardinalityOut = Cardinality.ZeroOrOne)
-
-    identifier
       .addOutEdge(edge = ref, inNode = methodParameterIn, cardinalityOut = Cardinality.ZeroOrOne)
+
+    namespaceBlock
+      .addOutEdge(edge = ref, inNode = namespace)
 
     ///////////////////////////////////////
     // To be removed from OSS spec

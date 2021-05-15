@@ -12,21 +12,18 @@ object Comment extends SchemaBase {
       |""".stripMargin
 
   def apply(builder: SchemaBuilder,
-            base: Base.Schema,
-            enhancements: Enhancements.Schema,
             common: CommonProperties.Schema,
-            ast: Ast.Schema) =
-    new Schema(builder, base, enhancements, common, ast)
+            ast: Ast.Schema,
+            fs : FileSystem.Schema) =
+    new Schema(builder, common, ast, fs)
 
   class Schema(builder: SchemaBuilder,
-               base: Base.Schema,
-               enhancements: Enhancements.Schema,
                common: CommonProperties.Schema,
-               astSchema: Ast.Schema) {
-    import base._
-    import enhancements._
+               astSchema: Ast.Schema,
+               fs : FileSystem.Schema) {
     import common._
     import astSchema._
+    import fs._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
 // node types
@@ -44,7 +41,6 @@ object Comment extends SchemaBase {
 
     file
       .addOutEdge(edge = ast, inNode = comment)
-// constants
 
   }
 
