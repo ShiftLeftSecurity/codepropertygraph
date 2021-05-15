@@ -8,27 +8,33 @@ object Enhancements extends SchemaBase {
 
   override def description: String =
     """
-      | Enhancement nodes/edges that will automatically be derived from the cpg
-      | Note: these should *NOT* be written by the language frontend.
+      |Node and edges introduced in the linking stage. These are edges that can only
+      |be drawn once all compilation units have gone through local analysis as done
+      |by the language frontend.
+      |
+      |These nodes/edges should NOT be created by the language frontend.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
             methodSchema: Method.Schema,
             methodBody: MethodBody.Schema,
-            typeDeclSchema: TypeDecl.Schema) =
-    new Schema(builder, base, methodSchema, methodBody, typeDeclSchema)
+            typeDeclSchema: TypeDecl.Schema,
+            common: CommonProperties.Schema) =
+    new Schema(builder, base, methodSchema, methodBody, typeDeclSchema, common)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                methodSchema: Method.Schema,
                methodBody: MethodBody.Schema,
-               typeDeclSchema: TypeDecl.Schema) {
+               typeDeclSchema: TypeDecl.Schema,
+               common: CommonProperties.Schema) {
 
     import base._
     import methodSchema._
     import methodBody._
     import typeDeclSchema._
+    import common._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
 // node properties
@@ -47,19 +53,19 @@ object Enhancements extends SchemaBase {
       )
       .protoId(21)
 
-    val inheritsFrom = builder
-      .addEdgeType(
-        name = "INHERITS_FROM",
-        comment = "Inheritance relation between types"
-      )
-      .protoId(23)
-
     val contains = builder
       .addEdgeType(
         name = "CONTAINS",
         comment = "Shortcut over multiple AST edges"
       )
       .protoId(28)
+
+    val inheritsFrom = builder
+      .addEdgeType(
+        name = "INHERITS_FROM",
+        comment = "Inheritance relation between types"
+      )
+      .protoId(23)
 
     val aliasOf = builder
       .addEdgeType(
@@ -68,7 +74,7 @@ object Enhancements extends SchemaBase {
       )
       .protoId(138)
 
-// node types
+    // node types
 
     val file: NodeType = builder
       .addNodeType(
@@ -100,15 +106,15 @@ object Enhancements extends SchemaBase {
     val namespace: NodeType = builder
       .addNodeType(
         name = "NAMESPACE",
-        comment =
-          "This node represents a namespace as a whole whereas the NAMESPACE_BLOCK is used for each grouping occurrence of a namespace in code. Single representing NAMESPACE node is required for easier navigation in the query language"
+        comment = """This node represents a namespace as a whole whereas the NAMESPACE_BLOCK is used
+            |for each grouping occurrence of a namespace in code.
+            |Single representing NAMESPACE node is required for easier navigation in
+            |the query language.
+            |""".stripMargin
       )
       .protoId(40)
       .addProperties(name)
       .extendz(astNode)
-
-    file
-      .addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
 
 // node relations
 
@@ -116,6 +122,7 @@ object Enhancements extends SchemaBase {
       .addOutEdge(edge = ref, inNode = method, cardinalityOut = Cardinality.One)
 
     file
+      .addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = contains, inNode = typeDecl)
       .addOutEdge(edge = contains, inNode = method)
 
@@ -194,31 +201,6 @@ object Enhancements extends SchemaBase {
 
     unknown
       .addOutEdge(edge = evalType, inNode = tpe)
-
-    val implicitCall: NodeType = builder
-      .addNodeType(
-        name = "IMPLICIT_CALL",
-        comment = "An implicit call site hidden in a method indicated by METHOD_MAP policy entries"
-      )
-      .protoId(307)
-      .extendz(callRepr, trackingPoint)
-
-    val postExecutionCall: NodeType = builder
-      .addNodeType(
-        name = "POST_EXECUTION_CALL",
-        comment =
-          "Indicates the existence of a call executed on a return value or out parameter of a method after this method has been executed. This is used to model framework code calling functors returned from user code. The outgoing REF edge indicates on which returned entitity the call will happen."
-      )
-      .protoId(3071)
-      .extendz(callRepr, trackingPoint)
-
-    postExecutionCall
-      .addOutEdge(edge = ref, inNode = methodReturn)
-      .addOutEdge(edge = ref, inNode = methodParameterOut)
-
-    method
-      .addOutEdge(edge = ast, inNode = implicitCall)
-      .addOutEdge(edge = ast, inNode = postExecutionCall)
 
   }
 

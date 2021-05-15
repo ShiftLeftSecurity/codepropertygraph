@@ -11,13 +11,22 @@ object MethodBody extends SchemaBase {
     """
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, typeDecl: TypeDecl.Schema) =
-    new Schema(builder, base, methodSchema, typeDecl)
+  def apply(builder: SchemaBuilder,
+            base: Base.Schema,
+            common: CommonProperties.Schema,
+            methodSchema: Method.Schema,
+            typeDecl: TypeDecl.Schema) =
+    new Schema(builder, base, common, methodSchema, typeDecl)
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, typeDecl: TypeDecl.Schema) {
+  class Schema(builder: SchemaBuilder,
+               base: Base.Schema,
+               common: CommonProperties.Schema,
+               methodSchema: Method.Schema,
+               typeDecl: TypeDecl.Schema) {
     import base._
     import methodSchema._
     import typeDecl._
+    import common._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     val argumentIndex = builder
@@ -62,7 +71,7 @@ object MethodBody extends SchemaBase {
         comment = "Expression as a specialisation of tracking point"
       )
       .addProperties(argumentIndex)
-      .extendz(trackingPoint, cfgNode, astNode)
+      .extendz(trackingPoint, astNode)
 
     val callRepr = builder
       .addNodeBaseType(
@@ -70,7 +79,6 @@ object MethodBody extends SchemaBase {
         comment = "A base class for nodes that represent different types of calls"
       )
       .addProperties(name, signature)
-      .extendz(cfgNode)
 
     val block: NodeType = builder
       .addNodeType(
@@ -190,7 +198,7 @@ object MethodBody extends SchemaBase {
       )
       .protoId(340)
       .addProperties(name, parserTypeName, argumentIndex)
-      .extendz(cfgNode, astNode)
+      .extendz(astNode)
 
     val methodRef: NodeType = builder
       .addNodeType(
@@ -238,32 +246,10 @@ object MethodBody extends SchemaBase {
       .addProperties(name, signature, fullName, methodFullName)
       .extendz(astNode)
 
-    method
+  method
       .addOutEdge(edge = ast, inNode = block, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
 
-    callNode
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
+  callNode
       .addOutEdge(edge = ast, inNode = callNode)
       .addOutEdge(edge = ast, inNode = identifier)
       .addOutEdge(edge = ast, inNode = fieldIdentifier, cardinalityIn = Cardinality.One)
@@ -309,33 +295,6 @@ object MethodBody extends SchemaBase {
 
     identifier
       .addOutEdge(edge = ref, inNode = local, cardinalityOut = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-
-    fieldIdentifier
-      .addOutEdge(edge = cfg,
-                  inNode = callNode,
-                  cardinalityOut = Cardinality.One,
-                  cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
 
     ret
       .addOutEdge(edge = ast, inNode = callNode)
@@ -377,7 +336,7 @@ object MethodBody extends SchemaBase {
       .addOutEdge(edge = argument, inNode = controlStructure)
       .addOutEdge(edge = argument, inNode = unknown)
 
-    block
+  block
       .addOutEdge(edge = ast, inNode = callNode)
       .addOutEdge(edge = ast, inNode = identifier)
       .addOutEdge(edge = ast, inNode = literal)
@@ -389,58 +348,8 @@ object MethodBody extends SchemaBase {
       .addOutEdge(edge = ast, inNode = unknown)
       .addOutEdge(edge = ast, inNode = jumpTarget)
       .addOutEdge(edge = ast, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
 
-    literal
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-
-    methodRef
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-
-    typeRef
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-
-    controlStructure
+  controlStructure
       .addOutEdge(edge = ast, inNode = literal, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = modifier)
       .addOutEdge(edge = ast, inNode = callNode, cardinalityIn = Cardinality.One)
@@ -464,43 +373,8 @@ object MethodBody extends SchemaBase {
       .addOutEdge(edge = condition, inNode = jumpTarget)
       .addOutEdge(edge = condition, inNode = unknown)
       .addOutEdge(edge = condition, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
 
-    jumpTarget
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-
-    unknown
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
+  unknown
       .addOutEdge(edge = ast, inNode = literal)
       .addOutEdge(edge = ast, inNode = modifier)
       .addOutEdge(edge = ast, inNode = callNode)
@@ -517,18 +391,6 @@ object MethodBody extends SchemaBase {
 
     identifier
       .addOutEdge(edge = ref, inNode = methodParameterIn, cardinalityOut = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = cfg, inNode = methodReturn)
-
-    ret.addOutEdge(edge = cfg,
-                   inNode = methodReturn,
-                   cardinalityOut = Cardinality.One,
-                   cardinalityIn = Cardinality.ZeroOrOne)
-
-    methodRef
-      .addOutEdge(edge = cfg, inNode = methodReturn)
-
-    typeRef
-      .addOutEdge(edge = cfg, inNode = methodReturn)
 
     methodInst
       .addOutEdge(edge = ast, inNode = typeArgument)
@@ -563,6 +425,37 @@ object MethodBody extends SchemaBase {
       Constant(name = "TRY", value = "TRY", valueType = ValueTypes.STRING, comment = "Represents a try statement")
         .protoId(10),
     )
+
+    ///////////////////////////////////////
+    // To be removed from OSS spec
+    ///////////////////////////////////////
+
+    val implicitCall: NodeType = builder
+      .addNodeType(
+        name = "IMPLICIT_CALL",
+        comment = "An implicit call site hidden in a method indicated by METHOD_MAP policy entries"
+      )
+      .protoId(307)
+      .extendz(callRepr, trackingPoint)
+
+    val postExecutionCall: NodeType = builder
+      .addNodeType(
+        name = "POST_EXECUTION_CALL",
+        comment =
+          "Indicates the existence of a call executed on a return value or out parameter of a method after this method has been executed. This is used to model framework code calling functors returned from user code. The outgoing REF edge indicates on which returned entitity the call will happen."
+      )
+      .protoId(3071)
+      .extendz(callRepr, trackingPoint)
+
+    postExecutionCall
+      .addOutEdge(edge = ref, inNode = methodReturn)
+      .addOutEdge(edge = ref, inNode = methodParameterOut)
+
+    method
+      .addOutEdge(edge = ast, inNode = implicitCall)
+      .addOutEdge(edge = ast, inNode = postExecutionCall)
+
+    /////////////////////////////////////////
 
   }
 

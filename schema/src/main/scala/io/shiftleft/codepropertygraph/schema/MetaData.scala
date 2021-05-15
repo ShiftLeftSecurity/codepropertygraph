@@ -14,11 +14,10 @@ object MetaData extends SchemaBase {
       |modified by passes.
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
+  def apply(builder: SchemaBuilder, common: CommonProperties.Schema) = new Schema(builder, common)
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema) {
-
-    import base._
+  class Schema(builder: SchemaBuilder, common: CommonProperties.Schema) {
+    import common._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     val overlays = builder

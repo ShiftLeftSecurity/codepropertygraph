@@ -5,7 +5,8 @@ import overflowdb.storage.ValueTypes
 
 object TypeDecl extends SchemaBase {
 
-  def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
+  def apply(builder: SchemaBuilder, base: Base.Schema, common: CommonProperties.Schema) =
+    new Schema(builder, base, common)
 
   def index: Int = 3
   override def providedByFrontend: Boolean = true
@@ -15,8 +16,9 @@ object TypeDecl extends SchemaBase {
       | Type layer (local).
       |""".stripMargin
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema) {
+  class Schema(builder: SchemaBuilder, base: Base.Schema, common: CommonProperties.Schema) {
     import base._
+    import common._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     val aliasTypeFullName = builder

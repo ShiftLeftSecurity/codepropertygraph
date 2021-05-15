@@ -11,12 +11,19 @@ object Comment extends SchemaBase {
     """
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) =
-    new Schema(builder, base, enhancements)
+  def apply(builder: SchemaBuilder,
+            base: Base.Schema,
+            enhancements: Enhancements.Schema,
+            common: CommonProperties.Schema) =
+    new Schema(builder, base, enhancements, common)
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema, enhancements: Enhancements.Schema) {
+  class Schema(builder: SchemaBuilder,
+               base: Base.Schema,
+               enhancements: Enhancements.Schema,
+               common: CommonProperties.Schema) {
     import base._
     import enhancements._
+    import common._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
 // node types

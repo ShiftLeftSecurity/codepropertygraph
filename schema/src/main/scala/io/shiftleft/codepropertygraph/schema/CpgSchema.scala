@@ -8,26 +8,28 @@ import overflowdb.schema.{Schema, SchemaBuilder}
   */
 class CpgSchema(builder: SchemaBuilder) {
   // the foundation
-  val base = Base(builder)
-  val metaData = MetaData(builder, base)
-  val typeDecl = TypeDecl(builder, base)
+  val common = CommonProperties(builder)
+  val base = Base(builder, common)
+  val metaData = MetaData(builder, common)
+  val typeDecl = TypeDecl(builder, base, common)
 
-  val method = Method(builder, base, typeDecl)
-  val methodBody = MethodBody(builder, base, method, typeDecl)
+  val method = Method(builder, base, common, typeDecl)
+  val methodBody = MethodBody(builder, base, common, method, typeDecl)
 
   val callGraph = CallGraph(builder, method, methodBody)
+  val cfg = ControlFlowGraph(builder, base, method, methodBody, common)
   val dominators = Dominators(builder, method, methodBody)
   val pdg = Pdg(builder, method, methodBody)
 
-  val enhancements = Enhancements(builder, base, method, methodBody, typeDecl)
+  val enhancements = Enhancements(builder, base, method, methodBody, typeDecl, common)
 
   // everything else
   val protoSerialize = ProtoSerialize(builder, methodBody)
   val closure = Closure(builder, base, method, methodBody, callGraph)
-  val finding = Finding(builder, base)
+  val finding = Finding(builder, common)
   val operators = Operators(builder)
-  val sourceSpecific = Comment(builder, base, enhancements)
-  val tagsAndLocation = TagsAndLocation(builder, base, typeDecl, method, methodBody, enhancements)
+  val sourceSpecific = Comment(builder, base, enhancements, common)
+  val tagsAndLocation = TagsAndLocation(builder, base, typeDecl, method, methodBody, enhancements, common)
 }
 
 object CpgSchema {

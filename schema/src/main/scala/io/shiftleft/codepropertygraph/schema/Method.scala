@@ -5,8 +5,11 @@ import overflowdb.storage.ValueTypes
 
 object Method extends SchemaBase {
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: TypeDecl.Schema) =
-    new Schema(builder, base, typeDeclSchema)
+  def apply(builder: SchemaBuilder,
+            base: Base.Schema,
+            common: CommonProperties.Schema,
+            typeDeclSchema: TypeDecl.Schema) =
+    new Schema(builder, base, common, typeDeclSchema)
 
   def index: Int = 2
   override def providedByFrontend: Boolean = true
@@ -17,8 +20,12 @@ object Method extends SchemaBase {
       | This layer is provided by the frontend and may be modified by passes.
       |""".stripMargin
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: TypeDecl.Schema) {
+  class Schema(builder: SchemaBuilder,
+               base: Base.Schema,
+               common: CommonProperties.Schema,
+               typeDeclSchema: TypeDecl.Schema) {
     import base._
+    import common._
     import typeDeclSchema._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
@@ -42,7 +49,7 @@ object Method extends SchemaBase {
       )
       .protoId(1)
       .addProperties(fullName, isExternal, signature, lineNumberEnd, columnNumberEnd, filename, hash)
-      .extendz(declaration, cfgNode, astNode)
+      .extendz(declaration, astNode)
 
     method
       .addProperties(astParentType, astParentFullName)
@@ -72,7 +79,7 @@ object Method extends SchemaBase {
       )
       .protoId(3)
       .addProperties(typeFullName)
-      .extendz(cfgNode, trackingPoint)
+      .extendz(trackingPoint)
 
     val binding: NodeType = builder
       .addNodeType(
@@ -95,15 +102,11 @@ object Method extends SchemaBase {
     binding
       .addProperties(isMethodNeverOverridden)
 
-    method
+  method
       .addOutEdge(edge = ast, inNode = methodReturn, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = methodParameterIn, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = typeParameter, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = cfg,
-                  inNode = methodReturn,
-                  cardinalityOut = Cardinality.ZeroOrOne,
-                  cardinalityIn = Cardinality.ZeroOrOne)
 
     val vtable = builder
       .addEdgeType(
