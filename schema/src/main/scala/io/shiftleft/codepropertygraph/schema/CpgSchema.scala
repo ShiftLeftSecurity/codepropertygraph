@@ -14,22 +14,22 @@ class CpgSchema(builder: SchemaBuilder) {
   val typeDecl = TypeDecl(builder, base, common)
 
   val method = Method(builder, base, common, typeDecl)
-  val methodBody = MethodBody(builder, base, common, method, typeDecl)
 
-  val callGraph = CallGraph(builder, method, methodBody)
-  val cfg = ControlFlowGraph(builder, base, method, methodBody, common)
-  val dominators = Dominators(builder, method, methodBody)
-  val pdg = Pdg(builder, method, methodBody)
+  val ast = Ast(builder, base, method, common, typeDecl)
+  val callGraph = CallGraph(builder, method, ast)
+  val cfg = ControlFlowGraph(builder, base, method, ast, common)
+  val dominators = Dominators(builder, method, ast)
+  val pdg = Pdg(builder, method, ast)
 
-  val enhancements = Enhancements(builder, base, method, methodBody, typeDecl, common)
+  val enhancements = Enhancements(builder, base, method, ast, typeDecl, common)
 
   // everything else
-  val protoSerialize = ProtoSerialize(builder, methodBody)
-  val closure = Closure(builder, base, method, methodBody, callGraph)
+  val protoSerialize = ProtoSerialize(builder, ast)
+  val closure = Closure(builder, method, ast, callGraph)
   val finding = Finding(builder, common)
   val operators = Operators(builder)
-  val sourceSpecific = Comment(builder, base, enhancements, common)
-  val tagsAndLocation = TagsAndLocation(builder, base, typeDecl, method, methodBody, enhancements, common)
+  val sourceSpecific = Comment(builder, base, enhancements, common, ast)
+  val tagsAndLocation = TagsAndLocation(builder, base, typeDecl, method, ast, enhancements, common)
 }
 
 object CpgSchema {

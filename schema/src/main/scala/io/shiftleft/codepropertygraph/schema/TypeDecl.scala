@@ -62,7 +62,6 @@ object TypeDecl extends SchemaBase {
       )
       .protoId(46)
       .addProperties(name, fullName, isExternal, inheritsFromTypeFullName, aliasTypeFullName, filename)
-      .extendz(astNode)
 
     typeDecl
       .addProperties(astParentType, astParentFullName)
@@ -74,9 +73,7 @@ object TypeDecl extends SchemaBase {
       )
       .protoId(9)
       .addProperties(code, typeFullName)
-      .extendz(declaration, astNode)
-
-    member.addOutEdge(edge = ast, inNode = modifier)
+      .extendz(declaration)
 
     val typeParameter: NodeType = builder
       .addNodeType(
@@ -85,7 +82,6 @@ object TypeDecl extends SchemaBase {
       )
       .protoId(47)
       .addProperties(name)
-      .extendz(astNode)
 
     val typeArgument: NodeType = builder
       .addNodeType(
@@ -95,7 +91,6 @@ object TypeDecl extends SchemaBase {
                     |""".stripMargin
       )
       .protoId(48)
-      .extendz(astNode)
 
     val tpe: NodeType = builder
       .addNodeType(
@@ -106,19 +101,8 @@ object TypeDecl extends SchemaBase {
       .protoId(45)
       .addProperties(name, fullName, typeDeclFullName)
 
-    tpe
-      .addOutEdge(edge = ast, inNode = typeArgument)
-
-    typeArgument
-      .addOutEdge(edge = ref, inNode = tpe)
-
     typeArgument
       .addOutEdge(edge = bindsTo, inNode = typeParameter)
-
-    typeDecl
-      .addOutEdge(edge = ast, inNode = typeParameter)
-      .addOutEdge(edge = ast, inNode = member, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
 
     typeDecl
       .addOutEdge(edge = typeDeclAlias, inNode = typeDecl)

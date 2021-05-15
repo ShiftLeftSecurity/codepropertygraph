@@ -10,13 +10,21 @@ object ControlFlowGraph extends SchemaBase {
     """
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, base : Base.Schema, methodSchema: Method.Schema, methodBody: MethodBody.Schema, common : CommonProperties.Schema) =
-    new Schema(builder, base, methodSchema, methodBody, common)
+  def apply(builder: SchemaBuilder,
+            base: Base.Schema,
+            methodSchema: Method.Schema,
+            ast: Ast.Schema,
+            common: CommonProperties.Schema) =
+    new Schema(builder, base, methodSchema, ast, common)
 
-  class Schema(builder: SchemaBuilder, base : Base.Schema, methodSchema: Method.Schema, methodBody: MethodBody.Schema, common : CommonProperties.Schema) {
+  class Schema(builder: SchemaBuilder,
+               base: Base.Schema,
+               methodSchema: Method.Schema,
+               ast: Ast.Schema,
+               common: CommonProperties.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
-    import methodBody._
+    import ast._
     import common._
     import base._
 
@@ -28,13 +36,13 @@ object ControlFlowGraph extends SchemaBase {
       .addProperties(lineNumber, columnNumber, code)
       .extendz(withinMethod, astNode)
 
-      // Method and MethodReturn nodes are used as ENTRY and EXIT nodes respectively
-      method.extendz(cfgNode)
-      methodReturn.extendz(cfgNode)
+    // Method and MethodReturn nodes are used as ENTRY and EXIT nodes respectively
+    method.extendz(cfgNode)
+    methodReturn.extendz(cfgNode)
 
-      expression.extendz(cfgNode)
-      callRepr.extendz(cfgNode)
-      jumpTarget.extendz(cfgNode)
+    expression.extendz(cfgNode)
+    callRepr.extendz(cfgNode)
+    jumpTarget.extendz(cfgNode)
 
     val cfg = builder
       .addEdgeType(
@@ -45,9 +53,9 @@ object ControlFlowGraph extends SchemaBase {
 
     method
       .addOutEdge(edge = cfg,
-        inNode = methodReturn,
-        cardinalityOut = Cardinality.ZeroOrOne,
-        cardinalityIn = Cardinality.ZeroOrOne)
+                  inNode = methodReturn,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = cfg, inNode = callNode)
       .addOutEdge(edge = cfg, inNode = identifier)
       .addOutEdge(edge = cfg, inNode = fieldIdentifier)
@@ -89,9 +97,9 @@ object ControlFlowGraph extends SchemaBase {
 
     fieldIdentifier
       .addOutEdge(edge = cfg,
-        inNode = callNode,
-        cardinalityOut = Cardinality.One,
-        cardinalityIn = Cardinality.ZeroOrOne)
+                  inNode = callNode,
+                  cardinalityOut = Cardinality.One,
+                  cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = cfg, inNode = identifier)
       .addOutEdge(edge = cfg, inNode = fieldIdentifier)
       .addOutEdge(edge = cfg, inNode = literal)
@@ -195,9 +203,9 @@ object ControlFlowGraph extends SchemaBase {
       .addOutEdge(edge = cfg, inNode = unknown)
 
     ret.addOutEdge(edge = cfg,
-      inNode = methodReturn,
-      cardinalityOut = Cardinality.One,
-      cardinalityIn = Cardinality.ZeroOrOne)
+                   inNode = methodReturn,
+                   cardinalityOut = Cardinality.One,
+                   cardinalityIn = Cardinality.ZeroOrOne)
 
     methodRef
       .addOutEdge(edge = cfg, inNode = methodReturn)

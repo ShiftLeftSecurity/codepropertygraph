@@ -14,16 +14,19 @@ object Comment extends SchemaBase {
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
             enhancements: Enhancements.Schema,
-            common: CommonProperties.Schema) =
-    new Schema(builder, base, enhancements, common)
+            common: CommonProperties.Schema,
+            ast: Ast.Schema) =
+    new Schema(builder, base, enhancements, common, ast)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                enhancements: Enhancements.Schema,
-               common: CommonProperties.Schema) {
+               common: CommonProperties.Schema,
+               astSchema: Ast.Schema) {
     import base._
     import enhancements._
     import common._
+    import astSchema._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
 // node types

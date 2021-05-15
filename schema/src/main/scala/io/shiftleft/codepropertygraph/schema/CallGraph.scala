@@ -11,13 +11,28 @@ object CallGraph extends SchemaBase {
     """
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, methodSchema: Method.Schema, methodBody: MethodBody.Schema) =
-    new Schema(builder, methodSchema, methodBody)
+  def apply(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) =
+    new Schema(builder, methodSchema, ast)
 
-  class Schema(builder: SchemaBuilder, methodSchema: Method.Schema, methodBody: MethodBody.Schema) {
+  class Schema(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
-    import methodBody._
+    import ast._
+
+    val argumentIndex = builder
+      .addProperty(
+        name = "ARGUMENT_INDEX",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.One,
+        comment = """AST-children of CALL nodes have an argument index, that is used to match
+                    |call-site arguments with callee parameters. Explicit parameters are numbered
+                    |from 1 to N, while index 0 is reserved for implicit self / this parameter.
+                    |CALLs without implicit parameter therefore have arguments starting with index 1.
+                    |AST-children of BLOCK nodes may have an argument index as well; in this case,
+                    |the last argument index determines the return-value of a BLOCK expression
+                    |""".stripMargin
+      )
+      .protoId(40)
 
     val evaluationStrategy = builder
       .addProperty(
@@ -45,6 +60,26 @@ object CallGraph extends SchemaBase {
       )
       .protoId(6)
 
+    val argument = builder
+      .addEdgeType(
+        name = "ARGUMENT",
+        comment = "Relation between a CALL and its arguments and RETURN and the returned expression"
+      )
+      .protoId(156)
+
+    val receiver = builder
+      .addEdgeType(
+        name = "RECEIVER",
+        comment = "The receiver of a method call which is either an object or a pointer"
+      )
+      .protoId(55)
+
+    jumpTarget
+      .addProperty(argumentIndex)
+
+    expression
+      .addProperties(argumentIndex)
+
     callNode
       .addProperties(dispatchType)
 
@@ -59,6 +94,71 @@ object CallGraph extends SchemaBase {
 
     callNode
       .addOutEdge(edge = call, inNode = method)
+
+    callNode
+      .addOutEdge(edge = receiver,
+                  inNode = callNode,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver,
+                  inNode = identifier,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver,
+                  inNode = literal,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver,
+                  inNode = methodRef,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver, inNode = typeRef)
+      .addOutEdge(edge = receiver,
+                  inNode = block,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver, inNode = controlStructure)
+      .addOutEdge(edge = receiver, inNode = unknown)
+      .addOutEdge(edge = argument, inNode = callNode, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = identifier, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = fieldIdentifier, cardinalityIn = Cardinality.One)
+      .addOutEdge(edge = argument, inNode = literal, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = methodRef, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = typeRef)
+      .addOutEdge(edge = argument, inNode = block, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = jumpTarget)
+      .addOutEdge(edge = argument, inNode = controlStructure)
+      .addOutEdge(edge = argument, inNode = unknown)
+
+    ret
+      .addOutEdge(edge = argument,
+                  inNode = callNode,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument,
+                  inNode = identifier,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument,
+                  inNode = literal,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument,
+                  inNode = methodRef,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = typeRef)
+      .addOutEdge(edge = argument,
+                  inNode = ret,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument,
+                  inNode = block,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = jumpTarget)
+      .addOutEdge(edge = argument, inNode = controlStructure)
+      .addOutEdge(edge = argument, inNode = unknown)
 
     val dispatchTypes = builder.addConstants(
       category = "DispatchTypes",

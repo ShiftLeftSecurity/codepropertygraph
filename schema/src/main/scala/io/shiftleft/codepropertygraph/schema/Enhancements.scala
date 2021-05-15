@@ -18,21 +18,21 @@ object Enhancements extends SchemaBase {
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
             methodSchema: Method.Schema,
-            methodBody: MethodBody.Schema,
+            ast: Ast.Schema,
             typeDeclSchema: TypeDecl.Schema,
             common: CommonProperties.Schema) =
-    new Schema(builder, base, methodSchema, methodBody, typeDeclSchema, common)
+    new Schema(builder, base, methodSchema, ast, typeDeclSchema, common)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                methodSchema: Method.Schema,
-               methodBody: MethodBody.Schema,
+               astSchema: Ast.Schema,
                typeDeclSchema: TypeDecl.Schema,
                common: CommonProperties.Schema) {
 
     import base._
     import methodSchema._
-    import methodBody._
+    import astSchema._
     import typeDeclSchema._
     import common._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)

@@ -12,10 +12,10 @@ object Finding extends SchemaBase {
       |
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, common : CommonProperties.Schema) =
+  def apply(builder: SchemaBuilder, common: CommonProperties.Schema) =
     new Schema(builder, common)
 
-  class Schema(builder: SchemaBuilder, common : CommonProperties.Schema) {
+  class Schema(builder: SchemaBuilder, common: CommonProperties.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import common._
 

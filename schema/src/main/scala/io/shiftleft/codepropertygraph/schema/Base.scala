@@ -77,12 +77,6 @@ object Base extends SchemaBase {
       .protoId(57)
 
     // edge types
-    val ast = builder
-      .addEdgeType(
-        name = "AST",
-        comment = "Syntax tree edge"
-      )
-      .protoId(3)
 
     val sourceFile = builder
       .addEdgeType(
@@ -90,13 +84,6 @@ object Base extends SchemaBase {
         comment = "Source file of a node, in which its LINE_NUMBER and COLUMN_NUMBER are valid"
       )
       .protoId(157)
-
-    val ref = builder
-      .addEdgeType(
-        name = "REF",
-        comment = "A reference to e.g. a LOCAL"
-      )
-      .protoId(10)
 
 // node base types
 
@@ -111,19 +98,6 @@ object Base extends SchemaBase {
         comment = "Any node that can occur in a data flow"
       )
       .extendz(withinMethod)
-
-    val astNode = builder
-      .addNodeBaseType(
-        name = "AST_NODE",
-        comment = """Base type for all nodes are (in particular) nodes of the abstract syntax tree.
-                    |In a syntax tree, sibling nodes (nodes who share a parent node) are ordered.
-                    |As some graph databases do not guarantee the order in which siblings are returned to
-                    |be stable, we make the ordering explicit by storing the position of each node relative
-                    |to its siblings in the order field. In the left most sibling, order is set to 0,
-                    |while in the right-most sibling, it is set to n-1 where n is the number of siblings.
-                    |""".stripMargin
-      )
-      .addProperties(order)
 
     val declaration = builder
       .addNodeBaseType(
@@ -165,29 +139,6 @@ object Base extends SchemaBase {
         comment = "Indicates the modifier which is represented by a MODIFIER node. See modifierTypes"
       )
       .protoId(26)
-
-    val namespaceBlock: NodeType = builder
-      .addNodeType(
-        name = "NAMESPACE_BLOCK",
-        comment = """A reference to a namespace.
-                    |We borrow the concept of a "namespace block" from C++, that is, a namespace block
-                    |is a block of code that has been placed in the same namespace by a programmer.
-                    |This block may be introduced via a `package` statement in Java or
-                    |a `namespace{ }` statement in C++.
-                    |""".stripMargin
-      )
-      .protoId(41)
-      .addProperties(name, fullName, filename)
-      .extendz(astNode)
-
-    val modifier: NodeType = builder
-      .addNodeType(
-        name = "MODIFIER",
-        comment = "A modifier, e.g., static, public, private"
-      )
-      .protoId(300)
-      .addProperties(modifierType)
-      .extendz(astNode)
 
 // constants
 

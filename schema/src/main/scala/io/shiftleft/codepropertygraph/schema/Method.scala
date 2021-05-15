@@ -49,7 +49,7 @@ object Method extends SchemaBase {
       )
       .protoId(1)
       .addProperties(fullName, isExternal, signature, lineNumberEnd, columnNumberEnd, filename, hash)
-      .extendz(declaration, astNode)
+      .extendz(declaration)
 
     method
       .addProperties(astParentType, astParentFullName)
@@ -61,7 +61,7 @@ object Method extends SchemaBase {
       )
       .protoId(34)
       .addProperties(code, typeFullName, lineNumber, columnNumber)
-      .extendz(declaration, localLike, trackingPoint, astNode)
+      .extendz(declaration, localLike, trackingPoint)
 
     val methodParameterOut: NodeType = builder
       .addNodeType(
@@ -70,7 +70,16 @@ object Method extends SchemaBase {
       )
       .protoId(33)
       .addProperties(code, typeFullName, lineNumber, columnNumber)
-      .extendz(declaration, trackingPoint, astNode)
+      .extendz(declaration, trackingPoint)
+
+    val local: NodeType = builder
+      .addNodeType(
+        name = "LOCAL",
+        comment = "A local variable"
+      )
+      .protoId(23)
+      .addProperties(code, typeFullName, lineNumber, columnNumber)
+      .extendz(declaration, localLike)
 
     val methodReturn: NodeType = builder
       .addNodeType(
@@ -101,12 +110,6 @@ object Method extends SchemaBase {
 
     binding
       .addProperties(isMethodNeverOverridden)
-
-  method
-      .addOutEdge(edge = ast, inNode = methodReturn, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = methodParameterIn, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = typeParameter, cardinalityIn = Cardinality.One)
 
     val vtable = builder
       .addEdgeType(
