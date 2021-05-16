@@ -17,7 +17,6 @@ object MetaData extends SchemaBase {
   def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
 
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
-
     import base._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 

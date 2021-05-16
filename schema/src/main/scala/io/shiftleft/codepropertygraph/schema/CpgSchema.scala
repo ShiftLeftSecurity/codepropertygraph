@@ -2,28 +2,31 @@ package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema.{Schema, SchemaBuilder}
 
-/**
-  * Schema for the base code property graph
-  * Language modules are required to produce graphs adhering to this schema
-  */
 class CpgSchema(builder: SchemaBuilder) {
-  // the foundation
+
   val base = Base(builder)
-  val typeDecl = TypeDecl(builder, base)
-  val method = Method(builder, base, typeDecl)
-  val methodBody = MethodBody(builder, base, method, typeDecl)
+  val operators = Operators(builder)
 
   val metaData = MetaData(builder, base)
+  val namespaces = Namespaces(builder, base)
 
-  val enhancements = Enhancements(builder, base, method, methodBody, typeDecl)
+  val typeDecl = TypeDecl(builder, base)
+  val method = Method(builder, base, typeDecl)
+  val fs = FileSystem(builder, base, namespaces, method, typeDecl)
+  val ast = Ast(builder, base, namespaces, method, typeDecl, fs)
 
-  // everything else
-  val protoSerialize = ProtoSerialize(builder, methodBody)
-  val closure = Closure(builder, base, method, methodBody, enhancements)
-  val finding = Finding(builder, enhancements)
-  val operators = Operators(builder)
-  val sourceSpecific = Comment(builder, base, enhancements)
-  val tagsAndLocation = TagsAndLocation(builder, base, typeDecl, method, methodBody, enhancements)
+  val callGraph = CallGraph(builder, method, ast)
+  val cfg = ControlFlowGraph(builder, base, method, ast)
+  val dominators = Dominators(builder, method, ast)
+  val pdg = Pdg(builder, method, ast)
+
+  val shortcuts = Shortcuts(builder, base, method, ast, typeDecl, fs)
+
+  val sourceSpecific = Comment(builder, base, ast, fs)
+  val closure = Closure(builder, base, method, ast, callGraph)
+  val tagsAndLocation = TagsAndLocation(builder, base, typeDecl, method, ast, fs)
+  val finding = Finding(builder, base)
+  val protoSerialize = ProtoSerialize(builder, ast)
 }
 
 object CpgSchema {

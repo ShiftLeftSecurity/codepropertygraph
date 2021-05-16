@@ -12,11 +12,11 @@ object ProtoSerialize extends SchemaBase {
       |
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, methodBody: MethodBody.Schema) = new Schema(builder, methodBody)
+  def apply(builder: SchemaBuilder, ast: Ast.Schema) = new Schema(builder, ast)
 
-  class Schema(builder: SchemaBuilder, methodBody: MethodBody.Schema) {
+  class Schema(builder: SchemaBuilder, ast: Ast.Schema) {
 
-    import methodBody._
+    import ast._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     val containedRef = builder

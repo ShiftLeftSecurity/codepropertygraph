@@ -15,19 +15,19 @@ object Closure extends SchemaBase {
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
             methodSchema: Method.Schema,
-            methodBody: MethodBody.Schema,
-            enhancements: Enhancements.Schema) =
-    new Schema(builder, base, methodSchema, methodBody, enhancements)
+            ast: Ast.Schema,
+            callGraph: CallGraph.Schema) =
+    new Schema(builder, base, methodSchema, ast, callGraph)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                methodSchema: Method.Schema,
-               methodBody: MethodBody.Schema,
-               enhancements: Enhancements.Schema) {
+               ast: Ast.Schema,
+               callGraph: CallGraph.Schema) {
     import base._
-    import enhancements._
+    import callGraph._
     import methodSchema._
-    import methodBody._
+    import ast._
 
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
