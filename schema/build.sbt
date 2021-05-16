@@ -2,9 +2,7 @@ name := "codepropertygraph-schema"
 
 libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "1.63"
 
-val schemaMd5File = file("target/schema-src.md5")
-def lastSchemaMd5: Option[String] = scala.util.Try(IO.read(schemaMd5File)).toOption
-def lastSchemaMd5(value: String): Unit = IO.write(schemaMd5File, value)
+scalacOptions += "-Xfatal-warnings"
 
 val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
 generateDomainClasses := Def.taskDyn {
@@ -47,4 +45,6 @@ generateProtobuf := Def.taskDyn {
   }
 }.value
 
-scalacOptions += "-Xfatal-warnings"
+lazy val schemaMd5File = file("target/schema-src.md5")
+def lastSchemaMd5: Option[String] = scala.util.Try(IO.read(schemaMd5File)).toOption
+def lastSchemaMd5(value: String): Unit = IO.write(schemaMd5File, value)
