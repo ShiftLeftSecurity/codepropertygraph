@@ -2,22 +2,25 @@ name := "codepropertygraph-schema"
 
 libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "1.63"
 
-val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
+val schemaMd5File = file("target/schema-src.md5")
+def lastSchemaMd5: Option[String] = scala.util.Try(IO.read(schemaMd5File)).toOption
+def lastSchemaMd5(value: String): Unit = IO.write(schemaMd5File, value)
 
+val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
 generateDomainClasses := Def.taskDyn {
   val outputRoot = target.value / "odb-codegen"
-  val currentMd5 = FileUtils.md5(sourceDirectory.value)
+  val currentSchemaMd5 = FileUtils.md5(sourceDirectory.value)
 
-  if (!outputRoot.exists || CodeGenGlobalState.lastMd5 != currentMd5) {
+  if (outputRoot.exists && lastSchemaMd5 == Some(currentSchemaMd5)) {
     Def.task {
-      FileUtils.deleteRecursively(outputRoot)
-      val invoked = (Compile/runMain).toTask(s" io.shiftleft.codepropertygraph.schema.Codegen schema/target/odb-codegen").value
-      CodeGenGlobalState.lastMd5 = currentMd5
+      lastSchemaMd5(currentSchemaMd5)
       FileUtils.listFilesRecursively(outputRoot)
     }
   } else {
     Def.task {
-      CodeGenGlobalState.lastMd5 = currentMd5
+      FileUtils.deleteRecursively(outputRoot)
+      (Compile/runMain).toTask(s" io.shiftleft.codepropertygraph.schema.Codegen schema/target/odb-codegen").value
+      lastSchemaMd5(currentSchemaMd5)
       FileUtils.listFilesRecursively(outputRoot)
     }
   }
