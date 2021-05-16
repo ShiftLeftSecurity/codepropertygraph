@@ -11,7 +11,6 @@ generateDomainClasses := Def.taskDyn {
 
   if (outputRoot.exists && lastSchemaMd5 == Some(currentSchemaMd5)) {
     Def.task {
-      lastSchemaMd5(currentSchemaMd5)
       FileUtils.listFilesRecursively(outputRoot)
     }
   } else {
@@ -30,15 +29,15 @@ generateProtobuf := Def.taskDyn {
   val outputFile = outputRoot / "cpg.proto"
   val currentMd5 = FileUtils.md5(sourceDirectory.value)
 
-  if (!outputRoot.exists || GenerateProtobufTaskGlobalState.lastMd5 != currentMd5) {
+  if (outputRoot.exists && GenerateProtobufTaskGlobalState.lastMd5 == currentMd5) {
     Def.task {
-      FileUtils.deleteRecursively(outputRoot)
-      val invoked = (Compile/runMain).toTask(s" io.shiftleft.codepropertygraph.schema.Protogen schema/target/protos").value
       GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
       outputFile
     }
   } else {
     Def.task {
+      FileUtils.deleteRecursively(outputRoot)
+      val invoked = (Compile/runMain).toTask(s" io.shiftleft.codepropertygraph.schema.Protogen schema/target/protos").value
       GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
       outputFile
     }
