@@ -40,11 +40,6 @@ object FileUtils {
 
 }
 
-object GenerateProtobufTaskGlobalState {
-  // this is very ugly, but I can't define it like that in the build.sbt
-  var lastMd5: String = ""
-}
-
 object CopyLatestCpgProtoTaskGlobalState {
   // this is very ugly, but I can't define it like that in the build.sbt
   var lastMd5: String = ""

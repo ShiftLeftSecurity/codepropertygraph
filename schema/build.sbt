@@ -27,18 +27,17 @@ val generateProtobuf = taskKey[File]("generate protobuf definitions: cpg.proto")
 generateProtobuf := Def.taskDyn {
   val outputRoot = target.value / "protos"
   val outputFile = outputRoot / "cpg.proto"
-  val currentMd5 = FileUtils.md5(sourceDirectory.value)
+  val currentSchemaMd5 = FileUtils.md5(sourceDirectory.value)
 
-  if (outputRoot.exists && GenerateProtobufTaskGlobalState.lastMd5 == currentMd5) {
+  if (outputRoot.exists && lastSchemaMd5 == Some(currentSchemaMd5)) {
     Def.task {
-      GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
       outputFile
     }
   } else {
     Def.task {
       FileUtils.deleteRecursively(outputRoot)
       val invoked = (Compile/runMain).toTask(s" io.shiftleft.codepropertygraph.schema.Protogen schema/target/protos").value
-      GenerateProtobufTaskGlobalState.lastMd5 = currentMd5
+      lastSchemaMd5(currentSchemaMd5)
       outputFile
     }
   }
