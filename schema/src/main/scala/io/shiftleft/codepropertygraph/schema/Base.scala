@@ -191,7 +191,6 @@ object Base extends SchemaBase {
         comment = "The FULL_NAME of a the AST parent of an entity"
       )
       .protoId(57)
-
     // node base types
 
     val withinMethod = builder.addNodeBaseType(

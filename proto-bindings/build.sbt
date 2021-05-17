@@ -13,18 +13,10 @@ ProtobufConfig / protobufGenerate := (ProtobufConfig/protobufGenerate).dependsOn
 lazy val copyLatestCpgProto = taskKey[Unit]("copy latest cpg.proto to externalIncludePath")
 copyLatestCpgProto := {
   val protoFile = (Projects.schema/generateProtobuf).value
-  val targetDir: java.io.File = (ProtobufConfig/protobufExternalIncludePath).value
+  val targetDir = (ProtobufConfig/protobufExternalIncludePath).value
   val targetFile = targetDir / (protoFile.getName)
-  val currentMd5 = FileUtils.md5(protoFile)
-  if (!targetFile.exists || CopyLatestCpgProtoTaskGlobalState.lastMd5 != currentMd5) {
-    targetDir.mkdirs
-    targetFile.delete
-    println(s"copying $protoFile to $targetFile")
-    java.nio.file.Files.copy(protoFile.toPath, targetFile.toPath)
-  } else {
-    println("no need to copy cpg.proto to externalIncludePath")
-  }
-  CopyLatestCpgProtoTaskGlobalState.lastMd5 = currentMd5
+  targetDir.mkdirs
+  IO.copyFile(protoFile, targetFile, CopyOptions().withOverwrite(true).withPreserveLastModified(true))
 }
 
 lazy val installProtoc = taskKey[File]("downloads configured protoc version for your platform, unless already available")
