@@ -6,7 +6,7 @@ val overflowdbVersion = "1.42"
 inThisBuild(
   List(
     organization := "io.shiftleft",
-    scalaVersion := "2.13.5",
+    scalaVersion := "2.13.6",
     resolvers ++= Seq(
       Resolver.mavenLocal,
       "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"
@@ -58,7 +58,7 @@ ThisBuild / libraryDependencies ++= Seq(
 // Scalafix / imports check setup
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0-alpha.1"
 ThisBuild / semanticdbEnabled := true
-ThisBuild / semanticdbVersion := scalafixSemanticdb.revision // use Scalafix compatible version
+ThisBuild / semanticdbVersion := "4.4.18" // alternative thay may work again in future: `scalafixSemanticdb.revision`
 
 name := "codepropertygraph"
 publish / skip := true
