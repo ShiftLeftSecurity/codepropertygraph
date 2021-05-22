@@ -20,10 +20,7 @@ object FileUtils {
     }
   }
 
-  def md5(root: File): String =
-    md5(List(root))
-
-  def md5(roots: List[File]): String = {
+  def md5(roots: File*): String = {
     val md = MessageDigest.getInstance("MD5")
     roots.foreach { root =>
       Files.walk(root.toPath).filter(!_.toFile.isDirectory).forEach { path =>
