@@ -1,6 +1,6 @@
 name := "codepropertygraph-schema"
 
-libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "1.63"
+libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "d9bfe7b77d8cdce945f4508d124b282b4adf48a4"
 
 val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
 generateDomainClasses := Def.taskDyn {
