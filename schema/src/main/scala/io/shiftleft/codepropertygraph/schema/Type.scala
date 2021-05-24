@@ -108,7 +108,7 @@ object Type extends SchemaBase {
         comment = "Member of a class struct or union"
       )
       .protoId(9)
-      .addProperties(code, typeFullName)
+      .addProperties(typeFullName)
       .extendz(declaration)
 
     val typeParameter: NodeType = builder
