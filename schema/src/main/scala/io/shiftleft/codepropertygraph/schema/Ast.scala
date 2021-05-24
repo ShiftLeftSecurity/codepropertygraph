@@ -5,7 +5,7 @@ import overflowdb.storage.ValueTypes
 
 object Ast extends SchemaBase {
 
-  def index: Int = 6
+  def index: Int = 7
   override def providedByFrontend: Boolean = true
 
   override def description: String =
@@ -15,17 +15,17 @@ object Ast extends SchemaBase {
 
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
-            namespaces: Namespaces.Schema,
+            namespaces: Namespace.Schema,
             methodSchema: Method.Schema,
-            typeDeclSchema: TypeDecl.Schema,
+            typeDeclSchema: Type.Schema,
             fs: FileSystem.Schema) =
     new Schema(builder, base, namespaces, methodSchema, typeDeclSchema, fs)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
-               namespaces: Namespaces.Schema,
+               namespaces: Namespace.Schema,
                methodSchema: Method.Schema,
-               typeDeclSchema: TypeDecl.Schema,
+               typeDeclSchema: Type.Schema,
                fs: FileSystem.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
@@ -102,7 +102,7 @@ object Ast extends SchemaBase {
     val literal: NodeType = builder
       .addNodeType(
         name = "LITERAL",
-        comment = "Literal/Constant"
+        comment = "Literal/Constant. This may be a string, in which case it includes the "
       )
       .protoId(8)
       .addProperties(typeFullName)
