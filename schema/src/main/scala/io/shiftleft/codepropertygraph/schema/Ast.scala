@@ -108,6 +108,16 @@ object Ast extends SchemaBase {
       .addProperties(typeFullName)
       .extendz(expression)
 
+    val methodFullName = builder
+      .addProperty(
+        name = "METHOD_FULL_NAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = """The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required
+                    |to have exactly one METHOD node for each METHOD_FULL_NAME""".stripMargin
+      )
+      .protoId(54)
+
     val callNode: NodeType = builder
       .addNodeType(
         name = "CALL",

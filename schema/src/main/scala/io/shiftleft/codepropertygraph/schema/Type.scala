@@ -20,6 +20,29 @@ object Type extends SchemaBase {
     import base._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
+    val typeFullName = builder
+      .addProperty(
+        name = "TYPE_FULL_NAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = """The static type of an entity. E.g. expressions, local, parameters etc.
+                    |This property is matched against the FULL_NAME of TYPE nodes and thus it
+                    |is required to have at least one TYPE node for each TYPE_FULL_NAME
+                    |""".stripMargin
+      )
+      .protoId(51)
+
+    val typeDeclFullName = builder
+      .addProperty(
+        name = "TYPE_DECL_FULL_NAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = """The static type decl of a TYPE. This property is matched against the FULL_NAME
+                    |of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each
+                    |different TYPE_DECL_FULL_NAME""".stripMargin
+      )
+      .protoId(52)
+
     val aliasTypeFullName = builder
       .addProperty(
         name = "ALIAS_TYPE_FULL_NAME",
