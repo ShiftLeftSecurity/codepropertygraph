@@ -5,7 +5,7 @@ libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "1.63"
 val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
 generateDomainClasses := Def.taskDyn {
   val outputRoot = target.value / "odb-codegen"
-  val currentSchemaMd5 = FileUtils.md5(sourceDirectory.value)
+  val currentSchemaMd5 = FileUtils.md5(sourceDirectory.value, file("schema/build.sbt"))
 
   if (outputRoot.exists && lastSchemaMd5 == Some(currentSchemaMd5)) {
     Def.task {
@@ -25,7 +25,7 @@ val generateProtobuf = taskKey[File]("generate protobuf definitions: cpg.proto")
 generateProtobuf := Def.taskDyn {
   val outputRoot = target.value / "protos"
   val outputFile = outputRoot / "cpg.proto"
-  val currentSchemaMd5 = FileUtils.md5(sourceDirectory.value)
+  val currentSchemaMd5 = FileUtils.md5(sourceDirectory.value, file("schema/build.sbt"))
 
   if (outputRoot.exists && lastSchemaMd5 == Some(currentSchemaMd5)) {
     Def.task {
