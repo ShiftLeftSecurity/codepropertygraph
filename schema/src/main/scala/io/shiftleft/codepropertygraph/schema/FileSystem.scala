@@ -13,7 +13,7 @@ object FileSystem extends SchemaBase {
             base: Base.Schema,
             namespaces: Namespace.Schema,
             methodSchema: Method.Schema,
-            typeDeclSchema: Type.Schema) =
+            typeSchema: Type.Schema) =
     new Schema(builder, base, namespaces, methodSchema, typeDeclSchema)
 
   class Schema(builder: SchemaBuilder,
