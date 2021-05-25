@@ -203,12 +203,6 @@ object ControlFlowGraph extends SchemaBase {
 
     typeRef
       .addOutEdge(edge = cfg, inNode = methodReturn)
-
-
-    val fooRoot = builder.addNodeBaseType("FOO_ROOT")
-    val foo1 = builder.addNodeType("FOO1").extendz(fooRoot)
-    val foo2 = builder.addNodeType("FOO2").extendz(fooRoot)
-    fooRoot.addOutEdge(cfg, fooRoot)
   }
 
 }
