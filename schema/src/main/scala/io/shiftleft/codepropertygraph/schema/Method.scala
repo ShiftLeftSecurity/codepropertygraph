@@ -6,7 +6,7 @@ import overflowdb.storage.ValueTypes
 object Method extends SchemaBase {
 
   def apply(builder: SchemaBuilder, base: Base.Schema, typeSchema: Type.Schema) =
-    new Schema(builder, base, typeDeclSchema)
+    new Schema(builder, base, typeSchema)
 
   def index: Int = 5
   override def providedByFrontend: Boolean = true
@@ -19,7 +19,7 @@ object Method extends SchemaBase {
 
   class Schema(builder: SchemaBuilder, base: Base.Schema, typeSchema: Type.Schema) {
     import base._
-    import typeDeclSchema._
+    import typeSchema._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     val signature = builder

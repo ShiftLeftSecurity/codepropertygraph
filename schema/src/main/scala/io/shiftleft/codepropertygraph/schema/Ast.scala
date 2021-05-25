@@ -19,19 +19,19 @@ object Ast extends SchemaBase {
             methodSchema: Method.Schema,
             typeSchema: Type.Schema,
             fs: FileSystem.Schema) =
-    new Schema(builder, base, namespaces, methodSchema, typeDeclSchema, fs)
+    new Schema(builder, base, namespaces, methodSchema, typeSchema, fs)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                namespaces: Namespace.Schema,
                methodSchema: Method.Schema,
-               typeDeclSchema: Type.Schema,
+               typeSchema: Type.Schema,
                fs: FileSystem.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import base._
     import namespaces._
-    import typeDeclSchema._
+    import typeSchema._
     import fs._
 
     // Base types

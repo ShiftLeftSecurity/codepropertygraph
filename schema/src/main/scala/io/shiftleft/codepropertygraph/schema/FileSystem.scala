@@ -14,7 +14,7 @@ object FileSystem extends SchemaBase {
             namespaces: Namespace.Schema,
             methodSchema: Method.Schema,
             typeSchema: Type.Schema) =
-    new Schema(builder, base, namespaces, methodSchema, typeDeclSchema)
+    new Schema(builder, base, namespaces, methodSchema, typeSchema)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
@@ -24,7 +24,7 @@ object FileSystem extends SchemaBase {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import namespaces._
     import methodSchema._
-    import typeDeclSchema._
+    import typeSchema._
     import base._
 
     val sourceFile = builder
