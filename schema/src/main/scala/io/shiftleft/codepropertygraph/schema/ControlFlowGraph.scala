@@ -42,39 +42,35 @@ object ControlFlowGraph extends SchemaBase {
       )
       .protoId(19)
 
-    // cfgNode.addOutEdge(edge = cfg, inNode = cfgNode)
-
     method
-      .addOutEdge(edge = cfg, inNode = cfgNode)
       .addOutEdge(edge = cfg,
                   inNode = methodReturn,
                   cardinalityOut = Cardinality.ZeroOrOne,
                   cardinalityIn = Cardinality.ZeroOrOne)
-      // .addOutEdge(edge = cfg, inNode = callNode)
-      // .addOutEdge(edge = cfg, inNode = identifier)
-      // .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      // .addOutEdge(edge = cfg, inNode = literal)
-      // .addOutEdge(edge = cfg, inNode = methodRef)
-      // .addOutEdge(edge = cfg, inNode = typeRef)
-      // .addOutEdge(edge = cfg, inNode = ret)
-      // .addOutEdge(edge = cfg, inNode = block)
-      // .addOutEdge(edge = cfg, inNode = jumpTarget)
-      // .addOutEdge(edge = cfg, inNode = controlStructure)
-      // .addOutEdge(edge = cfg, inNode = unknown)
+      .addOutEdge(edge = cfg, inNode = callNode)
+      .addOutEdge(edge = cfg, inNode = identifier)
+      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
+      .addOutEdge(edge = cfg, inNode = literal)
+      .addOutEdge(edge = cfg, inNode = methodRef)
+      .addOutEdge(edge = cfg, inNode = typeRef)
+      .addOutEdge(edge = cfg, inNode = ret)
+      .addOutEdge(edge = cfg, inNode = block)
+      .addOutEdge(edge = cfg, inNode = jumpTarget)
+      .addOutEdge(edge = cfg, inNode = controlStructure)
+      .addOutEdge(edge = cfg, inNode = unknown)
 
     callNode
-      .addOutEdge(edge = cfg, inNode = cfgNode)
-      // .addOutEdge(edge = cfg, inNode = callNode)
-      // .addOutEdge(edge = cfg, inNode = identifier)
-      // .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      // .addOutEdge(edge = cfg, inNode = literal)
-      // .addOutEdge(edge = cfg, inNode = methodRef)
-      // .addOutEdge(edge = cfg, inNode = typeRef)
-      // .addOutEdge(edge = cfg, inNode = ret)
-      // .addOutEdge(edge = cfg, inNode = block)
-      // .addOutEdge(edge = cfg, inNode = jumpTarget)
-      // .addOutEdge(edge = cfg, inNode = controlStructure)
-      // .addOutEdge(edge = cfg, inNode = unknown)
+      .addOutEdge(edge = cfg, inNode = callNode)
+      .addOutEdge(edge = cfg, inNode = identifier)
+      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
+      .addOutEdge(edge = cfg, inNode = literal)
+      .addOutEdge(edge = cfg, inNode = methodRef)
+      .addOutEdge(edge = cfg, inNode = typeRef)
+      .addOutEdge(edge = cfg, inNode = ret)
+      .addOutEdge(edge = cfg, inNode = block)
+      .addOutEdge(edge = cfg, inNode = jumpTarget)
+      .addOutEdge(edge = cfg, inNode = controlStructure)
+      .addOutEdge(edge = cfg, inNode = unknown)
 
     identifier
       .addOutEdge(edge = cfg, inNode = callNode)
@@ -208,6 +204,11 @@ object ControlFlowGraph extends SchemaBase {
     typeRef
       .addOutEdge(edge = cfg, inNode = methodReturn)
 
+
+    val fooRoot = builder.addNodeBaseType("FOO_ROOT")
+    val foo1 = builder.addNodeType("FOO1").extendz(fooRoot)
+    val foo2 = builder.addNodeType("FOO2").extendz(fooRoot)
+    fooRoot.addOutEdge(cfg, fooRoot)
   }
 
 }
