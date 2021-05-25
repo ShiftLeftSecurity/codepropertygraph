@@ -5,7 +5,7 @@ import overflowdb.storage.ValueTypes
 
 object Method extends SchemaBase {
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: Type.Schema) =
+  def apply(builder: SchemaBuilder, base: Base.Schema, typeSchema: Type.Schema) =
     new Schema(builder, base, typeDeclSchema)
 
   def index: Int = 5
