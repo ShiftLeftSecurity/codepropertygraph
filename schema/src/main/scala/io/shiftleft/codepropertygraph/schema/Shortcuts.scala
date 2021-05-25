@@ -4,7 +4,7 @@ import overflowdb.schema._
 
 object Shortcuts extends SchemaBase {
 
-  def index: Int = 3
+  def index: Int = 15
 
   override def description: String =
     """
@@ -16,7 +16,7 @@ object Shortcuts extends SchemaBase {
             base: Base.Schema,
             methodSchema: Method.Schema,
             ast: Ast.Schema,
-            typeDeclSchema: TypeDecl.Schema,
+            typeDeclSchema: Type.Schema,
             fs: FileSystem.Schema) =
     new Schema(builder, base, methodSchema, ast, typeDeclSchema, fs)
 
@@ -24,7 +24,7 @@ object Shortcuts extends SchemaBase {
                base: Base.Schema,
                methodSchema: Method.Schema,
                astSchema: Ast.Schema,
-               typeDeclSchema: TypeDecl.Schema,
+               typeDeclSchema: Type.Schema,
                fs: FileSystem.Schema) {
 
     import base._
