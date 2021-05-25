@@ -6,11 +6,11 @@ object Implicits {
 
   private val logger: Logger = LoggerFactory.getLogger(Implicits.getClass)
 
-  implicit class IteratorDeco[T](val iterator: Iterator[T]) extends AnyVal {
+  implicit class IterableOnceDeco[T](val iterable: IterableOnce[T]) extends AnyVal {
     def onlyChecked: T = {
-      if (iterator.hasNext) {
-        val res = iterator.next()
-        if (iterator.hasNext) {
+      if (iterable.iterator.hasNext) {
+        val res = iterable.iterator.next()
+        if (iterable.iterator.hasNext) {
           logger.warn("iterator was expected to have exactly one element, but it actually has more")
         }
         res
