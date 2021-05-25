@@ -102,7 +102,7 @@ object Ast extends SchemaBase {
     val literal: NodeType = builder
       .addNodeType(
         name = "LITERAL",
-        comment = "Literal/Constant. This may be a string, in which case it includes the "
+        comment = "Literal/Constant. This may be a string, in which case it includes the quotes."
       )
       .protoId(8)
       .addProperties(typeFullName)

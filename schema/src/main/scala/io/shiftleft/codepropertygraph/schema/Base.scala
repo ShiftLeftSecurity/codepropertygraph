@@ -46,7 +46,9 @@ object Base extends SchemaBase {
         name = "CODE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = "The code snippet the node represents"
+        comment = """All nodes that represent parts of the code have this field.
+            |It contains the code represented by the node.
+            |""".stripMargin
       )
       .protoId(21)
 
