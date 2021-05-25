@@ -20,7 +20,7 @@ object FileSystem extends SchemaBase {
                base: Base.Schema,
                namespaces: Namespace.Schema,
                methodSchema: Method.Schema,
-               typeDeclSchema: Type.Schema) {
+               typeSchema: Type.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import namespaces._
     import methodSchema._
