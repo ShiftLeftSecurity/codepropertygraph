@@ -6,8 +6,8 @@ import overflowdb.storage.ValueTypes
 import scala.collection.mutable
 
 /**
- * @param basePackage: specific for your domain, e.g. `com.example.mydomain`
- */
+  * @param basePackage: specific for your domain, e.g. `com.example.mydomain`
+  */
 class Schema(val basePackage: String,
              val properties: Seq[Property],
              val nodeBaseTypes: Seq[NodeBaseType],
@@ -22,19 +22,17 @@ class Schema(val basePackage: String,
 
   /** properties that are used in node types */
   def nodeProperties: Seq[Property] =
-    properties.filter(property =>
-      (nodeTypes ++ nodeBaseTypes).exists(_.properties.contains(property))
-    )
+    properties.filter(property => (nodeTypes ++ nodeBaseTypes).exists(_.properties.contains(property)))
 
   /** properties that are used in edge types */
   def edgeProperties: Seq[Property] =
-    properties.filter(property =>
-      edgeTypes.exists(_.properties.contains(property))
-    )
+    properties.filter(property => edgeTypes.exists(_.properties.contains(property)))
 }
 
 abstract class AbstractNodeType(val name: String, val comment: Option[String], val schemaInfo: SchemaInfo)
-  extends HasClassName with HasProperties with HasSchemaInfo {
+    extends HasClassName
+    with HasProperties
+    with HasSchemaInfo {
   protected val _extendz: mutable.Set[NodeBaseType] = mutable.Set.empty
   protected val _outEdges: mutable.Set[AdjacentNode] = mutable.Set.empty
   protected val _inEdges: mutable.Set[AdjacentNode] = mutable.Set.empty
@@ -68,8 +66,8 @@ abstract class AbstractNodeType(val name: String, val comment: Option[String], v
   }
 
   /**
-   * note: allowing to define one outEdge for ONE inNode only - if you are looking for Union Types, please use NodeBaseTypes
-   */
+    * note: allowing to define one outEdge for ONE inNode only - if you are looking for Union Types, please use NodeBaseTypes
+    */
   def addOutEdge(edge: EdgeType,
                  inNode: AbstractNodeType,
                  cardinalityOut: Cardinality = Cardinality.List,
@@ -98,7 +96,8 @@ abstract class AbstractNodeType(val name: String, val comment: Option[String], v
 }
 
 class NodeType(name: String, comment: Option[String], schemaInfo: SchemaInfo)
-  extends AbstractNodeType(name, comment, schemaInfo) with HasOptionalProtoId  {
+    extends AbstractNodeType(name, comment, schemaInfo)
+    with HasOptionalProtoId {
   protected val _containedNodes: mutable.Set[ContainedNode] = mutable.Set.empty
 
   lazy val classNameDb = s"${className}Db"
@@ -118,7 +117,7 @@ class NodeType(name: String, comment: Option[String], schemaInfo: SchemaInfo)
 }
 
 class NodeBaseType(name: String, comment: Option[String], schemaInfo: SchemaInfo)
-  extends AbstractNodeType(name, comment, schemaInfo) {
+    extends AbstractNodeType(name, comment, schemaInfo) {
 
   /** all node types that extend this node */
   override def subtypes(allNodes: Set[AbstractNodeType]) =
@@ -143,11 +142,15 @@ object Cardinality {
   def fromName(name: String): Cardinality =
     Seq(ZeroOrOne, One, List, ISeq)
       .find(_.name == name)
-      .getOrElse(throw new AssertionError(s"cardinality must be one of `zeroOrOne`, `one`, `list`, `iseq`, but was $name"))
+      .getOrElse(
+        throw new AssertionError(s"cardinality must be one of `zeroOrOne`, `one`, `list`, `iseq`, but was $name"))
 }
 
 class EdgeType(val name: String, val comment: Option[String], val schemaInfo: SchemaInfo)
-  extends HasClassName with HasProperties with HasOptionalProtoId with HasSchemaInfo {
+    extends HasClassName
+    with HasProperties
+    with HasOptionalProtoId
+    with HasSchemaInfo {
   override def toString = s"EdgeType($name)"
 }
 
@@ -155,7 +158,10 @@ class Property(val name: String,
                val comment: Option[String],
                val valueType: ValueTypes,
                val cardinality: Cardinality,
-               val schemaInfo: SchemaInfo) extends HasClassName with HasOptionalProtoId with HasSchemaInfo {
+               val schemaInfo: SchemaInfo)
+    extends HasClassName
+    with HasOptionalProtoId
+    with HasSchemaInfo {
   override def toString = s"Property($name)"
 }
 
@@ -163,17 +169,22 @@ class Constant(val name: String,
                val value: String,
                val valueType: ValueTypes,
                val comment: Option[String],
-               val schemaInfo: SchemaInfo) extends HasOptionalProtoId with HasSchemaInfo {
+               val schemaInfo: SchemaInfo)
+    extends HasOptionalProtoId
+    with HasSchemaInfo {
   override def toString = s"Constant($name)"
 }
 
 object Constant {
-  def apply(name: String, value: String, valueType: ValueTypes, comment: String = "")(
-    implicit schemaInfo: SchemaInfo = SchemaInfo.Unknown): Constant =
+  def apply(name: String, value: String, valueType: ValueTypes, comment: String = "")(implicit schemaInfo: SchemaInfo =
+                                                                                        SchemaInfo.Unknown): Constant =
     new Constant(name, value, valueType, stringToOption(comment), schemaInfo)
 }
 
-case class NeighborNodeInfo(accessorName: String, node: AbstractNodeType, cardinality: Cardinality, isInherited: Boolean)
+case class NeighborNodeInfo(accessorName: String,
+                            node: AbstractNodeType,
+                            cardinality: Cardinality,
+                            isInherited: Boolean)
 
 case class NeighborInfo(edge: EdgeType, nodeInfos: Seq[NeighborNodeInfo], offsetPosition: Int) {
   lazy val deriveNeighborNodeType: String = {
@@ -246,7 +257,7 @@ trait HasSchemaInfo {
 }
 
 /** carry extra information on where a schema element is being defined, e.g. when we want to be able to
- * refer back that `node XYZ` was defined in `BaseSchema`, e.g. for documentation */
+  * refer back that `node XYZ` was defined in `BaseSchema`, e.g. for documentation */
 case class SchemaInfo(definedIn: Option[Class[_]])
 object SchemaInfo {
   val Unknown = SchemaInfo(None)
