@@ -1,7 +1,7 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val overflowdbVersion = "1.35"
+val overflowdbVersion = "1.38"
 
 inThisBuild(
   List(
@@ -84,7 +84,7 @@ ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
   "-Ywarn-unused", // required by scalafix
-  "-Xfatal-warnings",
+  // "-Xfatal-warnings",
   "-language:implicitConversions",
   "-Ycache-macro-class-loader:last-modified",
   "-Ybackend-parallelism",

@@ -203,7 +203,6 @@ object ControlFlowGraph extends SchemaBase {
 
     typeRef
       .addOutEdge(edge = cfg, inNode = methodReturn)
-
   }
 
 }
