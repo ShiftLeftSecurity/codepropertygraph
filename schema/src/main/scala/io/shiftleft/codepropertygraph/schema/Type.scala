@@ -3,12 +3,12 @@ package io.shiftleft.codepropertygraph.schema
 import overflowdb.schema.{Cardinality, NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
-object TypeDecl extends SchemaBase {
+object Type extends SchemaBase {
 
   def apply(builder: SchemaBuilder, base: Base.Schema) =
     new Schema(builder, base)
 
-  def index: Int = 3
+  def index: Int = 6
   override def providedByFrontend: Boolean = true
 
   override def description: String =
@@ -19,6 +19,29 @@ object TypeDecl extends SchemaBase {
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
     import base._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+
+    val typeFullName = builder
+      .addProperty(
+        name = "TYPE_FULL_NAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = """The static type of an entity. E.g. expressions, local, parameters etc.
+                    |This property is matched against the FULL_NAME of TYPE nodes and thus it
+                    |is required to have at least one TYPE node for each TYPE_FULL_NAME
+                    |""".stripMargin
+      )
+      .protoId(51)
+
+    val typeDeclFullName = builder
+      .addProperty(
+        name = "TYPE_DECL_FULL_NAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = """The static type decl of a TYPE. This property is matched against the FULL_NAME
+                    |of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each
+                    |different TYPE_DECL_FULL_NAME""".stripMargin
+      )
+      .protoId(52)
 
     val aliasTypeFullName = builder
       .addProperty(
@@ -85,7 +108,7 @@ object TypeDecl extends SchemaBase {
         comment = "Member of a class struct or union"
       )
       .protoId(9)
-      .addProperties(code, typeFullName)
+      .addProperties(typeFullName)
       .extendz(declaration)
 
     val typeParameter: NodeType = builder
