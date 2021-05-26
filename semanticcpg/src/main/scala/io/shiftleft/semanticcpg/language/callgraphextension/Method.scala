@@ -45,8 +45,8 @@ class Method(val traversal: Traversal[nodes.Method]) extends AnyVal {
   /**
     * Incoming call sites
     * */
-  def callIn(implicit callResolver: ICallResolver): Traversal[nodes.Call] =
-    traversal.flatMap(method => callResolver.getMethodCallsitesAsTraversal(method).cast[nodes.Call])
+  def callIn(implicit callResolver: ICallResolver): Traversal[nodes.CallRepr] =
+    traversal.flatMap(method => callResolver.getMethodCallsitesAsTraversal(method))
 
   /**
     * Traverse to direct and transitive callers of the method.
