@@ -5,7 +5,7 @@ import overflowdb.storage.ValueTypes
 
 object Pdg extends SchemaBase {
 
-  def index: Int = 9
+  def index: Int = 6
   override def description: String =
     """
       |""".stripMargin
