@@ -5,7 +5,7 @@ import overflowdb.storage.ValueTypes
 
 object Ast extends SchemaBase {
 
-  def index: Int = 7
+  def index: Int = 6
   override def providedByFrontend: Boolean = true
 
   override def description: String =
@@ -15,23 +15,23 @@ object Ast extends SchemaBase {
 
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
-            namespaces: Namespace.Schema,
+            namespaces: Namespaces.Schema,
             methodSchema: Method.Schema,
-            typeSchema: Type.Schema,
+            typeDeclSchema: TypeDecl.Schema,
             fs: FileSystem.Schema) =
-    new Schema(builder, base, namespaces, methodSchema, typeSchema, fs)
+    new Schema(builder, base, namespaces, methodSchema, typeDeclSchema, fs)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
-               namespaces: Namespace.Schema,
+               namespaces: Namespaces.Schema,
                methodSchema: Method.Schema,
-               typeSchema: Type.Schema,
+               typeDeclSchema: TypeDecl.Schema,
                fs: FileSystem.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import base._
     import namespaces._
-    import typeSchema._
+    import typeDeclSchema._
     import fs._
 
     // Base types
@@ -47,7 +47,7 @@ object Ast extends SchemaBase {
                     |while in the right-most sibling, it is set to n-1 where n is the number of siblings.
                     |""".stripMargin
       )
-      .addProperties(order, code)
+      .addProperties(order)
 
     val callRepr = builder
       .addNodeBaseType(
@@ -102,21 +102,11 @@ object Ast extends SchemaBase {
     val literal: NodeType = builder
       .addNodeType(
         name = "LITERAL",
-        comment = "Literal/Constant. This may be a string, in which case it includes the quotes."
+        comment = "Literal/Constant"
       )
       .protoId(8)
       .addProperties(typeFullName)
       .extendz(expression)
-
-    val methodFullName = builder
-      .addProperty(
-        name = "METHOD_FULL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = """The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required
-                    |to have exactly one METHOD node for each METHOD_FULL_NAME""".stripMargin
-      )
-      .protoId(54)
 
     val callNode: NodeType = builder
       .addNodeType(
