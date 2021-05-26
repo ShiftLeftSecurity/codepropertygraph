@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.callgraphextension
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.help.Doc
 import overflowdb.traversal.{PathAwareTraversal, Traversal}
