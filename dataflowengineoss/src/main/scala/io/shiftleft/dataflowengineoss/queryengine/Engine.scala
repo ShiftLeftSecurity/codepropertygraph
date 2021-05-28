@@ -189,7 +189,7 @@ object Engine {
         !sameCallSite && curNode.isUsed) {
 
       val visible = if (sameCallSite) {
-        val semanticExists = parentNode.asInstanceOf[nodes.Expression].semanticsForCallByArg.nonEmpty
+        val semanticExists = parentNode.semanticsForCallByArg.nonEmpty
         val internalMethodsForCall = parentNodeCall.flatMap(methodsForCall).to(Traversal).internal
         (semanticExists && parentNode.isDefined) || internalMethodsForCall.isEmpty
       } else {

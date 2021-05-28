@@ -31,6 +31,13 @@ object Cfg extends SchemaBase {
     method.extendz(cfgNode)
     methodReturn.extendz(cfgNode)
 
+    // While an input parameter is a declaration, we can just as well view it
+    // as the CFG node that assigns the actual in to the parameter variable.
+    // Similarly, output parameters can be seen as assignments of the parameter
+    // to the actual out.
+    methodParameterIn.extendz(cfgNode)
+    methodParameterOut.extendz(cfgNode)
+
     expression.extendz(cfgNode)
     callRepr.extendz(cfgNode)
     jumpTarget.extendz(cfgNode)

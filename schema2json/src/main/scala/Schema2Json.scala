@@ -3,7 +3,7 @@ import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization
 import org.json4s.{Formats, NoTypeHints}
-import overflowdb.schema.{AbstractNodeType, EdgeType, NodeBaseType, SchemaInfo}
+import overflowdb.schema.{AbstractNodeType, NodeBaseType, SchemaInfo}
 
 object Schema2Json extends App {
 
