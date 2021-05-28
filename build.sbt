@@ -84,7 +84,7 @@ ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
   "-Ywarn-unused", // required by scalafix
-  // "-Xfatal-warnings",
+  "-Xfatal-warnings",
   "-language:implicitConversions",
   "-Ycache-macro-class-loader:last-modified",
   "-Ybackend-parallelism",
