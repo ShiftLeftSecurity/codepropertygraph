@@ -31,9 +31,6 @@ object Schema2Json extends App {
   private def schemaIndex(nodeType: AbstractNodeType): Int =
     schemaIndex(nodeType.schemaInfo)
 
-  private def schemaIndex(edgeType: EdgeType): Int =
-    schemaIndex(edgeType.schemaInfo)
-
   private def schemaIndex(schemaInfo: SchemaInfo) =
     schemaInfo.definedIn
       .map(_.getDeclaringClass.getDeclaredMethod("index").invoke(null).asInstanceOf[Int])
