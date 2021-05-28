@@ -13,8 +13,8 @@ import java.util.concurrent.{Callable, ExecutorCompletionService, ExecutorServic
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
 
-private case class ReachableByTask(sink: nodes.TrackingPoint,
-                                   sources: Set[nodes.TrackingPoint],
+private case class ReachableByTask(sink: nodes.CfgNode,
+                                   sources: Set[nodes.CfgNode],
                                    table: ResultTable,
                                    initialPath: Vector[PathElement] = Vector(),
                                    callDepth: Int = 0)
@@ -35,13 +35,13 @@ class Engine(context: EngineContext) {
   /**
     * Determine flows from sources to sinks by analyzing backwards from sinks.
     * */
-  def backwards(sinks: List[nodes.TrackingPoint], sources: List[nodes.TrackingPoint]): List[ReachableByResult] = {
+  def backwards(sinks: List[nodes.CfgNode], sources: List[nodes.CfgNode]): List[ReachableByResult] = {
     val sourcesSet = sources.toSet
     val tasks = sinks.map(sink => ReachableByTask(sink, sourcesSet, new ResultTable))
     solveTasks(tasks, sourcesSet)
   }
 
-  private def solveTasks(tasks: List[ReachableByTask], sources: Set[nodes.TrackingPoint]): List[ReachableByResult] = {
+  private def solveTasks(tasks: List[ReachableByTask], sources: Set[nodes.CfgNode]): List[ReachableByResult] = {
 
     tasks.foreach(submitTask)
     var result = List[ReachableByResult]()
@@ -64,7 +64,7 @@ class Engine(context: EngineContext) {
   }
 
   private def newTasksFromResults(resultsOfTask: Vector[ReachableByResult],
-                                  sources: Set[nodes.TrackingPoint]): Vector[ReachableByTask] = {
+                                  sources: Set[nodes.CfgNode]): Vector[ReachableByTask] = {
     tasksForParams(resultsOfTask, sources) ++ tasksForUnresolvedOutArgs(resultsOfTask, sources)
   }
 
@@ -74,7 +74,7 @@ class Engine(context: EngineContext) {
   }
 
   private def tasksForParams(resultsOfTask: Vector[ReachableByResult],
-                             sources: Set[nodes.TrackingPoint]): Vector[ReachableByTask] = {
+                             sources: Set[nodes.CfgNode]): Vector[ReachableByTask] = {
     val pathsFromParams = resultsOfTask.map(x => (x.path, x.callDepth))
     pathsFromParams.flatMap {
       case (path, callDepth) =>
@@ -91,7 +91,7 @@ class Engine(context: EngineContext) {
   }
 
   private def tasksForUnresolvedOutArgs(resultsOfTask: Vector[ReachableByResult],
-                                        sources: Set[nodes.TrackingPoint]): Vector[ReachableByTask] = {
+                                        sources: Set[nodes.CfgNode]): Vector[ReachableByTask] = {
 
     val outArgsAndCalls = resultsOfTask
       .map(x => (x.unresolvedArgs.collect { case e: nodes.Expression => e }, x.path, x.callDepth))
@@ -124,7 +124,7 @@ class Engine(context: EngineContext) {
 
 object Engine {
 
-  def expandIn(curNode: nodes.TrackingPoint, path: Vector[PathElement])(
+  def expandIn(curNode: nodes.CfgNode, path: Vector[PathElement])(
       implicit semantics: Semantics): Vector[PathElement] = {
     curNode match {
       case argument: nodes.Expression =>
@@ -148,17 +148,21 @@ object Engine {
   }
 
   private def edgeToPathElement(e: Edge): PathElement = {
-    val parentNode = e.outNode().asInstanceOf[nodes.TrackingPoint]
+    val parentNode = e.outNode().asInstanceOf[nodes.CfgNode]
     val outLabel = Some(e.property(Properties.VARIABLE)).getOrElse("")
     PathElement(parentNode, outEdgeLabel = outLabel)
   }
 
-  private def ddgInE(dstNode: nodes.TrackingPoint, path: Vector[PathElement]): Vector[Edge] = {
+  private def ddgInE(dstNode: nodes.CfgNode, path: Vector[PathElement]): Vector[Edge] = {
     dstNode
       .inE(EdgeTypes.REACHING_DEF)
       .asScala
-      .filter(e => e.outNode().isInstanceOf[nodes.TrackingPoint])
-      .filter(e => !path.map(_.node).contains(e.outNode().asInstanceOf[nodes.TrackingPoint]))
+      .filter { e =>
+        val outNode = e.outNode();
+        outNode.isInstanceOf[nodes.CfgNode] &&
+        !outNode.isInstanceOf[nodes.Method]
+      }
+      .filter(e => !path.map(_.node).contains(e.outNode().asInstanceOf[nodes.CfgNode]))
       .toVector
   }
 
@@ -298,10 +302,8 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     * @param path This is a path from a node to the sink. The first node
     *             of the path is expanded by this method
     * */
-  private def results[NodeType <: nodes.TrackingPoint](
-      path: Vector[PathElement],
-      sources: Set[NodeType],
-      table: ResultTable)(implicit semantics: Semantics): Vector[ReachableByResult] = {
+  private def results[NodeType <: nodes.CfgNode](path: Vector[PathElement], sources: Set[NodeType], table: ResultTable)(
+      implicit semantics: Semantics): Vector[ReachableByResult] = {
     val curNode = path.head.node
 
     val resultsForParents: Vector[ReachableByResult] = {
