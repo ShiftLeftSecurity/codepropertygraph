@@ -5,16 +5,20 @@ import overflowdb.storage.ValueTypes
 
 object Base extends SchemaBase {
 
-  def index: Int = 5
+  def index: Int = 1
   override def providedByFrontend: Boolean = true
   override def description: String =
     """
+      |Common properties and edge types shared among different schema parts as well
+      |as base node types.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder) = new Schema(builder)
 
   class Schema(builder: SchemaBuilder) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+
+    // Properties
 
     val version = builder
       .addProperty(
@@ -33,7 +37,7 @@ object Base extends SchemaBase {
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,
         comment = """Hash value. Used, for example, to store the hash of the
-                    |artifact that this CPG is built from""".stripMargin
+                    |artifact that a CPG is built from""".stripMargin
       )
       .protoId(120)
 
@@ -42,7 +46,9 @@ object Base extends SchemaBase {
         name = "CODE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = "The code snippet the node represents"
+        comment = """All nodes that represent parts of the code have this field.
+            |It contains the code represented by the node.
+            |""".stripMargin
       )
       .protoId(21)
 
@@ -51,7 +57,7 @@ object Base extends SchemaBase {
         name = "FILENAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = """Full path of canonical file that contained this node; will be linked into
+        comment = """Full path of canonical file that contains this node; will be linked into
                     |corresponding FILE nodes. Possible for METHOD, TYPE_DECL and NAMESPACE_BLOCK""".stripMargin
       )
       .protoId(106)
@@ -138,39 +144,6 @@ object Base extends SchemaBase {
 
     // The following fields are used to create edges between nodes in later processing stages.
 
-    val typeFullName = builder
-      .addProperty(
-        name = "TYPE_FULL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = """The static type of an entity. E.g. expressions, local, parameters etc.
-            |This property is matched against the FULL_NAME of TYPE nodes and thus it
-            |is required to have at least one TYPE node for each TYPE_FULL_NAME
-            |""".stripMargin
-      )
-      .protoId(51)
-
-    val typeDeclFullName = builder
-      .addProperty(
-        name = "TYPE_DECL_FULL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = """The static type decl of a TYPE. This property is matched against the FULL_NAME
-            |of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each
-            |different TYPE_DECL_FULL_NAME""".stripMargin
-      )
-      .protoId(52)
-
-    val methodFullName = builder
-      .addProperty(
-        name = "METHOD_FULL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = """The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required
-            |to have exactly one METHOD node for each METHOD_FULL_NAME""".stripMargin
-      )
-      .protoId(54)
-
     val astParentType = builder
       .addProperty(
         name = "AST_PARENT_TYPE",
@@ -191,6 +164,7 @@ object Base extends SchemaBase {
         comment = "The FULL_NAME of a the AST parent of an entity"
       )
       .protoId(57)
+
     // node base types
 
     val withinMethod = builder.addNodeBaseType(
