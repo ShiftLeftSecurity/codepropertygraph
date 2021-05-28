@@ -3,7 +3,7 @@ import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization
 import org.json4s.{Formats, NoTypeHints}
-import overflowdb.schema.{AbstractNodeType, NodeBaseType, SchemaInfo}
+import overflowdb.schema.{AbstractNodeType, EdgeType, NodeBaseType, SchemaInfo}
 
 object Schema2Json extends App {
 
@@ -29,14 +29,20 @@ object Schema2Json extends App {
     schemaInfo.definedIn.map(_.getDeclaringClass.getSimpleName).getOrElse("unknown")
 
   private def schemaIndex(nodeType: AbstractNodeType): Int =
-    nodeType.schemaInfo.definedIn
+    schemaIndex(nodeType.schemaInfo)
+
+  private def schemaIndex(edgeType: EdgeType): Int =
+    schemaIndex(edgeType.schemaInfo)
+
+  private def schemaIndex(schemaInfo: SchemaInfo) =
+    schemaInfo.definedIn
       .map(_.getDeclaringClass.getDeclaredMethod("index").invoke(null).asInstanceOf[Int])
       .getOrElse(Int.MaxValue)
 
   private def schemaSummary = {
-    schema.nodeTypes
+    (schema.nodeTypes.map(_.schemaInfo) ++ schema.edgeTypes.map(_.schemaInfo))
       .sortBy(schemaIndex)
-      .flatMap(_.schemaInfo.definedIn)
+      .flatMap(_.definedIn)
       .distinct
       .map { info =>
         val name = info.getDeclaringClass.getSimpleName
