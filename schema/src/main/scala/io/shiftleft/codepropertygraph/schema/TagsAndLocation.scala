@@ -17,23 +17,20 @@ object TagsAndLocation extends SchemaBase {
             typeDeclSchema: Type.Schema,
             methodSchema: Method.Schema,
             ast: Ast.Schema,
-            fs: FileSystem.Schema,
-            cfg : Cfg.Schema) =
-    new Schema(builder, base, typeDeclSchema, methodSchema, ast, fs, cfg)
+            fs: FileSystem.Schema) =
+    new Schema(builder, base, typeDeclSchema, methodSchema, ast, fs)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                typeDeclSchema: Type.Schema,
                methodSchema: Method.Schema,
                ast: Ast.Schema,
-               fs: FileSystem.Schema,
-               cfg: Cfg.Schema) {
+               fs: FileSystem.Schema) {
     import base._
     import typeDeclSchema._
     import methodSchema._
     import ast._
     import fs._
-    import cfg._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
 // node properties
@@ -175,7 +172,7 @@ object TagsAndLocation extends SchemaBase {
       .addContainedNode(builder.anyNode, "node", Cardinality.One)
 
     source
-      .addContainedNode(cfgNode, "node", Cardinality.One)
+      .addContainedNode(trackingPoint, "node", Cardinality.One)
       .addContainedNode(method, "method", Cardinality.One)
       .addContainedNode(tag, "methodTags", Cardinality.List)
       .addContainedNode(method, "callingMethod", Cardinality.ZeroOrOne)
@@ -184,7 +181,7 @@ object TagsAndLocation extends SchemaBase {
       .addContainedNode(tpe, "nodeType", Cardinality.One)
 
     sink
-      .addContainedNode(cfgNode, "node", Cardinality.One)
+      .addContainedNode(trackingPoint, "node", Cardinality.One)
       .addContainedNode(tpe, "nodeType", Cardinality.One)
       .addContainedNode(method, "method", Cardinality.One)
       .addContainedNode(tag, "methodTags", Cardinality.List)

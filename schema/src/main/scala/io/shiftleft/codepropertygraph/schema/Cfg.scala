@@ -31,9 +31,6 @@ object Cfg extends SchemaBase {
     method.extendz(cfgNode)
     methodReturn.extendz(cfgNode)
 
-    methodParameterIn.extendz(cfgNode)
-    methodParameterOut.extendz(cfgNode)
-
     expression.extendz(cfgNode)
     callRepr.extendz(cfgNode)
     jumpTarget.extendz(cfgNode)
