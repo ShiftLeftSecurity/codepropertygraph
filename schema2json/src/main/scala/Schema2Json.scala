@@ -3,7 +3,7 @@ import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization
 import org.json4s.{Formats, NoTypeHints}
-import overflowdb.schema.{AbstractNodeType, NodeBaseType}
+import overflowdb.schema.{AbstractNodeType, NodeBaseType, SchemaInfo}
 
 object Schema2Json extends App {
 
@@ -12,7 +12,7 @@ object Schema2Json extends App {
   implicit val formats: AnyRef with Formats =
     Serialization.formats(NoTypeHints)
 
-  val json = ("schemas" -> schemaSummary) ~ ("nodes" -> nodeTypesAsJson)
+  val json = ("schemas" -> schemaSummary) ~ ("nodes" -> nodeTypesAsJson) ~ ("properties" -> propertiesAsJson)
 
   val outFileName = "/tmp/schema.json"
   better.files
@@ -23,7 +23,10 @@ object Schema2Json extends App {
   println(s"Schema written to: $outFileName")
 
   private def schemaName(nodeType: AbstractNodeType): String =
-    nodeType.schemaInfo.definedIn.map(_.getDeclaringClass.getSimpleName).getOrElse("unknown")
+    schemaName(nodeType.schemaInfo)
+
+  private def schemaName(schemaInfo: SchemaInfo) =
+    schemaInfo.definedIn.map(_.getDeclaringClass.getSimpleName).getOrElse("unknown")
 
   private def schemaIndex(nodeType: AbstractNodeType): Int =
     nodeType.schemaInfo.definedIn
@@ -66,6 +69,16 @@ object Schema2Json extends App {
           ("schema" -> schemaName(nodeType)) ~
           ("schemaIndex" -> schemaIndex(nodeType)) ~
           ("isAbstract" -> nodeType.isInstanceOf[NodeBaseType])
+      }
+  }
+
+  private def propertiesAsJson = {
+    schema.properties
+      .sortBy(_.name)
+      .map { prop =>
+        ("name" -> prop.name) ~
+          ("comment" -> prop.comment) ~
+          ("schema" -> schemaName(prop.schemaInfo))
       }
   }
 
