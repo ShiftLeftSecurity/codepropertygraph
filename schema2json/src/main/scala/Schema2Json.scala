@@ -12,7 +12,7 @@ object Schema2Json extends App {
   implicit val formats: AnyRef with Formats =
     Serialization.formats(NoTypeHints)
 
-  val json = ("schemas" -> schemaSummary) ~ ("nodes" -> nodeTypesAsJson) ~ ("properties" -> propertiesAsJson)
+  val json = ("schemas" -> schemaSummary) ~ ("nodes" -> nodeTypesAsJson) ~ ("edges" -> edgeTypesAsJson) ~ ("properties" -> propertiesAsJson)
 
   val outFileName = "/tmp/schema.json"
   better.files
@@ -70,6 +70,14 @@ object Schema2Json extends App {
           ("schemaIndex" -> schemaIndex(nodeType)) ~
           ("isAbstract" -> nodeType.isInstanceOf[NodeBaseType])
       }
+  }
+
+  private def edgeTypesAsJson = {
+    schema.edgeTypes.sortBy(_.name).map { edge =>
+      ("name" -> edge.name) ~
+        ("comment" -> edge.comment) ~
+        ("schema" -> schemaName(edge.schemaInfo))
+    }
   }
 
   private def propertiesAsJson = {
