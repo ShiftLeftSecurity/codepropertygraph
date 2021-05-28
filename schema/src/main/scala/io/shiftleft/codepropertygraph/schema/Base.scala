@@ -172,13 +172,6 @@ object Base extends SchemaBase {
       comment = "Any node that can exist in a method"
     )
 
-    val trackingPoint = builder
-      .addNodeBaseType(
-        name = "TRACKING_POINT",
-        comment = "Any node that can occur in a data flow"
-      )
-      .extendz(withinMethod)
-
     val declaration = builder
       .addNodeBaseType(
         name = "DECLARATION",
