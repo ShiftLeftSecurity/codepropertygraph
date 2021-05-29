@@ -177,40 +177,24 @@ object CfgNodeMethods {
     (base, AccessPath.apply(Elements.normalized(revPath.reverse), Nil))
   }
 
-  def trackedBaseAccessPath(
-      node: nodes.CfgNode,
-      recurseWith: nodes.CfgNode => (TrackedBase, List[AccessElement])): (TrackedBase, List[AccessElement]) = {
-    trackedBaseAccessPath(node, recurseWith)
-  }
-
   def trackedBaseAccessPath(node: nodes.CfgNode): (TrackedBase, List[AccessElement]) = {
-    node match {
-      case block: nodes.Block =>
-        lastExpressionInBlock(block)
-          .map { x =>
-            trackedBaseAccessPath(x)
-          }
-          .getOrElse((TrackedUnknown, Nil))
-
-      case call: nodes.Call               => toTrackedBaseAndAccessPathInternalForCall(call, trackedBaseAccessPath)
-      case node: nodes.MethodParameterIn  => (TrackedNamedVariable(node.name), Nil)
-      case node: nodes.MethodParameterOut => (TrackedNamedVariable(node.name), Nil)
-      case node: nodes.Identifier         => (TrackedNamedVariable(node.name), Nil)
-      case node: nodes.Literal            => (TrackedLiteral(node), Nil)
-      case node: nodes.MethodRef          => (TrackedMethodOrTypeRef(node), Nil)
-      case node: nodes.TypeRef            => (TrackedMethodOrTypeRef(node), Nil)
-      case _: nodes.Return                => (TrackedFormalReturn, Nil)
-      case _: nodes.MethodReturn          => (TrackedFormalReturn, Nil)
-      case _: nodes.Unknown               => (TrackedUnknown, Nil)
-      case _: nodes.ControlStructure      => (TrackedUnknown, Nil)
-      // FieldIdentifiers are only fake arguments, hence should not be tracked
-      case _: nodes.FieldIdentifier => (TrackedUnknown, Nil)
+    val result = handleUnNested(node)
+    if (result.isDefined)
+      result.get
+    else {
+      node match {
+        case block: nodes.Block =>
+          lastExpressionInBlock(block)
+            .map { x =>
+              trackedBaseAccessPath(x)
+            }
+            .getOrElse((TrackedUnknown, Nil))
+        case call: nodes.Call => toTrackedBaseAndAccessPathInternalForCall(call)
+      }
     }
   }
 
-  private def toTrackedBaseAndAccessPathInternalForCall(
-      node: nodes.Call,
-      recurseWith: nodes.CfgNode => (TrackedBase, List[AccessElement])): (TrackedBase, List[AccessElement]) = {
+  private def toTrackedBaseAndAccessPathInternalForCall(node: nodes.Call): (TrackedBase, List[AccessElement]) = {
     node match {
       case call: nodes.Call if !MemberAccess.isGenericMemberAccessName(call.name) => (TrackedReturnValue(call), Nil)
       case memberAccess: nodes.Call                                               =>
@@ -221,51 +205,73 @@ object CfgNodeMethods {
           logger.warn(s"Missing first argument on call ${memberAccess}.")
           return (TrackedUnknown, Nil)
         }
-        val (base, tail) = recurseWith(argOne.get)
-        val path = memberAccess.name match {
-          case Operators.memberAccess | Operators.indirectMemberAccess =>
-            if (!hasWarnedDeprecations) {
-              logger.info(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
-              hasWarnedDeprecations = true
-            }
-            memberAccess
-              .argumentOption(2)
-              .collect {
-                case lit: nodes.Literal      => ConstantAccess(lit.code)
-                case withName: nodes.HasName => ConstantAccess(withName.name)
-              }
-              .getOrElse(VariableAccess) :: tail
-
-          case Operators.computedMemberAccess | Operators.indirectComputedMemberAccess =>
-            if (!hasWarnedDeprecations) {
-              logger.info(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
-              hasWarnedDeprecations = true
-            }
-            memberAccess
-              .argumentOption(2)
-              .collect {
-                case lit: nodes.Literal => ConstantAccess(lit.code)
-              }
-              .getOrElse(VariableAccess) :: tail
-          case Operators.indirection =>
-            IndirectionAccess :: tail
-          case Operators.addressOf =>
-            AddressOf :: tail
-          case Operators.fieldAccess | Operators.indexAccess =>
-            extractAccessStringToken(memberAccess) :: tail
-          case Operators.indirectFieldAccess =>
-            // we will reverse the list in the end
-            extractAccessStringToken(memberAccess) :: IndirectionAccess :: tail
-          case Operators.indirectIndexAccess =>
-            // we will reverse the list in the end
-            IndirectionAccess :: extractAccessIntToken(memberAccess) :: tail
-          case Operators.pointerShift =>
-            extractAccessIntToken(memberAccess) :: tail
-          case Operators.getElementPtr =>
-            // we will reverse the list in the end
-            AddressOf :: extractAccessStringToken(memberAccess) :: IndirectionAccess :: tail
-        }
+        val (base, tail) = trackedBaseAccessPath(argOne.get)
+        val path = getPath(memberAccess, tail)
         (base, path)
+    }
+  }
+
+  def handleUnNested(node: nodes.CfgNode): Option[(TrackedBase, List[AccessElement])] = {
+    node match {
+      case node: nodes.MethodParameterIn  => Some((TrackedNamedVariable(node.name), Nil))
+      case node: nodes.MethodParameterOut => Some((TrackedNamedVariable(node.name), Nil))
+      case node: nodes.Identifier         => Some((TrackedNamedVariable(node.name), Nil))
+      case node: nodes.Literal            => Some((TrackedLiteral(node), Nil))
+      case node: nodes.MethodRef          => Some((TrackedMethodOrTypeRef(node), Nil))
+      case node: nodes.TypeRef            => Some((TrackedMethodOrTypeRef(node), Nil))
+      case _: nodes.Return                => Some((TrackedFormalReturn, Nil))
+      case _: nodes.MethodReturn          => Some((TrackedFormalReturn, Nil))
+      case _: nodes.Unknown               => Some((TrackedUnknown, Nil))
+      case _: nodes.ControlStructure      => Some((TrackedUnknown, Nil))
+      // FieldIdentifiers are only fake arguments, hence should not be tracked
+      case _: nodes.FieldIdentifier => Some((TrackedUnknown, Nil))
+      case _                        => None
+    }
+  }
+
+  def getPath(memberAccess: nodes.Call, tail: List[AccessElement]): List[AccessElement] = {
+    memberAccess.name match {
+      case Operators.memberAccess | Operators.indirectMemberAccess =>
+        if (!hasWarnedDeprecations) {
+          logger.info(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
+          hasWarnedDeprecations = true
+        }
+        memberAccess
+          .argumentOption(2)
+          .collect {
+            case lit: nodes.Literal      => ConstantAccess(lit.code)
+            case withName: nodes.HasName => ConstantAccess(withName.name)
+          }
+          .getOrElse(VariableAccess) :: tail
+
+      case Operators.computedMemberAccess | Operators.indirectComputedMemberAccess =>
+        if (!hasWarnedDeprecations) {
+          logger.info(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
+          hasWarnedDeprecations = true
+        }
+        memberAccess
+          .argumentOption(2)
+          .collect {
+            case lit: nodes.Literal => ConstantAccess(lit.code)
+          }
+          .getOrElse(VariableAccess) :: tail
+      case Operators.indirection =>
+        IndirectionAccess :: tail
+      case Operators.addressOf =>
+        AddressOf :: tail
+      case Operators.fieldAccess | Operators.indexAccess =>
+        extractAccessStringToken(memberAccess) :: tail
+      case Operators.indirectFieldAccess =>
+        // we will reverse the list in the end
+        extractAccessStringToken(memberAccess) :: IndirectionAccess :: tail
+      case Operators.indirectIndexAccess =>
+        // we will reverse the list in the end
+        IndirectionAccess :: extractAccessIntToken(memberAccess) :: tail
+      case Operators.pointerShift =>
+        extractAccessIntToken(memberAccess) :: tail
+      case Operators.getElementPtr =>
+        // we will reverse the list in the end
+        AddressOf :: extractAccessStringToken(memberAccess) :: IndirectionAccess :: tail
     }
   }
 
