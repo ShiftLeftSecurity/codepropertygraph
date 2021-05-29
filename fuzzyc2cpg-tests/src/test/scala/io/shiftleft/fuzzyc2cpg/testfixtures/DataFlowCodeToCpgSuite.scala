@@ -57,9 +57,9 @@ class DataFlowCodeToCpgSuite extends FuzzyCCodeToCpgSuite {
         val method = point.method.head
         val method_name = method.name
         val code = s"$method_name(${method.parameter.l.sortBy(_.order).map(_.code).mkString(", ")})"
-        (code, point.cfgNode.lineNumber)
+        (code, point.lineNumber)
       }
-      case point => (point.cfgNode.repr, point.cfgNode.lineNumber)
+      case point => (point.statement.repr, point.lineNumber)
     }
     pairs.headOption.map(x => x :: pairs.sliding(2).collect { case Seq(a, b) if a != b => b }.toList).getOrElse(List())
   }

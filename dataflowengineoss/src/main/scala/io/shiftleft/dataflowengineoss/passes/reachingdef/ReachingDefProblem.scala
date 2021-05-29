@@ -57,15 +57,15 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
   private def initSucc(ns: List[nodes.StoredNode]): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
     ns.map {
       case n @ (_: nodes.Return) => n -> List(exitNode)
-      case n @ (cfgNode: nodes.CfgNode) =>
-        n ->
-          // `.cfgNext` would be wrong here because it filters `METHOD_RETURN`
-          cfgNode.out(EdgeTypes.CFG).map(_.asInstanceOf[nodes.StoredNode]).l
       case n @ (param: nodes.MethodParameterIn) =>
         n -> {
           val nextParam = param.method.parameter.order(param.order + 1).headOption
           if (nextParam.isDefined) { nextParam.toList } else { param.method.cfgFirst.l }
         }
+      case n @ (cfgNode: nodes.CfgNode) =>
+        n ->
+          // `.cfgNext` would be wrong here because it filters `METHOD_RETURN`
+          cfgNode.out(EdgeTypes.CFG).map(_.asInstanceOf[nodes.StoredNode]).l
       case n =>
         logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
         n -> List()
@@ -78,14 +78,14 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
   private def initPred(ns: List[nodes.StoredNode],
                        method: nodes.Method): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
     ns.map {
-      case n @ (_: nodes.CfgNode) if method.cfgFirst.headOption.contains(n) =>
-        n -> method.parameter.l.sortBy(_.order).lastOption.toList
-      case n @ (cfgNode: nodes.CfgNode) => n -> cfgNode.cfgPrev.l
       case n @ (param: nodes.MethodParameterIn) =>
         n -> {
           val prevParam = param.method.parameter.order(param.order - 1).headOption
           if (prevParam.isDefined) { prevParam.toList } else { List(method) }
         }
+      case n @ (_: nodes.CfgNode) if method.cfgFirst.headOption.contains(n) =>
+        n -> method.parameter.l.sortBy(_.order).lastOption.toList
+      case n @ (cfgNode: nodes.CfgNode) => n -> cfgNode.cfgPrev.l
       case n =>
         logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
         n -> List()
