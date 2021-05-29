@@ -35,7 +35,7 @@ class TrackingPointTests extends DataFlowCodeToCpgSuite {
 
   "allow traversing from argument node to param via `ddgIn`" in {
     cpg.method("sink").parameter.argument.l match {
-      case List(t: nodes.TrackingPoint) =>
+      case List(t: nodes.CfgNode) =>
         t.code shouldBe "y"
         t.ddgIn.l match {
           case List(param: nodes.MethodParameterIn) =>
