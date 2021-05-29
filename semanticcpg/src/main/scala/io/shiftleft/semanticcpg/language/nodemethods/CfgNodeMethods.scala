@@ -36,7 +36,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
       case method: nodes.MethodBase             => method.name
       case methodReturn: nodes.MethodReturnBase => methodReturn.code
       case expr: nodes.Expression               => expr.code
-      case call: nodes.ImplicitCallBase         => call.code
+      case call: nodes.CallRepr                 => call.code
     }
 
   /**
@@ -143,8 +143,7 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
       case node: nodes.Call if MemberAccess.isGenericMemberAccessName(node.name) =>
         parentExpansion(node)
 
-      case node: nodes.Call         => node
-      case node: nodes.ImplicitCall => node
+      case node: nodes.CallRepr     => node
       case node: nodes.MethodReturn => node
       case block: nodes.Block       =>
         // Just taking the lastExpressionInBlock is not quite correct because a BLOCK could have

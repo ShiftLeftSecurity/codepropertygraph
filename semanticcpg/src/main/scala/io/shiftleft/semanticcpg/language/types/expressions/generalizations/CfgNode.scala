@@ -27,7 +27,7 @@ class CfgNode[A <: nodes.CfgNode](val traversal: Traversal[A]) extends AnyVal {
         methodReturn.method
       case expression: nodes.Expression =>
         expression.method
-      case implicitCall: nodes.ImplicitCall =>
+      case implicitCall: nodes.CallRepr =>
         implicitCall._astIn.onlyChecked.asInstanceOf[nodes.Method]
     }
 

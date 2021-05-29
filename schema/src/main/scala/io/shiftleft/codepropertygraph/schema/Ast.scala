@@ -465,37 +465,6 @@ object Ast extends SchemaBase {
     namespaceBlock
       .addOutEdge(edge = ref, inNode = namespace)
 
-    ///////////////////////////////////////
-    // To be removed from OSS spec
-    ///////////////////////////////////////
-
-    val implicitCall: NodeType = builder
-      .addNodeType(
-        name = "IMPLICIT_CALL",
-        comment = "An implicit call site hidden in a method indicated by METHOD_MAP policy entries"
-      )
-      .protoId(307)
-      .extendz(callRepr, trackingPoint)
-
-    val postExecutionCall: NodeType = builder
-      .addNodeType(
-        name = "POST_EXECUTION_CALL",
-        comment =
-          "Indicates the existence of a call executed on a return value or out parameter of a method after this method has been executed. This is used to model framework code calling functors returned from user code. The outgoing REF edge indicates on which returned entitity the call will happen."
-      )
-      .protoId(3071)
-      .extendz(callRepr, trackingPoint)
-
-    method
-      .addOutEdge(edge = ast, inNode = implicitCall)
-      .addOutEdge(edge = ast, inNode = postExecutionCall)
-
-    postExecutionCall
-      .addOutEdge(edge = ref, inNode = methodReturn)
-      .addOutEdge(edge = ref, inNode = methodParameterOut)
-
-    //////////////////////////////////////
-
   }
 
 }
