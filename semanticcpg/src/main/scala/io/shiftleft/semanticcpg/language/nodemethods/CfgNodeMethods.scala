@@ -3,8 +3,10 @@ package io.shiftleft.semanticcpg.language.nodemethods
 import io.shiftleft.codepropertygraph.generated.{Operators, nodes}
 import io.shiftleft.semanticcpg.accesspath.{
   AccessElement,
+  AccessPath,
   AddressOf,
   ConstantAccess,
+  Elements,
   IndirectionAccess,
   PointerShift,
   TrackedBase,
@@ -118,6 +120,8 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     controllingNodes
   }
 
+  import CfgNodeMethods._
+
   def statement: nodes.CfgNode =
     statementInternal(node, _.parentExpression.get)
 
@@ -152,6 +156,12 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     }
   }
 
+}
+
+object CfgNodeMethods {
+  private var hasWarnedDeprecations = false
+  private val logger = LoggerFactory.getLogger(getClass)
+
   private def lastExpressionInBlock(block: nodes.Block): Option[nodes.Expression] =
     block._astOut.asScala
       .collect {
@@ -161,20 +171,29 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
       .sortBy(_.order)
       .lastOption
 
-  import CfgNodeMethods._
-
   // TODO this API is not amazing
 
+  def toTrackedBaseAndAccessPath(node: nodes.CfgNode): (TrackedBase, AccessPath) = {
+    val (base, revPath) = trackedBaseAccessPath(node)
+    (base, AccessPath.apply(Elements.normalized(revPath.reverse), Nil))
+  }
+
   def trackedBaseAccessPath(
+      node: nodes.CfgNode,
       recurseWith: nodes.CfgNode => (TrackedBase, List[AccessElement])): (TrackedBase, List[AccessElement]) = {
+    trackedBaseAccessPath(node, recurseWith)
+  }
+
+  def trackedBaseAccessPath(node: nodes.CfgNode): (TrackedBase, List[AccessElement]) = {
     node match {
       case block: nodes.Block =>
-        TrackingPointMethodsBase
-          .lastExpressionInBlock(block)
-          .map { recurseWith }
+        lastExpressionInBlock(block)
+          .map { x =>
+            trackedBaseAccessPath(x)
+          }
           .getOrElse((TrackedUnknown, Nil))
 
-      case call: nodes.Call               => toTrackedBaseAndAccessPathInternalForCall(call, recurseWith)
+      case call: nodes.Call               => toTrackedBaseAndAccessPathInternalForCall(call, trackedBaseAccessPath)
       case node: nodes.MethodParameterIn  => (TrackedNamedVariable(node.name), Nil)
       case node: nodes.MethodParameterOut => (TrackedNamedVariable(node.name), Nil)
       case node: nodes.Identifier         => (TrackedNamedVariable(node.name), Nil)
@@ -284,9 +303,5 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
       case _ => VariablePointerShift
     }
   }
-}
 
-object CfgNodeMethods {
-  private var hasWarnedDeprecations = false
-  private val logger = LoggerFactory.getLogger(getClass)
 }
