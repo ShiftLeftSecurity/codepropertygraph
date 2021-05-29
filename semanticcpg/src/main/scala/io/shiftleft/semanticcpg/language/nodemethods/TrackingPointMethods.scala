@@ -94,8 +94,7 @@ object TrackingPointMethodsBase {
     }
   }
 
-  def toTrackedBaseAndAccessPath(node: nodes.StoredNode): (TrackedBase, AccessPath) = {
-    // assume: node isa nodes.TrackingPoint
+  def toTrackedBaseAndAccessPath(node: nodes.TrackingPoint): (TrackedBase, AccessPath) = {
     node match {
       case ftp: FakeTrackingPoint =>
         ftp.trackedBaseAndAccessPathOverride
@@ -105,16 +104,18 @@ object TrackingPointMethodsBase {
     }
   }
 
-  def toTrackedBase(node: nodes.StoredNode): TrackedBase = toTrackedBaseAndAccessPath(node)._1
-  def toTrackedAccessPath(node: nodes.StoredNode): AccessPath = toTrackedBaseAndAccessPath(node)._2
+  def toTrackedBase(node: nodes.TrackingPoint): TrackedBase = toTrackedBaseAndAccessPath(node)._1
+  def toTrackedAccessPath(node: nodes.TrackingPoint): AccessPath = toTrackedBaseAndAccessPath(node)._2
 
-  private def toTrackedBaseAndAccessPathInternal(node: nodes.StoredNode): (TrackedBase, List[AccessElement]) =
+  private def toTrackedBaseAndAccessPathInternal(node: nodes.TrackingPoint): (TrackedBase, List[AccessElement]) =
     node match {
-      case node: nodes.MethodParameterIn  => (TrackedNamedVariable(node.name), Nil)
-      case node: nodes.MethodParameterOut => (TrackedNamedVariable(node.name), Nil)
-      case node: nodes.ImplicitCall       => (TrackedReturnValue(node), Nil)
+      case node: nodes.ImplicitCall => (TrackedReturnValue(node), Nil)
       case node: nodes.PostExecutionCall =>
         toTrackedBaseAndAccessPathInternal(node._refOut.next().asInstanceOf[nodes.TrackingPoint])
+
+      case node: nodes.MethodParameterIn  => (TrackedNamedVariable(node.name), Nil)
+      case node: nodes.MethodParameterOut => (TrackedNamedVariable(node.name), Nil)
+
       case node: nodes.Identifier    => (TrackedNamedVariable(node.name), Nil)
       case node: nodes.Literal       => (TrackedLiteral(node), Nil)
       case node: nodes.MethodRef     => (TrackedMethodOrTypeRef(node), Nil)
