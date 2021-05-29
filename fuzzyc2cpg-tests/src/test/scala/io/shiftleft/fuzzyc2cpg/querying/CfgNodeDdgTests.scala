@@ -6,7 +6,7 @@ import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.fuzzyc2cpg.testfixtures.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
-class TrackingPointTests extends DataFlowCodeToCpgSuite {
+class CfgNodeDdgTests extends DataFlowCodeToCpgSuite {
 
   implicit val resolver: NoResolve.type = NoResolve
   implicit var s: Semantics = _
