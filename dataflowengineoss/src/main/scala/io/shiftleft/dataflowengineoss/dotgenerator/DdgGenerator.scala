@@ -91,8 +91,8 @@ class DdgGenerator {
       .map(x => Edge(x.outNode.asInstanceOf[nodes.StoredNode], v, true, x.property(Properties.VARIABLE), edgeType))
 
     v match {
-      case cfgNode: nodes.CfgNode =>
-        cfgNode
+      case trackingPoint: nodes.TrackingPoint =>
+        trackingPoint
           .ddgInPathElem(withInvisible = true)
           .map(x => Edge(x.node.asInstanceOf[nodes.StoredNode], v, x.visible, x.outEdgeLabel, edgeType))
           .iterator ++ allInEdges.filter(_.src.isInstanceOf[nodes.Method]).iterator

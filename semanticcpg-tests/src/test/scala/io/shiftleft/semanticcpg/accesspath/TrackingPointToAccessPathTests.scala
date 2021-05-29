@@ -2,14 +2,12 @@ package io.shiftleft.semanticcpg.accesspath
 
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.semanticcpg.language.nodemethods.CfgNodeMethods.toTrackedBaseAndAccessPath
+import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase.toTrackedAccessPath
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 
 class TrackingPointToAccessPathTests extends AnyWordSpec {
-
-  def toTrackedAccessPath(node: nodes.CfgNode): AccessPath = toTrackedBaseAndAccessPath(node)._2
 
   def E(elements: AccessElement*): AccessPath = {
     new AccessPath(Elements.normalized(elements), Nil)

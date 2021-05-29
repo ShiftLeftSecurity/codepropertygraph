@@ -29,17 +29,14 @@ object Schema2Json extends App {
     schemaInfo.definedIn.map(_.getDeclaringClass.getSimpleName).getOrElse("unknown")
 
   private def schemaIndex(nodeType: AbstractNodeType): Int =
-    schemaIndex(nodeType.schemaInfo)
-
-  private def schemaIndex(schemaInfo: SchemaInfo) =
-    schemaInfo.definedIn
+    nodeType.schemaInfo.definedIn
       .map(_.getDeclaringClass.getDeclaredMethod("index").invoke(null).asInstanceOf[Int])
       .getOrElse(Int.MaxValue)
 
   private def schemaSummary = {
-    (schema.nodeTypes.map(_.schemaInfo) ++ schema.edgeTypes.map(_.schemaInfo))
+    schema.nodeTypes
       .sortBy(schemaIndex)
-      .flatMap(_.definedIn)
+      .flatMap(_.schemaInfo.definedIn)
       .distinct
       .map { info =>
         val name = info.getDeclaringClass.getSimpleName
