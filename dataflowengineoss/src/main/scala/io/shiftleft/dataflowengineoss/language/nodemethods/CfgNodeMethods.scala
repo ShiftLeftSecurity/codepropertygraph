@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.queryengine.{Engine, EngineContext, PathElement}
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
+import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.{Traversal, _}
 
 import scala.collection.mutable
