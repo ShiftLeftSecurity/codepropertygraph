@@ -49,13 +49,29 @@ object LocationCreator {
           methodReturn.lineNumber,
           methodReturn.method
         )
-      case callRepr: nodes.CallRepr =>
+      case call: nodes.Call =>
         apply(
-          callRepr,
-          callRepr.code,
-          callRepr.label,
-          callRepr.lineNumber,
-          callRepr.method
+          call,
+          call.code,
+          call.label,
+          call.lineNumber,
+          call.method
+        )
+      case implicitCall: nodes.ImplicitCall =>
+        apply(
+          implicitCall,
+          implicitCall.code,
+          implicitCall.label,
+          implicitCall.lineNumber,
+          implicitCall.method
+        )
+      case postExecutionCall: nodes.PostExecutionCall =>
+        apply(
+          postExecutionCall,
+          postExecutionCall.code,
+          postExecutionCall.label,
+          postExecutionCall.lineNumber,
+          postExecutionCall.method
         )
       case method: nodes.Method =>
         apply(
@@ -97,6 +113,8 @@ object LocationCreator {
           methodRef.lineNumber,
           methodRef._methodViaContainsIn.next()
         )
+      case source: nodes.Source =>
+        apply(source.node)
       case node =>
         emptyLocation(node.label, Some(node))
     }

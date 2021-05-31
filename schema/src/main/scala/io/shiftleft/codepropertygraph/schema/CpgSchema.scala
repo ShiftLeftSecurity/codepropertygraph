@@ -8,15 +8,15 @@ class CpgSchema(builder: SchemaBuilder) {
   val operators = Operators(builder)
 
   val metaData = MetaData(builder, base)
-  val namespaces = Namespace(builder, base)
+  val namespaces = Namespaces(builder, base)
 
-  val typeDecl = Type(builder, base)
+  val typeDecl = TypeDecl(builder, base)
   val method = Method(builder, base, typeDecl)
   val fs = FileSystem(builder, base, namespaces, method, typeDecl)
   val ast = Ast(builder, base, namespaces, method, typeDecl, fs)
 
   val callGraph = CallGraph(builder, method, ast)
-  val cfg = Cfg(builder, base, method, ast)
+  val cfg = ControlFlowGraph(builder, base, method, ast)
   val dominators = Dominators(builder, method, ast)
   val pdg = Pdg(builder, method, ast)
 

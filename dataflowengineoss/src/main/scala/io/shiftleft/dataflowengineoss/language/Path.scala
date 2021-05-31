@@ -4,24 +4,24 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.help.Table
 
-case class Path(elements: List[nodes.CfgNode])
+case class Path(elements: List[nodes.TrackingPoint])
 
 object Path {
 
   implicit val show: Show[Path] = { path: Path =>
     Table(
       columnNames = Array("tracked", "lineNumber", "method", "file"),
-      rows = path.elements.map { cfgNode =>
-        val method = cfgNode.method
+      rows = path.elements.map { trackingPoint =>
+        val method = trackingPoint.method
         val methodName = method.name
-        val lineNumber = cfgNode.lineNumber.getOrElse("N/A").toString
+        val lineNumber = trackingPoint.cfgNode.lineNumber.getOrElse("N/A").toString
         val fileName = method.file.name.headOption.getOrElse("N/A")
 
-        val trackedSymbol = cfgNode match {
+        val trackedSymbol = trackingPoint match {
           case _: nodes.MethodParameterIn =>
             val paramsPretty = method.parameter.toList.sortBy(_.order).map(_.code).mkString(", ")
             s"$methodName($paramsPretty)"
-          case x => x.statement.repr
+          case _ => trackingPoint.cfgNode.repr
         }
 
         Array(trackedSymbol, lineNumber, methodName, fileName)

@@ -5,10 +5,10 @@ import overflowdb.storage.ValueTypes
 
 object Method extends SchemaBase {
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, typeSchema: Type.Schema) =
-    new Schema(builder, base, typeSchema)
+  def apply(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: TypeDecl.Schema) =
+    new Schema(builder, base, typeDeclSchema)
 
-  def index: Int = 5
+  def index: Int = 2
   override def providedByFrontend: Boolean = true
 
   override def description: String =
@@ -17,9 +17,9 @@ object Method extends SchemaBase {
       | This layer is provided by the frontend and may be modified by passes.
       |""".stripMargin
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema, typeSchema: Type.Schema) {
+  class Schema(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: TypeDecl.Schema) {
     import base._
-    import typeSchema._
+    import typeDeclSchema._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     val signature = builder
@@ -71,8 +71,8 @@ object Method extends SchemaBase {
         comment = "This node represents a formal parameter going towards the callee side"
       )
       .protoId(34)
-      .addProperties(typeFullName)
-      .extendz(declaration, localLike)
+      .addProperties(code, typeFullName, lineNumber, columnNumber)
+      .extendz(declaration, localLike, trackingPoint)
 
     val methodParameterOut: NodeType = builder
       .addNodeType(
@@ -80,8 +80,8 @@ object Method extends SchemaBase {
         comment = "This node represents a formal output parameter. It does not need to be created by the frontend."
       )
       .protoId(33)
-      .addProperties(typeFullName)
-      .extendz(declaration)
+      .addProperties(code, typeFullName, lineNumber, columnNumber)
+      .extendz(declaration, trackingPoint)
 
     val local: NodeType = builder
       .addNodeType(
@@ -89,7 +89,7 @@ object Method extends SchemaBase {
         comment = "A local variable"
       )
       .protoId(23)
-      .addProperties(typeFullName, lineNumber, columnNumber)
+      .addProperties(code, typeFullName, lineNumber, columnNumber)
       .extendz(declaration, localLike)
 
     val methodReturn: NodeType = builder
@@ -99,6 +99,7 @@ object Method extends SchemaBase {
       )
       .protoId(3)
       .addProperties(typeFullName)
+      .extendz(trackingPoint)
 
     val binding: NodeType = builder
       .addNodeType(

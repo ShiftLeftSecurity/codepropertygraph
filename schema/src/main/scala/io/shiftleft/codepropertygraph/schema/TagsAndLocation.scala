@@ -5,7 +5,7 @@ import overflowdb.storage.ValueTypes
 
 object TagsAndLocation extends SchemaBase {
 
-  override def index: Int = 16
+  override def index: Int = 7
 
   override def description: String =
     """
@@ -14,7 +14,7 @@ object TagsAndLocation extends SchemaBase {
 
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
-            typeDeclSchema: Type.Schema,
+            typeDeclSchema: TypeDecl.Schema,
             methodSchema: Method.Schema,
             ast: Ast.Schema,
             fs: FileSystem.Schema) =
@@ -22,7 +22,7 @@ object TagsAndLocation extends SchemaBase {
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
-               typeDeclSchema: Type.Schema,
+               typeDeclSchema: TypeDecl.Schema,
                methodSchema: Method.Schema,
                ast: Ast.Schema,
                fs: FileSystem.Schema) {
@@ -147,6 +147,22 @@ object TagsAndLocation extends SchemaBase {
       .protoId(208)
       .addProperties()
 
+    val source: NodeType = builder
+      .addNodeType(
+        name = "SOURCE",
+        comment = ""
+      )
+      .protoId(202)
+      .addProperties(sourceType)
+
+    val sink: NodeType = builder
+      .addNodeType(
+        name = "SINK",
+        comment = ""
+      )
+      .protoId(203)
+      .addProperties(sinkType)
+
 // node relations
     location
       .addContainedNode(builder.anyNode, "node", Cardinality.ZeroOrOne)
@@ -154,6 +170,25 @@ object TagsAndLocation extends SchemaBase {
     tagNodePair
       .addContainedNode(tag, "tag", Cardinality.One)
       .addContainedNode(builder.anyNode, "node", Cardinality.One)
+
+    source
+      .addContainedNode(trackingPoint, "node", Cardinality.One)
+      .addContainedNode(method, "method", Cardinality.One)
+      .addContainedNode(tag, "methodTags", Cardinality.List)
+      .addContainedNode(method, "callingMethod", Cardinality.ZeroOrOne)
+      .addContainedNode(callNode, "callsite", Cardinality.ZeroOrOne)
+      .addContainedNode(tag, "tags", Cardinality.List)
+      .addContainedNode(tpe, "nodeType", Cardinality.One)
+
+    sink
+      .addContainedNode(trackingPoint, "node", Cardinality.One)
+      .addContainedNode(tpe, "nodeType", Cardinality.One)
+      .addContainedNode(method, "method", Cardinality.One)
+      .addContainedNode(tag, "methodTags", Cardinality.List)
+      .addContainedNode(method, "callingMethod", Cardinality.ZeroOrOne)
+      .addContainedNode(callNode, "callsite", Cardinality.ZeroOrOne)
+      .addContainedNode(methodParameterIn, "parameterIn", Cardinality.ZeroOrOne)
+      .addContainedNode(tag, "parameterInTags", Cardinality.List)
 
     method
       .addOutEdge(edge = taggedBy, inNode = tag)

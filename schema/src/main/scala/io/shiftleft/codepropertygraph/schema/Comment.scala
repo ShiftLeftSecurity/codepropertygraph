@@ -4,7 +4,7 @@ import overflowdb.schema._
 
 object Comment extends SchemaBase {
 
-  def index: Int = 12
+  def index: Int = 6
   override def providedByFrontend: Boolean = true
 
   override def description: String =

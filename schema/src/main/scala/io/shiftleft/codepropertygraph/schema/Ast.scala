@@ -5,7 +5,7 @@ import overflowdb.storage.ValueTypes
 
 object Ast extends SchemaBase {
 
-  def index: Int = 7
+  def index: Int = 6
   override def providedByFrontend: Boolean = true
 
   override def description: String =
@@ -15,23 +15,23 @@ object Ast extends SchemaBase {
 
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
-            namespaces: Namespace.Schema,
+            namespaces: Namespaces.Schema,
             methodSchema: Method.Schema,
-            typeSchema: Type.Schema,
+            typeDeclSchema: TypeDecl.Schema,
             fs: FileSystem.Schema) =
-    new Schema(builder, base, namespaces, methodSchema, typeSchema, fs)
+    new Schema(builder, base, namespaces, methodSchema, typeDeclSchema, fs)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
-               namespaces: Namespace.Schema,
+               namespaces: Namespaces.Schema,
                methodSchema: Method.Schema,
-               typeSchema: Type.Schema,
+               typeDeclSchema: TypeDecl.Schema,
                fs: FileSystem.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import base._
     import namespaces._
-    import typeSchema._
+    import typeDeclSchema._
     import fs._
 
     // Base types
@@ -47,7 +47,7 @@ object Ast extends SchemaBase {
                     |while in the right-most sibling, it is set to n-1 where n is the number of siblings.
                     |""".stripMargin
       )
-      .addProperties(order, code)
+      .addProperties(order)
 
     val callRepr = builder
       .addNodeBaseType(
@@ -77,6 +77,7 @@ object Ast extends SchemaBase {
         name = "EXPRESSION",
         comment = "Expression as a specialisation of tracking point"
       )
+      .extendz(trackingPoint)
 
     expression.extendz(astNode)
 
@@ -101,21 +102,11 @@ object Ast extends SchemaBase {
     val literal: NodeType = builder
       .addNodeType(
         name = "LITERAL",
-        comment = "Literal/Constant. This may be a string, in which case it includes the quotes."
+        comment = "Literal/Constant"
       )
       .protoId(8)
       .addProperties(typeFullName)
       .extendz(expression)
-
-    val methodFullName = builder
-      .addProperty(
-        name = "METHOD_FULL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = """The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required
-                    |to have exactly one METHOD node for each METHOD_FULL_NAME""".stripMargin
-      )
-      .protoId(54)
 
     val callNode: NodeType = builder
       .addNodeType(
@@ -463,6 +454,37 @@ object Ast extends SchemaBase {
 
     namespaceBlock
       .addOutEdge(edge = ref, inNode = namespace)
+
+    ///////////////////////////////////////
+    // To be removed from OSS spec
+    ///////////////////////////////////////
+
+    val implicitCall: NodeType = builder
+      .addNodeType(
+        name = "IMPLICIT_CALL",
+        comment = "An implicit call site hidden in a method indicated by METHOD_MAP policy entries"
+      )
+      .protoId(307)
+      .extendz(callRepr, trackingPoint)
+
+    val postExecutionCall: NodeType = builder
+      .addNodeType(
+        name = "POST_EXECUTION_CALL",
+        comment =
+          "Indicates the existence of a call executed on a return value or out parameter of a method after this method has been executed. This is used to model framework code calling functors returned from user code. The outgoing REF edge indicates on which returned entitity the call will happen."
+      )
+      .protoId(3071)
+      .extendz(callRepr, trackingPoint)
+
+    method
+      .addOutEdge(edge = ast, inNode = implicitCall)
+      .addOutEdge(edge = ast, inNode = postExecutionCall)
+
+    postExecutionCall
+      .addOutEdge(edge = ref, inNode = methodReturn)
+      .addOutEdge(edge = ref, inNode = methodParameterOut)
+
+    //////////////////////////////////////
 
   }
 

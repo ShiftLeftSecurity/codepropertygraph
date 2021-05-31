@@ -61,7 +61,8 @@ object DotSerializer {
         node.method.methodReturn
       case node: nodes.Call if MemberAccess.isGenericMemberAccessName(node.name) =>
         node.parentExpression.get
-      case node: nodes.CallRepr     => node
+      case node: nodes.Call         => node
+      case node: nodes.ImplicitCall => node
       case node: nodes.MethodReturn => node
       case node: nodes.Expression   => node
     }

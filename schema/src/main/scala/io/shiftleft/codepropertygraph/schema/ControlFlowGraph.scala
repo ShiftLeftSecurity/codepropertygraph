@@ -2,9 +2,9 @@ package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema.{Cardinality, SchemaBuilder, SchemaInfo}
 
-object Cfg extends SchemaBase {
+object ControlFlowGraph extends SchemaBase {
 
-  def index: Int = 8
+  def index: Int = 6
 
   override def description: String =
     """
@@ -24,19 +24,12 @@ object Cfg extends SchemaBase {
         name = "CFG_NODE",
         comment = "Any node that can occur as part of a control flow graph"
       )
-      .addProperties(lineNumber, columnNumber)
+      .addProperties(lineNumber, columnNumber, code)
       .extendz(withinMethod, astNode)
 
     // Method and MethodReturn nodes are used as ENTRY and EXIT nodes respectively
     method.extendz(cfgNode)
     methodReturn.extendz(cfgNode)
-
-    // While an input parameter is a declaration, we can just as well view it
-    // as the CFG node that assigns the actual in to the parameter variable.
-    // Similarly, output parameters can be seen as assignments of the parameter
-    // to the actual out.
-    methodParameterIn.extendz(cfgNode)
-    methodParameterOut.extendz(cfgNode)
 
     expression.extendz(cfgNode)
     callRepr.extendz(cfgNode)
