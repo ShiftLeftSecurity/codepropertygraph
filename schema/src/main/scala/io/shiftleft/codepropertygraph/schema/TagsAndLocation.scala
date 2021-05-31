@@ -5,7 +5,7 @@ import overflowdb.storage.ValueTypes
 
 object TagsAndLocation extends SchemaBase {
 
-  override def index: Int = 16
+  override def index: Int = 7
 
   override def description: String =
     """
@@ -14,7 +14,7 @@ object TagsAndLocation extends SchemaBase {
 
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
-            typeDeclSchema: Type.Schema,
+            typeDeclSchema: TypeDecl.Schema,
             methodSchema: Method.Schema,
             ast: Ast.Schema,
             fs: FileSystem.Schema) =
@@ -22,7 +22,7 @@ object TagsAndLocation extends SchemaBase {
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
-               typeDeclSchema: Type.Schema,
+               typeDeclSchema: TypeDecl.Schema,
                methodSchema: Method.Schema,
                ast: Ast.Schema,
                fs: FileSystem.Schema) {

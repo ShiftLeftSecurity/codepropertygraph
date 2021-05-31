@@ -4,27 +4,27 @@ import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
 
 object FileSystem extends SchemaBase {
 
-  def index: Int = 3
+  def index: Int = 5
   override def description: String =
     """
       |""".stripMargin
 
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
-            namespaces: Namespace.Schema,
+            namespaces: Namespaces.Schema,
             methodSchema: Method.Schema,
-            typeSchema: Type.Schema) =
-    new Schema(builder, base, namespaces, methodSchema, typeSchema)
+            typeDeclSchema: TypeDecl.Schema) =
+    new Schema(builder, base, namespaces, methodSchema, typeDeclSchema)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
-               namespaces: Namespace.Schema,
+               namespaces: Namespaces.Schema,
                methodSchema: Method.Schema,
-               typeSchema: Type.Schema) {
+               typeDeclSchema: TypeDecl.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import namespaces._
     import methodSchema._
-    import typeSchema._
+    import typeDeclSchema._
     import base._
 
     val sourceFile = builder
