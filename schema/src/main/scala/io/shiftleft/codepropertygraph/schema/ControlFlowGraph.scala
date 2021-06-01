@@ -24,7 +24,7 @@ object ControlFlowGraph extends SchemaBase {
         name = "CFG_NODE",
         comment = "Any node that can occur as part of a control flow graph"
       )
-      .addProperties(lineNumber, columnNumber, code)
+      .addProperties(lineNumber, columnNumber)
       .extendz(withinMethod, astNode)
 
     // Method and MethodReturn nodes are used as ENTRY and EXIT nodes respectively
