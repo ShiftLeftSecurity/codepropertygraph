@@ -47,7 +47,7 @@ object Ast extends SchemaBase {
                     |while in the right-most sibling, it is set to n-1 where n is the number of siblings.
                     |""".stripMargin
       )
-      .addProperties(order)
+      .addProperties(order, code)
 
     val callRepr = builder
       .addNodeBaseType(
