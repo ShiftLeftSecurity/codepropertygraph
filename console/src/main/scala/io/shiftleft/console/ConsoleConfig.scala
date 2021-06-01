@@ -40,7 +40,8 @@ class LanguageFrontendConfig(var csharp: CSharpFrontendConfig = CSharpFrontendCo
                              var js: JsFrontendConfig = JsFrontendConfig(),
                              var llvm: LlvmFrontendConfig = LlvmFrontendConfig(),
                              var python: PythonFrontendConfig = PythonFrontendConfig(),
-                             var php: PhpFrontendConfig = PhpFrontendConfig())
+                             var php: PhpFrontendConfig = PhpFrontendConfig(),
+                             var ghidra: GhidraFrontendConfig = GhidraFrontendConfig())
 
 class CSharpFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 class FuzzyCFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
@@ -50,6 +51,7 @@ class JsFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 class LlvmFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 class PythonFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 class PhpFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
+class GhidraFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 
 object CSharpFrontendConfig {
   def apply(): CSharpFrontendConfig = new CSharpFrontendConfig()
@@ -81,4 +83,8 @@ object PythonFrontendConfig {
 
 object PhpFrontendConfig {
   def apply(): PhpFrontendConfig = new PhpFrontendConfig()
+}
+
+object GhidraFrontendConfig {
+  def apply(): GhidraFrontendConfig = new GhidraFrontendConfig()
 }

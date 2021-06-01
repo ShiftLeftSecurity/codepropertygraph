@@ -22,6 +22,7 @@ package object cpgcreation {
       case Languages.JAVASCRIPT => Some(JsCpgGenerator(config.js, rootPath))
       case Languages.PYTHON     => Some(PythonCpgGenerator(config.python, rootPath))
       case Languages.PHP        => Some(PhpCpgGenerator(config.php, rootPath))
+      case Languages.GHIDRA     => Some(GhidraCpgGenerator(config.ghidra, rootPath))
       case _                    => None
     }
   }
