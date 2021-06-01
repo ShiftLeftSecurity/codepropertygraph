@@ -24,13 +24,15 @@ object AccessPath {
   private implicit class ElementsDecorations(el: Elements) {
 
     def noOvertaint(start: Int = 0, untilExclusive: Int = el.elements.length): Boolean = {
-      el.elements
-        .slice(start, untilExclusive)
-        .find {
-          case (VariablePointerShift | VariableAccess) => true
-          case _                                       => false
+      var idx = start
+      while (idx < untilExclusive) {
+        el.elements(idx) match {
+          case (VariablePointerShift | VariableAccess) => return false
+          case _                                       =>
         }
-        .forall(_ => false)
+        idx += 1
+      }
+      true
     }
 
     /**
@@ -49,9 +51,10 @@ object AccessPath {
       val nElements = el.elements.length - 1
       while (nElements - i > -1) {
         el.elements(nElements - i) match {
-          case (AddressOf | VariablePointerShift | _: PointerShift) => i += 1
+          case (AddressOf | VariablePointerShift | _: PointerShift) =>
           case _                                                    => return i
         }
+        i += 1
       }
       i
     }
@@ -65,24 +68,29 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
 
   def isEmpty: Boolean = this == AccessPath.empty
 
+  private var cachedHash: Int = 0
+
+  override def hashCode(): Int = {
+    if (cachedHash == 0) {
+      val computedHash = elements.hashCode() + exclusions.hashCode() ^ 0x404f92ab
+      cachedHash = if (computedHash == 0) 1 else computedHash
+      cachedHash
+    } else cachedHash
+  }
+
   // for handling of invertible elements, cf AccessPathAlgebra.md
   //FIXME: may need to process invertible tail of `other` better
 
   def ++(other: Elements): Option[AccessPath] = {
-    Some(other)
-      .filterNot(isExtensionExcluded)
-      .map(_ => AccessPath(this.elements ++ other, this.truncateExclusions(other).exclusions))
+    if (isExtensionExcluded(other)) None
+    else Some(AccessPath(this.elements ++ other, this.truncateExclusions(other).exclusions))
   }
 
   //FIXME: may need to process invertible tail of `other` better
   def ++(other: AccessPath): Option[AccessPath] = {
-    Some(other.elements)
-      .filterNot(isExtensionExcluded)
-      .map { otherElems =>
-        exclusions.foldLeft(AccessPath(this.elements ++ otherElems, this.truncateExclusions(otherElems).exclusions)) {
-          case (x, y) => x.addExclusion(y)
-        }
-      }
+    (this ++ other.elements).map { appended =>
+      other.exclusions.foldLeft(appended) { case (ap, ex) => ap.addExclusion(ex) }
+    }
   }
 
   def matchFull(other: AccessPath): FullMatchResult = {
@@ -192,11 +200,13 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
   }
 
   private def truncateExclusions(compareExclusion: Elements): AccessPath = {
+    if (exclusions.isEmpty) return this
     val size = compareExclusion.elements.length
     val newExclusions =
       exclusions
         .filter(_.elements.startsWith(compareExclusion.elements))
         .map(exclusion => Elements.normalized(exclusion.elements.drop(size)))
+        .sorted
     AccessPath(elements, newExclusions)
   }
 
@@ -204,8 +214,9 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
     if (newExclusion.noOvertaint()) {
       val ex =
         Elements.unnormalized(newExclusion.elements.dropRight(newExclusion.invertibleTailLength))
+      if (isExtensionExcluded(ex)) return this
       val unshadowed = exclusions.filter(!_.elements.startsWith(ex.elements))
-      AccessPath(elements, unshadowed :+ ex)
+      AccessPath(elements, (unshadowed :+ ex).sorted)
     } else this
   }
 
@@ -360,7 +371,7 @@ object Elements {
 
 }
 
-final class Elements(val elements: Array[AccessElement] = Array[AccessElement]()) {
+final class Elements(val elements: Array[AccessElement] = Array[AccessElement]()) extends Comparable[Elements] {
 
   def isEmpty: Boolean = elements.isEmpty
 
@@ -375,6 +386,21 @@ final class Elements(val elements: Array[AccessElement] = Array[AccessElement]()
   }
 
   override def hashCode(): Int = java.util.Arrays.hashCode(elements.asInstanceOf[Array[AnyRef]])
+
+  override def compareTo(other: Elements): Int = {
+    val until = scala.math.min(elements.length, other.elements.length)
+    var idx = 0
+    while (idx < until) {
+      elements(idx).compareTo(other.elements(idx)) match {
+        case 0          =>
+        case difference => return difference
+      }
+      idx += 1
+    }
+    if (idx < elements.length) +1
+    else if (idx < other.elements.length) -1
+    else 0
+  }
 
   def ++(otherElements: Elements): Elements = {
 
