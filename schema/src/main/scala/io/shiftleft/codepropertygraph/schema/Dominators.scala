@@ -4,7 +4,7 @@ import overflowdb.schema.{SchemaBuilder, SchemaInfo}
 
 object Dominators extends SchemaBase {
 
-  def index: Int = 6
+  def index: Int = 11
 
   override def description: String =
     """

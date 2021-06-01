@@ -8,7 +8,7 @@ object TypeDecl extends SchemaBase {
   def apply(builder: SchemaBuilder, base: Base.Schema) =
     new Schema(builder, base)
 
-  def index: Int = 3
+  def index: Int = 6
   override def providedByFrontend: Boolean = true
 
   override def description: String =
