@@ -5,7 +5,7 @@ import overflowdb.storage.ValueTypes
 
 object TagsAndLocation extends SchemaBase {
 
-  override def index: Int = 7
+  override def index: Int = 16
 
   override def description: String =
     """

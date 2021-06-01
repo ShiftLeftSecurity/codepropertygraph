@@ -4,7 +4,7 @@ import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
 
 object FileSystem extends SchemaBase {
 
-  def index: Int = 5
+  def index: Int = 3
   override def description: String =
     """
       |""".stripMargin

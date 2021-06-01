@@ -4,7 +4,7 @@ import overflowdb.schema.{Cardinality, SchemaBuilder, SchemaInfo}
 
 object ControlFlowGraph extends SchemaBase {
 
-  def index: Int = 6
+  def index: Int = 8
 
   override def description: String =
     """

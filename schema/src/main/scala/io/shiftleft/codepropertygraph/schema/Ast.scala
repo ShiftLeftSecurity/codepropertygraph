@@ -5,7 +5,7 @@ import overflowdb.storage.ValueTypes
 
 object Ast extends SchemaBase {
 
-  def index: Int = 6
+  def index: Int = 7
   override def providedByFrontend: Boolean = true
 
   override def description: String =
