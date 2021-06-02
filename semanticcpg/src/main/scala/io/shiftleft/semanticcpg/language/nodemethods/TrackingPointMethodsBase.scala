@@ -38,7 +38,6 @@ trait FakeTrackingPoint {
 // Utility methods for dealing with tracking points
 object TrackingPointMethodsBase {
   private val logger = LoggerFactory.getLogger(getClass)
-  private var hasWarnedDeprecations = false
 
   //we don't want to expose this API everywhere, only when explicitly imported
   implicit class ImplicitsAPI(val node: nodes.TrackingPoint) extends AnyVal {
@@ -100,124 +99,66 @@ object TrackingPointMethodsBase {
       case ftp: FakeTrackingPoint =>
         ftp.trackedBaseAndAccessPathOverride
       case _ =>
-        val (base, revPath) = toTrackedBaseAndAccessPathInternal(node)
-        (base, AccessPath.apply(Elements.normalized(revPath.reverse), Nil))
+        toTrackedBaseAndAccessPathSimple(node)
     }
+  }
+
+  def toTrackedBaseAndAccessPathSimple(node: nodes.StoredNode): (TrackedBase, AccessPath) = {
+    val (base, revPath) = toTrackedBaseAndAccessPathInternal(node)
+    (base, AccessPath.apply(Elements.normalized(revPath.reverse), Nil))
   }
 
   def toTrackedBase(node: nodes.StoredNode): TrackedBase = toTrackedBaseAndAccessPath(node)._1
   def toTrackedAccessPath(node: nodes.StoredNode): AccessPath = toTrackedBaseAndAccessPath(node)._2
 
-  private def toTrackedBaseAndAccessPathInternal(node: nodes.StoredNode): (TrackedBase, List[AccessElement]) =
+  private def leafToTrackedBaseAndAccessPathInternal(
+      node: nodes.StoredNode): Option[(TrackedBase, List[AccessElement])] = {
     node match {
-      case node: nodes.MethodParameterIn  => (TrackedNamedVariable(node.name), Nil)
-      case node: nodes.MethodParameterOut => (TrackedNamedVariable(node.name), Nil)
-      case node: nodes.ImplicitCall       => (TrackedReturnValue(node), Nil)
-      case node: nodes.PostExecutionCall =>
-        toTrackedBaseAndAccessPathInternal(node._refOut.next().asInstanceOf[nodes.TrackingPoint])
-      case node: nodes.Identifier    => (TrackedNamedVariable(node.name), Nil)
-      case node: nodes.Literal       => (TrackedLiteral(node), Nil)
-      case node: nodes.MethodRef     => (TrackedMethodOrTypeRef(node), Nil)
-      case node: nodes.TypeRef       => (TrackedMethodOrTypeRef(node), Nil)
-      case _: nodes.Return           => (TrackedFormalReturn, Nil)
-      case _: nodes.MethodReturn     => (TrackedFormalReturn, Nil)
-      case _: nodes.Unknown          => (TrackedUnknown, Nil)
-      case _: nodes.ControlStructure => (TrackedUnknown, Nil)
+      case node: nodes.MethodParameterIn  => Some((TrackedNamedVariable(node.name), Nil))
+      case node: nodes.MethodParameterOut => Some((TrackedNamedVariable(node.name), Nil))
+      case node: nodes.Identifier         => Some((TrackedNamedVariable(node.name), Nil))
+      case node: nodes.Literal            => Some((TrackedLiteral(node), Nil))
+      case node: nodes.MethodRef          => Some((TrackedMethodOrTypeRef(node), Nil))
+      case node: nodes.TypeRef            => Some((TrackedMethodOrTypeRef(node), Nil))
+      case _: nodes.Return                => Some((TrackedFormalReturn, Nil))
+      case _: nodes.MethodReturn          => Some((TrackedFormalReturn, Nil))
+      case _: nodes.Unknown               => Some((TrackedUnknown, Nil))
+      case _: nodes.ControlStructure      => Some((TrackedUnknown, Nil))
       // FieldIdentifiers are only fake arguments, hence should not be tracked
-      case _: nodes.FieldIdentifier => (TrackedUnknown, Nil)
-      case block: nodes.Block =>
-        TrackingPointMethodsBase
-          .lastExpressionInBlock(block)
-          .map { toTrackedBaseAndAccessPathInternal }
-          .getOrElse((TrackedUnknown, Nil))
-      case call: nodes.Call if !MemberAccess.isGenericMemberAccessName(call.name) => (TrackedReturnValue(call), Nil)
-
-      case memberAccess: nodes.Call =>
-        //assume: MemberAccess.isGenericMemberAccessName(call.name)
-        //FIXME: elevate debug to warn once csharp2cpg has managed to migrate.
-        val argOne = memberAccess.argumentOption(1)
-        if (argOne.isEmpty) {
-          logger.warn(s"Missing first argument on call ${memberAccess}.")
-          return (TrackedUnknown, Nil)
-        }
-        val (base, tail) = toTrackedBaseAndAccessPathInternal(argOne.get)
-        val path = memberAccess.name match {
-          case Operators.memberAccess | Operators.indirectMemberAccess =>
-            if (!hasWarnedDeprecations) {
-              logger.info(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
-              hasWarnedDeprecations = true
-            }
-            memberAccess
-              .argumentOption(2)
-              .collect {
-                case lit: nodes.Literal      => ConstantAccess(lit.code)
-                case withName: nodes.HasName => ConstantAccess(withName.name)
-              }
-              .getOrElse(VariableAccess) :: tail
-
-          case Operators.computedMemberAccess | Operators.indirectComputedMemberAccess =>
-            if (!hasWarnedDeprecations) {
-              logger.info(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
-              hasWarnedDeprecations = true
-            }
-            memberAccess
-              .argumentOption(2)
-              .collect {
-                case lit: nodes.Literal => ConstantAccess(lit.code)
-              }
-              .getOrElse(VariableAccess) :: tail
-          case Operators.indirection =>
-            IndirectionAccess :: tail
-          case Operators.addressOf =>
-            AddressOf :: tail
-          case Operators.fieldAccess | Operators.indexAccess =>
-            extractAccessStringToken(memberAccess) :: tail
-          case Operators.indirectFieldAccess =>
-            // we will reverse the list in the end
-            extractAccessStringToken(memberAccess) :: IndirectionAccess :: tail
-          case Operators.indirectIndexAccess =>
-            // we will reverse the list in the end
-            IndirectionAccess :: extractAccessIntToken(memberAccess) :: tail
-          case Operators.pointerShift =>
-            extractAccessIntToken(memberAccess) :: tail
-          case Operators.getElementPtr =>
-            // we will reverse the list in the end
-            AddressOf :: extractAccessStringToken(memberAccess) :: IndirectionAccess :: tail
-        }
-        (base, path)
-    }
-
-  private def extractAccessStringToken(memberAccess: nodes.Call): AccessElement = {
-    memberAccess.argumentOption(2) match {
-      case None => {
-        logger.warn(
-          s"Invalid AST: Found member access without second argument." +
-            s" Member access CODE: ${memberAccess.code}" +
-            s" In method ${memberAccess.method.fullName}")
-        VariableAccess
-      }
-      case Some(literal: nodes.Literal) => ConstantAccess(literal.code)
-      case Some(fieldIdentifier: nodes.FieldIdentifier) =>
-        ConstantAccess(fieldIdentifier.canonicalName)
-      case _ => VariableAccess
+      case _: nodes.FieldIdentifier => Some((TrackedUnknown, Nil))
+      case _                        => None
     }
   }
-  private def extractAccessIntToken(memberAccess: nodes.Call): AccessElement = {
-    memberAccess.argumentOption(2) match {
-      case None => {
-        logger.warn(
-          s"Invalid AST: Found member access without second argument." +
-            s" Member access CODE: ${memberAccess.code}" +
-            s" In method ${memberAccess.method.fullName}")
-        VariablePointerShift
+
+  private def toTrackedBaseAndAccessPathInternal(node: nodes.StoredNode): (TrackedBase, List[AccessElement]) = {
+    val result = leafToTrackedBaseAndAccessPathInternal(node)
+    if (result.isDefined) {
+      result.get
+    } else {
+      node match {
+        case node: nodes.ImplicitCall => (TrackedReturnValue(node), Nil)
+        case node: nodes.PostExecutionCall =>
+          toTrackedBaseAndAccessPathInternal(node._refOut.next().asInstanceOf[nodes.TrackingPoint])
+
+        case block: nodes.Block =>
+          TrackingPointMethodsBase
+            .lastExpressionInBlock(block)
+            .map { toTrackedBaseAndAccessPathInternal }
+            .getOrElse((TrackedUnknown, Nil))
+        case call: nodes.Call if !MemberAccess.isGenericMemberAccessName(call.name) => (TrackedReturnValue(call), Nil)
+
+        case memberAccess: nodes.Call =>
+          //assume: MemberAccess.isGenericMemberAccessName(call.name)
+          //FIXME: elevate debug to warn once csharp2cpg has managed to migrate.
+          val argOne = memberAccess.argumentOption(1)
+          if (argOne.isEmpty) {
+            logger.warn(s"Missing first argument on call ${memberAccess}.")
+            return (TrackedUnknown, Nil)
+          }
+          val (base, tail) = toTrackedBaseAndAccessPathInternal(argOne.get)
+          val path = MemberAccessToPath.memberAccessToPath(memberAccess, tail)
+          (base, path)
       }
-      case Some(literal: nodes.Literal) =>
-        literal.code.toIntOption.map(PointerShift).getOrElse(VariablePointerShift)
-      case Some(fieldIdentifier: nodes.FieldIdentifier) =>
-        fieldIdentifier.canonicalName.toIntOption
-          .map(PointerShift)
-          .getOrElse(VariablePointerShift)
-      case _ => VariablePointerShift
     }
   }
 
@@ -262,4 +203,91 @@ object TrackingPointToCfgNode {
       case node: nodes.Expression => node
     }
   }
+}
+
+object MemberAccessToPath {
+
+  private val logger = LoggerFactory.getLogger(getClass)
+  private var hasWarnedDeprecations = false
+
+  def memberAccessToPath(memberAccess: nodes.Call, tail: List[AccessElement]) = {
+    memberAccess.name match {
+      case Operators.memberAccess | Operators.indirectMemberAccess =>
+        if (!hasWarnedDeprecations) {
+          logger.info(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
+          hasWarnedDeprecations = true
+        }
+        memberAccess
+          .argumentOption(2)
+          .collect {
+            case lit: nodes.Literal      => ConstantAccess(lit.code)
+            case withName: nodes.HasName => ConstantAccess(withName.name)
+          }
+          .getOrElse(VariableAccess) :: tail
+
+      case Operators.computedMemberAccess | Operators.indirectComputedMemberAccess =>
+        if (!hasWarnedDeprecations) {
+          logger.info(s"Deprecated Operator ${memberAccess.name} on ${memberAccess}")
+          hasWarnedDeprecations = true
+        }
+        memberAccess
+          .argumentOption(2)
+          .collect {
+            case lit: nodes.Literal => ConstantAccess(lit.code)
+          }
+          .getOrElse(VariableAccess) :: tail
+      case Operators.indirection =>
+        IndirectionAccess :: tail
+      case Operators.addressOf =>
+        AddressOf :: tail
+      case Operators.fieldAccess | Operators.indexAccess =>
+        extractAccessStringToken(memberAccess) :: tail
+      case Operators.indirectFieldAccess =>
+        // we will reverse the list in the end
+        extractAccessStringToken(memberAccess) :: IndirectionAccess :: tail
+      case Operators.indirectIndexAccess =>
+        // we will reverse the list in the end
+        IndirectionAccess :: extractAccessIntToken(memberAccess) :: tail
+      case Operators.pointerShift =>
+        extractAccessIntToken(memberAccess) :: tail
+      case Operators.getElementPtr =>
+        // we will reverse the list in the end
+        AddressOf :: extractAccessStringToken(memberAccess) :: IndirectionAccess :: tail
+    }
+  }
+
+  private def extractAccessStringToken(memberAccess: nodes.Call): AccessElement = {
+    memberAccess.argumentOption(2) match {
+      case None => {
+        logger.warn(
+          s"Invalid AST: Found member access without second argument." +
+            s" Member access CODE: ${memberAccess.code}" +
+            s" In method ${memberAccess.method.fullName}")
+        VariableAccess
+      }
+      case Some(literal: nodes.Literal) => ConstantAccess(literal.code)
+      case Some(fieldIdentifier: nodes.FieldIdentifier) =>
+        ConstantAccess(fieldIdentifier.canonicalName)
+      case _ => VariableAccess
+    }
+  }
+  private def extractAccessIntToken(memberAccess: nodes.Call): AccessElement = {
+    memberAccess.argumentOption(2) match {
+      case None => {
+        logger.warn(
+          s"Invalid AST: Found member access without second argument." +
+            s" Member access CODE: ${memberAccess.code}" +
+            s" In method ${memberAccess.method.fullName}")
+        VariablePointerShift
+      }
+      case Some(literal: nodes.Literal) =>
+        literal.code.toIntOption.map(PointerShift).getOrElse(VariablePointerShift)
+      case Some(fieldIdentifier: nodes.FieldIdentifier) =>
+        fieldIdentifier.canonicalName.toIntOption
+          .map(PointerShift)
+          .getOrElse(VariablePointerShift)
+      case _ => VariablePointerShift
+    }
+  }
+
 }
