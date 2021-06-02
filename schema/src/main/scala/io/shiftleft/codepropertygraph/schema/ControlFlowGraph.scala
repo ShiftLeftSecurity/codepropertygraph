@@ -49,7 +49,6 @@ object ControlFlowGraph extends SchemaBase {
                   cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = cfg, inNode = cfgNode)
 
-
     fieldIdentifier
       .addOutEdge(edge = cfg, inNode = cfgNode)
       .addOutEdge(edge = cfg,
