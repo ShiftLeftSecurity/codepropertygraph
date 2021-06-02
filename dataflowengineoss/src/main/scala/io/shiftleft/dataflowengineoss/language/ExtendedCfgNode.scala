@@ -11,35 +11,29 @@ import scala.collection.mutable
 /**
   * Base class for nodes that can occur in data flows
   * */
-class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVal {
+class ExtendedCfgNode(val traversal: Traversal[nodes.CfgNode]) extends AnyVal {
 
-  /**
-    * Convert to nearest CFG node
-    * */
-  def cfgNode: Traversal[nodes.CfgNode] =
-    traversal.map(_.cfgNode)
-
-  def ddgIn(implicit semantics: Semantics): Traversal[nodes.TrackingPoint] = {
-    val cache = mutable.HashMap[nodes.TrackingPoint, Vector[PathElement]]()
+  def ddgIn(implicit semantics: Semantics): Traversal[nodes.CfgNode] = {
+    val cache = mutable.HashMap[nodes.CfgNode, Vector[PathElement]]()
     val result = traversal.flatMap(x => x.ddgIn(Vector(PathElement(x)), withInvisible = false, cache))
     cache.clear()
     result
   }
 
   def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = {
-    val cache = mutable.HashMap[nodes.TrackingPoint, Vector[PathElement]]()
+    val cache = mutable.HashMap[nodes.CfgNode, Vector[PathElement]]()
     val result = traversal.flatMap(x => x.ddgInPathElem(Vector(PathElement(x)), withInvisible = false, cache))
     cache.clear()
     result
   }
 
-  def reachableBy[NodeType <: nodes.TrackingPoint](sourceTravs: Traversal[NodeType]*)(
+  def reachableBy[NodeType <: nodes.CfgNode](sourceTravs: Traversal[NodeType]*)(
       implicit context: EngineContext): Traversal[NodeType] = {
     val reachedSources = reachableByInternal(sourceTravs).map(_.source)
     Traversal.from(reachedSources).cast[NodeType]
   }
 
-  def reachableByFlows[A <: nodes.TrackingPoint](sourceTravs: Traversal[A]*)(
+  def reachableByFlows[A <: nodes.CfgNode](sourceTravs: Traversal[A]*)(
       implicit context: EngineContext): Traversal[Path] = {
     val paths = reachableByInternal(sourceTravs)
       .map { result =>
@@ -64,12 +58,12 @@ class TrackingPoint(val traversal: Traversal[nodes.TrackingPoint]) extends AnyVa
     l.headOption.map(x => x :: l.sliding(2).collect { case Seq(a, b) if a != b => b }.toList).getOrElse(List())
   }
 
-  private def reachableByInternal[NodeType <: nodes.TrackingPoint](sourceTravs: Seq[Traversal[NodeType]])(
+  private def reachableByInternal[NodeType <: nodes.CfgNode](sourceTravs: Seq[Traversal[NodeType]])(
       implicit context: EngineContext): List[ReachableByResult] = {
-    val sources: List[nodes.TrackingPoint] =
+    val sources: List[nodes.CfgNode] =
       sourceTravs
         .flatMap(_.toList)
-        .collect { case n: nodes.TrackingPoint => n }
+        .collect { case n: nodes.CfgNode => n }
         .toList
 
     val sinks = traversal.dedup.toList.sortBy(_.id)

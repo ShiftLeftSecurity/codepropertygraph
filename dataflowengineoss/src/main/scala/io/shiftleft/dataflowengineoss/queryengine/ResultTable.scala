@@ -52,9 +52,9 @@ class ResultTable {
   *                e.g., by expanding output arguments backwards into method output parameters.
   * */
 case class ReachableByResult(path: Vector[PathElement], callDepth: Int = 0, partial: Boolean = false) {
-  def source: nodes.TrackingPoint = path.head.node
+  def source: nodes.CfgNode = path.head.node
 
-  def unresolvedArgs: Vector[nodes.TrackingPoint] =
+  def unresolvedArgs: Vector[nodes.CfgNode] =
     path.collect {
       case elem if !elem.resolved =>
         elem.node
@@ -71,7 +71,7 @@ case class ReachableByResult(path: Vector[PathElement], callDepth: Int = 0, part
   * @param resolved whether we have resolved the method call this argument belongs to
   * @param outEdgeLabel label of the outgoing DDG edge
   * */
-case class PathElement(node: nodes.TrackingPoint,
+case class PathElement(node: nodes.CfgNode,
                        visible: Boolean = true,
                        resolved: Boolean = true,
                        outEdgeLabel: String = "")
