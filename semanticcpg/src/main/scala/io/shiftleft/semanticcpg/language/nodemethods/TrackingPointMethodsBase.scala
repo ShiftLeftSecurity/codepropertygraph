@@ -23,7 +23,8 @@ trait FakeTrackingPoint {
   def trackedCfgNodeOverride: nodes.CfgNode
 }
 
-object AccessPathUsageCommercial {
+// Utility methods for dealing with tracking points
+object TrackingPointMethodsBase {
 
   private val logger = LoggerFactory.getLogger(getClass)
 
@@ -85,10 +86,6 @@ object AccessPathUsageCommercial {
       }
     }
   }
-}
-
-// Utility methods for dealing with tracking points
-object TrackingPointMethodsBase {
 
   def toCfgNode(node: nodes.TrackingPointBase): nodes.CfgNode = {
     node match {
