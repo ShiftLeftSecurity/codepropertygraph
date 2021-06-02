@@ -71,7 +71,7 @@ object Method extends SchemaBase {
         comment = "This node represents a formal parameter going towards the callee side"
       )
       .protoId(34)
-      .addProperties(typeFullName, lineNumber, columnNumber)
+      .addProperties(typeFullName)
       .extendz(declaration, localLike, trackingPoint)
 
     val methodParameterOut: NodeType = builder
@@ -80,7 +80,7 @@ object Method extends SchemaBase {
         comment = "This node represents a formal output parameter. It does not need to be created by the frontend."
       )
       .protoId(33)
-      .addProperties(typeFullName, lineNumber, columnNumber)
+      .addProperties(typeFullName)
       .extendz(declaration, trackingPoint)
 
     val local: NodeType = builder
