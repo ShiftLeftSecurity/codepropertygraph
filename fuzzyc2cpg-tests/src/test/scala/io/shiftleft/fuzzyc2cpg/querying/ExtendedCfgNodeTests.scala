@@ -6,7 +6,7 @@ import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.fuzzyc2cpg.testfixtures.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
-class TrackingPointTests extends DataFlowCodeToCpgSuite {
+class ExtendedCfgNodeTests extends DataFlowCodeToCpgSuite {
 
   implicit val resolver: NoResolve.type = NoResolve
   implicit var s: Semantics = _
@@ -35,7 +35,7 @@ class TrackingPointTests extends DataFlowCodeToCpgSuite {
 
   "allow traversing from argument node to param via `ddgIn`" in {
     cpg.method("sink").parameter.argument.l match {
-      case List(t: nodes.TrackingPoint) =>
+      case List(t: nodes.CfgNode) =>
         t.code shouldBe "y"
         t.ddgIn.l match {
           case List(param: nodes.MethodParameterIn) =>

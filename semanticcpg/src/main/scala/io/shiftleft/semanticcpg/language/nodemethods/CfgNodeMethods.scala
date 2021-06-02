@@ -98,5 +98,4 @@ class CfgNodeMethods(val node: nodes.CfgNode) extends AnyVal {
     }
     controllingNodes
   }
-
 }
