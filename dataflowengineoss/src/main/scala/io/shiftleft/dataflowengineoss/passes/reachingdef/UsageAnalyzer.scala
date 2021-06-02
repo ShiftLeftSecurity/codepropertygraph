@@ -2,9 +2,9 @@ package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.codepropertygraph.generated.{Operators, nodes}
+import io.shiftleft.dataflowengineoss.queryengine.AccessPathUsage.toTrackedBaseAndAccessPathSimple
 import io.shiftleft.semanticcpg.accesspath.MatchResult
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase.ImplicitsAPI
 
 /**
   * Upon calculating reaching definitions, we find ourselves with
@@ -75,8 +75,8 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
       case useCall: nodes.Call =>
         inElement match {
           case inCall: nodes.Call =>
-            val (useBase, useAccessPath) = useCall.trackedBaseAndAccessPath
-            val (inBase, inAccessPath) = inCall.trackedBaseAndAccessPath
+            val (useBase, useAccessPath) = toTrackedBaseAndAccessPathSimple(useCall)
+            val (inBase, inAccessPath) = toTrackedBaseAndAccessPathSimple(inCall)
             useBase == inBase && useAccessPath.matchAndDiff(inAccessPath.elements)._1 == MatchResult.EXACT_MATCH
           case _ => false
         }
