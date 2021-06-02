@@ -58,12 +58,17 @@ object Schema2Json extends App {
       .map { nodeType =>
         val baseTypeNames = nodeType.extendz.map(_.name)
         val allProperties = nodeType.properties.map(_.name)
-        val inheritedProperties = nodeType.extendz.flatMap { base =>
-          base.properties.map(_.name).map(x => (("baseType" -> base.name), ("name" -> x)))
-        }
+        val inheritedProperties = nodeType.extendz
+          .flatMap { base =>
+            base.properties.map(_.name).map(x => x -> base.name)
+          }
+          .toMap
+          .toList
+          .map(x => (("baseType" -> x._2), ("name" -> x._1)))
 
         val inheritedPropertyNames = inheritedProperties.map(_._2._2)
         val nonInheritedProperties = allProperties.filterNot(x => inheritedPropertyNames.contains(x))
+
         ("name" -> nodeType.name) ~
           ("comment" -> nodeType.comment) ~
           ("extends" -> baseTypeNames) ~
