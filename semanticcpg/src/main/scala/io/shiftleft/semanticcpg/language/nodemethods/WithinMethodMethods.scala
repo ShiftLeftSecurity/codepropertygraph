@@ -6,10 +6,10 @@ import io.shiftleft.codepropertygraph.generated.nodes
 class WithinMethodMethods(val node: nodes.WithinMethod) extends AnyVal {
   def method: nodes.Method = node match {
     case node: nodes.Method => node
-    case _: nodes.MethodParameterIn | _: nodes.MethodParameterOut | _: nodes.MethodReturn | _: nodes.ImplicitCall |
-        _: nodes.PostExecutionCall =>
+    case _: nodes.MethodParameterIn | _: nodes.MethodParameterOut | _: nodes.MethodReturn =>
       walkUpAst(node)
-    case _: nodes.Expression | _: nodes.JumpTarget => walkUpContains(node)
+    case _: nodes.CallRepr if !node.isInstanceOf[nodes.Call] => walkUpAst(node)
+    case _: nodes.Expression | _: nodes.JumpTarget           => walkUpContains(node)
   }
 
   private def walkUpAst(node: nodes.WithinMethod): nodes.Method =
