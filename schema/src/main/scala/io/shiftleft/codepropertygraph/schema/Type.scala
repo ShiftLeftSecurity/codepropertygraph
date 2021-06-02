@@ -3,7 +3,7 @@ package io.shiftleft.codepropertygraph.schema
 import overflowdb.schema.{Cardinality, NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
-object TypeDecl extends SchemaBase {
+object Type extends SchemaBase {
 
   def apply(builder: SchemaBuilder, base: Base.Schema) =
     new Schema(builder, base)

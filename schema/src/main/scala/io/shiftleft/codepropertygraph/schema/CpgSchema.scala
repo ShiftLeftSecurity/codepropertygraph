@@ -10,21 +10,21 @@ class CpgSchema(builder: SchemaBuilder) {
   val metaData = MetaData(builder, base)
   val namespaces = Namespace(builder, base)
 
-  val typeDecl = TypeDecl(builder, base)
-  val method = Method(builder, base, typeDecl)
-  val fs = FileSystem(builder, base, namespaces, method, typeDecl)
-  val ast = Ast(builder, base, namespaces, method, typeDecl, fs)
+  val typeSchema = Type(builder, base)
+  val method = Method(builder, base, typeSchema)
+  val fs = FileSystem(builder, base, namespaces, method, typeSchema)
+  val ast = Ast(builder, base, namespaces, method, typeSchema, fs)
 
   val callGraph = CallGraph(builder, method, ast)
   val cfg = Cfg(builder, base, method, ast)
   val dominators = Dominators(builder, method, ast)
   val pdg = Pdg(builder, method, ast)
 
-  val shortcuts = Shortcuts(builder, base, method, ast, typeDecl, fs)
+  val shortcuts = Shortcuts(builder, base, method, ast, typeSchema, fs)
 
   val sourceSpecific = Comment(builder, base, ast, fs)
   val closure = Closure(builder, base, method, ast, callGraph)
-  val tagsAndLocation = TagsAndLocation(builder, base, typeDecl, method, ast, fs)
+  val tagsAndLocation = TagsAndLocation(builder, base, typeSchema, method, ast, fs)
   val finding = Finding(builder, base)
   val protoSerialize = ProtoSerialize(builder, ast)
 }

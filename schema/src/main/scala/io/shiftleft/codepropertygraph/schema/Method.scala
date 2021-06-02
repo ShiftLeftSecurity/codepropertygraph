@@ -5,8 +5,8 @@ import overflowdb.storage.ValueTypes
 
 object Method extends SchemaBase {
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: TypeDecl.Schema) =
-    new Schema(builder, base, typeDeclSchema)
+  def apply(builder: SchemaBuilder, base: Base.Schema, typeSchema: Type.Schema) =
+    new Schema(builder, base, typeSchema)
 
   def index: Int = 5
   override def providedByFrontend: Boolean = true
@@ -17,7 +17,7 @@ object Method extends SchemaBase {
       | This layer is provided by the frontend and may be modified by passes.
       |""".stripMargin
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: TypeDecl.Schema) {
+  class Schema(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: Type.Schema) {
     import base._
     import typeDeclSchema._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
