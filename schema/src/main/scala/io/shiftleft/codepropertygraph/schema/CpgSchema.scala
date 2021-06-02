@@ -8,7 +8,7 @@ class CpgSchema(builder: SchemaBuilder) {
   val operators = Operators(builder)
 
   val metaData = MetaData(builder, base)
-  val namespaces = Namespaces(builder, base)
+  val namespaces = Namespace(builder, base)
 
   val typeDecl = TypeDecl(builder, base)
   val method = Method(builder, base, typeDecl)
