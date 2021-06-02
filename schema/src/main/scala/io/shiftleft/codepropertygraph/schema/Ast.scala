@@ -15,23 +15,23 @@ object Ast extends SchemaBase {
 
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
-            namespaces: Namespaces.Schema,
+            namespaces: Namespace.Schema,
             methodSchema: Method.Schema,
-            typeDeclSchema: TypeDecl.Schema,
+            typeSchema: Type.Schema,
             fs: FileSystem.Schema) =
-    new Schema(builder, base, namespaces, methodSchema, typeDeclSchema, fs)
+    new Schema(builder, base, namespaces, methodSchema, typeSchema, fs)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
-               namespaces: Namespaces.Schema,
+               namespaces: Namespace.Schema,
                methodSchema: Method.Schema,
-               typeDeclSchema: TypeDecl.Schema,
+               typeSchema: Type.Schema,
                fs: FileSystem.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import base._
     import namespaces._
-    import typeDeclSchema._
+    import typeSchema._
     import fs._
 
     // Base types
@@ -71,6 +71,16 @@ object Ast extends SchemaBase {
     typeArgument.extendz(astNode)
 
     namespaceBlock.extendz(astNode)
+
+    val methodFullName = builder
+      .addProperty(
+        name = "METHOD_FULL_NAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = """The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required
+                    |to have exactly one METHOD node for each METHOD_FULL_NAME""".stripMargin
+      )
+      .protoId(54)
 
     val expression = builder
       .addNodeBaseType(

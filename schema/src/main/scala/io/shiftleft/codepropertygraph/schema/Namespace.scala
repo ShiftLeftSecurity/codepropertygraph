@@ -2,7 +2,7 @@ package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
 
-object Namespaces extends SchemaBase {
+object Namespace extends SchemaBase {
 
   def index: Int = 4
 

@@ -11,20 +11,20 @@ object FileSystem extends SchemaBase {
 
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
-            namespaces: Namespaces.Schema,
+            namespaces: Namespace.Schema,
             methodSchema: Method.Schema,
-            typeDeclSchema: TypeDecl.Schema) =
-    new Schema(builder, base, namespaces, methodSchema, typeDeclSchema)
+            typeSchema: Type.Schema) =
+    new Schema(builder, base, namespaces, methodSchema, typeSchema)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
-               namespaces: Namespaces.Schema,
+               namespaces: Namespace.Schema,
                methodSchema: Method.Schema,
-               typeDeclSchema: TypeDecl.Schema) {
+               typeSchema: Type.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import namespaces._
     import methodSchema._
-    import typeDeclSchema._
+    import typeSchema._
     import base._
 
     val sourceFile = builder

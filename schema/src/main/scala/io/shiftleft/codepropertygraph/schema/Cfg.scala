@@ -2,7 +2,7 @@ package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema.{Cardinality, SchemaBuilder, SchemaInfo}
 
-object ControlFlowGraph extends SchemaBase {
+object Cfg extends SchemaBase {
 
   def index: Int = 8
 

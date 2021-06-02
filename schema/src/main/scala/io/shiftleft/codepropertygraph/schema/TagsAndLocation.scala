@@ -14,20 +14,20 @@ object TagsAndLocation extends SchemaBase {
 
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
-            typeDeclSchema: TypeDecl.Schema,
+            typeSchema: Type.Schema,
             methodSchema: Method.Schema,
             ast: Ast.Schema,
             fs: FileSystem.Schema) =
-    new Schema(builder, base, typeDeclSchema, methodSchema, ast, fs)
+    new Schema(builder, base, typeSchema, methodSchema, ast, fs)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
-               typeDeclSchema: TypeDecl.Schema,
+               typeSchema: Type.Schema,
                methodSchema: Method.Schema,
                ast: Ast.Schema,
                fs: FileSystem.Schema) {
     import base._
-    import typeDeclSchema._
+    import typeSchema._
     import methodSchema._
     import ast._
     import fs._
