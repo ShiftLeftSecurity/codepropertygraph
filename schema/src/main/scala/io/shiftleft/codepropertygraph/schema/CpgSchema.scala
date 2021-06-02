@@ -16,7 +16,7 @@ class CpgSchema(builder: SchemaBuilder) {
   val ast = Ast(builder, base, namespaces, method, typeDecl, fs)
 
   val callGraph = CallGraph(builder, method, ast)
-  val cfg = ControlFlowGraph(builder, base, method, ast)
+  val cfg = Cfg(builder, base, method, ast)
   val dominators = Dominators(builder, method, ast)
   val pdg = Pdg(builder, method, ast)
 
