@@ -3,7 +3,7 @@ import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization
 import org.json4s.{Formats, NoTypeHints}
-import overflowdb.schema.{AbstractNodeType, NodeBaseType, SchemaInfo}
+import overflowdb.schema.{AbstractNodeType, NodeBaseType, NodeType, SchemaInfo}
 
 object Schema2Json extends App {
 
@@ -69,6 +69,14 @@ object Schema2Json extends App {
         val inheritedPropertyNames = inheritedProperties.map(_._2._2)
         val nonInheritedProperties = allProperties.filterNot(x => inheritedPropertyNames.contains(x))
 
+        val containedNodes = nodeType match {
+          case nt: NodeType =>
+            nt.containedNodes.map { n =>
+              Map("name" -> n.localName, "type" -> n.nodeType.name, "cardinality" -> n.cardinality.name)
+            }
+          case _ => List()
+        }
+
         ("name" -> nodeType.name) ~
           ("comment" -> nodeType.comment) ~
           ("extends" -> baseTypeNames) ~
@@ -76,7 +84,8 @@ object Schema2Json extends App {
           ("properties" -> nonInheritedProperties) ~
           ("schema" -> schemaName(nodeType)) ~
           ("schemaIndex" -> schemaIndex(nodeType)) ~
-          ("isAbstract" -> nodeType.isInstanceOf[NodeBaseType])
+          ("isAbstract" -> nodeType.isInstanceOf[NodeBaseType]) ~
+          ("containedNodes" -> containedNodes)
       }
   }
 
