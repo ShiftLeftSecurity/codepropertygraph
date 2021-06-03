@@ -1,13 +1,14 @@
-package io.shiftleft.semanticcpg.accesspath
+package io.shiftleft.dataflowengineoss.queryengine
 
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.generated._
-import io.shiftleft.semanticcpg.language.nodemethods.TrackingPointMethodsBase.toTrackedAccessPath
+import io.shiftleft.dataflowengineoss.queryengine.AccessPathUsage.toTrackedBaseAndAccessPathSimple
+import io.shiftleft.semanticcpg.accesspath._
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 
-class TrackingPointToAccessPathTests extends AnyWordSpec {
+class AccessPathUsageTests extends AnyWordSpec {
 
   def E(elements: AccessElement*): AccessPath = {
     new AccessPath(Elements.normalized(elements), Nil)
@@ -52,6 +53,8 @@ class TrackingPointToAccessPathTests extends AnyWordSpec {
     ret.setProperty(Properties.CANONICAL_NAME, payload)
     ret.asInstanceOf[nodes.FieldIdentifier]
   }
+
+  private def toTrackedAccessPath(node: nodes.StoredNode): AccessPath = toTrackedBaseAndAccessPathSimple(node)._2
 
   "memberAccess" should {
     "work" in {
