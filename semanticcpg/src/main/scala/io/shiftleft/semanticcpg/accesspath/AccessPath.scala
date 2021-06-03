@@ -51,10 +51,9 @@ object AccessPath {
       val nElements = el.elements.length - 1
       while (nElements - i > -1) {
         el.elements(nElements - i) match {
-          case (AddressOf | VariablePointerShift | _: PointerShift) =>
+          case (AddressOf | VariablePointerShift | _: PointerShift) => i += 1
           case _                                                    => return i
         }
-        i += 1
       }
       i
     }
