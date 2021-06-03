@@ -57,7 +57,9 @@ object Schema2Json extends App {
       .sortBy(x => (schemaIndex(x), x.name))
       .map { nodeType =>
         val baseTypeNames = nodeType.extendz.map(_.name)
-        val allProperties = nodeType.properties.map(_.name)
+        val allPropertyNames = nodeType.properties.map(_.name)
+        val cardinalities = nodeType.properties.map(_.cardinality.name)
+
         val inheritedProperties = nodeType.extendz
           .flatMap { base =>
             base.properties.map(_.name).map(x => x -> base.name)
@@ -67,7 +69,7 @@ object Schema2Json extends App {
           .map(x => (("baseType" -> x._2), ("name" -> x._1)))
 
         val inheritedPropertyNames = inheritedProperties.map(_._2._2)
-        val nonInheritedProperties = allProperties.filterNot(x => inheritedPropertyNames.contains(x))
+        val nonInheritedProperties = allPropertyNames.filterNot(x => inheritedPropertyNames.contains(x))
 
         val containedNodes = nodeType match {
           case nt: NodeType =>
@@ -80,6 +82,8 @@ object Schema2Json extends App {
         ("name" -> nodeType.name) ~
           ("comment" -> nodeType.comment) ~
           ("extends" -> baseTypeNames) ~
+          ("allProperties" -> allPropertyNames) ~
+          ("cardinalities" -> cardinalities) ~
           ("inheritedProperties" -> inheritedProperties.map(x => x._1 ~ x._2)) ~
           ("properties" -> nonInheritedProperties) ~
           ("schema" -> schemaName(nodeType)) ~
