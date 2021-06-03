@@ -54,162 +54,32 @@ object Cfg extends SchemaBase {
                   inNode = methodReturn,
                   cardinalityOut = Cardinality.ZeroOrOne,
                   cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-
-    callNode
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-
-    identifier
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-      .addOutEdge(edge = cfg, inNode = methodReturn)
+      .addOutEdge(edge = cfg, inNode = cfgNode)
 
     fieldIdentifier
+      .addOutEdge(edge = cfg, inNode = cfgNode)
       .addOutEdge(edge = cfg,
                   inNode = callNode,
                   cardinalityOut = Cardinality.One,
                   cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
 
-    block
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-
-    literal
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-
-    methodRef
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-
-    typeRef
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-
-    controlStructure
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-
-    jumpTarget
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
-
-    unknown
-      .addOutEdge(edge = cfg, inNode = callNode)
-      .addOutEdge(edge = cfg, inNode = identifier)
-      .addOutEdge(edge = cfg, inNode = fieldIdentifier)
-      .addOutEdge(edge = cfg, inNode = literal)
-      .addOutEdge(edge = cfg, inNode = ret)
-      .addOutEdge(edge = cfg, inNode = methodRef)
-      .addOutEdge(edge = cfg, inNode = typeRef)
-      .addOutEdge(edge = cfg, inNode = block)
-      .addOutEdge(edge = cfg, inNode = jumpTarget)
-      .addOutEdge(edge = cfg, inNode = controlStructure)
-      .addOutEdge(edge = cfg, inNode = unknown)
+    block.addOutEdge(edge = cfg, inNode = cfgNode)
+    callNode.addOutEdge(edge = cfg, inNode = cfgNode)
+    controlStructure.addOutEdge(edge = cfg, inNode = cfgNode)
+    jumpTarget.addOutEdge(edge = cfg, inNode = cfgNode)
+    identifier.addOutEdge(edge = cfg, inNode = cfgNode)
+    literal.addOutEdge(edge = cfg, inNode = cfgNode)
+    methodRef.addOutEdge(edge = cfg, inNode = cfgNode)
+    typeRef.addOutEdge(edge = cfg, inNode = cfgNode)
+    unknown.addOutEdge(edge = cfg, inNode = cfgNode)
 
     ret.addOutEdge(edge = cfg,
                    inNode = methodReturn,
                    cardinalityOut = Cardinality.One,
                    cardinalityIn = Cardinality.ZeroOrOne)
 
-    methodRef
-      .addOutEdge(edge = cfg, inNode = methodReturn)
-
-    typeRef
-      .addOutEdge(edge = cfg, inNode = methodReturn)
+    methodRef.addOutEdge(edge = cfg, inNode = methodReturn)
+    typeRef.addOutEdge(edge = cfg, inNode = methodReturn)
   }
 
 }
