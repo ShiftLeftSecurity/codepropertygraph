@@ -72,7 +72,7 @@ object Method extends SchemaBase {
       )
       .protoId(34)
       .addProperties(typeFullName)
-      .extendz(declaration, localLike, trackingPoint)
+      .extendz(declaration, localLike)
 
     val methodParameterOut: NodeType = builder
       .addNodeType(
@@ -99,7 +99,6 @@ object Method extends SchemaBase {
       )
       .protoId(3)
       .addProperties(typeFullName)
-      .extendz(trackingPoint)
 
     val binding: NodeType = builder
       .addNodeType(
