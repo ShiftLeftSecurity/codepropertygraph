@@ -39,7 +39,7 @@ object FileSystem extends SchemaBase {
     val sourceFile = builder
       .addEdgeType(
         name = "SOURCE_FILE",
-        comment = "This edge connects a node to the node that represents it source file."
+        comment = "This edge connects a node to the node that represents its source file."
       )
       .protoId(157)
 
