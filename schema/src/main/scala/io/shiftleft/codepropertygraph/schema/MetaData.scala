@@ -10,8 +10,12 @@ object MetaData extends SchemaBase {
 
   override def description: String =
     """
-      |The MetaData Layer is provided by the frontend and may be modified
-      |modified by passes.
+      |The Meta Data Layer contains information about CPG creation. In particular,
+      |it indicates which language frontend generated the CPG and which overlays
+      |have been applied. The layer consists of a single node - the Meta Data node -
+      |and language frontends MUST create this node. Overlay creators MUST edit
+      |this node to indicate that a layer has been successfully applied in all
+      |cases where applying the layer more than once is prohibitive.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder, base: Base.Schema) = new Schema(builder, base)
@@ -25,7 +29,11 @@ object MetaData extends SchemaBase {
         name = "OVERLAYS",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.List,
-        comment = "Names of overlays applied to this graph, in order of application"
+        comment = """The field contains the names of the overlays applied to this CPG, in order of their
+            |application. Names are free form strings, that is, this specification does not
+            |dictate them but rather requires tool producers and consumers to communicate them
+            |between each other.
+            |""".stripMargin
       )
       .protoId(118)
 
@@ -34,15 +42,20 @@ object MetaData extends SchemaBase {
         name = "LANGUAGE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = "the CPG language frontend that generated this CPG"
+        comment = """This field indicates which CPG language frontend generated the CPG.
+            |Frontend developers may freely choose a value that describes their frontend
+            |so long as it is not used by an existing frontend. Reserved values are to date:
+            |C, LLVM, GHIDRA, PHP.
+            |""".stripMargin
       )
       .protoId(19)
 
     val metaData: NodeType = builder
       .addNodeType(
         name = "META_DATA",
-        comment = """Node to save meta data about the graph on its properties.
-                    |Exactly one node of this type per graph""".stripMargin
+        comment = """
+                    |This node contains the CPG meta data. Exactly one node of this type
+                    |MUST exist per CPG.""".stripMargin
       )
       .protoId(39)
       .addProperties(language, version, overlays, hash)
