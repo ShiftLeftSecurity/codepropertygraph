@@ -10,12 +10,13 @@ object Namespace extends SchemaBase {
     """
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, base: Base.Schema) =
-    new Schema(builder, base)
+  def apply(builder: SchemaBuilder, base: Base.Schema, fs: FileSystem.Schema) =
+    new Schema(builder, base, fs)
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema) {
+  class Schema(builder: SchemaBuilder, base: Base.Schema, fs: FileSystem.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import base._
+    import fs._
 
     val namespaceBlock: NodeType = builder
       .addNodeType(
@@ -41,6 +42,9 @@ object Namespace extends SchemaBase {
       )
       .protoId(40)
       .addProperties(name)
+
+    namespaceBlock
+      .addOutEdge(edge = sourceFile, inNode = file)
 
   }
 

@@ -5,14 +5,15 @@ import overflowdb.schema.{Schema, SchemaBuilder}
 class CpgSchema(builder: SchemaBuilder) {
 
   val base = Base(builder)
+  val fs = FileSystem(builder, base)
+  val namespaces = Namespace(builder, base, fs)
+
   val operators = Operators(builder)
-
   val metaData = MetaData(builder, base)
-  val namespaces = Namespace(builder, base)
 
-  val typeSchema = Type(builder, base)
-  val method = Method(builder, base, typeSchema)
-  val fs = FileSystem(builder, base, namespaces, method, typeSchema)
+  val typeSchema = Type(builder, base, fs)
+  val method = Method(builder, base, typeSchema, fs)
+
   val ast = Ast(builder, base, namespaces, method, typeSchema, fs)
 
   val callGraph = CallGraph(builder, method, ast)

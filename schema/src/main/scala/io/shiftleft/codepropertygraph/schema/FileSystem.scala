@@ -1,6 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
+import overflowdb.schema.{Cardinality, NodeType, SchemaBuilder, SchemaInfo}
+import overflowdb.storage.ValueTypes
 
 object FileSystem extends SchemaBase {
 
@@ -14,23 +15,22 @@ object FileSystem extends SchemaBase {
       |is to allow nodes of the graph to be mapped back to file system locations.
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder,
-            base: Base.Schema,
-            namespaces: Namespace.Schema,
-            methodSchema: Method.Schema,
-            typeSchema: Type.Schema) =
-    new Schema(builder, base, namespaces, methodSchema, typeSchema)
+  def apply(builder: SchemaBuilder, base: Base.Schema) =
+    new Schema(builder, base)
 
-  class Schema(builder: SchemaBuilder,
-               base: Base.Schema,
-               namespaces: Namespace.Schema,
-               methodSchema: Method.Schema,
-               typeSchema: Type.Schema) {
+  class Schema(builder: SchemaBuilder, base: Base.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
-    import namespaces._
-    import methodSchema._
-    import typeSchema._
     import base._
+
+    val filename = builder
+      .addProperty(
+        name = "FILENAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = """Full path of canonical file that contained this node; will be linked into
+                    |corresponding FILE nodes. Possible for METHOD, TYPE_DECL and NAMESPACE_BLOCK""".stripMargin
+      )
+      .protoId(106)
 
     val sourceFile = builder
       .addEdgeType(
@@ -63,15 +63,6 @@ object FileSystem extends SchemaBase {
       )
       .protoId(38)
       .addProperties(name, hash)
-
-    method
-      .addOutEdge(edge = sourceFile, inNode = file)
-
-    namespaceBlock
-      .addOutEdge(edge = sourceFile, inNode = file)
-
-    typeDecl
-      .addOutEdge(edge = sourceFile, inNode = file)
 
   }
 

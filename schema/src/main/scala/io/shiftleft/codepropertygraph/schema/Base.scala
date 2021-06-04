@@ -51,16 +51,6 @@ object Base extends SchemaBase {
       )
       .protoId(21)
 
-    val filename = builder
-      .addProperty(
-        name = "FILENAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = """Full path of canonical file that contained this node; will be linked into
-                    |corresponding FILE nodes. Possible for METHOD, TYPE_DECL and NAMESPACE_BLOCK""".stripMargin
-      )
-      .protoId(106)
-
     val lineNumber = builder
       .addProperty(
         name = "LINE_NUMBER",
