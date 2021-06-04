@@ -36,6 +36,24 @@ object FileSystem extends SchemaBase {
       )
       .protoId(106)
 
+    val lineNumber = builder
+      .addProperty(
+        name = "LINE_NUMBER",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.ZeroOrOne,
+        comment = "Line where the code starts"
+      )
+      .protoId(2)
+
+    val columnNumber = builder
+      .addProperty(
+        name = "COLUMN_NUMBER",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.ZeroOrOne,
+        comment = "Column where the code starts"
+      )
+      .protoId(11)
+
     val sourceFile = builder
       .addEdgeType(
         name = "SOURCE_FILE",
