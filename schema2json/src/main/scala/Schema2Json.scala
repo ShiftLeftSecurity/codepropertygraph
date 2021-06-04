@@ -8,7 +8,6 @@ import overflowdb.schema.{AbstractNodeType, NodeBaseType, NodeType, SchemaInfo}
 object Schema2Json extends App {
 
   val schema = CpgSchema.instance
-  val deprecatedSchemaName = "Deprecated"
 
   implicit val formats: AnyRef with Formats =
     Serialization.formats(NoTypeHints)
@@ -42,7 +41,6 @@ object Schema2Json extends App {
       .sortBy(schemaIndex)
       .flatMap(_.definedIn)
       .distinct
-      .filter { _.getDeclaringClass.getSimpleName != deprecatedSchemaName }
       .map { info =>
         val name = info.getDeclaringClass.getSimpleName
         val description = info.getDeclaringClass.getDeclaredMethod("description").invoke(null).asInstanceOf[String]
@@ -57,78 +55,59 @@ object Schema2Json extends App {
   private def nodeTypesAsJson = {
     (schema.nodeTypes ++ schema.nodeBaseTypes)
       .sortBy(x => (schemaIndex(x), x.name))
-      .flatMap { nodeType =>
+      .map { nodeType =>
         val baseTypeNames = nodeType.extendz.map(_.name)
         val allPropertyNames = nodeType.properties.map(_.name)
         val cardinalities = nodeType.properties.map(_.cardinality.name)
-        val schName = schemaName(nodeType)
 
-        if (schName == deprecatedSchemaName) {
-          None
-        } else {
-          val inheritedProperties = nodeType.extendz
-            .flatMap { base =>
-              base.properties.map(_.name).map(x => x -> base.name)
-            }
-            .toMap
-            .toList
-            .map(x => (("baseType" -> x._2), ("name" -> x._1)))
-
-          val inheritedPropertyNames = inheritedProperties.map(_._2._2)
-          val nonInheritedProperties = allPropertyNames.filterNot(x => inheritedPropertyNames.contains(x))
-
-          val containedNodes = nodeType match {
-            case nt: NodeType =>
-              nt.containedNodes.map { n =>
-                Map("name" -> n.localName, "type" -> n.nodeType.name, "cardinality" -> n.cardinality.name)
-              }
-            case _ => List()
+        val inheritedProperties = nodeType.extendz
+          .flatMap { base =>
+            base.properties.map(_.name).map(x => x -> base.name)
           }
-          val json = ("name" -> nodeType.name) ~
-            ("comment" -> nodeType.comment) ~
-            ("extends" -> baseTypeNames) ~
-            ("allProperties" -> allPropertyNames) ~
-            ("cardinalities" -> cardinalities) ~
-            ("inheritedProperties" -> inheritedProperties.map(x => x._1 ~ x._2)) ~
-            ("properties" -> nonInheritedProperties) ~
-            ("schema" -> schName) ~
-            ("schemaIndex" -> schemaIndex(nodeType)) ~
-            ("isAbstract" -> nodeType.isInstanceOf[NodeBaseType]) ~
-            ("containedNodes" -> containedNodes)
-          Some(json)
+          .toMap
+          .toList
+          .map(x => (("baseType" -> x._2), ("name" -> x._1)))
+
+        val inheritedPropertyNames = inheritedProperties.map(_._2._2)
+        val nonInheritedProperties = allPropertyNames.filterNot(x => inheritedPropertyNames.contains(x))
+
+        val containedNodes = nodeType match {
+          case nt: NodeType =>
+            nt.containedNodes.map { n =>
+              Map("name" -> n.localName, "type" -> n.nodeType.name, "cardinality" -> n.cardinality.name)
+            }
+          case _ => List()
         }
+
+        ("name" -> nodeType.name) ~
+          ("comment" -> nodeType.comment) ~
+          ("extends" -> baseTypeNames) ~
+          ("allProperties" -> allPropertyNames) ~
+          ("cardinalities" -> cardinalities) ~
+          ("inheritedProperties" -> inheritedProperties.map(x => x._1 ~ x._2)) ~
+          ("properties" -> nonInheritedProperties) ~
+          ("schema" -> schemaName(nodeType)) ~
+          ("schemaIndex" -> schemaIndex(nodeType)) ~
+          ("isAbstract" -> nodeType.isInstanceOf[NodeBaseType]) ~
+          ("containedNodes" -> containedNodes)
       }
   }
 
   private def edgeTypesAsJson = {
-    schema.edgeTypes.sortBy(_.name).flatMap { edge =>
-      val schName = schemaName(edge.schemaInfo)
-      if (schName == deprecatedSchemaName) {
-        None
-      } else {
-        Some(
-          ("name" -> edge.name) ~
-            ("comment" -> edge.comment) ~
-            ("schema" -> schName)
-        )
-      }
+    schema.edgeTypes.sortBy(_.name).map { edge =>
+      ("name" -> edge.name) ~
+        ("comment" -> edge.comment) ~
+        ("schema" -> schemaName(edge.schemaInfo))
     }
   }
 
   private def propertiesAsJson = {
     schema.properties
       .sortBy(_.name)
-      .flatMap { prop =>
-        val schName = schemaName(prop.schemaInfo)
-        if (schName == deprecatedSchemaName) {
-          None
-        } else {
-          Some(
-            ("name" -> prop.name) ~
-              ("comment" -> prop.comment) ~
-              ("schema" -> schName)
-          )
-        }
+      .map { prop =>
+        ("name" -> prop.name) ~
+          ("comment" -> prop.comment) ~
+          ("schema" -> schemaName(prop.schemaInfo))
       }
   }
 

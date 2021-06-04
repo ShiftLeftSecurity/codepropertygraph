@@ -26,7 +26,6 @@ class CpgSchema(builder: SchemaBuilder) {
   val closure = Closure(builder, base, method, ast, callGraph)
   val tagsAndLocation = TagsAndLocation(builder, base, typeSchema, method, ast, fs)
   val finding = Finding(builder, base)
-  val deprecated = Deprecated(builder, base, method, typeSchema, ast, tagsAndLocation)
   val protoSerialize = ProtoSerialize(builder, ast)
 }
 
