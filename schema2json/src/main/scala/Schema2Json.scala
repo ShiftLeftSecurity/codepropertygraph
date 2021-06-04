@@ -101,20 +101,34 @@ object Schema2Json extends App {
   }
 
   private def edgeTypesAsJson = {
-    schema.edgeTypes.sortBy(_.name).map { edge =>
-      ("name" -> edge.name) ~
-        ("comment" -> edge.comment) ~
-        ("schema" -> schemaName(edge.schemaInfo))
+    schema.edgeTypes.sortBy(_.name).flatMap { edge =>
+      val schName = schemaName(edge.schemaInfo)
+      if (schName == deprecatedSchemaName) {
+        None
+      } else {
+        Some(
+          ("name" -> edge.name) ~
+            ("comment" -> edge.comment) ~
+            ("schema" -> schName)
+        )
+      }
     }
   }
 
   private def propertiesAsJson = {
     schema.properties
       .sortBy(_.name)
-      .map { prop =>
-        ("name" -> prop.name) ~
-          ("comment" -> prop.comment) ~
-          ("schema" -> schemaName(prop.schemaInfo))
+      .flatMap { prop =>
+        val schName = schemaName(prop.schemaInfo)
+        if (schName == deprecatedSchemaName) {
+          None
+        } else {
+          Some(
+            ("name" -> prop.name) ~
+              ("comment" -> prop.comment) ~
+              ("schema" -> schName)
+          )
+        }
       }
   }
 
