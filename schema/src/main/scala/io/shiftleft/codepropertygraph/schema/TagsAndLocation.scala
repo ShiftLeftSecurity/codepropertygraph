@@ -88,24 +88,6 @@ object TagsAndLocation extends SchemaBase {
       )
       .protoId(105)
 
-    val sourceType = builder
-      .addProperty(
-        name = "SOURCE_TYPE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = ""
-      )
-      .protoId(115)
-
-    val sinkType = builder
-      .addProperty(
-        name = "SINK_TYPE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = ""
-      )
-      .protoId(116)
-
     val taggedBy = builder
       .addEdgeType(
         name = "TAGGED_BY",
@@ -113,7 +95,7 @@ object TagsAndLocation extends SchemaBase {
       )
       .protoId(11)
 
-    // node tpes
+    // node types
 
     val tag: NodeType = builder
       .addNodeType(
@@ -147,22 +129,6 @@ object TagsAndLocation extends SchemaBase {
       .protoId(208)
       .addProperties()
 
-    val source: NodeType = builder
-      .addNodeType(
-        name = "SOURCE",
-        comment = ""
-      )
-      .protoId(202)
-      .addProperties(sourceType)
-
-    val sink: NodeType = builder
-      .addNodeType(
-        name = "SINK",
-        comment = ""
-      )
-      .protoId(203)
-      .addProperties(sinkType)
-
 // node relations
     location
       .addContainedNode(builder.anyNode, "node", Cardinality.ZeroOrOne)
@@ -170,25 +136,6 @@ object TagsAndLocation extends SchemaBase {
     tagNodePair
       .addContainedNode(tag, "tag", Cardinality.One)
       .addContainedNode(builder.anyNode, "node", Cardinality.One)
-
-    source
-      .addContainedNode(trackingPoint, "node", Cardinality.One)
-      .addContainedNode(method, "method", Cardinality.One)
-      .addContainedNode(tag, "methodTags", Cardinality.List)
-      .addContainedNode(method, "callingMethod", Cardinality.ZeroOrOne)
-      .addContainedNode(callNode, "callsite", Cardinality.ZeroOrOne)
-      .addContainedNode(tag, "tags", Cardinality.List)
-      .addContainedNode(tpe, "nodeType", Cardinality.One)
-
-    sink
-      .addContainedNode(trackingPoint, "node", Cardinality.One)
-      .addContainedNode(tpe, "nodeType", Cardinality.One)
-      .addContainedNode(method, "method", Cardinality.One)
-      .addContainedNode(tag, "methodTags", Cardinality.List)
-      .addContainedNode(method, "callingMethod", Cardinality.ZeroOrOne)
-      .addContainedNode(callNode, "callsite", Cardinality.ZeroOrOne)
-      .addContainedNode(methodParameterIn, "parameterIn", Cardinality.ZeroOrOne)
-      .addContainedNode(tag, "parameterInTags", Cardinality.List)
 
     method
       .addOutEdge(edge = taggedBy, inNode = tag)
@@ -243,8 +190,6 @@ object TagsAndLocation extends SchemaBase {
 
     methodParameterOut
       .addOutEdge(edge = taggedBy, inNode = tag)
-
-// constants
 
   }
 

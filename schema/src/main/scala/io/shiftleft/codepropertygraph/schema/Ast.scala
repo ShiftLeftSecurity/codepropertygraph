@@ -87,7 +87,6 @@ object Ast extends SchemaBase {
         name = "EXPRESSION",
         comment = "Expression as a specialisation of tracking point"
       )
-      .extendz(trackingPoint)
 
     expression.extendz(astNode)
 
