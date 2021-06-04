@@ -28,7 +28,7 @@ object FileSystem extends SchemaBase {
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
         comment = """The absolute path of the source file this node was generated from. This field
-            |must be set but may be set to the value "<unknown>" to indicate that no source
+            |must be set but may be set to the value `<unknown>` to indicate that no source
             |file can be associated with the node, e.g., because the node represents an
             |entity known to exist because it is referenced, but for which the file that
             |is is declared in is unknown.
@@ -59,7 +59,7 @@ object FileSystem extends SchemaBase {
                     |not because they are the first node of the AST.
                     |
                     |Each CPG MUST contain a special file node with name set to
-                    |"<unknown>". This node is a placeholder used in cases where a file cannot be
+                    |`<unknown>`. This node is a placeholder used in cases where a file cannot be
                     |determined at compile time. As an example, consider external library functions.
                     |As their code is not available on CPG construction, the file name is unknown.
                     |
