@@ -35,24 +35,6 @@ object Method extends SchemaBase {
       )
       .protoId(22)
 
-    val lineNumberEnd = builder
-      .addProperty(
-        name = "LINE_NUMBER_END",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "Line where the code ends"
-      )
-      .protoId(12)
-
-    val columnNumberEnd = builder
-      .addProperty(
-        name = "COLUMN_NUMBER_END",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "Column where the code ends"
-      )
-      .protoId(16)
-
     val method: NodeType = builder
       .addNodeType(
         name = "METHOD",
