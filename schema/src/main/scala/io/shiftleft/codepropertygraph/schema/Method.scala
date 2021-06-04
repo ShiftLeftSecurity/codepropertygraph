@@ -89,7 +89,7 @@ object Method extends SchemaBase {
         comment = "A local variable"
       )
       .protoId(23)
-      .addProperties(typeFullName, lineNumber, columnNumber)
+      .addProperties(typeFullName)
       .extendz(declaration, localLike)
 
     val methodReturn: NodeType = builder

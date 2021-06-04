@@ -48,6 +48,7 @@ object Ast extends SchemaBase {
                     |""".stripMargin
       )
       .addProperties(order, code)
+      .addProperties(lineNumber, columnNumber)
 
     val callRepr = builder
       .addNodeBaseType(
