@@ -13,8 +13,7 @@ object Method extends SchemaBase {
 
   override def description: String =
     """
-      | Structural layer (namespace blocks, method declarations, and type declarations).
-      | This layer is provided by the frontend and may be modified by passes.
+      |The Method Layer contains declarations of methods, functions, and procedures.
       |""".stripMargin
 
   class Schema(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: Type.Schema, fs: FileSystem.Schema) {
