@@ -5,8 +5,8 @@ import overflowdb.storage.ValueTypes
 
 object Type extends SchemaBase {
 
-  def apply(builder: SchemaBuilder, base: Base.Schema) =
-    new Schema(builder, base)
+  def apply(builder: SchemaBuilder, base: Base.Schema, fs: FileSystem.Schema) =
+    new Schema(builder, base, fs)
 
   def index: Int = 6
   override def providedByFrontend: Boolean = true
@@ -16,8 +16,9 @@ object Type extends SchemaBase {
       | Type layer (local).
       |""".stripMargin
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema) {
+  class Schema(builder: SchemaBuilder, base: Base.Schema, fs: FileSystem.Schema) {
     import base._
+    import fs._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     val typeFullName = builder
@@ -148,6 +149,9 @@ object Type extends SchemaBase {
 
     typeDecl
       .addOutEdge(edge = aliasOf, inNode = tpe)
+
+    typeDecl
+      .addOutEdge(edge = sourceFile, inNode = file)
 
   }
 

@@ -32,8 +32,13 @@ object Base extends SchemaBase {
         name = "HASH",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,
-        comment = """Hash value. Used, for example, to store the hash of the
-                    |artifact that this CPG is built from""".stripMargin
+        comment = """This property contains a hash value in the form of a string.
+                    |Hashes can be used to summarize data, e.g., to summarize the
+                    |contents of source files or sub graphs. Such summaries are useful
+                    |to determine whether code has already been analyzed in incremental
+                    |analysis pipelines. This property is optional to allow its calculation
+                    |to be deferred or skipped if the hash is not needed.
+                    |""".stripMargin
       )
       .protoId(120)
 
@@ -45,16 +50,6 @@ object Base extends SchemaBase {
         comment = "The code snippet the node represents"
       )
       .protoId(21)
-
-    val filename = builder
-      .addProperty(
-        name = "FILENAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = """Full path of canonical file that contained this node; will be linked into
-                    |corresponding FILE nodes. Possible for METHOD, TYPE_DECL and NAMESPACE_BLOCK""".stripMargin
-      )
-      .protoId(106)
 
     val lineNumber = builder
       .addProperty(
