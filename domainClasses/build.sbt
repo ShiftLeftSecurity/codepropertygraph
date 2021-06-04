@@ -5,3 +5,5 @@ libraryDependencies += "io.shiftleft" %% "overflowdb-traversal" % Versions.overf
 val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
 
 Compile / sourceGenerators += Projects.schema / generateDomainClasses
+
+scalacOptions -= "-Xfatal-warnings"
