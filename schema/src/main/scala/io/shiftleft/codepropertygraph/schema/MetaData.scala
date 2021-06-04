@@ -57,7 +57,9 @@ object MetaData extends SchemaBase {
                     |This node contains the CPG meta data. Exactly one node of this type
                     |MUST exist per CPG. The `HASH` property MAY contain a hash value calculated
                     |over the source files this CPG was generated from. The `VERSION` MUST be
-                    |set to the version of the specification ("1.1").
+                    |set to the version of the specification ("1.1"). The language field indicates
+                    |which language frontend was used to generate the CPG and the list property
+                    |`OVERLAYS` specifies which overlays have been applied to the CPG.
                     | """.stripMargin
       )
       .protoId(39)
