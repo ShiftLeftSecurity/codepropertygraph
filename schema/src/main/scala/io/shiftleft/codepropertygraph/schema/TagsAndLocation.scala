@@ -172,7 +172,7 @@ object TagsAndLocation extends SchemaBase {
       .addContainedNode(builder.anyNode, "node", Cardinality.One)
 
     source
-      .addContainedNode(trackingPoint, "node", Cardinality.One)
+      .addContainedNode(builder.storedNode, "node", Cardinality.One)
       .addContainedNode(method, "method", Cardinality.One)
       .addContainedNode(tag, "methodTags", Cardinality.List)
       .addContainedNode(method, "callingMethod", Cardinality.ZeroOrOne)
