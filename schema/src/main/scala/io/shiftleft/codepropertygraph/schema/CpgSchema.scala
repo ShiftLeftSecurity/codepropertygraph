@@ -13,6 +13,7 @@ class CpgSchema(builder: SchemaBuilder) {
 
   val typeSchema = Type(builder, base, fs)
   val method = Method(builder, base, typeSchema, fs)
+  val binding = Binding(builder, base, typeSchema, method)
 
   val ast = Ast(builder, base, namespaces, method, typeSchema, fs)
 
