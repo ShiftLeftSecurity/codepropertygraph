@@ -30,7 +30,7 @@ object MetaData extends SchemaBase {
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.List,
         comment = """The field contains the names of the overlays applied to this CPG, in order of their
-            |application. Names are free form strings, that is, this specification does not
+            |application. Names are free-form strings, that is, this specification does not
             |dictate them but rather requires tool producers and consumers to communicate them
             |between each other.
             |""".stripMargin
@@ -55,7 +55,10 @@ object MetaData extends SchemaBase {
         name = "META_DATA",
         comment = """
                     |This node contains the CPG meta data. Exactly one node of this type
-                    |MUST exist per CPG.""".stripMargin
+                    |MUST exist per CPG. The `HASH` property MAY contain a hash value calculated
+                    |over the source files this CPG was generated from. The `VERSION` MUST be
+                    |set to the version of the specification ("1.1").
+                    | """.stripMargin
       )
       .protoId(39)
       .addProperties(language, version, overlays, hash)

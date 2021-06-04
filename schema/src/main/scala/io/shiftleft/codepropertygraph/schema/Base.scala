@@ -32,8 +32,13 @@ object Base extends SchemaBase {
         name = "HASH",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,
-        comment = """Hash value. Used, for example, to store the hash of the
-                    |artifact that this CPG is built from""".stripMargin
+        comment = """This property contains a hash value in the form of a string.
+                    |Hashes can be used to summarize data, e.g., to summarize the
+                    |contents of source files or sub graphs. Such summaries are useful
+                    |to determine whether code has already been analyzed in incremental
+                    |analysis pipelines. This property is optional to allow its calculation
+                    |to be deferred or skipped if the hash is not needed.
+                    |""".stripMargin
       )
       .protoId(120)
 
