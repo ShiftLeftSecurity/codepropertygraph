@@ -41,7 +41,9 @@ object FileSystem extends SchemaBase {
         name = "LINE_NUMBER",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.ZeroOrOne,
-        comment = "Line where the code starts"
+        comment = """This optional field provides the line number of the program construct
+            |represented by the node.
+            |""".stripMargin
       )
       .protoId(2)
 
@@ -50,7 +52,10 @@ object FileSystem extends SchemaBase {
         name = "COLUMN_NUMBER",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.ZeroOrOne,
-        comment = "Column where the code starts"
+        comment = """
+            |This optional fields provides the column number of the program construct
+            |represented by the node.
+            |""".stripMargin
       )
       .protoId(11)
 
@@ -59,7 +64,10 @@ object FileSystem extends SchemaBase {
         name = "LINE_NUMBER_END",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.ZeroOrOne,
-        comment = "Line where the code ends"
+        comment = """
+        |This optional fields provides the line number at which the program construct
+        |represented by the node ends.
+        """.stripMargin
       )
       .protoId(12)
 
@@ -68,7 +76,10 @@ object FileSystem extends SchemaBase {
         name = "COLUMN_NUMBER_END",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.ZeroOrOne,
-        comment = "Column where the code ends"
+        comment = """
+            |This optional fields provides the column number at which the program construct
+            |represented by the node ends.
+        """.stripMargin
       )
       .protoId(16)
 
