@@ -84,15 +84,6 @@ object Method extends SchemaBase {
 
     // To be removed
 
-    val vtable = builder
-      .addEdgeType(
-        name = "VTABLE",
-        comment = "Indicates that a method is part of the vtable of a certain type declaration"
-      )
-      .protoId(30)
-
-    typeDecl.addOutEdge(edge = vtable, inNode = method)
-
     method
       .addOutEdge(edge = sourceFile, inNode = file)
 
