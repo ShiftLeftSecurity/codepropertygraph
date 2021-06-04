@@ -27,8 +27,7 @@ object FileSystem extends SchemaBase {
         name = "FILENAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment =
-          """The absolute path of the source file this node was generated from. This field
+        comment = """The absolute path of the source file this node was generated from. This field
             |must be set but may be set to the value "<unknown>" to indicate that no source
             |file can be associated with the node, e.g., because the node represents an
             |entity known to exist because it is referenced, but for which the file that
