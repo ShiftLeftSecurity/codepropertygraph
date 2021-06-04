@@ -82,16 +82,6 @@ object Method extends SchemaBase {
       .protoId(3)
       .addProperties(typeFullName)
 
-    val parameterLink = builder
-      .addEdgeType(
-        name = "PARAMETER_LINK",
-        comment = "Links together corresponding METHOD_PARAMETER_IN and METHOD_PARAMETER_OUT nodes. Created by backend."
-      )
-      .protoId(12)
-
-    methodParameterIn
-      .addOutEdge(edge = parameterLink, inNode = methodParameterOut)
-
     // To be removed
 
     val vtable = builder
