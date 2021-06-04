@@ -4,7 +4,7 @@ import overflowdb.schema._
 
 object Shortcuts extends SchemaBase {
 
-  def index: Int = 15
+  def index: Int = 16
 
   override def description: String =
     """

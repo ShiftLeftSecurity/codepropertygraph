@@ -5,7 +5,7 @@ import overflowdb.storage.ValueTypes
 
 object Finding extends SchemaBase {
 
-  def index: Int = 14
+  def index: Int = 15
 
   override def description: String =
     """

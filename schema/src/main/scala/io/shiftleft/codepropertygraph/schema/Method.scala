@@ -101,40 +101,6 @@ object Method extends SchemaBase {
       .protoId(3)
       .addProperties(typeFullName)
 
-    val binding: NodeType = builder
-      .addNodeType(
-        name = "BINDING",
-        comment = "A binding of a METHOD into a TYPE_DECL"
-      )
-      .protoId(146)
-      .addProperties(name, signature)
-
-    val isMethodNeverOverridden = builder
-      .addProperty(
-        name = "IS_METHOD_NEVER_OVERRIDDEN",
-        valueType = ValueTypes.BOOLEAN,
-        cardinality = Cardinality.ZeroOrOne,
-        comment =
-          "True if the referenced method is never overridden by the subclasses and false otherwise. This can be left blank by the frontend."
-      )
-      .protoId(1002)
-
-    binding
-      .addProperties(isMethodNeverOverridden)
-
-    binding
-      .addOutEdge(edge = ref, inNode = method, cardinalityOut = Cardinality.One)
-
-    val binds = builder
-      .addEdgeType(
-        name = "BINDS",
-        comment = "Relation between TYPE_DECL and BINDING node"
-      )
-      .protoId(155)
-
-    typeDecl
-      .addOutEdge(edge = binds, inNode = binding, cardinalityIn = Cardinality.One)
-
     val parameterLink = builder
       .addEdgeType(
         name = "PARAMETER_LINK",
