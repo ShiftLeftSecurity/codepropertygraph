@@ -14,6 +14,8 @@ object Method extends SchemaBase {
   override def description: String =
     """
       |The Method Layer contains declarations of methods, functions, and procedures.
+      |Input parameterss output parameters (including return parameters) and local variables are
+      |represented, however, method contents is not present in this layer.
       |""".stripMargin
 
   class Schema(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: Type.Schema, fs: FileSystem.Schema) {
@@ -27,10 +29,13 @@ object Method extends SchemaBase {
         name = "SIGNATURE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = """Method signature. The format is defined by the language front-end, and the
-                    |backend simply compares strings to resolve function overloading, i.e. match
-                    |call-sites to METHODs. In theory, consecutive integers would be valid,
-                    |but in practice this should be human readable
+        comment = """
+                    |The method signature encodes the types of parameters in a string.
+                    |The string SHOULD be human readable and suitable for differentiating methods
+                    |with different parameter types sufficiently to allow for resolving of
+                    |function overloading. The present specification does not enforce a strict
+                    |format for the signature, that is, it can be chosen by the frontend
+                    |implementor to fit the source language.
                     |""".stripMargin
       )
       .protoId(22)
@@ -38,7 +43,24 @@ object Method extends SchemaBase {
     val method: NodeType = builder
       .addNodeType(
         name = "METHOD",
-        comment = "A method/function/procedure"
+        comment = """Programming languages offer many closely-related concepts for describing blocks
+            |of code that can be executed with input parameters and return output parameters,
+            |possibly causing side effects. In the CPG specification, we refer to all of these
+            |concepts (procedures, functions, methods, etc.) as methods. A single METHOD node
+            |must exist for each method found in the source program.
+            |
+            |The `FULL_NAME` field specifies the method's fully-qualified name, including
+            |information about the namespace it is contained in if applicable, the name field
+            |is the function's short name. The field `IS_EXTERNAL` indicates whether it was
+            |possible to identify a method body for the method. This is true for methods that
+            |are defined in the source program, and false for methods that are dynamically
+            |linked to the program, that is, methods that exist in an external dependency.
+            |
+            |Line and column number information is specified in the optional fields
+            |`LINE_NUMBER`, `COLUMN_NUMBER`, `LINE_NUMBER_END`, and `COLUMN_NUMBER_END` and
+            |the name of the source file is specified in `FILENAME`. An optional hash value
+            |MAY be calculated over the function contents and included in the `HASH` field.
+            |""".stripMargin
       )
       .protoId(1)
       .addProperties(fullName, isExternal, signature, lineNumberEnd, columnNumberEnd, filename, hash)
