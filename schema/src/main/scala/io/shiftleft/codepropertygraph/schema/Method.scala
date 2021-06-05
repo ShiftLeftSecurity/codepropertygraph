@@ -82,8 +82,6 @@ object Method extends SchemaBase {
       .protoId(3)
       .addProperties(typeFullName)
 
-    // To be removed
-
     method
       .addOutEdge(edge = sourceFile, inNode = file)
 
