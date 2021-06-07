@@ -13,7 +13,8 @@ object Type extends SchemaBase {
 
   override def description: String =
     """
-      | Type layer (local).
+      |The Type Layer contains information about type declarations, relations between
+      |types and type usage.
       |""".stripMargin
 
   class Schema(builder: SchemaBuilder, base: Base.Schema, fs: FileSystem.Schema) {
@@ -64,6 +65,39 @@ object Type extends SchemaBase {
       )
       .protoId(53)
 
+    val typeDecl: NodeType = builder
+      .addNodeType(
+        name = "TYPE_DECL",
+        comment = """This node represents a type declaration as for example given by a class-, struct-,
+            |or union declaration.
+            |
+            |The language frontend MUST create type declarations for all types declared in the
+            |source program and MAY provide type declarations for types that are not declared
+            |but referenced by the source program. If a declaration is present in the source
+            |program, the field `IS_EXTERNAL` is set to `false`. Otherwise, it is set to `true`.
+            |
+            |The `FULL_NAME` field specifies the type's fully-qualified name, including
+            |information about the namespace it is contained in if applicable, the name field
+            |is the type's short name. Line and column number information is specified in the
+            |optional fields `LINE_NUMBER`, `COLUMN_NUMBER`, `LINE_NUMBER_END`, and
+            |`COLUMN_NUMBER_END` and the name of the source file is specified in `FILENAME`.
+            |
+            |Base types can be specified via the `INHERITS_FROM_TYPE_FULL_NAME` list, where
+            |each entry contains the fully-qualified name of a base type. If the type is
+            |known to be an alias of another type (as for example introduced via the C
+            |`typedef` statement), the name of the alias is stored in `ALIAS_TYPE_FULL_NAME`.
+            |
+            |Finally, the fully qualified name of the program constructs that the type declaration
+            |is immediately contained in is stored in the `AST_PARENT_FULL_NAME` field
+            |and its type is indicated in the `AST_PARENT_TYPE` field to be one of
+            |`METHOD`, `TYPE_DECL` or `NAMESPACE_BLOCK`.
+            |
+            |""".stripMargin
+      )
+      .protoId(46)
+      .addProperties(name, fullName, isExternal, inheritsFromTypeFullName, aliasTypeFullName, filename)
+      .addProperties(astParentType, astParentFullName)
+
     val bindsTo = builder
       .addEdgeType(
         name = "BINDS_TO",
@@ -92,17 +126,6 @@ object Type extends SchemaBase {
       )
       .protoId(23)
 
-    val typeDecl: NodeType = builder
-      .addNodeType(
-        name = "TYPE_DECL",
-        comment = "A type declaration"
-      )
-      .protoId(46)
-      .addProperties(name, fullName, isExternal, inheritsFromTypeFullName, aliasTypeFullName, filename)
-
-    typeDecl
-      .addProperties(astParentType, astParentFullName)
-
     val member: NodeType = builder
       .addNodeType(
         name = "MEMBER",
@@ -115,7 +138,12 @@ object Type extends SchemaBase {
     val typeParameter: NodeType = builder
       .addNodeType(
         name = "TYPE_PARAMETER",
-        comment = "Type parameter of TYPE_DECL or METHOD"
+        comment = """This node represents a formal type parameter, that is, the type parameter
+            |as given in a type-parametrized method or type declaration. Examples for
+            |languages that support type parameters are Java (via Generics) and C++
+            |(via templates). Apart from the standard fields of AST nodes, the type
+            |parameter carries only a `NAME` field that holds the parameters name.
+            |""".stripMargin
       )
       .protoId(47)
       .addProperties(name)
@@ -123,8 +151,11 @@ object Type extends SchemaBase {
     val typeArgument: NodeType = builder
       .addNodeType(
         name = "TYPE_ARGUMENT",
-        comment = """Argument for a TYPE_PARAMETER that belongs to a TYPE. It binds another
-                    |TYPE to a TYPE_PARAMETER
+        comment = """An (actual) type argument assigns a concrete type to a type parameter in the
+                    |same way an (actual) argument provides a concrete value to a parameter.
+                    |The frontend is not expected to interpret the type argument but instead, it
+                    |merely places the code that corresponds to the type argument into the
+                    |`CODE` field.
                     |""".stripMargin
       )
       .protoId(48)
