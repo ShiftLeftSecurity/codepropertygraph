@@ -14,7 +14,8 @@ object Type extends SchemaBase {
   override def description: String =
     """
       |The Type Layer contains information about type declarations, relations between
-      |types and type usage.
+      |types, and type instantiation and usage. In its current form, it allows moedling of
+      |parametrized types, type hierarchies and aliases.
       |""".stripMargin
 
   class Schema(builder: SchemaBuilder, base: Base.Schema, fs: FileSystem.Schema) {
@@ -22,28 +23,19 @@ object Type extends SchemaBase {
     import fs._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
+    // Properties
+
     val typeFullName = builder
       .addProperty(
         name = "TYPE_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = """The static type of an entity. E.g. expressions, local, parameters etc.
-                    |This property is matched against the FULL_NAME of TYPE nodes and thus it
-                    |is required to have at least one TYPE node for each TYPE_FULL_NAME
+        comment = """This field contains the fully-qualified static type name of the entity
+                    |represented by a node. It is the name of an instantiated type, e.g.,
+                    |`List<Integer>`, not `List[T]`.
                     |""".stripMargin
       )
       .protoId(51)
-
-    val typeDeclFullName = builder
-      .addProperty(
-        name = "TYPE_DECL_FULL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = """The static type decl of a TYPE. This property is matched against the FULL_NAME
-                    |of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each
-                    |different TYPE_DECL_FULL_NAME""".stripMargin
-      )
-      .protoId(52)
 
     val aliasTypeFullName = builder
       .addProperty(
@@ -65,11 +57,26 @@ object Type extends SchemaBase {
       )
       .protoId(53)
 
+    val typeDeclFullName = builder
+      .addProperty(
+        name = "TYPE_DECL_FULL_NAME",
+        valueType = ValueTypes.STRING,
+        cardinality = Cardinality.One,
+        comment = """The static type decl of a TYPE. This property is matched against the FULL_NAME
+                    |of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each
+                    |different TYPE_DECL_FULL_NAME""".stripMargin
+      )
+      .protoId(52)
+
+    // Nodes
+
     val typeDecl: NodeType = builder
       .addNodeType(
         name = "TYPE_DECL",
         comment = """This node represents a type declaration as for example given by a class-, struct-,
-            |or union declaration.
+            |or union declaration. In contrast to a `TYPE` node, this node does not represent a
+            |concrete instantiation of a type, e.g., for the parametrized type `List[T]`, it represents
+            |`List[T]`, but not `List[Integer]` where `Integer` is a concrete type.
             |
             |The language frontend MUST create type declarations for all types declared in the
             |source program and MAY provide type declarations for types that are not declared
@@ -98,52 +105,15 @@ object Type extends SchemaBase {
       .addProperties(name, fullName, isExternal, inheritsFromTypeFullName, aliasTypeFullName, filename)
       .addProperties(astParentType, astParentFullName)
 
-    val bindsTo = builder
-      .addEdgeType(
-        name = "BINDS_TO",
-        comment = "Type argument binding to a type parameter"
-      )
-      .protoId(22)
-
-    val typeDeclAlias = builder
-      .addEdgeType(
-        name = "TYPE_DECL_ALIAS",
-        comment = "Alias relation between two TYPE_DECL"
-      )
-      .protoId(139)
-
-    val aliasOf = builder
-      .addEdgeType(
-        name = "ALIAS_OF",
-        comment = "Alias relation between types. Created by backend passes."
-      )
-      .protoId(138)
-
-    val inheritsFrom = builder
-      .addEdgeType(
-        name = "INHERITS_FROM",
-        comment = "Inheritance relation between types"
-      )
-      .protoId(23)
-
-    val member: NodeType = builder
-      .addNodeType(
-        name = "MEMBER",
-        comment = "Member of a class struct or union"
-      )
-      .protoId(9)
-      .addProperties(typeFullName)
-      .extendz(declaration)
-
     val typeParameter: NodeType = builder
       .addNodeType(
         name = "TYPE_PARAMETER",
         comment = """This node represents a formal type parameter, that is, the type parameter
-            |as given in a type-parametrized method or type declaration. Examples for
-            |languages that support type parameters are Java (via Generics) and C++
-            |(via templates). Apart from the standard fields of AST nodes, the type
-            |parameter carries only a `NAME` field that holds the parameters name.
-            |""".stripMargin
+                    |as given in a type-parametrized method or type declaration. Examples for
+                    |languages that support type parameters are Java (via Generics) and C++
+                    |(via templates). Apart from the standard fields of AST nodes, the type
+                    |parameter carries only a `NAME` field that holds the parameters name.
+                    |""".stripMargin
       )
       .protoId(47)
       .addProperties(name)
@@ -151,38 +121,72 @@ object Type extends SchemaBase {
     val typeArgument: NodeType = builder
       .addNodeType(
         name = "TYPE_ARGUMENT",
-        comment = """An (actual) type argument assigns a concrete type to a type parameter in the
-                    |same way an (actual) argument provides a concrete value to a parameter.
-                    |The frontend is not expected to interpret the type argument but instead, it
-                    |merely places the code that corresponds to the type argument into the
+        comment = """An (actual) type argument as used to instantiate a parametrized type, in the
+                    |same way an (actual) arguments provides concrete values for a parameter
+                    |at method call sites. As it true for arguments, the method is not expected
+                    |to  interpret the type argument. It MUST however store its code in the
                     |`CODE` field.
                     |""".stripMargin
       )
       .protoId(48)
 
+    val member: NodeType = builder
+      .addNodeType(
+        name = "MEMBER",
+        comment = """This node represents a type member of a class, struct or union, e.g., for the
+                    | type declaration `class Foo{ int i ; }`, it represents the declaration of the
+                    | variable `i`.
+                    |""".stripMargin
+      )
+      .protoId(9)
+      .addProperties(typeFullName)
+      .extendz(declaration)
+
     val tpe: NodeType = builder
       .addNodeType(
         name = "TYPE",
-        comment = """A type which always has to reference a type declaration and may have type
-                    |argument children if the referred to type declaration is a template""".stripMargin
+        comment = """This node represents a type instance, that is, a concrete instantiation
+                    |of a type declaration.""".stripMargin
       )
       .protoId(45)
       .addProperties(name, fullName, typeDeclFullName)
 
+    // edges
+
+    val bindsTo = builder
+      .addEdgeType(
+        name = "BINDS_TO",
+        comment = "Type argument binding to a type parameter"
+      )
+      .protoId(22)
+
+    val aliasOf = builder
+      .addEdgeType(
+        name = "ALIAS_OF",
+        comment = """This edge represents an alias relation between a type declaration and a type.
+            |The language frontend MUST NOT create `ALIAS_OF` edges as they are created
+            |automatically based on `ALIAS_TYPE_FULL_NAME` fields when the CPG is first loaded.
+            |""".stripMargin
+      )
+      .protoId(138)
+
+    val inheritsFrom = builder
+      .addEdgeType(
+        name = "INHERITS_FROM",
+        comment = """Inheritance relation between a type declaration and a type. This edge MUST NOT
+            | be created by the language frontend as it is automatically created from
+            | `INHERITS_FROM_TYPE_FULL_NAME` fields then the CPG is first loaded.
+            |""".stripMargin
+      )
+      .protoId(23)
+
     typeDecl
       .addOutEdge(edge = inheritsFrom, inNode = tpe)
+      .addOutEdge(edge = aliasOf, inNode = tpe)
+      .addOutEdge(edge = sourceFile, inNode = file)
 
     typeArgument
       .addOutEdge(edge = bindsTo, inNode = typeParameter)
-
-    typeDecl
-      .addOutEdge(edge = typeDeclAlias, inNode = typeDecl)
-
-    typeDecl
-      .addOutEdge(edge = aliasOf, inNode = tpe)
-
-    typeDecl
-      .addOutEdge(edge = sourceFile, inNode = file)
 
   }
 
