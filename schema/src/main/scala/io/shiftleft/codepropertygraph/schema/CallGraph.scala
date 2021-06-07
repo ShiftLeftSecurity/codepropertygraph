@@ -9,6 +9,7 @@ object CallGraph extends SchemaBase {
 
   override def description: String =
     """
+      |This overlay represents call relations between methods.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) =

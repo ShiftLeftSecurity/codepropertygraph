@@ -191,6 +191,7 @@ object Type extends SchemaBase {
 
     typeArgument
       .addOutEdge(edge = bindsTo, inNode = typeParameter)
+      .addOutEdge(edge = ref, inNode = tpe)
 
   }
 
