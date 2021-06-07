@@ -48,6 +48,7 @@ object Ast extends SchemaBase {
                     |""".stripMargin
       )
       .addProperties(order, code)
+      .addProperties(lineNumber, columnNumber)
 
     val callRepr = builder
       .addNodeBaseType(
@@ -61,7 +62,6 @@ object Ast extends SchemaBase {
     method.extendz(astNode)
     methodParameterIn.extendz(astNode)
     methodParameterOut.extendz(astNode)
-    local.extendz(astNode)
 
     // Type-related nodes that are part of the AST
 
@@ -116,6 +116,15 @@ object Ast extends SchemaBase {
       .protoId(8)
       .addProperties(typeFullName)
       .extendz(expression)
+
+    val local: NodeType = builder
+      .addNodeType(
+        name = "LOCAL",
+        comment = "This node represents a local variable."
+      )
+      .protoId(23)
+      .addProperties(typeFullName)
+      .extendz(declaration, localLike, astNode)
 
     val callNode: NodeType = builder
       .addNodeType(

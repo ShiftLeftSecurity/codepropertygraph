@@ -13,8 +13,9 @@ object Method extends SchemaBase {
 
   override def description: String =
     """
-      | Structural layer (namespace blocks, method declarations, and type declarations).
-      | This layer is provided by the frontend and may be modified by passes.
+      |The Method Layer contains declarations of methods, functions, and procedures.
+      |Input parameters and output parameters (including return parameters) are
+      |represented, however, method contents is not present in this layer.
       |""".stripMargin
 
   class Schema(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: Type.Schema, fs: FileSystem.Schema) {
@@ -28,48 +29,56 @@ object Method extends SchemaBase {
         name = "SIGNATURE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = """Method signature. The format is defined by the language front-end, and the
-                    |backend simply compares strings to resolve function overloading, i.e. match
-                    |call-sites to METHODs. In theory, consecutive integers would be valid,
-                    |but in practice this should be human readable
+        comment = """
+                    |The method signature encodes the types of parameters in a string.
+                    |The string SHOULD be human readable and suitable for differentiating methods
+                    |with different parameter types sufficiently to allow for resolving of
+                    |function overloading. The present specification does not enforce a strict
+                    |format for the signature, that is, it can be chosen by the frontend
+                    |implementor to fit the source language.
                     |""".stripMargin
       )
       .protoId(22)
 
-    val lineNumberEnd = builder
-      .addProperty(
-        name = "LINE_NUMBER_END",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "Line where the code ends"
-      )
-      .protoId(12)
-
-    val columnNumberEnd = builder
-      .addProperty(
-        name = "COLUMN_NUMBER_END",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "Column where the code ends"
-      )
-      .protoId(16)
-
     val method: NodeType = builder
       .addNodeType(
         name = "METHOD",
-        comment = "A method/function/procedure"
+        comment = """Programming languages offer many closely-related concepts for describing blocks
+            |of code that can be executed with input parameters and return output parameters,
+            |possibly causing side effects. In the CPG specification, we refer to all of these
+            |concepts (procedures, functions, methods, etc.) as methods. A single METHOD node
+            |must exist for each method found in the source program.
+            |
+            |The `FULL_NAME` field specifies the method's fully-qualified name, including
+            |information about the namespace it is contained in if applicable, the name field
+            |is the function's short name. The field `IS_EXTERNAL` indicates whether it was
+            |possible to identify a method body for the method. This is true for methods that
+            |are defined in the source program, and false for methods that are dynamically
+            |linked to the program, that is, methods that exist in an external dependency.
+            |
+            |Line and column number information is specified in the optional fields
+            |`LINE_NUMBER`, `COLUMN_NUMBER`, `LINE_NUMBER_END`, and `COLUMN_NUMBER_END` and
+            |the name of the source file is specified in `FILENAME`. An optional hash value
+            |MAY be calculated over the function contents and included in the `HASH` field.
+            |
+            |Finally, the fully qualified name of the program constructs that the method
+            |is immediately contained in is stored in the `AST_PARENT_FULL_NAME` field
+            |and its type is indicated in the `AST_PARENT_TYPE` field to be one of
+            |`METHOD`, `TYPE_DECL` or `NAMESPACE_BLOCK`.
+            |""".stripMargin
       )
       .protoId(1)
       .addProperties(fullName, isExternal, signature, lineNumberEnd, columnNumberEnd, filename, hash)
-      .extendz(declaration)
-
-    method
       .addProperties(astParentType, astParentFullName)
+      .extendz(declaration)
 
     val methodParameterIn: NodeType = builder
       .addNodeType(
         name = "METHOD_PARAMETER_IN",
-        comment = "This node represents a formal parameter going towards the callee side"
+        comment = """
+            |This node represents a formal input parameter. The field `NAME` contains its
+            |name, while the field `TYPE_FULL_NAME` contains the fully qualified type name.
+            |""".stripMargin
       )
       .protoId(34)
       .addProperties(typeFullName)
@@ -78,49 +87,26 @@ object Method extends SchemaBase {
     val methodParameterOut: NodeType = builder
       .addNodeType(
         name = "METHOD_PARAMETER_OUT",
-        comment = "This node represents a formal output parameter. It does not need to be created by the frontend."
+        comment = """This node represents a formal output parameter. Corresponding output parameters
+            |for input parameters MUST NOT be created by the frontend as they are automatically
+            |created upon first loading the CPG.
+            |""".stripMargin
       )
       .protoId(33)
       .addProperties(typeFullName)
       .extendz(declaration)
 
-    val local: NodeType = builder
-      .addNodeType(
-        name = "LOCAL",
-        comment = "A local variable"
-      )
-      .protoId(23)
-      .addProperties(typeFullName, lineNumber, columnNumber)
-      .extendz(declaration, localLike)
-
     val methodReturn: NodeType = builder
       .addNodeType(
         name = "METHOD_RETURN",
-        comment = "A formal method return"
+        comment = """This node represents an (unnamed) formal method return parameter. It carries its
+            |fully qualified type name in `TYPE_FULL_NAME`. The `CODE` field MAY be set freely,
+            |e.g., to the constant `RET`, however, subsequent layer creators MUST NOT depend
+            |on this value.
+            |""".stripMargin
       )
       .protoId(3)
       .addProperties(typeFullName)
-
-    val parameterLink = builder
-      .addEdgeType(
-        name = "PARAMETER_LINK",
-        comment = "Links together corresponding METHOD_PARAMETER_IN and METHOD_PARAMETER_OUT nodes. Created by backend."
-      )
-      .protoId(12)
-
-    methodParameterIn
-      .addOutEdge(edge = parameterLink, inNode = methodParameterOut)
-
-    // To be removed
-
-    val vtable = builder
-      .addEdgeType(
-        name = "VTABLE",
-        comment = "Indicates that a method is part of the vtable of a certain type declaration"
-      )
-      .protoId(30)
-
-    typeDecl.addOutEdge(edge = vtable, inNode = method)
 
     method
       .addOutEdge(edge = sourceFile, inNode = file)

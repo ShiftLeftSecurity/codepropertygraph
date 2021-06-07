@@ -51,24 +51,6 @@ object Base extends SchemaBase {
       )
       .protoId(21)
 
-    val lineNumber = builder
-      .addProperty(
-        name = "LINE_NUMBER",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "Line where the code starts"
-      )
-      .protoId(2)
-
-    val columnNumber = builder
-      .addProperty(
-        name = "COLUMN_NUMBER",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
-        comment = "Column where the code starts"
-      )
-      .protoId(11)
-
     val isExternal = builder
       .addProperty(
         name = "IS_EXTERNAL",

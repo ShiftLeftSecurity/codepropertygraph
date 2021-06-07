@@ -36,6 +36,53 @@ object FileSystem extends SchemaBase {
       )
       .protoId(106)
 
+    val lineNumber = builder
+      .addProperty(
+        name = "LINE_NUMBER",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.ZeroOrOne,
+        comment = """This optional field provides the line number of the program construct
+            |represented by the node.
+            |""".stripMargin
+      )
+      .protoId(2)
+
+    val columnNumber = builder
+      .addProperty(
+        name = "COLUMN_NUMBER",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.ZeroOrOne,
+        comment = """
+            |This optional fields provides the column number of the program construct
+            |represented by the node.
+            |""".stripMargin
+      )
+      .protoId(11)
+
+    val lineNumberEnd = builder
+      .addProperty(
+        name = "LINE_NUMBER_END",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.ZeroOrOne,
+        comment = """
+        |This optional fields provides the line number at which the program construct
+        |represented by the node ends.
+        """.stripMargin
+      )
+      .protoId(12)
+
+    val columnNumberEnd = builder
+      .addProperty(
+        name = "COLUMN_NUMBER_END",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.ZeroOrOne,
+        comment = """
+            |This optional fields provides the column number at which the program construct
+            |represented by the node ends.
+        """.stripMargin
+      )
+      .protoId(16)
+
     val sourceFile = builder
       .addEdgeType(
         name = "SOURCE_FILE",
