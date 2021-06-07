@@ -30,9 +30,9 @@ object Type extends SchemaBase {
         name = "TYPE_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = """This field contains the fully-qualified static type name of the entity
-                    |represented by a node. It is the name of an instantiated type, e.g.,
-                    |`List<Integer>`, not `List[T]`.
+        comment = """This field contains the fully-qualified static type name of the program
+                    |construct represented by a node. It is the name of an instantiated type, e.g.,
+                    |`List<Integer>`, rather than `List[T]`.
                     |""".stripMargin
       )
       .protoId(51)
@@ -42,7 +42,9 @@ object Type extends SchemaBase {
         name = "ALIAS_TYPE_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,
-        comment = "Type full name of which a TYPE_DECL is an alias of"
+        comment = """This property holds the fully qualified name of the type that the node is
+            |a type alias of.
+            |""".stripMargin
       )
       .protoId(158)
 
@@ -156,7 +158,9 @@ object Type extends SchemaBase {
     val bindsTo = builder
       .addEdgeType(
         name = "BINDS_TO",
-        comment = "Type argument binding to a type parameter"
+        comment = """This edge connects type arguments to type parameters to indicate
+            |that the type argument is used to instantiate the type parameter.
+            |""".stripMargin
       )
       .protoId(22)
 
