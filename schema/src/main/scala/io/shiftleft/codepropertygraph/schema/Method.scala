@@ -14,7 +14,7 @@ object Method extends SchemaBase {
   override def description: String =
     """
       |The Method Layer contains declarations of methods, functions, and procedures.
-      |Input parameterss output parameters (including return parameters) and local variables are
+      |Input parameters and output parameters (including return parameters) are
       |represented, however, method contents is not present in this layer.
       |""".stripMargin
 
@@ -60,19 +60,25 @@ object Method extends SchemaBase {
             |`LINE_NUMBER`, `COLUMN_NUMBER`, `LINE_NUMBER_END`, and `COLUMN_NUMBER_END` and
             |the name of the source file is specified in `FILENAME`. An optional hash value
             |MAY be calculated over the function contents and included in the `HASH` field.
+            |
+            |Finally, the fully qualified name of the program constructs that the method
+            |is immediately contained in is stored in the `AST_PARENT_FULL_NAME` field
+            |and its type is indicated in the `AST_PARENT_TYPE` field to be one of
+            |`METHOD`, `TYPE_DECL` or `NAMESPACE_BLOCK`.
             |""".stripMargin
       )
       .protoId(1)
       .addProperties(fullName, isExternal, signature, lineNumberEnd, columnNumberEnd, filename, hash)
-      .extendz(declaration)
-
-    method
       .addProperties(astParentType, astParentFullName)
+      .extendz(declaration)
 
     val methodParameterIn: NodeType = builder
       .addNodeType(
         name = "METHOD_PARAMETER_IN",
-        comment = "This node represents a formal parameter going towards the callee side"
+        comment = """
+            |This node represents a formal input parameter. The field `NAME` contains its
+            |name, while the field `TYPE_FULL_NAME` contains the fully qualified type name.
+            |""".stripMargin
       )
       .protoId(34)
       .addProperties(typeFullName)
@@ -81,25 +87,23 @@ object Method extends SchemaBase {
     val methodParameterOut: NodeType = builder
       .addNodeType(
         name = "METHOD_PARAMETER_OUT",
-        comment = "This node represents a formal output parameter. It does not need to be created by the frontend."
+        comment = """This node represents a formal output parameter. Corresponding output parameters
+            |for input parameters MUST NOT be created by the frontend as they are automatically
+            |created upon first loading the CPG.
+            |""".stripMargin
       )
       .protoId(33)
       .addProperties(typeFullName)
       .extendz(declaration)
 
-    val local: NodeType = builder
-      .addNodeType(
-        name = "LOCAL",
-        comment = "A local variable"
-      )
-      .protoId(23)
-      .addProperties(typeFullName)
-      .extendz(declaration, localLike)
-
     val methodReturn: NodeType = builder
       .addNodeType(
         name = "METHOD_RETURN",
-        comment = "A formal method return"
+        comment = """This node represents an (unnamed) formal method return parameter. It carries its
+            |fully qualified type name in `TYPE_FULL_NAME`. The `CODE` field MAY be set freely,
+            |e.g., to the constant `RET`, however, subsequent layer creators MUST NOT depend
+            |on this value.
+            |""".stripMargin
       )
       .protoId(3)
       .addProperties(typeFullName)
