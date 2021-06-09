@@ -211,8 +211,7 @@ object Ast extends SchemaBase {
         name = "CONTROL_STRUCTURE_TYPE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment =
-          """The `CONTROL_STRUCTURE_TYPE` field indicates which kind of control structure
+        comment = """The `CONTROL_STRUCTURE_TYPE` field indicates which kind of control structure
             |a `CONTROL_STRUCTURE` node represents. The available types are the following:
             | BREAK, CONTINUE, DO, WHILE, FOR, GOTO, IF, ELSE, TRY, and SWITCH.
             |""".stripMargin
@@ -224,9 +223,9 @@ object Ast extends SchemaBase {
       Constant(name = "BREAK", value = "BREAK", valueType = ValueTypes.STRING, comment = "Represents a break statement")
         .protoId(1),
       Constant(name = "CONTINUE",
-        value = "CONTINUE",
-        valueType = ValueTypes.STRING,
-        comment = "Represents a continue statement").protoId(2),
+               value = "CONTINUE",
+               valueType = ValueTypes.STRING,
+               comment = "Represents a continue statement").protoId(2),
       Constant(name = "WHILE", value = "WHILE", valueType = ValueTypes.STRING, comment = "Represents a while statement")
         .protoId(3),
       Constant(name = "DO", value = "DO", valueType = ValueTypes.STRING, comment = "Represents a do statement")
@@ -240,9 +239,9 @@ object Ast extends SchemaBase {
       Constant(name = "ELSE", value = "ELSE", valueType = ValueTypes.STRING, comment = "Represents an else statement")
         .protoId(8),
       Constant(name = "SWITCH",
-        value = "SWITCH",
-        valueType = ValueTypes.STRING,
-        comment = "Represents a switch statement").protoId(9),
+               value = "SWITCH",
+               valueType = ValueTypes.STRING,
+               comment = "Represents a switch statement").protoId(9),
       Constant(name = "TRY", value = "TRY", valueType = ValueTypes.STRING, comment = "Represents a try statement")
         .protoId(10),
     )
@@ -250,8 +249,7 @@ object Ast extends SchemaBase {
     val controlStructure: NodeType = builder
       .addNodeType(
         name = "CONTROL_STRUCTURE",
-        comment =
-          """Control structures such as if-blocks, for-loops, and while-loops are represented
+        comment = """Control structures such as if-blocks, for-loops, and while-loops are represented
             |in the CPG via `CONTROL_STRUCTURE` nodes.
             |""".stripMargin
       )
