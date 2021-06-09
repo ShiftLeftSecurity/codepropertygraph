@@ -1,7 +1,6 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.NewLocation
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal._
 
@@ -23,84 +22,36 @@ object LocationCreator {
     }
   }
 
-  private def location(node: nodes.StoredNode): NewLocation = {
-    node match {
-      case paramIn: nodes.MethodParameterIn =>
-        apply(
-          paramIn,
-          paramIn.name,
-          paramIn.label,
-          paramIn.lineNumber,
-          paramIn.method
-        )
-      case paramOut: nodes.MethodParameterOut =>
-        apply(
-          paramOut,
-          paramOut.name,
-          paramOut.label,
-          paramOut.lineNumber,
-          paramOut.method
-        )
-      case methodReturn: nodes.MethodReturn =>
-        apply(
-          methodReturn,
-          "$ret",
-          methodReturn.label,
-          methodReturn.lineNumber,
-          methodReturn.method
-        )
-      case call: nodes.CallRepr =>
-        apply(
-          call,
-          call.code,
-          call.label,
-          call.lineNumber,
-          call.method
-        )
-      case method: nodes.Method =>
-        apply(
-          method,
-          method.name,
-          method.label,
-          method.lineNumber,
-          method
-        )
-      case identifier: nodes.Identifier =>
-        apply(
-          identifier,
-          identifier.name,
-          identifier.label,
-          identifier.lineNumber,
-          identifier.method
-        )
-      case literal: nodes.Literal =>
-        apply(
-          literal,
-          literal.code,
-          literal.label,
-          literal.lineNumber,
-          literal.method
-        )
-      case local: nodes.Local =>
-        apply(
-          local,
-          local.name,
-          local.label,
-          local.lineNumber,
-          local.method.head
-        )
-      case methodRef: nodes.MethodRef =>
-        apply(
-          methodRef,
-          methodRef.code,
-          methodRef.label,
-          methodRef.lineNumber,
-          methodRef._methodViaContainsIn.next()
-        )
-      case source: nodes.Source =>
-        apply(source.node)
-      case node =>
-        emptyLocation(node.label, Some(node))
+  private def runtimeNodeDispatch[X, T <: nodes.StoredNode](node : nodes.StoredNode)(map : Map[String, nodes.StoredNode => Any]) : Any = {
+    map.get(node.getClass.getName + "$") match {
+      case Some(f) => f(node)
+      case None =>
+        throw new RuntimeException("Node type not handled")
+    }
+  }
+
+
+  // This table should be generated
+  def nodeDispatchTable() = {
+
+    def conversion[T <: nodes.StoredNode, M <: AddsMethodsToNode](node : T)(implicit conv : T => M) : M = {
+      conv(node)
+    }
+
+    List(
+      nodes.Method.getClass.getName -> { n : nodes.Method => conversion(n) }.asInstanceOf[nodes.StoredNode => Any],
+      nodes.MethodReturn.getClass.getName -> { n : nodes.MethodReturn => conversion(n) }.asInstanceOf[nodes.StoredNode => Any],
+      // ...
+
+    ).toMap
+  }
+
+  private def location(node: nodes.StoredNode): nodes.NewLocation = {
+    val map = nodeDispatchTable()
+    runtimeNodeDispatch(node)(map).asInstanceOf[AddsMethodsToNode] match {
+      case x : HasLocation => x.location
+      case _ =>
+        throw new RuntimeException("Node type not handled")
     }
   }
 

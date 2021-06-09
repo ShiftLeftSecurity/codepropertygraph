@@ -1,11 +1,23 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.NewLocation
+import io.shiftleft.semanticcpg.language.{AddsMethodsToNode, HasLocation, LocationCreator}
 import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
 
-class MethodMethods(val method: nodes.Method) extends AnyVal {
+class MethodMethods(val method: nodes.Method) extends AddsMethodsToNode with HasLocation {
+
+  override def location: NewLocation = {
+    LocationCreator.apply(
+      method,
+      method.name,
+      method.label,
+      method.lineNumber,
+      method
+    )
+  }
 
   def parameter: Traversal[nodes.MethodParameterIn] =
     method._methodParameterInViaAstOut
