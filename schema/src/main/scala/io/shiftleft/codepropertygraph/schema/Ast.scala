@@ -211,14 +211,49 @@ object Ast extends SchemaBase {
         name = "CONTROL_STRUCTURE_TYPE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = "Indicates the control structure type. See controlStructureTypes"
+        comment =
+          """The `CONTROL_STRUCTURE_TYPE` field indicates which kind of control structure
+            |a `CONTROL_STRUCTURE` node represents. The available types are the following:
+            | BREAK, CONTINUE, DO, WHILE, FOR, GOTO, IF, ELSE, TRY, and SWITCH.
+            |""".stripMargin
       )
       .protoId(27)
+
+    val controlStructureTypes = builder.addConstants(
+      category = "ControlStructureTypes",
+      Constant(name = "BREAK", value = "BREAK", valueType = ValueTypes.STRING, comment = "Represents a break statement")
+        .protoId(1),
+      Constant(name = "CONTINUE",
+        value = "CONTINUE",
+        valueType = ValueTypes.STRING,
+        comment = "Represents a continue statement").protoId(2),
+      Constant(name = "WHILE", value = "WHILE", valueType = ValueTypes.STRING, comment = "Represents a while statement")
+        .protoId(3),
+      Constant(name = "DO", value = "DO", valueType = ValueTypes.STRING, comment = "Represents a do statement")
+        .protoId(4),
+      Constant(name = "FOR", value = "FOR", valueType = ValueTypes.STRING, comment = "Represents a for statement")
+        .protoId(5),
+      Constant(name = "GOTO", value = "GOTO", valueType = ValueTypes.STRING, comment = "Represents a goto statement")
+        .protoId(6),
+      Constant(name = "IF", value = "IF", valueType = ValueTypes.STRING, comment = "Represents an if statement")
+        .protoId(7),
+      Constant(name = "ELSE", value = "ELSE", valueType = ValueTypes.STRING, comment = "Represents an else statement")
+        .protoId(8),
+      Constant(name = "SWITCH",
+        value = "SWITCH",
+        valueType = ValueTypes.STRING,
+        comment = "Represents a switch statement").protoId(9),
+      Constant(name = "TRY", value = "TRY", valueType = ValueTypes.STRING, comment = "Represents a try statement")
+        .protoId(10),
+    )
 
     val controlStructure: NodeType = builder
       .addNodeType(
         name = "CONTROL_STRUCTURE",
-        comment = "A control structure such as if, while, or for"
+        comment =
+          """Control structures such as if-blocks, for-loops, and while-loops are represented
+            |in the CPG via `CONTROL_STRUCTURE` nodes.
+            |""".stripMargin
       )
       .protoId(339)
       .addProperties(parserTypeName, controlStructureType)
@@ -348,34 +383,6 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
 
-    val controlStructureTypes = builder.addConstants(
-      category = "ControlStructureTypes",
-      Constant(name = "BREAK", value = "BREAK", valueType = ValueTypes.STRING, comment = "Represents a break statement")
-        .protoId(1),
-      Constant(name = "CONTINUE",
-               value = "CONTINUE",
-               valueType = ValueTypes.STRING,
-               comment = "Represents a continue statement").protoId(2),
-      Constant(name = "WHILE", value = "WHILE", valueType = ValueTypes.STRING, comment = "Represents a while statement")
-        .protoId(3),
-      Constant(name = "DO", value = "DO", valueType = ValueTypes.STRING, comment = "Represents a do statement")
-        .protoId(4),
-      Constant(name = "FOR", value = "FOR", valueType = ValueTypes.STRING, comment = "Represents a for statement")
-        .protoId(5),
-      Constant(name = "GOTO", value = "GOTO", valueType = ValueTypes.STRING, comment = "Represents a goto statement")
-        .protoId(6),
-      Constant(name = "IF", value = "IF", valueType = ValueTypes.STRING, comment = "Represents an if statement")
-        .protoId(7),
-      Constant(name = "ELSE", value = "ELSE", valueType = ValueTypes.STRING, comment = "Represents an else statement")
-        .protoId(8),
-      Constant(name = "SWITCH",
-               value = "SWITCH",
-               valueType = ValueTypes.STRING,
-               comment = "Represents a switch statement").protoId(9),
-      Constant(name = "TRY", value = "TRY", valueType = ValueTypes.STRING, comment = "Represents a try statement")
-        .protoId(10),
-    )
-
     val modifierTypes = builder.addConstants(
       category = "ModifierTypes",
       Constant(name = "STATIC", value = "STATIC", valueType = ValueTypes.STRING, comment = "The static modifier")
@@ -403,7 +410,7 @@ object Ast extends SchemaBase {
     val callRepr = builder
       .addNodeBaseType(
         name = "CALL_REPR",
-        comment = "A base class for nodes that represent different types of calls"
+        comment = "This is the base class of `CALL` that language implementers may safely ignore."
       )
       .addProperties(name, signature)
 
