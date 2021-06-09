@@ -17,24 +17,21 @@ object Shortcuts extends SchemaBase {
             methodSchema: Method.Schema,
             ast: Ast.Schema,
             typeSchema: Type.Schema,
-            fs: FileSystem.Schema,
-            callGraph: CallGraph.Schema) =
-    new Schema(builder, base, methodSchema, ast, typeSchema, fs, callGraph)
+            fs: FileSystem.Schema) =
+    new Schema(builder, base, methodSchema, ast, typeSchema, fs)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                methodSchema: Method.Schema,
                astSchema: Ast.Schema,
                typeSchema: Type.Schema,
-               fs: FileSystem.Schema,
-               callGraph: CallGraph.Schema) {
+               fs: FileSystem.Schema) {
 
     import base._
     import methodSchema._
     import astSchema._
     import typeSchema._
     import fs._
-    import callGraph._
 
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 

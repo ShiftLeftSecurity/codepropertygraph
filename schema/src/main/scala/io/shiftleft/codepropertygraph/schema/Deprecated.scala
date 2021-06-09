@@ -17,22 +17,22 @@ object Deprecated extends SchemaBase {
             methodSchema: Method.Schema,
             typeSchema: Type.Schema,
             tagsAndLocation: TagsAndLocation.Schema,
-            callGraph: CallGraph.Schema) =
-    new Schema(builder, base, methodSchema, typeSchema, tagsAndLocation, callGraph)
+            astSchema: Ast.Schema) =
+    new Schema(builder, base, methodSchema, typeSchema, tagsAndLocation, astSchema)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                methodSchema: Method.Schema,
                typeSchema: Type.Schema,
                tagsAndLocation: TagsAndLocation.Schema,
-               callGraph: CallGraph.Schema) {
+               astSchema: Ast.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     import methodSchema._
     import base._
     import typeSchema._
     import tagsAndLocation._
-    import callGraph._
+    import astSchema._
 
     val trackingPoint = builder
       .addNodeBaseType(

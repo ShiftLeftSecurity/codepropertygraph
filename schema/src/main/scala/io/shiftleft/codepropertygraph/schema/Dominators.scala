@@ -10,14 +10,13 @@ object Dominators extends SchemaBase {
     """
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema, callGraph: CallGraph.Schema) =
-    new Schema(builder, methodSchema, ast, callGraph)
+  def apply(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) =
+    new Schema(builder, methodSchema, ast)
 
-  class Schema(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema, callGraph: CallGraph.Schema) {
+  class Schema(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import ast._
-    import callGraph._
 
     val dominate = builder
       .addEdgeType(

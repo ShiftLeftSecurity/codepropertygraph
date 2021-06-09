@@ -1,25 +1,24 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Cardinality, Constant, NodeType, SchemaBuilder, SchemaInfo}
+import overflowdb.schema.{Cardinality, Constant, SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
 object CallGraph extends SchemaBase {
 
-  def index: Int = 7
+  def index: Int = 10
 
   override def description: String =
     """
       |This overlay represents call relations between methods.
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, typeSchema: Type.Schema) =
-    new Schema(builder, base, methodSchema, typeSchema)
+  def apply(builder: SchemaBuilder, methodSchema: Method.Schema, astSchema: Ast.Schema) =
+    new Schema(builder, methodSchema, astSchema: Ast.Schema)
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, typeSchema: Type.Schema) {
+  class Schema(builder: SchemaBuilder, methodSchema: Method.Schema, astSchema: Ast.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
-    import typeSchema._
-    import base._
+    import astSchema._
 
     val argumentIndex = builder
       .addProperty(
@@ -61,20 +60,7 @@ object CallGraph extends SchemaBase {
       )
       .protoId(54)
 
-    val expression = builder
-      .addNodeBaseType(
-        name = "EXPRESSION",
-        comment = """An expression is a piece of code that can be evaluated to yield a value
-            |of a fixed type.
-            |
-            | Expression may be arguments in method calls. For method calls that do
-            | not involved named parameters, the `ARGUMENT_INDEX` field indicates at
-            | which position in the argument list the expression occurs, e.g., an
-            | `ARGUMENT_INDEX` of 1 indicates that the expression is the first argument
-            | in a method call. For calls that employ named parameters, `ARGUMENT_INDEX`
-            | is set to -1 and the `NAME` fields holds the name of the parameter.
-            |""".stripMargin
-      )
+    expression
       .addProperties(argumentIndex, parameterName)
 
     val evaluationStrategy = builder
@@ -189,31 +175,6 @@ object CallGraph extends SchemaBase {
       ).protoId(2),
     )
 
-    val callRepr = builder
-      .addNodeBaseType(
-        name = "CALL_REPR",
-        comment = "A base class for nodes that represent different types of calls"
-      )
-      .addProperties(name, signature)
-
-    val callNode: NodeType = builder
-      .addNodeType(
-        name = "CALL",
-        comment = """A (function/method) call. The `METHOD_FULL_NAME` property is the name of the
-                    |invoked method (the callee) while the `TYPE_FULL_NAME` is its return type, and
-                    |therefore, the return type of the call when viewing it as an expression. For
-                    |languages like Javascript, it is common that we may know the (short-) name
-                    |of the invoked method, but we do not know at compile time which method
-                    |will actually be invoked, e.g., because it depends on a dynamic import.
-                    |In this case, we leave `METHOD_FULL_NAME` blank but at least fill out `NAME`,
-                    |which contains the method's (short-) name and `SIGNATURE`, which contains
-                    |any information we may have about the types of arguments and return value.
-                    |""".stripMargin
-      )
-      .protoId(15)
-      .extendz(callRepr)
-      .addProperties(typeFullName)
-
     callNode
       .addProperties(dispatchType)
 
@@ -223,6 +184,77 @@ object CallGraph extends SchemaBase {
     callNode
       .addProperty(methodFullName)
       .extendz(expression)
+
+    jumpTarget
+      .addProperty(argumentIndex)
+
+    methodInst.addProperty(methodFullName)
+    methodRef.addProperty(methodFullName)
+
+    callNode
+      .addOutEdge(edge = receiver,
+                  inNode = callNode,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver,
+                  inNode = identifier,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver,
+                  inNode = literal,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver,
+                  inNode = methodRef,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver, inNode = typeRef)
+      .addOutEdge(edge = receiver,
+                  inNode = block,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver, inNode = controlStructure)
+      .addOutEdge(edge = receiver, inNode = unknown)
+      .addOutEdge(edge = argument, inNode = callNode, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = identifier, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = fieldIdentifier, cardinalityIn = Cardinality.One)
+      .addOutEdge(edge = argument, inNode = literal, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = methodRef, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = typeRef)
+      .addOutEdge(edge = argument, inNode = block, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = jumpTarget)
+      .addOutEdge(edge = argument, inNode = controlStructure)
+      .addOutEdge(edge = argument, inNode = unknown)
+
+    ret
+      .addOutEdge(edge = argument,
+                  inNode = callNode,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument,
+                  inNode = identifier,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument,
+                  inNode = literal,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument,
+                  inNode = methodRef,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = typeRef)
+      .addOutEdge(edge = argument,
+                  inNode = ret,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument,
+                  inNode = block,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = jumpTarget)
+      .addOutEdge(edge = argument, inNode = controlStructure)
+      .addOutEdge(edge = argument, inNode = unknown)
 
   }
 

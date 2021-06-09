@@ -10,23 +10,14 @@ object Cfg extends SchemaBase {
     """
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder,
-            base: Base.Schema,
-            methodSchema: Method.Schema,
-            ast: Ast.Schema,
-            callGraph: CallGraph.Schema) =
-    new Schema(builder, base, methodSchema, ast, callGraph)
+  def apply(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, ast: Ast.Schema) =
+    new Schema(builder, base, methodSchema, ast)
 
-  class Schema(builder: SchemaBuilder,
-               base: Base.Schema,
-               methodSchema: Method.Schema,
-               ast: Ast.Schema,
-               callGraph: CallGraph.Schema) {
+  class Schema(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, ast: Ast.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import ast._
     import base._
-    import callGraph._
 
     val cfgNode = builder
       .addNodeBaseType(

@@ -13,22 +13,22 @@ class CpgSchema(builder: SchemaBuilder) {
 
   val typeSchema = Type(builder, base, fs)
   val method = Method(builder, base, typeSchema, fs)
-  val callGraph = CallGraph(builder, base, method, typeSchema)
-  val ast = Ast(builder, base, namespaces, method, typeSchema, fs, callGraph)
+  val ast = Ast(builder, base, namespaces, method, typeSchema, fs)
+  val callGraph = CallGraph(builder, method, ast)
 
   val binding = Binding(builder, base, typeSchema, method)
 
-  val cfg = Cfg(builder, base, method, ast, callGraph)
-  val dominators = Dominators(builder, method, ast, callGraph)
-  val pdg = Pdg(builder, method, ast, callGraph)
+  val cfg = Cfg(builder, base, method, ast)
+  val dominators = Dominators(builder, method, ast)
+  val pdg = Pdg(builder, method, ast)
 
-  val shortcuts = Shortcuts(builder, base, method, ast, typeSchema, fs, callGraph)
+  val shortcuts = Shortcuts(builder, base, method, ast, typeSchema, fs)
 
   val sourceSpecific = Comment(builder, base, ast, fs)
   val closure = Closure(builder, base, method, ast, callGraph)
   val tagsAndLocation = TagsAndLocation(builder, base, typeSchema, method, ast, fs, callGraph)
   val finding = Finding(builder, base)
-  val deprecated = Deprecated(builder, base, method, typeSchema, tagsAndLocation, callGraph)
+  val deprecated = Deprecated(builder, base, method, typeSchema, tagsAndLocation, ast)
   val protoSerialize = ProtoSerialize(builder, ast)
 }
 
