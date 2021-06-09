@@ -10,13 +10,14 @@ object Pdg extends SchemaBase {
     """
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) =
-    new Schema(builder, methodSchema, ast)
+  def apply(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema, callGraph: CallGraph.Schema) =
+    new Schema(builder, methodSchema, ast, callGraph)
 
-  class Schema(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) {
+  class Schema(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema, callGraph: CallGraph.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import ast._
+    import callGraph._
 
     val variable = builder
       .addProperty(

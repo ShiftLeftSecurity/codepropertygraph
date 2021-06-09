@@ -5,7 +5,7 @@ import overflowdb.storage.ValueTypes
 
 object Ast extends SchemaBase {
 
-  def index: Int = 7
+  def index: Int = 10
   override def providedByFrontend: Boolean = true
 
   override def description: String =
@@ -22,21 +22,24 @@ object Ast extends SchemaBase {
             namespaces: Namespace.Schema,
             methodSchema: Method.Schema,
             typeSchema: Type.Schema,
-            fs: FileSystem.Schema) =
-    new Schema(builder, base, namespaces, methodSchema, typeSchema, fs)
+            fs: FileSystem.Schema,
+            callGraph: CallGraph.Schema) =
+    new Schema(builder, base, namespaces, methodSchema, typeSchema, fs, callGraph)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                namespaces: Namespace.Schema,
                methodSchema: Method.Schema,
                typeSchema: Type.Schema,
-               fs: FileSystem.Schema) {
+               fs: FileSystem.Schema,
+               callGraph: CallGraph.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import base._
     import namespaces._
     import typeSchema._
     import fs._
+    import callGraph._
 
     // Base types
 
@@ -54,13 +57,6 @@ object Ast extends SchemaBase {
       .addProperties(order, code)
       .addProperties(lineNumber, columnNumber)
 
-    val callRepr = builder
-      .addNodeBaseType(
-        name = "CALL_REPR",
-        comment = "A base class for nodes that represent different types of calls"
-      )
-      .addProperties(name, signature)
-
     // Method-related nodes that are part of the AST
 
     method.extendz(astNode)
@@ -68,22 +64,6 @@ object Ast extends SchemaBase {
     methodParameterOut.extendz(astNode)
 
     // Type-related nodes that are part of the AST
-
-    val methodFullName = builder
-      .addProperty(
-        name = "METHOD_FULL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
-        comment = """The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required
-                    |to have exactly one METHOD node for each METHOD_FULL_NAME""".stripMargin
-      )
-      .protoId(54)
-
-    val expression = builder
-      .addNodeBaseType(
-        name = "EXPRESSION",
-        comment = "Expression as a specialisation of tracking point"
-      )
 
     val block: NodeType = builder
       .addNodeType(
@@ -101,16 +81,18 @@ object Ast extends SchemaBase {
       )
       .protoId(31)
       .addProperties(typeFullName)
-      .extendz(expression)
 
     val literal: NodeType = builder
       .addNodeType(
         name = "LITERAL",
-        comment = "Literal/Constant"
+        comment = """This node represents a literal such as an integer or string constant. Literals
+            |are symbols included in the code in verbatim form and which are immutable.
+            |The `TYPE_FULL_NAME` field stores the literal's fully-qualified type name,
+            |e.g., `java.lang.Integer`.
+            |""".stripMargin
       )
       .protoId(8)
       .addProperties(typeFullName)
-      .extendz(expression)
 
     val local: NodeType = builder
       .addNodeType(
@@ -121,24 +103,6 @@ object Ast extends SchemaBase {
       .addProperties(typeFullName)
       .extendz(declaration, astNode)
 
-    val callNode: NodeType = builder
-      .addNodeType(
-        name = "CALL",
-        comment = """A (function/method) call. The `methodFullName` property is the name of the
-                    |invoked method (the callee) while the `typeFullName` is its return type, and
-                    |therefore, the return type of the call when viewing it as an expression. For
-                    |languages like Javascript, it is common that we may know the (short-) name
-                    |of the invoked method, but we do not know at compile time which method
-                    |will actually be invoked, e.g., because it depends on a dynamic import.
-                    |In this case, we leave `methodFullName` blank but at least fill out `name`,
-                    |which contains the method's (short-) name and `signature`, which contains
-                    |any information we may have about the types of arguments and return value.
-                    |""".stripMargin
-      )
-      .protoId(15)
-      .extendz(callRepr, expression)
-      .addProperties(methodFullName, typeFullName)
-
     val identifier: NodeType = builder
       .addNodeType(
         name = "IDENTIFIER",
@@ -146,7 +110,6 @@ object Ast extends SchemaBase {
       )
       .protoId(27)
       .addProperties(typeFullName, name)
-      .extendz(expression)
 
     val canonicalName = builder
       .addProperty(
@@ -176,7 +139,6 @@ object Ast extends SchemaBase {
       )
       .protoId(2001081)
       .addProperties(canonicalName)
-      .extendz(expression)
 
     val modifierType = builder
       .addProperty(
@@ -213,7 +175,7 @@ object Ast extends SchemaBase {
                     |""".stripMargin
       )
       .protoId(32)
-      .addProperties(name, signature, fullName, methodFullName)
+      .addProperties(name, signature, fullName)
       .extendz(astNode)
 
     val methodRef: NodeType = builder
@@ -222,8 +184,7 @@ object Ast extends SchemaBase {
         comment = "Reference to a method instance"
       )
       .protoId(333)
-      .addProperties(typeFullName, methodFullName)
-      .extendz(expression)
+      .addProperties(typeFullName)
 
     val typeRef: NodeType = builder
       .addNodeType(
@@ -232,7 +193,6 @@ object Ast extends SchemaBase {
       )
       .protoId(335)
       .addProperties(typeFullName)
-      .extendz(expression)
 
     val ret: NodeType = builder
       .addNodeType(
@@ -240,7 +200,6 @@ object Ast extends SchemaBase {
         comment = "A return instruction"
       )
       .protoId(30)
-      .extendz(expression)
 
     val controlStructureType = builder
       .addProperty(
@@ -258,7 +217,6 @@ object Ast extends SchemaBase {
       )
       .protoId(339)
       .addProperties(parserTypeName, controlStructureType)
-      .extendz(expression)
 
     val unknown: NodeType = builder
       .addNodeType(
@@ -267,14 +225,12 @@ object Ast extends SchemaBase {
       )
       .protoId(44)
       .addProperties(parserTypeName, typeFullName)
-      .extendz(expression)
 
     typeDecl.extendz(astNode)
     member.extendz(astNode)
     typeParameter.extendz(astNode)
     typeArgument.extendz(astNode)
     namespaceBlock.extendz(astNode)
-    expression.extendz(astNode)
 
     // Edge types
 
@@ -313,19 +269,7 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = block, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = typeParameter, cardinalityIn = Cardinality.One)
 
-    callNode
-      .addOutEdge(edge = ast, inNode = callNode)
-      .addOutEdge(edge = ast, inNode = identifier)
-      .addOutEdge(edge = ast, inNode = fieldIdentifier, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = literal)
-      .addOutEdge(edge = ast, inNode = methodRef)
-      .addOutEdge(edge = ast, inNode = typeRef)
-      .addOutEdge(edge = ast, inNode = ret)
-      .addOutEdge(edge = ast, inNode = block)
-      .addOutEdge(edge = ast, inNode = controlStructure)
-
     ret
-      .addOutEdge(edge = ast, inNode = callNode)
       .addOutEdge(edge = ast, inNode = identifier)
       .addOutEdge(edge = ast, inNode = literal)
       .addOutEdge(edge = ast, inNode = methodRef)
@@ -337,7 +281,6 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = controlStructure)
 
     block
-      .addOutEdge(edge = ast, inNode = callNode)
       .addOutEdge(edge = ast, inNode = identifier)
       .addOutEdge(edge = ast, inNode = literal)
       .addOutEdge(edge = ast, inNode = methodRef)
@@ -352,7 +295,6 @@ object Ast extends SchemaBase {
     controlStructure
       .addOutEdge(edge = ast, inNode = literal, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = modifier)
-      .addOutEdge(edge = ast, inNode = callNode, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = local)
       .addOutEdge(edge = ast, inNode = identifier, cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = ast, inNode = ret, cardinalityIn = Cardinality.ZeroOrOne)
@@ -366,7 +308,6 @@ object Ast extends SchemaBase {
     unknown
       .addOutEdge(edge = ast, inNode = literal)
       .addOutEdge(edge = ast, inNode = modifier)
-      .addOutEdge(edge = ast, inNode = callNode)
       .addOutEdge(edge = ast, inNode = local)
       .addOutEdge(edge = ast, inNode = identifier)
       .addOutEdge(edge = ast, inNode = fieldIdentifier)
@@ -392,7 +333,6 @@ object Ast extends SchemaBase {
 
     controlStructure
       .addOutEdge(edge = condition, inNode = literal)
-      .addOutEdge(edge = condition, inNode = callNode)
       .addOutEdge(edge = condition, inNode = identifier)
       .addOutEdge(edge = condition, inNode = ret)
       .addOutEdge(edge = condition, inNode = block)
@@ -463,6 +403,115 @@ object Ast extends SchemaBase {
       Constant(name = "VIRTUAL", value = "VIRTUAL", valueType = ValueTypes.STRING, comment = "The virtual modifier")
         .protoId(8),
     )
+
+    jumpTarget
+      .addProperty(argumentIndex)
+
+    callNode
+      .addOutEdge(edge = receiver,
+                  inNode = callNode,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver,
+                  inNode = identifier,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver,
+                  inNode = literal,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver,
+                  inNode = methodRef,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver, inNode = typeRef)
+      .addOutEdge(edge = receiver,
+                  inNode = block,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = receiver, inNode = controlStructure)
+      .addOutEdge(edge = receiver, inNode = unknown)
+      .addOutEdge(edge = argument, inNode = callNode, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = identifier, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = fieldIdentifier, cardinalityIn = Cardinality.One)
+      .addOutEdge(edge = argument, inNode = literal, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = methodRef, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = typeRef)
+      .addOutEdge(edge = argument, inNode = block, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = jumpTarget)
+      .addOutEdge(edge = argument, inNode = controlStructure)
+      .addOutEdge(edge = argument, inNode = unknown)
+
+    ret
+      .addOutEdge(edge = argument,
+                  inNode = callNode,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument,
+                  inNode = identifier,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument,
+                  inNode = literal,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument,
+                  inNode = methodRef,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = typeRef)
+      .addOutEdge(edge = argument,
+                  inNode = ret,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument,
+                  inNode = block,
+                  cardinalityOut = Cardinality.ZeroOrOne,
+                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = argument, inNode = jumpTarget)
+      .addOutEdge(edge = argument, inNode = controlStructure)
+      .addOutEdge(edge = argument, inNode = unknown)
+
+    fieldIdentifier.extendz(expression)
+    identifier.extendz(expression)
+    literal.extendz(expression)
+    block.extendz(expression)
+    controlStructure.extendz(expression)
+    methodRef.extendz(expression)
+    typeRef.extendz(expression)
+    ret.extendz(expression)
+    unknown.extendz(expression)
+
+    methodInst.addProperty(methodFullName)
+    methodRef.addProperty(methodFullName)
+
+    expression.extendz(astNode)
+
+    callNode
+      .addOutEdge(edge = ast, inNode = callNode)
+      .addOutEdge(edge = ast, inNode = identifier)
+      .addOutEdge(edge = ast, inNode = fieldIdentifier, cardinalityIn = Cardinality.One)
+      .addOutEdge(edge = ast, inNode = literal)
+      .addOutEdge(edge = ast, inNode = methodRef)
+      .addOutEdge(edge = ast, inNode = typeRef)
+      .addOutEdge(edge = ast, inNode = ret)
+      .addOutEdge(edge = ast, inNode = block)
+      .addOutEdge(edge = ast, inNode = controlStructure)
+
+    ret
+      .addOutEdge(edge = ast, inNode = callNode)
+
+    block
+      .addOutEdge(edge = ast, inNode = callNode)
+
+    controlStructure
+      .addOutEdge(edge = ast, inNode = callNode, cardinalityIn = Cardinality.One)
+
+    unknown
+      .addOutEdge(edge = ast, inNode = callNode)
+
+    controlStructure
+      .addOutEdge(edge = condition, inNode = callNode)
 
     // To refactor
 
