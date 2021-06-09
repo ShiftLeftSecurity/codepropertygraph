@@ -10,7 +10,11 @@ object Ast extends SchemaBase {
 
   override def description: String =
     """
-      |Abstract syntax tree layer.
+      |The Abstract Syntax Tree (AST) Layer provides syntax trees for all compilation units.
+      |Source-based frontends MUST generate this layer, leaving subsequent generation of
+      |the control flow graph to the backend. Machine-code- and Bytecode-based
+      |MAY choose to skip generating this layer, in which case the frontend must generate
+      |the control flow layer.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder,
@@ -39,7 +43,7 @@ object Ast extends SchemaBase {
     val astNode = builder
       .addNodeBaseType(
         name = "AST_NODE",
-        comment = """Base type for all nodes are (in particular) nodes of the abstract syntax tree.
+        comment = """This is the base type for all nodes of the abstract syntax tree.
                     |In a syntax tree, sibling nodes (nodes who share a parent node) are ordered.
                     |As some graph databases do not guarantee the order in which siblings are returned to
                     |be stable, we make the ordering explicit by storing the position of each node relative
@@ -65,13 +69,6 @@ object Ast extends SchemaBase {
 
     // Type-related nodes that are part of the AST
 
-    typeDecl.extendz(astNode)
-    member.extendz(astNode)
-    typeParameter.extendz(astNode)
-    typeArgument.extendz(astNode)
-
-    namespaceBlock.extendz(astNode)
-
     val methodFullName = builder
       .addProperty(
         name = "METHOD_FULL_NAME",
@@ -88,8 +85,6 @@ object Ast extends SchemaBase {
         comment = "Expression as a specialisation of tracking point"
       )
 
-    expression.extendz(astNode)
-
     val block: NodeType = builder
       .addNodeType(
         name = "BLOCK",
@@ -100,8 +95,8 @@ object Ast extends SchemaBase {
                     |imply that the block does not yield a value upon evaluation, that is, that it is
                     |not an expression. This is true in languages such as C and Java, but not for languages
                     |such as Scala where the value of the block is given by that of the last expression it
-                    |contains. In fact, the Scala grammar uses the term \"BlockExpr\" (short for
-                    |\"block expression\") to describe what in the CPG spec we just call \"Block\".
+                    |contains. In fact, the Scala grammar uses the term "BlockExpr" (short for
+                    |"block expression") to describe what in the CPG spec we just call "Block".
                     |""".stripMargin
       )
       .protoId(31)
@@ -124,7 +119,7 @@ object Ast extends SchemaBase {
       )
       .protoId(23)
       .addProperties(typeFullName)
-      .extendz(declaration, localLike, astNode)
+      .extendz(declaration, astNode)
 
     val callNode: NodeType = builder
       .addNodeType(
@@ -150,8 +145,8 @@ object Ast extends SchemaBase {
         comment = "An arbitrary identifier/reference"
       )
       .protoId(27)
-      .addProperties(typeFullName)
-      .extendz(expression, localLike)
+      .addProperties(typeFullName, name)
+      .extendz(expression)
 
     val canonicalName = builder
       .addProperty(
@@ -274,12 +269,19 @@ object Ast extends SchemaBase {
       .addProperties(parserTypeName, typeFullName)
       .extendz(expression)
 
+    typeDecl.extendz(astNode)
+    member.extendz(astNode)
+    typeParameter.extendz(astNode)
+    typeArgument.extendz(astNode)
+    namespaceBlock.extendz(astNode)
+    expression.extendz(astNode)
+
     // Edge types
 
     val ast = builder
       .addEdgeType(
         name = "AST",
-        comment = "Syntax tree edge"
+        comment = "This edge connects a parent node to its child in the syntax tree."
       )
       .protoId(3)
 
@@ -463,8 +465,6 @@ object Ast extends SchemaBase {
     )
 
     // To refactor
-
-    typeArgument.addOutEdge(edge = ref, inNode = tpe)
 
     identifier
       .addOutEdge(edge = ref, inNode = local, cardinalityOut = Cardinality.ZeroOrOne)

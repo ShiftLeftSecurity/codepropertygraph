@@ -82,7 +82,7 @@ object Method extends SchemaBase {
       )
       .protoId(34)
       .addProperties(typeFullName)
-      .extendz(declaration, localLike)
+      .extendz(declaration)
 
     val methodParameterOut: NodeType = builder
       .addNodeType(

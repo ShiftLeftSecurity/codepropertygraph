@@ -149,13 +149,6 @@ object Base extends SchemaBase {
       )
       .addProperties(name)
 
-    val localLike = builder
-      .addNodeBaseType(
-        name = "LOCAL_LIKE",
-        comment = "Formal input parameters, locals, and identifiers"
-      )
-      .addProperties(name)
-
     // Edge types
 
     val ref = builder
