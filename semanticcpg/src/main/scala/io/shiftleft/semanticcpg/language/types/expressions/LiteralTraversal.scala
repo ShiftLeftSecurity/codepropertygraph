@@ -6,7 +6,7 @@ import overflowdb.traversal.Traversal
 /**
   A literal, e.g., a constant string or number
   */
-class Literal(val traversal: Traversal[nodes.Literal]) extends AnyVal {
+class LiteralTraversal(val traversal: Traversal[nodes.Literal]) extends AnyVal {
 
   /**
     * Traverse to method hosting this literal

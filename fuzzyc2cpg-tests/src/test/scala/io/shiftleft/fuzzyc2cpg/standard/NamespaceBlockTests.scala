@@ -2,7 +2,7 @@ package io.shiftleft.fuzzyc2cpg.standard
 
 import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.structure.{File, Namespace}
+import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, NamespaceTraversal}
 
 class NamespaceBlockTests extends FuzzyCCodeToCpgSuite {
 
@@ -21,30 +21,30 @@ class NamespaceBlockTests extends FuzzyCCodeToCpgSuite {
   }
 
   "should contain a correct global namespace block for the `<unknown>` file" in {
-    val List(x) = cpg.namespaceBlock.filename(File.UNKNOWN).l
-    x.name shouldBe Namespace.globalNamespaceName
-    x.fullName shouldBe Namespace.globalNamespaceName
+    val List(x) = cpg.namespaceBlock.filename(FileTraversal.UNKNOWN).l
+    x.name shouldBe NamespaceTraversal.globalNamespaceName
+    x.fullName shouldBe NamespaceTraversal.globalNamespaceName
     x.order shouldBe 1
   }
 
   "should contain correct namespace block for known file" in {
-    val List(x) = cpg.namespaceBlock.filenameNot(File.UNKNOWN).l
-    x.name shouldBe Namespace.globalNamespaceName
+    val List(x) = cpg.namespaceBlock.filenameNot(FileTraversal.UNKNOWN).l
+    x.name shouldBe NamespaceTraversal.globalNamespaceName
     x.filename should not be ""
-    x.fullName shouldBe s"${x.filename}:${Namespace.globalNamespaceName}"
+    x.fullName shouldBe s"${x.filename}:${NamespaceTraversal.globalNamespaceName}"
     x.order shouldBe 1
   }
 
   "should allow traversing from namespace block to method" in {
-    cpg.namespaceBlock.filenameNot(File.UNKNOWN).method.name.l shouldBe List("foo")
+    cpg.namespaceBlock.filenameNot(FileTraversal.UNKNOWN).method.name.l shouldBe List("foo")
   }
 
   "should allow traversing from namespace block to type declaration" in {
-    cpg.namespaceBlock.filenameNot(File.UNKNOWN).typeDecl.name.l shouldBe List("my_struct")
+    cpg.namespaceBlock.filenameNot(FileTraversal.UNKNOWN).typeDecl.name.l shouldBe List("my_struct")
   }
 
   "should allow traversing from namespace block to namespace" in {
-    cpg.namespaceBlock.filenameNot(File.UNKNOWN).namespace.name.l shouldBe List(Namespace.globalNamespaceName)
+    cpg.namespaceBlock.filenameNot(FileTraversal.UNKNOWN).namespace.name.l shouldBe List(NamespaceTraversal.globalNamespaceName)
   }
 
 }

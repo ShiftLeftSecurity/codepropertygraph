@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.types.expressions
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import overflowdb.traversal.Traversal
 
-class MethodRef(val traversal: Traversal[nodes.MethodRef]) extends AnyVal {
+class MethodRefTraversal(val traversal: Traversal[nodes.MethodRef]) extends AnyVal {
 
   /**
     * Traverse to referenced method.

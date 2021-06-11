@@ -5,7 +5,7 @@ import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
 
-class MethodParameterOut(val traversal: Traversal[nodes.MethodParameterOut]) extends AnyVal {
+class MethodParameterOutTraversal(val traversal: Traversal[nodes.MethodParameterOut]) extends AnyVal {
 
   /* method parameter indexes are  based, i.e. first parameter has index  (that's how java2cpg generates it) */
   def index(num: Int): Traversal[nodes.MethodParameterOut] =

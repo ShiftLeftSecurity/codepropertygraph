@@ -52,7 +52,7 @@ package io.shiftleft
   * traverse to all methods where `name` matches the regular expression ".*exec.*". You can see
   * a complete list of properties by browsing to the API documentation of the corresponding step.
   * For example, you can find the properties of method nodes at
-  * [[io.shiftleft.semanticcpg.language.types.structure.Method]].
+  * [[io.shiftleft.semanticcpg.language.types.structure.MethodTraversal]].
   *
   * == Side effects ==
   * Useful if you want to mutate something outside the traversal, or simply debug it:

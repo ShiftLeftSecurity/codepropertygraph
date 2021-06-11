@@ -5,13 +5,13 @@ import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
 import overflowdb.traversal.help.Doc
 
-object ControlStructure {
+object ControlStructureTraversal {
   val secondChildIndex = Int.box(2)
   val thirdChildIndex = Int.box(3)
 }
 
-class ControlStructure(val traversal: Traversal[nodes.ControlStructure]) extends AnyVal {
-  import ControlStructure._
+class ControlStructureTraversal(val traversal: Traversal[nodes.ControlStructure]) extends AnyVal {
+  import ControlStructureTraversal._
 
   @Doc("The condition associated with this control structure")
   def condition: Traversal[nodes.Expression] =

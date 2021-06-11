@@ -2,7 +2,7 @@ package io.shiftleft.fuzzyc2cpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.structure.Namespace
+import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -27,7 +27,7 @@ class CMetaDataPassTests extends AnyWordSpec with Matchers {
     }
 
     "create a '<global>' NamespaceBlock" in {
-      cpg.namespaceBlock.name.l shouldBe List(Namespace.globalNamespaceName)
+      cpg.namespaceBlock.name.l shouldBe List(NamespaceTraversal.globalNamespaceName)
     }
 
   }

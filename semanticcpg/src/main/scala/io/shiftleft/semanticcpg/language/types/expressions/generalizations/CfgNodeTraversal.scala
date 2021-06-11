@@ -7,7 +7,7 @@ import overflowdb.traversal.help.Doc
 import overflowdb.traversal.{Traversal, help}
 
 @help.Traversal(elementType = classOf[nodes.CfgNode])
-class CfgNode[A <: nodes.CfgNode](val traversal: Traversal[A]) extends AnyVal {
+class CfgNodeTraversal[A <: nodes.CfgNode](val traversal: Traversal[A]) extends AnyVal {
 
   /**
     * Textual representation of CFG node

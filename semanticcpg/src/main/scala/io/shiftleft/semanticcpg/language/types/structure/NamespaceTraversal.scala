@@ -7,7 +7,7 @@ import overflowdb.traversal.Traversal
 /**
   * A namespace, e.g., Java package or C# namespace
   * */
-class Namespace(val traversal: Traversal[nodes.Namespace]) extends AnyVal {
+class NamespaceTraversal(val traversal: Traversal[nodes.Namespace]) extends AnyVal {
 
   /**
     * The type declarations defined in this namespace
@@ -45,7 +45,7 @@ class Namespace(val traversal: Traversal[nodes.Namespace]) extends AnyVal {
 
 }
 
-object Namespace {
+object NamespaceTraversal {
 
   val globalNamespaceName = "<global>"
 

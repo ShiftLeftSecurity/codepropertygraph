@@ -6,7 +6,7 @@ import overflowdb.traversal.Traversal
 /**
   * A compilation unit
   * */
-class File(val traversal: Traversal[nodes.File]) extends AnyVal {
+class FileTraversal(val traversal: Traversal[nodes.File]) extends AnyVal {
 
   def typeDecl: Traversal[nodes.TypeDecl] =
     traversal.in(EdgeTypes.SOURCE_FILE).hasLabel(NodeTypes.TYPE_DECL).cast[nodes.TypeDecl]
@@ -25,7 +25,7 @@ class File(val traversal: Traversal[nodes.File]) extends AnyVal {
 
 }
 
-object File {
+object FileTraversal {
 
   val UNKNOWN = "<unknown>"
 

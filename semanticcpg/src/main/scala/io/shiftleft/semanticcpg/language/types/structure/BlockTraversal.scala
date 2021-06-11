@@ -5,7 +5,7 @@ import overflowdb.traversal.help.Doc
 import overflowdb.traversal.{Traversal, help}
 
 @help.Traversal(elementType = classOf[nodes.Block])
-class Block(val traversal: Traversal[nodes.Block]) extends AnyVal {
+class BlockTraversal(val traversal: Traversal[nodes.Block]) extends AnyVal {
 
   /** Traverse to locals of this block. */
   @Doc("Traverse to locals of this block.")

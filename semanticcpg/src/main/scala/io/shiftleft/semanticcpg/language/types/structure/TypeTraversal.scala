@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
 
-class Type(val traversal: Traversal[nodes.Type]) extends AnyVal {
+class TypeTraversal(val traversal: Traversal[nodes.Type]) extends AnyVal {
 
   /**
     * Namespaces in which the corresponding type declaration is defined.

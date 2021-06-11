@@ -9,11 +9,11 @@ trait Implicits {
   implicit def toNodeTypeStartersOperatorExtension(cpg: Cpg): NodeTypeStarters = new NodeTypeStarters(cpg)
   implicit def toArrayAccessExt(arrayAccess: opnodes.ArrayAccess): ArrayAccessMethods =
     new ArrayAccessMethods(arrayAccess)
-  implicit def toArrayAccessTrav(steps: Traversal[opnodes.ArrayAccess]): ArrayAccess = new ArrayAccess(steps)
+  implicit def toArrayAccessTrav(steps: Traversal[opnodes.ArrayAccess]): ArrayAccessTraversal = new ArrayAccessTraversal(steps)
   implicit def toAssignmentExt(assignment: opnodes.Assignment): AssignmentMethods = new AssignmentMethods(assignment)
-  implicit def toAssignmentTrav(steps: Traversal[opnodes.Assignment]): Assignment = new Assignment(steps)
+  implicit def toAssignmentTrav(steps: Traversal[opnodes.Assignment]): AssignmentTraversal = new AssignmentTraversal(steps)
   implicit def toTargetExt(call: nodes.Expression): TargetMethods = new TargetMethods(call)
-  implicit def toTargetTrav(steps: Traversal[nodes.Expression]): Target = new Target(steps)
+  implicit def toTargetTrav(steps: Traversal[nodes.Expression]): TargetTraversal = new TargetTraversal(steps)
   implicit def toOpAstNodeExt[A <: nodes.AstNode](node: A): OpAstNodeMethods[A] = new OpAstNodeMethods(node)
   implicit def toOpAstNodeTrav[A <: nodes.AstNode](steps: Traversal[A]): OpAstNode[A] = new OpAstNode(steps)
 }

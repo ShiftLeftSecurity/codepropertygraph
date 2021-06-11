@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import overflowdb.traversal.Traversal
 
-class NamespaceBlock(val traversal: Traversal[nodes.NamespaceBlock]) extends AnyVal {
+class NamespaceBlockTraversal(val traversal: Traversal[nodes.NamespaceBlock]) extends AnyVal {
 
   /**
     * Namespaces for namespace blocks.

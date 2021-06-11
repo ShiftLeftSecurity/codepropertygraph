@@ -9,7 +9,7 @@ import scala.jdk.CollectionConverters._
 /**
   An expression (base type)
   */
-class Expression[NodeType <: nodes.Expression](val traversal: Traversal[NodeType]) extends AnyVal {
+class ExpressionTraversal[NodeType <: nodes.Expression](val traversal: Traversal[NodeType]) extends AnyVal {
 
   /**
     * Traverse to it's parent expression (e.g. call or return) by following the incoming AST nodes.

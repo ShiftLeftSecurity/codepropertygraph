@@ -10,7 +10,7 @@ import scala.jdk.CollectionConverters._
   * Formal method input parameter
   * */
 @help.Traversal(elementType = classOf[nodes.MethodParameterIn])
-class MethodParameter(val traversal: Traversal[nodes.MethodParameterIn]) extends AnyVal {
+class MethodParameterTraversal(val traversal: Traversal[nodes.MethodParameterIn]) extends AnyVal {
 
   /**
     * Traverse to all `num`th parameters

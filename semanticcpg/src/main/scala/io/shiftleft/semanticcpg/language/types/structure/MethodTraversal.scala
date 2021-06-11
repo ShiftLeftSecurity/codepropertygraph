@@ -10,7 +10,7 @@ import overflowdb.traversal.{Traversal, help}
   * A method, function, or procedure
   * */
 @help.Traversal(elementType = classOf[nodes.Method])
-class Method(val traversal: Traversal[nodes.Method]) extends AnyVal {
+class MethodTraversal(val traversal: Traversal[nodes.Method]) extends AnyVal {
 
   /**
     * Traverse to parameters of the method

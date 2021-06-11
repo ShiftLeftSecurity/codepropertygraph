@@ -6,7 +6,7 @@ import overflowdb.traversal.help.Doc
 import overflowdb.traversal.{Traversal, help}
 
 @help.Traversal(elementType = classOf[nodes.MethodReturn])
-class MethodReturn(val traversal: Traversal[nodes.MethodReturn]) extends AnyVal {
+class MethodReturnTraversal(val traversal: Traversal[nodes.MethodReturn]) extends AnyVal {
 
   @Doc("traverse to parent method")
   def method: Traversal[nodes.Method] =

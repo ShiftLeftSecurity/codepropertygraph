@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, PropertyNames, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.structure.File
+import io.shiftleft.semanticcpg.language.types.structure.FileTraversal
 import io.shiftleft.semanticcpg.passes.linking.linker.Linker
 
 import scala.collection.mutable
@@ -25,7 +25,7 @@ class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
     }
 
     def createFileIfDoesNotExist(srcNode: nodes.StoredNode, destFullName: String): Unit = {
-      val dstFullName = if (destFullName == "") { File.UNKNOWN } else { destFullName }
+      val dstFullName = if (destFullName == "") { FileTraversal.UNKNOWN } else { destFullName }
       val newFile = newFileNameToNode.getOrElseUpdate(dstFullName, {
         val file = nodes.NewFile().name(dstFullName).order(0)
         dstGraph.addNode(file)

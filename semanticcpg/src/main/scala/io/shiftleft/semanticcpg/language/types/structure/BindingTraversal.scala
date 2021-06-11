@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import overflowdb.traversal.Traversal
 
-class Binding(val traversal: Traversal[nodes.Binding]) extends AnyVal {
+class BindingTraversal(val traversal: Traversal[nodes.Binding]) extends AnyVal {
 
   /**
     * Traverse to the method bound by this method binding.

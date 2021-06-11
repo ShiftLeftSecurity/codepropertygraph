@@ -6,7 +6,7 @@ import overflowdb.traversal.Traversal
 /**
   * A local variable
   * */
-class Local(val traversal: Traversal[nodes.Local]) extends AnyVal {
+class LocalTraversal(val traversal: Traversal[nodes.Local]) extends AnyVal {
 
   /**
     * The method hosting this local variable

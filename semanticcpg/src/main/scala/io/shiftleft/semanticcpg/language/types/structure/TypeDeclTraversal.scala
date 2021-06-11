@@ -8,8 +8,8 @@ import overflowdb.traversal.Traversal
 /**
   * Type declaration - possibly a template that requires instantiation
   * */
-class TypeDecl(val traversal: Traversal[nodes.TypeDecl]) extends AnyVal {
-  import TypeDecl._
+class TypeDeclTraversal(val traversal: Traversal[nodes.TypeDecl]) extends AnyVal {
+  import TypeDeclTraversal._
 
   /**
     * Types referencing to this type declaration.
@@ -152,6 +152,6 @@ class TypeDecl(val traversal: Traversal[nodes.TypeDecl]) extends AnyVal {
 
 }
 
-object TypeDecl {
+object TypeDeclTraversal {
   private val maxAliasExpansions = 100
 }

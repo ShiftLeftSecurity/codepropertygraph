@@ -2,7 +2,7 @@ package io.shiftleft.fuzzyc2cpg.standard
 
 import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.structure.File
+import io.shiftleft.semanticcpg.language.types.structure.FileTraversal
 
 class TypeDeclTests extends FuzzyCCodeToCpgSuite {
 
@@ -49,7 +49,7 @@ class TypeDeclTests extends FuzzyCCodeToCpgSuite {
     x.inheritsFromTypeFullName shouldBe List()
     x.aliasTypeFullName shouldBe None
     x.order shouldBe -1
-    x.filename shouldBe File.UNKNOWN
+    x.filename shouldBe FileTraversal.UNKNOWN
   }
 
   "should find exactly 1 internal type" in {

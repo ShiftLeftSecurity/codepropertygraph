@@ -5,7 +5,7 @@ import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.help.Doc
 import overflowdb.traversal.{PathAwareTraversal, Traversal}
 
-class Method(val traversal: Traversal[nodes.Method]) extends AnyVal {
+class MethodTraversal(val traversal: Traversal[nodes.Method]) extends AnyVal {
 
   /**
     * Intended for internal use!

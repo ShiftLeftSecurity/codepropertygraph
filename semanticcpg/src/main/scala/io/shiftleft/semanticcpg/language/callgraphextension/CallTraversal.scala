@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
 
-class Call(val traversal: Traversal[nodes.Call]) extends AnyVal {
+class CallTraversal(val traversal: Traversal[nodes.Call]) extends AnyVal {
 
   @deprecated("Use callee", "")
   def calledMethod(implicit callResolver: ICallResolver): Traversal[nodes.Method] = callee

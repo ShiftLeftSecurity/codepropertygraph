@@ -6,7 +6,7 @@ import overflowdb.traversal.Traversal
 /**
   * A member variable of a class/type.
   * */
-class Member(val traversal: Traversal[nodes.Member]) extends AnyVal {
+class MemberTraversal(val traversal: Traversal[nodes.Member]) extends AnyVal {
 
   /**
     * The type declaration this member is defined in

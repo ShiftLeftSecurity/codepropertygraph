@@ -7,7 +7,7 @@ import overflowdb.traversal.Traversal
 /**
   A call site
   */
-class Call(val traversal: Traversal[nodes.Call]) extends AnyVal {
+class CallTraversal(val traversal: Traversal[nodes.Call]) extends AnyVal {
 
   /**
     Only statically dispatched calls
