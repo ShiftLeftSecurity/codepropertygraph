@@ -1,7 +1,8 @@
 package io.shiftleft.semanticcpg.passes.linking.memberaccesslinker
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Operators, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Operators}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
@@ -28,15 +29,15 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
                     Operators.getElementPtr)
       )
       .l
-    val cache = collection.mutable.Map.empty[(nodes.Type, String), nodes.Member]
+    val cache = collection.mutable.Map.empty[(Type, String), Member]
     val dstGraph = DiffGraph.newBuilder // don't use parallel executor, caching is better
     memberAccessIterator.foreach(ma => resolve(dstGraph, cache, ma))
     List(dstGraph.build()).iterator
   }
 
   private def resolve(diffGraph: DiffGraph.Builder,
-                      cache: collection.mutable.Map[(nodes.Type, String), nodes.Member],
-                      call: nodes.Call): Unit = {
+                      cache: collection.mutable.Map[(Type, String), Member],
+                      call: Call): Unit = {
     if (call._refOut.hasNext && !loggedDeprecationWarning) {
       logger.warn(
         s"Using deprecated CPG format with already existing REF edge between" +
@@ -46,28 +47,28 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
     try {
       // fixme: use argumentIndex once deprecation is over
       val args = call._argumentOut.asScala.toList
-        .asInstanceOf[List[nodes.HasOrder]]
+        .asInstanceOf[List[HasOrder]]
         .sortBy {
           _.order
         }
-        .asInstanceOf[List[nodes.StoredNode]]
+        .asInstanceOf[List[StoredNode]]
       if (args.size != 2) throw new RuntimeException("member/field access-style operators need two arguments")
       val typ = args(0)._evalTypeOut.nextOption() match {
-        case Some(t: nodes.Type) => t
+        case Some(t: Type) => t
         case _                   => return
       }
 
       val fieldref: String = call.name match {
         case Operators.memberAccess | Operators.indirectMemberAccess =>
           args(1) match {
-            case id: nodes.Identifier => id.name
+            case id: Identifier => id.name
             case _                    => throw new RuntimeException("memberAccess needs Identifier as second argument")
           }
 
         case Operators.fieldAccess | Operators.indirectFieldAccess | Operators.getElementPtr =>
           args(1) match {
-            case id: nodes.FieldIdentifier => id.code // we intentionally don't use the CANONICAL_NAME field here.
-            case lit: nodes.Literal        => lit.code
+            case id: FieldIdentifier => id.code // we intentionally don't use the CANONICAL_NAME field here.
+            case lit: Literal        => lit.code
             case _                         => return
           }
         case _ => return
@@ -85,10 +86,10 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
     }
   }
 
-  private def getMember(cache: collection.mutable.Map[(nodes.Type, String), nodes.Member],
-                        typ: nodes.Type,
+  private def getMember(cache: collection.mutable.Map[(Type, String), Member],
+                        typ: Type,
                         name: String,
-                        depth: Int): nodes.Member = {
+                        depth: Int): Member = {
     if (depth > 100) {
       logger.warn(
         "Maximum depth for member access resolution exceeded on type=${typ.fullName}, member=$name. Recursive inheritance?")

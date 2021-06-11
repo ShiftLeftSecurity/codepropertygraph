@@ -1,7 +1,8 @@
 package io.shiftleft.semanticcpg.passes.containsedges
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes.AstNode
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
@@ -11,13 +12,13 @@ import scala.jdk.CollectionConverters._
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
   * language frontends which do not provide method stubs and type decl stubs.
   */
-class ContainsEdgePass(cpg: Cpg) extends ParallelCpgPass[nodes.AstNode](cpg) {
+class ContainsEdgePass(cpg: Cpg) extends ParallelCpgPass[AstNode](cpg) {
   import ContainsEdgePass.{destinationTypes, sourceTypes}
 
-  override def partIterator: Iterator[nodes.AstNode] =
-    cpg.graph.nodes(sourceTypes: _*).asScala.map(_.asInstanceOf[nodes.AstNode])
+  override def partIterator: Iterator[AstNode] =
+    cpg.graph.nodes(sourceTypes: _*).asScala.map(_.asInstanceOf[AstNode])
 
-  override def runOnPart(source: nodes.AstNode): Iterator[DiffGraph] = {
+  override def runOnPart(source: AstNode): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
     source

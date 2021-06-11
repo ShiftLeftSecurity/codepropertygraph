@@ -1,8 +1,8 @@
 package io.shiftleft.semanticcpg.passes.compat.bindingtablecompat
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.NewBinding
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
@@ -31,7 +31,7 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
     Iterator(diffGraph.build())
   }
 
-  private def createBinding(typeDecl: nodes.TypeDecl, diffGraph: DiffGraph.Builder)(method: nodes.Method): Unit = {
+  private def createBinding(typeDecl: TypeDecl, diffGraph: DiffGraph.Builder)(method: Method): Unit = {
     // The csharp frontend creates method names which contain type parameters.
     // It is necessary to keep them because a class may define parametric and non-parametric
     // functions with the same name, i.e., `void f() {} and void f<T>() {}' is valid.
@@ -43,8 +43,8 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
     diffGraph.addEdgeToOriginal(newBinding, method, EdgeTypes.REF)
   }
 
-  private def getNonConstructorMethodsTransitive(typeDecl: nodes.TypeDecl,
-                                                 alreadyVisitedTypeDecls: Set[nodes.TypeDecl]): List[nodes.Method] = {
+  private def getNonConstructorMethodsTransitive(typeDecl: TypeDecl,
+                                                 alreadyVisitedTypeDecls: Set[TypeDecl]): List[Method] = {
     if (alreadyVisitedTypeDecls.contains(typeDecl)) {
       BindingTableCompat.logger.warn(s"Found invalid cyclic TYPE_DECL inheritance for TYPE_DECL ${typeDecl.fullName}")
       return Nil
@@ -68,7 +68,7 @@ class BindingTableCompat(cpg: Cpg) extends CpgPass(cpg) {
     notShadowedInheritedMethods ++ ownNonConstructorMethods
   }
 
-  private def getNonConstructorMethods(typeDecl: nodes.TypeDecl): List[nodes.Method] =
+  private def getNonConstructorMethods(typeDecl: TypeDecl): List[Method] =
     typeDecl._methodViaAstOut
       .filter(method => method.isConstructor.isEmpty)
       .toList

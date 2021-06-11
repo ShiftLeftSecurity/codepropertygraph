@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes.cfgcreation
 
-import io.shiftleft.codepropertygraph.generated.nodes.CfgNode
-import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgcreation.Cfg.CfgEdgeType
@@ -46,7 +46,7 @@ import overflowdb.traversal.Traversal
   * outgoing edges for which the destination node is yet to be determined as
   * the "fringe" of the control flow graph.
   */
-class CfgCreator(entryNode: nodes.Method) {
+class CfgCreator(entryNode: Method) {
 
   import Cfg._
   import CfgCreator._
@@ -64,7 +64,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * representing formal return parameters, of which there exists
     * exactly one per method.
     * */
-  private val exitNode: nodes.MethodReturn = entryNode.methodReturn
+  private val exitNode: MethodReturn = entryNode.methodReturn
 
   /**
     * We return the CFG as a sequence of Diff Graphs that is
@@ -95,7 +95,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * to the CFG obtained by translating child CFGs one by
     * one and appending them.
     * */
-  private def cfgForMethod(node: nodes.Method): Cfg =
+  private def cfgForMethod(node: Method): Cfg =
     cfgForSingleNode(node) ++ cfgForChildren(node)
 
   /**
@@ -103,7 +103,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * containing that single node by setting it as
     * the entry node and placing it in the fringe.
     * */
-  private def cfgForSingleNode(node: nodes.CfgNode): Cfg =
+  private def cfgForSingleNode(node: CfgNode): Cfg =
     Cfg(entryNode = Some(node), fringe = List((node, AlwaysEdge)))
 
   /**
@@ -111,35 +111,35 @@ class CfgCreator(entryNode: nodes.Method) {
     * child ASTs one by one from left to right and appending
     * them.
     * */
-  private def cfgForChildren(node: nodes.AstNode): Cfg =
+  private def cfgForChildren(node: AstNode): Cfg =
     node.astChildren.l.map(cfgFor).reduceOption((x, y) => x ++ y).getOrElse(Cfg.empty)
 
   /**
     * This method dispatches AST nodes by type and calls
     * corresponding conversion methods.
     * */
-  protected def cfgFor(node: nodes.AstNode): Cfg =
+  protected def cfgFor(node: AstNode): Cfg =
     node match {
-      case _: nodes.Method | _: nodes.MethodParameterIn | _: nodes.Modifier | _: nodes.Local | _: nodes.TypeDecl |
-          _: nodes.Member =>
+      case _: Method | _: MethodParameterIn | _: Modifier | _: Local | _: TypeDecl |
+          _: Member =>
         Cfg.empty
-      case _: nodes.MethodRef | _: nodes.TypeRef =>
-        cfgForSingleNode(node.asInstanceOf[nodes.CfgNode])
-      case n: nodes.ControlStructure =>
+      case _: MethodRef | _: TypeRef =>
+        cfgForSingleNode(node.asInstanceOf[CfgNode])
+      case n: ControlStructure =>
         cfgForControlStructure(n)
-      case n: nodes.JumpTarget =>
+      case n: JumpTarget =>
         cfgForJumpTarget(n)
-      case actualRet: nodes.Return =>
+      case actualRet: Return =>
         cfgForReturn(actualRet)
-      case call: nodes.Call if call.name == Operators.logicalAnd =>
+      case call: Call if call.name == Operators.logicalAnd =>
         cfgForAndExpression(call)
-      case call: nodes.Call if call.name == Operators.logicalOr =>
+      case call: Call if call.name == Operators.logicalOr =>
         cfgForOrExpression(call)
-      case call: nodes.Call if call.name == Operators.conditional =>
+      case call: Call if call.name == Operators.conditional =>
         cfgForConditionalExpression(call)
-      case _: nodes.Call | _: nodes.FieldIdentifier | _: nodes.Identifier | _: nodes.Literal | _: nodes.MethodReturn |
-          _: nodes.Unknown =>
-        cfgForChildren(node) ++ cfgForSingleNode(node.asInstanceOf[nodes.CfgNode])
+      case _: Call | _: FieldIdentifier | _: Identifier | _: Literal | _: MethodReturn |
+          _: Unknown =>
+        cfgForChildren(node) ++ cfgForSingleNode(node.asInstanceOf[CfgNode])
       case _ =>
         cfgForChildren(node)
     }
@@ -149,7 +149,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * as well be part of `cfgFor` and has only been placed into a
     * separate function to increase readability.
     * */
-  protected def cfgForControlStructure(node: nodes.ControlStructure): Cfg =
+  protected def cfgForControlStructure(node: ControlStructure): Cfg =
     node.controlStructureType match {
       case ControlStructureTypes.BREAK =>
         cfgForBreakStatement(node)
@@ -184,10 +184,10 @@ class CfgCreator(entryNode: nodes.Method) {
     * the break statement to the entry point
     * of the other CFG.
     * */
-  protected def cfgForBreakStatement(node: nodes.ControlStructure): Cfg =
+  protected def cfgForBreakStatement(node: ControlStructure): Cfg =
     Cfg(entryNode = Some(node), breaks = List(node))
 
-  protected def cfgForContinueStatement(node: nodes.ControlStructure): Cfg =
+  protected def cfgForContinueStatement(node: ControlStructure): Cfg =
     Cfg(entryNode = Some(node), continues = List(node))
 
   /**
@@ -199,7 +199,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * labels. We store case/default labels separately from other labels,
     * but that is not a relevant implementation detail.
     * */
-  protected def cfgForJumpTarget(n: nodes.JumpTarget): Cfg = {
+  protected def cfgForJumpTarget(n: JumpTarget): Cfg = {
     val labelName = n.name
     val cfg = cfgForSingleNode(n)
     if (labelName.startsWith("case") || labelName.startsWith("default")) {
@@ -215,7 +215,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * store the goto for dispatching with `withResolvedGotos`
     * once the CFG for the entire method has been calculated.
     * */
-  protected def cfgForGotoStatement(node: nodes.ControlStructure): Cfg = {
+  protected def cfgForGotoStatement(node: ControlStructure): Cfg = {
     // TODO: the goto node should contain a field for the target so that
     // we can avoid the brittle split/slice operation here
     val target = node.code.split(" ").lastOption.map(x => x.slice(0, x.length - 1))
@@ -230,7 +230,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * a single edge to the method exit node. The fringe is
     * empty.
     * */
-  protected def cfgForReturn(actualRet: nodes.Return): Cfg = {
+  protected def cfgForReturn(actualRet: Return): Cfg = {
     cfgForChildren(actualRet) ++
       Cfg(entryNode = Some(actualRet), edges = singleEdge(actualRet, exitNode), List())
   }
@@ -243,7 +243,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * for the left and right hand expressions and appending the two,
     * where the fringe edge type of the left CFG is `TrueEdge`.
     * */
-  protected def cfgForAndExpression(call: nodes.Call): Cfg = {
+  protected def cfgForAndExpression(call: Call): Cfg = {
     val leftCfg = cfgFor(call.argument(1))
     val rightCfg = cfgFor(call.argument(2))
     val diffGraphs = edgesFromFringeTo(leftCfg, rightCfg.entryNode, TrueEdge) ++ leftCfg.edges ++ rightCfg.edges
@@ -257,7 +257,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * Same construction recipe as for the AND expression, just that the fringe edge type
     * of the left CFG is `FalseEdge`.
     * */
-  protected def cfgForOrExpression(call: nodes.Call): Cfg = {
+  protected def cfgForOrExpression(call: Call): Cfg = {
     val leftCfg = cfgFor(call.argument(1))
     val rightCfg = cfgFor(call.argument(2))
     val diffGraphs = edgesFromFringeTo(leftCfg, rightCfg.entryNode, FalseEdge) ++ leftCfg.edges ++ rightCfg.edges
@@ -273,7 +273,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * and adding edges between them. The new entry node is the condition entry
     * node.
     * */
-  protected def cfgForConditionalExpression(call: nodes.Call): Cfg = {
+  protected def cfgForConditionalExpression(call: Call): Cfg = {
     val conditionCfg = cfgFor(call.argument(1))
     val trueCfg = cfgFor(call.argument(2))
     val falseCfg = cfgFor(call.argument(3))
@@ -297,7 +297,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * relevant which of these three actually exist and we still have an entry
     * node for the loop and a fringe.
     * */
-  protected def cfgForForStatement(node: nodes.ControlStructure): Cfg = {
+  protected def cfgForForStatement(node: ControlStructure): Cfg = {
     val children = node.astChildren.l
     val nLocals = children.count(_.isLocal)
     val initExprCfg = children.find(_.order == nLocals + 1).map(cfgFor).getOrElse(Cfg.empty)
@@ -332,7 +332,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * We again first calculate the inner CFG as bodyCfg ++ conditionCfg and then connect
     * edges according to the semantics of do-while.
     * */
-  protected def cfgForDoStatement(node: nodes.ControlStructure): Cfg = {
+  protected def cfgForDoStatement(node: ControlStructure): Cfg = {
     val bodyCfg = node.astChildren.where(_.order(1)).headOption.map(cfgFor).getOrElse(Cfg.empty)
     val conditionCfg = Traversal.fromSingle(node).condition.headOption.map(cfgFor).getOrElse(Cfg.empty)
     val innerCfg = bodyCfg ++ conditionCfg
@@ -355,7 +355,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * CFG creation for while statements of the form `while(condition) body1 else body2`
     * where body1 and the else block are optional.
     * */
-  protected def cfgForWhileStatement(node: nodes.ControlStructure): Cfg = {
+  protected def cfgForWhileStatement(node: ControlStructure): Cfg = {
     val conditionCfg = Traversal.fromSingle(node).condition.headOption.map(cfgFor).getOrElse(Cfg.empty)
     val trueCfg = Traversal.fromSingle(node).whenTrue.headOption.map(cfgFor).getOrElse(Cfg.empty)
     val falseCfg = Traversal.fromSingle(node).whenFalse.headOption.map(cfgFor).getOrElse(Cfg.empty)
@@ -377,12 +377,12 @@ class CfgCreator(entryNode: nodes.Method) {
   /**
     * CFG creation for switch statements of the form `switch { case condition: ... }`.
     * */
-  protected def cfgForSwitchStatement(node: nodes.ControlStructure): Cfg = {
+  protected def cfgForSwitchStatement(node: ControlStructure): Cfg = {
     val conditionCfg = Traversal.fromSingle(node).condition.headOption.map(cfgFor).getOrElse(Cfg.empty)
     val bodyCfg = Traversal.fromSingle(node).whenTrue.headOption.map(cfgFor).getOrElse(Cfg.empty)
     val diffGraphs = edgesToMultiple(conditionCfg.fringe.map(_._1), bodyCfg.caseLabels, CaseEdge)
 
-    val hasDefaultCase = bodyCfg.caseLabels.exists(x => x.asInstanceOf[nodes.JumpTarget].name == "default")
+    val hasDefaultCase = bodyCfg.caseLabels.exists(x => x.asInstanceOf[JumpTarget].name == "default")
 
     Cfg
       .from(conditionCfg, bodyCfg)
@@ -398,7 +398,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * CFG creation for if statements of the form `if(condition) body`, optionally
     * followed by `else body2`.
     * */
-  protected def cfgForIfStatement(node: nodes.ControlStructure): Cfg = {
+  protected def cfgForIfStatement(node: ControlStructure): Cfg = {
     val conditionCfg = Traversal.fromSingle(node).condition.headOption.map(cfgFor).getOrElse(Cfg.empty)
     val trueCfg = Traversal.fromSingle(node).whenTrue.headOption.map(cfgFor).getOrElse(Cfg.empty)
     val falseCfg = Traversal.fromSingle(node).whenFalse.headOption.map(cfgFor).getOrElse(Cfg.empty)
@@ -425,7 +425,7 @@ class CfgCreator(entryNode: nodes.Method) {
     * CFG creation for try statements of the form `try { tryBody ] catch { catchBody } `, optionally
     * followed by `finally { finallyBody }`.
     * */
-  protected def cfgForTryStatement(node: nodes.ControlStructure): Cfg = {
+  protected def cfgForTryStatement(node: ControlStructure): Cfg = {
     val tryBodyCfg =
       Traversal
         .fromSingle(node)
@@ -461,7 +461,7 @@ class CfgCreator(entryNode: nodes.Method) {
 
 object CfgCreator {
 
-  implicit class FringeWrapper(fringe: List[(nodes.CfgNode, CfgEdgeType)]) {
+  implicit class FringeWrapper(fringe: List[(CfgNode, CfgEdgeType)]) {
     def withEdgeType(edgeType: CfgEdgeType): List[(CfgNode, CfgEdgeType)] = {
       fringe.map { case (x, _) => (x, edgeType) }
     }

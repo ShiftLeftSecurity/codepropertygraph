@@ -69,7 +69,7 @@ package io.shiftleft
   *
   * {{{
   *   cpg.method.as("method").definingTypeDecl.as("classDef").select.toList
-  *   // return type: List[(nodes.Method, nodes.TypeDecl)]
+  *   // return type: List[(Method, TypeDecl)]
   * }}}
   *
   * == [advanced] For comprehensions ==

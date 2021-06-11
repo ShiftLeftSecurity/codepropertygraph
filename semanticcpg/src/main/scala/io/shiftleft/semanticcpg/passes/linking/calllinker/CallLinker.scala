@@ -2,7 +2,8 @@ package io.shiftleft.semanticcpg.passes.linking.calllinker
 
 import io.shiftleft.Implicits._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
@@ -14,7 +15,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
 
   import CallLinker._
 
-  private val methodFullNameToNode = mutable.Map.empty[String, nodes.StoredNode]
+  private val methodFullNameToNode = mutable.Map.empty[String, StoredNode]
 
   /**
     * Main method of enhancement - to be implemented by child class
@@ -38,7 +39,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
     Iterator(dstGraph.build())
   }
 
-  private def linkCall(call: nodes.Call, dstGraph: DiffGraph.Builder): Unit = {
+  private def linkCall(call: Call, dstGraph: DiffGraph.Builder): Unit = {
     call.dispatchType match {
       case DispatchTypes.STATIC_DISPATCH =>
         val resolvedMethodOption = methodFullNameToNode.get(call.methodFullName)
@@ -58,7 +59,7 @@ class CallLinker(cpg: Cpg) extends CpgPass(cpg) {
               val receiverTypeDecl = receiver._evalTypeOut.onlyChecked._refOut.onlyChecked
 
               val resolvedMethodOption = receiverTypeDecl._bindsOut.asScala.collectFirst {
-                case binding: nodes.Binding if binding.name == call.name && binding.signature == call.signature =>
+                case binding: Binding if binding.name == call.name && binding.signature == call.signature =>
                   binding._methodViaRefOut
               }
               if (resolvedMethodOption.isDefined) {

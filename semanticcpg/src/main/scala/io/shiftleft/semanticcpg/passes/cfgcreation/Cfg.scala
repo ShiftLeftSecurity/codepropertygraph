@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.passes.cfgcreation
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.CfgNode
 import io.shiftleft.semanticcpg.passes.cfgcreation.Cfg.CfgEdgeType
 import org.slf4j.LoggerFactory
 
@@ -29,14 +29,14 @@ import org.slf4j.LoggerFactory
   * @param gotos unresolved gotos collected along the way
   *
   * */
-case class Cfg(entryNode: Option[nodes.CfgNode] = None,
+case class Cfg(entryNode: Option[CfgNode] = None,
                edges: List[CfgEdge] = List(),
-               fringe: List[(nodes.CfgNode, CfgEdgeType)] = List(),
-               labeledNodes: Map[String, nodes.CfgNode] = Map(),
-               breaks: List[nodes.CfgNode] = List(),
-               continues: List[nodes.CfgNode] = List(),
-               caseLabels: List[nodes.CfgNode] = List(),
-               gotos: List[(nodes.CfgNode, String)] = List()) {
+               fringe: List[(CfgNode, CfgEdgeType)] = List(),
+               labeledNodes: Map[String, CfgNode] = Map(),
+               breaks: List[CfgNode] = List(),
+               continues: List[CfgNode] = List(),
+               caseLabels: List[CfgNode] = List(),
+               gotos: List[(CfgNode, String)] = List()) {
 
   import Cfg._
 
@@ -96,7 +96,7 @@ case class Cfg(entryNode: Option[nodes.CfgNode] = None,
 
 }
 
-case class CfgEdge(src: nodes.CfgNode, dst: nodes.CfgNode, edgeType: CfgEdgeType)
+case class CfgEdge(src: CfgNode, dst: CfgNode, edgeType: CfgEdgeType)
 
 object Cfg {
 
@@ -132,7 +132,7 @@ object Cfg {
   /**
     * Create edges from all nodes of cfg's fringe to `node`.
     * */
-  def edgesFromFringeTo(cfg: Cfg, node: Option[nodes.CfgNode]): List[CfgEdge] = {
+  def edgesFromFringeTo(cfg: Cfg, node: Option[CfgNode]): List[CfgEdge] = {
     edgesFromFringeTo(cfg.fringe, node)
   }
 
@@ -140,14 +140,14 @@ object Cfg {
     * Create edges from all nodes of cfg's fringe to `node`, ignoring fringe edge types
     * and using `cfgEdgeType` instead.
     * */
-  def edgesFromFringeTo(cfg: Cfg, node: Option[nodes.CfgNode], cfgEdgeType: CfgEdgeType): List[CfgEdge] = {
+  def edgesFromFringeTo(cfg: Cfg, node: Option[CfgNode], cfgEdgeType: CfgEdgeType): List[CfgEdge] = {
     edges(cfg.fringe.map(_._1), node, cfgEdgeType)
   }
 
   /**
     * Create edges from a list (node, cfgEdgeType) pairs to `node`
     * */
-  def edgesFromFringeTo(fringeElems: List[(nodes.CfgNode, CfgEdgeType)], node: Option[nodes.CfgNode]): List[CfgEdge] = {
+  def edgesFromFringeTo(fringeElems: List[(CfgNode, CfgEdgeType)], node: Option[CfgNode]): List[CfgEdge] = {
     fringeElems.flatMap {
       case (sourceNode, cfgEdgeType) =>
         node.map { dstNode =>
@@ -159,14 +159,14 @@ object Cfg {
   /**
     * Create edges of given type from a list of source nodes to a destination node
     * */
-  def edges(sources: List[nodes.CfgNode],
-            dstNode: Option[nodes.CfgNode],
+  def edges(sources: List[CfgNode],
+            dstNode: Option[CfgNode],
             cfgEdgeType: CfgEdgeType = AlwaysEdge): List[CfgEdge] = {
     edgesToMultiple(sources, dstNode.toList, cfgEdgeType)
   }
 
-  def singleEdge(source: nodes.CfgNode,
-                 destination: nodes.CfgNode,
+  def singleEdge(source: CfgNode,
+                 destination: CfgNode,
                  cfgEdgeType: CfgEdgeType = AlwaysEdge): List[CfgEdge] = {
     edgesToMultiple(List(source), List(destination), cfgEdgeType)
   }
@@ -174,8 +174,8 @@ object Cfg {
   /**
     * Create edges of given type from all nodes in `sources` to `node`.
     * */
-  def edgesToMultiple(sources: List[nodes.CfgNode],
-                      destinations: List[nodes.CfgNode],
+  def edgesToMultiple(sources: List[CfgNode],
+                      destinations: List[CfgNode],
                       cfgEdgeType: CfgEdgeType = AlwaysEdge): List[CfgEdge] = {
 
     sources.flatMap { l =>

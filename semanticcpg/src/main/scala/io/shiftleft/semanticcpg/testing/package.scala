@@ -1,7 +1,8 @@
 package io.shiftleft.semanticcpg
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Languages, ModifierTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Languages, ModifierTypes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
@@ -22,7 +23,7 @@ package object testing {
     def withMetaData(language: String, overlays: List[String]): MockCpg = {
       withCustom { (diffGraph, _) =>
         diffGraph.addNode(
-          nodes.NewMetaData().language(language).overlays(overlays)
+          NewMetaData().language(language).overlays(overlays)
         )
       }
     }
@@ -30,15 +31,15 @@ package object testing {
     def withFile(filename: String): MockCpg =
       withCustom { (graph, _) =>
         graph.addNode(
-          nodes.NewFile().name(filename)
+          NewFile().name(filename)
         )
       }
 
     def withNamespace(name: String, inFile: Option[String] = None): MockCpg =
       withCustom { (graph, _) =>
         {
-          val namespaceBlock = nodes.NewNamespaceBlock().name(name)
-          val namespace = nodes.NewNamespace().name(name)
+          val namespaceBlock = NewNamespaceBlock().name(name)
+          val namespace = NewNamespace().name(name)
           graph.addNode(namespaceBlock)
           graph.addNode(namespace)
           graph.addEdge(namespaceBlock, namespace, EdgeTypes.REF)
@@ -55,15 +56,14 @@ package object testing {
                      inFile: Option[String] = None): MockCpg =
       withCustom { (graph, _) =>
         {
-          val typeNode = nodes.NewType().name(name)
-          val typeDeclNode = nodes
-            .NewTypeDecl()
+          val typeNode = NewType().name(name)
+          val typeDeclNode = NewTypeDecl()
             .name(name)
             .fullName(name)
             .isExternal(isExternal)
 
-          val member = nodes.NewMember().name("amember")
-          val modifier = nodes.NewModifier().modifierType(ModifierTypes.STATIC)
+          val member = NewMember().name("amember")
+          val modifier = NewModifier().modifierType(ModifierTypes.STATIC)
 
           graph.addNode(typeDeclNode)
           graph.addNode(typeNode)
@@ -89,14 +89,14 @@ package object testing {
                    inTypeDecl: Option[String] = None,
                    fileName: String = ""): MockCpg =
       withCustom { (graph, _) =>
-        val retParam = nodes.NewMethodReturn().typeFullName("int")
-        val param = nodes.NewMethodParameterIn().order(1).name("param1")
-        val paramType = nodes.NewType().name("paramtype")
-        val paramOut = nodes.NewMethodParameterOut().name("param1").order(1)
+        val retParam = NewMethodReturn().typeFullName("int")
+        val param = NewMethodParameterIn().order(1).name("param1")
+        val paramType = NewType().name("paramtype")
+        val paramOut = NewMethodParameterOut().name("param1").order(1)
         val method =
-          nodes.NewMethod().isExternal(external).name(name).fullName(name).signature("asignature").filename(fileName)
-        val block = nodes.NewBlock().typeFullName("int")
-        val modifier = nodes.NewModifier().modifierType("modifiertype")
+          NewMethod().isExternal(external).name(name).fullName(name).signature("asignature").filename(fileName)
+        val block = NewBlock().typeFullName("int")
+        val modifier = NewModifier().modifierType("modifiertype")
 
         graph.addNode(method)
         graph.addNode(retParam)
@@ -138,7 +138,7 @@ package object testing {
       withCustom { (graph, cpg) =>
         val methodNode = cpg.method.name(methodName).head
         val blockNode = methodNode.block.head
-        val callNode = nodes.NewCall().name(callName).code(callName)
+        val callNode = NewCall().name(callName).code(callName)
         graph.addNode(callNode)
         graph.addEdge(blockNode, callNode, EdgeTypes.AST)
         graph.addEdge(methodNode, callNode, EdgeTypes.CONTAINS)
@@ -148,8 +148,8 @@ package object testing {
       withCustom { (graph, cpg) =>
         val methodNode = cpg.method.name(methodName).head
         val blockNode = methodNode.block.head
-        val typeNode = nodes.NewType().name("alocaltype")
-        val localNode = nodes.NewLocal().name(localName).typeFullName("alocaltype")
+        val typeNode = NewType().name("alocaltype")
+        val localNode = NewLocal().name(localName).typeFullName("alocaltype")
         graph.addNode(localNode)
         graph.addNode(typeNode)
         graph.addEdge(blockNode, localNode, EdgeTypes.AST)
@@ -160,9 +160,8 @@ package object testing {
       withCustom { (graph, cpg) =>
         val callNode = cpg.call.name(callName).head
         val methodNode = callNode.method.head
-        val literalNode = nodes.NewLiteral().code(literalCode)
-        val typeDecl = nodes
-          .NewTypeDecl()
+        val literalNode = NewLiteral().code(literalCode)
+        val typeDecl = NewTypeDecl()
           .name("ATypeDecl")
           .fullName("ATypeDecl")
 
@@ -178,8 +177,8 @@ package object testing {
       withCustom { (graph, cpg) =>
         val callNode = cpg.call.name(callName).head
         val methodNode = callNode.method.head
-        val identifierNode = nodes.NewIdentifier().name(name)
-        val typeDecl = nodes.NewTypeDecl().name("abc")
+        val identifierNode = NewIdentifier().name(name)
+        val typeDecl = NewTypeDecl().name("abc")
         graph.addNode(identifierNode)
         graph.addNode(typeDecl)
         graph.addEdge(callNode, identifierNode, EdgeTypes.AST)
