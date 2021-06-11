@@ -1,7 +1,8 @@
 package io.shiftleft.fuzzyc2cpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{Languages, nodes}
+import io.shiftleft.codepropertygraph.generated.Languages
+import io.shiftleft.codepropertygraph.generated.nodes.{NewMetaData, NewNamespaceBlock}
 import io.shiftleft.passes.{CpgPass, DiffGraph, KeyPool}
 import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, NamespaceTraversal}
 
@@ -13,13 +14,12 @@ import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, Namespa
 class CMetaDataPass(cpg: Cpg, keyPool: Option[KeyPool] = None) extends CpgPass(cpg, keyPool = keyPool) {
   override def run(): Iterator[DiffGraph] = {
     def addMetaDataNode(diffGraph: DiffGraph.Builder): Unit = {
-      val metaNode = nodes.NewMetaData().language(Languages.C).version("0.1")
+      val metaNode = NewMetaData().language(Languages.C).version("0.1")
       diffGraph.addNode(metaNode)
     }
 
     def addAnyNamespaceBlock(diffGraph: DiffGraph.Builder): Unit = {
-      val node = nodes
-        .NewNamespaceBlock()
+      val node = NewNamespaceBlock()
         .name(NamespaceTraversal.globalNamespaceName)
         .fullName(CMetaDataPass.getGlobalNamespaceBlockFullName(None))
         .filename(FileTraversal.UNKNOWN)

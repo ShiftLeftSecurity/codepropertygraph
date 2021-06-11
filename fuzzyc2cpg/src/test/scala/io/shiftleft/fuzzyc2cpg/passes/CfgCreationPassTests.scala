@@ -2,11 +2,11 @@ package io.shiftleft.fuzzyc2cpg.passes
 
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.CfgNode
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
-import io.shiftleft.semanticcpg.passes.cfgcreation.Cfg.{AlwaysEdge, CaseEdge, CfgEdgeType, FalseEdge, TrueEdge}
+import io.shiftleft.semanticcpg.passes.cfgcreation.Cfg._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -470,7 +470,7 @@ class CfgFixture(file1Code: String) {
     new CfgCreationPass(cpg).createAndApply()
   }
 
-  val codeToNode: Map[String, nodes.CfgNode] =
+  val codeToNode: Map[String, CfgNode] =
     cpg.method.ast.isCfgNode.l.map { node =>
       node.code -> node
     }.toMap
@@ -483,7 +483,7 @@ class CfgFixture(file1Code: String) {
 
   def succOf(code: String): Set[String] = {
     codeToNode(code)._cfgOut.asScala
-      .map(_.asInstanceOf[nodes.CfgNode])
+      .map(_.asInstanceOf[CfgNode])
       .toSet
       .map[String](_.code)
   }

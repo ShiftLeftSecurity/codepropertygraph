@@ -1,7 +1,7 @@
 package io.shiftleft.fuzzyc2cpg.passes.astcreation
 
-import io.shiftleft.codepropertygraph.generated.nodes.NewNode
-import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators}
 import io.shiftleft.fuzzyc2cpg.ast.AstNode
 import io.shiftleft.fuzzyc2cpg.ast.declarations.{ClassDefStatement, IdentifierDecl}
 import io.shiftleft.fuzzyc2cpg.ast.expressions.{
@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory
 import scala.jdk.CollectionConverters._
 
 private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
-                                      namespaceBlock: nodes.NewNamespaceBlock,
+                                      namespaceBlock: NewNamespaceBlock,
                                       global: Global,
                                       childNum: Int)
     extends ASTNodeVisitor {
@@ -71,18 +71,18 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
   private val logger = LoggerFactory.getLogger(getClass)
 
   private var contextStack = List[Context]()
-  private val scope = new Scope[String, (nodes.AbstractNode, String), nodes.AbstractNode]()
+  private val scope = new Scope[String, (AbstractNode, String), AbstractNode]()
 
   pushContext(namespaceBlock, childNum)
 
-  private class Context(val cpgParent: nodes.AbstractNode,
+  private class Context(val cpgParent: AbstractNode,
                         var childNum: Int,
                         val parentIsClassDef: Boolean,
                         val parentIsMemberAccess: Boolean = false,
                         var addConditionEdgeOnNextAstEdge: Boolean = false,
                         var addArgumentEdgeOnNextAstEdge: Boolean = false) {}
 
-  private def pushContext(cpgParent: nodes.AbstractNode,
+  private def pushContext(cpgParent: AbstractNode,
                           startChildNum: Int,
                           parentIsClassDef: Boolean = false,
                           parentIsMemberAccess: Boolean = false): Unit = {
@@ -108,8 +108,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
     val code = returnType + " " + astFunction.getFunctionSignature(true)
 
     val location = astFunction.getLocation
-    val method = nodes
-      .NewMethod()
+    val method = NewMethod()
       .name(astFunction.getName)
       .code(code)
       .isExternal(false)
@@ -151,8 +150,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       .map(_.getEscapedCodeStr)
       .getOrElse("RET")
 
-    val methodReturn = nodes
-      .NewMethodReturn()
+    val methodReturn = NewMethodReturn()
       .code(retCode)
       .evaluationStrategy(EvaluationStrategies.BY_VALUE.name())
       .typeFullName(registerType(returnType))
@@ -173,8 +171,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       "int"
     }
     val location = astParameter.getLocation
-    val parameter = nodes
-      .NewMethodParameterIn()
+    val parameter = NewMethodParameterIn()
       .code(astParameter.getEscapedCodeStr)
       .name(astParameter.getName)
       .order(astParameter.getChildNumber + 1)
@@ -369,8 +366,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
 
   override def visit(astConstant: Constant): Unit = {
     val constantType = deriveConstantTypeFromCode(astConstant.getEscapedCodeStr)
-    val cpgConstant = nodes
-      .NewLiteral()
+    val cpgConstant = NewLiteral()
       .typeFullName(registerType(constantType))
       .code(astConstant.getEscapedCodeStr)
       .order(context.childNum)
@@ -403,8 +399,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
     val identifierName = astIdentifier.getEscapedCodeStr
 
     if (contextStack.nonEmpty && contextStack.head.parentIsMemberAccess && contextStack.head.childNum == 2) {
-      val cpgFieldIdentifier = nodes
-        .NewFieldIdentifier()
+      val cpgFieldIdentifier = NewFieldIdentifier()
         .canonicalName(identifierName)
         .code(astIdentifier.getEscapedCodeStr)
         .order(context.childNum)
@@ -424,8 +419,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
         Defines.anyTypeName
     }
 
-    val cpgIdentifier = nodes
-      .NewIdentifier()
+    val cpgIdentifier = NewIdentifier()
       .name(identifierName)
       .typeFullName(registerType(identifierTypeName))
       .code(astIdentifier.getEscapedCodeStr)
@@ -481,8 +475,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
           s"but ${classOfExpression.getSimpleName} found")
     }
 
-    val cpgBlock = nodes
-      .NewBlock()
+    val cpgBlock = NewBlock()
       .code("")
       .order(context.childNum)
       .argumentIndex(context.childNum)
@@ -584,8 +577,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
         statement.accept(this)
       }
     } else {
-      val block = nodes
-        .NewBlock()
+      val block = NewBlock()
         .code("")
         .order(context.childNum)
         .argumentIndex(context.childNum)
@@ -607,8 +599,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
   }
 
   override def visit(astNode: ReturnStatement): Unit = {
-    val cpgReturn = nodes
-      .NewReturn()
+    val cpgReturn = NewReturn()
       .code(astNode.getEscapedCodeStr)
       .order(context.childNum)
       .argumentIndex(context.childNum)
@@ -635,8 +626,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
     val declTypeName = identifierDecl.getType.getEscapedCodeStr
 
     if (identifierDecl.isTypedef) {
-      val aliasTypeDecl = nodes
-        .NewTypeDecl()
+      val aliasTypeDecl = NewTypeDecl()
         .name(identifierDecl.getName.getEscapedCodeStr)
         .fullName(identifierDecl.getName.getEscapedCodeStr)
         .isExternal(false)
@@ -647,9 +637,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       diffGraph.addNode(aliasTypeDecl)
       connectAstChild(aliasTypeDecl)
     } else if (context.parentIsClassDef) {
-      val member =
-        nodes
-          .NewMember()
+      val member = NewMember()
           .code(identifierDecl.getEscapedCodeStr)
           .name(identifierDecl.getName.getEscapedCodeStr)
           .typeFullName(registerType(declTypeName))
@@ -661,8 +649,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       // Everything else is ignored.
       if (!scope.isEmpty) {
         val localName = identifierDecl.getName.getEscapedCodeStr
-        val local = nodes
-          .NewLocal()
+        val local = NewLocal()
           .code(localName)
           .name(localName)
           .typeFullName(registerType(declTypeName))
@@ -706,8 +693,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
   }
 
   override def visit(astLabel: Label): Unit = {
-    val cpgLabel = nodes
-      .NewJumpTarget()
+    val cpgLabel = NewJumpTarget()
       .parserTypeName(astLabel.getClass.getSimpleName)
       .name(astLabel.getLabelName)
       .code(astLabel.getEscapedCodeStr)
@@ -797,8 +783,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
 
     baseClassList.foreach(registerType)
 
-    val typeDecl = nodes
-      .NewTypeDecl()
+    val typeDecl = NewTypeDecl()
       .name(name)
       .fullName(name)
       .isExternal(false)
@@ -890,10 +875,9 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
     }
   }
 
-  private def newCallNode(astNode: AstNode, methodName: String): nodes.NewCall = {
+  private def newCallNode(astNode: AstNode, methodName: String): NewCall = {
     val location = astNode.getLocation
-    nodes
-      .NewCall()
+      NewCall()
       .name(methodName)
       .dispatchType(DispatchTypes.STATIC_DISPATCH.name())
       .signature("TODO")
@@ -905,10 +889,9 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       .columnNumber(location.startPos)
   }
 
-  private def newUnknownNode(astNode: AstNode): nodes.NewUnknown = {
+  private def newUnknownNode(astNode: AstNode): NewUnknown = {
     val location = astNode.getLocation
-    nodes
-      .NewUnknown()
+      NewUnknown()
       .parserTypeName(astNode.getClass.getSimpleName)
       .code(astNode.getEscapedCodeStr)
       .order(context.childNum)
@@ -917,7 +900,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       .columnNumber(location.startPos)
   }
 
-  private def newControlStructureNode(astNode: AstNode): nodes.NewControlStructure = {
+  private def newControlStructureNode(astNode: AstNode): NewControlStructure = {
     val location = astNode.getLocation
     val controlStructureType = astNode.getClass.getSimpleName match {
       case "BreakStatement"    => ControlStructureTypes.BREAK
@@ -931,8 +914,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       case "SwitchStatement"   => ControlStructureTypes.SWITCH
       case someThingElse       => someThingElse
     }
-    nodes
-      .NewControlStructure()
+    NewControlStructure()
       .parserTypeName(astNode.getClass.getSimpleName)
       .controlStructureType(controlStructureType)
       .code(astNode.getEscapedCodeStr)

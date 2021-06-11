@@ -1,6 +1,6 @@
 package io.shiftleft.fuzzyc2cpg.passes.astcreation
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.NewNamespaceBlock
 import io.shiftleft.fuzzyc2cpg.ast.declarations.ClassDefStatement
 import io.shiftleft.fuzzyc2cpg.ast.langc.functiondef.FunctionDef
 import io.shiftleft.fuzzyc2cpg.ast.statements.IdentifierDeclStatement
@@ -10,7 +10,7 @@ import io.shiftleft.fuzzyc2cpg.{Global, ModuleLexer, ModuleParser}
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.{CharStream, ParserRuleContext}
 
-class AstVisitor(driver: AntlrCModuleParserDriver, astParentNode: nodes.NewNamespaceBlock, global: Global)
+class AstVisitor(driver: AntlrCModuleParserDriver, astParentNode: NewNamespaceBlock, global: Global)
     extends ASTNodeVisitor
     with AntlrParserDriverObserver {
 
