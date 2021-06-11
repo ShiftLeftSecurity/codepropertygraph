@@ -1,6 +1,7 @@
 package io.shiftleft.dataflowengineoss.dotgenerator
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties}
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.dotgenerator.DotSerializer.{Edge, Graph}
@@ -14,14 +15,14 @@ import scala.collection.mutable
 class DdgGenerator {
 
   val edgeType = "DDG"
-  private val edgeCache = mutable.Map[nodes.StoredNode, List[Edge]]()
+  private val edgeCache = mutable.Map[StoredNode, List[Edge]]()
 
-  def generate(methodNode: nodes.Method)(implicit semantics: Semantics): Graph = {
+  def generate(methodNode: Method)(implicit semantics: Semantics): Graph = {
     val entryNode = methodNode
     val paramNodes = methodNode.parameter.l
     val allOtherNodes = methodNode.cfgNode.l
     val exitNode = methodNode.methodReturn
-    val allNodes: List[nodes.StoredNode] = List(entryNode, exitNode) ++ paramNodes ++ allOtherNodes
+    val allNodes: List[StoredNode] = List(entryNode, exitNode) ++ paramNodes ++ allOtherNodes
     val visibleNodes = allNodes.filter(shouldBeDisplayed)
 
     val edges = visibleNodes.map { dstNode =>
@@ -35,35 +36,35 @@ class DdgGenerator {
     val ddgNodes = visibleNodes
       .filter(node => allIdsReferencedByEdges.contains(node.id))
       .map(surroundingCall)
-      .filterNot(node => node.isInstanceOf[nodes.Call] && isGenericMemberAccessName(node.asInstanceOf[nodes.Call].name))
+      .filterNot(node => node.isInstanceOf[Call] && isGenericMemberAccessName(node.asInstanceOf[Call].name))
 
     val ddgEdges = edges.flatten
       .map { e: Edge =>
         e.copy(src = surroundingCall(e.src), dst = surroundingCall(e.dst))
       }
       .filter(e => e.src != e.dst)
-      .filterNot(e => e.dst.isInstanceOf[nodes.Call] && isGenericMemberAccessName(e.dst.asInstanceOf[nodes.Call].name))
-      .filterNot(e => e.src.isInstanceOf[nodes.Call] && isGenericMemberAccessName(e.src.asInstanceOf[nodes.Call].name))
+      .filterNot(e => e.dst.isInstanceOf[Call] && isGenericMemberAccessName(e.dst.asInstanceOf[Call].name))
+      .filterNot(e => e.src.isInstanceOf[Call] && isGenericMemberAccessName(e.src.asInstanceOf[Call].name))
       .distinct
 
     edgeCache.clear()
     Graph(ddgNodes, ddgEdges)
   }
 
-  private def surroundingCall(node: nodes.StoredNode): nodes.StoredNode = {
+  private def surroundingCall(node: StoredNode): StoredNode = {
     node match {
-      case arg: nodes.Expression => arg.inCall.headOption.getOrElse(node)
+      case arg: Expression => arg.inCall.headOption.getOrElse(node)
       case _                     => node
     }
   }
 
   private def shouldBeDisplayed(v: Node): Boolean = !(
-    v.isInstanceOf[nodes.Block] ||
-      v.isInstanceOf[nodes.ControlStructure] ||
-      v.isInstanceOf[nodes.JumpTarget]
+    v.isInstanceOf[Block] ||
+      v.isInstanceOf[ControlStructure] ||
+      v.isInstanceOf[JumpTarget]
   )
 
-  private def inEdgesToDisplay(dstNode: nodes.StoredNode, visited: List[nodes.StoredNode] = List())(
+  private def inEdgesToDisplay(dstNode: StoredNode, visited: List[StoredNode] = List())(
       implicit semantics: Semantics): List[Edge] = {
 
     if (edgeCache.contains(dstNode)) {
@@ -84,18 +85,18 @@ class DdgGenerator {
     }
   }
 
-  private def expand(v: nodes.StoredNode)(implicit semantics: Semantics): Iterator[Edge] = {
+  private def expand(v: StoredNode)(implicit semantics: Semantics): Iterator[Edge] = {
 
     val allInEdges = v
       .inE(EdgeTypes.REACHING_DEF)
-      .map(x => Edge(x.outNode.asInstanceOf[nodes.StoredNode], v, true, x.property(Properties.VARIABLE), edgeType))
+      .map(x => Edge(x.outNode.asInstanceOf[StoredNode], v, true, x.property(Properties.VARIABLE), edgeType))
 
     v match {
-      case cfgNode: nodes.CfgNode =>
+      case cfgNode: CfgNode =>
         cfgNode
           .ddgInPathElem(withInvisible = true)
-          .map(x => Edge(x.node.asInstanceOf[nodes.StoredNode], v, x.visible, x.outEdgeLabel, edgeType))
-          .iterator ++ allInEdges.filter(_.src.isInstanceOf[nodes.Method]).iterator
+          .map(x => Edge(x.node.asInstanceOf[StoredNode], v, x.visible, x.outEdgeLabel, edgeType))
+          .iterator ++ allInEdges.filter(_.src.isInstanceOf[Method]).iterator
       case _ =>
         allInEdges.iterator
     }

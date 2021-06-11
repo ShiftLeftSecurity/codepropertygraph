@@ -1,15 +1,16 @@
 package io.shiftleft.console
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal._
 
 package object scan {
 
   implicit class ScannerStarters(val cpg: Cpg) extends AnyVal {
-    def finding: Traversal[nodes.Finding] =
-      cpg.graph.nodes(NodeTypes.FINDING).cast[nodes.Finding]
+    def finding: Traversal[Finding] =
+      cpg.graph.nodes(NodeTypes.FINDING).cast[Finding]
   }
 
   implicit class QueryWrapper(q: Query) {
@@ -17,7 +18,7 @@ package object scan {
     /**
       * Obtain list of findings by running query on CPG
       * */
-    def apply(cpg: Cpg): List[nodes.NewFinding] = {
+    def apply(cpg: Cpg): List[NewFinding] = {
       q.traversal(cpg)
         .map(
           evidence =>
@@ -39,7 +40,7 @@ package object scan {
     val score = "score"
   }
 
-  implicit class ScannerFindingStep(val traversal: Traversal[nodes.Finding]) extends AnyRef {
+  implicit class ScannerFindingStep(val traversal: Traversal[Finding]) extends AnyRef {
 
     def name: Traversal[String] = traversal.map(_.name)
 
@@ -53,7 +54,7 @@ package object scan {
 
   }
 
-  implicit class ScannerFindingExtension(val node: nodes.Finding) extends AnyRef {
+  implicit class ScannerFindingExtension(val node: Finding) extends AnyRef {
 
     def name: String = getValue(FindingKeys.name)
 
@@ -70,21 +71,20 @@ package object scan {
 
   }
 
-  private def finding(evidence: nodes.StoredNode,
+  private def finding(evidence: StoredNode,
                       name: String,
                       author: String,
                       title: String,
                       description: String,
-                      score: Double): nodes.NewFinding = {
-    nodes
-      .NewFinding()
+                      score: Double): NewFinding = {
+    NewFinding()
       .evidence(List(evidence))
       .keyValuePairs(List(
-        nodes.NewKeyValuePair().key(FindingKeys.name).value(name),
-        nodes.NewKeyValuePair().key(FindingKeys.author).value(author),
-        nodes.NewKeyValuePair().key(FindingKeys.title).value(title),
-        nodes.NewKeyValuePair().key(FindingKeys.description).value(description),
-        nodes.NewKeyValuePair().key(FindingKeys.score).value(score.toString)
+        NewKeyValuePair().key(FindingKeys.name).value(name),
+        NewKeyValuePair().key(FindingKeys.author).value(author),
+        NewKeyValuePair().key(FindingKeys.title).value(title),
+        NewKeyValuePair().key(FindingKeys.description).value(description),
+        NewKeyValuePair().key(FindingKeys.score).value(score.toString)
       ))
   }
 

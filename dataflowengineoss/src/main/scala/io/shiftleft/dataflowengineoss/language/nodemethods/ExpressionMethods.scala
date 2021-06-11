@@ -1,11 +1,11 @@
 package io.shiftleft.dataflowengineoss.language.nodemethods
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.{Expression, Method}
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
 
-class ExpressionMethods[NodeType <: nodes.Expression](val node: NodeType) extends AnyVal {
+class ExpressionMethods[NodeType <: Expression](val node: NodeType) extends AnyVal {
 
   /**
     * Determine whether evaluation of the call this argument is a part of results
@@ -39,7 +39,7 @@ class ExpressionMethods[NodeType <: nodes.Expression](val node: NodeType) extend
     }
   }
 
-  private def argToMethods(arg: nodes.Expression): Traversal[nodes.Method] = {
+  private def argToMethods(arg: Expression): Traversal[Method] = {
     arg.inCall.flatMap { call =>
       NoResolve.getCalledMethods(call)
     }

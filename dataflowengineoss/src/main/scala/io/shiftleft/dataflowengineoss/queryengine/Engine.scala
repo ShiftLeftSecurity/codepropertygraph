@@ -1,7 +1,7 @@
 package io.shiftleft.dataflowengineoss.queryengine
 
-import io.shiftleft.codepropertygraph.generated.nodes.Call
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties}
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.semanticsloader.{FlowSemantic, Semantics}
 import io.shiftleft.semanticcpg.language._
@@ -13,8 +13,8 @@ import java.util.concurrent.{Callable, ExecutorCompletionService, ExecutorServic
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
 
-private case class ReachableByTask(sink: nodes.CfgNode,
-                                   sources: Set[nodes.CfgNode],
+private case class ReachableByTask(sink: CfgNode,
+                                   sources: Set[CfgNode],
                                    table: ResultTable,
                                    initialPath: Vector[PathElement] = Vector(),
                                    callDepth: Int = 0)
@@ -35,13 +35,13 @@ class Engine(context: EngineContext) {
   /**
     * Determine flows from sources to sinks by analyzing backwards from sinks.
     * */
-  def backwards(sinks: List[nodes.CfgNode], sources: List[nodes.CfgNode]): List[ReachableByResult] = {
+  def backwards(sinks: List[CfgNode], sources: List[CfgNode]): List[ReachableByResult] = {
     val sourcesSet = sources.toSet
     val tasks = sinks.map(sink => ReachableByTask(sink, sourcesSet, new ResultTable))
     solveTasks(tasks, sourcesSet)
   }
 
-  private def solveTasks(tasks: List[ReachableByTask], sources: Set[nodes.CfgNode]): List[ReachableByResult] = {
+  private def solveTasks(tasks: List[ReachableByTask], sources: Set[CfgNode]): List[ReachableByResult] = {
 
     tasks.foreach(submitTask)
     var result = List[ReachableByResult]()
@@ -64,7 +64,7 @@ class Engine(context: EngineContext) {
   }
 
   private def newTasksFromResults(resultsOfTask: Vector[ReachableByResult],
-                                  sources: Set[nodes.CfgNode]): Vector[ReachableByTask] = {
+                                  sources: Set[CfgNode]): Vector[ReachableByTask] = {
     tasksForParams(resultsOfTask, sources) ++ tasksForUnresolvedOutArgs(resultsOfTask, sources)
   }
 
@@ -74,14 +74,14 @@ class Engine(context: EngineContext) {
   }
 
   private def tasksForParams(resultsOfTask: Vector[ReachableByResult],
-                             sources: Set[nodes.CfgNode]): Vector[ReachableByTask] = {
+                             sources: Set[CfgNode]): Vector[ReachableByTask] = {
     val pathsFromParams = resultsOfTask.map(x => (x.path, x.callDepth))
     pathsFromParams.flatMap {
       case (path, callDepth) =>
         val param = path.head.node
         Some(param)
           .collect {
-            case p: nodes.MethodParameterIn =>
+            case p: MethodParameterIn =>
               paramToArgs(p).map { arg =>
                 ReachableByTask(arg, sources, new ResultTable, path, callDepth + 1)
               }
@@ -91,15 +91,15 @@ class Engine(context: EngineContext) {
   }
 
   private def tasksForUnresolvedOutArgs(resultsOfTask: Vector[ReachableByResult],
-                                        sources: Set[nodes.CfgNode]): Vector[ReachableByTask] = {
+                                        sources: Set[CfgNode]): Vector[ReachableByTask] = {
 
     val outArgsAndCalls = resultsOfTask
-      .map(x => (x.unresolvedArgs.collect { case e: nodes.Expression => e }, x.path, x.callDepth))
+      .map(x => (x.unresolvedArgs.collect { case e: Expression => e }, x.path, x.callDepth))
       .distinct
 
     val forCalls = outArgsAndCalls.flatMap {
       case (args, path, callDepth) =>
-        val outCalls = args.collect { case n: nodes.Call => n }
+        val outCalls = args.collect { case n: Call => n }
         val methodReturns = outCalls
           .flatMap(NoResolve.getCalledMethods)
           .to(Traversal)
@@ -124,15 +124,15 @@ class Engine(context: EngineContext) {
 
 object Engine {
 
-  def expandIn(curNode: nodes.CfgNode, path: Vector[PathElement])(
+  def expandIn(curNode: CfgNode, path: Vector[PathElement])(
       implicit semantics: Semantics): Vector[PathElement] = {
     curNode match {
-      case argument: nodes.Expression =>
+      case argument: Expression =>
         val (arguments, nonArguments) = ddgInE(curNode, path)
           .filter { edge =>
-            !isCallRetvalThatShouldNotPropagate(edge.outNode().asInstanceOf[nodes.StoredNode])
+            !isCallRetvalThatShouldNotPropagate(edge.outNode().asInstanceOf[StoredNode])
           }
-          .partition(_.outNode().isInstanceOf[nodes.Expression])
+          .partition(_.outNode().isInstanceOf[Expression])
         val elemsForArguments = arguments.flatMap { e =>
           elemForArgument(e, argument)
         }
@@ -141,31 +141,31 @@ object Engine {
       case _ =>
         ddgInE(curNode, path)
           .filter { edge =>
-            !isCallRetvalThatShouldNotPropagate(edge.outNode().asInstanceOf[nodes.StoredNode])
+            !isCallRetvalThatShouldNotPropagate(edge.outNode().asInstanceOf[StoredNode])
           }
           .map(edgeToPathElement)
     }
   }
 
   private def edgeToPathElement(e: Edge): PathElement = {
-    val parentNode = e.outNode().asInstanceOf[nodes.CfgNode]
+    val parentNode = e.outNode().asInstanceOf[CfgNode]
     val outLabel = Some(e.property(Properties.VARIABLE)).getOrElse("")
     PathElement(parentNode, outEdgeLabel = outLabel)
   }
 
-  private def ddgInE(dstNode: nodes.CfgNode, path: Vector[PathElement]): Vector[Edge] = {
+  private def ddgInE(dstNode: CfgNode, path: Vector[PathElement]): Vector[Edge] = {
     dstNode
       .inE(EdgeTypes.REACHING_DEF)
       .asScala
       .filter { e =>
         val outNode = e.outNode()
-        outNode.isInstanceOf[nodes.CfgNode] && !outNode.isInstanceOf[nodes.Method]
+        outNode.isInstanceOf[CfgNode] && !outNode.isInstanceOf[Method]
       }
-      .filter(e => !path.map(_.node).contains(e.outNode().asInstanceOf[nodes.CfgNode]))
+      .filter(e => !path.map(_.node).contains(e.outNode().asInstanceOf[CfgNode]))
       .toVector
   }
 
-  def isCallRetvalThatShouldNotPropagate(parentNode: nodes.StoredNode)(implicit semantics: Semantics): Boolean = {
+  def isCallRetvalThatShouldNotPropagate(parentNode: StoredNode)(implicit semantics: Semantics): Boolean = {
     parentNode match {
       case call: Call =>
         val sem = semantics.forMethod(call.methodFullName)
@@ -182,9 +182,9 @@ object Engine {
     * field to specify whether it should be visible in the flow or not, a decision
     * that can also only be made by looking at both the parent and the child.
     * */
-  private def elemForArgument(e: Edge, curNode: nodes.Expression)(
+  private def elemForArgument(e: Edge, curNode: Expression)(
       implicit semantics: Semantics): Option[PathElement] = {
-    val parentNode = e.outNode().asInstanceOf[nodes.Expression]
+    val parentNode = e.outNode().asInstanceOf[Expression]
     val parentNodeCall = parentNode.inCall.l
     val sameCallSite = parentNode.inCall.l == curNode.start.inCall.l
 
@@ -205,13 +205,13 @@ object Engine {
     }
   }
 
-  def argToMethods(arg: nodes.Expression): List[nodes.Method] = {
+  def argToMethods(arg: Expression): List[Method] = {
     arg.inCall.l.flatMap { call =>
       methodsForCall(call)
     }
   }
 
-  def argToOutputParams(arg: nodes.Expression): Traversal[nodes.MethodParameterOut] = {
+  def argToOutputParams(arg: Expression): Traversal[MethodParameterOut] = {
     argToMethods(arg)
       .to(Traversal)
       .parameter
@@ -219,15 +219,15 @@ object Engine {
       .order(arg.order)
   }
 
-  def methodsForCall(call: nodes.Call): List[nodes.Method] = {
+  def methodsForCall(call: Call): List[Method] = {
     NoResolve.getCalledMethods(call).toList
   }
 
-  def paramToArgs(param: nodes.MethodParameterIn): List[nodes.Expression] =
+  def paramToArgs(param: MethodParameterIn): List[Expression] =
     NoResolve
       .getMethodCallsites(param.method)
       .to(Traversal)
-      .collectAll[nodes.Call]
+      .collectAll[Call]
       .argument(param.order)
       .l
 
@@ -301,7 +301,7 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     * @param path This is a path from a node to the sink. The first node
     *             of the path is expanded by this method
     * */
-  private def results[NodeType <: nodes.CfgNode](path: Vector[PathElement], sources: Set[NodeType], table: ResultTable)(
+  private def results[NodeType <: CfgNode](path: Vector[PathElement], sources: Set[NodeType], table: ResultTable)(
       implicit semantics: Semantics): Vector[ReachableByResult] = {
     val curNode = path.head.node
 
@@ -319,14 +319,14 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     val resultsForCurNode = {
       val endStates = if (sources.contains(curNode.asInstanceOf[NodeType])) {
         List(ReachableByResult(path))
-      } else if ((task.callDepth != context.config.maxCallDepth) && curNode.isInstanceOf[nodes.MethodParameterIn]) {
+      } else if ((task.callDepth != context.config.maxCallDepth) && curNode.isInstanceOf[MethodParameterIn]) {
         List(ReachableByResult(path, partial = true))
       } else {
         List()
       }
 
       val retsToResolve = curNode match {
-        case call: nodes.Call =>
+        case call: Call =>
           if ((task.callDepth != context.config.maxCallDepth) && methodsForCall(call)
                 .to(Traversal)
                 .internal
@@ -345,7 +345,7 @@ private class ReachableByCallable(task: ReachableByTask, context: EngineContext)
     res
   }
 
-  private def semanticsForCall(call: nodes.Call)(implicit semantics: Semantics): List[FlowSemantic] = {
+  private def semanticsForCall(call: Call)(implicit semantics: Semantics): List[FlowSemantic] = {
     Engine.methodsForCall(call).flatMap { method =>
       semantics.forMethod(method.fullName)
     }

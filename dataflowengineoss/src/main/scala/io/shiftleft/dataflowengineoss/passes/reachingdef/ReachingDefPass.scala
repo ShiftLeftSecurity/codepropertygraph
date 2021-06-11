@@ -1,18 +1,19 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{nodes, _}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, PropertyNames}
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
 /**
   * A pass that calculates reaching definitions ("data dependencies").
   * */
-class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
+class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
 
-  override def partIterator: Iterator[nodes.Method] = cpg.method.iterator
+  override def partIterator: Iterator[Method] = cpg.method.iterator
 
-  override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
+  override def runOnPart(method: Method): Iterator[DiffGraph] = {
     val problem = ReachingDefProblem.create(method)
     val solution = new DataFlowSolver().calculateMopSolutionForwards(problem)
     val dstGraph = addReachingDefEdges(method, solution)
@@ -24,14 +25,14 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     * by seeing which of these reaching definitions are relevant in the sense that
     * they are used.
     * */
-  private def addReachingDefEdges(method: nodes.Method, solution: Solution[Set[Definition]]): DiffGraph.Builder = {
+  private def addReachingDefEdges(method: Method, solution: Solution[Set[Definition]]): DiffGraph.Builder = {
 
     val dstGraph = DiffGraph.newBuilder
 
-    def addEdge(fromNode: nodes.StoredNode, toNode: nodes.StoredNode, variable: String = ""): Unit = {
+    def addEdge(fromNode: StoredNode, toNode: StoredNode, variable: String = ""): Unit = {
       val properties = List((PropertyNames.VARIABLE, variable))
-      if (fromNode.isInstanceOf[nodes.Unknown] || toNode
-            .isInstanceOf[nodes.Unknown])
+      if (fromNode.isInstanceOf[Unknown] || toNode
+            .isInstanceOf[Unknown])
         return
       dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF, properties)
     }
@@ -41,9 +42,9 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     val allNodes = in.keys.toList
     val usageAnalyzer = new UsageAnalyzer(in)
 
-    allNodes.foreach { node: nodes.StoredNode =>
+    allNodes.foreach { node: StoredNode =>
       node match {
-        case call: nodes.Call =>
+        case call: Call =>
           // Edges between arguments of call sites
           usageAnalyzer.usedIncomingDefs(call).foreach {
             case (use, ins) =>
@@ -65,10 +66,10 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
             }
           }
 
-        case ret: nodes.Return =>
+        case ret: Return =>
           usageAnalyzer.usedIncomingDefs(ret).foreach {
             case (use, inElements) =>
-              addEdge(use, ret, use.asInstanceOf[nodes.CfgNode].code)
+              addEdge(use, ret, use.asInstanceOf[CfgNode].code)
               inElements.filter(x => x.node != use).foreach { inElement =>
                 addEdge(inElement.node, ret, nodeToEdgeLabel(inElement.node))
               }
@@ -78,7 +79,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
           }
           addEdge(ret, method.methodReturn, "<RET>")
 
-        case exitNode: nodes.MethodReturn =>
+        case exitNode: MethodReturn =>
           in(exitNode).foreach { i =>
             addEdge(i.node, exitNode, nodeToEdgeLabel(i.node))
           }
@@ -97,18 +98,18 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     dstGraph
   }
 
-  private def nodeMayBeSource(x: nodes.StoredNode): Boolean = {
+  private def nodeMayBeSource(x: StoredNode): Boolean = {
     !(
-      x.isInstanceOf[nodes.Method] || x
-        .isInstanceOf[nodes.ControlStructure] || x.isInstanceOf[nodes.FieldIdentifier] || x
-        .isInstanceOf[nodes.JumpTarget] || x.isInstanceOf[nodes.MethodReturn] || x.isInstanceOf[nodes.Block]
+      x.isInstanceOf[Method] || x
+        .isInstanceOf[ControlStructure] || x.isInstanceOf[FieldIdentifier] || x
+        .isInstanceOf[JumpTarget] || x.isInstanceOf[MethodReturn] || x.isInstanceOf[Block]
     )
   }
 
-  private def nodeToEdgeLabel(node: nodes.StoredNode): String = {
+  private def nodeToEdgeLabel(node: StoredNode): String = {
     node match {
-      case n: nodes.MethodParameterIn => n.name
-      case n: nodes.CfgNode           => n.code
+      case n: MethodParameterIn => n.name
+      case n: CfgNode           => n.code
       case _                          => ""
     }
   }

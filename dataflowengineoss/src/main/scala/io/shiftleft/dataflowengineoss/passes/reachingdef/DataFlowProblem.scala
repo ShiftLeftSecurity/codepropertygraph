@@ -1,6 +1,6 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 
 /**
   * A general data flow problem, formulated as in the Dragon Book, Second Edition
@@ -23,11 +23,11 @@ class DataFlowProblem[V](val flowGraph: FlowGraph,
   * care of these minor discrepancies.
   * */
 trait FlowGraph {
-  val entryNode: nodes.StoredNode
-  val exitNode: nodes.StoredNode
-  val allNodes: List[nodes.StoredNode]
-  val succ: Map[nodes.StoredNode, List[nodes.StoredNode]]
-  val pred: Map[nodes.StoredNode, List[nodes.StoredNode]]
+  val entryNode: StoredNode
+  val exitNode: StoredNode
+  val allNodes: List[StoredNode]
+  val succ: Map[StoredNode, List[StoredNode]]
+  val pred: Map[StoredNode, List[StoredNode]]
 }
 
 /**
@@ -38,7 +38,7 @@ trait FlowGraph {
   * of definitions.
   * */
 trait TransferFunction[V] {
-  def apply(n: nodes.StoredNode, x: V): V
+  def apply(n: StoredNode, x: V): V
 }
 
 /**
@@ -49,9 +49,9 @@ trait TransferFunction[V] {
   * */
 trait InOutInit[V] {
 
-  def initIn: Map[nodes.StoredNode, V]
+  def initIn: Map[StoredNode, V]
 
-  def initOut: Map[nodes.StoredNode, V]
+  def initOut: Map[StoredNode, V]
 
 }
 
@@ -59,4 +59,4 @@ trait InOutInit[V] {
   * The solution consists of `in` and `out` for each
   * node of the flow graph. We also attach the problem.
   * */
-case class Solution[T](in: Map[nodes.StoredNode, T], out: Map[nodes.StoredNode, T], problem: DataFlowProblem[T])
+case class Solution[T](in: Map[StoredNode, T], out: Map[StoredNode, T], problem: DataFlowProblem[T])

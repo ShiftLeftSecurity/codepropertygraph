@@ -1,6 +1,7 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.MemberAccess.isGenericMemberAccessName
 import org.slf4j.{Logger, LoggerFactory}
@@ -16,16 +17,16 @@ import overflowdb.traversal._
   * but it greatly improves readability.
   * */
 object Definition {
-  def fromNode(node: nodes.StoredNode): Definition = {
+  def fromNode(node: StoredNode): Definition = {
     new Definition(node)
   }
 }
 
-case class Definition(node: nodes.StoredNode) {}
+case class Definition(node: StoredNode) {}
 
 object ReachingDefProblem {
 
-  def create(method: nodes.Method): DataFlowProblem[Set[Definition]] = {
+  def create(method: Method): DataFlowProblem[Set[Definition]] = {
     val flowGraph = new ReachingDefFlowGraph(method)
     val transfer = new ReachingDefTransferFunction(method)
     val init = new ReachingDefInit(transfer.gen)
@@ -40,32 +41,32 @@ object ReachingDefProblem {
 /**
   * The control flow graph as viewed by the data flow solver.
   * */
-class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
+class ReachingDefFlowGraph(method: Method) extends FlowGraph {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  val entryNode: nodes.StoredNode = method
-  val exitNode: nodes.StoredNode = method.methodReturn
-  val allNodes: List[nodes.StoredNode] = method.cfgNode.toList ++ List(entryNode, exitNode) ++ method.parameter.toList
+  val entryNode: StoredNode = method
+  val exitNode: StoredNode = method.methodReturn
+  val allNodes: List[StoredNode] = method.cfgNode.toList ++ List(entryNode, exitNode) ++ method.parameter.toList
 
-  val succ: Map[nodes.StoredNode, List[nodes.StoredNode]] = initSucc(allNodes)
-  val pred: Map[nodes.StoredNode, List[nodes.StoredNode]] = initPred(allNodes, method)
+  val succ: Map[StoredNode, List[StoredNode]] = initSucc(allNodes)
+  val pred: Map[StoredNode, List[StoredNode]] = initPred(allNodes, method)
 
   /**
     * Create a map that allows CFG successors to be retrieved for each node
     * */
-  private def initSucc(ns: List[nodes.StoredNode]): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
+  private def initSucc(ns: List[StoredNode]): Map[StoredNode, List[StoredNode]] = {
     ns.map {
-      case n @ (_: nodes.Return) => n -> List(exitNode)
-      case n @ (param: nodes.MethodParameterIn) =>
+      case n @ (_: Return) => n -> List(exitNode)
+      case n @ (param: MethodParameterIn) =>
         n -> {
           val nextParam = param.method.parameter.order(param.order + 1).headOption
           if (nextParam.isDefined) { nextParam.toList } else { param.method.cfgFirst.l }
         }
-      case n @ (cfgNode: nodes.CfgNode) =>
+      case n @ (cfgNode: CfgNode) =>
         n ->
           // `.cfgNext` would be wrong here because it filters `METHOD_RETURN`
-          cfgNode.out(EdgeTypes.CFG).map(_.asInstanceOf[nodes.StoredNode]).l
+          cfgNode.out(EdgeTypes.CFG).map(_.asInstanceOf[StoredNode]).l
       case n =>
         logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
         n -> List()
@@ -75,18 +76,18 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
   /**
     * Create a map that allows CFG predecessors to be retrieved for each node
     * */
-  private def initPred(ns: List[nodes.StoredNode],
-                       method: nodes.Method): Map[nodes.StoredNode, List[nodes.StoredNode]] = {
+  private def initPred(ns: List[StoredNode],
+                       method: Method): Map[StoredNode, List[StoredNode]] = {
     ns.map {
-      case n @ (param: nodes.MethodParameterIn) =>
+      case n @ (param: MethodParameterIn) =>
         n -> {
           val prevParam = param.method.parameter.order(param.order - 1).headOption
           if (prevParam.isDefined) { prevParam.toList } else { List(method) }
         }
-      case n @ (_: nodes.CfgNode) if method.cfgFirst.headOption.contains(n) =>
+      case n @ (_: CfgNode) if method.cfgFirst.headOption.contains(n) =>
         n -> method.parameter.l.sortBy(_.order).lastOption.toList
 
-      case n @ (cfgNode: nodes.CfgNode) => n -> cfgNode.cfgPrev.l
+      case n @ (cfgNode: CfgNode) => n -> cfgNode.cfgPrev.l
 
       case n =>
         logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
@@ -100,10 +101,10 @@ class ReachingDefFlowGraph(method: nodes.Method) extends FlowGraph {
   * For each node of the graph, this transfer function defines how it affects
   * the propagation of definitions.
   * */
-class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction[Set[Definition]] {
+class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[Definition]] {
 
-  val gen: Map[nodes.StoredNode, Set[Definition]] = initGen(method).withDefaultValue(Set.empty[Definition])
-  val kill: Map[nodes.StoredNode, Set[Definition]] =
+  val gen: Map[StoredNode, Set[Definition]] = initGen(method).withDefaultValue(Set.empty[Definition])
+  val kill: Map[StoredNode, Set[Definition]] =
     initKill(method, gen).withDefaultValue(Set.empty[Definition])
 
   /**
@@ -111,7 +112,7 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     * function to obtain the updated set of definitions, considering `gen(n)`
     * and `kill(n)`.
     * */
-  override def apply(n: nodes.StoredNode, x: Set[Definition]): Set[Definition] = {
+  override def apply(n: StoredNode, x: Set[Definition]): Set[Definition] = {
     gen(n).union(x.diff(kill(n)))
   }
 
@@ -119,10 +120,10 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     * Initialize the map `gen`, a map that contains generated
     * definitions for each flow graph node.
     * */
-  def initGen(method: nodes.Method): Map[nodes.StoredNode, Set[Definition]] = {
+  def initGen(method: Method): Map[StoredNode, Set[Definition]] = {
 
     val defsForParams = method.parameter.l.map { param =>
-      param -> Set(Definition.fromNode(param.asInstanceOf[nodes.StoredNode]))
+      param -> Set(Definition.fromNode(param.asInstanceOf[StoredNode]))
     }
 
     // We filter out field accesses to ensure that they propagate
@@ -136,7 +137,7 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
           val retVal = Set(call)
           val args = call.argument.filter(hasValidGenType)
           (retVal ++ args)
-            .map(x => Definition.fromNode(x.asInstanceOf[nodes.StoredNode]))
+            .map(x => Definition.fromNode(x.asInstanceOf[StoredNode]))
         }
       }
     (defsForParams ++ defsForCalls).toMap
@@ -145,10 +146,10 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
   /**
     * Restricts the types of nodes that represent definitions.
     * */
-  private def hasValidGenType(node: nodes.Expression): Boolean = {
+  private def hasValidGenType(node: Expression): Boolean = {
     node match {
-      case _: nodes.Call       => true
-      case _: nodes.Identifier => true
+      case _: Call       => true
+      case _: Identifier => true
       case _                   => false
     }
   }
@@ -161,8 +162,8 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
     * such as identifiers or field-identifiers have empty gen and kill sets,
     * meaning that they just pass on definitions unaltered.
     * */
-  private def initKill(method: nodes.Method,
-                       gen: Map[nodes.StoredNode, Set[Definition]]): Map[nodes.StoredNode, Set[Definition]] = {
+  private def initKill(method: Method,
+                       gen: Map[StoredNode, Set[Definition]]): Map[StoredNode, Set[Definition]] = {
 
     // We filter out field accesses to ensure that they propagate
     // taint unharmed.
@@ -190,19 +191,19 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
 
   private def definitionsOfSameVariable(definition: Definition): Set[Definition] = {
     val definedNodes = definition.node match {
-      case param: nodes.MethodParameterIn =>
+      case param: MethodParameterIn =>
         method.cfgNode
           .filter(x => x.id != param.id)
           .isIdentifier
           .nameExact(param.name)
           .toSet
-      case identifier: nodes.Identifier =>
+      case identifier: Identifier =>
         method.cfgNode
           .filter(x => x.id != identifier.id)
           .isIdentifier
           .nameExact(identifier.name)
           .toSet
-      case call: nodes.Call =>
+      case call: Call =>
         method.cfgNode
           .filter(x => x.id != call.id)
           .isCall
@@ -215,11 +216,11 @@ class ReachingDefTransferFunction(method: nodes.Method) extends TransferFunction
 
 }
 
-class ReachingDefInit(gen: Map[nodes.StoredNode, Set[Definition]]) extends InOutInit[Set[Definition]] {
-  override def initIn: Map[nodes.StoredNode, Set[Definition]] =
+class ReachingDefInit(gen: Map[StoredNode, Set[Definition]]) extends InOutInit[Set[Definition]] {
+  override def initIn: Map[StoredNode, Set[Definition]] =
     Map
-      .empty[nodes.StoredNode, Set[Definition]]
+      .empty[StoredNode, Set[Definition]]
       .withDefaultValue(Set.empty[Definition])
 
-  override def initOut: Map[nodes.StoredNode, Set[Definition]] = gen
+  override def initOut: Map[StoredNode, Set[Definition]] = gen
 }

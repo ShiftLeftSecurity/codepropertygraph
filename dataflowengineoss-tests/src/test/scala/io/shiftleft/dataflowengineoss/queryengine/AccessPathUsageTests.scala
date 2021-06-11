@@ -1,7 +1,8 @@
 package io.shiftleft.dataflowengineoss.queryengine
 
 import io.shiftleft.OverflowDbTestInstance
-import io.shiftleft.codepropertygraph.generated._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, Properties, Operators}
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.dataflowengineoss.queryengine.AccessPathUsage.toTrackedBaseAndAccessPathSimple
 import io.shiftleft.semanticcpg.accesspath._
 import org.scalatest.matchers.should.Matchers._
@@ -23,7 +24,7 @@ class AccessPathUsageTests extends AnyWordSpec {
 
   private val g = OverflowDbTestInstance.create
 
-  private def genCALL(graph: Graph, op: String, args: Node*): nodes.Call = {
+  private def genCALL(graph: Graph, op: String, args: Node*): Call = {
     val ret = graph + NodeTypes.CALL //(NodeTypes.CALL, Properties.NAME -> op)
     ret.setProperty(Properties.NAME, op)
     args.reverse.zipWithIndex.foreach { argTup =>
@@ -33,28 +34,28 @@ class AccessPathUsageTests extends AnyWordSpec {
       val javaInt: java.lang.Integer = idx + 1
       arg.setProperty(Properties.ARGUMENT_INDEX, javaInt)
     }
-    ret.asInstanceOf[nodes.Call]
+    ret.asInstanceOf[Call]
   }
 
-  private def genLit(graph: Graph, payload: String): nodes.Literal = {
+  private def genLit(graph: Graph, payload: String): Literal = {
     val ret = graph + NodeTypes.LITERAL
     ret.setProperty(Properties.CODE, payload)
-    ret.asInstanceOf[nodes.Literal]
+    ret.asInstanceOf[Literal]
   }
 
-  private def genID(graph: Graph, payload: String): nodes.Identifier = {
+  private def genID(graph: Graph, payload: String): Identifier = {
     val ret = graph + NodeTypes.IDENTIFIER
     ret.setProperty(Properties.NAME, payload)
-    ret.asInstanceOf[nodes.Identifier]
+    ret.asInstanceOf[Identifier]
   }
 
-  private def genFID(graph: Graph, payload: String): nodes.FieldIdentifier = {
+  private def genFID(graph: Graph, payload: String): FieldIdentifier = {
     val ret = graph + NodeTypes.FIELD_IDENTIFIER
     ret.setProperty(Properties.CANONICAL_NAME, payload)
-    ret.asInstanceOf[nodes.FieldIdentifier]
+    ret.asInstanceOf[FieldIdentifier]
   }
 
-  private def toTrackedAccessPath(node: nodes.StoredNode): AccessPath = toTrackedBaseAndAccessPathSimple(node)._2
+  private def toTrackedAccessPath(node: StoredNode): AccessPath = toTrackedBaseAndAccessPathSimple(node)._2
 
   "memberAccess" should {
     "work" in {

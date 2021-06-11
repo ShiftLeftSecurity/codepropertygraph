@@ -1,6 +1,6 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 
 import scala.collection.mutable
 
@@ -13,9 +13,9 @@ class DataFlowSolver {
     * exit respectively.
     * */
   def calculateMopSolutionForwards[T <: Iterable[_]](problem: DataFlowProblem[T]): Solution[T] = {
-    var out: Map[nodes.StoredNode, T] = problem.inOutInit.initOut
+    var out: Map[StoredNode, T] = problem.inOutInit.initOut
     var in = problem.inOutInit.initIn
-    val workList = mutable.Set.empty[nodes.StoredNode]
+    val workList = mutable.Set.empty[StoredNode]
     workList ++= problem.flowGraph.allNodes
 
     while (workList.nonEmpty) {
@@ -46,9 +46,9 @@ class DataFlowSolver {
     * exit respectively.
     * */
   def calculateMopSolutionBackwards[T <: Iterable[_]](problem: DataFlowProblem[T]): Solution[T] = {
-    var out: Map[nodes.StoredNode, T] = problem.inOutInit.initOut
+    var out: Map[StoredNode, T] = problem.inOutInit.initOut
     var in = problem.inOutInit.initIn
-    val workList = mutable.Set.empty[nodes.StoredNode]
+    val workList = mutable.Set.empty[StoredNode]
     workList ++= problem.flowGraph.allNodes
 
     while (workList.nonEmpty) {

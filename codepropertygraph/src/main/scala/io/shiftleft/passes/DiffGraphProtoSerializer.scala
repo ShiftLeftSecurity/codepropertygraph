@@ -1,7 +1,6 @@
 package io.shiftleft.passes
 
 import com.google.protobuf.ByteString
-import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
@@ -86,7 +85,7 @@ class DiffGraphProtoSerializer {
     builder.build()
   }
 
-  private def addNode(node: nodes.NewNode, appliedDiffGraph: AppliedDiffGraph): CpgStruct.Node = {
+  private def addNode(node: NewNode, appliedDiffGraph: AppliedDiffGraph): CpgStruct.Node = {
     val nodeId = appliedDiffGraph.nodeToGraphId(node)
 
     val nodeBuilder = CpgStruct.Node.newBuilder
@@ -105,13 +104,13 @@ class DiffGraphProtoSerializer {
   private def addEdge(change: DiffGraph.Change.CreateEdge, appliedDiffGraph: AppliedDiffGraph): CpgStruct.Edge = {
     val srcId: Long =
       if (change.sourceNodeKind == DiffGraph.Change.NodeKind.New)
-        appliedDiffGraph.nodeToGraphId(change.src.asInstanceOf[nodes.NewNode])
+        appliedDiffGraph.nodeToGraphId(change.src.asInstanceOf[NewNode])
       else
         change.src.asInstanceOf[Node].id
 
     val dstId: Long =
       if (change.destinationNodeKind == DiffGraph.Change.NodeKind.New)
-        appliedDiffGraph.nodeToGraphId(change.dst.asInstanceOf[nodes.NewNode])
+        appliedDiffGraph.nodeToGraphId(change.dst.asInstanceOf[NewNode])
       else
         change.dst.asInstanceOf[Node].id
 
