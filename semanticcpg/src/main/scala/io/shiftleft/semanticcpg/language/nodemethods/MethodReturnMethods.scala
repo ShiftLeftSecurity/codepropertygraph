@@ -1,10 +1,10 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.{MethodReturn, Return}
 
-class MethodReturnMethods(val node: nodes.MethodReturn) extends AnyVal {
+class MethodReturnMethods(val node: MethodReturn) extends AnyVal {
 
-  def toReturn: Option[nodes.Return] =
+  def toReturn: Option[Return] =
     node._returnViaCfgIn
 
 }

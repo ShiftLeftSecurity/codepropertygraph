@@ -1,24 +1,24 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.{Call, Expression}
 import overflowdb.traversal._
 
-class CallMethods(val node: nodes.Call) extends AnyVal {
-  def arguments(index: Int): Traversal[nodes.Expression] =
+class CallMethods(val node: Call) extends AnyVal {
+  def arguments(index: Int): Traversal[Expression] =
     node._argumentOut
       .collect {
-        case expr: nodes.Expression if expr.argumentIndex == index => expr
+        case expr: Expression if expr.argumentIndex == index => expr
       }
       .to(Traversal)
 
-  def argument: Traversal[nodes.Expression] =
-    node._argumentOut.collectAll[nodes.Expression]
+  def argument: Traversal[Expression] =
+    node._argumentOut.collectAll[Expression]
 
-  def argument(index: Int): nodes.Expression =
+  def argument(index: Int): Expression =
     arguments(index).head
 
-  def argumentOption(index: Int): Option[nodes.Expression] =
+  def argumentOption(index: Int): Option[Expression] =
     node._argumentOut.collectFirst {
-      case expr: nodes.Expression if expr.argumentIndex == index => expr
+      case expr: Expression if expr.argumentIndex == index => expr
     }
 }

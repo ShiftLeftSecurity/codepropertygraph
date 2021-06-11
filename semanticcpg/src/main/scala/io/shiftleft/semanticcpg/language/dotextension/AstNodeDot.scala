@@ -1,10 +1,10 @@
 package io.shiftleft.semanticcpg.language.dotextension
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.AstNode
 import io.shiftleft.semanticcpg.dotgenerator.DotAstGenerator
 import overflowdb.traversal.Traversal
 
-class AstNodeDot[NodeType <: nodes.AstNode](val traversal: Traversal[NodeType]) extends AnyVal {
+class AstNodeDot[NodeType <: AstNode](val traversal: Traversal[NodeType]) extends AnyVal {
 
   def dotAst: Traversal[String] = DotAstGenerator.dotAst(traversal)
 

@@ -1,19 +1,19 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.{CfgNode, Local, Method, MethodParameterIn, MethodReturn}
 import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
 
-class MethodMethods(val method: nodes.Method) extends AnyVal {
+class MethodMethods(val method: Method) extends AnyVal {
 
-  def parameter: Traversal[nodes.MethodParameterIn] =
+  def parameter: Traversal[MethodParameterIn] =
     method._methodParameterInViaAstOut
 
-  def methodReturn: nodes.MethodReturn =
+  def methodReturn: MethodReturn =
     method._methodReturnViaAstOut
 
-  def local: Traversal[nodes.Local] =
+  def local: Traversal[Local] =
     method._blockViaContainsOut.flatMap(_._localViaAstOut)
 
   def numberOfLines: Int = {
@@ -24,7 +24,7 @@ class MethodMethods(val method: nodes.Method) extends AnyVal {
     }
   }
 
-  def cfgNode: Traversal[nodes.CfgNode] =
-    method._containsOut.asScala.collect { case cfgNode: nodes.CfgNode => cfgNode }
+  def cfgNode: Traversal[CfgNode] =
+    method._containsOut.asScala.collect { case cfgNode: CfgNode => cfgNode }
 
 }

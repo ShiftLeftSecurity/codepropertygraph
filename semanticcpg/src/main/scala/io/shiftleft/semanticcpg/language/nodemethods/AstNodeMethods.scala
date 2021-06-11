@@ -1,48 +1,48 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.Implicits.JavaIteratorDeco
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.language._
 
-class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
+class AstNodeMethods(val node: AstNode) extends AnyVal {
 
   /**
     * Indicate whether the AST node represents a control structure,
     * e.g., `if`, `for`, `while`.
     * */
-  def isControlStructure: Boolean = node.isInstanceOf[nodes.ControlStructure]
+  def isControlStructure: Boolean = node.isInstanceOf[ControlStructure]
 
-  def isIdentifier: Boolean = node.isInstanceOf[nodes.Identifier]
+  def isIdentifier: Boolean = node.isInstanceOf[Identifier]
 
-  def isFieldIdentifier: Boolean = node.isInstanceOf[nodes.FieldIdentifier]
+  def isFieldIdentifier: Boolean = node.isInstanceOf[FieldIdentifier]
 
-  def isFile: Boolean = node.isInstanceOf[nodes.File]
+  def isFile: Boolean = node.isInstanceOf[File]
 
-  def isReturn: Boolean = node.isInstanceOf[nodes.Return]
+  def isReturn: Boolean = node.isInstanceOf[Return]
 
-  def isLiteral: Boolean = node.isInstanceOf[nodes.Literal]
+  def isLiteral: Boolean = node.isInstanceOf[Literal]
 
-  def isLocal: Boolean = node.isInstanceOf[nodes.Local]
+  def isLocal: Boolean = node.isInstanceOf[Local]
 
-  def isCall: Boolean = node.isInstanceOf[nodes.Call]
+  def isCall: Boolean = node.isInstanceOf[Call]
 
-  def isExpression: Boolean = node.isInstanceOf[nodes.Expression]
+  def isExpression: Boolean = node.isInstanceOf[Expression]
 
-  def isMember: Boolean = node.isInstanceOf[nodes.Member]
+  def isMember: Boolean = node.isInstanceOf[Member]
 
-  def isMethodRef: Boolean = node.isInstanceOf[nodes.MethodRef]
+  def isMethodRef: Boolean = node.isInstanceOf[MethodRef]
 
-  def isMethod: Boolean = node.isInstanceOf[nodes.Method]
+  def isMethod: Boolean = node.isInstanceOf[Method]
 
-  def isModifier: Boolean = node.isInstanceOf[nodes.Modifier]
+  def isModifier: Boolean = node.isInstanceOf[Modifier]
 
-  def isNamespaceBlock: Boolean = node.isInstanceOf[nodes.NamespaceBlock]
+  def isNamespaceBlock: Boolean = node.isInstanceOf[NamespaceBlock]
 
-  def isBlock: Boolean = node.isInstanceOf[nodes.Block]
+  def isBlock: Boolean = node.isInstanceOf[Block]
 
-  def isParameter: Boolean = node.isInstanceOf[nodes.MethodParameterIn]
+  def isParameter: Boolean = node.isInstanceOf[MethodParameterIn]
 
-  def isTypeDecl: Boolean = node.isInstanceOf[nodes.TypeDecl]
+  def isTypeDecl: Boolean = node.isInstanceOf[TypeDecl]
 
   def depth: Int = depth(_ => true)
 
@@ -51,7 +51,7 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
     * the tree to its leaves, the depth is only increased for
     * nodes where `p(node)` is true.
     * */
-  def depth(p: nodes.AstNode => Boolean): Int = {
+  def depth(p: AstNode => Boolean): Int = {
     val additionalDepth = if (p(node)) { 1 } else { 0 }
 
     val childDepths = node.astChildren.map(_.depth(p)).l
@@ -62,7 +62,7 @@ class AstNodeMethods(val node: nodes.AstNode) extends AnyVal {
                        })
   }
 
-  def astParent: nodes.AstNode =
-    node._astIn.onlyChecked.asInstanceOf[nodes.AstNode]
+  def astParent: AstNode =
+    node._astIn.onlyChecked.asInstanceOf[AstNode]
 
 }
