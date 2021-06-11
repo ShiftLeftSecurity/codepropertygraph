@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.{Method, MethodParameterIn}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
@@ -15,7 +15,7 @@ class MethodParameterTests extends AnyWordSpec with Matchers {
   "generic cpg" should {
     "find parameters" when {
       "asking for all parameters" in {
-        val args: List[nodes.MethodParameterIn] =
+        val args: List[MethodParameterIn] =
           cpg.method.name("foo").parameter.toList
 
         args.size shouldBe 1
@@ -24,14 +24,14 @@ class MethodParameterTests extends AnyWordSpec with Matchers {
       }
 
       "filtering by name" in {
-        val queryResult: List[nodes.MethodParameterIn] =
+        val queryResult: List[MethodParameterIn] =
           cpg.method.parameter.name(".*").toList
         queryResult.size shouldBe 1
       }
 
       "finding parameter by index" when {
         "specifying number" in {
-          val args: List[nodes.MethodParameterIn] =
+          val args: List[MethodParameterIn] =
             cpg.method.name("foo").parameter.index(num = 1).toList
 
           args.size shouldBe 1
@@ -39,14 +39,14 @@ class MethodParameterTests extends AnyWordSpec with Matchers {
         }
 
         "specifying index >= x" in {
-          val args: List[nodes.MethodParameterIn] =
+          val args: List[MethodParameterIn] =
             cpg.method.name("foo").parameter.indexFrom(1).toList
 
           args.map(_.typ.head.name).toSet shouldBe Set("paramtype")
         }
 
         "specifying index <= x" in {
-          val args: List[nodes.MethodParameterIn] =
+          val args: List[MethodParameterIn] =
             cpg.method.name("foo").parameter.indexTo(2).toList
 
           args.map(_.typ.head.name).toSet shouldBe Set("paramtype")
@@ -55,7 +55,7 @@ class MethodParameterTests extends AnyWordSpec with Matchers {
     }
 
     "find method that a MethodParameter belongs to" in {
-      val methods: List[nodes.Method] =
+      val methods: List[Method] =
         cpg.method.name("foo").parameter.index(num = 1).method.toList
 
       methods.size shouldBe 1

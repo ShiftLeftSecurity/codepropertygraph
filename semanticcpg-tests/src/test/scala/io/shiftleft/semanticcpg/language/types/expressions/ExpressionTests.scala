@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.language.types.expressions
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.codepropertygraph.generated.nodes.Call
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
@@ -24,7 +25,7 @@ class ExpressionTests extends AnyWordSpec with Matchers {
 
   "generic cpg" should {
     "expand to next expression in CFG" in {
-      val List(x: nodes.Call) = cpg.method.name("methodForCfgTest").cfgFirst.cfgNext.isExpression.l
+      val List(x: Call) = cpg.method.name("methodForCfgTest").cfgFirst.cfgNext.isExpression.l
       x.name shouldBe "call2"
     }
 
@@ -33,7 +34,7 @@ class ExpressionTests extends AnyWordSpec with Matchers {
     }
 
     "expand to previous expression in CFG" in {
-      val List(x: nodes.Call) =
+      val List(x: Call) =
         cpg.method.name("methodForCfgTest").cfgLast.cfgPrev.isExpression.l
       x.name shouldBe "call1"
     }

@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
@@ -16,31 +17,31 @@ class TypeTests extends AnyWordSpec with Matchers {
       .cpg
 
     "have ClassMemberTest as internal class" in {
-      def queryResult: List[nodes.TypeDecl] =
+      def queryResult: List[TypeDecl] =
         cpg.typeDecl.name("ClassMemberTest").internal.toList
       queryResult.size shouldBe 1
     }
 
     "have Object as external class" in {
-      def queryResult: List[nodes.TypeDecl] =
+      def queryResult: List[TypeDecl] =
         cpg.typeDecl.name("Object").external.toList
       queryResult.size shouldBe 1
     }
 
     "have a member called member" in {
-      def queryResult: List[nodes.Member] =
+      def queryResult: List[Member] =
         cpg.typeDecl("ClassMemberTest").member.nameExact("amember").toList
       queryResult.size shouldBe 1
     }
 
     "have a static member called amember" in {
-      def queryResult: List[nodes.Member] =
+      def queryResult: List[Member] =
         cpg.typeDecl("ClassMemberTest").member.nameExact("amember").isStatic.toList
       queryResult.size shouldBe 1
     }
 
     "more than 0 members found by regex" in {
-      def queryResult: List[nodes.Member] =
+      def queryResult: List[Member] =
         cpg.typeDecl.member.name(".*").toList
 
       queryResult.size should be > 0
@@ -63,7 +64,7 @@ class TypeTests extends AnyWordSpec with Matchers {
       .cpg
 
     "have class Base as base class of class Derived" in {
-      def queryResult: List[nodes.TypeDecl] =
+      def queryResult: List[TypeDecl] =
         cpg.typeDecl
           .name(".*Derived")
           .baseTypeDecl
@@ -76,7 +77,7 @@ class TypeTests extends AnyWordSpec with Matchers {
     }
 
     "have class Dervied as derived class of class Base" in {
-      def queryResult: List[nodes.TypeDecl] =
+      def queryResult: List[TypeDecl] =
         cpg.typeDecl
           .name(".*Base")
           .derivedTypeDecl
@@ -87,7 +88,7 @@ class TypeTests extends AnyWordSpec with Matchers {
     }
 
     "have Derived and DerivedFromDerived as transitive derived types of Base" in {
-      def queryResult: List[nodes.TypeDecl] =
+      def queryResult: List[TypeDecl] =
         cpg.typeDecl
           .name(".*Base")
           .derivedTypeDeclTransitive
@@ -97,7 +98,7 @@ class TypeTests extends AnyWordSpec with Matchers {
     }
 
     "have Base and Object as transitive base types of Derived" in {
-      def queryResult: List[nodes.TypeDecl] =
+      def queryResult: List[TypeDecl] =
         cpg.typeDecl
           .name("DerivedFromDerived")
           .baseTypeDeclTransitive
@@ -123,7 +124,7 @@ class TypeTests extends AnyWordSpec with Matchers {
       .cpg
 
     "have class Base as base class of class Derived" in {
-      def queryResult: List[nodes.Type] =
+      def queryResult: List[Type] =
         cpg.typ
           .name(".*Derived")
           .baseType
@@ -134,7 +135,7 @@ class TypeTests extends AnyWordSpec with Matchers {
     }
 
     "have class Dervied as derived class of class Base" in {
-      def queryResult: List[nodes.Type] =
+      def queryResult: List[Type] =
         cpg.typ
           .name(".*Base")
           .derivedType
@@ -145,7 +146,7 @@ class TypeTests extends AnyWordSpec with Matchers {
     }
 
     "have Derived and DerivedFromDerived as transitive derived types of Base" in {
-      def queryResult: List[nodes.Type] =
+      def queryResult: List[Type] =
         cpg.typ
           .name(".*Base")
           .derivedTypeTransitive
@@ -155,7 +156,7 @@ class TypeTests extends AnyWordSpec with Matchers {
     }
 
     "have Base and Object as transitive base types of Derived" in {
-      def queryResult: List[nodes.Type] =
+      def queryResult: List[Type] =
         cpg.typ
           .name("DerivedFromDerived")
           .baseTypeTransitive

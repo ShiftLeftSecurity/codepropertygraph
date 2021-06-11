@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.{ModifierTypes, PropertyNames, nodes}
+import io.shiftleft.codepropertygraph.generated.{ModifierTypes, PropertyNames}
 import io.shiftleft.passes.DiffGraph
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -30,7 +30,7 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
     "embedding a StoredNode and a NewNode" in {
       implicit val diffGraphBuilder = DiffGraph.newBuilder
       val cpg = Cpg.emptyCpg
-      val existingContainedNode = cpg.graph.addNode(42L, "MODIFIER").asInstanceOf[nodes.StoredNode]
+      val existingContainedNode = cpg.graph.addNode(42L, "MODIFIER").asInstanceOf[StoredNode]
       existingContainedNode.setProperty(PropertyNames.MODIFIER_TYPE, ModifierTypes.NATIVE)
       cpg.graph.V().asScala.toSet shouldBe Set(existingContainedNode)
 
@@ -65,7 +65,6 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
 
 object NewNodeNodeStepsTest {
   def newTestNode(containedNodes: List[AbstractNode] = Nil): NewFinding =
-    nodes
-      .NewFinding()
+      NewFinding()
       .evidence(containedNodes)
 }

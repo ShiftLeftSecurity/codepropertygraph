@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
+import io.shiftleft.codepropertygraph.generated.nodes.MethodParameterIn
 import io.shiftleft.semanticcpg.passes.methoddecorations.MethodDecoratorPass
 import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
 import org.scalatest.matchers.should.Matchers
@@ -21,7 +22,7 @@ class MethodDecoratorPassTests extends AnyWordSpec with Matchers {
         Properties.TYPE_FULL_NAME -> "some.Type",
         Properties.LINE_NUMBER -> 10
       )
-      .asInstanceOf[nodes.MethodParameterIn]
+      .asInstanceOf[MethodParameterIn]
 
     method --- EdgeTypes.AST --> parameterIn
 
