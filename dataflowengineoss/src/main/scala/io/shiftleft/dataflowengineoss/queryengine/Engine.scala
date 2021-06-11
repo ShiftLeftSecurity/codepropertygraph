@@ -124,8 +124,7 @@ class Engine(context: EngineContext) {
 
 object Engine {
 
-  def expandIn(curNode: CfgNode, path: Vector[PathElement])(
-      implicit semantics: Semantics): Vector[PathElement] = {
+  def expandIn(curNode: CfgNode, path: Vector[PathElement])(implicit semantics: Semantics): Vector[PathElement] = {
     curNode match {
       case argument: Expression =>
         val (arguments, nonArguments) = ddgInE(curNode, path)
@@ -182,8 +181,7 @@ object Engine {
     * field to specify whether it should be visible in the flow or not, a decision
     * that can also only be made by looking at both the parent and the child.
     * */
-  private def elemForArgument(e: Edge, curNode: Expression)(
-      implicit semantics: Semantics): Option[PathElement] = {
+  private def elemForArgument(e: Edge, curNode: Expression)(implicit semantics: Semantics): Option[PathElement] = {
     val parentNode = e.outNode().asInstanceOf[Expression]
     val parentNodeCall = parentNode.inCall.l
     val sameCallSite = parentNode.inCall.l == curNode.start.inCall.l

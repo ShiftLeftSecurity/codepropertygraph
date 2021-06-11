@@ -12,8 +12,7 @@ class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
     * Intended for internal use!
     * Traverse to direct and transitive callers of the method.
     */
-  def calledByIncludingSink(sourceTrav: Traversal[Method])(
-      implicit callResolver: ICallResolver): Traversal[Method] = {
+  def calledByIncludingSink(sourceTrav: Traversal[Method])(implicit callResolver: ICallResolver): Traversal[Method] = {
     val sourceMethods = sourceTrav.toSet
     val sinkMethods = traversal.dedup
 

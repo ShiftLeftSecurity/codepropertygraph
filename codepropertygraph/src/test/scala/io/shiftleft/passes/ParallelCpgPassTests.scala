@@ -3,8 +3,8 @@ package io.shiftleft.passes
 import better.files.File
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.NewFile
 import io.shiftleft.codepropertygraph.generated.Properties
+import io.shiftleft.codepropertygraph.generated.nodes.NewFile
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.traversal._

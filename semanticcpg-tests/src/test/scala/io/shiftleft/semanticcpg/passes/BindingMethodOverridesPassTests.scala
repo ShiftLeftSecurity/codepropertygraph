@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should.Matchers
@@ -14,10 +14,10 @@ class BindingMethodOverridesPassTests extends AnyWordSpec with Matchers {
     val typA = NewType().name("tA").fullName("typA").typeDeclFullName("typeDeclA")
     val typB = NewType().name("tB").fullName("typB").typeDeclFullName("typeDeclB")
     val typeDeclA = NewTypeDecl()
-        .name("tdA")
-        .fullName("typeDeclA")
-        .isExternal(false)
-        .inheritsFromTypeFullName(List())
+      .name("tdA")
+      .fullName("typeDeclA")
+      .isExternal(false)
+      .inheritsFromTypeFullName(List())
     val typeDeclB = NewTypeDecl()
       .name("tdB")
       .fullName("typeDeclB")
@@ -57,7 +57,7 @@ class BindingMethodOverridesPassTests extends AnyWordSpec with Matchers {
     val typA = NewType().name("tA").fullName("typA").typeDeclFullName("typeDeclA")
     val typB = NewType().name("tB").fullName("typB").typeDeclFullName("typeDeclB")
     val typeDeclA =
-        NewTypeDecl()
+      NewTypeDecl()
         .name("tdA")
         .fullName("typeDeclA")
         .isExternal(false)

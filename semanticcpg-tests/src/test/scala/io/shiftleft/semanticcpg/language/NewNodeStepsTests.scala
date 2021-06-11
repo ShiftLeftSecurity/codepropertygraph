@@ -65,6 +65,6 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
 
 object NewNodeNodeStepsTest {
   def newTestNode(containedNodes: List[AbstractNode] = Nil): NewFinding =
-      NewFinding()
+    NewFinding()
       .evidence(containedNodes)
 }

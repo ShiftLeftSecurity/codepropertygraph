@@ -13,8 +13,7 @@ package object language {
   implicit def expressionMethods[NodeType <: Expression](node: NodeType): ExpressionMethods[NodeType] =
     new ExpressionMethods(node)
 
-  implicit def toExtendedCfgNode[A, NodeType <: CfgNode](a: A)(
-      implicit f: A => Traversal[NodeType]): ExtendedCfgNode =
+  implicit def toExtendedCfgNode[A, NodeType <: CfgNode](a: A)(implicit f: A => Traversal[NodeType]): ExtendedCfgNode =
     new ExtendedCfgNode(f(a).cast[CfgNode])
 
   implicit def toDdgNodeDot[A](a: A)(implicit f: A => Traversal[Method]): DdgNodeDot =

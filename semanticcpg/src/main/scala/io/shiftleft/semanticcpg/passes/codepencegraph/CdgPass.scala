@@ -30,8 +30,8 @@ class CdgPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
     postDomFrontiers.foreach {
       case (node, postDomFrontierNode) =>
         postDomFrontierNode match {
-          case _: Literal | _: Identifier | _: Call | _: MethodRef | _: Unknown |
-              _: ControlStructure | _: JumpTarget => {
+          case _: Literal | _: Identifier | _: Call | _: MethodRef | _: Unknown | _: ControlStructure |
+              _: JumpTarget => {
             dstGraph.addEdgeInOriginal(postDomFrontierNode.asInstanceOf[StoredNode],
                                        node.asInstanceOf[StoredNode],
                                        EdgeTypes.CDG)

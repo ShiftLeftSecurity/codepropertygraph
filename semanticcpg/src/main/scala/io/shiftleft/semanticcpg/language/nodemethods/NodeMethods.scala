@@ -11,7 +11,7 @@ class NodeMethods(val node: AbstractNode) extends AnyVal {
   def location: NewLocation =
     node match {
       case storedNode: StoredNode => LocationCreator(storedNode)
-      case _                            => LocationCreator.emptyLocation("", None)
+      case _                      => LocationCreator.emptyLocation("", None)
     }
 
   def tagList: Traversal[TagBase] =
@@ -25,7 +25,7 @@ class NodeMethods(val node: AbstractNode) extends AnyVal {
           .distinct
           .collect {
             case (name, Some(value)) =>
-                NewTag()
+              NewTag()
                 .name(name)
                 .value(value)
                 .build

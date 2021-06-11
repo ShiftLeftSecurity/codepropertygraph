@@ -44,7 +44,8 @@ class NamespaceBlockTests extends FuzzyCCodeToCpgSuite {
   }
 
   "should allow traversing from namespace block to namespace" in {
-    cpg.namespaceBlock.filenameNot(FileTraversal.UNKNOWN).namespace.name.l shouldBe List(NamespaceTraversal.globalNamespaceName)
+    cpg.namespaceBlock.filenameNot(FileTraversal.UNKNOWN).namespace.name.l shouldBe List(
+      NamespaceTraversal.globalNamespaceName)
   }
 
 }

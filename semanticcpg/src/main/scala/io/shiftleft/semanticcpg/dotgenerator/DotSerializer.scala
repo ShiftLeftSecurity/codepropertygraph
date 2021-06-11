@@ -31,7 +31,7 @@ object DotSerializer {
     val sb = new StringBuilder
     val name = root match {
       case method: Method => method.name
-      case _                    => ""
+      case _              => ""
     }
     sb.append(s"digraph $name {  \n")
   }
@@ -46,7 +46,7 @@ object DotSerializer {
         case param: MethodParameterIn => ("PARAM", param.code).toString
         case local: Local             => (local.label, s"${local.code}: ${local.typeFullName}").toString
         case target: JumpTarget       => (target.label, target.name).toString
-        case _                              => ""
+        case _                        => ""
       }
     )
   }

@@ -55,21 +55,21 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
       if (args.size != 2) throw new RuntimeException("member/field access-style operators need two arguments")
       val typ = args(0)._evalTypeOut.nextOption() match {
         case Some(t: Type) => t
-        case _                   => return
+        case _             => return
       }
 
       val fieldref: String = call.name match {
         case Operators.memberAccess | Operators.indirectMemberAccess =>
           args(1) match {
             case id: Identifier => id.name
-            case _                    => throw new RuntimeException("memberAccess needs Identifier as second argument")
+            case _              => throw new RuntimeException("memberAccess needs Identifier as second argument")
           }
 
         case Operators.fieldAccess | Operators.indirectFieldAccess | Operators.getElementPtr =>
           args(1) match {
             case id: FieldIdentifier => id.code // we intentionally don't use the CANONICAL_NAME field here.
             case lit: Literal        => lit.code
-            case _                         => return
+            case _                   => return
           }
         case _ => return
       }

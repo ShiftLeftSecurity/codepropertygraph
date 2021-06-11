@@ -1,7 +1,7 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.MemberAccess.isGenericMemberAccessName
 import org.slf4j.{Logger, LoggerFactory}
@@ -76,8 +76,7 @@ class ReachingDefFlowGraph(method: Method) extends FlowGraph {
   /**
     * Create a map that allows CFG predecessors to be retrieved for each node
     * */
-  private def initPred(ns: List[StoredNode],
-                       method: Method): Map[StoredNode, List[StoredNode]] = {
+  private def initPred(ns: List[StoredNode], method: Method): Map[StoredNode, List[StoredNode]] = {
     ns.map {
       case n @ (param: MethodParameterIn) =>
         n -> {
@@ -150,7 +149,7 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
     node match {
       case _: Call       => true
       case _: Identifier => true
-      case _                   => false
+      case _             => false
     }
   }
 
@@ -162,8 +161,7 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
     * such as identifiers or field-identifiers have empty gen and kill sets,
     * meaning that they just pass on definitions unaltered.
     * */
-  private def initKill(method: Method,
-                       gen: Map[StoredNode, Set[Definition]]): Map[StoredNode, Set[Definition]] = {
+  private def initKill(method: Method, gen: Map[StoredNode, Set[Definition]]): Map[StoredNode, Set[Definition]] = {
 
     // We filter out field accesses to ensure that they propagate
     // taint unharmed.

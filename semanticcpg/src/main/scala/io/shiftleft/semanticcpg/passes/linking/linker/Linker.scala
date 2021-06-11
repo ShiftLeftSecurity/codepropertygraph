@@ -126,17 +126,17 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       case node: Type           => typeFullNameToNode += node.fullName -> node
       case node: Method         => methodFullNameToNode += node.fullName -> node
       case node: NamespaceBlock => namespaceBlockFullNameToNode += node.fullName -> node
-      case _                          => // ignore
+      case _                    => // ignore
     }
   }
 
   private def linkToMultiple[SRC_NODE_TYPE <: StoredNode](srcLabels: List[String],
-                                                                dstNodeLabel: String,
-                                                                edgeType: String,
-                                                                dstNodeMap: mutable.Map[String, StoredNode],
-                                                                getDstFullNames: SRC_NODE_TYPE => Iterable[String],
-                                                                dstFullNameKey: String,
-                                                                dstGraph: DiffGraph.Builder): Unit = {
+                                                          dstNodeLabel: String,
+                                                          edgeType: String,
+                                                          dstNodeMap: mutable.Map[String, StoredNode],
+                                                          getDstFullNames: SRC_NODE_TYPE => Iterable[String],
+                                                          dstFullNameKey: String,
+                                                          dstGraph: DiffGraph.Builder): Unit = {
     var loggedDeprecationWarning = false
     Traversal(cpg.graph.nodes(srcLabels: _*)).cast[SRC_NODE_TYPE].foreach { srcNode =>
       if (!srcNode.outE(edgeType).hasNext) {

@@ -32,8 +32,7 @@ class ExtendedCfgNode(val traversal: Traversal[CfgNode]) extends AnyVal {
     Traversal.from(reachedSources).cast[NodeType]
   }
 
-  def reachableByFlows[A <: CfgNode](sourceTravs: Traversal[A]*)(
-      implicit context: EngineContext): Traversal[Path] = {
+  def reachableByFlows[A <: CfgNode](sourceTravs: Traversal[A]*)(implicit context: EngineContext): Traversal[Path] = {
     val paths = reachableByInternal(sourceTravs)
       .map { result =>
         // We can get back results that start in nodes that are invisible

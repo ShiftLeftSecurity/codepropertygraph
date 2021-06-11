@@ -1,8 +1,8 @@
 package io.shiftleft.semanticcpg.codedumper
 
 import better.files.File
-import io.shiftleft.codepropertygraph.generated.nodes.{Expression, Method, NewLocation}
 import io.shiftleft.codepropertygraph.generated.Languages
+import io.shiftleft.codepropertygraph.generated.nodes.{Expression, Method, NewLocation}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -34,7 +34,7 @@ object CodeDumper {
     val method = node match {
       case n: Method     => Some(n)
       case n: Expression => Some(n.method)
-      case _                   => None
+      case _             => None
     }
 
     val lineToHighlight = location.lineNumber

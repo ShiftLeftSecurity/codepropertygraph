@@ -159,15 +159,11 @@ object Cfg {
   /**
     * Create edges of given type from a list of source nodes to a destination node
     * */
-  def edges(sources: List[CfgNode],
-            dstNode: Option[CfgNode],
-            cfgEdgeType: CfgEdgeType = AlwaysEdge): List[CfgEdge] = {
+  def edges(sources: List[CfgNode], dstNode: Option[CfgNode], cfgEdgeType: CfgEdgeType = AlwaysEdge): List[CfgEdge] = {
     edgesToMultiple(sources, dstNode.toList, cfgEdgeType)
   }
 
-  def singleEdge(source: CfgNode,
-                 destination: CfgNode,
-                 cfgEdgeType: CfgEdgeType = AlwaysEdge): List[CfgEdge] = {
+  def singleEdge(source: CfgNode, destination: CfgNode, cfgEdgeType: CfgEdgeType = AlwaysEdge): List[CfgEdge] = {
     edgesToMultiple(List(source), List(destination), cfgEdgeType)
   }
 

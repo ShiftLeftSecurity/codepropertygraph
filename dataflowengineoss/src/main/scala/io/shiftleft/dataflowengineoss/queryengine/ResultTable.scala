@@ -71,7 +71,4 @@ case class ReachableByResult(path: Vector[PathElement], callDepth: Int = 0, part
   * @param resolved whether we have resolved the method call this argument belongs to
   * @param outEdgeLabel label of the outgoing DDG edge
   * */
-case class PathElement(node: CfgNode,
-                       visible: Boolean = true,
-                       resolved: Boolean = true,
-                       outEdgeLabel: String = "")
+case class PathElement(node: CfgNode, visible: Boolean = true, resolved: Boolean = true, outEdgeLabel: String = "")

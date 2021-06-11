@@ -21,7 +21,7 @@ class ExtendedCfgNodeMethods[NodeType <: CfgNode](val node: NodeType) extends An
   def astNode: AstNode =
     node match {
       case n: AstNode => n
-      case _                => ??? //TODO markus/fabs?
+      case _          => ??? //TODO markus/fabs?
     }
 
   def reachableBy[NodeType <: CfgNode](sourceTravs: Traversal[NodeType]*)(
@@ -52,9 +52,7 @@ class ExtendedCfgNodeMethods[NodeType <: CfgNode](val node: NodeType) extends An
     * Traverse back in the data dependence graph by one step, taking into account semantics
     * @param path optional list of path elements that have been expanded already
     * */
-  def ddgIn(path: Vector[PathElement],
-            withInvisible: Boolean,
-            cache: mutable.HashMap[CfgNode, Vector[PathElement]])(
+  def ddgIn(path: Vector[PathElement], withInvisible: Boolean, cache: mutable.HashMap[CfgNode, Vector[PathElement]])(
       implicit semantics: Semantics): Traversal[CfgNode] = {
     ddgInPathElem(path, withInvisible, cache).map(_.node)
   }
@@ -64,18 +62,18 @@ class ExtendedCfgNodeMethods[NodeType <: CfgNode](val node: NodeType) extends An
     * taking into account semantics
     * @param path optional list of path elements that have been expanded already
     * */
-  def ddgInPathElem(path: Vector[PathElement],
-                    withInvisible: Boolean,
-                    cache: mutable.HashMap[CfgNode, Vector[PathElement]])(
-      implicit semantics: Semantics): Traversal[PathElement] = {
+  def ddgInPathElem(
+      path: Vector[PathElement],
+      withInvisible: Boolean,
+      cache: mutable.HashMap[CfgNode, Vector[PathElement]])(implicit semantics: Semantics): Traversal[PathElement] = {
     val result = ddgInPathElemInternal(path, withInvisible, cache).to(Traversal)
     result
   }
 
-  private def ddgInPathElemInternal(path: Vector[PathElement],
-                                    withInvisible: Boolean,
-                                    cache: mutable.HashMap[CfgNode, Vector[PathElement]])(
-      implicit semantics: Semantics): Vector[PathElement] = {
+  private def ddgInPathElemInternal(
+      path: Vector[PathElement],
+      withInvisible: Boolean,
+      cache: mutable.HashMap[CfgNode, Vector[PathElement]])(implicit semantics: Semantics): Vector[PathElement] = {
 
     if (cache.contains(node)) {
       return cache(node)
@@ -97,8 +95,7 @@ class ExtendedCfgNodeMethods[NodeType <: CfgNode](val node: NodeType) extends An
     statementInternal(node, _.parentExpression.get)
 
   @scala.annotation.tailrec
-  private def statementInternal(node: CfgNode,
-                                parentExpansion: Expression => Expression): CfgNode = {
+  private def statementInternal(node: CfgNode, parentExpansion: Expression => Expression): CfgNode = {
 
     node match {
       case node: Identifier => parentExpansion(node)

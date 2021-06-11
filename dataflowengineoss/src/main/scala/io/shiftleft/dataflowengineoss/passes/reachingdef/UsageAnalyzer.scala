@@ -1,7 +1,7 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.Operators
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.dataflowengineoss.queryengine.AccessPathUsage.toTrackedBaseAndAccessPathSimple
 import io.shiftleft.semanticcpg.accesspath.MatchResult
 import io.shiftleft.semanticcpg.language._
@@ -106,7 +106,7 @@ class UsageAnalyzer(in: Map[StoredNode, Set[Definition]]) {
       case call: Call =>
         use.code == call.code
       case identifier: Identifier => use.code == identifier.code
-      case _                            => false
+      case _                      => false
     }
   }
 

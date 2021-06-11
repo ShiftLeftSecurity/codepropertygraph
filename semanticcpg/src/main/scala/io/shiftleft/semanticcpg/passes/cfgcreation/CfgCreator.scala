@@ -120,8 +120,7 @@ class CfgCreator(entryNode: Method) {
     * */
   protected def cfgFor(node: AstNode): Cfg =
     node match {
-      case _: Method | _: MethodParameterIn | _: Modifier | _: Local | _: TypeDecl |
-          _: Member =>
+      case _: Method | _: MethodParameterIn | _: Modifier | _: Local | _: TypeDecl | _: Member =>
         Cfg.empty
       case _: MethodRef | _: TypeRef =>
         cfgForSingleNode(node.asInstanceOf[CfgNode])
@@ -137,8 +136,7 @@ class CfgCreator(entryNode: Method) {
         cfgForOrExpression(call)
       case call: Call if call.name == Operators.conditional =>
         cfgForConditionalExpression(call)
-      case _: Call | _: FieldIdentifier | _: Identifier | _: Literal | _: MethodReturn |
-          _: Unknown =>
+      case _: Call | _: FieldIdentifier | _: Identifier | _: Literal | _: MethodReturn | _: Unknown =>
         cfgForChildren(node) ++ cfgForSingleNode(node.asInstanceOf[CfgNode])
       case _ =>
         cfgForChildren(node)

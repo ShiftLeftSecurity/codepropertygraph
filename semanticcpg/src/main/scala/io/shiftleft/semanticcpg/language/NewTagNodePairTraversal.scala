@@ -14,9 +14,7 @@ class NewTagNodePairTraversal(traversal: Traversal[NewTagNodePair]) extends HasS
       diffGraph.addNode(tag.asInstanceOf[NewNode])
       tagValue match {
         case tagValue: StoredNode =>
-          diffGraph.addEdgeFromOriginal(tagValue,
-                                        tag.asInstanceOf[NewNode],
-                                        EdgeTypes.TAGGED_BY)
+          diffGraph.addEdgeFromOriginal(tagValue, tag.asInstanceOf[NewNode], EdgeTypes.TAGGED_BY)
         case tagValue: NewNode =>
           diffGraph.addEdge(tagValue, tag.asInstanceOf[NewNode], EdgeTypes.TAGGED_BY, Nil)
       }

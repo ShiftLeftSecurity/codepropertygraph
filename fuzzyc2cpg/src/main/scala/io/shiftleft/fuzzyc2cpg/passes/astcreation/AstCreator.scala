@@ -638,10 +638,10 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       connectAstChild(aliasTypeDecl)
     } else if (context.parentIsClassDef) {
       val member = NewMember()
-          .code(identifierDecl.getEscapedCodeStr)
-          .name(identifierDecl.getName.getEscapedCodeStr)
-          .typeFullName(registerType(declTypeName))
-          .order(context.childNum)
+        .code(identifierDecl.getEscapedCodeStr)
+        .name(identifierDecl.getName.getEscapedCodeStr)
+        .typeFullName(registerType(declTypeName))
+        .order(context.childNum)
       diffGraph.addNode(member)
       connectAstChild(member)
     } else {
@@ -877,7 +877,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
 
   private def newCallNode(astNode: AstNode, methodName: String): NewCall = {
     val location = astNode.getLocation
-      NewCall()
+    NewCall()
       .name(methodName)
       .dispatchType(DispatchTypes.STATIC_DISPATCH.name())
       .signature("TODO")
@@ -891,7 +891,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
 
   private def newUnknownNode(astNode: AstNode): NewUnknown = {
     val location = astNode.getLocation
-      NewUnknown()
+    NewUnknown()
       .parserTypeName(astNode.getClass.getSimpleName)
       .code(astNode.getEscapedCodeStr)
       .order(context.childNum)

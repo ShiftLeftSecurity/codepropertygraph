@@ -1,7 +1,13 @@
 package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{MethodBase, NewBlock, NewMethod, NewMethodParameterIn, NewMethodReturn}
+import io.shiftleft.codepropertygraph.generated.nodes.{
+  MethodBase,
+  NewBlock,
+  NewMethod,
+  NewMethodParameterIn,
+  NewMethodReturn
+}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._

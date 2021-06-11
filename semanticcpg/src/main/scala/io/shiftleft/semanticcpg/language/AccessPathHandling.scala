@@ -23,7 +23,7 @@ object AccessPathHandling {
       case _: ControlStructure      => Some((TrackedUnknown, Nil))
       // FieldIdentifiers are only fake arguments, hence should not be tracked
       case _: FieldIdentifier => Some((TrackedUnknown, Nil))
-      case _                        => None
+      case _                  => None
     }
   }
 

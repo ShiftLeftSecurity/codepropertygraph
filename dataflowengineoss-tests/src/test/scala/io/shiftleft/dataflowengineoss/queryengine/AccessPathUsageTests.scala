@@ -1,8 +1,8 @@
 package io.shiftleft.dataflowengineoss.queryengine
 
 import io.shiftleft.OverflowDbTestInstance
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, Properties, Operators}
 import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, Operators, Properties}
 import io.shiftleft.dataflowengineoss.queryengine.AccessPathUsage.toTrackedBaseAndAccessPathSimple
 import io.shiftleft.semanticcpg.accesspath._
 import org.scalatest.matchers.should.Matchers._

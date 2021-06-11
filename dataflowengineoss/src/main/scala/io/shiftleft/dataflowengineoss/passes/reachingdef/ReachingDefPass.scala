@@ -1,8 +1,8 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, PropertyNames}
 import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, PropertyNames}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
@@ -110,7 +110,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
     node match {
       case n: MethodParameterIn => n.name
       case n: CfgNode           => n.code
-      case _                          => ""
+      case _                    => ""
     }
   }
 

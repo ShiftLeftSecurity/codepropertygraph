@@ -4,7 +4,13 @@ import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.edges.ReachingDef
-import io.shiftleft.codepropertygraph.generated.nodes.{Identifier, MethodParameterIn, NewIdentifier, NewUnknown, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{
+  Identifier,
+  MethodParameterIn,
+  NewIdentifier,
+  NewUnknown,
+  StoredNode
+}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
