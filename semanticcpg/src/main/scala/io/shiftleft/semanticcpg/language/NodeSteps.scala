@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.codedumper.CodeDumper
 import overflowdb.Node
@@ -10,10 +11,10 @@ import overflowdb.traversal.{Traversal, help}
 /**
   * Steps for all node types
   *
-  * This is the base class for all steps defined on nodes.
+  * This is the base class for all steps defined on
   * */
-@help.Traversal(elementType = classOf[nodes.StoredNode])
-class NodeSteps[NodeType <: nodes.StoredNode](val traversal: Traversal[NodeType]) extends AnyVal {
+@help.Traversal(elementType = classOf[StoredNode])
+class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) extends AnyVal {
 
   @Doc(
     "The source file this code is in",
@@ -23,7 +24,7 @@ class NodeSteps[NodeType <: nodes.StoredNode](val traversal: Traversal[NodeType]
       |the file node that represents that source file.
       |""".stripMargin
   )
-  def file: Traversal[nodes.File] =
+  def file: Traversal[File] =
     traversal
       .choose(_.label) {
         case NodeTypes.NAMESPACE => _.in(EdgeTypes.REF).out(EdgeTypes.SOURCE_FILE)
@@ -31,7 +32,7 @@ class NodeSteps[NodeType <: nodes.StoredNode](val traversal: Traversal[NodeType]
         case _ =>
           _.repeat(_.coalesce(_.out(EdgeTypes.SOURCE_FILE), _.in(EdgeTypes.AST)))(_.until(_.hasLabel(NodeTypes.FILE)))
       }
-      .cast[nodes.File]
+      .cast[File]
 
   @Doc(
     "Location, including filename and line number",
@@ -45,7 +46,7 @@ class NodeSteps[NodeType <: nodes.StoredNode](val traversal: Traversal[NodeType]
       |on the user's side.
       |""".stripMargin
   )
-  def location: Traversal[nodes.NewLocation] =
+  def location: Traversal[NewLocation] =
     traversal.map(_.location)
 
   @Doc(
@@ -96,15 +97,15 @@ class NodeSteps[NodeType <: nodes.StoredNode](val traversal: Traversal[NodeType]
       |""".stripMargin,
     """.newTagNode("foo")"""
   )
-  def newTagNode(tagName: String): NewTagNodePair = newTagNodePair(tagName, "")
+  def newTagNode(tagName: String): NewTagNodePairTraversal = newTagNodePair(tagName, "")
 
   @Doc("Tag node with (`tagName`, `tagValue`)", "", """.newTagNodePair("key","val")""")
-  def newTagNodePair(tagName: String, tagValue: String): NewTagNodePair = {
-    new NewTagNodePair(
+  def newTagNodePair(tagName: String, tagValue: String): NewTagNodePairTraversal = {
+    new NewTagNodePairTraversal(
       traversal.map { node =>
         nodes
           .NewTagNodePair()
-          .tag(nodes.NewTag().name(tagName).value(tagValue))
+          .tag(NewTag().name(tagName).value(tagValue))
           .node(node)
           .build
       }
@@ -112,13 +113,13 @@ class NodeSteps[NodeType <: nodes.StoredNode](val traversal: Traversal[NodeType]
   }
 
   @Doc("Tags attached to this node")
-  def tagList: List[List[nodes.TagBase]] =
+  def tagList: List[List[TagBase]] =
     traversal.map { taggedNode =>
       taggedNode.tagList.l
     }.l
 
   @Doc("Tags attached to this node")
-  def tag: Traversal[nodes.Tag] = {
+  def tag: Traversal[Tag] = {
     traversal.flatMap { node =>
       node.tag
     }

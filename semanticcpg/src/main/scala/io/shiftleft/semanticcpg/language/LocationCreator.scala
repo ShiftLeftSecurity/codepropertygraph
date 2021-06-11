@@ -1,7 +1,6 @@
 package io.shiftleft.semanticcpg.language
 
-import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.NewLocation
+import io.shiftleft.codepropertygraph.generated.nodes._
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal._
 
@@ -13,7 +12,7 @@ object LocationCreator {
 
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  def apply(node: nodes.StoredNode): nodes.NewLocation = {
+  def apply(node: StoredNode): NewLocation = {
     try {
       location(node)
     } catch {
@@ -23,9 +22,9 @@ object LocationCreator {
     }
   }
 
-  private def location(node: nodes.StoredNode): NewLocation = {
+  private def location(node: StoredNode): NewLocation = {
     node match {
-      case paramIn: nodes.MethodParameterIn =>
+      case paramIn: MethodParameterIn =>
         apply(
           paramIn,
           paramIn.name,
@@ -33,7 +32,7 @@ object LocationCreator {
           paramIn.lineNumber,
           paramIn.method
         )
-      case paramOut: nodes.MethodParameterOut =>
+      case paramOut: MethodParameterOut =>
         apply(
           paramOut,
           paramOut.name,
@@ -41,7 +40,7 @@ object LocationCreator {
           paramOut.lineNumber,
           paramOut.method
         )
-      case methodReturn: nodes.MethodReturn =>
+      case methodReturn: MethodReturn =>
         apply(
           methodReturn,
           "$ret",
@@ -49,7 +48,7 @@ object LocationCreator {
           methodReturn.lineNumber,
           methodReturn.method
         )
-      case call: nodes.CallRepr =>
+      case call: CallRepr =>
         apply(
           call,
           call.code,
@@ -57,7 +56,7 @@ object LocationCreator {
           call.lineNumber,
           call.method
         )
-      case method: nodes.Method =>
+      case method: Method =>
         apply(
           method,
           method.name,
@@ -65,7 +64,7 @@ object LocationCreator {
           method.lineNumber,
           method
         )
-      case identifier: nodes.Identifier =>
+      case identifier: Identifier =>
         apply(
           identifier,
           identifier.name,
@@ -73,7 +72,7 @@ object LocationCreator {
           identifier.lineNumber,
           identifier.method
         )
-      case literal: nodes.Literal =>
+      case literal: Literal =>
         apply(
           literal,
           literal.code,
@@ -81,7 +80,7 @@ object LocationCreator {
           literal.lineNumber,
           literal.method
         )
-      case local: nodes.Local =>
+      case local: Local =>
         apply(
           local,
           local.name,
@@ -89,7 +88,7 @@ object LocationCreator {
           local.lineNumber,
           local.method.head
         )
-      case methodRef: nodes.MethodRef =>
+      case methodRef: MethodRef =>
         apply(
           methodRef,
           methodRef.code,
@@ -97,7 +96,7 @@ object LocationCreator {
           methodRef.lineNumber,
           methodRef._methodViaContainsIn.next()
         )
-      case source: nodes.Source =>
+      case source: Source =>
         apply(source.node)
       case node =>
         emptyLocation(node.label, Some(node))
@@ -105,15 +104,15 @@ object LocationCreator {
   }
 
   def apply(
-      node: nodes.AbstractNode,
+      node: AbstractNode,
       symbol: String,
       label: String,
       lineNumber: Option[Integer],
-      method: nodes.Method
-  ): nodes.NewLocation = {
+      method: Method
+  ): NewLocation = {
 
     if (method == null) {
-      nodes.NewLocation().node(Some(node))
+      NewLocation().node(Some(node))
     } else {
       val typeOption = methodToTypeDecl(method)
       val typeName = typeOption.map(_.fullName).getOrElse("")
@@ -126,8 +125,7 @@ object LocationCreator {
       } yield namespace.name
       val namespaceName = namespaceOption.getOrElse("")
 
-      nodes
-        .NewLocation()
+      NewLocation()
         .symbol(symbol)
         .methodFullName(method.fullName)
         .methodShortName(method.name)
@@ -141,17 +139,17 @@ object LocationCreator {
     }
   }
 
-  private def methodToTypeDecl(method: nodes.Method): Option[nodes.TypeDecl] =
-    findVertex(method, _.isInstanceOf[nodes.TypeDecl]).map(_.asInstanceOf[nodes.TypeDecl])
+  private def methodToTypeDecl(method: Method): Option[TypeDecl] =
+    findVertex(method, _.isInstanceOf[TypeDecl]).map(_.asInstanceOf[TypeDecl])
 
   @tailrec
-  private def findVertex(node: nodes.StoredNode, instanceCheck: nodes.StoredNode => Boolean): Option[nodes.StoredNode] =
+  private def findVertex(node: StoredNode, instanceCheck: StoredNode => Boolean): Option[StoredNode] =
     node._astIn.nextOption() match {
       case Some(head) if instanceCheck(head) => Some(head)
       case Some(head)                        => findVertex(head, instanceCheck)
       case None                              => None
     }
 
-  def emptyLocation(label: String, node: Option[nodes.AbstractNode]): nodes.NewLocation =
-    nodes.NewLocation().nodeLabel(label).node(node)
+  def emptyLocation(label: String, node: Option[AbstractNode]): NewLocation =
+    NewLocation().nodeLabel(label).node(node)
 }

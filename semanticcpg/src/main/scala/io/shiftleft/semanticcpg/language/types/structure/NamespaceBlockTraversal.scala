@@ -1,28 +1,29 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import overflowdb.traversal.Traversal
 
-class NamespaceBlockTraversal(val traversal: Traversal[nodes.NamespaceBlock]) extends AnyVal {
+class NamespaceBlockTraversal(val traversal: Traversal[NamespaceBlock]) extends AnyVal {
 
   /**
     * Namespaces for namespace blocks.
     * */
-  def namespace: Traversal[nodes.Namespace] =
-    traversal.out(EdgeTypes.REF).cast[nodes.Namespace]
+  def namespace: Traversal[Namespace] =
+    traversal.out(EdgeTypes.REF).cast[Namespace]
 
   /**
     * The type declarations defined in this namespace
     * */
-  def typeDecl: Traversal[nodes.TypeDecl] =
+  def typeDecl: Traversal[TypeDecl] =
     traversal
       .out(EdgeTypes.AST)
       .hasLabel(NodeTypes.TYPE_DECL)
-      .cast[nodes.TypeDecl]
+      .cast[TypeDecl]
 
-  def method: Traversal[nodes.Method] =
+  def method: Traversal[Method] =
     traversal
       .out(EdgeTypes.AST)
       .hasLabel(NodeTypes.METHOD)
-      .cast[nodes.Method]
+      .cast[Method]
 }

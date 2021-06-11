@@ -1,27 +1,28 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import overflowdb.traversal.Traversal
 
 /**
   * A compilation unit
   * */
-class FileTraversal(val traversal: Traversal[nodes.File]) extends AnyVal {
+class FileTraversal(val traversal: Traversal[File]) extends AnyVal {
 
-  def typeDecl: Traversal[nodes.TypeDecl] =
-    traversal.in(EdgeTypes.SOURCE_FILE).hasLabel(NodeTypes.TYPE_DECL).cast[nodes.TypeDecl]
+  def typeDecl: Traversal[TypeDecl] =
+    traversal.in(EdgeTypes.SOURCE_FILE).hasLabel(NodeTypes.TYPE_DECL).cast[TypeDecl]
 
-  def namespace: Traversal[nodes.Namespace] =
-    traversal.in(EdgeTypes.SOURCE_FILE).hasLabel(NodeTypes.NAMESPACE_BLOCK).out(EdgeTypes.REF).cast[nodes.Namespace]
+  def namespace: Traversal[Namespace] =
+    traversal.in(EdgeTypes.SOURCE_FILE).hasLabel(NodeTypes.NAMESPACE_BLOCK).out(EdgeTypes.REF).cast[Namespace]
 
-  def namespaceBlock: Traversal[nodes.NamespaceBlock] =
-    traversal.in(EdgeTypes.SOURCE_FILE).hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[nodes.NamespaceBlock]
+  def namespaceBlock: Traversal[NamespaceBlock] =
+    traversal.in(EdgeTypes.SOURCE_FILE).hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[NamespaceBlock]
 
-  def method: Traversal[nodes.Method] =
-    traversal.in(EdgeTypes.SOURCE_FILE).hasLabel(NodeTypes.METHOD).cast[nodes.Method]
+  def method: Traversal[Method] =
+    traversal.in(EdgeTypes.SOURCE_FILE).hasLabel(NodeTypes.METHOD).cast[Method]
 
-  def comment: Traversal[nodes.Comment] =
-    traversal.out(EdgeTypes.AST).hasLabel(NodeTypes.COMMENT).cast[nodes.Comment]
+  def comment: Traversal[Comment] =
+    traversal.out(EdgeTypes.AST).hasLabel(NodeTypes.COMMENT).cast[Comment]
 
 }
 

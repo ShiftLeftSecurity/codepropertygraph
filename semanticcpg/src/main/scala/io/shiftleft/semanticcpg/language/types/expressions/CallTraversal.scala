@@ -1,58 +1,59 @@
 package io.shiftleft.semanticcpg.language.types.expressions
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
 
 /**
   A call site
   */
-class CallTraversal(val traversal: Traversal[nodes.Call]) extends AnyVal {
+class CallTraversal(val traversal: Traversal[Call]) extends AnyVal {
 
   /**
     Only statically dispatched calls
     */
-  def isStatic: Traversal[nodes.Call] =
+  def isStatic: Traversal[Call] =
     traversal.dispatchType("STATIC_DISPATCH")
 
   /**
     Only dynamically dispatched calls
     */
-  def isDynamic: Traversal[nodes.Call] =
+  def isDynamic: Traversal[Call] =
     traversal.dispatchType("DYNAMIC_DISPATCH")
 
   /**
     The receiver of a call if the call has a receiver associated.
     */
-  def receiver: Traversal[nodes.Expression] =
-    traversal.out(EdgeTypes.RECEIVER).cast[nodes.Expression]
+  def receiver: Traversal[Expression] =
+    traversal.out(EdgeTypes.RECEIVER).cast[Expression]
 
   /**
     Arguments of the call
     */
-  def argument: Traversal[nodes.Expression] =
+  def argument: Traversal[Expression] =
     traversal.flatMap(_.argument)
 
   /**
     `i'th` arguments of the call
     */
-  def argument(i: Integer): Traversal[nodes.Expression] =
+  def argument(i: Integer): Traversal[Expression] =
     traversal.flatMap(_.arguments(i))
 
   /**
     To formal method return parameter
     */
-  def toMethodReturn(implicit callResolver: ICallResolver): Traversal[nodes.MethodReturn] =
+  def toMethodReturn(implicit callResolver: ICallResolver): Traversal[MethodReturn] =
     traversal
       .flatMap(callResolver.getCalledMethodsAsTraversal)
       .out(EdgeTypes.AST)
       .hasLabel(NodeTypes.METHOD_RETURN)
-      .cast[nodes.MethodReturn]
+      .cast[MethodReturn]
 
   /**
     * Traverse to referenced members
     * */
-  def referencedMember: Traversal[nodes.Member] =
-    traversal.out(EdgeTypes.REF).cast[nodes.Member]
+  def referencedMember: Traversal[Member] =
+    traversal.out(EdgeTypes.REF).cast[Member]
 
 }
