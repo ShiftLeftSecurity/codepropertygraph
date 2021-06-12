@@ -11,10 +11,7 @@ object Ast extends SchemaBase {
   override def description: String =
     """
       |The Abstract Syntax Tree (AST) Layer provides syntax trees for all compilation units.
-      |Source-based frontends MUST generate this layer, leaving subsequent generation of
-      |the control flow graph to the backend. Machine-code- and Bytecode-based frontends
-      |MAY choose to skip generating this layer but MUST in that case generate the control flow
-      |layer instead.
+      |This layer MUST be created by the frontend.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder,
@@ -254,8 +251,16 @@ object Ast extends SchemaBase {
     val controlStructure: NodeType = builder
       .addNodeType(
         name = "CONTROL_STRUCTURE",
-        comment = """Control structures such as if-blocks, for-loops, and while-loops are represented
-            |in the CPG via `CONTROL_STRUCTURE` nodes.
+        comment = """This node represents a control structure as introduced by control structure
+            |statements as well as conditional and unconditional jumps. Its type is stored in the
+            |`CONTROL_STRUCTURE_TYPE` field to be one of several pre-defined types. These types
+            | are used in the construction of the control flow layer, making it possible to
+            | generate the control flow layer from the abstract syntax tree layer automatically.
+            |
+            |In addition to the `CONTROL_STRUCTURE_TYPE` field, the `PARSER_TYPE_NAME` field
+            |MAY be used by frontends to store the name of the control structure as emitted by
+            |the parser or disassembler, however, the value of this field is not relevant
+            |for construction of the control flow layer.
             |""".stripMargin
       )
       .protoId(339)
@@ -420,7 +425,7 @@ object Ast extends SchemaBase {
     val callNode: NodeType = builder
       .addNodeType(
         name = "CALL",
-        comment = """A (function/method) call. The `METHOD_FULL_NAME` property is the name of the
+        comment = """A (function/method/procedure) call. The `METHOD_FULL_NAME` property is the name of the
                     |invoked method (the callee) while the `TYPE_FULL_NAME` is its return type, and
                     |therefore, the return type of the call when viewing it as an expression. For
                     |languages like Javascript, it is common that we may know the (short-) name
