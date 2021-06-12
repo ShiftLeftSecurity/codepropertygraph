@@ -188,7 +188,6 @@ object CallGraph extends SchemaBase {
     jumpTarget
       .addProperty(argumentIndex)
 
-    methodInst.addProperty(methodFullName)
     methodRef.addProperty(methodFullName)
 
     callNode
