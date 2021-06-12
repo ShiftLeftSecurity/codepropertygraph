@@ -11,7 +11,9 @@ object Ast extends SchemaBase {
   override def description: String =
     """
       |The Abstract Syntax Tree (AST) Layer provides syntax trees for all compilation units.
-      |This layer MUST be created by the frontend.
+      |This layer MUST be created by the frontend. All nodes of the layer inherit from the
+      |node base type `AST_NODE` and the vast majority inherits from `EXPRESSION`, a child
+      |base class of `AST_NODE`.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder,
@@ -443,8 +445,8 @@ object Ast extends SchemaBase {
     val expression = builder
       .addNodeBaseType(
         name = "EXPRESSION",
-        comment = """An expression is a piece of code that can be evaluated to yield a value
-                    |of a fixed type.
+        comment = """`EXPRESSION` is the base class for all nodes that represent code pieces
+                    |that can be evaluated.
                     |
                     | Expression may be arguments in method calls. For method calls that do
                     | not involved named parameters, the `ARGUMENT_INDEX` field indicates at
