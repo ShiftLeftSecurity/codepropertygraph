@@ -125,12 +125,13 @@ object Ast extends SchemaBase {
         name = "CANONICAL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = """Canonical token of a FIELD_IDENTIFIER. Typically identical to the CODE field,
-                    |but canonicalized according to source language semantics. Human readable names
-                    |are preferable. FIELD_IDENTIFIERs must share identical CANONICAL_NAME if and
-                    |only if they alias, e.g. in C-style unions (if the aliasing relationship is
+        comment = """THis field holds the canonical name of a `FIELD_IDENTIFIER`. It is typically
+                    |identical to the CODE field, but canonicalized according to source language
+                    |semantics. Human readable names are preferable. `FIELD_IDENTIFIER` nodes must
+                    |share identical `CANONICAL_NAME` if and
+                    |only if they alias, e.g., in C-style unions (if the aliasing relationship is
                     |unknown or there are partial overlaps, then one must make a reasonable guess,
-                    |and trade off between false negatives and false positives)
+                    |and trade off between false negatives and false positives).
                     |""".stripMargin
       )
       .protoId(2001092)
