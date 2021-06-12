@@ -138,12 +138,16 @@ object Ast extends SchemaBase {
     val fieldIdentifier: NodeType = builder
       .addNodeType(
         name = "FIELD_IDENTIFIER",
-        comment = """A node that represents which field is accessed in a <operator>.fieldAccess, in
-                    |e.g. obj.field. The CODE part is used for human display and matching to MEMBER nodes.
-                    |The CANONICAL_NAME is used for dataflow tracking; typically both coincide.
-                    |However, suppose that two fields foo and bar are a C-style union; then CODE refers
-                    |to whatever the programmer wrote (obj.foo or obj.bar), but both share the same
-                    |CANONICAL_NAME (e.g. GENERATED_foo_bar)
+        comment = """This node represents the field accessed in a field access, e.g., in
+                    |`a.b`, it represents `b`. The field name as it occurs in the code is
+                    |stored in the `CODE` field. This may mean that the `CODE` field holds
+                    |an expression. The `CANONICAL_NAME` field MAY contain the same value is
+                    |the `CODE` field but SHOULD contain the normalized name that results
+                    |from evaluating `CODE` as an expression if such an evaluation is
+                    |possible for the language frontend. The objective is to store an identifier
+                    |in `CANONICAL_NAME` that is the same for two nodes iff they refer to the
+                    |same field, regardless of whether they use the same expression to reference
+                    |it.
                     |""".stripMargin
       )
       .protoId(2001081)
