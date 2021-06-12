@@ -12,9 +12,9 @@ object Ast extends SchemaBase {
     """
       |The Abstract Syntax Tree (AST) Layer provides syntax trees for all compilation units.
       |Source-based frontends MUST generate this layer, leaving subsequent generation of
-      |the control flow graph to the backend. Machine-code- and Bytecode-based
-      |MAY choose to skip generating this layer, in which case the frontend must generate
-      |the control flow layer.
+      |the control flow graph to the backend. Machine-code- and Bytecode-based frontends
+      |MAY choose to skip generating this layer but MUST in that case generate the control flow
+      |layer instead.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder,
@@ -43,12 +43,17 @@ object Ast extends SchemaBase {
     val astNode = builder
       .addNodeBaseType(
         name = "AST_NODE",
-        comment = """This is the base type for all nodes of the abstract syntax tree.
-                    |In a syntax tree, sibling nodes (nodes who share a parent node) are ordered.
-                    |As some graph databases do not guarantee the order in which siblings are returned to
-                    |be stable, we make the ordering explicit by storing the position of each node relative
-                    |to its siblings in the order field. In the left most sibling, order is set to 0,
-                    |while in the right-most sibling, it is set to n-1 where n is the number of siblings.
+        comment = """This is the base type for all nodes of the abstract syntax tree (AST). An AST
+                    |node has a `CODE` and an `ORDER` field. The `CODE` field contains the
+                    |code (verbatim) represented by the AST node. The `ORDER` field contains the
+                    |nodes position among its siblings, encoded as an integer where the left most
+                    |sibling has the position `0`.
+                    |
+                    |AST nodes contain optional `LINE_NUMBER` and `COLUMN_NUMBER` fields. For
+                    |source-based frontends, these fields contain the start line number and
+                    |start column number of the code represented by the node.
+                    |For machine-code-based and bytecode-based frontends, `LINE_NUMBER` contains
+                    |the address at which the code starts while `COLUMN_NUMBER` is undefined.
                     |""".stripMargin
       )
       .addProperties(order, code)
@@ -73,7 +78,7 @@ object Ast extends SchemaBase {
     val block: NodeType = builder
       .addNodeType(
         name = "BLOCK",
-        comment = """A compound statement. Compound statements are used in many languages to allow
+        comment = """This node represents a compound statement. Compound statements are used in many languages to allow
                     |grouping a sequence of statements. For example, in C and Java, compound statements
                     |are statements enclosed by curly braces. Function/Method bodies are compound
                     |statements. We do not use the term "compound statement" because "statement" would
@@ -81,7 +86,7 @@ object Ast extends SchemaBase {
                     |not an expression. This is true in languages such as C and Java, but not for languages
                     |such as Scala where the value of the block is given by that of the last expression it
                     |contains. In fact, the Scala grammar uses the term "BlockExpr" (short for
-                    |"block expression") to describe what in the CPG spec we just call "Block".
+                    |"block expression") to describe what in the CPG we call "Block".
                     |""".stripMargin
       )
       .protoId(31)
