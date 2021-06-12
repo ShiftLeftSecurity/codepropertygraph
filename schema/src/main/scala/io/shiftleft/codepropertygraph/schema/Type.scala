@@ -32,7 +32,8 @@ object Type extends SchemaBase {
         cardinality = Cardinality.One,
         comment = """This field contains the fully-qualified static type name of the program
                     |construct represented by a node. It is the name of an instantiated type, e.g.,
-                    |`List<Integer>`, rather than `List[T]`.
+                    |`java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
+                    |cannot be determined, this field should be set to the empty string.
                     |""".stripMargin
       )
       .protoId(51)

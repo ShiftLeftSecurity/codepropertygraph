@@ -4,7 +4,7 @@ import overflowdb.schema.{Cardinality, SchemaBuilder, SchemaInfo}
 
 object Cfg extends SchemaBase {
 
-  def index: Int = 8
+  def index: Int = 9
 
   override def description: String =
     """

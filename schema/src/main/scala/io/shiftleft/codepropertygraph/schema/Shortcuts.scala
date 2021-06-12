@@ -32,6 +32,7 @@ object Shortcuts extends SchemaBase {
     import astSchema._
     import typeSchema._
     import fs._
+
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
     val evalType = builder
