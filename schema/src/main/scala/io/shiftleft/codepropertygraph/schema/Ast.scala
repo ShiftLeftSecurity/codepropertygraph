@@ -106,7 +106,11 @@ object Ast extends SchemaBase {
     val local: NodeType = builder
       .addNodeType(
         name = "LOCAL",
-        comment = "This node represents a local variable."
+        comment = """This node represents a local variable. Its fully qualified type name is stored
+            |in the `TYPE_FULL_NAME` field and its name in the `NAME` field. The `CODE` field
+            |contains the entire local variable declaration without initialization, e.g., for
+            |`int x = 10;`, it contains `int x`.
+            |""".stripMargin
       )
       .protoId(23)
       .addProperties(typeFullName)
@@ -115,7 +119,10 @@ object Ast extends SchemaBase {
     val identifier: NodeType = builder
       .addNodeType(
         name = "IDENTIFIER",
-        comment = "An arbitrary identifier/reference"
+        comment = """This node represents an identifier as used when referring to a variable by name.
+            |It holds the identifier's name in the `NAME` field and its fully-qualified type
+            |name in `TYPE_FULL_NAME`.
+            |""".stripMargin
       )
       .protoId(27)
       .addProperties(typeFullName, name)
@@ -125,7 +132,7 @@ object Ast extends SchemaBase {
         name = "CANONICAL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = """THis field holds the canonical name of a `FIELD_IDENTIFIER`. It is typically
+        comment = """This field holds the canonical name of a `FIELD_IDENTIFIER`. It is typically
                     |identical to the CODE field, but canonicalized according to source language
                     |semantics. Human readable names are preferable. `FIELD_IDENTIFIER` nodes must
                     |share identical `CANONICAL_NAME` if and
@@ -159,14 +166,43 @@ object Ast extends SchemaBase {
         name = "MODIFIER_TYPE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = "Indicates the modifier which is represented by a MODIFIER node. See modifierTypes"
+        comment = """The modifier type is a free-form string. The following are known modifier types:
+            |`STATIC`, `PUBLIC`, `PROTECTED`, `PRIVATE`, `ABSTRACT`, `NATIVE`, `CONSTRUCTOR`, `VIRTUAL`.
+            |""".stripMargin
       )
       .protoId(26)
+
+    val modifierTypes = builder.addConstants(
+      category = "ModifierTypes",
+      Constant(name = "STATIC", value = "STATIC", valueType = ValueTypes.STRING, comment = "The static modifier")
+        .protoId(1),
+      Constant(name = "PUBLIC", value = "PUBLIC", valueType = ValueTypes.STRING, comment = "The public modifier")
+        .protoId(2),
+      Constant(name = "PROTECTED",
+               value = "PROTECTED",
+               valueType = ValueTypes.STRING,
+               comment = "The protected modifier").protoId(3),
+      Constant(name = "PRIVATE", value = "PRIVATE", valueType = ValueTypes.STRING, comment = "The private modifier")
+        .protoId(4),
+      Constant(name = "ABSTRACT", value = "ABSTRACT", valueType = ValueTypes.STRING, comment = "The abstract modifier")
+        .protoId(5),
+      Constant(name = "NATIVE", value = "NATIVE", valueType = ValueTypes.STRING, comment = "The native modifier")
+        .protoId(6),
+      Constant(name = "CONSTRUCTOR",
+               value = "CONSTRUCTOR",
+               valueType = ValueTypes.STRING,
+               comment = "The constructor modifier").protoId(7),
+      Constant(name = "VIRTUAL", value = "VIRTUAL", valueType = ValueTypes.STRING, comment = "The virtual modifier")
+        .protoId(8),
+    )
 
     val modifier: NodeType = builder
       .addNodeType(
         name = "MODIFIER",
-        comment = "A modifier, e.g., static, public, private"
+        comment = """This field represents a (language-dependent) modifier such as `static`, `private`
+            |or `public`. Unlike most other AST nodes, it is NOT an expression, that is, it
+            |cannot be evaluated and cannot be passed as an argument in function calls.
+            |""".stripMargin
       )
       .protoId(300)
       .addProperties(modifierType)
@@ -175,7 +211,11 @@ object Ast extends SchemaBase {
     val jumpTarget: NodeType = builder
       .addNodeType(
         name = "JUMP_TARGET",
-        comment = "A jump target made explicit in the code using a label"
+        comment = """A jump target is any location in the code that has been specifically marked
+            |as the target of a jump, e.g., via a label. The `NAME` field holds the name of
+            |the label while the `PARSER_TYPE_NAME` field holds the name of language construct
+            |that this jump target is created from, e.g., "Label".
+            |""".stripMargin
       )
       .protoId(340)
       .addProperties(name, parserTypeName)
@@ -211,7 +251,10 @@ object Ast extends SchemaBase {
     val ret: NodeType = builder
       .addNodeType(
         name = "RETURN",
-        comment = "A return instruction"
+        comment = """This node represents a return instruction, e.g., `return x`. Note that it does
+            |NOT represent a formal return parameter as formal return parameters are
+            |represented via `METHOD_RETURN` nodes.
+            |""".stripMargin
       )
       .protoId(30)
 
@@ -276,7 +319,10 @@ object Ast extends SchemaBase {
     val unknown: NodeType = builder
       .addNodeType(
         name = "UNKNOWN",
-        comment = "A language-specific node"
+        comment = """Any AST node that the frontend would like to include in the AST but for
+            |which no suitable AST node is specified in the CPG specification may be
+            |included using a node of type `UNKNOWN`.
+            |""".stripMargin
       )
       .protoId(44)
       .addProperties(parserTypeName, typeFullName)
@@ -397,30 +443,6 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = methodParameterOut)
       .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
-
-    val modifierTypes = builder.addConstants(
-      category = "ModifierTypes",
-      Constant(name = "STATIC", value = "STATIC", valueType = ValueTypes.STRING, comment = "The static modifier")
-        .protoId(1),
-      Constant(name = "PUBLIC", value = "PUBLIC", valueType = ValueTypes.STRING, comment = "The public modifier")
-        .protoId(2),
-      Constant(name = "PROTECTED",
-               value = "PROTECTED",
-               valueType = ValueTypes.STRING,
-               comment = "The protected modifier").protoId(3),
-      Constant(name = "PRIVATE", value = "PRIVATE", valueType = ValueTypes.STRING, comment = "The private modifier")
-        .protoId(4),
-      Constant(name = "ABSTRACT", value = "ABSTRACT", valueType = ValueTypes.STRING, comment = "The abstract modifier")
-        .protoId(5),
-      Constant(name = "NATIVE", value = "NATIVE", valueType = ValueTypes.STRING, comment = "The native modifier")
-        .protoId(6),
-      Constant(name = "CONSTRUCTOR",
-               value = "CONSTRUCTOR",
-               valueType = ValueTypes.STRING,
-               comment = "The constructor modifier").protoId(7),
-      Constant(name = "VIRTUAL", value = "VIRTUAL", valueType = ValueTypes.STRING, comment = "The virtual modifier")
-        .protoId(8),
-    )
 
     val callRepr = builder
       .addNodeBaseType(
