@@ -221,17 +221,6 @@ object Ast extends SchemaBase {
       .addProperties(name, parserTypeName)
       .extendz(astNode)
 
-    val methodInst: NodeType = builder
-      .addNodeType(
-        name = "METHOD_INST",
-        comment = """A method instance which always has to reference a method and may have type
-                    |argument children if the referred to method is a template
-                    |""".stripMargin
-      )
-      .protoId(32)
-      .addProperties(name, signature, fullName)
-      .extendz(astNode)
-
     val methodRef: NodeType = builder
       .addNodeType(
         name = "METHOD_REF",
@@ -408,9 +397,6 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = jumpTarget)
       .addOutEdge(edge = ast, inNode = unknown)
       .addOutEdge(edge = ast, inNode = controlStructure)
-
-    methodInst
-      .addOutEdge(edge = ast, inNode = typeArgument)
 
     unknown
       .addOutEdge(edge = ast, inNode = member)

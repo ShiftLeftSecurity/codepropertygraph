@@ -11,7 +11,6 @@ import io.shiftleft.semanticcpg.passes.compat.bindingtablecompat.BindingTableCom
 import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
 import io.shiftleft.semanticcpg.passes.linking.calllinker.CallLinker
-import io.shiftleft.semanticcpg.passes.linking.capturinglinker.CapturingLinker
 import io.shiftleft.semanticcpg.passes.linking.filecompat.FileNameCompat
 import io.shiftleft.semanticcpg.passes.linking.linker.Linker
 import io.shiftleft.semanticcpg.passes.linking.memberaccesslinker.MemberAccessLinker
@@ -64,7 +63,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new ArgumentCompat(cpg),
           new ReceiverEdgePass(cpg),
           new MethodDecoratorPass(cpg),
-          new CapturingLinker(cpg),
           new Linker(cpg),
           new FileNameCompat(cpg),
           new FileCreationPass(cpg),
@@ -84,7 +82,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new TypeDeclStubCreator(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
-          new CapturingLinker(cpg),
           new Linker(cpg),
           new FileCreationPass(cpg),
           new BindingTableCompat(cpg),
@@ -102,7 +99,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new TypeDeclStubCreator(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
-          new CapturingLinker(cpg),
           new Linker(cpg),
           new FileNameCompat(cpg),
           new FileCreationPass(cpg),
@@ -121,7 +117,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new ArgumentCompat(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
-          new CapturingLinker(cpg),
           new Linker(cpg),
           new FileNameCompat(cpg),
           new FileCreationPass(cpg),
@@ -135,7 +130,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
         Iterator(
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
-          new CapturingLinker(cpg),
           new Linker(cpg),
           new FileNameCompat(cpg),
           new FileCreationPass(cpg),
@@ -149,7 +143,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
         Iterator(
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
-          new CapturingLinker(cpg),
           new Linker(cpg),
           new FileNameCompat(cpg),
           new FileCreationPass(cpg),

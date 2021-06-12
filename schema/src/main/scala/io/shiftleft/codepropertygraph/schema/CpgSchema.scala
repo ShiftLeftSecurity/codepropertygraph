@@ -25,7 +25,6 @@ class CpgSchema(builder: SchemaBuilder) {
   val shortcuts = Shortcuts(builder, base, method, ast, typeSchema, fs)
 
   val sourceSpecific = Comment(builder, base, ast, fs)
-  val closure = Closure(builder, base, method, ast, callGraph)
   val tagsAndLocation = TagsAndLocation(builder, base, typeSchema, method, ast, fs, callGraph)
   val finding = Finding(builder, base)
   val deprecated = Deprecated(builder, base, method, typeSchema, tagsAndLocation, ast)

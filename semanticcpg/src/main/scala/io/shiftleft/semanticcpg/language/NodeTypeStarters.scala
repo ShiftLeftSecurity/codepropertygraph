@@ -309,7 +309,4 @@ class NodeTypeStarters(cpg: Cpg) {
   @Doc("All tags with given name")
   def tag(name: String): Traversal[nodes.Tag] = tag.name(name)
 
-  @Doc("All closure bindings (binding of a LOCAL or METHOD_PARAMETER_IN into the closure of a method)")
-  def closureBinding: Traversal[nodes.ClosureBinding] =
-    cpg.graph.nodes(NodeTypes.CLOSURE_BINDING).cast[nodes.ClosureBinding]
 }
