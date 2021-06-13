@@ -36,6 +36,25 @@ class CPGQLServerTests extends AnyWordSpec with Matchers {
     ujson.read(getResponse.bytes)
   }
 
+  "foo1" in Fixture() { host =>
+    val webSocketTextMsg = scala.concurrent.Promise[String]()
+    cask.util.WsClient.connect(s"$host/connect") {
+      case cask.Ws.Text(msg) => webSocketTextMsg.success(msg)
+    }
+    val wsMsg = Await.result(webSocketTextMsg.future, DefaultPromiseAwaitTimeout)
+    wsMsg shouldBe "connected"
+  }
+
+  // copy of "allow posting a simple query without any websocket connections established" in Fixture() { host =>
+  "foo2" in Fixture() { host =>
+    val postQueryResponse = postQuery(host, "1")
+    postQueryResponse.obj.keySet should contain("success")
+    val UUIDResponse = postQueryResponse("uuid").str
+    UUIDResponse should not be empty
+    postQueryResponse("success").bool shouldBe true
+  }
+
+
   "CPGQLServer" should {
 
     "allow websocket connections to the `/connect` endpoint" in Fixture() { host =>
@@ -209,11 +228,23 @@ object Fixture {
       .setHandler(ammServer.defaultHandler)
       .build
     server.start()
-    val res =
-      try { f(httpEndpoint) } finally {
-        server.stop()
-        ammonite.shutdown()
-      }
+    // val res =
+    //   try {
+    //     f(httpEndpoint)
+    //   } finally {
+    //     server.stop()
+    //     println("XXXX0")
+    //     val res0 = ammonite.shutdown()
+    //     println("XXXX1")
+    //     res0
+    //   }
+    // println("XXXX2")
+    // res
+    val res = f(httpEndpoint)
+    Thread.sleep(1000)
+    server.stop()
+    Thread.sleep(1000)
+    ammonite.shutdown()
     res
   }
 }
