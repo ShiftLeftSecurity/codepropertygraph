@@ -2,8 +2,11 @@ package io.shiftleft.fuzzyc2cpg.querying
 
 import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.nodemethods.ILocationCreator
 
 class LocationTests extends FuzzyCCodeToCpgSuite {
+
+  implicit val locationCreator: ILocationCreator = LocationCreator
 
   override val code = """
    int my_func(int param1) {

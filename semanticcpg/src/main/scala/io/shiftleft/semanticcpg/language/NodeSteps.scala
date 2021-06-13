@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.codedumper.CodeDumper
+import io.shiftleft.semanticcpg.language.nodemethods.ILocationCreator
 import overflowdb.Node
 import overflowdb.traversal.help.Doc
 import overflowdb.traversal.{Traversal, help}
@@ -46,7 +47,7 @@ class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) exte
       |on the user's side.
       |""".stripMargin
   )
-  def location: Traversal[NewLocation] =
+  def location(implicit locationCreator: ILocationCreator): Traversal[NewLocation] =
     traversal.map(_.location)
 
   @Doc(
@@ -58,7 +59,7 @@ class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) exte
       |This only works for source frontends.
       |""".stripMargin
   )
-  def dump: List[String] =
+  def dump(implicit locationCreator: ILocationCreator): List[String] =
     _dump(highlight = true)
 
   @Doc(
@@ -69,10 +70,10 @@ class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) exte
       |to the expression. No color highlighting.
       |""".stripMargin
   )
-  def dumpRaw: List[String] =
+  def dumpRaw(implicit locationCreator: ILocationCreator): List[String] =
     _dump(highlight = false)
 
-  private def _dump(highlight: Boolean): List[String] = {
+  private def _dump(highlight: Boolean)(implicit locationCreator: ILocationCreator): List[String] = {
     var language: Option[String] = null // initialized on first element - need the graph for this
     traversal.map { node =>
       if (language == null) language = new Cpg(node.graph).metaData.language.headOption

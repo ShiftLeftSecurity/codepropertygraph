@@ -3,10 +3,13 @@ package io.shiftleft.fuzzyc2cpg.codedumper
 import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.codedumper.CodeDumper
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.nodemethods.ILocationCreator
 
 import java.util.regex.Pattern
 
 class CodeDumperTests extends FuzzyCCodeToCpgSuite {
+
+  implicit val locationCreator: ILocationCreator = LocationCreator
 
   override val code = """
                 | // A comment

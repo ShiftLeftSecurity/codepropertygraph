@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.language
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
+import io.shiftleft.semanticcpg.language.nodemethods.ILocationCreator
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
@@ -105,6 +106,7 @@ class StepsTest extends AnyWordSpec with Matchers {
     }
 
     "operating on NewNode" in {
+      implicit val locationCreator: ILocationCreator = LocationCreator
       val json = cpg.method.name("foo").location.toJson
       val parsed = parse(json).children.head //exactly one result for the above query
       (parsed \ "symbol") shouldBe JString("foo")

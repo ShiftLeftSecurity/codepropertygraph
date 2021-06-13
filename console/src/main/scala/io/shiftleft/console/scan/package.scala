@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.nodemethods.ILocationCreator
 import overflowdb.traversal._
 
 package object scan {
@@ -91,7 +92,7 @@ package object scan {
   /**
     * Print human readable list of findings to standard out.
     * */
-  def outputFindings(cpg: Cpg): Unit = {
+  def outputFindings(cpg: Cpg)(implicit locationCreator: ILocationCreator): Unit = {
     cpg.finding.sortBy(_.score.toInt).foreach { finding =>
       val evidence = finding.evidence.headOption
         .map { e =>

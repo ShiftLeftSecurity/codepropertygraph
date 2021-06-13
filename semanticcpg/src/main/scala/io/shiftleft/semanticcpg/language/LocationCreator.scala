@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.semanticcpg.language.nodemethods.ILocationCreator
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal._
 
@@ -8,7 +9,7 @@ import scala.annotation.tailrec
 
 /* TODO MP: this should be part of the normal steps, rather than matching on the type at runtime
  * all (and only) steps extending DataFlowObject should/must have `newSink`, `newSource` and `newLocation` */
-object LocationCreator {
+object LocationCreator extends ILocationCreator {
 
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
