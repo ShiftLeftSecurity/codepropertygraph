@@ -7,7 +7,7 @@ import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
 
-class NodeMethods(val node: AbstractNode) extends NodeExtension {
+class NodeMethods(val node: AbstractNode) extends AnyVal with NodeExtension {
 
   def location(implicit finder: NodeExtensionFinder): NewLocation =
     node match {

@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.NodeExtension
 import io.shiftleft.semanticcpg.language._
 
-class AstNodeMethods(val node: AstNode) extends NodeExtension {
+class AstNodeMethods(val node: AstNode) extends AnyVal with NodeExtension {
 
   /**
     * Indicate whether the AST node represents a control structure,

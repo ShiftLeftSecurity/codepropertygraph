@@ -14,7 +14,7 @@ import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
 
-class MethodMethods(val method: Method) extends NodeExtension with HasLocation {
+class MethodMethods(val method: Method) extends AnyVal with NodeExtension with HasLocation {
 
   def parameter: Traversal[MethodParameterIn] =
     method._methodParameterInViaAstOut

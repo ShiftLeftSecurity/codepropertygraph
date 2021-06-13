@@ -7,7 +7,7 @@ import io.shiftleft.semanticcpg.utils.MemberAccess
 
 import scala.annotation.tailrec
 
-class ExpressionMethods(val node: AstNode) extends NodeExtension {
+class ExpressionMethods(val node: AstNode) extends AnyVal with NodeExtension {
 
   /**
     * Traverse to it's parent expression (e.g. call or return) by following the incoming AST

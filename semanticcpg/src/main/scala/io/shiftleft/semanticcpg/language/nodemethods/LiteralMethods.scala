@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{Literal, NewLocation}
 import io.shiftleft.semanticcpg.NodeExtension
 import io.shiftleft.semanticcpg.language.{HasLocation, LocationCreator, _}
 
-class LiteralMethods(val literal: Literal) extends NodeExtension with HasLocation {
+class LiteralMethods(val literal: Literal) extends AnyVal with NodeExtension with HasLocation {
   override def location: NewLocation = {
     LocationCreator(
       literal,

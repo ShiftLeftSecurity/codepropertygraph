@@ -6,7 +6,7 @@ import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
 
-class CfgNodeMethods(val node: CfgNode) extends NodeExtension {
+class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {
 
   /**
     * Textual representation of CFG node

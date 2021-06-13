@@ -4,7 +4,7 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.NodeExtension
 
-class WithinMethodMethods(val node: WithinMethod) extends NodeExtension {
+class WithinMethodMethods(val node: WithinMethod) extends AnyVal with NodeExtension {
   def method: Method = node match {
     case node: Method => node
     case _: MethodParameterIn | _: MethodParameterOut | _: MethodReturn =>

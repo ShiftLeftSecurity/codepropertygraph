@@ -6,7 +6,7 @@ import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
 
-class StoredNodeMethods(val node: StoredNode) extends NodeExtension {
+class StoredNodeMethods(val node: StoredNode) extends AnyVal with NodeExtension {
   def tag: Traversal[Tag] = {
     node._taggedByOut.asScala.map(_.asInstanceOf[Tag]).to(Traversal)
   }
