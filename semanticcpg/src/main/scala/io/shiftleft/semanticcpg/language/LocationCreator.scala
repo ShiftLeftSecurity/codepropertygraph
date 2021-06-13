@@ -27,15 +27,6 @@ object LocationCreator {
       case Some(n: HasLocation) => n.location
       case _                    => LocationCreator.emptyLocation("", None)
     }
-
-//    node match {
-//      case call: CallRepr =>
-//      case methodRef: MethodRef =>
-//        apply(
-//        )
-//      case source: Source =>
-//        apply(source.node)
-//    }
   }
 
   def apply(
