@@ -1,11 +1,12 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.semanticcpg.NodeExtension
 import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
 
-class CfgNodeMethods(val node: CfgNode) extends AnyVal {
+class CfgNodeMethods(val node: CfgNode) extends NodeExtension {
 
   /**
     * Textual representation of CFG node

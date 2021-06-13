@@ -2,11 +2,12 @@ package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Call, Expression}
+import io.shiftleft.semanticcpg.NodeExtension
 import io.shiftleft.semanticcpg.utils.MemberAccess
 
 import scala.annotation.tailrec
 
-class ExpressionMethods(val node: AstNode) extends AnyVal {
+class ExpressionMethods(val node: AstNode) extends NodeExtension {
 
   /**
     * Traverse to it's parent expression (e.g. call or return) by following the incoming AST

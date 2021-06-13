@@ -46,7 +46,7 @@ class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) exte
       |on the user's side.
       |""".stripMargin
   )
-  def location: Traversal[NewLocation] =
+  def location(implicit finder: NodeExtensionFinder): Traversal[NewLocation] =
     traversal.map(_.location)
 
   @Doc(
@@ -58,7 +58,7 @@ class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) exte
       |This only works for source frontends.
       |""".stripMargin
   )
-  def dump: List[String] =
+  def dump(implicit finder: NodeExtensionFinder): List[String] =
     _dump(highlight = true)
 
   @Doc(
@@ -69,10 +69,10 @@ class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) exte
       |to the expression. No color highlighting.
       |""".stripMargin
   )
-  def dumpRaw: List[String] =
+  def dumpRaw(implicit finder: NodeExtensionFinder): List[String] =
     _dump(highlight = false)
 
-  private def _dump(highlight: Boolean): List[String] = {
+  private def _dump(highlight: Boolean)(implicit finder: NodeExtensionFinder): List[String] = {
     var language: Option[String] = null // initialized on first element - need the graph for this
     traversal.map { node =>
       if (language == null) language = new Cpg(node.graph).metaData.language.headOption
