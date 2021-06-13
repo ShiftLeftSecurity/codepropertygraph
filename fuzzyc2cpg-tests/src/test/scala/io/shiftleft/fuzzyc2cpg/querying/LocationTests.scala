@@ -5,6 +5,8 @@ import io.shiftleft.semanticcpg.language._
 
 class LocationTests extends FuzzyCCodeToCpgSuite {
 
+  implicit val finder: NodeExtensionFinder = DefaultNodeExtensionFinder
+
   override val code = """
    int my_func(int param1) {
       int x = foo(param1);

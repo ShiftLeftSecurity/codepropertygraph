@@ -12,7 +12,7 @@ object LocationCreator {
 
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  def apply(node: StoredNode): NewLocation = {
+  def apply(node: StoredNode)(implicit finder: NodeExtensionFinder): NewLocation = {
     try {
       location(node)
     } catch {
@@ -22,84 +22,10 @@ object LocationCreator {
     }
   }
 
-  private def location(node: StoredNode): NewLocation = {
-    node match {
-      case paramIn: MethodParameterIn =>
-        apply(
-          paramIn,
-          paramIn.name,
-          paramIn.label,
-          paramIn.lineNumber,
-          paramIn.method
-        )
-      case paramOut: MethodParameterOut =>
-        apply(
-          paramOut,
-          paramOut.name,
-          paramOut.label,
-          paramOut.lineNumber,
-          paramOut.method
-        )
-      case methodReturn: MethodReturn =>
-        apply(
-          methodReturn,
-          "$ret",
-          methodReturn.label,
-          methodReturn.lineNumber,
-          methodReturn.method
-        )
-      case call: CallRepr =>
-        apply(
-          call,
-          call.code,
-          call.label,
-          call.lineNumber,
-          call.method
-        )
-      case method: Method =>
-        apply(
-          method,
-          method.name,
-          method.label,
-          method.lineNumber,
-          method
-        )
-      case identifier: Identifier =>
-        apply(
-          identifier,
-          identifier.name,
-          identifier.label,
-          identifier.lineNumber,
-          identifier.method
-        )
-      case literal: Literal =>
-        apply(
-          literal,
-          literal.code,
-          literal.label,
-          literal.lineNumber,
-          literal.method
-        )
-      case local: Local =>
-        apply(
-          local,
-          local.name,
-          local.label,
-          local.lineNumber,
-          local.method.head
-        )
-      case methodRef: MethodRef =>
-        apply(
-          methodRef,
-          methodRef.code,
-          methodRef.label,
-          methodRef.lineNumber,
-          methodRef._methodViaContainsIn.next()
-        )
-      case source: Source =>
-        apply(source.node)
-      case node =>
-        emptyLocation(node.label, Some(node))
+  private def location(node: StoredNode)(implicit finder: NodeExtensionFinder): NewLocation = {
+    finder(node) match {
+      case Some(n: HasLocation) => n.location
+      case _                    => LocationCreator.emptyLocation("", None)
     }
   }
 
