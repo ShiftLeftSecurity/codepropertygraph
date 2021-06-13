@@ -1,8 +1,8 @@
 package io.shiftleft.semanticcpg.passes.codepencegraph
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.Method
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominatorFrontier, ReverseCpgCfgAdapter}
@@ -13,12 +13,12 @@ import scala.jdk.CollectionConverters._
 /**
   * This pass has ContainsEdgePass and CfgDominatorPass as prerequisites.
   */
-class CdgPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
+class CdgPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
   import CdgPass.logger
 
   override def partIterator: Iterator[Method] = cpg.method.iterator
 
-  override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
+  override def runOnPart(method: Method): Iterator[DiffGraph] = {
 
     val dominanceFrontier = new CfgDominatorFrontier(new ReverseCpgCfgAdapter, new CpgPostDomTreeAdapter)
 
@@ -30,10 +30,10 @@ class CdgPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     postDomFrontiers.foreach {
       case (node, postDomFrontierNode) =>
         postDomFrontierNode match {
-          case _: nodes.Literal | _: nodes.Identifier | _: nodes.Call | _: nodes.MethodRef | _: nodes.Unknown |
-              _: nodes.ControlStructure | _: nodes.JumpTarget => {
-            dstGraph.addEdgeInOriginal(postDomFrontierNode.asInstanceOf[nodes.StoredNode],
-                                       node.asInstanceOf[nodes.StoredNode],
+          case _: Literal | _: Identifier | _: Call | _: MethodRef | _: Unknown | _: ControlStructure |
+              _: JumpTarget => {
+            dstGraph.addEdgeInOriginal(postDomFrontierNode.asInstanceOf[StoredNode],
+                                       node.asInstanceOf[StoredNode],
                                        EdgeTypes.CDG)
           }
           case _ =>

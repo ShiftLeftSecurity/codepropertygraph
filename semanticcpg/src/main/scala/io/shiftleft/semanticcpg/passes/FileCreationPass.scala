@@ -1,10 +1,11 @@
 package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, PropertyNames, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes.{NewFile, StoredNode}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, PropertyNames}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.structure.File
+import io.shiftleft.semanticcpg.language.types.structure.FileTraversal
 import io.shiftleft.semanticcpg.passes.linking.linker.Linker
 
 import scala.collection.mutable
@@ -17,17 +18,17 @@ class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    val originalFileNameToNode = mutable.Map.empty[String, nodes.StoredNode]
-    val newFileNameToNode = mutable.Map.empty[String, nodes.NewFile]
+    val originalFileNameToNode = mutable.Map.empty[String, StoredNode]
+    val newFileNameToNode = mutable.Map.empty[String, NewFile]
 
     cpg.file.foreach { node =>
       originalFileNameToNode += node.name -> node
     }
 
-    def createFileIfDoesNotExist(srcNode: nodes.StoredNode, destFullName: String): Unit = {
-      val dstFullName = if (destFullName == "") { File.UNKNOWN } else { destFullName }
+    def createFileIfDoesNotExist(srcNode: StoredNode, destFullName: String): Unit = {
+      val dstFullName = if (destFullName == "") { FileTraversal.UNKNOWN } else { destFullName }
       val newFile = newFileNameToNode.getOrElseUpdate(dstFullName, {
-        val file = nodes.NewFile().name(dstFullName).order(0)
+        val file = NewFile().name(dstFullName).order(0)
         dstGraph.addNode(file)
         file
       })
@@ -35,7 +36,7 @@ class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
     }
 
     // Create SOURCE_FILE edges from nodes of various types
-    // to FILE nodes.
+    // to FILE
 
     Linker.linkToSingle(
       cpg,

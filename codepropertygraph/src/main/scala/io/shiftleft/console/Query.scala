@@ -1,7 +1,7 @@
 package io.shiftleft.console
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import overflowdb.traversal.Traversal
 
 case class CodeExamples(positive: List[String], negative: List[String])
@@ -11,7 +11,7 @@ case class Query(name: String,
                  title: String,
                  description: String,
                  score: Double,
-                 traversal: Cpg => Traversal[nodes.StoredNode],
+                 traversal: Cpg => Traversal[StoredNode],
                  traversalAsString: String = "",
                  tags: List[String] = List(),
                  language: String = "",
@@ -40,4 +40,4 @@ object Query {
   }
 }
 
-case class TraversalWithStrRep(traversal: Cpg => Traversal[nodes.StoredNode], strRep: String = "")
+case class TraversalWithStrRep(traversal: Cpg => Traversal[StoredNode], strRep: String = "")

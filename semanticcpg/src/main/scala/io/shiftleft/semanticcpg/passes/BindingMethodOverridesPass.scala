@@ -1,14 +1,15 @@
 package io.shiftleft.semanticcpg.passes
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{PropertyNames, nodes}
+import io.shiftleft.codepropertygraph.generated.PropertyNames
+import io.shiftleft.codepropertygraph.generated.nodes.{Binding, TypeDecl}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
 import scala.collection.mutable
 
 class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
-  val overwritten = mutable.HashSet[nodes.Binding]()
-  val bindingTable = scala.collection.mutable.HashMap[(String, String, nodes.TypeDecl), nodes.Binding]()
+  val overwritten = mutable.HashSet[Binding]()
+  val bindingTable = scala.collection.mutable.HashMap[(String, String, TypeDecl), Binding]()
 
   override def run(): Iterator[DiffGraph] = {
     val diffGraph = DiffGraph.newBuilder
@@ -39,7 +40,7 @@ class BindingMethodOverridesPass(cpg: Cpg) extends CpgPass(cpg) {
     Iterator(diffGraph.build())
   }
 
-  def markRecurse(binding: nodes.Binding): Unit = {
+  def markRecurse(binding: Binding): Unit = {
     val wasAlreadyOverwritten = overwritten.add(binding)
     if (wasAlreadyOverwritten) {
       for (parentType <- binding._typeDeclViaBindsIn._typeViaInheritsFromOut;

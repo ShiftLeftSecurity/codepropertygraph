@@ -1,7 +1,8 @@
 package io.shiftleft.semanticcpg.codedumper
 
 import better.files.File
-import io.shiftleft.codepropertygraph.generated.{Languages, nodes}
+import io.shiftleft.codepropertygraph.generated.Languages
+import io.shiftleft.codepropertygraph.generated.nodes.{Expression, Method, NewLocation}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -16,7 +17,7 @@ object CodeDumper {
   /**
     * Dump string representation of code at given `location`.
     * */
-  def dump(location: nodes.NewLocation, language: Option[String], highlight: Boolean): String = {
+  def dump(location: NewLocation, language: Option[String], highlight: Boolean): String = {
     val filename = location.filename
 
     if (location.node.isEmpty) {
@@ -31,15 +32,15 @@ object CodeDumper {
     }
 
     val method = node match {
-      case n: nodes.Method     => Some(n)
-      case n: nodes.Expression => Some(n.method)
-      case _                   => None
+      case n: Method     => Some(n)
+      case n: Expression => Some(n.method)
+      case _             => None
     }
 
     val lineToHighlight = location.lineNumber
     method
       .collect {
-        case m: nodes.Method if m.lineNumber.isDefined && m.lineNumberEnd.isDefined =>
+        case m: Method if m.lineNumber.isDefined && m.lineNumberEnd.isDefined =>
           val rawCode = code(filename, m.lineNumber.get, m.lineNumberEnd.get, lineToHighlight)
           if (highlight) {
             SourceHighlighter.highlight(Source(rawCode, language.get))

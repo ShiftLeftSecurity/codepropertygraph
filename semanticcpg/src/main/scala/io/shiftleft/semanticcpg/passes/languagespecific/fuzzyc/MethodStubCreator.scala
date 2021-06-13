@@ -1,8 +1,14 @@
 package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewMethodReturn}
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes.{
+  MethodBase,
+  NewBlock,
+  NewMethod,
+  NewMethodParameterIn,
+  NewMethodReturn
+}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
@@ -17,7 +23,7 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
 
   // Since the method fullNames for fuzzyc are not unique, we do not have
   // a 1to1 relation and may overwrite some values. We deem this ok for now.
-  private var methodFullNameToNode = Map[String, nodes.MethodBase]()
+  private var methodFullNameToNode = Map[String, MethodBase]()
   private var methodToParameterCount = Map[NameAndSignature, Int]()
 
   override def init(): Unit = {
@@ -57,9 +63,8 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
                                fullName: String,
                                signature: String,
                                parameterCount: Int,
-                               dstGraph: DiffGraph.Builder): nodes.MethodBase = {
-    val methodNode = nodes
-      .NewMethod()
+                               dstGraph: DiffGraph.Builder): MethodBase = {
+    val methodNode = NewMethod()
       .name(name)
       .fullName(fullName)
       .isExternal(true)
@@ -73,8 +78,7 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
     for (parameterOrder <- 1 to parameterCount) {
       val nameAndCode = s"p$parameterOrder"
 
-      val methodParameterIn = nodes
-        .NewMethodParameterIn()
+      val methodParameterIn = NewMethodParameterIn()
         .code(nameAndCode)
         .order(parameterOrder)
         .name(nameAndCode)

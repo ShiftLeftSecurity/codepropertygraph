@@ -1,10 +1,10 @@
 package io.shiftleft.dataflowengineoss.language
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.{CfgNode, MethodParameterIn}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.help.Table
 
-case class Path(elements: List[nodes.CfgNode])
+case class Path(elements: List[CfgNode])
 
 object Path {
 
@@ -18,7 +18,7 @@ object Path {
         val fileName = method.file.name.headOption.getOrElse("N/A")
 
         val trackedSymbol = cfgNode match {
-          case _: nodes.MethodParameterIn =>
+          case _: MethodParameterIn =>
             val paramsPretty = method.parameter.toList.sortBy(_.order).map(_.code).mkString(", ")
             s"$methodName($paramsPretty)"
           case _ => cfgNode.statement.repr

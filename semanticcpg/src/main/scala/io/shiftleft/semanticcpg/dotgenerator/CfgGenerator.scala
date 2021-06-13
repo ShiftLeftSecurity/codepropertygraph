@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.dotgenerator
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.dotgenerator.DotSerializer.{Edge, Graph}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.Node
@@ -11,11 +12,11 @@ class CfgGenerator {
 
   val edgeType: String = EdgeTypes.CFG
 
-  def generate(methodNode: nodes.Method): Graph = {
+  def generate(methodNode: Method): Graph = {
     val vertices = methodNode.cfgNode.l ++ List(methodNode, methodNode.methodReturn) ++ methodNode.parameter.l
     val verticesToDisplay = vertices.filter(cfgNodeShouldBeDisplayed)
 
-    def edgesToDisplay(srcNode: nodes.StoredNode, visited: List[nodes.StoredNode] = List()): List[Edge] = {
+    def edgesToDisplay(srcNode: StoredNode, visited: List[StoredNode] = List()): List[Edge] = {
       if (visited.contains(srcNode)) {
         List()
       } else {
@@ -42,19 +43,19 @@ class CfgGenerator {
     )
   }
 
-  protected def expand(v: nodes.StoredNode): Iterator[Edge] = {
+  protected def expand(v: StoredNode): Iterator[Edge] = {
     v._cfgOut.asScala
-      .filter(_.isInstanceOf[nodes.StoredNode])
+      .filter(_.isInstanceOf[StoredNode])
       .map(node => Edge(v, node, edgeType = edgeType))
   }
 
   def cfgNodeShouldBeDisplayed(v: Node): Boolean = !(
-    v.isInstanceOf[nodes.Literal] ||
-      v.isInstanceOf[nodes.Identifier] ||
-      v.isInstanceOf[nodes.Block] ||
-      v.isInstanceOf[nodes.ControlStructure] ||
-      v.isInstanceOf[nodes.JumpTarget] ||
-      v.isInstanceOf[nodes.MethodParameterIn]
+    v.isInstanceOf[Literal] ||
+      v.isInstanceOf[Identifier] ||
+      v.isInstanceOf[Block] ||
+      v.isInstanceOf[ControlStructure] ||
+      v.isInstanceOf[JumpTarget] ||
+      v.isInstanceOf[MethodParameterIn]
   )
 
 }

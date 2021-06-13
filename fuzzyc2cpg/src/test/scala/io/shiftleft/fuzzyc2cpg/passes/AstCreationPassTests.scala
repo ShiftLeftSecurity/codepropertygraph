@@ -2,7 +2,8 @@ package io.shiftleft.fuzzyc2cpg.passes
 
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, Operators, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, Operators}
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should.Matchers
@@ -34,7 +35,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct for empty method" in Fixture("void method(int x) { }") { cpg =>
       cpg.method.name("method").astChildren.l match {
-        case List(param: nodes.MethodParameterIn, _: nodes.Block, ret: nodes.MethodReturn) =>
+        case List(param: MethodParameterIn, _: Block, ret: MethodReturn) =>
           ret.typeFullName shouldBe "void"
           param.typeFullName shouldBe "int"
           param.name shouldBe "x"
@@ -48,12 +49,12 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |}
         |""".stripMargin) { cpg =>
       cpg.method.name("method").block.astChildren.l match {
-        case List(local: nodes.Local, call: nodes.Call) =>
+        case List(local: Local, call: Call) =>
           local.name shouldBe "local"
           local.typeFullName shouldBe "int"
           call.name shouldBe Operators.assignment
           call.astChildren.l match {
-            case List(identifier: nodes.Identifier, literal: nodes.Literal) =>
+            case List(identifier: Identifier, literal: Literal) =>
               identifier.name shouldBe "local"
               identifier.typeFullName shouldBe "int"
               identifier.order shouldBe 1
@@ -74,7 +75,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           |  int local = x;
           |}""".stripMargin) { cpg =>
         cpg.method.block.astChildren.assignments.source.l match {
-          case List(identifier: nodes.Identifier) =>
+          case List(identifier: Identifier) =>
             identifier.code shouldBe "x"
             identifier.typeFullName shouldBe "int"
             identifier.order shouldBe 2
@@ -126,7 +127,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           assignment.target.code shouldBe "x"
           assignment.source.start.isCall.name.l shouldBe List(Operators.addition)
           assignment.source.astChildren.l match {
-            case List(id1: nodes.Identifier, id2: nodes.Identifier) =>
+            case List(id1: Identifier, id2: Identifier) =>
               id1.order shouldBe 1
               id1.code shouldBe "y"
               id2.order shouldBe 2
@@ -146,10 +147,10 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |}
       """.stripMargin) { cpg =>
       cpg.method.name("method").block.astChildren.l match {
-        case List(local: nodes.Local, innerBlock: nodes.Block) =>
+        case List(local: Local, innerBlock: Block) =>
           local.name shouldBe "x"
           innerBlock.astChildren.l match {
-            case List(localInBlock: nodes.Local) =>
+            case List(localInBlock: Local) =>
               localInBlock.name shouldBe "y"
             case _ => fail()
           }
@@ -165,7 +166,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |}
       """.stripMargin) { cpg =>
       cpg.method.name("method").block.astChildren.isControlStructure.l match {
-        case List(controlStruct: nodes.ControlStructure) =>
+        case List(controlStruct: ControlStructure) =>
           controlStruct.code shouldBe "while (x < 1)"
           controlStruct.parserTypeName shouldBe "WhileStatement"
           controlStruct.controlStructureType shouldBe ControlStructureTypes.WHILE
@@ -188,7 +189,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |}
       """.stripMargin) { cpg =>
       cpg.method.name("method").controlStructure.l match {
-        case List(controlStruct: nodes.ControlStructure) =>
+        case List(controlStruct: ControlStructure) =>
           controlStruct.code shouldBe "if (x > 0)"
           controlStruct.parserTypeName shouldBe "IfStatement"
           controlStruct.controlStructureType shouldBe ControlStructureTypes.IF
@@ -281,7 +282,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           childContainsAssignments(forStmt, 1, List("x = 0", "y = 0"))
 
           forStmt.astChildren.order(2).l match {
-            case List(condition: nodes.Expression) =>
+            case List(condition: Expression) =>
               condition.code shouldBe "x < 1"
             case _ => fail()
           }
@@ -293,7 +294,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    def childContainsAssignments(node: nodes.AstNode, i: Int, list: List[String]) = {
+    def childContainsAssignments(node: AstNode, i: Int, list: List[String]) = {
       node.astChildren.order(i).l match {
         case List(child) =>
           child.assignments.code.l shouldBe list
@@ -342,11 +343,11 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           val arg2 = call.argument(2)
           arg1.isIdentifier shouldBe true
           arg1.argumentIndex shouldBe 1
-          arg1.asInstanceOf[nodes.Identifier].name shouldBe "x"
+          arg1.asInstanceOf[Identifier].name shouldBe "x"
           arg2.isFieldIdentifier shouldBe true
           arg2.argumentIndex shouldBe 2
-          arg2.asInstanceOf[nodes.FieldIdentifier].code shouldBe "a"
-          arg2.asInstanceOf[nodes.FieldIdentifier].canonicalName shouldBe "a"
+          arg2.asInstanceOf[FieldIdentifier].code shouldBe "a"
+          arg2.asInstanceOf[FieldIdentifier].canonicalName shouldBe "a"
         case _ => fail()
       }
     }
@@ -362,11 +363,11 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           val arg2 = call.argument(2)
           arg1.isIdentifier shouldBe true
           arg1.argumentIndex shouldBe 1
-          arg1.asInstanceOf[nodes.Identifier].name shouldBe "x"
+          arg1.asInstanceOf[Identifier].name shouldBe "x"
           arg2.isFieldIdentifier shouldBe true
           arg2.argumentIndex shouldBe 2
-          arg2.asInstanceOf[nodes.FieldIdentifier].code shouldBe "a"
-          arg2.asInstanceOf[nodes.FieldIdentifier].canonicalName shouldBe "a"
+          arg2.asInstanceOf[FieldIdentifier].code shouldBe "a"
+          arg2.asInstanceOf[FieldIdentifier].canonicalName shouldBe "a"
         case _ => fail()
       }
     }
@@ -485,13 +486,13 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
                                                                       | };
       """.stripMargin) { cpg =>
       cpg.typeDecl.name("foo").l match {
-        case List(fooStruct: nodes.TypeDecl) =>
+        case List(fooStruct: TypeDecl) =>
           fooStruct.member.name("x").size shouldBe 1
           fooStruct.astChildren.isTypeDecl.l match {
-            case List(barStruct: nodes.TypeDecl) =>
+            case List(barStruct: TypeDecl) =>
               barStruct.member.name("y").size shouldBe 1
               barStruct.astChildren.isTypeDecl.l match {
-                case List(foo2Struct: nodes.TypeDecl) =>
+                case List(foo2Struct: TypeDecl) =>
                   foo2Struct.member.name("z").size shouldBe 1
                 case _ => fail()
               }

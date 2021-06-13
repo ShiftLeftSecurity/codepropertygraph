@@ -1,7 +1,6 @@
 package io.shiftleft.semanticcpg.language
 
-import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import org.json4s.native.Serialization.{write, writePretty}
 import org.json4s.{CustomSerializer, Extraction}
 import overflowdb.traversal.Traversal
@@ -98,7 +97,7 @@ class Steps[A](val traversal: Traversal[A]) extends AnyVal {
 }
 
 object Steps {
-  private lazy val nodeSerializer = new CustomSerializer[nodes.StoredNode](
+  private lazy val nodeSerializer = new CustomSerializer[StoredNode](
     implicit format =>
       (
         { case _ => ??? }, {

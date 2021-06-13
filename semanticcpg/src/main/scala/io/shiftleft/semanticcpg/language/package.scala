@@ -1,15 +1,45 @@
 package io.shiftleft.semanticcpg
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.{AbstractNode, StoredNode}
-import io.shiftleft.semanticcpg.language.callgraphextension.{Call, Method}
+import io.shiftleft.codepropertygraph.generated.nodes.{
+  AbstractNode,
+  AstNode,
+  Binding,
+  Block,
+  Call,
+  CfgNode,
+  ControlStructure,
+  Expression,
+  File,
+  Identifier,
+  Literal,
+  Local,
+  Member,
+  Method,
+  MethodParameterIn,
+  MethodParameterOut,
+  MethodRef,
+  MethodReturn,
+  Namespace,
+  NamespaceBlock,
+  NewNode,
+  StoredNode,
+  Tag,
+  Type,
+  TypeDecl,
+  WithinMethod
+}
+import io.shiftleft.semanticcpg.language.callgraphextension.{CallTraversal, MethodTraversal}
 import io.shiftleft.semanticcpg.language.dotextension.{AstNodeDot, CfgNodeDot}
 import io.shiftleft.semanticcpg.language.nodemethods._
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations._
-import io.shiftleft.semanticcpg.language.types.expressions.{Call => OriginalCall, _}
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{
+  AstNodeTraversal,
+  CfgNodeTraversal,
+  ExpressionTraversal
+}
+import io.shiftleft.semanticcpg.language.types.expressions.{CallTraversal => OriginalCall, _}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
-import io.shiftleft.semanticcpg.language.types.structure.{Method => OriginalMethod, _}
+import io.shiftleft.semanticcpg.language.types.structure.{MethodTraversal => OriginalMethod, _}
 import overflowdb.traversal.Traversal
 
 /**
@@ -22,58 +52,62 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
   // Implicit conversions from generated node types. We use these to add methods
   // to generated node types.
 
-  implicit def cfgNodeToAsNode(node: nodes.CfgNode): AstNodeMethods = new AstNodeMethods(node)
-  implicit def toExtendedNode(node: nodes.AbstractNode): NodeMethods = new NodeMethods(node)
-  implicit def toExtendedStoredNode(node: nodes.StoredNode): StoredNodeMethods = new StoredNodeMethods(node)
-  implicit def withMethodMethodsQp(node: nodes.WithinMethod): WithinMethodMethods = new WithinMethodMethods(node)
-  implicit def toAstNodeMethods(node: nodes.AstNode): AstNodeMethods = new AstNodeMethods(node)
-  implicit def toCfgNodeMethods(node: nodes.CfgNode): CfgNodeMethods = new CfgNodeMethods(node)
-  implicit def toExpressionMethods(node: nodes.Expression): ExpressionMethods = new ExpressionMethods(node)
-  implicit def toMethodMethods(node: nodes.Method): MethodMethods = new MethodMethods(node)
-  implicit def toMethodReturnMethods(node: nodes.MethodReturn): MethodReturnMethods = new MethodReturnMethods(node)
-  implicit def toCallMethods(node: nodes.Call): CallMethods = new CallMethods(node)
+  implicit def cfgNodeToAsNode(node: CfgNode): AstNodeMethods = new AstNodeMethods(node)
+  implicit def toExtendedNode(node: AbstractNode): NodeMethods = new NodeMethods(node)
+  implicit def toExtendedStoredNode(node: StoredNode): StoredNodeMethods = new StoredNodeMethods(node)
+  implicit def withMethodMethodsQp(node: WithinMethod): WithinMethodMethods = new WithinMethodMethods(node)
+  implicit def toAstNodeMethods(node: AstNode): AstNodeMethods = new AstNodeMethods(node)
+  implicit def toCfgNodeMethods(node: CfgNode): CfgNodeMethods = new CfgNodeMethods(node)
+  implicit def toExpressionMethods(node: Expression): ExpressionMethods = new ExpressionMethods(node)
+  implicit def toMethodMethods(node: Method): MethodMethods = new MethodMethods(node)
+  implicit def toMethodReturnMethods(node: MethodReturn): MethodReturnMethods = new MethodReturnMethods(node)
+  implicit def toCallMethods(node: Call): CallMethods = new CallMethods(node)
 
   // Implicit conversions from Step[NodeType, Label] to corresponding Step classes.
   // If you introduce a new Step-type, that is, one that inherits from `Steps[NodeType]`,
   // then you need to add an implicit conversion from `Steps[NodeType]` to your type
   // here.
 
-  implicit def toLiteral[A](a: A)(implicit f: A => Traversal[nodes.Literal]): Literal = new Literal(f(a))
+  implicit def toLiteral[A](a: A)(implicit f: A => Traversal[Literal]): LiteralTraversal = new LiteralTraversal(f(a))
 
-  implicit def toType[A](a: A)(implicit f: A => Traversal[nodes.Type]): Type = new Type(f(a))
-  implicit def toTypeDecl[A](a: A)(implicit f: A => Traversal[nodes.TypeDecl]): TypeDecl = new TypeDecl(f(a))
-  implicit def toCall[A](a: A)(implicit f: A => Traversal[nodes.Call]): OriginalCall = new OriginalCall(f(a))
-  implicit def toControlStructure[A](a: A)(implicit f: A => Traversal[nodes.ControlStructure]): ControlStructure =
-    new ControlStructure(f(a))
-  implicit def toIdentifier[A](a: A)(implicit f: A => Traversal[nodes.Identifier]): IdentifierTrav =
-    new IdentifierTrav(f(a))
-  implicit def toMember[A](a: A)(implicit f: A => Traversal[nodes.Member]): Member = new Member(f(a))
-  implicit def toLocal[A](a: A)(implicit f: A => Traversal[nodes.Local]): Local = new Local(f(a))
-  implicit def toMethod[A](a: A)(implicit f: A => Traversal[nodes.Method]): OriginalMethod = new OriginalMethod(f(a))
-  implicit def toMethodParameter[A](a: A)(implicit f: A => Traversal[nodes.MethodParameterIn]): MethodParameter =
-    new MethodParameter(f(a))
-  implicit def toMethodParameterOut[A](a: A)(implicit f: A => Traversal[nodes.MethodParameterOut]): MethodParameterOut =
-    new MethodParameterOut(f(a))
-  implicit def toMethodReturn[A](a: A)(implicit f: A => Traversal[nodes.MethodReturn]): MethodReturn =
-    new MethodReturn(f(a))
-  implicit def toNamespace[A](a: A)(implicit f: A => Traversal[nodes.Namespace]): Namespace = new Namespace(f(a))
-  implicit def toNamespaceBlock[A](a: A)(implicit f: A => Traversal[nodes.NamespaceBlock]): NamespaceBlock =
-    new NamespaceBlock(f(a))
-  implicit def toFile[A](a: A)(implicit f: A => Traversal[nodes.File]): File = new File(f(a))
-  implicit def toBlock[A](a: A)(implicit f: A => Traversal[nodes.Block]): Block = new Block(f(a))
-  implicit def toMethodRef[A](a: A)(implicit f: A => Traversal[nodes.MethodRef]): MethodRef = new MethodRef(f(a))
-  implicit def toBinding[A](a: A)(implicit f: A => Traversal[nodes.Binding]): Binding = new Binding(f(a))
+  implicit def toType[A](a: A)(implicit f: A => Traversal[Type]): TypeTraversal = new TypeTraversal(f(a))
+  implicit def toTypeDecl[A](a: A)(implicit f: A => Traversal[TypeDecl]): TypeDeclTraversal =
+    new TypeDeclTraversal(f(a))
+  implicit def toCall[A](a: A)(implicit f: A => Traversal[Call]): OriginalCall = new OriginalCall(f(a))
+  implicit def toControlStructure[A](a: A)(implicit f: A => Traversal[ControlStructure]): ControlStructureTraversal =
+    new ControlStructureTraversal(f(a))
+  implicit def toIdentifier[A](a: A)(implicit f: A => Traversal[Identifier]): IdentifierTraversal =
+    new IdentifierTraversal(f(a))
+  implicit def toMember[A](a: A)(implicit f: A => Traversal[Member]): MemberTraversal = new MemberTraversal(f(a))
+  implicit def toLocal[A](a: A)(implicit f: A => Traversal[Local]): LocalTraversal = new LocalTraversal(f(a))
+  implicit def toMethod[A](a: A)(implicit f: A => Traversal[Method]): OriginalMethod = new OriginalMethod(f(a))
+  implicit def toMethodParameter[A](a: A)(implicit f: A => Traversal[MethodParameterIn]): MethodParameterTraversal =
+    new MethodParameterTraversal(f(a))
+  implicit def toMethodParameterOut[A](a: A)(
+      implicit f: A => Traversal[MethodParameterOut]): MethodParameterOutTraversal =
+    new MethodParameterOutTraversal(f(a))
+  implicit def toMethodReturn[A](a: A)(implicit f: A => Traversal[MethodReturn]): MethodReturnTraversal =
+    new MethodReturnTraversal(f(a))
+  implicit def toNamespace[A](a: A)(implicit f: A => Traversal[Namespace]): NamespaceTraversal =
+    new NamespaceTraversal(f(a))
+  implicit def toNamespaceBlock[A](a: A)(implicit f: A => Traversal[NamespaceBlock]): NamespaceBlockTraversal =
+    new NamespaceBlockTraversal(f(a))
+  implicit def toFile[A](a: A)(implicit f: A => Traversal[File]): FileTraversal = new FileTraversal(f(a))
+  implicit def toBlock[A](a: A)(implicit f: A => Traversal[Block]): BlockTraversal = new BlockTraversal(f(a))
+  implicit def toMethodRef[A](a: A)(implicit f: A => Traversal[MethodRef]): MethodRefTraversal =
+    new MethodRefTraversal(f(a))
+  implicit def toBinding[A](a: A)(implicit f: A => Traversal[Binding]): BindingTraversal = new BindingTraversal(f(a))
 
   // Call graph extension
-  implicit def toMethodForCallGraph[A](a: A)(implicit f: A => Traversal[nodes.Method]): Method = new Method(f(a))
-  implicit def toCallForCallGraph[A](a: A)(implicit f: A => Traversal[nodes.Call]): Call = new Call(f(a))
+  implicit def toMethodForCallGraph[A](a: A)(implicit f: A => Traversal[Method]): MethodTraversal =
+    new MethodTraversal(f(a))
+  implicit def toCallForCallGraph[A](a: A)(implicit f: A => Traversal[Call]): CallTraversal = new CallTraversal(f(a))
   // / Call graph extension
 
-  implicit def toAstNodeDot[A, NodeType <: nodes.AstNode](a: A)(
-      implicit f: A => Traversal[NodeType]): AstNodeDot[NodeType] =
+  implicit def toAstNodeDot[A, NodeType <: AstNode](a: A)(implicit f: A => Traversal[NodeType]): AstNodeDot[NodeType] =
     new AstNodeDot(f(a))
 
-  implicit def toCfgNodeDot[A](a: A)(implicit f: A => Traversal[nodes.Method]): CfgNodeDot =
+  implicit def toCfgNodeDot[A](a: A)(implicit f: A => Traversal[Method]): CfgNodeDot =
     new CfgNodeDot(f(a))
 
   implicit def toTraversal[NodeType <: AbstractNode](node: NodeType): Traversal[NodeType] =
@@ -84,46 +118,40 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
   implicit def toNodeSteps[A, NodeType <: StoredNode](a: A)(implicit f: A => Traversal[NodeType]): NodeSteps[NodeType] =
     new NodeSteps[NodeType](f(a))
 
-  implicit def toNewNodeTrav[NodeType <: nodes.NewNode](trav: Traversal[NodeType]): NewNodeSteps[NodeType] =
+  implicit def toNewNodeTrav[NodeType <: NewNode](trav: Traversal[NodeType]): NewNodeSteps[NodeType] =
     new NewNodeSteps[NodeType](trav)
 
   implicit def toNodeTypeStarters(cpg: Cpg): NodeTypeStarters = new NodeTypeStarters(cpg)
-  implicit def toTagTraversal(trav: Traversal[nodes.Tag]): Tag = new Tag(trav)
+  implicit def toTagTraversal(trav: Traversal[Tag]): TagTraversal = new TagTraversal(trav)
 
   // ~ EvalType accessors
-  implicit def toEvalTypeAccessorsLocal[A](a: A)(
-      implicit f: A => Traversal[nodes.Local]): EvalTypeAccessors[nodes.Local] =
+  implicit def toEvalTypeAccessorsLocal[A](a: A)(implicit f: A => Traversal[Local]): EvalTypeAccessors[Local] =
     new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsMember[A](a: A)(
-      implicit f: A => Traversal[nodes.Member]): EvalTypeAccessors[nodes.Member] =
+  implicit def toEvalTypeAccessorsMember[A](a: A)(implicit f: A => Traversal[Member]): EvalTypeAccessors[Member] =
     new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsMethod[A](a: A)(
-      implicit f: A => Traversal[nodes.Method]): EvalTypeAccessors[nodes.Method] =
+  implicit def toEvalTypeAccessorsMethod[A](a: A)(implicit f: A => Traversal[Method]): EvalTypeAccessors[Method] =
     new EvalTypeAccessors(f(a))
   implicit def toEvalTypeAccessorsMethodParameterIn[A](a: A)(
-      implicit f: A => Traversal[nodes.MethodParameterIn]): EvalTypeAccessors[nodes.MethodParameterIn] =
+      implicit f: A => Traversal[MethodParameterIn]): EvalTypeAccessors[MethodParameterIn] =
     new EvalTypeAccessors(f(a))
   implicit def toEvalTypeAccessorsMethodParameterOut[A](a: A)(
-      implicit f: A => Traversal[nodes.MethodParameterOut]): EvalTypeAccessors[nodes.MethodParameterOut] =
+      implicit f: A => Traversal[MethodParameterOut]): EvalTypeAccessors[MethodParameterOut] =
     new EvalTypeAccessors(f(a))
   implicit def toEvalTypeAccessorsMethodReturn[A](a: A)(
-      implicit f: A => Traversal[nodes.MethodReturn]): EvalTypeAccessors[nodes.MethodReturn] =
+      implicit f: A => Traversal[MethodReturn]): EvalTypeAccessors[MethodReturn] =
     new EvalTypeAccessors(f(a))
   // EvalType accessors ~
 
   // ~ Modifier accessors
-  implicit def toModifierAccessorsMember[A](a: A)(
-      implicit f: A => Traversal[nodes.Member]): ModifierAccessors[nodes.Member] =
+  implicit def toModifierAccessorsMember[A](a: A)(implicit f: A => Traversal[Member]): ModifierAccessors[Member] =
     new ModifierAccessors(f(a))
-  implicit def toModifierAccessorsMethod[A](a: A)(
-      implicit f: A => Traversal[nodes.Method]): ModifierAccessors[nodes.Method] =
+  implicit def toModifierAccessorsMethod[A](a: A)(implicit f: A => Traversal[Method]): ModifierAccessors[Method] =
     new ModifierAccessors(f(a))
-  implicit def toModifierAccessorsTypeDecl[A](a: A)(
-      implicit f: A => Traversal[nodes.TypeDecl]): ModifierAccessors[nodes.TypeDecl] =
+  implicit def toModifierAccessorsTypeDecl[A](a: A)(implicit f: A => Traversal[TypeDecl]): ModifierAccessors[TypeDecl] =
     new ModifierAccessors(f(a))
   // Modifier accessors ~
 
-  implicit class NewNodeTypeDeco[NodeType <: nodes.NewNode](val node: NodeType) extends AnyVal {
+  implicit class NewNodeTypeDeco[NodeType <: NewNode](val node: NodeType) extends AnyVal {
 
     /**
     Start a new traversal from this node
@@ -135,17 +163,19 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
 }
 
 trait LowPrioImplicits extends LowLowPrioImplicits {
-  implicit def toExpression[A, NodeType <: nodes.Expression](a: A)(
-      implicit f: A => Traversal[NodeType]): Expression[NodeType] = new Expression[NodeType](f(a))
+  implicit def toExpression[A, NodeType <: Expression](a: A)(
+      implicit f: A => Traversal[NodeType]): ExpressionTraversal[NodeType] = new ExpressionTraversal[NodeType](f(a))
 
-  implicit def toEvalTypeAccessorsExpression[A, NodeType <: nodes.Expression](a: A)(
+  implicit def toEvalTypeAccessorsExpression[A, NodeType <: Expression](a: A)(
       implicit f: A => Traversal[NodeType]): EvalTypeAccessors[NodeType] =
     new EvalTypeAccessors(f(a))
 }
 
 trait LowLowPrioImplicits {
-  implicit def toCfgNode[A, NodeType <: nodes.CfgNode](a: A)(implicit f: A => Traversal[NodeType]): CfgNode[NodeType] =
-    new CfgNode(f(a))
-  implicit def toAstNode[A, NodeType <: nodes.AstNode](a: A)(implicit f: A => Traversal[NodeType]): AstNode[NodeType] =
-    new AstNode[NodeType](f(a))
+  implicit def toCfgNode[A, NodeType <: CfgNode](a: A)(
+      implicit f: A => Traversal[NodeType]): CfgNodeTraversal[NodeType] =
+    new CfgNodeTraversal(f(a))
+  implicit def toAstNode[A, NodeType <: AstNode](a: A)(
+      implicit f: A => Traversal[NodeType]): AstNodeTraversal[NodeType] =
+    new AstNodeTraversal[NodeType](f(a))
 }

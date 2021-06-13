@@ -2,7 +2,7 @@ package io.shiftleft.fuzzyc2cpg.standard
 
 import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.types.structure.File
+import io.shiftleft.semanticcpg.language.types.structure.FileTraversal
 
 class FileTests extends FuzzyCCodeToCpgSuite {
 
@@ -15,17 +15,17 @@ class FileTests extends FuzzyCCodeToCpgSuite {
 
   "should contain two file nodes in total, both with order=0" in {
     cpg.file.order.l shouldBe List(0, 0)
-    cpg.file.name(File.UNKNOWN).size shouldBe 1
-    cpg.file.nameNot(File.UNKNOWN).size shouldBe 1
+    cpg.file.name(FileTraversal.UNKNOWN).size shouldBe 1
+    cpg.file.nameNot(FileTraversal.UNKNOWN).size shouldBe 1
   }
 
   "should contain exactly one placeholder file node with `name=\"<unknown>\"/order=0`" in {
-    cpg.file(File.UNKNOWN).order.l shouldBe List(0)
-    cpg.file(File.UNKNOWN).hash.l shouldBe List()
+    cpg.file(FileTraversal.UNKNOWN).order.l shouldBe List(0)
+    cpg.file(FileTraversal.UNKNOWN).hash.l shouldBe List()
   }
 
   "should contain exactly one non-placeholder file with absolute path in `name`" in {
-    val List(x) = cpg.file.nameNot(File.UNKNOWN).l
+    val List(x) = cpg.file.nameNot(FileTraversal.UNKNOWN).l
     x.name should startWith("/")
     // C-frontend currently does not set hash but should do so
     // in the future
@@ -33,15 +33,15 @@ class FileTests extends FuzzyCCodeToCpgSuite {
   }
 
   "should allow traversing from file to its namespace blocks" in {
-    cpg.file.nameNot(File.UNKNOWN).namespaceBlock.name.toSet shouldBe Set("<global>")
+    cpg.file.nameNot(FileTraversal.UNKNOWN).namespaceBlock.name.toSet shouldBe Set("<global>")
   }
 
   "should allow traversing from file to its methods via namespace block" in {
-    cpg.file.nameNot(File.UNKNOWN).method.name.toSet shouldBe Set("foo", "bar")
+    cpg.file.nameNot(FileTraversal.UNKNOWN).method.name.toSet shouldBe Set("foo", "bar")
   }
 
   "should allow traversing from file to its type declarations via namespace block" in {
-    cpg.file.nameNot(File.UNKNOWN).typeDecl.name.toSet shouldBe Set("my_struct")
+    cpg.file.nameNot(FileTraversal.UNKNOWN).typeDecl.name.toSet shouldBe Set("my_struct")
   }
 
   "should allow traversing to namespaces" in {

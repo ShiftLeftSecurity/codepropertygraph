@@ -1,7 +1,7 @@
 package io.shiftleft.fuzzyc2cpg.testfixtures
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.layers.dataflows.{OssDataFlow, OssDataFlowOptions}
 import io.shiftleft.dataflowengineoss.queryengine.EngineContext
@@ -42,18 +42,18 @@ class DataFlowCodeToCpgSuite extends FuzzyCCodeToCpgSuite {
   protected implicit def int2IntegerOption(x: Int): Option[Integer] =
     Some(x)
 
-  protected def getMemberOfType(cpg: Cpg, typeName: String, memberName: String): Traversal[nodes.Member] =
+  protected def getMemberOfType(cpg: Cpg, typeName: String, memberName: String): Traversal[Member] =
     cpg.typeDecl.nameExact(typeName).member.nameExact(memberName)
 
-  protected def getMethodOfType(cpg: Cpg, typeName: String, methodName: String): Traversal[nodes.Method] =
+  protected def getMethodOfType(cpg: Cpg, typeName: String, methodName: String): Traversal[Method] =
     cpg.typeDecl.nameExact(typeName).method.nameExact(methodName)
 
-  protected def getLiteralOfType(cpg: Cpg, typeName: String, literalName: String): Traversal[nodes.Literal] =
+  protected def getLiteralOfType(cpg: Cpg, typeName: String, literalName: String): Traversal[Literal] =
     cpg.typeDecl.nameExact(typeName).method.isLiteral.codeExact(literalName)
 
   protected def flowToResultPairs(path: Path): List[(String, Option[Integer])] = {
     val pairs = path.elements.map {
-      case point: nodes.MethodParameterIn => {
+      case point: MethodParameterIn => {
         val method = point.method.head
         val method_name = method.name
         val code = s"$method_name(${method.parameter.l.sortBy(_.order).map(_.code).mkString(", ")})"

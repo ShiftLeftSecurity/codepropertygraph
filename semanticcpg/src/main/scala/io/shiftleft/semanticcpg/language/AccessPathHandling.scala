@@ -1,49 +1,36 @@
 package io.shiftleft.semanticcpg.language
 
-import io.shiftleft.codepropertygraph.generated.{Operators, nodes}
-import io.shiftleft.semanticcpg.accesspath.{
-  AccessElement,
-  AddressOf,
-  ConstantAccess,
-  IndirectionAccess,
-  PointerShift,
-  TrackedBase,
-  TrackedFormalReturn,
-  TrackedLiteral,
-  TrackedMethodOrTypeRef,
-  TrackedNamedVariable,
-  TrackedUnknown,
-  VariableAccess,
-  VariablePointerShift
-}
+import io.shiftleft.codepropertygraph.generated.Operators
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.semanticcpg.accesspath._
 import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
 object AccessPathHandling {
 
-  def leafToTrackedBaseAndAccessPathInternal(node: nodes.StoredNode): Option[(TrackedBase, List[AccessElement])] = {
+  def leafToTrackedBaseAndAccessPathInternal(node: StoredNode): Option[(TrackedBase, List[AccessElement])] = {
     node match {
-      case node: nodes.MethodParameterIn  => Some((TrackedNamedVariable(node.name), Nil))
-      case node: nodes.MethodParameterOut => Some((TrackedNamedVariable(node.name), Nil))
-      case node: nodes.Identifier         => Some((TrackedNamedVariable(node.name), Nil))
-      case node: nodes.Literal            => Some((TrackedLiteral(node), Nil))
-      case node: nodes.MethodRef          => Some((TrackedMethodOrTypeRef(node), Nil))
-      case node: nodes.TypeRef            => Some((TrackedMethodOrTypeRef(node), Nil))
-      case _: nodes.Return                => Some((TrackedFormalReturn, Nil))
-      case _: nodes.MethodReturn          => Some((TrackedFormalReturn, Nil))
-      case _: nodes.Unknown               => Some((TrackedUnknown, Nil))
-      case _: nodes.ControlStructure      => Some((TrackedUnknown, Nil))
+      case node: MethodParameterIn  => Some((TrackedNamedVariable(node.name), Nil))
+      case node: MethodParameterOut => Some((TrackedNamedVariable(node.name), Nil))
+      case node: Identifier         => Some((TrackedNamedVariable(node.name), Nil))
+      case node: Literal            => Some((TrackedLiteral(node), Nil))
+      case node: MethodRef          => Some((TrackedMethodOrTypeRef(node), Nil))
+      case node: TypeRef            => Some((TrackedMethodOrTypeRef(node), Nil))
+      case _: Return                => Some((TrackedFormalReturn, Nil))
+      case _: MethodReturn          => Some((TrackedFormalReturn, Nil))
+      case _: Unknown               => Some((TrackedUnknown, Nil))
+      case _: ControlStructure      => Some((TrackedUnknown, Nil))
       // FieldIdentifiers are only fake arguments, hence should not be tracked
-      case _: nodes.FieldIdentifier => Some((TrackedUnknown, Nil))
-      case _                        => None
+      case _: FieldIdentifier => Some((TrackedUnknown, Nil))
+      case _                  => None
     }
   }
 
   private val logger = LoggerFactory.getLogger(getClass)
   private var hasWarnedDeprecations = false
 
-  def memberAccessToPath(memberAccess: nodes.Call, tail: List[AccessElement]) = {
+  def memberAccessToPath(memberAccess: Call, tail: List[AccessElement]) = {
     memberAccess.name match {
       case Operators.memberAccess | Operators.indirectMemberAccess =>
         if (!hasWarnedDeprecations) {
@@ -53,8 +40,8 @@ object AccessPathHandling {
         memberAccess
           .argumentOption(2)
           .collect {
-            case lit: nodes.Literal      => ConstantAccess(lit.code)
-            case withName: nodes.HasName => ConstantAccess(withName.name)
+            case lit: Literal      => ConstantAccess(lit.code)
+            case withName: HasName => ConstantAccess(withName.name)
           }
           .getOrElse(VariableAccess) :: tail
 
@@ -66,7 +53,7 @@ object AccessPathHandling {
         memberAccess
           .argumentOption(2)
           .collect {
-            case lit: nodes.Literal => ConstantAccess(lit.code)
+            case lit: Literal => ConstantAccess(lit.code)
           }
           .getOrElse(VariableAccess) :: tail
       case Operators.indirection =>
@@ -89,7 +76,7 @@ object AccessPathHandling {
     }
   }
 
-  private def extractAccessStringToken(memberAccess: nodes.Call): AccessElement = {
+  private def extractAccessStringToken(memberAccess: Call): AccessElement = {
     memberAccess.argumentOption(2) match {
       case None => {
         logger.warn(
@@ -98,13 +85,13 @@ object AccessPathHandling {
             s" In method ${memberAccess.method.fullName}")
         VariableAccess
       }
-      case Some(literal: nodes.Literal) => ConstantAccess(literal.code)
-      case Some(fieldIdentifier: nodes.FieldIdentifier) =>
+      case Some(literal: Literal) => ConstantAccess(literal.code)
+      case Some(fieldIdentifier: FieldIdentifier) =>
         ConstantAccess(fieldIdentifier.canonicalName)
       case _ => VariableAccess
     }
   }
-  private def extractAccessIntToken(memberAccess: nodes.Call): AccessElement = {
+  private def extractAccessIntToken(memberAccess: Call): AccessElement = {
     memberAccess.argumentOption(2) match {
       case None => {
         logger.warn(
@@ -113,9 +100,9 @@ object AccessPathHandling {
             s" In method ${memberAccess.method.fullName}")
         VariablePointerShift
       }
-      case Some(literal: nodes.Literal) =>
+      case Some(literal: Literal) =>
         literal.code.toIntOption.map(PointerShift).getOrElse(VariablePointerShift)
-      case Some(fieldIdentifier: nodes.FieldIdentifier) =>
+      case Some(fieldIdentifier: FieldIdentifier) =>
         fieldIdentifier.canonicalName.toIntOption
           .map(PointerShift)
           .getOrElse(VariablePointerShift)
@@ -123,10 +110,10 @@ object AccessPathHandling {
     }
   }
 
-  def lastExpressionInBlock(block: nodes.Block): Option[nodes.Expression] =
+  def lastExpressionInBlock(block: Block): Option[Expression] =
     block._astOut.asScala
       .collect {
-        case node: nodes.Expression if !node.isInstanceOf[nodes.Local] && !node.isInstanceOf[nodes.Method] => node
+        case node: Expression if !node.isInstanceOf[Local] && !node.isInstanceOf[Method] => node
       }
       .toVector
       .sortBy(_.order)

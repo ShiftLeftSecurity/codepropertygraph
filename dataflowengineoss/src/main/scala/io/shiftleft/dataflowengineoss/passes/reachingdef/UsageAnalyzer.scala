@@ -1,7 +1,7 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import io.shiftleft.codepropertygraph.generated.{Operators, nodes}
+import io.shiftleft.codepropertygraph.generated.Operators
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.dataflowengineoss.queryengine.AccessPathUsage.toTrackedBaseAndAccessPathSimple
 import io.shiftleft.semanticcpg.accesspath.MatchResult
 import io.shiftleft.semanticcpg.language._
@@ -13,7 +13,7 @@ import io.shiftleft.semanticcpg.language._
   * definitions that are relevant as the value they define is
   * actually used by `n`.
   * */
-class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
+class UsageAnalyzer(in: Map[StoredNode, Set[Definition]]) {
 
   private val allNodes = in.keys.toList
   val usedIncomingDefs: Map[StoredNode, Map[StoredNode, Set[Definition]]] = initUsedIncomingDefs()
@@ -24,7 +24,7 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
     }.toMap
   }
 
-  private def usedIncomingDefsForNode(node: nodes.StoredNode): Map[nodes.StoredNode, Set[Definition]] = {
+  private def usedIncomingDefsForNode(node: StoredNode): Map[StoredNode, Set[Definition]] = {
     uses(node).map { use =>
       use -> in(node).filter { inElement =>
         sameVariable(use, inElement.node) || isContainer(use, inElement.node) || isPart(use, inElement.node) || isAlias(
@@ -38,9 +38,9 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
     * Determine whether the node `use` describes a container for `inElement`, e.g.,
     * use = `ptr` while inElement = `ptr->foo`.
     * */
-  private def isContainer(use: nodes.Expression, inElement: nodes.StoredNode): Boolean = {
+  private def isContainer(use: Expression, inElement: StoredNode): Boolean = {
     inElement match {
-      case call: nodes.Call if Set(Operators.fieldAccess, Operators.indirectIndexAccess).contains(call.name) =>
+      case call: Call if Set(Operators.fieldAccess, Operators.indirectIndexAccess).contains(call.name) =>
         call.argument.headOption.exists { base =>
           base.code == use.code
         }
@@ -52,15 +52,15 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
     * Determine whether `use` is a part of `inElement`, e.g.,
     * use = `argv[0]` while inElement = `argv`
     * */
-  private def isPart(use: nodes.Expression, inElement: nodes.StoredNode): Boolean = {
+  private def isPart(use: Expression, inElement: StoredNode): Boolean = {
     use match {
-      case call: nodes.Call if Set(Operators.indirectIndexAccess, Operators.fieldAccess).contains(call.name) =>
+      case call: Call if Set(Operators.indirectIndexAccess, Operators.fieldAccess).contains(call.name) =>
         inElement match {
-          case param: nodes.MethodParameterIn =>
+          case param: MethodParameterIn =>
             call.argument.headOption.exists { base =>
               base.code == param.name
             }
-          case identifier: nodes.Identifier =>
+          case identifier: Identifier =>
             call.argument.headOption.exists { base =>
               base.code == identifier.name
             }
@@ -70,11 +70,11 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
     }
   }
 
-  private def isAlias(use: nodes.Expression, inElement: nodes.StoredNode): Boolean = {
+  private def isAlias(use: Expression, inElement: StoredNode): Boolean = {
     use match {
-      case useCall: nodes.Call =>
+      case useCall: Call =>
         inElement match {
-          case inCall: nodes.Call =>
+          case inCall: Call =>
             val (useBase, useAccessPath) = toTrackedBaseAndAccessPathSimple(useCall)
             val (inBase, inAccessPath) = toTrackedBaseAndAccessPathSimple(inCall)
             useBase == inBase && useAccessPath.matchAndDiff(inAccessPath.elements)._1 == MatchResult.EXACT_MATCH
@@ -84,29 +84,29 @@ class UsageAnalyzer(in: Map[nodes.StoredNode, Set[Definition]]) {
     }
   }
 
-  def uses(node: nodes.StoredNode): Set[nodes.Expression] = {
-    val n: Set[nodes.Expression] = node match {
-      case ret: nodes.Return =>
-        ret.astChildren.collect { case x: nodes.Expression => x }.toSet
-      case call: nodes.Call =>
+  def uses(node: StoredNode): Set[Expression] = {
+    val n: Set[Expression] = node match {
+      case ret: Return =>
+        ret.astChildren.collect { case x: Expression => x }.toSet
+      case call: Call =>
         call.argument.toSet
       case _ => Set()
     }
-    n.filterNot(_.isInstanceOf[nodes.FieldIdentifier])
+    n.filterNot(_.isInstanceOf[FieldIdentifier])
   }
 
   /**
     * Compares arguments of calls with incoming definitions
     * to see if they refer to the same variable
     * */
-  def sameVariable(use: nodes.Expression, incoming: StoredNode): Boolean = {
+  def sameVariable(use: Expression, incoming: StoredNode): Boolean = {
     incoming match {
-      case param: nodes.MethodParameterIn =>
+      case param: MethodParameterIn =>
         use.code == param.name
-      case call: nodes.Call =>
+      case call: Call =>
         use.code == call.code
-      case identifier: nodes.Identifier => use.code == identifier.code
-      case _                            => false
+      case identifier: Identifier => use.code == identifier.code
+      case _                      => false
     }
   }
 

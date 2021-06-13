@@ -1,9 +1,8 @@
 package io.shiftleft.dataflowengineoss.language
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.CfgNode
 import io.shiftleft.dataflowengineoss.queryengine.{Engine, EngineContext, PathElement, ReachableByResult}
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
-import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal._
 
 import scala.collection.mutable
@@ -11,30 +10,29 @@ import scala.collection.mutable
 /**
   * Base class for nodes that can occur in data flows
   * */
-class ExtendedCfgNode(val traversal: Traversal[nodes.CfgNode]) extends AnyVal {
+class ExtendedCfgNode(val traversal: Traversal[CfgNode]) extends AnyVal {
 
-  def ddgIn(implicit semantics: Semantics): Traversal[nodes.CfgNode] = {
-    val cache = mutable.HashMap[nodes.CfgNode, Vector[PathElement]]()
+  def ddgIn(implicit semantics: Semantics): Traversal[CfgNode] = {
+    val cache = mutable.HashMap[CfgNode, Vector[PathElement]]()
     val result = traversal.flatMap(x => x.ddgIn(Vector(PathElement(x)), withInvisible = false, cache))
     cache.clear()
     result
   }
 
   def ddgInPathElem(implicit semantics: Semantics): Traversal[PathElement] = {
-    val cache = mutable.HashMap[nodes.CfgNode, Vector[PathElement]]()
+    val cache = mutable.HashMap[CfgNode, Vector[PathElement]]()
     val result = traversal.flatMap(x => x.ddgInPathElem(Vector(PathElement(x)), withInvisible = false, cache))
     cache.clear()
     result
   }
 
-  def reachableBy[NodeType <: nodes.CfgNode](sourceTravs: Traversal[NodeType]*)(
+  def reachableBy[NodeType <: CfgNode](sourceTravs: Traversal[NodeType]*)(
       implicit context: EngineContext): Traversal[NodeType] = {
     val reachedSources = reachableByInternal(sourceTravs).map(_.source)
     Traversal.from(reachedSources).cast[NodeType]
   }
 
-  def reachableByFlows[A <: nodes.CfgNode](sourceTravs: Traversal[A]*)(
-      implicit context: EngineContext): Traversal[Path] = {
+  def reachableByFlows[A <: CfgNode](sourceTravs: Traversal[A]*)(implicit context: EngineContext): Traversal[Path] = {
     val paths = reachableByInternal(sourceTravs)
       .map { result =>
         // We can get back results that start in nodes that are invisible
@@ -58,12 +56,12 @@ class ExtendedCfgNode(val traversal: Traversal[nodes.CfgNode]) extends AnyVal {
     l.headOption.map(x => x :: l.sliding(2).collect { case Seq(a, b) if a != b => b }.toList).getOrElse(List())
   }
 
-  private def reachableByInternal[NodeType <: nodes.CfgNode](sourceTravs: Seq[Traversal[NodeType]])(
+  private def reachableByInternal[NodeType <: CfgNode](sourceTravs: Seq[Traversal[NodeType]])(
       implicit context: EngineContext): List[ReachableByResult] = {
-    val sources: List[nodes.CfgNode] =
+    val sources: List[CfgNode] =
       sourceTravs
         .flatMap(_.toList)
-        .collect { case n: nodes.CfgNode => n }
+        .collect { case n: CfgNode => n }
         .toList
 
     val sinks = traversal.dedup.toList.sortBy(_.id)

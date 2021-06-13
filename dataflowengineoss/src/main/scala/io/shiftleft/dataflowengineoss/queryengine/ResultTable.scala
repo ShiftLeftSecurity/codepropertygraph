@@ -1,18 +1,18 @@
 package io.shiftleft.dataflowengineoss.queryengine
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.{CfgNode, StoredNode}
 
 import scala.jdk.CollectionConverters._
 
 class ResultTable {
 
-  private val table = new java.util.concurrent.ConcurrentHashMap[nodes.StoredNode, Vector[ReachableByResult]].asScala
+  private val table = new java.util.concurrent.ConcurrentHashMap[StoredNode, Vector[ReachableByResult]].asScala
 
   /**
     * Add all results in `value` to table entry at `key`, appending to existing
     * results.
     */
-  def add(key: nodes.StoredNode, value: Vector[ReachableByResult]): Unit = {
+  def add(key: StoredNode, value: Vector[ReachableByResult]): Unit = {
     table.asJava.compute(key, { (_, existingValue) =>
       Option(existingValue).toVector.flatten ++ value
     })
@@ -37,7 +37,7 @@ class ResultTable {
     * Retrieve list of results for `node` or None if they are not
     * available in the table.
     */
-  def get(node: nodes.StoredNode): Option[Vector[ReachableByResult]] = {
+  def get(node: StoredNode): Option[Vector[ReachableByResult]] = {
     table.get(node)
   }
 
@@ -52,9 +52,9 @@ class ResultTable {
   *                e.g., by expanding output arguments backwards into method output parameters.
   * */
 case class ReachableByResult(path: Vector[PathElement], callDepth: Int = 0, partial: Boolean = false) {
-  def source: nodes.CfgNode = path.head.node
+  def source: CfgNode = path.head.node
 
-  def unresolvedArgs: Vector[nodes.CfgNode] =
+  def unresolvedArgs: Vector[CfgNode] =
     path.collect {
       case elem if !elem.resolved =>
         elem.node
@@ -71,7 +71,4 @@ case class ReachableByResult(path: Vector[PathElement], callDepth: Int = 0, part
   * @param resolved whether we have resolved the method call this argument belongs to
   * @param outEdgeLabel label of the outgoing DDG edge
   * */
-case class PathElement(node: nodes.CfgNode,
-                       visible: Boolean = true,
-                       resolved: Boolean = true,
-                       outEdgeLabel: String = "")
+case class PathElement(node: CfgNode, visible: Boolean = true, resolved: Boolean = true, outEdgeLabel: String = "")

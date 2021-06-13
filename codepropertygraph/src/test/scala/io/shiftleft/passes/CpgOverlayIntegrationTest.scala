@@ -4,7 +4,13 @@ import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.edges.ReachingDef
-import io.shiftleft.codepropertygraph.generated.nodes.{Identifier, MethodParameterIn, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{
+  Identifier,
+  MethodParameterIn,
+  NewIdentifier,
+  NewUnknown,
+  StoredNode
+}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
@@ -45,13 +51,13 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
       // 1) add a new node
       val addNodeInverse = applyDiffAndGetInverse(cpg)(
         _.addNode(
-          nodes.NewIdentifier().code(null)
+          NewIdentifier().code(null)
         ))
       cpg.graph.nodeCount shouldBe 2
       val additionalNode = cpg.graph.V
         .label(Identifier.Label)
         .collectFirst {
-          case mpe: nodes.Identifier if mpe.code == null => mpe
+          case mpe: Identifier if mpe.code == null => mpe
         }
         .get
         .asInstanceOf[StoredNode]
@@ -125,8 +131,8 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
     DiffGraph.fromProto(inverseProto, cpg)
   }
 
-  def passAddsEdgeTo(from: nodes.StoredNode, propValue: String, cpg: Cpg): CpgPass = {
-    val newNode = nodes.NewUnknown().code(propValue)
+  def passAddsEdgeTo(from: StoredNode, propValue: String, cpg: Cpg): CpgPass = {
+    val newNode = NewUnknown().code(propValue)
     new CpgPass(cpg) {
       override def run(): Iterator[DiffGraph] = {
         val dstGraph = DiffGraph.newBuilder

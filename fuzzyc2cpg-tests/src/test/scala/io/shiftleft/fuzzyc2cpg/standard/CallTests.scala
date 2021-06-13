@@ -1,6 +1,7 @@
 package io.shiftleft.fuzzyc2cpg.standard
 
-import io.shiftleft.codepropertygraph.generated.{Operators, nodes}
+import io.shiftleft.codepropertygraph.generated.Operators
+import io.shiftleft.codepropertygraph.generated.nodes.{Call, Literal}
 import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language.{NoResolve, _}
 
@@ -34,15 +35,15 @@ class CallTests extends FuzzyCCodeToCpgSuite {
     cpg.call("add").argument.size shouldBe 2
 
     val List(arg1) = cpg.call("add").argument(1).l
-    arg1.isInstanceOf[nodes.Call] shouldBe true
-    arg1.asInstanceOf[nodes.Call].name shouldBe Operators.addition
+    arg1.isInstanceOf[Call] shouldBe true
+    arg1.asInstanceOf[Call].name shouldBe Operators.addition
     arg1.code shouldBe "1+2"
     arg1.order shouldBe 1
     arg1.argumentIndex shouldBe 1
 
     val List(arg2) = cpg.call("add").argument(2).l
-    arg2.isInstanceOf[nodes.Literal] shouldBe true
-    arg2.asInstanceOf[nodes.Literal].code shouldBe "3"
+    arg2.isInstanceOf[Literal] shouldBe true
+    arg2.asInstanceOf[Literal].code shouldBe "3"
     arg2.code shouldBe "3"
     arg2.order shouldBe 2
     arg2.argumentIndex shouldBe 2

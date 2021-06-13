@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.codepropertygraph.generated.nodes.{Expression, Literal, Method, TypeDecl}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
@@ -28,7 +29,7 @@ class MethodTests extends AnyWordSpec with Matchers {
 
   "Method traversals" should {
     "expand to type declaration" in {
-      val queryResult: List[nodes.TypeDecl] =
+      val queryResult: List[TypeDecl] =
         cpg.method.name("foo").definingTypeDecl.toList
 
       queryResult.size shouldBe 1
@@ -36,7 +37,7 @@ class MethodTests extends AnyWordSpec with Matchers {
     }
 
     "expand to literal" in {
-      val queryResult: List[nodes.Literal] =
+      val queryResult: List[Literal] =
         cpg.method.name("foo").literal.toList
 
       queryResult.size shouldBe 1
@@ -49,26 +50,26 @@ class MethodTests extends AnyWordSpec with Matchers {
     }
 
     "filter by name" in {
-      val methods: List[nodes.Method] =
+      val methods: List[Method] =
         cpg.method.name("foo").toList
       methods.size shouldBe 1
       verifyMainMethod(methods.head)
     }
 
     "filter by name with regex" in {
-      val methods: List[nodes.Method] =
+      val methods: List[Method] =
         cpg.method.name(".*foo.*").toList
       methods.size shouldBe 1
       verifyMainMethod(methods.head)
     }
 
-    def verifyMainMethod(main: nodes.Method) = {
+    def verifyMainMethod(main: Method) = {
       main.name shouldBe "foo"
       main.fullName shouldBe "foo"
     }
 
     "expand to top level expressions" in {
-      val expressions: List[nodes.Expression] =
+      val expressions: List[Expression] =
         cpg.method.name("foo").topLevelExpressions.toList
 
       expressions.size shouldBe 2
@@ -77,7 +78,7 @@ class MethodTests extends AnyWordSpec with Matchers {
     }
 
     "expand to first expression" in {
-      val expressions: List[nodes.Expression] =
+      val expressions: List[Expression] =
         cpg.method.name("foo").cfgFirst.toList
 
       expressions.size shouldBe 1
@@ -85,7 +86,7 @@ class MethodTests extends AnyWordSpec with Matchers {
     }
 
     "expand to last expression" in {
-      val expressions: List[nodes.Expression] =
+      val expressions: List[Expression] =
         cpg.method.name("foo").cfgLast.toList
 
       expressions.size shouldBe 1
@@ -109,7 +110,7 @@ class MethodTests extends AnyWordSpec with Matchers {
     }
 
     "get the isExternal property (true) for external method calls" in {
-      val methods: List[nodes.Method] =
+      val methods: List[Method] =
         cpg.method.name("bar").toList
 
       methods.size shouldBe 1
@@ -117,7 +118,7 @@ class MethodTests extends AnyWordSpec with Matchers {
     }
 
     "get the isExternal property (false) for non-external method calls" in {
-      val methods: List[nodes.Method] =
+      val methods: List[Method] =
         cpg.method.name("foo").toList
 
       methods.size shouldBe 1
@@ -125,7 +126,7 @@ class MethodTests extends AnyWordSpec with Matchers {
     }
 
     "filter by modifier" in {
-      val internalMethod: List[nodes.Method] =
+      val internalMethod: List[Method] =
         cpg.method.name("foo").hasModifier("modifiertype").toList
       internalMethod.size shouldBe 1
     }

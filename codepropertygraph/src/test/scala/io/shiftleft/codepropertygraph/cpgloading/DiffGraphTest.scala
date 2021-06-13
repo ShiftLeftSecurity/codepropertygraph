@@ -3,7 +3,7 @@ package io.shiftleft.codepropertygraph.cpgloading
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.edges.ReachingDef
-import io.shiftleft.codepropertygraph.generated.nodes.{Identifier, MethodParameterIn, NewNode, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{Identifier, MethodParameterIn, NewNode, NewUnknown, StoredNode}
 import io.shiftleft.passes.{DiffGraph, IntervalKeyPool}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -142,12 +142,12 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
     finally graph.close()
   }
 
-  def createNewNode(code: String): nodes.NewUnknown = nodes.NewUnknown().code(code)
+  def createNewNode(code: String): NewUnknown = NewUnknown().code(code)
 
   def makeEdgeBetweenExistingNodes(graph: Graph, diff: DiffGraph.Builder, codeA: String, codeB: String) = {
     val a = graph.V.has(Properties.CODE, codeA).head
     val b = graph.V.has(Properties.CODE, codeB).head
-    diff.addEdge(a.asInstanceOf[nodes.StoredNode], b.asInstanceOf[nodes.StoredNode], EdgeTypes.AST)
+    diff.addEdge(a.asInstanceOf[StoredNode], b.asInstanceOf[StoredNode], EdgeTypes.AST)
   }
 
   def makeEdgeBetweenNewNodes(diff: DiffGraph.Builder, a: NewNode, b: NewNode) =

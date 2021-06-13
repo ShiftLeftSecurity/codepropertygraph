@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.{File, Namespace, TypeDecl}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.LoneElement
@@ -18,26 +18,26 @@ class FileTests extends AnyWordSpec with Matchers with LoneElement {
 
   "generic cpg" should {
     s"find file $fileName" in {
-      val queryResult: List[nodes.File] = cpg.file.l
+      val queryResult: List[File] = cpg.file.l
 
       queryResult.map(_.name) should contain(fileName)
     }
 
     "be able to expand to class FileTest" in {
-      val queryResult: List[nodes.TypeDecl] =
+      val queryResult: List[TypeDecl] =
         cpg.file.name(fileName).typeDecl.l
 
       queryResult.loneElement.name shouldBe "FileTest"
     }
 
     "be able to expand to namespace" in {
-      val queryResult: List[nodes.Namespace] =
+      val queryResult: List[Namespace] =
         cpg.file.name(fileName).namespace.l
       queryResult.loneElement.name shouldBe "io.shiftleft.testcode.file"
     }
 
     "be able to get file in which a formal method return is defined" in {
-      val queryResult: List[nodes.File] =
+      val queryResult: List[File] =
         cpg.method.name("method").methodReturn.file.l
 
       queryResult.loneElement.name shouldBe fileName

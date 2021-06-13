@@ -1,7 +1,8 @@
 package io.shiftleft.semanticcpg.passes.compat.argumentcompat
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.codepropertygraph.generated.nodes.AstNode
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
@@ -25,7 +26,7 @@ class ArgumentCompat(cpg: Cpg) extends CpgPass(cpg) {
     }
   }
 
-  private def addArgumentEdges(callOrReturn: nodes.AstNode, diffGraph: DiffGraph.Builder): Unit = {
+  private def addArgumentEdges(callOrReturn: AstNode, diffGraph: DiffGraph.Builder): Unit = {
     callOrReturn._astOut.asScala.foreach { argument =>
       if (!argument._argumentIn.hasNext) {
         diffGraph.addEdgeInOriginal(callOrReturn, argument, EdgeTypes.ARGUMENT)

@@ -1,8 +1,8 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Expression}
-import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.json4s.JString
 import org.json4s.native.JsonMethods.parse
@@ -45,8 +45,8 @@ class StepsTest extends AnyWordSpec with Matchers {
     "filter on id" when {
       "providing one" in {
         // find an arbitrary method so we can find it again in the next step
-        val method: nodes.Method = cpg.method.head
-        val results: List[nodes.Method] = cpg.method.id(method.id).toList
+        val method: Method = cpg.method.head
+        val results: List[Method] = cpg.method.id(method.id).toList
         results.size shouldBe 1
         results.head.underlying.id
       }
@@ -54,7 +54,7 @@ class StepsTest extends AnyWordSpec with Matchers {
       "providing multiple" in {
         // find two arbitrary methods so we can find it again in the next step
         val methods = cpg.method.toList.take(2)
-        val results: List[nodes.Method] = cpg.method.id(methods.map(_.id): _*).toList
+        val results: List[Method] = cpg.method.id(methods.map(_.id): _*).toList
 
         results.size shouldBe 2
         results.toSet shouldBe methods.toSet
@@ -128,7 +128,7 @@ class StepsTest extends AnyWordSpec with Matchers {
     }
 
     "render nodes as `(label,id): properties`" in {
-      def mainMethods: Traversal[nodes.Method] = cpg.method.name("woo")
+      def mainMethods: Traversal[Method] = cpg.method.name("woo")
 
       val nodeId = mainMethods.head.id
       val printed = mainMethods.p.head
@@ -138,11 +138,11 @@ class StepsTest extends AnyWordSpec with Matchers {
     }
 
     "allows to provide custom Show instance" in {
-      def mainMethods: Steps[nodes.Method] =
+      def mainMethods: Steps[Method] =
         cpg.method.name("woo")
 
-      implicit val customShowInstance = new Show[nodes.Method] {
-        override def apply(node: nodes.Method): String = "my custom pretty printer"
+      implicit val customShowInstance = new Show[Method] {
+        override def apply(node: Method): String = "my custom pretty printer"
       }
 
       mainMethods.p.head shouldBe "my custom pretty printer"
@@ -150,13 +150,13 @@ class StepsTest extends AnyWordSpec with Matchers {
 
     "uses Show instance from package" in {
       object SomePackage {
-        implicit def packageShowInstance: Show[nodes.Method] = { _ =>
+        implicit def packageShowInstance: Show[Method] = { _ =>
           "package defined pretty printer"
         }
       }
 
       import SomePackage._
-      def mainMethods: Steps[nodes.Method] =
+      def mainMethods: Steps[Method] =
         cpg.method.name("woo")
 
       mainMethods.p.head shouldBe "package defined pretty printer"
@@ -174,7 +174,7 @@ class StepsTest extends AnyWordSpec with Matchers {
     }
 
     "provide node-specific overview" in {
-      val methodSteps = new Steps[nodes.Method](null)
+      val methodSteps = new Steps[Method](null)
       methodSteps.help should include("Available steps for Method")
       methodSteps.help should include(".namespace")
       methodSteps.help should include(".depth") //from AstNode
@@ -186,7 +186,7 @@ class StepsTest extends AnyWordSpec with Matchers {
     "provides generic help" when {
       "using verbose mode" when {
         "traversing nodes" in {
-          val methodTraversal = Traversal.empty[nodes.Method]
+          val methodTraversal = Traversal.empty[Method]
           methodTraversal.helpVerbose should include(".l")
           methodTraversal.helpVerbose should include(".label")
         }
@@ -250,7 +250,7 @@ class StepsTest extends AnyWordSpec with Matchers {
     def methodParameterOut =
       cpg.graph
         .nodes(NodeTypes.METHOD_PARAMETER_OUT)
-        .cast[nodes.MethodParameterOut]
+        .cast[MethodParameterOut]
         .name("param1")
     methodParameterOut.typ.name.head shouldBe "paramtype"
     methodParameterOut.head.typ.name.head shouldBe "paramtype"
@@ -271,7 +271,7 @@ class StepsTest extends AnyWordSpec with Matchers {
     file.typeDecl.name.head shouldBe "AClass"
     file.head.typeDecl.name.head shouldBe "AClass"
 
-    def block = cpg.graph.nodes(NodeTypes.BLOCK).cast[nodes.Block].typeFullName("int")
+    def block = cpg.graph.nodes(NodeTypes.BLOCK).cast[Block].typeFullName("int")
     block.local.name.size shouldBe 1
     block.flatMap(_.local.name).size shouldBe 1
 
@@ -281,7 +281,7 @@ class StepsTest extends AnyWordSpec with Matchers {
     methodRef.headOption.map(_.referencedMethod)
 
     // not testable in this cpg, but if it compiles it's probably fine
-    def binding = cpg.graph.nodes(NodeTypes.BINDING).cast[nodes.Binding]
+    def binding = cpg.graph.nodes(NodeTypes.BINDING).cast[Binding]
     binding.boundMethod
     binding.headOption.map(_.boundMethod)
 

@@ -3,7 +3,8 @@ package io.shiftleft.passes
 import better.files.File
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{Properties, nodes}
+import io.shiftleft.codepropertygraph.generated.Properties
+import io.shiftleft.codepropertygraph.generated.nodes.NewFile
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.traversal._
@@ -22,7 +23,7 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
 
         override def runOnPart(part: String): Iterator[DiffGraph] = {
           val diffGraph = DiffGraph.newBuilder
-          diffGraph.addNode(nodes.NewFile().name(part))
+          diffGraph.addNode(NewFile().name(part))
           Iterator(diffGraph.build())
         }
       }

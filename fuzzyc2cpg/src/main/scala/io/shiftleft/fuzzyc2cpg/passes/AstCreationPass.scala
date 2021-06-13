@@ -2,15 +2,16 @@ package io.shiftleft.fuzzyc2cpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.NewNamespaceBlock
 import io.shiftleft.fuzzyc2cpg.Global
 import io.shiftleft.fuzzyc2cpg.passes.astcreation.{AntlrCModuleParserDriver, AstVisitor}
 import io.shiftleft.passes.{DiffGraph, IntervalKeyPool, ParallelCpgPass}
-import io.shiftleft.semanticcpg.language.types.structure.Namespace
+import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import org.slf4j.LoggerFactory
 
 /**
   * Given a list of filenames, this pass creates abstract syntax trees for
-  * each file, including File and NamespaceBlock nodes. Files are processed in parallel.
+  * each file, including File and NamespaceBlock  Files are processed in parallel.
   * */
 class AstCreationPass(filenames: List[String], cpg: Cpg, keyPool: IntervalKeyPool)
     extends ParallelCpgPass[String](cpg, keyPools = Some(keyPool.split(filenames.size))) {
@@ -26,7 +27,7 @@ class AstCreationPass(filenames: List[String], cpg: Cpg, keyPool: IntervalKeyPoo
     val absolutePath = new java.io.File(filename).toPath.toAbsolutePath.normalize().toString
     val namespaceBlock = nodes
       .NewNamespaceBlock()
-      .name(Namespace.globalNamespaceName)
+      .name(NamespaceTraversal.globalNamespaceName)
       .fullName(CMetaDataPass.getGlobalNamespaceBlockFullName(Some(absolutePath)))
       .filename(absolutePath)
       .order(1)
@@ -36,7 +37,7 @@ class AstCreationPass(filenames: List[String], cpg: Cpg, keyPool: IntervalKeyPoo
     tryToParse(driver, filename, diffGraph)
   }
 
-  private def createDriver(namespaceBlock: nodes.NewNamespaceBlock): AntlrCModuleParserDriver = {
+  private def createDriver(namespaceBlock: NewNamespaceBlock): AntlrCModuleParserDriver = {
     val driver = new AntlrCModuleParserDriver()
     val astVisitor = new AstVisitor(driver, namespaceBlock, global)
     driver.addObserver(astVisitor)

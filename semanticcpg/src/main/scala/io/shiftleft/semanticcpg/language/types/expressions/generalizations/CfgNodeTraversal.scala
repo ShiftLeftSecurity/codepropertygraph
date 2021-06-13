@@ -1,13 +1,14 @@
 package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 
 import io.shiftleft.Implicits.JavaIteratorDeco
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.help.Doc
 import overflowdb.traversal.{Traversal, help}
 
-@help.Traversal(elementType = classOf[nodes.CfgNode])
-class CfgNode[A <: nodes.CfgNode](val traversal: Traversal[A]) extends AnyVal {
+@help.Traversal(elementType = classOf[CfgNode])
+class CfgNodeTraversal[A <: CfgNode](val traversal: Traversal[A]) extends AnyVal {
 
   /**
     * Textual representation of CFG node
@@ -19,16 +20,16 @@ class CfgNode[A <: nodes.CfgNode](val traversal: Traversal[A]) extends AnyVal {
   /**
   Traverse to enclosing method
     */
-  def method: Traversal[nodes.Method] =
+  def method: Traversal[Method] =
     traversal.map {
-      case method: nodes.Method =>
+      case method: Method =>
         method
-      case methodReturn: nodes.MethodReturn =>
+      case methodReturn: MethodReturn =>
         methodReturn.method
-      case expression: nodes.Expression =>
+      case expression: Expression =>
         expression.method
-      case callRepr: nodes.CallRepr =>
-        callRepr._astIn.onlyChecked.asInstanceOf[nodes.Method]
+      case callRepr: CallRepr =>
+        callRepr._astIn.onlyChecked.asInstanceOf[Method]
     }
 
   /**
@@ -36,28 +37,28 @@ class CfgNode[A <: nodes.CfgNode](val traversal: Traversal[A]) extends AnyVal {
     */
 
   @Doc("Nodes directly reachable via outgoing CFG edges")
-  def cfgNext: Traversal[nodes.CfgNode] =
+  def cfgNext: Traversal[CfgNode] =
     traversal
       .out(EdgeTypes.CFG)
       .not(_.hasLabel(NodeTypes.METHOD_RETURN))
-      .cast[nodes.CfgNode]
+      .cast[CfgNode]
 
   /**
     * Traverse to previous expression in CFG.
     */
   @Doc("Nodes directly reachable via incoming CFG edges")
-  def cfgPrev: Traversal[nodes.CfgNode] =
+  def cfgPrev: Traversal[CfgNode] =
     traversal
       .in(EdgeTypes.CFG)
       .not(_.hasLabel(NodeTypes.METHOD))
-      .cast[nodes.CfgNode]
+      .cast[CfgNode]
 
   /**
     * Recursively determine all nodes on which any of
     * the nodes in this traversal are control dependent
     * */
   @Doc("All nodes on which this node is control dependent")
-  def controlledBy: Traversal[nodes.CfgNode] =
+  def controlledBy: Traversal[CfgNode] =
     traversal.flatMap(_.controlledBy)
 
   /**
@@ -65,7 +66,7 @@ class CfgNode[A <: nodes.CfgNode](val traversal: Traversal[A]) extends AnyVal {
     * control dependent on this node
     * */
   @Doc("All nodes control dependent on this node")
-  def controls: Traversal[nodes.CfgNode] =
+  def controls: Traversal[CfgNode] =
     traversal.flatMap(_.controls)
 
   /**
@@ -73,7 +74,7 @@ class CfgNode[A <: nodes.CfgNode](val traversal: Traversal[A]) extends AnyVal {
     * this node is dominated
     * */
   @Doc("All nodes by which this node is dominated")
-  def dominatedBy: Traversal[nodes.CfgNode] =
+  def dominatedBy: Traversal[CfgNode] =
     traversal.flatMap(_.dominatedBy)
 
   /**
@@ -81,7 +82,7 @@ class CfgNode[A <: nodes.CfgNode](val traversal: Traversal[A]) extends AnyVal {
     * this node dominates
     * */
   @Doc("All nodes that are dominated by this node")
-  def dominates: Traversal[nodes.CfgNode] =
+  def dominates: Traversal[CfgNode] =
     traversal.flatMap(_.dominates)
 
   /**
@@ -89,7 +90,7 @@ class CfgNode[A <: nodes.CfgNode](val traversal: Traversal[A]) extends AnyVal {
     * this node is post dominated
     * */
   @Doc("All nodes by which this node is post dominated")
-  def postDominatedBy: Traversal[nodes.CfgNode] =
+  def postDominatedBy: Traversal[CfgNode] =
     traversal.flatMap(_.postDominatedBy)
 
   /**
@@ -97,7 +98,7 @@ class CfgNode[A <: nodes.CfgNode](val traversal: Traversal[A]) extends AnyVal {
     * this node post dominates
     * */
   @Doc("All nodes that are post dominated by this node")
-  def postDominates: Traversal[nodes.CfgNode] =
+  def postDominates: Traversal[CfgNode] =
     traversal.flatMap(_.postDominates)
 
 }
