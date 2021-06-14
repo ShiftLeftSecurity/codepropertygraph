@@ -7,7 +7,6 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
 import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
 import io.shiftleft.semanticcpg.passes.compat.argumentcompat.ArgumentCompat
-import io.shiftleft.semanticcpg.passes.compat.bindingtablecompat.BindingTableCompat
 import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
 import io.shiftleft.semanticcpg.passes.linking.calllinker.CallLinker
@@ -19,7 +18,7 @@ import io.shiftleft.semanticcpg.passes.methodexternaldecorator.MethodExternalDec
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
 import io.shiftleft.semanticcpg.passes.trim.TrimPass
-import io.shiftleft.semanticcpg.passes.{BindingMethodOverridesPass, CfgCreationPass, FileCreationPass}
+import io.shiftleft.semanticcpg.passes.{CfgCreationPass, FileCreationPass}
 
 import scala.annotation.nowarn
 
@@ -66,8 +65,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new Linker(cpg),
           new FileNameCompat(cpg),
           new FileCreationPass(cpg),
-          new BindingTableCompat(cpg),
-          new BindingMethodOverridesPass(cpg),
           new CallLinker(cpg),
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
@@ -84,8 +81,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new MethodDecoratorPass(cpg),
           new Linker(cpg),
           new FileCreationPass(cpg),
-          new BindingTableCompat(cpg),
-          new BindingMethodOverridesPass(cpg),
           new CallLinker(cpg),
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
@@ -102,8 +97,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new Linker(cpg),
           new FileNameCompat(cpg),
           new FileCreationPass(cpg),
-          new BindingTableCompat(cpg),
-          new BindingMethodOverridesPass(cpg),
           new CallLinker(cpg),
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
