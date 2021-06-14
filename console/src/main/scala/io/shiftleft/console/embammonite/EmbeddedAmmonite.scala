@@ -121,10 +121,9 @@ object EmbeddedAmmonite {
    */
 
   val predef: String =
-    """
-      | class CustomFrontend extends ammonite.repl.AmmoniteFrontEnd() {
-      |   override def width = 65536
-      |   override def height = 65536
+    """class CustomFrontend extends ammonite.repl.AmmoniteFrontEnd(ammonite.compiler.Parsers) {
+      |  override def width = 65536
+      |  override def height = 65536
       |
       |  override def readLine(reader: java.io.Reader,
       |                        output: java.io.OutputStream,
@@ -135,21 +134,20 @@ object EmbeddedAmmonite {
       |
       |  val writer = new java.io.OutputStreamWriter(output)
       |
-      | val multilineFilter = ammonite.terminal.Filter.action(
-      |   ammonite.terminal.SpecialKeys.NewLine,
-      |   ti => ammonite.interp.Parsers.split(ti.ts.buffer.mkString).isEmpty
-      | ){
-      |   case ammonite.terminal.TermState(rest, b, c, _) => ammonite.terminal.filters.BasicFilters.injectNewLine(b, c, rest)
-      | }
+      |  val multilineFilter = ammonite.terminal.Filter.action(
+      |    ammonite.terminal.SpecialKeys.NewLine,
+      |    ti => ammonite.compiler.Parsers.split(ti.ts.buffer.mkString).isEmpty) {
+      |      case ammonite.terminal.TermState(rest, b, c, _) => ammonite.terminal.filters.BasicFilters.injectNewLine(b, c, rest)
+      |    }
       |
       |  val allFilters = ammonite.terminal.Filter.merge(extraFilters, multilineFilter, ammonite.terminal.filters.BasicFilters.all)
       |
-      |  new ammonite.terminal.LineReader(width, prompt, reader, writer, allFilters, displayTransform = { (x: Vector[Char], i: Int) => (fansi.Str(""), i) } )
+      |  new ammonite.terminal.LineReader(width, prompt, reader, writer, allFilters, displayTransform = { (_: Vector[Char], i: Int) => (fansi.Str(""), i) } )
       |  .readChar(ammonite.terminal.TermState(ammonite.terminal.LazyList.continually(reader.read()), Vector.empty, 0, ""), 0)
       | }
       |}
-      | repl.frontEnd() = new CustomFrontend()
       |
+      |repl.frontEnd() = new CustomFrontend()
       |""".stripMargin
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[EmbeddedAmmonite])
