@@ -11,9 +11,19 @@ object Ast extends SchemaBase {
   override def description: String =
     """
       |The Abstract Syntax Tree (AST) Layer provides syntax trees for all compilation units.
-      |This layer MUST be created by the frontend. All nodes of the layer inherit from the
-      |node base type `AST_NODE` and the vast majority inherits from `EXPRESSION`, a child
-      |base class of `AST_NODE`.
+      |All nodes of the tree inherit from the same base class (`AST_NODE`) and are connected
+      |to their child nodes via outgoing `AST` edges.
+      |
+      |Syntax trees are typed, that is, when possible, types for all expressions are stored
+      |in the tree. Moreover, common control structure types are defined in the specification,
+      |making it possible to translate trees into corresponding control flow graphs if only
+      |these common control structure types are used, possibly by desugaring on the side of
+      |the language frontend. For cases where this is not an option,
+      |the AST specification provides means of storing language-dependent information in the
+      |AST that can be interpreted by language-dependent control flow construction passes.
+      |
+      |This layer MUST be created by the frontend.
+      |
       |""".stripMargin
 
   def apply(builder: SchemaBuilder,
@@ -224,7 +234,11 @@ object Ast extends SchemaBase {
     val methodRef: NodeType = builder
       .addNodeType(
         name = "METHOD_REF",
-        comment = "Reference to a method instance"
+        comment = """This node represents a reference to a method/function/procedure as it
+            |appears when a method is passed as an argument in a call. The `METHOD_FULL_NAME`
+            |field holds the fully-qualified name of the referenced method and the
+            |`TYPE_FULL_NAME` holds its fully-qualified type name.
+            |""".stripMargin
       )
       .protoId(333)
       .addProperties(typeFullName)
@@ -328,7 +342,7 @@ object Ast extends SchemaBase {
     val condition = builder
       .addEdgeType(
         name = "CONDITION",
-        comment = "Edge from control structure node to the expression that holds the condition"
+        comment = "The edge connects control structure nodes to the expressions that holds their conditions."
       )
       .protoId(56)
 

@@ -26,8 +26,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   StoredNode,
   Tag,
   Type,
-  TypeDecl,
-  WithinMethod
+  TypeDecl
 }
 import io.shiftleft.semanticcpg.language.callgraphextension.{CallTraversal, MethodTraversal}
 import io.shiftleft.semanticcpg.language.dotextension.{AstNodeDot, CfgNodeDot}
@@ -55,7 +54,6 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
   implicit def cfgNodeToAsNode(node: CfgNode): AstNodeMethods = new AstNodeMethods(node)
   implicit def toExtendedNode(node: AbstractNode): NodeMethods = new NodeMethods(node)
   implicit def toExtendedStoredNode(node: StoredNode): StoredNodeMethods = new StoredNodeMethods(node)
-  implicit def withMethodMethodsQp(node: WithinMethod): WithinMethodMethods = new WithinMethodMethods(node)
   implicit def toAstNodeMethods(node: AstNode): AstNodeMethods = new AstNodeMethods(node)
   implicit def toCfgNodeMethods(node: CfgNode): CfgNodeMethods = new CfgNodeMethods(node)
   implicit def toExpressionMethods(node: Expression): ExpressionMethods = new ExpressionMethods(node)

@@ -137,11 +137,6 @@ object Base extends SchemaBase {
       .protoId(57)
     // node base types
 
-    val withinMethod = builder.addNodeBaseType(
-      name = "WITHIN_METHOD",
-      comment = "Any node that can exist in a method"
-    )
-
     val declaration = builder
       .addNodeBaseType(
         name = "DECLARATION",
