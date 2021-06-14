@@ -67,7 +67,6 @@ class EmbeddedAmmonite(predef: String = "") {
     * */
   def queryAsync(q: String)(observer: QueryResult => Unit): UUID = {
     val uuid = UUID.randomUUID()
-//    println(s"adding job to queue: ${q}")
     jobQueue.add(Job(uuid, q, observer))
     uuid
   }
@@ -80,10 +79,8 @@ class EmbeddedAmmonite(predef: String = "") {
     var result: QueryResult = null
     queryAsync(q) { r =>
       result = r
-//      println("EmbeddedAmmonite.query: mutex.release")
       mutex.release()
     }
-//    println("EmbeddedAmmonite.query: mutex.acquire")
     mutex.acquire()
     result
   }
