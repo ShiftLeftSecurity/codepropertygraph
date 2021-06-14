@@ -6,7 +6,7 @@ val overflowdbVersion = "1.42"
 inThisBuild(
   List(
     organization := "io.shiftleft",
-    scalaVersion := "2.13.4",
+    scalaVersion := "2.13.6",
     resolvers ++= Seq(
       Resolver.mavenLocal,
       "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"
