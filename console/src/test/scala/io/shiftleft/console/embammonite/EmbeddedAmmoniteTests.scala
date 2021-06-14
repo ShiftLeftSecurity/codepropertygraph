@@ -17,7 +17,7 @@ class EmbeddedAmmoniteTests extends AnyWordSpec with Matchers {
     "execute a command synchronously" in {
       val shell = new EmbeddedAmmonite()
       shell.start()
-      val result = shell.query("def foo() = {\n1\n}\n foo()")
+      val result = shell.query("def foo() = {1} \n foo()")
       result.out shouldBe
         """defined function foo
           |res1: Int = 1

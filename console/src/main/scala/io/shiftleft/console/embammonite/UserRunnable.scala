@@ -43,6 +43,7 @@ class UserRunnable(queue: BlockingQueue[Job], writer: PrintWriter, reader: Buffe
   }
 
   private def sendQueryToAmmonite(job: Job): Unit = {
+    println(s"sendQueryToAmmonite: ${job.query.trim} =========")
     writer.println(job.query.trim)
     writer.println(s""""END: ${job.uuid}"""")
     writer.println(s"""throw new RuntimeException("END: ${job.uuid}")""")
@@ -51,7 +52,12 @@ class UserRunnable(queue: BlockingQueue[Job], writer: PrintWriter, reader: Buffe
 
   private def stdOutUpToMarker(): Option[String] = {
     var currentOutput: String = ""
+    println("UserRunnable: reader.readLine()")
     var line = reader.readLine()
+    println(s"line=${line.toCharArray.toSeq.map(_.toInt)}") // magic echo seq...
+//    val substr = line.substring(magicEchoSeq.size)
+//    println(substr.toCharArray.toSeq.map(_.toInt))
+//    println(substr.map(_.toChar))
     while (line != null) {
       if (!line.startsWith(magicEchoSeq) && !line.isEmpty) {
         val uuid = uuidFromLine(line)
@@ -67,6 +73,7 @@ class UserRunnable(queue: BlockingQueue[Job], writer: PrintWriter, reader: Buffe
   }
 
   private def uuidFromLine(line: String): Iterator[UUID] = {
+//    println(s"uuidFromLine: ${line.toCharArray.toSeq.map(_.toInt)}")
     endMarker.findAllIn(line).matchData.flatMap { m =>
       Try { UUID.fromString(m.group(1)) }.toOption
     }
