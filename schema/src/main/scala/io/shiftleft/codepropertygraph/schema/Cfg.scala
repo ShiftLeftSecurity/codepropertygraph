@@ -10,21 +10,20 @@ object Cfg extends SchemaBase {
     """
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, ast: Ast.Schema) =
-    new Schema(builder, base, methodSchema, ast)
+  def apply(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) =
+    new Schema(builder, methodSchema, ast)
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema, methodSchema: Method.Schema, ast: Ast.Schema) {
+  class Schema(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) {
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import ast._
-    import base._
 
     val cfgNode = builder
       .addNodeBaseType(
         name = "CFG_NODE",
         comment = "Any node that can occur as part of a control flow graph"
       )
-      .extendz(withinMethod, astNode)
+      .extendz(astNode)
 
     // Method and MethodReturn nodes are used as ENTRY and EXIT nodes respectively
     method.extendz(cfgNode)

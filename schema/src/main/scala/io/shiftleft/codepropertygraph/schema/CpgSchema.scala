@@ -18,7 +18,7 @@ class CpgSchema(builder: SchemaBuilder) {
 
   val binding = Binding(builder, base, typeSchema, method)
 
-  val cfg = Cfg(builder, base, method, ast)
+  val cfg = Cfg(builder, method, ast)
   val dominators = Dominators(builder, method, ast)
   val pdg = Pdg(builder, method, ast)
 
