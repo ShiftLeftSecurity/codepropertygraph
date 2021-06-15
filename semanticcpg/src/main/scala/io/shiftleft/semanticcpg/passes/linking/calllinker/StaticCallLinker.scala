@@ -6,6 +6,7 @@ import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
+
 import scala.collection.mutable
 
 class StaticCallLinker(cpg: Cpg) extends CpgPass(cpg) {
@@ -39,12 +40,12 @@ class StaticCallLinker(cpg: Cpg) extends CpgPass(cpg) {
       case DispatchTypes.STATIC_DISPATCH =>
         linkStaticCall(call, dstGraph)
       case DispatchTypes.DYNAMIC_DISPATCH =>
-        // Do nothing
+      // Do nothing
       case _ => logger.warn(s"Unknown dispatch type on dynamic CALL ${call.code}")
     }
   }
 
-  private def linkStaticCall(call : Call, dstGraph : DiffGraph.Builder) : Unit = {
+  private def linkStaticCall(call: Call, dstGraph: DiffGraph.Builder): Unit = {
     val resolvedMethodOption = methodFullNameToNode.get(call.methodFullName)
     if (resolvedMethodOption.isDefined) {
       dstGraph.addEdgeInOriginal(call, resolvedMethodOption.get, EdgeTypes.CALL)
@@ -54,7 +55,6 @@ class StaticCallLinker(cpg: Cpg) extends CpgPass(cpg) {
           s"SIGNATURE ${call.signature}, CODE ${call.code}")
     }
   }
-
 
 }
 

@@ -7,6 +7,7 @@ import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
+
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
@@ -37,14 +38,14 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   private def linkCall(call: Call, dstGraph: DiffGraph.Builder): Unit = {
     call.dispatchType match {
       case DispatchTypes.STATIC_DISPATCH =>
-        // Do nothing
+      // Do nothing
       case DispatchTypes.DYNAMIC_DISPATCH =>
         linkDynamicCall(call, dstGraph)
       case _ => logger.warn(s"Unknown dispatch type on dynamic CALL ${call.code}")
     }
   }
 
-  private def linkDynamicCall(call : Call, dstGraph : DiffGraph.Builder) : Unit = {
+  private def linkDynamicCall(call: Call, dstGraph: DiffGraph.Builder): Unit = {
     val receiverIt = call._receiverOut
     if (receiverIt.hasNext) {
       val receiver = receiverIt.next
