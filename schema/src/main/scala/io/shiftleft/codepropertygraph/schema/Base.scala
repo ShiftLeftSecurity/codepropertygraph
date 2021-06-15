@@ -77,10 +77,9 @@ object Base extends SchemaBase {
         name = "FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = """Full name of an element, e.g., the class name along, including its package
-                    |(e.g. \"io.shiftleft.dataflowenging.layers.dataflows.DataFlowRunner.run\").
-                    |In theory, the FULL_NAME just needs to be unique and is used for linking references,
-                    |so a consecutive integer would be valid. In practice, this should be human readable
+        comment = """This is the fully-qualified name of an entity, e.g., the fully-qualified
+                    |name of a method or type. The details of what constitutes a fully-qualified
+                    |name are language specific. This field SHOULD be human readable.
                     |""".stripMargin
       )
       .protoId(6)
