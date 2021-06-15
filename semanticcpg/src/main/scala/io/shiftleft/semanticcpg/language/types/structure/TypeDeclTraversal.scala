@@ -83,18 +83,6 @@ class TypeDeclTraversal(val traversal: Traversal[TypeDecl]) extends AnyVal {
     traversal.repeat(_.baseTypeDecl)(_.emitAllButFirst)
 
   /**
-    * Traverse to methods bound to this type decl.
-    */
-  def boundMethod: Traversal[Method] =
-    methodBinding.boundMethod
-
-  /**
-    * Traverse to the method bindings of this type declaration.
-    */
-  def methodBinding: Traversal[Binding] =
-    canonicalType.out(EdgeTypes.BINDS).cast[Binding]
-
-  /**
     * Traverse to alias type declarations.
     */
   def isAlias: Traversal[TypeDecl] =

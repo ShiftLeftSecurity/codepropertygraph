@@ -281,11 +281,6 @@ class StepsTest extends AnyWordSpec with Matchers {
     methodRef.referencedMethod
     methodRef.headOption.map(_.referencedMethod)
 
-    // not testable in this cpg, but if it compiles it's probably fine
-    def binding = cpg.graph.nodes(NodeTypes.BINDING).cast[Binding]
-    binding.boundMethod
-    binding.headOption.map(_.boundMethod)
-
     def expression: Traversal[Expression] = cpg.identifier.name("anidentifier")
     expression.expressionUp.isCall.size shouldBe 1
     expression.head.expressionUp.isCall.size shouldBe 1
