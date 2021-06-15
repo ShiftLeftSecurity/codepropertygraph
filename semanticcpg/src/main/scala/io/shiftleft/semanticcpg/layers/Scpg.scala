@@ -10,7 +10,7 @@ import io.shiftleft.semanticcpg.passes.compat.argumentcompat.ArgumentCompat
 import io.shiftleft.semanticcpg.passes.compat.bindingtablecompat.BindingTableCompat
 import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
-import io.shiftleft.semanticcpg.passes.linking.calllinker.CallLinker
+import io.shiftleft.semanticcpg.passes.linking.calllinker.StaticCallLinker
 import io.shiftleft.semanticcpg.passes.linking.filecompat.FileNameCompat
 import io.shiftleft.semanticcpg.passes.linking.linker.Linker
 import io.shiftleft.semanticcpg.passes.linking.memberaccesslinker.MemberAccessLinker
@@ -68,7 +68,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new FileCreationPass(cpg),
           new BindingTableCompat(cpg),
           new BindingMethodOverridesPass(cpg),
-          new CallLinker(cpg),
+          new StaticCallLinker(cpg),
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
           new ContainsEdgePass(cpg),
@@ -86,7 +86,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new FileCreationPass(cpg),
           new BindingTableCompat(cpg),
           new BindingMethodOverridesPass(cpg),
-          new CallLinker(cpg),
+          new StaticCallLinker(cpg),
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
           new ContainsEdgePass(cpg),
@@ -104,7 +104,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new FileCreationPass(cpg),
           new BindingTableCompat(cpg),
           new BindingMethodOverridesPass(cpg),
-          new CallLinker(cpg),
+          new StaticCallLinker(cpg),
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
           new ContainsEdgePass(cpg),
