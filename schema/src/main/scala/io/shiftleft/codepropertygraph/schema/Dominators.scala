@@ -8,6 +8,9 @@ object Dominators extends SchemaBase {
 
   override def description: String =
     """
+      |The Dominators Layer provides dominator- and post-dominator trees for all methods.
+      |It is constructed automatically from the control flow graph layer and is in turn
+      |used to automatically construct control dependence relations of the PDG layer.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) =
@@ -21,14 +24,14 @@ object Dominators extends SchemaBase {
     val dominate = builder
       .addEdgeType(
         name = "DOMINATE",
-        comment = "Points to dominated node in DOM tree"
+        comment = "This edge indicates that the source node immediately dominates the destination node."
       )
       .protoId(181)
 
     val postDominate = builder
       .addEdgeType(
         name = "POST_DOMINATE",
-        comment = "Points to dominated node in post DOM tree"
+        comment = "This edge indicates that the source node immediately post dominates the destination node."
       )
       .protoId(182)
 

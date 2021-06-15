@@ -12,7 +12,9 @@ object Cfg extends SchemaBase {
       |flow graphs are constructed by marking a sub set of the abstract syntax tree nodes
       |as control flow nodes (`CFG_NODE`) and connecting these nodes via `CFG` edges.
       |The control flow graph models both the control flow within the calculation of an
-      |expression as well as from expression to expression.
+      |expression as well as from expression to expression. The layer can be automatically
+      |generated from the syntax tree layer if only control structure types supported by
+      |this specification are employed.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) =
