@@ -480,7 +480,7 @@ object Ast extends SchemaBase {
                     | which position in the argument list the expression occurs, e.g., an
                     | `ARGUMENT_INDEX` of 1 indicates that the expression is the first argument
                     | in a method call. For calls that employ named parameters, `ARGUMENT_INDEX`
-                    | is set to -1 and the `NAME` fields holds the name of the parameter.
+                    | is set to -1 and the `ARGUMENT_NAME` fields holds the name of the parameter.
                     |""".stripMargin
       )
       .extendz(astNode)

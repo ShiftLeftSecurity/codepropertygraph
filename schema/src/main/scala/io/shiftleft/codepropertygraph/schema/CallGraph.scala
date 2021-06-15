@@ -37,13 +37,13 @@ object CallGraph extends SchemaBase {
       )
       .protoId(40)
 
-    val parameterName = builder
+    val argumentName = builder
       .addProperty(
-        name = "PARAMETER_NAME",
+        name = "ARGUMENT_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.ZeroOrOne,
         comment = """
-            |For calls involving named parameters, the `PARAMETER_NAME` field holds the
+            |For calls involving named parameters, the `ARGUMENT_NAME` field holds the
             |name of the parameter initialized by the expression. For all other calls,
             |this field is unset.
             |""".stripMargin
@@ -61,7 +61,7 @@ object CallGraph extends SchemaBase {
       .protoId(54)
 
     expression
-      .addProperties(argumentIndex, parameterName)
+      .addProperties(argumentIndex, argumentName)
 
     val evaluationStrategy = builder
       .addProperty(
