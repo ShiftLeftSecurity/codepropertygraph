@@ -19,7 +19,7 @@ import io.shiftleft.semanticcpg.passes.methodexternaldecorator.MethodExternalDec
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
 import io.shiftleft.semanticcpg.passes.trim.TrimPass
-import io.shiftleft.semanticcpg.passes.{BindingMethodOverridesPass, CfgCreationPass, FileCreationPass}
+import io.shiftleft.semanticcpg.passes.{CfgCreationPass, FileCreationPass}
 
 import scala.annotation.nowarn
 
@@ -67,7 +67,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new FileNameCompat(cpg),
           new FileCreationPass(cpg),
           new BindingTableCompat(cpg),
-          new BindingMethodOverridesPass(cpg),
           new StaticCallLinker(cpg),
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
@@ -85,7 +84,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new Linker(cpg),
           new FileCreationPass(cpg),
           new BindingTableCompat(cpg),
-          new BindingMethodOverridesPass(cpg),
           new StaticCallLinker(cpg),
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
@@ -103,7 +101,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new FileNameCompat(cpg),
           new FileCreationPass(cpg),
           new BindingTableCompat(cpg),
-          new BindingMethodOverridesPass(cpg),
           new StaticCallLinker(cpg),
           new MemberAccessLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
