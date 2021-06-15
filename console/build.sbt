@@ -51,7 +51,7 @@ val BetterFilesVersion = "3.8.0"
 val CaskVersion = "0.7.8"
 val CatsVersion = "2.3.1"
 val CirceVersion = "0.12.2"
-val AmmoniteVersion = "2.4.0"
+val AmmoniteVersion = "2.3.8-125-f6bb1cf9"
 val ZeroturnaroundVersion = "1.13"
 
 dependsOn(Projects.fuzzyc2cpg % Test)
