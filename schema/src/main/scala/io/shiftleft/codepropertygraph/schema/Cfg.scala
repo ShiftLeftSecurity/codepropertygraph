@@ -8,6 +8,11 @@ object Cfg extends SchemaBase {
 
   override def description: String =
     """
+      |The Control Flow Graph Layer provides control flow graphs for each method. Control
+      |flow graphs are constructed by marking a sub set of the abstract syntax tree nodes
+      |as control flow nodes (`CFG_NODE`) and connecting these nodes via `CFG` edges.
+      |The control flow graph models both the control flow within the calculation of an
+      |expression as well as from expression to expression.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) =
@@ -21,7 +26,10 @@ object Cfg extends SchemaBase {
     val cfgNode = builder
       .addNodeBaseType(
         name = "CFG_NODE",
-        comment = "Any node that can occur as part of a control flow graph"
+        comment = """This is the base class for all control flow nodes. It is itself
+            |a child class of `AST_NODE`, that is, all control flow graph nodes
+            |are also syntax tree nodes in the CPG specification.
+            |"""".stripMargin
       )
       .extendz(astNode)
 
@@ -43,7 +51,7 @@ object Cfg extends SchemaBase {
     val cfg = builder
       .addEdgeType(
         name = "CFG",
-        comment = "Control flow edge"
+        comment = "This edge indicates control flow from the source to the destination node."
       )
       .protoId(19)
 
