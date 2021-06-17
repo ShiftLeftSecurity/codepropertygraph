@@ -49,6 +49,18 @@ object Ast extends SchemaBase {
 
     // Base types
 
+    val order = builder
+      .addProperty(
+        name = "ORDER",
+        valueType = ValueTypes.INTEGER,
+        cardinality = Cardinality.One,
+        comment = """This integer indicates the position of the node among
+            |its siblings in the AST. The left-most child has an
+            |order of 0.
+            |""".stripMargin
+      )
+      .protoId(4)
+
     val astNode = builder
       .addNodeBaseType(
         name = "AST_NODE",

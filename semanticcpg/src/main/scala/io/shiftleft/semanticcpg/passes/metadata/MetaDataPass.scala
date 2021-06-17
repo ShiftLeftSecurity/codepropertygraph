@@ -1,27 +1,27 @@
-package io.shiftleft.fuzzyc2cpg.passes
+package io.shiftleft.semanticcpg.passes.metadata
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.codepropertygraph.generated.nodes.{NewMetaData, NewNamespaceBlock}
 import io.shiftleft.passes.{CpgPass, DiffGraph, KeyPool}
 import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, NamespaceTraversal}
 
 /**
   * A pass that creates a MetaData node, specifying that this
-  * is a CPG for C, and a NamespaceBlock for anything that
+  * is a CPG for $language, and a NamespaceBlock for anything that
   * cannot be assigned to any other namespace.
   * */
-class CMetaDataPass(cpg: Cpg, keyPool: Option[KeyPool] = None) extends CpgPass(cpg, keyPool = keyPool) {
+class MetaDataPass(cpg: Cpg, language: String, keyPool: Option[KeyPool] = None)
+    extends CpgPass(cpg, keyPool = keyPool) {
   override def run(): Iterator[DiffGraph] = {
     def addMetaDataNode(diffGraph: DiffGraph.Builder): Unit = {
-      val metaNode = NewMetaData().language(Languages.C).version("0.1")
+      val metaNode = NewMetaData().language(language).version("0.1")
       diffGraph.addNode(metaNode)
     }
 
     def addAnyNamespaceBlock(diffGraph: DiffGraph.Builder): Unit = {
       val node = NewNamespaceBlock()
         .name(NamespaceTraversal.globalNamespaceName)
-        .fullName(CMetaDataPass.getGlobalNamespaceBlockFullName(None))
+        .fullName(MetaDataPass.getGlobalNamespaceBlockFullName(None))
         .filename(FileTraversal.UNKNOWN)
         .order(1)
       diffGraph.addNode(node)
@@ -34,7 +34,7 @@ class CMetaDataPass(cpg: Cpg, keyPool: Option[KeyPool] = None) extends CpgPass(c
   }
 }
 
-object CMetaDataPass {
+object MetaDataPass {
 
   def getGlobalNamespaceBlockFullName(fileNameOption: Option[String]): String = {
     fileNameOption match {

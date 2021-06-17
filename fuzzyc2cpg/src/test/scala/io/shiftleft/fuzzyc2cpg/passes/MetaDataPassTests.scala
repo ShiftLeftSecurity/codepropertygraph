@@ -1,18 +1,20 @@
 package io.shiftleft.fuzzyc2cpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
+import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import scala.jdk.CollectionConverters._
 
-class CMetaDataPassTests extends AnyWordSpec with Matchers {
+class MetaDataPassTests extends AnyWordSpec with Matchers {
 
   "MetaDataPass" should {
     val cpg = Cpg.emptyCpg
-    new CMetaDataPass(cpg).createAndApply()
+    new MetaDataPass(cpg, Languages.C).createAndApply()
 
     "create exactly two nodes" in {
       cpg.graph.V.asScala.size shouldBe 2

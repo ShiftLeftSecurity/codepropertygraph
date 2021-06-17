@@ -8,8 +8,8 @@ object Shortcuts extends SchemaBase {
 
   override def description: String =
     """
-      |Shortcut edges calculated by the backend.
-      |These edges should NOT be created by the language frontend.
+      |The Shortcuts Layer provides shortcut edges calculated to speed up
+      |subsequent queries. Language frontends MUST NOT create shortcut edges.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder,
@@ -38,21 +38,23 @@ object Shortcuts extends SchemaBase {
     val evalType = builder
       .addEdgeType(
         name = "EVAL_TYPE",
-        comment = "Link to evaluation type"
+        comment = "This edge connects a node to its evaluation type."
       )
       .protoId(21)
 
     val contains = builder
       .addEdgeType(
         name = "CONTAINS",
-        comment = "Shortcut over multiple AST edges"
+        comment = "This edge connects a node to the method that contains it."
       )
       .protoId(28)
 
     val parameterLink = builder
       .addEdgeType(
         name = "PARAMETER_LINK",
-        comment = "Links together corresponding METHOD_PARAMETER_IN and METHOD_PARAMETER_OUT nodes. Created by backend."
+        comment = """This edge connects a method input parameter to the corresponding
+            |method output parameter.
+            |""".stripMargin
       )
       .protoId(12)
 

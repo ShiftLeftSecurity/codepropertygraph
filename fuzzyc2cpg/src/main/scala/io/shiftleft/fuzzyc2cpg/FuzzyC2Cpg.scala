@@ -2,9 +2,11 @@ package io.shiftleft.fuzzyc2cpg
 
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.fuzzyc2cpg.passes.{AstCreationPass, CMetaDataPass, StubRemovalPass, TypeNodePass}
+import io.shiftleft.codepropertygraph.generated.Languages
+import io.shiftleft.fuzzyc2cpg.passes.{AstCreationPass, StubRemovalPass, TypeNodePass}
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
+import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.x2cpg.SourceFiles
 import org.slf4j.LoggerFactory
 import overflowdb.{Config, Graph}
@@ -76,7 +78,7 @@ class FuzzyC2Cpg() {
     val cpg = initCpg(optionalOutputPath)
     val sourceFileNames = SourceFiles.determine(sourcePaths, sourceFileExtensions)
 
-    new CMetaDataPass(cpg, Some(metaDataKeyPool)).createAndApply()
+    new MetaDataPass(cpg, Languages.C, Some(metaDataKeyPool)).createAndApply()
     val astCreator = new AstCreationPass(sourceFileNames, cpg, functionKeyPool)
     astCreator.createAndApply()
     new CfgCreationPass(cpg).createAndApply()

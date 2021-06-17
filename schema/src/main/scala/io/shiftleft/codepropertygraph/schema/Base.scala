@@ -47,7 +47,7 @@ object Base extends SchemaBase {
         name = "CODE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = "The code snippet the node represents"
+        comment = "This field holds the code snippet that the node represents."
       )
       .protoId(21)
 
@@ -77,10 +77,9 @@ object Base extends SchemaBase {
         name = "FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = """Full name of an element, e.g., the class name along, including its package
-                    |(e.g. \"io.shiftleft.dataflowenging.layers.dataflows.DataFlowRunner.run\").
-                    |In theory, the FULL_NAME just needs to be unique and is used for linking references,
-                    |so a consecutive integer would be valid. In practice, this should be human readable
+        comment = """This is the fully-qualified name of an entity, e.g., the fully-qualified
+                    |name of a method or type. The details of what constitutes a fully-qualified
+                    |name are language specific. This field SHOULD be human readable.
                     |""".stripMargin
       )
       .protoId(6)
@@ -94,22 +93,12 @@ object Base extends SchemaBase {
       )
       .protoId(3)
 
-    val order = builder
-      .addProperty(
-        name = "ORDER",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.One,
-        comment = """General ordering property, such that the children of each AST-node are
-                    |typically numbered from 1, ..., N (this is not enforced).""".stripMargin
-      )
-      .protoId(4)
-
     val value = builder
       .addProperty(
         name = "VALUE",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = "Generic node property"
+        comment = "This property denotes a string value as used in a key-value pair."
       )
       .protoId(8)
 
@@ -132,7 +121,7 @@ object Base extends SchemaBase {
         name = "AST_PARENT_FULL_NAME",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = "The FULL_NAME of a the AST parent of an entity"
+        comment = "This field holds the FULL_NAME of the AST parent of an entity."
       )
       .protoId(57)
     // node base types
@@ -140,7 +129,7 @@ object Base extends SchemaBase {
     val declaration = builder
       .addNodeBaseType(
         name = "DECLARATION",
-        comment = ""
+        comment = "This is the base node class for all declarations."
       )
       .addProperties(name)
 
@@ -149,7 +138,10 @@ object Base extends SchemaBase {
     val ref = builder
       .addEdgeType(
         name = "REF",
-        comment = "A reference to e.g. a LOCAL"
+        comment = """This edge indicates that the source node is an identifier that denotes
+            |access to the destination node. For example, an identifier may reference
+            |a local variable.
+            |""".stripMargin
       )
       .protoId(10)
 

@@ -9,7 +9,10 @@ object TagsAndLocation extends SchemaBase {
 
   override def description: String =
     """
-      |
+      |The Code Property Graph specification allows for tags to be attached
+      |to arbitrary nodes. Conceptually, this is similar to the creation of
+      |Finding nodes, however, tags are to be used for intermediate results
+      |rather than end-results that are to be reported to the user.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder,
@@ -94,7 +97,7 @@ object TagsAndLocation extends SchemaBase {
     val taggedBy = builder
       .addEdgeType(
         name = "TAGGED_BY",
-        comment = "Edges from nodes to tags"
+        comment = "Edges from nodes to the tags they are tagged by."
       )
       .protoId(11)
 
@@ -103,7 +106,7 @@ object TagsAndLocation extends SchemaBase {
     val tag: NodeType = builder
       .addNodeType(
         name = "TAG",
-        comment = "A string tag"
+        comment = "This node represents a tag."
       )
       .protoId(24)
       .addProperties(name, value)
@@ -111,7 +114,7 @@ object TagsAndLocation extends SchemaBase {
     val location: NodeType = builder
       .addNodeType(
         name = "LOCATION",
-        comment = ""
+        comment = "A location node summarizes a source code location."
       )
       .protoId(25)
       .addProperties(symbol,
@@ -127,7 +130,7 @@ object TagsAndLocation extends SchemaBase {
     val tagNodePair: NodeType = builder
       .addNodeType(
         name = "TAG_NODE_PAIR",
-        comment = ""
+        comment = "This node contains an arbitrary node and an associated tag node."
       )
       .protoId(208)
       .addProperties()
