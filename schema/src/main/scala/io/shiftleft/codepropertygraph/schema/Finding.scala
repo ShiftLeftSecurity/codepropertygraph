@@ -9,7 +9,8 @@ object Finding extends SchemaBase {
 
   override def description: String =
     """
-      |
+      |We allow findings (e.g., potential vulnerabilities, notes on dangerous practices) to
+      |be stored in the Findings Layer.
       |""".stripMargin
 
   def apply(builder: SchemaBuilder, base: Base.Schema) =
@@ -25,7 +26,7 @@ object Finding extends SchemaBase {
         name = "KEY",
         valueType = ValueTypes.STRING,
         cardinality = Cardinality.One,
-        comment = ""
+        comment = "This property denotes a key of a key-value pair."
       )
       .protoId(131)
 
@@ -33,7 +34,13 @@ object Finding extends SchemaBase {
     val finding: NodeType = builder
       .addNodeType(
         name = "FINDING",
-        comment = ""
+        comment = """Finding nodes may be used to store analysis results in the graph
+            |that are to be exposed to an end-user, e.g., information about
+            |potential vulnerabilities or dangerous programming practices.
+            |A Finding node may contain an abitrary list of key value pairs
+            |that characterize the finding, as well as a list of nodes that
+            |serve as evidence for the finding.
+            |""".stripMargin
       )
       .protoId(214)
       .addProperties()
@@ -41,7 +48,7 @@ object Finding extends SchemaBase {
     val keyValuePair: NodeType = builder
       .addNodeType(
         name = "KEY_VALUE_PAIR",
-        comment = ""
+        comment = "This node represents a key value pair, where both the key and the value are strings."
       )
       .protoId(217)
       .addProperties(key, value)
