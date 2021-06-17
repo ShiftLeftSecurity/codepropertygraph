@@ -7,6 +7,7 @@ import io.shiftleft.fuzzyc2cpg.Global
 import io.shiftleft.fuzzyc2cpg.passes.astcreation.{AntlrCModuleParserDriver, AstVisitor}
 import io.shiftleft.passes.{DiffGraph, IntervalKeyPool, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
+import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import org.slf4j.LoggerFactory
 
 /**
@@ -28,7 +29,7 @@ class AstCreationPass(filenames: List[String], cpg: Cpg, keyPool: IntervalKeyPoo
     val namespaceBlock = nodes
       .NewNamespaceBlock()
       .name(NamespaceTraversal.globalNamespaceName)
-      .fullName(CMetaDataPass.getGlobalNamespaceBlockFullName(Some(absolutePath)))
+      .fullName(MetaDataPass.getGlobalNamespaceBlockFullName(Some(absolutePath)))
       .filename(absolutePath)
       .order(1)
 
