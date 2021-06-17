@@ -6,7 +6,8 @@ val overflowdbVersion = "1.42"
 inThisBuild(
   List(
     organization := "io.shiftleft",
-    scalaVersion := "2.13.6",
+    scalaVersion := "2.13.5",
+    // don't upgrade to 2.13.6 until https://github.com/com-lihaoyi/Ammonite/issues/1182 is resolved
     resolvers ++= Seq(
       Resolver.mavenLocal,
       "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"
