@@ -54,8 +54,7 @@ object Ast extends SchemaBase {
         name = "ORDER",
         valueType = ValueTypes.INTEGER,
         cardinality = Cardinality.One,
-        comment =
-          """This integer indicates the position of the node among
+        comment = """This integer indicates the position of the node among
             |its siblings in the AST. The left-most child has an
             |order of 0.
             |""".stripMargin
