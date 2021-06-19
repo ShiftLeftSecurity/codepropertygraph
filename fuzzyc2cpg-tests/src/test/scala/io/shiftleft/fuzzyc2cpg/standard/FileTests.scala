@@ -45,7 +45,7 @@ class FileTests extends FuzzyCCodeToCpgSuite {
   }
 
   "should allow traversing to namespaces" in {
-    cpg.file.namespace.name("<global>").l.size shouldBe 2
+    cpg.file.namespace.name("<global>").l.size shouldBe 1
   }
 
 }

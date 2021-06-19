@@ -22,11 +22,11 @@ class NamespaceCreator(cpg: Cpg) extends CpgPass(cpg) {
     val dstGraph = DiffGraph.newBuilder
     cpg.namespaceBlock
       .groupBy { nb: NamespaceBlock =>
-        nb.name
+        nb.fullName
       }
       .foreach {
-        case (name: String, blocks) =>
-          val namespace = NewNamespace().name(name)
+        case (fullName: String, blocks) =>
+          val namespace = NewNamespace().name(fullName)
           dstGraph.addNode(namespace)
           blocks.foreach(block => dstGraph.addEdgeFromOriginal(block, namespace, EdgeTypes.REF))
       }

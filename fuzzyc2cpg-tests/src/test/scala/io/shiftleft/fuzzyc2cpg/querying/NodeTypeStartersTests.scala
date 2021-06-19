@@ -70,7 +70,7 @@ class NodeTypeStartersTests extends FuzzyCCodeToCpgSuite {
   }
 
   "should allow retrieving namespaces" in {
-    cpg.namespace.name.l shouldBe List("<global>")
+    cpg.namespace.name.head.endsWith("<global>") shouldBe true
   }
 
   "should allow retrieving namespace blocks" in {
