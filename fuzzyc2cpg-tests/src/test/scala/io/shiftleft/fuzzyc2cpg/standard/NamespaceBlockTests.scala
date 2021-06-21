@@ -1,5 +1,6 @@
 package io.shiftleft.fuzzyc2cpg.standard
 
+import io.shiftleft.codepropertygraph.generated.traversal._
 import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, NamespaceTraversal}

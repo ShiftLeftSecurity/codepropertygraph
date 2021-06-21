@@ -310,6 +310,6 @@ class NodeTypeStarters(cpg: Cpg) {
 
   @Doc("All tags with given name")
   def tag(name: String): Traversal[Tag] =
-    io.shiftleft.codepropertygraph.generated.traversal.toTagTraversal(tag).name(name)
+    tag.name(name)
 
 }

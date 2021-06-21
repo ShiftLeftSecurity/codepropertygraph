@@ -1,5 +1,6 @@
 package io.shiftleft.fuzzyc2cpg.codedumper
 
+import io.shiftleft.codepropertygraph.generated.traversal._
 import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.codedumper.CodeDumper
 import io.shiftleft.semanticcpg.language._

@@ -1,5 +1,6 @@
 package io.shiftleft.fuzzyc2cpg.querying
 
+import io.shiftleft.codepropertygraph.generated.traversal._
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.fuzzyc2cpg.testfixtures.DataFlowCodeToCpgSuite
