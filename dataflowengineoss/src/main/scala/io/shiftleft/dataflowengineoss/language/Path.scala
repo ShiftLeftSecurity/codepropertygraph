@@ -1,6 +1,7 @@
 package io.shiftleft.dataflowengineoss.language
 
 import io.shiftleft.codepropertygraph.generated.nodes.{CfgNode, MethodParameterIn}
+import io.shiftleft.codepropertygraph.generated.traversal._
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.help.Table
 

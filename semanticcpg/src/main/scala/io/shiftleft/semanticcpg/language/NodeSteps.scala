@@ -2,7 +2,8 @@ package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.traversal._
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.codedumper.CodeDumper
 import overflowdb.Node
 import overflowdb.traversal.help.Doc
@@ -103,8 +104,7 @@ class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) exte
   def newTagNodePair(tagName: String, tagValue: String): NewTagNodePairTraversal = {
     new NewTagNodePairTraversal(
       traversal.map { node =>
-        nodes
-          .NewTagNodePair()
+        NewTagNodePair()
           .tag(NewTag().name(tagName).value(tagValue))
           .node(node)
           .build

@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.layers
 
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.traversal._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Languages, NodeTypes}
 import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.language._

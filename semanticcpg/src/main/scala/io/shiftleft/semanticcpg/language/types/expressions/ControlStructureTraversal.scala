@@ -1,6 +1,7 @@
 package io.shiftleft.semanticcpg.language.types.expressions
 
 import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, ControlStructure, Expression}
+import io.shiftleft.codepropertygraph.generated.traversal._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal

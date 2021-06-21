@@ -11,6 +11,7 @@ class AmmoniteExecutorTest extends AnyWordSpec with Matchers {
     override protected def predef: String =
       """
         |import io.shiftleft.semanticcpg.language._
+        |import io.shiftleft.codepropertygraph.generated.traversal._
         |""".stripMargin
   }
 

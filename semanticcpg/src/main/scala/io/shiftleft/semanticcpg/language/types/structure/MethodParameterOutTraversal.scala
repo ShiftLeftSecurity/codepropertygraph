@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.traversal._
 import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._

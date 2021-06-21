@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.traversal._
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
 import overflowdb._
 import overflowdb.traversal._
@@ -308,6 +309,7 @@ class NodeTypeStarters(cpg: Cpg) {
     cpg.graph.nodes(NodeTypes.TAG).cast[Tag]
 
   @Doc("All tags with given name")
-  def tag(name: String): Traversal[Tag] = tag.name(name)
+  def tag(name: String): Traversal[Tag] =
+    tag.name(name)
 
 }
