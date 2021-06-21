@@ -10,6 +10,7 @@ import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.x2cpg.SourceFiles
 import org.slf4j.LoggerFactory
 import overflowdb.{Config, Graph}
+import scopt.OParser
 
 import java.nio.file.Files
 import java.util.concurrent.ConcurrentHashMap
@@ -161,46 +162,54 @@ object FuzzyC2Cpg {
       includeFiles.nonEmpty || includePaths.nonEmpty || defines.nonEmpty || undefines.nonEmpty
   }
 
-  def parseConfig(args: Array[String]): Option[Config] =
-    new scopt.OptionParser[Config](classOf[FuzzyC2Cpg].getSimpleName) {
-      arg[String]("<input-dir>")
-        .unbounded()
-        .text("source directories containing C/C++ code")
-        .action((x, c) => c.copy(inputPaths = c.inputPaths + x))
-      opt[String]("out")
-        .text("(DEPRECATED use `output`) output filename")
-        .action { (x, c) =>
-          logger.warn("`--out` is DEPRECATED. Use `--output` instead")
-          c.copy(outputPath = x)
-        }
-      opt[String]("output")
-        .abbr("o")
-        .text("output filename")
-        .action((x, c) => c.copy(outputPath = x))
-      opt[String]("source-file-ext")
-        .unbounded()
-        .text("source file extensions to include when gathering source files. Defaults are .c, .cc, .cpp, .h and .hpp")
-        .action((pat, cfg) => cfg.copy(sourceFileExtensions = cfg.sourceFileExtensions + pat))
-      opt[String]("include")
-        .unbounded()
-        .text("header include files")
-        .action((incl, cfg) => cfg.copy(includeFiles = cfg.includeFiles + incl))
-      opt[String]('I', "")
-        .unbounded()
-        .text("header include paths")
-        .action((incl, cfg) => cfg.copy(includePaths = cfg.includePaths + incl))
-      opt[String]('D', "define")
-        .unbounded()
-        .text("define a name")
-        .action((d, cfg) => cfg.copy(defines = cfg.defines + d))
-      opt[String]('U', "undefine")
-        .unbounded()
-        .text("undefine a name")
-        .action((u, cfg) => cfg.copy(undefines = cfg.undefines + u))
-      opt[String]("preprocessor-executable")
-        .text("path to the preprocessor executable")
-        .action((s, cfg) => cfg.copy(preprocessorExecutable = s))
-      help("help").text("display this help message")
-    }.parse(args, Config())
+  def parseConfig(args: Array[String]): Option[Config] = {
+    val parser = {
+      val builder = OParser.builder[Config]
+      import builder._
+      OParser.sequence(
+        programName(classOf[FuzzyC2Cpg].getSimpleName),
+        arg[String]("<input-dir>")
+          .unbounded()
+          .text("source directories containing C/C++ code")
+          .action((x, c) => c.copy(inputPaths = c.inputPaths + x)),
+        opt[String]("out")
+          .text("(DEPRECATED use `output`) output filename")
+          .action { (x, c) =>
+            logger.warn("`--out` is DEPRECATED. Use `--output` instead")
+            c.copy(outputPath = x)
+          },
+        opt[String]("output")
+          .abbr("o")
+          .text("output filename")
+          .action((x, c) => c.copy(outputPath = x)),
+        opt[String]("source-file-ext")
+          .unbounded()
+          .text(
+            "source file extensions to include when gathering source files. Defaults are .c, .cc, .cpp, .h and .hpp")
+          .action((pat, cfg) => cfg.copy(sourceFileExtensions = cfg.sourceFileExtensions + pat)),
+        opt[String]("include")
+          .unbounded()
+          .text("header include files")
+          .action((incl, cfg) => cfg.copy(includeFiles = cfg.includeFiles + incl)),
+        opt[String]('I', "")
+          .unbounded()
+          .text("header include paths")
+          .action((incl, cfg) => cfg.copy(includePaths = cfg.includePaths + incl)),
+        opt[String]('D', "define")
+          .unbounded()
+          .text("define a name")
+          .action((d, cfg) => cfg.copy(defines = cfg.defines + d)),
+        opt[String]('U', "undefine")
+          .unbounded()
+          .text("undefine a name")
+          .action((u, cfg) => cfg.copy(undefines = cfg.undefines + u)),
+        opt[String]("preprocessor-executable")
+          .text("path to the preprocessor executable")
+          .action((s, cfg) => cfg.copy(preprocessorExecutable = s)),
+        help("help").text("display this help message")
+      )
+    }
+    OParser.parse(parser, args, Config())
+  }
 
 }
