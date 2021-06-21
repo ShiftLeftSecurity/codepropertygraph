@@ -1,15 +1,14 @@
 package io.shiftleft.fuzzyc2cpg
 
-import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.fuzzyc2cpg.passes.{AstCreationPass, StubRemovalPass, TypeNodePass}
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
-import io.shiftleft.x2cpg.SourceFiles
+import io.shiftleft.x2cpg.X2Cpg.newEmptyCpg
+import io.shiftleft.x2cpg.{SourceFiles, X2CpgConfig, X2CpgMain}
 import org.slf4j.LoggerFactory
-import overflowdb.{Config, Graph}
 import scopt.OParser
 
 import java.nio.file.Files
@@ -76,7 +75,7 @@ class FuzzyC2Cpg() {
     val typesKeyPool = new IntervalKeyPool(100, 1000100)
     val functionKeyPool = new IntervalKeyPool(1000100, Long.MaxValue)
 
-    val cpg = initCpg(optionalOutputPath)
+    val cpg = newEmptyCpg(optionalOutputPath)
     val sourceFileNames = SourceFiles.determine(sourcePaths, sourceFileExtensions)
 
     new MetaDataPass(cpg, Languages.C, Some(metaDataKeyPool)).createAndApply()
@@ -88,30 +87,6 @@ class FuzzyC2Cpg() {
     cpg
   }
 
-  /**
-    * Create an empty CPG, backed by the file at `optionalOutputPath` or
-    * in-memory if `optionalOutputPath` is empty.
-    * */
-  private def initCpg(optionalOutputPath: Option[String]): Cpg = {
-    val odbConfig = optionalOutputPath
-      .map { outputPath =>
-        val outFile = File(outputPath)
-        if (outputPath != "" && outFile.exists) {
-          logger.info("Output file exists, removing: " + outputPath)
-          outFile.delete()
-        }
-        Config.withDefaults.withStorageLocation(outputPath)
-      }
-      .getOrElse {
-        Config.withDefaults()
-      }
-
-    val graph = Graph.open(odbConfig,
-                           io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
-                           io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava)
-    new Cpg(graph)
-  }
-
 }
 
 object FuzzyC2Cpg {
@@ -119,69 +94,35 @@ object FuzzyC2Cpg {
   private val logger = LoggerFactory.getLogger(classOf[FuzzyC2Cpg])
 
   def main(args: Array[String]): Unit = {
-    parseConfig(args) match {
-      case Some(config) =>
-        try {
-          val fuzzyc = new FuzzyC2Cpg()
 
-          if (config.usePreprocessor) {
-            fuzzyc.runWithPreprocessorAndOutput(
-              config.inputPaths,
-              config.sourceFileExtensions,
-              config.includeFiles,
-              config.includePaths,
-              config.defines,
-              config.undefines,
-              config.preprocessorExecutable,
-              Some(config.outputPath)
-            )
-          } else {
-            val cpg = fuzzyc.runAndOutput(config.inputPaths, config.sourceFileExtensions, Some(config.outputPath))
-            cpg.close()
-          }
+    final case class Config(inputPaths: Set[String] = Set.empty,
+                            outputPath: String = "cpg.bin",
+                            sourceFileExtensions: Set[String] = Set(".c", ".cc", ".cpp", ".h", ".hpp"),
+                            includeFiles: Set[String] = Set.empty,
+                            includePaths: Set[String] = Set.empty,
+                            defines: Set[String] = Set.empty,
+                            undefines: Set[String] = Set.empty,
+                            preprocessorExecutable: String = "./fuzzypp/bin/fuzzyppcli")
+        extends X2CpgConfig[Config] {
+      lazy val usePreprocessor: Boolean =
+        includeFiles.nonEmpty || includePaths.nonEmpty || defines.nonEmpty || undefines.nonEmpty
 
-        } catch {
-          case NonFatal(ex) =>
-            logger.error("Failed to generate CPG.", ex)
-            System.exit(1)
-        }
-      case _ =>
-        System.exit(1)
+      override def withAdditionalInputPath(inputPath: String): Config = copy(inputPaths = inputPaths + inputPath)
+      override def withOutputPath(x: String): Config = copy(outputPath = x)
     }
-  }
 
-  final case class Config(inputPaths: Set[String] = Set.empty,
-                          outputPath: String = "cpg.bin",
-                          sourceFileExtensions: Set[String] = Set(".c", ".cc", ".cpp", ".h", ".hpp"),
-                          includeFiles: Set[String] = Set.empty,
-                          includePaths: Set[String] = Set.empty,
-                          defines: Set[String] = Set.empty,
-                          undefines: Set[String] = Set.empty,
-                          preprocessorExecutable: String = "./fuzzypp/bin/fuzzyppcli") {
-    lazy val usePreprocessor: Boolean =
-      includeFiles.nonEmpty || includePaths.nonEmpty || defines.nonEmpty || undefines.nonEmpty
-  }
-
-  def parseConfig(args: Array[String]): Option[Config] = {
     val parser = {
       val builder = OParser.builder[Config]
       import builder._
       OParser.sequence(
         programName(classOf[FuzzyC2Cpg].getSimpleName),
-        arg[String]("<input-dir>")
-          .unbounded()
-          .text("source directories containing C/C++ code")
-          .action((x, c) => c.copy(inputPaths = c.inputPaths + x)),
+        X2CpgMain.parser[Config],
         opt[String]("out")
           .text("(DEPRECATED use `output`) output filename")
           .action { (x, c) =>
             logger.warn("`--out` is DEPRECATED. Use `--output` instead")
-            c.copy(outputPath = x)
+            c.withOutputPath(x)
           },
-        opt[String]("output")
-          .abbr("o")
-          .text("output filename")
-          .action((x, c) => c.copy(outputPath = x)),
         opt[String]("source-file-ext")
           .unbounded()
           .text(
@@ -206,10 +147,36 @@ object FuzzyC2Cpg {
         opt[String]("preprocessor-executable")
           .text("path to the preprocessor executable")
           .action((s, cfg) => cfg.copy(preprocessorExecutable = s)),
-        help("help").text("display this help message")
       )
     }
-    OParser.parse(parser, args, Config())
+
+    new X2CpgMain[Config] {
+      override def run(config: Config): Unit = {
+        try {
+          val fuzzyc = new FuzzyC2Cpg()
+          if (config.usePreprocessor) {
+            fuzzyc.runWithPreprocessorAndOutput(
+              config.inputPaths,
+              config.sourceFileExtensions,
+              config.includeFiles,
+              config.includePaths,
+              config.defines,
+              config.undefines,
+              config.preprocessorExecutable,
+              Some(config.outputPath)
+            )
+          } else {
+            val cpg = fuzzyc.runAndOutput(config.inputPaths, config.sourceFileExtensions, Some(config.outputPath))
+            cpg.close()
+          }
+        } catch {
+          case NonFatal(ex) =>
+            logger.error("Failed to generate CPG.", ex)
+            System.exit(1)
+        }
+      }
+    }.main(args, parser, Config())
+
   }
 
 }
