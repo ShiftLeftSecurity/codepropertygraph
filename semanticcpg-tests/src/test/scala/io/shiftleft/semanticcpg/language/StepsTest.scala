@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.traversal._
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.json4s.JString

@@ -29,6 +29,11 @@ object LocationCreator {
     }
   }
 
+  def foo: NewLocation = {
+    val a: NewLocationBuilder = ???
+    a
+  }
+
   def apply(
       node: AbstractNode,
       symbol: String,
@@ -38,7 +43,8 @@ object LocationCreator {
   ): NewLocation = {
 
     if (method == null) {
-      NewLocation().node(Some(node))
+      val a = NewLocation().node(Some(node))
+      a
     } else {
       val typeOption = methodToTypeDecl(method)
       val typeName = typeOption.map(_.fullName).getOrElse("")
