@@ -1,7 +1,7 @@
 package io.shiftleft.fuzzyc2cpg.dotgenerator
 
-import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.codepropertygraph.generated.traversal._
+import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.fuzzyc2cpg.testfixtures.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
