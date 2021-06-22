@@ -3,7 +3,6 @@ package io.shiftleft.console
 import better.files.Dsl._
 import better.files._
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.traversal._
 import io.shiftleft.console.testing._
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, Scpg}

@@ -27,6 +27,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   Type,
   TypeDecl
 }
+import io.shiftleft.codepropertygraph.generated.traversal.NodeTraversalImplicits
 import io.shiftleft.semanticcpg.language.callgraphextension.{CallTraversal, MethodTraversal}
 import io.shiftleft.semanticcpg.language.dotextension.{AstNodeDot, CfgNodeDot}
 import io.shiftleft.semanticcpg.language.nodemethods._
@@ -46,7 +47,7 @@ import overflowdb.traversal.Traversal
   Implicit conversions to specific steps, based on the node at hand.
   Automatically in scope when using anything in the `steps` package, e.g. `Steps`
   */
-package object language extends operatorextension.Implicits with LowPrioImplicits {
+package object language extends operatorextension.Implicits with LowPrioImplicits with NodeTraversalImplicits {
   // Implicit conversions from generated node types. We use these to add methods
   // to generated node types.
 
