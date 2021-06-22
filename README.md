@@ -122,6 +122,18 @@ cpg.method.name("getAccountList").definingTypeDecl.toList.head
 // TypeDecl(Some(v[464]),AccountController,io.shiftleft.controller.AccountController,false,List(java.lang.Object))
 ```
 
+# Scripts
+
+## Dump the CPG schema
+
+You can dump the current Code Property Graph schema using the `schema2json.sh`
+bash script.
+
+```bash
+./schema2json.sh
+Schema written to: /tmp/schema.json
+```
+
 # References
 
 [1]  Rodriguez and Neubauer - The Graph Traversal Pattern:
