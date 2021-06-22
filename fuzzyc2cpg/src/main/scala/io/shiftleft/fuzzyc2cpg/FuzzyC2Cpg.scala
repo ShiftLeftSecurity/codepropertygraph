@@ -7,7 +7,7 @@ import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.x2cpg.X2Cpg.newEmptyCpg
-import io.shiftleft.x2cpg.{SourceFiles, X2CpgConfig, X2CpgMain}
+import io.shiftleft.x2cpg.{SourceFiles, X2Cpg, X2CpgConfig}
 import org.slf4j.LoggerFactory
 import scopt.OParser
 
@@ -93,30 +93,29 @@ object FuzzyC2Cpg {
 
   private val logger = LoggerFactory.getLogger(classOf[FuzzyC2Cpg])
 
+  final case class Config(inputPaths: Set[String] = Set.empty,
+                          outputPath: String = X2CpgConfig.defaultOutputPath,
+                          sourceFileExtensions: Set[String] = Set(".c", ".cc", ".cpp", ".h", ".hpp"),
+                          includeFiles: Set[String] = Set.empty,
+                          includePaths: Set[String] = Set.empty,
+                          defines: Set[String] = Set.empty,
+                          undefines: Set[String] = Set.empty,
+                          preprocessorExecutable: String = "./fuzzypp/bin/fuzzyppcli")
+      extends X2CpgConfig[Config] {
+    lazy val usePreprocessor: Boolean =
+      includeFiles.nonEmpty || includePaths.nonEmpty || defines.nonEmpty || undefines.nonEmpty
+
+    override def withAdditionalInputPath(inputPath: String): Config = copy(inputPaths = inputPaths + inputPath)
+    override def withOutputPath(x: String): Config = copy(outputPath = x)
+  }
+
   def main(args: Array[String]): Unit = {
 
-    final case class Config(inputPaths: Set[String] = Set.empty,
-                            outputPath: String = "cpg.bin",
-                            sourceFileExtensions: Set[String] = Set(".c", ".cc", ".cpp", ".h", ".hpp"),
-                            includeFiles: Set[String] = Set.empty,
-                            includePaths: Set[String] = Set.empty,
-                            defines: Set[String] = Set.empty,
-                            undefines: Set[String] = Set.empty,
-                            preprocessorExecutable: String = "./fuzzypp/bin/fuzzyppcli")
-        extends X2CpgConfig[Config] {
-      lazy val usePreprocessor: Boolean =
-        includeFiles.nonEmpty || includePaths.nonEmpty || defines.nonEmpty || undefines.nonEmpty
-
-      override def withAdditionalInputPath(inputPath: String): Config = copy(inputPaths = inputPaths + inputPath)
-      override def withOutputPath(x: String): Config = copy(outputPath = x)
-    }
-
-    val parser = {
+    val frontendSpecificOptions = {
       val builder = OParser.builder[Config]
       import builder._
       OParser.sequence(
         programName(classOf[FuzzyC2Cpg].getSimpleName),
-        X2CpgMain.parser[Config],
         opt[String]("out")
           .text("(DEPRECATED use `output`) output filename")
           .action { (x, c) =>
@@ -150,8 +149,8 @@ object FuzzyC2Cpg {
       )
     }
 
-    new X2CpgMain[Config] {
-      override def run(config: Config): Unit = {
+    X2Cpg.parseCommandLine(args, frontendSpecificOptions, Config()) match {
+      case Some(config) =>
         try {
           val fuzzyc = new FuzzyC2Cpg()
           if (config.usePreprocessor) {
@@ -174,9 +173,9 @@ object FuzzyC2Cpg {
             logger.error("Failed to generate CPG.", ex)
             System.exit(1)
         }
-      }
-    }.main(args, parser, Config())
-
+      case None =>
+        System.exit(1)
+    }
   }
 
 }
