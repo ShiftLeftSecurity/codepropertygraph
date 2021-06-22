@@ -2,7 +2,6 @@ package io.shiftleft.fuzzyc2cpg.testfixtures
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.traversal._
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.layers.dataflows.{OssDataFlow, OssDataFlowOptions}
 import io.shiftleft.dataflowengineoss.queryengine.EngineContext

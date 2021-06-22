@@ -1,7 +1,6 @@
 package io.shiftleft.semanticcpg.passes.cfgcreation
 
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.traversal._
 import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language._
