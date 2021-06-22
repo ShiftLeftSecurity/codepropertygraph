@@ -307,6 +307,7 @@ trait BridgeBase {
                                  config.serverPort,
                                  config.serverAuthUsername,
                                  config.serverAuthPassword)
+    println("Starting CPGQL server ...")
     server.main(Array.empty)
   }
 
