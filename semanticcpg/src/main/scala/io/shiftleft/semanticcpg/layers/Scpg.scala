@@ -134,6 +134,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
         )
       case Languages.FUZZY_TEST_LANG =>
         Iterator(
+          new CfgCreationPass(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
           new Linker(cpg),
