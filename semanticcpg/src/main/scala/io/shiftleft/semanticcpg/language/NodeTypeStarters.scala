@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.language
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
+import io.shiftleft.semanticcpg.language._
 import overflowdb._
 import overflowdb.traversal._
 import overflowdb.traversal.help.{Doc, TraversalSource}
@@ -33,6 +34,46 @@ class NodeTypeStarters(cpg: Cpg) {
   @Doc("All control structures (source-based frontends)")
   def controlStructure: Traversal[ControlStructure] =
     cpg.graph.nodes(NodeTypes.CONTROL_STRUCTURE).cast[ControlStructure]
+
+  @Doc("All try blocks (`ControlStructure` nodes)")
+  def tryBlock: Traversal[ControlStructure] =
+    controlStructure.isTry
+
+  @Doc("All if blocks (`ControlStructure` nodes)")
+  def ifBlock: Traversal[ControlStructure] =
+    controlStructure.isIf
+
+  @Doc("All else blocks (`ControlStructure` nodes)")
+  def elseBlock: Traversal[ControlStructure] =
+    controlStructure.isElse
+
+  @Doc("All switch blocks (`ControlStructure` nodes)")
+  def switchBlock: Traversal[ControlStructure] =
+    controlStructure.isSwitch
+
+  @Doc("All do blocks (`ControlStructure` nodes)")
+  def doBlock: Traversal[ControlStructure] =
+    controlStructure.isDo
+
+  @Doc("All for blocks (`ControlStructure` nodes)")
+  def forBlock: Traversal[ControlStructure] =
+    controlStructure.isFor
+
+  @Doc("All while blocks (`ControlStructure` nodes)")
+  def whileBlock: Traversal[ControlStructure] =
+    controlStructure.isWhile
+
+  @Doc("All gotos (`ControlStructure` nodes)")
+  def goto: Traversal[ControlStructure] =
+    controlStructure.isGoto
+
+  @Doc("All breaks (`ControlStructure` nodes)")
+  def break: Traversal[ControlStructure] =
+    controlStructure.isBreak
+
+  @Doc("All continues (`ControlStructure` nodes)")
+  def continue: Traversal[ControlStructure] =
+    controlStructure.isContinue
 
   /**
     Traverse to all source files

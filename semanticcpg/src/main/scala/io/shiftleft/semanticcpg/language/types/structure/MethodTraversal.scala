@@ -40,6 +40,46 @@ class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
   def controlStructure(regex: String): Traversal[ControlStructure] =
     traversal.ast.isControlStructure.code(regex)
 
+  @Doc("All try blocks (`ControlStructure` nodes)")
+  def tryBlock: Traversal[ControlStructure] =
+    controlStructure.isTry
+
+  @Doc("All if blocks (`ControlStructure` nodes)")
+  def ifBlock: Traversal[ControlStructure] =
+    controlStructure.isIf
+
+  @Doc("All else blocks (`ControlStructure` nodes)")
+  def elseBlock: Traversal[ControlStructure] =
+    controlStructure.isElse
+
+  @Doc("All switch blocks (`ControlStructure` nodes)")
+  def switchBlock: Traversal[ControlStructure] =
+    controlStructure.isSwitch
+
+  @Doc("All do blocks (`ControlStructure` nodes)")
+  def doBlock: Traversal[ControlStructure] =
+    controlStructure.isDo
+
+  @Doc("All for blocks (`ControlStructure` nodes)")
+  def forBlock: Traversal[ControlStructure] =
+    controlStructure.isFor
+
+  @Doc("All while blocks (`ControlStructure` nodes)")
+  def whileBlock: Traversal[ControlStructure] =
+    controlStructure.isWhile
+
+  @Doc("All gotos (`ControlStructure` nodes)")
+  def goto: Traversal[ControlStructure] =
+    controlStructure.isGoto
+
+  @Doc("All breaks (`ControlStructure` nodes)")
+  def break: Traversal[ControlStructure] =
+    controlStructure.isBreak
+
+  @Doc("All continues (`ControlStructure` nodes)")
+  def continue: Traversal[ControlStructure] =
+    controlStructure.isContinue
+
   /**
     * The type declaration associated with this method, e.g., the class it is defined in.
     * */
