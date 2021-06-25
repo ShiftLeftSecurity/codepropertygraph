@@ -66,7 +66,7 @@ class CAstTests extends FuzzyCCodeToCpgSuite {
       .name("foo")
       .ast
       .isControlStructure
-      .parserTypeName("IfStatement")
+      .isIf
       .l
       .size shouldBe 2
 
@@ -74,7 +74,7 @@ class CAstTests extends FuzzyCCodeToCpgSuite {
       .name("foo")
       .ast
       .isControlStructure
-      .parserTypeName("ElseStatement")
+      .isElse
       .l
       .size shouldBe 1
   }

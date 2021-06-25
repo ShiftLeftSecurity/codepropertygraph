@@ -912,6 +912,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       case "IfStatement"       => ControlStructureTypes.IF
       case "ElseStatement"     => ControlStructureTypes.ELSE
       case "SwitchStatement"   => ControlStructureTypes.SWITCH
+      case "TryStatement"      => ControlStructureTypes.TRY
       case someThingElse       => someThingElse
     }
     NewControlStructure()
