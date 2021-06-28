@@ -48,7 +48,7 @@ class TypeDeclTests extends FuzzyCCodeToCpgSuite {
     x.isExternal shouldBe true
     x.inheritsFromTypeFullName shouldBe List()
     x.aliasTypeFullName shouldBe None
-    x.order shouldBe -1
+    x.order shouldBe null
     x.filename shouldBe FileTraversal.UNKNOWN
   }
 

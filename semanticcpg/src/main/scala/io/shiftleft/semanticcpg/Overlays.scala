@@ -26,7 +26,7 @@ object Overlays {
     }
   }
 
-  def appliedOverlays(cpg: Cpg): List[String] = {
+  def appliedOverlays(cpg: Cpg): Seq[String] = {
     cpg.metaData.headOption match {
       case Some(metaData) => Option(metaData.overlays).getOrElse(Nil)
       case None =>
