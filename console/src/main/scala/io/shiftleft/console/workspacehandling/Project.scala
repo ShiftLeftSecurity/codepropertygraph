@@ -26,15 +26,15 @@ case class Project(projectFile: ProjectFile, var path: Path, var cpg: Option[Cpg
 
   def inputPath: String = projectFile.inputPath
 
-  def appliedOverlays: List[String] = {
-    cpg.map(Overlays.appliedOverlays).getOrElse(List())
+  def appliedOverlays: Seq[String] = {
+    cpg.map(Overlays.appliedOverlays).getOrElse(Nil)
   }
 
   def availableOverlays: List[String] = {
     File(path.resolve("overlays")).list.map(_.name).toList
   }
 
-  def overlayDirs: List[File] = {
+  def overlayDirs: Seq[File] = {
     val overlayDir = File(path.resolve("overlays"))
     appliedOverlays.map(o => overlayDir / o)
   }
