@@ -8,7 +8,7 @@ import scala.jdk.CollectionConverters._
 
 class StableOutputTests extends AnyWordSpec with Matchers {
 
-  def createNodeStrings(): String = {
+  private def createNodeStrings(): String = {
     val projectName = "stableid"
     val dirName = String.format("src/test/resources/testcode/%s", projectName)
     val c2cpg = new C2Cpg()

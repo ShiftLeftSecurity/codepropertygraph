@@ -1,21 +1,22 @@
 package io.shiftleft.c2cpg
 
 import io.shiftleft.codepropertygraph.generated.Properties
-import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType
+import io.shiftleft.codepropertygraph.generated.nodes.{NamespaceBlock, TypeDecl}
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 
 class ProgramStructureTests extends AnyWordSpec with Matchers {
-  val fixture = CpgTestFixture("structure")
+
+  private val fixture: CpgTestFixture = CpgTestFixture("structure")
 
   "Program structure of test project" should {
 
     "contain <global> namespace block node" in {
       val namespaceBlocks =
         fixture.traversalSource
-          .label(NodeType.NAMESPACE_BLOCK.toString)
+          .label(NamespaceBlock.Label)
           .has(Properties.FULL_NAME -> NamespaceTraversal.globalNamespaceName)
           .l
 
@@ -23,7 +24,7 @@ class ProgramStructureTests extends AnyWordSpec with Matchers {
     }
 
     "contain type-decl node" in {
-      val nodes = fixture.traversalSource.label(NodeType.TYPE_DECL.toString).l
+      val nodes = fixture.traversalSource.label(TypeDecl.Label).l
       nodes.size should be > 0
     }
 

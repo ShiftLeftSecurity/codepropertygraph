@@ -1,64 +1,72 @@
 package io.shiftleft.c2cpg.passes
 
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
-import io.shiftleft.codepropertygraph.generated.nodes.NewNode
+import io.shiftleft.codepropertygraph.generated.nodes.{NewFile, NewNamespaceBlock, NewNode}
 import io.shiftleft.passes.DiffGraph
-import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit
+import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
+import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
+import org.eclipse.cdt.core.dom.ast.{IASTDeclaration, IASTNode, IASTTranslationUnit}
 
-import scala.collection.mutable
+object AstCreator {
 
-case class AstEdge(src: NewNode, dst: NewNode)
+  case class AstEdge(src: NewNode, dst: NewNode)
 
-object Ast {
-  def apply(node: NewNode): Ast = Ast(List(node))
-  def apply(): Ast = new Ast(List())
-}
+  object Ast {
+    def apply(node: NewNode): Ast = Ast(List(node))
 
-case class Ast(
-    nodes: List[NewNode],
-    edges: List[AstEdge] = List(),
-    conditionEdges: List[AstEdge] = List()
-) {
-
-  def root: Option[NewNode] = nodes.headOption
-  def rightMostLeaf: Option[NewNode] = nodes.lastOption
-
-  /** AST that results when adding `other` as a child to this AST.
-    * `other` is connected to this AST's root node.
-    */
-  def withChild(other: Ast): Ast = {
-    Ast(
-      nodes ++ other.nodes,
-      edges = edges ++ other.edges ++ root.toList.flatMap(r =>
-        other.root.toList.map { rc =>
-          AstEdge(r, rc)
-      }),
-      conditionEdges = conditionEdges ++ other.conditionEdges
-    )
+    def apply(): Ast = new Ast(List())
   }
 
-  /** AST that results when adding all ASTs in `asts` as children,
-    * that is, connecting them to the root node of this AST.
-    */
-  def withChildren(asts: Seq[Ast]): Ast = {
-    asts.headOption match {
-      case Some(head) =>
-        withChild(head).withChildren(asts.tail)
-      case None =>
-        this
+  case class Ast(
+      nodes: List[NewNode],
+      edges: List[AstEdge] = List(),
+      conditionEdges: List[AstEdge] = List()
+  ) {
+
+    def root: Option[NewNode] = nodes.headOption
+
+    def rightMostLeaf: Option[NewNode] = nodes.lastOption
+
+    /** AST that results when adding `other` as a child to this AST.
+      * `other` is connected to this AST's root node.
+      */
+    def withChild(other: Ast): Ast = {
+      Ast(
+        nodes ++ other.nodes,
+        edges = edges ++ other.edges ++ root.toList.flatMap(r =>
+          other.root.toList.map { rc =>
+            AstEdge(r, rc)
+        }),
+        conditionEdges = conditionEdges ++ other.conditionEdges
+      )
     }
-  }
 
-  def withConditionEdge(src: NewNode, dst: NewNode): Ast = {
-    this.copy(conditionEdges = conditionEdges ++ List(AstEdge(src, dst)))
+    /** AST that results when adding all ASTs in `asts` as children,
+      * that is, connecting them to the root node of this AST.
+      */
+    def withChildren(asts: Seq[Ast]): Ast = {
+      asts.headOption match {
+        case Some(head) =>
+          withChild(head).withChildren(asts.tail)
+        case None =>
+          this
+      }
+    }
+
+    def withConditionEdge(src: NewNode, dst: NewNode): Ast = {
+      this.copy(conditionEdges = conditionEdges ++ List(AstEdge(src, dst)))
+    }
+
   }
 
 }
 
 class AstCreator(filename: String) {
 
-  val stack: mutable.Stack[NewNode] = mutable.Stack()
-  val diffGraph: DiffGraph.Builder = DiffGraph.newBuilder
+  import AstCreator._
+
+  // private val stack: mutable.Stack[NewNode] = mutable.Stack()
+  private val diffGraph: DiffGraph.Builder = DiffGraph.newBuilder
 
   def createAst(parserResult: IASTTranslationUnit): Iterator[DiffGraph] = {
     storeInDiffGraph(astForFile(parserResult))
@@ -79,18 +87,38 @@ class AstCreator(filename: String) {
     }
   }
 
-  def astForFile(parserResult: IASTTranslationUnit): Ast = {
+  private def withOrder[T <: IASTNode, X](nodeList: List[T])(f: (T, Int) => X): Seq[X] =
+    nodeList.zipWithIndex.map {
+      case (x, i) =>
+        f(x, i + 1)
+    }
+
+  private def astForFile(parserResult: IASTTranslationUnit): Ast = {
     println(filename)
     println(parserResult.getRawSignature)
-    ???
-    /**
     Ast(NewFile(name = filename, order = 0))
       .withChild(
-        astForPackageDeclaration(parserResult.getPackageDeclaration.asScala)
-          .withChildren(withOrder(parserResult.getTypes) { (typ, order) =>
-            astForTypeDecl(typ, order)
+        astForIASTTranslationUnit(parserResult)
+          .withChildren(withOrder(parserResult.getDeclarations.toList) { (decl, order) =>
+            astForIASTDeclaration(decl, order)
           })
-      )**/
+      )
+  }
+
+  private def astForIASTTranslationUnit(iASTTranslationUnit: IASTTranslationUnit): Ast = {
+    val absolutePath = new java.io.File(iASTTranslationUnit.getFilePath).toPath.toAbsolutePath.normalize().toString
+    val namespaceBlock = NewNamespaceBlock()
+      .name(NamespaceTraversal.globalNamespaceName)
+      .fullName(MetaDataPass.getGlobalNamespaceBlockFullName(Some(absolutePath)))
+      .filename(absolutePath)
+      .order(1)
+    Ast(namespaceBlock)
+  }
+
+  private def astForIASTDeclaration(decl: IASTDeclaration, order: Int): Ast = {
+    // TODO: descent from here ...
+    println("Order " + order + ": " + decl.getRawSignature)
+    Ast()
   }
 
   /**
@@ -113,24 +141,6 @@ class AstCreator(filename: String) {
         astForMethod(m, typ, order)
       }
     )
-  }
-
-  def astForPackageDeclaration(packageDecl: Option[PackageDeclaration]): Ast = {
-
-    val absolutePath = new java.io.File(filename).toPath.toAbsolutePath.normalize().toString
-    val namespaceBlock = packageDecl match {
-      case Some(decl) =>
-        val packageName = decl.getName.toString
-        val name = packageName.split("\\.").lastOption.getOrElse("")
-        NewNamespaceBlock()
-          .name(name)
-          .fullName(packageName)
-      case None =>
-        NewNamespaceBlock()
-          .name(globalNamespaceName)
-          .fullName(globalNamespaceName)
-    }
-    Ast(namespaceBlock.filename(absolutePath).order(1))
   }
 
   private def astForMethod(
@@ -491,13 +501,6 @@ object AstCreator {
   def column(node: Node): Option[Integer] = {
     node.getBegin.map(x => Integer.valueOf(x.column)).asScala
   }
-
-  def withOrder[T <: Node, X](nodeList: java.util.List[T])(f: (T, Int) => X): Seq[X] = {
-    nodeList.asScala.zipWithIndex.map {
-      case (x, i) =>
-        f(x, i + 1)
-    }.toSeq
-  }
-  **/
+    **/
 
 }

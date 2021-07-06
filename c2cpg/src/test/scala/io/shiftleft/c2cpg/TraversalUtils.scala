@@ -5,6 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import overflowdb._
 
 trait TraversalUtils extends Matchers {
+
   val fixture: CpgTestFixture
 
   def getMethod(name: String): List[Node] = {
