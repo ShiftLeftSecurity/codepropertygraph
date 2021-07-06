@@ -75,6 +75,8 @@ lazy val dataflowengineosstests = Projects.dataflowengineosstests
 lazy val console = Projects.console
 lazy val fuzzyc2cpg = Projects.fuzzyc2cpg
 lazy val fuzzyc2cpgtests = Projects.fuzzyc2cpgtests
+lazy val c2cpg = Projects.c2cpg
+lazy val c2cpgtests = Projects.c2cpgtests
 lazy val macros = Projects.macros
 lazy val schema2json = Projects.schema2json
 
