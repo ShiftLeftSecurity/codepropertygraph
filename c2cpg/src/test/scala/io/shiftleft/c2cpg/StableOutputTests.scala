@@ -1,5 +1,6 @@
-package io.shiftleft.fuzzyc2cpg
+package io.shiftleft.c2cpg
 
+import io.shiftleft.c2cpg.C2Cpg.Config
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -10,8 +11,9 @@ class StableOutputTests extends AnyWordSpec with Matchers {
   def createNodeStrings(): String = {
     val projectName = "stableid"
     val dirName = String.format("src/test/resources/testcode/%s", projectName)
-    val fuzzyc2Cpg = new FuzzyC2Cpg()
-    val cpg = fuzzyc2Cpg.runAndOutput(Set(dirName), Set(".c", ".cc", ".cpp", ".h", ".hpp"))
+    val c2cpg = new C2Cpg()
+    val config = Config(includePaths = Set(dirName))
+    val cpg = c2cpg.runAndOutput(config)
     val nodes = cpg.graph.V().asScala.toList
     nodes.sortBy(_.id()).map(x => x.label + ": " + x.propertyMap().asScala.toString).mkString("\n")
   }

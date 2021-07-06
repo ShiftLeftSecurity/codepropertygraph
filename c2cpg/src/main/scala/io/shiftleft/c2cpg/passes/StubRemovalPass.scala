@@ -1,4 +1,4 @@
-package io.shiftleft.fuzzyc2cpg.passes
+package io.shiftleft.c2cpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.Method
@@ -11,7 +11,7 @@ import io.shiftleft.semanticcpg.language._
   * */
 class StubRemovalPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
 
-  private val sigToMethodWithDef = cpg.method.isNotStub.map(m => (m.signature -> true)).toMap
+  private val sigToMethodWithDef = cpg.method.isNotStub.map(m => m.signature -> true).toMap
 
   override def partIterator: Iterator[Method] =
     cpg.method.isStub.toList

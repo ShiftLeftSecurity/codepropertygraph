@@ -1,8 +1,8 @@
-package io.shiftleft.fuzzyc2cpg
+package io.shiftleft.c2cpg
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
-import io.shiftleft.fuzzyc2cpg.passes.{AstCreationPass, StubRemovalPass}
+import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
@@ -14,7 +14,7 @@ import overflowdb.traversal.TraversalSource
 case class CpgTestFixture(projectName: String) {
 
   val cpg: Cpg = Cpg.emptyCpg
-  val dirName = ProjectRoot.relativise(s"fuzzyc2cpg/src/test/resources/testcode/$projectName")
+  val dirName = ProjectRoot.relativise(s"c2cpg/src/test/resources/testcode/$projectName")
   val keyPoolFile1 = new IntervalKeyPool(1001, 2000)
   val filenames = SourceFiles.determine(Set(dirName), Set(".c"))
 

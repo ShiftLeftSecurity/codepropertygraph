@@ -1,4 +1,4 @@
-package io.shiftleft.fuzzyc2cpg
+package io.shiftleft.c2cpg
 
 import io.shiftleft.codepropertygraph.generated._
 import org.scalatest.matchers.should.Matchers

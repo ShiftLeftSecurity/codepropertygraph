@@ -1,4 +1,4 @@
-package io.shiftleft.fuzzyc2cpg.passes
+package io.shiftleft.c2cpg.passes
 
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
@@ -6,8 +6,6 @@ import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-
-import scala.jdk.CollectionConverters._
 
 class TypeNodePassTests extends AnyWordSpec with Matchers {
   "TypeNodePass" should {
@@ -19,8 +17,8 @@ class TypeNodePassTests extends AnyWordSpec with Matchers {
 
 object TypeNodePassFixture {
   def apply(file1Code: String)(f: Cpg => Unit): Unit = {
-    File.usingTemporaryDirectory("fuzzyctest") { dir =>
-      val file1 = (dir / "file1.c")
+    File.usingTemporaryDirectory("c2cpgtest") { dir =>
+      val file1 = dir / "file1.c"
       file1.write(file1Code)
 
       val cpg = Cpg.emptyCpg
@@ -28,8 +26,6 @@ object TypeNodePassFixture {
       val filenames = List(file1.path.toAbsolutePath.toString)
       val astCreator = new AstCreationPass(filenames, cpg, keyPool)
       astCreator.createAndApply()
-      new TypeNodePass(astCreator.global.usedTypes.keys().asScala.toList, cpg).createAndApply()
-
       f(cpg)
     }
   }

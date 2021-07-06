@@ -1,4 +1,4 @@
-package io.shiftleft.fuzzyc2cpg
+package io.shiftleft.c2cpg
 
 import io.shiftleft.codepropertygraph.generated.Properties
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Node.NodeType

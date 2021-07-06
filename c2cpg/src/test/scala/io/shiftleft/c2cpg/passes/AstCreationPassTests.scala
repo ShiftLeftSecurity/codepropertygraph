@@ -1,4 +1,4 @@
-package io.shiftleft.fuzzyc2cpg.passes
+package io.shiftleft.c2cpg.passes
 
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
@@ -20,8 +20,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       expectedFilenameFields.foreach { filename =>
         (dir / filename).write("//foo")
       }
-      new AstCreationPass(filenames, cpg, new IntervalKeyPool(1, 1000))
-        .createAndApply()
+      new AstCreationPass(filenames, cpg, new IntervalKeyPool(1, 1000)).createAndApply()
 
       "create one NamespaceBlock per file" in {
         val expectedNamespaceFullNames = expectedFilenameFields.map(f => s"$f:<global>").toSet
@@ -744,7 +743,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
 
 object Fixture {
   def apply(file1Code: String, file2Code: String = "")(f: Cpg => Unit): Unit = {
-    File.usingTemporaryDirectory("fuzzyctest") { dir =>
+    File.usingTemporaryDirectory("c2cpgtest") { dir =>
       val file1 = (dir / "file1.c")
       val file2 = (dir / "file2.c")
       file1.write(file1Code)

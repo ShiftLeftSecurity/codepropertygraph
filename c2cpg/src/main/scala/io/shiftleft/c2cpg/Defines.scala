@@ -1,4 +1,4 @@
-package io.shiftleft.fuzzyc2cpg
+package io.shiftleft.c2cpg
 
 object Defines {
   val anyTypeName = "ANY"

@@ -1,4 +1,4 @@
-package io.shiftleft.fuzzyc2cpg.passes
+package io.shiftleft.c2cpg.passes
 
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
@@ -461,7 +461,7 @@ class CfgFixture(file1Code: String) {
 
   val cpg: Cpg = Cpg.emptyCpg
 
-  File.usingTemporaryDirectory("fuzzyctest") { dir =>
+  File.usingTemporaryDirectory("c2cpgtest") { dir =>
     val file1 = dir / "file1.c"
     file1.write(s"RET func() { $file1Code }")
     val keyPoolFile1 = new IntervalKeyPool(1001, 2000)

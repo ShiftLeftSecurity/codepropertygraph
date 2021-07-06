@@ -1,4 +1,4 @@
-package io.shiftleft.fuzzyc2cpg.passes
+package io.shiftleft.c2cpg.passes
 
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
@@ -50,8 +50,8 @@ class StubRemovalPassTests extends AnyWordSpec with Matchers {
 
 object StubRemovalPassFixture {
   def apply(file1Code: String)(f: Cpg => Unit): Unit = {
-    File.usingTemporaryDirectory("fuzzyctest") { dir =>
-      val file1 = (dir / "file1.c")
+    File.usingTemporaryDirectory("c2cpgtest") { dir =>
+      val file1 = dir / "file1.c"
       file1.write(file1Code)
       val cpg = Cpg.emptyCpg
       val keyPool = new IntervalKeyPool(1001, 2000)
