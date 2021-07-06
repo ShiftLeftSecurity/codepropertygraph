@@ -134,17 +134,13 @@ bash script.
 Schema written to: /tmp/schema.json
 ```
 
-# References
+# Further Reading
 
-[1]  Rodriguez and Neubauer - The Graph Traversal Pattern:
-    https://pdfs.semanticscholar.org/ae6d/dcba8c848dd0a30a30c5a895cbb491c9e445.pdf
+- Rodriguez and Neubauer - The Graph Traversal Pattern: https://pdfs.semanticscholar.org/ae6d/dcba8c848dd0a30a30c5a895cbb491c9e445.pdf
 
-[2] Yamaguchi et al. - Modeling and Discovering Vulnerabilities with Code Property Graphs
-    https://www.sec.cs.tu-bs.de/pubs/2014-ieeesp.pdf
+- Yamaguchi et al. - Modeling and Discovering Vulnerabilities with Code Property Graphs: https://www.sec.cs.tu-bs.de/pubs/2014-ieeesp.pdf
 
-[3] The ShiftLeft Tinkergraph
-    https://github.com/ShiftLeftSecurity/tinkergraph-gremlin
+- The ShiftLeft Tinkergraph: https://github.com/ShiftLeftSecurity/tinkergraph-gremlin
 
-[4] ShiftLeft OverflowDB
-    https://github.com/ShiftLeftSecurity/overflowdb
+- ShiftLeft OverflowDB: https://github.com/ShiftLeftSecurity/overflowdb
 
