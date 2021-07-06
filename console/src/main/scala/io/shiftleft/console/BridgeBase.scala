@@ -316,8 +316,11 @@ trait BridgeBase {
         ammonite.shutdown()
         System.exit(1)
       }
-      case _: Throwable => {
-        println("Unhandled exception thrown while attempting to start CPGQL server, exiting.")
+      case e: Throwable => {
+        println("Unhandled exception thrown while attempting to start CPGQL server: ")
+        println(e.getMessage)
+        println("Exiting.")
+
         ammonite.shutdown()
         System.exit(1)
       }
