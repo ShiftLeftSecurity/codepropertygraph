@@ -308,7 +308,20 @@ trait BridgeBase {
                                  config.serverAuthUsername,
                                  config.serverAuthPassword)
     println("Starting CPGQL server ...")
-    server.main(Array.empty)
+    try {
+      server.main(Array.empty)
+    } catch {
+      case _: java.net.BindException => {
+        println("Could not bind socket for CPGQL server, exiting.")
+        ammonite.shutdown()
+        System.exit(1)
+      }
+      case _: Throwable => {
+        println("Unhandled exception thrown while attempting to start CPGQL server, exiting.")
+        ammonite.shutdown()
+        System.exit(1)
+      }
+    }
   }
 
   private def runScript(scriptFile: Path, config: Config) = {
