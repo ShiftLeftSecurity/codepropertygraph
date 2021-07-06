@@ -190,6 +190,29 @@ class CPGQLServerTests extends AnyWordSpec with Matchers {
     getResultResponse("success").bool shouldBe false
     getResultResponse("err").str.length should not equal (0)
   }
+
+  "return websocket responses for all queries when posted quickly in a large number" in Fixture() { host =>
+    var webSocketTextMsg = scala.concurrent.Promise[String]()
+    cask.util.WsClient.connect(s"$host/connect") {
+      case cask.Ws.Text(msg) => webSocketTextMsg.success(msg)
+    }
+    Await.result(webSocketTextMsg.future, DefaultPromiseAwaitTimeout)
+
+    val numQueries = 50
+    val postQueriesResponseUUIDs =
+      for (_ <- 1 to numQueries) {
+        val postQueryResponse = postQuery(host, "1")
+        postQueryResponse("uuid").str
+      }
+
+    val websocketMessages =
+      for (_ <- 1 to numQueries) {
+        webSocketTextMsg = scala.concurrent.Promise[String]()
+        Await.result(webSocketTextMsg.future, DefaultPromiseAwaitTimeout)
+      }
+
+    websocketMessages should be(postQueriesResponseUUIDs)
+  }
 }
 
 object Fixture {
