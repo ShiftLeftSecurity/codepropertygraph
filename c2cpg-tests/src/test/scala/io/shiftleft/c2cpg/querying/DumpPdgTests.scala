@@ -1,13 +1,14 @@
-package io.shiftleft.fuzzyc2cpg.querying
+package io.shiftleft.c2cpg.querying
 
 import better.files.File
 import io.shiftleft.dataflowengineoss.layers.dataflows.{DumpPdg, PdgDumpOptions}
-import io.shiftleft.fuzzyc2cpg.testfixtures.DataFlowCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.DataFlowCodeToCpgSuite
+import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.layers.LayerCreatorContext
 
 class DumpPdgTests extends DataFlowCodeToCpgSuite {
 
-  override val code =
+  override val code: String =
     """
       |int foo() {}
       |int bar() {}
@@ -19,7 +20,7 @@ class DumpPdgTests extends DataFlowCodeToCpgSuite {
 
       File.usingTemporaryDirectory("dumppdg") { tmpDir =>
         val opts = PdgDumpOptions(tmpDir.path.toString)
-        implicit val s = semantics
+        implicit val s: Semantics = semantics
         val layerContext = new LayerCreatorContext(cpg)
         new DumpPdg(opts).run(layerContext)
         (tmpDir / "0-pdg.dot").exists shouldBe true

@@ -1,14 +1,14 @@
-package io.shiftleft.fuzzyc2cpg.querying
+package io.shiftleft.c2cpg.querying
 
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.dataflowengineoss.language._
-import io.shiftleft.fuzzyc2cpg.testfixtures.DataFlowCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
 
 class CDataFlowTests1 extends DataFlowCodeToCpgSuite {
 
-  override val code =
+  override val code: String =
     """
       |
       | void flows1(FILE *fd, int mode) {

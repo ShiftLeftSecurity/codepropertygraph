@@ -1,11 +1,11 @@
-package io.shiftleft.fuzzyc2cpg.querying
+package io.shiftleft.c2cpg.querying
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.language.{NoResolve, _}
 
-class CallGraphTests extends FuzzyCCodeToCpgSuite {
+class CallGraphTests extends CCodeToCpgSuite {
 
-  implicit val resolver = NoResolve
+  implicit val resolver: NoResolve.type = NoResolve
 
   override val code = """
        int add(int x, int y) {

@@ -1,11 +1,11 @@
-package io.shiftleft.fuzzyc2cpg.standard
+package io.shiftleft.c2cpg.standard
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
-class TypeTests extends FuzzyCCodeToCpgSuite {
+class TypeTests extends CCodeToCpgSuite {
 
-  override val code =
+  override val code: String =
     """
       | class Foo {
       |  member_type x;

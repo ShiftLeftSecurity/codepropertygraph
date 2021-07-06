@@ -1,4 +1,4 @@
-package io.shiftleft.fuzzyc2cpg.testfixtures
+package io.shiftleft.c2cpg.testfixtures
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
@@ -13,7 +13,7 @@ class CodeDirToCpgFixture extends AnyWordSpec with Matchers with BeforeAndAfterA
 
   val dir: java.io.File = null
   var cpg: Cpg = _
-  val frontend: LanguageFrontend = new FuzzycFrontend
+  val frontend: LanguageFrontend = new C2CpgFrontend
   def passes(cpg: Cpg): Unit = createEnhancements(cpg)
 
   override def beforeAll(): Unit = {

@@ -1,7 +1,7 @@
-package io.shiftleft.fuzzyc2cpg.querying
+package io.shiftleft.c2cpg.querying
 
 import io.shiftleft.codepropertygraph.generated.NodeTypes
-import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
 /**
@@ -10,7 +10,7 @@ import io.shiftleft.semanticcpg.language._
   * can be used as a starting point, e.g., `cpg.method` starts at all methods
   * while `cpg.local` starts at all locals.
   * */
-class NodeTypeStartersTests extends FuzzyCCodeToCpgSuite {
+class NodeTypeStartersTests extends CCodeToCpgSuite {
 
   override val code = """
        /* A C comment */

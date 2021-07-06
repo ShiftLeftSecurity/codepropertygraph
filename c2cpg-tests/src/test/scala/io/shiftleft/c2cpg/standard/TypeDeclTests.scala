@@ -1,21 +1,19 @@
-package io.shiftleft.fuzzyc2cpg.standard
+package io.shiftleft.c2cpg.standard
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.FileTraversal
 
-class TypeDeclTests extends FuzzyCCodeToCpgSuite {
+class TypeDeclTests extends CCodeToCpgSuite {
 
-  override val code = """
-                   | class foo : bar {
-                   |   char x;
-                   |   int y;
-                   |   int method () {}
-                   | };
-                   |
-                   | typedef int mytype;
-                   |
-    """.stripMargin
+  override val code: String = """
+   | class foo : bar {
+   |   char x;
+   |   int y;
+   |   int method () {}
+   | };
+   |
+   | typedef int mytype;""".stripMargin
 
   "should contain a type decl for `foo` with correct fields" in {
     val List(x) = cpg.typeDecl("foo").l

@@ -1,36 +1,36 @@
-package io.shiftleft.fuzzyc2cpg.querying
+package io.shiftleft.c2cpg.querying
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
 /**
   * Language primitives for navigating local variables
   * */
-class LocalsTests extends FuzzyCCodeToCpgSuite {
+class LocalsTests extends CCodeToCpgSuite {
 
-  override val code = """| #include <stdlib.h>
-                    | struct node {
-                    | int value;
-                    | struct node *next;
-                    | };
-                    |
-                    | void free_list(struct node *head) {
-                    | struct node *q;
-                    | for (struct node *p = head; p != NULL; p = q) {
-                    |    q = p->next;
-                    |    free(p);
-                    |    }
-                    | }
-                    | int flow(int p0) {
-                    |    int a = p0;
-                    |    int b=a;
-                    |    int c=0x31;
-                    |    int z = b + c;
-                    |    z++;
-                    |    int x = z;
-                    |    return x;
-                    |    }
-                 """.stripMargin
+  override val code: String = """
+    | #include <stdlib.h>
+    | struct node {
+    | int value;
+    | struct node *next;
+    | };
+    |
+    | void free_list(struct node *head) {
+    | struct node *q;
+    | for (struct node *p = head; p != NULL; p = q) {
+    |    q = p->next;
+    |    free(p);
+    |    }
+    | }
+    | int flow(int p0) {
+    |    int a = p0;
+    |    int b=a;
+    |    int c=0x31;
+    |    int z = b + c;
+    |    z++;
+    |    int x = z;
+    |    return x;
+    | } """.stripMargin
 
   "should allow to query for all locals" in {
     cpg.local.name.toSet shouldBe Set("a", "b", "c", "z", "x", "q", "p")

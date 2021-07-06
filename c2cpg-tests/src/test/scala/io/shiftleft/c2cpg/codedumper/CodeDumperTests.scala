@@ -1,16 +1,16 @@
-package io.shiftleft.fuzzyc2cpg.codedumper
+package io.shiftleft.c2cpg.codedumper
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.codedumper.CodeDumper
 import io.shiftleft.semanticcpg.language._
 
 import java.util.regex.Pattern
 
-class CodeDumperTests extends FuzzyCCodeToCpgSuite {
+class CodeDumperTests extends CCodeToCpgSuite {
 
   implicit val finder: NodeExtensionFinder = DefaultNodeExtensionFinder
 
-  override val code = """
+  override val code: String = """
                 | // A comment
                 |int my_func(int param1)
                 |{

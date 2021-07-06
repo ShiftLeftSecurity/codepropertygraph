@@ -1,4 +1,4 @@
-package io.shiftleft.fuzzyc2cpg.testfixtures
+package io.shiftleft.c2cpg.testfixtures
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
@@ -14,7 +14,7 @@ import overflowdb.traversal.Traversal
 import scala.sys.process.Process
 import scala.util.Try
 
-class DataFlowCodeToCpgSuite extends FuzzyCCodeToCpgSuite {
+class DataFlowCodeToCpgSuite extends CCodeToCpgSuite {
 
   var semanticsFilename = "dataflowengineoss/src/test/resources/default.semantics"
   var semantics: Semantics = _
@@ -53,12 +53,11 @@ class DataFlowCodeToCpgSuite extends FuzzyCCodeToCpgSuite {
 
   protected def flowToResultPairs(path: Path): List[(String, Option[Integer])] = {
     val pairs = path.elements.map {
-      case point: MethodParameterIn => {
+      case point: MethodParameterIn =>
         val method = point.method.head
         val method_name = method.name
         val code = s"$method_name(${method.parameter.l.sortBy(_.order).map(_.code).mkString(", ")})"
         (code, point.lineNumber)
-      }
       case point => (point.statement.repr, point.lineNumber)
     }
     pairs.headOption.map(x => x :: pairs.sliding(2).collect { case Seq(a, b) if a != b => b }.toList).getOrElse(List())

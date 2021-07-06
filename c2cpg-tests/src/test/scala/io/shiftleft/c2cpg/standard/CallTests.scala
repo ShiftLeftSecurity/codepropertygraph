@@ -1,13 +1,13 @@
-package io.shiftleft.fuzzyc2cpg.standard
+package io.shiftleft.c2cpg.standard
 
 import io.shiftleft.codepropertygraph.generated.Operators
 import io.shiftleft.codepropertygraph.generated.nodes.{Call, Literal}
-import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.language.{NoResolve, _}
 
-class CallTests extends FuzzyCCodeToCpgSuite {
+class CallTests extends CCodeToCpgSuite {
 
-  implicit val resolver = NoResolve
+  implicit val resolver: NoResolve.type = NoResolve
 
   override val code = """
        int add(int x, int y) {

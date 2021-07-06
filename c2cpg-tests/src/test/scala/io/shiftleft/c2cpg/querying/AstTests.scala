@@ -1,11 +1,11 @@
-package io.shiftleft.fuzzyc2cpg.querying
+package io.shiftleft.c2cpg.querying
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
-class CAstTests extends FuzzyCCodeToCpgSuite {
+class CAstTests extends CCodeToCpgSuite {
 
-  override val code =
+  override val code: String =
     """
       | int foo(int y) {
       |   int x = 10;
@@ -135,9 +135,9 @@ class CAstTests extends FuzzyCCodeToCpgSuite {
   }
 }
 
-class CAstTests2 extends FuzzyCCodeToCpgSuite {
+class CAstTests2 extends CCodeToCpgSuite {
 
-  override val code =
+  override val code: String =
     """
       |void foo(int bar) {
       | char buf[10];

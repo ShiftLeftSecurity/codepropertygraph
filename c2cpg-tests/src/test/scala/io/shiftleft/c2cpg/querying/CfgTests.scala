@@ -1,11 +1,11 @@
-package io.shiftleft.fuzzyc2cpg.querying
+package io.shiftleft.c2cpg.querying
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
-class CfgTests extends FuzzyCCodeToCpgSuite {
+class CfgTests extends CCodeToCpgSuite {
 
-  override val code =
+  override val code: String =
     """
       | int foo(int y, int y) {
       |  if (y < 10)

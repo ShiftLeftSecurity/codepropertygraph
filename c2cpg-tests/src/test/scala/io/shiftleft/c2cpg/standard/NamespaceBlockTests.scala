@@ -1,10 +1,10 @@
-package io.shiftleft.fuzzyc2cpg.standard
+package io.shiftleft.c2cpg.standard
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, NamespaceTraversal}
 
-class NamespaceBlockTests extends FuzzyCCodeToCpgSuite {
+class NamespaceBlockTests extends CCodeToCpgSuite {
 
   // The fuzzyC parser currently just ignores namespaces. We place symbols
   // that can't be associated in a file into the namespace "<global>", and

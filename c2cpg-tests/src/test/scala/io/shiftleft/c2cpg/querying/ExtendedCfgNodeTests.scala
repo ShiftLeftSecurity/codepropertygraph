@@ -1,9 +1,9 @@
-package io.shiftleft.fuzzyc2cpg.querying
+package io.shiftleft.c2cpg.querying
 
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
-import io.shiftleft.fuzzyc2cpg.testfixtures.DataFlowCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
 class ExtendedCfgNodeTests extends DataFlowCodeToCpgSuite {
@@ -16,7 +16,7 @@ class ExtendedCfgNodeTests extends DataFlowCodeToCpgSuite {
     s = semantics
   }
 
-  override val code =
+  override val code: String =
     """
       |int foo(int y) {
       | int x = source();

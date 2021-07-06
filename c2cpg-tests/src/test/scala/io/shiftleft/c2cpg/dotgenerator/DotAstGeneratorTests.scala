@@ -1,11 +1,11 @@
-package io.shiftleft.fuzzyc2cpg.dotgenerator
+package io.shiftleft.c2cpg.dotgenerator
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
-class DotAstGeneratorTests extends FuzzyCCodeToCpgSuite {
+class DotAstGeneratorTests extends CCodeToCpgSuite {
 
-  override val code =
+  override val code: String =
     """| // A comment
        |int my_func(int x)
        |{

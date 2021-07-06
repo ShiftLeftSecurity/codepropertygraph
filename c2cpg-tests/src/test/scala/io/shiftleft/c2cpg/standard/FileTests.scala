@@ -1,10 +1,10 @@
-package io.shiftleft.fuzzyc2cpg.standard
+package io.shiftleft.c2cpg.standard
 
-import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.FileTraversal
 
-class FileTests extends FuzzyCCodeToCpgSuite {
+class FileTests extends CCodeToCpgSuite {
 
   override val code: String =
     """

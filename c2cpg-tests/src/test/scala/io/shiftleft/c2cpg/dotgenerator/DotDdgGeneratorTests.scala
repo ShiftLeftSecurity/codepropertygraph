@@ -1,11 +1,13 @@
-package io.shiftleft.fuzzyc2cpg.dotgenerator
+package io.shiftleft.c2cpg.dotgenerator
 
 import io.shiftleft.dataflowengineoss.language._
-import io.shiftleft.fuzzyc2cpg.testfixtures.DataFlowCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.DataFlowCodeToCpgSuite
+import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.language._
 
 class DotDdgGeneratorTests extends DataFlowCodeToCpgSuite {
-  override val code =
+
+  override val code: String =
     """
       |int foo(int param1, char *param2) {
       |   int i = 0;
@@ -20,7 +22,7 @@ class DotDdgGeneratorTests extends DataFlowCodeToCpgSuite {
 
   "A DdgDotGenerator" should {
     "create a dot graph with 31 edges" in {
-      implicit val s = semantics
+      implicit val s: Semantics = semantics
       val lines = cpg.method.name("foo").dotDdg.l.head.split("\n")
       lines.head.startsWith("digraph foo") shouldBe true
       lines.count(x => x.contains("->")) shouldBe 32
@@ -30,7 +32,8 @@ class DotDdgGeneratorTests extends DataFlowCodeToCpgSuite {
 }
 
 class DotDdgGeneratorTests2 extends DataFlowCodeToCpgSuite {
-  override val code =
+
+  override val code: String =
     """
       |int foo() {
       |int x = 42;
@@ -40,7 +43,7 @@ class DotDdgGeneratorTests2 extends DataFlowCodeToCpgSuite {
       |""".stripMargin
 
   "create correct dot graph" in {
-    implicit val s = semantics
+    implicit val s: Semantics = semantics
     val lines = cpg.method.name("foo").dotDdg.l.head.split("\n")
     lines.count(x => x.contains("->") && x.contains("\"x\"")) shouldBe 3
   }
