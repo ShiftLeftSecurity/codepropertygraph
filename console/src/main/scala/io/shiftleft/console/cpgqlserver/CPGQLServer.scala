@@ -57,15 +57,11 @@ class CPGQLServer(ammonite: EmbeddedAmmonite,
       connection.send(cask.Ws.Text("connected"))
       openConnections += connection
       cask.WsActor {
-        case cask.Ws.ChannelClosed() => {
-          println("Connection closed.")
-          openConnections -= connection
-        }
         case cask.Ws.Error(e) => {
           println("Connection error: " + e.getMessage)
           openConnections -= connection
         }
-        case cask.Ws.Close(_, _) => {
+        case cask.Ws.Close(_, _) | cask.Ws.ChannelClosed() => {
           println("Connection closed.")
           openConnections -= connection
         }
