@@ -34,8 +34,10 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTInitializer,
   IASTLiteralExpression,
   IASTName,
+  IASTNamedTypeSpecifier,
   IASTNode,
   IASTParameterDeclaration,
+  IASTSimpleDeclSpecifier,
   IASTSimpleDeclaration,
   IASTStatement,
   IASTTranslationUnit
@@ -43,14 +45,12 @@ import org.eclipse.cdt.core.dom.ast.{
 import org.eclipse.cdt.internal.core.dom.parser.c.{
   CASTCompositeTypeSpecifier,
   CASTFunctionDeclarator,
-  CASTParameterDeclaration,
-  CASTSimpleDeclSpecifier
+  CASTParameterDeclaration
 }
 import org.eclipse.cdt.internal.core.dom.parser.cpp.{
   CPPASTCompositeTypeSpecifier,
   CPPASTFunctionDeclarator,
-  CPPASTParameterDeclaration,
-  CPPASTSimpleDeclSpecifier
+  CPPASTParameterDeclaration
 }
 
 object AstCreator {
@@ -281,21 +281,6 @@ class AstCreator(filename: String, global: Global) {
     "(" + elements.mkString(",") + ")"
   }
 
-  /*
-  private def parentName(node: IASTNode): String = Option(node.getParent) match {
-    case Some(p: CPPASTCompositeTypeSpecifier) => p.getName.toString
-    case Some(p: CASTCompositeTypeSpecifier)   => p.getName.toString
-    case None                                  => ""
-  }
-
-  private def methodFullName(functDef: IASTFunctionDefinition): String = {
-    val typeName = parentName(functDef)
-    val returnType = typeForIASTDeclSpecifier(functDef.getDeclSpecifier)
-    val methodName = functDef.getDeclarator.getName.toString
-    s"$typeName.$methodName:$returnType${paramListSignature(functDef, includeParamNames = false)}"
-  }
-   */
-
   private def createMethodNode(
       functDef: IASTFunctionDefinition,
       childNum: Int
@@ -308,8 +293,6 @@ class AstCreator(filename: String, global: Global) {
       .name(functDef.getDeclarator.getName.toString)
       .code(code)
       .isExternal(false)
-      // TODO: maybe calculate actual fullName here
-      // .fullName(methodFullName(functDef))
       .fullName(name)
       .lineNumber(line(functDef))
       .columnNumber(column(functDef))
@@ -368,7 +351,7 @@ class AstCreator(filename: String, global: Global) {
     Option(init) match {
       case Some(i: IASTEqualsInitializer) =>
         val operatorName = Operators.assignment
-        val callNode = newCallNode(i, operatorName, order)
+        val callNode = newCallNode(declarator, operatorName, order)
         val left = astForIASTNode(declarator.getName, 1)
         val right = astForIASTNode(i.getInitializerClause, 2)
         Ast(callNode)
@@ -407,9 +390,9 @@ class AstCreator(filename: String, global: Global) {
             astForIASTDeclarator(s, d, order + o)
           }
         val calls =
-          withOrder(s.getDeclarators.toList) { (d, o) =>
+          withOrder(s.getDeclarators.toList.filter(_.getInitializer != null)) { (d, o) =>
             astForIASTInitializer(d, d.getInitializer, locals.size + o)
-          }.filter(_.root.isDefined)
+          }
         locals ++ calls
       case _ => ???
     }
@@ -491,9 +474,9 @@ class AstCreator(filename: String, global: Global) {
 
   private def typeForIASTDeclSpecifier(spec: IASTDeclSpecifier): String = {
     spec match {
-      case s: CPPASTSimpleDeclSpecifier => s.toString
-      case s: CASTSimpleDeclSpecifier   => s.toString
-      case _                            => ???
+      case s: IASTSimpleDeclSpecifier => s.toString
+      case s: IASTNamedTypeSpecifier  => s.getName.toString
+      case _                          => ???
     }
   }
 
