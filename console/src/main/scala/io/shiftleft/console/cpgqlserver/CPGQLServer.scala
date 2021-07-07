@@ -5,6 +5,11 @@ import io.shiftleft.console.embammonite.{EmbeddedAmmonite, QueryResult}
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.{Base64, UUID}
+import scala.meta._
+
+object CPGLSError extends Enumeration {
+  val parseError = Value("cpgqls_query_parse_error")
+}
 
 class CPGQLServer(ammonite: EmbeddedAmmonite,
                   serverHost: String,
@@ -48,7 +53,7 @@ class CPGQLServer(ammonite: EmbeddedAmmonite,
   }
 
   var openConnections = Set.empty[cask.WsChannelActor]
-  val resultMap = new ConcurrentHashMap[UUID, QueryResult]()
+  val resultMap = new ConcurrentHashMap[UUID, (QueryResult, Boolean)]()
   val unauthorizedResponse = Response(ujson.Obj(), 401, headers = Seq("WWW-Authenticate" -> "Basic"))
 
   @cask.websocket("/connect")
@@ -57,7 +62,14 @@ class CPGQLServer(ammonite: EmbeddedAmmonite,
       connection.send(cask.Ws.Text("connected"))
       openConnections += connection
       cask.WsActor {
-        case cask.Ws.Close(_, _) => openConnections -= connection
+        case cask.Ws.Error(e) => {
+          println("Connection error: " + e.getMessage)
+          openConnections -= connection
+        }
+        case cask.Ws.Close(_, _) | cask.Ws.ChannelClosed() => {
+          println("Connection closed.")
+          openConnections -= connection
+        }
       }
     }
   }
@@ -68,14 +80,23 @@ class CPGQLServer(ammonite: EmbeddedAmmonite,
     val res = if (!isAuthorized) {
       unauthorizedResponse
     } else {
-      val uuid = ammonite.queryAsync(query) { result =>
-        resultMap.put(result.uuid, result)
+      val hasErrorOnParseQuery = query.parse[Stat].toOption.isEmpty
+      if (hasErrorOnParseQuery) {
+        val result = new QueryResult("", CPGLSError.parseError.toString, UUID.randomUUID())
+        resultMap.put(result.uuid, (result, false))
         openConnections.foreach { connection =>
-          // Report on websocket connections that result is ready
           connection.send(cask.Ws.Text(result.uuid.toString))
         }
+        Response(ujson.Obj("success" -> false, "uuid" -> result.uuid.toString), 200)
+      } else {
+        val uuid = ammonite.queryAsync(query) { result =>
+          resultMap.put(result.uuid, (result, true))
+          openConnections.foreach { connection =>
+            connection.send(cask.Ws.Text(result.uuid.toString))
+          }
+        }
+        Response(ujson.Obj("success" -> true, "uuid" -> uuid.toString), 200)
       }
-      Response(ujson.Obj("success" -> true, "uuid" -> uuid.toString), 200)
     }
     res
   }
@@ -98,10 +119,10 @@ class CPGQLServer(ammonite: EmbeddedAmmonite,
         if (resFromMap == null) {
           ujson.Obj("success" -> false, "err" -> "No result found for specified UUID")
         } else {
-          ujson.Obj("success" -> true,
-                    "uuid" -> resFromMap.uuid.toString,
-                    "stdout" -> resFromMap.out,
-                    "stderr" -> resFromMap.err)
+          ujson.Obj("success" -> resFromMap._2,
+                    "uuid" -> resFromMap._1.uuid.toString,
+                    "stdout" -> resFromMap._1.out,
+                    "stderr" -> resFromMap._1.err)
         }
       }
       Response(finalRes, 200)
