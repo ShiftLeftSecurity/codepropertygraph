@@ -510,8 +510,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       // TODO requires .aliasTypeFullName accessor missing
       cpg.typeDecl
         .name("abc")
-        .filter(_.aliasTypeFullName.contains("foo"))
-        .size shouldBe 1
+        .count(_.aliasTypeFullName.contains("foo")) shouldBe 1
     }
 
     "be correct for single inheritance" in Fixture(
@@ -526,8 +525,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
     ) { cpg =>
       cpg.typeDecl
         .name("Derived")
-        .filter(_.inheritsFromTypeFullName == List("Base"))
-        .size shouldBe 1
+        .count(_.inheritsFromTypeFullName == List("Base")) shouldBe 1
     }
 
     "be correct for method calls" in Fixture(
