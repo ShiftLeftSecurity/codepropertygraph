@@ -1,11 +1,38 @@
 package io.shiftleft.c2cpg.passes
 
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
-import io.shiftleft.codepropertygraph.generated.nodes.{NewFile, NewNamespaceBlock, NewNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{
+  NewBlock,
+  NewFile,
+  NewMethod,
+  NewMethodParameterIn,
+  NewMethodReturn,
+  NewNamespaceBlock,
+  NewNode
+}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
-import org.eclipse.cdt.core.dom.ast.{IASTDeclaration, IASTNode, IASTTranslationUnit}
+import org.eclipse.cdt.core.dom.ast.{
+  IASTCompoundStatement,
+  IASTDeclSpecifier,
+  IASTDeclaration,
+  IASTFunctionDefinition,
+  IASTNode,
+  IASTParameterDeclaration,
+  IASTStatement,
+  IASTTranslationUnit
+}
+import org.eclipse.cdt.internal.core.dom.parser.c.{
+  CASTFunctionDeclarator,
+  CASTParameterDeclaration,
+  CASTSimpleDeclSpecifier
+}
+import org.eclipse.cdt.internal.core.dom.parser.cpp.{
+  CPPASTFunctionDeclarator,
+  CPPASTParameterDeclaration,
+  CPPASTSimpleDeclSpecifier
+}
 
 object AstCreator {
 
@@ -57,6 +84,14 @@ object AstCreator {
       this.copy(conditionEdges = conditionEdges ++ List(AstEdge(src, dst)))
     }
 
+  }
+
+  def line(node: IASTNode): Option[Integer] = {
+    Some(node.getFileLocation.getStartingLineNumber)
+  }
+
+  def column(node: IASTNode): Option[Integer] = {
+    Some(node.getFileLocation.getNodeOffset)
   }
 
 }
@@ -115,10 +150,139 @@ class AstCreator(filename: String) {
     Ast(namespaceBlock)
   }
 
+  private def params(functDef: IASTFunctionDefinition): List[IASTParameterDeclaration] = functDef.getDeclarator match {
+    case decl: CPPASTFunctionDeclarator => decl.getParameters.toList
+    case decl: CASTFunctionDeclarator   => decl.getParameters.toList
+    case _                              => ???
+  }
+
+  private def astForIASTFunctionDefinition(functDef: IASTFunctionDefinition, order: Int): Ast = {
+    val methodNode = createMethodNode(functDef, order)
+
+    val parameterAsts = withOrder(params(functDef)) { (p, order) =>
+      astForParameter(p, order)
+    }
+
+    val lastOrder = 2 + parameterAsts.size
+    Ast(methodNode)
+      .withChildren(parameterAsts)
+      .withChild(astForMethodBody(Option(functDef.getBody), lastOrder))
+      .withChild(astForMethodReturn(functDef, lastOrder, typeForIASTDeclSpecifier(functDef.getDeclSpecifier)))
+  }
+
+  private def astForMethodReturn(functDef: IASTFunctionDefinition, order: Int, tpe: String): Ast = {
+    val methodReturnNode =
+      NewMethodReturn()
+        .order(order)
+        .typeFullName(tpe)
+        .code(tpe)
+        .lineNumber(line(functDef.getDeclarator))
+    Ast(methodReturnNode)
+  }
+
+  private def paramListSignature(functDef: IASTFunctionDefinition, includeParamNames: Boolean): String = {
+    val elements =
+      if (!includeParamNames) params(functDef).map(p => typeForIASTDeclSpecifier(p.getDeclSpecifier))
+      else params(functDef).map(p => p.getDeclarator.getName.toString)
+    "(" + elements.mkString(",") + ")"
+  }
+
+  /*
+  private def parentName(node: IASTNode): String = Option(node.getParent) match {
+    case Some(p: CPPASTCompositeTypeSpecifier) => p.getName.toString
+    case Some(p: CASTCompositeTypeSpecifier)   => p.getName.toString
+    case None                                  => ""
+  }
+
+  private def methodFullName(functDef: IASTFunctionDefinition): String = {
+    val typeName = parentName(functDef)
+    val returnType = typeForIASTDeclSpecifier(functDef.getDeclSpecifier)
+    val methodName = functDef.getDeclarator.getName.toString
+    s"$typeName.$methodName:$returnType${paramListSignature(functDef, includeParamNames = false)}"
+  }
+   */
+
+  private def createMethodNode(
+      functDef: IASTFunctionDefinition,
+      childNum: Int
+  ) = {
+    val returnType = typeForIASTDeclSpecifier(functDef.getDeclSpecifier)
+    val signature = returnType + " " + paramListSignature(functDef, includeParamNames = false)
+    val code = returnType + " " + paramListSignature(functDef, includeParamNames = true)
+    val name = functDef.getDeclarator.getName.toString
+    val methodNode = NewMethod()
+      .name(functDef.getDeclarator.getName.toString)
+      .code(code)
+      .isExternal(false)
+      // TODO: maybe calculate actual fullName here
+      // .fullName(methodFullName(functDef))
+      .fullName(name)
+      .lineNumber(line(functDef))
+      .columnNumber(column(functDef))
+      .signature(signature)
+      .filename(filename)
+      .order(childNum)
+    methodNode
+  }
+
+  private def astForBlockStatement(stmt: IASTCompoundStatement, order: Int): Ast = {
+    val block = NewBlock(order = order, lineNumber = line(stmt), columnNumber = column(stmt))
+    Ast(block).withChildren(
+      withOrder(stmt.getStatements.toList) { (x, order) =>
+        astsForIASTStatement(x, order)
+      }.flatten
+    )
+  }
+
+  private def astsForIASTStatement(statement: IASTStatement, order: Int): Seq[Ast] = {
+    println(s"$statement at order $order")
+    statement match {
+      // TODO: handle all statement types
+      case _ => Seq()
+    }
+  }
+
+  private def astForMethodBody(body: Option[IASTStatement], order: Int): Ast = {
+    body match {
+      case Some(b: IASTCompoundStatement) => astForBlockStatement(b, order)
+      case None                           => Ast(NewBlock())
+      case _                              => ???
+    }
+  }
+
+  private def typeForIASTDeclSpecifier(spec: IASTDeclSpecifier): String = {
+    spec match {
+      case s: CPPASTSimpleDeclSpecifier => s.toString
+      case s: CASTSimpleDeclSpecifier   => s.toString
+      case _                            => ???
+    }
+  }
+
+  private def astForParameter(parameter: IASTParameterDeclaration, childNum: Int): Ast = {
+    val (name, tpe) = parameter match {
+      case _: CPPASTParameterDeclaration | _: CASTParameterDeclaration =>
+        val decl = parameter.getDeclarator
+        (decl.getName.getRawSignature, typeForIASTDeclSpecifier(parameter.getDeclSpecifier))
+      case _ => ???
+    }
+
+    val parameterNode = NewMethodParameterIn()
+      .name(name)
+      .code(parameter.toString)
+      .typeFullName(tpe)
+      .order(childNum)
+      .lineNumber(line(parameter))
+      .columnNumber(column(parameter))
+    Ast(parameterNode)
+  }
+
   private def astForIASTDeclaration(decl: IASTDeclaration, order: Int): Ast = {
     // TODO: descent from here ...
     println("Order " + order + ": " + decl.getRawSignature)
-    Ast()
+    decl match {
+      case functDef: IASTFunctionDefinition => astForIASTFunctionDefinition(functDef, order)
+      case _                                => Ast()
+    }
   }
 
   /**
@@ -143,59 +307,7 @@ class AstCreator(filename: String) {
     )
   }
 
-  private def astForMethod(
-      methodDeclaration: MethodDeclaration,
-      typeDecl: TypeDeclaration[_],
-      childNum: Int
-  ): Ast = {
-    val methodNode = createMethodNode(methodDeclaration, typeDecl, childNum)
-    val parameterAsts = withOrder(methodDeclaration.getParameters) { (p, order) =>
-      astForParameter(p, order)
-    }
-    val lastOrder = 2 + parameterAsts.size
-    Ast(methodNode)
-      .withChildren(parameterAsts)
-      .withChild(astForMethodReturn(methodDeclaration))
-      .withChild(astForMethodBody(methodDeclaration.getBody.asScala, lastOrder))
-  }
 
-  private def astForMethodReturn(methodDeclaration: MethodDeclaration): Ast = {
-    val methodReturnNode =
-      NewMethodReturn()
-        .order(methodDeclaration.getParameters.size + 2)
-        .typeFullName(methodDeclaration.getType.resolve().describe())
-        .code(methodDeclaration.getTypeAsString)
-        .lineNumber(line(methodDeclaration.getType))
-    Ast(methodReturnNode)
-  }
-
-  private def createMethodNode(
-      methodDeclaration: MethodDeclaration,
-      typeDecl: TypeDeclaration[_],
-      childNum: Int
-  ) = {
-    val fullName = methodFullName(typeDecl, methodDeclaration)
-    val code = methodDeclaration.getDeclarationAsString().trim
-    val methodNode = NewMethod()
-      .name(methodDeclaration.getNameAsString)
-      .fullName(fullName)
-      .code(code)
-      .signature(methodDeclaration.getTypeAsString + paramListSignature(methodDeclaration))
-      .isExternal(false)
-      .order(childNum)
-      .filename(filename)
-      .lineNumber(line(methodDeclaration))
-    methodNode
-  }
-
-  private def astForMethodBody(body: Option[BlockStmt], order: Int): Ast = {
-    body match {
-      case Some(b) => astForBlockStatement(b, order)
-      case None =>
-        val blockNode = NewBlock()
-        Ast(blockNode)
-    }
-  }
 
   def astsForLabeledStatement(stmt: LabeledStmt, order: Int): Seq[Ast] = {
     val jumpTargetAst = Ast(NewJumpTarget(name = stmt.getLabel.toString, order = order))
@@ -210,34 +322,6 @@ class AstCreator(filename: String) {
       order = order
     )
     Ast(tryNode)
-  }
-
-  private def astsForStatement(statement: Statement, order: Int): Seq[Ast] = {
-    statement match {
-      case x: AssertStmt                        => Seq() // TODO: translate to Call
-      case x: BlockStmt                         => Seq(astForBlockStatement(x, order))
-      case x: BreakStmt                         => Seq(astForBreakStatement(x, order))
-      case x: ContinueStmt                      => Seq(astForContinueStatement(x, order))
-      case x: DoStmt                            => Seq(astForDo(x, order))
-      case x: EmptyStmt                         => Seq()
-      case x: ExplicitConstructorInvocationStmt => Seq() // TODO: translate to Call
-      case x: ExpressionStmt                    => Seq(astForExpression(x.getExpression, order))
-      case x: ForEachStmt                       => Seq() // TODO: translate to For
-      case x: ForStmt                           => Seq(astForFor(x, order))
-      case x: IfStmt                            => Seq(astForIf(x, order))
-      case x: LabeledStmt                       => astsForLabeledStatement(x, order)
-      case x: LocalClassDeclarationStmt         => Seq()
-      case x: LocalRecordDeclarationStmt        => Seq()
-      case x: ReturnStmt                        => Seq(astForReturnNode(x, order))
-      case x: SwitchStmt                        => Seq(astForSwitchStatement(x, order))
-      case x: SynchronizedStmt                  => Seq()
-      case x: ThrowStmt                         => Seq()
-      case x: TryStmt                           => Seq(astForTry(x, order))
-      case x: UnparsableStmt                    => Seq()
-      case x: WhileStmt                         => Seq(astForWhile(x, order))
-      case x: YieldStmt                         => Seq()
-      case _                                    => Seq()
-    }
   }
 
   def astForIf(stmt: IfStmt, order: Int): Ast = {
@@ -362,14 +446,7 @@ class AstCreator(filename: String) {
     labelNodes.map(x => Ast(x)) ++ statementAsts
   }
 
-  private def astForBlockStatement(stmt: BlockStmt, order: Int): Ast = {
-    val block = NewBlock(order = order, lineNumber = line(stmt), columnNumber = column(stmt))
-    Ast(block).withChildren(
-      withOrder(stmt.getStatements) { (x, order) =>
-        astsForStatement(x, order)
-      }.flatten
-    )
-  }
+
 
   private def astForReturnNode(ret: ReturnStmt, order: Int): Ast = {
     // TODO: Make return node with expression as children
@@ -466,41 +543,10 @@ class AstCreator(filename: String) {
     Ast(callNode)
   }
 
-  private def astForParameter(parameter: Parameter, childNum: Int): Ast = {
-    val parameterNode = NewMethodParameterIn()
-      .name(parameter.getName.toString)
-      .code(parameter.toString)
-      .typeFullName(parameter.getType.resolve().describe())
-      .order(childNum)
-      .lineNumber(line(parameter))
-      .columnNumber(column(parameter))
-    Ast(parameterNode)
-  }
 
-  private def methodFullName(
-      typeDecl: TypeDeclaration[_],
-      methodDeclaration: MethodDeclaration
-  ): String = {
-    val typeName = typeDecl.getFullyQualifiedName.asScala.getOrElse("")
-    val returnType = methodDeclaration.getTypeAsString
-    val methodName = methodDeclaration.getNameAsString
-    s"$typeName.$methodName:$returnType${paramListSignature(methodDeclaration)}"
-  }
 
-  private def paramListSignature(methodDeclaration: MethodDeclaration) = {
-    val paramTypes = methodDeclaration.getParameters.asScala.map(_.getType.resolve().describe())
-    "(" + paramTypes.mkString(",") + ")"
-  }
+
 }
-
-object AstCreator {
-  def line(node: Node): Option[Integer] = {
-    node.getBegin.map(x => Integer.valueOf(x.line)).asScala
-  }
-
-  def column(node: Node): Option[Integer] = {
-    node.getBegin.map(x => Integer.valueOf(x.column)).asScala
-  }
     **/
 
 }
