@@ -26,6 +26,8 @@ object TypeNodePassFixture {
       val filenames = List(file1.path.toAbsolutePath.toString)
       val astCreator = new AstCreationPass(filenames, cpg, keyPool)
       astCreator.createAndApply()
+      new TypeNodePass(astCreator.usedTypes(), cpg).createAndApply()
+
       f(cpg)
     }
   }

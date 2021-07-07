@@ -53,8 +53,6 @@ import org.eclipse.cdt.internal.core.dom.parser.cpp.{
   CPPASTSimpleDeclSpecifier
 }
 
-import scala.collection.mutable
-
 object AstCreator {
 
   case class AstEdge(src: NewNode, dst: NewNode)
@@ -129,13 +127,12 @@ object AstCreator {
 
 }
 
-class AstCreator(filename: String) {
+class AstCreator(filename: String, global: Global) {
 
   import AstCreator._
 
-  // private val stack: mutable.Stack[NewNode] = mutable.Stack()
+  private val scope = new Scope[String, (NewNode, String), NewNode]()
 
-  private val scope = mutable.HashMap.empty[String, (NewNode, String)]
   private val diffGraph: DiffGraph.Builder = DiffGraph.newBuilder
 
   def createAst(parserResult: IASTTranslationUnit): Iterator[DiffGraph] = {
@@ -169,6 +166,11 @@ class AstCreator(filename: String) {
         f(x, i + 1)
     }
 
+  private def registerType(typeName: String): String = {
+    global.usedTypes.put(typeName, true)
+    typeName
+  }
+
   private def astForFile(parserResult: IASTTranslationUnit): Ast =
     Ast(NewFile(name = filename, order = 0))
       .withChild(
@@ -197,7 +199,7 @@ class AstCreator(filename: String) {
   private def astForLiteral(lit: IASTLiteralExpression, order: Int): Ast = {
     val tpe = lit.getExpressionType.toString
     val litNode = NewLiteral()
-      .typeFullName(tpe)
+      .typeFullName(registerType(tpe))
       .code(lit.getRawSignature)
       .order(order)
       .argumentIndex(order)
@@ -209,7 +211,7 @@ class AstCreator(filename: String) {
   private def astForIdentifier(ident: IASTNode, order: Int): Ast = {
     val identifierName = ident.toString
 
-    val variableOption = scope.get(identifierName)
+    val variableOption = scope.lookupVariable(identifierName)
     val identifierTypeName = variableOption match {
       case Some((_, variableTypeName)) =>
         variableTypeName
@@ -219,7 +221,7 @@ class AstCreator(filename: String) {
 
     val cpgIdentifier = NewIdentifier()
       .name(identifierName)
-      .typeFullName(identifierTypeName)
+      .typeFullName(registerType(identifierTypeName))
       .code(ident.getRawSignature)
       .order(order)
       .argumentIndex(order)
@@ -235,9 +237,9 @@ class AstCreator(filename: String) {
 
   private def astForIASTNode(node: IASTNode, order: Int): Ast = {
     node match {
-      case lit: IASTLiteralExpression => astForLiteral(lit, order)
-      case name: IASTName             => astForIdentifier(name, order)
-      case ident: IASTIdExpression    => astForIdentifier(ident, order)
+      case name: IASTName          => astForIdentifier(name, order)
+      case ident: IASTIdExpression => astForIdentifier(ident, order)
+      case expr: IASTExpression    => astForIASTExpression(expr, order)
       // TODO
       case _ => Ast()
     }
@@ -246,22 +248,27 @@ class AstCreator(filename: String) {
   private def astForIASTFunctionDefinition(functDef: IASTFunctionDefinition, order: Int): Ast = {
     val methodNode = createMethodNode(functDef, order)
 
+    scope.pushNewScope(methodNode)
+
     val parameterAsts = withOrder(params(functDef)) { (p, order) =>
       astForParameter(p, order)
     }
 
     val lastOrder = 2 + parameterAsts.size
-    Ast(methodNode)
+    val r = Ast(methodNode)
       .withChildren(parameterAsts)
       .withChild(astForMethodBody(Option(functDef.getBody), lastOrder))
       .withChild(astForMethodReturn(functDef, lastOrder, typeForIASTDeclSpecifier(functDef.getDeclSpecifier)))
+
+    scope.popScope()
+    r
   }
 
   private def astForMethodReturn(functDef: IASTFunctionDefinition, order: Int, tpe: String): Ast = {
     val methodReturnNode =
       NewMethodReturn()
         .order(order)
-        .typeFullName(tpe)
+        .typeFullName(registerType(tpe))
         .code(tpe)
         .lineNumber(line(functDef.getDeclarator))
     Ast(methodReturnNode)
@@ -294,9 +301,9 @@ class AstCreator(filename: String) {
       childNum: Int
   ) = {
     val returnType = typeForIASTDeclSpecifier(functDef.getDeclSpecifier)
-    val signature = returnType + " " + paramListSignature(functDef, includeParamNames = false)
-    val code = returnType + " " + paramListSignature(functDef, includeParamNames = true)
     val name = functDef.getDeclarator.getName.toString
+    val signature = returnType + " " + name + " " + paramListSignature(functDef, includeParamNames = false)
+    val code = returnType + " " + name + " " + paramListSignature(functDef, includeParamNames = true)
     val methodNode = NewMethod()
       .name(functDef.getDeclarator.getName.toString)
       .code(code)
@@ -312,13 +319,31 @@ class AstCreator(filename: String) {
     methodNode
   }
 
-  private def astForBlockStatement(stmt: IASTCompoundStatement, order: Int): Ast = {
-    val block = NewBlock(order = order, lineNumber = line(stmt), columnNumber = column(stmt))
-    Ast(block).withChildren(
-      withOrder(stmt.getStatements.toList) { (x, order) =>
-        astsForIASTStatement(x, order)
-      }.flatten
-    )
+  private def astForBlockStatement(parent: Option[NewNode], stmt: IASTCompoundStatement, order: Int): Ast = {
+    parent match {
+      case Some(p) =>
+        Ast(p).withChildren(
+          withOrder(stmt.getStatements.toList) { (x, order) =>
+            astsForIASTStatement(x, order)
+          }.flatten
+        )
+      case None =>
+        val block = NewBlock()
+          .order(order)
+          .argumentIndex(order)
+          .typeFullName(registerType(Defines.voidTypeName))
+          .lineNumber(line(stmt))
+          .columnNumber(column(stmt))
+
+        scope.pushNewScope(block)
+        val r = Ast(block).withChildren(
+          withOrder(stmt.getStatements.toList) { (x, order) =>
+            astsForIASTStatement(x, order)
+          }.flatten
+        )
+        scope.popScope()
+        r
+    }
   }
 
   private def parentIsClassDef(node: IASTNode): Boolean = Option(node.getParent) match {
@@ -361,16 +386,16 @@ class AstCreator(filename: String) {
       NewMember()
         .code(declaration.getRawSignature)
         .name(name)
-        .typeFullName(declTypeName)
+        .typeFullName(registerType(declTypeName))
         .order(order)
     } else {
       NewLocal()
         .code(name)
         .name(name)
-        .typeFullName(declTypeName)
+        .typeFullName(registerType(declTypeName))
         .order(order)
     }
-    scope(name) = (newNode, declTypeName)
+    scope.addToScope(name, (newNode, declTypeName))
     Ast(newNode)
   }
 
@@ -384,42 +409,42 @@ class AstCreator(filename: String) {
         val calls =
           withOrder(s.getDeclarators.toList) { (d, o) =>
             astForIASTInitializer(d, d.getInitializer, locals.size + o)
-          }
+          }.filter(_.root.isDefined)
         locals ++ calls
       case _ => ???
     }
 
   private def astForIASTBinaryExpression(bin: IASTBinaryExpression, order: Int): Ast = {
     val op = bin.getOperator match {
-      case IASTBinaryExpression.op_multiply         => ???
-      case IASTBinaryExpression.op_divide           => ???
-      case IASTBinaryExpression.op_modulo           => ???
-      case IASTBinaryExpression.op_plus             => ???
-      case IASTBinaryExpression.op_minus            => ???
-      case IASTBinaryExpression.op_shiftLeft        => ???
-      case IASTBinaryExpression.op_shiftRight       => ???
-      case IASTBinaryExpression.op_lessThan         => ???
-      case IASTBinaryExpression.op_greaterThan      => ???
-      case IASTBinaryExpression.op_lessEqual        => ???
-      case IASTBinaryExpression.op_greaterEqual     => ???
-      case IASTBinaryExpression.op_binaryAnd        => ???
-      case IASTBinaryExpression.op_binaryXor        => ???
-      case IASTBinaryExpression.op_binaryOr         => ???
-      case IASTBinaryExpression.op_logicalAnd       => ???
-      case IASTBinaryExpression.op_logicalOr        => ???
+      case IASTBinaryExpression.op_multiply         => Operators.multiplication
+      case IASTBinaryExpression.op_divide           => Operators.division
+      case IASTBinaryExpression.op_modulo           => Operators.modulo
+      case IASTBinaryExpression.op_plus             => Operators.addition
+      case IASTBinaryExpression.op_minus            => Operators.minus
+      case IASTBinaryExpression.op_shiftLeft        => Operators.shiftLeft
+      case IASTBinaryExpression.op_shiftRight       => Operators.arithmeticShiftRight
+      case IASTBinaryExpression.op_lessThan         => Operators.lessThan
+      case IASTBinaryExpression.op_greaterThan      => Operators.greaterThan
+      case IASTBinaryExpression.op_lessEqual        => Operators.lessEqualsThan
+      case IASTBinaryExpression.op_greaterEqual     => Operators.greaterEqualsThan
+      case IASTBinaryExpression.op_binaryAnd        => Operators.and
+      case IASTBinaryExpression.op_binaryXor        => Operators.xor
+      case IASTBinaryExpression.op_binaryOr         => Operators.or
+      case IASTBinaryExpression.op_logicalAnd       => Operators.logicalAnd
+      case IASTBinaryExpression.op_logicalOr        => Operators.logicalOr
       case IASTBinaryExpression.op_assign           => Operators.assignment
-      case IASTBinaryExpression.op_multiplyAssign   => ???
-      case IASTBinaryExpression.op_divideAssign     => ???
-      case IASTBinaryExpression.op_moduloAssign     => ???
-      case IASTBinaryExpression.op_plusAssign       => ???
-      case IASTBinaryExpression.op_minusAssign      => ???
-      case IASTBinaryExpression.op_shiftLeftAssign  => ???
-      case IASTBinaryExpression.op_shiftRightAssign => ???
-      case IASTBinaryExpression.op_binaryAndAssign  => ???
-      case IASTBinaryExpression.op_binaryXorAssign  => ???
-      case IASTBinaryExpression.op_binaryOrAssign   => ???
-      case IASTBinaryExpression.op_equals           => ???
-      case IASTBinaryExpression.op_notequals        => ???
+      case IASTBinaryExpression.op_multiplyAssign   => Operators.assignmentMultiplication
+      case IASTBinaryExpression.op_divideAssign     => Operators.assignmentDivision
+      case IASTBinaryExpression.op_moduloAssign     => Operators.assignmentModulo
+      case IASTBinaryExpression.op_plusAssign       => Operators.assignmentPlus
+      case IASTBinaryExpression.op_minusAssign      => Operators.assignmentMinus
+      case IASTBinaryExpression.op_shiftLeftAssign  => Operators.assignmentShiftLeft
+      case IASTBinaryExpression.op_shiftRightAssign => Operators.assignmentArithmeticShiftRight
+      case IASTBinaryExpression.op_binaryAndAssign  => Operators.assignmentAnd
+      case IASTBinaryExpression.op_binaryXorAssign  => Operators.assignmentXor
+      case IASTBinaryExpression.op_binaryOrAssign   => Operators.assignmentOr
+      case IASTBinaryExpression.op_equals           => Operators.equals
+      case IASTBinaryExpression.op_notequals        => Operators.notEquals
       case IASTBinaryExpression.op_pmdot            => ???
       case IASTBinaryExpression.op_pmarrow          => ???
       case IASTBinaryExpression.op_max              => ???
@@ -437,8 +462,9 @@ class AstCreator(filename: String) {
   }
 
   private def astForIASTExpression(expression: IASTExpression, order: Int): Ast = expression match {
-    case bin: IASTBinaryExpression => astForIASTBinaryExpression(bin, order)
-    case _                         => ???
+    case lit: IASTLiteralExpression => astForLiteral(lit, order)
+    case bin: IASTBinaryExpression  => astForIASTBinaryExpression(bin, order)
+    case _                          => ???
   }
 
   private def astsForIASTExpressionStatement(expr: IASTExpressionStatement, order: Int): Seq[Ast] = {
@@ -450,13 +476,14 @@ class AstCreator(filename: String) {
       // TODO: handle all statement types
       case decl: IASTDeclarationStatement => astsForIASTDeclarationStatement(decl, order)
       case expr: IASTExpressionStatement  => astsForIASTExpressionStatement(expr, order)
+      case block: IASTCompoundStatement   => Seq(astForBlockStatement(None, block, order))
       case _                              => Seq()
     }
   }
 
   private def astForMethodBody(body: Option[IASTStatement], order: Int): Ast = {
     body match {
-      case Some(b: IASTCompoundStatement) => astForBlockStatement(b, order)
+      case Some(b: IASTCompoundStatement) => astForBlockStatement(None, b, order)
       case None                           => Ast(NewBlock())
       case _                              => ???
     }
@@ -481,12 +508,12 @@ class AstCreator(filename: String) {
     val parameterNode = NewMethodParameterIn()
       .name(name)
       .code(parameter.toString)
-      .typeFullName(tpe)
+      .typeFullName(registerType(tpe))
       .order(childNum)
       .lineNumber(line(parameter))
       .columnNumber(column(parameter))
 
-    scope(name) = (parameterNode, tpe)
+    scope.addToScope(name, (parameterNode, tpe))
 
     Ast(parameterNode)
   }

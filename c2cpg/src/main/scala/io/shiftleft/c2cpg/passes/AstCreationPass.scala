@@ -6,12 +6,17 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.{DiffGraph, IntervalKeyPool, ParallelCpgPass}
 
 import java.nio.file.Paths
+import scala.jdk.CollectionConverters._
 
 class AstCreationPass(filenames: List[String],
                       cpg: Cpg,
                       keyPool: IntervalKeyPool,
                       parseConfig: ParseConfig = ParseConfig.empty)
     extends ParallelCpgPass[String](cpg, keyPools = Some(keyPool.split(filenames.size))) {
+
+  private val global: Global = Global()
+
+  def usedTypes(): List[String] = global.usedTypes.keys().asScala.toList
 
   override def partIterator: Iterator[String] = filenames.iterator
 
@@ -21,7 +26,7 @@ class AstCreationPass(filenames: List[String],
 
     parseResult match {
       case ParseResult(Some(ast), _, _) =>
-        new AstCreator(filename).createAst(ast)
+        new AstCreator(filename, global).createAst(ast)
       case _ =>
         Iterator()
     }

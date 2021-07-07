@@ -3,7 +3,7 @@ package io.shiftleft.c2cpg
 import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.parser.ParseConfig
 import io.shiftleft.codepropertygraph.generated.Languages
-import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
+import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass, TypeNodePass}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
@@ -35,13 +35,16 @@ class C2Cpg() {
 
   def runAndOutput(config: Config): Cpg = {
     val metaDataKeyPool = new IntervalKeyPool(1, 100)
-    val functionKeyPool = new IntervalKeyPool(101, Long.MaxValue)
+    val typesKeyPool = new IntervalKeyPool(100, 1000100)
+    val functionKeyPool = new IntervalKeyPool(1000100, Long.MaxValue)
 
     val cpg = newEmptyCpg(Some(config.outputPath))
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
 
     new MetaDataPass(cpg, Languages.C, Some(metaDataKeyPool)).createAndApply()
-    new AstCreationPass(sourceFileNames, cpg, functionKeyPool, createParseConfig(config)).createAndApply()
+    val astCreationPass = new AstCreationPass(sourceFileNames, cpg, functionKeyPool, createParseConfig(config))
+    astCreationPass.createAndApply()
+    new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
     new CfgCreationPass(cpg).createAndApply()
     new StubRemovalPass(cpg).createAndApply()
     cpg
