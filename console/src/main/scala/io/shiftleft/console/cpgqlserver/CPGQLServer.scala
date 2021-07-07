@@ -2,10 +2,10 @@ package io.shiftleft.console.cpgqlserver
 
 import cask.model.{Request, Response}
 import io.shiftleft.console.embammonite.{EmbeddedAmmonite, QueryResult}
-import scala.meta._
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.{Base64, UUID}
+import scala.meta._
 
 object CPGLSError extends Enumeration {
   val parseError = Value("cpgqls_query_parse_error")
