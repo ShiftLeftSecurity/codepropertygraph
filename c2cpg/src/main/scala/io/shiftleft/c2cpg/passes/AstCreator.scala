@@ -115,8 +115,14 @@ class AstCreator(filename: String, global: Global) {
     }
   }
 
-  private def withOrder[T <: IASTNode, X](nodeList: List[T])(f: (T, Int) => X): Seq[X] =
-    nodeList.zipWithIndex.map {
+  private def withOrder[T <: IASTNode, X](nodes: Seq[T])(f: (T, Int) => X): Seq[X] =
+    nodes.zipWithIndex.map {
+      case (x, i) =>
+        f(x, i + 1)
+    }
+
+  private def withOrder[T <: IASTNode, X](nodes: Array[T])(f: (T, Int) => X): Seq[X] =
+    nodes.toIndexedSeq.zipWithIndex.map {
       case (x, i) =>
         f(x, i + 1)
     }
@@ -137,8 +143,8 @@ class AstCreator(filename: String, global: Global) {
     case _                                   => false
   }
 
-  private def params(functDef: IASTFunctionDefinition): List[IASTParameterDeclaration] = functDef.getDeclarator match {
-    case decl: IASTStandardFunctionDeclarator => decl.getParameters.toList
+  private def params(functDef: IASTFunctionDefinition): Seq[IASTParameterDeclaration] = functDef.getDeclarator match {
+    case decl: IASTStandardFunctionDeclarator => decl.getParameters.toIndexedSeq
     case _                                    => notHandledYet(functDef)
   }
 
@@ -178,7 +184,7 @@ class AstCreator(filename: String, global: Global) {
     Ast(NewFile(name = filename, order = 0))
       .withChild(
         astForTranslationUnit(parserResult)
-          .withChildren(withOrder(parserResult.getDeclarations.toList) { (decl, order) =>
+          .withChildren(withOrder(parserResult.getDeclarations) { (decl, order) =>
             astForDeclaration(decl, order)
           })
       )
@@ -298,7 +304,7 @@ class AstCreator(filename: String, global: Global) {
     parent match {
       case Some(p) =>
         Ast(p).withChildren(
-          withOrder(stmt.getStatements.toList) { (x, order) =>
+          withOrder(stmt.getStatements) { (x, order) =>
             astsForIASTStatement(x, order)
           }.flatten
         )
@@ -312,7 +318,7 @@ class AstCreator(filename: String, global: Global) {
 
         scope.pushNewScope(block)
         val r = Ast(block).withChildren(
-          withOrder(stmt.getStatements.toList) { (x, order) =>
+          withOrder(stmt.getStatements) { (x, order) =>
             astsForIASTStatement(x, order)
           }.flatten
         )
@@ -360,11 +366,11 @@ class AstCreator(filename: String, global: Global) {
     decl.getDeclaration match {
       case decl: IASTSimpleDeclaration =>
         val locals =
-          withOrder(decl.getDeclarators.toList) { (d, o) =>
+          withOrder(decl.getDeclarators) { (d, o) =>
             astForDeclarator(decl, d, order + o)
           }
         val calls =
-          withOrder(decl.getDeclarators.toList.filter(_.getInitializer != null)) { (d, o) =>
+          withOrder(decl.getDeclarators.filter(_.getInitializer != null)) { (d, o) =>
             astForInitializer(d, d.getInitializer, locals.size + o)
           }
         locals ++ calls
@@ -418,12 +424,8 @@ class AstCreator(filename: String, global: Global) {
       .withArgEdge(callNode, right.root.get)
   }
 
-  private def astForExpressionList(exprList: IASTExpressionList, order: Int): Ast = {
-    Ast()
-      .withChildren(withOrder(exprList.getExpressions.toList) { (decl, _) =>
-        astForExpression(decl, order)
-      })
-  }
+  private def astForExpressionList(exprList: IASTExpressionList, order: Int): Ast =
+    Ast().withChildren(exprList.getExpressions.toIndexedSeq.map(astForExpression(_, order)))
 
   private def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
     case lit: IASTLiteralExpression   => astForLiteral(lit, order)
