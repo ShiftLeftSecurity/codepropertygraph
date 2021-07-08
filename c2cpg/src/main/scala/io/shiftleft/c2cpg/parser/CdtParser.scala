@@ -1,21 +1,17 @@
 package io.shiftleft.c2cpg.parser
 
 import io.shiftleft.c2cpg.utils.TimeUtils
-import org.eclipse.cdt.core.dom.ast.gnu.cpp.GPPLanguage
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit
+import org.eclipse.cdt.core.dom.ast.gnu.cpp.GPPLanguage
 import org.eclipse.cdt.core.model.ILanguage
-import org.eclipse.cdt.core.parser.DefaultLogService
-import org.eclipse.cdt.core.parser.ScannerInfo
+import org.eclipse.cdt.core.parser.{DefaultLogService, FileContent, ScannerInfo}
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPVisitor
-import org.eclipse.cdt.core.parser.FileContent
 import org.slf4j.LoggerFactory
 
 import java.nio.file.Path
 import java.util
-import scala.util.Failure
-import scala.util.Success
-import scala.util.Try
 import scala.jdk.CollectionConverters._
+import scala.util.{Failure, Success, Try}
 
 object CdtParser {
 

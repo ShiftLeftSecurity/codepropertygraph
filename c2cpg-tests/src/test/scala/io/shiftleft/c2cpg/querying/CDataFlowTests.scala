@@ -1,8 +1,8 @@
 package io.shiftleft.c2cpg.querying
 
+import io.shiftleft.c2cpg.testfixtures.DataFlowCodeToCpgSuite
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.dataflowengineoss.language._
-import io.shiftleft.c2cpg.testfixtures.DataFlowCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
 

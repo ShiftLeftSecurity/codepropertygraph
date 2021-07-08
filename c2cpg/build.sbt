@@ -3,13 +3,10 @@ name := "c2cpg"
 dependsOn(Projects.semanticcpg % "compile->compile; test->test")
 
 libraryDependencies ++= Seq(
-  "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.3",
-  "de.mhoffrogge.attached"  % "org.eclipse.cdt.core"       % "5.11.0",
-  "org.eclipse.equinox"     % "common"                     % "3.6.200-v20130402-1505",
-  "org.scalatest"        %% "scalatest"                % Versions.scalatest % Test,
+  "org.scala-lang.modules"  %% "scala-parallel-collections" % "1.0.3",
+  "com.diffplug.spotless"   % "spotless-eclipse-cdt"        % "10.3.0",
+  "org.scalatest"           %% "scalatest"                  % Versions.scalatest % Test,
 )
-
-scalacOptions -= "-Xfatal-warnings" // some antl-generated sources prompt compiler warnings :(
 
 scalacOptions ++= Seq(
   "-deprecation",                      // Emit warning and location for usages of deprecated APIs.

@@ -2,9 +2,8 @@ package io.shiftleft.c2cpg.parser
 
 import org.eclipse.cdt.core.index.IIndexFileLocation
 import org.eclipse.cdt.core.parser.FileContent
-import org.eclipse.cdt.internal.core.parser.scanner.InternalFileContentProvider
 import org.eclipse.cdt.internal.core.parser.IMacroDictionary
-import org.eclipse.cdt.internal.core.parser.scanner.InternalFileContent
+import org.eclipse.cdt.internal.core.parser.scanner.{InternalFileContent, InternalFileContentProvider}
 import org.slf4j.LoggerFactory
 
 object CustomFileContentProvider {

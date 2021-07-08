@@ -1,13 +1,6 @@
 package io.shiftleft.c2cpg.passes
 
 import io.shiftleft.c2cpg.Defines
-import io.shiftleft.codepropertygraph.generated.{
-  ControlStructureTypes,
-  DispatchTypes,
-  EdgeTypes,
-  EvaluationStrategies,
-  Operators
-}
 import io.shiftleft.codepropertygraph.generated.nodes.{
   NewBlock,
   NewCall,
@@ -23,6 +16,13 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   NewNamespaceBlock,
   NewNode,
   NewReturn
+}
+import io.shiftleft.codepropertygraph.generated.{
+  ControlStructureTypes,
+  DispatchTypes,
+  EdgeTypes,
+  EvaluationStrategies,
+  Operators
 }
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
@@ -411,8 +411,8 @@ class AstCreator(filename: String, global: Global) {
 
   private def astForIASTExpressionList(exprList: IASTExpressionList, order: Int): Ast = {
     Ast()
-      .withChildren(withOrder(exprList.getExpressions.toList) { (decl, o) =>
-        astForIASTExpression(decl, order + o)
+      .withChildren(withOrder(exprList.getExpressions.toList) { (decl, _) =>
+        astForIASTExpression(decl, order)
       })
   }
 

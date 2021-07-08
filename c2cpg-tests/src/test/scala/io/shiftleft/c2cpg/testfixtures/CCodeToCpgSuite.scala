@@ -1,8 +1,8 @@
 package io.shiftleft.c2cpg.testfixtures
 
-import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.c2cpg.C2Cpg
 import io.shiftleft.c2cpg.C2Cpg.Config
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.testfixtures.{CodeToCpgFixture, LanguageFrontend}
 
 import java.io.File

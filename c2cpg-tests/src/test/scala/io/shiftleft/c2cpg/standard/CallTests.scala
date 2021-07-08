@@ -1,8 +1,8 @@
 package io.shiftleft.c2cpg.standard
 
+import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.codepropertygraph.generated.Operators
 import io.shiftleft.codepropertygraph.generated.nodes.{Call, Literal}
-import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.language.{NoResolve, _}
 
 class CallTests extends CCodeToCpgSuite {

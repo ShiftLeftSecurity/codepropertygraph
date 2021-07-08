@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg.querying
 
-import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.c2cpg.testfixtures.DataFlowCodeToCpgSuite
+import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.semanticcpg.language._
 
 class DataFlowTests extends DataFlowCodeToCpgSuite {

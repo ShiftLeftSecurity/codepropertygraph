@@ -1,8 +1,8 @@
 package io.shiftleft.c2cpg.querying
 
 import better.files.File
-import io.shiftleft.dataflowengineoss.layers.dataflows.{Cpg14DumpOptions, DumpCpg14}
 import io.shiftleft.c2cpg.testfixtures.DataFlowCodeToCpgSuite
+import io.shiftleft.dataflowengineoss.layers.dataflows.{Cpg14DumpOptions, DumpCpg14}
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.layers.LayerCreatorContext
 

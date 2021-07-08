@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg.querying
 
-import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
+import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.semanticcpg.language._
 
 /**

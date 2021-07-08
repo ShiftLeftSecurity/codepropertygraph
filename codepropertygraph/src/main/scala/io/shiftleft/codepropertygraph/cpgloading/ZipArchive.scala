@@ -3,12 +3,12 @@ package io.shiftleft.codepropertygraph.cpgloading
 import java.io.Closeable
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{FileSystem, FileSystems, FileVisitResult, Files, Path, Paths, SimpleFileVisitor}
-import java.util.{Collection => JCollection}
+import java.util.{Collection => JCollection, Collections}
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 
 class ZipArchive(inputFile: String) extends Closeable {
-  private val zipFileSystem: FileSystem = FileSystems.newFileSystem(Paths.get(inputFile), null)
+  private val zipFileSystem: FileSystem = FileSystems.newFileSystem(Paths.get(inputFile), Collections.emptyMap(), null)
 
   private def root: Path = zipFileSystem.getRootDirectories.iterator.next
 

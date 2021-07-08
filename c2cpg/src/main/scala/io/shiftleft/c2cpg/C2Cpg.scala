@@ -2,9 +2,9 @@ package io.shiftleft.c2cpg
 
 import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.parser.ParseConfig
-import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass, TypeNodePass}
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
