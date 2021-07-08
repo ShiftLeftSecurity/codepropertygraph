@@ -1,7 +1,13 @@
 package io.shiftleft.c2cpg.passes
 
 import io.shiftleft.c2cpg.Defines
-import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, DispatchTypes, EdgeTypes, Operators}
+import io.shiftleft.codepropertygraph.generated.{
+  ControlStructureTypes,
+  DispatchTypes,
+  EdgeTypes,
+  EvaluationStrategies,
+  Operators
+}
 import io.shiftleft.codepropertygraph.generated.nodes.{
   NewBlock,
   NewCall,
@@ -15,7 +21,8 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   NewMethodParameterIn,
   NewMethodReturn,
   NewNamespaceBlock,
-  NewNode
+  NewNode,
+  NewReturn
 }
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
@@ -23,7 +30,9 @@ import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast.{
   IASTBinaryExpression,
+  IASTBreakStatement,
   IASTCompoundStatement,
+  IASTContinueStatement,
   IASTDeclSpecifier,
   IASTDeclaration,
   IASTDeclarationStatement,
@@ -41,7 +50,9 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTName,
   IASTNamedTypeSpecifier,
   IASTNode,
+  IASTNullStatement,
   IASTParameterDeclaration,
+  IASTReturnStatement,
   IASTSimpleDeclSpecifier,
   IASTSimpleDeclaration,
   IASTStatement,
@@ -57,8 +68,16 @@ object AstCreator {
     Some(node.getFileLocation.getStartingLineNumber)
   }
 
+  def lineEnd(node: IASTNode): Option[Integer] = {
+    Some(node.getFileLocation.getEndingLineNumber)
+  }
+
   def column(node: IASTNode): Option[Integer] = {
     Some(node.getFileLocation.getNodeOffset)
+  }
+
+  def columnEnd(node: IASTNode): Option[Integer] = {
+    Some(node.getNodeLocations.last.getNodeOffset)
   }
 
 }
@@ -179,10 +198,9 @@ class AstCreator(filename: String, global: Global) {
 
   private def astForIASTNode(node: IASTNode, order: Int): Ast = {
     node match {
-      case name: IASTName          => astForIdentifier(name, order)
-      case ident: IASTIdExpression => astForIdentifier(ident, order)
-      case expr: IASTExpression    => astForIASTExpression(expr, order)
-      case _                       => notHandledYet(node)
+      case name: IASTName       => astForIdentifier(name, order)
+      case expr: IASTExpression => astForIASTExpression(expr, order)
+      case _                    => notHandledYet(node)
     }
   }
 
@@ -211,14 +229,18 @@ class AstCreator(filename: String, global: Global) {
         .order(order)
         .typeFullName(registerType(tpe))
         .code(tpe)
-        .lineNumber(line(functDef.getDeclarator))
+        .evaluationStrategy(EvaluationStrategies.BY_VALUE)
+        .lineNumber(line(functDef))
+        .columnNumber(column(functDef))
     Ast(methodReturnNode)
   }
 
   private def paramListSignature(functDef: IASTFunctionDefinition, includeParamNames: Boolean): String = {
     val elements =
       if (!includeParamNames) params(functDef).map(p => typeForIASTDeclSpecifier(p.getDeclSpecifier))
-      else params(functDef).map(p => p.getDeclarator.getName.toString)
+      else
+        params(functDef).map(p =>
+          s"${typeForIASTDeclSpecifier(p.getDeclSpecifier)} ${p.getDeclarator.getName.toString}")
     "(" + elements.mkString(",") + ")"
   }
 
@@ -236,7 +258,9 @@ class AstCreator(filename: String, global: Global) {
       .isExternal(false)
       .fullName(name)
       .lineNumber(line(functDef))
+      .lineNumberEnd(lineEnd(functDef))
       .columnNumber(column(functDef))
+      .columnNumberEnd(columnEnd(functDef))
       .signature(signature)
       .filename(filename)
       .order(childNum)
@@ -376,8 +400,8 @@ class AstCreator(filename: String, global: Global) {
       case IASTBinaryExpression.op_ellipses         => notHandledYet(bin)
     }
     val callNode = newCallNode(bin, op, order)
-    val left = astForIASTNode(bin.getOperand1, 1)
-    val right = astForIASTNode(bin.getOperand2, 2)
+    val left = astForIASTExpression(bin.getOperand1, 1)
+    val right = astForIASTExpression(bin.getOperand2, 2)
     Ast(callNode)
       .withChild(left)
       .withArgEdge(callNode, left.root.get)
@@ -396,7 +420,27 @@ class AstCreator(filename: String, global: Global) {
     case lit: IASTLiteralExpression   => astForLiteral(lit, order)
     case bin: IASTBinaryExpression    => astForIASTBinaryExpression(bin, order)
     case exprList: IASTExpressionList => astForIASTExpressionList(exprList, order)
+    case ident: IASTIdExpression      => astForIdentifier(ident, order)
     case _                            => notHandledYet(expression)
+  }
+
+  private def astForIASTReturnStatement(ret: IASTReturnStatement, order: Int): Ast = {
+    val cpgReturn = NewReturn()
+      .code(ret.getRawSignature)
+      .order(order)
+      .argumentIndex(order)
+      .lineNumber(line(ret))
+      .columnNumber(column(ret))
+    val expr = Option(ret.getReturnValue).map(astForIASTExpression(_, 1)).getOrElse(Ast())
+    Ast(cpgReturn).withChild(expr)
+  }
+
+  private def astForIASTBreakStatement(br: IASTBreakStatement, order: Int): Ast = {
+    Ast(newControlStructureNode(br, ControlStructureTypes.BREAK, br.getRawSignature, order))
+  }
+
+  private def astForIASTContinueStatement(cont: IASTContinueStatement, order: Int): Ast = {
+    Ast(newControlStructureNode(cont, ControlStructureTypes.CONTINUE, cont.getRawSignature, order))
   }
 
   private def astsForIASTStatement(statement: IASTStatement, order: Int): Seq[Ast] = {
@@ -407,6 +451,10 @@ class AstCreator(filename: String, global: Global) {
       case ifStmt: IASTIfStatement        => Seq(astForIf(ifStmt, order))
       case whileStmt: IASTWhileStatement  => Seq(astForWhile(whileStmt, order))
       case forStmt: IASTForStatement      => Seq(astForFor(forStmt, order))
+      case _: IASTNullStatement           => Seq.empty
+      case ret: IASTReturnStatement       => Seq(astForIASTReturnStatement(ret, order))
+      case br: IASTBreakStatement         => Seq(astForIASTBreakStatement(br, order))
+      case cont: IASTContinueStatement    => Seq(astForIASTContinueStatement(cont, order))
       case _                              => notHandledYet(statement)
     }
   }
@@ -434,9 +482,10 @@ class AstCreator(filename: String, global: Global) {
 
     val parameterNode = NewMethodParameterIn()
       .name(name)
-      .code(parameter.toString)
+      .code(s"$tpe $name")
       .typeFullName(registerType(tpe))
       .order(childNum)
+      .evaluationStrategy(EvaluationStrategies.BY_VALUE)
       .lineNumber(line(parameter))
       .columnNumber(column(parameter))
 
@@ -461,20 +510,22 @@ class AstCreator(filename: String, global: Global) {
     val forNode = newControlStructureNode(stmt, ControlStructureTypes.FOR, code, order)
 
     val initAsts =
-      Option(stmt.getInitializerStatement).map(astsForIASTStatement(_, order = 0)).getOrElse(Seq.empty)
+      Option(stmt.getInitializerStatement).map(astsForIASTStatement(_, order = 1)).getOrElse(Seq.empty)
+
+    val continuedOrder = Math.max(initAsts.size, 1)
 
     val compareAst =
       Option(stmt.getConditionExpression)
-        .map(astForIASTExpression(_, order = order + initAsts.size))
+        .map(astForIASTExpression(_, order = continuedOrder + 1))
         .getOrElse(Ast())
 
     val updateAst =
       Option(stmt.getIterationExpression)
-        .map(astForIASTExpression(_, order = order + initAsts.size + 1))
+        .map(astForIASTExpression(_, order = continuedOrder + 2))
         .getOrElse(Ast())
 
     val stmtAst = Option(stmt.getBody)
-      .map(astsForIASTStatement(_, order = order + initAsts.size + 2))
+      .map(astsForIASTStatement(_, order = continuedOrder + 3))
       .getOrElse(Seq.empty)
 
     val ast = Ast(forNode)
@@ -646,17 +697,6 @@ class AstCreator(filename: String, global: Global) {
       astsForStatement(s, order + o + labelNodes.size)
     }.flatten
     labelNodes.map(x => Ast(x)) ++ statementAsts
-  }
-
-
-
-  private def astForReturnNode(ret: ReturnStmt, order: Int): Ast = {
-    // TODO: Make return node with expression as children
-    if (ret.getExpression.isPresent) {
-      astForExpression(ret.getExpression.get(), order + 1)
-    } else {
-      Ast()
-    }
   }
 
   def astForBinaryExpr(stmt: BinaryExpr, order: Int): Ast = {
