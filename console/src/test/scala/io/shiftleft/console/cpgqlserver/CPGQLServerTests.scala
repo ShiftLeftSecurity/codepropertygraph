@@ -219,7 +219,7 @@ class CPGQLServerTests extends AnyWordSpec with Matchers {
   }
 
   "return websocket responses for all queries when posted quickly in a large number" in Fixture() { host =>
-    val numQueries = 50
+    val numQueries = 10
     val correctNumberOfUUIDsReceived = scala.concurrent.Promise[String]()
     val wsUUIDs = ListBuffer[String]()
 
@@ -250,14 +250,14 @@ class CPGQLServerTests extends AnyWordSpec with Matchers {
         postQueryResponse("uuid").str
       }
 
-    Await.result(correctNumberOfUUIDsReceived.future, Duration(10, SECONDS))
+    Await.result(correctNumberOfUUIDsReceived.future, DefaultPromiseAwaitTimeout * numQueries)
     wsUUIDs.toSet should be(postQueriesResponseUUIDs.toSet)
   }
 
   "return websocket responses for all queries when some are invalid" in Fixture() { host =>
     val queries = List("1", "1 + 1", "open(", "open)", "open{", "open}")
     val correctNumberOfUUIDsReceived = scala.concurrent.Promise[String]()
-    var wsUUIDs = ListBuffer[String]()
+    val wsUUIDs = ListBuffer[String]()
     val connectedPromise = scala.concurrent.Promise[String]()
 
     val rtl: Lock = new ReentrantLock()
@@ -287,7 +287,7 @@ class CPGQLServerTests extends AnyWordSpec with Matchers {
           res("uuid").str
         })
     }
-    Await.result(correctNumberOfUUIDsReceived.future, DefaultPromiseAwaitTimeout)
+    Await.result(correctNumberOfUUIDsReceived.future, DefaultPromiseAwaitTimeout * queries.size)
     wsUUIDs.toSet should be(postQueriesResponseUUIDs.toSet)
   }
 }
