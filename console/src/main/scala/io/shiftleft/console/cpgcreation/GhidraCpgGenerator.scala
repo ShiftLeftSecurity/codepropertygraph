@@ -18,7 +18,7 @@ case class GhidraCpgGenerator(config: GhidraFrontendConfig, rootPath: Path) exte
                         outputPath: String = "cpg.bin",
                         namespaces: List[String] = List()): Option[String] = {
     val command = rootPath.resolve("ghidra2cpg").toString
-    val arguments = config.cmdLineParams.toSeq ++ Seq(inputPath, outputPath)
+    val arguments = config.cmdLineParams.toSeq ++ Seq(inputPath, "--output", outputPath)
     runShellCommand(command, arguments).map(_ => outputPath)
   }
 
