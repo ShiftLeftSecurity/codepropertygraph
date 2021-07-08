@@ -31,6 +31,7 @@ import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast.{
   IASTBinaryExpression,
   IASTBreakStatement,
+  IASTCompositeTypeSpecifier,
   IASTCompoundStatement,
   IASTContinueStatement,
   IASTDeclSpecifier,
@@ -55,12 +56,11 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTReturnStatement,
   IASTSimpleDeclSpecifier,
   IASTSimpleDeclaration,
+  IASTStandardFunctionDeclarator,
   IASTStatement,
   IASTTranslationUnit,
   IASTWhileStatement
 }
-import org.eclipse.cdt.internal.core.dom.parser.c.{CASTCompositeTypeSpecifier, CASTFunctionDeclarator}
-import org.eclipse.cdt.internal.core.dom.parser.cpp.{CPPASTCompositeTypeSpecifier, CPPASTFunctionDeclarator}
 
 object AstCreator {
 
@@ -126,16 +126,64 @@ class AstCreator(filename: String, global: Global) {
     typeName
   }
 
+  private def notHandledYet[T](node: IASTNode): T = {
+    val text = s"Node '${node.getClass.getSimpleName}' not handled yet. Code: '${node.getRawSignature}'"
+    println(text)
+    throw new NotImplementedError(text)
+  }
+
+  private def parentIsClassDef(node: IASTNode): Boolean = Option(node.getParent) match {
+    case Some(_: IASTCompositeTypeSpecifier) => true
+    case _                                   => false
+  }
+
+  private def params(functDef: IASTFunctionDefinition): List[IASTParameterDeclaration] = functDef.getDeclarator match {
+    case decl: IASTStandardFunctionDeclarator => decl.getParameters.toList
+    case _                                    => notHandledYet(functDef)
+  }
+
+  private def paramListSignature(functDef: IASTFunctionDefinition, includeParamNames: Boolean): String = {
+    val elements =
+      if (!includeParamNames) params(functDef).map(p => typeForDeclSpecifier(p.getDeclSpecifier))
+      else
+        params(functDef).map(p => s"${typeForDeclSpecifier(p.getDeclSpecifier)} ${p.getDeclarator.getName.toString}")
+    "(" + elements.mkString(",") + ")"
+  }
+
+  private def newCallNode(astNode: IASTNode, methodName: String, order: Int): NewCall =
+    NewCall()
+      .name(methodName)
+      .dispatchType(DispatchTypes.STATIC_DISPATCH)
+      .methodFullName(methodName)
+      .code(astNode.getRawSignature)
+      .order(order)
+      .argumentIndex(order)
+      .lineNumber(line(astNode))
+      .columnNumber(column(astNode))
+
+  private def newControlStructureNode(node: IASTNode,
+                                      controlStructureType: String,
+                                      code: String,
+                                      order: Int): NewControlStructure =
+    NewControlStructure()
+      .parserTypeName(node.getClass.getSimpleName)
+      .controlStructureType(controlStructureType)
+      .code(code)
+      .order(order)
+      .argumentIndex(order)
+      .lineNumber(line(node))
+      .columnNumber(column(node))
+
   private def astForFile(parserResult: IASTTranslationUnit): Ast =
     Ast(NewFile(name = filename, order = 0))
       .withChild(
-        astForIASTTranslationUnit(parserResult)
+        astForTranslationUnit(parserResult)
           .withChildren(withOrder(parserResult.getDeclarations.toList) { (decl, order) =>
-            astForIASTDeclaration(decl, order)
+            astForDeclaration(decl, order)
           })
       )
 
-  private def astForIASTTranslationUnit(iASTTranslationUnit: IASTTranslationUnit): Ast = {
+  private def astForTranslationUnit(iASTTranslationUnit: IASTTranslationUnit): Ast = {
     val absolutePath = new java.io.File(iASTTranslationUnit.getFilePath).toPath.toAbsolutePath.normalize().toString
     val namespaceBlock = NewNamespaceBlock()
       .name(NamespaceTraversal.globalNamespaceName)
@@ -143,18 +191,6 @@ class AstCreator(filename: String, global: Global) {
       .filename(absolutePath)
       .order(1)
     Ast(namespaceBlock)
-  }
-
-  private def notHandledYet[T](node: IASTNode): T = {
-    val text = s"Node '${node.getClass.getSimpleName}' not handled yet. Code: '${node.getRawSignature}'"
-    println(text)
-    throw new NotImplementedError(text)
-  }
-
-  private def params(functDef: IASTFunctionDefinition): List[IASTParameterDeclaration] = functDef.getDeclarator match {
-    case decl: CPPASTFunctionDeclarator => decl.getParameters.toList
-    case decl: CASTFunctionDeclarator   => decl.getParameters.toList
-    case _                              => notHandledYet(functDef)
   }
 
   private def astForLiteral(lit: IASTLiteralExpression, order: Int): Ast = {
@@ -196,15 +232,15 @@ class AstCreator(filename: String, global: Global) {
     }
   }
 
-  private def astForIASTNode(node: IASTNode, order: Int): Ast = {
+  private def astForNode(node: IASTNode, order: Int): Ast = {
     node match {
       case name: IASTName       => astForIdentifier(name, order)
-      case expr: IASTExpression => astForIASTExpression(expr, order)
+      case expr: IASTExpression => astForExpression(expr, order)
       case _                    => notHandledYet(node)
     }
   }
 
-  private def astForIASTFunctionDefinition(functDef: IASTFunctionDefinition, order: Int): Ast = {
+  private def astForFunctionDefinition(functDef: IASTFunctionDefinition, order: Int): Ast = {
     val methodNode = createMethodNode(functDef, order)
 
     scope.pushNewScope(methodNode)
@@ -217,7 +253,7 @@ class AstCreator(filename: String, global: Global) {
     val r = Ast(methodNode)
       .withChildren(parameterAsts)
       .withChild(astForMethodBody(Option(functDef.getBody), lastOrder))
-      .withChild(astForMethodReturn(functDef, lastOrder, typeForIASTDeclSpecifier(functDef.getDeclSpecifier)))
+      .withChild(astForMethodReturn(functDef, lastOrder, typeForDeclSpecifier(functDef.getDeclSpecifier)))
 
     scope.popScope()
     r
@@ -235,20 +271,11 @@ class AstCreator(filename: String, global: Global) {
     Ast(methodReturnNode)
   }
 
-  private def paramListSignature(functDef: IASTFunctionDefinition, includeParamNames: Boolean): String = {
-    val elements =
-      if (!includeParamNames) params(functDef).map(p => typeForIASTDeclSpecifier(p.getDeclSpecifier))
-      else
-        params(functDef).map(p =>
-          s"${typeForIASTDeclSpecifier(p.getDeclSpecifier)} ${p.getDeclarator.getName.toString}")
-    "(" + elements.mkString(",") + ")"
-  }
-
   private def createMethodNode(
       functDef: IASTFunctionDefinition,
       childNum: Int
   ) = {
-    val returnType = typeForIASTDeclSpecifier(functDef.getDeclSpecifier)
+    val returnType = typeForDeclSpecifier(functDef.getDeclSpecifier)
     val name = functDef.getDeclarator.getName.toString
     val signature = returnType + " " + name + " " + paramListSignature(functDef, includeParamNames = false)
     val code = returnType + " " + name + " " + paramListSignature(functDef, includeParamNames = true)
@@ -294,31 +321,13 @@ class AstCreator(filename: String, global: Global) {
     }
   }
 
-  private def parentIsClassDef(node: IASTNode): Boolean = Option(node.getParent) match {
-    case Some(_: CPPASTCompositeTypeSpecifier) => true
-    case Some(_: CASTCompositeTypeSpecifier)   => true
-    case _                                     => false
-  }
-
-  private def newCallNode(astNode: IASTNode, methodName: String, order: Int): NewCall = {
-    NewCall()
-      .name(methodName)
-      .dispatchType(DispatchTypes.STATIC_DISPATCH)
-      .methodFullName(methodName)
-      .code(astNode.getRawSignature)
-      .order(order)
-      .argumentIndex(order)
-      .lineNumber(line(astNode))
-      .columnNumber(column(astNode))
-  }
-
-  private def astForIASTInitializer(declarator: IASTDeclarator, init: IASTInitializer, order: Int): Ast =
+  private def astForInitializer(declarator: IASTDeclarator, init: IASTInitializer, order: Int): Ast =
     init match {
       case i: IASTEqualsInitializer =>
         val operatorName = Operators.assignment
         val callNode = newCallNode(declarator, operatorName, order)
-        val left = astForIASTNode(declarator.getName, 1)
-        val right = astForIASTNode(i.getInitializerClause, 2)
+        val left = astForNode(declarator.getName, 1)
+        val right = astForNode(i.getInitializerClause, 2)
         Ast(callNode)
           .withChild(left)
           .withArgEdge(callNode, left.root.get)
@@ -327,8 +336,8 @@ class AstCreator(filename: String, global: Global) {
       case _ => notHandledYet(init)
     }
 
-  private def astForIASTDeclarator(declaration: IASTSimpleDeclaration, declarator: IASTDeclarator, order: Int): Ast = {
-    val declTypeName = typeForIASTDeclSpecifier(declaration.getDeclSpecifier)
+  private def astForDeclarator(declaration: IASTSimpleDeclaration, declarator: IASTDeclarator, order: Int): Ast = {
+    val declTypeName = typeForDeclSpecifier(declaration.getDeclSpecifier)
     val name = declarator.getName.toString
     val newNode = if (parentIsClassDef(declaration.getParent)) {
       NewMember()
@@ -347,22 +356,22 @@ class AstCreator(filename: String, global: Global) {
     Ast(newNode)
   }
 
-  def astsForIASTDeclarationStatement(decl: IASTDeclarationStatement, order: Int): Seq[Ast] =
+  private def astForDeclarationStatement(decl: IASTDeclarationStatement, order: Int): Seq[Ast] =
     decl.getDeclaration match {
       case decl: IASTSimpleDeclaration =>
         val locals =
           withOrder(decl.getDeclarators.toList) { (d, o) =>
-            astForIASTDeclarator(decl, d, order + o)
+            astForDeclarator(decl, d, order + o)
           }
         val calls =
           withOrder(decl.getDeclarators.toList.filter(_.getInitializer != null)) { (d, o) =>
-            astForIASTInitializer(d, d.getInitializer, locals.size + o)
+            astForInitializer(d, d.getInitializer, locals.size + o)
           }
         locals ++ calls
       case decl => notHandledYet(decl)
     }
 
-  private def astForIASTBinaryExpression(bin: IASTBinaryExpression, order: Int): Ast = {
+  private def astForBinaryExpression(bin: IASTBinaryExpression, order: Int): Ast = {
     val op = bin.getOperator match {
       case IASTBinaryExpression.op_multiply         => Operators.multiplication
       case IASTBinaryExpression.op_divide           => Operators.division
@@ -400,8 +409,8 @@ class AstCreator(filename: String, global: Global) {
       case IASTBinaryExpression.op_ellipses         => notHandledYet(bin)
     }
     val callNode = newCallNode(bin, op, order)
-    val left = astForIASTExpression(bin.getOperand1, 1)
-    val right = astForIASTExpression(bin.getOperand2, 2)
+    val left = astForExpression(bin.getOperand1, 1)
+    val right = astForExpression(bin.getOperand2, 2)
     Ast(callNode)
       .withChild(left)
       .withArgEdge(callNode, left.root.get)
@@ -409,52 +418,52 @@ class AstCreator(filename: String, global: Global) {
       .withArgEdge(callNode, right.root.get)
   }
 
-  private def astForIASTExpressionList(exprList: IASTExpressionList, order: Int): Ast = {
+  private def astForExpressionList(exprList: IASTExpressionList, order: Int): Ast = {
     Ast()
       .withChildren(withOrder(exprList.getExpressions.toList) { (decl, _) =>
-        astForIASTExpression(decl, order)
+        astForExpression(decl, order)
       })
   }
 
-  private def astForIASTExpression(expression: IASTExpression, order: Int): Ast = expression match {
+  private def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
     case lit: IASTLiteralExpression   => astForLiteral(lit, order)
-    case bin: IASTBinaryExpression    => astForIASTBinaryExpression(bin, order)
-    case exprList: IASTExpressionList => astForIASTExpressionList(exprList, order)
+    case bin: IASTBinaryExpression    => astForBinaryExpression(bin, order)
+    case exprList: IASTExpressionList => astForExpressionList(exprList, order)
     case ident: IASTIdExpression      => astForIdentifier(ident, order)
     case _                            => notHandledYet(expression)
   }
 
-  private def astForIASTReturnStatement(ret: IASTReturnStatement, order: Int): Ast = {
+  private def astForReturnStatement(ret: IASTReturnStatement, order: Int): Ast = {
     val cpgReturn = NewReturn()
       .code(ret.getRawSignature)
       .order(order)
       .argumentIndex(order)
       .lineNumber(line(ret))
       .columnNumber(column(ret))
-    val expr = Option(ret.getReturnValue).map(astForIASTExpression(_, 1)).getOrElse(Ast())
+    val expr = Option(ret.getReturnValue).map(astForExpression(_, 1)).getOrElse(Ast())
     Ast(cpgReturn).withChild(expr)
   }
 
-  private def astForIASTBreakStatement(br: IASTBreakStatement, order: Int): Ast = {
+  private def astForBreakStatement(br: IASTBreakStatement, order: Int): Ast = {
     Ast(newControlStructureNode(br, ControlStructureTypes.BREAK, br.getRawSignature, order))
   }
 
-  private def astForIASTContinueStatement(cont: IASTContinueStatement, order: Int): Ast = {
+  private def astForContinueStatement(cont: IASTContinueStatement, order: Int): Ast = {
     Ast(newControlStructureNode(cont, ControlStructureTypes.CONTINUE, cont.getRawSignature, order))
   }
 
   private def astsForIASTStatement(statement: IASTStatement, order: Int): Seq[Ast] = {
     statement match {
-      case decl: IASTDeclarationStatement => astsForIASTDeclarationStatement(decl, order)
-      case expr: IASTExpressionStatement  => Seq(astForIASTExpression(expr.getExpression, order))
+      case decl: IASTDeclarationStatement => astForDeclarationStatement(decl, order)
+      case expr: IASTExpressionStatement  => Seq(astForExpression(expr.getExpression, order))
       case block: IASTCompoundStatement   => Seq(astForBlockStatement(None, block, order))
       case ifStmt: IASTIfStatement        => Seq(astForIf(ifStmt, order))
       case whileStmt: IASTWhileStatement  => Seq(astForWhile(whileStmt, order))
       case forStmt: IASTForStatement      => Seq(astForFor(forStmt, order))
       case _: IASTNullStatement           => Seq.empty
-      case ret: IASTReturnStatement       => Seq(astForIASTReturnStatement(ret, order))
-      case br: IASTBreakStatement         => Seq(astForIASTBreakStatement(br, order))
-      case cont: IASTContinueStatement    => Seq(astForIASTContinueStatement(cont, order))
+      case ret: IASTReturnStatement       => Seq(astForReturnStatement(ret, order))
+      case br: IASTBreakStatement         => Seq(astForBreakStatement(br, order))
+      case cont: IASTContinueStatement    => Seq(astForContinueStatement(cont, order))
       case _                              => notHandledYet(statement)
     }
   }
@@ -467,7 +476,7 @@ class AstCreator(filename: String, global: Global) {
     }
   }
 
-  private def typeForIASTDeclSpecifier(spec: IASTDeclSpecifier): String = {
+  private def typeForDeclSpecifier(spec: IASTDeclSpecifier): String = {
     spec match {
       case s: IASTSimpleDeclSpecifier => s.toString
       case s: IASTNamedTypeSpecifier  => s.getName.toString
@@ -478,7 +487,7 @@ class AstCreator(filename: String, global: Global) {
   private def astForParameter(parameter: IASTParameterDeclaration, childNum: Int): Ast = {
     val decl = parameter.getDeclarator
     val name = decl.getName.getRawSignature
-    val tpe = typeForIASTDeclSpecifier(parameter.getDeclSpecifier)
+    val tpe = typeForDeclSpecifier(parameter.getDeclSpecifier)
 
     val parameterNode = NewMethodParameterIn()
       .name(name)
@@ -494,8 +503,8 @@ class AstCreator(filename: String, global: Global) {
     Ast(parameterNode)
   }
 
-  private def astForIASTDeclaration(decl: IASTDeclaration, order: Int): Ast = decl match {
-    case functDef: IASTFunctionDefinition                                         => astForIASTFunctionDefinition(functDef, order)
+  private def astForDeclaration(decl: IASTDeclaration, order: Int): Ast = decl match {
+    case functDef: IASTFunctionDefinition                                         => astForFunctionDefinition(functDef, order)
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.isEmpty => Ast()
     case _                                                                        => notHandledYet(decl)
   }
@@ -516,12 +525,12 @@ class AstCreator(filename: String, global: Global) {
 
     val compareAst =
       Option(stmt.getConditionExpression)
-        .map(astForIASTExpression(_, order = continuedOrder + 1))
+        .map(astForExpression(_, order = continuedOrder + 1))
         .getOrElse(Ast())
 
     val updateAst =
       Option(stmt.getIterationExpression)
-        .map(astForIASTExpression(_, order = continuedOrder + 2))
+        .map(astForExpression(_, order = continuedOrder + 2))
         .getOrElse(Ast())
 
     val stmtAst = Option(stmt.getBody)
@@ -546,7 +555,7 @@ class AstCreator(filename: String, global: Global) {
 
     val whileNode = newControlStructureNode(stmt, ControlStructureTypes.WHILE, code, order)
 
-    val conditionAst = Option(stmt.getCondition).map(astForIASTExpression(_, order = 1)).getOrElse(Ast())
+    val conditionAst = Option(stmt.getCondition).map(astForExpression(_, order = 1)).getOrElse(Ast())
     val stmtAsts = Option(stmt.getBody).map(astsForIASTStatement(_, order = 2)).getOrElse(Seq.empty)
 
     val ast = Ast(whileNode)
@@ -566,7 +575,7 @@ class AstCreator(filename: String, global: Global) {
 
     val ifNode = newControlStructureNode(stmt, ControlStructureTypes.IF, code, order)
 
-    val conditionAst = Option(stmt.getConditionExpression).map(astForIASTExpression(_, order = 1)).getOrElse(Ast())
+    val conditionAst = Option(stmt.getConditionExpression).map(astForExpression(_, order = 1)).getOrElse(Ast())
     val stmtAsts = Option(stmt.getThenClause).map(astsForIASTStatement(_, order = 2)).getOrElse(Seq.empty)
     val elseAsts = Option(stmt.getElseClause).map(astsForIASTStatement(_, order = 3)).getOrElse(Seq.empty)
 
@@ -582,20 +591,6 @@ class AstCreator(filename: String, global: Global) {
         ast
     }
   }
-
-  private def newControlStructureNode(node: IASTNode,
-                                      controlStructureType: String,
-                                      code: String,
-                                      order: Int): NewControlStructure =
-    NewControlStructure()
-      .parserTypeName(node.getClass.getSimpleName)
-      .controlStructureType(controlStructureType)
-      .code(code)
-      .order(order)
-      .argumentIndex(order)
-      .lineNumber(line(node))
-      .columnNumber(column(node))
-
   /**
   def astForTypeDecl(typ: TypeDeclaration[_], order: Int): Ast = {
     val baseTypeFullNames = typ
