@@ -593,6 +593,7 @@ class AstCreator(filename: String, global: Global) {
         ast
     }
   }
+
   /**
   def astForTypeDecl(typ: TypeDeclaration[_], order: Int): Ast = {
     val baseTypeFullNames = typ
@@ -649,30 +650,6 @@ class AstCreator(filename: String, global: Global) {
     }
   }
 
-  def astForBreakStatement(stmt: BreakStmt, order: Int): Ast = {
-    val node = NewControlStructure(
-      controlStructureType = ControlStructureTypes.BREAK,
-      lineNumber = line(stmt),
-      columnNumber = column(stmt),
-      code = stmt.toString,
-      order = order
-    )
-    Ast(node)
-  }
-
-  def astForContinueStatement(stmt: ContinueStmt, order: Int): Ast = {
-    val node = NewControlStructure(
-      controlStructureType = ControlStructureTypes.CONTINUE,
-      lineNumber = line(stmt),
-      columnNumber = column(stmt),
-      code = stmt.toString,
-      order = order
-    )
-    Ast(node)
-  }
-
-
-
   def astForSwitchStatement(stmt: SwitchStmt, order: Int): Ast = {
     val switchNode =
       NewControlStructure(
@@ -695,38 +672,6 @@ class AstCreator(filename: String, global: Global) {
     }.flatten
     labelNodes.map(x => Ast(x)) ++ statementAsts
   }
-
-  def astForBinaryExpr(stmt: BinaryExpr, order: Int): Ast = {
-    val operatorName = stmt.getOperator match {
-      case BinaryExpr.Operator.OR                   => Operators.logicalOr
-      case BinaryExpr.Operator.AND                  => Operators.logicalAnd
-      case BinaryExpr.Operator.BINARY_OR            => Operators.or
-      case BinaryExpr.Operator.BINARY_AND           => Operators.and
-      case BinaryExpr.Operator.DIVIDE               => Operators.division
-      case BinaryExpr.Operator.EQUALS               => Operators.equals
-      case BinaryExpr.Operator.GREATER              => Operators.greaterThan
-      case BinaryExpr.Operator.GREATER_EQUALS       => Operators.greaterEqualsThan
-      case BinaryExpr.Operator.LESS                 => Operators.lessThan
-      case BinaryExpr.Operator.LESS_EQUALS          => Operators.lessEqualsThan
-      case BinaryExpr.Operator.LEFT_SHIFT           => Operators.shiftLeft
-      case BinaryExpr.Operator.SIGNED_RIGHT_SHIFT   => Operators.logicalShiftRight
-      case BinaryExpr.Operator.UNSIGNED_RIGHT_SHIFT => Operators.arithmeticShiftRight
-      case BinaryExpr.Operator.XOR                  => Operators.xor
-      case BinaryExpr.Operator.NOT_EQUALS           => Operators.notEquals
-      case BinaryExpr.Operator.PLUS                 => Operators.plus
-      case BinaryExpr.Operator.MINUS                => Operators.minus
-      case BinaryExpr.Operator.MULTIPLY             => Operators.multiplication
-      case BinaryExpr.Operator.REMAINDER            => Operators.modulo
-      case _                                        => ""
-    }
-
-    val callNode = NewCall(name = operatorName, methodFullName = operatorName, code = stmt.toString)
-    Ast(callNode)
-      .withChild(astForExpression(stmt.getLeft, 0))
-      .withChild(astForExpression(stmt.getRight, 1))
-  }
-
-
 
   private def astForMethodCall(call: MethodCallExpr, order: Int = 1): Ast = {
 
@@ -753,11 +698,6 @@ class AstCreator(filename: String, global: Global) {
     }
     Ast(callNode)
   }
-
-
-
-
-}
-    **/
+  **/
 
 }
