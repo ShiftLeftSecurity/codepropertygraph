@@ -167,7 +167,6 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.method.name("method").block.astChildren.isControlStructure.l match {
         case List(controlStruct: ControlStructure) =>
           controlStruct.code shouldBe "while (x < 1)"
-          controlStruct.parserTypeName shouldBe "WhileStatement"
           controlStruct.controlStructureType shouldBe ControlStructureTypes.WHILE
           controlStruct.condition.l match {
             case List(cndNode) =>
@@ -190,9 +189,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.method.name("method").controlStructure.l match {
         case List(controlStruct: ControlStructure) =>
           controlStruct.code shouldBe "if (x > 0)"
-          controlStruct.parserTypeName shouldBe "IfStatement"
           controlStruct.controlStructureType shouldBe ControlStructureTypes.IF
-          // TODO improve query language: controlStruct.condition
           controlStruct.condition.l match {
             case List(cndNode) =>
               cndNode.code shouldBe "x > 0"
@@ -215,13 +212,9 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |}
       """.stripMargin) { cpg =>
       cpg.method.name("method").controlStructure.l match {
-        case List(ifStmt, elseStmt) =>
-          ifStmt.parserTypeName shouldBe "IfStatement"
+        case List(ifStmt) =>
           ifStmt.controlStructureType shouldBe ControlStructureTypes.IF
           ifStmt.code shouldBe "if (x > 0)"
-          elseStmt.parserTypeName shouldBe "ElseStatement"
-          elseStmt.controlStructureType shouldBe ControlStructureTypes.ELSE
-          elseStmt.code shouldBe "else"
 
           ifStmt.condition.l match {
             case List(cndNode) =>
@@ -229,7 +222,6 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
             case _ => fail()
           }
 
-          // TODO .whenTrue => .whenTrue
           ifStmt.whenTrue.assignments
             .map(x => (x.target.code, x.source.code))
             .headOption shouldBe Some(("y", "0"))
@@ -276,7 +268,6 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       """.stripMargin) { cpg =>
       cpg.method.name("method").controlStructure.l match {
         case List(forStmt) =>
-          forStmt.parserTypeName shouldBe "ForStatement"
           forStmt.controlStructureType shouldBe ControlStructureTypes.FOR
           childContainsAssignments(forStmt, 1, List("x = 0", "y = 0"))
 

@@ -1,10 +1,11 @@
 package io.shiftleft.c2cpg.passes
 
 import io.shiftleft.c2cpg.Defines
-import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, Operators}
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, DispatchTypes, EdgeTypes, Operators}
 import io.shiftleft.codepropertygraph.generated.nodes.{
   NewBlock,
   NewCall,
+  NewControlStructure,
   NewFile,
   NewIdentifier,
   NewLiteral,
@@ -28,9 +29,12 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTDeclarator,
   IASTEqualsInitializer,
   IASTExpression,
+  IASTExpressionList,
   IASTExpressionStatement,
+  IASTForStatement,
   IASTFunctionDefinition,
   IASTIdExpression,
+  IASTIfStatement,
   IASTInitializer,
   IASTLiteralExpression,
   IASTName,
@@ -40,7 +44,8 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTSimpleDeclSpecifier,
   IASTSimpleDeclaration,
   IASTStatement,
-  IASTTranslationUnit
+  IASTTranslationUnit,
+  IASTWhileStatement
 }
 import org.eclipse.cdt.internal.core.dom.parser.c.{CASTCompositeTypeSpecifier, CASTFunctionDeclarator}
 import org.eclipse.cdt.internal.core.dom.parser.cpp.{CPPASTCompositeTypeSpecifier, CPPASTFunctionDeclarator}
@@ -441,10 +446,18 @@ class AstCreator(filename: String, global: Global) {
       .withArgEdge(callNode, right.root.get)
   }
 
+  private def astForIASTExpressionList(exprList: IASTExpressionList, order: Int): Ast = {
+    Ast()
+      .withChildren(withOrder(exprList.getExpressions.toList) { (decl, o) =>
+        astForIASTExpression(decl, order + o)
+      })
+  }
+
   private def astForIASTExpression(expression: IASTExpression, order: Int): Ast = expression match {
-    case lit: IASTLiteralExpression => astForLiteral(lit, order)
-    case bin: IASTBinaryExpression  => astForIASTBinaryExpression(bin, order)
-    case _                          => notHandledYet(expression)
+    case lit: IASTLiteralExpression   => astForLiteral(lit, order)
+    case bin: IASTBinaryExpression    => astForIASTBinaryExpression(bin, order)
+    case exprList: IASTExpressionList => astForIASTExpressionList(exprList, order)
+    case _                            => notHandledYet(expression)
   }
 
   private def astsForIASTStatement(statement: IASTStatement, order: Int): Seq[Ast] = {
@@ -452,6 +465,9 @@ class AstCreator(filename: String, global: Global) {
       case decl: IASTDeclarationStatement => astsForIASTDeclarationStatement(decl, order)
       case expr: IASTExpressionStatement  => Seq(astForIASTExpression(expr.getExpression, order))
       case block: IASTCompoundStatement   => Seq(astForBlockStatement(None, block, order))
+      case ifStmt: IASTIfStatement        => Seq(astForIf(ifStmt, order))
+      case whileStmt: IASTWhileStatement  => Seq(astForWhile(whileStmt, order))
+      case forStmt: IASTForStatement      => Seq(astForFor(forStmt, order))
       case _                              => notHandledYet(statement)
     }
   }
@@ -490,12 +506,105 @@ class AstCreator(filename: String, global: Global) {
     Ast(parameterNode)
   }
 
-  private def astForIASTDeclaration(decl: IASTDeclaration, order: Int): Ast =
-    decl match {
-      case functDef: IASTFunctionDefinition                                         => astForIASTFunctionDefinition(functDef, order)
-      case declaration: IASTSimpleDeclaration if declaration.getDeclarators.isEmpty => Ast()
-      case _                                                                        => notHandledYet(decl)
+  private def astForIASTDeclaration(decl: IASTDeclaration, order: Int): Ast = decl match {
+    case functDef: IASTFunctionDefinition                                         => astForIASTFunctionDefinition(functDef, order)
+    case declaration: IASTSimpleDeclaration if declaration.getDeclarators.isEmpty => Ast()
+    case _                                                                        => notHandledYet(decl)
+  }
+
+  private def astForFor(stmt: IASTForStatement, order: Int): Ast = {
+    val codeInit = Option(stmt.getInitializerStatement).map(_.getRawSignature).getOrElse("")
+    val codeCond = Option(stmt.getConditionExpression).map(_.getRawSignature).getOrElse("")
+    val codeIter = Option(stmt.getIterationExpression).map(_.getRawSignature).getOrElse("")
+
+    val code = s"for ($codeInit$codeCond;$codeIter)"
+
+    val forNode = newControlStructureNode(stmt, ControlStructureTypes.FOR, code, order)
+
+    val initAsts =
+      Option(stmt.getInitializerStatement).map(astsForIASTStatement(_, order = 0)).getOrElse(Seq.empty)
+
+    val compareAst =
+      Option(stmt.getConditionExpression)
+        .map(astForIASTExpression(_, order = order + initAsts.size))
+        .getOrElse(Ast())
+
+    val updateAst =
+      Option(stmt.getIterationExpression)
+        .map(astForIASTExpression(_, order = order + initAsts.size + 1))
+        .getOrElse(Ast())
+
+    val stmtAst = Option(stmt.getBody)
+      .map(astsForIASTStatement(_, order = order + initAsts.size + 2))
+      .getOrElse(Seq.empty)
+
+    val ast = Ast(forNode)
+      .withChildren(initAsts)
+      .withChild(compareAst)
+      .withChild(updateAst)
+      .withChildren(stmtAst)
+
+    compareAst.root match {
+      case Some(c) =>
+        ast.withConditionEdge(forNode, c)
+      case None => ast
     }
+  }
+
+  private def astForWhile(stmt: IASTWhileStatement, order: Int): Ast = {
+    val code = Option(stmt.getCondition).map(c => s"while (${c.getRawSignature})").getOrElse("while ()")
+
+    val whileNode = newControlStructureNode(stmt, ControlStructureTypes.WHILE, code, order)
+
+    val conditionAst = Option(stmt.getCondition).map(astForIASTExpression(_, order = 1)).getOrElse(Ast())
+    val stmtAsts = Option(stmt.getBody).map(astsForIASTStatement(_, order = 2)).getOrElse(Seq.empty)
+
+    val ast = Ast(whileNode)
+      .withChild(conditionAst)
+      .withChildren(stmtAsts)
+
+    conditionAst.root match {
+      case Some(r) =>
+        ast.withConditionEdge(whileNode, r)
+      case None =>
+        ast
+    }
+  }
+
+  def astForIf(stmt: IASTIfStatement, order: Int): Ast = {
+    val code = Option(stmt.getConditionExpression).map(c => s"if (${c.getRawSignature})").getOrElse("if ()")
+
+    val ifNode = newControlStructureNode(stmt, ControlStructureTypes.IF, code, order)
+
+    val conditionAst = Option(stmt.getConditionExpression).map(astForIASTExpression(_, order = 1)).getOrElse(Ast())
+    val stmtAsts = Option(stmt.getThenClause).map(astsForIASTStatement(_, order = 2)).getOrElse(Seq.empty)
+    val elseAsts = Option(stmt.getElseClause).map(astsForIASTStatement(_, order = 3)).getOrElse(Seq.empty)
+
+    val ast = Ast(ifNode)
+      .withChild(conditionAst)
+      .withChildren(stmtAsts)
+      .withChildren(elseAsts)
+
+    conditionAst.root match {
+      case Some(r) =>
+        ast.withConditionEdge(ifNode, r)
+      case None =>
+        ast
+    }
+  }
+
+  private def newControlStructureNode(node: IASTNode,
+                                      controlStructureType: String,
+                                      code: String,
+                                      order: Int): NewControlStructure =
+    NewControlStructure()
+      .parserTypeName(node.getClass.getSimpleName)
+      .controlStructureType(controlStructureType)
+      .code(code)
+      .order(order)
+      .argumentIndex(order)
+      .lineNumber(line(node))
+      .columnNumber(column(node))
 
   /**
   def astForTypeDecl(typ: TypeDeclaration[_], order: Int): Ast = {
@@ -536,38 +645,6 @@ class AstCreator(filename: String, global: Global) {
     Ast(tryNode)
   }
 
-  def astForIf(stmt: IfStmt, order: Int): Ast = {
-    val ifNode = NewControlStructure(controlStructureType = ControlStructureTypes.IF, order = order)
-    val conditionAst = astForExpression(stmt.getCondition, order = 0)
-    val stmtAsts = astsForStatement(stmt.getThenStmt, order = 1)
-
-    val ast = Ast(ifNode)
-      .withChild(conditionAst)
-      .withChildren(stmtAsts)
-
-    conditionAst.root match {
-      case Some(r) =>
-        ast.withConditionEdge(ifNode, r)
-      case None =>
-        ast
-    }
-  }
-
-  def astForWhile(stmt: WhileStmt, order: Int): Ast = {
-    val whileNode =
-      NewControlStructure(controlStructureType = ControlStructureTypes.WHILE, order = order)
-    val conditionAst = astForExpression(stmt.getCondition, order = 0)
-    val stmtAsts = astsForStatement(stmt.getBody, order = 1)
-    val ast = Ast(whileNode)
-      .withChild(conditionAst)
-      .withChildren(stmtAsts)
-    conditionAst.root match {
-      case Some(r) =>
-        ast.withConditionEdge(whileNode, r)
-      case None =>
-        ast
-    }
-  }
 
   def astForDo(stmt: DoStmt, order: Int): Ast = {
     val doNode =
@@ -607,33 +684,7 @@ class AstCreator(filename: String, global: Global) {
     Ast(node)
   }
 
-  def astForFor(stmt: ForStmt, order: Int): Ast = {
-    val forNode =
-      NewControlStructure(controlStructureType = ControlStructureTypes.FOR, order = order)
-    val initAsts = withOrder(stmt.getInitialization) { (s, o) =>
-      astForExpression(s, o)
-    }
-    val compareAst = stmt.getCompare.asScala.toList
-      .map(x => astForExpression(x, order + initAsts.size + 1))
-      .headOption
-    val updateAsts = withOrder(stmt.getUpdate) { (s, o) =>
-      astForExpression(s, o + initAsts.size + compareAst.size)
-    }
-    val stmtAst =
-      astsForStatement(stmt.getBody, initAsts.size + compareAst.size + updateAsts.size + 1)
 
-    val ast = Ast(forNode)
-      .withChildren(initAsts)
-      .withChildren(compareAst.toList)
-      .withChildren(updateAsts)
-      .withChildren(stmtAst)
-
-    compareAst.flatMap(_.root) match {
-      case Some(c) =>
-        ast.withConditionEdge(forNode, c)
-      case None => ast
-    }
-  }
 
   def astForSwitchStatement(stmt: SwitchStmt, order: Int): Ast = {
     val switchNode =
