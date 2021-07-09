@@ -487,8 +487,9 @@ class AstCreator(filename: String, global: Global) {
     val cpgUnary = newCallNode(unary, operatorMethod, DispatchTypes.STATIC_DISPATCH, order)
     val operandExpr = unary.getOperand match {
       // special handling for operand expression in brackets - we simply ignore the brackets
-      case opExpr: IASTUnaryExpression => opExpr.getOperand
-      case opExpr                      => opExpr
+      case opExpr: IASTUnaryExpression if opExpr.getOperator == IASTUnaryExpression.op_bracketedPrimary =>
+        opExpr.getOperand
+      case opExpr => opExpr
     }
 
     val operand = astForExpression(operandExpr, 1)
