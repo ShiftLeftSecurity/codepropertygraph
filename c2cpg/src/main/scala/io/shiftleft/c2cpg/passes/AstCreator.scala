@@ -448,7 +448,7 @@ class AstCreator(filename: String, global: Global) {
       case Some(r) if r.root.isDefined => ast.withRefEdge(cpgCall, r.root.get).withArgEdge(cpgCall, r.root.get)
       case _                           => ast
     }
-    args.map(a => refAst.withArgEdge(cpgCall, a.root.get)).last
+    args.collect { case a if a.root.isDefined => refAst.withArgEdge(cpgCall, a.root.get) }.last
   }
 
   private def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
