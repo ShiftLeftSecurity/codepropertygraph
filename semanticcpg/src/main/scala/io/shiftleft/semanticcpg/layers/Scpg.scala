@@ -8,7 +8,7 @@ import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
 import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
 import io.shiftleft.semanticcpg.passes.compat.argumentcompat.ArgumentCompat
 import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
-import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.{MethodStubCreator, TypeDeclStubCreator}
+import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.MethodStubCreator
 import io.shiftleft.semanticcpg.passes.linking.calllinker.StaticCallLinker
 import io.shiftleft.semanticcpg.passes.linking.filecompat.FileNameCompat
 import io.shiftleft.semanticcpg.passes.linking.linker.Linker
@@ -18,6 +18,7 @@ import io.shiftleft.semanticcpg.passes.methodexternaldecorator.MethodExternalDec
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
 import io.shiftleft.semanticcpg.passes.trim.TrimPass
+import io.shiftleft.semanticcpg.passes.typenodes.TypeDeclStubCreator
 import io.shiftleft.semanticcpg.passes.{CfgCreationPass, FileCreationPass}
 
 import scala.annotation.nowarn
