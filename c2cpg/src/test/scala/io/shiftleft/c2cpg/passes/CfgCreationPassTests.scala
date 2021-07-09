@@ -95,12 +95,13 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
       }
 
     "be correct for short-circuit AND expression" in
-      // TODO: Broken by supporting move params?
-      new CfgFixture("x && y;") {
-        succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
+      new CfgFixture("int z = x && y;") {
+        succOf("RET func ()") shouldBe expected(("z", AlwaysEdge))
+        succOf("z") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("y", TrueEdge), ("x && y", FalseEdge))
         succOf("y") shouldBe expected(("x && y", AlwaysEdge))
-        succOf("x && y") shouldBe expected(("RET", AlwaysEdge))
+        succOf("x && y") shouldBe expected(("z = x && y", AlwaysEdge))
+        succOf("z = x && y") shouldBe expected(("RET", AlwaysEdge))
       }
 
     "be correct for short-circuit OR expression" in

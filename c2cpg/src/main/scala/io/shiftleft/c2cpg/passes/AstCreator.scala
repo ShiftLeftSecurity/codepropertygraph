@@ -63,11 +63,15 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTStandardFunctionDeclarator,
   IASTStatement,
   IASTTranslationUnit,
+  IASTUnaryExpression,
   IASTWhileStatement,
   IPointerType
 }
+import org.slf4j.LoggerFactory
 
 object AstCreator {
+
+  private val logger = LoggerFactory.getLogger(classOf[AstCreator])
 
   def line(node: IASTNode): Option[Integer] = {
     Some(node.getFileLocation.getStartingLineNumber)
@@ -137,10 +141,18 @@ class AstCreator(filename: String, global: Global) {
     typeName
   }
 
-  private def notHandledYet[T](node: IASTNode): T = {
+  private def notHandledYetSeq[T](node: IASTNode): Seq[T] = {
     val text = s"Node '${node.getClass.getSimpleName}' not handled yet. Code: '${node.getRawSignature}'"
     println(text)
-    throw new NotImplementedError(text)
+    logger.warn(text)
+    Seq.empty
+  }
+
+  private def notHandledYet(node: IASTNode): Ast = {
+    val text = s"Node '${node.getClass.getSimpleName}' not handled yet. Code: '${node.getRawSignature}'"
+    println(text)
+    logger.warn(text)
+    Ast()
   }
 
   private def parentIsClassDef(node: IASTNode): Boolean = Option(node.getParent) match {
@@ -150,7 +162,7 @@ class AstCreator(filename: String, global: Global) {
 
   private def params(functDef: IASTFunctionDefinition): Seq[IASTParameterDeclaration] = functDef.getDeclarator match {
     case decl: IASTStandardFunctionDeclarator => decl.getParameters.toIndexedSeq
-    case _                                    => notHandledYet(functDef)
+    case _                                    => notHandledYetSeq(functDef)
   }
 
   private def paramListSignature(functDef: IASTFunctionDefinition, includeParamNames: Boolean): String = {
@@ -379,7 +391,7 @@ class AstCreator(filename: String, global: Global) {
             astForInitializer(d, d.getInitializer, locals.size + o)
           }
         locals ++ calls
-      case decl => notHandledYet(decl)
+      case decl => notHandledYetSeq(decl)
     }
 
   private def astForBinaryExpression(bin: IASTBinaryExpression, order: Int): Ast = {
@@ -413,11 +425,12 @@ class AstCreator(filename: String, global: Global) {
       case IASTBinaryExpression.op_binaryOrAssign   => Operators.assignmentOr
       case IASTBinaryExpression.op_equals           => Operators.equals
       case IASTBinaryExpression.op_notequals        => Operators.notEquals
-      case IASTBinaryExpression.op_pmdot            => notHandledYet(bin)
-      case IASTBinaryExpression.op_pmarrow          => notHandledYet(bin)
-      case IASTBinaryExpression.op_max              => notHandledYet(bin)
-      case IASTBinaryExpression.op_min              => notHandledYet(bin)
-      case IASTBinaryExpression.op_ellipses         => notHandledYet(bin)
+      case IASTBinaryExpression.op_pmdot            => Operators.indirectFieldAccess
+      case IASTBinaryExpression.op_pmarrow          => Operators.indirectFieldAccess
+      case IASTBinaryExpression.op_max              => "<operator>.max"
+      case IASTBinaryExpression.op_min              => "<operator>.min"
+      case IASTBinaryExpression.op_ellipses         => "<operator>.op_ellipses"
+      case _                                        => "<operator>.unknown"
     }
     val callNode = newCallNode(bin, op, DispatchTypes.STATIC_DISPATCH, order)
     val left = astForExpression(bin.getOperand1, 1)
@@ -451,8 +464,43 @@ class AstCreator(filename: String, global: Global) {
     args.collect { case a if a.root.isDefined => refAst.withArgEdge(cpgCall, a.root.get) }.last
   }
 
+  private def astForUnaryExpression(unary: IASTUnaryExpression, order: Int): Ast = {
+    val operatorMethod = unary.getOperator match {
+      case IASTUnaryExpression.op_prefixIncr  => Operators.preIncrement
+      case IASTUnaryExpression.op_prefixDecr  => Operators.preDecrement
+      case IASTUnaryExpression.op_plus        => Operators.plus
+      case IASTUnaryExpression.op_minus       => Operators.minus
+      case IASTUnaryExpression.op_star        => Operators.indirection
+      case IASTUnaryExpression.op_amper       => Operators.addressOf
+      case IASTUnaryExpression.op_tilde       => Operators.not
+      case IASTUnaryExpression.op_not         => Operators.logicalNot
+      case IASTUnaryExpression.op_sizeof      => Operators.sizeOf
+      case IASTUnaryExpression.op_postFixIncr => Operators.postIncrement
+      case IASTUnaryExpression.op_postFixDecr => Operators.postDecrement
+      case IASTUnaryExpression.op_throw       => "operator.<throw>"
+      case IASTUnaryExpression.op_typeid      => "operators.<typeOf>"
+      case _                                  => "operators.<unknown>"
+    }
+
+    val cpgUnary = newCallNode(unary, operatorMethod, DispatchTypes.STATIC_DISPATCH, order)
+    val operandExpr = unary.getOperand match {
+      // special handling for operand expression in brackets - we simply ignore the brackets
+      case opExpr: IASTUnaryExpression => opExpr.getOperand
+      case opExpr                      => opExpr
+    }
+
+    val operand = astForExpression(operandExpr, 1)
+
+    val ast = Ast(cpgUnary).withChild(operand)
+    operand.root match {
+      case Some(op) => ast.withArgEdge(cpgUnary, op)
+      case None     => ast
+    }
+  }
+
   private def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
     case lit: IASTLiteralExpression       => astForLiteral(lit, order)
+    case un: IASTUnaryExpression          => astForUnaryExpression(un, order)
     case bin: IASTBinaryExpression        => astForBinaryExpression(bin, order)
     case exprList: IASTExpressionList     => astForExpressionList(exprList, order)
     case ident: IASTIdExpression          => astForIdentifier(ident, order)
@@ -510,7 +558,7 @@ class AstCreator(filename: String, global: Global) {
       case decl: IASTDeclarationStatement => astsForDeclarationStatement(decl, order)
       case label: IASTLabelStatement      => astsForLabelStatement(label, order)
       case _: IASTNullStatement           => Seq.empty
-      case _                              => notHandledYet(statement)
+      case _                              => notHandledYetSeq(statement)
     }
   }
 
@@ -526,7 +574,8 @@ class AstCreator(filename: String, global: Global) {
     spec match {
       case s: IASTSimpleDeclSpecifier => s.toString
       case s: IASTNamedTypeSpecifier  => s.getName.toString
-      case _                          => notHandledYet(spec)
+      // TODO: handle other types of IASTDeclSpecifier
+      case _ => Defines.anyTypeName
     }
   }
 
