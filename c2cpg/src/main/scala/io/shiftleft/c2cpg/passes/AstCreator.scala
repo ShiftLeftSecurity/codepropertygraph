@@ -43,6 +43,7 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTExpressionList,
   IASTExpressionStatement,
   IASTForStatement,
+  IASTFunctionCallExpression,
   IASTFunctionDefinition,
   IASTIdExpression,
   IASTIfStatement,
@@ -59,7 +60,8 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTStandardFunctionDeclarator,
   IASTStatement,
   IASTTranslationUnit,
-  IASTWhileStatement
+  IASTWhileStatement,
+  IPointerType
 }
 
 object AstCreator {
@@ -156,10 +158,10 @@ class AstCreator(filename: String, global: Global) {
     "(" + elements.mkString(",") + ")"
   }
 
-  private def newCallNode(astNode: IASTNode, methodName: String, order: Int): NewCall =
+  private def newCallNode(astNode: IASTNode, methodName: String, dispatchType: String, order: Int): NewCall =
     NewCall()
       .name(methodName)
-      .dispatchType(DispatchTypes.STATIC_DISPATCH)
+      .dispatchType(dispatchType)
       .methodFullName(methodName)
       .code(astNode.getRawSignature)
       .order(order)
@@ -331,7 +333,7 @@ class AstCreator(filename: String, global: Global) {
     init match {
       case i: IASTEqualsInitializer =>
         val operatorName = Operators.assignment
-        val callNode = newCallNode(declarator, operatorName, order)
+        val callNode = newCallNode(declarator, operatorName, DispatchTypes.STATIC_DISPATCH, order)
         val left = astForNode(declarator.getName, 1)
         val right = astForNode(i.getInitializerClause, 2)
         Ast(callNode)
@@ -414,7 +416,7 @@ class AstCreator(filename: String, global: Global) {
       case IASTBinaryExpression.op_min              => notHandledYet(bin)
       case IASTBinaryExpression.op_ellipses         => notHandledYet(bin)
     }
-    val callNode = newCallNode(bin, op, order)
+    val callNode = newCallNode(bin, op, DispatchTypes.STATIC_DISPATCH, order)
     val left = astForExpression(bin.getOperand1, 1)
     val right = astForExpression(bin.getOperand2, 2)
     Ast(callNode)
@@ -427,12 +429,31 @@ class AstCreator(filename: String, global: Global) {
   private def astForExpressionList(exprList: IASTExpressionList, order: Int): Ast =
     Ast().withChildren(exprList.getExpressions.toIndexedSeq.map(astForExpression(_, order)))
 
+  private def astForCall(call: IASTFunctionCallExpression, order: Int): Ast = {
+    val targetMethodName = call.getFunctionNameExpression.toString
+    val (dispatchType, receiver) = call.getExpressionType match {
+      case _: IPointerType =>
+        (DispatchTypes.DYNAMIC_DISPATCH, Some(astForExpression(call.getFunctionNameExpression, 0)))
+      case _ => (DispatchTypes.STATIC_DISPATCH, None)
+    }
+    val cpgCall = newCallNode(call, targetMethodName, dispatchType, order)
+    val args = withOrder(call.getArguments) { case (a, o) => astForNode(a, o) }
+
+    val ast = Ast(cpgCall).withChildren(args)
+    receiver match {
+      case Some(r) if r.root.isDefined => ast.withRefEdge(cpgCall, r.root.get)
+      case _                           => ast
+    }
+
+  }
+
   private def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
-    case lit: IASTLiteralExpression   => astForLiteral(lit, order)
-    case bin: IASTBinaryExpression    => astForBinaryExpression(bin, order)
-    case exprList: IASTExpressionList => astForExpressionList(exprList, order)
-    case ident: IASTIdExpression      => astForIdentifier(ident, order)
-    case _                            => notHandledYet(expression)
+    case lit: IASTLiteralExpression       => astForLiteral(lit, order)
+    case bin: IASTBinaryExpression        => astForBinaryExpression(bin, order)
+    case exprList: IASTExpressionList     => astForExpressionList(exprList, order)
+    case ident: IASTIdExpression          => astForIdentifier(ident, order)
+    case call: IASTFunctionCallExpression => astForCall(call, order)
+    case _                                => notHandledYet(expression)
   }
 
   private def astForReturnStatement(ret: IASTReturnStatement, order: Int): Ast = {
