@@ -63,6 +63,7 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTStandardFunctionDeclarator,
   IASTStatement,
   IASTTranslationUnit,
+  IASTTypeIdExpression,
   IASTUnaryExpression,
   IASTWhileStatement,
   IPointerType
@@ -257,9 +258,10 @@ class AstCreator(filename: String, global: Global) {
 
   private def astForNode(node: IASTNode, order: Int): Ast = {
     node match {
-      case name: IASTName       => astForIdentifier(name, order)
-      case expr: IASTExpression => astForExpression(expr, order)
-      case _                    => notHandledYet(node)
+      case name: IASTName          => astForIdentifier(name, order)
+      case decl: IASTDeclSpecifier => astForIdentifier(decl, order)
+      case expr: IASTExpression    => astForExpression(expr, order)
+      case _                       => notHandledYet(node)
     }
   }
 
@@ -498,6 +500,24 @@ class AstCreator(filename: String, global: Global) {
     }
   }
 
+  private def astForTypeIdExpression(typeId: IASTTypeIdExpression, order: Int): Ast = {
+    typeId.getOperator match {
+      case op
+          if op == IASTTypeIdExpression.op_sizeof ||
+            op == IASTTypeIdExpression.op_typeid ||
+            op == IASTTypeIdExpression.op_alignof ||
+            op == IASTTypeIdExpression.op_typeof =>
+        val call = newCallNode(typeId, Operators.sizeOf, DispatchTypes.STATIC_DISPATCH, order)
+        val arg = astForNode(typeId.getTypeId.getDeclSpecifier, 1)
+        val ast = Ast(call).withChild(arg)
+        arg.root match {
+          case Some(r) => ast.withArgEdge(call, r)
+          case _       => ast
+        }
+      case _ => notHandledYet(typeId)
+    }
+  }
+
   private def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
     case lit: IASTLiteralExpression       => astForLiteral(lit, order)
     case un: IASTUnaryExpression          => astForUnaryExpression(un, order)
@@ -505,6 +525,7 @@ class AstCreator(filename: String, global: Global) {
     case exprList: IASTExpressionList     => astForExpressionList(exprList, order)
     case ident: IASTIdExpression          => astForIdentifier(ident, order)
     case call: IASTFunctionCallExpression => astForCall(call, order)
+    case typeId: IASTTypeIdExpression     => astForTypeIdExpression(typeId, order)
     case _                                => notHandledYet(expression)
   }
 
