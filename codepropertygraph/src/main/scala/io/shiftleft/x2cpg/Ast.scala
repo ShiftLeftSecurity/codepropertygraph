@@ -58,4 +58,11 @@ case class Ast(nodes: List[NewNode],
   def withArgEdge(src: NewNode, dst: NewNode): Ast = {
     this.copy(argEdges = argEdges ++ List(AstEdge(src, dst)))
   }
+
+  def withArgEdges(src: NewNode, dsts: Seq[NewNode]): Ast = {
+    this.copy(argEdges = argEdges ++ dsts.map { d =>
+      AstEdge(src, d)
+    })
+  }
+
 }
