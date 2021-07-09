@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   NewBlock,
   NewCall,
   NewControlStructure,
+  NewFieldIdentifier,
   NewFile,
   NewIdentifier,
   NewJumpTarget,
@@ -43,6 +44,7 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTExpression,
   IASTExpressionList,
   IASTExpressionStatement,
+  IASTFieldReference,
   IASTForStatement,
   IASTFunctionCallExpression,
   IASTFunctionDefinition,
@@ -519,6 +521,20 @@ class AstCreator(filename: String, global: Global) {
     }
   }
 
+  private def astForFieldReference(fieldRef: IASTFieldReference, order: Int): Ast = {
+    val op = if (fieldRef.isPointerDereference) Operators.indirectFieldAccess else Operators.fieldAccess
+    val ma = newCallNode(fieldRef, op, DispatchTypes.STATIC_DISPATCH, order)
+    val owner = astForExpression(fieldRef.getFieldOwner, 1)
+    val member = NewFieldIdentifier()
+      .canonicalName(fieldRef.getFieldName.toString)
+      .code(fieldRef.getFieldName.toString)
+      .order(2)
+      .argumentIndex(2)
+      .lineNumber(line(fieldRef.getFieldName))
+      .columnNumber(column(fieldRef.getFieldName))
+    Ast(ma).withChild(owner).withChild(Ast(member)).withArgEdge(ma, owner.root.get).withArgEdge(ma, member)
+  }
+
   private def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
     case lit: IASTLiteralExpression       => astForLiteral(lit, order)
     case un: IASTUnaryExpression          => astForUnaryExpression(un, order)
@@ -527,6 +543,7 @@ class AstCreator(filename: String, global: Global) {
     case ident: IASTIdExpression          => astForIdentifier(ident, order)
     case call: IASTFunctionCallExpression => astForCall(call, order)
     case typeId: IASTTypeIdExpression     => astForTypeIdExpression(typeId, order)
+    case fieldRef: IASTFieldReference     => astForFieldReference(fieldRef, order)
     case _                                => notHandledYet(expression)
   }
 
