@@ -7,6 +7,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   NewControlStructure,
   NewFile,
   NewIdentifier,
+  NewJumpTarget,
   NewLiteral,
   NewLocal,
   NewMember,
@@ -45,9 +46,11 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTForStatement,
   IASTFunctionCallExpression,
   IASTFunctionDefinition,
+  IASTGotoStatement,
   IASTIdExpression,
   IASTIfStatement,
   IASTInitializer,
+  IASTLabelStatement,
   IASTLiteralExpression,
   IASTName,
   IASTNamedTypeSpecifier,
@@ -364,7 +367,7 @@ class AstCreator(filename: String, global: Global) {
     Ast(newNode)
   }
 
-  private def astForDeclarationStatement(decl: IASTDeclarationStatement, order: Int): Seq[Ast] =
+  private def astsForDeclarationStatement(decl: IASTDeclarationStatement, order: Int): Seq[Ast] =
     decl.getDeclaration match {
       case decl: IASTSimpleDeclaration =>
         val locals =
@@ -475,18 +478,37 @@ class AstCreator(filename: String, global: Global) {
     Ast(newControlStructureNode(cont, ControlStructureTypes.CONTINUE, cont.getRawSignature, order))
   }
 
+  private def astForGotoStatement(goto: IASTGotoStatement, order: Int): Ast = {
+    Ast(newControlStructureNode(goto, ControlStructureTypes.GOTO, goto.getRawSignature, order))
+  }
+
+  private def astsForLabelStatement(label: IASTLabelStatement, order: Int): Seq[Ast] = {
+    val cpgLabel = NewJumpTarget()
+      .parserTypeName(label.getClass.getSimpleName)
+      .name(label.getName.toString)
+      .code(label.getRawSignature)
+      .order(order)
+      .argumentIndex(order)
+      .lineNumber(line(label))
+      .columnNumber(column(label))
+    val nestedStmts = Option(label.getNestedStatement).map(astsForIASTStatement(_, order + 1)).getOrElse(Seq.empty)
+    Ast(cpgLabel) +: nestedStmts
+  }
+
   private def astsForIASTStatement(statement: IASTStatement, order: Int): Seq[Ast] = {
     statement match {
-      case decl: IASTDeclarationStatement => astForDeclarationStatement(decl, order)
       case expr: IASTExpressionStatement  => Seq(astForExpression(expr.getExpression, order))
       case block: IASTCompoundStatement   => Seq(astForBlockStatement(None, block, order))
       case ifStmt: IASTIfStatement        => Seq(astForIf(ifStmt, order))
       case whileStmt: IASTWhileStatement  => Seq(astForWhile(whileStmt, order))
       case forStmt: IASTForStatement      => Seq(astForFor(forStmt, order))
-      case _: IASTNullStatement           => Seq.empty
       case ret: IASTReturnStatement       => Seq(astForReturnStatement(ret, order))
       case br: IASTBreakStatement         => Seq(astForBreakStatement(br, order))
       case cont: IASTContinueStatement    => Seq(astForContinueStatement(cont, order))
+      case goto: IASTGotoStatement        => Seq(astForGotoStatement(goto, order))
+      case decl: IASTDeclarationStatement => astsForDeclarationStatement(decl, order)
+      case label: IASTLabelStatement      => astsForLabelStatement(label, order)
+      case _: IASTNullStatement           => Seq.empty
       case _                              => notHandledYet(statement)
     }
   }

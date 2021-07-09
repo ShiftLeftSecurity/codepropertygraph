@@ -314,37 +314,37 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
   "Cfg for goto" should {
     "be correct for single label" in
-      new CfgFixture("x; goto l1; y; l1:") {
+      new CfgFixture("x; goto l1; y; l1: ;") {
         succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("goto l1;", AlwaysEdge))
-        succOf("goto l1;") shouldBe expected(("l1:", AlwaysEdge))
-        succOf("l1:") shouldBe expected(("RET", AlwaysEdge))
-        succOf("y") shouldBe expected(("l1:", AlwaysEdge))
+        succOf("goto l1;") shouldBe expected(("l1: ;", AlwaysEdge))
+        succOf("l1: ;") shouldBe expected(("RET", AlwaysEdge))
+        succOf("y") shouldBe expected(("l1: ;", AlwaysEdge))
       }
 
     "be correct for multiple labels" in
-      new CfgFixture("x;goto l1; l2: y; l1:") {
+      new CfgFixture("x; goto l1; l2: y; l1: ;") {
         succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("goto l1;", AlwaysEdge))
-        succOf("goto l1;") shouldBe expected(("l1:", AlwaysEdge))
-        succOf("y") shouldBe expected(("l1:", AlwaysEdge))
-        succOf("l1:") shouldBe expected(("RET", AlwaysEdge))
+        succOf("goto l1;") shouldBe expected(("l1: ;", AlwaysEdge))
+        succOf("y") shouldBe expected(("l1: ;", AlwaysEdge))
+        succOf("l1: ;") shouldBe expected(("RET", AlwaysEdge))
       }
 
     "be correct for multiple labels on same spot" in
-      new CfgFixture("x;goto l2;y;l1:l2:") {
+      new CfgFixture("x; goto l2; y; l1: ;l2: ;") {
         succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("goto l2;", AlwaysEdge))
-        succOf("goto l2;") shouldBe expected(("l2:", AlwaysEdge))
-        succOf("y") shouldBe expected(("l1:", AlwaysEdge))
-        succOf("l1:") shouldBe expected(("l2:", AlwaysEdge))
-        succOf("l2:") shouldBe expected(("RET", AlwaysEdge))
+        succOf("goto l2;") shouldBe expected(("l2: ;", AlwaysEdge))
+        succOf("y") shouldBe expected(("l1: ;", AlwaysEdge))
+        succOf("l1: ;") shouldBe expected(("l2: ;", AlwaysEdge))
+        succOf("l2: ;") shouldBe expected(("RET", AlwaysEdge))
       }
 
     "work correctly with if block" in
-      new CfgFixture("if(foo) goto end; if(bar) { f(x); } end:") {
+      new CfgFixture("if(foo) goto end; if(bar) { f(x); } end: ;") {
         succOf("RET func ()") shouldBe expected(("foo", AlwaysEdge))
-        succOf("goto end;") shouldBe expected(("end:", AlwaysEdge))
+        succOf("goto end;") shouldBe expected(("end: ;", AlwaysEdge))
       }
 
   }
