@@ -440,14 +440,15 @@ class AstCreator(filename: String, global: Global) {
       case _ => (DispatchTypes.STATIC_DISPATCH, None)
     }
     val cpgCall = newCallNode(call, targetMethodName, dispatchType, order)
-    val args = withOrder(call.getArguments) { case (a, o) => astForNode(a, o) }
+    val orderInc = if (receiver.isDefined) 1 else 0
+    val args = withOrder(call.getArguments) { case (a, o) => astForNode(a, orderInc + o) }
 
     val ast = Ast(cpgCall).withChildren(args)
-    receiver match {
-      case Some(r) if r.root.isDefined => ast.withRefEdge(cpgCall, r.root.get)
+    val refAst = receiver match {
+      case Some(r) if r.root.isDefined => ast.withRefEdge(cpgCall, r.root.get).withArgEdge(cpgCall, r.root.get)
       case _                           => ast
     }
-
+    args.map(a => refAst.withArgEdge(cpgCall, a.root.get)).last
   }
 
   private def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
