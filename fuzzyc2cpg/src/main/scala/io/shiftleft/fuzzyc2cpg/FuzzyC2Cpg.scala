@@ -2,10 +2,11 @@ package io.shiftleft.fuzzyc2cpg
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
-import io.shiftleft.fuzzyc2cpg.passes.{AstCreationPass, StubRemovalPass, TypeNodePass}
+import io.shiftleft.fuzzyc2cpg.passes.{AstCreationPass, StubRemovalPass}
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
+import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
 import io.shiftleft.x2cpg.X2Cpg.newEmptyCpg
 import io.shiftleft.x2cpg.{SourceFiles, X2Cpg, X2CpgConfig}
 import org.slf4j.LoggerFactory
