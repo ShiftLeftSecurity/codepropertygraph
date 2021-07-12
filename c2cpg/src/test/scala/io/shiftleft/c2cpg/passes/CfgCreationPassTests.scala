@@ -355,7 +355,8 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
       new CfgFixture("switch (x) { case 1: y; }") {
         succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("case 1:", CaseEdge), ("RET", CaseEdge))
-        succOf("case 1:") shouldBe expected(("y", AlwaysEdge))
+        succOf("case 1:") shouldBe expected(("1", AlwaysEdge))
+        succOf("1") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("RET", AlwaysEdge))
       }
 
@@ -363,9 +364,11 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
       new CfgFixture("switch (x) { case 1: y; case 2: z;}") {
         succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("case 1:", CaseEdge), ("case 2:", CaseEdge), ("RET", CaseEdge))
-        succOf("case 1:") shouldBe expected(("y", AlwaysEdge))
+        succOf("case 1:") shouldBe expected(("1", AlwaysEdge))
+        succOf("1") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("case 2:", AlwaysEdge))
-        succOf("case 2:") shouldBe expected(("z", AlwaysEdge))
+        succOf("case 2:") shouldBe expected(("2", AlwaysEdge))
+        succOf("2") shouldBe expected(("z", AlwaysEdge))
         succOf("z") shouldBe expected(("RET", AlwaysEdge))
       }
 
@@ -373,7 +376,10 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
       new CfgFixture("switch (x) { case 1: case 2: y; }") {
         succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("case 1:", CaseEdge), ("case 2:", CaseEdge), ("RET", CaseEdge))
-        succOf("case 1:") shouldBe expected(("case 2:", AlwaysEdge))
+        succOf("case 1:") shouldBe expected(("1", AlwaysEdge))
+        succOf("1") shouldBe expected(("case 2:", AlwaysEdge))
+        succOf("case 2:") shouldBe expected(("2", AlwaysEdge))
+        succOf("2") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("RET", AlwaysEdge))
       }
 
@@ -384,10 +390,13 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
                                       ("case 2:", CaseEdge),
                                       ("case 3:", CaseEdge),
                                       ("RET", CaseEdge))
-        succOf("case 1:") shouldBe expected(("case 2:", AlwaysEdge))
-        succOf("case 2:") shouldBe expected(("y", AlwaysEdge))
+        succOf("case 1:") shouldBe expected(("1", AlwaysEdge))
+        succOf("1") shouldBe expected(("case 2:", AlwaysEdge))
+        succOf("case 2:") shouldBe expected(("2", AlwaysEdge))
+        succOf("2") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("case 3:", AlwaysEdge))
-        succOf("case 3:") shouldBe expected(("z", AlwaysEdge))
+        succOf("case 3:") shouldBe expected(("3", AlwaysEdge))
+        succOf("3") shouldBe expected(("z", AlwaysEdge))
         succOf("z") shouldBe expected(("RET", AlwaysEdge))
       }
 
@@ -403,7 +412,8 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
       new CfgFixture("switch (x) { case 1: y; break; default: z;}") {
         succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("case 1:", CaseEdge), ("default:", CaseEdge))
-        succOf("case 1:") shouldBe expected(("y", AlwaysEdge))
+        succOf("case 1:") shouldBe expected(("1", AlwaysEdge))
+        succOf("1") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("break;", AlwaysEdge))
         succOf("break;") shouldBe expected(("RET", AlwaysEdge))
         succOf("default:") shouldBe expected(("z", AlwaysEdge))
@@ -414,7 +424,8 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
       new CfgFixture("switch (x) { case 1: switch(y) { default: z; } }") {
         succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
         succOf("x") shouldBe expected(("case 1:", CaseEdge), ("default:", CaseEdge))
-        succOf("case 1:") shouldBe expected(("y", AlwaysEdge))
+        succOf("case 1:") shouldBe expected(("1", AlwaysEdge))
+        succOf("1") shouldBe expected(("y", AlwaysEdge))
         succOf("y") shouldBe expected(("default:", CaseEdge))
         succOf("default:") shouldBe expected(("z", AlwaysEdge))
         succOf("z") shouldBe expected(("RET", AlwaysEdge))
