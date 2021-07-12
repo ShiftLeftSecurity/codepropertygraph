@@ -31,6 +31,7 @@ import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.x2cpg.Ast
+import org.eclipse.cdt.core.dom.ast.cpp.{ICPPASTCompositeTypeSpecifier, ICPPASTVisibilityLabel}
 import org.eclipse.cdt.core.dom.ast.{
   IASTBinaryExpression,
   IASTBreakStatement,
@@ -752,12 +753,23 @@ class AstCreator(filename: String, global: Global) {
 
   private def astForCompositeType(typeSpecifier: IASTCompositeTypeSpecifier, order: Int): Ast = {
     val name = typeSpecifier.getName.toString
-    val typeDecl = NewTypeDecl()
-      .name(name)
-      .fullName(name)
-      .isExternal(false)
-      .filename(typeSpecifier.getContainingFilename)
-      .order(order)
+    val typeDecl = typeSpecifier match {
+      case cppClass: ICPPASTCompositeTypeSpecifier =>
+        NewTypeDecl()
+          .name(name)
+          .fullName(name)
+          .isExternal(false)
+          .filename(typeSpecifier.getContainingFilename)
+          .order(order)
+          .inheritsFromTypeFullName(cppClass.getBaseSpecifiers.toSeq.map(_.getNameSpecifier.toString))
+      case _ =>
+        NewTypeDecl()
+          .name(name)
+          .fullName(name)
+          .isExternal(false)
+          .filename(typeSpecifier.getContainingFilename)
+          .order(order)
+    }
 
     scope.pushNewScope(typeDecl)
     val member = withOrder(typeSpecifier.getMembers) { (m, o) =>
@@ -787,10 +799,9 @@ class AstCreator(filename: String, global: Global) {
       withOrder(declaration.getDeclarators) { (d, o) =>
         astForDeclarator(declaration, d, o)
       }
-    //case declaration: IASTSimpleDeclaration if declaration.getDeclarators.isEmpty =>
-    //  Seq.empty
-    case _ =>
-      notHandledYetSeq(decl)
+    case _: ICPPASTVisibilityLabel                                                => Seq.empty
+    case declaration: IASTSimpleDeclaration if declaration.getDeclarators.isEmpty => Seq.empty
+    case _                                                                        => notHandledYetSeq(decl)
   }
 
   private def astForFor(forStmt: IASTForStatement, order: Int): Ast = {

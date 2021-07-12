@@ -533,18 +533,18 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct for method returns" in Fixture(
       """
-        |void double(int x) {
+        |int d(int x) {
         |  return x * 2;
         |}
         |""".stripMargin
     ) { cpg =>
       // TODO no step class defined for `Return` nodes
-      cpg.method.name("double").ast.isReturn.astChildren.order(1).isCall.code.l shouldBe List("x * 2")
+      cpg.method.name("d").ast.isReturn.astChildren.order(1).isCall.code.l shouldBe List("x * 2")
     }
 
     "be correct for binary method calls" in Fixture(
       """
-        |void double(int x) {
+        |int d(int x) {
         |  return x * 2;
         |}
         |""".stripMargin
@@ -595,8 +595,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name(Operators.sizeOf).argument(1).code.l shouldBe List("int")
     }
 
-    "be correct for label" in Fixture("foo() { label: }") { cpg =>
-      cpg.jumpTarget.code("label:").size shouldBe 1
+    "be correct for label" in Fixture("void foo() { label:; }") { cpg =>
+      cpg.jumpTarget.code("label:;").size shouldBe 1
     }
 
     "be correct for array indexing" in Fixture(
