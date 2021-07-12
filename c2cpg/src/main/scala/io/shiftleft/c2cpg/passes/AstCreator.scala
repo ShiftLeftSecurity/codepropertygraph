@@ -18,7 +18,8 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   NewNamespaceBlock,
   NewNode,
   NewReturn,
-  NewTypeDecl
+  NewTypeDecl,
+  NewUnknown
 }
 import io.shiftleft.codepropertygraph.generated.{
   ControlStructureTypes,
@@ -31,11 +32,19 @@ import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.x2cpg.Ast
-import org.eclipse.cdt.core.dom.ast.cpp.{ICPPASTCompositeTypeSpecifier, ICPPASTVisibilityLabel}
+import org.eclipse.cdt.core.dom.ast.cpp.{
+  ICPPASTCompositeTypeSpecifier,
+  ICPPASTConstructorInitializer,
+  ICPPASTDeleteExpression,
+  ICPPASTNewExpression,
+  ICPPASTVisibilityLabel
+}
 import org.eclipse.cdt.core.dom.ast.{
+  IASTArraySubscriptExpression,
   IASTBinaryExpression,
   IASTBreakStatement,
   IASTCaseStatement,
+  IASTCastExpression,
   IASTCompositeTypeSpecifier,
   IASTCompoundStatement,
   IASTConditionalExpression,
@@ -600,17 +609,91 @@ class AstCreator(filename: String, global: Global) {
     Ast(call).withChildren(children).withArgEdges(call, argChildren)
   }
 
+  private def astForArrayIndexExpression(arrayIndexExpression: IASTArraySubscriptExpression, order: Int): Ast = {
+    val cpgArrayIndexing =
+      newCallNode(arrayIndexExpression, Operators.indirectIndexAccess, DispatchTypes.STATIC_DISPATCH, order)
+
+    val expr = astForExpression(arrayIndexExpression.getArrayExpression, 1)
+    val arg = astForNode(arrayIndexExpression.getArgument, 2)
+
+    Ast(cpgArrayIndexing)
+      .withChild(expr)
+      .withChild(arg)
+      .withArgEdge(cpgArrayIndexing, expr.root.get)
+      .withArgEdge(cpgArrayIndexing, arg.root.get)
+  }
+
+  private def astForCastExpression(castExpression: IASTCastExpression, order: Int): Ast = {
+    val cpgCastExpression =
+      newCallNode(castExpression, Operators.cast, DispatchTypes.STATIC_DISPATCH, order)
+
+    val expr = astForExpression(castExpression.getOperand, 1)
+    val argNode = castExpression.getTypeId
+    val arg = Ast(
+      NewUnknown()
+        .parserTypeName(argNode.getClass.getSimpleName)
+        .code(argNode.getRawSignature)
+        .order(2)
+        .argumentIndex(2)
+        .lineNumber(line(argNode))
+        .columnNumber(column(argNode)))
+
+    Ast(cpgCastExpression)
+      .withChild(arg)
+      .withChild(expr)
+      .withArgEdge(cpgCastExpression, arg.root.get)
+      .withArgEdge(cpgCastExpression, expr.root.get)
+  }
+
+  private def astForNewExpression(newExpression: ICPPASTNewExpression, order: Int): Ast = {
+    val cpgNewExpression =
+      newCallNode(newExpression, "<operator>.new", DispatchTypes.STATIC_DISPATCH, order)
+
+    val typeId = newExpression.getTypeId
+    if (newExpression.isArrayAllocation) {
+      val cpgTypeId = astForIdentifier(typeId.getDeclSpecifier, 1)
+      Ast(cpgNewExpression).withChild(cpgTypeId).withArgEdge(cpgNewExpression, cpgTypeId.root.get)
+    } else {
+      val cpgTypeId = astForIdentifier(typeId.getDeclSpecifier, 1)
+      val args =
+        if (newExpression.getInitializer != null && newExpression.getInitializer
+              .isInstanceOf[ICPPASTConstructorInitializer]) {
+          val args = newExpression.getInitializer.asInstanceOf[ICPPASTConstructorInitializer].getArguments
+          withOrder(args) { (a, o) =>
+            astForNode(a, 1 + o)
+          }
+        } else {
+          Seq.empty
+        }
+      Ast(cpgNewExpression)
+        .withChild(cpgTypeId)
+        .withChildren(args)
+        .withArgEdge(cpgNewExpression, cpgTypeId.root.get)
+        .withArgEdges(cpgNewExpression, args.map(_.root.get))
+    }
+  }
+
+  private def astForDeleteExpression(delExpression: ICPPASTDeleteExpression, order: Int): Ast = {
+    val cpgDeleteNode = newCallNode(delExpression, Operators.delete, DispatchTypes.STATIC_DISPATCH, order)
+    val arg = astForExpression(delExpression.getOperand, 1)
+    Ast(cpgDeleteNode).withChild(arg).withArgEdge(cpgDeleteNode, arg.root.get)
+  }
+
   private def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
-    case lit: IASTLiteralExpression       => astForLiteral(lit, order)
-    case un: IASTUnaryExpression          => astForUnaryExpression(un, order)
-    case bin: IASTBinaryExpression        => astForBinaryExpression(bin, order)
-    case exprList: IASTExpressionList     => astForExpressionList(exprList, order)
-    case ident: IASTIdExpression          => astForIdentifier(ident, order)
-    case call: IASTFunctionCallExpression => astForCall(call, order)
-    case typeId: IASTTypeIdExpression     => astForTypeIdExpression(typeId, order)
-    case fieldRef: IASTFieldReference     => astForFieldReference(fieldRef, order)
-    case expr: IASTConditionalExpression  => astForConditionalExpression(expr, order)
-    case _                                => notHandledYet(expression)
+    case lit: IASTLiteralExpression                         => astForLiteral(lit, order)
+    case un: IASTUnaryExpression                            => astForUnaryExpression(un, order)
+    case bin: IASTBinaryExpression                          => astForBinaryExpression(bin, order)
+    case exprList: IASTExpressionList                       => astForExpressionList(exprList, order)
+    case ident: IASTIdExpression                            => astForIdentifier(ident, order)
+    case call: IASTFunctionCallExpression                   => astForCall(call, order)
+    case typeId: IASTTypeIdExpression                       => astForTypeIdExpression(typeId, order)
+    case fieldRef: IASTFieldReference                       => astForFieldReference(fieldRef, order)
+    case expr: IASTConditionalExpression                    => astForConditionalExpression(expr, order)
+    case arrayIndexExpression: IASTArraySubscriptExpression => astForArrayIndexExpression(arrayIndexExpression, order)
+    case castExpression: IASTCastExpression                 => astForCastExpression(castExpression, order)
+    case newExpression: ICPPASTNewExpression                => astForNewExpression(newExpression, order)
+    case delExpression: ICPPASTDeleteExpression             => astForDeleteExpression(delExpression, order)
+    case _                                                  => notHandledYet(expression)
   }
 
   private def astForReturnStatement(ret: IASTReturnStatement, order: Int): Ast = {

@@ -621,8 +621,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct for 'new' array" in Fixture(
       """
-        |int[] alloc(int n) {
-        |   int[] arr = new int[n];
+        |int * alloc(int n) {
+        |   int * arr = new int[n];
         |   return arr;
         |}
         |""".stripMargin
