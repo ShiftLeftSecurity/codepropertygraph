@@ -177,6 +177,10 @@ class AstCreator(filename: String, global: Global) {
     case _                                   => false
   }
 
+  private def isTypeDef(node: IASTNode): Boolean = node match {
+    case n: IASTSimpleDeclaration => n.getDeclSpecifier.isInstanceOf[IASTCompositeTypeSpecifier]
+  }
+
   private def params(functDef: IASTFunctionDefinition): Seq[IASTParameterDeclaration] = functDef.getDeclarator match {
     case decl: IASTStandardFunctionDeclarator => decl.getParameters.toIndexedSeq
     case _                                    => notHandledYetSeq(functDef)
@@ -398,7 +402,7 @@ class AstCreator(filename: String, global: Global) {
   private def astForDeclarator(declaration: IASTSimpleDeclaration, declarator: IASTDeclarator, order: Int): Ast = {
     val declTypeName = typeForDeclSpecifier(declaration.getDeclSpecifier)
     val name = declarator.getName.toString
-    if (false /* TODO isTypeDef */ ) {
+    if (isTypeDef(declaration)) {
       Ast(
         NewTypeDecl()
           .name(name)
@@ -719,8 +723,9 @@ class AstCreator(filename: String, global: Global) {
 
   private def typeForDeclSpecifier(spec: IASTDeclSpecifier): String = {
     spec match {
-      case s: IASTSimpleDeclSpecifier => s.toString
-      case s: IASTNamedTypeSpecifier  => s.getName.toString
+      case s: IASTSimpleDeclSpecifier    => s.toString
+      case s: IASTNamedTypeSpecifier     => s.getName.toString
+      case s: IASTCompositeTypeSpecifier => s.getName.toString
       // TODO: handle other types of IASTDeclSpecifier
       case _ => Defines.anyTypeName
     }
@@ -766,8 +771,18 @@ class AstCreator(filename: String, global: Global) {
   private def astsForDeclaration(decl: IASTDeclaration, order: Int): Seq[Ast] = decl match {
     case functDef: IASTFunctionDefinition =>
       Seq(astForFunctionDefinition(functDef, order))
-    case declaration: IASTSimpleDeclaration if declaration.getDeclSpecifier.isInstanceOf[IASTCompositeTypeSpecifier] =>
+    case declaration: IASTSimpleDeclaration
+        if declaration.getDeclSpecifier
+          .isInstanceOf[IASTCompositeTypeSpecifier] && declaration.getDeclarators.isEmpty =>
       Seq(astForCompositeType(declaration.getDeclSpecifier.asInstanceOf[IASTCompositeTypeSpecifier], order))
+    case declaration: IASTSimpleDeclaration
+        if declaration.getDeclSpecifier
+          .isInstanceOf[IASTCompositeTypeSpecifier] && declaration.getDeclarators.nonEmpty =>
+      val compAst = astForCompositeType(declaration.getDeclSpecifier.asInstanceOf[IASTCompositeTypeSpecifier], order)
+      val declAsts = withOrder(declaration.getDeclarators) { (d, o) =>
+        astForDeclarator(declaration, d, o)
+      }
+      compAst +: declAsts
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.nonEmpty =>
       withOrder(declaration.getDeclarators) { (d, o) =>
         astForDeclarator(declaration, d, o)

@@ -496,10 +496,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |} abc;
       """.stripMargin
     ) { cpg =>
-      // TODO requires .aliasTypeFullName accessor missing
-      cpg.typeDecl
-        .name("abc")
-        .count(_.aliasTypeFullName.contains("foo")) shouldBe 1
+      cpg.typeDecl.name("abc").aliasTypeFullName("foo").size shouldBe 1
     }
 
     "be correct for single inheritance" in Fixture(
