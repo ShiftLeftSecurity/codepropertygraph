@@ -35,6 +35,7 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTBreakStatement,
   IASTCompositeTypeSpecifier,
   IASTCompoundStatement,
+  IASTConditionalExpression,
   IASTContinueStatement,
   IASTDeclSpecifier,
   IASTDeclaration,
@@ -486,20 +487,24 @@ class AstCreator(filename: String, global: Global) {
       case _                                  => "operators.<unknown>"
     }
 
-    val cpgUnary = newCallNode(unary, operatorMethod, DispatchTypes.STATIC_DISPATCH, order)
-    val operandExpr = unary.getOperand match {
-      // special handling for operand expression in brackets - we simply ignore the brackets
-      case opExpr: IASTUnaryExpression if opExpr.getOperator == IASTUnaryExpression.op_bracketedPrimary =>
-        opExpr.getOperand
-      case opExpr => opExpr
-    }
+    if (unary.getOperator == IASTUnaryExpression.op_bracketedPrimary) {
+      astForExpression(unary.getOperand, order)
+    } else {
+      val cpgUnary = newCallNode(unary, operatorMethod, DispatchTypes.STATIC_DISPATCH, order)
+      val operandExpr = unary.getOperand match {
+        // special handling for operand expression in brackets - we simply ignore the brackets
+        case opExpr: IASTUnaryExpression if opExpr.getOperator == IASTUnaryExpression.op_bracketedPrimary =>
+          opExpr.getOperand
+        case opExpr => opExpr
+      }
 
-    val operand = astForExpression(operandExpr, 1)
+      val operand = astForExpression(operandExpr, 1)
 
-    val ast = Ast(cpgUnary).withChild(operand)
-    operand.root match {
-      case Some(op) => ast.withArgEdge(cpgUnary, op)
-      case None     => ast
+      val ast = Ast(cpgUnary).withChild(operand)
+      operand.root match {
+        case Some(op) => ast.withArgEdge(cpgUnary, op)
+        case None     => ast
+      }
     }
   }
 
@@ -535,6 +540,19 @@ class AstCreator(filename: String, global: Global) {
     Ast(ma).withChild(owner).withChild(Ast(member)).withArgEdge(ma, owner.root.get).withArgEdge(ma, member)
   }
 
+  private def astForConditionalExpression(expr: IASTConditionalExpression, order: Int): Ast = {
+    val call = newCallNode(expr, Operators.conditional, DispatchTypes.STATIC_DISPATCH, order)
+
+    val condAst = Option(expr.getLogicalConditionExpression).map(astForExpression(_, 1)).getOrElse(Ast())
+    val posAst = Option(expr.getPositiveResultExpression).map(astForExpression(_, 2)).getOrElse(Ast())
+    val negAst = Option(expr.getNegativeResultExpression).map(astForExpression(_, 3)).getOrElse(Ast())
+
+    val children = Seq(condAst, posAst, negAst)
+    val argChildren = children.collect { case c if c.root.isDefined => c.root.get }
+
+    Ast(call).withChildren(children).withArgEdges(call, argChildren)
+  }
+
   private def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
     case lit: IASTLiteralExpression       => astForLiteral(lit, order)
     case un: IASTUnaryExpression          => astForUnaryExpression(un, order)
@@ -544,6 +562,7 @@ class AstCreator(filename: String, global: Global) {
     case call: IASTFunctionCallExpression => astForCall(call, order)
     case typeId: IASTTypeIdExpression     => astForTypeIdExpression(typeId, order)
     case fieldRef: IASTFieldReference     => astForFieldReference(fieldRef, order)
+    case expr: IASTConditionalExpression  => astForConditionalExpression(expr, order)
     case _                                => notHandledYet(expression)
   }
 

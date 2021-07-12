@@ -2,12 +2,13 @@ package io.shiftleft.c2cpg
 
 import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.parser.ParseConfig
-import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass, TypeNodePass}
+import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
+import io.shiftleft.semanticcpg.passes.typenodes.{TypeDeclStubCreator, TypeNodePass}
 import io.shiftleft.x2cpg.X2Cpg.newEmptyCpg
 import io.shiftleft.x2cpg.{SourceFiles, X2Cpg, X2CpgConfig}
 import org.slf4j.LoggerFactory
@@ -45,8 +46,9 @@ class C2Cpg() {
     val astCreationPass = new AstCreationPass(sourceFileNames, cpg, functionKeyPool, createParseConfig(config))
     astCreationPass.createAndApply()
     new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
-    new CfgCreationPass(cpg).createAndApply()
+    new TypeDeclStubCreator(cpg)
     new StubRemovalPass(cpg).createAndApply()
+    new CfgCreationPass(cpg).createAndApply()
     cpg
   }
 
