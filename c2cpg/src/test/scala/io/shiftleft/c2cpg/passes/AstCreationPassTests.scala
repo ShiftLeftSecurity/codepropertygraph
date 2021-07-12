@@ -443,14 +443,12 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
                                                                      |   int x;
                                                                      | };
       """.stripMargin) { cpg =>
-      // TODO - this accessor is missing for some reason. Issue filed
-      // .typeFullName("int")
       cpg.typeDecl
         .name("foo")
         .member
         .code("x")
         .name("x")
-        .filter(_.typeFullName == "int")
+        .typeFullName("int")
         .size shouldBe 1
     }
 
@@ -733,8 +731,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
 object Fixture {
   def apply(file1Code: String, file2Code: String = "")(f: Cpg => Unit): Unit = {
     File.usingTemporaryDirectory("c2cpgtest") { dir =>
-      val file1 = (dir / "file1.c")
-      val file2 = (dir / "file2.c")
+      val file1 = dir / "file1.c"
+      val file2 = dir / "file2.c"
       file1.write(file1Code)
       file2.write(file2Code)
 

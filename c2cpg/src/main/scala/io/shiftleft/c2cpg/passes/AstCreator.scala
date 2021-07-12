@@ -17,7 +17,8 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   NewMethodReturn,
   NewNamespaceBlock,
   NewNode,
-  NewReturn
+  NewReturn,
+  NewTypeDecl
 }
 import io.shiftleft.codepropertygraph.generated.{
   ControlStructureTypes,
@@ -235,8 +236,8 @@ class AstCreator(filename: String, global: Global) {
       .withChild(
         astForTranslationUnit(parserResult)
           .withChildren(withOrder(parserResult.getDeclarations) { (decl, order) =>
-            astForDeclaration(decl, order)
-          })
+            astsForDeclaration(decl, order)
+          }.flatten)
       )
 
   private def astForTranslationUnit(iASTTranslationUnit: IASTTranslationUnit): Ast = {
@@ -397,21 +398,32 @@ class AstCreator(filename: String, global: Global) {
   private def astForDeclarator(declaration: IASTSimpleDeclaration, declarator: IASTDeclarator, order: Int): Ast = {
     val declTypeName = typeForDeclSpecifier(declaration.getDeclSpecifier)
     val name = declarator.getName.toString
-    val newNode = if (parentIsClassDef(declaration.getParent)) {
-      NewMember()
-        .code(declaration.getRawSignature)
-        .name(name)
-        .typeFullName(registerType(declTypeName))
-        .order(order)
-    } else {
-      NewLocal()
+    if (false /* TODO isTypeDef */ ) {
+      Ast(
+        NewTypeDecl()
+          .name(name)
+          .fullName(name)
+          .isExternal(false)
+          .aliasTypeFullName(Some(registerType(declTypeName)))
+          .filename(declaration.getContainingFilename)
+          .order(order))
+    } else if (parentIsClassDef(declaration)) {
+      Ast(
+        NewMember()
+          .code(declarator.getRawSignature)
+          .name(name)
+          .typeFullName(registerType(declTypeName))
+          .order(order))
+    } else if (!scope.isEmpty) {
+      val l = NewLocal()
         .code(name)
         .name(name)
         .typeFullName(registerType(declTypeName))
         .order(order)
-    }
-    scope.addToScope(name, (newNode, declTypeName))
-    Ast(newNode)
+      scope.addToScope(name, (l, declTypeName))
+      Ast(l)
+    } else Ast()
+
   }
 
   private def astsForDeclarationStatement(decl: IASTDeclarationStatement, order: Int): Seq[Ast] =
@@ -733,10 +745,37 @@ class AstCreator(filename: String, global: Global) {
     Ast(parameterNode)
   }
 
-  private def astForDeclaration(decl: IASTDeclaration, order: Int): Ast = decl match {
-    case functDef: IASTFunctionDefinition                                         => astForFunctionDefinition(functDef, order)
-    case declaration: IASTSimpleDeclaration if declaration.getDeclarators.isEmpty => Ast()
-    case _                                                                        => notHandledYet(decl)
+  private def astForCompositeType(typeSpecifier: IASTCompositeTypeSpecifier, order: Int): Ast = {
+    val name = typeSpecifier.getName.toString
+    val typeDecl = NewTypeDecl()
+      .name(name)
+      .fullName(name)
+      .isExternal(false)
+      .filename(typeSpecifier.getContainingFilename)
+      .order(order)
+
+    scope.pushNewScope(typeDecl)
+    val member = withOrder(typeSpecifier.getMembers) { (m, o) =>
+      astsForDeclaration(m, o + 1)
+    }.flatten
+    scope.popScope()
+
+    Ast(typeDecl).withChildren(member)
+  }
+
+  private def astsForDeclaration(decl: IASTDeclaration, order: Int): Seq[Ast] = decl match {
+    case functDef: IASTFunctionDefinition =>
+      Seq(astForFunctionDefinition(functDef, order))
+    case declaration: IASTSimpleDeclaration if declaration.getDeclSpecifier.isInstanceOf[IASTCompositeTypeSpecifier] =>
+      Seq(astForCompositeType(declaration.getDeclSpecifier.asInstanceOf[IASTCompositeTypeSpecifier], order))
+    case declaration: IASTSimpleDeclaration if declaration.getDeclarators.nonEmpty =>
+      withOrder(declaration.getDeclarators) { (d, o) =>
+        astForDeclarator(declaration, d, o)
+      }
+    //case declaration: IASTSimpleDeclaration if declaration.getDeclarators.isEmpty =>
+    //  Seq.empty
+    case _ =>
+      notHandledYetSeq(decl)
   }
 
   private def astForFor(forStmt: IASTForStatement, order: Int): Ast = {
