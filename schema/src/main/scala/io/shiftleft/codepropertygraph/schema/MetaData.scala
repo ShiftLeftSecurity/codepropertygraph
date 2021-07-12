@@ -77,6 +77,10 @@ object MetaData extends SchemaBase {
       Constant(name = "PHP", value = "PHP", valueType = ValueTypes.STRING, comment = "").protoId(8),
       Constant(name = "FUZZY_TEST_LANG", value = "FUZZY_TEST_LANG", valueType = ValueTypes.STRING, comment = "")
         .protoId(9),
+      Constant(name = "GHIDRA",
+               value = "GHIDRA",
+               valueType = ValueTypes.STRING,
+               comment = "generic reverse engineering framework").protoId(10),
     )
 
   }

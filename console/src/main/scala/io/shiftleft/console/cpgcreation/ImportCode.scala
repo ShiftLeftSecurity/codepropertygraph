@@ -55,6 +55,7 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
   def csharp: Frontend = new Frontend(Languages.CSHARP, "C# Source Frontend (Roslyn)")
   def python: Frontend = new Frontend(Languages.PYTHON, "Python Source Frontend")
   def php: Frontend = new Frontend(Languages.PHP, "PHP bytecode frontend")
+  def ghidra: Frontend = new Frontend(Languages.GHIDRA, "ghidra reverse engineering frontend")
 
   class Frontend(val language: String, val description: String = "") {
     def isAvailable: Boolean = {
@@ -93,7 +94,8 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
     java,
     javascript,
     llvm,
-    python
+    python,
+    ghidra,
   )
 
   /**

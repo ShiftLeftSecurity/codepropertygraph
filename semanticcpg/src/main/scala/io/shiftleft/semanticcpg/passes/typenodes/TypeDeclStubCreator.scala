@@ -1,4 +1,4 @@
-package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
+package io.shiftleft.semanticcpg.passes.typenodes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewTypeDecl, TypeDeclBase}
