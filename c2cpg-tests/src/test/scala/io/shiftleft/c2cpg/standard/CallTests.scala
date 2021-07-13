@@ -9,14 +9,13 @@ class CallTests extends CCodeToCpgSuite {
 
   implicit val resolver: NoResolve.type = NoResolve
 
-  override val code = """
-       int add(int x, int y) {
-         return x + y;
-       }
-       int main(int argc, char **argv) {
-         printf("%d\n", add((1+2), 3));
-       }
-    """
+  override val code: String = """
+    |int add(int x, int y) {
+    |  return x + y;
+    |}
+    |int main(int argc, char **argv) {
+    |  printf("%d\n", add((1+2), 3));
+    |}""".stripMargin
 
   "should contain a call node for `add` with correct fields" in {
     val List(x) = cpg.call("add").l
@@ -28,7 +27,7 @@ class CallTests extends CCodeToCpgSuite {
     // TODO x.signature
     // x.typeFullName : deprecated
     x.lineNumber shouldBe Some(6)
-    x.columnNumber shouldBe Some(24)
+    x.columnNumber shouldBe Some(21)
   }
 
   "should allow traversing from call to arguments" in {

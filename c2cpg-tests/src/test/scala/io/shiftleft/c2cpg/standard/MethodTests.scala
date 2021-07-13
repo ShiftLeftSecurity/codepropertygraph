@@ -23,7 +23,7 @@ class MethodTests extends CCodeToCpgSuite {
     x.lineNumber shouldBe Some(2)
     x.lineNumberEnd shouldBe Some(3)
     x.columnNumber shouldBe Some(2)
-    x.columnNumberEnd shouldBe Some(1)
+    x.columnNumberEnd shouldBe Some(2)
   }
 
   "should return correct number of lines" in {
