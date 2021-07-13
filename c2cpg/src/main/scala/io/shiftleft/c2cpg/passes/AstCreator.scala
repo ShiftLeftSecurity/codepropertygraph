@@ -62,6 +62,7 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTFieldReference,
   IASTForStatement,
   IASTFunctionCallExpression,
+  IASTFunctionDeclarator,
   IASTFunctionDefinition,
   IASTGotoStatement,
   IASTIdExpression,
@@ -86,6 +87,8 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTWhileStatement,
   IPointerType
 }
+import org.eclipse.cdt.internal.core.dom.parser.c.CASTFunctionDeclarator
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTFunctionDeclarator
 import org.slf4j.LoggerFactory
 
 class AstCreator(filename: String, global: Global) {
@@ -199,7 +202,13 @@ class AstCreator(filename: String, global: Global) {
 
   private def params(functDef: IASTFunctionDefinition): Seq[IASTParameterDeclaration] = functDef.getDeclarator match {
     case decl: IASTStandardFunctionDeclarator => decl.getParameters.toIndexedSeq
-    case _                                    => notHandledYetSeq(functDef)
+    case other                                => notHandledYetSeq(other)
+  }
+
+  private def params(functDecl: IASTFunctionDeclarator): Seq[IASTParameterDeclaration] = functDecl match {
+    case decl: CPPASTFunctionDeclarator => decl.getParameters.toIndexedSeq
+    case decl: CASTFunctionDeclarator   => decl.getParameters.toIndexedSeq
+    case other                          => notHandledYetSeq(other)
   }
 
   private def paramListSignature(functDef: IASTFunctionDefinition, includeParamNames: Boolean): String = {
@@ -207,6 +216,14 @@ class AstCreator(filename: String, global: Global) {
       if (!includeParamNames) params(functDef).map(p => typeForDeclSpecifier(p.getDeclSpecifier))
       else
         params(functDef).map(p => p.getRawSignature)
+    "(" + elements.mkString(",") + ")"
+  }
+
+  private def paramListSignature(functionDecl: IASTFunctionDeclarator, includeParamNames: Boolean): String = {
+    val elements =
+      if (!includeParamNames) params(functionDecl).map(p => typeForDeclSpecifier(p.getDeclSpecifier))
+      else
+        params(functionDecl).map(p => p.getRawSignature)
     "(" + elements.mkString(",") + ")"
   }
 
@@ -337,15 +354,15 @@ class AstCreator(filename: String, global: Global) {
     r
   }
 
-  private def astForMethodReturn(functDef: IASTFunctionDefinition, order: Int, tpe: String): Ast = {
+  private def astForMethodReturn(func: IASTNode, order: Int, tpe: String): Ast = {
     val methodReturnNode =
       NewMethodReturn()
         .order(order)
         .typeFullName(registerType(tpe))
         .code(tpe)
         .evaluationStrategy(EvaluationStrategies.BY_VALUE)
-        .lineNumber(line(functDef))
-        .columnNumber(column(functDef))
+        .lineNumber(line(func))
+        .columnNumber(column(func))
     Ast(methodReturnNode)
   }
 
@@ -874,6 +891,39 @@ class AstCreator(filename: String, global: Global) {
     Ast(typeDecl).withChildren(member)
   }
 
+  private def astForFunctionDeclarator(funcDecl: IASTFunctionDeclarator, order: Int): Ast = {
+    val returnType = typeForDeclSpecifier(funcDecl.getParent.asInstanceOf[IASTSimpleDeclaration].getDeclSpecifier)
+    val name = funcDecl.getName.toString
+    val signature = returnType + " " + name + " " + paramListSignature(funcDecl, includeParamNames = false)
+    val code = returnType + " " + name + " " + paramListSignature(funcDecl, includeParamNames = true)
+    val methodNode = NewMethod()
+      .name(name)
+      .code(code)
+      .isExternal(false)
+      .fullName(name)
+      .lineNumber(line(funcDecl))
+      .lineNumberEnd(lineEnd(funcDecl))
+      .columnNumber(column(funcDecl))
+      .columnNumberEnd(columnEnd(funcDecl))
+      .signature(signature)
+      .filename(filename)
+      .order(order)
+
+    scope.pushNewScope(methodNode)
+
+    val parameterAsts = withOrder(params(funcDecl)) { (p, order) =>
+      astForParameter(p, order)
+    }
+
+    val lastOrder = 2 + parameterAsts.size
+    val r = Ast(methodNode)
+      .withChildren(parameterAsts)
+      .withChild(astForMethodReturn(funcDecl, lastOrder, returnType))
+
+    scope.popScope()
+    r
+  }
+
   private def astsForDeclaration(decl: IASTDeclaration, order: Int): Seq[Ast] = decl match {
     case functDef: IASTFunctionDefinition =>
       Seq(astForFunctionDefinition(functDef, order))
@@ -890,8 +940,9 @@ class AstCreator(filename: String, global: Global) {
       }
       compAst +: declAsts
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.nonEmpty =>
-      withOrder(declaration.getDeclarators) { (d, o) =>
-        astForDeclarator(declaration, d, o)
+      withOrder(declaration.getDeclarators) {
+        case (d: IASTFunctionDeclarator, o) => astForFunctionDeclarator(d, o)
+        case (d, o)                         => astForDeclarator(declaration, d, o)
       }
     case _: ICPPASTVisibilityLabel                                                => Seq.empty
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.isEmpty => Seq.empty
