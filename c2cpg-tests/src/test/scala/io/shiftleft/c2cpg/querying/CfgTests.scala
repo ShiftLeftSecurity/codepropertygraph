@@ -7,7 +7,7 @@ class CfgTests extends CCodeToCpgSuite {
 
   override val code: String =
     """
-      | int foo(int y, int y) {
+      | int foo(int x, int y) {
       |  if (y < 10)
       |    goto end;
       |  if (x < 10) {
@@ -32,7 +32,7 @@ class CfgTests extends CCodeToCpgSuite {
     cpg.call("sink").dominates.l.size shouldBe 0
   }
 
-  "should find sink(x) is dominated by `x<10` and `y < 10`" in {
+  "should find sink(x) is dominated by `x < 10` and `y < 10`" in {
     cpg.call("sink").dominatedBy.isCall.code.toSet shouldBe Set("x < 10", "y < 10")
   }
 

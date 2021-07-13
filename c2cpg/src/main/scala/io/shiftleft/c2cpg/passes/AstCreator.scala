@@ -56,6 +56,7 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTDeclarator,
   IASTDefaultStatement,
   IASTDoStatement,
+  IASTElaboratedTypeSpecifier,
   IASTEqualsInitializer,
   IASTExpression,
   IASTExpressionList,
@@ -847,6 +848,12 @@ class AstCreator(filename: String, global: Global) {
       case s: IASTSimpleDeclSpecifier    => s.toString
       case s: IASTNamedTypeSpecifier     => s.getName.toString
       case s: IASTCompositeTypeSpecifier => s.getName.toString
+      case s: IASTElaboratedTypeSpecifier if s.getParent.isInstanceOf[IASTSimpleDeclaration] =>
+        val parentDecl = s.getParent.asInstanceOf[IASTSimpleDeclaration].getDeclarators.head
+        val pointers = parentDecl.getPointerOperators
+        if (pointers.isEmpty) { s"${s.toString}" } else {
+          s"${s.toString} ${"* " * pointers.size}".strip()
+        }
       // TODO: handle other types of IASTDeclSpecifier
       case _ => Defines.anyTypeName
     }
