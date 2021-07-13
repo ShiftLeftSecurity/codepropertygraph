@@ -12,9 +12,10 @@ class TypeNodePass(usedTypes: List[String], cpg: Cpg, keyPool: Option[KeyPool] =
   override def run(): Iterator[DiffGraph] = {
     val diffGraph = DiffGraph.newBuilder
     usedTypes.sorted.foreach { typeName =>
+      val shortName = typeName.split('.').lastOption.getOrElse(typeName)
       val node = nodes
         .NewType()
-        .name(typeName)
+        .name(shortName)
         .fullName(typeName)
         .typeDeclFullName(typeName)
       diffGraph.addNode(node)
