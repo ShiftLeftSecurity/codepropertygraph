@@ -37,6 +37,7 @@ import org.eclipse.cdt.core.dom.ast.cpp.{
   ICPPASTConstructorInitializer,
   ICPPASTDeleteExpression,
   ICPPASTNewExpression,
+  ICPPASTTryBlockStatement,
   ICPPASTVisibilityLabel
 }
 import org.eclipse.cdt.core.dom.ast.{
@@ -788,25 +789,35 @@ class AstCreator(filename: String, global: Global) {
     Ast(newJumpTarget(caseStmt, order))
   }
 
+  private def astForTryStatement(tryStmt: ICPPASTTryBlockStatement, order: Int): Ast = {
+    val cpgTry = newControlStructureNode(tryStmt, ControlStructureTypes.TRY, "try", order)
+    val body = nullSafeAst(tryStmt.getTryBody, 1)
+    val catches = withOrder(tryStmt.getCatchHandlers) { (c, o) =>
+      astForNode(c, o + 1)
+    }
+    Ast(cpgTry).withChildren(body).withChildren(catches)
+  }
+
   private def astsForStatement(statement: IASTStatement, order: Int): Seq[Ast] = {
     statement match {
-      case expr: IASTExpressionStatement   => Seq(astForExpression(expr.getExpression, order))
-      case block: IASTCompoundStatement    => Seq(astForBlockStatement(block, order))
-      case ifStmt: IASTIfStatement         => Seq(astForIf(ifStmt, order))
-      case whileStmt: IASTWhileStatement   => Seq(astForWhile(whileStmt, order))
-      case forStmt: IASTForStatement       => Seq(astForFor(forStmt, order))
-      case doStmt: IASTDoStatement         => Seq(astForDo(doStmt, order))
-      case switchStmt: IASTSwitchStatement => Seq(astForSwitch(switchStmt, order))
-      case ret: IASTReturnStatement        => Seq(astForReturnStatement(ret, order))
-      case br: IASTBreakStatement          => Seq(astForBreakStatement(br, order))
-      case cont: IASTContinueStatement     => Seq(astForContinueStatement(cont, order))
-      case goto: IASTGotoStatement         => Seq(astForGotoStatement(goto, order))
-      case defStmt: IASTDefaultStatement   => Seq(astForDefaultStatement(defStmt, order))
-      case caseStmt: IASTCaseStatement     => astsForCaseStatement(caseStmt, order)
-      case decl: IASTDeclarationStatement  => astsForDeclarationStatement(decl, order)
-      case label: IASTLabelStatement       => astsForLabelStatement(label, order)
-      case _: IASTNullStatement            => Seq.empty
-      case _                               => notHandledYetSeq(statement)
+      case expr: IASTExpressionStatement     => Seq(astForExpression(expr.getExpression, order))
+      case block: IASTCompoundStatement      => Seq(astForBlockStatement(block, order))
+      case ifStmt: IASTIfStatement           => Seq(astForIf(ifStmt, order))
+      case whileStmt: IASTWhileStatement     => Seq(astForWhile(whileStmt, order))
+      case forStmt: IASTForStatement         => Seq(astForFor(forStmt, order))
+      case doStmt: IASTDoStatement           => Seq(astForDo(doStmt, order))
+      case switchStmt: IASTSwitchStatement   => Seq(astForSwitch(switchStmt, order))
+      case ret: IASTReturnStatement          => Seq(astForReturnStatement(ret, order))
+      case br: IASTBreakStatement            => Seq(astForBreakStatement(br, order))
+      case cont: IASTContinueStatement       => Seq(astForContinueStatement(cont, order))
+      case goto: IASTGotoStatement           => Seq(astForGotoStatement(goto, order))
+      case defStmt: IASTDefaultStatement     => Seq(astForDefaultStatement(defStmt, order))
+      case tryStmt: ICPPASTTryBlockStatement => Seq(astForTryStatement(tryStmt, order))
+      case caseStmt: IASTCaseStatement       => astsForCaseStatement(caseStmt, order)
+      case decl: IASTDeclarationStatement    => astsForDeclarationStatement(decl, order)
+      case label: IASTLabelStatement         => astsForLabelStatement(label, order)
+      case _: IASTNullStatement              => Seq.empty
+      case _                                 => notHandledYetSeq(statement)
     }
   }
 
