@@ -142,7 +142,7 @@ class CAstTests2 extends CCodeToCpgSuite {
       |void foo(int bar) {
       | char buf[10];
       | int i;
-      | for (int i = 0; i < bar; i++) {
+      | for (int i = 0;i < bar;i++) {
       |   buf[i] = 42;
       | }
       |}
@@ -167,7 +167,7 @@ class CAstTests2 extends CCodeToCpgSuite {
       .inAstMinusLeaf
       .isControlStructure
       .code
-      .l shouldBe List("for (int i = 0; i < bar; i++)")
+      .l shouldBe List("for (int i = 0;i < bar;i++)")
 
   }
 

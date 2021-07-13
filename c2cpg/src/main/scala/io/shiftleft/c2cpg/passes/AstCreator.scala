@@ -230,6 +230,7 @@ class AstCreator(filename: String, global: Global) {
     NewCall()
       .name(methodName)
       .dispatchType(dispatchType)
+      .signature("TODO")
       .methodFullName(methodName)
       .code(astNode.getRawSignature)
       .order(order)
@@ -1015,12 +1016,17 @@ class AstCreator(filename: String, global: Global) {
 
     val conditionAst = nullSafeAst(ifStmt.getConditionExpression, 1)
     val stmtAsts = nullSafeAst(ifStmt.getThenClause, 2)
-    val elseAsts = nullSafeAst(ifStmt.getElseClause, 3)
+
+    val elseChild = if (ifStmt.getElseClause != null) {
+      val elseNode = newControlStructureNode(ifStmt.getElseClause, ControlStructureTypes.ELSE, "else", 3)
+      val elseAsts = nullSafeAst(ifStmt.getElseClause, 1)
+      Ast(elseNode).withChildren(elseAsts)
+    } else Ast()
 
     val ast = Ast(ifNode)
       .withChild(conditionAst)
       .withChildren(stmtAsts)
-      .withChildren(elseAsts)
+      .withChild(elseChild)
 
     conditionAst.root match {
       case Some(r) =>

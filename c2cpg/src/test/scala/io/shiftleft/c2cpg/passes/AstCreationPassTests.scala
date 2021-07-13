@@ -212,9 +212,11 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |}
       """.stripMargin) { cpg =>
       cpg.method.name("method").controlStructure.l match {
-        case List(ifStmt) =>
+        case List(ifStmt, elseStmt) =>
           ifStmt.controlStructureType shouldBe ControlStructureTypes.IF
           ifStmt.code shouldBe "if (x > 0)"
+          elseStmt.controlStructureType shouldBe ControlStructureTypes.ELSE
+          elseStmt.code shouldBe "else"
 
           ifStmt.condition.l match {
             case List(cndNode) =>
