@@ -854,6 +854,7 @@ class AstCreator(filename: String, global: Global) {
         if (pointers.isEmpty) { s"${s.toString}" } else {
           s"${s.toString} ${"* " * pointers.size}".strip()
         }
+      case s: IASTElaboratedTypeSpecifier => s.toString
       // TODO: handle other types of IASTDeclSpecifier
       case _ => Defines.anyTypeName
     }

@@ -668,7 +668,7 @@ class CDataFlowTests18 extends DataFlowCodeToCpgSuite {
 }
 
 class CDataFlowTests19 extends DataFlowCodeToCpgSuite {
-  override val code =
+  override val code: String =
     """
       | struct Point {
       |   int x;
@@ -949,9 +949,9 @@ class CDataFlowTests30 extends DataFlowCodeToCpgSuite {
 class CDataFlowTests31 extends DataFlowCodeToCpgSuite {
   override val code =
     """
-      |int foo() {
-      |   return bar();
-      |}
+      int foo() {
+         return bar();
+      }
     """
 
   "Test 31: should not create edges from call to ret twice" in {
