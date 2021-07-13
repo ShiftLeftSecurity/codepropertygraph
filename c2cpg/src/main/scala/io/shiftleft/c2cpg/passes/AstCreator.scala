@@ -196,9 +196,7 @@ class AstCreator(filename: String, global: Global) {
     case _                                   => false
   }
 
-  private def isTypeDef(node: IASTNode): Boolean = node match {
-    case n: IASTSimpleDeclaration => n.getDeclSpecifier.isInstanceOf[IASTCompositeTypeSpecifier]
-  }
+  private def isTypeDef(node: IASTNode): Boolean = node.getRawSignature.startsWith("typedef")
 
   private def params(functDef: IASTFunctionDefinition): Seq[IASTParameterDeclaration] = functDef.getDeclarator match {
     case decl: IASTStandardFunctionDeclarator => decl.getParameters.toIndexedSeq
@@ -866,13 +864,15 @@ class AstCreator(filename: String, global: Global) {
     val name = typeSpecifier.getName.toString
     val typeDecl = typeSpecifier match {
       case cppClass: ICPPASTCompositeTypeSpecifier =>
+        val baseClassList = cppClass.getBaseSpecifiers.toSeq.map(_.getNameSpecifier.toString)
+        baseClassList.foreach(registerType)
         NewTypeDecl()
           .name(name)
           .fullName(name)
           .isExternal(false)
           .filename(typeSpecifier.getContainingFilename)
           .order(order)
-          .inheritsFromTypeFullName(cppClass.getBaseSpecifiers.toSeq.map(_.getNameSpecifier.toString))
+          .inheritsFromTypeFullName(baseClassList)
       case _ =>
         NewTypeDecl()
           .name(name)
@@ -884,7 +884,7 @@ class AstCreator(filename: String, global: Global) {
 
     scope.pushNewScope(typeDecl)
     val member = withOrder(typeSpecifier.getDeclarations(true)) { (m, o) =>
-      astsForDeclaration(m, o + 1)
+      astsForDeclaration(m, o)
     }.flatten
     scope.popScope()
 
@@ -940,9 +940,9 @@ class AstCreator(filename: String, global: Global) {
       }
       compAst +: declAsts
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.nonEmpty =>
-      withOrder(declaration.getDeclarators) {
-        case (d: IASTFunctionDeclarator, o) => astForFunctionDeclarator(d, o)
-        case (d, o)                         => astForDeclarator(declaration, d, o)
+      declaration.getDeclarators.toIndexedSeq.map {
+        case d: IASTFunctionDeclarator => astForFunctionDeclarator(d, order)
+        case d                         => astForDeclarator(declaration, d, order)
       }
     case _: ICPPASTVisibilityLabel                                                => Seq.empty
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.isEmpty => Seq.empty
