@@ -16,14 +16,15 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
     val cpg = Cpg.emptyCpg
     File.usingTemporaryDirectory("astCreationTests") { dir =>
       val filenames = List("foo.c", "woo.c")
-      val expectedFilenameFields = filenames.map(f => File(f).path.toAbsolutePath.toString)
-      expectedFilenameFields.foreach { filename =>
-        (dir / filename).write("//foo")
+      val expectedFilenames = filenames.map { filename =>
+        val file = dir / filename
+        file.write("//foo")
+        file.path.toAbsolutePath.toString
       }
-      new AstCreationPass(filenames, cpg, new IntervalKeyPool(1, 1000)).createAndApply()
+      new AstCreationPass(expectedFilenames, cpg, new IntervalKeyPool(1, 1000)).createAndApply()
 
       "create one NamespaceBlock per file" in {
-        val expectedNamespaceFullNames = expectedFilenameFields.map(f => s"$f:<global>").toSet
+        val expectedNamespaceFullNames = expectedFilenames.map(f => s"$f:<global>").toSet
         cpg.namespaceBlock.fullName.toSet shouldBe expectedNamespaceFullNames
       }
 
