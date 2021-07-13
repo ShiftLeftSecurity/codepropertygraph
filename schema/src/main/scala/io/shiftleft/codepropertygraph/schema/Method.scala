@@ -72,6 +72,19 @@ object Method extends SchemaBase {
       .addProperties(astParentType, astParentFullName)
       .extendz(declaration)
 
+    val isVariadic = builder
+      .addProperty(
+        name = "IS_VARIADIC",
+        valueType = ValueTypes.BOOLEAN,
+        cardinality = Cardinality.One,
+        comment = """
+                    |Specifies whether a parameter is the variadic argument handling parameter of
+                    |a variadic method. Only one parameter of a method is allowed to have this
+                    |property set to true.
+                    |""".stripMargin
+      )
+      .protoId(221)
+
     val methodParameterIn: NodeType = builder
       .addNodeType(
         name = "METHOD_PARAMETER_IN",
@@ -81,7 +94,7 @@ object Method extends SchemaBase {
             |""".stripMargin
       )
       .protoId(34)
-      .addProperties(typeFullName)
+      .addProperties(typeFullName, isVariadic)
       .extendz(declaration)
 
     val methodParameterOut: NodeType = builder
@@ -93,7 +106,7 @@ object Method extends SchemaBase {
             |""".stripMargin
       )
       .protoId(33)
-      .addProperties(typeFullName)
+      .addProperties(typeFullName, isVariadic)
       .extendz(declaration)
 
     val methodReturn: NodeType = builder
