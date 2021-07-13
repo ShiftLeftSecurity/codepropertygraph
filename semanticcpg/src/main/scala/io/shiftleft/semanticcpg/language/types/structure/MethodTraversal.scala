@@ -112,6 +112,13 @@ class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
     traversal.where(_.out(EdgeTypes.CFG).not(_.hasLabel(NodeTypes.METHOD_RETURN)))
 
   /**
+    * Traverse only to methods that accept variadic arguments.
+    */
+  def isVariadic: Traversal[Method] = {
+    traversal.filter(_.isVariadic)
+  }
+
+  /**
     * Traverse to external methods, that is, methods not present
     * but only referenced in the CPG.
     * */
