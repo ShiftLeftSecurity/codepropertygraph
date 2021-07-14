@@ -52,7 +52,7 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
     val parameterCount = part._2
 
     implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
-    methodFullNameToNode.get(name) match {
+    methodFullNameToNode.get(fullName) match {
       case None =>
         createMethodStub(name, fullName, signature, parameterCount, dstGraph)
       case _ =>
