@@ -399,12 +399,14 @@ class AstCreator(filename: String, global: Global) {
       .columnNumber(column(blockStmt))
 
     scope.pushNewScope(cpgBlock)
-    val blockAst = Ast(cpgBlock).withChildren(
-      withOrder(blockStmt.getStatements) {
-        case (x, order) =>
-          astsForStatement(x, order)
-      }.flatten
-    )
+    var currOrder = 1
+    val childAsts = blockStmt.getStatements.flatMap { stmt =>
+      val r = astsForStatement(stmt, currOrder)
+      currOrder = currOrder + r.length
+      r
+    }
+
+    val blockAst = Ast(cpgBlock).withChildren(childAsts.toIndexedSeq)
     scope.popScope()
     blockAst
   }
@@ -460,11 +462,11 @@ class AstCreator(filename: String, global: Global) {
       case decl: IASTSimpleDeclaration =>
         val locals =
           withOrder(decl.getDeclarators) { (d, o) =>
-            astForDeclarator(decl, d, order + o)
+            astForDeclarator(decl, d, order + o - 1)
           }
         val calls =
           withOrder(decl.getDeclarators.filter(_.getInitializer != null)) { (d, o) =>
-            astForInitializer(d, d.getInitializer, locals.size + o)
+            astForInitializer(d, d.getInitializer, locals.size + order + o - 1)
           }
         locals ++ calls
       case decl => notHandledYetSeq(decl)
