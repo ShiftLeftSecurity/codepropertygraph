@@ -862,7 +862,7 @@ class CDataFlowTests26 extends DataFlowCodeToCpgSuite {
 class CDataFlowTests27 extends DataFlowCodeToCpgSuite {
   override val code =
     """
-      |int foo() {
+      |int foo(int y, int x) {
       |  free(y);
       |  free(x);
       |}
@@ -924,7 +924,7 @@ class CDataFlowTests29 extends DataFlowCodeToCpgSuite {
 class CDataFlowTests30 extends DataFlowCodeToCpgSuite {
   override val code =
     """
-      |int foo() {
+      |int foo(int b) {
       |  b = source();
       |  b = 10;
       |  sink(b);
