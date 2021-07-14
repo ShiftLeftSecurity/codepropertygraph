@@ -7,8 +7,8 @@ import overflowdb.traversal.Traversal
 
 class ArrayAccessMethods(val arrayAccess: opnodes.ArrayAccess) extends AnyVal {
   def array: Expression =
-    arrayAccess.argument(1)
+    arrayAccess.call.argument(1)
 
   def subscripts: Traversal[Identifier] =
-    arrayAccess.argument(2).ast.isIdentifier
+    arrayAccess.call.argument(2).ast.isIdentifier
 }
