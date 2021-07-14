@@ -34,7 +34,7 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
   }
 
   "should allow retrieving comments" in {
-    cpg.comment.code.toSet shouldBe Set("/* A C comment */", "// A C++ comment\n")
+    cpg.comment.code.toSet shouldBe Set("/* A C comment */", "// A C++ comment")
   }
 
   "should allow retrieving parameters" in {

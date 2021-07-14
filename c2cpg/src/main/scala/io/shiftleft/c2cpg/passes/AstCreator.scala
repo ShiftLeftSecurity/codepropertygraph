@@ -4,6 +4,7 @@ import io.shiftleft.c2cpg.Defines
 import io.shiftleft.codepropertygraph.generated.nodes.{
   NewBlock,
   NewCall,
+  NewComment,
   NewControlStructure,
   NewFieldIdentifier,
   NewFile,
@@ -46,6 +47,7 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTBreakStatement,
   IASTCaseStatement,
   IASTCastExpression,
+  IASTComment,
   IASTCompositeTypeSpecifier,
   IASTCompoundStatement,
   IASTConditionalExpression,
@@ -269,6 +271,9 @@ class AstCreator(filename: String, global: Global) {
       .columnNumber(column(node))
   }
 
+  private def astForComment(comment: IASTComment): Ast =
+    Ast(NewComment().code(comment.getRawSignature).filename(filename).lineNumber(line(comment)))
+
   private def astForFile(parserResult: IASTTranslationUnit): Ast =
     Ast(NewFile(name = filename, order = 0))
       .withChild(
@@ -276,7 +281,7 @@ class AstCreator(filename: String, global: Global) {
           .withChildren(withOrder(parserResult.getDeclarations) { (decl, order) =>
             astsForDeclaration(decl, order)
           }.flatten)
-      )
+          .withChildren(parserResult.getComments.map(comment => astForComment(comment)).toIndexedSeq))
 
   private def astForTranslationUnit(iASTTranslationUnit: IASTTranslationUnit): Ast = {
     val absolutePath = new java.io.File(iASTTranslationUnit.getFilePath).toPath.toAbsolutePath.normalize().toString
