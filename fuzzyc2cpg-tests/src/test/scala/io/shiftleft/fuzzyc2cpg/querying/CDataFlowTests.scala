@@ -851,7 +851,7 @@ class CDataFlowTests26 extends DataFlowCodeToCpgSuite {
     val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
     flows.size shouldBe 0
 
-    val source2 = cpg.assignment.codeExact("a->b = 10").target.l
+    val source2 = cpg.assignment.filter { _.call.code == "a->b = 10" }.target.l
     val sink2 = cpg.method.name("sink").parameter.l
     source2.size shouldBe 1
     sink2.size shouldBe 1
@@ -938,7 +938,7 @@ class CDataFlowTests30 extends DataFlowCodeToCpgSuite {
     val flows = sink.to(Traversal).reachableByFlows(source.to(Traversal)).l
     flows.size shouldBe 0
 
-    val source2 = cpg.assignment.codeExact("b = 10").target.l
+    val source2 = cpg.assignment.filter { _.call.code == "b = 10" }.target.l
     val sink2 = cpg.method.name("sink").parameter.l
     source2.size shouldBe 1
     sink2.size shouldBe 1

@@ -103,7 +103,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           case _ => fail()
         }
 
-        cpg.assignment.l.sortBy(_.order) match {
+        cpg.assignment.l.sortBy(_.call.order) match {
           case List(a1, a2) =>
             List(a1.target.code, a1.source.code) shouldBe List("local", "x")
             List(a2.target.code, a2.source.code) shouldBe List("local2", "y")
@@ -175,7 +175,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
               cndNode.code shouldBe "x < 1"
             case _ => fail()
           }
-          controlStruct.whenTrue.assignments.code.l shouldBe List("x += 1")
+          controlStruct.whenTrue.assignments.map { _.call }.code.l shouldBe List("x += 1")
         case _ => fail()
       }
     }
@@ -200,7 +200,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
             case _ => fail()
 
           }
-          controlStruct.whenTrue.assignments.code.l shouldBe List("y = 0")
+          controlStruct.whenTrue.assignments.map { _.call }.code.l shouldBe List("y = 0")
         case _ => fail()
       }
     }
@@ -297,7 +297,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
     def childContainsAssignments(node: AstNode, i: Int, list: List[String]) = {
       node.astChildren.order(i).l match {
         case List(child) =>
-          child.assignments.code.l shouldBe list
+          child.assignments.map { _.call.code }.l shouldBe list
         case _ => fail()
       }
     }
@@ -736,7 +736,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
                                                                    | }
       """.stripMargin) { cpg =>
       cpg.method.name("method").lineNumber.l shouldBe List(6)
-      cpg.method.name("method").block.assignments.lineNumber.l shouldBe List(8)
+      cpg.method.name("method").block.assignments.flatMap { _.call.lineNumber }.l shouldBe List(8)
     }
   }
 

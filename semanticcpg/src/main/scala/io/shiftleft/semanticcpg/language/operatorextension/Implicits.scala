@@ -4,6 +4,8 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Expression}
 import io.shiftleft.semanticcpg.language.operatorextension.nodemethods._
 import overflowdb.traversal.Traversal
+import io.shiftleft.semanticcpg.language.operatorextension.opnodes._
+import io.shiftleft.codepropertygraph.generated.nodes.Call
 
 trait Implicits {
   implicit def toNodeTypeStartersOperatorExtension(cpg: Cpg): NodeTypeStarters = new NodeTypeStarters(cpg)
@@ -18,4 +20,7 @@ trait Implicits {
   implicit def toTargetTrav(steps: Traversal[Expression]): TargetTraversal = new TargetTraversal(steps)
   implicit def toOpAstNodeExt[A <: AstNode](node: A): OpAstNodeMethods[A] = new OpAstNodeMethods(node)
   implicit def toOpAstNodeTrav[A <: AstNode](steps: Traversal[A]): OpAstNode[A] = new OpAstNode(steps)
+  implicit def unwrap(assignment: Assignment): Call = assignment.call
+  implicit def unwrap(assignment: Arithmetic): Call = assignment.call
+  implicit def unwrap(assignment: ArrayAccess): Call = assignment.call
 }

@@ -94,7 +94,7 @@ class NewCDataFlowTests5 extends DataFlowCodeToCpgSuite {
 
   "should find that flow is blocked by assignment" in {
     val source = cpg.call("source").l
-    val assignment = cpg.assignment.codeExact("x = y")
+    val assignment = cpg.assignment.filter { _.call.code == "x = y" }
     val sink = cpg.call("sink").l
 
     val flows = sink.reachableByFlows(source).l
@@ -161,7 +161,7 @@ class NewCDataFlowTests8 extends DataFlowCodeToCpgSuite {
 
   "should find that flow is blocked by assignment" in {
     val source = cpg.call("source").l
-    val assignment = cpg.assignment.codeExact("x.y = z")
+    val assignment = cpg.assignment.filter { _.call.code == "x.y = z" }
     val sink = cpg.call("sink").l
     val flows = sink.reachableByFlows(source).l
 
