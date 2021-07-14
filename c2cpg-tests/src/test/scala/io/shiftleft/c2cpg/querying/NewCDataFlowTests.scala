@@ -29,6 +29,9 @@ class NewCDataFlowTests2 extends DataFlowCodeToCpgSuite {
 
   override val code: String =
     """
+      | int sink(int arg){  return arg; };
+      | int source(){ return 0; };
+      |
       | void foo() {
       |   sink(source());
       | }
@@ -38,9 +41,14 @@ class NewCDataFlowTests2 extends DataFlowCodeToCpgSuite {
     val source = cpg.call("source")
     val sink = cpg.call("sink")
     val flows = sink.reachableByFlows(source).l
-    flows.size shouldBe 1
+    flows.size shouldBe 2
     flows.map(flowToResultPairs).toSet shouldBe Set(
-      List(("source()", Some(3)), ("sink(source())", Some(3)))
+      List(("source()", Some(6)), ("sink(source())", Some(6))),
+      List(("source()", Some(6)),
+           ("sink(int arg)", Some(2)),
+           ("return arg;", Some(2)),
+           ("int", Some(2)),
+           ("sink(source())", Some(6)))
     )
   }
 }
@@ -49,7 +57,7 @@ class NewCDataFlowTests3 extends DataFlowCodeToCpgSuite {
 
   override val code: String =
     """
-      | void foo() {
+      | void foo(int x) {
       |   woo(x);
       | }
       |""".stripMargin
@@ -69,7 +77,7 @@ class NewCDataFlowTests4 extends DataFlowCodeToCpgSuite {
 
   override val code: String =
     """
-      | void foo() {
+      | void foo(int x) {
       |   x = source();
       |   sink(x);
       | }
