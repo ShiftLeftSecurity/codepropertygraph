@@ -14,7 +14,7 @@ import io.shiftleft.semanticcpg.language._
 
 import scala.jdk.CollectionConverters._
 
-case class NameAndSignature(name: String, signature: String)
+case class NameAndSignature(name: String, signature: String, fullName: String)
 
 /**
   * This pass has no other pass as prerequisite.
@@ -36,7 +36,7 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
     cpg.call
       .sideEffect { call =>
         methodToParameterCount +=
-          NameAndSignature(call.name, call.signature) -> call._astOut.asScala.size
+          NameAndSignature(call.name, call.signature, call.methodFullName) -> call._astOut.asScala.size
       }
       .exec()
   }
@@ -47,13 +47,14 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
   // will only work for C because in C, name always equals full name.
   override def runOnPart(part: (NameAndSignature, Int)): Iterator[DiffGraph] = {
     val name = part._1.name
+    val fullName = part._1.fullName
     val signature = part._1.signature
     val parameterCount = part._2
 
     implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
-    methodFullNameToNode.get(name) match {
+    methodFullNameToNode.get(fullName) match {
       case None =>
-        createMethodStub(name, name, signature, parameterCount, dstGraph)
+        createMethodStub(name, fullName, signature, parameterCount, dstGraph)
       case _ =>
     }
     Iterator(dstGraph.build())
