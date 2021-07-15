@@ -17,10 +17,11 @@ jobs:
       run: git submodule update --init --recursive
     - name: apt-get update
       run: sudo apt-get update
-    - name: Set up JDK 1.8
-      run: sudo apt-get install openjdk-8-jdk
-    - name: Print sbt version
-      run: sbt --version
+    - name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: 11
     - name: Compile and run tests
       run: sbt compile test
     - name: Check formatting

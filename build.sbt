@@ -91,9 +91,14 @@ ThisBuild / scalacOptions ++= Seq(
   "-language:implicitConversions",
   "-Ycache-macro-class-loader:last-modified",
   "-Ybackend-parallelism",
-  "4"
+  "4",
+  "-target:jvm-1.8"
 )
-ThisBuild / compile / javacOptions ++= Seq("-g") //debug symbols
+ThisBuild / compile / javacOptions ++= Seq(
+  "-g", //debug symbols
+  "-source", "1.8",
+  "-target", "1.8",
+  "-Xlint")
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 Global / onLoad := {
