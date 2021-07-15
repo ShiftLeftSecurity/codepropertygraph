@@ -3,7 +3,7 @@ package io.shiftleft.codepropertygraph.cpgloading
 import java.io.Closeable
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{FileSystem, FileSystems, FileVisitResult, Files, Path, Paths, SimpleFileVisitor}
-import java.util.{Collection => JCollection, Collections}
+import java.util.{Collection => JCollection}
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 
