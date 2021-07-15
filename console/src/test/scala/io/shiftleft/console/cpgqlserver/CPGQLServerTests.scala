@@ -250,7 +250,7 @@ class CPGQLServerTests extends AnyWordSpec with Matchers {
         postQueryResponse("uuid").str
       }
 
-    Await.result(correctNumberOfUUIDsReceived.future, DefaultPromiseAwaitTimeout * numQueries)
+    Await.result(correctNumberOfUUIDsReceived.future, DefaultPromiseAwaitTimeout * numQueries.toLong)
     wsUUIDs.toSet should be(postQueriesResponseUUIDs.toSet)
   }
 
@@ -287,7 +287,7 @@ class CPGQLServerTests extends AnyWordSpec with Matchers {
           res("uuid").str
         })
     }
-    Await.result(correctNumberOfUUIDsReceived.future, DefaultPromiseAwaitTimeout * queries.size)
+    Await.result(correctNumberOfUUIDsReceived.future, DefaultPromiseAwaitTimeout * queries.size.toLong)
     wsUUIDs.toSet should be(postQueriesResponseUUIDs.toSet)
   }
 }
