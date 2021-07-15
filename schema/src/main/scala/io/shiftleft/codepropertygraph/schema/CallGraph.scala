@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Cardinality, Constant, SchemaBuilder, SchemaInfo}
+import overflowdb.schema.{Constant, SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
 object CallGraph extends SchemaBase {

@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Cardinality, SchemaBuilder, SchemaInfo}
+import overflowdb.schema.{SchemaBuilder, SchemaInfo}
 
 object Cfg extends SchemaBase {
 

@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Cardinality, Constant, NodeType, SchemaBuilder, SchemaInfo}
+import overflowdb.schema.{Constant, NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
 object MetaData extends SchemaBase {

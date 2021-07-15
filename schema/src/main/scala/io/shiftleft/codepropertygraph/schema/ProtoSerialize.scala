@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Cardinality, SchemaBuilder, SchemaInfo}
+import overflowdb.schema.{SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
 object ProtoSerialize extends SchemaBase {
