@@ -1,5 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
 import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.schema.Property.ValueType
 
@@ -29,13 +30,13 @@ object Type extends SchemaBase {
       .addProperty(
         name = "TYPE_FULL_NAME",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = """This field contains the fully-qualified static type name of the program
                     |construct represented by a node. It is the name of an instantiated type, e.g.,
                     |`java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
                     |cannot be determined, this field should be set to the empty string.
                     |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(51)
 
     val aliasTypeFullName = builder
@@ -52,22 +53,22 @@ object Type extends SchemaBase {
       .addProperty(
         name = "INHERITS_FROM_TYPE_FULL_NAME",
         valueType = ValueType.String,
-        cardinality = Cardinality.List,
         comment = """The static types a TYPE_DECL inherits from. This property is matched against the
                     |FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node
                     |for each TYPE_FULL_NAME""".stripMargin
       )
+      .asList()
       .protoId(53)
 
     val typeDeclFullName = builder
       .addProperty(
         name = "TYPE_DECL_FULL_NAME",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = """The static type decl of a TYPE. This property is matched against the FULL_NAME
                     |of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each
                     |different TYPE_DECL_FULL_NAME""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(52)
 
     // Nodes

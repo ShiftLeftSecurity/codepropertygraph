@@ -21,11 +21,11 @@ object Base extends SchemaBase {
       .addProperty(
         name = "VERSION",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = """A version, given as a string. Used, for example, in the META_DATA node to
                     |indicate which version of the CPG spec this CPG conforms to
                     |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(13)
 
     val hash = builder
@@ -76,30 +76,30 @@ object Base extends SchemaBase {
       .addProperty(
         name = "FULL_NAME",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = """This is the fully-qualified name of an entity, e.g., the fully-qualified
                     |name of a method or type. The details of what constitutes a fully-qualified
                     |name are language specific. This field SHOULD be human readable.
                     |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(6)
 
     val parserTypeName = builder
       .addProperty(
         name = "PARSER_TYPE_NAME",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = "AST node type name emitted by parser."
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(3)
 
     val value = builder
       .addProperty(
         name = "VALUE",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = "This property denotes a string value as used in a key-value pair."
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(8)
 
     // The following fields are used to create edges between nodes in later processing stages.
@@ -108,21 +108,21 @@ object Base extends SchemaBase {
       .addProperty(
         name = "AST_PARENT_TYPE",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = """The type of the AST parent. Since this is only used in some parts of the graph,
             |the list does not include all possible parents by intention.
             |Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK.
             |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(56)
 
     val astParentFullName = builder
       .addProperty(
         name = "AST_PARENT_FULL_NAME",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = "This field holds the FULL_NAME of the AST parent of an entity."
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(57)
     // node base types
 

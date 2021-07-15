@@ -1,5 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
 import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.schema.Property.ValueType
 
@@ -26,7 +27,6 @@ object FileSystem extends SchemaBase {
       .addProperty(
         name = "FILENAME",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = """The absolute path of the source file this node was generated from. This field
             |must be set but may be set to the value `<unknown>` to indicate that no source
             |file can be associated with the node, e.g., because the node represents an
@@ -34,6 +34,7 @@ object FileSystem extends SchemaBase {
             |is is declared in is unknown.
             |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(106)
 
     val lineNumber = builder

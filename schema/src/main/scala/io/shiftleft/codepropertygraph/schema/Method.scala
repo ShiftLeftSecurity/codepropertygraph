@@ -1,5 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
 import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.schema.Property.ValueType
 
@@ -28,7 +29,6 @@ object Method extends SchemaBase {
       .addProperty(
         name = "SIGNATURE",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = """
                     |The method signature encodes the types of parameters in a string.
                     |The string SHOULD be human readable and suitable for differentiating methods
@@ -38,6 +38,7 @@ object Method extends SchemaBase {
                     |implementor to fit the source language.
                     |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(22)
 
     val method: NodeType = builder
@@ -76,13 +77,13 @@ object Method extends SchemaBase {
       .addProperty(
         name = "IS_VARIADIC",
         valueType = ValueType.Boolean,
-        cardinality = Cardinality.One,
         comment = """
                     |Specifies whether a parameter is the variadic argument handling parameter of
                     |a variadic method. Only one parameter of a method is allowed to have this
                     |property set to true.
                     |""".stripMargin
       )
+      .mandatory(PropertyDefaults.Boolean)
       .protoId(221)
 
     val methodParameterIn: NodeType = builder

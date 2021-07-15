@@ -1,7 +1,10 @@
 package io.shiftleft.codepropertygraph.schema
 
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
+import overflowdb.schema.EdgeType.Cardinality
 import overflowdb.schema.{Constant, SchemaBuilder, SchemaInfo}
 import overflowdb.schema.Property.ValueType
+import overflowdb.storage.ValueTypes
 
 object CallGraph extends SchemaBase {
 
@@ -24,7 +27,6 @@ object CallGraph extends SchemaBase {
       .addProperty(
         name = "ARGUMENT_INDEX",
         valueType = ValueType.Int,
-        cardinality = Cardinality.One,
         comment = """AST-children of CALL nodes have an argument index, that is used to match
                     |call-site arguments with callee parameters. Explicit parameters are numbered
                     |from 1 to N, while index 0 is reserved for implicit self / this parameter.
@@ -35,6 +37,7 @@ object CallGraph extends SchemaBase {
                     |ignored. It is suggested to set it to -1.
                     |""".stripMargin
       )
+      .mandatory(PropertyDefaults.Int)
       .protoId(40)
 
     val argumentName = builder
@@ -53,10 +56,10 @@ object CallGraph extends SchemaBase {
       .addProperty(
         name = "METHOD_FULL_NAME",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = """The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required
                     |to have exactly one METHOD node for each METHOD_FULL_NAME""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(54)
 
     expression
@@ -66,7 +69,6 @@ object CallGraph extends SchemaBase {
       .addProperty(
         name = "EVALUATION_STRATEGY",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = """For formal method input parameters, output parameters, and return parameters,
             |this field holds the evaluation strategy, which is one of the following:
             |1) `BY_REFERENCE` indicates that the parameter is passed by reference, 2)
@@ -76,6 +78,7 @@ object CallGraph extends SchemaBase {
             |that it points to is not made.
             |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(15)
 
     val evaluationStrategies = builder.addConstants(
@@ -83,21 +86,21 @@ object CallGraph extends SchemaBase {
       Constant(
         name = "BY_REFERENCE",
         value = "BY_REFERENCE",
-        valueType = ValueType.String,
+        valueType = ValueTypes.STRING,
         comment =
           "A parameter or return of a function is passed by reference which means an address is used behind the scenes"
       ).protoId(1),
       Constant(
         name = "BY_SHARING",
         value = "BY_SHARING",
-        valueType = ValueType.String,
+        valueType = ValueTypes.STRING,
         comment =
           "Only applicable to object parameter or return values. The pointer to the object is passed by value but the object itself is not copied and changes to it are thus propagated out of the method context"
       ).protoId(2),
       Constant(
         name = "BY_VALUE",
         value = "BY_VALUE",
-        valueType = ValueType.String,
+        valueType = ValueTypes.STRING,
         comment = "A parameter or return of a function passed by value which means a flat copy is used"
       ).protoId(3),
     )
@@ -115,7 +118,6 @@ object CallGraph extends SchemaBase {
       .addProperty(
         name = "DISPATCH_TYPE",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = """This field holds the dispatch type of a call, which is either `STATIC_DISPATCH` or
             |`DYNAMIC_DISPATCH`. For statically dispatched method calls, the call target is known
             |at compile time while for dynamically dispatched calls, it can only be determined at
@@ -123,6 +125,7 @@ object CallGraph extends SchemaBase {
             |calls) or calculation of an offset.
             |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(25)
 
     val call = builder
@@ -163,13 +166,13 @@ object CallGraph extends SchemaBase {
       Constant(
         name = "STATIC_DISPATCH",
         value = "STATIC_DISPATCH",
-        valueType = ValueType.String,
+        valueType = ValueTypes.STRING,
         comment = "For statically dispatched calls the call target is known before program execution"
       ).protoId(1),
       Constant(
         name = "DYNAMIC_DISPATCH",
         value = "DYNAMIC_DISPATCH",
-        valueType = ValueType.String,
+        valueType = ValueTypes.STRING,
         comment = "For dynamically dispatched calls the target is determined during runtime"
       ).protoId(2),
     )

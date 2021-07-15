@@ -1,7 +1,9 @@
 package io.shiftleft.codepropertygraph.schema
 
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
 import overflowdb.schema.{Constant, NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.schema.Property.ValueType
+import overflowdb.storage.ValueTypes
 
 object MetaData extends SchemaBase {
 
@@ -28,26 +30,26 @@ object MetaData extends SchemaBase {
       .addProperty(
         name = "OVERLAYS",
         valueType = ValueType.String,
-        cardinality = Cardinality.List,
         comment = """The field contains the names of the overlays applied to this CPG, in order of their
             |application. Names are free-form strings, that is, this specification does not
             |dictate them but rather requires tool producers and consumers to communicate them
             |between each other.
             |""".stripMargin
       )
+      .asList()
       .protoId(118)
 
     val language = builder
       .addProperty(
         name = "LANGUAGE",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = """This field indicates which CPG language frontend generated the CPG.
             |Frontend developers may freely choose a value that describes their frontend
             |so long as it is not used by an existing frontend. Reserved values are to date:
             |C, LLVM, GHIDRA, PHP.
             |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(19)
 
     val metaData: NodeType = builder
@@ -67,19 +69,19 @@ object MetaData extends SchemaBase {
 
     val languages = builder.addConstants(
       category = "Languages",
-      Constant(name = "JAVA", value = "JAVA", valueType = ValueType.String, comment = "").protoId(1),
-      Constant(name = "JAVASCRIPT", value = "JAVASCRIPT", valueType = ValueType.String, comment = "").protoId(2),
-      Constant(name = "GOLANG", value = "GOLANG", valueType = ValueType.String, comment = "").protoId(3),
-      Constant(name = "CSHARP", value = "CSHARP", valueType = ValueType.String, comment = "").protoId(4),
-      Constant(name = "C", value = "C", valueType = ValueType.String, comment = "").protoId(5),
-      Constant(name = "PYTHON", value = "PYTHON", valueType = ValueType.String, comment = "").protoId(6),
-      Constant(name = "LLVM", value = "LLVM", valueType = ValueType.String, comment = "").protoId(7),
-      Constant(name = "PHP", value = "PHP", valueType = ValueType.String, comment = "").protoId(8),
-      Constant(name = "FUZZY_TEST_LANG", value = "FUZZY_TEST_LANG", valueType = ValueType.String, comment = "")
+      Constant(name = "JAVA", value = "JAVA", valueType = ValueTypes.STRING, comment = "").protoId(1),
+      Constant(name = "JAVASCRIPT", value = "JAVASCRIPT", valueType = ValueTypes.STRING, comment = "").protoId(2),
+      Constant(name = "GOLANG", value = "GOLANG", valueType = ValueTypes.STRING, comment = "").protoId(3),
+      Constant(name = "CSHARP", value = "CSHARP", valueType = ValueTypes.STRING, comment = "").protoId(4),
+      Constant(name = "C", value = "C", valueType = ValueTypes.STRING, comment = "").protoId(5),
+      Constant(name = "PYTHON", value = "PYTHON", valueType = ValueTypes.STRING, comment = "").protoId(6),
+      Constant(name = "LLVM", value = "LLVM", valueType = ValueTypes.STRING, comment = "").protoId(7),
+      Constant(name = "PHP", value = "PHP", valueType = ValueTypes.STRING, comment = "").protoId(8),
+      Constant(name = "FUZZY_TEST_LANG", value = "FUZZY_TEST_LANG", valueType = ValueTypes.STRING, comment = "")
         .protoId(9),
       Constant(name = "GHIDRA",
                value = "GHIDRA",
-               valueType = ValueType.String,
+               valueType = ValueTypes.STRING,
                comment = "generic reverse engineering framework").protoId(10),
     )
 

@@ -1,5 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
 import overflowdb.schema.{SchemaBuilder, SchemaInfo}
 import overflowdb.schema.Property.ValueType
 
@@ -23,10 +24,10 @@ object ProtoSerialize extends SchemaBase {
       .addProperty(
         name = "CONTAINED_REF",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment =
           "References to other nodes. This is not a real property; it exists here for the sake of proto serialization only. valueType and cardinality are meaningless."
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(2007161)
 
     unknown.addProperty(containedRef)
