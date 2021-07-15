@@ -1,5 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
 import overflowdb.schema.{Constant, NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.schema.Property.ValueType
 
@@ -58,7 +59,7 @@ object Ast extends SchemaBase {
             |order of 0.
             |""".stripMargin
       )
-      .mandatory(default = -1)
+      .mandatory(PropertyDefaults.Int)
       .protoId(4)
 
     val astNode = builder
@@ -162,7 +163,7 @@ object Ast extends SchemaBase {
                     |and trade off between false negatives and false positives).
                     |""".stripMargin
       )
-      .mandatory("<[empty]>")
+      .mandatory(PropertyDefaults.String)
       .protoId(2001092)
 
     val fieldIdentifier: NodeType = builder

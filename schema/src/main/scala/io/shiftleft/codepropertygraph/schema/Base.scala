@@ -1,5 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
 import overflowdb.schema._
 import overflowdb.schema.Property.ValueType
 
@@ -46,30 +47,30 @@ object Base extends SchemaBase {
       .addProperty(
         name = "CODE",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = "This field holds the code snippet that the node represents."
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(21)
 
     val isExternal = builder
       .addProperty(
         name = "IS_EXTERNAL",
-        valueType = ValueTypes.BOOLEAN,
-        cardinality = Cardinality.One,
+        valueType = ValueType.Boolean,
         comment = """Indicates that the construct (METHOD or TYPE_DECL) is external, that is,
                     |it is referenced but not defined in the code (applies both to insular
                     |parsing and to library functions where we have header files only)
                     |""".stripMargin
       )
+      .mandatory(PropertyDefaults.Boolean)
       .protoId(7)
 
     val name = builder
       .addProperty(
         name = "NAME",
         valueType = ValueType.String,
-        cardinality = Cardinality.One,
         comment = "Name of represented object, e.g., method name (e.g. \"run\")"
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(5)
 
     val fullName = builder

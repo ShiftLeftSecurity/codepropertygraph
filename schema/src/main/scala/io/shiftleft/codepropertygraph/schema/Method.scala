@@ -75,7 +75,7 @@ object Method extends SchemaBase {
     val isVariadic = builder
       .addProperty(
         name = "IS_VARIADIC",
-        valueType = ValueTypes.BOOLEAN,
+        valueType = ValueType.Boolean,
         cardinality = Cardinality.One,
         comment = """
                     |Specifies whether a parameter is the variadic argument handling parameter of
