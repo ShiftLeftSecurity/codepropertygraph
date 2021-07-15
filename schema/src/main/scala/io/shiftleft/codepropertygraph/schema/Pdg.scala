@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema.{SchemaBuilder, SchemaInfo}
-import overflowdb.storage.ValueTypes
+import overflowdb.schema.Property.ValueType
 
 object Pdg extends SchemaBase {
 
@@ -26,7 +26,7 @@ object Pdg extends SchemaBase {
     val variable = builder
       .addProperty(
         name = "VARIABLE",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.One,
         comment = "This edge property represents the variable propagated by a reaching definition edge."
       )

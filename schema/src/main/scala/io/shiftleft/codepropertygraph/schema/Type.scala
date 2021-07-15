@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
-import overflowdb.storage.ValueTypes
+import overflowdb.schema.Property.ValueType
 
 object Type extends SchemaBase {
 
@@ -28,7 +28,7 @@ object Type extends SchemaBase {
     val typeFullName = builder
       .addProperty(
         name = "TYPE_FULL_NAME",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.One,
         comment = """This field contains the fully-qualified static type name of the program
                     |construct represented by a node. It is the name of an instantiated type, e.g.,
@@ -41,7 +41,7 @@ object Type extends SchemaBase {
     val aliasTypeFullName = builder
       .addProperty(
         name = "ALIAS_TYPE_FULL_NAME",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.ZeroOrOne,
         comment = """This property holds the fully qualified name of the type that the node is
             |a type alias of.
@@ -52,7 +52,7 @@ object Type extends SchemaBase {
     val inheritsFromTypeFullName = builder
       .addProperty(
         name = "INHERITS_FROM_TYPE_FULL_NAME",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.List,
         comment = """The static types a TYPE_DECL inherits from. This property is matched against the
                     |FULL_NAME of TYPE nodes and thus it is required to have at least one TYPE node
@@ -63,7 +63,7 @@ object Type extends SchemaBase {
     val typeDeclFullName = builder
       .addProperty(
         name = "TYPE_DECL_FULL_NAME",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.One,
         comment = """The static type decl of a TYPE. This property is matched against the FULL_NAME
                     |of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each

@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
-import overflowdb.storage.ValueTypes
+import overflowdb.schema.Property.ValueType
 
 object Method extends SchemaBase {
 
@@ -27,7 +27,7 @@ object Method extends SchemaBase {
     val signature = builder
       .addProperty(
         name = "SIGNATURE",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.One,
         comment = """
                     |The method signature encodes the types of parameters in a string.

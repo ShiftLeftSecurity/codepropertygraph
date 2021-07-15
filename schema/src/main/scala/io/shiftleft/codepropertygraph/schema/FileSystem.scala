@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
-import overflowdb.storage.ValueTypes
+import overflowdb.schema.Property.ValueType
 
 object FileSystem extends SchemaBase {
 
@@ -25,7 +25,7 @@ object FileSystem extends SchemaBase {
     val filename = builder
       .addProperty(
         name = "FILENAME",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.One,
         comment = """The absolute path of the source file this node was generated from. This field
             |must be set but may be set to the value `<unknown>` to indicate that no source
@@ -39,7 +39,7 @@ object FileSystem extends SchemaBase {
     val lineNumber = builder
       .addProperty(
         name = "LINE_NUMBER",
-        valueType = ValueTypes.INTEGER,
+        valueType = ValueType.Int,
         cardinality = Cardinality.ZeroOrOne,
         comment = """This optional field provides the line number of the program construct
             |represented by the node.
@@ -50,7 +50,7 @@ object FileSystem extends SchemaBase {
     val columnNumber = builder
       .addProperty(
         name = "COLUMN_NUMBER",
-        valueType = ValueTypes.INTEGER,
+        valueType = ValueType.Int,
         cardinality = Cardinality.ZeroOrOne,
         comment = """
             |This optional fields provides the column number of the program construct
@@ -62,7 +62,7 @@ object FileSystem extends SchemaBase {
     val lineNumberEnd = builder
       .addProperty(
         name = "LINE_NUMBER_END",
-        valueType = ValueTypes.INTEGER,
+        valueType = ValueType.Int,
         cardinality = Cardinality.ZeroOrOne,
         comment = """
         |This optional fields provides the line number at which the program construct
@@ -74,7 +74,7 @@ object FileSystem extends SchemaBase {
     val columnNumberEnd = builder
       .addProperty(
         name = "COLUMN_NUMBER_END",
-        valueType = ValueTypes.INTEGER,
+        valueType = ValueType.Int,
         cardinality = Cardinality.ZeroOrOne,
         comment = """
             |This optional fields provides the column number at which the program construct

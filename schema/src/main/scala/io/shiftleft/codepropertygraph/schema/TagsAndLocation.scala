@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema._
-import overflowdb.storage.ValueTypes
+import overflowdb.schema.Property.ValueType
 
 object TagsAndLocation extends SchemaBase {
 
@@ -43,7 +43,7 @@ object TagsAndLocation extends SchemaBase {
     val symbol = builder
       .addProperty(
         name = "SYMBOL",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.One,
         comment = ""
       )
@@ -52,7 +52,7 @@ object TagsAndLocation extends SchemaBase {
     val methodShortName = builder
       .addProperty(
         name = "METHOD_SHORT_NAME",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.One,
         comment = ""
       )
@@ -61,7 +61,7 @@ object TagsAndLocation extends SchemaBase {
     val packageName = builder
       .addProperty(
         name = "PACKAGE_NAME",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.One,
         comment = ""
       )
@@ -70,7 +70,7 @@ object TagsAndLocation extends SchemaBase {
     val className = builder
       .addProperty(
         name = "CLASS_NAME",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.One,
         comment = ""
       )
@@ -79,7 +79,7 @@ object TagsAndLocation extends SchemaBase {
     val classShortName = builder
       .addProperty(
         name = "CLASS_SHORT_NAME",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.One,
         comment = ""
       )
@@ -88,7 +88,7 @@ object TagsAndLocation extends SchemaBase {
     val nodeLabel = builder
       .addProperty(
         name = "NODE_LABEL",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.One,
         comment = ""
       )

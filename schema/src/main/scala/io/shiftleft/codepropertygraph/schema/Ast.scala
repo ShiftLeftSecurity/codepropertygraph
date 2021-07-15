@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema.{Constant, NodeType, SchemaBuilder, SchemaInfo}
-import overflowdb.storage.ValueTypes
+import overflowdb.schema.Property.ValueType
 
 object Ast extends SchemaBase {
 
@@ -52,13 +52,13 @@ object Ast extends SchemaBase {
     val order = builder
       .addProperty(
         name = "ORDER",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.One,
+        valueType = ValueType.Int,
         comment = """This integer indicates the position of the node among
             |its siblings in the AST. The left-most child has an
             |order of 0.
             |""".stripMargin
       )
+      .mandatory(default = -1)
       .protoId(4)
 
     val astNode = builder
@@ -152,8 +152,7 @@ object Ast extends SchemaBase {
     val canonicalName = builder
       .addProperty(
         name = "CANONICAL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = """This field holds the canonical name of a `FIELD_IDENTIFIER`. It is typically
                     |identical to the CODE field, but canonicalized according to source language
                     |semantics. Human readable names are preferable. `FIELD_IDENTIFIER` nodes must
@@ -163,6 +162,7 @@ object Ast extends SchemaBase {
                     |and trade off between false negatives and false positives).
                     |""".stripMargin
       )
+      .mandatory("<[empty]>")
       .protoId(2001092)
 
     val fieldIdentifier: NodeType = builder
@@ -186,7 +186,7 @@ object Ast extends SchemaBase {
     val modifierType = builder
       .addProperty(
         name = "MODIFIER_TYPE",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.One,
         comment = """The modifier type is a free-form string. The following are known modifier types:
             |`STATIC`, `PUBLIC`, `PROTECTED`, `PRIVATE`, `ABSTRACT`, `NATIVE`, `CONSTRUCTOR`, `VIRTUAL`.
@@ -196,25 +196,25 @@ object Ast extends SchemaBase {
 
     val modifierTypes = builder.addConstants(
       category = "ModifierTypes",
-      Constant(name = "STATIC", value = "STATIC", valueType = ValueTypes.STRING, comment = "The static modifier")
+      Constant(name = "STATIC", value = "STATIC", valueType = ValueType.String, comment = "The static modifier")
         .protoId(1),
-      Constant(name = "PUBLIC", value = "PUBLIC", valueType = ValueTypes.STRING, comment = "The public modifier")
+      Constant(name = "PUBLIC", value = "PUBLIC", valueType = ValueType.String, comment = "The public modifier")
         .protoId(2),
       Constant(name = "PROTECTED",
                value = "PROTECTED",
-               valueType = ValueTypes.STRING,
+               valueType = ValueType.String,
                comment = "The protected modifier").protoId(3),
-      Constant(name = "PRIVATE", value = "PRIVATE", valueType = ValueTypes.STRING, comment = "The private modifier")
+      Constant(name = "PRIVATE", value = "PRIVATE", valueType = ValueType.String, comment = "The private modifier")
         .protoId(4),
-      Constant(name = "ABSTRACT", value = "ABSTRACT", valueType = ValueTypes.STRING, comment = "The abstract modifier")
+      Constant(name = "ABSTRACT", value = "ABSTRACT", valueType = ValueType.String, comment = "The abstract modifier")
         .protoId(5),
-      Constant(name = "NATIVE", value = "NATIVE", valueType = ValueTypes.STRING, comment = "The native modifier")
+      Constant(name = "NATIVE", value = "NATIVE", valueType = ValueType.String, comment = "The native modifier")
         .protoId(6),
       Constant(name = "CONSTRUCTOR",
                value = "CONSTRUCTOR",
-               valueType = ValueTypes.STRING,
+               valueType = ValueType.String,
                comment = "The constructor modifier").protoId(7),
-      Constant(name = "VIRTUAL", value = "VIRTUAL", valueType = ValueTypes.STRING, comment = "The virtual modifier")
+      Constant(name = "VIRTUAL", value = "VIRTUAL", valueType = ValueType.String, comment = "The virtual modifier")
         .protoId(8),
     )
 
@@ -276,7 +276,7 @@ object Ast extends SchemaBase {
     val controlStructureType = builder
       .addProperty(
         name = "CONTROL_STRUCTURE_TYPE",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         cardinality = Cardinality.One,
         comment = """The `CONTROL_STRUCTURE_TYPE` field indicates which kind of control structure
             |a `CONTROL_STRUCTURE` node represents. The available types are the following:
@@ -287,29 +287,29 @@ object Ast extends SchemaBase {
 
     val controlStructureTypes = builder.addConstants(
       category = "ControlStructureTypes",
-      Constant(name = "BREAK", value = "BREAK", valueType = ValueTypes.STRING, comment = "Represents a break statement")
+      Constant(name = "BREAK", value = "BREAK", valueType = ValueType.String, comment = "Represents a break statement")
         .protoId(1),
       Constant(name = "CONTINUE",
                value = "CONTINUE",
-               valueType = ValueTypes.STRING,
+               valueType = ValueType.String,
                comment = "Represents a continue statement").protoId(2),
-      Constant(name = "WHILE", value = "WHILE", valueType = ValueTypes.STRING, comment = "Represents a while statement")
+      Constant(name = "WHILE", value = "WHILE", valueType = ValueType.String, comment = "Represents a while statement")
         .protoId(3),
-      Constant(name = "DO", value = "DO", valueType = ValueTypes.STRING, comment = "Represents a do statement")
+      Constant(name = "DO", value = "DO", valueType = ValueType.String, comment = "Represents a do statement")
         .protoId(4),
-      Constant(name = "FOR", value = "FOR", valueType = ValueTypes.STRING, comment = "Represents a for statement")
+      Constant(name = "FOR", value = "FOR", valueType = ValueType.String, comment = "Represents a for statement")
         .protoId(5),
-      Constant(name = "GOTO", value = "GOTO", valueType = ValueTypes.STRING, comment = "Represents a goto statement")
+      Constant(name = "GOTO", value = "GOTO", valueType = ValueType.String, comment = "Represents a goto statement")
         .protoId(6),
-      Constant(name = "IF", value = "IF", valueType = ValueTypes.STRING, comment = "Represents an if statement")
+      Constant(name = "IF", value = "IF", valueType = ValueType.String, comment = "Represents an if statement")
         .protoId(7),
-      Constant(name = "ELSE", value = "ELSE", valueType = ValueTypes.STRING, comment = "Represents an else statement")
+      Constant(name = "ELSE", value = "ELSE", valueType = ValueType.String, comment = "Represents an else statement")
         .protoId(8),
       Constant(name = "SWITCH",
                value = "SWITCH",
-               valueType = ValueTypes.STRING,
+               valueType = ValueType.String,
                comment = "Represents a switch statement").protoId(9),
-      Constant(name = "TRY", value = "TRY", valueType = ValueTypes.STRING, comment = "Represents a try statement")
+      Constant(name = "TRY", value = "TRY", valueType = ValueType.String, comment = "Represents a try statement")
         .protoId(10),
     )
 
