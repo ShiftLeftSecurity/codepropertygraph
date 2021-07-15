@@ -33,6 +33,10 @@ class MethodMethods(val method: Method) extends AnyVal with NodeExtension with H
     }
   }
 
+  def isVariadic: Boolean = {
+    parameter.exists(_.isVariadic)
+  }
+
   def cfgNode: Traversal[CfgNode] =
     method._containsOut.asScala.collect { case cfgNode: CfgNode => cfgNode }
 

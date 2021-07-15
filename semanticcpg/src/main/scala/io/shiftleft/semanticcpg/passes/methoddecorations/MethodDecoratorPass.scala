@@ -33,6 +33,7 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
           .name(parameterIn.name)
           .evaluationStrategy(parameterIn.evaluationStrategy)
           .typeFullName(parameterIn.typeFullName)
+          .isVariadic(parameterIn.isVariadic)
           .lineNumber(parameterIn.lineNumber)
           .columnNumber(parameterIn.columnNumber)
 
