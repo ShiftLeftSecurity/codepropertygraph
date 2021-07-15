@@ -32,7 +32,6 @@ object Base extends SchemaBase {
       .addProperty(
         name = "HASH",
         valueType = ValueType.String,
-        cardinality = Cardinality.ZeroOrOne,
         comment = """This property contains a hash value in the form of a string.
                     |Hashes can be used to summarize data, e.g., to summarize the
                     |contents of source files or sub graphs. Such summaries are useful

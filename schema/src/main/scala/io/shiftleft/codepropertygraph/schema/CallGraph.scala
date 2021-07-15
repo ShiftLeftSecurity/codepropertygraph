@@ -41,7 +41,6 @@ object CallGraph extends SchemaBase {
       .addProperty(
         name = "ARGUMENT_NAME",
         valueType = ValueType.String,
-        cardinality = Cardinality.ZeroOrOne,
         comment = """
             |For calls involving named parameters, the `ARGUMENT_NAME` field holds the
             |name of the parameter initialized by the expression. For all other calls,

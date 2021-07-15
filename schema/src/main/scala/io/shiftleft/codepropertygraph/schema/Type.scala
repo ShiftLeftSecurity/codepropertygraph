@@ -42,7 +42,6 @@ object Type extends SchemaBase {
       .addProperty(
         name = "ALIAS_TYPE_FULL_NAME",
         valueType = ValueType.String,
-        cardinality = Cardinality.ZeroOrOne,
         comment = """This property holds the fully qualified name of the type that the node is
             |a type alias of.
             |""".stripMargin

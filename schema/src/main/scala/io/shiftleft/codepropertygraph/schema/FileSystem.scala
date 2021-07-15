@@ -40,7 +40,6 @@ object FileSystem extends SchemaBase {
       .addProperty(
         name = "LINE_NUMBER",
         valueType = ValueType.Int,
-        cardinality = Cardinality.ZeroOrOne,
         comment = """This optional field provides the line number of the program construct
             |represented by the node.
             |""".stripMargin
@@ -51,7 +50,6 @@ object FileSystem extends SchemaBase {
       .addProperty(
         name = "COLUMN_NUMBER",
         valueType = ValueType.Int,
-        cardinality = Cardinality.ZeroOrOne,
         comment = """
             |This optional fields provides the column number of the program construct
             |represented by the node.
@@ -63,7 +61,6 @@ object FileSystem extends SchemaBase {
       .addProperty(
         name = "LINE_NUMBER_END",
         valueType = ValueType.Int,
-        cardinality = Cardinality.ZeroOrOne,
         comment = """
         |This optional fields provides the line number at which the program construct
         |represented by the node ends.
@@ -75,7 +72,6 @@ object FileSystem extends SchemaBase {
       .addProperty(
         name = "COLUMN_NUMBER_END",
         valueType = ValueType.Int,
-        cardinality = Cardinality.ZeroOrOne,
         comment = """
             |This optional fields provides the column number at which the program construct
             |represented by the node ends.
