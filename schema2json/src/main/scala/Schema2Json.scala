@@ -3,7 +3,8 @@ import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization
 import org.json4s.{Formats, NoTypeHints}
-import overflowdb.schema.{AbstractNodeType, NodeBaseType, NodeType, SchemaInfo}
+import overflowdb.schema.Property.Cardinality
+import overflowdb.schema.{AbstractNodeType, NodeBaseType, NodeType, Property, SchemaInfo}
 
 object Schema2Json extends App {
 
@@ -58,7 +59,7 @@ object Schema2Json extends App {
       .flatMap { nodeType =>
         val baseTypeNames = nodeType.extendz.map(_.name)
         val allPropertyNames = nodeType.properties.map(_.name)
-        val cardinalities = nodeType.properties.map(_.cardinality.name)
+        val cardinalities = nodeType.properties.map(p => name(p.cardinality))
         val schName = schemaName(nodeType)
 
         val inheritedProperties = nodeType.extendz
@@ -75,7 +76,7 @@ object Schema2Json extends App {
         val containedNodes = nodeType match {
           case nt: NodeType =>
             nt.containedNodes.map { n =>
-              Map("name" -> n.localName, "type" -> n.nodeType.name, "cardinality" -> n.cardinality.name)
+              Map("name" -> n.localName, "type" -> n.nodeType.name, "cardinality" -> name(n.cardinality))
             }
           case _ => List()
         }
@@ -117,5 +118,13 @@ object Schema2Json extends App {
         )
       }
   }
+
+  private def name(cardinality: Property.Cardinality): String =
+    cardinality match {
+      case Cardinality.ZeroOrOne => "zeroOrOne"
+      case Cardinality.List => "list"
+      case Cardinality.ISeq => "array"
+      case Cardinality.One(_) => "one"
+    }
 
 }

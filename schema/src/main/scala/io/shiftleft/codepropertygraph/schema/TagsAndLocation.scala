@@ -142,8 +142,8 @@ object TagsAndLocation extends SchemaBase {
 
     // TODO MP: provide dummy/empty node as default, to avoid null?
     tagNodePair
-      .addContainedNode(tag, "tag", Property.Cardinality.One(null))
-      .addContainedNode(builder.anyNode, "node", Property.Cardinality.One(null))
+      .addContainedNode(tag, "tag", Property.Cardinality.One(Property.Default(null)))
+      .addContainedNode(builder.anyNode, "node", Property.Cardinality.One(Property.Default(null)))
 
     method
       .addOutEdge(edge = taggedBy, inNode = tag)

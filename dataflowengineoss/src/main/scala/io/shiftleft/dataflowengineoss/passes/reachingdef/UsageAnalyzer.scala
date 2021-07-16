@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.dataflowengineoss.queryengine.AccessPathUsage.toTrackedBaseAndAccessPathSimple
 import io.shiftleft.semanticcpg.accesspath.MatchResult
 import io.shiftleft.semanticcpg.language._
+import scala.collection.Set
 
 /**
   * Upon calculating reaching definitions, we find ourselves with

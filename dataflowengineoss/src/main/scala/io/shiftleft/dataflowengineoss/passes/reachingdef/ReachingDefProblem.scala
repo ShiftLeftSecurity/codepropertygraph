@@ -6,6 +6,7 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.MemberAccess.isGenericMemberAccessName
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal._
+import scala.collection.Set
 
 /**
   * The variables defined/used in the reaching def problem can
@@ -209,7 +210,7 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
           .toSet
       case _ => Set()
     }
-    definedNodes.map(x => Definition.fromNode(x))
+    definedNodes.map(Definition.fromNode)
   }
 
 }

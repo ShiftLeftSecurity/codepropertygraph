@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, PropertyNames}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
+import scala.collection.Set
 
 /**
   * A pass that calculates reaching definitions ("data dependencies").

@@ -184,7 +184,7 @@ object DiffGraph {
   }
 
   def propertiesHash(edge: Edge): Array[Byte] = {
-    val propertiesAsString = edge.propertyMap.asScala.toList.sortBy(_._1).mkString
+    val propertiesAsString = edge.propertiesMap.asScala.toList.sortBy(_._1).mkString
     MessageDigest.getInstance("MD5").digest(propertiesAsString.getBytes)
   }
 

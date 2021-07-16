@@ -12,7 +12,6 @@ trait DummyNodeImpl extends StoredNode {
   def property[A](x$1: overflowdb.PropertyKey[A]): A = ???
   def property(x$1: String): Object = ???
   def propertyKeys(): java.util.Set[String] = ???
-  def propertyMap(): java.util.Map[String, Object] = ???
   def propertyOption(x$1: String): java.util.Optional[Object] = ???
   def propertyOption[A](x$1: overflowdb.PropertyKey[A]): java.util.Optional[A] = ???
   def remove(): Unit = ???
