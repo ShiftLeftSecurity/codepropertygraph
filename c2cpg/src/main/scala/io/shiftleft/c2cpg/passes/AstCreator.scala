@@ -295,7 +295,7 @@ class AstCreator(filename: String, global: Global) {
   }
 
   private def astForLiteral(lit: IASTLiteralExpression, order: Int): Ast = {
-    val tpe = lit.getExpressionType.toString
+    val tpe = ASTTypeUtil.getType(lit.getExpressionType)
     val litNode = NewLiteral()
       .typeFullName(registerType(tpe))
       .code(lit.getRawSignature)
