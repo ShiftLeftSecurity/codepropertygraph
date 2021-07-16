@@ -96,7 +96,6 @@ class NamespaceTests extends AnyWordSpec with Matchers {
         |namespace X {
         |    using ::f;        // global f is now visible as ::X::f
         |    using A::g;       // A::g is now visible as ::X::g
-        |    using A::g, A::g; // (C++17) OK: double declaration allowed at namespace scope
         |}
         | 
         |void h()
