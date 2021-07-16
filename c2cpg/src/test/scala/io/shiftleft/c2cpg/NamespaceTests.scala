@@ -14,6 +14,25 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class NamespaceTests extends AnyWordSpec with Matchers {
 
+  private object NamespaceFixture {
+    def apply(code: String)(f: Cpg => Unit): Unit = {
+      File.usingTemporaryDirectory("c2cpgtest") { dir =>
+        val file = dir / "file1.c"
+        file.write(code)
+
+        val cpg = Cpg.emptyCpg
+        val keyPool = new IntervalKeyPool(1001, 2000)
+        val typesKeyPool = new IntervalKeyPool(2001, 3000)
+        val filenames = List(file.path.toAbsolutePath.toString)
+        val astCreationPass = new AstCreationPass(filenames, cpg, keyPool)
+        astCreationPass.createAndApply()
+        new StubRemovalPass(cpg).createAndApply()
+        new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
+        f(cpg)
+      }
+    }
+  }
+
   "Namespaces" should {
 
     "be correct for nested namespaces" in NamespaceFixture(
@@ -36,7 +55,7 @@ class NamespaceTests extends AnyWordSpec with Matchers {
         |    {}
         |}
         |""".stripMargin) { cpg =>
-      fail("Failed for: " + cpg)
+      fail("Not yet implemented! " + cpg)
     }
 
     "be correct for nested namespaces in C++17 style" in NamespaceFixture(
@@ -57,7 +76,7 @@ class NamespaceTests extends AnyWordSpec with Matchers {
         |               // enclosing namespaces are the global namespace, Q, and Q::V
         |{}
         |""".stripMargin) { cpg =>
-      fail("Failed for: " + cpg)
+      fail("Not yet implemented! " + cpg)
     }
 
     "be correct for unnamed namespaces" in NamespaceFixture(
@@ -83,7 +102,7 @@ class NamespaceTests extends AnyWordSpec with Matchers {
         |    A::i++; // ok, increments ::A::(unique)::i
         |    j++;    // ok, increments ::A::(unique)::j
         |}""".stripMargin) { cpg =>
-      fail("Failed for: " + cpg)
+      fail("Not yet implemented! " + cpg)
     }
 
     "be correct for namespaces with using" in NamespaceFixture(
@@ -103,7 +122,7 @@ class NamespaceTests extends AnyWordSpec with Matchers {
         |    X::f(); // calls ::f
         |    X::g(); // calls A::g
         |}""".stripMargin) { cpg =>
-      fail("Failed for: " + cpg)
+      fail("Not yet implemented! " + cpg)
     }
 
     "be correct for namespaces with using and synonyms" in NamespaceFixture(
@@ -125,7 +144,7 @@ class NamespaceTests extends AnyWordSpec with Matchers {
         |    using A::f; // this f is a synonym for both A::f(int) and A::f(char)
         |    f('a');     // calls f(char)
         |}""".stripMargin) { cpg =>
-      fail("Failed for: " + cpg)
+      fail("Not yet implemented! " + cpg)
     }
 
     "be correct for namespaces with alias" in NamespaceFixture("""
@@ -142,28 +161,9 @@ class NamespaceTests extends AnyWordSpec with Matchers {
         |int main() {
         |    int x = fbz::qux;
         |}""".stripMargin) { cpg =>
-      fail("Failed for: " + cpg)
+      fail("Not yet implemented! " + cpg)
     }
 
   }
 
-}
-
-object NamespaceFixture {
-  def apply(code: String)(f: Cpg => Unit): Unit = {
-    File.usingTemporaryDirectory("c2cpgtest") { dir =>
-      val file = dir / "file1.c"
-      file.write(code)
-
-      val cpg = Cpg.emptyCpg
-      val keyPool = new IntervalKeyPool(1001, 2000)
-      val typesKeyPool = new IntervalKeyPool(2001, 3000)
-      val filenames = List(file.path.toAbsolutePath.toString)
-      val astCreationPass = new AstCreationPass(filenames, cpg, keyPool)
-      astCreationPass.createAndApply()
-      new StubRemovalPass(cpg).createAndApply()
-      new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
-      f(cpg)
-    }
-  }
 }

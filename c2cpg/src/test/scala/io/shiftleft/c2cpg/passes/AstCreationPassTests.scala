@@ -12,6 +12,24 @@ import overflowdb.traversal._
 
 class AstCreationPassTests extends AnyWordSpec with Matchers {
 
+  private object Fixture {
+    def apply(file1Code: String, file2Code: String = "")(f: Cpg => Unit): Unit = {
+      File.usingTemporaryDirectory("c2cpgtest") { dir =>
+        val file1 = dir / "file1.c"
+        val file2 = dir / "file2.c"
+        file1.write(file1Code)
+        file2.write(file2Code)
+
+        val cpg = Cpg.emptyCpg
+        val keyPool = new IntervalKeyPool(1001, 2000)
+        val filenames = List(file1.path.toAbsolutePath.toString, file2.path.toAbsolutePath.toString)
+        new AstCreationPass(filenames, cpg, keyPool).createAndApply()
+
+        f(cpg)
+      }
+    }
+  }
+
   "AstCreationPass" should {
     val cpg = Cpg.emptyCpg
     File.usingTemporaryDirectory("astCreationTests") { dir =>
@@ -726,22 +744,4 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
     }
   }
 
-}
-
-object Fixture {
-  def apply(file1Code: String, file2Code: String = "")(f: Cpg => Unit): Unit = {
-    File.usingTemporaryDirectory("c2cpgtest") { dir =>
-      val file1 = dir / "file1.c"
-      val file2 = dir / "file2.c"
-      file1.write(file1Code)
-      file2.write(file2Code)
-
-      val cpg = Cpg.emptyCpg
-      val keyPool = new IntervalKeyPool(1001, 2000)
-      val filenames = List(file1.path.toAbsolutePath.toString, file2.path.toAbsolutePath.toString)
-      new AstCreationPass(filenames, cpg, keyPool).createAndApply()
-
-      f(cpg)
-    }
-  }
 }

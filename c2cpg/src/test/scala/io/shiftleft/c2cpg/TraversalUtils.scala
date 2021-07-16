@@ -6,7 +6,7 @@ import overflowdb._
 
 trait TraversalUtils extends Matchers {
 
-  val fixture: CpgTestFixture
+  protected val fixture: CpgTestFixture
 
   def getMethod(name: String): List[Node] = {
     val result =

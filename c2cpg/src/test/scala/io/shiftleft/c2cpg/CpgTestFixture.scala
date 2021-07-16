@@ -14,9 +14,10 @@ import overflowdb.traversal.TraversalSource
 case class CpgTestFixture(projectName: String) {
 
   val cpg: Cpg = Cpg.emptyCpg
-  val dirName: String = ProjectRoot.relativise(s"c2cpg/src/test/resources/testcode/$projectName")
-  val keyPool: IntervalKeyPool = new IntervalKeyPool(1001, 2000)
-  val filenames: List[String] = SourceFiles.determine(Set(dirName), Set(".c"))
+
+  private val dirName: String = ProjectRoot.relativise(s"c2cpg/src/test/resources/testcode/$projectName")
+  private val keyPool: IntervalKeyPool = new IntervalKeyPool(1001, 2000)
+  private val filenames: List[String] = SourceFiles.determine(Set(dirName), Set(".c"))
 
   new MetaDataPass(cpg, Languages.C).createAndApply()
   new AstCreationPass(filenames, cpg, keyPool).createAndApply()

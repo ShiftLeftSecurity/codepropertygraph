@@ -14,6 +14,39 @@ import scala.jdk.CollectionConverters._
 
 class CfgCreationPassTests extends AnyWordSpec with Matchers {
 
+  private class CfgFixture(file1Code: String) {
+
+    private val cpg: Cpg = Cpg.emptyCpg
+
+    File.usingTemporaryDirectory("c2cpgtest") { dir =>
+      val file1 = dir / "file1.c"
+      file1.write(s"RET func() { $file1Code }")
+      val keyPoolFile1 = new IntervalKeyPool(1001, 2000)
+      val filenames = List(file1.path.toAbsolutePath.toString)
+      new AstCreationPass(filenames, cpg, keyPoolFile1).createAndApply()
+      new CfgCreationPass(cpg).createAndApply()
+    }
+
+    val codeToNode: Map[String, CfgNode] =
+      cpg.method.ast.isCfgNode.l.map { node =>
+        node.code -> node
+      }.toMap
+
+    def expected(pairs: (String, CfgEdgeType)*): Set[String] = {
+      pairs.map {
+        case (code, _) => codeToNode(code).code
+      }.toSet
+    }
+
+    def succOf(code: String): Set[String] = {
+      codeToNode(code)._cfgOut.asScala
+        .map(_.asInstanceOf[CfgNode])
+        .toSet
+        .map[String](_.code)
+    }
+
+  }
+
   "Cfg" should {
 
     "contain an entry and exit node at least" in new CfgFixture("") {
@@ -465,39 +498,6 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
         succOf("d") shouldBe expected(("RET", AlwaysEdge))
         succOf("e") shouldBe expected(("RET", AlwaysEdge))
       }
-  }
-
-}
-
-class CfgFixture(file1Code: String) {
-
-  val cpg: Cpg = Cpg.emptyCpg
-
-  File.usingTemporaryDirectory("c2cpgtest") { dir =>
-    val file1 = dir / "file1.c"
-    file1.write(s"RET func() { $file1Code }")
-    val keyPoolFile1 = new IntervalKeyPool(1001, 2000)
-    val filenames = List(file1.path.toAbsolutePath.toString)
-    new AstCreationPass(filenames, cpg, keyPoolFile1).createAndApply()
-    new CfgCreationPass(cpg).createAndApply()
-  }
-
-  val codeToNode: Map[String, CfgNode] =
-    cpg.method.ast.isCfgNode.l.map { node =>
-      node.code -> node
-    }.toMap
-
-  def expected(pairs: (String, CfgEdgeType)*): Set[String] = {
-    pairs.map {
-      case (code, _) => codeToNode(code).code
-    }.toSet
-  }
-
-  def succOf(code: String): Set[String] = {
-    codeToNode(code)._cfgOut.asScala
-      .map(_.asInstanceOf[CfgNode])
-      .toSet
-      .map[String](_.code)
   }
 
 }

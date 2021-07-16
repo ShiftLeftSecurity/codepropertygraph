@@ -10,6 +10,22 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class StubRemovalPassTests extends AnyWordSpec with Matchers {
 
+  private object StubRemovalPassFixture {
+    def apply(file1Code: String)(f: Cpg => Unit): Unit = {
+      File.usingTemporaryDirectory("c2cpgtest") { dir =>
+        val file1 = dir / "file1.c"
+        file1.write(file1Code)
+        val cpg = Cpg.emptyCpg
+        val keyPool = new IntervalKeyPool(1001, 2000)
+        val filenames = List(file1.path.toAbsolutePath.toString)
+        new AstCreationPass(filenames, cpg, keyPool).createAndApply()
+        new CfgCreationPass(cpg).createAndApply()
+        new StubRemovalPass(cpg).createAndApply()
+        f(cpg)
+      }
+    }
+  }
+
   "StubRemovalPass" should {
     "remove stub if non-stub with same signature exists" in StubRemovalPassFixture("""
         |int foo(int x);
@@ -46,20 +62,4 @@ class StubRemovalPassTests extends AnyWordSpec with Matchers {
 
   }
 
-}
-
-object StubRemovalPassFixture {
-  def apply(file1Code: String)(f: Cpg => Unit): Unit = {
-    File.usingTemporaryDirectory("c2cpgtest") { dir =>
-      val file1 = dir / "file1.c"
-      file1.write(file1Code)
-      val cpg = Cpg.emptyCpg
-      val keyPool = new IntervalKeyPool(1001, 2000)
-      val filenames = List(file1.path.toAbsolutePath.toString)
-      new AstCreationPass(filenames, cpg, keyPool).createAndApply()
-      new CfgCreationPass(cpg).createAndApply()
-      new StubRemovalPass(cpg).createAndApply()
-      f(cpg)
-    }
-  }
 }
