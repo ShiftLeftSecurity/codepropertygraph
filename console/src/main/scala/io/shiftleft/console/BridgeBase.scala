@@ -254,7 +254,7 @@ trait BridgeBase {
     val replConfig = List(
       "repl.prompt() = \"" + promptStr() + "\"",
       configurePPrinterMaybe,
-      "implicit val implicitPPrinter = repl.pprinter()"
+      "implicit val implicitPPrinter = repl.pprinter()",
       "banner()"
     )
     ammonite
