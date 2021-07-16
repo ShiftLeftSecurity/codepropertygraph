@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class MethodDeclTest extends AnyWordSpec with Matchers {
+class MethodDeclTests extends AnyWordSpec with Matchers {
 
   private val fixture = CpgTestFixture("methoddecl")
 

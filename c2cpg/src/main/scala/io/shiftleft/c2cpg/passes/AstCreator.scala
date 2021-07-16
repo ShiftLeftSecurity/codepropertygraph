@@ -1,96 +1,14 @@
 package io.shiftleft.c2cpg.passes
 
 import io.shiftleft.c2cpg.Defines
-import io.shiftleft.codepropertygraph.generated.nodes.{
-  NewBlock,
-  NewCall,
-  NewComment,
-  NewControlStructure,
-  NewFieldIdentifier,
-  NewFile,
-  NewIdentifier,
-  NewJumpTarget,
-  NewLiteral,
-  NewLocal,
-  NewMember,
-  NewMethod,
-  NewMethodParameterIn,
-  NewMethodReturn,
-  NewNamespaceBlock,
-  NewNode,
-  NewReturn,
-  NewTypeDecl,
-  NewUnknown
-}
-import io.shiftleft.codepropertygraph.generated.{
-  ControlStructureTypes,
-  DispatchTypes,
-  EdgeTypes,
-  EvaluationStrategies,
-  Operators
-}
+import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.x2cpg.Ast
-import org.eclipse.cdt.core.dom.ast.cpp.{
-  ICPPASTCompositeTypeSpecifier,
-  ICPPASTConstructorInitializer,
-  ICPPASTDeleteExpression,
-  ICPPASTNewExpression,
-  ICPPASTTryBlockStatement,
-  ICPPASTVisibilityLabel
-}
-import org.eclipse.cdt.core.dom.ast.{
-  IASTArraySubscriptExpression,
-  IASTBinaryExpression,
-  IASTBreakStatement,
-  IASTCaseStatement,
-  IASTCastExpression,
-  IASTComment,
-  IASTCompositeTypeSpecifier,
-  IASTCompoundStatement,
-  IASTConditionalExpression,
-  IASTContinueStatement,
-  IASTDeclSpecifier,
-  IASTDeclaration,
-  IASTDeclarationStatement,
-  IASTDeclarator,
-  IASTDefaultStatement,
-  IASTDoStatement,
-  IASTElaboratedTypeSpecifier,
-  IASTEqualsInitializer,
-  IASTExpression,
-  IASTExpressionList,
-  IASTExpressionStatement,
-  IASTFieldReference,
-  IASTForStatement,
-  IASTFunctionCallExpression,
-  IASTFunctionDeclarator,
-  IASTFunctionDefinition,
-  IASTGotoStatement,
-  IASTIdExpression,
-  IASTIfStatement,
-  IASTInitializer,
-  IASTLabelStatement,
-  IASTLiteralExpression,
-  IASTName,
-  IASTNamedTypeSpecifier,
-  IASTNode,
-  IASTNullStatement,
-  IASTParameterDeclaration,
-  IASTReturnStatement,
-  IASTSimpleDeclSpecifier,
-  IASTSimpleDeclaration,
-  IASTStandardFunctionDeclarator,
-  IASTStatement,
-  IASTSwitchStatement,
-  IASTTranslationUnit,
-  IASTTypeIdExpression,
-  IASTUnaryExpression,
-  IASTWhileStatement,
-  IPointerType
-}
+import org.eclipse.cdt.core.dom.ast.cpp._
+import org.eclipse.cdt.core.dom.ast._
 import org.eclipse.cdt.internal.core.dom.parser.c.CASTFunctionDeclarator
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTFunctionDeclarator
 import org.slf4j.LoggerFactory
@@ -195,6 +113,29 @@ class AstCreator(filename: String, global: Global) {
     Option(node).map(astsForStatement(_, order)).getOrElse(Seq.empty)
   }
 
+  private def fullName(node: IASTNode): String = {
+    val qualifiedName = node match {
+      case namespace: ICPPASTNamespaceDefinition => namespace.getName.getBinding.toString
+      case cppClass: ICPPASTCompositeTypeSpecifier if cppClass.getName.getBinding.isInstanceOf[ICPPBinding] =>
+        ASTTypeUtil.getQualifiedName(cppClass.getName.getBinding.asInstanceOf[ICPPBinding])
+      case c: IASTCompositeTypeSpecifier => c.getName.toString
+      case f: ICPPASTFunctionDefinition  => f.getDeclarator.getName.toString
+      case other                         => notHandledYet(other); ""
+    }
+    qualifiedName.replaceAll("::", ".")
+  }
+
+  private def shortName(node: IASTNode): String = {
+    val name = node match {
+      case f: ICPPASTFunctionDefinition =>
+        val qualifiedName = f.getDeclarator.getName.toString
+        qualifiedName.split("::").lastOption.getOrElse(qualifiedName)
+      case f: IASTFunctionDefinition => f.getDeclarator.getName.toString
+      case other                     => notHandledYet(other); ""
+    }
+    name
+  }
+
   private def parentIsClassDef(node: IASTNode): Boolean = Option(node.getParent) match {
     case Some(_: IASTCompositeTypeSpecifier) => true
     case _                                   => false
@@ -274,14 +215,21 @@ class AstCreator(filename: String, global: Global) {
   private def astForComment(comment: IASTComment): Ast =
     Ast(NewComment().code(comment.getRawSignature).filename(filename).lineNumber(line(comment)))
 
-  private def astForFile(parserResult: IASTTranslationUnit): Ast =
-    Ast(NewFile(name = filename, order = 0))
-      .withChild(
-        astForTranslationUnit(parserResult)
-          .withChildren(withOrder(parserResult.getDeclarations) { (decl, order) =>
-            astsForDeclaration(decl, order)
-          }.flatten)
-          .withChildren(parserResult.getComments.map(comment => astForComment(comment)).toIndexedSeq))
+  private def astForFile(parserResult: IASTTranslationUnit): Ast = {
+    val cpgFile = Ast(NewFile(name = filename, order = 0))
+    val translationUnitAst = astForTranslationUnit(parserResult)
+
+    var currOrder = 1
+    val declsAsts = parserResult.getDeclarations.flatMap { stmt =>
+      val r = astsForDeclaration(stmt, currOrder)
+      currOrder = currOrder + r.length
+      r
+    }.toIndexedSeq
+
+    val commentsAsts = parserResult.getComments.map(comment => astForComment(comment)).toIndexedSeq
+
+    cpgFile.withChild(translationUnitAst.withChildren(declsAsts).withChildren(commentsAsts))
+  }
 
   private def astForTranslationUnit(iASTTranslationUnit: IASTTranslationUnit): Ast = {
     val absolutePath = new java.io.File(iASTTranslationUnit.getFilePath).toPath.toAbsolutePath.normalize().toString
@@ -377,14 +325,15 @@ class AstCreator(filename: String, global: Global) {
       childNum: Int
   ): NewMethod = {
     val returnType = typeForDeclSpecifier(functDef.getDeclSpecifier)
-    val name = functDef.getDeclarator.getName.toString
-    val signature = returnType + " " + name + " " + paramListSignature(functDef, includeParamNames = false)
+    val name = shortName(functDef)
+    val fullname = fullName(functDef)
+    val signature = returnType + " " + fullname + " " + paramListSignature(functDef, includeParamNames = false)
     val code = returnType + " " + name + " " + paramListSignature(functDef, includeParamNames = true)
     val methodNode = NewMethod()
-      .name(functDef.getDeclarator.getName.toString)
+      .name(name)
       .code(code)
       .isExternal(false)
-      .fullName(name)
+      .fullName(fullname)
       .lineNumber(line(functDef))
       .lineNumberEnd(lineEnd(functDef))
       .columnNumber(column(functDef))
@@ -889,21 +838,22 @@ class AstCreator(filename: String, global: Global) {
 
   private def astForCompositeType(typeSpecifier: IASTCompositeTypeSpecifier, order: Int): Ast = {
     val name = typeSpecifier.getName.toString
+    val fullname = fullName(typeSpecifier)
     val typeDecl = typeSpecifier match {
       case cppClass: ICPPASTCompositeTypeSpecifier =>
         val baseClassList = cppClass.getBaseSpecifiers.toSeq.map(_.getNameSpecifier.toString)
         baseClassList.foreach(registerType)
         NewTypeDecl()
           .name(name)
-          .fullName(name)
+          .fullName(fullname)
           .isExternal(false)
           .filename(typeSpecifier.getContainingFilename)
-          .order(order)
           .inheritsFromTypeFullName(baseClassList)
+          .order(order)
       case _ =>
         NewTypeDecl()
           .name(name)
-          .fullName(name)
+          .fullName(fullname)
           .isExternal(false)
           .filename(typeSpecifier.getContainingFilename)
           .order(order)
@@ -951,6 +901,29 @@ class AstCreator(filename: String, global: Global) {
     r
   }
 
+  private def astForNamespaceDefinition(namespaceDefinition: ICPPASTNamespaceDefinition, order: Int): Ast = {
+    val name = namespaceDefinition.getName.getLastName.toString
+    val fullname = fullName(namespaceDefinition)
+    val code = "namespace " + fullname
+    val cpgNamespace = NewNamespaceBlock()
+      .code(code)
+      .lineNumber(line(namespaceDefinition))
+      .columnNumber(column(namespaceDefinition))
+      .filename(filename)
+      .name(name)
+      .fullName(fullname)
+      .order(order)
+
+    var currOrder = order
+    val childrenAsts = namespaceDefinition.getDeclarations.flatMap { decl =>
+      val declAsts = astsForDeclaration(decl, currOrder)
+      currOrder = currOrder + declAsts.length
+      declAsts
+    }.toIndexedSeq
+
+    Ast(cpgNamespace).withChildren(childrenAsts)
+  }
+
   private def astsForDeclaration(decl: IASTDeclaration, order: Int): Seq[Ast] = decl match {
     case functDef: IASTFunctionDefinition =>
       Seq(astForFunctionDefinition(functDef, order))
@@ -971,6 +944,7 @@ class AstCreator(filename: String, global: Global) {
         case d: IASTFunctionDeclarator => astForFunctionDeclarator(d, order)
         case d                         => astForDeclarator(declaration, d, order)
       }
+    case namespaceDefinition: ICPPASTNamespaceDefinition                          => Seq(astForNamespaceDefinition(namespaceDefinition, order))
     case _: ICPPASTVisibilityLabel                                                => Seq.empty
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.isEmpty => Seq.empty
     case _                                                                        => notHandledYetSeq(decl)
