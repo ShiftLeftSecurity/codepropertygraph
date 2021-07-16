@@ -38,7 +38,7 @@ object Method extends SchemaBase {
                     |implementor to fit the source language.
                     |""".stripMargin
       )
-      .mandatory(PropertyDefaults.String)
+      .mandatory("")
       .protoId(22)
 
     val method: NodeType = builder
@@ -83,7 +83,7 @@ object Method extends SchemaBase {
                     |property set to true.
                     |""".stripMargin
       )
-      .mandatory(PropertyDefaults.Boolean)
+      .mandatory(false)
       .protoId(221)
 
     val methodParameterIn: NodeType = builder

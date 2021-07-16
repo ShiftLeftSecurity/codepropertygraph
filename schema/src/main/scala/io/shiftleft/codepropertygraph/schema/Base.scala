@@ -60,7 +60,7 @@ object Base extends SchemaBase {
                     |parsing and to library functions where we have header files only)
                     |""".stripMargin
       )
-      .mandatory(PropertyDefaults.Boolean)
+      .mandatory(false)
       .protoId(7)
 
     val name = builder

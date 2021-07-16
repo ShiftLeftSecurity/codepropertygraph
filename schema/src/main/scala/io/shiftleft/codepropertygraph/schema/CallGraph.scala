@@ -37,7 +37,7 @@ object CallGraph extends SchemaBase {
                     |ignored. It is suggested to set it to -1.
                     |""".stripMargin
       )
-      .mandatory(PropertyDefaults.Int)
+      .mandatory(-1)
       .protoId(40)
 
     val argumentName = builder
