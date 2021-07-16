@@ -1,8 +1,8 @@
 package io.shiftleft.codepropertygraph.schema
 
 import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
-import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.schema.Property.ValueType
+import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
 
 object Method extends SchemaBase {
 

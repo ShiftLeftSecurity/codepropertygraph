@@ -279,7 +279,7 @@ object DiffGraph {
     def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String) =
       node.propertyOption(propertyKey).asScala match {
         case Some(value) if value != node.propertyDefaultValue(propertyKey) =>
-        case _ => builder.removeNodeProperty(node.id, propertyKey)
+        case _                                                              => builder.removeNodeProperty(node.id, propertyKey)
       }
 
     def onBeforeEdgePropertyChange(edge: Edge, propertyKey: String) = {

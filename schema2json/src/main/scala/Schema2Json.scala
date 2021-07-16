@@ -122,9 +122,9 @@ object Schema2Json extends App {
   private def name(cardinality: Property.Cardinality): String =
     cardinality match {
       case Cardinality.ZeroOrOne => "zeroOrOne"
-      case Cardinality.List => "list"
-      case Cardinality.ISeq => "array"
-      case Cardinality.One(_) => "one"
+      case Cardinality.List      => "list"
+      case Cardinality.ISeq      => "array"
+      case Cardinality.One(_)    => "one"
     }
 
 }
