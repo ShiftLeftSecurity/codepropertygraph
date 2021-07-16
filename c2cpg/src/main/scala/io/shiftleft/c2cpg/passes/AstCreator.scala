@@ -123,10 +123,12 @@ class AstCreator(filename: String, global: Global) {
       case d: CPPASTIdExpression if d.getEvaluation.isInstanceOf[EvalBinding] =>
         val evaluation = d.getEvaluation.asInstanceOf[EvalBinding]
         evaluation.getBinding match {
-          case f: CPPFunction =>
+          case f: CPPFunction if f.getDeclarations != null =>
             usingDeclarationMappings.getOrElse(
               d.getName.toString.replace("::", "."),
               f.getDeclarations.headOption.map(_.getName.toString).getOrElse(f.getName))
+          case f: CPPFunction if f.getDefinition != null =>
+            usingDeclarationMappings.getOrElse(d.getName.toString.replace("::", "."), f.getDefinition.getName.toString)
           case other => other.getName
         }
       case alias: ICPPASTNamespaceAlias => alias.getMappingName.toString
@@ -168,8 +170,12 @@ class AstCreator(filename: String, global: Global) {
       case d: CPPASTIdExpression if d.getEvaluation.isInstanceOf[EvalBinding] =>
         val evaluation = d.getEvaluation.asInstanceOf[EvalBinding]
         evaluation.getBinding match {
-          case f: CPPFunction => f.getDeclarations.headOption.map(_.getName.toString).getOrElse(f.getName)
-          case other          => other.getName
+          case f: CPPFunction if f.getDeclarations != null =>
+            f.getDeclarations.headOption.map(_.getName.toString).getOrElse(f.getName)
+          case f: CPPFunction if f.getDefinition != null =>
+            f.getDefinition.getName.toString
+          case other =>
+            other.getName
         }
       case d: CPPASTIdExpression =>
         val qualifiedName = d.getName.toString

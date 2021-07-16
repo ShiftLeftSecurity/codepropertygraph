@@ -9,6 +9,7 @@ import io.shiftleft.dataflowengineoss.semanticsloader.{Parser, Semantics}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.dotextension.ImageViewer
 import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
+import io.shiftleft.utils.ProjectRoot
 import overflowdb.traversal.Traversal
 
 import scala.sys.process.Process
@@ -16,7 +17,7 @@ import scala.util.Try
 
 class DataFlowCodeToCpgSuite extends CCodeToCpgSuite {
 
-  var semanticsFilename = "dataflowengineoss/src/test/resources/default.semantics"
+  private val semanticsFilename = ProjectRoot.relativise("dataflowengineoss/src/test/resources/default.semantics")
   var semantics: Semantics = _
   implicit var context: EngineContext = _
 
