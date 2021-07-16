@@ -115,7 +115,13 @@ class AstCreator(filename: String, global: Global) {
 
   private def fullName(node: IASTNode): String = {
     val qualifiedName = node match {
-      case namespace: ICPPASTNamespaceDefinition => namespace.getName.getBinding.toString
+      case alias: ICPPASTNamespaceAlias => alias.getMappingName.toString
+      case namespace: ICPPASTNamespaceDefinition if namespace.getName.getBinding != null =>
+        namespace.getName.getBinding.toString
+      case namespace: ICPPASTNamespaceDefinition if namespace.getParent.isInstanceOf[ICPPASTNamespaceDefinition] =>
+        fullName(namespace.getParent) + "." + namespace.getName.toString
+      case namespace: ICPPASTNamespaceDefinition if !namespace.getParent.isInstanceOf[ICPPASTNamespaceDefinition] =>
+        namespace.getName.toString
       case cppClass: ICPPASTCompositeTypeSpecifier if cppClass.getName.getBinding.isInstanceOf[ICPPBinding] =>
         ASTTypeUtil.getQualifiedName(cppClass.getName.getBinding.asInstanceOf[ICPPBinding])
       case c: IASTCompositeTypeSpecifier => c.getName.toString
@@ -924,6 +930,22 @@ class AstCreator(filename: String, global: Global) {
     Ast(cpgNamespace).withChildren(childrenAsts)
   }
 
+  private def astForNamespaceAlias(namespaceAlias: ICPPASTNamespaceAlias, order: Int): Ast = {
+    val name = namespaceAlias.getAlias.toString
+    val fullname = fullName(namespaceAlias)
+    val code = "namespace " + name + " = " + fullname
+    val cpgNamespace = NewNamespaceBlock()
+      .code(code)
+      .lineNumber(line(namespaceAlias))
+      .columnNumber(column(namespaceAlias))
+      .filename(filename)
+      .name(name)
+      .fullName(fullname)
+      .order(order)
+
+    Ast(cpgNamespace)
+  }
+
   private def astsForDeclaration(decl: IASTDeclaration, order: Int): Seq[Ast] = decl match {
     case functDef: IASTFunctionDefinition =>
       Seq(astForFunctionDefinition(functDef, order))
@@ -944,6 +966,7 @@ class AstCreator(filename: String, global: Global) {
         case d: IASTFunctionDeclarator => astForFunctionDeclarator(d, order)
         case d                         => astForDeclarator(declaration, d, order)
       }
+    case namespaceAlias: ICPPASTNamespaceAlias                                    => Seq(astForNamespaceAlias(namespaceAlias, order))
     case namespaceDefinition: ICPPASTNamespaceDefinition                          => Seq(astForNamespaceDefinition(namespaceDefinition, order))
     case _: ICPPASTVisibilityLabel                                                => Seq.empty
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.isEmpty => Seq.empty

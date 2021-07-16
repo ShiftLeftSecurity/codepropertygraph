@@ -60,6 +60,92 @@ class NamespaceTests extends AnyWordSpec with Matchers {
       fail("Failed for: " + cpg)
     }
 
+    "be correct for unnamed namespaces" in NamespaceFixture(
+      """
+        |namespace {
+        |    int i; // defines ::(unique)::i
+        |}
+        |void f() {
+        |    i++;   // increments ::(unique)::i
+        |}
+        | 
+        |namespace A {
+        |    namespace {
+        |        int i;        // A::(unique)::i
+        |        int j;        // A::(unique)::j
+        |    }
+        |    void g() { i++; } // A::(unique)::i++
+        |}
+        | 
+        |using namespace A; // introduces all names from A into global namespace
+        |void h() {
+        |    i++;    // error: ::(unique)::i and ::A::(unique)::i are both in scope
+        |    A::i++; // ok, increments ::A::(unique)::i
+        |    j++;    // ok, increments ::A::(unique)::j
+        |}""".stripMargin) { cpg =>
+      fail("Failed for: " + cpg)
+    }
+
+    "be correct for namespaces with using" in NamespaceFixture(
+      """
+        |void f();
+        |namespace A {
+        |    void g();
+        |}
+        | 
+        |namespace X {
+        |    using ::f;        // global f is now visible as ::X::f
+        |    using A::g;       // A::g is now visible as ::X::g
+        |    using A::g, A::g; // (C++17) OK: double declaration allowed at namespace scope
+        |}
+        | 
+        |void h()
+        |{
+        |    X::f(); // calls ::f
+        |    X::g(); // calls A::g
+        |}""".stripMargin) { cpg =>
+      fail("Failed for: " + cpg)
+    }
+
+    "be correct for namespaces with using and synonyms" in NamespaceFixture(
+      """
+        |namespace A {
+        |    void f(int);
+        |}
+        |using A::f; // ::f is now a synonym for A::f(int)
+        | 
+        |namespace A {     // namespace extension
+        |    void f(char); // does not change what ::f means
+        |}
+        | 
+        |void foo() {
+        |    f('a'); // calls f(int), even though f(char) exists.
+        |}
+        | 
+        |void bar() {
+        |    using A::f; // this f is a synonym for both A::f(int) and A::f(char)
+        |    f('a');     // calls f(char)
+        |}""".stripMargin) { cpg =>
+      fail("Failed for: " + cpg)
+    }
+
+    "be correct for namespaces with alias" in NamespaceFixture("""
+        |namespace foo {
+        |    namespace bar {
+        |         namespace baz {
+        |             int qux = 42;
+        |         }
+        |    }
+        |}
+        | 
+        |namespace fbz = foo::bar::baz;
+        | 
+        |int main() {
+        |    int x = fbz::qux;
+        |}""".stripMargin) { cpg =>
+      fail("Failed for: " + cpg)
+    }
+
   }
 
 }
