@@ -275,10 +275,11 @@ object DiffGraph {
     def onNewEdge(edge: Edge) = builder.removeEdge(edge)
     def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String) = {
       val prop = node.propertyOption(propertyKey)
-      if (prop.isPresent)
+      if (prop.isPresent && prop.get() != node.propertyDefaultValue(propertyKey)) {
         builder.addNodeProperty(node, propertyKey, prop.get())
-      else
+      } else {
         builder.removeNodeProperty(node.id, propertyKey)
+      }
     }
     def onBeforeEdgePropertyChange(edge: Edge, propertyKey: String) = {
       val prop = edge.propertyOption(propertyKey)
