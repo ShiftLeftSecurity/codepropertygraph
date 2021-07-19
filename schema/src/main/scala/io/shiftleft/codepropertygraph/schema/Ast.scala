@@ -61,7 +61,7 @@ object Ast extends SchemaBase {
             |order of 0.
             |""".stripMargin
       )
-      .mandatory(PropertyDefaults.Int)
+      .mandatory(-1)
       .protoId(4)
 
     val astNode = builder
