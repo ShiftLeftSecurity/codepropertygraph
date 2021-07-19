@@ -313,6 +313,8 @@ class AstCreator(filename: String, global: Global) {
     val identifierTypeName = variableOption match {
       case Some((_, variableTypeName)) =>
         variableTypeName
+      case None if ident.getParent.isInstanceOf[IASTDeclarator] =>
+        ASTTypeUtil.getNodeType(ident.getParent.asInstanceOf[IASTDeclarator])
       case None =>
         Defines.anyTypeName
     }
@@ -466,17 +468,24 @@ class AstCreator(filename: String, global: Global) {
 
   private def astsForDeclarationStatement(decl: IASTDeclarationStatement, order: Int): Seq[Ast] =
     decl.getDeclaration match {
-      case decl: IASTSimpleDeclaration =>
+      case simplDecl: IASTSimpleDeclaration
+          if simplDecl.getDeclarators.headOption.exists(_.isInstanceOf[IASTFunctionDeclarator]) =>
+        Seq(astForFunctionDeclarator(simplDecl.getDeclarators.head.asInstanceOf[IASTFunctionDeclarator], order))
+      case simplDecl: IASTSimpleDeclaration =>
         val locals =
-          withOrder(decl.getDeclarators) { (d, o) =>
-            astForDeclarator(decl, d, order + o - 1)
+          withOrder(simplDecl.getDeclarators) { (d, o) =>
+            astForDeclarator(simplDecl, d, order + o - 1)
           }
         val calls =
-          withOrder(decl.getDeclarators.filter(_.getInitializer != null)) { (d, o) =>
+          withOrder(simplDecl.getDeclarators.filter(_.getInitializer != null)) { (d, o) =>
             astForInitializer(d, d.getInitializer, locals.size + order + o - 1)
           }
         locals ++ calls
-      case decl => notHandledYetSeq(decl)
+      case usingDeclaration: ICPPASTUsingDeclaration =>
+        handleUsingDeclaration(usingDeclaration)
+        Seq.empty
+      case decl =>
+        notHandledYetSeq(decl)
     }
 
   private def astForBinaryExpression(bin: IASTBinaryExpression, order: Int): Ast = {
@@ -961,9 +970,22 @@ class AstCreator(filename: String, global: Global) {
     r
   }
 
+  private var usedNamespaces: Int = 0
+
+  private def uniqueNamespaceName(name: String, fullName: String): (String, String) = {
+    if (name.isEmpty && (fullName.isEmpty || fullName.endsWith("."))) {
+      val newName = "anonymous_namespace_" + usedNamespaces
+      val newFullName = fullName + "anonymous_namespace_" + usedNamespaces
+      usedNamespaces = usedNamespaces + 1
+      (newName, newFullName)
+    } else {
+      (name, fullName)
+    }
+  }
+
   private def astForNamespaceDefinition(namespaceDefinition: ICPPASTNamespaceDefinition, order: Int): Ast = {
-    val name = namespaceDefinition.getName.getLastName.toString
-    val fullname = fullName(namespaceDefinition)
+    val (name, fullname) =
+      uniqueNamespaceName(namespaceDefinition.getName.getLastName.toString, fullName(namespaceDefinition))
     val code = "namespace " + fullname
     val cpgNamespace = NewNamespaceBlock()
       .code(code)
@@ -974,6 +996,7 @@ class AstCreator(filename: String, global: Global) {
       .fullName(fullname)
       .order(order)
 
+    scope.pushNewScope(cpgNamespace)
     var currOrder = order
     val childrenAsts = namespaceDefinition.getDeclarations.flatMap { decl =>
       val declAsts = astsForDeclaration(decl, currOrder)
@@ -981,7 +1004,9 @@ class AstCreator(filename: String, global: Global) {
       declAsts
     }.toIndexedSeq
 
-    Ast(cpgNamespace).withChildren(childrenAsts)
+    val namespaceAst = Ast(cpgNamespace).withChildren(childrenAsts)
+    scope.popScope()
+    namespaceAst
   }
 
   private def astForNamespaceAlias(namespaceAlias: ICPPASTNamespaceAlias, order: Int): Ast = {
@@ -1007,7 +1032,8 @@ class AstCreator(filename: String, global: Global) {
       usingDecl.getParent match {
         case ns: ICPPASTNamespaceDefinition =>
           usingDeclarationMappings.put(fullName(ns) + "." + mappedName, usingDecl.getName.toString.replace("::", "."))
-        case _ => // do nothing
+        case _ =>
+          usingDeclarationMappings.put(mappedName, usingDecl.getName.toString.replace("::", "."))
       }
     }
   }
@@ -1029,8 +1055,9 @@ class AstCreator(filename: String, global: Global) {
       compAst +: declAsts
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.nonEmpty =>
       declaration.getDeclarators.toIndexedSeq.map {
-        case d: IASTFunctionDeclarator => astForFunctionDeclarator(d, order)
-        case d                         => astForDeclarator(declaration, d, order)
+        case d: IASTFunctionDeclarator     => astForFunctionDeclarator(d, order)
+        case d if d.getInitializer != null => astForInitializer(d, d.getInitializer, order)
+        case d                             => astForDeclarator(declaration, d, order)
       }
     case namespaceAlias: ICPPASTNamespaceAlias                                    => Seq(astForNamespaceAlias(namespaceAlias, order))
     case namespaceDefinition: ICPPASTNamespaceDefinition                          => Seq(astForNamespaceDefinition(namespaceDefinition, order))
@@ -1038,6 +1065,8 @@ class AstCreator(filename: String, global: Global) {
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.isEmpty => Seq.empty
     case usingDecl: ICPPASTUsingDeclaration =>
       handleUsingDeclaration(usingDecl)
+      Seq.empty
+    case _: ICPPASTUsingDirective =>
       Seq.empty
     case _ => notHandledYetSeq(decl)
   }

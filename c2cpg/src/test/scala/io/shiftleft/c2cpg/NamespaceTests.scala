@@ -7,12 +7,11 @@ import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.Inside
+import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.passes.CfgCreationPass
 
-//import io.shiftleft.codepropertygraph.generated.nodes._
-//import io.shiftleft.semanticcpg.language._
-//import overflowdb.traversal._
-
-class NamespaceTests extends AnyWordSpec with Matchers {
+class NamespaceTests extends AnyWordSpec with Matchers with Inside {
 
   private object NamespaceFixture {
     def apply(code: String)(f: Cpg => Unit): Unit = {
@@ -26,6 +25,7 @@ class NamespaceTests extends AnyWordSpec with Matchers {
         val filenames = List(file.path.toAbsolutePath.toString)
         val astCreationPass = new AstCreationPass(filenames, cpg, keyPool)
         astCreationPass.createAndApply()
+        new CfgCreationPass(cpg).createAndApply()
         new StubRemovalPass(cpg).createAndApply()
         new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
         f(cpg)
@@ -39,44 +39,95 @@ class NamespaceTests extends AnyWordSpec with Matchers {
       """
         |namespace Q {
         |    namespace V {   // V is a member of Q, and is fully defined within Q
-        |        class C { void m(); }; // C is a member of V and is fully defined within V
+        |        class C { int m(); }; // C is a member of V and is fully defined within V
         |                               // C::m is only declared
-        |        void f(); // f is a member of V, but is only declared here
+        |        int f(); // f is a member of V, but is only declared here
         |    }
         | 
-        |    void V::f() // definition of V's member f outside of V
+        |    int V::f() // definition of V's member f outside of V
         |                // f's enclosing namespaces are still the global namespace, Q, and Q::V
         |    {
         |        extern void h(); // This declares ::Q::V::h
+        |        return 0;
         |    }
         | 
-        |    void V::C::m() // definition of V::C::m outside of the namespace (and the class body)
+        |    int V::C::m() // definition of V::C::m outside of the namespace (and the class body)
         |                   // enclosing namespaces are the global namespace, Q, and Q::V
-        |    {}
+        |    { return 0 ; }
         |}
         |""".stripMargin) { cpg =>
-      fail("Not yet implemented! " + cpg)
+      inside(cpg.method.fullName.l) {
+        case List(f, h, m) =>
+          f shouldBe "Q.V.f"
+          // TODO: this might be a bug. h is declared inside of f but as extern.
+          //  Looks like extern is not part of the Eclipse CDT AST:
+          h shouldBe "Q.V.f.h"
+          m shouldBe "Q.V.C.m"
+      }
+
+      inside(cpg.namespaceBlock.l) {
+        case List(_, q, v) =>
+          q.fullName shouldBe "Q"
+          v.fullName shouldBe "Q.V"
+
+          inside(v.typeDecl.l) {
+            case List(c) =>
+              c.name shouldBe "C"
+              c.fullName shouldBe "Q.V.C"
+          }
+
+          inside(q.method.l) {
+            case List(f, m) =>
+              f.name shouldBe "f"
+              f.fullName shouldBe "Q.V.f"
+              m.name shouldBe "m"
+              m.fullName shouldBe "Q.V.C.m"
+          }
+      }
+
     }
 
     "be correct for nested namespaces in C++17 style" in NamespaceFixture(
       """
         |namespace Q::V {
-        |   class C { void m(); }; // C is a member of V and is fully defined within V
+        |   class C { int m(); }; // C is a member of V and is fully defined within V
         |                               // C::m is only declared
-        |   void f(); // f is a member of V, but is only declared here
+        |   int f(); // f is a member of V, but is only declared here
         |}
         | 
-        |void V::f() // definition of V's member f outside of V
+        |int V::f() // definition of V's member f outside of V
         |            // f's enclosing namespaces are still the global namespace, Q, and Q::V
         |{
         |    extern void h(); // This declares ::Q::V::h
+        |    return 0;
         |}
         | 
-        |void V::C::m() // definition of V::C::m outside of the namespace (and the class body)
+        |int V::C::m() // definition of V::C::m outside of the namespace (and the class body)
         |               // enclosing namespaces are the global namespace, Q, and Q::V
-        |{}
+        |{ return 0; }
         |""".stripMargin) { cpg =>
-      fail("Not yet implemented! " + cpg)
+      inside(cpg.method.fullName.l) {
+        case List(m1, f1, f2, h, m2) =>
+          // TODO: this looks strange too it first glance. But as Eclipse CDT does not provide any
+          //  mapping from definitions outside of namespace into them we cant reconstruct proper full-names.
+          m1 shouldBe "Q.V.C.m"
+          f1 shouldBe "Q.V.f"
+          f2 shouldBe "V.f"
+          h shouldBe "V.f.h"
+          m2 shouldBe "V.C.m"
+      }
+
+      inside(cpg.namespaceBlock.l) {
+        case List(_, q, v) =>
+          q.fullName shouldBe "Q"
+          v.fullName shouldBe "Q.V"
+
+          inside(v.typeDecl.l) {
+            case List(c) =>
+              c.name shouldBe "C"
+              c.fullName shouldBe "Q.V.C"
+          }
+      }
     }
 
     "be correct for unnamed namespaces" in NamespaceFixture(
@@ -102,7 +153,26 @@ class NamespaceTests extends AnyWordSpec with Matchers {
         |    A::i++; // ok, increments ::A::(unique)::i
         |    j++;    // ok, increments ::A::(unique)::j
         |}""".stripMargin) { cpg =>
-      fail("Not yet implemented! " + cpg)
+      inside(cpg.namespaceBlock.l) {
+        case List(_, unnamed1, a, unnamed2) =>
+          unnamed1.fullName shouldBe "anonymous_namespace_0"
+          a.fullName shouldBe "A"
+          unnamed2.fullName shouldBe "A.anonymous_namespace_1"
+      }
+
+      inside(cpg.method.fullName.l) {
+        case List(f, g, h) =>
+          f shouldBe "f"
+          g shouldBe "A.g"
+          h shouldBe "h"
+      }
+
+      inside(cpg.method.nameExact("h").ast.isCall.code.l) {
+        case List(c1, c2, c3) =>
+          c1 shouldBe "i++"
+          c2 shouldBe "A::i++"
+          c3 shouldBe "j++"
+      }
     }
 
     "be correct for namespaces with using" in NamespaceFixture(
@@ -122,7 +192,26 @@ class NamespaceTests extends AnyWordSpec with Matchers {
         |    X::f(); // calls ::f
         |    X::g(); // calls A::g
         |}""".stripMargin) { cpg =>
-      fail("Not yet implemented! " + cpg)
+      inside(cpg.namespaceBlock.l) {
+        case List(_, a, x) =>
+          a.fullName shouldBe "A"
+          x.fullName shouldBe "X"
+      }
+
+      inside(cpg.method.fullName.l) {
+        case List(f, g, h) =>
+          f shouldBe "f"
+          g shouldBe "A.g"
+          h shouldBe "h"
+      }
+
+      inside(cpg.call.l) {
+        case List(f, g) =>
+          f.name shouldBe "f"
+          f.methodFullName shouldBe "f"
+          g.name shouldBe "g"
+          g.methodFullName shouldBe "A.g"
+      }
     }
 
     "be correct for namespaces with using and synonyms" in NamespaceFixture(
@@ -144,7 +233,30 @@ class NamespaceTests extends AnyWordSpec with Matchers {
         |    using A::f; // this f is a synonym for both A::f(int) and A::f(char)
         |    f('a');     // calls f(char)
         |}""".stripMargin) { cpg =>
-      fail("Not yet implemented! " + cpg)
+      inside(cpg.namespaceBlock.l) {
+        case List(_, a1, a2) =>
+          // TODO: how to handle namespace extension?
+          a1.fullName shouldBe "A"
+          a2.fullName shouldBe "A"
+      }
+
+      inside(cpg.method.l) {
+        case List(f1, f2, foo, bar) =>
+          f1.fullName shouldBe "A.f"
+          f1.signature shouldBe "void A.f (int)"
+          f2.fullName shouldBe "A.f"
+          f2.signature shouldBe "void A.f (char)"
+          foo.fullName shouldBe "foo"
+          bar.fullName shouldBe "bar"
+      }
+
+      inside(cpg.call.l) {
+        case List(c1, c2) =>
+          c1.name shouldBe "f"
+          c1.methodFullName shouldBe "A.f"
+          c2.name shouldBe "f"
+          c2.methodFullName shouldBe "A.f"
+      }
     }
 
     "be correct for namespaces with alias" in NamespaceFixture("""
@@ -161,7 +273,29 @@ class NamespaceTests extends AnyWordSpec with Matchers {
         |int main() {
         |    int x = fbz::qux;
         |}""".stripMargin) { cpg =>
-      fail("Not yet implemented! " + cpg)
+      inside(cpg.namespaceBlock.l) {
+        case List(_, foo, bar, baz, fbz) =>
+          foo.name shouldBe "foo"
+          foo.fullName shouldBe "foo"
+          bar.name shouldBe "bar"
+          bar.fullName shouldBe "foo.bar"
+          baz.name shouldBe "baz"
+          baz.fullName shouldBe "foo.bar.baz"
+
+          inside(baz.ast.isIdentifier.l) {
+            case List(qux) =>
+              qux.name shouldBe "qux"
+              qux.typeFullName shouldBe "int"
+          }
+
+          fbz.name shouldBe "fbz"
+          fbz.fullName shouldBe "foo.bar.baz"
+      }
+
+      inside(cpg.identifier.name("qux").l) {
+        case List(qux) =>
+          qux.typeFullName shouldBe "int"
+      }
     }
 
   }
