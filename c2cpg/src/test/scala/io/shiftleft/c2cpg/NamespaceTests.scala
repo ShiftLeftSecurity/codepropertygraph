@@ -4,12 +4,12 @@ import better.files.File
 import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.IntervalKeyPool
-import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.Inside
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
+import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
+import org.scalatest.Inside
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 class NamespaceTests extends AnyWordSpec with Matchers with Inside {
 
@@ -292,9 +292,10 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside {
           fbz.fullName shouldBe "foo.bar.baz"
       }
 
-      inside(cpg.identifier.name("qux").l) {
-        case List(qux) =>
-          qux.typeFullName shouldBe "int"
+      inside(cpg.identifier.l) {
+        case List(qux1, _, qux2) =>
+          qux1.name shouldBe "qux"
+          qux2.name shouldBe "foo.bar.baz.qux"
       }
     }
 

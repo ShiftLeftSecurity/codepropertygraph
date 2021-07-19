@@ -1,14 +1,14 @@
 package io.shiftleft.c2cpg.passes
 
 import io.shiftleft.c2cpg.Defines
-import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated._
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.x2cpg.Ast
-import org.eclipse.cdt.core.dom.ast.cpp._
 import org.eclipse.cdt.core.dom.ast._
+import org.eclipse.cdt.core.dom.ast.cpp._
 import org.eclipse.cdt.internal.core.dom.parser.c.CASTFunctionDeclarator
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalBinding
 import org.eclipse.cdt.internal.core.dom.parser.cpp.{CPPASTFunctionDeclarator, CPPASTIdExpression, CPPFunction}
@@ -307,7 +307,10 @@ class AstCreator(filename: String, global: Global) {
   }
 
   private def astForIdentifier(ident: IASTNode, order: Int): Ast = {
-    val identifierName = ident.toString
+    val identifierName = usingDeclarationMappings.get(ident.toString.split("::").reverse.tail.mkString(".")) match {
+      case Some(n) => n + "." + ident.toString.split("::").last
+      case None    => ident.toString
+    }
 
     val variableOption = scope.lookupVariable(identifierName)
     val identifierTypeName = variableOption match {
@@ -1012,6 +1015,11 @@ class AstCreator(filename: String, global: Global) {
   private def astForNamespaceAlias(namespaceAlias: ICPPASTNamespaceAlias, order: Int): Ast = {
     val name = namespaceAlias.getAlias.toString
     val fullname = fullName(namespaceAlias)
+
+    if (!name.startsWith("::")) {
+      usingDeclarationMappings.put(name, fullname)
+    }
+
     val code = "namespace " + name + " = " + fullname
     val cpgNamespace = NewNamespaceBlock()
       .code(code)
