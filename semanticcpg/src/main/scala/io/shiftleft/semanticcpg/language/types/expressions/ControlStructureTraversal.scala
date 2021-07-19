@@ -7,8 +7,8 @@ import overflowdb.traversal.Traversal
 import overflowdb.traversal.help.Doc
 
 object ControlStructureTraversal {
-  val secondChildIndex = Int.box(2)
-  val thirdChildIndex = Int.box(3)
+  val secondChildIndex = 2
+  val thirdChildIndex = 3
 }
 
 class ControlStructureTraversal(val traversal: Traversal[ControlStructure]) extends AnyVal {
@@ -24,7 +24,7 @@ class ControlStructureTraversal(val traversal: Traversal[ControlStructure]) exte
 
   @Doc("Sub tree taken when condition evaluates to true")
   def whenTrue: Traversal[AstNode] =
-    traversal.out.has(Properties.ORDER, secondChildIndex).cast[AstNode]
+    traversal.out.has(Properties.ORDER, secondChildIndex: Int).cast[AstNode]
 
   @Doc("Sub tree taken when condition evaluates to false")
   def whenFalse: Traversal[AstNode] =

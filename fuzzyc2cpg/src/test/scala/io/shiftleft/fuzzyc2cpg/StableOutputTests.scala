@@ -13,7 +13,7 @@ class StableOutputTests extends AnyWordSpec with Matchers {
     val fuzzyc2Cpg = new FuzzyC2Cpg()
     val cpg = fuzzyc2Cpg.runAndOutput(Set(dirName), Set(".c", ".cc", ".cpp", ".h", ".hpp"))
     val nodes = cpg.graph.V().asScala.toList
-    nodes.sortBy(_.id()).map(x => x.label + ": " + x.propertyMap().asScala.toString).mkString("\n")
+    nodes.sortBy(_.id()).map(x => x.label + ": " + x.propertiesMap().asScala.toString).mkString("\n")
   }
 
   "Nodes in test graph" should {

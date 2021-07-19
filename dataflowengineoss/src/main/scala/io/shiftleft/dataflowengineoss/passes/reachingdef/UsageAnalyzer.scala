@@ -6,6 +6,8 @@ import io.shiftleft.dataflowengineoss.queryengine.AccessPathUsage.toTrackedBaseA
 import io.shiftleft.semanticcpg.accesspath.MatchResult
 import io.shiftleft.semanticcpg.language._
 
+import scala.collection.Set
+
 /**
   * Upon calculating reaching definitions, we find ourselves with
   * a set of incoming definitions `in(n)` for each node `n` of the

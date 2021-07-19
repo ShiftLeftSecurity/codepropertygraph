@@ -1,7 +1,8 @@
 package io.shiftleft.codepropertygraph.schema
 
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
+import overflowdb.schema.Property.{Cardinality, ValueType}
 import overflowdb.schema._
-import overflowdb.storage.ValueTypes
 
 object Finding extends SchemaBase {
 
@@ -24,10 +25,10 @@ object Finding extends SchemaBase {
     val key = builder
       .addProperty(
         name = "KEY",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = "This property denotes a key of a key-value pair."
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(131)
 
 // node types

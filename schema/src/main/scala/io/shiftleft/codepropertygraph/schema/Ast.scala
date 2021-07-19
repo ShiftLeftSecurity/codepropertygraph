@@ -1,6 +1,9 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Cardinality, Constant, NodeType, SchemaBuilder, SchemaInfo}
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
+import overflowdb.schema.EdgeType.Cardinality
+import overflowdb.schema.Property.ValueType
+import overflowdb.schema.{Constant, NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
 object Ast extends SchemaBase {
@@ -52,13 +55,13 @@ object Ast extends SchemaBase {
     val order = builder
       .addProperty(
         name = "ORDER",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.One,
+        valueType = ValueType.Int,
         comment = """This integer indicates the position of the node among
             |its siblings in the AST. The left-most child has an
             |order of 0.
             |""".stripMargin
       )
+      .mandatory(-1)
       .protoId(4)
 
     val astNode = builder
@@ -152,8 +155,7 @@ object Ast extends SchemaBase {
     val canonicalName = builder
       .addProperty(
         name = "CANONICAL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = """This field holds the canonical name of a `FIELD_IDENTIFIER`. It is typically
                     |identical to the CODE field, but canonicalized according to source language
                     |semantics. Human readable names are preferable. `FIELD_IDENTIFIER` nodes must
@@ -163,6 +165,7 @@ object Ast extends SchemaBase {
                     |and trade off between false negatives and false positives).
                     |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(2001092)
 
     val fieldIdentifier: NodeType = builder
@@ -186,12 +189,12 @@ object Ast extends SchemaBase {
     val modifierType = builder
       .addProperty(
         name = "MODIFIER_TYPE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = """The modifier type is a free-form string. The following are known modifier types:
             |`STATIC`, `PUBLIC`, `PROTECTED`, `PRIVATE`, `ABSTRACT`, `NATIVE`, `CONSTRUCTOR`, `VIRTUAL`.
             |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(26)
 
     val modifierTypes = builder.addConstants(
@@ -276,13 +279,13 @@ object Ast extends SchemaBase {
     val controlStructureType = builder
       .addProperty(
         name = "CONTROL_STRUCTURE_TYPE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = """The `CONTROL_STRUCTURE_TYPE` field indicates which kind of control structure
             |a `CONTROL_STRUCTURE` node represents. The available types are the following:
             | BREAK, CONTINUE, DO, WHILE, FOR, GOTO, IF, ELSE, TRY, and SWITCH.
             |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(27)
 
     val controlStructureTypes = builder.addConstants(

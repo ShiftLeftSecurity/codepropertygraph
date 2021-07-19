@@ -1,6 +1,8 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Cardinality, Constant, NodeType, SchemaBuilder, SchemaInfo}
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
+import overflowdb.schema.Property.ValueType
+import overflowdb.schema.{Constant, NodeType, SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
 object MetaData extends SchemaBase {
@@ -27,27 +29,27 @@ object MetaData extends SchemaBase {
     val overlays = builder
       .addProperty(
         name = "OVERLAYS",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.List,
+        valueType = ValueType.String,
         comment = """The field contains the names of the overlays applied to this CPG, in order of their
             |application. Names are free-form strings, that is, this specification does not
             |dictate them but rather requires tool producers and consumers to communicate them
             |between each other.
             |""".stripMargin
       )
+      .asList()
       .protoId(118)
 
     val language = builder
       .addProperty(
         name = "LANGUAGE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = """This field indicates which CPG language frontend generated the CPG.
             |Frontend developers may freely choose a value that describes their frontend
             |so long as it is not used by an existing frontend. Reserved values are to date:
             |C, LLVM, GHIDRA, PHP.
             |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(19)
 
     val metaData: NodeType = builder
