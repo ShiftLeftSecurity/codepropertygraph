@@ -34,4 +34,16 @@ object CpgSchema {
     new CpgSchema(builder)
     builder.build
   }
+
+  object PropertyDefaults {
+    val String = "<[empty]>"
+    val Boolean: Boolean = false
+    val Byte: Byte = -1
+    val Short: Short = -1
+    val Int: Int = -1
+    val Long: Long = -1
+    val Float = 0f
+    val Double = 0d
+    val Char: Char = '?'
+  }
 }

@@ -1,7 +1,8 @@
 package io.shiftleft.codepropertygraph.schema
 
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
+import overflowdb.schema.Property.ValueType
 import overflowdb.schema._
-import overflowdb.storage.ValueTypes
 
 object TagsAndLocation extends SchemaBase {
 
@@ -43,55 +44,55 @@ object TagsAndLocation extends SchemaBase {
     val symbol = builder
       .addProperty(
         name = "SYMBOL",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = ""
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(100)
 
     val methodShortName = builder
       .addProperty(
         name = "METHOD_SHORT_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = ""
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(102)
 
     val packageName = builder
       .addProperty(
         name = "PACKAGE_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = ""
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(103)
 
     val className = builder
       .addProperty(
         name = "CLASS_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = ""
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(104)
 
     val classShortName = builder
       .addProperty(
         name = "CLASS_SHORT_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = ""
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(132)
 
     val nodeLabel = builder
       .addProperty(
         name = "NODE_LABEL",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = ""
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(105)
 
     val taggedBy = builder
@@ -137,11 +138,12 @@ object TagsAndLocation extends SchemaBase {
 
 // node relations
     location
-      .addContainedNode(builder.anyNode, "node", Cardinality.ZeroOrOne)
+      .addContainedNode(builder.anyNode, "node", Property.Cardinality.ZeroOrOne)
 
+    // TODO MP: provide dummy/empty node as default, to avoid null?
     tagNodePair
-      .addContainedNode(tag, "tag", Cardinality.One)
-      .addContainedNode(builder.anyNode, "node", Cardinality.One)
+      .addContainedNode(tag, "tag", Property.Cardinality.One(Property.Default(null)))
+      .addContainedNode(builder.anyNode, "node", Property.Cardinality.One(Property.Default(null)))
 
     method
       .addOutEdge(edge = taggedBy, inNode = tag)

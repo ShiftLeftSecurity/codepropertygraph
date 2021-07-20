@@ -9,6 +9,7 @@ import overflowdb.traversal._
 import java.security.MessageDigest
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.compat.java8.OptionConverters.RichOptionalGeneric
 import scala.jdk.CollectionConverters._
 
 /**
@@ -184,7 +185,7 @@ object DiffGraph {
   }
 
   def propertiesHash(edge: Edge): Array[Byte] = {
-    val propertiesAsString = edge.propertyMap.asScala.toList.sortBy(_._1).mkString
+    val propertiesAsString = edge.propertiesMap.asScala.toList.sortBy(_._1).mkString
     MessageDigest.getInstance("MD5").digest(propertiesAsString.getBytes)
   }
 
@@ -271,15 +272,18 @@ object DiffGraph {
 
   class InverseBuilderImpl extends InverseBuilder {
     private val builder = DiffGraph.newBuilder
+
     def onNewNode(node: StoredNode) = builder.removeNode(node)
     def onNewEdge(edge: Edge) = builder.removeEdge(edge)
-    def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String) = {
-      val prop = node.propertyOption(propertyKey)
-      if (prop.isPresent)
-        builder.addNodeProperty(node, propertyKey, prop.get())
-      else
-        builder.removeNodeProperty(node.id, propertyKey)
-    }
+
+    def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String) =
+      node.propertyOption(propertyKey).asScala match {
+        case Some(value) if value != node.propertyDefaultValue(propertyKey) =>
+          builder.addNodeProperty(node, propertyKey, value)
+        case _ =>
+          builder.removeNodeProperty(node.id, propertyKey)
+      }
+
     def onBeforeEdgePropertyChange(edge: Edge, propertyKey: String) = {
       val prop = edge.propertyOption(propertyKey)
       if (prop.isPresent)

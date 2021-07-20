@@ -1,7 +1,8 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Cardinality, NodeType, SchemaBuilder, SchemaInfo}
-import overflowdb.storage.ValueTypes
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
+import overflowdb.schema.Property.ValueType
+import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
 
 object FileSystem extends SchemaBase {
 
@@ -25,8 +26,7 @@ object FileSystem extends SchemaBase {
     val filename = builder
       .addProperty(
         name = "FILENAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = """The absolute path of the source file this node was generated from. This field
             |must be set but may be set to the value `<unknown>` to indicate that no source
             |file can be associated with the node, e.g., because the node represents an
@@ -34,13 +34,13 @@ object FileSystem extends SchemaBase {
             |is is declared in is unknown.
             |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(106)
 
     val lineNumber = builder
       .addProperty(
         name = "LINE_NUMBER",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
+        valueType = ValueType.Int,
         comment = """This optional field provides the line number of the program construct
             |represented by the node.
             |""".stripMargin
@@ -50,8 +50,7 @@ object FileSystem extends SchemaBase {
     val columnNumber = builder
       .addProperty(
         name = "COLUMN_NUMBER",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
+        valueType = ValueType.Int,
         comment = """
             |This optional fields provides the column number of the program construct
             |represented by the node.
@@ -62,8 +61,7 @@ object FileSystem extends SchemaBase {
     val lineNumberEnd = builder
       .addProperty(
         name = "LINE_NUMBER_END",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
+        valueType = ValueType.Int,
         comment = """
         |This optional fields provides the line number at which the program construct
         |represented by the node ends.
@@ -74,8 +72,7 @@ object FileSystem extends SchemaBase {
     val columnNumberEnd = builder
       .addProperty(
         name = "COLUMN_NUMBER_END",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.ZeroOrOne,
+        valueType = ValueType.Int,
         comment = """
             |This optional fields provides the column number at which the program construct
             |represented by the node ends.

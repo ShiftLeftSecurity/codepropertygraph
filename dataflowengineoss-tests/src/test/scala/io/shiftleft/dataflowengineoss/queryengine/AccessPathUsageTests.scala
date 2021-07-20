@@ -31,8 +31,7 @@ class AccessPathUsageTests extends AnyWordSpec {
       val arg = argTup._1
       val idx = argTup._2
       ret --- EdgeTypes.ARGUMENT --> arg
-      val javaInt: java.lang.Integer = idx + 1
-      arg.setProperty(Properties.ARGUMENT_INDEX, javaInt)
+      arg.setProperty(Properties.ARGUMENT_INDEX, idx + 1)
     }
     ret.asInstanceOf[Call]
   }

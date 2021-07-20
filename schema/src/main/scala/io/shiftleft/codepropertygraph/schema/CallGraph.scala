@@ -1,6 +1,9 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Cardinality, Constant, SchemaBuilder, SchemaInfo}
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
+import overflowdb.schema.EdgeType.Cardinality
+import overflowdb.schema.Property.ValueType
+import overflowdb.schema.{Constant, SchemaBuilder, SchemaInfo}
 import overflowdb.storage.ValueTypes
 
 object CallGraph extends SchemaBase {
@@ -23,8 +26,7 @@ object CallGraph extends SchemaBase {
     val argumentIndex = builder
       .addProperty(
         name = "ARGUMENT_INDEX",
-        valueType = ValueTypes.INTEGER,
-        cardinality = Cardinality.One,
+        valueType = ValueType.Int,
         comment = """AST-children of CALL nodes have an argument index, that is used to match
                     |call-site arguments with callee parameters. Explicit parameters are numbered
                     |from 1 to N, while index 0 is reserved for implicit self / this parameter.
@@ -35,13 +37,13 @@ object CallGraph extends SchemaBase {
                     |ignored. It is suggested to set it to -1.
                     |""".stripMargin
       )
+      .mandatory(-1)
       .protoId(40)
 
     val argumentName = builder
       .addProperty(
         name = "ARGUMENT_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.ZeroOrOne,
+        valueType = ValueType.String,
         comment = """
             |For calls involving named parameters, the `ARGUMENT_NAME` field holds the
             |name of the parameter initialized by the expression. For all other calls,
@@ -53,11 +55,11 @@ object CallGraph extends SchemaBase {
     val methodFullName = builder
       .addProperty(
         name = "METHOD_FULL_NAME",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = """The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required
                     |to have exactly one METHOD node for each METHOD_FULL_NAME""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(54)
 
     expression
@@ -66,8 +68,7 @@ object CallGraph extends SchemaBase {
     val evaluationStrategy = builder
       .addProperty(
         name = "EVALUATION_STRATEGY",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = """For formal method input parameters, output parameters, and return parameters,
             |this field holds the evaluation strategy, which is one of the following:
             |1) `BY_REFERENCE` indicates that the parameter is passed by reference, 2)
@@ -77,6 +78,7 @@ object CallGraph extends SchemaBase {
             |that it points to is not made.
             |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(15)
 
     val evaluationStrategies = builder.addConstants(
@@ -115,8 +117,7 @@ object CallGraph extends SchemaBase {
     val dispatchType = builder
       .addProperty(
         name = "DISPATCH_TYPE",
-        valueType = ValueTypes.STRING,
-        cardinality = Cardinality.One,
+        valueType = ValueType.String,
         comment = """This field holds the dispatch type of a call, which is either `STATIC_DISPATCH` or
             |`DYNAMIC_DISPATCH`. For statically dispatched method calls, the call target is known
             |at compile time while for dynamically dispatched calls, it can only be determined at
@@ -124,6 +125,7 @@ object CallGraph extends SchemaBase {
             |calls) or calculation of an offset.
             |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(25)
 
     val call = builder
