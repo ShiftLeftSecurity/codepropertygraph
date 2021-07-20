@@ -3,6 +3,8 @@ package io.shiftleft.c2cpg
 import better.files.File
 import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Operators
+import io.shiftleft.codepropertygraph.generated.nodes.{Call, FieldIdentifier, Identifier}
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
@@ -168,10 +170,11 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside {
       }
 
       inside(cpg.method.nameExact("h").ast.isCall.code.l) {
-        case List(c1, c2, c3) =>
+        case List(c1, c2, c3, c4) =>
           c1 shouldBe "i++"
           c2 shouldBe "A::i++"
-          c3 shouldBe "j++"
+          c3 shouldBe "A::i"
+          c4 shouldBe "j++"
       }
     }
 
@@ -292,10 +295,19 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside {
           fbz.fullName shouldBe "foo.bar.baz"
       }
 
-      inside(cpg.identifier.l) {
-        case List(qux1, _, qux2) =>
-          qux1.name shouldBe "qux"
-          qux2.name shouldBe "foo.bar.baz.qux"
+      inside(cpg.call.l) {
+        case List(c1, c2, c3) =>
+          c1.code shouldBe "qux = 42"
+          c2.code shouldBe "x = fbz::qux"
+          c3.code shouldBe "fbz::qux"
+          inside(c3.ast.l) {
+            case List(call: Call, x: Identifier, a: FieldIdentifier) =>
+              call.name shouldBe Operators.fieldAccess
+              x.order shouldBe 1
+              x.name shouldBe "foo.bar.baz"
+              a.order shouldBe 2
+              a.code shouldBe "qux"
+          }
       }
     }
 

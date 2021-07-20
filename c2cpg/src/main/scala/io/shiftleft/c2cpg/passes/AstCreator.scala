@@ -11,7 +11,12 @@ import org.eclipse.cdt.core.dom.ast._
 import org.eclipse.cdt.core.dom.ast.cpp._
 import org.eclipse.cdt.internal.core.dom.parser.c.CASTFunctionDeclarator
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalBinding
-import org.eclipse.cdt.internal.core.dom.parser.cpp.{CPPASTFunctionDeclarator, CPPASTIdExpression, CPPFunction}
+import org.eclipse.cdt.internal.core.dom.parser.cpp.{
+  CPPASTFunctionDeclarator,
+  CPPASTIdExpression,
+  CPPASTQualifiedName,
+  CPPFunction
+}
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
@@ -307,10 +312,13 @@ class AstCreator(filename: String, global: Global) {
   }
 
   private def astForIdentifier(ident: IASTNode, order: Int): Ast = {
-    val identifierName = usingDeclarationMappings.get(ident.toString.split("::").reverse.tail.mkString(".")) match {
-      case Some(n) => n + "." + ident.toString.split("::").last
-      case None    => ident.toString
-    }
+    val identifierName =
+      if (!ident.toString.contains("::")) usingDeclarationMappings.getOrElse(ident.toString, ident.toString)
+      else
+        usingDeclarationMappings.get(ident.toString.split("::").reverse.tail.mkString(".")) match {
+          case Some(n) => n + "." + ident.toString.split("::").last
+          case None    => ident.toString
+        }
 
     val variableOption = scope.lookupVariable(identifierName)
     val identifierTypeName = variableOption match {
@@ -722,11 +730,35 @@ class AstCreator(filename: String, global: Global) {
     Ast(cpgDeleteNode).withChild(arg).withArgEdge(cpgDeleteNode, arg.root.get)
   }
 
+  private def astForQualifiedName(qualId: CPPASTQualifiedName, order: Int): Ast = {
+    val op = Operators.fieldAccess
+    val ma = newCallNode(qualId, op, op, DispatchTypes.STATIC_DISPATCH, order)
+
+    def fieldAccesses(names: List[IASTNode]): Ast = names match {
+      case Nil          => Ast()
+      case head :: Nil  => astForNode(head, 1)
+      case head :: tail => astForNode(head, 1).withChildren(withOrder(tail) { case (n, o) => astForNode(n, o) })
+    }
+
+    val owner = fieldAccesses(qualId.getQualifier.toIndexedSeq.toList)
+
+    val member = NewFieldIdentifier()
+      .canonicalName(qualId.getLastName.toString)
+      .code(qualId.getLastName.toString)
+      .order(2)
+      .argumentIndex(2)
+      .lineNumber(line(qualId.getLastName))
+      .columnNumber(column(qualId.getLastName))
+    Ast(ma).withChild(owner).withChild(Ast(member)).withArgEdge(ma, owner.root.get).withArgEdge(ma, member)
+  }
+
   private def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
-    case lit: IASTLiteralExpression                         => astForLiteral(lit, order)
-    case un: IASTUnaryExpression                            => astForUnaryExpression(un, order)
-    case bin: IASTBinaryExpression                          => astForBinaryExpression(bin, order)
-    case exprList: IASTExpressionList                       => astForExpressionList(exprList, order)
+    case lit: IASTLiteralExpression   => astForLiteral(lit, order)
+    case un: IASTUnaryExpression      => astForUnaryExpression(un, order)
+    case bin: IASTBinaryExpression    => astForBinaryExpression(bin, order)
+    case exprList: IASTExpressionList => astForExpressionList(exprList, order)
+    case qualId: IASTIdExpression if qualId.getName.isInstanceOf[CPPASTQualifiedName] =>
+      astForQualifiedName(qualId.getName.asInstanceOf[CPPASTQualifiedName], order)
     case ident: IASTIdExpression                            => astForIdentifier(ident, order)
     case call: IASTFunctionCallExpression                   => astForCall(call, order)
     case typeId: IASTTypeIdExpression                       => astForTypeIdExpression(typeId, order)
@@ -875,6 +907,7 @@ class AstCreator(filename: String, global: Global) {
       case s: IASTSimpleDeclSpecifier    => s.toString
       case s: IASTNamedTypeSpecifier     => s.getName.toString
       case s: IASTCompositeTypeSpecifier => s.getName.toString
+      case s: IASTEnumerationSpecifier   => s.getName.toString
       case s: IASTElaboratedTypeSpecifier if s.getParent.isInstanceOf[IASTSimpleDeclaration] =>
         val parentDecl = s.getParent.asInstanceOf[IASTSimpleDeclaration].getDeclarators.head
         val pointers = parentDecl.getPointerOperators
@@ -939,6 +972,62 @@ class AstCreator(filename: String, global: Global) {
     Ast(typeDecl).withChildren(member)
   }
 
+  private def astsForEnumerator(enumerator: IASTEnumerationSpecifier.IASTEnumerator, order: Int): Seq[Ast] = {
+    val tpe = enumerator.getParent match {
+      case enumeration: ICPPASTEnumerationSpecifier if enumeration.getBaseType != null =>
+        enumeration.getBaseType.toString
+      case _ =>
+        ASTTypeUtil.getNodeType(enumerator) match {
+          case ""       => Defines.anyTypeName
+          case someType => someType
+        }
+    }
+    val cpgMember = NewMember()
+      .code(enumerator.getRawSignature)
+      .name(enumerator.getName.toString)
+      .typeFullName(registerType(tpe))
+      .order(order)
+
+    if (enumerator.getValue != null) {
+      val operatorName = Operators.assignment
+      val callNode = newCallNode(enumerator, operatorName, operatorName, DispatchTypes.STATIC_DISPATCH, order + 1)
+      val left = astForNode(enumerator.getName, 1)
+      val right = astForNode(enumerator.getValue, 2)
+
+      Seq(Ast(cpgMember),
+          Ast(callNode)
+            .withChild(left)
+            .withArgEdge(callNode, left.root.get)
+            .withChild(right)
+            .withArgEdge(callNode, right.root.get))
+    } else {
+      Seq(Ast(cpgMember))
+    }
+
+  }
+
+  private def astForEnum(enumSpecifier: IASTEnumerationSpecifier, order: Int): Ast = {
+    val (name, fullname) = uniqueName("enum", enumSpecifier.getName.toString, fullName(enumSpecifier))
+    val cpgEnumSpecifier =
+      NewTypeDecl()
+        .name(name)
+        .fullName(fullname)
+        .isExternal(false)
+        .filename(enumSpecifier.getContainingFilename)
+        .order(order)
+
+    scope.pushNewScope(cpgEnumSpecifier)
+    var currentOrder = 0
+    val member = enumSpecifier.getEnumerators.toIndexedSeq.flatMap { e =>
+      val eCpg = astsForEnumerator(e, currentOrder)
+      currentOrder = eCpg.size + currentOrder
+      eCpg
+    }
+    scope.popScope()
+
+    Ast(cpgEnumSpecifier).withChildren(member)
+  }
+
   private def astForFunctionDeclarator(funcDecl: IASTFunctionDeclarator, order: Int): Ast = {
     val returnType = typeForDeclSpecifier(funcDecl.getParent.asInstanceOf[IASTSimpleDeclaration].getDeclSpecifier)
     val name = shortName(funcDecl)
@@ -973,13 +1062,13 @@ class AstCreator(filename: String, global: Global) {
     r
   }
 
-  private var usedNamespaces: Int = 0
+  private var usedNames: Int = 0
 
-  private def uniqueNamespaceName(name: String, fullName: String): (String, String) = {
+  private def uniqueName(target: String, name: String, fullName: String): (String, String) = {
     if (name.isEmpty && (fullName.isEmpty || fullName.endsWith("."))) {
-      val newName = "anonymous_namespace_" + usedNamespaces
-      val newFullName = fullName + "anonymous_namespace_" + usedNamespaces
-      usedNamespaces = usedNamespaces + 1
+      val newName = s"anonymous_${target}_$usedNames"
+      val newFullName = s"${fullName}anonymous_${target}_$usedNames"
+      usedNames = usedNames + 1
       (newName, newFullName)
     } else {
       (name, fullName)
@@ -988,7 +1077,7 @@ class AstCreator(filename: String, global: Global) {
 
   private def astForNamespaceDefinition(namespaceDefinition: ICPPASTNamespaceDefinition, order: Int): Ast = {
     val (name, fullname) =
-      uniqueNamespaceName(namespaceDefinition.getName.getLastName.toString, fullName(namespaceDefinition))
+      uniqueName("namespace", namespaceDefinition.getName.getLastName.toString, fullName(namespaceDefinition))
     val code = "namespace " + fullname
     val cpgNamespace = NewNamespaceBlock()
       .code(code)
@@ -1058,7 +1147,19 @@ class AstCreator(filename: String, global: Global) {
           .isInstanceOf[IASTCompositeTypeSpecifier] && declaration.getDeclarators.nonEmpty =>
       val compAst = astForCompositeType(declaration.getDeclSpecifier.asInstanceOf[IASTCompositeTypeSpecifier], order)
       val declAsts = withOrder(declaration.getDeclarators) { (d, o) =>
-        astForDeclarator(declaration, d, o)
+        astForDeclarator(declaration, d, order + o)
+      }
+      compAst +: declAsts
+    case declaration: IASTSimpleDeclaration
+        if declaration.getDeclSpecifier
+          .isInstanceOf[IASTEnumerationSpecifier] && declaration.getDeclarators.isEmpty =>
+      Seq(astForEnum(declaration.getDeclSpecifier.asInstanceOf[IASTEnumerationSpecifier], order))
+    case declaration: IASTSimpleDeclaration
+        if declaration.getDeclSpecifier
+          .isInstanceOf[IASTEnumerationSpecifier] && declaration.getDeclarators.nonEmpty =>
+      val compAst = astForEnum(declaration.getDeclSpecifier.asInstanceOf[IASTEnumerationSpecifier], order)
+      val declAsts = withOrder(declaration.getDeclarators) { (d, o) =>
+        astForDeclarator(declaration, d, order + o)
       }
       compAst +: declAsts
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.nonEmpty =>
@@ -1067,10 +1168,9 @@ class AstCreator(filename: String, global: Global) {
         case d if d.getInitializer != null => astForInitializer(d, d.getInitializer, order)
         case d                             => astForDeclarator(declaration, d, order)
       }
-    case namespaceAlias: ICPPASTNamespaceAlias                                    => Seq(astForNamespaceAlias(namespaceAlias, order))
-    case namespaceDefinition: ICPPASTNamespaceDefinition                          => Seq(astForNamespaceDefinition(namespaceDefinition, order))
-    case _: ICPPASTVisibilityLabel                                                => Seq.empty
-    case declaration: IASTSimpleDeclaration if declaration.getDeclarators.isEmpty => Seq.empty
+    case namespaceAlias: ICPPASTNamespaceAlias           => Seq(astForNamespaceAlias(namespaceAlias, order))
+    case namespaceDefinition: ICPPASTNamespaceDefinition => Seq(astForNamespaceDefinition(namespaceDefinition, order))
+    case _: ICPPASTVisibilityLabel                       => Seq.empty
     case usingDecl: ICPPASTUsingDeclaration =>
       handleUsingDeclaration(usingDecl)
       Seq.empty

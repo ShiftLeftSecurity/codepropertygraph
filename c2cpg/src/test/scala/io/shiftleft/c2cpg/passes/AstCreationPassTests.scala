@@ -511,9 +511,18 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for typedef" in Fixture(
+    "be correct for typedef struct" in Fixture(
       """
         |typedef struct foo {
+        |} abc;
+      """.stripMargin
+    ) { cpg =>
+      cpg.typeDecl.name("abc").aliasTypeFullName("foo").size shouldBe 1
+    }
+
+    "be correct for typedef enum" in Fixture(
+      """
+        |typedef enum foo {
         |} abc;
       """.stripMargin
     ) { cpg =>
