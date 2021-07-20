@@ -24,6 +24,7 @@ object ProjectRoot {
 
     if (File(fileThatOnlyExistsInRoot).exists) "."
     else if (File(s"../$fileThatOnlyExistsInRoot").exists) ".."
+    else if (File(s"../../$fileThatOnlyExistsInRoot").exists) ".."
     else ???
   }
 
