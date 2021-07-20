@@ -220,14 +220,14 @@ object Linker {
           val defaultValueMaybe = Option(srcStoredNode.propertyDefaultValue(dstFullNameKey))
           if (defaultValueMaybe.isEmpty || defaultValueMaybe.get != dstFullName) {
             dstNodeMap.get(dstFullName) match {
-            case Some(dstNode) =>
-              dstGraph.addEdgeInOriginal(srcStoredNode, dstNode, edgeType)
-            case None =>
-              if (dstNotExistsHandler.isDefined) {
-                dstNotExistsHandler.get(srcStoredNode, dstFullName)
-              } else {
-                logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
-              }
+              case Some(dstNode) =>
+                dstGraph.addEdgeInOriginal(srcStoredNode, dstNode, edgeType)
+              case None =>
+                if (dstNotExistsHandler.isDefined) {
+                  dstNotExistsHandler.get(srcStoredNode, dstFullName)
+                } else {
+                  logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
+                }
             }
           }
         }
