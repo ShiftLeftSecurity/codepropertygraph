@@ -15,7 +15,7 @@ class StableOutputTests extends AnyWordSpec with Matchers {
     val config = Config(includePaths = Set(dirName))
     val cpg = c2cpg.runAndOutput(config)
     val nodes = cpg.graph.V().asScala.toList
-    nodes.sortBy(_.id()).map(x => x.label + ": " + x.propertyMap().asScala.toString).mkString("\n")
+    nodes.sortBy(_.id()).map(x => x.label + ": " + x.propertiesMap().asScala.toString).mkString("\n")
   }
 
   "Nodes in test graph" should {
