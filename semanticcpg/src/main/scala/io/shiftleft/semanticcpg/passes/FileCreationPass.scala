@@ -26,13 +26,15 @@ class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
     }
 
     def createFileIfDoesNotExist(srcNode: StoredNode, destFullName: String): Unit = {
-      val dstFullName = if (destFullName == "") { FileTraversal.UNKNOWN } else { destFullName }
-      val newFile = newFileNameToNode.getOrElseUpdate(dstFullName, {
-        val file = NewFile().name(dstFullName).order(0)
-        dstGraph.addNode(file)
-        file
-      })
-      dstGraph.addEdgeFromOriginal(srcNode, newFile, EdgeTypes.SOURCE_FILE)
+      if (destFullName != srcNode.propertyDefaultValue(PropertyNames.FILENAME)) {
+        val dstFullName = if (destFullName == "") { FileTraversal.UNKNOWN } else { destFullName }
+        val newFile = newFileNameToNode.getOrElseUpdate(dstFullName, {
+          val file = NewFile().name(dstFullName).order(0)
+          dstGraph.addNode(file)
+          file
+        })
+        dstGraph.addEdgeFromOriginal(srcNode, newFile, EdgeTypes.SOURCE_FILE)
+      }
     }
 
     // Create SOURCE_FILE edges from nodes of various types
