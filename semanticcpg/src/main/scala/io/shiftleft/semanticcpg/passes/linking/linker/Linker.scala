@@ -216,16 +216,18 @@ object Linker {
         srcNode.propertyOption(new PropertyKey[String](dstFullNameKey)).ifPresent { dstFullName =>
           // for `UNKNOWN` this is not always set, so we're using an Option here
           val srcStoredNode = srcNode.asInstanceOf[StoredNode]
-          if (dstFullName != "<[empty]>") {
+
+          val defaultValueMaybe = Option(srcStoredNode.propertyDefaultValue(dstFullNameKey))
+          if (defaultValueMaybe.isEmpty || defaultValueMaybe.get != dstFullName) {
             dstNodeMap.get(dstFullName) match {
-              case Some(dstNode) =>
-                dstGraph.addEdgeInOriginal(srcStoredNode, dstNode, edgeType)
-              case None =>
-                if (dstNotExistsHandler.isDefined) {
-                  dstNotExistsHandler.get(srcStoredNode, dstFullName)
-                } else {
-                  logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
-                }
+            case Some(dstNode) =>
+              dstGraph.addEdgeInOriginal(srcStoredNode, dstNode, edgeType)
+            case None =>
+              if (dstNotExistsHandler.isDefined) {
+                dstNotExistsHandler.get(srcStoredNode, dstFullName)
+              } else {
+                logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
+              }
             }
           }
         }
