@@ -221,7 +221,7 @@ object Linker {
               dstGraph.addEdgeInOriginal(srcStoredNode, dstNode, edgeType)
             case None if dstNotExistsHandler.isDefined =>
               dstNotExistsHandler.get(srcStoredNode, dstFullName)
-            case _ => 
+            case _ =>
               logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
           }
         }
