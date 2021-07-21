@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.passes
 import io.shiftleft.OverflowDbTestInstance
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
+import io.shiftleft.passes.CpgPassRunner
 import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -35,7 +36,7 @@ class CfgDominatorPassTests extends AnyWordSpec with Matchers {
     v5 --- EdgeTypes.CFG --> v6
 
     val dominatorTreePass = new CfgDominatorPass(cpg)
-    dominatorTreePass.createAndApply()
+    CpgPassRunner.apply(dominatorTreePass)
 
     val v0Dominates = v0.out(EdgeTypes.DOMINATE).asScala.toList
     v0Dominates.size shouldBe 1

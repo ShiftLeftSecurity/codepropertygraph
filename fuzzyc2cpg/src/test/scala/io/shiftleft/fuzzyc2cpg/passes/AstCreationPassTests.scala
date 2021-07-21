@@ -4,7 +4,7 @@ import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, Operators}
-import io.shiftleft.passes.IntervalKeyPool
+import io.shiftleft.passes.{CpgPassRunner, IntervalKeyPool}
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -20,8 +20,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       expectedFilenameFields.foreach { filename =>
         (dir / filename).write("//foo")
       }
-      new AstCreationPass(filenames, cpg, new IntervalKeyPool(1, 1000))
-        .createAndApply()
+      CpgPassRunner.apply(new AstCreationPass(filenames, cpg, new IntervalKeyPool(1, 1000)))
 
       "create one NamespaceBlock per file" in {
         val expectedNamespaceFullNames = expectedFilenameFields.map(f => s"$f:<global>").toSet
@@ -753,7 +752,7 @@ object Fixture {
       val cpg = Cpg.emptyCpg
       val keyPool = new IntervalKeyPool(1001, 2000)
       val filenames = List(file1.path.toAbsolutePath.toString, file2.path.toAbsolutePath.toString)
-      new AstCreationPass(filenames, cpg, keyPool).createAndApply()
+      CpgPassRunner.apply(new AstCreationPass(filenames, cpg, keyPool))
 
       f(cpg)
     }

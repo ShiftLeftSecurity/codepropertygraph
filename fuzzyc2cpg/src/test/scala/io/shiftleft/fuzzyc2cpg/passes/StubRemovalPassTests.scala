@@ -2,7 +2,7 @@ package io.shiftleft.fuzzyc2cpg.passes
 
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.IntervalKeyPool
+import io.shiftleft.passes.{CpgPassRunner, IntervalKeyPool}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import org.scalatest.matchers.should.Matchers
@@ -56,9 +56,12 @@ object StubRemovalPassFixture {
       val cpg = Cpg.emptyCpg
       val keyPool = new IntervalKeyPool(1001, 2000)
       val filenames = List(file1.path.toAbsolutePath.toString)
-      new AstCreationPass(filenames, cpg, keyPool).createAndApply()
-      new CfgCreationPass(cpg).createAndApply()
-      new StubRemovalPass(cpg).createAndApply()
+
+      val passRunner = new CpgPassRunner(cpg, outputDir = None, inverse = false)
+      passRunner.addPass(new AstCreationPass(filenames, cpg, keyPool))
+      passRunner.addPass(new CfgCreationPass(cpg))
+      passRunner.addPass(new StubRemovalPass(cpg))
+      passRunner.run()
       f(cpg)
     }
   }

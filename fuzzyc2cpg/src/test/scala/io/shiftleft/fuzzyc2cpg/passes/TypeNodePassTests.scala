@@ -2,7 +2,7 @@ package io.shiftleft.fuzzyc2cpg.passes
 
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.IntervalKeyPool
+import io.shiftleft.passes.{CpgPassRunner, IntervalKeyPool}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
 import org.scalatest.matchers.should.Matchers
@@ -28,8 +28,8 @@ object TypeNodePassFixture {
       val keyPool = new IntervalKeyPool(1001, 2000)
       val filenames = List(file1.path.toAbsolutePath.toString)
       val astCreator = new AstCreationPass(filenames, cpg, keyPool)
-      astCreator.createAndApply()
-      new TypeNodePass(astCreator.global.usedTypes.keys().asScala.toList, cpg).createAndApply()
+      CpgPassRunner.apply(astCreator)
+      CpgPassRunner.apply(new TypeNodePass(astCreator.global.usedTypes.keys().asScala.toList, cpg))
 
       f(cpg)
     }

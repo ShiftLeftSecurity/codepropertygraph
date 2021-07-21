@@ -3,7 +3,7 @@ package io.shiftleft.fuzzyc2cpg.passes
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.CfgNode
-import io.shiftleft.passes.IntervalKeyPool
+import io.shiftleft.passes.{CpgPassRunner, IntervalKeyPool}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.semanticcpg.passes.cfgcreation.Cfg._
@@ -466,8 +466,10 @@ class CfgFixture(file1Code: String) {
     file1.write(s"RET func() { $file1Code }")
     val keyPoolFile1 = new IntervalKeyPool(1001, 2000)
     val filenames = List(file1.path.toAbsolutePath.toString)
-    new AstCreationPass(filenames, cpg, keyPoolFile1).createAndApply()
-    new CfgCreationPass(cpg).createAndApply()
+    val passRunner = new CpgPassRunner(cpg, outputDir = None, inverse = false)
+    passRunner.addPass(new AstCreationPass(filenames, cpg, keyPoolFile1))
+    passRunner.addPass(new CfgCreationPass(cpg))
+    passRunner.run()
   }
 
   val codeToNode: Map[String, CfgNode] =

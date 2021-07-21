@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
+import io.shiftleft.passes.CpgPassRunner
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
@@ -17,7 +18,7 @@ class NamespaceCreatorTests extends AnyWordSpec with Matchers {
     val block3 = graph + (NodeTypes.NAMESPACE_BLOCK, Properties.NAME -> "namespace2")
 
     val namespaceCreator = new NamespaceCreator(new Cpg(graph))
-    namespaceCreator.createAndApply()
+    CpgPassRunner.apply(namespaceCreator)
 
     val namespaces = cpg.namespace.l
     namespaces.size shouldBe 2

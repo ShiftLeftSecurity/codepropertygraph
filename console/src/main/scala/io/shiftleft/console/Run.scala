@@ -26,7 +26,7 @@ object Run {
               Iterator(diffGraph.build())
             }
           }
-          runPass(pass, context, storeUndoInfo)
+          runPasses(pass::Nil, context, storeUndoInfo)
         }
         override def probe(cpg: Cpg): Boolean = false
       }

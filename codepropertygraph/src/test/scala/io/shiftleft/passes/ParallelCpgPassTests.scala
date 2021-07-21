@@ -1,7 +1,6 @@
 package io.shiftleft.passes
 
 import better.files.File
-import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Properties
 import io.shiftleft.codepropertygraph.generated.nodes.NewFile
@@ -34,17 +33,14 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
 
   "ParallelCpgPass" should {
     "allow creating and applying result of pass" in Fixture() { (cpg, pass) =>
-      pass.createAndApply()
+      CpgPassRunner.apply(pass)
       cpg.graph.nodes.map(_.property(Properties.NAME)).toSet shouldBe Set("foo", "bar")
     }
 
     "produce a serialized inverse CPG" in Fixture() { (_, pass) =>
-      File.usingTemporaryFile("pass", ".zip") { file =>
-        file.delete()
-        val filename = file.path.toString
-        val serializedCpg = new SerializedCpg(filename)
-        pass.createApplySerializeAndStore(serializedCpg, true)
-        serializedCpg.close()
+      File.usingTemporaryDirectory("cpgPassTests") { dir =>
+        val file = dir / "0MyPass.zip"
+        CpgPassRunner.applyAndStore(pass, dir.toString, false)
         file.exists shouldBe true
         file.size should not be 0
       }
@@ -56,7 +52,7 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
     )
 
     "take into account KeyPools for createAndApply" in Fixture(Some(keyPools)) { (cpg, pass) =>
-      pass.createAndApply()
+      CpgPassRunner.apply(pass)
       cpg.graph.V.asScala.map(_.id()).toSet shouldBe Set(10, 30)
     }
 

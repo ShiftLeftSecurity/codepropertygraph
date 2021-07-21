@@ -41,16 +41,13 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
       .getOrElse(throw new Exception("Meta node missing."))
 
     val enhancementExecList = createEnhancementExecList(cpg, language)
-    enhancementExecList.zipWithIndex.foreach {
-      case (pass, index) =>
-        runPass(pass, context, storeUndoInfo, index)
-    }
+    runPasses(enhancementExecList, context, storeUndoInfo)
   }
 
-  private def createEnhancementExecList(cpg: Cpg, language: String): Iterator[CpgPassBase] = {
+  private def createEnhancementExecList(cpg: Cpg, language: String): List[CpgPassBase] = {
     language match {
       case Languages.JAVA =>
-        Iterator(
+        List(
           new ReceiverEdgePass(cpg),
           new MethodDecoratorPass(cpg),
           new Linker(cpg),
@@ -66,7 +63,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new TrimPass(cpg),
         )
       case Languages.C =>
-        Iterator(
+        List(
           new TypeDeclStubCreator(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
@@ -81,7 +78,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CdgPass(cpg),
         )
       case Languages.LLVM =>
-        Iterator(
+        List(
           new TypeDeclStubCreator(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
@@ -97,7 +94,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CdgPass(cpg),
         )
       case Languages.JAVASCRIPT =>
-        Iterator(
+        List(
           new CfgCreationPass(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
@@ -111,7 +108,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new NamespaceCreator(cpg),
         )
       case Languages.PYTHON =>
-        Iterator(
+        List(
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
           new Linker(cpg),
@@ -124,7 +121,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new NamespaceCreator(cpg),
         )
       case Languages.FUZZY_TEST_LANG =>
-        Iterator(
+        List(
           new CfgCreationPass(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
@@ -137,7 +134,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CdgPass(cpg),
           new NamespaceCreator(cpg),
         )
-      case _ => Iterator()
+      case _ => List()
     }
   }
 
