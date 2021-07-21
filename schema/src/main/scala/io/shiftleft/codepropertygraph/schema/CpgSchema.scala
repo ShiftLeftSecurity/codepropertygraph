@@ -36,7 +36,7 @@ object CpgSchema {
   }
 
   object PropertyDefaults {
-    val String = "<[empty]>"
+    val String = "<empty>"
     val Boolean: Boolean = false
     val Byte: Byte = -1
     val Short: Short = -1
