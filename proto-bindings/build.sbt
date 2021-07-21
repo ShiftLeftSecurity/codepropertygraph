@@ -22,6 +22,7 @@ copyLatestCpgProto := {
 lazy val installProtoc = taskKey[File]("downloads configured protoc version for your platform, unless already available")
 installProtoc := {
   import sys.process._
+  import java.nio.file.Files
   // import better.files.FileExtensions
   val protocVersion = (ProtobufConfig/version).value
   val protocBinary = new File(protocBinaryPath)
@@ -40,7 +41,9 @@ installProtoc := {
     val outdir = new File(protocLocalDir)
     FileUtils.deleteRecursively(outdir)
     IO.unzipURL(url, outdir)
-    protocBinary.addPermission(java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE)
+    val permissionSet = new java.util.HashSet[java.nio.file.attribute.PosixFilePermission]()
+    permissionSet.add(java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE)
+    Files.setPosixFilePermissions(protocBinary.toPath(), permissionSet)
   }
   protocBinary
 }
