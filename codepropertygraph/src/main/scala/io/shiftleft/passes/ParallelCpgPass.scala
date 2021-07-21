@@ -17,7 +17,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
   def runOnPart(part: T): Iterator[DiffGraph]
 
   override def createAndApply(): Unit = {
-    withWriter() { writer =>
+    withWriter(new SerializedCpg(), "", false) { writer =>
       enqueueInParallel(writer)
     }
   }
@@ -28,9 +28,9 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
     }
   }
 
-  private def withWriter[X](serializedCpg: SerializedCpg = new SerializedCpg(),
-                            prefix: String = "",
-                            inverse: Boolean = false)(f: Writer => Unit): Unit = {
+  private def withWriter[X](serializedCpg: SerializedCpg,
+                            prefix: String,
+                            inverse: Boolean)(f: Writer => Unit): Unit = {
     val writer = new Writer(serializedCpg, prefix, inverse)
     val writerThread = new Thread(writer)
     writerThread.setName("Writer")
