@@ -36,7 +36,7 @@ class CfgDominatorPassTests extends AnyWordSpec with Matchers {
     v5 --- EdgeTypes.CFG --> v6
 
     val dominatorTreePass = new CfgDominatorPass(cpg)
-    CpgPassRunner.apply(dominatorTreePass)
+    CpgPassRunner.apply(cpg, dominatorTreePass)
 
     val v0Dominates = v0.out(EdgeTypes.DOMINATE).asScala.toList
     v0Dominates.size shouldBe 1

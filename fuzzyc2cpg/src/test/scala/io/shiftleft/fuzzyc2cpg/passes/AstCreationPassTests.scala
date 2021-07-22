@@ -20,7 +20,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       expectedFilenameFields.foreach { filename =>
         (dir / filename).write("//foo")
       }
-      CpgPassRunner.apply(new AstCreationPass(filenames, cpg, new IntervalKeyPool(1, 1000)))
+      CpgPassRunner.apply(cpg, new AstCreationPass(filenames, cpg, new IntervalKeyPool(1, 1000)))
 
       "create one NamespaceBlock per file" in {
         val expectedNamespaceFullNames = expectedFilenameFields.map(f => s"$f:<global>").toSet
@@ -752,7 +752,7 @@ object Fixture {
       val cpg = Cpg.emptyCpg
       val keyPool = new IntervalKeyPool(1001, 2000)
       val filenames = List(file1.path.toAbsolutePath.toString, file2.path.toAbsolutePath.toString)
-      CpgPassRunner.apply(new AstCreationPass(filenames, cpg, keyPool))
+      CpgPassRunner.apply(cpg, new AstCreationPass(filenames, cpg, keyPool))
 
       f(cpg)
     }

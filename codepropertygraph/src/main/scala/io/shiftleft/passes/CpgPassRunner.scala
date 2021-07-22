@@ -13,14 +13,14 @@ import scala.concurrent.duration.DurationLong
 object CpgPassRunner {
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  def apply(pass: CpgPassBase): Unit = {
-    val runner = new CpgPassRunner(pass.cpg, outputDir = None, inverse = false)
+  def apply(cpg: Cpg, pass: CpgPassBase): Unit = {
+    val runner = new CpgPassRunner(cpg, outputDir = None, inverse = false)
     runner.addPass(pass)
     runner.run()
   }
 
-  def applyAndStore(pass: CpgPassBase, outputDir: String, inverse: Boolean): Unit = {
-    val runner = new CpgPassRunner(pass.cpg, Some(outputDir), inverse)
+  def applyAndStore(cpg: Cpg, pass: CpgPassBase, outputDir: String, inverse: Boolean): Unit = {
+    val runner = new CpgPassRunner(cpg, Some(outputDir), inverse)
     runner.addPass(pass)
     runner.run()
   }
@@ -49,17 +49,21 @@ class CpgPassRunner(cpg: Cpg,
         new SerializedCpg()
       }
 
-      pass match {
-        case parallelPass: ParallelCpgPass[_] =>
-          withWriter(serializedCpg) { writer =>
-            enqueueInParallel(writer, parallelPass)
-          }
-        case cpgPass: CpgPass =>
-          withStartEndTimesLogged(cpgPass.name) {
-            cpgPass.run().foreach { diffGraph =>
-              applyDiffGraph(serializedCpg, diffGraph, cpgPass)
+      try {
+        pass match {
+          case parallelPass: ParallelCpgPass[_] =>
+            withWriter(serializedCpg) { writer =>
+              enqueueInParallel(writer, parallelPass)
             }
-          }
+          case cpgPass: CpgPass =>
+            withStartEndTimesLogged(cpgPass.name) {
+              cpgPass.run().foreach { diffGraph =>
+                applyDiffGraph(serializedCpg, diffGraph, cpgPass)
+              }
+            }
+        }
+      } finally {
+        serializedCpg.close()
       }
 
       index += 1

@@ -29,21 +29,21 @@ class CpgPassTests extends AnyWordSpec with Matchers {
 
   "CpgPass" should {
     "allow creating and applying result of pass" in Fixture() { (cpg, pass) =>
-      CpgPassRunner.apply(pass)
+      CpgPassRunner.apply(cpg, pass)
       cpg.graph.V().asScala.map(_.label).toSet shouldBe Set("FILE")
     }
 
-    "produce a serialized inverse CPG" in Fixture() { (_, pass) =>
+    "produce a serialized inverse CPG" in Fixture() { (cpg, pass) =>
       File.usingTemporaryDirectory("cpgPassTests") { dir =>
-        val file = dir / "0MyPass.zip"
-        CpgPassRunner.applyAndStore(pass, dir.toString, false)
+        val file = dir / "0_io.shiftleft.passes.CpgPassTests$Fixture$MyPass$1"
+        CpgPassRunner.applyAndStore(cpg, pass, dir.toString, false)
         file.exists shouldBe true
         file.size should not be 0
       }
     }
 
     "take into account KeyPool for createAndApply" in Fixture(Some(new IntervalKeyPool(100, 120))) { (cpg, pass) =>
-      CpgPassRunner.apply(pass)
+      CpgPassRunner.apply(cpg, pass)
       cpg.graph.V.asScala.map(_.id()).toSet shouldBe Set(100, 101)
     }
   }

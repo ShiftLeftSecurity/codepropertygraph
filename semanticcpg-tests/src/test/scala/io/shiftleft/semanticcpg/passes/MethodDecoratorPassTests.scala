@@ -27,8 +27,9 @@ class MethodDecoratorPassTests extends AnyWordSpec with Matchers {
 
     method --- EdgeTypes.AST --> parameterIn
 
-    val methodDecorator = new MethodDecoratorPass(new Cpg(graph))
-    CpgPassRunner.apply(methodDecorator)
+    val cpg = new Cpg(graph)
+    val methodDecorator = new MethodDecoratorPass(cpg)
+    CpgPassRunner.apply(cpg, methodDecorator)
 
     val parameterOut = parameterIn._methodParameterOutViaParameterLinkOut.next()
     parameterOut.code shouldBe "p1"

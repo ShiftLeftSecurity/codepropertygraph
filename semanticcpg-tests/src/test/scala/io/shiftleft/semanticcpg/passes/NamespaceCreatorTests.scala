@@ -18,7 +18,7 @@ class NamespaceCreatorTests extends AnyWordSpec with Matchers {
     val block3 = graph + (NodeTypes.NAMESPACE_BLOCK, Properties.NAME -> "namespace2")
 
     val namespaceCreator = new NamespaceCreator(new Cpg(graph))
-    CpgPassRunner.apply(namespaceCreator)
+    CpgPassRunner.apply(cpg, namespaceCreator)
 
     val namespaces = cpg.namespace.l
     namespaces.size shouldBe 2

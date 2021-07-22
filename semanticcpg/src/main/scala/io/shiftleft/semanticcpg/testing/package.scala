@@ -194,7 +194,7 @@ package object testing {
           Iterator(diffGraph.build())
         }
       }
-      CpgPassRunner.apply(new MyPass())
+      CpgPassRunner.apply(cpg, new MyPass())
       this
     }
   }

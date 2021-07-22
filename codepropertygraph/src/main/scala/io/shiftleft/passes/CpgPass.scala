@@ -100,8 +100,6 @@ trait CpgPassBase {
     */
   def name: String = getClass.getName
 
-  def cpg: Cpg
-
   protected def serialize(appliedDiffGraph: AppliedDiffGraph, inverse: Boolean): GeneratedMessageV3 = {
     if (inverse) {
       new DiffGraphProtoSerializer().serialize(appliedDiffGraph.inverseDiffGraph.get)
