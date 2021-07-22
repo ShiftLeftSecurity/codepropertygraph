@@ -1,5 +1,4 @@
 package io.shiftleft.passes
-import io.shiftleft.codepropertygraph.Cpg
 
 import scala.annotation.nowarn
 
@@ -10,7 +9,7 @@ class WorkItem[T](item: T, runOnPart: T => Iterator[DiffGraph]) {
 }
 
 @nowarn
-abstract class ParallelCpgPass[T](val cpg: Cpg, outName: String = "", val keyPools: Option[Iterator[KeyPool]] = None)
+abstract class ParallelCpgPass[T](outName: String = "", val keyPools: Option[Iterator[KeyPool]] = None)
     extends CpgPassBase {
 
   def init(): Unit = {}

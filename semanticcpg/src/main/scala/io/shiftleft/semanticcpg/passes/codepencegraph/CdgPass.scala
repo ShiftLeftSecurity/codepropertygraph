@@ -13,7 +13,7 @@ import scala.jdk.CollectionConverters._
 /**
   * This pass has ContainsEdgePass and CfgDominatorPass as prerequisites.
   */
-class CdgPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
+class CdgPass(cpg: Cpg) extends ParallelCpgPass[Method] {
   import CdgPass.logger
 
   override def partIterator: Iterator[Method] = cpg.method.iterator

@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.fuzzyc2cpg.passes.{AstCreationPass, StubRemovalPass}
 import io.shiftleft.passes.{CpgPassRunner, IntervalKeyPool}
-import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.semanticcpg.passes.{CfgCreationPass, FileCreationPass}
 import io.shiftleft.utils.ProjectRoot
@@ -20,7 +19,7 @@ case class CpgTestFixture(projectName: String) {
 
   val passRunner = new CpgPassRunner(cpg, outputDir = None, inverse = false)
   passRunner.addPass(new MetaDataPass(Languages.C))
-  passRunner.addPass(new AstCreationPass(filenames, cpg, keyPoolFile1))
+  passRunner.addPass(new AstCreationPass(filenames, keyPoolFile1))
   passRunner.addPass(new CfgCreationPass(cpg))
   passRunner.addPass(new StubRemovalPass(cpg))
   passRunner.addPass(new FileCreationPass(cpg))

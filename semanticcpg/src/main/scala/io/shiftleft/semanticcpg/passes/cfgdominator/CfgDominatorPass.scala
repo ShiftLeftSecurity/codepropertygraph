@@ -12,7 +12,7 @@ import scala.collection.mutable
 /**
   * This pass has no prerequisites.
   */
-class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
+class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[Method] {
 
   override def partIterator: Iterator[Method] = cpg.method.iterator
 

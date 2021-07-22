@@ -15,7 +15,7 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
   private object Fixture {
     def apply(keyPools: Option[Iterator[KeyPool]] = None)(f: (Cpg, CpgPassBase) => Unit): Unit = {
       val cpg = Cpg.emptyCpg
-      class MyPass(cpg: Cpg) extends ParallelCpgPass[String](cpg, "MyPass", keyPools) {
+      class MyPass extends ParallelCpgPass[String]("MyPass", keyPools) {
         override def partIterator: Iterator[String] = {
           Iterator("foo", "bar")
         }
@@ -26,7 +26,7 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
           Iterator(diffGraph.build())
         }
       }
-      val pass = new MyPass(cpg)
+      val pass = new MyPass()
       f(cpg, pass)
     }
   }

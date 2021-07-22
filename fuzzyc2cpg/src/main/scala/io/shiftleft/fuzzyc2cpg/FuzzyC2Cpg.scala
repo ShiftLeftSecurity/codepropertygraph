@@ -81,7 +81,7 @@ class FuzzyC2Cpg() {
 
     val passRunner = new CpgPassRunner(cpg, outputDir = None, inverse = false)
     passRunner.addPass(new MetaDataPass(Languages.C, Some(metaDataKeyPool)))
-    val astCreator = new AstCreationPass(sourceFileNames, cpg, functionKeyPool)
+    val astCreator = new AstCreationPass(sourceFileNames, functionKeyPool)
     passRunner.addPass(astCreator)
     passRunner.addPass(new CfgCreationPass(cpg))
     passRunner.addPass(new StubRemovalPass(cpg))

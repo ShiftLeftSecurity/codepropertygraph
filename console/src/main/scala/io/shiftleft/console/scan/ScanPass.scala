@@ -5,8 +5,7 @@ import io.shiftleft.console.Query
 import io.shiftleft.passes.{DiffGraph, KeyPoolCreator, ParallelCpgPass}
 
 class ScanPass(cpg: Cpg, queries: List[Query])
-    extends ParallelCpgPass[Query](cpg,
-                                   keyPools = Some(KeyPoolCreator.obtain(queries.size.toLong, 42949672950L).iterator)) {
+    extends ParallelCpgPass[Query](keyPools = Some(KeyPoolCreator.obtain(queries.size.toLong, 42949672950L).iterator)) {
 
   override def partIterator: Iterator[Query] = queries.iterator
 

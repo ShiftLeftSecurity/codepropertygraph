@@ -467,7 +467,7 @@ class CfgFixture(file1Code: String) {
     val keyPoolFile1 = new IntervalKeyPool(1001, 2000)
     val filenames = List(file1.path.toAbsolutePath.toString)
     val passRunner = new CpgPassRunner(cpg, outputDir = None, inverse = false)
-    passRunner.addPass(new AstCreationPass(filenames, cpg, keyPoolFile1))
+    passRunner.addPass(new AstCreationPass(filenames, keyPoolFile1))
     passRunner.addPass(new CfgCreationPass(cpg))
     passRunner.run()
   }

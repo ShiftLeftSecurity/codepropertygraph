@@ -19,7 +19,7 @@ case class NameAndSignature(name: String, signature: String, fullName: String)
 /**
   * This pass has no other pass as prerequisite.
   */
-class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int)](cpg) {
+class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int)] {
 
   // Since the method fullNames for fuzzyc are not unique, we do not have
   // a 1to1 relation and may overwrite some values. We deem this ok for now.

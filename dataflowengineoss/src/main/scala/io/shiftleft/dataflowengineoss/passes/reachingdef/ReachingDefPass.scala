@@ -11,7 +11,7 @@ import scala.collection.Set
 /**
   * A pass that calculates reaching definitions ("data dependencies").
   * */
-class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
+class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[Method] {
 
   override def partIterator: Iterator[Method] = cpg.method.iterator
 

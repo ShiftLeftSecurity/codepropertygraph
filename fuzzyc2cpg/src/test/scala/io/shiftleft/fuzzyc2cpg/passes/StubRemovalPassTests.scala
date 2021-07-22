@@ -58,7 +58,7 @@ object StubRemovalPassFixture {
       val filenames = List(file1.path.toAbsolutePath.toString)
 
       val passRunner = new CpgPassRunner(cpg, outputDir = None, inverse = false)
-      passRunner.addPass(new AstCreationPass(filenames, cpg, keyPool))
+      passRunner.addPass(new AstCreationPass(filenames, keyPool))
       passRunner.addPass(new CfgCreationPass(cpg))
       passRunner.addPass(new StubRemovalPass(cpg))
       passRunner.run()

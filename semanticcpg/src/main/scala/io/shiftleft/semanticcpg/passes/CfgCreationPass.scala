@@ -17,7 +17,7 @@ import io.shiftleft.semanticcpg.passes.cfgcreation.CfgCreator
   * only creates edges at the moment. Therefore, we currently
   * do without key pools.
   * */
-class CfgCreationPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
+class CfgCreationPass(cpg: Cpg) extends ParallelCpgPass[Method] {
 
   override def partIterator: Iterator[Method] = cpg.method.iterator
 
