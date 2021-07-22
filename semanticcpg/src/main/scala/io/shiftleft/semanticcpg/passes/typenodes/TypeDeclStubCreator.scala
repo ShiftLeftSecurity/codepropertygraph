@@ -45,7 +45,7 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass {
       .filename(FileTraversal.UNKNOWN)
   }
 
-  private def init(): Unit = {
+  override def init(): Unit = {
     cpg.typeDecl
       .sideEffect { typeDecl =>
         typeDeclFullNameToNode += typeDecl.fullName -> typeDecl

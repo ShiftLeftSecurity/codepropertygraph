@@ -11,7 +11,7 @@ import scala.jdk.CollectionConverters._
 class CpgPassTests extends AnyWordSpec with Matchers {
 
   private object Fixture {
-    def apply(keyPool: Option[KeyPool] = None)(f: (Cpg, CpgPassBase) => Unit): Unit = {
+    def apply(keyPool: Option[KeyPool] = None)(f: (Cpg, CpgPassBase[_]) => Unit): Unit = {
       val cpg = Cpg.emptyCpg
       class MyPass extends CpgPass(keyPool) {
         override def run(): Iterator[DiffGraph] = {

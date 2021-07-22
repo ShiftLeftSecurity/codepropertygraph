@@ -46,7 +46,7 @@ abstract class LayerCreator {
     }
   }
 
-  protected def runPasses(passes: Iterable[CpgPassBase],
+  protected def runPasses(passes: Iterable[CpgPassBase[_]],
                           context: LayerCreatorContext,
                           storeUndoInfo: Boolean,
                          ): Unit = {

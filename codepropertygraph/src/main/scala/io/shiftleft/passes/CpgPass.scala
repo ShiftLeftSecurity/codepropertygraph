@@ -23,22 +23,47 @@ import java.lang.{Long => JLong}
   *
   * @param cpg the source CPG this pass traverses
   */
-abstract class CpgPass(val keyPool: Option[KeyPool] = None) extends CpgPassBase {
+abstract class CpgPass(keyPool: Option[KeyPool] = None)
+  extends CpgPassBase[Unit](keyPool.map(Iterator.single)) {
 
   /**
     * Main method of enhancement - to be implemented by child class
     * */
   def run(): Iterator[DiffGraph]
 
+  override def partIterator: Iterator[Unit] = {
+    Iterator.single(())
+  }
+
+  override def runOnPart(part: Unit): Iterator[DiffGraph] = {
+    run()
+  }
+
 }
 
-trait CpgPassBase {
+abstract class CpgPassBase[T](val keyPools: Option[Iterator[KeyPool]]) {
   /**
     * Name of the enhancement pass.
     * By default it is inferred from the name of the class, override if needed.
     */
   def name: String = getClass.getName
 
+  def init(): Unit = {}
+
+  def partIterator: Iterator[T]
+
+  def runOnPart(part: T): Iterator[DiffGraph]
+
+  def workItemIterator: Iterator[WorkItem[T]] = {
+    partIterator.map(new WorkItem(_, runOnPart))
+  }
+
+}
+
+class WorkItem[T](item: T, runOnPart: T => Iterator[DiffGraph]) {
+  def run(): Iterator[DiffGraph] = {
+    runOnPart(item)
+  }
 }
 
 /**

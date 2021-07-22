@@ -13,13 +13,13 @@ import scala.concurrent.duration.DurationLong
 object CpgPassRunner {
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  def apply(cpg: Cpg, pass: CpgPassBase): Unit = {
+  def apply(cpg: Cpg, pass: CpgPassBase[_]): Unit = {
     val runner = new CpgPassRunner(cpg, outputDir = None, inverse = false)
     runner.addPass(pass)
     runner.run()
   }
 
-  def applyAndStore(cpg: Cpg, pass: CpgPassBase, outputDir: String, inverse: Boolean): Unit = {
+  def applyAndStore(cpg: Cpg, pass: CpgPassBase[_], outputDir: String, inverse: Boolean): Unit = {
     val runner = new CpgPassRunner(cpg, Some(outputDir), inverse)
     runner.addPass(pass)
     runner.run()
@@ -32,9 +32,9 @@ class CpgPassRunner(cpg: Cpg,
                    ) {
   import CpgPassRunner._
 
-  private val passes = mutable.ArrayBuffer.empty[CpgPassBase]
+  private val passes = mutable.ArrayBuffer.empty[CpgPassBase[_]]
 
-  def addPass(pass: CpgPassBase): Unit = {
+  def addPass(pass: CpgPassBase[_]): Unit = {
     passes.append(pass)
   }
 
@@ -50,33 +50,14 @@ class CpgPassRunner(cpg: Cpg,
       }
 
       try {
-        pass match {
-          case parallelPass: ParallelCpgPass[_] =>
-            withWriter(serializedCpg) { writer =>
-              enqueueInParallel(writer, parallelPass)
-            }
-          case cpgPass: CpgPass =>
-            withStartEndTimesLogged(cpgPass.name) {
-              cpgPass.run().foreach { diffGraph =>
-                applyDiffGraph(serializedCpg, diffGraph, cpgPass)
-              }
-            }
+        withWriter(serializedCpg) { writer =>
+          enqueueInParallel(writer, pass)
         }
       } finally {
         serializedCpg.close()
       }
 
       index += 1
-    }
-  }
-
-  private def applyDiffGraph(serializedCpg: SerializedCpg, diffGraph: DiffGraph, cpgPass: CpgPass): Unit = {
-    val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, outputDir.isDefined && inverse, cpgPass.keyPool)
-    if (!serializedCpg.isEmpty) {
-      val serialization = serialize(appliedDiffGraph)
-      if (serialization.getSerializedSize > 0) {
-        serializedCpg.addOverlay(serialization, "serialization")
-      }
     }
   }
 
@@ -88,7 +69,7 @@ class CpgPassRunner(cpg: Cpg,
     }
   }
 
-  private def enqueueInParallel(writer: Writer, parallelCpgPass: ParallelCpgPass[_]): Unit = {
+  private def enqueueInParallel(writer: Writer, parallelCpgPass: CpgPassBase[_]): Unit = {
     withStartEndTimesLogged(parallelCpgPass.name) {
       parallelCpgPass.init()
       val it = new ParallelIteratorExecutor(itWithKeyPools(parallelCpgPass)).map {
@@ -124,7 +105,7 @@ class CpgPassRunner(cpg: Cpg,
     }
   }
 
-  private def itWithKeyPools(parallelCpgPass: ParallelCpgPass[_]): Iterator[(WorkItem[_], Option[KeyPool])] = {
+  private def itWithKeyPools(parallelCpgPass: CpgPassBase[_]): Iterator[(WorkItem[_], Option[KeyPool])] = {
     if (parallelCpgPass.keyPools.isEmpty) {
       parallelCpgPass.workItemIterator.map(p => (p, None))
     } else {

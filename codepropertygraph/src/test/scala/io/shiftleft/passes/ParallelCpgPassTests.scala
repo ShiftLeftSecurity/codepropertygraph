@@ -13,7 +13,7 @@ import scala.jdk.CollectionConverters._
 class ParallelCpgPassTests extends AnyWordSpec with Matchers {
 
   private object Fixture {
-    def apply(keyPools: Option[Iterator[KeyPool]] = None)(f: (Cpg, CpgPassBase) => Unit): Unit = {
+    def apply(keyPools: Option[Iterator[KeyPool]] = None)(f: (Cpg, CpgPassBase[_]) => Unit): Unit = {
       val cpg = Cpg.emptyCpg
       class MyPass extends ParallelCpgPass[String](keyPools) {
         override def partIterator: Iterator[String] = {

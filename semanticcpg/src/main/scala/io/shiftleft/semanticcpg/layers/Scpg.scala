@@ -44,7 +44,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
     runPasses(enhancementExecList, context, storeUndoInfo)
   }
 
-  private def createEnhancementExecList(cpg: Cpg, language: String): List[CpgPassBase] = {
+  private def createEnhancementExecList(cpg: Cpg, language: String): List[CpgPassBase[_]] = {
     language match {
       case Languages.JAVA =>
         List(
