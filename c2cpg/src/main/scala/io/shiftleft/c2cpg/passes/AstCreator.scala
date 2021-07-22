@@ -1169,7 +1169,8 @@ class AstCreator(filename: String, global: Global) {
       Seq.empty
     case _: ICPPASTUsingDirective =>
       Seq.empty
-    case _ => notHandledYetSeq(decl)
+    case s: IASTSimpleDeclaration if s.getRawSignature == ";" => Seq.empty
+    case _                                                    => notHandledYetSeq(decl)
   }
 
   private def astForFor(forStmt: IASTForStatement, order: Int): Ast = {
