@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.layers
 import better.files.File
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.{CpgPassBase, CpgPassRunner}
+import io.shiftleft.passes.{CpgPassV2, CpgPassRunner}
 import io.shiftleft.semanticcpg.Overlays
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -46,7 +46,7 @@ abstract class LayerCreator {
     }
   }
 
-  protected def runPasses(passes: Iterable[CpgPassBase[_]],
+  protected def runPasses(passes: Iterable[CpgPassV2[_]],
                           context: LayerCreatorContext,
                           storeUndoInfo: Boolean,
                          ): Unit = {

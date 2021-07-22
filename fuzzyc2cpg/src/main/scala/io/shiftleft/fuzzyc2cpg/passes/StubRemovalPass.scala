@@ -2,7 +2,7 @@ package io.shiftleft.fuzzyc2cpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.Method
-import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
+import io.shiftleft.passes.{CpgPassV2, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
 import scala.collection.mutable
@@ -11,7 +11,7 @@ import scala.collection.mutable
   * A pass that ensures that for any method m for which a body exists,
   * there are no more method stubs for corresponding declarations.
   * */
-class StubRemovalPass(cpg: Cpg) extends ParallelCpgPass[Method] {
+class StubRemovalPass(cpg: Cpg) extends CpgPassV2[Method] {
 
   private val methodSignatureWithDef = mutable.Set.empty[String]
 

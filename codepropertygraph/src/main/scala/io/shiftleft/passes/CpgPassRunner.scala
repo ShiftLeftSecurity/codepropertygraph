@@ -13,13 +13,13 @@ import scala.concurrent.duration.DurationLong
 object CpgPassRunner {
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  def apply(cpg: Cpg, pass: CpgPassBase[_]): Unit = {
+  def apply(cpg: Cpg, pass: CpgPassV2[_]): Unit = {
     val runner = new CpgPassRunner(cpg, outputDir = None, inverse = false)
     runner.addPass(pass)
     runner.run()
   }
 
-  def applyAndStore(cpg: Cpg, pass: CpgPassBase[_], outputDir: String, inverse: Boolean): Unit = {
+  def applyAndStore(cpg: Cpg, pass: CpgPassV2[_], outputDir: String, inverse: Boolean): Unit = {
     val runner = new CpgPassRunner(cpg, Some(outputDir), inverse)
     runner.addPass(pass)
     runner.run()
@@ -32,9 +32,9 @@ class CpgPassRunner(cpg: Cpg,
                    ) {
   import CpgPassRunner._
 
-  private val passes = mutable.ArrayBuffer.empty[CpgPassBase[_]]
+  private val passes = mutable.ArrayBuffer.empty[CpgPassV2[_]]
 
-  def addPass(pass: CpgPassBase[_]): Unit = {
+  def addPass(pass: CpgPassV2[_]): Unit = {
     passes.append(pass)
   }
 
@@ -69,7 +69,7 @@ class CpgPassRunner(cpg: Cpg,
     }
   }
 
-  private def enqueueInParallel(writer: Writer, parallelCpgPass: CpgPassBase[_]): Unit = {
+  private def enqueueInParallel(writer: Writer, parallelCpgPass: CpgPassV2[_]): Unit = {
     withStartEndTimesLogged(parallelCpgPass.name) {
       parallelCpgPass.init()
       val it = new ParallelIteratorExecutor(itWithKeyPools(parallelCpgPass)).map {
@@ -105,7 +105,7 @@ class CpgPassRunner(cpg: Cpg,
     }
   }
 
-  private def itWithKeyPools(parallelCpgPass: CpgPassBase[_]): Iterator[(WorkItem[_], Option[KeyPool])] = {
+  private def itWithKeyPools(parallelCpgPass: CpgPassV2[_]): Iterator[(WorkItem[_], Option[KeyPool])] = {
     if (parallelCpgPass.keyPools.isEmpty) {
       parallelCpgPass.workItemIterator.map(p => (p, None))
     } else {

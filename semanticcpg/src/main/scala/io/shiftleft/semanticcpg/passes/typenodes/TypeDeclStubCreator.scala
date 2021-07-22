@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.typenodes
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewTypeDecl, TypeDeclBase}
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, NamespaceTraversal}
 
@@ -13,7 +13,7 @@ import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, Namespa
   * node, this pass creates a `TYPE_DECL` node. The `TYPE_DECL` is
   * considered external.
   */
-class TypeDeclStubCreator(cpg: Cpg) extends CpgPass {
+class TypeDeclStubCreator(cpg: Cpg) extends SimpleCpgPassV2 {
 
   private var typeDeclFullNameToNode = Map[String, TypeDeclBase]()
 

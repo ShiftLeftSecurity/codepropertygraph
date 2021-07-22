@@ -3,7 +3,7 @@ package io.shiftleft.dataflowengineoss.passes.reachingdef
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, PropertyNames}
-import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
+import io.shiftleft.passes.{CpgPassV2, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
 import scala.collection.Set
@@ -11,7 +11,7 @@ import scala.collection.Set
 /**
   * A pass that calculates reaching definitions ("data dependencies").
   * */
-class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[Method] {
+class ReachingDefPass(cpg: Cpg) extends CpgPassV2[Method] {
 
   override def partIterator: Iterator[Method] = cpg.method.iterator
 

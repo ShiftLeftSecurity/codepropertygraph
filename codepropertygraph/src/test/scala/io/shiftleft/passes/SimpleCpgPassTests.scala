@@ -8,12 +8,12 @@ import org.scalatest.wordspec.AnyWordSpec
 
 import scala.jdk.CollectionConverters._
 
-class CpgPassTests extends AnyWordSpec with Matchers {
+class SimpleCpgPassTests extends AnyWordSpec with Matchers {
 
   private object Fixture {
-    def apply(keyPool: Option[KeyPool] = None)(f: (Cpg, CpgPassBase[_]) => Unit): Unit = {
+    def apply(keyPool: Option[KeyPool] = None)(f: (Cpg, CpgPassV2[_]) => Unit): Unit = {
       val cpg = Cpg.emptyCpg
-      class MyPass extends CpgPass(keyPool) {
+      class MyPass extends SimpleCpgPassV2(keyPool) {
         override def run(): Iterator[DiffGraph] = {
           val diffGraph1 = DiffGraph.newBuilder
           val diffGraph2 = DiffGraph.newBuilder
@@ -35,7 +35,7 @@ class CpgPassTests extends AnyWordSpec with Matchers {
 
     "produce a serialized inverse CPG" in Fixture() { (cpg, pass) =>
       File.usingTemporaryDirectory("cpgPassTests") { dir =>
-        val file = dir / "0_io.shiftleft.passes.CpgPassTests$Fixture$MyPass$1"
+        val file = dir / "0_io.shiftleft.passes.SimpleCpgPassTests$Fixture$MyPass$1"
         CpgPassRunner.applyAndStore(cpg, pass, dir.toString, false)
         file.exists shouldBe true
         file.size should not be 0

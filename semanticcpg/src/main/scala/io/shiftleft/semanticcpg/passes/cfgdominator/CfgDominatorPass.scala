@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.cfgdominator
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.{Method, StoredNode}
-import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
+import io.shiftleft.passes.{CpgPassV2, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.Node
 
@@ -12,7 +12,7 @@ import scala.collection.mutable
 /**
   * This pass has no prerequisites.
   */
-class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[Method] {
+class CfgDominatorPass(cpg: Cpg) extends CpgPassV2[Method] {
 
   override def partIterator: Iterator[Method] = cpg.method.iterator
 

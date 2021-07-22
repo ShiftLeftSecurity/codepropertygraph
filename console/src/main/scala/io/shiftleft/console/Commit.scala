@@ -1,6 +1,6 @@
 package io.shiftleft.console
 
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, LayerCreatorOptions}
 
 object Commit {
@@ -17,7 +17,7 @@ class Commit(opts: CommitOptions) extends LayerCreator {
   override val description: String = Commit.description
 
   override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
-    val pass: CpgPass = new CpgPass {
+    val pass: SimpleCpgPassV2 = new SimpleCpgPassV2 {
       override val name = "commit"
       override def run(): Iterator[DiffGraph] = Iterator(opts.diffGraphBuilder.build())
     }

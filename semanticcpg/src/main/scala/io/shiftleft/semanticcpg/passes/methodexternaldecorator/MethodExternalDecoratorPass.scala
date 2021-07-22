@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.methodexternaldecorator
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.PropertyNames
 import io.shiftleft.codepropertygraph.generated.nodes.{Method, StoredNode, TypeDecl}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -15,7 +15,7 @@ import scala.jdk.CollectionConverters._
   *
   * This solution is only meant to be used until all language frontends set the isExternal flag on their own.
   */
-class MethodExternalDecoratorPass(cpg: Cpg) extends CpgPass {
+class MethodExternalDecoratorPass(cpg: Cpg) extends SimpleCpgPassV2 {
 
   import MethodExternalDecoratorPass._
 

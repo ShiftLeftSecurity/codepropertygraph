@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.linking.linker
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{PropertyNames, _}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
 import overflowdb.traversal._
@@ -14,7 +14,7 @@ import scala.collection.mutable
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
   * language frontends which do not provide method stubs and type decl stubs.
   */
-class Linker(cpg: Cpg) extends CpgPass {
+class Linker(cpg: Cpg) extends SimpleCpgPassV2 {
   import Linker.{linkToSingle, logFailedDstLookup, logFailedSrcLookup, logger}
 
   private val typeDeclFullNameToNode = mutable.Map.empty[String, StoredNode]

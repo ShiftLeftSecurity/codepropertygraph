@@ -23,8 +23,8 @@ import java.lang.{Long => JLong}
   *
   * @param cpg the source CPG this pass traverses
   */
-abstract class CpgPass(keyPool: Option[KeyPool] = None)
-  extends CpgPassBase[Unit](keyPool.map(Iterator.single)) {
+abstract class SimpleCpgPassV2(keyPool: Option[KeyPool] = None)
+  extends CpgPassV2[Unit](keyPool.map(Iterator.single)) {
 
   /**
     * Main method of enhancement - to be implemented by child class
@@ -41,7 +41,7 @@ abstract class CpgPass(keyPool: Option[KeyPool] = None)
 
 }
 
-abstract class CpgPassBase[T](val keyPools: Option[Iterator[KeyPool]]) {
+abstract class CpgPassV2[T](val keyPools: Option[Iterator[KeyPool]] = None) {
   /**
     * Name of the enhancement pass.
     * By default it is inferred from the name of the class, override if needed.

@@ -1,13 +1,13 @@
 package io.shiftleft.semanticcpg.passes.typenodes
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.passes.{CpgPass, DiffGraph, KeyPool}
+import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph, KeyPool}
 
 /**
   * Creates a `TYPE` node for each type in `usedTypes`
   * */
 class TypeNodePass(usedTypesProvider: () => List[String], keyPool: Option[KeyPool] = None)
-    extends CpgPass(keyPool) {
+    extends SimpleCpgPassV2(keyPool) {
   override def run(): Iterator[DiffGraph] = {
     val diffGraph = DiffGraph.newBuilder
     usedTypesProvider().sorted.foreach { typeName =>

@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.containsedges
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.AstNode
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
+import io.shiftleft.passes.{CpgPassV2, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
 import scala.jdk.CollectionConverters._
@@ -12,7 +12,7 @@ import scala.jdk.CollectionConverters._
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
   * language frontends which do not provide method stubs and type decl stubs.
   */
-class ContainsEdgePass(cpg: Cpg) extends ParallelCpgPass[AstNode] {
+class ContainsEdgePass(cpg: Cpg) extends CpgPassV2[AstNode] {
   import ContainsEdgePass.{destinationTypes, sourceTypes}
 
   override def partIterator: Iterator[AstNode] =

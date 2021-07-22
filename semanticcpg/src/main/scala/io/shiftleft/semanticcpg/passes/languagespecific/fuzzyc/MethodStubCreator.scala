@@ -1,15 +1,9 @@
 package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{
-  MethodBase,
-  NewBlock,
-  NewMethod,
-  NewMethodParameterIn,
-  NewMethodReturn
-}
+import io.shiftleft.codepropertygraph.generated.nodes.{MethodBase, NewBlock, NewMethod, NewMethodParameterIn, NewMethodReturn}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes}
-import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
+import io.shiftleft.passes.{CpgPassV2, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
 import scala.jdk.CollectionConverters._
@@ -19,7 +13,7 @@ case class NameAndSignature(name: String, signature: String, fullName: String)
 /**
   * This pass has no other pass as prerequisite.
   */
-class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int)] {
+class MethodStubCreator(cpg: Cpg) extends CpgPassV2[(NameAndSignature, Int)] {
 
   // Since the method fullNames for fuzzyc are not unique, we do not have
   // a 1to1 relation and may overwrite some values. We deem this ok for now.

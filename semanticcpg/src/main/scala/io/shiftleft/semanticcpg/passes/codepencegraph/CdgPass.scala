@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.codepencegraph
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties}
-import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
+import io.shiftleft.passes.{CpgPassV2, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominatorFrontier, ReverseCpgCfgAdapter}
 import org.slf4j.{Logger, LoggerFactory}
@@ -13,7 +13,7 @@ import scala.jdk.CollectionConverters._
 /**
   * This pass has ContainsEdgePass and CfgDominatorPass as prerequisites.
   */
-class CdgPass(cpg: Cpg) extends ParallelCpgPass[Method] {
+class CdgPass(cpg: Cpg) extends CpgPassV2[Method] {
   import CdgPass.logger
 
   override def partIterator: Iterator[Method] = cpg.method.iterator

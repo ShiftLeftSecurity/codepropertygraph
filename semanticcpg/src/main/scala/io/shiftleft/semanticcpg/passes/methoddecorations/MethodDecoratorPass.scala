@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.methoddecorations
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -15,7 +15,7 @@ import org.slf4j.{Logger, LoggerFactory}
   * not provide method stubs.
   *
   */
-class MethodDecoratorPass(cpg: Cpg) extends CpgPass {
+class MethodDecoratorPass(cpg: Cpg) extends SimpleCpgPassV2 {
   import MethodDecoratorPass.logger
 
   private[this] var loggedDeprecatedWarning = false

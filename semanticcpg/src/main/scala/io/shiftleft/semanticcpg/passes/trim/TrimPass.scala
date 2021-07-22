@@ -1,12 +1,12 @@
 package io.shiftleft.semanticcpg.passes.trim
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
 
-class TrimPass(cpg: Cpg) extends CpgPass {
+class TrimPass(cpg: Cpg) extends SimpleCpgPassV2 {
   override def run(): Iterator[DiffGraph] = {
     val reduction = cpg.all.iterator
       .map(_.asInstanceOf[NodeRef[NodeDb]].get.trim())

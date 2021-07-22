@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.Method
-import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
+import io.shiftleft.passes.{CpgPassV2, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgcreation.CfgCreator
 
@@ -17,7 +17,7 @@ import io.shiftleft.semanticcpg.passes.cfgcreation.CfgCreator
   * only creates edges at the moment. Therefore, we currently
   * do without key pools.
   * */
-class CfgCreationPass(cpg: Cpg) extends ParallelCpgPass[Method] {
+class CfgCreationPass(cpg: Cpg) extends CpgPassV2[Method] {
 
   override def partIterator: Iterator[Method] = cpg.method.iterator
 

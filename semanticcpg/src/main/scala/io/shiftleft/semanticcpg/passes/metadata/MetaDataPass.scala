@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes.metadata
 
 import io.shiftleft.codepropertygraph.generated.nodes.{NewMetaData, NewNamespaceBlock}
-import io.shiftleft.passes.{CpgPass, DiffGraph, KeyPool}
+import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph, KeyPool}
 import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, NamespaceTraversal}
 
 /**
@@ -10,7 +10,7 @@ import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, Namespa
   * cannot be assigned to any other namespace.
   * */
 class MetaDataPass(language: String, keyPool: Option[KeyPool] = None)
-    extends CpgPass(keyPool = keyPool) {
+    extends SimpleCpgPassV2(keyPool = keyPool) {
   override def run(): Iterator[DiffGraph] = {
     def addMetaDataNode(diffGraph: DiffGraph.Builder): Unit = {
       val metaNode = NewMetaData().language(language).version("0.1")

@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.layers
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes}
-import io.shiftleft.passes.CpgPassBase
+import io.shiftleft.passes.CpgPassV2
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
 import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
@@ -44,7 +44,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
     runPasses(enhancementExecList, context, storeUndoInfo)
   }
 
-  private def createEnhancementExecList(cpg: Cpg, language: String): List[CpgPassBase[_]] = {
+  private def createEnhancementExecList(cpg: Cpg, language: String): List[CpgPassV2[_]] = {
     language match {
       case Languages.JAVA =>
         List(

@@ -10,12 +10,12 @@ import overflowdb.traversal._
 
 import scala.jdk.CollectionConverters._
 
-class ParallelCpgPassTests extends AnyWordSpec with Matchers {
+class CpgPassV2Tests extends AnyWordSpec with Matchers {
 
   private object Fixture {
-    def apply(keyPools: Option[Iterator[KeyPool]] = None)(f: (Cpg, CpgPassBase[_]) => Unit): Unit = {
+    def apply(keyPools: Option[Iterator[KeyPool]] = None)(f: (Cpg, CpgPassV2[_]) => Unit): Unit = {
       val cpg = Cpg.emptyCpg
-      class MyPass extends ParallelCpgPass[String](keyPools) {
+      class MyPass extends CpgPassV2[String](keyPools) {
         override def partIterator: Iterator[String] = {
           Iterator("foo", "bar")
         }
@@ -39,7 +39,7 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
 
     "produce a serialized inverse CPG" in Fixture() { (cpg, pass) =>
       File.usingTemporaryDirectory("cpgPassTests") { dir =>
-        val file = dir / "0_io.shiftleft.passes.ParallelCpgPassTests$Fixture$MyPass$1"
+        val file = dir / "0_io.shiftleft.passes.CpgPassV2Tests$Fixture$MyPass$1"
         CpgPassRunner.applyAndStore(cpg, pass, dir.toString, false)
         file.exists shouldBe true
         file.size should not be 0
