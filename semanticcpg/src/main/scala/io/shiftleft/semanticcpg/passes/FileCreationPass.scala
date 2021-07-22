@@ -14,7 +14,7 @@ import scala.collection.mutable
   * For all nodes with FILENAME fields, create corresponding FILE nodes
   * and connect node with FILE node via outgoing SOURCE_FILE edges.
   */
-class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
+class FileCreationPass(cpg: Cpg) extends CpgPass {
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 

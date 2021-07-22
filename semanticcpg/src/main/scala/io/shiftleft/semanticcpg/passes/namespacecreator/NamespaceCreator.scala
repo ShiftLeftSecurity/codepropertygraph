@@ -12,7 +12,7 @@ import io.shiftleft.semanticcpg.language._
   *
   * This pass has no other pass as prerequisite.
   */
-class NamespaceCreator(cpg: Cpg) extends CpgPass(cpg) {
+class NamespaceCreator(cpg: Cpg) extends CpgPass {
 
   /**
     * Creates NAMESPACE nodes and connects NAMESPACE_BLOCKs

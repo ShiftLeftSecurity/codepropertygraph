@@ -17,7 +17,7 @@ class Commit(opts: CommitOptions) extends LayerCreator {
   override val description: String = Commit.description
 
   override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
-    val pass: CpgPass = new CpgPass(context.cpg) {
+    val pass: CpgPass = new CpgPass {
       override val name = "commit"
       override def run(): Iterator[DiffGraph] = Iterator(opts.diffGraphBuilder.build())
     }

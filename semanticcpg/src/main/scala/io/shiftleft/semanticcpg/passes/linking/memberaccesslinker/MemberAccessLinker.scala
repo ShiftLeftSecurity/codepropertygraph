@@ -13,7 +13,7 @@ import scala.jdk.CollectionConverters._
 /**
   * This pass has Linker as prerequisite.
   */
-class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
+class MemberAccessLinker(cpg: Cpg) extends CpgPass {
   import MemberAccessLinker.logger
 
   private[this] var loggedDeprecationWarning: Boolean = _

@@ -14,7 +14,7 @@ import scala.collection.mutable
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
   * language frontends which do not provide method stubs and type decl stubs.
   */
-class Linker(cpg: Cpg) extends CpgPass(cpg) {
+class Linker(cpg: Cpg) extends CpgPass {
   import Linker.{linkToSingle, logFailedDstLookup, logFailedSrcLookup, logger}
 
   private val typeDeclFullNameToNode = mutable.Map.empty[String, StoredNode]

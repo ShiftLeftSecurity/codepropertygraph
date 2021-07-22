@@ -6,7 +6,7 @@ import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
 
-class TrimPass(cpg: Cpg) extends CpgPass(cpg) {
+class TrimPass(cpg: Cpg) extends CpgPass {
   override def run(): Iterator[DiffGraph] = {
     val reduction = cpg.all.iterator
       .map(_.asInstanceOf[NodeRef[NodeDb]].get.trim())

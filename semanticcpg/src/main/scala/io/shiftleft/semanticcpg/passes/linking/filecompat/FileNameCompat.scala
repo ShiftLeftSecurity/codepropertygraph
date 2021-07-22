@@ -13,7 +13,7 @@ import io.shiftleft.semanticcpg.language._
   * This pass should come after AST edges have been reconstructed, that
   * is, after Linker.  Is used by FileLinker.
   */
-class FileNameCompat(cpg: Cpg) extends CpgPass(cpg) {
+class FileNameCompat(cpg: Cpg) extends CpgPass {
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 

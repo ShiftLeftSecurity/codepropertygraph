@@ -13,7 +13,7 @@ import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, Namespa
   * node, this pass creates a `TYPE_DECL` node. The `TYPE_DECL` is
   * considered external.
   */
-class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
+class TypeDeclStubCreator(cpg: Cpg) extends CpgPass {
 
   private var typeDeclFullNameToNode = Map[String, TypeDeclBase]()
 

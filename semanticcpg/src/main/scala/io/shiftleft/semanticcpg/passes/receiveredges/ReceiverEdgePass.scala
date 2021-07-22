@@ -20,7 +20,7 @@ import scala.jdk.CollectionConverters._
   *
   * TODO remove once not needed anymore.
   */
-class ReceiverEdgePass(cpg: Cpg) extends CpgPass(cpg) {
+class ReceiverEdgePass(cpg: Cpg) extends CpgPass {
   import ReceiverEdgePass.logger
 
   override def run(): Iterator[DiffGraph] = {

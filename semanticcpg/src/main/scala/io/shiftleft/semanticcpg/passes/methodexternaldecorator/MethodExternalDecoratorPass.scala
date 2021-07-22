@@ -15,7 +15,7 @@ import scala.jdk.CollectionConverters._
   *
   * This solution is only meant to be used until all language frontends set the isExternal flag on their own.
   */
-class MethodExternalDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
+class MethodExternalDecoratorPass(cpg: Cpg) extends CpgPass {
 
   import MethodExternalDecoratorPass._
 

@@ -2,7 +2,6 @@ package io.shiftleft.passes
 
 import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.SerializedCpg
-import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import org.slf4j.{Logger, LoggerFactory, MDC}
 
@@ -30,7 +29,7 @@ import scala.concurrent.duration.DurationLong
   * @param cpg the source CPG this pass traverses
   */
 @nowarn
-abstract class CpgPass(val cpg: Cpg, outName: String = "", val keyPool: Option[KeyPool] = None) extends CpgPassBase {
+abstract class CpgPass(outName: String = "", val keyPool: Option[KeyPool] = None) extends CpgPassBase {
 
   /**
     * Main method of enhancement - to be implemented by child class

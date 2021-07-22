@@ -19,7 +19,7 @@ case class CpgTestFixture(projectName: String) {
   val filenames = SourceFiles.determine(Set(dirName), Set(".c"))
 
   val passRunner = new CpgPassRunner(cpg, outputDir = None, inverse = false)
-  passRunner.addPass(new MetaDataPass(cpg, Languages.C))
+  passRunner.addPass(new MetaDataPass(Languages.C))
   passRunner.addPass(new AstCreationPass(filenames, cpg, keyPoolFile1))
   passRunner.addPass(new CfgCreationPass(cpg))
   passRunner.addPass(new StubRemovalPass(cpg))

@@ -189,7 +189,7 @@ package object testing {
     def withCustom(f: (DiffGraph.Builder, Cpg) => Unit): MockCpg = {
       val diffGraph = new DiffGraph.Builder
       f(diffGraph, cpg)
-      class MyPass extends CpgPass(cpg) {
+      class MyPass extends CpgPass {
         override def run(): Iterator[DiffGraph] = {
           Iterator(diffGraph.build())
         }

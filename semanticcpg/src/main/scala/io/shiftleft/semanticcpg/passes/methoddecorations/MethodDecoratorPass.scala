@@ -15,7 +15,7 @@ import org.slf4j.{Logger, LoggerFactory}
   * not provide method stubs.
   *
   */
-class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
+class MethodDecoratorPass(cpg: Cpg) extends CpgPass {
   import MethodDecoratorPass.logger
 
   private[this] var loggedDeprecatedWarning = false

@@ -9,7 +9,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
 
-class StaticCallLinker(cpg: Cpg) extends CpgPass(cpg) {
+class StaticCallLinker(cpg: Cpg) extends CpgPass {
 
   import StaticCallLinker._
   private val methodFullNameToNode = mutable.Map.empty[String, StoredNode]

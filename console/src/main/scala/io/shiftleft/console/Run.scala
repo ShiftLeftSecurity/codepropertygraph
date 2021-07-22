@@ -18,7 +18,7 @@ object Run {
         override val description: String = "A custom pass"
 
         override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
-          val pass: CpgPass = new CpgPass(console.cpg) {
+          val pass: CpgPass = new CpgPass {
             override val name = "custom"
             override def run(): Iterator[DiffGraph] = {
               implicit val diffGraph: DiffGraph.Builder = DiffGraph.newBuilder
