@@ -312,14 +312,7 @@ class AstCreator(filename: String, global: Global) {
   }
 
   private def astForIdentifier(ident: IASTNode, order: Int): Ast = {
-    val identifierName =
-      if (!ident.toString.contains("::")) usingDeclarationMappings.getOrElse(ident.toString, ident.toString)
-      else
-        usingDeclarationMappings.get(ident.toString.split("::").reverse.tail.mkString(".")) match {
-          case Some(n) => n + "." + ident.toString.split("::").last
-          case None    => ident.toString
-        }
-
+    val identifierName = ident.toString
     val variableOption = scope.lookupVariable(identifierName)
     val identifierTypeName = variableOption match {
       case Some((_, variableTypeName)) =>

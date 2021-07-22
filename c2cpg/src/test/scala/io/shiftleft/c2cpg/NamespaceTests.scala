@@ -304,7 +304,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside {
             case List(call: Call, x: Identifier, a: FieldIdentifier) =>
               call.name shouldBe Operators.fieldAccess
               x.order shouldBe 1
-              x.name shouldBe "foo.bar.baz"
+              x.name shouldBe "fbz"
               a.order shouldBe 2
               a.code shouldBe "qux"
           }
