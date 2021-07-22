@@ -85,9 +85,8 @@ class FuzzyC2Cpg() {
     passRunner.addPass(astCreator)
     passRunner.addPass(new CfgCreationPass(cpg))
     passRunner.addPass(new StubRemovalPass(cpg))
+    passRunner.addPass(new TypeNodePass(() => astCreator.global.usedTypes.keys().asScala.toList, Some(typesKeyPool)))
     passRunner.run()
-
-    CpgPassRunner.apply(cpg, new TypeNodePass(astCreator.global.usedTypes.keys().asScala.toList, Some(typesKeyPool)))
 
     cpg
   }
