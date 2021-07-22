@@ -1,12 +1,8 @@
 package io.shiftleft.passes
 
-import com.google.protobuf.GeneratedMessageV3
-import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
-import org.slf4j.{Logger, LoggerFactory, MDC}
 
 import java.lang.{Long => JLong}
-import scala.concurrent.duration.DurationLong
 
 /**
   * Base class for CPG pass - a program, which receives an input graph
@@ -34,106 +30,14 @@ abstract class CpgPass(val keyPool: Option[KeyPool] = None) extends CpgPassBase 
     * */
   def run(): Iterator[DiffGraph]
 
-  /**
-    * Execute the enhancement and apply result to the underlying graph
-    */
-//  override def createAndApply(): Unit =
-//    withStartEndTimesLogged {
-//      run().foreach(diffGraphConsumer)
-//    }
-//  }
-//
-//  /**
-//    * Execute and create a serialized overlay
-//    * @param inverse invert the diffgraph before serializing
-//    */
-//  def createApplyAndSerialize(inverse: Boolean = false): Iterator[GeneratedMessageV3] =
-//    withStartEndTimesLogged {
-//      val overlays = run().map { diffGraph =>
-//        val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse, keyPool)
-//        serialize(appliedDiffGraph, inverse)
-//      }
-//      overlays
-//    }
-//
-//  /**
-//    * Run a CPG pass to create diff graphs, apply diff graphs, create corresponding
-//    * overlays and add them to the serialized CPG. The name of the overlay is derived
-//    * from the class name of the pass.
-//    *
-//    * @param serializedCpg the destination serialized CPG to add overlays to
-//    * @param inverse invert the diffgraph before serializing
-//    * @param prefix a prefix to add to the output name
-//    * */
-//  override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
-//                                            inverse: Boolean = false,
-//                                            prefix: String = ""): Unit = {
-//    if (serializedCpg.isEmpty) {
-//      createAndApply()
-//    } else {
-//      val overlays = createApplyAndSerialize(inverse)
-//      overlays.zipWithIndex.foreach {
-//        case (overlay, index) => {
-//          val name = generateOutFileName(prefix, outName, index)
-//          store(overlay, name, serializedCpg)
-//        }
-//      }
-//    }
-//  }
-
 }
 
 trait CpgPassBase {
-
-  private val logger: Logger = LoggerFactory.getLogger(classOf[CpgPass])
-
-//  def createAndApply(): Unit
-
-//  def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false, prefix: String = ""): Unit
-
   /**
     * Name of the enhancement pass.
     * By default it is inferred from the name of the class, override if needed.
     */
   def name: String = getClass.getName
-
-  protected def serialize(appliedDiffGraph: AppliedDiffGraph, inverse: Boolean): GeneratedMessageV3 = {
-    if (inverse) {
-      new DiffGraphProtoSerializer().serialize(appliedDiffGraph.inverseDiffGraph.get)
-    } else {
-      new DiffGraphProtoSerializer().serialize(appliedDiffGraph)
-    }
-  }
-
-  protected def generateOutFileName(prefix: String, outName: String, index: Int): String = {
-    val outputName = {
-      if (outName.isEmpty) {
-        this.getClass.getSimpleName
-      } else {
-        outName
-      }
-    }
-    prefix + "_" + outputName + "_" + index
-  }
-
-  protected def store(overlay: GeneratedMessageV3, name: String, serializedCpg: SerializedCpg): Unit = {
-    if (overlay.getSerializedSize > 0) {
-      serializedCpg.addOverlay(overlay, name)
-    }
-  }
-
-  protected def withStartEndTimesLogged[A](fun: => A): A = {
-    logger.info(s"Start of enhancement: $name")
-    val startTime = System.currentTimeMillis
-    try {
-      fun
-    } finally {
-      val duration = (System.currentTimeMillis - startTime).millis.toCoarsest
-      MDC.put("time", duration.toString())
-      logger.info(s"Enhancement $name completed in $duration")
-      MDC.remove("time")
-    }
-  }
 
 }
 
