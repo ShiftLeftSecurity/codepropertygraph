@@ -21,7 +21,7 @@ object CdtParser {
 
 }
 
-class CdtParser(private val parseConfig: ParseConfig) {
+class CdtParser(private val parseConfig: ParseConfig) extends ParseProblemsLogger with PreprocessorStatementsLogger {
 
   import CdtParser._
 
@@ -47,6 +47,8 @@ class CdtParser(private val parseConfig: ParseConfig) {
           ParseResult(None, -1, -1)
         case Success(translationUnit) =>
           val problems = CPPVisitor.getProblems(translationUnit)
+          logProblems(problems.toList)
+          logPreprocessorStatements(translationUnit)
           ParseResult(
             Some(translationUnit),
             translationUnit.getPreprocessorProblemsCount,

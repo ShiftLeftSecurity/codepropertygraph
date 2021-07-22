@@ -19,6 +19,7 @@ import org.eclipse.cdt.internal.core.dom.parser.cpp.{
 }
 import org.slf4j.LoggerFactory
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 
 class AstCreator(filename: String, global: Global) {
@@ -97,16 +98,21 @@ class AstCreator(filename: String, global: Global) {
     typeName
   }
 
+  private def notHandledText(node: IASTNode): String =
+    s"""Node '${node.getClass.getSimpleName}' not handled yet!
+       |  Code: '${node.getRawSignature}'
+       |  File: '$filename'
+       |  Line: ${node.getFileLocation.getStartingLineNumber}
+       |  """.stripMargin
+
   private def notHandledYetSeq[T](node: IASTNode): Seq[T] = {
-    val text = s"Node '${node.getClass.getSimpleName}' not handled yet. Code: '${node.getRawSignature}'"
-    println(text)
+    val text = notHandledText(node)
     logger.warn(text)
     Seq.empty
   }
 
   private def notHandledYet(node: IASTNode): Ast = {
-    val text = s"Node '${node.getClass.getSimpleName}' not handled yet. Code: '${node.getRawSignature}'"
-    println(text)
+    val text = notHandledText(node)
     logger.warn(text)
     Ast()
   }
@@ -197,30 +203,20 @@ class AstCreator(filename: String, global: Global) {
 
   private def isTypeDef(node: IASTNode): Boolean = node.getRawSignature.startsWith("typedef")
 
-  private def params(functDef: IASTFunctionDefinition): Seq[IASTParameterDeclaration] = functDef.getDeclarator match {
+  @tailrec
+  private def params(funct: IASTNode): Seq[IASTParameterDeclaration] = funct match {
+    case decl: CPPASTFunctionDeclarator       => decl.getParameters.toIndexedSeq
+    case decl: CASTFunctionDeclarator         => decl.getParameters.toIndexedSeq
     case decl: IASTStandardFunctionDeclarator => decl.getParameters.toIndexedSeq
+    case defn: IASTFunctionDefinition         => params(defn.getDeclarator)
     case other                                => notHandledYetSeq(other)
   }
 
-  private def params(functDecl: IASTFunctionDeclarator): Seq[IASTParameterDeclaration] = functDecl match {
-    case decl: CPPASTFunctionDeclarator => decl.getParameters.toIndexedSeq
-    case decl: CASTFunctionDeclarator   => decl.getParameters.toIndexedSeq
-    case other                          => notHandledYetSeq(other)
-  }
-
-  private def paramListSignature(functDef: IASTFunctionDefinition, includeParamNames: Boolean): String = {
+  private def paramListSignature(func: IASTNode, includeParamNames: Boolean): String = {
     val elements =
-      if (!includeParamNames) params(functDef).map(p => typeForDeclSpecifier(p.getDeclSpecifier))
+      if (!includeParamNames) params(func).map(p => typeForDeclSpecifier(p.getDeclSpecifier))
       else
-        params(functDef).map(p => p.getRawSignature)
-    "(" + elements.mkString(",") + ")"
-  }
-
-  private def paramListSignature(functionDecl: IASTFunctionDeclarator, includeParamNames: Boolean): String = {
-    val elements =
-      if (!includeParamNames) params(functionDecl).map(p => typeForDeclSpecifier(p.getDeclSpecifier))
-      else
-        params(functionDecl).map(p => p.getRawSignature)
+        params(func).map(p => p.getRawSignature)
     "(" + elements.mkString(",") + ")"
   }
 
