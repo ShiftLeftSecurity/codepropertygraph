@@ -7,7 +7,7 @@ import io.shiftleft.passes.{CpgPass, DiffGraph, KeyPool}
   * Creates a `TYPE` node for each type in `usedTypes`
   * */
 class TypeNodePass(usedTypesProvider: () => List[String], keyPool: Option[KeyPool] = None)
-    extends CpgPass("types", keyPool) {
+    extends CpgPass(keyPool) {
   override def run(): Iterator[DiffGraph] = {
     val diffGraph = DiffGraph.newBuilder
     usedTypesProvider().sorted.foreach { typeName =>

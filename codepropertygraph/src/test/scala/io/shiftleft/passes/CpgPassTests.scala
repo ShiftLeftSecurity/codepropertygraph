@@ -13,7 +13,7 @@ class CpgPassTests extends AnyWordSpec with Matchers {
   private object Fixture {
     def apply(keyPool: Option[KeyPool] = None)(f: (Cpg, CpgPassBase) => Unit): Unit = {
       val cpg = Cpg.emptyCpg
-      class MyPass extends CpgPass("MyPass", keyPool) {
+      class MyPass extends CpgPass(keyPool) {
         override def run(): Iterator[DiffGraph] = {
           val diffGraph1 = DiffGraph.newBuilder
           val diffGraph2 = DiffGraph.newBuilder

@@ -1,15 +1,12 @@
 package io.shiftleft.passes
 
-import scala.annotation.nowarn
-
 class WorkItem[T](item: T, runOnPart: T => Iterator[DiffGraph]) {
   def run(): Iterator[DiffGraph] = {
     runOnPart(item)
   }
 }
 
-@nowarn
-abstract class ParallelCpgPass[T](outName: String = "", val keyPools: Option[Iterator[KeyPool]] = None)
+abstract class ParallelCpgPass[T](val keyPools: Option[Iterator[KeyPool]] = None)
     extends CpgPassBase {
 
   def init(): Unit = {}
