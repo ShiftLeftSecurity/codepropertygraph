@@ -108,6 +108,53 @@ class C2CpgDataFlowTests4 extends DataFlowCodeToCpgSuite {
 
   override val code: String =
     """
+      | int source() {
+      |   return 2;
+      | }
+      |
+      | int sink(int x) {
+      |   return 3;
+      | }
+      |
+      | void main() {
+      |   int k = source();
+      |   foo(k);
+      | }
+      |
+      | void foo(int par) {
+      |   sink(par);
+      | }""".stripMargin
+
+  "Test Interprocedural" should {
+    "have a flow from input parameter to return" in {
+      val source = cpg.method.name("source").methodReturn
+      val sink = cpg.method.name("sink").parameter.name("x")
+      val flows = sink.reachableByFlows(source).l
+
+      pendingUntilFixed( // for whatever reason tracking to and from method foo fails.
+        flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+          Set(
+            List(
+              ("$ret", Some(2)),
+              ("source(2)", Some(11)),
+              ("p2", None),
+              ("p1", None),
+              ("k", Some(11)),
+              ("k", Some(12)),
+              ("par", Some(15)),
+              ("par", Some(16)),
+              ("x", Some(6))
+            )
+          ))
+    }
+  }
+
+}
+
+class C2CpgDataFlowTests5 extends DataFlowCodeToCpgSuite {
+
+  override val code: String =
+    """
       | struct Point {
       |   int x;
       |   int y;
@@ -146,7 +193,7 @@ class C2CpgDataFlowTests4 extends DataFlowCodeToCpgSuite {
 
 }
 
-class C2CpgDataFlowTests5 extends DataFlowCodeToCpgSuite {
+class C2CpgDataFlowTests6 extends DataFlowCodeToCpgSuite {
 
   override val code: String =
     """
@@ -176,7 +223,7 @@ class C2CpgDataFlowTests5 extends DataFlowCodeToCpgSuite {
 
 }
 
-class C2CpgDataFlowTests6 extends DataFlowCodeToCpgSuite {
+class C2CpgDataFlowTests7 extends DataFlowCodeToCpgSuite {
 
   override val code: String =
     """
@@ -195,13 +242,19 @@ class C2CpgDataFlowTests6 extends DataFlowCodeToCpgSuite {
       val source = cpg.method.name("source").methodReturn
       val sink = cpg.method.name("sink").parameter
       val flows = sink.reachableByFlows(source).l
-      flows.size shouldBe 1
+
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe Set(
+        List(("int", Some(2)),
+             ("source()", Some(6)),
+             ("c[1][2] = source()", Some(6)),
+             ("sink(c[1])", Some(8)),
+             ("sink(int* cont)", Some(3))))
     }
   }
 
 }
 
-class C2CpgDataFlowTests7 extends DataFlowCodeToCpgSuite {
+class C2CpgDataFlowTests8 extends DataFlowCodeToCpgSuite {
 
   override val code: String =
     """
@@ -232,7 +285,7 @@ class C2CpgDataFlowTests7 extends DataFlowCodeToCpgSuite {
 
 }
 
-class C2CpgDataFlowTests8 extends DataFlowCodeToCpgSuite {
+class C2CpgDataFlowTests9 extends DataFlowCodeToCpgSuite {
 
   override val code: String =
     """
@@ -262,7 +315,7 @@ class C2CpgDataFlowTests8 extends DataFlowCodeToCpgSuite {
 
 }
 
-class C2CpgDataFlowTests9 extends DataFlowCodeToCpgSuite {
+class C2CpgDataFlowTests10 extends DataFlowCodeToCpgSuite {
 
   override val code: String =
     """
@@ -289,13 +342,22 @@ class C2CpgDataFlowTests9 extends DataFlowCodeToCpgSuite {
     "work as expected" in {
       def source = cpg.call("getpid")
       def sink = cpg.ret
-      sink.reachableByFlows(source).l.size shouldBe 1
+      val flows = sink.reachableByFlows(source).l
+
+      flows.map(flow => flowToResultPairs(flow)).toSet shouldBe
+        Set(
+          List(("getpid()", Some(8)),
+               ("a = getpid()", Some(8)),
+               ("a == 666", Some(9)),
+               ("a * 666", Some(11)),
+               ("a = a * 666", Some(11)),
+               ("return a;", Some(17))))
     }
   }
 
 }
 
-class C2CpgDataFlowTests10 extends DataFlowCodeToCpgSuite {
+class C2CpgDataFlowTests11 extends DataFlowCodeToCpgSuite {
 
   override val code: String =
     """
