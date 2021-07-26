@@ -23,24 +23,6 @@ import java.lang.{Long => JLong}
   *
   * @param cpg the source CPG this pass traverses
   */
-abstract class SimpleCpgPassV2(keyPool: Option[KeyPool] = None)
-  extends CpgPassV2[Unit](keyPool.map(Iterator.single)) {
-
-  /**
-    * Main method of enhancement - to be implemented by child class
-    * */
-  def run(diffGraphHandler: DiffGraphHandler): Unit
-
-  override def partIterator: Iterator[Unit] = {
-    Iterator.single(())
-  }
-
-  override def runOnPart(diffGraphHandler: DiffGraphHandler, part: Unit): Unit = {
-    run(diffGraphHandler)
-  }
-
-}
-
 abstract class CpgPassV2[T](val keyPools: Option[Iterator[KeyPool]] = None) {
   /**
     * Name of the enhancement pass.
@@ -56,6 +38,24 @@ abstract class CpgPassV2[T](val keyPools: Option[Iterator[KeyPool]] = None) {
 
   def workItemIterator: Iterator[WorkItem[T]] = {
     partIterator.map(new WorkItem(_, runOnPart))
+  }
+
+}
+
+abstract class SimpleCpgPassV2(keyPool: Option[KeyPool] = None)
+  extends CpgPassV2[Unit](keyPool.map(Iterator.single)) {
+
+  /**
+    * Main method of enhancement - to be implemented by child class
+    * */
+  def run(diffGraphHandler: DiffGraphHandler): Unit
+
+  override def partIterator: Iterator[Unit] = {
+    Iterator.single(())
+  }
+
+  override def runOnPart(diffGraphHandler: DiffGraphHandler, part: Unit): Unit = {
+    run(diffGraphHandler)
   }
 
 }
