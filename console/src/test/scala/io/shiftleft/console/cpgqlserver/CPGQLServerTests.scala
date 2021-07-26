@@ -191,6 +191,40 @@ class CPGQLServerTests extends AnyWordSpec with Matchers {
       resp("stdout").str shouldBe ""
       resp("stderr").str.length should not be (0)
     }
+
+    "write a well-formatted message to a websocket connection when a query containing an invalid char is submitted" in Fixture() {
+      host =>
+        val wsMsgPromise = scala.concurrent.Promise[String]()
+        val connectedPromise = scala.concurrent.Promise[String]()
+        cask.util.WsClient.connect(s"$host/connect") {
+          case cask.Ws.Text(msg) => {
+            if (msg == "connected") {
+              connectedPromise.success(msg)
+            } else {
+              wsMsgPromise.success(msg)
+            }
+          }
+        }
+        Await.result(connectedPromise.future, DefaultPromiseAwaitTimeout)
+
+        val postQueryResponse = postQuery(host, "@1")
+        val queryUUID = postQueryResponse("uuid").str
+        queryUUID.length should not be (0)
+
+        val wsMsg = Await.result(wsMsgPromise.future, DefaultPromiseAwaitTimeout)
+        wsMsg.length should not be (0)
+
+        val resp = getResponse(host, queryUUID)
+        resp.obj.keySet should contain("success")
+        resp.obj.keySet should contain("stdout")
+        resp.obj.keySet should contain("stderr")
+        resp.obj.keySet should not contain ("err")
+
+        resp("success").bool shouldBe false
+        resp("uuid").str shouldBe wsMsg
+        resp("stdout").str shouldBe ""
+        resp("stderr").str.length should not be (0)
+    }
   }
 
   "receive error when attempting to retrieve result with invalid uuid" in Fixture() { host =>
