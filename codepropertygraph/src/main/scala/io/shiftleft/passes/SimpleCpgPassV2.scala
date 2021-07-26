@@ -29,14 +29,14 @@ abstract class SimpleCpgPassV2(keyPool: Option[KeyPool] = None)
   /**
     * Main method of enhancement - to be implemented by child class
     * */
-  def run(): Iterator[DiffGraph]
+  def run(diffGraphHandler: DiffGraphHandler): Unit
 
   override def partIterator: Iterator[Unit] = {
     Iterator.single(())
   }
 
-  override def runOnPart(part: Unit): Iterator[DiffGraph] = {
-    run()
+  override def runOnPart(diffGraphHandler: DiffGraphHandler, part: Unit): Unit = {
+    run(diffGraphHandler)
   }
 
 }
@@ -52,7 +52,7 @@ abstract class CpgPassV2[T](val keyPools: Option[Iterator[KeyPool]] = None) {
 
   def partIterator: Iterator[T]
 
-  def runOnPart(part: T): Iterator[DiffGraph]
+  def runOnPart(diffGraphHandler: DiffGraphHandler, part: T): Unit
 
   def workItemIterator: Iterator[WorkItem[T]] = {
     partIterator.map(new WorkItem(_, runOnPart))
@@ -60,10 +60,14 @@ abstract class CpgPassV2[T](val keyPools: Option[Iterator[KeyPool]] = None) {
 
 }
 
-class WorkItem[T](item: T, runOnPart: T => Iterator[DiffGraph]) {
-  def run(): Iterator[DiffGraph] = {
-    runOnPart(item)
+class WorkItem[T](item: T, runOnPart: (DiffGraphHandler, T) => Unit) {
+  def run(diffGraphHandler: DiffGraphHandler): Unit = {
+    runOnPart(diffGraphHandler, item)
   }
+}
+
+trait DiffGraphHandler {
+  def addDiffGraph(diffGraph: DiffGraph): Unit
 }
 
 /**

@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewFile, StoredNode}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, PropertyNames}
-import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
+import io.shiftleft.passes.{DiffGraph, DiffGraphHandler, SimpleCpgPassV2}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.FileTraversal
 import io.shiftleft.semanticcpg.passes.linking.linker.Linker
@@ -15,7 +15,7 @@ import scala.collection.mutable
   * and connect node with FILE node via outgoing SOURCE_FILE edges.
   */
 class FileCreationPass(cpg: Cpg) extends SimpleCpgPassV2 {
-  override def run(): Iterator[DiffGraph] = {
+  override def run(diffGraphHandler: DiffGraphHandler): Unit = {
     val dstGraph = DiffGraph.newBuilder
 
     val originalFileNameToNode = mutable.Map.empty[String, StoredNode]
@@ -56,6 +56,6 @@ class FileCreationPass(cpg: Cpg) extends SimpleCpgPassV2 {
       Some(createFileIfDoesNotExist)
     )
 
-    Iterator(dstGraph.build())
+    diffGraphHandler.addDiffGraph(dstGraph.build())
   }
 }

@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes.metadata
 
 import io.shiftleft.codepropertygraph.generated.nodes.{NewMetaData, NewNamespaceBlock}
-import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph, KeyPool}
+import io.shiftleft.passes.{DiffGraph, DiffGraphHandler, KeyPool, SimpleCpgPassV2}
 import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, NamespaceTraversal}
 
 /**
@@ -11,7 +11,7 @@ import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, Namespa
   * */
 class MetaDataPass(language: String, keyPool: Option[KeyPool] = None)
     extends SimpleCpgPassV2(keyPool = keyPool) {
-  override def run(): Iterator[DiffGraph] = {
+  override def run(diffGraphHandler: DiffGraphHandler): Unit = {
     def addMetaDataNode(diffGraph: DiffGraph.Builder): Unit = {
       val metaNode = NewMetaData().language(language).version("0.1")
       diffGraph.addNode(metaNode)
@@ -29,7 +29,7 @@ class MetaDataPass(language: String, keyPool: Option[KeyPool] = None)
     val diffGraph = DiffGraph.newBuilder
     addMetaDataNode(diffGraph)
     addAnyNamespaceBlock(diffGraph)
-    Iterator(diffGraph.build())
+    diffGraphHandler.addDiffGraph(diffGraph.build())
   }
 }
 

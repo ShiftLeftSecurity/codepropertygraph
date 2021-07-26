@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{MethodBase, NewBlock, NewMethod, NewMethodParameterIn, NewMethodReturn}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes}
-import io.shiftleft.passes.{CpgPassV2, DiffGraph}
+import io.shiftleft.passes.{CpgPassV2, DiffGraph, DiffGraphHandler}
 import io.shiftleft.semanticcpg.language._
 
 import scala.jdk.CollectionConverters._
@@ -39,7 +39,7 @@ class MethodStubCreator(cpg: Cpg) extends CpgPassV2[(NameAndSignature, Int)] {
 
   // TODO bring in Receiver type. Just working on name and comparing to full name
   // will only work for C because in C, name always equals full name.
-  override def runOnPart(part: (NameAndSignature, Int)): Iterator[DiffGraph] = {
+  override def runOnPart(diffGraphHandler: DiffGraphHandler, part: (NameAndSignature, Int)): Unit = {
     val name = part._1.name
     val fullName = part._1.fullName
     val signature = part._1.signature
@@ -51,7 +51,7 @@ class MethodStubCreator(cpg: Cpg) extends CpgPassV2[(NameAndSignature, Int)] {
         createMethodStub(name, fullName, signature, parameterCount, dstGraph)
       case _ =>
     }
-    Iterator(dstGraph.build())
+    diffGraphHandler.addDiffGraph(dstGraph.build())
   }
 
   private def createMethodStub(name: String,

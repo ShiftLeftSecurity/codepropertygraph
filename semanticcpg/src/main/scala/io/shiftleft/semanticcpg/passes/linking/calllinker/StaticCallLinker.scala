@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.linking.calllinker
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes}
-import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
+import io.shiftleft.passes.{DiffGraph, DiffGraphHandler, SimpleCpgPassV2}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -17,7 +17,7 @@ class StaticCallLinker(cpg: Cpg) extends SimpleCpgPassV2 {
   /**
     * Main method of enhancement - to be implemented by child class
     **/
-  override def run(): Iterator[DiffGraph] = {
+  override def run(diffGraphHandler: DiffGraphHandler): Unit = {
     val dstGraph = DiffGraph.newBuilder
     cpg.method.foreach { method =>
       methodFullNameToNode.put(method.fullName, method)
@@ -32,7 +32,7 @@ class StaticCallLinker(cpg: Cpg) extends SimpleCpgPassV2 {
       }
     }
 
-    Iterator(dstGraph.build())
+    diffGraphHandler.addDiffGraph(dstGraph.build())
   }
 
   private def linkCall(call: Call, dstGraph: DiffGraph.Builder): Unit = {

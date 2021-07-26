@@ -14,12 +14,13 @@ class SimpleCpgPassTests extends AnyWordSpec with Matchers {
     def apply(keyPool: Option[KeyPool] = None)(f: (Cpg, CpgPassV2[_]) => Unit): Unit = {
       val cpg = Cpg.emptyCpg
       class MyPass extends SimpleCpgPassV2(keyPool) {
-        override def run(): Iterator[DiffGraph] = {
+        override def run(diffGraphHandler: DiffGraphHandler): Unit = {
           val diffGraph1 = DiffGraph.newBuilder
           val diffGraph2 = DiffGraph.newBuilder
           diffGraph1.addNode(NewFile().name("foo"))
           diffGraph2.addNode(NewFile().name("bar"))
-          Iterator(diffGraph1.build(), diffGraph2.build())
+          diffGraphHandler.addDiffGraph(diffGraph1.build())
+          diffGraphHandler.addDiffGraph(diffGraph2.build())
         }
       }
       val pass = new MyPass()

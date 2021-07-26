@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.cfgdominator
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.{Method, StoredNode}
-import io.shiftleft.passes.{CpgPassV2, DiffGraph}
+import io.shiftleft.passes.{CpgPassV2, DiffGraph, DiffGraphHandler}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.Node
 
@@ -16,7 +16,7 @@ class CfgDominatorPass(cpg: Cpg) extends CpgPassV2[Method] {
 
   override def partIterator: Iterator[Method] = cpg.method.iterator
 
-  override def runOnPart(method: Method): Iterator[DiffGraph] = {
+  override def runOnPart(diffGraphHandler: DiffGraphHandler, method: Method): Unit = {
     val cfgAdapter = new CpgCfgAdapter()
     val dominatorCalculator = new CfgDominator(cfgAdapter)
 
@@ -31,7 +31,7 @@ class CfgDominatorPass(cpg: Cpg) extends CpgPassV2[Method] {
     val cfgNodeToPostImmediateDominator = postDominatorCalculator.calculate(method.methodReturn)
     addPostDomTreeEdges(dstGraph, cfgNodeToPostImmediateDominator)
 
-    Iterator(dstGraph.build())
+    diffGraphHandler.addDiffGraph(dstGraph.build())
   }
 
   private def addDomTreeEdges(dstGraph: DiffGraph.Builder,

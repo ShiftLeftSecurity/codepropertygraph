@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.containsedges
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.AstNode
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import io.shiftleft.passes.{CpgPassV2, DiffGraph}
+import io.shiftleft.passes.{CpgPassV2, DiffGraph, DiffGraphHandler}
 import io.shiftleft.semanticcpg.language._
 
 import scala.jdk.CollectionConverters._
@@ -18,7 +18,7 @@ class ContainsEdgePass(cpg: Cpg) extends CpgPassV2[AstNode] {
   override def partIterator: Iterator[AstNode] =
     cpg.graph.nodes(sourceTypes: _*).asScala.map(_.asInstanceOf[AstNode])
 
-  override def runOnPart(source: AstNode): Iterator[DiffGraph] = {
+  override def runOnPart(diffGraphHandler: DiffGraphHandler, source: AstNode): Unit = {
     val dstGraph = DiffGraph.newBuilder
 
     source
@@ -30,7 +30,7 @@ class ContainsEdgePass(cpg: Cpg) extends CpgPassV2[AstNode] {
       }
       .iterate()
 
-    Iterator(dstGraph.build())
+    diffGraphHandler.addDiffGraph(dstGraph.build())
   }
 }
 

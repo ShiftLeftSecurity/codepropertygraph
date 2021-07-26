@@ -77,7 +77,8 @@ class CpgPassRunner(cpg: Cpg,
           // Note: write.enqueue(runOnPart(part)) would be wrong because
           // it would terminate the writer as soon as a pass returns None
           // as None is used as a termination symbol for the queue
-          workItem.run().foreach(diffGraph => writer.enqueue(Some(diffGraph), keyPool))
+          val diffGraphHandler = new DiffGraphHandlerImpl(writer, keyPool)
+          workItem.run(diffGraphHandler)
       }
       consume(it)
     }
@@ -131,6 +132,12 @@ class CpgPassRunner(cpg: Cpg,
       MDC.put("time", duration.toString())
       logger.info(s"Enhancement $name completed in $duration")
       MDC.remove("time")
+    }
+  }
+
+  private class DiffGraphHandlerImpl(writer: Writer, keyPool: Option[KeyPool]) extends DiffGraphHandler {
+    override def addDiffGraph(diffGraph: DiffGraph): Unit = {
+      writer.enqueue(Some(diffGraph), keyPool)
     }
   }
 

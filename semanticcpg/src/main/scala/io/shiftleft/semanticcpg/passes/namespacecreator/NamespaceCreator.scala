@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.namespacecreator
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.{NamespaceBlock, NewNamespace}
-import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
+import io.shiftleft.passes.{DiffGraph, DiffGraphHandler, SimpleCpgPassV2}
 import io.shiftleft.semanticcpg.language._
 
 /**
@@ -18,7 +18,7 @@ class NamespaceCreator(cpg: Cpg) extends SimpleCpgPassV2 {
     * Creates NAMESPACE nodes and connects NAMESPACE_BLOCKs
     * to corresponding NAMESPACE nodes.
     * */
-  override def run(): Iterator[DiffGraph] = {
+  override def run(diffGraphHandler: DiffGraphHandler): Unit = {
     val dstGraph = DiffGraph.newBuilder
     cpg.namespaceBlock
       .groupBy { nb: NamespaceBlock =>
@@ -30,6 +30,6 @@ class NamespaceCreator(cpg: Cpg) extends SimpleCpgPassV2 {
           dstGraph.addNode(namespace)
           blocks.foreach(block => dstGraph.addEdgeFromOriginal(block, namespace, EdgeTypes.REF))
       }
-    Iterator(dstGraph.build())
+    diffGraphHandler.addDiffGraph(dstGraph.build())
   }
 }

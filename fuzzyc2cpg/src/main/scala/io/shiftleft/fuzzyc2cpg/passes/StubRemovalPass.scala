@@ -2,7 +2,7 @@ package io.shiftleft.fuzzyc2cpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.Method
-import io.shiftleft.passes.{CpgPassV2, DiffGraph}
+import io.shiftleft.passes.{CpgPassV2, DiffGraph, DiffGraphHandler}
 import io.shiftleft.semanticcpg.language._
 
 import scala.collection.mutable
@@ -24,9 +24,9 @@ class StubRemovalPass(cpg: Cpg) extends CpgPassV2[Method] {
       .filter(m => methodSignatureWithDef.contains(m.signature))
       .iterator
 
-  override def runOnPart(stub: Method): Iterator[DiffGraph] = {
+  override def runOnPart(diffGraphHandler: DiffGraphHandler, stub: Method): Unit = {
     val diffGraph = DiffGraph.newBuilder
     stub.ast.foreach(diffGraph.removeNode)
-    Iterator(diffGraph.build())
+    diffGraphHandler.addDiffGraph(diffGraph.build())
   }
 }

@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.methodexternaldecorator
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.PropertyNames
 import io.shiftleft.codepropertygraph.generated.nodes.{Method, StoredNode, TypeDecl}
-import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
+import io.shiftleft.passes.{DiffGraph, DiffGraphHandler, SimpleCpgPassV2}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -46,7 +46,7 @@ class MethodExternalDecoratorPass(cpg: Cpg) extends SimpleCpgPassV2 {
     )
   }
 
-  override def run(): Iterator[DiffGraph] = {
+  override def run(diffGraphHandler: DiffGraphHandler): Unit = {
     val dstGraph = DiffGraph.newBuilder
 
     cpg.method
@@ -65,7 +65,7 @@ class MethodExternalDecoratorPass(cpg: Cpg) extends SimpleCpgPassV2 {
         }
       }
 
-    Iterator(dstGraph.build())
+    diffGraphHandler.addDiffGraph(dstGraph.build())
   }
 
   @inline

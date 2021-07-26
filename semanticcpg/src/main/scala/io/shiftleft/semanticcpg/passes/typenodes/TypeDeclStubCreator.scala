@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.typenodes
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewTypeDecl, TypeDeclBase}
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
-import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
+import io.shiftleft.passes.{DiffGraph, DiffGraphHandler, SimpleCpgPassV2}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, NamespaceTraversal}
 
@@ -17,7 +17,7 @@ class TypeDeclStubCreator(cpg: Cpg) extends SimpleCpgPassV2 {
 
   private var typeDeclFullNameToNode = Map[String, TypeDeclBase]()
 
-  override def run(): Iterator[DiffGraph] = {
+  override def run(diffGraphHandler: DiffGraphHandler): Unit = {
     val dstGraph = DiffGraph.newBuilder
 
     init()
@@ -30,7 +30,7 @@ class TypeDeclStubCreator(cpg: Cpg) extends SimpleCpgPassV2 {
         dstGraph.addNode(newTypeDecl)
       }
 
-    Iterator(dstGraph.build())
+    diffGraphHandler.addDiffGraph(dstGraph.build())
   }
 
   private def createTypeDeclStub(name: String, fullName: String): NewTypeDecl = {

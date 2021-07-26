@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.codepencegraph
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties}
-import io.shiftleft.passes.{CpgPassV2, DiffGraph}
+import io.shiftleft.passes.{CpgPassV2, DiffGraph, DiffGraphHandler}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominatorFrontier, ReverseCpgCfgAdapter}
 import org.slf4j.{Logger, LoggerFactory}
@@ -18,7 +18,7 @@ class CdgPass(cpg: Cpg) extends CpgPassV2[Method] {
 
   override def partIterator: Iterator[Method] = cpg.method.iterator
 
-  override def runOnPart(method: Method): Iterator[DiffGraph] = {
+  override def runOnPart(diffGraphHandler: DiffGraphHandler, method: Method): Unit = {
 
     val dominanceFrontier = new CfgDominatorFrontier(new ReverseCpgCfgAdapter, new CpgPostDomTreeAdapter)
 
@@ -44,7 +44,7 @@ class CdgPass(cpg: Cpg) extends CpgPassV2[Method] {
               s" number of outgoing CFG edges from $nodeLabel node: ${postDomFrontierNode.outE(EdgeTypes.CFG).asScala.size}")
         }
     }
-    Iterator(dstGraph.build())
+    diffGraphHandler.addDiffGraph(dstGraph.build())
   }
 }
 

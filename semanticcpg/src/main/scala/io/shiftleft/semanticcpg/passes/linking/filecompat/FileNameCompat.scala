@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.linking.filecompat
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
+import io.shiftleft.passes.{DiffGraph, DiffGraphHandler, SimpleCpgPassV2}
 import io.shiftleft.semanticcpg.language._
 
 /**
@@ -14,7 +14,7 @@ import io.shiftleft.semanticcpg.language._
   * is, after Linker.  Is used by FileLinker.
   */
 class FileNameCompat(cpg: Cpg) extends SimpleCpgPassV2 {
-  override def run(): Iterator[DiffGraph] = {
+  override def run(diffGraphHandler: DiffGraphHandler): Unit = {
     val dstGraph = DiffGraph.newBuilder
 
     def updateDefaultFileName(node: StoredNode with HasFilename): Unit = {
@@ -29,6 +29,6 @@ class FileNameCompat(cpg: Cpg) extends SimpleCpgPassV2 {
     cpg.typeDecl.foreach(updateDefaultFileName)
     cpg.method.foreach(updateDefaultFileName)
 
-    Iterator(dstGraph.build())
+    diffGraphHandler.addDiffGraph(dstGraph.build())
   }
 }

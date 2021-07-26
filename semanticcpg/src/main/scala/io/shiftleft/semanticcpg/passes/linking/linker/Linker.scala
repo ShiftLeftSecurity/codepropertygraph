@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.linking.linker
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{PropertyNames, _}
-import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
+import io.shiftleft.passes.{DiffGraph, DiffGraphHandler, SimpleCpgPassV2}
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
 import overflowdb.traversal._
@@ -22,7 +22,7 @@ class Linker(cpg: Cpg) extends SimpleCpgPassV2 {
   private val methodFullNameToNode = mutable.Map.empty[String, StoredNode]
   private val namespaceBlockFullNameToNode = mutable.Map.empty[String, StoredNode]
 
-  override def run(): Iterator[DiffGraph] = {
+  override def run(diffGraphHandler: DiffGraphHandler): Unit = {
     val dstGraph = DiffGraph.newBuilder
 
     initMaps()
@@ -117,7 +117,7 @@ class Linker(cpg: Cpg) extends SimpleCpgPassV2 {
       dstGraph
     )
 
-    Iterator(dstGraph.build())
+    diffGraphHandler.addDiffGraph(dstGraph.build())
   }
 
   private def initMaps(): Unit = {

@@ -1,7 +1,7 @@
 package io.shiftleft.console
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
+import io.shiftleft.passes.{DiffGraph, DiffGraphHandler, SimpleCpgPassV2}
 import io.shiftleft.semanticcpg.language.HasStoreMethod
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext}
 import org.reflections8.Reflections
@@ -20,10 +20,10 @@ object Run {
         override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
           val pass: SimpleCpgPassV2 = new SimpleCpgPassV2 {
             override val name = "custom"
-            override def run(): Iterator[DiffGraph] = {
+            override def run(diffGraphHandler: DiffGraphHandler): Unit = {
               implicit val diffGraph: DiffGraph.Builder = DiffGraph.newBuilder
               query.store()
-              Iterator(diffGraph.build())
+              diffGraphHandler.addDiffGraph(diffGraph.build())
             }
           }
           runPasses(pass::Nil, context, storeUndoInfo)

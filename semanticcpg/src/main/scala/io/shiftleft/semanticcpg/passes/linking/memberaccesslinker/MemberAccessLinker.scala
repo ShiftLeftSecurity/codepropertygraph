@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.linking.memberaccesslinker
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Operators}
-import io.shiftleft.passes.{SimpleCpgPassV2, DiffGraph}
+import io.shiftleft.passes.{DiffGraph, DiffGraphHandler, SimpleCpgPassV2}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal._
@@ -18,7 +18,7 @@ class MemberAccessLinker(cpg: Cpg) extends SimpleCpgPassV2 {
 
   private[this] var loggedDeprecationWarning: Boolean = _
 
-  override def run(): Iterator[DiffGraph] = {
+  override def run(diffGraphHandler: DiffGraphHandler): Unit = {
     loggedDeprecationWarning = false
     val memberAccessIterator = cpg.call
       .where(
@@ -32,7 +32,7 @@ class MemberAccessLinker(cpg: Cpg) extends SimpleCpgPassV2 {
     val cache = collection.mutable.Map.empty[(Type, String), Member]
     val dstGraph = DiffGraph.newBuilder // don't use parallel executor, caching is better
     memberAccessIterator.foreach(ma => resolve(dstGraph, cache, ma))
-    List(dstGraph.build()).iterator
+    diffGraphHandler.addDiffGraph(dstGraph.build())
   }
 
   private def resolve(diffGraph: DiffGraph.Builder,

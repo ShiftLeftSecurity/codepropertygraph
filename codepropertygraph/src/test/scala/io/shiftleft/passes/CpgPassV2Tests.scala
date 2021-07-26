@@ -20,10 +20,10 @@ class CpgPassV2Tests extends AnyWordSpec with Matchers {
           Iterator("foo", "bar")
         }
 
-        override def runOnPart(part: String): Iterator[DiffGraph] = {
+        override def runOnPart(diffGraphHandler: DiffGraphHandler, part: String): Unit = {
           val diffGraph = DiffGraph.newBuilder
           diffGraph.addNode(NewFile().name(part))
-          Iterator(diffGraph.build())
+          diffGraphHandler.addDiffGraph(diffGraph.build())
         }
       }
       val pass = new MyPass()

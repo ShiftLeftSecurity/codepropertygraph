@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Languages, ModifierTypes}
-import io.shiftleft.passes.{SimpleCpgPassV2, CpgPassRunner, DiffGraph}
+import io.shiftleft.passes.{CpgPassRunner, DiffGraph, DiffGraphHandler, SimpleCpgPassV2}
 import io.shiftleft.semanticcpg.language._
 
 package object testing {
@@ -190,8 +190,8 @@ package object testing {
       val diffGraph = new DiffGraph.Builder
       f(diffGraph, cpg)
       class MyPass extends SimpleCpgPassV2 {
-        override def run(): Iterator[DiffGraph] = {
-          Iterator(diffGraph.build())
+        override def run(diffGraphHandler: DiffGraphHandler): Unit = {
+          diffGraphHandler.addDiffGraph(diffGraph.build())
         }
       }
       CpgPassRunner.apply(cpg, new MyPass())

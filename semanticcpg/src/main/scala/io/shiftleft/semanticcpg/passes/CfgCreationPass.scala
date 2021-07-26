@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.Method
-import io.shiftleft.passes.{CpgPassV2, DiffGraph}
+import io.shiftleft.passes.{CpgPassV2, DiffGraphHandler}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgcreation.CfgCreator
 
@@ -21,7 +21,7 @@ class CfgCreationPass(cpg: Cpg) extends CpgPassV2[Method] {
 
   override def partIterator: Iterator[Method] = cpg.method.iterator
 
-  override def runOnPart(method: Method): Iterator[DiffGraph] =
-    new CfgCreator(method).run()
+  override def runOnPart(diffGraphHandler: DiffGraphHandler, method: Method): Unit =
+    new CfgCreator(method).run().foreach(diffGraphHandler.addDiffGraph)
 
 }

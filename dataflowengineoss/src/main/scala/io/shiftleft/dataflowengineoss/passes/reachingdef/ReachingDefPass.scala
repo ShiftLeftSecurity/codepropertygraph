@@ -3,7 +3,7 @@ package io.shiftleft.dataflowengineoss.passes.reachingdef
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, PropertyNames}
-import io.shiftleft.passes.{CpgPassV2, DiffGraph}
+import io.shiftleft.passes.{CpgPassV2, DiffGraph, DiffGraphHandler}
 import io.shiftleft.semanticcpg.language._
 
 import scala.collection.Set
@@ -15,11 +15,11 @@ class ReachingDefPass(cpg: Cpg) extends CpgPassV2[Method] {
 
   override def partIterator: Iterator[Method] = cpg.method.iterator
 
-  override def runOnPart(method: Method): Iterator[DiffGraph] = {
+  override def runOnPart(diffGraphHandler: DiffGraphHandler, method: Method): Unit = {
     val problem = ReachingDefProblem.create(method)
     val solution = new DataFlowSolver().calculateMopSolutionForwards(problem)
     val dstGraph = addReachingDefEdges(method, solution)
-    Iterator(dstGraph.build())
+    diffGraphHandler.addDiffGraph(dstGraph.build())
   }
 
   /**
