@@ -80,7 +80,13 @@ class CPGQLServer(ammonite: EmbeddedAmmonite,
     val res = if (!isAuthorized) {
       unauthorizedResponse
     } else {
-      val hasErrorOnParseQuery = query.parse[Stat].toOption.isEmpty
+      val hasErrorOnParseQuery =
+        try {
+          query.parse[Stat].toOption.isEmpty
+        } catch {
+          case _: org.scalameta.invariants.InvariantFailedException => true
+          case _: Throwable                                         => true
+        }
       if (hasErrorOnParseQuery) {
         val result = new QueryResult("", CPGLSError.parseError.toString, UUID.randomUUID())
         resultMap.put(result.uuid, (result, false))
