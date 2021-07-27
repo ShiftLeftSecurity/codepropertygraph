@@ -15,12 +15,9 @@ import org.slf4j.LoggerFactory
 import scopt.OParser
 
 import java.nio.file.Paths
-import java.util.concurrent.ConcurrentHashMap
 import scala.util.control.NonFatal
 
-case class Global(usedTypes: ConcurrentHashMap[String, Boolean] = new ConcurrentHashMap[String, Boolean]())
-
-class C2Cpg() {
+class C2Cpg {
 
   private def createParseConfig(config: Config): ParseConfig = {
     ParseConfig(

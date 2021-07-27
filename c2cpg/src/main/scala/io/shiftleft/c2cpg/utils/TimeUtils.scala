@@ -14,10 +14,10 @@ object TimeUtils {
     (result, elapsed)
   }
 
+  /** Selects most appropriate TimeUnit for given duration and formats it accordingly */
   def pretty(duration: Long): String = pretty(Duration.fromNanos(duration))
 
-  /** Selects most appropriate TimeUnit for given duration and formats it accordingly */
-  def pretty(duration: Duration): String =
+  private def pretty(duration: Duration): String =
     duration match {
       case d: FiniteDuration =>
         val nanos = d.toNanos

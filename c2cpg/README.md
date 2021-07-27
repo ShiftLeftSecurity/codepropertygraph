@@ -7,11 +7,11 @@ An [Eclipse CDT](https://wiki.eclipse.org/CDT/designs/Overview_of_Parsing) based
 
 ## Building the code
 
-The build process has been verified on Linux and it should be possible 
+The build process has been verified on Linux, and it should be possible 
 to build on OS X and BSD systems as well. The build process requires
 the following prerequisites:
 
-* Java runtime 8
+* Java runtime 11
   - Link: http://openjdk.java.net/install/
 * Scala build tool (sbt)
   - Link: https://www.scala-sbt.org/
@@ -73,7 +73,7 @@ Number of files with problems: 32940
 ## Dealing with Parser problems:
 (copied from [here](https://wiki.eclipse.org/CDT/designs/Overview_of_Parsing))
 
-When a syntax error is encountered in the source a _problem node_ will be generated in the AST. There are four types of problem node:
+In case a syntax error is encountered in the source a _problem node_ will be generated in the AST. There are four types of problem node:
  - `IASTProblemDeclaration`
  - `IASTProblemExpression`
  - `IASTProblemStatement`

@@ -6,15 +6,9 @@ import org.eclipse.cdt.internal.core.parser.IMacroDictionary
 import org.eclipse.cdt.internal.core.parser.scanner.{InternalFileContent, InternalFileContentProvider}
 import org.slf4j.LoggerFactory
 
-object CustomFileContentProvider {
-
-  private val logger = LoggerFactory.getLogger(classOf[CustomFileContentProvider])
-
-}
-
 class CustomFileContentProvider extends InternalFileContentProvider {
 
-  import CustomFileContentProvider.logger
+  private val logger = LoggerFactory.getLogger(classOf[CustomFileContentProvider])
 
   private def loadContent(path: String): InternalFileContent =
     if (!getInclusionExists(path)) {

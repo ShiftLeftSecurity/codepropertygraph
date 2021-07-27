@@ -55,7 +55,33 @@ class EnumTests extends AnyWordSpec with Matchers with Inside {
               green.name shouldBe "green"
               blue.name shouldBe "blue"
           }
-          inside(color.ast.isCall.code.l) {
+          inside(color.astChildren.isCall.code.l) {
+            case List(greenInit) =>
+              greenInit shouldBe "green = 20"
+          }
+      }
+    }
+
+    "be correct for simple enum typedef" in EnumFixture("""
+                                                  |typedef enum color
+                                                  |{
+                                                  |    red,
+                                                  |    yellow,
+                                                  |    green = 20,
+                                                  |    blue
+                                                  |} C;""".stripMargin) { cpg =>
+      inside(cpg.typeDecl.l) {
+        case List(color) =>
+          color.name shouldBe "C"
+          color.aliasTypeFullName shouldBe Some("color")
+          inside(color.astChildren.isMember.l) {
+            case List(red, yellow, green, blue) =>
+              red.name shouldBe "red"
+              yellow.name shouldBe "yellow"
+              green.name shouldBe "green"
+              blue.name shouldBe "blue"
+          }
+          inside(color.astChildren.isCall.code.l) {
             case List(greenInit) =>
               greenInit shouldBe "green = 20"
           }
@@ -78,7 +104,7 @@ class EnumTests extends AnyWordSpec with Matchers with Inside {
               low.name shouldBe "low"
               low.typeFullName shouldBe "char"
           }
-          inside(altitude.ast.isCall.code.l) {
+          inside(altitude.astChildren.isCall.code.l) {
             case List(highInit, lowInit) =>
               highInit shouldBe "high='h'"
               lowInit shouldBe "low='l'"
