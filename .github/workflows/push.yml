@@ -90,16 +90,17 @@ jobs:
         run: git submodule update --init --recursive
       - name: apt-get update
         run: sudo apt-get update
-      - name: Set up JDK 1.8
-        run: sudo apt-get install openjdk-8-jdk
-      - name: Print sbt version
-        run: sbt --version
       - name: Install gnupg
         run: sudo apt update && sudo apt install -y gnupg
       - name: Import GPG key
         run: echo $PGP_SECRET | base64 --decode | gpg --batch --import
         env:
             PGP_SECRET: ${{ secrets.PGP_SECRET }}
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: 11
       - name: Release to Sonatype
         run: sbt ciReleaseTagNextVersion ciReleaseSonatype
         env:
