@@ -9,8 +9,8 @@ import overflowdb.traversal._
 import java.security.MessageDigest
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
-import scala.compat.java8.OptionConverters.RichOptionalGeneric
 import scala.jdk.CollectionConverters._
+import scala.jdk.OptionConverters.RichOptional
 
 /**
   * A lightweight write-only graph used for creation of CPG graph overlays
@@ -277,7 +277,7 @@ object DiffGraph {
     def onNewEdge(edge: Edge) = builder.removeEdge(edge)
 
     def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String) =
-      node.propertyOption(propertyKey).asScala match {
+      node.propertyOption(propertyKey).toScala match {
         case Some(value) if value != node.propertyDefaultValue(propertyKey) =>
           builder.addNodeProperty(node, propertyKey, value)
         case _ =>
