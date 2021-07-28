@@ -14,6 +14,7 @@ import org.eclipse.cdt.internal.core.dom.parser.cpp.{
   CPPASTFunctionDeclarator,
   CPPASTIdExpression,
   CPPASTQualifiedName,
+  CPPASTTypeIdInitializerExpression,
   CPPFunction
 }
 import org.slf4j.LoggerFactory
@@ -499,6 +500,8 @@ class AstCreator(filename: String, global: Global) {
             astForInitializer(d, d.getInitializer, locals.size + order + o - 1)
           }
         locals ++ calls
+      case s: ICPPASTStaticAssertDeclaration =>
+        Seq(astForStaticAssert(s, order))
       case usingDeclaration: ICPPASTUsingDeclaration =>
         handleUsingDeclaration(usingDeclaration)
         Seq.empty
@@ -563,6 +566,8 @@ class AstCreator(filename: String, global: Global) {
         (astForFieldReference(reference, order), Some(astForNode(reference.getFieldName, 0)))
       case reference: IASTFieldReference =>
         (astForFieldReference(reference, order), None)
+      case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTFieldReference] =>
+        (astForFieldReference(unaryExpression.getOperand.asInstanceOf[IASTFieldReference], order), None)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTConditionalExpression] =>
         (astForUnaryExpression(unaryExpression, order), None)
       case _ =>
@@ -768,6 +773,55 @@ class AstCreator(filename: String, global: Global) {
     Ast(ma).withChild(owner).withChild(Ast(member)).withArgEdge(ma, owner.root.get).withArgEdge(ma, member)
   }
 
+  private def astForTypeIdInitExpression(typeIdInit: CPPASTTypeIdInitializerExpression, order: Int): Ast = {
+    val cpgCastExpression =
+      newCallNode(typeIdInit, Operators.cast, Operators.cast, DispatchTypes.STATIC_DISPATCH, order)
+
+    // TODO: how to represent the initializer here?
+    val expr = Ast(
+      NewUnknown()
+        .parserTypeName(typeIdInit.getInitializer.getClass.getSimpleName)
+        .code(typeIdInit.getInitializer.getRawSignature)
+        .order(1)
+        .argumentIndex(1)
+        .lineNumber(line(typeIdInit.getInitializer))
+        .columnNumber(column(typeIdInit.getInitializer)))
+
+    val typeNode = typeIdInit.getTypeId
+    val typeAst = Ast(
+      NewUnknown()
+        .parserTypeName(typeNode.getClass.getSimpleName)
+        .code(typeNode.getRawSignature)
+        .order(2)
+        .argumentIndex(2)
+        .lineNumber(line(typeNode))
+        .columnNumber(column(typeNode)))
+
+    Ast(cpgCastExpression)
+      .withChild(typeAst)
+      .withChild(expr)
+      .withArgEdge(cpgCastExpression, typeAst.root.get)
+      .withArgEdge(cpgCastExpression, expr.root.get)
+  }
+
+  private def astForConstructorExpression(c: ICPPASTSimpleTypeConstructorExpression, order: Int): Ast = {
+    val name = c.getDeclSpecifier.toString
+    val callNode = newCallNode(c, name, name, DispatchTypes.STATIC_DISPATCH, order)
+
+    // TODO: how to represent the initializer here?
+    val arg = Ast(
+      NewUnknown()
+        .parserTypeName(c.getInitializer.getClass.getSimpleName)
+        .code(c.getInitializer.getRawSignature)
+        .order(1)
+        .argumentIndex(1)
+        .lineNumber(line(c.getInitializer))
+        .columnNumber(column(c.getInitializer)))
+
+    val ast = Ast(callNode).withChild(arg)
+    ast.withArgEdge(callNode, arg.root.get)
+  }
+
   private def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
     case lit: IASTLiteralExpression   => astForLiteral(lit, order)
     case un: IASTUnaryExpression      => astForUnaryExpression(un, order)
@@ -784,6 +838,8 @@ class AstCreator(filename: String, global: Global) {
     case castExpression: IASTCastExpression                 => astForCastExpression(castExpression, order)
     case newExpression: ICPPASTNewExpression                => astForNewExpression(newExpression, order)
     case delExpression: ICPPASTDeleteExpression             => astForDeleteExpression(delExpression, order)
+    case typeIdInit: CPPASTTypeIdInitializerExpression      => astForTypeIdInitExpression(typeIdInit, order)
+    case c: ICPPASTSimpleTypeConstructorExpression          => astForConstructorExpression(c, order)
     case _                                                  => notHandledYet(expression)
   }
 
@@ -870,31 +926,32 @@ class AstCreator(filename: String, global: Global) {
     val cpgTry = newControlStructureNode(tryStmt, ControlStructureTypes.TRY, "try", order)
     val body = nullSafeAst(tryStmt.getTryBody, 1)
     val catches = withOrder(tryStmt.getCatchHandlers) { (c, o) =>
-      astForNode(c, o + 1)
-    }
+      astsForStatement(c.getCatchBody, o + 1)
+    }.flatten
     Ast(cpgTry).withChildren(body).withChildren(catches)
   }
 
   private def astsForStatement(statement: IASTStatement, order: Int): Seq[Ast] = {
     statement match {
-      case expr: IASTExpressionStatement     => Seq(astForExpression(expr.getExpression, order))
-      case block: IASTCompoundStatement      => Seq(astForBlockStatement(block, order))
-      case ifStmt: IASTIfStatement           => Seq(astForIf(ifStmt, order))
-      case whileStmt: IASTWhileStatement     => Seq(astForWhile(whileStmt, order))
-      case forStmt: IASTForStatement         => Seq(astForFor(forStmt, order))
-      case doStmt: IASTDoStatement           => Seq(astForDo(doStmt, order))
-      case switchStmt: IASTSwitchStatement   => Seq(astForSwitch(switchStmt, order))
-      case ret: IASTReturnStatement          => Seq(astForReturnStatement(ret, order))
-      case br: IASTBreakStatement            => Seq(astForBreakStatement(br, order))
-      case cont: IASTContinueStatement       => Seq(astForContinueStatement(cont, order))
-      case goto: IASTGotoStatement           => Seq(astForGotoStatement(goto, order))
-      case defStmt: IASTDefaultStatement     => Seq(astForDefaultStatement(defStmt, order))
-      case tryStmt: ICPPASTTryBlockStatement => Seq(astForTryStatement(tryStmt, order))
-      case caseStmt: IASTCaseStatement       => astsForCaseStatement(caseStmt, order)
-      case decl: IASTDeclarationStatement    => astsForDeclarationStatement(decl, order)
-      case label: IASTLabelStatement         => astsForLabelStatement(label, order)
-      case _: IASTNullStatement              => Seq.empty
-      case _                                 => notHandledYetSeq(statement)
+      case expr: IASTExpressionStatement          => Seq(astForExpression(expr.getExpression, order))
+      case block: IASTCompoundStatement           => Seq(astForBlockStatement(block, order))
+      case ifStmt: IASTIfStatement                => Seq(astForIf(ifStmt, order))
+      case whileStmt: IASTWhileStatement          => Seq(astForWhile(whileStmt, order))
+      case forStmt: IASTForStatement              => Seq(astForFor(forStmt, order))
+      case forStmt: ICPPASTRangeBasedForStatement => Seq(astForRangedFor(forStmt, order))
+      case doStmt: IASTDoStatement                => Seq(astForDo(doStmt, order))
+      case switchStmt: IASTSwitchStatement        => Seq(astForSwitch(switchStmt, order))
+      case ret: IASTReturnStatement               => Seq(astForReturnStatement(ret, order))
+      case br: IASTBreakStatement                 => Seq(astForBreakStatement(br, order))
+      case cont: IASTContinueStatement            => Seq(astForContinueStatement(cont, order))
+      case goto: IASTGotoStatement                => Seq(astForGotoStatement(goto, order))
+      case defStmt: IASTDefaultStatement          => Seq(astForDefaultStatement(defStmt, order))
+      case tryStmt: ICPPASTTryBlockStatement      => Seq(astForTryStatement(tryStmt, order))
+      case caseStmt: IASTCaseStatement            => astsForCaseStatement(caseStmt, order)
+      case decl: IASTDeclarationStatement         => astsForDeclarationStatement(decl, order)
+      case label: IASTLabelStatement              => astsForLabelStatement(label, order)
+      case _: IASTNullStatement                   => Seq.empty
+      case _                                      => notHandledYetSeq(statement)
     }
   }
 
@@ -1220,6 +1277,17 @@ class AstCreator(filename: String, global: Global) {
         astsForDeclaration(d, o)
     }.flatten
 
+  private def astForStaticAssert(a: ICPPASTStaticAssertDeclaration, order: Int): Ast = {
+    val name = "static_assert"
+    val call = newCallNode(a, name, name, DispatchTypes.STATIC_DISPATCH, order)
+    val cond = nullSafeAst(a.getCondition, 1)
+    val messg = nullSafeAst(a.getMessage, 2)
+    var ast = Ast(call).withChild(cond).withChild(messg)
+    cond.root.foreach(r => ast = ast.withArgEdge(call, r))
+    messg.root.foreach(m => ast = ast.withArgEdge(call, m))
+    ast
+  }
+
   private def astsForDeclaration(decl: IASTDeclaration, order: Int): Seq[Ast] = decl match {
     case functDef: IASTFunctionDefinition =>
       Seq(astForFunctionDefinition(functDef, order))
@@ -1251,6 +1319,7 @@ class AstCreator(filename: String, global: Global) {
       Seq.empty
     case s: IASTSimpleDeclaration if s.getRawSignature == ";" => Seq.empty
     case l: ICPPASTLinkageSpecification                       => astsForLinkageSpecification(l)
+    case a: ICPPASTStaticAssertDeclaration                    => Seq(astForStaticAssert(a, order))
     case _                                                    => notHandledYetSeq(decl)
   }
 
@@ -1280,6 +1349,23 @@ class AstCreator(filename: String, global: Global) {
         ast.withConditionEdge(forNode, c)
       case None => ast
     }
+  }
+
+  private def astForRangedFor(forStmt: ICPPASTRangeBasedForStatement, order: Int): Ast = {
+    val codeDecl = nullSafeCode(forStmt.getDeclaration)
+    val codeInit = nullSafeCode(forStmt.getInitializerClause)
+
+    val code = s"for ($codeDecl:$codeInit)"
+    val forNode = newControlStructureNode(forStmt, ControlStructureTypes.FOR, code, order)
+
+    val initAst = astForNode(forStmt.getInitializerClause, 1)
+    val declAst = astsForDeclaration(forStmt.getDeclaration, 2)
+    val stmtAst = nullSafeAst(forStmt.getBody, 3)
+
+    Ast(forNode)
+      .withChild(initAst)
+      .withChildren(declAst)
+      .withChildren(stmtAst)
   }
 
   private def astForWhile(whileStmt: IASTWhileStatement, order: Int): Ast = {

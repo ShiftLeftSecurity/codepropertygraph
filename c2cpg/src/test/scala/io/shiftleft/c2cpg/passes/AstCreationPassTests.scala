@@ -293,6 +293,35 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
+    "be correct for ranged for-loop" in Fixture("""
+       |void method() {
+       |  for (int x : list) {
+       |    int z = x;
+       |  }
+       |}
+      """.stripMargin) { cpg =>
+      cpg.method.name("method").controlStructure.l match {
+        case List(forStmt) =>
+          forStmt.controlStructureType shouldBe ControlStructureTypes.FOR
+          forStmt.astChildren.order(1).l match {
+            case List(ident) =>
+              ident.code shouldBe "list"
+            case _ => fail()
+          }
+          forStmt.astChildren.order(2).l match {
+            case List(ident) =>
+              ident.code shouldBe "x"
+            case _ => fail()
+          }
+          forStmt.astChildren.order(3).l match {
+            case List(block) =>
+              block.astChildren.isCall.code.l shouldBe List("z = x")
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+    }
+
     "be correct for for-loop with multiple initializations" in Fixture("""
         |void method(int x, int y) {
         |  for ( x = 0, y = 0; x < 1; x += 1) {
@@ -399,6 +428,26 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |void method(struct someUndefinedStruct *x) {
         |  x->a;
         |}
+      """.stripMargin) { cpg =>
+      cpg.method.name("method").ast.isCall.name(Operators.indirectFieldAccess).l match {
+        case List(call) =>
+          val arg1 = call.argument(1)
+          val arg2 = call.argument(2)
+          arg1.isIdentifier shouldBe true
+          arg1.argumentIndex shouldBe 1
+          arg1.asInstanceOf[Identifier].name shouldBe "x"
+          arg2.isFieldIdentifier shouldBe true
+          arg2.argumentIndex shouldBe 2
+          arg2.asInstanceOf[FieldIdentifier].code shouldBe "a"
+          arg2.asInstanceOf[FieldIdentifier].canonicalName shouldBe "a"
+        case _ => fail()
+      }
+    }
+
+    "be correct for indirect field access in call" in Fixture("""
+          |void method(struct someUndefinedStruct *x) {
+          |  return (x->a)(1, 2);
+          |}
       """.stripMargin) { cpg =>
       cpg.method.name("method").ast.isCall.name(Operators.indirectFieldAccess).l match {
         case List(call) =>
@@ -607,6 +656,53 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
+    "be correct for type initializer expression" in Fixture(
+      """
+        |int x = (int){ 1 };
+      """.stripMargin
+    ) { cpg =>
+      cpg.call.name(Operators.cast).l match {
+        case List(call: Call) =>
+          call.argument(1).code shouldBe "{ 1 }"
+          call.argument(2).code shouldBe "int"
+        case _ => fail()
+      }
+    }
+
+    "be correct for static assert" in Fixture(
+      """
+        |void foo(){
+        | int a = 0;
+        | static_assert ( a == 0 , "not 0!");
+        |}
+      """.stripMargin
+    ) { cpg =>
+      cpg.call.codeExact("static_assert ( a == 0 , \"not 0!\");").l match {
+        case List(call: Call) =>
+          call.name shouldBe "static_assert"
+          call.argument(1).code shouldBe "a == 0"
+          call.argument(2).code shouldBe "\"not 0!\""
+        case _ => fail()
+      }
+    }
+
+    "be correct for try catch" in Fixture(
+      """
+        |void bar();
+        |int foo(){
+        | try { bar(); } 
+        | catch(x) { return 0; };
+        |}
+      """.stripMargin
+    ) { cpg =>
+      cpg.controlStructure.l match {
+        case List(t) =>
+          t.ast.isCall.order(1).code.l shouldBe List("bar()")
+          t.ast.isReturn.code.l shouldBe List("return 0;")
+        case _ => fail()
+      }
+    }
+
     "be correct for constructor initializer" in Fixture(
       """
         |class Foo {
@@ -624,6 +720,27 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         case List(call: Call) =>
           call.name shouldBe "f1"
           call.argument(1).code shouldBe "0"
+        case _ => fail()
+      }
+    }
+
+    "be correct for constructor expression" in Fixture(
+      """
+        |class Foo {
+        |public:
+        | Foo(int i) {  };
+        |};
+        |Foo x = Foo{0};
+      """.stripMargin
+    ) { cpg =>
+      cpg.typeDecl
+        .name("Foo")
+        .l
+        .size shouldBe 1
+      cpg.call.codeExact("Foo{0}").l match {
+        case List(call: Call) =>
+          call.name shouldBe "Foo"
+          call.argument(1).code shouldBe "{0}"
         case _ => fail()
       }
     }
