@@ -474,9 +474,7 @@ class AstCreator(filename: String, global: Global) {
       case i: ICPPASTConstructorInitializer =>
         val name = declarator.getName.toString
         val callNode = newCallNode(declarator, name, name, DispatchTypes.STATIC_DISPATCH, order)
-
         val args = withOrder(i.getArguments) { case (a, o) => astForNode(a, o) }
-
         val ast = Ast(callNode) withChildren (args)
         val validArgs = args.collect { case a if a.root.isDefined => a.root.get }
         ast.withArgEdges(callNode, validArgs)
@@ -519,6 +517,14 @@ class AstCreator(filename: String, global: Global) {
           .order(order)
         scope.addToScope(name, (l, declTypeName))
         Ast(l)
+      case _ if scope.isEmpty =>
+        Ast(
+          NewTypeDecl()
+            .name(name)
+            .fullName(name)
+            .isExternal(false)
+            .filename(declaration.getContainingFilename)
+            .order(order))
       case _ => notHandledYet(declaration)
     }
   }
@@ -596,8 +602,15 @@ class AstCreator(filename: String, global: Global) {
     ast
   }
 
-  private def astForExpressionList(exprList: IASTExpressionList, order: Int): Ast =
-    Ast().withChildren(exprList.getExpressions.toIndexedSeq.map(astForExpression(_, order)))
+  private def astForExpressionList(exprList: IASTExpressionList, order: Int): Ast = {
+    val b = NewBlock()
+      .order(order)
+      .argumentIndex(order)
+      .typeFullName(registerType(Defines.voidTypeName))
+      .lineNumber(line(exprList))
+      .columnNumber(column(exprList))
+    Ast(b).withChildren(exprList.getExpressions.toIndexedSeq.map(astForExpression(_, order)))
+  }
 
   private def astForCall(call: IASTFunctionCallExpression, order: Int): Ast = {
     val (cpgCall, receiver) = call.getFunctionNameExpression match {
