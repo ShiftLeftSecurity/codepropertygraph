@@ -566,6 +566,8 @@ class AstCreator(filename: String, global: Global) {
         (astForFieldReference(reference, order), Some(astForNode(reference.getFieldName, 0)))
       case reference: IASTFieldReference =>
         (astForFieldReference(reference, order), None)
+      case b: IASTBinaryExpression =>
+        (astForBinaryExpression(b, order), None)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTBinaryExpression] =>
         (astForBinaryExpression(unaryExpression.getOperand.asInstanceOf[IASTBinaryExpression], order), None)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTFieldReference] =>
