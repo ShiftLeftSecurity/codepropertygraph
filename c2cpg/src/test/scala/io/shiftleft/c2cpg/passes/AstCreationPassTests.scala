@@ -3,7 +3,7 @@ package io.shiftleft.c2cpg.passes
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, Operators}
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, DispatchTypes, Operators}
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should.Matchers
@@ -253,6 +253,19 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
+    "be correct for conditional expression in call" in Fixture(
+      """
+         | void method() {
+         |   int x = (true ? vlc_dccp_CreateFD : vlc_datagram_CreateFD)(fd);
+         | }
+      """.stripMargin) { cpg =>
+      cpg.method.name("method").ast.isCall.name(Operators.conditional).l match {
+        case List(call) =>
+          call.code shouldBe "true ? vlc_dccp_CreateFD : vlc_datagram_CreateFD"
+        case _ => fail()
+      }
+    }
+
     "be correct for conditional expression" in Fixture("""
         | void method() {
         |   int x = (foo == 1) ? bar : 0;
@@ -274,6 +287,35 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
               trueBranch.code shouldBe "bar"
               falseBranch.argumentIndex shouldBe 3
               falseBranch.code shouldBe "0"
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+    }
+
+    "be correct for ranged for-loop" in Fixture("""
+       |void method() {
+       |  for (int x : list) {
+       |    int z = x;
+       |  }
+       |}
+      """.stripMargin) { cpg =>
+      cpg.method.name("method").controlStructure.l match {
+        case List(forStmt) =>
+          forStmt.controlStructureType shouldBe ControlStructureTypes.FOR
+          forStmt.astChildren.order(1).l match {
+            case List(ident) =>
+              ident.code shouldBe "list"
+            case _ => fail()
+          }
+          forStmt.astChildren.order(2).l match {
+            case List(ident) =>
+              ident.code shouldBe "x"
+            case _ => fail()
+          }
+          forStmt.astChildren.order(3).l match {
+            case List(block) =>
+              block.astChildren.isCall.code.l shouldBe List("z = x")
             case _ => fail()
           }
         case _ => fail()
@@ -343,6 +385,25 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .l shouldBe List("x")
     }
 
+    "be correct for call expression returning pointer" in Fixture("""
+        |int * foo(int arg);
+        |int * method(int x) {
+        |  foo(x);
+        |}
+      """.stripMargin) { cpg =>
+      cpg.method.name("method").ast.isCall.l match {
+        case List(call: Call) =>
+          call.name shouldBe "foo"
+          call.dispatchType shouldBe DispatchTypes.DYNAMIC_DISPATCH
+          val rec = call.receiver.l
+          rec.length shouldBe 1
+          rec.head.code shouldBe "foo"
+          call.argument(0).code shouldBe "foo"
+          call.argument(1).code shouldBe "x"
+        case _ => fail()
+      }
+    }
+
     "be correct for field access" in Fixture("""
         |void method(struct someUndefinedStruct x) {
         |  x.a;
@@ -367,6 +428,26 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |void method(struct someUndefinedStruct *x) {
         |  x->a;
         |}
+      """.stripMargin) { cpg =>
+      cpg.method.name("method").ast.isCall.name(Operators.indirectFieldAccess).l match {
+        case List(call) =>
+          val arg1 = call.argument(1)
+          val arg2 = call.argument(2)
+          arg1.isIdentifier shouldBe true
+          arg1.argumentIndex shouldBe 1
+          arg1.asInstanceOf[Identifier].name shouldBe "x"
+          arg2.isFieldIdentifier shouldBe true
+          arg2.argumentIndex shouldBe 2
+          arg2.asInstanceOf[FieldIdentifier].code shouldBe "a"
+          arg2.asInstanceOf[FieldIdentifier].canonicalName shouldBe "a"
+        case _ => fail()
+      }
+    }
+
+    "be correct for indirect field access in call" in Fixture("""
+          |void method(struct someUndefinedStruct *x) {
+          |  return (x->a)(1, 2);
+          |}
       """.stripMargin) { cpg =>
       cpg.method.name("method").ast.isCall.name(Operators.indirectFieldAccess).l match {
         case List(call) =>
@@ -459,6 +540,12 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.typeDecl.name("foo").size shouldBe 1
     }
 
+    "be correct for struct decl" in Fixture("""
+       | struct foo;
+      """.stripMargin) { cpg =>
+      cpg.typeDecl.name("foo").size shouldBe 1
+    }
+
     "be correct for named struct with single field" in Fixture("""
                                                                      | struct foo {
                                                                      |   int x;
@@ -544,6 +631,154 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .count(_.inheritsFromTypeFullName == List("Base")) shouldBe 1
     }
 
+    "be correct for field access" in Fixture(
+      """
+        |class Foo {
+        |public:
+        | char x;
+        | int method(){return i;};
+        |};
+        |
+        |Foo f;
+        |int x = f.method();
+      """.stripMargin
+    ) { cpg =>
+      cpg.typeDecl
+        .name("Foo")
+        .l
+        .size shouldBe 1
+      cpg.call.code("f.method()").l match {
+        case List(call: Call) =>
+          call.methodFullName shouldBe Operators.fieldAccess
+          call.argument(1).code shouldBe "f"
+          call.argument(2).code shouldBe "method"
+        case _ => fail()
+      }
+    }
+
+    "be correct for type initializer expression" in Fixture(
+      """
+        |int x = (int){ 1 };
+      """.stripMargin
+    ) { cpg =>
+      cpg.call.name(Operators.cast).l match {
+        case List(call: Call) =>
+          call.argument(1).code shouldBe "{ 1 }"
+          call.argument(2).code shouldBe "int"
+        case _ => fail()
+      }
+    }
+
+    "be correct for static assert" in Fixture(
+      """
+        |void foo(){
+        | int a = 0;
+        | static_assert ( a == 0 , "not 0!");
+        |}
+      """.stripMargin
+    ) { cpg =>
+      cpg.call.codeExact("static_assert ( a == 0 , \"not 0!\");").l match {
+        case List(call: Call) =>
+          call.name shouldBe "static_assert"
+          call.argument(1).code shouldBe "a == 0"
+          call.argument(2).code shouldBe "\"not 0!\""
+        case _ => fail()
+      }
+    }
+
+    "be correct for try catch" in Fixture(
+      """
+        |void bar();
+        |int foo(){
+        | try { bar(); } 
+        | catch(x) { return 0; };
+        |}
+      """.stripMargin
+    ) { cpg =>
+      cpg.controlStructure.l match {
+        case List(t) =>
+          t.ast.isCall.order(1).code.l shouldBe List("bar()")
+          t.ast.isReturn.code.l shouldBe List("return 0;")
+        case _ => fail()
+      }
+    }
+
+    "be correct for constructor initializer" in Fixture(
+      """
+        |class Foo {
+        |public:
+        | Foo(int i){};
+        |};
+        |Foo f1(0);
+      """.stripMargin
+    ) { cpg =>
+      cpg.typeDecl
+        .name("Foo")
+        .l
+        .size shouldBe 1
+      cpg.call.codeExact("f1(0)").l match {
+        case List(call: Call) =>
+          call.name shouldBe "f1"
+          call.argument(1).code shouldBe "0"
+        case _ => fail()
+      }
+    }
+
+    "be correct for template class" in Fixture(
+      """
+        | template<class T>
+        | class Y
+        | {
+        |   void mf() { }
+        | };
+        | template class Y<char*>;
+        | template void Y<double>::mf();
+      """.stripMargin
+    ) { cpg =>
+      cpg.typeDecl
+        .name("Y")
+        .l
+        .size shouldBe 1
+    }
+
+    "be correct for template function" in Fixture(
+      """
+        | template<typename T>
+        | void f(T s)
+        | { }
+        |
+        | template void f<double>(double); // instantiates f<double>(double)
+        | template void f<>(char); // instantiates f<char>(char), template argument deduced
+        | template void f(int); // instantiates f<int>(int), template argument deduced
+      """.stripMargin
+    ) { cpg =>
+      cpg.method
+        .name("f")
+        .l
+        .size shouldBe 1
+    }
+
+    "be correct for constructor expression" in Fixture(
+      """
+        |class Foo {
+        |public:
+        | Foo(int i) {  };
+        |};
+        |Foo x = Foo{0};
+      """.stripMargin
+    ) { cpg =>
+      cpg.typeDecl
+        .name("Foo")
+        .l
+        .size shouldBe 1
+      cpg.call.codeExact("Foo{0}").l match {
+        case List(call: Call) =>
+          call.name shouldBe "Foo"
+          call.argument(1).code shouldBe "{0}"
+        case _ => fail()
+      }
+    }
+
     "be correct for method calls" in Fixture(
       """
         |void foo(int x) {
@@ -559,6 +794,20 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .argument
         .code("x")
         .size shouldBe 1
+    }
+
+    "be correct for linkage specs" in Fixture(
+      """
+        |extern "C" {
+        | #include <vlc/libvlc.h>
+        | #include <vlc/libvlc_renderer_discoverer.h>
+        | #include <vlc/libvlc_picture.h>
+        | #include <vlc/libvlc_media.h>
+        | int x = 0;
+        |}
+        |""".stripMargin
+    ) { cpg =>
+      cpg.call.code("x = 0").l.size shouldBe 1
     }
 
     "be correct for method returns" in Fixture(
@@ -590,6 +839,18 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |""".stripMargin
     ) { cpg =>
       cpg.call.name(Operators.logicalNot).argument(1).code.l shouldBe List("b")
+    }
+
+    "be correct for unary expr" in Fixture(
+      """
+        |size_t strnlen (const char *str, size_t max)
+        |    {
+        |      const char *end = memchr (str, 0, max);
+        |      return end ? (size_t)(end - str) : max;
+        |    }
+        |""".stripMargin
+    ) { cpg =>
+      cpg.call.name("size_t").code.l shouldBe List("(size_t)(end - str)")
     }
 
     "be correct for post increment method calls" in Fixture(

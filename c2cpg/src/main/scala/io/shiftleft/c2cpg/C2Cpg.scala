@@ -27,7 +27,9 @@ class C2Cpg {
           val s = define.split("=")
           s.head -> s(1)
         case define => define -> "true"
-      }.toMap
+      }.toMap,
+      config.logProblems,
+      config.logPreprocessor
     )
   }
 
@@ -58,7 +60,9 @@ object C2Cpg {
                           outputPath: String = X2CpgConfig.defaultOutputPath,
                           sourceFileExtensions: Set[String] = Set(".c", ".cc", ".cpp", ".h", ".hpp"),
                           includePaths: Set[String] = Set.empty,
-                          defines: Set[String] = Set.empty)
+                          defines: Set[String] = Set.empty,
+                          logProblems: Boolean = false,
+                          logPreprocessor: Boolean = false)
       extends X2CpgConfig[Config] {
 
     override def withAdditionalInputPath(inputPath: String): Config = copy(inputPaths = inputPaths + inputPath)
@@ -72,6 +76,12 @@ object C2Cpg {
       import builder._
       OParser.sequence(
         programName(classOf[C2Cpg].getSimpleName),
+        opt[Unit]("log-problems")
+          .text(s"enables logging of all parse problems")
+          .action((_, c) => c.copy(logProblems = true)),
+        opt[Unit]("log-preprocessor")
+          .text(s"enables logging of all preprocessor statements")
+          .action((_, c) => c.copy(logPreprocessor = true)),
         opt[String]("include")
           .unbounded()
           .text("header include paths")
