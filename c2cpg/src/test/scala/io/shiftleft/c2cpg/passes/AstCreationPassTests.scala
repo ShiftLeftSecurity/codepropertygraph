@@ -3,7 +3,7 @@ package io.shiftleft.c2cpg.passes
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, Operators}
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, DispatchTypes, Operators}
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should.Matchers
@@ -343,6 +343,25 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .l shouldBe List("x")
     }
 
+    "be correct for call expression returning pointer" in Fixture("""
+        |int * foo(int arg);
+        |int * method(int x) {
+        |  foo(x);
+        |}
+      """.stripMargin) { cpg =>
+      cpg.method.name("method").ast.isCall.l match {
+        case List(call: Call) =>
+          call.name shouldBe "foo"
+          call.dispatchType shouldBe DispatchTypes.DYNAMIC_DISPATCH
+          val rec = call.receiver.l
+          rec.length shouldBe 1
+          rec.head.code shouldBe "foo"
+          call.argument(0).code shouldBe "foo"
+          call.argument(1).code shouldBe "x"
+        case _ => fail()
+      }
+    }
+
     "be correct for field access" in Fixture("""
         |void method(struct someUndefinedStruct x) {
         |  x.a;
@@ -459,6 +478,12 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.typeDecl.name("foo").size shouldBe 1
     }
 
+    "be correct for struct decl" in Fixture("""
+       | struct foo;
+      """.stripMargin) { cpg =>
+      cpg.typeDecl.name("foo").size shouldBe 1
+    }
+
     "be correct for named struct with single field" in Fixture("""
                                                                      | struct foo {
                                                                      |   int x;
@@ -544,6 +569,31 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .count(_.inheritsFromTypeFullName == List("Base")) shouldBe 1
     }
 
+    "be correct for field access" in Fixture(
+      """
+        |class Foo {
+        |public:
+        | char x;
+        | int method(){return i;};
+        |};
+        |
+        |Foo f;
+        |int x = f.method();
+      """.stripMargin
+    ) { cpg =>
+      cpg.typeDecl
+        .name("Foo")
+        .l
+        .size shouldBe 1
+      cpg.call.code("f.method()").l match {
+        case List(call: Call) =>
+          call.methodFullName shouldBe Operators.fieldAccess
+          call.argument(1).code shouldBe "f"
+          call.argument(2).code shouldBe "method"
+        case _ => fail()
+      }
+    }
+
     "be correct for method calls" in Fixture(
       """
         |void foo(int x) {
@@ -559,6 +609,20 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .argument
         .code("x")
         .size shouldBe 1
+    }
+
+    "be correct for linkage specs" in Fixture(
+      """
+        |extern "C" {
+        | #include <vlc/libvlc.h>
+        | #include <vlc/libvlc_renderer_discoverer.h>
+        | #include <vlc/libvlc_picture.h>
+        | #include <vlc/libvlc_media.h>
+        | int x = 0;
+        |}
+        |""".stripMargin
+    ) { cpg =>
+      cpg.call.code("x = 0").l.size shouldBe 1
     }
 
     "be correct for method returns" in Fixture(
@@ -590,6 +654,18 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |""".stripMargin
     ) { cpg =>
       cpg.call.name(Operators.logicalNot).argument(1).code.l shouldBe List("b")
+    }
+
+    "be correct for unary expr" in Fixture(
+      """
+        |size_t strnlen (const char *str, size_t max)
+        |    {
+        |      const char *end = memchr (str, 0, max);
+        |      return end ? (size_t)(end - str) : max;
+        |    }
+        |""".stripMargin
+    ) { cpg =>
+      cpg.call.name("size_t").code.l shouldBe List("(size_t)(end - str)")
     }
 
     "be correct for post increment method calls" in Fixture(
