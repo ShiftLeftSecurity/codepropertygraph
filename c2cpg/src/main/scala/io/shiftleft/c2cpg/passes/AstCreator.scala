@@ -1290,6 +1290,7 @@ class AstCreator(filename: String, global: Global) {
     ast
   }
 
+  @tailrec
   private def astsForDeclaration(decl: IASTDeclaration, order: Int): Seq[Ast] = decl match {
     case functDef: IASTFunctionDefinition =>
       Seq(astForFunctionDefinition(functDef, order))
@@ -1319,8 +1320,10 @@ class AstCreator(filename: String, global: Global) {
       Seq.empty
     case _: ICPPASTUsingDirective =>
       Seq.empty
+    case _: ICPPASTExplicitTemplateInstantiation              => Seq.empty
     case s: IASTSimpleDeclaration if s.getRawSignature == ";" => Seq.empty
     case l: ICPPASTLinkageSpecification                       => astsForLinkageSpecification(l)
+    case t: ICPPASTTemplateDeclaration                        => astsForDeclaration(t.getDeclaration, order)
     case a: ICPPASTStaticAssertDeclaration                    => Seq(astForStaticAssert(a, order))
     case _                                                    => notHandledYetSeq(decl)
   }

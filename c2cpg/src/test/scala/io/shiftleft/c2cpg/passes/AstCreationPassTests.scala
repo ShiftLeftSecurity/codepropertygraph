@@ -724,6 +724,40 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
+    "be correct for template class" in Fixture(
+      """
+        | template<class T>
+        | class Y
+        | {
+        |   void mf() { }
+        | };
+        | template class Y<char*>;
+        | template void Y<double>::mf();
+      """.stripMargin
+    ) { cpg =>
+      cpg.typeDecl
+        .name("Y")
+        .l
+        .size shouldBe 1
+    }
+
+    "be correct for template function" in Fixture(
+      """
+        | template<typename T>
+        | void f(T s)
+        | { }
+        |
+        | template void f<double>(double); // instantiates f<double>(double)
+        | template void f<>(char); // instantiates f<char>(char), template argument deduced
+        | template void f(int); // instantiates f<int>(int), template argument deduced
+      """.stripMargin
+    ) { cpg =>
+      cpg.method
+        .name("f")
+        .l
+        .size shouldBe 1
+    }
+
     "be correct for constructor expression" in Fixture(
       """
         |class Foo {
