@@ -253,6 +253,19 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
+    "be correct for conditional expression in call" in Fixture(
+      """
+         | void method() {
+         |   int x = (true ? vlc_dccp_CreateFD : vlc_datagram_CreateFD)(fd);
+         | }
+      """.stripMargin) { cpg =>
+      cpg.method.name("method").ast.isCall.name(Operators.conditional).l match {
+        case List(call) =>
+          call.code shouldBe "true ? vlc_dccp_CreateFD : vlc_datagram_CreateFD"
+        case _ => fail()
+      }
+    }
+
     "be correct for conditional expression" in Fixture("""
         | void method() {
         |   int x = (foo == 1) ? bar : 0;
@@ -590,6 +603,27 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           call.methodFullName shouldBe Operators.fieldAccess
           call.argument(1).code shouldBe "f"
           call.argument(2).code shouldBe "method"
+        case _ => fail()
+      }
+    }
+
+    "be correct for constructor initializer" in Fixture(
+      """
+        |class Foo {
+        |public:
+        | Foo(int i){};
+        |};
+        |Foo f1(0);
+      """.stripMargin
+    ) { cpg =>
+      cpg.typeDecl
+        .name("Foo")
+        .l
+        .size shouldBe 1
+      cpg.call.codeExact("f1(0)").l match {
+        case List(call: Call) =>
+          call.name shouldBe "f1"
+          call.argument(1).code shouldBe "0"
         case _ => fail()
       }
     }

@@ -441,6 +441,15 @@ class AstCreator(filename: String, global: Global) {
           .withArgEdge(callNode, left.root.get)
           .withChild(right)
           .withArgEdge(callNode, right.root.get)
+      case i: ICPPASTConstructorInitializer =>
+        val name = declarator.getName.toString
+        val callNode = newCallNode(declarator, name, name, DispatchTypes.STATIC_DISPATCH, order)
+
+        val args = withOrder(i.getArguments) { case (a, o) => astForNode(a, o) }
+
+        val ast = Ast(callNode) withChildren (args)
+        val validArgs = args.collect { case a if a.root.isDefined => a.root.get }
+        ast.withArgEdges(callNode, validArgs)
       case _ => notHandledYet(init)
     }
 
@@ -554,6 +563,8 @@ class AstCreator(filename: String, global: Global) {
         (astForFieldReference(reference, order), Some(astForNode(reference.getFieldName, 0)))
       case reference: IASTFieldReference =>
         (astForFieldReference(reference, order), None)
+      case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTConditionalExpression] =>
+        (astForUnaryExpression(unaryExpression, order), None)
       case _ =>
         val name = shortName(call.getFunctionNameExpression)
         val fullname = fullName(call.getFunctionNameExpression)
