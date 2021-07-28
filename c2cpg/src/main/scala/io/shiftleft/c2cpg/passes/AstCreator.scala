@@ -50,33 +50,44 @@ class AstCreator(filename: String, global: Global) {
     Iterator(diffGraph.build())
   }
 
+  private def nullSafeFileLocation(node: IASTNode): Option[IASTFileLocation] = Option(node.getFileLocation)
+
+  private def nullSafeLastNodeLocation(node: IASTNode): Option[IASTNodeLocation] =
+    Option(node.getNodeLocations).flatMap(_.lastOption)
+
   private def line(node: IASTNode): Option[Integer] = {
-    Some(node.getFileLocation.getStartingLineNumber)
+    nullSafeFileLocation(node).map(_.getStartingLineNumber)
   }
 
   private def lineEnd(node: IASTNode): Option[Integer] = {
-    Some(node.getFileLocation.getEndingLineNumber)
+    nullSafeFileLocation(node).map(_.getEndingLineNumber)
   }
 
   private def column(node: IASTNode): Option[Integer] = {
-    val l = line(node).get - 1
-    if (l == 0) {
-      Some(node.getFileLocation.getNodeOffset)
-    } else if (node.getFileLocation.getNodeOffset == 0) {
-      Some(0)
-    } else {
-      Some(node.getFileLocation.getNodeOffset - 1 - fileLines.slice(0, l).sum)
+    if (line(node).isEmpty) None
+    else {
+      val l = line(node).get - 1
+      if (l == 0) {
+        nullSafeFileLocation(node).map(_.getNodeOffset)
+      } else if (nullSafeFileLocation(node).map(_.getNodeOffset).contains(0)) {
+        Some(0)
+      } else {
+        nullSafeFileLocation(node).map(_.getNodeOffset - 1 - fileLines.slice(0, l).sum)
+      }
     }
   }
 
   private def columnEnd(node: IASTNode): Option[Integer] = {
-    val l = line(node).get - 1
-    if (l == 0) {
-      Some(node.getNodeLocations.last.getNodeOffset)
-    } else if (node.getNodeLocations.last.getNodeOffset == 0) {
-      Some(0)
-    } else {
-      Some(node.getNodeLocations.last.getNodeOffset - 1 - fileLines.slice(0, l).sum)
+    if (line(node).isEmpty) None
+    else {
+      val l = line(node).get - 1
+      if (l == 0) {
+        nullSafeLastNodeLocation(node).map(_.getNodeOffset)
+      } else if (nullSafeLastNodeLocation(node).map(_.getNodeOffset).contains(0)) {
+        Some(0)
+      } else {
+        nullSafeLastNodeLocation(node).map(_.getNodeOffset - 1 - fileLines.slice(0, l).sum)
+      }
     }
   }
 
@@ -101,7 +112,7 @@ class AstCreator(filename: String, global: Global) {
     s"""Node '${node.getClass.getSimpleName}' not handled yet!
        |  Code: '${node.getRawSignature}'
        |  File: '$filename'
-       |  Line: ${node.getFileLocation.getStartingLineNumber}
+       |  Line: ${line(node).getOrElse(-1)}
        |  """.stripMargin
 
   private def notHandledYetSeq[T](node: IASTNode): Seq[T] = {
@@ -345,11 +356,26 @@ class AstCreator(filename: String, global: Global) {
     }
   }
 
+  private def astForInitializerList(l: IASTInitializerList, order: Int): Ast = {
+    // TODO: how to represent this?
+    Ast(
+      NewUnknown()
+        .parserTypeName(l.getClass.getSimpleName)
+        .code(l.getRawSignature)
+        .order(order)
+        .argumentIndex(order)
+        .lineNumber(line(l))
+        .columnNumber(column(l)))
+  }
+
   private def astForNode(node: IASTNode, order: Int): Ast = {
     node match {
+      case id: IASTIdExpression if id.getName.isInstanceOf[CPPASTQualifiedName] =>
+        astForQualifiedName(id.getName.asInstanceOf[CPPASTQualifiedName], order)
       case name: IASTName          => astForIdentifier(name, order)
       case decl: IASTDeclSpecifier => astForIdentifier(decl, order)
       case expr: IASTExpression    => astForExpression(expr, order)
+      case l: IASTInitializerList  => astForInitializerList(l, order)
       case _                       => notHandledYet(node)
     }
   }
@@ -437,11 +463,14 @@ class AstCreator(filename: String, global: Global) {
         val callNode = newCallNode(declarator, operatorName, operatorName, DispatchTypes.STATIC_DISPATCH, order)
         val left = astForNode(declarator.getName, 1)
         val right = astForNode(i.getInitializerClause, 2)
-        Ast(callNode)
+        val ast = Ast(callNode)
           .withChild(left)
           .withArgEdge(callNode, left.root.get)
           .withChild(right)
-          .withArgEdge(callNode, right.root.get)
+        right.root match {
+          case Some(value) => ast.withArgEdge(callNode, value)
+          case None        => ast
+        }
       case i: ICPPASTConstructorInitializer =>
         val name = declarator.getName.toString
         val callNode = newCallNode(declarator, name, name, DispatchTypes.STATIC_DISPATCH, order)
@@ -548,13 +577,14 @@ class AstCreator(filename: String, global: Global) {
       case _                                        => "<operator>.unknown"
     }
     val callNode = newCallNode(bin, op, op, DispatchTypes.STATIC_DISPATCH, order)
-    val left = astForExpression(bin.getOperand1, 1)
-    val right = astForExpression(bin.getOperand2, 2)
-    Ast(callNode)
+    val left = nullSafeAst(bin.getOperand1, 1)
+    val right = nullSafeAst(bin.getOperand2, 2)
+    var ast = Ast(callNode)
       .withChild(left)
-      .withArgEdge(callNode, left.root.get)
       .withChild(right)
-      .withArgEdge(callNode, right.root.get)
+    if (left.root.isDefined) ast = ast.withArgEdge(callNode, left.root.get)
+    if (right.root.isDefined) ast = ast.withArgEdge(callNode, right.root.get)
+    ast
   }
 
   private def astForExpressionList(exprList: IASTExpressionList, order: Int): Ast =
@@ -625,7 +655,7 @@ class AstCreator(filename: String, global: Global) {
         case opExpr => opExpr
       }
 
-      val operand = astForExpression(operandExpr, 1)
+      val operand = nullSafeAst(operandExpr, 1)
 
       val ast = Ast(cpgUnary).withChild(operand)
       operand.root match {
@@ -759,13 +789,24 @@ class AstCreator(filename: String, global: Global) {
     val op = Operators.fieldAccess
     val ma = newCallNode(qualId, op, op, DispatchTypes.STATIC_DISPATCH, order)
 
-    def fieldAccesses(names: List[IASTNode]): Ast = names match {
-      case Nil          => Ast()
-      case head :: Nil  => astForNode(head, 1)
-      case head :: tail => astForNode(head, 1).withChildren(withOrder(tail) { case (n, o) => astForNode(n, o) })
+    def fieldAccesses(names: List[IASTNode], order: Int): Ast = names match {
+      case Nil => Ast()
+      case head :: Nil =>
+        astForNode(head, order)
+      case head :: tail =>
+        val callNode = newCallNode(head, op, op, DispatchTypes.STATIC_DISPATCH, order)
+        val arg1 = astForNode(head, 1)
+        val arg2 = fieldAccesses(tail, 2)
+        var call =
+          Ast(callNode)
+            .withChild(arg1)
+            .withChild(arg2)
+        if (arg1.root.isDefined) call = call.withArgEdge(callNode, arg1.root.get)
+        if (arg2.root.isDefined) call = call.withArgEdge(callNode, arg2.root.get)
+        call
     }
 
-    val owner = fieldAccesses(qualId.getQualifier.toIndexedSeq.toList)
+    val owner = fieldAccesses(qualId.getQualifier.toIndexedSeq.toList, 1)
 
     val member = NewFieldIdentifier()
       .canonicalName(qualId.getLastName.toString)
@@ -774,7 +815,12 @@ class AstCreator(filename: String, global: Global) {
       .argumentIndex(2)
       .lineNumber(line(qualId.getLastName))
       .columnNumber(column(qualId.getLastName))
-    Ast(ma).withChild(owner).withChild(Ast(member)).withArgEdge(ma, owner.root.get).withArgEdge(ma, member)
+    val ast = Ast(ma).withChild(owner).withChild(Ast(member)).withArgEdge(ma, member)
+    owner.root match {
+      case Some(value) => ast.withArgEdge(ma, value)
+      case None        => ast
+    }
+
   }
 
   private def astForTypeIdInitExpression(typeIdInit: CPPASTTypeIdInitializerExpression, order: Int): Ast = {
@@ -1053,13 +1099,17 @@ class AstCreator(filename: String, global: Global) {
       })
     }
 
-    typeDecls.foreach(t => scope.pushNewScope(t.root.get))
-    val member = withOrder(typeSpecifier.getDeclarations(true)) { (m, o) =>
-      astsForDeclaration(m, o)
-    }.flatten
-    typeDecls.foreach(_ => scope.popScope())
+    if (!typeDecls.exists(_.root.isDefined)) {
+      notHandledYetSeq(typeSpecifier)
+    } else {
+      typeDecls.foreach(t => scope.pushNewScope(t.root.get))
+      val member = withOrder(typeSpecifier.getDeclarations(true)) { (m, o) =>
+        astsForDeclaration(m, o)
+      }.flatten
+      typeDecls.foreach(_ => scope.popScope())
 
-    typeDecls.map(_.withChildren(member))
+      typeDecls.map(_.withChildren(member))
+    }
   }
 
   private def astsForElaboratedType(typeSpecifier: IASTElaboratedTypeSpecifier,
@@ -1156,16 +1206,20 @@ class AstCreator(filename: String, global: Global) {
             .order(order)))
     }
 
-    typeDecls.foreach(t => scope.pushNewScope(t.root.get))
-    var currentOrder = 0
-    val member = enumSpecifier.getEnumerators.toIndexedSeq.flatMap { e =>
-      val eCpg = astsForEnumerator(e, currentOrder)
-      currentOrder = eCpg.size + currentOrder
-      eCpg
-    }
-    typeDecls.foreach(_ => scope.popScope())
+    if (!typeDecls.exists(_.root.isDefined)) {
+      notHandledYetSeq(enumSpecifier)
+    } else {
+      typeDecls.foreach(t => scope.pushNewScope(t.root.get))
+      var currentOrder = 0
+      val member = enumSpecifier.getEnumerators.toIndexedSeq.flatMap { e =>
+        val eCpg = astsForEnumerator(e, currentOrder)
+        currentOrder = eCpg.size + currentOrder
+        eCpg
+      }
+      typeDecls.foreach(_ => scope.popScope())
 
-    typeDecls.map(_.withChildren(member))
+      typeDecls.map(_.withChildren(member))
+    }
   }
 
   private def astForFunctionDeclarator(funcDecl: IASTFunctionDeclarator, order: Int): Ast = {
@@ -1296,15 +1350,21 @@ class AstCreator(filename: String, global: Global) {
   private def astsForDeclaration(decl: IASTDeclaration, order: Int): Seq[Ast] = decl match {
     case functDef: IASTFunctionDefinition =>
       Seq(astForFunctionDefinition(functDef, order))
-    case declaration: IASTSimpleDeclaration if declaration.getDeclSpecifier.isInstanceOf[IASTCompositeTypeSpecifier] =>
+    case declaration: IASTSimpleDeclaration
+        if declaration.getDeclSpecifier != null && declaration.getDeclSpecifier
+          .isInstanceOf[IASTCompositeTypeSpecifier] =>
       astsForCompositeType(declaration.getDeclSpecifier.asInstanceOf[IASTCompositeTypeSpecifier],
                            declaration.getDeclarators.toList,
                            order)
-    case declaration: IASTSimpleDeclaration if declaration.getDeclSpecifier.isInstanceOf[IASTEnumerationSpecifier] =>
+    case declaration: IASTSimpleDeclaration
+        if declaration.getDeclSpecifier != null && declaration.getDeclSpecifier
+          .isInstanceOf[IASTEnumerationSpecifier] =>
       astsForEnum(declaration.getDeclSpecifier.asInstanceOf[IASTEnumerationSpecifier],
                   declaration.getDeclarators.toList,
                   order)
-    case declaration: IASTSimpleDeclaration if declaration.getDeclSpecifier.isInstanceOf[IASTElaboratedTypeSpecifier] =>
+    case declaration: IASTSimpleDeclaration
+        if declaration.getDeclSpecifier != null && declaration.getDeclSpecifier
+          .isInstanceOf[IASTElaboratedTypeSpecifier] =>
       astsForElaboratedType(declaration.getDeclSpecifier.asInstanceOf[IASTElaboratedTypeSpecifier],
                             declaration.getDeclarators.toList,
                             order)
