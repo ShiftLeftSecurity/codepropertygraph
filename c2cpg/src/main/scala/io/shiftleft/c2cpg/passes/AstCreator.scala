@@ -564,10 +564,10 @@ class AstCreator(filename: String, global: Global) {
     val (cpgCall, receiver) = call.getFunctionNameExpression match {
       case reference: IASTFieldReference if call.getExpressionType.isInstanceOf[IPointerType] =>
         (astForFieldReference(reference, order), Some(astForNode(reference.getFieldName, 0)))
-      case b: IASTBinaryExpression =>
-        (astForBinaryExpression(b, order), None)
       case reference: IASTFieldReference =>
         (astForFieldReference(reference, order), None)
+      case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTBinaryExpression] =>
+        (astForBinaryExpression(unaryExpression.getOperand.asInstanceOf[IASTBinaryExpression], order), None)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTFieldReference] =>
         (astForFieldReference(unaryExpression.getOperand.asInstanceOf[IASTFieldReference], order), None)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTConditionalExpression] =>
