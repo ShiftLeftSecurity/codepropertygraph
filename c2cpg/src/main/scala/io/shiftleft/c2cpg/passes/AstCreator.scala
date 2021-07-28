@@ -486,32 +486,41 @@ class AstCreator(filename: String, global: Global) {
   private def astForDeclarator(declaration: IASTSimpleDeclaration, declarator: IASTDeclarator, order: Int): Ast = {
     val declTypeName = typeForDeclSpecifier(declaration.getDeclSpecifier)
     val name = declarator.getName.toString
-    if (isTypeDef(declaration)) {
-      Ast(
-        NewTypeDecl()
-          .name(name)
-          .fullName(name)
-          .isExternal(false)
-          .aliasTypeFullName(Some(registerType(declTypeName)))
-          .filename(declaration.getContainingFilename)
-          .order(order))
-    } else if (parentIsClassDef(declaration)) {
-      Ast(
-        NewMember()
-          .code(declarator.getRawSignature)
+    declaration match {
+      case d if isTypeDef(d) =>
+        Ast(
+          NewTypeDecl()
+            .name(name)
+            .fullName(name)
+            .isExternal(false)
+            .aliasTypeFullName(Some(registerType(declTypeName)))
+            .filename(declaration.getContainingFilename)
+            .order(order))
+      case d if parentIsClassDef(d) =>
+        Ast(
+          NewMember()
+            .code(declarator.getRawSignature)
+            .name(name)
+            .typeFullName(registerType(declTypeName))
+            .order(order))
+      case _ if declarator.isInstanceOf[IASTArrayDeclarator] =>
+        Ast(
+          NewTypeDecl()
+            .name(name)
+            .fullName(name)
+            .isExternal(false)
+            .filename(declaration.getContainingFilename)
+            .order(order))
+      case _ if !scope.isEmpty =>
+        val l = NewLocal()
+          .code(name)
           .name(name)
           .typeFullName(registerType(declTypeName))
-          .order(order))
-    } else if (!scope.isEmpty) {
-      val l = NewLocal()
-        .code(name)
-        .name(name)
-        .typeFullName(registerType(declTypeName))
-        .order(order)
-      scope.addToScope(name, (l, declTypeName))
-      Ast(l)
-    } else Ast()
-
+          .order(order)
+        scope.addToScope(name, (l, declTypeName))
+        Ast(l)
+      case _ => notHandledYet(declaration)
+    }
   }
 
   private def astsForDeclarationStatement(decl: IASTDeclarationStatement, order: Int): Seq[Ast] =
