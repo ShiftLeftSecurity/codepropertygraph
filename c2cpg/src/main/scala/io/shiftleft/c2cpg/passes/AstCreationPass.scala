@@ -1,5 +1,6 @@
 package io.shiftleft.c2cpg.passes
 
+import io.shiftleft.c2cpg.C2Cpg
 import io.shiftleft.c2cpg.parser.CdtParser.ParseResult
 import io.shiftleft.c2cpg.parser.{CdtParser, ParseConfig}
 import io.shiftleft.codepropertygraph.Cpg
@@ -11,6 +12,7 @@ import scala.jdk.CollectionConverters._
 class AstCreationPass(filenames: List[String],
                       cpg: Cpg,
                       keyPool: IntervalKeyPool,
+                      config: C2Cpg.Config,
                       parseConfig: ParseConfig = ParseConfig.empty)
     extends ParallelCpgPass[String](cpg, keyPools = Some(keyPool.split(filenames.size))) {
 
@@ -25,8 +27,8 @@ class AstCreationPass(filenames: List[String],
     val parseResult = parser.parse(Paths.get(filename))
 
     parseResult match {
-      case ParseResult(Some(ast), _, _) =>
-        new AstCreator(filename, global).createAst(ast)
+      case ParseResult(Some(ast), _, _, _) =>
+        new AstCreator(filename, global, config).createAst(ast)
       case _ =>
         Iterator()
     }

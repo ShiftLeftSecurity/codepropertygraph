@@ -1,5 +1,6 @@
 package io.shiftleft.c2cpg
 
+import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
@@ -20,7 +21,7 @@ case class CpgTestFixture(projectName: String) {
   private val filenames: List[String] = SourceFiles.determine(Set(dirName), Set(".c"))
 
   new MetaDataPass(cpg, Languages.C).createAndApply()
-  new AstCreationPass(filenames, cpg, keyPool).createAndApply()
+  new AstCreationPass(filenames, cpg, keyPool, Config()).createAndApply()
   if (cpg.method.nonEmpty) {
     new CfgCreationPass(cpg).createAndApply()
   }

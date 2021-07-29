@@ -1,6 +1,7 @@
 package io.shiftleft.c2cpg.passes
 
 import better.files.File
+import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
@@ -18,7 +19,7 @@ class StubRemovalPassTests extends AnyWordSpec with Matchers {
         val cpg = Cpg.emptyCpg
         val keyPool = new IntervalKeyPool(1001, 2000)
         val filenames = List(file1.path.toAbsolutePath.toString)
-        new AstCreationPass(filenames, cpg, keyPool).createAndApply()
+        new AstCreationPass(filenames, cpg, keyPool, Config()).createAndApply()
         new CfgCreationPass(cpg).createAndApply()
         new StubRemovalPass(cpg).createAndApply()
         f(cpg)

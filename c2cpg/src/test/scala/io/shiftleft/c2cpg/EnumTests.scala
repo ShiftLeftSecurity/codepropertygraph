@@ -1,6 +1,7 @@
 package io.shiftleft.c2cpg
 
 import better.files.File
+import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Operators
@@ -25,7 +26,7 @@ class EnumTests extends AnyWordSpec with Matchers with Inside {
         val keyPool = new IntervalKeyPool(1001, 2000)
         val typesKeyPool = new IntervalKeyPool(2001, 3000)
         val filenames = List(file.path.toAbsolutePath.toString)
-        val astCreationPass = new AstCreationPass(filenames, cpg, keyPool)
+        val astCreationPass = new AstCreationPass(filenames, cpg, keyPool, Config())
         astCreationPass.createAndApply()
         new CfgCreationPass(cpg).createAndApply()
         new StubRemovalPass(cpg).createAndApply()

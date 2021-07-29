@@ -17,7 +17,10 @@ object CdtParser {
 
   private val logger = LoggerFactory.getLogger(classOf[CdtParser])
 
-  case class ParseResult(translationUnit: Option[IASTTranslationUnit], preprocessorErrorCount: Int, problems: Int)
+  case class ParseResult(translationUnit: Option[IASTTranslationUnit],
+                         preprocessorErrorCount: Int,
+                         problems: Int,
+                         failure: Option[Throwable] = None)
 
 }
 
@@ -43,8 +46,7 @@ class CdtParser(private val parseConfig: ParseConfig) extends ParseProblemsLogge
         lang.getASTTranslationUnit(fileContent, info, fileContentProvider, null, opts, log)
       ) match {
         case Failure(e) =>
-          e.printStackTrace()
-          ParseResult(None, -1, -1)
+          ParseResult(None, -1, -1, Some(e))
         case Success(translationUnit) =>
           val problems = CPPVisitor.getProblems(translationUnit)
           if (parseConfig.logProblems) logProblems(problems.toList)
@@ -60,11 +62,14 @@ class CdtParser(private val parseConfig: ParseConfig) extends ParseProblemsLogge
   }
 
   def parse(file: Path): ParseResult = parseInternal(file) match {
-    case (r @ ParseResult(None, _, _), duration) =>
-      logger.warn(s"Failed to parsed '$file' (took: $duration)")
-      r
-    case (r @ ParseResult(Some(t), c, p), duration) =>
+    case (r @ ParseResult(Some(t), c, p, _), duration) =>
       logger.info(s"Parsed '${t.getFilePath}' in $duration ($c preprocessor error(s), $p problems)")
+      r
+    case (r @ ParseResult(_, _, _, Some(e)), duration) =>
+      logger.warn(s"Failed to parse '$file' (took: $duration): ${e.getMessage}")
+      r
+    case (r @ ParseResult(_, _, _, None), duration) =>
+      logger.warn(s"Failed to parse '$file' (took: $duration)")
       r
   }
 
