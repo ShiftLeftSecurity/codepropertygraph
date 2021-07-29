@@ -66,10 +66,10 @@ class CdtParser(private val parseConfig: ParseConfig) extends ParseProblemsLogge
       logger.info(s"Parsed '${t.getFilePath}' in $duration ($c preprocessor error(s), $p problems)")
       r
     case (r @ ParseResult(_, _, _, Some(e)), duration) =>
-      logger.warn(s"Failed to parsed '$file' (took: $duration): ${e.getMessage}")
+      logger.warn(s"Failed to parse '$file' (took: $duration): ${e.getMessage}")
       r
     case (r @ ParseResult(_, _, _, None), duration) =>
-      logger.warn(s"Failed to parsed '$file' (took: $duration)")
+      logger.warn(s"Failed to parse '$file' (took: $duration)")
       r
   }
 
