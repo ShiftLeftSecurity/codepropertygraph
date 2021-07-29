@@ -1196,10 +1196,10 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       val left = astForNode(enumerator.getName, 1)
       val right = astForNode(enumerator.getValue, 2)
 
-      var ast = Ast(cpgMember).withChild(left).withChild(right)
+      var ast = Ast(callNode).withChild(left).withChild(right)
       if (left.root.isDefined) ast = ast.withArgEdge(callNode, left.root.get)
       if (right.root.isDefined) ast = ast.withArgEdge(callNode, right.root.get)
-      Seq(ast)
+      Seq(Ast(cpgMember), ast)
     } else {
       Seq(Ast(cpgMember))
     }
