@@ -20,7 +20,9 @@ import org.eclipse.cdt.internal.core.dom.parser.cpp.{
 }
 import org.slf4j.LoggerFactory
 
+import java.io.{BufferedReader, FileInputStream, InputStreamReader}
 import scala.annotation.tailrec
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 
 object AstCreator {
@@ -39,7 +41,8 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
 
   import AstCreator._
 
-  private val fileLines = better.files.File(filename).lines.toSeq.map(l => l.length)
+  private val reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "utf-8"));
+  private val fileLines = reader.lines().iterator().asScala.map(_.length)
 
   private val scope = new Scope[String, (NewNode, String), NewNode]()
 
