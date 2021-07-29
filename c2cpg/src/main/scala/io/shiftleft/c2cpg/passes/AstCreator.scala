@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory
 
 import java.io.{BufferedReader, FileInputStream, InputStreamReader}
 import scala.annotation.tailrec
-import scala.jdk.CollectionConverters._
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 
 object AstCreator {
 
