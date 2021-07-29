@@ -738,11 +738,12 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     val expr = astForExpression(arrayIndexExpression.getArrayExpression, 1)
     val arg = astForNode(arrayIndexExpression.getArgument, 2)
 
-    Ast(cpgArrayIndexing)
+    var ast = Ast(cpgArrayIndexing)
       .withChild(expr)
       .withChild(arg)
-      .withArgEdge(cpgArrayIndexing, expr.root.get)
-      .withArgEdge(cpgArrayIndexing, arg.root.get)
+    if (expr.root.isDefined) ast = ast.withArgEdge(cpgArrayIndexing, expr.root.get)
+    if (arg.root.isDefined) ast = ast.withArgEdge(cpgArrayIndexing, arg.root.get)
+    ast
   }
 
   private def astForCastExpression(castExpression: IASTCastExpression, order: Int): Ast = {
@@ -760,11 +761,12 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
         .lineNumber(line(argNode))
         .columnNumber(column(argNode)))
 
-    Ast(cpgCastExpression)
+    var ast = Ast(cpgCastExpression)
       .withChild(arg)
       .withChild(expr)
       .withArgEdge(cpgCastExpression, arg.root.get)
-      .withArgEdge(cpgCastExpression, expr.root.get)
+    if (expr.root.isDefined) ast = ast.withArgEdge(cpgCastExpression, expr.root.get)
+    ast
   }
 
   private def astForNewExpression(newExpression: ICPPASTNewExpression, order: Int): Ast = {
@@ -800,7 +802,9 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     val cpgDeleteNode =
       newCallNode(delExpression, Operators.delete, Operators.delete, DispatchTypes.STATIC_DISPATCH, order)
     val arg = astForExpression(delExpression.getOperand, 1)
-    Ast(cpgDeleteNode).withChild(arg).withArgEdge(cpgDeleteNode, arg.root.get)
+    var ast = Ast(cpgDeleteNode).withChild(arg)
+    if (arg.root.isDefined) ast = ast.withArgEdge(cpgDeleteNode, arg.root.get)
+    ast
   }
 
   private def astForQualifiedName(qualId: CPPASTQualifiedName, order: Int): Ast = {
@@ -1192,12 +1196,10 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       val left = astForNode(enumerator.getName, 1)
       val right = astForNode(enumerator.getValue, 2)
 
-      Seq(Ast(cpgMember),
-          Ast(callNode)
-            .withChild(left)
-            .withArgEdge(callNode, left.root.get)
-            .withChild(right)
-            .withArgEdge(callNode, right.root.get))
+      var ast = Ast(cpgMember).withChild(left).withChild(right)
+      if (left.root.isDefined) ast = ast.withArgEdge(callNode, left.root.get)
+      if (right.root.isDefined) ast = ast.withArgEdge(callNode, right.root.get)
+      Seq(ast)
     } else {
       Seq(Ast(cpgMember))
     }
