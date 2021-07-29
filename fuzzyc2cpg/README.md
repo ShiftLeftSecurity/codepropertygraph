@@ -21,7 +21,7 @@ The build process has been verified on Linux and it should be possible
 to build on OS X and BSD systems as well. The build process requires
 the following prerequisites:
 
-* Java runtime 8
+* Java runtime 11
   - Link: http://openjdk.java.net/install/
 * Scala build tool (sbt)
   - Link: https://www.scala-sbt.org/

@@ -20,8 +20,8 @@ class FileNameCompat(cpg: Cpg) extends CpgPass(cpg) {
     def updateDefaultFileName(node: StoredNode with HasFilename): Unit = {
       // When creating nodes via NewNode classes, filename is "", not null.
       // For operators, filename might also be null.
-      if (node.filename == null || node.filename == "") {
-        dstGraph.addNodeProperty(node, "FILENAME", node.file.name.headOption.getOrElse(""))
+      if (node.filename == "<empty>") {
+        dstGraph.addNodeProperty(node, "FILENAME", node.file.name.headOption.getOrElse("<empty>"))
       }
     }
 
