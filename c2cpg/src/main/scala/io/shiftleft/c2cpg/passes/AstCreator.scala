@@ -42,7 +42,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
   import AstCreator._
 
   private val reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "utf-8"));
-  private val fileLines = reader.lines().iterator().asScala.map(_.length)
+  private val fileLines = reader.lines().iterator().asScala.toSeq.map(_.length)
 
   private val scope = new Scope[String, (NewNode, String), NewNode]()
 
