@@ -613,39 +613,26 @@ class AstCreator(filename: String, global: Global) {
   }
 
   private def astForCall(call: IASTFunctionCallExpression, order: Int): Ast = {
-    val (cpgCall, receiver) = call.getFunctionNameExpression match {
-      case reference: IASTFieldReference if call.getExpressionType.isInstanceOf[IPointerType] =>
-        (astForFieldReference(reference, order), Some(astForNode(reference.getFieldName, 0)))
-      case reference: IASTFieldReference =>
-        (astForFieldReference(reference, order), None)
-      case b: IASTBinaryExpression =>
-        (astForBinaryExpression(b, order), None)
+    // TODO: proper handling of call receiver
+    val cpgCall = call.getFunctionNameExpression match {
+      case reference: IASTFieldReference => astForFieldReference(reference, order)
+      case b: IASTBinaryExpression       => astForBinaryExpression(b, order)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTBinaryExpression] =>
-        (astForBinaryExpression(unaryExpression.getOperand.asInstanceOf[IASTBinaryExpression], order), None)
+        astForBinaryExpression(unaryExpression.getOperand.asInstanceOf[IASTBinaryExpression], order)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTFieldReference] =>
-        (astForFieldReference(unaryExpression.getOperand.asInstanceOf[IASTFieldReference], order), None)
+        astForFieldReference(unaryExpression.getOperand.asInstanceOf[IASTFieldReference], order)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTConditionalExpression] =>
-        (astForUnaryExpression(unaryExpression, order), None)
+        astForUnaryExpression(unaryExpression, order)
       case _ =>
         val name = shortName(call.getFunctionNameExpression)
         val fullname = fullName(call.getFunctionNameExpression)
-        val (dispatchType, receiver) = call.getExpressionType match {
-          case _: IPointerType =>
-            (DispatchTypes.DYNAMIC_DISPATCH, Some(astForExpression(call.getFunctionNameExpression, 0)))
-          case _ => (DispatchTypes.STATIC_DISPATCH, None)
-        }
-        (Ast(newCallNode(call, name, fullname, dispatchType, order)), receiver)
+        Ast(newCallNode(call, name, fullname, DispatchTypes.STATIC_DISPATCH, order))
     }
     val args = withOrder(call.getArguments) { case (a, o) => astForNode(a, o) }
 
     val ast = cpgCall.withChildren(args)
-    val refAst = receiver match {
-      case Some(r) if r.root.isDefined =>
-        ast.withReceiverEdge(cpgCall.root.get, r.root.get).withArgEdge(cpgCall.root.get, r.root.get)
-      case _ => ast
-    }
     val validArgs = args.collect { case a if a.root.isDefined => a.root.get }
-    refAst.withArgEdges(cpgCall.root.get, validArgs)
+    ast.withArgEdges(cpgCall.root.get, validArgs)
   }
 
   private def astForUnaryExpression(unary: IASTUnaryExpression, order: Int): Ast = {
@@ -935,7 +922,8 @@ class AstCreator(filename: String, global: Global) {
   }
 
   private def astForGotoStatement(goto: IASTGotoStatement, order: Int): Ast = {
-    Ast(newControlStructureNode(goto, ControlStructureTypes.GOTO, goto.getRawSignature, order))
+    val code = s"goto ${goto.getName.toString};"
+    Ast(newControlStructureNode(goto, ControlStructureTypes.GOTO, code, order))
   }
 
   private def astsForLabelStatement(label: IASTLabelStatement, order: Int): Seq[Ast] = {
