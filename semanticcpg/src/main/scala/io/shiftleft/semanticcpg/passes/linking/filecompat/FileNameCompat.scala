@@ -21,7 +21,7 @@ class FileNameCompat(cpg: Cpg) extends CpgPass(cpg) {
       // When creating nodes via NewNode classes, filename is "", not null.
       // For operators, filename might also be null.
       if (node.filename == "<empty>") {
-        dstGraph.addNodeProperty(node, "FILENAME", node.file.name.headOption.getOrElse("empty"))
+        dstGraph.addNodeProperty(node, "FILENAME", node.file.name.headOption.getOrElse("<empty>"))
       }
     }
 
