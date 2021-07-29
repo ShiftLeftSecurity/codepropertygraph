@@ -787,11 +787,12 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
         } else {
           Seq.empty
         }
+      val validArgs = args.filter(_.root.isDefined)
       Ast(cpgNewExpression)
         .withChild(cpgTypeId)
-        .withChildren(args)
+        .withChildren(validArgs)
         .withArgEdge(cpgNewExpression, cpgTypeId.root.get)
-        .withArgEdges(cpgNewExpression, args.map(_.root.get))
+        .withArgEdges(cpgNewExpression, validArgs.map(_.root.get))
     }
   }
 
