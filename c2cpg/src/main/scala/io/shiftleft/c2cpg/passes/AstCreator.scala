@@ -41,7 +41,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
 
   import AstCreator._
 
-  private val reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "utf-8"));
+  private val reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "utf-8"))
   private val fileLines = reader.lines().iterator().asScala.toSeq.map(_.length)
 
   private val scope = new Scope[String, (NewNode, String), NewNode]()
@@ -119,20 +119,20 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
        |  Line: ${line(node).getOrElse(-1)}
        |  """.stripMargin
 
-  private def notHandledYetSeq[T](node: IASTNode): Seq[T] = {
+  private def notHandledYetSeq(node: IASTNode, order: Int): Seq[Ast] = {
     if (!node.isInstanceOf[IASTProblem] && !node.isInstanceOf[IASTProblemHolder]) {
       val text = notHandledText(node)
       logger.warn(text)
     }
-    Seq.empty
+    Seq(newUnkown(node, order))
   }
 
-  private def notHandledYet(node: IASTNode): Ast = {
+  private def notHandledYet(node: IASTNode, order: Int): Ast = {
     if (!node.isInstanceOf[IASTProblem] && !node.isInstanceOf[IASTProblemHolder]) {
       val text = notHandledText(node)
       logger.warn(text)
     }
-    Ast()
+    newUnkown(node, order)
   }
 
   private def nullSafeCode(node: IASTNode): String = {
@@ -191,7 +191,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       case _: IASTTranslationUnit           => ""
       case u: IASTUnaryExpression           => u.getOperand.toString
       case other if other.getParent != null => fullName(other.getParent)
-      case other                            => notHandledYet(other); ""
+      case other                            => notHandledYet(other, -1); ""
     }
     val cleaned = fixQualifiedName(qualifiedName)
     if (cleaned.startsWith(".")) {
@@ -216,7 +216,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
         }
       case d: CPPASTIdExpression  => lastNameOfQualifiedName(d.getName.toString)
       case u: IASTUnaryExpression => shortName(u.getOperand)
-      case other                  => notHandledYet(other); ""
+      case other                  => notHandledYet(other, -1); ""
     }
     name
   }
@@ -234,7 +234,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     case decl: CASTFunctionDeclarator         => decl.getParameters.toIndexedSeq
     case decl: IASTStandardFunctionDeclarator => decl.getParameters.toIndexedSeq
     case defn: IASTFunctionDefinition         => params(defn.getDeclarator)
-    case other                                => notHandledYetSeq(other)
+    case other                                => notHandledYet(other, -1); Seq.empty
   }
 
   private def paramListSignature(func: IASTNode, includeParamNames: Boolean): String = {
@@ -364,16 +364,19 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     }
   }
 
-  private def astForInitializerList(l: IASTInitializerList, order: Int): Ast = {
-    // TODO: how to represent this?
+  private def newUnkown(node: IASTNode, order: Int): Ast =
     Ast(
       NewUnknown()
-        .parserTypeName(l.getClass.getSimpleName)
-        .code(l.getRawSignature)
+        .parserTypeName(node.getClass.getSimpleName)
+        .code(node.getRawSignature)
         .order(order)
         .argumentIndex(order)
-        .lineNumber(line(l))
-        .columnNumber(column(l)))
+        .lineNumber(line(node))
+        .columnNumber(column(node)))
+
+  private def astForInitializerList(l: IASTInitializerList, order: Int): Ast = {
+    // TODO: how to represent this?
+    newUnkown(l, order)
   }
 
   private def astForNode(node: IASTNode, order: Int): Ast = {
@@ -384,7 +387,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       case decl: IASTDeclSpecifier => astForIdentifier(decl, order)
       case expr: IASTExpression    => astForExpression(expr, order)
       case l: IASTInitializerList  => astForInitializerList(l, order)
-      case _                       => notHandledYet(node)
+      case _                       => notHandledYet(node, order)
     }
   }
 
@@ -486,7 +489,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
         val ast = Ast(callNode).withChildren(args)
         val validArgs = args.collect { case a if a.root.isDefined => a.root.get }
         ast.withArgEdges(callNode, validArgs)
-      case _ => notHandledYet(init)
+      case _ => notHandledYet(init, order)
     }
 
   private def astForDeclarator(declaration: IASTSimpleDeclaration, declarator: IASTDeclarator, order: Int): Ast = {
@@ -533,7 +536,6 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
             .isExternal(false)
             .filename(declaration.getContainingFilename)
             .order(order))
-      case _ => notHandledYet(declaration)
     }
   }
 
@@ -558,7 +560,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
         handleUsingDeclaration(usingDeclaration)
         Seq.empty
       case decl =>
-        notHandledYetSeq(decl)
+        notHandledYetSeq(decl, order)
     }
 
   private def astForBinaryExpression(bin: IASTBinaryExpression, order: Int): Ast = {
@@ -696,7 +698,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
           case Some(r) => ast.withArgEdge(call, r)
           case _       => ast
         }
-      case _ => notHandledYet(typeId)
+      case _ => notHandledYet(typeId, order)
     }
   }
 
@@ -752,14 +754,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
 
     val expr = astForExpression(castExpression.getOperand, 1)
     val argNode = castExpression.getTypeId
-    val arg = Ast(
-      NewUnknown()
-        .parserTypeName(argNode.getClass.getSimpleName)
-        .code(argNode.getRawSignature)
-        .order(2)
-        .argumentIndex(2)
-        .lineNumber(line(argNode))
-        .columnNumber(column(argNode)))
+    val arg = newUnkown(argNode, 2)
 
     var ast = Ast(cpgCastExpression)
       .withChild(arg)
@@ -850,24 +845,10 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       newCallNode(typeIdInit, Operators.cast, Operators.cast, DispatchTypes.STATIC_DISPATCH, order)
 
     // TODO: how to represent the initializer here?
-    val expr = Ast(
-      NewUnknown()
-        .parserTypeName(typeIdInit.getInitializer.getClass.getSimpleName)
-        .code(typeIdInit.getInitializer.getRawSignature)
-        .order(1)
-        .argumentIndex(1)
-        .lineNumber(line(typeIdInit.getInitializer))
-        .columnNumber(column(typeIdInit.getInitializer)))
+    val expr = newUnkown(typeIdInit.getInitializer, 1)
 
     val typeNode = typeIdInit.getTypeId
-    val typeAst = Ast(
-      NewUnknown()
-        .parserTypeName(typeNode.getClass.getSimpleName)
-        .code(typeNode.getRawSignature)
-        .order(2)
-        .argumentIndex(2)
-        .lineNumber(line(typeNode))
-        .columnNumber(column(typeNode)))
+    val typeAst = newUnkown(typeNode, 2)
 
     Ast(cpgCastExpression)
       .withChild(typeAst)
@@ -881,14 +862,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     val callNode = newCallNode(c, name, name, DispatchTypes.STATIC_DISPATCH, order)
 
     // TODO: how to represent the initializer here?
-    val arg = Ast(
-      NewUnknown()
-        .parserTypeName(c.getInitializer.getClass.getSimpleName)
-        .code(c.getInitializer.getRawSignature)
-        .order(1)
-        .argumentIndex(1)
-        .lineNumber(line(c.getInitializer))
-        .columnNumber(column(c.getInitializer)))
+    val arg = newUnkown(c.getInitializer, 1)
 
     val ast = Ast(callNode).withChild(arg)
     ast.withArgEdge(callNode, arg.root.get)
@@ -912,7 +886,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     case delExpression: ICPPASTDeleteExpression             => astForDeleteExpression(delExpression, order)
     case typeIdInit: CPPASTTypeIdInitializerExpression      => astForTypeIdInitExpression(typeIdInit, order)
     case c: ICPPASTSimpleTypeConstructorExpression          => astForConstructorExpression(c, order)
-    case _                                                  => notHandledYet(expression)
+    case _                                                  => notHandledYet(expression, order)
   }
 
   private def astForReturnStatement(ret: IASTReturnStatement, order: Int): Ast = {
@@ -1024,7 +998,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       case decl: IASTDeclarationStatement         => astsForDeclarationStatement(decl, order)
       case label: IASTLabelStatement              => astsForLabelStatement(label, order)
       case _: IASTNullStatement                   => Seq.empty
-      case _                                      => notHandledYetSeq(statement)
+      case _                                      => notHandledYetSeq(statement, order)
     }
   }
 
@@ -1032,7 +1006,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     body match {
       case Some(b: IASTCompoundStatement) => astForBlockStatement(b, order)
       case None                           => Ast(NewBlock())
-      case Some(b)                        => notHandledYet(b)
+      case Some(b)                        => notHandledYet(b, order)
     }
   }
 
@@ -1123,7 +1097,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     }
 
     if (!typeDecls.exists(_.root.isDefined)) {
-      notHandledYetSeq(typeSpecifier)
+      notHandledYetSeq(typeSpecifier, order)
     } else {
       typeDecls.foreach(t => scope.pushNewScope(t.root.get))
       val member = withOrder(typeSpecifier.getDeclarations(true)) { (m, o) =>
@@ -1228,7 +1202,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     }
 
     if (!typeDecls.exists(_.root.isDefined)) {
-      notHandledYetSeq(enumSpecifier)
+      notHandledYetSeq(enumSpecifier, order)
     } else {
       typeDecls.foreach(t => scope.pushNewScope(t.root.get))
       var currentOrder = 0
@@ -1408,7 +1382,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     case l: ICPPASTLinkageSpecification                       => astsForLinkageSpecification(l)
     case t: ICPPASTTemplateDeclaration                        => astsForDeclaration(t.getDeclaration, order)
     case a: ICPPASTStaticAssertDeclaration                    => Seq(astForStaticAssert(a, order))
-    case _                                                    => notHandledYetSeq(decl)
+    case _                                                    => notHandledYetSeq(decl, order)
   }
 
   private def astForFor(forStmt: IASTForStatement, order: Int): Ast = {
