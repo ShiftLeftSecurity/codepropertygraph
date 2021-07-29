@@ -82,7 +82,7 @@ class CfgCreator(entryNode: Method) {
       //  CFG spec doesn't define an edge type at the moment
       diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.CFG)
     }
-    Iterator(diffGraph).map(_.build())
+    Iterator(diffGraph.build())
   }
 
   /**

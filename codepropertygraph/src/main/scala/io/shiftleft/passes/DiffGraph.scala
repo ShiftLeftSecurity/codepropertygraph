@@ -303,9 +303,10 @@ object DiffGraph {
     def build(): DiffGraph = EmptyChangeSet
   }
 
-  private class Applier(diffGraph: DiffGraph, graph: Graph, undoable: Boolean, keyPool: Option[KeyPool]) {
+  class Applier(diffGraph: DiffGraph, graph: Graph, undoable: Boolean, keyPool: Option[KeyPool]) {
     private val overlayNodeToOdbNode = new java.util.IdentityHashMap[NewNode, StoredNode]()
     private val deferredInitList = mutable.ArrayDeque[NewNode]()
+    var size = 0
     val inverseBuilder: InverseBuilder = if (undoable) InverseBuilder.newBuilder else InverseBuilder.noop
 
     def nodeMapping(newNode: NewNode): StoredNode = {
@@ -327,6 +328,7 @@ object DiffGraph {
         val stored = overlayNodeToOdbNode.get(newNode)
         stored.fromNewNode(newNode, nodeMapping)
         inverseBuilder.onNewNode(stored)
+        size += 1
       }
     }
 
@@ -349,14 +351,17 @@ object DiffGraph {
           case Change.RemoveNodeProperty(nodeId, propertyKey) =>
             graph.node(nodeId).removeProperty(propertyKey)
         }
+        size += 1
         drainDeferred()
       }
 
-      AppliedDiffGraph(
+      val res = AppliedDiffGraph(
         diffGraph,
         if (undoable) Some(inverseBuilder.build()) else None,
         overlayNodeToOdbNode
       )
+      res.size = size
+      res
     }
 
     private def addEdgeProperty(edge: Edge, key: String, value: AnyRef, inverseBuilder: DiffGraph.InverseBuilder) = {
@@ -408,7 +413,7 @@ object DiffGraph {
         inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
         newNode.fromNewNode(node, mapping = nodeMapping)
         overlayNodeToOdbNode.put(node, newNode)
-      }
+      } else { size -= 1 }
     }
   }
 

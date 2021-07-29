@@ -4,6 +4,7 @@ import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
+import io.shiftleft.passes.CpgPassBase.logger
 import org.slf4j.{Logger, LoggerFactory, MDC}
 
 import java.lang.{Long => JLong}
@@ -38,10 +39,9 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
   /**
     * Execute the enhancement and apply result to the underlying graph
     */
-  override def createAndApply(): Unit =
-    withStartEndTimesLogged {
-      run().foreach(diffGraph => DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool))
-    }
+  override def createAndApply(): Unit = {
+    createApplySerializeAndStore(null)
+  }
 
   /**
     * Execute and create a serialized overlay
@@ -68,24 +68,70 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
                                             prefix: String = ""): Unit = {
-    if (serializedCpg.isEmpty) {
-      createAndApply()
-    } else {
-      val overlays = createApplyAndSerialize(inverse)
-      overlays.zipWithIndex.foreach {
-        case (overlay, index) => {
-          val name = generateOutFileName(prefix, outName, index)
-          store(overlay, name, serializedCpg)
+    logger.info(s"Start of enhancement: $name")
+    val tic = System.nanoTime()
+    //diagnostics
+    var _nChunks = 0
+    var _nDiffElements = 0
+    var _nDiffElementsExpanded = 0
+    var _nanosApplier = 0L
+    var _nanosSerialize = 0L
+    var _nanosStore = 0L
+
+    try {
+      var index = 0
+      for (diffGraph <- run()) {
+        val applyTic = System.nanoTime
+        _nDiffElements += diffGraph.size
+        _nChunks += 1
+        val applied = DiffGraph.Applier.applyDiff(diffGraph,
+                                                  cpg,
+                                                  undoable = inverse && serializedCpg != null && !serializedCpg.isEmpty,
+                                                  keyPool)
+        _nDiffElementsExpanded += applied.size
+        val applyToc = System.nanoTime()
+        _nanosApplier += (applyToc - applyTic)
+        if (serializedCpg != null && !serializedCpg.isEmpty) {
+          val serialized = serialize(applied, inverse)
+          val serializedToc = System.nanoTime
+          _nanosSerialize += serializedToc - applyToc
+          store(serialized, generateOutFileName(prefix, outName, index), serializedCpg)
+          val storeToc = System.nanoTime
+          _nanosStore += storeToc - serializedToc
         }
+        index += 1
+      }
+    } catch {
+      case exception: Exception =>
+        logger.error(s"Enhancement ${name} failed!", exception)
+        throw exception
+    } finally {
+      val toc = System.nanoTime()
+      if (serializedCpg == null || serializedCpg.isEmpty) {
+        val fracApply = (_nanosApplier * 1e-2 / (1 + toc - tic))
+        val fracRun = (100.0 - fracApply)
+
+        logger.info(
+          f"Enhancement $name completed in ${(toc - tic) * 1e-6}%.0f ms (split: ${fracRun}%2.0f%%/${fracApply}%2.0f%%). ${_nDiffElements}%d + ${_nDiffElementsExpanded - _nDiffElements}%d changes commited over ${_nChunks}%d chunks.")
+      } else {
+        val fracApply = (_nanosApplier * 1e-2 / (1 + toc - tic))
+        val fracSerialize = (_nanosSerialize * 1e-2 / (1 + toc - tic))
+        val fracStore = (_nanosStore * 1e-2 / (1 + toc - tic))
+        val fracRun = (100.0 - fracApply - fracSerialize - fracStore)
+        logger.info(
+          f"Enhancement $name completed in ${(toc - tic) * 1e-6}%.0f ms (split: ${fracRun}%2.0f%%/${fracApply}%2.0f%%/${fracSerialize}%2.0f%%/${fracStore}%2.0f%%${if (inverse) " including inverse"
+          else ""}). ${_nDiffElements}%d + ${_nDiffElementsExpanded - _nDiffElements}%d changes committed over ${_nChunks}%d chunks.")
       }
     }
   }
 
 }
 
-trait CpgPassBase {
+object CpgPassBase {
+  val logger: Logger = LoggerFactory.getLogger(classOf[CpgPass])
+}
 
-  private val logger: Logger = LoggerFactory.getLogger(classOf[CpgPass])
+trait CpgPassBase {
 
   def createAndApply(): Unit
 
@@ -151,4 +197,6 @@ case class AppliedDiffGraph(diffGraph: DiffGraph,
   def nodeToGraphId(node: NewNode): JLong = {
     nodeToOdbNode.get(node).id
   }
+  // for diagnostics
+  var size = 0
 }
