@@ -1,6 +1,7 @@
 package io.shiftleft.c2cpg.passes
 
 import better.files.File
+import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.CfgNode
 import io.shiftleft.passes.IntervalKeyPool
@@ -23,7 +24,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
       file1.write(s"RET func() { $file1Code }")
       val keyPoolFile1 = new IntervalKeyPool(1001, 2000)
       val filenames = List(file1.path.toAbsolutePath.toString)
-      new AstCreationPass(filenames, cpg, keyPoolFile1).createAndApply()
+      new AstCreationPass(filenames, cpg, keyPoolFile1, Config()).createAndApply()
       new CfgCreationPass(cpg).createAndApply()
     }
 

@@ -1,5 +1,6 @@
 package io.shiftleft.c2cpg.passes
 
+import io.shiftleft.c2cpg.C2Cpg
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.passes.DiffGraph
@@ -34,7 +35,7 @@ object AstCreator {
 
 }
 
-class AstCreator(filename: String, global: Global) {
+class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
 
   import AstCreator._
 
@@ -301,9 +302,13 @@ class AstCreator(filename: String, global: Global) {
       r
     }.toIndexedSeq
 
-    val commentsAsts = parserResult.getComments.map(comment => astForComment(comment)).toIndexedSeq
-
-    cpgFile.withChild(translationUnitAst.withChildren(declsAsts).withChildren(commentsAsts))
+    val ast = cpgFile.withChild(translationUnitAst.withChildren(declsAsts))
+    if (config.includeComments) {
+      val commentsAsts = parserResult.getComments.map(comment => astForComment(comment)).toIndexedSeq
+      ast.withChildren(commentsAsts)
+    } else {
+      ast
+    }
   }
 
   private def astForTranslationUnit(iASTTranslationUnit: IASTTranslationUnit): Ast = {
@@ -475,7 +480,7 @@ class AstCreator(filename: String, global: Global) {
         val name = declarator.getName.toString
         val callNode = newCallNode(declarator, name, name, DispatchTypes.STATIC_DISPATCH, order)
         val args = withOrder(i.getArguments) { case (a, o) => astForNode(a, o) }
-        val ast = Ast(callNode) withChildren (args)
+        val ast = Ast(callNode).withChildren(args)
         val validArgs = args.collect { case a if a.root.isDefined => a.root.get }
         ast.withArgEdges(callNode, validArgs)
       case _ => notHandledYet(init)
@@ -1475,7 +1480,7 @@ class AstCreator(filename: String, global: Global) {
 
     val elseChild = if (ifStmt.getElseClause != null) {
       val elseNode = newControlStructureNode(ifStmt.getElseClause, ControlStructureTypes.ELSE, "else", 3)
-      val elseAsts = nullSafeAst(ifStmt.getElseClause, 1)
+      val elseAsts = astsForStatement(ifStmt.getElseClause, 1)
       Ast(elseNode).withChildren(elseAsts)
     } else Ast()
 

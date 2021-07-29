@@ -14,7 +14,8 @@ class C2CpgFrontend extends LanguageFrontend {
     val c2cpg = new C2Cpg()
     val config = Config(inputPaths = Set(sourceCodePath.getAbsolutePath),
                         outputPath = cpgFile.getAbsolutePath,
-                        sourceFileExtensions = Set(fileSuffix))
+                        sourceFileExtensions = Set(fileSuffix),
+                        includeComments = true)
     c2cpg.runAndOutput(config)
   }
   override val fileSuffix: String = ".c"

@@ -42,7 +42,7 @@ class C2Cpg {
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
 
     new MetaDataPass(cpg, Languages.C, Some(metaDataKeyPool)).createAndApply()
-    val astCreationPass = new AstCreationPass(sourceFileNames, cpg, functionKeyPool, createParseConfig(config))
+    val astCreationPass = new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, createParseConfig(config))
     astCreationPass.createAndApply()
     new CfgCreationPass(cpg).createAndApply()
     new StubRemovalPass(cpg).createAndApply()
@@ -61,6 +61,7 @@ object C2Cpg {
                           sourceFileExtensions: Set[String] = Set(".c", ".cc", ".cpp", ".h", ".hpp"),
                           includePaths: Set[String] = Set.empty,
                           defines: Set[String] = Set.empty,
+                          includeComments: Boolean = false,
                           logProblems: Boolean = false,
                           logPreprocessor: Boolean = false)
       extends X2CpgConfig[Config] {
@@ -76,6 +77,9 @@ object C2Cpg {
       import builder._
       OParser.sequence(
         programName(classOf[C2Cpg].getSimpleName),
+        opt[Unit]("include-comments")
+          .text(s"includes all comments into the CPG")
+          .action((_, c) => c.copy(includeComments = true)),
         opt[Unit]("log-problems")
           .text(s"enables logging of all parse problems")
           .action((_, c) => c.copy(logProblems = true)),

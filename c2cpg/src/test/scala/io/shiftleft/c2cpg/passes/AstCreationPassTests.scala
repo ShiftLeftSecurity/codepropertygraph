@@ -1,6 +1,7 @@
 package io.shiftleft.c2cpg.passes
 
 import better.files.File
+import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, Operators}
@@ -23,7 +24,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         val cpg = Cpg.emptyCpg
         val keyPool = new IntervalKeyPool(1001, 2000)
         val filenames = List(file1.path.toAbsolutePath.toString, file2.path.toAbsolutePath.toString)
-        new AstCreationPass(filenames, cpg, keyPool).createAndApply()
+        new AstCreationPass(filenames, cpg, keyPool, Config()).createAndApply()
 
         f(cpg)
       }
@@ -39,7 +40,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         file.write("//foo")
         file.path.toAbsolutePath.toString
       }
-      new AstCreationPass(expectedFilenames, cpg, new IntervalKeyPool(1, 1000)).createAndApply()
+      new AstCreationPass(expectedFilenames, cpg, new IntervalKeyPool(1, 1000), Config()).createAndApply()
 
       "create one NamespaceBlock per file" in {
         val expectedNamespaceFullNames = expectedFilenames.map(f => s"$f:<global>").toSet
