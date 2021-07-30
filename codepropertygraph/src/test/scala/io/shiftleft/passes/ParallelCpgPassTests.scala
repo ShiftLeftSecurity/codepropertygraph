@@ -57,7 +57,7 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
 
     "take into account KeyPools for createAndApply" in Fixture(Some(keyPools)) { (cpg, pass) =>
       pass.createAndApply()
-      cpg.graph.V.asScala.map(_.id()).toSet shouldBe Set(10, 30)
+      cpg.graph.V.asScala.map(_.id()).toSet shouldBe Set(10, 11)
     }
 
   }

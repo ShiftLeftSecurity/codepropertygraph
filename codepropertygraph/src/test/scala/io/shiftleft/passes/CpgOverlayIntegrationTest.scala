@@ -28,16 +28,14 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
       val initialNode = cpg.graph.V.has(Properties.CODE -> InitialNodeCode).head.asInstanceOf[StoredNode]
       val pass1 = passAddsEdgeTo(initialNode, Pass1NewNodeCode, cpg)
 
-      val overlay1 = pass1.createApplyAndSerialize()
-      fullyConsume(overlay1)
+      pass1.createAndApply()
       cpg.graph.nodeCount shouldBe 2
       initialNode.out.property(Properties.CODE).toList shouldBe List(Pass1NewNodeCode)
 
       val pass1NewNode = cpg.graph.V.has(Properties.CODE -> Pass1NewNodeCode).head.asInstanceOf[StoredNode]
       val pass2 = passAddsEdgeTo(pass1NewNode, Pass2NewNodeCode, cpg)
 
-      val overlay2 = pass2.createApplyAndSerialize()
-      fullyConsume(overlay2)
+      pass2.createAndApply()
       cpg.graph.nodeCount shouldBe 3
       pass1NewNode.out.property(Properties.CODE).toList shouldBe List(Pass2NewNodeCode)
     }

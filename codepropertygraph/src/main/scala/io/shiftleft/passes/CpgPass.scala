@@ -44,19 +44,6 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
   }
 
   /**
-    * Execute and create a serialized overlay
-    * @param inverse invert the diffgraph before serializing
-    */
-  def createApplyAndSerialize(inverse: Boolean = false): Iterator[GeneratedMessageV3] =
-    withStartEndTimesLogged {
-      val overlays = run().map { diffGraph =>
-        val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse, keyPool)
-        serialize(appliedDiffGraph, inverse)
-      }
-      overlays
-    }
-
-  /**
     * Run a CPG pass to create diff graphs, apply diff graphs, create corresponding
     * overlays and add them to the serialized CPG. The name of the overlay is derived
     * from the class name of the pass.
@@ -110,17 +97,20 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
       if (serializedCpg == null || serializedCpg.isEmpty) {
         val fracApply = (_nanosApplier * 1e-2 / (1 + toc - tic))
         val fracRun = (100.0 - fracApply)
-
+        MDC.put("time", s"${(toc - tic) * 1e-6}%.0f")
         logger.info(
           f"Enhancement $name completed in ${(toc - tic) * 1e-6}%.0f ms (split: ${fracRun}%2.0f%%/${fracApply}%2.0f%%). ${_nDiffElements}%d + ${_nDiffElementsExpanded - _nDiffElements}%d changes commited over ${_nChunks}%d chunks.")
+        MDC.remove("time")
       } else {
         val fracApply = (_nanosApplier * 1e-2 / (1 + toc - tic))
         val fracSerialize = (_nanosSerialize * 1e-2 / (1 + toc - tic))
         val fracStore = (_nanosStore * 1e-2 / (1 + toc - tic))
         val fracRun = (100.0 - fracApply - fracSerialize - fracStore)
+        MDC.put("time", s"${(toc - tic) * 1e-6}%.0f")
         logger.info(
           f"Enhancement $name completed in ${(toc - tic) * 1e-6}%.0f ms (split: ${fracRun}%2.0f%%/${fracApply}%2.0f%%/${fracSerialize}%2.0f%%/${fracStore}%2.0f%%${if (inverse) " including inverse"
           else ""}). ${_nDiffElements}%d + ${_nDiffElementsExpanded - _nDiffElements}%d changes committed over ${_nChunks}%d chunks.")
+        MDC.remove("time")
       }
     }
   }

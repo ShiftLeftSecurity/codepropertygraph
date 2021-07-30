@@ -2,6 +2,8 @@ package io.shiftleft.passes
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.CpgPassBase.logger
+import org.slf4j.MDC
+
 import scala.collection.mutable
 import java.util.function.{BiConsumer, Supplier}
 import scala.collection.immutable.ArraySeq
@@ -95,17 +97,20 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
       if (serializedCpg == null || serializedCpg.isEmpty) {
         val fracApply = (_nanosApplier * 1e-2 / (1 + toc - tic))
         val fracRun = (100.0 - fracApply)
-
+        MDC.put("time", s"${(toc - tic) * 1e-6}%.0f")
         logger.info(
           f"Enhancement $name completed in ${(toc - tic) * 1e-6}%.0f ms (split: ${fracRun}%2.0f%%/${fracApply}%2.0f%%). ${_nDiffElements}%d + ${_nDiffElementsExpanded - _nDiffElements}%d changes commited from ${_nParts}%d parts.")
+        MDC.remove("time")
       } else {
         val fracApply = (_nanosApplier * 1e-2 / (1 + toc - tic))
         val fracSerialize = (_nanosSerialize * 1e-2 / (1 + toc - tic))
         val fracStore = (_nanosStore * 1e-2 / (1 + toc - tic))
         val fracRun = (100.0 - fracApply - fracSerialize - fracStore)
+        MDC.put("time", s"${(toc - tic) * 1e-6}%.0f")
         logger.info(
           f"Enhancement $name completed in ${(toc - tic) * 1e-6}%.0f ms (split: ${fracRun}%2.0f%%/${fracApply}%2.0f%%/${fracSerialize}%2.0f%%/${fracStore}%2.0f%%${if (inverse) " including inverse"
           else ""}). ${_nDiffElements}%d + ${_nDiffElementsExpanded - _nDiffElements}%d changes committed from ${_nParts}%d parts.")
+        MDC.remove("time")
       }
     }
   }
