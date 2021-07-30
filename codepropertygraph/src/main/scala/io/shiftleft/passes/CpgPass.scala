@@ -18,7 +18,48 @@ import scala.concurrent.duration.DurationLong
   * cpg.bin.zip file.
   *
   * A pass is provided by inheriting from this class and implementing `run`,
-  * a method, which creates the sequence of diff graphs from an input graph.
+  * a method, which creates an iterator of diff graphs from an input graph.
+  *
+  * When applying the diffgraphs, the implementation may either decide to
+  * immediately drain the iterator and combine the changesets, or it may
+  * decide to apply them one after the other (see current implementation);
+  * this detail may change without warning in any release. Hence, one needs
+  * to take care when returning an iterator representing a lazy computation.
+  * The only valid use of nontrivial iterators is if its draining does not
+  * read from the graph, or is very carefully designed to not interfere
+  * with itself.
+  *
+  * For example, the following may throw ConcurrentModificationException if
+  * the internal implementation decides to interleave iterator draining and
+  * commits of graph updates:
+  *
+  *   def run(): Iterator[DiffGraph] =
+  *     cpg
+  *     .method
+  *     .filter{_.fullName == "FooBar"}
+  *     .map{m =>
+  *       val diffGraph = DiffGraph.newBuilder
+  *       diffGraph.addNode(NewMethod().build)
+  *       diffGraph.build
+  *     }
+  *
+  * On the other hand, the following will fail to do the expected thing if
+  * the implementation drains the iterator before commiting changes:
+  *
+  * def run(): Iterator[DiffGraph] = new MyIterator()
+  * private class MyIterator extends Iterator[DiffGraph]{
+  *   private var state = 0
+  *   def hasNext:Boolean = state < 2
+  *   def next: DiffGraph = state match {
+  *     case 0|1 =>
+  *       state += 1
+  *       val builder = DiffGraph.newBuilder
+  *       if(cpg.method.fullNameExact("FooBar").hasNext)
+  *         builder.addNode(NewMethod().fullName("FooBar").build)
+  *       builder.build
+  *     case _ => throw new RuntimeException()
+  *   }
+  * }
   *
   * Overview of steps and their meaning:
   *
