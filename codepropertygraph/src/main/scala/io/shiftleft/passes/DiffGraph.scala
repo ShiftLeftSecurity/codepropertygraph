@@ -192,11 +192,10 @@ object DiffGraph {
   def newBuilder: Builder = new Builder()
 
   class Builder {
-    private var _buffer: mutable.ArrayBuffer[Change] = null
-    private var _nodeSet: java.util.IdentityHashMap[NewNode, NewNode] = null
-    private def buffer: mutable.ArrayBuffer[Change] = {
+    private var _buffer: ChangeBuffer = null
+    private def buffer: ChangeBuffer = {
       if (_buffer == null)
-        _buffer = new mutable.ArrayBuffer[Change]()
+        _buffer = new ChangeBuffer()
       _buffer
     }
 
@@ -205,8 +204,9 @@ object DiffGraph {
     def addEdge(src: AbstractNode,
                 dst: AbstractNode,
                 edgeLabel: String,
-                properties: Seq[(String, AnyRef)] = List()): Unit = {
+                properties: Seq[(String, AnyRef)] = List()): this.type = {
       buffer.append(Change.CreateEdge(src, dst, edgeLabel, properties))
+      this
     }
     def build(buf: mutable.ArrayBuffer[Change]) = {
       if (buf == null || buf.isEmpty)
@@ -220,42 +220,50 @@ object DiffGraph {
     def build(): DiffGraph = build(_buffer)
     def buildReverse(): DiffGraph = build(if (_buffer != null) _buffer.reverse else null)
 
-    def addNode(node: NewNode): Boolean = {
-      if (_nodeSet == null) _nodeSet = new java.util.IdentityHashMap[NewNode, NewNode]()
-      if (_nodeSet.put(node, node) == null) {
-        buffer.append(Change.CreateNode(node))
-        true
-      } else false
+    def addNode(node: NewNode): this.type = { buffer.append(Change.CreateNode(node)); this }
+
+    def addChanges(elems: Array[Change]): this.type = { buffer.addArrayElements(elems); this }
+    //cf ArrayBuffer.scala, uses ArrayCopy
+    def addChanges(other: Builder): this.type = { buffer.addAll(other.buffer); this }
+    def addChanges(other: DiffGraph): this.type = other match {
+      case ArrayChangeSet(changes) => addChanges(changes)
+      case SingleChangeSet(change) => buffer.append(change); this
+      case EmptyChangeSet          => this
     }
 
     def addEdgeToOriginal(srcNode: NewNode,
                           dstNode: StoredNode,
                           edgeLabel: String,
-                          properties: Seq[(String, AnyRef)] = List()): Unit =
+                          properties: Seq[(String, AnyRef)] = List()): this.type =
       addEdge(srcNode, dstNode, edgeLabel, properties)
     def addEdgeFromOriginal(srcNode: StoredNode,
                             dstNode: NewNode,
                             edgeLabel: String,
-                            properties: Seq[(String, AnyRef)] = List()): Unit =
+                            properties: Seq[(String, AnyRef)] = List()): this.type =
       addEdge(srcNode, dstNode, edgeLabel, properties)
     def addEdgeInOriginal(srcNode: StoredNode,
                           dstNode: StoredNode,
                           edgeLabel: String,
-                          properties: Seq[(String, AnyRef)] = List()): Unit =
+                          properties: Seq[(String, AnyRef)] = List()): this.type =
       addEdge(srcNode, dstNode, edgeLabel, properties)
-    def addNodeProperty(node: StoredNode, key: String, value: AnyRef): Unit =
-      buffer.append(Change.SetNodeProperty(node, key, value))
-    def addEdgeProperty(edge: Edge, key: String, value: AnyRef): Unit =
-      buffer.append(Change.SetEdgeProperty(edge, key, value))
-    def removeNode(id: Long): Unit =
+    def addNodeProperty(node: StoredNode, key: String, value: AnyRef): this.type = {
+      buffer.append(Change.SetNodeProperty(node, key, value)); this
+    }
+    def addEdgeProperty(edge: Edge, key: String, value: AnyRef): this.type = {
+      buffer.append(Change.SetEdgeProperty(edge, key, value)); this
+    }
+    def removeNode(id: Long): this.type = {
       buffer.append(Change.RemoveNode(id))
-    def removeNode(node: StoredNode): Unit =
-      buffer.append(Change.RemoveNode(node.id))
-    def removeEdge(edge: Edge): Unit = buffer += Change.RemoveEdge(edge)
-    def removeNodeProperty(nodeId: Long, propertyKey: String): Unit =
-      buffer.append(Change.RemoveNodeProperty(nodeId, propertyKey))
-    def removeEdgeProperty(edge: Edge, propertyKey: String): Unit =
-      buffer.append(Change.RemoveEdgeProperty(edge, propertyKey))
+      this
+    }
+    def removeNode(node: StoredNode): this.type = removeNode(node.id())
+    def removeEdge(edge: Edge): this.type = { buffer += Change.RemoveEdge(edge); this }
+    def removeNodeProperty(nodeId: Long, propertyKey: String): this.type = {
+      buffer.append(Change.RemoveNodeProperty(nodeId, propertyKey)); this
+    }
+    def removeEdgeProperty(edge: Edge, propertyKey: String): this.type = {
+      buffer.append(Change.RemoveEdgeProperty(edge, propertyKey)); this
+    }
   }
 
   abstract class InverseBuilder {
@@ -429,6 +437,16 @@ object DiffGraph {
     def unapplyDiff(graph: Graph, inverseDiff: DiffGraph): Unit = {
       val applier = new Applier(inverseDiff, graph, undoable = false, keyPool = None)
       applier.run()
+    }
+  }
+
+  class ChangeBuffer extends ArrayBuffer[Change] {
+    //equivalent to addAll(elems); cf ArrayBuffer.scala, we need to do this by hand because scala stdlib misses the obvious optimization
+    def addArrayElements(elems: Array[Change]): this.type = {
+      ensureSize(length + elems.length)
+      Array.copy(elems, 0, array, length, elems.length)
+      size0 = length + elems.length
+      this
     }
   }
 
