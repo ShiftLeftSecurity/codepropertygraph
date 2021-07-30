@@ -7,6 +7,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import org.slf4j.{Logger, LoggerFactory, MDC}
 
 import java.lang.{Long => JLong}
+import java.util.function.{BiConsumer, Supplier}
 import scala.concurrent.duration.DurationLong
 
 /**
@@ -83,9 +84,88 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
 
 }
 
+abstract class NewStylePass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
+    extends CpgPassBase {
+  //generate Array of parts that can be processed in parallel
+  def generateParts(): Array[_ <: AnyRef] = Array[AnyRef](null)
+  //setup large data structures, acquire external resources
+  def init(): Unit = {}
+  //release large data structures and external resources
+  def finish(): Unit = {}
+  //main function: add desired changes to builder
+  def runOnPart(builder: DiffGraph.Builder, part: T): Unit
+
+  override def createAndApply(): Unit = createApplySerializeAndStore(null)
+
+  override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
+                                            inverse: Boolean = false,
+                                            prefix: String = ""): Unit = {
+    baseLogger.info(s"Start of enhancement: $name")
+    val tic = System.nanoTime()
+    var nParts = 0
+    var tocBuild = -1L
+    var size = -1
+    try {
+      init()
+      val parts = generateParts()
+      nParts = parts.size
+      val diffGraph = nParts match {
+        case 0 => DiffGraph.EmptyChangeSet
+        case 1 =>
+          val builder = DiffGraph.newBuilder
+          runOnPart(builder, parts(0).asInstanceOf[T])
+          builder.build()
+        case _ =>
+          java.util.Arrays
+            .stream(parts)
+            .parallel()
+            .collect(
+              new Supplier[DiffGraph.Builder] {
+                override def get(): DiffGraph.Builder = DiffGraph.newBuilder
+              },
+              new BiConsumer[DiffGraph.Builder, AnyRef] {
+                override def accept(builder: DiffGraph.Builder, part: AnyRef): Unit =
+                  runOnPart(builder, part.asInstanceOf[T])
+              },
+              new BiConsumer[DiffGraph.Builder, DiffGraph.Builder] {
+                override def accept(leftBuilder: DiffGraph.Builder, rightBuilder: DiffGraph.Builder): Unit =
+                  leftBuilder.addChanges(rightBuilder)
+              }
+            )
+            .build()
+      }
+      tocBuild = System.nanoTime()
+      size = diffGraph.size
+      val withInverse = serializedCpg != null && !serializedCpg.isEmpty && inverse
+      val doSerialize = serializedCpg != null && !serializedCpg.isEmpty
+      val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, withInverse, keyPool)
+      if (doSerialize) {
+        store(serialize(appliedDiffGraph, withInverse), generateOutFileName(prefix, outName, 0), serializedCpg)
+      }
+    } catch {
+      case exc: Exception =>
+        baseLogger.error(s"Enhancement pass ${name} failed", exc)
+        throw exc
+    } finally {
+      try {
+        finish()
+      } finally {
+        // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
+        // in the reported timings, and we must have our final log message if finish() throws
+        val toc = System.nanoTime()
+        MDC.put("time", s"${(toc - tic) * 1e-6}%.0f")
+        val fracRun = if (tocBuild == -1) 100.0 else (tocBuild - tic) * 100.0 / (toc - tic + 1)
+        baseLogger.info(
+          f"Enhancement $name completed in ${(toc - tic) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${size}%d changes commited from ${nParts}%d parts.")
+        MDC.remove("time")
+      }
+    }
+  }
+}
+
 trait CpgPassBase {
 
-  private val logger: Logger = LoggerFactory.getLogger(classOf[CpgPass])
+  protected val baseLogger: Logger = LoggerFactory.getLogger(classOf[CpgPass])
 
   def createAndApply(): Unit
 
@@ -123,14 +203,14 @@ trait CpgPassBase {
   }
 
   protected def withStartEndTimesLogged[A](fun: => A): A = {
-    logger.info(s"Start of enhancement: $name")
+    baseLogger.info(s"Start of enhancement: $name")
     val startTime = System.currentTimeMillis
     try {
       fun
     } finally {
       val duration = (System.currentTimeMillis - startTime).millis.toCoarsest
       MDC.put("time", duration.toString())
-      logger.info(s"Enhancement $name completed in $duration")
+      baseLogger.info(s"Enhancement $name completed in $duration")
       MDC.remove("time")
     }
   }
