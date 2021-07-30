@@ -192,10 +192,10 @@ object DiffGraph {
   def newBuilder: Builder = new Builder()
 
   class Builder {
-    private var _buffer: ChangeBuffer = null
-    private def buffer: ChangeBuffer = {
+    private var _buffer: mutable.ArrayDeque[Change] = null
+    private def buffer: mutable.ArrayDeque[Change] = {
       if (_buffer == null)
-        _buffer = new ChangeBuffer()
+        _buffer = new mutable.ArrayDeque[Change]()
       _buffer
     }
 
@@ -208,7 +208,7 @@ object DiffGraph {
       buffer.append(Change.CreateEdge(src, dst, edgeLabel, properties))
       this
     }
-    def build(buf: mutable.ArrayBuffer[Change]) = {
+    def build(buf: mutable.ArrayDeque[Change]) = {
       if (buf == null || buf.isEmpty)
         EmptyChangeSet
       else if (buf.size == 1)
@@ -222,13 +222,22 @@ object DiffGraph {
 
     def addNode(node: NewNode): this.type = { buffer.append(Change.CreateNode(node)); this }
 
-    def addChanges(elems: Array[Change]): this.type = { buffer.addArrayElements(elems); this }
-    //cf ArrayBuffer.scala, uses ArrayCopy
-    def addChanges(other: Builder): this.type = { buffer.addAll(other.buffer); this }
-    def addChanges(other: DiffGraph): this.type = other match {
-      case ArrayChangeSet(changes) => addChanges(changes)
-      case SingleChangeSet(change) => buffer.append(change); this
-      case EmptyChangeSet          => this
+    //joins the two diffgraphs; behaves as if all changes from other are appended to this, and other is cleared
+    def join(other: Builder): this.type = {
+      if (other._buffer == null) { //nothing to do
+      } else if (_buffer == null) {
+        _buffer = other._buffer
+        other._buffer = null
+      } else if (_buffer.size > other._buffer.size) {
+        _buffer.appendAll(other._buffer)
+        other._buffer = null
+      } else {
+        //This does the right thing and is very different from _buffer.foreach(other._buffer.prepend)
+        other._buffer.prependAll(_buffer)
+        _buffer = other._buffer
+        other._buffer = null
+      }
+      this
     }
 
     def addEdgeToOriginal(srcNode: NewNode,
@@ -437,16 +446,6 @@ object DiffGraph {
     def unapplyDiff(graph: Graph, inverseDiff: DiffGraph): Unit = {
       val applier = new Applier(inverseDiff, graph, undoable = false, keyPool = None)
       applier.run()
-    }
-  }
-
-  class ChangeBuffer extends ArrayBuffer[Change] {
-    //equivalent to addAll(elems); cf ArrayBuffer.scala, we need to do this by hand because scala stdlib misses the obvious optimization
-    def addArrayElements(elems: Array[Change]): this.type = {
-      ensureSize(length + elems.length)
-      Array.copy(elems, 0, array, length, elems.length)
-      size0 = length + elems.length
-      this
     }
   }
 

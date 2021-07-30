@@ -129,7 +129,7 @@ abstract class NewStylePass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool
               },
               new BiConsumer[DiffGraph.Builder, DiffGraph.Builder] {
                 override def accept(leftBuilder: DiffGraph.Builder, rightBuilder: DiffGraph.Builder): Unit =
-                  leftBuilder.addChanges(rightBuilder)
+                  leftBuilder.join(rightBuilder)
               }
             )
             .build()

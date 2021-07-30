@@ -36,7 +36,7 @@ class AstCreationPass(filenames: List[String], cpg: Cpg, keyPool: IntervalKeyPoo
     val localDiff = DiffGraph.newBuilder
     val driver = createDriver(namespaceBlock)
     //only commit changes from within the file if the entire file succeeds
-    if (tryToParse(driver, filename, localDiff)) diffGraph.addChanges(localDiff)
+    if (tryToParse(driver, filename, localDiff)) diffGraph.join(localDiff)
   }
 
   private def createDriver(namespaceBlock: NewNamespaceBlock): AntlrCModuleParserDriver = {
