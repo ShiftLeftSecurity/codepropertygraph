@@ -153,8 +153,14 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
   private def isQualifiedName(name: String): Boolean =
     name.startsWith(Defines.qualifiedNameSeparator)
 
-  private def lastNameOfQualifiedName(name: String): String =
-    name.split(Defines.qualifiedNameSeparator).lastOption.getOrElse(name)
+  private def lastNameOfQualifiedName(name: String): String = {
+    val cleanedName = if (name.contains("<") && name.contains(">")) {
+      name.substring(0, name.indexOf("<"))
+    } else {
+      name
+    }
+    cleanedName.split(Defines.qualifiedNameSeparator).lastOption.getOrElse(cleanedName)
+  }
 
   private def fullName(node: IASTNode): String = {
     val qualifiedName = node match {
@@ -639,6 +645,10 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
         astForFieldReference(unaryExpression.getOperand.asInstanceOf[IASTFieldReference], order)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTConditionalExpression] =>
         astForUnaryExpression(unaryExpression, order)
+      case unaryExpression: IASTUnaryExpression =>
+        astForUnaryExpression(unaryExpression, order)
+      case functionCallExpression: IASTFunctionCallExpression =>
+        astForCall(functionCallExpression, order)
       case _ =>
         val name = shortName(call.getFunctionNameExpression)
         val fullname = fullName(call.getFunctionNameExpression)
