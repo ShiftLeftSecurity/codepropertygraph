@@ -637,22 +637,19 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
   private def astForCall(call: IASTFunctionCallExpression, order: Int): Ast = {
     // TODO: proper handling of call receiver
     val cpgCall = call.getFunctionNameExpression match {
-      case reference: IASTFieldReference => astForFieldReference(reference, order)
-      case b: IASTBinaryExpression       => astForBinaryExpression(b, order)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTBinaryExpression] =>
         astForBinaryExpression(unaryExpression.getOperand.asInstanceOf[IASTBinaryExpression], order)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTFieldReference] =>
         astForFieldReference(unaryExpression.getOperand.asInstanceOf[IASTFieldReference], order)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTConditionalExpression] =>
         astForUnaryExpression(unaryExpression, order)
-      case unaryExpression: IASTUnaryExpression =>
-        astForUnaryExpression(unaryExpression, order)
-      case functionCallExpression: IASTFunctionCallExpression =>
-        astForCall(functionCallExpression, order)
-      case _ =>
-        val name = shortName(call.getFunctionNameExpression)
-        val fullname = fullName(call.getFunctionNameExpression)
+      case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTUnaryExpression] =>
+        astForUnaryExpression(unaryExpression.getOperand.asInstanceOf[IASTUnaryExpression], order)
+      case idExpression: IASTIdExpression =>
+        val name = shortName(idExpression)
+        val fullname = fullName(idExpression)
         Ast(newCallNode(call, name, fullname, DispatchTypes.STATIC_DISPATCH, order))
+      case otherExpr => astForExpression(otherExpr, order)
     }
     val args = withOrder(call.getArguments) { case (a, o) => astForNode(a, o) }
 
