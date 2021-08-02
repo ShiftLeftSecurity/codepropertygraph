@@ -77,7 +77,9 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       } else if (nullSafeFileLocation(node).map(_.getNodeOffset).contains(0)) {
         Some(0)
       } else {
-        nullSafeFileLocation(node).map(_.getNodeOffset - 1 - fileLines.slice(0, l).sum)
+        val slice = fileLines.slice(0, l)
+        val length = slice.size - 1
+        nullSafeFileLocation(node).map(_.getNodeOffset - 1 - slice.sum - length)
       }
     }
   }
@@ -91,7 +93,9 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       } else if (nullSafeLastNodeLocation(node).map(_.getNodeOffset).contains(0)) {
         Some(0)
       } else {
-        nullSafeLastNodeLocation(node).map(_.getNodeOffset - 1 - fileLines.slice(0, l).sum)
+        val slice = fileLines.slice(0, l)
+        val length = slice.size - 1
+        nullSafeLastNodeLocation(node).map(_.getNodeOffset - 1 - slice.sum - length)
       }
     }
   }

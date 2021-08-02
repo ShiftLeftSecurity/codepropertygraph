@@ -1035,6 +1035,26 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.method.name("method").lineNumber.l shouldBe List(6)
       cpg.method.name("method").block.assignments.lineNumber.l shouldBe List(8)
     }
+
+    "have correct line numbers" in Fixture("""
+       |int main() {
+       |int a = 0;
+       |statementthatdoesnothing();
+       |int b = 0;
+       |int c = 0;
+       |}
+      """.stripMargin) { cpg =>
+      cpg.identifier.l match {
+        case List(a, b, c) =>
+          a.lineNumber shouldBe Some(3)
+          a.columnNumber shouldBe Some(4)
+          b.lineNumber shouldBe Some(5)
+          b.columnNumber shouldBe Some(4)
+          c.lineNumber shouldBe Some(6)
+          c.columnNumber shouldBe Some(4)
+        case _ => fail()
+      }
+    }
   }
 
 }
