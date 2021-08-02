@@ -1,6 +1,7 @@
 package io.shiftleft.passes
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.passes.LargeChunkCpgPass.writerQueueCapacity
 import org.slf4j.{LoggerFactory, MDC}
 
 import scala.collection.mutable
@@ -122,11 +123,11 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
   }
 }
 
-object LargeChunkPass {
+object LargeChunkCpgPass {
   val writerQueueCapacity = 4
-  val producerQueueCapacity = 16
+  val producerQueueCapacity = 2 + 4 * Runtime.getRuntime().availableProcessors()
 }
-abstract class LargeChunkPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
+abstract class LargeChunkCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends CpgPassBase {
 
   //generate Array of parts that can be processed in parallel
@@ -150,9 +151,9 @@ abstract class LargeChunkPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPo
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
                                             prefix: String = ""): Unit = {
-    import LargeChunkPass.producerQueueCapacity
+    import LargeChunkCpgPass.producerQueueCapacity
     baseLogger.info(s"Start of enhancement: $name")
-    val tic = System.nanoTime()
+    val nanosStart = System.nanoTime()
     var nParts = 0
     var nDiff = 0
 
@@ -167,14 +168,19 @@ abstract class LargeChunkPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPo
     writerThread.start()
     try {
       try {
+        // The idea is that we have a ringbuffer completionQueue that contains thw workunits that are currently in-flight.
+        // We add futures to the end of the ringbuffer, and take futures from the front.
+        // then we await the taken future from the front, and add it to the writer-queue.
+        // the end result is that we get deterministic output (esp. deterministic order of changes), while having up to one
+        // writer-thread and up to producerQueueCapacity many threads in-flight.
+        // as opposed to ParallelCpgPass, there is no race between diffgraph-generators to enqueue into the writer -- everything
+        // is nice and ordered. Downside is that a very slow part may gum up the works (i.e. the completionQueue fills up and threads go idle)
         var done = false
         while (!done) {
           if (completionQueue.size < producerQueueCapacity && partIter.hasNext) {
             val next = partIter.next()
             //todo: Verify that we get FIFO scheduling; otherwise, do something about it.
-            //if this e.g. used LIFO with 15 threads, then they work on the last 15 parts, while the main thread blocks on the first;
-            //at some time, the 15 threads finish, one starts on the first part while the remaining 14 idle;
-            //once the first task is done, the main thread unblocks, schedules 16 new tasks and the same story begins again.
+            //if this e.g. used LIFO with 4 cores and 18 size of ringbuffer, then 3 cores may idle while we block on the front item.
             completionQueue.append(Future.apply {
               val builder = DiffGraph.newBuilder
               runOnPart(builder, next.asInstanceOf[T])
@@ -198,19 +204,17 @@ abstract class LargeChunkPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPo
     } finally {
       // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
       // in the reported timings, and we must have our final log message if finish() throws
-      val toc = System.nanoTime()
-      MDC.put("time", s"${(toc - tic) * 1e-6}%.0f")
+      val nanosStop = System.nanoTime()
+      MDC.put("time", s"${(nanosStop - nanosStart) * 1e-6}%.0f")
       baseLogger.info(
-        f"Enhancement $name completed in ${(toc - tic) * 1e-6}%.0f ms. ${nDiff}%d changes commited from ${nParts}%d parts.")
+        f"Enhancement $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms. ${nDiff}%d changes commited from ${nParts}%d parts.")
       MDC.remove("time")
     }
   }
 
   private class Writer(serializedCpg: SerializedCpg, prefix: String, inverse: Boolean) extends Runnable {
 
-    private val weiteLogger = LoggerFactory.getLogger(classOf[Writer])
-
-    val queue = new LinkedBlockingQueue[Option[DiffGraph]](4)
+    val queue = new LinkedBlockingQueue[Option[DiffGraph]](writerQueueCapacity)
 
     override def run(): Unit = {
       try {
@@ -219,7 +223,7 @@ abstract class LargeChunkPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPo
         while (!terminate) {
           queue.take() match {
             case None =>
-              weiteLogger.debug("Shutting down WriterThread")
+              baseLogger.debug("Shutting down WriterThread")
               terminate = true
             case Some(diffGraph) =>
               val withInverse = serializedCpg != null && !serializedCpg.isEmpty && inverse
@@ -234,7 +238,7 @@ abstract class LargeChunkPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPo
           }
         }
       } catch {
-        case exception: InterruptedException => weiteLogger.warn("Interrupted WriterThread", exception)
+        case exception: InterruptedException => baseLogger.warn("Interrupted WriterThread", exception)
       }
     }
   }

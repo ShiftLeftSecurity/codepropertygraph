@@ -222,8 +222,8 @@ object DiffGraph {
 
     def addNode(node: NewNode): this.type = { buffer.append(Change.CreateNode(node)); this }
 
-    //joins the two diffgraphs; behaves as if all changes from other are appended to this, and other is cleared
-    def join(other: Builder): this.type = {
+    /*Moves changes from other to this, preserving order*/
+    def moveFrom(other: Builder): this.type = {
       if (other._buffer == null) { //nothing to do
       } else if (_buffer == null) {
         _buffer = other._buffer

@@ -84,10 +84,20 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
 
 }
 
-abstract class NewStylePass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
+abstract class NewStyleSimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
+    extends NewStyleCpgPass[AnyRef](cpg, outName, keyPool) {
+
+  def run(builder: DiffGraph.Builder): Unit
+
+  final override def generateParts(): Array[_ <: AnyRef] = Array[AnyRef](null)
+
+  final override def runOnPart(builder: DiffGraph.Builder, part: AnyRef): Unit = run(builder)
+}
+
+abstract class NewStyleCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends CpgPassBase {
   //generate Array of parts that can be processed in parallel
-  def generateParts(): Array[_ <: AnyRef] = Array[AnyRef](null)
+  def generateParts(): Array[_ <: AnyRef]
   //setup large data structures, acquire external resources
   def init(): Unit = {}
   //release large data structures and external resources
@@ -101,10 +111,10 @@ abstract class NewStylePass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool
                                             inverse: Boolean = false,
                                             prefix: String = ""): Unit = {
     baseLogger.info(s"Start of enhancement: $name")
-    val tic = System.nanoTime()
+    val nanosStart = System.nanoTime()
     var nParts = 0
-    var tocBuild = -1L
-    var size = -1
+    var nanosBuilt = -1L
+    var nDiff = -1
     try {
       init()
       val parts = generateParts()
@@ -129,13 +139,13 @@ abstract class NewStylePass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool
               },
               new BiConsumer[DiffGraph.Builder, DiffGraph.Builder] {
                 override def accept(leftBuilder: DiffGraph.Builder, rightBuilder: DiffGraph.Builder): Unit =
-                  leftBuilder.join(rightBuilder)
+                  leftBuilder.moveFrom(rightBuilder)
               }
             )
             .build()
       }
-      tocBuild = System.nanoTime()
-      size = diffGraph.size
+      nanosBuilt = System.nanoTime()
+      nDiff = diffGraph.size
       val withInverse = serializedCpg != null && !serializedCpg.isEmpty && inverse
       val doSerialize = serializedCpg != null && !serializedCpg.isEmpty
       val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, withInverse, keyPool)
@@ -152,12 +162,12 @@ abstract class NewStylePass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool
       } finally {
         // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
         // in the reported timings, and we must have our final log message if finish() throws
-        val toc = System.nanoTime()
-        MDC.put("time", s"${(toc - tic) * 1e-6}%.0f")
-        val fracRun = if (tocBuild == -1) 100.0 else (tocBuild - tic) * 100.0 / (toc - tic + 1)
+        val nanosStop = System.nanoTime()
+        //MDC.put("time", s"${(nanosStop - nanosStart) * 1e-6}%.0f")
+        val fracRun = if (nanosBuilt == -1) 100.0 else (nanosBuilt - nanosStart) * 100.0 / (nanosStop - nanosStart + 1)
         baseLogger.info(
-          f"Enhancement $name completed in ${(toc - tic) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${size}%d changes commited from ${nParts}%d parts.")
-        MDC.remove("time")
+          f"Enhancement $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d changes commited from ${nParts}%d parts.")
+        //MDC.remove("time")
       }
     }
   }

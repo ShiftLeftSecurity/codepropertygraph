@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.nodes.NewNamespaceBlock
 import io.shiftleft.fuzzyc2cpg.Global
 import io.shiftleft.fuzzyc2cpg.passes.astcreation.{AntlrCModuleParserDriver, AstVisitor}
-import io.shiftleft.passes.{DiffGraph, IntervalKeyPool, LargeChunkPass, ParallelCpgPass}
+import io.shiftleft.passes.{DiffGraph, IntervalKeyPool, LargeChunkCpgPass}
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import org.slf4j.LoggerFactory
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory
   * each file, including File and NamespaceBlock  Files are processed in parallel.
   * */
 class AstCreationPass(filenames: List[String], cpg: Cpg, keyPool: IntervalKeyPool)
-    extends LargeChunkPass[String](cpg, keyPool = Some(keyPool)) {
+    extends LargeChunkCpgPass[String](cpg, keyPool = Some(keyPool)) {
 
   private val logger = LoggerFactory.getLogger(getClass)
   val global: Global = Global()
@@ -36,7 +36,7 @@ class AstCreationPass(filenames: List[String], cpg: Cpg, keyPool: IntervalKeyPoo
     val localDiff = DiffGraph.newBuilder
     val driver = createDriver(namespaceBlock)
     //only commit changes from within the file if the entire file succeeds
-    if (tryToParse(driver, filename, localDiff)) diffGraph.join(localDiff)
+    if (tryToParse(driver, filename, localDiff)) diffGraph.moveFrom(localDiff)
   }
 
   private def createDriver(namespaceBlock: NewNamespaceBlock): AntlrCModuleParserDriver = {
