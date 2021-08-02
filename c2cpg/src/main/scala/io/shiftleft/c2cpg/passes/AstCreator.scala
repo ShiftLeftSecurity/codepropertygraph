@@ -178,7 +178,10 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
         namespace.getName.toString
       case cppClass: ICPPASTCompositeTypeSpecifier if cppClass.getName.getBinding.isInstanceOf[ICPPBinding] =>
         ASTTypeUtil.getQualifiedName(cppClass.getName.getBinding.asInstanceOf[ICPPBinding])
-      case c: IASTCompositeTypeSpecifier => c.getName.toString
+      case enum: IASTEnumerationSpecifier if enum.getParent != null =>
+        fullName(enum.getParent) + "." + enum.getName.toString
+      case enum: IASTEnumerationSpecifier => enum.getName.toString
+      case c: IASTCompositeTypeSpecifier  => c.getName.toString
       case f: IASTFunctionDeclarator if f.getParent != null =>
         fullName(f.getParent) + "." + f.getName.toString
       case f: IASTFunctionDeclarator =>
@@ -226,7 +229,10 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     case _                                   => false
   }
 
-  private def isTypeDef(node: IASTNode): Boolean = node.getRawSignature.startsWith("typedef")
+  private def isTypeDef(decl: IASTSimpleDeclaration): Boolean =
+    decl.getRawSignature.startsWith("typedef") ||
+      decl.getDeclSpecifier.isInstanceOf[IASTCompositeTypeSpecifier] ||
+      decl.getDeclSpecifier.isInstanceOf[IASTEnumerationSpecifier]
 
   @tailrec
   private def params(funct: IASTNode): Seq[IASTParameterDeclaration] = funct match {
