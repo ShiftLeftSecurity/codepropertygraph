@@ -67,11 +67,14 @@ case class Ast(nodes: List[NewNode],
     * that is, connecting them to the root node of this AST.
     */
   def withChildren(asts: Seq[Ast]): Ast = {
-    asts.headOption match {
-      case Some(head) =>
-        withChild(head).withChildren(asts.tail)
-      case None =>
-        this
+    if (asts.isEmpty) {
+      this
+    } else {
+      // we do this iteratively as a recursive solution will fail with
+      // a StackOverflowException if there are too many elements in .tail.
+      var ast = withChild(asts.head)
+      asts.tail.foreach(c => ast = ast.withChild(c))
+      ast
     }
   }
 

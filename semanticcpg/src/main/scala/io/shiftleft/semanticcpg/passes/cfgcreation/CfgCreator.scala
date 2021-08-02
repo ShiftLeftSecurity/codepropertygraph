@@ -136,8 +136,12 @@ class CfgCreator(entryNode: Method) {
         cfgForOrExpression(call)
       case call: Call if call.name == Operators.conditional =>
         cfgForConditionalExpression(call)
-      case _: Call | _: FieldIdentifier | _: Identifier | _: Literal | _: MethodReturn | _: Unknown =>
+      case _: Call | _: FieldIdentifier | _: Identifier | _: Literal | _: Unknown =>
         cfgForChildren(node) ++ cfgForSingleNode(node.asInstanceOf[CfgNode])
+      case _: MethodReturn =>
+        // A MethodReturn node should never have AST children.
+        // Creating outgoing CFG edges for it is prohibited anyway.
+        cfgForSingleNode(node.asInstanceOf[CfgNode])
       case _ =>
         cfgForChildren(node)
     }
