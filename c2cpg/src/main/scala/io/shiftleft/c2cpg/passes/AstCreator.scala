@@ -637,8 +637,9 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
   private def astForCall(call: IASTFunctionCallExpression, order: Int): Ast = {
     // TODO: proper handling of call receiver
     val cpgCall = call.getFunctionNameExpression match {
-      case reference: IASTFieldReference => astForFieldReference(reference, order)
-      case b: IASTBinaryExpression       => astForBinaryExpression(b, order)
+      case reference: IASTFieldReference   => astForFieldReference(reference, order)
+      case b: IASTBinaryExpression         => astForBinaryExpression(b, order)
+      case s: IASTArraySubscriptExpression => astForArrayIndexExpression(s, order)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTBinaryExpression] =>
         astForBinaryExpression(unaryExpression.getOperand.asInstanceOf[IASTBinaryExpression], order)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTFieldReference] =>
