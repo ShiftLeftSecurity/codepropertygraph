@@ -845,14 +845,21 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
 
     "be correct for unary expr" in Fixture(
       """
-        |size_t strnlen (const char *str, size_t max)
+        |int strnlen (const char *str, int max)
         |    {
-        |      const char *end = memchr (str, 0, max);
-        |      return end ? (size_t)(end - str) : max;
+        |      const char *end = memchr(str, 0, max);
+        |      return end ? (int)(end - str) : max;
         |    }
         |""".stripMargin
     ) { cpg =>
-      cpg.call.name("size_t").code.l shouldBe List("(size_t)(end - str)")
+      cpg.call.name(Operators.cast).astChildren.l match {
+        case List(call: Call, tpe: Unknown) =>
+          call.code shouldBe "end - str"
+          call.argumentIndex shouldBe 1
+          tpe.code shouldBe "int"
+          tpe.argumentIndex shouldBe 2
+        case _ => fail()
+      }
     }
 
     "be correct for post increment method calls" in Fixture(

@@ -122,7 +122,7 @@ class CfgCreator(entryNode: Method) {
     node match {
       case _: Method | _: MethodParameterIn | _: Modifier | _: Local | _: TypeDecl | _: Member =>
         Cfg.empty
-      case _: MethodRef | _: TypeRef =>
+      case _: MethodRef | _: TypeRef | _: MethodReturn =>
         cfgForSingleNode(node.asInstanceOf[CfgNode])
       case n: ControlStructure =>
         cfgForControlStructure(n)
@@ -136,7 +136,7 @@ class CfgCreator(entryNode: Method) {
         cfgForOrExpression(call)
       case call: Call if call.name == Operators.conditional =>
         cfgForConditionalExpression(call)
-      case _: Call | _: FieldIdentifier | _: Identifier | _: Literal | _: MethodReturn | _: Unknown =>
+      case _: Call | _: FieldIdentifier | _: Identifier | _: Literal | _: Unknown =>
         cfgForChildren(node) ++ cfgForSingleNode(node.asInstanceOf[CfgNode])
       case _ =>
         cfgForChildren(node)

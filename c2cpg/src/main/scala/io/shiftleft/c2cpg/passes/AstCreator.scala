@@ -153,8 +153,14 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
   private def isQualifiedName(name: String): Boolean =
     name.startsWith(Defines.qualifiedNameSeparator)
 
-  private def lastNameOfQualifiedName(name: String): String =
-    name.split(Defines.qualifiedNameSeparator).lastOption.getOrElse(name)
+  private def lastNameOfQualifiedName(name: String): String = {
+    val cleanedName = if (name.contains("<") && name.contains(">")) {
+      name.substring(0, name.indexOf("<"))
+    } else {
+      name
+    }
+    cleanedName.split(Defines.qualifiedNameSeparator).lastOption.getOrElse(cleanedName)
+  }
 
   private def fullName(node: IASTNode): String = {
     val qualifiedName = node match {
@@ -178,7 +184,10 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
         namespace.getName.toString
       case cppClass: ICPPASTCompositeTypeSpecifier if cppClass.getName.getBinding.isInstanceOf[ICPPBinding] =>
         ASTTypeUtil.getQualifiedName(cppClass.getName.getBinding.asInstanceOf[ICPPBinding])
-      case c: IASTCompositeTypeSpecifier => c.getName.toString
+      case enum: IASTEnumerationSpecifier if enum.getParent != null =>
+        fullName(enum.getParent) + "." + enum.getName.toString
+      case enum: IASTEnumerationSpecifier => enum.getName.toString
+      case c: IASTCompositeTypeSpecifier  => c.getName.toString
       case f: IASTFunctionDeclarator if f.getParent != null =>
         fullName(f.getParent) + "." + f.getName.toString
       case f: IASTFunctionDeclarator =>
@@ -226,7 +235,10 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     case _                                   => false
   }
 
-  private def isTypeDef(node: IASTNode): Boolean = node.getRawSignature.startsWith("typedef")
+  private def isTypeDef(decl: IASTSimpleDeclaration): Boolean =
+    decl.getRawSignature.startsWith("typedef") ||
+      decl.getDeclSpecifier.isInstanceOf[IASTCompositeTypeSpecifier] ||
+      decl.getDeclSpecifier.isInstanceOf[IASTEnumerationSpecifier]
 
   @tailrec
   private def params(funct: IASTNode): Seq[IASTParameterDeclaration] = funct match {
@@ -625,14 +637,20 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
   private def astForCall(call: IASTFunctionCallExpression, order: Int): Ast = {
     // TODO: proper handling of call receiver
     val cpgCall = call.getFunctionNameExpression match {
-      case reference: IASTFieldReference => astForFieldReference(reference, order)
-      case b: IASTBinaryExpression       => astForBinaryExpression(b, order)
+      case reference: IASTFieldReference   => astForFieldReference(reference, order)
+      case b: IASTBinaryExpression         => astForBinaryExpression(b, order)
+      case s: IASTArraySubscriptExpression => astForArrayIndexExpression(s, order)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTBinaryExpression] =>
         astForBinaryExpression(unaryExpression.getOperand.asInstanceOf[IASTBinaryExpression], order)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTFieldReference] =>
         astForFieldReference(unaryExpression.getOperand.asInstanceOf[IASTFieldReference], order)
+      case unaryExpression: IASTUnaryExpression
+          if unaryExpression.getOperand.isInstanceOf[IASTArraySubscriptExpression] =>
+        astForArrayIndexExpression(unaryExpression.getOperand.asInstanceOf[IASTArraySubscriptExpression], order)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTConditionalExpression] =>
         astForUnaryExpression(unaryExpression, order)
+      case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTUnaryExpression] =>
+        astForUnaryExpression(unaryExpression.getOperand.asInstanceOf[IASTUnaryExpression], order)
       case _ =>
         val name = shortName(call.getFunctionNameExpression)
         val fullname = fullName(call.getFunctionNameExpression)
