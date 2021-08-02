@@ -19,7 +19,6 @@ class MethodTests extends CCodeToCpgSuite {
     x.isExternal shouldBe false
     x.order shouldBe 1
     x.filename.startsWith("/") shouldBe true
-    x.filename.endsWith(".c") shouldBe true
     x.lineNumber shouldBe Some(2)
     x.lineNumberEnd shouldBe Some(3)
     x.columnNumber shouldBe Some(2)

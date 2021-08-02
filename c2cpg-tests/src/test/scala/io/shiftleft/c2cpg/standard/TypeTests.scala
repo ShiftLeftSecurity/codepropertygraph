@@ -1,9 +1,10 @@
 package io.shiftleft.c2cpg.standard
 
+import io.shiftleft.c2cpg.parser.FileDefaults
 import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 
-class TypeTests extends CCodeToCpgSuite {
+class TypeTests extends CCodeToCpgSuite(FileDefaults.CPP_EXT) {
 
   override val code: String =
     """

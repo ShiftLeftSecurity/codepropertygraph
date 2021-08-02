@@ -14,16 +14,14 @@ import overflowdb.traversal._
 class AstCreationPassTests extends AnyWordSpec with Matchers {
 
   private object Fixture {
-    def apply(file1Code: String, file2Code: String = "")(f: Cpg => Unit): Unit = {
+    def apply(code: String, fileName: String = "file.c")(f: Cpg => Unit): Unit = {
       File.usingTemporaryDirectory("c2cpgtest") { dir =>
-        val file1 = dir / "file1.c"
-        val file2 = dir / "file2.c"
-        file1.write(file1Code)
-        file2.write(file2Code)
+        val file = dir / fileName
+        file.write(code)
 
         val cpg = Cpg.emptyCpg
         val keyPool = new IntervalKeyPool(1001, 2000)
-        val filenames = List(file1.path.toAbsolutePath.toString, file2.path.toAbsolutePath.toString)
+        val filenames = List(file.path.toAbsolutePath.toString)
         new AstCreationPass(filenames, cpg, keyPool, Config()).createAndApply()
 
         f(cpg)
@@ -299,8 +297,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
        |  for (int x : list) {
        |    int z = x;
        |  }
-       |}
-      """.stripMargin) { cpg =>
+       |}""".stripMargin,
+                                                "file.cpp") { cpg =>
       cpg.method.name("method").controlStructure.l match {
         case List(forStmt) =>
           forStmt.controlStructureType shouldBe ControlStructureTypes.FOR
@@ -506,13 +504,11 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .size shouldBe 1
     }
 
-    "be correct for sizeof operator on type" in Fixture(
-      """
+    "be correct for sizeof operator on type" in Fixture("""
         |void method() {
         |  sizeof(int);
-        |}
-      """.stripMargin
-    ) { cpg =>
+        |}""".stripMargin,
+                                                        "file.cpp") { cpg =>
       cpg.method
         .name("method")
         .ast
@@ -626,7 +622,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         | char x;
         | int method(){return i;};
         |};
-      """.stripMargin
+      """.stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.typeDecl
         .name("Derived")
@@ -643,7 +640,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |
         |Foo f;
         |int x = f.method();
-      """.stripMargin
+      """.stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.typeDecl
         .name("Foo")
@@ -661,7 +659,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
     "be correct for type initializer expression" in Fixture(
       """
         |int x = (int){ 1 };
-      """.stripMargin
+      """.stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.call.name(Operators.cast).l match {
         case List(call: Call) =>
@@ -677,7 +676,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         | int a = 0;
         | static_assert ( a == 0 , "not 0!");
         |}
-      """.stripMargin
+      """.stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.call.codeExact("static_assert ( a == 0 , \"not 0!\");").l match {
         case List(call: Call) =>
@@ -695,7 +695,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         | try { bar(); } 
         | catch(x) { return 0; };
         |}
-      """.stripMargin
+      """.stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.controlStructure.l match {
         case List(t) =>
@@ -712,7 +713,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         | Foo(int i){};
         |};
         |Foo f1(0);
-      """.stripMargin
+      """.stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.typeDecl
         .name("Foo")
@@ -735,7 +737,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         | };
         | template class Y<char*>;
         | template void Y<double>::mf();
-      """.stripMargin
+      """.stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.typeDecl
         .name("Y")
@@ -752,7 +755,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         | template void f<double>(double); // instantiates f<double>(double)
         | template void f<>(char); // instantiates f<char>(char), template argument deduced
         | template void f(int); // instantiates f<int>(int), template argument deduced
-      """.stripMargin
+      """.stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.method
         .name("f")
@@ -767,7 +771,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         | Foo(int i) {  };
         |};
         |Foo x = Foo{0};
-      """.stripMargin
+      """.stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.typeDecl
         .name("Foo")
@@ -807,7 +812,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         | #include <vlc/libvlc_media.h>
         | int x = 0;
         |}
-        |""".stripMargin
+        |""".stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.call.code("x = 0").l.size shouldBe 1
     }
@@ -925,7 +931,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |   int * arr = new int[n];
         |   return arr;
         |}
-        |""".stripMargin
+        |""".stripMargin,
+      "file.cpp"
     ) { cpg =>
       // TODO: "<operator>.new" is not part of Operators
       cpg.call.name("<operator>.new").code("new int\\[n\\]").argument.code("int").size shouldBe 1
@@ -937,7 +944,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |   Foo* foo = new Foo(n, 42);
         |   return foo;
         |}
-        |""".stripMargin
+        |""".stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.call.name("<operator>.new").codeExact("new Foo(n, 42)").argument.code("Foo").size shouldBe 1
     }
@@ -947,7 +955,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |int delete_number(int* n) {
         |  delete n;
         |}
-        |""".stripMargin
+        |""".stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.call.name(Operators.delete).code("delete n").argument.code("n").size shouldBe 1
     }
@@ -957,7 +966,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |void delete_number(int n[]) {
         |  delete[] n;
         |}
-        |""".stripMargin
+        |""".stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.call.name(Operators.delete).codeExact("delete[] n").argument.code("n").size shouldBe 1
     }
@@ -968,7 +978,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |  int y = const_cast<int>(n);
         |  return;
         |}
-        |""".stripMargin
+        |""".stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.call.name(Operators.cast).codeExact("const_cast<int>(n)").argument.code.l shouldBe List("int", "n")
     }
@@ -979,7 +990,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |  int y = static_cast<int>(n);
         |  return;
         |}
-        |""".stripMargin
+        |""".stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.call.name(Operators.cast).codeExact("static_cast<int>(n)").argument.code.l shouldBe List("int", "n")
     }
@@ -990,7 +1002,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |  int y = dynamic_cast<int>(n);
         |  return;
         |}
-        |""".stripMargin
+        |""".stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.call.name(Operators.cast).codeExact("dynamic_cast<int>(n)").argument.code.l shouldBe List("int", "n")
     }
@@ -1001,7 +1014,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         |  int y = reinterpret_cast<int>(n);
         |  return;
         |}
-        |""".stripMargin
+        |""".stripMargin,
+      "file.cpp"
     ) { cpg =>
       cpg.call.name(Operators.cast).codeExact("reinterpret_cast<int>(n)").argument.code.l shouldBe List("int", "n")
     }

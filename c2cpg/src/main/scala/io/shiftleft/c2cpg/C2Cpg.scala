@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg
 
 import io.shiftleft.c2cpg.C2Cpg.Config
-import io.shiftleft.c2cpg.parser.ParseConfig
+import io.shiftleft.c2cpg.parser.{FileDefaults, ParseConfig}
 import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
@@ -58,7 +58,7 @@ object C2Cpg {
 
   final case class Config(inputPaths: Set[String] = Set.empty,
                           outputPath: String = X2CpgConfig.defaultOutputPath,
-                          sourceFileExtensions: Set[String] = Set(".c", ".cc", ".cpp", ".h", ".hpp"),
+                          sourceFileExtensions: Set[String] = FileDefaults.SOURCE_FILE_EXTENSIONS,
                           includePaths: Set[String] = Set.empty,
                           defines: Set[String] = Set.empty,
                           includeComments: Boolean = false,
