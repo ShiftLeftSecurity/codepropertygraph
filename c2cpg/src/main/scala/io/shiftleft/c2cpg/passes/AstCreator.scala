@@ -424,7 +424,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     val r = Ast(methodNode)
       .withChildren(parameterAsts)
       .withChild(astForMethodBody(Option(functDef.getBody), lastOrder))
-      .withChild(astForMethodReturn(functDef, lastOrder, typeForDeclSpecifier(functDef.getDeclSpecifier)))
+      .withChild(astForMethodReturn(functDef, lastOrder + 1, typeForDeclSpecifier(functDef.getDeclSpecifier)))
 
     scope.popScope()
     r
