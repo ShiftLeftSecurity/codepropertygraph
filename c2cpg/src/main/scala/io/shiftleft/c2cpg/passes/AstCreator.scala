@@ -18,6 +18,7 @@ import org.eclipse.cdt.internal.core.dom.parser.cpp.{
   CPPASTTypeIdInitializerExpression,
   CPPFunction
 }
+import org.eclipse.cdt.internal.core.model.ASTStringUtil
 import org.slf4j.LoggerFactory
 
 import java.io.{BufferedReader, FileInputStream, InputStreamReader}
@@ -76,7 +77,9 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       } else if (nullSafeFileLocation(node).map(_.getNodeOffset).contains(0)) {
         Some(0)
       } else {
-        nullSafeFileLocation(node).map(_.getNodeOffset - 1 - fileLines.slice(0, l).sum)
+        val slice = fileLines.slice(0, l)
+        val length = slice.size - 1
+        nullSafeFileLocation(node).map(_.getNodeOffset - 1 - slice.sum - length)
       }
     }
   }
@@ -90,7 +93,9 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       } else if (nullSafeLastNodeLocation(node).map(_.getNodeOffset).contains(0)) {
         Some(0)
       } else {
-        nullSafeLastNodeLocation(node).map(_.getNodeOffset - 1 - fileLines.slice(0, l).sum)
+        val slice = fileLines.slice(0, l)
+        val length = slice.size - 1
+        nullSafeLastNodeLocation(node).map(_.getNodeOffset - 1 - slice.sum - length)
       }
     }
   }
@@ -196,7 +201,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
         fullName(f.getParent) + "." + f.getDeclarator.getName.toString
       case f: IASTFunctionDefinition =>
         f.getDeclarator.getName.toString
-      case d: CPPASTIdExpression            => d.getName.toString
+      case d: IASTIdExpression              => d.getName.toString
       case _: IASTTranslationUnit           => ""
       case u: IASTUnaryExpression           => u.getOperand.toString
       case other if other.getParent != null => fullName(other.getParent)
@@ -223,7 +228,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
           case other =>
             other.getName
         }
-      case d: CPPASTIdExpression  => lastNameOfQualifiedName(d.getName.toString)
+      case d: IASTIdExpression    => lastNameOfQualifiedName(d.getName.toString)
       case u: IASTUnaryExpression => shortName(u.getOperand)
       case other                  => notHandledYet(other, -1); ""
     }
@@ -349,7 +354,10 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
   }
 
   private def astForIdentifier(ident: IASTNode, order: Int): Ast = {
-    val identifierName = ident.toString
+    val identifierName = ident match {
+      case id: IASTIdExpression => ASTStringUtil.getSimpleName(id.getName)
+      case _                    => ident.toString
+    }
     val variableOption = scope.lookupVariable(identifierName)
     val identifierTypeName = variableOption match {
       case Some((_, variableTypeName)) =>
@@ -1032,27 +1040,26 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     spec match {
       case s: IASTSimpleDeclSpecifier if s.getParent.isInstanceOf[IASTParameterDeclaration] =>
         val parentDecl = s.getParent.asInstanceOf[IASTParameterDeclaration].getDeclarator
+        val nodeAsString = ASTStringUtil.getReturnTypeString(s, null)
         val pointers = parentDecl.getPointerOperators
-        if (pointers.isEmpty) { s"${s.toString}" } else {
-          s"${s.toString} ${"* " * pointers.size}".strip()
+        if (pointers.isEmpty) { nodeAsString } else {
+          s"$nodeAsString ${"* " * pointers.size}".strip()
         }
       case s: IASTSimpleDeclSpecifier if s.getParent.isInstanceOf[IASTFunctionDefinition] =>
         val parentDecl = s.getParent.asInstanceOf[IASTFunctionDefinition].getDeclarator
-        val pointers = parentDecl.getPointerOperators
-        if (pointers.isEmpty) { s"${s.toString}" } else {
-          s"${s.toString} ${"* " * pointers.size}".strip()
-        }
-      case s: IASTSimpleDeclSpecifier    => s.toString
+        ASTStringUtil.getReturnTypeString(s, parentDecl)
+      case s: IASTSimpleDeclSpecifier    => ASTStringUtil.getReturnTypeString(s, null)
       case s: IASTNamedTypeSpecifier     => s.getName.toString
       case s: IASTCompositeTypeSpecifier => s.getName.toString
       case s: IASTEnumerationSpecifier   => s.getName.toString
       case s: IASTElaboratedTypeSpecifier if s.getParent.isInstanceOf[IASTSimpleDeclaration] =>
         val parentDecl = s.getParent.asInstanceOf[IASTSimpleDeclaration].getDeclarators.head
         val pointers = parentDecl.getPointerOperators
-        if (pointers.isEmpty) { s"${s.toString}" } else {
-          s"${s.toString} ${"* " * pointers.size}".strip()
+        val nodeAsString = ASTStringUtil.getReturnTypeString(s, null)
+        if (pointers.isEmpty) { nodeAsString } else {
+          s"$nodeAsString ${"* " * pointers.size}".strip()
         }
-      case s: IASTElaboratedTypeSpecifier => s.toString
+      case s: IASTElaboratedTypeSpecifier => ASTStringUtil.getSignatureString(s, null)
       // TODO: handle other types of IASTDeclSpecifier
       case _ => Defines.anyTypeName
     }

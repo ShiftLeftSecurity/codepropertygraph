@@ -13,7 +13,7 @@ class CodeDirToCpgFixture extends AnyWordSpec with Matchers with BeforeAndAfterA
 
   val dir: java.io.File = null
   var cpg: Cpg = _
-  val frontend: LanguageFrontend = new C2CpgFrontend
+  val frontend: LanguageFrontend = new C2CpgFrontend()
   def passes(cpg: Cpg): Unit = createEnhancements(cpg)
 
   override def beforeAll(): Unit = {

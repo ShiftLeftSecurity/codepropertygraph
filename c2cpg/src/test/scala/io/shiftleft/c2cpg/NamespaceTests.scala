@@ -19,7 +19,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside {
   private object NamespaceFixture {
     def apply(code: String)(f: Cpg => Unit): Unit = {
       File.usingTemporaryDirectory("c2cpgtest") { dir =>
-        val file = dir / "file1.c"
+        val file = dir / "file1.cpp"
         file.write(code)
 
         val cpg = Cpg.emptyCpg
