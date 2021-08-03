@@ -420,11 +420,11 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       astForParameter(p, order)
     }
 
-    val lastOrder = 2 + parameterAsts.size
+    val lastOrder = 1 + parameterAsts.size
     val r = Ast(methodNode)
       .withChildren(parameterAsts)
       .withChild(astForMethodBody(Option(functDef.getBody), lastOrder))
-      .withChild(astForMethodReturn(functDef, lastOrder, typeForDeclSpecifier(functDef.getDeclSpecifier)))
+      .withChild(astForMethodReturn(functDef, lastOrder + 1, typeForDeclSpecifier(functDef.getDeclSpecifier)))
 
     scope.popScope()
     r
@@ -1267,7 +1267,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       astForParameter(p, order)
     }
 
-    val lastOrder = 2 + parameterAsts.size
+    val lastOrder = 1 + parameterAsts.size
     val r = Ast(methodNode)
       .withChildren(parameterAsts)
       .withChild(astForMethodReturn(funcDecl, lastOrder, returnType))
