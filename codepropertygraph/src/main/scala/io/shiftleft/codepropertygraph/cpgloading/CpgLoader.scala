@@ -4,8 +4,6 @@ import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.PropertyNames
 import org.slf4j.{Logger, LoggerFactory}
-import overflowdb.Graph
-
 import scala.util.Try
 
 object CpgLoader {
@@ -95,13 +93,7 @@ private class CpgLoader {
   }
 
   def loadFromOverflowDb(config: CpgLoaderConfig = CpgLoaderConfig()): Cpg = {
-    val odbGraph =
-      Graph.open(
-        config.overflowDbConfig,
-        io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
-        io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava
-      )
-    val cpg = Cpg(odbGraph)
+    val cpg = Cpg.withConfig(config.overflowDbConfig)
     if (config.createIndexes) { createIndexes(cpg) }
     cpg
   }
