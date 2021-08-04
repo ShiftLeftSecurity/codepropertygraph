@@ -1036,7 +1036,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.method.name("method").block.assignments.lineNumber.l shouldBe List(8)
     }
 
-    "have correct line numbers" in Fixture("""
+    "have correct line numbers example 1" in Fixture("""
        |int main() {
        |int a = 0;
        |statementthatdoesnothing();
@@ -1044,6 +1044,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
        |int c = 0;
        |}
       """.stripMargin) { cpg =>
+      // for https://github.com/ShiftLeftSecurity/codepropertygraph/issues/1321
       cpg.identifier.l match {
         case List(a, b, c) =>
           a.lineNumber shouldBe Some(3)
@@ -1052,6 +1053,32 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
           b.columnNumber shouldBe Some(4)
           c.lineNumber shouldBe Some(6)
           c.columnNumber shouldBe Some(4)
+        case _ => fail()
+      }
+    }
+
+    "have correct line numbers example 2" in Fixture("""
+       |void offset() {
+       |char * data = NULL;
+       |memset(data, 'A', 100-1); /* fill with 'A's */
+       |data = dataBuffer;    
+       |}
+      """.stripMargin) { cpg =>
+      // for https://github.com/ShiftLeftSecurity/codepropertygraph/issues/1321
+      cpg.identifier.name("data").l match {
+        case List(a, b, c) =>
+          a.lineNumber shouldBe Some(3)
+          a.columnNumber shouldBe Some(7)
+          b.lineNumber shouldBe Some(4)
+          b.columnNumber shouldBe Some(7)
+          c.lineNumber shouldBe Some(5)
+          c.columnNumber shouldBe Some(0)
+        case _ => fail()
+      }
+      cpg.identifier.name("dataBuffer").l match {
+        case List(a) =>
+          a.lineNumber shouldBe Some(5)
+          a.columnNumber shouldBe Some(7)
         case _ => fail()
       }
     }
