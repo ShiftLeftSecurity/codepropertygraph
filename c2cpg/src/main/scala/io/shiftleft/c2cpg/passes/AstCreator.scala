@@ -1126,7 +1126,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       val fullname = fullName(typeSpecifier)
       List(typeSpecifier match {
         case cppClass: ICPPASTCompositeTypeSpecifier =>
-          val baseClassList = cppClass.getBaseSpecifiers.toSeq.map(_.getNameSpecifier.toString)
+          val baseClassList = cppClass.getBaseSpecifiers.toIndexedSeq.map(_.getNameSpecifier.toString)
           baseClassList.foreach(registerType)
           Ast(
             NewTypeDecl()
@@ -1181,7 +1181,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       val fullname = fullName(typeSpecifier)
       List(typeSpecifier match {
         case cppClass: ICPPASTCompositeTypeSpecifier =>
-          val baseClassList = cppClass.getBaseSpecifiers.toSeq.map(_.getNameSpecifier.toString)
+          val baseClassList = cppClass.getBaseSpecifiers.toIndexedSeq.map(_.getNameSpecifier.toString)
           baseClassList.foreach(registerType)
           Ast(
             NewTypeDecl()
