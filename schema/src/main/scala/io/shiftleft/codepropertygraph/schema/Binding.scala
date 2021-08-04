@@ -51,6 +51,9 @@ object Binding extends SchemaBase {
     typeDecl
       .addOutEdge(edge = binds, inNode = binding, cardinalityIn = EdgeType.Cardinality.One)
 
+    binding
+      .addOutEdge(edge = ref, inNode = method, cardinalityOut = EdgeType.Cardinality.One)
+
   }
 
 }
