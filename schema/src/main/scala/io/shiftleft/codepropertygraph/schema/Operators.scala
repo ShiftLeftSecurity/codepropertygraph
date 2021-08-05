@@ -237,6 +237,12 @@ object Operators extends SchemaBase {
         valueType = ValueTypes.STRING,
         comment = "Replaces an expression with its string value."
       ),
+      Constant(
+        name = "range",
+        value = "<operator>.range",
+        valueType = ValueTypes.STRING,
+        comment = "Defines a range of values, e.g. `for (i in 1..10) print(i)`."
+      ),
     )
 
   }
