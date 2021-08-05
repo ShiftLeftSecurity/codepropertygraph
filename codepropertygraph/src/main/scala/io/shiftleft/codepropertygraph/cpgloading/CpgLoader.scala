@@ -4,6 +4,7 @@ import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.PropertyNames
 import org.slf4j.{Logger, LoggerFactory}
+
 import scala.util.Try
 
 object CpgLoader {

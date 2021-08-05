@@ -9,9 +9,7 @@ object Protogen extends App {
   val outputDir =
     args.headOption.map(new File(_)).getOrElse(throw new AssertionError("please pass outputDir as first parameter"))
 
-  val builder = new SchemaBuilder(
-    domainShortName = "Cpg",
-    basePackage = "io.shiftleft.codepropertygraph.generated")
+  val builder = new SchemaBuilder(domainShortName = "Cpg", basePackage = "io.shiftleft.codepropertygraph.generated")
 
   builder.protoOptions(
     ProtoOptions(
