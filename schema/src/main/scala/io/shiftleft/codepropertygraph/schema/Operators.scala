@@ -225,6 +225,18 @@ object Operators extends SchemaBase {
         comment =
           "Derives a pointer to a field of a struct from a pointer to the entire struct. This corresponds to the C idiom &(ptr->field), which does not access memory. The field selection works the same way as for fieldAccess. This operator is currently only used directly by the LLVM language. Handling of this operator is special-cased in the back-end"
       ),
+      Constant(
+        name = "formatString",
+        value = "<operator>.formatString",
+        valueType = ValueTypes.STRING,
+        comment = "Defines a string literal which can replace containing expressions with their values."
+      ),
+      Constant(
+        name = "formattedValue",
+        value = "<operator>.formattedValue",
+        valueType = ValueTypes.STRING,
+        comment = "Replaces an expression with its string value."
+      ),
     )
 
   }
