@@ -154,6 +154,13 @@ object Operators extends SchemaBase {
         valueType = ValueTypes.STRING,
         comment = "E.g. `a ? consequent : alternate`. In future probably also used for if statements"
       ),
+      Constant(
+        name = "elvis",
+        value = "<operator>.elvis",
+        valueType = ValueTypes.STRING,
+        comment =
+          "E.g. `x = f() ?: g()`. A binary operator that returns its first operand if that operand evaluates to a true value, and otherwise evaluates and returns its second operand."
+      ),
       Constant(name = "cast",
                value = "<operator>.cast",
                valueType = ValueTypes.STRING,
