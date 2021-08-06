@@ -3,6 +3,7 @@ package io.shiftleft.passes
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{AbstractNode, NewNode, StoredNode}
 import io.shiftleft.proto.cpg.Cpg.{DiffGraph => DiffGraphProto}
+import org.slf4j.LoggerFactory
 import overflowdb._
 import overflowdb.traversal._
 
@@ -272,6 +273,7 @@ object DiffGraph {
     def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String): Unit
     def onBeforeEdgePropertyChange(edge: Edge, propertyKey: String): Unit
     def build(): DiffGraph
+    def onIrreversible(change: Change): Unit
   }
   object InverseBuilder {
     def newBuilder: InverseBuilder = new InverseBuilderImpl
@@ -280,6 +282,7 @@ object DiffGraph {
 
   class InverseBuilderImpl extends InverseBuilder {
     private val builder = DiffGraph.newBuilder
+    private var hasWarned = false
 
     def onNewNode(node: StoredNode) = builder.removeNode(node)
     def onNewEdge(edge: Edge) = builder.removeEdge(edge)
@@ -301,6 +304,11 @@ object DiffGraph {
     }
 
     def build(): DiffGraph = builder.buildReverse()
+
+    override def onIrreversible(change: Change): Unit = if (!hasWarned) {
+      hasWarned = true
+      logger.warn(s"Committing irreversible change: ${change} even though reversibility was requested by user.")
+    }
   }
 
   object NoopInverseBuilder extends InverseBuilder {
@@ -309,6 +317,7 @@ object DiffGraph {
     def onBeforeNodePropertyChange(node: StoredNode, propertyKey: String) = ()
     def onBeforeEdgePropertyChange(edge: Edge, propertyKey: String) = ()
     def build(): DiffGraph = EmptyChangeSet
+    def onIrreversible(change: Change): Unit = {}
   }
 
   private class Applier(diffGraph: DiffGraph, graph: Graph, undoable: Boolean, keyPool: Option[KeyPool]) {
@@ -349,12 +358,17 @@ object DiffGraph {
           case Change.SetEdgeProperty(edge, key, value) =>
             //deprecate?
             addEdgeProperty(edge, key, value, inverseBuilder)
-          case Change.RemoveEdge(edge)                      => edge.remove()
+          case removal @ Change.RemoveEdge(edge) =>
+            inverseBuilder.onIrreversible(removal)
+            edge.remove()
           case Change.RemoveEdgeProperty(edge, propertyKey) =>
             //deprecate?
             edge.removeProperty(propertyKey)
-          case Change.RemoveNode(nodeId) => graph.node(nodeId).remove()
-          case Change.RemoveNodeProperty(nodeId, propertyKey) =>
+          case removal @ Change.RemoveNode(nodeId) =>
+            inverseBuilder.onIrreversible(removal)
+            graph.node(nodeId).remove()
+          case removal @ Change.RemoveNodeProperty(nodeId, propertyKey) =>
+            inverseBuilder.onIrreversible(removal)
             graph.node(nodeId).removeProperty(propertyKey)
         }
         drainDeferred()
@@ -461,4 +475,6 @@ object DiffGraph {
   case class EdgeToOriginal(src: NewNode, dst: StoredNode, label: String, properties: Properties) extends DiffEdge
   case class EdgeFromOriginal(src: StoredNode, dst: NewNode, label: String, properties: Properties) extends DiffEdge
   case class EdgeInOriginal(src: StoredNode, dst: StoredNode, label: String, properties: Properties) extends DiffEdge
+
+  val logger = LoggerFactory.getLogger(getClass)
 }
