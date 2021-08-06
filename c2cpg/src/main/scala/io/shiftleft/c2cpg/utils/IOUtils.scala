@@ -4,7 +4,6 @@ import org.eclipse.cdt.core.parser.FileContent
 
 import java.io.{BufferedReader, FileInputStream, InputStreamReader}
 import java.nio.file.{Path, Paths}
-
 import scala.jdk.CollectionConverters._
 
 object IOUtils {
