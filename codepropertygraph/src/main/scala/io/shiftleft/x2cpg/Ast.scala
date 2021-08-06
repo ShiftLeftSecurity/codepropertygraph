@@ -28,6 +28,9 @@ object Ast {
     ast.refEdges.foreach { edge =>
       diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.REF)
     }
+    ast.bindsEdges.foreach { edge =>
+      diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.BINDS)
+    }
     ast.argEdges.foreach { edge =>
       diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.ARGUMENT)
     }
@@ -39,6 +42,7 @@ case class Ast(nodes: List[NewNode],
                edges: List[AstEdge] = List(),
                conditionEdges: List[AstEdge] = List(),
                refEdges: List[AstEdge] = List(),
+               bindsEdges: List[AstEdge] = List(),
                receiverEdges: List[AstEdge] = List(),
                argEdges: List[AstEdge] = List()) {
 
@@ -59,7 +63,8 @@ case class Ast(nodes: List[NewNode],
       conditionEdges = conditionEdges ++ other.conditionEdges,
       argEdges = argEdges ++ other.argEdges,
       receiverEdges = receiverEdges ++ other.receiverEdges,
-      refEdges = refEdges ++ other.refEdges
+      refEdges = refEdges ++ other.refEdges,
+      bindsEdges = bindsEdges ++ other.bindsEdges
     )
   }
 
@@ -84,6 +89,10 @@ case class Ast(nodes: List[NewNode],
 
   def withRefEdge(src: NewNode, dst: NewNode): Ast = {
     this.copy(refEdges = refEdges ++ List(AstEdge(src, dst)))
+  }
+
+  def withBindsEdge(src: NewNode, dst: NewNode): Ast = {
+    this.copy(bindsEdges = bindsEdges ++ List(AstEdge(src, dst)))
   }
 
   def withReceiverEdge(src: NewNode, dst: NewNode): Ast = {

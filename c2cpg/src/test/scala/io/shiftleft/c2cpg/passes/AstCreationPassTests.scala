@@ -65,6 +65,61 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
 
   "Method AST layout" should {
 
+    "be correct for simple lambda expressions" in Fixture(
+      """
+        |auto x = [] (int a, int b) -> int
+        |{
+        |    return a + b;
+        |};
+        |auto x = [] (string a, string b) -> string
+        |{
+        |    return a + b;
+        |};
+        |""".stripMargin,
+      "test.cpp"
+    ) { cpg =>
+      val lambda1FullName = "anonymous_lambda_0"
+      val lambda2FullName = "anonymous_lambda_1"
+
+      cpg.assignment.order(1).l match {
+        case List(assignment1) =>
+          assignment1.name shouldBe Operators.assignment
+          assignment1.astMinusRoot.isMethodRef.l match {
+            case List(ref) =>
+              ref.methodFullName shouldBe lambda1FullName
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+
+      cpg.assignment.order(2).l match {
+        case List(assignment2) =>
+          assignment2.name shouldBe Operators.assignment
+          assignment2.astMinusRoot.isMethodRef.l match {
+            case List(ref) =>
+              ref.methodFullName shouldBe lambda2FullName
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+
+      cpg.method.fullNameExact(lambda1FullName).l match {
+        case List(l1) =>
+          l1.name shouldBe lambda1FullName
+          l1.code shouldBe "int anonymous_lambda_0 (int a,int b)"
+          l1.signature shouldBe "int anonymous_lambda_0 (int,int)"
+        case _ => fail()
+      }
+
+      cpg.method.fullNameExact(lambda2FullName).l match {
+        case List(l2) =>
+          l2.name shouldBe lambda2FullName
+          l2.code shouldBe "string anonymous_lambda_1 (string a,string b)"
+          l2.signature shouldBe "string anonymous_lambda_1 (string,string)"
+        case _ => fail()
+      }
+    }
+
     "be correct for empty method" in Fixture("void method(int x) { }") { cpg =>
       cpg.method.name("method").astChildren.l match {
         case List(param: MethodParameterIn, _: Block, ret: MethodReturn) =>
@@ -732,7 +787,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       "file.cpp"
     ) { cpg =>
       cpg.typeDecl
-        .name("Foo")
+        .fullNameExact("Foo")
         .l
         .size shouldBe 1
       cpg.call.codeExact("f1(0)").l match {
@@ -790,7 +845,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       "file.cpp"
     ) { cpg =>
       cpg.typeDecl
-        .name("Foo")
+        .fullNameExact("Foo")
         .l
         .size shouldBe 1
       cpg.call.codeExact("Foo{0}").l match {
