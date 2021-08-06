@@ -1,11 +1,11 @@
 package io.shiftleft.c2cpg.parser
 
-import io.shiftleft.c2cpg.utils.TimeUtils
+import io.shiftleft.c2cpg.utils.{IOUtils, TimeUtils}
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit
 import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage
 import org.eclipse.cdt.core.dom.ast.gnu.cpp.GPPLanguage
 import org.eclipse.cdt.core.model.ILanguage
-import org.eclipse.cdt.core.parser.{DefaultLogService, FileContent, ScannerInfo}
+import org.eclipse.cdt.core.parser.{DefaultLogService, ScannerInfo}
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPVisitor
 import org.slf4j.LoggerFactory
 
@@ -49,7 +49,7 @@ class CdtParser(private val parseConfig: ParseConfig) extends ParseProblemsLogge
 
   private def parseInternal(file: Path): (ParseResult, String) = {
     val (results, duration) = TimeUtils.time {
-      val fileContent = FileContent.createForExternalFileLocation(file.toString)
+      val fileContent = IOUtils.readFile(file)
       val fileContentProvider = new CustomFileContentProvider()
       val lang = createParseLanguage(file)
       Try(
