@@ -13,6 +13,21 @@ import overflowdb.traversal._
 
 class AstCreationPassTests extends AnyWordSpec with Matchers {
 
+  private object CpgFixture {
+    def apply(code: String, fileName: String = "file.c"): Cpg = {
+      val cpg = Cpg.emptyCpg
+      File.usingTemporaryDirectory("c2cpgtest") { dir =>
+        val file = dir / fileName
+        file.write(code)
+
+        val keyPool = new IntervalKeyPool(1001, 2000)
+        val filenames = List(file.path.toAbsolutePath.toString)
+        new AstCreationPass(filenames, cpg, keyPool, Config()).createAndApply()
+      }
+      cpg
+    }
+  }
+
   private object Fixture {
     def apply(code: String, fileName: String = "file.c")(f: Cpg => Unit): Unit = {
       File.usingTemporaryDirectory("c2cpgtest") { dir =>
@@ -525,15 +540,15 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
   "Structural AST layout" should {
 
     "be correct for empty method" in Fixture("""
-                                                   | void method() {
-                                                   | };
+       | void method() {
+       | };
       """.stripMargin) { cpg =>
       cpg.method.name("method").size shouldBe 1
     }
 
     "be correct for empty named struct" in Fixture("""
-                                                         | struct foo {
-                                                         | };
+       | struct foo {
+       | };
       """.stripMargin) { cpg =>
       cpg.typeDecl.name("foo").size shouldBe 1
     }
@@ -545,9 +560,9 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
     }
 
     "be correct for named struct with single field" in Fixture("""
-                                                                     | struct foo {
-                                                                     |   int x;
-                                                                     | };
+       | struct foo {
+       |   int x;
+       | };
       """.stripMargin) { cpg =>
       cpg.typeDecl
         .name("foo")
@@ -559,25 +574,25 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
     }
 
     "be correct for named struct with multiple fields" in Fixture("""
-                                                                        | struct foo {
-                                                                        |   int x;
-                                                                        |   int y;
-                                                                        |   int z;
-                                                                        | };
+        | struct foo {
+        |   int x;
+        |   int y;
+        |   int z;
+        | };
       """.stripMargin) { cpg =>
       cpg.typeDecl.name("foo").member.code.toSet shouldBe Set("x", "y", "z")
     }
 
     "be correct for named struct with nested struct" in Fixture("""
-                                                                      | struct foo {
-                                                                      |   int x;
-                                                                      |   struct bar {
-                                                                      |     int y;
-                                                                      |     struct foo2 {
-                                                                      |       int z;
-                                                                      |     };
-                                                                      |   };
-                                                                      | };
+        | struct foo {
+        |   int x;
+        |   struct bar {
+        |     int y;
+        |     struct foo2 {
+        |       int z;
+        |     };
+        |   };
+        | };
       """.stripMargin) { cpg =>
       cpg.typeDecl.name("foo").l match {
         case List(fooStruct: TypeDecl) =>
@@ -1023,19 +1038,20 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
 
   "AST" should {
     "have correct line number for method content" in Fixture("""
-                                                                   |
-                                                                   |
-                                                                   |
-                                                                   |
-                                                                   | void method(int x) {
-                                                                   |
-                                                                   |   x = 1;
-                                                                   | }
+       |
+       |
+       |
+       |
+       | void method(int x) {
+       |
+       |   x = 1;
+       | }
       """.stripMargin) { cpg =>
       cpg.method.name("method").lineNumber.l shouldBe List(6)
       cpg.method.name("method").block.assignments.lineNumber.l shouldBe List(8)
     }
 
+    // for https://github.com/ShiftLeftSecurity/codepropertygraph/issues/1321
     "have correct line numbers example 1" in Fixture("""
        |int main() {
        |int a = 0;
@@ -1044,7 +1060,6 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
        |int c = 0;
        |}
       """.stripMargin) { cpg =>
-      // for https://github.com/ShiftLeftSecurity/codepropertygraph/issues/1321
       cpg.identifier.l match {
         case List(a, b, c) =>
           a.lineNumber shouldBe Some(3)
@@ -1057,30 +1072,41 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "have correct line numbers example 2" in Fixture("""
-       |void offset() {
-       |char * data = NULL;
-       |memset(data, 'A', 100-1); /* fill with 'A's */
-       |data = dataBuffer;    
-       |}
-      """.stripMargin) { cpg =>
-      // for https://github.com/ShiftLeftSecurity/codepropertygraph/issues/1321
-      cpg.identifier.name("data").l match {
-        case List(a, b, c) =>
-          a.lineNumber shouldBe Some(3)
-          a.columnNumber shouldBe Some(7)
-          b.lineNumber shouldBe Some(4)
-          b.columnNumber shouldBe Some(7)
-          c.lineNumber shouldBe Some(5)
-          c.columnNumber shouldBe Some(0)
-        case _ => fail()
-      }
-      cpg.identifier.name("dataBuffer").l match {
-        case List(a) =>
-          a.lineNumber shouldBe Some(5)
-          a.columnNumber shouldBe Some(7)
-        case _ => fail()
-      }
+    // for https://github.com/ShiftLeftSecurity/codepropertygraph/issues/1321
+    "have correct line/column numbers on all platforms" in {
+      val windowsNewline = "\r\n"
+      val windowsFixture: Cpg = CpgFixture(
+        s"void offset() {${windowsNewline}char * data = NULL;${windowsNewline}memset(data, 'A', 100-1); /* fill with 'A's */${windowsNewline}data = dataBuffer;$windowsNewline}")
+      val macNewline = "\r"
+      val macFixture: Cpg = CpgFixture(
+        s"void offset() {${macNewline}char * data = NULL;${macNewline}memset(data, 'A', 100-1); /* fill with 'A's */${macNewline}data = dataBuffer;$macNewline}")
+      val linuxNewline = "\n"
+      val linuxFixture: Cpg = CpgFixture(
+        s"void offset() {${linuxNewline}char * data = NULL;${linuxNewline}memset(data, 'A', 100-1); /* fill with 'A's */${linuxNewline}data = dataBuffer;$linuxNewline}")
+
+      val windowsLineNumbers = windowsFixture.identifier.lineNumber.l
+      val macLineNumbers = macFixture.identifier.lineNumber.l
+      val linuxLineNumbers = linuxFixture.identifier.lineNumber.l
+
+      windowsLineNumbers should not be empty
+      macLineNumbers should not be empty
+      linuxLineNumbers should not be empty
+
+      windowsLineNumbers shouldBe macLineNumbers
+      windowsLineNumbers shouldBe linuxLineNumbers
+      macLineNumbers shouldBe linuxLineNumbers
+
+      val windowsColumnNumbers = windowsFixture.identifier.columnNumber.l
+      val macColumnNumbers = macFixture.identifier.columnNumber.l
+      val linuxColumnNumbers = linuxFixture.identifier.columnNumber.l
+
+      windowsColumnNumbers should not be empty
+      macColumnNumbers should not be empty
+      linuxColumnNumbers should not be empty
+
+      windowsColumnNumbers shouldBe macColumnNumbers
+      windowsColumnNumbers shouldBe linuxColumnNumbers
+      macColumnNumbers shouldBe linuxColumnNumbers
     }
   }
 

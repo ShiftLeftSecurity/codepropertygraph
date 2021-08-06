@@ -1,6 +1,7 @@
 package io.shiftleft.c2cpg.passes
 
 import io.shiftleft.c2cpg.C2Cpg
+import io.shiftleft.c2cpg.utils.IOUtils
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.passes.DiffGraph
@@ -21,10 +22,8 @@ import org.eclipse.cdt.internal.core.dom.parser.cpp.{
 import org.eclipse.cdt.internal.core.model.ASTStringUtil
 import org.slf4j.LoggerFactory
 
-import java.io.{BufferedReader, FileInputStream, InputStreamReader}
 import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
 
 object AstCreator {
 
@@ -42,8 +41,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
 
   import AstCreator._
 
-  private val reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "utf-8"))
-  private val fileLines = reader.lines().iterator().asScala.toSeq.map(_.replaceAll("\r\n", "\n").length)
+  private val fileLines = IOUtils.linesInFile(IOUtils.readFile(filename)).map(_.length)
 
   private val scope = new Scope[String, (NewNode, String), NewNode]()
 
