@@ -18,6 +18,21 @@ object TestBundle extends QueryBundle {
   )
 }
 
+// invalid because one of the query creators, `foo`,
+// does not provide a default argument for parameter `n`
+object InvalidBundle extends QueryBundle {
+  @q def foo(n: Int): Query = Query(
+    name = "a-name",
+    author = "an-author",
+    title = "a-title",
+    description = s"a-description $n",
+    score = 2.0,
+    traversal = { cpg =>
+      cpg.method
+    }
+  )
+}
+
 class QueryDatabaseTests extends AnyWordSpec with should.Matchers {
   "QueryDatabase" should {
     "contain Metrics bundle" in {
@@ -49,6 +64,16 @@ class QueryDatabaseTests extends AnyWordSpec with should.Matchers {
         }
       )
       query.title shouldBe "a-title"
+    }
+
+    "throw exception when trying to fetch queries from invalid bundle" in {
+      val qdb = new QueryDatabase(namespace = "io.shiftleft.console")
+      val testBundles = qdb.allBundles.filter { bundle =>
+        bundle.getName.endsWith("InvalidBundle$")
+      }
+      testBundles.size shouldBe 1
+      val testBundle = testBundles.head
+      assertThrows[RuntimeException] { qdb.queriesInBundle(testBundle) }
     }
   }
 }
