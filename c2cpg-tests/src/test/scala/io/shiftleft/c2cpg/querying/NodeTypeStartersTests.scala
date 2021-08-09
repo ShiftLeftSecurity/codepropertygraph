@@ -58,7 +58,7 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
   }
 
   "should allow retrieving type declarations" in {
-    cpg.typeDecl.internal.name.toSet shouldBe Set("foo")
+    cpg.typeDecl.internal.name.toSet shouldBe Set("foo", "main")
   }
 
   "should allow retrieving members" in {
@@ -105,6 +105,7 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
       NodeTypes.LOCAL,
       NodeTypes.CALL,
       NodeTypes.LITERAL,
+      NodeTypes.BINDING
     )
   }
 

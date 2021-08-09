@@ -65,6 +65,245 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
 
   "Method AST layout" should {
 
+    "be correct for simple lambda expressions" in Fixture(
+      """
+        |auto x = [] (int a, int b) -> int
+        |{
+        |    return a + b;
+        |};
+        |auto x = [] (string a, string b) -> string
+        |{
+        |    return a + b;
+        |};
+        |""".stripMargin,
+      "test.cpp"
+    ) { cpg =>
+      val lambda1FullName = "anonymous_lambda_0"
+      val lambda2FullName = "anonymous_lambda_1"
+
+      cpg.assignment.order(1).l match {
+        case List(assignment1) =>
+          assignment1.astMinusRoot.isMethodRef.l match {
+            case List(ref) =>
+              ref.methodFullName shouldBe lambda1FullName
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+
+      cpg.assignment.order(2).l match {
+        case List(assignment2) =>
+          assignment2.astMinusRoot.isMethodRef.l match {
+            case List(ref) =>
+              ref.methodFullName shouldBe lambda2FullName
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+
+      cpg.method.fullNameExact(lambda1FullName).l match {
+        case List(l1) =>
+          l1.name shouldBe lambda1FullName
+          l1.code shouldBe "int anonymous_lambda_0 (int a,int b)"
+          l1.signature shouldBe "int anonymous_lambda_0 (int,int)"
+        case _ => fail()
+      }
+
+      cpg.method.fullNameExact(lambda2FullName).l match {
+        case List(l2) =>
+          l2.name shouldBe lambda2FullName
+          l2.code shouldBe "string anonymous_lambda_1 (string a,string b)"
+          l2.signature shouldBe "string anonymous_lambda_1 (string,string)"
+        case _ => fail()
+      }
+
+      cpg.typeDecl(lambda1FullName).head.bindsOut.l match {
+        case List(binding: Binding) =>
+          binding.name shouldBe lambda1FullName
+          binding.signature shouldBe "int anonymous_lambda_0 (int,int)"
+          binding.refOut.l match {
+            case List(method: Method) =>
+              method.name shouldBe lambda1FullName
+              method.fullName shouldBe lambda1FullName
+              method.signature shouldBe "int anonymous_lambda_0 (int,int)"
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+    }
+
+    "be correct for simple lambda expression in class" in Fixture(
+      """
+        |class Foo {
+        | auto x = [] (int a, int b) -> int
+        | {
+        |   return a + b;
+        | };
+        |};
+        |
+        |""".stripMargin,
+      "test.cpp"
+    ) { cpg =>
+      val lambdaName = "anonymous_lambda_0"
+      val lambdaFullName = "Foo.anonymous_lambda_0"
+      val signature = "int Foo.anonymous_lambda_0 (int,int)"
+
+      cpg.assignment.order(1).l match {
+        case List(assignment1) =>
+          assignment1.astMinusRoot.isMethodRef.l match {
+            case List(ref) =>
+              ref.methodFullName shouldBe lambdaFullName
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+
+      cpg.method.fullNameExact(lambdaFullName).l match {
+        case List(l1) =>
+          l1.name shouldBe lambdaName
+          l1.code shouldBe "int anonymous_lambda_0 (int a,int b)"
+          l1.signature shouldBe signature
+        case _ => fail()
+      }
+
+      cpg.typeDecl("Foo").head.bindsOut.l match {
+        case List(binding: Binding) =>
+          binding.name shouldBe lambdaName
+          binding.signature shouldBe signature
+          binding.refOut.l match {
+            case List(method: Method) =>
+              method.name shouldBe lambdaName
+              method.fullName shouldBe lambdaFullName
+              method.signature shouldBe signature
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+    }
+
+    "be correct for simple lambda expression in class under namespaces" in Fixture(
+      """
+        |namespace A { class B {
+        |class Foo {
+        | auto x = [] (int a, int b) -> int
+        | {
+        |   return a + b;
+        | };
+        |};
+        |};}
+        |""".stripMargin,
+      "test.cpp"
+    ) { cpg =>
+      val lambdaName = "anonymous_lambda_0"
+      val lambdaFullName = "A.B.Foo.anonymous_lambda_0"
+      val signature = "int A.B.Foo.anonymous_lambda_0 (int,int)"
+
+      cpg.assignment.order(1).l match {
+        case List(assignment1) =>
+          assignment1.astMinusRoot.isMethodRef.l match {
+            case List(ref) =>
+              ref.methodFullName shouldBe lambdaFullName
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+
+      cpg.method.fullNameExact(lambdaFullName).l match {
+        case List(l1) =>
+          l1.name shouldBe lambdaName
+          l1.code shouldBe "int anonymous_lambda_0 (int a,int b)"
+          l1.signature shouldBe signature
+        case _ => fail()
+      }
+
+      cpg.typeDecl.fullNameExact("A.B.Foo").head.bindsOut.l match {
+        case List(binding: Binding) =>
+          binding.name shouldBe lambdaName
+          binding.signature shouldBe signature
+          binding.refOut.l match {
+            case List(method: Method) =>
+              method.name shouldBe lambdaName
+              method.fullName shouldBe lambdaFullName
+              method.signature shouldBe signature
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+    }
+
+    "be correct when calling a lambda" in Fixture(
+      """
+        |auto x = [](int n) -> int
+        |{
+        |  return 32 + n;
+        |};
+        |
+        |constexpr int foo1 = x(10);
+        |constexpr int foo2 = [](int n) -> int
+        |{
+        |  return 32 + n;
+        |}(10);
+        |""".stripMargin,
+      "test.cpp"
+    ) { cpg =>
+      val lambda1Name = "anonymous_lambda_0"
+      val signature1 = "int anonymous_lambda_0 (int)"
+      val lambda2Name = "anonymous_lambda_1"
+
+      cpg.assignment.order(1).l match {
+        case List(assignment1) =>
+          assignment1.astMinusRoot.isMethodRef.l match {
+            case List(ref) =>
+              ref.methodFullName shouldBe lambda1Name
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+
+      cpg.method.fullNameExact(lambda1Name).l match {
+        case List(l1) =>
+          l1.name shouldBe lambda1Name
+          l1.code shouldBe "int anonymous_lambda_0 (int n)"
+          l1.signature shouldBe signature1
+        case _ => fail()
+      }
+
+      cpg.typeDecl(lambda1Name).head.bindsOut.l match {
+        case List(binding: Binding) =>
+          binding.name shouldBe lambda1Name
+          binding.signature shouldBe signature1
+          binding.refOut.l match {
+            case List(method: Method) =>
+              method.name shouldBe lambda1Name
+              method.fullName shouldBe lambda1Name
+              method.signature shouldBe signature1
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+
+      cpg.call(lambda2Name).l match {
+        case List(lambda2call) =>
+          lambda2call.name shouldBe lambda2Name
+          lambda2call.methodFullName shouldBe lambda2Name
+          lambda2call.astChildren.l match {
+            case List(ref: MethodRef, lit: Literal) =>
+              ref.methodFullName shouldBe lambda2Name
+              ref.code shouldBe "int anonymous_lambda_1 (int n)"
+              lit.code shouldBe "10"
+            case _ => fail()
+          }
+          lambda2call.argument.l match {
+            case List(ref: MethodRef, lit: Literal) =>
+              ref.methodFullName shouldBe lambda2Name
+              ref.code shouldBe "int anonymous_lambda_1 (int n)"
+              lit.code shouldBe "10"
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+    }
+
     "be correct for empty method" in Fixture("void method(int x) { }") { cpg =>
       cpg.method.name("method").astChildren.l match {
         case List(param: MethodParameterIn, _: Block, ret: MethodReturn) =>
@@ -732,7 +971,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       "file.cpp"
     ) { cpg =>
       cpg.typeDecl
-        .name("Foo")
+        .fullNameExact("Foo")
         .l
         .size shouldBe 1
       cpg.call.codeExact("f1(0)").l match {
@@ -790,7 +1029,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       "file.cpp"
     ) { cpg =>
       cpg.typeDecl
-        .name("Foo")
+        .fullNameExact("Foo")
         .l
         .size shouldBe 1
       cpg.call.codeExact("Foo{0}").l match {
