@@ -1,12 +1,11 @@
 package io.shiftleft.passes
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.LargeChunkCpgPass.writerQueueCapacity
 import org.slf4j.{LoggerFactory, MDC}
 
+import java.util.concurrent.LinkedBlockingQueue
 import scala.collection.mutable
 import scala.concurrent.{Await, Future}
-import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 
@@ -235,7 +234,7 @@ abstract class LargeChunkCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", ke
 
   private class Writer(serializedCpg: SerializedCpg, prefix: String, inverse: Boolean) extends Runnable {
 
-    val queue = new LinkedBlockingQueue[Option[DiffGraph]](writerQueueCapacity)
+    val queue = new LinkedBlockingQueue[Option[DiffGraph]](LargeChunkCpgPass.writerQueueCapacity)
 
     override def run(): Unit = {
       try {
