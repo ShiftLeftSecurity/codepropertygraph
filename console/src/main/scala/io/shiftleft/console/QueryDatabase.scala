@@ -110,7 +110,14 @@ class QueryDatabase(defaultArgumentProvider: DefaultArgumentProvider = new Defau
         .instance)
     val args = (for (ps <- method.paramLists; p <- ps) yield p).zipWithIndex
       .map {
-        case (x, i) => defaultArgumentProvider.defaultArgument(method, im, x, i)
+        case (x, i) => {
+          val defaultValue = defaultArgumentProvider.defaultArgument(method, im, x, i)
+          if (defaultValue.isEmpty) {
+            throw new RuntimeException(
+              s"No default value found for parameter `${x.toString}` of query creator method `$method` ")
+          }
+          defaultValue
+        }
       }
     if (args.contains(None)) {
       None
