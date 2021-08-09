@@ -1,10 +1,11 @@
 package io.shiftleft.c2cpg.standard
 
+import io.shiftleft.c2cpg.parser.FileDefaults
 import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.FileTraversal
 
-class TypeDeclTests extends CCodeToCpgSuite {
+class TypeDeclTests extends CCodeToCpgSuite(FileDefaults.CPP_EXT) {
 
   override val code: String = """
    | class foo : bar {
@@ -24,7 +25,7 @@ class TypeDeclTests extends CCodeToCpgSuite {
     x.aliasTypeFullName shouldBe None
     x.order shouldBe 1
     x.filename.startsWith("/") shouldBe true
-    x.filename.endsWith(".c") shouldBe true
+    x.filename.endsWith(FileDefaults.CPP_EXT) shouldBe true
   }
 
   "should contain type decl for alias `mytype` of `int`" in {
@@ -36,7 +37,7 @@ class TypeDeclTests extends CCodeToCpgSuite {
     x.aliasTypeFullName shouldBe Some("int")
     x.order shouldBe 2
     x.filename.startsWith("/") shouldBe true
-    x.filename.endsWith(".c") shouldBe true
+    x.filename.endsWith(FileDefaults.CPP_EXT) shouldBe true
   }
 
   "should contain type decl for external type `int`" in {
@@ -72,7 +73,7 @@ class TypeDeclTests extends CCodeToCpgSuite {
   }
 
   "should allow traversing from type to enclosing file" in {
-    cpg.typeDecl.file.filter(_.name.endsWith(".c")).l should not be empty
+    cpg.typeDecl.file.filter(_.name.endsWith(FileDefaults.CPP_EXT)).l should not be empty
   }
 
 }

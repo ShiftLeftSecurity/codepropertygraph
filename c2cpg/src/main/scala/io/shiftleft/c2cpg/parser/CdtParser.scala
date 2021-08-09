@@ -1,10 +1,11 @@
 package io.shiftleft.c2cpg.parser
 
-import io.shiftleft.c2cpg.utils.TimeUtils
+import io.shiftleft.c2cpg.utils.{IOUtils, TimeUtils}
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit
+import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage
 import org.eclipse.cdt.core.dom.ast.gnu.cpp.GPPLanguage
 import org.eclipse.cdt.core.model.ILanguage
-import org.eclipse.cdt.core.parser.{DefaultLogService, FileContent, ScannerInfo}
+import org.eclipse.cdt.core.parser.{DefaultLogService, ScannerInfo}
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPVisitor
 import org.slf4j.LoggerFactory
 
@@ -37,11 +38,20 @@ class CdtParser(private val parseConfig: ParseConfig) extends ParseProblemsLogge
   // enables parsing of code behind disabled preprocessor defines:
   private val opts: Int = ILanguage.OPTION_PARSE_INACTIVE_CODE
 
+  private def createParseLanguage(file: Path): ILanguage = {
+    val fileAsString = file.toString
+    if (fileAsString.endsWith(FileDefaults.CPP_EXT) || fileAsString.endsWith(FileDefaults.CPP_HEADER_EXT)) {
+      new GPPLanguage()
+    } else {
+      new GCCLanguage()
+    }
+  }
+
   private def parseInternal(file: Path): (ParseResult, String) = {
     val (results, duration) = TimeUtils.time {
-      val fileContent = FileContent.createForExternalFileLocation(file.toString)
+      val fileContent = IOUtils.readFile(file)
       val fileContentProvider = new CustomFileContentProvider()
-      val lang = new GPPLanguage()
+      val lang = createParseLanguage(file)
       Try(
         lang.getASTTranslationUnit(fileContent, info, fileContentProvider, null, opts, log)
       ) match {

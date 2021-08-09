@@ -83,6 +83,7 @@ object MetaData extends SchemaBase {
                value = "GHIDRA",
                valueType = ValueTypes.STRING,
                comment = "generic reverse engineering framework").protoId(10),
+      Constant(name = "KOTLIN", value = "KOTLIN", valueType = ValueTypes.STRING, comment = "").protoId(11)
     )
 
   }

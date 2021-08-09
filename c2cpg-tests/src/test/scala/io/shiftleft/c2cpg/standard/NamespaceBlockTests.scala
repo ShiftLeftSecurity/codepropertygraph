@@ -40,7 +40,7 @@ class NamespaceBlockTests extends CCodeToCpgSuite {
   }
 
   "should allow traversing from namespace block to type declaration" in {
-    cpg.namespaceBlock.filenameNot(FileTraversal.UNKNOWN).typeDecl.name.l shouldBe List("my_struct")
+    cpg.namespaceBlock.filenameNot(FileTraversal.UNKNOWN).typeDecl.name.l shouldBe List("my_struct", "foo")
   }
 
   "should allow traversing from namespace block to namespace" in {
