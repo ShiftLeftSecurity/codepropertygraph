@@ -181,6 +181,56 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
+    "be correct for simple lambda expression in class under namespaces" in Fixture(
+      """
+        |namespace A { class B {
+        |class Foo {
+        | auto x = [] (int a, int b) -> int
+        | {
+        |   return a + b;
+        | };
+        |};
+        |};}
+        |""".stripMargin,
+      "test.cpp"
+    ) { cpg =>
+      val lambdaName = "anonymous_lambda_0"
+      val lambdaFullName = "A.B.Foo.anonymous_lambda_0"
+      val signature = "int A.B.Foo.anonymous_lambda_0 (int,int)"
+
+      cpg.assignment.order(1).l match {
+        case List(assignment1) =>
+          assignment1.astMinusRoot.isMethodRef.l match {
+            case List(ref) =>
+              ref.methodFullName shouldBe lambdaFullName
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+
+      cpg.method.fullNameExact(lambdaFullName).l match {
+        case List(l1) =>
+          l1.name shouldBe lambdaName
+          l1.code shouldBe "int anonymous_lambda_0 (int a,int b)"
+          l1.signature shouldBe signature
+        case _ => fail()
+      }
+
+      cpg.typeDecl.fullNameExact("A.B.Foo").head.bindsOut.l match {
+        case List(binding: Binding) =>
+          binding.name shouldBe lambdaName
+          binding.signature shouldBe signature
+          binding.refOut.l match {
+            case List(method: Method) =>
+              method.name shouldBe lambdaName
+              method.fullName shouldBe lambdaFullName
+              method.signature shouldBe signature
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+    }
+
     "be correct when calling a lambda" in Fixture(
       """
         |auto x = [](int n) -> int

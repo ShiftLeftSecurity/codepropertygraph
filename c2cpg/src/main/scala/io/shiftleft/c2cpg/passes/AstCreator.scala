@@ -48,9 +48,9 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
 
   private val usingDeclarationMappings = mutable.HashMap.empty[String, String]
 
-  // Nested methods are not put in the AST where they are defined.
-  // Instead we put them directly under the METHOD in which they are
-  // defined. To achieve this we need this extra stack.
+  // Lambdas are not put in the AST where they are defined.
+  // Instead we put them directly under the TYPE_DECL (or METHOD of not parent TYPE_DECL is available)
+  // in which they are defined. To achieve this we need this extra stack.
   private val methodAstParentStack = new Stack[NewNode]()
 
   private val diffGraph = DiffGraph.newBuilder
@@ -416,7 +416,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
                                             methodName: String,
                                             methodFullName: String,
                                             signature: String): Unit = {
-    val parentNode: NewNode = methodAstParentStack.findLast(_.isInstanceOf[NewTypeDecl]).getOrElse {
+    val parentNode: NewNode = methodAstParentStack.find(_.isInstanceOf[NewTypeDecl]).getOrElse {
       val astParentType = methodAstParentStack.head.label
       val astParentFullName = methodAstParentStack.head.properties("FULL_NAME").toString
       val newTypeDeclNode = NewTypeDecl()
