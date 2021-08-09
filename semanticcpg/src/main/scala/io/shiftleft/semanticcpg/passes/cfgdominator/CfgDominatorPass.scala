@@ -1,7 +1,8 @@
 package io.shiftleft.semanticcpg.passes.cfgdominator
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
@@ -10,11 +11,11 @@ import scala.collection.mutable
 /**
   * This pass has no prerequisites.
   */
-class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
+class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
 
-  override def partIterator: Iterator[nodes.Method] = cpg.method.iterator
+  override def partIterator: Iterator[Method] = cpg.method.iterator
 
-  override def runOnPart(method: nodes.Method): Iterator[DiffGraph] = {
+  override def runOnPart(method: Method): Iterator[DiffGraph] = {
     val cfgAdapter = new CpgCfgAdapter()
     val dominatorCalculator = new CfgDominator(cfgAdapter)
 
@@ -33,7 +34,7 @@ class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
   }
 
   private def addDomTreeEdges(dstGraph: DiffGraph.Builder,
-                              cfgNodeToImmediateDominator: mutable.Map[nodes.StoredNode, nodes.StoredNode]): Unit = {
+                              cfgNodeToImmediateDominator: mutable.Map[StoredNode, StoredNode]): Unit = {
     // TODO do not iterate over potential hash map to ensure same interation order for
     // edge creation.
     cfgNodeToImmediateDominator.foreach {
@@ -42,9 +43,8 @@ class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[nodes.Method](cpg) {
     }
   }
 
-  private def addPostDomTreeEdges(
-      dstGraph: DiffGraph.Builder,
-      cfgNodeToPostImmediateDominator: mutable.Map[nodes.StoredNode, nodes.StoredNode]): Unit = {
+  private def addPostDomTreeEdges(dstGraph: DiffGraph.Builder,
+                                  cfgNodeToPostImmediateDominator: mutable.Map[StoredNode, StoredNode]): Unit = {
     // TODO do not iterate over potential hash map to ensure same interation order for
     // edge creation.
     cfgNodeToPostImmediateDominator.foreach {

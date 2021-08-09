@@ -1,13 +1,12 @@
 package io.shiftleft.semanticcpg.passes.codepencegraph
 
-import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import io.shiftleft.semanticcpg.passes.cfgdominator.DomTreeAdapter
-import overflowdb.Node
 import overflowdb.traversal._
 
-class CpgPostDomTreeAdapter extends DomTreeAdapter[Node] {
+class CpgPostDomTreeAdapter extends DomTreeAdapter[StoredNode] {
 
-  override def immediateDominator(cfgNode: Node): Option[Node] = {
-    cfgNode.in(EdgeTypes.POST_DOMINATE).nextOption()
+  override def immediateDominator(cfgNode: StoredNode): Option[StoredNode] = {
+    cfgNode._postDominateIn.nextOption()
   }
 }
