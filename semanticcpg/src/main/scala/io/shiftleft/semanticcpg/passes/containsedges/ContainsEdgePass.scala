@@ -3,9 +3,7 @@ package io.shiftleft.semanticcpg.passes.containsedges
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import io.shiftleft.passes.{DiffGraph, LargeChunkCpgPass, NewStyleCpgPass}
-import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass.{isDestinationType, isSourceType}
+import io.shiftleft.passes.{DiffGraph, LargeChunkCpgPass}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
