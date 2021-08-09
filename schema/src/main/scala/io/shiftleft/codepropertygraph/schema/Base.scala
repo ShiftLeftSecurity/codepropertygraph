@@ -102,6 +102,17 @@ object Base extends SchemaBase {
       .mandatory(PropertyDefaults.String)
       .protoId(8)
 
+    val content = builder
+      .addProperty(
+        name = "CONTENT",
+        valueType = ValueType.String,
+        comment = """Certain files, e.g., configuration files, may be included in the CPG as-is.
+            |For such files, the `CONTENT` field contains the files content.
+            |""".stripMargin
+      )
+      .mandatory(CpgSchema.PropertyDefaults.String)
+      .protoId(20)
+
     // The following fields are used to create edges between nodes in later processing stages.
 
     val astParentType = builder

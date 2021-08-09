@@ -32,7 +32,9 @@ object Hidden extends SchemaBase {
 
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
-    // node properties
+    /*
+     * Closure bindings
+     * */
 
     val closureBindingId = builder
       .addProperty(
@@ -89,7 +91,35 @@ object Hidden extends SchemaBase {
     closureBinding
       .addOutEdge(edge = ref, inNode = local, cardinalityOut = EdgeType.Cardinality.One)
       .addOutEdge(edge = ref, inNode = methodParameterIn)
-    // constants
+
+    /*
+     * Dependencies
+     * */
+
+    val dependencyGroupId = builder
+      .addProperty(
+        name = "DEPENDENCY_GROUP_ID",
+        valueType = ValueType.String,
+        comment = "The group ID for a dependency"
+      )
+      .protoId(58)
+
+    val usedIn = builder
+      .addProperty(
+        name = "USED_IN",
+        valueType = ValueType.String,
+        comment = "The name of the file for which this include is valid"
+      )
+      .protoId(22919)
+
+    // node types
+    val dependency: NodeType = builder
+      .addNodeType(
+        name = "DEPENDENCY",
+        comment = "This node represents a dependency"
+      )
+      .protoId(35)
+      .addProperties(version, name, dependencyGroupId, usedIn)
 
   }
 
