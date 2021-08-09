@@ -16,12 +16,14 @@ object Hidden extends SchemaBase {
   def apply(builder: SchemaBuilder,
             base: Base.Schema,
             methodSchema: Method.Schema,
+            typeDecl: Type.Schema,
             ast: Ast.Schema,
-            callGraph: CallGraph.Schema) = new Schema(builder, base, methodSchema, ast, callGraph)
+            callGraph: CallGraph.Schema) = new Schema(builder, base, methodSchema, typeDecl, ast, callGraph)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                methodSchema: Method.Schema,
+               typeDecl: Type.Schema,
                ast: Ast.Schema,
                callGraph: CallGraph.Schema) {
 
@@ -29,6 +31,7 @@ object Hidden extends SchemaBase {
     import methodSchema._
     import ast._
     import callGraph._
+    import typeDecl._
 
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
@@ -120,6 +123,31 @@ object Hidden extends SchemaBase {
       )
       .protoId(35)
       .addProperties(version, name, dependencyGroupId, usedIn)
+
+    /*
+     * Type hints
+     * */
+
+    val dynamicTypeHintFullName = builder
+      .addProperty(
+        name = "DYNAMIC_TYPE_HINT_FULL_NAME",
+        valueType = ValueType.String,
+        comment = "Type hint for the dynamic type"
+      )
+      .asList()
+      .protoId(1591)
+
+    callNode.addProperties(dynamicTypeHintFullName)
+    methodParameterIn.addProperties(dynamicTypeHintFullName)
+    methodReturn.addProperties(dynamicTypeHintFullName)
+    methodRef.addProperties(dynamicTypeHintFullName)
+    typeRef.addProperties(dynamicTypeHintFullName)
+    local.addProperties(dynamicTypeHintFullName)
+    block.addProperties(dynamicTypeHintFullName)
+    unknown.addProperties(dynamicTypeHintFullName)
+    literal.addProperties(dynamicTypeHintFullName)
+    identifier.addProperties(dynamicTypeHintFullName)
+    member.addProperties(dynamicTypeHintFullName)
 
   }
 
