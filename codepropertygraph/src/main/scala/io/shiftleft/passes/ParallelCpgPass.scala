@@ -122,7 +122,28 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
     }
   }
 }
-
+/* LargeChunkCpgPass is a possible replacement for ParallelCpgPass and NewStylePass.
+ *
+ * Instead of returning an Iterator, generateParts() returns an Array. This means that the entire collection
+ * of parts must live on the heap at the same time; on the other hand, there are no possible issues with iterator invalidation,
+ * e.g. when running over all METHOD nodes and deleting some of them.
+ *
+ * Changes are applied sequentially, in the same order as the output of `runOnParts`, as opposed to `ParallelCpgPass`,
+ * where the ordering of change application is non-deterministic. For this reason, LargeChunkCpgPass only accepts a single KeyPool.
+ *
+ * However, as opposed to NewStylePass, changes are not buffered and applied in one go; instead, they are applied as the respective
+ * `runOnPart` finishes, concurrently with other `runOnPart` invocations.
+ *
+ * Compared to NewStylePass, this avoids excessive peak memory consumption. On the other hand, `runOnPart` sees the CPG
+ * in an intermediate state: No promises are made about which previous changes are already applied; and changes are
+ * applied concurrently, such that all reads from the graph are potential race conditions. Furthermore, this variant has
+ * higher constant overhead per part than NewStylePass, i.e. is better suited to passes that create few large diffs.
+ *
+ *
+ * Initialization and cleanup of external resources or large datastructures can be done in the `init()` and `finish()`
+ * methods. This may be better than using the constructor or GC, because e.g. SCPG chains of passes construct
+ * passes eagerly, and releases them only when the entire chain has run.
+ * */
 object LargeChunkCpgPass {
   val writerQueueCapacity = 4
   val producerQueueCapacity = 2 + 4 * Runtime.getRuntime().availableProcessors()

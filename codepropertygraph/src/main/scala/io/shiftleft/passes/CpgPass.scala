@@ -84,6 +84,22 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
 
 }
 
+/* NewStyleSimpleCpgPass is a possible replacement for CpgPass.
+ *
+ *  Instead of returning an Iterator[DiffGraph], the `run` fuction gets a DiffGraphBuilder as input, and can attach its
+ *  modifications to it (i.e. mutate the builder).
+ *
+ * CpgPass has somewhat subtle semantics with respect to lazy evaluation order of the returned iterator and graph writes.
+ * The subtleties are gone with NewStyleSimpleCpgPass.
+ *
+ * Note that NewStyleSimpleCpgPass does not support lazy evaluation games. Take care before porting passes that
+ * write large amounts of data that risk OOM errors.
+ *
+ * Initialization and cleanup of external resources or large datastructures can be done in the `init()` and `finish()`
+ * methods. This may be better than using the constructor or GC, because e.g. SCPG chains of passes construct
+ * passes eagerly, and releases them only when the entire chain has run.
+ * */
+
 abstract class NewStyleSimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends NewStyleCpgPass[AnyRef](cpg, outName, keyPool) {
 
@@ -94,6 +110,28 @@ abstract class NewStyleSimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Op
   final override def runOnPart(builder: DiffGraph.Builder, part: AnyRef): Unit = run(builder)
 }
 
+/* NewStyleCpgPass is a possible replacement for CpgPass and ParallelCpgPass.
+ *
+ * Instead of returning an Iterator, generateParts() returns an Array. This means that the entire collection
+ * of parts must live on the heap at the same time; on the other hand, there are no possible issues with iterator invalidation,
+ * e.g. when running over all METHOD nodes and deleting some of them.
+ *
+ * Instead of streaming writes as ParallelCpgPass or LargeChunkPass do, all `runOnPart` invocations read the initial state
+ * of the graph. Then all changes (accumulated in the DiffGraphBuilders) are merged into a single change, and applied in one go.
+ *
+ * In other words, the parallelism follows the fork/join parallel map-reduce (java: collect, scala: aggregate) model.
+ * The effect is identical as if one were to sequentially run `runOnParts` on all output elements of `generateParts()`
+ * in sequential order, with the same builder.
+ *
+ * This simplifies semantics and makes it easy to reason about possible races.
+ *
+ * Note that NewStyleCpgPass never writes intermediate results, so one must consider peak memory consumption when
+ * porting from ParallelCpgPass. Consider LargeChunkPass when this is a problem.
+ *
+ * Initialization and cleanup of external resources or large datastructures can be done in the `init()` and `finish()`
+ * methods. This may be better than using the constructor or GC, because e.g. SCPG chains of passes construct
+ * passes eagerly, and releases them only when the entire chain has run.
+ * */
 abstract class NewStyleCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends CpgPassBase {
   //generate Array of parts that can be processed in parallel

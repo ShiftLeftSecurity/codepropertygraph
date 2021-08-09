@@ -1,52 +1,51 @@
 package io.shiftleft.semanticcpg.passes.containsedges
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.AstNode
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import io.shiftleft.passes.{DiffGraph, NewStyleCpgPass}
+import io.shiftleft.passes.{DiffGraph, LargeChunkCpgPass, NewStyleCpgPass}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass.{isDestinationType, isSourceType}
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 /**
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
   * language frontends which do not provide method stubs and type decl stubs.
   */
-class ContainsEdgePass(cpg: Cpg) extends NewStyleCpgPass[AstNode](cpg) {
-  import ContainsEdgePass.{destinationTypes, sourceTypes}
+class ContainsEdgePass(cpg: Cpg) extends LargeChunkCpgPass[AstNode](cpg) {
+  import ContainsEdgePass._
 
   override def generateParts(): Array[AstNode] =
     cpg.graph.nodes(sourceTypes: _*).asScala.map(_.asInstanceOf[AstNode]).toArray
 
   override def runOnPart(dstGraph: DiffGraph.Builder, source: AstNode): Unit = {
-    source
-      .walkAstUntilReaching(sourceTypes)
-      .sideEffect { destination =>
-        if (destinationTypes.contains(destination.label)) {
-          dstGraph.addEdgeInOriginal(source, destination, EdgeTypes.CONTAINS)
-        }
+    //AST is assumed to be a tree. If it contains cycles, then this will give a nice endless loop with OOM
+    val queue = mutable.ArrayDeque[StoredNode](source)
+    while (queue.nonEmpty) {
+      val parent = queue.removeHead()
+      for (nextNode <- parent._astOut.asScala) {
+        if (isDestinationType(nextNode)) dstGraph.addEdge(source, nextNode, EdgeTypes.CONTAINS)
+        if (!isSourceType(nextNode)) queue.append(nextNode)
       }
-      .iterate()
+    }
   }
 }
 
 object ContainsEdgePass {
 
-  private val destinationTypes = List(
-    NodeTypes.BLOCK,
-    NodeTypes.IDENTIFIER,
-    NodeTypes.FIELD_IDENTIFIER,
-    NodeTypes.RETURN,
-    NodeTypes.METHOD,
-    NodeTypes.TYPE_DECL,
-    NodeTypes.CALL,
-    NodeTypes.LITERAL,
-    NodeTypes.METHOD_REF,
-    NodeTypes.TYPE_REF,
-    NodeTypes.CONTROL_STRUCTURE,
-    NodeTypes.JUMP_TARGET,
-    NodeTypes.UNKNOWN
-  )
+  def isSourceType(node: StoredNode): Boolean = node match {
+    case _: Method | _: TypeDecl | _: File => true
+    case _                                 => false
+  }
+
+  def isDestinationType(node: StoredNode): Boolean = node match {
+    case _: Block | _: Identifier | _: FieldIdentifier | _: Return | _: Method | _: TypeDecl | _: Call | _: Literal |
+        _: MethodRef | _: TypeRef | _: ControlStructure | _: JumpTarget | _: Unknown =>
+      true
+    case _ => false
+  }
 
   private val sourceTypes = List(
     NodeTypes.METHOD,
