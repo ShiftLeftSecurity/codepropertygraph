@@ -243,6 +243,18 @@ object Operators extends SchemaBase {
         valueType = ValueTypes.STRING,
         comment = "Defines a range of values, e.g. `for (i in 1..10) print(i)`."
       ),
+      Constant(
+        name = "in",
+        value = "<operator>.in",
+        valueType = ValueTypes.STRING,
+        comment = "Checks the existence of a variable in a range or collection, e.g. `for (i in 1..10) print(i)`."
+      ),
+      Constant(
+        name = "notIn",
+        value = "<operator>.notIn",
+        valueType = ValueTypes.STRING,
+        comment = "Checks the non-existence of a variable in a range or collection, e.g. `print(5 not in [1, 2, 3, 4])`"
+      ),
     )
 
   }
