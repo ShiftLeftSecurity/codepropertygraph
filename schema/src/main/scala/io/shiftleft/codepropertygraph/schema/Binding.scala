@@ -7,7 +7,7 @@ object Binding extends SchemaBase {
   def apply(builder: SchemaBuilder, base: Base.Schema, typeSchema: Type.Schema, methodSchema: Method.Schema) =
     new Schema(builder, base, typeSchema, methodSchema)
 
-  override def index: Int = 18
+  override def index: Int = 19
 
   override def description: String =
     """
