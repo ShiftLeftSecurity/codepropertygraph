@@ -2,7 +2,16 @@ package io.shiftleft.semanticcpg.passes.codepencegraph
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
-import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.nodes.{
+  Literal,
+  Call,
+  ControlStructure,
+  Identifier,
+  JumpTarget,
+  Method,
+  MethodRef,
+  Unknown
+}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgDominatorFrontier, ReverseCpgCfgAdapter}
