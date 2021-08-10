@@ -37,7 +37,7 @@ class TemplateTests extends AnyWordSpec with Matchers with Inside {
   "Templates" should {
 
     "be correct for class templates" in TemplateFixture("""
-        |template<class T> class X;
+        |template<class T> class X {};
         |template<typename A, typename B> class Y;
         |using A = X<int>;
         |using B = Y<int, char>;
@@ -56,6 +56,23 @@ class TemplateTests extends AnyWordSpec with Matchers with Inside {
           b.name shouldBe "B"
           b.fullName shouldBe "B"
           b.aliasTypeFullName shouldBe Some("Y<int,char>")
+      }
+    }
+
+    "be correct for class templates with inheritance" in TemplateFixture(
+      """
+        |template<typename T> class X;
+        |template<typename A, typename B> class Y : public X<A> {};
+        |""".stripMargin) { cpg =>
+      inside(cpg.typeDecl.l) {
+        case List(x, y) =>
+          x.name shouldBe "X"
+          x.fullName shouldBe "X"
+          x.aliasTypeFullName shouldBe Some("X<T>")
+          y.name shouldBe "Y"
+          y.fullName shouldBe "Y"
+          y.aliasTypeFullName shouldBe Some("Y<A,B>")
+          y.inheritsFromTypeFullName shouldBe Seq("X<A>")
       }
     }
 

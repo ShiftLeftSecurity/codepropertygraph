@@ -167,7 +167,8 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
 
   private def templateParameters(e: IASTNode): Option[String] = {
     val templateDeclaration = e match {
-      case _: IASTElaboratedTypeSpecifier | _: IASTFunctionDeclarator if e.getParent != null =>
+      case _: IASTElaboratedTypeSpecifier | _: IASTFunctionDeclarator | _: IASTCompositeTypeSpecifier
+          if e.getParent != null =>
         Some(e.getParent.getParent)
       case _: IASTFunctionDefinition if e.getParent != null =>
         Some(e.getParent)
@@ -1145,6 +1146,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     } else {
       val name = typeSpecifier.getName.toString
       val fullname = fullName(typeSpecifier)
+      val nameWithTemplateParams = templateParameters(typeSpecifier).map(fullname + _)
       List(typeSpecifier match {
         case cppClass: ICPPASTCompositeTypeSpecifier =>
           val baseClassList = cppClass.getBaseSpecifiers.toSeq.map(_.getNameSpecifier.toString)
@@ -1156,6 +1158,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
               .isExternal(false)
               .filename(typeSpecifier.getContainingFilename)
               .inheritsFromTypeFullName(baseClassList)
+              .aliasTypeFullName(nameWithTemplateParams)
               .order(order))
         case _ =>
           Ast(
@@ -1164,6 +1167,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
               .fullName(fullname)
               .isExternal(false)
               .filename(typeSpecifier.getContainingFilename)
+              .aliasTypeFullName(nameWithTemplateParams)
               .order(order))
       })
     }
