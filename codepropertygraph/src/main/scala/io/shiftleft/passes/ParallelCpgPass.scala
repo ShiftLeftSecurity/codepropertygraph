@@ -5,9 +5,9 @@ import org.slf4j.{LoggerFactory, MDC}
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.collection.mutable
-import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Option[Iterator[KeyPool]] = None)
     extends CpgPassBase {
