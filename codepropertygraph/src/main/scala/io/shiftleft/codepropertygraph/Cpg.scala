@@ -1,3 +1,4 @@
+/*
 package io.shiftleft.codepropertygraph
 
 import io.shiftleft.codepropertygraph.generated.{edges, nodes}
@@ -58,3 +59,6 @@ class Cpg(val graph: Graph = Cpg.emptyGraph) extends AutoCloseable {
   override def close(): Unit =
     graph.close
 }
+
+
+ */

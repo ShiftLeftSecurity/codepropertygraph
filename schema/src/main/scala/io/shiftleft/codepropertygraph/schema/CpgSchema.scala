@@ -33,7 +33,7 @@ class CpgSchema(builder: SchemaBuilder) {
 
 object CpgSchema {
   val instance: Schema = {
-    val builder = new SchemaBuilder("io.shiftleft.codepropertygraph.generated")
+    val builder = new SchemaBuilder("Cpg", "io.shiftleft.codepropertygraph.generated")
     new CpgSchema(builder)
     builder.build
   }

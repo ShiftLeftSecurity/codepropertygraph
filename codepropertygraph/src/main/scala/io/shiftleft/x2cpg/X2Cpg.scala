@@ -3,7 +3,7 @@ package io.shiftleft.x2cpg
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
 import org.slf4j.LoggerFactory
-import overflowdb.{Config, Graph}
+import overflowdb.Config
 import scopt.OParser
 
 object X2CpgConfig {
@@ -74,11 +74,7 @@ object X2Cpg {
       .getOrElse {
         Config.withDefaults()
       }
-
-    val graph = Graph.open(odbConfig,
-                           io.shiftleft.codepropertygraph.generated.nodes.Factories.allAsJava,
-                           io.shiftleft.codepropertygraph.generated.edges.Factories.allAsJava)
-    new Cpg(graph)
+    Cpg.withConfig(odbConfig)
   }
 
 }

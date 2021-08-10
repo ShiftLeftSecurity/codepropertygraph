@@ -1134,7 +1134,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
               .fullName(fullname)
               .isExternal(false)
               .filename(typeSpecifier.getContainingFilename)
-              .inheritsFromTypeFullName(baseClassList)
+              .inheritsFromTypeFullName(baseClassList.toIndexedSeq)
               .order(order))
         case _ =>
           Ast(
@@ -1189,7 +1189,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
               .fullName(fullname)
               .isExternal(false)
               .filename(typeSpecifier.getContainingFilename)
-              .inheritsFromTypeFullName(baseClassList)
+              .inheritsFromTypeFullName(baseClassList.toIndexedSeq)
               .order(order))
         case _ =>
           Ast(

@@ -787,7 +787,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
       .name(name)
       .fullName(name)
       .isExternal(false)
-      .inheritsFromTypeFullName(baseClassList)
+      .inheritsFromTypeFullName(baseClassList.toIndexedSeq)
       .filename(namespaceBlock.filename)
       .order(context.childNum)
 
