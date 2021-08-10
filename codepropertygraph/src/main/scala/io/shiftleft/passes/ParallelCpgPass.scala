@@ -121,14 +121,14 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
     }
   }
 }
-/* LargeChunkCpgPass is a possible replacement for ParallelCpgPass and NewStylePass.
+/* ConcurrentWriterCpgPass is a possible replacement for ParallelCpgPass and NewStylePass.
  *
  * Instead of returning an Iterator, generateParts() returns an Array. This means that the entire collection
  * of parts must live on the heap at the same time; on the other hand, there are no possible issues with iterator invalidation,
  * e.g. when running over all METHOD nodes and deleting some of them.
  *
  * Changes are applied sequentially, in the same order as the output of `runOnParts`, as opposed to `ParallelCpgPass`,
- * where the ordering of change application is non-deterministic. For this reason, LargeChunkCpgPass only accepts a single KeyPool.
+ * where the ordering of change application is non-deterministic. For this reason, ConcurrentWriterCpgPass only accepts a single KeyPool.
  *
  * However, as opposed to NewStylePass, changes are not buffered and applied in one go; instead, they are applied as the respective
  * `runOnPart` finishes, concurrently with other `runOnPart` invocations.
@@ -143,11 +143,11 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
  * methods. This may be better than using the constructor or GC, because e.g. SCPG chains of passes construct
  * passes eagerly, and releases them only when the entire chain has run.
  * */
-object LargeChunkCpgPass {
+object ConcurrentWriterCpgPass {
   val writerQueueCapacity = 4
   val producerQueueCapacity = 2 + 4 * Runtime.getRuntime().availableProcessors()
 }
-abstract class LargeChunkCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
+abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends CpgPassBase {
 
   //generate Array of parts that can be processed in parallel
@@ -157,10 +157,10 @@ abstract class LargeChunkCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", ke
   //release large data structures and external resources
   def finish(): Unit = {}
 
-  /** WARNING: runOnPart is executed in parallel to commiting of graph modifications.
+  /** WARNING: runOnPart is executed in parallel to committing of graph modifications.
     * The upshot is that it is unsafe to read ANY data from cpg, on pain of bad race conditions
     *
-    * Only use LargeChunkPass if you are _very_ sure that you avoid races.
+    * Only use ConcurrentWriterCpgPass if you are _very_ sure that you avoid races.
     *
     * E.g. adding a CFG edge to node X races with reading an AST edge of node X.
     * */
@@ -171,7 +171,7 @@ abstract class LargeChunkCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", ke
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
                                             prefix: String = ""): Unit = {
-    import LargeChunkCpgPass.producerQueueCapacity
+    import ConcurrentWriterCpgPass.producerQueueCapacity
     baseLogger.info(s"Start of enhancement: $name")
     val nanosStart = System.nanoTime()
     var nParts = 0
@@ -188,9 +188,9 @@ abstract class LargeChunkCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", ke
     writerThread.start()
     try {
       try {
-        // The idea is that we have a ringbuffer completionQueue that contains thw workunits that are currently in-flight.
+        // The idea is that we have a ringbuffer completionQueue that contains the workunits that are currently in-flight.
         // We add futures to the end of the ringbuffer, and take futures from the front.
-        // then we await the taken future from the front, and add it to the writer-queue.
+        // then we await the future from the front, and add it to the writer-queue.
         // the end result is that we get deterministic output (esp. deterministic order of changes), while having up to one
         // writer-thread and up to producerQueueCapacity many threads in-flight.
         // as opposed to ParallelCpgPass, there is no race between diffgraph-generators to enqueue into the writer -- everything
@@ -234,7 +234,7 @@ abstract class LargeChunkCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", ke
 
   private class Writer(serializedCpg: SerializedCpg, prefix: String, inverse: Boolean) extends Runnable {
 
-    val queue = new LinkedBlockingQueue[Option[DiffGraph]](LargeChunkCpgPass.writerQueueCapacity)
+    val queue = new LinkedBlockingQueue[Option[DiffGraph]](ConcurrentWriterCpgPass.writerQueueCapacity)
 
     override def run(): Unit = {
       try {

@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.receiveredges
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.HasArgumentIndex
-import io.shiftleft.passes.{DiffGraph, NewStyleSimpleCpgPass}
+import io.shiftleft.passes.{DiffGraph, SimpleCpgPass}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -20,7 +20,7 @@ import scala.jdk.CollectionConverters._
   *
   * TODO remove once not needed anymore.
   */
-class ReceiverEdgePass(cpg: Cpg) extends NewStyleSimpleCpgPass(cpg) {
+class ReceiverEdgePass(cpg: Cpg) extends SimpleCpgPass(cpg) {
   import ReceiverEdgePass.logger
 
   override def run(dstGraph: DiffGraph.Builder): Unit = {
