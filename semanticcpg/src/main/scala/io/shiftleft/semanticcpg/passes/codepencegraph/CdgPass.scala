@@ -3,11 +3,11 @@ package io.shiftleft.semanticcpg.passes.codepencegraph
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.{
-  Literal,
   Call,
   ControlStructure,
   Identifier,
   JumpTarget,
+  Literal,
   Method,
   MethodRef,
   Unknown
