@@ -271,7 +271,8 @@ object Ast extends SchemaBase {
         name = "RETURN",
         comment = """This node represents a return instruction, e.g., `return x`. Note that it does
             |NOT represent a formal return parameter as formal return parameters are
-            |represented via `METHOD_RETURN` nodes.
+            |represented via `METHOD_RETURN` nodes. The returned expression should be connected with
+            |both AST and ARGUMENT edges.
             |""".stripMargin
       )
       .protoId(30)
