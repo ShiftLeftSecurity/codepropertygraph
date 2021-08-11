@@ -184,8 +184,9 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
       }
       nanosBuilt = System.nanoTime()
       nDiff = diffGraph.size
-      val withInverse = serializedCpg != null && !serializedCpg.isEmpty && inverse
       val doSerialize = serializedCpg != null && !serializedCpg.isEmpty
+      val withInverse = doSerialize && inverse
+
       val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, withInverse, keyPool)
       if (doSerialize) {
         store(serialize(appliedDiffGraph, withInverse), generateOutFileName(prefix, outName, 0), serializedCpg)

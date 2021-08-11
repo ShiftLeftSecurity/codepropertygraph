@@ -212,11 +212,11 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
             done = true
           }
         }
-        //
       } finally {
-        writer.queue.put(None)
-        writerThread.join()
-        finish()
+        try {
+          writer.queue.put(None)
+          writerThread.join()
+        } finally { finish() }
       }
     } finally {
       // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
@@ -235,14 +235,14 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
       try {
         var terminate = false
         var index: Int = 0
+        val doSerialize = serializedCpg != null && !serializedCpg.isEmpty
+        val withInverse = doSerialize && inverse
         while (!terminate) {
           queue.take() match {
             case None =>
               baseLogger.debug("Shutting down WriterThread")
               terminate = true
             case Some(diffGraph) =>
-              val withInverse = serializedCpg != null && !serializedCpg.isEmpty && inverse
-              val doSerialize = serializedCpg != null && !serializedCpg.isEmpty
               val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, withInverse, keyPool)
               if (doSerialize) {
                 store(serialize(appliedDiffGraph, withInverse),
