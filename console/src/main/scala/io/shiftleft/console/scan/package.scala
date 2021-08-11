@@ -78,8 +78,8 @@ package object scan {
                       description: String,
                       score: Double): NewFinding = {
     NewFinding()
-      .evidence(IndexedSeq(evidence))
-      .keyValuePairs(IndexedSeq(
+      .evidence(List(evidence))
+      .keyValuePairs(List(
         NewKeyValuePair().key(FindingKeys.name).value(name),
         NewKeyValuePair().key(FindingKeys.author).value(author),
         NewKeyValuePair().key(FindingKeys.title).value(title),

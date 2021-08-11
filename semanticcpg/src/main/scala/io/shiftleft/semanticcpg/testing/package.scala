@@ -18,9 +18,9 @@ package object testing {
 
   case class MockCpg(cpg: Cpg = Cpg.emptyCpg) {
 
-    def withMetaData(language: String = Languages.C): MockCpg = withMetaData(language, IndexedSeq.empty)
+    def withMetaData(language: String = Languages.C): MockCpg = withMetaData(language, Nil)
 
-    def withMetaData(language: String, overlays: IndexedSeq[String]): MockCpg = {
+    def withMetaData(language: String, overlays: List[String]): MockCpg = {
       withCustom { (diffGraph, _) =>
         diffGraph.addNode(
           NewMetaData().language(language).overlays(overlays)

@@ -779,7 +779,7 @@ private[astcreation] class AstCreator(diffGraph: DiffGraph.Builder,
     val baseClassList = astClassDef.baseClasses.asScala.map { identifier =>
       val baseClassName = identifier.toString
       baseClassName.substring(1, baseClassName.length - 1)
-    }.toIndexedSeq
+    }.toList
 
     baseClassList.foreach(registerType)
 
