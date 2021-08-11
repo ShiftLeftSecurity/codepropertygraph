@@ -201,19 +201,21 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
         // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
         // in the reported timings, and we must have our final log message if finish() throws
         val nanosStop = System.nanoTime()
-        //MDC.put("time", s"${(nanosStop - nanosStart) * 1e-6}%.0f")
         val fracRun = if (nanosBuilt == -1) 100.0 else (nanosBuilt - nanosStart) * 100.0 / (nanosStop - nanosStart + 1)
         baseLogger.info(
           f"Enhancement $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d changes commited from ${nParts}%d parts.")
-        //MDC.remove("time")
       }
     }
   }
 }
 
+object CpgPassBase {
+  private val baseLogger: Logger = LoggerFactory.getLogger(classOf[CpgPass])
+}
+
 trait CpgPassBase {
 
-  protected val baseLogger: Logger = LoggerFactory.getLogger(classOf[CpgPass])
+  protected def baseLogger: Logger = CpgPassBase.baseLogger
 
   def createAndApply(): Unit
 

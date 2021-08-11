@@ -1,7 +1,6 @@
 package io.shiftleft.passes
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import org.slf4j.{LoggerFactory, MDC}
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.collection.mutable
@@ -88,8 +87,6 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
 
     case class DiffGraphAndKeyPool(diffGraph: Option[DiffGraph], keyPool: Option[KeyPool])
 
-    private val writeLogger = LoggerFactory.getLogger(classOf[Writer])
-
     private val queue = new LinkedBlockingQueue[DiffGraphAndKeyPool]
 
     def enqueue(diffGraph: Option[DiffGraph], keyPool: Option[KeyPool]): Unit = {
@@ -111,12 +108,12 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
                 store(overlay, name, serializedCpg)
               }
             case DiffGraphAndKeyPool(None, _) =>
-              writeLogger.debug("Shutting down WriterThread")
+              baseLogger.debug("Shutting down WriterThread")
               terminate = true
           }
         }
       } catch {
-        case exception: InterruptedException => writeLogger.warn("Interrupted WriterThread", exception)
+        case exception: InterruptedException => baseLogger.warn("Interrupted WriterThread", exception)
       }
     }
   }
@@ -225,10 +222,8 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
       // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
       // in the reported timings, and we must have our final log message if finish() throws
       val nanosStop = System.nanoTime()
-      MDC.put("time", s"${(nanosStop - nanosStart) * 1e-6}%.0f")
       baseLogger.info(
         f"Enhancement $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms. ${nDiff}%d changes commited from ${nParts}%d parts.")
-      MDC.remove("time")
     }
   }
 

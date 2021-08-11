@@ -51,14 +51,8 @@ class AstCreationPass(filenames: List[String], cpg: Cpg, keyPool: IntervalKeyPoo
       driver.parseAndWalkFile(filename, diffGraph)
       true
     } catch {
-      case ex: RuntimeException => {
-        logger.warn("Cannot parse module: " + filename + ", skipping")
-        logger.warn("Complete exception: ", ex)
-        ex.printStackTrace()
-        false
-      }
-      case _: StackOverflowError => {
-        logger.warn("Cannot parse module: " + filename + ", skipping, StackOverflow")
+      case ex: Exception => {
+        logger.warn("Cannot parse module: " + filename + ", skipping", ex)
         false
       }
     }
