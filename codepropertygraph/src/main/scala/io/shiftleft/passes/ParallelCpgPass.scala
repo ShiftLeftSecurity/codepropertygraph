@@ -141,8 +141,8 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
  * passes eagerly, and releases them only when the entire chain has run.
  * */
 object ConcurrentWriterCpgPass {
-  val writerQueueCapacity = 4
-  val producerQueueCapacity = 2 + 4 * Runtime.getRuntime().availableProcessors()
+  private val writerQueueCapacity = 4
+  private val producerQueueCapacity = 2 + 4 * Runtime.getRuntime().availableProcessors()
 }
 abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends CpgPassBase {
