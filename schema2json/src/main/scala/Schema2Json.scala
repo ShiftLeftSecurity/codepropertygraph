@@ -133,7 +133,6 @@ object Schema2Json extends App {
     cardinality match {
       case Cardinality.ZeroOrOne => "zeroOrOne"
       case Cardinality.List      => "list"
-      case Cardinality.ISeq      => "array"
       case Cardinality.One(_)    => "one"
     }
 
