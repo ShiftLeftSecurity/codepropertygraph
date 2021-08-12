@@ -1091,8 +1091,12 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
   private def pointersFor(spec: IASTDeclSpecifier, parentDecl: IASTDeclarator): String = {
     val nodeAsString = ASTStringUtil.getReturnTypeString(spec, null)
     val pointers = parentDecl.getPointerOperators
-    if (pointers.isEmpty) { nodeAsString } else {
-      s"$nodeAsString ${"* " * pointers.size}".strip()
+    val arr = parentDecl match {
+      case p: IASTArrayDeclarator => "[]" * p.getArrayModifiers.length
+      case _                      => ""
+    }
+    if (pointers.isEmpty) { s"$nodeAsString$arr" } else {
+      s"$nodeAsString$arr ${"* " * pointers.size}".strip()
     }
   }
 
@@ -1111,6 +1115,9 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       case s: IASTNamedTypeSpecifier     => s.getName.toString
       case s: IASTCompositeTypeSpecifier => s.getName.toString
       case s: IASTEnumerationSpecifier   => s.getName.toString
+      case s: IASTElaboratedTypeSpecifier if s.getParent.isInstanceOf[IASTParameterDeclaration] =>
+        val parentDecl = s.getParent.asInstanceOf[IASTParameterDeclaration].getDeclarator
+        pointersFor(s, parentDecl)
       case s: IASTElaboratedTypeSpecifier if s.getParent.isInstanceOf[IASTSimpleDeclaration] =>
         val parentDecl = s.getParent.asInstanceOf[IASTSimpleDeclaration].getDeclarators.head
         pointersFor(s, parentDecl)

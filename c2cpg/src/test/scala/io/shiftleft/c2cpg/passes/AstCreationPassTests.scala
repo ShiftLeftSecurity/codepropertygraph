@@ -299,6 +299,82 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
       }
     }
 
+    "be correct parameter in nodes as pointer with struct" in TestAstOnlyFixture("""
+       |void method(struct date *date) {
+       |  void *x = NULL;
+       |  a_struct->foo = x;
+       |  free(x);
+       |}
+       |""".stripMargin) { cpg =>
+      cpg.method.name("method").parameter.l match {
+        case List(param: MethodParameterIn) =>
+          param.typeFullName shouldBe "struct date *"
+          param.name shouldBe "date"
+        case _ => fail()
+      }
+    }
+
+    "be correct parameter in nodes as array" in TestAstOnlyFixture("""
+       |void method(int x[]) {
+       |  void *x = NULL;
+       |  a_struct->foo = x;
+       |  free(x);
+       |}
+       |""".stripMargin) { cpg =>
+      cpg.method.name("method").parameter.l match {
+        case List(param: MethodParameterIn) =>
+          param.typeFullName shouldBe "int[]"
+          param.name shouldBe "x"
+        case _ => fail()
+      }
+    }
+
+    "be correct parameter in nodes as array ptr" in TestAstOnlyFixture("""
+       |void method(int []) {
+       |  void *x = NULL;
+       |  a_struct->foo = x;
+       |  free(x);
+       |}
+       |""".stripMargin) { cpg =>
+      cpg.method.name("method").parameter.l match {
+        case List(param: MethodParameterIn) =>
+          param.typeFullName shouldBe "int[]"
+          param.name shouldBe ""
+        case _ => fail()
+      }
+    }
+
+    "be correct parameter in nodes as struct array" in TestAstOnlyFixture("""
+       |void method(a_struct_type a_struct[]) {
+       |  void *x = NULL;
+       |  a_struct->foo = x;
+       |  free(x);
+       |}
+       |""".stripMargin) { cpg =>
+      cpg.method.name("method").parameter.l match {
+        case List(param: MethodParameterIn) =>
+          param.typeFullName shouldBe "a_struct_type[]"
+          param.name shouldBe "a_struct"
+        case _ => fail()
+      }
+    }
+
+    "be correct parameter in nodes as struct array with ptr" in TestAstOnlyFixture(
+      """
+      |void method(a_struct_type *a_struct[]) {
+      |  void *x = NULL;
+      |  a_struct->foo = x;
+      |  free(x);
+      |}
+      |""".stripMargin) { cpg =>
+      cpg.method.name("method").parameter.l match {
+        case List(param: MethodParameterIn) =>
+          param.typeFullName shouldBe "a_struct_type[] *"
+          param.name shouldBe "a_struct"
+        case _ => fail()
+      }
+    }
+
     "be correct for decl assignment" in TestAstOnlyFixture("""
         |void method() {
         |  int local = 1;
