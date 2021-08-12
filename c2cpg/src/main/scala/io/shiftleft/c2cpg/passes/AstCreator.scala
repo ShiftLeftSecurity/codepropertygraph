@@ -1088,36 +1088,32 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     }
   }
 
+  private def pointersFor(spec: IASTDeclSpecifier, parentDecl: IASTDeclarator): String = {
+    val nodeAsString = ASTStringUtil.getReturnTypeString(spec, null)
+    val pointers = parentDecl.getPointerOperators
+    if (pointers.isEmpty) { nodeAsString } else {
+      s"$nodeAsString ${"* " * pointers.size}".strip()
+    }
+  }
+
   private def typeForDeclSpecifier(spec: IASTDeclSpecifier): String = {
     spec match {
       case s: IASTSimpleDeclSpecifier if s.getParent.isInstanceOf[IASTParameterDeclaration] =>
         val parentDecl = s.getParent.asInstanceOf[IASTParameterDeclaration].getDeclarator
-        val nodeAsString = ASTStringUtil.getReturnTypeString(s, null)
-        val pointers = parentDecl.getPointerOperators
-        if (pointers.isEmpty) { nodeAsString } else {
-          s"$nodeAsString ${"* " * pointers.size}".strip()
-        }
+        pointersFor(s, parentDecl)
       case s: IASTSimpleDeclSpecifier if s.getParent.isInstanceOf[IASTFunctionDefinition] =>
         val parentDecl = s.getParent.asInstanceOf[IASTFunctionDefinition].getDeclarator
         ASTStringUtil.getReturnTypeString(s, parentDecl)
       case s: IASTSimpleDeclSpecifier => ASTStringUtil.getReturnTypeString(s, null)
       case s: IASTNamedTypeSpecifier if s.getParent.isInstanceOf[IASTParameterDeclaration] =>
         val parentDecl = s.getParent.asInstanceOf[IASTParameterDeclaration].getDeclarator
-        val pointers = parentDecl.getPointerOperators
-        val nodeAsString = ASTStringUtil.getReturnTypeString(s, null)
-        if (pointers.isEmpty) { nodeAsString } else {
-          s"$nodeAsString ${"* " * pointers.size}".strip()
-        }
+        pointersFor(s, parentDecl)
       case s: IASTNamedTypeSpecifier     => s.getName.toString
       case s: IASTCompositeTypeSpecifier => s.getName.toString
       case s: IASTEnumerationSpecifier   => s.getName.toString
       case s: IASTElaboratedTypeSpecifier if s.getParent.isInstanceOf[IASTSimpleDeclaration] =>
         val parentDecl = s.getParent.asInstanceOf[IASTSimpleDeclaration].getDeclarators.head
-        val pointers = parentDecl.getPointerOperators
-        val nodeAsString = ASTStringUtil.getReturnTypeString(s, null)
-        if (pointers.isEmpty) { nodeAsString } else {
-          s"$nodeAsString ${"* " * pointers.size}".strip()
-        }
+        pointersFor(s, parentDecl)
       case s: IASTElaboratedTypeSpecifier => ASTStringUtil.getSignatureString(s, null)
       // TODO: handle other types of IASTDeclSpecifier
       case _ => Defines.anyTypeName
