@@ -1,9 +1,11 @@
 package io.shiftleft.codepropertygraph
 
-import io.shiftleft.codepropertygraph.generated.{edges, nodes}
+import overflowdb.Graph
 import overflowdb.traversal.help.TraversalHelp
-import overflowdb.{Config, Graph}
 
+/** TODO this is now being generated as well - for now we'll just forward calls to `generated.Cpg`
+  * next step is to remove this class and move remove the `generated` part from the generated package
+  */
 object Cpg {
 
   /**
@@ -27,15 +29,13 @@ object Cpg {
     * @param path to the storage file, e.g. /home/user1/overflowdb.bin
     */
   def withStorage(path: String): Cpg =
-    new Cpg(
-      Graph
-        .open(Config.withoutOverflow.withStorageLocation(path), nodes.Factories.allAsJava, edges.Factories.allAsJava))
+    new Cpg(generated.Cpg.withStorage(path).graph)
 
-  /**
-    * Returns a fresh, empty graph
-    */
-  private def emptyGraph: Graph =
-    Graph.open(Config.withoutOverflow, nodes.Factories.allAsJava, edges.Factories.allAsJava)
+  def withConfig(config: overflowdb.Config): Cpg =
+    Cpg(generated.Cpg.withConfig(config).graph)
+
+  def emptyGraph: Graph =
+    generated.Cpg.emptyGraph
 
 }
 
@@ -46,7 +46,7 @@ object Cpg {
   *
   * @param graph the underlying graph. An empty graph is created if this parameter is omitted.
   */
-class Cpg(val graph: Graph = Cpg.emptyGraph) extends AutoCloseable {
+class Cpg(val graph: Graph = generated.Cpg.emptyGraph) extends AutoCloseable {
 
   lazy val help: String =
     new TraversalHelp("io.shiftleft").forTraversalSources
