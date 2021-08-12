@@ -4,7 +4,7 @@ import better.files.File
 import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, Operators}
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators}
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should.Matchers
@@ -1081,6 +1081,16 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
     ) { cpg =>
       // TODO no step class defined for `Return` nodes
       cpg.method.name("d").ast.isReturn.astChildren.order(1).isCall.code.l shouldBe List("x * 2")
+      cpg.method
+        .name("d")
+        .ast
+        .isReturn
+        .outE(EdgeTypes.ARGUMENT)
+        .head
+        .inNode()
+        .get
+        .asInstanceOf[CallDb]
+        .code shouldBe "x * 2"
     }
 
     "be correct for binary method calls" in Fixture(

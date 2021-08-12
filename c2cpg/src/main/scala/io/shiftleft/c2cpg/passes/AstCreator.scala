@@ -971,7 +971,11 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       .lineNumber(line(ret))
       .columnNumber(column(ret))
     val expr = nullSafeAst(ret.getReturnValue, 1)
-    Ast(cpgReturn).withChild(expr)
+    val ast = Ast(cpgReturn).withChild(expr)
+    expr.root match {
+      case Some(r) => ast.withArgEdge(cpgReturn, r)
+      case None    => ast
+    }
   }
 
   private def astForBreakStatement(br: IASTBreakStatement, order: Int): Ast = {
