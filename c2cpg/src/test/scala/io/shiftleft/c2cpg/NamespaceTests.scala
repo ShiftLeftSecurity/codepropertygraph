@@ -1,44 +1,18 @@
 package io.shiftleft.c2cpg
 
-import better.files.File
-import io.shiftleft.c2cpg.C2Cpg.Config
-import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
-import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.c2cpg.fixtures.CompleteCpgFixture
 import io.shiftleft.codepropertygraph.generated.Operators
 import io.shiftleft.codepropertygraph.generated.nodes.{Call, FieldIdentifier, Identifier}
-import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.passes.CfgCreationPass
-import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
 import org.scalatest.Inside
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class NamespaceTests extends AnyWordSpec with Matchers with Inside {
-
-  private object NamespaceFixture {
-    def apply(code: String)(f: Cpg => Unit): Unit = {
-      File.usingTemporaryDirectory("c2cpgtest") { dir =>
-        val file = dir / "file1.cpp"
-        file.write(code)
-
-        val cpg = Cpg.emptyCpg
-        val keyPool = new IntervalKeyPool(1001, 2000)
-        val typesKeyPool = new IntervalKeyPool(2001, 3000)
-        val filenames = List(file.path.toAbsolutePath.toString)
-        val astCreationPass = new AstCreationPass(filenames, cpg, keyPool, Config())
-        astCreationPass.createAndApply()
-        new CfgCreationPass(cpg).createAndApply()
-        new StubRemovalPass(cpg).createAndApply()
-        new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
-        f(cpg)
-      }
-    }
-  }
+class NamespaceTests extends AnyWordSpec with Matchers with Inside with CompleteCpgFixture {
 
   "Namespaces" should {
 
-    "be correct for nested namespaces" in NamespaceFixture(
+    "be correct for nested namespaces" in CompleteCpgFixture(
       """
         |namespace Q {
         |    namespace V {   // V is a member of Q, and is fully defined within Q
@@ -90,7 +64,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside {
 
     }
 
-    "be correct for nested namespaces in C++17 style" in NamespaceFixture(
+    "be correct for nested namespaces in C++17 style" in CompleteCpgFixture(
       """
         |namespace Q::V {
         |   class C { int m(); }; // C is a member of V and is fully defined within V
@@ -133,7 +107,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside {
       }
     }
 
-    "be correct for unnamed namespaces" in NamespaceFixture(
+    "be correct for unnamed namespaces" in CompleteCpgFixture(
       """
         |namespace {
         |    int i; // defines ::(unique)::i
@@ -179,7 +153,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside {
       }
     }
 
-    "be correct for namespaces with using" in NamespaceFixture(
+    "be correct for namespaces with using" in CompleteCpgFixture(
       """
         |void f();
         |namespace A {
@@ -218,7 +192,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside {
       }
     }
 
-    "be correct for namespaces with using and synonyms" in NamespaceFixture(
+    "be correct for namespaces with using and synonyms" in CompleteCpgFixture(
       """
         |namespace A {
         |    void f(int);
@@ -263,7 +237,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside {
       }
     }
 
-    "be correct for namespaces with alias" in NamespaceFixture("""
+    "be correct for namespaces with alias" in CompleteCpgFixture("""
         |namespace foo {
         |    namespace bar {
         |         namespace baz {

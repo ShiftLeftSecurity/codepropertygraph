@@ -1,42 +1,16 @@
 package io.shiftleft.c2cpg
 
-import better.files.File
-import io.shiftleft.c2cpg.C2Cpg.Config
-import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
-import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.IntervalKeyPool
+import io.shiftleft.c2cpg.fixtures.CompleteCpgFixture
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.passes.CfgCreationPass
-import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
 import org.scalatest.Inside
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class TemplateTests extends AnyWordSpec with Matchers with Inside {
-
-  private object TemplateFixture {
-    def apply(code: String)(f: Cpg => Unit): Unit = {
-      File.usingTemporaryDirectory("c2cpgtest") { dir =>
-        val file = dir / "file1.cpp"
-        file.write(code)
-
-        val cpg = Cpg.emptyCpg
-        val keyPool = new IntervalKeyPool(1001, 2000)
-        val typesKeyPool = new IntervalKeyPool(2001, 3000)
-        val filenames = List(file.path.toAbsolutePath.toString)
-        val astCreationPass = new AstCreationPass(filenames, cpg, keyPool, Config())
-        astCreationPass.createAndApply()
-        new CfgCreationPass(cpg).createAndApply()
-        new StubRemovalPass(cpg).createAndApply()
-        new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
-        f(cpg)
-      }
-    }
-  }
+class TemplateTests extends AnyWordSpec with Matchers with Inside with CompleteCpgFixture {
 
   "Templates" should {
 
-    "be correct for class templates" in TemplateFixture("""
+    "be correct for class templates" in CompleteCpgFixture("""
         |template<class T> class X {};
         |template<typename A, typename B> class Y;
         |using A = X<int>;
@@ -59,7 +33,7 @@ class TemplateTests extends AnyWordSpec with Matchers with Inside {
       }
     }
 
-    "be correct for class templates with inheritance" in TemplateFixture(
+    "be correct for class templates with inheritance" in CompleteCpgFixture(
       """
         |template<typename T> class X;
         |template<typename A, typename B> class Y : public X<A> {};
@@ -76,7 +50,7 @@ class TemplateTests extends AnyWordSpec with Matchers with Inside {
       }
     }
 
-    "be correct for struct templates" in TemplateFixture("""
+    "be correct for struct templates" in CompleteCpgFixture("""
         |template<typename A, typename B> struct Foo;
         |""".stripMargin) { cpg =>
       inside(cpg.typeDecl.l) {
@@ -87,7 +61,7 @@ class TemplateTests extends AnyWordSpec with Matchers with Inside {
       }
     }
 
-    "be correct for function templates" in TemplateFixture("""
+    "be correct for function templates" in CompleteCpgFixture("""
        |template<class T, class U>
        |void x(T a, U b) {};
        |

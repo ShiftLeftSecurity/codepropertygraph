@@ -1,5 +1,6 @@
 package io.shiftleft.c2cpg
 
+import io.shiftleft.c2cpg.fixtures.TestProjectFixture
 import io.shiftleft.codepropertygraph.generated._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -7,7 +8,7 @@ import overflowdb._
 
 class MethodHeaderTests extends AnyWordSpec with Matchers {
 
-  private val fixture: CpgTestFixture = CpgTestFixture("methodheader")
+  private val fixture: TestProjectFixture = TestProjectFixture("methodheader")
 
   "Method header" should {
 

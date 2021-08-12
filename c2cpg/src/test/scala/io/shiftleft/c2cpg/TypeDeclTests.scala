@@ -1,5 +1,6 @@
 package io.shiftleft.c2cpg
 
+import io.shiftleft.c2cpg.fixtures.TestProjectFixture
 import io.shiftleft.codepropertygraph.generated.Properties
 import io.shiftleft.codepropertygraph.generated.nodes.{Member, TypeDecl}
 import org.scalatest.matchers.should.Matchers
@@ -8,7 +9,7 @@ import overflowdb._
 
 class TypeDeclTests extends AnyWordSpec with Matchers {
 
-  private val fixture: CpgTestFixture = CpgTestFixture("typedecl")
+  private val fixture: TestProjectFixture = TestProjectFixture("typedecl")
 
   "Type decl test project" should {
     "contain one internal type decl node for Foo" in {

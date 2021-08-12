@@ -2,6 +2,7 @@ package io.shiftleft.c2cpg.passes
 
 import better.files.File
 import io.shiftleft.c2cpg.C2Cpg.Config
+import io.shiftleft.c2cpg.fixtures.{CpgAstOnlyFixture, TestAstOnlyFixture}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators}
@@ -9,40 +10,9 @@ import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import overflowdb.traversal._
+import overflowdb.traversal.NodeOps
 
-class AstCreationPassTests extends AnyWordSpec with Matchers {
-
-  private object CpgFixture {
-    def apply(code: String, fileName: String = "file.c"): Cpg = {
-      val cpg = Cpg.emptyCpg
-      File.usingTemporaryDirectory("c2cpgtest") { dir =>
-        val file = dir / fileName
-        file.write(code)
-
-        val keyPool = new IntervalKeyPool(1001, 2000)
-        val filenames = List(file.path.toAbsolutePath.toString)
-        new AstCreationPass(filenames, cpg, keyPool, Config()).createAndApply()
-      }
-      cpg
-    }
-  }
-
-  private object Fixture {
-    def apply(code: String, fileName: String = "file.c")(f: Cpg => Unit): Unit = {
-      File.usingTemporaryDirectory("c2cpgtest") { dir =>
-        val file = dir / fileName
-        file.write(code)
-
-        val cpg = Cpg.emptyCpg
-        val keyPool = new IntervalKeyPool(1001, 2000)
-        val filenames = List(file.path.toAbsolutePath.toString)
-        new AstCreationPass(filenames, cpg, keyPool, Config()).createAndApply()
-
-        f(cpg)
-      }
-    }
-  }
+class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixture with TestAstOnlyFixture {
 
   "AstCreationPass" should {
     val cpg = Cpg.emptyCpg
@@ -65,7 +35,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
 
   "Method AST layout" should {
 
-    "be correct for simple lambda expressions" in Fixture(
+    "be correct for simple lambda expressions" in TestAstOnlyFixture(
       """
         |auto x = [] (int a, int b) -> int
         |{
@@ -132,7 +102,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for simple lambda expression in class" in Fixture(
+    "be correct for simple lambda expression in class" in TestAstOnlyFixture(
       """
         |class Foo {
         | auto x = [] (int a, int b) -> int
@@ -181,7 +151,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for simple lambda expression in class under namespaces" in Fixture(
+    "be correct for simple lambda expression in class under namespaces" in TestAstOnlyFixture(
       """
         |namespace A { class B {
         |class Foo {
@@ -231,7 +201,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct when calling a lambda" in Fixture(
+    "be correct when calling a lambda" in TestAstOnlyFixture(
       """
         |auto x = [](int n) -> int
         |{
@@ -304,7 +274,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for empty method" in Fixture("void method(int x) { }") { cpg =>
+    "be correct for empty method" in TestAstOnlyFixture("void method(int x) { }") { cpg =>
       cpg.method.name("method").astChildren.l match {
         case List(param: MethodParameterIn, _: Block, ret: MethodReturn) =>
           ret.typeFullName shouldBe "void"
@@ -314,7 +284,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for decl assignment" in Fixture("""
+    "be correct for decl assignment" in TestAstOnlyFixture("""
         |void method() {
         |  int local = 1;
         |}
@@ -341,7 +311,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
     }
 
     "be correct for decl assignment with identifier on the right" in
-      Fixture("""
+      TestAstOnlyFixture("""
           |void method(int x) {
           |  int local = x;
           |}""".stripMargin) { cpg =>
@@ -356,7 +326,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
 
     "be correct for decl assignment of multiple locals" in
-      Fixture("""
+      TestAstOnlyFixture("""
           |void method(int x, int y) {
           |  int local = x, local2 = y;
           |}""".stripMargin) { cpg =>
@@ -382,7 +352,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         }
       }
 
-    "be correct for nested expression" in Fixture("""
+    "be correct for nested expression" in TestAstOnlyFixture("""
         |void method() {
         |  int x;
         |  int y;
@@ -409,7 +379,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for nested block" in Fixture("""
+    "be correct for nested block" in TestAstOnlyFixture("""
         |void method() {
         |  int x;
         |  {
@@ -429,7 +399,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for while-loop" in Fixture("""
+    "be correct for while-loop" in TestAstOnlyFixture("""
         |void method(int x) {
         |  while (x < 1) {
         |    x += 1;
@@ -450,7 +420,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for if" in Fixture("""
+    "be correct for if" in TestAstOnlyFixture("""
         |void method(int x) {
         |  int y;
         |  if (x > 0) {
@@ -473,7 +443,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for if-else" in Fixture("""
+    "be correct for if-else" in TestAstOnlyFixture("""
         |void method(int x) {
         |  int y;
         |  if (x > 0) {
@@ -506,7 +476,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for conditional expression in call" in Fixture(
+    "be correct for conditional expression in call" in TestAstOnlyFixture(
       """
          | void method() {
          |   int x = (true ? vlc_dccp_CreateFD : vlc_datagram_CreateFD)(fd);
@@ -519,7 +489,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for conditional expression" in Fixture("""
+    "be correct for conditional expression" in TestAstOnlyFixture("""
         | void method() {
         |   int x = (foo == 1) ? bar : 0;
         | }
@@ -546,13 +516,13 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for ranged for-loop" in Fixture("""
+    "be correct for ranged for-loop" in TestAstOnlyFixture("""
        |void method() {
        |  for (int x : list) {
        |    int z = x;
        |  }
        |}""".stripMargin,
-                                                "file.cpp") { cpg =>
+                                                           "file.cpp") { cpg =>
       cpg.method.name("method").controlStructure.l match {
         case List(forStmt) =>
           forStmt.controlStructureType shouldBe ControlStructureTypes.FOR
@@ -575,7 +545,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for for-loop with multiple initializations" in Fixture("""
+    "be correct for for-loop with multiple initializations" in TestAstOnlyFixture(
+      """
         |void method(int x, int y) {
         |  for ( x = 0, y = 0; x < 1; x += 1) {
         |    int z = 0;
@@ -608,7 +579,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for unary expression '++'" in Fixture("""
+    "be correct for unary expression '++'" in TestAstOnlyFixture("""
         |void method(int x) {
         |  ++x;
         |}
@@ -623,7 +594,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .l shouldBe List("x")
     }
 
-    "be correct for call expression" in Fixture("""
+    "be correct for call expression" in TestAstOnlyFixture("""
         |void method(int x) {
         |  foo(x);
         |}
@@ -638,7 +609,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .l shouldBe List("x")
     }
 
-    "be correct for call expression returning pointer" in Fixture("""
+    "be correct for call expression returning pointer" in TestAstOnlyFixture("""
         |int * foo(int arg);
         |int * method(int x) {
         |  foo(x);
@@ -658,7 +629,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for field access" in Fixture("""
+    "be correct for field access" in TestAstOnlyFixture("""
         |void method(struct someUndefinedStruct x) {
         |  x.a;
         |}
@@ -678,7 +649,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for indirect field access" in Fixture("""
+    "be correct for indirect field access" in TestAstOnlyFixture("""
         |void method(struct someUndefinedStruct *x) {
         |  x->a;
         |}
@@ -698,7 +669,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for indirect field access in call" in Fixture("""
+    "be correct for indirect field access in call" in TestAstOnlyFixture("""
           |void method(struct someUndefinedStruct *x) {
           |  return (x->a)(1, 2);
           |}
@@ -718,7 +689,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for sizeof operator on identifier with brackets" in Fixture(
+    "be correct for sizeof operator on identifier with brackets" in TestAstOnlyFixture(
       """
         |void method() {
         |  int a;
@@ -738,7 +709,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .size shouldBe 1
     }
 
-    "be correct for sizeof operator on identifier without brackets" in Fixture(
+    "be correct for sizeof operator on identifier without brackets" in TestAstOnlyFixture(
       """
         |void method() {
         |  int a;
@@ -758,11 +729,11 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .size shouldBe 1
     }
 
-    "be correct for sizeof operator on type" in Fixture("""
+    "be correct for sizeof operator on type" in TestAstOnlyFixture("""
         |void method() {
         |  sizeof(int);
         |}""".stripMargin,
-                                                        "file.cpp") { cpg =>
+                                                                   "file.cpp") { cpg =>
       cpg.method
         .name("method")
         .ast
@@ -778,27 +749,27 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
 
   "Structural AST layout" should {
 
-    "be correct for empty method" in Fixture("""
+    "be correct for empty method" in TestAstOnlyFixture("""
        | void method() {
        | };
       """.stripMargin) { cpg =>
       cpg.method.name("method").size shouldBe 1
     }
 
-    "be correct for empty named struct" in Fixture("""
+    "be correct for empty named struct" in TestAstOnlyFixture("""
        | struct foo {
        | };
       """.stripMargin) { cpg =>
       cpg.typeDecl.name("foo").size shouldBe 1
     }
 
-    "be correct for struct decl" in Fixture("""
+    "be correct for struct decl" in TestAstOnlyFixture("""
        | struct foo;
       """.stripMargin) { cpg =>
       cpg.typeDecl.name("foo").size shouldBe 1
     }
 
-    "be correct for named struct with single field" in Fixture("""
+    "be correct for named struct with single field" in TestAstOnlyFixture("""
        | struct foo {
        |   int x;
        | };
@@ -812,7 +783,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .size shouldBe 1
     }
 
-    "be correct for named struct with multiple fields" in Fixture("""
+    "be correct for named struct with multiple fields" in TestAstOnlyFixture("""
         | struct foo {
         |   int x;
         |   int y;
@@ -822,7 +793,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.typeDecl.name("foo").member.code.toSet shouldBe Set("x", "y", "z")
     }
 
-    "be correct for named struct with nested struct" in Fixture("""
+    "be correct for named struct with nested struct" in TestAstOnlyFixture("""
         | struct foo {
         |   int x;
         |   struct bar {
@@ -850,7 +821,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for typedef struct" in Fixture(
+    "be correct for typedef struct" in TestAstOnlyFixture(
       """
         |typedef struct foo {
         |} abc;
@@ -859,7 +830,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.typeDecl.name("abc").aliasTypeFullName("foo").size shouldBe 1
     }
 
-    "be correct for typedef enum" in Fixture(
+    "be correct for typedef enum" in TestAstOnlyFixture(
       """
         |typedef enum foo {
         |} abc;
@@ -868,7 +839,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.typeDecl.name("abc").aliasTypeFullName("foo").size shouldBe 1
     }
 
-    "be correct for single inheritance" in Fixture(
+    "be correct for single inheritance" in TestAstOnlyFixture(
       """
         |class Base {public: int i;};
         |class Derived : public Base{
@@ -884,7 +855,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .count(_.inheritsFromTypeFullName == List("Base")) shouldBe 1
     }
 
-    "be correct for field access" in Fixture(
+    "be correct for field access" in TestAstOnlyFixture(
       """
         |class Foo {
         |public:
@@ -910,7 +881,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for type initializer expression" in Fixture(
+    "be correct for type initializer expression" in TestAstOnlyFixture(
       """
         |int x = (int){ 1 };
       """.stripMargin,
@@ -924,7 +895,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for static assert" in Fixture(
+    "be correct for static assert" in TestAstOnlyFixture(
       """
         |void foo(){
         | int a = 0;
@@ -942,7 +913,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for try catch" in Fixture(
+    "be correct for try catch" in TestAstOnlyFixture(
       """
         |void bar();
         |int foo(){
@@ -960,7 +931,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for constructor initializer" in Fixture(
+    "be correct for constructor initializer" in TestAstOnlyFixture(
       """
         |class Foo {
         |public:
@@ -982,7 +953,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for template class" in Fixture(
+    "be correct for template class" in TestAstOnlyFixture(
       """
         | template<class T>
         | class Y
@@ -1000,7 +971,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .size shouldBe 1
     }
 
-    "be correct for template function" in Fixture(
+    "be correct for template function" in TestAstOnlyFixture(
       """
         | template<typename T>
         | void f(T s)
@@ -1018,7 +989,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .size shouldBe 1
     }
 
-    "be correct for constructor expression" in Fixture(
+    "be correct for constructor expression" in TestAstOnlyFixture(
       """
         |class Foo {
         |public:
@@ -1040,7 +1011,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for method calls" in Fixture(
+    "be correct for method calls" in TestAstOnlyFixture(
       """
         |void foo(int x) {
         |  bar(x);
@@ -1057,7 +1028,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .size shouldBe 1
     }
 
-    "be correct for linkage specs" in Fixture(
+    "be correct for linkage specs" in TestAstOnlyFixture(
       """
         |extern "C" {
         | #include <vlc/libvlc.h>
@@ -1072,7 +1043,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.code("x = 0").l.size shouldBe 1
     }
 
-    "be correct for method returns" in Fixture(
+    "be correct for method returns" in TestAstOnlyFixture(
       """
         |int d(int x) {
         |  return x * 2;
@@ -1093,7 +1064,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
         .code shouldBe "x * 2"
     }
 
-    "be correct for binary method calls" in Fixture(
+    "be correct for binary method calls" in TestAstOnlyFixture(
       """
         |int d(int x) {
         |  return x * 2;
@@ -1103,7 +1074,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name(Operators.multiplication).code.l shouldBe List("x * 2")
     }
 
-    "be correct for unary method calls" in Fixture(
+    "be correct for unary method calls" in TestAstOnlyFixture(
       """
         |bool invert(bool b) {
         |  return !b;
@@ -1113,7 +1084,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name(Operators.logicalNot).argument(1).code.l shouldBe List("b")
     }
 
-    "be correct for unary expr" in Fixture(
+    "be correct for unary expr" in TestAstOnlyFixture(
       """
         |int strnlen (const char *str, int max)
         |    {
@@ -1132,7 +1103,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "be correct for post increment method calls" in Fixture(
+    "be correct for post increment method calls" in TestAstOnlyFixture(
       """
         |int foo(int x) {
         |  int sub = x--;
@@ -1145,7 +1116,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name(Operators.postDecrement).argument(1).code("x").size shouldBe 1
     }
 
-    "be correct for conditional expressions containing calls" in Fixture(
+    "be correct for conditional expressions containing calls" in TestAstOnlyFixture(
       """
         |int abs(int x) {
         |  return x > 0 ? x : -x;
@@ -1155,7 +1126,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name(Operators.conditional).argument.code.l shouldBe List("x > 0", "x", "-x")
     }
 
-    "be correct for sizeof expressions" in Fixture(
+    "be correct for sizeof expressions" in TestAstOnlyFixture(
       """
         |size_t int_size() {
         |  return sizeof(int);
@@ -1165,11 +1136,11 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name(Operators.sizeOf).argument(1).code.l shouldBe List("int")
     }
 
-    "be correct for label" in Fixture("void foo() { label:; }") { cpg =>
+    "be correct for label" in TestAstOnlyFixture("void foo() { label:; }") { cpg =>
       cpg.jumpTarget.code("label:;").size shouldBe 1
     }
 
-    "be correct for array indexing" in Fixture(
+    "be correct for array indexing" in TestAstOnlyFixture(
       """
         |int head(int x[]) {
         |  return x[0];
@@ -1179,7 +1150,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name(Operators.indirectIndexAccess).argument.code.l shouldBe List("x", "0")
     }
 
-    "be correct for type casts" in Fixture(
+    "be correct for type casts" in TestAstOnlyFixture(
       """
         |int trunc(long x) {
         |  return (int) x;
@@ -1189,7 +1160,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name(Operators.cast).argument.code.l shouldBe List("int", "x")
     }
 
-    "be correct for 'new' array" in Fixture(
+    "be correct for 'new' array" in TestAstOnlyFixture(
       """
         |int * alloc(int n) {
         |   int * arr = new int[n];
@@ -1202,7 +1173,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name("<operator>.new").code("new int\\[n\\]").argument.code("int").size shouldBe 1
     }
 
-    "be correct for 'new' object" in Fixture(
+    "be correct for 'new' object" in TestAstOnlyFixture(
       """
         |Foo* alloc(int n) {
         |   Foo* foo = new Foo(n, 42);
@@ -1214,7 +1185,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name("<operator>.new").codeExact("new Foo(n, 42)").argument.code("Foo").size shouldBe 1
     }
 
-    "be correct for simple 'delete'" in Fixture(
+    "be correct for simple 'delete'" in TestAstOnlyFixture(
       """
         |int delete_number(int* n) {
         |  delete n;
@@ -1225,7 +1196,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name(Operators.delete).code("delete n").argument.code("n").size shouldBe 1
     }
 
-    "be correct for array 'delete'" in Fixture(
+    "be correct for array 'delete'" in TestAstOnlyFixture(
       """
         |void delete_number(int n[]) {
         |  delete[] n;
@@ -1236,7 +1207,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name(Operators.delete).codeExact("delete[] n").argument.code("n").size shouldBe 1
     }
 
-    "be correct for const_cast" in Fixture(
+    "be correct for const_cast" in TestAstOnlyFixture(
       """
         |void foo() {
         |  int y = const_cast<int>(n);
@@ -1248,7 +1219,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name(Operators.cast).codeExact("const_cast<int>(n)").argument.code.l shouldBe List("int", "n")
     }
 
-    "be correct for static_cast" in Fixture(
+    "be correct for static_cast" in TestAstOnlyFixture(
       """
         |void foo() {
         |  int y = static_cast<int>(n);
@@ -1260,7 +1231,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name(Operators.cast).codeExact("static_cast<int>(n)").argument.code.l shouldBe List("int", "n")
     }
 
-    "be correct for dynamic_cast" in Fixture(
+    "be correct for dynamic_cast" in TestAstOnlyFixture(
       """
         |void foo() {
         |  int y = dynamic_cast<int>(n);
@@ -1272,7 +1243,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
       cpg.call.name(Operators.cast).codeExact("dynamic_cast<int>(n)").argument.code.l shouldBe List("int", "n")
     }
 
-    "be correct for reinterpret_cast" in Fixture(
+    "be correct for reinterpret_cast" in TestAstOnlyFixture(
       """
         |void foo() {
         |  int y = reinterpret_cast<int>(n);
@@ -1286,7 +1257,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
   }
 
   "AST" should {
-    "have correct line number for method content" in Fixture("""
+    "have correct line number for method content" in TestAstOnlyFixture("""
        |
        |
        |
@@ -1301,7 +1272,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
     }
 
     // for https://github.com/ShiftLeftSecurity/codepropertygraph/issues/1321
-    "have correct line numbers example 1" in Fixture("""
+    "have correct line numbers example 1" in TestAstOnlyFixture("""
        |int main() {
        |int a = 0;
        |statementthatdoesnothing();
@@ -1324,13 +1295,13 @@ class AstCreationPassTests extends AnyWordSpec with Matchers {
     // for https://github.com/ShiftLeftSecurity/codepropertygraph/issues/1321
     "have correct line/column numbers on all platforms" in {
       val windowsNewline = "\r\n"
-      val windowsFixture: Cpg = CpgFixture(
+      val windowsFixture: Cpg = CpgAstOnlyFixture(
         s"void offset() {${windowsNewline}char * data = NULL;${windowsNewline}memset(data, 'A', 100-1); /* fill with 'A's */${windowsNewline}data = dataBuffer;$windowsNewline}")
       val macNewline = "\r"
-      val macFixture: Cpg = CpgFixture(
+      val macFixture: Cpg = CpgAstOnlyFixture(
         s"void offset() {${macNewline}char * data = NULL;${macNewline}memset(data, 'A', 100-1); /* fill with 'A's */${macNewline}data = dataBuffer;$macNewline}")
       val linuxNewline = "\n"
-      val linuxFixture: Cpg = CpgFixture(
+      val linuxFixture: Cpg = CpgAstOnlyFixture(
         s"void offset() {${linuxNewline}char * data = NULL;${linuxNewline}memset(data, 'A', 100-1); /* fill with 'A's */${linuxNewline}data = dataBuffer;$linuxNewline}")
 
       val windowsLineNumbers = windowsFixture.identifier.lineNumber.l
