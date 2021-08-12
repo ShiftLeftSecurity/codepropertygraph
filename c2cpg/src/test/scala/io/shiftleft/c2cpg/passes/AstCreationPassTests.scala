@@ -284,6 +284,21 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
       }
     }
 
+    "be correct parameter in nodes as pointer" in TestAstOnlyFixture("""
+        |void method(a_struct_type *a_struct) {
+        |  void *x = NULL;
+        |  a_struct->foo = x;
+        |  free(x);
+        |}
+        |""".stripMargin) { cpg =>
+      cpg.method.name("method").parameter.l match {
+        case List(param: MethodParameterIn) =>
+          param.typeFullName shouldBe "a_struct_type *"
+          param.name shouldBe "a_struct"
+        case _ => fail()
+      }
+    }
+
     "be correct for decl assignment" in TestAstOnlyFixture("""
         |void method() {
         |  int local = 1;

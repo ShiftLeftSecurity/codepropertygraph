@@ -1100,7 +1100,14 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       case s: IASTSimpleDeclSpecifier if s.getParent.isInstanceOf[IASTFunctionDefinition] =>
         val parentDecl = s.getParent.asInstanceOf[IASTFunctionDefinition].getDeclarator
         ASTStringUtil.getReturnTypeString(s, parentDecl)
-      case s: IASTSimpleDeclSpecifier    => ASTStringUtil.getReturnTypeString(s, null)
+      case s: IASTSimpleDeclSpecifier => ASTStringUtil.getReturnTypeString(s, null)
+      case s: IASTNamedTypeSpecifier if s.getParent.isInstanceOf[IASTParameterDeclaration] =>
+        val parentDecl = s.getParent.asInstanceOf[IASTParameterDeclaration].getDeclarator
+        val pointers = parentDecl.getPointerOperators
+        val nodeAsString = ASTStringUtil.getReturnTypeString(s, null)
+        if (pointers.isEmpty) { nodeAsString } else {
+          s"$nodeAsString ${"* " * pointers.size}".strip()
+        }
       case s: IASTNamedTypeSpecifier     => s.getName.toString
       case s: IASTCompositeTypeSpecifier => s.getName.toString
       case s: IASTEnumerationSpecifier   => s.getName.toString
