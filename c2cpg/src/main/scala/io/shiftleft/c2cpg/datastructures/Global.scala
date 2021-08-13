@@ -1,4 +1,4 @@
-package io.shiftleft.c2cpg.passes
+package io.shiftleft.c2cpg.datastructures
 
 import java.util.concurrent.ConcurrentHashMap
 

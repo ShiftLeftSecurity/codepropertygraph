@@ -1,7 +1,8 @@
-package io.shiftleft.c2cpg.passes
+package io.shiftleft.c2cpg.datastructures
 
 /**
   * Handles the scope stack for tracking identifier to variable relation.
+  *
   * @tparam I Identifier type.
   * @tparam V Variable type.
   * @tparam S Scope type.

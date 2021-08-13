@@ -1,4 +1,4 @@
-package io.shiftleft.c2cpg.passes
+package io.shiftleft.c2cpg.datastructures
 
 /**
   * A single element of a scope stack.
