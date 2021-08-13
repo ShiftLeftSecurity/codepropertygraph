@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{
   AbstractNode,
   AstNode,
+  Binding,
   Block,
   Call,
   CfgNode,
@@ -28,6 +29,11 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   TypeDecl
 }
 import io.shiftleft.codepropertygraph.generated.traversal.NodeTraversalImplicits
+import io.shiftleft.semanticcpg.language.bindingextension.{
+  BindingTraversal,
+  MethodTraversal => BindingMethodTraversal,
+  TypeDeclTraversal => BindingTypeDeclTraversal
+}
 import io.shiftleft.semanticcpg.language.callgraphextension.{CallTraversal, MethodTraversal}
 import io.shiftleft.semanticcpg.language.dotextension.{AstNodeDot, CfgNodeDot}
 import io.shiftleft.semanticcpg.language.nodemethods._
@@ -108,6 +114,14 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
     new MethodTraversal(f(a))
   implicit def toCallForCallGraph[A](a: A)(implicit f: A => Traversal[Call]): CallTraversal = new CallTraversal(f(a))
   // / Call graph extension
+
+  // Binding extensions
+  implicit def toBinding[A](a: A)(implicit f: A => Traversal[Binding]): BindingTraversal =
+    new BindingTraversal(f(a))
+  implicit def toMethodForBindingExt[A](a: A)(implicit f: A => Traversal[Method]): BindingMethodTraversal =
+    new BindingMethodTraversal(f(a))
+  implicit def toTypeDeclForBindingExt[A](a: A)(implicit f: A => Traversal[TypeDecl]): BindingTypeDeclTraversal =
+    new BindingTypeDeclTraversal(f(a))
 
   implicit def toAstNodeDot[A, NodeType <: AstNode](a: A)(implicit f: A => Traversal[NodeType]): AstNodeDot[NodeType] =
     new AstNodeDot(f(a))

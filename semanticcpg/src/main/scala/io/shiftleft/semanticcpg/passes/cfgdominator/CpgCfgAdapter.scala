@@ -1,16 +1,15 @@
 package io.shiftleft.semanticcpg.passes.cfgdominator
 
-import io.shiftleft.codepropertygraph.generated.EdgeTypes
-import overflowdb.Node
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 
 import scala.jdk.CollectionConverters._
 
-class CpgCfgAdapter extends CfgAdapter[Node] {
-  override def successors(node: Node): IterableOnce[Node] = {
-    node.out(EdgeTypes.CFG).asScala
+class CpgCfgAdapter extends CfgAdapter[StoredNode] {
+  override def successors(node: StoredNode): IterableOnce[StoredNode] = {
+    node._cfgOut.asScala
   }
 
-  override def predecessors(node: Node): IterableOnce[Node] = {
-    node.in(EdgeTypes.CFG).asScala
+  override def predecessors(node: StoredNode): IterableOnce[StoredNode] = {
+    node._cfgIn.asScala
   }
 }
