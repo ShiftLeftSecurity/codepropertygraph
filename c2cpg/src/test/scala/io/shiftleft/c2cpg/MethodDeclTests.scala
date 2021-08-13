@@ -1,12 +1,13 @@
 package io.shiftleft.c2cpg
 
+import io.shiftleft.c2cpg.fixtures.TestProjectFixture
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class MethodDeclTests extends AnyWordSpec with Matchers {
 
-  private val fixture = CpgTestFixture("methoddecl")
+  private val fixture = TestProjectFixture("methoddecl")
 
   "MethodDeclTest" should {
     "omit the method declaration in presence of a definition" in {

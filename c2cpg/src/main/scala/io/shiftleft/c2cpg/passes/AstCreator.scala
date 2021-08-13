@@ -14,6 +14,7 @@ import org.eclipse.cdt.core.dom.ast.cpp._
 import org.eclipse.cdt.internal.core.dom.parser.c.{CASTFunctionDeclarator, CASTTypeId}
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalBinding
 import org.eclipse.cdt.internal.core.dom.parser.cpp.{
+  CPPASTAliasDeclaration,
   CPPASTFunctionDeclarator,
   CPPASTIdExpression,
   CPPASTQualifiedName,
@@ -164,6 +165,21 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     cleanedName.split(Defines.qualifiedNameSeparator).lastOption.getOrElse(cleanedName)
   }
 
+  private def templateParameters(e: IASTNode): Option[String] = {
+    val templateDeclaration = e match {
+      case _: IASTElaboratedTypeSpecifier | _: IASTFunctionDeclarator | _: IASTCompositeTypeSpecifier
+          if e.getParent != null =>
+        Some(e.getParent.getParent)
+      case _: IASTFunctionDefinition if e.getParent != null =>
+        Some(e.getParent)
+      case _ => None
+    }
+
+    val decl = templateDeclaration.collect { case t: ICPPASTTemplateDeclaration => t }
+    val templateParams = decl.map(d => ASTStringUtil.getTemplateParameterArray(d.getTemplateParameters))
+    templateParams.map(_.mkString("<", ",", ">"))
+  }
+
   private def fullName(node: IASTNode): String = {
     val qualifiedName = node match {
       case d: CPPASTIdExpression if d.getEvaluation.isInstanceOf[EvalBinding] =>
@@ -200,9 +216,13 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
         fullName(f.getParent) + "." + f.getDeclarator.getName.toString
       case f: IASTFunctionDefinition =>
         f.getDeclarator.getName.toString
-      case d: IASTIdExpression              => d.getName.toString
-      case _: IASTTranslationUnit           => ""
-      case u: IASTUnaryExpression           => u.getOperand.toString
+      case d: IASTIdExpression    => d.getName.toString
+      case _: IASTTranslationUnit => ""
+      case u: IASTUnaryExpression => u.getOperand.toString
+      case e: ICPPASTElaboratedTypeSpecifier if e.getParent != null =>
+        fullName(e.getParent) + "." + e.getName.toString
+      case e: ICPPASTElaboratedTypeSpecifier if e.getParent == null =>
+        e.getName.toString
       case other if other.getParent != null => fullName(other.getParent)
       case other                            => notHandledYet(other, -1); ""
     }
@@ -437,7 +457,9 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     val returnType = typeForDeclSpecifier(functDef.getDeclSpecifier)
     val name = shortName(functDef)
     val fullname = fullName(functDef)
-    val signature = returnType + " " + fullname + " " + paramListSignature(functDef, includeParamNames = false)
+    val templateParams = templateParameters(functDef).getOrElse("")
+    val signature = returnType + " " + fullname + templateParams + " " + paramListSignature(functDef,
+                                                                                            includeParamNames = false)
     val code = returnType + " " + name + " " + paramListSignature(functDef, includeParamNames = true)
     val methodNode = NewMethod()
       .name(name)
@@ -949,7 +971,11 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
       .lineNumber(line(ret))
       .columnNumber(column(ret))
     val expr = nullSafeAst(ret.getReturnValue, 1)
-    Ast(cpgReturn).withChild(expr)
+    val ast = Ast(cpgReturn).withChild(expr)
+    expr.root match {
+      case Some(r) => ast.withArgEdge(cpgReturn, r)
+      case None    => ast
+    }
   }
 
   private def astForBreakStatement(br: IASTBreakStatement, order: Int): Ast = {
@@ -1062,29 +1088,39 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     }
   }
 
+  private def pointersFor(spec: IASTDeclSpecifier, parentDecl: IASTDeclarator): String = {
+    val nodeAsString = ASTStringUtil.getReturnTypeString(spec, null)
+    val pointers = parentDecl.getPointerOperators
+    val arr = parentDecl match {
+      case p: IASTArrayDeclarator => "[]" * p.getArrayModifiers.length
+      case _                      => ""
+    }
+    if (pointers.isEmpty) { s"$nodeAsString$arr" } else {
+      s"$nodeAsString$arr ${"* " * pointers.size}".strip()
+    }
+  }
+
   private def typeForDeclSpecifier(spec: IASTDeclSpecifier): String = {
     spec match {
       case s: IASTSimpleDeclSpecifier if s.getParent.isInstanceOf[IASTParameterDeclaration] =>
         val parentDecl = s.getParent.asInstanceOf[IASTParameterDeclaration].getDeclarator
-        val nodeAsString = ASTStringUtil.getReturnTypeString(s, null)
-        val pointers = parentDecl.getPointerOperators
-        if (pointers.isEmpty) { nodeAsString } else {
-          s"$nodeAsString ${"* " * pointers.size}".strip()
-        }
+        pointersFor(s, parentDecl)
       case s: IASTSimpleDeclSpecifier if s.getParent.isInstanceOf[IASTFunctionDefinition] =>
         val parentDecl = s.getParent.asInstanceOf[IASTFunctionDefinition].getDeclarator
         ASTStringUtil.getReturnTypeString(s, parentDecl)
-      case s: IASTSimpleDeclSpecifier    => ASTStringUtil.getReturnTypeString(s, null)
+      case s: IASTSimpleDeclSpecifier => ASTStringUtil.getReturnTypeString(s, null)
+      case s: IASTNamedTypeSpecifier if s.getParent.isInstanceOf[IASTParameterDeclaration] =>
+        val parentDecl = s.getParent.asInstanceOf[IASTParameterDeclaration].getDeclarator
+        pointersFor(s, parentDecl)
       case s: IASTNamedTypeSpecifier     => s.getName.toString
       case s: IASTCompositeTypeSpecifier => s.getName.toString
       case s: IASTEnumerationSpecifier   => s.getName.toString
+      case s: IASTElaboratedTypeSpecifier if s.getParent.isInstanceOf[IASTParameterDeclaration] =>
+        val parentDecl = s.getParent.asInstanceOf[IASTParameterDeclaration].getDeclarator
+        pointersFor(s, parentDecl)
       case s: IASTElaboratedTypeSpecifier if s.getParent.isInstanceOf[IASTSimpleDeclaration] =>
         val parentDecl = s.getParent.asInstanceOf[IASTSimpleDeclaration].getDeclarators.head
-        val pointers = parentDecl.getPointerOperators
-        val nodeAsString = ASTStringUtil.getReturnTypeString(s, null)
-        if (pointers.isEmpty) { nodeAsString } else {
-          s"$nodeAsString ${"* " * pointers.size}".strip()
-        }
+        pointersFor(s, parentDecl)
       case s: IASTElaboratedTypeSpecifier => ASTStringUtil.getSignatureString(s, null)
       // TODO: handle other types of IASTDeclSpecifier
       case _ => Defines.anyTypeName
@@ -1124,6 +1160,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     } else {
       val name = typeSpecifier.getName.toString
       val fullname = fullName(typeSpecifier)
+      val nameWithTemplateParams = templateParameters(typeSpecifier).map(fullname + _)
       List(typeSpecifier match {
         case cppClass: ICPPASTCompositeTypeSpecifier =>
           val baseClassList = cppClass.getBaseSpecifiers.toSeq.map(_.getNameSpecifier.toString)
@@ -1135,6 +1172,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
               .isExternal(false)
               .filename(typeSpecifier.getContainingFilename)
               .inheritsFromTypeFullName(baseClassList)
+              .aliasTypeFullName(nameWithTemplateParams)
               .order(order))
         case _ =>
           Ast(
@@ -1143,6 +1181,7 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
               .fullName(fullname)
               .isExternal(false)
               .filename(typeSpecifier.getContainingFilename)
+              .aliasTypeFullName(nameWithTemplateParams)
               .order(order))
       })
     }
@@ -1179,27 +1218,16 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     } else {
       val name = typeSpecifier.getName.toString
       val fullname = fullName(typeSpecifier)
-      List(typeSpecifier match {
-        case cppClass: ICPPASTCompositeTypeSpecifier =>
-          val baseClassList = cppClass.getBaseSpecifiers.toSeq.map(_.getNameSpecifier.toString)
-          baseClassList.foreach(registerType)
-          Ast(
-            NewTypeDecl()
-              .name(name)
-              .fullName(fullname)
-              .isExternal(false)
-              .filename(typeSpecifier.getContainingFilename)
-              .inheritsFromTypeFullName(baseClassList)
-              .order(order))
-        case _ =>
-          Ast(
-            NewTypeDecl()
-              .name(name)
-              .fullName(fullname)
-              .isExternal(false)
-              .filename(typeSpecifier.getContainingFilename)
-              .order(order))
-      })
+      val nameWithTemplateParams = templateParameters(typeSpecifier).map(fullname + _)
+      Seq(
+        Ast(
+          NewTypeDecl()
+            .name(name)
+            .fullName(fullname)
+            .isExternal(false)
+            .aliasTypeFullName(nameWithTemplateParams)
+            .filename(typeSpecifier.getContainingFilename)
+            .order(order)))
     }
 
     typeDecls
@@ -1336,7 +1364,9 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     val returnType = typeForDeclSpecifier(funcDecl.getParent.asInstanceOf[IASTSimpleDeclaration].getDeclSpecifier)
     val name = shortName(funcDecl)
     val fullname = fullName(funcDecl)
-    val signature = returnType + " " + fullname + " " + paramListSignature(funcDecl, includeParamNames = false)
+    val templateParams = templateParameters(funcDecl).getOrElse("")
+    val signature = returnType + " " + fullname + templateParams + " " + paramListSignature(funcDecl,
+                                                                                            includeParamNames = false)
     val code = returnType + " " + name + " " + paramListSignature(funcDecl, includeParamNames = true)
     val methodNode = NewMethod()
       .name(name)
@@ -1459,8 +1489,24 @@ class AstCreator(filename: String, global: Global, config: C2Cpg.Config) {
     ast
   }
 
+  private def astForAliasDeclaration(aliasDeclaration: CPPASTAliasDeclaration, order: Int): Ast = {
+    val name = aliasDeclaration.getAlias.toString
+    val mappedName = ASTTypeUtil.getType(aliasDeclaration.getMappingTypeId)
+    val typeDeclNode = NewTypeDecl()
+      .name(name)
+      .fullName(name)
+      .aliasTypeFullName(Some(registerType(mappedName)))
+      .filename(filename)
+      .lineNumber(line(aliasDeclaration))
+      .columnNumber(column(aliasDeclaration))
+      .isExternal(false)
+      .order(order)
+    Ast(typeDeclNode)
+  }
+
   @tailrec
   private def astsForDeclaration(decl: IASTDeclaration, order: Int): Seq[Ast] = decl match {
+    case u: CPPASTAliasDeclaration => Seq(astForAliasDeclaration(u, order))
     case functDef: IASTFunctionDefinition =>
       Seq(astForFunctionDefinition(functDef, order))
     case declaration: IASTSimpleDeclaration

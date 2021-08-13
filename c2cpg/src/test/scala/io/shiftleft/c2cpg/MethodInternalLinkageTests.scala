@@ -1,14 +1,14 @@
 package io.shiftleft.c2cpg
 
+import io.shiftleft.c2cpg.fixtures.{TestProjectFixture, TraversalUtils}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, Properties}
-import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 import overflowdb.traversal._
 
-class MethodInternalLinkageTests extends AnyWordSpec with Matchers with TraversalUtils {
+class MethodInternalLinkageTests extends AnyWordSpec with TraversalUtils {
 
-  override val fixture: CpgTestFixture = CpgTestFixture("methodinternallinkage")
+  override val fixture: TestProjectFixture = TestProjectFixture("methodinternallinkage")
 
   implicit class VertexListWrapper(vertexList: List[Node]) {
     def expandAst(filterLabels: String*): List[Node] = {
