@@ -255,6 +255,14 @@ object Operators extends SchemaBase {
         valueType = ValueTypes.STRING,
         comment = "Checks the non-existence of a variable in a range or collection, e.g. `print(5 not in [1, 2, 3, 4])`"
       ),
+      Constant(name = "is",
+               value = "<operator>.is",
+               valueType = ValueTypes.STRING,
+               comment = "Checks whether a variable is of a given type"),
+      Constant(name = "isNot",
+               value = "<operator>.isNot",
+               valueType = ValueTypes.STRING,
+               comment = "Checks whether a variable is not of a given type"),
     )
 
   }
