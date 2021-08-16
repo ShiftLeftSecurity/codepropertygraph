@@ -140,6 +140,19 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CdgPass(cpg),
           new NamespaceCreator(cpg),
         )
+      case Languages.KOTLIN =>
+        Iterator(
+          new CfgCreationPass(cpg),
+          new NamespaceCreator(cpg),
+          new FileCreationPass(cpg),
+          new TypeDeclStubCreator(cpg),
+          new ContainsEdgePass(cpg),
+          new Linker(cpg),
+          new MethodDecoratorPass(cpg),
+          new StaticCallLinker(cpg),
+          new CfgDominatorPass(cpg),
+          new CdgPass(cpg),
+        )
       case _ => Iterator()
     }
   }
