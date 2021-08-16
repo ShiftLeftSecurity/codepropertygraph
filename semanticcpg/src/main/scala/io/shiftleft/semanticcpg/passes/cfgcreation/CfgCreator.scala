@@ -46,7 +46,7 @@ import overflowdb.traversal.Traversal
   * outgoing edges for which the destination node is yet to be determined as
   * the "fringe" of the control flow graph.
   */
-class CfgCreator(entryNode: Method) {
+class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
 
   import Cfg._
   import CfgCreator._
@@ -71,18 +71,12 @@ class CfgCreator(entryNode: Method) {
     * calculated by first obtaining the CFG for the method
     * and then resolving gotos.
     * */
-  def run(): Iterator[DiffGraph] = toDiffGraphs(
-    cfgForMethod(entryNode).withResolvedGotos().edges
-  )
-
-  private def toDiffGraphs(edges: List[CfgEdge]): Iterator[DiffGraph] = {
-    val diffGraph = DiffGraph.newBuilder
-    edges.foreach { edge =>
+  def run(): Unit = {
+    cfgForMethod(entryNode).withResolvedGotos().edges.foreach { edge =>
       // TODO: we are ignoring edge.edgeType because the
       //  CFG spec doesn't define an edge type at the moment
       diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.CFG)
     }
-    Iterator(diffGraph).map(_.build())
   }
 
   /**

@@ -21,7 +21,8 @@ object CdtParser {
   case class ParseResult(translationUnit: Option[IASTTranslationUnit],
                          preprocessorErrorCount: Int,
                          problems: Int,
-                         failure: Option[Throwable] = None)
+                         failure: Option[Throwable] = None,
+                         duration: Long = 0)
 
 }
 
@@ -47,8 +48,8 @@ class CdtParser(private val parseConfig: ParseConfig) extends ParseProblemsLogge
     }
   }
 
-  private def parseInternal(file: Path): (ParseResult, String) = {
-    val (results, duration) = TimeUtils.time {
+  private def parseInternal(file: Path): ParseResult = {
+    val (result, duration) = TimeUtils.time {
       val fileContent = IOUtils.readFile(file)
       val fileContentProvider = new CustomFileContentProvider()
       val lang = createParseLanguage(file)
@@ -68,19 +69,20 @@ class CdtParser(private val parseConfig: ParseConfig) extends ParseProblemsLogge
           )
       }
     }
-    (results, TimeUtils.pretty(duration))
+    result.copy(duration = duration)
   }
 
-  def parse(file: Path): ParseResult = parseInternal(file) match {
-    case (r @ ParseResult(Some(t), c, p, _), duration) =>
-      logger.info(s"Parsed '${t.getFilePath}' in $duration ($c preprocessor error(s), $p problems)")
-      r
-    case (r @ ParseResult(_, _, _, Some(e)), duration) =>
-      logger.warn(s"Failed to parse '$file' (took: $duration): ${e.getMessage}")
-      r
-    case (r @ ParseResult(_, _, _, None), duration) =>
-      logger.warn(s"Failed to parse '$file' (took: $duration)")
-      r
+  def parse(file: Path): Option[IASTTranslationUnit] = {
+    val parseResult = parseInternal(file)
+    val duration = TimeUtils.pretty(parseResult.duration)
+    parseResult match {
+      case ParseResult(Some(t), c, p, _, _) =>
+        logger.info(s"Parsed '${t.getFilePath}' in $duration ($c preprocessor error(s), $p problems)")
+        Some(t)
+      case ParseResult(_, _, _, maybeThrowable, _) =>
+        logger.warn(s"Failed to parse '$file' (took: $duration) ${maybeThrowable.map(_.getMessage)}")
+        None
+    }
   }
 
 }
