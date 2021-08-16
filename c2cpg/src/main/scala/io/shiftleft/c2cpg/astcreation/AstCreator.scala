@@ -14,7 +14,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
 
-class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Config)
+class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Config, val diffGraph: DiffGraph.Builder)
     extends AstForTypesCreator
     with AstForFunctionsCreator
     with AstForPrimitivesCreator
@@ -36,12 +36,8 @@ class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Con
   // in which they are defined. To achieve this we need this extra stack.
   protected val methodAstParentStack: Stack[NewNode] = new Stack()
 
-  protected val diffGraph: DiffGraph.Builder = DiffGraph.newBuilder
-
-  def createAst(parserResult: IASTTranslationUnit): Iterator[DiffGraph] = {
+  def createAst(parserResult: IASTTranslationUnit): Unit =
     Ast.storeInDiffGraph(astForFile(parserResult), diffGraph)
-    Iterator(diffGraph.build())
-  }
 
   private def astForFile(parserResult: IASTTranslationUnit): Ast = {
     val cpgFile = Ast(NewFile(name = filename, order = 0))
@@ -64,7 +60,6 @@ class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Con
   }
 
   private def astForTranslationUnit(iASTTranslationUnit: IASTTranslationUnit): Ast = {
-
     val absolutePath = new java.io.File(iASTTranslationUnit.getFilePath).toPath.toAbsolutePath.normalize().toString
     val namespaceBlock = NewNamespaceBlock()
       .name(NamespaceTraversal.globalNamespaceName)

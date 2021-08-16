@@ -169,7 +169,7 @@ trait AstForTypesCreator {
     }
   }
 
-  private def astForAliasDeclaration(aliasDeclaration: CPPASTAliasDeclaration, order: Int): Ast = {
+  protected def astForAliasDeclaration(aliasDeclaration: ICPPASTAliasDeclaration, order: Int): Ast = {
     val name = aliasDeclaration.getAlias.toString
     val mappedName = ASTTypeUtil.getType(aliasDeclaration.getMappingTypeId)
     val typeDeclNode = NewTypeDecl()

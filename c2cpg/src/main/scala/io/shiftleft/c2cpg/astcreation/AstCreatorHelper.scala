@@ -201,9 +201,10 @@ trait AstCreatorHelper {
           case other =>
             other.getName
         }
-      case d: IASTIdExpression    => lastNameOfQualifiedName(d.getName.toString)
-      case u: IASTUnaryExpression => shortName(u.getOperand)
-      case other                  => notHandledYet(other, -1); ""
+      case d: IASTIdExpression           => lastNameOfQualifiedName(d.getName.toString)
+      case u: IASTUnaryExpression        => shortName(u.getOperand)
+      case c: IASTFunctionCallExpression => shortName(c.getFunctionNameExpression)
+      case other                         => notHandledYet(other, -1); ""
     }
     name
   }

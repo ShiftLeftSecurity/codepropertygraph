@@ -5,8 +5,8 @@ import io.shiftleft.codepropertygraph.generated.EvaluationStrategies
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
-import org.eclipse.cdt.core.dom.ast.cpp.{ICPPASTLambdaExpression, ICPPASTTypeId}
-import org.eclipse.cdt.internal.core.dom.parser.c.{CASTFunctionDeclarator, CASTTypeId}
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTLambdaExpression
+import org.eclipse.cdt.internal.core.dom.parser.c.CASTFunctionDeclarator
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTFunctionDeclarator
 
 import scala.annotation.tailrec
@@ -43,7 +43,8 @@ trait AstForFunctionsCreator {
     case decl: IASTStandardFunctionDeclarator      => decl.getParameters.toIndexedSeq
     case defn: IASTFunctionDefinition              => parameters(defn.getDeclarator)
     case lambdaExpression: ICPPASTLambdaExpression => parameters(lambdaExpression.getDeclarator)
-    case other                                     => notHandledYet(other, -1); Seq.empty
+    case other if other != null                    => notHandledYet(other, -1); Seq.empty
+    case null                                      => Seq.empty
   }
 
   private def parameterListSignature(func: IASTNode, includeParamNames: Boolean): String = {
@@ -55,10 +56,13 @@ trait AstForFunctionsCreator {
   }
 
   protected def methodRefForLambda(lambdaExpression: ICPPASTLambdaExpression): NewMethodRef = {
-    val returnType = lambdaExpression.getDeclarator.getTrailingReturnType match {
-      case id: CASTTypeId    => typeForDeclSpecifier(id.getDeclSpecifier)
-      case id: ICPPASTTypeId => typeForDeclSpecifier(id.getDeclSpecifier)
-      case _                 => Defines.anyTypeName;
+    val returnType = lambdaExpression.getDeclarator match {
+      case declarator: IASTDeclarator =>
+        declarator.getTrailingReturnType match {
+          case id: IASTTypeId => typeForDeclSpecifier(id.getDeclSpecifier)
+          case _              => Defines.anyTypeName
+        }
+      case null => Defines.anyTypeName
     }
     val (name, fullname) = uniqueName("lambda", "", fullName(lambdaExpression))
     val signature = returnType + " " + fullname + " " + parameterListSignature(lambdaExpression,

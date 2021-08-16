@@ -51,6 +51,7 @@ trait AstForStatementsCreator {
       case usingDeclaration: ICPPASTUsingDeclaration =>
         handleUsingDeclaration(usingDeclaration)
         Seq.empty
+      case alias: ICPPASTAliasDeclaration => Seq(astForAliasDeclaration(alias, order))
       case decl =>
         Seq(astForNode(decl, order))
     }
