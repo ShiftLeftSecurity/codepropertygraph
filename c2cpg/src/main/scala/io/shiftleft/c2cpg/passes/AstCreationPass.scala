@@ -24,7 +24,7 @@ class AstCreationPass(filenames: List[String],
   override def generateParts(): Array[String] = filenames.toArray
 
   override def runOnPart(diffGraph: DiffGraph.Builder, filename: String): Unit =
-    new CdtParser(parseConfig).parse(Paths.get(filename)).map { ast =>
+    new CdtParser(parseConfig).parse(Paths.get(filename)).foreach { ast =>
       val localDiff = DiffGraph.newBuilder
       new AstCreator(filename, global, config, localDiff).createAst(ast)
       diffGraph.moveFrom(localDiff)
