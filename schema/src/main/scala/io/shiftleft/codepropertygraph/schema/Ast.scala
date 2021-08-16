@@ -219,6 +219,8 @@ object Ast extends SchemaBase {
                comment = "The constructor modifier").protoId(7),
       Constant(name = "VIRTUAL", value = "VIRTUAL", valueType = ValueTypes.STRING, comment = "The virtual modifier")
         .protoId(8),
+      Constant(name = "INTERNAL", value = "INTERNAL", valueType = ValueTypes.STRING, comment = "The internal modifier")
+        .protoId(9),
     )
 
     val modifier: NodeType = builder
