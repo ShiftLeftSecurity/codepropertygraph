@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{DispatchTypes, Operators}
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
 import org.eclipse.cdt.core.dom.ast.cpp._
-import org.eclipse.cdt.internal.core.dom.parser.cpp.{CPPASTQualifiedName, CPPASTTypeIdInitializerExpression}
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTQualifiedName
 
 trait AstForExpressionsCreator {
 
@@ -248,7 +248,7 @@ trait AstForExpressionsCreator {
     ast
   }
 
-  private def astForTypeIdInitExpression(typeIdInit: CPPASTTypeIdInitializerExpression, order: Int): Ast = {
+  private def astForTypeIdInitExpression(typeIdInit: IASTTypeIdInitializerExpression, order: Int): Ast = {
     val cpgCastExpression =
       newCallNode(typeIdInit, Operators.cast, Operators.cast, DispatchTypes.STATIC_DISPATCH, order)
 
@@ -292,7 +292,7 @@ trait AstForExpressionsCreator {
     case castExpression: IASTCastExpression                 => astForCastExpression(castExpression, order)
     case newExpression: ICPPASTNewExpression                => astForNewExpression(newExpression, order)
     case delExpression: ICPPASTDeleteExpression             => astForDeleteExpression(delExpression, order)
-    case typeIdInit: CPPASTTypeIdInitializerExpression      => astForTypeIdInitExpression(typeIdInit, order)
+    case typeIdInit: IASTTypeIdInitializerExpression        => astForTypeIdInitExpression(typeIdInit, order)
     case c: ICPPASTSimpleTypeConstructorExpression          => astForConstructorExpression(c, order)
     case lambdaExpression: ICPPASTLambdaExpression          => Ast(methodRefForLambda(lambdaExpression))
     case _                                                  => notHandledYet(expression, order)
