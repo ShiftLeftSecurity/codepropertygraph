@@ -84,7 +84,6 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
         .order(parameterOrder)
         .name(nameAndCode)
         .evaluationStrategy(EvaluationStrategies.BY_VALUE)
-        .typeFullName("ANY")
 
       dstGraph.addNode(methodParameterIn)
       dstGraph.addEdge(methodNode, methodParameterIn, EdgeTypes.AST)
@@ -93,7 +92,6 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
     val methodReturn = NewMethodReturn()
       .code("RET")
       .evaluationStrategy(EvaluationStrategies.BY_VALUE)
-      .typeFullName("ANY")
 
     dstGraph.addNode(methodReturn)
     dstGraph.addEdge(methodNode, methodReturn, EdgeTypes.AST)
@@ -101,7 +99,6 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
     val blockNode = NewBlock()
       .order(1)
       .argumentIndex(1)
-      .typeFullName("ANY")
 
     dstGraph.addNode(blockNode)
     dstGraph.addEdge(methodNode, blockNode, EdgeTypes.AST)
