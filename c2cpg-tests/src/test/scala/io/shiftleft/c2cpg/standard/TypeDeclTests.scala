@@ -55,8 +55,8 @@ class TypeDeclTests extends CCodeToCpgSuite(FileDefaults.CPP_EXT) {
     cpg.typeDecl.internal.name.toSet shouldBe Set("foo")
   }
 
-  "should find three external types (`bar`, `char`, `int`, `void`)" in {
-    cpg.typeDecl.external.name.toSet shouldBe Set("bar", "char", "int", "void")
+  "should find five external types (`bar`, `char`, `int`, `void`, `ANY`)" in {
+    cpg.typeDecl.external.name.toSet shouldBe Set("bar", "char", "int", "void", "ANY")
   }
 
   "should find two members for `foo`: `x` and `y`" in {

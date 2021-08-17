@@ -9,7 +9,7 @@ class TypeNodePassTests extends AnyWordSpec with Matchers with CpgTypeNodeFixtur
 
   "TypeNodePass" should {
     "create TYPE nodes for used types" in CpgTypeNodeFixture("int main() { int x; }") { cpg =>
-      cpg.typ.name.toSet shouldBe Set("int", "void")
+      cpg.typ.name.toSet shouldBe Set("int", "void", "ANY")
     }
   }
 
