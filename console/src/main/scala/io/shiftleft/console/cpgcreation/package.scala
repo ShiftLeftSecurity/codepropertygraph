@@ -23,6 +23,7 @@ package object cpgcreation {
       case Languages.PYTHON     => Some(PythonCpgGenerator(config.python, rootPath))
       case Languages.PHP        => Some(PhpCpgGenerator(config.php, rootPath))
       case Languages.GHIDRA     => Some(GhidraCpgGenerator(config.ghidra, rootPath))
+      case Languages.NEWC       => Some(CCpgGenerator(config.c, rootPath))
       case _                    => None
     }
   }
