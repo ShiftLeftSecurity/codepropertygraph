@@ -73,6 +73,7 @@ trait AstForExpressionsCreator {
   private def astForCallExpression(call: IASTFunctionCallExpression, order: Int): Ast = {
     // TODO: proper handling of call receiver
     val cpgCall = call.getFunctionNameExpression match {
+      case cast: IASTCastExpression        => astForCastExpression(cast, order)
       case reference: IASTFieldReference   => astForFieldReference(reference, order)
       case b: IASTBinaryExpression         => astForBinaryExpression(b, order)
       case s: IASTArraySubscriptExpression => astForArrayIndexExpression(s, order)
@@ -148,6 +149,7 @@ trait AstForExpressionsCreator {
     typeId.getOperator match {
       case op
           if op == IASTTypeIdExpression.op_sizeof ||
+            op == IASTTypeIdExpression.op_sizeofParameterPack ||
             op == IASTTypeIdExpression.op_typeid ||
             op == IASTTypeIdExpression.op_alignof ||
             op == IASTTypeIdExpression.op_typeof =>
@@ -158,7 +160,7 @@ trait AstForExpressionsCreator {
           case Some(r) => ast.withArgEdge(call, r)
           case _       => ast
         }
-      case _ => astForNode(typeId, order)
+      case _ => notHandledYet(typeId, order)
     }
   }
 

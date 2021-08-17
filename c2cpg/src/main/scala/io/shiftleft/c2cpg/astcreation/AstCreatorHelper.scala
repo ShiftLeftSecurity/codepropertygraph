@@ -3,6 +3,7 @@ package io.shiftleft.c2cpg.astcreation
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
 import org.eclipse.cdt.core.dom.ast.cpp._
+import org.eclipse.cdt.core.dom.ast.gnu.c.ICASTKnRFunctionDeclarator
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalBinding
 import org.eclipse.cdt.internal.core.dom.parser.cpp.{CPPASTIdExpression, CPPASTQualifiedName, CPPFunction}
 import org.eclipse.cdt.internal.core.model.ASTStringUtil
@@ -233,7 +234,7 @@ trait AstCreatorHelper {
     }
   }
 
-  protected def typeForDeclSpecifier(spec: IASTDeclSpecifier): String = {
+  protected def typeForDeclSpecifier(spec: IASTNode): String = {
     spec match {
       case s: IASTSimpleDeclSpecifier if s.getParent.isInstanceOf[IASTParameterDeclaration] =>
         val parentDecl = s.getParent.asInstanceOf[IASTParameterDeclaration].getDeclarator
@@ -241,7 +242,11 @@ trait AstCreatorHelper {
       case s: IASTSimpleDeclSpecifier if s.getParent.isInstanceOf[IASTFunctionDefinition] =>
         val parentDecl = s.getParent.asInstanceOf[IASTFunctionDefinition].getDeclarator
         ASTStringUtil.getReturnTypeString(s, parentDecl)
-      case s: IASTSimpleDeclSpecifier => ASTStringUtil.getReturnTypeString(s, null)
+      case s: IASTSimpleDeclaration if s.getParent.isInstanceOf[ICASTKnRFunctionDeclarator] =>
+        val decl = s.getDeclarators.head
+        pointersAsString(s.getDeclSpecifier, decl)
+      case s: IASTSimpleDeclSpecifier =>
+        ASTStringUtil.getReturnTypeString(s, null)
       case s: IASTNamedTypeSpecifier if s.getParent.isInstanceOf[IASTParameterDeclaration] =>
         val parentDecl = s.getParent.asInstanceOf[IASTParameterDeclaration].getDeclarator
         pointersAsString(s, parentDecl)
