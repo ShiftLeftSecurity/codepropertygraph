@@ -148,6 +148,7 @@ trait AstForExpressionsCreator {
     typeId.getOperator match {
       case op
           if op == IASTTypeIdExpression.op_sizeof ||
+            op == IASTTypeIdExpression.op_sizeofParameterPack ||
             op == IASTTypeIdExpression.op_typeid ||
             op == IASTTypeIdExpression.op_alignof ||
             op == IASTTypeIdExpression.op_typeof =>
@@ -158,7 +159,7 @@ trait AstForExpressionsCreator {
           case Some(r) => ast.withArgEdge(call, r)
           case _       => ast
         }
-      case _ => astForNode(typeId, order)
+      case _ => notHandledYet(typeId, order)
     }
   }
 
