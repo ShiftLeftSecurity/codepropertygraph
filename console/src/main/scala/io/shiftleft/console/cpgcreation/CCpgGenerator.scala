@@ -1,8 +1,8 @@
 package io.shiftleft.console.cpgcreation
 
-import io.shiftleft.console.CFrontendConfig
 import io.shiftleft.c2cpg.C2Cpg
 import io.shiftleft.c2cpg.C2Cpg.Config
+import io.shiftleft.console.CFrontendConfig
 
 import java.nio.file.Path
 
