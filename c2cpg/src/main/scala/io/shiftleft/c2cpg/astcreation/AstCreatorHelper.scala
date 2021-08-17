@@ -235,7 +235,7 @@ trait AstCreatorHelper {
   }
 
   protected def typeForDeclSpecifier(spec: IASTNode): String = {
-    spec match {
+    val tpe = spec match {
       case s: IASTSimpleDeclSpecifier if s.getParent.isInstanceOf[IASTParameterDeclaration] =>
         val parentDecl = s.getParent.asInstanceOf[IASTParameterDeclaration].getDeclarator
         pointersAsString(s, parentDecl)
@@ -263,6 +263,7 @@ trait AstCreatorHelper {
       // TODO: handle other types of IASTDeclSpecifier
       case _ => Defines.anyTypeName
     }
+    if (tpe.isEmpty) Defines.anyTypeName else tpe
   }
 
 }
