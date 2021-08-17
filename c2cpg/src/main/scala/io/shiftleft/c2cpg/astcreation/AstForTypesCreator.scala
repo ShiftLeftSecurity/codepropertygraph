@@ -242,54 +242,43 @@ trait AstForTypesCreator {
       astForDeclarator(typeSpecifier.getParent.asInstanceOf[IASTSimpleDeclaration], d, order + o)
     }
 
-    val typeDecls = if (declAsts.nonEmpty) {
-      declAsts
-    } else {
-      val name = typeSpecifier.getName.toString
-      val fullname = fullName(typeSpecifier)
-      val nameWithTemplateParams = templateParameters(typeSpecifier).map(fullname + _)
-      List(typeSpecifier match {
-        case cppClass: ICPPASTCompositeTypeSpecifier =>
-          val baseClassList = cppClass.getBaseSpecifiers.toSeq.map(_.getNameSpecifier.toString)
-          baseClassList.foreach(registerType)
-          Ast(
-            NewTypeDecl()
-              .name(name)
-              .fullName(fullname)
-              .isExternal(false)
-              .filename(typeSpecifier.getContainingFilename)
-              .inheritsFromTypeFullName(baseClassList)
-              .aliasTypeFullName(nameWithTemplateParams)
-              .order(order))
-        case _ =>
-          Ast(
-            NewTypeDecl()
-              .name(name)
-              .fullName(fullname)
-              .isExternal(false)
-              .filename(typeSpecifier.getContainingFilename)
-              .aliasTypeFullName(nameWithTemplateParams)
-              .order(order))
-      })
+    val name = typeSpecifier.getName.toString
+    val fullname = fullName(typeSpecifier)
+    val nameWithTemplateParams = templateParameters(typeSpecifier).map(fullname + _)
+
+    val typeDecl = typeSpecifier match {
+      case cppClass: ICPPASTCompositeTypeSpecifier =>
+        val baseClassList = cppClass.getBaseSpecifiers.toSeq.map(_.getNameSpecifier.toString)
+        baseClassList.foreach(registerType)
+        NewTypeDecl()
+          .name(name)
+          .fullName(fullname)
+          .isExternal(false)
+          .filename(typeSpecifier.getContainingFilename)
+          .inheritsFromTypeFullName(baseClassList)
+          .aliasTypeFullName(nameWithTemplateParams)
+          .order(order)
+      case _ =>
+        NewTypeDecl()
+          .name(name)
+          .fullName(fullname)
+          .isExternal(false)
+          .filename(typeSpecifier.getContainingFilename)
+          .aliasTypeFullName(nameWithTemplateParams)
+          .order(order)
     }
 
-    if (!typeDecls.exists(_.root.isDefined)) {
-      Seq(notHandledYet(typeSpecifier, order))
-    } else {
-      typeDecls.foreach { t =>
-        methodAstParentStack.push(t.root.get)
-        scope.pushNewScope(t.root.get)
-      }
-      val member = withOrder(typeSpecifier.getDeclarations(true)) { (m, o) =>
-        astsForDeclaration(m, o)
-      }.flatten
-      typeDecls.foreach { _ =>
-        methodAstParentStack.pop()
-        scope.popScope()
-      }
+    methodAstParentStack.push(typeDecl)
+    scope.pushNewScope(typeDecl)
 
-      typeDecls.map(_.withChildren(member))
-    }
+    val member = withOrder(typeSpecifier.getDeclarations(true)) { (m, o) =>
+      astsForDeclaration(m, o)
+    }.flatten
+
+    methodAstParentStack.pop()
+    scope.popScope()
+
+    declAsts :+ Ast(typeDecl).withChildren(member)
   }
 
   private def astsForElaboratedType(typeSpecifier: IASTElaboratedTypeSpecifier,
@@ -300,24 +289,20 @@ trait AstForTypesCreator {
       astForDeclarator(typeSpecifier.getParent.asInstanceOf[IASTSimpleDeclaration], d, order + o)
     }
 
-    val typeDecls = if (declAsts.nonEmpty) {
-      declAsts
-    } else {
-      val name = typeSpecifier.getName.toString
-      val fullname = fullName(typeSpecifier)
-      val nameWithTemplateParams = templateParameters(typeSpecifier).map(fullname + _)
-      Seq(
-        Ast(
-          NewTypeDecl()
-            .name(name)
-            .fullName(fullname)
-            .isExternal(false)
-            .aliasTypeFullName(nameWithTemplateParams)
-            .filename(typeSpecifier.getContainingFilename)
-            .order(order)))
-    }
+    val name = typeSpecifier.getName.toString
+    val fullname = fullName(typeSpecifier)
+    val nameWithTemplateParams = templateParameters(typeSpecifier).map(fullname + _)
 
-    typeDecls
+    val typeDecl =
+      NewTypeDecl()
+        .name(name)
+        .fullName(fullname)
+        .isExternal(false)
+        .aliasTypeFullName(nameWithTemplateParams)
+        .filename(typeSpecifier.getContainingFilename)
+        .order(order)
+
+    declAsts :+ Ast(typeDecl)
   }
 
   private def astsForEnumerator(enumerator: IASTEnumerationSpecifier.IASTEnumerator, order: Int): Seq[Ast] = {
@@ -359,40 +344,27 @@ trait AstForTypesCreator {
       astForDeclarator(enumSpecifier.getParent.asInstanceOf[IASTSimpleDeclaration], d, order + o)
     }
 
-    val typeDecls = if (declAsts.nonEmpty) {
-      declAsts
-    } else {
-      val (name, fullname) = uniqueName("enum", enumSpecifier.getName.toString, fullName(enumSpecifier))
-      List(
-        Ast(
-          NewTypeDecl()
-            .name(name)
-            .fullName(fullname)
-            .isExternal(false)
-            .filename(enumSpecifier.getContainingFilename)
-            .order(order)))
-    }
+    val (name, fullname) = uniqueName("enum", enumSpecifier.getName.toString, fullName(enumSpecifier))
+    val typeDecl = NewTypeDecl()
+      .name(name)
+      .fullName(fullname)
+      .isExternal(false)
+      .filename(enumSpecifier.getContainingFilename)
+      .order(order)
 
-    if (!typeDecls.exists(_.root.isDefined)) {
-      Seq(notHandledYet(enumSpecifier, order))
-    } else {
-      typeDecls.foreach { t =>
-        methodAstParentStack.push(t.root.get)
-        scope.pushNewScope(t.root.get)
-      }
-      var currentOrder = 0
-      val member = enumSpecifier.getEnumerators.toIndexedSeq.flatMap { e =>
-        val eCpg = astsForEnumerator(e, currentOrder)
-        currentOrder = eCpg.size + currentOrder
-        eCpg
-      }
-      typeDecls.foreach { _ =>
-        methodAstParentStack.pop()
-        scope.popScope()
-      }
+    methodAstParentStack.push(typeDecl)
+    scope.pushNewScope(typeDecl)
 
-      typeDecls.map(_.withChildren(member))
+    var currentOrder = 0
+    val member = enumSpecifier.getEnumerators.toIndexedSeq.flatMap { e =>
+      val eCpg = astsForEnumerator(e, currentOrder)
+      currentOrder = eCpg.size + currentOrder
+      eCpg
     }
+    methodAstParentStack.pop()
+    scope.popScope()
+
+    declAsts :+ Ast(typeDecl).withChildren(member)
   }
 
 }
