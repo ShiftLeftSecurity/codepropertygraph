@@ -66,7 +66,7 @@ class NodeTypeStartersTests extends FuzzyCCodeToCpgSuite {
   }
 
   "should allow retrieving (used) types" in {
-    cpg.typ.name.toSet shouldBe Set("int", "void", "char * *")
+    cpg.typ.name.toSet shouldBe Set("int", "void", "char * *", "ANY")
   }
 
   "should allow retrieving namespaces" in {

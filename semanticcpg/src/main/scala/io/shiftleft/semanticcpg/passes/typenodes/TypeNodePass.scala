@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes.typenodes
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes
+import io.shiftleft.codepropertygraph.generated.nodes.NewType
 import io.shiftleft.passes.{CpgPass, DiffGraph, KeyPool}
 
 /**
@@ -11,10 +11,17 @@ class TypeNodePass(usedTypes: List[String], cpg: Cpg, keyPool: Option[KeyPool] =
     extends CpgPass(cpg, "types", keyPool) {
   override def run(): Iterator[DiffGraph] = {
     val diffGraph = DiffGraph.newBuilder
+
+    diffGraph.addNode(
+      NewType()
+        .name("ANY")
+        .fullName("ANY")
+        .typeDeclFullName("ANY")
+    )
+
     usedTypes.sorted.foreach { typeName =>
       val shortName = typeName.split('.').lastOption.getOrElse(typeName)
-      val node = nodes
-        .NewType()
+      val node = NewType()
         .name(shortName)
         .fullName(typeName)
         .typeDeclFullName(typeName)
