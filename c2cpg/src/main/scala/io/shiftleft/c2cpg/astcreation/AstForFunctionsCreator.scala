@@ -6,6 +6,7 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTLambdaExpression
+import org.eclipse.cdt.core.dom.ast.gnu.c.ICASTKnRFunctionDeclarator
 import org.eclipse.cdt.internal.core.dom.parser.c.CASTFunctionDeclarator
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTFunctionDeclarator
 
@@ -37,20 +38,23 @@ trait AstForFunctionsCreator {
   }
 
   @tailrec
-  private def parameters(funct: IASTNode): Seq[IASTParameterDeclaration] = funct match {
+  private def parameters(funct: IASTNode): Seq[IASTNode] = funct match {
     case decl: CPPASTFunctionDeclarator            => decl.getParameters.toIndexedSeq
     case decl: CASTFunctionDeclarator              => decl.getParameters.toIndexedSeq
     case decl: IASTStandardFunctionDeclarator      => decl.getParameters.toIndexedSeq
     case defn: IASTFunctionDefinition              => parameters(defn.getDeclarator)
     case lambdaExpression: ICPPASTLambdaExpression => parameters(lambdaExpression.getDeclarator)
+    case knr: ICASTKnRFunctionDeclarator           => knr.getParameterDeclarations.toIndexedSeq
     case other if other != null                    => notHandledYet(other, -1); Seq.empty
     case null                                      => Seq.empty
   }
 
   private def parameterListSignature(func: IASTNode, includeParamNames: Boolean): String = {
     val elements =
-      if (!includeParamNames) parameters(func).map(p => typeForDeclSpecifier(p.getDeclSpecifier))
-      else
+      if (!includeParamNames) parameters(func).map {
+        case p: IASTParameterDeclaration => typeForDeclSpecifier(p.getDeclSpecifier)
+        case other                       => typeForDeclSpecifier(other)
+      } else
         parameters(func).map(p => p.getRawSignature)
     "(" + elements.mkString(",") + ")"
   }
@@ -184,11 +188,17 @@ trait AstForFunctionsCreator {
     r
   }
 
-  private def astForParameter(parameter: IASTParameterDeclaration, childNum: Int): Ast = {
-    val decl = parameter.getDeclarator
-    val name = decl.getName.getRawSignature
-    val code = parameter.getRawSignature
-    val tpe = typeForDeclSpecifier(parameter.getDeclSpecifier)
+  private def astForParameter(parameter: IASTNode, childNum: Int): Ast = {
+    val (name, code, tpe) = parameter match {
+      case p: IASTParameterDeclaration =>
+        (p.getDeclarator.getName.getRawSignature, p.getRawSignature, typeForDeclSpecifier(p.getDeclSpecifier))
+      case s: IASTSimpleDeclaration =>
+        (s.getDeclarators.headOption.map(_.getName.getRawSignature).getOrElse(uniqueName("parameter", "", "")._1),
+         s.getRawSignature,
+         typeForDeclSpecifier(s))
+      case other =>
+        (other.getRawSignature, other.getRawSignature, typeForDeclSpecifier(other))
+    }
 
     val parameterNode = NewMethodParameterIn()
       .name(name)
