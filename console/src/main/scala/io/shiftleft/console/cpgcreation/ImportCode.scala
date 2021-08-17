@@ -70,7 +70,8 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
     }
   }
 
-  class CFrontend(language: String = Languages.C, description: String = "Fuzzy Parser for C/C++") extends Frontend(language, description) {
+  class CFrontend(language: String = Languages.C, description: String = "Fuzzy Parser for C/C++")
+      extends Frontend(language, description) {
     def fromString(str: String): Option[Cpg] = {
       withCodeInTmpFile(str, "tmp.c") { dir =>
         apply(dir.path.toString)
