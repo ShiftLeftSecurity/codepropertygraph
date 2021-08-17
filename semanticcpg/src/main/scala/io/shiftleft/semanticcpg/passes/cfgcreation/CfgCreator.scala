@@ -5,7 +5,6 @@ import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeType
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgcreation.Cfg.CfgEdgeType
-import org.slf4j.LoggerFactory
 import overflowdb.traversal.Traversal
 
 /**
@@ -67,8 +66,6 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
     * */
   private val exitNode: MethodReturn = entryNode.methodReturn
 
-  private val logger = LoggerFactory.getLogger(classOf[CfgCreator])
-
   /**
     * We return the CFG as a sequence of Diff Graphs that is
     * calculated by first obtaining the CFG for the method
@@ -78,18 +75,6 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
     cfgForMethod(entryNode).withResolvedGotos().edges.foreach { edge =>
       // TODO: we are ignoring edge.edgeType because the
       //  CFG spec doesn't define an edge type at the moment
-      if (edge.src.label == "METHOD_RETURN") {
-        val file = entryNode.filename
-        val signature = entryNode.signature
-        val code = entryNode.code
-        val line = entryNode.lineNumber.getOrElse(-1)
-        logger.error(s"""Tried CFG edge from 'METHOD_RETURN' in Method
-             | file: $file
-             | signature: $signature
-             | code: $code
-             | line: $line
-             | """.stripMargin)
-      }
       diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.CFG)
     }
   }
