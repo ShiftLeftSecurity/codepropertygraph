@@ -22,5 +22,5 @@ case class GhidraCpgGenerator(config: GhidraFrontendConfig, rootPath: Path) exte
     runShellCommand(command, arguments).map(_ => outputPath)
   }
 
-  override def isAvailable: Boolean = rootPath.resolve("ghidra2cpg.sh").toFile.exists()
+  override def isAvailable: Boolean = rootPath.resolve("ghidra2cpg").toFile.exists()
 }
