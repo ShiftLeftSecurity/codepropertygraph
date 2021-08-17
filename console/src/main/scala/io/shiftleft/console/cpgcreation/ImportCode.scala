@@ -48,6 +48,7 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
   }
 
   def c: CFrontend = new CFrontend()
+  def newc: CFrontend = new CFrontend(Languages.NEWC, "Eclipse CDT Based Frontend for C/C++")
   def llvm: Frontend = new Frontend(Languages.LLVM, "LLVM Bitcode Frontend")
   def java: Frontend = new Frontend(Languages.JAVA, "Java/Dalvik Bytecode Frontend")
   def golang: Frontend = new Frontend(Languages.GOLANG, "Golang Source Frontend")
@@ -69,7 +70,8 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
     }
   }
 
-  class CFrontend extends Frontend(Languages.C, "Fuzzy Parser for C/C++") {
+  class CFrontend(language: String = Languages.C, description: String = "Fuzzy Parser for C/C++")
+      extends Frontend(language, description) {
     def fromString(str: String): Option[Cpg] = {
       withCodeInTmpFile(str, "tmp.c") { dir =>
         apply(dir.path.toString)

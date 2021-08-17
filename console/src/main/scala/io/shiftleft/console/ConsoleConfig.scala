@@ -33,7 +33,8 @@ object LanguageFrontendConfig {
   def apply(): LanguageFrontendConfig = new LanguageFrontendConfig()
 }
 
-class LanguageFrontendConfig(var csharp: CSharpFrontendConfig = CSharpFrontendConfig(),
+class LanguageFrontendConfig(var c: CFrontendConfig = CFrontendConfig(),
+                             var csharp: CSharpFrontendConfig = CSharpFrontendConfig(),
                              var fuzzyc: FuzzyCFrontendConfig = FuzzyCFrontendConfig(),
                              var go: GoFrontendConfig = GoFrontendConfig(),
                              var java: JavaFrontendConfig = JavaFrontendConfig(),
@@ -43,6 +44,7 @@ class LanguageFrontendConfig(var csharp: CSharpFrontendConfig = CSharpFrontendCo
                              var php: PhpFrontendConfig = PhpFrontendConfig(),
                              var ghidra: GhidraFrontendConfig = GhidraFrontendConfig())
 
+class CFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 class CSharpFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 class FuzzyCFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 class GoFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
@@ -53,6 +55,9 @@ class PythonFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer(
 class PhpFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 class GhidraFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
 
+object CFrontendConfig {
+  def apply(): CFrontendConfig = new CFrontendConfig()
+}
 object CSharpFrontendConfig {
   def apply(): CSharpFrontendConfig = new CSharpFrontendConfig()
 }

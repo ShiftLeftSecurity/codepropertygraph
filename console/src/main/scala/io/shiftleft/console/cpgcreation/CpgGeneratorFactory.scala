@@ -49,7 +49,8 @@ class CpgGeneratorFactory(config: ConsoleConfig) {
       Languages.FUZZY_TEST_LANG,
       Languages.LLVM,
       Languages.PHP,
-      Languages.KOTLIN
+      Languages.KOTLIN,
+      Languages.NEWC
     ).contains(language)
   }
 
