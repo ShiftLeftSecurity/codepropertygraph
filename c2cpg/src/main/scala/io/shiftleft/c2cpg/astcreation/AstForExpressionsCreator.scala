@@ -73,6 +73,7 @@ trait AstForExpressionsCreator {
   private def astForCallExpression(call: IASTFunctionCallExpression, order: Int): Ast = {
     // TODO: proper handling of call receiver
     val cpgCall = call.getFunctionNameExpression match {
+      case cast: IASTCastExpression        => astForCastExpression(cast, order)
       case reference: IASTFieldReference   => astForFieldReference(reference, order)
       case b: IASTBinaryExpression         => astForBinaryExpression(b, order)
       case s: IASTArraySubscriptExpression => astForArrayIndexExpression(s, order)
