@@ -19,8 +19,8 @@ trait AstForFunctionsCreator {
   private def createFunctionTypeAndTypeDecl(method: NewMethod,
                                             methodName: String,
                                             methodFullName: String,
-                                            signature: String): Unit = {
-    val parentNode: NewNode = methodAstParentStack.find(_.isInstanceOf[NewTypeDecl]).getOrElse {
+                                            signature: String): Ast = {
+    val parentNode: NewTypeDecl = methodAstParentStack.collectFirst { case t: NewTypeDecl => t }.getOrElse {
       val astParentType = methodAstParentStack.head.label
       val astParentFullName = methodAstParentStack.head.properties("FULL_NAME").toString
       val newTypeDeclNode = NewTypeDecl()
@@ -32,9 +32,10 @@ trait AstForFunctionsCreator {
       newTypeDeclNode
     }
 
+    method.astParentFullName = parentNode.fullName
+    method.astParentType = parentNode.label
     val functionBinding = NewBinding().name(methodName).signature(signature)
-    val ast = Ast().withBindsEdge(parentNode, functionBinding).withRefEdge(functionBinding, method)
-    Ast.storeInDiffGraph(ast, diffGraph)
+    Ast(functionBinding).withBindsEdge(parentNode, functionBinding).withRefEdge(functionBinding, method)
   }
 
   @tailrec
@@ -72,7 +73,7 @@ trait AstForFunctionsCreator {
     val signature = returnType + " " + fullname + " " + parameterListSignature(lambdaExpression,
                                                                                includeParamNames = false)
     val code = returnType + " " + name + " " + parameterListSignature(lambdaExpression, includeParamNames = true)
-    val methodNode = NewMethod()
+    val methodNode: NewMethod = NewMethod()
       .name(name)
       .code(code)
       .isExternal(false)
@@ -83,26 +84,25 @@ trait AstForFunctionsCreator {
       .columnNumberEnd(columnEnd(lambdaExpression))
       .signature(signature)
       .filename(filename)
-    val methodRefNode = createMethodRefNode(code, fullname, lambdaExpression)
 
     scope.pushNewScope(methodNode)
-
     val parameterAsts = withOrder(parameters(lambdaExpression.getDeclarator)) { (p, o) =>
       astForParameter(p, o)
     }
 
     val lastOrder = 1 + parameterAsts.size
+
     val r = Ast(methodNode)
       .withChildren(parameterAsts)
       .withChild(astForMethodReturn(lambdaExpression, lastOrder, returnType))
 
-    Ast.storeInDiffGraph(r, diffGraph)
-
     scope.popScope()
+    val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
 
-    createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
+    Ast.storeInDiffGraph(r, diffGraph)
+    Ast.storeInDiffGraph(typeDeclAst, diffGraph)
 
-    methodRefNode
+    createMethodRefNode(code, fullname, methodNode.astParentFullName, lambdaExpression)
   }
 
   protected def astForFunctionDeclarator(funcDecl: IASTFunctionDeclarator, order: Int): Ast = {
@@ -140,7 +140,8 @@ trait AstForFunctionsCreator {
 
     scope.popScope()
 
-    createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
+    val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
+    Ast.storeInDiffGraph(typeDeclAst, diffGraph)
 
     r
   }
@@ -183,7 +184,8 @@ trait AstForFunctionsCreator {
     scope.popScope()
     methodAstParentStack.pop()
 
-    createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
+    val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
+    Ast.storeInDiffGraph(typeDeclAst, diffGraph)
 
     r
   }

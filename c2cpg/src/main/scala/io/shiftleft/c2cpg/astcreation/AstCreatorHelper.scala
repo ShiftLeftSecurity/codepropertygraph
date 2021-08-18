@@ -12,12 +12,6 @@ trait AstCreatorHelper {
 
   this: AstCreator =>
 
-  object Defines {
-    val anyTypeName = "ANY"
-    val voidTypeName = "void"
-    val qualifiedNameSeparator = "::"
-  }
-
   private var usedNames: Int = 0
 
   protected def uniqueName(target: String, name: String, fullName: String): (String, String) = {

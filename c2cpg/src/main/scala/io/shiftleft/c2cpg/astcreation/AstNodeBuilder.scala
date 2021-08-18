@@ -16,11 +16,14 @@ trait AstNodeBuilder {
       .lineNumber(line(node))
       .columnNumber(column(node))
 
-  protected def createMethodRefNode(code: String, methodFullName: String, node: IASTNode): NewMethodRef =
+  protected def createMethodRefNode(code: String,
+                                    methodFullName: String,
+                                    typeFullName: String,
+                                    node: IASTNode): NewMethodRef =
     NewMethodRef()
       .code(code)
       .methodFullName(methodFullName)
-      .typeFullName(methodFullName)
+      .typeFullName(typeFullName)
       .lineNumber(line(node))
       .columnNumber(column(node))
 

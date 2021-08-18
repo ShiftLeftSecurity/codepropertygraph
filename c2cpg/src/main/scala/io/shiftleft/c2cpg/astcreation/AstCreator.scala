@@ -31,9 +31,9 @@ class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Con
 
   protected val usingDeclarationMappings: mutable.Map[String, String] = mutable.HashMap.empty
 
-  // Lambdas are not put in the AST where they are defined.
-  // Instead we put them directly under the TYPE_DECL (or METHOD of not parent TYPE_DECL is available)
-  // in which they are defined. To achieve this we need this extra stack.
+  // TypeDecls with their bindings (with their refs) for lambdas and methods are not put in the AST
+  // where the respective nodes are defined. Instead we put them under the parent TYPE_DECL in which they are defined.
+  // To achieve this we need this extra stack.
   protected val methodAstParentStack: Stack[NewNode] = new Stack()
 
   def createAst(parserResult: IASTTranslationUnit): Unit =
