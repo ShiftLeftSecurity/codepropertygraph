@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg.passes
 
 import io.shiftleft.c2cpg.C2Cpg
-import io.shiftleft.c2cpg.astcreation.AstCreator
+import io.shiftleft.c2cpg.astcreation.{AstCreator, Defines}
 import io.shiftleft.c2cpg.datastructures.Global
 import io.shiftleft.c2cpg.parser.{CdtParser, ParseConfig}
 import io.shiftleft.codepropertygraph.Cpg
@@ -19,7 +19,8 @@ class AstCreationPass(filenames: List[String],
 
   private val global: Global = Global()
 
-  def usedTypes(): List[String] = global.usedTypes.keys().asScala.toList
+  def usedTypes(): List[String] =
+    global.usedTypes.keys().asScala.filterNot(_ == Defines.anyTypeName).toSet.toList
 
   override def generateParts(): Array[String] = filenames.toArray
 
