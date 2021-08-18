@@ -100,8 +100,10 @@ trait AstForExpressionsCreator {
         (DispatchTypes.DYNAMIC_DISPATCH, rec.root.get.asInstanceOf[NewMethodRef].methodFullName)
       case _ if rec.root.exists(_.isInstanceOf[NewIdentifier]) =>
         (DispatchTypes.STATIC_DISPATCH, rec.root.get.asInstanceOf[NewIdentifier].name)
-      case other =>
-        (DispatchTypes.DYNAMIC_DISPATCH, other.getRawSignature)
+      case reference: IASTIdExpression =>
+        (DispatchTypes.STATIC_DISPATCH, reference.getRawSignature)
+      case _ =>
+        (DispatchTypes.DYNAMIC_DISPATCH, "")
     }
 
     val cpgCall = Ast(newCallNode(call, name, name, dd, order))
