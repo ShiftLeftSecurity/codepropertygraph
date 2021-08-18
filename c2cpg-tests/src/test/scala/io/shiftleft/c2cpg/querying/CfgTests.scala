@@ -37,7 +37,7 @@ class CfgTests extends CCodeToCpgSuite {
   }
 
   "should find that printf post dominates all" in {
-    cpg.call("printf").postDominates.size shouldBe 12
+    cpg.call("printf").postDominates.size shouldBe 14
   }
 
   "should find that method does not post dominate anything" in {

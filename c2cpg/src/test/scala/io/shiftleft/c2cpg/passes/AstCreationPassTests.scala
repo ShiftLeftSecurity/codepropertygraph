@@ -5,7 +5,7 @@ import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.fixtures.{CpgAstOnlyFixture, TestAstOnlyFixture}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators}
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, DispatchTypes, EdgeTypes, Operators}
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should.Matchers
@@ -276,10 +276,35 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
         case _ => fail()
       }
 
+      cpg.call("x").l match {
+        case List(lambda1call) =>
+          lambda1call.name shouldBe "x"
+          lambda1call.methodFullName shouldBe "x"
+          lambda1call.dispatchType shouldBe DispatchTypes.STATIC_DISPATCH
+          lambda1call.astChildren.l match {
+            case List(id: Identifier, lit: Literal) =>
+              id.name shouldBe "x"
+              lit.code shouldBe "10"
+            case _ => fail()
+          }
+          lambda1call.argument.l match {
+            case List(lit: Literal) =>
+              lit.code shouldBe "10"
+            case _ => fail()
+          }
+          lambda1call.receiver.l match {
+            case List(id: Identifier) =>
+              id.name shouldBe "x"
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+
       cpg.call(lambda2Name).l match {
         case List(lambda2call) =>
           lambda2call.name shouldBe lambda2Name
           lambda2call.methodFullName shouldBe lambda2Name
+          lambda2call.dispatchType shouldBe DispatchTypes.DYNAMIC_DISPATCH
           lambda2call.astChildren.l match {
             case List(ref: MethodRef, lit: Literal) =>
               ref.methodFullName shouldBe lambda2Name
@@ -288,10 +313,14 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
             case _ => fail()
           }
           lambda2call.argument.l match {
-            case List(ref: MethodRef, lit: Literal) =>
+            case List(lit: Literal) =>
+              lit.code shouldBe "10"
+            case _ => fail()
+          }
+          lambda2call.receiver.l match {
+            case List(ref: MethodRef) =>
               ref.methodFullName shouldBe lambda2Name
               ref.code shouldBe "int anonymous_lambda_1 (int n)"
-              lit.code shouldBe "10"
             case _ => fail()
           }
         case _ => fail()
@@ -616,8 +645,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
       cpg.method.name("method").ast.isCall.name(Operators.conditional).l match {
         case List(call) =>
           call.code shouldBe "(foo == 1) ? bar : 0"
-          // TODO call.argument => call.argument
-          call.start.argument.l match {
+          call.argument.l match {
             case List(condition, trueBranch, falseBranch) =>
               condition.argumentIndex shouldBe 1
               condition.code shouldBe "foo == 1"
@@ -732,13 +760,11 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
       """.stripMargin) { cpg =>
       cpg.method.name("method").ast.isCall.l match {
         case List(call: Call) =>
-          call.name shouldBe "foo"
-          // TODO: fix call receiver
-          // call.dispatchType shouldBe DispatchTypes.DYNAMIC_DISPATCH
-          // val rec = call.receiver.l
-          // rec.length shouldBe 1
-          // rec.head.code shouldBe "foo"
-          // call.argument(0).code shouldBe "foo"
+          call.code shouldBe "foo(x)"
+          call.dispatchType shouldBe DispatchTypes.STATIC_DISPATCH
+          val rec = call.receiver.l
+          rec.length shouldBe 1
+          rec.head.code shouldBe "foo"
           call.argument(1).code shouldBe "x"
         case _ => fail()
       }
@@ -1396,9 +1422,11 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
        |}
       """.stripMargin) { cpg =>
       cpg.identifier.l match {
-        case List(a, b, c) =>
+        case List(a, st, b, c) =>
           a.lineNumber shouldBe Some(3)
           a.columnNumber shouldBe Some(4)
+          st.lineNumber shouldBe Some(4)
+          st.columnNumber shouldBe Some(0)
           b.lineNumber shouldBe Some(5)
           b.columnNumber shouldBe Some(4)
           c.lineNumber shouldBe Some(6)
