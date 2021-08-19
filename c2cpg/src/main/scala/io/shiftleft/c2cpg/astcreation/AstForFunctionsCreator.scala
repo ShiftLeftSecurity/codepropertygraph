@@ -23,11 +23,7 @@ trait AstForFunctionsCreator {
     val parentNode: NewTypeDecl = methodAstParentStack.collectFirst { case t: NewTypeDecl => t }.getOrElse {
       val astParentType = methodAstParentStack.head.label
       val astParentFullName = methodAstParentStack.head.properties("FULL_NAME").toString
-      val newTypeDeclNode = NewTypeDecl()
-        .name(methodName)
-        .fullName(methodFullName)
-        .astParentType(astParentType)
-        .astParentFullName(astParentFullName)
+      val newTypeDeclNode = newTypeDecl(methodName, methodFullName, astParentType, astParentFullName)
       Ast.storeInDiffGraph(Ast(newTypeDeclNode), diffGraph)
       newTypeDeclNode
     }
@@ -102,7 +98,7 @@ trait AstForFunctionsCreator {
     Ast.storeInDiffGraph(r, diffGraph)
     Ast.storeInDiffGraph(typeDeclAst, diffGraph)
 
-    createMethodRefNode(code, fullname, methodNode.astParentFullName, lambdaExpression)
+    newMethodRefNode(code, fullname, methodNode.astParentFullName, lambdaExpression)
   }
 
   protected def astForFunctionDeclarator(funcDecl: IASTFunctionDeclarator, order: Int): Ast = {
