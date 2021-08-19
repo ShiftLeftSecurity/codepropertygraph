@@ -38,6 +38,7 @@ trait AstForPrimitivesCreator {
       case None if ident.getParent.isInstanceOf[IASTDeclarator] =>
         ASTTypeUtil.getNodeType(ident.getParent.asInstanceOf[IASTDeclarator]) match {
           case t if t == "?" || t.isEmpty => Defines.anyTypeName
+          case t if t.endsWith("*")       => "*"
           case t                          => t
         }
       case None =>
