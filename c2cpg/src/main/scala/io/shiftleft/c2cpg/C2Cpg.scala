@@ -2,7 +2,7 @@ package io.shiftleft.c2cpg
 
 import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.parser.{FileDefaults, ParseConfig}
-import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
+import io.shiftleft.c2cpg.passes.AstCreationPass
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.IntervalKeyPool
@@ -45,7 +45,6 @@ class C2Cpg {
     val astCreationPass = new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, createParseConfig(config))
     astCreationPass.createAndApply()
     new CfgCreationPass(cpg).createAndApply()
-    new StubRemovalPass(cpg).createAndApply()
     new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
     cpg
   }

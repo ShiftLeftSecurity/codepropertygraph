@@ -2,7 +2,7 @@ package io.shiftleft.c2cpg.fixtures
 
 import better.files.File
 import io.shiftleft.c2cpg.C2Cpg.Config
-import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
+import io.shiftleft.c2cpg.passes.AstCreationPass
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
@@ -20,7 +20,6 @@ object CompleteCpgFixture {
       val astCreationPass = new AstCreationPass(filenames, cpg, keyPool, Config())
       astCreationPass.createAndApply()
       new CfgCreationPass(cpg).createAndApply()
-      new StubRemovalPass(cpg).createAndApply()
       new TypeNodePass(astCreationPass.usedTypes(), cpg).createAndApply()
       f(cpg)
     }

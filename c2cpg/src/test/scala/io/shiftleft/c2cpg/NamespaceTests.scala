@@ -33,11 +33,8 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
         |    { return 0 ; }
         |}
         |""".stripMargin) { cpg =>
-      inside(cpg.method.fullName.l) {
-        case List(f, h, m) =>
-          // TODO: this might be a bug. h is declared inside of f but as extern.
-          //  Looks like extern is not part of the Eclipse CDT AST:
-          h shouldBe "Q.V.f.h"
+      inside(cpg.method.isNotStub.fullName.l) {
+        case List(f, m) =>
           f shouldBe "Q.V.f"
           m shouldBe "Q.V.C.m"
       }
