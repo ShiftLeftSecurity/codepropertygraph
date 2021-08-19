@@ -93,13 +93,13 @@ trait AstForExpressionsCreator {
 
     val (dd, name) = call.getFunctionNameExpression match {
       case _: ICPPASTLambdaExpression =>
-        (DispatchTypes.DYNAMIC_DISPATCH, rec.root.get.asInstanceOf[NewMethodRef].methodFullName)
+        (DispatchTypes.STATIC_DISPATCH, rec.root.get.asInstanceOf[NewMethodRef].methodFullName)
       case _ if rec.root.exists(_.isInstanceOf[NewIdentifier]) =>
         (DispatchTypes.STATIC_DISPATCH, rec.root.get.asInstanceOf[NewIdentifier].name)
       case reference: IASTIdExpression =>
         (DispatchTypes.STATIC_DISPATCH, reference.getRawSignature)
       case _ =>
-        (DispatchTypes.DYNAMIC_DISPATCH, "")
+        (DispatchTypes.STATIC_DISPATCH, "")
     }
 
     val cpgCall = Ast(newCallNode(call, name, name, dd, order))

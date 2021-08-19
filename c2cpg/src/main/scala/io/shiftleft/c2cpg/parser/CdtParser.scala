@@ -41,7 +41,7 @@ class CdtParser(private val parseConfig: ParseConfig) extends ParseProblemsLogge
 
   private def createParseLanguage(file: Path): ILanguage = {
     val fileAsString = file.toString
-    if (fileAsString.endsWith(FileDefaults.CPP_EXT)) {
+    if (fileAsString.endsWith(FileDefaults.CPP_EXT) || fileAsString.endsWith(FileDefaults.CPP_HEADER_EXT)) {
       new GPPLanguage()
     } else {
       new GCCLanguage()
