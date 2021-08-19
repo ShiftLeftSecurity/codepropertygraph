@@ -143,37 +143,39 @@ trait AstCreatorHelper {
           case other => other.getName
         }
       case alias: ICPPASTNamespaceAlias => alias.getMappingName.toString
-      case namespace: ICPPASTNamespaceDefinition if namespace.getName.getBinding != null =>
-        namespace.getName.getBinding.toString
-      case namespace: ICPPASTNamespaceDefinition if namespace.getParent.isInstanceOf[ICPPASTNamespaceDefinition] =>
-        fullName(namespace.getParent) + "." + namespace.getName.toString
-      case namespace: ICPPASTNamespaceDefinition if !namespace.getParent.isInstanceOf[ICPPASTNamespaceDefinition] =>
-        namespace.getName.toString
-      case cppClass: ICPPASTCompositeTypeSpecifier if cppClass.getName.getBinding.isInstanceOf[ICPPBinding] =>
-        ASTTypeUtil.getQualifiedName(cppClass.getName.getBinding.asInstanceOf[ICPPBinding])
-      case enum: IASTEnumerationSpecifier if enum.getParent != null =>
+      case namespace: ICPPASTNamespaceDefinition if namespace.getName.getRawSignature.nonEmpty =>
+        fullName(namespace.getParent) + "." + namespace.getName.getRawSignature
+      case namespace: ICPPASTNamespaceDefinition if namespace.getName.getRawSignature.isEmpty =>
+        fullName(namespace.getParent) + "." + uniqueName("namespace", "", "")._1
+      case cppClass: ICPPASTCompositeTypeSpecifier if cppClass.getName.getRawSignature.nonEmpty =>
+        fullName(cppClass.getParent) + "." + cppClass.getName.toString
+      case cppClass: ICPPASTCompositeTypeSpecifier if cppClass.getName.getRawSignature.isEmpty =>
+        val name = cppClass.getParent match {
+          case decl: IASTSimpleDeclaration =>
+            decl.getDeclarators.headOption
+              .map(_.getName.getRawSignature)
+              .getOrElse(uniqueName("composite_type", "", "")._1)
+          case _ => uniqueName("composite_type", "", "")._1
+        }
+        val fullname = s"${fullName(cppClass.getParent)}.$name"
+        fullname
+      case enum: IASTEnumerationSpecifier =>
         fullName(enum.getParent) + "." + enum.getName.toString
-      case enum: IASTEnumerationSpecifier => enum.getName.toString
-      case c: IASTCompositeTypeSpecifier  => c.getName.toString
-      case f: IASTFunctionDeclarator if f.getParent != null =>
-        fullName(f.getParent) + "." + f.getName.toString
-      case f: ICPPASTLambdaExpression if f.getParent != null =>
-        fullName(f.getParent) + "."
+      case c: IASTCompositeTypeSpecifier => c.getName.toString
       case f: IASTFunctionDeclarator =>
-        f.getName.toString
-      case f: IASTFunctionDefinition if f.getParent != null =>
-        fullName(f.getParent) + "." + f.getDeclarator.getName.toString
+        fullName(f.getParent) + "." + f.getName.toString
+      case f: ICPPASTLambdaExpression =>
+        fullName(f.getParent) + "."
       case f: IASTFunctionDefinition =>
-        f.getDeclarator.getName.toString
+        fullName(f.getParent) + "." + f.getDeclarator.getName.toString
       case d: IASTIdExpression    => d.getName.toString
       case _: IASTTranslationUnit => ""
       case u: IASTUnaryExpression => u.getOperand.toString
-      case e: ICPPASTElaboratedTypeSpecifier if e.getParent != null =>
+      case e: ICPPASTElaboratedTypeSpecifier =>
         fullName(e.getParent) + "." + e.getName.toString
-      case e: ICPPASTElaboratedTypeSpecifier if e.getParent == null =>
-        e.getName.toString
       case other if other.getParent != null => fullName(other.getParent)
-      case other                            => notHandledYet(other, -1); ""
+      case other if other != null           => notHandledYet(other, -1); ""
+      case null                             => ""
     }
     val cleaned = fixQualifiedName(qualifiedName)
     if (cleaned.startsWith(".")) {
