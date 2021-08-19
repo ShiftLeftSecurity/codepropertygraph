@@ -23,11 +23,7 @@ trait AstForFunctionsCreator {
     val parentNode: NewTypeDecl = methodAstParentStack.collectFirst { case t: NewTypeDecl => t }.getOrElse {
       val astParentType = methodAstParentStack.head.label
       val astParentFullName = methodAstParentStack.head.properties("FULL_NAME").toString
-      val newTypeDeclNode = NewTypeDecl()
-        .name(methodName)
-        .fullName(methodFullName)
-        .astParentType(astParentType)
-        .astParentFullName(astParentFullName)
+      val newTypeDeclNode = newTypeDecl(methodName, methodFullName, astParentType, astParentFullName)
       Ast.storeInDiffGraph(Ast(newTypeDeclNode), diffGraph)
       newTypeDeclNode
     }
@@ -99,10 +95,9 @@ trait AstForFunctionsCreator {
     scope.popScope()
     val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
 
-    Ast.storeInDiffGraph(r, diffGraph)
-    Ast.storeInDiffGraph(typeDeclAst, diffGraph)
+    Ast.storeInDiffGraph(r.merge(typeDeclAst), diffGraph)
 
-    createMethodRefNode(code, fullname, methodNode.astParentFullName, lambdaExpression)
+    newMethodRefNode(code, fullname, methodNode.astParentFullName, lambdaExpression)
   }
 
   protected def astForFunctionDeclarator(funcDecl: IASTFunctionDeclarator, order: Int): Ast = {
@@ -141,9 +136,8 @@ trait AstForFunctionsCreator {
     scope.popScope()
 
     val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
-    Ast.storeInDiffGraph(typeDeclAst, diffGraph)
 
-    r
+    r.merge(typeDeclAst)
   }
 
   protected def astForFunctionDefinition(functDef: IASTFunctionDefinition, order: Int): Ast = {
@@ -185,9 +179,8 @@ trait AstForFunctionsCreator {
     methodAstParentStack.pop()
 
     val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
-    Ast.storeInDiffGraph(typeDeclAst, diffGraph)
 
-    r
+    r.merge(typeDeclAst)
   }
 
   private def astForParameter(parameter: IASTNode, childNum: Int): Ast = {

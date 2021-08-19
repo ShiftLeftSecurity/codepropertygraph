@@ -20,7 +20,7 @@ class AstCreationPass(filenames: List[String],
   private val global: Global = Global()
 
   def usedTypes(): List[String] =
-    global.usedTypes.keys().asScala.filterNot(_ == Defines.anyTypeName).toSet.toList
+    global.usedTypes.keys().asScala.filterNot(_ == Defines.anyTypeName).toList
 
   override def generateParts(): Array[String] = filenames.toArray
 

@@ -33,15 +33,8 @@ trait AstForPrimitivesCreator {
     }
     val variableOption = scope.lookupVariable(identifierName)
     val identifierTypeName = variableOption match {
-      case Some((_, variableTypeName)) =>
-        variableTypeName
-      case None if ident.getParent.isInstanceOf[IASTDeclarator] =>
-        ASTTypeUtil.getNodeType(ident.getParent.asInstanceOf[IASTDeclarator]) match {
-          case t if t == "?" || t.isEmpty => Defines.anyTypeName
-          case t                          => t
-        }
-      case None =>
-        Defines.anyTypeName
+      case Some((_, variableTypeName)) => variableTypeName
+      case None                        => typeFor(ident)
     }
 
     val cpgIdentifier = NewIdentifier()
