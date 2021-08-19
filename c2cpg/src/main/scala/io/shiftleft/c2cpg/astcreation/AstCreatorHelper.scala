@@ -136,13 +136,15 @@ trait AstCreatorHelper {
         evaluation.getBinding match {
           case f: CPPFunction if f.getDeclarations != null =>
             usingDeclarationMappings.getOrElse(
-              fixQualifiedName(d.getName.toString),
-              f.getDeclarations.headOption.map(_.getName.toString).getOrElse(f.getName))
+              fixQualifiedName(d.getName.getRawSignature),
+              f.getDeclarations.headOption.map(_.getName.getRawSignature).getOrElse(f.getName))
           case f: CPPFunction if f.getDefinition != null =>
-            usingDeclarationMappings.getOrElse(fixQualifiedName(d.getName.toString), f.getDefinition.getName.toString)
+            usingDeclarationMappings.getOrElse(fixQualifiedName(d.getName.getRawSignature),
+                                               f.getDefinition.getName.getRawSignature)
           case other => other.getName
         }
-      case alias: ICPPASTNamespaceAlias => alias.getMappingName.toString
+      case alias: ICPPASTNamespaceAlias =>
+        alias.getMappingName.getRawSignature
       case namespace: ICPPASTNamespaceDefinition if namespace.getName.getRawSignature.nonEmpty =>
         fullName(namespace.getParent) + "." + namespace.getName.getRawSignature
       case namespace: ICPPASTNamespaceDefinition if namespace.getName.getRawSignature.isEmpty =>
@@ -160,19 +162,19 @@ trait AstCreatorHelper {
         val fullname = s"${fullName(cppClass.getParent)}.$name"
         fullname
       case enum: IASTEnumerationSpecifier =>
-        fullName(enum.getParent) + "." + enum.getName.toString
-      case c: IASTCompositeTypeSpecifier => c.getName.toString
+        fullName(enum.getParent) + "." + enum.getName.getRawSignature
+      case c: IASTCompositeTypeSpecifier => c.getName.getRawSignature
       case f: IASTFunctionDeclarator =>
-        fullName(f.getParent) + "." + f.getName.toString
+        fullName(f.getParent) + "." + f.getName.getRawSignature
       case f: ICPPASTLambdaExpression =>
         fullName(f.getParent) + "."
       case f: IASTFunctionDefinition =>
-        fullName(f.getParent) + "." + f.getDeclarator.getName.toString
-      case d: IASTIdExpression    => d.getName.toString
+        fullName(f.getParent) + "." + f.getDeclarator.getName.getRawSignature
+      case d: IASTIdExpression    => d.getName.getRawSignature
       case _: IASTTranslationUnit => ""
-      case u: IASTUnaryExpression => u.getOperand.toString
+      case u: IASTUnaryExpression => u.getOperand.getRawSignature
       case e: ICPPASTElaboratedTypeSpecifier =>
-        fullName(e.getParent) + "." + e.getName.toString
+        fullName(e.getParent) + "." + e.getName.getRawSignature
       case other if other.getParent != null => fullName(other.getParent)
       case other if other != null           => notHandledYet(other, -1); ""
       case null                             => ""
