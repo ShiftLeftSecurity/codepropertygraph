@@ -95,8 +95,8 @@ trait AstForFunctionsCreator {
     scope.popScope()
     val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
 
-    Ast.storeInDiffGraph(r.withRefEdge(typeDeclAst.root.get, methodNode), diffGraph)
     Ast.storeInDiffGraph(typeDeclAst, diffGraph)
+    Ast.storeInDiffGraph(r.withRefEdge(typeDeclAst.root.get, methodNode), diffGraph)
 
     newMethodRefNode(code, fullname, methodNode.astParentFullName, lambdaExpression)
   }
