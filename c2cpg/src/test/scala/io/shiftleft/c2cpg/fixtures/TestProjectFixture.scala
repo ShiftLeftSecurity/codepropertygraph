@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg.fixtures
 
 import io.shiftleft.c2cpg.C2Cpg.Config
-import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
+import io.shiftleft.c2cpg.passes.AstCreationPass
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.IntervalKeyPool
@@ -22,7 +22,6 @@ case class TestProjectFixture(projectName: String) {
   new MetaDataPass(cpg, Languages.C).createAndApply()
   new AstCreationPass(filenames, cpg, keyPool, Config()).createAndApply()
   new CfgCreationPass(cpg).createAndApply()
-  new StubRemovalPass(cpg).createAndApply()
   new FileCreationPass(cpg).createAndApply()
 
   def traversalSource: TraversalSource = TraversalSource(cpg.graph)
