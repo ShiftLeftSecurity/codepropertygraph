@@ -9,6 +9,7 @@ import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
 import io.shiftleft.semanticcpg.passes.compat.argumentcompat.ArgumentCompat
 import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.MethodStubCreator
+import io.shiftleft.semanticcpg.passes.languagespecific.kotlin.HeuristicsCallLinker
 import io.shiftleft.semanticcpg.passes.linking.calllinker.StaticCallLinker
 import io.shiftleft.semanticcpg.passes.linking.filecompat.FileNameCompat
 import io.shiftleft.semanticcpg.passes.linking.linker.Linker
@@ -152,6 +153,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CfgDominatorPass(cpg),
           new CdgPass(cpg),
           new NamespaceCreator(cpg),
+          new HeuristicsCallLinker(cpg),
         )
       case _ => Iterator()
     }
