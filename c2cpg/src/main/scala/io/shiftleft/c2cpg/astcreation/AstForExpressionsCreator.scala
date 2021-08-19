@@ -72,10 +72,6 @@ trait AstForExpressionsCreator {
 
   private def astForCallExpression(call: IASTFunctionCallExpression, order: Int): Ast = {
     val rec = call.getFunctionNameExpression match {
-      case cast: IASTCastExpression        => astForCastExpression(cast, 0)
-      case reference: IASTFieldReference   => astForFieldReference(reference, 0)
-      case b: IASTBinaryExpression         => astForBinaryExpression(b, 0)
-      case s: IASTArraySubscriptExpression => astForArrayIndexExpression(s, 0)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTBinaryExpression] =>
         astForBinaryExpression(unaryExpression.getOperand.asInstanceOf[IASTBinaryExpression], 0)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTFieldReference] =>
