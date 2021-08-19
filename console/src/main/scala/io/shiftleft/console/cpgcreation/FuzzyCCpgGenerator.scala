@@ -1,7 +1,6 @@
 package io.shiftleft.console.cpgcreation
 
 import io.shiftleft.console.FuzzyCFrontendConfig
-import io.shiftleft.fuzzyc2cpg.FuzzyC2Cpg
 
 import java.nio.file.Path
 
@@ -17,12 +16,11 @@ case class FuzzyCCpgGenerator(config: FuzzyCFrontendConfig, rootPath: Path) exte
     * CPG was generated.
     **/
   override def generate(inputPath: String,
-                        outputPath: String = "cpg.bin.zip",
+                        outputPath: String = "cpg.bin",
                         namespaces: List[String] = List()): Option[String] = {
-    val fuzzyc = new FuzzyC2Cpg()
-    val cpg = fuzzyc.runAndOutput(Set(inputPath), Set(".c", ".cc", ".cpp", ".h", ".hpp"), Some(outputPath))
-    cpg.close()
-    Some(outputPath)
+    val command = rootPath.resolve("fuzzyc2cpg.sh").toString
+    val arguments = config.cmdLineParams.toSeq ++ Seq(inputPath, "--output", outputPath)
+    runShellCommand(command, arguments).map(_ => outputPath)
   }
 
   override def isAvailable: Boolean = true
