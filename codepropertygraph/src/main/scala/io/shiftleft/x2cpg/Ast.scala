@@ -68,6 +68,18 @@ case class Ast(nodes: List[NewNode],
     )
   }
 
+  def merge(other: Ast): Ast = {
+    Ast(
+      nodes ++ other.nodes,
+      edges = edges ++ other.edges,
+      conditionEdges = conditionEdges ++ other.conditionEdges,
+      argEdges = argEdges ++ other.argEdges,
+      receiverEdges = receiverEdges ++ other.receiverEdges,
+      refEdges = refEdges ++ other.refEdges,
+      bindsEdges = bindsEdges ++ other.bindsEdges
+    )
+  }
+
   /** AST that results when adding all ASTs in `asts` as children,
     * that is, connecting them to the root node of this AST.
     */

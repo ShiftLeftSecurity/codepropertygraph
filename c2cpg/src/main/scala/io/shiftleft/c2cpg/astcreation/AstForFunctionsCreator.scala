@@ -31,7 +31,7 @@ trait AstForFunctionsCreator {
     method.astParentFullName = parentNode.fullName
     method.astParentType = parentNode.label
     val functionBinding = NewBinding().name(methodName).signature(signature)
-    Ast(functionBinding).withBindsEdge(parentNode, functionBinding)
+    Ast(functionBinding).withBindsEdge(parentNode, functionBinding).withRefEdge(functionBinding, method)
   }
 
   @tailrec
@@ -95,8 +95,7 @@ trait AstForFunctionsCreator {
     scope.popScope()
     val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
 
-    Ast.storeInDiffGraph(typeDeclAst, diffGraph)
-    Ast.storeInDiffGraph(r.withRefEdge(typeDeclAst.root.get, methodNode), diffGraph)
+    Ast.storeInDiffGraph(r.merge(typeDeclAst), diffGraph)
 
     newMethodRefNode(code, fullname, methodNode.astParentFullName, lambdaExpression)
   }
@@ -137,9 +136,8 @@ trait AstForFunctionsCreator {
     scope.popScope()
 
     val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
-    Ast.storeInDiffGraph(typeDeclAst, diffGraph)
 
-    r.withRefEdge(typeDeclAst.root.get, methodNode)
+    r.merge(typeDeclAst)
   }
 
   protected def astForFunctionDefinition(functDef: IASTFunctionDefinition, order: Int): Ast = {
@@ -181,9 +179,8 @@ trait AstForFunctionsCreator {
     methodAstParentStack.pop()
 
     val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
-    Ast.storeInDiffGraph(typeDeclAst, diffGraph)
 
-    r.withRefEdge(typeDeclAst.root.get, methodNode)
+    r.merge(typeDeclAst)
   }
 
   private def astForParameter(parameter: IASTNode, childNum: Int): Ast = {
