@@ -12,8 +12,6 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
-import scala.jdk.CollectionConverters._
-
 case class NameAndSignature(name: String, signature: String, fullName: String)
 
 /**
@@ -36,7 +34,7 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
     cpg.call
       .sideEffect { call =>
         methodToParameterCount +=
-          NameAndSignature(call.name, call.signature, call.methodFullName) -> call._astOut.asScala.size
+          NameAndSignature(call.name, call.signature, call.methodFullName) -> call.astOut.filterNot(_.order == 0).size
       }
       .exec()
   }

@@ -1,6 +1,6 @@
 package io.shiftleft.c2cpg.astcreation
 
-import io.shiftleft.codepropertygraph.generated.nodes.NewBlock
+import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewIdentifier, NewMethodRef}
 import io.shiftleft.codepropertygraph.generated.{DispatchTypes, Operators}
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
@@ -71,39 +71,46 @@ trait AstForExpressionsCreator {
   }
 
   private def astForCallExpression(call: IASTFunctionCallExpression, order: Int): Ast = {
-    // TODO: proper handling of call receiver
-    val cpgCall = call.getFunctionNameExpression match {
-      case cast: IASTCastExpression        => astForCastExpression(cast, order)
-      case reference: IASTFieldReference   => astForFieldReference(reference, order)
-      case b: IASTBinaryExpression         => astForBinaryExpression(b, order)
-      case s: IASTArraySubscriptExpression => astForArrayIndexExpression(s, order)
+    val rec = call.getFunctionNameExpression match {
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTBinaryExpression] =>
-        astForBinaryExpression(unaryExpression.getOperand.asInstanceOf[IASTBinaryExpression], order)
+        astForBinaryExpression(unaryExpression.getOperand.asInstanceOf[IASTBinaryExpression], 0)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTFieldReference] =>
-        astForFieldReference(unaryExpression.getOperand.asInstanceOf[IASTFieldReference], order)
+        astForFieldReference(unaryExpression.getOperand.asInstanceOf[IASTFieldReference], 0)
       case unaryExpression: IASTUnaryExpression
           if unaryExpression.getOperand.isInstanceOf[IASTArraySubscriptExpression] =>
-        astForArrayIndexExpression(unaryExpression.getOperand.asInstanceOf[IASTArraySubscriptExpression], order)
+        astForArrayIndexExpression(unaryExpression.getOperand.asInstanceOf[IASTArraySubscriptExpression], 0)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTConditionalExpression] =>
-        astForUnaryExpression(unaryExpression, order)
+        astForUnaryExpression(unaryExpression, 0)
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTUnaryExpression] =>
-        astForUnaryExpression(unaryExpression.getOperand.asInstanceOf[IASTUnaryExpression], order)
+        astForUnaryExpression(unaryExpression.getOperand.asInstanceOf[IASTUnaryExpression], 0)
       case lambdaExpression: ICPPASTLambdaExpression =>
         val methodRef = methodRefForLambda(lambdaExpression)
-        val name = methodRef.methodFullName
-        val fullname = methodRef.methodFullName
-        val callNode = newCallNode(call, name, fullname, DispatchTypes.STATIC_DISPATCH, order)
-        Ast(callNode).withChild(Ast(methodRef)).withArgEdge(callNode, methodRef)
-      case _ =>
-        val name = shortName(call.getFunctionNameExpression)
-        val fullname = fullName(call.getFunctionNameExpression)
-        Ast(newCallNode(call, name, fullname, DispatchTypes.STATIC_DISPATCH, order))
+        methodRef.order = 0
+        methodRef.argumentIndex = 0
+        Ast(methodRef)
+      case other => astForExpression(other, 0)
     }
-    val args = withOrder(call.getArguments) { case (a, o) => astForNode(a, o) }
 
-    val ast = cpgCall.withChildren(args)
+    val (dd, name) = call.getFunctionNameExpression match {
+      case _: ICPPASTLambdaExpression =>
+        (DispatchTypes.DYNAMIC_DISPATCH, rec.root.get.asInstanceOf[NewMethodRef].methodFullName)
+      case _ if rec.root.exists(_.isInstanceOf[NewIdentifier]) =>
+        (DispatchTypes.STATIC_DISPATCH, rec.root.get.asInstanceOf[NewIdentifier].name)
+      case reference: IASTIdExpression =>
+        (DispatchTypes.STATIC_DISPATCH, reference.getRawSignature)
+      case _ =>
+        (DispatchTypes.DYNAMIC_DISPATCH, "")
+    }
+
+    val cpgCall = Ast(newCallNode(call, name, name, dd, order))
+    val args = withOrder(call.getArguments) { case (a, o)     => astForNode(a, o) }
     val validArgs = args.collect { case a if a.root.isDefined => a.root.get }
-    ast.withArgEdges(cpgCall.root.get, validArgs)
+
+    val ast = cpgCall.withChild(rec).withChildren(args).withArgEdges(cpgCall.root.get, validArgs)
+    rec.root match {
+      case Some(r) => ast.withReceiverEdge(cpgCall.root.get, r)
+      case None    => ast
+    }
   }
 
   private def astForUnaryExpression(unary: IASTUnaryExpression, order: Int): Ast = {

@@ -183,12 +183,12 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
           h shouldBe "h"
       }
 
-      inside(cpg.call.l) {
+      inside(cpg.call.filterNot(_.name == Operators.fieldAccess).l) {
         case List(f, g) =>
-          f.name shouldBe "f"
-          f.methodFullName shouldBe "f"
-          g.name shouldBe "g"
-          g.methodFullName shouldBe "A.g"
+          f.name shouldBe "X::f"
+          f.methodFullName shouldBe "X::f"
+          g.name shouldBe "X::g"
+          g.methodFullName shouldBe "X::g"
       }
     }
 
@@ -231,9 +231,9 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
       inside(cpg.call.l) {
         case List(c1, c2) =>
           c1.name shouldBe "f"
-          c1.methodFullName shouldBe "A.f"
+          c1.methodFullName shouldBe "f"
           c2.name shouldBe "f"
-          c2.methodFullName shouldBe "A.f"
+          c2.methodFullName shouldBe "f"
       }
     }
 

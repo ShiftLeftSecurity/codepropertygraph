@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{DispatchTypes, Operators}
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
+import org.eclipse.cdt.core.dom.ast.c.ICASTTypedefNameSpecifier
 import org.eclipse.cdt.core.dom.ast.cpp._
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTAliasDeclaration
 import org.eclipse.cdt.internal.core.model.ASTStringUtil
@@ -206,6 +207,20 @@ trait AstForTypesCreator {
       astsForElaboratedType(declaration.getDeclSpecifier.asInstanceOf[IASTElaboratedTypeSpecifier],
                             declaration.getDeclarators.toList,
                             order)
+
+    case declaration: IASTSimpleDeclaration
+        if declaration.getDeclSpecifier != null && declaration.getDeclSpecifier
+          .isInstanceOf[ICASTTypedefNameSpecifier] =>
+      val spec = declaration.getDeclSpecifier.asInstanceOf[ICASTTypedefNameSpecifier]
+      val name = spec.getName.getRawSignature
+      Seq(
+        Ast(
+          NewTypeDecl()
+            .name(name)
+            .fullName(registerType(name))
+            .isExternal(false)
+            .filename(spec.getContainingFilename)
+            .order(order)))
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.nonEmpty =>
       declaration.getDeclarators.toIndexedSeq.map {
         case d: IASTFunctionDeclarator     => astForFunctionDeclarator(d, order)

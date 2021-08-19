@@ -105,7 +105,8 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
       NodeTypes.LOCAL,
       NodeTypes.CALL,
       NodeTypes.LITERAL,
-      NodeTypes.BINDING
+      NodeTypes.BINDING,
+      NodeTypes.IDENTIFIER
     )
   }
 
