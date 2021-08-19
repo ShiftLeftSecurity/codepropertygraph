@@ -1,7 +1,6 @@
 package io.shiftleft.console.cpgcreation
 
 import io.shiftleft.console.FuzzyCFrontendConfig
-import io.shiftleft.fuzzyc2cpg.FuzzyC2Cpg
 
 import java.nio.file.Path
 
