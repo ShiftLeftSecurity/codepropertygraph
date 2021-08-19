@@ -87,6 +87,21 @@ trait AstCreatorHelper {
     typeName
   }
 
+  private def cleanType(t: String): String = t match {
+    case ""                                        => Defines.anyTypeName
+    case t if t.contains("?")                      => Defines.anyTypeName
+    case t if t.contains("#")                      => Defines.anyTypeName
+    case t if t.startsWith("{") && t.endsWith("}") => Defines.anyTypeName
+    case t if t.contains("*")                      => "*"
+    case t if t.contains("[")                      => "[]"
+    case t if t.contains("::")                     => fixQualifiedName(t).split(".").lastOption.getOrElse(Defines.anyTypeName)
+    case someType                                  => someType
+  }
+
+  protected def typeFor(node: IASTNode): String = cleanType(ASTTypeUtil.getNodeType(node))
+
+  protected def typeFor(node: IASTTypeId): String = cleanType(ASTTypeUtil.getType(node))
+
   private def notHandledText(node: IASTNode): String =
     s"""Node '${node.getClass.getSimpleName}' not handled yet!
        |  Code: '${node.getRawSignature}'
