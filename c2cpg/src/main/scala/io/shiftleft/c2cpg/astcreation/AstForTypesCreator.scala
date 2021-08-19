@@ -282,9 +282,12 @@ trait AstForTypesCreator {
         enumeration.getBaseType.toString
       case _ =>
         ASTTypeUtil.getNodeType(enumerator) match {
-          case ""                   => Defines.anyTypeName
-          case t if t.endsWith("*") => "*"
-          case someType             => someType
+          case ""                                        => Defines.anyTypeName
+          case t if t.startsWith("{") && t.endsWith("}") => Defines.anyTypeName
+          case t if t.contains("*")                      => "*"
+          case t if t.contains("[")                      => "[]"
+          case t if t.contains("::")                     => fixQualifiedName(t).split(".").lastOption.getOrElse(Defines.anyTypeName)
+          case someType                                  => someType
         }
     }
     val cpgMember = NewMember()

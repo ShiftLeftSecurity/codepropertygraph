@@ -35,14 +35,15 @@ trait AstForPrimitivesCreator {
     val identifierTypeName = variableOption match {
       case Some((_, variableTypeName)) =>
         variableTypeName
-      case None if ident.getParent.isInstanceOf[IASTDeclarator] =>
-        ASTTypeUtil.getNodeType(ident.getParent.asInstanceOf[IASTDeclarator]) match {
-          case t if t == "?" || t.isEmpty => Defines.anyTypeName
-          case t if t.endsWith("*")       => "*"
-          case t                          => t
-        }
       case None =>
-        Defines.anyTypeName
+        ASTTypeUtil.getNodeType(ident) match {
+          case t if t == "?" || t.isEmpty                => Defines.anyTypeName
+          case t if t.startsWith("{") && t.endsWith("}") => Defines.anyTypeName
+          case t if t.contains("*")                      => "*"
+          case t if t.contains("[")                      => "[]"
+          case t if t.contains("::")                     => fixQualifiedName(t).split(".").lastOption.getOrElse(Defines.anyTypeName)
+          case t                                         => t
+        }
     }
 
     val cpgIdentifier = NewIdentifier()
