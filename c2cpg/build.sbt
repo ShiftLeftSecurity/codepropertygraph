@@ -52,3 +52,6 @@ compile / javacOptions ++= Seq("-Xlint:all", "-Xlint:-cast", "-g")
 Test / fork := true
 
 enablePlugins(JavaAppPackaging)
+
+// no top level directory in Universal/packageXyz
+topLevelDirectory := None
