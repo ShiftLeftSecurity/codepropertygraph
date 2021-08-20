@@ -1,7 +1,5 @@
 package io.shiftleft.console.cpgcreation
 
-import io.shiftleft.c2cpg.C2Cpg
-import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.console.CFrontendConfig
 
 import java.nio.file.Path
@@ -18,17 +16,11 @@ case class CCpgGenerator(config: CFrontendConfig, rootPath: Path) extends CpgGen
     * CPG was generated.
     **/
   override def generate(inputPath: String,
-                        outputPath: String = "cpg.bin.zip",
+                        outputPath: String = "cpg.bin",
                         namespaces: List[String] = List()): Option[String] = {
-    val c = new C2Cpg()
-    val config = Config(
-      inputPaths = Set(inputPath),
-      outputPath = outputPath,
-      sourceFileExtensions = Set(".c", ".cc", ".cpp", ".h", ".hpp")
-    )
-    val cpg = c.runAndOutput(config)
-    cpg.close()
-    Some(outputPath)
+    val command = rootPath.resolve("c2cpg.sh").toString
+    val arguments = config.cmdLineParams.toSeq ++ Seq(inputPath, "--output", outputPath)
+    runShellCommand(command, arguments).map(_ => outputPath)
   }
 
   override def isAvailable: Boolean = true
