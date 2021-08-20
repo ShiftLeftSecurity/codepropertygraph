@@ -148,12 +148,12 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new MethodDecoratorPass(cpg),
           new Linker(cpg),
           new StaticCallLinker(cpg),
+          new HeuristicsCallLinker(cpg),
           new FileCreationPass(cpg),
           new ContainsEdgePass(cpg),
           new CfgDominatorPass(cpg),
           new CdgPass(cpg),
           new NamespaceCreator(cpg),
-          new HeuristicsCallLinker(cpg),
         )
       case _ => Iterator()
     }
