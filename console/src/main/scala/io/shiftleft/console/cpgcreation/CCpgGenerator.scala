@@ -1,6 +1,7 @@
 package io.shiftleft.console.cpgcreation
 
 import io.shiftleft.console.CFrontendConfig
+
 import java.nio.file.Path
 
 /**
