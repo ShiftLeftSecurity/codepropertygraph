@@ -53,5 +53,5 @@ Test / fork := true
 
 enablePlugins(JavaAppPackaging)
 
-// no top level directory in Universal/packageXyz
-topLevelDirectory := None
+Universal/packageName := name.value
+Universal/topLevelDirectory := None

@@ -64,5 +64,5 @@ Antlr4 / javaSource := (Compile / sourceManaged).value
 
 enablePlugins(JavaAppPackaging)
 
-// no top level directory in Universal/packageXyz
-topLevelDirectory := None
+Universal/packageName := name.value
+Universal/topLevelDirectory := None

@@ -153,8 +153,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: fuzzyc2cpg/target/universal/*.zip
-          asset_name: fuzzy2cpg.zip.zip
+          asset_path: fuzzyc2cpg/target/universal/fuzzyc2cpg.zip
+          asset_name: fuzzy2cpg.zip
           asset_content_type: application/zip
       - name: Upload c2cpg to release
         uses: actions/upload-release-asset@v1
@@ -162,6 +162,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: c2cpg/target/universal/*.zip
-          asset_name: c2cpg.zip.zip
+          asset_path: c2cpg/target/universal/c2cpg.zip
+          asset_name: c2cpg.zip
           asset_content_type: application/zip
