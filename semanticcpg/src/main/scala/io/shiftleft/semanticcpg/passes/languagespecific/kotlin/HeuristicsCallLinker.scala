@@ -30,16 +30,17 @@ import scala.collection.mutable
 class HeuristicsCallLinker(cpg: Cpg) extends CpgPass(cpg) {
 
   import HeuristicsCallLinker._
-  private val methodNameToNodes = mutable.Map.empty[String, Seq[(StoredNode, Int)]]
+  private val fqMethodNamesToNodes = mutable.Map.empty[String, Seq[(StoredNode, Int)]]
 
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
     cpg.method.foreach { method =>
-      val entry = methodNameToNodes.get(method.name)
+      val fqMethodName = method.fullName.split(":").head
+      val entry = fqMethodNamesToNodes.get(fqMethodName)
       if (entry.isDefined) {
-        methodNameToNodes.put(method.name, entry.get ++ Seq((method, method.parameter.size)))
+        fqMethodNamesToNodes.put(fqMethodName, entry.get ++ Seq((method, method.parameter.size)))
       } else {
-        methodNameToNodes.put(method.name, Seq((method, method.parameter.size)))
+        fqMethodNamesToNodes.put(fqMethodName, Seq((method, method.parameter.size)))
       }
     }
 
@@ -60,7 +61,7 @@ class HeuristicsCallLinker(cpg: Cpg) extends CpgPass(cpg) {
 
   private def linkStaticCall(call: Call, dstGraph: DiffGraph.Builder): Unit = {
     val methodName = call.methodFullName.split(":").head
-    val resolvedMethodOption = methodNameToNodes.get(methodName)
+    val resolvedMethodOption = fqMethodNamesToNodes.get(methodName)
     if (resolvedMethodOption.isDefined) {
       if (resolvedMethodOption.get.size == 1) {
         dstGraph.addEdgeInOriginal(call, resolvedMethodOption.get(0)._1, EdgeTypes.CALL)
