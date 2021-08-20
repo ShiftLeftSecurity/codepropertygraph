@@ -105,6 +105,3 @@ Global / onLoad := {
   assert(GitLFSUtils.isGitLFSEnabled(), "You need to install git-lfs and run 'git lfs pull'")
   (Global / onLoad).value
 }
-
-// no top level directory in Universal/packageXyz
-ThisBuild/topLevelDirectory := None

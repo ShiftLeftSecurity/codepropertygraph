@@ -146,7 +146,7 @@ jobs:
           asset_name: fuzzyppcli-win.zip
           asset_content_type: application/zip
       - name: Package frontends for release
-        run: sbt clean Universal/c2cpg/packageBin Universal/fuzzyc2cpg/packageBin
+        run: sbt clean c2cpg/Universal/packageBin fuzzyc2cpg/Universal/packageBin
       - name: Upload fuzzyc2cpg to release
         uses: actions/upload-release-asset@v1
         env:
