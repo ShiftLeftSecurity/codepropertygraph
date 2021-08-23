@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{DispatchTypes, Operators}
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
 import org.eclipse.cdt.core.dom.ast.cpp._
+import org.eclipse.cdt.core.dom.ast.gnu.IGNUASTCompoundStatementExpression
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTQualifiedName
 
 trait AstForExpressionsCreator {
@@ -285,6 +286,10 @@ trait AstForExpressionsCreator {
     ast.withArgEdge(callNode, arg)
   }
 
+  private def astForCompoundStatementExpression(compoundExpression: IGNUASTCompoundStatementExpression,
+                                                order: Int): Ast =
+    nullSafeAst(compoundExpression.getCompoundStatement, order).headOption.getOrElse(Ast())
+
   protected def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
     case lit: IASTLiteralExpression   => astForLiteral(lit, order)
     case un: IASTUnaryExpression      => astForUnaryExpression(un, order)
@@ -304,7 +309,9 @@ trait AstForExpressionsCreator {
     case typeIdInit: IASTTypeIdInitializerExpression        => astForTypeIdInitExpression(typeIdInit, order)
     case c: ICPPASTSimpleTypeConstructorExpression          => astForConstructorExpression(c, order)
     case lambdaExpression: ICPPASTLambdaExpression          => Ast(methodRefForLambda(lambdaExpression))
-    case _                                                  => notHandledYet(expression, order)
+    case compoundExpression: IGNUASTCompoundStatementExpression =>
+      astForCompoundStatementExpression(compoundExpression, order)
+    case _ => notHandledYet(expression, order)
   }
 
   protected def astForStaticAssert(a: ICPPASTStaticAssertDeclaration, order: Int): Ast = {
