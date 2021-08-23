@@ -179,9 +179,8 @@ trait AstForExpressionsCreator {
     val posAst = nullSafeAst(expr.getPositiveResultExpression, 2)
     val negAst = nullSafeAst(expr.getNegativeResultExpression, 3)
 
-    val children = Seq(condAst, posAst, negAst).zipWithIndex.map {
-      case (c, _) if c.root.isDefined => c
-      case (_, o)                     => Ast(newUnknown(expr, o + 1))
+    val children = Seq(condAst, posAst, negAst).collect {
+      case c if c.root.isDefined => c
     }
 
     Ast(call).withChildren(children).withArgEdges(call, children.map(_.root.get))

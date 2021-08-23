@@ -79,6 +79,13 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
       succOf("x ? y : z") shouldBe expected(("RET", AlwaysEdge))
     }
 
+    "be correct for conditional expression with empty then" in new CpgCfgFixture("x ? : z;") {
+      succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
+      succOf("x") shouldBe expected(("x ? : z", TrueEdge), ("z", FalseEdge))
+      succOf("z") shouldBe expected(("x ? : z", AlwaysEdge))
+      succOf("x ? : z") shouldBe expected(("RET", AlwaysEdge))
+    }
+
     "be correct for short-circuit AND expression" in new CpgCfgFixture("int z = x && y;") {
       succOf("RET func ()") shouldBe expected(("z", AlwaysEdge))
       succOf("z") shouldBe expected(("x", AlwaysEdge))
