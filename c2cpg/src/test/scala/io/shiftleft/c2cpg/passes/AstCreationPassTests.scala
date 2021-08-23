@@ -35,6 +35,36 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
 
   "Method AST layout" should {
 
+    "be correct for compound statement expressions" in TestAstOnlyFixture(
+      """
+       |int x = ({int y = 1; y;}) + ({int z = 2; z;});
+       |""".stripMargin) { cpg =>
+      cpg.call(Operators.addition).l match {
+        case List(add) =>
+          add.argument.l match {
+            case List(y, z) =>
+              y.argumentIndex shouldBe 1
+              y.order shouldBe 1
+              y.astChildren.l match {
+                case List(_, c: Call, i: Identifier) =>
+                  c.code shouldBe "y = 1"
+                  i.code shouldBe "y"
+                case _ => fail()
+              }
+              z.argumentIndex shouldBe 2
+              z.order shouldBe 2
+              z.astChildren.l match {
+                case List(_, c: Call, i: Identifier) =>
+                  c.code shouldBe "z = 2"
+                  i.code shouldBe "z"
+                case _ => fail()
+              }
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+    }
+
     "be correct for knr function declarations" in TestAstOnlyFixture("""
         |int handler(x, y)
         | int *x;

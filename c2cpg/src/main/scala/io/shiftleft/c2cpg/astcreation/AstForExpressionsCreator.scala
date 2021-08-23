@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{DispatchTypes, Operators}
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
 import org.eclipse.cdt.core.dom.ast.cpp._
+import org.eclipse.cdt.core.dom.ast.gnu.IGNUASTCompoundStatementExpression
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTQualifiedName
 
 trait AstForExpressionsCreator {
@@ -178,10 +179,11 @@ trait AstForExpressionsCreator {
     val posAst = nullSafeAst(expr.getPositiveResultExpression, 2)
     val negAst = nullSafeAst(expr.getNegativeResultExpression, 3)
 
-    val children = Seq(condAst, posAst, negAst)
-    val argChildren = children.collect { case c if c.root.isDefined => c.root.get }
+    val children = Seq(condAst, posAst, negAst).collect {
+      case c if c.root.isDefined => c
+    }
 
-    Ast(call).withChildren(children).withArgEdges(call, argChildren)
+    Ast(call).withChildren(children).withArgEdges(call, children.map(_.root.get))
   }
 
   private def astForArrayIndexExpression(arrayIndexExpression: IASTArraySubscriptExpression, order: Int): Ast = {
@@ -285,6 +287,10 @@ trait AstForExpressionsCreator {
     ast.withArgEdge(callNode, arg)
   }
 
+  private def astForCompoundStatementExpression(compoundExpression: IGNUASTCompoundStatementExpression,
+                                                order: Int): Ast =
+    nullSafeAst(compoundExpression.getCompoundStatement, order).headOption.getOrElse(Ast())
+
   protected def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
     case lit: IASTLiteralExpression   => astForLiteral(lit, order)
     case un: IASTUnaryExpression      => astForUnaryExpression(un, order)
@@ -304,7 +310,9 @@ trait AstForExpressionsCreator {
     case typeIdInit: IASTTypeIdInitializerExpression        => astForTypeIdInitExpression(typeIdInit, order)
     case c: ICPPASTSimpleTypeConstructorExpression          => astForConstructorExpression(c, order)
     case lambdaExpression: ICPPASTLambdaExpression          => Ast(methodRefForLambda(lambdaExpression))
-    case _                                                  => notHandledYet(expression, order)
+    case compoundExpression: IGNUASTCompoundStatementExpression =>
+      astForCompoundStatementExpression(compoundExpression, order)
+    case _ => notHandledYet(expression, order)
   }
 
   protected def astForStaticAssert(a: ICPPASTStaticAssertDeclaration, order: Int): Ast = {

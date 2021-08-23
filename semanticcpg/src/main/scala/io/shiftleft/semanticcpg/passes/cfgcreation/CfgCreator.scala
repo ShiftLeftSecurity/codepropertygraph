@@ -261,23 +261,35 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
 
   /**
     * A conditional expression is of the form `condition ? trueExpr ; falseExpr`
+    * where both `trueExpr` and `falseExpr` are optional.
     * We create the corresponding CFGs by creating CFGs for the three expressions
     * and adding edges between them. The new entry node is the condition entry
     * node.
     * */
   protected def cfgForConditionalExpression(call: Call): Cfg = {
     val conditionCfg = cfgFor(call.argument(1))
-    val trueCfg = cfgFor(call.argument(2))
-    val falseCfg = cfgFor(call.argument(3))
+    val trueCfg = call.argumentOption(2).map(cfgFor).getOrElse(Cfg.empty)
+    val falseCfg = call.argumentOption(3).map(cfgFor).getOrElse(Cfg.empty)
     val diffGraphs = edgesFromFringeTo(conditionCfg, trueCfg.entryNode, TrueEdge) ++
       edgesFromFringeTo(conditionCfg, falseCfg.entryNode, FalseEdge)
+
+    val trueFridge = if (trueCfg.entryNode.isDefined) {
+      trueCfg.fringe
+    } else {
+      conditionCfg.fringe.withEdgeType(TrueEdge)
+    }
+    val falseFridge = if (falseCfg.entryNode.isDefined) {
+      falseCfg.fringe
+    } else {
+      conditionCfg.fringe.withEdgeType(FalseEdge)
+    }
 
     Cfg
       .from(conditionCfg, trueCfg, falseCfg)
       .copy(
         entryNode = conditionCfg.entryNode,
         edges = conditionCfg.edges ++ trueCfg.edges ++ falseCfg.edges ++ diffGraphs,
-        fringe = trueCfg.fringe ++ falseCfg.fringe
+        fringe = trueFridge ++ falseFridge
       ) ++ cfgForSingleNode(call)
   }
 
