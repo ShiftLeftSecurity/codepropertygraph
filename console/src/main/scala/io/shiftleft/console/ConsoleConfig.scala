@@ -20,7 +20,7 @@ object InstallConfig {
 }
 
 class ConsoleConfig(val install: InstallConfig = InstallConfig(),
-                    val frontend: LanguageFrontendConfig = LanguageFrontendConfig(),
+                    val frontend: FrontendConfig = FrontendConfig(),
                     val tools: ToolsConfig = ToolsConfig()) {}
 
 object ToolsConfig {
@@ -29,67 +29,8 @@ object ToolsConfig {
 
 class ToolsConfig(var imageViewer: String = "xdg-open")
 
-object LanguageFrontendConfig {
-  def apply(): LanguageFrontendConfig = new LanguageFrontendConfig()
-}
-
-class LanguageFrontendConfig(var c: CFrontendConfig = CFrontendConfig(),
-                             var csharp: CSharpFrontendConfig = CSharpFrontendConfig(),
-                             var fuzzyc: FuzzyCFrontendConfig = FuzzyCFrontendConfig(),
-                             var go: GoFrontendConfig = GoFrontendConfig(),
-                             var java: JavaFrontendConfig = JavaFrontendConfig(),
-                             var js: JsFrontendConfig = JsFrontendConfig(),
-                             var llvm: LlvmFrontendConfig = LlvmFrontendConfig(),
-                             var python: PythonFrontendConfig = PythonFrontendConfig(),
-                             var php: PhpFrontendConfig = PhpFrontendConfig(),
-                             var ghidra: GhidraFrontendConfig = GhidraFrontendConfig())
-
-class CFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class CSharpFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class FuzzyCFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class GoFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class JavaFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class JsFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class LlvmFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class PythonFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class PhpFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class GhidraFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-
-object CFrontendConfig {
-  def apply(): CFrontendConfig = new CFrontendConfig()
-}
-object CSharpFrontendConfig {
-  def apply(): CSharpFrontendConfig = new CSharpFrontendConfig()
-}
-
-object FuzzyCFrontendConfig {
-  def apply(): FuzzyCFrontendConfig = new FuzzyCFrontendConfig()
-}
-
-object GoFrontendConfig {
-  def apply(): GoFrontendConfig = new GoFrontendConfig()
-}
-
-object JavaFrontendConfig {
-  def apply(): JavaFrontendConfig = new JavaFrontendConfig()
-}
-
-object JsFrontendConfig {
-  def apply(): JsFrontendConfig = new JsFrontendConfig()
-}
-
-object LlvmFrontendConfig {
-  def apply(): LlvmFrontendConfig = new LlvmFrontendConfig()
-}
-
-object PythonFrontendConfig {
-  def apply(): PythonFrontendConfig = new PythonFrontendConfig()
-}
-
-object PhpFrontendConfig {
-  def apply(): PhpFrontendConfig = new PhpFrontendConfig()
-}
-
-object GhidraFrontendConfig {
-  def apply(): GhidraFrontendConfig = new GhidraFrontendConfig()
+case class FrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer()) {
+  def withAdditionalArgs(additionalArgs: Iterable[String]): FrontendConfig = {
+    FrontendConfig(cmdLineParams ++ additionalArgs)
+  }
 }

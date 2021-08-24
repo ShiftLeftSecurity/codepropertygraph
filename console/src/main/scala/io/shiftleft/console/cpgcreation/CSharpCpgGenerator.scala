@@ -1,13 +1,13 @@
 package io.shiftleft.console.cpgcreation
 
-import io.shiftleft.console.CSharpFrontendConfig
+import io.shiftleft.console.FrontendConfig
 
 import java.nio.file.Path
 
 /**
   * C# language frontend. Translates C# project files into code property graphs.
   * */
-case class CSharpCpgGenerator(config: CSharpFrontendConfig, rootPath: Path) extends CpgGenerator {
+case class CSharpCpgGenerator(config: FrontendConfig, rootPath: Path) extends CpgGenerator {
 
   private val dotnetFrameworkOpt = "--dotnet-framework"
   private val dotnetCoreOpt = "--dotnet-core"

@@ -1,10 +1,10 @@
 package io.shiftleft.console.cpgcreation
 
-import io.shiftleft.console.PythonFrontendConfig
+import io.shiftleft.console.FrontendConfig
 
 import java.nio.file.Path
 
-case class PythonCpgGenerator(config: PythonFrontendConfig, rootPath: Path) extends CpgGenerator {
+case class PythonCpgGenerator(config: FrontendConfig, rootPath: Path) extends CpgGenerator {
 
   /**
     * Generate a CPG for the given input path.

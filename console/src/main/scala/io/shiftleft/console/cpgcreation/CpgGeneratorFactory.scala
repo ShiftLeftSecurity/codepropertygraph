@@ -19,7 +19,7 @@ class CpgGeneratorFactory(config: ConsoleConfig) {
     guessLanguage(inputPath)
       .flatMap { l =>
         report("Using generator for language: " + l)
-        cpgGeneratorForLanguage(l, config.frontend, config.install.rootPath.path)
+        cpgGeneratorForLanguage(l, config.frontend, config.install.rootPath.path, additionalArgs = Nil)
       }
   }
 
@@ -34,7 +34,8 @@ class CpgGeneratorFactory(config: ConsoleConfig) {
           cpgGeneratorForLanguage(
             lang,
             config.frontend,
-            config.install.rootPath.path
+            config.install.rootPath.path,
+            additionalArgs = Nil
         ))
   }
 

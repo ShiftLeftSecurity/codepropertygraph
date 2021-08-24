@@ -15,5 +15,22 @@ class ConsoleConfigTest extends AnyWordSpec with Matchers {
       val config = new InstallConfig(environment = Map("SHIFTLEFT_OCULAR_INSTALL_DIR" -> "/tmp"))
       config.rootPath shouldBe File("/tmp")
     }
+
+    "copy config with params correctly" in {
+      val config = new FrontendConfig()
+      val initialParamList = List("param1", "param2")
+      val additionalParamList = List("param3", "param4", "param5")
+
+      config.cmdLineParams ++= initialParamList
+      val newConfig = config.withAdditionalArgs(additionalParamList)
+
+      withClue("New config should have the full param list") {
+        newConfig.cmdLineParams shouldBe (initialParamList ++ additionalParamList)
+      }
+
+      withClue("Old config should not be mutated") {
+        config.cmdLineParams shouldBe initialParamList
+      }
+    }
   }
 }

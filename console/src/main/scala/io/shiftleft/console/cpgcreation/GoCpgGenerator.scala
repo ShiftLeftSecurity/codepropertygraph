@@ -1,13 +1,13 @@
 package io.shiftleft.console.cpgcreation
 
-import io.shiftleft.console.GoFrontendConfig
+import io.shiftleft.console.FrontendConfig
 
 import java.nio.file.Path
 
 /**
   * Language frontend for Go code.  Translates Go source code into Code Property Graphs.
   */
-case class GoCpgGenerator(config: GoFrontendConfig, rootPath: Path) extends CpgGenerator {
+case class GoCpgGenerator(config: FrontendConfig, rootPath: Path) extends CpgGenerator {
 
   /**
     * Generate a CPG for the given input path.
