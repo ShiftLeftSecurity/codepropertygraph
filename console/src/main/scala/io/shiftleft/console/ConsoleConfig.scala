@@ -29,8 +29,6 @@ object ToolsConfig {
 
 class ToolsConfig(var imageViewer: String = "xdg-open")
 
-case class FrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer()) {
-  def withAdditionalArgs(additionalArgs: Iterable[String]): FrontendConfig = {
-    FrontendConfig(cmdLineParams ++ additionalArgs)
-  }
+case class FrontendConfig(cmdLineParams: Iterable[String] = Nil) {
+  def withAdditionalArgs(additionalArgs: Iterable[String]) = copy(cmdLineParams ++ additionalArgs)
 }
