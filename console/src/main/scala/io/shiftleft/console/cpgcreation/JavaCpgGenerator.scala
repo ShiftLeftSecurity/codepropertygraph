@@ -1,13 +1,13 @@
 package io.shiftleft.console.cpgcreation
 
-import io.shiftleft.console.JavaFrontendConfig
+import io.shiftleft.console.FrontendConfig
 
 import java.nio.file.Path
 
 /**
   * Language frontend for Java archives (JAR files). Translates Java archives into code property graphs.
   * */
-case class JavaCpgGenerator(config: JavaFrontendConfig, rootPath: Path) extends CpgGenerator {
+case class JavaCpgGenerator(config: FrontendConfig, rootPath: Path) extends CpgGenerator {
 
   /**
     * Generate a CPG for the given input path.

@@ -1,13 +1,13 @@
 package io.shiftleft.console.cpgcreation
 
-import io.shiftleft.console.LlvmFrontendConfig
+import io.shiftleft.console.FrontendConfig
 
 import java.nio.file.Path
 
 /**
   * Language frontend for LLVM.  Translates LLVM bitcode into Code Property Graphs.
   */
-case class LlvmCpgGenerator(config: LlvmFrontendConfig, rootPath: Path) extends CpgGenerator {
+case class LlvmCpgGenerator(config: FrontendConfig, rootPath: Path) extends CpgGenerator {
 
   /**
     * Generate a CPG for the given input path.

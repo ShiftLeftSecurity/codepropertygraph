@@ -1,10 +1,10 @@
 package io.shiftleft.console.cpgcreation
 
-import io.shiftleft.console.PhpFrontendConfig
+import io.shiftleft.console.FrontendConfig
 
 import java.nio.file.Path
 
-case class PhpCpgGenerator(config: PhpFrontendConfig, rootPath: Path) extends CpgGenerator {
+case class PhpCpgGenerator(config: FrontendConfig, rootPath: Path) extends CpgGenerator {
 
   override def generate(inputPath: String, outputPath: String, namespaces: List[String]): Option[String] = {
     val command = rootPath.resolve("php2cpg").toString

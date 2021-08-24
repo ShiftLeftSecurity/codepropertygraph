@@ -1,6 +1,6 @@
 package io.shiftleft.console.cpgcreation
 
-import io.shiftleft.console.FuzzyCFrontendConfig
+import io.shiftleft.console.FrontendConfig
 
 import java.nio.file.Path
 
@@ -8,7 +8,7 @@ import java.nio.file.Path
   * Fuzzy C/C++ language frontend. Translates C/C++ source files
   * into code property graphs via fuzzy parsing.
   * */
-case class FuzzyCCpgGenerator(config: FuzzyCFrontendConfig, rootPath: Path) extends CpgGenerator {
+case class FuzzyCCpgGenerator(config: FrontendConfig, rootPath: Path) extends CpgGenerator {
 
   /**
     * Generate a CPG for the given input path.
