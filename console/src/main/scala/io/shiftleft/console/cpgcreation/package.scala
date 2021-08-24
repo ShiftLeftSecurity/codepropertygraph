@@ -13,18 +13,18 @@ package object cpgcreation {
   def cpgGeneratorForLanguage(language: String,
                               config: FrontendConfig,
                               rootPath: Path,
-                              additionalArgs: List[String]): Option[CpgGenerator] = {
+                              args: List[String]): Option[CpgGenerator] = {
     language match {
-      case Languages.CSHARP     => Some(CSharpCpgGenerator(config.withAdditionalArgs(additionalArgs), rootPath))
-      case Languages.C          => Some(FuzzyCCpgGenerator(config.withAdditionalArgs(additionalArgs), rootPath))
-      case Languages.LLVM       => Some(LlvmCpgGenerator(config.withAdditionalArgs(additionalArgs), rootPath))
-      case Languages.GOLANG     => Some(GoCpgGenerator(config.withAdditionalArgs(additionalArgs), rootPath))
-      case Languages.JAVA       => Some(JavaCpgGenerator(config.withAdditionalArgs(additionalArgs), rootPath))
-      case Languages.JAVASCRIPT => Some(JsCpgGenerator(config.withAdditionalArgs(additionalArgs), rootPath))
-      case Languages.PYTHON     => Some(PythonCpgGenerator(config.withAdditionalArgs(additionalArgs), rootPath))
-      case Languages.PHP        => Some(PhpCpgGenerator(config.withAdditionalArgs(additionalArgs), rootPath))
-      case Languages.GHIDRA     => Some(GhidraCpgGenerator(config.withAdditionalArgs(additionalArgs), rootPath))
-      case Languages.NEWC       => Some(CCpgGenerator(config.withAdditionalArgs(additionalArgs), rootPath))
+      case Languages.CSHARP     => Some(CSharpCpgGenerator(config.withArgs(args), rootPath))
+      case Languages.C          => Some(FuzzyCCpgGenerator(config.withArgs(args), rootPath))
+      case Languages.LLVM       => Some(LlvmCpgGenerator(config.withArgs(args), rootPath))
+      case Languages.GOLANG     => Some(GoCpgGenerator(config.withArgs(args), rootPath))
+      case Languages.JAVA       => Some(JavaCpgGenerator(config.withArgs(args), rootPath))
+      case Languages.JAVASCRIPT => Some(JsCpgGenerator(config.withArgs(args), rootPath))
+      case Languages.PYTHON     => Some(PythonCpgGenerator(config.withArgs(args), rootPath))
+      case Languages.PHP        => Some(PhpCpgGenerator(config.withArgs(args), rootPath))
+      case Languages.GHIDRA     => Some(GhidraCpgGenerator(config.withArgs(args), rootPath))
+      case Languages.NEWC       => Some(CCpgGenerator(config.withArgs(args), rootPath))
       case _                    => None
     }
   }

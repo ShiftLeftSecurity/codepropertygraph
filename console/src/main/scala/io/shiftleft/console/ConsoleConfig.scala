@@ -30,8 +30,8 @@ object ToolsConfig {
 class ToolsConfig(var imageViewer: String = "xdg-open")
 
 class FrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer()) {
-  def withAdditionalArgs(additionalArgs: Iterable[String]): FrontendConfig = {
-    new FrontendConfig(cmdLineParams ++ additionalArgs)
+  def withArgs(args: Iterable[String]): FrontendConfig = {
+    new FrontendConfig(cmdLineParams ++ args)
   }
 }
 
