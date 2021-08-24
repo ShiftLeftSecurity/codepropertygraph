@@ -2,8 +2,6 @@ package io.shiftleft.console
 
 import better.files._
 
-import scala.collection.mutable
-
 /**
   * Installation configuration of Console
   *
