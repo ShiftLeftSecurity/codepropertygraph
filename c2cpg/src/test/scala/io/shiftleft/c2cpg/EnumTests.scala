@@ -136,10 +136,12 @@ class EnumTests extends AnyWordSpec with Matchers with Inside with CompleteCpgFi
        |    a,
        |    b
        |};
-       |int x = X::a;
+       |void foo() {
+       |  int x = X::a;
+       |};
        |""".stripMargin) { cpg =>
       inside(cpg.typeDecl.l) {
-        case List(x) =>
+        case List(_, x) =>
           x.name shouldBe "X"
           inside(x.member.l) {
             case List(a, b) =>

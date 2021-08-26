@@ -37,7 +37,9 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
 
     "be correct for compound statement expressions" in TestAstOnlyFixture(
       """
-       |int x = ({int y = 1; y;}) + ({int z = 2; z;});
+       |void foo() {
+       |  int x = ({int y = 1; y;}) + ({int z = 2; z;});
+       |};
        |""".stripMargin) { cpg =>
       cpg.call(Operators.addition).l match {
         case List(add) =>
@@ -91,21 +93,25 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
 
     "be correct for simple lambda expressions" in TestAstOnlyFixture(
       """
-        |auto x = [] (int a, int b) -> int
-        |{
-        |    return a + b;
-        |};
-        |auto x = [] (string a, string b) -> string
-        |{
-        |    return a + b;
+        |void foo() {
+        |  auto x = [] (int a, int b) -> int
+        |  {
+        |      return a + b;
+        |  };
+        |  auto x = [] (string a, string b) -> string
+        |  {
+        |      return a + b;
+        |  };
         |};
         |""".stripMargin,
       "test.cpp"
     ) { cpg =>
-      val lambda1FullName = "anonymous_lambda_0"
-      val lambda2FullName = "anonymous_lambda_1"
+      val lambda1Name = "anonymous_lambda_0"
+      val lambda2Name = "anonymous_lambda_1"
+      val lambda1FullName = "foo.anonymous_lambda_0"
+      val lambda2FullName = "foo.anonymous_lambda_1"
 
-      cpg.assignment.order(1).l match {
+      cpg.assignment.order(2).l match {
         case List(assignment1) =>
           assignment1.astMinusRoot.isMethodRef.l match {
             case List(ref) =>
@@ -115,7 +121,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
         case _ => fail()
       }
 
-      cpg.assignment.order(2).l match {
+      cpg.assignment.order(4).l match {
         case List(assignment2) =>
           assignment2.astMinusRoot.isMethodRef.l match {
             case List(ref) =>
@@ -127,29 +133,29 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
 
       cpg.method.fullNameExact(lambda1FullName).l match {
         case List(l1) =>
-          l1.name shouldBe lambda1FullName
+          l1.name shouldBe lambda1Name
           l1.code shouldBe "int anonymous_lambda_0 (int a,int b)"
-          l1.signature shouldBe "int anonymous_lambda_0 (int,int)"
+          l1.signature shouldBe "int foo.anonymous_lambda_0 (int,int)"
         case _ => fail()
       }
 
       cpg.method.fullNameExact(lambda2FullName).l match {
         case List(l2) =>
-          l2.name shouldBe lambda2FullName
+          l2.name shouldBe lambda2Name
           l2.code shouldBe "string anonymous_lambda_1 (string a,string b)"
-          l2.signature shouldBe "string anonymous_lambda_1 (string,string)"
+          l2.signature shouldBe "string foo.anonymous_lambda_1 (string,string)"
         case _ => fail()
       }
 
       cpg.typeDecl(lambda1FullName).head.bindsOut.l match {
         case List(binding: Binding) =>
-          binding.name shouldBe lambda1FullName
-          binding.signature shouldBe "int anonymous_lambda_0 (int,int)"
+          binding.name shouldBe lambda1Name
+          binding.signature shouldBe "int foo.anonymous_lambda_0 (int,int)"
           binding.refOut.l match {
             case List(method: Method) =>
-              method.name shouldBe lambda1FullName
+              method.name shouldBe lambda1Name
               method.fullName shouldBe lambda1FullName
-              method.signature shouldBe "int anonymous_lambda_0 (int,int)"
+              method.signature shouldBe "int foo.anonymous_lambda_0 (int,int)"
             case _ => fail()
           }
         case _ => fail()
@@ -257,34 +263,37 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
 
     "be correct when calling a lambda" in TestAstOnlyFixture(
       """
-        |auto x = [](int n) -> int
-        |{
-        |  return 32 + n;
-        |};
+        |void foo() {
+        |  auto x = [](int n) -> int
+        |  {
+        |    return 32 + n;
+        |  };
         |
-        |constexpr int foo1 = x(10);
-        |constexpr int foo2 = [](int n) -> int
-        |{
-        |  return 32 + n;
-        |}(10);
+        |  constexpr int foo1 = x(10);
+        |  constexpr int foo2 = [](int n) -> int
+        |  {
+        |    return 32 + n;
+        |  }(10);
+        |};
         |""".stripMargin,
       "test.cpp"
     ) { cpg =>
       val lambda1Name = "anonymous_lambda_0"
-      val signature1 = "int anonymous_lambda_0 (int)"
-      val lambda2Name = "anonymous_lambda_1"
+      val lambda1FullName = "foo.anonymous_lambda_0"
+      val signature1 = "int foo.anonymous_lambda_0 (int)"
+      val lambda2FullName = "foo.anonymous_lambda_1"
 
-      cpg.assignment.order(1).l match {
+      cpg.assignment.order(2).l match {
         case List(assignment1) =>
           assignment1.astMinusRoot.isMethodRef.l match {
             case List(ref) =>
-              ref.methodFullName shouldBe lambda1Name
+              ref.methodFullName shouldBe lambda1FullName
             case _ => fail()
           }
         case _ => fail()
       }
 
-      cpg.method.fullNameExact(lambda1Name).l match {
+      cpg.method.fullNameExact(lambda1FullName).l match {
         case List(l1) =>
           l1.name shouldBe lambda1Name
           l1.code shouldBe "int anonymous_lambda_0 (int n)"
@@ -292,14 +301,14 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
         case _ => fail()
       }
 
-      cpg.typeDecl(lambda1Name).head.bindsOut.l match {
+      cpg.typeDecl(lambda1FullName).head.bindsOut.l match {
         case List(binding: Binding) =>
           binding.name shouldBe lambda1Name
           binding.signature shouldBe signature1
           binding.refOut.l match {
             case List(method: Method) =>
               method.name shouldBe lambda1Name
-              method.fullName shouldBe lambda1Name
+              method.fullName shouldBe lambda1FullName
               method.signature shouldBe signature1
             case _ => fail()
           }
@@ -330,14 +339,14 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
         case _ => fail()
       }
 
-      cpg.call(lambda2Name).l match {
+      cpg.call(lambda2FullName).l match {
         case List(lambda2call) =>
-          lambda2call.name shouldBe lambda2Name
-          lambda2call.methodFullName shouldBe lambda2Name
+          lambda2call.name shouldBe lambda2FullName
+          lambda2call.methodFullName shouldBe lambda2FullName
           // TODO: lambda2call.dispatchType shouldBe DispatchTypes.DYNAMIC_DISPATCH
           lambda2call.astChildren.l match {
             case List(ref: MethodRef, lit: Literal) =>
-              ref.methodFullName shouldBe lambda2Name
+              ref.methodFullName shouldBe lambda2FullName
               ref.code shouldBe "int anonymous_lambda_1 (int n)"
               lit.code shouldBe "10"
             case _ => fail()
@@ -349,7 +358,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
           }
           lambda2call.receiver.l match {
             case List(ref: MethodRef) =>
-              ref.methodFullName shouldBe lambda2Name
+              ref.methodFullName shouldBe lambda2FullName
               ref.code shouldBe "int anonymous_lambda_1 (int n)"
             case _ => fail()
           }
@@ -1033,9 +1042,10 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
         | char x;
         | int method(){return i;};
         |};
-        |
-        |Foo f;
-        |int x = f.method();
+        |void foo() {
+        |  Foo f;
+        |  int x = f.method();
+        |}
       """.stripMargin,
       "file.cpp"
     ) { cpg =>
@@ -1054,7 +1064,9 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
 
     "be correct for type initializer expression" in TestAstOnlyFixture(
       """
-        |int x = (int){ 1 };
+        |void foo() {
+        |  int x = (int){ 1 };
+        |};
       """.stripMargin,
       "file.cpp"
     ) { cpg =>
@@ -1108,7 +1120,9 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
         |public:
         | Foo(int i){};
         |};
-        |Foo f1(0);
+        |void foo() {
+        |  Foo f1(0);
+        |};
       """.stripMargin,
       "file.cpp"
     ) { cpg =>
@@ -1166,7 +1180,9 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
         |public:
         | Foo(int i) {  };
         |};
-        |Foo x = Foo{0};
+        |void foo() {
+        |  Foo x = Foo{0};
+        |};
       """.stripMargin,
       "file.cpp"
     ) { cpg =>
@@ -1206,7 +1222,9 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
         | #include <vlc/libvlc_renderer_discoverer.h>
         | #include <vlc/libvlc_picture.h>
         | #include <vlc/libvlc_media.h>
-        | int x = 0;
+        | void foo() {
+        |   int x = 0;
+        | }
         |}
         |""".stripMargin,
       "file.cpp"
@@ -1428,6 +1446,15 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
   }
 
   "AST" should {
+    "be correct for global variable" in TestAstOnlyFixture("""
+        |static const char foo[] = "foo";
+      """.stripMargin) { cpg =>
+      // We can't handle global variables currently.
+      // See: https://github.com/ShiftLeftSecurity/codescience/issues/3515
+      cpg.identifier.size shouldBe 0
+      cpg.identifier.method.size shouldBe 0
+    }
+
     "have correct line number for method content" in TestAstOnlyFixture("""
        |
        |

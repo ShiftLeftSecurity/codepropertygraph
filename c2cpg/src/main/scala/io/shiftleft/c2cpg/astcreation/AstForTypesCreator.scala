@@ -115,7 +115,7 @@ trait AstForTypesCreator {
   }
 
   protected def astForInitializer(declarator: IASTDeclarator, init: IASTInitializer, order: Int): Ast = init match {
-    case i: IASTEqualsInitializer =>
+    case i: IASTEqualsInitializer if !scope.isEmpty =>
       val operatorName = Operators.assignment
       val callNode = newCallNode(declarator, operatorName, operatorName, DispatchTypes.STATIC_DISPATCH, order)
       val left = astForNode(declarator.getName, 1)
@@ -128,14 +128,15 @@ trait AstForTypesCreator {
         case Some(value) => ast.withArgEdge(callNode, value)
         case None        => ast
       }
-    case i: ICPPASTConstructorInitializer =>
+    case i: ICPPASTConstructorInitializer if !scope.isEmpty =>
       val name = declarator.getName.toString
       val callNode = newCallNode(declarator, name, name, DispatchTypes.STATIC_DISPATCH, order)
       val args = withOrder(i.getArguments) { case (a, o) => astForNode(a, o) }
       val ast = Ast(callNode).withChildren(args)
       val validArgs = args.collect { case a if a.root.isDefined => a.root.get }
       ast.withArgEdges(callNode, validArgs)
-    case _ => astForNode(init, order)
+    case _ if !scope.isEmpty => astForNode(init, order)
+    case _                   => Ast()
   }
 
   protected def handleUsingDeclaration(usingDecl: ICPPASTUsingDeclaration): Unit = {
