@@ -4,8 +4,8 @@ import io.shiftleft.c2cpg.C2Cpg
 import io.shiftleft.c2cpg.datastructures.Stack._
 import io.shiftleft.c2cpg.datastructures.{Global, Scope}
 import io.shiftleft.c2cpg.utils.IOUtils
-import io.shiftleft.codepropertygraph.generated.{EvaluationStrategies, NodeTypes}
 import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EvaluationStrategies, NodeTypes}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
