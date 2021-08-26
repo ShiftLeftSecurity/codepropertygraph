@@ -81,7 +81,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
         |{ return 0; }
         |""".stripMargin) { cpg =>
       inside(cpg.method.fullName.l) {
-        case List(m1, f1, f2, h, m2) =>
+        case List(_, m1, f1, f2, h, m2) =>
           // TODO: this looks strange too it first glance. But as Eclipse CDT does not provide any
           //  mapping from definitions outside of namespace into them we cant reconstruct proper full-names.
           m1 shouldBe "Q.V.C.m"
@@ -135,7 +135,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
       }
 
       inside(cpg.method.fullName.l) {
-        case List(f, g, h) =>
+        case List(_, f, g, h) =>
           f shouldBe "f"
           g shouldBe "A.g"
           h shouldBe "h"
@@ -174,7 +174,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
       }
 
       inside(cpg.method.fullName.l) {
-        case List(f, g, h) =>
+        case List(_, f, g, h) =>
           f shouldBe "f"
           g shouldBe "A.g"
           h shouldBe "h"
@@ -216,7 +216,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
       }
 
       inside(cpg.method.l) {
-        case List(f1, f2, foo, bar) =>
+        case List(_, f1, f2, foo, bar) =>
           f1.fullName shouldBe "A.f"
           f1.signature shouldBe "void A.f (int)"
           f2.fullName shouldBe "A.f"

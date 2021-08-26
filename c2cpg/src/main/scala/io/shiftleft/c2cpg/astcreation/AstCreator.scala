@@ -5,6 +5,7 @@ import io.shiftleft.c2cpg.datastructures.Stack._
 import io.shiftleft.c2cpg.datastructures.{Global, Scope}
 import io.shiftleft.c2cpg.utils.IOUtils
 import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{EvaluationStrategies, NodeTypes}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
@@ -43,14 +44,7 @@ class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Con
     val cpgFile = Ast(NewFile(name = filename, order = 0))
     val translationUnitAst = astForTranslationUnit(parserResult)
 
-    var currOrder = 1
-    val declsAsts = parserResult.getDeclarations.flatMap { stmt =>
-      val r = astsForDeclaration(stmt, currOrder)
-      currOrder = currOrder + r.length
-      r
-    }.toIndexedSeq
-
-    val ast = cpgFile.withChild(translationUnitAst.withChildren(declsAsts))
+    val ast = cpgFile.withChild(translationUnitAst)
     if (config.includeComments) {
       val commentsAsts = parserResult.getComments.map(comment => astForComment(comment)).toIndexedSeq
       ast.withChildren(commentsAsts)
@@ -59,15 +53,56 @@ class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Con
     }
   }
 
+  private def createFakeMethod(name: String,
+                               fullName: String,
+                               path: String,
+                               iASTTranslationUnit: IASTTranslationUnit): Ast = {
+    val fakeGlobalMethod =
+      NewMethod()
+        .name(name)
+        .code(name)
+        .fullName(fullName)
+        .filename(path)
+        .astParentType(NodeTypes.NAMESPACE_BLOCK)
+        .astParentFullName(fullName)
+
+    methodAstParentStack.push(fakeGlobalMethod)
+    scope.pushNewScope(fakeGlobalMethod)
+
+    val blockNode = NewBlock()
+      .order(1)
+      .argumentIndex(1)
+      .typeFullName("ANY")
+
+    var currOrder = 1
+    val declsAsts = iASTTranslationUnit.getDeclarations.flatMap { stmt =>
+      val r = astsForDeclaration(stmt, currOrder)
+      currOrder = currOrder + r.length
+      r
+    }.toIndexedSeq
+
+    val methodReturn = NewMethodReturn()
+      .code("RET")
+      .evaluationStrategy(EvaluationStrategies.BY_VALUE)
+      .typeFullName("ANY")
+      .order(2)
+
+    Ast(fakeGlobalMethod)
+      .withChild(Ast(blockNode).withChildren(declsAsts))
+      .withChild(Ast(methodReturn))
+  }
+
   private def astForTranslationUnit(iASTTranslationUnit: IASTTranslationUnit): Ast = {
     val absolutePath = new java.io.File(iASTTranslationUnit.getFilePath).toPath.toAbsolutePath.normalize().toString
+    val name = NamespaceTraversal.globalNamespaceName
+    val fullName = MetaDataPass.getGlobalNamespaceBlockFullName(Some(absolutePath))
     val namespaceBlock = NewNamespaceBlock()
-      .name(NamespaceTraversal.globalNamespaceName)
-      .fullName(MetaDataPass.getGlobalNamespaceBlockFullName(Some(absolutePath)))
+      .name(name)
+      .fullName(fullName)
       .filename(absolutePath)
       .order(1)
     methodAstParentStack.push(namespaceBlock)
-    Ast(namespaceBlock)
+    Ast(namespaceBlock).withChild(createFakeMethod(name, fullName, absolutePath, iASTTranslationUnit))
   }
 
 }

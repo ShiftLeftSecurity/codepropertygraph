@@ -69,7 +69,7 @@ class TemplateTests extends AnyWordSpec with Matchers with Inside with CompleteC
        |void y(T a, U b);
        |""".stripMargin) { cpg =>
       inside(cpg.method.l) {
-        case List(x, y) =>
+        case List(_, x, y) =>
           x.name shouldBe "x"
           x.fullName shouldBe "x"
           x.signature shouldBe "void x<T,U> (T,U)"

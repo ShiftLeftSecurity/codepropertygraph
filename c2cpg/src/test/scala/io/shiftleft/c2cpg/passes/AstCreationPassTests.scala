@@ -489,7 +489,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
           |void method(int x) {
           |  int local = x;
           |}""".stripMargin) { cpg =>
-        cpg.method.block.astChildren.assignments.source.l match {
+        cpg.method("method").block.astChildren.assignments.source.l match {
           case List(identifier: Identifier) =>
             identifier.code shouldBe "x"
             identifier.typeFullName shouldBe "int"
@@ -537,7 +537,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
       """.stripMargin) { cpg =>
       cpg.local.l.sortBy(_.order).map(_.name) shouldBe List("x", "y", "z")
 
-      cpg.method.assignments.l match {
+      cpg.method.name("method").assignments.l match {
         case List(assignment) =>
           assignment.target.code shouldBe "x"
           assignment.source.start.isCall.name.l shouldBe List(Operators.addition)
