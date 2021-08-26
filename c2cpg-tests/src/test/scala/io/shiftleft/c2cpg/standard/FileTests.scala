@@ -37,7 +37,7 @@ class FileTests extends CCodeToCpgSuite {
   }
 
   "should allow traversing from file to its methods via namespace block" in {
-    cpg.file.nameNot(FileTraversal.UNKNOWN).method.name.toSet shouldBe Set("foo", "bar")
+    cpg.file.nameNot(FileTraversal.UNKNOWN).method.name.toSet shouldBe Set("<global>", "foo", "bar")
   }
 
   "should allow traversing from file to its type declarations via namespace block" in {

@@ -11,7 +11,7 @@ class MethodTests extends CCodeToCpgSuite {
       | }""".stripMargin
 
   "should contain exactly one method node with correct fields" in {
-    val List(x) = cpg.method.l
+    val List(x) = cpg.method.name("main").l
     x.name shouldBe "main"
     x.fullName shouldBe "main"
     x.code shouldBe "int main (int argc,char **argv)"
@@ -26,7 +26,7 @@ class MethodTests extends CCodeToCpgSuite {
   }
 
   "should return correct number of lines" in {
-    cpg.method.numberOfLines.l shouldBe List(2)
+    cpg.method.name("main").numberOfLines.l shouldBe List(2)
   }
 
   "should allow traversing to parameters" in {
@@ -47,7 +47,7 @@ class CMethodTests2 extends CCodeToCpgSuite {
   override val code = "int foo(); int bar() { return woo(); }"
 
   "should identify method as stub" in {
-    cpg.method.isStub.name.toSet shouldBe Set("foo", "woo")
+    cpg.method.isStub.name.toSet shouldBe Set("<global>", "foo", "woo")
     cpg.method.isNotStub.name.l shouldBe List("bar")
   }
 }

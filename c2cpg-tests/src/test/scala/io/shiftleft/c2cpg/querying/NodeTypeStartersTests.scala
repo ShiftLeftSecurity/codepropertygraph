@@ -29,7 +29,7 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
     * exists is in `cpg.method.internal`. All other methods are in `cpg.method.external`.
     * */
   "should allow retrieving methods" in {
-    cpg.method.internal.name.l shouldBe List("main")
+    cpg.method.internal.name.l shouldBe List("<global>", "main")
     cpg.method.external.name.l shouldBe List("libfunc")
   }
 
@@ -78,7 +78,7 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
   }
 
   "should allow retrieving of method returns" in {
-    cpg.methodReturn.l.size shouldBe 2
+    cpg.methodReturn.l.size shouldBe 3
   }
 
   "should allow retrieving of meta data" in {
