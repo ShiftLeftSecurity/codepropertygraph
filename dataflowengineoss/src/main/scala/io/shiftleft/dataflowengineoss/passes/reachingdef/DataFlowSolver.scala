@@ -27,10 +27,12 @@ class DataFlowSolver {
           .getOrElse(problem.empty)
         in += n -> inSet
         val old = out(n)
-        out += n -> problem.transferFunction(n, inSet)
-        if (old != out(n))
+        val newSet = problem.transferFunction(n, inSet)
+        val changed = !old.equals(newSet)
+        out += n -> newSet
+        if (changed) {
           problem.flowGraph.succ(n)
-        else
+        } else
           List()
       }
       workList.clear()
@@ -60,8 +62,10 @@ class DataFlowSolver {
           .getOrElse(problem.empty)
         out += n -> outSet
         val old = in(n)
-        in += n -> problem.transferFunction(n, outSet)
-        if (old != in(n))
+        val newSet = problem.transferFunction(n, outSet)
+        val changed = !old.equals(newSet)
+        in += n -> newSet
+        if (changed)
           problem.flowGraph.pred(n)
         else
           List()
