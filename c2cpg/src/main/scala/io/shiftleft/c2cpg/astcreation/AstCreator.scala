@@ -85,7 +85,7 @@ class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Con
       .code("RET")
       .evaluationStrategy(EvaluationStrategies.BY_VALUE)
       .typeFullName("ANY")
-      .order(declsAsts.length + 1)
+      .order(2)
 
     Ast(fakeGlobalMethod)
       .withChild(Ast(blockNode).withChildren(declsAsts))
@@ -102,9 +102,7 @@ class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Con
       .filename(absolutePath)
       .order(1)
     methodAstParentStack.push(namespaceBlock)
-    val fakeMethod = createFakeMethod(name, fullName, absolutePath, iASTTranslationUnit)
-
-    Ast(namespaceBlock).withChild(fakeMethod)
+    Ast(namespaceBlock).withChild(createFakeMethod(name, fullName, absolutePath, iASTTranslationUnit))
   }
 
 }
