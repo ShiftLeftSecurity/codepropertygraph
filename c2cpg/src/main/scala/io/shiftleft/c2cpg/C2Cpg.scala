@@ -89,7 +89,7 @@ object C2Cpg {
           .unbounded()
           .text("header include paths")
           .action((incl, cfg) => cfg.copy(includePaths = cfg.includePaths + incl)),
-        opt[String]('D', "define")
+        opt[String]("define")
           .unbounded()
           .text("define a name")
           .action((d, cfg) => cfg.copy(defines = cfg.defines + d))
