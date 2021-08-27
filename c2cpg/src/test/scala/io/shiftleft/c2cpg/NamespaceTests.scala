@@ -283,6 +283,25 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
       }
     }
 
+    "be correct for namespaces with alias inside of methods" in CompleteCpgFixture("""
+       |namespace foo {
+       | namespace bar {};
+       |};
+       | 
+       |int main() {
+       |    namespace x = foo::bar;
+       |};""".stripMargin) { cpg =>
+      inside(cpg.namespaceBlock.l) {
+        case List(_, foo, bar, x) =>
+          foo.name shouldBe "foo"
+          foo.fullName shouldBe "foo"
+          bar.name shouldBe "bar"
+          bar.fullName shouldBe "foo.bar"
+          x.name shouldBe "x"
+          x.fullName shouldBe "foo.bar"
+      }
+    }
+
   }
 
 }

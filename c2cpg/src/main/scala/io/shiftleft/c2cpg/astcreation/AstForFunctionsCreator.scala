@@ -7,8 +7,8 @@ import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTLambdaExpression
 import org.eclipse.cdt.core.dom.ast.gnu.c.ICASTKnRFunctionDeclarator
-import org.eclipse.cdt.internal.core.dom.parser.c.CASTFunctionDeclarator
-import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTFunctionDeclarator
+import org.eclipse.cdt.internal.core.dom.parser.c.{CASTFunctionDeclarator, CASTParameterDeclaration}
+import org.eclipse.cdt.internal.core.dom.parser.cpp.{CPPASTFunctionDeclarator, CPPASTParameterDeclaration}
 
 import scala.annotation.tailrec
 
@@ -38,7 +38,6 @@ trait AstForFunctionsCreator {
   private def parameters(funct: IASTNode): Seq[IASTNode] = funct match {
     case decl: CPPASTFunctionDeclarator            => decl.getParameters.toIndexedSeq
     case decl: CASTFunctionDeclarator              => decl.getParameters.toIndexedSeq
-    case decl: IASTStandardFunctionDeclarator      => decl.getParameters.toIndexedSeq
     case defn: IASTFunctionDefinition              => parameters(defn.getDeclarator)
     case lambdaExpression: ICPPASTLambdaExpression => parameters(lambdaExpression.getDeclarator)
     case knr: ICASTKnRFunctionDeclarator           => knr.getParameterDeclarations.toIndexedSeq
@@ -46,14 +45,25 @@ trait AstForFunctionsCreator {
     case null                                      => Seq.empty
   }
 
+  @tailrec
+  private def isVariadic(funct: IASTNode): Boolean = funct match {
+    case decl: CPPASTFunctionDeclarator            => decl.takesVarArgs()
+    case decl: CASTFunctionDeclarator              => decl.takesVarArgs()
+    case defn: IASTFunctionDefinition              => isVariadic(defn.getDeclarator)
+    case lambdaExpression: ICPPASTLambdaExpression => isVariadic(lambdaExpression.getDeclarator)
+    case _                                         => false
+  }
+
   private def parameterListSignature(func: IASTNode, includeParamNames: Boolean): String = {
+    val variadic = if (isVariadic(func)) "..." else ""
     val elements =
       if (!includeParamNames) parameters(func).map {
         case p: IASTParameterDeclaration => typeForDeclSpecifier(p.getDeclSpecifier)
         case other                       => typeForDeclSpecifier(other)
-      } else
+      } else {
         parameters(func).map(p => p.getRawSignature)
-    "(" + elements.mkString(",") + ")"
+      }
+    s"(${elements.mkString(",")}$variadic)"
   }
 
   protected def methodRefForLambda(lambdaExpression: ICPPASTLambdaExpression): NewMethodRef = {
@@ -85,6 +95,13 @@ trait AstForFunctionsCreator {
     val parameterAsts = withOrder(parameters(lambdaExpression.getDeclarator)) { (p, o) =>
       astForParameter(p, o)
     }
+
+    parameterAsts.lastOption.foreach(_.root.foreach {
+      case p: NewMethodParameterIn if isVariadic(lambdaExpression) =>
+        p.isVariadic = true
+        p.code = p.code + "..."
+      case _ =>
+    })
 
     val lastOrder = 1 + parameterAsts.size
 
@@ -128,6 +145,13 @@ trait AstForFunctionsCreator {
       astForParameter(p, order)
     }
 
+    parameterAsts.lastOption.foreach(_.root.foreach {
+      case p: NewMethodParameterIn if isVariadic(funcDecl) =>
+        p.isVariadic = true
+        p.code = p.code + "..."
+      case _ =>
+    })
+
     val lastOrder = 1 + parameterAsts.size
     val r = Ast(methodNode)
       .withChildren(parameterAsts)
@@ -140,24 +164,24 @@ trait AstForFunctionsCreator {
     r.merge(typeDeclAst)
   }
 
-  protected def astForFunctionDefinition(functDef: IASTFunctionDefinition, order: Int): Ast = {
-    val returnType = typeForDeclSpecifier(functDef.getDeclSpecifier)
-    val name = shortName(functDef)
-    val fullname = fullName(functDef)
-    val templateParams = templateParameters(functDef).getOrElse("")
-    val signature = returnType + " " + fullname + templateParams + " " + parameterListSignature(functDef,
+  protected def astForFunctionDefinition(funcDef: IASTFunctionDefinition, order: Int): Ast = {
+    val returnType = typeForDeclSpecifier(funcDef.getDeclSpecifier)
+    val name = shortName(funcDef)
+    val fullname = fullName(funcDef)
+    val templateParams = templateParameters(funcDef).getOrElse("")
+    val signature = returnType + " " + fullname + templateParams + " " + parameterListSignature(funcDef,
                                                                                                 includeParamNames =
                                                                                                   false)
-    val code = returnType + " " + name + " " + parameterListSignature(functDef, includeParamNames = true)
+    val code = returnType + " " + name + " " + parameterListSignature(funcDef, includeParamNames = true)
     val methodNode = NewMethod()
       .name(name)
       .code(code)
       .isExternal(false)
       .fullName(fullname)
-      .lineNumber(line(functDef))
-      .lineNumberEnd(lineEnd(functDef))
-      .columnNumber(column(functDef))
-      .columnNumberEnd(columnEnd(functDef))
+      .lineNumber(line(funcDef))
+      .lineNumberEnd(lineEnd(funcDef))
+      .columnNumber(column(funcDef))
+      .columnNumberEnd(columnEnd(funcDef))
       .signature(signature)
       .filename(filename)
       .order(order)
@@ -165,15 +189,22 @@ trait AstForFunctionsCreator {
     methodAstParentStack.push(methodNode)
     scope.pushNewScope(methodNode)
 
-    val parameterAsts = withOrder(parameters(functDef)) { (p, order) =>
+    val parameterAsts = withOrder(parameters(funcDef)) { (p, order) =>
       astForParameter(p, order)
     }
+
+    parameterAsts.lastOption.foreach(_.root.foreach {
+      case p: NewMethodParameterIn if isVariadic(funcDef) =>
+        p.isVariadic = true
+        p.code = p.code + "..."
+      case _ =>
+    })
 
     val lastOrder = 1 + parameterAsts.size
     val r = Ast(methodNode)
       .withChildren(parameterAsts)
-      .withChild(astForMethodBody(Option(functDef.getBody), lastOrder))
-      .withChild(astForMethodReturn(functDef, lastOrder + 1, typeForDeclSpecifier(functDef.getDeclSpecifier)))
+      .withChild(astForMethodBody(Option(funcDef.getBody), lastOrder))
+      .withChild(astForMethodReturn(funcDef, lastOrder + 1, typeForDeclSpecifier(funcDef.getDeclSpecifier)))
 
     scope.popScope()
     methodAstParentStack.pop()
@@ -184,15 +215,21 @@ trait AstForFunctionsCreator {
   }
 
   private def astForParameter(parameter: IASTNode, childNum: Int): Ast = {
-    val (name, code, tpe) = parameter match {
-      case p: IASTParameterDeclaration =>
-        (p.getDeclarator.getName.getRawSignature, p.getRawSignature, typeForDeclSpecifier(p.getDeclSpecifier))
+    val (name, code, tpe, variadic) = parameter match {
+      case p: CASTParameterDeclaration =>
+        (p.getDeclarator.getName.getRawSignature, p.getRawSignature, typeForDeclSpecifier(p.getDeclSpecifier), false)
+      case p: CPPASTParameterDeclaration =>
+        (p.getDeclarator.getName.getRawSignature,
+         p.getRawSignature,
+         typeForDeclSpecifier(p.getDeclSpecifier),
+         p.getDeclarator.declaresParameterPack())
       case s: IASTSimpleDeclaration =>
         (s.getDeclarators.headOption.map(_.getName.getRawSignature).getOrElse(uniqueName("parameter", "", "")._1),
          s.getRawSignature,
-         typeForDeclSpecifier(s))
+         typeForDeclSpecifier(s),
+         false)
       case other =>
-        (other.getRawSignature, other.getRawSignature, typeForDeclSpecifier(other))
+        (other.getRawSignature, other.getRawSignature, typeForDeclSpecifier(other), false)
     }
 
     val parameterNode = NewMethodParameterIn()
@@ -201,6 +238,7 @@ trait AstForFunctionsCreator {
       .typeFullName(registerType(tpe))
       .order(childNum)
       .evaluationStrategy(EvaluationStrategies.BY_VALUE)
+      .isVariadic(variadic)
       .lineNumber(line(parameter))
       .columnNumber(column(parameter))
 

@@ -5,7 +5,7 @@ import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.fixtures.{CpgAstOnlyFixture, TestAstOnlyFixture}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, DispatchTypes, EdgeTypes, Operators}
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, DispatchTypes, EdgeTypes, NodeTypes, Operators}
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
 import org.scalatest.matchers.should.Matchers
@@ -35,30 +35,48 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
 
   "Method AST layout" should {
 
-    "be correct for compound statement expressions" in TestAstOnlyFixture(
-      """
-       |int x = ({int y = 1; y;}) + ({int z = 2; z;});
-       |""".stripMargin) { cpg =>
-      cpg.call(Operators.addition).l match {
-        case List(add) =>
-          add.argument.l match {
-            case List(y, z) =>
-              y.argumentIndex shouldBe 1
-              y.order shouldBe 1
-              y.astChildren.l match {
-                case List(_, c: Call, i: Identifier) =>
-                  c.code shouldBe "y = 1"
-                  i.code shouldBe "y"
-                case _ => fail()
-              }
-              z.argumentIndex shouldBe 2
-              z.order shouldBe 2
-              z.astChildren.l match {
-                case List(_, c: Call, i: Identifier) =>
-                  c.code shouldBe "z = 2"
-                  i.code shouldBe "z"
-                case _ => fail()
-              }
+    "be correct for packed args" in TestAstOnlyFixture("""
+       |void foo(int x, int*... args) {};
+       |""".stripMargin,
+                                                       "test.cpp") { cpg =>
+      cpg.method("foo").l match {
+        case List(m) =>
+          m.parameter.l match {
+            case List(x, args) =>
+              x.name shouldBe "x"
+              x.code shouldBe "int x"
+              x.typeFullName shouldBe "int"
+              x.isVariadic shouldBe false
+              x.order shouldBe 1
+              args.name shouldBe "args"
+              args.code shouldBe "int*... args"
+              args.typeFullName shouldBe "int *"
+              args.isVariadic shouldBe true
+              args.order shouldBe 2
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+    }
+
+    "be correct for varargs" in TestAstOnlyFixture("""
+       |void foo(int x, int args...) {};
+       |""".stripMargin,
+                                                   "test.cpp") { cpg =>
+      cpg.method("foo").l match {
+        case List(m) =>
+          m.parameter.l match {
+            case List(x, args) =>
+              x.name shouldBe "x"
+              x.code shouldBe "int x"
+              x.typeFullName shouldBe "int"
+              x.isVariadic shouldBe false
+              x.order shouldBe 1
+              args.name shouldBe "args"
+              args.code shouldBe "int args..."
+              args.typeFullName shouldBe "int"
+              args.isVariadic shouldBe true
+              args.order shouldBe 2
             case _ => fail()
           }
         case _ => fail()
@@ -1010,6 +1028,23 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
       cpg.typeDecl.name("abc").aliasTypeFullName("foo").size shouldBe 1
     }
 
+    "be correct for classes with friends" in TestAstOnlyFixture(
+      """
+        |class Bar {};
+        |class Foo {
+        |  friend Bar;
+        |};
+      """.stripMargin,
+      "test.cpp"
+    ) { cpg =>
+      cpg.typeDecl("Foo").astChildren.isTypeDecl.l match {
+        case List(bar) =>
+          bar.name shouldBe "Bar"
+          bar.aliasTypeFullName shouldBe Some("Bar")
+        case _ => fail()
+      }
+    }
+
     "be correct for single inheritance" in TestAstOnlyFixture(
       """
         |class Base {public: int i;};
@@ -1428,6 +1463,71 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
   }
 
   "AST" should {
+
+    "be correct for call with pack expansion" in TestAstOnlyFixture("""
+       |void foo(int x, int*... args) {
+       |  foo(x, args...);
+       |};
+      """.stripMargin,
+                                                                    "test.cpp") { cpg =>
+      cpg.call.l match {
+        case List(fooCall: Call) =>
+          fooCall.code shouldBe "foo(x, args...)"
+          fooCall.argument.l match {
+            case List(x, args) =>
+              x.order shouldBe 1
+              x.code shouldBe "x"
+              args.order shouldBe 2
+              args.code shouldBe "args"
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+    }
+
+    "be correct for embedded ASM code" in TestAstOnlyFixture("""
+        |asm(
+        | "  push %ebp       \n"
+        | "  movl %esp, %ebp \n"
+        | "  push %ebx       \n"
+        |);
+      """.stripMargin) { cpg =>
+      cpg.method.ast.filter(_.label == NodeTypes.UNKNOWN).l match {
+        case List(asm: Unknown) => asm.code should startWith("asm(")
+        case _                  => fail()
+      }
+    }
+
+    "be correct for compound statement expressions" in TestAstOnlyFixture(
+      """
+        |int x = ({int y = 1; y;}) + ({int z = 2; z;});
+        |""".stripMargin) { cpg =>
+      cpg.call(Operators.addition).l match {
+        case List(add) =>
+          add.argument.l match {
+            case List(y, z) =>
+              y.argumentIndex shouldBe 1
+              y.order shouldBe 1
+              y.astChildren.l match {
+                case List(_, c: Call, i: Identifier) =>
+                  c.code shouldBe "y = 1"
+                  i.code shouldBe "y"
+                case _ => fail()
+              }
+              z.argumentIndex shouldBe 2
+              z.order shouldBe 2
+              z.astChildren.l match {
+                case List(_, c: Call, i: Identifier) =>
+                  c.code shouldBe "z = 2"
+                  i.code shouldBe "z"
+                case _ => fail()
+              }
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+    }
+
     "have correct line number for method content" in TestAstOnlyFixture("""
        |
        |
