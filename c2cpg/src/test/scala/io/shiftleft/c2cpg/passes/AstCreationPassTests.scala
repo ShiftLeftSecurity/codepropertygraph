@@ -503,6 +503,42 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
       }
     }
 
+    "be correct for decl assignment with typedecl" in TestAstOnlyFixture(
+      """
+       |void method() {
+       |  int local = 1;
+       |  constexpr bool is_std_array_v = decltype(local)::value;
+       |}
+       |""".stripMargin,
+      "test.cpp"
+    ) { cpg =>
+      cpg.method.name("method").block.astChildren.l match {
+        case List(_, call1: Call, _, call2: Call) =>
+          call1.name shouldBe Operators.assignment
+          call2.astChildren.l match {
+            case List(identifier: Identifier, call: Call) =>
+              identifier.name shouldBe "is_std_array_v"
+              identifier.typeFullName shouldBe "bool"
+              identifier.order shouldBe 1
+              identifier.argumentIndex shouldBe 1
+              call.code shouldBe "decltype(local)::value"
+              call.order shouldBe 2
+              call.methodFullName shouldBe Operators.fieldAccess
+              call.argument(2).code shouldBe "value"
+              call.argument(1).l match {
+                case List(fa: Call) =>
+                  fa.code shouldBe "decltype(local)"
+                  fa.methodFullName shouldBe "operators.<typeOf>"
+                  fa.argument(1).code shouldBe "local"
+                case _ => fail()
+              }
+
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+    }
+
     "be correct for decl assignment with identifier on the right" in
       TestAstOnlyFixture("""
           |void method(int x) {
