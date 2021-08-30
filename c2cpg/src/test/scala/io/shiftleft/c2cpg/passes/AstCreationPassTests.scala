@@ -1532,6 +1532,20 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
       }
     }
 
+    "be correct for embedded ASM calls" in TestAstOnlyFixture("""
+       |void foo() {
+       |  asm("paddh %0, %1, %2\n\t"
+       |	  : "=f" (x)
+       |	  : "f" (y), "f" (z)
+       |	);
+       |}
+      """.stripMargin) { cpg =>
+      cpg.method("foo").ast.filter(_.label == NodeTypes.UNKNOWN).l match {
+        case List(asm: Unknown) => asm.code should startWith("asm(")
+        case _                  => fail()
+      }
+    }
+
     "be correct for compound statement expressions" in TestAstOnlyFixture(
       """
         |int x = ({int y = 1; y;}) + ({int z = 2; z;});
