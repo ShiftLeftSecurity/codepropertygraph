@@ -15,22 +15,23 @@ import overflowdb.traversal.NodeOps
 class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixture with TestAstOnlyFixture {
 
   "AstCreationPass" should {
-    val cpg = Cpg.emptyCpg
-    File.usingTemporaryDirectory("astCreationTests") { dir =>
-      val filenames = List("foo.c", "woo.c")
-      val expectedFilenames = filenames.map { filename =>
-        val file = dir / filename
-        file.write("//foo")
-        file.path.toAbsolutePath.toString
-      }
-      new AstCreationPass(expectedFilenames, cpg, new IntervalKeyPool(1, 1000), Config()).createAndApply()
 
-      "create one NamespaceBlock per file" in {
+    "create one NamespaceBlock per file" in {
+      val cpg = Cpg.emptyCpg
+      File.usingTemporaryDirectory("astCreationTests") { dir =>
+        val filenames = List("foo.c", "woo.c")
+        val expectedFilenames = filenames.map { filename =>
+          val file = dir / filename
+          file.write("//foo")
+          file.path.toAbsolutePath.toString
+        }
+        new AstCreationPass(expectedFilenames, cpg, new IntervalKeyPool(1, 1000), Config()).createAndApply()
+
         val expectedNamespaceFullNames = expectedFilenames.map(f => s"$f:<global>").toSet
         cpg.namespaceBlock.fullName.toSet shouldBe expectedNamespaceFullNames
       }
-
     }
+
   }
 
   "Method AST layout" should {
@@ -730,6 +731,39 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
           forStmt.astChildren.order(3).l match {
             case List(block) =>
               block.astChildren.isCall.code.l shouldBe List("z = x")
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+    }
+
+    "be correct for ranged for-loop with structured binding" in TestAstOnlyFixture(
+      """
+        |void method() {
+        |  int foo[2] = {1, 2};
+        |  for(const auto& [a, b] : foo) {};
+        |}
+        |""".stripMargin,
+      "test.cpp"
+    ) { cpg =>
+      cpg.method.name("method").controlStructure.l match {
+        case List(forStmt) =>
+          forStmt.controlStructureType shouldBe ControlStructureTypes.FOR
+          forStmt.astChildren.order(1).l match {
+            case List(ident) =>
+              ident.code shouldBe "foo"
+            case _ => fail()
+          }
+          forStmt.astChildren.order(2).astChildren.l match {
+            case List(a, b) =>
+              a.code shouldBe "a"
+              b.code shouldBe "b"
+            case _ => fail()
+          }
+          forStmt.astChildren.order(3).l match {
+            case List(block) =>
+              block.code shouldBe "<empty>"
+              block.astChildren.l shouldBe empty
             case _ => fail()
           }
         case _ => fail()

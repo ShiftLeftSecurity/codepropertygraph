@@ -55,6 +55,7 @@ trait AstForStatementsCreator {
       case alias: ICPPASTAliasDeclaration => Seq(astForAliasDeclaration(alias, order))
       case func: IASTFunctionDefinition   => Seq(astForFunctionDefinition(func, order))
       case alias: CPPASTNamespaceAlias    => Seq(astForNamespaceAlias(alias, order))
+      case _: ICPPASTUsingDirective       => Seq.empty
       case decl =>
         Seq(astForNode(decl, order))
     }

@@ -165,6 +165,26 @@ trait AstForTypesCreator {
 
   private def astForASMDeclaration(asm: IASTASMDeclaration, order: Int): Ast = Ast(newUnknown(asm, order))
 
+  private def astForStructuredBindingDeclaration(structuredBindingDeclaration: ICPPASTStructuredBindingDeclaration,
+                                                 order: Int): Ast = {
+    val cpgBlock = NewBlock()
+      .order(order)
+      .argumentIndex(order)
+      .typeFullName(registerType(Defines.voidTypeName))
+      .lineNumber(line(structuredBindingDeclaration))
+      .columnNumber(column(structuredBindingDeclaration))
+
+    scope.pushNewScope(cpgBlock)
+    val childAsts = withOrder(structuredBindingDeclaration.getNames) {
+      case (name, o) =>
+        astForNode(name, o)
+    }
+
+    val blockAst = Ast(cpgBlock).withChildren(childAsts)
+    scope.popScope()
+    blockAst
+  }
+
   protected def astsForDeclaration(decl: IASTDeclaration, order: Int): Seq[Ast] = decl match {
     case u: CPPASTAliasDeclaration => Seq(astForAliasDeclaration(u, order))
     case functDef: IASTFunctionDefinition =>
@@ -214,7 +234,9 @@ trait AstForTypesCreator {
     case t: ICPPASTTemplateDeclaration                        => astsForDeclaration(t.getDeclaration, order)
     case a: ICPPASTStaticAssertDeclaration                    => Seq(astForStaticAssert(a, order))
     case asm: IASTASMDeclaration                              => Seq(astForASMDeclaration(asm, order))
-    case _                                                    => Seq(astForNode(decl, order))
+    case structuredBindingDeclaration: ICPPASTStructuredBindingDeclaration =>
+      Seq(astForStructuredBindingDeclaration(structuredBindingDeclaration, order))
+    case _ => Seq(astForNode(decl, order))
   }
 
   private def astsForLinkageSpecification(l: ICPPASTLinkageSpecification): Seq[Ast] =
