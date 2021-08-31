@@ -5,7 +5,6 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{DispatchTypes, Operators}
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
-import org.eclipse.cdt.core.dom.ast.c.ICASTTypedefNameSpecifier
 import org.eclipse.cdt.core.dom.ast.cpp._
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTAliasDeclaration
 import org.eclipse.cdt.internal.core.model.ASTStringUtil
@@ -65,7 +64,7 @@ trait AstForTypesCreator {
     namespaceAst
   }
 
-  private def astForNamespaceAlias(namespaceAlias: ICPPASTNamespaceAlias, order: Int): Ast = {
+  protected def astForNamespaceAlias(namespaceAlias: ICPPASTNamespaceAlias, order: Int): Ast = {
     val name = namespaceAlias.getAlias.toString
     val fullname = fullName(namespaceAlias)
 
@@ -164,6 +163,28 @@ trait AstForTypesCreator {
     Ast(typeDeclNode)
   }
 
+  protected def astForASMDeclaration(asm: IASTASMDeclaration, order: Int): Ast = Ast(newUnknown(asm, order))
+
+  private def astForStructuredBindingDeclaration(structuredBindingDeclaration: ICPPASTStructuredBindingDeclaration,
+                                                 order: Int): Ast = {
+    val cpgBlock = NewBlock()
+      .order(order)
+      .argumentIndex(order)
+      .typeFullName(registerType(Defines.voidTypeName))
+      .lineNumber(line(structuredBindingDeclaration))
+      .columnNumber(column(structuredBindingDeclaration))
+
+    scope.pushNewScope(cpgBlock)
+    val childAsts = withOrder(structuredBindingDeclaration.getNames) {
+      case (name, o) =>
+        astForNode(name, o)
+    }
+
+    val blockAst = Ast(cpgBlock).withChildren(childAsts)
+    scope.popScope()
+    blockAst
+  }
+
   protected def astsForDeclaration(decl: IASTDeclaration, order: Int): Seq[Ast] = decl match {
     case u: CPPASTAliasDeclaration => Seq(astForAliasDeclaration(u, order))
     case functDef: IASTFunctionDefinition =>
@@ -189,10 +210,10 @@ trait AstForTypesCreator {
 
     case declaration: IASTSimpleDeclaration
         if declaration.getDeclSpecifier != null && declaration.getDeclSpecifier
-          .isInstanceOf[ICASTTypedefNameSpecifier] =>
-      val spec = declaration.getDeclSpecifier.asInstanceOf[ICASTTypedefNameSpecifier]
+          .isInstanceOf[IASTNamedTypeSpecifier] && declaration.getDeclarators.isEmpty =>
+      val spec = declaration.getDeclSpecifier.asInstanceOf[IASTNamedTypeSpecifier]
       val name = spec.getName.getRawSignature
-      Seq(Ast(newTypeDecl(name, registerType(name), order = order)))
+      Seq(Ast(newTypeDecl(name, registerType(name), alias = Some(name), order = order)))
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.nonEmpty =>
       declaration.getDeclarators.toIndexedSeq.map {
         case d: IASTFunctionDeclarator     => astForFunctionDeclarator(d, order)
@@ -212,7 +233,10 @@ trait AstForTypesCreator {
     case l: ICPPASTLinkageSpecification                       => astsForLinkageSpecification(l)
     case t: ICPPASTTemplateDeclaration                        => astsForDeclaration(t.getDeclaration, order)
     case a: ICPPASTStaticAssertDeclaration                    => Seq(astForStaticAssert(a, order))
-    case _                                                    => Seq(astForNode(decl, order))
+    case asm: IASTASMDeclaration                              => Seq(astForASMDeclaration(asm, order))
+    case structuredBindingDeclaration: ICPPASTStructuredBindingDeclaration =>
+      Seq(astForStructuredBindingDeclaration(structuredBindingDeclaration, order))
+    case _ => Seq(astForNode(decl, order))
   }
 
   private def astsForLinkageSpecification(l: ICPPASTLinkageSpecification): Seq[Ast] =

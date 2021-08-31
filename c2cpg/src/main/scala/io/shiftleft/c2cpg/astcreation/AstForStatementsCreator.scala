@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewReturn}
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
 import org.eclipse.cdt.core.dom.ast.cpp._
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTNamespaceAlias
 
 trait AstForStatementsCreator {
 
@@ -53,6 +54,9 @@ trait AstForStatementsCreator {
         Seq.empty
       case alias: ICPPASTAliasDeclaration => Seq(astForAliasDeclaration(alias, order))
       case func: IASTFunctionDefinition   => Seq(astForFunctionDefinition(func, order))
+      case alias: CPPASTNamespaceAlias    => Seq(astForNamespaceAlias(alias, order))
+      case _: ICPPASTUsingDirective       => Seq.empty
+      case asm: IASTASMDeclaration        => Seq(astForASMDeclaration(asm, order))
       case decl =>
         Seq(astForNode(decl, order))
     }

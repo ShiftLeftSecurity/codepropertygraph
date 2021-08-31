@@ -15,22 +15,22 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
     "be correct for nested namespaces" in CompleteCpgFixture(
       """
         |namespace Q {
-        |    namespace V {   // V is a member of Q, and is fully defined within Q
-        |        class C { int m(); }; // C is a member of V and is fully defined within V
-        |                               // C::m is only declared
-        |        int f(); // f is a member of V, but is only declared here
-        |    }
+        |  namespace V {   // V is a member of Q, and is fully defined within Q
+        |    class C { int m(); }; // C is a member of V and is fully defined within V
+        |                          // C::m is only declared
+        |    int f(); // f is a member of V, but is only declared here
+        |  }
         | 
-        |    int V::f() // definition of V's member f outside of V
-        |                // f's enclosing namespaces are still the global namespace, Q, and Q::V
-        |    {
-        |        extern void h(); // This declares ::Q::V::h
-        |        return 0;
-        |    }
+        |  int V::f() // definition of V's member f outside of V
+        |             // f's enclosing namespaces are still the global namespace, Q, and Q::V
+        |  {
+        |    extern void h(); // This declares ::Q::V::h
+        |    return 0;
+        |  }
         | 
-        |    int V::C::m() // definition of V::C::m outside of the namespace (and the class body)
-        |                   // enclosing namespaces are the global namespace, Q, and Q::V
-        |    { return 0 ; }
+        |  int V::C::m() // definition of V::C::m outside of the namespace (and the class body)
+        |                // enclosing namespaces are the global namespace, Q, and Q::V
+        |  { return 0 ; }
         |}
         |""".stripMargin) { cpg =>
       inside(cpg.method.isNotStub.fullName.l) {
@@ -64,20 +64,20 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
     "be correct for nested namespaces in C++17 style" in CompleteCpgFixture(
       """
         |namespace Q::V {
-        |   class C { int m(); }; // C is a member of V and is fully defined within V
-        |                               // C::m is only declared
-        |   int f(); // f is a member of V, but is only declared here
+        |  class C { int m(); }; // C is a member of V and is fully defined within V
+        |                        // C::m is only declared
+        |  int f(); // f is a member of V, but is only declared here
         |}
         | 
         |int V::f() // definition of V's member f outside of V
-        |            // f's enclosing namespaces are still the global namespace, Q, and Q::V
+        |           // f's enclosing namespaces are still the global namespace, Q, and Q::V
         |{
-        |    extern void h(); // This declares ::Q::V::h
-        |    return 0;
+        |  extern void h(); // This declares ::Q::V::h
+        |  return 0;
         |}
         | 
         |int V::C::m() // definition of V::C::m outside of the namespace (and the class body)
-        |               // enclosing namespaces are the global namespace, Q, and Q::V
+        |              // enclosing namespaces are the global namespace, Q, and Q::V
         |{ return 0; }
         |""".stripMargin) { cpg =>
       inside(cpg.method.fullName.l) {
@@ -107,25 +107,26 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
     "be correct for unnamed namespaces" in CompleteCpgFixture(
       """
         |namespace {
-        |    int i; // defines ::(unique)::i
+        |  int i; // defines ::(unique)::i
         |}
         |void f() {
-        |    i++;   // increments ::(unique)::i
+        |  i++;   // increments ::(unique)::i
         |}
         | 
         |namespace A {
-        |    namespace {
-        |        int i;        // A::(unique)::i
-        |        int j;        // A::(unique)::j
-        |    }
-        |    void g() { i++; } // A::(unique)::i++
+        |  namespace {
+        |    int i;        // A::(unique)::i
+        |    int j;        // A::(unique)::j
+        |  }
+        |  void g() { i++; } // A::(unique)::i++
         |}
         | 
         |using namespace A; // introduces all names from A into global namespace
+        |
         |void h() {
-        |    i++;    // error: ::(unique)::i and ::A::(unique)::i are both in scope
-        |    A::i++; // ok, increments ::A::(unique)::i
-        |    j++;    // ok, increments ::A::(unique)::j
+        |  i++;    // error: ::(unique)::i and ::A::(unique)::i are both in scope
+        |  A::i++; // ok, increments ::A::(unique)::i
+        |  j++;    // ok, increments ::A::(unique)::j
         |}""".stripMargin) { cpg =>
       inside(cpg.namespaceBlock.l) {
         case List(_, unnamed1, a, unnamed2) =>
@@ -153,19 +154,19 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
     "be correct for namespaces with using" in CompleteCpgFixture(
       """
         |void f();
+        |
         |namespace A {
-        |    void g();
+        |  void g();
         |}
         | 
         |namespace X {
-        |    using ::f;        // global f is now visible as ::X::f
-        |    using A::g;       // A::g is now visible as ::X::g
+        |  using ::f;        // global f is now visible as ::X::f
+        |  using A::g;       // A::g is now visible as ::X::g
         |}
         | 
-        |void h()
-        |{
-        |    X::f(); // calls ::f
-        |    X::g(); // calls A::g
+        |void h() {
+        |  X::f(); // calls ::f
+        |  X::g(); // calls A::g
         |}""".stripMargin) { cpg =>
       inside(cpg.namespaceBlock.l) {
         case List(_, a, x) =>
@@ -192,21 +193,21 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
     "be correct for namespaces with using and synonyms" in CompleteCpgFixture(
       """
         |namespace A {
-        |    void f(int);
+        |  void f(int);
         |}
         |using A::f; // ::f is now a synonym for A::f(int)
         | 
         |namespace A {     // namespace extension
-        |    void f(char); // does not change what ::f means
+        |  void f(char); // does not change what ::f means
         |}
         | 
         |void foo() {
-        |    f('a'); // calls f(int), even though f(char) exists.
+        |  f('a'); // calls f(int), even though f(char) exists.
         |}
         | 
         |void bar() {
-        |    using A::f; // this f is a synonym for both A::f(int) and A::f(char)
-        |    f('a');     // calls f(char)
+        |  using A::f; // this f is a synonym for both A::f(int) and A::f(char)
+        |  f('a');     // calls f(char)
         |}""".stripMargin) { cpg =>
       inside(cpg.namespaceBlock.l) {
         case List(_, a1, a2) =>
@@ -236,17 +237,17 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
 
     "be correct for namespaces with alias" in CompleteCpgFixture("""
         |namespace foo {
-        |    namespace bar {
-        |         namespace baz {
-        |             int qux = 42;
-        |         }
+        |  namespace bar {
+        |    namespace baz {
+        |      int qux = 42;
         |    }
+        |  }
         |}
         | 
         |namespace fbz = foo::bar::baz;
         | 
         |int main() {
-        |    int x = fbz::qux;
+        |  int x = fbz::qux;
         |}""".stripMargin) { cpg =>
       inside(cpg.namespaceBlock.l) {
         case List(_, foo, bar, baz, fbz) =>
@@ -280,6 +281,42 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
               a.order shouldBe 2
               a.code shouldBe "qux"
           }
+      }
+    }
+
+    "be correct for namespaces with alias inside of methods" in CompleteCpgFixture("""
+       |namespace foo {
+       |  namespace bar {};
+       |};
+       | 
+       |int main() {
+       |  namespace x = foo::bar;
+       |};""".stripMargin) { cpg =>
+      inside(cpg.namespaceBlock.l) {
+        case List(_, foo, bar, x) =>
+          foo.name shouldBe "foo"
+          foo.fullName shouldBe "foo"
+          bar.name shouldBe "bar"
+          bar.fullName shouldBe "foo.bar"
+          x.name shouldBe "x"
+          x.fullName shouldBe "foo.bar"
+      }
+    }
+
+    "be correct for using namespaces inside of methods" in CompleteCpgFixture("""
+       |namespace foo {
+       |  namespace bar {};
+       |};
+       | 
+       |int main() {
+       |  using namespace foo::bar;
+       |};""".stripMargin) { cpg =>
+      inside(cpg.namespaceBlock.l) {
+        case List(_, foo, bar) =>
+          foo.name shouldBe "foo"
+          foo.fullName shouldBe "foo"
+          bar.name shouldBe "bar"
+          bar.fullName shouldBe "foo.bar"
       }
     }
 

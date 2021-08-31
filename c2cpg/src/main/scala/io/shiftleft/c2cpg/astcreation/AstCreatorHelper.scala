@@ -1,5 +1,6 @@
 package io.shiftleft.c2cpg.astcreation
 
+import io.shiftleft.codepropertygraph.generated.DispatchTypes
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
 import org.eclipse.cdt.core.dom.ast.cpp._
@@ -235,15 +236,29 @@ trait AstCreatorHelper {
     }
   }
 
+  private def astforDecltypeSpecifier(decl: ICPPASTDecltypeSpecifier, order: Int): Ast = {
+    val op = "operators.<typeOf>"
+    val cpgUnary = newCallNode(decl, op, op, DispatchTypes.STATIC_DISPATCH, order)
+
+    val operand = nullSafeAst(decl.getDecltypeExpression, 1)
+
+    val ast = Ast(cpgUnary).withChild(operand)
+    operand.root match {
+      case Some(op) => ast.withArgEdge(cpgUnary, op)
+      case None     => ast
+    }
+  }
+
   protected def astForNode(node: IASTNode, order: Int): Ast = {
     node match {
       case id: IASTIdExpression if id.getName.isInstanceOf[CPPASTQualifiedName] =>
         astForQualifiedName(id.getName.asInstanceOf[CPPASTQualifiedName], order)
-      case name: IASTName          => astForIdentifier(name, order)
-      case decl: IASTDeclSpecifier => astForIdentifier(decl, order)
-      case expr: IASTExpression    => astForExpression(expr, order)
-      case l: IASTInitializerList  => astForInitializerList(l, order)
-      case _                       => notHandledYet(node, order)
+      case name: IASTName                 => astForIdentifier(name, order)
+      case decl: IASTDeclSpecifier        => astForIdentifier(decl, order)
+      case expr: IASTExpression           => astForExpression(expr, order)
+      case l: IASTInitializerList         => astForInitializerList(l, order)
+      case decl: ICPPASTDecltypeSpecifier => astforDecltypeSpecifier(decl, order)
+      case _                              => notHandledYet(node, order)
     }
   }
 

@@ -291,6 +291,9 @@ trait AstForExpressionsCreator {
                                                 order: Int): Ast =
     nullSafeAst(compoundExpression.getCompoundStatement, order).headOption.getOrElse(Ast())
 
+  private def astForPackExpansionExpression(packExpansionExpression: ICPPASTPackExpansionExpression, order: Int): Ast =
+    astForExpression(packExpansionExpression.getPattern, order)
+
   protected def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
     case lit: IASTLiteralExpression   => astForLiteral(lit, order)
     case un: IASTUnaryExpression      => astForUnaryExpression(un, order)
@@ -312,6 +315,8 @@ trait AstForExpressionsCreator {
     case lambdaExpression: ICPPASTLambdaExpression          => Ast(methodRefForLambda(lambdaExpression))
     case compoundExpression: IGNUASTCompoundStatementExpression =>
       astForCompoundStatementExpression(compoundExpression, order)
+    case packExpansionExpression: ICPPASTPackExpansionExpression =>
+      astForPackExpansionExpression(packExpansionExpression, order)
     case _ => notHandledYet(expression, order)
   }
 
