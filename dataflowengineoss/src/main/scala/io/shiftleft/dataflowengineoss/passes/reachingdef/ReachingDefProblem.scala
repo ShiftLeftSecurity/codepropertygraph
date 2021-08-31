@@ -154,6 +154,7 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutab
     * and `kill(n)`.
     * */
   override def apply(n: StoredNode, x: mutable.Set[Definition]): mutable.Set[Definition] = {
+    println(method.name)
     gen(n).union(x.diff(kill(n)))
   }
 
