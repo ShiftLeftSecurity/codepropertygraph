@@ -7,7 +7,7 @@ import io.shiftleft.semanticcpg.utils.MemberAccess.isGenericMemberAccessName
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal._
 
-import scala.collection.Set
+import scala.collection.{Set, mutable}
 
 /**
   * The variables defined/used in the reaching def problem can
@@ -28,25 +28,17 @@ case class Definition(node: StoredNode) {}
 
 object ReachingDefProblem {
 
-  def create(method: Method): DataFlowProblem[Set[Definition]] = {
+  def create(method: Method): DataFlowProblem[mutable.Set[Definition]] = {
     val flowGraph = new ReachingDefFlowGraph(method)
     val transfer = new ReachingDefTransferFunction(method)
     val init = new ReachingDefInit(transfer.gen)
-    def meet: (Set[Definition], Set[Definition]) => Set[Definition] =
-      (x: Set[Definition], y: Set[Definition]) => { x.union(y) }
+    def meet: (mutable.Set[Definition], mutable.Set[Definition]) => mutable.Set[Definition] =
+      (x: mutable.Set[Definition], y: mutable.Set[Definition]) => { x.union(y) }
 
-    new ReachingDefProblem(flowGraph, transfer, meet, init, true, Set[Definition]())
+    new DataFlowProblem[mutable.Set[Definition]](flowGraph, transfer, meet, init, true, mutable.Set[Definition]())
   }
 
 }
-
-class ReachingDefProblem(flowGraph: FlowGraph,
-                         transfer: ReachingDefTransferFunction,
-                         meet: (Set[Definition], Set[Definition]) => Set[Definition],
-                         init: ReachingDefInit,
-                         forward: Boolean,
-                         empty: Set[Definition])
-    extends DataFlowProblem[Set[Definition]](flowGraph, transfer, meet, init, forward, empty) {}
 
 /**
   * The control flow graph as viewed by the data flow solver.
@@ -110,7 +102,7 @@ class ReachingDefFlowGraph(method: Method) extends FlowGraph {
   * For each node of the graph, this transfer function defines how it affects
   * the propagation of definitions.
   * */
-class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[Definition]] {
+class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutable.Set[Definition]] {
 
   val generatedOnlyOnce: Map[Call, List[Definition]] = {
     val paramAndLocalNames = method.parameter.name.l ++ method.local.name.l
@@ -136,7 +128,7 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
       .map { case (k, v) => (k, v.map(_._2).map(Definition.fromNode)) }
   }
 
-  def notInGenOnce(g: Map[StoredNode, Set[Definition]]): Map[StoredNode, Set[Definition]] = {
+  def notInGenOnce(g: Map[StoredNode, mutable.Set[Definition]]): Map[StoredNode, mutable.Set[Definition]] = {
     g.map {
       case (k, defs) =>
         k match {
@@ -147,10 +139,10 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
     }
   }
 
-  val gen: Map[StoredNode, Set[Definition]] = {
+  val gen: Map[StoredNode, mutable.Set[Definition]] = {
     notInGenOnce(
       initGen(method)
-    ).withDefaultValue(Set.empty[Definition])
+    ).withDefaultValue(mutable.Set.empty[Definition])
   }
 
   val kill: Map[StoredNode, Set[Definition]] =
@@ -161,7 +153,7 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
     * function to obtain the updated set of definitions, considering `gen(n)`
     * and `kill(n)`.
     * */
-  override def apply(n: StoredNode, x: Set[Definition]): Set[Definition] = {
+  override def apply(n: StoredNode, x: mutable.Set[Definition]): mutable.Set[Definition] = {
     gen(n).union(x.diff(kill(n)))
   }
 
@@ -169,10 +161,10 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
     * Initialize the map `gen`, a map that contains generated
     * definitions for each flow graph node.
     * */
-  def initGen(method: Method): Map[StoredNode, Set[Definition]] = {
+  def initGen(method: Method): Map[StoredNode, mutable.Set[Definition]] = {
 
     val defsForParams = method.parameter.l.map { param =>
-      param -> Set(Definition.fromNode(param.asInstanceOf[StoredNode]))
+      param -> mutable.Set(Definition.fromNode(param.asInstanceOf[StoredNode]))
     }
 
     // We filter out field accesses to ensure that they propagate
@@ -183,7 +175,7 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
       .l
       .map { call =>
         call -> {
-          val retVal = Set(call)
+          val retVal = mutable.Set(call)
           val args = call.argument.filter(hasValidGenType)
           (retVal ++ args)
             .map(x => Definition.fromNode(x.asInstanceOf[StoredNode]))
@@ -275,11 +267,11 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
 
 }
 
-class ReachingDefInit(gen: Map[StoredNode, Set[Definition]]) extends InOutInit[Set[Definition]] {
-  override def initIn: Map[StoredNode, Set[Definition]] =
+class ReachingDefInit(gen: Map[StoredNode, mutable.Set[Definition]]) extends InOutInit[mutable.Set[Definition]] {
+  override def initIn: Map[StoredNode, mutable.Set[Definition]] =
     Map
-      .empty[StoredNode, Set[Definition]]
-      .withDefaultValue(Set.empty[Definition])
+      .empty[StoredNode, mutable.Set[Definition]]
+      .withDefaultValue(mutable.Set.empty[Definition])
 
-  override def initOut: Map[StoredNode, Set[Definition]] = gen
+  override def initOut: Map[StoredNode, mutable.Set[Definition]] = gen
 }

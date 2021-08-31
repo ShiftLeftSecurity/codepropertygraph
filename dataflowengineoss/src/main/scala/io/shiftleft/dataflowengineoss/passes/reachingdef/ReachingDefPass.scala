@@ -6,7 +6,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, PropertyNames}
 import io.shiftleft.passes.{ConcurrentWriterCpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
-import scala.collection.Set
+import scala.collection.{Set, mutable}
 
 /**
   * A pass that calculates reaching definitions ("data dependencies").
@@ -27,7 +27,7 @@ class ReachingDefPass(cpg: Cpg) extends ConcurrentWriterCpgPass[Method](cpg) {
     * by seeing which of these reaching definitions are relevant in the sense that
     * they are used.
     * */
-  private def addReachingDefEdges(method: Method, solution: Solution[Set[Definition]]): DiffGraph.Builder = {
+  private def addReachingDefEdges(method: Method, solution: Solution[mutable.Set[Definition]]): DiffGraph.Builder = {
 
     val dstGraph = DiffGraph.newBuilder
 
@@ -40,8 +40,10 @@ class ReachingDefPass(cpg: Cpg) extends ConcurrentWriterCpgPass[Method](cpg) {
     }
 
     val in = solution.in
-    val problem = solution.problem.asInstanceOf[ReachingDefProblem]
-    val gen = problem.transferFunction.asInstanceOf[ReachingDefTransferFunction].initGen(method).withDefaultValue(Set())
+    val gen = solution.problem.transferFunction
+      .asInstanceOf[ReachingDefTransferFunction]
+      .initGen(method)
+      .withDefaultValue(Set())
     val allNodes = in.keys.toList
     val usageAnalyzer = new UsageAnalyzer(in)
 
@@ -89,7 +91,7 @@ class ReachingDefPass(cpg: Cpg) extends ConcurrentWriterCpgPass[Method](cpg) {
 
           // Add edges to the exit node from all expression that are generated
           // only once.
-          val genOnce = problem.transferFunction.asInstanceOf[ReachingDefTransferFunction].generatedOnlyOnce
+          val genOnce = solution.problem.transferFunction.asInstanceOf[ReachingDefTransferFunction].generatedOnlyOnce
           genOnce.foreach {
             case (_, defs) =>
               defs.foreach { d =>
