@@ -40,7 +40,8 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
     }
 
     val in = solution.in
-    val gen = solution.problem.transferFunction.asInstanceOf[ReachingDefTransferFunction].gen
+    val problem = solution.problem.asInstanceOf[ReachingDefProblem]
+    val gen = problem.transferFunction.asInstanceOf[ReachingDefTransferFunction].initGen(method).withDefaultValue(Set())
     val allNodes = in.keys.toList
     val usageAnalyzer = new UsageAnalyzer(in)
 
@@ -85,6 +86,17 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
           in(exitNode).foreach { i =>
             addEdge(i.node, exitNode, nodeToEdgeLabel(i.node))
           }
+
+          // Add edges to the exit node from all expression that are generated
+          // only once.
+          val genOnce = problem.transferFunction.asInstanceOf[ReachingDefTransferFunction].generatedOnlyOnce
+          genOnce.foreach {
+            case (_, defs) =>
+              defs.foreach { d =>
+                addEdge(d.node, exitNode, nodeToEdgeLabel(d.node))
+              }
+          }
+
         case _ =>
       }
     }

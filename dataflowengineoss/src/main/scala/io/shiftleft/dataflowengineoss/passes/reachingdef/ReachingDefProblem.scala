@@ -35,10 +35,18 @@ object ReachingDefProblem {
     def meet: (Set[Definition], Set[Definition]) => Set[Definition] =
       (x: Set[Definition], y: Set[Definition]) => { x.union(y) }
 
-    new DataFlowProblem[Set[Definition]](flowGraph, transfer, meet, init, true, Set[Definition]())
+    new ReachingDefProblem(flowGraph, transfer, meet, init, true, Set[Definition]())
   }
 
 }
+
+class ReachingDefProblem(flowGraph: FlowGraph,
+                         transfer: ReachingDefTransferFunction,
+                         meet: (Set[Definition], Set[Definition]) => Set[Definition],
+                         init: ReachingDefInit,
+                         forward: Boolean,
+                         empty: Set[Definition])
+    extends DataFlowProblem[Set[Definition]](flowGraph, transfer, meet, init, forward, empty) {}
 
 /**
   * The control flow graph as viewed by the data flow solver.
@@ -104,7 +112,47 @@ class ReachingDefFlowGraph(method: Method) extends FlowGraph {
   * */
 class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[Definition]] {
 
-  val gen: Map[StoredNode, Set[Definition]] = initGen(method).withDefaultValue(Set.empty[Definition])
+  val generatedOnlyOnce: Map[Call, List[Definition]] = {
+    val paramAndLocalNames = method.parameter.name.l ++ method.local.name.l
+
+    val callArgPairs: List[(Call, Identifier)] = method.call.l
+      .flatMap { call =>
+        call.argument.isIdentifier
+          .filterNot { i =>
+            paramAndLocalNames.contains(i.name)
+          }
+          .l
+          .map { a =>
+            (call, a)
+          }
+      }
+
+    callArgPairs
+      .map { case (call, arg) => (arg.name, call, arg) }
+      .groupBy(_._1)
+      .collect { case (_, v) if v.size == 1 => v.map(x => (x._2, x._3)).head }
+      .toList
+      .groupBy(_._1)
+      .map { case (k, v) => (k, v.map(_._2).map(Definition.fromNode)) }
+  }
+
+  def notInGenOnce(g: Map[StoredNode, Set[Definition]]): Map[StoredNode, Set[Definition]] = {
+    g.map {
+      case (k, defs) =>
+        k match {
+          case call: Call if (generatedOnlyOnce.contains(call)) =>
+            (call, defs.filterNot(generatedOnlyOnce(call).contains(_)))
+          case _ => (k, defs)
+        }
+    }
+  }
+
+  val gen: Map[StoredNode, Set[Definition]] = {
+    notInGenOnce(
+      initGen(method)
+    ).withDefaultValue(Set.empty[Definition])
+  }
+
   val kill: Map[StoredNode, Set[Definition]] =
     initKill(method, gen).withDefaultValue(Set.empty[Definition])
 
