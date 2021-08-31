@@ -216,10 +216,26 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
     // We filter out field accesses to ensure that they propagate
     // taint unharmed.
 
+    val allIdentifiers = method.ast.isIdentifier.l
+      .map { x =>
+        (x.name, x)
+      }
+      .groupBy(_._1)
+      .map { case (k, v) => k -> v.map(_._2) }
+      .withDefaultValue(List.empty[Identifier])
+
+    val allCalls = method.call.l
+      .map { x =>
+        (x.code, x)
+      }
+      .groupBy(_._1)
+      .map { case (k, v) => k -> v.map(_._2) }
+      .withDefaultValue(List.empty[Call])
+
     method.call
       .filterNot(x => isGenericMemberAccessName(x.name))
       .map { call =>
-        call -> killsForGens(gen(call))
+        call -> killsForGens(gen(call), allIdentifiers, allCalls)
       }
       .toMap
   }
@@ -231,35 +247,30 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
     * of the same variable for each, that is, we calculate kill(call)
     * based on gen(call).
     * */
-  private def killsForGens(genOfCall: Set[Definition]): Set[Definition] = {
+  private def killsForGens(genOfCall: Set[Definition],
+                           allIdentifiers: Map[String, List[Identifier]],
+                           allCalls: Map[String, List[Call]]): Set[Definition] = {
     genOfCall.flatMap { definition =>
-      definitionsOfSameVariable(definition)
+      definitionsOfSameVariable(definition, allIdentifiers, allCalls)
     }
   }
 
-  private def definitionsOfSameVariable(definition: Definition): Set[Definition] = {
+  private def definitionsOfSameVariable(definition: Definition,
+                                        allIdentifiers: Map[String, List[Identifier]],
+                                        allCalls: Map[String, List[Call]]): Set[Definition] = {
     val definedNodes = definition.node match {
       case param: MethodParameterIn =>
-        method.cfgNode
+        allIdentifiers(param.name)
           .filter(x => x.id != param.id)
-          .isIdentifier
-          .nameExact(param.name)
-          .toSet
       case identifier: Identifier =>
-        method.cfgNode
+        allIdentifiers(identifier.name)
           .filter(x => x.id != identifier.id)
-          .isIdentifier
-          .nameExact(identifier.name)
-          .toSet
       case call: Call =>
-        method.cfgNode
+        allCalls(call.code)
           .filter(x => x.id != call.id)
-          .isCall
-          .codeExact(call.code)
-          .toSet
       case _ => Set()
     }
-    definedNodes.map(Definition.fromNode)
+    definedNodes.map(Definition.fromNode).toSet
   }
 
 }
