@@ -196,27 +196,26 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutab
   private def killsForGens(genOfCall: Set[Definition],
                            allIdentifiers: Map[String, List[Identifier]],
                            allCalls: Map[String, List[Call]]): Set[Definition] = {
-    genOfCall.flatMap { definition =>
-      definitionsOfSameVariable(definition, allIdentifiers, allCalls)
-    }
-  }
 
-  private def definitionsOfSameVariable(definition: Definition,
-                                        allIdentifiers: Map[String, List[Identifier]],
-                                        allCalls: Map[String, List[Call]]): Set[Definition] = {
-    val definedNodes = definition.node match {
-      case param: MethodParameterIn =>
-        allIdentifiers(param.name)
-          .filter(x => x.id != param.id)
-      case identifier: Identifier =>
-        allIdentifiers(identifier.name)
-          .filter(x => x.id != identifier.id)
-      case call: Call =>
-        allCalls(call.code)
-          .filter(x => x.id != call.id)
-      case _ => Set()
+    def definitionsOfSameVariable(definition: Definition): Set[Definition] = {
+      val definedNodes = definition.node match {
+        case param: MethodParameterIn =>
+          allIdentifiers(param.name)
+            .filter(x => x.id != param.id)
+        case identifier: Identifier =>
+          allIdentifiers(identifier.name)
+            .filter(x => x.id != identifier.id)
+        case call: Call =>
+          allCalls(call.code)
+            .filter(x => x.id != call.id)
+        case _ => Set()
+      }
+      definedNodes.map(Definition.fromNode).toSet
     }
-    definedNodes.map(Definition.fromNode).toSet
+
+    genOfCall.flatMap { definition =>
+      definitionsOfSameVariable(definition)
+    }
   }
 
 }
