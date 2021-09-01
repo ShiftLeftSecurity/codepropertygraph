@@ -30,7 +30,7 @@ object ReachingDefProblem {
 
   def create(method: Method): DataFlowProblem[mutable.Set[Definition]] = {
     val flowGraph = new ReachingDefFlowGraph(method)
-    val transfer = new ReachingDefTransferFunction(method)
+    val transfer = new OptimizedReachingDefTransferFunction(method)
     val init = new ReachingDefInit(transfer.gen)
     def meet: (mutable.Set[Definition], mutable.Set[Definition]) => mutable.Set[Definition] =
       (x: mutable.Set[Definition], y: mutable.Set[Definition]) => { x.union(y) }
@@ -99,51 +99,59 @@ class ReachingDefFlowGraph(method: Method) extends FlowGraph {
 }
 
 /**
-  * For each node of the graph, this transfer function defines how it affects
-  * the propagation of definitions.
+  * Lone Identifier Optimization: we first determine and store all identifiers
+  * that neither refer to a local or parameter and that appear only once
+  * as a call argument. For these identifiers, we know that they are
+  * not used in any other location in the code, and so, we remove
+  * them from `gen` sets so that they need not be propagated through
+  * the entire graph only to determine that they reach the exit node. Instead,
+  * when creating reaching definition edges, we simply create edges from the
+  * identifier to the exit node.
   * */
-class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutable.Set[Definition]] {
+class OptimizedReachingDefTransferFunction(method: Method) extends ReachingDefTransferFunction(method) {
 
-  val generatedOnlyOnce: Map[Call, List[Definition]] = {
+  lazy val loneIdentifiers: Map[Call, List[Definition]] = {
     val paramAndLocalNames = method.parameter.name.l ++ method.local.name.l
 
-    val callArgPairs: List[(Call, Identifier)] = method.call.l
-      .flatMap { call =>
-        call.argument.isIdentifier
-          .filterNot { i =>
-            paramAndLocalNames.contains(i.name)
-          }
-          .l
-          .map { a =>
-            (call, a)
-          }
-      }
+    val callArgPairs = method.call.flatMap { call =>
+      call.argument.isIdentifier
+        .filterNot(i => paramAndLocalNames.contains(i.name))
+        .map(arg => (arg.name, call, arg))
+    }.l
 
     callArgPairs
-      .map { case (call, arg) => (arg.name, call, arg) }
       .groupBy(_._1)
-      .collect { case (_, v) if v.size == 1 => v.map(x => (x._2, x._3)).head }
+      .collect { case (_, v) if v.size == 1 => v.map { case (_, call, arg) => (call, arg) }.head }
       .toList
       .groupBy(_._1)
-      .map { case (k, v) => (k, v.map(_._2).map(Definition.fromNode)) }
+      .map { case (k, v) => (k, v.map(x => Definition.fromNode(x._2))) }
   }
 
-  def notInGenOnce(g: Map[StoredNode, mutable.Set[Definition]]): Map[StoredNode, mutable.Set[Definition]] = {
+  override def initGen(method: Method): Map[StoredNode, mutable.Set[Definition]] =
+    withoutLoneIdentifiers(super.initGen(method))
+
+  private def withoutLoneIdentifiers(
+      g: Map[StoredNode, mutable.Set[Definition]]): Map[StoredNode, mutable.Set[Definition]] = {
     g.map {
       case (k, defs) =>
         k match {
-          case call: Call if (generatedOnlyOnce.contains(call)) =>
-            (call, defs.filterNot(generatedOnlyOnce(call).contains(_)))
+          case call: Call if (loneIdentifiers.contains(call)) =>
+            (call, defs.filterNot(loneIdentifiers(call).contains(_)))
           case _ => (k, defs)
         }
     }
   }
 
-  val gen: Map[StoredNode, mutable.Set[Definition]] = {
-    notInGenOnce(
-      initGen(method)
-    ).withDefaultValue(mutable.Set.empty[Definition])
-  }
+}
+
+/**
+  * For each node of the graph, this transfer function defines how it affects
+  * the propagation of definitions.
+  * */
+class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutable.Set[Definition]] {
+
+  val gen: Map[StoredNode, mutable.Set[Definition]] =
+    initGen(method).withDefaultValue(mutable.Set.empty[Definition])
 
   val kill: Map[StoredNode, Set[Definition]] =
     initKill(method, gen).withDefaultValue(Set.empty[Definition])
