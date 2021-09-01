@@ -99,52 +99,6 @@ class ReachingDefFlowGraph(method: Method) extends FlowGraph {
 }
 
 /**
-  * Lone Identifier Optimization: we first determine and store all identifiers
-  * that neither refer to a local or parameter and that appear only once
-  * as a call argument. For these identifiers, we know that they are
-  * not used in any other location in the code, and so, we remove
-  * them from `gen` sets so that they need not be propagated through
-  * the entire graph only to determine that they reach the exit node. Instead,
-  * when creating reaching definition edges, we simply create edges from the
-  * identifier to the exit node.
-  * */
-class OptimizedReachingDefTransferFunction(method: Method) extends ReachingDefTransferFunction(method) {
-
-  lazy val loneIdentifiers: Map[Call, List[Definition]] = {
-    val paramAndLocalNames = method.parameter.name.l ++ method.local.name.l
-
-    val callArgPairs = method.call.flatMap { call =>
-      call.argument.isIdentifier
-        .filterNot(i => paramAndLocalNames.contains(i.name))
-        .map(arg => (arg.name, call, arg))
-    }.l
-
-    callArgPairs
-      .groupBy(_._1)
-      .collect { case (_, v) if v.size == 1 => v.map { case (_, call, arg) => (call, arg) }.head }
-      .toList
-      .groupBy(_._1)
-      .map { case (k, v) => (k, v.map(x => Definition.fromNode(x._2))) }
-  }
-
-  override def initGen(method: Method): Map[StoredNode, mutable.Set[Definition]] =
-    withoutLoneIdentifiers(super.initGen(method))
-
-  private def withoutLoneIdentifiers(
-      g: Map[StoredNode, mutable.Set[Definition]]): Map[StoredNode, mutable.Set[Definition]] = {
-    g.map {
-      case (k, defs) =>
-        k match {
-          case call: Call if (loneIdentifiers.contains(call)) =>
-            (call, defs.filterNot(loneIdentifiers(call).contains(_)))
-          case _ => (k, defs)
-        }
-    }
-  }
-
-}
-
-/**
   * For each node of the graph, this transfer function defines how it affects
   * the propagation of definitions.
   * */
@@ -213,24 +167,16 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutab
     * */
   private def initKill(method: Method, gen: Map[StoredNode, Set[Definition]]): Map[StoredNode, Set[Definition]] = {
 
-    // We filter out field accesses to ensure that they propagate
-    // taint unharmed.
-
-    val allIdentifiers = method.ast.isIdentifier.l
-      .map { x =>
-        (x.name, x)
-      }
-      .groupBy(_._1)
-      .map { case (k, v) => k -> v.map(_._2) }
+    val allIdentifiers: Map[String, List[Identifier]] = method.ast.isIdentifier.l
+      .groupBy(_.name)
       .withDefaultValue(List.empty[Identifier])
 
-    val allCalls = method.call.l
-      .map { x =>
-        (x.code, x)
-      }
-      .groupBy(_._1)
-      .map { case (k, v) => k -> v.map(_._2) }
+    val allCalls: Map[String, List[Call]] = method.call.l
+      .groupBy(_.code)
       .withDefaultValue(List.empty[Call])
+
+    // We filter out field accesses to ensure that they propagate
+    // taint unharmed.
 
     method.call
       .filterNot(x => isGenericMemberAccessName(x.name))
@@ -273,6 +219,51 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutab
     definedNodes.map(Definition.fromNode).toSet
   }
 
+}
+
+/**
+  * Lone Identifier Optimization: we first determine and store all identifiers
+  * that neither refer to a local or parameter and that appear only once
+  * as a call argument. For these identifiers, we know that they are
+  * not used in any other location in the code, and so, we remove
+  * them from `gen` sets so that they need not be propagated through
+  * the entire graph only to determine that they reach the exit node. Instead,
+  * when creating reaching definition edges, we simply create edges from the
+  * identifier to the exit node.
+  * */
+class OptimizedReachingDefTransferFunction(method: Method) extends ReachingDefTransferFunction(method) {
+
+  lazy val loneIdentifiers: Map[Call, List[Definition]] = {
+    val paramAndLocalNames = method.parameter.name.l ++ method.local.name.l
+
+    val callArgPairs = method.call.flatMap { call =>
+      call.argument.isIdentifier
+        .filterNot(i => paramAndLocalNames.contains(i.name))
+        .map(arg => (arg.name, call, arg))
+    }.l
+
+    callArgPairs
+      .groupBy(_._1)
+      .collect { case (_, v) if v.size == 1 => v.map { case (_, call, arg) => (call, arg) }.head }
+      .toList
+      .groupBy(_._1)
+      .map { case (k, v) => (k, v.map(x => Definition.fromNode(x._2))) }
+  }
+
+  override def initGen(method: Method): Map[StoredNode, mutable.Set[Definition]] =
+    withoutLoneIdentifiers(super.initGen(method))
+
+  private def withoutLoneIdentifiers(
+      g: Map[StoredNode, mutable.Set[Definition]]): Map[StoredNode, mutable.Set[Definition]] = {
+    g.map {
+      case (k, defs) =>
+        k match {
+          case call: Call if (loneIdentifiers.contains(call)) =>
+            (call, defs.filterNot(loneIdentifiers(call).contains(_)))
+          case _ => (k, defs)
+        }
+    }
+  }
 }
 
 class ReachingDefInit(gen: Map[StoredNode, mutable.Set[Definition]]) extends InOutInit[mutable.Set[Definition]] {
