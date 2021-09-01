@@ -6,7 +6,7 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, PropertyNames}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
-import scala.collection.Set
+import scala.collection.{Set, mutable}
 
 /**
   * A pass that calculates reaching definitions ("data dependencies").
@@ -19,6 +19,7 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
     val problem = ReachingDefProblem.create(method)
     val solution = new DataFlowSolver().calculateMopSolutionForwards(problem)
     val dstGraph = addReachingDefEdges(method, solution)
+    addEdgesFromLoneIdentifiersToExit(dstGraph, method, solution)
     Iterator(dstGraph.build())
   }
 
@@ -27,20 +28,13 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
     * by seeing which of these reaching definitions are relevant in the sense that
     * they are used.
     * */
-  private def addReachingDefEdges(method: Method, solution: Solution[Set[Definition]]): DiffGraph.Builder = {
-
-    val dstGraph = DiffGraph.newBuilder
-
-    def addEdge(fromNode: StoredNode, toNode: StoredNode, variable: String = ""): Unit = {
-      val properties = List((PropertyNames.VARIABLE, variable))
-      if (fromNode.isInstanceOf[Unknown] || toNode
-            .isInstanceOf[Unknown])
-        return
-      dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF, properties)
-    }
-
+  private def addReachingDefEdges(method: Method, solution: Solution[mutable.Set[Definition]]): DiffGraph.Builder = {
+    implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
     val in = solution.in
-    val gen = solution.problem.transferFunction.asInstanceOf[ReachingDefTransferFunction].gen
+    val gen = solution.problem.transferFunction
+      .asInstanceOf[ReachingDefTransferFunction]
+      .initGen(method)
+      .withDefaultValue(Set())
     val allNodes = in.keys.toList
     val usageAnalyzer = new UsageAnalyzer(in)
 
@@ -100,6 +94,15 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
     dstGraph
   }
 
+  private def addEdge(fromNode: StoredNode, toNode: StoredNode, variable: String = "")(
+      implicit dstGraph: DiffGraph.Builder): Unit = {
+    val properties = List((PropertyNames.VARIABLE, variable))
+    if (fromNode.isInstanceOf[Unknown] || toNode
+          .isInstanceOf[Unknown])
+      return
+    dstGraph.addEdgeInOriginal(fromNode, toNode, EdgeTypes.REACHING_DEF, properties)
+  }
+
   private def nodeMayBeSource(x: StoredNode): Boolean = {
     !(
       x.isInstanceOf[Method] || x
@@ -113,6 +116,27 @@ class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
       case n: MethodParameterIn => n.name
       case n: CfgNode           => n.code
       case _                    => ""
+    }
+  }
+
+  /**
+    * This is part of the Lone-identifier optimization: as we
+    * remove lone identifiers from `gen` sets, we must now
+    * retrieve them and create an edge from each lone identifier
+    * to the exit node.
+    * */
+  def addEdgesFromLoneIdentifiersToExit(builder: DiffGraph.Builder,
+                                        method: Method,
+                                        solution: Solution[mutable.Set[Definition]]): Unit = {
+    implicit val dstGraph: DiffGraph.Builder = builder
+    val exitNode = method.methodReturn
+    val transferFunction = solution.problem.transferFunction.asInstanceOf[OptimizedReachingDefTransferFunction]
+    val genOnce = transferFunction.loneIdentifiers
+    genOnce.foreach {
+      case (_, defs) =>
+        defs.foreach { d =>
+          addEdge(d.node, exitNode, nodeToEdgeLabel(d.node))
+        }
     }
   }
 
