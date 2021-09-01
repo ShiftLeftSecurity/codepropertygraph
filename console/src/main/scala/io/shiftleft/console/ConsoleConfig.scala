@@ -13,6 +13,18 @@ class InstallConfig(environment: Map[String, String] = sys.env) {
   var rootPath: File = environment
     .getOrElse("SHIFTLEFT_OCULAR_INSTALL_DIR", ".")
     .toFile
+
+  var cpgGeneratorsDir: String = ""
+
+  def withCpgGeneratorsDir(cpgGeneratorsDir: String): InstallConfig = {
+    this.cpgGeneratorsDir = cpgGeneratorsDir
+    this
+  }
+
+  def withRootPath(rootPath: String): InstallConfig = {
+    this.rootPath = File(rootPath)
+    this
+  }
 }
 
 object InstallConfig {

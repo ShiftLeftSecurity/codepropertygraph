@@ -60,7 +60,7 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
 
   class Frontend(val language: String, val description: String = "") {
     def isAvailable: Boolean = {
-      cpgGeneratorForLanguage(language, config.frontend, config.install.rootPath.path, args = Nil).get.isAvailable
+      cpgGeneratorForLanguage(language, config.frontend, config.install, args = Nil).get.isAvailable
     }
 
     def apply(inputPath: String,
@@ -68,7 +68,7 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
               namespaces: List[String] = List(),
               args: List[String] = List()): Option[Cpg] = {
       val frontend = {
-        cpgGeneratorForLanguage(language, config.frontend, config.install.rootPath.path, args)
+        cpgGeneratorForLanguage(language, config.frontend, config.install, args)
       }
       new ImportCode(console)(frontend.get, inputPath, projectName, namespaces)
     }

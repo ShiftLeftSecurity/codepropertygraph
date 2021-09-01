@@ -1,7 +1,9 @@
 package io.shiftleft.console.cpgcreation
 
 import better.files.File
+import io.shiftleft.console.{FrontendConfig, InstallConfig}
 
+import java.nio.file.{Path, Paths}
 import scala.sys.process._
 
 /**

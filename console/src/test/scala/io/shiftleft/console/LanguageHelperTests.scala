@@ -69,7 +69,7 @@ class LanguageHelperTests extends AnyWordSpec with Matchers {
       val frontend = io.shiftleft.console.cpgcreation.cpgGeneratorForLanguage(
         Languages.LLVM,
         FrontendConfig(),
-        File(".").path,
+        InstallConfig().withRootPath("."),
         Nil
       )
       frontend.get.isInstanceOf[LlvmCpgGenerator] shouldBe true

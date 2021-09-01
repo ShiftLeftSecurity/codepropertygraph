@@ -12,19 +12,22 @@ package object cpgcreation {
     * */
   def cpgGeneratorForLanguage(language: String,
                               config: FrontendConfig,
-                              rootPath: Path,
+                              installConfig: InstallConfig,
                               args: List[String]): Option[CpgGenerator] = {
+
+    val rootPath = installConfig.rootPath.path
+
     language match {
       case Languages.CSHARP     => Some(CSharpCpgGenerator(config.withArgs(args), rootPath))
-      case Languages.C          => Some(FuzzyCCpgGenerator(config.withArgs(args), rootPath))
+      case Languages.C          => Some(FuzzyCCpgGenerator(config.withArgs(args), installConfig))
       case Languages.LLVM       => Some(LlvmCpgGenerator(config.withArgs(args), rootPath))
       case Languages.GOLANG     => Some(GoCpgGenerator(config.withArgs(args), rootPath))
       case Languages.JAVA       => Some(JavaCpgGenerator(config.withArgs(args), rootPath))
-      case Languages.JAVASCRIPT => Some(JsCpgGenerator(config.withArgs(args), rootPath))
+      case Languages.JAVASCRIPT => Some(JsCpgGenerator(config.withArgs(args), installConfig))
       case Languages.PYTHON     => Some(PythonCpgGenerator(config.withArgs(args), rootPath))
       case Languages.PHP        => Some(PhpCpgGenerator(config.withArgs(args), rootPath))
-      case Languages.GHIDRA     => Some(GhidraCpgGenerator(config.withArgs(args), rootPath))
-      case Languages.NEWC       => Some(CCpgGenerator(config.withArgs(args), rootPath))
+      case Languages.GHIDRA     => Some(GhidraCpgGenerator(config.withArgs(args), installConfig))
+      case Languages.NEWC       => Some(CCpgGenerator(config.withArgs(args), installConfig))
       case _                    => None
     }
   }
