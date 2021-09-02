@@ -263,6 +263,10 @@ object Operators extends SchemaBase {
                value = "<operator>.isNot",
                valueType = ValueTypes.STRING,
                comment = "Checks whether a variable is not of a given type"),
+      Constant(name = "notNullAssert",
+               value = "<operator>.notNullAssert",
+               valueType = ValueTypes.STRING,
+               comment = "Converts any value to a not-null type"),
     )
 
   }
