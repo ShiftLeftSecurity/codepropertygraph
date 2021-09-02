@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewReturn}
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
 import org.eclipse.cdt.core.dom.ast.cpp._
+import org.eclipse.cdt.core.dom.ast.gnu.IGNUASTGotoStatement
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTNamespaceAlias
 
 trait AstForStatementsCreator {
@@ -89,6 +90,17 @@ trait AstForStatementsCreator {
     Ast(newControlStructureNode(goto, ControlStructureTypes.GOTO, code, order))
   }
 
+  private def astsForGnuGotoStatement(goto: IGNUASTGotoStatement, order: Int): Seq[Ast] = {
+    // This is for GNU GOTO labels as values.
+    // See: https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html
+    // For such GOTOs we cannot statically determine the target label. As a quick
+    // hack we simply put edges to all labels found indicated by *. This might be an over-taint.
+    val code = s"goto *;"
+    val gotoNode = Ast(newControlStructureNode(goto, ControlStructureTypes.GOTO, code, order))
+    val exprNode = nullSafeAst(goto.getLabelNameExpression, order + 1)
+    Seq(gotoNode, exprNode)
+  }
+
   private def astsForLabelStatement(label: IASTLabelStatement, order: Int): Seq[Ast] = {
     val cpgLabel = newJumpTarget(label, order)
     val nestedStmts = nullSafeAst(label.getNestedStatement, order + 1)
@@ -168,6 +180,7 @@ trait AstForStatementsCreator {
       case br: IASTBreakStatement                 => Seq(astForBreakStatement(br, order))
       case cont: IASTContinueStatement            => Seq(astForContinueStatement(cont, order))
       case goto: IASTGotoStatement                => Seq(astForGotoStatement(goto, order))
+      case goto: IGNUASTGotoStatement             => astsForGnuGotoStatement(goto, order)
       case defStmt: IASTDefaultStatement          => Seq(astForDefaultStatement(defStmt, order))
       case tryStmt: ICPPASTTryBlockStatement      => Seq(astForTryStatement(tryStmt, order))
       case caseStmt: IASTCaseStatement            => astsForCaseStatement(caseStmt, order)
