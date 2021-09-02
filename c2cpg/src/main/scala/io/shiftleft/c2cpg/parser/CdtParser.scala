@@ -1,9 +1,9 @@
 package io.shiftleft.c2cpg.parser
 
 import io.shiftleft.c2cpg.utils.{IOUtils, TimeUtils}
-import org.eclipse.cdt.core.dom.ast.{IASTPreprocessorStatement, IASTTranslationUnit}
 import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage
 import org.eclipse.cdt.core.dom.ast.gnu.cpp.GPPLanguage
+import org.eclipse.cdt.core.dom.ast.{IASTPreprocessorStatement, IASTTranslationUnit}
 import org.eclipse.cdt.core.model.ILanguage
 import org.eclipse.cdt.core.parser.{DefaultLogService, ScannerInfo}
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPVisitor
