@@ -293,6 +293,24 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
       succOf("y") shouldBe expected(("l1: ;", AlwaysEdge))
     }
 
+    "be correct for GNU goto labels as values" in new CpgCfgFixture("""
+        |void *ptr = &&foo;
+        |goto *ptr;
+        |otherCall();
+        |foo: someCall();
+        |""".stripMargin) {
+      succOf("RET func ()") shouldBe expected(("ptr", AlwaysEdge))
+      succOf("ptr") shouldBe expected(("*ptr", AlwaysEdge))
+      succOf("foo") shouldBe expected(("&&foo", AlwaysEdge))
+      succOf("*ptr = &&foo") shouldBe expected(("goto *;", AlwaysEdge))
+      succOf("goto *;") shouldBe expected(("foo: someCall();", AlwaysEdge))
+      succOf("foo: someCall();") shouldBe expected(("someCall", AlwaysEdge))
+      succOf("otherCall") shouldBe expected(("otherCall()", AlwaysEdge))
+      succOf("otherCall()") shouldBe expected(("foo: someCall();", AlwaysEdge))
+      succOf("someCall") shouldBe expected(("someCall()", AlwaysEdge))
+      succOf("someCall()") shouldBe expected(("RET", AlwaysEdge))
+    }
+
     "be correct for multiple labels" in new CpgCfgFixture("x; goto l1; l2: y; l1: ;") {
       succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
       succOf("x") shouldBe expected(("goto l1;", AlwaysEdge))
