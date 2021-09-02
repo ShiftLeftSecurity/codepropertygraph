@@ -1,14 +1,16 @@
 package io.shiftleft.console
 
-import better.files.File
+import better.files.{File, FileExtensions}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class ConsoleConfigTest extends AnyWordSpec with Matchers {
   "An InstallConfig" should {
-    "set the rootPath to the current working directory by default" in {
+    "set the rootPath to parent of directory containing jar by default" in {
       val config = new InstallConfig(environment = Map.empty)
-      config.rootPath shouldBe File(".")
+      val uriToLibDir = classOf[io.shiftleft.console.InstallConfig].getProtectionDomain.getCodeSource.getLocation.toURI
+      val pathToLibDir = new java.io.File(uriToLibDir).toPath
+      config.rootPath shouldBe pathToLibDir.getParent.getParent.toFile.toScala
     }
 
     "set the rootPath to SHIFTLEFT_OCULAR_INSTALL_DIR if it is defined" in {

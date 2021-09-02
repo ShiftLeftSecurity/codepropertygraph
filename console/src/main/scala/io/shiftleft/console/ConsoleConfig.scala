@@ -10,9 +10,15 @@ import scala.collection.mutable
   * @param environment A map of system environment variables.
   * */
 class InstallConfig(environment: Map[String, String] = sys.env) {
-  var rootPath: File = environment
-    .getOrElse("SHIFTLEFT_OCULAR_INSTALL_DIR", ".")
-    .toFile
+  var rootPath: File = {
+    if (environment.contains("SHIFTLEFT_OCULAR_INSTALL_DIR")) {
+      environment("SHIFTLEFT_OCULAR_INSTALL_DIR").toFile
+    } else {
+      val uriToLibDir = classOf[io.shiftleft.console.InstallConfig].getProtectionDomain.getCodeSource.getLocation.toURI
+      val pathToLibDir = new java.io.File(uriToLibDir).toPath
+      pathToLibDir.getParent.getParent.toFile.toScala
+    }
+  }
 }
 
 object InstallConfig {
