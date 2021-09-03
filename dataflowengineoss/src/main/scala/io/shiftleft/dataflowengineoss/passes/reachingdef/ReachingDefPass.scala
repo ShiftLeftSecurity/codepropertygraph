@@ -5,22 +5,44 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, PropertyNames}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.{Set, mutable}
 
 /**
   * A pass that calculates reaching definitions ("data dependencies").
   * */
-class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
+class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 1024) extends ParallelCpgPass[Method](cpg) {
 
-  override def partIterator: Iterator[Method] = cpg.method.iterator
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
+  override def partIterator: Iterator[Method] = cpg.method.internal.iterator
 
   override def runOnPart(method: Method): Iterator[DiffGraph] = {
+    logger.info("Calculating reaching definitions for: {} in {}", method.fullName, method.filename)
     val problem = ReachingDefProblem.create(method)
+
+    if (shouldBailOut(problem)) {
+      logger.info("Bailing out.")
+    }
+
     val solution = new DataFlowSolver().calculateMopSolutionForwards(problem)
     val dstGraph = addReachingDefEdges(method, solution)
     addEdgesFromLoneIdentifiersToExit(dstGraph, method, solution)
     Iterator(dstGraph.build())
+  }
+
+  private def shouldBailOut(problem: DataFlowProblem[mutable.Set[Definition]]): Boolean = {
+    val method = problem.flowGraph.entryNode.asInstanceOf[Method]
+    val transferFunction = problem.transferFunction.asInstanceOf[ReachingDefTransferFunction]
+    val numberOfDefinitions = transferFunction.gen.foldLeft(0)(_ + _._2.size)
+    logger.info("Number of definitions for {}: {}", method.fullName, numberOfDefinitions)
+    if (numberOfDefinitions > maxNumberOfDefinitions) {
+      logger.info("Problem has more than {} definitions", maxNumberOfDefinitions)
+      true
+    } else {
+      false
+    }
   }
 
   /**
