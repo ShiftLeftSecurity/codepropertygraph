@@ -4,8 +4,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.dataflowengineoss.passes.reachingdef.ReachingDefPass
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, LayerCreatorOptions}
 
-import scala.annotation.nowarn
-
 object OssDataFlow {
   val overlayName: String = "dataflowOss"
   val description: String = "Layer to support the OSS lightweight data flow tracker"
@@ -13,9 +11,8 @@ object OssDataFlow {
   def defaultOpts = new OssDataFlowOptions()
 }
 
-class OssDataFlowOptions() extends LayerCreatorOptions {}
+class OssDataFlowOptions(var maxNumberOfDefinitions: Int = 1024) extends LayerCreatorOptions {}
 
-@nowarn
 class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
 
   override val overlayName: String = OssDataFlow.overlayName
@@ -23,7 +20,7 @@ class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
 
   override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
     val cpg = context.cpg
-    val enhancementExecList = Iterator(new ReachingDefPass(cpg))
+    val enhancementExecList = Iterator(new ReachingDefPass(cpg, opts.maxNumberOfDefinitions))
     enhancementExecList.zipWithIndex.foreach {
       case (pass, index) =>
         runPass(pass, context, storeUndoInfo, index)
