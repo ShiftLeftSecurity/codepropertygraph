@@ -1,9 +1,9 @@
 package io.shiftleft.c2cpg.parser
 
 import io.shiftleft.c2cpg.utils.{IOUtils, TimeUtils}
-import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit
 import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage
 import org.eclipse.cdt.core.dom.ast.gnu.cpp.GPPLanguage
+import org.eclipse.cdt.core.dom.ast.{IASTPreprocessorStatement, IASTTranslationUnit}
 import org.eclipse.cdt.core.model.ILanguage
 import org.eclipse.cdt.core.parser.{DefaultLogService, ScannerInfo}
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.CPPVisitor
@@ -70,6 +70,10 @@ class CdtParser(private val parseConfig: ParseConfig) extends ParseProblemsLogge
       }
     }
     result.copy(duration = duration)
+  }
+
+  def preprocessorStatements(file: Path): Iterable[IASTPreprocessorStatement] = {
+    parse(file).map(t => preprocessorStatements(t)).getOrElse(Iterable.empty)
   }
 
   def parse(file: Path): Option[IASTTranslationUnit] = {

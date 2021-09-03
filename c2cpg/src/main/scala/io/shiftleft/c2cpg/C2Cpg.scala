@@ -2,7 +2,7 @@ package io.shiftleft.c2cpg
 
 import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.parser.{FileDefaults, ParseConfig}
-import io.shiftleft.c2cpg.passes.AstCreationPass
+import io.shiftleft.c2cpg.passes.{AstCreationPass, PreprocessorPass}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.IntervalKeyPool
@@ -49,6 +49,12 @@ class C2Cpg {
     cpg
   }
 
+  def printIfDefsOnly(config: Config): Unit = {
+    val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
+    val stmts = new PreprocessorPass(sourceFileNames, createParseConfig(config)).run().mkString(",")
+    println(stmts)
+  }
+
 }
 
 object C2Cpg {
@@ -62,7 +68,8 @@ object C2Cpg {
                           defines: Set[String] = Set.empty,
                           includeComments: Boolean = false,
                           logProblems: Boolean = false,
-                          logPreprocessor: Boolean = false)
+                          logPreprocessor: Boolean = false,
+                          printIfDefsOnly: Boolean = false)
       extends X2CpgConfig[Config] {
 
     override def withAdditionalInputPath(inputPath: String): Config = copy(inputPaths = inputPaths + inputPath)
@@ -80,11 +87,14 @@ object C2Cpg {
           .text(s"includes all comments into the CPG")
           .action((_, c) => c.copy(includeComments = true)),
         opt[Unit]("log-problems")
-          .text(s"enables logging of all parse problems")
+          .text(s"enables logging of all parse problems while generating the CPG")
           .action((_, c) => c.copy(logProblems = true)),
         opt[Unit]("log-preprocessor")
-          .text(s"enables logging of all preprocessor statements")
+          .text(s"enables logging of all preprocessor statements while generating the CPG")
           .action((_, c) => c.copy(logPreprocessor = true)),
+        opt[Unit]("print-ifdef-only")
+          .text(s"prints a comma-separated list of all preprocessor ifdef and if statements; does not create a CPG")
+          .action((_, c) => c.copy(printIfDefsOnly = true)),
         opt[String]("include")
           .unbounded()
           .text("header include paths")
@@ -97,6 +107,14 @@ object C2Cpg {
     }
 
     X2Cpg.parseCommandLine(args, frontendSpecificOptions, Config()) match {
+      case Some(config) if config.printIfDefsOnly =>
+        try {
+          new C2Cpg().printIfDefsOnly(config)
+        } catch {
+          case NonFatal(ex) =>
+            logger.error("Failed to print preprocessor statements.", ex)
+            System.exit(1)
+        }
       case Some(config) =>
         try {
           val cpg = new C2Cpg().runAndOutput(config)
