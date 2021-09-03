@@ -12,7 +12,7 @@ import scala.collection.{Set, mutable}
 /**
   * A pass that calculates reaching definitions ("data dependencies").
   * */
-class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 1024) extends ParallelCpgPass[Method](cpg) {
+class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int) extends ParallelCpgPass[Method](cpg) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -33,6 +33,13 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 1024) extends Para
     Iterator(dstGraph.build())
   }
 
+  /**
+    * Before we start propagating definitions in the graph, which is the bulk
+    * of the work, we check how many definitions were are dealing with in total.
+    * If a threshold is reached, we bail out instead, leaving reaching definitions
+    * uncalculated for the method in question. Users can increase the threshold
+    * if desired.
+    * */
   private def shouldBailOut(problem: DataFlowProblem[mutable.Set[Definition]]): Boolean = {
     val method = problem.flowGraph.entryNode.asInstanceOf[Method]
     val transferFunction = problem.transferFunction.asInstanceOf[ReachingDefTransferFunction]
@@ -41,7 +48,7 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 1024) extends Para
     val numberOfDefinitions = transferFunction.gen.foldLeft(0)(_ + _._2.size)
     logger.info("Number of definitions for {}: {}", method.fullName, numberOfDefinitions)
     if (numberOfDefinitions > maxNumberOfDefinitions) {
-      logger.warn("Problem has more than {} definitions", maxNumberOfDefinitions)
+      logger.warn("{} has more than {} definitions", method.fullName, maxNumberOfDefinitions)
       true
     } else {
       false

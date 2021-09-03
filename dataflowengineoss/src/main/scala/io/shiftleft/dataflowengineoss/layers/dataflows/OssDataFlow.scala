@@ -11,7 +11,7 @@ object OssDataFlow {
   def defaultOpts = new OssDataFlowOptions()
 }
 
-class OssDataFlowOptions(var maxNumberOfDefinitions: Int = 1024) extends LayerCreatorOptions {}
+class OssDataFlowOptions(var maxNumberOfDefinitions: Int = 4000) extends LayerCreatorOptions {}
 
 class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
 
