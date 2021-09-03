@@ -4,9 +4,12 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.language._
+import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal._
 
 package object scan {
+
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   implicit class ScannerStarters(val cpg: Cpg) extends AnyVal {
     def finding: Traversal[Finding] =
@@ -19,16 +22,22 @@ package object scan {
       * Obtain list of findings by running query on CPG
       * */
     def apply(cpg: Cpg): List[NewFinding] = {
-      q.traversal(cpg)
-        .map(
-          evidence =>
-            finding(evidence = evidence,
-                    name = q.name,
-                    author = q.author,
-                    title = q.title,
-                    description = q.description,
-                    score = q.score))
-        .l
+      try {
+        q.traversal(cpg)
+          .map(
+            evidence =>
+              finding(evidence = evidence,
+                name = q.name,
+                author = q.author,
+                title = q.title,
+                description = q.description,
+                score = q.score))
+          .l
+      } catch { case ex: Throwable =>
+        logger.warn("Error executing query", ex)
+        List()
+      }
+
     }
   }
 
