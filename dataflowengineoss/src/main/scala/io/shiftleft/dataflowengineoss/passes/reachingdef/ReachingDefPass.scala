@@ -5,22 +5,54 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, PropertyNames}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.{Set, mutable}
 
 /**
   * A pass that calculates reaching definitions ("data dependencies").
   * */
-class ReachingDefPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
+class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int) extends ParallelCpgPass[Method](cpg) {
 
-  override def partIterator: Iterator[Method] = cpg.method.iterator
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
+  override def partIterator: Iterator[Method] = cpg.method.internal.iterator
 
   override def runOnPart(method: Method): Iterator[DiffGraph] = {
+    logger.info("Calculating reaching definitions for: {} in {}", method.fullName, method.filename)
     val problem = ReachingDefProblem.create(method)
+
+    if (shouldBailOut(problem)) {
+      logger.warn("Bailing out.")
+      return Iterator()
+    }
+
     val solution = new DataFlowSolver().calculateMopSolutionForwards(problem)
     val dstGraph = addReachingDefEdges(method, solution)
     addEdgesFromLoneIdentifiersToExit(dstGraph, method, solution)
     Iterator(dstGraph.build())
+  }
+
+  /**
+    * Before we start propagating definitions in the graph, which is the bulk
+    * of the work, we check how many definitions were are dealing with in total.
+    * If a threshold is reached, we bail out instead, leaving reaching definitions
+    * uncalculated for the method in question. Users can increase the threshold
+    * if desired.
+    * */
+  private def shouldBailOut(problem: DataFlowProblem[mutable.Set[Definition]]): Boolean = {
+    val method = problem.flowGraph.entryNode.asInstanceOf[Method]
+    val transferFunction = problem.transferFunction.asInstanceOf[ReachingDefTransferFunction]
+    // For each node, the `gen` map contains the list of definitions it generates
+    // We add up the sizes of these lists to obtain the total number of definitions
+    val numberOfDefinitions = transferFunction.gen.foldLeft(0)(_ + _._2.size)
+    logger.info("Number of definitions for {}: {}", method.fullName, numberOfDefinitions)
+    if (numberOfDefinitions > maxNumberOfDefinitions) {
+      logger.warn("{} has more than {} definitions", method.fullName, maxNumberOfDefinitions)
+      true
+    } else {
+      false
+    }
   }
 
   /**
