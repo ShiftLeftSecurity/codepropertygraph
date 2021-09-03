@@ -27,15 +27,16 @@ package object scan {
           .map(
             evidence =>
               finding(evidence = evidence,
-                name = q.name,
-                author = q.author,
-                title = q.title,
-                description = q.description,
-                score = q.score))
+                      name = q.name,
+                      author = q.author,
+                      title = q.title,
+                      description = q.description,
+                      score = q.score))
           .l
-      } catch { case ex: Throwable =>
-        logger.warn("Error executing query", ex)
-        List()
+      } catch {
+        case ex: Throwable =>
+          logger.warn("Error executing query", ex)
+          List()
       }
 
     }
