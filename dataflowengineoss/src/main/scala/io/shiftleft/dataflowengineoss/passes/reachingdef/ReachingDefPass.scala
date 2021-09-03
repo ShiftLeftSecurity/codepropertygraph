@@ -23,7 +23,8 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 1024) extends Para
     val problem = ReachingDefProblem.create(method)
 
     if (shouldBailOut(problem)) {
-      logger.info("Bailing out.")
+      logger.warn("Bailing out.")
+      return Iterator()
     }
 
     val solution = new DataFlowSolver().calculateMopSolutionForwards(problem)
@@ -38,7 +39,7 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 1024) extends Para
     val numberOfDefinitions = transferFunction.gen.foldLeft(0)(_ + _._2.size)
     logger.info("Number of definitions for {}: {}", method.fullName, numberOfDefinitions)
     if (numberOfDefinitions > maxNumberOfDefinitions) {
-      logger.info("Problem has more than {} definitions", maxNumberOfDefinitions)
+      logger.warn("Problem has more than {} definitions", maxNumberOfDefinitions)
       true
     } else {
       false
