@@ -87,7 +87,11 @@ object MetaData extends SchemaBase {
       Constant(name = "NEWC",
                value = "NEWC",
                valueType = ValueTypes.STRING,
-               comment = "Eclipse CDT based parser for C/C++").protoId(12)
+               comment = "Eclipse CDT based parser for C/C++").protoId(12),
+      Constant(name = "JAVASRC",
+               value = "JAVASRC",
+               valueType = ValueTypes.STRING,
+               comment = "Source-based front-end for Java").protoId(13)
     )
 
   }

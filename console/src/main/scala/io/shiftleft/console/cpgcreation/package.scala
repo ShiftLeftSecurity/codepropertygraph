@@ -20,6 +20,7 @@ package object cpgcreation {
       case Languages.LLVM       => Some(LlvmCpgGenerator(config.withArgs(args), rootPath))
       case Languages.GOLANG     => Some(GoCpgGenerator(config.withArgs(args), rootPath))
       case Languages.JAVA       => Some(JavaCpgGenerator(config.withArgs(args), rootPath))
+      case Languages.JAVASRC    => Some(JavaSrcCpgGenerator(config.withArgs(args), rootPath))
       case Languages.JAVASCRIPT => Some(JsCpgGenerator(config.withArgs(args), rootPath))
       case Languages.PYTHON     => Some(PythonCpgGenerator(config.withArgs(args), rootPath))
       case Languages.PHP        => Some(PhpCpgGenerator(config.withArgs(args), rootPath))

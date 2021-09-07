@@ -51,7 +51,8 @@ class CpgGeneratorFactory(config: ConsoleConfig) {
       Languages.LLVM,
       Languages.PHP,
       Languages.KOTLIN,
-      Languages.NEWC
+      Languages.NEWC,
+      Languages.JAVASRC
     ).contains(language)
   }
 
