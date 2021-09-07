@@ -51,6 +51,7 @@ class ImportCode[T <: Project](console: io.shiftleft.console.Console[T]) {
   def newc: CFrontend = new CFrontend(Languages.NEWC, "Eclipse CDT Based Frontend for C/C++")
   def llvm: Frontend = new Frontend(Languages.LLVM, "LLVM Bitcode Frontend")
   def java: Frontend = new Frontend(Languages.JAVA, "Java/Dalvik Bytecode Frontend")
+  def javasrc: Frontend = new Frontend(Languages.JAVASRC, "Java Source Frontend")
   def golang: Frontend = new Frontend(Languages.GOLANG, "Golang Source Frontend")
   def javascript: Frontend = new Frontend(Languages.JAVASCRIPT, "Javascript Source Frontend")
   def csharp: Frontend = new Frontend(Languages.CSHARP, "C# Source Frontend (Roslyn)")
