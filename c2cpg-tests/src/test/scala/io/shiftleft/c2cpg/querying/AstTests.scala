@@ -184,3 +184,21 @@ class CAstTests2 extends CCodeToCpgSuite {
   }
 
 }
+
+class CAstTests3 extends CCodeToCpgSuite {
+
+  override val code: String =
+    """
+       #define A_MACRO(x) (x = 10)
+
+       int foo() {
+        int y;
+        A_MACRO(y);
+       }
+    """.stripMargin
+
+  "foo" in {
+    cpg.method("foo").call.ast.code.foreach(println)
+  }
+
+}
