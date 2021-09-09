@@ -39,7 +39,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
                       cache: collection.mutable.Map[(Type, String), Member],
                       call: Call): Unit = {
     if (call._refOut.hasNext && !loggedDeprecationWarning) {
-      logger.warn(
+      logger.info(
         s"Using deprecated CPG format with already existing REF edge between" +
           s" a member access node and a member.")
       loggedDeprecationWarning = true
@@ -80,7 +80,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
       }
     } catch {
       case exception: Exception =>
-        logger.warn(
+        logger.info(
           s"Error while obtaining IDENTIFIER associated to member access at ${call}" +
             s" Reason: ${exception.getMessage}")
     }
@@ -91,7 +91,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
                         name: String,
                         depth: Int): Member = {
     if (depth > 100) {
-      logger.warn(
+      logger.info(
         "Maximum depth for member access resolution exceeded on type=${typ.fullName}, member=$name. Recursive inheritance?")
       return null
     }
@@ -115,7 +115,7 @@ class MemberAccessLinker(cpg: Cpg) extends CpgPass(cpg) {
           } else null
         }
         if (depth == 0 && res == null) {
-          logger.warn(s"Could not find type member. type=${typ.fullName}, member=$name")
+          logger.info(s"Could not find type member. type=${typ.fullName}, member=$name")
         }
         res
       }

@@ -7,7 +7,7 @@ import io.shiftleft.console.cpgqlserver.CPGQLServer
 import io.shiftleft.console.embammonite.EmbeddedAmmonite
 import io.shiftleft.console.qdbwserver.QDBWServer
 
-import java.io.{FileOutputStream, IOException, PrintStream}
+import java.io.IOException
 
 case class Config(
     scriptFile: Option[Path] = None,
@@ -232,16 +232,9 @@ trait BridgeBase {
         | $storeCode
         |""".stripMargin
 
-    val logFileName = "/tmp/" + productName + "-scan-log.txt"
-    println(s"Detailed logs at: $logFileName")
-    val file = new java.io.File(logFileName);
-    val fos = new FileOutputStream(file);
-    val ps = new PrintStream(fos);
-    System.setErr(ps)
     withTemporaryScript(code, productName) { file =>
       runScript(os.Path(file.path.toString), config)
     }
-    ps.close()
   }
 
   private def startInteractiveShell(config: Config, slProduct: SLProduct) = {
