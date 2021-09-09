@@ -294,32 +294,30 @@ trait AstForExpressionsCreator {
   private def astForPackExpansionExpression(packExpansionExpression: ICPPASTPackExpansionExpression, order: Int): Ast =
     astForExpression(packExpansionExpression.getPattern, order)
 
-  protected def astForExpression(expression: IASTExpression, order: Int): Ast = {
-    expression match {
-      case lit: IASTLiteralExpression   => astForLiteral(lit, order)
-      case un: IASTUnaryExpression      => astForUnaryExpression(un, order)
-      case bin: IASTBinaryExpression    => astForBinaryExpression(bin, order)
-      case exprList: IASTExpressionList => astForExpressionList(exprList, order)
-      case qualId: IASTIdExpression if qualId.getName.isInstanceOf[CPPASTQualifiedName] =>
-        astForQualifiedName(qualId.getName.asInstanceOf[CPPASTQualifiedName], order)
-      case ident: IASTIdExpression                            => astForIdentifier(ident, order)
-      case call: IASTFunctionCallExpression                   => astForCallExpression(call, order)
-      case typeId: IASTTypeIdExpression                       => astForTypeIdExpression(typeId, order)
-      case fieldRef: IASTFieldReference                       => astForFieldReference(fieldRef, order)
-      case expr: IASTConditionalExpression                    => astForConditionalExpression(expr, order)
-      case arrayIndexExpression: IASTArraySubscriptExpression => astForArrayIndexExpression(arrayIndexExpression, order)
-      case castExpression: IASTCastExpression                 => astForCastExpression(castExpression, order)
-      case newExpression: ICPPASTNewExpression                => astForNewExpression(newExpression, order)
-      case delExpression: ICPPASTDeleteExpression             => astForDeleteExpression(delExpression, order)
-      case typeIdInit: IASTTypeIdInitializerExpression        => astForTypeIdInitExpression(typeIdInit, order)
-      case c: ICPPASTSimpleTypeConstructorExpression          => astForConstructorExpression(c, order)
-      case lambdaExpression: ICPPASTLambdaExpression          => Ast(methodRefForLambda(lambdaExpression))
-      case compoundExpression: IGNUASTCompoundStatementExpression =>
-        astForCompoundStatementExpression(compoundExpression, order)
-      case packExpansionExpression: ICPPASTPackExpansionExpression =>
-        astForPackExpansionExpression(packExpansionExpression, order)
-      case _ => notHandledYet(expression, order)
-    }
+  protected def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
+    case lit: IASTLiteralExpression   => astForLiteral(lit, order)
+    case un: IASTUnaryExpression      => astForUnaryExpression(un, order)
+    case bin: IASTBinaryExpression    => astForBinaryExpression(bin, order)
+    case exprList: IASTExpressionList => astForExpressionList(exprList, order)
+    case qualId: IASTIdExpression if qualId.getName.isInstanceOf[CPPASTQualifiedName] =>
+      astForQualifiedName(qualId.getName.asInstanceOf[CPPASTQualifiedName], order)
+    case ident: IASTIdExpression                            => astForIdentifier(ident, order)
+    case call: IASTFunctionCallExpression                   => astForCallExpression(call, order)
+    case typeId: IASTTypeIdExpression                       => astForTypeIdExpression(typeId, order)
+    case fieldRef: IASTFieldReference                       => astForFieldReference(fieldRef, order)
+    case expr: IASTConditionalExpression                    => astForConditionalExpression(expr, order)
+    case arrayIndexExpression: IASTArraySubscriptExpression => astForArrayIndexExpression(arrayIndexExpression, order)
+    case castExpression: IASTCastExpression                 => astForCastExpression(castExpression, order)
+    case newExpression: ICPPASTNewExpression                => astForNewExpression(newExpression, order)
+    case delExpression: ICPPASTDeleteExpression             => astForDeleteExpression(delExpression, order)
+    case typeIdInit: IASTTypeIdInitializerExpression        => astForTypeIdInitExpression(typeIdInit, order)
+    case c: ICPPASTSimpleTypeConstructorExpression          => astForConstructorExpression(c, order)
+    case lambdaExpression: ICPPASTLambdaExpression          => Ast(methodRefForLambda(lambdaExpression))
+    case compoundExpression: IGNUASTCompoundStatementExpression =>
+      astForCompoundStatementExpression(compoundExpression, order)
+    case packExpansionExpression: ICPPASTPackExpansionExpression =>
+      astForPackExpansionExpression(packExpansionExpression, order)
+    case _ => notHandledYet(expression, order)
   }
 
   protected def astForStaticAssert(a: ICPPASTStaticAssertDeclaration, order: Int): Ast = {
