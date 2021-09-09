@@ -111,8 +111,8 @@ class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Con
 object AstCreator {
 
   @nowarn
-    /** The CDT utility method is unfortunately in a class that is marked as deprecated, however, 
-    * this is because the CDT team would like to discourage its use but at the same time does 
+  /** The CDT utility method is unfortunately in a class that is marked as deprecated, however,
+    * this is because the CDT team would like to discourage its use but at the same time does
     * not plan to remove this code.
     */
   def nodeSignature(node: IASTNode): String = {
