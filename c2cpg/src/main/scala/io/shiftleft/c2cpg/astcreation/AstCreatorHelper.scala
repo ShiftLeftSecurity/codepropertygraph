@@ -153,44 +153,44 @@ trait AstCreatorHelper {
           case f: CPPFunction if f.getDeclarations != null =>
             usingDeclarationMappings.getOrElse(
               fixQualifiedName(AstCreator.nodeSignature(d.getName)),
-              f.getDeclarations.headOption.map(_.getName.getRawSignature).getOrElse(f.getName))
+              f.getDeclarations.headOption.map(x => AstCreator.nodeSignature(x.getName)).getOrElse(f.getName))
           case f: CPPFunction if f.getDefinition != null =>
-            usingDeclarationMappings.getOrElse(fixQualifiedName(d.getName.getRawSignature),
-                                               f.getDefinition.getName.getRawSignature)
+            usingDeclarationMappings.getOrElse(fixQualifiedName(AstCreator.nodeSignature(d.getName)),
+                                               AstCreator.nodeSignature(f.getDefinition.getName))
           case other => other.getName
         }
       case alias: ICPPASTNamespaceAlias =>
-        alias.getMappingName.getRawSignature
-      case namespace: ICPPASTNamespaceDefinition if namespace.getName.getRawSignature.nonEmpty =>
-        fullName(namespace.getParent) + "." + namespace.getName.getRawSignature
-      case namespace: ICPPASTNamespaceDefinition if namespace.getName.getRawSignature.isEmpty =>
+        AstCreator.nodeSignature(alias.getMappingName)
+      case namespace: ICPPASTNamespaceDefinition if AstCreator.nodeSignature(namespace.getName).nonEmpty =>
+        fullName(namespace.getParent) + "." + AstCreator.nodeSignature(namespace.getName)
+      case namespace: ICPPASTNamespaceDefinition if AstCreator.nodeSignature(namespace.getName).isEmpty =>
         fullName(namespace.getParent) + "." + uniqueName("namespace", "", "")._1
-      case cppClass: ICPPASTCompositeTypeSpecifier if cppClass.getName.getRawSignature.nonEmpty =>
+      case cppClass: ICPPASTCompositeTypeSpecifier if AstCreator.nodeSignature(cppClass.getName).nonEmpty =>
         fullName(cppClass.getParent) + "." + cppClass.getName.toString
-      case cppClass: ICPPASTCompositeTypeSpecifier if cppClass.getName.getRawSignature.isEmpty =>
+      case cppClass: ICPPASTCompositeTypeSpecifier if AstCreator.nodeSignature(cppClass.getName).isEmpty =>
         val name = cppClass.getParent match {
           case decl: IASTSimpleDeclaration =>
             decl.getDeclarators.headOption
-              .map(_.getName.getRawSignature)
+              .map(x => AstCreator.nodeSignature(x.getName))
               .getOrElse(uniqueName("composite_type", "", "")._1)
           case _ => uniqueName("composite_type", "", "")._1
         }
         val fullname = s"${fullName(cppClass.getParent)}.$name"
         fullname
       case enum: IASTEnumerationSpecifier =>
-        fullName(enum.getParent) + "." + enum.getName.getRawSignature
-      case c: IASTCompositeTypeSpecifier => c.getName.getRawSignature
+        fullName(enum.getParent) + "." + AstCreator.nodeSignature(enum.getName)
+      case c: IASTCompositeTypeSpecifier => AstCreator.nodeSignature(c.getName)
       case f: IASTFunctionDeclarator =>
-        fullName(f.getParent) + "." + f.getName.getRawSignature
+        fullName(f.getParent) + "." + AstCreator.nodeSignature(f.getName)
       case f: ICPPASTLambdaExpression =>
         fullName(f.getParent) + "."
       case f: IASTFunctionDefinition =>
-        fullName(f.getParent) + "." + f.getDeclarator.getName.getRawSignature
-      case d: IASTIdExpression    => d.getName.getRawSignature
+        fullName(f.getParent) + "." + AstCreator.nodeSignature(f.getDeclarator.getName)
+      case d: IASTIdExpression    => AstCreator.nodeSignature(d.getName)
       case _: IASTTranslationUnit => ""
-      case u: IASTUnaryExpression => u.getOperand.getRawSignature
+      case u: IASTUnaryExpression => AstCreator.nodeSignature(u.getOperand)
       case e: ICPPASTElaboratedTypeSpecifier =>
-        fullName(e.getParent) + "." + e.getName.getRawSignature
+        fullName(e.getParent) + "." + AstCreator.nodeSignature(e.getName)
       case other if other.getParent != null => fullName(other.getParent)
       case other if other != null           => notHandledYet(other, -1); ""
       case null                             => ""

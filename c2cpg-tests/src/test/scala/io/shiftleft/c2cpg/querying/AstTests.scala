@@ -230,3 +230,22 @@ class MacroHandlingTests2 extends CCodeToCpgSuite {
     arg2.code shouldBe "1"
   }
 }
+
+class MacroHandlingTests3 extends CCodeToCpgSuite {
+  override val code: String =
+    """
+       #define A_MACRO(x) (printf(x))
+       int foo() {
+        int y;
+        A_MACRO(y);
+        return 10 * y;
+       }
+    """.stripMargin
+
+  "should correctly expand macro inside macro" in {
+    val List(x: Call) = cpg.method("foo").call.nameExact("printf").l
+    x.code shouldBe "printf(y)"
+    val List(arg: Identifier) = x.argument.l.sortBy(_.argumentIndex)
+    arg.name shouldBe "y"
+  }
+}

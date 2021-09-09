@@ -64,7 +64,7 @@ trait AstForStatementsCreator {
 
   private def astForReturnStatement(ret: IASTReturnStatement, order: Int): Ast = {
     val cpgReturn = NewReturn()
-      .code(ret.getRawSignature)
+      .code(AstCreator.nodeSignature(ret))
       .order(order)
       .argumentIndex(order)
       .lineNumber(line(ret))
@@ -78,11 +78,11 @@ trait AstForStatementsCreator {
   }
 
   private def astForBreakStatement(br: IASTBreakStatement, order: Int): Ast = {
-    Ast(newControlStructureNode(br, ControlStructureTypes.BREAK, br.getRawSignature, order))
+    Ast(newControlStructureNode(br, ControlStructureTypes.BREAK, AstCreator.nodeSignature(br), order))
   }
 
   private def astForContinueStatement(cont: IASTContinueStatement, order: Int): Ast = {
-    Ast(newControlStructureNode(cont, ControlStructureTypes.CONTINUE, cont.getRawSignature, order))
+    Ast(newControlStructureNode(cont, ControlStructureTypes.CONTINUE, AstCreator.nodeSignature(cont), order))
   }
 
   private def astForGotoStatement(goto: IASTGotoStatement, order: Int): Ast = {
@@ -108,7 +108,7 @@ trait AstForStatementsCreator {
   }
 
   private def astForDoStatement(doStmt: IASTDoStatement, order: Int): Ast = {
-    val code = doStmt.getRawSignature
+    val code = AstCreator.nodeSignature(doStmt)
 
     val doNode = newControlStructureNode(doStmt, ControlStructureTypes.DO, code, order)
 
