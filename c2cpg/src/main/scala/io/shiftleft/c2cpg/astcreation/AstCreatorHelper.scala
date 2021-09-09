@@ -119,7 +119,7 @@ trait AstCreatorHelper {
   }
 
   protected def nullSafeCode(node: IASTNode): String = {
-    Option(node).map(_.getRawSignature).getOrElse("")
+    Option(node).map(AstCreator.nodeSignature).getOrElse("")
   }
 
   protected def nullSafeAst(node: IASTExpression, order: Int): Ast = {
@@ -152,7 +152,7 @@ trait AstCreatorHelper {
         evaluation.getBinding match {
           case f: CPPFunction if f.getDeclarations != null =>
             usingDeclarationMappings.getOrElse(
-              fixQualifiedName(d.getName.getRawSignature),
+              fixQualifiedName(AstCreator.nodeSignature(d.getName)),
               f.getDeclarations.headOption.map(_.getName.getRawSignature).getOrElse(f.getName))
           case f: CPPFunction if f.getDefinition != null =>
             usingDeclarationMappings.getOrElse(fixQualifiedName(d.getName.getRawSignature),

@@ -10,7 +10,7 @@ import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.x2cpg.Ast
-import org.eclipse.cdt.core.dom.ast.{IASTNode, IASTTranslationUnit}
+import org.eclipse.cdt.core.dom.ast.{IASTMacroExpansionLocation, IASTNode, IASTTranslationUnit}
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.annotation.nowarn
@@ -111,9 +111,13 @@ class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Con
 object AstCreator {
 
   @nowarn
-  def nodeSignature(node : IASTNode) : String = {
+  def nodeSignature(node: IASTNode): String = {
     import org.eclipse.cdt.core.dom.ast.ASTSignatureUtil.getNodeSignature
-    getNodeSignature(node)
+    if (node.getNodeLocations.headOption.exists(_.isInstanceOf[IASTMacroExpansionLocation])) {
+      getNodeSignature(node)
+    } else {
+      node.getRawSignature
+    }
   }
 
 }

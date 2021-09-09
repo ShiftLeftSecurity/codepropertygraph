@@ -1,6 +1,8 @@
 package io.shiftleft.c2cpg.querying
 
 import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
+import io.shiftleft.codepropertygraph.generated.Operators
+import io.shiftleft.codepropertygraph.generated.nodes.{Call, Identifier, Literal}
 import io.shiftleft.semanticcpg.language._
 
 class CAstTests extends CCodeToCpgSuite {
@@ -190,7 +192,6 @@ class CAstTests3 extends CCodeToCpgSuite {
   override val code: String =
     """
        #define A_MACRO(x) (x = 10)
-
        int foo() {
         int y;
         A_MACRO(y);
@@ -198,8 +199,12 @@ class CAstTests3 extends CCodeToCpgSuite {
        }
     """.stripMargin
 
-  "foo" in {
-    cpg.method("foo").call.ast.code.foreach(println)
+  "should correctly expand macro" in {
+    val List(x: Call) = cpg.method("foo").call.nameExact(Operators.assignment).l
+    x.code shouldBe "y = 10"
+    val List(l: Identifier, r: Literal) = x.astMinusRoot.l.sortBy(_.order)
+    l.name shouldBe "y"
+    r.code shouldBe "10"
   }
 
 }
