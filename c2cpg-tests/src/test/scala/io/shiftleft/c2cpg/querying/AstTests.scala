@@ -194,6 +194,7 @@ class CAstTests3 extends CCodeToCpgSuite {
        int foo() {
         int y;
         A_MACRO(y);
+        return 10 * y;
        }
     """.stripMargin
 

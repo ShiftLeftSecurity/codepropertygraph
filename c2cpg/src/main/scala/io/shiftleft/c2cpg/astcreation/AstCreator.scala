@@ -10,9 +10,10 @@ import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.x2cpg.Ast
-import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit
+import org.eclipse.cdt.core.dom.ast.{IASTNode, IASTTranslationUnit}
 import org.slf4j.{Logger, LoggerFactory}
 
+import scala.annotation.nowarn
 import scala.collection.mutable
 
 class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Config, val diffGraph: DiffGraph.Builder)
@@ -103,6 +104,16 @@ class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Con
       .order(1)
     methodAstParentStack.push(namespaceBlock)
     Ast(namespaceBlock).withChild(createFakeMethod(name, fullName, absolutePath, iASTTranslationUnit))
+  }
+
+}
+
+object AstCreator {
+
+  @nowarn
+  def nodeSignature(node : IASTNode) : String = {
+    import org.eclipse.cdt.core.dom.ast.ASTSignatureUtil.getNodeSignature
+    getNodeSignature(node)
   }
 
 }

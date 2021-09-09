@@ -31,17 +31,18 @@ trait AstNodeBuilder {
                             name: String,
                             fullname: String,
                             dispatchType: String,
-                            order: Int): NewCall =
+                            order: Int): NewCall = {
     NewCall()
       .name(name)
       .dispatchType(dispatchType)
       .signature("TODO")
       .methodFullName(fullname)
-      .code(astNode.getRawSignature)
+      .code(AstCreator.nodeSignature(astNode))
       .order(order)
       .argumentIndex(order)
       .lineNumber(line(astNode))
       .columnNumber(column(astNode))
+  }
 
   protected def newControlStructureNode(node: IASTNode,
                                         controlStructureType: String,
