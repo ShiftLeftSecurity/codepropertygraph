@@ -12,7 +12,7 @@ import scala.collection.{Set, mutable}
 /**
   * A pass that calculates reaching definitions ("data dependencies").
   * */
-class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int) extends ParallelCpgPass[Method](cpg) {
+class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends ParallelCpgPass[Method](cpg) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
