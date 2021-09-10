@@ -10,9 +10,10 @@ import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.x2cpg.Ast
-import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit
+import org.eclipse.cdt.core.dom.ast.{IASTMacroExpansionLocation, IASTNode, IASTTranslationUnit}
 import org.slf4j.{Logger, LoggerFactory}
 
+import scala.annotation.nowarn
 import scala.collection.mutable
 
 class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Config, val diffGraph: DiffGraph.Builder)
@@ -103,6 +104,24 @@ class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Con
       .order(1)
     methodAstParentStack.push(namespaceBlock)
     Ast(namespaceBlock).withChild(createFakeMethod(name, fullName, absolutePath, iASTTranslationUnit))
+  }
+
+}
+
+object AstCreator {
+
+  @nowarn
+  /** The CDT utility method is unfortunately in a class that is marked as deprecated, however,
+    * this is because the CDT team would like to discourage its use but at the same time does
+    * not plan to remove this code.
+    */
+  def nodeSignature(node: IASTNode): String = {
+    import org.eclipse.cdt.core.dom.ast.ASTSignatureUtil.getNodeSignature
+    if (node.getNodeLocations.headOption.exists(_.isInstanceOf[IASTMacroExpansionLocation])) {
+      getNodeSignature(node)
+    } else {
+      node.getRawSignature
+    }
   }
 
 }

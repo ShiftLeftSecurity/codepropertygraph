@@ -1,6 +1,8 @@
 package io.shiftleft.c2cpg.querying
 
 import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
+import io.shiftleft.codepropertygraph.generated.Operators
+import io.shiftleft.codepropertygraph.generated.nodes.{Call, Identifier, Literal}
 import io.shiftleft.semanticcpg.language._
 
 class CAstTests extends CCodeToCpgSuite {
@@ -183,4 +185,67 @@ class CAstTests2 extends CCodeToCpgSuite {
       .l shouldBe List("i < bar")
   }
 
+}
+
+class MacroHandlingTests1 extends CCodeToCpgSuite {
+  override val code: String =
+    """
+       #define A_MACRO(x) (x = 10)
+       int foo() {
+        int y;
+        A_MACRO(y);
+        return 10 * y;
+       }
+    """.stripMargin
+
+  "should correctly expand macro" in {
+    val List(x: Call) = cpg.method("foo").call.nameExact(Operators.assignment).l
+    x.code shouldBe "y = 10"
+    val List(l: Identifier, r: Literal) = x.astMinusRoot.l.sortBy(_.order)
+    l.name shouldBe "y"
+    r.code shouldBe "10"
+  }
+}
+
+class MacroHandlingTests2 extends CCodeToCpgSuite {
+  override val code: String =
+    """
+       #define A_MACRO(x) (x = A_SECOND_MACRO(x))
+       #define A_SECOND_MACRO(x) (x+1)
+       int foo() {
+        int y;
+        A_MACRO(y);
+        return 10 * y;
+       }
+    """.stripMargin
+
+  "should correctly expand macro inside macro" in {
+    val List(x: Call) = cpg.method("foo").call.nameExact(Operators.assignment).l
+    x.code shouldBe "y = (y + 1)"
+    val List(id: Identifier, call2: Call) = x.astChildren.l.sortBy(_.order)
+    id.name shouldBe "y"
+    call2.code shouldBe "y + 1"
+    val List(arg1: Identifier, arg2: Literal) = call2.argument.l.sortBy(_.argumentIndex)
+    arg1.name shouldBe "y"
+    arg2.code shouldBe "1"
+  }
+}
+
+class MacroHandlingTests3 extends CCodeToCpgSuite {
+  override val code: String =
+    """
+       #define A_MACRO(x) (printf(x))
+       int foo() {
+        int y;
+        A_MACRO(y);
+        return 10 * y;
+       }
+    """.stripMargin
+
+  "should correctly expand macro inside macro" in {
+    val List(x: Call) = cpg.method("foo").call.nameExact("printf").l
+    x.code shouldBe "printf(y)"
+    val List(arg: Identifier) = x.argument.l.sortBy(_.argumentIndex)
+    arg.name shouldBe "y"
+  }
 }

@@ -98,7 +98,7 @@ trait AstForExpressionsCreator {
       case _ if rec.root.exists(_.isInstanceOf[NewIdentifier]) =>
         (DispatchTypes.STATIC_DISPATCH, rec.root.get.asInstanceOf[NewIdentifier].name)
       case reference: IASTIdExpression =>
-        (DispatchTypes.STATIC_DISPATCH, reference.getRawSignature)
+        (DispatchTypes.STATIC_DISPATCH, AstCreator.nodeSignature(reference))
       case _ =>
         (DispatchTypes.STATIC_DISPATCH, "")
     }

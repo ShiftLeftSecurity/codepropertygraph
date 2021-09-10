@@ -10,7 +10,7 @@ trait AstNodeBuilder {
   protected def newUnknown(node: IASTNode, order: Int): NewUnknown =
     NewUnknown()
       .parserTypeName(node.getClass.getSimpleName)
-      .code(node.getRawSignature)
+      .code(AstCreator.nodeSignature(node))
       .order(order)
       .argumentIndex(order)
       .lineNumber(line(node))
@@ -31,17 +31,18 @@ trait AstNodeBuilder {
                             name: String,
                             fullname: String,
                             dispatchType: String,
-                            order: Int): NewCall =
+                            order: Int): NewCall = {
     NewCall()
       .name(name)
       .dispatchType(dispatchType)
       .signature("TODO")
       .methodFullName(fullname)
-      .code(astNode.getRawSignature)
+      .code(AstCreator.nodeSignature(astNode))
       .order(order)
       .argumentIndex(order)
       .lineNumber(line(astNode))
       .columnNumber(column(astNode))
+  }
 
   protected def newControlStructureNode(node: IASTNode,
                                         controlStructureType: String,
@@ -57,7 +58,7 @@ trait AstNodeBuilder {
       .columnNumber(column(node))
 
   protected def newJumpTarget(node: IASTNode, order: Int): NewJumpTarget = {
-    val code = node.getRawSignature
+    val code = AstCreator.nodeSignature(node)
     val name = node match {
       case label: IASTLabelStatement    => label.getName.toString
       case _ if code.startsWith("case") => "case"
