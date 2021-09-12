@@ -1,1 +1,0 @@
-./schema2json/target/universal/stage/bin/schema2json
