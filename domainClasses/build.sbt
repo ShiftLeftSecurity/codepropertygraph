@@ -4,9 +4,9 @@ dependsOn(Projects.schema)
 
 libraryDependencies += "io.shiftleft" %% "overflowdb-traversal" % Versions.overflowdb
 
-val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
+// val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
 
-Compile / sourceGenerators += Projects.schema/generateDomainClasses
+// Compile / sourceGenerators += Projects.schema/generateDomainClasses
 
 /* generated sources occasionally have some warnings.. 
  * we're trying to minimise them on a best effort basis, but don't want
