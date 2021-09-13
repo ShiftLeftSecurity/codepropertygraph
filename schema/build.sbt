@@ -1,6 +1,17 @@
 name := "codepropertygraph-schema"
 
-libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "1.98"
+libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "1.98+0-25497b3a+20210913-0822"
+
+val generateDomainClasses2 = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
+generateDomainClasses2 := Def.taskDyn {
+  val outputRoot = target.value / "odb-codegen"
+  Def.task {
+    FileUtils.deleteRecursively(outputRoot)
+    (Compile/runMain).toTask(s" overflowdb.codegen.Main schema/target/odb-codegen").value
+    FileUtils.listFilesRecursively(outputRoot)
+  }
+}.value
+
 
 val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
 generateDomainClasses := Def.taskDyn {
