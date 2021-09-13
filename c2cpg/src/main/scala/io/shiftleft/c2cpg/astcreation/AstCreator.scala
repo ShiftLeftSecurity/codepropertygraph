@@ -19,14 +19,15 @@ class AstCreator(val filename: String,
                  val global: Global,
                  val config: C2Cpg.Config,
                  val diffGraph: DiffGraph.Builder,
-                 parserResult: IASTTranslationUnit)
+                 val parserResult: IASTTranslationUnit)
     extends AstForTypesCreator
     with AstForFunctionsCreator
     with AstForPrimitivesCreator
     with AstForStatementsCreator
     with AstForExpressionsCreator
     with AstNodeBuilder
-    with AstCreatorHelper {
+    with AstCreatorHelper
+    with MacroHandler {
 
   protected val logger: Logger = LoggerFactory.getLogger(classOf[AstCreator])
 
@@ -40,8 +41,6 @@ class AstCreator(val filename: String,
   // where the respective nodes are defined. Instead we put them under the parent TYPE_DECL in which they are defined.
   // To achieve this we need this extra stack.
   protected val methodAstParentStack: Stack[NewNode] = new Stack()
-
-  protected val macroHandler = new MacroHandler(parserResult)
 
   def createAst(): Unit =
     Ast.storeInDiffGraph(astForFile(parserResult), diffGraph)

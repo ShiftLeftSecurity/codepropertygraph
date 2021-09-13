@@ -6,14 +6,15 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTMacroExpansionLocation,
   IASTNode,
   IASTPreprocessorFunctionStyleMacroDefinition,
-  IASTPreprocessorMacroDefinition,
-  IASTTranslationUnit
+  IASTPreprocessorMacroDefinition
 }
 
 import scala.annotation.nowarn
 import scala.collection.mutable
 
-class MacroHandler(parserResult: IASTTranslationUnit) {
+trait MacroHandler {
+
+  this: AstCreator =>
 
   /**
     * For the given node, determine if it is expanded from a macro, and if so,
@@ -59,11 +60,12 @@ class MacroHandler(parserResult: IASTTranslationUnit) {
     * */
   private def createMacroCall(node: IASTNode, macroDef: IASTPreprocessorFunctionStyleMacroDefinition): Ast = {
     val name = macroDef.getName.toString
-    val code = node.getRawSignature
+    val code = node.getRawSignature.replaceAll(";$", "")
     val callNode = NewCall()
       .name(name)
       .methodFullName(name)
       .code(code)
+      .lineNumber(line(node))
     Ast(callNode)
   }
 

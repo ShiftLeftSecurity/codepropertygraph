@@ -19,7 +19,7 @@ trait AstForTypesCreator {
   }
 
   private def isTypeDef(decl: IASTSimpleDeclaration): Boolean =
-    macroHandler.nodeSignature(decl).startsWith("typedef") ||
+    nodeSignature(decl).startsWith("typedef") ||
       decl.getDeclSpecifier.isInstanceOf[IASTCompositeTypeSpecifier] ||
       decl.getDeclSpecifier.isInstanceOf[IASTEnumerationSpecifier]
 
@@ -94,7 +94,7 @@ trait AstForTypesCreator {
       case d if parentIsClassDef(d) =>
         Ast(
           NewMember()
-            .code(macroHandler.nodeSignature(declarator))
+            .code(nodeSignature(declarator))
             .name(name)
             .typeFullName(registerType(declTypeName))
             .order(order))
@@ -212,7 +212,7 @@ trait AstForTypesCreator {
         if declaration.getDeclSpecifier != null && declaration.getDeclSpecifier
           .isInstanceOf[IASTNamedTypeSpecifier] && declaration.getDeclarators.isEmpty =>
       val spec = declaration.getDeclSpecifier.asInstanceOf[IASTNamedTypeSpecifier]
-      val name = macroHandler.nodeSignature(spec.getName)
+      val name = nodeSignature(spec.getName)
       Seq(Ast(newTypeDecl(name, registerType(name), alias = Some(name), order = order)))
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.nonEmpty =>
       declaration.getDeclarators.toIndexedSeq.map {
@@ -228,12 +228,12 @@ trait AstForTypesCreator {
       Seq.empty
     case _: ICPPASTUsingDirective =>
       Seq.empty
-    case _: ICPPASTExplicitTemplateInstantiation                          => Seq.empty
-    case s: IASTSimpleDeclaration if macroHandler.nodeSignature(s) == ";" => Seq.empty
-    case l: ICPPASTLinkageSpecification                                   => astsForLinkageSpecification(l)
-    case t: ICPPASTTemplateDeclaration                                    => astsForDeclaration(t.getDeclaration, order)
-    case a: ICPPASTStaticAssertDeclaration                                => Seq(astForStaticAssert(a, order))
-    case asm: IASTASMDeclaration                                          => Seq(astForASMDeclaration(asm, order))
+    case _: ICPPASTExplicitTemplateInstantiation             => Seq.empty
+    case s: IASTSimpleDeclaration if nodeSignature(s) == ";" => Seq.empty
+    case l: ICPPASTLinkageSpecification                      => astsForLinkageSpecification(l)
+    case t: ICPPASTTemplateDeclaration                       => astsForDeclaration(t.getDeclaration, order)
+    case a: ICPPASTStaticAssertDeclaration                   => Seq(astForStaticAssert(a, order))
+    case asm: IASTASMDeclaration                             => Seq(astForASMDeclaration(asm, order))
     case structuredBindingDeclaration: ICPPASTStructuredBindingDeclaration =>
       Seq(astForStructuredBindingDeclaration(structuredBindingDeclaration, order))
     case _ => Seq(astForNode(decl, order))
@@ -307,7 +307,7 @@ trait AstForTypesCreator {
       case _ => typeFor(enumerator)
     }
     val cpgMember = NewMember()
-      .code(macroHandler.nodeSignature(enumerator))
+      .code(nodeSignature(enumerator))
       .name(enumerator.getName.toString)
       .typeFullName(registerType(tpe))
       .order(order)

@@ -281,10 +281,9 @@ class MacroHandlingTests4 extends CCodeToCpgSuite {
     """.stripMargin
 
   "should correctly expand macro inside macro" in {
-//    implicit val viewer: ImageViewer = (pathStr: String) =>
-//      Try {
-//        Process(Seq("xdg-open", pathStr)).!!
-//    }
-//    cpg.method("foo").plotDotAst
+    val List(call1: Call) = cpg.method("foo").call.nameExact("A_MACRO").l
+    call1.code shouldBe "A_MACRO(dst, ptr, 1)"
+    call1.name shouldBe "A_MACRO"
+    call1.methodFullName shouldBe "A_MACRO"
   }
 }

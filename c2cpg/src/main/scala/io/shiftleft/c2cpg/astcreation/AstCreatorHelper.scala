@@ -119,7 +119,7 @@ trait AstCreatorHelper {
   }
 
   protected def nullSafeCode(node: IASTNode): String = {
-    Option(node).map(macroHandler.nodeSignature).getOrElse("")
+    Option(node).map(nodeSignature).getOrElse("")
   }
 
   protected def nullSafeAst(node: IASTExpression, order: Int): Ast = {
@@ -152,46 +152,46 @@ trait AstCreatorHelper {
         evaluation.getBinding match {
           case f: CPPFunction if f.getDeclarations != null =>
             usingDeclarationMappings.getOrElse(
-              fixQualifiedName(macroHandler.nodeSignature(d.getName)),
-              f.getDeclarations.headOption.map(x => macroHandler.nodeSignature(x.getName)).getOrElse(f.getName)
+              fixQualifiedName(nodeSignature(d.getName)),
+              f.getDeclarations.headOption.map(x => nodeSignature(x.getName)).getOrElse(f.getName)
             )
           case f: CPPFunction if f.getDefinition != null =>
-            usingDeclarationMappings.getOrElse(fixQualifiedName(macroHandler.nodeSignature(d.getName)),
-                                               macroHandler.nodeSignature(f.getDefinition.getName))
+            usingDeclarationMappings.getOrElse(fixQualifiedName(nodeSignature(d.getName)),
+                                               nodeSignature(f.getDefinition.getName))
           case other => other.getName
         }
       case alias: ICPPASTNamespaceAlias =>
-        macroHandler.nodeSignature(alias.getMappingName)
-      case namespace: ICPPASTNamespaceDefinition if macroHandler.nodeSignature(namespace.getName).nonEmpty =>
-        fullName(namespace.getParent) + "." + macroHandler.nodeSignature(namespace.getName)
-      case namespace: ICPPASTNamespaceDefinition if macroHandler.nodeSignature(namespace.getName).isEmpty =>
+        nodeSignature(alias.getMappingName)
+      case namespace: ICPPASTNamespaceDefinition if nodeSignature(namespace.getName).nonEmpty =>
+        fullName(namespace.getParent) + "." + nodeSignature(namespace.getName)
+      case namespace: ICPPASTNamespaceDefinition if nodeSignature(namespace.getName).isEmpty =>
         fullName(namespace.getParent) + "." + uniqueName("namespace", "", "")._1
-      case cppClass: ICPPASTCompositeTypeSpecifier if macroHandler.nodeSignature(cppClass.getName).nonEmpty =>
+      case cppClass: ICPPASTCompositeTypeSpecifier if nodeSignature(cppClass.getName).nonEmpty =>
         fullName(cppClass.getParent) + "." + cppClass.getName.toString
-      case cppClass: ICPPASTCompositeTypeSpecifier if macroHandler.nodeSignature(cppClass.getName).isEmpty =>
+      case cppClass: ICPPASTCompositeTypeSpecifier if nodeSignature(cppClass.getName).isEmpty =>
         val name = cppClass.getParent match {
           case decl: IASTSimpleDeclaration =>
             decl.getDeclarators.headOption
-              .map(x => macroHandler.nodeSignature(x.getName))
+              .map(x => nodeSignature(x.getName))
               .getOrElse(uniqueName("composite_type", "", "")._1)
           case _ => uniqueName("composite_type", "", "")._1
         }
         val fullname = s"${fullName(cppClass.getParent)}.$name"
         fullname
       case enum: IASTEnumerationSpecifier =>
-        fullName(enum.getParent) + "." + macroHandler.nodeSignature(enum.getName)
-      case c: IASTCompositeTypeSpecifier => macroHandler.nodeSignature(c.getName)
+        fullName(enum.getParent) + "." + nodeSignature(enum.getName)
+      case c: IASTCompositeTypeSpecifier => nodeSignature(c.getName)
       case f: IASTFunctionDeclarator =>
-        fullName(f.getParent) + "." + macroHandler.nodeSignature(f.getName)
+        fullName(f.getParent) + "." + nodeSignature(f.getName)
       case f: ICPPASTLambdaExpression =>
         fullName(f.getParent) + "."
       case f: IASTFunctionDefinition =>
-        fullName(f.getParent) + "." + macroHandler.nodeSignature(f.getDeclarator.getName)
-      case d: IASTIdExpression    => macroHandler.nodeSignature(d.getName)
+        fullName(f.getParent) + "." + nodeSignature(f.getDeclarator.getName)
+      case d: IASTIdExpression    => nodeSignature(d.getName)
       case _: IASTTranslationUnit => ""
-      case u: IASTUnaryExpression => macroHandler.nodeSignature(u.getOperand)
+      case u: IASTUnaryExpression => nodeSignature(u.getOperand)
       case e: ICPPASTElaboratedTypeSpecifier =>
-        fullName(e.getParent) + "." + macroHandler.nodeSignature(e.getName)
+        fullName(e.getParent) + "." + nodeSignature(e.getName)
       case other if other.getParent != null => fullName(other.getParent)
       case other if other != null           => notHandledYet(other, -1); ""
       case null                             => ""

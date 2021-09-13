@@ -64,7 +64,7 @@ trait AstForStatementsCreator {
 
   private def astForReturnStatement(ret: IASTReturnStatement, order: Int): Ast = {
     val cpgReturn = NewReturn()
-      .code(macroHandler.nodeSignature(ret))
+      .code(nodeSignature(ret))
       .order(order)
       .argumentIndex(order)
       .lineNumber(line(ret))
@@ -78,11 +78,11 @@ trait AstForStatementsCreator {
   }
 
   private def astForBreakStatement(br: IASTBreakStatement, order: Int): Ast = {
-    Ast(newControlStructureNode(br, ControlStructureTypes.BREAK, macroHandler.nodeSignature(br), order))
+    Ast(newControlStructureNode(br, ControlStructureTypes.BREAK, nodeSignature(br), order))
   }
 
   private def astForContinueStatement(cont: IASTContinueStatement, order: Int): Ast = {
-    Ast(newControlStructureNode(cont, ControlStructureTypes.CONTINUE, macroHandler.nodeSignature(cont), order))
+    Ast(newControlStructureNode(cont, ControlStructureTypes.CONTINUE, nodeSignature(cont), order))
   }
 
   private def astForGotoStatement(goto: IASTGotoStatement, order: Int): Ast = {
@@ -108,7 +108,7 @@ trait AstForStatementsCreator {
   }
 
   private def astForDoStatement(doStmt: IASTDoStatement, order: Int): Ast = {
-    val code = macroHandler.nodeSignature(doStmt)
+    val code = nodeSignature(doStmt)
 
     val doNode = newControlStructureNode(doStmt, ControlStructureTypes.DO, code, order)
 
@@ -125,7 +125,7 @@ trait AstForStatementsCreator {
       case None =>
         ast
     }
-    macroHandler.asChildOfMacroCall(doStmt, r)
+    asChildOfMacroCall(doStmt, r)
   }
 
   private def astForSwitchStatement(switchStmt: IASTSwitchStatement, order: Int): Ast = {

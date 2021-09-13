@@ -61,7 +61,7 @@ trait AstForFunctionsCreator {
         case p: IASTParameterDeclaration => typeForDeclSpecifier(p.getDeclSpecifier)
         case other                       => typeForDeclSpecifier(other)
       } else {
-        parameters(func).map(p => macroHandler.nodeSignature(p))
+        parameters(func).map(p => nodeSignature(p))
       }
     s"(${elements.mkString(",")}$variadic)"
   }
@@ -217,24 +217,21 @@ trait AstForFunctionsCreator {
   private def astForParameter(parameter: IASTNode, childNum: Int): Ast = {
     val (name, code, tpe, variadic) = parameter match {
       case p: CASTParameterDeclaration =>
-        (macroHandler.nodeSignature(p.getDeclarator.getName),
-         macroHandler.nodeSignature(p),
-         typeForDeclSpecifier(p.getDeclSpecifier),
-         false)
+        (nodeSignature(p.getDeclarator.getName), nodeSignature(p), typeForDeclSpecifier(p.getDeclSpecifier), false)
       case p: CPPASTParameterDeclaration =>
-        (macroHandler.nodeSignature(p.getDeclarator.getName),
-         macroHandler.nodeSignature(p),
+        (nodeSignature(p.getDeclarator.getName),
+         nodeSignature(p),
          typeForDeclSpecifier(p.getDeclSpecifier),
          p.getDeclarator.declaresParameterPack())
       case s: IASTSimpleDeclaration =>
         (s.getDeclarators.headOption
-           .map(x => macroHandler.nodeSignature(x.getName))
+           .map(x => nodeSignature(x.getName))
            .getOrElse(uniqueName("parameter", "", "")._1),
-         macroHandler.nodeSignature(s),
+         nodeSignature(s),
          typeForDeclSpecifier(s),
          false)
       case other =>
-        (macroHandler.nodeSignature(other), macroHandler.nodeSignature(other), typeForDeclSpecifier(other), false)
+        (nodeSignature(other), nodeSignature(other), typeForDeclSpecifier(other), false)
     }
 
     val parameterNode = NewMethodParameterIn()
