@@ -294,4 +294,36 @@ trait AstCreatorHelper {
     if (tpe.isEmpty) Defines.anyTypeName else tpe
   }
 
+  /**
+    * For the given node, determine if it is expanded from a macro, and if so, find the first
+    * matching (offset, macro) pair in nodeOffsetMacroPairs, removing none matching elements
+    * from the start of nodeOffsetMacroPairs. Returns (Some(macroDefinition)) if a macro
+    * definition matches and None otherwise.
+    * */
+  def extractMatchingMacro(node: IASTNode): Option[IASTPreprocessorFunctionStyleMacroDefinition] = {
+    AstCreator.expandedFromMacro(node).foreach { expandedFrom =>
+      val nodeOffset = node.getFileLocation.getNodeOffset
+      val macroName = expandedFrom.getExpansion.getMacroDefinition.getName.toString
+      while (nodeOffsetMacroPairs.headOption.exists(
+               x => x._1 <= nodeOffset && x._2.isInstanceOf[IASTPreprocessorFunctionStyleMacroDefinition])) {
+        val (_, macroDefinition: IASTPreprocessorFunctionStyleMacroDefinition) = nodeOffsetMacroPairs.head
+        nodeOffsetMacroPairs.remove(0)
+        val name = macroDefinition.getName.toString
+        if (macroName == name) {
+          return Some(macroDefinition)
+        }
+      }
+    }
+    None
+  }
+
+  def asChildOfMacroCall(node: IASTNode, ast: Ast): Ast = {
+    val macroCallAst = extractMatchingMacro(node).map(createMacroCall(node, _))
+    if (macroCallAst.isDefined) {
+      macroCallAst.get.withChild(ast)
+    } else {
+      ast
+    }
+  }
+
 }
