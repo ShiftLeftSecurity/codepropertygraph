@@ -2,11 +2,12 @@ name := "codepropertygraph-domain-classes"
 
 dependsOn(Projects.schema)
 
-libraryDependencies += "io.shiftleft" %% "overflowdb-traversal" % Versions.overflowdb
+// libraryDependencies += "io.shiftleft" %% "overflowdb-traversal" % Versions.overflowdb
 
-// val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
+Compile / generateDomainClasses / classWithSchema := "io.shiftleft.codepropertygraph.schema.CpgSchema$"
+Compile / generateDomainClasses / fieldName := "instance"
 
-// Compile / sourceGenerators += Projects.schema/generateDomainClasses
+Compile / sourceGenerators += Compile / generateDomainClasses
 
 /* generated sources occasionally have some warnings.. 
  * we're trying to minimise them on a best effort basis, but don't want

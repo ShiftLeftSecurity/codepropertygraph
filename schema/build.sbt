@@ -1,13 +1,12 @@
 name := "codepropertygraph-schema"
 
-// libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "1.98+1-13aea12f+20210913-0906"
+// libraryDependencies += "io.shiftleft" % "overflowdb-core" % Versions.overflowdb
+libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "1.98+1-13aea12f+20210913-0906"
 
-// val classWithSchema = settingKey[String]("")
-// val fieldName = settingKey[String]("")
-// val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
-
-Compile/generateDomainClasses/classWithSchema := "io.shiftleft.codepropertygraph.schema.CpgSchema$"
-Compile/generateDomainClasses/fieldName := "instance"
+// Compile/generateDomainClasses/classWithSchema := "io.shiftleft.codepropertygraph.schema.CpgSchema$"
+// Compile/generateDomainClasses/fieldName := "instance"
+// generateDomainClasses/fieldName := "instance"
+// fieldName := "instance"
 
 // generateDomainClasses := Def.taskDyn {
 //   val outputRoot = sourceManaged.value / "overflowdb-codegen"
