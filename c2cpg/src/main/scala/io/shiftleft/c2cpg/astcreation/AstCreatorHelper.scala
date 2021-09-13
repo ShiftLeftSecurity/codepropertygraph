@@ -119,7 +119,7 @@ trait AstCreatorHelper {
   }
 
   protected def nullSafeCode(node: IASTNode): String = {
-    Option(node).map(AstCreator.nodeSignature).getOrElse("")
+    Option(node).map(macroHandler.nodeSignature).getOrElse("")
   }
 
   protected def nullSafeAst(node: IASTExpression, order: Int): Ast = {
@@ -152,45 +152,46 @@ trait AstCreatorHelper {
         evaluation.getBinding match {
           case f: CPPFunction if f.getDeclarations != null =>
             usingDeclarationMappings.getOrElse(
-              fixQualifiedName(AstCreator.nodeSignature(d.getName)),
-              f.getDeclarations.headOption.map(x => AstCreator.nodeSignature(x.getName)).getOrElse(f.getName))
+              fixQualifiedName(macroHandler.nodeSignature(d.getName)),
+              f.getDeclarations.headOption.map(x => macroHandler.nodeSignature(x.getName)).getOrElse(f.getName)
+            )
           case f: CPPFunction if f.getDefinition != null =>
-            usingDeclarationMappings.getOrElse(fixQualifiedName(AstCreator.nodeSignature(d.getName)),
-                                               AstCreator.nodeSignature(f.getDefinition.getName))
+            usingDeclarationMappings.getOrElse(fixQualifiedName(macroHandler.nodeSignature(d.getName)),
+                                               macroHandler.nodeSignature(f.getDefinition.getName))
           case other => other.getName
         }
       case alias: ICPPASTNamespaceAlias =>
-        AstCreator.nodeSignature(alias.getMappingName)
-      case namespace: ICPPASTNamespaceDefinition if AstCreator.nodeSignature(namespace.getName).nonEmpty =>
-        fullName(namespace.getParent) + "." + AstCreator.nodeSignature(namespace.getName)
-      case namespace: ICPPASTNamespaceDefinition if AstCreator.nodeSignature(namespace.getName).isEmpty =>
+        macroHandler.nodeSignature(alias.getMappingName)
+      case namespace: ICPPASTNamespaceDefinition if macroHandler.nodeSignature(namespace.getName).nonEmpty =>
+        fullName(namespace.getParent) + "." + macroHandler.nodeSignature(namespace.getName)
+      case namespace: ICPPASTNamespaceDefinition if macroHandler.nodeSignature(namespace.getName).isEmpty =>
         fullName(namespace.getParent) + "." + uniqueName("namespace", "", "")._1
-      case cppClass: ICPPASTCompositeTypeSpecifier if AstCreator.nodeSignature(cppClass.getName).nonEmpty =>
+      case cppClass: ICPPASTCompositeTypeSpecifier if macroHandler.nodeSignature(cppClass.getName).nonEmpty =>
         fullName(cppClass.getParent) + "." + cppClass.getName.toString
-      case cppClass: ICPPASTCompositeTypeSpecifier if AstCreator.nodeSignature(cppClass.getName).isEmpty =>
+      case cppClass: ICPPASTCompositeTypeSpecifier if macroHandler.nodeSignature(cppClass.getName).isEmpty =>
         val name = cppClass.getParent match {
           case decl: IASTSimpleDeclaration =>
             decl.getDeclarators.headOption
-              .map(x => AstCreator.nodeSignature(x.getName))
+              .map(x => macroHandler.nodeSignature(x.getName))
               .getOrElse(uniqueName("composite_type", "", "")._1)
           case _ => uniqueName("composite_type", "", "")._1
         }
         val fullname = s"${fullName(cppClass.getParent)}.$name"
         fullname
       case enum: IASTEnumerationSpecifier =>
-        fullName(enum.getParent) + "." + AstCreator.nodeSignature(enum.getName)
-      case c: IASTCompositeTypeSpecifier => AstCreator.nodeSignature(c.getName)
+        fullName(enum.getParent) + "." + macroHandler.nodeSignature(enum.getName)
+      case c: IASTCompositeTypeSpecifier => macroHandler.nodeSignature(c.getName)
       case f: IASTFunctionDeclarator =>
-        fullName(f.getParent) + "." + AstCreator.nodeSignature(f.getName)
+        fullName(f.getParent) + "." + macroHandler.nodeSignature(f.getName)
       case f: ICPPASTLambdaExpression =>
         fullName(f.getParent) + "."
       case f: IASTFunctionDefinition =>
-        fullName(f.getParent) + "." + AstCreator.nodeSignature(f.getDeclarator.getName)
-      case d: IASTIdExpression    => AstCreator.nodeSignature(d.getName)
+        fullName(f.getParent) + "." + macroHandler.nodeSignature(f.getDeclarator.getName)
+      case d: IASTIdExpression    => macroHandler.nodeSignature(d.getName)
       case _: IASTTranslationUnit => ""
-      case u: IASTUnaryExpression => AstCreator.nodeSignature(u.getOperand)
+      case u: IASTUnaryExpression => macroHandler.nodeSignature(u.getOperand)
       case e: ICPPASTElaboratedTypeSpecifier =>
-        fullName(e.getParent) + "." + AstCreator.nodeSignature(e.getName)
+        fullName(e.getParent) + "." + macroHandler.nodeSignature(e.getName)
       case other if other.getParent != null => fullName(other.getParent)
       case other if other != null           => notHandledYet(other, -1); ""
       case null                             => ""
@@ -292,38 +293,6 @@ trait AstCreatorHelper {
       case _ => Defines.anyTypeName
     }
     if (tpe.isEmpty) Defines.anyTypeName else tpe
-  }
-
-  /**
-    * For the given node, determine if it is expanded from a macro, and if so, find the first
-    * matching (offset, macro) pair in nodeOffsetMacroPairs, removing none matching elements
-    * from the start of nodeOffsetMacroPairs. Returns (Some(macroDefinition)) if a macro
-    * definition matches and None otherwise.
-    * */
-  def extractMatchingMacro(node: IASTNode): Option[IASTPreprocessorFunctionStyleMacroDefinition] = {
-    AstCreator.expandedFromMacro(node).foreach { expandedFrom =>
-      val nodeOffset = node.getFileLocation.getNodeOffset
-      val macroName = expandedFrom.getExpansion.getMacroDefinition.getName.toString
-      while (nodeOffsetMacroPairs.headOption.exists(
-               x => x._1 <= nodeOffset && x._2.isInstanceOf[IASTPreprocessorFunctionStyleMacroDefinition])) {
-        val (_, macroDefinition: IASTPreprocessorFunctionStyleMacroDefinition) = nodeOffsetMacroPairs.head
-        nodeOffsetMacroPairs.remove(0)
-        val name = macroDefinition.getName.toString
-        if (macroName == name) {
-          return Some(macroDefinition)
-        }
-      }
-    }
-    None
-  }
-
-  def asChildOfMacroCall(node: IASTNode, ast: Ast): Ast = {
-    val macroCallAst = extractMatchingMacro(node).map(createMacroCall(node, _))
-    if (macroCallAst.isDefined) {
-      macroCallAst.get.withChild(ast)
-    } else {
-      ast
-    }
   }
 
 }

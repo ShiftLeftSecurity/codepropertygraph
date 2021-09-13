@@ -10,15 +10,9 @@ import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.x2cpg.Ast
-import org.eclipse.cdt.core.dom.ast.{
-  IASTMacroExpansionLocation,
-  IASTNode,
-  IASTPreprocessorMacroDefinition,
-  IASTTranslationUnit
-}
+import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit
 import org.slf4j.{Logger, LoggerFactory}
 
-import scala.annotation.nowarn
 import scala.collection.mutable
 
 class AstCreator(val filename: String,
@@ -47,15 +41,7 @@ class AstCreator(val filename: String,
   // To achieve this we need this extra stack.
   protected val methodAstParentStack: Stack[NewNode] = new Stack()
 
-  protected var nodeOffsetMacroPairs: mutable.Buffer[(Int, IASTPreprocessorMacroDefinition)] = {
-    parserResult.getNodeLocations.toList
-      .collect {
-        case exp: IASTMacroExpansionLocation =>
-          (exp.asFileLocation().getNodeOffset, exp.getExpansion.getMacroDefinition)
-      }
-      .sortBy(_._1)
-      .toBuffer
-  }
+  protected val macroHandler = new MacroHandler(parserResult)
 
   def createAst(): Unit =
     Ast.storeInDiffGraph(astForFile(parserResult), diffGraph)
@@ -123,36 +109,6 @@ class AstCreator(val filename: String,
       .order(1)
     methodAstParentStack.push(namespaceBlock)
     Ast(namespaceBlock).withChild(createFakeMethod(name, fullName, absolutePath, iASTTranslationUnit))
-  }
-
-}
-
-object AstCreator {
-
-  /** The CDT utility method is unfortunately in a class that is marked as deprecated, however,
-    * this is because the CDT team would like to discourage its use but at the same time does
-    * not plan to remove this code.
-    */
-  @nowarn
-  def nodeSignature(node: IASTNode): String = {
-    import org.eclipse.cdt.core.dom.ast.ASTSignatureUtil.getNodeSignature
-    if (isExpandedFromMacro(node)) {
-      getNodeSignature(node)
-    } else {
-      node.getRawSignature
-    }
-  }
-
-  def isExpandedFromMacro(node: IASTNode): Boolean =
-    expandedFromMacro(node).nonEmpty
-
-  def expandedFromMacro(node: IASTNode): Option[IASTMacroExpansionLocation] = {
-    val locations = node.getNodeLocations
-    if (locations.nonEmpty) {
-      node.getNodeLocations.headOption.collect { case x: IASTMacroExpansionLocation => x }
-    } else {
-      None
-    }
   }
 
 }

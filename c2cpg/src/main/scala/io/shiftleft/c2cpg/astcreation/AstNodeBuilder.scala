@@ -10,7 +10,7 @@ trait AstNodeBuilder {
   protected def newUnknown(node: IASTNode, order: Int): NewUnknown =
     NewUnknown()
       .parserTypeName(node.getClass.getSimpleName)
-      .code(AstCreator.nodeSignature(node))
+      .code(macroHandler.nodeSignature(node))
       .order(order)
       .argumentIndex(order)
       .lineNumber(line(node))
@@ -37,7 +37,7 @@ trait AstNodeBuilder {
       .dispatchType(dispatchType)
       .signature("TODO")
       .methodFullName(fullname)
-      .code(AstCreator.nodeSignature(astNode))
+      .code(macroHandler.nodeSignature(astNode))
       .order(order)
       .argumentIndex(order)
       .lineNumber(line(astNode))
@@ -58,7 +58,7 @@ trait AstNodeBuilder {
       .columnNumber(column(node))
 
   protected def newJumpTarget(node: IASTNode, order: Int): NewJumpTarget = {
-    val code = AstCreator.nodeSignature(node)
+    val code = macroHandler.nodeSignature(node)
     val name = node match {
       case label: IASTLabelStatement    => label.getName.toString
       case _ if code.startsWith("case") => "case"
