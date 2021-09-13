@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg.astcreation
 
 import io.shiftleft.codepropertygraph.generated.ControlStructureTypes
-import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewReturn}
+import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewCall, NewReturn}
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
 import org.eclipse.cdt.core.dom.ast.cpp._
@@ -11,6 +11,29 @@ import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTNamespaceAlias
 trait AstForStatementsCreator {
 
   this: AstCreator =>
+
+  /**
+    * For the given node, determine if it is expanded from a macro, and if so, find the first
+    * matching (offset, macro) pair in nodeOffsetMacroPairs, removing none matching elements
+    * from the start of nodeOffsetMacroPairs. Returns (Some(macroDefinition)) if a macro
+    * definition matches and None otherwise.
+    * */
+  def extractMatchingMacro(node: IASTNode): Option[IASTPreprocessorFunctionStyleMacroDefinition] = {
+    AstCreator.expandedFromMacro(node).foreach { expandedFrom =>
+      val nodeOffset = node.getFileLocation.getNodeOffset
+      val macroName = expandedFrom.getExpansion.getMacroDefinition.getName.toString
+      while (nodeOffsetMacroPairs.headOption.exists(
+               x => x._1 <= nodeOffset && x._2.isInstanceOf[IASTPreprocessorFunctionStyleMacroDefinition])) {
+        val (_, macroDefinition: IASTPreprocessorFunctionStyleMacroDefinition) = nodeOffsetMacroPairs.head
+        nodeOffsetMacroPairs.remove(0)
+        val name = macroDefinition.getName.toString
+        if (macroName == name) {
+          return Some(macroDefinition)
+        }
+      }
+    }
+    None
+  }
 
   protected def astForBlockStatement(blockStmt: IASTCompoundStatement, order: Int): Ast = {
     val cpgBlock = NewBlock()
@@ -107,6 +130,15 @@ trait AstForStatementsCreator {
     Ast(cpgLabel) +: nestedStmts
   }
 
+  private def asChildOfMacroCall(node: IASTNode, ast: Ast): Ast = {
+    val macroCallAst = extractMatchingMacro(node).map(createMacroCall(node, _))
+    if (macroCallAst.isDefined) {
+      macroCallAst.get.withChild(ast)
+    } else {
+      ast
+    }
+  }
+
   private def astForDoStatement(doStmt: IASTDoStatement, order: Int): Ast = {
     val code = AstCreator.nodeSignature(doStmt)
 
@@ -119,12 +151,13 @@ trait AstForStatementsCreator {
       .withChild(conditionAst)
       .withChildren(stmtAsts)
 
-    conditionAst.root match {
+    val r = conditionAst.root match {
       case Some(r) =>
         ast.withConditionEdge(doNode, r)
       case None =>
         ast
     }
+    asChildOfMacroCall(doStmt, r)
   }
 
   private def astForSwitchStatement(switchStmt: IASTSwitchStatement, order: Int): Ast = {
@@ -256,9 +289,18 @@ trait AstForStatementsCreator {
     }
   }
 
+  def createMacroCall(node: IASTNode, m: IASTPreprocessorFunctionStyleMacroDefinition): Ast = {
+    val name = m.getName.toString
+    val code = node.getRawSignature
+    val callNode = NewCall()
+      .name(name)
+      .methodFullName(name)
+      .code(code)
+    Ast(callNode)
+  }
+
   private def astForIf(ifStmt: IASTIfStatement, order: Int): Ast = {
     val code = s"if (${nullSafeCode(ifStmt.getConditionExpression)})"
-
     val ifNode = newControlStructureNode(ifStmt, ControlStructureTypes.IF, code, order)
 
     val conditionAst = nullSafeAst(ifStmt.getConditionExpression, 1)

@@ -249,3 +249,42 @@ class MacroHandlingTests3 extends CCodeToCpgSuite {
     arg.name shouldBe "y"
   }
 }
+
+class MacroHandlingTests4 extends CCodeToCpgSuite {
+  override val code: String =
+    """
+       #define A_MACRO(dst, code, size)\
+     do \
+    { \
+        if( (i_read) >= (size) ) \
+        { \
+            dst = (code); \
+            p_peek += (size); \
+            i_read -= (size); \
+        } \
+        else \
+        { \
+            dst = 0; \
+            i_read = 0; \
+        } \
+    } while(0)
+
+    #define A_MACRO_2() (dst++)
+
+    int foo() {
+        char * dst, ptr;
+        A_MACRO(dst, ptr, 1);
+        dst++;
+        A_MACRO_2();
+        return 10 * y;
+       }
+    """.stripMargin
+
+  "should correctly expand macro inside macro" in {
+//    implicit val viewer: ImageViewer = (pathStr: String) =>
+//      Try {
+//        Process(Seq("xdg-open", pathStr)).!!
+//    }
+//    cpg.method("foo").plotDotAst
+  }
+}

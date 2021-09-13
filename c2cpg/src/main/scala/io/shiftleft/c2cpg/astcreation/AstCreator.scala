@@ -10,13 +10,22 @@ import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.x2cpg.Ast
-import org.eclipse.cdt.core.dom.ast.{IASTMacroExpansionLocation, IASTNode, IASTTranslationUnit}
+import org.eclipse.cdt.core.dom.ast.{
+  IASTMacroExpansionLocation,
+  IASTNode,
+  IASTPreprocessorMacroDefinition,
+  IASTTranslationUnit
+}
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.annotation.nowarn
 import scala.collection.mutable
 
-class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Config, val diffGraph: DiffGraph.Builder)
+class AstCreator(val filename: String,
+                 val global: Global,
+                 val config: C2Cpg.Config,
+                 val diffGraph: DiffGraph.Builder,
+                 parserResult: IASTTranslationUnit)
     extends AstForTypesCreator
     with AstForFunctionsCreator
     with AstForPrimitivesCreator
@@ -38,7 +47,17 @@ class AstCreator(val filename: String, val global: Global, val config: C2Cpg.Con
   // To achieve this we need this extra stack.
   protected val methodAstParentStack: Stack[NewNode] = new Stack()
 
-  def createAst(parserResult: IASTTranslationUnit): Unit =
+  protected var nodeOffsetMacroPairs: mutable.Buffer[(Int, IASTPreprocessorMacroDefinition)] = {
+    parserResult.getNodeLocations.toList
+      .collect {
+        case exp: IASTMacroExpansionLocation =>
+          (exp.asFileLocation().getNodeOffset, exp.getExpansion.getMacroDefinition)
+      }
+      .sortBy(_._1)
+      .toBuffer
+  }
+
+  def createAst(): Unit =
     Ast.storeInDiffGraph(astForFile(parserResult), diffGraph)
 
   private def astForFile(parserResult: IASTTranslationUnit): Ast = {
@@ -117,10 +136,22 @@ object AstCreator {
   @nowarn
   def nodeSignature(node: IASTNode): String = {
     import org.eclipse.cdt.core.dom.ast.ASTSignatureUtil.getNodeSignature
-    if (node.getNodeLocations.headOption.exists(_.isInstanceOf[IASTMacroExpansionLocation])) {
+    if (isExpandedFromMacro(node)) {
       getNodeSignature(node)
     } else {
       node.getRawSignature
+    }
+  }
+
+  def isExpandedFromMacro(node: IASTNode): Boolean =
+    expandedFromMacro(node).nonEmpty
+
+  def expandedFromMacro(node: IASTNode): Option[IASTMacroExpansionLocation] = {
+    val locations = node.getNodeLocations
+    if (locations.nonEmpty) {
+      node.getNodeLocations.headOption.collect { case x: IASTMacroExpansionLocation => x }
+    } else {
+      None
     }
   }
 
