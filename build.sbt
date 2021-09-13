@@ -20,7 +20,7 @@ publish / skip := true
 
 // lazy val codepropertygraph = Projects.codepropertygraph
 lazy val schema = Projects.schema
-// lazy val domainClasses = Projects.domainClasses
+lazy val domainClasses = Projects.domainClasses
 // lazy val protoBindings = Projects.protoBindings
 // lazy val schema2json = Projects.schema2json
 
