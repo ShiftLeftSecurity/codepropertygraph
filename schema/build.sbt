@@ -1,32 +1,31 @@
 name := "codepropertygraph-schema"
 
 // libraryDependencies += "io.shiftleft" % "overflowdb-core" % Versions.overflowdb
-libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "1.98+1-13aea12f+20210913-0906"
+libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "1.98+6-2dea5c5f+20210914-1008"
 
-// Compile/generateDomainClasses/classWithSchema := "io.shiftleft.codepropertygraph.schema.CpgSchema$"
-// Compile/generateDomainClasses/fieldName := "instance"
-// generateDomainClasses/fieldName := "instance"
-// fieldName := "instance"
+Compile / generateDomainClasses / classWithSchema := "io.shiftleft.codepropertygraph.schema.CpgSchema$"
+Compile / generateDomainClasses / fieldName := "instance"
 
-// generateDomainClasses := Def.taskDyn {
-//   val outputRoot = sourceManaged.value / "overflowdb-codegen"
-//   val classWithSchema_ = classWithSchema.value
-//   val fieldName_ = fieldName.value
-//   val currentSchemaMd5 = FileUtils.md5(sourceDirectory.value, baseDirectory.value/"build.sbt")
+val generateDomainClasses2 = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
+generateDomainClasses2 := Def.taskDyn {
+  val outputRoot = sourceManaged.value / "overflowdb-codegen"
+  val classWithSchema_ = (Compile/generateDomainClasses/classWithSchema).value
+  val fieldName_ = (Compile/generateDomainClasses/fieldName).value
+  val currentSchemaMd5 = FileUtils.md5(sourceDirectory.value, baseDirectory.value/"build.sbt")
 
-//   if (outputRoot.exists && lastSchemaMd5 == Some(currentSchemaMd5)) {
-//     Def.task {
-//       FileUtils.listFilesRecursively(outputRoot)
-//     }
-//   } else {
-//     Def.task {
-//       FileUtils.deleteRecursively(outputRoot)
-//       (Compile/runMain).toTask(s" overflowdb.codegen.Main --classWithSchema=$classWithSchema_ --field=$fieldName_ --out=$outputRoot").value
-//       lastSchemaMd5(currentSchemaMd5)
-//       FileUtils.listFilesRecursively(outputRoot)
-//     }
-//   }
-// }.value
+  if (outputRoot.exists && lastSchemaMd5 == Some(currentSchemaMd5)) {
+    Def.task {
+      FileUtils.listFilesRecursively(outputRoot)
+    }
+  } else {
+    Def.task {
+      FileUtils.deleteRecursively(outputRoot)
+      (Compile/runMain).toTask(s" overflowdb.codegen.Main --classWithSchema=$classWithSchema_ --field=$fieldName_ --out=$outputRoot").value
+      lastSchemaMd5(currentSchemaMd5)
+      FileUtils.listFilesRecursively(outputRoot)
+    }
+  }
+}.value
 
 val generateProtobuf = taskKey[File]("generate protobuf definitions: cpg.proto")
 generateProtobuf := Def.taskDyn {
