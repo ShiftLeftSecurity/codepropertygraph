@@ -10,14 +10,28 @@ import scala.collection.mutable
   * @param environment A map of system environment variables.
   * */
 class InstallConfig(environment: Map[String, String] = sys.env) {
-  var rootPath: File = {
+  lazy val rootPath: File = {
     if (environment.contains("SHIFTLEFT_OCULAR_INSTALL_DIR")) {
       environment("SHIFTLEFT_OCULAR_INSTALL_DIR").toFile
     } else {
       val uriToLibDir = classOf[io.shiftleft.console.InstallConfig].getProtectionDomain.getCodeSource.getLocation.toURI
-      val pathToLibDir = new java.io.File(uriToLibDir).toPath
-      pathToLibDir.getParent.getParent.toFile.toScala
+      val pathToLibDir = File(uriToLibDir)
+      findRootDirectory(pathToLibDir).getOrElse(throw new AssertionError(
+        s"""unable to find root installation directory
+           | context: tried to find marker file `$rootDirectoryMarkerFilename`
+           | started search in $pathToLibDir and searched $maxSearchDepth directories upwards""".stripMargin))
     }
+  }
+
+  private val rootDirectoryMarkerFilename = ".installation_root"
+  private val maxSearchDepth = 10
+  private def findRootDirectory(currentSearchDir: File, currentSearchDepth: Int = 0): Option[File] = {
+    if (currentSearchDir.list.map(_.name).contains(rootDirectoryMarkerFilename))
+      Some(currentSearchDir)
+    else if (currentSearchDepth < maxSearchDepth && currentSearchDir.parentOption.isDefined)
+      findRootDirectory(currentSearchDir.parent)
+    else
+      None
   }
 }
 
