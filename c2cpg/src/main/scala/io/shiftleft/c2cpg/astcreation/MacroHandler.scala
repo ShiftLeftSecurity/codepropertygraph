@@ -9,7 +9,7 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTPreprocessorFunctionStyleMacroDefinition,
   IASTPreprocessorMacroDefinition
 }
-import org.eclipse.cdt.internal.core.parser.scanner.C2CpgMacroExplorer
+import org.eclipse.cdt.internal.core.parser.scanner.MacroArgumentExtractor
 
 import scala.annotation.nowarn
 import scala.collection.mutable
@@ -49,7 +49,7 @@ trait MacroHandler {
         nodeOffsetMacroPairs.remove(0)
         val name = macroDefinition.getName.toString
         if (macroName == name) {
-          val arguments = new C2CpgMacroExplorer(parserResult, node.getFileLocation).getArguments
+          val arguments = new MacroArgumentExtractor(parserResult, node.getFileLocation).getArguments
           return Some((macroDefinition, arguments))
         }
       }

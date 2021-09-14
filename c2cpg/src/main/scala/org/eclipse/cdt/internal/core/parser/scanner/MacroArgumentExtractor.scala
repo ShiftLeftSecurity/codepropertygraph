@@ -14,7 +14,11 @@ import org.eclipse.cdt.internal.core.parser.scanner.Lexer.LexerOptions
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-class C2CpgMacroExplorer(tu: IASTTranslationUnit, loc: IASTFileLocation) {
+/**
+  * Utility class that obtains the arguments of the macro at `loc`
+  * of the translation unit `tu`.
+  * */
+class MacroArgumentExtractor(tu: IASTTranslationUnit, loc: IASTFileLocation) {
 
   def getArguments: List[String] = {
     val resolver = tu.getAdapter(classOf[ILocationResolver])
@@ -57,6 +61,11 @@ class C2CpgMacroExpansionTracker(stepToTrack: Int) extends MacroExpansionTracker
 
   val arguments: mutable.Buffer[String] = mutable.Buffer()
 
+  /**
+    * This function is called as part of the expansion process. Unfortunately, its
+    * default implementation in `MacroExpansionTracker` destroys the calculated
+    * arguments, so, we override this method to instead store them in `arguments`.
+    * */
   override def endFunctionStyleMacro(): Unit = {
     val macroStackField = classOf[MacroExpansionTracker].getDeclaredField("fMacroStack")
     macroStackField.setAccessible(true)
