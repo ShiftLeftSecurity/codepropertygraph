@@ -1461,7 +1461,9 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
           // TODO: "<operator>.arrayInitializer" is not part of Operators
           call.name shouldBe "<operator>.arrayInitializer"
           call.methodFullName shouldBe "<operator>.arrayInitializer"
-          call.astChildren.l match {
+          val children = call.astChildren.l
+          val args = call.argument.l
+          children match {
             case List(a: Literal, b: Literal, c: Literal, d: Literal) =>
               a.order shouldBe 1
               a.code shouldBe "0"
@@ -1473,18 +1475,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
               d.code shouldBe "3"
             case _ => fail()
           }
-          call.argument.l match {
-            case List(a: Literal, b: Literal, c: Literal, d: Literal) =>
-              a.order shouldBe 1
-              a.code shouldBe "0"
-              b.order shouldBe 2
-              b.code shouldBe "1"
-              c.order shouldBe 3
-              c.code shouldBe "2"
-              d.order shouldBe 4
-              d.code shouldBe "3"
-            case _ => fail()
-          }
+          children shouldBe args
         case _ => fail()
       }
     }
