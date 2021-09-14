@@ -1,5 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/ShiftLeftSecurity/c2cpg.png?branch=master)](http://travis-ci.org/ShiftLeftSecurity/c2cpg)
-[![bintray](https://api.bintray.com/packages/shiftleft/maven/c2cpg/images/download.svg)](https://bintray.com/shiftleft/maven/c2cpg/_latestVersion)
+[![CI pipeline](https://github.com/ShiftLeftSecurity/codepropertygraph/actions/workflows/push.yml/badge.svg)](https://github.com/ShiftLeftSecurity/codepropertygraph/actions/workflows/push.yml)
 
 # c2cpg
 
