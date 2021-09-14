@@ -16,7 +16,10 @@ import overflowdb.traversal.help.Doc
 import scala.sys.process.Process
 import scala.util.{Failure, Success, Try}
 
-class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[T]) extends ScriptManager(executor) {
+class Console[T <: Project](executor: AmmoniteExecutor,
+                            loader: WorkspaceLoader[T],
+                            baseDir: File = File.currentWorkingDirectory)
+    extends ScriptManager(executor) {
 
   import Console._
 
@@ -25,7 +28,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
   def console: Console[T] = this
 
   protected var workspaceManager: WorkspaceManager[T] = _
-  switchWorkspace(File.currentWorkingDirectory.path.resolve("workspace").toString)
+  switchWorkspace(baseDir.path.resolve("workspace").toString)
   protected def workspacePathName: String = workspaceManager.getPath
 
   private val nameOfCpgInProject = "cpg.bin"

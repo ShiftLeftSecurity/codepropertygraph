@@ -32,7 +32,8 @@ object TestWorkspaceLoader extends WorkspaceLoader[Project] {
   override def createProject(projectFile: ProjectFile, path: Path): Project = Project(projectFile, path)
 }
 
-class TestConsole(workspaceDir: String) extends Console[Project](DefaultAmmoniteExecutor, TestWorkspaceLoader) {
+class TestConsole(workspaceDir: String)
+    extends Console[Project](DefaultAmmoniteExecutor, TestWorkspaceLoader, File(workspaceDir)) {
   override def config = new ConsoleConfig(
     install = new InstallConfig(Map("SHIFTLEFT_OCULAR_INSTALL_DIR" -> workspaceDir))
   )
