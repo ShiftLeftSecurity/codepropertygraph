@@ -1452,11 +1452,30 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
     "be correct for array init" in TestAstOnlyFixture("""
         |int x[] = {0, 1, 2, 3};
         |""".stripMargin) { cpg =>
-      cpg.assignment.ast.l match {
-        case List(_, ident: Identifier, unknown: Unknown) =>
+      cpg.assignment.astChildren.l match {
+        case List(ident: Identifier, call: Call) =>
           ident.typeFullName shouldBe "int[]"
-          // TODO: arrayInitializers
-          unknown.code shouldBe "{0, 1, 2, 3}"
+          ident.order shouldBe 1
+          call.code shouldBe "{0, 1, 2, 3}"
+          call.order shouldBe 2
+          // TODO: "<operator>.arrayInitializer" is not part of Operators
+          call.name shouldBe "<operator>.arrayInitializer"
+          call.methodFullName shouldBe "<operator>.arrayInitializer"
+          val children = call.astChildren.l
+          val args = call.argument.l
+          children match {
+            case List(a: Literal, b: Literal, c: Literal, d: Literal) =>
+              a.order shouldBe 1
+              a.code shouldBe "0"
+              b.order shouldBe 2
+              b.code shouldBe "1"
+              c.order shouldBe 3
+              c.code shouldBe "2"
+              d.order shouldBe 4
+              d.code shouldBe "3"
+            case _ => fail()
+          }
+          children shouldBe args
         case _ => fail()
       }
     }
