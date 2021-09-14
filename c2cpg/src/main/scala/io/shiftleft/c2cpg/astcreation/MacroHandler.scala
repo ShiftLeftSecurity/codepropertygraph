@@ -24,7 +24,7 @@ trait MacroHandler {
     * as its child.
     * */
   def asChildOfMacroCall(node: IASTNode, ast: Ast): Ast = {
-    val macroCallAst = extractMatchingMacro(node).map(createMacroCall(node, _))
+    val macroCallAst = extractMatchingMacro(node).map { case (mac, args) => createMacroCall(node, mac, args) }
     if (macroCallAst.isDefined) {
       macroCallAst.get.withChild(ast)
     } else {
@@ -34,14 +34,13 @@ trait MacroHandler {
 
   /**
     * For the given node, determine if it is expanded from a macro, and if so, find the first
-    * matching (offset, macro) pair in nodeOffsetMacroPairs, removing none matching elements
-    * from the start of nodeOffsetMacroPairs. Returns (Some(macroDefinition)) if a macro
-    * definition matches and None otherwise.
+    * matching (offset, macro) pair in nodeOffsetMacroPairs, removing non-matching elements
+    * from the start of nodeOffsetMacroPairs. Returns (Some(macroDefinition, arguments))
+    * if a macro definition matches and None otherwise.
     * */
-  private def extractMatchingMacro(node: IASTNode): Option[IASTPreprocessorFunctionStyleMacroDefinition] = {
+  private def extractMatchingMacro(
+      node: IASTNode): Option[(IASTPreprocessorFunctionStyleMacroDefinition, List[String])] = {
     expandedFromMacro(node).foreach { expandedFrom =>
-      new C2CpgMacroExplorer(parserResult, node.getFileLocation)
-
       val nodeOffset = node.getFileLocation.getNodeOffset
       val macroName = expandedFrom.getExpansion.getMacroDefinition.getName.toString
       while (nodeOffsetMacroPairs.headOption.exists(
@@ -50,7 +49,8 @@ trait MacroHandler {
         nodeOffsetMacroPairs.remove(0)
         val name = macroDefinition.getName.toString
         if (macroName == name) {
-          return Some(macroDefinition)
+          val arguments = new C2CpgMacroExplorer(parserResult, node.getFileLocation).getArguments
+          return Some((macroDefinition, arguments))
         }
       }
     }
@@ -62,9 +62,12 @@ trait MacroHandler {
     * `node` is the node is the root node of the expansion and
     * `macroDef` is the macro definition.
     * */
-  private def createMacroCall(node: IASTNode, macroDef: IASTPreprocessorFunctionStyleMacroDefinition): Ast = {
+  private def createMacroCall(node: IASTNode,
+                              macroDef: IASTPreprocessorFunctionStyleMacroDefinition,
+                              args: List[String]): Ast = {
     val name = macroDef.getName.toString
     val code = node.getRawSignature.replaceAll(";$", "")
+    println(args)
     val callNode = NewCall()
       .name(name)
       .methodFullName(name)

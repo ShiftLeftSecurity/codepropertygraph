@@ -5,37 +5,38 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTName,
   IASTPreprocessorElifStatement,
   IASTPreprocessorIfStatement,
+  IASTPreprocessorMacroExpansion,
   IASTTranslationUnit
 }
 import org.eclipse.cdt.core.parser.util.CharArrayMap
 import org.eclipse.cdt.internal.core.parser.scanner.Lexer.LexerOptions
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 class C2CpgMacroExplorer(tu: IASTTranslationUnit, loc: IASTFileLocation) {
 
-  private val resolver = tu.getAdapter(classOf[ILocationResolver])
-  private val expansion = resolver.getMacroExpansions(loc).headOption
-  private val dictionary: CharArrayMap[PreprocessorMacro] = createDictionary()
-  private val lexerOptions = tu.getAdapter(classOf[LexerOptions])
-  private val expander = new MacroExpander(ILexerLog.NULL, dictionary, null, lexerOptions)
-  private val tracker: MacroExpansionTracker = new C2CpgMacroExpansionTracker(Integer.MAX_VALUE)
-
-  val source: String = resolver.getUnpreprocessedSignature(loc).mkString("")
-  expansion.foreach { exp =>
-    val refLoc = exp.getFileLocation
-    val from = 0
-    val to = from + refLoc.getNodeLength
-    val input = source.substring(from, to - from)
-    val enclosing = tu.getNodeSelector(null).findEnclosingNode(from - 1, 2)
-    val isPPCondition = enclosing.isInstanceOf[IASTPreprocessorIfStatement] || enclosing
-      .isInstanceOf[IASTPreprocessorElifStatement]
-    expander.expand(input, tracker, tu.getFilePath, refLoc.getStartingLineNumber, isPPCondition)
-    println(tracker)
+  def getArguments: List[String] = {
+    val resolver = tu.getAdapter(classOf[ILocationResolver])
+    val expansion = resolver.getMacroExpansions(loc).headOption
+    expansion.toList.flatMap { exp =>
+      val dictionary: CharArrayMap[PreprocessorMacro] = createDictionary(exp)
+      val lexerOptions = tu.getAdapter(classOf[LexerOptions])
+      val expander = new MacroExpander(ILexerLog.NULL, dictionary, null, lexerOptions)
+      val tracker = new C2CpgMacroExpansionTracker(Integer.MAX_VALUE)
+      val source: String = resolver.getUnpreprocessedSignature(loc).mkString("")
+      val refLoc = exp.getFileLocation
+      val input = source.substring(0, refLoc.getNodeLength)
+      val enclosing = tu.getNodeSelector(null).findEnclosingNode(-1, 2)
+      val isPPCondition = enclosing.isInstanceOf[IASTPreprocessorIfStatement] || enclosing
+        .isInstanceOf[IASTPreprocessorElifStatement]
+      expander.expand(input, tracker, tu.getFilePath, refLoc.getStartingLineNumber, isPPCondition)
+      tracker.arguments.toList
+    }
   }
 
-  def createDictionary(): CharArrayMap[PreprocessorMacro] = {
-    val refs: Array[IASTName] = expansion.map(_.getMacroReference).toList.toArray
+  private def createDictionary(expansion: IASTPreprocessorMacroExpansion): CharArrayMap[PreprocessorMacro] = {
+    val refs: Array[IASTName] = Array(expansion.getMacroReference)
     val map = new CharArrayMap[PreprocessorMacro](refs.length);
     refs.foreach(name => addMacroDefinition(map, name))
     map
@@ -54,15 +55,18 @@ class C2CpgMacroExplorer(tu: IASTTranslationUnit, loc: IASTFileLocation) {
 
 class C2CpgMacroExpansionTracker(stepToTrack: Int) extends MacroExpansionTracker(stepToTrack) {
 
+  val arguments: mutable.Buffer[String] = mutable.Buffer()
+
   override def endFunctionStyleMacro(): Unit = {
-    val field = classOf[MacroExpansionTracker].getDeclaredField("fMacroStack")
-    field.setAccessible(true)
-    val list = field.get(this).asInstanceOf[java.util.List[MacroInfo]].asScala
+    val macroStackField = classOf[MacroExpansionTracker].getDeclaredField("fMacroStack")
+    macroStackField.setAccessible(true)
+    val list = macroStackField.get(this).asInstanceOf[java.util.List[MacroInfo]].asScala
     list.headOption.foreach { macroInfo =>
-      val field = classOf[MacroInfo].getDeclaredField("fArguments")
-      field.setAccessible(true)
-      val arguments = field.get(macroInfo).asInstanceOf[java.util.ArrayList[TokenList]].asScala.toList
-      arguments.foreach { argTokenList =>
+      val argumentsField = classOf[MacroInfo].getDeclaredField("fArguments")
+      argumentsField.setAccessible(true)
+      val args = argumentsField.get(macroInfo).asInstanceOf[java.util.ArrayList[TokenList]].asScala.toList
+      arguments.clear()
+      arguments.addAll(args.map { argTokenList =>
         var arg = ""
         var done = false
         while (!done) {
@@ -73,10 +77,9 @@ class C2CpgMacroExpansionTracker(stepToTrack: Int) extends MacroExpansionTracker
             arg += next.toString + " "
           }
         }
-        arg = arg.trim
-        println(arg)
-      }
+        arg.trim
+      })
     }
-    println("HOOKED")
   }
+
 }
