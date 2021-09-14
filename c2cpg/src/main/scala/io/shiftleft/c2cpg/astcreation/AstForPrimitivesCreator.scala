@@ -68,8 +68,15 @@ trait AstForPrimitivesCreator {
   }
 
   protected def astForInitializerList(l: IASTInitializerList, order: Int): Ast = {
-    // TODO: how to represent this?
-    Ast(newUnknown(l, order))
+    // TODO re-use from Operators once it there
+    val op = "<operator>.arrayInitializer"
+    val initCallNode = newCallNode(l, op, op, DispatchTypes.STATIC_DISPATCH, order)
+    val args = withOrder(l.getClauses) {
+      case (c, o) =>
+        astForNode(c, o)
+    }
+    val validArgs = args.collect { case a if a.root.isDefined => a.root.get }
+    Ast(initCallNode).withChildren(args).withArgEdges(initCallNode, validArgs)
   }
 
   protected def astForQualifiedName(qualId: CPPASTQualifiedName, order: Int): Ast = {
