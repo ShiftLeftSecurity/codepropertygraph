@@ -1,13 +1,9 @@
 package io.shiftleft.c2cpg.astcreation
 
+import io.shiftleft.codepropertygraph.generated.DispatchTypes
 import io.shiftleft.codepropertygraph.generated.nodes.NewCall
 import io.shiftleft.x2cpg.Ast
-import org.eclipse.cdt.core.dom.ast.{
-  IASTMacroExpansionLocation,
-  IASTNode,
-  IASTPreprocessorFunctionStyleMacroDefinition,
-  IASTPreprocessorMacroDefinition
-}
+import org.eclipse.cdt.core.dom.ast.{IASTMacroExpansionLocation, IASTNode, IASTPreprocessorFunctionStyleMacroDefinition, IASTPreprocessorMacroDefinition}
 
 import scala.annotation.nowarn
 import scala.collection.mutable
@@ -38,6 +34,10 @@ trait MacroHandler {
     * */
   private def extractMatchingMacro(node: IASTNode): Option[IASTPreprocessorFunctionStyleMacroDefinition] = {
     expandedFromMacro(node).foreach { expandedFrom =>
+
+      // val explorer = C2CpgMacroExplorer(parserResult, node.getFileLocation)
+      // println(explorer.getExpansionStep(0))
+
       val nodeOffset = node.getFileLocation.getNodeOffset
       val macroName = expandedFrom.getExpansion.getMacroDefinition.getName.toString
       while (nodeOffsetMacroPairs.headOption.exists(
@@ -66,6 +66,9 @@ trait MacroHandler {
       .methodFullName(name)
       .code(code)
       .lineNumber(line(node))
+      .columnNumber(column(node))
+      .typeFullName(typeFor(node))
+      .dispatchType(DispatchTypes.STATIC_DISPATCH)
     Ast(callNode)
   }
 

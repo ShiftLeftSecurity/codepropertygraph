@@ -4,6 +4,10 @@ import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
 import io.shiftleft.codepropertygraph.generated.Operators
 import io.shiftleft.codepropertygraph.generated.nodes.{Call, Identifier, Literal}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.dotextension.ImageViewer
+
+import scala.sys.process.Process
+import scala.util.Try
 
 class CAstTests extends CCodeToCpgSuite {
 
@@ -285,5 +289,16 @@ class MacroHandlingTests4 extends CCodeToCpgSuite {
     call1.code shouldBe "A_MACRO(dst, ptr, 1)"
     call1.name shouldBe "A_MACRO"
     call1.methodFullName shouldBe "A_MACRO"
+    call1.lineNumber shouldBe Some(22)
+    call1.columnNumber shouldBe Some(8)
+    call1.typeFullName shouldBe "ANY"
+
+    implicit val viewer: ImageViewer = (pathStr: String) =>
+      Try {
+        Process(Seq("xdg-open", pathStr)).!!
+      }
+
+    cpg.method("foo").plotDotAst
+
   }
 }
