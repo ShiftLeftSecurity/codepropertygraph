@@ -1449,6 +1449,18 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
       cpg.call.name("<operator>.new").code("new int\\[n\\]").argument.code("int").size shouldBe 1
     }
 
+    "be correct for array init" in TestAstOnlyFixture("""
+        |int x[] = {0, 1, 2, 3};
+        |""".stripMargin) { cpg =>
+      cpg.assignment.ast.l match {
+        case List(_, ident: Identifier, unknown: Unknown) =>
+          ident.typeFullName shouldBe "int[]"
+          // TODO: arrayInitializers
+          unknown.code shouldBe "{0, 1, 2, 3}"
+        case _ => fail()
+      }
+    }
+
     "be correct for 'new' object" in TestAstOnlyFixture(
       """
         |Foo* alloc(int n) {

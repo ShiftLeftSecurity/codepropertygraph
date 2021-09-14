@@ -93,10 +93,10 @@ trait AstCreatorHelper {
     case t if t.contains("?")                      => Defines.anyTypeName
     case t if t.contains("#")                      => Defines.anyTypeName
     case t if t.startsWith("{") && t.endsWith("}") => Defines.anyTypeName
+    case t if t.startsWith("[") && t.endsWith("]") => "[]"
     case t if t.contains("*")                      => "*"
-    case t if t.contains("[")                      => "[]"
     case t if t.contains("::")                     => fixQualifiedName(t).split(".").lastOption.getOrElse(Defines.anyTypeName)
-    case someType                                  => someType
+    case someType                                  => someType.replace(" ", "")
   }
 
   protected def typeFor(node: IASTNode): String = cleanType(ASTTypeUtil.getNodeType(node))
