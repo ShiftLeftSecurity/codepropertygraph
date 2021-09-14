@@ -25,7 +25,7 @@ class Console[T <: Project](executor: AmmoniteExecutor, loader: WorkspaceLoader[
   def console: Console[T] = this
 
   protected var workspaceManager: WorkspaceManager[T] = _
-  switchWorkspace(config.install.rootPath.path.resolve("workspace").toString)
+  switchWorkspace(File.currentWorkingDirectory.path.resolve("workspace").toString)
   protected def workspacePathName: String = workspaceManager.getPath
 
   private val nameOfCpgInProject = "cpg.bin"
