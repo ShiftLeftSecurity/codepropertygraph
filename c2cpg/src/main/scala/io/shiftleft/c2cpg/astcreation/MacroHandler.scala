@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg.astcreation
 
 import io.shiftleft.codepropertygraph.generated.DispatchTypes
-import io.shiftleft.codepropertygraph.generated.nodes.NewCall
+import io.shiftleft.codepropertygraph.generated.nodes.{NewCall, NewIdentifier}
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast.{
   IASTMacroExpansionLocation,
@@ -24,7 +24,13 @@ trait MacroHandler {
     * as its child.
     * */
   def asChildOfMacroCall(node: IASTNode, ast: Ast): Ast = {
-    val macroCallAst = extractMatchingMacro(node).map { case (mac, args) => createMacroCall(node, mac, args) }
+    val macroCallAst = extractMatchingMacro(node).map {
+      case (mac, args) =>
+        createMacroCallAst( // ast,
+                           node,
+                           mac,
+                           args)
+    }
     if (macroCallAst.isDefined) {
       macroCallAst.get.withChild(ast)
     } else {
@@ -58,16 +64,17 @@ trait MacroHandler {
   }
 
   /**
-    * Create a CALL node that represents the macro invocation where
-    * `node` is the node is the root node of the expansion and
-    * `macroDef` is the macro definition.
+    * Create an AST that represents a macro expansion as a call.
+    * The AST is rooted in a CALL node and contains sub trees
+    * for arguments. These are also connected to the AST via
+    * ARGUMENT edges.
     * */
-  private def createMacroCall(node: IASTNode,
-                              macroDef: IASTPreprocessorFunctionStyleMacroDefinition,
-                              args: List[String]): Ast = {
+  private def createMacroCallAst( // ast: Ast,
+                                 node: IASTNode,
+                                 macroDef: IASTPreprocessorFunctionStyleMacroDefinition,
+                                 arguments: List[String]): Ast = {
     val name = macroDef.getName.toString
     val code = node.getRawSignature.replaceAll(";$", "")
-    println(args)
     val callNode = NewCall()
       .name(name)
       .methodFullName(name)
@@ -76,7 +83,23 @@ trait MacroHandler {
       .columnNumber(column(node))
       .typeFullName(typeFor(node))
       .dispatchType(DispatchTypes.STATIC_DISPATCH)
+
+    // TODO We want to clone the ASTS of arguments here
+    // and then attach those ASTS to the AST we return
+    // For now, we instead create identifier nodes
+    // val nodes = ast.nodes
+    // val argRoots = arguments.flatMap { arg =>
+    //  nodes.find(x => x.properties.get("CODE").contains(arg))
+    // }
+
+    val argAsts = arguments.zipWithIndex.map {
+      case (arg, i) =>
+        Ast(NewIdentifier(code = arg, order = i + 1))
+    }
+
     Ast(callNode)
+      .withChildren(argAsts)
+      .withArgEdges(callNode, argAsts.flatMap(_.root))
   }
 
   private val nodeOffsetMacroPairs: mutable.Buffer[(Int, IASTPreprocessorMacroDefinition)] = {

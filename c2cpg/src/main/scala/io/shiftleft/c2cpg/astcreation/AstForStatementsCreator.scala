@@ -168,7 +168,7 @@ trait AstForStatementsCreator {
   }
 
   protected def astsForStatement(statement: IASTStatement, order: Int): Seq[Ast] = {
-    statement match {
+    val r = statement match {
       case expr: IASTExpressionStatement          => Seq(astForExpression(expr.getExpression, order))
       case block: IASTCompoundStatement           => Seq(astForBlockStatement(block, order))
       case ifStmt: IASTIfStatement                => Seq(astForIf(ifStmt, order))
@@ -190,6 +190,7 @@ trait AstForStatementsCreator {
       case _: IASTNullStatement                   => Seq.empty
       case _                                      => Seq(astForNode(statement, order))
     }
+    r.map(x => asChildOfMacroCall(statement, x))
   }
 
   private def astForFor(forStmt: IASTForStatement, order: Int): Ast = {

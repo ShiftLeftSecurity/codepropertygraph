@@ -43,7 +43,7 @@ class MacroArgumentExtractor(tu: IASTTranslationUnit, loc: IASTFileLocation) {
       val tracker = new C2CpgMacroExpansionTracker(Integer.MAX_VALUE)
       val source: String = resolver.getUnpreprocessedSignature(loc).mkString("")
       val refLoc = exp.getFileLocation
-      val input = source.substring(0, refLoc.getNodeLength)
+      val input = source.slice(0, refLoc.getNodeLength)
       val enclosing = tu.getNodeSelector(null).findEnclosingNode(-1, 2)
       val isPPCondition = enclosing.isInstanceOf[IASTPreprocessorIfStatement] || enclosing
         .isInstanceOf[IASTPreprocessorElifStatement]
@@ -74,13 +74,17 @@ class C2CpgMacroExpansionTracker(stepToTrack: Int) extends MacroExpansionTracker
 
   @nowarn
   override def setExpandedMacroArgument(tokenList: TokenList): Unit = {
+    arguments.addOne(tokenListToString(tokenList))
+  }
+
+  private def tokenListToString(tokenList: TokenList): String = {
     var tok: IToken = tokenList.first()
     var arg = ""
     while (tok != null) {
       arg += tok.toString + " "
       tok = tok.getNext
     }
-    arguments.addOne(arg.trim)
+    arg.trim
   }
 
 }
