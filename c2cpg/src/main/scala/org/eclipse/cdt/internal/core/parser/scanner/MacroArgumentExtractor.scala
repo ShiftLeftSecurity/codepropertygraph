@@ -8,6 +8,7 @@ import org.eclipse.cdt.core.dom.ast.{
   IASTPreprocessorMacroExpansion,
   IASTTranslationUnit
 }
+import org.eclipse.cdt.core.parser.IToken
 import org.eclipse.cdt.core.parser.util.CharArrayMap
 import org.eclipse.cdt.internal.core.parser.scanner.Lexer.LexerOptions
 
@@ -16,7 +17,17 @@ import scala.collection.mutable
 
 /**
   * Utility class that obtains the arguments of the macro at `loc` of the translation
-  * unit `tu`.
+  * unit `tu` (we used CDT's naming convention here.) The way this works is by performing
+  * macro expansion using CDT's `MacroExpander`, which accepts a `MacroExpansionTracker`,
+  * which is informed of arguments as they are determined. The problem is that the
+  * default `MacroExpansionTracker` does not make these arguments available separately
+  * but only in a form where all arguments have been merged back into a string.
+  *
+  * By supplying a custom tracker that inherits from `MacroExpansionTracker` and overrides
+  * the method `setExpandedMacroArgument`, we can intercept arguments and store them in
+  * a list for later retrieval. We wrap this rather complicated way of accessing the
+  * macro arguments in the single public method `getArguments` of the
+  * `MacroArgumentExtractor`.
   *
   * This class must be in this package in order to have access to `PreprocessorMacro`.
   * */
@@ -59,20 +70,15 @@ class MacroArgumentExtractor(tu: IASTTranslationUnit, loc: IASTFileLocation) {
 }
 
 class C2CpgMacroExpansionTracker(stepToTrack: Int) extends MacroExpansionTracker(stepToTrack) {
-
   val arguments: mutable.Buffer[String] = mutable.Buffer()
 
   @nowarn
   override def setExpandedMacroArgument(tokenList: TokenList): Unit = {
+    var tok: IToken = tokenList.first()
     var arg = ""
-    var done = false
-    while (!done) {
-      val next = tokenList.removeFirst()
-      if (next == null) {
-        done = true
-      } else {
-        arg += next.toString + " "
-      }
+    while (tok != null) {
+      arg += tok.toString + " "
+      tok = tok.getNext
     }
     arguments.addOne(arg.trim)
   }
