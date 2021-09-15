@@ -11,12 +11,14 @@ import org.eclipse.cdt.core.dom.ast.{
 import org.eclipse.cdt.core.parser.util.CharArrayMap
 import org.eclipse.cdt.internal.core.parser.scanner.Lexer.LexerOptions
 
+import scala.annotation.nowarn
 import scala.collection.mutable
-import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 /**
-  * Utility class that obtains the arguments of the macro at `loc`
-  * of the translation unit `tu`.
+  * Utility class that obtains the arguments of the macro at `loc` of the translation
+  * unit `tu`.
+  *
+  * This class must be in this package in order to have access to `PreprocessorMacro`.
   * */
 class MacroArgumentExtractor(tu: IASTTranslationUnit, loc: IASTFileLocation) {
 
@@ -54,41 +56,25 @@ class MacroArgumentExtractor(tu: IASTTranslationUnit, loc: IASTFileLocation) {
       case _ =>
     }
   }
-
 }
 
 class C2CpgMacroExpansionTracker(stepToTrack: Int) extends MacroExpansionTracker(stepToTrack) {
 
   val arguments: mutable.Buffer[String] = mutable.Buffer()
 
-  /**
-    * This function is called as part of the expansion process. Unfortunately, its
-    * default implementation in `MacroExpansionTracker` destroys the calculated
-    * arguments, so, we override this method to instead store them in `arguments`.
-    * */
-  override def endFunctionStyleMacro(): Unit = {
-    val macroStackField = classOf[MacroExpansionTracker].getDeclaredField("fMacroStack")
-    macroStackField.setAccessible(true)
-    val list = macroStackField.get(this).asInstanceOf[java.util.List[MacroInfo]].asScala
-    list.headOption.foreach { macroInfo =>
-      val argumentsField = classOf[MacroInfo].getDeclaredField("fArguments")
-      argumentsField.setAccessible(true)
-      val args = argumentsField.get(macroInfo).asInstanceOf[java.util.ArrayList[TokenList]].asScala.toList
-      arguments.clear()
-      arguments.addAll(args.map { argTokenList =>
-        var arg = ""
-        var done = false
-        while (!done) {
-          val next = argTokenList.removeFirst()
-          if (next == null) {
-            done = true
-          } else {
-            arg += next.toString + " "
-          }
-        }
-        arg.trim
-      })
+  @nowarn
+  override def setExpandedMacroArgument(tokenList: TokenList): Unit = {
+    var arg = ""
+    var done = false
+    while (!done) {
+      val next = tokenList.removeFirst()
+      if (next == null) {
+        done = true
+      } else {
+        arg += next.toString + " "
+      }
     }
+    arguments.addOne(arg.trim)
   }
 
 }
