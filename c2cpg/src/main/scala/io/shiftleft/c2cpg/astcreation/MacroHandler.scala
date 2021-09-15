@@ -3,12 +3,7 @@ package io.shiftleft.c2cpg.astcreation
 import io.shiftleft.codepropertygraph.generated.DispatchTypes
 import io.shiftleft.codepropertygraph.generated.nodes.{NewCall, NewIdentifier}
 import io.shiftleft.x2cpg.Ast
-import org.eclipse.cdt.core.dom.ast.{
-  IASTMacroExpansionLocation,
-  IASTNode,
-  IASTPreprocessorFunctionStyleMacroDefinition,
-  IASTPreprocessorMacroDefinition
-}
+import org.eclipse.cdt.core.dom.ast.{IASTMacroExpansionLocation, IASTNode, IASTPreprocessorMacroDefinition}
 import org.eclipse.cdt.internal.core.parser.scanner.MacroArgumentExtractor
 
 import scala.annotation.nowarn
@@ -44,22 +39,26 @@ trait MacroHandler {
     * from the start of nodeOffsetMacroPairs. Returns (Some(macroDefinition, arguments))
     * if a macro definition matches and None otherwise.
     * */
-  private def extractMatchingMacro(
-      node: IASTNode): Option[(IASTPreprocessorFunctionStyleMacroDefinition, List[String])] = {
-    expandedFromMacro(node).foreach { expandedFrom =>
-      val nodeOffset = node.getFileLocation.getNodeOffset
-      val macroName = expandedFrom.getExpansion.getMacroDefinition.getName.toString
-      while (nodeOffsetMacroPairs.headOption.exists(
-               x => x._1 <= nodeOffset && x._2.isInstanceOf[IASTPreprocessorFunctionStyleMacroDefinition])) {
-        val (_, macroDefinition: IASTPreprocessorFunctionStyleMacroDefinition) = nodeOffsetMacroPairs.head
-        nodeOffsetMacroPairs.remove(0)
-        val name = macroDefinition.getName.toString
-        if (macroName == name) {
-          val arguments = new MacroArgumentExtractor(parserResult, node.getFileLocation).getArguments
-          return Some((macroDefinition, arguments))
+  private def extractMatchingMacro(node: IASTNode): Option[(IASTPreprocessorMacroDefinition, List[String])] = {
+    expandedFromMacro(node)
+      .filterNot { expandedFrom =>
+        expandedFromMacro(node.getParent)
+          .map(_.getExpansion.getMacroDefinition)
+          .contains(expandedFrom.getExpansion.getMacroDefinition)
+      }
+      .foreach { expandedFrom =>
+        val nodeOffset = node.getFileLocation.getNodeOffset
+        val macroName = expandedFrom.getExpansion.getMacroDefinition.getName.toString
+        while (nodeOffsetMacroPairs.headOption.exists(x => x._1 <= nodeOffset)) {
+          val (_, macroDefinition) = nodeOffsetMacroPairs.head
+          nodeOffsetMacroPairs.remove(0)
+          val name = macroDefinition.getName.toString
+          if (macroName == name) {
+            val arguments = new MacroArgumentExtractor(parserResult, node.getFileLocation).getArguments
+            return Some((macroDefinition, arguments))
+          }
         }
       }
-    }
     None
   }
 
@@ -71,7 +70,7 @@ trait MacroHandler {
     * */
   private def createMacroCallAst( // ast: Ast,
                                  node: IASTNode,
-                                 macroDef: IASTPreprocessorFunctionStyleMacroDefinition,
+                                 macroDef: IASTPreprocessorMacroDefinition,
                                  arguments: List[String]): Ast = {
     val name = macroDef.getName.toString
     val code = node.getRawSignature.replaceAll(";$", "")
@@ -132,7 +131,8 @@ trait MacroHandler {
   def expandedFromMacro(node: IASTNode): Option[IASTMacroExpansionLocation] = {
     val locations = node.getNodeLocations
     if (locations.nonEmpty) {
-      node.getNodeLocations.headOption.collect { case x: IASTMacroExpansionLocation => x }
+      node.getNodeLocations.headOption
+        .collect { case x: IASTMacroExpansionLocation => x }
     } else {
       None
     }

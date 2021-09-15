@@ -222,8 +222,8 @@ class MacroHandlingTests2 extends CCodeToCpgSuite {
   "should correctly expand macro inside macro" in {
     val List(x: Call) = cpg.method("foo").call.nameExact(Operators.assignment).l
     x.code shouldBe "y = (y + 1)"
-    val List(id: Identifier, call2: Call) = x.astChildren.l.sortBy(_.order)
-    id.name shouldBe "y"
+    val List(identifier: Identifier, call2: Call) = x.astChildren.l.sortBy(_.order)
+    identifier.code shouldBe "y"
     call2.code shouldBe "y + 1"
     val List(arg1: Identifier, arg2: Literal) = call2.argument.l.sortBy(_.argumentIndex)
     arg1.name shouldBe "y"
@@ -280,7 +280,7 @@ class MacroHandlingTests4 extends CCodeToCpgSuite {
        }
     """.stripMargin
 
-  "should correctly expand macro inside macro" in {
+  "should correctly include calls to macros" in {
     val List(call1: Call) = cpg.method("foo").call.nameExact("A_MACRO").l
     call1.code shouldBe "A_MACRO(dst, ptr, 1)"
     call1.name shouldBe "A_MACRO"
@@ -301,5 +301,22 @@ class MacroHandlingTests4 extends CCodeToCpgSuite {
     call2.columnNumber shouldBe Some(8)
     call2.typeFullName shouldBe "ANY"
     call2.argument.l.sortBy(_.order).size shouldBe 0
+  }
+}
+
+class MacroHandlingTests5 extends CCodeToCpgSuite {
+  override val code: String =
+    """
+       #define A_MACRO (1)
+       int foo() {
+        return A_MACRO;
+       }
+    """.stripMargin
+
+  "should correctly include call to macro that is only a constant in a return" in {
+    val List(call: Call) = cpg.method("foo").call.l
+    call.name shouldBe "A_MACRO"
+    call.code shouldBe "A_MACRO"
+    call.argument.size shouldBe 0
   }
 }

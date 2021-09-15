@@ -119,13 +119,12 @@ trait AstForStatementsCreator {
       .withChild(conditionAst)
       .withChildren(stmtAsts)
 
-    val r = conditionAst.root match {
+    conditionAst.root match {
       case Some(r) =>
         ast.withConditionEdge(doNode, r)
       case None =>
         ast
     }
-    asChildOfMacroCall(doStmt, r)
   }
 
   private def astForSwitchStatement(switchStmt: IASTSwitchStatement, order: Int): Ast = {
