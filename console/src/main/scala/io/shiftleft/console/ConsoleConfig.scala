@@ -16,8 +16,7 @@ class InstallConfig(environment: Map[String, String] = sys.env) {
     } else {
       val uriToLibDir = classOf[io.shiftleft.console.InstallConfig].getProtectionDomain.getCodeSource.getLocation.toURI
       val pathToLibDir = File(uriToLibDir)
-      findRootDirectory(pathToLibDir).getOrElse(throw new AssertionError(
-        s"""unable to find root installation directory
+      findRootDirectory(pathToLibDir).getOrElse(throw new AssertionError(s"""unable to find root installation directory
            | context: tried to find marker file `$rootDirectoryMarkerFilename`
            | started search in $pathToLibDir and searched $maxSearchDepth directories upwards""".stripMargin))
     }

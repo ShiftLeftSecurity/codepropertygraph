@@ -28,4 +28,7 @@ object ProjectRoot {
     else ???
   }
 
+  def find: File =
+    File(findRelativePath)
+
 }
