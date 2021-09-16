@@ -310,7 +310,7 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
       .reduceOption((x, y) => x ++ y)
       .getOrElse(Cfg.empty) ++ cfgForSingleNode(call)
     val cfgForExpansion = call.astChildren.lastOption.map(cfgFor).getOrElse(Cfg.empty)
-    Cfg
+    val cfg = Cfg
       .from(cfgForMacroCall, cfgForExpansion)
       .copy(
         entryNode = cfgForMacroCall.entryNode,
@@ -318,6 +318,7 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
           singleEdge(call, x)),
         fringe = cfgForMacroCall.fringe ++ cfgForExpansion.fringe
       )
+    cfg
   }
 
   /**

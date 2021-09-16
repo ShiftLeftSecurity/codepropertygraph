@@ -1,8 +1,9 @@
 package io.shiftleft.c2cpg.querying
 
-import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.{CCodeToCpgSuite, DataFlowCodeToCpgSuite}
 import io.shiftleft.codepropertygraph.generated.DispatchTypes
-import io.shiftleft.codepropertygraph.generated.nodes.{Call, Identifier}
+import io.shiftleft.codepropertygraph.generated.nodes.Call
+import io.shiftleft.dataflowengineoss.language.toExtendedCfgNode
 import io.shiftleft.semanticcpg.language._
 
 class CfgTests extends CCodeToCpgSuite {
@@ -39,7 +40,7 @@ class CfgTests extends CCodeToCpgSuite {
   }
 
   "should find that printf post dominates all" in {
-    cpg.call("printf").postDominates.size shouldBe 14
+    cpg.call("printf").postDominates.size shouldBe 12
   }
 
   "should find that method does not post dominate anything" in {
@@ -47,7 +48,7 @@ class CfgTests extends CCodeToCpgSuite {
   }
 }
 
-class CfgMacroTests extends CCodeToCpgSuite {
+class CfgMacroTests extends DataFlowCodeToCpgSuite {
   override val code: String =
     """
        #define MP4_GET4BYTES( dst ) MP4_GETX_PRIVATE( dst, GetDWBE(p_peek), 4 )
@@ -75,10 +76,12 @@ class CfgMacroTests extends CCodeToCpgSuite {
 
     """.stripMargin
 
-  "should create correct CFG for macro expansion" in {
+  "should create correct CFG for macro expansion and find data flow" in {
     val List(callToMacro: Call) = cpg.method("foo").call.dispatchType(DispatchTypes.INLINED).l
-    val l = callToMacro.cfgNext.collect { case x: Identifier => x }.name.l.sorted
-    l shouldBe List("i_read", "sink")
+    callToMacro.argument.code.l shouldBe List("x")
+    callToMacro.cfgNext.code.toSet shouldBe Set("x", "i_read")
+    val source = cpg.method("foo").call.name("MP4_GET4BYTES").argument(1).l
+    val sink = cpg.method("foo").call.name("sink").argument(1).l
+    sink.reachableByFlows(source).l.foreach(println)
   }
-
 }

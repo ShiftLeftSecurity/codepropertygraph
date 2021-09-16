@@ -50,8 +50,7 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
     }
 
     "be correct for call expression" in new CpgCfgFixture("foo(a + 1, b);") {
-      succOf("RET func ()") shouldBe expected(("foo", AlwaysEdge))
-      succOf("foo") shouldBe expected(("a", AlwaysEdge))
+      succOf("RET func ()") shouldBe expected(("a", AlwaysEdge))
       succOf("a") shouldBe expected(("1", AlwaysEdge))
       succOf("1") shouldBe expected(("a + 1", AlwaysEdge))
       succOf("a + 1") shouldBe expected(("b", AlwaysEdge))
@@ -277,10 +276,9 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
     }
 
     "be correct with function call condition with empty block" in new CpgCfgFixture("for (; x(1);) ;") {
-      succOf("RET func ()") shouldBe expected(("x", AlwaysEdge))
-      succOf("x") shouldBe expected(("1", AlwaysEdge))
+      succOf("RET func ()") shouldBe expected(("1", AlwaysEdge))
       succOf("1") shouldBe expected(("x(1)", AlwaysEdge))
-      succOf("x(1)") shouldBe expected(("x", TrueEdge), ("RET", FalseEdge))
+      succOf("x(1)") shouldBe expected(("1", TrueEdge), ("RET", FalseEdge))
     }
   }
 
@@ -304,10 +302,8 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
       succOf("foo") shouldBe expected(("&&foo", AlwaysEdge))
       succOf("*ptr = &&foo") shouldBe expected(("goto *;", AlwaysEdge))
       succOf("goto *;") shouldBe expected(("foo: someCall();", AlwaysEdge))
-      succOf("foo: someCall();") shouldBe expected(("someCall", AlwaysEdge))
-      succOf("otherCall") shouldBe expected(("otherCall()", AlwaysEdge))
+      succOf("foo: someCall();") shouldBe expected(("someCall()", AlwaysEdge))
       succOf("otherCall()") shouldBe expected(("foo: someCall();", AlwaysEdge))
-      succOf("someCall") shouldBe expected(("someCall()", AlwaysEdge))
       succOf("someCall()") shouldBe expected(("RET", AlwaysEdge))
     }
 

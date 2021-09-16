@@ -107,10 +107,22 @@ trait AstForExpressionsCreator {
     val args = withOrder(call.getArguments) { case (a, o)     => astForNode(a, o) }
     val validArgs = args.collect { case a if a.root.isDefined => a.root.get }
 
-    val ast = cpgCall.withChild(rec).withChildren(args).withArgEdges(cpgCall.root.get, validArgs)
+    println(rec.root)
     rec.root match {
-      case Some(r) => ast.withReceiverEdge(cpgCall.root.get, r)
-      case None    => ast
+      // Optimization: do not include the receiver if the receiver is just the function name,
+      // e.g., for `f(x)`, don't include an `f` identifier node as a first child. Since we
+      // have so many call sites in CPGs, this drastically reduces the number of nodes.
+      // Moreover, the data flow tracker does not need to track `f`, which would not make
+      // much sense anyway.
+      case Some(r: NewIdentifier) if r.name == name =>
+        cpgCall.withChildren(args).withArgEdges(cpgCall.root.get, validArgs)
+      case Some(r) =>
+        cpgCall
+          .withChild(rec)
+          .withChildren(args)
+          .withArgEdges(cpgCall.root.get, validArgs)
+          .withReceiverEdge(cpgCall.root.get, r)
+      case None => cpgCall.withChildren(args).withArgEdges(cpgCall.root.get, validArgs)
     }
   }
 
