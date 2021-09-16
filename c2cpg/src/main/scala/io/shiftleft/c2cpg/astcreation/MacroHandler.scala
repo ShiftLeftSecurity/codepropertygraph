@@ -18,15 +18,17 @@ trait MacroHandler {
     * create a Call node to represent the macro invocation and attach `ast`
     * as its child.
     * */
-  def asChildOfMacroCall(node: IASTNode, ast: Ast): Ast = {
+  def asChildOfMacroCall(node: IASTNode, ast: Ast, order: Int): Ast = {
     val macroCallAst = extractMatchingMacro(node).map {
       case (mac, args) =>
         createMacroCallAst( // ast,
                            node,
                            mac,
-                           args)
+                           args,
+                           order)
     }
     if (macroCallAst.isDefined) {
+      // TODO order/argument_index of `ast`'s root needs to be set to 1
       macroCallAst.get.withChild(ast)
     } else {
       ast
@@ -71,7 +73,8 @@ trait MacroHandler {
   private def createMacroCallAst( // ast: Ast,
                                  node: IASTNode,
                                  macroDef: IASTPreprocessorMacroDefinition,
-                                 arguments: List[String]): Ast = {
+                                 arguments: List[String],
+                                 order: Int): Ast = {
     val name = macroDef.getName.toString
     val code = node.getRawSignature.replaceAll(";$", "")
     val callNode = NewCall()
@@ -82,6 +85,8 @@ trait MacroHandler {
       .columnNumber(column(node))
       .typeFullName(typeFor(node))
       .dispatchType(DispatchTypes.INLINED)
+      .order(order)
+      .argumentIndex(order)
 
     // TODO We want to clone the ASTS of arguments here
     // and then attach those ASTS to the AST we return

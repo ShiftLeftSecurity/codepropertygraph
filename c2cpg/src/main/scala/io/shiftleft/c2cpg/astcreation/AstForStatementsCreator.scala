@@ -189,7 +189,7 @@ trait AstForStatementsCreator {
       case _: IASTNullStatement                   => Seq.empty
       case _                                      => Seq(astForNode(statement, order))
     }
-    r.map(x => asChildOfMacroCall(statement, x))
+    r.map(x => asChildOfMacroCall(statement, x, order))
   }
 
   private def astForFor(forStmt: IASTForStatement, order: Int): Ast = {

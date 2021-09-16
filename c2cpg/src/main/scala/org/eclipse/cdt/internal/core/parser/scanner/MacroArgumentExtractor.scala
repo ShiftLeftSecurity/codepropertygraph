@@ -74,7 +74,11 @@ class C2CpgMacroExpansionTracker(stepToTrack: Int) extends MacroExpansionTracker
 
   @nowarn
   override def setExpandedMacroArgument(tokenList: TokenList): Unit = {
-    arguments.addOne(tokenListToString(tokenList))
+    if (tokenList != null) {
+      arguments.addOne(tokenListToString(tokenList))
+    } else {
+      arguments.addOne("")
+    }
   }
 
   private def tokenListToString(tokenList: TokenList): String = {

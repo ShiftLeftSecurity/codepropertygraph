@@ -107,7 +107,6 @@ trait AstForExpressionsCreator {
     val args = withOrder(call.getArguments) { case (a, o)     => astForNode(a, o) }
     val validArgs = args.collect { case a if a.root.isDefined => a.root.get }
 
-    println(rec.root)
     rec.root match {
       // Optimization: do not include the receiver if the receiver is just the function name,
       // e.g., for `f(x)`, don't include an `f` identifier node as a first child. Since we
@@ -332,7 +331,7 @@ trait AstForExpressionsCreator {
         astForPackExpansionExpression(packExpansionExpression, order)
       case _ => notHandledYet(expression, order)
     }
-    asChildOfMacroCall(expression, r)
+    asChildOfMacroCall(expression, r, order)
   }
 
   protected def astForStaticAssert(a: ICPPASTStaticAssertDeclaration, order: Int): Ast = {
