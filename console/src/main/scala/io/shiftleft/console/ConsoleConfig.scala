@@ -15,7 +15,8 @@ class InstallConfig(environment: Map[String, String] = sys.env) {
       environment("SHIFTLEFT_OCULAR_INSTALL_DIR").toFile
     } else {
       findRootDirectory(File.currentWorkingDirectory).getOrElse {
-        val uriToLibDir = classOf[io.shiftleft.console.InstallConfig].getProtectionDomain.getCodeSource.getLocation.toURI
+        val uriToLibDir =
+          classOf[io.shiftleft.console.InstallConfig].getProtectionDomain.getCodeSource.getLocation.toURI
         val pathToLibDir = File(uriToLibDir).parent
         findRootDirectory(pathToLibDir).getOrElse(
           throw new AssertionError(s"""unable to find root installation directory
