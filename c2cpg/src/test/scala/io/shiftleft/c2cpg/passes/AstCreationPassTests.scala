@@ -331,8 +331,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
           lambda1call.methodFullName shouldBe "x"
           lambda1call.dispatchType shouldBe DispatchTypes.STATIC_DISPATCH
           lambda1call.astChildren.l match {
-            case List(id: Identifier, lit: Literal) =>
-              id.name shouldBe "x"
+            case List(lit: Literal) =>
               lit.code shouldBe "10"
             case _ => fail()
           }
@@ -342,9 +341,8 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
             case _ => fail()
           }
           lambda1call.receiver.l match {
-            case List(id: Identifier) =>
-              id.name shouldBe "x"
-            case _ => fail()
+            case List() =>
+            case _      => fail()
           }
         case _ => fail()
       }
@@ -881,8 +879,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
           call.code shouldBe "foo(x)"
           call.dispatchType shouldBe DispatchTypes.STATIC_DISPATCH
           val rec = call.receiver.l
-          rec.length shouldBe 1
-          rec.head.code shouldBe "foo"
+          rec.length shouldBe 0
           call.argument(1).code shouldBe "x"
         case _ => fail()
       }
@@ -1666,12 +1663,12 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
        |int c = 0;
        |}
       """.stripMargin) { cpg =>
+      val x = cpg.identifier.l
+      x.foreach(println)
       cpg.identifier.l match {
-        case List(a, st, b, c) =>
+        case List(a, b, c) =>
           a.lineNumber shouldBe Some(3)
           a.columnNumber shouldBe Some(4)
-          st.lineNumber shouldBe Some(4)
-          st.columnNumber shouldBe Some(0)
           b.lineNumber shouldBe Some(5)
           b.columnNumber shouldBe Some(4)
           c.lineNumber shouldBe Some(6)

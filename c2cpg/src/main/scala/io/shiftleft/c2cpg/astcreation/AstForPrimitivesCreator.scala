@@ -12,13 +12,13 @@ trait AstForPrimitivesCreator {
   this: AstCreator =>
 
   protected def astForComment(comment: IASTComment): Ast =
-    Ast(NewComment().code(AstCreator.nodeSignature(comment)).filename(filename).lineNumber(line(comment)))
+    Ast(NewComment().code(nodeSignature(comment)).filename(filename).lineNumber(line(comment)))
 
   protected def astForLiteral(lit: IASTLiteralExpression, order: Int): Ast = {
     val tpe = ASTTypeUtil.getType(lit.getExpressionType)
     val litNode = NewLiteral()
       .typeFullName(registerType(tpe))
-      .code(AstCreator.nodeSignature(lit))
+      .code(nodeSignature(lit))
       .order(order)
       .argumentIndex(order)
       .lineNumber(line(lit))
@@ -40,7 +40,7 @@ trait AstForPrimitivesCreator {
     val cpgIdentifier = NewIdentifier()
       .name(identifierName)
       .typeFullName(registerType(identifierTypeName))
-      .code(AstCreator.nodeSignature(ident))
+      .code(nodeSignature(ident))
       .order(order)
       .argumentIndex(order)
       .lineNumber(line(ident))

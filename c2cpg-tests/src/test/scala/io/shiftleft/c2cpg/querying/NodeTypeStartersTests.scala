@@ -15,7 +15,7 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
   override val code = """
        /* A C comment */
        // A C++ comment
-       int main(int argc, char **argv) { int mylocal; libfunc(1); }
+       int main(int argc, char **argv) { int mylocal; libfunc(1, argc); }
        struct foo { int x; };
     """
 

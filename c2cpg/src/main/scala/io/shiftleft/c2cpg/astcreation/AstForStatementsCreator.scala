@@ -64,7 +64,7 @@ trait AstForStatementsCreator {
 
   private def astForReturnStatement(ret: IASTReturnStatement, order: Int): Ast = {
     val cpgReturn = NewReturn()
-      .code(AstCreator.nodeSignature(ret))
+      .code(nodeSignature(ret))
       .order(order)
       .argumentIndex(order)
       .lineNumber(line(ret))
@@ -78,11 +78,11 @@ trait AstForStatementsCreator {
   }
 
   private def astForBreakStatement(br: IASTBreakStatement, order: Int): Ast = {
-    Ast(newControlStructureNode(br, ControlStructureTypes.BREAK, AstCreator.nodeSignature(br), order))
+    Ast(newControlStructureNode(br, ControlStructureTypes.BREAK, nodeSignature(br), order))
   }
 
   private def astForContinueStatement(cont: IASTContinueStatement, order: Int): Ast = {
-    Ast(newControlStructureNode(cont, ControlStructureTypes.CONTINUE, AstCreator.nodeSignature(cont), order))
+    Ast(newControlStructureNode(cont, ControlStructureTypes.CONTINUE, nodeSignature(cont), order))
   }
 
   private def astForGotoStatement(goto: IASTGotoStatement, order: Int): Ast = {
@@ -108,7 +108,7 @@ trait AstForStatementsCreator {
   }
 
   private def astForDoStatement(doStmt: IASTDoStatement, order: Int): Ast = {
-    val code = AstCreator.nodeSignature(doStmt)
+    val code = nodeSignature(doStmt)
 
     val doNode = newControlStructureNode(doStmt, ControlStructureTypes.DO, code, order)
 
@@ -167,7 +167,7 @@ trait AstForStatementsCreator {
   }
 
   protected def astsForStatement(statement: IASTStatement, order: Int): Seq[Ast] = {
-    statement match {
+    val r = statement match {
       case expr: IASTExpressionStatement          => Seq(astForExpression(expr.getExpression, order))
       case block: IASTCompoundStatement           => Seq(astForBlockStatement(block, order))
       case ifStmt: IASTIfStatement                => Seq(astForIf(ifStmt, order))
@@ -189,6 +189,7 @@ trait AstForStatementsCreator {
       case _: IASTNullStatement                   => Seq.empty
       case _                                      => Seq(astForNode(statement, order))
     }
+    r.map(x => asChildOfMacroCall(statement, x, order))
   }
 
   private def astForFor(forStmt: IASTForStatement, order: Int): Ast = {
@@ -258,7 +259,6 @@ trait AstForStatementsCreator {
 
   private def astForIf(ifStmt: IASTIfStatement, order: Int): Ast = {
     val code = s"if (${nullSafeCode(ifStmt.getConditionExpression)})"
-
     val ifNode = newControlStructureNode(ifStmt, ControlStructureTypes.IF, code, order)
 
     val conditionAst = nullSafeAst(ifStmt.getConditionExpression, 1)

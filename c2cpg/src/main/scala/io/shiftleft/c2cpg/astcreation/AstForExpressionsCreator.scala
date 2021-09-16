@@ -98,7 +98,7 @@ trait AstForExpressionsCreator {
       case _ if rec.root.exists(_.isInstanceOf[NewIdentifier]) =>
         (DispatchTypes.STATIC_DISPATCH, rec.root.get.asInstanceOf[NewIdentifier].name)
       case reference: IASTIdExpression =>
-        (DispatchTypes.STATIC_DISPATCH, AstCreator.nodeSignature(reference))
+        (DispatchTypes.STATIC_DISPATCH, nodeSignature(reference))
       case _ =>
         (DispatchTypes.STATIC_DISPATCH, "")
     }
@@ -107,10 +107,21 @@ trait AstForExpressionsCreator {
     val args = withOrder(call.getArguments) { case (a, o)     => astForNode(a, o) }
     val validArgs = args.collect { case a if a.root.isDefined => a.root.get }
 
-    val ast = cpgCall.withChild(rec).withChildren(args).withArgEdges(cpgCall.root.get, validArgs)
     rec.root match {
-      case Some(r) => ast.withReceiverEdge(cpgCall.root.get, r)
-      case None    => ast
+      // Optimization: do not include the receiver if the receiver is just the function name,
+      // e.g., for `f(x)`, don't include an `f` identifier node as a first child. Since we
+      // have so many call sites in CPGs, this drastically reduces the number of nodes.
+      // Moreover, the data flow tracker does not need to track `f`, which would not make
+      // much sense anyway.
+      case Some(r: NewIdentifier) if r.name == name =>
+        cpgCall.withChildren(args).withArgEdges(cpgCall.root.get, validArgs)
+      case Some(r) =>
+        cpgCall
+          .withChild(rec)
+          .withChildren(args)
+          .withArgEdges(cpgCall.root.get, validArgs)
+          .withReceiverEdge(cpgCall.root.get, r)
+      case None => cpgCall.withChildren(args).withArgEdges(cpgCall.root.get, validArgs)
     }
   }
 
@@ -294,30 +305,33 @@ trait AstForExpressionsCreator {
   private def astForPackExpansionExpression(packExpansionExpression: ICPPASTPackExpansionExpression, order: Int): Ast =
     astForExpression(packExpansionExpression.getPattern, order)
 
-  protected def astForExpression(expression: IASTExpression, order: Int): Ast = expression match {
-    case lit: IASTLiteralExpression   => astForLiteral(lit, order)
-    case un: IASTUnaryExpression      => astForUnaryExpression(un, order)
-    case bin: IASTBinaryExpression    => astForBinaryExpression(bin, order)
-    case exprList: IASTExpressionList => astForExpressionList(exprList, order)
-    case qualId: IASTIdExpression if qualId.getName.isInstanceOf[CPPASTQualifiedName] =>
-      astForQualifiedName(qualId.getName.asInstanceOf[CPPASTQualifiedName], order)
-    case ident: IASTIdExpression                            => astForIdentifier(ident, order)
-    case call: IASTFunctionCallExpression                   => astForCallExpression(call, order)
-    case typeId: IASTTypeIdExpression                       => astForTypeIdExpression(typeId, order)
-    case fieldRef: IASTFieldReference                       => astForFieldReference(fieldRef, order)
-    case expr: IASTConditionalExpression                    => astForConditionalExpression(expr, order)
-    case arrayIndexExpression: IASTArraySubscriptExpression => astForArrayIndexExpression(arrayIndexExpression, order)
-    case castExpression: IASTCastExpression                 => astForCastExpression(castExpression, order)
-    case newExpression: ICPPASTNewExpression                => astForNewExpression(newExpression, order)
-    case delExpression: ICPPASTDeleteExpression             => astForDeleteExpression(delExpression, order)
-    case typeIdInit: IASTTypeIdInitializerExpression        => astForTypeIdInitExpression(typeIdInit, order)
-    case c: ICPPASTSimpleTypeConstructorExpression          => astForConstructorExpression(c, order)
-    case lambdaExpression: ICPPASTLambdaExpression          => Ast(methodRefForLambda(lambdaExpression))
-    case compoundExpression: IGNUASTCompoundStatementExpression =>
-      astForCompoundStatementExpression(compoundExpression, order)
-    case packExpansionExpression: ICPPASTPackExpansionExpression =>
-      astForPackExpansionExpression(packExpansionExpression, order)
-    case _ => notHandledYet(expression, order)
+  protected def astForExpression(expression: IASTExpression, order: Int): Ast = {
+    val r = expression match {
+      case lit: IASTLiteralExpression   => astForLiteral(lit, order)
+      case un: IASTUnaryExpression      => astForUnaryExpression(un, order)
+      case bin: IASTBinaryExpression    => astForBinaryExpression(bin, order)
+      case exprList: IASTExpressionList => astForExpressionList(exprList, order)
+      case qualId: IASTIdExpression if qualId.getName.isInstanceOf[CPPASTQualifiedName] =>
+        astForQualifiedName(qualId.getName.asInstanceOf[CPPASTQualifiedName], order)
+      case ident: IASTIdExpression                            => astForIdentifier(ident, order)
+      case call: IASTFunctionCallExpression                   => astForCallExpression(call, order)
+      case typeId: IASTTypeIdExpression                       => astForTypeIdExpression(typeId, order)
+      case fieldRef: IASTFieldReference                       => astForFieldReference(fieldRef, order)
+      case expr: IASTConditionalExpression                    => astForConditionalExpression(expr, order)
+      case arrayIndexExpression: IASTArraySubscriptExpression => astForArrayIndexExpression(arrayIndexExpression, order)
+      case castExpression: IASTCastExpression                 => astForCastExpression(castExpression, order)
+      case newExpression: ICPPASTNewExpression                => astForNewExpression(newExpression, order)
+      case delExpression: ICPPASTDeleteExpression             => astForDeleteExpression(delExpression, order)
+      case typeIdInit: IASTTypeIdInitializerExpression        => astForTypeIdInitExpression(typeIdInit, order)
+      case c: ICPPASTSimpleTypeConstructorExpression          => astForConstructorExpression(c, order)
+      case lambdaExpression: ICPPASTLambdaExpression          => Ast(methodRefForLambda(lambdaExpression))
+      case compoundExpression: IGNUASTCompoundStatementExpression =>
+        astForCompoundStatementExpression(compoundExpression, order)
+      case packExpansionExpression: ICPPASTPackExpansionExpression =>
+        astForPackExpansionExpression(packExpansionExpression, order)
+      case _ => notHandledYet(expression, order)
+    }
+    asChildOfMacroCall(expression, r, order)
   }
 
   protected def astForStaticAssert(a: ICPPASTStaticAssertDeclaration, order: Int): Ast = {
