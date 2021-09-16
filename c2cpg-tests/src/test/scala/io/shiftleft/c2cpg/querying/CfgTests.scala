@@ -1,6 +1,8 @@
 package io.shiftleft.c2cpg.querying
 
 import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
+import io.shiftleft.codepropertygraph.generated.DispatchTypes
+import io.shiftleft.codepropertygraph.generated.nodes.{Call, Identifier}
 import io.shiftleft.semanticcpg.language._
 
 class CfgTests extends CCodeToCpgSuite {
@@ -43,7 +45,6 @@ class CfgTests extends CCodeToCpgSuite {
   "should find that method does not post dominate anything" in {
     cpg.method("foo").postDominates.l.size shouldBe 0
   }
-
 }
 
 class CfgMacroTests extends CCodeToCpgSuite {
@@ -74,12 +75,10 @@ class CfgMacroTests extends CCodeToCpgSuite {
 
     """.stripMargin
 
-  "foo" in {
-//    implicit val viewer: ImageViewer = (pathStr: String) =>
-//      Try {
-//        Process(Seq("xdg-open", pathStr)).!!
-//    }
-//    cpg.method("foo").plotDotCfg
+  "should create correct CFG for macro expansion" in {
+    val List(callToMacro: Call) = cpg.method("foo").call.dispatchType(DispatchTypes.INLINED).l
+    val l = callToMacro.cfgNext.collect { case x: Identifier => x }.name.l.sorted
+    l shouldBe List("i_read", "sink")
   }
 
 }
