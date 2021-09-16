@@ -48,8 +48,8 @@ case class JavaCpgGenerator(config: FrontendConfig, rootPath: Path) extends CpgG
   }
 
   private def generateOss(inputPath: String, outputPath: String): Option[String] = {
-    val command = rootPath.resolve("joern-parse").toString
-    val arguments = Seq(inputPath, "--out", outputPath, "--language", "java", "--noenhance")
+    val command = rootPath.resolve("jimple2cpg").toString
+    val arguments = config.cmdLineParams.toSeq ++ Seq(inputPath, "--output", outputPath)
     runShellCommand(command, arguments).map(_ => outputPath)
   }
 
@@ -74,7 +74,7 @@ case class JavaCpgGenerator(config: FrontendConfig, rootPath: Path) extends CpgG
   }
 
   private def commercialAvailable: Boolean = rootPath.resolve("java2cpg.sh").toFile.exists()
-  private def ossAvailable: Boolean = rootPath.resolve("joern-parse").toFile.exists()
+  private def ossAvailable: Boolean = rootPath.resolve("jimple2cpg").toFile.exists()
 
 }
 
