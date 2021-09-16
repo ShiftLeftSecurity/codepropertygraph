@@ -1,8 +1,8 @@
 package io.shiftleft.c2cpg.querying
 
 import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
-import io.shiftleft.codepropertygraph.generated.Operators
 import io.shiftleft.codepropertygraph.generated.nodes.{Call, Identifier, Literal}
+import io.shiftleft.codepropertygraph.generated.{DispatchTypes, Operators}
 import io.shiftleft.semanticcpg.language._
 
 class CAstTests extends CCodeToCpgSuite {
@@ -201,6 +201,7 @@ class MacroHandlingTests1 extends CCodeToCpgSuite {
   "should correctly expand macro" in {
     val List(x: Call) = cpg.method("foo").call.nameExact(Operators.assignment).l
     x.code shouldBe "y = 10"
+    x.dispatchType shouldBe DispatchTypes.STATIC_DISPATCH
     val List(l: Identifier, r: Literal) = x.astMinusRoot.l.sortBy(_.order)
     l.name shouldBe "y"
     r.code shouldBe "10"
@@ -288,6 +289,7 @@ class MacroHandlingTests4 extends CCodeToCpgSuite {
     call1.lineNumber shouldBe Some(22)
     call1.columnNumber shouldBe Some(8)
     call1.typeFullName shouldBe "ANY"
+    call1.dispatchType shouldBe DispatchTypes.INLINED
     val List(arg1, arg2, arg3) = call1.argument.l.sortBy(_.order)
     arg1.code shouldBe "dst"
     arg2.code shouldBe "ptr"
@@ -301,6 +303,7 @@ class MacroHandlingTests4 extends CCodeToCpgSuite {
     call2.columnNumber shouldBe Some(8)
     call2.typeFullName shouldBe "ANY"
     call2.argument.l.sortBy(_.order).size shouldBe 0
+    call2.dispatchType shouldBe DispatchTypes.INLINED
   }
 }
 

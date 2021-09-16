@@ -45,3 +45,41 @@ class CfgTests extends CCodeToCpgSuite {
   }
 
 }
+
+class CfgMacroTests extends CCodeToCpgSuite {
+  override val code: String =
+    """
+       #define MP4_GET4BYTES( dst ) MP4_GETX_PRIVATE( dst, GetDWBE(p_peek), 4 )
+       #define MP4_GETX_PRIVATE(dst, code, size) \
+    do \
+    { \
+        if( (i_read) >= (size) ) \
+        { \
+            dst = (code); \
+            p_peek += (size); \
+            i_read -= (size); \
+        } \
+        else \
+        { \
+            dst = 0; \
+            i_read = 0; \
+        } \
+    } while(0)
+
+    int foo() {
+       unsigned int x;
+       MP4_GET4BYTES(x);
+       sink(x);
+    }
+
+    """.stripMargin
+
+  "foo" in {
+//    implicit val viewer: ImageViewer = (pathStr: String) =>
+//      Try {
+//        Process(Seq("xdg-open", pathStr)).!!
+//    }
+//    cpg.method("foo").plotDotCfg
+  }
+
+}

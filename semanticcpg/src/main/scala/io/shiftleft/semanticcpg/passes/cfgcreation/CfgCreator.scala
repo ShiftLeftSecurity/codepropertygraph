@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes.cfgcreation
 
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators}
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, DispatchTypes, EdgeTypes, Operators}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgcreation.Cfg.CfgEdgeType
@@ -130,6 +130,8 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
         cfgForOrExpression(call)
       case call: Call if call.name == Operators.conditional =>
         cfgForConditionalExpression(call)
+      case call: Call if call.dispatchType == DispatchTypes.INLINED =>
+        cfgForInlinedCall(call)
       case _: Call | _: FieldIdentifier | _: Identifier | _: Literal | _: Unknown =>
         cfgForChildren(node) ++ cfgForSingleNode(node.asInstanceOf[CfgNode])
       case _ =>
@@ -291,6 +293,31 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
         edges = conditionCfg.edges ++ trueCfg.edges ++ falseCfg.edges ++ diffGraphs,
         fringe = trueFridge ++ falseFridge
       ) ++ cfgForSingleNode(call)
+  }
+
+  /**
+    * For macros, the AST contains a CALL node, along with child sub trees
+    * for all arguments, and a final sub tree that contains the inlined code.
+    * The corresponding CFG consists of the CFG for the call, an edge to the
+    * exit and an edge to the CFG of the inlined code. We choose this
+    * representation because it allows both queries that use the macro
+    * reference as well as queries that reference the inline code to
+    * be chosen as sources/sinks in data flow queries.
+    * */
+  def cfgForInlinedCall(call: Call): Cfg = {
+    val cfgForMacroCall = call.argument.l
+      .map(cfgFor)
+      .reduceOption((x, y) => x ++ y)
+      .getOrElse(Cfg.empty) ++ cfgForSingleNode(call)
+    val cfgForExpansion = call.astChildren.lastOption.map(cfgFor).getOrElse(Cfg.empty)
+    Cfg
+      .from(cfgForMacroCall, cfgForExpansion)
+      .copy(
+        entryNode = cfgForMacroCall.entryNode,
+        edges = cfgForMacroCall.edges ++ cfgForExpansion.edges ++ cfgForExpansion.entryNode.toList.flatMap(x =>
+          singleEdge(call, x)),
+        fringe = cfgForMacroCall.fringe ++ cfgForExpansion.fringe
+      )
   }
 
   /**

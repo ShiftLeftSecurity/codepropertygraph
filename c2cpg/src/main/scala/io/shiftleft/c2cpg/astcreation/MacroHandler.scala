@@ -81,7 +81,7 @@ trait MacroHandler {
       .lineNumber(line(node))
       .columnNumber(column(node))
       .typeFullName(typeFor(node))
-      .dispatchType(DispatchTypes.STATIC_DISPATCH)
+      .dispatchType(DispatchTypes.INLINED)
 
     // TODO We want to clone the ASTS of arguments here
     // and then attach those ASTS to the AST we return
