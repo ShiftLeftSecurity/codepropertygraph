@@ -19,12 +19,18 @@ class HeaderFileFinder(roots: List[String]) {
       .map(x => (x._1, x._2.map(_._2)))
   }
 
+  /**
+    * Given an unresolved header file, given as a non-existing absolute path,
+    * determine whether a header file with the same name can be found anywhere
+    * in the code base.
+    * */
   def find(path: String): String = {
     path
       .split(FileSystems.getDefault.getSeparator)
       .lastOption
       .flatMap { name =>
-        nameToPathMap.get(name).flatMap(_.headOption).map(_.toString)
+        val matches = nameToPathMap.getOrElse(name, List())
+        matches.map(_.toString).sorted.headOption
       }
       .orNull
   }
