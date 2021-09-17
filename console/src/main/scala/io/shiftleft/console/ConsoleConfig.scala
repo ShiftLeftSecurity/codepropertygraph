@@ -10,15 +10,28 @@ import scala.collection.mutable
   * @param environment A map of system environment variables.
   * */
 class InstallConfig(environment: Map[String, String] = sys.env) {
+
+  /** determining the root path of the joern/ocular installation is rather complex unfortunately,
+    * because we support a variety of use cases:
+    * - running the installed distribution from the install dir
+    * - running the installed distribution anywhere else on the system
+    * - running a locally staged ocular/joern build (via `sbt stage` and then
+    *   either `./joern` or `cd joern-cli/target/universal/stage; ./joern`)
+    * - running a unit/integration test (note: the jars would be in the local cache, e.g. in ~/.coursier/cache)
+    */
   lazy val rootPath: File = {
     if (environment.contains("SHIFTLEFT_OCULAR_INSTALL_DIR")) {
       environment("SHIFTLEFT_OCULAR_INSTALL_DIR").toFile
     } else {
       val uriToLibDir = classOf[io.shiftleft.console.InstallConfig].getProtectionDomain.getCodeSource.getLocation.toURI
       val pathToLibDir = File(uriToLibDir).parent
-      findRootDirectory(pathToLibDir).getOrElse(throw new AssertionError(s"""unable to find root installation directory
-           | context: tried to find marker file `$rootDirectoryMarkerFilename`
-           | started search in $pathToLibDir and searched $maxSearchDepth directories upwards""".stripMargin))
+      findRootDirectory(pathToLibDir).getOrElse {
+        val cwd = File.currentWorkingDirectory
+        findRootDirectory(cwd).getOrElse(throw new AssertionError(s"""unable to find root installation directory
+                                   | context: tried to find marker file `$rootDirectoryMarkerFilename`
+                                   | started search in both $pathToLibDir and $cwd and searched 
+                                   | $maxSearchDepth directories upwards""".stripMargin))
+      }
     }
   }
 
