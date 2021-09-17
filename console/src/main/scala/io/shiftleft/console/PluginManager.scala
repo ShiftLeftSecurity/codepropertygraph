@@ -69,7 +69,6 @@ class PluginManager(val installDir: File) {
 
   def rm(name: String): List[String] = {
     if (!listPlugins().contains(name)) {
-      println(s"Plugin $name is not installed")
       List()
     } else {
       val filesToRemove = pluginDir.toList.flatMap { dir =>
