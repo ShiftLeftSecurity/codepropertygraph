@@ -71,12 +71,29 @@ trait AstForPrimitivesCreator {
     // TODO re-use from Operators once it there
     val op = "<operator>.arrayInitializer"
     val initCallNode = newCallNode(l, op, op, DispatchTypes.STATIC_DISPATCH, order)
-    val args = withOrder(l.getClauses) {
+
+    val MAX_INITIALIZERS = 1000
+    val clauses = l.getClauses.slice(0, MAX_INITIALIZERS)
+
+    val args = withOrder(clauses) {
       case (c, o) =>
         astForNode(c, o)
     }
     val validArgs = args.collect { case a if a.root.isDefined => a.root.get }
-    Ast(initCallNode).withChildren(args).withArgEdges(initCallNode, validArgs)
+    val ast = Ast(initCallNode).withChildren(args).withArgEdges(initCallNode, validArgs)
+
+    if (l.getClauses.length > MAX_INITIALIZERS) {
+      val placeholder = NewLiteral()
+        .typeFullName("ANY")
+        .code("<too-many-initializers>")
+        .order(MAX_INITIALIZERS)
+        .argumentIndex(MAX_INITIALIZERS)
+        .lineNumber(line(l))
+        .columnNumber(column(l))
+      ast.withChild(Ast(placeholder)).withArgEdge(initCallNode, placeholder)
+    } else {
+      ast
+    }
   }
 
   protected def astForQualifiedName(qualId: CPPASTQualifiedName, order: Int): Ast = {
