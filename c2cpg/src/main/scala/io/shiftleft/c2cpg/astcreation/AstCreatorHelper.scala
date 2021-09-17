@@ -113,7 +113,7 @@ trait AstCreatorHelper {
   protected def notHandledYet(node: IASTNode, order: Int): Ast = {
     if (!node.isInstanceOf[IASTProblem] && !node.isInstanceOf[IASTProblemHolder]) {
       val text = notHandledText(node)
-      logger.warn(text)
+      logger.info(text)
     }
     Ast(newUnknown(node, order))
   }
