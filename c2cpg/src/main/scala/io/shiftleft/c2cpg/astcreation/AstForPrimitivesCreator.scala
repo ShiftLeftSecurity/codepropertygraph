@@ -117,7 +117,13 @@ trait AstForPrimitivesCreator {
         call
     }
 
-    val owner = fieldAccesses(qualId.getQualifier.toIndexedSeq.toList, 1)
+    val qualifier = fieldAccesses(qualId.getQualifier.toIndexedSeq.toList, 1)
+
+    val owner = if (qualifier != Ast()) {
+      qualifier
+    } else {
+      Ast(NewLiteral(code = "<global>", order = 1, argumentIndex = 1, typeFullName = "ANY"))
+    }
 
     val member = NewFieldIdentifier()
       .canonicalName(qualId.getLastName.toString)
