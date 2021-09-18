@@ -1,6 +1,7 @@
 package io.shiftleft.c2cpg.parser
 
 import better.files._
+import org.jline.utils.Levenshtein
 
 import java.nio.file.{FileSystems, Path}
 
@@ -30,7 +31,7 @@ class HeaderFileFinder(roots: List[String]) {
       .lastOption
       .flatMap { name =>
         val matches = nameToPathMap.getOrElse(name, List())
-        matches.map(_.toString).sorted.headOption
+        matches.map(_.toString).sortBy(x => Levenshtein.distance(x, path)).headOption
       }
       .orNull
   }
