@@ -11,7 +11,8 @@ class HeaderFileFinder(roots: List[String]) {
   private val headerExtensions = List(".h", ".hpp", ".hh")
   private val nameToPathMap: Map[String, List[Path]] = {
 
-    SourceFiles.determine(roots.toSet, headerExtensions.toSet)
+    SourceFiles
+      .determine(roots.toSet, headerExtensions.toSet)
       .map { p =>
         val file = File(p)
         (file.name, file.path)
