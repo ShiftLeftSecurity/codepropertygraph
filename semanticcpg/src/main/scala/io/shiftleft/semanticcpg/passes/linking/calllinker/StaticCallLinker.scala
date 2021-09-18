@@ -37,7 +37,7 @@ class StaticCallLinker(cpg: Cpg) extends CpgPass(cpg) {
 
   private def linkCall(call: Call, dstGraph: DiffGraph.Builder): Unit = {
     call.dispatchType match {
-      case DispatchTypes.STATIC_DISPATCH =>
+      case DispatchTypes.STATIC_DISPATCH | DispatchTypes.INLINED =>
         linkStaticCall(call, dstGraph)
       case DispatchTypes.DYNAMIC_DISPATCH =>
       // Do nothing
