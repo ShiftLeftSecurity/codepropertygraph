@@ -26,7 +26,9 @@ object CdtParser {
 
 }
 
-class CdtParser(private val parseConfig: ParseConfig) extends ParseProblemsLogger with PreprocessorStatementsLogger {
+class CdtParser(private val parseConfig: ParseConfig, private val headerFileFinder: HeaderFileFinder)
+    extends ParseProblemsLogger
+    with PreprocessorStatementsLogger {
 
   import CdtParser._
 
@@ -51,7 +53,7 @@ class CdtParser(private val parseConfig: ParseConfig) extends ParseProblemsLogge
   private def parseInternal(file: Path): ParseResult = {
     val (result, duration) = TimeUtils.time {
       val fileContent = IOUtils.readFile(file)
-      val fileContentProvider = new CustomFileContentProvider()
+      val fileContentProvider = new CustomFileContentProvider(headerFileFinder)
       val lang = createParseLanguage(file)
       Try(
         lang.getASTTranslationUnit(fileContent, info, fileContentProvider, null, opts, log)

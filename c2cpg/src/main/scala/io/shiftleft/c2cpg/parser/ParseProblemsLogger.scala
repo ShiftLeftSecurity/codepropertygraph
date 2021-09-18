@@ -15,7 +15,7 @@ trait ParseProblemsLogger {
                   |  File: '${node.getFileLocation.getFileName}'
                   |  Line: ${node.getFileLocation.getStartingLineNumber}
                   |  """.stripMargin
-    logger.warn(text)
+    logger.info(text)
   }
 
   protected def logProblems(problems: List[IASTProblem]): Unit = {

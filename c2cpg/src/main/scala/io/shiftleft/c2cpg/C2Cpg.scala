@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg
 
 import io.shiftleft.c2cpg.C2Cpg.Config
-import io.shiftleft.c2cpg.parser.{FileDefaults, ParseConfig}
+import io.shiftleft.c2cpg.parser.{FileDefaults, HeaderFileFinder, ParseConfig}
 import io.shiftleft.c2cpg.passes.{AstCreationPass, PreprocessorPass}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
@@ -42,7 +42,9 @@ class C2Cpg {
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
 
     new MetaDataPass(cpg, Languages.C, Some(metaDataKeyPool)).createAndApply()
-    val astCreationPass = new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, createParseConfig(config))
+    val headerFileFinder = new HeaderFileFinder(config.inputPaths.toList)
+    val astCreationPass =
+      new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, createParseConfig(config), headerFileFinder)
     astCreationPass.createAndApply()
     new CfgCreationPass(cpg).createAndApply()
     new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
@@ -51,7 +53,8 @@ class C2Cpg {
 
   def printIfDefsOnly(config: Config): Unit = {
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
-    val stmts = new PreprocessorPass(sourceFileNames, createParseConfig(config)).run().mkString(",")
+    val headerFileFinder = new HeaderFileFinder(config.inputPaths.toList)
+    val stmts = new PreprocessorPass(sourceFileNames, createParseConfig(config), headerFileFinder).run().mkString(",")
     println(stmts)
   }
 
