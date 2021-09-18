@@ -212,7 +212,7 @@ trait BridgeBase {
       io.shiftleft.console.cpgcreation
         .guessLanguage(src)
         .map(_.toLowerCase)
-        .getOrElse(Languages.C))
+        .getOrElse("c"))
     val storeCode = if (config.store) { "save" } else { "" }
     val runDataflow = if (productName == "ocular") { "run.dataflow" } else { "run.ossdataflow" }
     val code = s"""
