@@ -3,6 +3,7 @@ package io.shiftleft.console
 import ammonite.ops.{Path, pwd}
 import ammonite.util.{Colors, Res}
 import better.files._
+import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.console.cpgqlserver.CPGQLServer
 import io.shiftleft.console.embammonite.EmbeddedAmmonite
 import io.shiftleft.console.qdbwserver.QDBWServer
@@ -211,7 +212,7 @@ trait BridgeBase {
       io.shiftleft.console.cpgcreation
         .guessLanguage(src)
         .map(_.toLowerCase)
-        .getOrElse("c"))
+        .getOrElse(Languages.C))
     val storeCode = if (config.store) { "save" } else { "" }
     val runDataflow = if (productName == "ocular") { "run.dataflow" } else { "run.ossdataflow" }
     val code = s"""
