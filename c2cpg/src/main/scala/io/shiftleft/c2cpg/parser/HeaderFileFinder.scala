@@ -1,6 +1,7 @@
 package io.shiftleft.c2cpg.parser
 
 import better.files._
+import io.shiftleft.x2cpg.SourceFiles
 import org.jline.utils.Levenshtein
 
 import java.nio.file.{FileSystems, Path}
@@ -9,11 +10,10 @@ class HeaderFileFinder(roots: List[String]) {
 
   private val headerExtensions = List(".h", ".hpp", ".hh")
   private val nameToPathMap: Map[String, List[Path]] = {
-    roots
-      .flatMap { root =>
-        File(root).listRecursively.filter(f => f.extension.isDefined && headerExtensions.contains(f.extension.get))
-      }
-      .map { file =>
+
+    SourceFiles.determine(roots.toSet, headerExtensions.toSet)
+      .map { p =>
+        val file = File(p)
         (file.name, file.path)
       }
       .groupBy(_._1)
