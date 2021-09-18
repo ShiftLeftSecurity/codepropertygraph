@@ -3,7 +3,6 @@ package io.shiftleft.console
 import ammonite.ops.{Path, pwd}
 import ammonite.util.{Colors, Res}
 import better.files._
-import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.console.cpgqlserver.CPGQLServer
 import io.shiftleft.console.embammonite.EmbeddedAmmonite
 import io.shiftleft.console.qdbwserver.QDBWServer
