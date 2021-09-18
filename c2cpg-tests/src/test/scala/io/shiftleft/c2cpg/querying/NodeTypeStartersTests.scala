@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg.querying
 
 import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
-import io.shiftleft.codepropertygraph.generated.NodeTypes
+import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes}
 import io.shiftleft.semanticcpg.language._
 
 /**
@@ -82,7 +82,7 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
   }
 
   "should allow retrieving of meta data" in {
-    cpg.metaData.language.l shouldBe List("C")
+    cpg.metaData.language.l shouldBe List(Languages.NEWC)
   }
 
   "should allow retrieving all nodes" in {

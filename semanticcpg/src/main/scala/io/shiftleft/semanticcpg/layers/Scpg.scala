@@ -155,6 +155,21 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CdgPass(cpg),
           new NamespaceCreator(cpg),
         )
+      case Languages.NEWC =>
+        Iterator(
+          new TypeDeclStubCreator(cpg),
+          new MethodStubCreator(cpg),
+          new MethodDecoratorPass(cpg),
+          new Linker(cpg),
+          new FileCreationPass(cpg),
+          new StaticCallLinker(cpg),
+          new MemberAccessLinker(cpg),
+          new MethodExternalDecoratorPass(cpg),
+          new ContainsEdgePass(cpg),
+          new NamespaceCreator(cpg),
+          new CfgDominatorPass(cpg),
+          new CdgPass(cpg),
+        )
       case _ => Iterator()
     }
   }

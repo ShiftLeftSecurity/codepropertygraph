@@ -26,7 +26,7 @@ object CodeDumper {
     }
 
     val node = location.node.get
-    if (language.isEmpty || !Set(Languages.C).contains(language.get)) {
+    if (language.isEmpty || !Set(Languages.C, Languages.NEWC).contains(language.get)) {
       logger.info("dump not supported for this language or language not set in CPG")
       return ""
     }
