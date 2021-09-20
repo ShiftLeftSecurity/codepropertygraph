@@ -264,7 +264,7 @@ trait BridgeBase {
   private def serveQueryDatabaseWebsite(installDir: File, config: Config): Unit = {
     val websiteZip = installDir / "qdb-website.zip"
     if (!websiteZip.exists) {
-      println("Could not find the Query Database Website content zip. Exitting...")
+      println("Could not find the Query Database Website content zip at `" + websiteZip + "`. Exiting.")
       System.exit(1)
     }
 
@@ -275,15 +275,17 @@ trait BridgeBase {
         websiteContentDir.delete()
       } catch {
         case _: IOException => {
-          println("Could not remove query database website content folder. Exitting...")
+          println("Could not remove Query Database Website content folder at `" + websiteContentDir + "`. Exiting.")
           System.exit(1)
         }
       }
     }
     websiteZip.unzipTo(websiteContentDir)
 
-    val server = new QDBWServer(config.qdbwServeHost, config.qdbwServePort, contentDirName)
-    println("Serving Query Database Website...")
+    // the `cask` web framework requires relative paths for serving static content
+    val relativized = installDir.relativize(websiteContentDir)
+    val server = new QDBWServer(config.qdbwServeHost, config.qdbwServePort, relativized.toString)
+    println(s"Serving Query Database Website from `${relativized.toString}`...")
     println(
       s"Open the following URL in your browser: http://${config.qdbwServeHost}:${config.qdbwServePort}/index.html")
     server.main(Array.empty)
