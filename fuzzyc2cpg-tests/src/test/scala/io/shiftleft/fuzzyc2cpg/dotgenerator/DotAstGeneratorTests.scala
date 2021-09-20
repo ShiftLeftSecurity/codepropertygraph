@@ -28,7 +28,7 @@ class DotAstGeneratorTests extends FuzzyCCodeToCpgSuite {
     "generate dot graph" in {
       cpg.method.name("my_func").dotAst.l match {
         case x :: _ =>
-          x.startsWith("digraph my_func") shouldBe true
+          x.startsWith("digraph \"my_func\"") shouldBe true
           x.contains("""[label = "(CONTROL_STRUCTURE,if (y > 42),if (y > 42))" ]""") shouldBe true
           x.endsWith("}\n") shouldBe true
         case _ => fail()
@@ -37,7 +37,7 @@ class DotAstGeneratorTests extends FuzzyCCodeToCpgSuite {
 
     "allow selection method" in {
       cpg.method.name("boop").dotAst.l match {
-        case x :: _ => x.startsWith("digraph boop") shouldBe true
+        case x :: _ => x.startsWith("digraph \"boop\"") shouldBe true
         case _      => fail()
       }
     }

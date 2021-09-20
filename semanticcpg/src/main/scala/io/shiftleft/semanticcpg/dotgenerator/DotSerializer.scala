@@ -33,7 +33,7 @@ object DotSerializer {
       case method: Method => method.name
       case _              => ""
     }
-    sb.append(s"digraph $name {  \n")
+    sb.append(s"""digraph "$name" {  \n""")
   }
 
   private def stringRepr(vertex: StoredNode): String = {
