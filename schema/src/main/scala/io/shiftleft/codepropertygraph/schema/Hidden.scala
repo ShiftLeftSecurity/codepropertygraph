@@ -160,7 +160,7 @@ object Hidden extends SchemaBase {
       .addNodeType(
         name = "IMPORT",
         comment = """Declarative import as it is found in statically typed languages like Java.
-            |This kind of not is not supposed to be used for imports in dynamically typed
+            |This kind of node is not supposed to be used for imports in dynamically typed
             |languages like Javascript.
             |""".stripMargin
       )
