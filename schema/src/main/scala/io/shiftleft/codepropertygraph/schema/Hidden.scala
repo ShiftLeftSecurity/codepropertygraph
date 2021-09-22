@@ -18,20 +18,23 @@ object Hidden extends SchemaBase {
             methodSchema: Method.Schema,
             typeDecl: Type.Schema,
             ast: Ast.Schema,
-            callGraph: CallGraph.Schema) = new Schema(builder, base, methodSchema, typeDecl, ast, callGraph)
+            fs: FileSystem.Schema,
+            callGraph: CallGraph.Schema) = new Schema(builder, base, methodSchema, typeDecl, ast, fs, callGraph)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                methodSchema: Method.Schema,
-               typeDecl: Type.Schema,
-               ast: Ast.Schema,
+               typeDeclSchema: Type.Schema,
+               astSchema: Ast.Schema,
+               fsSchema: FileSystem.Schema,
                callGraph: CallGraph.Schema) {
 
     import base._
     import methodSchema._
-    import ast._
+    import astSchema._
+    import fsSchema._
     import callGraph._
-    import typeDecl._
+    import typeDeclSchema._
 
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
@@ -149,6 +152,81 @@ object Hidden extends SchemaBase {
     identifier.addProperties(dynamicTypeHintFullName)
     member.addProperties(dynamicTypeHintFullName)
 
+    /*
+     * Declarative imports
+     * */
+
+    val importNode = builder
+      .addNodeType(
+        name = "IMPORT",
+        comment = """Declarative import as it is found in statically typed languages like Java.
+            |This kind of node is not supposed to be used for imports in dynamically typed
+            |languages like Javascript.
+            |""".stripMargin
+      )
+      .extendz(astNode)
+
+    val importedEntity = builder
+      .addProperty(
+        name = "IMPORTED_ENTITY",
+        valueType = ValueType.String,
+        comment = """The identifying string of the imported entity.
+            |For a Java import like "import java.nio.ByteBuffer;" this would be "java.nio.ByteBuffer".
+            |""".stripMargin
+      )
+
+    val importedAs = builder
+      .addProperty(
+        name = "IMPORTED_AS",
+        valueType = ValueType.String,
+        comment = """The identifier under which the import can be accessed in the importing context.
+            |For a Java import this is always identical to the class name. But e.g. for a
+            |Kotlin import like "import java.nio.ByteBuffer as BBuffer" this would be "BBuffer".
+            |This property is ignored if IS_WILDCARD is true.
+            |""".stripMargin
+      )
+
+    val explicitAs = builder
+      .addProperty(
+        name = "EXPLICIT_AS",
+        valueType = ValueType.Boolean,
+        comment = """Specifies whether the IMPORTED_AS property was explicitly present in the code.
+            |For languages like Java which do not allow a renaming during import this is
+            |always false. For e.g. Kotlin it depends on the existence of the "as" keyword.
+            |""".stripMargin
+      )
+
+    val isWildcard = builder
+      .addProperty(
+        name = "IS_WILDCARD",
+        valueType = ValueType.Boolean,
+        comment = """Specifies whether this is a wildcard import.
+            |For a Java import like "import java.nio.*;" IS_WILDCARD would be "true" and
+            |IMPORTED_ENTITY would be "java.nio".
+            |For wildcard imports the IMPORTED_AS property is ignored.
+            |""".stripMargin
+      )
+
+    val isExplicit = builder
+      .addProperty(
+        name = "EXPLICIT_IMPORT",
+        valueType = ValueType.Boolean,
+        comment = """Specifies whether this is an explicit import.
+            |Most languages have implicit default imports of some standard library elements
+            |and this flag is used to distinguish those from explicit imports found in the
+            |code base.
+            |""".stripMargin
+      )
+
+    importNode.addProperty(importedEntity)
+    importNode.addProperty(importedAs)
+    importNode.addProperty(explicitAs)
+    importNode.addProperty(isWildcard)
+    importNode.addProperty(isExplicit)
+
+    block.addOutEdge(edge = ast, inNode = importNode)
+    file.addOutEdge(edge = ast, inNode = importNode)
+    typeDecl.addOutEdge(edge = ast, inNode = importNode)
   }
 
 }
