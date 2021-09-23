@@ -23,7 +23,7 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
     val problem = ReachingDefProblem.create(method)
 
     if (shouldBailOut(problem)) {
-      logger.warn("Bailing out.")
+      logger.warn("Skipping.")
       return Iterator()
     }
 
