@@ -209,7 +209,7 @@ object Hidden extends SchemaBase {
 
     val isExplicit = builder
       .addProperty(
-        name = "EXPLICIT_IMPORT",
+        name = "IS_EXPLICIT",
         valueType = ValueType.Boolean,
         comment = """Specifies whether this is an explicit import.
             |Most languages have implicit default imports of some standard library elements
