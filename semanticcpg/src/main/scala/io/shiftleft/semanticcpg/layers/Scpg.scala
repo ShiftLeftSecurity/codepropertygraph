@@ -170,6 +170,18 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CfgDominatorPass(cpg),
           new CdgPass(cpg),
         )
+      case Languages.GHIDRA =>
+        Iterator(
+          new MethodStubCreator(cpg),
+          new MethodDecoratorPass(cpg),
+          new Linker(cpg),
+          new FileCreationPass(cpg),
+          new StaticCallLinker(cpg),
+          new MemberAccessLinker(cpg),
+          new MethodExternalDecoratorPass(cpg),
+          new ContainsEdgePass(cpg),
+          new NamespaceCreator(cpg)
+        )
       case _ => Iterator()
     }
   }
