@@ -89,14 +89,15 @@ class ScriptManagerTest extends AnyWordSpec with Matchers with Inside with Befor
     }
 
     "throw an exception if the specified CPG can not be found" in withScriptManager { scriptManager =>
-      if (System.getProperty("java.specification.version").toInt < 13)
+      if (System.getProperty("java.specification.version").toInt < 13) {
         intercept[FileSystemNotFoundException] {
           scriptManager.runScript("general/list-funcs.sc", Map.empty, "cake.bin.zip")
         }
-      else
+      } else {
         intercept[NoSuchFileException] {
           scriptManager.runScript("general/list-funcs.sc", Map.empty, "cake.bin.zip")
         }
+      }
     }
 
     "throw an exception if the specified script can not be found" in withScriptManager { scriptManager =>
