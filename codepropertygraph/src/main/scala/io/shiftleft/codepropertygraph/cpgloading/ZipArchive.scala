@@ -8,7 +8,8 @@ import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 
 class ZipArchive(inputFile: String) extends Closeable {
-  private val zipFileSystem: FileSystem = FileSystems.newFileSystem(Paths.get(inputFile), ZipArchive.super.getClass.getClassLoader)
+  private val zipFileSystem: FileSystem =
+    FileSystems.newFileSystem(Paths.get(inputFile), ZipArchive.super.getClass.getClassLoader)
 
   private def root: Path = zipFileSystem.getRootDirectories.iterator.next
 
