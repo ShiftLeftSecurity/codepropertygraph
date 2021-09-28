@@ -1,44 +1,18 @@
 package io.shiftleft.c2cpg
 
-import better.files.File
-import io.shiftleft.c2cpg.C2Cpg.Config
-import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
-import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.c2cpg.fixtures.CompleteCpgFixture
 import io.shiftleft.codepropertygraph.generated.Operators
 import io.shiftleft.codepropertygraph.generated.nodes.{Call, FieldIdentifier, Identifier}
-import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.passes.CfgCreationPass
-import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
 import org.scalatest.Inside
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class EnumTests extends AnyWordSpec with Matchers with Inside {
-
-  private object EnumFixture {
-    def apply(code: String)(f: Cpg => Unit): Unit = {
-      File.usingTemporaryDirectory("c2cpgtest") { dir =>
-        val file = dir / "file1.c"
-        file.write(code)
-
-        val cpg = Cpg.emptyCpg
-        val keyPool = new IntervalKeyPool(1001, 2000)
-        val typesKeyPool = new IntervalKeyPool(2001, 3000)
-        val filenames = List(file.path.toAbsolutePath.toString)
-        val astCreationPass = new AstCreationPass(filenames, cpg, keyPool, Config())
-        astCreationPass.createAndApply()
-        new CfgCreationPass(cpg).createAndApply()
-        new StubRemovalPass(cpg).createAndApply()
-        new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
-        f(cpg)
-      }
-    }
-  }
+class EnumTests extends AnyWordSpec with Matchers with Inside with CompleteCpgFixture {
 
   "Enums" should {
 
-    "be correct for simple enum" in EnumFixture("""
+    "be correct for simple enum" in CompleteCpgFixture("""
         |enum color
         |{
         |    red,
@@ -63,18 +37,20 @@ class EnumTests extends AnyWordSpec with Matchers with Inside {
       }
     }
 
-    "be correct for simple enum typedef" in EnumFixture("""
-                                                  |typedef enum color
-                                                  |{
-                                                  |    red,
-                                                  |    yellow,
-                                                  |    green = 20,
-                                                  |    blue
-                                                  |} C;""".stripMargin) { cpg =>
+    "be correct for simple enum typedef" in CompleteCpgFixture("""
+        |typedef enum color
+        |{
+        |    red,
+        |    yellow,
+        |    green = 20,
+        |    blue
+        |} C;""".stripMargin) { cpg =>
       inside(cpg.typeDecl.l) {
-        case List(color) =>
-          color.name shouldBe "C"
-          color.aliasTypeFullName shouldBe Some("color")
+        case List(c, color) =>
+          color.name shouldBe "color"
+          color.aliasTypeFullName shouldBe None
+          c.name shouldBe "C"
+          c.aliasTypeFullName shouldBe Some("color")
           inside(color.astChildren.isMember.l) {
             case List(red, yellow, green, blue) =>
               red.name shouldBe "red"
@@ -89,7 +65,7 @@ class EnumTests extends AnyWordSpec with Matchers with Inside {
       }
     }
 
-    "be correct for simple enum class" in EnumFixture("""
+    "be correct for simple enum class" in CompleteCpgFixture("""
         |enum class altitude: char
         |{ 
         |     high='h',
@@ -113,7 +89,7 @@ class EnumTests extends AnyWordSpec with Matchers with Inside {
       }
     }
 
-    "be correct for simple enum with type" in EnumFixture("""
+    "be correct for simple enum with type" in CompleteCpgFixture("""
         enum smallenum: int
         |{
         |    a,
@@ -135,7 +111,7 @@ class EnumTests extends AnyWordSpec with Matchers with Inside {
       }
     }
 
-    "be correct for anonymous enum" in EnumFixture("""
+    "be correct for anonymous enum" in CompleteCpgFixture("""
          |enum
          |{
          |    d,
@@ -154,7 +130,7 @@ class EnumTests extends AnyWordSpec with Matchers with Inside {
       }
     }
 
-    "be correct for enum access" in EnumFixture("""
+    "be correct for enum access" in CompleteCpgFixture("""
        |enum X: int
        |{
        |    a,

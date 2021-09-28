@@ -26,7 +26,7 @@ object Schema2Json extends App {
   private def schemaName(nodeType: AbstractNodeType): String =
     schemaName(nodeType.schemaInfo)
 
-  private def schemaName(schemaInfo: SchemaInfo) =
+  private def schemaName(schemaInfo: SchemaInfo): String =
     schemaInfo.definedIn.map(_.getDeclaringClass.getSimpleName).getOrElse("unknown")
 
   private def schemaIndex(nodeType: AbstractNodeType): Int =
@@ -37,8 +37,12 @@ object Schema2Json extends App {
       .map(_.getDeclaringClass.getDeclaredMethod("index").invoke(null).asInstanceOf[Int])
       .getOrElse(Int.MaxValue)
 
+  private def isSchemaHidden(schemaInfo: SchemaInfo) =
+    schemaName(schemaInfo) == "Hidden"
+
   private def schemaSummary = {
     (schema.nodeTypes.map(_.schemaInfo) ++ schema.edgeTypes.map(_.schemaInfo))
+      .filterNot(isSchemaHidden)
       .sortBy(schemaIndex)
       .flatMap(_.definedIn)
       .distinct
@@ -55,11 +59,13 @@ object Schema2Json extends App {
 
   private def nodeTypesAsJson = {
     (schema.nodeTypes ++ schema.nodeBaseTypes)
+      .filterNot(x => isSchemaHidden(x.schemaInfo))
       .sortBy(x => (schemaIndex(x), x.name))
       .flatMap { nodeType =>
         val baseTypeNames = nodeType.extendz.map(_.name)
-        val allPropertyNames = nodeType.properties.map(_.name)
-        val cardinalities = nodeType.properties.map(p => name(p.cardinality))
+        val allPropertyNames = nodeType.properties.filterNot(x => isSchemaHidden(x.schemaInfo)).map(_.name)
+        val cardinalities =
+          nodeType.properties.filterNot(x => isSchemaHidden(x.schemaInfo)).map(p => name(p.cardinality))
         val schName = schemaName(nodeType)
 
         val inheritedProperties = nodeType.extendz
@@ -74,7 +80,7 @@ object Schema2Json extends App {
         val nonInheritedProperties = allPropertyNames.filterNot(x => inheritedPropertyNames.contains(x))
 
         val containedNodes = nodeType match {
-          case nt: NodeType =>
+          case nt: NodeType if !isSchemaHidden(nt.schemaInfo) =>
             nt.containedNodes.map { n =>
               Map("name" -> n.localName, "type" -> n.nodeType.name, "cardinality" -> name(n.cardinality))
             }
@@ -96,19 +102,23 @@ object Schema2Json extends App {
   }
 
   private def edgeTypesAsJson = {
-    schema.edgeTypes.sortBy(_.name).flatMap { edge =>
-      val schName = schemaName(edge.schemaInfo)
-      Some(
-        ("name" -> edge.name) ~
-          ("comment" -> edge.comment) ~
-          ("schema" -> schName)
-      )
-    }
+    schema.edgeTypes
+      .sortBy(_.name)
+      .filterNot(x => isSchemaHidden(x.schemaInfo))
+      .flatMap { edge =>
+        val schName = schemaName(edge.schemaInfo)
+        Some(
+          ("name" -> edge.name) ~
+            ("comment" -> edge.comment) ~
+            ("schema" -> schName)
+        )
+      }
   }
 
   private def propertiesAsJson = {
     schema.properties
       .sortBy(_.name)
+      .filterNot(x => isSchemaHidden(x.schemaInfo))
       .flatMap { prop =>
         val schName = schemaName(prop.schemaInfo)
         Some(
@@ -123,7 +133,6 @@ object Schema2Json extends App {
     cardinality match {
       case Cardinality.ZeroOrOne => "zeroOrOne"
       case Cardinality.List      => "list"
-      case Cardinality.ISeq      => "array"
       case Cardinality.One(_)    => "one"
     }
 

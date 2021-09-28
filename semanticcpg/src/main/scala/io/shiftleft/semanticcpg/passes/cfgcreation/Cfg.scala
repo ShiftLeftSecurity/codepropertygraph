@@ -80,7 +80,7 @@ case class Cfg(entryNode: Option[CfgNode] = None,
     * */
   def withResolvedGotos(): Cfg = {
     val edges = gotos.flatMap {
-      case (goto, label) =>
+      case (goto, label) if label != "*" =>
         labeledNodes.get(label) match {
           case Some(labeledNode) =>
             // TODO set edge type of Always once the backend
@@ -89,6 +89,13 @@ case class Cfg(entryNode: Option[CfgNode] = None,
           case None =>
             logger.info("Unable to wire goto statement. Missing label {}.", label)
             None
+        }
+      case (goto, _) =>
+        // We come here for: https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html
+        // For such GOTOs we cannot statically determine the target label. As a quick
+        // hack we simply put edges to all labels found. This might be an over-taint.
+        labeledNodes.flatMap {
+          case (_, labeledNode) => Some(CfgEdge(goto, labeledNode, AlwaysEdge))
         }
     }
     this.copy(edges = this.edges ++ edges)

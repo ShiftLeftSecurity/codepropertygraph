@@ -213,18 +213,24 @@ object Linker {
       // If the source node does not have any outgoing edges of this type
       // This check is just required for backward compatibility
       if (srcNode.outE(edgeType).isEmpty) {
-        srcNode.propertyOption(new PropertyKey[String](dstFullNameKey)).ifPresent { dstFullName =>
-          // for `UNKNOWN` this is not always set, so we're using an Option here
-          val srcStoredNode = srcNode.asInstanceOf[StoredNode]
-          dstNodeMap.get(dstFullName) match {
-            case Some(dstNode) =>
-              dstGraph.addEdgeInOriginal(srcStoredNode, dstNode, edgeType)
-            case None if dstNotExistsHandler.isDefined =>
-              dstNotExistsHandler.get(srcStoredNode, dstFullName)
-            case _ =>
-              logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
+        val key = new PropertyKey[String](dstFullNameKey)
+        srcNode
+          .propertyOption(key)
+          .filter { dstFullName =>
+            !srcNode.propertyDefaultValue(dstFullNameKey).equals(dstFullName)
           }
-        }
+          .ifPresent { dstFullName =>
+            // for `UNKNOWN` this is not always set, so we're using an Option here
+            val srcStoredNode = srcNode.asInstanceOf[StoredNode]
+            dstNodeMap.get(dstFullName) match {
+              case Some(dstNode) =>
+                dstGraph.addEdgeInOriginal(srcStoredNode, dstNode, edgeType)
+              case None if dstNotExistsHandler.isDefined =>
+                dstNotExistsHandler.get(srcStoredNode, dstFullName)
+              case _ =>
+                logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
+            }
+          }
       } else {
         srcNode.out(edgeType).property(Properties.FULL_NAME).nextOption() match {
           case Some(dstFullName) => srcNode.setProperty(dstFullNameKey, dstFullName)

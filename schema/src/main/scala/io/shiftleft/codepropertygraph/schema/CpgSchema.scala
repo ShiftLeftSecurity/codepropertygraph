@@ -9,6 +9,7 @@ class CpgSchema(builder: SchemaBuilder) {
   val namespaces = Namespace(builder, base, fs)
 
   val operators = Operators(builder)
+  val configuration = Configuration(builder, base)
   val metaData = MetaData(builder, base)
 
   val typeSchema = Type(builder, base, fs)
@@ -24,13 +25,15 @@ class CpgSchema(builder: SchemaBuilder) {
 
   val sourceSpecific = Comment(builder, base, ast, fs)
   val tagsAndLocation = TagsAndLocation(builder, base, typeSchema, method, ast, fs, callGraph)
+  val binding = Binding(builder, base, typeSchema, method)
   val finding = Finding(builder, base)
+  val hidden = Hidden(builder, base, method, typeSchema, ast, fs, callGraph)
   val protoSerialize = ProtoSerialize(builder, ast)
 }
 
 object CpgSchema {
   val instance: Schema = {
-    val builder = new SchemaBuilder("io.shiftleft.codepropertygraph.generated")
+    val builder = new SchemaBuilder(domainShortName = "Cpg", basePackage = "io.shiftleft.codepropertygraph.generated")
     new CpgSchema(builder)
     builder.build
   }

@@ -1,13 +1,13 @@
 package io.shiftleft.console.cpgcreation
 
-import io.shiftleft.console.GhidraFrontendConfig
+import io.shiftleft.console.FrontendConfig
 
 import java.nio.file.Path
 
 /**
   * Language frontend for Ghidra - translates compiled binaries into Code Property Graphs.
   */
-case class GhidraCpgGenerator(config: GhidraFrontendConfig, rootPath: Path) extends CpgGenerator {
+case class GhidraCpgGenerator(config: FrontendConfig, rootPath: Path) extends CpgGenerator {
 
   /**
     * Generate a CPG for the given input path.
@@ -22,5 +22,5 @@ case class GhidraCpgGenerator(config: GhidraFrontendConfig, rootPath: Path) exte
     runShellCommand(command, arguments).map(_ => outputPath)
   }
 
-  override def isAvailable: Boolean = rootPath.resolve("ghidra2cpg.sh").toFile.exists()
+  override def isAvailable: Boolean = rootPath.resolve("ghidra2cpg").toFile.exists()
 }

@@ -24,7 +24,11 @@ object ProjectRoot {
 
     if (File(fileThatOnlyExistsInRoot).exists) "."
     else if (File(s"../$fileThatOnlyExistsInRoot").exists) ".."
+    else if (File(s"../../$fileThatOnlyExistsInRoot").exists) ".."
     else ???
   }
+
+  def find: File =
+    File(findRelativePath)
 
 }

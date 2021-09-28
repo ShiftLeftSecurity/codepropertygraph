@@ -43,8 +43,7 @@ object LocationCreator {
   ): NewLocation = {
 
     if (method == null) {
-      val a = NewLocation().node(Some(node))
-      a
+      NewLocation().node(node)
     } else {
       val typeOption = methodToTypeDecl(method)
       val typeName = typeOption.map(_.fullName).getOrElse("")
@@ -67,7 +66,7 @@ object LocationCreator {
         .classShortName(typeShortName)
         .nodeLabel(label)
         .filename(if (method.filename.isEmpty) "N/A" else method.filename)
-        .node(Some(node))
+        .node(node)
     }
   }
 

@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg.querying
 
 import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
-import io.shiftleft.codepropertygraph.generated.NodeTypes
+import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes}
 import io.shiftleft.semanticcpg.language._
 
 /**
@@ -15,7 +15,7 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
   override val code = """
        /* A C comment */
        // A C++ comment
-       int main(int argc, char **argv) { int mylocal; libfunc(1); }
+       int main(int argc, char **argv) { int mylocal; libfunc(1, argc); }
        struct foo { int x; };
     """
 
@@ -29,7 +29,7 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
     * exists is in `cpg.method.internal`. All other methods are in `cpg.method.external`.
     * */
   "should allow retrieving methods" in {
-    cpg.method.internal.name.l shouldBe List("main")
+    cpg.method.internal.name.l shouldBe List("<global>", "main")
     cpg.method.external.name.l shouldBe List("libfunc")
   }
 
@@ -58,7 +58,7 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
   }
 
   "should allow retrieving type declarations" in {
-    cpg.typeDecl.internal.name.toSet shouldBe Set("foo")
+    cpg.typeDecl.internal.name.toSet shouldBe Set("foo", "main")
   }
 
   "should allow retrieving members" in {
@@ -66,7 +66,7 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
   }
 
   "should allow retrieving (used) types" in {
-    cpg.typ.name.toSet shouldBe Set("int", "void", "char * *")
+    cpg.typ.name.toSet shouldBe Set("int", "void", "char * *", "ANY", "foo")
   }
 
   "should allow retrieving namespaces" in {
@@ -78,11 +78,11 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
   }
 
   "should allow retrieving of method returns" in {
-    cpg.methodReturn.l.size shouldBe 2
+    cpg.methodReturn.l.size shouldBe 3
   }
 
   "should allow retrieving of meta data" in {
-    cpg.metaData.language.l shouldBe List("C")
+    cpg.metaData.language.l shouldBe List(Languages.NEWC)
   }
 
   "should allow retrieving all nodes" in {
@@ -105,6 +105,8 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
       NodeTypes.LOCAL,
       NodeTypes.CALL,
       NodeTypes.LITERAL,
+      NodeTypes.BINDING,
+      NodeTypes.IDENTIFIER
     )
   }
 

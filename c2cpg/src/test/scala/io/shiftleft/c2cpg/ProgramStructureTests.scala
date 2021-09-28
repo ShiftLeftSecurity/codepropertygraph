@@ -1,5 +1,6 @@
 package io.shiftleft.c2cpg
 
+import io.shiftleft.c2cpg.fixtures.TestProjectFixture
 import io.shiftleft.codepropertygraph.generated.Properties
 import io.shiftleft.codepropertygraph.generated.nodes.{NamespaceBlock, TypeDecl}
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
@@ -9,7 +10,7 @@ import overflowdb._
 
 class ProgramStructureTests extends AnyWordSpec with Matchers {
 
-  private val fixture: CpgTestFixture = CpgTestFixture("structure")
+  private val fixture: TestProjectFixture = TestProjectFixture("structure")
 
   "Program structure of test project" should {
 

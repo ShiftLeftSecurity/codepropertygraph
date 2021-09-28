@@ -13,7 +13,7 @@ import scala.jdk.CollectionConverters._
 class TypeNodePassTests extends AnyWordSpec with Matchers {
   "TypeNodePass" should {
     "create TYPE nodes for used types" in TypeNodePassFixture("int main() { int x; }") { cpg =>
-      cpg.typ.name.toSet shouldBe Set("int", "void")
+      cpg.typ.name.toSet shouldBe Set("int", "void", "ANY")
     }
   }
 }

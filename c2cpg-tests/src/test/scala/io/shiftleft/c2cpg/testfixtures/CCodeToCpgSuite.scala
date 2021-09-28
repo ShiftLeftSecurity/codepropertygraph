@@ -2,12 +2,13 @@ package io.shiftleft.c2cpg.testfixtures
 
 import io.shiftleft.c2cpg.C2Cpg
 import io.shiftleft.c2cpg.C2Cpg.Config
+import io.shiftleft.c2cpg.parser.FileDefaults
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.testfixtures.{CodeToCpgFixture, LanguageFrontend}
 
 import java.io.File
 
-class C2CpgFrontend extends LanguageFrontend {
+class C2CpgFrontend(override val fileSuffix: String = FileDefaults.C_EXT) extends LanguageFrontend {
   def execute(sourceCodePath: File): Cpg = {
     val cpgFile = File.createTempFile("c2cpg", ".zip")
     cpgFile.deleteOnExit()
@@ -18,7 +19,6 @@ class C2CpgFrontend extends LanguageFrontend {
                         includeComments = true)
     c2cpg.runAndOutput(config)
   }
-  override val fileSuffix: String = ".c"
 }
 
-class CCodeToCpgSuite extends CodeToCpgFixture(new C2CpgFrontend) {}
+class CCodeToCpgSuite(fileSuffix: String = FileDefaults.C_EXT) extends CodeToCpgFixture(new C2CpgFrontend(fileSuffix)) {}

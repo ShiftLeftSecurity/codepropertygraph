@@ -7,7 +7,7 @@ import io.shiftleft.semanticcpg.utils.MemberAccess.isGenericMemberAccessName
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.traversal._
 
-import scala.collection.Set
+import scala.collection.{Set, mutable}
 
 /**
   * The variables defined/used in the reaching def problem can
@@ -28,14 +28,14 @@ case class Definition(node: StoredNode) {}
 
 object ReachingDefProblem {
 
-  def create(method: Method): DataFlowProblem[Set[Definition]] = {
+  def create(method: Method): DataFlowProblem[mutable.Set[Definition]] = {
     val flowGraph = new ReachingDefFlowGraph(method)
-    val transfer = new ReachingDefTransferFunction(method)
+    val transfer = new OptimizedReachingDefTransferFunction(method)
     val init = new ReachingDefInit(transfer.gen)
-    def meet: (Set[Definition], Set[Definition]) => Set[Definition] =
-      (x: Set[Definition], y: Set[Definition]) => { x.union(y) }
+    def meet: (mutable.Set[Definition], mutable.Set[Definition]) => mutable.Set[Definition] =
+      (x: mutable.Set[Definition], y: mutable.Set[Definition]) => { x.union(y) }
 
-    new DataFlowProblem[Set[Definition]](flowGraph, transfer, meet, init, true, Set[Definition]())
+    new DataFlowProblem[mutable.Set[Definition]](flowGraph, transfer, meet, init, true, mutable.Set[Definition]())
   }
 
 }
@@ -102,9 +102,11 @@ class ReachingDefFlowGraph(method: Method) extends FlowGraph {
   * For each node of the graph, this transfer function defines how it affects
   * the propagation of definitions.
   * */
-class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[Definition]] {
+class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutable.Set[Definition]] {
 
-  val gen: Map[StoredNode, Set[Definition]] = initGen(method).withDefaultValue(Set.empty[Definition])
+  val gen: Map[StoredNode, mutable.Set[Definition]] =
+    initGen(method).withDefaultValue(mutable.Set.empty[Definition])
+
   val kill: Map[StoredNode, Set[Definition]] =
     initKill(method, gen).withDefaultValue(Set.empty[Definition])
 
@@ -113,7 +115,7 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
     * function to obtain the updated set of definitions, considering `gen(n)`
     * and `kill(n)`.
     * */
-  override def apply(n: StoredNode, x: Set[Definition]): Set[Definition] = {
+  override def apply(n: StoredNode, x: mutable.Set[Definition]): mutable.Set[Definition] = {
     gen(n).union(x.diff(kill(n)))
   }
 
@@ -121,10 +123,10 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
     * Initialize the map `gen`, a map that contains generated
     * definitions for each flow graph node.
     * */
-  def initGen(method: Method): Map[StoredNode, Set[Definition]] = {
+  def initGen(method: Method): Map[StoredNode, mutable.Set[Definition]] = {
 
     val defsForParams = method.parameter.l.map { param =>
-      param -> Set(Definition.fromNode(param.asInstanceOf[StoredNode]))
+      param -> mutable.Set(Definition.fromNode(param.asInstanceOf[StoredNode]))
     }
 
     // We filter out field accesses to ensure that they propagate
@@ -135,7 +137,7 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
       .l
       .map { call =>
         call -> {
-          val retVal = Set(call)
+          val retVal = mutable.Set(call)
           val args = call.argument.filter(hasValidGenType)
           (retVal ++ args)
             .map(x => Definition.fromNode(x.asInstanceOf[StoredNode]))
@@ -165,13 +167,21 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
     * */
   private def initKill(method: Method, gen: Map[StoredNode, Set[Definition]]): Map[StoredNode, Set[Definition]] = {
 
+    val allIdentifiers: Map[String, List[Identifier]] = method.ast.isIdentifier.l
+      .groupBy(_.name)
+      .withDefaultValue(List.empty[Identifier])
+
+    val allCalls: Map[String, List[Call]] = method.call.l
+      .groupBy(_.code)
+      .withDefaultValue(List.empty[Call])
+
     // We filter out field accesses to ensure that they propagate
     // taint unharmed.
 
     method.call
       .filterNot(x => isGenericMemberAccessName(x.name))
       .map { call =>
-        call -> killsForGens(gen(call))
+        call -> killsForGens(gen(call), allIdentifiers, allCalls)
       }
       .toMap
   }
@@ -183,44 +193,83 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[Set[D
     * of the same variable for each, that is, we calculate kill(call)
     * based on gen(call).
     * */
-  private def killsForGens(genOfCall: Set[Definition]): Set[Definition] = {
+  private def killsForGens(genOfCall: Set[Definition],
+                           allIdentifiers: Map[String, List[Identifier]],
+                           allCalls: Map[String, List[Call]]): Set[Definition] = {
+
+    def definitionsOfSameVariable(definition: Definition): Set[Definition] = {
+      val definedNodes = definition.node match {
+        case param: MethodParameterIn =>
+          allIdentifiers(param.name)
+            .filter(x => x.id != param.id)
+        case identifier: Identifier =>
+          allIdentifiers(identifier.name)
+            .filter(x => x.id != identifier.id)
+        case call: Call =>
+          allCalls(call.code)
+            .filter(x => x.id != call.id)
+        case _ => Set()
+      }
+      definedNodes.map(Definition.fromNode).toSet
+    }
+
     genOfCall.flatMap { definition =>
       definitionsOfSameVariable(definition)
     }
   }
 
-  private def definitionsOfSameVariable(definition: Definition): Set[Definition] = {
-    val definedNodes = definition.node match {
-      case param: MethodParameterIn =>
-        method.cfgNode
-          .filter(x => x.id != param.id)
-          .isIdentifier
-          .nameExact(param.name)
-          .toSet
-      case identifier: Identifier =>
-        method.cfgNode
-          .filter(x => x.id != identifier.id)
-          .isIdentifier
-          .nameExact(identifier.name)
-          .toSet
-      case call: Call =>
-        method.cfgNode
-          .filter(x => x.id != call.id)
-          .isCall
-          .codeExact(call.code)
-          .toSet
-      case _ => Set()
-    }
-    definedNodes.map(Definition.fromNode)
-  }
-
 }
 
-class ReachingDefInit(gen: Map[StoredNode, Set[Definition]]) extends InOutInit[Set[Definition]] {
-  override def initIn: Map[StoredNode, Set[Definition]] =
-    Map
-      .empty[StoredNode, Set[Definition]]
-      .withDefaultValue(Set.empty[Definition])
+/**
+  * Lone Identifier Optimization: we first determine and store all identifiers
+  * that neither refer to a local or parameter and that appear only once
+  * as a call argument. For these identifiers, we know that they are
+  * not used in any other location in the code, and so, we remove
+  * them from `gen` sets so that they need not be propagated through
+  * the entire graph only to determine that they reach the exit node. Instead,
+  * when creating reaching definition edges, we simply create edges from the
+  * identifier to the exit node.
+  * */
+class OptimizedReachingDefTransferFunction(method: Method) extends ReachingDefTransferFunction(method) {
 
-  override def initOut: Map[StoredNode, Set[Definition]] = gen
+  lazy val loneIdentifiers: Map[Call, List[Definition]] = {
+    val paramAndLocalNames = method.parameter.name.l ++ method.local.name.l
+
+    val callArgPairs = method.call.flatMap { call =>
+      call.argument.isIdentifier
+        .filterNot(i => paramAndLocalNames.contains(i.name))
+        .map(arg => (arg.name, call, arg))
+    }.l
+
+    callArgPairs
+      .groupBy(_._1)
+      .collect { case (_, v) if v.size == 1 => v.map { case (_, call, arg) => (call, arg) }.head }
+      .toList
+      .groupBy(_._1)
+      .map { case (k, v) => (k, v.map(x => Definition.fromNode(x._2))) }
+  }
+
+  override def initGen(method: Method): Map[StoredNode, mutable.Set[Definition]] =
+    withoutLoneIdentifiers(super.initGen(method))
+
+  private def withoutLoneIdentifiers(
+      g: Map[StoredNode, mutable.Set[Definition]]): Map[StoredNode, mutable.Set[Definition]] = {
+    g.map {
+      case (k, defs) =>
+        k match {
+          case call: Call if (loneIdentifiers.contains(call)) =>
+            (call, defs.filterNot(loneIdentifiers(call).contains(_)))
+          case _ => (k, defs)
+        }
+    }
+  }
+}
+
+class ReachingDefInit(gen: Map[StoredNode, mutable.Set[Definition]]) extends InOutInit[mutable.Set[Definition]] {
+  override def initIn: Map[StoredNode, mutable.Set[Definition]] =
+    Map
+      .empty[StoredNode, mutable.Set[Definition]]
+      .withDefaultValue(mutable.Set.empty[Definition])
+
+  override def initOut: Map[StoredNode, mutable.Set[Definition]] = gen
 }

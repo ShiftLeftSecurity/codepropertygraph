@@ -145,3 +145,23 @@ jobs:
           asset_path: ./fuzzyppcli-win.zip
           asset_name: fuzzyppcli-win.zip
           asset_content_type: application/zip
+      - name: Package frontends for release
+        run: sbt clean c2cpg/Universal/packageBin fuzzyc2cpg/Universal/packageBin
+      - name: Upload fuzzyc2cpg to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: fuzzyc2cpg/target/universal/fuzzyc2cpg.zip
+          asset_name: fuzzy2cpg.zip
+          asset_content_type: application/zip
+      - name: Upload c2cpg to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: c2cpg/target/universal/c2cpg.zip
+          asset_name: c2cpg.zip
+          asset_content_type: application/zip

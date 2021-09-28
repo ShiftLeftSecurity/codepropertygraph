@@ -1,8 +1,8 @@
 package io.shiftleft.c2cpg
 
 import io.shiftleft.c2cpg.C2Cpg.Config
-import io.shiftleft.c2cpg.parser.ParseConfig
-import io.shiftleft.c2cpg.passes.{AstCreationPass, StubRemovalPass}
+import io.shiftleft.c2cpg.parser.{FileDefaults, HeaderFileFinder, ParseConfig}
+import io.shiftleft.c2cpg.passes.{AstCreationPass, PreprocessorPass}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.IntervalKeyPool
@@ -41,13 +41,21 @@ class C2Cpg {
     val cpg = newEmptyCpg(Some(config.outputPath))
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
 
-    new MetaDataPass(cpg, Languages.C, Some(metaDataKeyPool)).createAndApply()
-    val astCreationPass = new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, createParseConfig(config))
+    new MetaDataPass(cpg, Languages.NEWC, Some(metaDataKeyPool)).createAndApply()
+    val headerFileFinder = new HeaderFileFinder(config.inputPaths.toList)
+    val astCreationPass =
+      new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, createParseConfig(config), headerFileFinder)
     astCreationPass.createAndApply()
     new CfgCreationPass(cpg).createAndApply()
-    new StubRemovalPass(cpg).createAndApply()
     new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
     cpg
+  }
+
+  def printIfDefsOnly(config: Config): Unit = {
+    val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
+    val headerFileFinder = new HeaderFileFinder(config.inputPaths.toList)
+    val stmts = new PreprocessorPass(sourceFileNames, createParseConfig(config), headerFileFinder).run().mkString(",")
+    println(stmts)
   }
 
 }
@@ -58,12 +66,13 @@ object C2Cpg {
 
   final case class Config(inputPaths: Set[String] = Set.empty,
                           outputPath: String = X2CpgConfig.defaultOutputPath,
-                          sourceFileExtensions: Set[String] = Set(".c", ".cc", ".cpp", ".h", ".hpp"),
+                          sourceFileExtensions: Set[String] = FileDefaults.SOURCE_FILE_EXTENSIONS,
                           includePaths: Set[String] = Set.empty,
                           defines: Set[String] = Set.empty,
                           includeComments: Boolean = false,
                           logProblems: Boolean = false,
-                          logPreprocessor: Boolean = false)
+                          logPreprocessor: Boolean = false,
+                          printIfDefsOnly: Boolean = false)
       extends X2CpgConfig[Config] {
 
     override def withAdditionalInputPath(inputPath: String): Config = copy(inputPaths = inputPaths + inputPath)
@@ -81,16 +90,19 @@ object C2Cpg {
           .text(s"includes all comments into the CPG")
           .action((_, c) => c.copy(includeComments = true)),
         opt[Unit]("log-problems")
-          .text(s"enables logging of all parse problems")
+          .text(s"enables logging of all parse problems while generating the CPG")
           .action((_, c) => c.copy(logProblems = true)),
         opt[Unit]("log-preprocessor")
-          .text(s"enables logging of all preprocessor statements")
+          .text(s"enables logging of all preprocessor statements while generating the CPG")
           .action((_, c) => c.copy(logPreprocessor = true)),
+        opt[Unit]("print-ifdef-only")
+          .text(s"prints a comma-separated list of all preprocessor ifdef and if statements; does not create a CPG")
+          .action((_, c) => c.copy(printIfDefsOnly = true)),
         opt[String]("include")
           .unbounded()
           .text("header include paths")
           .action((incl, cfg) => cfg.copy(includePaths = cfg.includePaths + incl)),
-        opt[String]('D', "define")
+        opt[String]("define")
           .unbounded()
           .text("define a name")
           .action((d, cfg) => cfg.copy(defines = cfg.defines + d))
@@ -98,6 +110,14 @@ object C2Cpg {
     }
 
     X2Cpg.parseCommandLine(args, frontendSpecificOptions, Config()) match {
+      case Some(config) if config.printIfDefsOnly =>
+        try {
+          new C2Cpg().printIfDefsOnly(config)
+        } catch {
+          case NonFatal(ex) =>
+            logger.error("Failed to print preprocessor statements.", ex)
+            System.exit(1)
+        }
       case Some(config) =>
         try {
           val cpg = new C2Cpg().runAndOutput(config)

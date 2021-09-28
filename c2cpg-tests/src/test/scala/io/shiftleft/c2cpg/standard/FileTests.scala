@@ -37,11 +37,11 @@ class FileTests extends CCodeToCpgSuite {
   }
 
   "should allow traversing from file to its methods via namespace block" in {
-    cpg.file.nameNot(FileTraversal.UNKNOWN).method.name.toSet shouldBe Set("foo", "bar")
+    cpg.file.nameNot(FileTraversal.UNKNOWN).method.name.toSet shouldBe Set("<global>", "foo", "bar")
   }
 
   "should allow traversing from file to its type declarations via namespace block" in {
-    cpg.file.nameNot(FileTraversal.UNKNOWN).typeDecl.name.toSet shouldBe Set("my_struct")
+    cpg.file.nameNot(FileTraversal.UNKNOWN).typeDecl.name.toSet shouldBe Set("foo", "bar", "my_struct")
   }
 
   "should allow traversing to namespaces" in {

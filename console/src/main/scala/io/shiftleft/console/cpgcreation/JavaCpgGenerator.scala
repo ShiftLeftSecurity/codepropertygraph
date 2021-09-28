@@ -1,13 +1,13 @@
 package io.shiftleft.console.cpgcreation
 
-import io.shiftleft.console.JavaFrontendConfig
+import io.shiftleft.console.FrontendConfig
 
 import java.nio.file.Path
 
 /**
   * Language frontend for Java archives (JAR files). Translates Java archives into code property graphs.
   * */
-case class JavaCpgGenerator(config: JavaFrontendConfig, rootPath: Path) extends CpgGenerator {
+case class JavaCpgGenerator(config: FrontendConfig, rootPath: Path) extends CpgGenerator {
 
   /**
     * Generate a CPG for the given input path.
@@ -48,8 +48,8 @@ case class JavaCpgGenerator(config: JavaFrontendConfig, rootPath: Path) extends 
   }
 
   private def generateOss(inputPath: String, outputPath: String): Option[String] = {
-    val command = rootPath.resolve("joern-parse").toString
-    val arguments = Seq(inputPath, "--out", outputPath, "--language", "java", "--noenhance")
+    val command = rootPath.resolve("jimple2cpg").toString
+    val arguments = config.cmdLineParams.toSeq ++ Seq(inputPath, "--output", outputPath)
     runShellCommand(command, arguments).map(_ => outputPath)
   }
 
@@ -74,7 +74,7 @@ case class JavaCpgGenerator(config: JavaFrontendConfig, rootPath: Path) extends 
   }
 
   private def commercialAvailable: Boolean = rootPath.resolve("java2cpg.sh").toFile.exists()
-  private def ossAvailable: Boolean = rootPath.resolve("joern-parse").toFile.exists()
+  private def ossAvailable: Boolean = rootPath.resolve("jimple2cpg").toFile.exists()
 
 }
 

@@ -31,10 +31,9 @@ object AccessPathUsage {
 
         case memberAccess: Call =>
           //assume: MemberAccess.isGenericMemberAccessName(call.name)
-          //FIXME: elevate debug to warn once csharp2cpg has managed to migrate.
           val argOne = memberAccess.argumentOption(1)
           if (argOne.isEmpty) {
-            logger.warn(s"Missing first argument on call ${memberAccess}.")
+            logger.warn(s"Missing first argument on call ${memberAccess.code}.")
             return (TrackedUnknown, Nil)
           }
           val (base, tail) = toTrackedBaseAndAccessPathInternal(argOne.get)

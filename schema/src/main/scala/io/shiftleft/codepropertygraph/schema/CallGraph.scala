@@ -175,6 +175,12 @@ object CallGraph extends SchemaBase {
         valueType = ValueTypes.STRING,
         comment = "For dynamically dispatched calls the target is determined during runtime"
       ).protoId(2),
+      Constant(
+        name = "INLINED",
+        value = "INLINED",
+        valueType = ValueTypes.STRING,
+        comment = "For macro expansions, code is inlined."
+      ).protoId(3),
     )
 
     callNode

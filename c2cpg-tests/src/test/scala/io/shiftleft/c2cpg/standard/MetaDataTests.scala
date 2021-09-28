@@ -1,6 +1,7 @@
 package io.shiftleft.c2cpg.standard
 
 import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
+import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.semanticcpg.language._
 
 class MetaDataTests extends CCodeToCpgSuite {
@@ -12,7 +13,7 @@ class MetaDataTests extends CCodeToCpgSuite {
 
   "should contain exactly one node with all mandatory fields set" in {
     val List(x) = cpg.metaData.l
-    x.language shouldBe "C"
+    x.language shouldBe Languages.NEWC
     x.version shouldBe "0.1"
     x.overlays shouldBe List("semanticcpg")
     // C-frontend does not set hash for entire CPG.

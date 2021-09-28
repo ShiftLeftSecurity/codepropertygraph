@@ -26,11 +26,13 @@ class DataFlowSolver {
           .reduceOption((x, y) => problem.meet(x, y))
           .getOrElse(problem.empty)
         in += n -> inSet
-        val oldSize = out(n).size
-        out += n -> problem.transferFunction(n, inSet)
-        if (oldSize != out(n).size)
+        val old = out(n)
+        val newSet = problem.transferFunction(n, inSet)
+        val changed = !old.equals(newSet)
+        out += n -> newSet
+        if (changed) {
           problem.flowGraph.succ(n)
-        else
+        } else
           List()
       }
       workList.clear()
@@ -59,9 +61,11 @@ class DataFlowSolver {
           .reduceOption((x, y) => problem.meet(x, y))
           .getOrElse(problem.empty)
         out += n -> outSet
-        val oldSize = in(n).size
-        in += n -> problem.transferFunction(n, outSet)
-        if (oldSize != in(n).size)
+        val old = in(n)
+        val newSet = problem.transferFunction(n, outSet)
+        val changed = !old.equals(newSet)
+        in += n -> newSet
+        if (changed)
           problem.flowGraph.pred(n)
         else
           List()

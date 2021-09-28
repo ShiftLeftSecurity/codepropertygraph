@@ -12,8 +12,6 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
-import scala.jdk.CollectionConverters._
-
 case class NameAndSignature(name: String, signature: String, fullName: String)
 
 /**
@@ -22,23 +20,19 @@ case class NameAndSignature(name: String, signature: String, fullName: String)
 class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int)](cpg) {
 
   // Since the method fullNames for fuzzyc are not unique, we do not have
-  // a 1to1 relation and may overwrite some values. We deem this ok for now.
+  // a 1to1 relation and may overwrite some values. This is ok for now.
   private var methodFullNameToNode = Map[String, MethodBase]()
   private var methodToParameterCount = Map[NameAndSignature, Int]()
 
   override def init(): Unit = {
-    cpg.method
-      .sideEffect { method =>
-        methodFullNameToNode += method.fullName -> method
-      }
-      .exec()
+    cpg.method.foreach { method =>
+      methodFullNameToNode += method.fullName -> method
+    }
 
-    cpg.call
-      .sideEffect { call =>
-        methodToParameterCount +=
-          NameAndSignature(call.name, call.signature, call.methodFullName) -> call._astOut.asScala.size
-      }
-      .exec()
+    cpg.call.foreach { call =>
+      methodToParameterCount +=
+        NameAndSignature(call.name, call.signature, call.methodFullName) -> call.argument.size
+    }
   }
 
   override def partIterator: Iterator[(NameAndSignature, Int)] = methodToParameterCount.iterator

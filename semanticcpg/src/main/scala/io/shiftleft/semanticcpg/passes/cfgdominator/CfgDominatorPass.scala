@@ -5,7 +5,6 @@ import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.{Method, StoredNode}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
-import overflowdb.Node
 
 import scala.collection.mutable
 
@@ -35,26 +34,22 @@ class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
   }
 
   private def addDomTreeEdges(dstGraph: DiffGraph.Builder,
-                              cfgNodeToImmediateDominator: mutable.Map[Node, Node]): Unit = {
+                              cfgNodeToImmediateDominator: mutable.Map[StoredNode, StoredNode]): Unit = {
     // TODO do not iterate over potential hash map to ensure same interation order for
     // edge creation.
     cfgNodeToImmediateDominator.foreach {
       case (node, immediateDominator) =>
-        dstGraph.addEdgeInOriginal(immediateDominator.asInstanceOf[StoredNode],
-                                   node.asInstanceOf[StoredNode],
-                                   EdgeTypes.DOMINATE)
+        dstGraph.addEdgeInOriginal(immediateDominator, node, EdgeTypes.DOMINATE)
     }
   }
 
   private def addPostDomTreeEdges(dstGraph: DiffGraph.Builder,
-                                  cfgNodeToPostImmediateDominator: mutable.Map[Node, Node]): Unit = {
+                                  cfgNodeToPostImmediateDominator: mutable.Map[StoredNode, StoredNode]): Unit = {
     // TODO do not iterate over potential hash map to ensure same interation order for
     // edge creation.
     cfgNodeToPostImmediateDominator.foreach {
       case (node, immediatePostDominator) =>
-        dstGraph.addEdgeInOriginal(immediatePostDominator.asInstanceOf[StoredNode],
-                                   node.asInstanceOf[StoredNode],
-                                   EdgeTypes.POST_DOMINATE)
+        dstGraph.addEdgeInOriginal(immediatePostDominator, node, EdgeTypes.POST_DOMINATE)
     }
   }
 }

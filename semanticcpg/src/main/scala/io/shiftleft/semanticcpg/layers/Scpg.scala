@@ -9,6 +9,7 @@ import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
 import io.shiftleft.semanticcpg.passes.compat.argumentcompat.ArgumentCompat
 import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.MethodStubCreator
+import io.shiftleft.semanticcpg.passes.languagespecific.kotlin.HeuristicsCallLinker
 import io.shiftleft.semanticcpg.passes.linking.calllinker.StaticCallLinker
 import io.shiftleft.semanticcpg.passes.linking.filecompat.FileNameCompat
 import io.shiftleft.semanticcpg.passes.linking.linker.Linker
@@ -139,6 +140,47 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CfgDominatorPass(cpg),
           new CdgPass(cpg),
           new NamespaceCreator(cpg),
+        )
+      case Languages.KOTLIN =>
+        Iterator(
+          new CfgCreationPass(cpg),
+          new TypeDeclStubCreator(cpg),
+          new MethodDecoratorPass(cpg),
+          new Linker(cpg),
+          new StaticCallLinker(cpg),
+          new HeuristicsCallLinker(cpg),
+          new FileCreationPass(cpg),
+          new ContainsEdgePass(cpg),
+          new CfgDominatorPass(cpg),
+          new CdgPass(cpg),
+          new NamespaceCreator(cpg),
+        )
+      case Languages.NEWC =>
+        Iterator(
+          new TypeDeclStubCreator(cpg),
+          new MethodStubCreator(cpg),
+          new MethodDecoratorPass(cpg),
+          new Linker(cpg),
+          new FileCreationPass(cpg),
+          new StaticCallLinker(cpg),
+          new MemberAccessLinker(cpg),
+          new MethodExternalDecoratorPass(cpg),
+          new ContainsEdgePass(cpg),
+          new NamespaceCreator(cpg),
+          new CfgDominatorPass(cpg),
+          new CdgPass(cpg),
+        )
+      case Languages.GHIDRA =>
+        Iterator(
+          new MethodStubCreator(cpg),
+          new MethodDecoratorPass(cpg),
+          new Linker(cpg),
+          new FileCreationPass(cpg),
+          new StaticCallLinker(cpg),
+          new MemberAccessLinker(cpg),
+          new MethodExternalDecoratorPass(cpg),
+          new ContainsEdgePass(cpg),
+          new NamespaceCreator(cpg)
         )
       case _ => Iterator()
     }

@@ -10,9 +10,41 @@ import scala.collection.mutable
   * @param environment A map of system environment variables.
   * */
 class InstallConfig(environment: Map[String, String] = sys.env) {
-  var rootPath: File = environment
-    .getOrElse("SHIFTLEFT_OCULAR_INSTALL_DIR", ".")
-    .toFile
+
+  /** determining the root path of the joern/ocular installation is rather complex unfortunately,
+    * because we support a variety of use cases:
+    * - running the installed distribution from the install dir
+    * - running the installed distribution anywhere else on the system
+    * - running a locally staged ocular/joern build (via `sbt stage` and then
+    *   either `./joern` or `cd joern-cli/target/universal/stage; ./joern`)
+    * - running a unit/integration test (note: the jars would be in the local cache, e.g. in ~/.coursier/cache)
+    */
+  lazy val rootPath: File = {
+    if (environment.contains("SHIFTLEFT_OCULAR_INSTALL_DIR")) {
+      environment("SHIFTLEFT_OCULAR_INSTALL_DIR").toFile
+    } else {
+      val uriToLibDir = classOf[io.shiftleft.console.InstallConfig].getProtectionDomain.getCodeSource.getLocation.toURI
+      val pathToLibDir = File(uriToLibDir).parent
+      findRootDirectory(pathToLibDir).getOrElse {
+        val cwd = File.currentWorkingDirectory
+        findRootDirectory(cwd).getOrElse(throw new AssertionError(s"""unable to find root installation directory
+                                   | context: tried to find marker file `$rootDirectoryMarkerFilename`
+                                   | started search in both $pathToLibDir and $cwd and searched 
+                                   | $maxSearchDepth directories upwards""".stripMargin))
+      }
+    }
+  }
+
+  private val rootDirectoryMarkerFilename = ".installation_root"
+  private val maxSearchDepth = 10
+  private def findRootDirectory(currentSearchDir: File, currentSearchDepth: Int = 0): Option[File] = {
+    if (currentSearchDir.list.map(_.name).contains(rootDirectoryMarkerFilename))
+      Some(currentSearchDir)
+    else if (currentSearchDepth < maxSearchDepth && currentSearchDir.parentOption.isDefined)
+      findRootDirectory(currentSearchDir.parent)
+    else
+      None
+  }
 }
 
 object InstallConfig {
@@ -20,7 +52,7 @@ object InstallConfig {
 }
 
 class ConsoleConfig(val install: InstallConfig = InstallConfig(),
-                    val frontend: LanguageFrontendConfig = LanguageFrontendConfig(),
+                    val frontend: FrontendConfig = FrontendConfig(),
                     val tools: ToolsConfig = ToolsConfig()) {}
 
 object ToolsConfig {
@@ -29,62 +61,12 @@ object ToolsConfig {
 
 class ToolsConfig(var imageViewer: String = "xdg-open")
 
-object LanguageFrontendConfig {
-  def apply(): LanguageFrontendConfig = new LanguageFrontendConfig()
+class FrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer()) {
+  def withArgs(args: Iterable[String]): FrontendConfig = {
+    new FrontendConfig(cmdLineParams ++ args)
+  }
 }
 
-class LanguageFrontendConfig(var csharp: CSharpFrontendConfig = CSharpFrontendConfig(),
-                             var fuzzyc: FuzzyCFrontendConfig = FuzzyCFrontendConfig(),
-                             var go: GoFrontendConfig = GoFrontendConfig(),
-                             var java: JavaFrontendConfig = JavaFrontendConfig(),
-                             var js: JsFrontendConfig = JsFrontendConfig(),
-                             var llvm: LlvmFrontendConfig = LlvmFrontendConfig(),
-                             var python: PythonFrontendConfig = PythonFrontendConfig(),
-                             var php: PhpFrontendConfig = PhpFrontendConfig(),
-                             var ghidra: GhidraFrontendConfig = GhidraFrontendConfig())
-
-class CSharpFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class FuzzyCFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class GoFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class JavaFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class JsFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class LlvmFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class PythonFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class PhpFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-class GhidraFrontendConfig(var cmdLineParams: Iterable[String] = mutable.Buffer())
-
-object CSharpFrontendConfig {
-  def apply(): CSharpFrontendConfig = new CSharpFrontendConfig()
-}
-
-object FuzzyCFrontendConfig {
-  def apply(): FuzzyCFrontendConfig = new FuzzyCFrontendConfig()
-}
-
-object GoFrontendConfig {
-  def apply(): GoFrontendConfig = new GoFrontendConfig()
-}
-
-object JavaFrontendConfig {
-  def apply(): JavaFrontendConfig = new JavaFrontendConfig()
-}
-
-object JsFrontendConfig {
-  def apply(): JsFrontendConfig = new JsFrontendConfig()
-}
-
-object LlvmFrontendConfig {
-  def apply(): LlvmFrontendConfig = new LlvmFrontendConfig()
-}
-
-object PythonFrontendConfig {
-  def apply(): PythonFrontendConfig = new PythonFrontendConfig()
-}
-
-object PhpFrontendConfig {
-  def apply(): PhpFrontendConfig = new PhpFrontendConfig()
-}
-
-object GhidraFrontendConfig {
-  def apply(): GhidraFrontendConfig = new GhidraFrontendConfig()
+object FrontendConfig {
+  def apply(): FrontendConfig = new FrontendConfig()
 }

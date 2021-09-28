@@ -36,8 +36,11 @@ trait PreprocessorStatementsLogger {
     logger.info(text + additionalInfo)
   }
 
+  protected def preprocessorStatements(translationUnit: IASTTranslationUnit): Iterable[IASTPreprocessorStatement] =
+    translationUnit.getAllPreprocessorStatements
+
   protected def logPreprocessorStatements(translationUnit: IASTTranslationUnit): Unit = {
-    translationUnit.getAllPreprocessorStatements.foreach(logPreprocessorStatement)
+    preprocessorStatements(translationUnit).foreach(logPreprocessorStatement)
   }
 
 }

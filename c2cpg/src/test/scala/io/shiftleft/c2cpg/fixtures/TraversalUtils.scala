@@ -1,12 +1,12 @@
-package io.shiftleft.c2cpg
+package io.shiftleft.c2cpg.fixtures
 
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
 import org.scalatest.matchers.should.Matchers
-import overflowdb._
+import overflowdb.{Node, _}
 
 trait TraversalUtils extends Matchers {
 
-  protected val fixture: CpgTestFixture
+  protected val fixture: TestProjectFixture
 
   def getMethod(name: String): List[Node] = {
     val result =

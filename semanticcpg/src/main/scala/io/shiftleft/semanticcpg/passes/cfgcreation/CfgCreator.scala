@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.passes.cfgcreation
 
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Operators}
+import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, DispatchTypes, EdgeTypes, Operators}
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgcreation.Cfg.CfgEdgeType
@@ -46,7 +46,7 @@ import overflowdb.traversal.Traversal
   * outgoing edges for which the destination node is yet to be determined as
   * the "fringe" of the control flow graph.
   */
-class CfgCreator(entryNode: Method) {
+class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
 
   import Cfg._
   import CfgCreator._
@@ -71,18 +71,12 @@ class CfgCreator(entryNode: Method) {
     * calculated by first obtaining the CFG for the method
     * and then resolving gotos.
     * */
-  def run(): Iterator[DiffGraph] = toDiffGraphs(
-    cfgForMethod(entryNode).withResolvedGotos().edges
-  )
-
-  private def toDiffGraphs(edges: List[CfgEdge]): Iterator[DiffGraph] = {
-    val diffGraph = DiffGraph.newBuilder
-    edges.foreach { edge =>
+  def run(): Unit = {
+    cfgForMethod(entryNode).withResolvedGotos().edges.foreach { edge =>
       // TODO: we are ignoring edge.edgeType because the
       //  CFG spec doesn't define an edge type at the moment
       diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.CFG)
     }
-    Iterator(diffGraph).map(_.build())
   }
 
   /**
@@ -136,6 +130,8 @@ class CfgCreator(entryNode: Method) {
         cfgForOrExpression(call)
       case call: Call if call.name == Operators.conditional =>
         cfgForConditionalExpression(call)
+      case call: Call if call.dispatchType == DispatchTypes.INLINED =>
+        cfgForInlinedCall(call)
       case _: Call | _: FieldIdentifier | _: Identifier | _: Literal | _: Unknown =>
         cfgForChildren(node) ++ cfgForSingleNode(node.asInstanceOf[CfgNode])
       case _ =>
@@ -267,24 +263,62 @@ class CfgCreator(entryNode: Method) {
 
   /**
     * A conditional expression is of the form `condition ? trueExpr ; falseExpr`
+    * where both `trueExpr` and `falseExpr` are optional.
     * We create the corresponding CFGs by creating CFGs for the three expressions
     * and adding edges between them. The new entry node is the condition entry
     * node.
     * */
   protected def cfgForConditionalExpression(call: Call): Cfg = {
     val conditionCfg = cfgFor(call.argument(1))
-    val trueCfg = cfgFor(call.argument(2))
-    val falseCfg = cfgFor(call.argument(3))
+    val trueCfg = call.argumentOption(2).map(cfgFor).getOrElse(Cfg.empty)
+    val falseCfg = call.argumentOption(3).map(cfgFor).getOrElse(Cfg.empty)
     val diffGraphs = edgesFromFringeTo(conditionCfg, trueCfg.entryNode, TrueEdge) ++
       edgesFromFringeTo(conditionCfg, falseCfg.entryNode, FalseEdge)
+
+    val trueFridge = if (trueCfg.entryNode.isDefined) {
+      trueCfg.fringe
+    } else {
+      conditionCfg.fringe.withEdgeType(TrueEdge)
+    }
+    val falseFridge = if (falseCfg.entryNode.isDefined) {
+      falseCfg.fringe
+    } else {
+      conditionCfg.fringe.withEdgeType(FalseEdge)
+    }
 
     Cfg
       .from(conditionCfg, trueCfg, falseCfg)
       .copy(
         entryNode = conditionCfg.entryNode,
         edges = conditionCfg.edges ++ trueCfg.edges ++ falseCfg.edges ++ diffGraphs,
-        fringe = trueCfg.fringe ++ falseCfg.fringe
+        fringe = trueFridge ++ falseFridge
       ) ++ cfgForSingleNode(call)
+  }
+
+  /**
+    * For macros, the AST contains a CALL node, along with child sub trees
+    * for all arguments, and a final sub tree that contains the inlined code.
+    * The corresponding CFG consists of the CFG for the call, an edge to the
+    * exit and an edge to the CFG of the inlined code. We choose this
+    * representation because it allows both queries that use the macro
+    * reference as well as queries that reference the inline code to
+    * be chosen as sources/sinks in data flow queries.
+    * */
+  def cfgForInlinedCall(call: Call): Cfg = {
+    val cfgForMacroCall = call.argument.l
+      .map(cfgFor)
+      .reduceOption((x, y) => x ++ y)
+      .getOrElse(Cfg.empty) ++ cfgForSingleNode(call)
+    val cfgForExpansion = call.astChildren.lastOption.map(cfgFor).getOrElse(Cfg.empty)
+    val cfg = Cfg
+      .from(cfgForMacroCall, cfgForExpansion)
+      .copy(
+        entryNode = cfgForMacroCall.entryNode,
+        edges = cfgForMacroCall.edges ++ cfgForExpansion.edges ++ cfgForExpansion.entryNode.toList.flatMap(x =>
+          singleEdge(call, x)),
+        fringe = cfgForMacroCall.fringe ++ cfgForExpansion.fringe
+      )
+    cfg
   }
 
   /**

@@ -43,5 +43,4 @@ class CfgTests extends CCodeToCpgSuite {
   "should find that method does not post dominate anything" in {
     cpg.method("foo").postDominates.l.size shouldBe 0
   }
-
 }
