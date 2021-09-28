@@ -8,7 +8,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{BeforeAndAfterAll, Inside}
 
-import java.nio.file.{FileSystemNotFoundException, NoSuchFileException, Path}
+import java.nio.file.{NoSuchFileException, Path}
 import scala.io.Source
 import scala.util.Try
 
@@ -28,6 +28,7 @@ class ScriptManagerTest extends AnyWordSpec with Matchers with Inside with Befor
 
   private object TestScriptExecutor extends AmmoniteExecutor {
     override protected def predef: String = ""
+
     override def runScript(scriptPath: Path, parameters: Map[String, String], cpg: Cpg): IO[Any] = IO.fromTry(
       Try {
         val source = Source.fromFile(scriptPath.toFile)
@@ -89,7 +90,7 @@ class ScriptManagerTest extends AnyWordSpec with Matchers with Inside with Befor
     }
 
     "throw an exception if the specified CPG can not be found" in withScriptManager { scriptManager =>
-      intercept[FileSystemNotFoundException] {
+      intercept[Exception] {
         scriptManager.runScript("general/list-funcs.sc", Map.empty, "cake.bin.zip")
       }
     }

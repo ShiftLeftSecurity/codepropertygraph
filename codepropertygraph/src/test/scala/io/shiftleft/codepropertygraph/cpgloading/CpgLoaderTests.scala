@@ -5,8 +5,6 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.Config
 
-import java.nio.file.FileSystemNotFoundException
-
 /**
   * Specification of the CPGLoader. The loader allows CPGs to be loaded
   * from the CPG protobuf file format (based on Google protocol buffers).
@@ -38,7 +36,7 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
     }
 
     "throw an appropriate exception if the provided filename that refers to a non-existing file" in {
-      an[FileSystemNotFoundException] should be thrownBy CpgLoader.load("invalid/path/cpg.bin.zip")
+      an[Exception] should be thrownBy CpgLoader.load("invalid/path/cpg.bin.zip")
     }
 
     /**
