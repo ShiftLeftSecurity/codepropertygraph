@@ -267,6 +267,13 @@ object Operators extends SchemaBase {
                value = "<operator>.notNullAssert",
                valueType = ValueTypes.STRING,
                comment = "Converts any value to a not-null type"),
+      Constant(
+        name = "lengthOf",
+        value = "<operator>.lengthOf",
+        valueType = ValueTypes.STRING,
+        comment =
+          "Returns the length of the given collection e.g. (new int[]{ 1, 2, 3 }).length in Java or len([1, 2, 3]) in Python"
+      ),
     )
 
   }
