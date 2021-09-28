@@ -5,8 +5,6 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.Config
 
-import java.nio.file.FileSystemNotFoundException
-
 /**
   * Specification of the CPGLoader. The loader allows CPGs to be loaded
   * from the CPG protobuf file format (based on Google protocol buffers).
