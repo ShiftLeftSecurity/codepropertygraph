@@ -101,8 +101,6 @@ trait AstCreatorHelper {
 
   protected def typeFor(node: IASTNode): String = cleanType(ASTTypeUtil.getNodeType(node))
 
-  protected def typeFor(node: IASTTypeId): String = cleanType(ASTTypeUtil.getType(node))
-
   private def notHandledText(node: IASTNode): String =
     s"""Node '${node.getClass.getSimpleName}' not handled yet!
        |  Code: '${node.getRawSignature}'
