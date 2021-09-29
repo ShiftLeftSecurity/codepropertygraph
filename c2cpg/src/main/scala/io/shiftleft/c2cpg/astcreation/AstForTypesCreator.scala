@@ -99,8 +99,15 @@ trait AstForTypesCreator {
             .typeFullName(registerType(declTypeName))
             .order(order))
       case _ if declarator.isInstanceOf[IASTArrayDeclarator] =>
-        Ast(newTypeDecl(name, registerType(name), order = order))
-      case _ if !scope.isEmpty =>
+        val tpe = typeFor(declarator)
+        val l = NewLocal()
+          .code(name)
+          .name(name)
+          .typeFullName(registerType(tpe))
+          .order(order)
+        scope.addToScope(name, (l, tpe))
+        Ast(l)
+      case _ =>
         val l = NewLocal()
           .code(name)
           .name(name)
@@ -108,8 +115,6 @@ trait AstForTypesCreator {
           .order(order)
         scope.addToScope(name, (l, declTypeName))
         Ast(l)
-      case _ if scope.isEmpty =>
-        Ast(newTypeDecl(name, registerType(name), order = order))
     }
   }
 

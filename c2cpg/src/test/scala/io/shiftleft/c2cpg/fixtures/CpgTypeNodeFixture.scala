@@ -5,7 +5,9 @@ import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.passes.AstCreationPass
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.IntervalKeyPool
-import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
+import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.MethodStubCreator
+import io.shiftleft.semanticcpg.passes.linking.linker.Linker
+import io.shiftleft.semanticcpg.passes.typenodes.{TypeDeclStubCreator, TypeNodePass}
 
 object CpgTypeNodeFixture {
   def apply(code: String, fileName: String = "test.c")(f: Cpg => Unit): Unit = {
@@ -19,6 +21,9 @@ object CpgTypeNodeFixture {
       val astCreationPass = new AstCreationPass(filenames, cpg, keyPool, Config())
       astCreationPass.createAndApply()
       new TypeNodePass(astCreationPass.usedTypes(), cpg).createAndApply()
+      new TypeDeclStubCreator(cpg).createAndApply()
+      new MethodStubCreator(cpg).createAndApply()
+      new Linker(cpg).createAndApply()
     }
     f(cpg)
   }
