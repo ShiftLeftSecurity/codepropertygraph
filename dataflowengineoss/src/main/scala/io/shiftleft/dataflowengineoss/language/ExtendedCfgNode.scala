@@ -1,7 +1,7 @@
 package io.shiftleft.dataflowengineoss.language
 
 import io.shiftleft.codepropertygraph.generated.nodes.CfgNode
-import io.shiftleft.dataflowengineoss.queryengine.{Engine, EngineContext, PathElement, ReachableByResult}
+import io.shiftleft.dataflowengineoss.queryengine.{Engine, EngineContext, PathElement, ReachableByResult, ResultTable}
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import overflowdb.traversal._
 
@@ -28,12 +28,12 @@ class ExtendedCfgNode(val traversal: Traversal[CfgNode]) extends AnyVal {
 
   def reachableBy[NodeType <: CfgNode](sourceTravs: Traversal[NodeType]*)(
       implicit context: EngineContext): Traversal[NodeType] = {
-    val reachedSources = reachableByInternal(sourceTravs).map(_.source)
+    val reachedSources = reachableByInternal(sourceTravs)._1.map(_.source)
     Traversal.from(reachedSources).cast[NodeType]
   }
 
   def reachableByFlows[A <: CfgNode](sourceTravs: Traversal[A]*)(implicit context: EngineContext): Traversal[Path] = {
-    val paths = reachableByInternal(sourceTravs)
+    val paths = reachableByInternal(sourceTravs)._1
       .map { result =>
         // We can get back results that start in nodes that are invisible
         // according to the semantic, e.g., arguments that are only used
@@ -52,18 +52,22 @@ class ExtendedCfgNode(val traversal: Traversal[CfgNode]) extends AnyVal {
     paths.to(Traversal)
   }
 
+  def reachableByTable[NodeType <: CfgNode](sourceTravs: Traversal[NodeType]*)(
+      implicit context: EngineContext): ResultTable = {
+    reachableByInternal(sourceTravs)._2
+  }
+
   private def removeConsecutiveDuplicates[T](l: Vector[T]): List[T] = {
     l.headOption.map(x => x :: l.sliding(2).collect { case Seq(a, b) if a != b => b }.toList).getOrElse(List())
   }
 
   private def reachableByInternal[NodeType <: CfgNode](sourceTravs: Seq[Traversal[NodeType]])(
-      implicit context: EngineContext): List[ReachableByResult] = {
+      implicit context: EngineContext): (List[ReachableByResult], ResultTable) = {
     val sources: List[CfgNode] =
       sourceTravs
         .flatMap(_.toList)
         .collect { case n: CfgNode => n }
         .toList
-
     val sinks = traversal.dedup.toList.sortBy(_.id)
     val engine = new Engine(context)
     val result = engine.backwards(sinks, sources)
