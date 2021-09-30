@@ -34,11 +34,15 @@ class Engine(context: EngineContext) {
 
   /**
     * Determine flows from sources to sinks by analyzing backwards from sinks.
+    * Returns the list of results along with the ResultTable, a cache of known
+    * paths created during the analysis.
     * */
-  def backwards(sinks: List[CfgNode], sources: List[CfgNode]): List[ReachableByResult] = {
+  def backwards(sinks: List[CfgNode], sources: List[CfgNode]): (List[ReachableByResult], ResultTable) = {
     val sourcesSet = sources.toSet
-    val tasks = sinks.map(sink => ReachableByTask(sink, sourcesSet, new ResultTable))
-    solveTasks(tasks, sourcesSet)
+    val table = new ResultTable
+    val tasks = sinks.map(sink => ReachableByTask(sink, sourcesSet, table))
+    val results = solveTasks(tasks, sourcesSet)
+    (results, table)
   }
 
   private def solveTasks(tasks: List[ReachableByTask], sources: Set[CfgNode]): List[ReachableByResult] = {
