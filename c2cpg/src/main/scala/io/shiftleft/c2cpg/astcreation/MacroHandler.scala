@@ -16,7 +16,11 @@ trait MacroHandler {
   /**
     * For the given node, determine if it is expanded from a macro, and if so,
     * create a Call node to represent the macro invocation and attach `ast`
-    * as its child.
+    * as its child. Also create a METHOD node to represent the macro if it has
+    * not been created as part of processing the current translation unit.
+    * Removal of duplicates that result from usage of the same macro in multiple
+    * compilation units is deferred to a pass that runs once all ASTs have been
+    * created.
     * */
   def asChildOfMacroCall(node: IASTNode, ast: Ast, order: Int): Ast = {
     val macroCallAst = extractMatchingMacro(node).map {
@@ -43,14 +47,12 @@ trait MacroHandler {
     * */
   private def extractMatchingMacro(node: IASTNode): Option[(IASTPreprocessorMacroDefinition, List[String])] = {
     expandedFromMacro(node)
-      .filterNot { expandedFrom =>
-        expandedFromMacro(node.getParent)
-          .map(_.getExpansion.getMacroDefinition)
-          .contains(expandedFrom.getExpansion.getMacroDefinition)
+      .filterNot { m =>
+        isExpandedFrom(node.getParent, m)
       }
-      .foreach { expandedFrom =>
+      .foreach { m =>
         val nodeOffset = node.getFileLocation.getNodeOffset
-        val macroName = expandedFrom.getExpansion.getMacroDefinition.getName.toString
+        val macroName = m.getExpansion.getMacroDefinition.getName.toString
         while (nodeOffsetMacroPairs.headOption.exists(x => x._1 <= nodeOffset)) {
           val (_, macroDefinition) = nodeOffsetMacroPairs.head
           nodeOffsetMacroPairs.remove(0)
@@ -62,6 +64,16 @@ trait MacroHandler {
         }
       }
     None
+  }
+
+  /**
+    * Determine whether `node` is expanded from the macro expansion
+    * at `loc`.
+    * */
+  private def isExpandedFrom(node: IASTNode, loc: IASTMacroExpansionLocation) = {
+    expandedFromMacro(node)
+      .map(_.getExpansion.getMacroDefinition)
+      .contains(loc.getExpansion.getMacroDefinition)
   }
 
   /**
