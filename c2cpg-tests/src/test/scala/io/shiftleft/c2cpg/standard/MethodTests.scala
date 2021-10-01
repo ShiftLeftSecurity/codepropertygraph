@@ -15,7 +15,7 @@ class MethodTests extends CCodeToCpgSuite {
     x.name shouldBe "main"
     x.fullName shouldBe "main"
     x.code shouldBe "int main (int argc,char **argv)"
-    x.signature shouldBe "int main (int,char * *)"
+    x.signature shouldBe "int main (int,char**)"
     x.isExternal shouldBe false
     x.order shouldBe 1
     x.filename.startsWith("/") shouldBe true

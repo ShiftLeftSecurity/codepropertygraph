@@ -66,7 +66,7 @@ class NodeTypeStartersTests extends CCodeToCpgSuite {
   }
 
   "should allow retrieving (used) types" in {
-    cpg.typ.name.toSet shouldBe Set("int", "void", "char * *", "ANY", "foo")
+    cpg.typ.name.toSet shouldBe Set("int", "void", "char**", "ANY", "foo")
   }
 
   "should allow retrieving namespaces" in {
