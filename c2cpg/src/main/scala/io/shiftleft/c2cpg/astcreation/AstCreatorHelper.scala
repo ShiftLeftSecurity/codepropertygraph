@@ -231,7 +231,7 @@ trait AstCreatorHelper {
       case _                      => ""
     }
     if (pointers.isEmpty) { s"$nodeAsString$arr" } else {
-      s"$nodeAsString$arr ${"* " * pointers.size}".strip()
+      s"$nodeAsString$arr${"*" * pointers.size}".strip()
     }
   }
 
@@ -272,6 +272,9 @@ trait AstCreatorHelper {
       case s: IASTSimpleDeclaration if s.getParent.isInstanceOf[ICASTKnRFunctionDeclarator] =>
         val decl = s.getDeclarators.head
         pointersAsString(s.getDeclSpecifier, decl)
+      case s: IASTSimpleDeclSpecifier if s.getParent.isInstanceOf[IASTSimpleDeclaration] =>
+        val parentDecl = s.getParent.asInstanceOf[IASTSimpleDeclaration].getDeclarators.head
+        pointersAsString(s, parentDecl)
       case s: IASTSimpleDeclSpecifier =>
         ASTStringUtil.getReturnTypeString(s, null)
       case s: IASTNamedTypeSpecifier if s.getParent.isInstanceOf[IASTParameterDeclaration] =>

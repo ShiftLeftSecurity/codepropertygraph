@@ -36,12 +36,29 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
 
   "Method AST layout" should {
 
+    "be correct for method signature" in TestAstOnlyFixture("""
+       |char *foo() {};
+       |char *hello();
+       |""".stripMargin) { cpg =>
+      cpg.method("foo").l match {
+        case List(foo) =>
+          foo.signature shouldBe "char* foo ()"
+        case _ => fail()
+      }
+      cpg.method("hello").l match {
+        case List(hello) =>
+          hello.signature shouldBe "char* hello ()"
+        case _ => fail()
+      }
+    }
+
     "be correct for packed args" in TestAstOnlyFixture("""
        |void foo(int x, int*... args) {};
        |""".stripMargin,
                                                        "test.cpp") { cpg =>
       cpg.method("foo").l match {
         case List(m) =>
+          m.signature shouldBe "void foo (int,int*)"
           m.parameter.l match {
             case List(x, args) =>
               x.name shouldBe "x"
@@ -51,7 +68,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
               x.order shouldBe 1
               args.name shouldBe "args"
               args.code shouldBe "int*... args"
-              args.typeFullName shouldBe "int *"
+              args.typeFullName shouldBe "int*"
               args.isVariadic shouldBe true
               args.order shouldBe 2
             case _ => fail()
@@ -96,11 +113,11 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
             case List(x, y) =>
               x.name shouldBe "x"
               x.code shouldBe "int *x;"
-              x.typeFullName shouldBe "int *"
+              x.typeFullName shouldBe "int*"
               x.order shouldBe 1
               y.name shouldBe "y"
               y.code shouldBe "int *y;"
-              y.typeFullName shouldBe "int *"
+              y.typeFullName shouldBe "int*"
               y.order shouldBe 2
             case _ => fail()
           }
@@ -393,7 +410,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
         |""".stripMargin) { cpg =>
       cpg.method.name("method").parameter.l match {
         case List(param: MethodParameterIn) =>
-          param.typeFullName shouldBe "a_struct_type *"
+          param.typeFullName shouldBe "a_struct_type*"
           param.name shouldBe "a_struct"
         case _ => fail()
       }
@@ -408,7 +425,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
        |""".stripMargin) { cpg =>
       cpg.method.name("method").parameter.l match {
         case List(param: MethodParameterIn) =>
-          param.typeFullName shouldBe "struct date *"
+          param.typeFullName shouldBe "struct date*"
           param.name shouldBe "date"
         case _ => fail()
       }
@@ -469,7 +486,7 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
       |""".stripMargin) { cpg =>
       cpg.method.name("method").parameter.l match {
         case List(param: MethodParameterIn) =>
-          param.typeFullName shouldBe "a_struct_type[] *"
+          param.typeFullName shouldBe "a_struct_type[]*"
           param.name shouldBe "a_struct"
         case _ => fail()
       }
