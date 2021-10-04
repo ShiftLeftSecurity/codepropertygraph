@@ -274,6 +274,12 @@ object Operators extends SchemaBase {
         comment =
           "Returns the length of the given collection e.g. (new int[]{ 1, 2, 3 }).length in Java or len([1, 2, 3]) in Python"
       ),
+      Constant(
+        name = "safeNavigation",
+        value = "<operator>.safeNavigation",
+        valueType = ValueTypes.STRING,
+        comment = "Returns null if the first operator is null, otherwise performs a dereferencing operation"
+      ),
     )
 
   }
