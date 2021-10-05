@@ -1,8 +1,9 @@
 package io.shiftleft.c2cpg.querying
 
-import io.shiftleft.c2cpg.testfixtures.CCodeToCpgSuite
+import io.shiftleft.c2cpg.testfixtures.{CCodeToCpgSuite, DataFlowCodeToCpgSuite}
 import io.shiftleft.codepropertygraph.generated.nodes.{Call, Identifier, Literal}
 import io.shiftleft.codepropertygraph.generated.{DispatchTypes, Operators}
+import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.semanticcpg.language._
 
 class MacroHandlingTests1 extends CCodeToCpgSuite {
@@ -139,5 +140,43 @@ class MacroHandlingTests5 extends CCodeToCpgSuite {
     call.name shouldBe "A_MACRO"
     call.code shouldBe "A_MACRO"
     call.argument.size shouldBe 0
+  }
+}
+
+class CfgMacroTests extends DataFlowCodeToCpgSuite {
+  override val code: String =
+    """
+       #define MP4_GET4BYTES( dst ) MP4_GETX_PRIVATE( dst, GetDWBE(p_peek), 4 )
+       #define MP4_GETX_PRIVATE(dst, code, size) \
+    do \
+    { \
+        if( (i_read) >= (size) ) \
+        { \
+            dst = (code); \
+            p_peek += (size); \
+            i_read -= (size); \
+        } \
+        else \
+        { \
+            dst = 0; \
+            i_read = 0; \
+        } \
+    } while(0)
+
+    int foo() {
+       unsigned int x;
+       MP4_GET4BYTES(x);
+       sink(x);
+    }
+
+    """.stripMargin
+
+  "should create correct CFG for macro expansion and find data flow" in {
+    val List(callToMacro: Call) = cpg.method("foo").call.dispatchType(DispatchTypes.INLINED).l
+    callToMacro.argument.code.l shouldBe List("x")
+    callToMacro.cfgNext.code.toSet shouldBe Set("x", "i_read")
+    val source = cpg.method("foo").call.name("MP4_GET4BYTES").argument(1).l
+    val sink = cpg.method("foo").call.name("sink").argument(1).l
+    sink.reachableByFlows(source).l.foreach(println)
   }
 }
