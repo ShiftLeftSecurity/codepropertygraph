@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg.astcreation
 
 import io.shiftleft.codepropertygraph.generated.DispatchTypes
-import io.shiftleft.codepropertygraph.generated.nodes.{NewCall, NewIdentifier}
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNodeNew, NewCall}
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast.{IASTMacroExpansionLocation, IASTNode, IASTPreprocessorMacroDefinition}
 import org.eclipse.cdt.internal.core.parser.scanner.MacroArgumentExtractor
@@ -72,6 +72,15 @@ trait MacroHandler {
       .contains(loc.getExpansion.getMacroDefinition)
   }
 
+  private def argumentTrees(arguments: List[String], ast: Ast): List[Option[Ast]] = {
+    arguments.map { arg =>
+      val rootNode = ast.nodes.find(_.properties.get("CODE").contains(arg.replace(" ", "")))
+      rootNode.map { x =>
+        ast.subTreeCopy(x.asInstanceOf[AstNodeNew], 1)
+      }
+    }
+  }
+
   /**
     * Create an AST that represents a macro expansion as a call.
     * The AST is rooted in a CALL node and contains sub trees
@@ -83,9 +92,6 @@ trait MacroHandler {
                                  macroDef: IASTPreprocessorMacroDefinition,
                                  arguments: List[String],
                                  order: Int): Ast = {
-
-    println(ast.root)
-
     val name = macroDef.getName.toString
     val code = node.getRawSignature.replaceAll(";$", "")
     val callNode = NewCall()
@@ -99,22 +105,10 @@ trait MacroHandler {
       .order(order)
       .argumentIndex(order)
 
-    // TODO We want to clone the ASTS of arguments here
-    // and then attach those ASTS to the AST we return
-    // For now, we instead create identifier nodes
-    // val nodes = ast.nodes
-    // val argRoots = arguments.flatMap { arg =>
-    //  nodes.find(x => x.properties.get("CODE").contains(arg))
-    // }
-
-    val argAsts = arguments.zipWithIndex.map {
-      case (arg, i) =>
-        Ast(NewIdentifier().name(arg).code(arg).order(i + 1).argumentIndex(i + 1))
-    }
-
+    val argAsts = argumentTrees(arguments, ast).map(_.getOrElse(Ast()))
     Ast(callNode)
       .withChildren(argAsts)
-      .withArgEdges(callNode, argAsts.flatMap(_.root))
+      .withArgEdges(callNode, argAsts.flatMap(x => x.root))
   }
 
   private val nodeOffsetMacroPairs: mutable.Buffer[(Int, IASTPreprocessorMacroDefinition)] = {

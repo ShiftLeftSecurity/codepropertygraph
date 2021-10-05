@@ -1,7 +1,7 @@
 package io.shiftleft.x2cpg
 
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
-import io.shiftleft.codepropertygraph.generated.nodes.NewNode
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNodeNew, NewNode}
 import io.shiftleft.passes.DiffGraph
 
 case class AstEdge(src: NewNode, dst: NewNode)
@@ -119,6 +119,21 @@ case class Ast(nodes: List[NewNode],
     this.copy(argEdges = argEdges ++ dsts.map { d =>
       AstEdge(src, d)
     })
+  }
+
+  /**
+    * Returns a deep copy of the sub tree rooted in `node`, taking
+    * into account only AST edges.
+    * */
+  def subTreeCopy(node: AstNodeNew, order: Int): Ast = {
+    val newNode = node.copy
+    newNode.order = order
+    val edgesToChildren = edges.filter(_.src == node)
+    val astChildren = edgesToChildren.map(_.dst).map(_.copy)
+    Ast(newNode)
+      .withChildren(
+        astChildren.zipWithIndex.map { case (x, i) => this.subTreeCopy(x.asInstanceOf[AstNodeNew], i) }
+      )
   }
 
 }

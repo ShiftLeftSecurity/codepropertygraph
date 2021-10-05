@@ -11,19 +11,23 @@ class MacroHandlingTests1 extends CCodeToCpgSuite {
     """
        #define A_MACRO(x) (x = 10)
        int foo() {
-        int y;
-        A_MACRO(y);
+        int *y;
+        A_MACRO(*y);
         return 10 * y;
        }
     """.stripMargin
 
   "should correctly expand macro" in {
     val List(x: Call) = cpg.method("foo").call.nameExact(Operators.assignment).l
-    x.code shouldBe "y = 10"
+    x.code shouldBe "*y = 10"
     x.dispatchType shouldBe DispatchTypes.STATIC_DISPATCH
-    val List(l: Identifier, r: Literal) = x.astMinusRoot.l.sortBy(_.order)
-    l.name shouldBe "y"
-    r.code shouldBe "10"
+    val List(macroCall: Call) = cpg.method("foo").call.nameExact("A_MACRO").l
+    macroCall.code shouldBe "A_MACRO(*y)"
+    val List(arg: Call) = macroCall.argument.l
+    arg.name shouldBe Operators.indirection
+    arg.code shouldBe "*y"
+    val List(identifier: Identifier) = arg.astChildren.l
+    identifier.name shouldBe "y"
   }
 }
 
