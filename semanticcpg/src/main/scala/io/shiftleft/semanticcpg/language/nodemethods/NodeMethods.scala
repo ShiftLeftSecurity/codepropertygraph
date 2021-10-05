@@ -29,7 +29,6 @@ class NodeMethods(val node: AbstractNode) extends AnyVal with NodeExtension {
               NewTag()
                 .name(name)
                 .value(value)
-                .build
                 .asInstanceOf[TagBase]
           }
       case _ =>
