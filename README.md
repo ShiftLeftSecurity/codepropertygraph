@@ -143,4 +143,3 @@ Schema written to: /tmp/schema.json
 - The ShiftLeft Tinkergraph: https://github.com/ShiftLeftSecurity/tinkergraph-gremlin
 
 - ShiftLeft OverflowDB: https://github.com/ShiftLeftSecurity/overflowdb
-
