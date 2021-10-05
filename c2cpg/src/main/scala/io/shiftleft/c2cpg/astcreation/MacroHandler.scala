@@ -25,11 +25,7 @@ trait MacroHandler {
   def asChildOfMacroCall(node: IASTNode, ast: Ast, order: Int): Ast = {
     val macroCallAst = extractMatchingMacro(node).map {
       case (mac, args) =>
-        createMacroCallAst( // ast,
-                           node,
-                           mac,
-                           args,
-                           order)
+        createMacroCallAst(ast, node, mac, args, order)
     }
     if (macroCallAst.isDefined) {
       // TODO order/argument_index of `ast`'s root needs to be set to 1
@@ -82,11 +78,14 @@ trait MacroHandler {
     * for arguments. These are also connected to the AST via
     * ARGUMENT edges.
     * */
-  private def createMacroCallAst( // ast: Ast,
+  private def createMacroCallAst(ast: Ast,
                                  node: IASTNode,
                                  macroDef: IASTPreprocessorMacroDefinition,
                                  arguments: List[String],
                                  order: Int): Ast = {
+
+    println(ast.root)
+
     val name = macroDef.getName.toString
     val code = node.getRawSignature.replaceAll(";$", "")
     val callNode = NewCall()
