@@ -46,7 +46,7 @@ class AstCreator(val filename: String,
     Ast.storeInDiffGraph(astForFile(parserResult), diffGraph)
 
   private def astForFile(parserResult: IASTTranslationUnit): Ast = {
-    val cpgFile = Ast(NewFile(name = filename, order = 0))
+    val cpgFile = Ast(NewFile().name(filename).order(0))
     val translationUnitAst = astForTranslationUnit(parserResult)
 
     val ast = cpgFile.withChild(translationUnitAst)
