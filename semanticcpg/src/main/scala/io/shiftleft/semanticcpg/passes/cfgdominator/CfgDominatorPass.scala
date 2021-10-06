@@ -6,8 +6,6 @@ import io.shiftleft.codepropertygraph.generated.nodes.{Method, StoredNode}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
-import scala.collection.mutable
-
 /**
   * This pass has no prerequisites.
   */
@@ -34,8 +32,8 @@ class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
   }
 
   private def addDomTreeEdges(dstGraph: DiffGraph.Builder,
-                              cfgNodeToImmediateDominator: mutable.Map[StoredNode, StoredNode]): Unit = {
-    // TODO do not iterate over potential hash map to ensure same interation order for
+                              cfgNodeToImmediateDominator: Map[StoredNode, StoredNode]): Unit = {
+    // TODO do not iterate over potential hash map to ensure same iteration order for
     // edge creation.
     cfgNodeToImmediateDominator.foreach {
       case (node, immediateDominator) =>
@@ -44,8 +42,8 @@ class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
   }
 
   private def addPostDomTreeEdges(dstGraph: DiffGraph.Builder,
-                                  cfgNodeToPostImmediateDominator: mutable.Map[StoredNode, StoredNode]): Unit = {
-    // TODO do not iterate over potential hash map to ensure same interation order for
+                                  cfgNodeToPostImmediateDominator: Map[StoredNode, StoredNode]): Unit = {
+    // TODO do not iterate over potential hash map to ensure same iteration order for
     // edge creation.
     cfgNodeToPostImmediateDominator.foreach {
       case (node, immediatePostDominator) =>
