@@ -9,25 +9,28 @@ import io.shiftleft.semanticcpg.language._
 class MacroHandlingTests1 extends CCodeToCpgSuite {
   override val code: String =
     """
-       #define A_MACRO(x) (x = 10)
+       #define A_MACRO(x,c) (x = 10 + c)
        int foo() {
         int *y;
-        A_MACRO(*y);
+        A_MACRO(*y, 2);
         return 10 * y;
        }
     """.stripMargin
 
   "should correctly expand macro" in {
     val List(x: Call) = cpg.method("foo").call.nameExact(Operators.assignment).l
-    x.code shouldBe "*y = 10"
+    x.code shouldBe "*y = 10 + 2"
     x.dispatchType shouldBe DispatchTypes.STATIC_DISPATCH
     val List(macroCall: Call) = cpg.method("foo").call.nameExact("A_MACRO").l
-    macroCall.code shouldBe "A_MACRO(*y)"
-    val List(arg: Call) = macroCall.argument.l
-    arg.name shouldBe Operators.indirection
-    arg.code shouldBe "*y"
-    val List(identifier: Identifier) = arg.argument.l
+    macroCall.code shouldBe "A_MACRO(*y, 2)"
+    val List(arg1: Call, arg2: Literal) = macroCall.argument.l.sortBy(_.order)
+    arg1.name shouldBe Operators.indirection
+    arg1.code shouldBe "*y"
+    val List(identifier: Identifier) = arg1.argument.l
     identifier.name shouldBe "y"
+    identifier.order shouldBe 1
+    arg2.code shouldBe "2"
+    arg2.order shouldBe 2
   }
 }
 
