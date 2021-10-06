@@ -43,4 +43,14 @@ object NodeOrdering {
       .map { case (node, _) => node }
   }
 
+  /**
+    * For a list of (node, number) pairs, return the list of nodes obtained
+    * by sorting nodes according to number.
+    * */
+  def nodeList[NodeType](nodeNumberPairs: List[(NodeType, Int)]): List[NodeType] = {
+    nodeNumberPairs
+      .sortBy { case (_, num) => num }
+      .map { case (node, _) => node }
+  }
+
 }

@@ -52,6 +52,18 @@ class MethodMethods(val method: Method) extends AnyVal with NodeExtension with H
     )
   }
 
+  /**
+    * List of CFG nodes in post order
+    * */
+  def postOrder: Traversal[CfgNode] = {
+    def expand(x: CfgNode) = { x.cfgNext.iterator }
+    Traversal.from(
+      NodeOrdering.nodeList(
+        NodeOrdering.postOrderNumbering(method, expand).toList
+      )
+    )
+  }
+
   override def location: NewLocation = {
     LocationCreator(
       method,
