@@ -1,4 +1,4 @@
-package io.shiftleft.semanticcpg.passes.cfgdominator
+package io.shiftleft.semanticcpg.language
 
 import scala.collection.mutable
 

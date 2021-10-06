@@ -1,5 +1,7 @@
 package io.shiftleft.semanticcpg.passes.cfgdominator
 
+import io.shiftleft.semanticcpg.language.NodeOrdering
+
 class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
 
   /**
