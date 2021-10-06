@@ -16,7 +16,7 @@ class DataFlowSolver {
     var out: Map[StoredNode, T] = problem.inOutInit.initOut
     var in = problem.inOutInit.initIn
     val workList = mutable.Set.empty[StoredNode]
-    workList ++= problem.flowGraph.allNodes
+    workList ++= problem.flowGraph.allNodesReversePostOrder
 
     while (workList.nonEmpty) {
       val newEntries = workList.flatMap { n =>
@@ -51,7 +51,7 @@ class DataFlowSolver {
     var out: Map[StoredNode, T] = problem.inOutInit.initOut
     var in = problem.inOutInit.initIn
     val workList = mutable.Set.empty[StoredNode]
-    workList ++= problem.flowGraph.allNodes
+    workList ++= problem.flowGraph.allNodesPostOrder
 
     while (workList.nonEmpty) {
       val newEntries = workList.flatMap { n =>

@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.passes.cfgdominator
 
-import scala.collection.mutable
+import io.shiftleft.semanticcpg.language.NodeOrdering
 
 class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
 
@@ -9,24 +9,30 @@ class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
     * Since the cfgEntry does not have an immediate dominator, it has no entry in the
     * return map.
     *
-    * The used algorithm is from: "A Simple, Fast Dominance Algorithm" from
+    * The algorithm is from: "A Simple, Fast Dominance Algorithm" from
     * "Keith D. Cooper, Timothy J. Harvey, and Ken Kennedy".
     */
-  def calculate(cfgEntry: NodeType): mutable.Map[NodeType, NodeType] = {
+  def calculate(cfgEntry: NodeType): Map[NodeType, NodeType] = {
     val UNDEFINED = -1
-    val postOrderNumbering = createPostOrderNumbering(cfgEntry)
-    val indexOf = postOrderNumbering.withDefaultValue(UNDEFINED) // Index of each node into dominators array.
+    def expand(x: NodeType) = { adapter.successors(x).iterator }
+    def expandBack(x: NodeType) = { adapter.predecessors(x).iterator }
+
+    val postOrderNumbering = NodeOrdering.postOrderNumbering(cfgEntry, expand)
+    val nodesInReversePostOrder = NodeOrdering.reverseNodeList(postOrderNumbering.toList).filterNot(_ == cfgEntry)
+    // Index of each node into dominators array.
+    val indexOf = postOrderNumbering.withDefaultValue(UNDEFINED)
     // We use withDefault because unreachable/dead
     // code nodes are not numbered but may be touched
     // as predecessors of reachable nodes.
-    val nodesInReversePostOrder = postOrderNumbering.toList // Does not contain entry.
-      .sortBy { case (_, index) => -index }
-      .map { case (node, _) => node }
-      .filter { _ != cfgEntry }
-    val dominators = Array.fill(indexOf.size)(UNDEFINED)
 
-    // Used in places where index might be UNDEFINED.
-    def saveDominators(index: Int): Int = {
+    val dominators = Array.fill(indexOf.size)(UNDEFINED)
+    dominators(indexOf(cfgEntry)) = indexOf(cfgEntry)
+
+    /**
+      * Retrieve index of immediate dominator for node with given index. If the
+      * index is `UNDEFINED`, UNDEFINED is returned.
+      * */
+    def safeDominators(index: Int): Int = {
       if (index != UNDEFINED) {
         dominators(index)
       } else {
@@ -34,24 +40,18 @@ class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
       }
     }
 
-    dominators(indexOf(cfgEntry)) = indexOf(cfgEntry)
-
     var changed = true
     while (changed) {
       changed = false
       nodesInReversePostOrder.foreach { node =>
-        val firstNotUndefinedPred = adapter
-          .predecessors(node)
-          .iterator
-          .find { predecessor =>
-            saveDominators(indexOf(predecessor)) != UNDEFINED
-          }
-          .get
+        val firstNotUndefinedPred = expandBack(node).find { predecessor =>
+          safeDominators(indexOf(predecessor)) != UNDEFINED
+        }.get
 
         var newImmediateDominator = indexOf(firstNotUndefinedPred)
-        adapter.predecessors(node).iterator.foreach { predecessor =>
+        expandBack(node).foreach { predecessor =>
           val predecessorIndex = indexOf(predecessor)
-          if (saveDominators(predecessorIndex) != UNDEFINED) {
+          if (safeDominators(predecessorIndex) != UNDEFINED) {
             newImmediateDominator = intersect(dominators, predecessorIndex, newImmediateDominator)
           }
         }
@@ -89,29 +89,4 @@ class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
     finger1
   }
 
-  private def createPostOrderNumbering(cfgEntry: NodeType): mutable.Map[NodeType, Int] = {
-    var stack = (cfgEntry, adapter.successors(cfgEntry).iterator) :: Nil
-    val visited = mutable.Set.empty[NodeType]
-    val numbering = mutable.Map.empty[NodeType, Int]
-    var nextNumber = 0
-
-    while (stack.nonEmpty) {
-      val (node, successorIt) = stack.head
-
-      visited += node
-
-      if (successorIt.hasNext) {
-        val successor = successorIt.next()
-        if (!visited.contains(successor)) {
-          stack = (successor, adapter.successors(successor).iterator) :: stack
-        }
-      } else {
-        stack = stack.tail
-        numbering += (node -> nextNumber)
-        nextNumber += 1
-      }
-    }
-
-    numbering
-  }
 }

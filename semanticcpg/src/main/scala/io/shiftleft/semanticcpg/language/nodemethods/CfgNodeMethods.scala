@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.language.nodemethods
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.NodeExtension
+import io.shiftleft.semanticcpg.language.toCfgNode
 import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
@@ -19,6 +20,20 @@ class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {
       case expr: Expression                           => expr.code
       case call: CallRepr if !call.isInstanceOf[Call] => call.code
     }
+
+  /**
+    * Successors in the CFG
+    * */
+  def cfgNext: Traversal[CfgNode] = {
+    Traversal.fromSingle(node).cfgNext
+  }
+
+  /**
+    * Predecessors in the CFG
+    * */
+  def cfgPrev: Traversal[CfgNode] = {
+    Traversal.fromSingle(node).cfgPrev
+  }
 
   /**
     * Recursively determine all nodes on which this

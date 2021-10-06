@@ -49,10 +49,15 @@ class ReachingDefFlowGraph(method: Method) extends FlowGraph {
 
   val entryNode: StoredNode = method
   val exitNode: StoredNode = method.methodReturn
-  val allNodes: List[StoredNode] = method.cfgNode.toList ++ List(entryNode, exitNode) ++ method.parameter.toList
 
-  val succ: Map[StoredNode, List[StoredNode]] = initSucc(allNodes)
-  val pred: Map[StoredNode, List[StoredNode]] = initPred(allNodes, method)
+  val allNodesReversePostOrder: List[StoredNode] =
+    List(entryNode) ++ method.parameter.toList ++ method.reversePostOrder.toList ++ List(exitNode)
+
+  val allNodesPostOrder: List[StoredNode] =
+    List(exitNode) ++ method.postOrder.toList ++ method.parameter.toList ++ List(entryNode)
+
+  val succ: Map[StoredNode, List[StoredNode]] = initSucc(allNodesReversePostOrder)
+  val pred: Map[StoredNode, List[StoredNode]] = initPred(allNodesReversePostOrder, method)
 
   /**
     * Create a map that allows CFG successors to be retrieved for each node

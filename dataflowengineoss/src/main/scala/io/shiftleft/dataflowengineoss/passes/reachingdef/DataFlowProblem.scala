@@ -25,7 +25,8 @@ class DataFlowProblem[V](val flowGraph: FlowGraph,
 trait FlowGraph {
   val entryNode: StoredNode
   val exitNode: StoredNode
-  val allNodes: List[StoredNode]
+  val allNodesReversePostOrder: List[StoredNode]
+  val allNodesPostOrder: List[StoredNode]
   val succ: Map[StoredNode, List[StoredNode]]
   val pred: Map[StoredNode, List[StoredNode]]
 }

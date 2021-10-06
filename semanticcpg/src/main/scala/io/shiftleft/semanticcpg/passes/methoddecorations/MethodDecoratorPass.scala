@@ -37,19 +37,23 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
           .lineNumber(parameterIn.lineNumber)
           .columnNumber(parameterIn.columnNumber)
 
-        val method = parameterIn._methodViaAstIn
-        if (parameterIn.typeFullName == null) {
-          val evalType = parameterIn._typeViaEvalTypeOut
-          dstGraph.addEdgeToOriginal(parameterOut, evalType, EdgeTypes.EVAL_TYPE)
-          if (!loggedMissingTypeFullName) {
-            logger.warn("Using deprecated CPG format with missing TYPE_FULL_NAME on METHOD_PARAMETER_IN nodes.")
-            loggedMissingTypeFullName = true
+        val method = parameterIn.astIn.headOption
+        if (method.isEmpty) {
+          logger.warn("Parameter without method encountered: " + parameterIn.toString)
+        } else {
+          if (parameterIn.typeFullName == null) {
+            val evalType = parameterIn._typeViaEvalTypeOut
+            dstGraph.addEdgeToOriginal(parameterOut, evalType, EdgeTypes.EVAL_TYPE)
+            if (!loggedMissingTypeFullName) {
+              logger.warn("Using deprecated CPG format with missing TYPE_FULL_NAME on METHOD_PARAMETER_IN nodes.")
+              loggedMissingTypeFullName = true
+            }
           }
-        }
 
-        dstGraph.addNode(parameterOut)
-        dstGraph.addEdgeFromOriginal(method, parameterOut, EdgeTypes.AST)
-        dstGraph.addEdgeFromOriginal(parameterIn, parameterOut, EdgeTypes.PARAMETER_LINK)
+          dstGraph.addNode(parameterOut)
+          dstGraph.addEdgeFromOriginal(method.get, parameterOut, EdgeTypes.AST)
+          dstGraph.addEdgeFromOriginal(parameterIn, parameterOut, EdgeTypes.PARAMETER_LINK)
+        }
       } else if (!loggedDeprecatedWarning) {
         logger.warn("Using deprecated CPG format with PARAMETER_LINK edges")
         loggedDeprecatedWarning = true
