@@ -1,8 +1,7 @@
 package io.shiftleft.semanticcpg.passes.receiveredges
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.EdgeTypes
-import io.shiftleft.codepropertygraph.generated.nodes.HasArgumentIndex
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
 import io.shiftleft.passes.{DiffGraph, SimpleCpgPass}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
@@ -28,8 +27,11 @@ class ReceiverEdgePass(cpg: Cpg) extends SimpleCpgPass(cpg) {
 
     cpg.call
       .sideEffect { call =>
-        call._astOut.asScala.find { case node: HasArgumentIndex => node.argumentIndex == 0 }.foreach { instance =>
-          if (!instance._receiverIn.hasNext) {
+        call._astOut.asScala.find { case node: nodes.HasArgumentIndex => node.argumentIndex == 0 }.foreach { instance =>
+          // The check for !instance.isInstanceOf[nodes.Return] is only here to not crash and burn
+          // do to invalid input of the python2cpg frontend which currently provides RETURN nodes
+          // as argumentIndex 0 AST child to CALL nodes.
+          if (!instance._receiverIn.hasNext && !instance.isInstanceOf[nodes.Return]) {
             dstGraph.addEdgeInOriginal(call, instance, EdgeTypes.RECEIVER)
             if (!loggedDeprecationWarning) {
               logger.warn("Using deprecated CPG format without RECEIVER edge between CALL and instance nodes.")
