@@ -51,7 +51,7 @@ class ReachingDefFlowGraph(method: Method) extends FlowGraph {
   val exitNode: StoredNode = method.methodReturn
 
   val allNodesReversePostOrder: List[StoredNode] =
-    List(entryNode) ++ method.reversePostOrder.toList ++ method.parameter.toList ++ List(exitNode)
+    List(entryNode) ++ method.parameter.toList ++ method.reversePostOrder.toList ++ List(exitNode)
 
   val allNodesPostOrder: List[StoredNode] =
     List(exitNode) ++ method.postOrder.toList ++ method.parameter.toList ++ List(entryNode)
