@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg.astcreation
 
 import io.shiftleft.codepropertygraph.generated.DispatchTypes
-import io.shiftleft.codepropertygraph.generated.nodes.{AstNodeNew, NewCall}
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNodeNew, NewCall, NewLocal}
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast.{IASTMacroExpansionLocation, IASTNode, IASTPreprocessorMacroDefinition}
 import org.eclipse.cdt.internal.core.parser.scanner.MacroArgumentExtractor
@@ -74,7 +74,8 @@ trait MacroHandler {
 
   private def argumentTrees(arguments: List[String], ast: Ast): List[Option[Ast]] = {
     arguments.map { arg =>
-      val rootNode = ast.nodes.find(_.properties.get("CODE").contains(arg.replace(" ", "")))
+      val rootNode =
+        ast.nodes.find(x => !x.isInstanceOf[NewLocal] && x.properties.get("CODE").contains(arg.replace(" ", "")))
       rootNode.map { x =>
         ast.subTreeCopy(x.asInstanceOf[AstNodeNew], 1)
       }
