@@ -9,8 +9,7 @@ object NodeOrdering {
     * return a map that associates each node with an index such that nodes are numbered
     * in post order.
     * */
-  def createPostOrderNumbering[NodeType](cfgEntry: NodeType,
-                                         expand: NodeType => Iterator[NodeType]): Map[NodeType, Int] = {
+  def postOrderNumbering[NodeType](cfgEntry: NodeType, expand: NodeType => Iterator[NodeType]): Map[NodeType, Int] = {
     var stack = (cfgEntry, expand(cfgEntry)) :: Nil
     val visited = mutable.Set.empty[NodeType]
     val numbering = mutable.Map.empty[NodeType, Int]
@@ -34,9 +33,13 @@ object NodeOrdering {
     numbering.toMap
   }
 
-  def reverseNodeList[NodeType](ordering: List[(NodeType, Int)]): List[NodeType] = {
-    ordering
-      .sortBy { case (_, index) => -index }
+  /**
+    * For a list of (node, number) pairs, return the list of nodes obtained
+    * by sorting nodes according to number in reverse order.
+    * */
+  def reverseNodeList[NodeType](nodeNumberPairs: List[(NodeType, Int)]): List[NodeType] = {
+    nodeNumberPairs
+      .sortBy { case (_, num) => -num }
       .map { case (node, _) => node }
   }
 

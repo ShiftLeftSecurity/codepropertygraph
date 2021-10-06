@@ -13,15 +13,18 @@ class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
   def calculate(cfgEntry: NodeType): Map[NodeType, NodeType] = {
     val UNDEFINED = -1
     def expand(x: NodeType) = { adapter.successors(x).iterator }
-    val postOrderNumbering = NodeOrdering.createPostOrderNumbering(cfgEntry, expand)
+    def expandBack(x: NodeType) = { adapter.predecessors(x).iterator }
+
+    val postOrderNumbering = NodeOrdering.postOrderNumbering(cfgEntry, expand)
+    val nodesInReversePostOrder = NodeOrdering.reverseNodeList(postOrderNumbering.toList).filterNot(_ == cfgEntry)
     // Index of each node into dominators array.
     val indexOf = postOrderNumbering.withDefaultValue(UNDEFINED)
     // We use withDefault because unreachable/dead
     // code nodes are not numbered but may be touched
     // as predecessors of reachable nodes.
-    // Do not include cfgEntry.
-    val nodesInReversePostOrder = NodeOrdering.reverseNodeList(postOrderNumbering.toList).filter { _ != cfgEntry }
+
     val dominators = Array.fill(indexOf.size)(UNDEFINED)
+    dominators(indexOf(cfgEntry)) = indexOf(cfgEntry)
 
     /**
       * Retrieve index of immediate dominator for node with given index. If the
@@ -35,22 +38,16 @@ class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
       }
     }
 
-    dominators(indexOf(cfgEntry)) = indexOf(cfgEntry)
-
     var changed = true
     while (changed) {
       changed = false
       nodesInReversePostOrder.foreach { node =>
-        val firstNotUndefinedPred = adapter
-          .predecessors(node)
-          .iterator
-          .find { predecessor =>
-            safeDominators(indexOf(predecessor)) != UNDEFINED
-          }
-          .get
+        val firstNotUndefinedPred = expandBack(node).find { predecessor =>
+          safeDominators(indexOf(predecessor)) != UNDEFINED
+        }.get
 
         var newImmediateDominator = indexOf(firstNotUndefinedPred)
-        adapter.predecessors(node).iterator.foreach { predecessor =>
+        expandBack(node).foreach { predecessor =>
           val predecessorIndex = indexOf(predecessor)
           if (safeDominators(predecessorIndex) != UNDEFINED) {
             newImmediateDominator = intersect(dominators, predecessorIndex, newImmediateDominator)
