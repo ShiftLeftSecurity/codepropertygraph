@@ -122,7 +122,7 @@ trait AstForPrimitivesCreator {
     val owner = if (qualifier != Ast()) {
       qualifier
     } else {
-      Ast(NewLiteral().code("<global>").order(1).argumentIndex(1).typeFullName("ANY"))
+      Ast(NewLiteral(code = "<global>", order = 1, argumentIndex = 1, typeFullName = "ANY"))
     }
 
     val member = NewFieldIdentifier()
