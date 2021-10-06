@@ -87,7 +87,7 @@ case class Ast(nodes: List[NewNode],
     if (asts.isEmpty) {
       this
     } else {
-      // we do this iteratively as a recursive solution will fail with
+      // we do this iteratively as a recursive solution which will fail with
       // a StackOverflowException if there are too many elements in .tail.
       var ast = withChild(asts.head)
       asts.tail.foreach(c => ast = ast.withChild(c))
@@ -116,24 +116,42 @@ case class Ast(nodes: List[NewNode],
   }
 
   def withArgEdges(src: NewNode, dsts: Seq[NewNode]): Ast = {
-    this.copy(argEdges = argEdges ++ dsts.map { d =>
-      AstEdge(src, d)
-    })
+    this.copy(argEdges = argEdges ++ dsts.map(AstEdge(src, _)))
+  }
+
+  def withConditionEdges(src: NewNode, dsts: List[NewNode]): Ast = {
+    this.copy(conditionEdges = conditionEdges ++ dsts.map(AstEdge(src, _)))
+  }
+
+  def withRefEdges(src: NewNode, dsts: List[NewNode]): Ast = {
+    this.copy(refEdges = refEdges ++ dsts.map(AstEdge(src, _)))
+  }
+
+  def withBindsEdges(src: NewNode, dsts: List[NewNode]): Ast = {
+    this.copy(bindsEdges = bindsEdges ++ dsts.map(AstEdge(src, _)))
+  }
+
+  def withReceiverEdges(src: NewNode, dsts: List[NewNode]): Ast = {
+    this.copy(receiverEdges = receiverEdges ++ dsts.map(AstEdge(src, _)))
   }
 
   /**
-    * Returns a deep copy of the sub tree rooted in `node`, taking
-    * into account only AST edges.
+    * Returns a deep copy of the sub tree rooted in `node`.
     * */
   def subTreeCopy(node: AstNodeNew, order: Int): Ast = {
     val newNode = node.copy
     newNode.order = order
     val edgesToChildren = edges.filter(_.src == node)
-    val astChildren = edgesToChildren.map(_.dst).map(_.copy)
+    val astChildren = edgesToChildren.map(_.dst.copy)
     Ast(newNode)
       .withChildren(
         astChildren.zipWithIndex.map { case (x, i) => this.subTreeCopy(x.asInstanceOf[AstNodeNew], i) }
       )
+      .withArgEdges(newNode, argEdges.filter(_.src == node).map(_.dst.copy))
+      .withConditionEdges(newNode, conditionEdges.filter(_.src == node).map(_.dst.copy))
+      .withRefEdges(newNode, refEdges.filter(_.src == node).map(_.dst.copy))
+      .withBindsEdges(newNode, bindsEdges.filter(_.src == node).map(_.dst.copy))
+      .withReceiverEdges(newNode, receiverEdges.filter(_.src == node).map(_.dst.copy))
   }
 
 }

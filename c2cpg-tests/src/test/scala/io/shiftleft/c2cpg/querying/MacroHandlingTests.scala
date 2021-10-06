@@ -26,7 +26,7 @@ class MacroHandlingTests1 extends CCodeToCpgSuite {
     val List(arg: Call) = macroCall.argument.l
     arg.name shouldBe Operators.indirection
     arg.code shouldBe "*y"
-    val List(identifier: Identifier) = arg.astChildren.l
+    val List(identifier: Identifier) = arg.argument.l
     identifier.name shouldBe "y"
   }
 }
