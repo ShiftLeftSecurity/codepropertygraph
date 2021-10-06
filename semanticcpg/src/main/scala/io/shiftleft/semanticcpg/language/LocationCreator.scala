@@ -29,6 +29,11 @@ object LocationCreator {
     }
   }
 
+  def foo: NewLocation = {
+    val a: NewLocationBuilder = ???
+    a
+  }
+
   def apply(
       node: AbstractNode,
       symbol: String,

@@ -106,6 +106,7 @@ class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) exte
         NewTagNodePair()
           .tag(NewTag().name(tagName).value(tagValue))
           .node(node)
+          .build
       }
     )
   }

@@ -98,7 +98,7 @@ trait MacroHandler {
 
     val argAsts = arguments.zipWithIndex.map {
       case (arg, i) =>
-        Ast(NewIdentifier().name(arg).code(arg).order(i + 1).argumentIndex(i + 1))
+        Ast(NewIdentifier(name = arg, code = arg, order = i + 1, argumentIndex = i + 1))
     }
 
     Ast(callNode)
