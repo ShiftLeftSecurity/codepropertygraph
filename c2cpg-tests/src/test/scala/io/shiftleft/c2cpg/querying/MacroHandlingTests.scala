@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg.querying
 
 import io.shiftleft.c2cpg.testfixtures.{CCodeToCpgSuite, DataFlowCodeToCpgSuite}
-import io.shiftleft.codepropertygraph.generated.nodes.{Call, Identifier, Literal}
+import io.shiftleft.codepropertygraph.generated.nodes.{Call, Identifier, Literal, Method}
 import io.shiftleft.codepropertygraph.generated.{DispatchTypes, Operators}
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.semanticcpg.language._
@@ -35,6 +35,16 @@ class MacroHandlingTests1 extends CCodeToCpgSuite {
     arg2.order shouldBe 2
     arg2.argumentIndex shouldBe 2
   }
+
+  "should create a METHOD for the expanded macro" in {
+    val List(m: Method) = cpg.method.name("A_MACRO").l
+    m.fullName.endsWith("A_MACRO:2") shouldBe true
+    m.filename.endsWith(".c") shouldBe true
+    val List(param1, param2) = m.parameter.l.sortBy(_.order)
+    param1.name shouldBe "p1"
+    param2.name shouldBe "p2"
+  }
+
 }
 
 class MacroHandlingTests2 extends CCodeToCpgSuite {

@@ -57,7 +57,7 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
                                signature: String,
                                parameterCount: Int,
                                dstGraph: DiffGraph.Builder): MethodBase = {
-    val methodNode = NewMethod()
+    val methodNode1 = NewMethod()
       .name(name)
       .fullName(fullName)
       .isExternal(true)
@@ -65,6 +65,15 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
       .astParentType(NodeTypes.NAMESPACE_BLOCK)
       .astParentFullName("<global>")
       .order(0)
+
+    val methodNode = {
+      val s = fullName.split(":")
+      if (s.size == 3) {
+        methodNode1.filename(s(0))
+      } else {
+        methodNode1
+      }
+    }
 
     dstGraph.addNode(methodNode)
 
