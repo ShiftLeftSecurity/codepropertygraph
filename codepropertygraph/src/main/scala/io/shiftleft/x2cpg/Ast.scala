@@ -1,7 +1,7 @@
 package io.shiftleft.x2cpg
 
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
-import io.shiftleft.codepropertygraph.generated.nodes.{AstNodeNew, NewNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNodeNew, ExpressionNew, NewNode}
 import io.shiftleft.passes.DiffGraph
 
 case class AstEdge(src: NewNode, dst: NewNode)
@@ -136,18 +136,30 @@ case class Ast(nodes: List[NewNode],
   }
 
   /**
-    * Returns a deep copy of the sub tree rooted in `node`.
+    * Returns a deep copy of the sub tree rooted in `node`. If `order`
+    * is set, then the `order` and `argumentIndex` fields of the
+    * new root node are set to `order`.
     * */
-  def subTreeCopy(node: AstNodeNew, order: Int): Ast = {
+  def subTreeCopy(node: AstNodeNew, order: Int = -1): Ast = {
     val newNode = node.copy
-    newNode.order = order
+    if (order != -1) {
+      newNode.order = order
+      newNode match {
+        case expr: ExpressionNew =>
+          expr.argumentIndex = order
+        case _ =>
+      }
+    }
     val edgesToChildren = edges.filter(_.src == node)
-    val astChildren = edgesToChildren.map(_.dst.copy)
+    val astChildren = edgesToChildren.map(_.dst)
+    val newChildren = astChildren.map { x =>
+      this.subTreeCopy(x.asInstanceOf[AstNodeNew])
+    }
+    val oldToNew = astChildren.zip(newChildren).map { case (old, n) => old -> n.root.get }.toMap
+
     Ast(newNode)
-      .withChildren(
-        astChildren.zipWithIndex.map { case (x, i) => this.subTreeCopy(x.asInstanceOf[AstNodeNew], i) }
-      )
-      .withArgEdges(newNode, argEdges.filter(_.src == node).map(_.dst.copy))
+      .withChildren(newChildren)
+      .withArgEdges(newNode, argEdges.filter(_.src == node).map(x => oldToNew(x.dst)))
       .withConditionEdges(newNode, conditionEdges.filter(_.src == node).map(_.dst.copy))
       .withRefEdges(newNode, refEdges.filter(_.src == node).map(_.dst.copy))
       .withBindsEdges(newNode, bindsEdges.filter(_.src == node).map(_.dst.copy))

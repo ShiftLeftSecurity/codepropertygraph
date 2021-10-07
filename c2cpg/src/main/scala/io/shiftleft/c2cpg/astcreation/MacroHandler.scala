@@ -83,7 +83,12 @@ trait MacroHandler {
   }
 
   private def argForCode(code: String, ast: Ast): Option[NewNode] = {
-    ast.nodes.find(x => !x.isInstanceOf[NewLocal] && x.properties.get("CODE").contains(code.replace(" ", "")))
+    val normalizedCode = code.replace(" ", "")
+    ast.nodes
+      .find { x =>
+        !x.isInstanceOf[NewLocal] &&
+        x.properties.get("CODE").map(_.toString.replace(" ", "")).contains(normalizedCode)
+      }
   }
 
   /**

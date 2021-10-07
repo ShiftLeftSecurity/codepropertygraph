@@ -8,7 +8,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   NewMethodParameterIn,
   NewMethodReturn
 }
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, EvaluationStrategies, NodeTypes}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
@@ -29,7 +29,7 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
       methodFullNameToNode += method.fullName -> method
     }
 
-    cpg.call.foreach { call =>
+    cpg.call.dispatchTypeNot(DispatchTypes.INLINED).foreach { call =>
       methodToParameterCount +=
         NameAndSignature(call.name, call.signature, call.methodFullName) -> call.argument.size
     }

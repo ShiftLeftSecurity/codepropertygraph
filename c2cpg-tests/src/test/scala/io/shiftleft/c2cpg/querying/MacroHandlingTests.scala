@@ -26,11 +26,14 @@ class MacroHandlingTests1 extends CCodeToCpgSuite {
     val List(arg1: Call, arg2: Literal) = macroCall.argument.l.sortBy(_.order)
     arg1.name shouldBe Operators.indirection
     arg1.code shouldBe "*y"
+    arg1.order shouldBe 1
+    arg1.argumentIndex shouldBe 1
     val List(identifier: Identifier) = arg1.argument.l
     identifier.name shouldBe "y"
     identifier.order shouldBe 1
     arg2.code shouldBe "2"
     arg2.order shouldBe 2
+    arg2.argumentIndex shouldBe 2
   }
 }
 
@@ -54,7 +57,11 @@ class MacroHandlingTests2 extends CCodeToCpgSuite {
     call2.code shouldBe "y + 1"
     val List(arg1: Identifier, arg2: Literal) = call2.argument.l.sortBy(_.argumentIndex)
     arg1.name shouldBe "y"
+    arg1.order shouldBe 1
+    arg1.argumentIndex shouldBe 1
     arg2.code shouldBe "1"
+    arg2.order shouldBe 2
+    arg2.argumentIndex shouldBe 2
   }
 }
 
@@ -148,6 +155,25 @@ class MacroHandlingTests5 extends CCodeToCpgSuite {
     call.code shouldBe "A_MACRO"
     call.argument.size shouldBe 0
   }
+}
+
+class MacroHandlingTests6 extends CCodeToCpgSuite {
+
+  override val code: String =
+    """
+       #define A_MACRO 0x0
+       int foo() {
+        return A_MACRO;
+       }
+    """.stripMargin
+
+  "should correctly include call to macro that is only a constant (no brackets) in a return" in {
+    val List(call: Call) = cpg.method("foo").call.l
+    call.name shouldBe "A_MACRO"
+    call.code shouldBe "A_MACRO"
+    call.argument.size shouldBe 0
+  }
+
 }
 
 class CfgMacroTests extends DataFlowCodeToCpgSuite {
