@@ -68,8 +68,8 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
 
     val methodNode = {
       val s = fullName.split(":")
-      if (s.size == 3) {
-        methodNode1.filename(s(0))
+      if (s.size == 4) {
+        methodNode1.filename(s(0)).lineNumber(s(1).toInt)
       } else {
         methodNode1
       }
