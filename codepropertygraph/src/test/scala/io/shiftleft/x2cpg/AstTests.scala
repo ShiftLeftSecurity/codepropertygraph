@@ -1,6 +1,6 @@
 package io.shiftleft.x2cpg
 
-import io.shiftleft.codepropertygraph.generated.nodes.{AstNodeNew, NewCall, NewIdentifier}
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNodeNew, HasName, NewCall, NewIdentifier}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -70,6 +70,10 @@ class AstTests extends AnyWordSpec with Matchers {
           c.name shouldBe "leaf"
         case _ => fail()
       }
+    }
+
+    "preserve order of nodes" in {
+      copied.nodes.collect { case x: HasName => x.name } shouldBe List("moo", "callincall", "leaf")
     }
 
   }

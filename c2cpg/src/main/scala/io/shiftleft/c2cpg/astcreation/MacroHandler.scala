@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg.astcreation
 
 import io.shiftleft.codepropertygraph.generated.DispatchTypes
-import io.shiftleft.codepropertygraph.generated.nodes.{AstNodeNew, NewCall, NewLocal, NewNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNodeNew, ExpressionNew, NewCall, NewFieldIdentifier, NewNode}
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast.{IASTMacroExpansionLocation, IASTNode, IASTPreprocessorMacroDefinition}
 import org.eclipse.cdt.internal.core.parser.scanner.MacroArgumentExtractor
@@ -84,11 +84,15 @@ trait MacroHandler {
 
   private def argForCode(code: String, ast: Ast): Option[NewNode] = {
     val normalizedCode = code.replace(" ", "")
-    ast.nodes
-      .find { x =>
-        !x.isInstanceOf[NewLocal] &&
-        x.properties.get("CODE").map(_.toString.replace(" ", "")).contains(normalizedCode)
-      }
+    if (normalizedCode == "") {
+      None
+    } else {
+      ast.nodes
+        .find {
+          case x: AstNodeNew =>
+            x.isInstanceOf[ExpressionNew] && !x.isInstanceOf[NewFieldIdentifier] && x.code == normalizedCode
+        }
+    }
   }
 
   /**
