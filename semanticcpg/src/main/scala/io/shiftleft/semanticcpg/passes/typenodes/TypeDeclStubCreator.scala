@@ -1,8 +1,8 @@
 package io.shiftleft.semanticcpg.passes.typenodes
 
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.NodeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.{NewTypeDecl, TypeDeclBase}
-import io.shiftleft.codepropertygraph.generated.{NodeTypes, nodes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, NamespaceTraversal}
@@ -16,6 +16,13 @@ import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, Namespa
 class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 
   private var typeDeclFullNameToNode = Map[String, TypeDeclBase]()
+
+  private def init(): Unit = {
+    cpg.typeDecl
+      .foreach { typeDecl =>
+        typeDeclFullNameToNode += typeDecl.fullName -> typeDecl
+      }
+  }
 
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
@@ -34,8 +41,7 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   private def createTypeDeclStub(name: String, fullName: String): NewTypeDecl = {
-    nodes
-      .NewTypeDecl()
+    NewTypeDecl()
       .name(name)
       .fullName(fullName)
       .isExternal(true)
@@ -45,11 +51,4 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
       .filename(FileTraversal.UNKNOWN)
   }
 
-  private def init(): Unit = {
-    cpg.typeDecl
-      .sideEffect { typeDecl =>
-        typeDeclFullNameToNode += typeDecl.fullName -> typeDecl
-      }
-      .exec()
-  }
 }

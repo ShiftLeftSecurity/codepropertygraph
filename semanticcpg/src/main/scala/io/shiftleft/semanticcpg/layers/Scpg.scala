@@ -164,7 +164,6 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new FileCreationPass(cpg),
           new StaticCallLinker(cpg),
           new MemberAccessLinker(cpg),
-          new MethodExternalDecoratorPass(cpg),
           new ContainsEdgePass(cpg),
           new NamespaceCreator(cpg),
           new CfgDominatorPass(cpg),

@@ -49,15 +49,20 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
 
   private def enqueueInParallel(writer: Writer): Unit = {
     withStartEndTimesLogged {
-      init()
-      val it = new ParallelIteratorExecutor(itWithKeyPools()).map {
-        case (part, keyPool) =>
-          // Note: write.enqueue(runOnPart(part)) would be wrong because
-          // it would terminate the writer as soon as a pass returns None
-          // as None is used as a termination symbol for the queue
-          runOnPart(part).foreach(diffGraph => writer.enqueue(Some(diffGraph), keyPool))
+      try {
+        init()
+        val it = new ParallelIteratorExecutor(itWithKeyPools()).map {
+          case (part, keyPool) =>
+            // Note: write.enqueue(runOnPart(part)) would be wrong because
+            // it would terminate the writer as soon as a pass returns None
+            // as None is used as a termination symbol for the queue
+            runOnPart(part).foreach(diffGraph => writer.enqueue(Some(diffGraph), keyPool))
+        }
+        consume(it)
+      } catch {
+        case exception: Exception =>
+          baseLogger.warn(s"Exception in parallel CPG pass $name:", exception)
       }
-      consume(it)
     }
   }
 

@@ -32,12 +32,12 @@ import scala.concurrent.duration.DurationLong
 abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None) extends CpgPassBase {
 
   /**
-    * Main method of enhancement - to be implemented by child class
+    * Main method of pass - to be implemented by child class
     * */
   def run(): Iterator[DiffGraph]
 
   /**
-    * Execute the enhancement and apply result to the underlying graph
+    * Execute the pass and apply result to the underlying graph
     */
   override def createAndApply(): Unit =
     withStartEndTimesLogged {
@@ -148,7 +148,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
                                             prefix: String = ""): Unit = {
-    baseLogger.info(s"Start of enhancement: $name")
+    baseLogger.info(s"Start of pass: $name")
     val nanosStart = System.nanoTime()
     var nParts = 0
     var nanosBuilt = -1L
@@ -193,7 +193,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
       }
     } catch {
       case exc: Exception =>
-        baseLogger.error(s"Enhancement pass ${name} failed", exc)
+        baseLogger.error(s"Pass ${name} failed", exc)
         throw exc
     } finally {
       try {
@@ -204,7 +204,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
         val nanosStop = System.nanoTime()
         val fracRun = if (nanosBuilt == -1) 100.0 else (nanosBuilt - nanosStart) * 100.0 / (nanosStop - nanosStart + 1)
         baseLogger.info(
-          f"Enhancement $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d changes commited from ${nParts}%d parts.")
+          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d changes commited from ${nParts}%d parts.")
       }
     }
   }
@@ -223,7 +223,7 @@ trait CpgPassBase {
   def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false, prefix: String = ""): Unit
 
   /**
-    * Name of the enhancement pass.
+    * Name of the pass.
     * By default it is inferred from the name of the class, override if needed.
     */
   def name: String = getClass.getName
@@ -254,14 +254,14 @@ trait CpgPassBase {
   }
 
   protected def withStartEndTimesLogged[A](fun: => A): A = {
-    baseLogger.info(s"Start of enhancement: $name")
+    baseLogger.info(s"Running pass: $name")
     val startTime = System.currentTimeMillis
     try {
       fun
     } finally {
       val duration = (System.currentTimeMillis - startTime).millis.toCoarsest
       MDC.put("time", duration.toString())
-      baseLogger.info(s"Enhancement $name completed in $duration")
+      baseLogger.info(s"Pass $name completed in $duration")
       MDC.remove("time")
     }
   }

@@ -21,7 +21,7 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   private[this] var loggedDeprecatedWarning = false
   private[this] var loggedMissingTypeFullName = false
 
-  override def run() = {
+  override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
     cpg.parameter.foreach { parameterIn =>
