@@ -118,7 +118,7 @@ class MacroHandlingTests4 extends CCodeToCpgSuite {
     val List(call1: Call) = cpg.method("foo").call.nameExact("A_MACRO").l
     call1.code shouldBe "A_MACRO(dst, ptr, 1)"
     call1.name shouldBe "A_MACRO"
-    call1.methodFullName shouldBe "A_MACRO"
+    call1.methodFullName.endsWith("A_MACRO:3") shouldBe true
     call1.lineNumber shouldBe Some(22)
     call1.columnNumber shouldBe Some(8)
     call1.typeFullName shouldBe "ANY"
@@ -131,7 +131,7 @@ class MacroHandlingTests4 extends CCodeToCpgSuite {
     val List(call2: Call) = cpg.method("foo").call.nameExact("A_MACRO_2").l
     call2.code shouldBe "A_MACRO_2()"
     call2.name shouldBe "A_MACRO_2"
-    call2.methodFullName shouldBe "A_MACRO_2"
+    call2.methodFullName.endsWith("A_MACRO_2:0") shouldBe true
     call2.lineNumber shouldBe Some(24)
     call2.columnNumber shouldBe Some(8)
     call2.typeFullName shouldBe "ANY"

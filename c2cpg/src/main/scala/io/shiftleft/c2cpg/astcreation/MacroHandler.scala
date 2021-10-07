@@ -108,9 +108,12 @@ trait MacroHandler {
                                  order: Int): Ast = {
     val name = macroDef.getName.toString
     val code = node.getRawSignature.replaceAll(";$", "")
+    val argAsts = argumentTrees(arguments, ast).map(_.getOrElse(Ast()))
+    val fullName = macroDef.getFileLocation.getFileName + ":" + name + ":" + argAsts.size
+
     val callNode = NewCall()
       .name(name)
-      .methodFullName(name)
+      .methodFullName(fullName)
       .code(code)
       .lineNumber(line(node))
       .columnNumber(column(node))
@@ -119,7 +122,6 @@ trait MacroHandler {
       .order(order)
       .argumentIndex(order)
 
-    val argAsts = argumentTrees(arguments, ast).map(_.getOrElse(Ast()))
     Ast(callNode)
       .withChildren(argAsts)
       .withArgEdges(callNode, argAsts.flatMap(x => x.root))
