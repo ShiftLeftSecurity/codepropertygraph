@@ -28,8 +28,8 @@ trait MacroHandler {
         createMacroCallAst(ast, node, mac, args, order)
     }
     if (macroCallAst.isDefined) {
-      // TODO order/argument_index of `ast`'s root needs to be set to 1
-      macroCallAst.get.withChild(ast)
+      val newAst = ast.subTreeCopy(ast.root.get.asInstanceOf[AstNodeNew], order = 1)
+      macroCallAst.get.withChild(newAst)
     } else {
       ast
     }

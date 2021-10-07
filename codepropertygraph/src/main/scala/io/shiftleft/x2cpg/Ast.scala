@@ -157,15 +157,23 @@ case class Ast(nodes: List[NewNode],
     }
 
     val oldToNew = astChildren.zip(newChildren).map { case (old, n) => old -> n.root.get }.toMap
-    val newArgEdges = argEdges.filter(_.src == node).map(x => AstEdge(newNode, oldToNew(x.dst)))
+    def newIfExists(x: NewNode) = {
+      oldToNew.get(x).getOrElse(x)
+    }
+
+    val newArgEdges = argEdges.filter(_.src == node).map(x => AstEdge(newNode, newIfExists(x.dst)))
+    val newConditionEdges = conditionEdges.filter(_.src == node).map(x => AstEdge(newNode, newIfExists(x.dst)))
+    val newRefEdges = refEdges.filter(_.src == node).map(x => AstEdge(newNode, newIfExists(x.dst)))
+    val newBindsEdges = bindsEdges.filter(_.src == node).map(x => AstEdge(newNode, newIfExists(x.dst)))
+    val newReceiverEdges = receiverEdges.filter(_.src == node).map(x => AstEdge(newNode, newIfExists(x.dst)))
 
     Ast(newNode)
-      .copy(argEdges = newArgEdges)
+      .copy(argEdges = newArgEdges,
+            conditionEdges = newConditionEdges,
+            refEdges = newRefEdges,
+            bindsEdges = newBindsEdges,
+            receiverEdges = newReceiverEdges)
       .withChildren(newChildren)
-      .withConditionEdges(newNode, conditionEdges.filter(_.src == node).map(_.dst.copy))
-      .withRefEdges(newNode, refEdges.filter(_.src == node).map(_.dst.copy))
-      .withBindsEdges(newNode, bindsEdges.filter(_.src == node).map(_.dst.copy))
-      .withReceiverEdges(newNode, receiverEdges.filter(_.src == node).map(_.dst.copy))
   }
 
 }
