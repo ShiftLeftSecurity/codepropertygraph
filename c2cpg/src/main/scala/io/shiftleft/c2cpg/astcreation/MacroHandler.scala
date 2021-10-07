@@ -109,8 +109,17 @@ trait MacroHandler {
     val name = macroDef.getName.toString
     val code = node.getRawSignature.replaceAll(";$", "")
     val argAsts = argumentTrees(arguments, ast).map(_.getOrElse(Ast()))
-    val lineNo = macroDef.getFileLocation.getStartingLineNumber
-    val fullName = macroDef.getFileLocation.getFileName + ":" + lineNo + ":" + name + ":" + argAsts.size
+    val fileLocation = macroDef.getFileLocation
+
+    val fullName = {
+      if (fileLocation != null) {
+        val lineNo = fileLocation.getStartingLineNumber
+        val fileName = fileLocation.getFileName
+        fileName + ":" + lineNo + ":" + name + ":" + argAsts.size
+      } else {
+        "<empty>:-1:" + name + ":" + argAsts.size
+      }
+    }
 
     val callNode = NewCall()
       .name(name)
