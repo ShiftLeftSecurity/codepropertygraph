@@ -150,16 +150,18 @@ case class Ast(nodes: List[NewNode],
         case _ =>
       }
     }
-    val edgesToChildren = edges.filter(_.src == node)
-    val astChildren = edgesToChildren.map(_.dst)
+
+    val astChildren = edges.filter(_.src == node).map(_.dst)
     val newChildren = astChildren.map { x =>
       this.subTreeCopy(x.asInstanceOf[AstNodeNew])
     }
+
     val oldToNew = astChildren.zip(newChildren).map { case (old, n) => old -> n.root.get }.toMap
+    val newArgEdges = argEdges.filter(_.src == node).map(x => AstEdge(newNode, oldToNew(x.dst)))
 
     Ast(newNode)
+      .copy(argEdges = newArgEdges)
       .withChildren(newChildren)
-      .withArgEdges(newNode, argEdges.filter(_.src == node).map(x => oldToNew(x.dst)))
       .withConditionEdges(newNode, conditionEdges.filter(_.src == node).map(_.dst.copy))
       .withRefEdges(newNode, refEdges.filter(_.src == node).map(_.dst.copy))
       .withBindsEdges(newNode, bindsEdges.filter(_.src == node).map(_.dst.copy))

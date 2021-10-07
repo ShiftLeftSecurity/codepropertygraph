@@ -8,24 +8,27 @@ class AstTests extends AnyWordSpec with Matchers {
 
   "subTreeCopy" should {
 
-    val testTree = Ast(NewCall().name("foo"))
+    val foo = NewCall().name("foo")
+    val bar = NewCall().name("bar").order(1)
+    val idName = NewIdentifier().name("idname").order(1)
+    val moo = NewCall().name("moo").order(1)
+    val callInCall = NewCall().name("callincall").order(1)
+    val leaf = NewIdentifier().name("leaf").order(1)
+
+    val testTree = Ast(foo)
       .withChildren(
         List(
-          Ast(NewCall().name("bar").order(1))
-            .withChild(Ast(NewIdentifier().name("idname").order(1))),
-          Ast(NewCall().name("moo").order(1))
-            .withChild(
-              Ast(NewCall().name("callincall").order(1))
-                .withChild(Ast(NewIdentifier().name("leaf").order(1)))
-            ),
+          Ast(bar).withChild(Ast(idName)).withArgEdge(bar, idName),
+          Ast(moo)
+            .withChild(Ast(callInCall).withChild(Ast(leaf)).withArgEdge(callInCall, leaf))
+            .withArgEdge(moo, callInCall),
         )
       )
+      .withArgEdges(foo, List(bar, moo))
 
-    "copy sub tree correctly" in {
-      val moo = testTree.nodes.filter(x => x.properties("NAME") == "moo").head.asInstanceOf[NewCall]
-      val leaf = testTree.nodes.filter(x => x.properties("NAME") == "leaf").head.asInstanceOf[NewIdentifier]
-      val copied = testTree.subTreeCopy(moo.asInstanceOf[AstNodeNew], 123)
+    val copied = testTree.subTreeCopy(moo.asInstanceOf[AstNodeNew], 123)
 
+    "copy root node correctly" in {
       copied.root match {
         case Some(root: NewCall) =>
           root should not be Some(moo)
@@ -34,11 +37,14 @@ class AstTests extends AnyWordSpec with Matchers {
           root.argumentIndex shouldBe 123
         case _ => fail()
       }
+    }
 
-      val List(_, callincallClone: NewCall, leafClone: NewIdentifier) = copied.nodes
-      callincallClone.order shouldBe 1
+    "copy AST edges correctly" in {
+      val List(_, callInCallClone: NewCall, leafClone: NewIdentifier) = copied.nodes
+      callInCallClone.order shouldBe 1
       leafClone.order shouldBe 1
-      copied.edges.filter(_.src == callincallClone).map(_.dst) match {
+
+      copied.edges.filter(_.src == callInCallClone).map(_.dst) match {
         case List(x: NewIdentifier) =>
           x shouldBe leafClone
           x should not be leaf
@@ -46,5 +52,25 @@ class AstTests extends AnyWordSpec with Matchers {
         case _ => fail()
       }
     }
+
+    "copy argument edges correctly" in {
+      val List(edge1, edge2) = copied.argEdges
+      edge1 match {
+        case AstEdge(m: NewCall, c: NewCall) =>
+          m should not be moo
+          c should not be callInCall
+          m.name shouldBe "moo"
+          c.name shouldBe "callincall"
+        case _ => fail()
+      }
+
+      edge2 match {
+        case AstEdge(m: NewCall, c: NewIdentifier) =>
+          m.name shouldBe "callincall"
+          c.name shouldBe "leaf"
+        case _ => fail()
+      }
+    }
+
   }
 }
