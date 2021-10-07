@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg.querying
 
 import io.shiftleft.c2cpg.testfixtures.{CCodeToCpgSuite, DataFlowCodeToCpgSuite}
-import io.shiftleft.codepropertygraph.generated.nodes.{Call, Identifier, Literal}
+import io.shiftleft.codepropertygraph.generated.nodes.{Call, Identifier, Literal, Method}
 import io.shiftleft.codepropertygraph.generated.{DispatchTypes, Operators}
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.semanticcpg.language._
@@ -35,6 +35,17 @@ class MacroHandlingTests1 extends CCodeToCpgSuite {
     arg2.order shouldBe 2
     arg2.argumentIndex shouldBe 2
   }
+
+  "should create a METHOD for the expanded macro" in {
+    val List(m: Method) = cpg.method.name("A_MACRO").l
+    m.fullName.endsWith("A_MACRO:2") shouldBe true
+    m.filename.endsWith(".c") shouldBe true
+    m.lineNumber shouldBe Some(2)
+    val List(param1, param2) = m.parameter.l.sortBy(_.order)
+    param1.name shouldBe "p1"
+    param2.name shouldBe "p2"
+  }
+
 }
 
 class MacroHandlingTests2 extends CCodeToCpgSuite {
@@ -118,7 +129,7 @@ class MacroHandlingTests4 extends CCodeToCpgSuite {
     val List(call1: Call) = cpg.method("foo").call.nameExact("A_MACRO").l
     call1.code shouldBe "A_MACRO(dst, ptr, 1)"
     call1.name shouldBe "A_MACRO"
-    call1.methodFullName shouldBe "A_MACRO"
+    call1.methodFullName.endsWith("A_MACRO:3") shouldBe true
     call1.lineNumber shouldBe Some(22)
     call1.columnNumber shouldBe Some(8)
     call1.typeFullName shouldBe "ANY"
@@ -131,7 +142,7 @@ class MacroHandlingTests4 extends CCodeToCpgSuite {
     val List(call2: Call) = cpg.method("foo").call.nameExact("A_MACRO_2").l
     call2.code shouldBe "A_MACRO_2()"
     call2.name shouldBe "A_MACRO_2"
-    call2.methodFullName shouldBe "A_MACRO_2"
+    call2.methodFullName.endsWith("A_MACRO_2:0") shouldBe true
     call2.lineNumber shouldBe Some(24)
     call2.columnNumber shouldBe Some(8)
     call2.typeFullName shouldBe "ANY"

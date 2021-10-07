@@ -8,7 +8,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   NewMethodParameterIn,
   NewMethodReturn
 }
-import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, EvaluationStrategies, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes}
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
@@ -29,7 +29,7 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
       methodFullNameToNode += method.fullName -> method
     }
 
-    cpg.call.dispatchTypeNot(DispatchTypes.INLINED).foreach { call =>
+    cpg.call.foreach { call =>
       methodToParameterCount +=
         NameAndSignature(call.name, call.signature, call.methodFullName) -> call.argument.size
     }
@@ -37,12 +37,10 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
 
   override def partIterator: Iterator[(NameAndSignature, Int)] = methodToParameterCount.iterator
 
-  // TODO bring in Receiver type. Just working on name and comparing to full name
-  // will only work for C because in C, name always equals full name.
   override def runOnPart(part: (NameAndSignature, Int)): Iterator[DiffGraph] = {
     val name = part._1.name
-    val fullName = part._1.fullName
     val signature = part._1.signature
+    val fullName = part._1.fullName
     val parameterCount = part._2
 
     implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
@@ -59,7 +57,7 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
                                signature: String,
                                parameterCount: Int,
                                dstGraph: DiffGraph.Builder): MethodBase = {
-    val methodNode = NewMethod()
+    val methodNode1 = NewMethod()
       .name(name)
       .fullName(fullName)
       .isExternal(true)
@@ -68,20 +66,28 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
       .astParentFullName("<global>")
       .order(0)
 
+    val methodNode = {
+      val s = fullName.split(":")
+      if (s.size == 4) {
+        methodNode1.filename(s(0)).lineNumber(s(1).toInt)
+      } else {
+        methodNode1
+      }
+    }
+
     dstGraph.addNode(methodNode)
 
-    for (parameterOrder <- 1 to parameterCount) {
+    (1 to parameterCount).foreach { parameterOrder =>
       val nameAndCode = s"p$parameterOrder"
-
-      val methodParameterIn = NewMethodParameterIn()
+      val param = NewMethodParameterIn()
         .code(nameAndCode)
         .order(parameterOrder)
         .name(nameAndCode)
         .evaluationStrategy(EvaluationStrategies.BY_VALUE)
         .typeFullName("ANY")
 
-      dstGraph.addNode(methodParameterIn)
-      dstGraph.addEdge(methodNode, methodParameterIn, EdgeTypes.AST)
+      dstGraph.addNode(param)
+      dstGraph.addEdge(methodNode, param, EdgeTypes.AST)
     }
 
     val methodReturn = NewMethodReturn()
