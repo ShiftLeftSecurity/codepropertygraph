@@ -23,6 +23,7 @@ class AstTests extends AnyWordSpec with Matchers {
 
     "copy sub tree correctly" in {
       val moo = testTree.nodes.filter(x => x.properties("NAME") == "moo").head.asInstanceOf[NewCall]
+      val leaf = testTree.nodes.filter(x => x.properties("NAME") == "leaf").head.asInstanceOf[NewIdentifier]
       val copied = testTree.subTreeCopy(moo.asInstanceOf[AstNodeNew], 123)
 
       copied.root match {
@@ -37,6 +38,13 @@ class AstTests extends AnyWordSpec with Matchers {
       val List(_, callincallClone: NewCall, leafClone: NewIdentifier) = copied.nodes
       callincallClone.order shouldBe 1
       leafClone.order shouldBe 1
+      copied.edges.filter(_.src == callincallClone).map(_.dst) match {
+        case List(x: NewIdentifier) =>
+          x shouldBe leafClone
+          x should not be leaf
+          x.name shouldBe "leaf"
+        case _ => fail()
+      }
     }
   }
 }
