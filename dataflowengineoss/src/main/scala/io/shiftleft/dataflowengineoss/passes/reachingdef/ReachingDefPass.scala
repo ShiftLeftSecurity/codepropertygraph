@@ -40,7 +40,7 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
     * uncalculated for the method in question. Users can increase the threshold
     * if desired.
     * */
-  private def shouldBailOut(problem: DataFlowProblem[mutable.Set[Definition]]): Boolean = {
+  private def shouldBailOut(problem: DataFlowProblem[mutable.BitSet]): Boolean = {
     val method = problem.flowGraph.entryNode.asInstanceOf[Method]
     val transferFunction = problem.transferFunction.asInstanceOf[ReachingDefTransferFunction]
     // For each node, the `gen` map contains the list of definitions it generates
@@ -60,9 +60,9 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
     * by seeing which of these reaching definitions are relevant in the sense that
     * they are used.
     * */
-  private def addReachingDefEdges(problem: DataFlowProblem[mutable.Set[Definition]],
+  private def addReachingDefEdges(problem: DataFlowProblem[mutable.BitSet],
                                   method: Method,
-                                  solution: Solution[mutable.Set[Definition]]): DiffGraph.Builder = {
+                                  solution: Solution[mutable.BitSet]): DiffGraph.Builder = {
     val numberToNode = problem.flowGraph.asInstanceOf[ReachingDefFlowGraph].numberToNode
     implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
     val in = solution.in
@@ -165,9 +165,9 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
     * to the exit node.
     * */
   def addEdgesFromLoneIdentifiersToExit(builder: DiffGraph.Builder,
-                                        problem: DataFlowProblem[mutable.Set[Definition]],
+                                        problem: DataFlowProblem[mutable.BitSet],
                                         method: Method,
-                                        solution: Solution[mutable.Set[Definition]]): Unit = {
+                                        solution: Solution[mutable.BitSet]): Unit = {
     val numberToNode = problem.flowGraph.asInstanceOf[ReachingDefFlowGraph].numberToNode
     implicit val dstGraph: DiffGraph.Builder = builder
     val exitNode = method.methodReturn
