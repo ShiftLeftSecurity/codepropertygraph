@@ -15,7 +15,7 @@ import scala.collection.{Set, mutable}
   * definitions that are relevant as the value they define is
   * actually used by `n`.
   * */
-class UsageAnalyzer(problem: DataFlowProblem[mutable.Set[Definition]], in: Map[StoredNode, Set[Definition]]) {
+class UsageAnalyzer(problem: DataFlowProblem[mutable.BitSet], in: Map[StoredNode, Set[Definition]]) {
 
   val numberToNode = problem.flowGraph.asInstanceOf[ReachingDefFlowGraph].numberToNode
   private val allNodes = in.keys.toList
@@ -30,7 +30,7 @@ class UsageAnalyzer(problem: DataFlowProblem[mutable.Set[Definition]], in: Map[S
   private def usedIncomingDefsForNode(node: StoredNode): Map[StoredNode, Set[Definition]] = {
     uses(node).map { use =>
       use -> in(node).filter { inElement =>
-        val inElemNode = numberToNode(inElement.nodeNum)
+        val inElemNode = numberToNode(inElement)
         sameVariable(use, inElemNode) || isContainer(use, inElemNode) || isPart(use, inElemNode) || isAlias(use,
                                                                                                             inElemNode)
       }
