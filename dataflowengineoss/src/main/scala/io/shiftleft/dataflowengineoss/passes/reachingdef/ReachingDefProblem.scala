@@ -30,7 +30,7 @@ object ReachingDefProblem {
 
   def create(method: Method): DataFlowProblem[mutable.Set[Definition]] = {
     val flowGraph = new ReachingDefFlowGraph(method)
-    val transfer = new OptimizedReachingDefTransferFunction(method)
+    val transfer = new OptimizedReachingDefTransferFunction(flowGraph)
     val init = new ReachingDefInit(transfer.gen)
     def meet: (mutable.Set[Definition], mutable.Set[Definition]) => mutable.Set[Definition] =
       (x: mutable.Set[Definition], y: mutable.Set[Definition]) => { x.union(y) }
@@ -43,7 +43,7 @@ object ReachingDefProblem {
 /**
   * The control flow graph as viewed by the data flow solver.
   * */
-class ReachingDefFlowGraph(method: Method) extends FlowGraph {
+class ReachingDefFlowGraph(val method: Method) extends FlowGraph {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -107,7 +107,9 @@ class ReachingDefFlowGraph(method: Method) extends FlowGraph {
   * For each node of the graph, this transfer function defines how it affects
   * the propagation of definitions.
   * */
-class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutable.Set[Definition]] {
+class ReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph) extends TransferFunction[mutable.Set[Definition]] {
+
+  val method = flowGraph.method
 
   val gen: Map[StoredNode, mutable.Set[Definition]] =
     initGen(method).withDefaultValue(mutable.Set.empty[Definition])
@@ -235,7 +237,7 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutab
   * when creating reaching definition edges, we simply create edges from the
   * identifier to the exit node.
   * */
-class OptimizedReachingDefTransferFunction(method: Method) extends ReachingDefTransferFunction(method) {
+class OptimizedReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph) extends ReachingDefTransferFunction(flowGraph) {
 
   lazy val loneIdentifiers: Map[Call, List[Definition]] = {
     val paramAndLocalNames = method.parameter.name.l ++ method.local.name.l
