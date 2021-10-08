@@ -65,7 +65,7 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
     val in = solution.in
     val gen = solution.problem.transferFunction
       .asInstanceOf[ReachingDefTransferFunction]
-      .initGen(method)
+      .gen
       .withDefaultValue(Set())
     val allNodes = in.keys.toList
     val usageAnalyzer = new UsageAnalyzer(in)
