@@ -50,10 +50,10 @@ class ReachingDefFlowGraph(method: Method) extends FlowGraph {
   val entryNode: StoredNode = method
   val exitNode: StoredNode = method.methodReturn
 
-  val allNodesReversePostOrder: List[StoredNode] =
+  lazy val allNodesReversePostOrder: List[StoredNode] =
     List(entryNode) ++ method.parameter.toList ++ method.reversePostOrder.toList ++ List(exitNode)
 
-  val allNodesPostOrder: List[StoredNode] =
+  lazy val allNodesPostOrder: List[StoredNode] =
     List(exitNode) ++ method.postOrder.toList ++ method.parameter.toList ++ List(entryNode)
 
   val succ: Map[StoredNode, List[StoredNode]] = initSucc(allNodesReversePostOrder)
