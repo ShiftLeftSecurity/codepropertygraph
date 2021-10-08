@@ -14,20 +14,17 @@ import scala.collection.{Set, mutable}
   * all be represented via nodes in the graph, however, that's
   * pretty confusing because it is then unclear that variables
   * and nodes are actually two separate domains. To make the
-  * definition domain visible, we wrap nodes in `Definition`
-  * classes. From a computational standpoint, this is not necessary,
+  * definition domain visible, we use the type alias `Definition`.
+  * From a computational standpoint, this is not necessary,
   * but it greatly improves readability.
   * */
 object Definition {
   def fromNode(node: StoredNode, nodeToNumber: Map[StoredNode, Int]): Definition = {
-    new Definition(nodeToNumber(node))
+    nodeToNumber(node)
   }
 }
 
-case class Definition(nodeNum: Int) {}
-
 object ReachingDefProblem {
-
   def create(method: Method): DataFlowProblem[mutable.Set[Definition]] = {
     val flowGraph = new ReachingDefFlowGraph(method)
     val transfer = new OptimizedReachingDefTransferFunction(flowGraph)
@@ -210,7 +207,7 @@ class ReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph) extends Trans
                            allCalls: Map[String, List[Call]]): Set[Definition] = {
 
     def definitionsOfSameVariable(definition: Definition): Set[Definition] = {
-      val definedNodes = flowGraph.numberToNode(definition.nodeNum) match {
+      val definedNodes = flowGraph.numberToNode(definition) match {
         case param: MethodParameterIn =>
           allIdentifiers(param.name)
             .filter(x => x.id != param.id)

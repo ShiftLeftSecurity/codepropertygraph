@@ -30,7 +30,7 @@ class UsageAnalyzer(problem: DataFlowProblem[mutable.Set[Definition]], in: Map[S
   private def usedIncomingDefsForNode(node: StoredNode): Map[StoredNode, Set[Definition]] = {
     uses(node).map { use =>
       use -> in(node).filter { inElement =>
-        val inElemNode = numberToNode(inElement.nodeNum)
+        val inElemNode = numberToNode(inElement)
         sameVariable(use, inElemNode) || isContainer(use, inElemNode) || isPart(use, inElemNode) || isAlias(use,
                                                                                                             inElemNode)
       }

@@ -80,7 +80,7 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
           usageAnalyzer.usedIncomingDefs(call).foreach {
             case (use, ins) =>
               ins.foreach { in =>
-                val inNode = numberToNode(in.nodeNum)
+                val inNode = numberToNode(in)
                 if (inNode != use) {
                   addEdge(inNode, use, nodeToEdgeLabel(inNode))
                 }
@@ -92,7 +92,7 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
           // and the return value
           usageAnalyzer.uses(node).foreach { use =>
             gen(node).foreach { g =>
-              val genNode = numberToNode(g.nodeNum)
+              val genNode = numberToNode(g)
               if (use != genNode && nodeMayBeSource(use)) {
                 addEdge(use, genNode, nodeToEdgeLabel(use))
               }
@@ -103,8 +103,8 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
           usageAnalyzer.usedIncomingDefs(ret).foreach {
             case (use, inElements) =>
               addEdge(use, ret, use.asInstanceOf[CfgNode].code)
-              inElements.filter(x => numberToNode(x.nodeNum) != use).foreach { inElement =>
-                val inElemNode = numberToNode(inElement.nodeNum)
+              inElements.filter(x => numberToNode(x) != use).foreach { inElement =>
+                val inElemNode = numberToNode(inElement)
                 addEdge(inElemNode, ret, nodeToEdgeLabel(inElemNode))
               }
               if (inElements.isEmpty) {
@@ -115,7 +115,7 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
 
         case exitNode: MethodReturn =>
           in(exitNode).foreach { i =>
-            val iNode = numberToNode(i.nodeNum)
+            val iNode = numberToNode(i)
             addEdge(iNode, exitNode, nodeToEdgeLabel(iNode))
           }
         case _ =>
@@ -176,7 +176,7 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
     genOnce.foreach {
       case (_, defs) =>
         defs.foreach { d =>
-          val dNode = numberToNode(d.nodeNum)
+          val dNode = numberToNode(d)
           addEdge(dNode, exitNode, nodeToEdgeLabel(dNode))
         }
     }
