@@ -28,8 +28,8 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
     }
 
     val solution = new DataFlowSolver().calculateMopSolutionForwards(problem)
-    val dstGraph = addReachingDefEdges(method, solution)
-    addEdgesFromLoneIdentifiersToExit(dstGraph, method, solution)
+    val dstGraph = addReachingDefEdges(problem, method, solution)
+    addEdgesFromLoneIdentifiersToExit(dstGraph, problem, method, solution)
     Iterator(dstGraph.build())
   }
 
@@ -60,15 +60,18 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
     * by seeing which of these reaching definitions are relevant in the sense that
     * they are used.
     * */
-  private def addReachingDefEdges(method: Method, solution: Solution[mutable.Set[Definition]]): DiffGraph.Builder = {
+  private def addReachingDefEdges(problem: DataFlowProblem[mutable.Set[Definition]],
+                                  method: Method,
+                                  solution: Solution[mutable.Set[Definition]]): DiffGraph.Builder = {
+    val numberToNode = problem.flowGraph.asInstanceOf[ReachingDefFlowGraph].numberToNode
     implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
     val in = solution.in
     val gen = solution.problem.transferFunction
       .asInstanceOf[ReachingDefTransferFunction]
-      .initGen(method)
+      .gen
       .withDefaultValue(Set())
     val allNodes = in.keys.toList
-    val usageAnalyzer = new UsageAnalyzer(in)
+    val usageAnalyzer = new UsageAnalyzer(problem, in)
 
     allNodes.foreach { node: StoredNode =>
       node match {
@@ -77,8 +80,9 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
           usageAnalyzer.usedIncomingDefs(call).foreach {
             case (use, ins) =>
               ins.foreach { in =>
-                if (in.node != use) {
-                  addEdge(in.node, use, nodeToEdgeLabel(in.node))
+                val inNode = numberToNode(in.nodeNum)
+                if (inNode != use) {
+                  addEdge(inNode, use, nodeToEdgeLabel(inNode))
                 }
               }
           }
@@ -88,8 +92,9 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
           // and the return value
           usageAnalyzer.uses(node).foreach { use =>
             gen(node).foreach { g =>
-              if (use != g.node && nodeMayBeSource(use)) {
-                addEdge(use, g.node, nodeToEdgeLabel(use))
+              val genNode = numberToNode(g.nodeNum)
+              if (use != genNode && nodeMayBeSource(use)) {
+                addEdge(use, genNode, nodeToEdgeLabel(use))
               }
             }
           }
@@ -98,8 +103,9 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
           usageAnalyzer.usedIncomingDefs(ret).foreach {
             case (use, inElements) =>
               addEdge(use, ret, use.asInstanceOf[CfgNode].code)
-              inElements.filter(x => x.node != use).foreach { inElement =>
-                addEdge(inElement.node, ret, nodeToEdgeLabel(inElement.node))
+              inElements.filter(x => numberToNode(x.nodeNum) != use).foreach { inElement =>
+                val inElemNode = numberToNode(inElement.nodeNum)
+                addEdge(inElemNode, ret, nodeToEdgeLabel(inElemNode))
               }
               if (inElements.isEmpty) {
                 addEdge(method, ret)
@@ -109,7 +115,8 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
 
         case exitNode: MethodReturn =>
           in(exitNode).foreach { i =>
-            addEdge(i.node, exitNode, nodeToEdgeLabel(i.node))
+            val iNode = numberToNode(i.nodeNum)
+            addEdge(iNode, exitNode, nodeToEdgeLabel(iNode))
           }
         case _ =>
       }
@@ -158,8 +165,10 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
     * to the exit node.
     * */
   def addEdgesFromLoneIdentifiersToExit(builder: DiffGraph.Builder,
+                                        problem: DataFlowProblem[mutable.Set[Definition]],
                                         method: Method,
                                         solution: Solution[mutable.Set[Definition]]): Unit = {
+    val numberToNode = problem.flowGraph.asInstanceOf[ReachingDefFlowGraph].numberToNode
     implicit val dstGraph: DiffGraph.Builder = builder
     val exitNode = method.methodReturn
     val transferFunction = solution.problem.transferFunction.asInstanceOf[OptimizedReachingDefTransferFunction]
@@ -167,7 +176,8 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
     genOnce.foreach {
       case (_, defs) =>
         defs.foreach { d =>
-          addEdge(d.node, exitNode, nodeToEdgeLabel(d.node))
+          val dNode = numberToNode(d.nodeNum)
+          addEdge(dNode, exitNode, nodeToEdgeLabel(dNode))
         }
     }
   }

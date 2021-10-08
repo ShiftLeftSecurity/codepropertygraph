@@ -6,7 +6,7 @@ import io.shiftleft.dataflowengineoss.queryengine.AccessPathUsage.toTrackedBaseA
 import io.shiftleft.semanticcpg.accesspath.MatchResult
 import io.shiftleft.semanticcpg.language._
 
-import scala.collection.Set
+import scala.collection.{Set, mutable}
 
 /**
   * Upon calculating reaching definitions, we find ourselves with
@@ -15,8 +15,9 @@ import scala.collection.Set
   * definitions that are relevant as the value they define is
   * actually used by `n`.
   * */
-class UsageAnalyzer(in: Map[StoredNode, Set[Definition]]) {
+class UsageAnalyzer(problem: DataFlowProblem[mutable.Set[Definition]], in: Map[StoredNode, Set[Definition]]) {
 
+  val numberToNode = problem.flowGraph.asInstanceOf[ReachingDefFlowGraph].numberToNode
   private val allNodes = in.keys.toList
   val usedIncomingDefs: Map[StoredNode, Map[StoredNode, Set[Definition]]] = initUsedIncomingDefs()
 
@@ -29,9 +30,9 @@ class UsageAnalyzer(in: Map[StoredNode, Set[Definition]]) {
   private def usedIncomingDefsForNode(node: StoredNode): Map[StoredNode, Set[Definition]] = {
     uses(node).map { use =>
       use -> in(node).filter { inElement =>
-        sameVariable(use, inElement.node) || isContainer(use, inElement.node) || isPart(use, inElement.node) || isAlias(
-          use,
-          inElement.node)
+        val inElemNode = numberToNode(inElement.nodeNum)
+        sameVariable(use, inElemNode) || isContainer(use, inElemNode) || isPart(use, inElemNode) || isAlias(use,
+                                                                                                            inElemNode)
       }
     }.toMap
   }

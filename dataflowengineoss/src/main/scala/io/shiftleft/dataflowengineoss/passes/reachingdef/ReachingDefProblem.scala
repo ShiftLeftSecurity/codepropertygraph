@@ -19,18 +19,18 @@ import scala.collection.{Set, mutable}
   * but it greatly improves readability.
   * */
 object Definition {
-  def fromNode(node: StoredNode): Definition = {
-    new Definition(node)
+  def fromNode(node: StoredNode, nodeToNumber: Map[StoredNode, Int]): Definition = {
+    new Definition(nodeToNumber(node))
   }
 }
 
-case class Definition(node: StoredNode) {}
+case class Definition(nodeNum: Int) {}
 
 object ReachingDefProblem {
 
   def create(method: Method): DataFlowProblem[mutable.Set[Definition]] = {
     val flowGraph = new ReachingDefFlowGraph(method)
-    val transfer = new OptimizedReachingDefTransferFunction(method)
+    val transfer = new OptimizedReachingDefTransferFunction(flowGraph)
     val init = new ReachingDefInit(transfer.gen)
     def meet: (mutable.Set[Definition], mutable.Set[Definition]) => mutable.Set[Definition] =
       (x: mutable.Set[Definition], y: mutable.Set[Definition]) => { x.union(y) }
@@ -43,7 +43,7 @@ object ReachingDefProblem {
 /**
   * The control flow graph as viewed by the data flow solver.
   * */
-class ReachingDefFlowGraph(method: Method) extends FlowGraph {
+class ReachingDefFlowGraph(val method: Method) extends FlowGraph {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -53,7 +53,10 @@ class ReachingDefFlowGraph(method: Method) extends FlowGraph {
   val allNodesReversePostOrder: List[StoredNode] =
     List(entryNode) ++ method.parameter.toList ++ method.reversePostOrder.toList ++ List(exitNode)
 
-  val allNodesPostOrder: List[StoredNode] =
+  val nodeToNumber: Map[StoredNode, Int] = allNodesReversePostOrder.zipWithIndex.map { case (x, i) => x -> i }.toMap
+  val numberToNode: Map[Int, StoredNode] = allNodesReversePostOrder.zipWithIndex.map { case (x, i) => i -> x }.toMap
+
+  lazy val allNodesPostOrder: List[StoredNode] =
     List(exitNode) ++ method.postOrder.toList ++ method.parameter.toList ++ List(entryNode)
 
   val succ: Map[StoredNode, List[StoredNode]] = initSucc(allNodesReversePostOrder)
@@ -107,7 +110,9 @@ class ReachingDefFlowGraph(method: Method) extends FlowGraph {
   * For each node of the graph, this transfer function defines how it affects
   * the propagation of definitions.
   * */
-class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutable.Set[Definition]] {
+class ReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph) extends TransferFunction[mutable.Set[Definition]] {
+
+  val method = flowGraph.method
 
   val gen: Map[StoredNode, mutable.Set[Definition]] =
     initGen(method).withDefaultValue(mutable.Set.empty[Definition])
@@ -131,7 +136,7 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutab
   def initGen(method: Method): Map[StoredNode, mutable.Set[Definition]] = {
 
     val defsForParams = method.parameter.l.map { param =>
-      param -> mutable.Set(Definition.fromNode(param.asInstanceOf[StoredNode]))
+      param -> mutable.Set(Definition.fromNode(param.asInstanceOf[StoredNode], flowGraph.nodeToNumber))
     }
 
     // We filter out field accesses to ensure that they propagate
@@ -143,9 +148,11 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutab
       .map { call =>
         call -> {
           val retVal = mutable.Set(call)
-          val args = call.argument.filter(hasValidGenType)
+          val args = call.argument
+            .filter(hasValidGenType)
           (retVal ++ args)
-            .map(x => Definition.fromNode(x.asInstanceOf[StoredNode]))
+            .filter(x => flowGraph.nodeToNumber.contains(x))
+            .map(x => Definition.fromNode(x.asInstanceOf[StoredNode], flowGraph.nodeToNumber))
         }
       }
     (defsForParams ++ defsForCalls).toMap
@@ -203,7 +210,7 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutab
                            allCalls: Map[String, List[Call]]): Set[Definition] = {
 
     def definitionsOfSameVariable(definition: Definition): Set[Definition] = {
-      val definedNodes = definition.node match {
+      val definedNodes = flowGraph.numberToNode(definition.nodeNum) match {
         case param: MethodParameterIn =>
           allIdentifiers(param.name)
             .filter(x => x.id != param.id)
@@ -215,7 +222,12 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutab
             .filter(x => x.id != call.id)
         case _ => Set()
       }
-      definedNodes.map(Definition.fromNode).toSet
+      definedNodes
+      // It can happen that the CFG is broken and contains isolated nodes,
+      // in which case they are not in `nodeToNumber`. Let's filter those.
+        .filter(x => flowGraph.nodeToNumber.contains(x))
+        .map(x => Definition.fromNode(x, flowGraph.nodeToNumber))
+        .toSet
     }
 
     genOfCall.flatMap { definition =>
@@ -235,7 +247,8 @@ class ReachingDefTransferFunction(method: Method) extends TransferFunction[mutab
   * when creating reaching definition edges, we simply create edges from the
   * identifier to the exit node.
   * */
-class OptimizedReachingDefTransferFunction(method: Method) extends ReachingDefTransferFunction(method) {
+class OptimizedReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph)
+    extends ReachingDefTransferFunction(flowGraph) {
 
   lazy val loneIdentifiers: Map[Call, List[Definition]] = {
     val paramAndLocalNames = method.parameter.name.l ++ method.local.name.l
@@ -251,7 +264,12 @@ class OptimizedReachingDefTransferFunction(method: Method) extends ReachingDefTr
       .collect { case (_, v) if v.size == 1 => v.map { case (_, call, arg) => (call, arg) }.head }
       .toList
       .groupBy(_._1)
-      .map { case (k, v) => (k, v.map(x => Definition.fromNode(x._2))) }
+      .map {
+        case (k, v) =>
+          (k,
+           v.filter(x => flowGraph.nodeToNumber.contains(x._2))
+             .map(x => Definition.fromNode(x._2, flowGraph.nodeToNumber)))
+      }
   }
 
   override def initGen(method: Method): Map[StoredNode, mutable.Set[Definition]] =
