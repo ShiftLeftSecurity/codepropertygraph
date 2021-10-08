@@ -88,9 +88,9 @@ trait MacroHandler {
       None
     } else {
       ast.nodes
-        .find {
-          case x: AstNodeNew =>
-            x.isInstanceOf[ExpressionNew] && !x.isInstanceOf[NewFieldIdentifier] && x.code == normalizedCode
+        .collect { case x: AstNodeNew => x }
+        .find { x =>
+          x.isInstanceOf[ExpressionNew] && !x.isInstanceOf[NewFieldIdentifier] && x.code == normalizedCode
         }
     }
   }
