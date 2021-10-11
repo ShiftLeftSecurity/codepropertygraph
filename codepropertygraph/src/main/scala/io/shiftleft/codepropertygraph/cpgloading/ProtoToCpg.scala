@@ -1,6 +1,7 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.{Edge, Node}
 import io.shiftleft.proto.cpg.Cpg.PropertyValue
 import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase._
@@ -8,7 +9,7 @@ import io.shiftleft.utils.StringInterner
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
 
-import java.util.{Collection => JCollection, NoSuchElementException}
+import java.util.{NoSuchElementException, Collection => JCollection}
 import scala.jdk.CollectionConverters._
 
 object ProtoToCpg {
@@ -60,41 +61,34 @@ class ProtoToCpg(overflowConfig: Config = Config.withoutOverflow) {
     }
   }
 
-  def addEdges(protoEdges: JCollection[Edge]): Unit =
-    addEdges(protoEdges.asScala)
-
-  def addEdges(protoEdges: Iterable[Edge]): Unit = {
-    for (edgeProto <- protoEdges) {
-      val srcNode = findNodeById(edgeProto, edgeProto.getSrc)
-      val dstNode = findNodeById(edgeProto, edgeProto.getDst)
-      val properties = edgeProto.getPropertyList.asScala.toSeq
-        .map(prop => (prop.getName.name, prop.getValue))
-        .map(toProperty)
-      try {
-        srcNode --- (edgeProto.getType.name, properties: _*) --> dstNode
-      } catch {
-        case e: IllegalArgumentException =>
-          val context = "label=" + edgeProto.getType.name +
-            ", srcNodeId=" + edgeProto.getSrc +
-            ", dstNodeId=" + edgeProto.getDst +
-            ", srcNode=" + srcNode +
-            ", dstNode=" + dstNode
-          logger.warn("Failed to insert an edge. context: " + context, e)
-      }
+  def addEdge(dst: Long, src: Long, typ: EdgeType, properties: Iterable[Edge.Property]): Unit = {
+    val srcNode = findNodeById(src, typ)
+    val dstNode = findNodeById(dst, typ)
+    val propertyPairs = properties.toSeq
+      .map(prop => (prop.getName.name, prop.getValue))
+      .map(toProperty)
+    try {
+      srcNode --- (typ.name, propertyPairs: _*) --> dstNode
+    } catch {
+      case e: IllegalArgumentException =>
+        val context = "label=" + typ.name +
+          ", srcNodeId=" + src +
+          ", dstNodeId=" + dst +
+          ", srcNode=" + srcNode +
+          ", dstNode=" + dstNode
+        logger.warn("Failed to insert an edge. context: " + context, e)
     }
   }
 
   def build(): Cpg = new Cpg(odbGraph)
 
-  private def findNodeById(edge: Edge, nodeId: Long): overflowdb.Node = {
+  private def findNodeById(nodeId: Long, typ: EdgeType): overflowdb.Node = {
     if (nodeId == -1)
-      throw new IllegalArgumentException(
-        "edge " + edge + " has illegal src|dst node. something seems wrong with the cpg")
+      throw new IllegalArgumentException("Illegal src|dst node ID -1 on edge of type " + typ.name)
     odbGraph
       .nodeOption(nodeId)
       .getOrElse(
-        throw new NoSuchElementException(
-          "Couldn't find src|dst node " + nodeId + " for edge " + edge + " of type " + edge.getType.name))
+        throw new NoSuchElementException("Couldn't find src|dst node " + nodeId + " for edge of type " + typ.name))
   }
 
 }
