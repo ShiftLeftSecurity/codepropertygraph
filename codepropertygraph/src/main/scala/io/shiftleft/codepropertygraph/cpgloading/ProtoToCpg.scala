@@ -9,7 +9,7 @@ import io.shiftleft.utils.StringInterner
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
 
-import java.util.{NoSuchElementException, Collection => JCollection}
+import java.util.{Collection => JCollection, NoSuchElementException}
 import scala.jdk.CollectionConverters._
 
 object ProtoToCpg {
