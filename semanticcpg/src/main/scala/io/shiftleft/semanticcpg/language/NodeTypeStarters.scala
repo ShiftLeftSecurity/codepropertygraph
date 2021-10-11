@@ -6,9 +6,9 @@ import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
 import io.shiftleft.semanticcpg.language._
 import overflowdb._
 import overflowdb.traversal._
-import overflowdb.traversal.help.{Doc, TraversalSource}
+import overflowdb.traversal.help.Doc
 
-@TraversalSource
+@help.TraversalSource
 class NodeTypeStarters(cpg: Cpg) {
 
   /**
@@ -172,6 +172,13 @@ class NodeTypeStarters(cpg: Cpg) {
     * */
   def method(fullName: String): Traversal[Method] =
     method.fullName(fullName)
+
+  /**
+    * Shorthand for `cpg.method.fullNameExact(fullName)`, but first looks up the fullname in the index.
+    * */
+  def methodFullNameExact(value: String): Traversal[Method] = {
+    TraversalSource(cpg.graph).has(Method.PropertyNames.FullName, value).label(Method.Label).cast[Method]
+  }
 
   /**
     Traverse to all formal return parameters
