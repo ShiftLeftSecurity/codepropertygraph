@@ -152,8 +152,10 @@ class ReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph) extends Trans
             .l
           mutable.BitSet(
             (retVal ++ args)
-              .filter(x => nodeToNumber.contains(x))
-              .map(x => Definition.fromNode(x.asInstanceOf[StoredNode], nodeToNumber)): _*
+              .collect {
+                case x if nodeToNumber.contains(x) =>
+                  Definition.fromNode(x.asInstanceOf[StoredNode], nodeToNumber)
+              }: _*
           )
         }
       }
@@ -227,9 +229,7 @@ class ReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph) extends Trans
       definedNodes
       // It can happen that the CFG is broken and contains isolated nodes,
       // in which case they are not in `nodeToNumber`. Let's filter those.
-        .filter(x => nodeToNumber.contains(x))
-        .map(x => Definition.fromNode(x, nodeToNumber))
-        .toSet
+      .collect { case x if nodeToNumber.contains(x) => Definition.fromNode(x, nodeToNumber) }.toSet
     }
 
     genOfCall.flatMap { definition =>
