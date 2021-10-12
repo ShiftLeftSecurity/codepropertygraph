@@ -1,9 +1,8 @@
 package io.shiftleft.c2cpg.utils
 
-import java.io
-
 import org.slf4j.LoggerFactory
 
+import java.io
 import scala.collection.mutable
 import scala.sys.process.{Process, ProcessLogger}
 import scala.util.{Failure, Success, Try}
