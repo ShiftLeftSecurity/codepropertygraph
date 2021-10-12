@@ -19,7 +19,7 @@ object IncludeAutoDiscovery {
     output
       .slice(startIndex, endIndex)
       .map { p =>
-        Paths.get(p.trim)
+        Paths.get(p.trim).toRealPath()
       }
       .toSet
   }
@@ -34,16 +34,15 @@ object IncludeAutoDiscovery {
   }
 
   def discoverIncludePaths(config: Config): List[Path] = {
-    val includesFromConfig = config.includePaths.map(Paths.get(_))
-    if (!config.includePathsAutoDiscovery) {
-      includesFromConfig.map(_.toRealPath()).toList
-    } else {
-      val includePaths = (discoverPaths(C_INCLUDE_COMMAND) ++ discoverPaths(CPP_INCLUDE_COMMAND)).map(_.toRealPath())
+    val includesFromConfig = config.includePaths.map(Paths.get(_).toRealPath())
+    val includesFromSystem = if (config.includePathsAutoDiscovery) {
+      val includePaths = discoverPaths(C_INCLUDE_COMMAND) ++ discoverPaths(CPP_INCLUDE_COMMAND)
       logger.info(
         "Using the following system include paths:" + includePaths
           .mkString(System.lineSeparator() + "- ", System.lineSeparator() + "- ", System.lineSeparator()))
-      (includesFromConfig ++ includePaths).toList
-    }
+      includePaths
+    } else Set.empty
+    (includesFromConfig ++ includesFromSystem).toList
   }
 
 }
