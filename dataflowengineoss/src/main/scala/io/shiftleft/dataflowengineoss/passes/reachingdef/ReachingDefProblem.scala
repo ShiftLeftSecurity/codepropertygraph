@@ -109,6 +109,8 @@ class ReachingDefFlowGraph(val method: Method) extends FlowGraph {
   * */
 class ReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph) extends TransferFunction[mutable.BitSet] {
 
+  private val nodeToNumber = flowGraph.nodeToNumber
+
   val method = flowGraph.method
 
   val gen: Map[StoredNode, mutable.BitSet] =
@@ -133,7 +135,7 @@ class ReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph) extends Trans
   def initGen(method: Method): Map[StoredNode, mutable.BitSet] = {
 
     val defsForParams = method.parameter.l.map { param =>
-      param -> mutable.BitSet(Definition.fromNode(param.asInstanceOf[StoredNode], flowGraph.nodeToNumber))
+      param -> mutable.BitSet(Definition.fromNode(param.asInstanceOf[StoredNode], nodeToNumber))
     }
 
     // We filter out field accesses to ensure that they propagate
@@ -150,8 +152,10 @@ class ReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph) extends Trans
             .l
           mutable.BitSet(
             (retVal ++ args)
-              .filter(x => flowGraph.nodeToNumber.contains(x))
-              .map(x => Definition.fromNode(x.asInstanceOf[StoredNode], flowGraph.nodeToNumber)): _*
+              .collect {
+                case x if nodeToNumber.contains(x) =>
+                  Definition.fromNode(x.asInstanceOf[StoredNode], nodeToNumber)
+              }: _*
           )
         }
       }
@@ -225,9 +229,7 @@ class ReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph) extends Trans
       definedNodes
       // It can happen that the CFG is broken and contains isolated nodes,
       // in which case they are not in `nodeToNumber`. Let's filter those.
-        .filter(x => flowGraph.nodeToNumber.contains(x))
-        .map(x => Definition.fromNode(x, flowGraph.nodeToNumber))
-        .toSet
+      .collect { case x if nodeToNumber.contains(x) => Definition.fromNode(x, nodeToNumber) }.toSet
     }
 
     genOfCall.flatMap { definition =>
