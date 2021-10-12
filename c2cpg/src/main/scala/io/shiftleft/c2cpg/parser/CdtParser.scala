@@ -34,7 +34,7 @@ class CdtParser(private val parseConfig: ParseConfig, private val headerFileFind
 
   private val definedSymbols: util.Map[String, String] = parseConfig.definedSymbols.asJava
 
-  private val includePaths: Seq[String] = parseConfig.includePaths.map(_.toAbsolutePath.toString)
+  private val includePaths: Seq[String] = parseConfig.includePaths.map(_.toString)
   private val info: ScannerInfo = new ScannerInfo(definedSymbols, includePaths.toArray)
   private val log: DefaultLogService = new DefaultLogService
 

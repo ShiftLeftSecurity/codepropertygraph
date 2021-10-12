@@ -3,6 +3,7 @@ package io.shiftleft.c2cpg
 import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.parser.{FileDefaults, HeaderFileFinder, ParseConfig}
 import io.shiftleft.c2cpg.passes.{AstCreationPass, PreprocessorPass}
+import io.shiftleft.c2cpg.utils.IncludeAutoDiscovery
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.IntervalKeyPool
@@ -14,14 +15,13 @@ import io.shiftleft.x2cpg.{SourceFiles, X2Cpg, X2CpgConfig}
 import org.slf4j.LoggerFactory
 import scopt.OParser
 
-import java.nio.file.Paths
 import scala.util.control.NonFatal
 
 class C2Cpg {
 
   private def createParseConfig(config: Config): ParseConfig = {
     ParseConfig(
-      config.includePaths.map(Paths.get(_)).toList,
+      IncludeAutoDiscovery.discoverIncludePaths(config),
       config.defines.map {
         case define if define.contains("=") =>
           val s = define.split("=")
@@ -72,7 +72,8 @@ object C2Cpg {
                           includeComments: Boolean = false,
                           logProblems: Boolean = false,
                           logPreprocessor: Boolean = false,
-                          printIfDefsOnly: Boolean = false)
+                          printIfDefsOnly: Boolean = false,
+                          includePathsAutoDiscovery: Boolean = false)
       extends X2CpgConfig[Config] {
 
     override def withAdditionalInputPath(inputPath: String): Config = copy(inputPaths = inputPaths + inputPath)
@@ -101,11 +102,14 @@ object C2Cpg {
         opt[String]("include")
           .unbounded()
           .text("header include paths")
-          .action((incl, cfg) => cfg.copy(includePaths = cfg.includePaths + incl)),
+          .action((incl, c) => c.copy(includePaths = c.includePaths + incl)),
+        opt[Unit]("with-include-auto-discovery")
+          .text("auto discover header include paths")
+          .action((_, c) => c.copy(includePathsAutoDiscovery = true)),
         opt[String]("define")
           .unbounded()
           .text("define a name")
-          .action((d, cfg) => cfg.copy(defines = cfg.defines + d))
+          .action((d, c) => c.copy(defines = c.defines + d))
       )
     }
 
