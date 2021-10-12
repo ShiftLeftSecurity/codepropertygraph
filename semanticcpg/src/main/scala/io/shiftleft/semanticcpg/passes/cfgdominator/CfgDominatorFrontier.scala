@@ -20,19 +20,19 @@ class CfgDominatorFrontier[NodeType](cfgAdapter: CfgAdapter[NodeType], domTreeAd
 
   def calculate(cfgNodes: Seq[NodeType]): mutable.MultiDict[NodeType, NodeType] = {
     val domFrontier = mutable.MultiDict.empty[NodeType, NodeType]
-    cfgNodes
-      .flatMap(onlyJoinNodes)
-      .flatMap(x => withIDom(x._1, x._2))
-      .foreach {
-        case (joinNode, preds, joinNodeIDom) =>
-          preds.foreach { p =>
-            var currentPred = Option(p)
-            while (currentPred.isDefined && currentPred.get != joinNodeIDom) {
-              domFrontier.addOne(currentPred.get, joinNode)
-              currentPred = doms(currentPred.get)
-            }
-          }
+
+    for {
+      cfgNode <- cfgNodes
+      (nodeType, joinNodes) <- onlyJoinNodes(cfgNode)
+      (joinNode, preds, joinNodeIDom) <- withIDom(nodeType, joinNodes)
+    } preds.foreach { p =>
+      var currentPred = Option(p)
+      while (currentPred.isDefined && currentPred.get != joinNodeIDom) {
+        domFrontier.addOne(currentPred.get, joinNode)
+        currentPred = doms(currentPred.get)
       }
+    }
+
     domFrontier
   }
 }
