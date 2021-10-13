@@ -40,11 +40,13 @@ class C2Cpg {
 
     val cpg = newEmptyCpg(Some(config.outputPath))
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
+    val parserConfig = createParseConfig(config)
+    val headerIncludePaths = parserConfig.includePaths.map(_.toString)
 
     new MetaDataPass(cpg, Languages.NEWC, Some(metaDataKeyPool)).createAndApply()
-    val headerFileFinder = new HeaderFileFinder(config.inputPaths.toList)
+    val headerFileFinder = new HeaderFileFinder(headerIncludePaths)
     val astCreationPass =
-      new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, createParseConfig(config), headerFileFinder)
+      new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, parserConfig, headerFileFinder)
     astCreationPass.createAndApply()
     new CfgCreationPass(cpg).createAndApply()
     new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
@@ -53,8 +55,10 @@ class C2Cpg {
 
   def printIfDefsOnly(config: Config): Unit = {
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
-    val headerFileFinder = new HeaderFileFinder(config.inputPaths.toList)
-    val stmts = new PreprocessorPass(sourceFileNames, createParseConfig(config), headerFileFinder).run().mkString(",")
+    val parserConfig = createParseConfig(config)
+    val headerIncludePaths = parserConfig.includePaths.map(_.toString)
+    val headerFileFinder = new HeaderFileFinder(headerIncludePaths)
+    val stmts = new PreprocessorPass(sourceFileNames, parserConfig, headerFileFinder).run().mkString(",")
     println(stmts)
   }
 

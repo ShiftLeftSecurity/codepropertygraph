@@ -9,17 +9,15 @@ import java.nio.file.{FileSystems, Path}
 class HeaderFileFinder(roots: List[String]) {
 
   private val headerExtensions = List(".h", ".hpp", ".hh")
-  private val nameToPathMap: Map[String, List[Path]] = {
 
-    SourceFiles
-      .determine(roots.toSet, headerExtensions.toSet)
-      .map { p =>
-        val file = File(p)
-        (file.name, file.path)
-      }
-      .groupBy(_._1)
-      .map(x => (x._1, x._2.map(_._2)))
-  }
+  private val nameToPathMap: Map[String, List[Path]] = SourceFiles
+    .determine(roots.toSet, headerExtensions.toSet)
+    .map { p =>
+      val file = File(p)
+      (file.name, file.path)
+    }
+    .groupBy(_._1)
+    .map(x => (x._1, x._2.map(_._2)))
 
   /**
     * Given an unresolved header file, given as a non-existing absolute path,
