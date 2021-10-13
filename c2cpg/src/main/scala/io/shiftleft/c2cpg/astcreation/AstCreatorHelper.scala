@@ -84,8 +84,9 @@ trait AstCreatorHelper {
     }
 
   protected def registerType(typeName: String): String = {
-    global.usedTypes.put(typeName, true)
-    typeName
+    val fixedTypeName = fixQualifiedName(typeName)
+    global.usedTypes.put(fixedTypeName, true)
+    fixedTypeName
   }
 
   private def cleanType(t: String): String = t match {
@@ -95,8 +96,9 @@ trait AstCreatorHelper {
     case t if t.startsWith("{") && t.endsWith("}") => Defines.anyTypeName
     case t if t.startsWith("[") && t.endsWith("]") => "[]"
     case t if t.contains("*")                      => "*"
-    case t if t.contains("::")                     => fixQualifiedName(t).split(".").lastOption.getOrElse(Defines.anyTypeName)
-    case someType                                  => someType.replace(" ", "")
+    case t if t.contains(Defines.qualifiedNameSeparator) =>
+      fixQualifiedName(t).split(".").lastOption.getOrElse(Defines.anyTypeName)
+    case someType => someType.replace(" ", "")
   }
 
   protected def typeFor(node: IASTNode): String = cleanType(ASTTypeUtil.getNodeType(node))

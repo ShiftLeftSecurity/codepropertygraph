@@ -320,6 +320,107 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
       }
     }
 
+    "be correct for derived classes in namespaces" in CompleteCpgFixture(
+      """
+        |namespace BaseClasses {
+        |
+        |class A {
+        |};
+        |
+        |}
+        |
+        |namespace IntermediateClasses {
+        |
+        |class B1 : public BaseClasses::A {
+        |};
+        |
+        |class B2 : public BaseClasses::A {
+        |};
+        |
+        |}
+        |
+        |namespace FinalClasses {
+        |
+        |class C11 : public IntermediateClasses::B1 {
+        |};
+        |
+        |class C12 : public IntermediateClasses::B1 {
+        |};
+        |
+        |class C21 : public IntermediateClasses::B2 {
+        |};
+        |
+        |class C22 : public IntermediateClasses::B2 {
+        |};
+        |
+        |class C23 : public IntermediateClasses::B2 {
+        |};
+        |
+        |}
+        |
+        |int main(int argc, char** argv) {
+        |  IntermediateClasses::B1* b11 = new FinalClasses::C11();
+        |  IntermediateClasses::B1* b12 = new FinalClasses::C12();
+        |  IntermediateClasses::B2* b21 = new FinalClasses::C21();
+        |  IntermediateClasses::B2* b22 = new FinalClasses::C22();
+        |  IntermediateClasses::B2* b23 = new FinalClasses::C23();
+        |
+        |  BaseClasses::A* a11 = b11;
+        |  BaseClasses::A* a12 = b12;
+        |  BaseClasses::A* a21 = b21;
+        |  BaseClasses::A* a22 = b22;
+        |  BaseClasses::A* a23 = b23;
+        |
+        |  return 0;
+        |};
+        |""".stripMargin) { cpg =>
+      inside(cpg.namespace.nameNot("<global>").sortBy(_.name).toList) {
+        case List(baseClasses, finalClasses, interClasses) =>
+          baseClasses.name shouldBe "BaseClasses"
+          interClasses.name shouldBe "IntermediateClasses"
+          finalClasses.name shouldBe "FinalClasses"
+      }
+      inside(cpg.namespaceBlock.nameNot("<global>").l) {
+        case List(baseClasses, interClasses, finalClasses) =>
+          baseClasses.name shouldBe "BaseClasses"
+          baseClasses.fullName shouldBe "BaseClasses"
+          interClasses.name shouldBe "IntermediateClasses"
+          interClasses.fullName shouldBe "IntermediateClasses"
+          finalClasses.name shouldBe "FinalClasses"
+          finalClasses.fullName shouldBe "FinalClasses"
+      }
+      inside(cpg.typ.name("A").derivedTypeTransitive.l) {
+        case List(b1, c11, c12, b2, c21, c22, c23) =>
+          b1.name shouldBe "B1"
+          b1.fullName shouldBe "IntermediateClasses.B1"
+          b1.typeDeclFullName shouldBe "IntermediateClasses.B1"
+
+          c11.name shouldBe "C11"
+          c11.fullName shouldBe "FinalClasses.C11"
+          c11.typeDeclFullName shouldBe "FinalClasses.C11"
+
+          c12.name shouldBe "C12"
+          c12.fullName shouldBe "FinalClasses.C12"
+          c12.typeDeclFullName shouldBe "FinalClasses.C12"
+
+          b2.name shouldBe "B2"
+          b2.fullName shouldBe "IntermediateClasses.B2"
+          b2.typeDeclFullName shouldBe "IntermediateClasses.B2"
+
+          c21.name shouldBe "C21"
+          c21.fullName shouldBe "FinalClasses.C21"
+          c21.typeDeclFullName shouldBe "FinalClasses.C21"
+
+          c22.name shouldBe "C22"
+          c22.fullName shouldBe "FinalClasses.C22"
+          c22.typeDeclFullName shouldBe "FinalClasses.C22"
+
+          c23.name shouldBe "C23"
+          c23.fullName shouldBe "FinalClasses.C23"
+          c23.typeDeclFullName shouldBe "FinalClasses.C23"
+      }
+    }
+
   }
 
 }

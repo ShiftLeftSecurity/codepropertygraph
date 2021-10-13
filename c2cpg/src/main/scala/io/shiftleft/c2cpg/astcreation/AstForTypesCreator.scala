@@ -105,7 +105,7 @@ trait AstForTypesCreator {
           .name(name)
           .typeFullName(registerType(tpe))
           .order(order)
-        scope.addToScope(name, (l, tpe))
+        scope.addToScope(name, (l, fixQualifiedName(tpe)))
         Ast(l)
       case _ =>
         val l = NewLocal()
@@ -113,7 +113,7 @@ trait AstForTypesCreator {
           .name(name)
           .typeFullName(registerType(declTypeName))
           .order(order)
-        scope.addToScope(name, (l, declTypeName))
+        scope.addToScope(name, (l, fixQualifiedName(declTypeName)))
         Ast(l)
     }
   }
@@ -264,7 +264,7 @@ trait AstForTypesCreator {
 
     val typeDecl = typeSpecifier match {
       case cppClass: ICPPASTCompositeTypeSpecifier =>
-        val baseClassList = cppClass.getBaseSpecifiers.toSeq.map(_.getNameSpecifier.toString)
+        val baseClassList = cppClass.getBaseSpecifiers.toSeq.map(s => fixQualifiedName(s.getNameSpecifier.toString))
         baseClassList.foreach(registerType)
         newTypeDecl(name,
                     registerType(fullname),
