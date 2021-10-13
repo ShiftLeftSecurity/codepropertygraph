@@ -22,7 +22,7 @@ class MethodHeaderTests extends AnyWordSpec with Matchers {
       method.property(Properties.LINE_NUMBER) shouldBe 1
       method.property(Properties.COLUMN_NUMBER) shouldBe 0
       method.property(Properties.LINE_NUMBER_END) shouldBe 3
-      method.property(Properties.COLUMN_NUMBER_END) shouldBe 0
+      method.property(Properties.COLUMN_NUMBER_END) shouldBe 1
       method.property(Properties.CODE) shouldBe "int foo (int x,int y)"
     }
 

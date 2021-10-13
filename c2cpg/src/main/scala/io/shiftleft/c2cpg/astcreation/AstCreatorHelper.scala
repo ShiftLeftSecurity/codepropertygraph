@@ -26,10 +26,8 @@ trait AstCreatorHelper {
     }
   }
 
-  private def nullSafeFileLocation(node: IASTNode): Option[IASTFileLocation] = Option(node.getFileLocation)
-
-  private def nullSafeLastNodeLocation(node: IASTNode): Option[IASTNodeLocation] =
-    Option(node.getNodeLocations).flatMap(_.lastOption)
+  private def nullSafeFileLocation(node: IASTNode): Option[IASTFileLocation] =
+    Option(parserResult.flattenLocationsToFile(node.getNodeLocations).asFileLocation())
 
   protected def line(node: IASTNode): Option[Integer] = {
     nullSafeFileLocation(node).map(_.getStartingLineNumber)
@@ -43,30 +41,32 @@ trait AstCreatorHelper {
     if (line(node).isEmpty) None
     else {
       val l = line(node).get - 1
+      val loc = nullSafeFileLocation(node)
       if (l == 0) {
-        nullSafeFileLocation(node).map(_.getNodeOffset)
-      } else if (nullSafeFileLocation(node).map(_.getNodeOffset).contains(0)) {
+        loc.map(_.getNodeOffset)
+      } else if (loc.map(_.getNodeOffset).contains(0)) {
         Some(0)
       } else {
         val slice = fileLines.slice(0, l)
         val length = slice.size - 1
-        nullSafeFileLocation(node).map(_.getNodeOffset - 1 - slice.sum - length)
+        loc.map(_.getNodeOffset - 1 - slice.sum - length)
       }
     }
   }
 
   protected def columnEnd(node: IASTNode): Option[Integer] = {
-    if (line(node).isEmpty) None
+    if (lineEnd(node).isEmpty) None
     else {
-      val l = line(node).get - 1
+      val l = lineEnd(node).get - 1
+      val loc = nullSafeFileLocation(node)
       if (l == 0) {
-        nullSafeLastNodeLocation(node).map(_.getNodeOffset)
-      } else if (nullSafeLastNodeLocation(node).map(_.getNodeOffset).contains(0)) {
+        loc.map(l => l.getNodeOffset + l.getNodeLength)
+      } else if (loc.map(l => l.getNodeOffset + l.getNodeLength).contains(0)) {
         Some(0)
       } else {
         val slice = fileLines.slice(0, l)
         val length = slice.size - 1
-        nullSafeLastNodeLocation(node).map(_.getNodeOffset - 1 - slice.sum - length)
+        loc.map(l => l.getNodeOffset + l.getNodeLength - 1 - slice.sum - length)
       }
     }
   }
