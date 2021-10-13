@@ -6,6 +6,8 @@ import io.shiftleft.c2cpg.passes.AstCreationPass
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
+import io.shiftleft.semanticcpg.passes.linking.linker.Linker
+import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
 import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
 
 object CompleteCpgFixture {
@@ -21,6 +23,8 @@ object CompleteCpgFixture {
       astCreationPass.createAndApply()
       new CfgCreationPass(cpg).createAndApply()
       new TypeNodePass(astCreationPass.usedTypes(), cpg).createAndApply()
+      new NamespaceCreator(cpg).createAndApply()
+      new Linker(cpg).createAndApply()
       f(cpg)
     }
   }
