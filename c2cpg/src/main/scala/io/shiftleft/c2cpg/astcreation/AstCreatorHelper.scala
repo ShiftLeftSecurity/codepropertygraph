@@ -179,6 +179,8 @@ trait AstCreatorHelper {
       case enum: IASTEnumerationSpecifier =>
         fullName(enum.getParent) + "." + nodeSignature(enum.getName)
       case c: IASTCompositeTypeSpecifier => nodeSignature(c.getName)
+      case f: IASTFunctionDeclarator if f.getName.toString.isEmpty && f.getNestedDeclarator != null =>
+        fullName(f.getParent) + "." + nodeSignature(f.getNestedDeclarator.getName)
       case f: IASTFunctionDeclarator =>
         fullName(f.getParent) + "." + nodeSignature(f.getName)
       case f: ICPPASTLambdaExpression =>
@@ -204,7 +206,9 @@ trait AstCreatorHelper {
     val name = node match {
       case f: ICPPASTFunctionDefinition => lastNameOfQualifiedName(f.getDeclarator.getName.toString)
       case f: IASTFunctionDefinition    => f.getDeclarator.getName.toString
-      case f: IASTFunctionDeclarator    => f.getName.toString
+      case f: IASTFunctionDeclarator if f.getName.toString.isEmpty && f.getNestedDeclarator != null =>
+        f.getNestedDeclarator.getName.toString
+      case f: IASTFunctionDeclarator => f.getName.toString
       case d: CPPASTIdExpression if d.getEvaluation.isInstanceOf[EvalBinding] =>
         val evaluation = d.getEvaluation.asInstanceOf[EvalBinding]
         evaluation.getBinding match {
