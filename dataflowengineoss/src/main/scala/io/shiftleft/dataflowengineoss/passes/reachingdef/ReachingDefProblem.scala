@@ -1,11 +1,8 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.utils.MemberAccess.isGenericMemberAccessName
-import org.slf4j.{Logger, LoggerFactory}
-import overflowdb.traversal._
 
 import scala.collection.{Set, mutable}
 
@@ -26,7 +23,7 @@ object Definition {
 
 object ReachingDefProblem {
   def create(method: Method): DataFlowProblem[mutable.BitSet] = {
-    val flowGraph = new ReachingDefFlowGraph(method)
+    val flowGraph = new FlowGraph(method)
     val transfer = new OptimizedReachingDefTransferFunction(flowGraph)
     val init = new ReachingDefInit(transfer.gen)
     def meet: (mutable.BitSet, mutable.BitSet) => mutable.BitSet =
@@ -37,12 +34,7 @@ object ReachingDefProblem {
 
 }
 
-/**
-  * The control flow graph as viewed by the data flow solver.
-  * */
-class ReachingDefFlowGraph(val method: Method) extends FlowGraph {
-
-  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
+class NodeNumbering(method: Method) {
 
   val entryNode: StoredNode = method
   val exitNode: StoredNode = method.methodReturn
@@ -56,58 +48,13 @@ class ReachingDefFlowGraph(val method: Method) extends FlowGraph {
   lazy val allNodesPostOrder: List[StoredNode] =
     List(exitNode) ++ method.postOrder.toList ++ method.parameter.toList ++ List(entryNode)
 
-  val succ: Map[StoredNode, List[StoredNode]] = initSucc(allNodesReversePostOrder)
-  val pred: Map[StoredNode, List[StoredNode]] = initPred(allNodesReversePostOrder, method)
-
-  /**
-    * Create a map that allows CFG successors to be retrieved for each node
-    * */
-  private def initSucc(ns: List[StoredNode]): Map[StoredNode, List[StoredNode]] = {
-    ns.map {
-      case n @ (_: Return) => n -> List(exitNode)
-      case n @ (param: MethodParameterIn) =>
-        n -> {
-          val nextParam = param.method.parameter.order(param.order + 1).headOption
-          if (nextParam.isDefined) { nextParam.toList } else { param.method.cfgFirst.l }
-        }
-      case n @ (cfgNode: CfgNode) =>
-        n ->
-          // `.cfgNext` would be wrong here because it filters `METHOD_RETURN`
-          cfgNode.out(EdgeTypes.CFG).map(_.asInstanceOf[StoredNode]).l
-      case n =>
-        logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
-        n -> List()
-    }.toMap
-  }
-
-  /**
-    * Create a map that allows CFG predecessors to be retrieved for each node
-    * */
-  private def initPred(ns: List[StoredNode], method: Method): Map[StoredNode, List[StoredNode]] = {
-    ns.map {
-      case n @ (param: MethodParameterIn) =>
-        n -> {
-          val prevParam = param.method.parameter.order(param.order - 1).headOption
-          if (prevParam.isDefined) { prevParam.toList } else { List(method) }
-        }
-      case n @ (_: CfgNode) if method.cfgFirst.headOption.contains(n) =>
-        n -> method.parameter.l.sortBy(_.order).lastOption.toList
-
-      case n @ (cfgNode: CfgNode) => n -> cfgNode.cfgPrev.l
-
-      case n =>
-        logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
-        n -> List()
-    }.toMap
-  }
-
 }
 
 /**
   * For each node of the graph, this transfer function defines how it affects
   * the propagation of definitions.
   * */
-class ReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph) extends TransferFunction[mutable.BitSet] {
+class ReachingDefTransferFunction(flowGraph: FlowGraph) extends TransferFunction[mutable.BitSet] {
 
   private val nodeToNumber = flowGraph.nodeToNumber
 
@@ -249,8 +196,7 @@ class ReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph) extends Trans
   * when creating reaching definition edges, we simply create edges from the
   * identifier to the exit node.
   * */
-class OptimizedReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph)
-    extends ReachingDefTransferFunction(flowGraph) {
+class OptimizedReachingDefTransferFunction(flowGraph: FlowGraph) extends ReachingDefTransferFunction(flowGraph) {
 
   lazy val loneIdentifiers: Map[Call, List[Definition]] = {
     val paramAndLocalNames = method.parameter.name.l ++ method.local.name.l

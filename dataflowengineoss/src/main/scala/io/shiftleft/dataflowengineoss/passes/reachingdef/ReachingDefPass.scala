@@ -63,7 +63,7 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
   private def addReachingDefEdges(problem: DataFlowProblem[mutable.BitSet],
                                   method: Method,
                                   solution: Solution[mutable.BitSet]): DiffGraph.Builder = {
-    val numberToNode = problem.flowGraph.asInstanceOf[ReachingDefFlowGraph].numberToNode
+    val numberToNode = problem.flowGraph.numberToNode
     implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
     val in = solution.in
     val gen = solution.problem.transferFunction
@@ -168,7 +168,7 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
                                         problem: DataFlowProblem[mutable.BitSet],
                                         method: Method,
                                         solution: Solution[mutable.BitSet]): Unit = {
-    val numberToNode = problem.flowGraph.asInstanceOf[ReachingDefFlowGraph].numberToNode
+    val numberToNode = problem.flowGraph.numberToNode
     implicit val dstGraph: DiffGraph.Builder = builder
     val exitNode = method.methodReturn
     val transferFunction = solution.problem.transferFunction.asInstanceOf[OptimizedReachingDefTransferFunction]

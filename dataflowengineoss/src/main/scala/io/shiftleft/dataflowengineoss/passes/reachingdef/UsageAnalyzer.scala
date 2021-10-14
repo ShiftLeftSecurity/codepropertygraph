@@ -17,7 +17,7 @@ import scala.collection.{Set, mutable}
   * */
 class UsageAnalyzer(problem: DataFlowProblem[mutable.BitSet], in: Map[StoredNode, Set[Definition]]) {
 
-  val numberToNode = problem.flowGraph.asInstanceOf[ReachingDefFlowGraph].numberToNode
+  val numberToNode = problem.flowGraph.numberToNode
   private val allNodes = in.keys.toList
   val usedIncomingDefs: Map[StoredNode, Map[StoredNode, Set[Definition]]] = initUsedIncomingDefs()
 

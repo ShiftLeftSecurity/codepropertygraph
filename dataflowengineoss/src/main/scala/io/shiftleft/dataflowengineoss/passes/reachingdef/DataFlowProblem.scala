@@ -1,6 +1,10 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
 
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
+import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.codepropertygraph.generated.nodes.{CfgNode, Method, MethodParameterIn, Return, StoredNode}
+import io.shiftleft.semanticcpg.language._
+import org.slf4j.{Logger, LoggerFactory}
+import overflowdb.traversal.jIteratortoTraversal
 
 /**
   * A general data flow problem, formulated as in the Dragon Book, Second Edition
@@ -22,13 +26,67 @@ class DataFlowProblem[V](val flowGraph: FlowGraph,
   * defining successors and predecessors, we provide a wrapper that takes
   * care of these minor discrepancies.
   * */
-trait FlowGraph {
-  val entryNode: StoredNode
-  val exitNode: StoredNode
-  val allNodesReversePostOrder: List[StoredNode]
-  val allNodesPostOrder: List[StoredNode]
-  val succ: Map[StoredNode, List[StoredNode]]
-  val pred: Map[StoredNode, List[StoredNode]]
+class FlowGraph(val method: Method) {
+
+  val entryNode: StoredNode = method
+  val exitNode: StoredNode = method.methodReturn
+
+  val allNodesReversePostOrder: List[StoredNode] =
+    List(entryNode) ++ method.parameter.toList ++ method.reversePostOrder.toList ++ List(exitNode)
+
+  val nodeToNumber: Map[StoredNode, Int] = allNodesReversePostOrder.zipWithIndex.map { case (x, i) => x -> i }.toMap
+  val numberToNode: Map[Int, StoredNode] = allNodesReversePostOrder.zipWithIndex.map { case (x, i) => i -> x }.toMap
+
+  lazy val allNodesPostOrder: List[StoredNode] =
+    List(exitNode) ++ method.postOrder.toList ++ method.parameter.toList ++ List(entryNode)
+
+  val succ: Map[StoredNode, List[StoredNode]] = initSucc()
+  val pred: Map[StoredNode, List[StoredNode]] = initPred()
+
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
+  /**
+    * Create a map that allows CFG successors to be retrieved for each node
+    * */
+  private def initSucc(): Map[StoredNode, List[StoredNode]] = {
+    allNodesReversePostOrder.map {
+      case n @ (_: Return) => n -> List(exitNode)
+      case n @ (param: MethodParameterIn) =>
+        n -> {
+          val nextParam = param.method.parameter.order(param.order + 1).headOption
+          if (nextParam.isDefined) { nextParam.toList } else { param.method.cfgFirst.l }
+        }
+      case n @ (cfgNode: CfgNode) =>
+        n ->
+          // `.cfgNext` would be wrong here because it filters `METHOD_RETURN`
+          cfgNode.out(EdgeTypes.CFG).map(_.asInstanceOf[StoredNode]).l
+      case n =>
+        logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
+        n -> List()
+    }.toMap
+  }
+
+  /**
+    * Create a map that allows CFG predecessors to be retrieved for each node
+    * */
+  private def initPred(): Map[StoredNode, List[StoredNode]] = {
+    allNodesReversePostOrder.map {
+      case n @ (param: MethodParameterIn) =>
+        n -> {
+          val prevParam = param.method.parameter.order(param.order - 1).headOption
+          if (prevParam.isDefined) { prevParam.toList } else { List(method) }
+        }
+      case n @ (_: CfgNode) if method.cfgFirst.headOption.contains(n) =>
+        n -> method.parameter.l.sortBy(_.order).lastOption.toList
+
+      case n @ (cfgNode: CfgNode) => n -> cfgNode.cfgPrev.l
+
+      case n =>
+        logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
+        n -> List()
+    }.toMap
+  }
+
 }
 
 /**
