@@ -1,5 +1,6 @@
 package io.shiftleft.c2cpg.astcreation
 
+import io.shiftleft.c2cpg.utils.IOUtils
 import io.shiftleft.codepropertygraph.generated.DispatchTypes
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
@@ -8,6 +9,8 @@ import org.eclipse.cdt.core.dom.ast.gnu.c.ICASTKnRFunctionDeclarator
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalBinding
 import org.eclipse.cdt.internal.core.dom.parser.cpp.{CPPASTIdExpression, CPPASTQualifiedName, CPPFunction}
 import org.eclipse.cdt.internal.core.model.ASTStringUtil
+
+import scala.collection.mutable
 
 trait AstCreatorHelper {
 
@@ -26,8 +29,19 @@ trait AstCreatorHelper {
     }
   }
 
+  private val file2LinesCache = mutable.HashMap.empty[String, Seq[Int]]
+
+  private def fileLines(node: IASTNode): Seq[Int] = {
+    val f = fileName(node)
+    file2LinesCache.getOrElseUpdate(f, IOUtils.linesInFile(IOUtils.readFile(f)).map(_.length))
+  }
+
   private def nullSafeFileLocation(node: IASTNode): Option[IASTFileLocation] =
     Option(parserResult.flattenLocationsToFile(node.getNodeLocations).asFileLocation())
+
+  protected def fileName(node: IASTNode): String = {
+    nullSafeFileLocation(node).map(_.getFileName).getOrElse(filename)
+  }
 
   protected def line(node: IASTNode): Option[Integer] = {
     nullSafeFileLocation(node).map(_.getStartingLineNumber)
@@ -47,7 +61,7 @@ trait AstCreatorHelper {
       } else if (loc.map(_.getNodeOffset).contains(0)) {
         Some(0)
       } else {
-        val slice = fileLines.slice(0, l)
+        val slice = fileLines(node).slice(0, l)
         val length = slice.size - 1
         loc.map(_.getNodeOffset - 1 - slice.sum - length)
       }
@@ -64,7 +78,7 @@ trait AstCreatorHelper {
       } else if (loc.map(l => l.getNodeOffset + l.getNodeLength).contains(0)) {
         Some(0)
       } else {
-        val slice = fileLines.slice(0, l)
+        val slice = fileLines(node).slice(0, l)
         val length = slice.size - 1
         loc.map(l => l.getNodeOffset + l.getNodeLength - 1 - slice.sum - length)
       }

@@ -23,7 +23,7 @@ trait AstForFunctionsCreator {
     val parentNode: NewTypeDecl = methodAstParentStack.collectFirst { case t: NewTypeDecl => t }.getOrElse {
       val astParentType = methodAstParentStack.head.label
       val astParentFullName = methodAstParentStack.head.properties("FULL_NAME").toString
-      val newTypeDeclNode = newTypeDecl(methodName, methodFullName, astParentType, astParentFullName)
+      val newTypeDeclNode = newTypeDecl(methodName, methodFullName, filename, astParentType, astParentFullName)
       Ast.storeInDiffGraph(Ast(newTypeDeclNode), diffGraph)
       newTypeDeclNode
     }
@@ -89,7 +89,7 @@ trait AstForFunctionsCreator {
       .columnNumber(column(lambdaExpression))
       .columnNumberEnd(columnEnd(lambdaExpression))
       .signature(signature)
-      .filename(filename)
+      .filename(fileName(lambdaExpression))
 
     scope.pushNewScope(methodNode)
     val parameterAsts = withOrder(parameters(lambdaExpression.getDeclarator)) { (p, o) =>
@@ -136,7 +136,7 @@ trait AstForFunctionsCreator {
       .columnNumber(column(funcDecl))
       .columnNumberEnd(columnEnd(funcDecl))
       .signature(signature)
-      .filename(filename)
+      .filename(fileName(funcDecl))
       .order(order)
 
     scope.pushNewScope(methodNode)
@@ -183,7 +183,7 @@ trait AstForFunctionsCreator {
       .columnNumber(column(funcDef))
       .columnNumberEnd(columnEnd(funcDef))
       .signature(signature)
-      .filename(filename)
+      .filename(fileName(funcDef))
       .order(order)
 
     methodAstParentStack.push(methodNode)

@@ -3,7 +3,6 @@ package io.shiftleft.c2cpg.astcreation
 import io.shiftleft.c2cpg.C2Cpg
 import io.shiftleft.c2cpg.datastructures.Stack._
 import io.shiftleft.c2cpg.datastructures.{Global, Scope}
-import io.shiftleft.c2cpg.utils.IOUtils
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EvaluationStrategies, NodeTypes}
 import io.shiftleft.passes.DiffGraph
@@ -30,8 +29,6 @@ class AstCreator(val filename: String,
     with MacroHandler {
 
   protected val logger: Logger = LoggerFactory.getLogger(classOf[AstCreator])
-
-  protected val fileLines: Seq[Int] = IOUtils.linesInFile(IOUtils.readFile(filename)).map(_.length)
 
   protected val scope: Scope[String, (NewNode, String), NewNode] = new Scope()
 
