@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg
 
 import io.shiftleft.c2cpg.C2Cpg.Config
-import io.shiftleft.c2cpg.parser.{FileDefaults, HeaderFileFinder, ParseConfig}
+import io.shiftleft.c2cpg.parser.{FileDefaults, HeaderFileFinder, ParserConfig}
 import io.shiftleft.c2cpg.passes.{AstCreationPass, PreprocessorPass}
 import io.shiftleft.c2cpg.utils.IncludeAutoDiscovery
 import io.shiftleft.codepropertygraph.Cpg
@@ -15,12 +15,14 @@ import io.shiftleft.x2cpg.{SourceFiles, X2Cpg, X2CpgConfig}
 import org.slf4j.LoggerFactory
 import scopt.OParser
 
+import java.nio.file.Paths
 import scala.util.control.NonFatal
 
 class C2Cpg {
 
-  private def createParseConfig(config: Config): ParseConfig = {
-    ParseConfig(
+  private def createParseConfig(config: Config): ParserConfig = {
+    ParserConfig(
+      config.includePaths.map(Paths.get(_).toRealPath()),
       IncludeAutoDiscovery.discoverIncludePaths(config),
       config.defines.map {
         case define if define.contains("=") =>
@@ -41,10 +43,8 @@ class C2Cpg {
     val cpg = newEmptyCpg(Some(config.outputPath))
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
     val parserConfig = createParseConfig(config)
-    val headerIncludePaths = parserConfig.includePaths.map(_.toString)
-
     new MetaDataPass(cpg, Languages.NEWC, Some(metaDataKeyPool)).createAndApply()
-    val headerFileFinder = new HeaderFileFinder(headerIncludePaths)
+    val headerFileFinder = new HeaderFileFinder(parserConfig)
     val astCreationPass =
       new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, parserConfig, headerFileFinder)
     astCreationPass.createAndApply()
@@ -56,8 +56,7 @@ class C2Cpg {
   def printIfDefsOnly(config: Config): Unit = {
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
     val parserConfig = createParseConfig(config)
-    val headerIncludePaths = parserConfig.includePaths.map(_.toString)
-    val headerFileFinder = new HeaderFileFinder(headerIncludePaths)
+    val headerFileFinder = new HeaderFileFinder(parserConfig)
     val stmts = new PreprocessorPass(sourceFileNames, parserConfig, headerFileFinder).run().mkString(",")
     println(stmts)
   }

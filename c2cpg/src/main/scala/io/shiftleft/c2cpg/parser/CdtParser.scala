@@ -26,7 +26,7 @@ object CdtParser {
 
 }
 
-class CdtParser(private val parseConfig: ParseConfig, private val headerFileFinder: HeaderFileFinder)
+class CdtParser(private val parseConfig: ParserConfig, private val headerFileFinder: HeaderFileFinder)
     extends ParseProblemsLogger
     with PreprocessorStatementsLogger {
 
@@ -34,7 +34,7 @@ class CdtParser(private val parseConfig: ParseConfig, private val headerFileFind
 
   private val definedSymbols: util.Map[String, String] = parseConfig.definedSymbols.asJava
 
-  private val includePaths: Seq[String] = parseConfig.includePaths.map(_.toString)
+  private val includePaths: Set[String] = parseConfig.allIncludePaths.map(_.toString)
   private val info: ScannerInfo = new ScannerInfo(definedSymbols, includePaths.toArray)
   private val log: DefaultLogService = new DefaultLogService
 
