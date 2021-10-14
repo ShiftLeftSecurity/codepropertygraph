@@ -28,7 +28,7 @@ class DataFlowProblem[V](val flowGraph: FlowGraph,
   * */
 class FlowGraph(val method: Method) {
 
-  val entryNode: StoredNode = method
+  private val entryNode: StoredNode = method
   val exitNode: StoredNode = method.methodReturn
 
   private val reversePostOrder = List(entryNode) ++ method.parameter.toList ++ method.reversePostOrder.toList ++ List(
@@ -38,9 +38,6 @@ class FlowGraph(val method: Method) {
 
   val nodeToNumber: Map[StoredNode, Int] = reversePostOrder.zipWithIndex.map { case (x, i) => x -> i }.toMap
   val numberToNode: Map[Int, StoredNode] = reversePostOrder.zipWithIndex.map { case (x, i) => i -> x }.toMap
-
-  lazy val allNodesPostOrder: List[Int] =
-    (List(exitNode) ++ method.postOrder.toList ++ method.parameter.toList ++ List(entryNode)).map(nodeToNumber)
 
   val succ: Map[Int, List[Int]] = initSucc()
   val pred: Map[Int, List[Int]] = initPred()

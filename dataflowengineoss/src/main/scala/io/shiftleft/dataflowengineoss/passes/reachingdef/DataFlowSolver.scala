@@ -1,4 +1,7 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
+
+import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
+
 import scala.collection.mutable
 
 class DataFlowSolver {
@@ -12,7 +15,7 @@ class DataFlowSolver {
   def calculateMopSolutionForwards[T <: Iterable[_]](problem: DataFlowProblem[T]): Solution[T] = {
     var out: Map[Int, T] = problem.inOutInit.initOut
     var in = problem.inOutInit.initIn
-    val workList = mutable.Set.empty[Int]
+    val workList = mutable.BitSet()
     workList ++= problem.flowGraph.allNodesReversePostOrder
 
     while (workList.nonEmpty) {
@@ -35,9 +38,8 @@ class DataFlowSolver {
       workList.clear()
       workList ++= newEntries
     }
-    val inResult = in.map { case (k, v)   => problem.flowGraph.numberToNode(k) -> v }
-    val outResult = out.map { case (k, v) => problem.flowGraph.numberToNode(k) -> v }
-    Solution(inResult, outResult, problem)
+    implicit val p: DataFlowProblem[T] = problem
+    Solution(toNodes(in), toNodes(out), problem)
   }
 
   /**
@@ -49,8 +51,8 @@ class DataFlowSolver {
   def calculateMopSolutionBackwards[T <: Iterable[_]](problem: DataFlowProblem[T]): Solution[T] = {
     var out: Map[Int, T] = problem.inOutInit.initOut
     var in = problem.inOutInit.initIn
-    val workList = mutable.Set.empty[Int]
-    workList ++= problem.flowGraph.allNodesPostOrder
+    val workList = mutable.BitSet()
+    workList ++= problem.flowGraph.allNodesReversePostOrder.reverse
 
     while (workList.nonEmpty) {
       val newEntries = workList.flatMap { n =>
@@ -72,9 +74,11 @@ class DataFlowSolver {
       workList.clear()
       workList ++= newEntries
     }
-    val inResult = in.map { case (k, v)   => problem.flowGraph.numberToNode(k) -> v }
-    val outResult = out.map { case (k, v) => problem.flowGraph.numberToNode(k) -> v }
-    Solution(inResult, outResult, problem)
+    implicit val p: DataFlowProblem[T] = problem
+    Solution(toNodes(in), toNodes(out), problem)
   }
+
+  private def toNodes[T](m: Map[Int, T])(implicit problem: DataFlowProblem[T]): Map[StoredNode, T] =
+    m.map { case (k, v) => problem.flowGraph.numberToNode(k) -> v }
 
 }
