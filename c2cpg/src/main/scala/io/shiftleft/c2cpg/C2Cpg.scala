@@ -22,7 +22,7 @@ class C2Cpg {
 
   private def createParseConfig(config: Config): ParserConfig = {
     ParserConfig(
-      config.includePaths.map(Paths.get(_).toRealPath()),
+      (config.inputPaths ++ config.includePaths).map(Paths.get(_).toRealPath()),
       IncludeAutoDiscovery.discoverIncludePaths(config),
       config.defines.map {
         case define if define.contains("=") =>
