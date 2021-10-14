@@ -1,5 +1,6 @@
 package io.shiftleft.c2cpg.astcreation
 
+import io.shiftleft.c2cpg.utils.IOUtils
 import io.shiftleft.codepropertygraph.generated.DispatchTypes
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast._
@@ -8,6 +9,8 @@ import org.eclipse.cdt.core.dom.ast.gnu.c.ICASTKnRFunctionDeclarator
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalBinding
 import org.eclipse.cdt.internal.core.dom.parser.cpp.{CPPASTIdExpression, CPPASTQualifiedName, CPPFunction}
 import org.eclipse.cdt.internal.core.model.ASTStringUtil
+
+import scala.collection.mutable
 
 trait AstCreatorHelper {
 
@@ -26,10 +29,19 @@ trait AstCreatorHelper {
     }
   }
 
-  private def nullSafeFileLocation(node: IASTNode): Option[IASTFileLocation] = Option(node.getFileLocation)
+  private val file2LinesCache = mutable.HashMap.empty[String, Seq[Int]]
 
-  private def nullSafeLastNodeLocation(node: IASTNode): Option[IASTNodeLocation] =
-    Option(node.getNodeLocations).flatMap(_.lastOption)
+  private def fileLines(node: IASTNode): Seq[Int] = {
+    val f = fileName(node)
+    file2LinesCache.getOrElseUpdate(f, IOUtils.linesInFile(IOUtils.readFile(f)).map(_.length))
+  }
+
+  private def nullSafeFileLocation(node: IASTNode): Option[IASTFileLocation] =
+    Option(parserResult.flattenLocationsToFile(node.getNodeLocations).asFileLocation())
+
+  protected def fileName(node: IASTNode): String = {
+    nullSafeFileLocation(node).map(_.getFileName).getOrElse(filename)
+  }
 
   protected def line(node: IASTNode): Option[Integer] = {
     nullSafeFileLocation(node).map(_.getStartingLineNumber)
@@ -43,30 +55,32 @@ trait AstCreatorHelper {
     if (line(node).isEmpty) None
     else {
       val l = line(node).get - 1
+      val loc = nullSafeFileLocation(node)
       if (l == 0) {
-        nullSafeFileLocation(node).map(_.getNodeOffset)
-      } else if (nullSafeFileLocation(node).map(_.getNodeOffset).contains(0)) {
+        loc.map(_.getNodeOffset)
+      } else if (loc.map(_.getNodeOffset).contains(0)) {
         Some(0)
       } else {
-        val slice = fileLines.slice(0, l)
+        val slice = fileLines(node).slice(0, l)
         val length = slice.size - 1
-        nullSafeFileLocation(node).map(_.getNodeOffset - 1 - slice.sum - length)
+        loc.map(_.getNodeOffset - 1 - slice.sum - length)
       }
     }
   }
 
   protected def columnEnd(node: IASTNode): Option[Integer] = {
-    if (line(node).isEmpty) None
+    if (lineEnd(node).isEmpty) None
     else {
-      val l = line(node).get - 1
+      val l = lineEnd(node).get - 1
+      val loc = nullSafeFileLocation(node)
       if (l == 0) {
-        nullSafeLastNodeLocation(node).map(_.getNodeOffset)
-      } else if (nullSafeLastNodeLocation(node).map(_.getNodeOffset).contains(0)) {
+        loc.map(l => l.getNodeOffset + l.getNodeLength)
+      } else if (loc.map(l => l.getNodeOffset + l.getNodeLength).contains(0)) {
         Some(0)
       } else {
-        val slice = fileLines.slice(0, l)
+        val slice = fileLines(node).slice(0, l)
         val length = slice.size - 1
-        nullSafeLastNodeLocation(node).map(_.getNodeOffset - 1 - slice.sum - length)
+        loc.map(l => l.getNodeOffset + l.getNodeLength - 1 - slice.sum - length)
       }
     }
   }
@@ -84,8 +98,9 @@ trait AstCreatorHelper {
     }
 
   protected def registerType(typeName: String): String = {
-    global.usedTypes.put(typeName, true)
-    typeName
+    val fixedTypeName = fixQualifiedName(typeName)
+    global.usedTypes.put(fixedTypeName, true)
+    fixedTypeName
   }
 
   private def cleanType(t: String): String = t match {
@@ -95,8 +110,9 @@ trait AstCreatorHelper {
     case t if t.startsWith("{") && t.endsWith("}") => Defines.anyTypeName
     case t if t.startsWith("[") && t.endsWith("]") => "[]"
     case t if t.contains("*")                      => "*"
-    case t if t.contains("::")                     => fixQualifiedName(t).split(".").lastOption.getOrElse(Defines.anyTypeName)
-    case someType                                  => someType.replace(" ", "")
+    case t if t.contains(Defines.qualifiedNameSeparator) =>
+      fixQualifiedName(t).split(".").lastOption.getOrElse(Defines.anyTypeName)
+    case someType => someType.replace(" ", "")
   }
 
   protected def typeFor(node: IASTNode): String = cleanType(ASTTypeUtil.getNodeType(node))
@@ -179,6 +195,8 @@ trait AstCreatorHelper {
       case enum: IASTEnumerationSpecifier =>
         fullName(enum.getParent) + "." + nodeSignature(enum.getName)
       case c: IASTCompositeTypeSpecifier => nodeSignature(c.getName)
+      case f: IASTFunctionDeclarator if f.getName.toString.isEmpty && f.getNestedDeclarator != null =>
+        fullName(f.getParent) + "." + nodeSignature(f.getNestedDeclarator.getName)
       case f: IASTFunctionDeclarator =>
         fullName(f.getParent) + "." + nodeSignature(f.getName)
       case f: ICPPASTLambdaExpression =>
@@ -204,7 +222,9 @@ trait AstCreatorHelper {
     val name = node match {
       case f: ICPPASTFunctionDefinition => lastNameOfQualifiedName(f.getDeclarator.getName.toString)
       case f: IASTFunctionDefinition    => f.getDeclarator.getName.toString
-      case f: IASTFunctionDeclarator    => f.getName.toString
+      case f: IASTFunctionDeclarator if f.getName.toString.isEmpty && f.getNestedDeclarator != null =>
+        f.getNestedDeclarator.getName.toString
+      case f: IASTFunctionDeclarator => f.getName.toString
       case d: CPPASTIdExpression if d.getEvaluation.isInstanceOf[EvalBinding] =>
         val evaluation = d.getEvaluation.asInstanceOf[EvalBinding]
         evaluation.getBinding match {

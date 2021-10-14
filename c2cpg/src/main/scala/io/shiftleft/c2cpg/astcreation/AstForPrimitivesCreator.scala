@@ -12,7 +12,7 @@ trait AstForPrimitivesCreator {
   this: AstCreator =>
 
   protected def astForComment(comment: IASTComment): Ast =
-    Ast(NewComment().code(nodeSignature(comment)).filename(filename).lineNumber(line(comment)))
+    Ast(NewComment().code(nodeSignature(comment)).filename(fileName(comment)).lineNumber(line(comment)))
 
   protected def astForLiteral(lit: IASTLiteralExpression, order: Int): Ast = {
     val tpe = ASTTypeUtil.getType(lit.getExpressionType)
