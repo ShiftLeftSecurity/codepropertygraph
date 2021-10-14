@@ -63,7 +63,7 @@ class ReachingDefTransferFunction(flowGraph: FlowGraph) extends TransferFunction
   val gen: Map[Int, mutable.BitSet] =
     initGen(method).withDefaultValue(mutable.BitSet())
 
-  val kill: Map[Int, Set[Definition]] =
+  val kill: Map[Int, mutable.BitSet] =
     initKill(method, gen).withDefaultValue(mutable.BitSet())
 
   /**
@@ -129,7 +129,7 @@ class ReachingDefTransferFunction(flowGraph: FlowGraph) extends TransferFunction
     * such as identifiers or field-identifiers have empty gen and kill sets,
     * meaning that they just pass on definitions unaltered.
     * */
-  private def initKill(method: Method, gen: Map[Int, Set[Definition]]): Map[Int, Set[Definition]] = {
+  private def initKill(method: Method, gen: Map[Int, mutable.BitSet]): Map[Int, mutable.BitSet] = {
 
     val allIdentifiers: Map[String, List[Identifier]] = method.ast.isIdentifier.l
       .groupBy(_.name)
@@ -158,11 +158,11 @@ class ReachingDefTransferFunction(flowGraph: FlowGraph) extends TransferFunction
     * of the same variable for each, that is, we calculate kill(call)
     * based on gen(call).
     * */
-  private def killsForGens(genOfCall: Set[Definition],
+  private def killsForGens(genOfCall: mutable.BitSet,
                            allIdentifiers: Map[String, List[Identifier]],
-                           allCalls: Map[String, List[Call]]): Set[Definition] = {
+                           allCalls: Map[String, List[Call]]): mutable.BitSet = {
 
-    def definitionsOfSameVariable(definition: Definition): Set[Definition] = {
+    def definitionsOfSameVariable(definition: Definition): mutable.BitSet = {
       val definedNodes = flowGraph.numberToNode(definition) match {
         case param: MethodParameterIn =>
           allIdentifiers(param.name)
@@ -175,10 +175,12 @@ class ReachingDefTransferFunction(flowGraph: FlowGraph) extends TransferFunction
             .filter(x => x.id != call.id)
         case _ => Set()
       }
-      definedNodes
-      // It can happen that the CFG is broken and contains isolated nodes,
-      // in which case they are not in `nodeToNumber`. Let's filter those.
-      .collect { case x if nodeToNumber.contains(x) => Definition.fromNode(x, nodeToNumber) }.toSet
+      mutable.BitSet(
+        definedNodes
+        // It can happen that the CFG is broken and contains isolated nodes,
+        // in which case they are not in `nodeToNumber`. Let's filter those.
+        .collect { case x if nodeToNumber.contains(x) => Definition.fromNode(x, nodeToNumber) }.toList: _*
+      )
     }
 
     genOfCall.flatMap { definition =>
