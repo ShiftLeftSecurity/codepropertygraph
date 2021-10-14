@@ -31,25 +31,27 @@ class FlowGraph(val method: Method) {
   val entryNode: StoredNode = method
   val exitNode: StoredNode = method.methodReturn
 
-  val allNodesReversePostOrder: List[StoredNode] =
-    List(entryNode) ++ method.parameter.toList ++ method.reversePostOrder.toList ++ List(exitNode)
+  private val reversePostOrder = List(entryNode) ++ method.parameter.toList ++ method.reversePostOrder.toList ++ List(
+    exitNode)
 
-  val nodeToNumber: Map[StoredNode, Int] = allNodesReversePostOrder.zipWithIndex.map { case (x, i) => x -> i }.toMap
-  val numberToNode: Map[Int, StoredNode] = allNodesReversePostOrder.zipWithIndex.map { case (x, i) => i -> x }.toMap
+  val allNodesReversePostOrder: List[Int] = List.range(0, reversePostOrder.size)
 
-  lazy val allNodesPostOrder: List[StoredNode] =
-    List(exitNode) ++ method.postOrder.toList ++ method.parameter.toList ++ List(entryNode)
+  val nodeToNumber: Map[StoredNode, Int] = reversePostOrder.zipWithIndex.map { case (x, i) => x -> i }.toMap
+  val numberToNode: Map[Int, StoredNode] = reversePostOrder.zipWithIndex.map { case (x, i) => i -> x }.toMap
 
-  val succ: Map[StoredNode, List[StoredNode]] = initSucc()
-  val pred: Map[StoredNode, List[StoredNode]] = initPred()
+  lazy val allNodesPostOrder: List[Int] =
+    (List(exitNode) ++ method.postOrder.toList ++ method.parameter.toList ++ List(entryNode)).map(nodeToNumber)
+
+  val succ: Map[Int, List[Int]] = initSucc()
+  val pred: Map[Int, List[Int]] = initPred()
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   /**
     * Create a map that allows CFG successors to be retrieved for each node
     * */
-  private def initSucc(): Map[StoredNode, List[StoredNode]] = {
-    allNodesReversePostOrder.map {
+  private def initSucc(): Map[Int, List[Int]] = {
+    val m = reversePostOrder.map {
       case n @ (_: Return) => n -> List(exitNode)
       case n @ (param: MethodParameterIn) =>
         n -> {
@@ -64,27 +66,30 @@ class FlowGraph(val method: Method) {
         logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
         n -> List()
     }.toMap
+    m.map { case (k, xs) => nodeToNumber(k) -> xs.map(nodeToNumber) }.withDefaultValue(List())
   }
 
   /**
     * Create a map that allows CFG predecessors to be retrieved for each node
     * */
-  private def initPred(): Map[StoredNode, List[StoredNode]] = {
-    allNodesReversePostOrder.map {
-      case n @ (param: MethodParameterIn) =>
-        n -> {
-          val prevParam = param.method.parameter.order(param.order - 1).headOption
-          if (prevParam.isDefined) { prevParam.toList } else { List(method) }
-        }
-      case n @ (_: CfgNode) if method.cfgFirst.headOption.contains(n) =>
-        n -> method.parameter.l.sortBy(_.order).lastOption.toList
+  private def initPred(): Map[Int, List[Int]] = {
+    val m =
+      reversePostOrder.map {
+        case n @ (param: MethodParameterIn) =>
+          n -> {
+            val prevParam = param.method.parameter.order(param.order - 1).headOption
+            if (prevParam.isDefined) { prevParam.toList } else { List(method) }
+          }
+        case n @ (_: CfgNode) if method.cfgFirst.headOption.contains(n) =>
+          n -> method.parameter.l.sortBy(_.order).lastOption.toList
 
-      case n @ (cfgNode: CfgNode) => n -> cfgNode.cfgPrev.l
+        case n @ (cfgNode: CfgNode) => n -> cfgNode.cfgPrev.l
 
-      case n =>
-        logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
-        n -> List()
-    }.toMap
+        case n =>
+          logger.warn(s"Node type ${n.getClass.getSimpleName} should not be part of the CFG");
+          n -> List()
+      }.toMap
+    m.map { case (k, xs) => nodeToNumber(k) -> xs.map(nodeToNumber) }.withDefaultValue(List())
   }
 
 }
@@ -97,7 +102,7 @@ class FlowGraph(val method: Method) {
   * of definitions.
   * */
 trait TransferFunction[V] {
-  def apply(n: StoredNode, x: V): V
+  def apply(n: Int, x: V): V
 }
 
 /**
@@ -108,9 +113,9 @@ trait TransferFunction[V] {
   * */
 trait InOutInit[V] {
 
-  def initIn: Map[StoredNode, V]
+  def initIn: Map[Int, V]
 
-  def initOut: Map[StoredNode, V]
+  def initOut: Map[Int, V]
 
 }
 

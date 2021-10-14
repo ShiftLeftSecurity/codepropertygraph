@@ -91,7 +91,7 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
           // taint corresponding output arguments
           // and the return value
           usageAnalyzer.uses(node).foreach { use =>
-            gen(node).foreach { g =>
+            gen(problem.flowGraph.nodeToNumber(node)).foreach { g =>
               val genNode = numberToNode(g)
               if (use != genNode && nodeMayBeSource(use)) {
                 addEdge(use, genNode, nodeToEdgeLabel(use))

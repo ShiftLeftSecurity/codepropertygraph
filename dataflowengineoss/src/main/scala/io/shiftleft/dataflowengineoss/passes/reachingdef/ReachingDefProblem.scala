@@ -60,10 +60,10 @@ class ReachingDefTransferFunction(flowGraph: FlowGraph) extends TransferFunction
 
   val method = flowGraph.method
 
-  val gen: Map[StoredNode, mutable.BitSet] =
+  val gen: Map[Int, mutable.BitSet] =
     initGen(method).withDefaultValue(mutable.BitSet())
 
-  val kill: Map[StoredNode, Set[Definition]] =
+  val kill: Map[Int, Set[Definition]] =
     initKill(method, gen).withDefaultValue(mutable.BitSet())
 
   /**
@@ -71,7 +71,7 @@ class ReachingDefTransferFunction(flowGraph: FlowGraph) extends TransferFunction
     * function to obtain the updated set of definitions, considering `gen(n)`
     * and `kill(n)`.
     * */
-  override def apply(n: StoredNode, x: mutable.BitSet): mutable.BitSet = {
+  override def apply(n: Int, x: mutable.BitSet): mutable.BitSet = {
     gen(n).union(x.diff(kill(n)))
   }
 
@@ -79,7 +79,7 @@ class ReachingDefTransferFunction(flowGraph: FlowGraph) extends TransferFunction
     * Initialize the map `gen`, a map that contains generated
     * definitions for each flow graph node.
     * */
-  def initGen(method: Method): Map[StoredNode, mutable.BitSet] = {
+  def initGen(method: Method): Map[Int, mutable.BitSet] = {
 
     val defsForParams = method.parameter.l.map { param =>
       param -> mutable.BitSet(Definition.fromNode(param.asInstanceOf[StoredNode], nodeToNumber))
@@ -106,7 +106,8 @@ class ReachingDefTransferFunction(flowGraph: FlowGraph) extends TransferFunction
           )
         }
       }
-    (defsForParams ++ defsForCalls).toMap
+    val m = (defsForParams ++ defsForCalls).toMap
+    m.map { case (k, xs) => nodeToNumber(k) -> xs }
   }
 
   /**
@@ -128,7 +129,7 @@ class ReachingDefTransferFunction(flowGraph: FlowGraph) extends TransferFunction
     * such as identifiers or field-identifiers have empty gen and kill sets,
     * meaning that they just pass on definitions unaltered.
     * */
-  private def initKill(method: Method, gen: Map[StoredNode, Set[Definition]]): Map[StoredNode, Set[Definition]] = {
+  private def initKill(method: Method, gen: Map[Int, Set[Definition]]): Map[Int, Set[Definition]] = {
 
     val allIdentifiers: Map[String, List[Identifier]] = method.ast.isIdentifier.l
       .groupBy(_.name)
@@ -141,12 +142,13 @@ class ReachingDefTransferFunction(flowGraph: FlowGraph) extends TransferFunction
     // We filter out field accesses to ensure that they propagate
     // taint unharmed.
 
-    method.call
+    val m = method.call
       .filterNot(x => isGenericMemberAccessName(x.name))
       .map { call =>
-        call -> killsForGens(gen(call), allIdentifiers, allCalls)
+        call -> killsForGens(gen(nodeToNumber(call)), allIdentifiers, allCalls)
       }
       .toMap
+    m.map { case (k, xs) => nodeToNumber(k) -> xs }
   }
 
   /**
@@ -220,26 +222,26 @@ class OptimizedReachingDefTransferFunction(flowGraph: FlowGraph) extends Reachin
       }
   }
 
-  override def initGen(method: Method): Map[StoredNode, mutable.BitSet] =
+  override def initGen(method: Method): Map[Int, mutable.BitSet] =
     withoutLoneIdentifiers(super.initGen(method))
 
-  private def withoutLoneIdentifiers(g: Map[StoredNode, mutable.BitSet]): Map[StoredNode, mutable.BitSet] = {
+  private def withoutLoneIdentifiers(g: Map[Int, mutable.BitSet]): Map[Int, mutable.BitSet] = {
     g.map {
       case (k, defs) =>
-        k match {
-          case call: Call if (loneIdentifiers.contains(call)) =>
-            (call, defs.filterNot(loneIdentifiers(call).contains(_)))
+        flowGraph.numberToNode(k) match {
+          case call: Call if loneIdentifiers.contains(call) =>
+            (k, defs.filterNot(loneIdentifiers(call).contains(_)))
           case _ => (k, defs)
         }
     }
   }
 }
 
-class ReachingDefInit(gen: Map[StoredNode, mutable.BitSet]) extends InOutInit[mutable.BitSet] {
-  override def initIn: Map[StoredNode, mutable.BitSet] =
+class ReachingDefInit(gen: Map[Int, mutable.BitSet]) extends InOutInit[mutable.BitSet] {
+  override def initIn: Map[Int, mutable.BitSet] =
     Map
-      .empty[StoredNode, mutable.BitSet]
+      .empty[Int, mutable.BitSet]
       .withDefaultValue(mutable.BitSet())
 
-  override def initOut: Map[StoredNode, mutable.BitSet] = gen
+  override def initOut: Map[Int, mutable.BitSet] = gen
 }

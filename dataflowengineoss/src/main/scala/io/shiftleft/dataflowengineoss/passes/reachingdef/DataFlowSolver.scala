@@ -1,7 +1,4 @@
 package io.shiftleft.dataflowengineoss.passes.reachingdef
-
-import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-
 import scala.collection.mutable
 
 class DataFlowSolver {
@@ -13,9 +10,9 @@ class DataFlowSolver {
     * exit respectively.
     * */
   def calculateMopSolutionForwards[T <: Iterable[_]](problem: DataFlowProblem[T]): Solution[T] = {
-    var out: Map[StoredNode, T] = problem.inOutInit.initOut
+    var out: Map[Int, T] = problem.inOutInit.initOut
     var in = problem.inOutInit.initIn
-    val workList = mutable.Set.empty[StoredNode]
+    val workList = mutable.Set.empty[Int]
     workList ++= problem.flowGraph.allNodesReversePostOrder
 
     while (workList.nonEmpty) {
@@ -38,7 +35,9 @@ class DataFlowSolver {
       workList.clear()
       workList ++= newEntries
     }
-    Solution(in, out, problem)
+    val inResult = in.map { case (k, v)   => problem.flowGraph.numberToNode(k) -> v }
+    val outResult = out.map { case (k, v) => problem.flowGraph.numberToNode(k) -> v }
+    Solution(inResult, outResult, problem)
   }
 
   /**
@@ -48,9 +47,9 @@ class DataFlowSolver {
     * exit respectively.
     * */
   def calculateMopSolutionBackwards[T <: Iterable[_]](problem: DataFlowProblem[T]): Solution[T] = {
-    var out: Map[StoredNode, T] = problem.inOutInit.initOut
+    var out: Map[Int, T] = problem.inOutInit.initOut
     var in = problem.inOutInit.initIn
-    val workList = mutable.Set.empty[StoredNode]
+    val workList = mutable.Set.empty[Int]
     workList ++= problem.flowGraph.allNodesPostOrder
 
     while (workList.nonEmpty) {
@@ -73,7 +72,9 @@ class DataFlowSolver {
       workList.clear()
       workList ++= newEntries
     }
-    Solution(in, out, problem)
+    val inResult = in.map { case (k, v)   => problem.flowGraph.numberToNode(k) -> v }
+    val outResult = out.map { case (k, v) => problem.flowGraph.numberToNode(k) -> v }
+    Solution(inResult, outResult, problem)
   }
 
 }
