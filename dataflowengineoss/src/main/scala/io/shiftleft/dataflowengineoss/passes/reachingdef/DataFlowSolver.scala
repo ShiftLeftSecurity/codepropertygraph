@@ -15,7 +15,7 @@ class DataFlowSolver {
   def calculateMopSolutionForwards[T <: Iterable[_]](problem: DataFlowProblem[T]): Solution[T] = {
     var out: Map[StoredNode, T] = problem.inOutInit.initOut
     var in = problem.inOutInit.initIn
-    val workList = mutable.Set.empty[StoredNode]
+    val workList = mutable.ListBuffer[StoredNode]()
     workList ++= problem.flowGraph.allNodesReversePostOrder
 
     while (workList.nonEmpty) {
@@ -36,7 +36,7 @@ class DataFlowSolver {
           List()
       }
       workList.clear()
-      workList ++= newEntries
+      workList ++= newEntries.distinct
     }
     Solution(in, out, problem)
   }
@@ -50,7 +50,7 @@ class DataFlowSolver {
   def calculateMopSolutionBackwards[T <: Iterable[_]](problem: DataFlowProblem[T]): Solution[T] = {
     var out: Map[StoredNode, T] = problem.inOutInit.initOut
     var in = problem.inOutInit.initIn
-    val workList = mutable.Set.empty[StoredNode]
+    val workList = mutable.ListBuffer[StoredNode]()
     workList ++= problem.flowGraph.allNodesPostOrder
 
     while (workList.nonEmpty) {
@@ -71,7 +71,7 @@ class DataFlowSolver {
           List()
       }
       workList.clear()
-      workList ++= newEntries
+      workList ++= newEntries.distinct
     }
     Solution(in, out, problem)
   }
