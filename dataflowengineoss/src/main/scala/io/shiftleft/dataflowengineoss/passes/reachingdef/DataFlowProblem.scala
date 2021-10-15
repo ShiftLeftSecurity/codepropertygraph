@@ -31,8 +31,8 @@ class FlowGraph(val method: Method) {
   private val entryNode: StoredNode = method
   val exitNode: StoredNode = method.methodReturn
 
-  private val reversePostOrder = List(entryNode) ++ method.parameter.toList ++ method.reversePostOrder.toList ++ List(
-    exitNode)
+  private val reversePostOrder = List(entryNode) ++ method.parameter.toList ++ method.reversePostOrder.toList
+    .filter(_.id != entryNode.id) ++ List(exitNode)
 
   val allNodesReversePostOrder: List[Int] = List.range(0, reversePostOrder.size)
 
