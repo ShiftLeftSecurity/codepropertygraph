@@ -12,6 +12,8 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies
 import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 
+import scala.util.Try
+
 case class NameAndSignature(name: String, signature: String, fullName: String)
 
 /**
@@ -68,8 +70,10 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
 
     val methodNode = {
       val s = fullName.split(":")
-      if (s.size == 4) {
-        methodNode1.filename(s(0)).lineNumber(s(1).toInt)
+      if (s.size == 4 && Try { s(1).toInt }.isSuccess) {
+        val filename = s(0)
+        val lineNumber = s(1).toInt
+        methodNode1.filename(filename).lineNumber(lineNumber)
       } else {
         methodNode1
       }
