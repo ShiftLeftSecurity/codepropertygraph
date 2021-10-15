@@ -1,9 +1,8 @@
 package io.shiftleft.c2cpg
 
 import io.shiftleft.c2cpg.C2Cpg.Config
-import io.shiftleft.c2cpg.parser.{FileDefaults, HeaderFileFinder, ParserConfig}
+import io.shiftleft.c2cpg.parser.{FileDefaults, HeaderFileFinder, ParseConfig}
 import io.shiftleft.c2cpg.passes.{AstCreationPass, PreprocessorPass}
-import io.shiftleft.c2cpg.utils.IncludeAutoDiscovery
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.IntervalKeyPool
@@ -20,10 +19,9 @@ import scala.util.control.NonFatal
 
 class C2Cpg {
 
-  private def createParseConfig(config: Config): ParserConfig = {
-    ParserConfig(
-      (config.inputPaths ++ config.includePaths).map(Paths.get(_).toRealPath()),
-      IncludeAutoDiscovery.discoverIncludePaths(config),
+  private def createParseConfig(config: Config): ParseConfig = {
+    ParseConfig(
+      config.includePaths.map(Paths.get(_)).toList,
       config.defines.map {
         case define if define.contains("=") =>
           val s = define.split("=")
@@ -42,11 +40,11 @@ class C2Cpg {
 
     val cpg = newEmptyCpg(Some(config.outputPath))
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
-    val parserConfig = createParseConfig(config)
+
     new MetaDataPass(cpg, Languages.NEWC, Some(metaDataKeyPool)).createAndApply()
-    val headerFileFinder = new HeaderFileFinder(parserConfig)
+    val headerFileFinder = new HeaderFileFinder(config.inputPaths.toList)
     val astCreationPass =
-      new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, parserConfig, headerFileFinder)
+      new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, createParseConfig(config), headerFileFinder)
     astCreationPass.createAndApply()
     new CfgCreationPass(cpg).createAndApply()
     new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
@@ -55,9 +53,8 @@ class C2Cpg {
 
   def printIfDefsOnly(config: Config): Unit = {
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
-    val parserConfig = createParseConfig(config)
-    val headerFileFinder = new HeaderFileFinder(parserConfig)
-    val stmts = new PreprocessorPass(sourceFileNames, parserConfig, headerFileFinder).run().mkString(",")
+    val headerFileFinder = new HeaderFileFinder(config.inputPaths.toList)
+    val stmts = new PreprocessorPass(sourceFileNames, createParseConfig(config), headerFileFinder).run().mkString(",")
     println(stmts)
   }
 
@@ -75,8 +72,7 @@ object C2Cpg {
                           includeComments: Boolean = false,
                           logProblems: Boolean = false,
                           logPreprocessor: Boolean = false,
-                          printIfDefsOnly: Boolean = false,
-                          includePathsAutoDiscovery: Boolean = false)
+                          printIfDefsOnly: Boolean = false)
       extends X2CpgConfig[Config] {
 
     override def withAdditionalInputPath(inputPath: String): Config = copy(inputPaths = inputPaths + inputPath)
@@ -105,14 +101,11 @@ object C2Cpg {
         opt[String]("include")
           .unbounded()
           .text("header include paths")
-          .action((incl, c) => c.copy(includePaths = c.includePaths + incl)),
-        opt[Unit]("with-include-auto-discovery")
-          .text("auto discover header include paths")
-          .action((_, c) => c.copy(includePathsAutoDiscovery = true)),
+          .action((incl, cfg) => cfg.copy(includePaths = cfg.includePaths + incl)),
         opt[String]("define")
           .unbounded()
           .text("define a name")
-          .action((d, c) => c.copy(defines = c.defines + d))
+          .action((d, cfg) => cfg.copy(defines = cfg.defines + d))
       )
     }
 

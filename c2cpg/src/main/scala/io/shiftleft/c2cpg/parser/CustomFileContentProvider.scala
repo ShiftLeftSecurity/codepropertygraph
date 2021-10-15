@@ -11,18 +11,18 @@ class CustomFileContentProvider(headerFileFinder: HeaderFileFinder) extends Inte
   private val logger = LoggerFactory.getLogger(classOf[CustomFileContentProvider])
 
   private def loadContent(path: String): InternalFileContent = {
-    val headerFilePath = if (!getInclusionExists(path)) {
+    val fileName = if (!getInclusionExists(path)) {
       Some(headerFileFinder).map(finder => finder.find(path)).orNull
     } else {
       path
     }
 
-    if (headerFilePath != null) {
-      logger.debug(s"Loading header file '$headerFilePath'")
-      val content = FileContent.createForExternalFileLocation(headerFilePath)
+    if (fileName != null) {
+      logger.info(s"Loading header file $fileName")
+      val content = FileContent.createForExternalFileLocation(fileName)
       content.asInstanceOf[InternalFileContent]
     } else {
-      logger.debug(s"Cannot find header file '$path'")
+      logger.info(s"Cannot find header file for $path")
       null
     }
 

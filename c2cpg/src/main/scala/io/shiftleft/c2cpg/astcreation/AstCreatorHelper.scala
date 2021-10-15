@@ -37,7 +37,7 @@ trait AstCreatorHelper {
   }
 
   private def nullSafeFileLocation(node: IASTNode): Option[IASTFileLocation] =
-    Option(parserResult.flattenLocationsToFile(node.getNodeLocations)).map(_.asFileLocation())
+    Option(parserResult.flattenLocationsToFile(node.getNodeLocations).asFileLocation())
 
   protected def fileName(node: IASTNode): String = {
     nullSafeFileLocation(node).map(_.getFileName).getOrElse(filename)
