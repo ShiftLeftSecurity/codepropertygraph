@@ -136,6 +136,22 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
     }
   }
 
+  "adding two new edges to the same NewNode should still result in only adding one NewNode" in withTestOdb { graph =>
+    val diffBuilder = DiffGraph.newBuilder
+    val newNodeA = createNewNode("a")
+    val newNodeB = createNewNode("b")
+    val newNodeC = createNewNode("c")
+    diffBuilder.addNode(newNodeA)
+    diffBuilder.addNode(newNodeB)
+    diffBuilder.addNode(newNodeC)
+    diffBuilder.addEdge(newNodeA, newNodeC, EdgeTypes.AST)
+    diffBuilder.addEdge(newNodeB, newNodeC, EdgeTypes.CFG)
+    val diff = diffBuilder.build()
+    DiffGraph.Applier.applyDiff(diff, graph, false, None)
+    graph.nodeCount shouldBe 3
+    graph.edgeCount shouldBe 2
+  }
+
   def withTestOdb[T](f: Graph => T): T = {
     val graph = OverflowDbTestInstance.create
     try f(graph)
