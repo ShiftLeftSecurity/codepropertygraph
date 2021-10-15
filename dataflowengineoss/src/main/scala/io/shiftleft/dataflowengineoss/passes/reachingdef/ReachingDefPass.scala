@@ -41,7 +41,7 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
     * if desired.
     * */
   private def shouldBailOut(problem: DataFlowProblem[mutable.BitSet]): Boolean = {
-    val method = problem.flowGraph.entryNode.asInstanceOf[Method]
+    val method = problem.flowGraph.method
     val transferFunction = problem.transferFunction.asInstanceOf[ReachingDefTransferFunction]
     // For each node, the `gen` map contains the list of definitions it generates
     // We add up the sizes of these lists to obtain the total number of definitions

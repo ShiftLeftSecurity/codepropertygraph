@@ -44,7 +44,7 @@ class ReachingDefFlowGraph(method: Method) extends FlowGraph(method) {}
   * For each node of the graph, this transfer function defines how it affects
   * the propagation of definitions.
   * */
-class ReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph) extends TransferFunction[mutable.BitSet] {
+class ReachingDefTransferFunction(flowGraph: FlowGraph) extends TransferFunction[mutable.BitSet] {
 
   private val nodeToNumber = flowGraph.nodeToNumber
 
@@ -186,8 +186,7 @@ class ReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph) extends Trans
   * when creating reaching definition edges, we simply create edges from the
   * identifier to the exit node.
   * */
-class OptimizedReachingDefTransferFunction(flowGraph: ReachingDefFlowGraph)
-    extends ReachingDefTransferFunction(flowGraph) {
+class OptimizedReachingDefTransferFunction(flowGraph: FlowGraph) extends ReachingDefTransferFunction(flowGraph) {
 
   lazy val loneIdentifiers: Map[Call, List[Definition]] = {
     val paramAndLocalNames = method.parameter.name.l ++ method.local.name.l
