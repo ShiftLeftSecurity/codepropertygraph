@@ -1,7 +1,7 @@
 package io.shiftleft.x2cpg
 
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
-import io.shiftleft.codepropertygraph.generated.nodes.{AstNodeNew, ExpressionNew, NewNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNodeNew, ExpressionNew, NewMethod, NewNode}
 import io.shiftleft.passes.DiffGraph
 
 case class AstEdge(src: NewNode, dst: NewNode)
@@ -13,10 +13,22 @@ object Ast {
   /** Copy nodes/edges of given `AST` into the given `diffGraph`.
     */
   def storeInDiffGraph(ast: Ast, diffGraph: DiffGraph.Builder): Unit = {
-    ast.nodes.foreach { node =>
-      diffGraph.addNode(node)
+    if (ast.addNodes) {
+      ast.nodes.foreach { node =>
+        node match {
+          case n: NewMethod if n.name == "fclose" =>
+            println("Adding fclose: " + n)
+          case _ =>
+        }
+        diffGraph.addNode(node)
+      }
     }
     ast.edges.foreach { edge =>
+      edge.dst match {
+        case n: NewMethod if n.name == "fclose" =>
+          println("Adding edge from " + edge.src.label + " to fclose: " + n)
+        case _ =>
+      }
       diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.AST)
     }
     ast.conditionEdges.foreach { edge =>
@@ -44,7 +56,8 @@ case class Ast(nodes: List[NewNode],
                refEdges: List[AstEdge] = List(),
                bindsEdges: List[AstEdge] = List(),
                receiverEdges: List[AstEdge] = List(),
-               argEdges: List[AstEdge] = List()) {
+               argEdges: List[AstEdge] = List(),
+               addNodes: Boolean = true) {
 
   def root: Option[NewNode] = nodes.headOption
 
@@ -55,7 +68,7 @@ case class Ast(nodes: List[NewNode],
     */
   def withChild(other: Ast): Ast = {
     Ast(
-      nodes ++ other.nodes,
+      nodes ++ { if (other.addNodes) other.nodes else Nil },
       edges = edges ++ other.edges ++ root.toList.flatMap(r =>
         other.root.toList.map { rc =>
           AstEdge(r, rc)
@@ -70,7 +83,7 @@ case class Ast(nodes: List[NewNode],
 
   def merge(other: Ast): Ast = {
     Ast(
-      nodes ++ other.nodes,
+      nodes ++ { if (other.addNodes) other.nodes else Nil },
       edges = edges ++ other.edges,
       conditionEdges = conditionEdges ++ other.conditionEdges,
       argEdges = argEdges ++ other.argEdges,

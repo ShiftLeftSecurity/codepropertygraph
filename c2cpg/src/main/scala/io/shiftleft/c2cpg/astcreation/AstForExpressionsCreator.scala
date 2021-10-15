@@ -85,10 +85,10 @@ trait AstForExpressionsCreator {
       case unaryExpression: IASTUnaryExpression if unaryExpression.getOperand.isInstanceOf[IASTUnaryExpression] =>
         astForUnaryExpression(unaryExpression.getOperand.asInstanceOf[IASTUnaryExpression], 0)
       case lambdaExpression: ICPPASTLambdaExpression =>
-        val methodRef = methodRefForLambda(lambdaExpression)
-        methodRef.order = 0
-        methodRef.argumentIndex = 0
-        Ast(methodRef)
+        val methodRefAst = astForMethodRefForLambda(lambdaExpression)
+        methodRefAst.root.get.asInstanceOf[NewMethodRef].order = 0
+        methodRefAst.root.get.asInstanceOf[NewMethodRef].argumentIndex = 0
+        methodRefAst
       case other => astForExpression(other, 0)
     }
 
@@ -324,7 +324,7 @@ trait AstForExpressionsCreator {
       case delExpression: ICPPASTDeleteExpression             => astForDeleteExpression(delExpression, order)
       case typeIdInit: IASTTypeIdInitializerExpression        => astForTypeIdInitExpression(typeIdInit, order)
       case c: ICPPASTSimpleTypeConstructorExpression          => astForConstructorExpression(c, order)
-      case lambdaExpression: ICPPASTLambdaExpression          => Ast(methodRefForLambda(lambdaExpression))
+      case lambdaExpression: ICPPASTLambdaExpression          => astForMethodRefForLambda(lambdaExpression)
       case compoundExpression: IGNUASTCompoundStatementExpression =>
         astForCompoundStatementExpression(compoundExpression, order)
       case packExpansionExpression: ICPPASTPackExpansionExpression =>
