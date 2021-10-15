@@ -30,8 +30,8 @@ class FlowGraph(val method: Method) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  val entryNode: StoredNode = method
-  val exitNode: StoredNode = method.methodReturn
+  private val entryNode: StoredNode = method
+  private val exitNode: StoredNode = method.methodReturn
 
   val allNodesReversePostOrder: List[StoredNode] =
     List(entryNode) ++ method.parameter.toList ++ method.reversePostOrder.toList.filter(x =>
@@ -42,14 +42,14 @@ class FlowGraph(val method: Method) {
 
   lazy val allNodesPostOrder: List[StoredNode] = allNodesReversePostOrder.reverse
 
-  val succ: Map[StoredNode, List[StoredNode]] = initSucc(allNodesReversePostOrder)
-  val pred: Map[StoredNode, List[StoredNode]] = initPred(allNodesReversePostOrder, method)
+  val succ: Map[StoredNode, List[StoredNode]] = initSucc()
+  val pred: Map[StoredNode, List[StoredNode]] = initPred()
 
   /**
     * Create a map that allows CFG successors to be retrieved for each node
     * */
-  private def initSucc(ns: List[StoredNode]): Map[StoredNode, List[StoredNode]] = {
-    ns.map {
+  private def initSucc(): Map[StoredNode, List[StoredNode]] = {
+    allNodesReversePostOrder.map {
       case n @ (_: Return) => n -> List(exitNode)
       case n @ (param: MethodParameterIn) =>
         n -> {
@@ -69,8 +69,8 @@ class FlowGraph(val method: Method) {
   /**
     * Create a map that allows CFG predecessors to be retrieved for each node
     * */
-  private def initPred(ns: List[StoredNode], method: Method): Map[StoredNode, List[StoredNode]] = {
-    ns.map {
+  private def initPred(): Map[StoredNode, List[StoredNode]] = {
+    allNodesReversePostOrder.map {
       case n @ (param: MethodParameterIn) =>
         n -> {
           val prevParam = param.method.parameter.order(param.order - 1).headOption
