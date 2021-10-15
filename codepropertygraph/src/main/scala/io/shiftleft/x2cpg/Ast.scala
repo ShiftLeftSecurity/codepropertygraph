@@ -26,7 +26,7 @@ object Ast {
     ast.edges.foreach { edge =>
       edge.dst match {
         case n: NewMethod if n.name == "fclose" =>
-          println("Adding edge from " + edge.src.label + " to fclose: " + n)
+          println("Adding edge from " + edge.src.label + s" (${edge.src}) to fclose: " + n)
         case _ =>
       }
       diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.AST)

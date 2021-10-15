@@ -1,7 +1,7 @@
 package io.shiftleft.passes
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{AbstractNode, NewNode, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{AbstractNode, Method, NewNode, StoredNode}
 import io.shiftleft.proto.cpg.Cpg.{DiffGraph => DiffGraphProto}
 import overflowdb._
 import overflowdb.traversal._
@@ -417,12 +417,16 @@ object DiffGraph {
       }
     }
     private def tryAddNodeInit(node: NewNode): Unit = {
+      if (node.properties.get("AST_PARENT_FULL_NAME").filter(_ == "fclose").isDefined) {
+        println(s"XXX0 about to add $node to the graph")
+        println("XXX1 existing fclosed method nodes: " + graph.nodes(Method.Label).has("NAME", "fclose").l)
+      }
       if (overlayNodeToOdbNode.get(node) == null) {
         val newNode = keyPool match {
           case Some(pool) => graph.addNode(pool.next, node.label).asInstanceOf[StoredNode]
           case None       => graph.addNode(node.label).asInstanceOf[StoredNode]
         }
-        inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
+        inverseBuilder.onNewNode(newNode)
         newNode.fromNewNode(node, mapping = nodeMapping)
         overlayNodeToOdbNode.put(node, newNode)
       }
