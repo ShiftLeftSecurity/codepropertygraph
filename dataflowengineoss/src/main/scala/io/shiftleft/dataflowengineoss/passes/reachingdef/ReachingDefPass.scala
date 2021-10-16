@@ -7,7 +7,7 @@ import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
-import scala.collection.{Set, mutable}
+import scala.collection.mutable
 
 /**
   * A pass that calculates reaching definitions ("data dependencies").
@@ -69,7 +69,7 @@ class ReachingDefPass(cpg: Cpg, maxNumberOfDefinitions: Int = 4000) extends Para
     val gen = solution.problem.transferFunction
       .asInstanceOf[ReachingDefTransferFunction]
       .gen
-      .withDefaultValue(Set())
+
     val allNodes = in.keys.toList
     val usageAnalyzer = new UsageAnalyzer(problem, in)
 
