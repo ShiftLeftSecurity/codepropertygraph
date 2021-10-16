@@ -290,9 +290,12 @@ trait BridgeBase {
     val actualScriptFile =
       if (isEncryptedScript) decryptedScript(scriptFile)
       else scriptFile
+    val importCpgCode = config.cpgToLoad.map { cpgFile =>
+      "importCpg(\"" + cpgFile + "\")"
+    }.toList
     ammonite
       .Main(
-        predefCode = predefPlus(additionalImportCode(config) ++ shutdownHooks),
+        predefCode = predefPlus(additionalImportCode(config) ++ importCpgCode ++ shutdownHooks),
         remoteLogging = false,
         colors = ammoniteColors(config)
       )
