@@ -24,7 +24,8 @@ case class Config(
     serverPort: Int = 8080,
     serverAuthUsername: String = "",
     serverAuthPassword: String = "",
-    nocolors: Boolean = false
+    nocolors: Boolean = false,
+    cpgToLoad: Option[File] = None
 )
 
 /**
@@ -117,6 +118,11 @@ trait BridgeBase {
         .text("Basic auth password for the CPGQL server")
 
       note("Misc")
+
+      arg[java.io.File]("<cpg.bin>")
+        .optional()
+        .action((x, c) => c.copy(cpgToLoad = Some(x.toScala)))
+        .text("CPG to load")
 
       opt[Unit]("nocolors")
         .action((_, c) => c.copy(nocolors = true))
@@ -227,7 +233,9 @@ trait BridgeBase {
       configurePPrinterMaybe,
       "implicit val implicitPPrinter = repl.pprinter()",
       "banner()"
-    )
+    ) ++ config.cpgToLoad.map { cpgFile =>
+      "importCpg(\"" + cpgFile + "\")"
+    }
     ammonite
       .Main(
         predefCode = predefPlus(additionalImportCode(config) ++ replConfig ++ shutdownHooks),
