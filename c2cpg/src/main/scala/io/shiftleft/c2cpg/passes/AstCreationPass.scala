@@ -3,7 +3,7 @@ package io.shiftleft.c2cpg.passes
 import io.shiftleft.c2cpg.C2Cpg
 import io.shiftleft.c2cpg.astcreation.{AstCreator, Defines}
 import io.shiftleft.c2cpg.datastructures.Global
-import io.shiftleft.c2cpg.parser.{CdtParser, HeaderFileFinder, ParserConfig}
+import io.shiftleft.c2cpg.parser.{CdtParser, HeaderFileFinder, ParseConfig}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.{ConcurrentWriterCpgPass, DiffGraph, IntervalKeyPool}
 
@@ -14,7 +14,7 @@ class AstCreationPass(filenames: List[String],
                       cpg: Cpg,
                       keyPool: IntervalKeyPool,
                       config: C2Cpg.Config,
-                      parseConfig: ParserConfig = ParserConfig.empty,
+                      parseConfig: ParseConfig = ParseConfig.empty,
                       headerFileFinder: HeaderFileFinder = null)
     extends ConcurrentWriterCpgPass[String](cpg, keyPool = Some(keyPool)) {
 

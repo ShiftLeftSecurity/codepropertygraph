@@ -1,6 +1,6 @@
 package io.shiftleft.c2cpg.passes
 
-import io.shiftleft.c2cpg.parser.{CdtParser, HeaderFileFinder, ParserConfig}
+import io.shiftleft.c2cpg.parser.{CdtParser, HeaderFileFinder, ParseConfig}
 import org.eclipse.cdt.core.dom.ast.{
   IASTPreprocessorIfStatement,
   IASTPreprocessorIfdefStatement,
@@ -11,7 +11,7 @@ import java.nio.file.Paths
 import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
 import scala.collection.parallel.immutable.ParIterable
 
-class PreprocessorPass(filenames: List[String], parseConfig: ParserConfig, headerFileFinder: HeaderFileFinder = null) {
+class PreprocessorPass(filenames: List[String], parseConfig: ParseConfig, headerFileFinder: HeaderFileFinder = null) {
 
   def run(): ParIterable[String] = filenames.par.flatMap(runOnPart)
 
