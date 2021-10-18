@@ -4,11 +4,11 @@ import java.nio.file.Path
 
 object ParseConfig {
 
-  def empty: ParseConfig = ParseConfig(List.empty, Map.empty, logProblems = false, logPreprocessor = false)
+  def empty: ParseConfig = ParseConfig(Set.empty, Map.empty, logProblems = false, logPreprocessor = false)
 
 }
 
-case class ParseConfig(includePaths: List[Path],
+case class ParseConfig(includePaths: Set[Path],
                        definedSymbols: Map[String, String],
                        logProblems: Boolean,
                        logPreprocessor: Boolean)

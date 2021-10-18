@@ -58,7 +58,7 @@ class PreprocessorPassTests extends AnyWordSpec with Matchers {
         file.write(code)
         val filePath = file.path.toAbsolutePath.toString
 
-        val parseConfig = ParseConfig(List.empty, Map("SYMBOL" -> "true"), logProblems = false, logPreprocessor = false)
+        val parseConfig = ParseConfig(Set.empty, Map("SYMBOL" -> "true"), logProblems = false, logPreprocessor = false)
         val stmts = new PreprocessorPass(List(filePath), parseConfig).run().toList
         stmts shouldBe List("SYMBOL=true", "FOO=true")
       }

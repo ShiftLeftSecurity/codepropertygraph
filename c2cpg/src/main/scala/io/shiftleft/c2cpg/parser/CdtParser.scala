@@ -34,8 +34,8 @@ class CdtParser(private val parseConfig: ParseConfig, private val headerFileFind
 
   private val definedSymbols: util.Map[String, String] = parseConfig.definedSymbols.asJava
 
-  private val includePaths: Seq[String] = parseConfig.includePaths.map(_.toAbsolutePath.toString)
-  private val info: ScannerInfo = new ScannerInfo(definedSymbols, includePaths.toArray)
+  private val includePaths: Set[String] = parseConfig.includePaths.map(_.toString)
+  private val scannerInfo: ScannerInfo = new ScannerInfo(definedSymbols, includePaths.toArray)
   private val log: DefaultLogService = new DefaultLogService
 
   // enables parsing of code behind disabled preprocessor defines:
@@ -56,7 +56,7 @@ class CdtParser(private val parseConfig: ParseConfig, private val headerFileFind
       val fileContentProvider = new CustomFileContentProvider(headerFileFinder)
       val lang = createParseLanguage(file)
       Try(
-        lang.getASTTranslationUnit(fileContent, info, fileContentProvider, null, opts, log)
+        lang.getASTTranslationUnit(fileContent, scannerInfo, fileContentProvider, null, opts, log)
       ) match {
         case Failure(e) =>
           ParseResult(None, -1, -1, Some(e))
