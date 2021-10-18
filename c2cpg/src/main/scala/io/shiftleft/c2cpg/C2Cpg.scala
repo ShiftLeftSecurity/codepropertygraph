@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg
 
 import io.shiftleft.c2cpg.C2Cpg.Config
-import io.shiftleft.c2cpg.parser.{FileDefaults, HeaderFileFinder, ParseConfig}
+import io.shiftleft.c2cpg.parser.{FileDefaults, HeaderFileFinder, ParserConfig}
 import io.shiftleft.c2cpg.passes.{AstCreationPass, PreprocessorPass}
 import io.shiftleft.c2cpg.utils.IncludeAutoDiscovery
 import io.shiftleft.codepropertygraph.Cpg
@@ -20,8 +20,8 @@ import scala.util.control.NonFatal
 
 class C2Cpg {
 
-  private def createParseConfig(config: Config): ParseConfig = {
-    ParseConfig(
+  private def createParserConfig(config: Config): ParserConfig = {
+    ParserConfig(
       config.includePaths.map(Paths.get(_).toAbsolutePath) ++ IncludeAutoDiscovery.discoverIncludePaths(config),
       config.defines.map {
         case define if define.contains("=") =>
@@ -45,7 +45,7 @@ class C2Cpg {
     new MetaDataPass(cpg, Languages.NEWC, Some(metaDataKeyPool)).createAndApply()
     val headerFileFinder = new HeaderFileFinder(config.inputPaths.toList)
     val astCreationPass =
-      new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, createParseConfig(config), headerFileFinder)
+      new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, createParserConfig(config), headerFileFinder)
     astCreationPass.createAndApply()
     new CfgCreationPass(cpg).createAndApply()
     new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
@@ -55,7 +55,7 @@ class C2Cpg {
   def printIfDefsOnly(config: Config): Unit = {
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
     val headerFileFinder = new HeaderFileFinder(config.inputPaths.toList)
-    val stmts = new PreprocessorPass(sourceFileNames, createParseConfig(config), headerFileFinder).run().mkString(",")
+    val stmts = new PreprocessorPass(sourceFileNames, createParserConfig(config), headerFileFinder).run().mkString(",")
     println(stmts)
   }
 

@@ -26,7 +26,7 @@ object CdtParser {
 
 }
 
-class CdtParser(private val parseConfig: ParseConfig, private val headerFileFinder: HeaderFileFinder)
+class CdtParser(private val parseConfig: ParserConfig, private val headerFileFinder: HeaderFileFinder)
     extends ParseProblemsLogger
     with PreprocessorStatementsLogger {
 
