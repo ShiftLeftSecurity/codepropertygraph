@@ -39,50 +39,70 @@ trait AstForTypesCreator {
   }
 
   private def astForNamespaceDefinition(namespaceDefinition: ICPPASTNamespaceDefinition, order: Int): Ast = {
-    val (name, fullname) =
-      uniqueName("namespace", namespaceDefinition.getName.getLastName.toString, fullName(namespaceDefinition))
-    val code = "namespace " + fullname
-    val cpgNamespace = NewNamespaceBlock()
-      .code(code)
-      .lineNumber(line(namespaceDefinition))
-      .columnNumber(column(namespaceDefinition))
-      .filename(fileName(namespaceDefinition))
-      .name(name)
-      .fullName(fullname)
-      .order(order)
+    val linenumber = line(namespaceDefinition)
+    val columnnumber = column(namespaceDefinition)
+    val filename = fileName(namespaceDefinition)
 
-    scope.pushNewScope(cpgNamespace)
-    var currOrder = order
-    val childrenAsts = namespaceDefinition.getDeclarations.flatMap { decl =>
-      val declAsts = astsForDeclaration(decl, currOrder)
-      currOrder = currOrder + declAsts.length
-      declAsts
-    }.toIndexedSeq
+    AstCreator.getAstFromAstCache(
+      filename,
+      linenumber,
+      columnnumber, {
+        val (name, fullname) =
+          uniqueName("namespace", namespaceDefinition.getName.getLastName.toString, fullName(namespaceDefinition))
+        val code = "namespace " + fullname
+        val cpgNamespace = NewNamespaceBlock()
+          .code(code)
+          .lineNumber(linenumber)
+          .columnNumber(columnnumber)
+          .filename(filename)
+          .name(name)
+          .fullName(fullname)
+          .order(order)
 
-    val namespaceAst = Ast(cpgNamespace).withChildren(childrenAsts)
-    scope.popScope()
-    namespaceAst
+        scope.pushNewScope(cpgNamespace)
+        var currOrder = order
+        val childrenAsts = namespaceDefinition.getDeclarations.flatMap { decl =>
+          val declAsts = astsForDeclaration(decl, currOrder)
+          currOrder = currOrder + declAsts.length
+          declAsts
+        }.toIndexedSeq
+
+        val namespaceAst = Ast(cpgNamespace).withChildren(childrenAsts)
+        scope.popScope()
+        namespaceAst
+      }
+    )
   }
 
   protected def astForNamespaceAlias(namespaceAlias: ICPPASTNamespaceAlias, order: Int): Ast = {
-    val name = namespaceAlias.getAlias.toString
-    val fullname = fullName(namespaceAlias)
+    val linenumber = line(namespaceAlias)
+    val columnnumber = column(namespaceAlias)
+    val filename = fileName(namespaceAlias)
 
-    if (!isQualifiedName(name)) {
-      usingDeclarationMappings.put(name, fullname)
-    }
+    AstCreator.getAstFromAstCache(
+      filename,
+      linenumber,
+      columnnumber, {
+        val name = namespaceAlias.getAlias.toString
+        val fullname = fullName(namespaceAlias)
 
-    val code = "namespace " + name + " = " + fullname
-    val cpgNamespace = NewNamespaceBlock()
-      .code(code)
-      .lineNumber(line(namespaceAlias))
-      .columnNumber(column(namespaceAlias))
-      .filename(fileName(namespaceAlias))
-      .name(name)
-      .fullName(fullname)
-      .order(order)
+        if (!isQualifiedName(name)) {
+          usingDeclarationMappings.put(name, fullname)
+        }
 
-    Ast(cpgNamespace)
+        val code = "namespace " + name + " = " + fullname
+        val cpgNamespace = NewNamespaceBlock()
+          .code(code)
+          .lineNumber(linenumber)
+          .columnNumber(columnnumber)
+          .filename(filename)
+          .name(name)
+          .fullName(fullname)
+          .order(order)
+
+        Ast(cpgNamespace)
+      }
+    )
   }
 
   protected def astForDeclarator(declaration: IASTSimpleDeclaration, declarator: IASTDeclarator, order: Int): Ast = {
@@ -90,7 +110,12 @@ trait AstForTypesCreator {
     val name = declarator.getName.toString
     declaration match {
       case d if isTypeDef(d) =>
-        Ast(newTypeDecl(name, registerType(name), fileName(d), alias = Some(registerType(declTypeName)), order = order))
+        val linenumber = line(declaration)
+        val columnnumber = column(declaration)
+        val filename = fileName(declaration)
+        AstCreator.getAstFromAstCache(filename, linenumber, columnnumber, {
+          Ast(newTypeDecl(name, registerType(name), filename, alias = Some(registerType(declTypeName)), order = order))
+        })
       case d if parentIsClassDef(d) =>
         Ast(
           NewMember()
@@ -116,6 +141,7 @@ trait AstForTypesCreator {
         scope.addToScope(name, (l, fixQualifiedName(declTypeName)))
         Ast(l)
     }
+
   }
 
   protected def astForInitializer(declarator: IASTDeclarator, init: IASTInitializer, order: Int): Ast = init match {
@@ -156,19 +182,29 @@ trait AstForTypesCreator {
   }
 
   protected def astForAliasDeclaration(aliasDeclaration: ICPPASTAliasDeclaration, order: Int): Ast = {
-    val name = aliasDeclaration.getAlias.toString
-    val mappedName = ASTTypeUtil.getType(aliasDeclaration.getMappingTypeId)
-    val typeDeclNode =
-      newTypeDecl(
-        name,
-        registerType(name),
-        fileName(aliasDeclaration),
-        alias = Some(registerType(mappedName)),
-        line = line(aliasDeclaration),
-        column = column(aliasDeclaration),
-        order = order
-      )
-    Ast(typeDeclNode)
+    val linenumber = line(aliasDeclaration)
+    val columnnumber = column(aliasDeclaration)
+    val filename = fileName(aliasDeclaration)
+
+    AstCreator.getAstFromAstCache(
+      filename,
+      linenumber,
+      columnnumber, {
+        val name = aliasDeclaration.getAlias.toString
+        val mappedName = ASTTypeUtil.getType(aliasDeclaration.getMappingTypeId)
+        val typeDeclNode =
+          newTypeDecl(
+            name,
+            registerType(name),
+            filename,
+            alias = Some(registerType(mappedName)),
+            line = linenumber,
+            column = columnnumber,
+            order = order
+          )
+        Ast(typeDeclNode)
+      }
+    )
   }
 
   protected def astForASMDeclaration(asm: IASTASMDeclaration, order: Int): Ast = Ast(newUnknown(asm, order))
@@ -220,8 +256,17 @@ trait AstForTypesCreator {
         if declaration.getDeclSpecifier != null && declaration.getDeclSpecifier
           .isInstanceOf[IASTNamedTypeSpecifier] && declaration.getDeclarators.isEmpty =>
       val spec = declaration.getDeclSpecifier.asInstanceOf[IASTNamedTypeSpecifier]
-      val name = nodeSignature(spec.getName)
-      Seq(Ast(newTypeDecl(name, registerType(name), fileName(spec), alias = Some(name), order = order)))
+      val linenumber = line(spec)
+      val columnnumber = column(spec)
+      val filename = fileName(spec)
+      AstCreator.getAstsFromAstCache(
+        filename,
+        linenumber,
+        columnnumber, {
+          val name = nodeSignature(spec.getName)
+          Seq(Ast(newTypeDecl(name, registerType(name), filename, alias = Some(name), order = order)))
+        }
+      )
     case declaration: IASTSimpleDeclaration if declaration.getDeclarators.nonEmpty =>
       declaration.getDeclarators.toIndexedSeq.map {
         case d: IASTFunctionDeclarator     => astForFunctionDeclarator(d, order)
@@ -256,62 +301,74 @@ trait AstForTypesCreator {
   private def astsForCompositeType(typeSpecifier: IASTCompositeTypeSpecifier,
                                    decls: List[IASTDeclarator],
                                    order: Int): Seq[Ast] = {
+    val linenumber = line(typeSpecifier)
+    val columnnumber = column(typeSpecifier)
+    val filename = fileName(typeSpecifier)
+    AstCreator.getAstsFromAstCache(
+      filename,
+      linenumber,
+      columnnumber, {
+        val declAsts = withOrder(decls) { (d, o) =>
+          astForDeclarator(typeSpecifier.getParent.asInstanceOf[IASTSimpleDeclaration], d, order + o)
+        }
 
-    val declAsts = withOrder(decls) { (d, o) =>
-      astForDeclarator(typeSpecifier.getParent.asInstanceOf[IASTSimpleDeclaration], d, order + o)
-    }
+        val name = typeSpecifier.getName.toString
+        val fullname = fullName(typeSpecifier)
+        val nameWithTemplateParams = templateParameters(typeSpecifier).map(fullname + _)
 
-    val name = typeSpecifier.getName.toString
-    val fullname = fullName(typeSpecifier)
-    val nameWithTemplateParams = templateParameters(typeSpecifier).map(fullname + _)
+        val typeDecl = typeSpecifier match {
+          case cppClass: ICPPASTCompositeTypeSpecifier =>
+            val baseClassList = cppClass.getBaseSpecifiers.toSeq.map(s => fixQualifiedName(s.getNameSpecifier.toString))
+            baseClassList.foreach(registerType)
+            newTypeDecl(name,
+                        registerType(fullname),
+                        filename,
+                        inherits = baseClassList,
+                        alias = nameWithTemplateParams,
+                        order = order)
+          case _ =>
+            newTypeDecl(name, registerType(fullname), filename, alias = nameWithTemplateParams, order = order)
+        }
 
-    val typeDecl = typeSpecifier match {
-      case cppClass: ICPPASTCompositeTypeSpecifier =>
-        val baseClassList = cppClass.getBaseSpecifiers.toSeq.map(s => fixQualifiedName(s.getNameSpecifier.toString))
-        baseClassList.foreach(registerType)
-        newTypeDecl(name,
-                    registerType(fullname),
-                    fileName(typeSpecifier),
-                    inherits = baseClassList,
-                    alias = nameWithTemplateParams,
-                    order = order)
-      case _ =>
-        newTypeDecl(name,
-                    registerType(fullname),
-                    fileName(typeSpecifier),
-                    alias = nameWithTemplateParams,
-                    order = order)
-    }
+        methodAstParentStack.push(typeDecl)
+        scope.pushNewScope(typeDecl)
 
-    methodAstParentStack.push(typeDecl)
-    scope.pushNewScope(typeDecl)
+        val member = withOrder(typeSpecifier.getDeclarations(true)) { (m, o) =>
+          astsForDeclaration(m, o)
+        }.flatten
 
-    val member = withOrder(typeSpecifier.getDeclarations(true)) { (m, o) =>
-      astsForDeclaration(m, o)
-    }.flatten
+        methodAstParentStack.pop()
+        scope.popScope()
 
-    methodAstParentStack.pop()
-    scope.popScope()
-
-    declAsts :+ Ast(typeDecl).withChildren(member)
+        declAsts :+ Ast(typeDecl).withChildren(member)
+      }
+    )
   }
 
   private def astsForElaboratedType(typeSpecifier: IASTElaboratedTypeSpecifier,
                                     decls: List[IASTDeclarator],
                                     order: Int): Seq[Ast] = {
+    val linenumber = line(typeSpecifier)
+    val columnnumber = column(typeSpecifier)
+    val filename = fileName(typeSpecifier)
+    AstCreator.getAstsFromAstCache(
+      filename,
+      linenumber,
+      columnnumber, {
+        val declAsts = withOrder(decls) { (d, o) =>
+          astForDeclarator(typeSpecifier.getParent.asInstanceOf[IASTSimpleDeclaration], d, order + o)
+        }
 
-    val declAsts = withOrder(decls) { (d, o) =>
-      astForDeclarator(typeSpecifier.getParent.asInstanceOf[IASTSimpleDeclaration], d, order + o)
-    }
+        val name = typeSpecifier.getName.toString
+        val fullname = fullName(typeSpecifier)
+        val nameWithTemplateParams = templateParameters(typeSpecifier).map(fullname + _)
 
-    val name = typeSpecifier.getName.toString
-    val fullname = fullName(typeSpecifier)
-    val nameWithTemplateParams = templateParameters(typeSpecifier).map(fullname + _)
+        val typeDecl =
+          newTypeDecl(name, registerType(fullname), filename, alias = nameWithTemplateParams, order = order)
 
-    val typeDecl =
-      newTypeDecl(name, registerType(fullname), fileName(typeSpecifier), alias = nameWithTemplateParams, order = order)
-
-    declAsts :+ Ast(typeDecl)
+        declAsts :+ Ast(typeDecl)
+      }
+    )
   }
 
   private def astsForEnumerator(enumerator: IASTEnumerationSpecifier.IASTEnumerator, order: Int): Seq[Ast] = {
@@ -345,26 +402,35 @@ trait AstForTypesCreator {
   private def astsForEnum(enumSpecifier: IASTEnumerationSpecifier,
                           decls: List[IASTDeclarator],
                           order: Int): Seq[Ast] = {
-    val declAsts = withOrder(decls) { (d, o) =>
-      astForDeclarator(enumSpecifier.getParent.asInstanceOf[IASTSimpleDeclaration], d, order + o)
-    }
+    val linenumber = line(enumSpecifier)
+    val columnnumber = column(enumSpecifier)
+    val filename = fileName(enumSpecifier)
+    AstCreator.getAstsFromAstCache(
+      filename,
+      linenumber,
+      columnnumber, {
+        val declAsts = withOrder(decls) { (d, o) =>
+          astForDeclarator(enumSpecifier.getParent.asInstanceOf[IASTSimpleDeclaration], d, order + o)
+        }
 
-    val (name, fullname) = uniqueName("enum", enumSpecifier.getName.toString, fullName(enumSpecifier))
-    val typeDecl = newTypeDecl(name, registerType(fullname), fileName(enumSpecifier), order = order)
+        val (name, fullname) = uniqueName("enum", enumSpecifier.getName.toString, fullName(enumSpecifier))
+        val typeDecl = newTypeDecl(name, registerType(fullname), filename, order = order)
 
-    methodAstParentStack.push(typeDecl)
-    scope.pushNewScope(typeDecl)
+        methodAstParentStack.push(typeDecl)
+        scope.pushNewScope(typeDecl)
 
-    var currentOrder = 0
-    val member = enumSpecifier.getEnumerators.toIndexedSeq.flatMap { e =>
-      val eCpg = astsForEnumerator(e, currentOrder)
-      currentOrder = eCpg.size + currentOrder
-      eCpg
-    }
-    methodAstParentStack.pop()
-    scope.popScope()
+        var currentOrder = 0
+        val member = enumSpecifier.getEnumerators.toIndexedSeq.flatMap { e =>
+          val eCpg = astsForEnumerator(e, currentOrder)
+          currentOrder = eCpg.size + currentOrder
+          eCpg
+        }
+        methodAstParentStack.pop()
+        scope.popScope()
 
-    declAsts :+ Ast(typeDecl).withChildren(member)
+        declAsts :+ Ast(typeDecl).withChildren(member)
+      }
+    )
   }
 
 }

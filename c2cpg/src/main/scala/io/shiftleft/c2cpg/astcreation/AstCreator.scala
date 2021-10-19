@@ -3,6 +3,7 @@ package io.shiftleft.c2cpg.astcreation
 import io.shiftleft.c2cpg.C2Cpg
 import io.shiftleft.c2cpg.datastructures.Stack._
 import io.shiftleft.c2cpg.datastructures.{Global, Scope}
+import io.shiftleft.c2cpg.parser.FileDefaults
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EvaluationStrategies, NodeTypes}
 import io.shiftleft.passes.DiffGraph
@@ -12,7 +13,49 @@ import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit
 import org.slf4j.{Logger, LoggerFactory}
 
+import scala.collection.concurrent.TrieMap
 import scala.collection.mutable
+
+object AstCreator {
+  // we cache our previously created CPG Sub-ASTs for included header files
+  // by (filename, linenumber, columnnumber)
+  private val newAstCache: TrieMap[(String, Int, Int), Seq[Ast]] = TrieMap.empty
+
+  def getAstsFromAstCache(filename: String,
+                          linenumber: Option[Integer],
+                          columnnumber: Option[Integer],
+                          astCreatorFunction: => Seq[Ast]): Seq[Ast] = this.synchronized {
+    if (FileDefaults.isHeaderFile(filename) && linenumber.isDefined && columnnumber.isDefined) {
+      // Actually, we want to use .getOrElseUpdate here. Sadly, the implementation for that
+      // does not prevent multiple invocations of astCreatorFunction when being accessed
+      // by multiple threads in parallel. Same applies to getAstFromAstCache below.
+      // Hence, we have to synchronize on the companion object AstCreator
+      // and do the usual if-contains-key-then-get-else-update thing.
+      if (newAstCache.contains((filename, linenumber.get, columnnumber.get))) {
+        newAstCache((filename, linenumber.get, columnnumber.get))
+      } else {
+        val value = astCreatorFunction
+        newAstCache((filename, linenumber.get, columnnumber.get)) = value.map(v => Ast(v.nodes))
+        value
+      }
+    } else { astCreatorFunction }
+  }
+
+  def getAstFromAstCache(filename: String,
+                         linenumber: Option[Integer],
+                         columnnumber: Option[Integer],
+                         astCreatorFunction: => Ast): Ast = this.synchronized {
+    if (FileDefaults.isHeaderFile(filename) && linenumber.isDefined && columnnumber.isDefined) {
+      if (newAstCache.contains((filename, linenumber.get, columnnumber.get))) {
+        newAstCache((filename, linenumber.get, columnnumber.get)).head
+      } else {
+        val value = astCreatorFunction
+        newAstCache((filename, linenumber.get, columnnumber.get)) = Seq(Ast(value.nodes))
+        value
+      }
+    } else { astCreatorFunction }
+  }
+}
 
 class AstCreator(val filename: String,
                  val global: Global,

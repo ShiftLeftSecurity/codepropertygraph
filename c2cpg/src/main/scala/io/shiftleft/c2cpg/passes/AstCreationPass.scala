@@ -5,7 +5,7 @@ import io.shiftleft.c2cpg.astcreation.{AstCreator, Defines}
 import io.shiftleft.c2cpg.datastructures.Global
 import io.shiftleft.c2cpg.parser.{CdtParser, HeaderFileFinder, ParserConfig}
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.{ConcurrentWriterCpgPass, DiffGraph, IntervalKeyPool}
+import io.shiftleft.passes.{DiffGraph, ForkJoinParallelCpgPass, IntervalKeyPool}
 
 import java.nio.file.Paths
 import scala.jdk.CollectionConverters._
@@ -16,7 +16,9 @@ class AstCreationPass(filenames: List[String],
                       config: C2Cpg.Config,
                       parseConfig: ParserConfig = ParserConfig.empty,
                       headerFileFinder: HeaderFileFinder = null)
-    extends ConcurrentWriterCpgPass[String](cpg, keyPool = Some(keyPool)) {
+    extends ForkJoinParallelCpgPass[String](cpg, keyPool = Some(keyPool)) {
+  // We use the ForkJoinParallelCpgPass as this is the only parallel CPG pass at the moment
+  // that gets node de-duplication right.
 
   private val global: Global = Global()
 
@@ -27,9 +29,7 @@ class AstCreationPass(filenames: List[String],
 
   override def runOnPart(diffGraph: DiffGraph.Builder, filename: String): Unit =
     new CdtParser(parseConfig, headerFileFinder).parse(Paths.get(filename)).foreach { parserResult =>
-      val localDiff = DiffGraph.newBuilder
-      new AstCreator(filename, global, config, localDiff, parserResult).createAst()
-      diffGraph.moveFrom(localDiff)
+      new AstCreator(filename, global, config, diffGraph, parserResult).createAst()
     }
 
 }

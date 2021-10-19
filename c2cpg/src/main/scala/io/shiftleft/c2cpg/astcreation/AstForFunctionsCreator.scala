@@ -66,152 +66,182 @@ trait AstForFunctionsCreator {
     s"(${elements.mkString(",")}$variadic)"
   }
 
-  protected def methodRefForLambda(lambdaExpression: ICPPASTLambdaExpression): NewMethodRef = {
-    val returnType = lambdaExpression.getDeclarator match {
-      case declarator: IASTDeclarator =>
-        declarator.getTrailingReturnType match {
-          case id: IASTTypeId => typeForDeclSpecifier(id.getDeclSpecifier)
-          case _              => Defines.anyTypeName
+  protected def astForMethodRefForLambda(lambdaExpression: ICPPASTLambdaExpression): Ast = {
+    val linenumber = line(lambdaExpression)
+    val columnnumber = column(lambdaExpression)
+    val filename = fileName(lambdaExpression)
+
+    AstCreator.getAstFromAstCache(
+      filename,
+      linenumber,
+      columnnumber, {
+        val returnType = lambdaExpression.getDeclarator match {
+          case declarator: IASTDeclarator =>
+            declarator.getTrailingReturnType match {
+              case id: IASTTypeId => typeForDeclSpecifier(id.getDeclSpecifier)
+              case _              => Defines.anyTypeName
+            }
+          case null => Defines.anyTypeName
         }
-      case null => Defines.anyTypeName
-    }
-    val (name, fullname) = uniqueName("lambda", "", fullName(lambdaExpression))
-    val signature = returnType + " " + fullname + " " + parameterListSignature(lambdaExpression,
-                                                                               includeParamNames = false)
-    val code = returnType + " " + name + " " + parameterListSignature(lambdaExpression, includeParamNames = true)
-    val methodNode: NewMethod = NewMethod()
-      .name(name)
-      .code(code)
-      .isExternal(false)
-      .fullName(fullname)
-      .lineNumber(line(lambdaExpression))
-      .lineNumberEnd(lineEnd(lambdaExpression))
-      .columnNumber(column(lambdaExpression))
-      .columnNumberEnd(columnEnd(lambdaExpression))
-      .signature(signature)
-      .filename(fileName(lambdaExpression))
+        val (name, fullname) = uniqueName("lambda", "", fullName(lambdaExpression))
+        val signature = returnType + " " + fullname + " " + parameterListSignature(lambdaExpression,
+                                                                                   includeParamNames = false)
+        val code = returnType + " " + name + " " + parameterListSignature(lambdaExpression, includeParamNames = true)
+        val methodNode: NewMethod = NewMethod()
+          .name(name)
+          .code(code)
+          .isExternal(false)
+          .fullName(fullname)
+          .lineNumber(linenumber)
+          .lineNumberEnd(lineEnd(lambdaExpression))
+          .columnNumber(columnnumber)
+          .columnNumberEnd(columnEnd(lambdaExpression))
+          .signature(signature)
+          .filename(filename)
 
-    scope.pushNewScope(methodNode)
-    val parameterAsts = withOrder(parameters(lambdaExpression.getDeclarator)) { (p, o) =>
-      astForParameter(p, o)
-    }
+        scope.pushNewScope(methodNode)
+        val parameterAsts = withOrder(parameters(lambdaExpression.getDeclarator)) { (p, o) =>
+          astForParameter(p, o)
+        }
 
-    parameterAsts.lastOption.foreach(_.root.foreach {
-      case p: NewMethodParameterIn if isVariadic(lambdaExpression) =>
-        p.isVariadic = true
-        p.code = p.code + "..."
-      case _ =>
-    })
+        parameterAsts.lastOption.foreach(_.root.foreach {
+          case p: NewMethodParameterIn if isVariadic(lambdaExpression) =>
+            p.isVariadic = true
+            p.code = p.code + "..."
+          case _ =>
+        })
 
-    val lastOrder = 1 + parameterAsts.size
+        val lastOrder = 1 + parameterAsts.size
 
-    val r = Ast(methodNode)
-      .withChildren(parameterAsts)
-      .withChild(astForMethodReturn(lambdaExpression, lastOrder, returnType))
+        val r = Ast(methodNode)
+          .withChildren(parameterAsts)
+          .withChild(astForMethodReturn(lambdaExpression, lastOrder, returnType))
 
-    scope.popScope()
-    val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
+        scope.popScope()
+        val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
 
-    Ast.storeInDiffGraph(r.merge(typeDeclAst), diffGraph)
+        Ast.storeInDiffGraph(r.merge(typeDeclAst), diffGraph)
 
-    newMethodRefNode(code, fullname, methodNode.astParentFullName, lambdaExpression)
+        Ast(newMethodRefNode(code, fullname, methodNode.astParentFullName, lambdaExpression))
+      }
+    )
   }
 
   protected def astForFunctionDeclarator(funcDecl: IASTFunctionDeclarator, order: Int): Ast = {
-    val returnType = typeForDeclSpecifier(funcDecl.getParent.asInstanceOf[IASTSimpleDeclaration].getDeclSpecifier)
-    val name = shortName(funcDecl)
-    val fullname = fullName(funcDecl)
-    val templateParams = templateParameters(funcDecl).getOrElse("")
-    val signature = returnType + " " + fullname + templateParams + " " + parameterListSignature(funcDecl,
-                                                                                                includeParamNames =
-                                                                                                  false)
-    val code = returnType + " " + name + " " + parameterListSignature(funcDecl, includeParamNames = true)
-    val methodNode = NewMethod()
-      .name(name)
-      .code(code)
-      .isExternal(false)
-      .fullName(fullname)
-      .lineNumber(line(funcDecl))
-      .lineNumberEnd(lineEnd(funcDecl))
-      .columnNumber(column(funcDecl))
-      .columnNumberEnd(columnEnd(funcDecl))
-      .signature(signature)
-      .filename(fileName(funcDecl))
-      .order(order)
+    val linenumber = line(funcDecl)
+    val columnnumber = column(funcDecl)
+    val filename = fileName(funcDecl)
 
-    scope.pushNewScope(methodNode)
+    AstCreator.getAstFromAstCache(
+      filename,
+      linenumber,
+      columnnumber, {
+        val returnType = typeForDeclSpecifier(funcDecl.getParent.asInstanceOf[IASTSimpleDeclaration].getDeclSpecifier)
+        val name = shortName(funcDecl)
+        val fullname = fullName(funcDecl)
+        val templateParams = templateParameters(funcDecl).getOrElse("")
+        val signature = returnType + " " + fullname + templateParams + " " + parameterListSignature(funcDecl,
+                                                                                                    includeParamNames =
+                                                                                                      false)
+        val code = returnType + " " + name + " " + parameterListSignature(funcDecl, includeParamNames = true)
+        val methodNode = NewMethod()
+          .name(name)
+          .code(code)
+          .isExternal(false)
+          .fullName(fullname)
+          .lineNumber(linenumber)
+          .lineNumberEnd(lineEnd(funcDecl))
+          .columnNumber(columnnumber)
+          .columnNumberEnd(columnEnd(funcDecl))
+          .signature(signature)
+          .filename(filename)
+          .order(order)
 
-    val parameterAsts = withOrder(parameters(funcDecl)) { (p, order) =>
-      astForParameter(p, order)
-    }
+        scope.pushNewScope(methodNode)
 
-    parameterAsts.lastOption.foreach(_.root.foreach {
-      case p: NewMethodParameterIn if isVariadic(funcDecl) =>
-        p.isVariadic = true
-        p.code = p.code + "..."
-      case _ =>
-    })
+        val parameterAsts = withOrder(parameters(funcDecl)) { (p, order) =>
+          astForParameter(p, order)
+        }
 
-    val lastOrder = 1 + parameterAsts.size
-    val r = Ast(methodNode)
-      .withChildren(parameterAsts)
-      .withChild(astForMethodReturn(funcDecl, lastOrder, returnType))
+        parameterAsts.lastOption.foreach(_.root.foreach {
+          case p: NewMethodParameterIn if isVariadic(funcDecl) =>
+            p.isVariadic = true
+            p.code = p.code + "..."
+          case _ =>
+        })
 
-    scope.popScope()
+        val lastOrder = 1 + parameterAsts.size
+        val r = Ast(methodNode)
+          .withChildren(parameterAsts)
+          .withChild(astForMethodReturn(funcDecl, lastOrder, returnType))
 
-    val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
+        scope.popScope()
 
-    r.merge(typeDeclAst)
+        val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
+
+        r.merge(typeDeclAst)
+      }
+    )
   }
 
   protected def astForFunctionDefinition(funcDef: IASTFunctionDefinition, order: Int): Ast = {
-    val returnType = typeForDeclSpecifier(funcDef.getDeclSpecifier)
-    val name = shortName(funcDef)
-    val fullname = fullName(funcDef)
-    val templateParams = templateParameters(funcDef).getOrElse("")
-    val signature = returnType + " " + fullname + templateParams + " " + parameterListSignature(funcDef,
-                                                                                                includeParamNames =
-                                                                                                  false)
-    val code = returnType + " " + name + " " + parameterListSignature(funcDef, includeParamNames = true)
-    val methodNode = NewMethod()
-      .name(name)
-      .code(code)
-      .isExternal(false)
-      .fullName(fullname)
-      .lineNumber(line(funcDef))
-      .lineNumberEnd(lineEnd(funcDef))
-      .columnNumber(column(funcDef))
-      .columnNumberEnd(columnEnd(funcDef))
-      .signature(signature)
-      .filename(fileName(funcDef))
-      .order(order)
+    val linenumber = line(funcDef)
+    val columnnumber = column(funcDef)
+    val filename = fileName(funcDef)
 
-    methodAstParentStack.push(methodNode)
-    scope.pushNewScope(methodNode)
+    AstCreator.getAstFromAstCache(
+      filename,
+      linenumber,
+      columnnumber, {
+        val returnType = typeForDeclSpecifier(funcDef.getDeclSpecifier)
+        val name = shortName(funcDef)
+        val fullname = fullName(funcDef)
+        val templateParams = templateParameters(funcDef).getOrElse("")
+        val signature = returnType + " " + fullname + templateParams + " " + parameterListSignature(funcDef,
+                                                                                                    includeParamNames =
+                                                                                                      false)
+        val code = returnType + " " + name + " " + parameterListSignature(funcDef, includeParamNames = true)
+        val methodNode = NewMethod()
+          .name(name)
+          .code(code)
+          .isExternal(false)
+          .fullName(fullname)
+          .lineNumber(linenumber)
+          .lineNumberEnd(lineEnd(funcDef))
+          .columnNumber(columnnumber)
+          .columnNumberEnd(columnEnd(funcDef))
+          .signature(signature)
+          .filename(filename)
+          .order(order)
 
-    val parameterAsts = withOrder(parameters(funcDef)) { (p, order) =>
-      astForParameter(p, order)
-    }
+        methodAstParentStack.push(methodNode)
+        scope.pushNewScope(methodNode)
 
-    parameterAsts.lastOption.foreach(_.root.foreach {
-      case p: NewMethodParameterIn if isVariadic(funcDef) =>
-        p.isVariadic = true
-        p.code = p.code + "..."
-      case _ =>
-    })
+        val parameterAsts = withOrder(parameters(funcDef)) { (p, order) =>
+          astForParameter(p, order)
+        }
 
-    val lastOrder = 1 + parameterAsts.size
-    val r = Ast(methodNode)
-      .withChildren(parameterAsts)
-      .withChild(astForMethodBody(Option(funcDef.getBody), lastOrder))
-      .withChild(astForMethodReturn(funcDef, lastOrder + 1, typeForDeclSpecifier(funcDef.getDeclSpecifier)))
+        parameterAsts.lastOption.foreach(_.root.foreach {
+          case p: NewMethodParameterIn if isVariadic(funcDef) =>
+            p.isVariadic = true
+            p.code = p.code + "..."
+          case _ =>
+        })
 
-    scope.popScope()
-    methodAstParentStack.pop()
+        val lastOrder = 1 + parameterAsts.size
+        val r = Ast(methodNode)
+          .withChildren(parameterAsts)
+          .withChild(astForMethodBody(Option(funcDef.getBody), lastOrder))
+          .withChild(astForMethodReturn(funcDef, lastOrder + 1, typeForDeclSpecifier(funcDef.getDeclSpecifier)))
 
-    val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
+        scope.popScope()
+        methodAstParentStack.pop()
 
-    r.merge(typeDeclAst)
+        val typeDeclAst = createFunctionTypeAndTypeDecl(methodNode, name, fullname, signature)
+
+        r.merge(typeDeclAst)
+      }
+    )
   }
 
   private def astForParameter(parameter: IASTNode, childNum: Int): Ast = {
