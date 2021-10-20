@@ -46,7 +46,7 @@ class EnumTests extends AnyWordSpec with Matchers with Inside with CompleteCpgFi
         |    blue
         |} C;""".stripMargin) { cpg =>
       inside(cpg.typeDecl.l) {
-        case List(c, color) =>
+        case List(color, c) =>
           color.name shouldBe "color"
           color.aliasTypeFullName shouldBe None
           c.name shouldBe "C"

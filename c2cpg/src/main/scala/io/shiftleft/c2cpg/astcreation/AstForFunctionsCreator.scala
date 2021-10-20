@@ -1,5 +1,6 @@
 package io.shiftleft.c2cpg.astcreation
 
+import io.shiftleft.c2cpg.datastructures.Global
 import io.shiftleft.c2cpg.datastructures.Stack._
 import io.shiftleft.codepropertygraph.generated.EvaluationStrategies
 import io.shiftleft.codepropertygraph.generated.nodes._
@@ -71,8 +72,9 @@ trait AstForFunctionsCreator {
     val columnnumber = column(lambdaExpression)
     val filename = fileName(lambdaExpression)
 
-    AstCreator.getAstFromAstCache(
+    Global.getAstFromAstCache(
       filename,
+      this.filename,
       linenumber,
       columnnumber, {
         val returnType = lambdaExpression.getDeclarator match {
@@ -132,8 +134,9 @@ trait AstForFunctionsCreator {
     val columnnumber = column(funcDecl)
     val filename = fileName(funcDecl)
 
-    AstCreator.getAstFromAstCache(
+    Global.getAstFromAstCache(
       filename,
+      this.filename,
       linenumber,
       columnnumber, {
         val returnType = typeForDeclSpecifier(funcDecl.getParent.asInstanceOf[IASTSimpleDeclaration].getDeclSpecifier)
@@ -189,8 +192,9 @@ trait AstForFunctionsCreator {
     val columnnumber = column(funcDef)
     val filename = fileName(funcDef)
 
-    AstCreator.getAstFromAstCache(
+    Global.getAstFromAstCache(
       filename,
+      this.filename,
       linenumber,
       columnnumber, {
         val returnType = typeForDeclSpecifier(funcDef.getDeclSpecifier)

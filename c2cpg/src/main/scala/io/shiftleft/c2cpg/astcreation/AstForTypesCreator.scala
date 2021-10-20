@@ -1,5 +1,6 @@
 package io.shiftleft.c2cpg.astcreation
 
+import io.shiftleft.c2cpg.datastructures.Global
 import io.shiftleft.c2cpg.datastructures.Stack._
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{DispatchTypes, Operators}
@@ -43,8 +44,9 @@ trait AstForTypesCreator {
     val columnnumber = column(namespaceDefinition)
     val filename = fileName(namespaceDefinition)
 
-    AstCreator.getAstFromAstCache(
+    Global.getAstFromAstCache(
       filename,
+      this.filename,
       linenumber,
       columnnumber, {
         val (name, fullname) =
@@ -79,8 +81,9 @@ trait AstForTypesCreator {
     val columnnumber = column(namespaceAlias)
     val filename = fileName(namespaceAlias)
 
-    AstCreator.getAstFromAstCache(
+    Global.getAstFromAstCache(
       filename,
+      this.filename,
       linenumber,
       columnnumber, {
         val name = namespaceAlias.getAlias.toString
@@ -113,9 +116,15 @@ trait AstForTypesCreator {
         val linenumber = line(declaration)
         val columnnumber = column(declaration)
         val filename = fileName(declaration)
-        AstCreator.getAstFromAstCache(filename, linenumber, columnnumber, {
-          Ast(newTypeDecl(name, registerType(name), filename, alias = Some(registerType(declTypeName)), order = order))
-        })
+        Global.getAstFromAstCache(
+          filename,
+          this.filename,
+          linenumber,
+          columnnumber, {
+            Ast(
+              newTypeDecl(name, registerType(name), filename, alias = Some(registerType(declTypeName)), order = order))
+          }
+        )
       case d if parentIsClassDef(d) =>
         Ast(
           NewMember()
@@ -186,8 +195,9 @@ trait AstForTypesCreator {
     val columnnumber = column(aliasDeclaration)
     val filename = fileName(aliasDeclaration)
 
-    AstCreator.getAstFromAstCache(
+    Global.getAstFromAstCache(
       filename,
+      this.filename,
       linenumber,
       columnnumber, {
         val name = aliasDeclaration.getAlias.toString
@@ -259,8 +269,9 @@ trait AstForTypesCreator {
       val linenumber = line(spec)
       val columnnumber = column(spec)
       val filename = fileName(spec)
-      AstCreator.getAstsFromAstCache(
+      Global.getAstsFromAstCache(
         filename,
+        this.filename,
         linenumber,
         columnnumber, {
           val name = nodeSignature(spec.getName)
@@ -304,8 +315,9 @@ trait AstForTypesCreator {
     val linenumber = line(typeSpecifier)
     val columnnumber = column(typeSpecifier)
     val filename = fileName(typeSpecifier)
-    AstCreator.getAstsFromAstCache(
+    Global.getAstsFromAstCache(
       filename,
+      this.filename,
       linenumber,
       columnnumber, {
         val declAsts = withOrder(decls) { (d, o) =>
@@ -340,7 +352,7 @@ trait AstForTypesCreator {
         methodAstParentStack.pop()
         scope.popScope()
 
-        declAsts :+ Ast(typeDecl).withChildren(member)
+        Ast(typeDecl).withChildren(member) +: declAsts
       }
     )
   }
@@ -351,8 +363,9 @@ trait AstForTypesCreator {
     val linenumber = line(typeSpecifier)
     val columnnumber = column(typeSpecifier)
     val filename = fileName(typeSpecifier)
-    AstCreator.getAstsFromAstCache(
+    Global.getAstsFromAstCache(
       filename,
+      this.filename,
       linenumber,
       columnnumber, {
         val declAsts = withOrder(decls) { (d, o) =>
@@ -366,7 +379,7 @@ trait AstForTypesCreator {
         val typeDecl =
           newTypeDecl(name, registerType(fullname), filename, alias = nameWithTemplateParams, order = order)
 
-        declAsts :+ Ast(typeDecl)
+        Ast(typeDecl) +: declAsts
       }
     )
   }
@@ -405,8 +418,9 @@ trait AstForTypesCreator {
     val linenumber = line(enumSpecifier)
     val columnnumber = column(enumSpecifier)
     val filename = fileName(enumSpecifier)
-    AstCreator.getAstsFromAstCache(
+    Global.getAstsFromAstCache(
       filename,
+      this.filename,
       linenumber,
       columnnumber, {
         val declAsts = withOrder(decls) { (d, o) =>
@@ -428,7 +442,7 @@ trait AstForTypesCreator {
         methodAstParentStack.pop()
         scope.popScope()
 
-        declAsts :+ Ast(typeDecl).withChildren(member)
+        Ast(typeDecl).withChildren(member) +: declAsts
       }
     )
   }

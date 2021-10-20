@@ -2,11 +2,11 @@ package io.shiftleft.c2cpg
 
 import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.parser.{FileDefaults, HeaderFileFinder, ParserConfig}
-import io.shiftleft.c2cpg.passes.{AstCreationPass, PreprocessorPass}
+import io.shiftleft.c2cpg.passes.{AstCreationPass, HeaderContentPass, PreprocessorPass}
 import io.shiftleft.c2cpg.utils.IncludeAutoDiscovery
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
-import io.shiftleft.passes.IntervalKeyPool
+import io.shiftleft.passes.{IntervalKeyPool, KeyPoolCreator}
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
@@ -35,9 +35,11 @@ class C2Cpg {
   }
 
   def runAndOutput(config: Config): Cpg = {
+    val keyPool = KeyPoolCreator.obtain(3, minValue = 101)
     val metaDataKeyPool = new IntervalKeyPool(1, 100)
-    val typesKeyPool = new IntervalKeyPool(100, 1000100)
-    val functionKeyPool = new IntervalKeyPool(1000100, Long.MaxValue)
+    val typesKeyPool = keyPool.head
+    val astKeyPool = keyPool(1)
+    val includeKeyPool = keyPool(2)
 
     val cpg = newEmptyCpg(Some(config.outputPath))
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
@@ -45,8 +47,9 @@ class C2Cpg {
     new MetaDataPass(cpg, Languages.NEWC, Some(metaDataKeyPool)).createAndApply()
     val headerFileFinder = new HeaderFileFinder(config.inputPaths.toList)
     val astCreationPass =
-      new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, createParserConfig(config), headerFileFinder)
+      new AstCreationPass(sourceFileNames, cpg, astKeyPool, config, createParserConfig(config), headerFileFinder)
     astCreationPass.createAndApply()
+    new HeaderContentPass(cpg, includeKeyPool).createAndApply()
     new CfgCreationPass(cpg).createAndApply()
     new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
     cpg
