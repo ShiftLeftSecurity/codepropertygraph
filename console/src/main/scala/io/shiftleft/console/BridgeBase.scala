@@ -25,7 +25,8 @@ case class Config(
     serverAuthUsername: String = "",
     serverAuthPassword: String = "",
     nocolors: Boolean = false,
-    cpgToLoad: Option[File] = None
+    cpgToLoad: Option[File] = None,
+    forInputPath: Option[String] = None
 )
 
 /**
@@ -93,7 +94,7 @@ trait BridgeBase {
 
       opt[Unit]("store")
         .action((_, c) => c.copy(store = true))
-        .text("Store graph changes made by bundle")
+        .text("Store graph changes made by layer creator")
 
       note("REST server mode")
 
@@ -123,6 +124,10 @@ trait BridgeBase {
         .optional()
         .action((x, c) => c.copy(cpgToLoad = Some(x.toScala)))
         .text("CPG to load")
+
+      opt[String]("for-input-path")
+        .action((x, c) => c.copy(forInputPath = Some(x)))
+        .text("Open CPG for given input path - overrides <cpg.bin>")
 
       opt[Unit]("nocolors")
         .action((_, c) => c.copy(nocolors = true))
@@ -208,9 +213,7 @@ trait BridgeBase {
         |   save
         | } else {
         |    println("Using existing CPG - Use `--overwrite` if this is not what you want")
-        |    workspace.projects
-        |    .filter(x => x.inputPath == "$src")
-        |    .map(_.name).map(open)
+        |    openForInputPath(\"$src\")
         | }
         | run.$bundleName
         | $storeCode
@@ -235,6 +238,10 @@ trait BridgeBase {
       "banner()"
     ) ++ config.cpgToLoad.map { cpgFile =>
       "importCpg(\"" + cpgFile + "\")"
+    } ++ config.forInputPath.map { name =>
+      s"""
+        |openForInputPath(\"$name\")
+        |""".stripMargin
     }
     ammonite
       .Main(
