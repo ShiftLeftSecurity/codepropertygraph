@@ -125,7 +125,7 @@ trait BridgeBase {
         .action((x, c) => c.copy(cpgToLoad = Some(x.toScala)))
         .text("CPG to load")
 
-      opt[String]("src")
+      opt[String]("for-input-path")
         .action((x, c) => c.copy(projectToOpen = Some(x)))
         .text("Open CPG for given input path - overrides <cpg.bin>")
 
@@ -242,9 +242,9 @@ trait BridgeBase {
       "importCpg(\"" + cpgFile + "\")"
     } ++ config.projectToOpen.map { name =>
       s"""
-        |workspace.projects
-        |.filter(x => x.inputPath == "$name")
-        |.map(_.name).map(open)
+        |workspace.projects.
+        | filter(x => x.inputPath == "$name").
+        | map(_.name).map(open)
         |""".stripMargin
     }
     ammonite
