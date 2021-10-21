@@ -5,7 +5,7 @@ import io.shiftleft.c2cpg.astcreation.{AstCreator, Defines}
 import io.shiftleft.c2cpg.datastructures.Global
 import io.shiftleft.c2cpg.parser.{CdtParser, HeaderFileFinder, ParserConfig}
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.{DiffGraph, ConcurrentWriterCpgPass, IntervalKeyPool}
+import io.shiftleft.passes.{ConcurrentWriterCpgPass, DiffGraph, IntervalKeyPool}
 
 import java.nio.file.Paths
 

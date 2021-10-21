@@ -35,11 +35,10 @@ class C2Cpg {
   }
 
   def runAndOutput(config: Config): Cpg = {
-    val keyPool = KeyPoolCreator.obtain(3, minValue = 101)
+    val keyPool = KeyPoolCreator.obtain(2, minValue = 101)
     val metaDataKeyPool = new IntervalKeyPool(1, 100)
     val typesKeyPool = keyPool.head
     val astKeyPool = keyPool(1)
-    val includeKeyPool = keyPool(2)
 
     val cpg = newEmptyCpg(Some(config.outputPath))
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
@@ -49,7 +48,7 @@ class C2Cpg {
     val astCreationPass =
       new AstCreationPass(sourceFileNames, cpg, astKeyPool, config, createParserConfig(config), headerFileFinder)
     astCreationPass.createAndApply()
-    new HeaderContentPass(cpg, includeKeyPool).createAndApply()
+    new HeaderContentPass(cpg).createAndApply()
     new CfgCreationPass(cpg).createAndApply()
     new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
     cpg

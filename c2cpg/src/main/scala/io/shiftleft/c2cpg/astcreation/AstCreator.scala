@@ -1,8 +1,8 @@
 package io.shiftleft.c2cpg.astcreation
 
 import io.shiftleft.c2cpg.C2Cpg
-import io.shiftleft.c2cpg.datastructures.Stack._
 import io.shiftleft.c2cpg.datastructures.Scope
+import io.shiftleft.c2cpg.datastructures.Stack._
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EvaluationStrategies, NodeTypes}
 import io.shiftleft.passes.DiffGraph

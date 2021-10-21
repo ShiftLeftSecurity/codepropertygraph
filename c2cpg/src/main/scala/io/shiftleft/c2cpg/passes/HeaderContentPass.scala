@@ -1,32 +1,58 @@
 package io.shiftleft.c2cpg.passes
 
 import io.shiftleft.c2cpg.datastructures.Global
-import io.shiftleft.c2cpg.datastructures.Global.HeaderIncludeResult
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
-import io.shiftleft.passes.{DiffGraph, ForkJoinParallelCpgPass, IntervalKeyPool}
+import io.shiftleft.codepropertygraph.generated.nodes.{HasFilename, StoredNode}
+import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
-import io.shiftleft.x2cpg.Ast
+import overflowdb.traversal.Traversal
 
-class HeaderContentPass(cpg: Cpg, keyPool: IntervalKeyPool)
-    extends ForkJoinParallelCpgPass[HeaderIncludeResult](cpg, keyPool = Some(keyPool)) {
+import scala.collection.mutable
 
-  override def generateParts(): Array[HeaderIncludeResult] = Global.headerAstCache.values.toArray
+class HeaderContentPass(cpg: Cpg) extends CpgPass(cpg) {
+  private val filenameToBlock: Map[String, StoredNode] =
+    Global.headerAstCache.values
+      .flatMap(_.includedInFilenames)
+      .map(
+        f =>
+          f -> cpg.method
+            .name(NamespaceTraversal.globalNamespaceName)
+            .filename(f)
+            .astChildren
+            .isBlock
+            .head)
+      .toMap
 
-  override def runOnPart(diffGraph: DiffGraph.Builder, headerIncludeResult: HeaderIncludeResult): Unit = {
-    headerIncludeResult.ast
-      .collect {
-        case a if a.root.isDefined => a
+  private val headerToFilename = mutable.Map.empty[String, Set[String]]
+
+  override def run(): Iterator[DiffGraph] = {
+    val dstGraph = DiffGraph.newBuilder
+
+    Global.headerAstCache.foreach {
+      case (key, value) =>
+        if (headerToFilename.contains(key._1)) {
+          val old = headerToFilename(key._1)
+          headerToFilename(key._1) = old ++ value.includedInFilenames
+        } else {
+          headerToFilename(key._1) = value.includedInFilenames
+        }
+    }
+
+    Traversal(cpg.graph.nodes()).foreach { srcNode =>
+      if (!srcNode.inE(EdgeTypes.AST).hasNext) {
+        srcNode match {
+          case f: HasFilename if headerToFilename.contains(f.filename) =>
+            val filename = f.filename
+            val blocks = headerToFilename(filename).map(filenameToBlock)
+            blocks.foreach(dstGraph.addEdgeInOriginal(_, srcNode.asInstanceOf[StoredNode], EdgeTypes.AST))
+          case _ =>
+        }
       }
-      .foreach { ast =>
-        Ast.storeInDiffGraph(ast, diffGraph)
-        cpg.method
-          .name(NamespaceTraversal.globalNamespaceName)
-          .filename(headerIncludeResult.includedInFilenames.toSeq: _*)
-          .astChildren
-          .isBlock
-          .foreach(diffGraph.addEdgeFromOriginal(_, ast.root.get, EdgeTypes.AST))
-      }
+    }
+
+    Iterator(dstGraph.build())
   }
+
 }

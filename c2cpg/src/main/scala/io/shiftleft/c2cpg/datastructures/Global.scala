@@ -1,6 +1,7 @@
 package io.shiftleft.c2cpg.datastructures
 
 import io.shiftleft.c2cpg.parser.FileDefaults
+import io.shiftleft.passes.DiffGraph
 import io.shiftleft.x2cpg.Ast
 
 import scala.collection.concurrent.TrieMap
@@ -10,21 +11,23 @@ object Global {
 
   // TODO: We could also the set isExternal to TypeDecls, Methods, and such
   //       if they are from a system header include
-  case class HeaderIncludeResult(ast: Seq[Ast], includedInFilenames: Set[String])
+  case class HeaderIncludeResult(includedInFilenames: Set[String])
 
   // We cache our already created CPG Sub-ASTs for included header files
   // by (filename, linenumber, columnnumber)
   val headerAstCache: TrieMap[(String, Int, Int), HeaderIncludeResult] = TrieMap.empty
 
-  def getAstsFromAstCache(filename: String,
+  def getAstsFromAstCache(diffGraph: DiffGraph.Builder,
+                          filename: String,
                           fromFilename: String,
                           linenumber: Option[Integer],
                           columnnumber: Option[Integer],
                           astCreatorFunction: => Seq[Ast]): Seq[Ast] = this.synchronized {
-    if (FileDefaults.isHeaderFile(filename) && linenumber.isDefined && columnnumber.isDefined) {
+    if (FileDefaults
+          .isHeaderFile(filename) && filename != fromFilename && linenumber.isDefined && columnnumber.isDefined) {
       if (!headerAstCache.contains((filename, linenumber.get, columnnumber.get))) {
-        headerAstCache((filename, linenumber.get, columnnumber.get)) =
-          HeaderIncludeResult(astCreatorFunction, Set(fromFilename))
+        headerAstCache((filename, linenumber.get, columnnumber.get)) = HeaderIncludeResult(Set(fromFilename))
+        astCreatorFunction.foreach(Ast.storeInDiffGraph(_, diffGraph))
       } else {
         val prev = headerAstCache((filename, linenumber.get, columnnumber.get))
         headerAstCache((filename, linenumber.get, columnnumber.get)) =
@@ -34,15 +37,17 @@ object Global {
     } else { astCreatorFunction }
   }
 
-  def getAstFromAstCache(filename: String,
+  def getAstFromAstCache(diffGraph: DiffGraph.Builder,
+                         filename: String,
                          fromFilename: String,
                          linenumber: Option[Integer],
                          columnnumber: Option[Integer],
                          astCreatorFunction: => Ast): Ast = this.synchronized {
-    if (FileDefaults.isHeaderFile(filename) && linenumber.isDefined && columnnumber.isDefined) {
+    if (FileDefaults
+          .isHeaderFile(filename) && filename != fromFilename && linenumber.isDefined && columnnumber.isDefined) {
       if (!headerAstCache.contains((filename, linenumber.get, columnnumber.get))) {
-        headerAstCache((filename, linenumber.get, columnnumber.get)) =
-          HeaderIncludeResult(Seq(astCreatorFunction), Set(fromFilename))
+        headerAstCache((filename, linenumber.get, columnnumber.get)) = HeaderIncludeResult(Set(fromFilename))
+        Ast.storeInDiffGraph(astCreatorFunction, diffGraph)
       } else {
         val prev = headerAstCache((filename, linenumber.get, columnnumber.get))
         headerAstCache((filename, linenumber.get, columnnumber.get)) =

@@ -24,7 +24,7 @@ trait AstForFunctionsCreator {
     val parentNode: NewTypeDecl = methodAstParentStack.collectFirst { case t: NewTypeDecl => t }.getOrElse {
       val astParentType = methodAstParentStack.head.label
       val astParentFullName = methodAstParentStack.head.properties("FULL_NAME").toString
-      val newTypeDeclNode = newTypeDecl(methodName, methodFullName, filename, astParentType, astParentFullName)
+      val newTypeDeclNode = newTypeDecl(methodName, methodFullName, method.filename, astParentType, astParentFullName)
       Ast.storeInDiffGraph(Ast(newTypeDeclNode), diffGraph)
       newTypeDeclNode
     }
@@ -73,6 +73,7 @@ trait AstForFunctionsCreator {
     val filename = fileName(lambdaExpression)
 
     Global.getAstFromAstCache(
+      diffGraph,
       filename,
       this.filename,
       linenumber,
@@ -135,6 +136,7 @@ trait AstForFunctionsCreator {
     val filename = fileName(funcDecl)
 
     Global.getAstFromAstCache(
+      diffGraph,
       filename,
       this.filename,
       linenumber,
@@ -193,6 +195,7 @@ trait AstForFunctionsCreator {
     val filename = fileName(funcDef)
 
     Global.getAstFromAstCache(
+      diffGraph,
       filename,
       this.filename,
       linenumber,

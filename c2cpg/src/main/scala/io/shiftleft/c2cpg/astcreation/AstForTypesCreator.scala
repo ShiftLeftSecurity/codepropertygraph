@@ -45,6 +45,7 @@ trait AstForTypesCreator {
     val filename = fileName(namespaceDefinition)
 
     Global.getAstFromAstCache(
+      diffGraph,
       filename,
       this.filename,
       linenumber,
@@ -82,6 +83,7 @@ trait AstForTypesCreator {
     val filename = fileName(namespaceAlias)
 
     Global.getAstFromAstCache(
+      diffGraph,
       filename,
       this.filename,
       linenumber,
@@ -117,6 +119,7 @@ trait AstForTypesCreator {
         val columnnumber = column(declaration)
         val filename = fileName(declaration)
         Global.getAstFromAstCache(
+          diffGraph,
           filename,
           this.filename,
           linenumber,
@@ -196,6 +199,7 @@ trait AstForTypesCreator {
     val filename = fileName(aliasDeclaration)
 
     Global.getAstFromAstCache(
+      diffGraph,
       filename,
       this.filename,
       linenumber,
@@ -270,6 +274,7 @@ trait AstForTypesCreator {
       val columnnumber = column(spec)
       val filename = fileName(spec)
       Global.getAstsFromAstCache(
+        diffGraph,
         filename,
         this.filename,
         linenumber,
@@ -316,6 +321,7 @@ trait AstForTypesCreator {
     val columnnumber = column(typeSpecifier)
     val filename = fileName(typeSpecifier)
     Global.getAstsFromAstCache(
+      diffGraph,
       filename,
       this.filename,
       linenumber,
@@ -364,6 +370,7 @@ trait AstForTypesCreator {
     val columnnumber = column(typeSpecifier)
     val filename = fileName(typeSpecifier)
     Global.getAstsFromAstCache(
+      diffGraph,
       filename,
       this.filename,
       linenumber,
@@ -419,6 +426,7 @@ trait AstForTypesCreator {
     val columnnumber = column(enumSpecifier)
     val filename = fileName(enumSpecifier)
     Global.getAstsFromAstCache(
+      diffGraph,
       filename,
       this.filename,
       linenumber,
