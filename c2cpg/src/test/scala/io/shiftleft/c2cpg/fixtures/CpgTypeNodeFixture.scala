@@ -7,7 +7,7 @@ import io.shiftleft.c2cpg.passes.AstCreationPass
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.MethodStubCreator
-import io.shiftleft.semanticcpg.passes.linking.linker.Linker
+import io.shiftleft.semanticcpg.passes.linking.linker.{Linker, TypeLinker}
 import io.shiftleft.semanticcpg.passes.typenodes.{TypeDeclStubCreator, TypeNodePass}
 
 object CpgTypeNodeFixture {
@@ -25,6 +25,7 @@ object CpgTypeNodeFixture {
       new TypeNodePass(astCreationPass.usedTypes(), cpg).createAndApply()
       new TypeDeclStubCreator(cpg).createAndApply()
       new MethodStubCreator(cpg).createAndApply()
+      new TypeLinker(cpg).createAndApply()
       new Linker(cpg).createAndApply()
     }
     f(cpg)
