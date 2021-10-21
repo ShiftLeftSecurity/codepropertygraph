@@ -26,7 +26,8 @@ import org.slf4j.LoggerFactory
   * @param caseLabels labels beginning with "case"
   * @param breaks unresolved breaks collected along the way
   * @param continues unresolved continues collected along the way
-  * @param gotos unresolved gotos collected along the way
+  * @param jumpsToLabel unresolved gotos, labeled break and labeld continues
+  *                     collected along the way
   *
   * */
 case class Cfg(entryNode: Option[CfgNode] = None,
@@ -36,7 +37,7 @@ case class Cfg(entryNode: Option[CfgNode] = None,
                breaks: List[CfgNode] = List(),
                continues: List[CfgNode] = List(),
                caseLabels: List[CfgNode] = List(),
-               gotos: List[(CfgNode, String)] = List()) {
+               jumpsToLabel: List[(CfgNode, String)] = List()) {
 
   import Cfg._
 
@@ -60,7 +61,7 @@ case class Cfg(entryNode: Option[CfgNode] = None,
         fringe = other.fringe,
         edges = this.edges ++ other.edges ++
           edgesFromFringeTo(this, other.entryNode),
-        gotos = this.gotos ++ other.gotos,
+        jumpsToLabel = this.jumpsToLabel ++ other.jumpsToLabel,
         labeledNodes = this.labeledNodes ++ other.labeledNodes,
         breaks = this.breaks ++ other.breaks,
         continues = this.continues ++ other.continues,
@@ -75,27 +76,27 @@ case class Cfg(entryNode: Option[CfgNode] = None,
 
   /**
     * Upon completing traversal of the abstract syntax tree,
-    * this method creates CFG edges between gotos and
-    * respective labels.
+    * this method creates CFG edges between jumps like gotos,
+    * labeled breaks, labeled continues and respective labels.
     * */
-  def withResolvedGotos(): Cfg = {
-    val edges = gotos.flatMap {
-      case (goto, label) if label != "*" =>
+  def withResolvedJumpToLabel(): Cfg = {
+    val edges = jumpsToLabel.flatMap {
+      case (jumpToLabel, label) if label != "*" =>
         labeledNodes.get(label) match {
           case Some(labeledNode) =>
             // TODO set edge type of Always once the backend
             // supports it
-            Some(CfgEdge(goto, labeledNode, AlwaysEdge))
+            Some(CfgEdge(jumpToLabel, labeledNode, AlwaysEdge))
           case None =>
-            logger.info("Unable to wire goto statement. Missing label {}.", label)
+            logger.info("Unable to wire jump statement. Missing label {}.", label)
             None
         }
-      case (goto, _) =>
+      case (jumpToLabel, _) =>
         // We come here for: https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html
         // For such GOTOs we cannot statically determine the target label. As a quick
         // hack we simply put edges to all labels found. This might be an over-taint.
         labeledNodes.flatMap {
-          case (_, labeledNode) => Some(CfgEdge(goto, labeledNode, AlwaysEdge))
+          case (_, labeledNode) => Some(CfgEdge(jumpToLabel, labeledNode, AlwaysEdge))
         }
     }
     this.copy(edges = this.edges ++ edges)
@@ -109,7 +110,7 @@ object Cfg {
 
   def from(cfgs: Cfg*): Cfg = {
     Cfg(
-      gotos = cfgs.map(_.gotos).reduceOption((x, y) => x ++ y).getOrElse(List()),
+      jumpsToLabel = cfgs.map(_.jumpsToLabel).reduceOption((x, y) => x ++ y).getOrElse(List()),
       breaks = cfgs.map(_.breaks).reduceOption((x, y) => x ++ y).getOrElse(List()),
       continues = cfgs.map(_.continues).reduceOption((x, y) => x ++ y).getOrElse(List()),
       caseLabels = cfgs.map(_.caseLabels).reduceOption((x, y) => x ++ y).getOrElse(List()),

@@ -72,7 +72,7 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
     * and then resolving gotos.
     * */
   def run(): Unit = {
-    cfgForMethod(entryNode).withResolvedGotos().edges.foreach { edge =>
+    cfgForMethod(entryNode).withResolvedJumpToLabel().edges.foreach { edge =>
       // TODO: we are ignoring edge.edgeType because the
       //  CFG spec doesn't define an edge type at the moment
       diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.CFG)
@@ -177,12 +177,27 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
     * not result in the creation of an edge from
     * the break statement to the entry point
     * of the other CFG.
+    * Labeled breaks are treated like gotos and are added to "jumpsToLabel".
     * */
-  protected def cfgForBreakStatement(node: ControlStructure): Cfg =
-    Cfg(entryNode = Some(node), breaks = List(node))
+  protected def cfgForBreakStatement(node: ControlStructure): Cfg = {
+    node.astChildren.find(_.order == 1) match {
+      case Some(jumpLabel) =>
+        val labelName = jumpLabel.asInstanceOf[JumpLabel].name
+        Cfg(entryNode = Some(node), jumpsToLabel = List((node, labelName)))
+      case None =>
+        Cfg(entryNode = Some(node), breaks = List(node))
+    }
+  }
 
-  protected def cfgForContinueStatement(node: ControlStructure): Cfg =
-    Cfg(entryNode = Some(node), continues = List(node))
+  protected def cfgForContinueStatement(node: ControlStructure): Cfg = {
+    node.astChildren.find(_.order == 1) match {
+      case Some(jumpLabel) =>
+        val labelName = jumpLabel.asInstanceOf[JumpLabel].name
+        Cfg(entryNode = Some(node), jumpsToLabel = List((node, labelName)))
+      case None =>
+        Cfg(entryNode = Some(node), continues = List(node))
+    }
+  }
 
   /**
     * Jump targets ("labels") are included in the CFG. As these
@@ -206,14 +221,14 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
   /**
     * A CFG for a goto statement is one containing the goto
     * node as an entry node and an empty fringe. Moreover, we
-    * store the goto for dispatching with `withResolvedGotos`
+    * store the goto for dispatching with `withResolvedJumpToLabel`
     * once the CFG for the entire method has been calculated.
     * */
   protected def cfgForGotoStatement(node: ControlStructure): Cfg = {
     // TODO: the goto node should contain a field for the target so that
     // we can avoid the brittle split/slice operation here
     val target = node.code.split(" ").lastOption.map(x => x.slice(0, x.length - 1))
-    target.map(t => Cfg(entryNode = Some(node), gotos = List((node, t)))).getOrElse(Cfg.empty)
+    target.map(t => Cfg(entryNode = Some(node), jumpsToLabel = List((node, t)))).getOrElse(Cfg.empty)
   }
 
   /**
