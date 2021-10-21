@@ -18,12 +18,11 @@ class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    val originalFileNameToNode = mutable.Map.empty[String, StoredNode]
-    val newFileNameToNode = mutable.Map.empty[String, NewFile]
+    val originalFileNameToNode = cpg.file.map { node =>
+      node.name -> node
+    }.toMap
 
-    cpg.file.foreach { node =>
-      originalFileNameToNode += node.name -> node
-    }
+    val newFileNameToNode = mutable.Map.empty[String, NewFile]
 
     def createFileIfDoesNotExist(srcNode: StoredNode, destFullName: String): Unit = {
       if (destFullName != srcNode.propertyDefaultValue(PropertyNames.FILENAME)) {

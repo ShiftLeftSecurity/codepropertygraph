@@ -4,11 +4,10 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{PropertyNames, _}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
 import overflowdb.traversal._
-
-import scala.collection.mutable
 
 /**
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
@@ -17,17 +16,24 @@ import scala.collection.mutable
 class Linker(cpg: Cpg) extends CpgPass(cpg) {
   import Linker.{linkToSingle, logFailedDstLookup, logFailedSrcLookup, logger}
 
-  private val typeDeclFullNameToNode = mutable.Map.empty[String, StoredNode]
-  private val typeFullNameToNode = mutable.Map.empty[String, StoredNode]
-  private val methodFullNameToNode = mutable.Map.empty[String, StoredNode]
-  private val namespaceBlockFullNameToNode = mutable.Map.empty[String, StoredNode]
-
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    initMaps()
+    val typeDeclFullNameToNode = cpg.typeDecl.map { node =>
+      node.fullName -> node
+    }.toMap
+    val typeFullNameToNode = cpg.typ.map { node =>
+      node.fullName -> node
+    }.toMap
+    val methodFullNameToNode = cpg.method.map { node =>
+      node.fullName -> node
+    }.toMap
 
-    linkAstChildToParent(dstGraph)
+    val namespaceBlockFullNameToNode = cpg.namespaceBlock.map { node =>
+      node.fullName -> node
+    }.toMap
+
+    linkAstChildToParent(dstGraph, methodFullNameToNode, typeDeclFullNameToNode, namespaceBlockFullNameToNode)
 
     // Create REF edges from TYPE nodes to TYPE_DECL
 
@@ -120,20 +126,10 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     Iterator(dstGraph.build())
   }
 
-  private def initMaps(): Unit = {
-    cpg.graph.nodes.foreach {
-      case node: TypeDecl       => typeDeclFullNameToNode += node.fullName -> node
-      case node: Type           => typeFullNameToNode += node.fullName -> node
-      case node: Method         => methodFullNameToNode += node.fullName -> node
-      case node: NamespaceBlock => namespaceBlockFullNameToNode += node.fullName -> node
-      case _                    => // ignore
-    }
-  }
-
   private def linkToMultiple[SRC_NODE_TYPE <: StoredNode](srcLabels: List[String],
                                                           dstNodeLabel: String,
                                                           edgeType: String,
-                                                          dstNodeMap: mutable.Map[String, StoredNode],
+                                                          dstNodeMap: Map[String, StoredNode],
                                                           getDstFullNames: SRC_NODE_TYPE => Iterable[String],
                                                           dstFullNameKey: String,
                                                           dstGraph: DiffGraph.Builder): Unit = {
@@ -159,7 +155,10 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     }
   }
 
-  private def linkAstChildToParent(dstGraph: DiffGraph.Builder): Unit = {
+  private def linkAstChildToParent(dstGraph: DiffGraph.Builder,
+                                   methodFullNameToNode: Map[String, StoredNode],
+                                   typeDeclFullNameToNode: Map[String, StoredNode],
+                                   namespaceBlockFullNameToNode: Map[String, StoredNode]): Unit = {
     Traversal(cpg.graph.nodes(NodeTypes.METHOD, NodeTypes.TYPE_DECL))
       .cast[HasAstParentType with HasAstParentFullName with StoredNode]
       .filter(astChild => astChild.inE(EdgeTypes.AST).isEmpty)
@@ -204,7 +203,7 @@ object Linker {
                    srcLabels: List[String],
                    dstNodeLabel: String,
                    edgeType: String,
-                   dstNodeMap: mutable.Map[String, StoredNode],
+                   dstNodeMap: Map[String, StoredNode],
                    dstFullNameKey: String,
                    dstGraph: DiffGraph.Builder,
                    dstNotExistsHandler: Option[(StoredNode, String) => Unit]): Unit = {
