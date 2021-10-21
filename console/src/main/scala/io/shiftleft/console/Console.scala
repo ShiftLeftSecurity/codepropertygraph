@@ -149,7 +149,7 @@ class Console[T <: Project](executor: AmmoniteExecutor,
   }
 
   @Doc(
-    "Open project",
+    "Open project by name",
     """
       |open([projectName])
       |
@@ -169,6 +169,28 @@ class Console[T <: Project](executor: AmmoniteExecutor,
     workspace.openProject(projectName).map { project =>
       project
     }
+  }
+
+  @Doc(
+    "Open project for input path",
+    """
+      |openForInputPath([input-path])
+      |
+      |Opens the project of the CPG generated for the input path `input-path`.
+      |
+      |Upon completion of this operation, the CPG stored in this project
+      |can be queried via `cpg`. Returns an optional reference to the
+      |project, which is empty on error.
+      |""".stripMargin
+  )
+  def openForInputPath(inputPath: String): Option[Project] = {
+    val absInputPath = File(inputPath).path.toAbsolutePath.toString
+    workspace.projects
+      .filter(x => x.inputPath == absInputPath)
+      .map(_.name)
+      .map(open)
+      .headOption
+      .flatten
   }
 
   /**

@@ -26,7 +26,7 @@ case class Config(
     serverAuthPassword: String = "",
     nocolors: Boolean = false,
     cpgToLoad: Option[File] = None,
-    projectToOpen: Option[String] = None
+    forInputPath: Option[String] = None
 )
 
 /**
@@ -126,7 +126,7 @@ trait BridgeBase {
         .text("CPG to load")
 
       opt[String]("for-input-path")
-        .action((x, c) => c.copy(projectToOpen = Some(x)))
+        .action((x, c) => c.copy(forInputPath = Some(x)))
         .text("Open CPG for given input path - overrides <cpg.bin>")
 
       opt[Unit]("nocolors")
@@ -213,9 +213,7 @@ trait BridgeBase {
         |   save
         | } else {
         |    println("Using existing CPG - Use `--overwrite` if this is not what you want")
-        |    workspace.projects
-        |    .filter(x => x.inputPath == "$src")
-        |    .map(_.name).map(open)
+        |    openForInputPath(\"$src\")
         | }
         | run.$bundleName
         | $storeCode
@@ -240,11 +238,9 @@ trait BridgeBase {
       "banner()"
     ) ++ config.cpgToLoad.map { cpgFile =>
       "importCpg(\"" + cpgFile + "\")"
-    } ++ config.projectToOpen.map { name =>
+    } ++ config.forInputPath.map { name =>
       s"""
-        |workspace.projects.
-        | filter(x => x.inputPath == "$name").
-        | map(_.name).map(open)
+        |openForInputPath(\"$name\")
         |""".stripMargin
     }
     ammonite
