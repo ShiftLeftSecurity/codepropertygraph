@@ -10,19 +10,9 @@ import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import overflowdb.traversal.Traversal
 
 class HeaderContentPass(cpg: Cpg) extends CpgPass(cpg) {
-  private val filenameToBlock: Map[String, StoredNode] =
-    Global.headerToFilenameCache.values.flatten
-      .map(
-        f =>
-          f -> cpg.method
-            .name(NamespaceTraversal.globalNamespaceName)
-            .filename(f)
-            .astChildren
-            .isBlock
-            .head)
-      .toMap
 
   override def run(): Iterator[DiffGraph] = {
+    Global.headerAstCache.clear()
     val dstGraph = DiffGraph.newBuilder
 
     Traversal(cpg.graph.nodes()).foreach { srcNode =>
@@ -30,7 +20,11 @@ class HeaderContentPass(cpg: Cpg) extends CpgPass(cpg) {
         srcNode match {
           case f: HasFilename if Global.headerToFilenameCache.contains(f.filename) =>
             val filename = f.filename
-            val blocks = Global.headerToFilenameCache(filename).map(filenameToBlock)
+            val blocks = cpg.method
+              .name(NamespaceTraversal.globalNamespaceName)
+              .filename(Global.headerToFilenameCache(filename).toSeq: _*)
+              .astChildren
+              .isBlock
             blocks.foreach(dstGraph.addEdgeInOriginal(_, srcNode.asInstanceOf[StoredNode], EdgeTypes.AST))
           case _ =>
         }
