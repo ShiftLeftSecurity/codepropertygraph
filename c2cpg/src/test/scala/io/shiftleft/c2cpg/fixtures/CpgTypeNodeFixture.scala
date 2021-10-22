@@ -5,9 +5,10 @@ import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.datastructures.Global
 import io.shiftleft.c2cpg.passes.AstCreationPass
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.MethodStubCreator
-import io.shiftleft.semanticcpg.passes.linking.linker.Linker
-import io.shiftleft.semanticcpg.passes.typenodes.{TypeDeclStubCreator, TypeNodePass}
+import io.shiftleft.codepropertygraph.generated.Languages
+import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
+import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
+import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
 
 object CpgTypeNodeFixture {
   def apply(code: String, fileName: String = "test.c")(f: Cpg => Unit): Unit = {
@@ -17,13 +18,14 @@ object CpgTypeNodeFixture {
       val file = dir / fileName
       file.write(code)
 
+      new MetaDataPass(cpg, Languages.NEWC).createAndApply()
       val filenames = List(file.path.toAbsolutePath.toString)
       val astCreationPass = new AstCreationPass(filenames, cpg, None, Config())
       astCreationPass.createAndApply()
       new TypeNodePass(astCreationPass.usedTypes(), cpg).createAndApply()
-      new TypeDeclStubCreator(cpg).createAndApply()
-      new MethodStubCreator(cpg).createAndApply()
-      new Linker(cpg).createAndApply()
+
+      val context = new LayerCreatorContext(cpg)
+      new Scpg().run(context)
     }
     f(cpg)
   }
