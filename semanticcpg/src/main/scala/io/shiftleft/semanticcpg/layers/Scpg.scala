@@ -173,15 +173,14 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
         )
       case Languages.NEWC =>
         Iterator(
-          // Global code structure: filenames, namespaces, stubs + method parameter out
           new MethodStubCreator(cpg),
           new TypeDeclStubCreator(cpg),
           new MethodDecoratorPass(cpg),
           new FileCreationPass(cpg),
           new NamespaceCreator(cpg),
-          // Index
           new ContainsEdgePass(cpg),
           new TypeLinker(cpg),
+          //
           new Linker(cpg),
           new StaticCallLinker(cpg),
           // Control flow layer

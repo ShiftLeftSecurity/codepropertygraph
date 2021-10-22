@@ -15,19 +15,12 @@ import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, Namespa
   */
 class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 
-  private var typeDeclFullNameToNode = Map[String, TypeDeclBase]()
-
-  private def init(): Unit = {
-    cpg.typeDecl
-      .foreach { typeDecl =>
-        typeDeclFullNameToNode += typeDecl.fullName -> typeDecl
-      }
-  }
-
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    init()
+    var typeDeclFullNameToNode: Map[String, TypeDeclBase] = cpg.typeDecl.map { typeDecl =>
+      typeDecl.fullName -> typeDecl
+    }.toMap
 
     cpg.typ
       .filterNot(typ => typeDeclFullNameToNode.isDefinedAt(typ.fullName))

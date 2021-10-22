@@ -1,7 +1,8 @@
 package io.shiftleft.semanticcpg.passes.methoddecorations
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
+import io.shiftleft.codepropertygraph.generated.EdgeTypes
+import io.shiftleft.codepropertygraph.generated.nodes.NewMethodParameterOut
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
@@ -26,8 +27,7 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
 
     cpg.parameter.foreach { parameterIn =>
       if (!parameterIn._parameterLinkOut.hasNext) {
-        val parameterOut = nodes
-          .NewMethodParameterOut()
+        val parameterOut = NewMethodParameterOut()
           .code(parameterIn.code)
           .order(parameterIn.order)
           .name(parameterIn.name)

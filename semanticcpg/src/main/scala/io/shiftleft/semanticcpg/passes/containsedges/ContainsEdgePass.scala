@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.passes.{ConcurrentWriterCpgPass, DiffGraph}
+import io.shiftleft.semanticcpg.language._
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -13,25 +14,12 @@ import scala.jdk.CollectionConverters._
   * language frontends which do not provide method stubs and type decl stubs.
   */
 class ContainsEdgePass(cpg: Cpg) extends ConcurrentWriterCpgPass[AstNode](cpg) {
-  import ContainsEdgePass._
 
-  override def generateParts(): Array[AstNode] =
-    cpg.graph.nodes(sourceTypes: _*).asScala.map(_.asInstanceOf[AstNode]).toArray
-
-  override def runOnPart(dstGraph: DiffGraph.Builder, source: AstNode): Unit = {
-    //AST is assumed to be a tree. If it contains cycles, then this will give a nice endless loop with OOM
-    val queue = mutable.ArrayDeque[StoredNode](source)
-    while (queue.nonEmpty) {
-      val parent = queue.removeHead()
-      for (nextNode <- parent._astOut.asScala) {
-        if (isDestinationType(nextNode)) dstGraph.addEdge(source, nextNode, EdgeTypes.CONTAINS)
-        if (!isSourceType(nextNode)) queue.append(nextNode)
-      }
-    }
-  }
-}
-
-object ContainsEdgePass {
+  private val sourceTypes = List(
+    NodeTypes.METHOD,
+    NodeTypes.TYPE_DECL,
+    NodeTypes.FILE
+  )
 
   def isSourceType(node: StoredNode): Boolean = node match {
     case _: Method | _: TypeDecl | _: File => true
@@ -45,10 +33,20 @@ object ContainsEdgePass {
     case _ => false
   }
 
-  private val sourceTypes = List(
-    NodeTypes.METHOD,
-    NodeTypes.TYPE_DECL,
-    NodeTypes.FILE
-  )
+  override def generateParts(): Array[AstNode] =
+    cpg.graph.nodes(sourceTypes: _*).asScala.map(_.asInstanceOf[AstNode]).toArray
 
+  override def runOnPart(dstGraph: DiffGraph.Builder, source: AstNode): Unit = {
+    // We do not check here whether the AST is free of cycles, that is, we assume
+    // that it is indeed a tree. If this is not the case, then the loop will run
+    // until an out of memory condition is reached, resulting in a crash.
+    val queue = mutable.ArrayDeque[AstNode](source)
+    while (queue.nonEmpty) {
+      val parent = queue.removeHead()
+      for (child <- parent.astChildren) {
+        if (isDestinationType(child)) dstGraph.addEdge(source, child, EdgeTypes.CONTAINS)
+        if (!isSourceType(child)) queue.append(child)
+      }
+    }
+  }
 }

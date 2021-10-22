@@ -33,7 +33,7 @@ class CdgPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
 
     implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
 
-    val cfgNodes = method._containsOut.asScala.toList
+    val cfgNodes = method.cfgNode.l
     val postDomFrontiers = dominanceFrontier.calculate(method :: cfgNodes)
 
     postDomFrontiers.foreach {
