@@ -1,11 +1,12 @@
 package io.shiftleft.c2cpg
 
 import io.shiftleft.c2cpg.C2Cpg.Config
-import io.shiftleft.c2cpg.parser.{FileDefaults, HeaderFileFinder, ParseConfig}
-import io.shiftleft.c2cpg.passes.{AstCreationPass, PreprocessorPass}
+import io.shiftleft.c2cpg.parser.{FileDefaults, HeaderFileFinder, ParserConfig}
+import io.shiftleft.c2cpg.passes.{AstCreationPass, HeaderContentPass, PreprocessorPass}
+import io.shiftleft.c2cpg.utils.IncludeAutoDiscovery
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
-import io.shiftleft.passes.IntervalKeyPool
+import io.shiftleft.passes.{IntervalKeyPool, KeyPoolCreator}
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
@@ -19,9 +20,9 @@ import scala.util.control.NonFatal
 
 class C2Cpg {
 
-  private def createParseConfig(config: Config): ParseConfig = {
-    ParseConfig(
-      config.includePaths.map(Paths.get(_)).toList,
+  private def createParserConfig(config: Config): ParserConfig = {
+    ParserConfig(
+      config.includePaths.map(Paths.get(_).toAbsolutePath) ++ IncludeAutoDiscovery.discoverIncludePaths(config),
       config.defines.map {
         case define if define.contains("=") =>
           val s = define.split("=")
@@ -34,9 +35,10 @@ class C2Cpg {
   }
 
   def runAndOutput(config: Config): Cpg = {
+    val keyPool = KeyPoolCreator.obtain(2, minValue = 101)
     val metaDataKeyPool = new IntervalKeyPool(1, 100)
-    val typesKeyPool = new IntervalKeyPool(100, 1000100)
-    val functionKeyPool = new IntervalKeyPool(1000100, Long.MaxValue)
+    val typesKeyPool = keyPool.head
+    val astKeyPool = keyPool(1)
 
     val cpg = newEmptyCpg(Some(config.outputPath))
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
@@ -44,8 +46,9 @@ class C2Cpg {
     new MetaDataPass(cpg, Languages.NEWC, Some(metaDataKeyPool)).createAndApply()
     val headerFileFinder = new HeaderFileFinder(config.inputPaths.toList)
     val astCreationPass =
-      new AstCreationPass(sourceFileNames, cpg, functionKeyPool, config, createParseConfig(config), headerFileFinder)
+      new AstCreationPass(sourceFileNames, cpg, astKeyPool, config, createParserConfig(config), headerFileFinder)
     astCreationPass.createAndApply()
+    new HeaderContentPass(cpg, config.inputPaths.head).createAndApply()
     new CfgCreationPass(cpg).createAndApply()
     new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
     cpg
@@ -54,7 +57,7 @@ class C2Cpg {
   def printIfDefsOnly(config: Config): Unit = {
     val sourceFileNames = SourceFiles.determine(config.inputPaths, config.sourceFileExtensions)
     val headerFileFinder = new HeaderFileFinder(config.inputPaths.toList)
-    val stmts = new PreprocessorPass(sourceFileNames, createParseConfig(config), headerFileFinder).run().mkString(",")
+    val stmts = new PreprocessorPass(sourceFileNames, createParserConfig(config), headerFileFinder).run().mkString(",")
     println(stmts)
   }
 
@@ -72,7 +75,8 @@ object C2Cpg {
                           includeComments: Boolean = false,
                           logProblems: Boolean = false,
                           logPreprocessor: Boolean = false,
-                          printIfDefsOnly: Boolean = false)
+                          printIfDefsOnly: Boolean = false,
+                          includePathsAutoDiscovery: Boolean = false)
       extends X2CpgConfig[Config] {
 
     override def withAdditionalInputPath(inputPath: String): Config = copy(inputPaths = inputPaths + inputPath)
@@ -101,11 +105,14 @@ object C2Cpg {
         opt[String]("include")
           .unbounded()
           .text("header include paths")
-          .action((incl, cfg) => cfg.copy(includePaths = cfg.includePaths + incl)),
+          .action((incl, c) => c.copy(includePaths = c.includePaths + incl)),
+        opt[Unit]("with-include-auto-discovery")
+          .text("auto discover header include paths")
+          .action((_, c) => c.copy(includePathsAutoDiscovery = true)),
         opt[String]("define")
           .unbounded()
           .text("define a name")
-          .action((d, cfg) => cfg.copy(defines = cfg.defines + d))
+          .action((d, c) => c.copy(defines = c.defines + d))
       )
     }
 

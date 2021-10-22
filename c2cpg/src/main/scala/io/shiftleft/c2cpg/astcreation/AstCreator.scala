@@ -1,8 +1,8 @@
 package io.shiftleft.c2cpg.astcreation
 
 import io.shiftleft.c2cpg.C2Cpg
+import io.shiftleft.c2cpg.datastructures.Scope
 import io.shiftleft.c2cpg.datastructures.Stack._
-import io.shiftleft.c2cpg.datastructures.{Global, Scope}
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EvaluationStrategies, NodeTypes}
 import io.shiftleft.passes.DiffGraph
@@ -15,7 +15,6 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.mutable
 
 class AstCreator(val filename: String,
-                 val global: Global,
                  val config: C2Cpg.Config,
                  val diffGraph: DiffGraph.Builder,
                  val parserResult: IASTTranslationUnit)

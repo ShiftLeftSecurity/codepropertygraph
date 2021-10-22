@@ -18,11 +18,11 @@ class CustomFileContentProvider(headerFileFinder: HeaderFileFinder) extends Inte
     }
 
     if (fileName != null) {
-      logger.info(s"Loading header file $fileName")
+      logger.debug(s"Loading header file $fileName")
       val content = FileContent.createForExternalFileLocation(fileName)
       content.asInstanceOf[InternalFileContent]
     } else {
-      logger.info(s"Cannot find header file for $path")
+      logger.debug(s"Cannot find header file for $path")
       null
     }
 
