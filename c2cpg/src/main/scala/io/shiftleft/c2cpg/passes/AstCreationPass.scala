@@ -29,7 +29,4 @@ class AstCreationPass(filenames: List[String],
       diffGraph.moveFrom(localDiff)
     }
 
-  override def finish(): Unit = {
-    Global.headerAstCache.clear()
-  }
 }
