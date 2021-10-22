@@ -28,6 +28,7 @@ object Comment extends SchemaBase {
       )
       .protoId(511)
       .addProperties(lineNumber, code, filename)
+      .extendz(astNode)
 
 // node relations
     comment
