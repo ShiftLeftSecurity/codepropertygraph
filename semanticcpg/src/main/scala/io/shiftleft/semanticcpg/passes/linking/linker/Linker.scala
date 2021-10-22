@@ -21,7 +21,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     val dstGraph = DiffGraph.newBuilder
 
     val indexManager = cpg.graph.indexManager
-    indexManager.createNodePropertyIndex(PropertyNames.FULL_NAME)
 
     def typeDeclFullNameToNode(x: String): Option[TypeDecl] =
       nodesWithFullName(x).collectFirst { case x: TypeDecl => x }

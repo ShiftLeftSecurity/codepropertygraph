@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.layers
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes, PropertyNames}
 import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
@@ -39,6 +39,8 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
     val cpg = context.cpg
     val language = cpg.metaData.language.headOption
       .getOrElse(throw new Exception("Meta node missing."))
+
+    cpg.graph.indexManager.createNodePropertyIndex(PropertyNames.FULL_NAME)
 
     val enhancementExecList = createEnhancementExecList(cpg, language)
     enhancementExecList.zipWithIndex.foreach {
