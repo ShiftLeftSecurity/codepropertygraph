@@ -180,10 +180,8 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new NamespaceCreator(cpg),
           new ContainsEdgePass(cpg),
           new TypeLinker(cpg),
-          //
           new Linker(cpg),
           new StaticCallLinker(cpg),
-          // Control flow layer
           new CfgDominatorPass(cpg),
           new CdgPass(cpg),
         )
