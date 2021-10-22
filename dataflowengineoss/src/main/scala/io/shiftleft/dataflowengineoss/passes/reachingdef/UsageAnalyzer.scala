@@ -19,6 +19,7 @@ class UsageAnalyzer(problem: DataFlowProblem[mutable.BitSet], in: Map[StoredNode
 
   val numberToNode = problem.flowGraph.asInstanceOf[ReachingDefFlowGraph].numberToNode
   private val allNodes = in.keys.toList
+  private val containerSet = Set(Operators.fieldAccess, Operators.indexAccess, Operators.indirectIndexAccess)
   val usedIncomingDefs: Map[StoredNode, Map[StoredNode, Set[Definition]]] = initUsedIncomingDefs()
 
   def initUsedIncomingDefs(): Map[StoredNode, Map[StoredNode, Set[Definition]]] = {
@@ -43,7 +44,7 @@ class UsageAnalyzer(problem: DataFlowProblem[mutable.BitSet], in: Map[StoredNode
     * */
   private def isContainer(use: Expression, inElement: StoredNode): Boolean = {
     inElement match {
-      case call: Call if Set(Operators.fieldAccess, Operators.indirectIndexAccess).contains(call.name) =>
+      case call: Call if containerSet.contains(call.name) =>
         call.argument.headOption.exists { base =>
           base.code == use.code
         }
@@ -57,7 +58,7 @@ class UsageAnalyzer(problem: DataFlowProblem[mutable.BitSet], in: Map[StoredNode
     * */
   private def isPart(use: Expression, inElement: StoredNode): Boolean = {
     use match {
-      case call: Call if Set(Operators.indirectIndexAccess, Operators.fieldAccess).contains(call.name) =>
+      case call: Call if containerSet.contains(call.name) =>
         inElement match {
           case param: MethodParameterIn =>
             call.argument.headOption.exists { base =>
