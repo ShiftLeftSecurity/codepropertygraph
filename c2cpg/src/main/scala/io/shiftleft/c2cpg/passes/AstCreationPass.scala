@@ -24,7 +24,12 @@ class AstCreationPass(filenames: List[String],
 
   override def runOnPart(diffGraph: DiffGraph.Builder, filename: String): Unit =
     new CdtParser(parseConfig, headerFileFinder).parse(Paths.get(filename)).foreach { parserResult =>
-      new AstCreator(filename, config, diffGraph, parserResult).createAst()
+      val localDiff = DiffGraph.newBuilder
+      new AstCreator(filename, config, localDiff, parserResult).createAst()
+      diffGraph.moveFrom(localDiff)
     }
 
+  override def finish(): Unit = {
+    Global.headerAstCache.clear()
+  }
 }

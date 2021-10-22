@@ -10,12 +10,10 @@ import scala.collection.mutable
 object Global {
   val usedTypes: TrieMap[String, Boolean] = TrieMap.empty
 
-  // We cache our already created CPG Sub-ASTs for included header files
+  // We remember our already created CPG Sub-ASTs for included header files
   // by filename -> (linenumber, columnnumber)
   val headerAstCache: mutable.HashMap[String, mutable.HashSet[(Integer, Integer)]] =
     mutable.HashMap.empty
-
-  val headerToFilenameCache: mutable.HashMap[String, mutable.HashSet[String]] = mutable.HashMap.empty
 
   def getAstsFromAstCache(diffGraph: DiffGraph.Builder,
                           filename: String,
@@ -28,14 +26,11 @@ object Global {
       if (!headerAstCache.contains(filename)) {
         val value = mutable.HashSet((linenumber.get, columnnumber.get))
         headerAstCache.put(filename, value)
-        headerToFilenameCache.put(filename, mutable.HashSet(fromFilename))
         astCreatorFunction.foreach(Ast.storeInDiffGraph(_, diffGraph))
       } else {
         if (!headerAstCache(filename).contains((linenumber.get, columnnumber.get))) {
           headerAstCache(filename).add((linenumber.get, columnnumber.get))
           astCreatorFunction.foreach(Ast.storeInDiffGraph(_, diffGraph))
-        } else {
-          headerToFilenameCache(filename).add(fromFilename)
         }
       }
       Seq.empty
@@ -53,14 +48,11 @@ object Global {
       if (!headerAstCache.contains(filename)) {
         val value = mutable.HashSet((linenumber.get, columnnumber.get))
         headerAstCache.put(filename, value)
-        headerToFilenameCache.put(filename, mutable.HashSet(fromFilename))
         Ast.storeInDiffGraph(astCreatorFunction, diffGraph)
       } else {
         if (!headerAstCache(filename).contains((linenumber.get, columnnumber.get))) {
           headerAstCache(filename).add((linenumber.get, columnnumber.get))
           Ast.storeInDiffGraph(astCreatorFunction, diffGraph)
-        } else {
-          headerToFilenameCache(filename).add(fromFilename)
         }
       }
       Ast()

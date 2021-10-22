@@ -27,7 +27,6 @@ class CCodeToCpgSuite(fileSuffix: String = FileDefaults.C_EXT) extends CodeToCpg
   override def beforeAll(): Unit = {
     super.beforeAll()
     Global.usedTypes.clear()
-    Global.headerAstCache.clear()
   }
 
 }
