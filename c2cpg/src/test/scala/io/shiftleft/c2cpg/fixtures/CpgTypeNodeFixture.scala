@@ -5,7 +5,6 @@ import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.datastructures.Global
 import io.shiftleft.c2cpg.passes.AstCreationPass
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.IntervalKeyPool
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.MethodStubCreator
 import io.shiftleft.semanticcpg.passes.linking.linker.Linker
 import io.shiftleft.semanticcpg.passes.typenodes.{TypeDeclStubCreator, TypeNodePass}
@@ -18,9 +17,8 @@ object CpgTypeNodeFixture {
       val file = dir / fileName
       file.write(code)
 
-      val keyPool = new IntervalKeyPool(1001, 2000)
       val filenames = List(file.path.toAbsolutePath.toString)
-      val astCreationPass = new AstCreationPass(filenames, cpg, keyPool, Config())
+      val astCreationPass = new AstCreationPass(filenames, cpg, None, Config())
       astCreationPass.createAndApply()
       new TypeNodePass(astCreationPass.usedTypes(), cpg).createAndApply()
       new TypeDeclStubCreator(cpg).createAndApply()

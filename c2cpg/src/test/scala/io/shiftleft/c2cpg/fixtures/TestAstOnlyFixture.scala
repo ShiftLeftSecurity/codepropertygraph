@@ -4,7 +4,6 @@ import better.files.File
 import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.passes.AstCreationPass
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.passes.IntervalKeyPool
 
 object TestAstOnlyFixture {
   def apply(code: String, fileName: String = "file.c")(f: Cpg => Unit): Unit = {
@@ -13,9 +12,8 @@ object TestAstOnlyFixture {
       file.write(code)
 
       val cpg = Cpg.emptyCpg
-      val keyPool = new IntervalKeyPool(1001, 2000)
       val filenames = List(file.path.toAbsolutePath.toString)
-      new AstCreationPass(filenames, cpg, keyPool, Config()).createAndApply()
+      new AstCreationPass(filenames, cpg, None, Config()).createAndApply()
 
       f(cpg)
     }

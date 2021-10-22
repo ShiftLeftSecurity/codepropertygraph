@@ -11,11 +11,11 @@ import java.nio.file.Paths
 
 class AstCreationPass(filenames: List[String],
                       cpg: Cpg,
-                      keyPool: IntervalKeyPool,
+                      keyPool: Option[IntervalKeyPool],
                       config: C2Cpg.Config,
                       parseConfig: ParserConfig = ParserConfig.empty,
                       headerFileFinder: HeaderFileFinder = null)
-    extends ConcurrentWriterCpgPass[String](cpg, keyPool = Some(keyPool)) {
+    extends ConcurrentWriterCpgPass[String](cpg, keyPool = keyPool) {
 
   def usedTypes(): List[String] =
     Global.usedTypes.keys.filterNot(_ == Defines.anyTypeName).toList
