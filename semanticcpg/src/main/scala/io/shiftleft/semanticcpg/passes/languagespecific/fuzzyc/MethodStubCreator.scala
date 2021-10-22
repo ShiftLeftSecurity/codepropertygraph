@@ -17,24 +17,31 @@ import scala.util.Try
 case class NameAndSignature(name: String, signature: String, fullName: String)
 
 /**
+  * Determines calls to functions for which there is no corresponding
+  * method in the CPG and creates method stubs for these methods. A
+  * method stub consists of a METHOD node, one node for each parameter,
+  * a METHOD_RETURN node that represents the formal return parameter, and
+  * a BLOCK node that represents an empty compound statement.
+  *
   * This pass has no other pass as prerequisite.
   */
 class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int)](cpg) {
 
-  // Since the method fullNames for fuzzyc are not unique, we do not have
-  // a 1to1 relation and may overwrite some values. This is ok for now.
   private var methodFullNameToNode = Map[String, MethodBase]()
   private var methodToParameterCount = Map[NameAndSignature, Int]()
 
   override def init(): Unit = {
-    cpg.method.foreach { method =>
-      methodFullNameToNode += method.fullName -> method
-    }
+    // Warning: if fullName is not unique (likely the case for fuzzyc),
+    // then we may overwrite key-value pairs in this map. However,
+    // assuming that `cpg.method` returns nodes in the same order on
+    // each run, this is at least deterministic
+    methodFullNameToNode = cpg.method.map { method =>
+      method.fullName -> method
+    }.toMap
 
-    cpg.call.foreach { call =>
-      methodToParameterCount +=
-        NameAndSignature(call.name, call.signature, call.methodFullName) -> call.argument.size
-    }
+    methodToParameterCount = cpg.call.map { call =>
+      NameAndSignature(call.name, call.signature, call.methodFullName) -> call.argument.size
+    }.toMap
   }
 
   override def partIterator: Iterator[(NameAndSignature, Int)] = methodToParameterCount.iterator
