@@ -20,7 +20,7 @@ class EnumTests extends AnyWordSpec with Matchers with Inside with CompleteCpgFi
         |    green = 20,
         |    blue
         |};""".stripMargin) { cpg =>
-      inside(cpg.typeDecl.l) {
+      inside(cpg.typeDecl.internal.l) {
         case List(color) =>
           color.name shouldBe "color"
           inside(color.member.l) {
@@ -45,7 +45,7 @@ class EnumTests extends AnyWordSpec with Matchers with Inside with CompleteCpgFi
         |    green = 20,
         |    blue
         |} C;""".stripMargin) { cpg =>
-      inside(cpg.typeDecl.l) {
+      inside(cpg.typeDecl.filter(x => !x.isExternal).l) {
         case List(color, c) =>
           color.name shouldBe "color"
           color.aliasTypeFullName shouldBe None
@@ -71,7 +71,7 @@ class EnumTests extends AnyWordSpec with Matchers with Inside with CompleteCpgFi
         |     high='h',
         |     low='l', // C++11 allows the extra comma
         |}; """.stripMargin) { cpg =>
-      inside(cpg.typeDecl.l) {
+      inside(cpg.typeDecl.internal.l) {
         case List(altitude) =>
           altitude.name shouldBe "altitude"
           inside(altitude.member.l) {
@@ -96,7 +96,7 @@ class EnumTests extends AnyWordSpec with Matchers with Inside with CompleteCpgFi
         |    b,
         |    c
         |};""".stripMargin) { cpg =>
-      inside(cpg.typeDecl.l) {
+      inside(cpg.typeDecl.internal.l) {
         case List(smallenum) =>
           smallenum.name shouldBe "smallenum"
           inside(smallenum.member.l) {
@@ -118,7 +118,7 @@ class EnumTests extends AnyWordSpec with Matchers with Inside with CompleteCpgFi
          |    e,
          |    f
          |};""".stripMargin) { cpg =>
-      inside(cpg.typeDecl.l) {
+      inside(cpg.typeDecl.internal.l) {
         case List(anon) =>
           anon.name shouldBe "anonymous_enum_0"
           inside(anon.member.l) {
@@ -138,7 +138,7 @@ class EnumTests extends AnyWordSpec with Matchers with Inside with CompleteCpgFi
        |};
        |int x = X::a;
        |""".stripMargin) { cpg =>
-      inside(cpg.typeDecl.l) {
+      inside(cpg.typeDecl.internal.l) {
         case List(x) =>
           x.name shouldBe "X"
           inside(x.member.l) {

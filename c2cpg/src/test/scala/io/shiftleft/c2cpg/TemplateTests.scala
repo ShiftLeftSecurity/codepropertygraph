@@ -16,7 +16,7 @@ class TemplateTests extends AnyWordSpec with Matchers with Inside with CompleteC
         |using A = X<int>;
         |using B = Y<int, char>;
         |""".stripMargin) { cpg =>
-      inside(cpg.typeDecl.l) {
+      inside(cpg.typeDecl.filter(x => !x.isExternal).l) {
         case List(x, y, a, b) =>
           x.name shouldBe "X"
           x.fullName shouldBe "X"
@@ -38,7 +38,7 @@ class TemplateTests extends AnyWordSpec with Matchers with Inside with CompleteC
         |template<typename T> class X;
         |template<typename A, typename B> class Y : public X<A> {};
         |""".stripMargin) { cpg =>
-      inside(cpg.typeDecl.l) {
+      inside(cpg.typeDecl.filter(x => !x.isExternal).l) {
         case List(x, y) =>
           x.name shouldBe "X"
           x.fullName shouldBe "X"
@@ -53,7 +53,7 @@ class TemplateTests extends AnyWordSpec with Matchers with Inside with CompleteC
     "be correct for struct templates" in CompleteCpgFixture("""
         |template<typename A, typename B> struct Foo;
         |""".stripMargin) { cpg =>
-      inside(cpg.typeDecl.l) {
+      inside(cpg.typeDecl.filter(x => !x.isExternal).l) {
         case List(foo) =>
           foo.name shouldBe "Foo"
           foo.fullName shouldBe "Foo"
@@ -68,7 +68,7 @@ class TemplateTests extends AnyWordSpec with Matchers with Inside with CompleteC
        |template<class T, class U>
        |void y(T a, U b);
        |""".stripMargin) { cpg =>
-      inside(cpg.method.l) {
+      inside(cpg.method.internal.l) {
         case List(_, x, y) =>
           x.name shouldBe "x"
           x.fullName shouldBe "x"

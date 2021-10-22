@@ -4,9 +4,10 @@ import better.files.File
 import io.shiftleft.c2cpg.C2Cpg.Config
 import io.shiftleft.c2cpg.passes.AstCreationPass
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Languages
+import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
-import io.shiftleft.semanticcpg.passes.linking.linker.Linker
-import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
+import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
 
 object CompleteCpgFixture {
@@ -16,13 +17,14 @@ object CompleteCpgFixture {
       file.write(code)
 
       val cpg = Cpg.emptyCpg
+      new MetaDataPass(cpg, Languages.NEWC).createAndApply()
       val filenames = List(file.path.toAbsolutePath.toString)
       val astCreationPass = new AstCreationPass(filenames, cpg, None, Config())
       astCreationPass.createAndApply()
       new CfgCreationPass(cpg).createAndApply()
       new TypeNodePass(astCreationPass.usedTypes(), cpg).createAndApply()
-      new NamespaceCreator(cpg).createAndApply()
-      new Linker(cpg).createAndApply()
+      val context = new LayerCreatorContext(cpg)
+      new Scpg().run(context)
       f(cpg)
     }
   }
