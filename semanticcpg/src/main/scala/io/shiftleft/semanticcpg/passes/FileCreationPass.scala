@@ -50,7 +50,9 @@ class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
       ),
       dstNodeLabel = NodeTypes.FILE,
       edgeType = EdgeTypes.SOURCE_FILE,
-      dstNodeMap = originalFileNameToNode,
+      dstNodeMap = { x =>
+        originalFileNameToNode.get(x)
+      },
       dstFullNameKey = PropertyNames.FILENAME,
       dstGraph,
       Some(createFileIfDoesNotExist)

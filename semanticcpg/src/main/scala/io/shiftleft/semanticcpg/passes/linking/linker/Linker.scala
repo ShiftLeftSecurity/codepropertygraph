@@ -8,7 +8,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
 import overflowdb.traversal._
 
-import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 
 /**
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
@@ -17,17 +17,28 @@ import scala.collection.mutable
 class Linker(cpg: Cpg) extends CpgPass(cpg) {
   import Linker.{linkToSingle, logFailedDstLookup, logFailedSrcLookup, logger}
 
-  private val typeDeclFullNameToNode = mutable.Map.empty[String, StoredNode]
-  private val typeFullNameToNode = mutable.Map.empty[String, StoredNode]
-  private val methodFullNameToNode = mutable.Map.empty[String, StoredNode]
-  private val namespaceBlockFullNameToNode = mutable.Map.empty[String, StoredNode]
-
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    initMaps()
+    val indexManager = cpg.graph.indexManager
+    indexManager.createNodePropertyIndex(PropertyNames.FULL_NAME)
 
-    linkAstChildToParent(dstGraph)
+    def typeDeclFullNameToNode(x: String): Option[TypeDecl] =
+      nodesWithFullName(x).collectFirst { case x: TypeDecl => x }
+
+    def typeFullNameToNode(x: String): Option[Type] =
+      nodesWithFullName(x).collectFirst { case x: Type => x }
+
+    def methodFullNameToNode(x: String): Option[Method] =
+      nodesWithFullName(x).collectFirst { case x: Method => x }
+
+    def namespaceBlockFullNameToNode(x: String) =
+      nodesWithFullName(x).collectFirst { case x: NamespaceBlock => x }
+
+    def nodesWithFullName(x: String) =
+      indexManager.lookup(PropertyNames.FULL_NAME, x).asScala
+
+    linkAstChildToParent(dstGraph, methodFullNameToNode, typeDeclFullNameToNode, namespaceBlockFullNameToNode)
 
     // Create REF edges from TYPE nodes to TYPE_DECL
 
@@ -120,20 +131,10 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     Iterator(dstGraph.build())
   }
 
-  private def initMaps(): Unit = {
-    cpg.graph.nodes.foreach {
-      case node: TypeDecl       => typeDeclFullNameToNode += node.fullName -> node
-      case node: Type           => typeFullNameToNode += node.fullName -> node
-      case node: Method         => methodFullNameToNode += node.fullName -> node
-      case node: NamespaceBlock => namespaceBlockFullNameToNode += node.fullName -> node
-      case _                    => // ignore
-    }
-  }
-
   private def linkToMultiple[SRC_NODE_TYPE <: StoredNode](srcLabels: List[String],
                                                           dstNodeLabel: String,
                                                           edgeType: String,
-                                                          dstNodeMap: mutable.Map[String, StoredNode],
+                                                          dstNodeMap: String => Option[StoredNode],
                                                           getDstFullNames: SRC_NODE_TYPE => Iterable[String],
                                                           dstFullNameKey: String,
                                                           dstGraph: DiffGraph.Builder): Unit = {
@@ -141,7 +142,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     Traversal(cpg.graph.nodes(srcLabels: _*)).cast[SRC_NODE_TYPE].foreach { srcNode =>
       if (!srcNode.outE(edgeType).hasNext) {
         getDstFullNames(srcNode).foreach { dstFullName =>
-          dstNodeMap.get(dstFullName) match {
+          dstNodeMap(dstFullName) match {
             case Some(dstNode) => dstGraph.addEdgeInOriginal(srcNode, dstNode, edgeType)
             case None          => logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
           }
@@ -159,16 +160,19 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     }
   }
 
-  private def linkAstChildToParent(dstGraph: DiffGraph.Builder): Unit = {
+  private def linkAstChildToParent(dstGraph: DiffGraph.Builder,
+                                   methodFullNameToNode: String => Option[StoredNode],
+                                   typeDeclFullNameToNode: String => Option[StoredNode],
+                                   namespaceBlockFullNameToNode: String => Option[StoredNode]): Unit = {
     Traversal(cpg.graph.nodes(NodeTypes.METHOD, NodeTypes.TYPE_DECL))
       .cast[HasAstParentType with HasAstParentFullName with StoredNode]
       .filter(astChild => astChild.inE(EdgeTypes.AST).isEmpty)
       .foreach { astChild =>
         val astParentOption: Option[StoredNode] =
           astChild.astParentType match {
-            case NodeTypes.METHOD          => methodFullNameToNode.get(astChild.astParentFullName)
-            case NodeTypes.TYPE_DECL       => typeDeclFullNameToNode.get(astChild.astParentFullName)
-            case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode.get(astChild.astParentFullName)
+            case NodeTypes.METHOD          => methodFullNameToNode(astChild.astParentFullName)
+            case NodeTypes.TYPE_DECL       => typeDeclFullNameToNode(astChild.astParentFullName)
+            case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode(astChild.astParentFullName)
             case _ =>
               logger.warn(
                 s"Invalid AST_PARENT_TYPE=${astChild.propertyOption(Properties.AST_PARENT_FULL_NAME)};" +
@@ -204,7 +208,7 @@ object Linker {
                    srcLabels: List[String],
                    dstNodeLabel: String,
                    edgeType: String,
-                   dstNodeMap: mutable.Map[String, StoredNode],
+                   dstNodeMap: String => Option[StoredNode],
                    dstFullNameKey: String,
                    dstGraph: DiffGraph.Builder,
                    dstNotExistsHandler: Option[(StoredNode, String) => Unit]): Unit = {
@@ -222,7 +226,7 @@ object Linker {
           .ifPresent { dstFullName =>
             // for `UNKNOWN` this is not always set, so we're using an Option here
             val srcStoredNode = srcNode.asInstanceOf[StoredNode]
-            dstNodeMap.get(dstFullName) match {
+            dstNodeMap(dstFullName) match {
               case Some(dstNode) =>
                 dstGraph.addEdgeInOriginal(srcStoredNode, dstNode, edgeType)
               case None if dstNotExistsHandler.isDefined =>
