@@ -12,6 +12,10 @@ import scala.jdk.CollectionConverters._
 /**
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
   * language frontends which do not provide method stubs and type decl stubs.
+  *
+  * The pass creates so called `CONTAINS` edges, which serve as shortcuts that
+  * allow to traverse from an AST node to the METHOD, TYPE_DECL, or FILE
+  * it is contained in.
   */
 class ContainsEdgePass(cpg: Cpg) extends ConcurrentWriterCpgPass[AstNode](cpg) {
 
