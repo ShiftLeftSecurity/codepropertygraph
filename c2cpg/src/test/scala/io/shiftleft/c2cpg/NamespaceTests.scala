@@ -40,7 +40,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
       }
 
       inside(cpg.namespaceBlock.l) {
-        case List(_, q, v) =>
+        case List(_, _, q, v) =>
           q.fullName shouldBe "Q"
           v.fullName shouldBe "Q.V"
 
@@ -92,7 +92,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
       }
 
       inside(cpg.namespaceBlock.l) {
-        case List(_, q, v) =>
+        case List(_, _, q, v) =>
           q.fullName shouldBe "Q"
           v.fullName shouldBe "Q.V"
 
@@ -129,13 +129,13 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
         |  j++;    // ok, increments ::A::(unique)::j
         |}""".stripMargin) { cpg =>
       inside(cpg.namespaceBlock.l) {
-        case List(_, unnamed1, a, unnamed2) =>
+        case List(_, _, unnamed1, a, unnamed2) =>
           unnamed1.fullName shouldBe "anonymous_namespace_0"
           a.fullName shouldBe "A"
           unnamed2.fullName shouldBe "A.anonymous_namespace_1"
       }
 
-      inside(cpg.method.fullName.l) {
+      inside(cpg.method.internal.fullName.l) {
         case List(_, f, g, h) =>
           f shouldBe "f"
           g shouldBe "A.g"
@@ -169,12 +169,12 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
         |  X::g(); // calls A::g
         |}""".stripMargin) { cpg =>
       inside(cpg.namespaceBlock.l) {
-        case List(_, a, x) =>
+        case List(_, _, a, x) =>
           a.fullName shouldBe "A"
           x.fullName shouldBe "X"
       }
 
-      inside(cpg.method.fullName.l) {
+      inside(cpg.method.internal.fullName.l) {
         case List(_, f, g, h) =>
           f shouldBe "f"
           g shouldBe "A.g"
@@ -210,13 +210,13 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
         |  f('a');     // calls f(char)
         |}""".stripMargin) { cpg =>
       inside(cpg.namespaceBlock.l) {
-        case List(_, a1, a2) =>
+        case List(_, _, a1, a2) =>
           // TODO: how to handle namespace extension?
           a1.fullName shouldBe "A"
           a2.fullName shouldBe "A"
       }
 
-      inside(cpg.method.l) {
+      inside(cpg.method.internal.l) {
         case List(_, f1, f2, foo, bar) =>
           f1.fullName shouldBe "A.f"
           f1.signature shouldBe "void A.f (int)"
@@ -250,7 +250,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
         |  int x = fbz::qux;
         |}""".stripMargin) { cpg =>
       inside(cpg.namespaceBlock.l) {
-        case List(_, foo, bar, baz, fbz) =>
+        case List(_, _, foo, bar, baz, fbz) =>
           foo.name shouldBe "foo"
           foo.fullName shouldBe "foo"
           bar.name shouldBe "bar"
@@ -293,7 +293,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
        |  namespace x = foo::bar;
        |};""".stripMargin) { cpg =>
       inside(cpg.namespaceBlock.l) {
-        case List(_, foo, bar, x) =>
+        case List(_, _, foo, bar, x) =>
           foo.name shouldBe "foo"
           foo.fullName shouldBe "foo"
           bar.name shouldBe "bar"
@@ -312,7 +312,7 @@ class NamespaceTests extends AnyWordSpec with Matchers with Inside with Complete
        |  using namespace foo::bar;
        |};""".stripMargin) { cpg =>
       inside(cpg.namespaceBlock.l) {
-        case List(_, foo, bar) =>
+        case List(_, _, foo, bar) =>
           foo.name shouldBe "foo"
           foo.fullName shouldBe "foo"
           bar.name shouldBe "bar"

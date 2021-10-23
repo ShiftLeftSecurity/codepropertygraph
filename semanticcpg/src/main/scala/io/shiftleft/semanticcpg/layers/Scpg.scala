@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.layers
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes, PropertyNames}
 import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
@@ -11,7 +11,13 @@ import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
 import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.MethodStubCreator
 import io.shiftleft.semanticcpg.passes.linking.calllinker.StaticCallLinker
 import io.shiftleft.semanticcpg.passes.linking.filecompat.FileNameCompat
-import io.shiftleft.semanticcpg.passes.linking.linker.Linker
+import io.shiftleft.semanticcpg.passes.linking.linker.{
+  AliasLinker,
+  AstLinkerPass,
+  MethodRefLinker,
+  TypeHierarchyPass,
+  TypeUsagePass
+}
 import io.shiftleft.semanticcpg.passes.methoddecorations.MethodDecoratorPass
 import io.shiftleft.semanticcpg.passes.methodexternaldecorator.MethodExternalDecoratorPass
 import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
@@ -40,6 +46,8 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
     val language = cpg.metaData.language.headOption
       .getOrElse(throw new Exception("Meta node missing."))
 
+    cpg.graph.indexManager.createNodePropertyIndex(PropertyNames.FULL_NAME)
+
     val enhancementExecList = createEnhancementExecList(cpg, language)
     enhancementExecList.zipWithIndex.foreach {
       case (pass, index) =>
@@ -54,7 +62,11 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new ArgumentCompat(cpg),
           new ReceiverEdgePass(cpg),
           new MethodDecoratorPass(cpg),
-          new Linker(cpg),
+          new AstLinkerPass(cpg),
+          new TypeUsagePass(cpg),
+          new TypeHierarchyPass(cpg),
+          new AliasLinker(cpg),
+          new MethodRefLinker(cpg),
           new FileNameCompat(cpg),
           new FileCreationPass(cpg),
           new StaticCallLinker(cpg),
@@ -72,7 +84,11 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new FileCreationPass(cpg),
           new TypeDeclStubCreator(cpg),
           new ContainsEdgePass(cpg),
-          new Linker(cpg),
+          new AstLinkerPass(cpg),
+          new TypeUsagePass(cpg),
+          new TypeHierarchyPass(cpg),
+          new AliasLinker(cpg),
+          new MethodRefLinker(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
           new StaticCallLinker(cpg),
@@ -84,7 +100,11 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new TypeDeclStubCreator(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
-          new Linker(cpg),
+          new AstLinkerPass(cpg),
+          new TypeUsagePass(cpg),
+          new TypeHierarchyPass(cpg),
+          new AliasLinker(cpg),
+          new MethodRefLinker(cpg),
           new FileCreationPass(cpg),
           new StaticCallLinker(cpg),
           new MethodExternalDecoratorPass(cpg),
@@ -98,7 +118,11 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new TypeDeclStubCreator(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
-          new Linker(cpg),
+          new AstLinkerPass(cpg),
+          new TypeUsagePass(cpg),
+          new TypeHierarchyPass(cpg),
+          new AliasLinker(cpg),
+          new MethodRefLinker(cpg),
           new FileNameCompat(cpg),
           new FileCreationPass(cpg),
           new StaticCallLinker(cpg),
@@ -114,7 +138,11 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new ArgumentCompat(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
-          new Linker(cpg),
+          new AstLinkerPass(cpg),
+          new TypeUsagePass(cpg),
+          new TypeHierarchyPass(cpg),
+          new AliasLinker(cpg),
+          new MethodRefLinker(cpg),
           new FileNameCompat(cpg),
           new FileCreationPass(cpg),
           new ContainsEdgePass(cpg),
@@ -127,7 +155,11 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
         Iterator(
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
-          new Linker(cpg),
+          new AstLinkerPass(cpg),
+          new TypeUsagePass(cpg),
+          new TypeHierarchyPass(cpg),
+          new AliasLinker(cpg),
+          new MethodRefLinker(cpg),
           new FileNameCompat(cpg),
           new FileCreationPass(cpg),
           new ContainsEdgePass(cpg),
@@ -141,7 +173,11 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CfgCreationPass(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
-          new Linker(cpg),
+          new AstLinkerPass(cpg),
+          new TypeUsagePass(cpg),
+          new TypeHierarchyPass(cpg),
+          new AliasLinker(cpg),
+          new MethodRefLinker(cpg),
           new FileNameCompat(cpg),
           new FileCreationPass(cpg),
           new ContainsEdgePass(cpg),
@@ -155,7 +191,11 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new CfgCreationPass(cpg),
           new TypeDeclStubCreator(cpg),
           new MethodDecoratorPass(cpg),
-          new Linker(cpg),
+          new AstLinkerPass(cpg),
+          new TypeUsagePass(cpg),
+          new TypeHierarchyPass(cpg),
+          new AliasLinker(cpg),
+          new MethodRefLinker(cpg),
           new StaticCallLinker(cpg),
           new FileCreationPass(cpg),
           new ContainsEdgePass(cpg),
@@ -168,7 +208,11 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new TypeDeclStubCreator(cpg),
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
-          new Linker(cpg),
+          new AstLinkerPass(cpg),
+          new TypeUsagePass(cpg),
+          new TypeHierarchyPass(cpg),
+          new AliasLinker(cpg),
+          new MethodRefLinker(cpg),
           new FileCreationPass(cpg),
           new StaticCallLinker(cpg),
           new ContainsEdgePass(cpg),
@@ -180,7 +224,11 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
         Iterator(
           new MethodStubCreator(cpg),
           new MethodDecoratorPass(cpg),
-          new Linker(cpg),
+          new AstLinkerPass(cpg),
+          new TypeUsagePass(cpg),
+          new TypeHierarchyPass(cpg),
+          new AliasLinker(cpg),
+          new MethodRefLinker(cpg),
           new FileCreationPass(cpg),
           new StaticCallLinker(cpg),
           new MethodExternalDecoratorPass(cpg),

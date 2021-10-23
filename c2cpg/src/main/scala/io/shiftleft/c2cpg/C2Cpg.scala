@@ -46,7 +46,7 @@ class C2Cpg {
     new MetaDataPass(cpg, Languages.NEWC, Some(metaDataKeyPool)).createAndApply()
     val headerFileFinder = new HeaderFileFinder(config.inputPaths.toList)
     val astCreationPass =
-      new AstCreationPass(sourceFileNames, cpg, astKeyPool, config, createParserConfig(config), headerFileFinder)
+      new AstCreationPass(sourceFileNames, cpg, Some(astKeyPool), config, createParserConfig(config), headerFileFinder)
     astCreationPass.createAndApply()
     new HeaderContentPass(cpg, config.inputPaths.head).createAndApply()
     new CfgCreationPass(cpg).createAndApply()
