@@ -97,49 +97,14 @@ class TypeUsagePass(cpg: Cpg) extends CpgPass(cpg) {
   }
 }
 
-/**
-  * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
-  * language frontends which do not provide method stubs and type decl stubs.
-  */
-class Linker(cpg: Cpg) extends CpgPass(cpg) {
-  import Linker.{linkToSingle, logFailedSrcLookup, logger}
+class AstLinkerPass(cpg: Cpg) extends CpgPass(cpg) {
+
+  import Linker.{logFailedSrcLookup, logger}
 
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
-
     cpg.method.whereNot(_.inE(EdgeTypes.AST)).foreach(addAstEdge(_, dstGraph))
     cpg.typeDecl.whereNot(_.inE(EdgeTypes.AST)).foreach(addAstEdge(_, dstGraph))
-
-    // Create REF edges from METHOD_REFs to
-    // METHOD
-
-    linkToSingle(
-      cpg,
-      srcLabels = List(NodeTypes.METHOD_REF),
-      dstNodeLabel = NodeTypes.METHOD,
-      edgeType = EdgeTypes.REF,
-      dstNodeMap = methodFullNameToNode(cpg, _),
-      dstFullNameKey = PropertyNames.METHOD_FULL_NAME,
-      dstGraph,
-      None
-    )
-
-    // Create ALIAS_OF edges from TYPE_DECL nodes to
-    // TYPE
-
-    linkToMultiple(
-      cpg,
-      srcLabels = List(NodeTypes.TYPE_DECL),
-      dstNodeLabel = NodeTypes.TYPE,
-      edgeType = EdgeTypes.ALIAS_OF,
-      dstNodeMap = typeFullNameToNode(cpg, _),
-      getDstFullNames = (srcNode: TypeDecl) => {
-        srcNode.aliasTypeFullName
-      },
-      dstFullNameKey = PropertyNames.ALIAS_TYPE_FULL_NAME,
-      dstGraph
-    )
-
     Iterator(dstGraph.build())
   }
 
@@ -176,11 +141,55 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
                            methodOrTypeDecl.id.toString)
     }
   }
+}
+
+/**
+  * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
+  * language frontends which do not provide method stubs and type decl stubs.
+  */
+class Linker(cpg: Cpg) extends CpgPass(cpg) {
+  import Linker.linkToSingle
+
+  override def run(): Iterator[DiffGraph] = {
+    val dstGraph = DiffGraph.newBuilder
+
+    // Create REF edges from METHOD_REFs to
+    // METHOD
+
+    linkToSingle(
+      cpg,
+      srcLabels = List(NodeTypes.METHOD_REF),
+      dstNodeLabel = NodeTypes.METHOD,
+      edgeType = EdgeTypes.REF,
+      dstNodeMap = methodFullNameToNode(cpg, _),
+      dstFullNameKey = PropertyNames.METHOD_FULL_NAME,
+      dstGraph,
+      None
+    )
+
+    // Create ALIAS_OF edges from TYPE_DECL nodes to
+    // TYPE
+
+    linkToMultiple(
+      cpg,
+      srcLabels = List(NodeTypes.TYPE_DECL),
+      dstNodeLabel = NodeTypes.TYPE,
+      edgeType = EdgeTypes.ALIAS_OF,
+      dstNodeMap = typeFullNameToNode(cpg, _),
+      getDstFullNames = (srcNode: TypeDecl) => {
+        srcNode.aliasTypeFullName
+      },
+      dstFullNameKey = PropertyNames.ALIAS_TYPE_FULL_NAME,
+      dstGraph
+    )
+
+    Iterator(dstGraph.build())
+  }
 
 }
 
 object Linker {
-  private val logger: Logger = LoggerFactory.getLogger(classOf[Linker])
+  val logger: Logger = LoggerFactory.getLogger(classOf[Linker])
 
   def typeDeclFullNameToNode(cpg: Cpg, x: String): Option[TypeDecl] =
     nodesWithFullName(cpg, x).collectFirst { case x: TypeDecl => x }
@@ -280,11 +289,11 @@ object Linker {
   }
 
   @inline
-  private def logFailedDstLookup(edgeType: String,
-                                 srcNodeType: String,
-                                 srcNodeId: String,
-                                 dstNodeType: String,
-                                 dstFullName: String): Unit = {
+  def logFailedDstLookup(edgeType: String,
+                         srcNodeType: String,
+                         srcNodeId: String,
+                         dstNodeType: String,
+                         dstFullName: String): Unit = {
     logger.warn(
       "Could not create edge. Destination lookup failed. " +
         s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcNodeId=$srcNodeId, " +
@@ -292,11 +301,11 @@ object Linker {
   }
 
   @inline
-  private def logFailedSrcLookup(edgeType: String,
-                                 srcNodeType: String,
-                                 srcFullName: String,
-                                 dstNodeType: String,
-                                 dstNodeId: String): Unit = {
+  def logFailedSrcLookup(edgeType: String,
+                         srcNodeType: String,
+                         srcFullName: String,
+                         dstNodeType: String,
+                         dstNodeId: String): Unit = {
     logger.warn(
       "Could not create edge. Source lookup failed. " +
         s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcFullName=$srcFullName, " +
