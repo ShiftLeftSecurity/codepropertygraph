@@ -4,40 +4,61 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{PropertyNames, _}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.semanticcpg.passes.linking.linker.Linker.{
+  linkToMultiple,
+  methodFullNameToNode,
+  namespaceBlockFullNameToNode,
+  typeDeclFullNameToNode,
+  typeFullNameToNode
+}
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
 import overflowdb.traversal._
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
+
+/**
+  * Create INHERITS_FROM edges from `TYPE_DECL` nodes to `TYPE` nodes.
+  * */
+class TypeHierarchyPass(cpg: Cpg) extends CpgPass(cpg) {
+
+  override def run(): Iterator[DiffGraph] = {
+    val dstGraph = DiffGraph.newBuilder
+    linkToMultiple(
+      cpg,
+      srcLabels = List(NodeTypes.TYPE_DECL),
+      dstNodeLabel = NodeTypes.TYPE,
+      edgeType = EdgeTypes.INHERITS_FROM,
+      dstNodeMap = typeFullNameToNode(cpg, _),
+      getDstFullNames = (srcNode: TypeDecl) => {
+        if (srcNode.inheritsFromTypeFullName != null) {
+          srcNode.inheritsFromTypeFullName
+        } else {
+          Seq()
+        }
+      },
+      dstFullNameKey = PropertyNames.INHERITS_FROM_TYPE_FULL_NAME,
+      dstGraph
+    )
+    Iterator(dstGraph.build())
+  }
+}
 
 /**
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
   * language frontends which do not provide method stubs and type decl stubs.
   */
 class Linker(cpg: Cpg) extends CpgPass(cpg) {
-  import Linker.{linkToSingle, logFailedDstLookup, logFailedSrcLookup, logger}
+  import Linker.{linkToSingle, logFailedSrcLookup, logger}
 
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
-    val indexManager = cpg.graph.indexManager
-
-    def typeDeclFullNameToNode(x: String): Option[TypeDecl] =
-      nodesWithFullName(x).collectFirst { case x: TypeDecl => x }
-
-    def typeFullNameToNode(x: String): Option[Type] =
-      nodesWithFullName(x).collectFirst { case x: Type => x }
-
-    def methodFullNameToNode(x: String): Option[Method] =
-      nodesWithFullName(x).collectFirst { case x: Method => x }
-
-    def namespaceBlockFullNameToNode(x: String) =
-      nodesWithFullName(x).collectFirst { case x: NamespaceBlock => x }
-
-    def nodesWithFullName(x: String) =
-      indexManager.lookup(PropertyNames.FULL_NAME, x).asScala
-
-    linkAstChildToParent(dstGraph, methodFullNameToNode, typeDeclFullNameToNode, namespaceBlockFullNameToNode)
+    linkAstChildToParent(dstGraph,
+                         methodFullNameToNode(cpg, _),
+                         typeDeclFullNameToNode(cpg, _),
+                         namespaceBlockFullNameToNode(cpg, _))
 
     // Create REF edges from TYPE nodes to TYPE_DECL
 
@@ -46,7 +67,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       srcLabels = List(NodeTypes.TYPE),
       dstNodeLabel = NodeTypes.TYPE_DECL,
       edgeType = EdgeTypes.REF,
-      dstNodeMap = typeDeclFullNameToNode,
+      dstNodeMap = typeDeclFullNameToNode(cpg, _),
       dstFullNameKey = PropertyNames.TYPE_DECL_FULL_NAME,
       dstGraph,
       None
@@ -73,7 +94,7 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       ),
       dstNodeLabel = NodeTypes.TYPE,
       edgeType = EdgeTypes.EVAL_TYPE,
-      dstNodeMap = typeFullNameToNode,
+      dstNodeMap = typeFullNameToNode(cpg, _),
       dstFullNameKey = "TYPE_FULL_NAME",
       dstGraph,
       None
@@ -87,39 +108,21 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       srcLabels = List(NodeTypes.METHOD_REF),
       dstNodeLabel = NodeTypes.METHOD,
       edgeType = EdgeTypes.REF,
-      dstNodeMap = methodFullNameToNode,
+      dstNodeMap = methodFullNameToNode(cpg, _),
       dstFullNameKey = PropertyNames.METHOD_FULL_NAME,
       dstGraph,
       None
-    )
-
-    // Create INHERITS_FROM nodes from TYPE_DECL
-    // nodes to TYPE
-
-    linkToMultiple(
-      srcLabels = List(NodeTypes.TYPE_DECL),
-      dstNodeLabel = NodeTypes.TYPE,
-      edgeType = EdgeTypes.INHERITS_FROM,
-      dstNodeMap = typeFullNameToNode,
-      getDstFullNames = (srcNode: TypeDecl) => {
-        if (srcNode.inheritsFromTypeFullName != null) {
-          srcNode.inheritsFromTypeFullName
-        } else {
-          Seq()
-        }
-      },
-      dstFullNameKey = PropertyNames.INHERITS_FROM_TYPE_FULL_NAME,
-      dstGraph
     )
 
     // Create ALIAS_OF edges from TYPE_DECL nodes to
     // TYPE
 
     linkToMultiple(
+      cpg,
       srcLabels = List(NodeTypes.TYPE_DECL),
       dstNodeLabel = NodeTypes.TYPE,
       edgeType = EdgeTypes.ALIAS_OF,
-      dstNodeMap = typeFullNameToNode,
+      dstNodeMap = typeFullNameToNode(cpg, _),
       getDstFullNames = (srcNode: TypeDecl) => {
         srcNode.aliasTypeFullName
       },
@@ -128,35 +131,6 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     )
 
     Iterator(dstGraph.build())
-  }
-
-  private def linkToMultiple[SRC_NODE_TYPE <: StoredNode](srcLabels: List[String],
-                                                          dstNodeLabel: String,
-                                                          edgeType: String,
-                                                          dstNodeMap: String => Option[StoredNode],
-                                                          getDstFullNames: SRC_NODE_TYPE => Iterable[String],
-                                                          dstFullNameKey: String,
-                                                          dstGraph: DiffGraph.Builder): Unit = {
-    var loggedDeprecationWarning = false
-    Traversal(cpg.graph.nodes(srcLabels: _*)).cast[SRC_NODE_TYPE].foreach { srcNode =>
-      if (!srcNode.outE(edgeType).hasNext) {
-        getDstFullNames(srcNode).foreach { dstFullName =>
-          dstNodeMap(dstFullName) match {
-            case Some(dstNode) => dstGraph.addEdgeInOriginal(srcNode, dstNode, edgeType)
-            case None          => logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
-          }
-        }
-      } else {
-        val dstFullNames = srcNode.out(edgeType).property(Properties.FULL_NAME).l
-        srcNode.setProperty(dstFullNameKey, dstFullNames)
-        if (!loggedDeprecationWarning) {
-          logger.warn(
-            s"Using deprecated CPG format with already existing $edgeType edge between" +
-              s" a source node of type $srcLabels and a $dstNodeLabel node.")
-          loggedDeprecationWarning = true
-        }
-      }
-    }
   }
 
   private def linkAstChildToParent(dstGraph: DiffGraph.Builder,
@@ -196,6 +170,21 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
 
 object Linker {
   private val logger: Logger = LoggerFactory.getLogger(classOf[Linker])
+
+  def typeDeclFullNameToNode(cpg: Cpg, x: String): Option[TypeDecl] =
+    nodesWithFullName(cpg, x).collectFirst { case x: TypeDecl => x }
+
+  def typeFullNameToNode(cpg: Cpg, x: String): Option[Type] =
+    nodesWithFullName(cpg, x).collectFirst { case x: Type => x }
+
+  def methodFullNameToNode(cpg: Cpg, x: String): Option[Method] =
+    nodesWithFullName(cpg, x).collectFirst { case x: Method => x }
+
+  def namespaceBlockFullNameToNode(cpg: Cpg, x: String): Option[NamespaceBlock] =
+    nodesWithFullName(cpg, x).collectFirst { case x: NamespaceBlock => x }
+
+  def nodesWithFullName(cpg: Cpg, x: String): mutable.Seq[NodeRef[_ <: NodeDb]] =
+    cpg.graph.indexManager.lookup(PropertyNames.FULL_NAME, x).asScala
 
   /**
     * For all nodes `n` with a label in `srcLabels`, determine
@@ -239,6 +228,36 @@ object Linker {
           case Some(dstFullName) => srcNode.setProperty(dstFullNameKey, dstFullName)
           case None              => logger.warn(s"Missing outgoing edge of type ${edgeType} from node ${srcNode}")
         }
+        if (!loggedDeprecationWarning) {
+          logger.warn(
+            s"Using deprecated CPG format with already existing $edgeType edge between" +
+              s" a source node of type $srcLabels and a $dstNodeLabel node.")
+          loggedDeprecationWarning = true
+        }
+      }
+    }
+  }
+
+  def linkToMultiple[SRC_NODE_TYPE <: StoredNode](cpg: Cpg,
+                                                  srcLabels: List[String],
+                                                  dstNodeLabel: String,
+                                                  edgeType: String,
+                                                  dstNodeMap: String => Option[StoredNode],
+                                                  getDstFullNames: SRC_NODE_TYPE => Iterable[String],
+                                                  dstFullNameKey: String,
+                                                  dstGraph: DiffGraph.Builder): Unit = {
+    var loggedDeprecationWarning = false
+    Traversal(cpg.graph.nodes(srcLabels: _*)).cast[SRC_NODE_TYPE].foreach { srcNode =>
+      if (!srcNode.outE(edgeType).hasNext) {
+        getDstFullNames(srcNode).foreach { dstFullName =>
+          dstNodeMap(dstFullName) match {
+            case Some(dstNode) => dstGraph.addEdgeInOriginal(srcNode, dstNode, edgeType)
+            case None          => logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
+          }
+        }
+      } else {
+        val dstFullNames = srcNode.out(edgeType).property(Properties.FULL_NAME).l
+        srcNode.setProperty(dstFullNameKey, dstFullNames)
         if (!loggedDeprecationWarning) {
           logger.warn(
             s"Using deprecated CPG format with already existing $edgeType edge between" +
