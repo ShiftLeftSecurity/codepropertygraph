@@ -4,8 +4,10 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{PropertyNames, _}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.linking.linker.Linker.{
   linkToMultiple,
+  linkToSingle,
   methodFullNameToNode,
   namespaceBlockFullNameToNode,
   typeDeclFullNameToNode,
@@ -45,20 +47,11 @@ class TypeHierarchyPass(cpg: Cpg) extends CpgPass(cpg) {
   }
 }
 
-/**
-  * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
-  * language frontends which do not provide method stubs and type decl stubs.
-  */
-class Linker(cpg: Cpg) extends CpgPass(cpg) {
-  import Linker.{linkToSingle, logFailedSrcLookup, logger}
+class TypeUsagePass(cpg: Cpg) extends CpgPass(cpg) {
 
   override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
 
-    linkAstChildToParent(dstGraph,
-                         methodFullNameToNode(cpg, _),
-                         typeDeclFullNameToNode(cpg, _),
-                         namespaceBlockFullNameToNode(cpg, _))
+    val dstGraph = DiffGraph.newBuilder
 
     // Create REF edges from TYPE nodes to TYPE_DECL
 
@@ -100,6 +93,23 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       None
     )
 
+    Iterator(dstGraph.build())
+  }
+}
+
+/**
+  * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
+  * language frontends which do not provide method stubs and type decl stubs.
+  */
+class Linker(cpg: Cpg) extends CpgPass(cpg) {
+  import Linker.{linkToSingle, logFailedSrcLookup, logger}
+
+  override def run(): Iterator[DiffGraph] = {
+    val dstGraph = DiffGraph.newBuilder
+
+    cpg.method.whereNot(_.inE(EdgeTypes.AST)).foreach(addAstEdge(_, dstGraph))
+    cpg.typeDecl.whereNot(_.inE(EdgeTypes.AST)).foreach(addAstEdge(_, dstGraph))
+
     // Create REF edges from METHOD_REFs to
     // METHOD
 
@@ -133,39 +143,40 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
     Iterator(dstGraph.build())
   }
 
-  private def linkAstChildToParent(dstGraph: DiffGraph.Builder,
-                                   methodFullNameToNode: String => Option[StoredNode],
-                                   typeDeclFullNameToNode: String => Option[StoredNode],
-                                   namespaceBlockFullNameToNode: String => Option[StoredNode]): Unit = {
-    Traversal(cpg.graph.nodes(NodeTypes.METHOD, NodeTypes.TYPE_DECL))
-      .cast[HasAstParentType with HasAstParentFullName with StoredNode]
-      .filter(astChild => astChild.inE(EdgeTypes.AST).isEmpty)
-      .foreach { astChild =>
-        val astParentOption: Option[StoredNode] =
-          astChild.astParentType match {
-            case NodeTypes.METHOD          => methodFullNameToNode(astChild.astParentFullName)
-            case NodeTypes.TYPE_DECL       => typeDeclFullNameToNode(astChild.astParentFullName)
-            case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode(astChild.astParentFullName)
-            case _ =>
-              logger.warn(
-                s"Invalid AST_PARENT_TYPE=${astChild.propertyOption(Properties.AST_PARENT_FULL_NAME)};" +
-                  s" astChild LABEL=${astChild.label};" +
-                  s" astChild FULL_NAME=${astChild.propertyOption(Properties.FULL_NAME)}")
-              None
-          }
-
-        astParentOption match {
-          case Some(astParent) =>
-            dstGraph.addEdgeInOriginal(astParent, astChild, EdgeTypes.AST)
-          case None =>
-            logFailedSrcLookup(EdgeTypes.AST,
-                               astChild.astParentType,
-                               astChild.astParentFullName,
-                               astChild.label,
-                               astChild.id.toString)
-        }
+  /**
+    * For the given method or type declaration, determine its parent in the AST
+    * via the AST_PARENT_TYPE and AST_PARENT_FULL_NAME fields and create an
+    * AST edge from the parent to it. AST creation to methods and type declarations
+    * is deferred in frontends in order to allow them to process methods/type-
+    * declarations independently.
+    * */
+  private def addAstEdge(methodOrTypeDecl: HasAstParentType with HasAstParentFullName with StoredNode,
+                         dstGraph: DiffGraph.Builder): Unit = {
+    val astParentOption: Option[StoredNode] =
+      methodOrTypeDecl.astParentType match {
+        case NodeTypes.METHOD          => methodFullNameToNode(cpg, methodOrTypeDecl.astParentFullName)
+        case NodeTypes.TYPE_DECL       => typeDeclFullNameToNode(cpg, methodOrTypeDecl.astParentFullName)
+        case NodeTypes.NAMESPACE_BLOCK => namespaceBlockFullNameToNode(cpg, methodOrTypeDecl.astParentFullName)
+        case _ =>
+          logger.warn(
+            s"Invalid AST_PARENT_TYPE=${methodOrTypeDecl.propertyOption(Properties.AST_PARENT_FULL_NAME)};" +
+              s" astChild LABEL=${methodOrTypeDecl.label};" +
+              s" astChild FULL_NAME=${methodOrTypeDecl.propertyOption(Properties.FULL_NAME)}")
+          None
       }
+
+    astParentOption match {
+      case Some(astParent) =>
+        dstGraph.addEdgeInOriginal(astParent, methodOrTypeDecl, EdgeTypes.AST)
+      case None =>
+        logFailedSrcLookup(EdgeTypes.AST,
+                           methodOrTypeDecl.astParentType,
+                           methodOrTypeDecl.astParentFullName,
+                           methodOrTypeDecl.label,
+                           methodOrTypeDecl.id.toString)
+    }
   }
+
 }
 
 object Linker {
