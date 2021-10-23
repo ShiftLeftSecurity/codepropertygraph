@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{PropertyNames, _}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.passes.linking.linker.Linker.{
+import io.shiftleft.semanticcpg.passes.linking.linker.MethodRefLinker.{
   linkToMultiple,
   linkToSingle,
   methodFullNameToNode,
@@ -99,7 +99,7 @@ class TypeUsagePass(cpg: Cpg) extends CpgPass(cpg) {
 
 class AstLinkerPass(cpg: Cpg) extends CpgPass(cpg) {
 
-  import Linker.{logFailedSrcLookup, logger}
+  import MethodRefLinker.{logFailedSrcLookup, logger}
 
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
@@ -143,12 +143,33 @@ class AstLinkerPass(cpg: Cpg) extends CpgPass(cpg) {
   }
 }
 
+class AliasLinker(cpg: Cpg) extends CpgPass(cpg) {
+  override def run(): Iterator[DiffGraph] = {
+    val dstGraph = DiffGraph.newBuilder
+    // Create ALIAS_OF edges from TYPE_DECL nodes to
+    // TYPE
+    linkToMultiple(
+      cpg,
+      srcLabels = List(NodeTypes.TYPE_DECL),
+      dstNodeLabel = NodeTypes.TYPE,
+      edgeType = EdgeTypes.ALIAS_OF,
+      dstNodeMap = typeFullNameToNode(cpg, _),
+      getDstFullNames = (srcNode: TypeDecl) => {
+        srcNode.aliasTypeFullName
+      },
+      dstFullNameKey = PropertyNames.ALIAS_TYPE_FULL_NAME,
+      dstGraph
+    )
+    Iterator(dstGraph.build())
+  }
+}
+
 /**
   * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
   * language frontends which do not provide method stubs and type decl stubs.
   */
-class Linker(cpg: Cpg) extends CpgPass(cpg) {
-  import Linker.linkToSingle
+class MethodRefLinker(cpg: Cpg) extends CpgPass(cpg) {
+  import MethodRefLinker.linkToSingle
 
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
@@ -167,29 +188,13 @@ class Linker(cpg: Cpg) extends CpgPass(cpg) {
       None
     )
 
-    // Create ALIAS_OF edges from TYPE_DECL nodes to
-    // TYPE
-
-    linkToMultiple(
-      cpg,
-      srcLabels = List(NodeTypes.TYPE_DECL),
-      dstNodeLabel = NodeTypes.TYPE,
-      edgeType = EdgeTypes.ALIAS_OF,
-      dstNodeMap = typeFullNameToNode(cpg, _),
-      getDstFullNames = (srcNode: TypeDecl) => {
-        srcNode.aliasTypeFullName
-      },
-      dstFullNameKey = PropertyNames.ALIAS_TYPE_FULL_NAME,
-      dstGraph
-    )
-
     Iterator(dstGraph.build())
   }
 
 }
 
-object Linker {
-  val logger: Logger = LoggerFactory.getLogger(classOf[Linker])
+object MethodRefLinker {
+  val logger: Logger = LoggerFactory.getLogger(classOf[MethodRefLinker])
 
   def typeDeclFullNameToNode(cpg: Cpg, x: String): Option[TypeDecl] =
     nodesWithFullName(cpg, x).collectFirst { case x: TypeDecl => x }
