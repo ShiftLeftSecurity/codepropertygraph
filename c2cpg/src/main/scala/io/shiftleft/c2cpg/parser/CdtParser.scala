@@ -51,7 +51,7 @@ class CdtParser(private val parseConfig: ParserConfig, private val headerFileFin
 
   private def parseInternal(file: Path): ParseResult = {
     val (result, duration) = TimeUtils.time {
-      val fileContent = IOUtils.readFile(file)
+      val fileContent = IOUtils.readFileAsFileContent(file)
       val fileContentProvider = new CustomFileContentProvider(headerFileFinder)
       val lang = createParseLanguage(file)
       Try(
