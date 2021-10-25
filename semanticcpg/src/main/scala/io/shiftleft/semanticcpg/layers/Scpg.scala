@@ -4,27 +4,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes, PropertyNames}
 import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
-import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
-import io.shiftleft.semanticcpg.passes.compat.argumentcompat.ArgumentCompat
-import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
-import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.MethodStubCreator
-import io.shiftleft.semanticcpg.passes.linking.calllinker.StaticCallLinker
-import io.shiftleft.semanticcpg.passes.linking.filecompat.FileNameCompat
-import io.shiftleft.semanticcpg.passes.linking.linker.{
-  AliasLinker,
-  AstLinkerPass,
-  MethodRefLinker,
-  TypeHierarchyPass,
-  TypeUsagePass
-}
-import io.shiftleft.semanticcpg.passes.methoddecorations.MethodDecoratorPass
-import io.shiftleft.semanticcpg.passes.methodexternaldecorator.MethodExternalDecoratorPass
-import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
-import io.shiftleft.semanticcpg.passes.receiveredges.ReceiverEdgePass
-import io.shiftleft.semanticcpg.passes.trim.TrimPass
-import io.shiftleft.semanticcpg.passes.typenodes.TypeDeclStubCreator
-import io.shiftleft.semanticcpg.passes.{CfgCreationPass, FileCreationPass}
 
 import scala.annotation.nowarn
 
@@ -56,171 +35,21 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
   }
 
   private def createEnhancementExecList(cpg: Cpg, language: String): Iterator[CpgPassBase] = {
+
+    def defaultPasses =
+      Base.passes(cpg) ++ ControlFlow.passes(cpg) ++
+        TypeRelations.passes(cpg) ++ CallGraph.passes(cpg)
+
     language match {
-      case Languages.JAVA =>
-        Iterator(
-          new ArgumentCompat(cpg),
-          new ReceiverEdgePass(cpg),
-          new MethodDecoratorPass(cpg),
-          new AstLinkerPass(cpg),
-          new TypeUsagePass(cpg),
-          new TypeHierarchyPass(cpg),
-          new AliasLinker(cpg),
-          new MethodRefLinker(cpg),
-          new FileNameCompat(cpg),
-          new FileCreationPass(cpg),
-          new StaticCallLinker(cpg),
-          new MethodExternalDecoratorPass(cpg),
-          new ContainsEdgePass(cpg),
-          new NamespaceCreator(cpg),
-          new CfgDominatorPass(cpg),
-          new CdgPass(cpg),
-          new TrimPass(cpg),
-        )
-      case Languages.JAVASRC =>
-        Iterator(
-          new CfgCreationPass(cpg),
-          new NamespaceCreator(cpg),
-          new FileCreationPass(cpg),
-          new TypeDeclStubCreator(cpg),
-          new ContainsEdgePass(cpg),
-          new AstLinkerPass(cpg),
-          new TypeUsagePass(cpg),
-          new TypeHierarchyPass(cpg),
-          new AliasLinker(cpg),
-          new MethodRefLinker(cpg),
-          new MethodStubCreator(cpg),
-          new MethodDecoratorPass(cpg),
-          new StaticCallLinker(cpg),
-          new CfgDominatorPass(cpg),
-          new CdgPass(cpg)
-        )
-      case Languages.C =>
-        Iterator(
-          new TypeDeclStubCreator(cpg),
-          new MethodStubCreator(cpg),
-          new MethodDecoratorPass(cpg),
-          new AstLinkerPass(cpg),
-          new TypeUsagePass(cpg),
-          new TypeHierarchyPass(cpg),
-          new AliasLinker(cpg),
-          new MethodRefLinker(cpg),
-          new FileCreationPass(cpg),
-          new StaticCallLinker(cpg),
-          new MethodExternalDecoratorPass(cpg),
-          new ContainsEdgePass(cpg),
-          new NamespaceCreator(cpg),
-          new CfgDominatorPass(cpg),
-          new CdgPass(cpg),
-        )
-      case Languages.LLVM =>
-        Iterator(
-          new TypeDeclStubCreator(cpg),
-          new MethodStubCreator(cpg),
-          new MethodDecoratorPass(cpg),
-          new AstLinkerPass(cpg),
-          new TypeUsagePass(cpg),
-          new TypeHierarchyPass(cpg),
-          new AliasLinker(cpg),
-          new MethodRefLinker(cpg),
-          new FileNameCompat(cpg),
-          new FileCreationPass(cpg),
-          new StaticCallLinker(cpg),
-          new MethodExternalDecoratorPass(cpg),
-          new ContainsEdgePass(cpg),
-          new NamespaceCreator(cpg),
-          new CfgDominatorPass(cpg),
-          new CdgPass(cpg),
-        )
-      case Languages.JAVASCRIPT =>
-        Iterator(
-          new CfgCreationPass(cpg),
-          new ArgumentCompat(cpg),
-          new MethodStubCreator(cpg),
-          new MethodDecoratorPass(cpg),
-          new AstLinkerPass(cpg),
-          new TypeUsagePass(cpg),
-          new TypeHierarchyPass(cpg),
-          new AliasLinker(cpg),
-          new MethodRefLinker(cpg),
-          new FileNameCompat(cpg),
-          new FileCreationPass(cpg),
-          new ContainsEdgePass(cpg),
-          new MethodExternalDecoratorPass(cpg),
-          new CfgDominatorPass(cpg),
-          new CdgPass(cpg),
-          new NamespaceCreator(cpg),
-        )
-      case Languages.PYTHON =>
-        Iterator(
-          new MethodStubCreator(cpg),
-          new MethodDecoratorPass(cpg),
-          new AstLinkerPass(cpg),
-          new TypeUsagePass(cpg),
-          new TypeHierarchyPass(cpg),
-          new AliasLinker(cpg),
-          new MethodRefLinker(cpg),
-          new FileNameCompat(cpg),
-          new FileCreationPass(cpg),
-          new ContainsEdgePass(cpg),
-          new MethodExternalDecoratorPass(cpg),
-          new CfgDominatorPass(cpg),
-          new CdgPass(cpg),
-          new NamespaceCreator(cpg),
-        )
-      case Languages.FUZZY_TEST_LANG =>
-        Iterator(
-          new CfgCreationPass(cpg),
-          new MethodStubCreator(cpg),
-          new MethodDecoratorPass(cpg),
-          new AstLinkerPass(cpg),
-          new TypeUsagePass(cpg),
-          new TypeHierarchyPass(cpg),
-          new AliasLinker(cpg),
-          new MethodRefLinker(cpg),
-          new FileNameCompat(cpg),
-          new FileCreationPass(cpg),
-          new ContainsEdgePass(cpg),
-          new MethodExternalDecoratorPass(cpg),
-          new CfgDominatorPass(cpg),
-          new CdgPass(cpg),
-          new NamespaceCreator(cpg),
-        )
-      case Languages.KOTLIN =>
-        Iterator(
-          new CfgCreationPass(cpg),
-          new TypeDeclStubCreator(cpg),
-          new MethodDecoratorPass(cpg),
-          new AstLinkerPass(cpg),
-          new TypeUsagePass(cpg),
-          new TypeHierarchyPass(cpg),
-          new AliasLinker(cpg),
-          new MethodRefLinker(cpg),
-          new StaticCallLinker(cpg),
-          new FileCreationPass(cpg),
-          new ContainsEdgePass(cpg),
-          new CfgDominatorPass(cpg),
-          new CdgPass(cpg),
-          new NamespaceCreator(cpg),
-        )
-      case Languages.NEWC =>
-        Base.passes(cpg) ++ ControlFlow.passes(cpg) ++ TypeRelations.passes(cpg) ++ CallGraph.passes(cpg)
-      case Languages.GHIDRA =>
-        Iterator(
-          new MethodStubCreator(cpg),
-          new MethodDecoratorPass(cpg),
-          new AstLinkerPass(cpg),
-          new TypeUsagePass(cpg),
-          new TypeHierarchyPass(cpg),
-          new AliasLinker(cpg),
-          new MethodRefLinker(cpg),
-          new FileCreationPass(cpg),
-          new StaticCallLinker(cpg),
-          new MethodExternalDecoratorPass(cpg),
-          new ContainsEdgePass(cpg),
-          new NamespaceCreator(cpg)
-        )
-      case _ => Iterator()
+      case Languages.JAVASRC         => defaultPasses
+      case Languages.C               => defaultPasses
+      case Languages.LLVM            => defaultPasses
+      case Languages.JAVASCRIPT      => defaultPasses
+      case Languages.FUZZY_TEST_LANG => defaultPasses
+      case Languages.KOTLIN          => defaultPasses
+      case Languages.NEWC            => defaultPasses
+      case Languages.GHIDRA          => defaultPasses
+      case _                         => defaultPasses
     }
   }
 
