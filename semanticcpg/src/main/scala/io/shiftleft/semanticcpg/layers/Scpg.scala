@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{Languages, NodeTypes, PropertyNames}
 import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.passes.CfgCreationPass
 
 import scala.annotation.nowarn
 
@@ -43,12 +44,13 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
     language match {
       case Languages.JAVASRC         => defaultPasses
       case Languages.C               => defaultPasses
-      case Languages.LLVM            => defaultPasses
       case Languages.JAVASCRIPT      => defaultPasses
       case Languages.FUZZY_TEST_LANG => defaultPasses
       case Languages.KOTLIN          => defaultPasses
       case Languages.NEWC            => defaultPasses
-      case Languages.GHIDRA          => defaultPasses
+      case Languages.JAVA            => defaultPasses.filterNot(_.isInstanceOf[CfgCreationPass])
+      case Languages.LLVM            => defaultPasses.filterNot(_.isInstanceOf[CfgCreationPass])
+      case Languages.GHIDRA          => defaultPasses.filterNot(_.isInstanceOf[CfgCreationPass])
       case _                         => defaultPasses
     }
   }
