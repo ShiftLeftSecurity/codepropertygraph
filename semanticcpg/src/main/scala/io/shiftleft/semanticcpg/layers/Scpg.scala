@@ -204,22 +204,7 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
           new NamespaceCreator(cpg),
         )
       case Languages.NEWC =>
-        Iterator(
-          new TypeDeclStubCreator(cpg),
-          new MethodStubCreator(cpg),
-          new MethodDecoratorPass(cpg),
-          new AstLinkerPass(cpg),
-          new TypeUsagePass(cpg),
-          new TypeHierarchyPass(cpg),
-          new AliasLinker(cpg),
-          new MethodRefLinker(cpg),
-          new FileCreationPass(cpg),
-          new StaticCallLinker(cpg),
-          new ContainsEdgePass(cpg),
-          new NamespaceCreator(cpg),
-          new CfgDominatorPass(cpg),
-          new CdgPass(cpg),
-        )
+        Base.passes(cpg) ++ ControlFlow.passes(cpg) ++ TypeRelations.passes(cpg) ++ CallGraph.passes(cpg)
       case Languages.GHIDRA =>
         Iterator(
           new MethodStubCreator(cpg),
