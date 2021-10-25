@@ -11,12 +11,12 @@ import io.shiftleft.semanticcpg.passes.cfgcreation.Cfg.CfgEdgeType
 
 import scala.jdk.CollectionConverters._
 
-class CpgCfgFixture(code: String) {
+class CpgCfgFixture(code: String, fileExtension: String = ".c") {
 
   private val cpg: Cpg = Cpg.emptyCpg
 
   File.usingTemporaryDirectory("c2cpgtest") { dir =>
-    val file1 = dir / "file1.c"
+    val file1 = dir / s"file1$fileExtension"
     file1.write(s"RET func() { $code }")
     val filenames = List(file1.path.toAbsolutePath.toString)
     new AstCreationPass(filenames, cpg, None, Config()).createAndApply()
