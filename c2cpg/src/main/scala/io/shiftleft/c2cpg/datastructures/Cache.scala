@@ -4,18 +4,14 @@ import java.util.concurrent.ConcurrentHashMap
 import scala.jdk.CollectionConverters._
 
 object Cache {
-  val DEFAULT_INITIAL_CAPACITY = 10000000
+  val DEFAULT_INITIAL_CAPACITY = 1000
   val DEFAULT_CONCURRENCY_LEVEL = 8
   val DEFAULT_LOAD_FACTOR = 0.75f
 }
 
-class Cache[K, V](initialCapacity: Int, loadFactor: Float, concurrencyLevel: Int) {
-
-  def this() = this(
-    Cache.DEFAULT_INITIAL_CAPACITY,
-    Cache.DEFAULT_LOAD_FACTOR,
-    Cache.DEFAULT_CONCURRENCY_LEVEL
-  )
+class Cache[K, V](initialCapacity: Int = Cache.DEFAULT_INITIAL_CAPACITY,
+                  loadFactor: Float = Cache.DEFAULT_LOAD_FACTOR,
+                  concurrencyLevel: Int = Cache.DEFAULT_CONCURRENCY_LEVEL) {
 
   private val cache = new ConcurrentHashMap[K, LazyWrapper[V]](initialCapacity, loadFactor, concurrencyLevel).asScala
 
@@ -38,13 +34,9 @@ class Cache[K, V](initialCapacity: Int, loadFactor: Float, concurrencyLevel: Int
     cache.clear()
   }
 
-  private def wrap[T](value: => T): LazyWrapper[T] = {
-    new LazyWrapper[T](value)
-  }
+  private def wrap[T](value: => T): LazyWrapper[T] = new LazyWrapper[T](value)
 
-  private def unwrap[T](lazyWrapper: LazyWrapper[T]): T = {
-    lazyWrapper.value
-  }
+  private def unwrap[T](lazyWrapper: LazyWrapper[T]): T = lazyWrapper.value
 }
 
 class LazyWrapper[T](wrapped: => T) {

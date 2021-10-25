@@ -2,7 +2,7 @@ package io.shiftleft.c2cpg.astcreation
 
 import io.shiftleft.c2cpg.C2Cpg
 import io.shiftleft.c2cpg.datastructures.Stack._
-import io.shiftleft.c2cpg.datastructures.{Global, Scope}
+import io.shiftleft.c2cpg.datastructures.{Cache, Global, Scope}
 import io.shiftleft.c2cpg.parser.FileDefaults
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EvaluationStrategies, NodeTypes}
@@ -86,12 +86,12 @@ class AstCreator(val filename: String,
       val r =
         if (FileDefaults
               .isHeaderFile(filename) && filename != this.filename && linenumber.isDefined && columnnumber.isDefined) {
-          global.headerAsts.getOrElseUpdate(
-            (filename, linenumber.get, columnnumber.get), {
+          global.headerAsts
+            .getOrElseUpdate(filename, new Cache())
+            .getOrElseUpdate((linenumber.get, columnnumber.get), {
               astsForDeclaration(stmt, currOrder).foreach(Ast.storeInDiffGraph(_, diffGraph))
               true
-            }
-          )
+            })
           Seq.empty
         } else {
           astsForDeclaration(stmt, currOrder)
