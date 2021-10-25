@@ -225,10 +225,15 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
     * once the CFG for the entire method has been calculated.
     * */
   protected def cfgForGotoStatement(node: ControlStructure): Cfg = {
-    // TODO: the goto node should contain a field for the target so that
-    // we can avoid the brittle split/slice operation here
-    val target = node.code.split(" ").lastOption.map(x => x.slice(0, x.length - 1))
-    target.map(t => Cfg(entryNode = Some(node), jumpsToLabel = List((node, t)))).getOrElse(Cfg.empty)
+    node.astChildren.find(_.order == 1) match {
+      case Some(jumpLabel) =>
+        val labelName = jumpLabel.asInstanceOf[JumpLabel].name
+        Cfg(entryNode = Some(node), jumpsToLabel = List((node, labelName)))
+      case None =>
+        // Support for old format where the label name is parsed from the code field.
+        val target = node.code.split(" ").lastOption.map(x => x.slice(0, x.length - 1))
+        target.map(t => Cfg(entryNode = Some(node), jumpsToLabel = List((node, t)))).getOrElse(Cfg.empty)
+    }
   }
 
   /**
