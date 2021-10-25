@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.fuzzyc2cpg.passes.{AstCreationPass, StubRemovalPass}
 import io.shiftleft.passes.IntervalKeyPool
-import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
 import io.shiftleft.x2cpg.X2Cpg.newEmptyCpg
@@ -82,7 +81,6 @@ class FuzzyC2Cpg() {
     new MetaDataPass(cpg, Languages.C, Some(metaDataKeyPool)).createAndApply()
     val astCreator = new AstCreationPass(sourceFileNames, cpg, functionKeyPool)
     astCreator.createAndApply()
-    new CfgCreationPass(cpg).createAndApply()
     new StubRemovalPass(cpg).createAndApply()
     new TypeNodePass(astCreator.global.usedTypes.keys().asScala.toList, cpg, Some(typesKeyPool)).createAndApply()
     cpg
