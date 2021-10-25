@@ -1,6 +1,5 @@
 package io.shiftleft.c2cpg.astcreation
 
-import io.shiftleft.c2cpg.datastructures.Global
 import io.shiftleft.c2cpg.utils.IOUtils
 import io.shiftleft.codepropertygraph.generated.DispatchTypes
 import io.shiftleft.x2cpg.Ast
@@ -100,7 +99,7 @@ trait AstCreatorHelper {
 
   protected def registerType(typeName: String): String = {
     val fixedTypeName = fixQualifiedName(typeName)
-    Global.usedTypes.putIfAbsent(fixedTypeName, true)
+    global.usedTypes.putIfAbsent(fixedTypeName, true)
     fixedTypeName
   }
 

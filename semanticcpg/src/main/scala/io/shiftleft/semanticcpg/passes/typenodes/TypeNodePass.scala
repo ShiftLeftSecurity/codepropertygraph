@@ -7,7 +7,7 @@ import io.shiftleft.passes.{CpgPass, DiffGraph, KeyPool}
 /**
   * Creates a `TYPE` node for each type in `usedTypes`
   * */
-class TypeNodePass(usedTypes: List[String], cpg: Cpg, keyPool: Option[KeyPool] = None)
+class TypeNodePass(usedTypes: Seq[String], cpg: Cpg, keyPool: Option[KeyPool] = None)
     extends CpgPass(cpg, "types", keyPool) {
   override def run(): Iterator[DiffGraph] = {
     val diffGraph = DiffGraph.newBuilder

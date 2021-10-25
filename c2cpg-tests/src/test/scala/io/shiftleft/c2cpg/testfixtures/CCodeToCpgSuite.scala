@@ -2,7 +2,6 @@ package io.shiftleft.c2cpg.testfixtures
 
 import io.shiftleft.c2cpg.C2Cpg
 import io.shiftleft.c2cpg.C2Cpg.Config
-import io.shiftleft.c2cpg.datastructures.Global
 import io.shiftleft.c2cpg.parser.FileDefaults
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.testfixtures.{CodeToCpgFixture, LanguageFrontend}
@@ -22,11 +21,4 @@ class C2CpgFrontend(override val fileSuffix: String = FileDefaults.C_EXT) extend
   }
 }
 
-class CCodeToCpgSuite(fileSuffix: String = FileDefaults.C_EXT) extends CodeToCpgFixture(new C2CpgFrontend(fileSuffix)) {
-
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-    Global.usedTypes.clear()
-  }
-
-}
+class CCodeToCpgSuite(fileSuffix: String = FileDefaults.C_EXT) extends CodeToCpgFixture(new C2CpgFrontend(fileSuffix))

@@ -1,8 +1,9 @@
 package io.shiftleft.c2cpg.astcreation
 
 import io.shiftleft.c2cpg.C2Cpg
-import io.shiftleft.c2cpg.datastructures.Scope
 import io.shiftleft.c2cpg.datastructures.Stack._
+import io.shiftleft.c2cpg.datastructures.{Global, Scope}
+import io.shiftleft.c2cpg.parser.FileDefaults
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EvaluationStrategies, NodeTypes}
 import io.shiftleft.passes.DiffGraph
@@ -16,6 +17,7 @@ import scala.collection.mutable
 
 class AstCreator(val filename: String,
                  val config: C2Cpg.Config,
+                 val global: Global,
                  val diffGraph: DiffGraph.Builder,
                  val parserResult: IASTTranslationUnit)
     extends AstForTypesCreator
@@ -77,10 +79,26 @@ class AstCreator(val filename: String,
 
     var currOrder = 1
     val declsAsts = iASTTranslationUnit.getDeclarations.flatMap { stmt =>
-      val r = astsForDeclaration(stmt, currOrder)
+      val linenumber = line(stmt)
+      val columnnumber = column(stmt)
+      val filename = fileName(stmt)
+
+      val r =
+        if (FileDefaults
+              .isHeaderFile(filename) && filename != this.filename && linenumber.isDefined && columnnumber.isDefined) {
+          global.headerAsts.getOrElseUpdate(
+            (filename, linenumber.get, columnnumber.get), {
+              astsForDeclaration(stmt, currOrder).foreach(Ast.storeInDiffGraph(_, diffGraph))
+              true
+            }
+          )
+          Seq.empty
+        } else {
+          astsForDeclaration(stmt, currOrder)
+        }
       currOrder = currOrder + r.length
       r
-    }.toIndexedSeq
+    }.toSeq
 
     val methodReturn = NewMethodReturn()
       .code("RET")

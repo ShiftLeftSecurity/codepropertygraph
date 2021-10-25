@@ -17,15 +17,23 @@ class AstCreationPass(filenames: List[String],
                       headerFileFinder: HeaderFileFinder = null)
     extends ConcurrentWriterCpgPass[String](cpg, keyPool = keyPool) {
 
-  def usedTypes(): List[String] =
-    Global.usedTypes.keys.filterNot(_ == Defines.anyTypeName).toList
+  private val global: Global = new Global()
+
+  def usedTypes(): Seq[String] =
+    global.usedTypes.keys().filterNot(_ == Defines.anyTypeName)
+
+  def hasHeaderContentAndClear: Boolean = {
+    val r = global.headerAsts.nonEmpty
+    global.headerAsts.clear()
+    r
+  }
 
   override def generateParts(): Array[String] = filenames.toArray
 
   override def runOnPart(diffGraph: DiffGraph.Builder, filename: String): Unit =
     new CdtParser(parseConfig, headerFileFinder).parse(Paths.get(filename)).foreach { parserResult =>
       val localDiff = DiffGraph.newBuilder
-      new AstCreator(filename, config, localDiff, parserResult).createAst()
+      new AstCreator(filename, config, global, localDiff, parserResult).createAst()
       diffGraph.moveFrom(localDiff)
     }
 
