@@ -305,16 +305,20 @@ object Ast extends SchemaBase {
 
     val controlStructureTypes = builder.addConstants(
       category = "ControlStructureTypes",
-      Constant(name = "BREAK", value = "BREAK", valueType = ValueTypes.STRING,
-        comment =
-          """Represents a break statement. Labeled breaks are expected to have a JUMP_LABEL
-            |node AST child with ORDER 1""".stripMargin)
-        .protoId(1),
-      Constant(name = "CONTINUE",
-               value = "CONTINUE",
-               valueType = ValueTypes.STRING,
-               comment = """Represents a continue statement. Labeled continues are expected to have a JUMP_LABEL
-                           |node AST child with ORDER 1""".stripMargin).protoId(2),
+      Constant(
+        name = "BREAK",
+        value = "BREAK",
+        valueType = ValueTypes.STRING,
+        comment = """Represents a break statement. Labeled breaks are expected to have a JUMP_LABEL
+            |node AST child with ORDER 1""".stripMargin
+      ).protoId(1),
+      Constant(
+        name = "CONTINUE",
+        value = "CONTINUE",
+        valueType = ValueTypes.STRING,
+        comment = """Represents a continue statement. Labeled continues are expected to have a JUMP_LABEL
+                           |node AST child with ORDER 1""".stripMargin
+      ).protoId(2),
       Constant(name = "WHILE", value = "WHILE", valueType = ValueTypes.STRING, comment = "Represents a while statement")
         .protoId(3),
       Constant(name = "DO", value = "DO", valueType = ValueTypes.STRING, comment = "Represents a do statement")
