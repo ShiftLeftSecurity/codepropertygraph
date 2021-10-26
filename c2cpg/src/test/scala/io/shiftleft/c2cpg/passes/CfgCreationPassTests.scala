@@ -438,4 +438,38 @@ class CfgCreationPassTests extends AnyWordSpec with Matchers {
     }
   }
 
+  "Cfg for try" should {
+    "be correct for try with a single catch" in new CpgCfgFixture(
+      "try { a; } catch (int x) { b; }",
+      fileExtension = ".cpp"
+    ) {
+      succOf("RET func ()") shouldBe expected(("a", AlwaysEdge))
+      succOf("a") shouldBe expected(("b", AlwaysEdge), ("RET", AlwaysEdge))
+      succOf("b") shouldBe expected(("RET", AlwaysEdge))
+    }
+
+    "be correct for try with multiple catches" in new CpgCfgFixture(
+      """
+        |try {
+        |  a;
+        |} catch (short x) {
+        |  b;
+        |} catch (int y) {
+        |  c;
+        |} catch (long z) {
+        |  d;
+        |}
+        |""".stripMargin,
+      fileExtension = ".cpp"
+    ) {
+
+      succOf("RET func ()") shouldBe expected(("a", AlwaysEdge))
+      // Try should have an edge to all catches and return
+      succOf("a") shouldBe expected(("b", AlwaysEdge), ("c", AlwaysEdge), ("d", AlwaysEdge), ("RET", AlwaysEdge))
+      // But catches should only have edges to return
+      succOf("b") shouldBe expected(("RET", AlwaysEdge))
+      succOf("c") shouldBe expected(("RET", AlwaysEdge))
+      succOf("d") shouldBe expected(("RET", AlwaysEdge))
+    }
+  }
 }

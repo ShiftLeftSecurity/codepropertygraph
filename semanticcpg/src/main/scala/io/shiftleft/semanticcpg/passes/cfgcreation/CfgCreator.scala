@@ -456,39 +456,85 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
   /**
     * CFG creation for try statements of the form `try { tryBody ] catch { catchBody } `, optionally
     * followed by `finally { finallyBody }`.
+    *
+    * To avoid very large CFGs for try statements, only edges from the last statement in the `try` block
+    * to each `catch` block (and optionally the `finally` block) are created. The last statement in each
+    * `catch` block should then have an outgoing edge to the `finally` block if it exists (and not to any
+    * subsequent catch blocks), or otherwise * be part of the fringe.
+    *
+    * By default, the first child of the `TRY` node is treated as the try body, while every subsequent
+    * node is treated as a `catch`, with no `finally` present. To treat the last child of the node as the
+    * `finally` block, the `code` field of the `Block` node must be set to `finally`.
     * */
   protected def cfgForTryStatement(node: ControlStructure): Cfg = {
-    val tryBodyCfg =
+    val maybeTryBlock =
       Traversal
         .fromSingle(node)
         .astChildren
         .where(_.order(1))
+        .where(_.astChildren) // Filter out empty `try` bodies
         .headOption
+
+    val tryBodyCfg: Cfg =
+      maybeTryBlock
         .map(cfgFor)
         .getOrElse(Cfg.empty)
 
-    val catchBodyCfg = Traversal.fromSingle(node).whenTrue.headOption.map(cfgFor).getOrElse(Cfg.empty)
+    val catchBodyCfgs: List[Cfg] =
+      Traversal
+        .fromSingle(node)
+        .astChildren
+        .where(_.orderGt(1))
+        .where(_.codeNot("finally"))
+        .toList match {
+        case Nil  => List(Cfg.empty)
+        case asts => asts.map(cfgFor)
+      }
 
-    val finallyBodyCfg =
-      Traversal.fromSingle(node).whenFalse.headOption.map(cfgFor).getOrElse(Cfg.empty)
+    val maybeFinallyBodyCfg: List[Cfg] =
+      Traversal
+        .fromSingle(node)
+        .astChildren
+        .where(_.codeExact("finally"))
+        .map(cfgFor)
+        .headOption // Assume there can only be one
+        .toList
 
-    val diffGraphs = edgesFromFringeTo(tryBodyCfg, catchBodyCfg.entryNode) ++
-      edgesFromFringeTo(tryBodyCfg, finallyBodyCfg.entryNode) ++
-      edgesFromFringeTo(catchBodyCfg, finallyBodyCfg.entryNode)
+    val tryToCatchEdges = catchBodyCfgs.flatMap { catchBodyCfg =>
+      edgesFromFringeTo(tryBodyCfg, catchBodyCfg.entryNode)
+    }
 
-    Cfg
-      .from(tryBodyCfg, catchBodyCfg, finallyBodyCfg)
-      .copy(
-        entryNode = tryBodyCfg.entryNode,
-        edges = diffGraphs ++ tryBodyCfg.edges ++ catchBodyCfg.edges ++ finallyBodyCfg.edges,
-        fringe = if (finallyBodyCfg.entryNode.isDefined) {
-          finallyBodyCfg.fringe
-        } else {
-          tryBodyCfg.fringe ++ catchBodyCfg.fringe
-        }
-      )
+    val catchToFinallyEdges = (
+      for (catchBodyCfg <- catchBodyCfgs;
+           finallyBodyCfg <- maybeFinallyBodyCfg) yield edgesFromFringeTo(catchBodyCfg, finallyBodyCfg.entryNode)
+    ).flatten
+
+    val tryToFinallyEdges = maybeFinallyBodyCfg.flatMap { cfg =>
+      edgesFromFringeTo(tryBodyCfg, cfg.entryNode)
+    }
+
+    val diffGraphs = tryToCatchEdges ++ catchToFinallyEdges ++ tryToFinallyEdges
+
+    if (maybeTryBlock.isEmpty) {
+      // This case deals with the situation where the try block is empty. In this case,
+      // no catch block can be executed since nothing can be thrown, but the finally block
+      // will still be executed.
+      maybeFinallyBodyCfg.headOption.getOrElse(Cfg.empty)
+    } else {
+      Cfg
+        .from(Seq(tryBodyCfg) ++ catchBodyCfgs ++ maybeFinallyBodyCfg: _*)
+        .copy(
+          entryNode = tryBodyCfg.entryNode,
+          edges = diffGraphs ++ tryBodyCfg.edges ++ catchBodyCfgs.flatMap(_.edges) ++ maybeFinallyBodyCfg.flatMap(
+            _.edges),
+          fringe = if (maybeFinallyBodyCfg.flatMap(_.entryNode).nonEmpty) {
+            maybeFinallyBodyCfg.head.fringe
+          } else {
+            tryBodyCfg.fringe ++ catchBodyCfgs.flatMap(_.fringe)
+          }
+        )
+    }
   }
-
 }
 
 object CfgCreator {
