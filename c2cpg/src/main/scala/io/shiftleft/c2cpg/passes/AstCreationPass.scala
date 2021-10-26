@@ -8,6 +8,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.{ConcurrentWriterCpgPass, DiffGraph, IntervalKeyPool}
 
 import java.nio.file.Paths
+import scala.jdk.CollectionConverters._
 
 class AstCreationPass(filenames: List[String],
                       cpg: Cpg,
@@ -20,10 +21,10 @@ class AstCreationPass(filenames: List[String],
   private val global: Global = new Global()
 
   def usedTypes(): Seq[String] =
-    global.usedTypes.keys().filterNot(_ == Defines.anyTypeName)
+    global.usedTypes.keys().asScala.filterNot(_ == Defines.anyTypeName).toSeq
 
   def hasHeaderContentAndClear: Boolean = {
-    val r = global.headerAstCache.nonEmpty
+    val r = !global.headerAstCache.isEmpty
     global.headerAstCache.clear()
     r
   }

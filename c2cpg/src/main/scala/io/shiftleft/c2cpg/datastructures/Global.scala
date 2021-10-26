@@ -1,9 +1,13 @@
 package io.shiftleft.c2cpg.datastructures
 
+import java.util.concurrent.ConcurrentHashMap
+
 class Global {
 
-  val usedTypes: Cache[String, Boolean] = new Cache()
+  val usedTypes: ConcurrentHashMap[String, Boolean] =
+    new ConcurrentHashMap()
 
-  val headerAstCache: Cache[String, Cache[(Integer, Integer), Boolean]] = new Cache(initialCapacity = 100000)
+  val headerAstCache: ConcurrentHashMap[String, ConcurrentHashMap[(Integer, Integer), Boolean]] =
+    new ConcurrentHashMap()
 
 }

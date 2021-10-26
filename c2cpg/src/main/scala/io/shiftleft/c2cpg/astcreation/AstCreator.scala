@@ -2,7 +2,7 @@ package io.shiftleft.c2cpg.astcreation
 
 import io.shiftleft.c2cpg.C2Cpg
 import io.shiftleft.c2cpg.datastructures.Stack._
-import io.shiftleft.c2cpg.datastructures.{Cache, Global, Scope}
+import io.shiftleft.c2cpg.datastructures.{Global, Scope}
 import io.shiftleft.c2cpg.parser.FileDefaults
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EvaluationStrategies, NodeTypes}
@@ -13,6 +13,7 @@ import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit
 import org.slf4j.{Logger, LoggerFactory}
 
+import java.util.concurrent.ConcurrentHashMap
 import scala.collection.mutable
 
 class AstCreator(val filename: String,
@@ -87,8 +88,8 @@ class AstCreator(val filename: String,
         if (FileDefaults
               .isHeaderFile(filename) && filename != this.filename && linenumber.isDefined && columnnumber.isDefined) {
           global.headerAstCache
-            .computeIfAbsent(filename, new Cache())
-            .computeIfAbsent((linenumber.get, columnnumber.get), {
+            .computeIfAbsent(filename, _ => new ConcurrentHashMap())
+            .computeIfAbsent((linenumber.get, columnnumber.get), _ => {
               astsForDeclaration(stmt, currOrder).foreach(Ast.storeInDiffGraph(_, diffGraph))
               true
             })
