@@ -23,12 +23,6 @@ class AstCreationPass(filenames: List[String],
   def usedTypes(): Seq[String] =
     global.usedTypes.keys().asScala.filterNot(_ == Defines.anyTypeName).toSeq
 
-  def hasHeaderContentAndClear: Boolean = {
-    val r = Global.headerAstCache.nonEmpty
-    Global.headerAstCache.clear()
-    r
-  }
-
   override def generateParts(): Array[String] = filenames.toArray
 
   override def runOnPart(diffGraph: DiffGraph.Builder, filename: String): Unit =

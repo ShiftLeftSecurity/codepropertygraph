@@ -47,7 +47,7 @@ class C2Cpg {
     val astCreationPass =
       new AstCreationPass(sourceFileNames, cpg, Some(astKeyPool), config, createParserConfig(config), headerFileFinder)
     astCreationPass.createAndApply()
-    new HeaderContentPass(cpg, astCreationPass.hasHeaderContentAndClear, config.inputPaths.head).createAndApply()
+    new HeaderContentPass(cpg, config.inputPaths.head).createAndApply()
     new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
     cpg
   }
