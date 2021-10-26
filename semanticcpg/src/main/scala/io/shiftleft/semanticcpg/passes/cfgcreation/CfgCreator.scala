@@ -495,7 +495,7 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
       Traversal
         .fromSingle(node)
         .astChildren
-        .where(_.code("finally"))
+        .where(_.codeExact("finally"))
         .map(cfgFor)
         .headOption // Assume there can only be one
         .toList
