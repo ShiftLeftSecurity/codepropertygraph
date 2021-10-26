@@ -86,9 +86,9 @@ class AstCreator(val filename: String,
       val r =
         if (FileDefaults
               .isHeaderFile(filename) && filename != this.filename && linenumber.isDefined && columnnumber.isDefined) {
-          global.headerAsts
-            .getOrElseUpdate(filename, new Cache())
-            .getOrElseUpdate((linenumber.get, columnnumber.get), {
+          global.headerAstCache
+            .computeIfAbsent(filename, new Cache())
+            .computeIfAbsent((linenumber.get, columnnumber.get), {
               astsForDeclaration(stmt, currOrder).foreach(Ast.storeInDiffGraph(_, diffGraph))
               true
             })

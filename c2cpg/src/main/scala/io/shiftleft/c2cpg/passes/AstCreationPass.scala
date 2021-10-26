@@ -23,8 +23,8 @@ class AstCreationPass(filenames: List[String],
     global.usedTypes.keys().filterNot(_ == Defines.anyTypeName)
 
   def hasHeaderContentAndClear: Boolean = {
-    val r = global.headerAsts.nonEmpty
-    global.headerAsts.clear()
+    val r = global.headerAstCache.nonEmpty
+    global.headerAstCache.clear()
     r
   }
 

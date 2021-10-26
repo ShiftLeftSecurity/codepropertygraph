@@ -4,8 +4,8 @@ import java.util.concurrent.ConcurrentHashMap
 import scala.jdk.CollectionConverters._
 
 object Cache {
-  val DEFAULT_INITIAL_CAPACITY = 1000
-  val DEFAULT_CONCURRENCY_LEVEL = 8
+  val DEFAULT_INITIAL_CAPACITY = 100
+  val DEFAULT_CONCURRENCY_LEVEL = 16
   val DEFAULT_LOAD_FACTOR = 0.75f
 }
 
@@ -13,32 +13,22 @@ class Cache[K, V](initialCapacity: Int = Cache.DEFAULT_INITIAL_CAPACITY,
                   loadFactor: Float = Cache.DEFAULT_LOAD_FACTOR,
                   concurrencyLevel: Int = Cache.DEFAULT_CONCURRENCY_LEVEL) {
 
-  private val cache = new ConcurrentHashMap[K, LazyWrapper[V]](initialCapacity, loadFactor, concurrencyLevel).asScala
+  private val cache = new ConcurrentHashMap[K, V](initialCapacity, loadFactor, concurrencyLevel)
 
-  def putIfAbsent(key: K, value: V): Option[V] = {
-    cache.putIfAbsent(key, wrap(value)).map(unwrap)
+  def putIfAbsent(key: K, value: V): Unit = {
+    cache.putIfAbsent(key, value)
   }
 
-  def getOrElseUpdate(key: K, value: => V): V = {
-    val newWrapper = wrap(value)
-    cache.putIfAbsent(key, newWrapper).getOrElse(newWrapper).value
+  def computeIfAbsent(key: K, value: => V): V = {
+    cache.computeIfAbsent(key, _ => value)
   }
 
-  def keys(): Seq[K] = cache.keys.toSeq
+  def keys(): Seq[K] = cache.keys.asScala.toSeq
 
   def isEmpty: Boolean = cache.isEmpty
 
-  def nonEmpty: Boolean = cache.nonEmpty
+  def nonEmpty: Boolean = !isEmpty
 
-  def clear(): Unit = {
-    cache.clear()
-  }
+  def clear(): Unit = cache.clear()
 
-  private def wrap[T](value: => T): LazyWrapper[T] = new LazyWrapper[T](value)
-
-  private def unwrap[T](lazyWrapper: LazyWrapper[T]): T = lazyWrapper.value
-}
-
-class LazyWrapper[T](wrapped: => T) {
-  lazy val value: T = wrapped
 }
