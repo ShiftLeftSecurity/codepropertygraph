@@ -27,21 +27,20 @@ object Global {
                           fromFilename: String,
                           linenumber: Option[Integer],
                           columnnumber: Option[Integer],
-                          astCreatorFunction: () => Seq[Ast]): Seq[Ast] = this.synchronized {
+                          astCreatorFunction: => Seq[Ast]): Seq[Ast] = Global.synchronized {
     if (FileDefaults
           .isHeaderFile(filename) && filename != fromFilename && linenumber.isDefined && columnnumber.isDefined) {
       if (!headerAstCache.contains(filename)) {
-        val value = mutable.HashSet((linenumber.get, columnnumber.get))
-        headerAstCache.put(filename, value)
-        astCreatorFunction().foreach(Ast.storeInDiffGraph(_, diffGraph))
+        headerAstCache.put(filename, mutable.HashSet((linenumber.get, columnnumber.get)))
+        astCreatorFunction.foreach(Ast.storeInDiffGraph(_, diffGraph))
       } else {
         if (!headerAstCache(filename).contains((linenumber.get, columnnumber.get))) {
           headerAstCache(filename).add((linenumber.get, columnnumber.get))
-          astCreatorFunction().foreach(Ast.storeInDiffGraph(_, diffGraph))
+          astCreatorFunction.foreach(Ast.storeInDiffGraph(_, diffGraph))
         }
       }
       Seq.empty
-    } else { astCreatorFunction() }
+    } else { astCreatorFunction }
   }
 
 }

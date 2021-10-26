@@ -87,7 +87,7 @@ class AstCreator(val filename: String,
                                          this.filename,
                                          linenumber,
                                          columnnumber,
-                                         () => astsForDeclaration(stmt, currOrder))
+                                         astsForDeclaration(stmt, currOrder))
       currOrder = currOrder + r.length
       r
     }.toSeq
