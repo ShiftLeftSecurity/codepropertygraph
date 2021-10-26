@@ -1,7 +1,6 @@
 package io.shiftleft.dataflowengineoss.layers.dataflows
 
 import better.files.File
-import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.language._
@@ -31,6 +30,4 @@ class DumpCpg14(options: Cpg14DumpOptions)(implicit semantics: Semantics) extend
         (File(options.outDir) / s"${i}-cpg.dot").write(str)
     }
   }
-
-  override def probe(cpg: Cpg): Boolean = false
 }

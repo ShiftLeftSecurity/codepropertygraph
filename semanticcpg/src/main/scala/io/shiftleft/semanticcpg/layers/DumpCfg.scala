@@ -1,7 +1,6 @@
 package io.shiftleft.semanticcpg.layers
 
 import better.files.File
-import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.language._
 
 case class CfgDumpOptions(var outDir: String) extends LayerCreatorOptions {}
@@ -28,6 +27,4 @@ class DumpCfg(options: CfgDumpOptions) extends LayerCreator {
         (File(options.outDir) / s"${i}-cfg.dot").write(str)
     }
   }
-
-  override def probe(cpg: Cpg): Boolean = false
 }

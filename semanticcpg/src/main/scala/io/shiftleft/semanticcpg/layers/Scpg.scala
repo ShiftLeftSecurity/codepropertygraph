@@ -1,7 +1,6 @@
 package io.shiftleft.semanticcpg.layers
 
-import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.{NodeTypes, PropertyNames}
+import io.shiftleft.codepropertygraph.generated.PropertyNames
 
 import scala.annotation.nowarn
 
@@ -30,7 +29,4 @@ class Scpg(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
     }
   }
 
-  override def probe(cpg: Cpg): Boolean = {
-    cpg.graph.nodes(NodeTypes.METHOD_PARAMETER_OUT).hasNext
-  }
 }

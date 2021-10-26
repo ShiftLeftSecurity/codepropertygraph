@@ -21,8 +21,8 @@ object CallGraph {
 
 @nowarn
 class CallGraph(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
-  override val overlayName: String = ControlFlow.overlayName
-  override val description: String = ControlFlow.description
+  override val overlayName: String = CallGraph.overlayName
+  override val description: String = CallGraph.description
   override val dependsOn = List(TypeRelations.overlayName)
 
   override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
