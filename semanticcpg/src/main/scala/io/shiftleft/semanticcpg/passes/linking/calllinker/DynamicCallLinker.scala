@@ -1,16 +1,18 @@
 package io.shiftleft.semanticcpg.passes.linking.calllinker
 
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.nodes.{Call, Method, TypeDecl}
 import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
+import overflowdb.traversal.jIteratortoTraversal
 
 import scala.collection.mutable
 
 class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
 
   import DynamicCallLinker._
-
   // Used to track potential method candidates for a given method fullname. Since our method
   // full names contain the type decl we don't need to specify an addition map to wrap this in
   private val validM = mutable.Map.empty[String, Set[String]]
@@ -62,8 +64,7 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
             .collect { case x: TypeDecl =>
               x.fullName
             }
-            .toSet
-            .toSet
+            .toSetImmutable
         // The second check makes sure that set is changing which wouldn't be the case in circular hierarchies
         val totalSubclasses: Set[String] = if (directSubclasses.isEmpty) {
           directSubclasses ++ Set(typDeclFullName)
@@ -93,11 +94,10 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
     validM.get(call.methodFullName) match {
       case Some(value) =>
         value.foreach { destMethod =>
-          dstGraph.addEdgeInOriginal(
-            call,
-            cpg.method.fullNameExact(destMethod).head,
-            EdgeTypes.CALL
-          )
+          val tgt = cpg.method.fullNameExact(destMethod).headOption
+          if (tgt.isDefined) {
+            dstGraph.addEdgeInOriginal(call, tgt.get, EdgeTypes.CALL)
+          }
         }
       case None =>
         logger.info(
@@ -109,6 +109,5 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
 }
 
 object DynamicCallLinker {
-  private val logger: Logger = LoggerFactory.getLogger(classOf[StaticCallLinker])
+  private val logger: Logger = LoggerFactory.getLogger(classOf[DynamicCallLinker])
 }
-
