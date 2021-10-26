@@ -98,14 +98,20 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
           val tgt = cpg.method.fullNameExact(destMethod).headOption
           if (tgt.isDefined) {
             dstGraph.addEdgeInOriginal(call, tgt.get, EdgeTypes.CALL)
+          } else {
+            printLinkingError(call)
           }
         }
-      case None =>
-        logger.info(
-          s"Unable to link dynamic CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
-            s"SIGNATURE ${call.signature}, CODE ${call.code}"
-        )
+      case None => printLinkingError(call)
     }
+  }
+
+  @inline
+  private def printLinkingError(call: Call): Unit = {
+    logger.info(
+      s"Unable to link dynamic CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
+        s"SIGNATURE ${call.signature}, CODE ${call.code}"
+    )
   }
 }
 
