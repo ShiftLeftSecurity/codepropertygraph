@@ -24,8 +24,8 @@ class AstCreationPass(filenames: List[String],
     global.usedTypes.keys().asScala.filterNot(_ == Defines.anyTypeName).toSeq
 
   def hasHeaderContentAndClear: Boolean = {
-    val r = !global.headerAstCache.isEmpty
-    global.headerAstCache.clear()
+    val r = Global.headerAstCache.nonEmpty
+    Global.headerAstCache.clear()
     r
   }
 

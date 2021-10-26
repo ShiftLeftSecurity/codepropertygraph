@@ -10,8 +10,6 @@ import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalBinding
 import org.eclipse.cdt.internal.core.dom.parser.cpp.{CPPASTIdExpression, CPPASTQualifiedName, CPPFunction}
 import org.eclipse.cdt.internal.core.model.ASTStringUtil
 
-import scala.collection.mutable
-
 trait AstCreatorHelper {
 
   this: AstCreator =>
@@ -29,11 +27,9 @@ trait AstCreatorHelper {
     }
   }
 
-  private val file2LinesCache = mutable.HashMap.empty[String, Seq[Int]]
-
   private def fileLines(node: IASTNode): Seq[Int] = {
     val f = fileName(node)
-    file2LinesCache.getOrElseUpdate(f, IOUtils.readLinesInFile(f).map(_.length))
+    global.file2LinesCache.computeIfAbsent(f, _ => IOUtils.readLinesInFile(f).map(_.length))
   }
 
   private def nullSafeFileLocation(node: IASTNode): Option[IASTFileLocation] =
