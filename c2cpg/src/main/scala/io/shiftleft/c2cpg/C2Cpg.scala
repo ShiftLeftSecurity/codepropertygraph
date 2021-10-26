@@ -7,7 +7,6 @@ import io.shiftleft.c2cpg.utils.IncludeAutoDiscovery
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.{IntervalKeyPool, KeyPoolCreator}
-import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
 import io.shiftleft.x2cpg.X2Cpg.newEmptyCpg
@@ -49,7 +48,6 @@ class C2Cpg {
       new AstCreationPass(sourceFileNames, cpg, Some(astKeyPool), config, createParserConfig(config), headerFileFinder)
     astCreationPass.createAndApply()
     new HeaderContentPass(cpg, astCreationPass.hasHeaderContentAndClear, config.inputPaths.head).createAndApply()
-    new CfgCreationPass(cpg).createAndApply()
     new TypeNodePass(astCreationPass.usedTypes(), cpg, Some(typesKeyPool)).createAndApply()
     cpg
   }
