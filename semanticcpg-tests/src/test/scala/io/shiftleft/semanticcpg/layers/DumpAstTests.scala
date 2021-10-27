@@ -17,7 +17,7 @@ class DumpAstTests extends AnyWordSpec with Matchers {
         .cpg
 
       val context = new LayerCreatorContext(cpg)
-      new Scpg().run(context)
+      new Base().run(context)
       File.usingTemporaryDirectory("dumpast") { tmpDir =>
         val opts = AstDumpOptions(tmpDir.path.toString)
         new DumpAst(opts).run(context)

@@ -4,15 +4,7 @@ import better.files.Dsl._
 import better.files._
 import io.shiftleft.console.testing._
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.layers.{
-  Base,
-  CallGraph,
-  ControlFlow,
-  LayerCreator,
-  LayerCreatorContext,
-  Scpg,
-  TypeRelations
-}
+import io.shiftleft.semanticcpg.layers.{Base, CallGraph, ControlFlow, LayerCreator, LayerCreatorContext, TypeRelations}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -341,7 +333,7 @@ class ConsoleTests extends AnyWordSpec with Matchers {
       console.undo
       console.project.appliedOverlays shouldBe List()
       console.cpg.parameter.asOutput.l.size shouldBe 0
-      console._runAnalyzer(new Scpg)
+      console._runAnalyzer(new Base)
       console.cpg.parameter.asOutput.l.size should be > 0
     }
   }

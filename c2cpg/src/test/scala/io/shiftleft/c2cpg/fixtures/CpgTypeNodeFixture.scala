@@ -6,7 +6,7 @@ import io.shiftleft.c2cpg.datastructures.Global
 import io.shiftleft.c2cpg.passes.AstCreationPass
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
-import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
+import io.shiftleft.semanticcpg.layers.{Base, LayerCreatorContext}
 import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
 
@@ -25,7 +25,7 @@ object CpgTypeNodeFixture {
       new TypeNodePass(astCreationPass.usedTypes(), cpg).createAndApply()
 
       val context = new LayerCreatorContext(cpg)
-      new Scpg().run(context)
+      new Base().run(context)
     }
     f(cpg)
   }

@@ -2,6 +2,7 @@ package io.shiftleft.fuzzyc2cpg.standard
 
 import io.shiftleft.fuzzyc2cpg.testfixtures.FuzzyCCodeToCpgSuite
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.layers.{Base, CallGraph, ControlFlow, TypeRelations}
 
 class MetaDataTests extends FuzzyCCodeToCpgSuite {
 
@@ -14,7 +15,10 @@ class MetaDataTests extends FuzzyCCodeToCpgSuite {
     val List(x) = cpg.metaData.l
     x.language shouldBe "C"
     x.version shouldBe "0.1"
-    x.overlays shouldBe List("semanticcpg")
+    x.overlays shouldBe List(Base.overlayName,
+                             ControlFlow.overlayName,
+                             TypeRelations.overlayName,
+                             CallGraph.overlayName)
     // C-frontend does not set hash for entire CPG.
     // Change this assertion if it is supposed to.
     x.hash shouldBe None

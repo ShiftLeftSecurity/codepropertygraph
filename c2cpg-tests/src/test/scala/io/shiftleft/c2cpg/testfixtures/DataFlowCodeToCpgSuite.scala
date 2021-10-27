@@ -8,7 +8,7 @@ import io.shiftleft.dataflowengineoss.queryengine.EngineContext
 import io.shiftleft.dataflowengineoss.semanticsloader.{Parser, Semantics}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.dotextension.ImageViewer
-import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
+import io.shiftleft.semanticcpg.layers.{Base, CallGraph, ControlFlow, LayerCreatorContext, TypeRelations}
 import io.shiftleft.utils.ProjectRoot
 import overflowdb.traversal.Traversal
 
@@ -34,7 +34,10 @@ class DataFlowCodeToCpgSuite extends CCodeToCpgSuite {
 
   override def passes(cpg: Cpg): Unit = {
     val context = new LayerCreatorContext(cpg)
-    new Scpg().run(context)
+    new Base().run(context)
+    new TypeRelations().run(context)
+    new ControlFlow().run(context)
+    new CallGraph().run(context)
 
     val options = new OssDataFlowOptions()
     new OssDataFlow(options).run(context)
