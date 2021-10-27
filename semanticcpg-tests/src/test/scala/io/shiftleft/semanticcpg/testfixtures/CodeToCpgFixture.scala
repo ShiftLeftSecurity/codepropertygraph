@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.testfixtures
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
+import io.shiftleft.semanticcpg.layers.{Base, CallGraph, ControlFlow, LayerCreatorContext, TypeRelations}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -22,7 +22,10 @@ class CodeToCpgFixture(val frontend: LanguageFrontend) extends AnyWordSpec with 
 
   def createEnhancements(cpg: Cpg): Unit = {
     val context = new LayerCreatorContext(cpg)
-    new Scpg().run(context)
+    new Base().run(context)
+    new ControlFlow().run(context)
+    new TypeRelations().run(context)
+    new CallGraph().run(context)
   }
 
   private def buildCpgForDir[T](dir: File): Unit = {

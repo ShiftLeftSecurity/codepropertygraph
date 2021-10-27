@@ -1,7 +1,9 @@
 package io.shiftleft.semanticcpg.layers
 
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.CpgPassBase
+import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.CfgCreationPass
 import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
 import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
@@ -13,11 +15,17 @@ object ControlFlow {
   val description: String = "Control flow layer (including dominators and CDG edges)"
   def defaultOpts = new LayerCreatorOptions()
 
-  def passes(cpg: Cpg): Iterator[CpgPassBase] = Iterator(
-    new CfgCreationPass(cpg),
-    new CfgDominatorPass(cpg),
-    new CdgPass(cpg),
-  )
+  def passes(cpg: Cpg): Iterator[CpgPassBase] = {
+    val cfgCreationPass = cpg.metaData.language.lastOption match {
+      case Some(Languages.GHIDRA) => Iterator[CpgPassBase]()
+      case Some(Languages.LLVM)   => Iterator[CpgPassBase]()
+      case _                      => Iterator[CpgPassBase](new CfgCreationPass(cpg))
+    }
+    cfgCreationPass ++ Iterator(
+      new CfgDominatorPass(cpg),
+      new CdgPass(cpg),
+    )
+  }
 
 }
 

@@ -1,6 +1,5 @@
 package io.shiftleft.dataflowengineoss.layers.dataflows
 
-import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.dataflowengineoss.passes.reachingdef.ReachingDefPass
 import io.shiftleft.semanticcpg.layers.{LayerCreator, LayerCreatorContext, LayerCreatorOptions}
 
@@ -25,9 +24,5 @@ class OssDataFlow(opts: OssDataFlowOptions) extends LayerCreator {
       case (pass, index) =>
         runPass(pass, context, storeUndoInfo, index)
     }
-  }
-
-  override def probe(cpg: Cpg): Boolean = {
-    false
   }
 }

@@ -1,7 +1,6 @@
 package io.shiftleft.dataflowengineoss.layers.dataflows
 
 import better.files.File
-import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.dataflowengineoss.language._
 import io.shiftleft.dataflowengineoss.semanticsloader.Semantics
 import io.shiftleft.semanticcpg.language._
@@ -31,6 +30,4 @@ class DumpDdg(options: DdgDumpOptions)(implicit semantics: Semantics) extends La
         (File(options.outDir) / s"${i}-ddg.dot").write(str)
     }
   }
-
-  override def probe(cpg: Cpg): Boolean = false
 }

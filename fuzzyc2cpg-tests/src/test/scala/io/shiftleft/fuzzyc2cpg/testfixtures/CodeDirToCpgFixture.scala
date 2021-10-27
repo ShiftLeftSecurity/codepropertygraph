@@ -1,7 +1,7 @@
 package io.shiftleft.fuzzyc2cpg.testfixtures
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.semanticcpg.layers.{LayerCreatorContext, Scpg}
+import io.shiftleft.semanticcpg.layers.{Base, LayerCreatorContext}
 import io.shiftleft.semanticcpg.testfixtures.LanguageFrontend
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
@@ -22,7 +22,7 @@ class CodeDirToCpgFixture extends AnyWordSpec with Matchers with BeforeAndAfterA
 
   def createEnhancements(cpg: Cpg): Unit = {
     val context = new LayerCreatorContext(cpg)
-    new Scpg().run(context)
+    new Base().run(context)
   }
 
   private def buildCpgForDir[T](dir: File): Unit = {

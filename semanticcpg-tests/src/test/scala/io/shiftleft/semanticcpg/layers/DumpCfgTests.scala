@@ -17,7 +17,8 @@ class DumpCfgTests extends AnyWordSpec with Matchers {
         .cpg
 
       val context = new LayerCreatorContext(cpg)
-      new Scpg().run(context)
+      new Base().run(context)
+      new ControlFlow().run(context)
       File.usingTemporaryDirectory("dumpcfg") { tmpDir =>
         val opts = CfgDumpOptions(tmpDir.path.toString)
         new DumpCfg(opts).run(context)
