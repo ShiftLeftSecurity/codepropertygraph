@@ -8,6 +8,7 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.{ConcurrentWriterCpgPass, DiffGraph, IntervalKeyPool}
 
 import java.nio.file.Paths
+import scala.jdk.CollectionConverters._
 
 class AstCreationPass(filenames: List[String],
                       cpg: Cpg,
@@ -17,15 +18,17 @@ class AstCreationPass(filenames: List[String],
                       headerFileFinder: HeaderFileFinder = null)
     extends ConcurrentWriterCpgPass[String](cpg, keyPool = keyPool) {
 
+  private val global: Global = new Global()
+
   def usedTypes(): List[String] =
-    Global.usedTypes.keys.filterNot(_ == Defines.anyTypeName).toList
+    global.usedTypes.keys().asScala.filterNot(_ == Defines.anyTypeName).toList
 
   override def generateParts(): Array[String] = filenames.toArray
 
   override def runOnPart(diffGraph: DiffGraph.Builder, filename: String): Unit =
     new CdtParser(parseConfig, headerFileFinder).parse(Paths.get(filename)).foreach { parserResult =>
       val localDiff = DiffGraph.newBuilder
-      new AstCreator(filename, config, localDiff, parserResult).createAst()
+      new AstCreator(filename, config, global, localDiff, parserResult).createAst()
       diffGraph.moveFrom(localDiff)
     }
 

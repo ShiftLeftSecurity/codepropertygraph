@@ -1,6 +1,5 @@
 package io.shiftleft.c2cpg.astcreation
 
-import io.shiftleft.c2cpg.datastructures.Global
 import io.shiftleft.c2cpg.utils.IOUtils
 import io.shiftleft.codepropertygraph.generated.DispatchTypes
 import io.shiftleft.x2cpg.Ast
@@ -10,8 +9,6 @@ import org.eclipse.cdt.core.dom.ast.gnu.c.ICASTKnRFunctionDeclarator
 import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.EvalBinding
 import org.eclipse.cdt.internal.core.dom.parser.cpp.{CPPASTIdExpression, CPPASTQualifiedName, CPPFunction}
 import org.eclipse.cdt.internal.core.model.ASTStringUtil
-
-import scala.collection.mutable
 
 trait AstCreatorHelper {
 
@@ -30,11 +27,9 @@ trait AstCreatorHelper {
     }
   }
 
-  private val file2LinesCache = mutable.HashMap.empty[String, Seq[Int]]
-
   private def fileLines(node: IASTNode): Seq[Int] = {
     val f = fileName(node)
-    file2LinesCache.getOrElseUpdate(f, IOUtils.readLinesInFile(f).map(_.length))
+    global.file2LinesCache.computeIfAbsent(f, _ => IOUtils.readLinesInFile(f).map(_.length))
   }
 
   private def nullSafeFileLocation(node: IASTNode): Option[IASTFileLocation] =
@@ -100,7 +95,7 @@ trait AstCreatorHelper {
 
   protected def registerType(typeName: String): String = {
     val fixedTypeName = fixQualifiedName(typeName)
-    Global.usedTypes.putIfAbsent(fixedTypeName, true)
+    global.usedTypes.putIfAbsent(fixedTypeName, true)
     fixedTypeName
   }
 

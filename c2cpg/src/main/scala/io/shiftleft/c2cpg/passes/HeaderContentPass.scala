@@ -5,6 +5,7 @@ import io.shiftleft.c2cpg.parser.FileDefaults
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{
   HasFilename,
+  Local,
   NewBlock,
   NewFile,
   NewMethod,
@@ -22,12 +23,10 @@ import overflowdb.traversal.Traversal
 class HeaderContentPass(cpg: Cpg, projectPath: String) extends CpgPass(cpg) {
 
   override def run(): Iterator[DiffGraph] = {
-    if (Global.headerAstCache.isEmpty) {
+    if (!Global.shouldBeCleared()) {
       Iterator.empty
     } else {
-      Global.headerAstCache.clear()
       val dstGraph = DiffGraph.newBuilder
-
       val absolutePath = new java.io.File(projectPath).toPath.toAbsolutePath.normalize().toString
       val filename = s"$absolutePath:<includes>"
       val globalName = NamespaceTraversal.globalNamespaceName
@@ -67,14 +66,12 @@ class HeaderContentPass(cpg: Cpg, projectPath: String) extends CpgPass(cpg) {
 
       Ast.storeInDiffGraph(ast, dstGraph)
 
-      Traversal(cpg.graph.nodes()).foreach { srcNode =>
-        if (!srcNode.inE(EdgeTypes.AST).hasNext) {
-          srcNode match {
-            case f: HasFilename if FileDefaults.isHeaderFile(f.filename) =>
-              dstGraph.addEdgeToOriginal(blockNode, srcNode.asInstanceOf[StoredNode], EdgeTypes.AST)
-            case _ =>
-          }
-        }
+      Traversal(cpg.graph.nodes()).whereNot(_.inE(EdgeTypes.AST)).foreach {
+        case srcNode: HasFilename if FileDefaults.isHeaderFile(srcNode.filename) =>
+          dstGraph.addEdgeToOriginal(blockNode, srcNode.asInstanceOf[StoredNode], EdgeTypes.AST)
+        case srcNode: Local =>
+          dstGraph.addEdgeToOriginal(blockNode, srcNode.asInstanceOf[StoredNode], EdgeTypes.AST)
+        case _ =>
       }
 
       Iterator(dstGraph.build())
