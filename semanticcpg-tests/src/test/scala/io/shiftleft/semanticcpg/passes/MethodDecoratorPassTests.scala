@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes.MethodParameterIn
-import io.shiftleft.semanticcpg.passes.methoddecorations.MethodDecoratorPass
+import io.shiftleft.semanticcpg.passes.base.MethodDecoratorPass
 import io.shiftleft.semanticcpg.testfixtures.EmptyGraphFixture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

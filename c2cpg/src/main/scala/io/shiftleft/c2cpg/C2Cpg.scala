@@ -7,8 +7,7 @@ import io.shiftleft.c2cpg.utils.IncludeAutoDiscovery
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.{IntervalKeyPool, KeyPoolCreator}
-import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
-import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
+import io.shiftleft.semanticcpg.passes.frontend.{MetaDataPass, TypeNodePass}
 import io.shiftleft.x2cpg.X2Cpg.newEmptyCpg
 import io.shiftleft.x2cpg.{SourceFiles, X2Cpg, X2CpgConfig}
 import org.slf4j.LoggerFactory
