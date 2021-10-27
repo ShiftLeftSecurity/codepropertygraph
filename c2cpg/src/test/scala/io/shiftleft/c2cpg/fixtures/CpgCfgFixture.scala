@@ -18,8 +18,7 @@ class CpgCfgFixture(code: String, fileExtension: String = ".c") {
   File.usingTemporaryDirectory("c2cpgtest") { dir =>
     val file1 = dir / s"file1$fileExtension"
     file1.write(s"RET func() { $code }")
-    val filenames = List(file1.path.toAbsolutePath.toString)
-    new AstCreationPass(filenames, cpg, None, Config()).createAndApply()
+    new AstCreationPass(cpg, None, Config(inputPaths = Set(dir.path.toString))).createAndApply()
     new CfgCreationPass(cpg).createAndApply()
   }
 

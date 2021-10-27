@@ -11,9 +11,7 @@ object CpgAstOnlyFixture {
     File.usingTemporaryDirectory("c2cpgtest") { dir =>
       val file = dir / fileName
       file.write(code)
-
-      val filenames = List(file.path.toAbsolutePath.toString)
-      new AstCreationPass(filenames, cpg, None, Config()).createAndApply()
+      new AstCreationPass(cpg, None, Config(inputPaths = Set(dir.path.toString))).createAndApply()
     }
     cpg
   }

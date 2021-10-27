@@ -20,7 +20,7 @@ import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
 import io.shiftleft.x2cpg.Ast
 import overflowdb.traversal.Traversal
 
-class HeaderContentPass(cpg: Cpg, projectPath: String) extends CpgPass(cpg) {
+class HeaderContentLinkerPass(cpg: Cpg, projectPath: String) extends CpgPass(cpg) {
 
   override def run(): Iterator[DiffGraph] = {
     if (!Global.shouldBeCleared()) {

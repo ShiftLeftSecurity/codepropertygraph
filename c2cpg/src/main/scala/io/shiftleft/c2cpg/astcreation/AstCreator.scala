@@ -78,16 +78,13 @@ class AstCreator(val filename: String,
 
     var currOrder = 1
     val declsAsts = iASTTranslationUnit.getDeclarations.flatMap { stmt =>
-      val linenumber = line(stmt)
-      val columnnumber = column(stmt)
-      val filename = fileName(stmt)
-
-      val r = Global.getAstsFromAstCache(diffGraph,
-                                         filename,
-                                         this.filename,
-                                         linenumber,
-                                         columnnumber,
-                                         astsForDeclaration(stmt, currOrder))
+      val r =
+        Global.getAstsFromAstCache(diffGraph,
+                                   fileName(stmt),
+                                   filename,
+                                   line(stmt),
+                                   column(stmt),
+                                   astsForDeclaration(stmt, currOrder))
       currOrder = currOrder + r.length
       r
     }.toIndexedSeq

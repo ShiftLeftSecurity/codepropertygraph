@@ -18,8 +18,7 @@ object CompleteCpgFixture {
 
       val cpg = Cpg.emptyCpg
       new MetaDataPass(cpg, Languages.NEWC).createAndApply()
-      val filenames = List(file.path.toAbsolutePath.toString)
-      val astCreationPass = new AstCreationPass(filenames, cpg, None, Config())
+      val astCreationPass = new AstCreationPass(cpg, None, Config(inputPaths = Set(dir.path.toString)))
       astCreationPass.createAndApply()
       new CfgCreationPass(cpg).createAndApply()
       new TypeNodePass(astCreationPass.usedTypes(), cpg).createAndApply()
