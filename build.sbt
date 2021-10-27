@@ -72,7 +72,6 @@ lazy val semanticcpg = Projects.semanticcpg
 lazy val semanticcpgtests = Projects.semanticcpgtests
 lazy val dataflowengineoss = Projects.dataflowengineoss
 lazy val dataflowengineosstests = Projects.dataflowengineosstests
-lazy val console = Projects.console
 lazy val fuzzyc2cpg = Projects.fuzzyc2cpg
 lazy val fuzzyc2cpgtests = Projects.fuzzyc2cpgtests
 lazy val c2cpg = Projects.c2cpg
