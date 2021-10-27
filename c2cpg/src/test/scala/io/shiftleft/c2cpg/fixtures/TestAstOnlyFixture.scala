@@ -12,8 +12,7 @@ object TestAstOnlyFixture {
       file.write(code)
 
       val cpg = Cpg.emptyCpg
-      val filenames = List(file.path.toAbsolutePath.toString)
-      new AstCreationPass(filenames, cpg, None, Config()).createAndApply()
+      new AstCreationPass(cpg, None, Config(inputPaths = Set(dir.path.toString))).createAndApply()
 
       f(cpg)
     }

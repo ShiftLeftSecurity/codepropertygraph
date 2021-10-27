@@ -17,8 +17,7 @@ object CpgTypeNodeFixture {
       file.write(code)
 
       new MetaDataPass(cpg, Languages.NEWC).createAndApply()
-      val filenames = List(file.path.toAbsolutePath.toString)
-      val astCreationPass = new AstCreationPass(filenames, cpg, None, Config())
+      val astCreationPass = new AstCreationPass(cpg, None, Config(inputPaths = Set(dir.path.toString)))
       astCreationPass.createAndApply()
       new TypeNodePass(astCreationPass.usedTypes(), cpg).createAndApply()
 
