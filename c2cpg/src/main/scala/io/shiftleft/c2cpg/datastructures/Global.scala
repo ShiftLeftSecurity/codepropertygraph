@@ -22,6 +22,8 @@ object Global {
   private val headerAstCache: mutable.HashMap[String, mutable.HashSet[(Integer, Integer)]] =
     mutable.HashMap.empty
 
+  def headerFiles: Set[String] = headerAstCache.keySet.toSet
+
   def shouldBeCleared(): Boolean = {
     if (headerAstCache.nonEmpty) {
       headerAstCache.clear()
