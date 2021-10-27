@@ -6,7 +6,6 @@ import io.shiftleft.c2cpg.datastructures.Global
 import io.shiftleft.c2cpg.parser.{CdtParser, FileDefaults, HeaderFileFinder, ParserConfig}
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.{ConcurrentWriterCpgPass, DiffGraph, IntervalKeyPool}
-import io.shiftleft.semanticcpg.language._
 import io.shiftleft.x2cpg.SourceFiles
 
 import java.nio.file.Paths
@@ -26,9 +25,8 @@ class HeaderAstCreationPass(cpg: Cpg,
 
   override def generateParts(): Array[String] = {
     val allHeaderFiles = SourceFiles.determine(config.inputPaths, FileDefaults.HEADER_FILE_EXTENSIONS).toSet
-    val alreadySeenHeaderFiles =
-      cpg.method.filename.filter(FileDefaults.isHeaderFile) ++ cpg.method.filename.filter(FileDefaults.isHeaderFile)
-    (allHeaderFiles -- alreadySeenHeaderFiles.toSet).toArray
+    val alreadySeenHeaderFiles = Global.headerFiles
+    (allHeaderFiles -- alreadySeenHeaderFiles).toArray
   }
 
   override def runOnPart(diffGraph: DiffGraph.Builder, filename: String): Unit =
