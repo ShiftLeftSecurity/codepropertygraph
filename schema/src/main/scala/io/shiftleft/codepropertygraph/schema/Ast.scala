@@ -248,6 +248,19 @@ object Ast extends SchemaBase {
       .addProperties(name, parserTypeName)
       .extendz(astNode)
 
+    val jumpLabel: NodeType = builder
+      .addNodeType(
+        name = "JUMP_LABEL",
+        comment = """A jump label specifies the label and thus the JUMP_TARGET of control structures
+                    |BREAK and CONTINUE. The `NAME` field holds the name of the label while the
+                    |`PARSER_TYPE_NAME` field holds the name of language construct that this jump
+                    |label is created from, e.g., "Label".
+                    |""".stripMargin
+      )
+      .protoId(341)
+      .addProperties(name, parserTypeName)
+      .extendz(astNode)
+
     val methodRef: NodeType = builder
       .addNodeType(
         name = "METHOD_REF",
@@ -292,12 +305,20 @@ object Ast extends SchemaBase {
 
     val controlStructureTypes = builder.addConstants(
       category = "ControlStructureTypes",
-      Constant(name = "BREAK", value = "BREAK", valueType = ValueTypes.STRING, comment = "Represents a break statement")
-        .protoId(1),
-      Constant(name = "CONTINUE",
-               value = "CONTINUE",
-               valueType = ValueTypes.STRING,
-               comment = "Represents a continue statement").protoId(2),
+      Constant(
+        name = "BREAK",
+        value = "BREAK",
+        valueType = ValueTypes.STRING,
+        comment = """Represents a break statement. Labeled breaks are expected to have a JUMP_LABEL
+            |node AST child with ORDER 1""".stripMargin
+      ).protoId(1),
+      Constant(
+        name = "CONTINUE",
+        value = "CONTINUE",
+        valueType = ValueTypes.STRING,
+        comment = """Represents a continue statement. Labeled continues are expected to have a JUMP_LABEL
+                           |node AST child with ORDER 1""".stripMargin
+      ).protoId(2),
       Constant(name = "WHILE", value = "WHILE", valueType = ValueTypes.STRING, comment = "Represents a while statement")
         .protoId(3),
       Constant(name = "DO", value = "DO", valueType = ValueTypes.STRING, comment = "Represents a do statement")
@@ -416,6 +437,7 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = controlStructure)
       .addOutEdge(edge = ast, inNode = methodRef, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = typeRef)
+      .addOutEdge(edge = ast, inNode = jumpLabel)
 
     unknown
       .addOutEdge(edge = ast, inNode = literal)
