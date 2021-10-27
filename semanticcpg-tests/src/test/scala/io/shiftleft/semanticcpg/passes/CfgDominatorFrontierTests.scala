@@ -1,7 +1,12 @@
 package io.shiftleft.semanticcpg.passes
 
 import io.shiftleft.OverflowDbTestInstance
-import io.shiftleft.semanticcpg.passes.cfgdominator.{CfgAdapter, CfgDominator, CfgDominatorFrontier, DomTreeAdapter}
+import io.shiftleft.semanticcpg.passes.controlflow.cfgdominator.{
+  CfgAdapter,
+  CfgDominator,
+  CfgDominatorFrontier,
+  DomTreeAdapter
+}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._

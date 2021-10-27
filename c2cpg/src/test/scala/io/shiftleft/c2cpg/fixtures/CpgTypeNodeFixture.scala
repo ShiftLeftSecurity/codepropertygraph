@@ -6,8 +6,7 @@ import io.shiftleft.c2cpg.passes.AstCreationPass
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.semanticcpg.layers.{Base, LayerCreatorContext}
-import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
-import io.shiftleft.semanticcpg.passes.typenodes.TypeNodePass
+import io.shiftleft.semanticcpg.passes.frontend.{MetaDataPass, TypeNodePass}
 
 object CpgTypeNodeFixture {
   def apply(code: String, fileName: String = "test.c")(f: Cpg => Unit): Unit = {

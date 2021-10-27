@@ -4,9 +4,9 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.passes.CfgCreationPass
-import io.shiftleft.semanticcpg.passes.cfgdominator.CfgDominatorPass
-import io.shiftleft.semanticcpg.passes.codepencegraph.CdgPass
+import io.shiftleft.semanticcpg.passes.controlflow.CfgCreationPass
+import io.shiftleft.semanticcpg.passes.controlflow.cfgdominator.CfgDominatorPass
+import io.shiftleft.semanticcpg.passes.controlflow.codepencegraph.CdgPass
 
 import scala.annotation.nowarn
 

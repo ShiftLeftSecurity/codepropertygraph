@@ -1,7 +1,7 @@
 package io.shiftleft.c2cpg.passes
 
 import io.shiftleft.c2cpg.fixtures.CpgCfgFixture
-import io.shiftleft.semanticcpg.passes.cfgcreation.Cfg._
+import io.shiftleft.semanticcpg.passes.controlflow.cfgcreation.Cfg._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 

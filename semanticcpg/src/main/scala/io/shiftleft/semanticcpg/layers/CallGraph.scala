@@ -2,8 +2,7 @@ package io.shiftleft.semanticcpg.layers
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.CpgPassBase
-import io.shiftleft.semanticcpg.passes.linking.calllinker.StaticCallLinker
-import io.shiftleft.semanticcpg.passes.linking.linker.MethodRefLinker
+import io.shiftleft.semanticcpg.passes.callgraph.{MethodRefLinker, StaticCallLinker}
 
 import scala.annotation.nowarn
 

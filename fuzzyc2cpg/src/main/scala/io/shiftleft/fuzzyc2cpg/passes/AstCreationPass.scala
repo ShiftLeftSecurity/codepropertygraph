@@ -7,7 +7,7 @@ import io.shiftleft.fuzzyc2cpg.Global
 import io.shiftleft.fuzzyc2cpg.passes.astcreation.{AntlrCModuleParserDriver, AstVisitor}
 import io.shiftleft.passes.{ConcurrentWriterCpgPass, DiffGraph, IntervalKeyPool}
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
-import io.shiftleft.semanticcpg.passes.metadata.MetaDataPass
+import io.shiftleft.semanticcpg.passes.frontend.MetaDataPass
 import org.slf4j.LoggerFactory
 
 /**

@@ -3,13 +3,16 @@ package io.shiftleft.semanticcpg.layers
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.PropertyNames
 import io.shiftleft.passes.CpgPassBase
-import io.shiftleft.semanticcpg.passes.FileCreationPass
-import io.shiftleft.semanticcpg.passes.containsedges.ContainsEdgePass
-import io.shiftleft.semanticcpg.passes.languagespecific.fuzzyc.MethodStubCreator
-import io.shiftleft.semanticcpg.passes.linking.linker.{AstLinkerPass, TypeUsagePass}
-import io.shiftleft.semanticcpg.passes.methoddecorations.MethodDecoratorPass
-import io.shiftleft.semanticcpg.passes.namespacecreator.NamespaceCreator
-import io.shiftleft.semanticcpg.passes.typenodes.TypeDeclStubCreator
+import io.shiftleft.semanticcpg.passes.base.{
+  AstLinkerPass,
+  ContainsEdgePass,
+  FileCreationPass,
+  MethodDecoratorPass,
+  MethodStubCreator,
+  NamespaceCreator,
+  TypeDeclStubCreator,
+  TypeUsagePass
+}
 
 import scala.annotation.nowarn
 

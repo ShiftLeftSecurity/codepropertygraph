@@ -6,8 +6,8 @@ import io.shiftleft.c2cpg.passes.AstCreationPass
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.CfgNode
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.passes.CfgCreationPass
-import io.shiftleft.semanticcpg.passes.cfgcreation.Cfg.CfgEdgeType
+import io.shiftleft.semanticcpg.passes.controlflow.CfgCreationPass
+import io.shiftleft.semanticcpg.passes.controlflow.cfgcreation.Cfg.CfgEdgeType
 
 import scala.jdk.CollectionConverters._
 

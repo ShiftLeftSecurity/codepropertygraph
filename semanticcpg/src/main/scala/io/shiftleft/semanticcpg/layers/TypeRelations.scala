@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.layers
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.CpgPassBase
-import io.shiftleft.semanticcpg.passes.linking.linker.{AliasLinker, TypeHierarchyPass}
+import io.shiftleft.semanticcpg.passes.typerelations.{AliasLinkerPass, TypeHierarchyPass}
 
 import scala.annotation.nowarn
 
@@ -13,7 +13,7 @@ object TypeRelations {
 
   def passes(cpg: Cpg): Iterator[CpgPassBase] = Iterator(
     new TypeHierarchyPass(cpg),
-    new AliasLinker(cpg),
+    new AliasLinkerPass(cpg),
   )
 
 }
