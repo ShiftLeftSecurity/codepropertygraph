@@ -52,7 +52,8 @@ class C2Cpg {
       new HeaderAstCreationPass(cpg, Some(headerKeyPool), config, parserConfig, headerFileFinder)
     headerAstCreationPass.createAndApply()
     new HeaderContentLinkerPass(cpg, config.inputPaths.head).createAndApply()
-    new TypeNodePass(astCreationPass.usedTypes() ++ headerAstCreationPass.usedTypes(), cpg, Some(typesKeyPool))
+    val types = astCreationPass.usedTypes() ++ headerAstCreationPass.usedTypes()
+    new TypeNodePass(types.distinct, cpg, Some(typesKeyPool))
       .createAndApply()
     cpg
   }
