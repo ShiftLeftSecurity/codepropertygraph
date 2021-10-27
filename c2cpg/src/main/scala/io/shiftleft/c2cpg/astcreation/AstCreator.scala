@@ -90,7 +90,7 @@ class AstCreator(val filename: String,
                                          astsForDeclaration(stmt, currOrder))
       currOrder = currOrder + r.length
       r
-    }.toSeq
+    }.toIndexedSeq
 
     val methodReturn = NewMethodReturn()
       .code("RET")

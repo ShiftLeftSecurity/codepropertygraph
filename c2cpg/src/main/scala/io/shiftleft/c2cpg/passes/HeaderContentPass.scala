@@ -23,11 +23,9 @@ import overflowdb.traversal.Traversal
 class HeaderContentPass(cpg: Cpg, projectPath: String) extends CpgPass(cpg) {
 
   override def run(): Iterator[DiffGraph] = {
-    if (Global.headerAstCache.isEmpty) {
+    if (!Global.shouldBeCleared()) {
       Iterator.empty
     } else {
-      Global.headerAstCache.clear()
-
       val dstGraph = DiffGraph.newBuilder
       val absolutePath = new java.io.File(projectPath).toPath.toAbsolutePath.normalize().toString
       val filename = s"$absolutePath:<includes>"

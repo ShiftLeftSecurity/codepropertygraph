@@ -19,8 +19,17 @@ class Global {
 
 object Global {
 
-  val headerAstCache: mutable.HashMap[String, mutable.HashSet[(Integer, Integer)]] =
+  private val headerAstCache: mutable.HashMap[String, mutable.HashSet[(Integer, Integer)]] =
     mutable.HashMap.empty
+
+  def shouldBeCleared(): Boolean = {
+    if (headerAstCache.nonEmpty) {
+      headerAstCache.clear()
+      true
+    } else {
+      false
+    }
+  }
 
   def getAstsFromAstCache(diffGraph: DiffGraph.Builder,
                           filename: String,
