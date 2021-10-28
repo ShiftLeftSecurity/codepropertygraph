@@ -17,10 +17,7 @@ import scala.jdk.CollectionConverters._
   * methods.
   *
   * This pass intentionally ignores the vtable mechanism based on BINDING nodes but does check for an existing call edge
-  * before adding one.
-  *
-  * This pass is not idempotent, i.e. It assumes non-circular inheritance, on pain of endless recursion / stack
-  * overflow.
+  * before adding one. It assumes non-circular inheritance, on pain of endless recursion / stack overflow.
   *
   * Based on the algorithm by Jang, Dongseok & Tatlock, Zachary & Lerner, Sorin. (2014).
   * SAFEDISPATCH: Securing C++ Virtual Calls from Memory Corruption Attacks.
@@ -29,11 +26,12 @@ import scala.jdk.CollectionConverters._
 class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
 
   import DynamicCallLinker._
-  // Used to track potential method candidates for a given method fullname. Since our method
-  // full names contain the type decl we don't need to specify an addition map to wrap this in
-  private val validM = mutable.Map.empty[String, Set[String]]
+  // Used to track potential method candidates for a given method fullname. Since our method full names contain the type
+  // decl we don't need to specify an addition map to wrap this in. LinkedHashSets are used here to preserve order in
+  // the best interest of reproducibility during debugging.
+  private val validM = mutable.Map.empty[String, mutable.LinkedHashSet[String]]
   // Used for dynamic programming as subtree's don't need to be recalculated later
-  private val subclassCache = mutable.Map.empty[String, Set[String]]
+  private val subclassCache = mutable.Map.empty[String, mutable.LinkedHashSet[String]]
   // Used for O(1) lookups on methods that will work without indexManager
   private val typeMap = cpg.typeDecl.map { typeDecl =>
     typeDecl.fullName -> typeDecl
@@ -73,7 +71,7 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
 
   /** Recursively returns all the sub-types of the given type declaration. Does not account for circular hierarchies.
     */
-  def allSubclasses(typDeclFullName: String): Set[String] = {
+  def allSubclasses(typDeclFullName: String): mutable.LinkedHashSet[String] = {
     subclassCache.get(typDeclFullName) match {
       case Some(value) => value
       case None =>
@@ -85,12 +83,12 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
               case x: TypeDecl =>
                 x.fullName
             }
-            .toSetImmutable
+            .to(mutable.LinkedHashSet)
         // The second check makes sure that set is changing which wouldn't be the case in circular hierarchies
-        val totalSubclasses: Set[String] = if (directSubclasses.isEmpty) {
-          directSubclasses ++ Set(typDeclFullName)
+        val totalSubclasses: mutable.LinkedHashSet[String] = if (directSubclasses.isEmpty) {
+          directSubclasses ++ mutable.LinkedHashSet(typDeclFullName)
         } else {
-          directSubclasses.flatMap(t => allSubclasses(t)) ++ Set(typDeclFullName)
+          directSubclasses.flatMap(t => allSubclasses(t)) ++ mutable.LinkedHashSet(typDeclFullName)
         }
         subclassCache.put(typDeclFullName, totalSubclasses)
         totalSubclasses
@@ -114,13 +112,14 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   private def linkDynamicCall(call: Call, dstGraph: DiffGraph.Builder): Unit = {
     validM.get(call.methodFullName) match {
       case Some(tgts) =>
+        val callsOut = call.callOut.fullName.toSetImmutable
         tgts.foreach { destMethod =>
           val tgtM = if (cpg.graph.indexManager.isIndexed(PropertyNames.FULL_NAME)) {
             methodFullNameToNode(destMethod)
           } else {
             cpg.method.fullNameExact(destMethod).headOption
           }
-          if (tgtM.isDefined && !call.callOut.fullName.toSetImmutable.contains(tgtM.get.fullName)) {
+          if (tgtM.isDefined && !callsOut.contains(tgtM.get.fullName)) {
             dstGraph.addEdgeInOriginal(call, tgtM.get, EdgeTypes.CALL)
           } else {
             printLinkingError(call)
