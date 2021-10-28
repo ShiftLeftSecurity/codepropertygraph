@@ -291,11 +291,10 @@ trait AstForExpressionsCreator {
     val name = c.getDeclSpecifier.toString
     val callNode = newCallNode(c, name, name, DispatchTypes.STATIC_DISPATCH, order)
 
-    // TODO: how to represent the initializer here?
-    val arg = newUnknown(c.getInitializer, 1)
+    val arg = astForNode(c.getInitializer, 1)
 
-    val ast = Ast(callNode).withChild(Ast(arg))
-    ast.withArgEdge(callNode, arg)
+    val ast = Ast(callNode).withChild(arg)
+    if (arg.root.isDefined) { ast.withArgEdge(callNode, arg.root.get) } else ast
   }
 
   private def astForCompoundStatementExpression(compoundExpression: IGNUASTCompoundStatementExpression,
