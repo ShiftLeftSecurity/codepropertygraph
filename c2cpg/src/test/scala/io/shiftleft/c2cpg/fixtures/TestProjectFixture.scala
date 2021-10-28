@@ -19,7 +19,7 @@ case class TestProjectFixture(projectName: String) {
   new MetaDataPass(cpg, Languages.C).createAndApply()
   new AstCreationPass(cpg, None, Config(inputPaths = Set(dirName))).createAndApply()
   new HeaderAstCreationPass(cpg, None, Config(inputPaths = Set(dirName))).createAndApply()
-  new HeaderContentLinkerPass(cpg, dirName).createAndApply()
+  new HeaderContentLinkerPass(cpg, dirName, Set.empty).createAndApply()
   new CfgCreationPass(cpg).createAndApply()
   new FileCreationPass(cpg).createAndApply()
 

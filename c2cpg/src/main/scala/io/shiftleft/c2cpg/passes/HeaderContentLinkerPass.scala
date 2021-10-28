@@ -5,6 +5,7 @@ import io.shiftleft.c2cpg.parser.FileDefaults
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{
   HasFilename,
+  HasIsExternal,
   Local,
   NewBlock,
   NewFile,
@@ -13,14 +14,22 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   NewNamespaceBlock,
   StoredNode
 }
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, EvaluationStrategies, NodeTypes, PropertyNames}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language.types.structure.NamespaceTraversal
 import io.shiftleft.semanticcpg.passes.frontend.MetaDataPass
 import io.shiftleft.x2cpg.Ast
 import overflowdb.traversal.Traversal
 
-class HeaderContentLinkerPass(cpg: Cpg, projectPath: String) extends CpgPass(cpg) {
+import java.nio.file.Path
+
+class HeaderContentLinkerPass(cpg: Cpg, projectPath: String, systemIncludePaths: Set[Path]) extends CpgPass(cpg) {
+
+  private def setExternal(node: HasFilename, diffGraph: DiffGraph.Builder): Unit = {
+    if (node.isInstanceOf[HasIsExternal] && systemIncludePaths.exists(p => node.filename.startsWith(p.toString))) {
+      diffGraph.addNodeProperty(node.asInstanceOf[StoredNode], PropertyNames.IS_EXTERNAL, Boolean.box(true))
+    }
+  }
 
   override def run(): Iterator[DiffGraph] = {
     if (!Global.shouldBeCleared()) {
@@ -69,6 +78,7 @@ class HeaderContentLinkerPass(cpg: Cpg, projectPath: String) extends CpgPass(cpg
       Traversal(cpg.graph.nodes()).whereNot(_.inE(EdgeTypes.AST)).foreach {
         case srcNode: HasFilename if FileDefaults.isHeaderFile(srcNode.filename) =>
           dstGraph.addEdgeToOriginal(blockNode, srcNode.asInstanceOf[StoredNode], EdgeTypes.AST)
+          setExternal(srcNode, dstGraph)
         case srcNode: Local =>
           dstGraph.addEdgeToOriginal(blockNode, srcNode.asInstanceOf[StoredNode], EdgeTypes.AST)
         case _ =>
