@@ -1578,6 +1578,123 @@ class AstCreationPassTests extends AnyWordSpec with Matchers with CpgAstOnlyFixt
 
   "AST" should {
 
+    "be correct for designated initializers in plain C" in TestAstOnlyFixture("""
+       |void foo() {
+       |  int a[3] = { [1] = 5, [2] = 10 };
+       |};
+      """.stripMargin) { cpg =>
+      cpg.assignment.head.astChildren.l match {
+        case List(ident: Identifier, call: Call) =>
+          ident.typeFullName shouldBe "int[3]"
+          ident.order shouldBe 1
+          call.code shouldBe "{ [1] = 5, [2] = 10 }"
+          call.order shouldBe 2
+          // TODO: "<operator>.arrayInitializer" is not part of Operators
+          call.name shouldBe "<operator>.arrayInitializer"
+          call.methodFullName shouldBe "<operator>.arrayInitializer"
+          val children = call.astMinusRoot.isCall.l
+          val args = call.argument.astChildren.l
+          children match {
+            case List(call1, call2) =>
+              call1.code shouldBe "[1] = 5"
+              call1.name shouldBe Operators.assignment
+              call1.astMinusRoot.code.l shouldBe List("1", "5")
+              call1.argument.code.l shouldBe List("1", "5")
+              call2.code shouldBe "[2] = 10"
+              call2.name shouldBe Operators.assignment
+              call2.astMinusRoot.code.l shouldBe List("2", "10")
+              call2.argument.code.l shouldBe List("2", "10")
+            case _ => fail()
+          }
+          children shouldBe args
+        case _ => fail()
+      }
+    }
+
+    "be correct for struct designated initializers in plain C" in TestAstOnlyFixture(
+      """
+        |void foo() {
+        |  struct foo b = { .a = 1, .b = 2 };
+        |};
+      """.stripMargin) { cpg =>
+      cpg.assignment.head.astChildren.l match {
+        case List(ident: Identifier, call: Call) =>
+          ident.typeFullName shouldBe "struct foo"
+          ident.order shouldBe 1
+          call.code shouldBe "{ .a = 1, .b = 2 }"
+          call.order shouldBe 2
+          // TODO: "<operator>.arrayInitializer" is not part of Operators
+          call.name shouldBe "<operator>.arrayInitializer"
+          call.methodFullName shouldBe "<operator>.arrayInitializer"
+          val children = call.astMinusRoot.isCall.l
+          val args = call.argument.astChildren.l
+          children match {
+            case List(call1, call2) =>
+              call1.code shouldBe ".a = 1"
+              call1.name shouldBe Operators.assignment
+              call1.astMinusRoot.code.l shouldBe List("a", "1")
+              call1.argument.code.l shouldBe List("a", "1")
+              call2.code shouldBe ".b = 2"
+              call2.name shouldBe Operators.assignment
+              call2.astMinusRoot.code.l shouldBe List("b", "2")
+              call2.argument.code.l shouldBe List("b", "2")
+            case _ => fail()
+          }
+          children shouldBe args
+        case _ => fail()
+      }
+    }
+
+    "be correct for designated initializers in C++" in TestAstOnlyFixture(
+      """
+       |class Point3D {
+       | public:
+       |  int x;
+       |  int y;
+       |  int z;
+       |};
+       |
+       |void foo() {
+       |  Point3D point3D { .x = 1, .y = 2, .z = 3 };
+       |};
+      """.stripMargin,
+      "test.cpp"
+    ) { cpg =>
+      cpg.call.code("point3D \\{ .x = 1, .y = 2, .z = 3 \\}").l match {
+        case List(call: Call) =>
+          call.name shouldBe "point3D"
+          call.methodFullName shouldBe "point3D"
+          call.astChildren.l match {
+            case List(initCall: Call) =>
+              initCall.code shouldBe "{ .x = 1, .y = 2, .z = 3 }"
+              // TODO: "<operator>.arrayInitializer" is not part of Operators
+              initCall.name shouldBe "<operator>.arrayInitializer"
+              initCall.methodFullName shouldBe "<operator>.arrayInitializer"
+              val children = initCall.astMinusRoot.isCall.l
+              val args = initCall.argument.astChildren.l
+              children match {
+                case List(call1, call2, call3) =>
+                  call1.code shouldBe ".x = 1"
+                  call1.name shouldBe Operators.assignment
+                  call1.astMinusRoot.code.l shouldBe List("x", "1")
+                  call1.argument.code.l shouldBe List("x", "1")
+                  call2.code shouldBe ".y = 2"
+                  call2.name shouldBe Operators.assignment
+                  call2.astMinusRoot.code.l shouldBe List("y", "2")
+                  call2.argument.code.l shouldBe List("y", "2")
+                  call3.code shouldBe ".z = 3"
+                  call3.name shouldBe Operators.assignment
+                  call3.astMinusRoot.code.l shouldBe List("z", "3")
+                  call3.argument.code.l shouldBe List("z", "3")
+                case _ => fail()
+              }
+              children shouldBe args
+            case _ => fail()
+          }
+        case _ => fail()
+      }
+    }
+
     "be correct for call with pack expansion" in TestAstOnlyFixture("""
        |void foo(int x, int*... args) {
        |  foo(x, args...);
