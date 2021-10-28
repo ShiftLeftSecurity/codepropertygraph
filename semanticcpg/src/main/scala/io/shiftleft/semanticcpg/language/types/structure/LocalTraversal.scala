@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
+import io.shiftleft.semanticcpg.language.MySteps._
 import overflowdb.traversal.Traversal
 
 /**
@@ -38,4 +39,17 @@ class LocalTraversal(val traversal: Traversal[Local]) extends AnyVal {
     * */
   def typ: Traversal[Type] =
     traversal.out(EdgeTypes.EVAL_TYPE).cast[Type]
+}
+
+import scala.jdk.CollectionConverters._
+
+class LocalTraversalNew[PipeT[_]](nodeOrPipe: PipeT[Local]) {
+  def definingBlock(implicit ops: PipeOps[PipeT]): PipeT[Block] = {
+    nodeOrPipe.map(_._astIn.asScala.next()).cast[Block]
+  }
+
+  def referencingIdentifiers(implicit ops: PipeOps[PipeT]): PipeN[Identifier] = {
+    nodeOrPipe.flatMapIter(_._refIn.asScala).filter2(_.label == NodeTypes.IDENTIFIER)
+      .cast[Identifier]
+  }
 }

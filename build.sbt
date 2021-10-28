@@ -78,6 +78,7 @@ lazy val c2cpg = Projects.c2cpg
 lazy val c2cpgtests = Projects.c2cpgtests
 lazy val macros = Projects.macros
 lazy val schema2json = Projects.schema2json
+lazy val performance = Projects.performance
 
 // Once sbt-scalafmt is at version > 2.x, use scalafmtAll
 addCommandAlias("format", ";scalafixAll OrganizeImports;scalafmt;test:scalafmt")
@@ -85,7 +86,6 @@ addCommandAlias("format", ";scalafixAll OrganizeImports;scalafmt;test:scalafmt")
 ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
-  "-Ywarn-unused", // required by scalafix
   "-Xfatal-warnings",
   "-language:implicitConversions",
   "-Ycache-macro-class-loader:last-modified",
