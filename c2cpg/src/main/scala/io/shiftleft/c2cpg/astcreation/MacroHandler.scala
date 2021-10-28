@@ -1,7 +1,14 @@
 package io.shiftleft.c2cpg.astcreation
 
 import io.shiftleft.codepropertygraph.generated.DispatchTypes
-import io.shiftleft.codepropertygraph.generated.nodes.{AstNodeNew, ExpressionNew, NewCall, NewFieldIdentifier, NewNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{
+  AstNodeNew,
+  ExpressionNew,
+  NewBlock,
+  NewCall,
+  NewFieldIdentifier,
+  NewNode
+}
 import io.shiftleft.x2cpg.Ast
 import org.eclipse.cdt.core.dom.ast.{IASTMacroExpansionLocation, IASTNode, IASTPreprocessorMacroDefinition}
 import org.eclipse.cdt.internal.core.parser.scanner.MacroArgumentExtractor
@@ -29,7 +36,14 @@ trait MacroHandler {
     }
     if (macroCallAst.isDefined) {
       val newAst = ast.subTreeCopy(ast.root.get.asInstanceOf[AstNodeNew], order = 1)
-      macroCallAst.get.withChild(newAst)
+      // We need to wrap the copied AST as it may contain CPG nodes not being allowed
+      // to be connected via AST edges under a CALL. E.g., LOCALs.
+      val b = Ast(
+        NewBlock()
+          .order(1)
+          .argumentIndex(1)
+          .typeFullName(registerType(Defines.voidTypeName)))
+      macroCallAst.get.withChild(b.withChild(newAst))
     } else {
       ast
     }
