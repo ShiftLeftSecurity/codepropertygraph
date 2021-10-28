@@ -2,22 +2,40 @@ package io.shiftleft.semanticcpg.passes.callgraph
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{Call, Method, TypeDecl}
-import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes}
+import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, PropertyNames}
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
+import overflowdb.traversal.jIteratortoTraversal
+import overflowdb.{NodeDb, NodeRef}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
+/** We compute the set of possible call-targets for each dynamic call, and add them as CALL edges to the graph, based on
+  * call.methodFullName, method.name and method.signature, the inheritance hierarchy and the AST of typedecls and
+  * methods.
+  *
+  * This pass intentionally ignores the vtable mechanism based on BINDING nodes but does check for an existing call edge
+  * before adding one. It assumes non-circular inheritance, on pain of endless recursion / stack overflow.
+  *
+  * Based on the algorithm by Jang, Dongseok & Tatlock, Zachary & Lerner, Sorin. (2014).
+  * SAFEDISPATCH: Securing C++ Virtual Calls from Memory Corruption Attacks.
+  * 10.14722/ndss.2014.23287.
+  */
 class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
 
   import DynamicCallLinker._
-  // Used to track potential method candidates for a given method fullname. Since our method
-  // full names contain the type decl we don't need to specify an addition map to wrap this in
-  private val validM = mutable.Map.empty[String, Set[String]]
+  // Used to track potential method candidates for a given method fullname. Since our method full names contain the type
+  // decl we don't need to specify an addition map to wrap this in. LinkedHashSets are used here to preserve order in
+  // the best interest of reproducibility during debugging.
+  private val validM = mutable.Map.empty[String, mutable.LinkedHashSet[String]]
   // Used for dynamic programming as subtree's don't need to be recalculated later
-  private val subclassCache = mutable.Map.empty[String, Set[String]]
+  private val subclassCache = mutable.Map.empty[String, mutable.LinkedHashSet[String]]
+  // Used for O(1) lookups on methods that will work without indexManager
+  private val typeMap = cpg.typeDecl.map { typeDecl =>
+    typeDecl.fullName -> typeDecl
+  }.toMap
 
   /** Main method of enhancement - to be implemented by child class
     */
@@ -51,26 +69,26 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
     Iterator(dstGraph.build())
   }
 
-  /** Recursively returns all the sub-types of the given type declaration
+  /** Recursively returns all the sub-types of the given type declaration. Does not account for circular hierarchies.
     */
-  def allSubclasses(typDeclFullName: String): Set[String] = {
+  def allSubclasses(typDeclFullName: String): mutable.LinkedHashSet[String] = {
     subclassCache.get(typDeclFullName) match {
       case Some(value) => value
       case None =>
         val directSubclasses =
           cpg.typ
             .nameExact(typDeclFullName)
-            .flatMap(_.in(EdgeTypes.INHERITS_FROM).asScala)
+            .flatMap(_.in(EdgeTypes.INHERITS_FROM))
             .collect {
               case x: TypeDecl =>
                 x.fullName
             }
-            .toSetImmutable
+            .to(mutable.LinkedHashSet)
         // The second check makes sure that set is changing which wouldn't be the case in circular hierarchies
-        val totalSubclasses: Set[String] = if (directSubclasses.isEmpty) {
-          directSubclasses ++ Set(typDeclFullName)
+        val totalSubclasses: mutable.LinkedHashSet[String] = if (directSubclasses.isEmpty) {
+          directSubclasses ++ mutable.LinkedHashSet(typDeclFullName)
         } else {
-          directSubclasses.flatMap(t => allSubclasses(t)) ++ Set(typDeclFullName)
+          directSubclasses.flatMap(t => allSubclasses(t)) ++ mutable.LinkedHashSet(typDeclFullName)
         }
         subclassCache.put(typDeclFullName, totalSubclasses)
         totalSubclasses
@@ -80,7 +98,7 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   /** Returns the method from a sub-class implementing a method for the given subclass.
     */
   private def staticLookup(subclass: String, method: Method): Option[String] = {
-    cpg.typeDecl.fullNameExact(subclass).headOption match {
+    typeMap.get(subclass) match {
       case Some(sc) =>
         sc._methodViaAstOut
           .nameExact(method.name)
@@ -93,11 +111,16 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
 
   private def linkDynamicCall(call: Call, dstGraph: DiffGraph.Builder): Unit = {
     validM.get(call.methodFullName) match {
-      case Some(value) =>
-        value.foreach { destMethod =>
-          val tgt = cpg.method.fullNameExact(destMethod).headOption
-          if (tgt.isDefined) {
-            dstGraph.addEdgeInOriginal(call, tgt.get, EdgeTypes.CALL)
+      case Some(tgts) =>
+        val callsOut = call.callOut.fullName.toSetImmutable
+        tgts.foreach { destMethod =>
+          val tgtM = if (cpg.graph.indexManager.isIndexed(PropertyNames.FULL_NAME)) {
+            methodFullNameToNode(destMethod)
+          } else {
+            cpg.method.fullNameExact(destMethod).headOption
+          }
+          if (tgtM.isDefined && !callsOut.contains(tgtM.get.fullName)) {
+            dstGraph.addEdgeInOriginal(call, tgtM.get, EdgeTypes.CALL)
           } else {
             printLinkingError(call)
           }
@@ -105,6 +128,12 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
       case None => printLinkingError(call)
     }
   }
+
+  private def nodesWithFullName(x: String): Iterable[NodeRef[_ <: NodeDb]] =
+    cpg.graph.indexManager.lookup(PropertyNames.FULL_NAME, x).asScala
+
+  private def methodFullNameToNode(x: String): Option[Method] =
+    nodesWithFullName(x).collectFirst { case x: Method => x }
 
   @inline
   private def printLinkingError(call: Call): Unit = {
