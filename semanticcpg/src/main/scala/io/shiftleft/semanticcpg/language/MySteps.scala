@@ -21,7 +21,7 @@ object MySteps {
 
   implicit val opsN = new PipeNIterableOps()
 
-  val pipeNGen: PipeNGenerator[Iterable] = new PipeNGenerator[Iterable] {
+  val pipeNGenIterable: PipeNGenerator[Iterable] = new PipeNGenerator[Iterable] {
     override def empty[T](): Iterable[T] = {
       Nil
     }
@@ -82,6 +82,11 @@ class Basic[I, C[_], PipeT[U[_], _]](pipe: PipeT[C, I]) {
 class ExtensionClass[I <: nodes.Method, C[_], PipeT[U[_], _]](pipe: PipeT[C, I]) {
   def methodReturn2()(implicit ops: PipeOps[C, PipeT]): PipeT[C, nodes.MethodReturn] = {
     pipe.map(_._astOut.asScala.collectFirst { case x: nodes.MethodReturn => x }.get)
+    //ops.map(pipe)(_._astOut.asScala.collectFirst { case x: nodes.MethodReturn => x }.get)
+  }
+
+  def methodParameters()(implicit ops: PipeOps[C, PipeT], gen: PipeNGenerator[C]): PipeN[C, nodes.MethodParameterIn] = {
+    pipe.flatMapIter(_._astOut.asScala.collect { case x: nodes.MethodParameterIn => x })
     //ops.map(pipe)(_._astOut.asScala.collectFirst { case x: nodes.MethodReturn => x }.get)
   }
 }
