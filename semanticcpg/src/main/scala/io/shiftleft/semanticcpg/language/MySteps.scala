@@ -7,100 +7,80 @@ import overflowdb.traversal.Traversal
 import scala.jdk.CollectionConverters._
 
 object MySteps {
-  type Pipe1[T] = T
-  type PipeN[T] = Iterable[T]
+  type Pipe1[C[_], T] = T
+  type PipeN[C[_], T] = C[T]
 
-  trait PipeOps[PipeT[_]] {
-    def map[I, O](pipe: PipeT[I])(f: I => O): PipeT[O]
-    def filter[I](pipe: PipeT[I])(f: I => Boolean): PipeN[I]
-    def flatMap[I, O](pipe: PipeT[I])(f: I => Iterable[O]): PipeN[O]
-    def flatMapIter[I, O](pipe: PipeT[I])(f: I => Iterator[O]): PipeN[O]
+  trait PipeNGenerator[C[_]] {
+    def empty[T](): C[T]
+    def single[T](element: T): C[T]
+    def multi[T](elements: Iterable[T]): C[T]
+    def multi[T](elements: Iterator[T]): C[T]
   }
 
-  implicit val ops1 = new PipeOps[Pipe1] {
-    override def map[I, O](pipe: Pipe1[I])(f: I => O): Pipe1[O] = {
-      f(pipe)
+  implicit val ops1 = new Pipe1Ops()
+
+  implicit val opsN = new PipeNIterableOps()
+
+  val pipeNGen: PipeNGenerator[Iterable] = new PipeNGenerator[Iterable] {
+    override def empty[T](): Iterable[T] = {
+      Nil
     }
 
-    override def filter[I](pipe: Pipe1[I])(f: I => Boolean): PipeN[I] = {
-      if (f(pipe)) {
-        Iterable.single(pipe)
-      } else {
-        Iterable.empty
-      }
+    override def single[T](element: T): Iterable[T] = {
+      element :: Nil
     }
 
-    override def flatMap[I, O](pipe: Pipe1[I])(f: I => Iterable[O]): PipeN[O] = {
-      f(pipe)
+    override def multi[T](elements: Iterable[T]): Iterable[T] = {
+      elements.toList
     }
 
-    override def flatMapIter[I, O](pipe: Pipe1[I])(f: I => Iterator[O]): PipeN[O] = {
-      f(pipe).to(Iterable)
-    }
-  }
-
-  private val opsN = new PipeOps[PipeN] {
-    override def map[I, O](pipe: PipeN[I])(f: I => O): PipeN[O] = {
-      pipe.map(f)
-    }
-
-    override def filter[I](pipe: PipeN[I])(f: I => Boolean): PipeN[I] = {
-      pipe.filter(f)
-    }
-
-    override def flatMap[I, O](pipe: PipeN[I])(f: I => Iterable[O]): PipeN[O] = {
-      pipe.flatMap(f)
-    }
-
-    override def flatMapIter[I, O](pipe: PipeN[I])(f: I => Iterator[O]): PipeN[O] = {
-      pipe.flatMap(f)
+    override def multi[T](elements: Iterator[T]): Iterable[T] = {
+      elements.toList
     }
   }
 
-  implicit def opsNFunc[PipeN[_]]: PipeOps[PipeN] = opsN.asInstanceOf[PipeOps[PipeN]]
-
-  implicit def toExtClass[I <: nodes.Method, PipeT[_]](pipe: PipeT[I]): ExtensionClass[I, PipeT] = {
+  implicit def toExtClass[I <: nodes.Method, C[_], PipeT[U[_], _]](pipe: PipeT[C, I]): ExtensionClass[I, C, PipeT] = {
     new ExtensionClass(pipe)
   }
 
-  implicit def toExtClass[I <: nodes.Method](pipe: I): ExtensionClass[I, Pipe1] = {
-    new ExtensionClass(pipe: Pipe1[I])
+  implicit def toExtClass[I <: nodes.Method, C[_]](pipe: I): ExtensionClass[I, C, Pipe1] = {
+    new ExtensionClass(pipe: Pipe1[C, I])
   }
 
-  implicit def toBasic[I, PipeT[_]](pipe: PipeT[I]): Basic[I, PipeT] = {
+  implicit def toBasic[I, C[_], PipeT[U[_], _]](pipe: PipeT[C, I]): Basic[I, C, PipeT] = {
     new Basic(pipe)
   }
 
-  implicit def toBasic1[I](pipe: I): Basic[I, Pipe1] = {
-    new Basic(pipe: Pipe1[I])
+  implicit def toBasic1[I, C[_]](pipe: I): Basic[I, C, Pipe1] = {
+    new Basic(pipe: Pipe1[C, I])
   }
 
 }
 
-class Basic[I, PipeT[_]](pipe: PipeT[I]) {
-  def map[O](f: I => O)(implicit ops: PipeOps[PipeT]): PipeT[O] = {
+class Basic[I, C[_], PipeT[U[_], _]](pipe: PipeT[C, I]) {
+  def map[O](f: I => O)(implicit ops: PipeOps[C, PipeT]): PipeT[C, O] = {
     ops.map(pipe)(f)
   }
 
-  def filter2(f: I => Boolean)(implicit ops: PipeOps[PipeT]): PipeN[I] = {
+  def filter2(f: I => Boolean)(implicit ops: PipeOps[C, PipeT], gen: PipeNGenerator[C]): PipeN[C, I] = {
     ops.filter(pipe)(f)
   }
 
-  def flatMap[O](f: I => Iterable[O])(implicit ops: PipeOps[PipeT]): PipeN[O] = {
+  def flatMap[O](f: I => Iterable[O])(implicit ops: PipeOps[C, PipeT], gen: PipeNGenerator[C]): PipeN[C, O] = {
     ops.flatMap(pipe)(f)
   }
 
-  def flatMapIter[O](f: I => Iterator[O])(implicit ops: PipeOps[PipeT]): PipeN[O] = {
+  def flatMapIter[O](f: I => Iterator[O])(implicit ops: PipeOps[C, PipeT], gen: PipeNGenerator[C]): PipeN[C, O] = {
     ops.flatMapIter(pipe)(f)
   }
 
-  def cast[T]: PipeT[T] = {
-    pipe.asInstanceOf[PipeT[T]]
+  def cast[T]: PipeT[C, T] = {
+    pipe.asInstanceOf[PipeT[C, T]]
   }
 }
 
-class ExtensionClass[I <: nodes.Method, PipeT[_]](pipe: PipeT[I]) {
-  def methodReturn2()(implicit ops: PipeOps[PipeT]): PipeT[nodes.MethodReturn] = {
+class ExtensionClass[I <: nodes.Method, C[_], PipeT[U[_], _]](pipe: PipeT[C, I]) {
+  def methodReturn2()(implicit ops: PipeOps[C, PipeT]): PipeT[C, nodes.MethodReturn] = {
     pipe.map(_._astOut.asScala.collectFirst { case x: nodes.MethodReturn => x }.get)
     //ops.map(pipe)(_._astOut.asScala.collectFirst { case x: nodes.MethodReturn => x }.get)
   }
