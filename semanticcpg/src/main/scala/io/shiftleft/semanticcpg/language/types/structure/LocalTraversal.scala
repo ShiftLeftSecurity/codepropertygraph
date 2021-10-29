@@ -44,12 +44,12 @@ class LocalTraversal(val traversal: Traversal[Local]) extends AnyVal {
 
 import scala.jdk.CollectionConverters._
 
-class LocalTraversalNew[C[_], PipeT[U[_], _]](nodeOrPipe: PipeT[C, Local]) {
-  def definingBlock(implicit ops: PipeOps[C, PipeT]): PipeT[C, Block] = {
+class LocalTraversalNew[PipeT[_], C[_]](nodeOrPipe: PipeT[Local]) {
+  def definingBlock(implicit ops: PipeOps[PipeT, C]): ops.T1to1[Block] = {
     nodeOrPipe.map(_._astIn.asScala.next()).cast[Block]
   }
 
-  def referencingIdentifiers(implicit ops: PipeOps[C, PipeT], ops2: PipeOps[C, PipeN], gen: PipeNGenerator[C]): PipeN[C, Identifier] = {
+  def referencingIdentifiers(implicit ops: PipeOps[PipeT, C], ops2: PipeOps[C, C], gen: PipeNGenerator[C]): ops.T1toN[Identifier] = {
     nodeOrPipe.flatMapIter(_._refIn.asScala).filter2(_.label == NodeTypes.IDENTIFIER)
       .cast[Identifier]
   }

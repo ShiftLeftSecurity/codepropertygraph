@@ -33,7 +33,7 @@ class MyTests {
 
   @Benchmark
   def newTrav(state: MyState): Unit = {
-    val x = state.method.methodReturn2()
+    val x = state.method.methodParameters()
   }
 
   @Benchmark
@@ -58,5 +58,16 @@ class MyTests {
   @Benchmark
   def direct2(state: MyState): Unit = {
     val x = state.method._astOut.asScala.collectFirst { case x: MethodReturn => x }.get
+  }
+
+  @Benchmark
+  def list(): Unit = {
+    val x = 1 :: Nil
+    val y = x.map(_ + 1).head
+  }
+
+  @Benchmark
+  def list2(): Unit = {
+    val x = 1 + 1
   }
 }

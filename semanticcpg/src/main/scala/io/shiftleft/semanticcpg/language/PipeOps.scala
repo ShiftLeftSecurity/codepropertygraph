@@ -1,21 +1,25 @@
 package io.shiftleft.semanticcpg.language
 
-import io.shiftleft.semanticcpg.language.MySteps.{Pipe1, PipeN, PipeNGenerator}
+import io.shiftleft.semanticcpg.language.MySteps.{Pipe1, PipeNGenerator}
 
 
-trait PipeOps[C[_], PipeT[U[_], _]] {
-  def map[I, O](pipe: PipeT[C, I])(f: I => O): PipeT[C, O]
-  def filter[I](pipe: PipeT[C, I])(f: I => Boolean)(implicit gen: PipeNGenerator[C]): PipeN[C, I]
-  def flatMap[I, O](pipe: PipeT[C, I])(f: I => Iterable[O])(implicit gen: PipeNGenerator[C]): PipeN[C, O]
-  def flatMapIter[I, O](pipe: PipeT[C, I])(f: I => Iterator[O])(implicit gen: PipeNGenerator[C]): PipeN[C, O]
+trait PipeOps[PipeT[_], C[_]] {
+  type T1to1[T]
+  type T1toN[T] = C[T]
+  def map[I, O](pipe: PipeT[I])(f: I => O): T1to1[O]
+  def filter[I](pipe: PipeT[I])(f: I => Boolean)(implicit gen: PipeNGenerator[C]): T1toN[I]
+  def flatMap[I, O](pipe: PipeT[I])(f: I => Iterable[O])(implicit gen: PipeNGenerator[C]): T1toN[O]
+  def flatMapIter[I, O](pipe: PipeT[I])(f: I => Iterator[O])(implicit gen: PipeNGenerator[C]): T1toN[O]
 }
 
-class Pipe1Ops extends PipeOps[Iterable, Pipe1] {
-  override def map[I, O](pipe: Pipe1[Iterable, I])(f: I => O): Pipe1[Iterable, O] = {
+class Pipe1Ops extends PipeOps[Pipe1, Iterable] {
+  override type T1to1[T] = Pipe1[T]
+
+  override def map[I, O](pipe: Pipe1[I])(f: I => O): T1to1[O] = {
     f(pipe)
   }
 
-  override def filter[I](pipe: Pipe1[Iterable, I])(f: I => Boolean)(implicit gen: PipeNGenerator[Iterable]): PipeN[Iterable, I] = {
+  override def filter[I](pipe: Pipe1[I])(f: I => Boolean)(implicit gen: PipeNGenerator[Iterable]): T1toN[I] = {
     if (f(pipe)) {
       gen.single(pipe)
     } else {
@@ -23,29 +27,31 @@ class Pipe1Ops extends PipeOps[Iterable, Pipe1] {
     }
   }
 
-  override def flatMap[I, O](pipe: Pipe1[Iterable, I])(f: I => Iterable[O])(implicit gen: PipeNGenerator[Iterable]): PipeN[Iterable, O] = {
+  override def flatMap[I, O](pipe: Pipe1[I])(f: I => Iterable[O])(implicit gen: PipeNGenerator[Iterable]): T1toN[O] = {
     gen.multi(f(pipe))
   }
 
-  override def flatMapIter[I, O](pipe: Pipe1[Iterable, I])(f: I => Iterator[O])(implicit gen: PipeNGenerator[Iterable]): PipeN[Iterable, O] = {
+  override def flatMapIter[I, O](pipe: Pipe1[I])(f: I => Iterator[O])(implicit gen: PipeNGenerator[Iterable]): T1toN[O] = {
     gen.multi(f(pipe))
   }
 }
 
-class PipeNIterableOps extends PipeOps[Iterable, PipeN] {
-  override def map[I, O](pipe: PipeN[Iterable, I])(f: I => O): PipeN[Iterable, O] = {
+class PipeNIterableOps extends PipeOps[Iterable, Iterable] {
+  override type T1to1[T] = Iterable[T]
+
+  override def map[I, O](pipe: Iterable[I])(f: I => O): T1to1[O] = {
     pipe.map(f)
   }
 
-  override def filter[I](pipe: PipeN[Iterable, I])(f: I => Boolean)(implicit gen: PipeNGenerator[Iterable]): PipeN[Iterable, I] = {
+  override def filter[I](pipe: Iterable[I])(f: I => Boolean)(implicit gen: PipeNGenerator[Iterable]): T1toN[I] = {
     pipe.filter(f)
   }
 
-  override def flatMap[I, O](pipe: PipeN[Iterable, I])(f: I => Iterable[O])(implicit gen: PipeNGenerator[Iterable]): PipeN[Iterable, O] = {
+  override def flatMap[I, O](pipe: Iterable[I])(f: I => Iterable[O])(implicit gen: PipeNGenerator[Iterable]): T1toN[O] = {
     pipe.flatMap(f)
   }
 
-  override def flatMapIter[I, O](pipe: PipeN[Iterable, I])(f: I => Iterator[O])(implicit gen: PipeNGenerator[Iterable]): PipeN[Iterable, O] = {
+  override def flatMapIter[I, O](pipe: Iterable[I])(f: I => Iterator[O])(implicit gen: PipeNGenerator[Iterable]): T1toN[O] = {
     pipe.flatMap(f)
   }
 }
