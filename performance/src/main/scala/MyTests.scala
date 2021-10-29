@@ -61,13 +61,17 @@ class MyTests {
   }
 
   @Benchmark
-  def list(): Unit = {
-    val x = 1 :: Nil
-    val y = x.map(_ + 1).head
+  def listOption(): Option[Int] = {
+    val x = 1
+    if (x == 1) {
+      Some(x)
+    } else {
+      None
+    }
   }
 
   @Benchmark
-  def list2(): Unit = {
-    val x = 1 + 1
+  def list2(): Option[Int] = {
+    Some(1).filter(_ == 1)
   }
 }

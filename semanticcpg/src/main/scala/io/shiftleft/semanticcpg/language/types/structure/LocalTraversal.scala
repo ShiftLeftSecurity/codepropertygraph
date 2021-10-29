@@ -49,7 +49,7 @@ class LocalTraversalNew[PipeT[_], C[_]](nodeOrPipe: PipeT[Local]) {
     nodeOrPipe.map(_._astIn.asScala.next()).cast[Block]
   }
 
-  def referencingIdentifiers(implicit ops: PipeOps[PipeT, C], ops2: PipeOps[C, C], gen: PipeNGenerator[C]): ops.T1toN[Identifier] = {
+  def referencingIdentifiers(implicit ops: PipeOps[PipeT, C], ops2: PipeOps[C, C]): ops2.T1toOption[Identifier] = {
     nodeOrPipe.flatMapIter(_._refIn.asScala).filter2(_.label == NodeTypes.IDENTIFIER)
       .cast[Identifier]
   }
