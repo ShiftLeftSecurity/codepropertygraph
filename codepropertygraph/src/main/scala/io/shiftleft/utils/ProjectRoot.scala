@@ -16,16 +16,23 @@ import better.files.File
   */
 object ProjectRoot {
 
+  private val SEARCH_DEPTH = 4
+  object SearchDepthExceededError extends Error
+
   def relativise(path: String): String =
-    s"$findRelativePath/$path"
+    s"$findRelativePath$path"
 
   def findRelativePath: String = {
     val fileThatOnlyExistsInRoot = ".git"
 
-    if (File(fileThatOnlyExistsInRoot).exists) "."
-    else if (File(s"../$fileThatOnlyExistsInRoot").exists) ".."
-    else if (File(s"../../$fileThatOnlyExistsInRoot").exists) ".."
-    else ???
+    for (depth <- 0 to SEARCH_DEPTH) {
+      val pathPrefix = "./" + "../" * depth
+      if (File(s"$pathPrefix$fileThatOnlyExistsInRoot").exists) {
+        return pathPrefix
+      }
+    }
+
+    throw SearchDepthExceededError
   }
 
   def find: File =
