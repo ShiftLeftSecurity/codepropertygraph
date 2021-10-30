@@ -38,6 +38,12 @@ class Engine(context: EngineContext) {
     * paths created during the analysis.
     * */
   def backwards(sinks: List[CfgNode], sources: List[CfgNode]): (List[ReachableByResult], ResultTable) = {
+    if (sources.isEmpty) {
+      logger.warn("Attempting to determine flows from empty list of sources.")
+    }
+    if (sinks.isEmpty) {
+      logger.warn("Attempting to determine flows to empty list of sinks.")
+    }
     val sourcesSet = sources.toSet
     val table = new ResultTable
     val tasks = sinks.map(sink => ReachableByTask(sink, sourcesSet, table))
