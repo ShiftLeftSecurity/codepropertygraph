@@ -3,7 +3,7 @@ name := "c2cpg-tests"
 dependsOn(Projects.semanticcpg,
           Projects.c2cpg,
           Projects.dataflowengineoss % Test,
-          Projects.semanticcpgtests % "compile->compile; test->test"
+          Projects.semanticcpg % "test->test"
 )
 
 libraryDependencies ++= Seq(

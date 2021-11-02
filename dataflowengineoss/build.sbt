@@ -1,7 +1,7 @@
 name := "dataflowengineoss"
 
 dependsOn(Projects.semanticcpg,
-          Projects.semanticcpgtests % "test -> test"
+          Projects.semanticcpg % "test -> test"
 )
 
 libraryDependencies ++= Seq(
