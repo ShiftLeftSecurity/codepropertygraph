@@ -1,6 +1,6 @@
 name := "dataflowengineoss-tests"
 
-dependsOn(Projects.semanticcpg, Projects.semanticcpgtests % "test -> test",
+dependsOn(Projects.semanticcpg, Projects.semanticcpg % "test -> test",
   Projects.dataflowengineoss,
 )
 dependsOn(Projects.fuzzyc2cpg % Test)
