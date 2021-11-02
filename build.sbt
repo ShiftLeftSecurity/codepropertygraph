@@ -70,7 +70,6 @@ lazy val domainClasses = Projects.domainClasses
 lazy val protoBindings = Projects.protoBindings
 lazy val semanticcpg = Projects.semanticcpg
 lazy val dataflowengineoss = Projects.dataflowengineoss
-lazy val dataflowengineosstests = Projects.dataflowengineosstests
 lazy val fuzzyc2cpg = Projects.fuzzyc2cpg
 lazy val fuzzyc2cpgtests = Projects.fuzzyc2cpgtests
 lazy val c2cpg = Projects.c2cpg
