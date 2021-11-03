@@ -7,7 +7,6 @@ object Projects {
   lazy val protoBindings = project.in(file("proto-bindings"))
   lazy val semanticcpg = project.in(file("semanticcpg"))
   lazy val dataflowengineoss = project.in(file("dataflowengineoss"))
-  lazy val dataflowengineosstests = project.in(file("dataflowengineoss-tests"))
   lazy val fuzzyc2cpg = project.in(file("fuzzyc2cpg"))
   lazy val fuzzyc2cpgtests = project.in(file("fuzzyc2cpg-tests"))
   lazy val c2cpg = project.in(file("c2cpg"))
