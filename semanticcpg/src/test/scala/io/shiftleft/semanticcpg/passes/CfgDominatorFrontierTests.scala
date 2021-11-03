@@ -57,13 +57,13 @@ class CfgDominatorFrontierTests extends AnyWordSpec with Matchers {
     val cfgDominatorFrontier = new CfgDominatorFrontier(cfgAdapter, domTreeAdapter)
     val dominanceFrontier = cfgDominatorFrontier.calculate(graph.nodes.asScala.toList)
 
-    dominanceFrontier.get(v0) shouldBe Set.empty
-    dominanceFrontier.get(v1) shouldBe Set.empty
-    dominanceFrontier.get(v2) shouldBe Set(v2)
-    dominanceFrontier.get(v3) shouldBe Set(v2, v5)
-    dominanceFrontier.get(v4) shouldBe Set(v2, v5)
-    dominanceFrontier.get(v5) shouldBe Set.empty
-    dominanceFrontier.get(v6) shouldBe Set.empty
+    dominanceFrontier.get(v0) shouldBe None
+    dominanceFrontier.get(v1) shouldBe None
+    dominanceFrontier.apply(v2) shouldBe Set(v2)
+    dominanceFrontier.apply(v3) shouldBe Set(v2, v5)
+    dominanceFrontier.apply(v4) shouldBe Set(v2, v5)
+    dominanceFrontier.get(v5) shouldBe None
+    dominanceFrontier.get(v6) shouldBe None
   }
 
   "Cfg domiance frontier with dead code test" in {
@@ -84,9 +84,9 @@ class CfgDominatorFrontierTests extends AnyWordSpec with Matchers {
     val cfgDominatorFrontier = new CfgDominatorFrontier(cfgAdapter, domTreeAdapter)
     val dominanceFrontier = cfgDominatorFrontier.calculate(graph.nodes.asScala.toList)
 
-    dominanceFrontier.get(v0) shouldBe Set.empty
-    dominanceFrontier.get(v1) shouldBe Set(v2)
-    dominanceFrontier.get(v2) shouldBe Set.empty
+    dominanceFrontier.get(v0) shouldBe None
+    dominanceFrontier.apply(v1) shouldBe Set(v2)
+    dominanceFrontier.get(v2) shouldBe None
   }
 
 }

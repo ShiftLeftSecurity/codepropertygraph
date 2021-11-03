@@ -18,8 +18,8 @@ class CfgDominatorFrontier[NodeType](cfgAdapter: CfgAdapter[NodeType], domTreeAd
   private def withIDom(x: NodeType, preds: Seq[NodeType]) =
     doms(x).map(i => (x, preds, i))
 
-  def calculate(cfgNodes: Seq[NodeType]): mutable.MultiDict[NodeType, NodeType] = {
-    val domFrontier = mutable.MultiDict.empty[NodeType, NodeType]
+  def calculate(cfgNodes: Seq[NodeType]): mutable.Map[NodeType, mutable.Set[NodeType]] = {
+    val domFrontier = mutable.Map.empty[NodeType, mutable.Set[NodeType]]
 
     for {
       cfgNode <- cfgNodes
@@ -28,7 +28,8 @@ class CfgDominatorFrontier[NodeType](cfgAdapter: CfgAdapter[NodeType], domTreeAd
     } preds.foreach { p =>
       var currentPred = Option(p)
       while (currentPred.isDefined && currentPred.get != joinNodeIDom) {
-        domFrontier.addOne(currentPred.get, joinNode)
+        val frontierNodes = domFrontier.getOrElseUpdate(currentPred.get, mutable.Set.empty)
+        frontierNodes.add(joinNode)
         currentPred = doms(currentPred.get)
       }
     }

@@ -1,7 +1,7 @@
 /* reads version declarations from /build.sbt so that we can declare them in one place */
 object Versions {
   val overflowdb = parseVersion("overflowdbVersion")
-  val scalatest  = "3.1.1"
+  val scalatest  = "3.2.10"
   val antlr = "4.7.2"
 
   private def parseVersion(key: String): String = {
