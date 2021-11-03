@@ -11,13 +11,12 @@ object Comment extends SchemaBase {
     """
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, ast: Ast.Schema, fs: FileSystem.Schema) =
-    new Schema(builder, base, ast, fs)
+  def apply(builder: SchemaBuilder, ast: Ast.Schema, fs: FileSystem.Schema) =
+    new Schema(builder, ast, fs)
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema, astSchema: Ast.Schema, fs: FileSystem.Schema) {
+  class Schema(builder: SchemaBuilder, astSchema: Ast.Schema, fs: FileSystem.Schema) {
     import astSchema._
     import fs._
-    import base._
     implicit private val schemaInfo = SchemaInfo.forClass(getClass)
 
 // node types
@@ -27,7 +26,7 @@ object Comment extends SchemaBase {
         comment = "A source code comment"
       )
       .protoId(511)
-      .addProperties(lineNumber, code, filename)
+      .addProperties(filename)
       .extendz(astNode)
 
 // node relations
