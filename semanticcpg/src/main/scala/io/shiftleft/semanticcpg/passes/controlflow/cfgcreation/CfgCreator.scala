@@ -504,8 +504,7 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
       Traversal
         .fromSingle(node)
         .astChildren
-        .where(_.orderGt(1))
-        .where(_.codeNot("finally"))
+        .where(_.order(2))
         .toList match {
         case Nil  => List(Cfg.empty)
         case asts => asts.map(cfgFor)
@@ -515,7 +514,7 @@ class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
       Traversal
         .fromSingle(node)
         .astChildren
-        .where(_.codeExact("finally"))
+        .where(_.order(3))
         .map(cfgFor)
         .headOption // Assume there can only be one
         .toList
