@@ -33,7 +33,7 @@ class MyTests {
 
   @Benchmark
   def newTrav(state: MyState): Unit = {
-    val x = state.method.methodParameters()
+    val x = state.method.methodParameters
   }
 
   @Benchmark
@@ -71,7 +71,6 @@ class MyTests {
   }
 
   @Benchmark
-  def list2(): Option[Int] = {
-    Some(1).filter(_ == 1)
+  def list2(): Unit = {
   }
 }
