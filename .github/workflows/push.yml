@@ -7,7 +7,6 @@ on:
 jobs:
   test-codepropertygraph:
     runs-on: ubuntu-18.04
-
     steps:
     - uses: actions/checkout@v2
       with:
@@ -29,58 +28,9 @@ jobs:
     - run: echo "Previous step failed because code is not formatted. Run 'sbt format'"
       if: ${{ failure() }}
 
-  test-fuzzypp-linux:
-    runs-on: ubuntu-18.04
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          lfs: true
-      - name: Clone submodules
-        run: git submodule update --init --recursive
-      - name: Install g++-8
-        run: sudo apt-get install gcc-8 g++-8
-      - name: Run cmake on fuzzypp
-        run: cmake -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 ./fuzzypp
-      - name: Run cmake build
-        run: cmake --build . -- -j4
-      - name: Run fuzzyppcli-tests
-        run: "./fuzzypp/bin/fuzzyppcli-tests"
-      - name: Zip artifact
-        run: zip -j ./fuzzyppcli.zip ./fuzzypp/bin/fuzzyppcli
-      - name: Upload zip artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: unix-zip
-          path: ./fuzzyppcli.zip
-
-  test-fuzzypp-windows:
-    runs-on: windows-2019
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          lfs: true
-      - name: Clone submodules
-        run: git submodule update --init --recursive
-      - name: Run cmake on fuzzypp
-        run: cmake -G "Visual Studio 16 2019" -A "x64" ./fuzzypp
-      - name: Run cmake build
-        run: cmake --build . --config Release
-      - name: Run fuzzyppcli-tests
-        run: "./fuzzypp/bin/Release/fuzzyppcli-tests.exe"
-      - name: Zip artifact
-        run: 7z a -r -tzip ./fuzzyppcli-win.zip ./fuzzypp/bin/Release/fuzzyppcli.exe
-      - name: Upload zip artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: windows-zip
-          path: ./fuzzyppcli-win.zip
-
   release:
-    needs: [test-codepropertygraph, test-fuzzypp-linux, test-fuzzypp-windows]
+    needs: [test-codepropertygraph]
     runs-on: ubuntu-18.04
-
     steps:
       - uses: actions/checkout@v2
         with:
@@ -119,32 +69,6 @@ jobs:
           release_name: ${{ env.LATEST_TAG }}
           draft: false
           prerelease: false
-      - name: Download unix zip
-        uses: actions/download-artifact@v2
-        with:
-          name: unix-zip
-      - name: Upload fuzzypp zip
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./fuzzyppcli.zip
-          asset_name: fuzzyppcli.zip
-          asset_content_type: application/zip
-      - name: Download windows zip
-        uses: actions/download-artifact@v2
-        with:
-          name: windows-zip
-      - name: Upload fuzzypp Windows zip
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./fuzzyppcli-win.zip
-          asset_name: fuzzyppcli-win.zip
-          asset_content_type: application/zip
       - name: Package frontends for release
         run: sbt clean fuzzyc2cpg/Universal/packageBin
       - name: Upload fuzzyc2cpg to release
