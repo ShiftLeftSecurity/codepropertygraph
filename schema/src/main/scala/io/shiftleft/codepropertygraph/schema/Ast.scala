@@ -297,7 +297,7 @@ object Ast extends SchemaBase {
         valueType = ValueType.String,
         comment = """The `CONTROL_STRUCTURE_TYPE` field indicates which kind of control structure
             |a `CONTROL_STRUCTURE` node represents. The available types are the following:
-            | BREAK, CONTINUE, DO, WHILE, FOR, GOTO, IF, ELSE, TRY, and SWITCH.
+            | BREAK, CONTINUE, DO, WHILE, FOR, GOTO, IF, ELSE, TRY, THROW and SWITCH.
             |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
@@ -337,6 +337,8 @@ object Ast extends SchemaBase {
                comment = "Represents a switch statement").protoId(9),
       Constant(name = "TRY", value = "TRY", valueType = ValueTypes.STRING, comment = "Represents a try statement")
         .protoId(10),
+      Constant(name = "THROW", value = "THROW", valueType = ValueTypes.STRING, comment = "Represents a throw statement")
+        .protoId(11)
     )
 
     val controlStructure: NodeType = builder
