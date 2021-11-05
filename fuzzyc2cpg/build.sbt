@@ -1,6 +1,10 @@
 name := "fuzzyc2cpg"
 
-dependsOn(Projects.semanticcpg % "compile->compile; test->test")
+dependsOn(
+  Projects.semanticcpg,
+  Projects.semanticcpg % "test->test",
+  Projects.dataflowengineoss % Test,
+)
 
 libraryDependencies ++= Seq(
   "org.antlr"            %  "antlr4-runtime"           % Versions.antlr,
@@ -67,3 +71,5 @@ enablePlugins(JavaAppPackaging)
 
 Universal/packageName := name.value
 Universal/topLevelDirectory := None
+
+Test / packageBin / publishArtifact := true
