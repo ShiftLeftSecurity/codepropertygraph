@@ -3,7 +3,7 @@ name := "semanticcpg"
 dependsOn(Projects.codepropertygraph)
 
 libraryDependencies ++= Seq(
-  "org.json4s"             %% "json4s-native"            % "4.0.3",
+  "org.json4s" %% "json4s-native" % Versions.json4s,
   "org.scalatest" %% "scalatest" % Versions.scalatest % Test,
 )
 

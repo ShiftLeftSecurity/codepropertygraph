@@ -3,6 +3,7 @@ object Versions {
   val overflowdb = parseVersion("overflowdbVersion")
   val scalatest  = "3.2.10"
   val antlr = "4.7.2"
+  val json4s = "4.0.3"
 
   private def parseVersion(key: String): String = {
     val versionRegexp = s""".*val $key[ ]+=[ ]?"(.*?)"""".r

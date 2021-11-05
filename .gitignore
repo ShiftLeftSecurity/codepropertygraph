@@ -20,6 +20,7 @@ project/.bloop
 /foo.c
 /woo.c
 /.bsp
+/logs
 
 foo.c
 woo.c
