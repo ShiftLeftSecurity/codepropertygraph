@@ -1,8 +1,6 @@
 name := "dataflowengineoss"
 
-dependsOn(Projects.semanticcpg,
-          Projects.semanticcpg % "test -> test",
-          Projects.fuzzyc2cpg % Test)
+dependsOn(Projects.semanticcpg)
 
 libraryDependencies ++= Seq(
   "org.antlr"     %  "antlr4-runtime" % Versions.antlr,
