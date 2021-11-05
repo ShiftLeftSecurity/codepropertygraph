@@ -64,13 +64,11 @@ ThisBuild / semanticdbVersion := "4.4.18" // alternative thay may work again in 
 name := "codepropertygraph"
 publish / skip := true
 
-lazy val codepropertygraph = Projects.codepropertygraph
 lazy val schema = Projects.schema
 lazy val domainClasses = Projects.domainClasses
 lazy val protoBindings = Projects.protoBindings
+lazy val codepropertygraph = Projects.codepropertygraph
 lazy val semanticcpg = Projects.semanticcpg
-lazy val dataflowengineoss = Projects.dataflowengineoss
-lazy val fuzzyc2cpg = Projects.fuzzyc2cpg
 lazy val macros = Projects.macros
 lazy val schema2json = Projects.schema2json
 

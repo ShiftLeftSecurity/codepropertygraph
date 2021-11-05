@@ -36,10 +36,6 @@ cpg.bin
 # Created by https://www.gitignore.io/api/c++,cmake,linux
 # Edit at https://www.gitignore.io/?templates=c++,cmake,linux
 
-## FuzzyPP ##
-bin/
-lib/
-
 ### C++ ###
 # Prerequisites
 *.d
