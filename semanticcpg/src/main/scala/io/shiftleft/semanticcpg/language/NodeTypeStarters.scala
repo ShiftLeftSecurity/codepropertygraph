@@ -75,6 +75,10 @@ class NodeTypeStarters(cpg: Cpg) {
   def continue: Traversal[ControlStructure] =
     controlStructure.isContinue
 
+  @Doc("All throws (`ControlStructure` nodes)")
+  def throws: Traversal[ControlStructure] =
+    controlStructure.isThrow
+
   /**
     Traverse to all source files
     */

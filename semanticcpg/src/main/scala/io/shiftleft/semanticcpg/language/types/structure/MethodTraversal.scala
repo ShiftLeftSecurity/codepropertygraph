@@ -80,6 +80,10 @@ class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
   def continue: Traversal[ControlStructure] =
     controlStructure.isContinue
 
+  @Doc("All throws (`ControlStructure` nodes)")
+  def throws: Traversal[ControlStructure] =
+    controlStructure.isThrow
+
   /**
     * The type declaration associated with this method, e.g., the class it is defined in.
     * */
