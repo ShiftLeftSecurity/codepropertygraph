@@ -48,30 +48,37 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
     Iterator(dstGraph.build())
   }
 
+  private def addLineNumberInfo(methodNode: NewMethod, fullName: String): NewMethod = {
+    val s = fullName.split(":")
+    if (s.size == 5 && Try { s(1).toInt }.isSuccess && Try { s(2).toInt }.isSuccess) {
+      val filename = s(0)
+      val lineNumber = s(1).toInt
+      val lineNumberEnd = s(2).toInt
+      methodNode
+        .filename(filename)
+        .lineNumber(lineNumber)
+        .lineNumberEnd(lineNumberEnd)
+    } else {
+      methodNode
+    }
+  }
+
   private def createMethodStub(name: String,
                                fullName: String,
                                signature: String,
                                parameterCount: Int,
                                dstGraph: DiffGraph.Builder): MethodBase = {
-    val methodNode1 = NewMethod()
-      .name(name)
-      .fullName(fullName)
-      .isExternal(true)
-      .signature(signature)
-      .astParentType(NodeTypes.NAMESPACE_BLOCK)
-      .astParentFullName("<global>")
-      .order(0)
-
-    val methodNode = {
-      val s = fullName.split(":")
-      if (s.size == 4 && Try { s(1).toInt }.isSuccess) {
-        val filename = s(0)
-        val lineNumber = s(1).toInt
-        methodNode1.filename(filename).lineNumber(lineNumber)
-      } else {
-        methodNode1
-      }
-    }
+    val methodNode = addLineNumberInfo(
+      NewMethod()
+        .name(name)
+        .fullName(fullName)
+        .isExternal(true)
+        .signature(signature)
+        .astParentType(NodeTypes.NAMESPACE_BLOCK)
+        .astParentFullName("<global>")
+        .order(0),
+      fullName
+    )
 
     dstGraph.addNode(methodNode)
 
