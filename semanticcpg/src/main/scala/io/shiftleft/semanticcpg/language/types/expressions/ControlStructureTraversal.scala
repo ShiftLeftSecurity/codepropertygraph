@@ -70,4 +70,8 @@ class ControlStructureTraversal(val traversal: Traversal[ControlStructure]) exte
   def isContinue: Traversal[ControlStructure] =
     traversal.controlStructureTypeExact(ControlStructureTypes.CONTINUE)
 
+  @Doc("Only `Throw` control structures")
+  def isThrow: Traversal[ControlStructure] =
+    traversal.controlStructureTypeExact(ControlStructureTypes.THROW)
+
 }
