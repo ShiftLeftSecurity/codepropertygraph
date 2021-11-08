@@ -54,7 +54,8 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
       val filename = s(0)
       val lineNumber = s(1).toInt
       val lineNumberEnd = s(2).toInt
-      methodNode.filename(filename)
+      methodNode
+        .filename(filename)
         .lineNumber(lineNumber)
         .lineNumberEnd(lineNumberEnd)
     } else {
