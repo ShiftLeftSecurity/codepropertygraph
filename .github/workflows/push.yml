@@ -29,6 +29,7 @@ jobs:
       if: ${{ failure() }}
 
   release:
+    concurrency: release
     needs: [test-codepropertygraph]
     runs-on: ubuntu-18.04
     steps:
