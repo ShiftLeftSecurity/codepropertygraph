@@ -99,10 +99,10 @@ object MethodRefLinker {
       } else {
         srcNode.out(edgeType).property(Properties.FULL_NAME).nextOption() match {
           case Some(dstFullName) => srcNode.setProperty(dstFullNameKey, dstFullName)
-          case None              => logger.warn(s"Missing outgoing edge of type ${edgeType} from node ${srcNode}")
+          case None              => logger.info(s"Missing outgoing edge of type ${edgeType} from node ${srcNode}")
         }
         if (!loggedDeprecationWarning) {
-          logger.warn(
+          logger.info(
             s"Using deprecated CPG format with already existing $edgeType edge between" +
               s" a source node of type $srcLabels and a $dstNodeLabel node.")
           loggedDeprecationWarning = true
@@ -132,7 +132,7 @@ object MethodRefLinker {
         val dstFullNames = srcNode.out(edgeType).property(Properties.FULL_NAME).l
         srcNode.setProperty(dstFullNameKey, dstFullNames)
         if (!loggedDeprecationWarning) {
-          logger.warn(
+          logger.info(
             s"Using deprecated CPG format with already existing $edgeType edge between" +
               s" a source node of type $srcLabels and a $dstNodeLabel node.")
           loggedDeprecationWarning = true
@@ -147,7 +147,7 @@ object MethodRefLinker {
                          srcNodeId: String,
                          dstNodeType: String,
                          dstFullName: String): Unit = {
-    logger.warn(
+    logger.info(
       "Could not create edge. Destination lookup failed. " +
         s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcNodeId=$srcNodeId, " +
         s"dstNodeType=$dstNodeType, dstFullName=$dstFullName")
@@ -159,7 +159,7 @@ object MethodRefLinker {
                          srcFullName: String,
                          dstNodeType: String,
                          dstNodeId: String): Unit = {
-    logger.warn(
+    logger.info(
       "Could not create edge. Source lookup failed. " +
         s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcFullName=$srcFullName, " +
         s"dstNodeType=$dstNodeType, dstNodeId=$dstNodeId")
