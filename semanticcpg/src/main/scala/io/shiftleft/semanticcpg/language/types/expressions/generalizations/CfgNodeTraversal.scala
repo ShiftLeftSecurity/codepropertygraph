@@ -54,6 +54,16 @@ class CfgNodeTraversal[A <: CfgNode](val traversal: Traversal[A]) extends AnyVal
       .cast[CfgNode]
 
   /**
+    * All nodes reachable in the CFG by up to n forward expansions
+    */
+  def cfgNext(n: Int): Traversal[CfgNode] = traversal.flatMap(_.cfgNext(n))
+
+  /**
+    * All nodes reachable in the CFG by up to n backward expansions
+    */
+  def cfgPrev(n: Int): Traversal[CfgNode] = traversal.flatMap(_.cfgPrev(n))
+
+  /**
     * Recursively determine all nodes on which any of
     * the nodes in this traversal are control dependent
     * */
@@ -100,5 +110,12 @@ class CfgNodeTraversal[A <: CfgNode](val traversal: Traversal[A]) extends AnyVal
   @Doc("All nodes that are post dominated by this node")
   def postDominates: Traversal[CfgNode] =
     traversal.flatMap(_.postDominates)
+
+  /**
+    * Obtain hexadecimal string representation of lineNumber field.
+    */
+  @Doc("Address of the code (for binary code)")
+  def address: Traversal[Option[String]] =
+    traversal.map(_.address)
 
 }

@@ -142,6 +142,18 @@ class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {
     case _: Expression | _: JumpTarget           => walkUpContains(node)
   }
 
+  /**
+    * Obtain hexadecimal string representation of lineNumber field.
+    *
+    * Binary frontends store addresses in the lineNumber field as
+    * integers. For interoperability with other binary analysis
+    * tooling, it is convenient to allow retrieving these as
+    * hex strings.
+    * */
+  def address: Option[String] = {
+    node.lineNumber.map(_.toLong.toHexString)
+  }
+
   private def walkUpAst(node: CfgNode): Method =
     node._astIn.onlyChecked.asInstanceOf[Method]
 
