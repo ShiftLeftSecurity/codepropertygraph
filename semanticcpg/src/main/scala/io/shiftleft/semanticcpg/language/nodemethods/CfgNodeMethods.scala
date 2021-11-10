@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.nodemethods
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.NodeExtension
-import io.shiftleft.semanticcpg.language.toCfgNode
+import io.shiftleft.semanticcpg.language.{toCfgNode, toCfgNodeMethods}
 import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
@@ -34,7 +34,7 @@ class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {
     **/
   def cfgNext(n: Int): Traversal[CfgNode] = n match {
     case 0 => Traversal()
-    case _ => cfgNext.flatMap(x => List(x) ++ cfgNext(n - 1))
+    case _ => cfgNext.flatMap(x => List(x) ++ x.cfgNext(n - 1))
   }
 
   /**
@@ -43,7 +43,7 @@ class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {
     **/
   def cfgPrev(n: Int): Traversal[CfgNode] = n match {
     case 0 => Traversal()
-    case _ => cfgPrev.flatMap(x => List(x) ++ cfgPrev(n - 1))
+    case _ => cfgPrev.flatMap(x => List(x) ++ x.cfgPrev(n - 1))
   }
 
   /**

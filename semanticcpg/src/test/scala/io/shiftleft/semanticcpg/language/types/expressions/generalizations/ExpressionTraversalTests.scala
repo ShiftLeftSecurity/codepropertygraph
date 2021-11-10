@@ -1,4 +1,4 @@
-package io.shiftleft.semanticcpg.language.types.expressions
+package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.Call
@@ -7,7 +7,7 @@ import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class ExpressionTests extends AnyWordSpec with Matchers {
+class ExpressionTraversalTests extends AnyWordSpec with Matchers {
 
   val cpg = MockCpg()
     .withMethod("methodForCfgTest")
