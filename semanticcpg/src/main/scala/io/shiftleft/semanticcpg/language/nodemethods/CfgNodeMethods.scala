@@ -29,6 +29,24 @@ class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {
   }
 
   /**
+    * Maps each node in the traversal to a traversal returning
+    * its n successors.
+    **/
+  def cfgNext(n: Int): Traversal[CfgNode] = n match {
+    case 0 => Traversal()
+    case _ => cfgNext.flatMap(x => List(x) ++ cfgNext(n - 1))
+  }
+
+  /**
+    * Maps each node in the traversal to a traversal returning
+    * its n predecessors.
+    **/
+  def cfgPrev(n: Int): Traversal[CfgNode] = n match {
+    case 0 => Traversal()
+    case _ => cfgPrev.flatMap(x => List(x) ++ cfgPrev(n - 1))
+  }
+
+  /**
     * Predecessors in the CFG
     * */
   def cfgPrev: Traversal[CfgNode] = {
