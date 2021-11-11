@@ -6,7 +6,6 @@ import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, Prope
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
-import overflowdb.traversal.jIteratortoTraversal
 import overflowdb.{NodeDb, NodeRef}
 
 import scala.collection.mutable
@@ -33,15 +32,28 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   // Used for dynamic programming as subtree's don't need to be recalculated later
   private val subclassCache = mutable.Map.empty[String, mutable.LinkedHashSet[String]]
   // Used for O(1) lookups on methods that will work without indexManager
-  private val typeMap = cpg.typeDecl.map { typeDecl =>
-    typeDecl.fullName -> typeDecl
-  }.toMap
+  private val typeMap = mutable.Map.empty[String, TypeDecl]
+  // For linking loose method stubs that cannot be resolved by crawling parent types
+  private val methodStubMap = mutable.Map.empty[String, Method]
+
+  private def initMaps(): Unit = {
+    cpg.typeDecl.foreach { typeDecl =>
+      typeMap += (typeDecl.fullName -> typeDecl)
+    }
+    cpg.method
+      .filter(m => m.isExternal && !m.name.startsWith("<operator>"))
+      .foreach { method =>
+        methodStubMap += (method.fullName -> method)
+      }
+  }
 
   /** Main method of enhancement - to be implemented by child class
     */
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
-
+    // Perform early stopping in the case of no virtual calls
+    if (!cpg.call.exists(_.dispatchType == DispatchTypes.DYNAMIC_DISPATCH)) return Iterator()
+    else initMaps()
     // ValidM maps class C and method name N to the set of
     // func ptrs implementing N for C and its subclasses
     cpg.typeDecl
@@ -78,7 +90,7 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
         val directSubclasses =
           cpg.typ
             .nameExact(typDeclFullName)
-            .flatMap(_.in(EdgeTypes.INHERITS_FROM))
+            .flatMap(_.in(EdgeTypes.INHERITS_FROM).asScala)
             .collect {
               case x: TypeDecl =>
                 x.fullName
@@ -125,7 +137,17 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
             printLinkingError(call)
           }
         }
-      case None => printLinkingError(call)
+      case None => fallbackToStaticResolution(call, dstGraph)
+    }
+  }
+
+  /** In the case where the method isn't an internal method and cannot be resolved by crawling TYPE_DECL nodes it can be
+    *  resolved from the map of external methods.
+    */
+  private def fallbackToStaticResolution(call: Call, dstGraph: DiffGraph.Builder): Unit = {
+    methodStubMap.get(call.methodFullName) match {
+      case Some(tgtM) => dstGraph.addEdgeInOriginal(call, tgtM, EdgeTypes.CALL)
+      case None       => printLinkingError(call)
     }
   }
 

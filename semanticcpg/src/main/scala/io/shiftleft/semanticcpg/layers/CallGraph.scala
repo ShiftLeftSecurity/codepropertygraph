@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.layers
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.CpgPassBase
-import io.shiftleft.semanticcpg.passes.callgraph.{MethodRefLinker, StaticCallLinker}
+import io.shiftleft.semanticcpg.passes.callgraph.{DynamicCallLinker, MethodRefLinker, StaticCallLinker}
 
 import scala.annotation.nowarn
 
@@ -11,10 +11,13 @@ object CallGraph {
   val description: String = "Call graph layer"
   def defaultOpts = new LayerCreatorOptions()
 
-  def passes(cpg: Cpg): Iterator[CpgPassBase] = Iterator(
-    new MethodRefLinker(cpg),
-    new StaticCallLinker(cpg),
-  )
+  def passes(cpg: Cpg): Iterator[CpgPassBase] = {
+    Iterator(
+      new MethodRefLinker(cpg),
+      new StaticCallLinker(cpg),
+      new DynamicCallLinker(cpg),
+    )
+  }
 
 }
 
