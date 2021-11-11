@@ -36,6 +36,13 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   private val typeMap = cpg.typeDecl.map { typeDecl =>
     typeDecl.fullName -> typeDecl
   }.toMap
+  // For linking loose method stubs that cannot be resolved by crawling parent types
+  private val methodStubMap = cpg.method
+    .filter(m => m.isExternal && !m.name.startsWith("<operator>"))
+    .map { method =>
+      method.fullName -> method
+    }
+    .toMap
 
   /** Main method of enhancement - to be implemented by child class
     */
@@ -125,7 +132,17 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
             printLinkingError(call)
           }
         }
-      case None => printLinkingError(call)
+      case None => fallbackToStaticResolution(call, dstGraph)
+    }
+  }
+
+  /** In the case where the method isn't an internal method and cannot be resolved by crawling TYPE_DECL nodes it can be
+   *  resolved from the map of external methods.
+   */
+  private def fallbackToStaticResolution(call: Call, dstGraph: DiffGraph.Builder): Unit = {
+    methodStubMap.get(call.methodFullName) match {
+      case Some(tgtM) => dstGraph.addEdgeInOriginal(call, tgtM, EdgeTypes.CALL)
+      case None       => printLinkingError(call)
     }
   }
 
