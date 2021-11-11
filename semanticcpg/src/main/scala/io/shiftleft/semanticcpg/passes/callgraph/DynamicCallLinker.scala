@@ -137,8 +137,8 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   /** In the case where the method isn't an internal method and cannot be resolved by crawling TYPE_DECL nodes it can be
-   *  resolved from the map of external methods.
-   */
+    *  resolved from the map of external methods.
+    */
   private def fallbackToStaticResolution(call: Call, dstGraph: DiffGraph.Builder): Unit = {
     methodStubMap.get(call.methodFullName) match {
       case Some(tgtM) => dstGraph.addEdgeInOriginal(call, tgtM, EdgeTypes.CALL)
