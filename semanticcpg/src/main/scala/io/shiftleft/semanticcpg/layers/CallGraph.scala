@@ -1,9 +1,7 @@
 package io.shiftleft.semanticcpg.layers
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.passes.CpgPassBase
-import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.callgraph.{DynamicCallLinker, MethodRefLinker, StaticCallLinker}
 
 import scala.annotation.nowarn
@@ -17,10 +15,8 @@ object CallGraph {
     Iterator(
       new MethodRefLinker(cpg),
       new StaticCallLinker(cpg),
-    ) ++ (cpg.metaData.language.lastOption match {
-      case Some(Languages.C) => Iterator[CpgPassBase]()
-      case _                 => Iterator[CpgPassBase](new DynamicCallLinker(cpg))
-    })
+      new DynamicCallLinker(cpg),
+    )
   }
 
 }

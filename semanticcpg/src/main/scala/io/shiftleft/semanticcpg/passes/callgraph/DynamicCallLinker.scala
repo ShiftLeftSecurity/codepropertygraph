@@ -33,22 +33,28 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   // Used for dynamic programming as subtree's don't need to be recalculated later
   private val subclassCache = mutable.Map.empty[String, mutable.LinkedHashSet[String]]
   // Used for O(1) lookups on methods that will work without indexManager
-  private val typeMap = cpg.typeDecl.map { typeDecl =>
-    typeDecl.fullName -> typeDecl
-  }.toMap
+  private val typeMap = mutable.Map.empty[String, TypeDecl]
   // For linking loose method stubs that cannot be resolved by crawling parent types
-  private val methodStubMap = cpg.method
-    .filter(m => m.isExternal && !m.name.startsWith("<operator>"))
-    .map { method =>
-      method.fullName -> method
+  private val methodStubMap = mutable.Map.empty[String, Method]
+
+  private def initMaps(): Unit = {
+    cpg.typeDecl.foreach { typeDecl =>
+      typeMap += (typeDecl.fullName -> typeDecl)
     }
-    .toMap
+    cpg.method
+      .filter(m => m.isExternal && !m.name.startsWith("<operator>"))
+      .foreach { method =>
+        methodStubMap += (method.fullName -> method)
+      }
+  }
 
   /** Main method of enhancement - to be implemented by child class
     */
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
-
+    // Perform early stopping in the case of no virtual calls
+    if (!cpg.call.exists(_.dispatchType == DispatchTypes.DYNAMIC_DISPATCH)) return Iterator()
+    else initMaps()
     // ValidM maps class C and method name N to the set of
     // func ptrs implementing N for C and its subclasses
     cpg.typeDecl
