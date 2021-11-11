@@ -17,10 +17,10 @@ object CallGraph {
     Iterator(
       new MethodRefLinker(cpg),
       new StaticCallLinker(cpg),
-    ) ++ cpg.metaData.language.lastOption match {
+    ) ++ (cpg.metaData.language.lastOption match {
       case Some(Languages.C) => Iterator[CpgPassBase]()
       case _                 => Iterator[CpgPassBase](new DynamicCallLinker(cpg))
-    }
+    })
   }
 
 }
