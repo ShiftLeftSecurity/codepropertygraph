@@ -8,4 +8,5 @@ object Projects {
   lazy val semanticcpg = project.in(file("semanticcpg"))
   lazy val macros = project.in(file("macros"))
   lazy val schema2json = project.in(file("schema2json"))
+  lazy val performance = project.in(file("performance"))
 }

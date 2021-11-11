@@ -1,7 +1,7 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val overflowdbVersion = "1.64"
+val overflowdbVersion = "1.68"
 
 inThisBuild(
   List(
@@ -71,6 +71,7 @@ lazy val codepropertygraph = Projects.codepropertygraph
 lazy val semanticcpg = Projects.semanticcpg
 lazy val macros = Projects.macros
 lazy val schema2json = Projects.schema2json
+lazy val performance = Projects.performance
 
 // Once sbt-scalafmt is at version > 2.x, use scalafmtAll
 addCommandAlias("format", ";scalafixAll OrganizeImports;scalafmt;test:scalafmt")
@@ -78,7 +79,6 @@ addCommandAlias("format", ";scalafixAll OrganizeImports;scalafmt;test:scalafmt")
 ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
-  "-Ywarn-unused", // required by scalafix
   "-Xfatal-warnings",
   "-language:implicitConversions",
   "-Ycache-macro-class-loader:last-modified",
