@@ -1,13 +1,12 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val overflowdbVersion = "1.64"
+val overflowdbVersion = "1.69"
 
 inThisBuild(
   List(
     organization := "io.shiftleft",
     scalaVersion := "2.13.7",
-    // don't upgrade to 2.13.6 until https://github.com/com-lihaoyi/Ammonite/issues/1182 is resolved
     resolvers ++= Seq(
       Resolver.mavenLocal,
       "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"
