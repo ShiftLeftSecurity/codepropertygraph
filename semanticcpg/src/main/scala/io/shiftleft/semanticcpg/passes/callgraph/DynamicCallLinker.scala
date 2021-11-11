@@ -6,7 +6,6 @@ import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, Prope
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
-import overflowdb.traversal.jIteratortoTraversal
 import overflowdb.{NodeDb, NodeRef}
 
 import scala.collection.mutable
