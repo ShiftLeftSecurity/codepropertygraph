@@ -26,7 +26,7 @@ object CodeDumper {
     }
 
     val node = location.node.get
-    if (language.isEmpty || !Set(Languages.C, Languages.NEWC).contains(language.get)) {
+    if (language.isEmpty || !Set(Languages.C, Languages.NEWC, Languages.GHIDRA).contains(language.get)) {
       logger.info("dump not supported for this language or language not set in CPG")
       return ""
     }
@@ -41,7 +41,11 @@ object CodeDumper {
     method
       .collect {
         case m: Method if m.lineNumber.isDefined && m.lineNumberEnd.isDefined =>
-          val rawCode = code(filename, m.lineNumber.get, m.lineNumberEnd.get, lineToHighlight)
+          val rawCode = if (language.contains(Languages.GHIDRA)) {
+            m.code
+          } else {
+            code(filename, m.lineNumber.get, m.lineNumberEnd.get, lineToHighlight)
+          }
           if (highlight) {
             SourceHighlighter.highlight(Source(rawCode, language.get))
           } else {

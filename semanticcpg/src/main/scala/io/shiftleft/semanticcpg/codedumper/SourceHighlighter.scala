@@ -15,8 +15,8 @@ object SourceHighlighter {
 
   def highlight(source: Source): Option[String] = {
     val langFlag = source.language match {
-      case Languages.C | Languages.NEWC => "-sC"
-      case other                        => throw new RuntimeException(s"Attempting to call highlighter on unsupported language: $other")
+      case Languages.C | Languages.NEWC | Languages.GHIDRA => "-sC"
+      case other                                           => throw new RuntimeException(s"Attempting to call highlighter on unsupported language: $other")
     }
 
     val tmpSrcFile = File.newTemporaryFile("dump")
