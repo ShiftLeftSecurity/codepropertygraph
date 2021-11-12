@@ -33,16 +33,17 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
                             prefix: String = "",
                             inverse: Boolean = false)(f: Writer => Unit)(implicit executor: Executor): Unit = {
     val writer = new Writer(serializedCpg, prefix, inverse)
-    executor.execute(() => {
-      try {
-        f(writer)
-      } catch {
-        case exception: Exception =>
-          baseLogger.warn("pass failed", exception)
-      } finally {
-        writer.enqueue(None, None)
-      }
-    })
+    val task = new FutureTask[Unit](writer, ())
+    executor.execute(task)
+    try {
+      f(writer)
+    } catch {
+      case exception: Exception =>
+        baseLogger.warn("pass failed", exception)
+    } finally {
+      writer.enqueue(None, None)
+    }
+    task.get()
   }
 
   private def enqueueInParallel(writer: Writer): Unit = {
