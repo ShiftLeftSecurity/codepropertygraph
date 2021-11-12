@@ -86,7 +86,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
 
 /* SimpleCpgPass is a possible replacement for CpgPass.
  *
- *  Instead of returning an Iterator[DiffGraph], the `run` fuction gets a DiffGraphBuilder as input, and can attach its
+ *  Instead of returning an Iterator[DiffGraph], the `run` function gets a DiffGraphBuilder as input, and can attach its
  *  modifications to it (i.e. mutate the builder).
  *
  * CpgPass has somewhat subtle semantics with respect to lazy evaluation order of the returned iterator and graph writes.
@@ -148,7 +148,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
                                             prefix: String = ""): Unit = {
-    baseLogger.info(s"Start of pass: $name")
+    baseLogger.info("Start of pass: {}", name)
     val nanosStart = System.nanoTime()
     var nParts = 0
     var nanosBuilt = -1L
@@ -193,7 +193,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
       }
     } catch {
       case exc: Exception =>
-        baseLogger.error(s"Pass ${name} failed", exc)
+        baseLogger.error("Pass {} failed", name, exc)
         throw exc
     } finally {
       try {
@@ -204,7 +204,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
         val nanosStop = System.nanoTime()
         val fracRun = if (nanosBuilt == -1) 100.0 else (nanosBuilt - nanosStart) * 100.0 / (nanosStop - nanosStart + 1)
         baseLogger.info(
-          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d changes commited from ${nParts}%d parts.")
+          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms ($fracRun%.0f%% on mutations). $nDiff%d changes committed from $nParts%d parts.")
       }
     }
   }
@@ -254,14 +254,14 @@ trait CpgPassBase {
   }
 
   protected def withStartEndTimesLogged[A](fun: => A): A = {
-    baseLogger.info(s"Running pass: $name")
+    baseLogger.info("Running pass: {}", name)
     val startTime = System.currentTimeMillis
     try {
       fun
     } finally {
       val duration = (System.currentTimeMillis - startTime).millis.toCoarsest
       MDC.put("time", duration.toString())
-      baseLogger.info(s"Pass $name completed in $duration")
+      baseLogger.info("Pass {} completed in {}", name, duration)
       MDC.remove("time")
     }
   }

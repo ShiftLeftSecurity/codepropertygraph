@@ -61,7 +61,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
         consume(it)
       } catch {
         case exception: Exception =>
-          baseLogger.warn(s"Exception in parallel CPG pass $name:", exception)
+          baseLogger.warn("Exception in parallel CPG pass {}:", name, exception)
       }
     }
   }
@@ -152,11 +152,11 @@ object ConcurrentWriterCpgPass {
 abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends CpgPassBase {
 
-  //generate Array of parts that can be processed in parallel
+  // generate Array of parts that can be processed in parallel
   def generateParts(): Array[_ <: AnyRef] = Array[AnyRef](null)
-  //setup large data structures, acquire external resources
+  // setup large data structures, acquire external resources
   def init(): Unit = {}
-  //release large data structures and external resources
+  // release large data structures and external resources
   def finish(): Unit = {}
 
   /** WARNING: runOnPart is executed in parallel to committing of graph modifications.
@@ -174,7 +174,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
                                             inverse: Boolean = false,
                                             prefix: String = ""): Unit = {
     import ConcurrentWriterCpgPass.producerQueueCapacity
-    baseLogger.info(s"Start of enhancement: $name")
+    baseLogger.info("Start of enhancement: {}", name)
     val nanosStart = System.nanoTime()
     var nParts = 0
     var nDiff = 0
@@ -201,8 +201,8 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
         while (!done) {
           if (completionQueue.size < producerQueueCapacity && partIter.hasNext) {
             val next = partIter.next()
-            //todo: Verify that we get FIFO scheduling; otherwise, do something about it.
-            //if this e.g. used LIFO with 4 cores and 18 size of ringbuffer, then 3 cores may idle while we block on the front item.
+            // TODO: Verify that we get FIFO scheduling; otherwise, do something about it.
+            // if this e.g. used LIFO with 4 cores and 18 size of ringbuffer, then 3 cores may idle while we block on the front item.
             completionQueue.append(Future.apply {
               val builder = DiffGraph.newBuilder
               runOnPart(builder, next.asInstanceOf[T])
@@ -228,7 +228,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
       // in the reported timings, and we must have our final log message if finish() throws
       val nanosStop = System.nanoTime()
       baseLogger.info(
-        f"Enhancement $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms. ${nDiff}%d changes commited from ${nParts}%d parts.")
+        f"Enhancement $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms. $nDiff%d changes committed from $nParts%d parts.")
     }
   }
 
