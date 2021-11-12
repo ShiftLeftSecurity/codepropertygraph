@@ -8,6 +8,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import java.io.File
+import java.util.concurrent.{Executor, Executors}
 
 class BinToCpgFixture(val frontend: LanguageFrontend) extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 
@@ -17,6 +18,7 @@ class BinToCpgFixture(val frontend: LanguageFrontend) extends AnyWordSpec with M
 
   def createEnhancements(cpg: Cpg): Unit = {
     val context = new LayerCreatorContext(cpg)
+    implicit val executor: Executor = Executors.newSingleThreadExecutor()
     new Base().run(context)
     new ControlFlow().run(context)
     new TypeRelations().run(context)

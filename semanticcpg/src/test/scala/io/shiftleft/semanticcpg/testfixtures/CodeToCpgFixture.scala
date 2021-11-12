@@ -8,6 +8,7 @@ import org.scalatest.wordspec.AnyWordSpec
 
 import java.io.{File, PrintWriter}
 import java.nio.file.Files
+import java.util.concurrent.{Executor, Executors}
 
 class CodeToCpgFixture(val frontend: LanguageFrontend) extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 
@@ -22,6 +23,7 @@ class CodeToCpgFixture(val frontend: LanguageFrontend) extends AnyWordSpec with 
 
   def createEnhancements(cpg: Cpg): Unit = {
     val context = new LayerCreatorContext(cpg)
+    implicit val executor: Executor = Executors.newSingleThreadExecutor()
     new Base().run(context)
     new ControlFlow().run(context)
     new TypeRelations().run(context)

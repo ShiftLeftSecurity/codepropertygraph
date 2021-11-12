@@ -3,17 +3,9 @@ package io.shiftleft.semanticcpg.layers
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.PropertyNames
 import io.shiftleft.passes.CpgPassBase
-import io.shiftleft.semanticcpg.passes.base.{
-  AstLinkerPass,
-  ContainsEdgePass,
-  FileCreationPass,
-  MethodDecoratorPass,
-  MethodStubCreator,
-  NamespaceCreator,
-  TypeDeclStubCreator,
-  TypeUsagePass
-}
+import io.shiftleft.semanticcpg.passes.base.{AstLinkerPass, ContainsEdgePass, FileCreationPass, MethodDecoratorPass, MethodStubCreator, NamespaceCreator, TypeDeclStubCreator, TypeUsagePass}
 
+import java.util.concurrent.Executor
 import scala.annotation.nowarn
 
 object Base {
@@ -39,7 +31,7 @@ class Base(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
   override val overlayName: String = Base.overlayName
   override val description: String = Base.description
 
-  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
+  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean)(implicit executor: Executor): Unit = {
     val cpg = context.cpg
     cpg.graph.indexManager.createNodePropertyIndex(PropertyNames.FULL_NAME)
     Base.passes(cpg).zipWithIndex.foreach {

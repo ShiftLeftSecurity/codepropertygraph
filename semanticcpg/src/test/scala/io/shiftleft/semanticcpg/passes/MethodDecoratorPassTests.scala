@@ -9,6 +9,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 
+import java.util.concurrent.{Executor, Executors}
+
 class MethodDecoratorPassTests extends AnyWordSpec with Matchers {
   "MethodDecoratorTest" in EmptyGraphFixture { graph =>
     val method = graph + NodeTypes.METHOD
@@ -27,6 +29,7 @@ class MethodDecoratorPassTests extends AnyWordSpec with Matchers {
     method --- EdgeTypes.AST --> parameterIn
 
     val methodDecorator = new MethodDecoratorPass(new Cpg(graph))
+    implicit val executor: Executor = Executors.newSingleThreadExecutor()
     methodDecorator.createAndApply()
 
     val parameterOut = parameterIn._methodParameterOutViaParameterLinkOut.next()

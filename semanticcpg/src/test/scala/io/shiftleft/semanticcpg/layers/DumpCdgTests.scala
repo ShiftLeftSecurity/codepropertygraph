@@ -5,6 +5,8 @@ import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import java.util.concurrent.{Executor, Executors}
+
 class DumpCdgTests extends AnyWordSpec with Matchers {
 
   "DumpCdg" should {
@@ -17,6 +19,7 @@ class DumpCdgTests extends AnyWordSpec with Matchers {
         .cpg
 
       val context = new LayerCreatorContext(cpg)
+      implicit val executor: Executor = Executors.newSingleThreadExecutor()
       new Base().run(context)
       new ControlFlow().run(context)
       File.usingTemporaryDirectory("dumpcdg") { tmpDir =>

@@ -2,7 +2,7 @@ package io.shiftleft.passes
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 
-import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.{Executor, FutureTask, LinkedBlockingQueue}
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
@@ -17,13 +17,13 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
 
   def runOnPart(part: T): Iterator[DiffGraph]
 
-  override def createAndApply(): Unit = {
+  override def createAndApply()(implicit executor: Executor): Unit = {
     withWriter() { writer =>
       enqueueInParallel(writer)
     }
   }
 
-  override def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean, prefix: String): Unit = {
+  override def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean, prefix: String)(implicit executor: Executor): Unit = {
     withWriter(serializedCpg, prefix, inverse) { writer =>
       enqueueInParallel(writer)
     }
@@ -31,20 +31,18 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
 
   private def withWriter[X](serializedCpg: SerializedCpg = new SerializedCpg(),
                             prefix: String = "",
-                            inverse: Boolean = false)(f: Writer => Unit): Unit = {
+                            inverse: Boolean = false)(f: Writer => Unit)(implicit executor: Executor): Unit = {
     val writer = new Writer(serializedCpg, prefix, inverse)
-    val writerThread = new Thread(writer)
-    writerThread.setName("Writer")
-    writerThread.start()
-    try {
-      f(writer)
-    } catch {
-      case exception: Exception =>
-        baseLogger.warn("pass failed", exception)
-    } finally {
-      writer.enqueue(None, None)
-      writerThread.join()
-    }
+    executor.execute(() => {
+      try {
+        f(writer)
+      } catch {
+        case exception: Exception =>
+          baseLogger.warn("pass failed", exception)
+      } finally {
+        writer.enqueue(None, None)
+      }
+    })
   }
 
   private def enqueueInParallel(writer: Writer): Unit = {
@@ -149,6 +147,7 @@ object ConcurrentWriterCpgPass {
   private val writerQueueCapacity = 4
   private val producerQueueCapacity = 2 + 4 * Runtime.getRuntime().availableProcessors()
 }
+
 abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends CpgPassBase {
 
@@ -168,11 +167,11 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     * */
   def runOnPart(builder: DiffGraph.Builder, part: T): Unit
 
-  override def createAndApply(): Unit = createApplySerializeAndStore(null)
+  override def createAndApply()(implicit executor: Executor): Unit = createApplySerializeAndStore(null)
 
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
-                                            prefix: String = ""): Unit = {
+                                            prefix: String = "")(implicit executor: Executor): Unit = {
     import ConcurrentWriterCpgPass.producerQueueCapacity
     baseLogger.info("Start of enhancement: {}", name)
     val nanosStart = System.nanoTime()
@@ -185,9 +184,8 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     val partIter = parts.iterator
     val completionQueue = mutable.ArrayDeque[Future[DiffGraph]]()
     val writer = new Writer(serializedCpg, prefix, inverse)
-    val writerThread = new Thread(writer)
-    writerThread.setName("Writer")
-    writerThread.start()
+    val task = new FutureTask[Unit](writer, ())
+    executor.execute(task)
     try {
       try {
         // The idea is that we have a ringbuffer completionQueue that contains the workunits that are currently in-flight.
@@ -220,7 +218,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
       } finally {
         try {
           writer.queue.put(None)
-          writerThread.join()
+          task.get()
         } finally { finish() }
       }
     } finally {

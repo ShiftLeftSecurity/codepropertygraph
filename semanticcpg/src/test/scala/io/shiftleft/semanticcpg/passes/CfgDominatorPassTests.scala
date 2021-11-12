@@ -8,6 +8,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 
+import java.util.concurrent.{Executor, Executors}
 import scala.jdk.CollectionConverters._
 
 class CfgDominatorPassTests extends AnyWordSpec with Matchers {
@@ -35,6 +36,7 @@ class CfgDominatorPassTests extends AnyWordSpec with Matchers {
     v5 --- EdgeTypes.CFG --> v6
 
     val dominatorTreePass = new CfgDominatorPass(cpg)
+    implicit val executor: Executor = Executors.newSingleThreadExecutor()
     dominatorTreePass.createAndApply()
 
     val v0Dominates = v0.out(EdgeTypes.DOMINATE).asScala.toList

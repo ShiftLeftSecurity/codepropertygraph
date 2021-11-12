@@ -7,6 +7,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import org.slf4j.{Logger, LoggerFactory, MDC}
 
 import java.lang.{Long => JLong}
+import java.util.concurrent.Executor
 import java.util.function.{BiConsumer, Supplier}
 import scala.concurrent.duration.DurationLong
 
@@ -39,7 +40,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
   /**
     * Execute the pass and apply result to the underlying graph
     */
-  override def createAndApply(): Unit =
+  override def createAndApply()(implicit executor: Executor): Unit =
     withStartEndTimesLogged {
       run().foreach(diffGraph => DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool))
     }
@@ -68,16 +69,15 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
     * */
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
-                                            prefix: String = ""): Unit = {
+                                            prefix: String = "")(implicit executor: Executor): Unit = {
     if (serializedCpg.isEmpty) {
       createAndApply()
     } else {
       val overlays = createApplyAndSerialize(inverse)
       overlays.zipWithIndex.foreach {
-        case (overlay, index) => {
+        case (overlay, index) =>
           val name = generateOutFileName(prefix, outName, index)
           store(overlay, name, serializedCpg)
-        }
       }
     }
   }
@@ -134,20 +134,20 @@ abstract class SimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[Key
  * */
 abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends CpgPassBase {
-  //generate Array of parts that can be processed in parallel
+  // generate Array of parts that can be processed in parallel
   def generateParts(): Array[_ <: AnyRef]
-  //setup large data structures, acquire external resources
+  // setup large data structures, acquire external resources
   def init(): Unit = {}
-  //release large data structures and external resources
+  // release large data structures and external resources
   def finish(): Unit = {}
-  //main function: add desired changes to builder
+  // main function: add desired changes to builder
   def runOnPart(builder: DiffGraph.Builder, part: T): Unit
 
-  override def createAndApply(): Unit = createApplySerializeAndStore(null)
+  override def createAndApply()(implicit executor: Executor): Unit = createApplySerializeAndStore(null)
 
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
-                                            prefix: String = ""): Unit = {
+                                            prefix: String = "")(implicit executor: Executor): Unit = {
     baseLogger.info("Start of pass: {}", name)
     val nanosStart = System.nanoTime()
     var nParts = 0
@@ -218,9 +218,9 @@ trait CpgPassBase {
 
   protected def baseLogger: Logger = CpgPassBase.baseLogger
 
-  def createAndApply(): Unit
+  def createAndApply()(implicit executor: Executor): Unit
 
-  def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false, prefix: String = ""): Unit
+  def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false, prefix: String = "")(implicit executor: Executor): Unit
 
   /**
     * Name of the pass.
