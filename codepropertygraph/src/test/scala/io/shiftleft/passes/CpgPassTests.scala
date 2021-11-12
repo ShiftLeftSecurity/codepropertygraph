@@ -7,11 +7,11 @@ import io.shiftleft.codepropertygraph.generated.nodes.NewFile
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-import java.util.concurrent.{Executor, Executors}
+import scala.concurrent.ExecutionContext
 import scala.jdk.CollectionConverters._
 
 class CpgPassTests extends AnyWordSpec with Matchers {
-  implicit val executor: Executor = Executors.newSingleThreadExecutor()
+  implicit val ec: ExecutionContext = ExecutionContext.global
 
   private object Fixture {
     def apply(keyPool: Option[KeyPool] = None)(f: (Cpg, CpgPassBase) => Unit): Unit = {

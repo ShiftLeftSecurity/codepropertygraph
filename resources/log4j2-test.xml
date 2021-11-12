@@ -2,22 +2,16 @@
 <Configuration status="warn" strict="true">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%-5p] %m%n" />
+            <PatternLayout pattern="[%-5p] %m; %X{x}%n" />
         </Console>
         <File name="FileAppender" fileName="${sys:user.dir}/logs/cpg.log">
-            <PatternLayout pattern="[%-5p] %m%n" />
+            <PatternLayout pattern="[%-5p] %m; %X{x}%n" />
         </File>
     </Appenders>
     <Loggers>
-        <Logger name="org.reflections8.Reflections" level="error"/>
-        <Logger name="org.xnio.nio" level="error"/>
-        <Logger name="overflowdb" level="error"/>
-        <Logger name="io.shiftleft.codepropertygraph.cpgloading" level="error"/>
-        <Logger name="io.shiftleft.console.scripting" level="error"/>
-
-        <Root level="all">
+        <Root level="trace">
             <AppenderRef ref="FileAppender" level="trace" />
-            <AppenderRef ref="Console" level="error" />
+            <AppenderRef ref="Console" level="trace" />
         </Root>
     </Loggers>
 </Configuration>

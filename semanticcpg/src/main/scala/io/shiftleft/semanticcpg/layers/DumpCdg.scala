@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.layers
 import better.files.File
 import io.shiftleft.semanticcpg.language._
 
-import java.util.concurrent.Executor
+import scala.concurrent.ExecutionContext
 
 case class CdgDumpOptions(var outDir: String) extends LayerCreatorOptions {}
 
@@ -21,7 +21,7 @@ class DumpCdg(options: CdgDumpOptions) extends LayerCreator {
   override val description: String = DumpCdg.description
   override val modifiesCpg: Boolean = false
 
-  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean)(implicit executor: Executor): Unit = {
+  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean)(implicit ec: ExecutionContext): Unit = {
     val cpg = context.cpg
     cpg.method.zipWithIndex.foreach {
       case (method, i) =>

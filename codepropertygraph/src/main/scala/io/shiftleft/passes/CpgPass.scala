@@ -7,8 +7,8 @@ import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import org.slf4j.{Logger, LoggerFactory, MDC}
 
 import java.lang.{Long => JLong}
-import java.util.concurrent.Executor
 import java.util.function.{BiConsumer, Supplier}
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationLong
 
 /**
@@ -40,7 +40,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
   /**
     * Execute the pass and apply result to the underlying graph
     */
-  override def createAndApply()(implicit executor: Executor): Unit =
+  override def createAndApply()(implicit ec: ExecutionContext): Unit =
     withStartEndTimesLogged {
       run().foreach(diffGraph => DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool))
     }
@@ -69,7 +69,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
     * */
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
-                                            prefix: String = "")(implicit executor: Executor): Unit = {
+                                            prefix: String = "")(implicit ec: ExecutionContext): Unit = {
     if (serializedCpg.isEmpty) {
       createAndApply()
     } else {
@@ -143,11 +143,11 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
   // main function: add desired changes to builder
   def runOnPart(builder: DiffGraph.Builder, part: T): Unit
 
-  override def createAndApply()(implicit executor: Executor): Unit = createApplySerializeAndStore(null)
+  override def createAndApply()(implicit ec: ExecutionContext): Unit = createApplySerializeAndStore(null)
 
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
-                                            prefix: String = "")(implicit executor: Executor): Unit = {
+                                            prefix: String = "")(implicit ec: ExecutionContext): Unit = {
     baseLogger.info("Start of pass: {}", name)
     val nanosStart = System.nanoTime()
     var nParts = 0
@@ -218,9 +218,9 @@ trait CpgPassBase {
 
   protected def baseLogger: Logger = CpgPassBase.baseLogger
 
-  def createAndApply()(implicit executor: Executor): Unit
+  def createAndApply()(implicit ec: ExecutionContext): Unit
 
-  def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false, prefix: String = "")(implicit executor: Executor): Unit
+  def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false, prefix: String = "")(implicit ec: ExecutionContext): Unit
 
   /**
     * Name of the pass.

@@ -7,7 +7,7 @@ import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.Overlays
 import org.slf4j.{Logger, LoggerFactory}
 
-import java.util.concurrent.Executor
+import scala.concurrent.ExecutionContext
 
 abstract class LayerCreator {
 
@@ -24,7 +24,7 @@ abstract class LayerCreator {
     * */
   protected val modifiesCpg: Boolean = true
 
-  def run(context: LayerCreatorContext, storeUndoInfo: Boolean = false)(implicit executor: Executor): Unit = {
+  def run(context: LayerCreatorContext, storeUndoInfo: Boolean = false)(implicit ec: ExecutionContext): Unit = {
     val appliedOverlays = Overlays.appliedOverlays(context.cpg).toSet
     if (!dependsOn.toSet.subsetOf(appliedOverlays)) {
       logger.warn(
@@ -49,13 +49,13 @@ abstract class LayerCreator {
   protected def runPass(pass: CpgPassBase,
                         context: LayerCreatorContext,
                         storeUndoInfo: Boolean,
-                        index: Int = 0)(implicit executor: Executor): Unit = {
+                        index: Int = 0)(implicit ec: ExecutionContext): Unit = {
     val serializedCpg = initSerializedCpg(context.outputDir, pass.name, index)
     pass.createApplySerializeAndStore(serializedCpg, inverse = storeUndoInfo)
     serializedCpg.close()
   }
 
-  def create(context: LayerCreatorContext, storeUndoInfo: Boolean = false)(implicit executor: Executor): Unit
+  def create(context: LayerCreatorContext, storeUndoInfo: Boolean = false)(implicit ec: ExecutionContext): Unit
 
 }
 

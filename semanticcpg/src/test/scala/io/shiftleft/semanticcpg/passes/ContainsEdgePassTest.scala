@@ -8,7 +8,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 
-import java.util.concurrent.{Executor, Executors}
+import scala.concurrent.ExecutionContext
 import scala.jdk.CollectionConverters._
 
 class ContainsEdgePassTest extends AnyWordSpec with Matchers {
@@ -63,7 +63,7 @@ object ContainsEdgePassTest {
     innerMethodVertex --- EdgeTypes.AST --> innerExpressionVertex
 
     val containsEdgeCalculator = new ContainsEdgePass(new Cpg(graph))
-    implicit val executor: Executor = Executors.newSingleThreadExecutor()
+    implicit val ec: ExecutionContext = ExecutionContext.global
     containsEdgeCalculator.createAndApply()
   }
 

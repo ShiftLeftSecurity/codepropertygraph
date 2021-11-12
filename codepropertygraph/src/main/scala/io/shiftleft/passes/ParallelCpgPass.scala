@@ -2,11 +2,10 @@ package io.shiftleft.passes
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 
-import java.util.concurrent.{Executor, FutureTask, LinkedBlockingQueue}
+import java.util.concurrent.{FutureTask, LinkedBlockingQueue}
 import scala.collection.mutable
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Option[Iterator[KeyPool]] = None)
     extends CpgPassBase {
@@ -17,13 +16,13 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
 
   def runOnPart(part: T): Iterator[DiffGraph]
 
-  override def createAndApply()(implicit executor: Executor): Unit = {
+  override def createAndApply()(implicit ec: ExecutionContext): Unit = {
     withWriter() { writer =>
       enqueueInParallel(writer)
     }
   }
 
-  override def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean, prefix: String)(implicit executor: Executor): Unit = {
+  override def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean, prefix: String)(implicit ec: ExecutionContext): Unit = {
     withWriter(serializedCpg, prefix, inverse) { writer =>
       enqueueInParallel(writer)
     }
@@ -31,10 +30,10 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
 
   private def withWriter[X](serializedCpg: SerializedCpg = new SerializedCpg(),
                             prefix: String = "",
-                            inverse: Boolean = false)(f: Writer => Unit)(implicit executor: Executor): Unit = {
+                            inverse: Boolean = false)(f: Writer => Unit)(implicit ec: ExecutionContext): Unit = {
     val writer = new Writer(serializedCpg, prefix, inverse)
     val task = new FutureTask[Unit](writer, ())
-    executor.execute(task)
+    ec.execute(task)
     try {
       f(writer)
     } catch {
@@ -168,11 +167,11 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     * */
   def runOnPart(builder: DiffGraph.Builder, part: T): Unit
 
-  override def createAndApply()(implicit executor: Executor): Unit = createApplySerializeAndStore(null)
+  override def createAndApply()(implicit ec: ExecutionContext): Unit = createApplySerializeAndStore(null)
 
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
-                                            prefix: String = "")(implicit executor: Executor): Unit = {
+                                            prefix: String = "")(implicit ec: ExecutionContext): Unit = {
     import ConcurrentWriterCpgPass.producerQueueCapacity
     baseLogger.info("Start of enhancement: {}", name)
     val nanosStart = System.nanoTime()
@@ -186,7 +185,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     val completionQueue = mutable.ArrayDeque[Future[DiffGraph]]()
     val writer = new Writer(serializedCpg, prefix, inverse)
     val task = new FutureTask[Unit](writer, ())
-    executor.execute(task)
+    ec.execute(task)
     try {
       try {
         // The idea is that we have a ringbuffer completionQueue that contains the workunits that are currently in-flight.

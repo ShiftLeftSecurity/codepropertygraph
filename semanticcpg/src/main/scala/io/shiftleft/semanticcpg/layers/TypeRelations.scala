@@ -4,8 +4,8 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.passes.typerelations.{AliasLinkerPass, TypeHierarchyPass}
 
-import java.util.concurrent.Executor
 import scala.annotation.nowarn
+import scala.concurrent.ExecutionContext
 
 object TypeRelations {
   val overlayName: String = "typerel"
@@ -25,7 +25,7 @@ class TypeRelations(optionsUnused: LayerCreatorOptions = null) extends LayerCrea
   override val description: String = TypeRelations.description
   override val dependsOn = List(Base.overlayName)
 
-  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean)(implicit executor: Executor): Unit = {
+  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean)(implicit ec: ExecutionContext): Unit = {
     val cpg = context.cpg
     TypeRelations.passes(cpg).zipWithIndex.foreach {
       case (pass, index) =>
