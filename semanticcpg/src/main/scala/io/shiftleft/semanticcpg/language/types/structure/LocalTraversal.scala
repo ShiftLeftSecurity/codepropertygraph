@@ -10,9 +10,9 @@ import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
 
-class LocalTraversalNew[I <: nodes.Local, IT[_], FT[_]](val pipe: IT[I]) extends AnyVal {
+class LocalTraversalNew[I <: nodes.Local, IT[_], FT[_]](val trav: IT[I]) extends AnyVal {
   def referencingIdentifiers(implicit ops1: TravOps[IT, FT], ops2: TravNOps[FT]) = {
-    pipe
+    trav
       .flatMap(_._refIn.asScala)
       .filter(_.label == NodeTypes.IDENTIFIER)
       .cast[Identifier]

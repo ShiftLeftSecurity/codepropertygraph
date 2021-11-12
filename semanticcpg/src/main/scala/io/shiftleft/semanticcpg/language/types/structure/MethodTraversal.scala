@@ -14,7 +14,7 @@ class MethodTraversalNew[I <: nodes.Method, IT[_], FT[_]](val trav: IT[I]) exten
     trav.map(_._astOut.asScala.collectFirst { case x: nodes.MethodReturn => x }.get)
   }
 
-  def methodParameters()(implicit ops: TravOps[IT, FT], ops2: TravNOps[FT]) = {
+  def methodParameters()(implicit ops1: TravOps[IT, FT], ops2: TravNOps[FT]) = {
     trav.flatMap(_._astOut.asScala.collect { case x: nodes.MethodParameterIn => x })
   }
 }
