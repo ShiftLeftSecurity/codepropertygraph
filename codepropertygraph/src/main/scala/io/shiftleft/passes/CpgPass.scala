@@ -220,7 +220,8 @@ trait CpgPassBase {
 
   def createAndApply()(implicit ec: ExecutionContext): Unit
 
-  def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false, prefix: String = "")(implicit ec: ExecutionContext): Unit
+  def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false, prefix: String = "")(
+      implicit ec: ExecutionContext): Unit
 
   /**
     * Name of the pass.
