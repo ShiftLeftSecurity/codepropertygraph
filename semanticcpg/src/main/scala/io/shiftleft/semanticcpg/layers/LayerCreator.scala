@@ -55,7 +55,8 @@ abstract class LayerCreator {
     serializedCpg.close()
   }
 
-  @nowarn def createWithExecutionContext(context: LayerCreatorContext, storeUndoInfo: Boolean = false)(implicit ec: ExecutionContext): Unit = create(context, storeUndoInfo)
+  @nowarn def createWithExecutionContext(context: LayerCreatorContext, storeUndoInfo: Boolean = false)(
+      implicit ec: ExecutionContext): Unit = create(context, storeUndoInfo)
 
   def create(context: LayerCreatorContext, storeUndoInfo: Boolean = false): Unit = ???
 
