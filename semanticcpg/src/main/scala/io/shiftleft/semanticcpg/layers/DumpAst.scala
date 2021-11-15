@@ -2,8 +2,6 @@ package io.shiftleft.semanticcpg.layers
 import better.files.File
 import io.shiftleft.semanticcpg.language._
 
-import scala.concurrent.ExecutionContext
-
 case class AstDumpOptions(var outDir: String) extends LayerCreatorOptions {}
 
 object DumpAst {
@@ -20,7 +18,7 @@ class DumpAst(options: AstDumpOptions) extends LayerCreator {
   override val description: String = DumpAst.description
   override val modifiesCpg: Boolean = false
 
-  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean)(implicit ec: ExecutionContext): Unit = {
+  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
     val cpg = context.cpg
     cpg.method.zipWithIndex.foreach {
       case (method, i) =>

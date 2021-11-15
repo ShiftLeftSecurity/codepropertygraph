@@ -7,6 +7,7 @@ import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.Overlays
 import org.slf4j.{Logger, LoggerFactory}
 
+import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 
 abstract class LayerCreator {
@@ -33,7 +34,7 @@ abstract class LayerCreator {
     } else if (appliedOverlays.contains(overlayName)) {
       logger.warn("The overlay {} already exists - skipping creation", overlayName)
     } else {
-      create(context, storeUndoInfo)
+      createWithExecutionContext(context, storeUndoInfo)
       if (modifiesCpg) {
         Overlays.appendOverlayName(context.cpg, overlayName)
       }
@@ -54,7 +55,9 @@ abstract class LayerCreator {
     serializedCpg.close()
   }
 
-  def create(context: LayerCreatorContext, storeUndoInfo: Boolean = false)(implicit ec: ExecutionContext): Unit
+  @nowarn def createWithExecutionContext(context: LayerCreatorContext, storeUndoInfo: Boolean = false)(implicit ec: ExecutionContext): Unit = create(context, storeUndoInfo)
+
+  def create(context: LayerCreatorContext, storeUndoInfo: Boolean = false): Unit = ???
 
 }
 

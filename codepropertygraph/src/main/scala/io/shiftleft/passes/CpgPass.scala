@@ -36,7 +36,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
   /**
     * Main method of pass - to be implemented by child class
     * */
-  def run(): Iterator[DiffGraph]
+  def run(): Iterator[DiffGraph] = ???
 
   /**
     * Secondary main method of pass - child classes may implement it if they need an execution context.

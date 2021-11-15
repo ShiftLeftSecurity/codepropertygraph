@@ -36,7 +36,7 @@ class ControlFlow(optionsUnused: LayerCreatorOptions = null) extends LayerCreato
   override val description: String = ControlFlow.description
   override val dependsOn = List(Base.overlayName)
 
-  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean)(implicit ec: ExecutionContext): Unit = {
+  override def createWithExecutionContext(context: LayerCreatorContext, storeUndoInfo: Boolean)(implicit ec: ExecutionContext): Unit = {
     val cpg = context.cpg
     ControlFlow.passes(cpg).zipWithIndex.foreach {
       case (pass, index) =>
