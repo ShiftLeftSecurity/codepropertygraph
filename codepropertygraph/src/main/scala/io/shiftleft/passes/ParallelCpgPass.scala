@@ -22,7 +22,8 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
     }
   }
 
-  override def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean, prefix: String)(implicit ec: ExecutionContext): Unit = {
+  override def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean, prefix: String)(
+      implicit ec: ExecutionContext): Unit = {
     withWriter(serializedCpg, prefix, inverse) { writer =>
       enqueueInParallel(writer)
     }
