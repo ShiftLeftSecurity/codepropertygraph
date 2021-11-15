@@ -2,7 +2,7 @@ package io.shiftleft.passes
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 
-import java.util.concurrent.{FutureTask, LinkedBlockingQueue}
+import java.util.concurrent.LinkedBlockingQueue
 import scala.collection.mutable
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -32,8 +32,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
                             prefix: String = "",
                             inverse: Boolean = false)(f: Writer => Unit)(implicit ec: ExecutionContext): Unit = {
     val writer = new Writer(serializedCpg, prefix, inverse)
-    val task = new FutureTask[Unit](writer, ())
-    ec.execute(task)
+    val task = Future { writer.run() }
     try {
       f(writer)
     } catch {
@@ -42,7 +41,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
     } finally {
       writer.enqueue(None, None)
     }
-    task.get()
+    Await.ready(task, Duration.Inf)
   }
 
   private def enqueueInParallel(writer: Writer): Unit = {
@@ -184,8 +183,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     val partIter = parts.iterator
     val completionQueue = mutable.ArrayDeque[Future[DiffGraph]]()
     val writer = new Writer(serializedCpg, prefix, inverse)
-    val task = new FutureTask[Unit](writer, ())
-    ec.execute(task)
+    val task = Future { writer.run() }
     try {
       try {
         // The idea is that we have a ringbuffer completionQueue that contains the workunits that are currently in-flight.
@@ -218,7 +216,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
       } finally {
         try {
           writer.queue.put(None)
-          task.get()
+          Await.ready(task, Duration.Inf)
         } finally { finish() }
       }
     } finally {
