@@ -35,7 +35,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
   /**
     * Main method of pass - to be implemented by child class
     * */
-  def run(): Iterator[DiffGraph]
+  def run()(implicit ec: ExecutionContext): Iterator[DiffGraph]
 
   /**
     * Execute the pass and apply result to the underlying graph
@@ -49,7 +49,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
     * Execute and create a serialized overlay
     * @param inverse invert the diffgraph before serializing
     */
-  def createApplyAndSerialize(inverse: Boolean = false): Iterator[GeneratedMessageV3] =
+  def createApplyAndSerialize(inverse: Boolean = false)(implicit ec: ExecutionContext): Iterator[GeneratedMessageV3] =
     withStartEndTimesLogged {
       val overlays = run().map { diffGraph =>
         val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse, keyPool)
