@@ -9,11 +9,9 @@ import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker.{
   typeFullNameToNode
 }
 
-import scala.concurrent.ExecutionContext
-
 class TypeUsagePass(cpg: Cpg) extends CpgPass(cpg) {
 
-  override def run()(implicit ec: ExecutionContext): Iterator[DiffGraph] = {
+  override def run(): Iterator[DiffGraph] = {
 
     val dstGraph = DiffGraph.newBuilder
 

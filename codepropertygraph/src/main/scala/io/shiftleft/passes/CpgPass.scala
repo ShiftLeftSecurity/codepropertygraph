@@ -8,6 +8,7 @@ import org.slf4j.{Logger, LoggerFactory, MDC}
 
 import java.lang.{Long => JLong}
 import java.util.function.{BiConsumer, Supplier}
+import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationLong
 
@@ -35,14 +36,19 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
   /**
     * Main method of pass - to be implemented by child class
     * */
-  def run()(implicit ec: ExecutionContext): Iterator[DiffGraph]
+  def run(): Iterator[DiffGraph]
+
+  /**
+    * Secondary main method of pass - child classes may implement it if they need an execution context.
+    */
+  @nowarn def runWithExecutionContext()(implicit ec: ExecutionContext): Iterator[DiffGraph] = run()
 
   /**
     * Execute the pass and apply result to the underlying graph
     */
   override def createAndApply()(implicit ec: ExecutionContext): Unit =
     withStartEndTimesLogged {
-      run().foreach(diffGraph => DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool))
+      runWithExecutionContext().foreach(diffGraph => DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool))
     }
 
   /**
@@ -51,7 +57,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
     */
   def createApplyAndSerialize(inverse: Boolean = false)(implicit ec: ExecutionContext): Iterator[GeneratedMessageV3] =
     withStartEndTimesLogged {
-      val overlays = run().map { diffGraph =>
+      val overlays = runWithExecutionContext().map { diffGraph =>
         val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse, keyPool)
         serialize(appliedDiffGraph, inverse)
       }

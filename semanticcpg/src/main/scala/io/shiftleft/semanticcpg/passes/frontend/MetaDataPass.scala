@@ -5,8 +5,6 @@ import io.shiftleft.codepropertygraph.generated.nodes.{NewMetaData, NewNamespace
 import io.shiftleft.passes.{CpgPass, DiffGraph, KeyPool}
 import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, NamespaceTraversal}
 
-import scala.concurrent.ExecutionContext
-
 /**
   * A pass that creates a MetaData node, specifying that this
   * is a CPG for language, and a NamespaceBlock for anything that
@@ -14,7 +12,7 @@ import scala.concurrent.ExecutionContext
   * */
 class MetaDataPass(cpg: Cpg, language: String, keyPool: Option[KeyPool] = None)
     extends CpgPass(cpg, keyPool = keyPool) {
-  override def run()(implicit ec: ExecutionContext): Iterator[DiffGraph] = {
+  override def run(): Iterator[DiffGraph] = {
     def addMetaDataNode(diffGraph: DiffGraph.Builder): Unit = {
       val metaNode = NewMetaData().language(language).version("0.1")
       diffGraph.addNode(metaNode)

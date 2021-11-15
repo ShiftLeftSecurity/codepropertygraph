@@ -6,10 +6,8 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, PropertyN
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker.{linkToMultiple, typeFullNameToNode}
 
-import scala.concurrent.ExecutionContext
-
 class AliasLinkerPass(cpg: Cpg) extends CpgPass(cpg) {
-  override def run()(implicit ec: ExecutionContext): Iterator[DiffGraph] = {
+  override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
     // Create ALIAS_OF edges from TYPE_DECL nodes to
     // TYPE

@@ -137,7 +137,7 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
   def passAddsEdgeTo(from: StoredNode, propValue: String, cpg: Cpg): CpgPass = {
     val newNode = NewUnknown().code(propValue)
     new CpgPass(cpg) {
-      override def run()(implicit ec: ExecutionContext): Iterator[DiffGraph] = {
+      override def run(): Iterator[DiffGraph] = {
         val dstGraph = DiffGraph.newBuilder
         dstGraph.addNode(newNode)
         dstGraph.addEdgeFromOriginal(srcNode = from, dstNode = newNode, edgeLabel = EdgeTypes.AST)

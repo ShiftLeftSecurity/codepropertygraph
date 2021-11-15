@@ -10,7 +10,6 @@ import overflowdb._
 import overflowdb.traversal._
 
 import scala.collection.mutable
-import scala.concurrent.ExecutionContext
 import scala.jdk.CollectionConverters._
 
 /**
@@ -20,7 +19,7 @@ import scala.jdk.CollectionConverters._
 class MethodRefLinker(cpg: Cpg) extends CpgPass(cpg) {
   import MethodRefLinker.linkToSingle
 
-  override def run()(implicit ec: ExecutionContext): Iterator[DiffGraph] = {
+  override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
     // Create REF edges from METHOD_REFs to

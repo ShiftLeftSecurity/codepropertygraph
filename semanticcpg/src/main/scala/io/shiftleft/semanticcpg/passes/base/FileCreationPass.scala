@@ -9,14 +9,13 @@ import io.shiftleft.semanticcpg.language.types.structure.FileTraversal
 import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker
 
 import scala.collection.mutable
-import scala.concurrent.ExecutionContext
 
 /**
   * For all nodes with FILENAME fields, create corresponding FILE nodes
   * and connect node with FILE node via outgoing SOURCE_FILE edges.
   */
 class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
-  override def run()(implicit ec: ExecutionContext): Iterator[DiffGraph] = {
+  override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
     val originalFileNameToNode = mutable.Map.empty[String, StoredNode]
