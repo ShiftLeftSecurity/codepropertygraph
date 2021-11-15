@@ -44,7 +44,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
     Await.ready(task, Duration.Inf)
   }
 
-  private def enqueueInParallel(writer: Writer): Unit = {
+  private def enqueueInParallel(writer: Writer)(implicit ec: ExecutionContext): Unit = {
     withStartEndTimesLogged {
       try {
         init()
