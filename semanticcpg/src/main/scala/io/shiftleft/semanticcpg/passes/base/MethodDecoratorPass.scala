@@ -6,6 +6,8 @@ import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
+import scala.concurrent.ExecutionContext
+
 /**
   * Adds a METHOD_PARAMETER_OUT for each METHOD_PARAMETER_IN to the graph and
   * connects those with a PARAMETER_LINK edge.
@@ -21,7 +23,7 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   private[this] var loggedDeprecatedWarning = false
   private[this] var loggedMissingTypeFullName = false
 
-  override def run(): Iterator[DiffGraph] = {
+  override def run()(implicit ec: ExecutionContext): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
     cpg.parameter.foreach { parameterIn =>

@@ -8,6 +8,7 @@ import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext
 
 class StaticCallLinker(cpg: Cpg) extends CpgPass(cpg) {
 
@@ -17,7 +18,7 @@ class StaticCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   /**
     * Main method of enhancement - to be implemented by child class
     **/
-  override def run(): Iterator[DiffGraph] = {
+  override def run()(implicit ec: ExecutionContext): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
     cpg.method.foreach { method =>
       methodFullNameToNode.put(method.fullName, method)

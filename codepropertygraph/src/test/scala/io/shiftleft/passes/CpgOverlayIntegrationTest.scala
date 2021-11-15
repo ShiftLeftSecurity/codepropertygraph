@@ -17,8 +17,11 @@ import overflowdb._
 import overflowdb.traversal._
 
 import java.util.Optional
+import scala.concurrent.ExecutionContext
 
 class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
+  implicit val ec: ExecutionContext = ExecutionContext.global
+
   val InitialNodeCode = "initialNode"
   val Pass1NewNodeCode = "pass1NewNodeCode"
   val Pass2NewNodeCode = "pass2NewNodeCode"
@@ -134,7 +137,7 @@ class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
   def passAddsEdgeTo(from: StoredNode, propValue: String, cpg: Cpg): CpgPass = {
     val newNode = NewUnknown().code(propValue)
     new CpgPass(cpg) {
-      override def run(): Iterator[DiffGraph] = {
+      override def run()(implicit ec: ExecutionContext): Iterator[DiffGraph] = {
         val dstGraph = DiffGraph.newBuilder
         dstGraph.addNode(newNode)
         dstGraph.addEdgeFromOriginal(srcNode = from, dstNode = newNode, edgeLabel = EdgeTypes.AST)

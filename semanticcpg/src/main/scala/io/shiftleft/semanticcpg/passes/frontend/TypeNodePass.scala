@@ -4,12 +4,14 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewType
 import io.shiftleft.passes.{CpgPass, DiffGraph, KeyPool}
 
+import scala.concurrent.ExecutionContext
+
 /**
   * Creates a `TYPE` node for each type in `usedTypes`
   * */
 class TypeNodePass(usedTypes: List[String], cpg: Cpg, keyPool: Option[KeyPool] = None)
     extends CpgPass(cpg, "types", keyPool) {
-  override def run(): Iterator[DiffGraph] = {
+  override def run()(implicit ec: ExecutionContext): Iterator[DiffGraph] = {
     val diffGraph = DiffGraph.newBuilder
 
     diffGraph.addNode(

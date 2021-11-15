@@ -9,6 +9,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.{NodeDb, NodeRef}
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext
 import scala.jdk.CollectionConverters._
 
 /** We compute the set of possible call-targets for each dynamic call, and add them as CALL edges to the graph, based on
@@ -49,7 +50,7 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
 
   /** Main method of enhancement - to be implemented by child class
     */
-  override def run(): Iterator[DiffGraph] = {
+  override def run()(implicit ec: ExecutionContext): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
     // Perform early stopping in the case of no virtual calls
     if (!cpg.call.exists(_.dispatchType == DispatchTypes.DYNAMIC_DISPATCH)) return Iterator()

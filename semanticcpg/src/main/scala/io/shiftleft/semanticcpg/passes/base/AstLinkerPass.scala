@@ -12,11 +12,13 @@ import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker.{
   typeDeclFullNameToNode
 }
 
+import scala.concurrent.ExecutionContext
+
 class AstLinkerPass(cpg: Cpg) extends CpgPass(cpg) {
 
   import MethodRefLinker.{logFailedSrcLookup, logger}
 
-  override def run(): Iterator[DiffGraph] = {
+  override def run()(implicit ec: ExecutionContext): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
     cpg.method.whereNot(_.inE(EdgeTypes.AST)).foreach(addAstEdge(_, dstGraph))
     cpg.typeDecl.whereNot(_.inE(EdgeTypes.AST)).foreach(addAstEdge(_, dstGraph))

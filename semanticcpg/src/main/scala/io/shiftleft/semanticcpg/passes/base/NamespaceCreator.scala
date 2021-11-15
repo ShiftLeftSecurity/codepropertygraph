@@ -6,6 +6,8 @@ import io.shiftleft.codepropertygraph.generated.nodes.{NamespaceBlock, NewNamesp
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
+import scala.concurrent.ExecutionContext
+
 /**
   * Creates NAMESPACE nodes and connects NAMESPACE_BLOCKs
   * to corresponding NAMESPACE nodes.
@@ -18,7 +20,7 @@ class NamespaceCreator(cpg: Cpg) extends CpgPass(cpg) {
     * Creates NAMESPACE nodes and connects NAMESPACE_BLOCKs
     * to corresponding NAMESPACE nodes.
     * */
-  override def run(): Iterator[DiffGraph] = {
+  override def run()(implicit ec: ExecutionContext): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
     cpg.namespaceBlock
       .groupBy { nb: NamespaceBlock =>

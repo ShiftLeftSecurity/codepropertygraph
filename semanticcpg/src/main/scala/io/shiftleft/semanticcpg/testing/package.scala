@@ -192,7 +192,7 @@ package object testing {
       val diffGraph = new DiffGraph.Builder
       f(diffGraph, cpg)
       class MyPass extends CpgPass(cpg) {
-        override def run(): Iterator[DiffGraph] = {
+        override def run()(implicit ec: ExecutionContext): Iterator[DiffGraph] = {
           Iterator(diffGraph.build())
         }
       }
