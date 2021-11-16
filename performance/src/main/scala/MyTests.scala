@@ -129,7 +129,7 @@ class MyTestNew {
 
   @Benchmark
   def syntheticIterableNew(state: MyState) = {
-    //toSynth(state.d1:: Nil).toD2
+    //toSynth(state.d1:: Nil).toD2Multi
     Iterable.single(state.d1).toD2
   }
 

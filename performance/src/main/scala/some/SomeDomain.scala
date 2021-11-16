@@ -15,6 +15,9 @@ object SomeDomain {
     def toD2(implicit ops: TravOps[IT, FT]) = {
       trav.map(_.x)
     }
+    def toD2Multi(implicit ops: TravOps[IT, FT]) = {
+      trav.flatMap(x => Iterator.single(x))
+    }
   }
 
   case class D1(x: D2)
