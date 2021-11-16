@@ -5,6 +5,8 @@ import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import scala.concurrent.ExecutionContext
+
 class DumpAstTests extends AnyWordSpec with Matchers {
 
   "DumpAst" should {
@@ -17,6 +19,7 @@ class DumpAstTests extends AnyWordSpec with Matchers {
         .cpg
 
       val context = new LayerCreatorContext(cpg)
+      implicit val ec: ExecutionContext = ExecutionContext.global
       new Base().run(context)
       File.usingTemporaryDirectory("dumpast") { tmpDir =>
         val opts = AstDumpOptions(tmpDir.path.toString)

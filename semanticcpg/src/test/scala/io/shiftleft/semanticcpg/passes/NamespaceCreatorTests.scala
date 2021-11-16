@@ -9,6 +9,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb._
 
+import scala.concurrent.ExecutionContext
+
 class NamespaceCreatorTests extends AnyWordSpec with Matchers {
   "NamespaceCreateor test " in EmptyGraphFixture { graph =>
     val cpg = new Cpg(graph)
@@ -17,6 +19,7 @@ class NamespaceCreatorTests extends AnyWordSpec with Matchers {
     val block3 = graph + (NodeTypes.NAMESPACE_BLOCK, Properties.NAME -> "namespace2")
 
     val namespaceCreator = new NamespaceCreator(new Cpg(graph))
+    implicit val ec: ExecutionContext = ExecutionContext.global
     namespaceCreator.createAndApply()
 
     val namespaces = cpg.namespace.l

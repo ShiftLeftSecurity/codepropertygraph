@@ -7,6 +7,9 @@ import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.Overlays
 import org.slf4j.{Logger, LoggerFactory}
 
+import scala.annotation.nowarn
+import scala.concurrent.ExecutionContext
+
 abstract class LayerCreator {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
@@ -22,15 +25,16 @@ abstract class LayerCreator {
     * */
   protected val modifiesCpg: Boolean = true
 
-  def run(context: LayerCreatorContext, storeUndoInfo: Boolean = false): Unit = {
+  def run(context: LayerCreatorContext, storeUndoInfo: Boolean = false)(implicit ec: ExecutionContext): Unit = {
     val appliedOverlays = Overlays.appliedOverlays(context.cpg).toSet
     if (!dependsOn.toSet.subsetOf(appliedOverlays)) {
-      logger.warn(
-        s"${this.getClass.getName} depends on $dependsOn but CPG only has $appliedOverlays - skipping creation")
+      logger.warn("{} depends on {} but CPG only has $appliedOverlays - skipping creation",
+                  this.getClass.getName,
+                  dependsOn)
     } else if (appliedOverlays.contains(overlayName)) {
-      logger.warn(s"The overlay $overlayName already exists - skipping creation")
+      logger.warn("The overlay {} already exists - skipping creation", overlayName)
     } else {
-      create(context, storeUndoInfo)
+      createWithExecutionContext(context, storeUndoInfo)
       if (modifiesCpg) {
         Overlays.appendOverlayName(context.cpg, overlayName)
       }
@@ -44,16 +48,17 @@ abstract class LayerCreator {
     }
   }
 
-  protected def runPass(pass: CpgPassBase,
-                        context: LayerCreatorContext,
-                        storeUndoInfo: Boolean,
-                        index: Int = 0): Unit = {
+  protected def runPass(pass: CpgPassBase, context: LayerCreatorContext, storeUndoInfo: Boolean, index: Int = 0)(
+      implicit ec: ExecutionContext): Unit = {
     val serializedCpg = initSerializedCpg(context.outputDir, pass.name, index)
     pass.createApplySerializeAndStore(serializedCpg, inverse = storeUndoInfo)
     serializedCpg.close()
   }
 
-  def create(context: LayerCreatorContext, storeUndoInfo: Boolean = false): Unit
+  @nowarn def createWithExecutionContext(context: LayerCreatorContext, storeUndoInfo: Boolean = false)(
+      implicit ec: ExecutionContext): Unit = create(context, storeUndoInfo)
+
+  def create(context: LayerCreatorContext, storeUndoInfo: Boolean = false): Unit = ???
 
 }
 

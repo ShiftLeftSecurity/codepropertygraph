@@ -9,6 +9,7 @@ import io.shiftleft.semanticcpg.passes.controlflow.cfgdominator.CfgDominatorPass
 import io.shiftleft.semanticcpg.passes.controlflow.codepencegraph.CdgPass
 
 import scala.annotation.nowarn
+import scala.concurrent.ExecutionContext
 
 object ControlFlow {
   val overlayName: String = "controlflow"
@@ -35,7 +36,8 @@ class ControlFlow(optionsUnused: LayerCreatorOptions = null) extends LayerCreato
   override val description: String = ControlFlow.description
   override val dependsOn = List(Base.overlayName)
 
-  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
+  override def createWithExecutionContext(context: LayerCreatorContext, storeUndoInfo: Boolean)(
+      implicit ec: ExecutionContext): Unit = {
     val cpg = context.cpg
     ControlFlow.passes(cpg).zipWithIndex.foreach {
       case (pass, index) =>

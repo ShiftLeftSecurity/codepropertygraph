@@ -17,8 +17,11 @@ import overflowdb._
 import overflowdb.traversal._
 
 import java.util.Optional
+import scala.concurrent.ExecutionContext
 
 class CpgOverlayIntegrationTest extends AnyWordSpec with Matchers {
+  implicit val ec: ExecutionContext = ExecutionContext.global
+
   val InitialNodeCode = "initialNode"
   val Pass1NewNodeCode = "pass1NewNodeCode"
   val Pass2NewNodeCode = "pass2NewNodeCode"
