@@ -4,9 +4,50 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.langv2._
+import io.shiftleft.semanticcpg.langv3.{Helper, Kernel1ToN, Kernel1ToO}
 import overflowdb.traversal.help.Doc
 import overflowdb.traversal.{Traversal, help}
+
+import scala.collection.IterableOps
 import scala.jdk.CollectionConverters._
+
+class AstNodeIsExpressionKernel[I <: AstNode] extends Kernel1ToO[I, I with Expression] {
+  override def apply(i: I): Option[I with Expression] = {
+    if (i.isInstanceOf[Expression]) {
+      Some(i.asInstanceOf[I with Expression])
+    } else {
+      None
+    }
+  }
+}
+
+object AstNodeIsExpression {
+  type NodeType = AstNode
+  type KernelType[T <: NodeType] = AstNodeIsExpressionKernel[T]
+
+  private val _impl = new KernelType[NodeType]()
+  private def impl[I <: NodeType] = _impl.asInstanceOf[KernelType[I]]
+
+  trait Imports {
+    implicit def toSingleExt[I <: NodeType](i: I) = new SingleExt(i)
+    implicit def toIterableExt[I <: NodeType, CC[_], C](i: IterableOps[I, CC, C]) = new IterableExt(i)
+    implicit def toIteratorExt[I <: NodeType](i: Iterator[I]) = new IteratorExt(i)
+    implicit def toOptionExt[I <: NodeType](i: Option[I]) = new OptionExt(i)
+  }
+
+  class SingleExt[I <: NodeType](val i: I) extends AnyVal {
+    def isExpression = Helper(i, impl[I])
+  }
+  class IterableExt[I <: NodeType, CC[_], C](val i: IterableOps[I, CC, C]) extends AnyVal {
+    def isExpression = Helper(i, impl[I])
+  }
+  class IteratorExt[I <: NodeType](val i: Iterator[I]) extends AnyVal {
+    def isExpression = Helper(i, impl[I])
+  }
+  class OptionExt[I <: NodeType](val i: Option[I]) extends AnyVal {
+    def isExpression = Helper(i, impl[I])
+  }
+}
 
 class AstTraversalNew[I <: AstNode, IT[_], FT[_]](val trav: IT[I]) extends AnyVal {
 

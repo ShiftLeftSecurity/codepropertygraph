@@ -12,3 +12,8 @@ package object langv2 {
   }
 
 }
+object foo {
+  implicit class MethoddParameterSingleExt(val node: Int) extends AnyVal {
+    def parameterB: Iterator[Int] = Iterator.single(2)
+  }
+}

@@ -1,13 +1,15 @@
 package io.shiftleft.semanticcpg.language.types.expressions
 
 import io.shiftleft.codepropertygraph.generated.NodeTypes
-import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Method, MethodReturn}
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Method, MethodReturn, StoredNode}
 import io.shiftleft.semanticcpg.testing.MockCpg
 import io.shiftleft.semanticcpg.language.MySteps._
+import io.shiftleft.semanticcpg.language.ImportsV3._
 
 import scala.jdk.CollectionConverters._
 import org.openjdk.jmh.annotations._
 import MyTests._
+import io.shiftleft.semanticcpg.language.types.structure.LocalReferencingIdentifiers
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -70,6 +72,12 @@ class MyTestNew {
   }
 
   @Benchmark
+  def refIdNew3(state: MyState) = {
+    val x = rftoSingleExt(state.local).referencingIdentifiers
+    x
+  }
+
+  @Benchmark
   def refIdBase(state: MyState) = {
     val x = Iterable.from(state.local._refIn.asScala).filter(_.label == NodeTypes.IDENTIFIER)
     x
@@ -95,8 +103,13 @@ class MyTestNew {
   }
 
   @Benchmark
-  def astTestNew(state: MyState) = {
-    state.method.isExpression.headOption
+  def astTestNewV2(state: MyState) = {
+    toAstTraversalNew1(state.method).isExpression
+  }
+
+  @Benchmark
+  def astTestNewV3(state: MyState) = {
+    toSingleExt(state.method).isExpression
   }
 
   @Benchmark
