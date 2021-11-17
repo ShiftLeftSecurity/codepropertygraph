@@ -8,7 +8,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Option[Iterator[KeyPool]] = None)
-    extends CpgPassBase {
+    extends CpgPassBase[ExecutionContext] {
 
   def init(): Unit = {}
 
@@ -149,7 +149,7 @@ object ConcurrentWriterCpgPass {
 }
 
 abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
-    extends CpgPassBase {
+    extends CpgPassBase[ExecutionContext] {
 
   // generate Array of parts that can be processed in parallel
   def generateParts(): Array[_ <: AnyRef] = Array[AnyRef](null)

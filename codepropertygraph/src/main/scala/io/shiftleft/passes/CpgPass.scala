@@ -12,6 +12,24 @@ import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationLong
 
+trait MaybeExecutionContext[T] {
+  type ExecCtx
+  def value: ExecCtx
+}
+
+object MaybeExecutionContext {
+  implicit def executionContextIsMaybeExecutionContext(ec: ExecutionContext): MaybeExecutionContext[ExecutionContext] = new MaybeExecutionContext[ExecutionContext] {
+    override type ExecCtx = ExecutionContext
+    override def value: ExecCtx = ec
+  }
+  implicit val NoExecutionContextIsMaybeExecutionContext: MaybeExecutionContext[NoExecutionContextRequired] = new MaybeExecutionContext[NoExecutionContextRequired] {
+    override type ExecCtx = Unit
+    override def value: ExecCtx = ()
+  }
+}
+
+trait NoExecutionContextRequired
+
 /**
   * Base class for CPG pass - a program, which receives an input graph
   * and outputs a sequence of additive diff graphs. These diff graphs can
@@ -31,24 +49,22 @@ import scala.concurrent.duration.DurationLong
   *
   * @param cpg the source CPG this pass traverses
   */
-abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None) extends CpgPassBase {
+@nowarn
+abstract class CpgPass[T : MaybeExecutionContext](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None) extends CpgPassBase[T] {
+
+  def baseRun()(implicit ec: ExecutionContext): Iterator[DiffGraph]
 
   /**
     * Main method of pass - to be implemented by child class
     * */
-  def run(): Iterator[DiffGraph] = ???
-
-  /**
-    * Secondary main method of pass - child classes may implement it if they need an execution context.
-    */
-  @nowarn def runWithExecutionContext()(implicit ec: ExecutionContext): Iterator[DiffGraph] = run()
+  def run()(implicit ec: T): Iterator[DiffGraph] = ???
 
   /**
     * Execute the pass and apply result to the underlying graph
     */
-  override def createAndApply()(implicit ec: ExecutionContext): Unit =
+  override def createAndApply()(implicit ec: T): Unit =
     withStartEndTimesLogged {
-      runWithExecutionContext().foreach(diffGraph =>
+      run().foreach(diffGraph =>
         DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool))
     }
 
@@ -56,9 +72,9 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
     * Execute and create a serialized overlay
     * @param inverse invert the diffgraph before serializing
     */
-  def createApplyAndSerialize(inverse: Boolean = false)(implicit ec: ExecutionContext): Iterator[GeneratedMessageV3] =
+  def createApplyAndSerialize(inverse: Boolean = false)(implicit ec: T): Iterator[GeneratedMessageV3] =
     withStartEndTimesLogged {
-      val overlays = runWithExecutionContext().map { diffGraph =>
+      val overlays = run().map { diffGraph =>
         val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse, keyPool)
         serialize(appliedDiffGraph, inverse)
       }
@@ -76,7 +92,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
     * */
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
-                                            prefix: String = "")(implicit ec: ExecutionContext): Unit = {
+                                            prefix: String = "")(implicit ec: T): Unit = {
     if (serializedCpg.isEmpty) {
       createAndApply()
     } else {
@@ -107,8 +123,8 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
  * passes eagerly, and releases them only when the entire chain has run.
  * */
 
-abstract class SimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
-    extends ForkJoinParallelCpgPass[AnyRef](cpg, outName, keyPool) {
+abstract class SimpleCpgPass[C : MaybeExecutionContext](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
+    extends ForkJoinParallelCpgPass[AnyRef, C](cpg, outName, keyPool) {
 
   def run(builder: DiffGraph.Builder): Unit
 
@@ -139,8 +155,9 @@ abstract class SimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[Key
  * methods. This may be better than using the constructor or GC, because e.g. SCPG chains of passes construct
  * passes eagerly, and releases them only when the entire chain has run.
  * */
-abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
-    extends CpgPassBase {
+@nowarn
+abstract class ForkJoinParallelCpgPass[T <: AnyRef, C : MaybeExecutionContext](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
+    extends CpgPassBase[C] {
   // generate Array of parts that can be processed in parallel
   def generateParts(): Array[_ <: AnyRef]
   // setup large data structures, acquire external resources
@@ -150,11 +167,11 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
   // main function: add desired changes to builder
   def runOnPart(builder: DiffGraph.Builder, part: T): Unit
 
-  override def createAndApply()(implicit ec: ExecutionContext): Unit = createApplySerializeAndStore(null)
+  override def createAndApply()(implicit ec: C): Unit = createApplySerializeAndStore(null)
 
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
-                                            prefix: String = "")(implicit ec: ExecutionContext): Unit = {
+                                            prefix: String = "")(implicit ec: C): Unit = {
     baseLogger.info("Start of pass: {}", name)
     val nanosStart = System.nanoTime()
     var nParts = 0
@@ -218,17 +235,17 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
 }
 
 object CpgPassBase {
-  private val baseLogger: Logger = LoggerFactory.getLogger(classOf[CpgPass])
+  private val baseLogger: Logger = LoggerFactory.getLogger(classOf[CpgPass[NoExecutionContextRequired]])
 }
 
-trait CpgPassBase {
+trait CpgPassBase[T] {
 
   protected def baseLogger: Logger = CpgPassBase.baseLogger
 
-  def createAndApply()(implicit ec: ExecutionContext): Unit
+  def createAndApply()(implicit ec: T): Unit
 
   def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false, prefix: String = "")(
-      implicit ec: ExecutionContext): Unit
+      implicit ec: T): Unit
 
   /**
     * Name of the pass.
