@@ -64,3 +64,26 @@ object IterableOps extends TravOps[Iterable, Iterable] {
     trav.flatMap(f)
   }
 }
+
+object IteratorOps extends TravOps[Iterator, Iterator] {
+
+  override def head[I](trav: Iterator[I]): I = {
+    trav.next()
+  }
+
+  override def headOption[I](trav: Iterator[I]): Option[I] = {
+    trav.nextOption()
+  }
+
+  override def map[I, O](trav: Iterator[I])(f: I => O): Iterator[O] = {
+    trav.map(f)
+  }
+
+  override def filter[I](trav: Iterator[I])(f: I => Boolean): Iterator[I] = {
+    trav.filter(f)
+  }
+
+  override def flatMap[I, O](trav: Iterator[I])(f: I => Iterator[O]): Iterator[O] = {
+    trav.flatMap(f)
+  }
+}
