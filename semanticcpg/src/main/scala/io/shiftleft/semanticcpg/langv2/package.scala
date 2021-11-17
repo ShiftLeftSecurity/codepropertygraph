@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg
 
-package object langv2 {
+package object langv2 extends InstanceOfOpsImplicits {
   type Trav1[T] = T
 
   implicit val trav1Ops = Trav1Ops

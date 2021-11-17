@@ -29,16 +29,9 @@ class AnyTraversal[I, IT[_], FT[_]](val trav: IT[I]) extends AnyVal {
     trav.asInstanceOf[IT[A]]
   }
 
-  // This is about ten times slower than .filter(_.isInstanceOf[C]).cast[C]
-  // but thanks to JVM generics we cannot use isInstanceOf with type parameters.
-  // So use this method for convenience on a REPL and otherwise use filter.
-  def collectAll[C: ClassTag](implicit ops: TravOps[IT, FT]): FT[C] = {
-    ops
-      .filter(trav) {
-        case _: C => true
-        case _    => false
-      }
-      .cast[C]
+  // We dont use ClassTag and instead use our own IsInstanceOfOps for performance reasons.
+  def collectAll[T](implicit ops: TravOps[IT, FT], isInstanceOfOps: IsInstanceOfOps[T]): FT[T] = {
+    ops.filter(trav)(isInstanceOfOps).cast[T]
   }
 
   def rMap[O <: I](f: I => O, g: RepeatBehaviourBuilder[I] => RepeatBehaviourBuilder[I] = identity)(
