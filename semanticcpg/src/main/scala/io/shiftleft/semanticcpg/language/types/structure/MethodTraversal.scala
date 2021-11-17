@@ -3,21 +3,9 @@ package io.shiftleft.semanticcpg.language.types.structure
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.langv2._
 import overflowdb._
 import overflowdb.traversal.help.Doc
 import overflowdb.traversal.{Traversal, help}
-import scala.jdk.CollectionConverters._
-
-class MethodTraversalNew[I <: nodes.Method, IT[_], FT[_]](val trav: IT[I]) extends AnyVal {
-  def methodReturn()(implicit ops1: TravOps[IT, FT], ops2: TravNOps[FT]) = {
-    trav.map(_._astOut.asScala.collectFirst { case x: nodes.MethodReturn => x }.get)
-  }
-
-  def methodParameters()(implicit ops1: TravOps[IT, FT], ops2: TravNOps[FT]) = {
-    trav.flatMap(_._astOut.asScala.collect { case x: nodes.MethodParameterIn => x })
-  }
-}
 
 /**
   * A method, function, or procedure

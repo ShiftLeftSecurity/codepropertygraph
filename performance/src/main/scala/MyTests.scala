@@ -49,7 +49,7 @@ class MyTestNew {
 
   @Benchmark
   def newTrav2(state: MyState) = {
-    val x = state.method.methodReturn()
+    val x = state.method.methodReturn
     x
   }
 
