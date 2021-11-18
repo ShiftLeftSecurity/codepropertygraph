@@ -46,8 +46,8 @@ object LocalReferencingIdentifiers {
   }
 }
 
-class LocalTraversalNew[I <: nodes.Local, IT[_]](val trav: IT[I]) extends AnyVal {
-  def referencingIdentifiers(implicit ops1: TravOps[IT]): ops1.CCOneToMany[Identifier] = {
+class LocalTraversalNew[I <: nodes.Local, IT[_], TM <: TypeMultiplexer](val trav: IT[I]) extends AnyVal {
+  def referencingIdentifiers(implicit ops1: TravOps[IT, TM]): TM#CCOneToMany[Identifier] = {
     ops1.oneToMany(trav)(_._refIn.asScala.filter(_.label == NodeTypes.IDENTIFIER)
       .cast[Identifier])
   }

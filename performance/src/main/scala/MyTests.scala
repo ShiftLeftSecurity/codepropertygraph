@@ -131,8 +131,9 @@ class MyTestNew {
   @Benchmark
   def syntheticIterableNew(state: MyState) = {
     //toSynth(state.d1:: Nil).toD2Multi
-    val y: TravOps[Iterable] = toIt2Ops
-    val x: Iterable[D2] = Iterable.single(state.d1).toD2(toIt2Ops)
+    //val y: TravOps[Iterable, IterableTypes[Iterable, Iterable[Any]]] = toIt2Ops
+    val c = toSynth3(Array(state.d1).view.slice(1,2)).toD2
+    val x: List[D2] = List(state.d1).toD2(toIt2Ops)
     x
   }
 
