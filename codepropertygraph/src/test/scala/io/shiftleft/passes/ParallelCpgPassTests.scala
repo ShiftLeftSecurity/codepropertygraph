@@ -9,11 +9,9 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.traversal._
 
-import scala.concurrent.ExecutionContext
 import scala.jdk.CollectionConverters._
 
 class ParallelCpgPassTests extends AnyWordSpec with Matchers {
-  implicit val ec: ExecutionContext = ExecutionContext.global
 
   private object Fixture {
     def apply(keyPools: Option[Iterator[KeyPool]] = None)(f: (Cpg, CpgPassBase) => Unit): Unit = {

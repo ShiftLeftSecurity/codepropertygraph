@@ -15,7 +15,6 @@ import io.shiftleft.semanticcpg.passes.base.{
 }
 
 import scala.annotation.nowarn
-import scala.concurrent.ExecutionContext
 
 object Base {
   val overlayName: String = "base"
@@ -40,8 +39,7 @@ class Base(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
   override val overlayName: String = Base.overlayName
   override val description: String = Base.description
 
-  override def createWithEC(context: LayerCreatorContext, storeUndoInfo: Boolean)(
-      implicit ec: ExecutionContext): Unit = {
+  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
     val cpg = context.cpg
     cpg.graph.indexManager.createNodePropertyIndex(PropertyNames.FULL_NAME)
     Base.passes(cpg).zipWithIndex.foreach {
