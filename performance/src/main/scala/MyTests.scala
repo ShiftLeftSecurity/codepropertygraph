@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language.types.expressions
 
 import io.shiftleft.codepropertygraph.generated.NodeTypes
-import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Method, MethodReturn, StoredNode}
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Expression, Method, MethodParameterIn, MethodReturn, StoredNode}
 import io.shiftleft.semanticcpg.testing.MockCpg
 import io.shiftleft.semanticcpg.language.MySteps._
 import io.shiftleft.semanticcpg.language.ImportsV3._
@@ -104,7 +104,8 @@ class MyTestNew {
 
   @Benchmark
   def astTestNewV2(state: MyState) = {
-    toAstTraversalNew1(state.method).isExpression
+    val x: Option[Expression] = toAstTraversalNew1(state.method).isExpression
+    x
   }
 
   @Benchmark
@@ -130,7 +131,9 @@ class MyTestNew {
   @Benchmark
   def syntheticIterableNew(state: MyState) = {
     //toSynth(state.d1:: Nil).toD2Multi
-    Iterable.single(state.d1).toD2
+    val y: TravOps[Iterable] = toIt2Ops
+    val x: Iterable[D2] = Iterable.single(state.d1).toD2(toIt2Ops)
+    x
   }
 
   @Benchmark
