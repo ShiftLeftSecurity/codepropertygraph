@@ -40,7 +40,7 @@ class Base(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
   override val overlayName: String = Base.overlayName
   override val description: String = Base.description
 
-  override def createWithExecutionContext(context: LayerCreatorContext, storeUndoInfo: Boolean)(
+  override def createWithEC(context: LayerCreatorContext, storeUndoInfo: Boolean)(
       implicit ec: ExecutionContext): Unit = {
     val cpg = context.cpg
     cpg.graph.indexManager.createNodePropertyIndex(PropertyNames.FULL_NAME)
