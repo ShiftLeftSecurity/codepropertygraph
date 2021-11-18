@@ -5,7 +5,6 @@ import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.passes.callgraph.{DynamicCallLinker, MethodRefLinker, StaticCallLinker}
 
 import scala.annotation.nowarn
-import scala.concurrent.ExecutionContext
 
 object CallGraph {
   val overlayName: String = "callgraph"
@@ -28,8 +27,7 @@ class CallGraph(optionsUnused: LayerCreatorOptions = null) extends LayerCreator 
   override val description: String = CallGraph.description
   override val dependsOn = List(TypeRelations.overlayName)
 
-  override def createWithExecutionContext(context: LayerCreatorContext, storeUndoInfo: Boolean)(
-      implicit ec: ExecutionContext): Unit = {
+  override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
     val cpg = context.cpg
     CallGraph.passes(cpg).zipWithIndex.foreach {
       case (pass, index) =>

@@ -8,8 +8,6 @@ import org.slf4j.{Logger, LoggerFactory, MDC}
 
 import java.lang.{Long => JLong}
 import java.util.function.{BiConsumer, Supplier}
-import scala.annotation.nowarn
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationLong
 
 /**
@@ -36,29 +34,23 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
   /**
     * Main method of pass - to be implemented by child class
     * */
-  def run(): Iterator[DiffGraph] = ???
-
-  /**
-    * Secondary main method of pass - child classes may implement it if they need an execution context.
-    */
-  @nowarn def runWithExecutionContext()(implicit ec: ExecutionContext): Iterator[DiffGraph] = run()
+  def run(): Iterator[DiffGraph]
 
   /**
     * Execute the pass and apply result to the underlying graph
     */
-  override def createAndApply()(implicit ec: ExecutionContext): Unit =
+  override def createAndApply(): Unit =
     withStartEndTimesLogged {
-      runWithExecutionContext().foreach(diffGraph =>
-        DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool))
+      run().foreach(diffGraph => DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool))
     }
 
   /**
     * Execute and create a serialized overlay
     * @param inverse invert the diffgraph before serializing
     */
-  def createApplyAndSerialize(inverse: Boolean = false)(implicit ec: ExecutionContext): Iterator[GeneratedMessageV3] =
+  def createApplyAndSerialize(inverse: Boolean = false): Iterator[GeneratedMessageV3] =
     withStartEndTimesLogged {
-      val overlays = runWithExecutionContext().map { diffGraph =>
+      val overlays = run().map { diffGraph =>
         val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse, keyPool)
         serialize(appliedDiffGraph, inverse)
       }
@@ -76,15 +68,16 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
     * */
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
-                                            prefix: String = "")(implicit ec: ExecutionContext): Unit = {
+                                            prefix: String = ""): Unit = {
     if (serializedCpg.isEmpty) {
       createAndApply()
     } else {
       val overlays = createApplyAndSerialize(inverse)
       overlays.zipWithIndex.foreach {
-        case (overlay, index) =>
+        case (overlay, index) => {
           val name = generateOutFileName(prefix, outName, index)
           store(overlay, name, serializedCpg)
+        }
       }
     }
   }
@@ -93,7 +86,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
 
 /* SimpleCpgPass is a possible replacement for CpgPass.
  *
- *  Instead of returning an Iterator[DiffGraph], the `run` function gets a DiffGraphBuilder as input, and can attach its
+ *  Instead of returning an Iterator[DiffGraph], the `run` fuction gets a DiffGraphBuilder as input, and can attach its
  *  modifications to it (i.e. mutate the builder).
  *
  * CpgPass has somewhat subtle semantics with respect to lazy evaluation order of the returned iterator and graph writes.
@@ -141,21 +134,21 @@ abstract class SimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[Key
  * */
 abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends CpgPassBase {
-  // generate Array of parts that can be processed in parallel
+  //generate Array of parts that can be processed in parallel
   def generateParts(): Array[_ <: AnyRef]
-  // setup large data structures, acquire external resources
+  //setup large data structures, acquire external resources
   def init(): Unit = {}
-  // release large data structures and external resources
+  //release large data structures and external resources
   def finish(): Unit = {}
-  // main function: add desired changes to builder
+  //main function: add desired changes to builder
   def runOnPart(builder: DiffGraph.Builder, part: T): Unit
 
-  override def createAndApply()(implicit ec: ExecutionContext): Unit = createApplySerializeAndStore(null)
+  override def createAndApply(): Unit = createApplySerializeAndStore(null)
 
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg,
                                             inverse: Boolean = false,
-                                            prefix: String = "")(implicit ec: ExecutionContext): Unit = {
-    baseLogger.info("Start of pass: {}", name)
+                                            prefix: String = ""): Unit = {
+    baseLogger.info(s"Start of pass: $name")
     val nanosStart = System.nanoTime()
     var nParts = 0
     var nanosBuilt = -1L
@@ -200,7 +193,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
       }
     } catch {
       case exc: Exception =>
-        baseLogger.error("Pass {} failed", name, exc)
+        baseLogger.error(s"Pass ${name} failed", exc)
         throw exc
     } finally {
       try {
@@ -211,7 +204,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
         val nanosStop = System.nanoTime()
         val fracRun = if (nanosBuilt == -1) 100.0 else (nanosBuilt - nanosStart) * 100.0 / (nanosStop - nanosStart + 1)
         baseLogger.info(
-          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms ($fracRun%.0f%% on mutations). $nDiff%d changes committed from $nParts%d parts.")
+          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d changes commited from ${nParts}%d parts.")
       }
     }
   }
@@ -225,10 +218,9 @@ trait CpgPassBase {
 
   protected def baseLogger: Logger = CpgPassBase.baseLogger
 
-  def createAndApply()(implicit ec: ExecutionContext): Unit
+  def createAndApply(): Unit
 
-  def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false, prefix: String = "")(
-      implicit ec: ExecutionContext): Unit
+  def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false, prefix: String = ""): Unit
 
   /**
     * Name of the pass.
@@ -262,14 +254,14 @@ trait CpgPassBase {
   }
 
   protected def withStartEndTimesLogged[A](fun: => A): A = {
-    baseLogger.info("Running pass: {}", name)
+    baseLogger.info(s"Running pass: $name")
     val startTime = System.currentTimeMillis
     try {
       fun
     } finally {
       val duration = (System.currentTimeMillis - startTime).millis.toCoarsest
       MDC.put("time", duration.toString())
-      baseLogger.info("Pass {} completed in {}", name, duration)
+      baseLogger.info(s"Pass $name completed in $duration")
       MDC.remove("time")
     }
   }
