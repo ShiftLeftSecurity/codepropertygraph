@@ -28,7 +28,7 @@ class CallGraph(optionsUnused: LayerCreatorOptions = null) extends LayerCreator 
   override val description: String = CallGraph.description
   override val dependsOn = List(TypeRelations.overlayName)
 
-  override def createWithEC(context: LayerCreatorContext, storeUndoInfo: Boolean)(
+  override def createWithExecutionContext(context: LayerCreatorContext, storeUndoInfo: Boolean)(
       implicit ec: ExecutionContext): Unit = {
     val cpg = context.cpg
     CallGraph.passes(cpg).zipWithIndex.foreach {

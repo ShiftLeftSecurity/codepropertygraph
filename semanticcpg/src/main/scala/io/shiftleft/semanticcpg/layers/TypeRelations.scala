@@ -25,7 +25,7 @@ class TypeRelations(optionsUnused: LayerCreatorOptions = null) extends LayerCrea
   override val description: String = TypeRelations.description
   override val dependsOn = List(Base.overlayName)
 
-  override def createWithEC(context: LayerCreatorContext, storeUndoInfo: Boolean)(
+  override def createWithExecutionContext(context: LayerCreatorContext, storeUndoInfo: Boolean)(
       implicit ec: ExecutionContext): Unit = {
     val cpg = context.cpg
     TypeRelations.passes(cpg).zipWithIndex.foreach {
