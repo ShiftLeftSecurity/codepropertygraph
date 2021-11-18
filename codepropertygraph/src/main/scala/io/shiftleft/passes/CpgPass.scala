@@ -41,14 +41,14 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
   /**
     * Secondary main method of pass - child classes may implement it if they need an execution context.
     */
-  @nowarn def runWithExecutionContext()(implicit ec: ExecutionContext): Iterator[DiffGraph] = run()
+  @nowarn def runWithEC()(implicit ec: ExecutionContext): Iterator[DiffGraph] = run()
 
   /**
     * Execute the pass and apply result to the underlying graph
     */
   override def createAndApply()(implicit ec: ExecutionContext): Unit =
     withStartEndTimesLogged {
-      runWithExecutionContext().foreach(diffGraph =>
+      runWithEC().foreach(diffGraph =>
         DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool))
     }
 
@@ -58,7 +58,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
     */
   def createApplyAndSerialize(inverse: Boolean = false)(implicit ec: ExecutionContext): Iterator[GeneratedMessageV3] =
     withStartEndTimesLogged {
-      val overlays = runWithExecutionContext().map { diffGraph =>
+      val overlays = runWithEC().map { diffGraph =>
         val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse, keyPool)
         serialize(appliedDiffGraph, inverse)
       }

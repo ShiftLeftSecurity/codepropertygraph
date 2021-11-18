@@ -34,7 +34,7 @@ abstract class LayerCreator {
     } else if (appliedOverlays.contains(overlayName)) {
       logger.warn("The overlay {} already exists - skipping creation", overlayName)
     } else {
-      createWithExecutionContext(context, storeUndoInfo)
+      createWithEC(context, storeUndoInfo)
       if (modifiesCpg) {
         Overlays.appendOverlayName(context.cpg, overlayName)
       }
@@ -55,7 +55,7 @@ abstract class LayerCreator {
     serializedCpg.close()
   }
 
-  @nowarn def createWithExecutionContext(context: LayerCreatorContext, storeUndoInfo: Boolean = false)(
+  @nowarn def createWithEC(context: LayerCreatorContext, storeUndoInfo: Boolean = false)(
       implicit ec: ExecutionContext): Unit = create(context, storeUndoInfo)
 
   def create(context: LayerCreatorContext, storeUndoInfo: Boolean = false): Unit = ???
