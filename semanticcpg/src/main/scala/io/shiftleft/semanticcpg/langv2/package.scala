@@ -6,6 +6,7 @@ package object langv2 extends InstanceOfOpsImplicits {
   type Trav1[T] = T
 
   trait TypeMultiplexer {
+    type IT[_]
     type CCOneToOne[_]
     type CCOneToOption[_]
     type CCOneToBoolean[_]
@@ -13,6 +14,7 @@ package object langv2 extends InstanceOfOpsImplicits {
   }
 
   object SingleTypes extends TypeMultiplexer {
+    override type IT[T] = T
     override type CCOneToOne[T] = T
     override type CCOneToOption[T] = Option[T]
     override type CCOneToBoolean[T] = Option[T]
@@ -20,6 +22,7 @@ package object langv2 extends InstanceOfOpsImplicits {
   }
 
   object OptionTypes extends TypeMultiplexer {
+    override type IT[T] = Option[T]
     override type CCOneToOne[T] = Option[T]
     override type CCOneToOption[T] = Option[T]
     override type CCOneToBoolean[T] = Option[T]
@@ -27,6 +30,7 @@ package object langv2 extends InstanceOfOpsImplicits {
   }
 
   class IterableTypes[CC[_], C] extends TypeMultiplexer {
+    override type IT[T] = IterableOnceOps[T, CC, C]
     override type CCOneToOne[T] = CC[T]
     override type CCOneToOption[T] = CC[T]
     override type CCOneToBoolean[T] = C
@@ -48,14 +52,14 @@ package object langv2 extends InstanceOfOpsImplicits {
   // implicit val iterOps = new IterableOnceOpsOps(Iterable.empty[Any])
 
   implicit def toAnyTraversalNew1[I](trav: Option[I]) = {
-    new AnyTraversal[I, Option, OptionTypes.type](trav)
+    new AnyTraversal[I, OptionTypes.type](trav)
   }
-  implicit def toAnyTraversalNew2[I, IT[_], TM <: TypeMultiplexer](trav: IT[I]) = {
-    new AnyTraversal[I, IT, TM](trav)
+  implicit def toAnyTraversalNew2[I, TM <: TypeMultiplexer](trav: TM#IT[I]) = {
+    new AnyTraversal[I, TM](trav)
   }
   implicit def toAnyTraversalNew3[I, CC[_], C](trav: IterableOnceOps[I, CC, C]) = {
     //new AstTraversalNew[I, ({type X[B] = IterableOnceOps[B, CC, C]})#X, CC, CC, ({type X[B] = C})#X, CC](trav)
-    new AnyTraversal[I, ({type X[B] = IterableOnceOps[B, CC, C]})#X, IterableTypes[CC, C]](trav)
+    new AnyTraversal[I, IterableTypes[CC, C]](trav)
   }
 
 }
