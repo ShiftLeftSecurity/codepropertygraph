@@ -48,8 +48,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
     */
   override def createAndApply()(implicit ec: ExecutionContext): Unit =
     withStartEndTimesLogged {
-      runWithEC().foreach(diffGraph =>
-        DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool))
+      runWithEC().foreach(diffGraph => DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool))
     }
 
   /**
