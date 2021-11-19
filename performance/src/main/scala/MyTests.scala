@@ -40,7 +40,6 @@ case class Bar[T](x: T)
 
 class MyTestNew {
   import io.shiftleft.semanticcpg.langv2._
-  import io.shiftleft.semanticcpg.language.New._
   @Benchmark
   def travNew(state: MyState) = {
     val x = state.method.methodReturn

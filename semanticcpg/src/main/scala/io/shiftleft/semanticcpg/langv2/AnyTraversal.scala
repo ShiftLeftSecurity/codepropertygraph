@@ -2,6 +2,19 @@ package io.shiftleft.semanticcpg.langv2
 
 import overflowdb.traversal.RepeatStepIterator
 
+import scala.collection.IterableOnceOps
+
+trait AnyTraversalImplicits {
+  implicit def toAnyTraversalGeneric[I, T[_] <: SupportedTypes[_]](trav: TravTypesFor[T]#Collection[I]) = {
+    new AnyTraversal[I, TravTypesFor[T]](trav)
+  }
+  implicit def toAnyTraversalIterOnceOps[I, CC[_], C](trav: IterableOnceOps[I, CC, C]) = {
+    new AnyTraversal[I, IterableOnceOpsTravTypes[CC, C]](trav)
+  }
+  implicit def toAnyTraversalInternal[I, TT <: TravTypes](trav: TT#Collection[I]) = {
+    new AnyTraversal[I, TT](trav)
+  }
+}
 
 class AnyTraversal[I, TT <: TravTypes](val trav: TT#Collection[I]) extends AnyVal {
 
