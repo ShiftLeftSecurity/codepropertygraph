@@ -10,7 +10,7 @@ import scala.jdk.CollectionConverters._
 trait LocalTraversalImplicits {
 
   implicit def toLocalTraversalSingle[I <: nodes.Local](trav: I) = {
-    new LocalTraversal[I, SingleTravTypes.type](trav: Single[I])
+    new LocalTraversal[I, SingleTravTypes](trav: Single[I])
   }
   implicit def toLocalTraversalGeneric[I <: nodes.Local, T[_] <: SupportedTypes[_]](trav: TravTypesFor[T]#Collection[I]) = {
     new LocalTraversal[I, TravTypesFor[T]](trav)

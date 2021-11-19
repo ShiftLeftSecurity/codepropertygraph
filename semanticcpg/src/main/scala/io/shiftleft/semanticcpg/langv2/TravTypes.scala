@@ -10,7 +10,7 @@ trait TravTypes {
   type CCOneToMany[_]
 }
 
-object SingleTravTypes extends TravTypes {
+abstract final class SingleTravTypes extends TravTypes {
   override type Collection[T] = T
   override type CCOneToOne[T] = T
   override type CCOneToOption[T] = Option[T]
@@ -18,7 +18,7 @@ object SingleTravTypes extends TravTypes {
   override type CCOneToMany[T] = Seq[T]
 }
 
-object OptionTravTypes extends TravTypes {
+abstract final class OptionTravTypes extends TravTypes {
   override type Collection[T] = Option[T]
   override type CCOneToOne[T] = Option[T]
   override type CCOneToOption[T] = Option[T]
@@ -26,7 +26,7 @@ object OptionTravTypes extends TravTypes {
   override type CCOneToMany[T] = Seq[T]
 }
 
-class IterableOnceOpsTravTypes[CC[_], C] extends TravTypes {
+abstract final class IterableOnceOpsTravTypes[CC[_], C] extends TravTypes {
   override type Collection[T] = IterableOnceOps[T, CC, C]
   override type CCOneToOne[T] = CC[T]
   override type CCOneToOption[T] = CC[T]

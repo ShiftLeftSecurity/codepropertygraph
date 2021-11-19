@@ -18,7 +18,7 @@ trait TravOps[_TT <: TravTypes] {
   def oneToMany[I, O](trav: TT#Collection[I])(f: I => Iterator[O]): TT#CCOneToMany[O]
 }
 
-object SingleOps extends TravOps[SingleTravTypes.type] {
+object SingleOps extends TravOps[SingleTravTypes] {
 
   override def oneToOne[I, O](trav: this.type#TT#Collection[I])(f: I => O): this.type#TT#CCOneToOne[O] = {
     f(trav)
@@ -41,7 +41,7 @@ object SingleOps extends TravOps[SingleTravTypes.type] {
   }
 }
 
-object OptionOps extends TravOps[OptionTravTypes.type] {
+object OptionOps extends TravOps[OptionTravTypes] {
 
   override def oneToOne[I, O](trav: this.type#TT#Collection[I])(f: I => O): this.type#TT#CCOneToOne[O] = {
     trav.map(f)

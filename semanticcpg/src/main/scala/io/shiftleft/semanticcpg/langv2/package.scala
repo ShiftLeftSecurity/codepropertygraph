@@ -4,7 +4,7 @@ package object langv2 extends ExtensionClassImplicits with AnyTraversalImplicits
   type Single[T] = T
 
   type SupportedTypes[T] = Option[T]
-  type TravTypesFor[T[_]] = OptionTravTypes.type
+  type TravTypesFor[T[_]] = OptionTravTypes
 
   implicit val singleOps = SingleOps
   implicit val optionOps = OptionOps

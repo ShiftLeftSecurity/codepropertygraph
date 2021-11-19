@@ -10,7 +10,7 @@ import scala.jdk.CollectionConverters._
 
 trait MethodTraversalImplicits {
   implicit def toMethodTraversalSingle[I <: nodes.Method](trav: I) = {
-    new MethodTraversal[I, SingleTravTypes.type](trav: Single[I])
+    new MethodTraversal[I, SingleTravTypes](trav: Single[I])
   }
   implicit def toMethodTraversalGeneric[I <: nodes.Method, T[_] <: SupportedTypes[_]](trav: TravTypesFor[T]#Collection[I]) = {
     new MethodTraversal[I, TravTypesFor[T]](trav)

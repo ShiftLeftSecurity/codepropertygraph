@@ -6,7 +6,7 @@ import scala.collection.IterableOnceOps
 
 object SomeDomain {
   implicit def toSynth1(p: D1) = {
-    new SynthExt[SingleTravTypes.type](p: Single[D1])
+    new SynthExt[SingleTravTypes](p: Single[D1])
   }
   implicit def toSynth2[T[_]](trav: TravTypesFor[T]#Collection[D1]) = {
     new SynthExt[TravTypesFor[T]](trav)

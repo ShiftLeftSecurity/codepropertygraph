@@ -10,7 +10,7 @@ import scala.jdk.CollectionConverters._
 
 trait AstNodeTraversalImplicits {
   implicit def toAstNodeTraversalSingle[I <: AstNode](trav: I) = {
-    new AstNodeTraversal[I, SingleTravTypes.type](trav: Single[I])
+    new AstNodeTraversal[I, SingleTravTypes](trav: Single[I])
   }
   implicit def toAstNodeTraversalGeneric[I <: AstNode, T[_] <: SupportedTypes[_]](trav: TravTypesFor[T]#Collection[I]) = {
     new AstNodeTraversal[I, TravTypesFor[T]](trav)
