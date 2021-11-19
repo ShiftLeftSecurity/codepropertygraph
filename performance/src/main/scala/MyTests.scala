@@ -53,12 +53,6 @@ class MyTestNew {
   }
 
   @Benchmark
-  def refIdNew1(state: MyState) = {
-    val x = toLocalNew(state.local).referencingIdentifiers
-    x
-  }
-
-  @Benchmark
   def refIdNew2(state: MyState) = {
     val x = toLocalTraversalSingle(state.local).referencingIdentifiers
     x
@@ -66,13 +60,13 @@ class MyTestNew {
 
   @Benchmark
   def refIdNew3(state: MyState) = {
-    val x = rftoSingleExt(state.local).referencingIdentifiers
+    val x = Seq.from(rftoSingleExt(state.local).referencingIdentifiers)
     x
   }
 
   @Benchmark
   def refIdBase(state: MyState) = {
-    val x = Iterable.from(state.local._refIn.asScala).filter(_.label == NodeTypes.IDENTIFIER)
+    val x = Seq.from(state.local._refIn.asScala.filter(_.label == NodeTypes.IDENTIFIER))
     x
   }
 
@@ -151,7 +145,7 @@ class MyTestsOld {
 
   @Benchmark
   def refIdOld(state: MyState) = {
-    val x = Traversal(state.local).referencingIdentifiers2.head
+    val x = Traversal(state.local).referencingIdentifiers2.toSeq
     x
   }
 
