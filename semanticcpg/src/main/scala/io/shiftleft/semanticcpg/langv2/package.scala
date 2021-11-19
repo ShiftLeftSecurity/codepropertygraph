@@ -37,28 +37,22 @@ package object langv2 extends InstanceOfOpsImplicits {
     override type CCOneToMany[T] = CC[T]
   }
 
+  type TypeBound[T] = Option[T]
+  type TypesClassFor[IT[_]] = OptionTypes.type
 
   implicit val trav1Ops = Trav1Ops
-
-
+  implicit val optionOps = OptionOps
   private val it2Ops = new IterableOnceOpsOps()
   implicit def toIt2Ops[CC[_], C] = it2Ops.asInstanceOf[IterableOnceOpsOps[CC, C]]
 
-  // Iterable[A] = IterableOnceOps[A, Iterable, Iterable[A]]
-  // io.shiftleft.semanticcpg.langv2.IterableOnceOpsOps[[+A]Iterable[A],Iterable[Any]]
 
-
-
-  // implicit val iterOps = new IterableOnceOpsOps(Iterable.empty[Any])
-
-  implicit def toAnyTraversalNew1[I](trav: Option[I]) = {
-    new AnyTraversal[I, OptionTypes.type](trav)
+  implicit def toAnyTraversalNew1[I, IT[_] <: TypeBound[_]](trav: TypesClassFor[IT]#IT[I]) = {
+    new AnyTraversal[I, TypesClassFor[IT]](trav)
   }
   implicit def toAnyTraversalNew2[I, TM <: TypeMultiplexer](trav: TM#IT[I]) = {
     new AnyTraversal[I, TM](trav)
   }
   implicit def toAnyTraversalNew3[I, CC[_], C](trav: IterableOnceOps[I, CC, C]) = {
-    //new AstTraversalNew[I, ({type X[B] = IterableOnceOps[B, CC, C]})#X, CC, CC, ({type X[B] = C})#X, CC](trav)
     new AnyTraversal[I, IterableTypes[CC, C]](trav)
   }
 

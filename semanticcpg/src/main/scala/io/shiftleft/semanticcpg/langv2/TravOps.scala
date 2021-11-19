@@ -41,7 +41,7 @@ object Trav1Ops extends TravOps[SingleTypes.type] {
   }
 }
 
-object OptionOps extends TravOps[OptionTypes.type ] {
+object OptionOps extends TravOps[OptionTypes.type] {
 
   override def oneToOne[I, O](trav: this.type#tm#IT[I])(f: I => O): this.type#tm#CCOneToOne[O] = {
     trav.map(f)
@@ -65,30 +65,6 @@ object OptionOps extends TravOps[OptionTypes.type ] {
   }
 }
 
-//class IterableOps[Col[A] <: Iterable[A] ] extends TravOps[Col] {
-//  override type CCOneToOne[T] = Col[T]
-//  override type CCOneToOption[T] = Col[T]
-//  override type CCOneToBoolean[T] = Col[T]
-//  override type CCOneToMany[T] = Col[T]
-//
-//  override def oneToOne[I, O](trav: Col[I])(f: I => O): CCOneToOne[O] = {
-//    trav.map(f).asInstanceOf[Col[O]]
-//  }
-//
-//  override def oneToOption[I, O](trav: Col[I])(f: I => Option[O]): CCOneToOption[O] = {
-//    trav.flatMap(f).asInstanceOf[Col[O]]
-//  }
-//
-//  override def oneToBoolean[I](trav: Col[I])(f: I => Boolean): CCOneToBoolean[I] = {
-//    trav.filter(f).asInstanceOf[Col[I]]
-//  }
-//
-//  override def oneToMany[I, O](trav: Col[I])(f: I => Iterator[O]): CCOneToMany[O] = {
-//    trav.flatMap(f).asInstanceOf[Col[O]]
-//  }
-//}
-
-//class IterableOnceOpsOps[CC[_], C](unused: IterableOnceOps[_, CC, C]) extends TravOps[({type X[B] = IterableOnceOps[B, CC, C]})#X] {
 class IterableOnceOpsOps[CC[_], C] extends TravOps[IterableTypes[CC, C] ] {
 
   override def oneToOne[I, O](trav: this.type#tm#IT[I])(f: I => O): this.type#tm#CCOneToOne[O] = {

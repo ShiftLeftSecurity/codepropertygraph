@@ -11,7 +11,7 @@ import org.openjdk.jmh.annotations._
 import MyTests._
 import io.shiftleft.semanticcpg.language.types.structure.LocalReferencingIdentifiers
 
-import scala.collection.mutable
+import scala.collection.{View, mutable}
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import org.openjdk.jmh.infra.Blackhole
 import overflowdb.traversal.Traversal
@@ -132,7 +132,6 @@ class MyTestNew {
   def syntheticIterableNew(state: MyState) = {
     //toSynth(state.d1:: Nil).toD2Multi
     //val y: TravOps[Iterable, IterableTypes[Iterable, Iterable[Any]]] = toIt2Ops
-    val c = toSynth3(Array(state.d1).view.slice(1,2)).toD2
     val x: List[D2] = List(state.d1).toD2(toIt2Ops)
     x
   }
@@ -140,6 +139,12 @@ class MyTestNew {
   @Benchmark
   def syntheticIterableBase(state: MyState) = {
     Iterable.single(state.d1).map(_.x)
+  }
+
+  def compileTest(state: MyState) = {
+    val c = toSynth3(Array(state.d1).view.slice(1,2)).toD2
+    val d: View[D2] = c
+    d.rFlatMap(x => Iterator.single(x)).r
   }
 }
 

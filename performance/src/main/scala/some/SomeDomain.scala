@@ -8,8 +8,8 @@ object SomeDomain {
   implicit def toSynth1(p: D1) = {
     new SynthExt[SingleTypes.type](p: Trav1[D1])
   }
-  implicit def toSynth2(trav: Option[D1]) = {
-    new SynthExt[OptionTypes.type](trav)
+  implicit def toSynth2[IT[_]](trav: TypesClassFor[IT]#IT[D1]) = {
+    new SynthExt[TypesClassFor[IT]](trav)
   }
   implicit def toSynth3[CC[_], C](trav: IterableOnceOps[D1, CC, C]) = {
     //new AstTraversalNew[I, ({type X[B] = IterableOnceOps[B, CC, C]})#X, CC, CC, ({type X[B] = C})#X, CC](trav)
