@@ -61,7 +61,7 @@ class MyTestNew {
 
   @Benchmark
   def refIdNew2(state: MyState) = {
-    val x = toLocalTraversalNew1(state.local).referencingIdentifiers
+    val x = toLocalTraversalSingle(state.local).referencingIdentifiers
     x
   }
 
@@ -98,7 +98,7 @@ class MyTestNew {
 
   @Benchmark
   def astTestNewV2(state: MyState) = {
-    val x: Option[Expression] = toAstTraversalNew1(state.method).isExpression
+    val x: Option[Expression] = toAstNodeTraversalSingle(state.method).isExpression
     x
   }
 

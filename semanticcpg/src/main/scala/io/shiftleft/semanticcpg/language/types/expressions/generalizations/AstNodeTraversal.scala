@@ -1,14 +1,14 @@
 package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
+import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.langv2._
 import io.shiftleft.semanticcpg.langv3.{Helper, Kernel1ToN, Kernel1ToO}
 import overflowdb.traversal.help.Doc
 import overflowdb.traversal.{Traversal, help}
 
-import scala.collection.IterableOps
+import scala.collection.{IterableOnceOps, IterableOps}
 import scala.jdk.CollectionConverters._
 
 class AstNodeIsExpressionKernel[I <: AstNode] extends Kernel1ToO[I, I with Expression] {
@@ -47,24 +47,6 @@ object AstNodeIsExpression {
   class OptionExt[I <: NodeType](val i: Option[I]) extends AnyVal {
     def isExpression = Helper(i, impl[I])
   }
-}
-
-class AstTraversalNew[I <: AstNode, TT <: TravTypes](val trav: TT#Collection[I])
-  extends AnyVal {
-
-  /**
-    * Nodes of the AST rooted in this node, including the node itself.
-    * */
-  @Doc("All nodes of the abstract syntax tree")
-  def ast(implicit ops1: TravOps[TT]) =
-    trav.rFlatMap(_._astOut.asScala.asInstanceOf[Iterator[I]], _.emit)
-
-  /**
-    * Traverse only to AST nodes that are expressions
-    * */
-  def isExpression(implicit ops1: TravOps[TT]) =
-    trav.collectAll[Expression]
-
 }
 
 @help.Traversal(elementType = classOf[AstNode])

@@ -5,8 +5,20 @@ import io.shiftleft.semanticcpg.langv2._
 import overflowdb.traversal.help
 import overflowdb.traversal.help.Doc
 
+import scala.collection.IterableOnceOps
 import scala.jdk.CollectionConverters._
 
+trait MethodTraversalImplicits {
+  implicit def toMethodTraversalSingle[I <: nodes.Method](trav: I) = {
+    new MethodTraversal[I, SingleTravTypes.type](trav: Single[I])
+  }
+  implicit def toMethodTraversalGeneric[I <: nodes.Method, T[_] <: SupportedTypes[_]](trav: TravTypesFor[T]#Collection[I]) = {
+    new MethodTraversal[I, TravTypesFor[T]](trav)
+  }
+  implicit def toMethodTraversalIterOnceOps[I <: nodes.Method, CC[_], C](trav: IterableOnceOps[I, CC, C]) = {
+    new MethodTraversal[I, IterableOnceOpsTravTypes[CC, C]](trav)
+  }
+}
 
 /**
   * A method, function, or procedure
