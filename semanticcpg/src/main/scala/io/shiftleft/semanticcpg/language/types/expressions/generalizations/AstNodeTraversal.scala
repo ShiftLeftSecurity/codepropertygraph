@@ -49,20 +49,20 @@ object AstNodeIsExpression {
   }
 }
 
-class AstTraversalNew[I <: AstNode, TM <: TypeMultiplexer](val trav: TM#IT[I])
+class AstTraversalNew[I <: AstNode, TT <: TravTypes](val trav: TT#Collection[I])
   extends AnyVal {
 
   /**
     * Nodes of the AST rooted in this node, including the node itself.
     * */
   @Doc("All nodes of the abstract syntax tree")
-  def ast(implicit ops1: TravOps[TM]) =
+  def ast(implicit ops1: TravOps[TT]) =
     trav.rFlatMap(_._astOut.asScala.asInstanceOf[Iterator[I]], _.emit)
 
   /**
     * Traverse only to AST nodes that are expressions
     * */
-  def isExpression(implicit ops1: TravOps[TM]) =
+  def isExpression(implicit ops1: TravOps[TT]) =
     trav.collectAll[Expression]
 
 }

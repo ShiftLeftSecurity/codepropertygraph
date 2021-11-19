@@ -6,25 +6,21 @@ import scala.collection.IterableOnceOps
 
 object SomeDomain {
   implicit def toSynth1(p: D1) = {
-    new SynthExt[SingleTypes.type](p: Trav1[D1])
+    new SynthExt[SingleTravTypes.type](p: Single[D1])
   }
-  implicit def toSynth2[IT[_]](trav: TypesClassFor[IT]#IT[D1]) = {
-    new SynthExt[TypesClassFor[IT]](trav)
+  implicit def toSynth2[T[_]](trav: TravTypesFor[T]#Collection[D1]) = {
+    new SynthExt[TravTypesFor[T]](trav)
   }
   implicit def toSynth3[CC[_], C](trav: IterableOnceOps[D1, CC, C]) = {
     //new AstTraversalNew[I, ({type X[B] = IterableOnceOps[B, CC, C]})#X, CC, CC, ({type X[B] = C})#X, CC](trav)
-    new SynthExt[IterableTypes[CC, C]](trav)
+    new SynthExt[IterableOnceOpsTravTypes[CC, C]](trav)
   }
 
-  //implicit def toSynth[IT[_]](p: IT[D1]): SynthExt[IT] = {
-  //  new SynthExt(p)
-  //}
-
-  class SynthExt[TM <: TypeMultiplexer](val trav: TM#IT[D1]) extends AnyVal {
-    def toD2(implicit ops: TravOps[TM]) = {
+  class SynthExt[TT <: TravTypes](val trav: TT#Collection[D1]) extends AnyVal {
+    def toD2(implicit ops: TravOps[TT]) = {
       trav.map(_.x)
     }
-    def toD2Multi(implicit ops: TravOps[TM]) = {
+    def toD2Multi(implicit ops: TravOps[TT]) = {
       trav.flatMap(Iterator.single)
     }
   }
