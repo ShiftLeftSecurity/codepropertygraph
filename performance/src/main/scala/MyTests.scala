@@ -42,19 +42,13 @@ class MyTestNew {
   import io.shiftleft.semanticcpg.langv2._
   import io.shiftleft.semanticcpg.language.New._
   @Benchmark
-  def newTrav(state: MyState) = {
-    val x = toExtClass(state.method).methodReturn2()
-    x
-  }
-
-  @Benchmark
-  def newTrav2(state: MyState) = {
+  def travNew(state: MyState) = {
     val x = state.method.methodReturn
     x
   }
 
   @Benchmark
-  def direct2(state: MyState) = {
+  def travBase(state: MyState) = {
     val x = state.method._astOut.asScala.collectFirst { case x: MethodReturn => x }.get
     x
   }
@@ -144,7 +138,6 @@ class MyTestNew {
   def compileTest(state: MyState) = {
     val c = toSynth3(Array(state.d1).view.slice(1,2)).toD2
     val d: View[D2] = c
-    d.rFlatMap(x => Iterator.single(x)).r
   }
 }
 
@@ -152,7 +145,7 @@ class MyTestsOld {
   import io.shiftleft.semanticcpg.language._
 
   @Benchmark
-  def oldTrav(state: MyState) = {
+  def travOld(state: MyState) = {
     val x = toMethodMethods(state.method).methodReturn.l
     x
   }

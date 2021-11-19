@@ -22,10 +22,10 @@ object SomeDomain {
 
   class SynthExt[TM <: TypeMultiplexer](val trav: TM#IT[D1]) extends AnyVal {
     def toD2(implicit ops: TravOps[TM]) = {
-      ops.oneToOne(trav)(_.x)
+      trav.map(_.x)
     }
     def toD2Multi(implicit ops: TravOps[TM]) = {
-      ops.oneToMany(trav)(x => Iterator.single(x))
+      trav.flatMap(Iterator.single)
     }
   }
 

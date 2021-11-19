@@ -9,6 +9,18 @@ class AnyTraversal[I, TM <: TypeMultiplexer](val trav: TM#IT[I]) extends AnyVal 
     trav.asInstanceOf[TM#CCOneToOne[A]]
   }
 
+  def map[O](f: I => O)(implicit ops: TravOps[TM]): TM#CCOneToOne[O] = {
+    ops.oneToOne(trav)(f)
+  }
+
+  def filter(f: I => Boolean)(implicit ops: TravOps[TM]): TM#CCOneToBoolean[I] = {
+    ops.oneToBoolean(trav)(f)
+  }
+
+  def flatMap[O](f: I => Iterator[O])(implicit ops: TravOps[TM]): TM#CCOneToMany[O] = {
+    ops.oneToMany(trav)(f)
+  }
+
   // We dont use ClassTag and instead use our own IsInstanceOfOps for performance reasons.
   def collectAll[T](implicit ops: TravOps[TM], isInstanceOfOps: IsInstanceOfOps[T]): TM#CCOneToBoolean[T] = {
     ops.oneToBoolean(trav)(isInstanceOfOps).asInstanceOf[TM#CCOneToBoolean[T]]
