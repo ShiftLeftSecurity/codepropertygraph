@@ -1,7 +1,7 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val overflowdbVersion = "1.71+0-b63f6183+20211119-1608"
+val overflowdbVersion = "1.71+1-14a0d611"
 
 inThisBuild(
   List(
@@ -48,9 +48,9 @@ inThisBuild(
 
 ThisBuild / publishTo := sonatypePublishToBundle.value
 ThisBuild / Test / fork := true
-ThisBuild / Test / javaOptions += s"-Dlog4j2.configurationFile=file:${(ThisBuild/baseDirectory).value}/resources/log4j2-test.xml"
+ThisBuild / Test / javaOptions += s"-Dlog4j2.configurationFile=file:${(ThisBuild / baseDirectory).value}/resources/log4j2-test.xml"
 // If we fork we immediately stumble upon https://github.com/sbt/sbt/issues/3892 and https://github.com/sbt/sbt/issues/3892
-ThisBuild / Test / javaOptions += s"-Duser.dir=${(ThisBuild/baseDirectory).value}"
+ThisBuild / Test / javaOptions += s"-Duser.dir=${(ThisBuild / baseDirectory).value}"
 
 ThisBuild / libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.11.2" % Test
@@ -94,11 +94,12 @@ ThisBuild / scalacOptions ++= Seq(
   "4",
   "-target:jvm-1.8"
 )
-ThisBuild / compile / javacOptions ++= Seq(
-  "-g", //debug symbols
-  "-source", "1.8",
-  "-target", "1.8",
-  "-Xlint")
+ThisBuild / compile / javacOptions ++= Seq("-g", //debug symbols
+                                           "-source",
+                                           "1.8",
+                                           "-target",
+                                           "1.8",
+                                           "-Xlint")
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 Global / onLoad := {

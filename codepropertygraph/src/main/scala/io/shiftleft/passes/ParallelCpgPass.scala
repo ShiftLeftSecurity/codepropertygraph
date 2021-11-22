@@ -4,6 +4,7 @@ import io.shiftleft.codepropertygraph.Cpg
 
 import java.util.concurrent.{Callable, LinkedBlockingQueue}
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext
 //import scala.concurrent.ExecutionContext.Implicits.global
 //import scala.concurrent.duration.Duration
 //import scala.concurrent.{Await, Future}
@@ -34,7 +35,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
                             prefix: String = "",
                             inverse: Boolean = false)(f: Writer => Unit): Unit = {
     val writer = new Writer(serializedCpg, prefix, inverse)
-    val writerThread = new Thread(writer)
+    val writerThread = StructuredConcurrencyContext.getThreadFactory().newThread(writer)
     writerThread.setName("Writer")
     writerThread.start()
     try {
@@ -52,7 +53,8 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
     withStartEndTimesLogged {
       try {
         init()
-        val it = new ParallelIteratorExecutor(itWithKeyPools()).map {
+        val executor = ExecutionContext.fromExecutorService(StructuredConcurrencyContext.getCachedPool())
+        val it = new ParallelIteratorExecutor(executor, itWithKeyPools()).map {
           case (part, keyPool) =>
             // Note: write.enqueue(runOnPart(part)) would be wrong because
             // it would terminate the writer as soon as a pass returns None
@@ -205,7 +207,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
             val next = partIter.next()
             //todo: Verify that we get FIFO scheduling; otherwise, do something about it.
             //if this e.g. used LIFO with 4 cores and 18 size of ringbuffer, then 3 cores may idle while we block on the front item.
-            completionQueue.append(executor.submit( new Callable[DiffGraph] {
+            completionQueue.append(executor.submit(new Callable[DiffGraph] {
               override def call(): DiffGraph = {
                 val builder = DiffGraph.newBuilder
                 runOnPart(builder, next.asInstanceOf[T])
