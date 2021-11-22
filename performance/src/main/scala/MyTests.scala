@@ -129,7 +129,7 @@ class MyTestNew {
   }
 
   def compileTest(state: MyState) = {
-    val c = toSynth3(Array(state.d1).view.slice(1,2)).toD2
+    val c = toSynthIter(Array(state.d1).view.slice(1,2)).toD2
     val d: View[D2] = c
   }
 }
