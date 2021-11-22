@@ -4,11 +4,14 @@ import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
-import org.slf4j.{Logger, LoggerFactory, MDC}
+import org.slf4j.{Logger, LoggerFactory}
 
 import java.lang.{Long => JLong}
 import java.util.function.{BiConsumer, Supplier}
 import scala.concurrent.duration.DurationLong
+import io.shiftleft.threadpoolisolation.StructuredConcurrencyContext
+
+import java.util.concurrent.Callable
 
 /**
   * Base class for CPG pass - a program, which receives an input graph
@@ -164,23 +167,25 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
           runOnPart(builder, parts(0).asInstanceOf[T])
           builder.build()
         case _ =>
-          java.util.Arrays
-            .stream(parts)
-            .parallel()
-            .collect(
-              new Supplier[DiffGraph.Builder] {
-                override def get(): DiffGraph.Builder = DiffGraph.newBuilder
-              },
-              new BiConsumer[DiffGraph.Builder, AnyRef] {
-                override def accept(builder: DiffGraph.Builder, part: AnyRef): Unit =
-                  runOnPart(builder, part.asInstanceOf[T])
-              },
-              new BiConsumer[DiffGraph.Builder, DiffGraph.Builder] {
-                override def accept(leftBuilder: DiffGraph.Builder, rightBuilder: DiffGraph.Builder): Unit =
-                  leftBuilder.moveFrom(rightBuilder)
-              }
-            )
-            .build()
+          StructuredConcurrencyContext.getForkJoinPool().submit( new Callable[DiffGraph] {
+            override def call(): DiffGraph = java.util.Arrays
+              .stream(parts)
+              .parallel()
+              .collect(
+                new Supplier[DiffGraph.Builder] {
+                  override def get(): DiffGraph.Builder = DiffGraph.newBuilder
+                },
+                new BiConsumer[DiffGraph.Builder, AnyRef] {
+                  override def accept(builder: DiffGraph.Builder, part: AnyRef): Unit =
+                    runOnPart(builder, part.asInstanceOf[T])
+                },
+                new BiConsumer[DiffGraph.Builder, DiffGraph.Builder] {
+                  override def accept(leftBuilder: DiffGraph.Builder, rightBuilder: DiffGraph.Builder): Unit =
+                    leftBuilder.moveFrom(rightBuilder)
+                }
+              )
+              .build()
+          }).get()
       }
       nanosBuilt = System.nanoTime()
       nDiff = diffGraph.size
@@ -260,9 +265,7 @@ trait CpgPassBase {
       fun
     } finally {
       val duration = (System.currentTimeMillis - startTime).millis.toCoarsest
-      MDC.put("time", duration.toString())
       baseLogger.info(s"Pass $name completed in $duration")
-      MDC.remove("time")
     }
   }
 

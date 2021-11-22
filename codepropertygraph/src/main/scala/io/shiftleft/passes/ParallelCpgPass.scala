@@ -2,11 +2,12 @@ package io.shiftleft.passes
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 
-import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.{Callable, LinkedBlockingQueue}
 import scala.collection.mutable
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+//import scala.concurrent.ExecutionContext.Implicits.global
+//import scala.concurrent.duration.Duration
+//import scala.concurrent.{Await, Future}
+import io.shiftleft.threadpoolisolation.StructuredConcurrencyContext
 
 abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Option[Iterator[KeyPool]] = None)
     extends CpgPassBase {
@@ -183,11 +184,12 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     val parts = generateParts()
     nParts = parts.size
     val partIter = parts.iterator
-    val completionQueue = mutable.ArrayDeque[Future[DiffGraph]]()
+    val completionQueue = mutable.ArrayDeque[java.util.concurrent.Future[DiffGraph]]()
     val writer = new Writer(serializedCpg, prefix, inverse)
-    val writerThread = new Thread(writer)
+    val writerThread = StructuredConcurrencyContext.getThreadFactory().newThread(writer)
     writerThread.setName("Writer")
     writerThread.start()
+    val executor = StructuredConcurrencyContext.getCachedPool()
     try {
       try {
         // The idea is that we have a ringbuffer completionQueue that contains the workunits that are currently in-flight.
@@ -203,14 +205,16 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
             val next = partIter.next()
             //todo: Verify that we get FIFO scheduling; otherwise, do something about it.
             //if this e.g. used LIFO with 4 cores and 18 size of ringbuffer, then 3 cores may idle while we block on the front item.
-            completionQueue.append(Future.apply {
-              val builder = DiffGraph.newBuilder
-              runOnPart(builder, next.asInstanceOf[T])
-              builder.build()
-            })
+            completionQueue.append(executor.submit( new Callable[DiffGraph] {
+              override def call(): DiffGraph = {
+                val builder = DiffGraph.newBuilder
+                runOnPart(builder, next.asInstanceOf[T])
+                builder.build()
+              }
+            }))
           } else if (completionQueue.nonEmpty) {
             val future = completionQueue.removeHead()
-            val res = Await.result(future, Duration.Inf)
+            val res = future.get()
             nDiff += res.size
             writer.queue.put(Some(res))
           } else {
