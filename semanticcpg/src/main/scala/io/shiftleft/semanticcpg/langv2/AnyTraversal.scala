@@ -6,7 +6,7 @@ import scala.collection.IterableOnceOps
 
 trait AnyTraversalImplicits {
   implicit def toAnyTraversalIterOnceOps[I, CC[_], C](trav: IterableOnceOps[I, CC, C]) = {
-    new AnyTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterMarker[CC, C]](trav)
+    new AnyTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]](trav)
   }
   implicit def toAnyTraversalInternal[I, IT[_], Marker](trav: IT[I]) = {
     new AnyTraversal[I, IT, Marker](trav)

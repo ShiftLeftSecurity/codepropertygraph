@@ -8,15 +8,15 @@ import scala.collection.IterableOnceOps
 import scala.jdk.CollectionConverters._
 
 trait LocalTraversalImplicits {
-  implicit def toLocalTraversalSingle[I <: nodes.Local](trav: I) = {
-    new LocalTraversal[I, Single, DefaultMarker](trav: Single[I])
+  implicit def toLocalTraversalSingle[I <: nodes.Local](trav: I): LocalTraversal[I, Single, Nothing] = {
+    new LocalTraversal(trav: Single[I])
   }
-  implicit def toLocalTraversalGeneric[I <: nodes.Local, IT[_] <: Option[_]](trav: IT[I]) = {
-    new LocalTraversal[I, IT, DefaultMarker](trav)
+  implicit def toLocalTraversalGeneric[I <: nodes.Local, IT[_] <: Option[_]](trav: IT[I]): LocalTraversal[I, IT, Nothing] = {
+    new LocalTraversal(trav)
   }
   implicit def toLocalTraversalIterOnceOps[I <: nodes.Local, CC[_], C](trav: IterableOnceOps[I, CC, C])
-  : LocalTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterMarker[CC, C]] = {
-    new LocalTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterMarker[CC, C]](trav)
+  : LocalTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]] = {
+    new LocalTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]](trav)
   }
 }
 

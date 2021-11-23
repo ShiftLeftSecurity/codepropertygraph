@@ -9,14 +9,15 @@ import scala.jdk.CollectionConverters._
 
 
 trait AstNodeTraversalImplicits {
-  implicit def toAstNodeTraversalSingle[I <: AstNode](trav: I) = {
-    new AstNodeTraversal[I, Single, DefaultMarker](trav: Single[I])
+  implicit def toAstNodeTraversalSingle[I <: AstNode](trav: I): AstNodeTraversal[I, Single, Nothing] = {
+    new AstNodeTraversal(trav: Single[I])
   }
-  implicit def toAstNodeTraversalGeneric[I <: AstNode, IT[_] <: Option[_]](trav: IT[I]) = {
-    new AstNodeTraversal[I, IT, DefaultMarker](trav)
+  implicit def toAstNodeTraversalGeneric[I <: AstNode, IT[_] <: Option[_]](trav: IT[I]): AstNodeTraversal[I, IT, Nothing] = {
+    new AstNodeTraversal(trav)
   }
-  implicit def toAstNodeTraversalIterOnceOps[I <: AstNode, CC[_], C](trav: IterableOnceOps[I, CC, C]) = {
-    new AstNodeTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterMarker[CC, C]](trav)
+  implicit def toAstNodeTraversalIterOnceOps[I <: AstNode, CC[_], C](trav: IterableOnceOps[I, CC, C])
+  : AstNodeTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]] = {
+    new AstNodeTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]](trav)
   }
 
 }

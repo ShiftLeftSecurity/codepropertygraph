@@ -10,7 +10,7 @@ import scala.collection.IterableOnceOps
   * @tparam FlatMapTraversal Flat map operation output traversal type.
   *                          Abbreviated in other generics as FT.
   */
-trait TravOps[_Collection[_], Marker] {
+trait TravOps[_Collection[_], ExtraTypes] {
   type Collection[T] = _Collection[T]
   type CCOneToOne[_]
   type CCOneToOption[_]
@@ -23,7 +23,7 @@ trait TravOps[_Collection[_], Marker] {
   def oneToMany[I, O](trav: Collection[I])(f: I => Iterator[O]): CCOneToMany[O]
 }
 
-object SingleOps extends TravOps[Single, DefaultMarker] {
+object SingleOps extends TravOps[Single, Nothing] {
   override type CCOneToOne[T] = T
   override type CCOneToOption[T] = Option[T]
   override type CCOneToBoolean[T] = Option[T]
@@ -50,7 +50,7 @@ object SingleOps extends TravOps[Single, DefaultMarker] {
   }
 }
 
-object OptionOps extends TravOps[Option, DefaultMarker] {
+object OptionOps extends TravOps[Option, Nothing] {
   override type CCOneToOne[T] = Option[T]
   override type CCOneToOption[T] = Option[T]
   override type CCOneToBoolean[T] = Option[T]
@@ -78,7 +78,12 @@ object OptionOps extends TravOps[Option, DefaultMarker] {
   }
 }
 
-class IterableOnceOpsOps[CC[_], C] extends TravOps[({type X[A] = IterableOnceOps[A, CC, C]})#X, IterMarker[CC, C]] {
+class IterTypes[_CC[_], _C] {
+  type CC[T] = _CC[T]
+  type C = _C
+}
+
+class IterableOnceOpsOps[CC[_], C] extends TravOps[({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]] {
   override type CCOneToOne[T] = CC[T]
   override type CCOneToOption[T] = CC[T]
   override type CCOneToBoolean[T] = C

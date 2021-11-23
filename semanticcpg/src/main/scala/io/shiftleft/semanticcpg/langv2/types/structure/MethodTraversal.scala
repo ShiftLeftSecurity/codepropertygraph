@@ -9,14 +9,15 @@ import scala.collection.IterableOnceOps
 import scala.jdk.CollectionConverters._
 
 trait MethodTraversalImplicits {
-  implicit def toMethodTraversalSingle[I <: nodes.Method](trav: I) = {
-    new MethodTraversal[I, Single, DefaultMarker](trav: Single[I])
+  implicit def toMethodTraversalSingle[I <: nodes.Method](trav: I): MethodTraversal[I, Single, Nothing] = {
+    new MethodTraversal(trav: Single[I])
   }
-  implicit def toMethodTraversalGeneric[I <: nodes.Method, IT[_] <: Option[_]](trav: IT[I]) = {
-    new MethodTraversal[I, IT, DefaultMarker](trav)
+  implicit def toMethodTraversalGeneric[I <: nodes.Method, IT[_] <: Option[_]](trav: IT[I]): MethodTraversal[I, IT, Nothing] = {
+    new MethodTraversal(trav)
   }
-  implicit def toMethodTraversalIterOnceOps[I <: nodes.Method, CC[_], C](trav: IterableOnceOps[I, CC, C]) = {
-    new MethodTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterMarker[CC, C]](trav)
+  implicit def toMethodTraversalIterOnceOps[I <: nodes.Method, CC[_], C](trav: IterableOnceOps[I, CC, C])
+  : MethodTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]] = {
+    new MethodTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]](trav)
   }
 }
 
